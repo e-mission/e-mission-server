@@ -1,0 +1,236 @@
+import unittest
+import json
+from pymongo import MongoClient
+import re
+from get_database import get_mode_db, get_section_db, get_trip_db
+# Needed to modify the pythonpath
+import sys
+import os
+
+# print "old path is %s" % sys.path
+sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
+sys.path.append("%s" % os.getcwd())
+# print "new path is %s" % sys.path
+
+from utils import load_database_json, purge_database_json
+from moves import collect
+
+class TestMovesCollect(unittest.TestCase):
+  def setUp(self):
+    self.testUUID = "myuuidisverylongandcomplicated"
+    self.serverName = 'localhost'
+
+    # Sometimes, we may have entries left behind in the database if one of the tests failed
+    # or threw an exception, so let us start by cleaning up all entries
+    self.ModesColl = get_mode_db()
+    self.assertEquals(self.ModesColl.find().count(), 0)
+
+    dataJSON = json.load(open("tests/data/modes.json"))
+    for row in dataJSON:
+      self.ModesColl.insert(row)
+
+    # load_database_json.loadTable(self.serverName, "Test_Modes", "tests/data/modes.json")
+
+  def tearDown(self):
+    get_section_db().remove({"user_id": self.testUUID})
+    self.ModesColl.remove()
+    self.assertEquals(self.ModesColl.find().count(), 0)
+
+  def loadTestJSON(self, fileName):
+    fileHandle = open(fileName)
+    return json.load(fileHandle)
+    # dataStr = fileHandle.readline()
+    # dataStr = load_database_json.fixFormat(dataStr)
+    # dataStr = re.sub(r'ObjectId\(\'(.*)\'\)', r'"\1"', dataStr)
+    # dataJSON = json.loads(dataStr)
+    # return dataJSON
+
+  # Would be good to avoid duplicating this, change loadTestJSON to send in set
+  # of additional preprocessing steps?
+  def loadReplaceUser(self, fileName, origEmail, fakeEmail):
+    fileHandle = open(fileName)
+    dataStr = fileHandle.readline()
+    dataStr = load_database_json.fixFormat(dataStr)
+    dataStr = dataStr.replace(origEmail, fakeEmail)
+    dataJSON = json.loads(dataStr)
+    return dataJSON
+
+  # This is a trip from Thomas Raffill, where we missed the section where he
+  # cycled to Barracuda Asked and recieved consent to check this trip into the
+  # repository, identified by the tamtom2000@gmail.com email account on
+  # Tuesday, Apr 8th, at 7:40am
+  def testMissingSections(self):
+    result = self.loadReplaceUser("tests/data/tom_missing_trip", "tamtom2000@gmail.com", self.testUUID)
+    collect.processResult(self.testUUID, result)
+
+    SectionColl = get_section_db()
+    storedSections = SectionColl.find({'user_id': self.testUUID})
+    self.assertEquals(storedSections.count(), 21)
+    
+    tripToWorkSections = SectionColl.find({'$and' : [{'user_id': self.testUUID,
+                                                      'trip_id': '20140407T085210-0700'}]})
+    self.assertEquals(tripToWorkSections.count(), 5)
+    
+     
+  def testDoubleLoad(self):
+    result = self.loadReplaceUser("tests/data/tom_missing_trip", "tamtom2000@gmail.com", self.testUUID)
+    collect.processResult(self.testUUID, result)
+    collect.processResult(self.testUUID, result)
+
+    SectionColl = get_section_db()
+    storedSections = SectionColl.find({'user_id': self.testUUID})
+    self.assertEquals(storedSections.count(), 21)
+
+    tripToWorkSections = SectionColl.find({'$and' : [{'user_id': self.testUUID,
+                                                      'trip_id': '20140407T085210-0700'}]})
+    self.assertEquals(tripToWorkSections.count(), 5)
+
+  def testPartialLoadUpdate(self):
+    resultAll = self.loadReplaceUser("tests/data/tom_missing_trip", "tamtom2000@gmail.com", self.testUUID)
+    resultSubset = self.loadReplaceUser("tests/data/tom_missing_trip_subset", "tamtom2000@gmail.com", self.testUUID)
+    collect.processResult(self.testUUID, resultSubset)
+
+    SectionColl = get_section_db()
+    tripToWorkSections = SectionColl.find({'$and' : [{'user_id': self.testUUID,
+                                                      'trip_id': '20140407T085210-0700'}]})
+    self.assertEquals(tripToWorkSections.count(), 3)
+
+    collect.processResult(self.testUUID, resultAll)
+    tripToWorkSections = SectionColl.find({'$and' : [{'user_id': self.testUUID,
+                                                      'trip_id': '20140407T085210-0700'}]})
+    self.assertEquals(tripToWorkSections.count(), 5)
+
+  def testBlankToday(self):
+    result = self.loadTestJSON("tests/data/tamtom2000_blank_today")
+    collect.processResult(self.testUUID, [result[0]])
+    collect.processResult(self.testUUID, [result[1]])
+    
+    SectionColl = get_section_db()
+    self.assertTrue(SectionColl.find({'user_id': self.testUUID}).count() > 0)
+
+  def testWeirdLoadWithNoSections(self):
+    result = self.loadTestJSON("tests/data/shankari_blank_today")
+    collect.processResult(self.testUUID, result)
+
+  def testYesterdayForJustSignedUp(self):
+    result = self.loadTestJSON("tests/data/yesterday_for_justsignedup")
+    collect.processResult(self.testUUID, result)
+
+    SectionColl = get_section_db()
+    self.assertEquals(SectionColl.find({"user_id": self.testUUID}).count(), 0)
+
+  def testUpdateSectionForExistingTrip(self):
+    result = self.loadReplaceUser("tests/data/tom_missing_trip", "tamtom2000@gmail.com", self.testUUID)
+    collect.processResult(self.testUUID, result)
+
+    SectionColl = get_section_db()
+    storedSections = SectionColl.find({'user_id': self.testUUID})
+    self.assertEquals(storedSections.count(), 21)
+    # Trip 20140407T175709-0700 has two sections
+    storedTripSections = SectionColl.find({'$and': [{'user_id': self.testUUID},
+                                                    {'trip_id': '20140407T175709-0700'}]})
+    self.assertEquals(storedTripSections.count(), 2)
+
+    TripColl = get_trip_db()
+    storedTrips = TripColl.find({'$and': [{'user_id': self.testUUID},
+                                                    {'trip_id': '20140407T175709-0700'}]})
+    self.assertEquals(storedTrips.count(), 1)
+    for trip in storedTrips:
+      self.assertEquals(len(trip['sections']), 2)
+
+    selTripFromMoves = None
+    for i, seg in enumerate(result[0]['segments']):
+      if seg['startTime'] == '20140407T175709-0700':
+        selTripFromMoves = seg
+
+    copiedTripSections = []
+    for i, act in enumerate(selTripFromMoves['activities']):
+      act['startTime'] = '20140407T18%s039-0700' % (i + 2)
+      print act['startTime']
+      copiedTripSections.append(act)
+
+    self.assertEquals(len(copiedTripSections), 2)
+    [selTripFromMoves['activities'].append(act) for act in copiedTripSections]
+    self.assertEquals(len(selTripFromMoves['activities']), 4)
+
+    collect.processResult(self.testUUID, result)
+
+    storedTripSections = SectionColl.find({'$and': [{'user_id': self.testUUID},
+                                                    {'trip_id': '20140407T175709-0700'}]})
+    self.assertEquals(storedTripSections.count(), 4)
+
+    storedTrips = TripColl.find({'$and': [{'user_id': self.testUUID},
+                                                    {'trip_id': '20140407T175709-0700'}]})
+    self.assertEquals(storedTrips.count(), 1)
+
+    # This is actually a bug in the existing code. Need to fix it.
+    for trip in storedTrips:
+      self.assertEquals(len(trip['sections']), 2)
+
+  def testFillSectionWithValidData(self):
+    testMovesSec = {}
+    testMovesSec['manual'] = True
+    testMovesSec['startTime'] = "20140407T183039-0700"
+    testMovesSec['endTime'] = "20140407T191539-0700"
+    testMovesSec['duration'] = 45
+    testMovesSec['distance'] = 10
+    testMovesSec['trackPoints'] = [{u'lat': 37, u'lon': -122, u'time': u'20140407T083200-0700'},
+                                   {u'lat': 38, u'lon': -123, u'time': u'20140407T083220-0700'}]
+
+    newSec = {} 
+    collect.fillSectionWithMovesData(testMovesSec, newSec)
+
+    self.assertEquals(newSec['manual'], True)
+    self.assertEquals(newSec['section_start_time'], "20140407T183039-0700")
+    self.assertEquals(newSec['section_end_time'], "20140407T191539-0700")
+    self.assertEquals(newSec['section_start_datetime'].month, 04)
+    self.assertEquals(newSec['section_end_datetime'].hour, 19)
+    self.assertEquals(newSec['duration'], 45)
+    self.assertEquals(newSec['distance'], 10)
+
+    self.assertEquals(len(newSec['track_points']), 2)
+    self.assertEquals(newSec['section_start_point']['coordinates'], [-122, 37])
+    self.assertEquals(newSec['section_end_point']['coordinates'], [-123, 38])
+
+  def testFillSectionWithInvalidData(self):
+    testMovesSec = {}
+    newSec = {} 
+    collect.fillSectionWithMovesData(testMovesSec, newSec)
+
+    self.assertEquals(newSec['manual'], None)
+
+    # SHANKARI Unsure why this is '' instead of None. Will check with Mogeng on
+    # it and then try to nomalize them
+    self.assertEquals(newSec['section_start_time'], '')
+    self.assertEquals(newSec['section_end_time'], '')
+    # self.assertEquals(newSec['section_start_datetime'], )
+    # self.assertEquals(newSec['section_end_datetime'], )
+    self.assertEquals(newSec['duration'], None)
+    self.assertEquals(newSec['distance'], None)
+
+    self.assertEquals(len(newSec['track_points']), 0)
+    self.assertEquals(newSec['section_start_point'], None)
+    self.assertEquals(newSec['section_end_point'], None)
+
+  def testFillTripWithValidData(self):
+    testMovesSec = {}
+    testMovesSec['type'] = 'move'
+    testMovesSec['startTime'] = "20140407T183039-0700"
+    testMovesSec['endTime'] = "20140407T191539-0700"
+    testMovesSec['place'] = {}
+    testMovesSec['place']['id'] = 10
+    testMovesSec['place']['type'] = 'home'
+    testMovesSec['place']['location'] = {u'lat': 37, u'lon': -122, u'time': u'20140407T083200-0700'}
+
+    newSec = {} 
+    collect.fillTripWithMovesData(testMovesSec, newSec)
+
+    self.assertEquals(newSec['type'], 'move')
+    self.assertEquals(newSec['trip_start_time'], "20140407T183039-0700")
+    self.assertEquals(newSec['trip_end_time'], "20140407T191539-0700")
+    self.assertEquals(newSec['trip_start_datetime'].month, 04)
+    self.assertEquals(newSec['trip_end_datetime'].hour, 19)
+    self.assertEquals(newSec['place']['place_location']['coordinates'][0], -122)
+
+if __name__ == '__main__':
+    unittest.main()

@@ -1,0 +1,302 @@
+from pymongo import MongoClient
+import logging
+
+import sys
+import os
+
+# On the server, we've installed miniconda for now, so we are just going to add
+# it to the python path
+sys.path.append("/home/ubuntu/miniconda/lib/python2.7/site-packages/")
+sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
+sys.path.append("%s" % os.getcwd())
+
+import numpy as np
+import scipy as sp
+from featurecalc import calDistance, calSpeed, calHeading, calAvgSpeed, calSpeeds, calAccels, getIthMaxSpeed, getIthMaxAccel, calHCR,\
+calSR, calVCR, mode_cluster, mode_start_end_coverage
+
+# We are not going to use the feature matrix for analysis unless we have at
+# least 50 points in the training set. 50 is arbitrary. We could also consider
+# combining the old and new training data, but this is really a bootstrapping
+# problem, so we don't need to solve it right now.
+minTrainingSetSize = 1000
+
+class ModeInferencePipeline:
+  def __init__(self):
+    self.featureLabels = ["distance", "duration", "first filter mode", "sectionId", "avg speed",
+                          "speed EV", "speed variance", "max speed", "max accel", "isCommute",
+                          "heading change rate", "stop rate", "velocity change rate",
+                          "start lat", "start lng", "stop lat", "stop lng",
+                          "start hour", "end hour", "close to bus stop", "close to train stop"]
+    self.Sections = MongoClient('localhost').Stage_database.Stage_Sections
+
+  def runPipeline(self):
+    allConfirmedTripsQuery = {"$and": [{'type': 'move'}, {'confirmed_mode': {'$ne': ''}}]}
+    (self.modeList, self.confirmedSections) = self.loadTrainingDataStep(allConfirmedTripsQuery)
+    if (self.confirmedSections.count() < minTrainingSetSize):
+      logging.info("initial loadTrainingDataStep DONE")
+      logging.debug("current training set too small, reloading from backup!")
+      backupSections = MongoClient('localhost').Backup_database.Stage_Sections
+      (self.modeList, self.confirmedSections) = self.loadTrainingDataStep(allConfirmedTripsQuery, backupSections)
+    logging.info("loadTrainingDataStep DONE")
+    (self.bus_cluster, self.train_cluster) = self.generateBusAndTrainStopStep() 
+    logging.info("generateBusAndTrainStopStep DONE")
+    (self.featureMatrix, self.resultVector) = self.generateFeatureMatrixAndResultVectorStep()
+    logging.info("generateFeatureMatrixAndResultVectorStep DONE")
+    (self.cleanedFeatureMatrix, self.cleanedResultVector) = self.cleanDataStep()
+    logging.info("cleanDataStep DONE")
+    self.selFeatureIndices = self.selectFeatureIndicesStep()
+    logging.info("selectFeatureIndicesStep DONE")
+    self.selFeatureMatrix = self.cleanedFeatureMatrix[:,self.selFeatureIndices]
+    self.model = self.buildModelStep()
+    logging.info("buildModelStep DONE")
+    toPredictTripsQuery = {"$and": [{'type': 'move'}, {'confirmed_mode': ''},
+      {'predicted_mode': None}]}
+    (self.toPredictFeatureMatrix, self.sectionIds, self.sectionUserIds) = self.generateFeatureMatrixAndIDsStep(toPredictTripsQuery)
+    logging.info("generateFeatureMatrixAndIDsStep DONE")
+    self.predictedProb = self.predictModesStep()
+    logging.info("predictModesStep DONE")
+    self.savePredictionsStep()
+    logging.info("savePredictionsStep DONE")
+
+  # TODO: Refactor into generic steps and results
+  def loadTrainingDataStep(self, sectionQuery, sectionDb = None):
+    if (sectionDb == None):
+      sectionDb = self.Sections
+    logging.debug("Section data set size = %s" % sectionDb.find({'type': 'move'}).count())
+    confirmedSections = sectionDb.find(sectionQuery)
+    modeList = []
+    for mode in MongoClient('localhost').Stage_database.Stage_Modes.find():
+        modeList.append(mode)
+        logging.debug(mode)
+    logging.debug("Training set total size = %s" %
+      sectionDb.find({"$and": [{'type': 'move'}, {'confirmed_mode': {'$ne': ''}}]}).count())
+    for mode in modeList:
+      logging.debug("%s: %s" % (mode['mode_name'],
+        sectionDb.find({"$and": [{'type': 'move'}, {'confirmed_mode': mode['mode_id']}]}).count()))
+    return (modeList, confirmedSections)
+
+  # TODO: Should mode_cluster be in featurecalc or here?
+  def generateBusAndTrainStopStep(self):
+    bus_cluster=mode_cluster(5,105,1)
+    train_cluster=mode_cluster(6,600,1)
+    return (bus_cluster, train_cluster)
+
+# Feature matrix construction
+  def generateFeatureMatrixAndResultVectorStep(self):
+      featureMatrix = np.zeros([self.confirmedSections.count(), len(self.featureLabels)])
+      resultVector = np.zeros(self.confirmedSections.count())
+      # There are a couple of additions to the standard confirmedSections cursor here.
+      # First, we read it in batches of 300 in order to avoid the 10 minute timeout
+      # Our logging shows that we can process roughly 500 entries in 10 minutes
+
+      # Second, it looks like the cursor requeries while iterating. So when we
+      # first check, we get count of x, but if new entries were read (or in
+      # this case, classified) while we are iterating over the cursor, we may
+      # end up processing > x entries.
+
+      # This will crash the script because we will try to access a record that
+      # doesn't exist.
+
+      # So we limit the records to the size of the matrix that we have created
+      for (i, section) in enumerate(self.confirmedSections.limit(featureMatrix.shape[0]).batch_size(300)):
+        self.updateFeatureMatrixRowWithSection(featureMatrix, i, section)
+        resultVector[i] = section['confirmed_mode']
+        if i % 100 == 0:
+            logging.debug("Processing record %s " % i)
+      return (featureMatrix, resultVector)
+
+# Features are:
+# 0. distance
+# 1. duration
+# 2. first filter mode
+# 3. sectionId
+# 4. avg speed
+# 5. speed EV
+# 6. speed variance
+# 7. max speed
+# 8. max accel
+# 9. isCommute
+# 10. heading change rate (currently unfilled)
+# 11. stop rate (currently unfilled)
+# 12. velocity change rate (currently unfilled)
+# 13. start lat
+# 14. start lng
+# 15. stop lat
+# 16. stop lng
+# 17. start hour
+# 18. end hour
+# 19. both start and end close to bus stop
+# 20. both start and end close to train station
+  def updateFeatureMatrixRowWithSection(self, featureMatrix, i, section):
+    featureMatrix[i, 0] = section['distance']
+    featureMatrix[i, 1] = (section['section_end_datetime'] - section['section_start_datetime']).total_seconds()
+
+    # Deal with unknown modes like "airplane"
+    try:
+      featureMatrix[i, 2] = section['mode']
+    except ValueError:
+      featureMatrix[i, 2] = 0
+
+    featureMatrix[i, 3] = section['section_id']
+    featureMatrix[i, 4] = calAvgSpeed(section)
+    speeds = calSpeeds(section)
+    if speeds != None:
+        featureMatrix[i, 5] = np.mean(speeds)
+        featureMatrix[i, 6] = np.std(speeds)
+        featureMatrix[i, 7] = np.max(speeds)
+    else:
+        # They will remain zero
+        pass
+    accels = calAccels(section)
+    if accels != None and len(accels) > 0:
+        featureMatrix[i, 8] = np.max(accels)
+    else:
+        # They will remain zero
+        pass
+    featureMatrix[i, 9] = ('commute' in section) and (section['commute'] == 'to' or section['commute'] == 'from')
+    featureMatrix[i, 10] = calHCR(section)
+    featureMatrix[i, 11] = calSR(section)
+    featureMatrix[i, 12] = calVCR(section)
+    if 'section_start_point' in section and section['section_start_point'] != None:
+        startCoords = section['section_start_point']['coordinates']
+        featureMatrix[i, 13] = startCoords[0]
+        featureMatrix[i, 14] = startCoords[1]
+    
+    if 'section_end_point' in section and section['section_end_point'] != None:
+        endCoords = section['section_end_point']['coordinates']
+        featureMatrix[i, 15] = endCoords[0]
+        featureMatrix[i, 16] = endCoords[1]
+    
+    featureMatrix[i, 17] = section['section_start_datetime'].time().hour
+    featureMatrix[i, 18] = section['section_end_datetime'].time().hour
+    
+    featureMatrix[i, 19] = mode_start_end_coverage(section, self.bus_cluster,105)
+    featureMatrix[i, 20] = mode_start_end_coverage(section, self.train_cluster,600)
+
+  def cleanDataStep(self):
+    runIndices = self.resultVector == 2
+    transportIndices = self.resultVector == 4
+    mixedIndices = self.resultVector == 8
+    airIndices = self.resultVector == 9
+    unknownIndices = self.resultVector == 0
+    strippedIndices = np.logical_not(runIndices | transportIndices | mixedIndices | airIndices | unknownIndices)
+    logging.debug("Stripped trips with mode: run %s, transport %s, mixed %s, air %s, unknown %s unstripped %s" %
+      (np.count_nonzero(runIndices), np.count_nonzero(transportIndices),
+      np.count_nonzero(mixedIndices), np.count_nonzero(airIndices),
+      np.count_nonzero(unknownIndices), np.count_nonzero(strippedIndices)))
+
+    strippedFeatureMatrix = self.featureMatrix[strippedIndices]
+    strippedResultVector = self.resultVector[strippedIndices]
+
+    # In spite of stripping out the values, we see that there are clear
+    # outliers. This is almost certainly a mis-classified trip, because the
+    # distance and speed are both really large, but the mode is walking. Let's
+    # manually filter out this outlier.
+
+    distanceOutliers = strippedFeatureMatrix[:,0] > 500000
+    speedOutliers = strippedFeatureMatrix[:,4] > 100
+    speedMeanOutliers = strippedFeatureMatrix[:,5] > 80
+    speedVarianceOutliers = strippedFeatureMatrix[:,6] > 70
+    maxSpeedOutliers = strippedFeatureMatrix[:,7] > 160
+    logging.debug("Stripping out distanceOutliers %s, speedOutliers %s, speedMeanOutliers %s, speedVarianceOutliers %s, maxSpeedOutliers %s" % 
+            (np.nonzero(distanceOutliers), np.nonzero(speedOutliers),
+            np.nonzero(speedMeanOutliers), np.nonzero(speedVarianceOutliers),
+            np.nonzero(maxSpeedOutliers)))
+    nonOutlierIndices = np.logical_not(distanceOutliers | speedOutliers | speedMeanOutliers | speedVarianceOutliers | maxSpeedOutliers)
+    logging.debug("nonOutlierIndices.shape = %s" % nonOutlierIndices.shape)
+
+    return (strippedFeatureMatrix[nonOutlierIndices],
+            strippedResultVector[nonOutlierIndices])
+
+# Feature Indices
+  def selectFeatureIndicesStep(self):
+    genericFeatureIndices = list(xrange(0,10))
+    AdvancedFeatureIndices = list(xrange(10,13))
+    LocationFeatureIndices = list(xrange(13,17))
+    TimeFeatureIndices = list(xrange(17,19))
+    BusTrainFeatureIndices = list(xrange(19,21))
+    logging.debug("generic features = %s" % genericFeatureIndices)
+    logging.debug("advanced features = %s" % AdvancedFeatureIndices)
+    logging.debug("location features = %s" % LocationFeatureIndices)
+    logging.debug("time features = %s" % TimeFeatureIndices)
+    logging.debug("bus train features = %s" % BusTrainFeatureIndices)
+    return genericFeatureIndices + BusTrainFeatureIndices
+
+  def buildModelStep(self):
+    from sklearn import ensemble
+    forestClf = ensemble.RandomForestClassifier()
+    model = forestClf.fit(self.selFeatureMatrix, self.cleanedResultVector)
+    return model
+
+  def generateFeatureMatrixAndIDsStep(self, sectionQuery):
+    toPredictSections = self.Sections.find(sectionQuery)
+    logging.debug("Predicting values for %d sections" % toPredictSections.count())
+    featureMatrix = np.zeros([toPredictSections.count(), len(self.featureLabels)])
+    sectionIds = []
+    sectionUserIds = []
+    for (i, section) in enumerate(toPredictSections.limit(featureMatrix.shape[0]).batch_size(300)):
+      if i % 50 == 0:
+        logging.debug("Processing test record %s " % i)
+      self.updateFeatureMatrixRowWithSection(featureMatrix, i, section)
+      sectionIds.append(section['_id'])
+      sectionUserIds.append(section['user_id'])
+    return (featureMatrix[:,self.selFeatureIndices], sectionIds, sectionUserIds)
+
+  def predictModesStep(self):
+    return self.model.predict_proba(self.toPredictFeatureMatrix)
+
+  # The current probability will only have results for values from the set of
+  # unique values in the resultVector. This means that the location of the
+  # highest probability is not a 1:1 mapping to the mode, which will probably
+  # have issues down the road. We are going to fix this here by storing the
+  # non-zero probabilities in a map instead of in a list. We used to have an
+  # list here, but we move to a map instead because we plan to support lots of
+  # different modes, and having an giant array consisting primarily of zeros
+  # doesn't sound like a great option.
+  # In other words, uniqueModes = [1, 5]
+  # predictedProb = [[1,0], [0,1]]
+  # allModes has length 8
+  # returns [{'walking': 1}, {'bus': 1}]
+  def convertPredictedProbToMap(self, allModeList, uniqueModes, predictedProbArr):
+      currProbMap = {}
+      uniqueModesInt = [int(um) for um in uniqueModes]
+      logging.debug("predictedProbArr has %s non-zero elements" % np.count_nonzero(predictedProbArr))
+      logging.debug("uniqueModes are %s " % uniqueModesInt)
+      for (j, uniqueMode) in enumerate(uniqueModesInt):
+        if predictedProbArr[j] != 0:
+          # Modes start from 1, but allModeList indices start from 0
+          # so walking (mode id 1) -> modeList[0]
+          modeName = allModeList[uniqueMode-1]['mode_name']
+          logging.debug("Setting probability of mode %s (%s) to %s" %
+            (uniqueMode, modeName, predictedProbArr[j]))
+          currProbMap[modeName] = predictedProbArr[j]
+      return currProbMap
+
+  def savePredictionsStep(self):
+    from dao.user import User
+    from dao.client import Client
+
+    uniqueModes = sorted(set(self.cleanedResultVector))
+
+    for i in range(self.predictedProb.shape[0]):
+      currSectionId = self.sectionIds[i]
+      currProb = self.convertPredictedProbToMap(self.modeList, uniqueModes, self.predictedProb[i])
+
+      logging.debug("Updating probability for section with id = %s" % currSectionId)
+      self.Sections.update({'_id': currSectionId}, {"$set": {"predicted_mode": currProb}})
+
+      currUser = User.fromUUID(self.sectionUserIds[i])
+      clientSpecificUpdate = Client(currUser.getFirstStudy()).clientSpecificSetters(currUser.uuid, currSectionId, currProb)
+      if clientSpecificUpdate != None:
+        self.Sections.update({'_id': currSectionId}, clientSpecificUpdate)
+
+if __name__ == "__main__":
+  import json
+
+  config_data = json.load(open('config.json'))
+  log_base_dir = config_data['paths']['log_base_dir']
+  logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
+                      filename="%s/pipeline.log" % log_base_dir, level=logging.DEBUG)
+  modeInferPipeline = ModeInferencePipeline()
+  modeInferPipeline.runPipeline()

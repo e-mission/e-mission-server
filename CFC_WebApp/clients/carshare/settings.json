@@ -1,0 +1,9 @@
+{
+  "name": "carshare",
+  "start_date": "2014/10/11",
+  "end_date": "2015/06/25",
+  "key": "this_is_the_super_secret_id",
+  "client_settings": {
+    "result_url": "https://e-mission.eecs.berkeley.edu/client/carshare/classifiedCount"
+  }
+}

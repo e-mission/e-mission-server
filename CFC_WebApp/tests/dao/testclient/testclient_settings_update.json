@@ -1,0 +1,8 @@
+{
+  "name": "testclient",
+  "start_date": "2015/01/13",
+  "end_date": "2015/04/25",
+  "client_settings": {
+    "result_url": "https://e-mission.eecs.berkeley.edu"
+  }
+}

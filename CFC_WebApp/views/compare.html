@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+  <head>
+    <title>E-Mission</title>
+    <link href="front/nv.d3.css" rel="stylesheet" type="text/css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.2/d3.js" charset="utf-8"></script>
+    <script src="front/nv.d3.min.js" charset="utf-8"></script>
+    <script src="front/nv.d3.utils.js"></script>
+    <script src="front/nv.d3.models.pieChart.js"></script>
+    <script src="front/bullet.js"></script>
+    <script src="front/cfc.display.js"></script>
+    <script src="front/cfc.compare.js"></script>
+  </head>
+  <body onload="cfc.compare.displayCompare();">
+    <center>
+      <form>
+      <select id="myList" onchange="cfc.compare.displayCompare()">
+        <option>My Summary</option>
+        <option>Compare mode share counts</option>  
+        <option>Compare mode share distances</option>  
+        <option>Compare mode carbon footprint</option>
+      </select>
+      </form>
+      <h3 id="message"></h3><small id="carbon_info"><a href="front/carbon_calc_details.html">Calculation Details</a></small>
+      <div id="chart" class="mypiechart"></div>
+    </center>
+    <script>
+      var myModeShareCount = {{myModeShareCount}}
+      var avgModeShareCount = {{avgModeShareCount}}
+
+      var myModeShareDistance = {{myModeShareDistance}}
+      var avgModeShareDistance = {{avgModeShareDistance}}
+
+      var myModeCarbonFootprint = {{myModeCarbonFootprint}}
+      var avgModeCarbonFootprint = {{avgModeCarbonFootprint}}
+
+      var myOptimalCarbonFootprint = {{myOptimalCarbonFootprint}}
+      var avgOptimalCarbonFootprint = {{avgOptimalCarbonFootprint}}
+    </script>
+  </body>
+</html>

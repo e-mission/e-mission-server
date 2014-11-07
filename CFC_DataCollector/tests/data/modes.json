@@ -1,0 +1,9 @@
+[{"mode_id": 1, "_id": "5331d090f105591994cc2366", "mode_name": "walking"},
+ {"mode_id": 2, "_id": "5331d090f105591994cc2367", "mode_name": "running"},
+ {"mode_id": 3, "_id": "5331d090f105591994cc2368", "mode_name": "cycling"},
+ {"mode_id": 4, "_id": "5331d090f105591994cc2369", "mode_name": "transport"},
+ {"mode_id": 5, "_id": "5331d090f105591994cc236a", "mode_name": "bus"},
+ {"mode_id": 6, "_id": "5331d090f105591994cc236b", "mode_name": "train"},
+ {"mode_id": 7, "_id": "5331d090f105591994cc236c", "mode_name": "car"},
+ {"mode_id": 8, "_id": "5331d090f105591994cc236d", "mode_name": "mixed"},
+ {"mode_id": 9, "_id": "5331d090f105591994cc236e", "mode_name": "air"}]
