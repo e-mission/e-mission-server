@@ -1,0 +1,153 @@
+<html>
+<head>
+<style>
+table
+{
+border-collapse:collapse;
+}
+table, td, th
+{
+border:1px solid black;
+}
+th
+{
+background-color:gray;
+color:white;
+}
+</style>
+</head>
+<body>
+<h2>Details of how we compute the carbon footprint</h2>
+Computing the carbon footprint of transportation is tricky to do in sufficient
+detail. At a high level, the computation involves two components.
+<ol>
+<li> The distance travelled</li>
+<li> The energy consumed per unit distance</li>
+</ol>
+As part of this project, we are greatly improving the accuracy of the first
+piece. However, for the second piece, we just use the averages for each
+transportation mode from published data. This means that both individual
+changes such as switching to more fuel efficient cars, and larger changes such
+as the electrification of Caltrain, will not affect the calculation.
+<p>
+In the future, we will allow users to specify their vehicle, and also use the
+fleet-wide carbon emission metrics for transit agencies, which should make this
+calculation a lot more accurate. This should not be too challenging technically.
+<p>
+For maximum accuracy, we will have to take into account the driving patterns of
+individual drivers. We will have to experiment with the data that we collect as
+part of this study, and see if it is possible to infer these patterns from the
+data that we collect.
+<p>
+In addition, we provide three comparison metrics to frame this number in a larger context.
+<ol>
+<li> SB 375 mandates per capita CO<sub><small>2</small></sub> transportation emission
+reduction targets for 2020 and 2035. We show the 2035 target.
+<li> EO S-3-05 mandates that carbon emissions be reduced to 80% of 1990 levels
+by 2050. This does not mandate the share of the reduction from the
+transportation sector. We show a target assuming a proportional reduction, so
+that transportation emissions are also 80% below 1990 levels by 2050.
+<li> Finally, we show the potential carbon footprint achievable if a user
+changed their commute pattern so that all short trips (&lt; 3 miles) were through
+non-motorized transport and all long trips (&gt; 3 miles) were through the most
+efficient motorized transport (train for &lt; 600 miles, air for &gt; 600
+miles). This provides users a concrete and achieveable goal that they can work
+towards.
+</ol>
+<h3>GHG emission table</h3>
+Data on motorized transport is from <a
+href="http://www.its.berkeley.edu/publications/UCB/2008/VWP/UCB-ITS-VWP-2008-2.pdf">"Environmental
+Life-cycle Assessment of Passenger Transportation : A Detailed Methodology for
+Energy, Greenhouse Gas, and Criteria Pollutant Inventories of Automobiles,
+Buses, Light Rail, Heavy Rail and Air", Mikhail Chester and Arpad Horvath, UC
+Berkeley Center for Future Urban Transport, UCB-ITS-VWP-2008-2</a>.
+<p>
+We use the Greenhouse Gas Emissions (GHG, measured in g
+CO<sub><small>2</small></sub>e) per Passenger Mile Travelled (PMT) and convert
+it to Passenger Kilometers Travelled (PKmT) as our contribution towards moving
+the US to a metric system.
+<table>
+<tr><th>Mode</th><th>GHG per PMT</th><th>GHG per PKmT</th><th>Notes</th></tr>
+<tr><td>walking</td><td>0</td><td>0</td>
+<td>We assume that people don't exhale more or eat more because they walk</td></tr>
+<!-- <tr><td>scoot/rollerblade</td><td>0</td>
+<td>Similar to above</td></tr> -->
+<tr><td>cycling</td><td>0</td><td>0</td>
+<td>Since we are looking at ongoing behaviour, we ignore one-time manufacturing costs</td></tr>
+<tr><td>bus</td><td>267</td><td>165.94157</td>
+<td>Average of peak (59) and non-peak (475)</td></tr>
+<tr><td>train</td><td>92</td><td>57.1717</td>
+<td>Average of BART(84), Caltrain(74), Muni(90) and Green Line(120). CAHSR dropped since it does not exist.</td></tr>
+<tr><td>car</td><td>278</td><td>172.77812</td>
+<td>Average of sedan (232), SUV (275) and Pickup (327) </td></tr>
+<tr><td>air</td><td>217</td><td>134.86</td>
+<td>Average of small (230), medium (170) and large (250) aircraft </td></tr>
+<!-- <tr><td>carpool</td><td>139</td>
+<td>car/2</td></tr> -->
+</table>
+<h3>Comparison data</h3>
+<h4>SB 375 data</h4>
+The <a href="http://arb.ca.gov/cc/sb375/mpo.co2.reduction.calc.pdf">California
+Air Resources Board (CARB) has estimated transportation related GHG emissions
+for the implementation of SB 375</a>. The corresponding numbers for the Bay
+Area are reproduced here for convenience. Note that their values are computed
+in lbs/weekday, so we convert them to kg/week by using a factor of 0.453592 * 5
+= 2.267960.
+<table>
+<tr><th>Field</th><th>lbs/weekday</th><th>kg/week</th></tr>
+<tr><td>Baseline (2005)</td><td>20.8</td><td>47.173568</td></tr>
+<tr><td>SB 375 target for 2020</td><td>19.3</td><td>43.771628</td></tr>
+<tr><td>SB 375 target for 2035</td><td>17.7</td><td>40.142892</td></tr>
+</table>
+
+<h4>EO S-3-05 goal</h4>
+The <a
+href="http://www.arb.ca.gov/cc/inventory/pubs/reports/staff_report_1990_level.pdf">CARB
+estimated the 1990 baseline for all emissions as 427 Million </a> Metrics Tons
+of CO<sub><small>2</small></sub> emitted (MMTCO2e). The transportation
+component of that was 38%, or 182.4 MMTCO2e. The passenger vehicle (cars and
+light-duty truck) component is 70% of that, at 108.5 MMTCO2e.
+<p>
+We can use that to estimate total transportation emissions in 2020 and 2050
+assuming that all sectors had to cut their emissions proportionally. Note that
+the proportional cuts, while reasonable, are NOT mandated in the executive
+order.
+<p>
+The 1990 population estimate is from the
+<a href="https://www.census.gov/prod/2001pubs/c2kbr01-2.pdf">US census bureau</a>.
+The 2020 and 2050 projections are from the
+<a href="http://www.dof.ca.gov/research/demographic/reports/projections/p-1/documents/Projections_Press_Release_2010-2060.pdf">California Department of Finance</a>.
+<p>
+The per capita calculation is per the formula
+<code><pre>
+per capita kg CO2e/wk = (1,000,000 * 1000 * MMTCO2e) / (population * 52)
+</pre></code>
+<table>
+<tr><th>Field</th><th>Yearly MMTCO2e (cars/trucks)</th><th>Population</th><th>Per Capita kgCO2e/wk</th></tr>
+<tr><td>Baseline (1990)</td><td> 108.5 </td><td> 29,760,021 </td><td>70.11213</td></tr>
+<tr><td>2020</td><td> 108.5 </td><td>40,643,643</td><td> 51.33738 </td></tr>
+<tr><td>2050</td><td> 21.70 </td><td>50,365,074</td><td> 8.28565 </td></tr>
+</table>
+
+<h4>Optimal E-Mission</h4>
+In order to calculate the optimal E-Mission for a particular user, we
+classified all motorized trips into short (&lt; 3 miles/5km) and long (&gt; 3
+miles/5km).
+<ol>
+<li> We did this for both transit and private auto trips because the average
+carbon footprint of a bus, when both peak and off-peak hours are included
+(267), does not appear to be much lower than that an average private auto (278).
+<li> We chose 3 miles (5 km) as the boundary between short and long trips,
+because we believe that it is a reasonable distance to bicycle. In addition,
+two 3 mile trips at a 12 mph pace will provide the user with their recommended
+30 mins of exercise a day.
+<li> The boundary is different for air travel because people don't use planes
+for 5km trips. Instead, we assume that short trips that are roughly the distance
+between San Francisco and Los Angeles (~ 600km). <a
+href="http://en.wikipedia.org/wiki/Acela_Express">Wikipedia claims</a> that the
+Acela has captured 75% of air/train riders between Washington D.C. and New York
+City (~ 400km) and 54% of riders between Washington D.C. and Boston (~ 700km),
+so this seems like a reasonable choice.
+</ol>
+</body>
+</html>
