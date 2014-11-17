@@ -134,10 +134,10 @@ class ModeInferencePipeline:
   def getGroundTruthMode(self, section):
       # logging.debug("getting ground truth for section %s" % section)
       if 'corrected_mode' in section:
-          logging.debug("Returning corrected mode %s" % section['corrected_mode'])
+          # logging.debug("Returning corrected mode %s" % section['corrected_mode'])
           return section['corrected_mode']
       else:
-          logging.debug("Returning confirmed mode %s" % section['confirmed_mode'])
+          # logging.debug("Returning confirmed mode %s" % section['confirmed_mode'])
           return section['confirmed_mode']
 
 # Features are:
