@@ -72,7 +72,7 @@ class TestPipeline(unittest.TestCase):
     self.assertEquals(self.ModesColl.find().count(), 0)
 
   def testLoadTrainingData(self):
-    allConfirmedTripsQuery = {"$and": [{'type': 'move'}, {'confirmed_mode': {'$ne': ''}}]}
+    allConfirmedTripsQuery = pipeline.ModeInferencePipeline.getSectionQueryWithGroundTruth({'$ne': ''})
     (self.pipeline.modeList, self.pipeline.confirmedSections) = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery)
     self.assertEquals(self.pipeline.confirmedSections.count(), len(self.testUsers) * 2)
 
