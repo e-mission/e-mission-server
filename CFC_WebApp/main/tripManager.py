@@ -4,6 +4,7 @@ import math
 import json
 from get_database import get_mode_db, get_section_db
 from datetime import datetime, timedelta
+from userclient import getClientSpecificQueryFilter
 
 def travel_time(time1,time2):
     start_time=parser.parse(time1)
@@ -125,20 +126,6 @@ def queryUnclassifiedSections(uuid):
     logging.debug('Unsec.count = %s' % unclassifiedSections.count())
     logging.debug('Total Unsec.count = %s' % totalUnclassifiedSections.count())
     return unclassifiedSections
-
-def getClientSpecificQueryFilter(uuid):
-    from dao.user import User
-    from dao.client import Client
-
-    studyList = User.fromUUID(uuid).getStudy()
-    if len(studyList) > 0:
-      assert(len(studyList) == 1)
-      study = studyList[0]
-      client = Client(study)
-      return client.getSectionFilter(uuid)
-    else:
-      # User is not part of any study, so no additional filtering is needed
-      return []
 
 def getUnclassifiedSections(uuid):
     return_dict={}

@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 from dateutil import parser
 from pytz import timezone
 from get_database import get_mode_db, get_section_db, get_trip_db, get_test_db
+from userclient import getClientSpecificQueryFilter
+
 # from pylab import *
 # from scipy.interpolate import Rbf
 # import simplekml
@@ -102,11 +104,13 @@ def getModeShareDistance(user,start,end):
 def getDistanceForMode(spec):
   distanceList = []
   totalDist = 0
-  projection = {'distance': True, '_id': False}
-  for section in get_section_db().find(spec, projection):
-#     logging.debug("found section with %s %s %s %s %s" %
-#       (section['trip_id'], section['section_id'], section['confirmed_mode'],
-#           section['user_id'], section['type']))
+#  projection = {'distance': True, '_id': False}
+#  for section in get_section_db().find(spec, projection):
+  for section in get_section_db().find(spec):
+#    logging.debug("found section %s" % section)
+    logging.debug("found section with %s %s %s %s %s %s %s" %
+      (section['trip_id'], section['section_id'], section['confirmed_mode'],
+          section['user_id'], section['type'], section.get('auto_confirmed'), section.get('distance')))
     if section['distance']!=None:
         totalDist = totalDist + section['distance']
     else:
@@ -392,6 +396,25 @@ def Inside_polygon(pnt,poly):
 
     return inside
 
+# Consider passing in a time range as well. We could just do it right now,
+# but that might be over engineering
+def getClassifiedRatio(uuid):
+    defaultQueryList = [ {'source':'Shankari'},
+                         {'user_id':uuid},
+                         {'predicted_mode': { '$exists' : True } },
+                         { 'type': 'move' } ]
+    clientSpecificQuery = getClientSpecificQueryFilter(uuid)
+    completeQueryList = defaultQueryList + clientSpecificQuery
+    logging.debug("completeQueryList = %s" % completeQueryList)
+    unclassifiedQueryList = completeQueryList + [{'confirmed_mode': ''}]
+    classifiedQueryList = completeQueryList + [{'confirmed_mode': {"$ne": ''}}]
+
+    unclassifiedCount = get_section_db().find({'$and': unclassifiedQueryList}).count()
+    classifiedCount = get_section_db().find({'$and': classifiedQueryList}).count()
+    totalCount = get_section_db().find({'$and': completeQueryList}).count()
+    logging.info("unclassifiedCount = %s, classifiedCount = %s, totalCount = %s" % (unclassifiedCount, classifiedCount, totalCount))
+    assert(unclassifiedCount + classifiedCount == totalCount)
+    return float(classifiedCount)/totalCount
 
 # def generategrid(latsouth, latnorth, loneast, lonwest,ncell):
 #     xgrid = np.linspace(lonwest, loneast, ncell)

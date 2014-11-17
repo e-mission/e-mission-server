@@ -38,7 +38,9 @@ def dropAllCollections(db):
 def createDummySection(startTime, endTime, startLoc, endLoc, predictedMode = None, confirmedMode = None):
   from get_database import get_section_db
 
-  section = {'section_start_datetime': startTime,
+  section = {
+             'source': 'Shankari',
+             'section_start_datetime': startTime,
              'section_end_datetime': endTime,
              'section_start_time': startTime.isoformat(),
              'section_end_time': endTime.isoformat(),

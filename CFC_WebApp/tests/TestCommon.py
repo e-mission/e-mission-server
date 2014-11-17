@@ -10,6 +10,8 @@ sys.path.append("%s" % os.getcwd())
 from main import common
 from get_database import get_db, get_section_db
 
+logging.basicConfig(level=logging.DEBUG)
+
 class TestCommon(unittest.TestCase):
   def setUp(self):
     import tests.common
@@ -143,6 +145,79 @@ class TestCommon(unittest.TestCase):
 
     retrieveByQuery = get_section_db().find(common.getConfirmationModeQuery(4))
     self.assertEqual(retrieveByQuery.count(), 0)
+
+  @staticmethod
+  def getDummySection(predictedMode, confirmedMode):
+    import tests.common
+    from datetime import datetime, timedelta
+
+    return tests.common.createDummySection(
+            datetime.now()+timedelta(hours = -1),
+            datetime.now(),
+            [1, -1], [-1, 1], predictedMode, confirmedMode)
+
+  def testGetClassifiedRatioWithoutPredictions(self):
+    from copy import copy
+
+    # This doesn't really require track points, so let us insert fake data that 
+    # has distances, predicted modes and confirmed modes
+    # 3 sections are confirmed, 3 sections are not yet predicted, classifiedRatio = 1.0
+    (user, dummySection, dummyPredModeMap) = self.setupClientTest()
+
+    for i in range(0, 3):
+        predSection = copy(dummySection)
+        predSection['_id'] = "%s confirmed" % (i)
+        predSection['type'] = 'move'
+        predSection['confirmed_mode'] = "5"
+        predSection['user_id'] = user.uuid
+        get_section_db().insert(predSection)
+
+        noPredSection = copy(dummySection)
+        noPredSection['_id'] = "%s nopred" % (i)
+        noPredSection['type'] = 'move'
+        noPredSection['user_id'] = user.uuid
+        del noPredSection['predicted_mode']
+        self.assertIn('predicted_mode', predSection)
+        get_section_db().insert(noPredSection)
+
+    logging.debug("After inserting sections, count is %s" % get_section_db().find().count())
+    logging.debug("Manual query count = %s" % get_section_db().find({'$and': [{'source': 'Shankari'}, {'user_id': user.uuid}, {'predicted_mode': {'$exists': True}}, {'type': 'move'}]}).count())
+    self.assertEqual(common.getClassifiedRatio(user.uuid), 1)
+
+  def testGetClassifiedRatioWithPredictions(self):
+    from copy import copy
+
+    # This doesn't really require track points, so let us insert fake data that 
+    # has distances, predicted modes and confirmed modes
+    # 3 sections are confirmed, 3 sections are not yet predicted, classifiedRatio = 1.0
+    (user, dummySection, dummyPredModeMap) = self.setupClientTest()
+
+    for i in range(0, 3):
+        predSection = copy(dummySection)
+        predSection['_id'] = "%s confirmed" % (i)
+        predSection['type'] = 'move'
+        predSection['confirmed_mode'] = "5"
+        predSection['user_id'] = user.uuid
+        get_section_db().insert(predSection)
+
+        noPredSection = copy(dummySection)
+        noPredSection['_id'] = "%s nopred" % (i)
+        noPredSection['type'] = 'move'
+        noPredSection['user_id'] = user.uuid
+        # moves collect currently sets the confirmed_mode to "", so we must set it here too
+        # Otherwise the query won't work
+        noPredSection['confirmed_mode'] = ""
+
+        self.assertIn('predicted_mode', predSection)
+        self.assertIn('predicted_mode', noPredSection)
+        self.assertIn('confirmed_mode', predSection)
+        get_section_db().insert(noPredSection)
+
+    logging.debug("After inserting sections, count is %s" % get_section_db().find().count())
+    logging.debug("Manual query count = %s" % get_section_db().find({'$and': [{'source': 'Shankari'}, {'user_id': user.uuid}, {'predicted_mode': {'$exists': True}}, {'type': 'move'}]}).count())
+    logging.debug("Manual query count classified = %s" % get_section_db().find({'$and': [{'source': 'Shankari'}, {'user_id': user.uuid}, {'predicted_mode': {'$exists': True}}, {'type': 'move'}, {'confirmed_mode': {"$ne": ''}} ]}).count())
+
+    self.assertEqual(common.getClassifiedRatio(user.uuid), 3.0/6)
 
 if __name__ == '__main__':
     unittest.main()
