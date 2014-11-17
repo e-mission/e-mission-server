@@ -29,23 +29,28 @@ class TestCommon(unittest.TestCase):
     retSpec = common.addModeIdToSpec(inSpec, 3)
     self.assertEqual(retSpec["$and"][0], {"type" : "move"})
     self.assertIn("$or", retSpec['$and'][1])
-    self.assertEqual(retSpec['$and'][1]["$or"][0], {"confirmed_mode": 3})
-    self.assertIn({'test_auto_confirmed.mode': 3}, retSpec['$and'][1]["$or"][1]['$and'][1]["$or"])
+    self.assertEqual(retSpec['$and'][1]["$or"][0], {"corrected_mode": 3})
+    self.assertEqual(retSpec['$and'][1]["$or"][1]['$and'][1], {"confirmed_mode": 3})
+    self.assertIn({'test_auto_confirmed.mode': 3}, retSpec['$and'][1]["$or"][2]['$and'][2]["$or"])
 
   def testAddModeIdNone(self):
     inSpec = None
     retSpec = common.addModeIdToSpec(inSpec, 3)
-    self.assertEquals(retSpec['$or'][0], {'confirmed_mode': 3})
-    self.assertEquals(retSpec['$or'][1]['$and'][0], {'confirmed_mode': {'$exists': False}})
-    self.assertIn({'test_auto_confirmed.mode': 3}, retSpec['$or'][1]['$and'][1]['$or'])
+    self.assertEquals(retSpec['$or'][0], {'corrected_mode': 3})
+    self.assertEquals(retSpec['$or'][1]['$and'][0], {'corrected_mode': {'$exists': False}})
+    self.assertEquals(retSpec['$or'][2]['$and'][0], {'corrected_mode': {'$exists': False}})
+    self.assertEquals(retSpec['$or'][2]['$and'][1], {'confirmed_mode': {'$exists': False}})
+    self.assertIn({'test_auto_confirmed.mode': 3}, retSpec['$or'][2]['$and'][2]['$or'])
 
   def testAddModeIdAndSpec(self):
     inSpec = {"$and": [{'type': 'move'}, {'commute':'on'}]}
     retSpec = common.addModeIdToSpec(inSpec, 3)
+    logging
     self.assertIn({'type': 'move'}, retSpec['$and'])
     self.assertIn({'commute': 'on'}, retSpec['$and'])
-    self.assertIn({'confirmed_mode': 3}, retSpec['$and'][2]['$or'])
-    self.assertIn({'test_auto_confirmed.mode': 3}, retSpec['$and'][2]['$or'][1]['$and'][1]['$or'])
+    self.assertIn({'corrected_mode': 3}, retSpec['$and'][2]['$or'])
+    self.assertIn({'confirmed_mode': 3}, retSpec['$and'][2]['$or'][1]['$and'])
+    self.assertIn({'test_auto_confirmed.mode': 3}, retSpec['$and'][2]['$or'][2]['$and'][2]['$or'])
 
   def testAddModeIdAndSpecTwice(self):
     inSpec = {"$and": [{'type': 'move'}, {'commute':'on'}]}
@@ -53,10 +58,12 @@ class TestCommon(unittest.TestCase):
     firstSpec = common.addModeIdToSpec(inSpec, 3)
 
     retSpec = common.addModeIdToSpec(inSpec, 4)
+    logging.debug(retSpec)
     self.assertIn({'type': 'move'}, retSpec['$and'])
     self.assertIn({'commute': 'on'}, retSpec['$and'])
-    self.assertIn({'confirmed_mode': 4}, retSpec['$and'][2]['$or'])
-    self.assertIn({'test_auto_confirmed.mode': 4}, retSpec['$and'][2]['$or'][1]['$and'][1]['$or'])
+    self.assertIn({'corrected_mode': 4}, retSpec['$and'][2]['$or'])
+    self.assertIn({'confirmed_mode': 4}, retSpec['$and'][2]['$or'][1]['$and'])
+    self.assertIn({'test_auto_confirmed.mode': 4}, retSpec['$and'][2]['$or'][2]['$and'][2]['$or'])
 
   def setupClientTest(self):
     # At this point, the more important test is to execute the query and see
@@ -123,6 +130,40 @@ class TestCommon(unittest.TestCase):
     for entry in retrieveByQuery:
       print entry
     self.assertEqual(retrieveByQuery.count(), 0)
+
+    retrieveByQuery = get_section_db().find(common.getConfirmationModeQuery(4))
+    for entry in retrieveByQuery:
+      print entry
+    self.assertEqual(retrieveByQuery.count(), 1)
+
+  def testConfirmationModeQueryCorrectedManualAndAuto(self):
+    from dao.client import Client
+
+    (user, dummySection, dummyPredModeMap) = self.setupClientTest()
+    clientSetQuery = Client(user.getFirstStudy()).clientSpecificSetters(user.uuid, dummySection, dummyPredModeMap)
+
+    # Apply the change
+    get_section_db().update({'_id': dummySection['_id']}, clientSetQuery)
+    retrievedSection = get_section_db().find_one({'_id': dummySection['_id']})
+    self.assertEqual(retrievedSection['test_auto_confirmed']['mode'], 1)
+
+    get_section_db().update({'_id': dummySection['_id']}, {'$set': {'confirmed_mode': 4}})
+    get_section_db().update({'_id': dummySection['_id']}, {'$set': {'corrected_mode': 9}})
+
+    retrieveByQuery = get_section_db().find(common.getConfirmationModeQuery(1))
+    for entry in retrieveByQuery:
+      print entry
+    self.assertEqual(retrieveByQuery.count(), 0)
+
+    retrieveByQuery = get_section_db().find(common.getConfirmationModeQuery(4))
+    for entry in retrieveByQuery:
+      print entry
+    self.assertEqual(retrieveByQuery.count(), 0)
+
+    retrieveByQuery = get_section_db().find(common.getConfirmationModeQuery(9))
+    for entry in retrieveByQuery:
+      print entry
+    self.assertEqual(retrieveByQuery.count(), 1)
 
   def testConfirmationModeQueryManualNotAuto(self):
     from dao.client import Client
