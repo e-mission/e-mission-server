@@ -194,6 +194,22 @@ class TestCarbon(unittest.TestCase):
     self.assertEqual(carbon.getDistinctUserCount(carbon.getQuerySpec(None, None,
                      self.weekago + timedelta(weeks = -1), self.now)), len(self.testUsers))
 
+  def testDelLongMotorizedModes(self):
+    testMap = {'bus_short': 1, 'bus_long': 2, 'air_short': 3, 'air_long': 4}
+    carbon.delLongMotorizedModes(testMap)
+    self.assertEqual(len(testMap), 2)
+    self.assertIn('bus_short', testMap)
+    self.assertIn('bus_long', testMap)
+    self.assertNotIn('air_short', testMap)
+    self.assertNotIn('air_long', testMap)
+
+  def testGetCarbonFootprintsForMap(self):
+    testDistanceMap = {'a': 1, 'b': 2, 'c': 3}
+    testModeFootprintMap = {'a': 1, 'b': 2, 'c': 3}
+
+    footprintMap = carbon.getCarbonFootprintsForMap(testDistanceMap, testModeFootprintMap)
+    self.assertEqual(footprintMap, {'a': 0.001, 'b': 0.004, 'c': 0.009})
+
   def testAvgCalculation(self):
     testMap = {'a': 5, 'b': 10, 'c': 15, 'd': 3, 'e': 7, 'f': 13}
     avgTestMap = carbon.convertToAvg(testMap, 5)
