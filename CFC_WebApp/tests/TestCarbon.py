@@ -16,6 +16,7 @@ logging.basicConfig(level=logging.DEBUG)
 class TestCarbon(unittest.TestCase):
   def setUp(self):
     import tests.common
+    from copy import copy
 
     self.testUsers = ["test@example.com", "best@example.com", "fest@example.com",
                       "rest@example.com", "nest@example.com"]
@@ -34,6 +35,9 @@ class TestCarbon(unittest.TestCase):
     self.walkExpect = 1057.2524056424411
     self.busExpect = 2162.668467546699
     self.busCarbon = 267.0/1609
+    self.airCarbon = 217.0/1609
+    self.driveCarbon = 278.0/1609
+    self.busOptimalCarbon = 92.0/1609
 
     self.now = datetime.now()
     self.dayago = self.now - timedelta(days=1)
@@ -42,6 +46,12 @@ class TestCarbon(unittest.TestCase):
     for section in self.SectionsColl.find():
       section['section_start_datetime'] = self.dayago
       section['section_end_datetime'] = self.dayago + timedelta(hours = 1)
+      if section['confirmed_mode'] == 5:
+        airSection = copy(section)
+        airSection['confirmed_mode'] = 9
+        airSection['_id'] = section['_id'] + "_air"
+        self.SectionsColl.insert(airSection)
+          
       # print("Section start = %s, section end = %s" %
       #   (section['section_start_datetime'], section['section_end_datetime']))
       self.SectionsColl.save(section)
@@ -74,6 +84,7 @@ class TestCarbon(unittest.TestCase):
     # try different modes
     self.assertEqual(carbon.getTripCountForMode("test@example.com", 1, self.weekago, self.now), 1) # walk
     self.assertEqual(carbon.getTripCountForMode("test@example.com", 5, self.weekago, self.now), 1) # bus
+    self.assertEqual(carbon.getTripCountForMode("test@example.com", 9, self.weekago, self.now), 1) # bus
 
     # try different users
     self.assertEqual(carbon.getTripCountForMode("best@example.com", 1, self.weekago, self.now), 1) # walk
@@ -141,6 +152,8 @@ class TestCarbon(unittest.TestCase):
     self.assertEqual(myModeDistance['cycling'], 0)
     self.assertEqual(myModeDistance['bus_short'], (self.busCarbon * self.busExpect/1000))
     self.assertEqual(myModeDistance['train_short'], 0)
+    # We duplicate the bus trips to get air trips, so the distance should be the same
+    self.assertEqual(myModeDistance['air_short'], (self.airCarbon * self.busExpect/1000))
 
   def testTotalCarbonFootprint(self):
     totalModeDistance = carbon.getModeCarbonFootprint(None, carbon.carbonFootprintForMode, self.weekago, self.now)
@@ -148,7 +161,20 @@ class TestCarbon(unittest.TestCase):
     self.assertEqual(totalModeDistance['cycling'], 0)
     # We divide by 1000 to make it comprehensible in getModeCarbonFootprint
     self.assertEqual(totalModeDistance['bus_short'], (self.busCarbon * len(self.testUsers) * self.busExpect)/1000)
+    self.assertEqual(totalModeDistance['air_short'], (self.airCarbon * len(self.testUsers) * self.busExpect)/1000)
     self.assertEqual(totalModeDistance['train_short'], 0)
+
+  def testSummaryAllTrips(self):
+    summary = carbon.getSummaryAllTrips(self.weekago, self.now)
+    # *2 because the walking trips don't count, but we have doubled the bus
+    # trips to count as air trips
+    self.assertEqual(summary['current'], (self.busCarbon * self.busExpect + self.airCarbon * self.busExpect)/1000)
+    # No * 2 because the optimal value for short bus trips is to actually move to bikes :)
+    self.assertEqual(summary['optimal'], (self.busOptimalCarbon * self.busExpect)/1000)
+    # These are are without air, so will only count the bus trips
+    self.assertEqual(summary['current no air'], (self.busCarbon * self.busExpect)/1000)
+    self.assertEqual(summary['optimal no air'], 0)
+    self.assertAlmostEqual(summary['all drive'], (self.driveCarbon * (self.busExpect * 2 + self.walkExpect))/1000, places = 4)
 
   def testDistinctUserCount(self):
     self.assertEqual(carbon.getDistinctUserCount({}), len(self.testUsers))
