@@ -27,7 +27,8 @@ class ModeInferencePipeline:
                           "speed EV", "speed variance", "max speed", "max accel", "isCommute",
                           "heading change rate", "stop rate", "velocity change rate",
                           "start lat", "start lng", "stop lat", "stop lng",
-                          "start hour", "end hour", "close to bus stop", "close to train stop"]
+                          "start hour", "end hour", "close to bus stop", "close to train stop",
+                          "close to airport"]
     self.Sections = MongoClient('localhost').Stage_database.Stage_Sections
 
   def runPipeline(self):
@@ -102,6 +103,7 @@ class ModeInferencePipeline:
   def generateBusAndTrainStopStep(self):
     bus_cluster=mode_cluster(5,105,1)
     train_cluster=mode_cluster(6,600,1)
+    air_cluster=mode_cluster(9,600,1)
     return (bus_cluster, train_cluster)
 
 # Feature matrix construction
@@ -160,6 +162,7 @@ class ModeInferencePipeline:
 # 18. end hour
 # 19. both start and end close to bus stop
 # 20. both start and end close to train station
+# 21. both start and end close to airport
   def updateFeatureMatrixRowWithSection(self, featureMatrix, i, section):
     featureMatrix[i, 0] = section['distance']
     featureMatrix[i, 1] = (section['section_end_datetime'] - section['section_start_datetime']).total_seconds()
@@ -212,11 +215,11 @@ class ModeInferencePipeline:
     mixedIndices = self.resultVector == 8
     airIndices = self.resultVector == 9
     unknownIndices = self.resultVector == 0
-    strippedIndices = np.logical_not(runIndices | transportIndices | mixedIndices | airIndices | unknownIndices)
-    logging.debug("Stripped trips with mode: run %s, transport %s, mixed %s, air %s, unknown %s unstripped %s" %
+    strippedIndices = np.logical_not(runIndices | transportIndices | mixedIndices | unknownIndices)
+    logging.debug("Stripped trips with mode: run %s, transport %s, mixed %s, unknown %s unstripped %s" %
       (np.count_nonzero(runIndices), np.count_nonzero(transportIndices),
-      np.count_nonzero(mixedIndices), np.count_nonzero(airIndices),
-      np.count_nonzero(unknownIndices), np.count_nonzero(strippedIndices)))
+      np.count_nonzero(mixedIndices), np.count_nonzero(unknownIndices),
+      np.count_nonzero(strippedIndices)))
 
     strippedFeatureMatrix = self.featureMatrix[strippedIndices]
     strippedResultVector = self.resultVector[strippedIndices]
@@ -247,7 +250,7 @@ class ModeInferencePipeline:
     AdvancedFeatureIndices = list(xrange(10,13))
     LocationFeatureIndices = list(xrange(13,17))
     TimeFeatureIndices = list(xrange(17,19))
-    BusTrainFeatureIndices = list(xrange(19,21))
+    BusTrainFeatureIndices = list(xrange(19,22))
     logging.debug("generic features = %s" % genericFeatureIndices)
     logging.debug("advanced features = %s" % AdvancedFeatureIndices)
     logging.debug("location features = %s" % LocationFeatureIndices)

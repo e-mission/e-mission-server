@@ -127,7 +127,7 @@ class TestPipeline(unittest.TestCase):
     self.testCleanDataStep()
 
     self.pipeline.selFeatureIndices = self.pipeline.selectFeatureIndicesStep()
-    self.assertEqual(len(self.pipeline.selFeatureIndices), 12)
+    self.assertEqual(len(self.pipeline.selFeatureIndices), 13)
     self.pipeline.selFeatureMatrix = self.pipeline.cleanedFeatureMatrix[:,self.pipeline.selFeatureIndices]
     self.assertEqual(self.pipeline.selFeatureMatrix.shape[1], len(self.pipeline.selFeatureIndices))
 
