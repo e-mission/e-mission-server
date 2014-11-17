@@ -444,8 +444,10 @@ def Inside_polygon(pnt,poly):
 def getConfirmationModeQuery(mode):
   from dao.client import Client
 
-  return {'$or': [{'confirmed_mode': mode}, 
-                  {'$and': [{'confirmed_mode': {'$exists': False}}] + Client.getClientConfirmedModeQueries(mode)}]}
+  return {'$or': [{'corrected_mode': mode},
+                  {'$and': [{'corrected_mode': {'$exists': False}}, {'confirmed_mode': mode}]}, 
+                  {'$and': [{'corrected_mode': {'$exists': False}},
+                            {'confirmed_mode': {'$exists': False}}] + Client.getClientConfirmedModeQueries(mode)}]}
 
 def convertModeNameToIndex(ModeDb, modeName):
   logging.debug("modedb size = %s" % ModeDb.find().count())
