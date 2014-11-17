@@ -31,8 +31,10 @@ class ModeInferencePipeline:
     self.Sections = MongoClient('localhost').Stage_database.Stage_Sections
 
   def runPipeline(self):
-    allConfirmedTripsQuery = {"$and": [{'type': 'move'}, {'confirmed_mode': {'$ne': ''}}]}
+    allConfirmedTripsQuery = ModeInferencePipeline.getSectionQueryWithGroundTruth({'$ne': ''})
     (self.modeList, self.confirmedSections) = self.loadTrainingDataStep(allConfirmedTripsQuery)
+    logging.debug("confirmedSections.count() = %s" % (self.confirmedSections.count()))
+    
     if (self.confirmedSections.count() < minTrainingSetSize):
       logging.info("initial loadTrainingDataStep DONE")
       logging.debug("current training set too small, reloading from backup!")
@@ -50,14 +52,33 @@ class ModeInferencePipeline:
     self.selFeatureMatrix = self.cleanedFeatureMatrix[:,self.selFeatureIndices]
     self.model = self.buildModelStep()
     logging.info("buildModelStep DONE")
-    toPredictTripsQuery = {"$and": [{'type': 'move'}, {'confirmed_mode': ''},
-      {'predicted_mode': None}]}
+    toPredictTripsQuery = {"$and": [{'type': 'move'},
+                                    ModeInferencePipeline.getModeQuery(''),
+                                    {'predicted_mode': None}]}
     (self.toPredictFeatureMatrix, self.sectionIds, self.sectionUserIds) = self.generateFeatureMatrixAndIDsStep(toPredictTripsQuery)
     logging.info("generateFeatureMatrixAndIDsStep DONE")
     self.predictedProb = self.predictModesStep()
     logging.info("predictModesStep DONE")
     self.savePredictionsStep()
     logging.info("savePredictionsStep DONE")
+
+    # Most of the time, this will be an int, but it can also be a subquery, like
+    # {'$ne': ''}. This will be used to find the set of entries for the training
+    # set, for example
+  @staticmethod
+  def getModeQuery(groundTruthMode):
+    # We need the existence check because the corrected mode is not guaranteed to exist,
+    # and if it doesn't exist, it will end up match the != '' query (since it
+    # is not '', it is non existent)
+    correctedModeQuery = lambda mode: {'$and': [{'corrected_mode': {'$exists': True}},
+                                                {'corrected_mode': groundTruthMode}]}
+    return {'$or': [correctedModeQuery(groundTruthMode),
+                              {'confirmed_mode': groundTruthMode}]}
+
+  @staticmethod
+  def getSectionQueryWithGroundTruth(groundTruthMode):
+    return {"$and": [{'type': 'move'},
+                     ModeInferencePipeline.getModeQuery(groundTruthMode)]}
 
   # TODO: Refactor into generic steps and results
   def loadTrainingDataStep(self, sectionQuery, sectionDb = None):
@@ -70,10 +91,11 @@ class ModeInferencePipeline:
         modeList.append(mode)
         logging.debug(mode)
     logging.debug("Training set total size = %s" %
-      sectionDb.find({"$and": [{'type': 'move'}, {'confirmed_mode': {'$ne': ''}}]}).count())
+      sectionDb.find(ModeInferencePipeline.getSectionQueryWithGroundTruth({'$ne': ''})).count())
+
     for mode in modeList:
       logging.debug("%s: %s" % (mode['mode_name'],
-        sectionDb.find({"$and": [{'type': 'move'}, {'confirmed_mode': mode['mode_id']}]}).count()))
+        sectionDb.find(ModeInferencePipeline.getSectionQueryWithGroundTruth(mode['mode_id']))))
     return (modeList, confirmedSections)
 
   # TODO: Should mode_cluster be in featurecalc or here?
@@ -86,6 +108,7 @@ class ModeInferencePipeline:
   def generateFeatureMatrixAndResultVectorStep(self):
       featureMatrix = np.zeros([self.confirmedSections.count(), len(self.featureLabels)])
       resultVector = np.zeros(self.confirmedSections.count())
+      logging.debug("created data structures of size %s" % self.confirmedSections.count())
       # There are a couple of additions to the standard confirmedSections cursor here.
       # First, we read it in batches of 300 in order to avoid the 10 minute timeout
       # Our logging shows that we can process roughly 500 entries in 10 minutes
@@ -101,10 +124,19 @@ class ModeInferencePipeline:
       # So we limit the records to the size of the matrix that we have created
       for (i, section) in enumerate(self.confirmedSections.limit(featureMatrix.shape[0]).batch_size(300)):
         self.updateFeatureMatrixRowWithSection(featureMatrix, i, section)
-        resultVector[i] = section['confirmed_mode']
+        resultVector[i] = self.getGroundTruthMode(section)
         if i % 100 == 0:
             logging.debug("Processing record %s " % i)
       return (featureMatrix, resultVector)
+
+  def getGroundTruthMode(self, section):
+      # logging.debug("getting ground truth for section %s" % section)
+      if 'corrected_mode' in section:
+          logging.debug("Returning corrected mode %s" % section['corrected_mode'])
+          return section['corrected_mode']
+      else:
+          logging.debug("Returning confirmed mode %s" % section['confirmed_mode'])
+          return section['confirmed_mode']
 
 # Features are:
 # 0. distance
