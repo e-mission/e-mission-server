@@ -54,7 +54,7 @@ def getCarbonFootprintsForMap(modeDistanceMap, carbonFootprintMap):
   logging.debug("In getCarbonFootprintsForMap, modeDistanceMap = %s" % modeDistanceMap)
   modeFootprintMap = {}
   for modeName in modeDistanceMap:
-    logging.debug("Consider mode with name %s" % modeName)
+    # logging.debug("Consider mode with name %s" % modeName)
     carbonForMode = float(carbonFootprintMap[modeName] * modeDistanceMap[modeName])/1000
     modeFootprintMap[modeName] = carbonForMode
   return modeFootprintMap
@@ -168,17 +168,28 @@ def getFootprintCompare(user):
           myOptimalCarbonFootprintNoLongMotorized, avgOptimalCarbonFootprintNoLongMotorized)
 
 def getSummaryAllTrips(start,end):
-  totalModeShareDistance = getModeShareDistance(None, start, end)
+  # totalModeShareDistance = getModeShareDistance(None, start, end)
   totalShortLongModeShareDistance = getShortLongModeShareDistance(None, start, end)
 
-  totalModeCarbonFootprint = getModeCarbonFootprint(None,
-      carbonFootprintForMode, start, end)
-  totalOptimalCarbonFootprint = getModeCarbonFootprint(None,
-      optimalCarbonFootprintForMode, start, end)
+  totalModeCarbonFootprint = getCarbonFootprintsForMap(totalShortLongModeShareDistance,
+      carbonFootprintForMode)
+  totalOptimalCarbonFootprint = getCarbonFootprintsForMap(totalShortLongModeShareDistance,
+      optimalCarbonFootprintForMode)
 
-  delLongMotorizedModes(totalShortLongModeShareDistance)
-  logging.debug("After deleting long motorized mode, map is %s", totalModeShareDistance)
+  # Hack to prevent divide by zero on an empty DB.
+  # We will never really have an empty DB in the real production world,
+  # but shouldn't crash in that case.
+  # This is pretty safe because if we have no users, we won't have any modeCarbonFootprint either
   nUsers = getDistinctUserCount(getQuerySpec(None, None, start, end))
+  if nUsers == 0:
+    nUsers = 1
+  sumModeCarbonFootprint = sum(totalModeCarbonFootprint.values())
+  sumOptimalCarbonFootprint = sum(totalOptimalCarbonFootprint.values())
+  sumModeShareDistance = sum(totalShortLongModeShareDistance.values())/1000
+
+  # We need to calculate the sums before we delete certain modes from the mode share dict
+  delLongMotorizedModes(totalShortLongModeShareDistance)
+  logging.debug("After deleting long motorized mode, map is %s", totalShortLongModeShareDistance)
 
   totalModeCarbonFootprintNoLongMotorized = getCarbonFootprintsForMap(
         totalShortLongModeShareDistance,
@@ -186,15 +197,6 @@ def getSummaryAllTrips(start,end):
   totalOptimalCarbonFootprintNoLongMotorized = getCarbonFootprintsForMap(
         totalShortLongModeShareDistance,
         optimalCarbonFootprintForMode)
-  # Hack to prevent divide by zero on an empty DB.
-  # We will never really have an empty DB in the real production world,
-  # but shouldn't crash in that case.
-  # This is pretty safe because if we have no users, we won't have any modeCarbonFootprint either
-  if nUsers == 0:
-    nUsers = 1
-  sumModeCarbonFootprint = sum(totalModeCarbonFootprint.values())
-  sumOptimalCarbonFootprint = sum(totalOptimalCarbonFootprint.values())
-  sumModeShareDistance = sum(totalModeShareDistance.values())/1000
   return {
           "current": float(sumModeCarbonFootprint)/nUsers,
           "optimal": float(sumOptimalCarbonFootprint)/nUsers,
