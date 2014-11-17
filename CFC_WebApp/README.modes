@@ -1,0 +1,45 @@
+We have a bunch of modes now, so I thought that it would be useful to write out
+what all of them are and how they are used.
+
+BY MODE GENERATION
+------------------
+- autoMode: This is the mode that is detected by the sensor algorithms. Right
+  now, it represents the mode detected by Moves. Once we move to our own data
+  collection, it will represent the mode detected by the APIs on the phone
+  platforms (iOS and android). This typically deals with active transportation
+  (walk/bike/run, and lumps everything else into IN_VEHICLE or transit)
+
+  The autoMode is used as one of the features to the decision forest. Since it
+  is not user confirmed, it is typically not used for much else.
+
+- autoConfirmed.mode: After we run our algorithm, we get a predicted mode, and
+  its confidence. At least for the carshare study, if the confidence is high
+  enough, we don't want to show the trip to the user. For such high confidence
+  trips, is the trip confirmed or not? Here's the assumption that we have made:
+    - it isn't confirmed enough to use as ground truth for further learning
+    - however, it is high confidence enough to be used in statistics, for
+      example, to calculate the carbon footprint. Otherwise, the carbon
+      footprint calculation will be really inaccurate.
+
+- confirmed mode: ground truth from the user. used for stats, and as ground
+  truth for the next learning iteration
+
+- corrected mode: in cases where the algorithm generates high confidence trips
+  which are inaccurate, the confirmed mode might also be wrong. We found this
+  while looking at air trips - until Nov 2014, we didn't predict air trips, so
+  the prediction would always be wrong, but often be with high confidence.
+  These trips were typically not corrected by users - we found several of these
+  through manual inspection. In this case, we manually correct the trips, and
+  retain the earlier confirmation mode for later analysis. This should be used
+  both for stats, and as ground truth for the next learning iteration.
+
+BY USAGE
+--------
+- stats:
+  - if corrected mode exists, use it
+  - else if confirmed mode exists, use it
+  - else if autoConfirmed.mode exists, use it
+
+- ground truth for learning
+  - if corrected mode exists, use it
+  - if autoConfirmed.mode exists, use it

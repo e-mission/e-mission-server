@@ -72,7 +72,7 @@ class TestPipeline(unittest.TestCase):
     self.assertEquals(self.ModesColl.find().count(), 0)
 
   def testLoadTrainingData(self):
-    allConfirmedTripsQuery = {"$and": [{'type': 'move'}, {'confirmed_mode': {'$ne': ''}}]}
+    allConfirmedTripsQuery = pipeline.ModeInferencePipeline.getSectionQueryWithGroundTruth({'$ne': ''})
     (self.pipeline.modeList, self.pipeline.confirmedSections) = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery)
     self.assertEquals(self.pipeline.confirmedSections.count(), len(self.testUsers) * 2)
 
@@ -127,7 +127,7 @@ class TestPipeline(unittest.TestCase):
     self.testCleanDataStep()
 
     self.pipeline.selFeatureIndices = self.pipeline.selectFeatureIndicesStep()
-    self.assertEqual(len(self.pipeline.selFeatureIndices), 12)
+    self.assertEqual(len(self.pipeline.selFeatureIndices), 13)
     self.pipeline.selFeatureMatrix = self.pipeline.cleanedFeatureMatrix[:,self.pipeline.selFeatureIndices]
     self.assertEqual(self.pipeline.selFeatureMatrix.shape[1], len(self.pipeline.selFeatureIndices))
 
