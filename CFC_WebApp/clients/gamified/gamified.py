@@ -2,7 +2,6 @@ import logging
 from get_database import get_section_db
 from main import carbon, common
 from datetime import datetime, timedelta
-from bottle import template
 
 # Returns the components on which the score is based. These will be combined in
 # getScore later, but it is useful to see them to decide how to set up the
@@ -38,6 +37,10 @@ def getScoreComponents(user_uuid):
   return components
 
 def getResult(user_uuid):
+  # This is in here, as opposed to the top level as recommended by the PEP
+  # because then we don't have to worry about loading bottle in the unit tests
+  from bottle import template
+
   components = getScoreComponents(user_uuid)
   renderedTemplate = template("clients/gamified/result_template.html",
                               pctClassified = components[0],
