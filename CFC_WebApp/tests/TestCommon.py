@@ -9,6 +9,7 @@ from utils import load_database_json, purge_database_json
 sys.path.append("%s" % os.getcwd())
 from main import common
 from get_database import get_db, get_section_db
+from uuid import UUID
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -196,6 +197,9 @@ class TestCommon(unittest.TestCase):
             datetime.now()+timedelta(hours = -1),
             datetime.now(),
             [1, -1], [-1, 1], predictedMode, confirmedMode)
+
+  def testGetClassifiedRatioNoTrips(self):
+    self.assertEqual(common.getClassifiedRatio('this is fake'), 0)
 
   def testGetClassifiedRatioWithoutPredictions(self):
     from copy import copy

@@ -1,4 +1,3 @@
-# Needed to modify the pythonpath
 import unittest
 import json
 from utils import load_database_json, purge_database_json
