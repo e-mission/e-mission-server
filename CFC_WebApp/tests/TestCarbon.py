@@ -164,6 +164,42 @@ class TestCarbon(unittest.TestCase):
     self.assertEqual(totalModeDistance['air_short'], (self.airCarbon * len(self.testUsers) * self.busExpect)/1000)
     self.assertEqual(totalModeDistance['train_short'], 0)
 
+  def testMySummary(self):
+      (myModeShareCount, avgModeShareCount,
+       myModeShareDistance, avgModeShareDistance,
+       myModeCarbonFootprint, avgModeCarbonFootprint,
+       myModeCarbonFootprintNoLongMotorized, avgModeCarbonFootprintNoLongMotorized,
+       myOptimalCarbonFootprint, avgOptimalCarbonFootprint,
+       myOptimalCarbonFootprintNoLongMotorized, avgOptimalCarbonFootprintNoLongMotorized) = carbon.getFootprintCompare('fest@example.com')
+
+      # >>> m = {'air_long': 0, 'air_short': 0.2, 'bus_long': 0, 'bus_short': 0.3}
+      # >>> f = [(i, m[i]) for i in m if m[i] != 0]
+      # >>> f
+      # [('bus_short', 0.3), ('air_short', 0.2)]
+      # >>> dict(f)
+      # {'bus_short': 0.3, 'air_short': 0.2}
+      filterZero = lambda m: dict([(i, m[i]) for i in m if m[i] != 0])
+
+      self.assertEqual(len(myModeShareCount), len(carbon.getDisplayModes()))
+      self.assertEqual(len(myModeShareDistance), len(carbon.getDisplayModes()))
+      # We have duplicated the bus trip to get bus, air and unconfirmed trips.
+      # we ignore the unconfirmed trip, so only expect to get three values...
+      self.assertAlmostEqual(sum(myModeShareDistance.values()), 2 * self.busExpect + self.walkExpect, places = 4)
+      self.assertEqual(filterZero(myModeShareDistance),
+                        {'bus': self.busExpect,
+                         'walking': self.walkExpect,
+                         'air': self.busExpect})
+      logging.debug(filterZero(myModeShareDistance))
+      self.assertEqual(filterZero(myModeCarbonFootprint),
+            {'bus_short': (self.busExpect * self.busCarbon)/1000,
+             'air_short': (self.busExpect * self.airCarbon)/1000})
+      self.assertEqual(filterZero(myModeCarbonFootprintNoLongMotorized),
+            {'bus_short': (self.busExpect * self.busCarbon)/1000})
+      self.assertEqual(filterZero(myOptimalCarbonFootprint),
+            {'air_short': (self.busExpect * self.busOptimalCarbon)/1000})
+      self.assertEqual(filterZero(myOptimalCarbonFootprintNoLongMotorized),
+            {})
+
   def testSummaryAllTrips(self):
     summary = carbon.getSummaryAllTrips(self.weekago, self.now)
     # *2 because the walking trips don't count, but we have doubled the bus

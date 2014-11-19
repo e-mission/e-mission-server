@@ -108,9 +108,9 @@ def getDistanceForMode(spec):
 #  for section in get_section_db().find(spec, projection):
   for section in get_section_db().find(spec):
 #    logging.debug("found section %s" % section)
-    logging.debug("found section with %s %s %s %s %s %s %s" %
-      (section['trip_id'], section['section_id'], section['confirmed_mode'],
-          section['user_id'], section['type'], section.get('auto_confirmed'), section.get('distance')))
+#    logging.debug("found section with %s %s %s %s %s %s %s" %
+#       (section['trip_id'], section['section_id'], section['confirmed_mode'],
+#           section['user_id'], section['type'], section.get('auto_confirmed'), section.get('distance')))
     if section['distance']!=None:
         totalDist = totalDist + section['distance']
     else:
