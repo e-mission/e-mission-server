@@ -1,3 +1,4 @@
 *.pyc
 *.pdf
+*.swp
 *debug.log
