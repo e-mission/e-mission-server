@@ -50,8 +50,8 @@ class User:
         return []
 
   def getFirstStudy(self):
-    studyList = self.getProfile()['study_list']
-    if len(studyList) == 0:
+    studyList = self.getStudy()
+    if studyList == None or len(studyList) == 0:
       return None
     else:
       assert(len(studyList) == 1)
