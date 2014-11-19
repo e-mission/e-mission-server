@@ -1,3 +1,25 @@
+"""
+#########################################################
+#Google Map Display Tool for E-Mission Trip/Section Data#
+#########################################################
+Author: En (Ryan) Lei
+A library of functions that allows the user to plot GPS coordinates data via Google Maps API(pygmap). 
+Plots are stored in HTML format and can be open using Chrome or Firefox web browser. For more inform
+ation please refer to the comments within the function.
+
+Color - Transportation Mode Mapping:
+
+walking - blue
+running - green
+cycling - yellow
+transport - red
+bus - aqua
+train - darkOrange
+car - grey 
+mixed - olive
+air - skyBlue
+"""
+
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
 import json
@@ -19,6 +41,8 @@ from datetime import date, timedelta
 from uuid import *
 from tripManager import calDistance
 from pygeocoder import Geocoder
+
+
 
 POINTS = 'points'
 PATH = 'path'
@@ -140,6 +164,9 @@ def compareTrips(section1, section2):
 
 
 def drawTrip(trip_id, db, gmap):
+    #Given trip_id, database where the trip is stored, and a pygmap.map object
+    #drawTrip plots all sections associated with the trip_id on the map object
+    #and returns the modified map object
     trip = None
     trip_cursor = db.Stage_Trips.find({'trip_id': trip_id})
 
