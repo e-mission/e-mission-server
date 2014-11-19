@@ -177,6 +177,12 @@ class Client:
     else:
       return []
 
+  def getResult(self, uuid):
+    if self.isActive(datetime.now()):
+        return self.__loadModule().getResult(uuid)
+    else:
+        return None
+
   def clientSpecificSetters(self, uuid, sectionId, predictedModeMap):
     if self.isActive(datetime.now()):
       return self.__loadModule().clientSpecificSetters(uuid, sectionId, predictedModeMap)
@@ -188,8 +194,6 @@ class Client:
   # Read the design decisions for an example of how to improve this
   @staticmethod
   def getClientConfirmedModeQueries(mode):
-
-    # Read the common query list file
     queryList = clients.common.getConfirmFields()
     queryListWithMode = [{query: mode} for query in queryList]
     return [{'$or': queryListWithMode}]

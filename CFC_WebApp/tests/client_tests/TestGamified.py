@@ -84,9 +84,8 @@ class TestGamified(unittest.TestCase):
         self.assertEqual(user.getFirstStudy(), 'gamified')
         self.user = user
 
-    def testGetScore(self):
-        request = {'user': self.user.uuid}
-        components = gamified.getScoreComponents(request)
+    def testGetScoreComponents(self):
+        components = gamified.getScoreComponents(self.user.uuid)
         self.assertEqual(components[0], 0.75)
         # bus_short disappears in optimal, air_short disappears as long motorized, so optimal = 0
         self.assertEqual(components[1], (self.busExpect * self.busCarbon) / 1000)
