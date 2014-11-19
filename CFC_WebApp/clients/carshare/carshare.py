@@ -1,11 +1,14 @@
 import logging
 from get_database import get_section_db
+from bottle import template
 
 def classifiedCount(request):
-  from bottle import template
-
   print "carshare.classifiedCount called for user %s!" % request['user']
-  tripCount = get_section_db().find({"$and": [{'user_id': request['user']}, {'type': 'move'}, {'confirmed_mode': {'$ne': ''}}]}).count()
+  return getResult(request['user'])
+
+def getResult(user_uuid):
+  logging.debug("carshare.getResult called for user %s!" % user_uuid)
+  tripCount = get_section_db().find({"$and": [{'user_id': user_uuid}, {'type': 'move'}, {'confirmed_mode': {'$ne': ''}}]}).count()
   renderedTemplate = template("clients/carshare/result_template.html",
                               count = tripCount)
   return renderedTemplate
