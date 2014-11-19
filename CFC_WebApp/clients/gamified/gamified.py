@@ -2,7 +2,11 @@ import logging
 from get_database import get_section_db
 from main import carbon, common
 
-def getScore(request):
+# Returns the components on which the score is based. These will be combined in
+# getScore later, but it is useful to see them to decide how to set up the
+# weights
+
+def getScoreComponents(request):
   user = request['user']
 
   # The score is based on the following components:
@@ -21,6 +25,8 @@ def getScore(request):
   myAllDrive = carbon.getAllDrive(myModeShareDistance)
   myCarbonFootprintSum = sum(myModeCarbonFootprintNoLongMotorized.values())
   myOptimalFootprintSum = sum(myOptimalCarbonFootprintNoLongMotorized.values())
+  logging.debug("myCarbonFootprintSum = %s, myOptimalFootprintSum = %s, myAllDrive = %s" %
+        (myCarbonFootprintSum, myOptimalFootprintSum, myAllDrive))
   components = [pctClassified,
                  (myCarbonFootprintSum - myOptimalFootprintSum),
                  (myAllDrive - myCarbonFootprintSum),

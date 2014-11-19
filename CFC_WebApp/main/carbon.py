@@ -91,19 +91,20 @@ def appendDistanceFilter(spec, distFilter):
   distanceFilter = {'distance': distFilter}
   return addFilterToSpec(spec, distanceFilter)
 
-def delModeNameWithPrefix(modeName, prefix, modeDistanceMap):
-  modeNameWithPrefix = '%s_%s' % (modeName, prefix)
-  logging.debug("In delModeNameWithPrefix.modeNameWithPrefix = %s" % modeNameWithPrefix)
-  if modeNameWithPrefix in modeDistanceMap:
-    del modeDistanceMap[modeNameWithPrefix]
+def delModeNameWithSuffix(modeName, prefix, modeDistanceMap):
+  modeNameWithSuffix = '%s%s' % (modeName, prefix)
+  logging.debug("In delModeNameWithSuffix.modeNameWithSuffix = %s" % modeNameWithSuffix)
+  if modeNameWithSuffix in modeDistanceMap:
+    del modeDistanceMap[modeNameWithSuffix]
 
 # Doesn't return anything, deletes entries from the distance map as a side effect
 def delLongMotorizedModes(modeDistanceMap):
   logging.debug("At the beginning of delLongMotorizedModes, the distance map was %s" % modeDistanceMap)
   for mode in longMotorizedModeList:
       logging.debug("Deleting entries for mode %s from the distance map" % mode)
-      delModeNameWithPrefix(mode, "short", modeDistanceMap)
-      delModeNameWithPrefix(mode, "long", modeDistanceMap)
+      delModeNameWithSuffix(mode, "", modeDistanceMap)
+      delModeNameWithSuffix(mode, "_short", modeDistanceMap)
+      delModeNameWithSuffix(mode, "_long", modeDistanceMap)
   logging.debug("At the end of delLongMotorizedModes, the distance map was %s" % modeDistanceMap)
 
 def getFootprintCompare(user):

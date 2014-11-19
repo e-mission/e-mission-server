@@ -1,3 +1,4 @@
+# Needed to modify the pythonpath
 import unittest
 import json
 from utils import load_database_json, purge_database_json
@@ -6,9 +7,6 @@ from pymongo import MongoClient
 import logging
 from get_database import get_db, get_mode_db, get_section_db
 import re
-# Needed to modify the pythonpath
-import sys
-import os
 from datetime import datetime, timedelta
 
 logging.basicConfig(level=logging.DEBUG)
@@ -231,6 +229,12 @@ class TestCarbon(unittest.TestCase):
                      self.weekago + timedelta(weeks = -1), self.now)), len(self.testUsers))
 
   def testDelLongMotorizedModes(self):
+    testMap = {'bus': 1, 'air': 3}
+    carbon.delLongMotorizedModes(testMap)
+    self.assertEqual(len(testMap), 1)
+    self.assertEqual(testMap, {'bus': 1})
+
+  def testDelLongMotorizedModesShortLong(self):
     testMap = {'bus_short': 1, 'bus_long': 2, 'air_short': 3, 'air_long': 4}
     carbon.delLongMotorizedModes(testMap)
     self.assertEqual(len(testMap), 2)

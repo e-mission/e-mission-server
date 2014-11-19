@@ -5,6 +5,8 @@ from get_database import get_profile_db, get_client_db, get_pending_signup_db
 import dateutil.parser
 from datetime import datetime
 
+import clients.common
+
 class Client:
   def __init__(self, clientName):
     # TODO: write background process to ensure that there is only one client with each name
@@ -186,7 +188,6 @@ class Client:
   # Read the design decisions for an example of how to improve this
   @staticmethod
   def getClientConfirmedModeQueries(mode):
-    import clients.common
 
     # Read the common query list file
     queryList = clients.common.getConfirmFields()
