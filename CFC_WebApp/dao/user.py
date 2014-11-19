@@ -40,8 +40,14 @@ class User:
   def getProfile(self):
     return get_profile_db().find_one({'user_id': self.uuid})
 
+  # In the real system, we should always have a profile for the user. But
+  # during unit tests, and durig analysis, that it not always true. Let us fail
+  # more gracefully if no profile is present
   def getStudy(self):
-    return self.getProfile()['study_list']
+    if self.getProfile() != None:
+        return self.getProfile()['study_list']
+    else:
+        return []
 
   def getFirstStudy(self):
     studyList = self.getProfile()['study_list']
