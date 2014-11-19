@@ -186,8 +186,10 @@ class Client:
   # Read the design decisions for an example of how to improve this
   @staticmethod
   def getClientConfirmedModeQueries(mode):
+    import clients.common
+
     # Read the common query list file
-    queryList = json.load(open("clients/query_list"))['client_confirm_fields']
+    queryList = clients.common.getConfirmFields()
     queryListWithMode = [{query: mode} for query in queryList]
     return [{'$or': queryListWithMode}]
 
