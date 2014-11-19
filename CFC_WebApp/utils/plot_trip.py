@@ -9,8 +9,10 @@ db = MongoClient().Stage_database
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
+    if len(sys.argv) == 1:
         print "USAGE: %s trip_id\n" % sys.argv[0]
+        print "option: -o , immediately open file in default browser"
+        print "OUTPUT: plot will be stored at ./plots/trip_id.html"
         print "COLOR SCHEME FOR THE PLOT:\n"
         print "walking - blue\nrunning - green\ncycling - yellow\ntransport - red\nbus - aqua\ntrain - darkOrange\ncar - grey\nmixed - olive\nair -skyBlue\n"
         exit(1)
@@ -33,4 +35,8 @@ if __name__ == '__main__':
             if not os.path.exists('plots'):
                 os.makedirs('plots')
             gmap.draw('plots/' + trip_id + '.html')
-            webbrowser.open('plots/' + trip_id + '.html')
+            try: 
+                if sys.argv[2] == '-o':
+                    webbrowser.open('plots/' + trip_id + '.html')
+            except:
+                exit(1)
