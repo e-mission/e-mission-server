@@ -110,29 +110,31 @@ def delLongMotorizedModes(modeDistanceMap):
 def getFootprintCompare(user):
   now = datetime.now()
   weekago = now - timedelta(days=7)
+  return getFootprintCompareForRange(user, weekago, now)
 
-  myModeShareCount = getModeShare(user, weekago,now)
-  totalModeShareCount = getModeShare(None, weekago,now)
+def getFootprintCompareForRange(user, start, end):
+  myModeShareCount = getModeShare(user, start,end)
+  totalModeShareCount = getModeShare(None, start,end)
   logging.debug("myModeShareCount = %s totalModeShareCount = %s" %
       (myModeShareCount, totalModeShareCount))
 
-  myModeShareDistance = getModeShareDistance(user,weekago,now)
-  totalModeShareDistance = getModeShareDistance(None, weekago,now)
+  myModeShareDistance = getModeShareDistance(user,start,end)
+  totalModeShareDistance = getModeShareDistance(None, start,end)
   logging.debug("myModeShareDistance = %s totalModeShareDistance = %s" %
       (myModeShareDistance, totalModeShareDistance))
-  myShortLongModeShareDistance = getShortLongModeShareDistance(user, weekago, now)
-  totalShortLongModeShareDistance = getShortLongModeShareDistance(None, weekago, now)
+  myShortLongModeShareDistance = getShortLongModeShareDistance(user, start, end)
+  totalShortLongModeShareDistance = getShortLongModeShareDistance(None, start, end)
 
-  myModeCarbonFootprint = getModeCarbonFootprint(user, carbonFootprintForMode,weekago,now)
+  myModeCarbonFootprint = getModeCarbonFootprint(user, carbonFootprintForMode,start,end)
   myModeCalcWithNewMethod = getCarbonFootprintsForMap(myShortLongModeShareDistance, carbonFootprintForMode)
   assert(myModeCarbonFootprint == myModeCalcWithNewMethod)
 
-  totalModeCarbonFootprint = getModeCarbonFootprint(None, carbonFootprintForMode,weekago,now)
+  totalModeCarbonFootprint = getModeCarbonFootprint(None, carbonFootprintForMode,start,end)
   logging.debug("myModeCarbonFootprint = %s, totalModeCarbonFootprint = %s" %
       (myModeCarbonFootprint, totalModeCarbonFootprint))
 
-  myOptimalCarbonFootprint = getModeCarbonFootprint(user, optimalCarbonFootprintForMode,weekago,now)
-  totalOptimalCarbonFootprint = getModeCarbonFootprint(None, optimalCarbonFootprintForMode,weekago,now)
+  myOptimalCarbonFootprint = getModeCarbonFootprint(user, optimalCarbonFootprintForMode,start,end)
+  totalOptimalCarbonFootprint = getModeCarbonFootprint(None, optimalCarbonFootprintForMode,start,end)
   logging.debug("myOptimalCarbonFootprint = %s, totalOptimalCarbonFootprint = %s" %
       (myOptimalCarbonFootprint, totalOptimalCarbonFootprint))
 
@@ -145,7 +147,7 @@ def getFootprintCompare(user):
   myOptimalCarbonFootprintNoLongMotorized = getCarbonFootprintsForMap(myShortLongModeShareDistance, optimalCarbonFootprintForMode)
   totalOptimalCarbonFootprintNoLongMotorized = getCarbonFootprintsForMap(totalShortLongModeShareDistance, optimalCarbonFootprintForMode)
 
-  nUsers = getDistinctUserCount(getQuerySpec(None, None, weekago, now))
+  nUsers = getDistinctUserCount(getQuerySpec(None, None, start, end))
   # Hack to prevent divide by zero on an empty DB.
   # We will never really have an empty DB in the real production world,
   # but shouldn't crash in that case.

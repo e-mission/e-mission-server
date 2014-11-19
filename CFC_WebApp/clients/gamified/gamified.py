@@ -1,6 +1,7 @@
 import logging
 from get_database import get_section_db
 from main import carbon, common
+from datetime import datetime, timedelta
 
 # Returns the components on which the score is based. These will be combined in
 # getScore later, but it is useful to see them to decide how to set up the
@@ -8,6 +9,8 @@ from main import carbon, common
 
 def getScoreComponents(request):
   user = request['user']
+  now = datetime.now()
+  yearago = now - timedelta(days=365)
 
   # The score is based on the following components:
   # - Percentage of trips classified. We are not auto-classifying high
@@ -19,7 +22,7 @@ def getScoreComponents(request):
    myModeCarbonFootprint, avgModeCarbonFootprint,
    myModeCarbonFootprintNoLongMotorized, avgModeCarbonFootprintNoLongMotorized,
    myOptimalCarbonFootprint, avgOptimalCarbonFootprint,
-   myOptimalCarbonFootprintNoLongMotorized, avgOptimalCarbonFootprintNoLongMotorized) = carbon.getFootprintCompare(user)
+   myOptimalCarbonFootprintNoLongMotorized, avgOptimalCarbonFootprintNoLongMotorized) = carbon.getFootprintCompareForRange(user, yearago, now)
 
   carbon.delLongMotorizedModes(myModeShareDistance)
   myAllDrive = carbon.getAllDrive(myModeShareDistance)
