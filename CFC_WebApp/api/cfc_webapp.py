@@ -47,7 +47,7 @@ logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
                   filename=config_data["paths"]["log_file"], level=logging.DEBUG)
 
 from main import modeshare, zipcode, distance, tripManager, auth,\
-                 carbon, commute, work_time, Berkeley, common, visualize, stats
+                 carbon, commute, work_time, Berkeley, common, visualize, stats, userclient
 from dao.client import Client
 from dao.user import User
 from get_database import get_uuid_db, get_mode_db
@@ -250,14 +250,19 @@ def getCarbonCompare():
     return "Waiting for user data to be become available.."
 
   user_uuid = getUUID(request)
-  user = User.fromUUID(user_uuid)
-  if user.getFirstStudy() == 'carshare':
-    return callStudy("carshare", "classifiedCount")
+  clientResult = userclient.getClientSpecificResult(user_uuid)
+  if clientResult != None:
+    logging.debug("Found overriding client result for user %s, returning it" % user_uuid)
+    return clientResult
+  else:
+    logging.debug("No overriding client result for user %s, returning default" % user_uuid)
   
   (myModeShareCount, avgModeShareCount,
      myModeShareDistance, avgModeShareDistance,
      myModeCarbonFootprint, avgModeCarbonFootprint,
-     myOptimalCarbonFootprint, avgOptimalCarbonFootprint) = carbon.getFootprintCompare(user_uuid)
+     myModeCarbonFootprintNoLongMotorized, avgModeCarbonFootprintNoLongMotorized, # ignored
+     myOptimalCarbonFootprint, avgOptimalCarbonFootprint,
+     myOptimalCarbonFootprintNoLongMotorized, avgOptimalCarbonFootprintNoLongMotorized) = carbon.getFootprintCompare(user_uuid)
 
   renderedTemplate = template("compare.html",
                       myModeShareCount = json.dumps(myModeShareCount),

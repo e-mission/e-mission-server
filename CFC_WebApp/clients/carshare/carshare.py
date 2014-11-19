@@ -2,10 +2,16 @@ import logging
 from get_database import get_section_db
 
 def classifiedCount(request):
+  print "carshare.classifiedCount called for user %s!" % request['user']
+  return getResult(request['user'])
+
+def getResult(user_uuid):
+  # This is in here, as opposed to the top level as recommended by the PEP
+  # because then we don't have to worry about loading bottle in the unit tests
   from bottle import template
 
-  print "carshare.classifiedCount called for user %s!" % request['user']
-  tripCount = get_section_db().find({"$and": [{'user_id': request['user']}, {'type': 'move'}, {'confirmed_mode': {'$ne': ''}}]}).count()
+  logging.debug("carshare.getResult called for user %s!" % user_uuid)
+  tripCount = get_section_db().find({"$and": [{'user_id': user_uuid}, {'type': 'move'}, {'confirmed_mode': {'$ne': ''}}]}).count()
   renderedTemplate = template("clients/carshare/result_template.html",
                               count = tripCount)
   return renderedTemplate

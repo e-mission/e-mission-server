@@ -5,6 +5,8 @@ from get_database import get_profile_db, get_client_db, get_pending_signup_db
 import dateutil.parser
 from datetime import datetime
 
+import clients.common
+
 class Client:
   def __init__(self, clientName):
     # TODO: write background process to ensure that there is only one client with each name
@@ -175,6 +177,12 @@ class Client:
     else:
       return []
 
+  def getResult(self, uuid):
+    if self.isActive(datetime.now()):
+        return self.__loadModule().getResult(uuid)
+    else:
+        return None
+
   def clientSpecificSetters(self, uuid, sectionId, predictedModeMap):
     if self.isActive(datetime.now()):
       return self.__loadModule().clientSpecificSetters(uuid, sectionId, predictedModeMap)
@@ -186,8 +194,7 @@ class Client:
   # Read the design decisions for an example of how to improve this
   @staticmethod
   def getClientConfirmedModeQueries(mode):
-    # Read the common query list file
-    queryList = json.load(open("clients/query_list"))['client_confirm_fields']
+    queryList = clients.common.getConfirmFields()
     queryListWithMode = [{query: mode} for query in queryList]
     return [{'$or': queryListWithMode}]
 
