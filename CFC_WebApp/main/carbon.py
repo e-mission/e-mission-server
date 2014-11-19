@@ -48,7 +48,8 @@ optimalCarbonFootprintForMode = {'walking' : 0,
 def getModeCarbonFootprint(user, carbonFootprintMap,start,end):
   modeDistanceMap = getShortLongModeShareDistance(user,start,end)
   logging.debug("getModeCarbonFootprint, modeDistanceMap = %s" % modeDistanceMap)
-  return getCarbonFootprintsForMap(modeDistanceMap, carbonFootprintForMode)
+  logging.debug("footprintMap = %s" % carbonFootprintMap)
+  return getCarbonFootprintsForMap(modeDistanceMap, carbonFootprintMap)
 
 def getCarbonFootprintsForMap(modeDistanceMap, carbonFootprintMap):
   logging.debug("In getCarbonFootprintsForMap, modeDistanceMap = %s" % modeDistanceMap)
@@ -56,6 +57,8 @@ def getCarbonFootprintsForMap(modeDistanceMap, carbonFootprintMap):
   for modeName in modeDistanceMap:
     # logging.debug("Consider mode with name %s" % modeName)
     carbonForMode = float(carbonFootprintMap[modeName] * modeDistanceMap[modeName])/1000
+    logging.debug("carbonForMode %s = %s from %s * %s" % 
+        (modeName, carbonForMode, carbonFootprintMap[modeName], modeDistanceMap[modeName]))
     modeFootprintMap[modeName] = carbonForMode
   return modeFootprintMap
 
@@ -116,9 +119,11 @@ def getFootprintCompare(user):
   totalModeShareDistance = getModeShareDistance(None, weekago,now)
   logging.debug("myModeShareDistance = %s totalModeShareDistance = %s" %
       (myModeShareDistance, totalModeShareDistance))
+  myShortLongModeShareDistance = getShortLongModeShareDistance(user, weekago, now)
+  totalShortLongModeShareDistance = getShortLongModeShareDistance(None, weekago, now)
 
   myModeCarbonFootprint = getModeCarbonFootprint(user, carbonFootprintForMode,weekago,now)
-  myModeCalcWithNewMethod = getCarbonFootprintsForMap(modeDistanceMap, carbonFootprintForMode)
+  myModeCalcWithNewMethod = getCarbonFootprintsForMap(myShortLongModeShareDistance, carbonFootprintForMode)
   assert(myModeCarbonFootprint == myModeCalcWithNewMethod)
 
   totalModeCarbonFootprint = getModeCarbonFootprint(None, carbonFootprintForMode,weekago,now)
@@ -127,15 +132,17 @@ def getFootprintCompare(user):
 
   myOptimalCarbonFootprint = getModeCarbonFootprint(user, optimalCarbonFootprintForMode,weekago,now)
   totalOptimalCarbonFootprint = getModeCarbonFootprint(None, optimalCarbonFootprintForMode,weekago,now)
+  logging.debug("myOptimalCarbonFootprint = %s, totalOptimalCarbonFootprint = %s" %
+      (myOptimalCarbonFootprint, totalOptimalCarbonFootprint))
 
-  shortLongModeShareDistance = getShortLongModeShareDistance(user, start, end)
-  delLongMotorizedModes(myModeShareDistance)
-  logging.debug("After deleting long motorized mode, map is %s", myModeShareDistance)
+  delLongMotorizedModes(myShortLongModeShareDistance)
+  delLongMotorizedModes(totalShortLongModeShareDistance)
+  logging.debug("After deleting long motorized mode, map is %s", myShortLongModeShareDistance)
 
-  myModeCarbonFootprintNoLongMotorized = getCarbonFootprintsForMap(myModeShareDistance, carbonFootprintForMode)
-  totalModeCarbonFootprintNoLongMotorized = getCarbonFootprintsForMap(totalModeShareDistance, carbonFootprintForMode,weekago,now)
-  myOptimalCarbonFootprintNoLongMotorized = getCarbonFootprintsForMap(myModeShareDistance, optimalCarbonFootprintForMode)
-  totalOptimalCarbonFootprintNoLongMotorized = getCarbonFootprintsForMap(totalModeShareDistance, optimalCarbonFootprintForMode,weekago,now)
+  myModeCarbonFootprintNoLongMotorized = getCarbonFootprintsForMap(myShortLongModeShareDistance, carbonFootprintForMode)
+  totalModeCarbonFootprintNoLongMotorized = getCarbonFootprintsForMap(totalShortLongModeShareDistance, carbonFootprintForMode)
+  myOptimalCarbonFootprintNoLongMotorized = getCarbonFootprintsForMap(myShortLongModeShareDistance, optimalCarbonFootprintForMode)
+  totalOptimalCarbonFootprintNoLongMotorized = getCarbonFootprintsForMap(totalShortLongModeShareDistance, optimalCarbonFootprintForMode)
 
   nUsers = getDistinctUserCount(getQuerySpec(None, None, weekago, now))
   # Hack to prevent divide by zero on an empty DB.
@@ -206,3 +213,7 @@ def getSummaryAllTrips(start,end):
           "SB375 mandate for 2035": 40.142892,
           "EO 2050 goal (80% below 1990)": 8.28565
          }
+
+def getAllDrive(modeDistanceMap):
+   totalDistance = sum(modeDistanceMap.values()) / 1000
+   return totalDistance * carbonFootprintForMode['car_short']
