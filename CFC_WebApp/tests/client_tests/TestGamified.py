@@ -85,14 +85,20 @@ class TestGamified(unittest.TestCase):
         self.user = user
 
     def testGetScoreComponents(self):
-        components = gamified.getScoreComponents(self.user.uuid)
+        components = gamified.getScoreComponents(self.user.uuid, self.weekago, self.now)
         self.assertEqual(components[0], 0.75)
         # bus_short disappears in optimal, air_short disappears as long motorized, so optimal = 0
-        self.assertEqual(components[1], (self.busExpect * self.busCarbon) / 1000)
+        # self.assertEqual(components[1], (self.busExpect * self.busCarbon) / 1000)
+        # TODO: Figure out what we should do when optimal == 0. Currently, we
+        # return 0, which seems sub-optimal (pun intended)
+        self.assertEqual(components[1], 0.0)
         # air_short disappears as long motorized, but we need to consider walking
-        self.assertAlmostEqual(components[2], (self.busExpect * (self.driveCarbon - self.busCarbon) + self.walkExpect * self.driveCarbon)/1000, places = 4)
+        allDrive = (self.busExpect * self.driveCarbon + self.walkExpect * self.driveCarbon)/1000
+        myFootprint = (self.busExpect * self.busCarbon)/1000
+        self.assertAlmostEqual(components[2], (allDrive - myFootprint)/allDrive, places=4)
         # air_short disappears as long motorized, so only bus_short is left
-        self.assertEqual(components[3], 40.142892 - (self.busExpect * self.busCarbon)/1000)
+        sb375Goal = 40.142892/7
+        self.assertAlmostEqual(components[3], (sb375Goal - myFootprint)/sb375Goal, places = 4)
 
 if __name__ == '__main__':
     unittest.main()

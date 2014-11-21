@@ -399,11 +399,12 @@ def Inside_polygon(pnt,poly):
 
 # Consider passing in a time range as well. We could just do it right now,
 # but that might be over engineering
-def getClassifiedRatio(uuid):
+def getClassifiedRatio(uuid, start, end):
     defaultQueryList = [ {'source':'Shankari'},
                          {'user_id':uuid},
                          {'predicted_mode': { '$exists' : True } },
-                         { 'type': 'move' } ]
+                         { 'type': 'move' },
+                         { 'section_start_datetime': {'$gt': start, '$lt': end}}]
     clientSpecificQuery = getClientSpecificQueryFilter(uuid)
     completeQueryList = defaultQueryList + clientSpecificQuery
     logging.debug("completeQueryList = %s" % completeQueryList)

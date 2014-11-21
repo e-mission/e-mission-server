@@ -10,6 +10,7 @@ sys.path.append("%s" % os.getcwd())
 from main import common
 from get_database import get_db, get_section_db
 from uuid import UUID
+from datetime import datetime, timedelta
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -24,6 +25,8 @@ class TestCommon(unittest.TestCase):
     
     # Load modes, otherwise the queries won't work properly
     load_database_json.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
+    self.dayago = datetime.now() - timedelta(days=1)
+    self.now = datetime.now()
 
   def testAddModeIdNonAndSpec(self):
     inSpec = {'type': 'move'}
@@ -72,7 +75,6 @@ class TestCommon(unittest.TestCase):
     from dao.user import User
     from dao.client import Client
     import tests.common
-    from datetime import datetime, timedelta
     from get_database import get_section_db
 
     fakeEmail = "fake@fake.com"
@@ -191,7 +193,6 @@ class TestCommon(unittest.TestCase):
   @staticmethod
   def getDummySection(predictedMode, confirmedMode):
     import tests.common
-    from datetime import datetime, timedelta
 
     return tests.common.createDummySection(
             datetime.now()+timedelta(hours = -1),
@@ -199,7 +200,8 @@ class TestCommon(unittest.TestCase):
             [1, -1], [-1, 1], predictedMode, confirmedMode)
 
   def testGetClassifiedRatioNoTrips(self):
-    self.assertEqual(common.getClassifiedRatio('this is fake'), 0)
+
+    self.assertEqual(common.getClassifiedRatio('this is fake', self.dayago, self.now), 0)
 
   def testGetClassifiedRatioWithoutPredictions(self):
     from copy import copy
@@ -227,7 +229,7 @@ class TestCommon(unittest.TestCase):
 
     logging.debug("After inserting sections, count is %s" % get_section_db().find().count())
     logging.debug("Manual query count = %s" % get_section_db().find({'$and': [{'source': 'Shankari'}, {'user_id': user.uuid}, {'predicted_mode': {'$exists': True}}, {'type': 'move'}]}).count())
-    self.assertEqual(common.getClassifiedRatio(user.uuid), 1)
+    self.assertEqual(common.getClassifiedRatio(user.uuid, self.dayago, self.now), 1)
 
   def testGetClassifiedRatioWithPredictions(self):
     from copy import copy
@@ -262,7 +264,9 @@ class TestCommon(unittest.TestCase):
     logging.debug("Manual query count = %s" % get_section_db().find({'$and': [{'source': 'Shankari'}, {'user_id': user.uuid}, {'predicted_mode': {'$exists': True}}, {'type': 'move'}]}).count())
     logging.debug("Manual query count classified = %s" % get_section_db().find({'$and': [{'source': 'Shankari'}, {'user_id': user.uuid}, {'predicted_mode': {'$exists': True}}, {'type': 'move'}, {'confirmed_mode': {"$ne": ''}} ]}).count())
 
-    self.assertEqual(common.getClassifiedRatio(user.uuid), 3.0/6)
+    self.assertEqual(common.getClassifiedRatio(user.uuid, self.dayago, self.now), 3.0/6)
+    two_days_ago = datetime.now() - timedelta(days=2)
+    self.assertEqual(common.getClassifiedRatio(user.uuid, two_days_ago, self.dayago), 0)
 
 if __name__ == '__main__':
     unittest.main()
