@@ -57,8 +57,8 @@ def getCarbonFootprintsForMap(modeDistanceMap, carbonFootprintMap):
   for modeName in modeDistanceMap:
     # logging.debug("Consider mode with name %s" % modeName)
     carbonForMode = float(carbonFootprintMap[modeName] * modeDistanceMap[modeName])/1000
-    logging.debug("carbonForMode %s = %s from %s * %s" % 
-        (modeName, carbonForMode, carbonFootprintMap[modeName], modeDistanceMap[modeName]))
+    # logging.debug("carbonForMode %s = %s from %s * %s" % 
+    #     (modeName, carbonForMode, carbonFootprintMap[modeName], modeDistanceMap[modeName]))
     modeFootprintMap[modeName] = carbonForMode
   return modeFootprintMap
 
@@ -125,16 +125,13 @@ def getFootprintCompareForRange(user, start, end):
   myShortLongModeShareDistance = getShortLongModeShareDistance(user, start, end)
   totalShortLongModeShareDistance = getShortLongModeShareDistance(None, start, end)
 
-  myModeCarbonFootprint = getModeCarbonFootprint(user, carbonFootprintForMode,start,end)
-  myModeCalcWithNewMethod = getCarbonFootprintsForMap(myShortLongModeShareDistance, carbonFootprintForMode)
-  assert(myModeCarbonFootprint == myModeCalcWithNewMethod)
-
-  totalModeCarbonFootprint = getModeCarbonFootprint(None, carbonFootprintForMode,start,end)
+  myModeCarbonFootprint = getCarbonFootprintsForMap(myShortLongModeShareDistance, carbonFootprintForMode)
+  totalModeCarbonFootprint = getCarbonFootprintsForMap(totalShortLongModeShareDistance, carbonFootprintForMode)
   logging.debug("myModeCarbonFootprint = %s, totalModeCarbonFootprint = %s" %
       (myModeCarbonFootprint, totalModeCarbonFootprint))
 
-  myOptimalCarbonFootprint = getModeCarbonFootprint(user, optimalCarbonFootprintForMode,start,end)
-  totalOptimalCarbonFootprint = getModeCarbonFootprint(None, optimalCarbonFootprintForMode,start,end)
+  myOptimalCarbonFootprint = getCarbonFootprintsForMap(myShortLongModeShareDistance, optimalCarbonFootprintForMode)
+  totalOptimalCarbonFootprint = getCarbonFootprintsForMap(totalShortLongModeShareDistance, optimalCarbonFootprintForMode)
   logging.debug("myOptimalCarbonFootprint = %s, totalOptimalCarbonFootprint = %s" %
       (myOptimalCarbonFootprint, totalOptimalCarbonFootprint))
 
