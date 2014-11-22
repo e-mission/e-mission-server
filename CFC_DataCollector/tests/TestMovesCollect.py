@@ -1,4 +1,5 @@
 import unittest
+import logging
 import json
 from pymongo import MongoClient
 import re
@@ -6,6 +7,8 @@ from get_database import get_mode_db, get_section_db, get_trip_db
 # Needed to modify the pythonpath
 import sys
 import os
+
+logging.basicConfig(level=logging.DEBUG)
 
 # print "old path is %s" % sys.path
 sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
@@ -23,6 +26,8 @@ class TestMovesCollect(unittest.TestCase):
     # Sometimes, we may have entries left behind in the database if one of the tests failed
     # or threw an exception, so let us start by cleaning up all entries
     self.ModesColl = get_mode_db()
+    self.ModesColl.remove()
+
     self.assertEquals(self.ModesColl.find().count(), 0)
 
     dataJSON = json.load(open("tests/data/modes.json"))
@@ -58,6 +63,7 @@ class TestMovesCollect(unittest.TestCase):
   # This is a trip from Thomas Raffill, where we missed the section where he
   # cycled to Barracuda Asked and recieved consent to check this trip into the
   # repository, identified by the tamtom2000@gmail.com email account on
+
   # Tuesday, Apr 8th, at 7:40am
   def testMissingSections(self):
     result = self.loadReplaceUser("tests/data/tom_missing_trip", "tamtom2000@gmail.com", self.testUUID)
@@ -118,6 +124,38 @@ class TestMovesCollect(unittest.TestCase):
 
     SectionColl = get_section_db()
     self.assertEquals(SectionColl.find({"user_id": self.testUUID}).count(), 0)
+
+  def testPlaceLoad(self):
+    result = self.loadTestJSON("tests/data/raff20140410")
+    collect.processResult(self.testUUID, result)
+
+    # Check that the trips are loaded correctly
+    TripColl = get_trip_db()
+    firstStoredTrip = TripColl.find_one({'$and': [{'user_id': self.testUUID,
+                                      'trip_id': '20140409T191531-0700'}]})
+    logging.debug("selected trip = %s" % firstStoredTrip)
+    # For some reason, the place is always "unknown", at least for this set of test trips.
+    # Maybe it is related to the fact that they haven't been tagged in FourSquare
+    self.assertEqual(firstStoredTrip['type'], 'place')
+    self.assertEqual(firstStoredTrip['trip_start_time'], '20140409T191531-0700')
+    self.assertEqual(firstStoredTrip['trip_end_time'], "20140410T065227-0700")
+    self.assertIn('place_location', firstStoredTrip['place'])
+    self.assertEqual(firstStoredTrip['place']['place_location'], {'type': 'Point',
+                                                            'coordinates': [-122.08632, 37.391]})
+
+    # Now, check that we have the sections as well. The previous trip did not
+    # have any sections. This one does
+    tripWithSections = TripColl.find_one({'$and': [{'user_id': self.testUUID,
+                                      'trip_id': '20140410T071320-0700'}]})
+
+    self.assertNotEqual(tripWithSections, None)
+    self.assertEqual(tripWithSections['sections'], [0])
+
+    SectionColl = get_section_db()
+    sectionForTrip = SectionColl.find_one({'$and': [{'user_id': self.testUUID,
+                                      'trip_id': '20140410T071320-0700',
+                                      'section_id': 0}]})
+    self.assertNotEqual(sectionForTrip, None)
 
   def testUpdateSectionForExistingTrip(self):
     result = self.loadReplaceUser("tests/data/tom_missing_trip", "tamtom2000@gmail.com", self.testUUID)
