@@ -64,6 +64,14 @@ class User:
     newTs = self.getUpdateTS() + timedelta
     get_profile_db().update({'user_id': self.uuid}, {'$set': {'update_ts': newTs}})
 
+  def getScore(self):
+    profile = self.getProfile()
+    return profile['score'] if 'score' in profile else 0
+
+  def setScore(self, newScore):
+    logging.debug("Changing score for user %s from %s to %s" % (self.uuid, self.getScore(), newScore))
+    get_profile_db().update({'user_id': self.uuid}, {'$set': {'score': newScore}})
+
   @staticmethod
   def mergeDicts(dict1, dict2):
     retDict = dict1.copy()

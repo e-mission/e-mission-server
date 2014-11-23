@@ -36,6 +36,15 @@ class TestGamified(unittest.TestCase):
         self.driveCarbon = 278.0/1609
         self.busOptimalCarbon = 92.0/1609
 
+        self.allDriveExpect = (self.busExpect * self.driveCarbon + self.walkExpect * self.driveCarbon)/1000
+        self.myFootprintExpect = (self.busExpect * self.busCarbon)/1000
+        self.sb375GoalExpect = 40.142892/7
+
+        self.mineMinusOptimalExpect = 0
+        self.allDriveMinusMineExpect = (self.allDriveExpect - self.myFootprintExpect)/self.allDriveExpect
+        self.sb375DailyGoalMinusMineExpect = (self.sb375GoalExpect - self.myFootprintExpect)/self.sb375GoalExpect
+
+
         self.now = datetime.now()
         self.dayago = self.now - timedelta(days=1)
         self.weekago = self.now - timedelta(weeks = 1)
@@ -93,12 +102,17 @@ class TestGamified(unittest.TestCase):
         # return 0, which seems sub-optimal (pun intended)
         self.assertEqual(components[1], 0.0)
         # air_short disappears as long motorized, but we need to consider walking
-        allDrive = (self.busExpect * self.driveCarbon + self.walkExpect * self.driveCarbon)/1000
-        myFootprint = (self.busExpect * self.busCarbon)/1000
-        self.assertAlmostEqual(components[2], (allDrive - myFootprint)/allDrive, places=4)
+        self.assertAlmostEqual(components[2], self.allDriveMinusMineExpect, places=4)
         # air_short disappears as long motorized, so only bus_short is left
-        sb375Goal = 40.142892/7
-        self.assertAlmostEqual(components[3], (sb375Goal - myFootprint)/sb375Goal, places = 4)
+        self.assertAlmostEqual(components[3], self.sb375DailyGoalMinusMineExpect, places = 4)
+
+    # Checks both calcScore and updateScore, since we calculate the score before we update it
+    def testUpdateScore(self):
+        self.assertEqual(self.user.getScore(), 0)
+        components = gamified.updateScore(self.user.uuid)
+        expectedScore = 0.75 * 5 + 3 * self.allDriveMinusMineExpect + 2 * 0.0 + \
+            1 * self.sb375DailyGoalMinusMineExpect
+        self.assertEqual(self.user.getScore(), expectedScore)
 
 if __name__ == '__main__':
     unittest.main()
