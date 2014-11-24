@@ -72,6 +72,10 @@ def doc(filename):
 def server_static(filename):
   return static_file(filename, static_path)
 
+@route('/clients/<clientname>/front/<filename>')
+def server_static(clientname, filename):
+  return static_file(filename, "clients/%s/%s" % (clientname, static_path))
+
 # Returns the proportion of survey takers who use each mode
 @route('/result/commute.modeshare.distance')
 def getCommuteModeShare():

@@ -45,7 +45,7 @@ def calcScore(componentArr):
   # Let's just convert everything to percentages to keep the ratios consistent
   # Also, we subtract the mineMinusOptimal term, since being way above optimal
   # should lower your score
-  return 5 * pctClassified + 3 * allDriveMinusMine - 2 * mineMinusOptimal + 1 * sb375DailyGoal
+  return 50 * pctClassified + 30 * allDriveMinusMine - 20 * mineMinusOptimal + 10 * sb375DailyGoal
 
 def getScore(user_uuid, start, end):
     components = getScoreComponents(user_uuid, start, end)
@@ -76,6 +76,8 @@ def updateScore(user_uuid):
     # Need to figure out how to structure client specific profile enhancements.
     # Should they even be stored in the user profile?
     newScore = user.getScore() + getScore(user_uuid, yesterdayStart, todayStart)
+    if newScore < 0:
+        newScore = 0
     user.setScore(newScore)
 
 def getResult(user_uuid):
@@ -83,12 +85,8 @@ def getResult(user_uuid):
   # because then we don't have to worry about loading bottle in the unit tests
   from bottle import template
 
-  score = user.fromUUID(user_uuid).getScore()
-  renderedTemplate = template("clients/gamified/result_template.html",
-                              pctClassified = pctClassified,
-                              mineMinusOptimal = mineMinusOptimal,
-                              allDriveMinusMine = allDriveMinusMine,
-                              sb375MinusMine = sb375MinusMine)
+  score = User.fromUUID(user_uuid).getScore()
+  renderedTemplate = template("clients/gamified/result_template.html")
   return renderedTemplate
 
 # These are copy/pasted from our first client, the carshare study
