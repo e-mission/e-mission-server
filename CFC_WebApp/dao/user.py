@@ -66,11 +66,15 @@ class User:
 
   def getScore(self):
     profile = self.getProfile()
-    return profile['score'] if 'score' in profile else 0
+    currScore = profile.get('currentScore', 0)
+    prevScore = profile.get('previousScore', 0)
+    return (prevScore, currScore)
 
-  def setScore(self, newScore):
-    logging.debug("Changing score for user %s from %s to %s" % (self.uuid, self.getScore(), newScore))
-    get_profile_db().update({'user_id': self.uuid}, {'$set': {'score': newScore}})
+  def setScores(self, prevScore, newScore):
+    logging.debug("Changing score for user %s from %s to %s" % (self.uuid, prevScore, newScore))
+    get_profile_db().update({'user_id': self.uuid}, {'$set': {'previousScore': prevScore,
+                                                              'currentScore': newScore}})
+    # TODO: Add a server side stat here so that we can know for sure how the score varies over time
 
   @staticmethod
   def mergeDicts(dict1, dict2):

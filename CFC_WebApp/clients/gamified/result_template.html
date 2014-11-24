@@ -5,11 +5,11 @@
     <style>
         * { margin: 0; padding: 0; }
         html { 
-            background: url("clients/gamified/front/level_1_1.png") no-repeat center center fixed; 
-            -webkit-background-size: contain;
-            -moz-background-size: contain;
-            -o-background-size: contain;
-            background-size: contain;
+            background: url("clients/gamified/front/{{level_picture_filename}}") no-repeat center center fixed; 
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
         }
     </style>
 
@@ -30,8 +30,12 @@
         .bullet .subtitle { fill: #999; }
     </style>
   </head>
-  <body onload="client.gamified.displayScore(50, 100);">
+  <body onload="client.gamified.displayScore(prevScore, currScore);">
     <div id="chart" align="bottom">
     </div>
+    <script>
+        var currScore = {{currScore}}
+        var prevScore = {{prevScore}}
+    </script>
   </body>
 </html>

@@ -75,18 +75,40 @@ def updateScore(user_uuid):
     # TODO: getScore() shouldn't really be defined in User because it doesn't apply to all clients.
     # Need to figure out how to structure client specific profile enhancements.
     # Should they even be stored in the user profile?
-    newScore = user.getScore() + getScore(user_uuid, yesterdayStart, todayStart)
+    (discardedScore, prevScore) = user.getScore()
+    newScore = prevScore + getScore(user_uuid, yesterdayStart, todayStart)
     if newScore < 0:
         newScore = 0
-    user.setScore(newScore)
+    user.setScores(prevScore, newScore)
+
+def getLevel(score):
+  if score < 1000:
+    level = 1
+    sublevel = (score / 200) + 1
+  elif score < 10000:
+    level = 2
+    sublevel = (score / 2000) + 1
+  elif score < 100000:
+    level = 3
+    sublevel = (score / 20000) + 1
+  else:
+    # Off the charts, stay at the top image
+    level = 3
+    sublevel = 5
+  return (level, sublevel)
 
 def getResult(user_uuid):
   # This is in here, as opposed to the top level as recommended by the PEP
   # because then we don't have to worry about loading bottle in the unit tests
   from bottle import template
 
-  score = User.fromUUID(user_uuid).getScore()
-  renderedTemplate = template("clients/gamified/result_template.html")
+  (prevScore, currScore) = User.fromUUID(user_uuid).getScore()
+  (level, sublevel) = getLevel(currScore)
+  
+  renderedTemplate = template("clients/gamified/result_template.html",
+                              level_picture_filename = "level_%s_%s.png" % (level, sublevel),
+                              prevScore = prevScore,
+                              currScore = currScore)
   return renderedTemplate
 
 # These are copy/pasted from our first client, the carshare study
