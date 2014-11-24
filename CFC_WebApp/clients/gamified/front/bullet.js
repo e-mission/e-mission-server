@@ -110,7 +110,7 @@ d3.bullet = function() {
 
       var axis = g.selectAll("g.axis").data([0]);
       axis.enter().append("g").attr("class", "axis");
-      axis.call(xAxis.scale(x1).ticks(11, "f"));
+      axis.call(xAxis.scale(x1).ticks(11, ".1s"));
     });
     d3.timer.flush();
   }

@@ -4,9 +4,9 @@ client.gamified = client.gamified || {};
 client.gamified.displayScore = function(prevScore, currScore) {
     console.log("displayScore called");
 
-    var margin = {top: 25, right: 40, bottom: 50, left: 80},
-    width = 150 - margin.left - margin.right,
-    height = 450 - margin.top - margin.bottom;
+    var margin = {top: 2, right: 2, bottom: 2, left: 2},
+    width = 65 - margin.left - margin.right,
+    height = 350 - margin.top - margin.bottom;
 
     var chart = d3.bullet()
         .orient("bottom")
@@ -22,11 +22,6 @@ client.gamified.displayScore = function(prevScore, currScore) {
 
     console.log("data = "+data);
 
-    var logScale = d3.scale.log()
-            .domain([1, data[0]['ranges'][-1]])
-            .range([0, height])
-    chart.__chart__ = logScale
-
       var svg = d3.select("#chart").selectAll("svg")
           .data(data)
           .enter().append("svg")
@@ -36,7 +31,6 @@ client.gamified.displayScore = function(prevScore, currScore) {
         .append("g")
           .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
           .call(chart);
-
 
 /*
       var title = svg.append("g")
