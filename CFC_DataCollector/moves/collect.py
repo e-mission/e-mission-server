@@ -98,7 +98,8 @@ def fillSectionWithMovesData(sec_from_moves, newSec):
 # to occur in practice, so it doesn't appear to be so critical that we are able
 # to fix it
 def fillTripWithMovesData(trip_from_moves, new_trip):
-  new_trip['type'] = trip_from_moves["type"]
+  logging.debug("trip_from_moves = %s" % trip_from_moves)
+  new_trip['type'] = trip_from_moves["type"] if 'type' in trip_from_moves else "unknown"
   new_trip['trip_start_time'] = trip_from_moves["startTime"]
   new_trip['trip_end_time'] = trip_from_moves["endTime"]
   new_trip['trip_start_datetime'] = parser.parse(trip_from_moves["startTime"])
@@ -127,7 +128,7 @@ def processResult(user_uuid, result):
   Stage_Sections=get_section_db()
   Modes=get_mode_db()
 
-  #logging.debug(json.dumps(result))
+  # logging.debug(json.dumps(result))
 
   # It turns out that if a user just signed up, then they don't have any
   # trips for yesterday, and it is a dict instead of a list. In that case, we
@@ -202,8 +203,11 @@ def processResult(user_uuid, result):
                            'user_id': user_uuid,
                            'trip_id':trip_id,
                            'sections':[sections['section_id'] for sections in Stage_Sections.find({"$and":[{"user_id":user_uuid}, {"trip_id":trip_id}]})]}
+              fillTripWithMovesData(seg_note, trips_todo)
               logging.info("About to insert trip with trip_id = %s " % (trip_id))
               Stage_Trips.insert(trips_todo)
+          else:
+              logging.debug("Found existing trip with trip_id = %s " % (trip_id))
   else:
     logging.warning("result[0] = %s, does not contain any segments" % result[0])
     # # logging.debug(json.dumps(result[0]["segments"][0]["activities"][0]))
