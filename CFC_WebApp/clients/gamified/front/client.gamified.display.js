@@ -4,8 +4,8 @@ client.gamified = client.gamified || {};
 client.gamified.displayScore = function(prevScore, currScore) {
     console.log("displayScore called");
 
-    var margin = {top: 2, right: 2, bottom: 2, left: 2},
-    width = 65 - margin.left - margin.right,
+    var margin = {top: 10, right: 2, bottom: 2, left: 35},
+    width = 50 - margin.left - margin.right,
     height = 350 - margin.top - margin.bottom;
 
     var chart = d3.bullet()
@@ -31,6 +31,11 @@ client.gamified.displayScore = function(prevScore, currScore) {
         .append("g")
           .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
           .call(chart);
+
+      console.log("domains are "+d3.selectAll("path"))
+      
+      d3.selectAll("path").style("opacity", 0)
+
 
 /*
       var title = svg.append("g")
