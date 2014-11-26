@@ -36,6 +36,15 @@ class TestGamified(unittest.TestCase):
         self.driveCarbon = 278.0/1609
         self.busOptimalCarbon = 92.0/1609
 
+        self.allDriveExpect = (self.busExpect * self.driveCarbon + self.walkExpect * self.driveCarbon)/1000
+        self.myFootprintExpect = (self.busExpect * self.busCarbon)/1000
+        self.sb375GoalExpect = 40.142892/7
+
+        self.mineMinusOptimalExpect = 0
+        self.allDriveMinusMineExpect = (self.allDriveExpect - self.myFootprintExpect)/self.allDriveExpect
+        self.sb375DailyGoalMinusMineExpect = (self.sb375GoalExpect - self.myFootprintExpect)/self.sb375GoalExpect
+
+
         self.now = datetime.now()
         self.dayago = self.now - timedelta(days=1)
         self.weekago = self.now - timedelta(weeks = 1)
@@ -85,14 +94,37 @@ class TestGamified(unittest.TestCase):
         self.user = user
 
     def testGetScoreComponents(self):
-        components = gamified.getScoreComponents(self.user.uuid)
+        components = gamified.getScoreComponents(self.user.uuid, self.weekago, self.now)
         self.assertEqual(components[0], 0.75)
         # bus_short disappears in optimal, air_short disappears as long motorized, so optimal = 0
-        self.assertEqual(components[1], (self.busExpect * self.busCarbon) / 1000)
+        # self.assertEqual(components[1], (self.busExpect * self.busCarbon) / 1000)
+        # TODO: Figure out what we should do when optimal == 0. Currently, we
+        # return 0, which seems sub-optimal (pun intended)
+        self.assertEqual(components[1], 0.0)
         # air_short disappears as long motorized, but we need to consider walking
-        self.assertAlmostEqual(components[2], (self.busExpect * (self.driveCarbon - self.busCarbon) + self.walkExpect * self.driveCarbon)/1000, places = 4)
+        self.assertAlmostEqual(components[2], self.allDriveMinusMineExpect, places=4)
         # air_short disappears as long motorized, so only bus_short is left
-        self.assertEqual(components[3], 40.142892 - (self.busExpect * self.busCarbon)/1000)
+        self.assertAlmostEqual(components[3], self.sb375DailyGoalMinusMineExpect, places = 4)
+
+    # Checks both calcScore and updateScore, since we calculate the score before we update it
+    def testUpdateScore(self):
+        self.assertEqual(self.user.getScore(), (0, 0))
+        components = gamified.updateScore(self.user.uuid)
+        expectedScore = 0.75 * 50 + 30 * self.allDriveMinusMineExpect + 20 * 0.0 + \
+            10 * self.sb375DailyGoalMinusMineExpect
+        self.assertEqual(self.user.getScore(), (0, expectedScore))
+
+    def testGetLevel(self):
+        self.assertEqual(gamified.getLevel(0), (1, 1))
+        self.assertEqual(gamified.getLevel(100), (1, 1))
+        self.assertEqual(gamified.getLevel(199), (1, 1))
+        self.assertEqual(gamified.getLevel(200), (1, 2))
+        self.assertEqual(gamified.getLevel(201), (1, 2))
+        self.assertEqual(gamified.getLevel(999), (1, 5))
+        self.assertEqual(gamified.getLevel(1000), (2, 1))
+        self.assertEqual(gamified.getLevel(9999), (2, 5))
+        self.assertEqual(gamified.getLevel(10000), (3, 1))
+        self.assertEqual(gamified.getLevel(100000), (3, 5))
 
 if __name__ == '__main__':
     unittest.main()
