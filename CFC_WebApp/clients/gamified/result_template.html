@@ -5,6 +5,10 @@
     <script src="clients/gamified/front/d3.js" charset="utf-8"></script>
     <script src="clients/gamified/front/bullet.js"></script>
     <script src="clients/gamified/front/client.gamified.display.js" charset="utf-8"></script>
+    <script src="clients/gamified/front/jquery-1.10.2.min.js" charset="utf-8"></script>
+    <script src="clients/gamified/front/jquery.mobile-1.4.5.min.js" charset="utf-8"></script>
+
+    <link rel="stylesheet" href="clients/gamified/front/jquery.mobile-1.4.5.min.css">
     <style>
         * { margin: 0; padding: 0; }
         html { 
@@ -14,6 +18,14 @@
             -webkit-background-size: cover;
             -moz-background-size: cover;
             -o-background-size: cover;
+            background-size: cover;
+        }
+        .ui-page {
+            background: transparent;
+            background-size: cover;
+        }
+        .ui-mobile-viewport {
+            background: transparent;
             background-size: cover;
         }
     </style>
@@ -31,13 +43,50 @@
         .bullet .title { font-size: 14px; font-weight: bold; }
         .bullet .subtitle { fill: #999; }
     </style>
+    <script>
+    $(document).on("pageshow", function(event) {
+        console.log("page shown");
+        alert("page shown " + $(".ui-page").css("min-height"));
+    });
+     $( window ).load(function() {
+        alert( "window loaded, min-height = "+$(".ui-page").css("min-height"));
+        $(".ui-page").css("min-height", "0px")
+    });
+     $( document ).ready(function() {
+        alert( "document ready, min-height = "+$(".ui-page").css("min-height"));
+        $(".ui-page").css("min-height", "0px")
+    });
+    </script>
   </head>
   <body onload="client.gamified.displayScore(prevScore, currScore);">
+    <a href="#popupRules" id="rulesButton" data-rel="popup" data-role="button" data-inline="true" data-transition="pop" data-theme="b">Rules</a>
+    <div data-role="popup" id="popupRules" data-overlay-theme="a" data-theme="c" data-dismissible="false" style="max-width:400px;" class="ui-corner-all">
+        <div data-role="header" data-theme="a" class="ui-corner-top">
+            <h1>Penguin Game Rules</h1>
+        </div>
+        <div data-role="content" data-theme="d" class="ui-corner-bottom ui-content">
+            <h3 class="ui-title">Welcome to the Penguin game!</h3>
+                <p>Welcome to Penguin Land! We need your help to revitalize
+a once fun and vibrant penguin community. You can help us by by confirming your
+trips and choosing eco-friendly travel modes! As your points accumulate, you'll
+see the gradual revival of Penguin Land.</p>
+<p>
+Point accruals are based on trip confirmation and your carbon footprint (the
+lower the carbon footprint, the more points!) Watch out - your points may
+decrease some days (depending on your behavior), but don't worry, you'll never
+go below 0. Trip confirmation is heavily weighed, so make sure you confirm for
+the penguins' sake!</p>
+<p> The game starts once you have confirmed trips. Please confirm trips at the end
+of the day. </p>
+            <a href="#" data-role="button" data-inline="true" data-rel="back" data-theme="b">Got it!</a>  
+        </div>
+    </div>
     <div id="chart" align="bottom">
     </div>
     <script>
         var currScore = {{currScore}}
         var prevScore = {{prevScore}}
+        alert($(".ui-page").css("min-height"));
     </script>
   </body>
 </html>
