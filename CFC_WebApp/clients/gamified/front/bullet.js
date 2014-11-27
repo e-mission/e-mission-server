@@ -9,6 +9,7 @@ d3.bullet = function() {
       vertical = false,
       ranges = bulletRanges,
       markers = bulletMarkers,
+      submarkers = bulletSubMarkers,
       measures = bulletMeasures,
       width = 380,
       height = 30,
@@ -19,6 +20,7 @@ d3.bullet = function() {
     g.each(function(d, i) {
       var rangez = ranges.call(this, d, i).slice().sort(d3.descending),
           markerz = markers.call(this, d, i).slice().sort(d3.descending),
+          submarkerz = submarkers.call(this, d, i).slice().sort(d3.descending),
           measurez = measures.call(this, d, i).slice().sort(d3.descending),
           g = d3.select(this),
           extentX,
@@ -108,6 +110,23 @@ d3.bullet = function() {
           .attr("y1", extentY / 6)
           .attr("y2", extentY * 5 / 6);
 
+      // Update the submarker lines.
+      var submarker = wrap.selectAll("line.submarker")
+          .data(submarkerz);
+
+      submarker.enter().append("line")
+          .attr("class", "submarker")
+          .attr("x1", x0)
+          .attr("x2", x0)
+          .attr("y1", extentY / 6)
+          .attr("y2", extentY * 5 / 6);
+
+      d3.transition(submarker)
+          .attr("x1", x1)
+          .attr("x2", x1)
+          .attr("y1", extentY / 6)
+          .attr("y2", extentY * 5 / 6);
+
       var axis = g.selectAll("g.axis").data([0]);
       axis.enter().append("g").attr("class", "axis");
       axis.call(xAxis.scale(x1).ticks(11, ".1s"));
@@ -166,6 +185,10 @@ function bulletRanges(d) {
 
 function bulletMarkers(d) {
   return d.markers;
+}
+
+function bulletSubMarkers(d) {
+  return d.submarkers;
 }
 
 function bulletMeasures(d) {

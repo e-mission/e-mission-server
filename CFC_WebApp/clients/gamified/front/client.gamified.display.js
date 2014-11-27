@@ -1,6 +1,16 @@
 var client = client || {};
 client.gamified = client.gamified || {};
 
+/*
+ * From http://stackoverflow.com/questions/3895478/does-javascript-have-a-range-equivalent
+ * but not tested
+ */
+function range(start, stop, step){
+  var a=[start], b=start;
+  while(b<stop){b+=step;a.push(b)}
+  return a;
+};
+
 client.gamified.displayScore = function(prevScore, currScore) {
     console.log("displayScore called");
 
@@ -17,6 +27,7 @@ client.gamified.displayScore = function(prevScore, currScore) {
             'subtitle': 'Number of points',
             'ranges': [1000, 10000, 100000],
             'measures': [prevScore, currScore],
+            'submarkers': range(200, 800, 200).concat(range(2000, 8000, 2000)).concat(range(20000, 80000, 20000)),
             'markers': [1000, 10000, 100000]
            }];
 
@@ -32,10 +43,9 @@ client.gamified.displayScore = function(prevScore, currScore) {
           .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
           .call(chart);
 
-      console.log("domains are "+d3.selectAll("path"))
+      console.log("domains are "+d3.selectAll("path"));
       
-      d3.selectAll("path").style("opacity", 0)
-
+      d3.selectAll("path").style("opacity", 0);
 
 /*
       var title = svg.append("g")
