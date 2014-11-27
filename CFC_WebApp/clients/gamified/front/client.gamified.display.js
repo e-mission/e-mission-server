@@ -13,7 +13,6 @@ function range(start, stop, step){
 
 client.gamified.displayScore = function(prevScore, currScore) {
     console.log("displayScore called");
-    alert("displayScore called");
 
     var margin = {top: 10, right: 2, bottom: 2, left: 35},
     width = 50 - margin.left - margin.right,
@@ -47,25 +46,6 @@ client.gamified.displayScore = function(prevScore, currScore) {
       console.log("domains are "+d3.selectAll("path"));
       
       d3.selectAll("path").style("opacity", 0);
-
-    alert( "in javascript, min-height = "+$(".ui-page").css("min-height"));
-    console.log( "in javascript, min-height = "+$(".ui-page").css("min-height"));
-    $(".ui-page").css("min-height", "0px")
-    localStorage.removeItem("rulesShown")
-    if (typeof(Storage) != "undefined") {
-        if (localStorage.rulesShown) {
-            console.log("Rules already shown");
-        } else {
-            console.log("Rules should be shown");
-//            $("#rulesButton").trigger("click");
-//            $("#popupRules", $(this)).popup("open");
-            localStorage.rulesShown = "True";
-        }
-    } else {
-        console.log("No web storage support");
-    }
-    console.log( "end of function = "+$(".ui-page").css("min-height"));
-
 
 /*
       var title = svg.append("g")
