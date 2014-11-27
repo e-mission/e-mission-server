@@ -43,31 +43,17 @@
         .bullet .title { font-size: 14px; font-weight: bold; }
         .bullet .subtitle { fill: #999; }
     </style>
-    <script>
-    $(document).on("pageshow", function(event) {
-        console.log("page shown");
-        alert("page shown " + $(".ui-page").css("min-height"));
-    });
-     $( window ).load(function() {
-        alert( "window loaded, min-height = "+$(".ui-page").css("min-height"));
-        $(".ui-page").css("min-height", "0px")
-    });
-     $( document ).ready(function() {
-        alert( "document ready, min-height = "+$(".ui-page").css("min-height"));
-        $(".ui-page").css("min-height", "0px")
-    });
-    </script>
   </head>
   <body onload="client.gamified.displayScore(prevScore, currScore);">
     <a href="#popupRules" id="rulesButton" data-rel="popup" data-role="button" data-inline="true" data-transition="pop" data-theme="b">Rules</a>
-    <div data-role="popup" id="popupRules" data-overlay-theme="a" data-theme="c" data-dismissible="false" style="max-width:400px;" class="ui-corner-all">
+    <div data-role="popup" id="popupRules" data-overlay-theme="a" data-theme="c" data-dismissible="true" style="width:95%; height:100%" class="ui-corner-all">
         <div data-role="header" data-theme="a" class="ui-corner-top">
-            <h1>Penguin Game Rules</h1>
+            <h1>Penguin Land</h1>
         </div>
-        <div data-role="content" data-theme="d" class="ui-corner-bottom ui-content">
-            <h3 class="ui-title">Welcome to the Penguin game!</h3>
-                <p>Welcome to Penguin Land! We need your help to revitalize
-a once fun and vibrant penguin community. You can help us by by confirming your
+        <div data-role="content" data-theme="d" class="ui-corner-bottom ui-content" style="width:80%; height:100%">
+            <h3 class="ui-title">Welcome to Penguin Land!</h3>
+                <p>We need your help to revitalize
+a once fun and vibrant penguin community. You can help us by confirming your
 trips and choosing eco-friendly travel modes! As your points accumulate, you'll
 see the gradual revival of Penguin Land.</p>
 <p>
@@ -86,7 +72,6 @@ of the day. </p>
     <script>
         var currScore = {{currScore}}
         var prevScore = {{prevScore}}
-        alert($(".ui-page").css("min-height"));
     </script>
   </body>
 </html>
