@@ -67,4 +67,23 @@ to go with the second option.  In the future, we should consider having the
 static list periodically generated from the modules by an external script, in
 order to resolve the tradeoff
 
+--------------------------------------------------------------------------
+How do we run client specific background tasks?
 
+There are two options here:
+- Client specific: Keep track of a list of clients that require background
+  processing, and for each of those, call the client specific runBackgroundTasks method.
+  That method is responsible for determining the list of affected users and updating them.
+
+- User specific: Iterate over all users and call the corresponding client
+  specific runBackgroundTasks method, if the user has an associated client.
+
+The tradeoff here is between maintainability and performance. If there is a
+significant subset of users for whom we don't need to run a background task,
+then a client specific view might be more performant. But it requires clients
+that do need background tasks to add themselves to a separate list, and is a
+different mechanism than the one that we use for the filtering of the trips to
+confirm, for example.
+
+Since we currently anticipate using this for all clients, we will go with the
+user centered approach.

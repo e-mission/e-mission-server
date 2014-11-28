@@ -121,3 +121,6 @@ def clientSpecificSetters(uuid, sectionId, predictedModeMap):
 
 def getClientConfirmedModeField():
   return None
+
+def runBackgroundTasks(uuid):
+  updateScore(uuid)

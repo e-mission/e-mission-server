@@ -45,3 +45,10 @@ def clientSpecificSetters(uuid, sectionId, predictedModeMap):
 
 def getClientConfirmedModeField():
   return "test_auto_confirmed.mode"
+
+def runBackgroundTasks(uuid):
+  from dao.user import User
+
+  testuser = User.fromUUID(uuid)
+  testuser.setScores("updatedPrev", "updatedCurr")
+

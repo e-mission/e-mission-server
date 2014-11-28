@@ -7,6 +7,7 @@ sys.path.append("%s" % os.getcwd())
 from dao.user import User
 from dao.client import Client
 from tests import common
+from main import userclient
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -24,7 +25,7 @@ class TestUser(unittest.TestCase):
     self.assertFalse(User.isRegistered('fake@fake.com'))
 
   def testCountForStudyZero(self):
-    self.assertEquals(User.countForStudy('testclient'), 0)
+    self.assertEquals(userclient.countForStudy('testclient'), 0)
 
   def testRegisterNonStudyUser(self):
     user = User.register('fake@fake.com')
@@ -46,35 +47,23 @@ class TestUser(unittest.TestCase):
     user = User.register('fake@fake.com')
     self.assertTrue(User.isRegistered('fake@fake.com'))
 
-  def testCountForStudy(self):
-    client = Client("testclient")
-    client.update(createKey = False)
-    common.makeValid(client)
-
-    (resultPre, resultReg) = client.preRegister("this_is_the_super_secret_id", "fake@fake.com")
-    self.assertEqual(resultPre, 1)
-    self.assertEqual(resultReg, 0)
-
-    user = User.register('fake@fake.com')
-    self.assertEquals(User.countForStudy('testclient'), 1)
-
   def testSetStudy(self):
     user = User.register('fake@fake.com')
     user.setStudy('testclient')
-    self.assertEquals(User.countForStudy('testclient'), 1)
+    self.assertEquals(userclient.countForStudy('testclient'), 1)
 
   def testUnsetStudyExists(self):
     user = User.register('fake@fake.com')
     user.setStudy('testclient')
-    self.assertEquals(User.countForStudy('testclient'), 1)
+    self.assertEquals(userclient.countForStudy('testclient'), 1)
 
     user.unsetStudy('testclient')
-    self.assertEquals(User.countForStudy('testclient'), 0)
+    self.assertEquals(userclient.countForStudy('testclient'), 0)
 
   def testUnsetStudyNotExists(self):
     user = User.register('fake@fake.com')
     user.unsetStudy('testclient')
-    self.assertEquals(User.countForStudy('testclient'), 0)
+    self.assertEquals(userclient.countForStudy('testclient'), 0)
 
   def testMergeDict(self):
     dict1 = {'a': 'a1', 'b': 'b1', 'c': 'c1'}

@@ -3,6 +3,7 @@
 # it into User or into Client.
 from dao.user import User
 from dao.client import Client
+from get_database import get_profile_db
 
 def getUserClient(user_uuid):
     study = User.fromUUID(user_uuid).getFirstStudy()
@@ -26,3 +27,25 @@ def getClientSpecificResult(user_uuid):
       return None
     else:
       return client.getResult(user_uuid)
+
+def runClientSpecificBackgroundTasks(user_uuid, defaultTasks):
+    client = getUserClient(user_uuid)
+    if client == None:
+      defaultTasks(user_uuid)
+    else:
+      client.runBackgroundTasks(user_uuid)
+
+def getClientQuery(clientName):
+    if clientName is None:
+        return {'study_list': {'$size': 0}}
+    else:
+        return {'study_list': {'$in': [clientName]}}
+
+def countForStudy(study):
+  return get_profile_db().find(getClientQuery(study)).count()
+
+def getUsersForClient(clientName):
+  # Find all users for this client
+  client_uuids = []
+  for user in get_profile_db().find(getClientQuery(clientName)):
+    client_uuids.append(user)
