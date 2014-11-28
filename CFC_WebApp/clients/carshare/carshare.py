@@ -56,3 +56,6 @@ def clientSpecificSetters(uuid, sectionId, predictedModeMap):
 
 def getClientConfirmedModeField():
     return "auto_confirmed.mode"
+
+def runBackgroundTasks(uuid):
+  pass

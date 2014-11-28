@@ -126,6 +126,7 @@ class Client:
 # result will still be a NOP, though
   def __preRegister(self, userEmail):
     from dao.user import User
+    from main import userclient
 
     if User.isRegistered(userEmail):
       User.fromEmail(userEmail).setStudy(self.clientName)
@@ -146,7 +147,7 @@ class Client:
         e.msg = writeResult['err'][0]["errmsg"]
         raise e
     return (get_pending_signup_db().find({'study': self.clientName}).count(),
-            User.countForStudy(self.clientName))
+            userclient.countForStudy(self.clientName))
 
   def preRegister(self, clientKey, userEmail):
     if not self.__validateKey(clientKey):
@@ -188,6 +189,12 @@ class Client:
       return self.__loadModule().clientSpecificSetters(uuid, sectionId, predictedModeMap)
     else:
       return None
+
+  def runBackgroundTasks(self, uuid):
+    if self.isActive(datetime.now()):
+        self.__loadModule().runBackgroundTasks(uuid)
+    else:
+        logging.debug("Client is not active, skipping call...")
   # END: Standard customization hooks
 
   # This reads the combined set of queries from all clients

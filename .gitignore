@@ -2,3 +2,4 @@
 *.pdf
 *.swp
 *debug.log
+.DS_Store
