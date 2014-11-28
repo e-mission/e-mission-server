@@ -33,10 +33,6 @@ class User:
     user = User(user_uuid)
     return user
 
-  @staticmethod
-  def countForStudy(study):
-    return get_profile_db().find({'study_list': {'$in': [study]}}).count()
-
   def getProfile(self):
     return get_profile_db().find_one({'user_id': self.uuid})
 
@@ -63,6 +59,18 @@ class User:
   def changeUpdateTs(self, timedelta):
     newTs = self.getUpdateTS() + timedelta
     get_profile_db().update({'user_id': self.uuid}, {'$set': {'update_ts': newTs}})
+
+  def getScore(self):
+    profile = self.getProfile()
+    currScore = profile.get('currentScore', 0)
+    prevScore = profile.get('previousScore', 0)
+    return (prevScore, currScore)
+
+  def setScores(self, prevScore, newScore):
+    logging.debug("Changing score for user %s from %s to %s" % (self.uuid, prevScore, newScore))
+    get_profile_db().update({'user_id': self.uuid}, {'$set': {'previousScore': prevScore,
+                                                              'currentScore': newScore}})
+    # TODO: Add a server side stat here so that we can know for sure how the score varies over time
 
   @staticmethod
   def mergeDicts(dict1, dict2):

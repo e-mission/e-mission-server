@@ -72,6 +72,10 @@ def doc(filename):
 def server_static(filename):
   return static_file(filename, static_path)
 
+@route('/clients/<clientname>/front/<filename>')
+def server_static(clientname, filename):
+  return static_file(filename, "clients/%s/%s" % (clientname, static_path))
+
 # Returns the proportion of survey takers who use each mode
 @route('/result/commute.modeshare.distance')
 def getCommuteModeShare():
@@ -256,13 +260,20 @@ def getCarbonCompare():
     return clientResult
   else:
     logging.debug("No overriding client result for user %s, returning default" % user_uuid)
-  
+
+  user = User.fromUUID(user_uuid)
+  (ignore, currFootprint) = user.getScore()
+
+  if currFootprint == 0:
+    currFootprint = carbon.getFootprintCompare(user_uuid)
+    user.saveScores(None, currFootprint)
+
   (myModeShareCount, avgModeShareCount,
      myModeShareDistance, avgModeShareDistance,
      myModeCarbonFootprint, avgModeCarbonFootprint,
      myModeCarbonFootprintNoLongMotorized, avgModeCarbonFootprintNoLongMotorized, # ignored
      myOptimalCarbonFootprint, avgOptimalCarbonFootprint,
-     myOptimalCarbonFootprintNoLongMotorized, avgOptimalCarbonFootprintNoLongMotorized) = carbon.getFootprintCompare(user_uuid)
+     myOptimalCarbonFootprintNoLongMotorized, avgOptimalCarbonFootprintNoLongMotorized) = currFootprint
 
   renderedTemplate = template("compare.html",
                       myModeShareCount = json.dumps(myModeShareCount),
