@@ -116,15 +116,21 @@ class TestGamified(unittest.TestCase):
 
     def testGetLevel(self):
         self.assertEqual(gamified.getLevel(0), (1, 1))
+        self.assertEqual(gamified.getLevel(11.0), (1, 1))
         self.assertEqual(gamified.getLevel(100), (1, 1))
-        self.assertEqual(gamified.getLevel(199), (1, 1))
+        self.assertEqual(gamified.getLevel(199.0), (1, 1))
         self.assertEqual(gamified.getLevel(200), (1, 2))
-        self.assertEqual(gamified.getLevel(201), (1, 2))
+        self.assertEqual(gamified.getLevel(201.0), (1, 2))
         self.assertEqual(gamified.getLevel(999), (1, 5))
         self.assertEqual(gamified.getLevel(1000), (2, 1))
-        self.assertEqual(gamified.getLevel(9999), (2, 5))
+        self.assertEqual(gamified.getLevel(9999.0), (2, 5))
         self.assertEqual(gamified.getLevel(10000), (3, 1))
         self.assertEqual(gamified.getLevel(100000), (3, 5))
+
+    def testGetFileName(self):
+        self.assertEqual(gamified.getFileName(1, 1), "level_1_1.png")
+        self.assertEqual(gamified.getFileName(1.0, 2.0), "level_1_2.png")
+        self.assertEqual(gamified.getFileName(1.055, 2), "level_1_2.png")
 
 if __name__ == '__main__':
     unittest.main()
