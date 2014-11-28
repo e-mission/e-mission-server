@@ -3,9 +3,10 @@ import logging
 import sys
 import os
 
-from get_database import get_uuid_db
-
+sys.path.append("%s" % os.getcwd())
 sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
+
+from get_database import get_uuid_db
 from main import userclient, carbon
 from dao.user import User
 
@@ -26,7 +27,7 @@ class PrecomputeResults:
 
     def precomputeResults(self):
         for user_uuid_dict in get_uuid_db().find({}, {'uuid': 1, '_id': 0}):
-            logging.info("Computing precomputed results for ")
+            logging.info("Computing precomputed results for %s" % user_uuid_dict['uuid'])
             userclient.runClientSpecificBackgroundTasks(user_uuid_dict['uuid'], self.precomputeDefault)
 
 if __name__ == '__main__':

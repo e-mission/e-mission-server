@@ -266,7 +266,7 @@ def getCarbonCompare():
 
   if currFootprint == 0:
     currFootprint = carbon.getFootprintCompare(user_uuid)
-    user.saveScores(None, currFootprint)
+    user.setScores(None, currFootprint)
 
   (myModeShareCount, avgModeShareCount,
      myModeShareDistance, avgModeShareDistance,

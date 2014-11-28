@@ -3,6 +3,7 @@ from get_database import get_section_db
 from main import carbon, common
 from datetime import datetime, time, timedelta
 from dao.user import User
+import math
 
 # sb375 is a weekly goal - we convert it to daily by dividing by 7
 sb375DailyGoal = 40.142892/7
@@ -84,18 +85,21 @@ def updateScore(user_uuid):
 def getLevel(score):
   if score < 1000:
     level = 1
-    sublevel = (score / 200) + 1
+    sublevel = math.floor(score / 200) + 1
   elif score < 10000:
     level = 2
-    sublevel = (score / 2000) + 1
+    sublevel = math.floor(score / 2000) + 1
   elif score < 100000:
     level = 3
-    sublevel = (score / 20000) + 1
+    sublevel = math.floor(score / 20000) + 1
   else:
     # Off the charts, stay at the top image
     level = 3
     sublevel = 5
   return (level, sublevel)
+
+def getFileName(level, sublevel):
+    return "level_%s_%s.png" % (int(level), int(sublevel))
 
 def getResult(user_uuid):
   # This is in here, as opposed to the top level as recommended by the PEP
@@ -106,7 +110,7 @@ def getResult(user_uuid):
   (level, sublevel) = getLevel(currScore)
   
   renderedTemplate = template("clients/gamified/result_template.html",
-                              level_picture_filename = "level_%s_%s.png" % (level, sublevel),
+                              level_picture_filename = getFileName(level, sublevel),
                               prevScore = prevScore,
                               currScore = currScore)
   return renderedTemplate
