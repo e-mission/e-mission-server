@@ -33,10 +33,6 @@ class User:
     user = User(user_uuid)
     return user
 
-  @staticmethod
-  def countForStudy(study):
-    return get_profile_db().find({'study_list': {'$in': [study]}}).count()
-
   def getProfile(self):
     return get_profile_db().find_one({'user_id': self.uuid})
 
