@@ -1,0 +1,9 @@
+{
+  "name": "gamified",
+  "start_date": "2014/10/13",
+  "end_date": "2015/06/01",
+  "key": "this_is_the_super_secret_id",
+  "client_settings": {
+    "result_url": "http://localhost:8080/compare"
+  }
+}

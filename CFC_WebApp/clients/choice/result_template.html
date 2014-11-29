@@ -1,0 +1,104 @@
+<html ng-app="e-mission-choice">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title>Inline Tabs</title>
+
+    <!-- <link rel="stylesheet" href="clients/choice/front/ionicons.min.css"> -->
+    <script src="clients/choice/front/ionic.bundle.js" charset="utf-8"></script>
+    <script src="clients/choice/front/ionic-tabs-myapp.js"></script>
+
+    <script src="clients/gamified/front/jquery-1.10.2.min.js" charset="utf-8"></script>
+    <script src="clients/gamified/front/d3.js" charset="utf-8"></script>
+    <link href="front/nv.d3.css" rel="stylesheet" type="text/css">
+    <script src="front/nv.d3.min.js" charset="utf-8"></script>
+    <script src="front/nv.d3.utils.js"></script>
+    <script src="front/nv.d3.models.pieChart.js"></script>
+
+    <script src="clients/gamified/front/bullet.js"></script>
+    <script src="clients/gamified/front/jquery.mobile-1.4.5.min.js" charset="utf-8"></script>
+
+    <script src="front/cfc.display.js"></script>
+    <script src="front/cfc.compare.js"></script>
+    <script src="clients/gamified/front/client.gamified.display.js" charset="utf-8"></script>
+
+    <link rel="stylesheet" href="clients/choice/front/ionic.min.css">
+  </head>
+  <body ng-controller="RootCtrl">
+
+    <ion-tabs class="tabs-icon-only tabs-positive">
+      <ion-tab title="Data" 
+               icon-on="ion-ios7-filing" 
+               icon-off="ion-ios7-filing-outline" 
+               on-select="onDataSelected()"
+               ng-click="onDataClicked()"
+               ng-controller="DataCtrl">
+        <ion-content has-tabs="true" on-refresh="onRefresh()">
+        <div id="data-div" ng-include="'dataResult.html'"></div>
+        </ion-content>
+      </ion-tab>
+
+      <ion-tab title="Game"
+            icon-on="icon ion-ios7-clock"
+            icon-off="icon ion-ios7-clock-outline"
+            on-select="onGameSelected()"
+            ng-click="onGameClicked()"
+            ng-controller="GameCtrl">
+        <ion-content has-tabs="true" has-header="true" on-refresh="onRefresh()">
+           <div id="game-div" ng-include="'gameResult.html'"></div>
+        </ion-content>
+      </ion-tab>
+    </ion-tabs>
+
+    <!-- Calling onInitDone() from anyplace in the ion-tabs view (ion-tabs, or
+        the second ion-tab), doesn't work. It throws a "tab is not defined" error.
+        Creating a new, empty div that shows up after the ion-tabs ensures that they have been 
+        fully initialized before we are invoked -->
+    <div ng-init="onInitDone()"></div>
+
+    <script id="dataResult.html" type="text/ng-template">
+        <html>
+          <!-- <body onload="cfc.compare.displayCompare();"> -->
+          <body>
+            <center>
+              <form>
+              <!-- <select id="myList" onchange="cfc.compare.displayCompare()"> -->
+              <select id="myList" onchange="cfc.compare.displayCompare()">
+                <option>My Summary</option>
+                <option>Compare mode share counts</option>  
+                <option>Compare mode share distances</option>  
+                <option>Compare mode carbon footprint</option>
+              </select>
+              </form>
+              <h3 id="message"></h3><small id="carbon_info"><a href="front/carbon_calc_details.html">Calculation Details</a></small>
+              <div id="chart" class="mypiechart"></div>
+            </center>
+        </body>
+        </html>
+    </script>
+
+    <script id="gameResult.html" type="text/ng-template">
+    </script>
+
+    <script>
+        var serverVariables = {{variables}};
+        console.log("variables are "+JSON.stringify(serverVariables));
+    </script>
+
+    <script>
+      var myModeShareCount = {"walking": 0, "cycling": 0, "bus": 0, "air": 0, "running": 0, "train": 0, "car": 0, "mixed": 0};
+      var avgModeShareCount = {"walking": 1.0, "cycling": 0.0, "bus": 1.0, "air": 1.0, "running": 0.0 , "train": 0.0, "car": 0.0, "mixed": 0.0};
+
+      var myModeShareDistance = {"walking": 0, "cycling": 0, "bus": 0, "air": 0, "running": 0, "train": 0, "car": 0, "mixed": 0};
+      var avgModeShareDistance = {"walking": 1057.252405642441, "cycling": 0.0, "bus": 2162.668467546699, "air": 2162.668467546699, "running": 0.0, "train": 0.0, "car": 0.0, "mixed": 0.0};
+
+      var myModeCarbonFootprint = {"walking": 0.0, "cycling": 0.0, "train_long": 0.0, "bus_short": 0.0, "air_short": 0.0, "bus_long": 0.0, "train_short": 0.0, "car_short": 0.0, "running": 0.0, "car_long": 0.0, "mixed": 0.0, "air_long": 0.0};
+      var avgModeCarbonFootprint = {"walking": 0.0, "cycling": 0.0, "car_long": 0.0, "bus_short": 0.35887661953696004, "air_short": 0.29167126007310984, "car_short": 0.0, "train_short": 0.0, "train_long": 0.0, "running": 0.0, "bus_long": 0.0, "mixed": 0.0, "air_long": 0.0};
+
+      var myOptimalCarbonFootprint = {"walking": 0.0, "cycling": 0.0, "train_long": 0.0, "bus_short": 0.0, "air_short": 0.0, "bus_long": 0.0, "train_short": 0.0, "car_short": 0.0, "running": 0.0, "car_long": 0.0, "mixed": 0.0, "air_long": 0.0};
+      var avgOptimalCarbonFootprint = {"walking": 0.0, "cycling": 0.0, "car_long": 0.0, "bus_short": 0.35887661953696004, "air_short": 0.29167126007310984, "car_short": 0.0, "train_short": 0.0, "train_long": 0.0, "running": 0.0, "bus_long": 0.0, "mixed": 0.0, "air_long": 0.0};
+    console.log("Finished loading carbon footprint variables");
+    </script>
+
+  </body>
+</html>
