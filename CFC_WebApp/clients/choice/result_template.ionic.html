@@ -1,0 +1,79 @@
+<html ng-app="ionicApp">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title>Inline Tabs</title>
+
+    <link href="http://code.ionicframework.com/1.0.0-beta.1/css/ionic.min.css" rel="stylesheet">
+    <script src="http://code.ionicframework.com/1.0.0-beta.1/js/ionic.bundle.min.js"></script>
+  </head>
+  <body ng-controller="RootCtrl">
+    
+    <ion-tabs class="tabs-icon-only tabs-positive">
+
+      <ion-tab title="Home" 
+               icon-on="ion-ios7-filing" 
+               icon-off="ion-ios7-filing-outline" 
+               ng-controller="HomeCtrl">
+        
+        <ion-header-bar class="bar-positive">
+          <button class="button button-clear" ng-click="newTask()">New</button>
+          <h1 class="title">Tasks</h1>
+        </ion-header-bar>
+        
+        <ion-content has-tabs="true" on-refresh="onRefresh()">
+
+          <ion-refresher></ion-refresher>
+          <ion-list scroll="false" on-refresh="onRefresh()"
+                    s-editing="isEditingItems" 
+                    animation="fade-out"
+                    delete-icon="icon ion-minus-circled">
+            <ion-item ng-repeat="item in items"
+                      item="item"
+                      buttons="item.buttons"
+                      can-delete="true"
+                      can-swipe="true"
+                      on-delete="deleteItem(item)"
+                      ng-class="{completed: item.isCompleted}">
+              {{item.title}}
+              <i class="{{item.icon}}"></i>
+            </ion-item>
+          </ion-list>
+        </ion-content>
+      </ion-tab>
+
+      <ion-tab title="About" icon-on="icon ion-ios7-clock" icon-off="icon ion-ios7-clock-outline">
+        <header class="bar bar-header bar-positive">
+          <h1 class="title">Deadlines</h1>
+        </header>
+        <ion-content has-header="true">
+          <h1>Deadlines</h1>
+        </ion-content>
+      </ion-tab>
+
+      <ion-tab title="Settings" icon-on="icon ion-ios7-gear" icon-off="icon ion-ios7-gear-outline">
+        <header class="bar bar-header bar-positive">
+          <h1 class="title">Settings</h1>
+        </header>
+        <ion-content has-header="true">
+          <h1>Settings</h1>
+        </ion-content>
+      </ion-tab>
+      
+    </ion-tabs>
+
+    <script id="newTask.html" type="text/ng-template">
+      <div id="task-view" class="modal slide-in-up" ng-controller="TaskCtrl">
+        <header class="bar bar-header bar-secondary">
+          <h1 class="title">New Task</h1>
+          <button class="button button-clear button-primary" ng-click="close()">Done</button>
+        </header>
+        <ion-content class="padding has-header">
+          <input type="text" placeholder="I need to do this...">
+        </ion-content>
+      </div>
+    </script>
+
+  </body>
+</html>
+
