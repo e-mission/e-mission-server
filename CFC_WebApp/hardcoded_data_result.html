@@ -1,0 +1,43 @@
+<html>
+  <head>
+    <title>E-Mission</title>
+    <link href="front/nv.d3.css" rel="stylesheet" type="text/css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.2/d3.js" charset="utf-8"></script>
+    <script src="front/nv.d3.min.js" charset="utf-8"></script>
+    <script src="front/nv.d3.utils.js"></script>
+    <script src="front/nv.d3.models.pieChart.js"></script>
+    <script src="front/bullet.js"></script>
+    <script src="front/cfc.display.js"></script>
+    <script src="front/cfc.compare.js"></script>
+  </head>
+  <body onload="cfc.compare.displayCompare();">
+    <center>
+      <form>
+      <select id="myList" onchange="cfc.compare.displayCompare()">
+        <option>My Summary</option>
+        <option>Compare mode share counts</option>  
+        <option>Compare mode share distances</option>  
+        <option>Compare mode carbon footprint</option>
+      </select>
+      </form>
+      <h3 id="message"></h3><small id="carbon_info"><a href="front/carbon_calc_details.html">Calculation Details</a></small>
+      <div id="chart" class="mypiechart"></div>
+    </center>
+    <script>
+      var myModeShareCount = {"walking": 0, "cycling": 0, "bus": 0, "air": 0, "running": 0, "train": 
+0, "car": 0, "mixed": 0}
+      var avgModeShareCount = {"walking": 1.0, "cycling": 0.0, "bus": 1.0, "air": 1.0, "running": 0.0
+, "train": 0.0, "car": 0.0, "mixed": 0.0}
+
+      var myModeShareDistance = {"walking": 0, "cycling": 0, "bus": 0, "air": 0, "running": 0, "train": 0, "car": 0, "mixed": 0}
+      var avgModeShareDistance = {"walking": 1057.252405642441, "cycling": 0.0, "bus": 2162.668467546699, "air": 2162.668467546699, "running": 0.0, "train": 0.0, "car": 0.0, "mixed": 0.0}
+
+      var myModeCarbonFootprint = {"walking": 0.0, "cycling": 0.0, "train_long": 0.0, "bus_short": 0.0, "air_short": 0.0, "bus_long": 0.0, "train_short": 0.0, "car_short": 0.0, "running": 0.0, "car_long": 0.0, "mixed": 0.0, "air_long": 0.0}
+      var avgModeCarbonFootprint = {"walking": 0.0, "cycling": 0.0, "car_long": 0.0, "bus_short": 0.35887661953696004, "air_short": 0.29167126007310984, "car_short": 0.0, "train_short": 0.0, "train_long": 0.0, "running": 0.0, "bus_long": 0.0, "mixed": 0.0, "air_long": 0.0}
+
+      var myOptimalCarbonFootprint = {"walking": 0.0, "cycling": 0.0, "train_long": 0.0, "bus_short": 0.0, "air_short": 0.0, "bus_long": 0.0, "train_short": 0.0, "car_short": 0.0, "running": 0.0, "car_long": 0.0, "mixed": 0.0, "air_long": 0.0}
+      var avgOptimalCarbonFootprint = {"walking": 0.0, "cycling": 0.0, "car_long": 0.0, "bus_short": 0.35887661953696004, "air_short": 0.29167126007310984, "car_short": 0.0, "train_short": 0.0, "train_long": 0.0, "running": 0.0, "bus_long": 0.0, "mixed": 0.0, "air_long": 0.0}
+    </script>
+  </body>
+</html>
