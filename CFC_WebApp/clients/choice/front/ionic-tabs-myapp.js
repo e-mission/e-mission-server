@@ -34,13 +34,54 @@ angular.module('e-mission-choice', ['ionic'])
    */
   $scope.onInitDone = function() {
     alert("Init is done");
-    console.log("Init is done");
+    // console.log("Init is done with scope "+JSON.stringify($scope));
+    // console.log("Init is done with this "+JSON.stringify(this));
     // $scope.currChoice = $scope.getIndexForTab(initialChoice);
     $scope.currChoice = 1;
     console.log("Switching to choice "+$scope.currChoice);
     $ionicTabsDelegate.select($scope.currChoice);
   }
 })
+
+.directive('inlineResult', ['$document', function($document) {
+  function link(scope, element, attrs) {
+    console.log("inlineResult invoked with element = "+element[0]);
+    console.log("child document = "+element[0].contentDocument);
+    console.log("curr base URI= "+element[0].contentDocument.baseURI);
+    // console.log("currSrc = "+element[0].src);
+    // alert("after retrieving child document");
+    console.log("current html = "+$document[0]);
+    console.log("current base = "+$document[0].baseURI);
+    var currSrc = element[0].src;
+    var parts = currSrc.split(",");
+    console.log(parts);
+    var decodedText = atob(parts[1]);
+    // console.log("decodedText = "+decodedText);
+    var currBaseURI = $document[0].baseURI;
+    var decodedTextWithBase = decodedText.replace("<head>", "<head><base href=\""+currBaseURI+"\">");
+    // console.log("decodedTextWithBase = "+decodedTextWithBase);
+    var encodedTextWithBase = btoa(decodedTextWithBase);
+    var srcWithBase = parts[0]+","+encodedTextWithBase;
+    // console.log("srcWithBase "+srcWithBase);
+    element[0].setAttribute("src",srcWithBase)
+    // console.log("updatedSrc = "+element[0].src);
+
+    element.on('load', function() {
+        var loadedDoc = element[0].contentDocument
+        console.log("after loading, child document = "+element[0].contentDocument);
+        console.log("after loading, curr base URI= "+loadedDoc.baseURI);
+        console.log("after loading, curr document element= "+loadedDoc.documentElement);
+        console.log("after loading, head= "+loadedDoc.head);
+        var baseElement = loadedDoc.createElement("base");
+        baseElement.href = $document[0].baseURI;
+        loadedDoc.head.insertBefore(baseElement, loadedDoc.head.firstChild);
+        alert("after loading child document");
+    });
+  }
+  return {
+    link: link
+  }
+}])
 
 .controller('DataCtrl', function($scope, $http, $window, $timeout, $ionicModal,
         $ionicActionSheet, $ionicTabsDelegate) {
