@@ -10,13 +10,22 @@
     <link rel="stylesheet" href="clients/choice/front/ionic.min.css">
   </head>
   <style>
-    .tabs {top: 0}
+    .tabs-top > .tabs, .tabs.tabs-top {
+        top: 0px;
+        padding-top: 0px;
+        background-position: center bottom;
+    }
+    .has-tabs-top {
+        top: 49px;
+    }
   </style>
   <body ng-controller="RootCtrl" hide-nav-bar="true">
 
+    <!--
     <div class="bar bar-header has-tabs-top bar-positive">
       <div class="title">Results</div>
     </div>
+    -->
     <!-- tabs-top to ensure that the tabs are not hidden on ios4 -->
     <ion-tabs class="tabs-icon-only tabs-positive tabs-top" hide-nav-bar="true">
       <ion-tab title="Data" 
@@ -25,7 +34,7 @@
                on-select="onDataSelected()"
                ng-click="onDataClicked()"
                ng-controller="DataCtrl">
-        <ion-content class="has-tabs-top" has-tabs="true" on-refresh="onRefresh()">
+        <ion-content has-tabs="true" on-refresh="onRefresh()">
         <div id="data-div">
         <iframe src='data:text/html;base64,{{dataResult}}' height="100%" width="100%" seamless>
         </iframe>
@@ -39,7 +48,7 @@
             on-select="onGameSelected()"
             ng-click="onGameClicked()"
             ng-controller="GameCtrl">
-        <ion-content class="has-tabs-top" has-tabs="true" on-refresh="onRefresh()">
+        <ion-content has-tabs="true" on-refresh="onRefresh()">
            <div id="game-div">
             <iframe src='data:text/html;base64,{{gameResult}}' height="100%" width="100%" seamless>
             </iframe>
