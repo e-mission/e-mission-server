@@ -20,7 +20,7 @@
                ng-controller="DataCtrl">
         <ion-content has-tabs="true" on-refresh="onRefresh()">
         <div id="data-div">
-        <iframe src='hardcoded_data_result.html' height="100%" width="100%" seamless>
+        <iframe srcdoc='{{dataResult}}' height="100%" width="100%" seamless>
         </iframe>
         </div>
         </ion-content>
@@ -34,7 +34,7 @@
             ng-controller="GameCtrl">
         <ion-content has-tabs="true" has-header="true" on-refresh="onRefresh()">
            <div id="game-div">
-            <iframe src='hardcoded_game_result.html' height="100%" width="100%" seamless>
+            <iframe srcdoc='{{gameResult}}' height="100%" width="100%" seamless>
             </iframe>
            </div>
         </ion-content>
