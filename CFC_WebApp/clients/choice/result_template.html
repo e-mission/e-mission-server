@@ -9,18 +9,25 @@
 
     <link rel="stylesheet" href="clients/choice/front/ionic.min.css">
   </head>
-  <body ng-controller="RootCtrl">
+  <style>
+    .tabs {top: 0}
+  </style>
+  <body ng-controller="RootCtrl" hide-nav-bar="true">
 
-    <ion-tabs class="tabs-icon-only tabs-positive">
+    <div class="bar bar-header has-tabs-top bar-positive">
+      <div class="title">Results</div>
+    </div>
+    <!-- tabs-top to ensure that the tabs are not hidden on ios4 -->
+    <ion-tabs class="tabs-icon-only tabs-positive tabs-top" hide-nav-bar="true">
       <ion-tab title="Data" 
                icon-on="ion-ios7-filing" 
                icon-off="ion-ios7-filing-outline" 
                on-select="onDataSelected()"
                ng-click="onDataClicked()"
                ng-controller="DataCtrl">
-        <ion-content has-tabs="true" on-refresh="onRefresh()">
+        <ion-content class="has-tabs-top" has-tabs="true" on-refresh="onRefresh()">
         <div id="data-div">
-        <iframe srcdoc='{{dataResult}}' height="100%" width="100%" seamless>
+        <iframe src='data:text/html;base64,{{dataResult}}' height="100%" width="100%" seamless>
         </iframe>
         </div>
         </ion-content>
@@ -32,9 +39,9 @@
             on-select="onGameSelected()"
             ng-click="onGameClicked()"
             ng-controller="GameCtrl">
-        <ion-content has-tabs="true" has-header="true" on-refresh="onRefresh()">
+        <ion-content class="has-tabs-top" has-tabs="true" on-refresh="onRefresh()">
            <div id="game-div">
-            <iframe srcdoc='{{gameResult}}' height="100%" width="100%" seamless>
+            <iframe src='data:text/html;base64,{{gameResult}}' height="100%" width="100%" seamless>
             </iframe>
            </div>
         </ion-content>
@@ -47,31 +54,9 @@
         fully initialized before we are invoked -->
     <div ng-init="onInitDone()"></div>
 
-    <script id="dataResult.html" type="text/ng-template">
-    </script>
-
-    <script id="gameResult.html" type="text/ng-template">
-    </script>
-
     <script>
         var serverVariables = {{variables}};
         console.log("variables are "+JSON.stringify(serverVariables));
     </script>
-
-    <script>
-      var myModeShareCount = {"walking": 0, "cycling": 0, "bus": 0, "air": 0, "running": 0, "train": 0, "car": 0, "mixed": 0};
-      var avgModeShareCount = {"walking": 1.0, "cycling": 0.0, "bus": 1.0, "air": 1.0, "running": 0.0 , "train": 0.0, "car": 0.0, "mixed": 0.0};
-
-      var myModeShareDistance = {"walking": 0, "cycling": 0, "bus": 0, "air": 0, "running": 0, "train": 0, "car": 0, "mixed": 0};
-      var avgModeShareDistance = {"walking": 1057.252405642441, "cycling": 0.0, "bus": 2162.668467546699, "air": 2162.668467546699, "running": 0.0, "train": 0.0, "car": 0.0, "mixed": 0.0};
-
-      var myModeCarbonFootprint = {"walking": 0.0, "cycling": 0.0, "train_long": 0.0, "bus_short": 0.0, "air_short": 0.0, "bus_long": 0.0, "train_short": 0.0, "car_short": 0.0, "running": 0.0, "car_long": 0.0, "mixed": 0.0, "air_long": 0.0};
-      var avgModeCarbonFootprint = {"walking": 0.0, "cycling": 0.0, "car_long": 0.0, "bus_short": 0.35887661953696004, "air_short": 0.29167126007310984, "car_short": 0.0, "train_short": 0.0, "train_long": 0.0, "running": 0.0, "bus_long": 0.0, "mixed": 0.0, "air_long": 0.0};
-
-      var myOptimalCarbonFootprint = {"walking": 0.0, "cycling": 0.0, "train_long": 0.0, "bus_short": 0.0, "air_short": 0.0, "bus_long": 0.0, "train_short": 0.0, "car_short": 0.0, "running": 0.0, "car_long": 0.0, "mixed": 0.0, "air_long": 0.0};
-      var avgOptimalCarbonFootprint = {"walking": 0.0, "cycling": 0.0, "car_long": 0.0, "bus_short": 0.35887661953696004, "air_short": 0.29167126007310984, "car_short": 0.0, "train_short": 0.0, "train_long": 0.0, "running": 0.0, "bus_long": 0.0, "mixed": 0.0, "air_long": 0.0};
-    console.log("Finished loading carbon footprint variables");
-    </script>
-
   </body>
 </html>

@@ -48,8 +48,6 @@ angular.module('e-mission-choice', ['ionic'])
 
   $scope.onDataClicked = function() {
     $scope.setCurrChoice("data")
-    console.log("myModeCarbonFootprint = "+myModeCarbonFootprint);
-    // cfc.compare.displayCompare();
   }
 
   $scope.onDataSelected = function() {
