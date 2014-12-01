@@ -60,13 +60,10 @@ class TestMovesCollect(unittest.TestCase):
     dataJSON = json.loads(dataStr)
     return dataJSON
 
-  # This is a trip from Thomas Raffill, where we missed the section where he
-  # cycled to Barracuda Asked and recieved consent to check this trip into the
-  # repository, identified by the tamtom2000@gmail.com email account on
-
-  # Tuesday, Apr 8th, at 7:40am
+  # This is a trip where we missed a cycling trip section. I recieved consent
+  # to check this trip into the repository on Tuesday, Apr 8th, at 7:40am
   def testMissingSections(self):
-    result = self.loadReplaceUser("tests/data/tom_missing_trip", "tamtom2000@gmail.com", self.testUUID)
+    result = self.loadTestJSON("tests/data/missing_trip")
     collect.processResult(self.testUUID, result)
 
     SectionColl = get_section_db()
@@ -79,7 +76,7 @@ class TestMovesCollect(unittest.TestCase):
     
      
   def testDoubleLoad(self):
-    result = self.loadReplaceUser("tests/data/tom_missing_trip", "tamtom2000@gmail.com", self.testUUID)
+    result = self.loadTestJSON("tests/data/missing_trip")
     collect.processResult(self.testUUID, result)
     collect.processResult(self.testUUID, result)
 
@@ -92,8 +89,8 @@ class TestMovesCollect(unittest.TestCase):
     self.assertEquals(tripToWorkSections.count(), 5)
 
   def testPartialLoadUpdate(self):
-    resultAll = self.loadReplaceUser("tests/data/tom_missing_trip", "tamtom2000@gmail.com", self.testUUID)
-    resultSubset = self.loadReplaceUser("tests/data/tom_missing_trip_subset", "tamtom2000@gmail.com", self.testUUID)
+    resultAll = self.loadTestJSON("tests/data/missing_trip")
+    resultSubset = self.loadTestJSON("tests/data/missing_trip_subset")
     collect.processResult(self.testUUID, resultSubset)
 
     SectionColl = get_section_db()
@@ -107,7 +104,7 @@ class TestMovesCollect(unittest.TestCase):
     self.assertEquals(tripToWorkSections.count(), 5)
 
   def testBlankToday(self):
-    result = self.loadTestJSON("tests/data/tamtom2000_blank_today")
+    result = self.loadTestJSON("tests/data/test2_blank_today")
     collect.processResult(self.testUUID, [result[0]])
     collect.processResult(self.testUUID, [result[1]])
     
@@ -115,7 +112,7 @@ class TestMovesCollect(unittest.TestCase):
     self.assertTrue(SectionColl.find({'user_id': self.testUUID}).count() > 0)
 
   def testWeirdLoadWithNoSections(self):
-    result = self.loadTestJSON("tests/data/shankari_blank_today")
+    result = self.loadTestJSON("tests/data/test1_blank_today")
     collect.processResult(self.testUUID, result)
 
   def testYesterdayForJustSignedUp(self):
@@ -126,7 +123,7 @@ class TestMovesCollect(unittest.TestCase):
     self.assertEquals(SectionColl.find({"user_id": self.testUUID}).count(), 0)
 
   def testPlaceLoad(self):
-    result = self.loadTestJSON("tests/data/raff20140410")
+    result = self.loadTestJSON("tests/data/test20140410")
     collect.processResult(self.testUUID, result)
 
     # Check that the trips are loaded correctly
@@ -158,7 +155,7 @@ class TestMovesCollect(unittest.TestCase):
     self.assertNotEqual(sectionForTrip, None)
 
   def testUpdateSectionForExistingTrip(self):
-    result = self.loadReplaceUser("tests/data/tom_missing_trip", "tamtom2000@gmail.com", self.testUUID)
+    result = self.loadReplaceUser("tests/data/missing_trip", "tamtom2000@gmail.com", self.testUUID)
     collect.processResult(self.testUUID, result)
 
     SectionColl = get_section_db()
