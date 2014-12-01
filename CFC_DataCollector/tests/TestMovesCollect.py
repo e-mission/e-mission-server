@@ -155,7 +155,7 @@ class TestMovesCollect(unittest.TestCase):
     self.assertNotEqual(sectionForTrip, None)
 
   def testUpdateSectionForExistingTrip(self):
-    result = self.loadReplaceUser("tests/data/missing_trip", "tamtom2000@gmail.com", self.testUUID)
+    result = self.loadTestJSON("tests/data/missing_trip")
     collect.processResult(self.testUUID, result)
 
     SectionColl = get_section_db()

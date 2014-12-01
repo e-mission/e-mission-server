@@ -1,0 +1,69 @@
+<html ng-app="e-mission-choice">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title>Inline Tabs</title>
+
+    <script src="clients/choice/front/ionic.bundle.js" charset="utf-8"></script>
+    <script src="clients/choice/front/ionic-tabs-myapp.js"></script>
+
+    <link rel="stylesheet" href="clients/choice/front/ionic.min.css">
+  </head>
+  <style>
+    .tabs-top > .tabs, .tabs.tabs-top {
+        top: 0px;
+        padding-top: 0px;
+        background-position: center bottom;
+    }
+    .has-tabs-top {
+        top: 49px;
+    }
+  </style>
+  <body ng-controller="RootCtrl" hide-nav-bar="true">
+
+    <!--
+    <div class="bar bar-header has-tabs-top bar-positive">
+      <div class="title">Results</div>
+    </div>
+    -->
+    <!-- tabs-top to ensure that the tabs are not hidden on ios4 -->
+    <ion-tabs class="tabs-icon-only tabs-positive tabs-top" hide-nav-bar="true">
+      <ion-tab title="Data" 
+               icon="ion-pie-graph" 
+               on-select="onDataSelected()"
+               ng-click="onDataClicked()"
+               ng-controller="DataCtrl">
+        <ion-content has-tabs="true" on-refresh="onRefresh()">
+        <div id="data-div">
+        <iframe inline-result src='data:text/html;base64,{{dataResult}}' height="100%" width="100%" seamless>
+        </iframe>
+        </div>
+        </ion-content>
+      </ion-tab>
+
+      <ion-tab title="Game"
+            icon="ion-game-controller-b"
+            on-select="onGameSelected()"
+            ng-click="onGameClicked()"
+            ng-controller="GameCtrl">
+        <ion-content has-tabs="true" on-refresh="onRefresh()">
+           <div id="game-div">
+            <iframe inline-result src='data:text/html;base64,{{gameResult}}' height="100%" width="100%" seamless>
+            </iframe>
+           </div>
+        </ion-content>
+      </ion-tab>
+    </ion-tabs>
+
+    <!-- Calling onInitDone() from anyplace in the ion-tabs view (ion-tabs, or
+        the second ion-tab), doesn't work. It throws a "tab is not defined" error.
+        Creating a new, empty div that shows up after the ion-tabs ensures that they have been 
+        fully initialized before we are invoked -->
+    <div ng-init="onInitDone()"></div>
+
+    <script>
+        var serverVariables = {{variables}};
+        console.log("variables are "+JSON.stringify(serverVariables));
+    </script>
+  </body>
+</html>

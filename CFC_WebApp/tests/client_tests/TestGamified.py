@@ -108,23 +108,29 @@ class TestGamified(unittest.TestCase):
 
     # Checks both calcScore and updateScore, since we calculate the score before we update it
     def testUpdateScore(self):
-        self.assertEqual(self.user.getScore(), (0, 0))
+        self.assertEqual(gamified.getStoredScore(self.user), (0, 0))
         components = gamified.updateScore(self.user.uuid)
         expectedScore = 0.75 * 50 + 30 * self.allDriveMinusMineExpect + 20 * 0.0 + \
             10 * self.sb375DailyGoalMinusMineExpect
-        self.assertEqual(self.user.getScore(), (0, expectedScore))
+        self.assertEqual(gamified.getStoredScore(self.user), (0, expectedScore))
 
     def testGetLevel(self):
         self.assertEqual(gamified.getLevel(0), (1, 1))
+        self.assertEqual(gamified.getLevel(11.0), (1, 1))
         self.assertEqual(gamified.getLevel(100), (1, 1))
-        self.assertEqual(gamified.getLevel(199), (1, 1))
+        self.assertEqual(gamified.getLevel(199.0), (1, 1))
         self.assertEqual(gamified.getLevel(200), (1, 2))
-        self.assertEqual(gamified.getLevel(201), (1, 2))
+        self.assertEqual(gamified.getLevel(201.0), (1, 2))
         self.assertEqual(gamified.getLevel(999), (1, 5))
         self.assertEqual(gamified.getLevel(1000), (2, 1))
-        self.assertEqual(gamified.getLevel(9999), (2, 5))
+        self.assertEqual(gamified.getLevel(9999.0), (2, 5))
         self.assertEqual(gamified.getLevel(10000), (3, 1))
         self.assertEqual(gamified.getLevel(100000), (3, 5))
+
+    def testGetFileName(self):
+        self.assertEqual(gamified.getFileName(1, 1), "level_1_1.png")
+        self.assertEqual(gamified.getFileName(1.0, 2.0), "level_1_2.png")
+        self.assertEqual(gamified.getFileName(1.055, 2), "level_1_2.png")
 
 if __name__ == '__main__':
     unittest.main()

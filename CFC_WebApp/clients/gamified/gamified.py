@@ -3,9 +3,26 @@ from get_database import get_section_db
 from main import carbon, common
 from datetime import datetime, time, timedelta
 from dao.user import User
+import math
 
 # sb375 is a weekly goal - we convert it to daily by dividing by 7
 sb375DailyGoal = 40.142892/7
+
+# BEGIN: Code to get and set client specific fields in the profile (currentScore and previousScore)
+def getStoredScore(user):
+    profile = user.getProfile()
+    if profile is None:
+        return (0, 0)
+    currScore = profile.get('currentScore', 0)
+    prevScore = profile.get('previousScore', 0)
+    return (prevScore, currScore)
+
+def setScores(user, prevScore, newScore):
+    logging.debug("Changing score for user %s from %s to %s" % (user.uuid, prevScore, newScore))
+    user.setClientSpecificProfileFields({'previousScore': prevScore,
+                                         'currentScore': newScore})
+    # TODO: Add a server side stat here so that we can know for sure how the score varies over time
+# END: Code to get and set client specific fields in the profile (currentScore and previousScore)
 
 # Returns the components on which the score is based. These will be combined in
 # getScore later, but it is useful to see them to decide how to set up the
@@ -72,41 +89,41 @@ def updateScore(user_uuid):
     todayStart = datetime.combine(today, time.min)
 
     user = User.fromUUID(user_uuid)
-    # TODO: getScore() shouldn't really be defined in User because it doesn't apply to all clients.
-    # Need to figure out how to structure client specific profile enhancements.
-    # Should they even be stored in the user profile?
-    (discardedScore, prevScore) = user.getScore()
+    (discardedScore, prevScore) = getStoredScore(user)
     newScore = prevScore + getScore(user_uuid, yesterdayStart, todayStart)
     if newScore < 0:
         newScore = 0
-    user.setScores(prevScore, newScore)
+    setScores(user, prevScore, newScore)
 
 def getLevel(score):
   if score < 1000:
     level = 1
-    sublevel = (score / 200) + 1
+    sublevel = math.floor(score / 200) + 1
   elif score < 10000:
     level = 2
-    sublevel = (score / 2000) + 1
+    sublevel = math.floor(score / 2000) + 1
   elif score < 100000:
     level = 3
-    sublevel = (score / 20000) + 1
+    sublevel = math.floor(score / 20000) + 1
   else:
     # Off the charts, stay at the top image
     level = 3
     sublevel = 5
   return (level, sublevel)
 
+def getFileName(level, sublevel):
+    return "level_%s_%s.png" % (int(level), int(sublevel))
+
 def getResult(user_uuid):
   # This is in here, as opposed to the top level as recommended by the PEP
   # because then we don't have to worry about loading bottle in the unit tests
   from bottle import template
 
-  (prevScore, currScore) = User.fromUUID(user_uuid).getScore()
+  (prevScore, currScore) = getStoredScore(User.fromUUID(user_uuid))
   (level, sublevel) = getLevel(currScore)
   
   renderedTemplate = template("clients/gamified/result_template.html",
-                              level_picture_filename = "level_%s_%s.png" % (level, sublevel),
+                              level_picture_filename = getFileName(level, sublevel),
                               prevScore = prevScore,
                               currScore = currScore)
   return renderedTemplate

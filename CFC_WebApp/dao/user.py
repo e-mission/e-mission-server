@@ -60,17 +60,9 @@ class User:
     newTs = self.getUpdateTS() + timedelta
     get_profile_db().update({'user_id': self.uuid}, {'$set': {'update_ts': newTs}})
 
-  def getScore(self):
-    profile = self.getProfile()
-    currScore = profile.get('currentScore', 0)
-    prevScore = profile.get('previousScore', 0)
-    return (prevScore, currScore)
-
-  def setScores(self, prevScore, newScore):
-    logging.debug("Changing score for user %s from %s to %s" % (self.uuid, prevScore, newScore))
-    get_profile_db().update({'user_id': self.uuid}, {'$set': {'previousScore': prevScore,
-                                                              'currentScore': newScore}})
-    # TODO: Add a server side stat here so that we can know for sure how the score varies over time
+  def setClientSpecificProfileFields(self, setQuery):
+    logging.debug("Changing profile for user %s to %s" % (self.uuid, setQuery))
+    get_profile_db().update({'user_id': self.uuid}, {'$set': setQuery})
 
   @staticmethod
   def mergeDicts(dict1, dict2):
