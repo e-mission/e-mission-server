@@ -13,19 +13,23 @@ angular.module('e-mission-choice', ['ionic'])
   }
 
   $scope.setCurrChoice = function(newChoiceLabel) {
-      $http.get('/client/choice/switchChoice?choice='+newChoiceLabel).
-        success(function(data, status, headers, config) {
-          alert("call successful");
-          $scope.currChoice = $scope.getIndexForTab(newChoiceLabel);
-          $ionicTabsDelegate.select($scope.currChoice);
-          // this callback will be called asynchronously
-          // when the response is available
-        }).
-        error(function(data, status, headers, config) {
-          alert("call error");
-          // called asynchronously if an error occurs
-          // or server returns response with an error status.
-        });
+    var queryParams = "client_key="+serverVariables['client_key']+
+        "&uuid="+serverVariables['uuid']+
+        "&new_view="+newChoiceLabel;
+    console.log("queryParams = "+queryParams);
+    $http.get("/client/choice/switchResultDisplay?"+queryParams).
+      success(function(data, status, headers, config) {
+        alert("call successful");
+        $scope.currChoice = $scope.getIndexForTab(newChoiceLabel);
+        $ionicTabsDelegate.select($scope.currChoice);
+        // this callback will be called asynchronously
+        // when the response is available
+      }).
+      error(function(data, status, headers, config) {
+        alert("call error");
+        // called asynchronously if an error occurs
+        // or server returns response with an error status.
+      });
   }
 
   /*
@@ -37,7 +41,7 @@ angular.module('e-mission-choice', ['ionic'])
     // console.log("Init is done with scope "+JSON.stringify($scope));
     // console.log("Init is done with this "+JSON.stringify(this));
     // $scope.currChoice = $scope.getIndexForTab(initialChoice);
-    $scope.currChoice = 1;
+    $scope.currChoice = $scope.getIndexForTab(serverVariables['curr_view']);
     console.log("Switching to choice "+$scope.currChoice);
     $ionicTabsDelegate.select($scope.currChoice);
   }
@@ -65,18 +69,6 @@ angular.module('e-mission-choice', ['ionic'])
     // console.log("srcWithBase "+srcWithBase);
     element[0].setAttribute("src",srcWithBase)
     // console.log("updatedSrc = "+element[0].src);
-
-    element.on('load', function() {
-        var loadedDoc = element[0].contentDocument
-        console.log("after loading, child document = "+element[0].contentDocument);
-        console.log("after loading, curr base URI= "+loadedDoc.baseURI);
-        console.log("after loading, curr document element= "+loadedDoc.documentElement);
-        console.log("after loading, head= "+loadedDoc.head);
-        var baseElement = loadedDoc.createElement("base");
-        baseElement.href = $document[0].baseURI;
-        loadedDoc.head.insertBefore(baseElement, loadedDoc.head.firstChild);
-        alert("after loading child document");
-    });
   }
   return {
     link: link

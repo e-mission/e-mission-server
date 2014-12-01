@@ -74,6 +74,7 @@ def server_static(filename):
 
 @route('/clients/<clientname>/front/<filename>')
 def server_static(clientname, filename):
+  logging.debug("returning file %s from client %s " % (filename, clientname))
   return static_file(filename, "clients/%s/%s" % (clientname, static_path))
 
 # Returns the proportion of survey takers who use each mode
@@ -247,6 +248,8 @@ def setStats():
 @post('/compare')
 # @get('/compare')
 def getCarbonCompare():
+  from clients.default import default
+
   if request.json == None:
     return "Waiting for user data to become available..."
 
@@ -260,33 +263,7 @@ def getCarbonCompare():
     return clientResult
   else:
     logging.debug("No overriding client result for user %s, returning default" % user_uuid)
-
-  user = User.fromUUID(user_uuid)
-  (ignore, currFootprint) = user.getScore()
-
-  if currFootprint == 0:
-    currFootprint = carbon.getFootprintCompare(user_uuid)
-    user.setScores(None, currFootprint)
-
-  (myModeShareCount, avgModeShareCount,
-     myModeShareDistance, avgModeShareDistance,
-     myModeCarbonFootprint, avgModeCarbonFootprint,
-     myModeCarbonFootprintNoLongMotorized, avgModeCarbonFootprintNoLongMotorized, # ignored
-     myOptimalCarbonFootprint, avgOptimalCarbonFootprint,
-     myOptimalCarbonFootprintNoLongMotorized, avgOptimalCarbonFootprintNoLongMotorized) = currFootprint
-
-  renderedTemplate = template("compare.html",
-                      myModeShareCount = json.dumps(myModeShareCount),
-                      avgModeShareCount = json.dumps(avgModeShareCount),
-                      myModeShareDistance = json.dumps(myModeShareDistance),
-                      avgModeShareDistance = json.dumps(avgModeShareDistance),
-                      myModeCarbonFootprint = json.dumps(myModeCarbonFootprint),
-                      avgModeCarbonFootprint = json.dumps(avgModeCarbonFootprint),
-                      myOptimalCarbonFootprint = json.dumps(myOptimalCarbonFootprint),
-                      avgOptimalCarbonFootprint = json.dumps(avgOptimalCarbonFootprint))
-                  
-  # logging.debug(renderedTemplate)
-  return renderedTemplate
+  return default.getResult(user_uuid)
 
 # Client related code START
 @post("/client/<clientname>/<method>")
@@ -300,6 +277,7 @@ def registeredForStudy():
   userEmail = request.query.email
   client = request.query.client
   client_key = request.query.client_key
+
   logging.debug("request = %s" % (request))
   logging.debug("userEmail = %s, client = %s, client_key = %s" % (userEmail, client, client_key))
   # try:
@@ -307,6 +285,16 @@ def registeredForStudy():
   # except Exception as e:
   #   abort(e.code, e.msg)
   return {'email': userEmail, 'client': client, 'signup_count': newSignupCount }
+
+@get('/client/<clientName>/<method>')
+def javascriptCallback(clientName, method):
+  from clients.choice import choice
+
+  client = Client(clientName)
+  client_key = request.query.client_key
+  client.callJavascriptCallback(client_key, method, request.params)
+  return {'status': 'ok'}
+
 # Client related code END
 
 # Data source integration START

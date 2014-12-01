@@ -95,17 +95,21 @@ class Client:
     logging.debug("Invoking %s on module %s" % (method, clientModule))
     return method(request)
 
+  def getClientKey(self):
+    logging.debug("About to return %s from JSON %s" % (self.clientJSON['key'], self.clientJSON))
+    return self.clientJSON['key']
+
   def __validateKey(self, clientKey):
     if (not self.isActive(datetime.now())):
       logging.info("Client %s is not yet active, so key %s is not valid" %
         (self.clientName, clientKey))
       return False
-    client_key = self.clientJSON['key']
+    client_key = self.getClientKey()
     if client_key == clientKey:
       return True
     else:
       logging.info("For client %s, incoming key %s does not match stored key %s!" %
-        (self.clientName, client_key, clientKey))
+        (self.clientName, clientKey, client_key))
       return False
 
 # What should we do if a user registers again after they have installed the app?
@@ -156,6 +160,22 @@ class Client:
       e.msg = "This is not the client key for your study, or your study has already ended. Please contact e-mission@lists.eecs.berkeley.edu to obtain a client key, or restart your study"
       raise e
     return self.__preRegister(userEmail)
+
+  def __callJavascriptCallback(self, methodName, params):
+    if self.isActive(datetime.now()):
+      clientModule = self.__loadModule()
+      method = getattr(clientModule, methodName)
+      return method(params)
+    else:
+      return None
+
+  def callJavascriptCallback(self, clientKey, method, request):
+    if not self.__validateKey(clientKey):
+      e = Exception()
+      e.code = 403
+      e.msg = "This is not the client key for your study, or your study has already ended. Please contact e-mission@lists.eecs.berkeley.edu to obtain a client key, or restart your study"
+      raise e
+    return self.__callJavascriptCallback(method, request)
 
   # BEGIN: Standard customization hooks
   def getClientConfirmedModeQuery(self, mode):

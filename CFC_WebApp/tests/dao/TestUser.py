@@ -151,6 +151,21 @@ class TestUser(unittest.TestCase):
 
     user = User.fromEmail('fake@fake.com')
     self.assertEqual(user.getFirstStudy(), 'testclient')
+
+  def testSetClientSpecificFields(self):
+    user = User.register('fake@fake.com')
+    self.assertTrue(User.isRegistered('fake@fake.com'))
+
+    # Check that the field doesn't exist initially    
+    self.assertTrue(user.getProfile().get('test_field', 'blank'), 'blank')
+
+    # Check that a simple value update works
+    user.setClientSpecificProfileFields({'test_field': 'something beautiful'})
+    self.assertTrue(user.getProfile().get('test_field', 'blank'), 'something beautiful')
+
+    # Check that a data structure update works
+    user.setClientSpecificProfileFields({'test_field': {'something': 'beautiful'}})
+    self.assertTrue(user.getProfile().get('test_field', 'blank'), {'something': 'beautiful'})
     
 if __name__ == '__main__':
     unittest.main()
