@@ -60,11 +60,22 @@ class User:
     newTs = self.getUpdateTS() + timedelta
     get_profile_db().update({'user_id': self.uuid}, {'$set': {'update_ts': newTs}})
 
+  def setClientSpecificProfileFields(self, setQuery):
+    logging.debug("Changing profile for user %s to %s" % (self.uuid, setQuery))
+    get_profile_db().update({'user_id': self.uuid}, {'$set': setQuery})
+
   def getScore(self):
     profile = self.getProfile()
+    if profile is None:
+        return (0, 0)
     currScore = profile.get('currentScore', 0)
     prevScore = profile.get('previousScore', 0)
     return (prevScore, currScore)
+
+  def setScores(self, prevScore, newScore):
+    logging.debug("Changing score for user %s from %s to %s" % (self.uuid, prevScore, newScore))
+    get_profile_db().update({'user_id': self.uuid}, {'$set': {'previousScore': prevScore,
+                                                              'currentScore': newScore}})
 
   def setScores(self, prevScore, newScore):
     logging.debug("Changing score for user %s from %s to %s" % (self.uuid, prevScore, newScore))

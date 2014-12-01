@@ -87,3 +87,16 @@ confirm, for example.
 
 Since we currently anticipate using this for all clients, we will go with the
 user centered approach.
+--------------------------------------------------------------------------
+How do we process changes to the user choice?
+- Embed JWT into returned HTTP document and reuse it to record switch and to
+  reload with POST
+    - JWT expires in 1 hour
+    - in android, app memory is not reclaimed unless app or activity are
+      closed. If Home screen is pressed, app stays in memory without
+      suspending, no new call happens, and JWT is not refreshed. So if user
+      tries to switch result screen much later, call might fail on server side
+      due to failed JWT token
+      can't call fresh auth code since current iOS app is not written using cordova.
+
+Embed both result screens + use special HTTP GET method to switch
