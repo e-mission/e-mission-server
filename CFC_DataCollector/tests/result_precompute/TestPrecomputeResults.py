@@ -16,6 +16,8 @@ from utils import load_database_json, purge_database_json
 from dao.user import User
 from dao.client import Client
 import tests.common
+from clients.testclient import testclient
+from clients.default import default
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -61,23 +63,12 @@ class TestPrecomputeResults(unittest.TestCase):
           self.SectionsColl.save(section)
           self.pr = precompute_results.PrecomputeResults()
 
-    def testDefaultPrecompute(self):
-        for email in self.testUsers:
-            currUser = User.fromEmail(email)
-            self.assertEqual(currUser.getScore(), (0, 0))
-
-        self.pr.precomputeResults()
-
-        for email in self.testUsers:
-            currUser = User.fromEmail(email)
-            (expectNone, carbonFootprint) = currUser.getScore()
-            self.assertEqual(expectNone, None)
-            self.assertEqual(len(carbonFootprint), 12)
-
     def testClientSpecificPrecompute(self):
         for email in self.testUsers:
             currUser = User.fromEmail(email)
-            self.assertEqual(currUser.getScore(), (0, 0))
+            self.assertEqual(currUser.getProfile().get("testfield1"), None)
+            self.assertEqual(currUser.getProfile().get("testfield2"), None)
+            self.assertEqual(default.getCarbonFootprint(currUser), None)
 
         fakeEmail = "fest@example.com"
 
@@ -91,14 +82,14 @@ class TestPrecomputeResults(unittest.TestCase):
 
         self.pr.precomputeResults()
 
-        self.assertEqual(user.getScore(), ('updatedPrev', 'updatedCurr'))
+        self.assertEqual(user.getProfile()['testfield1'], 'value1')
+        self.assertEqual(user.getProfile()['testfield2'], 'value2')
 
         for email in self.testUsers:
             if email != fakeEmail:
                 currUser = User.fromEmail(email)
 
-                (expectNone, carbonFootprint) = currUser.getScore()
-                self.assertEqual(expectNone, None)
+                carbonFootprint = default.getCarbonFootprint(currUser)
                 self.assertEqual(len(carbonFootprint), 12)
 
 if __name__ == '__main__':

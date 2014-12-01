@@ -108,11 +108,11 @@ class TestGamified(unittest.TestCase):
 
     # Checks both calcScore and updateScore, since we calculate the score before we update it
     def testUpdateScore(self):
-        self.assertEqual(self.user.getScore(), (0, 0))
+        self.assertEqual(gamified.getStoredScore(self.user), (0, 0))
         components = gamified.updateScore(self.user.uuid)
         expectedScore = 0.75 * 50 + 30 * self.allDriveMinusMineExpect + 20 * 0.0 + \
             10 * self.sb375DailyGoalMinusMineExpect
-        self.assertEqual(self.user.getScore(), (0, expectedScore))
+        self.assertEqual(gamified.getStoredScore(self.user), (0, expectedScore))
 
     def testGetLevel(self):
         self.assertEqual(gamified.getLevel(0), (1, 1))

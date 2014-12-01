@@ -29,3 +29,11 @@ for user_uuid_dict in get_uuid_db().find({}, {'uuid': 1, '_id': 0}):
         logging.debug("After change, currentScore = %s, currFootprint = %s" % (
             currUser.getProfile().get("currentScore"),
             default.getCarbonFootprint(currUser)))
+
+# Informal testing from the command line since this is a one-time script
+# Can be pulled out into a unit test if reworked
+# Test setup steps from the REPL:
+# In [52]: userTest = User.register("test.unset@gmail.com")
+# In [53]: userTest1 = User.register("test.unset1@gmail.com")
+# In [54]: gamified.setScores(userTest, None, [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}])
+# In [55]: gamified.setScores(userTest1, None, [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}])

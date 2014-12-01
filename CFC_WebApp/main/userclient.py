@@ -28,10 +28,12 @@ def getClientSpecificResult(user_uuid):
     else:
       return client.getResult(user_uuid)
 
-def runClientSpecificBackgroundTasks(user_uuid, defaultTasks):
+def runClientSpecificBackgroundTasks(user_uuid):
+    from clients.default import default
+
     client = getUserClient(user_uuid)
     if client == None:
-      defaultTasks(user_uuid)
+      default.runBackgroundTasks(user_uuid)
     else:
       client.runBackgroundTasks(user_uuid)
 

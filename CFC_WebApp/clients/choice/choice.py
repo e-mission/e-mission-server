@@ -6,6 +6,8 @@ from dao.user import User
 import math
 import json
 from uuid import UUID
+from clients.gamified import gamified
+from clients.default import default
 
 # TODO: Consider subclassing to provide client specific user functions
 def setCurrView(uuid, newView):
@@ -35,8 +37,6 @@ def getResult(user_uuid):
   # This is in here, as opposed to the top level as recommended by the PEP
   # because then we don't have to worry about loading bottle in the unit tests
   from bottle import template
-  from clients.gamified import gamified
-  from clients.default import default
   import base64
   from dao.user import User
   from dao.client import Client
@@ -64,4 +64,5 @@ def getClientConfirmedModeField():
   return None
 
 def runBackgroundTasks(uuid):
-  pass
+  gamified.runBackgroundTasks(uuid)
+  default.runBackgroundTasks(uuid)

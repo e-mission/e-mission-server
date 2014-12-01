@@ -7,28 +7,18 @@ sys.path.append("%s" % os.getcwd())
 sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
 
 from get_database import get_uuid_db
-from main import userclient, carbon
-from dao.user import User
+from main import userclient
 
 class PrecomputeResults:
     def __init__(self):
         pass
 
-    # This should really be pulled out into a separate default client
-    def precomputeDefault(self, user_uuid):
-      user = User.fromUUID(user_uuid)
-      # carbon compare results is a tuple. Tuples are converted to arrays
-      # by mongodb
-      # In [44]: testUser.setScores(('a','b', 'c', 'd'), ('s', 't', 'u', 'v'))
-      # In [45]: testUser.getScore()
-      # Out[45]: ([u'a', u'b', u'c', u'd'], [u's', u't', u'u', u'v'])
-      carbonCompareResults = carbon.getFootprintCompare(user_uuid)
-      user.setScores(None, carbonCompareResults)
-
     def precomputeResults(self):
+        # TODO: Ensure that the default client is "default", which will make
+        # life much easier overall
         for user_uuid_dict in get_uuid_db().find({}, {'uuid': 1, '_id': 0}):
             logging.info("Computing precomputed results for %s" % user_uuid_dict['uuid'])
-            userclient.runClientSpecificBackgroundTasks(user_uuid_dict['uuid'], self.precomputeDefault)
+            userclient.runClientSpecificBackgroundTasks(user_uuid_dict['uuid'])
 
 if __name__ == '__main__':
     import json

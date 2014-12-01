@@ -50,5 +50,5 @@ def runBackgroundTasks(uuid):
   from dao.user import User
 
   testuser = User.fromUUID(uuid)
-  testuser.setScores("updatedPrev", "updatedCurr")
+  testuser.setClientSpecificProfileFields({'testfield1': 'value1', 'testfield2': 'value2'})
 
