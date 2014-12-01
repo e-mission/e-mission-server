@@ -42,8 +42,6 @@ def getResult(user_uuid):
   from dao.client import Client
 
   user = User.fromUUID(user_uuid)
-  user.setScores(2000, 0)
-
   renderedTemplate = template("clients/choice/result_template.html",
                           variables = json.dumps({'curr_view': getCurrView(user_uuid),
                                        'uuid': str(user_uuid),

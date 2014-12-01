@@ -13,7 +13,7 @@
     <style>
         * { margin: 0; padding: 0; }
         html { 
-            background: url("clients/gamified/front/{{level_picture_filename}}") no-repeat center center; 
+            background: url("clients/gamified/front/{{level_picture_filename}}") no-repeat center center fixed; 
             background-repeat: no-repeat;
             background-position: center center;
             -webkit-background-size: cover;
@@ -38,32 +38,8 @@
     </style>
   </head>
   <body ng-controller="RootCtrl" ng-init="displayScore()">
-    <!-- <a icon="ion-information-circled"></a> -->
-    <!--
-    <a href="#popupRules" id="rulesButton" data-rel="popup" data-role="button" data-inline="true" data-transition="pop" data-theme="b">Rules</a>
-    <div data-role="popup" id="popupRules" data-overlay-theme="a" data-theme="c" data-dismissible="true" style="width:95%; height:100%" class="ui-corner-all">
-        <div data-role="header" data-theme="a" class="ui-corner-top">
-            <h1>Penguin Land</h1>
-        </div>
-        <div data-role="content" data-theme="d" class="ui-corner-bottom ui-content" style="width:80%; height:100%">
-            <h3 class="ui-title">Welcome to Penguin Land!</h3>
-                <p>We need your help to revitalize
-a once fun and vibrant penguin community. You can help us by confirming your
-trips and choosing eco-friendly travel modes! As your points accumulate, you
-will see the gradual revival of Penguin Land.</p>
-<p>
-Point accruals are based on trip confirmation and your carbon footprint (the
-lower the carbon footprint, the more points!) Watch out - your points may
-decrease some days (depending on your behavior), but don&#39;t worry, you&#39;ll never
-go below 0. Trip confirmation is heavily weighed, so make sure you confirm for
-the penguins&#39; sake!</p>
-<p> The game starts once you have confirmed trips. Please confirm trips at the end
-of the day. </p>
-            <a href="#" data-role="button" data-inline="true" data-rel="back" data-theme="b">Got it!</a>  
-        </div>
-    </div>
-    -->
-    <div id="chart" align="bottom">
+    <a class="button button-icon icon ion-information-circled" style="color: lightgreen" ng-click="showAlert()"> </a>
+    <div id="chart" align="bottom" ng-click="showAlert()">
     </div>
     <script>
         var currScore = {{currScore}};
