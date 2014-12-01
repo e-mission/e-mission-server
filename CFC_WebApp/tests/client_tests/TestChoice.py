@@ -9,7 +9,7 @@ from dao.user import User
 
 logging.basicConfig(level=logging.DEBUG)
 
-class TestGamified(unittest.TestCase):
+class TestChoice(unittest.TestCase):
     def setUp(self):
         import tests.common
         # Sometimes, we may have entries left behind in the database if one of the tests failed
