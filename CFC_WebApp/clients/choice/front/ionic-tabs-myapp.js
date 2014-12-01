@@ -2,7 +2,7 @@ angular.module('e-mission-choice', ['ionic'])
 
 .controller('RootCtrl', function($scope, $timeout, $ionicTabsDelegate, $http) {
   $scope.onControllerChanged = function(oldController, oldIndex, newController, newIndex) {
-    alert('controller changed');
+    // alert('controller changed');
     console.log('Controller changed', oldController, oldIndex, newController, newIndex);
     console.log(arguments);
   };
@@ -19,14 +19,14 @@ angular.module('e-mission-choice', ['ionic'])
     console.log("queryParams = "+queryParams);
     $http.get("/client/choice/switchResultDisplay?"+queryParams).
       success(function(data, status, headers, config) {
-        alert("call successful");
+        // alert("call successful");
         $scope.currChoice = $scope.getIndexForTab(newChoiceLabel);
         $ionicTabsDelegate.select($scope.currChoice);
         // this callback will be called asynchronously
         // when the response is available
       }).
       error(function(data, status, headers, config) {
-        alert("call error");
+        // alert("call error");
         // called asynchronously if an error occurs
         // or server returns response with an error status.
       });
@@ -37,7 +37,7 @@ angular.module('e-mission-choice', ['ionic'])
    * whether or not the tab that we want to use has been created.
    */
   $scope.onInitDone = function() {
-    alert("Init is done");
+    // alert("Init is done");
     // console.log("Init is done with scope "+JSON.stringify($scope));
     // console.log("Init is done with this "+JSON.stringify(this));
     // $scope.currChoice = $scope.getIndexForTab(initialChoice);
@@ -51,14 +51,13 @@ angular.module('e-mission-choice', ['ionic'])
   function link(scope, element, attrs) {
     console.log("inlineResult invoked with element = "+element[0]);
     console.log("child document = "+element[0].contentDocument);
-    console.log("curr base URI= "+element[0].contentDocument.baseURI);
+    // console.log("curr base URI= "+element[0].contentDocument.baseURI);
     // console.log("currSrc = "+element[0].src);
-    // alert("after retrieving child document");
-    console.log("current html = "+$document[0]);
+    // console.log("current html = "+$document[0]);
     console.log("current base = "+$document[0].baseURI);
     var currSrc = element[0].src;
     var parts = currSrc.split(",");
-    console.log(parts);
+    // console.log(parts);
     var decodedText = atob(parts[1]);
     // console.log("decodedText = "+decodedText);
     var currBaseURI = $document[0].baseURI;
@@ -77,7 +76,7 @@ angular.module('e-mission-choice', ['ionic'])
 
 .controller('DataCtrl', function($scope, $http, $window, $timeout, $ionicModal,
         $ionicActionSheet, $ionicTabsDelegate) {
-  alert("DataCtrl called");
+  // alert("DataCtrl called");
 
   $scope.onDataClicked = function() {
     $scope.setCurrChoice("data")
@@ -88,7 +87,7 @@ angular.module('e-mission-choice', ['ionic'])
   }
 
   $scope.onRefresh = function() {
-    alert("DataCtrl.ON REFRESH");
+    // alert("DataCtrl.ON REFRESH");
     console.log('ON REFRESH');
 
     $timeout(function() {
@@ -98,7 +97,7 @@ angular.module('e-mission-choice', ['ionic'])
 })
 
 .controller('GameCtrl', function($scope, $ionicModal) {
-  alert("GameCtrl called");
+  // alert("GameCtrl called");
 
   $scope.onGameClicked = function() {
     $scope.setCurrChoice("game")
@@ -109,7 +108,7 @@ angular.module('e-mission-choice', ['ionic'])
   }
 
   $scope.onRefresh = function() {
-    alert("GameCtrl.ON REFRESH");
+    // alert("GameCtrl.ON REFRESH");
     console.log('ON REFRESH');
 
     $timeout(function() {
