@@ -1,8 +1,12 @@
 <!doctype html>
-<html>
+<html ng-app="e-mission-default">
   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
     <title>E-Mission</title>
     <link href="front/nv.d3.css" rel="stylesheet" type="text/css">
+    <link href="front/cfc.display.css" rel="stylesheet" type="text/css">
+
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.2/d3.js" charset="utf-8"></script>
     <script src="front/nv.d3.min.js" charset="utf-8"></script>
@@ -10,9 +14,12 @@
     <script src="front/nv.d3.models.pieChart.js"></script>
     <script src="front/bullet.js"></script>
     <script src="front/cfc.display.js"></script>
+    <script src="clients/choice/front/ionic.bundle.js" charset="utf-8"></script>
     <script src="front/cfc.compare.js"></script>
+
+    <link rel="stylesheet" href="clients/choice/front/ionic.min.css">
   </head>
-  <body onload="cfc.compare.displayCompare();">
+  <body ng-controller="RootCtrl" ng-init="displayCompare()">
     <center>
       <form>
       <select id="myList" onchange="cfc.compare.displayCompare()">
@@ -22,7 +29,8 @@
         <option>Compare mode carbon footprint</option>
       </select>
       </form>
-      <h3 id="message"></h3><small id="carbon_info"><a href="front/carbon_calc_details.html">Calculation Details</a></small>
+      <a class="button button-icon icon ion-information-circled" ng-click="showAlert()"> </a>
+      <h3 id="message"></h3>
       <div id="chart" class="mypiechart"></div>
     </center>
     <script>

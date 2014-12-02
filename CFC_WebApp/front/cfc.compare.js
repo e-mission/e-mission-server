@@ -1,3 +1,27 @@
+angular.module('e-mission-default', ['ionic'])
+
+.controller('RootCtrl', function($scope, $timeout, $ionicPopup, $http) {
+    // alert("RootCtrl initialized");
+    $scope.showAlert = function() {
+       var alertPopup = $ionicPopup.alert({
+           title: 'Welcome to E-Mission!',
+           okText: 'Got it!',
+           template: "<p>This app tracks your travel behavior and calculates your carbon footprint! You can then see how your daily carbon footprint measures up to the average user's footprint, your footprint if you were to drive everywhere, and other fun metrics.</p><p>The measurement is weekly, but we'll ask you to confirm your trips several times a day. You can confirm trips whenever convenient - most people confirm once a day.</p> <b>IMPORTANT</b>: If you are have an iPhone, your trip log may not automatically update. To fix this, toggle 'Force Sync' by going to Auth &gt; Force Sync. Your recent trips should then show up for your confirmation.  You may have to do this daily.</p> <p>Thank you for participating!</p>",
+         });
+         alertPopup.then(function(res) {
+           console.log('Displayed results to the user');
+           alertPopup.close();
+         });
+         $timeout(function() {
+            console.log("timed out, closing popup");
+            alertPopup.close(); //close the popup after 3 seconds for some reason
+         }, 5000);
+    }
+
+    $scope.displayCompare = function() {
+        return cfc.compare.displayCompare();
+    }
+});
 
 var cfc = cfc || {};
 cfc.compare = cfc.compare || {};
@@ -25,8 +49,8 @@ cfc.compare.displayCompare = function() {
 cfc.compare.displayModeShareCountCompare = function() {
   cfc.compare.compareMineAndAvg(myModeShareCount, avgModeShareCount,
     "Number of trips");
-  $("#message").text("Number of trips using various modes")
-  $("#carbon_info").hide()
+  // $("#message").text("Number of trips using various modes")
+  // $("#carbon_info").hide()
 }
 
 cfc.compare.displayModeShareDistanceCompare = function() {
@@ -34,15 +58,15 @@ cfc.compare.displayModeShareDistanceCompare = function() {
     cfc.compare.scaleValues(myModeShareDistance, 1000),
     cfc.compare.scaleValues(avgModeShareDistance, 1000),
     "km");
-  $("#message").text("Share of travel distance using various modes")
-  $("#carbon_info").hide()
+  // $("#message").text("Share of travel distance using various modes")
+  // $("#carbon_info").hide()
 }
 
 cfc.compare.displayModeCarbonFootprintCompare = function() {
   cfc.compare.compareMineAndAvg(myModeCarbonFootprint, avgModeCarbonFootprint,
     "kg CO2 per week");
-  $("#message").text("Carbon footprints of various modes")
-  $("#carbon_info").show()
+  // $("#message").text("Carbon footprints of various modes")
+  // $("#carbon_info").show()
 }
 
 cfc.compare.getSum = function(obj) {
@@ -79,8 +103,8 @@ cfc.compare.displayMySummary = function() {
   summaryDataSeries['key'] = "Carbon footprint and targets";
   summaryDataSeries['values'] = cfc.display.convert(summaryData);
   cfc.display.barChart([summaryDataSeries], "kg CO2 per week");
-  $("#message").text("Carbon footprint versus goals")
-  $("#carbon_info").show()
+  // $("#message").text("My footprint summary")
+  // $("#carbon_info").show()
 }
 
 cfc.compare.compareMineAndAvg = function(myMap, avgMap, yAxisLabel) {
