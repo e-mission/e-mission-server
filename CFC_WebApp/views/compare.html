@@ -1,6 +1,8 @@
 <!doctype html>
-<html>
+<html ng-app="e-mission-default">
   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
     <title>E-Mission</title>
     <link href="front/nv.d3.css" rel="stylesheet" type="text/css">
     <link href="front/cfc.display.css" rel="stylesheet" type="text/css">
@@ -12,9 +14,12 @@
     <script src="front/nv.d3.models.pieChart.js"></script>
     <script src="front/bullet.js"></script>
     <script src="front/cfc.display.js"></script>
+    <script src="clients/choice/front/ionic.bundle.js" charset="utf-8"></script>
     <script src="front/cfc.compare.js"></script>
+
+    <link rel="stylesheet" href="clients/choice/front/ionic.min.css">
   </head>
-  <body onload="cfc.compare.displayCompare();">
+  <body ng-controller="RootCtrl" ng-init="displayCompare()">
     <center>
       <form>
       <select id="myList" onchange="cfc.compare.displayCompare()">
@@ -24,20 +29,8 @@
         <option>Compare mode carbon footprint</option>
       </select>
       </form>
-      <h3 id="message"></h3><a href="#info_form" id="info_pop">Info</a>
-        <!-- popup form #1 -->
-        <a href="#x" class="overlay" id="info_form"></a>
-        <div class="popup">
-            <h2>Welcome to E-Mission!</h2>
-               <p>This app tracks your travel behavior and calculates your carbon
-                footprint! You can then see how your daily carbon footprint measures up to the
-                average user’s footprint, your footprint if you were to drive everywhere, and
-                other fun metrics.</p><p>The measurement is weekly, but we’ll ask you to confirm your
-                trips several times a day. You can confirm trips whenever convenient - most
-                people confirm once a day.</p>
-                <p>Thank you for participating!</p>
-            <a class="close" href="#close"></a>
-        </div>
+      <a class="button button-icon icon ion-information-circled" ng-click="showAlert()"> </a>
+      <h3 id="message"></h3>
       <div id="chart" class="mypiechart"></div>
     </center>
     <script>
