@@ -6,7 +6,7 @@ angular.module('e-mission-gamified', ['ionic'])
        var alertPopup = $ionicPopup.alert({
            title: 'Welcome to Penguin Land!',
            okText: 'Got it!',
-           template: '<p>We need your help to revitalize a once fun and vibrant penguin community. You can help us by confirming your trips and choosing eco-friendly travel modes! As your points accumulate, you will see the gradual revival of Penguin Land.</p> <p> Point accruals are based on trip confirmation and your carbon footprint (the lower the carbon footprint, the more points!) Watch out - your points may decrease some days (depending on your behavior), but don&#39;t worry, you&#39;ll never go below 0. Trip confirmation is heavily weighed, so make sure you confirm for the penguins&#39; sake!</p> <p> The game starts once you have confirmed trips. Please confirm trips at the end of the day. </p>',
+           template: '<p>We need your help to revitalize a once fun and vibrant penguin community. You can help us by confirming your trips and choosing eco-friendly travel modes! As your points accumulate, you will see the gradual revival of Penguin Land.</p> <p> Point accruals are based on trip confirmation and your carbon footprint (the lower the carbon footprint, the more points!) Watch out - your points may decrease some days (depending on your behavior), but don&#39;t worry, you&#39;ll never go below 0. Trip confirmation is heavily weighed, so make sure you confirm for the penguins&#39; sake!</p> <p> The game starts once you have confirmed trips. Please confirm trips at the end of the day.  <p><b>IMPORTANT</b>: If you are have an iPhone, your trip log may not automatically update. To fix this, toggle "Force Sync" by going to Auth &gt; Force Sync. Your recent trips should then show up for your confirmation.  You may have to do this daily.</p>',
          });
          alertPopup.then(function(res) {
            console.log('Displayed results to the user');
@@ -15,7 +15,7 @@ angular.module('e-mission-gamified', ['ionic'])
          $timeout(function() {
             console.log("timed out, closing popup");
             alertPopup.close(); //close the popup after 3 seconds for some reason
-         }, 4000);
+         }, 5000);
     }
     $scope.displayScore = function() {
         // alert("displayScore called");
