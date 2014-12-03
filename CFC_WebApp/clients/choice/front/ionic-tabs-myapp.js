@@ -92,7 +92,7 @@ angular.module('e-mission-choice', ['ionic'])
 
     $timeout(function() {
       $scope.$broadcast('scroll.refreshComplete');
-    }, 1000);
+    }, 10000);
   }
 })
 

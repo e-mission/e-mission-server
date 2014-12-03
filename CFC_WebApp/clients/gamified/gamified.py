@@ -96,15 +96,15 @@ def updateScore(user_uuid):
     setScores(user, prevScore, newScore)
 
 def getLevel(score):
-  if score < 1000:
+  if score < 100:
     level = 1
+    sublevel = math.floor(score / 20) + 1
+  elif score < 1000:
+    level = 2
     sublevel = math.floor(score / 200) + 1
   elif score < 10000:
-    level = 2
-    sublevel = math.floor(score / 2000) + 1
-  elif score < 100000:
     level = 3
-    sublevel = math.floor(score / 20000) + 1
+    sublevel = math.floor(score / 2000) + 1
   else:
     # Off the charts, stay at the top image
     level = 3
