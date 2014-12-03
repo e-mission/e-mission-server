@@ -15,7 +15,7 @@ angular.module('e-mission-gamified', ['ionic'])
          $timeout(function() {
             console.log("timed out, closing popup");
             alertPopup.close(); //close the popup after 3 seconds for some reason
-         }, 5000);
+         }, 10000);
     }
     $scope.displayScore = function() {
         // alert("displayScore called");
@@ -32,10 +32,10 @@ angular.module('e-mission-gamified', ['ionic'])
 
         data = [{'title': 'Score',
                 'subtitle': 'Number of points',
-                'ranges': [1000, 10000, 100000],
+                'ranges': [100, 1000, 10000],
                 'measures': [prevScore, currScore],
-                'submarkers': range(200, 800, 200).concat(range(2000, 8000, 2000)).concat(range(20000, 80000, 20000)),
-                'markers': [1000, 10000, 100000]
+                'submarkers': range(20, 80, 20).concat(range(200, 800, 200)).concat(range(2000, 8000, 2000)),
+                'markers': [100, 1000, 10000]
                }];
 
         console.log("data = "+JSON.stringify(data));
