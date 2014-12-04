@@ -5,6 +5,8 @@ import json
 from get_database import get_mode_db, get_section_db
 from datetime import datetime, timedelta
 from userclient import getClientSpecificQueryFilter
+import stats
+import time
 
 def travel_time(time1,time2):
     start_time=parser.parse(time1)
@@ -134,8 +136,8 @@ def queryUnclassifiedSections(uuid):
     # - they are too old
     # - they have enough confidence that above the magic threshold (90%) AND
     # the client has requested stripping out
-    stats.storeEntry(user_uuid, "stats.TRIP_MGR_PCT_SHOWN", time.time(),
-            float(unclassifiedSectionCount)/totalUnclassifiedSectionCount)
+    stats.storeServerEntry(user_uuid, stats.STAT_TRIP_MGR_PCT_SHOWN, time.time(),
+            0 if totalUnclassifiedSectionCount == 0 else float(unclassifiedSectionCount)/totalUnclassifiedSectionCount)
     return unclassifiedSections
 
 def getUnclassifiedSections(uuid):
