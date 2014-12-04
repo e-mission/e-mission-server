@@ -27,7 +27,7 @@ def setClientMeasurements(user, reportedVals):
   for key in stats:
     values = stats[key]
     for value in values:
-      storeEntry(user, key, value[0], value[1], metadata)
+      storeClientEntry(user, key, value[0], value[1], metadata)
 
 def storeClientEntry(user, key, ts, reading, metadata):
   logging.debug("storing client entry for user %s, key %s at timestamp %s" % (user, key, ts))
