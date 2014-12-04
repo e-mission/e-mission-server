@@ -7,6 +7,7 @@ import sys
 import os
 import logging
 from datetime import datetime
+import time
 # So that we can set the socket timeout
 import socket
 # For decoding tokens using the google decode URL
@@ -317,12 +318,18 @@ def movesCallback():
 @app.hook('before_request')
 def before_request():
   print("START %s %s %s" % (datetime.now(), request.method, request.path))
+  request.params.start_ts = time.time()
   logging.debug("START %s %s" % (request.method, request.path))
 
 @app.hook('after_request')
 def after_request():
-  print("END %s %s %s" % (datetime.now(), request.method, request.path))
-  logging.debug("END %s %s" % (request.method, request.path))
+  msTimeNow = time.time()
+  duration = msTimeNow - request.params.start_ts
+  print("END %s %s %s %s %s " % (datetime.now(), request.method, request.path, request.params.user_uuid, duration))
+  logging.debug("END %s %s %s %s " % (request.method, request.path, request.params.user_uuid, duration))
+  # Keep track of the time and duration for each call
+  stats.storeServerEntry(request.params.user_uuid, "%s %s" % (request.method, request.path),
+        msTimeNow, duration)
 
 # Auth helpers BEGIN
 # This should only be used by createUserProfile since we may not have a UUID
@@ -347,6 +354,7 @@ def getUUIDFromToken(token):
     return user_uuid
 
 def getUUID(request):
+  retUUID = None
   if skipAuth:
     from uuid import UUID
     from get_database import get_uuid_db
@@ -355,11 +363,13 @@ def getUUID(request):
     else:
       # TODO: Figure out what we really want to do here
       user_uuid = UUID('{3a307244-ecf1-3e6e-a9a7-3aaf101b40fa}')
+    retUUID = user_uuid
     logging.debug("skipAuth = %s, returning fake UUID %s" % (skipAuth, user_uuid))
-    return user_uuid
   else:
     userToken = request.json['user']
-    return getUUIDFromToken(userToken)
+    retUUID = getUUIDFromToken(userToken)
+  request.params.user_uuid = retUUID
+  return retUUID
 # Auth helpers END
 
 # We have see the sockets hang in practice. Let's set the socket timeout = 1
