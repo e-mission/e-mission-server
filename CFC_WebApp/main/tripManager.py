@@ -123,8 +123,19 @@ def queryUnclassifiedSections(uuid):
                                                  {'user_id':user_uuid},
                                                  {'confirmed_mode': ''},
                                                  { 'type': 'move' }]})
-    logging.debug('Unsec.count = %s' % unclassifiedSections.count())
-    logging.debug('Total Unsec.count = %s' % totalUnclassifiedSections.count())
+
+    unclassifiedSectionCount = unclassifiedSections.count()
+    totalUnclassifiedSectionCount = totalUnclassifiedSections.count()
+
+    logging.debug('Unsec.count = %s' % unclassifiedSectionCount)
+    logging.debug('Total Unsec.count = %s' % totalUnclassifiedSectionCount)
+    # Keep track of what percent of sections are stripped out.
+    # Sections can be stripped out for various reasons:
+    # - they are too old
+    # - they have enough confidence that above the magic threshold (90%) AND
+    # the client has requested stripping out
+    stats.storeEntry(user_uuid, "stats.TRIP_MGR_PCT_SHOWN", time.time(),
+            float(unclassifiedSectionCount)/totalUnclassifiedSectionCount)
     return unclassifiedSections
 
 def getUnclassifiedSections(uuid):
