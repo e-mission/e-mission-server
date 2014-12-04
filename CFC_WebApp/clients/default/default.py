@@ -1,6 +1,7 @@
 import logging
-from main import carbon
+from main import carbon, stats
 from dao.user import User
+import time
 import json
 
 # BEGIN: Code to get and set client specific fields in the profile (currentScore and previousScore)
@@ -12,7 +13,6 @@ def getCarbonFootprint(user):
 
 def setCarbonFootprint(user, newFootprint):
     user.setClientSpecificProfileFields({'carbon_footprint': newFootprint})
-
 # END: Code to get and set client specific fields in the profile (currentScore and previousScore)
 
 def getResult(user_uuid):
@@ -47,6 +47,9 @@ def getResult(user_uuid):
   # logging.debug(renderedTemplate)
   return renderedTemplate
 
+def getCategorySum(carbonFootprintMap):
+    return sum(carbonFootprintMap.values())
+
 def runBackgroundTasks(user_uuid):
   user = User.fromUUID(user_uuid)
   # carbon compare results is a tuple. Tuples are converted to arrays
@@ -57,3 +60,20 @@ def runBackgroundTasks(user_uuid):
   carbonCompareResults = carbon.getFootprintCompare(user_uuid)
   setCarbonFootprint(user, carbonCompareResults)
 
+  (myModeShareCount, avgModeShareCount,
+     myModeShareDistance, avgModeShareDistance,
+     myModeCarbonFootprint, avgModeCarbonFootprint,
+     myModeCarbonFootprintNoLongMotorized, avgModeCarbonFootprintNoLongMotorized, # ignored
+     myOptimalCarbonFootprint, avgOptimalCarbonFootprint,
+     myOptimalCarbonFootprintNoLongMotorized, avgOptimalCarbonFootprintNoLongMotorized) = carbonCompareResults
+  # We only compute server stats in the background, because including them in
+  # the set call means that they may be invoked when the user makes a call and
+  # the cached value is None, which would potentially slow down user response time
+  msNow = time.time()
+  stats.storeResultEntry(user_uuid, stats.STAT_MY_CARBON_FOOTPRINT, msNow, getCategorySum(myModeCarbonFootprint))
+  stats.storeResultEntry(user_uuid, stats.STAT_MY_CARBON_FOOTPRINT_NO_AIR, msNow, getCategorySum(myModeCarbonFootprintNoLongMotorized))
+  stats.storeResultEntry(user_uuid, stats.STAT_MY_OPTIMAL_FOOTPRINT, msNow, getCategorySum(myOptimalCarbonFootprint))
+  stats.storeResultEntry(user_uuid, stats.STAT_MY_OPTIMAL_FOOTPRINT_NO_AIR, msNow, getCategorySum(myOptimalCarbonFootprintNoLongMotorized))
+  stats.storeResultEntry(user_uuid, stats.STAT_MY_ALLDRIVE_FOOTPRINT, msNow, getCategorySum(myModeShareDistance) * (278.0/(1609 * 1000)))
+  stats.storeResultEntry(user_uuid, stats.STAT_MEAN_FOOTPRINT, msNow, getCategorySum(avgModeCarbonFootprint))
+  stats.storeResultEntry(user_uuid, stats.STAT_MEAN_FOOTPRINT_NO_AIR, msNow, getCategorySum(avgModeCarbonFootprintNoLongMotorized))

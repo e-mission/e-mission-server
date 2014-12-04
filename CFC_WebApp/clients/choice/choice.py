@@ -1,11 +1,12 @@
 import logging
 from get_database import get_section_db
-from main import carbon, common
+from main import carbon, common, stats
 from datetime import datetime, time, timedelta
 from dao.user import User
 import math
 import json
 from uuid import UUID
+import time
 from clients.gamified import gamified
 from clients.default import default
 
@@ -13,6 +14,7 @@ from clients.default import default
 def setCurrView(uuid, newView):
   user = User.fromUUID(uuid)
   user.setClientSpecificProfileFields({'curr_view': newView})
+  stats.storeResultEntry(uuid, stats.STAT_VIEW_CHOICE, time.time(), newView)
 
 def getCurrView(uuid):
   user = User.fromUUID(uuid)

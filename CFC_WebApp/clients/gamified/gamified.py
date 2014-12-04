@@ -1,7 +1,9 @@
 import logging
 from get_database import get_section_db
-from main import carbon, common
-from datetime import datetime, time, timedelta
+from main import carbon, common, stats
+from datetime import datetime, timedelta
+from datetime import time as dttime
+import time
 from dao.user import User
 import math
 
@@ -85,14 +87,15 @@ def getScore(user_uuid, start, end):
 def updateScore(user_uuid):
     today = datetime.now().date()
     yesterday = today - timedelta(days = 1)
-    yesterdayStart = datetime.combine(yesterday, time.min)
-    todayStart = datetime.combine(today, time.min)
+    yesterdayStart = datetime.combine(yesterday, dttime.min)
+    todayStart = datetime.combine(today, dttime.min)
 
     user = User.fromUUID(user_uuid)
     (discardedScore, prevScore) = getStoredScore(user)
     newScore = prevScore + getScore(user_uuid, yesterdayStart, todayStart)
     if newScore < 0:
         newScore = 0
+    stats.storeResultEntry(user_uuid, stats.STAT_GAME_SCORE, time.time(), newScore)
     setScores(user, prevScore, newScore)
 
 def getLevel(score):

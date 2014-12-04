@@ -26,6 +26,10 @@ class TestDefault(unittest.TestCase):
         default.setCarbonFootprint(user, dummyCarbonFootprint)
         # recall that pymongo converts tuples to lists somewhere down the line
         self.assertEquals(default.getCarbonFootprint(user), list(dummyCarbonFootprint))
+    
+    def testGetCategorySum(self):
+        calcSum = default.getCategorySum({'walking': 1, 'cycling': 2, 'bus': 3, 'train': 4, 'car': 5})
+        self.assertEqual(calcSum, 15)
 
 if __name__ == '__main__':
     unittest.main()
