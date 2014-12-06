@@ -3,11 +3,18 @@ import time
 from get_database import get_client_stats_db, get_server_stats_db, get_result_stats_db
 
 STAT_TRIP_MGR_PCT_SHOWN = "tripManager.pctShown"
+
 STAT_MY_CARBON_FOOTPRINT = "footprint.my_carbon"
 STAT_MY_CARBON_FOOTPRINT_NO_AIR = "footprint.my_carbon.no_air"
 STAT_MY_OPTIMAL_FOOTPRINT = "footprint.optimal"
 STAT_MY_OPTIMAL_FOOTPRINT_NO_AIR = "footprint.optimal.no_air"
 STAT_MY_ALLDRIVE_FOOTPRINT = "footprint.alldrive"
+
+STAT_PCT_CLASSIFIED = "game.score.pct_classified"
+STAT_MINE_MINUS_OPTIMAL = "game.score.mine_minus_optimal"
+STAT_ALL_DRIVE_MINUS_MINE = "game.score.all_drive_minus_mine"
+STAT_SB375_DAILY_GOAL = "game.score.sb375_daily_goal"
+
 STAT_MEAN_FOOTPRINT = "footprint.mean"
 STAT_MEAN_FOOTPRINT_NO_AIR = "footprint.mean.no_air"
 STAT_GAME_SCORE = "game.score"
@@ -32,7 +39,6 @@ def setClientMeasurements(user, reportedVals):
 # metadata format is 
 def storeClientEntry(user, key, ts, reading, metadata):
   logging.debug("storing client entry for user %s, key %s at timestamp %s" % (user, key, ts))
-  logging.debug("metadata format is %s"% metadata)
   currEntry = createEntry(user, key, ts, reading)
   # Add the os and app versions from the metadata dict
   currEntry.update(metadata)
@@ -64,5 +70,5 @@ def getClientMeasurementCount(readings):
 def createEntry(user, stat, ts, reading):
   return {'user': user,
           'stat': stat,
-          'client_ts': ts,
+          'ts': ts,
           'reading': reading}

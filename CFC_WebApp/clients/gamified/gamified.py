@@ -68,6 +68,11 @@ def calcScore(componentArr):
 
 def getScore(user_uuid, start, end):
     components = getScoreComponents(user_uuid, start, end)
+    [pctClassified, mineMinusOptimal, allDriveMinusMine, sb375DailyGoal] = components
+    stats.storeResultEntry(user_uuid, stats.STAT_PCT_CLASSIFIED, time.time(), pctClassified)
+    stats.storeResultEntry(user_uuid, stats.STAT_MINE_MINUS_OPTIMAL, time.time(), mineMinusOptimal)
+    stats.storeResultEntry(user_uuid, stats.STAT_ALL_DRIVE_MINUS_MINE, time.time(), allDriveMinusMine)
+    stats.storeResultEntry(user_uuid, stats.STAT_SB375_DAILY_GOAL, time.time(), sb375DailyGoal)
     return calcScore(components)
 
 # Ok so this is a big tricky to get right.
