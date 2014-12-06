@@ -29,8 +29,10 @@ def setClientMeasurements(user, reportedVals):
     for value in values:
       storeClientEntry(user, key, value[0], value[1], metadata)
 
+# metadata format is 
 def storeClientEntry(user, key, ts, reading, metadata):
   logging.debug("storing client entry for user %s, key %s at timestamp %s" % (user, key, ts))
+  logging.debug("metadata format is %s"% metadata)
   currEntry = createEntry(user, key, ts, reading)
   # Add the os and app versions from the metadata dict
   currEntry.update(metadata)
