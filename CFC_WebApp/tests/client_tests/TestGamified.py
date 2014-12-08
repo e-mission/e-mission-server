@@ -46,12 +46,12 @@ class TestGamified(unittest.TestCase):
 
 
         self.now = datetime.now()
-        self.dayago = self.now - timedelta(days=1)
+        self.twodaysago = self.now - timedelta(days=2)
         self.weekago = self.now - timedelta(weeks = 1)
 
         for section in self.SectionsColl.find():
-            section['section_start_datetime'] = self.dayago
-            section['section_end_datetime'] = self.dayago + timedelta(hours = 1)
+            section['section_start_datetime'] = self.twodaysago
+            section['section_end_datetime'] = self.twodaysago + timedelta(hours = 1)
             section['predicted_mode'] = {'walking': 1.0}
             if section['user_id'] == 'fest@example.com':
                 logging.debug("Setting user_id for section %s, %s = %s" %
