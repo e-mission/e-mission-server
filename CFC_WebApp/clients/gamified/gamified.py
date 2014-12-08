@@ -92,12 +92,19 @@ def getScore(user_uuid, start, end):
 def updateScore(user_uuid):
     today = datetime.now().date()
     yesterday = today - timedelta(days = 1)
+    dayBeforeYesterday = today - timedelta(days = 2)
+
+    dayBeforeYesterdayStart = datetime.combine(dayBeforeYesterday, dttime.min)
     yesterdayStart = datetime.combine(yesterday, dttime.min)
     todayStart = datetime.combine(today, dttime.min)
 
     user = User.fromUUID(user_uuid)
     (discardedScore, prevScore) = getStoredScore(user)
-    newScore = prevScore + getScore(user_uuid, yesterdayStart, todayStart)
+    # Using score from dayBeforeYesterday instead of yesterday because there is
+    # currently a significant lag in the time for e-mission to prompt for
+    # entries, so people might not confirm yesterday's trips until sometime
+    # today, which means that it won't be counted in their score
+    newScore = prevScore + getScore(user_uuid, dayBeforeYesterdayStart, yesterdayStart)
     if newScore < 0:
         newScore = 0
     stats.storeResultEntry(user_uuid, stats.STAT_GAME_SCORE, time.time(), newScore)
