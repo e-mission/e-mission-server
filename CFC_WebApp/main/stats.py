@@ -3,6 +3,7 @@ import time
 from get_database import get_client_stats_db, get_server_stats_db, get_result_stats_db
 
 STAT_TRIP_MGR_PCT_SHOWN = "tripManager.pctShown"
+STAT_TRIP_MGR_TRIPS_FOR_DAY = "tripManager.tripsForDay"
 
 STAT_MY_CARBON_FOOTPRINT = "footprint.my_carbon"
 STAT_MY_CARBON_FOOTPRINT_NO_AIR = "footprint.my_carbon.no_air"

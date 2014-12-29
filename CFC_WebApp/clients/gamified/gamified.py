@@ -91,6 +91,9 @@ def getScore(user_uuid, start, end):
 # let's do the cheap solution for now so that we know whether it works at all.
 def updateScore(user_uuid):
     today = datetime.now().date()
+    updateScoreForDay(user_uuid, today)
+
+def updateScoreForDay(user_uuid, today):
     yesterday = today - timedelta(days = 1)
     dayBeforeYesterday = today - timedelta(days = 2)
 
@@ -155,4 +158,8 @@ def getClientConfirmedModeField():
   return None
 
 def runBackgroundTasks(uuid):
-  updateScore(uuid)
+  today = datetime.now().date()
+  runBackgroundTasksForDay(uuid, today)
+
+def runBackgroundTasksForDay(uuid, today):
+  updateScoreForDay(uuid, today)

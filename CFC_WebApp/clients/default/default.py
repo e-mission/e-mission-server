@@ -2,6 +2,7 @@ import logging
 from main import carbon, stats
 from dao.user import User
 import time
+from datetime import datetime, timedelta
 import json
 
 # BEGIN: Code to get and set client specific fields in the profile (currentScore and previousScore)
@@ -50,14 +51,20 @@ def getResult(user_uuid):
 def getCategorySum(carbonFootprintMap):
     return sum(carbonFootprintMap.values())
 
+# TODO: Change the use of runBackgroundTasks 
 def runBackgroundTasks(user_uuid):
+  today = datetime.now()
+  runBackgroundTasksForDay(user_uuid, today)
+
+def runBackgroundTasksForDay(user_uuid, today):
   user = User.fromUUID(user_uuid)
   # carbon compare results is a tuple. Tuples are converted to arrays
   # by mongodb
   # In [44]: testUser.setScores(('a','b', 'c', 'd'), ('s', 't', 'u', 'v'))
   # In [45]: testUser.getScore()
   # Out[45]: ([u'a', u'b', u'c', u'd'], [u's', u't', u'u', u'v'])
-  carbonCompareResults = carbon.getFootprintCompare(user_uuid)
+  weekago = today - timedelta(days=7)
+  carbonCompareResults = carbon.getFootprintCompareForRange(user_uuid, weekago, today)
   setCarbonFootprint(user, carbonCompareResults)
 
   (myModeShareCount, avgModeShareCount,
