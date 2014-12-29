@@ -109,6 +109,18 @@ class User:
       logging.error("In setStudy, err = %s" % writeResult['err'])
       raise Exception()
 
+  @staticmethod
+  def createProfile(uuid, ts, studyList):
+    initProfileObj = {'user_id': uuid,
+                      'source':'Shankari',
+                      'update_ts': ts}
+    writeResultProfile = get_profile_db().update(
+        {'user_id': uuid},
+        {'$set': initProfileObj,
+         '$addToSet': {'study_list': {'$each': studyList}}},
+        upsert=True)
+    return writeResultProfile
+
   # Create assumes that we will definitely create a new one every time.
   # This introduces state and makes things complex.
   # Instead, we can write an idempotent function that will create if necessary
@@ -179,14 +191,7 @@ class User:
     # TODO: Write a script that periodically goes through and identifies maps
     # that don't have an associated profile and fix them
     study_list = Client.getPendingClientRegs(userEmail)
-    initProfileObj = {'user_id': anonUUID,
-                      'source':'Shankari',
-                      'update_ts': datetime.now()}
-    writeResultProfile = get_profile_db().update(
-        {'user_id': anonUUID},
-        {'$set': initProfileObj,
-         '$addToSet': {'study_list': {'$each': study_list}}},
-        upsert=True)
+    writeResultProfile = User.createProfile(anonUUID, datetime.now(), study_list)
      
     if 'err' not in writeResultProfile:
       # update was successful!
