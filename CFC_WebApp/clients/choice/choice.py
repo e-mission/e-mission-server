@@ -63,6 +63,15 @@ def clientSpecificSetters(uuid, sectionId, predictedModeMap):
 def getClientConfirmedModeField():
   return None
 
+# TODO: Simplify this. runBackgroundTasks are currently only invoked from the
+# result precomputation code. We could change that code to pass in the day, and
+# remove this interface. Extra credit: should we pass in the day, or a date
+# range?  Passing in the date range could make it possible for us to run the
+# scripts more than once a day...
 def runBackgroundTasks(uuid):
-  gamified.runBackgroundTasks(uuid)
-  default.runBackgroundTasks(uuid)
+  today = datetime.now().date()
+  runBackgroundTasksForDay(uuid, today)
+
+def runBackgroundTasksForDay(uuid, today):
+  gamified.runBackgroundTasksForDay(uuid, today)
+  default.runBackgroundTasksForDay(uuid, today)
