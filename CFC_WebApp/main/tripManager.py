@@ -15,7 +15,7 @@ import sys
 import os
 
 sys.path.append("%s" % os.getcwd())
-sys.path.append("%s/../CFC_Datacollector/moves" % os.getcwd())
+sys.path.append("%s/../CFC_DataCollector/moves" % os.getcwd())
 
 import collect
 
