@@ -4,7 +4,7 @@ from utils import load_database_json, purge_database_json
 from main import tripManager
 from pymongo import MongoClient
 import logging
-from get_database import get_db, get_mode_db, get_section_db
+from get_database import get_db, get_mode_db, get_section_db, get_trip_db
 import re
 # Needed to modify the pythonpath
 import sys
@@ -124,7 +124,48 @@ class TestTripManager(unittest.TestCase):
     queriedUnclassifiedSections = tripManager.queryUnclassifiedSections(User.fromEmail(fakeEmail).uuid)
     self.assertEqual(queriedUnclassifiedSections.count(), 0)
 
+  def testStoreSensedTrips(self):
+    fakeEmail = "fest@example.com"
+    fakeUUID = User.fromEmail(fakeEmail).uuid
+
+    trip_array = json.load(open("tests/data/sensed_trips.json"))
+    self.assertEqual(len(trip_array), 2)
+    tripManager.storeSensedTrips(fakeUUID, trip_array)
+    insertedTrips = [trip for trip in get_trip_db().find({"user_id": fakeUUID})]
+    # We load two sections for each user in the setup. Here we only want to
+    # look at sections that we added here. We distinguish between the two by looking
+    # to see whether the predicted mode exists
+    insertedSections = [section for section in get_section_db().find({"$and":
+        [{"user_id": fakeUUID}, {"predicted_mode": {"$exists": False}}]})]
+    # insertedSections = [section["predicted_mode"] for section in get_section_db().find({"user_id": fakeUUID})]
+
+    self.assertEqual(len(insertedTrips), 2)
+
+    self.assertEqual(insertedTrips[0]["type"], "place")
+    self.assertEqual(insertedTrips[0]["trip_start_time"], "20150101T000153-0500")
+    # self.assertEqual(insertedTrips[0]["trip_start_datetime"], datetime(2014,12,31,17,31,52))
+    self.assertEqual(insertedTrips[0]["trip_end_time"], "20150102T000252-0500")
+    # self.assertEqual(insertedTrips[0]["trip_end_datetime"], datetime(2015,01,02,04,01,51))
+
+    startPlaceLocation = insertedTrips[0]["place"]["place_location"]
+    self.assertEqual(startPlaceLocation["coordinates"], [-122.086945, 37.380866])
+
+    self.assertEqual(insertedTrips[1]["type"], "move")
+    self.assertEqual(insertedTrips[1]["trip_start_time"], "20150102T000252-0500")
+    self.assertEqual(insertedTrips[1]["trip_end_time"], "20150102T000252-0500")
+
+    self.assertEqual(len(insertedSections), 2)
+    walkingSection = insertedSections[0]
+    walkingTrackPointArray = insertedSections[0]["track_points"]
+
+    self.assertEqual(walkingSection["section_start_time"], "20150102T000252-0500")
+    self.assertEqual(walkingSection["section_end_time"], "20150102T000253-0500")
+    self.assertEqual(walkingSection["duration"], 180631)
+    self.assertAlmostEqual(walkingSection["distance"], 1311.125, places=2)
+
+    self.assertEqual(len(walkingTrackPointArray), 10)
+    self.assertEqual(walkingTrackPointArray[0]["track_location"]["coordinates"], [-122.086945, 37.380866])
+    self.assertEqual(walkingTrackPointArray[8]["track_location"]["coordinates"], [-122.078265, 37.385461])
+
 if __name__ == '__main__':
     unittest.main()
-    
-  
