@@ -8,6 +8,17 @@ from userclient import getClientSpecificQueryFilter
 import stats
 import time
 
+# TODO: Argh! Until now, we just had the data collector import the webapp.
+# Now we have the webapp import the data collector. This badly needs
+# restructuring.
+import sys
+import os
+
+sys.path.append("%s" % os.getcwd())
+sys.path.append("%s/../CFC_Datacollector/moves" % os.getcwd())
+
+import collect
+
 def travel_time(time1,time2):
     start_time=parser.parse(time1)
     end_time=parser.parse(time2)
@@ -178,6 +189,10 @@ def setSectionClassification(uuid, userClassifications):
                                                             if Modes.find({'mode_name':userClassifications[sectionindex]['userMode']}).count()!=0
                                                             else userClassifications[sectionindex]['userMode']}})
                 logging.debug("update done" )
+
+def storeSensedTrips(user_uuid, sections):
+    collect.processTripArray(user_uuid, sections)
+    logging.debug("done storing sensed trips")
 
 def getModeOptions():
     Modes=get_mode_db()
