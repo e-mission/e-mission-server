@@ -212,6 +212,12 @@ def setSectionClassification():
   updates = request.json['updates']
   return tripManager.setSectionClassification(user_uuid, updates)
 
+@post('/tripManager/storeSensedTrips')
+def storeSensedTrips():
+  user_uuid=getUUID(request)
+  sections = request.json['sections']
+  return tripManager.storeSensedTrips(user_uuid, sections)
+
 @post('/profile/create')
 def createUserProfile():
   logging.debug("Called createUserProfile")

@@ -98,7 +98,7 @@ def fillSectionWithMovesData(sec_from_moves, newSec):
 # to occur in practice, so it doesn't appear to be so critical that we are able
 # to fix it
 def fillTripWithMovesData(trip_from_moves, new_trip):
-  logging.debug("trip_from_moves = %s" % trip_from_moves)
+  # logging.debug("trip_from_moves = %s" % trip_from_moves)
   new_trip['type'] = trip_from_moves["type"] if 'type' in trip_from_moves else "unknown"
   new_trip['trip_start_time'] = trip_from_moves["startTime"]
   new_trip['trip_end_time'] = trip_from_moves["endTime"]
@@ -123,11 +123,6 @@ def convertModeNameToIndex(ModeDb, modeName):
     if ModeDb.find({'mode_name':modeName}).count()!=0 else modeName
 
 def processResult(user_uuid, result):
-  # First, we open a connection to the database
-  Stage_Trips=get_trip_db()
-  Stage_Sections=get_section_db()
-  Modes=get_mode_db()
-
   # logging.debug(json.dumps(result))
 
   # It turns out that if a user just signed up, then they don't have any
@@ -141,77 +136,88 @@ def processResult(user_uuid, result):
     logging.debug("result has length 0, returning early")
     return
 
-  if result[0]["segments"] != None:
-      number_of_trips=len(result[0]["segments"])
-      logging.info("number of trips = %s" % number_of_trips)
-      for trip in range(number_of_trips):
-          seg_note=result[0]["segments"][trip]
-          trip_id=seg_note["startTime"]
-          _id_trip=str(user_uuid)+'_'+seg_note["startTime"]
-          #logging.debug(json.dumps(seg_note))
-          if "activities" in seg_note:
-              number_of_sections=len(seg_note["activities"])
-              for sectionindex in range(number_of_sections):
-                  seg_act_note=seg_note["activities"][sectionindex]
-                  # if the section is missing some data that we access later, then we skip it
-                  if Stage_Sections.find({"$and":[ {"user_id":user_uuid},{"trip_id": trip_id},{"section_id": sectionindex}]}).count()==0:
-                      try:
-                          _id_section = str(user_uuid)+'_'+seg_act_note["startTime"]+'_'+str(sectionindex)
-                          _mode = convertModeNameToIndex(Modes, seg_act_note["activity"])
-                          sections_todo={'source':'Shankari',
-                                         '_id':_id_section,
-                                         'user_id': user_uuid,
-                                         'trip_id':trip_id,
-                                         'type':seg_note["type"],
-                                         'section_id':sectionindex,
-                                         'mode' : _mode,
-                                          # SHANKARI: what does seg_act_note["manual"] mean?
-                                         'confirmed_mode' :_mode if seg_act_note["manual"]==True else '',
-                                         # 'group':int(''.join(map(str, [group['group_id'] for group in Groups.find({'group_name':seg_act_note["group"]})])))
-                                         # if "group" in seg_act_note else '',
-                                        }
-                          fillSectionWithMovesData(seg_act_note, sections_todo)
-                          # Now that we have created this section, let's insert it into the database
-                          try:
-                            logging.info("About to insert section with trip_id = %s,p section_id = %s, section_start_time = %s, type = %s and mode = %s " %
-                                (trip_id, sectionindex, sections_todo['section_start_time'], seg_note["type"], seg_act_note["activity"]))
-                            Stage_Sections.insert(sections_todo)
-                          except DuplicateKeyError:
-                            logging.warning("DuplicateKeyError, skipping insert %s" % sections_todo)
-                            logging.warning("Existing section is %s" % Stage_Sections.find_one({"_id": _id_section}))
-                      except KeyError:
-                        logging.warning("Missing key, skipping section insert %s" % seg_act_note)
-
-                        insertedSectionCount = Stage_Sections.find({"$and" : [{"user_id": user_uuid},
-                                                                              {"trip_id": trip_id},
-                                                                              {"section_id": sectionindex}]}).count()
-                        if insertedSectionCount == 0:
-                             logging.error("Insert appears to have FAILED. No entry for %s, %s, %s found" %
-                                    (user_uuid, trip_id, sectionindex))
-                  else:
-                     logging.debug("Found existing matching entry for %s, %s, %s, skipping entry" %
-                            (user_uuid, trip_id, sectionindex))
-
-          # Insert a trip if it doesn't already exist
-          # SHANKARI: What if we get other sections for a trip later? When do we update the trip?
-          # Do we even need to keep this linkage, with the concomittant
-          # management cost if we can just find all sections by trip_id
-          # instead? How expensive is the query?
-          if Stage_Trips.find({"$and":[ {"user_id":user_uuid},{"trip_id": trip_id}]}).count()==0:
-              trips_todo={ 'source':'Shankari',
-                           '_id':_id_trip,
-                           'user_id': user_uuid,
-                           'trip_id':trip_id,
-                           'sections':[sections['section_id'] for sections in Stage_Sections.find({"$and":[{"user_id":user_uuid}, {"trip_id":trip_id}]})]}
-              fillTripWithMovesData(seg_note, trips_todo)
-              logging.info("About to insert trip with trip_id = %s " % (trip_id))
-              Stage_Trips.insert(trips_todo)
-          else:
-              logging.debug("Found existing trip with trip_id = %s " % (trip_id))
+  trip_array = result[0]["segments"]
+  if trip_array != None:
+    processTripArray(user_uuid, trip_array)
   else:
     logging.warning("result[0] = %s, does not contain any segments" % result[0])
     # # logging.debug(json.dumps(result[0]["segments"][0]["activities"][0]))
     # # logging.debug(json.dumps(result))
+
+def processTripArray(user_uuid, trip_array):
+  # First, we open a connection to the database
+  Stage_Trips=get_trip_db()
+  Stage_Sections=get_section_db()
+  Modes=get_mode_db()
+
+  number_of_trips=len(trip_array)
+  logging.info("number of trips = %s" % number_of_trips)
+  for trip in range(number_of_trips):
+      seg_note=trip_array[trip]
+      trip_id=seg_note["startTime"]
+      _id_trip=str(user_uuid)+'_'+seg_note["startTime"]
+      #logging.debug(json.dumps(seg_note))
+      if "activities" in seg_note:
+          number_of_sections=len(seg_note["activities"])
+          logging.debug("number of sections = %s" % number_of_sections)
+          for sectionindex in range(number_of_sections):
+              seg_act_note=seg_note["activities"][sectionindex]
+              # if the section is missing some data that we access later, then we skip it
+              if Stage_Sections.find({"$and":[ {"user_id":user_uuid},{"trip_id": trip_id},{"section_id": sectionindex}]}).count()==0:
+                  try:
+                      _id_section = str(user_uuid)+'_'+seg_act_note["startTime"]+'_'+str(sectionindex)
+                      _mode = convertModeNameToIndex(Modes, seg_act_note["activity"])
+                      isManual = seg_act_note["manual"] if "manual" in seg_act_note else False
+                      sections_todo={'source':'Shankari',
+                                     '_id':_id_section,
+                                     'user_id': user_uuid,
+                                     'trip_id':trip_id,
+                                     'type':seg_note["type"],
+                                     'section_id':sectionindex,
+                                     'mode' : _mode,
+                                      # SHANKARI: what does seg_act_note["manual"] mean?
+                                     'confirmed_mode' :_mode if isManual else '',
+                                     # 'group':int(''.join(map(str, [group['group_id'] for group in Groups.find({'group_name':seg_act_note["group"]})])))
+                                     # if "group" in seg_act_note else '',
+                                    }
+                      fillSectionWithMovesData(seg_act_note, sections_todo)
+                      # Now that we have created this section, let's insert it into the database
+                      try:
+                        logging.info("About to insert section with trip_id = %s,p section_id = %s, section_start_time = %s, type = %s and mode = %s " %
+                            (trip_id, sectionindex, sections_todo['section_start_time'], seg_note["type"], seg_act_note["activity"]))
+                        Stage_Sections.insert(sections_todo)
+                      except DuplicateKeyError:
+                        logging.warning("DuplicateKeyError, skipping insert %s" % sections_todo)
+                        logging.warning("Existing section is %s" % Stage_Sections.find_one({"_id": _id_section}))
+                  except KeyError, e:
+                    logging.warning("Missing key %s, skipping section insert %s" % (e, seg_act_note))
+
+                    insertedSectionCount = Stage_Sections.find({"$and" : [{"user_id": user_uuid},
+                                                                          {"trip_id": trip_id},
+                                                                          {"section_id": sectionindex}]}).count()
+                    if insertedSectionCount == 0:
+                         logging.error("Insert appears to have FAILED. No entry for %s, %s, %s found" %
+                                (user_uuid, trip_id, sectionindex))
+              else:
+                 logging.debug("Found existing matching entry for %s, %s, %s, skipping entry" %
+                        (user_uuid, trip_id, sectionindex))
+
+      # Insert a trip if it doesn't already exist
+      # SHANKARI: What if we get other sections for a trip later? When do we update the trip?
+      # Do we even need to keep this linkage, with the concomittant
+      # management cost if we can just find all sections by trip_id
+      # instead? How expensive is the query?
+      if Stage_Trips.find({"$and":[ {"user_id":user_uuid},{"trip_id": trip_id}]}).count()==0:
+          trips_todo={ 'source':'Shankari',
+                       '_id':_id_trip,
+                       'user_id': user_uuid,
+                       'trip_id':trip_id,
+                       'sections':[sections['section_id'] for sections in Stage_Sections.find({"$and":[{"user_id":user_uuid}, {"trip_id":trip_id}]})]}
+          fillTripWithMovesData(seg_note, trips_todo)
+          logging.info("About to insert trip with trip_id = %s " % (trip_id))
+          Stage_Trips.insert(trips_todo)
+      else:
+          logging.debug("Found existing trip with trip_id = %s " % (trip_id))
 
 if __name__ == "__main__":
   collect()
