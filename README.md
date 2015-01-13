@@ -129,5 +129,5 @@ TODO: clean up later
 
     $ cp api/wsgiserver2.py <dist-packages>/cherrypy/wsgiserver/wsgiserver2.py
 
-[CFC_WebApp_Structure]: https://raw.github.com/amplab/e-mission-server/figs/CFC_WebApp_Structure.png
-[CFC_DataCollector_Structure]: https://raw.github.com/amplab/e-mission-server/figs/CFC_DataCollector_Structure.png
+[CFC_WebApp_Structure]: https://raw.github.com/amplab/e-mission-server/master/figs/CFC_WebApp_Structure.png
+[CFC_DataCollector_Structure]: https://raw.github.com/amplab/e-mission-server/master/figs/CFC_DataCollector_Structure.png
