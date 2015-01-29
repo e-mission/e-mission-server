@@ -108,8 +108,8 @@ Instead, we have focused on developing the backend code and exposing it via a
 simple API. I have maintained separation between the backend code and the API
 glue so that we can swap out the API glue later if needed.
 
-The API glue is currently bottle, which is a single file webapp framework. I
-chose bottle because it was simple, didn't use a lot of space, and because it
+The API glue is currently [Bottle](http://bottlepy.org/docs/dev/index.html), which is a single file webapp framework. I
+chose [Bottle](http://bottlepy.org/docs/dev/index.html) because it was simple, didn't use a lot of space, and because it
 wasn't heavy weight, could easily be replaced with something more heavyweight
 later.
 
