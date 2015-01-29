@@ -58,7 +58,6 @@ fill them in
 or connect to it using the phone app
 
 
-1. Add current directory to your PYTHONPATH. 
 
 1. Run unit tests
         $ cd CFC_WebApp
@@ -98,7 +97,10 @@ And then copy over the sample files from these locations and replace the values 
 * CFC\_DataCollector/keys.json
 
 
+TROUBLESHOOTING:
+If a python execution fails to import a module, make sure to add current directory to your PYTHONPATH. 
 
+If starting the server gives a CONNECTION_ERROR, make sure MongoDB is actively running when you attempt to start the server.
 
 ## Design decisions: ##
 ----------
