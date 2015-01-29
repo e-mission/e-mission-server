@@ -57,8 +57,6 @@ fill them in
 [http://localhost:8080](http://localhost:8080)
 or connect to it using the phone app
 
-
-
 1. Run unit tests
         $ cd CFC_WebApp
         $ python tests/TestCarbon.py
