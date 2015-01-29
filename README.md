@@ -23,6 +23,8 @@ ensure reasonable performance.
 
 ### Python: ###
 
+    (You may need super user permissions to run these commands)
+
     $ pip install pymongo
     $ pip install requests
     $ pip install pytz
