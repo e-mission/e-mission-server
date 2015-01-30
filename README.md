@@ -18,7 +18,7 @@ ensure reasonable performance.
 -------------------
 
 ### Database: ###
-1. Install [Mongodb](http://www.mongodb.org/)
+1. Install [Mongodb](http://www.mongodb.org/) (For Windows: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-windows/)
 1. Start it at the default port
 
 ### Python: ###
@@ -46,7 +46,7 @@ config.json, depending on which platform you are testing against.
 1. Copy keys.json.sample to keys.json, register for the appropriate keys, and
 fill them in
 
-1. Start the server
+1. Start the server (Note: mongodb appears to be installed as a service on windows and it starts automatically on reboot)
 
         $ cd CFC_WebApp
         $ python api/cfc_webapp.py
