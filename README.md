@@ -25,16 +25,9 @@ Ubuntu: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
 ### Python: ###
 
     (You may need super user permissions to run these commands)
-
-    $ pip install pymongo
-    $ pip install requests
-    $ pip install pytz
-    $ pip install cherrypy
+    $ pip install -r requirements.txt 
     # If you are running this in production over SSL, copy over the cherrypy-wsgiserver
     $ cp api/wsgiserver2.py <dist-packages>/cherrypy/wsgiserver/wsgiserver2.py
-    $ pip install python-dateutil
-    $ pip install pygeocoder
-    $ pip install utm
 
 ## Development: ##
 -------------------
