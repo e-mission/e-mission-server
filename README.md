@@ -20,7 +20,13 @@ ensure reasonable performance.
 ### Database: ###
 1. Install [Mongodb](http://www.mongodb.org/) (Note: mongodb appears to be installed as a service on Windows devices and it starts automatically on reboot)
 1. Start it at the default port
+    $ mongod
 Ubuntu: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
+
+### Installing Pip for Mac: ###
+1. Download get-pip.py (https://pip.pypa.io)
+2. Install pip:
+    $ python get-pip.py
 
 ### Python: ###
 
