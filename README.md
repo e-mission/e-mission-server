@@ -20,6 +20,12 @@ ensure reasonable performance.
 ### Database: ###
 1. Install [Mongodb](http://www.mongodb.org/)
 1. Start it at the default port
+    $ mongod
+
+### Installing Pip for Mac: ###
+1. Download get-pip.py (https://pip.pypa.io)
+2. Install pip:
+    $ python get-pip.py
 
 ### Python: ###
 
