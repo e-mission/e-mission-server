@@ -19,9 +19,12 @@ ensure reasonable performance.
 
 ### Database: ###
 1. Install [Mongodb](http://www.mongodb.org/)
-1. Start it at the default port
+2. Start it at the default port
+Ubuntu: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
 
 ### Python: ###
+
+    (You may need super user permissions to run these commands)
 
     $ pip install pymongo
     $ pip install requests
@@ -61,6 +64,7 @@ or connect to it using the phone app
         $ cd CFC_WebApp
         $ python tests/TestCarbon.py
         $ python tests/TestTripManager.py
+You might get an ImportError for the module utils. In this case you have to add PYTHONPATH to have the current directory in it. Try running "PYTHONPATH=. python tests/TestCarbon.py" instead.
 
 1. If you need to run any of the backend scripts, copy the config.json and
 keys.json files to that directory as well, and run the scripts:
@@ -95,7 +99,10 @@ And then copy over the sample files from these locations and replace the values 
 * CFC\_DataCollector/keys.json
 
 
+TROUBLESHOOTING:
+If a python execution fails to import a module, make sure to add current directory to your PYTHONPATH. 
 
+If starting the server gives a CONNECTION_ERROR, make sure MongoDB is actively running when you attempt to start the server.
 
 ## Design decisions: ##
 ----------
@@ -108,8 +115,8 @@ Instead, we have focused on developing the backend code and exposing it via a
 simple API. I have maintained separation between the backend code and the API
 glue so that we can swap out the API glue later if needed.
 
-The API glue is currently bottle, which is a single file webapp framework. I
-chose bottle because it was simple, didn't use a lot of space, and because it
+The API glue is currently [Bottle](http://bottlepy.org/docs/dev/index.html), which is a single file webapp framework. I
+chose [Bottle](http://bottlepy.org/docs/dev/index.html) because it was simple, didn't use a lot of space, and because it
 wasn't heavy weight, could easily be replaced with something more heavyweight
 later.
 
