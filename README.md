@@ -19,7 +19,8 @@ ensure reasonable performance.
 
 ### Database: ###
 1. Install [Mongodb](http://www.mongodb.org/)
-1. Start it at the default port
+2. Start it at the default port
+Ubuntu: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
 
 ### Python: ###
 
