@@ -34,8 +34,8 @@ ensure reasonable performance.
     $ pip install utm
 
 ### On Windows: ###
-    To install pip:
-    Download/save get-pip.py file: https://bootstrap.pypa.io/get-pip.py
+    # To install pip:
+    # Download or save get-pip.py file: https://bootstrap.pypa.io/get-pip.py
     
     # From download directory, run:
     $ python get-pip.py
