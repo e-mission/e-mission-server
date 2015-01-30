@@ -1,6 +1,6 @@
 import json
 from random import randrange
-from bottle import route, post, get, run, template, static_file, request, app, HTTPError, SimpleTemplate, abort
+from bottle import route, post, get, run, template, static_file, request, app, HTTPError, SimpleTemplate, abort, BaseRequest
 # import import_my_lib
 # To support dynamic loading of client-specific libraries
 import sys
@@ -29,6 +29,9 @@ ssl_cert = key_data["ssl_certificate"]
 private_key = key_data["private_key"]
 client_key = key_data["client_key"]
 hack_client_key = key_data["ios_client_key"]
+
+BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
+# to accomodate large section sizes
 
 skipAuth = False
 
@@ -214,7 +217,11 @@ def setSectionClassification():
 
 @post('/tripManager/storeSensedTrips')
 def storeSensedTrips():
+  print "Called storeSensedTrips"
+  logging.debug("Called storeSensedTrips")
   user_uuid=getUUID(request)
+  print "user_uuid %s" % user_uuid
+  logging.debug("user_uuid %s" % user_uuid)
   sections = request.json['sections']
   return tripManager.storeSensedTrips(user_uuid, sections)
 
