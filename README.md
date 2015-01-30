@@ -43,7 +43,7 @@ ensure reasonable performance.
     # To add pip to path (replace 'XX' in 'PythonXX' with name of Python version, e.g. 'Python 27':
     $ python C:\PythonXX\Tools\Scripts\win_add2path.py
     
-    # Then as above:
+    # Finally, to install modules as above:
     $ python -m pip install <name of module>
 
 
