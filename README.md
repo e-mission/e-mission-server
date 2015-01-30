@@ -33,6 +33,20 @@ ensure reasonable performance.
     $ pip install pygeocoder
     $ pip install utm
 
+### On Windows: ###
+    To install pip:
+    Download/save get-pip.py file: https://bootstrap.pypa.io/get-pip.py
+    
+    # From download directory, run:
+    $ python get-pip.py
+    
+    # To add pip to path (replace 'XX' in 'PythonXX' with name of Python version, e.g. 'Python 27':
+    $ python C:\PythonXX\Tools\Scripts\win_add2path.py
+    
+    # Then as above:
+    $ python -m pip install <name of module>
+
+
 ## Development: ##
 -------------------
 In order to test out changes to the webapp, you should make the changes
