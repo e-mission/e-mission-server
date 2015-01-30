@@ -33,10 +33,9 @@ ensure reasonable performance.
     $ pip install pygeocoder
     $ pip install utm
 
-### On Windows: ###
+### Using Pip on Windows: ###
     # To install pip:
     # Download or save get-pip.py file: https://bootstrap.pypa.io/get-pip.py
-    
     # From download directory, run:
     $ python get-pip.py
     
