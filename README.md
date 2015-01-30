@@ -40,7 +40,7 @@ ensure reasonable performance.
     # From download directory, run:
     $ python get-pip.py
     
-    # To add pip to path (replace 'XX' in 'PythonXX' with name of Python version, e.g. 'Python 27':
+    # To add pip to path (replace 'PythonXX' with actual Python directory name, e.g. 'Python27'):
     $ python C:\PythonXX\Tools\Scripts\win_add2path.py
     
     # Finally, to install modules as above:
