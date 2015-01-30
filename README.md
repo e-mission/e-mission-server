@@ -35,6 +35,18 @@ Ubuntu: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
     # If you are running this in production over SSL, copy over the cherrypy-wsgiserver
     $ cp api/wsgiserver2.py <dist-packages>/cherrypy/wsgiserver/wsgiserver2.py
 
+### Using Pip on Windows: ###
+    # To install pip:
+    # Download or save get-pip.py file: https://bootstrap.pypa.io/get-pip.py
+    # From download directory, run:
+    $ python get-pip.py
+    
+    # To add pip to path (replace 'PythonXX' with actual Python directory name, e.g. 'Python27'):
+    $ python C:\PythonXX\Tools\Scripts\win_add2path.py
+    
+    # Finally, to install modules as above:
+    $ python -m pip install -r requirements.txt
+
 ## Development: ##
 -------------------
 In order to test out changes to the webapp, you should make the changes
