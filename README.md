@@ -66,6 +66,9 @@ fill them in
         $ python api/cfc_webapp.py
 
    You may need to install some of the python dependencies from above
+   Amongst the dependencies include:
+   -cherrypy
+   -pygeocoder
 
 1. Browse to 
 [http://localhost:8080](http://localhost:8080)
