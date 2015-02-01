@@ -22,6 +22,7 @@ python_path = config_data["paths"]["python_path"]
 server_host = config_data["server"]["host"]
 server_port = config_data["server"]["port"]
 socket_timeout = config_data["server"]["timeout"]
+log_base_dir = config_data["paths"]["log_base_dir"]
 
 key_file = open('keys.json')
 key_data = json.load(key_file)
@@ -223,6 +224,8 @@ def storeSensedTrips():
   print "user_uuid %s" % user_uuid
   logging.debug("user_uuid %s" % user_uuid)
   sections = request.json['sections']
+  fileName = "%s/phone/%s" % (log_base_dir, time.time())
+  json.dump(sections, open(fileName, "w"))
   return tripManager.storeSensedTrips(user_uuid, sections)
 
 @post('/profile/create')
