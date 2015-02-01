@@ -124,7 +124,6 @@ class ModeInferencePipeline:
     
 
     duration = time.time() - begin
-    logging.debug("LOADING TRAINING DATA STEP TOOK %s" % (duration))
     return (modeList, confirmedSections)
 
   # TODO: Should mode_cluster be in featurecalc or here?
