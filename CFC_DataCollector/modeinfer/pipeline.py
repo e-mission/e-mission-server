@@ -14,6 +14,7 @@ import numpy as np
 import scipy as sp
 from featurecalc import calDistance, calSpeed, calHeading, calAvgSpeed, calSpeeds, calAccels, getIthMaxSpeed, getIthMaxAccel, calHCR,\
 calSR, calVCR, mode_cluster, mode_start_end_coverage
+import time
 
 # We are not going to use the feature matrix for analysis unless we have at
 # least 50 points in the training set. 50 is arbitrary. We could also consider
@@ -33,6 +34,9 @@ class ModeInferencePipeline:
 
   def runPipeline(self):
     allConfirmedTripsQuery = ModeInferencePipeline.getSectionQueryWithGroundTruth({'$ne': ''})
+
+
+
     (self.modeList, self.confirmedSections) = self.loadTrainingDataStep(allConfirmedTripsQuery)
     logging.debug("confirmedSections.count() = %s" % (self.confirmedSections.count()))
     
@@ -83,20 +87,43 @@ class ModeInferencePipeline:
 
   # TODO: Refactor into generic steps and results
   def loadTrainingDataStep(self, sectionQuery, sectionDb = None):
+    logging.debug("START TRAINING DATA STEP %s" % (datetime.now()))
     if (sectionDb == None):
       sectionDb = self.Sections
+
+    begin = time.time()
     logging.debug("Section data set size = %s" % sectionDb.find({'type': 'move'}).count())
+    duration = time.time() - begin
+    logging.debug("Getting dataset size took %s" % (duration))
+        
+    logging.debug("Querying confirmedSections %s" % (datetime.now()))
+    begin = time.time()
     confirmedSections = sectionDb.find(sectionQuery)
+    duration = time.time() - begin
+    logging.debug("Querying confirmedSection took %s" % (duration))
+    
+    logging.debug("Querying stage modes %s" % (datetime.now()))
+    begin = time.time()
     modeList = []
     for mode in MongoClient('localhost').Stage_database.Stage_Modes.find():
         modeList.append(mode)
         logging.debug(mode)
+    duration = time.time() - begin
+    logging.debug("Querying stage modes took %s" % (duration))
+    
+    logging.debug("Section query with ground truth %s" % (datetime.now()))
+    begin = time.time()
     logging.debug("Training set total size = %s" %
       sectionDb.find(ModeInferencePipeline.getSectionQueryWithGroundTruth({'$ne': ''})).count())
 
     for mode in modeList:
       logging.debug("%s: %s" % (mode['mode_name'],
         sectionDb.find(ModeInferencePipeline.getSectionQueryWithGroundTruth(mode['mode_id']))))
+    duration = time.time() - begin
+    logging.debug("Getting section query with ground truth took %s" % (duration))
+    
+
+    duration = time.time() - begin
     return (modeList, confirmedSections)
 
   # TODO: Should mode_cluster be in featurecalc or here?
