@@ -1,6 +1,6 @@
 from __future__ import division
 import numpy as np
-from main import calDistance
+from common import calDistance
 import math
 from scipy.ndimage import measurements
 # Tristan Ursell

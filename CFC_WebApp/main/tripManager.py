@@ -169,8 +169,8 @@ def setSectionClassification(uuid, userClassifications):
                 logging.debug("update done" )
 
 def storeSensedTrips(user_uuid, sections):
+    logging.debug("invoked storing sensed trips")
     collect.processTripArray(user_uuid, sections)
-    json.save(sections)
     logging.debug("done storing sensed trips")
 
 def getModeOptions():
