@@ -2,7 +2,7 @@ from __future__ import division
 import numpy as np
 import math
 from get_database import get_routeDistanceMatrix_db,get_routeCluster_db,get_section_db
-from tripManager import calDistance
+from common import calDistance
 from route_matching import fullMatchDistance,getRoute
 from gmap_display import drawSection
 from LCS import lcsScore

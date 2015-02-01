@@ -1,9 +1,8 @@
 import logging
 from random import randrange
 import math
-from common import getDistance
+from common import getDistance, calDistance
 # from commute import get_morning_commute_sections
-from tripManager import calDistance
 from get_database import get_section_db,get_worktime_db
 
 # dis_list = [[0,1],[1,2],[2,3], [3,5], [5,10], [10,20], [20,30], [30,50], [50,100],[100,200],[200,500]]

@@ -5,6 +5,7 @@ import json
 from get_database import get_mode_db, get_section_db
 from datetime import datetime, timedelta
 from userclient import getClientSpecificQueryFilter
+from common import calDistance, travel_time
 import stats
 import time
 
@@ -18,29 +19,6 @@ sys.path.append("%s" % os.getcwd())
 sys.path.append("%s/../CFC_DataCollector/moves" % os.getcwd())
 
 import collect
-
-def travel_time(time1,time2):
-    start_time=parser.parse(time1)
-    end_time=parser.parse(time2)
-    travel_time = end_time-start_time
-    return travel_time.seconds
-
-def calDistance(point1, point2):
-
-    earthRadius = 6371000
-    # SHANKARI: Why do we have two calDistance() functions?
-    # Need to combine into one
-    # points are now in geojson format (lng,lat)
-    dLat = math.radians(point1[1]-point2[1])
-    dLon = math.radians(point1[0]-point2[0])
-    lat1 = math.radians(point1[1])
-    lat2 = math.radians(point2[1])
-
-    a = (math.sin(dLat/2) ** 2) + ((math.sin(dLon/2) ** 2) * math.cos(lat1) * math.cos(lat2))
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-    d = earthRadius * c
-
-    return d
 
 def max_Distance(points):
     # 'track_points':[{'track_location':{'type':'Point', 'coordinates':[point["lat"],point["lon"]]}, 'time':point["time"]}for point in seg_act_note["trackPoints"]] if "trackPoints" in seg_act_note else []}
@@ -192,6 +170,7 @@ def setSectionClassification(uuid, userClassifications):
 
 def storeSensedTrips(user_uuid, sections):
     collect.processTripArray(user_uuid, sections)
+    json.save(sections)
     logging.debug("done storing sensed trips")
 
 def getModeOptions():
