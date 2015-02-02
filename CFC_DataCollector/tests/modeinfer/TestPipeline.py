@@ -1,6 +1,7 @@
 import unittest
 import json
 import logging
+import numpy as np
 from get_database import get_db, get_mode_db, get_section_db
 import modeinfer
 from modeinfer import pipeline
@@ -83,6 +84,26 @@ class TestPipeline(unittest.TestCase):
     # So we expect to have to cluster points - one for start and one for end
     self.assertEquals(len(self.pipeline.train_cluster), 0)
     self.assertEquals(len(self.pipeline.bus_cluster), 2)
+
+  def testFeatureGenWithOnePoint(self):
+    trackpoint1 = {"track_location": {"coordinates": [-122.0861645, 37.3910201]},
+                   "time" : "20150127T203305-0800"}
+    now = datetime.now()
+
+    # ensure that the start and end datetimes are the same, since the average calculation uses
+    # the total distance and the total duration
+    testSeg = {"track_points": [trackpoint1],
+               "distance": 500,
+               "section_start_datetime": now,
+               "section_end_datetime": now,
+               "mode": 1,
+               "section_id": 2}
+
+    featureMatrix = np.zeros([1, len(self.pipeline.featureLabels)])
+    resultVector = np.zeros(1)
+    self.pipeline.updateFeatureMatrixRowWithSection(featureMatrix, 0, testSeg)
+    self.assertEqual(np.count_nonzero(featureMatrix[0][4:16]), 0)
+    self.assertEqual(np.count_nonzero(featureMatrix[0][19:21]), 0)
 
   def testGenerateTrainingSet(self):
     self.testLoadTrainingData()
