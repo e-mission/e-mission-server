@@ -176,7 +176,7 @@ class ModeInferencePipeline:
     featureMatrix[i, 3] = section['section_id']
     featureMatrix[i, 4] = calAvgSpeed(section)
     speeds = calSpeeds(section)
-    if speeds != None:
+    if speeds != None and len(speeds) > 0:
         featureMatrix[i, 5] = np.mean(speeds)
         featureMatrix[i, 6] = np.std(speeds)
         featureMatrix[i, 7] = np.max(speeds)
@@ -205,9 +205,16 @@ class ModeInferencePipeline:
     
     featureMatrix[i, 17] = section['section_start_datetime'].time().hour
     featureMatrix[i, 18] = section['section_end_datetime'].time().hour
-    
-    featureMatrix[i, 19] = mode_start_end_coverage(section, self.bus_cluster,105)
-    featureMatrix[i, 20] = mode_start_end_coverage(section, self.train_cluster,600)
+   
+    if (hasattr(self, "bus_cluster")): 
+        featureMatrix[i, 19] = mode_start_end_coverage(section, self.bus_cluster,105)
+    if (hasattr(self, "train_cluster")): 
+        featureMatrix[i, 20] = mode_start_end_coverage(section, self.train_cluster,600)
+    if (hasattr(self, "air_cluster")): 
+        featureMatrix[i, 21] = mode_start_end_coverage(section, self.air_cluster,600)
+
+    # Replace NaN and inf by zeros so that it doesn't crash later
+    featureMatrix[i] = np.nan_to_num(featureMatrix[i])
 
   def cleanDataStep(self):
     runIndices = self.resultVector == 2

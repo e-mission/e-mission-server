@@ -178,7 +178,7 @@ def calAccels(segment):
   speeds = calSpeeds(segment)
   trackpoints = segment['track_points']
 
-  if speeds == None:
+  if speeds is None or len(speeds) == 0:
     return None
 
   accel = np.zeros(len(speeds) - 1)
