@@ -1,7 +1,6 @@
 from __future__ import division
 from random import randrange
 import logging
-from tripManager import calDistance, travel_time
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 from dateutil import parser
@@ -479,3 +478,27 @@ def convertModeNameToIndex(ModeDb, modeName):
   logging.debug("modedb size = %s" % ModeDb.find().count())
   return int(''.join(map(str, [mode['mode_id'] for mode in ModeDb.find({'mode_name':modeName})]))) \
     if ModeDb.find({'mode_name':modeName}).count()!=0 else modeName
+
+def travel_time(time1,time2):
+    start_time=parser.parse(time1)
+    end_time=parser.parse(time2)
+    travel_time = end_time-start_time
+    return travel_time.seconds
+
+def calDistance(point1, point2):
+
+    earthRadius = 6371000
+    # SHANKARI: Why do we have two calDistance() functions?
+    # Need to combine into one
+    # points are now in geojson format (lng,lat)
+    dLat = math.radians(point1[1]-point2[1])
+    dLon = math.radians(point1[0]-point2[0])
+    lat1 = math.radians(point1[1])
+    lat2 = math.radians(point2[1])
+
+    a = (math.sin(dLat/2) ** 2) + ((math.sin(dLon/2) ** 2) * math.cos(lat1) * math.cos(lat2))
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    d = earthRadius * c
+
+    return d
+

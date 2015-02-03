@@ -1,5 +1,5 @@
 __author__ = 'Mogeng'
-from tripManager import calDistance
+from common import calDistance
 import numpy as np
 
 class Dtw(object):
