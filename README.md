@@ -54,6 +54,7 @@ locally, test them and then push. Then, deployment is as simple as pulling from
 the repo to the real server.
 
 Here are the steps for doing this:
+
 1. Copy config.json.localhost.android or config.json.localhost.ios to
 config.json, depending on which platform you are testing against.
 
@@ -114,9 +115,10 @@ And then copy over the sample files from these locations and replace the values 
 
 
 TROUBLESHOOTING:
-If a python execution fails to import a module, make sure to add current directory to your PYTHONPATH. 
 
-If starting the server gives a CONNECTION_ERROR, make sure MongoDB is actively running when you attempt to start the server.
+1. If a python execution fails to import a module, make sure to add current directory to your PYTHONPATH. 
+
+1. If starting the server gives a CONNECTION_ERROR, make sure MongoDB is actively running when you attempt to start the server. Make sure to md c:\data\db\ if dbpath does not exist.
 
 ## Design decisions: ##
 ----------
