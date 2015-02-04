@@ -87,7 +87,7 @@ class ModeInferencePipeline:
 
   # TODO: Refactor into generic steps and results
   def loadTrainingDataStep(self, sectionQuery, sectionDb = None):
-    logging.debug("START TRAINING DATA STEP %s" % (datetime.now()))
+    logging.debug("START TRAINING DATA STEP")
     if (sectionDb == None):
       sectionDb = self.Sections
 
