@@ -19,6 +19,8 @@ ensure reasonable performance.
 
 ### Database: ###
 1. Install [Mongodb](http://www.mongodb.org/) (Note: mongodb appears to be installed as a service on Windows devices and it starts automatically on reboot)
+Note: If you are using OSX: (http://docs.mongodb.org/manual/tutorial/install-mongodb-on-os-x/)
+
 1. Start it at the default port
     $ mongod
 Ubuntu: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
