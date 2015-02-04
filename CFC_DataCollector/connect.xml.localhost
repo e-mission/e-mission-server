@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <!--
+    You can also use the IP address of your local computer - i.e.
+    the output of "ifconfig" or "ipconfig".
+    More details are here:
+    http://stackoverflow.com/questions/5806220/how-to-connect-to-my-http-localhost-web-server-from-android-emulator-in-eclips
+    <string name="connect_url">http://10.0.3.2:8080/</string>
+    -->
+<resources>
+    <string name="connect_url">http://localhost:8080/</string>
+    <string name="google_webapp_client_id">97387382925-tqph2akrmf2fj27851d02jddon8s224m.apps.googleusercontent.com</string>
+    <string name="moves_client_id">op9YOyXJ3PxwImHUTmO9msqKY8z4mmke</string>
+</resources>
