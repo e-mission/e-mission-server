@@ -21,8 +21,8 @@ def getDistinctUserCount():
 def get_userZipcode(user):
     location = detect_home_from_db(user)
     current_db = get_profile_db()
-    user_pro=current.find_one({"$and":[{'source':'Shankari'},{'user_id':user_id}]})
-    if user_pro['zip']:
+    user_pro = current_db.find_one({"$and":[{'source':'Shankari'},{'user_id':user_id}]})
+    if user_pro['zip'] and user_pro['zip_valid']:
         return user_pro['zip']
     
 

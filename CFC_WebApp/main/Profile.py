@@ -1,13 +1,14 @@
 __author__ = 'Yin'
 import logging
-from home import detect_home
+from home import detect_home, detect_home_from_db
 from zipcode import get_userZipcode
 from work_place import detect_work_office, detect_daily_work_office
 from get_database import get_section_db,get_profile_db
 from pygeocoder import Geocoder
-from 
+from common import calDistance 
 logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', level=logging.DEBUG)
 Profiles=get_profile_db()
+TOLERANCE = 100 ##How much movement we allow before updating zip codes again.
 
 for user in get_section_db().distinct('user_id'):
     user_home=detect_home(user)
@@ -16,10 +17,14 @@ for user in get_section_db().distinct('user_id'):
         profile_todo={'source':'Shankari','user_id': user,'home':user_home}
         Profiles.insert(profile_todo)
     else:
+        if calDistance(user_home, detect_home_from_db(user)) > TOLERANCE:
+            #set zip_valid to false
         Profiles.update({"$and":[{'source':'Shankari'},
                                      {'user_id':user}]},{"$set":{'home':user_home}})
     user_work=detect_work_office(user)
     Profiles.update({"$and":[{'source':'Shankari'},{'user_id':user}]},{"$set":{'work_place':user_work}})
+    
+
     user_zip=get_userZipcode(user)
     Profiles.update({"$and":[{'source':'Shankari'},{'user_id':user}]},{"$set":{'zip':user_zip}})
     if user_zip!='N/A':
