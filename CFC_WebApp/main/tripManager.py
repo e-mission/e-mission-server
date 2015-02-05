@@ -125,6 +125,7 @@ def queryUnclassifiedSections(uuid):
     # - they are too old
     # - they have enough confidence that above the magic threshold (90%) AND
     # the client has requested stripping out
+    # - they have already been identified as being too short by the filter label
     stats.storeServerEntry(user_uuid, stats.STAT_TRIP_MGR_PCT_SHOWN, time.time(),
             0 if totalUnclassifiedSectionCount == 0 else float(unclassifiedSectionCount)/totalUnclassifiedSectionCount)
     return unclassifiedSections
