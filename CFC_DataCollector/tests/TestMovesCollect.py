@@ -313,22 +313,5 @@ class TestMovesCollect(unittest.TestCase):
     collect.label_filtered_section(newSec)
     self.assertEquals(newSec['filtered'], False)
 
-    
-
-
-    # self.assertEquals(newSec['section_start_time'], "20140407T183039-0700")
-    # self.assertEquals(newSec['section_end_time'], "20140407T191539-0700")
-    # self.assertEquals(newSec['section_start_datetime'].month, 04)
-    # self.assertEquals(newSec['section_end_datetime'].hour, 19)
-    # self.assertEquals(newSec['duration'], 45)
-    # self.assertEquals(newSec['distance'], 10)
-
-    # self.assertEquals(len(newSec['track_points']), 2)
-    # self.assertEquals(newSec['section_start_point']['coordinates'], [-122, 37])
-    # self.assertEquals(newSec['section_end_point']['coordinates'], [-123, 38])
-
-    
-    
-
 if __name__ == '__main__':
     unittest.main()
