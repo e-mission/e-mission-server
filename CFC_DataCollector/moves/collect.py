@@ -90,6 +90,13 @@ def fillSectionWithMovesData(sec_from_moves, newSec):
    newSec['section_start_point'] = {'type':'Point', 'coordinates':[sec_from_moves['trackPoints'][0]["lon"],sec_from_moves['trackPoints'][0]["lat"]]} if ("trackPoints" in sec_from_moves and len(sec_from_moves['trackPoints'])>0) else None
    newSec['section_end_point'] = {'type':'Point', 'coordinates':[sec_from_moves['trackPoints'][-1]["lon"],sec_from_moves['trackPoints'][-1]["lat"]]} if ("trackPoints" in sec_from_moves and len(sec_from_moves['trackPoints'])>0) else None
 
+
+def travel_time(time1,time2):
+    start_time=parser.parse(time1)
+    end_time=parser.parse(time2)
+    travel_time = end_time-start_time
+    return travel_time.seconds
+
 def label_filtered_section(section):
     minimum_travel_time=120
     minimum_travel_distance=200

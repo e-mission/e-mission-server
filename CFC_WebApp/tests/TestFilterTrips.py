@@ -51,6 +51,8 @@ class TestFilterTrips(unittest.TestCase):
     for section in self.SectionsColl.find():
       section['section_start_datetime'] = self.dayago
       section['section_end_datetime'] = self.dayago + timedelta(hours = 1)
+      section['section_start_point'] = "filler start point"
+      section['section_end_point'] = "filler end point"
       section['predicted_mode'] = [0, 0.4, 0.6, 0]
       section['confirmed_mode'] = ''
       # print("Section start = %s, section end = %s" %
@@ -65,7 +67,7 @@ class TestFilterTrips(unittest.TestCase):
     self.ModesColl.remove()
     self.assertEquals(self.ModesColl.find().count(), 0)
 
-  def testQueryUnclassifiedSectionsFiltered(self):
+  def testGetUnclassifiedSectionsFiltered(self):
     """
     Tests that queryUnclassifiedSections never returns 
     a section with section['filter'] == True. A section is only returned if 
@@ -86,13 +88,12 @@ class TestFilterTrips(unittest.TestCase):
     user = User.fromEmail(fakeEmail)
     self.assertEqual(user.getFirstStudy(), 'testclient')
 
-    queriedUnclassifiedSections = tripManager.queryUnclassifiedSections(User.fromEmail(fakeEmail).uuid)
+    unclassifiedSections = tripManager.getUnclassifiedSections(User.fromEmail(fakeEmail).uuid)['sections']
     # Check that of the valid sections in the testFilterFile (2/3), only one of them is returned by the query
-    self.assertEqual(queriedUnclassifiedSections.count(), 1)
+    self.assertEqual(len(unclassifiedSections), 1)
     # Check that the second entry in the testFilterFile is the only section 
     # that is loaded into the database
-    self.assertEqual('20140401T095738-0700',queriedUnclassifiedSections[0]['trip_id'])
-                     
+    self.assertEqual('20140401T095738-0700',unclassifiedSections[0]['trip_id'])                     
 
 if __name__ == '__main__':
     unittest.main()
