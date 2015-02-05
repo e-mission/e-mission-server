@@ -51,52 +51,6 @@ def max_Distance(points):
             max_d=max(max_d,calDistance(points[i]['track_location']['coordinates'], points[j]['track_location']['coordinates']))
     return max_d
 
-def filter_unclassifiedSections(UnclassifiedSections):
-    minimum_travel_time=120
-    minimum_travel_distance=200
-    Modes=get_mode_db()
-    Sections=get_section_db()
-    filtered_Sections=[]
-    for section in UnclassifiedSections:
-        # logging.debug("Appending %s" % json.dumps(section))
-        if section['section_start_time']!=''and section['section_end_time']!=''and len(section['track_points'])>=2:
-            if travel_time(section['section_start_time'],section['section_end_time']) >= minimum_travel_time and \
-                            max_Distance(section['track_points']) >= minimum_travel_distance:
-                section['mode']=''.join(mode['mode_name'] for mode in Modes.find({"mode_id":section['mode']})) \
-                    if type(section['mode'])!=type('aa') else section['mode']
-                filtered_Sections.append(section)
-            else:
-                Sections.update({"$and":[{'source':'Shankari'},
-                                     {'user_id':section['user_id']},
-                                     {'trip_id': section['trip_id']},
-                                     {'section_id': section['section_id']}]},{"$set":{'type':'not a trip'}})
-        elif section['section_start_time']!=''and section['section_end_time']!=''and len(section['track_points'])<2:
-            if travel_time(section['section_start_time'],section['section_end_time']) >= minimum_travel_time:
-                section['mode']=''.join(mode['mode_name'] for mode in Modes.find({"mode_id":section['mode']})) \
-                    if type(section['mode'])!=type('aa') else section['mode']
-                filtered_Sections.append(section)
-            else:
-                Sections.update({"$and":[{'source':'Shankari'},
-                                     {'user_id':section['user_id']},
-                                     {'trip_id': section['trip_id']},
-                                     {'section_id': section['section_id']}]},{"$set":{'type':'not a trip'}})
-        elif (section['section_start_time']==''or section['section_end_time']=='') and len(section['track_points'])>=2:
-            if max_Distance(section['track_points']) >= minimum_travel_distance:
-                section['mode']=''.join(mode['mode_name'] for mode in Modes.find({"mode_id":section['mode']})) \
-                    if type(section['mode'])!=type('aa') else section['mode']
-                filtered_Sections.append(section)
-            else:
-                Sections.update({"$and":[{'source':'Shankari'},
-                                     {'user_id':section['user_id']},
-                                     {'trip_id': section['trip_id']},
-                                     {'section_id': section['section_id']}]},{"$set":{'type':'not a trip'}})
-        else:
-            Sections.update({"$and":[{'source':'Shankari'},
-                                     {'user_id':section['user_id']},
-                                     {'trip_id': section['trip_id']},
-                                     {'section_id': section['section_id']}]},{"$set":{'type':'not complete information'}})
-    return filtered_Sections
-
 # TODO: Mogeng fix me the right way
 def stripoutNonSerializable(sectionList):
     strippedList = []
@@ -108,6 +62,13 @@ def stripoutNonSerializable(sectionList):
         del section['user_id']
         strippedList.append(section)
     return strippedList
+
+def filter_unclassifiedSections(UnclassifiedSections):
+    filtered_Sections=[]
+    for section in UnclassifiedSections:
+        if section['filtered']:
+            filtered_Sections.append(section)
+    return filtered_Sections
 
 def queryUnclassifiedSections(uuid):
     now = datetime.now()
