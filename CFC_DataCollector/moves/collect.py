@@ -90,6 +90,40 @@ def fillSectionWithMovesData(sec_from_moves, newSec):
    newSec['section_start_point'] = {'type':'Point', 'coordinates':[sec_from_moves['trackPoints'][0]["lon"],sec_from_moves['trackPoints'][0]["lat"]]} if ("trackPoints" in sec_from_moves and len(sec_from_moves['trackPoints'])>0) else None
    newSec['section_end_point'] = {'type':'Point', 'coordinates':[sec_from_moves['trackPoints'][-1]["lon"],sec_from_moves['trackPoints'][-1]["lat"]]} if ("trackPoints" in sec_from_moves and len(sec_from_moves['trackPoints'])>0) else None
 
+def label_filtered_section(section):
+    minimum_travel_time=120
+    minimum_travel_distance=200
+    Modes=get_mode_db()
+    Sections=get_section_db()
+
+    is_filtered = False
+    # logging.debug("Appending %s" % json.dumps(section))
+    if section['section_start_time']!=''and section['section_end_time']!=''and len(section['track_points'])>=2:
+        if travel_time(section['section_start_time'],section['section_end_time']) >= minimum_travel_time and \
+                        max_Distance(section['track_points']) >= minimum_travel_distance:
+            section['mode']=''.join(mode['mode_name'] for mode in Modes.find({"mode_id":section['mode']})) \
+                if type(section['mode'])!=type('aa') else section['mode']
+            is_filtered =  True
+        else:
+            section['type'] ='not a trip'
+    elif section['section_start_time']!=''and section['section_end_time']!=''and len(section['track_points'])<2:
+        if travel_time(section['section_start_time'],section['section_end_time']) >= minimum_travel_time:
+            section['mode']=''.join(mode['mode_name'] for mode in Modes.find({"mode_id":section['mode']})) \
+                if type(section['mode'])!=type('aa') else section['mode']
+            is_filtered =  True
+        else:
+            section['type'] ='not a trip'
+    elif (section['section_start_time']==''or section['section_end_time']=='') and len(section['track_points'])>=2:
+        if max_Distance(section['track_points']) >= minimum_travel_distance:
+            section['mode']=''.join(mode['mode_name'] for mode in Modes.find({"mode_id":section['mode']})) \
+                if type(section['mode'])!=type('aa') else section['mode']
+            is_filtered =  True
+        else:
+            section['type'] ='not a trip'
+    else:
+        section['type'] ='not complete information'
+    section['filtered'] = is_filtered
+
 # The new trip will have some fields already filled in, notably, the ones
 # that we get from the trip information. We fill in the other information here.
 # Note that the function does not return anything since the new_trip has been created
@@ -181,6 +215,9 @@ def processTripArray(user_uuid, trip_array):
                                      # if "group" in seg_act_note else '',
                                     }
                       fillSectionWithMovesData(seg_act_note, sections_todo)
+
+                      label_filtered_section(sections_todo)
+                      
                       # Now that we have created this section, let's insert it into the database
                       try:
                         logging.info("About to insert section with trip_id = %s,p section_id = %s, section_start_time = %s, type = %s and mode = %s " %
@@ -189,6 +226,7 @@ def processTripArray(user_uuid, trip_array):
                       except DuplicateKeyError:
                         logging.warning("DuplicateKeyError, skipping insert %s" % sections_todo)
                         logging.warning("Existing section is %s" % Stage_Sections.find_one({"_id": _id_section}))
+
                   except KeyError, e:
                     logging.warning("Missing key %s, skipping section insert %s" % (e, seg_act_note))
 
