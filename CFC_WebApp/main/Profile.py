@@ -20,13 +20,16 @@ for user in get_section_db().distinct('user_id'):
     else:
         if calDistance(user_home, detect_home_from_db(user)) < TOLERANCE:
             zip_is_valid = True
+            print "less than tolerance" 
         Profiles.update({"$and":[{'source':'Shankari'},
                                      {'user_id':user}]},{"$set":{'home':user_home}})
     user_work=detect_work_office(user)
     Profiles.update({"$and":[{'source':'Shankari'},{'user_id':user}]},{"$set":{'work_place':user_work}})
     Profiles.update({"$and":[{'source':'Shankari'},{'user_id':user}]},{"$set":{'zip_valid':zip_is_valid}}) 
-
+    print "updating with " + zip_is_valid 
     user_zip=get_userZipcode(user)
+    zip_is_valid = True
+    Profiles.update({"$and":[{'source':'Shankari'},{'user_id':user}]},{"$set":{'zip_valid':zip_is_valid}})
     Profiles.update({"$and":[{'source':'Shankari'},{'user_id':user}]},{"$set":{'zip':user_zip}})
     if user_zip!='N/A':
         geoinfo= Geocoder.geocode(user_zip)
