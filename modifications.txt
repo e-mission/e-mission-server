@@ -1,3 +1,0 @@
-The changes that were made according to the README was to change the config files and key files to a shortened version which
-may have been unclear why this was the case. However, it could be automated by writing a quick bash script that changes those 
-values for you for security and performance reasons. 
