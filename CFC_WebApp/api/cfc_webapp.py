@@ -355,24 +355,20 @@ def after_request():
 def verifyUserToken(token):
   # attempt to validate token on the client-side
   try:
-    tokenFields = verify_id_token(id_token, client_key)
+    tokenFields = verify_id_token(token, client_key)
   except AppIdentityError:
     try:
-      tokenFields = verify_id_token(id_token, hack_client_key)
+      tokenFields = verify_id_token(token, hack_client_key)
     except AppIdentityError:
-      pass
+      # fall back to verifying using Google API
+      constructedURL = ("https://www.googleapis.com/oauth2/v1/tokeninfo?id_token=%s" % token)
+      r = requests.get(constructedURL)
+      tokenFields = json.loads(r.content)
+      in_client_key = tokenFields['audience']
+      if (in_client_key != client_key):
+        if (in_client_key != hack_client_key):
+          abort(401, "Invalid client key %s" % in_client_key)
 
-  if tokenFields:
-    return tokenFields['email']
-
-  # fall back to verifying using Google API
-  constructedURL = ("https://www.googleapis.com/oauth2/v1/tokeninfo?id_token=%s" % token)
-  r = requests.get(constructedURL)
-  tokenFields = json.loads(r.content)
-  in_client_key = tokenFields['audience']
-  if (in_client_key != client_key):
-    if (in_client_key != hack_client_key):
-      abort(401, "Invalid client key %s" % in_client_key)
   logging.debug("Found user email %s" % tokenFields['email'])
   return tokenFields['email']
 
