@@ -14,36 +14,43 @@ path = "our_collection_data/android/after_elapsed_time_fix/"
 total_data = []
 for path, direc, filenames in os.walk(path):
     for filename in filenames:
-        fr = open(path+filename)
-        data = json.load(fr)
-        temp_list = []
-        for segment in data:
-            if segment["type"] == "move":
-                #print "Num. Activities: " + str(len(segment['activities']))
-                for act in segment['activities']:
-                    #print "Num. Points: " +str(len(act['trackPoints']))
-                    points = [[point["loc_utc_ts"], point["lon"], point["lat"]]  for point in act["trackPoints"]]
-                    points = np.array(points)
-                    if np.shape(points)[0] != 0:
-                        total_data.append(points)
+        if filename == "1422220481.05":
+            fr = open(path+filename)
+            data = json.load(fr)
+            temp_list = []
+            for segment in data:
+                if segment["type"] == "move":
+                    #print "Num. Activities: " + str(len(segment['activities']))
+                    for act in segment['activities']:
+                        #print "Num. Points: " +str(len(act['trackPoints']))
+                        points = [[point["loc_utc_ts"], point["lon"], point["lat"]]  for point in act["trackPoints"]]
+                        points = np.array(points)
+                        if np.shape(points)[0] != 0 and np.shape(points)[0] > 50:
+                            total_data.append(points)
 #print len(total_data)
 model = linear_model.LinearRegression()
 first_set = total_data[0]
 #print np.shape(first_set)
 time_stamp = first_set[:,0].reshape(len(first_set[:,0]), 1)
 print np.shape(time_stamp)
-lon_lat = first_set[:,1:]
+lon_lat = first_set[:,1:2]
 print lon_lat
 #reshape(len(first_set[:,1]), 1)
 print np.shape(lon_lat)
-model.fit(time_stamp, lon_lat)
+model.fit(lon_lat, time_stamp)
 #model.fit(lon_lat, time_stamp)
 model_ransac = linear_model.RANSACRegressor(linear_model.LinearRegression())
-model_ransac.fit(time_stamp, lon_lat)
+model_ransac.fit(lon_lat, time_stamp)
 inlier_mask = model_ransac.inlier_mask_
 outlier_mask = np.logical_not(inlier_mask)
 print inlier_mask
-#print outlier_mask
+outliers = [o for o in outlier_mask if o]
+print len(outliers)
+for i in range(len(outlier_mask)):
+    if outlier_mask[i]:
+        print time_stamp[i]
+
+'''
 line_X = np.arange(-5, 5)
 line_y = model.predict(line_X[:, np.newaxis])
 line_y_ransac = model_ransac.predict(line_X[:, np.newaxis])
@@ -60,6 +67,8 @@ plt.plot(line_X, line_y_ransac, '-b', label='RANSAC regressor')
 plt.savefig("ransac.png")
 #dataDict = {}
 #dataDict["points"] =  processed_data
+'''
+
 '''
 print len(dataDict["points"])
 print np.shape(dataDict["points"])
