@@ -3,6 +3,7 @@ import logging
 import datetime
 import sys
 import os
+from sklearn import linear_model
 
 # On the server, we've installed miniconda for now, so we are just going to add
 # it to the python path
@@ -205,6 +206,33 @@ class ModeInferencePipeline:
 # 20. both start and end close to train station
 # 21. both start and end close to airport
   def updateFeatureMatrixRowWithSection(self, featureMatrix, i, section):
+    model = linear_model.LinearRegression()
+    points = section["track_points"]
+    if len(points) > 4:
+        #print [(datetime.datetime.strptime(point['time'].split('-')[0],"%Y%m%dT%H%M%S") - datetime.datetime(1970,1,1)).total_seconds() for point in points]
+        points = np.array([[(datetime.datetime.strptime(point['time'].split('-')[0], "%Y%m%dT%H%M%S") - datetime.datetime(1970,1,1)).total_seconds(), 
+            point["track_location"]["coordinates"][0], point["track_location"]["coordinates"][1]] for point in points])
+        #points = np.array([[point["time"], point["track_location"]["coordinates"][0], point["track_location"]["coordinates"][1]] for point in points])
+        #print np.shape(points)
+        time_stamp = points[:,0].reshape(len(points[:,0]), 1)
+        #print np.shape(time_stamp)
+        lon_lat = points[:,1:]
+        #print lon_lat
+        #print np.shape(lon_lat)
+        model.fit(lon_lat, time_stamp)
+        #model.fit(lon_lat, time_stamp)
+        model_ransac = linear_model.RANSACRegressor(linear_model.LinearRegression())
+        model_ransac.fit(lon_lat, time_stamp)
+        inlier_mask = model_ransac.inlier_mask_
+        outlier_mask = np.logical_not(inlier_mask)
+        print "total size: " + str(len(outlier_mask))
+        to_remove = []
+        for i in range(len(outlier_mask)):
+            if outlier_mask[i]: 
+                to_remove.append(i)
+        for index in sorted(to_remove, reverse=True):
+            del section["track_points"][index]
+        print len(section["track_points"])
     featureMatrix[i, 0] = section['distance']
     featureMatrix[i, 1] = (section['section_end_datetime'] - section['section_start_datetime']).total_seconds()
 

@@ -1,10 +1,12 @@
 import scipy.io
 import random
+import numpy as np
 
 mat = scipy.io.loadmat('original_data.mat')
 #modified_mat = scipy.io.loadmat('modified_data.mat')
 
 rows = mat['X'].shape[0]
+mat['y'] = np.transpose(mat['y']).ravel()
 test_size = 50
 
 orig_training_set = mat['X'][0:rows-test_size]
@@ -41,7 +43,7 @@ def score_classifier(predicted_labels, true_labels):
 		if predicted_labels[c] == true_labels[c]:
 			correct += 1
 		else:
-			wrong += 1
+                        print true_labels[c]
 		c += 1
 	return (correct, wrong)
 
