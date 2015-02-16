@@ -58,7 +58,6 @@ class ModeInferencePipeline:
     
     (self.featureMatrix, self.resultVector) = self.generateFeatureMatrixAndResultVectorStep()
     logging.info("generateFeatureMatrixAndResultVectorStep DONE")
-    
 
     (self.cleanedFeatureMatrix, self.cleanedResultVector) = self.cleanDataStep()
     logging.info("cleanDataStep DONE")
@@ -151,7 +150,7 @@ class ModeInferencePipeline:
 
 # Feature matrix construction
   def generateFeatureMatrixAndResultVectorStep(self):
-      featureMatrix = np.zeros([self.confirmedSections.count(), len(self.featureLabels)])
+      featureMatrix = np.zeros([self.confirmedSections.count(), len(self.featureLabels)],dtype=np.float32)
       resultVector = np.zeros(self.confirmedSections.count())
       logging.debug("created data structures of size %s" % self.confirmedSections.count())
       # There are a couple of additions to the standard confirmedSections cursor here.
@@ -167,10 +166,13 @@ class ModeInferencePipeline:
       # doesn't exist.
       # So we limit the records to the size of the matrix that we have created
       for (i, section) in enumerate(self.confirmedSections.limit(featureMatrix.shape[0]).batch_size(300)):
-        self.updateFeatureMatrixRowWithSection(featureMatrix, i, section)
+        #self.updateFeatureMatrixRowWithSection(featureMatrix, i, section)
+        featureMatrix[i] = self.updateFeatureMatrixRowWithSection(featureMatrix, i, section)
         resultVector[i] = self.getGroundTruthMode(section)
         if i % 100 == 0:
             logging.debug("Processing record %s " % i)
+      featureMatrix = np.nan_to_num(featureMatrix)
+      print np.shape(featureMatrix)
       return (featureMatrix, resultVector)
 
   def getGroundTruthMode(self, section):
@@ -206,7 +208,6 @@ class ModeInferencePipeline:
 # 20. both start and end close to train station
 # 21. both start and end close to airport
   def updateFeatureMatrixRowWithSection(self, featureMatrix, i, section):
-    model = linear_model.LinearRegression()
     points = section["track_points"]
     if len(points) > 4:
         #print [(datetime.datetime.strptime(point['time'].split('-')[0],"%Y%m%dT%H%M%S") - datetime.datetime(1970,1,1)).total_seconds() for point in points]
@@ -219,7 +220,6 @@ class ModeInferencePipeline:
         lon_lat = points[:,1:]
         #print lon_lat
         #print np.shape(lon_lat)
-        model.fit(lon_lat, time_stamp)
         #model.fit(lon_lat, time_stamp)
         model_ransac = linear_model.RANSACRegressor(linear_model.LinearRegression())
         model_ransac.fit(lon_lat, time_stamp)
@@ -230,53 +230,55 @@ class ModeInferencePipeline:
         for i in range(len(outlier_mask)):
             if outlier_mask[i]: 
                 to_remove.append(i)
-        for index in sorted(to_remove, reverse=True):
-            del section["track_points"][index]
+        print to_remove
+        section["track_points"] = [v for i,v in enumerate(section["track_points"]) if i not in frozenset(to_remove)]
         print len(section["track_points"])
-    featureMatrix[i, 0] = section['distance']
-    featureMatrix[i, 1] = (section['section_end_datetime'] - section['section_start_datetime']).total_seconds()
-
-    # Deal with unknown modes like "airplane"
-    try:
-      featureMatrix[i, 2] = section['mode']
-    except ValueError:
-      featureMatrix[i, 2] = 0
-
-    featureMatrix[i, 3] = section['section_id']
-    featureMatrix[i, 4] = calAvgSpeed(section)
-    speeds = calSpeeds(section)
-    if speeds != None:
-        featureMatrix[i, 5] = np.mean(speeds)
-        featureMatrix[i, 6] = np.std(speeds)
-        featureMatrix[i, 7] = np.max(speeds)
-    else:
-        # They will remain zero
-        pass
-    accels = calAccels(section)
-    if accels != None and len(accels) > 0:
-        featureMatrix[i, 8] = np.max(accels)
-    else:
-        # They will remain zero
-        pass
-    featureMatrix[i, 9] = ('commute' in section) and (section['commute'] == 'to' or section['commute'] == 'from')
-    featureMatrix[i, 10] = calHCR(section)
-    featureMatrix[i, 11] = calSR(section)
-    featureMatrix[i, 12] = calVCR(section)
-    if 'section_start_point' in section and section['section_start_point'] != None:
-        startCoords = section['section_start_point']['coordinates']
-        featureMatrix[i, 13] = startCoords[0]
-        featureMatrix[i, 14] = startCoords[1]
-    
-    if 'section_end_point' in section and section['section_end_point'] != None:
-        endCoords = section['section_end_point']['coordinates']
-        featureMatrix[i, 15] = endCoords[0]
-        featureMatrix[i, 16] = endCoords[1]
-    
-    featureMatrix[i, 17] = section['section_start_datetime'].time().hour
-    featureMatrix[i, 18] = section['section_end_datetime'].time().hour
-    
-    featureMatrix[i, 19] = mode_start_end_coverage(section, self.bus_cluster,105)
-    featureMatrix[i, 20] = mode_start_end_coverage(section, self.train_cluster,600)
+    if i < (self.confirmedSections.count()): 
+        featureMatrix[i, 0] = section['distance']
+        featureMatrix[i, 1] = (section['section_end_datetime'] - section['section_start_datetime']).total_seconds()
+        
+        # Deal with unknown modes like "airplane"
+        try:
+          featureMatrix[i, 2] = section['mode']
+        except ValueError:
+          featureMatrix[i, 2] = 0
+        
+        featureMatrix[i, 3] = section['section_id']
+        featureMatrix[i, 4] = calAvgSpeed(section)
+        speeds = calSpeeds(section)
+        if speeds != None:
+            featureMatrix[i, 5] = np.mean(speeds)
+            featureMatrix[i, 6] = np.std(speeds)
+            featureMatrix[i, 7] = np.max(speeds)
+        else:
+            # They will remain zero
+            pass
+        accels = calAccels(section)
+        if accels != None and len(accels) > 0:
+            featureMatrix[i, 8] = np.max(accels)
+        else:
+            # They will remain zero
+            pass
+        featureMatrix[i, 9] = ('commute' in section) and (section['commute'] == 'to' or section['commute'] == 'from')
+        featureMatrix[i, 10] = calHCR(section)
+        featureMatrix[i, 11] = calSR(section)
+        featureMatrix[i, 12] = calVCR(section)
+        if 'section_start_point' in section and section['section_start_point'] != None:
+            startCoords = section['section_start_point']['coordinates']
+            featureMatrix[i, 13] = startCoords[0]
+            featureMatrix[i, 14] = startCoords[1]
+        
+        if 'section_end_point' in section and section['section_end_point'] != None:
+            endCoords = section['section_end_point']['coordinates']
+            featureMatrix[i, 15] = endCoords[0]
+            featureMatrix[i, 16] = endCoords[1]
+        
+        featureMatrix[i, 17] = section['section_start_datetime'].time().hour
+        featureMatrix[i, 18] = section['section_end_datetime'].time().hour
+        
+        featureMatrix[i, 19] = mode_start_end_coverage(section, self.bus_cluster,105)
+        featureMatrix[i, 20] = mode_start_end_coverage(section, self.train_cluster,600)
+        return np.nan_to_num(featureMatrix[i,:])
 
   def cleanDataStep(self):
     runIndices = self.resultVector == 2
