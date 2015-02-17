@@ -7,13 +7,11 @@ from sklearn import linear_model
 
 # On the server, we've installed miniconda for now, so we are just going to add
 # it to the python path
-#sys.path.append("/home/ubuntu/miniconda/lib/python2.7/site-packages/")
-#sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
-#sys.path.append("%s" % os.getcwd())
-sys.path.append("../../CFC_WebApp/")
+sys.path.append("/home/ubuntu/miniconda/lib/python2.7/site-packages/")
+sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
+sys.path.append("%s" % os.getcwd())
 import numpy as np
 import scipy as sp
-import scipy.io 
 from featurecalc import calDistance, calSpeed, calHeading, calAvgSpeed, calSpeeds, calAccels, getIthMaxSpeed, getIthMaxAccel, calHCR,\
 calSR, calVCR, mode_cluster, mode_start_end_coverage
 import time
@@ -66,7 +64,6 @@ class ModeInferencePipeline:
     logging.info("selectFeatureIndicesStep DONE")
 
     self.selFeatureMatrix = self.cleanedFeatureMatrix[:,self.selFeatureIndices]
-    scipy.io.savemat('original_data.mat', mdict={'X': self.cleanedFeatureMatrix, 'y': self.cleanedResultVector})
     
     self.model = self.buildModelStep()
     logging.info("buildModelStep DONE")
