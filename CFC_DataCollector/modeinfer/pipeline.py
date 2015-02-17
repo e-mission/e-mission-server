@@ -213,7 +213,6 @@ class ModeInferencePipeline:
         #print [(datetime.datetime.strptime(point['time'].split('-')[0],"%Y%m%dT%H%M%S") - datetime.datetime(1970,1,1)).total_seconds() for point in points]
         points = np.array([[(datetime.datetime.strptime(point['time'].split('-')[0], "%Y%m%dT%H%M%S") - datetime.datetime(1970,1,1)).total_seconds(), 
             point["track_location"]["coordinates"][0], point["track_location"]["coordinates"][1]] for point in points])
-        #points = np.array([[point["time"], point["track_location"]["coordinates"][0], point["track_location"]["coordinates"][1]] for point in points])
         #print np.shape(points)
         time_stamp = points[:,0].reshape(len(points[:,0]), 1)
         #print np.shape(time_stamp)
@@ -226,13 +225,18 @@ class ModeInferencePipeline:
         inlier_mask = model_ransac.inlier_mask_
         outlier_mask = np.logical_not(inlier_mask)
         print "total size: " + str(len(outlier_mask))
+        remove = [i for i,v in enumerate(outlier_mask) if v]
+        #print remove
+        '''
         to_remove = []
         for i in range(len(outlier_mask)):
             if outlier_mask[i]: 
                 to_remove.append(i)
-        print to_remove
-        section["track_points"] = [v for i,v in enumerate(section["track_points"]) if i not in frozenset(to_remove)]
-        print len(section["track_points"])
+        #print to_remove
+        '''
+        section["track_points"] = [v for i,v in enumerate(section["track_points"]) if i not in frozenset(remove)]
+
+
     if i < (self.confirmedSections.count()): 
         featureMatrix[i, 0] = section['distance']
         featureMatrix[i, 1] = (section['section_end_datetime'] - section['section_start_datetime']).total_seconds()
