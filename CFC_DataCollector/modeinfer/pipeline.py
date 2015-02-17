@@ -13,7 +13,7 @@ from sklearn import linear_model
 sys.path.append("../../CFC_WebApp/")
 import numpy as np
 import scipy as sp
-import scipy.io
+import scipy.io 
 from featurecalc import calDistance, calSpeed, calHeading, calAvgSpeed, calSpeeds, calAccels, getIthMaxSpeed, getIthMaxAccel, calHCR,\
 calSR, calVCR, mode_cluster, mode_start_end_coverage
 import time
@@ -66,9 +66,7 @@ class ModeInferencePipeline:
     logging.info("selectFeatureIndicesStep DONE")
 
     self.selFeatureMatrix = self.cleanedFeatureMatrix[:,self.selFeatureIndices]
-    
     scipy.io.savemat('original_data.mat', mdict={'X': self.cleanedFeatureMatrix, 'y': self.cleanedResultVector})
-    
     
     self.model = self.buildModelStep()
     logging.info("buildModelStep DONE")
@@ -207,34 +205,21 @@ class ModeInferencePipeline:
 # 19. both start and end close to bus stop
 # 20. both start and end close to train station
 # 21. both start and end close to airport
+#TODO: pass appropriate vector (featureMatrix[i]) rather than Matrix and index..
   def updateFeatureMatrixRowWithSection(self, featureMatrix, i, section):
     points = section["track_points"]
     if len(points) > 4:
-        #print [(datetime.datetime.strptime(point['time'].split('-')[0],"%Y%m%dT%H%M%S") - datetime.datetime(1970,1,1)).total_seconds() for point in points]
         points = np.array([[(datetime.datetime.strptime(point['time'].split('-')[0], "%Y%m%dT%H%M%S") - datetime.datetime(1970,1,1)).total_seconds(), 
             point["track_location"]["coordinates"][0], point["track_location"]["coordinates"][1]] for point in points])
-        #print np.shape(points)
         time_stamp = points[:,0].reshape(len(points[:,0]), 1)
-        #print np.shape(time_stamp)
         lon_lat = points[:,1:]
-        #print lon_lat
-        #print np.shape(lon_lat)
-        #model.fit(lon_lat, time_stamp)
         model_ransac = linear_model.RANSACRegressor(linear_model.LinearRegression())
         model_ransac.fit(lon_lat, time_stamp)
         inlier_mask = model_ransac.inlier_mask_
         outlier_mask = np.logical_not(inlier_mask)
         print "total size: " + str(len(outlier_mask))
-        remove = [i for i,v in enumerate(outlier_mask) if v]
-        #print remove
-        '''
-        to_remove = []
-        for i in range(len(outlier_mask)):
-            if outlier_mask[i]: 
-                to_remove.append(i)
-        #print to_remove
-        '''
-        section["track_points"] = [v for i,v in enumerate(section["track_points"]) if i not in frozenset(remove)]
+        remove = [index for index,v in enumerate(outlier_mask) if v]
+        section["track_points"] = [v for j,v in enumerate(section["track_points"]) if j not in frozenset(remove)]
 
 
     if i < (self.confirmedSections.count()): 
