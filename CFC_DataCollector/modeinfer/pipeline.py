@@ -1,9 +1,9 @@
 from pymongo import MongoClient
 import logging
-import datetime
 import sys
 import os
 from sklearn import linear_model
+import datetime
 
 # On the server, we've installed miniconda for now, so we are just going to add
 # it to the python path
@@ -12,9 +12,9 @@ sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
 sys.path.append("%s" % os.getcwd())
 import numpy as np
 import scipy as sp
+import time
 from featurecalc import calDistance, calSpeed, calHeading, calAvgSpeed, calSpeeds, calAccels, getIthMaxSpeed, getIthMaxAccel, calHCR,\
 calSR, calVCR, mode_cluster, mode_start_end_coverage
-import time
 
 # We are not going to use the feature matrix for analysis unless we have at
 # least 50 points in the training set. 50 is arbitrary. We could also consider
@@ -101,39 +101,23 @@ class ModeInferencePipeline:
     logging.debug("START TRAINING DATA STEP")
     if (sectionDb == None):
       sectionDb = self.Sections
-    begin = time.time()
+
     logging.debug("Section data set size = %s" % sectionDb.find({'type': 'move'}).count())
-    duration = time.time() - begin
-    logging.debug("Getting dataset size took %s" % (duration))
         
-    logging.debug("Querying confirmedSections %s" % (datetime.datetime.now()))
-    begin = time.time()
     confirmedSections = sectionDb.find(sectionQuery)
-    duration = time.time() - begin
-    logging.debug("Querying confirmedSection took %s" % (duration))
     
-    logging.debug("Querying stage modes %s" % (datetime.datetime.now()))
-    begin = time.time()
     modeList = []
     for mode in MongoClient('localhost').Stage_database.Stage_Modes.find():
         modeList.append(mode)
         logging.debug(mode)
-    duration = time.time() - begin
-    logging.debug("Querying stage modes took %s" % (duration))
     
-    logging.debug("Section query with ground truth %s" % (datetime.datetime.now()))
-    begin = time.time()
     logging.debug("Training set total size = %s" %
       sectionDb.find(ModeInferencePipeline.getSectionQueryWithGroundTruth({'$ne': ''})).count())
 
     for mode in modeList:
       logging.debug("%s: %s" % (mode['mode_name'],
         sectionDb.find(ModeInferencePipeline.getSectionQueryWithGroundTruth(mode['mode_id']))))
-    duration = time.time() - begin
-    logging.debug("Getting section query with ground truth took %s" % (duration))
-    
 
-    duration = time.time() - begin
     return (modeList, confirmedSections)
 
   # TODO: Should mode_cluster be in featurecalc or here?
@@ -162,12 +146,10 @@ class ModeInferencePipeline:
       # So we limit the records to the size of the matrix that we have created
       for (i, section) in enumerate(self.confirmedSections.limit(featureMatrix.shape[0]).batch_size(300)):
         #self.updateFeatureMatrixRowWithSection(featureMatrix, i, section)
-        featureMatrix[i] = self.updateFeatureMatrixRowWithSection(featureMatrix, i, section)
+        self.updateFeatureMatrixRowWithSection(featureMatrix, i, section)
         resultVector[i] = self.getGroundTruthMode(section)
         if i % 100 == 0:
             logging.debug("Processing record %s " % i)
-      featureMatrix = np.nan_to_num(featureMatrix)
-      print np.shape(featureMatrix)
       return (featureMatrix, resultVector)
 
   def getGroundTruthMode(self, section):
@@ -264,7 +246,7 @@ class ModeInferencePipeline:
         
         featureMatrix[i, 19] = mode_start_end_coverage(section, self.bus_cluster,105)
         featureMatrix[i, 20] = mode_start_end_coverage(section, self.train_cluster,600)
-        return np.nan_to_num(featureMatrix[i,:])
+        featureMatrix[i] = np.nan_to_num(featureMatrix[i])
 
   def cleanDataStep(self):
     runIndices = self.resultVector == 2

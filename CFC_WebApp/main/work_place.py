@@ -1,8 +1,7 @@
 __author__ = 'Yin'
 from pymongo import MongoClient
 from home import detect_home,detect_home_from_db
-from tripManager import calDistance
-from common import Is_weekday, get_static_pnts, most_common, calculate_appearance_rate, Is_date,Is_place
+from common import Is_weekday, get_static_pnts, most_common, calculate_appearance_rate, Is_date,Is_place, calDistance
 from dateutil import parser
 from get_database import get_section_db, get_profile_db
 
