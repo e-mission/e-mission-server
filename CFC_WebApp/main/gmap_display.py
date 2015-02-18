@@ -39,7 +39,7 @@ import math
 import pygmaps
 from datetime import date, timedelta
 from uuid import *
-from tripManager import calDistance
+from common import calDistance
 from pygeocoder import Geocoder
 
 

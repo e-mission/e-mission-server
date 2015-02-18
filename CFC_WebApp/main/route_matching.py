@@ -1,7 +1,7 @@
 from __future__ import division
 from common import Is_place_2,Include_place_2
 from get_database import get_section_db,get_transit_db, get_routeDistanceMatrix_db,get_routeCluster_db
-from tripManager import calDistance
+from common import calDistance
 import numpy as np
 from Frechet import Frechet
 from LCS import lcs,lcsScore

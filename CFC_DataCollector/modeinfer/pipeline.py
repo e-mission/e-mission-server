@@ -106,18 +106,19 @@ class ModeInferencePipeline:
     logging.debug("START TRAINING DATA STEP")
     if (sectionDb == None):
       sectionDb = self.Sections
+
     begin = time.time()
     logging.debug("Section data set size = %s" % sectionDb.find({'type': 'move'}).count())
     duration = time.time() - begin
     logging.debug("Getting dataset size took %s" % (duration))
         
-    logging.debug("Querying confirmedSections %s" % (datetime.datetime.now()))
+    logging.debug("Querying confirmedSections %s" % (datetime.now()))
     begin = time.time()
     confirmedSections = sectionDb.find(sectionQuery)
     duration = time.time() - begin
     logging.debug("Querying confirmedSection took %s" % (duration))
     
-    logging.debug("Querying stage modes %s" % (datetime.datetime.now()))
+    logging.debug("Querying stage modes %s" % (datetime.now()))
     begin = time.time()
     modeList = []
     for mode in MongoClient('localhost').Stage_database.Stage_Modes.find():
@@ -126,7 +127,7 @@ class ModeInferencePipeline:
     duration = time.time() - begin
     logging.debug("Querying stage modes took %s" % (duration))
     
-    logging.debug("Section query with ground truth %s" % (datetime.datetime.now()))
+    logging.debug("Section query with ground truth %s" % (datetime.now()))
     begin = time.time()
     logging.debug("Training set total size = %s" %
       sectionDb.find(ModeInferencePipeline.getSectionQueryWithGroundTruth({'$ne': ''})).count())
@@ -217,7 +218,7 @@ class ModeInferencePipeline:
     featureMatrix[i, 3] = section['section_id']
     featureMatrix[i, 4] = calAvgSpeed(section)
     speeds = calSpeeds(section)
-    if speeds != None:
+    if speeds != None and len(speeds) > 0:
         featureMatrix[i, 5] = np.mean(speeds)
         featureMatrix[i, 6] = np.std(speeds)
         featureMatrix[i, 7] = np.max(speeds)
@@ -246,9 +247,16 @@ class ModeInferencePipeline:
     
     featureMatrix[i, 17] = section['section_start_datetime'].time().hour
     featureMatrix[i, 18] = section['section_end_datetime'].time().hour
-    
-    featureMatrix[i, 19] = mode_start_end_coverage(section, self.bus_cluster,105)
-    featureMatrix[i, 20] = mode_start_end_coverage(section, self.train_cluster,600)
+   
+    if (hasattr(self, "bus_cluster")): 
+        featureMatrix[i, 19] = mode_start_end_coverage(section, self.bus_cluster,105)
+    if (hasattr(self, "train_cluster")): 
+        featureMatrix[i, 20] = mode_start_end_coverage(section, self.train_cluster,600)
+    if (hasattr(self, "air_cluster")): 
+        featureMatrix[i, 21] = mode_start_end_coverage(section, self.air_cluster,600)
+
+    # Replace NaN and inf by zeros so that it doesn't crash later
+    featureMatrix[i] = np.nan_to_num(featureMatrix[i])
 
   def cleanDataStep(self):
     runIndices = self.resultVector == 2

@@ -7,7 +7,7 @@ from gmap_display import *
 from pygeocoder import Geocoder
 from route_matching import *
 from DTW import Dtw
-from tripManager import calDistance
+from common import calDistance
 from matplotlib import pyplot as plt
 
 
