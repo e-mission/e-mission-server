@@ -49,9 +49,7 @@ class TestProfile(unittest.TestCase):
     self.assertEquals(self.Profiles.find().count(), 0)
 
   def testZipCreation(self):
-    # Add some old sections that shouldn't be returned by the query
-    # This one is just over a week old
-    print self.Profiles
+    # Make sure that zipcodes are updated in the database, correctly and when needed
     prof_1 = self.Profiles.find_one({'user_id':'1'})
     self.assertEquals(prof_1['_id'],  '1')
     #zip creation phase, should make API call and obtain zipcode
@@ -75,7 +73,7 @@ class TestProfile(unittest.TestCase):
 
   def testZipAPI(self):
     # Check to make sure that the Geocoder API is not used if not needed
-    print self.Profiles
+    # Only checks that geocode IS NOT called the second time (zipcode MUST come from somwhere, ensuring that Google API is called the first time)
     prof_1 = self.Profiles.find_one({'user_id':'1'})
     self.assertEquals(prof_1['_id'],  '1')
     #zip creation phase, should make API call and obtain zipcode
