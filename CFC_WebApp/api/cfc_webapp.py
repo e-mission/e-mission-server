@@ -34,7 +34,7 @@ hack_client_key = key_data["ios_client_key"]
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes
 
-skipAuth = False
+skipAuth = True
 
 app = app()
 
@@ -262,16 +262,18 @@ def setStats():
   inStats = request.json['stats']
   stats.setClientMeasurements(user_uuid, inStats)
 
-@post('/compare')
-# @get('/compare')
+# @post('/compare')
+@get('/compare')
 def getCarbonCompare():
+  for key, val in request.headers.items():
+    print("  %s: %s" % (key, val))
+  # token = request.headers.get('Authorization')
+  # print token
+
   from clients.default import default
-
-  if request.json == None:
-    return "Waiting for user data to become available..."
-
-  if 'user' not in request.json:
-    return "Waiting for user data to be become available.."
+  
+  # if token is None or 'Bearer' not in token:
+  #   return "Waiting for user data to become available..."
 
   user_uuid = getUUID(request)
   clientResult = userclient.getClientSpecificResult(user_uuid)
@@ -382,7 +384,8 @@ def getUUID(request):
     retUUID = user_uuid
     logging.debug("skipAuth = %s, returning fake UUID %s" % (skipAuth, user_uuid))
   else:
-    userToken = request.json['user']
+    userToken = request.headers.get('Authorization').split()[1]
+    # userToken = request.json['user']
     retUUID = getUUIDFromToken(userToken)
   request.params.user_uuid = retUUID
   return retUUID
