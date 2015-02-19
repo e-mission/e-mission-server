@@ -123,25 +123,22 @@ def queryUnclassifiedSections(uuid):
     # users and haven't yet run the classifier. As we get more users, this
     # window can only grow, and it is easy to handle it, so let's just do so now.
     defaultQueryList = [ {'source':'Shankari'},
-                         {'user_id':user_uuid},
                          {'predicted_mode': { '$exists' : True } },
                          {'confirmed_mode': ''},
-                         { 'type': 'move' },
-                         {'section_end_datetime': {"$gt": weekago}}]
+                         { 'type': 'move' }]
     completeQueryList = defaultQueryList + clientSpecificQuery
     unclassifiedSections=Sections.find({"$and": completeQueryList})
 
     # totalUnclassifiedSections are for debugging only, can remove after we know that this works well
     totalUnclassifiedSections=Sections.find({"$and":[ {'source':'Shankari'},
-                                                 {'user_id':user_uuid},
                                                  {'confirmed_mode': ''},
                                                  { 'type': 'move' }]})
 
     unclassifiedSectionCount = unclassifiedSections.count()
     totalUnclassifiedSectionCount = totalUnclassifiedSections.count()
 
-    logging.debug('Unsec.count = %s' % unclassifiedSectionCount)
-    logging.debug('Total Unsec.count = %s' % totalUnclassifiedSectionCount)
+    print('Unsec.count = %s' % unclassifiedSectionCount)
+    print('Total Unsec.count = %s' % totalUnclassifiedSectionCount)
     # Keep track of what percent of sections are stripped out.
     # Sections can be stripped out for various reasons:
     # - they are too old
@@ -154,7 +151,7 @@ def queryUnclassifiedSections(uuid):
 def getUnclassifiedSections(uuid):
     return_dict={}
     unclassifiedSections = queryUnclassifiedSections(uuid)
-    filtered_UnclassifiedSections=filter_unclassifiedSections(unclassifiedSections)
+    filtered_UnclassifiedSections=list(unclassifiedSections)
     logging.debug("filtered_UnclassifiedSections = %s" % len(filtered_UnclassifiedSections))
     stripped_filtered_UnclassifiedSections = stripoutNonSerializable(filtered_UnclassifiedSections)
     logging.debug("stripped_filtered_UnclassifiedSections = %s" % len(stripped_filtered_UnclassifiedSections))
