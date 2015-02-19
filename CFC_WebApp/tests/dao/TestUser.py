@@ -52,6 +52,30 @@ class TestUser(unittest.TestCase):
     user.setStudy('testclient')
     self.assertEquals(userclient.countForStudy('testclient'), 1)
 
+  def testGetAvgMpg(self):
+    user = User.register('fake@fake.com')
+    user.setMpgArray([45, 50, 31])
+    self.assertEquals(user.getAvgMpg(), 42)
+
+  def testGetCarbonFootprintForMode(self):
+    user = User.register('fake@fake.com')
+    user.setMpgArray([45, 50, 31])
+    # Avg MPG = 42
+    correctCarbonFootprintForMode = {'walking' : 0,
+                          'running' : 0,
+                          'cycling' : 0,
+                            'mixed' : 0,
+                        'bus_short' : 267.0/1609,
+                         'bus_long' : 267.0/1609,
+                      'train_short' : 92.0/1609,
+                       'train_long' : 92.0/1609,
+                        'car_short' : (1/(42*1.6093))*8.91,
+                         'car_long' : (1/(42*1.6093))*8.91,
+                        'air_short' : 217.0/1609,
+                         'air_long' : 217.0/1609
+                      }
+    self.assertEquals(user.getCarbonFootprintForMode(), correctCarbonFootprintForMode)
+
   def testUnsetStudyExists(self):
     user = User.register('fake@fake.com')
     user.setStudy('testclient')

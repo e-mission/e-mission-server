@@ -241,6 +241,21 @@ def createUserProfile():
   logging.debug("Returning result %s" % {'uuid': str(user.uuid)})
   return {'uuid': str(user.uuid)}
 
+@post('/profile/update')
+def updateUserProfile():
+  logging.debug("Called updateUserProfile")
+  userToken = request.json['user']
+  mpg_array = request.json['mpg_array']
+  # This is the only place we should use the email, since we may not have a
+  # UUID yet. All others should only use the UUID.
+  userEmail = verifyUserToken(userToken)
+  logging.debug("userEmail = %s" % userEmail)
+  user = User.register(userEmail)
+  logging.debug("Looked up user = %s" % user)
+  logging.debug("Returning result %s" % {'uuid': str(user.uuid)})
+  return user.setMpgArray(mpg_array)
+
+
 @post('/profile/consent')
 def setConsentInProfile():
   user_uuid = getUUID(request)
