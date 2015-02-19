@@ -9,7 +9,6 @@ from collections import defaultdict
 from get_database import get_section_db,get_profile_db
 from modeshare import get_user_mode_share_by_distance
 
-
 # zipcode_list = ["other", "94720", "94709", "94705", "94706", "94703", "94704"]
 
 def getDistinctUserCount():
@@ -17,18 +16,26 @@ def getDistinctUserCount():
     distinctUserCount = len(Profiles.distinct("user_id"))
     logging.debug("Found %s distinct users " % distinctUserCount)
     return distinctUserCount
+   
 
-def get_userZipcode(user):
+def get_userZipcode(user, valid_zip):
     location = detect_home_from_db(user)
-    if location!='N/A':
+    current_db = get_profile_db()
+    user_pro = current_db.find_one({"$and":[{'source':'Shankari'},{'user_id':user}]})
+    if valid_zip and user_pro.get('zip'):
+        return user_pro['zip']
+    elif location!='N/A':
         # Convert from our internal GeoJSON specific (lng, lat) to the (lat, lng)
         # format required by geocoder
-        zipcode = Geocoder.reverse_geocode(location[1],location[0])
-        zip=zipcode[0].postal_code
-        return zip
+        return _geocodeZipcode(user_pro, location)
     else:
         return 'N/A'
 
+def _geocodeZipcode(user_pro, location):
+    zipcode = Geocoder.reverse_geocode(location[1],location[0])
+    zip=zipcode[0].postal_code
+    user_pro['zip'] = zip
+    return zip
 
 def getZipcode():
     Profiles=get_profile_db()

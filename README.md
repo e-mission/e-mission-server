@@ -18,20 +18,40 @@ ensure reasonable performance.
 -------------------
 
 ### Database: ###
+<<<<<<< HEAD
 1. Install [Mongodb](http://www.mongodb.org/) (For Windows: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-windows/)
+=======
+1. Install [Mongodb](http://www.mongodb.org/) (Note: mongodb appears to be installed as a service on Windows devices and it starts automatically on reboot)
+Note: If you are using OSX: You want to install homebrew and then use homebrew to install mongodb. Follow these instruction on how to do so ---> (http://docs.mongodb.org/manual/tutorial/install-mongodb-on-os-x/)
+
+>>>>>>> 17ecaf3702bdca7dc2a9c7faaf611b71cff71dc8
 1. Start it at the default port
+    $ mongod
+Ubuntu: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
+
+### Installing Pip for Mac: ###
+1. Download get-pip.py (https://pip.pypa.io)
+2. Install pip:
+    $ python get-pip.py
 
 ### Python: ###
 
-    $ pip install pymongo
-    $ pip install requests
-    $ pip install pytz
-    $ pip install cherrypy
+    (You may need super user permissions to run these commands)
+    $ pip install -r requirements.txt 
     # If you are running this in production over SSL, copy over the cherrypy-wsgiserver
     $ cp api/wsgiserver2.py <dist-packages>/cherrypy/wsgiserver/wsgiserver2.py
-    $ pip install python-dateutil
-    $ pip install pygeocoder
-    $ pip install utm
+
+### Using Pip on Windows: ###
+    # To install pip:
+    # Download or save get-pip.py file: https://bootstrap.pypa.io/get-pip.py
+    # From download directory, run:
+    $ python get-pip.py
+    
+    # To add pip to path (replace 'PythonXX' with actual Python directory name, e.g. 'Python27'):
+    $ python C:\PythonXX\Tools\Scripts\win_add2path.py
+    
+    # Finally, to install modules as above:
+    $ python -m pip install -r requirements.txt
 
 ## Development: ##
 -------------------
@@ -40,6 +60,7 @@ locally, test them and then push. Then, deployment is as simple as pulling from
 the repo to the real server.
 
 Here are the steps for doing this:
+
 1. Copy config.json.localhost.android or config.json.localhost.ios to
 config.json, depending on which platform you are testing against.
 
@@ -52,6 +73,9 @@ fill them in
         $ python api/cfc_webapp.py
 
    You may need to install some of the python dependencies from above
+   Amongst the dependencies include:
+   -cherrypy
+   -pygeocoder
 
 1. Browse to 
 [http://localhost:8080](http://localhost:8080)
@@ -61,6 +85,7 @@ or connect to it using the phone app
         $ cd CFC_WebApp
         $ python tests/TestCarbon.py
         $ python tests/TestTripManager.py
+You might get an ImportError for the module utils. In this case you have to add PYTHONPATH to have the current directory in it. Try running "PYTHONPATH=. python tests/TestCarbon.py" instead.
 
 1. If you need to run any of the backend scripts, copy the config.json and
 keys.json files to that directory as well, and run the scripts:
@@ -95,7 +120,11 @@ And then copy over the sample files from these locations and replace the values 
 * CFC\_DataCollector/keys.json
 
 
+TROUBLESHOOTING:
 
+1. If a python execution fails to import a module, make sure to add current directory to your PYTHONPATH. 
+
+1. If starting the server gives a CONNECTION_ERROR, make sure MongoDB is actively running when you attempt to start the server. Make sure to md c:\data\db\ if dbpath does not exist.
 
 ## Design decisions: ##
 ----------
@@ -108,8 +137,8 @@ Instead, we have focused on developing the backend code and exposing it via a
 simple API. I have maintained separation between the backend code and the API
 glue so that we can swap out the API glue later if needed.
 
-The API glue is currently bottle, which is a single file webapp framework. I
-chose bottle because it was simple, didn't use a lot of space, and because it
+The API glue is currently [Bottle](http://bottlepy.org/docs/dev/index.html), which is a single file webapp framework. I
+chose [Bottle](http://bottlepy.org/docs/dev/index.html) because it was simple, didn't use a lot of space, and because it
 wasn't heavy weight, could easily be replaced with something more heavyweight
 later.
 

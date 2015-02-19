@@ -39,7 +39,7 @@ import math
 import pygmaps
 from datetime import date, timedelta
 from uuid import *
-from tripManager import calDistance
+from common import calDistance
 from pygeocoder import Geocoder
 
 
@@ -170,13 +170,21 @@ def drawTrip(trip_id, db, gmap):
     trip = None
     trip_cursor = db.Stage_Trips.find({'trip_id': trip_id})
 
-    if trip_cursor.count() == 1:
-        trip = trip_cursor[0]
+    if trip_cursor.count() == 0:
+        print "No trip database found, using section database instead"
     else:
-        print "Duplicated trip_id: " + trip_id
-        exit()
+        if trip_cursor.count() == 1:
+            unused = trip_cursor[0]
+        else:
+            print "Duplicated trip_id: " + trip_id
+            exit()
     sections = db.Stage_Sections.find({'trip_id': trip_id})
     drawSections(sections, ALL, gmap)
     return gmap
     
-
+def drawTripsForUser(user_uuid, db, gmap):
+    """
+        Given a user plot all the trips for that user
+    """
+    sections = db.Stage_Sections.find({'user_id': user_uuid})
+    drawSections(sections, ALL, gmap)

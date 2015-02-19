@@ -35,7 +35,7 @@ def getDifferenceDict(routeDict, diff_metric = 'DTW'):
                 differences[key][_id]
             except KeyError:
                 if diff_metric == 'DTW':
-                    value = DTW.Dtw(routeDict[_id], routeDict[key], tripManager.calDistance)
+                    value = DTW.Dtw(routeDict[_id], routeDict[key], common.calDistance)
                     value = value.calculate_distance()
                     differences[_id][key] = value
                     differences[key][_id] = value
@@ -44,12 +44,12 @@ def getDifferenceDict(routeDict, diff_metric = 'DTW'):
                     differences[_id][key] = value
                     differences[key][_id] = value
                 if diff_metric == 'DtwSym':
-                    value = DTW.DtwSym(routeDict[_id], routeDict[key], tripManager.calDistance)
+                    value = DTW.DtwSym(routeDict[_id], routeDict[key], common.calDistance)
                     value = value.calculate_distance()
                     differences[_id][key] = value
                     differences[key][_id] = value
                 if diff_metric == 'DtwAsym':
-                    value = DTW.DtwAsym(routeDict[_id], routeDict[key], tripManager.calDistance)
+                    value = DTW.DtwAsym(routeDict[_id], routeDict[key], common.calDistance)
                     value = value.calculate_distance()
                     differences[_id][key] = value
                     differences[key][_id] = value
