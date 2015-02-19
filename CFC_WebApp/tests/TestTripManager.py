@@ -17,6 +17,21 @@ import tests.common
 logging.basicConfig(level=logging.DEBUG)
 
 class TestTripManager(unittest.TestCase):
+  def updateSections(self):
+    """
+    Updates sections with appropriate test data
+    Should be called anytime new data is loaded into the
+    'Stage_Sections' table
+    """
+    for section in self.SectionsColl.find():
+      section['section_start_datetime'] = self.dayago
+      section['section_end_datetime'] = self.dayago + timedelta(hours = 1)
+      section['predicted_mode'] = [0, 0.4, 0.6, 0]
+      section['confirmed_mode'] = ''
+      # Replace the user email with the UUID
+      section['user_id'] = User.fromEmail(section['user_id']).uuid
+      self.SectionsColl.save(section)
+
   def setUp(self):
     self.testUsers = ["test@example.com", "best@example.com", "fest@example.com",
                       "rest@example.com", "nest@example.com"]
@@ -47,17 +62,7 @@ class TestTripManager(unittest.TestCase):
     self.now = datetime.now()
     self.dayago = self.now - timedelta(days=1)
     self.weekago = self.now - timedelta(weeks = 1)
-
-    for section in self.SectionsColl.find():
-      section['section_start_datetime'] = self.dayago
-      section['section_end_datetime'] = self.dayago + timedelta(hours = 1)
-      section['predicted_mode'] = [0, 0.4, 0.6, 0]
-      section['confirmed_mode'] = ''
-      # print("Section start = %s, section end = %s" %
-      #   (section['section_start_datetime'], section['section_end_datetime']))
-      # Replace the user email with the UUID
-      section['user_id'] = User.fromEmail(section['user_id']).uuid
-      self.SectionsColl.save(section)
+    self.updateSections()
 
   def tearDown(self):
     for testUser in self.testUsers:
@@ -166,6 +171,45 @@ class TestTripManager(unittest.TestCase):
     self.assertEqual(len(walkingTrackPointArray), 10)
     self.assertEqual(walkingTrackPointArray[0]["track_location"]["coordinates"], [-122.086945, 37.380866])
     self.assertEqual(walkingTrackPointArray[8]["track_location"]["coordinates"], [-122.078265, 37.385461])
+
+  def testGetUnclassifiedSectionsFiltered(self):
+    """
+    Tests that queryUnclassifiedSections never returns 
+    a section with section['retained'] == False. A section is only returned if 
+    section['retained'] == True  and all other query conditions are met    
+    """
+    # Clear previous Stage_Sections data and load new data
+    # specific to filtering
+    self.SectionsColl.remove()
+    load_database_json.loadTable(self.serverName, "Stage_Sections", "tests/data/testFilterFile")   
+    self.updateSections() 
+    # Extra updates to Sections necessary for testing filtering
+    for section in self.SectionsColl.find():
+      section['section_start_point'] = "filler start point"
+      section['section_end_point'] = "filler end point"   
+      self.SectionsColl.save(section)
+
+    from dao.user import User
+    fakeEmail = "fest@example.com"
+
+    client = Client("testclient")
+    client.update(createKey = False)
+    tests.common.makeValid(client)
+
+    (resultPre, resultReg) = client.preRegister("this_is_the_super_secret_id", fakeEmail)
+    self.assertEqual(resultPre, 0)
+    self.assertEqual(resultReg, 1)
+
+    user = User.fromEmail(fakeEmail)
+    self.assertEqual(user.getFirstStudy(), 'testclient')
+
+    unclassifiedSections = tripManager.getUnclassifiedSections(User.fromEmail(fakeEmail).uuid)['sections']
+    # Check that of the valid sections in the testFilterFile (2/3), only one of them is returned by the query
+    self.assertEqual(len(unclassifiedSections), 1)
+    # Check that the second entry in the testFilterFile is the only section 
+    # that is loaded into the database
+    self.assertEqual('20140401T095742-0700',unclassifiedSections[0]['trip_id'])                     
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -29,52 +29,6 @@ def max_Distance(points):
             max_d=max(max_d,calDistance(points[i]['track_location']['coordinates'], points[j]['track_location']['coordinates']))
     return max_d
 
-def filter_unclassifiedSections(UnclassifiedSections):
-    minimum_travel_time=120
-    minimum_travel_distance=200
-    Modes=get_mode_db()
-    Sections=get_section_db()
-    filtered_Sections=[]
-    for section in UnclassifiedSections:
-        # logging.debug("Appending %s" % json.dumps(section))
-        if section['section_start_time']!=''and section['section_end_time']!=''and len(section['track_points'])>=2:
-            if travel_time(section['section_start_time'],section['section_end_time']) >= minimum_travel_time and \
-                            max_Distance(section['track_points']) >= minimum_travel_distance:
-                section['mode']=''.join(mode['mode_name'] for mode in Modes.find({"mode_id":section['mode']})) \
-                    if type(section['mode'])!=type('aa') else section['mode']
-                filtered_Sections.append(section)
-            else:
-                Sections.update({"$and":[{'source':'Shankari'},
-                                     {'user_id':section['user_id']},
-                                     {'trip_id': section['trip_id']},
-                                     {'section_id': section['section_id']}]},{"$set":{'type':'not a trip'}})
-        elif section['section_start_time']!=''and section['section_end_time']!=''and len(section['track_points'])<2:
-            if travel_time(section['section_start_time'],section['section_end_time']) >= minimum_travel_time:
-                section['mode']=''.join(mode['mode_name'] for mode in Modes.find({"mode_id":section['mode']})) \
-                    if type(section['mode'])!=type('aa') else section['mode']
-                filtered_Sections.append(section)
-            else:
-                Sections.update({"$and":[{'source':'Shankari'},
-                                     {'user_id':section['user_id']},
-                                     {'trip_id': section['trip_id']},
-                                     {'section_id': section['section_id']}]},{"$set":{'type':'not a trip'}})
-        elif (section['section_start_time']==''or section['section_end_time']=='') and len(section['track_points'])>=2:
-            if max_Distance(section['track_points']) >= minimum_travel_distance:
-                section['mode']=''.join(mode['mode_name'] for mode in Modes.find({"mode_id":section['mode']})) \
-                    if type(section['mode'])!=type('aa') else section['mode']
-                filtered_Sections.append(section)
-            else:
-                Sections.update({"$and":[{'source':'Shankari'},
-                                     {'user_id':section['user_id']},
-                                     {'trip_id': section['trip_id']},
-                                     {'section_id': section['section_id']}]},{"$set":{'type':'not a trip'}})
-        else:
-            Sections.update({"$and":[{'source':'Shankari'},
-                                     {'user_id':section['user_id']},
-                                     {'trip_id': section['trip_id']},
-                                     {'section_id': section['section_id']}]},{"$set":{'type':'not complete information'}})
-    return filtered_Sections
-
 # TODO: Mogeng fix me the right way
 def stripoutNonSerializable(sectionList):
     strippedList = []
@@ -86,6 +40,13 @@ def stripoutNonSerializable(sectionList):
         del section['user_id']
         strippedList.append(section)
     return strippedList
+
+# def filter_unclassifiedSections(UnclassifiedSections):
+#     filtered_Sections=[]
+#     for section in UnclassifiedSections:
+#         if section['filtered']:
+#             filtered_Sections.append(section)
+#     return filtered_Sections
 
 def queryUnclassifiedSections(uuid):
     now = datetime.now()
@@ -102,10 +63,11 @@ def queryUnclassifiedSections(uuid):
     # window can only grow, and it is easy to handle it, so let's just do so now.
     defaultQueryList = [ {'source':'Shankari'},
                          {'user_id':user_uuid},
-                         {'predicted_mode': { '$exists' : True } },
-                         {'confirmed_mode': ''},
+                         {'predicted_mode':{ '$exists' : True }},
+                         {'confirmed_mode':''},
+                         {'retained':True},
                          { 'type': 'move' },
-                         {'section_end_datetime': {"$gt": weekago}}]
+                         {'section_end_datetime':{"$gt": weekago}}]
     completeQueryList = defaultQueryList + clientSpecificQuery
     unclassifiedSections=Sections.find({"$and": completeQueryList})
 
@@ -125,16 +87,16 @@ def queryUnclassifiedSections(uuid):
     # - they are too old
     # - they have enough confidence that above the magic threshold (90%) AND
     # the client has requested stripping out
+    # - they have already been identified as being too short by the filter label
     stats.storeServerEntry(user_uuid, stats.STAT_TRIP_MGR_PCT_SHOWN, time.time(),
             0 if totalUnclassifiedSectionCount == 0 else float(unclassifiedSectionCount)/totalUnclassifiedSectionCount)
     return unclassifiedSections
 
 def getUnclassifiedSections(uuid):
     return_dict={}
-    unclassifiedSections = queryUnclassifiedSections(uuid)
-    filtered_UnclassifiedSections=filter_unclassifiedSections(unclassifiedSections)
-    logging.debug("filtered_UnclassifiedSections = %s" % len(filtered_UnclassifiedSections))
-    stripped_filtered_UnclassifiedSections = stripoutNonSerializable(filtered_UnclassifiedSections)
+    unclassifiedSections = list(queryUnclassifiedSections(uuid))
+    logging.debug("filtered_UnclassifiedSections = %s" % len(unclassifiedSections))
+    stripped_filtered_UnclassifiedSections = stripoutNonSerializable(unclassifiedSections)
     logging.debug("stripped_filtered_UnclassifiedSections = %s" % len(stripped_filtered_UnclassifiedSections))
     return_dict["sections"]=stripped_filtered_UnclassifiedSections
     return return_dict
