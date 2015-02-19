@@ -41,12 +41,12 @@ def stripoutNonSerializable(sectionList):
         strippedList.append(section)
     return strippedList
 
-def filter_unclassifiedSections(UnclassifiedSections):
-    filtered_Sections=[]
-    for section in UnclassifiedSections:
-        if section['filtered']:
-            filtered_Sections.append(section)
-    return filtered_Sections
+# def filter_unclassifiedSections(UnclassifiedSections):
+#     filtered_Sections=[]
+#     for section in UnclassifiedSections:
+#         if section['filtered']:
+#             filtered_Sections.append(section)
+#     return filtered_Sections
 
 def queryUnclassifiedSections(uuid):
     now = datetime.now()
@@ -63,10 +63,11 @@ def queryUnclassifiedSections(uuid):
     # window can only grow, and it is easy to handle it, so let's just do so now.
     defaultQueryList = [ {'source':'Shankari'},
                          {'user_id':user_uuid},
-                         {'predicted_mode': { '$exists' : True } },
-                         {'confirmed_mode': ''},
+                         {'predicted_mode':{ '$exists' : True }},
+                         {'confirmed_mode':''},
+                         {'retained':True},
                          { 'type': 'move' },
-                         {'section_end_datetime': {"$gt": weekago}}]
+                         {'section_end_datetime':{"$gt": weekago}}]
     completeQueryList = defaultQueryList + clientSpecificQuery
     unclassifiedSections=Sections.find({"$and": completeQueryList})
 
@@ -93,10 +94,9 @@ def queryUnclassifiedSections(uuid):
 
 def getUnclassifiedSections(uuid):
     return_dict={}
-    unclassifiedSections = queryUnclassifiedSections(uuid)
-    filtered_UnclassifiedSections=filter_unclassifiedSections(unclassifiedSections)
-    logging.debug("filtered_UnclassifiedSections = %s" % len(filtered_UnclassifiedSections))
-    stripped_filtered_UnclassifiedSections = stripoutNonSerializable(filtered_UnclassifiedSections)
+    unclassifiedSections = list(queryUnclassifiedSections(uuid))
+    logging.debug("filtered_UnclassifiedSections = %s" % len(unclassifiedSections))
+    stripped_filtered_UnclassifiedSections = stripoutNonSerializable(unclassifiedSections)
     logging.debug("stripped_filtered_UnclassifiedSections = %s" % len(stripped_filtered_UnclassifiedSections))
     return_dict["sections"]=stripped_filtered_UnclassifiedSections
     return return_dict

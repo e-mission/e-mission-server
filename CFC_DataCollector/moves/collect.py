@@ -129,33 +129,33 @@ def label_filtered_section(section):
     Modes=get_mode_db()
     Sections=get_section_db()
 
-    is_filtered = False
+    is_retained = False
     # logging.debug("Appending %s" % json.dumps(section))
     if section['section_start_time']!=''and section['section_end_time']!=''and len(section['track_points'])>=2:
         if travel_time(section['section_start_time'],section['section_end_time']) >= minimum_travel_time and \
                         max_Distance(section['track_points']) >= minimum_travel_distance:
             section['mode']=''.join(mode['mode_name'] for mode in Modes.find({"mode_id":section['mode']})) \
                 if type(section['mode'])!=type('aa') else section['mode']
-            is_filtered =  True
+            is_retained =  True
         else:
             section['type'] ='not a trip'
     elif section['section_start_time']!=''and section['section_end_time']!=''and len(section['track_points'])<2:
         if travel_time(section['section_start_time'],section['section_end_time']) >= minimum_travel_time:
             section['mode']=''.join(mode['mode_name'] for mode in Modes.find({"mode_id":section['mode']})) \
                 if type(section['mode'])!=type('aa') else section['mode']
-            is_filtered =  True
+            is_retained =  True
         else:
             section['type'] ='not a trip'
     elif (section['section_start_time']==''or section['section_end_time']=='') and len(section['track_points'])>=2:
         if max_Distance(section['track_points']) >= minimum_travel_distance:
             section['mode']=''.join(mode['mode_name'] for mode in Modes.find({"mode_id":section['mode']})) \
                 if type(section['mode'])!=type('aa') else section['mode']
-            is_filtered =  True
+            is_retained =  True
         else:
             section['type'] ='not a trip'
     else:
         section['type'] ='not complete information'
-    section['filtered'] = is_filtered
+    section['retained'] = is_retained
 
 # The new trip will have some fields already filled in, notably, the ones
 # that we get from the trip information. We fill in the other information here.

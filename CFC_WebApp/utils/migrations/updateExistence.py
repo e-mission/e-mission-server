@@ -18,7 +18,7 @@ logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
 def updateExistence():
   Sections = get_section_db()
   for tempSec in Sections:
-    if ('filtered' not in tempSec.keys() or tempSec['filtered'] is None):
+    if 'retained' not in tempSec.keys() or tempSec['retained'] is None:
 		label_filtered_section(tempSec)
     else:
       #don't update
