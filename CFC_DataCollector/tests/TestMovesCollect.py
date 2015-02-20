@@ -282,14 +282,14 @@ class TestMovesCollect(unittest.TestCase):
     newSec = {'mode': ''} 
     collect.fillSectionWithMovesData(testMovesSec, newSec)
     collect.label_filtered_section(newSec)
-    self.assertEquals(newSec['filtered'], True)
+    self.assertEquals(newSec['retained'], True)
 
     # Testing first outer elif statement in label_filtered
     testMovesSec['trackPoints'] = []
     newSec = {'mode':''} 
     collect.fillSectionWithMovesData(testMovesSec, newSec)
     collect.label_filtered_section(newSec)
-    self.assertEquals(newSec['filtered'], True)
+    self.assertEquals(newSec['retained'], True)
 
     # Testing second outer elif statement in label_filtered
     testMovesSec['startTime'] = ""
@@ -301,7 +301,7 @@ class TestMovesCollect(unittest.TestCase):
     newSec = {'mode':''} 
     collect.fillSectionWithMovesData(testMovesSec, newSec)
     collect.label_filtered_section(newSec)
-    self.assertEquals(newSec['filtered'], True)
+    self.assertEquals(newSec['retained'], True)
 
     # Testing outer else statement in label_filtered
     testMovesSec['startTime'] = ""
@@ -311,7 +311,7 @@ class TestMovesCollect(unittest.TestCase):
     newSec = {'mode':''} 
     collect.fillSectionWithMovesData(testMovesSec, newSec)
     collect.label_filtered_section(newSec)
-    self.assertEquals(newSec['filtered'], False)
+    self.assertEquals(newSec['retained'], False)
 
 if __name__ == '__main__':
     unittest.main()

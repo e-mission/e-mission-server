@@ -8,6 +8,7 @@ from pytz import timezone
 from get_database import get_mode_db, get_section_db, get_trip_db, get_test_db
 from userclient import getClientSpecificQueryFilter
 from dao.client import Client
+import math
 
 # from pylab import *
 # from scipy.interpolate import Rbf

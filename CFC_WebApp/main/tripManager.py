@@ -1,6 +1,5 @@
 import logging
 from dateutil import parser
-import math
 import json
 from get_database import get_mode_db, get_section_db
 from datetime import datetime, timedelta
