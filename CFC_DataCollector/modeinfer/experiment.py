@@ -2,7 +2,8 @@ import scipy.io
 import random
 import numpy as np
 from sklearn.cross_validation import KFold
-
+import confusion_matrix
+from sklearn import ensemble
 mat = scipy.io.loadmat('original_data.mat')
 #modified_mat = scipy.io.loadmat('modified_data.mat')
 
@@ -25,13 +26,17 @@ orig_test_labels = mat['y'][rows-test_size:]
 #mod_test_set = modified_mat['X'][rows-test_size:]
 #mod_test_labels = modified_mat['y'][rows-test_size:]
 
-    
-def buildModelStep(selFeatureMatrix, cleanedResultVector):
-	from sklearn import ensemble
-	forestClf = ensemble.RandomForestClassifier()
-	model = forestClf.fit(selFeatureMatrix, cleanedResultVector)
-	return model
-	
+
+forestClf = ensemble.RandomForestClassifier()
+currCM, fig = confusion_matrix.printConfusionMatrix(forestClf, mat['X'], mat['y'], "All features, random forest")
+fig.savefig("original_data_results.png", bbox_inches="tight")
+
+forestClf = ensemble.RandomForestClassifier()
+currCM, fig = confusion_matrix.printConfusionMatrix(forestClf, modified_mat['X'], modified_mat['y'], "All features, random forest")
+fig.savefig("cleaned_data_results.png", bbox_inches="tight")
+
+
+"""
 kf = KFold(rows, n_folds=5)
 scores = []
 for train, test in kf:
@@ -63,4 +68,4 @@ for train, test in kf:
     print("Total accuracy: " + str((float(correct)/float(correct+wrong))*100.0))
     scores.append((float(correct)/float(correct+wrong))*100.0)
 print sum(scores)/len(scores)
-	
+"""

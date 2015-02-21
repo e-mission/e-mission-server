@@ -1,0 +1,148 @@
+2015-02-18 23:08:44,754:DEBUG:START TRAINING DATA STEP
+2015-02-18 23:08:44,795:DEBUG:Section data set size = 120
+2015-02-18 23:08:44,796:DEBUG:Getting dataset size took 0.0416250228882
+2015-02-18 23:08:44,796:DEBUG:Querying confirmedSections 2015-02-18 23:08:44.796119
+2015-02-18 23:08:44,796:DEBUG:Querying confirmedSection took 2.98023223877e-05
+2015-02-18 23:08:44,796:DEBUG:Querying stage modes 2015-02-18 23:08:44.796372
+2015-02-18 23:08:44,797:DEBUG:Querying stage modes took 0.00133800506592
+2015-02-18 23:08:44,798:DEBUG:Section query with ground truth 2015-02-18 23:08:44.797980
+2015-02-18 23:08:44,799:DEBUG:Training set total size = 114
+2015-02-18 23:08:44,799:DEBUG:Getting section query with ground truth took 0.00117707252502
+2015-02-18 23:08:44,800:DEBUG:confirmedSections.count() = 114
+2015-02-18 23:08:44,800:INFO:loadTrainingDataStep DONE
+2015-02-18 23:08:44,800:DEBUG:Trying to find cluster locations for 1 trips
+2015-02-18 23:08:44,843:DEBUG:Trying to find cluster locations for 46 trips
+2015-02-18 23:08:44,907:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-18 23:08:44,908:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-18 23:08:44,908:INFO:generateBusAndTrainStopStep DONE
+2015-02-18 23:08:44,910:DEBUG:created data structures of size 114
+2015-02-18 23:08:45,264:DEBUG:Processing record 0 
+2015-02-18 23:08:49,571:DEBUG:Processing record 100 
+2015-02-18 23:08:50,169:INFO:generateFeatureMatrixAndResultVectorStep DONE
+2015-02-18 23:08:50,169:DEBUG:Stripped trips with mode: run 0, transport 0, mixed 5, unknown 0 unstripped 109
+2015-02-18 23:08:50,169:INFO:savePredictionsStep DONE
+2015-02-18 23:08:50,170:DEBUG:Stripping out distanceOutliers (array([], dtype=int64),), speedOutliers (array([54]),), speedMeanOutliers (array([7]),), speedVarianceOutliers (array([  2,   7,  16,  31,  48,  54,  68,  69,  70,  73,  74,  78,  81,
+        86, 107]),), maxSpeedOutliers (array([  0,   2,   7,   9,  16,  25,  29,  30,  31,  47,  48,  54,  68,
+        69,  70,  73,  74,  78,  81,  86, 107]),)
+2015-02-18 23:08:50,170:DEBUG:nonOutlierIndices.shape = 109
+2015-02-18 23:08:50,170:INFO:cleanDataStep DONE
+2015-02-18 23:08:50,170:DEBUG:generic features = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+2015-02-18 23:08:50,170:DEBUG:advanced features = [10, 11, 12]
+2015-02-18 23:08:50,170:DEBUG:location features = [13, 14, 15, 16]
+2015-02-18 23:08:50,170:DEBUG:time features = [17, 18]
+2015-02-18 23:08:50,170:DEBUG:bus train features = [19, 20, 21]
+2015-02-18 23:08:50,171:INFO:selectFeatureIndicesStep DONE
+2015-02-18 23:08:50,351:INFO:buildModelStep DONE
+2015-02-18 23:08:50,352:DEBUG:Predicting values for 0 sections
+2015-02-18 23:08:50,353:INFO:generateFeatureMatrixAndIDsStep DONE
+2015-02-18 23:08:50,354:INFO:predictModesStep DONE
+2015-02-18 23:09:26,711:DEBUG:START TRAINING DATA STEP
+2015-02-18 23:09:26,711:DEBUG:Section data set size = 120
+2015-02-18 23:09:26,711:DEBUG:Getting dataset size took 0.000809192657471
+2015-02-18 23:09:26,712:DEBUG:Querying confirmedSections 2015-02-18 23:09:26.711996
+2015-02-18 23:09:26,712:DEBUG:Querying confirmedSection took 1.97887420654e-05
+2015-02-18 23:09:26,712:DEBUG:Querying stage modes 2015-02-18 23:09:26.712134
+2015-02-18 23:09:26,713:DEBUG:Querying stage modes took 0.00132703781128
+2015-02-18 23:09:26,713:DEBUG:Section query with ground truth 2015-02-18 23:09:26.713661
+2015-02-18 23:09:26,715:DEBUG:Training set total size = 114
+2015-02-18 23:09:26,715:DEBUG:Getting section query with ground truth took 0.00146579742432
+2015-02-18 23:09:26,716:DEBUG:confirmedSections.count() = 114
+2015-02-18 23:09:26,716:INFO:loadTrainingDataStep DONE
+2015-02-18 23:09:26,716:DEBUG:Trying to find cluster locations for 1 trips
+2015-02-18 23:09:26,719:DEBUG:Trying to find cluster locations for 46 trips
+2015-02-18 23:09:26,763:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-18 23:09:26,763:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-18 23:09:26,763:INFO:generateBusAndTrainStopStep DONE
+2015-02-18 23:09:26,766:DEBUG:created data structures of size 114
+2015-02-18 23:09:26,929:DEBUG:Processing record 0 
+2015-02-18 23:09:31,688:DEBUG:Processing record 100 
+2015-02-18 23:09:32,537:INFO:generateFeatureMatrixAndResultVectorStep DONE
+2015-02-18 23:09:32,538:DEBUG:Stripped trips with mode: run 0, transport 0, mixed 5, unknown 0 unstripped 109
+2015-02-18 23:09:32,538:INFO:savePredictionsStep DONE
+2015-02-18 23:09:32,539:DEBUG:Stripping out distanceOutliers (array([], dtype=int64),), speedOutliers (array([54]),), speedMeanOutliers (array([ 4, 68, 89]),), speedVarianceOutliers (array([  2,   4,   7,  16,  31,  54,  64,  68,  69,  70,  74,  78,  86,
+        89, 107]),), maxSpeedOutliers (array([  0,   2,   4,   7,   9,  16,  25,  29,  31,  47,  48,  54,  64,
+        68,  69,  70,  74,  78,  81,  86,  89,  95, 103, 107]),)
+2015-02-18 23:09:32,539:DEBUG:nonOutlierIndices.shape = 109
+2015-02-18 23:09:32,539:INFO:cleanDataStep DONE
+2015-02-18 23:09:32,539:DEBUG:generic features = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+2015-02-18 23:09:32,539:DEBUG:advanced features = [10, 11, 12]
+2015-02-18 23:09:32,539:DEBUG:location features = [13, 14, 15, 16]
+2015-02-18 23:09:32,539:DEBUG:time features = [17, 18]
+2015-02-18 23:09:32,539:DEBUG:bus train features = [19, 20, 21]
+2015-02-18 23:09:32,539:INFO:selectFeatureIndicesStep DONE
+2015-02-18 23:09:32,558:INFO:buildModelStep DONE
+2015-02-18 23:09:32,560:DEBUG:Predicting values for 0 sections
+2015-02-18 23:09:32,561:INFO:generateFeatureMatrixAndIDsStep DONE
+2015-02-18 23:09:32,562:INFO:predictModesStep DONE
+2015-02-18 23:09:32,720:INFO:savePredictionsStep DONE
+2015-02-18 23:10:05,412:DEBUG:START TRAINING DATA STEP
+2015-02-18 23:10:05,413:DEBUG:Section data set size = 120
+2015-02-18 23:10:05,413:DEBUG:Getting dataset size took 0.000771999359131
+2015-02-18 23:10:05,413:DEBUG:Querying confirmedSections 2015-02-18 23:10:05.413627
+2015-02-18 23:10:05,413:DEBUG:Querying confirmedSection took 1.71661376953e-05
+2015-02-18 23:10:05,413:DEBUG:Querying stage modes 2015-02-18 23:10:05.413755
+2015-02-18 23:10:05,414:DEBUG:Querying stage modes took 0.001051902771
+2015-02-18 23:10:05,414:DEBUG:Section query with ground truth 2015-02-18 23:10:05.414968
+2015-02-18 23:10:05,416:DEBUG:Training set total size = 114
+2015-02-18 23:10:05,416:DEBUG:Getting section query with ground truth took 0.00100302696228
+2015-02-18 23:10:05,416:DEBUG:confirmedSections.count() = 114
+2015-02-18 23:10:05,417:INFO:loadTrainingDataStep DONE
+2015-02-18 23:10:05,417:DEBUG:Trying to find cluster locations for 1 trips
+2015-02-18 23:10:05,420:DEBUG:Trying to find cluster locations for 46 trips
+2015-02-18 23:10:05,455:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-18 23:10:05,456:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-18 23:10:05,456:INFO:generateBusAndTrainStopStep DONE
+2015-02-18 23:10:05,458:DEBUG:created data structures of size 114
+2015-02-18 23:10:05,595:DEBUG:Processing record 0 
+2015-02-18 23:10:09,807:DEBUG:Processing record 100 
+2015-02-18 23:10:10,420:INFO:generateFeatureMatrixAndResultVectorStep DONE
+2015-02-18 23:10:10,420:DEBUG:Stripped trips with mode: run 0, transport 0, mixed 5, unknown 0 unstripped 109
+2015-02-18 23:10:10,420:INFO:savePredictionsStep DONE
+2015-02-18 23:10:10,421:DEBUG:Stripping out distanceOutliers (array([], dtype=int64),), speedOutliers (array([54]),), speedMeanOutliers (array([4]),), speedVarianceOutliers (array([  2,   4,   7,  16,  30,  31,  48,  54,  68,  69,  70,  74,  86, 107]),), maxSpeedOutliers (array([  0,   2,   4,   7,   9,  16,  25,  29,  30,  31,  47,  48,  54,
+        68,  69,  70,  73,  74,  81,  86, 103, 105, 107]),)
+2015-02-18 23:10:10,421:DEBUG:nonOutlierIndices.shape = 109
+2015-02-18 23:10:10,421:INFO:cleanDataStep DONE
+2015-02-18 23:10:10,421:DEBUG:generic features = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+2015-02-18 23:10:10,421:DEBUG:advanced features = [10, 11, 12]
+2015-02-18 23:10:10,421:DEBUG:location features = [13, 14, 15, 16]
+2015-02-18 23:10:10,421:DEBUG:time features = [17, 18]
+2015-02-18 23:10:10,421:DEBUG:bus train features = [19, 20, 21]
+2015-02-18 23:10:10,421:INFO:selectFeatureIndicesStep DONE
+2015-02-18 23:10:16,060:DEBUG:START TRAINING DATA STEP
+2015-02-18 23:10:16,061:DEBUG:Section data set size = 120
+2015-02-18 23:10:16,062:DEBUG:Getting dataset size took 0.000900983810425
+2015-02-18 23:10:16,062:DEBUG:Querying confirmedSections 2015-02-18 23:10:16.062096
+2015-02-18 23:10:16,062:DEBUG:Querying confirmedSection took 2.28881835938e-05
+2015-02-18 23:10:16,062:DEBUG:Querying stage modes 2015-02-18 23:10:16.062238
+2015-02-18 23:10:16,063:DEBUG:Querying stage modes took 0.00111985206604
+2015-02-18 23:10:16,063:DEBUG:Section query with ground truth 2015-02-18 23:10:16.063513
+2015-02-18 23:10:16,064:DEBUG:Training set total size = 114
+2015-02-18 23:10:16,064:DEBUG:Getting section query with ground truth took 0.00107502937317
+2015-02-18 23:10:16,065:DEBUG:confirmedSections.count() = 114
+2015-02-18 23:10:16,065:INFO:loadTrainingDataStep DONE
+2015-02-18 23:10:16,066:DEBUG:Trying to find cluster locations for 1 trips
+2015-02-18 23:10:16,068:DEBUG:Trying to find cluster locations for 46 trips
+2015-02-18 23:10:16,105:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-18 23:10:16,105:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-18 23:10:16,105:INFO:generateBusAndTrainStopStep DONE
+2015-02-18 23:10:16,108:DEBUG:created data structures of size 114
+2015-02-18 23:10:16,250:DEBUG:Processing record 0 
+2015-02-18 23:10:20,690:DEBUG:Processing record 100 
+2015-02-18 23:10:21,315:INFO:generateFeatureMatrixAndResultVectorStep DONE
+2015-02-18 23:10:21,315:DEBUG:Stripped trips with mode: run 0, transport 0, mixed 5, unknown 0 unstripped 109
+2015-02-18 23:10:21,315:INFO:savePredictionsStep DONE
+2015-02-18 23:10:21,315:DEBUG:Stripping out distanceOutliers (array([], dtype=int64),), speedOutliers (array([54]),), speedMeanOutliers (array([54]),), speedVarianceOutliers (array([  2,   7,  31,  48,  54,  68,  69,  70,  74,  78,  82,  86, 107]),), maxSpeedOutliers (array([  0,   2,   7,   9,  16,  25,  29,  30,  31,  47,  48,  54,  68,
+        69,  70,  73,  74,  78,  81,  82,  86,  95, 103, 107]),)
+2015-02-18 23:10:21,315:DEBUG:nonOutlierIndices.shape = 109
+2015-02-18 23:10:21,316:INFO:cleanDataStep DONE
+2015-02-18 23:10:21,316:DEBUG:generic features = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+2015-02-18 23:10:21,316:DEBUG:advanced features = [10, 11, 12]
+2015-02-18 23:10:21,316:DEBUG:location features = [13, 14, 15, 16]
+2015-02-18 23:10:21,316:DEBUG:time features = [17, 18]
+2015-02-18 23:10:21,316:DEBUG:bus train features = [19, 20, 21]
+2015-02-18 23:10:21,316:INFO:selectFeatureIndicesStep DONE
+2015-02-18 23:10:21,572:INFO:buildModelStep DONE
+2015-02-18 23:10:21,574:DEBUG:Predicting values for 0 sections
+2015-02-18 23:10:21,576:INFO:generateFeatureMatrixAndIDsStep DONE
+2015-02-18 23:10:21,577:INFO:predictModesStep DONE
+2015-02-18 23:10:21,579:INFO:savePredictionsStep DONE
