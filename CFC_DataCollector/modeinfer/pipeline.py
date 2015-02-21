@@ -10,6 +10,8 @@ from sklearn import linear_model
 sys.path.append("/home/ubuntu/miniconda/lib/python2.7/site-packages/")
 sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
 sys.path.append("%s" % os.getcwd())
+sys.path.append("../../CFC_WebApp/")
+
 import numpy as np
 import scipy as sp
 from featurecalc import calDistance, calSpeed, calHeading, calAvgSpeed, calSpeeds, calAccels, getIthMaxSpeed, getIthMaxAccel, calHCR,\
@@ -64,7 +66,9 @@ class ModeInferencePipeline:
     logging.info("selectFeatureIndicesStep DONE")
 
     self.selFeatureMatrix = self.cleanedFeatureMatrix[:,self.selFeatureIndices]
-    
+    import scipy.io
+    scipy.io.savemat('original_data.mat', mdict={'X': self.cleanedFeatureMatrix, 'y': self.cleanedResultVector})
+   
     self.model = self.buildModelStep()
     logging.info("buildModelStep DONE")
     toPredictTripsQuery = {"$and": [{'type': 'move'},
