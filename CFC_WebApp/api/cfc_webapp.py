@@ -10,10 +10,12 @@ from datetime import datetime
 import time
 # So that we can set the socket timeout
 import socket
-# For decoding tokens using the google decode URL
-# We want to switch this to something offline later
+# For decoding JWTs using the google decode URL
 import urllib
 import requests
+# For decoding JWTs on the client side
+import oauth2client.client
+from oauth2client.crypt import AppIdentityError
 
 config_file = open('config.json')
 config_data = json.load(config_file)
@@ -351,15 +353,24 @@ def after_request():
 # This should only be used by createUserProfile since we may not have a UUID
 # yet. All others should use the UUID.
 def verifyUserToken(token):
-  constructedURL = ("https://www.googleapis.com/oauth2/v1/tokeninfo?id_token=%s"%token)
-  r = requests.get(constructedURL)
-  tokenFields = json.loads(r.content)
-  in_client_key = tokenFields['audience']
-  if (in_client_key != client_key):
-    if (in_client_key != hack_client_key):
-      abort(401, "Invalid client key %s" % in_client_key)
-  logging.debug("Found user email %s" % tokenFields['email'])
-  return tokenFields['email']
+    try:
+        # attempt to validate token on the client-side
+        logging.debug("Using OAuth2Client to verify id token")
+        tokenFields = oauth2client.client.verify_id_token(token,client_key)
+        print tokenFields
+    except AppIdentityError:
+        logging.debug("OAuth failed to verify id token, falling back to constructedURL")
+        #fallback to verifying using Google API
+        constructedURL = ("https://www.googleapis.com/oauth2/v1/tokeninfo?id_token=%s" % token)
+        r = requests.get(constructedURL)
+        tokenFields = json.loads(r.content)
+        in_client_key = tokenFields['audience']
+        if (in_client_key != client_key):
+            abort(401, "Invalid client key %s" % in_client_key)
+    logging.debug("Found user email %s" % tokenFields['email'])
+    return tokenFields['email']
+
+
 
 def getUUIDFromToken(token):
     userEmail = verifyUserToken(token)

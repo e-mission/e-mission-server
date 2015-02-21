@@ -181,7 +181,6 @@ class TestMovesCollect(unittest.TestCase):
     copiedTripSections = []
     for i, act in enumerate(selTripFromMoves['activities']):
       act['startTime'] = '20140407T18%s039-0700' % (i + 2)
-      print act['startTime']
       copiedTripSections.append(act)
 
     self.assertEquals(len(copiedTripSections), 2)
@@ -266,6 +265,53 @@ class TestMovesCollect(unittest.TestCase):
     self.assertEquals(newSec['trip_start_datetime'].month, 04)
     self.assertEquals(newSec['trip_end_datetime'].hour, 19)
     self.assertEquals(newSec['place']['place_location']['coordinates'][0], -122)
+
+  def testSectionFilterLabeling(self):
+    """
+    Tests that incoming section data parsed by collect.py is properly 
+    labeled with a filter flag
+    """
+    # Testing first outer if statement in label_filtered
+    testMovesSec = {}
+    testMovesSec['manual'] = True
+    testMovesSec['startTime'] = "20140407T183039-0700"
+    testMovesSec['endTime'] = "20140407T191539-0700"
+    testMovesSec['trackPoints'] = [{u'lat': 37, u'lon': -122, u'time': u'20140407T083200-0700'},
+                                   {u'lat': 38, u'lon': -123, u'time': u'20140407T083220-0700'}]
+
+    newSec = {'mode': ''} 
+    collect.fillSectionWithMovesData(testMovesSec, newSec)
+    collect.label_filtered_section(newSec)
+    self.assertEquals(newSec['retained'], True)
+
+    # Testing first outer elif statement in label_filtered
+    testMovesSec['trackPoints'] = []
+    newSec = {'mode':''} 
+    collect.fillSectionWithMovesData(testMovesSec, newSec)
+    collect.label_filtered_section(newSec)
+    self.assertEquals(newSec['retained'], True)
+
+    # Testing second outer elif statement in label_filtered
+    testMovesSec['startTime'] = ""
+    testMovesSec['endTime'] = ""
+    testMovesSec['trackPoints'] = [{u'lat': 37, u'lon': -122, u'time': u'20140407T083200-0700'},
+                                   {u'lat': 38, u'lon': -123, u'time': u'20140407T083220-0700'}]
+
+
+    newSec = {'mode':''} 
+    collect.fillSectionWithMovesData(testMovesSec, newSec)
+    collect.label_filtered_section(newSec)
+    self.assertEquals(newSec['retained'], True)
+
+    # Testing outer else statement in label_filtered
+    testMovesSec['startTime'] = ""
+    testMovesSec['endTime'] = ""
+    testMovesSec['trackPoints'] = ""
+    
+    newSec = {'mode':''} 
+    collect.fillSectionWithMovesData(testMovesSec, newSec)
+    collect.label_filtered_section(newSec)
+    self.assertEquals(newSec['retained'], False)
 
 if __name__ == '__main__':
     unittest.main()
