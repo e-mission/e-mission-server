@@ -220,7 +220,7 @@ def processTripArray(user_uuid, trip_array):
       else:
           logging.debug("Found existing trip with trip_id = %s " % (trip_id))
 
-def _cleanGPSData(raw_points):
+def _cleanGPSData(points):
     if len(points) > 4:
         points = np.array([[(datetime.datetime.strptime(point['time'].split('-')[0], "%Y%m%dT%H%M%S") - datetime.datetime(1970,1,1)).total_seconds(), 
             point["track_location"]["coordinates"][0], point["track_location"]["coordinates"][1]] for point in points])
@@ -232,8 +232,8 @@ def _cleanGPSData(raw_points):
         outlier_mask = np.logical_not(inlier_mask)
         print "total size: " + str(len(outlier_mask))
         remove = [index for index,v in enumerate(outlier_mask) if v]
-        section["track_points"] = [v for j,v in enumerate(section["track_points"]) if j not in frozenset(remove)]
-    newSec['cleaned_points'] = _cleanGPSData(newSec['track_points'])
+        return [v for j,v in enumerate(section["track_points"]) if j not in frozenset(remove)]
+    return []
 
 if __name__ == "__main__":
   collect()
