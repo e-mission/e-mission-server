@@ -23,7 +23,6 @@ for path, direc, filenames in os.walk(path):
                     #points = [[point["loc_elapsed_ts"], (point["lon"], point["lat"])]  for point in act["trackPoints"]]
                     points_test_ascending = sorted(points, key=lambda point: point[0])
                     if points != points_test_ascending:
-                        print "FUCKFUCKFUCK"
                         raise Exception
                     temp_list.append(points)
 dataDict = {}
