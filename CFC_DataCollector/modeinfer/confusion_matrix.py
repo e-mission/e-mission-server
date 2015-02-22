@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 
 
 def printConfusionMatrix(algo, X, y, title):
+    print "Shape of X: " + str(np.shape(X))
+    print np.shape(y)
     skf = cross_validation.StratifiedKFold(y, 5)
     nClasses = np.count_nonzero(np.unique(y))
     print "nClasses = %s" % nClasses
@@ -36,12 +38,13 @@ def printConfusionMatrix(algo, X, y, title):
     # First element is "" because of http://stackoverflow.com/questions/3529666/matplotlib-matshow-labels
     ax.set_xticklabels(["","walk", "", "bus", "", "car", ""])
     ax.set_yticklabels(["","walk", "cycle", "bus", "train", "car", "air"])
-    cax = ax.matshow(logFinalPCM, cmap=cm.gray)
+    #cax = ax.matshow(logFinalPCM, cmap=cm.gray)
+    cax = ax.matshow(logFinalPCM) 
     ax.set_title(title, color='green', weight='bold', size=16, y=1.1)
     
     fig.colorbar(cax)
     ax.set_ylabel('True label', size="large")
     ax.set_xlabel('Predicted label', size="large")
     fig.tight_layout()
-    plt.show()
+    #plt.show()
     return (finalPCM, fig)

@@ -4,14 +4,14 @@ import numpy as np
 from sklearn.cross_validation import KFold
 import confusion_matrix
 from sklearn import ensemble
+# Takes in a file with cleaned, and uncleaned data
 mat = scipy.io.loadmat('original_data.mat')
-#modified_mat = scipy.io.loadmat('modified_data.mat')
+modified_mat = scipy.io.loadmat('modified_data.mat')
 
 rows = mat['X'].shape[0]
-print rows
 mat['y'] = np.transpose(mat['y']).ravel()
-#test_size = 50
-test_size = 30
+modified_mat['y'] = np.transpose(modified_mat['y']).ravel()
+test_size = rows * 0.2
 
 orig_training_set = mat['X'][0:rows-test_size]
 print np.shape(orig_training_set)
@@ -25,7 +25,6 @@ orig_test_labels = mat['y'][rows-test_size:]
 
 #mod_test_set = modified_mat['X'][rows-test_size:]
 #mod_test_labels = modified_mat['y'][rows-test_size:]
-
 
 forestClf = ensemble.RandomForestClassifier()
 currCM, fig = confusion_matrix.printConfusionMatrix(forestClf, mat['X'], mat['y'], "All features, random forest")

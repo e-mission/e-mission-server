@@ -146,3 +146,224 @@
 2015-02-18 23:10:21,576:INFO:generateFeatureMatrixAndIDsStep DONE
 2015-02-18 23:10:21,577:INFO:predictModesStep DONE
 2015-02-18 23:10:21,579:INFO:savePredictionsStep DONE
+2015-02-21 15:28:01,848:DEBUG:START TRAINING DATA STEP
+2015-02-21 15:28:01,849:DEBUG:Section data set size = 0
+2015-02-21 15:28:01,850:DEBUG:Training set total size = 0
+2015-02-21 15:28:01,850:DEBUG:confirmedSections.count() = 0
+2015-02-21 15:28:01,851:INFO:loadTrainingDataStep DONE
+2015-02-21 15:28:01,851:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-21 15:28:01,851:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-21 15:28:01,852:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-21 15:28:01,852:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-21 15:28:01,852:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-21 15:28:01,852:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-21 15:28:01,853:INFO:generateBusAndTrainStopStep DONE
+2015-02-21 15:28:01,853:DEBUG:created data structures of size 0
+2015-02-21 15:28:01,854:INFO:generateFeatureMatrixAndResultVectorStep DONE
+2015-02-21 15:28:01,854:DEBUG:Stripped trips with mode: run 0, transport 0, mixed 0, unknown 0 unstripped 0
+2015-02-21 15:28:01,854:INFO:savePredictionsStep DONE
+2015-02-21 15:28:01,854:DEBUG:Stripping out distanceOutliers (array([], dtype=int64),), speedOutliers (array([], dtype=int64),), speedMeanOutliers (array([], dtype=int64),), speedVarianceOutliers (array([], dtype=int64),), maxSpeedOutliers (array([], dtype=int64),)
+2015-02-21 15:28:01,854:DEBUG:nonOutlierIndices.shape = 0
+2015-02-21 15:28:01,854:INFO:cleanDataStep DONE
+2015-02-21 15:28:01,854:DEBUG:generic features = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+2015-02-21 15:28:01,854:DEBUG:advanced features = [10, 11, 12]
+2015-02-21 15:28:01,854:DEBUG:location features = [13, 14, 15, 16]
+2015-02-21 15:28:01,854:DEBUG:time features = [17, 18]
+2015-02-21 15:28:01,854:DEBUG:bus train features = [19, 20, 21]
+2015-02-21 15:28:01,854:INFO:selectFeatureIndicesStep DONE
+2015-02-21 15:28:14,290:DEBUG:START TRAINING DATA STEP
+2015-02-21 15:28:14,291:DEBUG:Section data set size = 0
+2015-02-21 15:28:14,292:DEBUG:Training set total size = 0
+2015-02-21 15:28:14,293:DEBUG:confirmedSections.count() = 0
+2015-02-21 15:28:14,293:INFO:loadTrainingDataStep DONE
+2015-02-21 15:28:14,293:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-21 15:28:14,293:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-21 15:28:14,294:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-21 15:28:14,294:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-21 15:28:14,294:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-21 15:28:14,295:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-21 15:28:14,295:INFO:generateBusAndTrainStopStep DONE
+2015-02-21 15:28:14,296:DEBUG:created data structures of size 0
+2015-02-21 15:28:14,296:INFO:generateFeatureMatrixAndResultVectorStep DONE
+2015-02-21 15:28:14,296:DEBUG:Stripped trips with mode: run 0, transport 0, mixed 0, unknown 0 unstripped 0
+2015-02-21 15:28:14,296:INFO:savePredictionsStep DONE
+2015-02-21 15:28:14,296:DEBUG:Stripping out distanceOutliers (array([], dtype=int64),), speedOutliers (array([], dtype=int64),), speedMeanOutliers (array([], dtype=int64),), speedVarianceOutliers (array([], dtype=int64),), maxSpeedOutliers (array([], dtype=int64),)
+2015-02-21 15:28:14,296:DEBUG:nonOutlierIndices.shape = 0
+2015-02-21 15:28:14,296:INFO:cleanDataStep DONE
+2015-02-21 15:28:14,296:DEBUG:generic features = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+2015-02-21 15:28:14,297:DEBUG:advanced features = [10, 11, 12]
+2015-02-21 15:28:14,297:DEBUG:location features = [13, 14, 15, 16]
+2015-02-21 15:28:14,297:DEBUG:time features = [17, 18]
+2015-02-21 15:28:14,297:DEBUG:bus train features = [19, 20, 21]
+2015-02-21 15:28:14,297:INFO:selectFeatureIndicesStep DONE
+2015-02-21 15:28:52,656:DEBUG:START TRAINING DATA STEP
+2015-02-21 15:28:52,656:DEBUG:Section data set size = 0
+2015-02-21 15:28:52,658:DEBUG:Training set total size = 0
+2015-02-21 15:28:52,658:DEBUG:confirmedSections.count() = 0
+2015-02-21 15:28:52,658:INFO:loadTrainingDataStep DONE
+2015-02-21 15:28:52,659:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-21 15:28:52,659:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-21 15:28:52,659:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-21 15:28:52,660:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-21 15:28:52,660:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-21 15:28:52,660:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-21 15:28:52,661:INFO:generateBusAndTrainStopStep DONE
+2015-02-21 15:28:52,662:DEBUG:created data structures of size 0
+2015-02-21 15:28:52,662:INFO:generateFeatureMatrixAndResultVectorStep DONE
+2015-02-21 15:28:52,662:DEBUG:Stripped trips with mode: run 0, transport 0, mixed 0, unknown 0 unstripped 0
+2015-02-21 15:28:52,662:INFO:savePredictionsStep DONE
+2015-02-21 15:28:52,662:DEBUG:Stripping out distanceOutliers (array([], dtype=int64),), speedOutliers (array([], dtype=int64),), speedMeanOutliers (array([], dtype=int64),), speedVarianceOutliers (array([], dtype=int64),), maxSpeedOutliers (array([], dtype=int64),)
+2015-02-21 15:28:52,662:DEBUG:nonOutlierIndices.shape = 0
+2015-02-21 15:28:52,662:INFO:cleanDataStep DONE
+2015-02-21 15:28:52,662:DEBUG:generic features = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+2015-02-21 15:28:52,662:DEBUG:advanced features = [10, 11, 12]
+2015-02-21 15:28:52,662:DEBUG:location features = [13, 14, 15, 16]
+2015-02-21 15:28:52,663:DEBUG:time features = [17, 18]
+2015-02-21 15:28:52,663:DEBUG:bus train features = [19, 20, 21]
+2015-02-21 15:28:52,663:INFO:selectFeatureIndicesStep DONE
+2015-02-21 15:28:52,669:INFO:generateFeatureMatrixAndIDsStep DONE
+2015-02-21 15:29:07,684:DEBUG:START TRAINING DATA STEP
+2015-02-21 15:29:07,685:DEBUG:Section data set size = 0
+2015-02-21 15:29:07,687:DEBUG:Training set total size = 0
+2015-02-21 15:29:07,687:DEBUG:confirmedSections.count() = 0
+2015-02-21 15:29:07,687:INFO:loadTrainingDataStep DONE
+2015-02-21 15:29:07,687:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-21 15:29:07,688:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-21 15:29:07,688:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-21 15:29:07,688:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-21 15:29:07,689:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-21 15:29:07,689:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-21 15:29:07,689:INFO:generateBusAndTrainStopStep DONE
+2015-02-21 15:29:07,690:DEBUG:created data structures of size 0
+2015-02-21 15:29:07,690:INFO:generateFeatureMatrixAndResultVectorStep DONE
+2015-02-21 15:29:07,691:DEBUG:Stripped trips with mode: run 0, transport 0, mixed 0, unknown 0 unstripped 0
+2015-02-21 15:29:07,691:INFO:savePredictionsStep DONE
+2015-02-21 15:29:07,691:DEBUG:Stripping out distanceOutliers (array([], dtype=int64),), speedOutliers (array([], dtype=int64),), speedMeanOutliers (array([], dtype=int64),), speedVarianceOutliers (array([], dtype=int64),), maxSpeedOutliers (array([], dtype=int64),)
+2015-02-21 15:29:07,691:DEBUG:nonOutlierIndices.shape = 0
+2015-02-21 15:29:07,691:INFO:cleanDataStep DONE
+2015-02-21 15:29:07,691:DEBUG:generic features = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+2015-02-21 15:29:07,691:DEBUG:advanced features = [10, 11, 12]
+2015-02-21 15:29:07,691:DEBUG:location features = [13, 14, 15, 16]
+2015-02-21 15:29:07,691:DEBUG:time features = [17, 18]
+2015-02-21 15:29:07,691:DEBUG:bus train features = [19, 20, 21]
+2015-02-21 15:29:07,691:INFO:selectFeatureIndicesStep DONE
+2015-02-21 15:30:48,541:DEBUG:START TRAINING DATA STEP
+2015-02-21 15:30:48,541:DEBUG:Section data set size = 0
+2015-02-21 15:30:48,543:DEBUG:Training set total size = 0
+2015-02-21 15:30:48,543:DEBUG:confirmedSections.count() = 0
+2015-02-21 15:30:48,543:INFO:loadTrainingDataStep DONE
+2015-02-21 15:30:48,544:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-21 15:30:48,544:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-21 15:30:48,544:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-21 15:30:48,545:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-21 15:30:48,545:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-21 15:30:48,545:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-21 15:30:48,545:INFO:generateBusAndTrainStopStep DONE
+2015-02-21 15:30:48,546:DEBUG:created data structures of size 0
+2015-02-21 15:30:48,546:INFO:generateFeatureMatrixAndResultVectorStep DONE
+2015-02-21 15:30:48,546:DEBUG:Stripped trips with mode: run 0, transport 0, mixed 0, unknown 0 unstripped 0
+2015-02-21 15:30:48,547:INFO:savePredictionsStep DONE
+2015-02-21 15:30:48,547:DEBUG:Stripping out distanceOutliers (array([], dtype=int64),), speedOutliers (array([], dtype=int64),), speedMeanOutliers (array([], dtype=int64),), speedVarianceOutliers (array([], dtype=int64),), maxSpeedOutliers (array([], dtype=int64),)
+2015-02-21 15:30:48,547:DEBUG:nonOutlierIndices.shape = 0
+2015-02-21 15:30:48,547:INFO:cleanDataStep DONE
+2015-02-21 15:30:48,547:DEBUG:generic features = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+2015-02-21 15:30:48,547:DEBUG:advanced features = [10, 11, 12]
+2015-02-21 15:30:48,547:DEBUG:location features = [13, 14, 15, 16]
+2015-02-21 15:30:48,547:DEBUG:time features = [17, 18]
+2015-02-21 15:30:48,547:DEBUG:bus train features = [19, 20, 21]
+2015-02-21 15:30:48,547:INFO:selectFeatureIndicesStep DONE
+2015-02-21 15:33:43,224:DEBUG:START TRAINING DATA STEP
+2015-02-21 15:33:43,225:DEBUG:Section data set size = 0
+2015-02-21 15:33:43,226:DEBUG:Training set total size = 0
+2015-02-21 15:33:43,227:DEBUG:confirmedSections.count() = 0
+2015-02-21 15:33:43,227:INFO:loadTrainingDataStep DONE
+2015-02-21 15:33:43,227:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-21 15:33:43,228:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-21 15:33:43,228:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-21 15:33:43,228:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-21 15:33:43,229:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-21 15:33:43,229:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-21 15:33:43,229:INFO:generateBusAndTrainStopStep DONE
+2015-02-21 15:33:43,230:DEBUG:created data structures of size 0
+2015-02-21 15:33:43,230:INFO:generateFeatureMatrixAndResultVectorStep DONE
+2015-02-21 15:33:43,230:DEBUG:Stripped trips with mode: run 0, transport 0, mixed 0, unknown 0 unstripped 0
+2015-02-21 15:33:43,230:INFO:savePredictionsStep DONE
+2015-02-21 15:33:43,231:DEBUG:Stripping out distanceOutliers (array([], dtype=int64),), speedOutliers (array([], dtype=int64),), speedMeanOutliers (array([], dtype=int64),), speedVarianceOutliers (array([], dtype=int64),), maxSpeedOutliers (array([], dtype=int64),)
+2015-02-21 15:33:43,231:DEBUG:nonOutlierIndices.shape = 0
+2015-02-21 15:33:43,231:INFO:cleanDataStep DONE
+2015-02-21 15:33:43,231:DEBUG:generic features = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+2015-02-21 15:33:43,231:DEBUG:advanced features = [10, 11, 12]
+2015-02-21 15:33:43,231:DEBUG:location features = [13, 14, 15, 16]
+2015-02-21 15:33:43,231:DEBUG:time features = [17, 18]
+2015-02-21 15:33:43,231:DEBUG:bus train features = [19, 20, 21]
+2015-02-21 15:33:43,231:INFO:selectFeatureIndicesStep DONE
+2015-02-21 15:35:09,435:DEBUG:START TRAINING DATA STEP
+2015-02-21 15:35:09,436:DEBUG:Section data set size = 221
+2015-02-21 15:35:09,439:DEBUG:Training set total size = 197
+2015-02-21 15:35:09,440:DEBUG:confirmedSections.count() = 197
+2015-02-21 15:35:09,440:INFO:loadTrainingDataStep DONE
+2015-02-21 15:35:09,441:DEBUG:Trying to find cluster locations for 1 trips
+2015-02-21 15:35:09,443:DEBUG:Trying to find cluster locations for 53 trips
+2015-02-21 15:35:09,513:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-21 15:35:09,514:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-21 15:35:09,514:INFO:generateBusAndTrainStopStep DONE
+2015-02-21 15:35:09,517:DEBUG:created data structures of size 197
+2015-02-21 15:35:09,580:DEBUG:Processing record 0 
+2015-02-21 15:35:16,481:DEBUG:START TRAINING DATA STEP
+2015-02-21 15:35:16,482:DEBUG:Section data set size = 221
+2015-02-21 15:35:16,484:DEBUG:Training set total size = 197
+2015-02-21 15:35:16,485:DEBUG:confirmedSections.count() = 197
+2015-02-21 15:35:16,485:INFO:loadTrainingDataStep DONE
+2015-02-21 15:35:16,486:DEBUG:Trying to find cluster locations for 1 trips
+2015-02-21 15:35:16,488:DEBUG:Trying to find cluster locations for 53 trips
+2015-02-21 15:35:16,526:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-21 15:35:16,527:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-21 15:35:16,527:INFO:generateBusAndTrainStopStep DONE
+2015-02-21 15:35:16,531:DEBUG:created data structures of size 197
+2015-02-21 15:35:16,592:DEBUG:Processing record 0 
+2015-02-21 15:35:19,966:DEBUG:Processing record 100 
+2015-02-21 15:35:23,474:INFO:generateFeatureMatrixAndResultVectorStep DONE
+2015-02-21 15:35:23,474:DEBUG:Stripped trips with mode: run 0, transport 0, mixed 5, unknown 0 unstripped 192
+2015-02-21 15:35:23,475:INFO:savePredictionsStep DONE
+2015-02-21 15:35:23,476:DEBUG:Stripping out distanceOutliers (array([23]),), speedOutliers (array([  1,  23,  24,  64, 136]),), speedMeanOutliers (array([  1,  23,  24,  64,  78,  86,  89, 136, 171]),), speedVarianceOutliers (array([  1,   5,  16,  23,  24,  35,  55,  59,  64,  78,  84,  86,  89,
+        98, 106, 113, 130, 136, 138, 146, 147, 150, 151, 152, 155, 156,
+       160, 163, 164, 168, 171, 186, 187, 189]),), maxSpeedOutliers (array([  1,   2,   5,  16,  17,  23,  24,  35,  51,  55,  59,  64,  68,
+        69,  70,  77,  78,  84,  86,  89,  91,  92,  98, 106, 107, 111,
+       112, 113, 129, 130, 136, 138, 146, 147, 150, 151, 152, 155, 156,
+       157, 160, 162, 163, 164, 168, 171, 177, 185, 186, 187, 189, 190]),)
+2015-02-21 15:35:23,477:DEBUG:nonOutlierIndices.shape = 192
+2015-02-21 15:35:23,477:INFO:cleanDataStep DONE
+2015-02-21 15:35:23,477:DEBUG:generic features = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+2015-02-21 15:35:23,477:DEBUG:advanced features = [10, 11, 12]
+2015-02-21 15:35:23,477:DEBUG:location features = [13, 14, 15, 16]
+2015-02-21 15:35:23,477:DEBUG:time features = [17, 18]
+2015-02-21 15:35:23,477:DEBUG:bus train features = [19, 20, 21]
+2015-02-21 15:35:23,477:INFO:selectFeatureIndicesStep DONE
+2015-02-21 15:35:49,273:DEBUG:START TRAINING DATA STEP
+2015-02-21 15:35:49,274:DEBUG:Section data set size = 221
+2015-02-21 15:35:49,276:DEBUG:Training set total size = 197
+2015-02-21 15:35:49,277:DEBUG:confirmedSections.count() = 197
+2015-02-21 15:35:49,277:INFO:loadTrainingDataStep DONE
+2015-02-21 15:35:49,278:DEBUG:Trying to find cluster locations for 1 trips
+2015-02-21 15:35:49,281:DEBUG:Trying to find cluster locations for 53 trips
+2015-02-21 15:35:49,317:DEBUG:Trying to find cluster locations for 0 trips
+2015-02-21 15:35:49,318:DEBUG:No points found in cluster input, nothing to fit..
+2015-02-21 15:35:49,318:INFO:generateBusAndTrainStopStep DONE
+2015-02-21 15:35:49,322:DEBUG:created data structures of size 197
+2015-02-21 15:35:49,554:DEBUG:Processing record 0 
+2015-02-21 15:35:53,078:DEBUG:Processing record 100 
+2015-02-21 15:35:56,754:INFO:generateFeatureMatrixAndResultVectorStep DONE
+2015-02-21 15:35:56,754:DEBUG:Stripped trips with mode: run 0, transport 0, mixed 5, unknown 0 unstripped 192
+2015-02-21 15:35:56,754:INFO:savePredictionsStep DONE
+2015-02-21 15:35:56,756:DEBUG:Stripping out distanceOutliers (array([23]),), speedOutliers (array([  1,  23,  24,  64, 136]),), speedMeanOutliers (array([ 64, 150]),), speedVarianceOutliers (array([  1,  23,  24,  35,  64,  78,  84,  89,  98, 113, 130, 136, 146,
+       150, 151, 152, 160, 163, 168, 189]),), maxSpeedOutliers (array([  1,  17,  23,  24,  35,  51,  59,  64,  69,  77,  78,  84,  89,
+        91,  98, 107, 111, 112, 113, 129, 130, 136, 146, 150, 151, 152,
+       156, 160, 163, 164, 168, 177, 185, 189, 190]),)
+2015-02-21 15:35:56,756:DEBUG:nonOutlierIndices.shape = 192
+2015-02-21 15:35:56,756:INFO:cleanDataStep DONE
+2015-02-21 15:35:56,756:DEBUG:generic features = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+2015-02-21 15:35:56,756:DEBUG:advanced features = [10, 11, 12]
+2015-02-21 15:35:56,756:DEBUG:location features = [13, 14, 15, 16]
+2015-02-21 15:35:56,756:DEBUG:time features = [17, 18]
+2015-02-21 15:35:56,756:DEBUG:bus train features = [19, 20, 21]
+2015-02-21 15:35:56,756:INFO:selectFeatureIndicesStep DONE
