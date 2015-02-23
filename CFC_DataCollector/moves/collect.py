@@ -86,8 +86,8 @@ def fillSectionWithMovesData(sec_from_moves, newSec):
    #     print(section)
    newSec['duration'] = sec_from_moves["duration"] if "duration" in sec_from_moves else None
    newSec['distance'] = sec_from_moves["distance"] if "distance" in sec_from_moves else None
-   newSec['track_points'] = [{'track_location':{'type':'Point', 'coordinates':[point["lon"],point["lat"]]}, 'time':point["time"]}for point in sec_from_moves["trackPoints"]] if "trackPoints" in sec_from_moves else []
-   newSec['cleaned_points'] = _cleanGPSData(newSec['track_points'])
+   newSec['original_points'] = [{'track_location':{'type':'Point', 'coordinates':[point["lon"],point["lat"]]}, 'time':point["time"]}for point in sec_from_moves["trackPoints"]] if "trackPoints" in sec_from_moves else []
+   newSec['track_points'] = _cleanGPSData(newSec['original_points'])
    newSec['section_start_point'] = {'type':'Point', 'coordinates':[sec_from_moves['trackPoints'][0]["lon"],sec_from_moves['trackPoints'][0]["lat"]]} if ("trackPoints" in sec_from_moves and len(sec_from_moves['trackPoints'])>0) else None
    newSec['section_end_point'] = {'type':'Point', 'coordinates':[sec_from_moves['trackPoints'][-1]["lon"],sec_from_moves['trackPoints'][-1]["lat"]]} if ("trackPoints" in sec_from_moves and len(sec_from_moves['trackPoints'])>0) else None
 
