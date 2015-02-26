@@ -245,6 +245,7 @@ def createUserProfile():
 def updateUserProfile():
   logging.debug("Called updateUserProfile")
   user_uuid = getUUID(request)
+  user = User.fromUUID(user_uuid)
   mpg_array = request.json['mpg_array']
   return user.setMpgArray(mpg_array)
 
