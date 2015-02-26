@@ -2,6 +2,7 @@ import logging
 import distance
 from datetime import datetime, timedelta
 # from get_database import get_user_db
+from dao.user import User
 from common import getDistinctUserCount, getAllModes, getDisplayModes, getQuerySpec, addFilterToSpec, getTripCountForMode, getModeShare, getDistanceForMode,\
     getModeShareDistance, convertToAvg
 
@@ -113,6 +114,9 @@ def getFootprintCompare(user):
   return getFootprintCompareForRange(user, weekago, now)
 
 def getFootprintCompareForRange(user, start, end):
+  userObj = User.fromUUID(user)
+  myCarbonFootprintForMode = userObj.getCarbonFootprintForMode()
+
   myModeShareCount = getModeShare(user, start,end)
   totalModeShareCount = getModeShare(None, start,end)
   logging.debug("myModeShareCount = %s totalModeShareCount = %s" %
@@ -125,8 +129,8 @@ def getFootprintCompareForRange(user, start, end):
   myShortLongModeShareDistance = getShortLongModeShareDistance(user, start, end)
   totalShortLongModeShareDistance = getShortLongModeShareDistance(None, start, end)
 
-  myModeCarbonFootprint = getCarbonFootprintsForMap(myShortLongModeShareDistance, carbonFootprintForMode)
-  totalModeCarbonFootprint = getCarbonFootprintsForMap(totalShortLongModeShareDistance, carbonFootprintForMode)
+  myModeCarbonFootprint = getCarbonFootprintsForMap(myShortLongModeShareDistance, myCarbonFootprintForMode)
+  totalModeCarbonFootprint = getCarbonFootprintsForMap(totalShortLongModeShareDistance, myCarbonFootprintForMode)
   logging.debug("myModeCarbonFootprint = %s, totalModeCarbonFootprint = %s" %
       (myModeCarbonFootprint, totalModeCarbonFootprint))
 
@@ -139,8 +143,8 @@ def getFootprintCompareForRange(user, start, end):
   delLongMotorizedModes(totalShortLongModeShareDistance)
   logging.debug("After deleting long motorized mode, map is %s", myShortLongModeShareDistance)
 
-  myModeCarbonFootprintNoLongMotorized = getCarbonFootprintsForMap(myShortLongModeShareDistance, carbonFootprintForMode)
-  totalModeCarbonFootprintNoLongMotorized = getCarbonFootprintsForMap(totalShortLongModeShareDistance, carbonFootprintForMode)
+  myModeCarbonFootprintNoLongMotorized = getCarbonFootprintsForMap(myShortLongModeShareDistance, myCarbonFootprintForMode)
+  totalModeCarbonFootprintNoLongMotorized = getCarbonFootprintsForMap(totalShortLongModeShareDistance, myCarbonFootprintForMode)
   myOptimalCarbonFootprintNoLongMotorized = getCarbonFootprintsForMap(myShortLongModeShareDistance, optimalCarbonFootprintForMode)
   totalOptimalCarbonFootprintNoLongMotorized = getCarbonFootprintsForMap(totalShortLongModeShareDistance, optimalCarbonFootprintForMode)
 
@@ -214,6 +218,7 @@ def getSummaryAllTrips(start,end):
           "EO 2050 goal (80% below 1990)": 8.28565
          }
 
-def getAllDrive(modeDistanceMap):
-   totalDistance = sum(modeDistanceMap.values()) / 1000
-   return totalDistance * carbonFootprintForMode['car_short']
+def getAllDrive(user, modeDistanceMap):
+  myCarbonFootprintForMode = user.getCarbonFootprintForMode()
+  totalDistance = sum(modeDistanceMap.values()) / 1000
+  return totalDistance * myCarbonFootprintForMode['car_short']

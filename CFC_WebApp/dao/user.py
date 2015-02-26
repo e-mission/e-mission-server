@@ -53,6 +53,44 @@ class User:
       assert(len(studyList) == 1)
       return studyList[0]
 
+  # Returns Average of MPG of all cars the user drives
+  def getAvgMpg(self):
+    mpg_array = [92.0/1609]
+    if self.getProfile() != None:
+        mpg_array = self.getProfile()['mpg_array']
+    total = 0
+    for mpg in mpg_array:
+      total += mpg
+    avg = total/len(mpg_array)
+    return avg
+
+  # Stores Array of MPGs of all the cars the user drives.
+  # At this point, guaranteed that user has a profile.
+  def setMpgArray(self, mpg_array):
+    logging.debug("Setting MPG array for user %s to : %s" % (self.uuid, mpg_array))
+    get_profile_db().update({'user_id': self.uuid}, {'$set': {'mpg_array': mpg_array}})
+
+  def getCarbonFootprintForMode(self):
+    logging.debug("Setting Carbon Footprint map for user %s to" % (self.uuid))
+    #using conversion: 8.91 kg CO2 for one gallon
+    #must convert Mpg -> Km, factor of 1000 in denom for g -> kg conversion
+    avgMetersPerGallon = self.getAvgMpg()*1.6093
+    car_footprint = (1/avgMetersPerGallon)*8.91
+    modeMap = {'walking' : 0,
+                          'running' : 0,
+                          'cycling' : 0,
+                            'mixed' : 0,
+                        'bus_short' : 267.0/1609,
+                         'bus_long' : 267.0/1609,
+                      'train_short' : 92.0/1609,
+                       'train_long' : 92.0/1609,
+                        'car_short' : car_footprint,
+                         'car_long' : car_footprint,
+                        'air_short' : 217.0/1609,
+                         'air_long' : 217.0/1609
+                      }
+    return modeMap
+
   def getUpdateTS(self):
     return self.getProfile()['update_ts']
 
@@ -113,7 +151,8 @@ class User:
   def createProfile(uuid, ts, studyList):
     initProfileObj = {'user_id': uuid,
                       'source':'Shankari',
-                      'update_ts': ts}
+                      'update_ts': ts,
+                      'mpg_array': [92.0/1609]}
     writeResultProfile = get_profile_db().update(
         {'user_id': uuid},
         {'$set': initProfileObj,

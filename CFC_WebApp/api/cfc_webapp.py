@@ -243,6 +243,15 @@ def createUserProfile():
   logging.debug("Returning result %s" % {'uuid': str(user.uuid)})
   return {'uuid': str(user.uuid)}
 
+@post('/profile/update')
+def updateUserProfile():
+  logging.debug("Called updateUserProfile")
+  user_uuid = getUUID(request)
+  user = User.fromUUID(user_uuid)
+  mpg_array = request.json['mpg_array']
+  return user.setMpgArray(mpg_array)
+
+
 @post('/profile/consent')
 def setConsentInProfile():
   user_uuid = getUUID(request)
