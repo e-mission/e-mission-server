@@ -249,13 +249,6 @@ class TestCarbon(unittest.TestCase):
     footprintMap = carbon.getCarbonFootprintsForMap(testDistanceMap, testModeFootprintMap)
     self.assertEqual(footprintMap, {'a': 0.001, 'b': 0.004, 'c': 0.009})
 
-  def testGetCarbonFootprintsForMap(self):
-    testDistanceMap = {'a': 1, 'b': 2, 'c': 3}
-    testModeFootprintMap = {'a': 1, 'b': 2, 'c': 3}
-
-    footprintMap = carbon.getCarbonFootprintsForMap(testDistanceMap, testModeFootprintMap)
-    self.assertEqual(footprintMap, {'a': 0.001, 'b': 0.004, 'c': 0.009})
-
   def testAvgCalculation(self):
     testMap = {'a': 5, 'b': 10, 'c': 15, 'd': 3, 'e': 7, 'f': 13}
     avgTestMap = carbon.convertToAvg(testMap, 5)
