@@ -266,7 +266,7 @@ class TestMovesCollect(unittest.TestCase):
     self.assertEquals(newSec['trip_end_datetime'].hour, 19)
     self.assertEquals(newSec['place']['place_location']['coordinates'][0], -122)
 
-  def testFillTripWithValidData(self):
+  def testFillTripWithInvalidData(self):
     testMovesSec = {}
     testMovesSec['type'] = 'move'
     testMovesSec['place'] = {}
