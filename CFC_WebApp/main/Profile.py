@@ -6,6 +6,9 @@ from work_place import detect_work_office, detect_daily_work_office
 from get_database import get_section_db,get_profile_db
 from pygeocoder import Geocoder
 from common import calDistance 
+import math
+
+
 logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', level=logging.DEBUG)
 Profiles=get_profile_db()
 TOLERANCE = 200 #How much movement we allow before updating zip codes again. Should be pretty large.. this is conservative

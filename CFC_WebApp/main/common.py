@@ -6,8 +6,6 @@ from datetime import datetime, timedelta
 from dateutil import parser
 from pytz import timezone
 from get_database import get_mode_db, get_section_db, get_trip_db, get_test_db
-from userclient import getClientSpecificQueryFilter
-from dao.client import Client
 import math
 
 # from pylab import *
@@ -107,11 +105,6 @@ def getDistanceForMode(spec):
   totalDist = 0
   projection = {'distance': True, '_id': False}
   for section in get_section_db().find(spec, projection):
-#  for section in get_section_db().find(spec):
-#    logging.debug("found section %s" % section)
-#    logging.debug("found section with %s %s %s %s %s %s %s" %
-#       (section['trip_id'], section['section_id'], section['confirmed_mode'],
-#           section['user_id'], section['type'], section.get('auto_confirmed'), section.get('distance')))
     if section['distance']!=None:
         totalDist = totalDist + section['distance']
     else:
@@ -397,9 +390,9 @@ def Inside_polygon(pnt,poly):
 
     return inside
 
-# Consider passing in a time range as well. We could just do it right now,
-# but that might be over engineering
 def getClassifiedRatio(uuid, start, end):
+    from userclient import getClientSpecificQueryFilter
+
     defaultQueryList = [ {'source':'Shankari'},
                          {'user_id':uuid},
                          {'predicted_mode': { '$exists' : True } },
@@ -470,6 +463,7 @@ def getClassifiedRatio(uuid, start, end):
 #     # kml.save(filename+'.kml')
 
 def getConfirmationModeQuery(mode):
+  from dao.client import Client
   return {'$or': [{'corrected_mode': mode},
                   {'$and': [{'corrected_mode': {'$exists': False}}, {'confirmed_mode': mode}]}, 
                   {'$and': [{'corrected_mode': {'$exists': False}},
