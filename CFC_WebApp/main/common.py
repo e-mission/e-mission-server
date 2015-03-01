@@ -61,11 +61,7 @@ def getQuerySpec(user, modeId,start,end):
   return query
 
 def getTripCountForMode(user, modeId,start,end):
-  try:
-    return get_section_db().find(getQuerySpec(user, modeId,start,end)).count()
-  except:
-    logging.error("Got BSON error while calculating distances for user %s" % user)
-    return 0
+  return get_section_db().find(getQuerySpec(user, modeId,start,end)).count()
 
 def getModeShare(user,start,end):
   displayModeList = getDisplayModes()
@@ -108,25 +104,21 @@ def getDistanceForMode(spec):
   distanceList = []
   totalDist = 0
   projection = {'distance': True, '_id': False}
-  try:
-    for section in get_section_db().find(spec, projection):
+  for section in get_section_db().find(spec, projection):
   #  for section in get_section_db().find(spec):
   #    logging.debug("found section %s" % section)
   #    logging.debug("found section with %s %s %s %s %s %s %s" %
   #       (section['trip_id'], section['section_id'], section['confirmed_mode'],
   #           section['user_id'], section['type'], section.get('auto_confirmed'), section.get('distance')))
-      if section['distance']!=None:
-          totalDist = totalDist + section['distance']
-      else:
-          logging.warning("distance key not found in projection, returning zero...")
-        # returning zero for the distance
-          pass
-    # logging.debug("for sectionList %s, distanceList = %s" % (len(sectionList), distanceList))
-    distanceForMode = totalDist
-    return distanceForMode
-  except:
-    logging.error("Got BSON error while calculating distances for spec %s" % spec)
-    return 0
+    if section['distance']!=None:
+        totalDist = totalDist + section['distance']
+    else:
+        logging.warning("distance key not found in projection, returning zero...")
+      # returning zero for the distance
+        pass
+  # logging.debug("for sectionList %s, distanceList = %s" % (len(sectionList), distanceList))
+  distanceForMode = totalDist
+  return distanceForMode
 
 def generateRandomResult(category_list):
     result = {}

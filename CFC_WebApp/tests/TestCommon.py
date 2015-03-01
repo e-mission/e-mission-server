@@ -282,8 +282,6 @@ class TestCommon(unittest.TestCase):
             get_database.get_section_db()
         except:
             print "Exception thrown!"
-        # We don't throw any exception
-        self.assertEquals(common.getTripCountForMode(user.uuid, 5, self.dayago, self.now), 0)
         # although the database was called
         self.assertEquals(func1.called, True)
         func1.resetMock()
