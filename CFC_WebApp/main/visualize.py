@@ -41,16 +41,6 @@ def Commute_pop_route(modeId,start,end):
     commuteQuery = {"$or": [{'commute': 'to'}, {'commute': 'from'}]}
     modeQuery = {"$or": [{'mode': modeId}, getConfirmationModeQuery(modeId)]}
     dateTimeQuery = {"section_start_datetime": {"$gte": start, "$lt": end}}
-#     for section in Sections.find({"$and":[commuteQuery, modeQuery,dateTimeQuery,{'type':'move'}]}):
-#         if len(section['track_points']) > 5:
-#           # skip routes that have less than 3 points
-#           if section['commute'] == 'to':
-#             for pnt in section['track_points'][5:]:
-#                     list_of_point.append(pnt['track_location']['coordinates'])
-#           if section['commute'] == 'from':
-#             for pnt in section['track_points'][:-5]:
-#                     list_of_point.append(pnt['track_location']['coordinates'])
-
     for section in Sections.find({"$and":[modeQuery,dateTimeQuery,{'type':'move'}]}):
         if len(section['track_points']) > 5:
           # skip routes that have less than 3 points
