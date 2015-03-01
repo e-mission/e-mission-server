@@ -1,14 +1,14 @@
 import logging
-
 import unittest
 import json
 import sys
 import os
+import mock
 from utils import load_database_json, purge_database_json
 
 sys.path.append("%s" % os.getcwd())
+import get_database
 from main import common
-from get_database import get_db, get_section_db
 from uuid import UUID
 from datetime import datetime, timedelta
 
@@ -21,7 +21,7 @@ class TestCommon(unittest.TestCase):
     self.serverName = 'localhost'
 
     # Make sure we start with a clean slate every time
-    tests.common.dropAllCollections(get_db())
+    tests.common.dropAllCollections(get_database.get_db())
     
     # Load modes, otherwise the queries won't work properly
     load_database_json.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
@@ -75,7 +75,6 @@ class TestCommon(unittest.TestCase):
     from dao.user import User
     from dao.client import Client
     import tests.common
-    from get_database import get_section_db
 
     fakeEmail = "fake@fake.com"
 
@@ -107,11 +106,11 @@ class TestCommon(unittest.TestCase):
     clientSetQuery = Client(user.getFirstStudy()).clientSpecificSetters(user.uuid, dummySection, dummyPredModeMap)
 
     # Apply the change
-    get_section_db().update({'_id': dummySection['_id']}, clientSetQuery)
-    retrievedSection = get_section_db().find_one({'_id': dummySection['_id']})
+    get_database.get_section_db().update({'_id': dummySection['_id']}, clientSetQuery)
+    retrievedSection = get_database.get_section_db().find_one({'_id': dummySection['_id']})
     self.assertEqual(retrievedSection['test_auto_confirmed']['mode'], 1)
 
-    retrieveByQuery = get_section_db().find(common.getConfirmationModeQuery(1))
+    retrieveByQuery = get_database.get_section_db().find(common.getConfirmationModeQuery(1))
     for entry in retrieveByQuery:
       print entry
     self.assertEqual(retrieveByQuery.count(), 1)
@@ -123,18 +122,18 @@ class TestCommon(unittest.TestCase):
     clientSetQuery = Client(user.getFirstStudy()).clientSpecificSetters(user.uuid, dummySection, dummyPredModeMap)
 
     # Apply the change
-    get_section_db().update({'_id': dummySection['_id']}, clientSetQuery)
-    retrievedSection = get_section_db().find_one({'_id': dummySection['_id']})
+    get_database.get_section_db().update({'_id': dummySection['_id']}, clientSetQuery)
+    retrievedSection = get_database.get_section_db().find_one({'_id': dummySection['_id']})
     self.assertEqual(retrievedSection['test_auto_confirmed']['mode'], 1)
 
-    get_section_db().update({'_id': dummySection['_id']}, {'$set': {'confirmed_mode': 4}})
+    get_database.get_section_db().update({'_id': dummySection['_id']}, {'$set': {'confirmed_mode': 4}})
 
-    retrieveByQuery = get_section_db().find(common.getConfirmationModeQuery(1))
+    retrieveByQuery = get_database.get_section_db().find(common.getConfirmationModeQuery(1))
     for entry in retrieveByQuery:
       print entry
     self.assertEqual(retrieveByQuery.count(), 0)
 
-    retrieveByQuery = get_section_db().find(common.getConfirmationModeQuery(4))
+    retrieveByQuery = get_database.get_section_db().find(common.getConfirmationModeQuery(4))
     for entry in retrieveByQuery:
       print entry
     self.assertEqual(retrieveByQuery.count(), 1)
@@ -146,24 +145,24 @@ class TestCommon(unittest.TestCase):
     clientSetQuery = Client(user.getFirstStudy()).clientSpecificSetters(user.uuid, dummySection, dummyPredModeMap)
 
     # Apply the change
-    get_section_db().update({'_id': dummySection['_id']}, clientSetQuery)
-    retrievedSection = get_section_db().find_one({'_id': dummySection['_id']})
+    get_database.get_section_db().update({'_id': dummySection['_id']}, clientSetQuery)
+    retrievedSection = get_database.get_section_db().find_one({'_id': dummySection['_id']})
     self.assertEqual(retrievedSection['test_auto_confirmed']['mode'], 1)
 
-    get_section_db().update({'_id': dummySection['_id']}, {'$set': {'confirmed_mode': 4}})
-    get_section_db().update({'_id': dummySection['_id']}, {'$set': {'corrected_mode': 9}})
+    get_database.get_section_db().update({'_id': dummySection['_id']}, {'$set': {'confirmed_mode': 4}})
+    get_database.get_section_db().update({'_id': dummySection['_id']}, {'$set': {'corrected_mode': 9}})
 
-    retrieveByQuery = get_section_db().find(common.getConfirmationModeQuery(1))
+    retrieveByQuery = get_database.get_section_db().find(common.getConfirmationModeQuery(1))
     for entry in retrieveByQuery:
       print entry
     self.assertEqual(retrieveByQuery.count(), 0)
 
-    retrieveByQuery = get_section_db().find(common.getConfirmationModeQuery(4))
+    retrieveByQuery = get_database.get_section_db().find(common.getConfirmationModeQuery(4))
     for entry in retrieveByQuery:
       print entry
     self.assertEqual(retrieveByQuery.count(), 0)
 
-    retrieveByQuery = get_section_db().find(common.getConfirmationModeQuery(9))
+    retrieveByQuery = get_database.get_section_db().find(common.getConfirmationModeQuery(9))
     for entry in retrieveByQuery:
       print entry
     self.assertEqual(retrieveByQuery.count(), 1)
@@ -172,22 +171,22 @@ class TestCommon(unittest.TestCase):
     from dao.client import Client
 
     (user, dummySection, dummyPredModeMap) = self.setupClientTest()
-    get_section_db().update({'_id': dummySection['_id']}, {'$set': {'confirmed_mode': 4}})
+    get_database.get_section_db().update({'_id': dummySection['_id']}, {'$set': {'confirmed_mode': 4}})
 
-    retrieveByQuery = get_section_db().find(common.getConfirmationModeQuery(1))
+    retrieveByQuery = get_database.get_section_db().find(common.getConfirmationModeQuery(1))
     self.assertEqual(retrieveByQuery.count(), 0)
 
-    retrieveByQuery = get_section_db().find(common.getConfirmationModeQuery(4))
+    retrieveByQuery = get_database.get_section_db().find(common.getConfirmationModeQuery(4))
     self.assertEqual(retrieveByQuery.count(), 1)
 
   def testConfirmationModeQueryNeither(self):
     from dao.client import Client
 
     (user, dummySection, dummyPredModeMap) = self.setupClientTest()
-    retrieveByQuery = get_section_db().find(common.getConfirmationModeQuery(1))
+    retrieveByQuery = get_database.get_section_db().find(common.getConfirmationModeQuery(1))
     self.assertEqual(retrieveByQuery.count(), 0)
 
-    retrieveByQuery = get_section_db().find(common.getConfirmationModeQuery(4))
+    retrieveByQuery = get_database.get_section_db().find(common.getConfirmationModeQuery(4))
     self.assertEqual(retrieveByQuery.count(), 0)
 
   @staticmethod
@@ -217,7 +216,7 @@ class TestCommon(unittest.TestCase):
         predSection['type'] = 'move'
         predSection['confirmed_mode'] = "5"
         predSection['user_id'] = user.uuid
-        get_section_db().insert(predSection)
+        get_database.get_section_db().insert(predSection)
 
         noPredSection = copy(dummySection)
         noPredSection['_id'] = "%s nopred" % (i)
@@ -225,10 +224,10 @@ class TestCommon(unittest.TestCase):
         noPredSection['user_id'] = user.uuid
         del noPredSection['predicted_mode']
         self.assertIn('predicted_mode', predSection)
-        get_section_db().insert(noPredSection)
+        get_database.get_section_db().insert(noPredSection)
 
-    logging.debug("After inserting sections, count is %s" % get_section_db().find().count())
-    logging.debug("Manual query count = %s" % get_section_db().find({'$and': [{'source': 'Shankari'}, {'user_id': user.uuid}, {'predicted_mode': {'$exists': True}}, {'type': 'move'}]}).count())
+    logging.debug("After inserting sections, count is %s" % get_database.get_section_db().find().count())
+    logging.debug("Manual query count = %s" % get_database.get_section_db().find({'$and': [{'source': 'Shankari'}, {'user_id': user.uuid}, {'predicted_mode': {'$exists': True}}, {'type': 'move'}]}).count())
     self.assertEqual(common.getClassifiedRatio(user.uuid, self.dayago, self.now), 1)
 
   def testGetClassifiedRatioWithPredictions(self):
@@ -245,7 +244,7 @@ class TestCommon(unittest.TestCase):
         predSection['type'] = 'move'
         predSection['confirmed_mode'] = "5"
         predSection['user_id'] = user.uuid
-        get_section_db().insert(predSection)
+        get_database.get_section_db().insert(predSection)
 
         noPredSection = copy(dummySection)
         noPredSection['_id'] = "%s nopred" % (i)
@@ -258,15 +257,36 @@ class TestCommon(unittest.TestCase):
         self.assertIn('predicted_mode', predSection)
         self.assertIn('predicted_mode', noPredSection)
         self.assertIn('confirmed_mode', predSection)
-        get_section_db().insert(noPredSection)
+        get_database.get_section_db().insert(noPredSection)
 
-    logging.debug("After inserting sections, count is %s" % get_section_db().find().count())
-    logging.debug("Manual query count = %s" % get_section_db().find({'$and': [{'source': 'Shankari'}, {'user_id': user.uuid}, {'predicted_mode': {'$exists': True}}, {'type': 'move'}]}).count())
-    logging.debug("Manual query count classified = %s" % get_section_db().find({'$and': [{'source': 'Shankari'}, {'user_id': user.uuid}, {'predicted_mode': {'$exists': True}}, {'type': 'move'}, {'confirmed_mode': {"$ne": ''}} ]}).count())
+    logging.debug("After inserting sections, count is %s" % get_database.get_section_db().find().count())
+    logging.debug("Manual query count = %s" % get_database.get_section_db().find({'$and': [{'source': 'Shankari'}, {'user_id': user.uuid}, {'predicted_mode': {'$exists': True}}, {'type': 'move'}]}).count())
+    logging.debug("Manual query count classified = %s" % get_database.get_section_db().find({'$and': [{'source': 'Shankari'}, {'user_id': user.uuid}, {'predicted_mode': {'$exists': True}}, {'type': 'move'}, {'confirmed_mode': {"$ne": ''}} ]}).count())
 
     self.assertEqual(common.getClassifiedRatio(user.uuid, self.dayago, self.now), 3.0/6)
     two_days_ago = datetime.now() - timedelta(days=2)
     self.assertEqual(common.getClassifiedRatio(user.uuid, two_days_ago, self.dayago), 0)
+
+  def testBSONExceptionHandling(self):
+    (user, dummySection, dummyPredModeMap) = self.setupClientTest()
+    # This mock test only works if the access to the mocked function is in
+    # here, not in common. I found this entry on stackoverflow on mocking
+    # module methods, but trying the appropriate sequence in the REPL still
+    # doesn't work. I think that this might be because of the multiple copies
+    # of get_database, so that the get_database loaded from common is not the
+    # same as the get_database loaded here.
+    # So I will leave this half-baked test in here, and will return to it after
+    # fixing the mess around get_database loading
+    with mock.patch('get_database.get_section_db', side_effect=Exception("bson.errors.InvalidDocument")) as func1:
+        try:
+            get_database.get_section_db()
+        except:
+            print "Exception thrown!"
+        # We don't throw any exception
+        self.assertEquals(common.getTripCountForMode(user.uuid, 5, self.dayago, self.now), 0)
+        # although the database was called
+        self.assertEquals(func1.called, True)
+        func1.resetMock()
 
 if __name__ == '__main__':
     unittest.main()

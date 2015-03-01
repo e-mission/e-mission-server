@@ -4,9 +4,8 @@ from home import detect_home
 from work_place import detect_daily_work_office
 from get_database import get_section_db
 from common import Is_date, Is_place
-from tripManager import travel_time
 from dateutil import parser
-from common import parse_time
+from common import parse_time, travel_time
 
 ########################################## morning commute ########################################################
 def get_daily_morning_commute_sections(user_id,day):

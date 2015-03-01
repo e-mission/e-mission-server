@@ -167,10 +167,10 @@ def label_filtered_section(section):
 def fillTripWithMovesData(trip_from_moves, new_trip):
   # logging.debug("trip_from_moves = %s" % trip_from_moves)
   new_trip['type'] = trip_from_moves["type"] if 'type' in trip_from_moves else "unknown"
-  new_trip['trip_start_time'] = trip_from_moves["startTime"]
-  new_trip['trip_end_time'] = trip_from_moves["endTime"]
-  new_trip['trip_start_datetime'] = parser.parse(trip_from_moves["startTime"])
-  new_trip['trip_end_datetime'] = parser.parse(trip_from_moves["endTime"])
+  new_trip['trip_start_time'] = trip_from_moves["startTime"] if "startTime" in trip_from_moves else ""
+  new_trip['trip_end_time'] = trip_from_moves["endTime"] if "endTime" in trip_from_moves else "" 
+  new_trip['trip_start_datetime'] = parser.parse(trip_from_moves["startTime"]) if "startTime" in trip_from_moves else None
+  new_trip['trip_end_datetime'] = parser.parse(trip_from_moves["endTime"]) if "endTime" in trip_from_moves else None
   new_trip['place'] = {'place_id':    trip_from_moves["place"]["id"],
                       'place_type':   trip_from_moves["place"]["type"],
                       'place_location':{'type':'Point',

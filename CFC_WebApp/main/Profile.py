@@ -6,6 +6,11 @@ from work_place import detect_work_office, detect_daily_work_office
 from get_database import get_section_db,get_profile_db
 from pygeocoder import Geocoder
 from common import calDistance 
+import math
+from route_matching import update_user_routeDistanceMatrix, update_user_routeClusters
+from K_medoid_2 import kmedoids, user_route_data
+
+
 logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', level=logging.DEBUG)
 Profiles=get_profile_db()
 TOLERANCE = 200 #How much movement we allow before updating zip codes again. Should be pretty large.. this is conservative
@@ -45,6 +50,11 @@ def update_profiles(dummy_users=False):
             key='work'+str(day)
             Profiles.update({"$and":[{'source':'Shankari'},
                                          {'user_id':user}]},{"$set":{key:detect_daily_work_office(user,day)}})
+        ## update route clusters:
+        routes_user = user_route_data(user,get_section_db())
+        update_user_routeDistanceMatrix(user,routes_user,step1=100000,step2=100000,method='DTW')
+        clusters_user = kmedoids(routes_user,int(math.ceil(len(routes_user)/8)),user,method='DTW')
+        update_user_routeClusters(user,clusters_user[2],method='DTW')
     # print(Profiles.find().count())
     # for profile in Profiles.find():
     #     print(profile)

@@ -133,5 +133,12 @@ class TestGamified(unittest.TestCase):
         self.assertEqual(gamified.getFileName(1.0, 2.0), "level_1_2.png")
         self.assertEqual(gamified.getFileName(1.055, 2), "level_1_2.png")
 
+    def testRunBackgroundTasksForDay(self):
+        self.assertEqual(gamified.getStoredScore(self.user), (0, 0))
+        components = gamified.runBackgroundTasks(self.user.uuid)
+        expectedScore = 0.75 * 50 + 30 * self.allDriveMinusMineExpect + 20 * 0.0 + \
+            10 * self.sb375DailyGoalMinusMineExpect
+        self.assertEqual(gamified.getStoredScore(self.user), (0, expectedScore))
+
 if __name__ == '__main__':
     unittest.main()

@@ -6,8 +6,6 @@ from datetime import datetime, timedelta
 from dateutil import parser
 from pytz import timezone
 from get_database import get_mode_db, get_section_db, get_trip_db, get_test_db
-from userclient import getClientSpecificQueryFilter
-from dao.client import Client
 import math
 
 # from pylab import *
@@ -63,7 +61,11 @@ def getQuerySpec(user, modeId,start,end):
   return query
 
 def getTripCountForMode(user, modeId,start,end):
-  return get_section_db().find(getQuerySpec(user, modeId,start,end)).count()
+  try:
+    return get_section_db().find(getQuerySpec(user, modeId,start,end)).count()
+  except:
+    logging.error("Got BSON error while calculating distances for user %s" % user)
+    return 0
 
 def getModeShare(user,start,end):
   displayModeList = getDisplayModes()
@@ -106,21 +108,25 @@ def getDistanceForMode(spec):
   distanceList = []
   totalDist = 0
   projection = {'distance': True, '_id': False}
-  for section in get_section_db().find(spec, projection):
-#  for section in get_section_db().find(spec):
-#    logging.debug("found section %s" % section)
-#    logging.debug("found section with %s %s %s %s %s %s %s" %
-#       (section['trip_id'], section['section_id'], section['confirmed_mode'],
-#           section['user_id'], section['type'], section.get('auto_confirmed'), section.get('distance')))
-    if section['distance']!=None:
-        totalDist = totalDist + section['distance']
-    else:
-        logging.warning("distance key not found in projection, returning zero...")
-      # returning zero for the distance
-        pass
-  # logging.debug("for sectionList %s, distanceList = %s" % (len(sectionList), distanceList))
-  distanceForMode = totalDist
-  return distanceForMode
+  try:
+    for section in get_section_db().find(spec, projection):
+  #  for section in get_section_db().find(spec):
+  #    logging.debug("found section %s" % section)
+  #    logging.debug("found section with %s %s %s %s %s %s %s" %
+  #       (section['trip_id'], section['section_id'], section['confirmed_mode'],
+  #           section['user_id'], section['type'], section.get('auto_confirmed'), section.get('distance')))
+      if section['distance']!=None:
+          totalDist = totalDist + section['distance']
+      else:
+          logging.warning("distance key not found in projection, returning zero...")
+        # returning zero for the distance
+          pass
+    # logging.debug("for sectionList %s, distanceList = %s" % (len(sectionList), distanceList))
+    distanceForMode = totalDist
+    return distanceForMode
+  except:
+    logging.error("Got BSON error while calculating distances for spec %s" % spec)
+    return 0
 
 def generateRandomResult(category_list):
     result = {}
@@ -397,9 +403,9 @@ def Inside_polygon(pnt,poly):
 
     return inside
 
-# Consider passing in a time range as well. We could just do it right now,
-# but that might be over engineering
 def getClassifiedRatio(uuid, start, end):
+    from userclient import getClientSpecificQueryFilter
+
     defaultQueryList = [ {'source':'Shankari'},
                          {'user_id':uuid},
                          {'predicted_mode': { '$exists' : True } },
@@ -470,6 +476,7 @@ def getClassifiedRatio(uuid, start, end):
 #     # kml.save(filename+'.kml')
 
 def getConfirmationModeQuery(mode):
+  from dao.client import Client
   return {'$or': [{'corrected_mode': mode},
                   {'$and': [{'corrected_mode': {'$exists': False}}, {'confirmed_mode': mode}]}, 
                   {'$and': [{'corrected_mode': {'$exists': False}},
