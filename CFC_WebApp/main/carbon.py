@@ -109,24 +109,32 @@ def delLongMotorizedModes(modeDistanceMap):
   logging.debug("At the end of delLongMotorizedModes, the distance map was %s" % modeDistanceMap)
 
 def getFootprintCompare(user):
+  """
+    The user is assumed to be a user object, not a UUID
+  """
+  assert(isinstance(user, User))
   now = datetime.now()
   weekago = now - timedelta(days=7)
   return getFootprintCompareForRange(user, weekago, now)
 
-def getFootprintCompareForRange(user, start, end):
-  userObj = User.fromUUID(user)
+def getFootprintCompareForRange(userObj, start, end):
+  """
+    The input userObj is assumed to be a user object, not a UUID
+  """
+  assert(isinstance(userObj, User))
   myCarbonFootprintForMode = userObj.getCarbonFootprintForMode()
+  user_uuid = userObj.uuid
 
-  myModeShareCount = getModeShare(user, start,end)
+  myModeShareCount = getModeShare(user_uuid, start,end)
   totalModeShareCount = getModeShare(None, start,end)
   logging.debug("myModeShareCount = %s totalModeShareCount = %s" %
       (myModeShareCount, totalModeShareCount))
 
-  myModeShareDistance = getModeShareDistance(user,start,end)
+  myModeShareDistance = getModeShareDistance(user_uuid,start,end)
   totalModeShareDistance = getModeShareDistance(None, start,end)
   logging.debug("myModeShareDistance = %s totalModeShareDistance = %s" %
       (myModeShareDistance, totalModeShareDistance))
-  myShortLongModeShareDistance = getShortLongModeShareDistance(user, start, end)
+  myShortLongModeShareDistance = getShortLongModeShareDistance(user_uuid, start, end)
   totalShortLongModeShareDistance = getShortLongModeShareDistance(None, start, end)
 
   myModeCarbonFootprint = getCarbonFootprintsForMap(myShortLongModeShareDistance, myCarbonFootprintForMode)
@@ -152,7 +160,7 @@ def getFootprintCompareForRange(user, start, end):
   # Hack to prevent divide by zero on an empty DB.
   # We will never really have an empty DB in the real production world,
   # but shouldn't crash in that case.
-  # This is pretty safe because if we have no users, we won't have any modeCarbonFootprint either
+  # This is pretty safe because if we have no user_uuids, we won't have any modeCarbonFootprint either
   if nUsers == 0:
     nUsers = 1
 

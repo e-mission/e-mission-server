@@ -36,7 +36,7 @@ def getScoreComponents(user_uuid, start, end):
   # confidence trips, so don't need to handle those here
   user = User.fromUUID(user_uuid)
 
-  pctClassified = common.getClassifiedRatio(user, start, end)
+  pctClassified = common.getClassifiedRatio(user_uuid, start, end)
 
   (myModeShareCount, avgModeShareCount,
    myModeShareDistance, avgModeShareDistance,
