@@ -34,7 +34,7 @@ hack_client_key = key_data["ios_client_key"]
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes
 
-skipAuth = True
+skipAuth = False
 
 app = app()
 
