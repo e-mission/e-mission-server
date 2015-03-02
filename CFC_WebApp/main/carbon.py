@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from dao.user import User
 from common import getDistinctUserCount, getAllModes, getDisplayModes, getQuerySpec, addFilterToSpec, getTripCountForMode, getModeShare, getDistanceForMode,\
     getModeShareDistance, convertToAvg
+from uuid import UUID
 
 # Although air is a motorized mode, we don't include it here because there is
 # not much point in finding < 5 km air trips to convert to non motorized trips
@@ -108,22 +109,22 @@ def delLongMotorizedModes(modeDistanceMap):
       delModeNameWithSuffix(mode, "_long", modeDistanceMap)
   logging.debug("At the end of delLongMotorizedModes, the distance map was %s" % modeDistanceMap)
 
-def getFootprintCompare(user):
+def getFootprintCompare(user_uuid):
   """
-    The user is assumed to be a user object, not a UUID
+    The user is assumed to be a UUID, not a User object
   """
-  assert(isinstance(user, User))
+  assert(not isinstance(user_uuid, User))
   now = datetime.now()
   weekago = now - timedelta(days=7)
-  return getFootprintCompareForRange(user, weekago, now)
+  return getFootprintCompareForRange(user_uuid, weekago, now)
 
-def getFootprintCompareForRange(userObj, start, end):
+def getFootprintCompareForRange(user_uuid, start, end):
   """
-    The input userObj is assumed to be a user object, not a UUID
+    The input userObj is assumed to be a UUID, not a User object
   """
-  assert(isinstance(userObj, User))
+  assert(not isinstance(user_uuid, User))
+  userObj = User.fromUUID(user_uuid)
   myCarbonFootprintForMode = userObj.getCarbonFootprintForMode()
-  user_uuid = userObj.uuid
 
   myModeShareCount = getModeShare(user_uuid, start,end)
   totalModeShareCount = getModeShare(None, start,end)
@@ -226,7 +227,9 @@ def getSummaryAllTrips(start,end):
           "EO 2050 goal (80% below 1990)": 8.28565
          }
 
-def getAllDrive(user, modeDistanceMap):
+def getAllDrive(user_uuid, modeDistanceMap):
+  assert(not isinstance(user_uuid, User))
+  user = User.fromUUID(user_uuid)
   myCarbonFootprintForMode = user.getCarbonFootprintForMode()
   totalDistance = sum(modeDistanceMap.values()) / 1000
   return totalDistance * myCarbonFootprintForMode['car_short']

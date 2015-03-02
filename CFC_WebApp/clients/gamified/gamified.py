@@ -43,10 +43,10 @@ def getScoreComponents(user_uuid, start, end):
    myModeCarbonFootprint, avgModeCarbonFootprint,
    myModeCarbonFootprintNoLongMotorized, avgModeCarbonFootprintNoLongMotorized,
    myOptimalCarbonFootprint, avgOptimalCarbonFootprint,
-   myOptimalCarbonFootprintNoLongMotorized, avgOptimalCarbonFootprintNoLongMotorized) = carbon.getFootprintCompareForRange(user, start, end)
+   myOptimalCarbonFootprintNoLongMotorized, avgOptimalCarbonFootprintNoLongMotorized) = carbon.getFootprintCompareForRange(user.uuid, start, end)
 
   carbon.delLongMotorizedModes(myModeShareDistance)
-  myAllDrive = carbon.getAllDrive(user, myModeShareDistance)
+  myAllDrive = carbon.getAllDrive(user.uuid, myModeShareDistance)
   myCarbonFootprintSum = sum(myModeCarbonFootprintNoLongMotorized.values())
   myOptimalFootprintSum = sum(myOptimalCarbonFootprintNoLongMotorized.values())
   logging.debug("myCarbonFootprintSum = %s, myOptimalFootprintSum = %s, myAllDrive = %s" %

@@ -54,7 +54,7 @@ class TestDefault(unittest.TestCase):
         test_uuid = self.uuid_list[0]
         test_user = User.fromUUID(test_uuid)
         self.assertNotIn('carbon_footprint', test_user.getProfile().keys())
-        default.runBackgroundTasks(self.uuid_list[0])
+        default.runBackgroundTasks(test_user.uuid)
         self.assertIn('carbon_footprint', test_user.getProfile().keys())
 
 if __name__ == '__main__':

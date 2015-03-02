@@ -141,7 +141,9 @@ class TestGamified(unittest.TestCase):
         components = gamified.runBackgroundTasks(self.user.uuid)
         expectedScore = 0.75 * 50 + 30 * self.allDriveMinusMineExpect + 20 * 0.0 + \
             10 * self.sb375DailyGoalMinusMineExpect
-        self.assertEqual(gamified.getStoredScore(self.user), (0, expectedScore))
+        storedScore = gamified.getStoredScore(self.user)
+        self.assertEqual(storedScore[0], 0)
+        self.assertAlmostEqual(storedScore[1], expectedScore, 6)
 
 if __name__ == '__main__':
     unittest.main()

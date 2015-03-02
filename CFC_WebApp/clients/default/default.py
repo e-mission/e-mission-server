@@ -59,6 +59,7 @@ def runBackgroundTasks(user_uuid):
 def runBackgroundTasksForDay(user_uuid, today):
   today_dt = datetime.combine(today, time.max)
   user = User.fromUUID(user_uuid)
+
   # carbon compare results is a tuple. Tuples are converted to arrays
   # by mongodb
   # In [44]: testUser.setScores(('a','b', 'c', 'd'), ('s', 't', 'u', 'v'))
