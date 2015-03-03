@@ -3,6 +3,9 @@ import logging
 
 from get_database import get_profile_db, get_pending_signup_db, get_uuid_db
 
+defaultCarFootprint = 278.0/1609
+defaultMpg = 8.91/(1.6093 * defaultCarFootprint) # Should be roughly 32
+
 class User:
   def __init__(self, uuid):
     self.uuid = uuid
@@ -55,13 +58,17 @@ class User:
 
   # Returns Average of MPG of all cars the user drives
   def getAvgMpg(self):
-    mpg_array = [92.0/1609]
-    if self.getProfile() != None:
+    mpg_array = [defaultMpg]
+    # All existing profiles will be missing the 'mpg_array' field.
+    # TODO: Might want to write a support script here to populate it for existing data
+    # and remove this additional check
+    if self.getProfile() != None and 'mpg_array' in self.getProfile():
         mpg_array = self.getProfile()['mpg_array']
     total = 0
     for mpg in mpg_array:
       total += mpg
     avg = total/len(mpg_array)
+    print "Returning total = %s, len = %s, avg = %s" % (total, len(mpg_array), avg)
     return avg
 
   # Stores Array of MPGs of all the cars the user drives.
@@ -152,7 +159,7 @@ class User:
     initProfileObj = {'user_id': uuid,
                       'source':'Shankari',
                       'update_ts': ts,
-                      'mpg_array': [92.0/1609]}
+                      'mpg_array': [defaultMpg]}
     writeResultProfile = get_profile_db().update(
         {'user_id': uuid},
         {'$set': initProfileObj,
