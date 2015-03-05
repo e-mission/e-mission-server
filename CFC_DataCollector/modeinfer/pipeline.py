@@ -1,18 +1,18 @@
 from pymongo import MongoClient
 import logging
-import datetime
+from datetime import datetime
+
 import sys
 import os
 
 # On the server, we've installed miniconda for now, so we are just going to add
 # it to the python path
-#sys.path.append("/home/ubuntu/miniconda/lib/python2.7/site-packages/")
-#sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
-#sys.path.append("%s" % os.getcwd())
-sys.path.append("../../CFC_WebApp/")
+sys.path.append("/home/ubuntu/miniconda/lib/python2.7/site-packages/")
+sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
+sys.path.append("%s" % os.getcwd())
+
 import numpy as np
 import scipy as sp
-import scipy.io
 from featurecalc import calDistance, calSpeed, calHeading, calAvgSpeed, calSpeeds, calAccels, getIthMaxSpeed, getIthMaxAccel, calHCR,\
 calSR, calVCR, mode_cluster, mode_start_end_coverage
 import time
@@ -42,42 +42,27 @@ class ModeInferencePipeline:
     (self.modeList, self.confirmedSections) = self.loadTrainingDataStep(allConfirmedTripsQuery)
     logging.debug("confirmedSections.count() = %s" % (self.confirmedSections.count()))
     
-    #commented out for now, because the training set is not large enough and there is some
-    #issue with this query, it doesn't load any sections for me
-    """
     if (self.confirmedSections.count() < minTrainingSetSize):
       logging.info("initial loadTrainingDataStep DONE")
       logging.debug("current training set too small, reloading from backup!")
       backupSections = MongoClient('localhost').Backup_database.Stage_Sections
       (self.modeList, self.confirmedSections) = self.loadTrainingDataStep(allConfirmedTripsQuery, backupSections)
-    """
     logging.info("loadTrainingDataStep DONE")
-    
     (self.bus_cluster, self.train_cluster) = self.generateBusAndTrainStopStep() 
     logging.info("generateBusAndTrainStopStep DONE")
-    
     (self.featureMatrix, self.resultVector) = self.generateFeatureMatrixAndResultVectorStep()
     logging.info("generateFeatureMatrixAndResultVectorStep DONE")
-    
-
     (self.cleanedFeatureMatrix, self.cleanedResultVector) = self.cleanDataStep()
     logging.info("cleanDataStep DONE")
-
     self.selFeatureIndices = self.selectFeatureIndicesStep()
     logging.info("selectFeatureIndicesStep DONE")
-
     self.selFeatureMatrix = self.cleanedFeatureMatrix[:,self.selFeatureIndices]
-    
-    scipy.io.savemat('original_data.mat', mdict={'X': self.cleanedFeatureMatrix, 'y': self.cleanedResultVector})
-    
-    
     self.model = self.buildModelStep()
     logging.info("buildModelStep DONE")
     toPredictTripsQuery = {"$and": [{'type': 'move'},
                                     ModeInferencePipeline.getModeQuery(''),
                                     {'predicted_mode': None}]}
     (self.toPredictFeatureMatrix, self.sectionIds, self.sectionUserIds) = self.generateFeatureMatrixAndIDsStep(toPredictTripsQuery)
-
     logging.info("generateFeatureMatrixAndIDsStep DONE")
     self.predictedProb = self.predictModesStep()
     logging.info("predictModesStep DONE")
@@ -166,6 +151,7 @@ class ModeInferencePipeline:
 
       # This will crash the script because we will try to access a record that
       # doesn't exist.
+
       # So we limit the records to the size of the matrix that we have created
       for (i, section) in enumerate(self.confirmedSections.limit(featureMatrix.shape[0]).batch_size(300)):
         self.updateFeatureMatrixRowWithSection(featureMatrix, i, section)
@@ -270,7 +256,6 @@ class ModeInferencePipeline:
       (np.count_nonzero(runIndices), np.count_nonzero(transportIndices),
       np.count_nonzero(mixedIndices), np.count_nonzero(unknownIndices),
       np.count_nonzero(strippedIndices)))
-    logging.info("savePredictionsStep DONE")
 
     strippedFeatureMatrix = self.featureMatrix[strippedIndices]
     strippedResultVector = self.resultVector[strippedIndices]
