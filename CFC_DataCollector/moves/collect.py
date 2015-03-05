@@ -10,6 +10,7 @@ from get_database import get_mode_db, get_section_db, get_trip_db, get_moves_db
 from time import sleep
 import numpy as np
 from sklearn import linear_model
+import math
 
 config_data = json.load(open('config.json'))
 log_base_dir = config_data['paths']['log_base_dir']
@@ -89,10 +90,75 @@ def fillSectionWithMovesData(sec_from_moves, newSec):
    newSec['duration'] = sec_from_moves["duration"] if "duration" in sec_from_moves else None
    newSec['distance'] = sec_from_moves["distance"] if "distance" in sec_from_moves else None
    newSec['original_points'] = [{'track_location':{'type':'Point', 'coordinates':[point["lon"],point["lat"]]}, 'time':point["time"]}for point in sec_from_moves["trackPoints"]] if "trackPoints" in sec_from_moves else []
-   print type(_cleanGPSData(newSec['original_points']))
    newSec['track_points'] = _cleanGPSData(newSec['original_points'])
    newSec['section_start_point'] = {'type':'Point', 'coordinates':[sec_from_moves['trackPoints'][0]["lon"],sec_from_moves['trackPoints'][0]["lat"]]} if ("trackPoints" in sec_from_moves and len(sec_from_moves['trackPoints'])>0) else None
    newSec['section_end_point'] = {'type':'Point', 'coordinates':[sec_from_moves['trackPoints'][-1]["lon"],sec_from_moves['trackPoints'][-1]["lat"]]} if ("trackPoints" in sec_from_moves and len(sec_from_moves['trackPoints'])>0) else None
+
+def calDistance(point1, point2):
+
+    earthRadius = 6371000
+    # SHANKARI: Why do we have two calDistance() functions?
+    # Need to combine into one
+    # points are now in geojson format (lng,lat)
+    dLat = math.radians(point1[1]-point2[1])
+    dLon = math.radians(point1[0]-point2[0])
+    lat1 = math.radians(point1[1])
+    lat2 = math.radians(point2[1])
+
+    a = (math.sin(dLat/2) ** 2) + ((math.sin(dLon/2) ** 2) * math.cos(lat1) * math.cos(lat2))
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    d = earthRadius * c
+
+    return d
+
+def max_Distance(points):
+    # 'track_points':[{'track_location':{'type':'Point', 'coordinates':[point["lat"],point["lon"]]}, 'time':point["time"]}for point in seg_act_note["trackPoints"]] if "trackPoints" in seg_act_note else []}
+    num_pts=len(points)
+    max_d=0
+    for i in range(num_pts):
+        for j in range(i+1,num_pts):
+            max_d=max(max_d,calDistance(points[i]['track_location']['coordinates'], points[j]['track_location']['coordinates']))
+    return max_d
+
+def travel_time(time1,time2):
+    start_time=parser.parse(time1)
+    end_time=parser.parse(time2)
+    travel_time = end_time-start_time
+    return travel_time.seconds
+
+def label_filtered_section(section):
+    minimum_travel_time=120
+    minimum_travel_distance=200
+    Modes=get_mode_db()
+    Sections=get_section_db()
+
+    is_retained = False
+    # logging.debug("Appending %s" % json.dumps(section))
+    if section['section_start_time']!=''and section['section_end_time']!=''and len(section['track_points'])>=2:
+        if travel_time(section['section_start_time'],section['section_end_time']) >= minimum_travel_time and \
+                        max_Distance(section['track_points']) >= minimum_travel_distance:
+            section['mode']=''.join(mode['mode_name'] for mode in Modes.find({"mode_id":section['mode']})) \
+                if type(section['mode'])!=type('aa') else section['mode']
+            is_retained =  True
+        else:
+            section['type'] ='not a trip'
+    elif section['section_start_time']!=''and section['section_end_time']!=''and len(section['track_points'])<2:
+        if travel_time(section['section_start_time'],section['section_end_time']) >= minimum_travel_time:
+            section['mode']=''.join(mode['mode_name'] for mode in Modes.find({"mode_id":section['mode']})) \
+                if type(section['mode'])!=type('aa') else section['mode']
+            is_retained =  True
+        else:
+            section['type'] ='not a trip'
+    elif (section['section_start_time']==''or section['section_end_time']=='') and len(section['track_points'])>=2:
+        if max_Distance(section['track_points']) >= minimum_travel_distance:
+            section['mode']=''.join(mode['mode_name'] for mode in Modes.find({"mode_id":section['mode']})) \
+                if type(section['mode'])!=type('aa') else section['mode']
+            is_retained =  True
+        else:
+            section['type'] ='not a trip'
+    else:
+        section['type'] ='not complete information'
+    section['retained'] = is_retained
 
 # The new trip will have some fields already filled in, notably, the ones
 # that we get from the trip information. We fill in the other information here.
@@ -104,10 +170,10 @@ def fillSectionWithMovesData(sec_from_moves, newSec):
 def fillTripWithMovesData(trip_from_moves, new_trip):
   # logging.debug("trip_from_moves = %s" % trip_from_moves)
   new_trip['type'] = trip_from_moves["type"] if 'type' in trip_from_moves else "unknown"
-  new_trip['trip_start_time'] = trip_from_moves["startTime"]
-  new_trip['trip_end_time'] = trip_from_moves["endTime"]
-  new_trip['trip_start_datetime'] = parser.parse(trip_from_moves["startTime"])
-  new_trip['trip_end_datetime'] = parser.parse(trip_from_moves["endTime"])
+  new_trip['trip_start_time'] = trip_from_moves["startTime"] if "startTime" in trip_from_moves else ""
+  new_trip['trip_end_time'] = trip_from_moves["endTime"] if "endTime" in trip_from_moves else "" 
+  new_trip['trip_start_datetime'] = parser.parse(trip_from_moves["startTime"]) if "startTime" in trip_from_moves else None
+  new_trip['trip_end_datetime'] = parser.parse(trip_from_moves["endTime"]) if "endTime" in trip_from_moves else None
   new_trip['place'] = {'place_id':    trip_from_moves["place"]["id"],
                       'place_type':   trip_from_moves["place"]["type"],
                       'place_location':{'type':'Point',
@@ -185,7 +251,7 @@ def processTripArray(user_uuid, trip_array):
                                      # if "group" in seg_act_note else '',
                                     }
                       fillSectionWithMovesData(seg_act_note, sections_todo)
-                      #print sections_todo['track_points']
+                      label_filtered_section(sections_todo)
                       # Now that we have created this section, let's insert it into the database
                       try:
                         logging.info("About to insert section with trip_id = %s,p section_id = %s, section_start_time = %s, type = %s and mode = %s " %
@@ -194,6 +260,7 @@ def processTripArray(user_uuid, trip_array):
                       except DuplicateKeyError:
                         logging.warning("DuplicateKeyError, skipping insert %s" % sections_todo)
                         logging.warning("Existing section is %s" % Stage_Sections.find_one({"_id": _id_section}))
+
                   except KeyError, e:
                     logging.warning("Missing key %s, skipping section insert %s" % (e, seg_act_note))
 

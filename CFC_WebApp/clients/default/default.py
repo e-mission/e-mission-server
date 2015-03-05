@@ -1,8 +1,8 @@
 import logging
 from main import carbon, stats
 from dao.user import User
-import time
-from datetime import datetime, timedelta
+import time as systime
+from datetime import datetime, time, timedelta
 import json
 
 # BEGIN: Code to get and set client specific fields in the profile (currentScore and previousScore)
@@ -57,14 +57,16 @@ def runBackgroundTasks(user_uuid):
   runBackgroundTasksForDay(user_uuid, today)
 
 def runBackgroundTasksForDay(user_uuid, today):
+  today_dt = datetime.combine(today, time.max)
   user = User.fromUUID(user_uuid)
+
   # carbon compare results is a tuple. Tuples are converted to arrays
   # by mongodb
   # In [44]: testUser.setScores(('a','b', 'c', 'd'), ('s', 't', 'u', 'v'))
   # In [45]: testUser.getScore()
   # Out[45]: ([u'a', u'b', u'c', u'd'], [u's', u't', u'u', u'v'])
-  weekago = today - timedelta(days=7)
-  carbonCompareResults = carbon.getFootprintCompareForRange(user_uuid, weekago, today)
+  weekago = today_dt - timedelta(days=7)
+  carbonCompareResults = carbon.getFootprintCompareForRange(user_uuid, weekago, today_dt)
   setCarbonFootprint(user, carbonCompareResults)
 
   (myModeShareCount, avgModeShareCount,
@@ -76,7 +78,7 @@ def runBackgroundTasksForDay(user_uuid, today):
   # We only compute server stats in the background, because including them in
   # the set call means that they may be invoked when the user makes a call and
   # the cached value is None, which would potentially slow down user response time
-  msNow = time.time()
+  msNow = systime.time()
   stats.storeResultEntry(user_uuid, stats.STAT_MY_CARBON_FOOTPRINT, msNow, getCategorySum(myModeCarbonFootprint))
   stats.storeResultEntry(user_uuid, stats.STAT_MY_CARBON_FOOTPRINT_NO_AIR, msNow, getCategorySum(myModeCarbonFootprintNoLongMotorized))
   stats.storeResultEntry(user_uuid, stats.STAT_MY_OPTIMAL_FOOTPRINT, msNow, getCategorySum(myOptimalCarbonFootprint))

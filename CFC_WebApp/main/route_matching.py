@@ -6,7 +6,7 @@ import numpy as np
 from Frechet import Frechet
 from LCS import lcs,lcsScore
 from DTW import Dtw,dynamicTimeWarp,DtwAsym,DtwSym
-import urllib,simplejson,csv
+import urllib,json,csv
 import xml.etree.cElementTree as ET
 import urllib2
 import time
@@ -273,7 +273,7 @@ def storeCalTrainStop():
             # print(add)
             url='https://maps.googleapis.com/maps/api/geocode/json?address='+urllib.quote_plus(row[0]+' caltrain station')
             print(url)
-            geo= simplejson.load(urllib.urlopen(url))
+            geo= json.load(urllib.urlopen(url))
             result=geo['results'][0]
             print(result['geometry']['location'])
             stops.append([result['geometry']['location']['lat'],result['geometry']['location']['lng']])

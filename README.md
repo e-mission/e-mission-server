@@ -120,7 +120,7 @@ TROUBLESHOOTING:
 
 1. If a python execution fails to import a module, make sure to add current directory to your PYTHONPATH. 
 
-1. If starting the server gives a CONNECTION_ERROR, make sure MongoDB is actively running when you attempt to start the server. Make sure to md c:\data\db\ if dbpath does not exist.
+1. If starting the server gives a CONNECTION\_ERROR, make sure MongoDB is actively running when you attempt to start the server. Make sure to md c:\data\db\ if dbpath does not exist.
 
 ## Design decisions: ##
 ----------
@@ -153,6 +153,21 @@ of the wsgiserver file.
 TODO: clean up later
 
     $ cp api/wsgiserver2.py <dist-packages>/cherrypy/wsgiserver/wsgiserver2.py
+
+Also, now that we decode the JWTs locally, we need to use the oauth2client,
+which requires the PyOpenSSL library. This can be installed on ubuntu using the
+python-openssl package, but then it is not accessible using the anaconda
+distribution. In order to enable it for the conda distribution as well, use
+
+    $ conda install pyopenssl
+
+Also, installing via `requirements.txt` does not appear to install all of the
+requirements for the google-api-client. If you get mysterious "Invalid token"
+errors for tokens that are correctly validated by the backup URL method, try to
+uninstall and reinstall with the --update option.
+
+    $ pip uninstall google-api-python-client
+    $ pip install --upgrade google-api-python-client
 
 [CFC_WebApp_Structure]: https://raw.github.com/amplab/e-mission-server/master/figs/CFC_WebApp_Structure.png
 [CFC_DataCollector_Structure]: https://raw.github.com/amplab/e-mission-server/master/figs/CFC_DataCollector_Structure.png
