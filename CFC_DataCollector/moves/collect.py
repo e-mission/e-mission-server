@@ -8,6 +8,8 @@ import json
 from dateutil import parser
 from get_database import get_mode_db, get_section_db, get_trip_db, get_moves_db
 from time import sleep
+import numpy as np
+from sklearn import linear_model
 
 config_data = json.load(open('config.json'))
 log_base_dir = config_data['paths']['log_base_dir']
@@ -87,6 +89,7 @@ def fillSectionWithMovesData(sec_from_moves, newSec):
    newSec['duration'] = sec_from_moves["duration"] if "duration" in sec_from_moves else None
    newSec['distance'] = sec_from_moves["distance"] if "distance" in sec_from_moves else None
    newSec['original_points'] = [{'track_location':{'type':'Point', 'coordinates':[point["lon"],point["lat"]]}, 'time':point["time"]}for point in sec_from_moves["trackPoints"]] if "trackPoints" in sec_from_moves else []
+   print type(_cleanGPSData(newSec['original_points']))
    newSec['track_points'] = _cleanGPSData(newSec['original_points'])
    newSec['section_start_point'] = {'type':'Point', 'coordinates':[sec_from_moves['trackPoints'][0]["lon"],sec_from_moves['trackPoints'][0]["lat"]]} if ("trackPoints" in sec_from_moves and len(sec_from_moves['trackPoints'])>0) else None
    newSec['section_end_point'] = {'type':'Point', 'coordinates':[sec_from_moves['trackPoints'][-1]["lon"],sec_from_moves['trackPoints'][-1]["lat"]]} if ("trackPoints" in sec_from_moves and len(sec_from_moves['trackPoints'])>0) else None
@@ -182,6 +185,7 @@ def processTripArray(user_uuid, trip_array):
                                      # if "group" in seg_act_note else '',
                                     }
                       fillSectionWithMovesData(seg_act_note, sections_todo)
+                      #print sections_todo['track_points']
                       # Now that we have created this section, let's insert it into the database
                       try:
                         logging.info("About to insert section with trip_id = %s,p section_id = %s, section_start_time = %s, type = %s and mode = %s " %
@@ -220,10 +224,10 @@ def processTripArray(user_uuid, trip_array):
       else:
           logging.debug("Found existing trip with trip_id = %s " % (trip_id))
 
-def _cleanGPSData(points):
-    if len(points) > 4:
-        points = np.array([[(datetime.datetime.strptime(point['time'].split('-')[0], "%Y%m%dT%H%M%S") - datetime.datetime(1970,1,1)).total_seconds(), 
-            point["track_location"]["coordinates"][0], point["track_location"]["coordinates"][1]] for point in points])
+def _cleanGPSData(old_points):
+    if len(old_points) > 4:
+        points = np.array([[(datetime.strptime(point['time'].split('-')[0], "%Y%m%dT%H%M%S") - datetime(1970,1,1)).total_seconds(), 
+            point["track_location"]["coordinates"][0], point["track_location"]["coordinates"][1]] for point in old_points])
         time_stamp = points[:,0].reshape(len(points[:,0]), 1)
         lon_lat = points[:,1:]
         model_ransac = linear_model.RANSACRegressor(linear_model.LinearRegression())
@@ -232,8 +236,8 @@ def _cleanGPSData(points):
         outlier_mask = np.logical_not(inlier_mask)
         print "total size: " + str(len(outlier_mask))
         remove = [index for index,v in enumerate(outlier_mask) if v]
-        return [v for j,v in enumerate(section["track_points"]) if j not in frozenset(remove)]
-    return []
+        return [v for j,v in enumerate(old_points) if j not in frozenset(remove)]
+    return old_points
 
 if __name__ == "__main__":
   collect()
