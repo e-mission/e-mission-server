@@ -275,8 +275,7 @@ def setStats():
   stats.setClientMeasurements(user_uuid, inStats)
 
 @post('/compare')
-# @get('/compare')
-def getCarbonCompare():
+def postCarbonCompare():
   from clients.default import default
 
   if request.json == None:
@@ -286,6 +285,26 @@ def getCarbonCompare():
     return "Waiting for user data to be become available.."
 
   user_uuid = getUUID(request)
+  clientResult = userclient.getClientSpecificResult(user_uuid)
+  if clientResult != None:
+    logging.debug("Found overriding client result for user %s, returning it" % user_uuid)
+    return clientResult
+  else:
+    logging.debug("No overriding client result for user %s, returning default" % user_uuid)
+  return default.getResult(user_uuid)
+
+@get('/compare')
+def getCarbonCompare():
+  for key, val in request.headers.items():
+    print("  %s: %s" % (key, val))
+
+  from clients.default import default
+  
+  if 'user' not in request.headers or request.headers.get('user') == '':
+    return "Waiting for user data to become available..."
+
+  user_uuid = getUUID(request, inHeader=True)
+  print ('UUID', user_uuid)
   clientResult = userclient.getClientSpecificResult(user_uuid)
   if clientResult != None:
     logging.debug("Found overriding client result for user %s, returning it" % user_uuid)
@@ -397,7 +416,7 @@ def getUUIDFromToken(token):
     user_uuid=user.uuid
     return user_uuid
 
-def getUUID(request):
+def getUUID(request, inHeader=False):
   retUUID = None
   if skipAuth:
     from uuid import UUID
@@ -410,7 +429,10 @@ def getUUID(request):
     retUUID = user_uuid
     logging.debug("skipAuth = %s, returning fake UUID %s" % (skipAuth, user_uuid))
   else:
-    userToken = request.json['user']
+    if inHeader:
+      userToken = request.headers.get('user').split()[1]
+    else:
+      userToken = request.json['user']
     retUUID = getUUIDFromToken(userToken)
   request.params.user_uuid = retUUID
   return retUUID
