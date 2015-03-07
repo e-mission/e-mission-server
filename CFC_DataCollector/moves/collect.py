@@ -292,17 +292,17 @@ def processTripArray(user_uuid, trip_array):
           logging.debug("Found existing trip with trip_id = %s " % (trip_id))
 
 def _cleanGPSData(old_points):
-    if len(old_points) > 4:
+    if len(old_points) > 10:
         points = np.array([[(datetime.strptime(point['time'].split('-')[0], "%Y%m%dT%H%M%S") - datetime(1970,1,1)).total_seconds(), 
             point["track_location"]["coordinates"][0], point["track_location"]["coordinates"][1]] for point in old_points])
         time_stamp = points[:,0].reshape(len(points[:,0]), 1)
         lon_lat = points[:,1:]
-        model_ransac = linear_model.RANSACRegressor(linear_model.LinearRegression())
+        model_ransac = linear_model.RANSACRegressor(linear_model.LinearRegression(), min_samples = 10)
         model_ransac.fit(lon_lat, time_stamp)
         inlier_mask = model_ransac.inlier_mask_
         outlier_mask = np.logical_not(inlier_mask)
-        print "total size: " + str(len(outlier_mask))
         remove = [index for index,v in enumerate(outlier_mask) if v]
+        print "removed points size: ",  remove
         return [v for j,v in enumerate(old_points) if j not in frozenset(remove)]
     return old_points
 
