@@ -78,9 +78,11 @@ fill them in
 or connect to it using the phone app
 
 1. Run unit tests
+
         $ cd CFC_WebApp
         $ python tests/TestCarbon.py
         $ python tests/TestTripManager.py
+
 You might get an ImportError for the module utils. In this case you have to add PYTHONPATH to have the current directory in it. Try running "PYTHONPATH=. python tests/TestCarbon.py" instead.
 
 1. If you need to run any of the backend scripts, copy the config.json and
