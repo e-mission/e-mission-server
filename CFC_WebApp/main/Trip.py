@@ -4,9 +4,10 @@ from googlemaps import GoogleMaps
 from pymongo import MongoClient
 import urllib2
 import xml.etree.ElementTree as ET
-API_KEY = "AIzaSyBBcTJ5g9sLrufvAE5BC_KhYZ5ecmbOUxU"
-gmaps = GoogleMaps(API_KEY)
+API_KEYS = ("AIzaSyBBcTJ5g9sLrufvAE5BC_KhYZ5ecmbOUxU")
+gmaps = GoogleMaps(API_KEYS[0])
 sectiondb = MongoClient().Stage_database.Stage_Sections
+
 
 def meters_to_miles(meters):
 	return meters * 0.000621371
@@ -38,13 +39,13 @@ class Leg(object):
 	"""Represents the leg of a trip"""
 	def __init__(self, trip_id):
 		self.trip_id = 0
-		self.starting_point = 0
-		self.ending_point = 0
+		self.starting_point = None
+		self.ending_point = None
 		self.mode = None
 		self.cost = 0
 		self.duration = 0
 		self.distance = 0
-		self.dirs = gmaps.directions(self.starting_point, self.ending_point)
+		self.dirs = None
 
 	def calc_cost(self):
 		if self.mode == "car":
@@ -57,4 +58,7 @@ class Leg(object):
 	def set_mode(self):
 		self.mode = self.dirs['routes'][0]['mode']
 
+
+	def get_dirs(starting_point, ending_point):
+		self.dirs = gmaps.directions(starting_point, ending_point)
 
