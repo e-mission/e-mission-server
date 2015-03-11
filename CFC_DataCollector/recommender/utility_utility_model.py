@@ -16,7 +16,7 @@
 
 from sklearn import linear_model as lm
 
-class UserModel:
+class UserUtilityModel:
   # TO DO:
   # - receive augmented trips as imput, don't call out to receive them
   # - store/retrive model from DB
