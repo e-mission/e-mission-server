@@ -1,3 +1,6 @@
+#maps team provided get_cost function
+from maps import get_cost
+import common
 class Trip: 
     //Instance parameters
     def __init__(self, single_mode, cost, legs, start_time, end_time, start_point, end_point, alternatives=[], augmented=False): 
@@ -15,16 +18,32 @@ class Trip:
         self.alternatives = alternatives
         self.augmented = False
 
+    @staticmethod
+    def trip_from_json(json_seg):
+        '''
+        parse json into proper trip format
+        '''
+        single_mode = get_single_mode()
+        cost = get_cost()
+        legs = get_legs()
+        #start_time = 
+        #end_time = 
+        #start_point = 
+        #end_point = 
+        if augmented:
+            return Trip(single_mode, cost, legs, start_time, end_time, start_point, end_point, alternatives, True)
+        return Trip(single_mode, cost, legs, start_time, end_time, start_point, end_point, alternatives, False)
+
     def get_duration():
         return
 
     def get_distance():
         return
 
+
 class Leg:
-       """Represents the leg of a trip"""
+    """Represents the leg of a trip"""
     def __init__(self, trip_id):
-        self.trip_id = 0
         self.starting_point = None
         self.ending_point = None
         self.mode = None
