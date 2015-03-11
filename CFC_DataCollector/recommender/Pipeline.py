@@ -26,4 +26,16 @@ def getTargetTrips(user_uuid, query_filter=""):
     Defaults to using all trips unless there is a filter specified """
     return TripFactory(user_uuid,query_filter)
 
+
+"""
+1  Find trips to improve
+2. Augment with alternatives
+3. Perturbe trips
+4. Augment perturbed trips
+5. Apply model to alternate and perturbed trips
+6. Return list of improved trips
+"""
+def buildRecommendedTrip(user_uuid, augmented_trips):
+	
+	return 
  
