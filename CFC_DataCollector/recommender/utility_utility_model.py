@@ -14,6 +14,7 @@
 # these trips are no longer static--in Phase 1, we can augment each trip with a
 # set of alternative routes. In Phase 2, this learning is time-dependent (think traffic).
 
+from get_database import get_utility_model_db
 from sklearn import linear_model as lm
 
 class UserUtilityModel:
@@ -21,11 +22,11 @@ class UserUtilityModel:
   # - receive augmented trips as imput, don't call out to receive them
   # - store/retrive model from DB
   # - define basic data structure
+  # - define get_utility_model in get_database
 
   # return user-specific weights for a given user based on logistic regression on
   # their past trips and potential alternatives
-  def calculateWeights(userID):
-    augmented_trips = getAugmentedTripsByUser(userID, tripFilter)
+  def __init__(user_id, augmented_trips):
     features = [extractFeatures(trip) for trip in augmented_trips]
 
     targets = []
@@ -35,9 +36,18 @@ class UserUtilityModel:
     weights = (0, 0, 0)
     return weights
 
-  # filter trips with no alternatives
-  def tripFilter(trip):
-    return trip.alternatives
+  # update existing model using existing trips
+  # for now, just create a new model and return it
+  def update(augmented_trips):
+    pass
+
+  def self.find_from_db(user_id):
+    return get_utility_model_db().find_one({'user_id': user_id})
+
+  def store_in_db():
+    model_query = {'user_id': self.user_id}
+    model_object = {'cost': self.cost, 'time': self.time, 'mode': self.mode, 'updated_at': datetime.now()}
+    get_utility_model_db().update(model_query, model_object, upsert = True)
 
   # TODO: move to trip.py
   # return an array of feature values for the given trip
