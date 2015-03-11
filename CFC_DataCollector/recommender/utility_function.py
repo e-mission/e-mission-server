@@ -16,28 +16,35 @@
 
 from sklearn import linear_model as lm
 
-# return user-specific weights for a given user based on logistic regression on
-# their past trips and potential alternatives
-def calculateWeights(userID):
-  augmented_trips = getAugmentedTripsByUser(userID, tripFilter)
-  features = [extractFeatures(trip) for trip in augmented_trips]
+class UserModel:
+  # TO DO:
+  # - receive augmented trips as imput, don't call out to receive them
+  # - store/retrive model from DB
+  # - define basic data structure
 
-  targets = []
-  regression = lm.LogisticRegression()
-  regression.fit(features, targets)
+  # return user-specific weights for a given user based on logistic regression on
+  # their past trips and potential alternatives
+  def calculateWeights(userID):
+    augmented_trips = getAugmentedTripsByUser(userID, tripFilter)
+    features = [extractFeatures(trip) for trip in augmented_trips]
 
-  weights = (0, 0, 0)
-  return weights
+    targets = []
+    regression = lm.LogisticRegression()
+    regression.fit(features, targets)
 
-# filter trips with no alternatives
-def tripFilter(trip):
-  return trip.alternatives
+    weights = (0, 0, 0)
+    return weights
 
-# return an array of feature values for the given trip
-# current features are cost, time, mode
-def extractFeatures(trip):
-  cost = trip.calc_cost()
-  time = trip.calc_time()
-  mode = trip.mode
+  # filter trips with no alternatives
+  def tripFilter(trip):
+    return trip.alternatives
 
-  return (cost, time, mode)
+  # TODO: move to trip.py
+  # return an array of feature values for the given trip
+  # current features are cost, time, mode
+  def extractFeatures(trip):
+    cost = trip.calc_cost()
+    time = trip.calc_time()
+    mode = trip.mode
+
+    return (cost, time, mode)
