@@ -23,4 +23,3 @@ def get_user_ids(filter_queries):
 get_user_ids(filter_queries)
 bare_trips = get_bare_trips(
 augment_trips()
-
