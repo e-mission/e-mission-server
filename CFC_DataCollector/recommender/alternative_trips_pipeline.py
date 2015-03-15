@@ -1,4 +1,5 @@
 import get_trips
+import googlemaps
 #import Profiles
 
 def alternative_trips(trip_list):
@@ -18,6 +19,7 @@ def get_user_ids(filter_queries):
     '''
     get a list of user ids
     '''
+
     return
 
 def get_alternative_trips(user_ID, trip_ID):
