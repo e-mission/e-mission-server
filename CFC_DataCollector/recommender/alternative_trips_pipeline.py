@@ -19,6 +19,7 @@ def get_user_ids(filter_queries):
     '''
     get a list of user ids
     '''
+
     return
 
 def get_alternative_trips(user_ID, trip_ID):
