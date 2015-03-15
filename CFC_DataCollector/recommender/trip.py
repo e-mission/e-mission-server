@@ -3,13 +3,13 @@ from common.featurecalc import get_cost
 
 class Trip(object): 
     //Instance parameters
-    def __init__(self, single_mode, cost, legs, start_time, end_time, start_point, end_point)
+    def __init__(self, single_mode, legs, cost, start_time, end_time, start_point, end_point):
         #may be useful for utility function, distinguishing between
         #multimodal classifier or single
         #contains the mode if only one, None if not
         self.single_mode = single_mode
-        #list of Activity objects for multi-mode trips 
-        self.cost = cost
+        #list of Activity objects for multi-mode trips
+        self.cost = cost 
         self.legs = legs
         self.start_time = start_time
         self.end_time = end_time
