@@ -50,12 +50,7 @@ def get_alternative_trips(user_ID, trip_ID):
 
     return []
 
-<<<<<<< HEAD
-get_user_ids(filter_queries)
-bare_trips = get_bare_trips()
-augment_trips()
-=======
+
 #get_user_ids(filter_queries)
 #bare_trips = get_bare_trips()
 #augment_trips()
->>>>>>> cbf956ef9552f3447f158fc4f5283d679b505f2d
