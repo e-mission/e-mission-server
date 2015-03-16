@@ -1,12 +1,14 @@
 import get_trips
-import googlemaps
+from common import store_trip_in_db
 #import Profiles
 
 def alternative_trips(trip_list):
     '''
     store trips to database
     '''
-    return    
+    for trip in trip_list:
+        store_trip_in_db(trip)
+    
 
 def get_bare_trips(user_ID, filter_queries):
     '''
@@ -30,5 +32,5 @@ def get_alternative_trips(user_ID, trip_ID):
     return
 
 get_user_ids(filter_queries)
-bare_trips = get_bare_trips(
+bare_trips = get_bare_trips()
 augment_trips()

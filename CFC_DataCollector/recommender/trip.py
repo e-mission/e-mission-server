@@ -1,9 +1,9 @@
 #maps team provided get_cost function
-from common.featurecalc import get_cost
+#from common.featurecalc import get_cost
 
 class Trip(object): 
-    //Instance parameters
-    def __init__(self, single_mode, legs, cost, start_time, end_time, start_point, end_point):
+    #Instance parameters
+    def __init__(self, single_mode, legs, cost, start_time, end_time, start_point, end_point, user_id, parent_tid):
         #may be useful for utility function, distinguishing between
         #multimodal classifier or single
         #contains the mode if only one, None if not
@@ -15,6 +15,8 @@ class Trip(object):
         self.end_time = end_time
         self.start_point = start_point
         self.end_point = end_point
+        self.user_id = user_id
+        self.parent_tid = parent_tid
 
     def get_duration():
         return
@@ -24,8 +26,8 @@ class Trip(object):
 
 class E_Mission_Trip(Trip):
     #augmented parameter necessary so that we don't try and find alternatives again for a trip which previously had none
-    def __init__(self, single_mode, cost, legs, start_time, end_time, start_point, end_point, alternatives=[], augmented=False): 
-        super(E_Mission_Trip, self).__init__(single_mode, cost, legs, start_time, end_time, start_point, end_point, alternatives=[], augmented=False): 
+    def __init__(self, single_mode, cost, legs, start_time, end_time, start_point, end_point, user_id, parent_tid, alternatives=[], augmented=False): 
+        super(E_Mission_Trip, self).__init__(single_mode, cost, legs, start_time, end_time, start_point, end_point, user_id, parent_tid)
         self.alternatives = alternatives
         self.augmented = augmented
     
