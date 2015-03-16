@@ -1,26 +1,26 @@
-import get_trips
-import Trip
+#import get_trips
+from trip import E_Mission_Trip
 #import Profiles
 
 def alternative_trips(trip_list):
     '''
     store trips to database
     '''
-    return
+    return []
 
-def get_bare_trips(user_ID, filter_queries):
+def get_user_trips(user_ID, filter_queries):
     '''
     get a list of user trips, using get_trips logic (filter? will produce canonical trip?)
 
     '''
-    return
+    return []
 
 def get_user_ids(filter_queries):
     '''
     get a list of user ids
     '''
 
-    return
+    return []
 
 def get_alternative_trips(user_ID, trip_ID):
     '''
@@ -43,8 +43,8 @@ def get_alternative_trips(user_ID, trip_ID):
                 totalDistance += step["distance"]["value"]
             legs.push(leg)
 
-    return
+    return []
 
-get_user_ids(filter_queries)
-bare_trips = get_bare_trips(
-augment_trips()
+#get_user_ids(filter_queries)
+#bare_trips = get_bare_trips()
+#augment_trips()
