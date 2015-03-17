@@ -141,11 +141,11 @@ def drawSection(section, option, gmap, Color = 'default'):
         for point in track_points:
             coordinate = point['track_location']['coordinates']
             
-            coordinate_tuple = tuple([coordinate[1], coordinate[0]])
+            coordinate_tuple = tuple([coordinate[0], coordinate[1]])
             path.append(coordinate_tuple)
             if option == POINTS or option == ALL:
                 # coordinates are in GeoJSON format, ie lng, lat
-                gmap.addpoint(coordinate[1], coordinate[0], color)
+                gmap.addpoint(coordinate[0], coordinate[1], color)
         if option == PATH or option == ALL:
             gmap.addpath(path, color)
 
@@ -156,7 +156,7 @@ def drawSections(sections,option, gmap, Color = 'default'):
 def compareTrips(section1, section2):
     startPoint = section1['section_start_point']['coordinates']
     # coordinates are in GeoJSON format, ie lng, lat
-    gmap = pygmaps.maps(startPoint[1], startPoint[0], 14)
+    gmap = pygmaps.maps(startPoint[0], startPoint[1], 14)
     drawSection(section1, PATH,gmap,COLOR[1])
     drawSection(section2, PATH,gmap,COLOR[4])
     gmap.draw('gmap_display/compare.html')

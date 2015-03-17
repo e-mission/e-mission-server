@@ -6,7 +6,7 @@ import numpy as np
 from Frechet import Frechet
 from LCS import lcs,lcsScore
 from DTW import Dtw,dynamicTimeWarp,DtwAsym,DtwSym
-import urllib,simplejson,csv
+import urllib,json,csv
 import xml.etree.cElementTree as ET
 import urllib2
 import time
@@ -216,6 +216,9 @@ def getRoute(section_id):
     return route
 
 def refineRoute(lst1,step):
+    if lst1 ==[]:
+        return lst1
+
     # print(len(lst1))
     lst1_extended=[]
     for i in range(len(lst1)-1):
@@ -273,7 +276,7 @@ def storeCalTrainStop():
             # print(add)
             url='https://maps.googleapis.com/maps/api/geocode/json?address='+urllib.quote_plus(row[0]+' caltrain station')
             print(url)
-            geo= simplejson.load(urllib.urlopen(url))
+            geo= json.load(urllib.urlopen(url))
             result=geo['results'][0]
             print(result['geometry']['location'])
             stops.append([result['geometry']['location']['lat'],result['geometry']['location']['lng']])
@@ -290,6 +293,9 @@ def existingMatchDistance(route1,route2,step1=100000,step2=100000,method='lcs',r
     # print(lst[0],lst[-1])
     # print(route)
     dis=999999
+    if len(route1) < 2 or len(route2) < 2:
+        return dis
+
     for start_route2 in range(len(route2)):
         coverage_start=find_near(route1,route2[start_route2],radius1)
         if coverage_start!=[]:
@@ -305,7 +311,13 @@ def existingMatchDistance(route1,route2,step1=100000,step2=100000,method='lcs',r
         end_route1=coverage_end[-1]
 
         if abs(start_route1-end_route1)>=1:
-        ## using DTW
+        ## using DTW Iteration
+            if method=='dtw':
+                if start_route1<end_route1:
+                    new_dis=dynamicTimeWarp(refineRoute(route1[start_route1:end_route1+1],step1),refineRoute(route2[start_route2:end_route2+1],step2),calDistance)
+                elif end_route1<start_route1:
+                    new_dis=dynamicTimeWarp(refineRoute(route1[end_route1:start_route1+1][::-1],step1),refineRoute(route2[start_route2:end_route2+1],step2),calDistance)
+        ## using DTW Recursion     
             if method=='DTW':
                 if start_route1<end_route1:
                     aa=Dtw(refineRoute(route1[start_route1:end_route1+1],step1),refineRoute(route2[start_route2:end_route2+1],step2),calDistance)
@@ -351,12 +363,18 @@ def existingMatchDistance(route1,route2,step1=100000,step2=100000,method='lcs',r
     return [start_route2,end_route2,dis]
 
 def fullMatchDistance(route1,route2,step1=100000,step2=100000,method='lcs',radius1=2000):
+    dis=999999
+    if len(route1) < 2 or len(route2) < 2:
+        return dis
     ## see how if "route1" can partially match with "route"
     ## will be mainly used in matching with transit route
     # print(lst[0],lst[-1])
     # print(route)
-    dis=999999
-## using DTW
+    
+## using DTW Iteration
+    if method=='dtw':
+        new_dis=dynamicTimeWarp(refineRoute(route1,step1),refineRoute(route2,step2),calDistance)
+## using DTW Recursion
     if method=='DTW':
         aa=Dtw(refineRoute(route1,step1),refineRoute(route2,step2),calDistance)
         new_dis=aa.calculate_distance()
@@ -414,7 +432,7 @@ def update_user_routeDistanceMatrix(user_id,data_feature,step1=100000,step2=1000
 
     # print(len(ids))
     for _id in ids:
-        print(a)
+        # print(a)
         a+=1
         for key in ids:
             try:
@@ -438,9 +456,10 @@ def update_user_routeClusters(user_id,clusters,method='lcs'):
 def plot_each_route_cluster_for_user(user_id,method='lcs'):
     i=0
     Sections = get_section_db()
-    user_route_clusters = get_routeCluster_db().find_one({'$and':[{'user':user_id},{'method':method}]})
+    user_route_clusters = get_routeCluster_db().find_one({'$and':[{'user':user_id},{'method':method}]})['clusters']
     # plot each cluster as a file.
     for idx in user_route_clusters.keys():
+        print idx
         gmap = pygmaps.maps(getRoute(idx)[0][0], getRoute(idx)[0][1], 14)
         section=Sections.find_one({'_id': idx})
         drawSection(section, 'path', gmap)

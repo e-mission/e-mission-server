@@ -20,22 +20,29 @@ def getDistinctUserCount():
 
 def get_userZipcode(user, valid_zip):
     location = detect_home_from_db(user)
+    # print location
     current_db = get_profile_db()
     user_pro = current_db.find_one({"$and":[{'source':'Shankari'},{'user_id':user}]})
-    if valid_zip and user_pro.get('zip'):
+    if valid_zip and user_pro.get('zip') != None:
         return user_pro['zip']
     elif location!='N/A':
         # Convert from our internal GeoJSON specific (lng, lat) to the (lat, lng)
         # format required by geocoder
-        return _geocodeZipcode(user_pro, location)
+        return _geocodeZipcode(location)
     else:
         return 'N/A'
 
-def _geocodeZipcode(user_pro, location):
-    zipcode = Geocoder.reverse_geocode(location[1],location[0])
-    zip=zipcode[0].postal_code
-    user_pro['zip'] = zip
-    return zip
+def _geocodeZipcode(location):
+    try:
+        zipcode = Geocoder.reverse_geocode(location[0],location[1])
+        zipc=zipcode[0].postal_code
+        # user_pro['zip'] = zip
+    except:
+        zipc = 'N/A'
+    if zipc == None:
+        zipc = 'N/A'
+    return zipc
+
 
 def getZipcode():
     Profiles=get_profile_db()

@@ -112,7 +112,7 @@ def dynamicTimeWarp(seqA, seqB, d = calDistance):
     #    for entry in row:
     #       print "%03d" % entry,
     #    print ""
-    return cost[-1][-1]
+    return cost[-1][-1]/(len(seqA) + len(seqB))
 
 class DtwSym(object):
     def __init__(self, seq1, seq2, distance_func=None):

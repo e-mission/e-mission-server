@@ -67,6 +67,9 @@ def kmedoids(data_feature, k, user_id,method='lcs'):
     5. repeat steps 2 to 4 until there is no change in the medoid.
     '''
 
+    if k >= len(data_feature):
+        return (0, [], {})
+
     disMat_user=get_routeDistanceMatrix_db().find_one({'$and':[{'user':user_id},{'method':method}]})['disMat']
 
     medoids_idx = random.sample([i for i in data_feature.keys()], k)
