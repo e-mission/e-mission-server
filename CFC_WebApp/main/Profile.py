@@ -23,7 +23,7 @@ def update_profiles(dummy_users=False):
     else:
         user_list = get_section_db().distinct('user_id')
     for user in user_list:
-        print user
+        # print user
         user_home=detect_home(user)
         zip_is_valid = _check_zip_validity(user_home, user)
         logging.debug('starting for %s' % user)
@@ -36,9 +36,9 @@ def update_profiles(dummy_users=False):
                                          {'user_id':user}]},{"$set":{'home':user_home}})
         user_work=detect_work_office(user)
         Profiles.update({"$and":[{'source':'Shankari'},{'user_id':user}]},{"$set":{'work_place':user_work}})
-        print user_home
+        # print user_home
         user_zip=get_userZipcode(user, zip_is_valid)
-        print user_zip
+        # print user_zip
         Profiles.update({"$and":[{'source':'Shankari'},{'user_id':user}]},{"$set":{'zip':user_zip}})
         if user_zip!='N/A':
             geoinfo= Geocoder.geocode(user_zip)
