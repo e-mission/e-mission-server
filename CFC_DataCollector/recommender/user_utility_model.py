@@ -19,22 +19,22 @@ from sklearn import linear_model as lm
 
 class UserUtilityModel:
   # TO DO:
-  # - receive augmented trips as imput, don't call out to receive them
-  # - store/retrive model from DB
   # - define basic data structure
   # - define get_utility_model in get_database
 
   # return user-specific weights for a given user based on logistic regression on
   # their past trips and potential alternatives
   def __init__(user_id, augmented_trips):
-    features = [extractFeatures(trip) for trip in augmented_trips]
-
-    targets = []
     regression = lm.LogisticRegression()
-    regression.fit(features, targets)
+    for trip in augmented_trips:
+      alternatives = trip.get_alternatives()
+      trip_features = trip.extract_features()
+      features = [trip_features] + [alt.extract_features() for alt in alternatives]
+      regression.fit(features, trip_features)
 
-    weights = (0, 0, 0)
-    return weights
+      # cross validation?
+
+    return regression.get_params()
 
   # update existing model using existing trips
   # for now, just create a new model and return it
@@ -52,7 +52,7 @@ class UserUtilityModel:
   # TODO: move to trip.py
   # return an array of feature values for the given trip
   # current features are cost, time, mode
-  def extractFeatures(trip):
+  def extract_features(trip):
     cost = trip.calc_cost()
     time = trip.calc_time()
     mode = trip.mode
