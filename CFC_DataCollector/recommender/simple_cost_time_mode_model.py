@@ -15,7 +15,6 @@ class SimpleCostTimeModeModel(UserUtilityModel):
     model_object = {'cost': self.cost, 'time': self.time, 'mode': self.mode, 'updated_at': datetime.now()}
     get_utility_model_db().update(model_query, model_object, upsert = True)
 
-  # return an array of feature values for the given trip
   # current features are cost, time, mode
   def extract_features(trip):
     cost = trip.calc_cost()
