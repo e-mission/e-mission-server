@@ -33,9 +33,6 @@ class UserUtilityModel:
       regression.fit(trip_features + alt_features, target_vector)
 
     self.coefficients = regression.coef_
-    self.cost = self.coefficients[0]
-    self.time = self.coefficients[1]
-    self.mode = self.coefficients[2]
 
   # update existing model using existing trips
   # for now, just create a new model and return it
@@ -53,17 +50,3 @@ class UserUtilityModel:
   def find_from_db(user_id):
     db_model = get_utility_model_db().find_one({'user_id': user_id})
     # contruct and return model using params from DB
-
-  def store_in_db():
-    model_query = {'user_id': self.user_id}
-    model_object = {'cost': self.cost, 'time': self.time, 'mode': self.mode, 'updated_at': datetime.now()}
-    get_utility_model_db().update(model_query, model_object, upsert = True)
-
-  # return an array of feature values for the given trip
-  # current features are cost, time, mode
-  def extract_features(trip):
-    cost = trip.calc_cost()
-    time = trip.calc_time()
-    mode = trip.mode
-
-    return (cost, time, mode)
