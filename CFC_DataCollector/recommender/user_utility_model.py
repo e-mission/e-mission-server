@@ -16,7 +16,6 @@
 
 from get_database import get_utility_model_db
 from sklearn import linear_model as lm
-
 class UserUtilityModel:
   # TO DO:
   # - define get_utility_model in get_database
