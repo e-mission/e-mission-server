@@ -9,14 +9,31 @@ class TripIterator:
     into the Google Maps API section
     """
 
+    """ filter_queries are a tuple ["module_name", "function_name"]
+    or ["module_name", "function_name", "options"] (see module.py)
+
+
+    *** for example, if we wanted the top 5 trips, we would pass in the query:
+        ["trips", "get top trips", 5]
+
+    *** note: some functions do not allow/have options
+
+    """
     def __init__(self, user_uuid, filterQuery):
         # Query section_db with queryList and
         # instantiate the cursor object
         # returned as an instance variable
-        mod, query = filter_queries[0], filter_queries[1]
-        query = query_modules.modules.get(mod).get(query)
-        if query:
-            return query(uid)
+        mod, query, options = filter_queries[0], filter_queries[1]
+        query_function = query_modules.modules.get(mod).get(query)
+
+        if query_function:
+            if len(filterQuery) == 3:
+                # options
+                option = filter_queries[2]
+                return query_function(uid, option)
+            else:
+                # no options
+                return query_function(uid)
         else:
             print "Your query ", query, "is not in the specified module: ", module
 
