@@ -1,28 +1,39 @@
-from userclient import getClientSpecificQueryFilter
-from get_database import get_section_db
+import os, sys
+sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
+from main.userclient import getClientSpecificQueryFilter
+from main.get_database import get_section_db
 
-class TripFactory:
+class TripIterator:
     """
     Extracts Trip objects that can be passed
     into the Google Maps API section
     """
-    
-    def __init__(self, user_uuid, queryList = []):                
-        # Query section_db with queryList and 
-        # instantiate the cursor object 
+
+    def __init__(self, user_uuid, filterQuery):
+        # Query section_db with queryList and
+        # instantiate the cursor object
         # returned as an instance variable
+        mod, query = filter_queries[0], filter_queries[1]
+        query = query_modules.modules.get(mod).get(query)
+        if query:
+            return query(uid)
+        else:
+            print "Your query ", query, "is not in the specified module: ", module
+
+        """
         clientSpecificQuery = getClientSpecificQueryFilter(user_uuid)
         completeQuery = clientSpecificQuery + queryList
         Sections = get_section_db()
         self.cur = Sections.find({"and": completeQuery})
+        """
 
     def __iter__(self):
         return self
-        
+
     def next(self):
-        # Get next record from cursor and 
-        # cast it to a Trip object, or one 
-        # of the Trip subclasses.        
+        # Get next record from cursor and
+        # cast it to a Trip object, or one
+        # of the Trip subclasses.
         trip = next(self.cur)
         if trip is None:
             return None
