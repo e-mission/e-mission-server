@@ -8,10 +8,10 @@ module_name { query_string: function_for_query }
 modules = {
    # Trip Module
    'trips': {
-   'get top': getTopTrips,
-   'get all': getAllTrips,
-   'get most recent': getRecentTrips,
-   'get trips by mode': getTripsThroughMode},
+   'get_top': getTopTrips,
+   'get_all': getAllTrips,
+   'get_most_recent': getRecentTrips,
+   'get_trips_by_mode': getTripsThroughMode},
 
    # Utility Module
    'utility': {},

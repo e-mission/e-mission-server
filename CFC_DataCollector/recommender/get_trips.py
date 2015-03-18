@@ -23,10 +23,12 @@ class TripIterator:
         # Query section_db with queryList and
         # instantiate the cursor object
         # returned as an instance variable
-        mod, query, options = filter_queries[0], filter_queries[1]
+        assert (len(filterQuery) >= 2), "filterQuery too short"
+
+        mod, query = filter_queries[0], filter_queries[1]
         query_function = query_modules.modules.get(mod).get(query)
 
-        if query_function:
+        try:
             if len(filterQuery) == 3:
                 # options
                 option = filter_queries[2]
@@ -34,8 +36,9 @@ class TripIterator:
             else:
                 # no options
                 return query_function(uid)
-        else:
-            print "Your query ", query, "is not in the specified module: ", module
+        except TypeError:
+            logging.warn("Found no query function for filterQuery: ", filterQuery);
+            return []
 
         """
         clientSpecificQuery = getClientSpecificQueryFilter(user_uuid)
