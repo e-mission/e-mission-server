@@ -1,17 +1,10 @@
 #maps team provided get_cost function
-<<<<<<< HEAD
 #from common.featurecalc import get_cost
 
 class Trip(object): 
     #Instance parameters
     def __init__(self, single_mode, legs, cost, start_time, end_time, start_point, end_point, user_id, parent_tid):
-=======
-#from featurecalc import get_cost
 
-class Trip(object): 
-    #Instance parameters
-    def __init__(self, _id, single_mode, legs, start_time, end_time, start_point, end_point):
->>>>>>> cbf956ef9552f3447f158fc4f5283d679b505f2d
         #may be useful for utility function, distinguishing between
         #multimodal classifier or single
         #contains the mode if only one, None if not
@@ -33,15 +26,10 @@ class Trip(object):
         return
 
 class E_Mission_Trip(Trip):
-<<<<<<< HEAD
-    #augmented parameter necessary so that we don't try and find alternatives again for a trip which previously had none
-    def __init__(self, single_mode, cost, legs, start_time, end_time, start_point, end_point, user_id, parent_tid, alternatives=[], augmented=False): 
-        super(E_Mission_Trip, self).__init__(single_mode, cost, legs, start_time, end_time, start_point, end_point, user_id, parent_tid)
-=======
+
     #if there are no alternatives found, set alternatives list to None 
     def __init__(self, _id, single_mode, legs, start_time, end_time, start_point, end_point, alternatives=[]): 
         super(E_Mission_Trip, self).__init__(_id, single_mode, legs, start_time, end_time, start_point, end_point, alternatives=[], augmented=False) 
->>>>>>> cbf956ef9552f3447f158fc4f5283d679b505f2d
         self.alternatives = alternatives
         self.augmented = augmented
     
@@ -72,5 +60,4 @@ class Leg:
         self.duration = 0
         self.distance = 0
         self.dirs = None
-
 
