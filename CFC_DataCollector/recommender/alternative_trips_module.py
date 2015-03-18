@@ -13,11 +13,11 @@ def calc_alternative_trips(trip_iterator):
 
 def store_alternative_trips(tripObj):
     # store populated tripObj with _id (concatenated trip id and user id)
-
+    return True
 
 def get_alternative_trips(_id):
     # User Utility Pipeline calls this to get alternatve trips for one original trip (_id)
-    
+    return []    
 
 
 #get_user_ids(filter_queries)

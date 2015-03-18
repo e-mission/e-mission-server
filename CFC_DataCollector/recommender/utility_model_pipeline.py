@@ -9,13 +9,13 @@ def get_training_trips(user_id, filter_function = None):
     #TODO: IMPLEMENT ME
     return []
 
-def build_user_model(user_id, augmented_trips):
+def build_user_model(user_id, trips):
   model = UserUtilityModel.find_from_db(user_id)
 
   if model:
-    model.update(augmented_trips)
+    model.update(trips, alternatives)
   else:
-    model = UserUtilityModel(augmented_trips)
+    model = UserUtilityModel(trips, alternatives)
 
   model.store_in_db()
   return model

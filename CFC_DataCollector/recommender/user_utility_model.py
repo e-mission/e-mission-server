@@ -22,21 +22,27 @@ class UserUtilityModel:
 
   # return user-specific weights for a given user based on logistic regression on
   # their past trips and potential alternatives
-  def __init__(augmented_trips = []):
-    regression = lm.LogisticRegression()
-    for trip in augmented_trips:
-      alternatives = trip.get_alternatives()
-      trip_features = trip.extract_features()
-      alt_features = [alt.extract_features() for alt in alternatives]
-      target_vector = [1] + ([0] * len(alternatives))
-      regression.fit(trip_features + alt_features, target_vector)
-
-    self.coefficients = regression.coef_
+  def __init__(trips = [], alternatives = []): # assuming alternatives a list of lists
+    assert(len(trips) == len(alternatives))
+    self.regression = lm.LogisticRegression()
+    self.update(trips, alternatives)
+    # for i in range(len(augmented_trips)):
+    #   trip_features = trips[i].extract_features()
+    #   alt_features = [alt.extract_features() for alt in alternatives[i]]
+    #   target_vector = [1] + ([0] * len(alternatives))
+    #   self.regression.fit(trip_features + alt_features, target_vector)
+    # self.coefficients = regression.coef_
 
   # update existing model using existing trips
   # for now, just create a new model and return it
-  def update(augmented_trips):
-    pass
+  def update(trips = [], alternatives = []):
+    assert(len(trips) == len(alternatives))
+    for i in range(len(augmented_trips)):
+      trip_features = trips[i].extract_features()
+      alt_features = [alt.extract_features() for alt in alternatives[i]]
+      target_vector = [1] + ([0] * len(alternatives))
+      self.regression.fit(trip_features + alt_features, target_vector)
+    self.coefficients = regression.coef_
 
   # calculate the utility of trip using the model
   def predict_utility(trip):
@@ -49,3 +55,13 @@ class UserUtilityModel:
   def find_from_db(user_id):
     db_model = get_utility_model_db().find_one({'user_id': user_id})
     # contruct and return model using params from DB
+
+  # store the object with the correct extracted features in the database
+  # must be filled out in subclass
+  def store_in_db():
+    pass
+
+  # return an array of feature values for the given trip
+  # must be filled out in subclass
+  def extract_features(trip):
+    pass
