@@ -14,7 +14,9 @@ modules = {
    'get_trips_by_mode': getTripsThroughMode},
 
    # Utility Module
-   'utility': {},
+   'utility': {
+        'get_training': getTrainingTrips
+    },
 
    #Pertubation Module
    'pertubation': {}
@@ -35,3 +37,10 @@ def getRecentTrips(uid, options = 10):
 
 def getTripsThroughMode(uid, options = 10):
     return[]
+
+# Returns the trips that are suitable for training
+# Currently this is:
+# - trips that have alternatives, and
+# - have not yet been included in a training set
+def getTrainingTrips(uid)
+    return []
