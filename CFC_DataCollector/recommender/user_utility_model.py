@@ -32,20 +32,21 @@ class UserUtilityModel:
       target_vector = [1] + ([0] * len(alternatives))
       regression.fit(trip_features + alt_features, target_vector)
 
-    coefficients = regression.coef_
-
-    self.cost = 0 # coefficients[0]
-    self.time = 0 # coefficients[1]
-    self.mode = 0 # coefficients[2]
+    self.coefficients = regression.coef_
+    self.cost = self.coefficients[0]
+    self.time = self.coefficients[1]
+    self.mode = self.coefficients[2]
 
   # update existing model using existing trips
   # for now, just create a new model and return it
   def update(augmented_trips):
     pass
 
-  # calculate the utility a trip using the model
-  def calculate_utility(trip):
-    pass
+  # calculate the utility of trip using the model
+  def predict_utility(trip):
+    trip_features = extract_features(trip)
+    utility = sum(f * c for f, c in zip(trip_features, self.coefficients))
+    return utility
 
   # find model params from DB and construct a model using these params
   @staticmethod
