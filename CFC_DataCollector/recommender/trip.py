@@ -27,8 +27,8 @@ class Trip(object):
 class E_Mission_Trip(Trip):
 
     #if there are no alternatives found, set alternatives list to None 
-    def __init__(self, _id, single_mode, legs, start_time, end_time, start_point, end_point, alternatives=[]): 
-        super(E_Mission_Trip, self).__init__(_id, single_mode, legs, start_time, end_time, start_point, end_point, alternatives=[], augmented=False) 
+    def __init__(self, _id, single_mode, legs, cost, start_time, end_time, start_point, end_point, alternatives=[], augmented=False): 
+        super(E_Mission_Trip, self).__init__(_id, single_mode, legs, cost, start_time, end_time, start_point, end_point) 
         self.alternatives = alternatives
         self.augmented = augmented
     
@@ -48,6 +48,20 @@ class E_Mission_Trip(Trip):
         #start_point = 
         #end_point = 
         return E_Mission_Trip(_id, single_mode, legs, start_time, end_time, start_point, end_point, alternatives)
+
+class Canonical_Trip(Trip):
+    #if there are no alternatives found, set alternatives list to None 
+    def __init__(self, _id, single_mode, legs, start_time, end_time, start_point, end_point, start_point_distr, end_point_distr, start_time_distr, end_time_distr, num_trips, alternatives = []):
+        super(Canonical_Trip, self).__init__(_id, single_mode, legs, start_time, end_time, start_point, end_point)
+        self.start_point_distr = start_point_distr
+        self.end_point_distr = end_point_distr
+        self.start_time_distr = start_time_distr
+        self.end_time_distr = end_time_distr
+        self.num_trips = num_trips
+        self.alternatives = alternatives
+    
+    def get_alternatives(self):
+        return self.alternatives
 
 class Alternative_Trip(Trip):
     def __init__(self, _id, single_mode, legs, start_time, end_time, start_point, end_point, trip_id, parent_id):

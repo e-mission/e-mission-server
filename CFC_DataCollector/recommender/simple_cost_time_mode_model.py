@@ -1,6 +1,7 @@
 # simple user utility model taking cost, time, and mode into account
 
 from get_database import get_utility_model_db
+from datetime import datetime
 
 class SimpleCostTimeModeModel(UserUtilityModel):
   def __init__(*args):
@@ -19,7 +20,7 @@ class SimpleCostTimeModeModel(UserUtilityModel):
   # current features are cost, time, mode
   def extract_features(trip):
     cost = trip.calc_cost()
-    time = trip.calc_time()
+    time = trip.end_time - trip.start_time    
     mode = trip.mode
 
     return (cost, time, mode)

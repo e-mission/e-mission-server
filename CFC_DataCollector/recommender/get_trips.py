@@ -1,7 +1,9 @@
-from userclient import getClientSpecificQueryFilter
-from get_database import get_section_db
+import os, sys
+sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
+from main.userclient import getClientSpecificQueryFilter
+from main.get_database import get_section_db
 
-class TripFactory:
+class TripIterator:
     """
     Extracts Trip objects that can be passed
     into the Google Maps API section

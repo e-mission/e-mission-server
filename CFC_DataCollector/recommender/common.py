@@ -2,8 +2,9 @@ from __future__ import division
 import urllib2
 import xml.etree.ElementTree as ET
 from get_database import get_section_db
-from datetime import datetime
+from datetime import datetime, timedelta
 import trip
+from trip import E_Mission_Trip
 
 
 def meters_to_miles(meters):
@@ -58,12 +59,18 @@ def test():
 
 def find_perturbed_trips(trip, delta=2):
     to_return = [ ]
-    time_delta = datetime.timedelta(minutes=delta)
-    fifteen_min = datetime.timedelta(minutes=15)
+    time_delta = timedelta(minutes=delta)
+    fifteen_min = timedelta(minutes=15)
     start = trip.start_time - fifteen_min
     end = trip.end_time + fifteen_min
     time = start
     while time < end:
-        new_trip = E_Mission_Trip(0, 0, 0, 0, time, 0, trip.start_point, trip.end_point)
+        new_trip = E_Mission_Trip(0, 0, 0, 0, 0, time, 0, trip.start_point, trip.end_point)
         to_return.append(new_trip)
+        time += time_delta
     return to_return
+
+
+def test_pt():
+	trip = E_Mission_Trip(12, True, [], 0, datetime(2015, 10, 10, 0), datetime(2015, 10, 10, 20), 29292, 29292)
+	print find_perturbed_trips(trip)
