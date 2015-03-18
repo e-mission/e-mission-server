@@ -3,7 +3,7 @@
 
 class Trip(object): 
     #Instance parameters
-    def __init__(self, single_mode, legs, cost, start_time, end_time, start_point, end_point, user_id, parent_tid):
+    def __init__(self, _id, single_mode, legs, cost, start_time, end_time, start_point, end_point):
 
         #may be useful for utility function, distinguishing between
         #multimodal classifier or single
@@ -16,8 +16,7 @@ class Trip(object):
         self.end_time = end_time
         self.start_point = start_point
         self.end_point = end_point
-        self.user_id = user_id
-        self.parent_tid = parent_tid
+
 
     def get_duration():
         return
@@ -49,6 +48,12 @@ class E_Mission_Trip(Trip):
         #start_point = 
         #end_point = 
         return E_Mission_Trip(_id, single_mode, legs, start_time, end_time, start_point, end_point, alternatives)
+
+class Alternative_Trip(Trip):
+    def __init__(self, _id, single_mode, legs, start_time, end_time, start_point, end_point, trip_id, parent_id):
+        super(Alternative_Trip, self).__init__(_id, single_mode, legs, start_time, end_time, start_point, end_point)
+        self.trip_id = trip_id
+        self.parent_id = parent_id
 
 class Leg:
     """Represents the leg of a trip"""
