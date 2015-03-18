@@ -16,6 +16,8 @@
 
 from get_database import get_utility_model_db
 from sklearn import linear_model as lm
+from datetime import datetime
+from common import calc_car_cost
 
 class UserUtilityModel:
   # TO DO:
@@ -53,8 +55,14 @@ class UserUtilityModel:
   # return an array of feature values for the given trip
   # current features are cost, time, mode
   def extract_features(trip):
-    cost = trip.calc_cost()
-    time = trip.calc_time()
-    mode = trip.mode
+    cost = trip.cost
+    time = calc_duration(trip)
+    mode = trip.single_mode
 
     return (cost, time, mode)
+
+  def calc_duration(trip):
+  	start_time = trip.start_time
+    end_time = trip.end_time
+    duration = end_time - start_time
+    return duration
