@@ -1,7 +1,4 @@
 import os, sys
-print ("HERE")
-print (os.getcwd())
-print ("THERE")
 sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
 from main.userclient import getClientSpecificQueryFilter
 from main.get_database import get_section_db
