@@ -10,19 +10,28 @@ modules = {
    'trips': {
    'get top': getTopTrips,
    'get all': getAllTrips,
-   'get most recent': getRecentTrips},
+   'get most recent': getRecentTrips,
+   'get trips by mode': getTripsThroughMode},
 
+   # Utility Module
    'utility': {},
+
+   #Pertubation Module
    'pertubation': {}
  }
 
 #returns the top trips for the user, defaulting to the top 10 trips
 def getTopTrips(uid, options = 10):
+    """ options that we can have for get top trips:
+    """
     return []
 
 #returns all trips to the user
 def getAllTrips(uid):
     return []
 
-def getRecentTrips(uid, options=10):
+def getRecentTrips(uid, options = 10):
     return []
+
+def getTripsThroughMode(uid, options = 10):
+    return[]
