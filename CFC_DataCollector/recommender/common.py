@@ -54,3 +54,16 @@ def store_trip_in_db(trip, is_alternate):
 def test():
 	t = trip.E_Mission_Trip(False, [], 20, datetime(2013, 10, 10, 10), datetime(2013, 10, 10, 11), [122311, 1334113], [314354234, 325213525], 90809808, 903468035689)
 	store_trip_in_db(t, True)
+
+
+def find_perturbed_trips(trip, delta=2):
+    to_return = [ ]
+    time_delta = datetime.timedelta(minutes=delta)
+    fifteen_min = datetime.timedelta(minutes=15)
+    start = trip.start_time - fifteen_min
+    end = trip.end_time + fifteen_min
+    time = start
+    while time < end:
+        new_trip = E_Mission_Trip(0, 0, 0, 0, time, 0, trip.start_point, trip.end_point)
+        to_return.append(new_trip)
+    return to_return
