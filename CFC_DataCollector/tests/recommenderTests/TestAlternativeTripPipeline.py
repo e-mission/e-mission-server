@@ -10,7 +10,7 @@ import sys
 import os
 from datetime import datetime, timedelta
 from recommender import alternative_trips_pipeline as pipeline
-from trip import *
+from recommender.trip import *
 # Needed to modify the pythonpath
 sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
 sys.path.append("%s" % os.getcwd())
@@ -68,17 +68,20 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     
   def testRetrieveAllUserTrips(self):
     #get a users trips, there should be 21
-    trip_list = pipeline.get_user_trips(self.testUUID, self.trip_filters)
-    self.assertEquals(len(trip_list), 21) 
+    trip_list = pipeline.get_trips_for_alternatives(self.testUUID)
+    self.assertEquals(len(trip_list), 39) 
     # Trip 20140407T175709-0700 has two sections
 
   def testAugmentTrips(self):
-    trip_list = pipeline.get_user_trips(self.testUUID, self.trip_filters)
+    trip_list = pipeline.get_trips_for_alternatives(self.testUUID)
     self.assertEquals(type(trip_list), list)
     self.assertNotEquals(len(trip_list), 21) 
     self.assertEquals(type(trip_list[0]), E_Mission_Trip)
-    alternative_list = pipeline.get_alternative_trips(self.testUUID, trip_list[0])
-    self.assertEquals(type(alternative_list), list)
+    # calc_alternative_trips merely schedules the alternative trip calculation at a later time
+    # it can't return the alternative trips right now
+    # TODO: Figure out how to get this to work
+    pipeline.calc_alternative_trips([trip_list[0]].__iter__())
+    # self.assertEquals(type(alternative_list), list)
    	
   def storeAlternativeTrips(self):
     trip_list = pipeline.get_user_trips(self.testUUID, self.trip_filters)

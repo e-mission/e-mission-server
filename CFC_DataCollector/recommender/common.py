@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 import trip
 from trip import E_Mission_Trip
 
+def get_uuid_list():
+    return []
 
 def meters_to_miles(meters):
 	return meters * 0.000621371

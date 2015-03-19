@@ -2,6 +2,7 @@ import os, sys
 sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
 from main.userclient import getClientSpecificQueryFilter
 from main.get_database import get_section_db
+import query_modules
 
 class TripIterator:
     """
@@ -19,26 +20,27 @@ class TripIterator:
     *** note: some functions do not allow/have options
 
     """
-    def __init__(self, user_uuid, filterQuery):
+    def __init__(self, user_uuid, filter_queries):
         # Query section_db with queryList and
         # instantiate the cursor object
         # returned as an instance variable
-        assert (len(filterQuery) >= 2), "filterQuery too short"
+        assert (len(filter_queries) >= 2), "filter_queries too short"
 
         mod, query = filter_queries[0], filter_queries[1]
         query_function = query_modules.modules.get(mod).get(query)
 
         try:
-            if len(filterQuery) == 3:
+            if len(filter_queries) == 3:
                 # options
                 option = filter_queries[2]
-                return query_function(uid, option)
+                self.storedIter = query_function(user_uuid, option)
             else:
+                pass
                 # no options
-                return query_function(uid)
+                self.storedIter = query_function(user_uuid)
         except TypeError:
-            logging.warn("Found no query function for filterQuery: ", filterQuery);
-            return []
+            logging.warn("Found no query function for filter_queries: ", filter_queries);
+            self.storedIter = []
 
         """
         clientSpecificQuery = getClientSpecificQueryFilter(user_uuid)
@@ -48,13 +50,13 @@ class TripIterator:
         """
 
     def __iter__(self):
-        return self
+        return self.storedIter.__iter__()
 
     def next(self):
         # Get next record from cursor and
         # cast it to a Trip object, or one
         # of the Trip subclasses.
-        trip = next(self.cur)
+        trip = next(self.storedIter)
         if trip is None:
             return None
         return Trip(trip)

@@ -4,6 +4,31 @@ structured:
 module_name { query_string: function_for_query }
 
 """
+from get_database import get_section_db
+import trip
+
+#returns the top trips for the user, defaulting to the top 10 trips
+def getTopTrips(uid, options = 10):
+    """ options that we can have for get top trips:
+    """
+    return []
+
+#returns all trips to the user
+def getAllTrips(uid):
+    return [trip.E_Mission_Trip.trip_from_json(jsonStr) for jsonStr in get_section_db().find()].__iter__()
+
+def getRecentTrips(uid, options = 10):
+    return []
+
+def getTripsThroughMode(uid, options = 10):
+    return[]
+
+# Returns the trips that are suitable for training
+# Currently this is:
+# - trips that have alternatives, and
+# - have not yet been included in a training set
+def getTrainingTrips(uid):
+    return []
 
 modules = {
    # Trip Module
@@ -22,25 +47,3 @@ modules = {
    'pertubation': {}
  }
 
-#returns the top trips for the user, defaulting to the top 10 trips
-def getTopTrips(uid, options = 10):
-    """ options that we can have for get top trips:
-    """
-    return []
-
-#returns all trips to the user
-def getAllTrips(uid):
-    return []
-
-def getRecentTrips(uid, options = 10):
-    return []
-
-def getTripsThroughMode(uid, options = 10):
-    return[]
-
-# Returns the trips that are suitable for training
-# Currently this is:
-# - trips that have alternatives, and
-# - have not yet been included in a training set
-def getTrainingTrips(uid)
-    return []

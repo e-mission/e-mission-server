@@ -40,13 +40,15 @@ class E_Mission_Trip(Trip):
         '''
         parse json into proper trip format
         '''
-        single_mode = get_single_mode()
-        cost = get_cost()
-        legs = get_legs()
-        #start_time = 
-        #end_time = 
-        #start_point = 
-        #end_point = 
+        _id = ""
+        single_mode = ""
+        cost = ""
+        legs = ""
+        start_time = ""
+        end_time = ""
+        start_point = ""
+        end_point = ""
+        alternatives = []
         return E_Mission_Trip(_id, single_mode, legs, start_time, end_time, start_point, end_point, alternatives)
 
 class Canonical_Trip(Trip):
