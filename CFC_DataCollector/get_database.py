@@ -75,6 +75,11 @@ def get_transit_db():
     Transits=current_db.Stage_Transits
     return Transits
 
+def get_utility_model_db():
+    current_db = MongoClient().Stage_database
+    Utility_Models = current_db.Stage_utility_models
+    return Utility_Models
+
 def get_alternative_trips_db():
     current_db = MongoClient().Stage_database
     Alternative_trips=current_db.Stage_alternative_trips

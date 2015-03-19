@@ -17,9 +17,6 @@
 from get_database import get_utility_model_db
 from sklearn import linear_model as lm
 class UserUtilityModel:
-  # TO DO:
-  # - define get_utility_model in get_database
-
   # return user-specific weights for a given user based on logistic regression on
   # their past trips and potential alternatives
   def __init__(trips = [], alternatives = []): # assuming alternatives a list of lists

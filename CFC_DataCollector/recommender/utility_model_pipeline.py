@@ -7,7 +7,7 @@ from user_utility_model import UserUtilityModel
 import get_trips as gt
 
 def get_training_trips(user_id, filter_function = None):
-    return gt(user_id, ["utility", "get_training"])
+    return gt.TripIterator(user_id, ["utility", "get_training"])
 
 def build_user_model(user_id, trips):
   model = UserUtilityModel.find_from_db(user_id)
