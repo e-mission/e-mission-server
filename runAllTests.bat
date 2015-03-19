@@ -7,7 +7,7 @@ popd
 pushd "%cd%"/CFC_DataCollector
 cp ../CFC_WebApp/config.json config.json
 cp ../CFC_WebApp/keys.json.sample keys.json
-set PYTHONPATH=. py 
+set PYTHONPATH=. python 
 python -m unittest discover -s tests -p Test* || goto :error
 popd
 
