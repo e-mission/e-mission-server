@@ -20,11 +20,7 @@ class SimpleCostTimeModeModel(UserUtilityModel):
 
   # current features are cost, time, mode
   def extract_features(trip):
-    distance = feature_trip_extraction.getDistance(trip.start_point, trip.end_point)
-    if trip.mode == "car":
-      cost = calc_car_cost(trip._id, distance)
-    else:
-      cost = 0
+    cost = trip.cost
     time = feature_trip_extraction.travel_time(trip.start_time, trip.end_time)  
     mode = trip.mode
 
