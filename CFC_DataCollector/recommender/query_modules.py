@@ -28,7 +28,8 @@ def getTripsThroughMode(uid, options = 10):
 # - trips that have alternatives, and
 # - have not yet been included in a training set
 def getTrainingTrips(uid):
-    return []
+    queryString = {'type':'move'}
+    return [trip.E_Mission_Trip.trip_from_json(jsonStr) for jsonStr in get_section_db().find(queryString)].__iter__()
 
 modules = {
    # Trip Module

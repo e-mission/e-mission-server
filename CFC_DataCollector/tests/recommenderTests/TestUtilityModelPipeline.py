@@ -17,10 +17,11 @@ from dao.user import User
 from dao.client import Client
 import tests.common
 from moves import collect
+from recommender.user_utility_model import UserUtilityModel
 
 logging.basicConfig(level=logging.DEBUG)
 
-class TestRecommendationPipeline(unittest.TestCase):
+class TestUtilityModelPipeline(unittest.TestCase):
   def setUp(self):
     self.testUUID = "myuuidisverylongandcomplicated"
     #self.testUserEmails = ["test@example.com", "best@example.com", "fest@example.com",
@@ -68,21 +69,21 @@ class TestRecommendationPipeline(unittest.TestCase):
   def testRetrieveTrainingTrips(self):
     #get a users trips, there should be 21
     trip_list = pipeline.get_training_trips(self.testUUID, self.trip_filters)
-    self.assertEquals(len(trip_list), 21) 
-    self.assertEquals(len(trip_list), 21) 
+    self.assertEquals(len(list(trip_list)), 22) 
 
   def testBuildUserModel(self):
     #get a users trips, there should be 21
     trip_list = pipeline.get_training_trips(self.testUUID, self.trip_filters)
     model = pipeline.build_user_model(self.testUUID, trip_list)
-    self.assertEquals(type(model), UserUtilityModel)
+    self.assertTrue(isinstance(model, UserUtilityModel))
 
   def testModifyUserModel(self):
     trip_list = pipeline.get_training_trips(self.testUUID, self.trip_filters)
     model = pipeline.build_user_model(self.testUUID, trip_list)
-    self.assertEquals(type(model), UserUtilityModel)
-    new_model = pipeline.modify_user_utility_model(self.testUUID, model)
-    self.assertEquals(type(model), UserUtilityModel)
+    print model
+    self.assertTrue(isinstance(model, UserUtilityModel))
+    new_model = pipeline.modify_user_utility_model(self.testUUID, model, trip_list)
+    self.assertTrue(isinstance(model, UserUtilityModel))
     self.assertNotEquals(new_model, model)
 
 if __name__ == '__main__':
