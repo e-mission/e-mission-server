@@ -17,6 +17,8 @@ class Trip(object):
         self.start_point = start_point
         self.end_point = end_point
 
+    def get_id():
+        return self._id
 
     def get_duration():
         return
