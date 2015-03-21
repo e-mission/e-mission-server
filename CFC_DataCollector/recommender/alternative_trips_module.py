@@ -9,9 +9,10 @@ def calc_alternative_trips(trip_iterator):
     pass
     # trip_iterator in python does not have a hasNext(). This is not java
     # TODO: Fix this so that it works
-    # while trip_iterator.hasNext():
-    #     list_of_perturbed_trips = find_perturbed_trips(trip_iterator.next())
-    #     schedule_queries(list_of_perturbed_trips)
+    n = next(trip_iterator)
+    while n:
+        list_of_perturbed_trips = find_perturbed_trips(n)
+        schedule_queries(list_of_perturbed_trips)
 
 def store_alternative_trips(tripObj):
     # store populated tripObj with _id (concatenated trip id and user id)
