@@ -26,16 +26,31 @@ class Trip(object):
     def get_distance():
         return
 
+class PipelineFlags(object):
+    def __init__(self):
+        self.alternativesStarted = False
+        self.alternativesFinished = False
+
+    def startAlternatives(self):
+        self.alternativesStarted = True
+
+    def finishAlternatives(self):
+        self.alternativesFinished = True
+
 class E_Mission_Trip(Trip):
 
     #if there are no alternatives found, set alternatives list to None 
-    def __init__(self, _id, single_mode, legs, cost, start_time, end_time, start_point, end_point, alternatives=[], augmented=False): 
+    def __init__(self, _id, single_mode, legs, cost, start_time, end_time, start_point, end_point, alternatives=[], pipelineFlags = None, augmented=False): 
         super(E_Mission_Trip, self).__init__(_id, single_mode, legs, cost, start_time, end_time, start_point, end_point) 
         self.alternatives = alternatives
         self.augmented = augmented
+        self.pipelineFlags = PipelineFlags()
     
     def get_alternatives(self):
         return self.alternatives
+
+    def getPipelineFlags(self):
+        return self.pipelineFlags
 
     @staticmethod
     def trip_from_json(json_seg):
@@ -51,7 +66,8 @@ class E_Mission_Trip(Trip):
         start_point = ""
         end_point = ""
         alternatives = []
-        return E_Mission_Trip(_id, single_mode, legs, start_time, end_time, start_point, end_point, alternatives)
+        pipelineFlags = None
+        return E_Mission_Trip(_id, single_mode, legs, start_time, end_time, start_point, end_point, alternatives, pipelineFlags)
 
 class Canonical_Trip(Trip):
     #if there are no alternatives found, set alternatives list to None 
