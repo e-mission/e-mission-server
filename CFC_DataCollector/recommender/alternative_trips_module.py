@@ -31,7 +31,7 @@ Overview of helper files relevant to this pipeline:
 
 
 # Invoked in recommendation pipeline to get perturbed trips user should consider
-def calc_perturbed_trips():
+def calc_alternative_trips():
     all_user_ids = get_uuid_list()
     for user_id in all_user_ids:
         trip_iterator = TripIterator(user_id, ["trips", "get top trips", 5])
