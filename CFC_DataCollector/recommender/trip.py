@@ -40,8 +40,9 @@ class PipelineFlags(object):
 class E_Mission_Trip(Trip):
 
     #if there are no alternatives found, set alternatives list to None 
-    def __init__(self, _id, single_mode, legs, cost, start_time, end_time, start_point, end_point, alternatives=[], pipelineFlags = None): 
-        super(E_Mission_Trip, self).__init__(_id, single_mode, legs, cost, start_time, end_time, start_point, end_point) 
+    #def __init__(self, _id, single_mode, legs, start_time, end_time, start_point, end_point, alternatives=[], pipelineFlags = None): 
+    def __init__(self, alternatives=[], pipelineFlags = None, json_segment): 
+        self.trip_from_json()
         self.alternatives = alternatives
         self.pipelineFlags = PipelineFlags()
     
@@ -51,22 +52,20 @@ class E_Mission_Trip(Trip):
     def getPipelineFlags(self):
         return self.pipelineFlags
 
-    @staticmethod
-    def trip_from_json(json_seg):
+    def trip_from_json(self, json_seg):
         '''
         parse json into proper trip format
         '''
-        _id = ""
-        single_mode = ""
-        cost = ""
-        legs = ""
-        start_time = ""
-        end_time = ""
-        start_point = ""
-        end_point = ""
-        alternatives = []
-        pipelineFlags = None
-        return E_Mission_Trip(_id, single_mode, legs, start_time, end_time, start_point, end_point, alternatives, pipelineFlags)
+        self._id = json_seg["_id"]
+        #TODO: make sure this is correct
+        self.single_mode = json_seg["mode"] 
+        #TODO: not sure how to get all legs from section query
+        self.legs = []
+        self.start_time = json_seg["section_start_time"]
+        self.end_time = json_seg["section_end_time"]
+        #TODO: fix this field
+        self.start_point = ""
+        self.end_point = ""
 
 class Canonical_Trip(Trip):
     #if there are no alternatives found, set alternatives list to None 
@@ -83,10 +82,28 @@ class Canonical_Trip(Trip):
         return self.alternatives
 
 class Alternative_Trip(Trip):
-    def __init__(self, _id, single_mode, legs, start_time, end_time, start_point, end_point, trip_id, parent_id):
-        super(Alternative_Trip, self).__init__(_id, single_mode, legs, start_time, end_time, start_point, end_point)
+    #def __init__(self, _id, single_mode, legs, start_time, end_time, start_point, end_point, trip_id, parent_id, cost):
+    def __init__(self, trip_id, parent_id, cost, json_segment):
+        self.trip_from_json(json_segment)
         self.trip_id = trip_id
         self.parent_id = parent_id
+        self.cost = cost
+
+    def trip_from_json(self, json_seg):
+        '''
+        parse json into proper trip format
+        '''
+        #TODO: match google maps schema?
+        self._id = json_seg["_id"]
+        #TODO: make sure this is correct
+        self.single_mode = json_seg["mode"] 
+        #TODO: not sure how to get all legs from section query
+        self.legs = []
+        self.start_time = json_seg["section_start_time"]
+        self.end_time = json_seg["section_end_time"]
+        #TODO: fix this field
+        self.start_point = ""
+        self.end_point = ""
 
 class Leg:
     """Represents the leg of a trip"""
