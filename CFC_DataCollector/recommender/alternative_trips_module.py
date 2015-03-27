@@ -46,7 +46,7 @@ def calc_perturbed_trips():
 
 
 
-"""
+
 #this call should be made asynchronously
 #if it returns true, that means the perturbation queries were finished, and we are now able to move on to the next pipeline
 #if it returns false, that means the perturbation queries were not finished
@@ -67,7 +67,6 @@ def check_all_queries_made(_id):
         if perturbed_trips[perturbed_u_id] == None:
             return False
     return True
-"""
 
 
 def store_alternative_trips(tripObj):
@@ -82,7 +81,7 @@ def get_alternative_trips(_id):
     # db = get_alternative_trips_db()
     # _id = tripObj.get_id()
     # return db.find(_id)
-    return [trip.E_Mission_Trip.trip_from_json(jsonStr) for jsonStr in get_alternative_trips_db().find({'_id' : _id})].__iter__()
+    return [Trip(jsonStr) for jsonStr in get_alternative_trips_db().find({'_id' : _id})].__iter__()
 
 def store_perturbed_trips(tripObj):
     # store populated tripObj with _id (concatenated trip id and user id)
@@ -96,7 +95,7 @@ def get_perturbed_trips(_id):
     # db = get_perturbed_trips_db()
     # _id = tripObj.get_id()
     # return db.find(_id)
-    return [trip.E_Mission_Trip.trip_from_json(jsonStr) for jsonStr in get_perturbed_trips_db().find({'_id' : _id})].__iter__()
+    return [Trip(jsonStr) for jsonStr in get_perturbed_trips_db().find({'_id' : _id})].__iter__()
 
 
 
