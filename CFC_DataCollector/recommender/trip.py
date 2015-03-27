@@ -40,10 +40,9 @@ class PipelineFlags(object):
 class E_Mission_Trip(Trip):
 
     #if there are no alternatives found, set alternatives list to None 
-    def __init__(self, _id, single_mode, legs, cost, start_time, end_time, start_point, end_point, alternatives=[], pipelineFlags = None, augmented=False): 
+    def __init__(self, _id, single_mode, legs, cost, start_time, end_time, start_point, end_point, alternatives=[], pipelineFlags = None): 
         super(E_Mission_Trip, self).__init__(_id, single_mode, legs, cost, start_time, end_time, start_point, end_point) 
         self.alternatives = alternatives
-        self.augmented = augmented
         self.pipelineFlags = PipelineFlags()
     
     def get_alternatives(self):
