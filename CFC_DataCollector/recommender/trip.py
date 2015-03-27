@@ -45,7 +45,7 @@ class E_Mission_Trip(Trip):
 
     #if there are no alternatives found, set alternatives list to None 
     #def __init__(self, _id, single_mode, legs, start_time, end_time, start_point, end_point, alternatives=[], pipelineFlags = None): 
-    def __init__(self, alternatives=[], pipelineFlags = None, json_segment): 
+    def __init__(self, json_segment, alternatives=[], pipelineFlags = None): 
         super(self.__class__, self).__init__()
         self.alternatives = alternatives
         self.pipelineFlags = PipelineFlags()
