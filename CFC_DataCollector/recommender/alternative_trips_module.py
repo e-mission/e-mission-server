@@ -32,9 +32,9 @@ Overview of helper files relevant to this pipeline:
 
 # Invoked in recommendation pipeline to get perturbed trips user should consider
 def calc_perturbed_trips():
-    all_users = get_uuid_list()
-    for user in all_users:
-        trip_iterator = TripIterator(user.id, ["trips", "get top trips", 5])
+    all_user_ids = get_uuid_list()
+    for user_id in all_user_ids:
+        trip_iterator = TripIterator(user_id, ["trips", "get top trips", 5])
         while (trip_iterator.next() != None):
             curr_trip = trip_iterator.next()
             if not curr_trip.getPipelineFlags().alternativesStarted:
