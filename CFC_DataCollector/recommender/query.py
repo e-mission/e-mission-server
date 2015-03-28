@@ -39,7 +39,7 @@ if len(sys.argv) == 4:
 			print("Removed job!")
 
 	trip = get_trip(_id)
-	trip.pipelineFlags.finishAlternatives()
+	trip.getpipelineFlags().finishAlternatives()
 
 else:
 	print("Wrong number of input arguments.")

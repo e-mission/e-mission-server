@@ -1,5 +1,12 @@
 #maps team provided get_cost function
 #from common.featurecalc import get_cost
+import jsonpickle
+
+
+# def unit_test():
+#     info = open("C:/Users/rzarrabi/Documents/school/junior/spring/trip/e-mission-server/CFC_DataCollector/tests/data/missing_trip", "r")
+#     t = Trip(info.read())
+#     return tt
 
 class Trip(object): 
     #Instance parameters
@@ -7,6 +14,7 @@ class Trip(object):
         self.trip_from_json(json_segment)
 
     def trip_from_json(self, json_seg):
+        print json_seg
         '''
         parse json into proper trip format
         '''
@@ -18,8 +26,8 @@ class Trip(object):
         self.start_time = json_seg["section_start_time"]
         self.end_time = json_seg["section_end_time"]
         #TODO: check this field
-        self.start_point = json_seg["track_points"][0]
-        self.end_point = json_seg["track_points"][-1]
+        self.start_point = json_seg["track_points"][0] if json_seg["track_points"] else None
+        self.end_point = json_seg["track_points"][-1] if json_seg["track_points"] else None
 
     def get_id():
         return self._id
@@ -46,7 +54,7 @@ class E_Mission_Trip(Trip):
     #if there are no alternatives found, set alternatives list to None 
     #def __init__(self, _id, single_mode, legs, start_time, end_time, start_point, end_point, alternatives=[], pipelineFlags = None): 
     def __init__(self, json_segment, alternatives=[], pipelineFlags = None): 
-        super(self.__class__, self).__init__()
+        super(E_Mission_Trip, self).__init__(json_segment)
         self.alternatives = alternatives
         self.pipelineFlags = PipelineFlags()
     

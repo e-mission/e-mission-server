@@ -1,6 +1,5 @@
 import get_trips
-from common import store_trip_in_db, find_perturbed_trips
-#import get_trips
+from common import store_trip_in_db, find_perturbed_trips, get_uuid_list
 from trip import E_Mission_Trip
 from get_database import get_alternative_trips_db, get_perturbed_trips_db
 
@@ -23,6 +22,8 @@ Overview of helper files relevant to this pipeline:
     -query.py -> makes a google maps query immediately to get the directions
               -> will also store the query into the database collection
     -perturb.py -> schedules calls to query.py on cron jobs
+
+    @TODO: this doesn't exist yet, but it would make more sense than to put it in here in order to keep the code clean
     -database_util.py -> contains all the helper methods to abstract out interaction with the database
 
 
@@ -30,6 +31,7 @@ Overview of helper files relevant to this pipeline:
 
 
 # Invoked in recommendation pipeline to get perturbed trips user should consider
+
 def calc_perturbed_trips():
     #TODO: query all users
     for user in all_users:
