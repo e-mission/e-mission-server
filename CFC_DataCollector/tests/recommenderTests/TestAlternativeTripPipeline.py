@@ -91,6 +91,10 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     temp = db.find_one({'type' : 'move'})
     our_id = temp['_id']
     initialize_empty_perturbed_trips(our_id)
+    p_db = get_perturbed_trips_db()
+    our_id = our_id.replace('.', '')
+    temp = p_db.find_one({"_id" : our_id})
+    self.assertEquals(temp, None)
    	
   def storeAlternativeTrips(self):
     trip_list = pipeline.get_user_trips(self.testUUID, self.trip_filters)

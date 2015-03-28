@@ -19,10 +19,10 @@ def get_uuid_list():
 def insert_into_pdb(pdb, my_id, new_perturbed_trip):
 	my_id = str(my_id)
 	assert(type(my_id) == str)
-	new_id = my_id.replace(".", "")
-	new_id = new_id.replace(".", "")
+	new_id = my_id.replace('.', "")
 	assert(type(new_id) == str)
-	pdb.insert({new_id : new_perturbed_trip})
+	if '.' not in new_id:
+		pdb.insert({'joh' : new_perturbed_trip})
     
 def initialize_empty_perturbed_trips(_id):
 	# Assuming I have the methods json_to_trip and trip_to_json
@@ -32,6 +32,7 @@ def initialize_empty_perturbed_trips(_id):
 	new_perturbed_trip = { }
 	trip = E_Mission_Trip(json_trip)
 	for pert in find_perturbed_trips(trip):
+		pert._id = pert._id.replace('.', '') 
 		new_perturbed_trip[pert._id] = None
 	insert_into_pdb(pdb, trip._id, new_perturbed_trip)
 	return

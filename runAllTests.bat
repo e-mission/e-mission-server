@@ -13,5 +13,4 @@ popd
 
 
 :error
-	cd ..
 	exit /b %errorlevel%
