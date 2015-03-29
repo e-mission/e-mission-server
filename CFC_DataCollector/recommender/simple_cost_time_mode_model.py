@@ -3,7 +3,8 @@
 from get_database import get_utility_model_db
 from datetime import datetime
 import feature_trip_extraction
-from common import calc_car_cost, travel_time
+from common import calc_car_cost
+from main import common as cm
 
 class SimpleCostTimeModeModel(UserUtilityModel):
   def __init__(*args):
@@ -21,7 +22,7 @@ class SimpleCostTimeModeModel(UserUtilityModel):
   # current features are cost, time, mode
   def extract_features(trip):
     cost = trip.cost
-    time = travel_time(trip.start_time, trip.end_time)  
+    time = cm.travel_time(trip.start_time, trip.end_time)  
     mode = trip.mode
 
     return (cost, time, mode)
