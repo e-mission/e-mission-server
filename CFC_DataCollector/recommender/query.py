@@ -3,7 +3,6 @@ import googlemaps
 import datetime
 from crontab import CronTab
 
-
 #usage:
 #(From terminal)
 #python query.py lat1,lon1 lat2,lon2

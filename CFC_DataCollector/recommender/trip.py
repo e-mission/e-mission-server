@@ -1,5 +1,12 @@
 #maps team provided get_cost function
 #from common.featurecalc import get_cost
+import jsonpickle
+
+
+# def unit_test():
+#     info = open("C:/Users/rzarrabi/Documents/school/junior/spring/trip/e-mission-server/CFC_DataCollector/tests/data/missing_trip", "r")
+#     t = Trip(info.read())
+#     return tt
 
 class Trip(object): 
     #Instance parameters

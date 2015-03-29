@@ -4,12 +4,13 @@ import json
 #from main import tripManager
 from pymongo import MongoClient
 import logging
-from get_database import get_db, get_mode_db, get_section_db, get_trip_db
+from get_database import *
 import re
 import sys 
 import os
 from datetime import datetime, timedelta
-from recommender import alternative_trips_pipeline as pipeline
+import recommender.alternative_trips_module as pipeline_module
+import recommender.alternative_trips_pipeline as pipeline 
 from recommender.trip import *
 # Needed to modify the pythonpath
 sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
@@ -18,6 +19,7 @@ from dao.user import User
 from dao.client import Client
 import tests.common
 from moves import collect
+from recommender.common import *
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -81,8 +83,18 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     # calc_alternative_trips merely schedules the alternative trip calculation at a later time
     # it can't return the alternative trips right now
     # TODO: Figure out how to get this to work
-    pipeline.calc_alternative_trips([trip_list[0]].__iter__())
+    pipeline_module.calc_alternative_trips([trip_list[0]].__iter__())
     # self.assertEquals(type(alternative_list), list)
+
+  def test_initialize_empty_perturbed_trips(self):
+    db = get_section_db()
+    temp = db.find_one({'type' : 'move'})
+    our_id = temp['_id']
+    initialize_empty_perturbed_trips(our_id)
+    p_db = get_perturbed_trips_db()
+    our_id = our_id.replace('.', '')
+    temp = p_db.find_one({"_id" : our_id})
+    self.assertEquals(temp, None)
    	
   def storeAlternativeTrips(self):
     trip_list = pipeline.get_user_trips(self.testUUID, self.trip_filters)
@@ -92,6 +104,16 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     alternative_list = pipeline.get_alternative_trips(self.testUUID, trip_list[0]._id)
     pipeline.store_alternative_trips(alternative_list)
     self.assertEquals(type(alternative_list), list)
+
+
+  # def testLoadDatabse(self):
+  #   trip_list = pipeline.get_user_trips(self.testUUID, self.trip_filters)
+  #   alternative_list = pipeline.get_alternative_trips(self.testUUID, trip_list[0]._id)
+  #   pipeline.store_alternative_trips(alternative_list)
+  #   altTripsDB = get_alternative_trips_db()
+  #   json_trip = altTripsDB.find_one({"type" : "move"})
+  #   self.assertTrue(json_trip)
+
 
 
 if __name__ == '__main__':
