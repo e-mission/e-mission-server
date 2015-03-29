@@ -1,5 +1,5 @@
 import get_trips
-from common import store_trip_in_db, find_perturbed_trips, get_uuid_list
+from common import store_trip_in_db, find_perturbed_trips
 from trip import E_Mission_Trip
 from get_database import get_alternative_trips_db, get_perturbed_trips_db
 
@@ -31,20 +31,17 @@ Overview of helper files relevant to this pipeline:
 
 
 # Invoked in recommendation pipeline to get perturbed trips user should consider
-def calc_alternative_trips():
-    all_user_ids = get_uuid_list()
-    for user_id in all_user_ids:
-        trip_iterator = TripIterator(user_id, ["trips", "get top trips", 5])
-        while (trip_iterator.next() != None):
-            curr_trip = trip_iterator.next()
-            if not curr_trip.getPipelineFlags().alternativesStarted:
-                curr_trip.getPipelineFlags().startAlternatives()
-                curr_unique_id = curr_trip._id
-                list_of_perturbed_trips = find_perturbed_trips(curr_unique_id)
-                
-                #@TODO: need a method that initializes the relationship bewteen a trip, and its perturbations
-                #initialize_perturbations(curr_unique_id)
-                schedule_queries(list_of_perturbed_trips)
+def calc_alternative_trips(trip_iterator):
+    while (trip_iterator.next() != None):
+        curr_trip = trip_iterator.next()
+        if not curr_trip.getPipelineFlags().alternativesStarted:
+            curr_trip.getPipelineFlags().startAlternatives()
+            curr_unique_id = curr_trip._id
+            list_of_perturbed_trips = find_perturbed_trips(curr_unique_id)
+            
+            #@TODO: need a method that initializes the relationship bewteen a trip, and its perturbations
+            #initialize_perturbations(curr_unique_id)
+            schedule_queries(list_of_perturbed_trips)
 
 
 #@TODO: put these methods in database_util.py
