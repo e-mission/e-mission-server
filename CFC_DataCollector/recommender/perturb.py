@@ -14,12 +14,15 @@ See more on how to enable these here: https://github.com/googlemaps/google-maps-
 import googlemaps
 import datetime
 from crontab import CronTab
+import sys
 
 
 #otherwise, you can just pass in an address
 
-python_location = '/Users/jeffdh5/Desktop/e-mission/recommender/venv/bin/python'
-query_script_location = '/Users/jeffdh5/Desktop/e-mission/recommender/query.py'
+python_location = sys.executable
+#python_location = '/Users/jeffdh5/Desktop/e-mission/recommender/venv/bin/python'
+#query_script_location = '/Users/jeffdh5/Desktop/e-mission/recommender/query.py'
+query_script_location = 'recommender/query.py'
 
 def schedule_queries(_id, trip_array):
 	#_id: This is the original trip _id
@@ -52,11 +55,11 @@ def schedule_queries(_id, trip_array):
 		cron.write()
 		print("You have successfully scheduled this CRON job.")
 
-#Unit Test
-#home = '37.199024,-121.831479'
-#destination = '37.862591,-122.261784'
-#test_time = datetime.datetime.now() + datetime.timedelta(minutes = 1)
+# #Unit Test
+# home = '37.199024,-121.831479'
+# destination = '37.862591,-122.261784'
+# test_time = datetime.datetime.now() + datetime.timedelta(minutes = 1)
 
 
-#print("Scheduling query for: \nhome=" + home + "\ndestination=" + destination + "\ntime=" + test_time.strftime("%A %d. %B %Y"))
-#schedule_query(home, destination, test_time)
+# print("Scheduling query for: \nhome=" + home + "\ndestination=" + destination + "\ntime=" + test_time.strftime("%A %d. %B %Y"))
+# schedule_query(home, destination, test_time)

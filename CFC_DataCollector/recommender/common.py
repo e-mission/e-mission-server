@@ -22,28 +22,25 @@ def insert_into_pdb(pdb, my_id, new_perturbed_trip):
 	new_id = my_id.replace('.', "")
 	assert(type(new_id) == str)
 	if '.' not in new_id:
-		pdb.insert({'joh' : new_perturbed_trip})
+		pdb.insert({new_id : new_perturbed_trip})
     
-def initialize_empty_perturbed_trips(_id):
+def initialize_empty_perturbed_trips(_id, pdb):
 	# Assuming I have the methods json_to_trip and trip_to_json
 	db = get_section_db()
-	pdb = get_perturbed_trips_db()
 	json_trip = db.find_one({"_id" : _id})
 	new_perturbed_trip = { }
 	trip = E_Mission_Trip(json_trip)
 	for pert in find_perturbed_trips(trip):
 		pert._id = pert._id.replace('.', '') 
-		new_perturbed_trip[pert._id] = None
-	insert_into_pdb(pdb, trip._id, new_perturbed_trip)
-	return
-
+		new_perturbed_trip[pert._id] = 'null'
+	#insert_into_pdb(pdb, trip._id, new_perturbed_trip)
+	_id = _id.replace('.', "")
+	pdb.insert({_id : new_perturbed_trip})
 
 def update_perturbations(_id, perturbed_trip):
-	## Assuming I have trip_to_json function
 	db = get_perturbed_trips_db()
 	json_trip = db.find_one({"_id" : _id})
 	json_trip[perturbed_trip._id] = jsonpickle.encode(perturbed_trip)
-	return
 
 #def query_perturbed_trips()
 
@@ -132,8 +129,6 @@ def string_start_time_to_datetime(start_time_string):
 def datetime_to_string(datetime_obj):
 	temp = str(datetime_obj)
 	return "%s%s%sT%s%s%s-0700" % (temp[:4], temp[5:7], temp[8:10], temp[11:13], temp[14:16], temp[17:19])
-
-
 
 def find_perturbed_trips(trip, delta=2):
     to_return = [ ]

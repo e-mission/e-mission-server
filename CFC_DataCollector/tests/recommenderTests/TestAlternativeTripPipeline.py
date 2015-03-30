@@ -90,11 +90,26 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     db = get_section_db()
     temp = db.find_one({'type' : 'move'})
     our_id = temp['_id']
-    initialize_empty_perturbed_trips(our_id)
+    #self.assertEquals(type(our_id), str)
     p_db = get_perturbed_trips_db()
+    initialize_empty_perturbed_trips(our_id, p_db)
     our_id = our_id.replace('.', '')
     temp = p_db.find_one({"_id" : our_id})
-    self.assertEquals(temp, None)
+    self.assertEquals(type(temp), dict)
+
+  def test_update_perturbations(self):
+    json_trip = self.loadTestJSON("tests/data/testModeInferFile")
+    #self.assertEquals(type(json_trip), json)
+    #json_trip = json_trip.read()
+    trip = E_Mission_Trip(json_trip[0])
+    db = get_section_db()
+    pdb = get_perturbed_trips_db()
+    temp = db.find_one({'type' : 'move'})
+    our_id = temp['_id']
+    initialize_empty_perturbed_trips(our_id, pdb)
+    update_perturbations(our_id, trip)
+    
+
    	
   def storeAlternativeTrips(self):
     trip_list = pipeline.get_user_trips(self.testUUID, self.trip_filters)
