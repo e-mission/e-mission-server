@@ -1,7 +1,9 @@
 import get_trips
 from common import store_trip_in_db, find_perturbed_trips, initialize_empty_perturbed_trips, update_perturbations 
 from trip import E_Mission_Trip
-from get_database import get_alternative_trips_db, get_perturbed_trips_db
+#from get_database import get_perturbed_trips_db
+from get_database import *
+from query_scheduler_pipeline import schedule_queries
 
 #import Profiles
 
@@ -30,14 +32,8 @@ def calc_alternative_trips(trip_iterator):
             curr_trip.getPipelineFlags().startAlternatives()
             curr_unique_id = curr_trip.get_id()
             list_of_perturbed_trips = find_perturbed_trips(curr_trip)
-            
-            #@TODO: need a method that initializes the relationship bewteen a trip, and its perturbations
             initialize_empty_perturbed_trips(curr_unique_id, get_perturbed_trips_db())
-            # TODO: Fix me
-            # This is commented out because it generates the error:
-            # global name 'schedule_queries' is not defined
-            # There is no schedule_queries here and I don't plan to fix this myself
-            # schedule_queries(curr_unique_id, list_of_perturbed_trips)
+            schedule_queries(curr_unique_id, list_of_perturbed_trips)
 
 
 #@TODO: put these methods in database_util.py

@@ -1,7 +1,7 @@
 #maps team provided get_cost function
 #from common.featurecalc import get_cost
 import jsonpickle
-
+import datetime
 
 # def unit_test():
 #     info = open("C:/Users/rzarrabi/Documents/school/junior/spring/trip/e-mission-server/CFC_DataCollector/tests/data/missing_trip", "r")
@@ -37,6 +37,22 @@ class Trip(object):
 
     def get_distance():
         return
+
+    def get_start_coordinates(self):
+        #TODO: return self.start_point in following string format
+        #"lat,lng"        
+        return '37.862591,-122.261784'
+
+    def get_end_coordinates(self):
+        #TODO: return self.end_point in following string format
+        #"lat,lng"
+        return '37.862591,-122.261784'
+
+
+    def get_time(self):
+        #TODO: convert self.start_time to datetime object
+        return datetime.datetime.now()
+
 
 class PipelineFlags(object):
     def __init__(self):
