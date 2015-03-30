@@ -67,7 +67,7 @@ def display_home():
             user_home=detect_home(user)
             print(user_home)
             if user_home!='N/A':
-                mymap_home.addpoint(user_home[0], user_home[1], "#FF0000")
+                mymap_home.addpoint(user_home[1], user_home[0], "#FF0000")
             mymap_home.draw('mymap_home.html')
 
 def Date(date):
@@ -98,7 +98,7 @@ def Date(date):
 def display_trip(user, date, option):
     user_id = UUID(user)
     user_home = detect_home(user_id)
-    gmap = pygmaps.maps(user_home[0], user_home[1], 14)
+    gmap = pygmaps.maps(user_home[1], user_home[0], 14)
     start, end = Date(date)
     for section in get_section_db().find({"$and":[{'user_id':user_id},{"section_start_datetime": {"$gte": start, "$lt": end}}]}):
         drawSection(section, option, gmap)
@@ -107,7 +107,7 @@ def display_trip(user, date, option):
 def searchTrip(user, period, startpoint, endpoint, mode, option):
     user_id = UUID(user)
     user_home = detect_home(user_id)
-    gmap = pygmaps.maps(user_home[0], user_home[1], 14)
+    gmap = pygmaps.maps(user_home[1], user_home[0], 14)
     start, end = Date(period)
     sectionList = []
     startpoint = Geocoder.geocode(startpoint)[0].coordinates
@@ -121,10 +121,10 @@ def searchTrip(user, period, startpoint, endpoint, mode, option):
         {"section_end_point": {"$ne": None}}]}):
         point_start = section['section_start_point']['coordinates']
         point_end = section['section_end_point']['coordinates']
-        if calDistance(startpoint, point_start) < 100 and calDistance(endpoint, point_end) < 100:
+        if calDistance(startpoint[::-1], point_start) < 100 and calDistance(endpoint[::-1], point_end) < 100:
             sectionList.append(section['_id'])
-            gmap.addpoint(point_end[0], point_end[1], COLOR[1])
-            gmap.addpoint(point_start[0], point_start[1], COLOR[1])
+            gmap.addpoint(point_end[1], point_end[0], COLOR[1])
+            gmap.addpoint(point_start[1], point_start[0], COLOR[1])
         drawSection(section, option, gmap)
     gmap.draw('gmap_display/' + 'SearchResult' + str(start)[:10] + '-' + str(end)[:10] + '_' + user + '.html')
     print sectionList
@@ -140,12 +140,13 @@ def drawSection(section, option, gmap, Color = 'default'):
             color = COLOR[section['mode']]
         for point in track_points:
             coordinate = point['track_location']['coordinates']
-            
             coordinate_tuple = tuple([coordinate[1], coordinate[0]])
             path.append(coordinate_tuple)
+
             if option == POINTS or option == ALL:
                 # coordinates are in GeoJSON format, ie lng, lat
                 gmap.addpoint(coordinate[1], coordinate[0], color)
+        print path
         if option == PATH or option == ALL:
             gmap.addpath(path, color)
 

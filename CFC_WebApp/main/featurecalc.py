@@ -8,7 +8,6 @@ from sklearn.cluster import DBSCAN
 from get_database import get_routeCluster_db,get_transit_db
 from uuid import UUID
 from route_matching import getRoute,fullMatchDistance,matchTransitRoutes,matchTransitStops
-from common import get_mode_share_by_count
 
 Sections = MongoClient('localhost').Stage_database.Stage_Sections
 Modes=MongoClient('localhost').Stage_database.Stage_Modes
