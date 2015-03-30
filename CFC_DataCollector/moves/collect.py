@@ -8,6 +8,8 @@ import json
 from dateutil import parser
 from get_database import get_mode_db, get_section_db, get_trip_db, get_moves_db
 from time import sleep
+import numpy as np
+from sklearn import linear_model
 import math
 
 config_data = json.load(open('config.json'))
@@ -168,10 +170,10 @@ def label_filtered_section(section):
 def fillTripWithMovesData(trip_from_moves, new_trip):
   # logging.debug("trip_from_moves = %s" % trip_from_moves)
   new_trip['type'] = trip_from_moves["type"] if 'type' in trip_from_moves else "unknown"
-  new_trip['trip_start_time'] = trip_from_moves["startTime"]
-  new_trip['trip_end_time'] = trip_from_moves["endTime"]
-  new_trip['trip_start_datetime'] = parser.parse(trip_from_moves["startTime"])
-  new_trip['trip_end_datetime'] = parser.parse(trip_from_moves["endTime"])
+  new_trip['trip_start_time'] = trip_from_moves["startTime"] if "startTime" in trip_from_moves else ""
+  new_trip['trip_end_time'] = trip_from_moves["endTime"] if "endTime" in trip_from_moves else "" 
+  new_trip['trip_start_datetime'] = parser.parse(trip_from_moves["startTime"]) if "startTime" in trip_from_moves else None
+  new_trip['trip_end_datetime'] = parser.parse(trip_from_moves["endTime"]) if "endTime" in trip_from_moves else None
   new_trip['place'] = {'place_id':    trip_from_moves["place"]["id"],
                       'place_type':   trip_from_moves["place"]["type"],
                       'place_location':{'type':'Point',
@@ -249,9 +251,7 @@ def processTripArray(user_uuid, trip_array):
                                      # if "group" in seg_act_note else '',
                                     }
                       fillSectionWithMovesData(seg_act_note, sections_todo)
-
                       label_filtered_section(sections_todo)
-                      
                       # Now that we have created this section, let's insert it into the database
                       try:
                         logging.info("About to insert section with trip_id = %s,p section_id = %s, section_start_time = %s, type = %s and mode = %s " %
@@ -291,20 +291,20 @@ def processTripArray(user_uuid, trip_array):
       else:
           logging.debug("Found existing trip with trip_id = %s " % (trip_id))
 
-def _cleanGPSData(points):
-    if len(points) > 4:
-        points = np.array([[(datetime.datetime.strptime(point['time'].split('-')[0], "%Y%m%dT%H%M%S") - datetime.datetime(1970,1,1)).total_seconds(), 
-            point["track_location"]["coordinates"][0], point["track_location"]["coordinates"][1]] for point in points])
+def _cleanGPSData(old_points):
+    if len(old_points) > 10:
+        points = np.array([[(datetime.strptime(point['time'].split('-')[0], "%Y%m%dT%H%M%S") - datetime(1970,1,1)).total_seconds(), 
+            point["track_location"]["coordinates"][0], point["track_location"]["coordinates"][1]] for point in old_points])
         time_stamp = points[:,0].reshape(len(points[:,0]), 1)
         lon_lat = points[:,1:]
-        model_ransac = linear_model.RANSACRegressor(linear_model.LinearRegression())
+        model_ransac = linear_model.RANSACRegressor(linear_model.LinearRegression(), min_samples = 10)
         model_ransac.fit(lon_lat, time_stamp)
         inlier_mask = model_ransac.inlier_mask_
         outlier_mask = np.logical_not(inlier_mask)
-        print "total size: " + str(len(outlier_mask))
         remove = [index for index,v in enumerate(outlier_mask) if v]
-        return [v for j,v in enumerate(section["track_points"]) if j not in frozenset(remove)]
-    return []
+        print "removed points size: ",  remove
+        return [v for j,v in enumerate(old_points) if j not in frozenset(remove)]
+    return old_points
 
 if __name__ == "__main__":
   collect()

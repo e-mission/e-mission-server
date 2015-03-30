@@ -266,6 +266,24 @@ class TestMovesCollect(unittest.TestCase):
     self.assertEquals(newSec['trip_end_datetime'].hour, 19)
     self.assertEquals(newSec['place']['place_location']['coordinates'][0], -122)
 
+  def testFillTripWithInvalidData(self):
+    testMovesSec = {}
+    testMovesSec['type'] = 'move'
+    testMovesSec['place'] = {}
+    testMovesSec['place']['id'] = 10
+    testMovesSec['place']['type'] = 'home'
+    testMovesSec['place']['location'] = {u'lat': 37, u'lon': -122, u'time': u'20140407T083200-0700'}
+
+    newSec = {} 
+    collect.fillTripWithMovesData(testMovesSec, newSec)
+
+    self.assertEquals(newSec['type'], 'move')
+    self.assertEquals(newSec['trip_start_time'], "")
+    self.assertEquals(newSec['trip_end_time'], "")
+    self.assertEquals(newSec['trip_start_datetime'], None)
+    self.assertEquals(newSec['trip_end_datetime'], None)
+    self.assertEquals(newSec['place']['place_location']['coordinates'][0], -122)
+
   def testSectionFilterLabeling(self):
     """
     Tests that incoming section data parsed by collect.py is properly 
