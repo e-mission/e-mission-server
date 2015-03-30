@@ -15,14 +15,14 @@ import googlemaps
 import datetime
 from crontab import CronTab
 import sys
-
+import os
 
 #otherwise, you can just pass in an address
 
 python_location = sys.executable
 #python_location = '/Users/jeffdh5/Desktop/e-mission/recommender/venv/bin/python'
 #query_script_location = '/Users/jeffdh5/Desktop/e-mission/recommender/query.py'
-query_script_location = 'recommender/query.py'
+query_script_location = os.path.join(os.getcwd(), 'query.py')
 
 def schedule_queries(_id, trip_array):
 	#_id: This is the original trip _id

@@ -41,7 +41,6 @@ if len(sys.argv) == 4:
 	pdb = get_perturbed_trips_db()
 	trip = pdb.find_one({"_id" : _id})
 
-	#@TODO: josh - can you fill in this code? not sure what method to call to get the trip from the alternatives collection
 	all_alts_finished = True
 	for pert in find_perturbed_trips(trip):
 		pert._id = pert._id.replace('.', '') 
