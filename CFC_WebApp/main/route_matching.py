@@ -73,10 +73,10 @@ def route_matching(lst1,lst2,step,radius,len_match,min_score):
         if num_inter==0:
             lst1_extended.append(lst1[i]['track_location']['coordinates'])
         else:
-            lat_list=np.linspace(lst1[i]['track_location']['coordinates'][0],lst1[i+1]['track_location']['coordinates'][0],num_inter,False)
-            lon_list=np.linspace(lst1[i]['track_location']['coordinates'][1],lst1[i+1]['track_location']['coordinates'][1],num_inter,False)
-            for j in range(len(lat_list)):
-                lst1_extended.append([lat_list[j],lon_list[j]])
+            lon_list=np.linspace(lst1[i]['track_location']['coordinates'][0],lst1[i+1]['track_location']['coordinates'][0],num_inter,False)
+            lat_list=np.linspace(lst1[i]['track_location']['coordinates'][1],lst1[i+1]['track_location']['coordinates'][1],num_inter,False)
+            for j in range(len(lon_list)):
+                lst1_extended.append([lon_list[j],lat_list[j]])
     lst1_extended.append(end_pnt1['track_location']['coordinates'])
     lst2_extended=[]
     for i in range(len(lst2)-1):
@@ -85,10 +85,10 @@ def route_matching(lst1,lst2,step,radius,len_match,min_score):
         if num_inter==0:
             lst2_extended.append(lst2[i]['track_location']['coordinates'])
         else:
-            lat_list=np.linspace(lst2[i]['track_location']['coordinates'][0],lst2[i+1]['track_location']['coordinates'][0],num_inter,False)
-            lon_list=np.linspace(lst2[i]['track_location']['coordinates'][1],lst2[i+1]['track_location']['coordinates'][1],num_inter,False)
-            for j in range(len(lat_list)):
-                lst2_extended.append([lat_list[j],lon_list[j]])
+            lon_list=np.linspace(lst2[i]['track_location']['coordinates'][0],lst2[i+1]['track_location']['coordinates'][0],num_inter,False)
+            lat_list=np.linspace(lst2[i]['track_location']['coordinates'][1],lst2[i+1]['track_location']['coordinates'][1],num_inter,False)
+            for j in range(len(lon_list)):
+                lst2_extended.append([lon_list[j],lat_list[j]])
     lst2_extended.append(end_pnt2['track_location']['coordinates'])
 
     # print(len(lst1_extended))
@@ -169,10 +169,10 @@ def route_matching_2(lst1,lst2,step,radius,min_score):
         if num_inter==0:
             lst1_extended.append(lst1[i]['track_location']['coordinates'])
         else:
-            lat_list=np.linspace(lst1[i]['track_location']['coordinates'][0],lst1[i+1]['track_location']['coordinates'][0],num_inter,False)
-            lon_list=np.linspace(lst1[i]['track_location']['coordinates'][1],lst1[i+1]['track_location']['coordinates'][1],num_inter,False)
-            for j in range(len(lat_list)):
-                lst1_extended.append([lat_list[j],lon_list[j]])
+            lon_list=np.linspace(lst1[i]['track_location']['coordinates'][0],lst1[i+1]['track_location']['coordinates'][0],num_inter,False)
+            lat_list=np.linspace(lst1[i]['track_location']['coordinates'][1],lst1[i+1]['track_location']['coordinates'][1],num_inter,False)
+            for j in range(len(lon_list)):
+                lst1_extended.append([lon_list[j],lat_list[j]])
     lst1_extended.append(end_pnt1['track_location']['coordinates'])
     lst2_extended=[]
     for i in range(len(lst2)-1):
@@ -181,10 +181,10 @@ def route_matching_2(lst1,lst2,step,radius,min_score):
         if num_inter==0:
             lst2_extended.append(lst2[i]['track_location']['coordinates'])
         else:
-            lat_list=np.linspace(lst2[i]['track_location']['coordinates'][0],lst2[i+1]['track_location']['coordinates'][0],num_inter,False)
-            lon_list=np.linspace(lst2[i]['track_location']['coordinates'][1],lst2[i+1]['track_location']['coordinates'][1],num_inter,False)
-            for j in range(len(lat_list)):
-                lst2_extended.append([lat_list[j],lon_list[j]])
+            lon_list=np.linspace(lst2[i]['track_location']['coordinates'][0],lst2[i+1]['track_location']['coordinates'][0],num_inter,False)
+            lat_list=np.linspace(lst2[i]['track_location']['coordinates'][1],lst2[i+1]['track_location']['coordinates'][1],num_inter,False)
+            for j in range(len(lon_list)):
+                lst2_extended.append([lon_list[j],lat_list[j]])
     lst2_extended.append(end_pnt2['track_location']['coordinates'])
 
     # print(len(lst1_extended))
@@ -227,10 +227,10 @@ def refineRoute(lst1,step):
         if num_inter==0:
             lst1_extended.append(lst1[i])
         else:
-            lat_list=np.linspace(lst1[i][0],lst1[i+1][0],num_inter,False)
-            lon_list=np.linspace(lst1[i][1],lst1[i+1][1],num_inter,False)
-            for j in range(len(lat_list)):
-                lst1_extended.append([lat_list[j],lon_list[j]])
+            lon_list=np.linspace(lst1[i][0],lst1[i+1][0],num_inter,False)
+            lat_list=np.linspace(lst1[i][1],lst1[i+1][1],num_inter,False)
+            for j in range(len(lon_list)):
+                lst1_extended.append([lon_list[j],lat_list[j]])
     lst1_extended.append(lst1[-1])
     # print(len(lst1))
     # print(len(lst1_extended))
@@ -250,8 +250,8 @@ def storeTransitStop(type,route):
             print(row[0])
             for i in range(len(root[1])):
                 if row[0].replace(' / ','/').replace('Street','St.').replace('International',"Int'l")==root[1][i].find('name').text:
-                    print(float(root[1][i].find('gtfs_latitude').text),float(root[1][i].find('gtfs_longitude').text))
-                    stops.append([float(root[1][i].find('gtfs_latitude').text),float(root[1][i].find('gtfs_longitude').text)])
+                    print(float(root[1][i].find('gtfs_longitude').text),float(root[1][i].find('gtfs_latitude').text))
+                    stops.append([float(root[1][i].find('gtfs_longitude').text),float(root[1][i].find('gtfs_latitude').text)])
                     break
 
     todo['type']=type
@@ -279,7 +279,7 @@ def storeCalTrainStop():
             geo= json.load(urllib.urlopen(url))
             result=geo['results'][0]
             print(result['geometry']['location'])
-            stops.append([result['geometry']['location']['lat'],result['geometry']['location']['lng']])
+            stops.append([result['geometry']['location']['lng'],result['geometry']['location']['lat']])
 
     todo['type']='CalTrain'
     todo['route']='CalTrain'
@@ -459,7 +459,7 @@ def plot_each_route_cluster_for_user(user_id,method='lcs'):
     user_route_clusters = get_routeCluster_db().find_one({'$and':[{'user':user_id},{'method':method}]})['clusters']
     # plot each cluster as a file.
     for idx in user_route_clusters.keys():
-        print idx
+        # print idx
         gmap = pygmaps.maps(getRoute(idx)[0][0], getRoute(idx)[0][1], 14)
         section=Sections.find_one({'_id': idx})
         drawSection(section, 'path', gmap)

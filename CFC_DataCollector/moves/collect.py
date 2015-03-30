@@ -5,12 +5,14 @@ from datetime import datetime, timedelta
 import logging
 import pytz
 import json
+import numpy as np
 from dateutil import parser
 from get_database import get_mode_db, get_section_db, get_trip_db, get_moves_db
 from time import sleep
 import numpy as np
 from sklearn import linear_model
 import math
+from sklearn import linear_model
 
 config_data = json.load(open('config.json'))
 log_base_dir = config_data['paths']['log_base_dir']
@@ -290,6 +292,7 @@ def processTripArray(user_uuid, trip_array):
           Stage_Trips.insert(trips_todo)
       else:
           logging.debug("Found existing trip with trip_id = %s " % (trip_id))
+
 
 def _cleanGPSData(old_points):
     if len(old_points) > 10:

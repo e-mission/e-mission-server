@@ -34,7 +34,7 @@ def get_userZipcode(user, valid_zip):
 
 def _geocodeZipcode(location):
     try:
-        zipcode = Geocoder.reverse_geocode(location[0],location[1])
+        zipcode = Geocoder.reverse_geocode(location[1],location[0])
         zipc=zipcode[0].postal_code
         # user_pro['zip'] = zip
     except:
