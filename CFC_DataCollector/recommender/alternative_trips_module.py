@@ -25,7 +25,7 @@ Overview of helper files relevant to this pipeline:
 # Invoked in recommendation pipeline to get perturbed trips user should consider
 def calc_alternative_trips(trip_iterator):
 
-    while (trip_iterator.next() != None):
+    while (trip_iterator.hasNext()):
         curr_trip = trip_iterator.next()
         if not curr_trip.getPipelineFlags().alternativesStarted:
             curr_trip.getPipelineFlags().startAlternatives()
