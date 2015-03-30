@@ -40,7 +40,7 @@ class UserUtilityModel:
       # X has 1 samples, but y has 23.
       # self.regression.fit(trip_features + alt_features, target_vector)
     # TODO: AttributeError: 'LogisticRegression' object has no attribute 'coef_'
-    self.coefficients = self.regression.coef_
+    # self.coefficients = self.regression.coef_
 
   # calculate the utility of trip using the model
   def predict_utility(self, trip):

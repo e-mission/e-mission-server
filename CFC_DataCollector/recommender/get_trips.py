@@ -63,6 +63,3 @@ class TripIterator:
         if trip is None:
             return None
         return Trip(trip)
-
-    def hasNext(self):
-        return len(self.storedIter) > 0

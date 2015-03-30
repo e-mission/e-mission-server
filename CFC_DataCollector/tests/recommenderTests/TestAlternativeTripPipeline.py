@@ -71,19 +71,20 @@ class TestAlternativeTripPipeline(unittest.TestCase):
   def testRetrieveAllUserTrips(self):
     #get a users trips, there should be 21
     trip_list = pipeline.get_trips_for_alternatives(self.testUUID)
-    self.assertEquals(len(trip_list), 21) 
+    self.assertEquals(len(list(trip_list)), 21) 
     # Trip 20140407T175709-0700 has two sections
 
   def testAugmentTrips(self):
     trip_list = pipeline.get_trips_for_alternatives(self.testUUID)
-    self.assertEquals(type(trip_list), list)
+    self.assertTrue(hasattr(trip_list, '__iter__'))
     # TODO: Why should this not be 21? Check with Shaun?
     # self.assertNotEquals(len(trip_list), 21) 
-    self.assertEquals(type(trip_list[0]), E_Mission_Trip)
+    firstElement = list(trip_list)[0]
+    self.assertTrue(isinstance(firstElement, E_Mission_Trip))
     # calc_alternative_trips merely schedules the alternative trip calculation at a later time
     # it can't return the alternative trips right now
     # TODO: Figure out how to get this to work
-    pipeline_module.calc_alternative_trips([trip_list[0]].__iter__())
+    pipeline_module.calc_alternative_trips([firstElement].__iter__())
     # self.assertEquals(type(alternative_list), list)
 
   def test_initialize_empty_perturbed_trips(self):

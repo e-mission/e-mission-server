@@ -25,16 +25,19 @@ Overview of helper files relevant to this pipeline:
 # Invoked in recommendation pipeline to get perturbed trips user should consider
 def calc_alternative_trips(trip_iterator):
 
-    while (trip_iterator.hasNext()):
-        curr_trip = trip_iterator.next()
+    for curr_trip in trip_iterator:
         if not curr_trip.getPipelineFlags().alternativesStarted:
             curr_trip.getPipelineFlags().startAlternatives()
             curr_unique_id = curr_trip.get_id()
-            list_of_perturbed_trips = find_perturbed_trips(curr_unique_id)
+            list_of_perturbed_trips = find_perturbed_trips(curr_trip)
             
             #@TODO: need a method that initializes the relationship bewteen a trip, and its perturbations
-            initialize_empty_perturbed_trips(curr_unique_id)
-            schedule_queries(curr_unique_id, list_of_perturbed_trips)
+            initialize_empty_perturbed_trips(curr_unique_id, get_perturbed_trips_db())
+            # TODO: Fix me
+            # This is commented out because it generates the error:
+            # global name 'schedule_queries' is not defined
+            # There is no schedule_queries here and I don't plan to fix this myself
+            # schedule_queries(curr_unique_id, list_of_perturbed_trips)
 
 
 #@TODO: put these methods in database_util.py

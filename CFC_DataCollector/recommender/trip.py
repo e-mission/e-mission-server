@@ -29,7 +29,7 @@ class Trip(object):
         self.start_point = json_seg["track_points"][0] if json_seg["track_points"] else None
         self.end_point = json_seg["track_points"][-1] if json_seg["track_points"] else None
 
-    def get_id():
+    def get_id(self):
         return self._id
 
     def get_duration():
