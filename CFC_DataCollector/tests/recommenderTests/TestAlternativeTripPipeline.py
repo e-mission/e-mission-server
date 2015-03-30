@@ -94,7 +94,7 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     p_db = get_perturbed_trips_db()
     initialize_empty_perturbed_trips(our_id, p_db)
     our_id = our_id.replace('.', '')
-    temp = p_db.find_one({"_id" : our_id})
+    temp = p_db.find_one()[our_id]
     self.assertEquals(type(temp), dict)
 
   def test_update_perturbations(self):

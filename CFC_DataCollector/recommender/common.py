@@ -37,9 +37,12 @@ def initialize_empty_perturbed_trips(_id, pdb):
 	_id = _id.replace('.', "")
 	pdb.insert({_id : new_perturbed_trip})
 
+
 def update_perturbations(_id, perturbed_trip):
 	db = get_perturbed_trips_db()
-	json_trip = db.find_one({"_id" : _id})
+	_id = _id.replace('.', '')
+	json_trip = db.find_one()[_id]
+
 	json_trip[perturbed_trip._id] = jsonpickle.encode(perturbed_trip)
 
 #def query_perturbed_trips()
