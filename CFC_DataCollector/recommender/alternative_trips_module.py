@@ -1,5 +1,5 @@
 import get_trips
-from common import store_trip_in_db, find_perturbed_trips, get_uuid_list
+from common import store_trip_in_db, find_perturbed_trips, initialize_empty_perturbed_trips, update_perturbations 
 from trip import E_Mission_Trip
 from get_database import get_alternative_trips_db, get_perturbed_trips_db
 
@@ -29,12 +29,12 @@ def calc_alternative_trips(trip_iterator):
         curr_trip = trip_iterator.next()
         if not curr_trip.getPipelineFlags().alternativesStarted:
             curr_trip.getPipelineFlags().startAlternatives()
-            curr_unique_id = curr_trip._id
+            curr_unique_id = curr_trip.get_id()
             list_of_perturbed_trips = find_perturbed_trips(curr_unique_id)
             
             #@TODO: need a method that initializes the relationship bewteen a trip, and its perturbations
-            #initialize_perturbations(curr_unique_id)
-            schedule_queries(list_of_perturbed_trips)
+            initialize_empty_perturbed_trips(curr_unique_id)
+            schedule_queries(curr_unique_id, list_of_perturbed_trips)
 
 
 #@TODO: put these methods in database_util.py
