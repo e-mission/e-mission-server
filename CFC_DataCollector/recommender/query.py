@@ -2,6 +2,7 @@ import sys
 import googlemaps
 import datetime
 from crontab import CronTab
+from common import get_perturbed_trips_db, json_to_trip, find_perturbed_trips, initialize_empty_perturbed_trips, update_perturbations 
 
 #usage:
 #(From terminal)
@@ -15,8 +16,7 @@ if len(sys.argv) == 4:
 	curr_minute = curr_time.minute
 
 	_id = sys.argv[1]
-	start = sys.argv[2]
-	end = sys.argv[3]
+
 	modes = ['driving', 'walking', 'bicycling', 'transit']
 	gmaps = googlemaps.Client(key='AIzaSyBEkw4PXVv_bsAdUmrFwatEyS6xLw3Bd9c')
 
@@ -27,10 +27,10 @@ if len(sys.argv) == 4:
 		for result in directions_result:
 			#do something here related to saving the trip
 			#not really sure how to maintain unique ids??
-			gmaps_trip = directions_json_to_trip(result)
+			gmaps_trip = json_to_trip(result)
 			update_perturbations(_id, gmaps_trip)
 
-	#remove job from cron
+	#remove job from cronjob
 	#TODO: make sure that you only remove the cronjob related to your current query, this will remove all cronjobs scheduled at the same time
 	cron = CronTab()
 	for job in cron:
@@ -38,8 +38,18 @@ if len(sys.argv) == 4:
 			cron.remove(job)
 			print("Removed job!")
 
-	trip = get_trip(_id)
-	trip.getpipelineFlags().finishAlternatives()
+	pdb = get_perturbed_trips_db()
+	trip = pdb.find_one({"_id" : _id})
+
+	#@TODO: josh - can you fill in this code? not sure what method to call to get the trip from the alternatives collection
+	all_alts_finished = True
+	for pert in find_perturbed_trips(trip):
+		pert._id = pert._id.replace('.', '') 
+		if [pert._id] == None:
+			all_alts_finished = False
+
+	if all_alts_finished:
+		trip.getpipelineFlags().finishAlternatives()
 
 else:
 	print("Wrong number of input arguments.")
