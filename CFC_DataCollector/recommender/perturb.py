@@ -40,7 +40,7 @@ def schedule_queries(_id, trip_array):
 		time = trip.get_time()
 
 		cron = CronTab()
-		exec_str = python_location + ' ' + query_script_location + ' ' + _id + ' ' + start + ' ' + end
+		exec_str = python_location + ' ' + query_script_location + ' ' + _id
 		job = cron.new(command=exec_str)
 
 		job.month.on(perturbed_time.month)
