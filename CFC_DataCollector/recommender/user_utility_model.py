@@ -22,17 +22,10 @@ class UserUtilityModel:
   def __init__(self, trips = [], alternatives = []): # assuming alternatives a list of lists
     # TODO: Using list() here removes the performance benefits of an iterator.
     # Consider removing/relaxing the assert
-    print list(trips)
     print len(list(trips)), len(alternatives)
     assert(len(list(trips)) == len(alternatives))
     self.regression = lm.LogisticRegression()
     self.update(trips, alternatives)
-    # for i in range(len(augmented_trips)):
-    #   trip_features = trips[i].extract_features()
-    #   alt_features = [alt.extract_features() for alt in alternatives[i]]
-    #   target_vector = [1] + ([0] * len(alternatives))
-    #   self.regression.fit(trip_features + alt_features, target_vector)
-    # self.coefficients = regression.coef_
 
   # update existing model using existing trips
   # for now, just create a new model and return it
@@ -47,7 +40,7 @@ class UserUtilityModel:
       # X has 1 samples, but y has 23.
       # self.regression.fit(trip_features + alt_features, target_vector)
     # TODO: AttributeError: 'LogisticRegression' object has no attribute 'coef_'
-    # self.coefficients = self.regression.coef_
+    self.coefficients = self.regression.coef_
 
   # calculate the utility of trip using the model
   def predict_utility(self, trip):
