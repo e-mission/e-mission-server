@@ -4,6 +4,13 @@
 #
 # This is free software, licensed under the Lesser Affero General 
 # Public License, available in the accompanying LICENSE.txt file.
+# Edited by Josh Zarrabi 2015
+# Updated the directions API calls to work with the new json file that Google puts out 
+# Thus, the geocoding and local search API calls will not work, but thats okay because they arnt used for this project
+# E-Missions 2015
+# #SaveTheWorld
+# #environment 
+# #Yolo
 
 
 """
@@ -13,6 +20,7 @@ An easy-to-use Python wrapper for the Google Maps and Local Search APIs.
 * **Reverse Geocoding**: find the nearest address to (lat, lng)
 * **Local Search**: find places matching a query near a given location
 * **Directions**: turn-by-turn directions, distance, time, etc. from A to B
+
 
 """
 
