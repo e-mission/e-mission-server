@@ -32,17 +32,19 @@ def initialize_empty_perturbed_trips(_id, pdb):
 	trip = E_Mission_Trip(json_trip)
 	for pert in find_perturbed_trips(trip):
 		pert._id = pert._id.replace('.', '') 
-		new_perturbed_trip[pert._id] = 'null'
+		new_perturbed_trip[pert._id] = None
 	#insert_into_pdb(pdb, trip._id, new_perturbed_trip)
 	_id = _id.replace('.', "")
-	pdb.insert({_id : new_perturbed_trip})
+	to_insert = { }
+	to_insert['_id'] = _id
+	to_insert['trips'] = new_perturbed_trip
+	pdb.insert({'our_id': _id, "trips" : new_perturbed_trip})
 
 
 def update_perturbations(_id, perturbed_trip):
 	db = get_perturbed_trips_db()
 	_id = _id.replace('.', '')
-	json_trip = db.find_one()[_id]
-
+	json_trip = db.find_one({"our_id" : _id})
 	json_trip[perturbed_trip._id] = jsonpickle.encode(perturbed_trip)
 
 #def query_perturbed_trips()
