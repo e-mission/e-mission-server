@@ -22,11 +22,11 @@ def detect_home_2(user_id):
         list_home_candidate_cood.append(pnt['track_location']['coordinates'])
 
     list_home_candidate_np = np.asarray(list_home_candidate_cood)
-    minlat = np.min(list_home_candidate_np[:, 0])
-    minlng = np.min(list_home_candidate_np[:, 1])
+    minlat = np.min(list_home_candidate_np[:, 1])
+    minlng = np.min(list_home_candidate_np[:, 0])
     list_home_candidate_np_2 = np.zeros((len(list_home_candidate_np), 2))
-    list_home_candidate_np_2[:, 0] = (list_home_candidate_np[:, 0] - minlat) * 89.7
-    list_home_candidate_np_2[:, 1] = (list_home_candidate_np[:, 1] - minlng) * 112.7
+    list_home_candidate_np_2[:, 1] = (list_home_candidate_np[:, 0] - minlat) * 89.7
+    list_home_candidate_np_2[:, 0] = (list_home_candidate_np[:, 1] - minlng) * 112.7
     db = DBSCAN(eps=0.2, min_samples=3)
     db_fit = db.fit(list_home_candidate_np_2)
     db_labels = db_fit.labels_

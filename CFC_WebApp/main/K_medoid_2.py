@@ -66,6 +66,9 @@ def kmedoids(data_feature, k, user_id,method='lcs'):
     4. Select the configuration with the lowest cost.
     5. repeat steps 2 to 4 until there is no change in the medoid.
     '''
+    
+    if k >= len(data_feature):
+        return (0, [], {})
 
     disMat_user=get_routeDistanceMatrix_db().find_one({'$and':[{'user':user_id},{'method':method}]})['disMat']
 
