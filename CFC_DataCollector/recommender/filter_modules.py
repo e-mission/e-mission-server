@@ -29,6 +29,7 @@ def getCanonicalTrips(uid, number_returned = 10):
     for cid in sorted_clusters:
         if x <= number_returned:
             canonical_trip_list.append(random.choice(user_route_clusters[cid]))
+            x+=1
 
     return iter(canonical_trip_list)
 
