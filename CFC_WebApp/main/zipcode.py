@@ -32,11 +32,17 @@ def get_userZipcode(user, valid_zip):
         return 'N/A'
 
 def _geocodeZipcode(user_pro, location):
-    zipcode = Geocoder.reverse_geocode(location[1],location[0])
-    zip=zipcode[0].postal_code
-    user_pro['zip'] = zip
-    return zip
-
+    try:
+        zipcode = Geocoder.reverse_geocode(location[1],location[0])
+        zipc=zipcode[0].postal_code
+        # user_pro['zip'] = zip
+    except:
+        zipc = 'N/A'
+    if zipc == None:
+        zipc = 'N/A'
+    user_pro['zip'] = zipc
+    return zipc
+    
 def getZipcode():
     Profiles=get_profile_db()
     zips = Profiles.distinct("zip")
