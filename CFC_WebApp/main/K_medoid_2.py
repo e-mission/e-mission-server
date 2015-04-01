@@ -7,7 +7,6 @@ from route_matching import fullMatchDistance,getRoute
 from LCS import lcsScore
 from common import getDisplayModes
 import random
-import pygmaps
 import sys
 import time
 
