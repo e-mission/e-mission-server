@@ -2,6 +2,7 @@
 #from common.featurecalc import get_cost
 import jsonpickle
 import datetime
+from get_database import *
 
 # def unit_test():
 #     info = open("C:/Users/rzarrabi/Documents/school/junior/spring/trip/e-mission-server/CFC_DataCollector/tests/data/missing_trip", "r")
@@ -65,6 +66,22 @@ class PipelineFlags(object):
     def finishAlternatives(self):
         self.alternativesFinished = True
 
+    def loadPipelineFlags(self, _id):
+        db = get_section_db()
+        json_object = db.find_one({'_id': _id})
+        if json_object != None and 'pipelineFlags' in json_object:
+        
+            tf = json_object['pipelineFlags']
+            if tf['alternativesStarted'] == 'True':
+                self.alternativesStarted = True
+            if tf['alternativesFinished'] == 'True':
+                self.alternativesFinished = True
+
+    def savePipelineFlags(self, _id):
+        db = get_section_db()
+        json_object = db.find_one({'_id' : _id})
+        json_object['pipelineFlags'] = {'alternativesStarted': self.alternativesStarted, 'alternativesFinished': self.alternativesFinished} 
+
 class E_Mission_Trip(Trip):
 
     #if there are no alternatives found, set alternatives list to None 
@@ -73,6 +90,9 @@ class E_Mission_Trip(Trip):
         super(E_Mission_Trip, self).__init__(json_segment)
         self.alternatives = alternatives
         self.pipelineFlags = PipelineFlags()
+
+        #looks into database to see if pipeline flags have been set before
+        self.pipelineFlags.loadPipelineFlags(json_segment['_id'])
     
     def get_alternatives(self):
         return self.alternatives
