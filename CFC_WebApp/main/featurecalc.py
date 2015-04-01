@@ -8,33 +8,11 @@ from sklearn.cluster import DBSCAN
 from get_database import get_routeCluster_db,get_transit_db
 from uuid import UUID
 from route_matching import getRoute,fullMatchDistance,matchTransitRoutes,matchTransitStops
-from common import get_mode_share_by_count
+from common import get_mode_share_by_count, calDistance, Include_place_2
 
 Sections = MongoClient('localhost').Stage_database.Stage_Sections
 Modes=MongoClient('localhost').Stage_database.Stage_Modes
-# Returns distance in m
-def Include_place(lst,place,radius):
-    # list of tracking points
-    count=0
-    for pnt in lst:
-        count=count+(1 if calDistance(pnt,place)<=radius else 0)
-    if count>0:
-        return True
-    else:
-        return False
 
-def calDistance(point1, point2):
-    earthRadius = 6371000
-    dLat = math.radians(point1[0]-point2[0])
-    dLon = math.radians(point1[1]-point2[1])
-    lat1 = math.radians(point1[0])
-    lat2 = math.radians(point2[0])
-
-    a = (math.sin(dLat/2) ** 2) + ((math.sin(dLon/2) ** 2) * math.cos(lat1) * math.cos(lat2))
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-    d = earthRadius * c
-
-    return d
 
 # The speed is in m/s
 def calSpeed(trackpoint1, trackpoint2):
@@ -323,8 +301,8 @@ def mode_start_end_coverage(segment,cluster,eps):
     centers=cluster
     # print(centers)
     try:
-        if Include_place(centers,segment['section_start_point']['coordinates'],eps) and \
-                    Include_place(centers,segment['section_end_point']['coordinates'],eps):
+        if Include_place_2(centers,segment['section_start_point']['coordinates'],eps) and \
+                    Include_place_2(centers,segment['section_end_point']['coordinates'],eps):
             return 1
         else:
             return 0

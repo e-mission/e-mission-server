@@ -4,11 +4,9 @@ import math
 from get_database import get_routeDistanceMatrix_db,get_routeCluster_db,get_section_db
 from common import calDistance
 from route_matching import fullMatchDistance,getRoute
-from gmap_display import drawSection
 from LCS import lcsScore
 from common import getDisplayModes
 import random
-import pygmaps
 import sys
 import time
 
@@ -66,6 +64,9 @@ def kmedoids(data_feature, k, user_id,method='lcs'):
     4. Select the configuration with the lowest cost.
     5. repeat steps 2 to 4 until there is no change in the medoid.
     '''
+    
+    if k >= len(data_feature):
+        return (0, [], {})
 
     disMat_user=get_routeDistanceMatrix_db().find_one({'$and':[{'user':user_id},{'method':method}]})['disMat']
 
