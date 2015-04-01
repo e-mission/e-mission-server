@@ -3,7 +3,6 @@ import numpy as np
 from pymongo import MongoClient
 import random
 from uuid import UUID
-from gmap_display import *
 from pygeocoder import Geocoder
 from route_matching import *
 from DTW import Dtw
