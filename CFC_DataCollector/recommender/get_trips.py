@@ -3,7 +3,7 @@ import logging
 sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
 from main.userclient import getClientSpecificQueryFilter
 from main.get_database import get_section_db
-import query_modules
+import filter_modules
 
 class TripIterator:
     """
@@ -28,7 +28,7 @@ class TripIterator:
         assert (len(filter_queries) >= 2), "filter_queries too short"
 
         mod, query = filter_queries[0], filter_queries[1]
-        query_function = query_modules.modules.get(mod).get(query)
+        query_function = filter_modules.modules.get(mod).get(query)
 
         try:
             if len(filter_queries) == 3:
