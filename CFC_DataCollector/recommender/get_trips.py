@@ -40,7 +40,7 @@ class TripIterator:
                 # no options
                 self.storedIter = query_function(user_uuid)
         except TypeError as e:
-            print e 
+            print e
             print "initializing iterator"
             logging.warn("Found no query function for filter_queries: ", filter_queries);
             self.storedIter = []
