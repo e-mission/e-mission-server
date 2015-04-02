@@ -62,7 +62,7 @@ class TestRecommendationPipeline(unittest.TestCase):
     recommended_trips = pipeline.recommend_trips(trip_list[0]._id, utility_model)
 
   def testCanonical(self):
-    canonical_trip_iter = TripIterator(self.testUUID, ['trips', ['get_canonical']]).__iter__()
+    canonical_trip_iter = TripIterator(self.testUUID, ['trips', 'get_canonical']).__iter__()
 
 if __name__ == '__main__':
     unittest.main()
