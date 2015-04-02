@@ -17,7 +17,7 @@ from dao.user import User
 from dao.client import Client
 import tests.common
 from moves import collect
-from get_trips import TripIterator
+from recommender.get_trips import TripIterator
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -62,7 +62,7 @@ class TestRecommendationPipeline(unittest.TestCase):
     recommended_trips = pipeline.recommend_trips(trip_list[0]._id, utility_model)
 
   def testCanonical(self):
-    canonical_trip_iter = TripIterator(['trips', ['get_canonical']]).__iter__()
+    canonical_trip_iter = TripIterator(self.testUUID, ['trips', 'get_canonical']).__iter__()
 
 if __name__ == '__main__':
     unittest.main()
