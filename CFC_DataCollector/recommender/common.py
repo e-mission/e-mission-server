@@ -9,6 +9,17 @@ import random
 import json
 import jsonpickle
 
+class Coordinate:
+    def __init__(self, lat, lon):
+        self.lat = lat
+        self.lon = long
+
+    def get_lat(self):
+        return self.lat
+
+    def get_lon(self):
+        return self.lon
+
 def get_uuid_list():
 	uuid_list = [ ]
 	db = get_section_db()

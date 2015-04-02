@@ -1,5 +1,6 @@
 #maps team provided get_cost function
 #from common.featurecalc import get_cost
+from common import Coordinate
 import jsonpickle
 import datetime
 from get_database import *
@@ -9,26 +10,45 @@ from get_database import *
 #     t = Trip(info.read())
 #     return tt
 
+def trip_factory(json_segment):
+    #E_Mission_Trip
+    if json_segment.get("alternatives"):
+        if json_segment.get("start_point_distr"):
+            return Canonical_E_Mission_Trip(json_segment)
+        else:
+            return E_Mission_Trip(json_segment)
+    #Alternative Trip
+    else:
+        #Canonical Alternative   
+        if json_segment.get("canonical"):
+            return Canonical_Alternative_Trip(json_segment)
+        elif json_segment.get("perturbed"):
+            return Perturbed_Trip(json_segment)
+        else:
+            return Alternative_Trip(json_segment)
+
+        
+
 class Trip(object): 
     #Instance parameters
     def __init__(self, json_segment):
         self.trip_from_json(json_segment)
 
     def trip_from_json(self, json_seg):
-        print json_seg
-        '''
-        parse json into proper trip format
-        '''
         self._id = json_seg["_id"]
         #TODO: make sure this is correct
         self.single_mode = json_seg["mode"] 
-        #TODO: not sure how to get all legs from section query
-        self.legs = []
         self.start_time = json_seg["section_start_time"]
         self.end_time = json_seg["section_end_time"]
         #TODO: check this field
-        self.start_point = json_seg["track_points"][0] if json_seg["track_points"] else None
-        self.end_point = json_seg["track_points"][-1] if json_seg["track_points"] else None
+        points = json_seg["track_points"]
+        self.start_point = Coordinate(points[0][1], points[0][0]) if points else None
+        self.end_point = Coordinate(points[-1][1], points[-1][0]) if points else None
+        print self.__dict__
+
+    def save_to_db(self, collection):
+        attrs = self.__dict__
+        collection.insert(attrs)
 
     def get_id(self):
         return self._id
@@ -59,6 +79,7 @@ class PipelineFlags(object):
     def __init__(self):
         self.alternativesStarted = False
         self.alternativesFinished = False
+        self.loadPipelineFlags()
 
     def startAlternatives(self):
         self.alternativesStarted = True
@@ -85,7 +106,6 @@ class PipelineFlags(object):
 class E_Mission_Trip(Trip):
 
     #if there are no alternatives found, set alternatives list to None 
-    #def __init__(self, _id, single_mode, legs, start_time, end_time, start_point, end_point, alternatives=[], pipelineFlags = None): 
     def __init__(self, json_segment, alternatives=[], pipelineFlags = None): 
         super(E_Mission_Trip, self).__init__(json_segment)
         self.alternatives = alternatives
@@ -100,46 +120,41 @@ class E_Mission_Trip(Trip):
     def getPipelineFlags(self):
         return self.pipelineFlags
 
-class Canonical_Trip(Trip):
+    def saveToDb(self, collection):
+        db = get_section_db()
+        json_object = db.find_one({'_id' : self._id})
+        json_object['pipelineFlags'] = {'alternativesStarted': self.alternativesStarted, 'alternativesFinished': self.alternativesFinished} 
+    
+
+class Canonical_E_Mission_Trip(E_Mission_Trip):
     #if there are no alternatives found, set alternatives list to None 
     #def __init__(self, json_segment, start_point_distr, end_point_distr, start_time_distr, end_time_distr, num_trips, alternatives = []):
-    def __init__(self, json_segment, num_trips, alternatives = []):
-        super(self.__class__, self).__init__(json_segment)
-        self.calc_start_point_distr(json_segment)
-        self.calc_end_point_distr(json_segment)
-        self.calc_start_time_distr(json_segment)
-        self.calc_end_time_distr(json_segment)
-        self.num_trips = num_trips
-        self.alternatives = alternatives
-
-    def calc_start_point_distr(json_segment):
-        self.start_point_distr = None 
-    def calc_end_point_distr(json_segment):
-        self.end_point_distr = None 
-    def calc_start_time_distr(json_segment):
-        self.start_time_distr = None 
-    def calc_end_time_distr(json_segment):
-        self.end_time_distr = None 
+    def __init__(self, json_segment, alternatives = [], pipelineFlags = None):
+        super(self.__class__, self).__init__(json_segment, alternatives, pipelineFlags)
+        self.start_point_distr = json_segment["start_point_distr"]
+        self.end_point_distr = json_segment["end_point_distr"]
+        self.start_time_distr = json_segment["start_time_distr"]
+        self.end_time_distr = json_segment["end_time_distr"]
     
     def get_alternatives(self):
         return self.alternatives
 
-class Alternative_Trip(Trip):
-    #def __init__(self, _id, single_mode, legs, start_time, end_time, start_point, end_point, trip_id, parent_id, cost):
-    def __init__(self, trip_id, parent_id, cost, json_segment):
-        super(self.__class__, self).__init__(json_segment)
-        self.trip_id = trip_id
-        self.parent_id = parent_id
-        self.cost = cost
+    def get_num_trips(self):
+        #TODO: make sure this is consistent with generation
+        return len(self.start_point_distr)
 
-class Leg:
-    """Represents the leg of a trip"""
-    def __init__(self, trip_id):
-        self.starting_point = None
-        self.ending_point = None
-        self.mode = None
-        self.cost = 0
-        self.duration = 0
-        self.distance = 0
-        self.dirs = None
+class Alternative_Trip(Trip):
+    def __init__(self, json_segment):
+        super(self.__class__, self).__init__(json_segment)
+        self.parent_id = json_segment["parent_id"]
+        self.cost = json_segment.get("cost")
+
+class Canonical_Alternative_Trip(Alternative_Trip):
+    def __init__(self, canonical_trip_id, cost, json_segment):
+        super(self.__class__, self).__init__(json_segment)
+        self.canonical = True
+
+class Perturbed_Trip(Alternative_Trip, E_Mission_Trip):
+    def __init__(self, json_segment):
+        super(self.__class__, self).__init__(json_segment)
 
