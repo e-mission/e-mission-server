@@ -36,7 +36,6 @@ def insert_into_pdb(pdb, my_id, new_perturbed_trip):
 		pdb.insert({new_id : new_perturbed_trip})
     
 def initialize_empty_perturbed_trips(_id, pdb):
-	# Assuming I have the methods json_to_trip and trip_to_json
 	db = get_section_db()
 	json_trip = db.find_one({"_id" : _id})
 	new_perturbed_trip = { }
@@ -73,62 +72,6 @@ def calc_car_cost(trip_id, distance):
 	xml = price.read()
 	p = ET.fromstring(xml)[-1]
 	return float(p.text)*gallons
-
-def store_trip_in_db(trip, is_alternate):
-	""" Stores a trip in the databse, specify whether or not the trip is an alternative """
-	db = get_section_db()
-	to_insert = { }
-	to_insert['_id'] = trip._id
-	#to_insert['distance'] = trip.distance
-	to_insert['section_start_datetime'] = trip.start_time
-	to_insert['section_end_datetime'] = trip.end_time
-	to_insert['section_start_point'] = {'type' : 'Point', 'coordinates' : trip.start_point}
-	to_insert['section_end_point'] = {'type' : 'Point', 'coordinates' : trip.end_point}
-	to_insert['cost'] = trip.cost
-	to_insert['single_mode'] = str(single_mode)
-	to_insert['legs'] = [ ]
-	for leg in trip.legs:
-		l = { }
-		l['mode'] = leg.mode
-		l['cost'] = leg.cost
-		l['duration'] = leg.duration
-		l['distance'] = distance
-		l['start_point'] = {'type' : 'Point', 'coordinates' : leg.starting_point}
-		l['end_point'] = {'type' : 'Point', 'coordinates' : leg.ending_point}
-		to_insert['legs'].append(l)
-	if is_alternate:
-		t = db.find_one({'trip_id' : trip.parent_tid})
-		try:
-			t['alternate_trips'].append(to_insert)
-		except:
-			t['alternate_trips'] = []
-			t['alternate_trips'].append(to_insert)
-	else:
-		db.insert(to_insert)
-
-
-def trip_to_json(trip):
-	to_insert = { }
-	to_insert['_id'] = trip._id
-	#to_insert['distance'] = trip.distance
-	to_insert['section_start_datetime'] = trip.start_time
-	to_insert['section_end_datetime'] = trip.end_time
-	to_insert['section_start_point'] = {'type' : 'Point', 'coordinates' : trip.start_point}
-	to_insert['section_end_point'] = {'type' : 'Point', 'coordinates' : trip.end_point}
-	to_insert['cost'] = trip.cost
-	to_insert['single_mode'] = str(single_mode)
-	to_insert['legs'] = [ ]
-	for leg in trip.legs:
-		l = { }
-		l['mode'] = leg.mode
-		l['cost'] = leg.cost
-		l['duration'] = leg.duration
-		l['distance'] = distance
-		l['start_point'] = {'type' : 'Point', 'coordinates' : leg.starting_point}
-		l['end_point'] = {'type' : 'Point', 'coordinates' : leg.ending_point}
-		to_insert['legs'].append(l)
-	final = {tripObj._id : to_insert}
-	return final
 
 def create_trip_id():
 	return random.randint(100, 999)

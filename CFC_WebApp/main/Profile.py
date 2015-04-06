@@ -5,7 +5,9 @@ from zipcode import get_userZipcode
 from work_place import detect_work_office, detect_daily_work_office
 from get_database import get_section_db,get_profile_db
 from pygeocoder import Geocoder
-from common import calDistance 
+from common import calDistance
+from route_matching import update_user_routeDistanceMatrix, update_user_routeClusters
+from K_medoid_2 import kmedoids, user_route_data
 import math
 
 
@@ -19,7 +21,9 @@ def update_profiles(dummy_users=False):
     else:
         user_list = get_section_db().distinct('user_id')
     for user in user_list:
+        # print user
         user_home=detect_home(user)
+        # print user_home
         zip_is_valid = _check_zip_validity(user_home, user)
         logging.debug('starting for %s' % user)
         if Profiles.find({'user_id':user}).count()==0:
@@ -48,6 +52,11 @@ def update_profiles(dummy_users=False):
             key='work'+str(day)
             Profiles.update({"$and":[{'source':'Shankari'},
                                          {'user_id':user}]},{"$set":{key:detect_daily_work_office(user,day)}})
+        ## update route clusters:
+        routes_user = user_route_data(user,get_section_db())
+        update_user_routeDistanceMatrix(user,routes_user,step1=100000,step2=100000,method='dtw')
+        clusters_user = kmedoids(routes_user,int(math.ceil(len(routes_user)/8) + 1),user,method='dtw')
+        update_user_routeClusters(user,clusters_user[2],method='dtw')
     # print(Profiles.find().count())
     # for profile in Profiles.find():
     #     print(profile)

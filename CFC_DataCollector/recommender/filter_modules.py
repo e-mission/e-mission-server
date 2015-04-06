@@ -64,16 +64,6 @@ def getAllTrips(uid):
     #return [trip.E_Mission_Trip.trip_from_json(jsonStr) for jsonStr in get_section_db().find({'user_id' : uid})].__iter__()
     return [trip.E_Mission_Trip(jsonStr) for jsonStr in get_section_db().find({'user_id' : uid})].__iter__()
 
-def trip_comparator_date(less_than):
-    def compare(x, y):
-        if x.start_time < y.start_time:
-            return -1
-        elif y.start_time < x.start_time:
-            return 1
-        else:
-            return 0
-    return compare
-
 def getRecentTrips(uid, options = 10):
     return []
 

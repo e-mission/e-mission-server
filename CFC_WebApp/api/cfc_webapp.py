@@ -300,7 +300,7 @@ def getCarbonCompare():
 
   from clients.default import default
   
-  if 'user' not in request.headers or request.headers.get('user') == '':
+  if 'User' not in request.headers or request.headers.get('User') == '':
     return "Waiting for user data to become available..."
 
   user_uuid = getUUID(request, inHeader=True)
@@ -430,7 +430,7 @@ def getUUID(request, inHeader=False):
     logging.debug("skipAuth = %s, returning fake UUID %s" % (skipAuth, user_uuid))
   else:
     if inHeader:
-      userToken = request.headers.get('user').split()[1]
+      userToken = request.headers.get('User').split()[1]
     else:
       userToken = request.json['user']
     retUUID = getUUIDFromToken(userToken)
