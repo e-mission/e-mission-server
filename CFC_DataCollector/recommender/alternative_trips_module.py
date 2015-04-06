@@ -25,7 +25,6 @@ Overview of helper files relevant to this pipeline:
 
 # Invoked in recommendation pipeline to get perturbed trips user should consider
 def calc_alternative_trips(trip_iterator):
-
     for curr_trip in trip_iterator:
         if not curr_trip.pipelineFlags.alternativesStarted:
             curr_trip.pipelineFlags.startAlternatives()
@@ -33,7 +32,6 @@ def calc_alternative_trips(trip_iterator):
             list_of_perturbed_trips = find_perturbed_trips(curr_trip)
             initialize_empty_perturbed_trips(curr_unique_id, get_perturbed_trips_db())
             schedule_queries(curr_unique_id, list_of_perturbed_trips)
-
 
 #@TODO: put these methods in database_util.py
 #@TODO: These stubs need to be passed in a unique id as well as a trip ppboject

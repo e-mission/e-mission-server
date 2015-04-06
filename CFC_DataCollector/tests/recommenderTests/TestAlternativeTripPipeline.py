@@ -11,7 +11,7 @@ import sys
 import os
 from datetime import datetime, timedelta
 import recommender.alternative_trips_module as pipeline_module
-import recommender.alternative_trips_pipeline as pipeline 
+from recommender.alternative_trips_pipeline import AlternativeTripsPipeline
 from recommender.trip import *
 # Needed to modify the pythonpath
 sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
@@ -49,12 +49,11 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     for row in dataJSON:
       self.ModesColl.insert(row)
     
-    # import data from tests/data/testModeInferFiles
-    #self.pipeline = pipeline.ModeRecommendationPipeline()
-    #self.testRecommendationPipeline()
     # register each of the users and add sample trips to each user
     result = self.loadTestJSON("tests/data/missing_trip")
     collect.processResult(self.testUUID, result)
+    
+    self.pipeline = AlternativeTripsPipeline()
 
   def tearDown(self):
     get_section_db().remove({"user_id": self.testUUID})
@@ -69,12 +68,12 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     
   def testRetrieveAllUserTrips(self):
     #get a users trips, there should be 21
-    trip_list = pipeline.get_trips_for_alternatives(self.testUUID)
+    trip_list = self.pipeline.get_trips_for_alternatives(self.testUUID)
     self.assertEquals(len(list(trip_list)), 21) 
     # Trip 20140407T175709-0700 has two sections
 
   def testAugmentTrips(self):
-    trip_list = pipeline.get_trips_for_alternatives(self.testUUID)
+    trip_list = self.pipeline.get_trips_for_alternatives(self.testUUID)
     self.assertTrue(hasattr(trip_list, '__iter__'))
     # TODO: Why should this not be 21? Check with Shaun?
     # self.assertNotEquals(len(trip_list), 21) 
@@ -117,15 +116,17 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     initialize_empty_perturbed_trips(our_id, pdb)
     update_perturbations(our_id, trip)
   '''
+  def test_pipeline_e2e(self):
+    self.pipeline.runPipeline()
     
   def storeAlternativeTrips(self):
-    trip_list = pipeline.get_trip_for_alternatives(self.testUUID) 
+    trip_list = self.pipeline.get_trip_for_alternatives(self.testUUID) 
     self.assertEquals(type(trip_list), collections.Iterator)
     self.assertNotEquals(len(trip_list), 21) 
     self.assertEquals(type(trip_list[0]), E_Mission_Trip)
-    alternative_list = pipeline.get_alternative_trips(self.testUUID, trip_list[0]._id)
+    alternative_list = pipeline_module.get_alternative_trips(self.testUUID, trip_list[0]._id)
     self.assertGreater(len(alternative_list), 0)
-    pipeline.store_alternative_trips(alternative_list)
+    pipeline_module.store_alternative_trips(alternative_list)
     self.assertEquals(type(alternative_list), list)
 
 

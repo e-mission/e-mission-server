@@ -9,7 +9,7 @@ import re
 import sys 
 import os
 from datetime import datetime, timedelta
-from recommender import utility_model_pipeline as pipeline
+from recommender.utility_model_pipeline import UtilityModelPipeline
 # Needed to modify the pythonpath
 sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
 sys.path.append("%s" % os.getcwd())
@@ -48,12 +48,9 @@ class TestUtilityModelPipeline(unittest.TestCase):
     #TODO: add many trip filter functions to play with
     self.trip_filters = None
 
-    # import data from tests/data/testModeInferFiles
-    #self.pipeline = pipeline.ModeRecommendationPipeline()
-    #self.testRecommendationPipeline()
-    # register each of the users and add sample trips to each user
     result = self.loadTestJSON("tests/data/missing_trip")
     collect.processResult(self.testUUID, result)
+    self.pipeline = UtilityModelPipeline()
 
   def tearDown(self):
     get_section_db().remove({"user_id": self.testUUID})
@@ -68,23 +65,26 @@ class TestUtilityModelPipeline(unittest.TestCase):
     
   def testRetrieveTrainingTrips(self):
     #get a users trips, there should be 21
-    trip_list = pipeline.get_training_trips(self.testUUID, self.trip_filters)
+    trip_list = self.pipeline.get_training_trips(self.testUUID)
     self.assertEquals(len(list(trip_list)), 22) 
 
   def testBuildUserModel(self):
     #get a users trips, there should be 21
-    trip_list = pipeline.get_training_trips(self.testUUID, self.trip_filters)
-    model = pipeline.build_user_model(self.testUUID, trip_list)
+    trip_list = self.pipeline.get_training_trips(self.testUUID)
+    model = self.pipeline.build_user_model(self.testUUID, trip_list)
     self.assertTrue(isinstance(model, UserUtilityModel))
 
   def testModifyUserModel(self):
-    trip_list = pipeline.get_training_trips(self.testUUID, self.trip_filters)
-    model = pipeline.build_user_model(self.testUUID, trip_list)
+    trip_list = self.pipeline.get_training_trips(self.testUUID)
+    model = self.pipeline.build_user_model(self.testUUID, trip_list)
     print model
     self.assertTrue(isinstance(model, UserUtilityModel))
-    new_model = pipeline.modify_user_utility_model(self.testUUID, model, trip_list)
+    new_model = self.pipeline.modify_user_utility_model(model)
     self.assertTrue(isinstance(model, UserUtilityModel))
     self.assertNotEquals(new_model, model)
+
+  def test_pipeline_e2e(self):
+    self.pipeline.runPipeline()
 
 if __name__ == '__main__':
     unittest.main()

@@ -16,14 +16,15 @@
 
 from get_database import get_utility_model_db
 from sklearn import linear_model as lm
-class UserUtilityModel:
+class UserUtilityModel(object):
   # return user-specific weights for a given user based on logistic regression on
   # their past trips and potential alternatives
-  def __init__(self, trips = [], alternatives = []): # assuming alternatives a list of lists
+  def __init__(self, user_id, trips, alternatives): # assuming alternatives a list of lists
     # TODO: Using list() here removes the performance benefits of an iterator.
     # Consider removing/relaxing the assert
     print len(list(trips)), len(alternatives)
     assert(len(list(trips)) == len(alternatives))
+    self.user_id = user_id
     self.regression = lm.LogisticRegression()
     self.update(trips, alternatives)
 
