@@ -20,6 +20,7 @@ from dao.client import Client
 import tests.common
 from moves import collect
 from recommender.common import *
+import collections
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -47,9 +48,6 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     for row in dataJSON:
       self.ModesColl.insert(row)
     
-    #TODO: add many trip filter functions to play with
-    self.trip_filters = None
-
     # import data from tests/data/testModeInferFiles
     #self.pipeline = pipeline.ModeRecommendationPipeline()
     #self.testRecommendationPipeline()
@@ -118,27 +116,24 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     initialize_empty_perturbed_trips(our_id, pdb)
     update_perturbations(our_id, trip)
     
-
-   	
   def storeAlternativeTrips(self):
-    trip_list = pipeline.get_user_trips(self.testUUID, self.trip_filters)
-    self.assertEquals(type(trip_list), list)
+    trip_list = pipeline.get_trip_for_alternatives(self.testUUID) 
+    self.assertEquals(type(trip_list), collections.Iterator)
     self.assertNotEquals(len(trip_list), 21) 
     self.assertEquals(type(trip_list[0]), E_Mission_Trip)
     alternative_list = pipeline.get_alternative_trips(self.testUUID, trip_list[0]._id)
+    self.assertGreater(len(alternative_list), 0)
     pipeline.store_alternative_trips(alternative_list)
     self.assertEquals(type(alternative_list), list)
 
 
-  # def testLoadDatabse(self):
-  #   trip_list = pipeline.get_user_trips(self.testUUID, self.trip_filters)
-  #   alternative_list = pipeline.get_alternative_trips(self.testUUID, trip_list[0]._id)
-  #   pipeline.store_alternative_trips(alternative_list)
-  #   altTripsDB = get_alternative_trips_db()
-  #   json_trip = altTripsDB.find_one({"type" : "move"})
-  #   self.assertTrue(json_trip)
-
-
+def testLoadDatabse(self):
+    trip_list = pipeline.get_user_trips(self.testUUID, self.trip_filters)
+    alternative_list = pipeline.get_alternative_trips(self.testUUID, trip_list[0]._id)
+    pipeline.store_alternative_trips(alternative_list)
+    altTripsDB = get_alternative_trips_db()
+    json_trip = altTripsDB.find_one({"type" : "move"})
+    self.assertTrue(json_trip)
 
 if __name__ == '__main__':
     unittest.main()

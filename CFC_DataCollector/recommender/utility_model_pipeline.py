@@ -4,11 +4,11 @@ augmented trips. Store in database and return the model.
 """
 
 from user_utility_model import UserUtilityModel
-import get_trips as gt
+import tripiterator as ti
 import alternative_trips_module as atm
 
 def get_training_trips(user_id, filter_function = None):
-    return gt.TripIterator(user_id, ["utility", "get_training"])
+    return ti.TripIterator(user_id, ["utility", "get_training"])
 
 def build_user_model(user_id, trips):
   model = UserUtilityModel.find_from_db(user_id)
@@ -27,7 +27,8 @@ def build_user_model(user_id, trips):
 
 # We have two options for recommendation: adjusting user utility model,
 # incorporating factors such as emissions, or adjusting user trips,
-# perhaps finding a trip that meets the user
+# perhaps finding a trip that meets the user needs better but that they haven't
+# considered
 def modify_user_utility_model(user_id, utility_model, trips):
     # change utility model,
     # TODO: IMPLEMENT ME

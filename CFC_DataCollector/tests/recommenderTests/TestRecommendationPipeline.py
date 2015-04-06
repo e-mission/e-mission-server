@@ -17,7 +17,7 @@ from dao.user import User
 from dao.client import Client
 import tests.common
 from moves import collect
-from recommender.get_trips import TripIterator
+from recommender.tripiterator import TripIterator
 
 logging.basicConfig(level=logging.DEBUG)
 

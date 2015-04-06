@@ -1,8 +1,6 @@
-from common import store_trip_in_db
-#import get_trips
 from trip import E_Mission_Trip
 from alternative_trips_module import calc_alternative_trips
-import get_trips as gt
+import tripiterator as ti
 from common import get_uuid_list
 
 
@@ -11,7 +9,7 @@ from common import get_uuid_list
 
 def get_trips_for_alternatives(user_uuid):
     # TODO: Should this be all, or should it only be the trips that don't have alternatives yet
-    return gt.TripIterator(user_uuid, ["trips", "get_all"])
+    return ti.TripIterator(user_uuid, ["trips", "get_all"])
 
 for user_uuid in get_uuid_list():
     bare_trips = get_trips_for_alternatives(user_uuid)

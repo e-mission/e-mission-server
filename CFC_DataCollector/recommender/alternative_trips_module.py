@@ -1,5 +1,4 @@
-import get_trips
-from common import store_trip_in_db, find_perturbed_trips, initialize_empty_perturbed_trips, update_perturbations 
+from common import find_perturbed_trips, initialize_empty_perturbed_trips, update_perturbations 
 from trip import E_Mission_Trip
 #from get_database import get_perturbed_trips_db
 from get_database import *
