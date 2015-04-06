@@ -27,9 +27,9 @@ Overview of helper files relevant to this pipeline:
 def calc_alternative_trips(trip_iterator):
 
     for curr_trip in trip_iterator:
-        if not curr_trip.getPipelineFlags().alternativesStarted:
-            curr_trip.getPipelineFlags().startAlternatives()
-            curr_unique_id = curr_trip.get_id()
+        if not curr_trip.pipelineFlags.alternativesStarted:
+            curr_trip.pipelineFlags.startAlternatives()
+            curr_unique_id = curr_trip._id
             list_of_perturbed_trips = find_perturbed_trips(curr_trip)
             initialize_empty_perturbed_trips(curr_unique_id, get_perturbed_trips_db())
             schedule_queries(curr_unique_id, list_of_perturbed_trips)

@@ -1,4 +1,5 @@
 import unittest
+import traceback
 import json
 #from utils import load_database_json, purge_database_json
 #from main import tripManager
@@ -84,7 +85,7 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     # TODO: Figure out how to get this to work
     pipeline_module.calc_alternative_trips([firstElement].__iter__())
     # self.assertEquals(type(alternative_list), list)
-
+  '''
   def test_initialize_empty_perturbed_trips(self):
     db = get_section_db()
     i = 0
@@ -115,6 +116,7 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     our_id = temp['_id']
     initialize_empty_perturbed_trips(our_id, pdb)
     update_perturbations(our_id, trip)
+  '''
     
   def storeAlternativeTrips(self):
     trip_list = pipeline.get_trip_for_alternatives(self.testUUID) 

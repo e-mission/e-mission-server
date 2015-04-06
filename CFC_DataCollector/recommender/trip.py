@@ -5,81 +5,148 @@ import jsonpickle
 import datetime
 from get_database import *
 
-# def unit_test():
-#     info = open("C:/Users/rzarrabi/Documents/school/junior/spring/trip/e-mission-server/CFC_DataCollector/tests/data/missing_trip", "r")
-#     t = Trip(info.read())
-#     return tt
+DATE_FORMAT = "%Y%m%dT%H%M%S-0700"
 
-def trip_factory(json_segment):
-    #E_Mission_Trip
-    if json_segment.get("alternatives"):
-        if json_segment.get("start_point_distr"):
-            return Canonical_E_Mission_Trip(json_segment)
-        else:
-            return E_Mission_Trip(json_segment)
-    #Alternative Trip
-    else:
-        #Canonical Alternative   
-        if json_segment.get("canonical"):
-            return Canonical_Alternative_Trip(json_segment)
-        elif json_segment.get("perturbed"):
-            return Perturbed_Trip(json_segment)
-        else:
-            return Alternative_Trip(json_segment)
+class Trip(object):
 
-        
-
-class Trip(object): 
-    #Instance parameters
     def __init__(self, json_segment):
-        self.trip_from_json(json_segment)
+        self._id = json_segment.get("_id")
+        self.user_id = json_segment.get("user_id")
+        self.trip_id = json_segment.get("trip_id")
+        self.sections = self._init_sections(self.user_id, self.trip_id, len(json_segment.get("sections"))) if json_segment.get("sections") else None
+        print json_segment
+        self.trip_start_time = datetime.datetime.strptime(json_segment.get("trip_start_time"), DATE_FORMAT)
+        self.trip_end_time = datetime.datetime.strptime(json_segment.get("trip_end_time"), DATE_FORMAT)
+        self.trip_start_location = self._start_location(self.sections)
+        self.trip_end_location = self._end_location(self.sections)
+    
+    def _init_sections(self, user_id, trip_id, num_sections):
+        sections = []
+        db = get_section_db()
+        json_object = db.find({'user_id': user_id, 'trip_id' : trip_id}, limit = num_sections)
+        for section_json in json_object:
+            sections.append(Section(section_json))
+        return sections 
 
-    def trip_from_json(self, json_seg):
-        self._id = json_seg["_id"]
-        #TODO: make sure this is correct
-        self.single_mode = json_seg["mode"] 
-        self.start_time = json_seg["section_start_time"]
-        self.end_time = json_seg["section_end_time"]
-        #TODO: check this field
-        points = json_seg["track_points"]
-        self.start_point = Coordinate(points[0][1], points[0][0]) if points else None
-        self.end_point = Coordinate(points[-1][1], points[-1][0]) if points else None
-        print self.__dict__
+    def _start_location(self, sections):
+        return sections[0].section_start_location if sections else None
+         
+    def _end_location(self, sections):
+        return sections[-1].section_end_location if sections else None
 
-    def save_to_db(self, collection):
-        attrs = self.__dict__
-        collection.insert(attrs)
+    def save_to_db(self):
+        pass
 
-    def get_id(self):
-        return self._id
+class Section(object):
 
-    def get_duration():
-        return
+    def __init__(self, json_segment):
+        self._id = json_segment.get("_id")
+        self.trip_id = json_segment.get("trip_id")
+        self.distance = json_segment.get("distance")
+        self.section_start_time = datetime.datetime.strptime(json_segment.get("section_start_time"), DATE_FORMAT)
+        self.section_end_time = datetime.datetime.strptime(json_segment.get("section_end_time"), DATE_FORMAT)
+        self.section_start_location = self._start_location(json_segment.get("track_points"))
+        self.section_end_location = self._end_location(json_segment.get("track_points"))
+        self.mode = json_segment.get("mode")
+        self.confirmed_mode = json_segment.get("confirmed_mode")
 
-    def get_distance():
-        return
+    def _start_location(self, points):
+        return Coordinate(points[0]["track_location"]["coordinates"][1], points[0]["track_location"]["coordinates"][0]) if points else None
 
-    def get_start_coordinates(self):
-        #TODO: return self.start_point in following string format
-        #"lat,lng"        
-        return '37.862591,-122.261784'
+    def _end_location(self, points):
+        return Coordinate(points[-1]["track_location"]["coordinates"][1], points[-1]["track_location"]["coordinates"][0]) if points else None
 
-    def get_end_coordinates(self):
-        #TODO: return self.end_point in following string format
-        #"lat,lng"
-        return '37.862591,-122.261784'
+    def save_to_db(self):
+        db = get_section_db()
+        db.update_one({"_id": self._id}, 
+                      {"$set": {"distance" : self.distance, "mode" : self.mode, "confirmed_mode" : self.confirmed_mode}},
+                       upsert=False)
 
+class E_Mission_Trip(Trip):
 
-    def get_time(self):
-        #TODO: convert self.start_time to datetime object
-        return datetime.datetime.now()
+    def __init__(self, json_segment, pipelineFlags = None): 
+        super(E_Mission_Trip, self).__init__(json_segment)
+        self.subtype = None
+        self.alternatives = self._init_alternatives(self.user_id, self.trip_id, len(json_segment.get("alternatives"))) if json_segment.get("alternatives") else None
+        self.perturbed_trips = self._init_perturbed(self.user_id, self.trip_id, len(json_segment.get("perturbed"))) if json_segment.get("perturbed") else None
+        self.pipelineFlags = PipelineFlags(self._id)
+        self.single_mode = self._init_single_mode(self.sections)
 
+        #looks into database to see if pipeline flags have been set before
+        self.pipelineFlags.loadPipelineFlags(json_segment['_id'])
+
+    def _init_alternatives(self, user_id, trip_id, num_alternatives):
+        alternatives = []
+        db = get_alternatives_db()
+        json_object = db.find({'user_id' : user_id, 'trip_id' : trip_id}, limit = num_alternatives)
+        for alternative_json in json_object:
+            alternatives.append(Alternative_Trip(alternative_json))
+        return alternatives 
+
+    def _init_perturbed(self, user_id, trip_id, num_perturbed):
+        perturbed = []
+        db = get_perturbed_db()
+        json_object = db.find({'user_id' : user_id, 'trip_id' : trip_id}, limit = num_perturbed)
+        for perturbed_json in json_object:
+            perturbed.append(Perturbed_Trip(perturbed_json))
+        return perturbed 
+
+    def _init_single_mode(self, sections):
+        if not sections:
+            return None
+        mode = sections[0].mode
+        for section in sections:
+            if section.mode != mode:
+                return None
+        return mode
+
+    def save_to_db(self):
+        db = get_trip_db()
+        db.update_one({"_id": self._id}, 
+                      {"$set": {"distance" : self.distance, "mode" : self.mode, "confirmed_mode" : self.confirmed_mode}},
+                       upsert=False)
+        self.save_alternatives(self.alternatives)
+        self.save_perturbed(self.perturbed)
+
+    def _save_alternatives(alternatives):
+        for alternative in alternatives:
+            alternative.save_to_db()
+
+    def _save_perturbed(perturbeds):
+        for perturbed in perturbeds:
+            perturbed.save_to_db()
+
+class Canonical_E_Mission_Trip(E_Mission_Trip):
+    #if there are no alternatives found, set alternatives list to None 
+    def __init__(self, json_segment):
+        super(self.__class__, self).__init__(json_segment)
+        self.start_point_distr = json_segment.get("start_point_distr")
+        self.end_point_distr = json_segment.get("end_point_distr")
+        self.start_time_distr = json_segment.get("start_time_distr")
+        self.end_time_distr = json_segment.get("end_time_distr")
+
+class Alternative_Trip(Trip):
+    def __init__(self, json_segment):
+        super(self.__class__, self).__init__(json_segment)
+        self.parent_id = json_segment.get("parent_id")
+        self.cost = json_segment.get("cost")
+
+class Canonical_Alternative_Trip(Alternative_Trip):
+    def __init__(self, canonical_trip_id, cost, json_segment):
+        super(self.__class__, self).__init__(json_segment)
+        self.subtype = "canonical_alternative"
+
+class Perturbed_Trip(Alternative_Trip, E_Mission_Trip):
+    def __init__(self, json_segment):
+        super(self.__class__, self).__init__(json_segment)
+        self.subtype = "perturbed"
 
 class PipelineFlags(object):
-    def __init__(self):
+    def __init__(self, _id):
         self.alternativesStarted = False
         self.alternativesFinished = False
-        self.loadPipelineFlags()
+        self._id = _id
+        self.loadPipelineFlags(self._id)
 
     def startAlternatives(self):
         self.alternativesStarted = True
@@ -88,73 +155,19 @@ class PipelineFlags(object):
         self.alternativesFinished = True
 
     def loadPipelineFlags(self, _id):
-        db = get_section_db()
+        db = get_trip_db()
         json_object = db.find_one({'_id': _id})
-        if json_object != None and 'pipelineFlags' in json_object:
-        
-            tf = json_object['pipelineFlags']
-            if tf['alternativesStarted'] == 'True':
-                self.alternativesStarted = True
-            if tf['alternativesFinished'] == 'True':
-                self.alternativesFinished = True
-
+        if json_object:
+            tf = json_object.get('pipelineFlags')
+            if tf:
+                if tf['alternativesStarted'] == 'True':
+                    self.alternativesStarted = True
+                if tf['alternativesFinished'] == 'True':
+                    self.alternativesFinished = True
+    
     def savePipelineFlags(self, _id):
-        db = get_section_db()
-        json_object = db.find_one({'_id' : _id})
-        json_object['pipelineFlags'] = {'alternativesStarted': self.alternativesStarted, 'alternativesFinished': self.alternativesFinished} 
-
-class E_Mission_Trip(Trip):
-
-    #if there are no alternatives found, set alternatives list to None 
-    def __init__(self, json_segment, alternatives=[], pipelineFlags = None): 
-        super(E_Mission_Trip, self).__init__(json_segment)
-        self.alternatives = alternatives
-        self.pipelineFlags = PipelineFlags()
-
-        #looks into database to see if pipeline flags have been set before
-        self.pipelineFlags.loadPipelineFlags(json_segment['_id'])
-    
-    def get_alternatives(self):
-        return self.alternatives
-
-    def getPipelineFlags(self):
-        return self.pipelineFlags
-
-    def saveToDb(self, collection):
-        db = get_section_db()
-        json_object = db.find_one({'_id' : self._id})
-        json_object['pipelineFlags'] = {'alternativesStarted': self.alternativesStarted, 'alternativesFinished': self.alternativesFinished} 
-    
-
-class Canonical_E_Mission_Trip(E_Mission_Trip):
-    #if there are no alternatives found, set alternatives list to None 
-    #def __init__(self, json_segment, start_point_distr, end_point_distr, start_time_distr, end_time_distr, num_trips, alternatives = []):
-    def __init__(self, json_segment, alternatives = [], pipelineFlags = None):
-        super(self.__class__, self).__init__(json_segment, alternatives, pipelineFlags)
-        self.start_point_distr = json_segment["start_point_distr"]
-        self.end_point_distr = json_segment["end_point_distr"]
-        self.start_time_distr = json_segment["start_time_distr"]
-        self.end_time_distr = json_segment["end_time_distr"]
-    
-    def get_alternatives(self):
-        return self.alternatives
-
-    def get_num_trips(self):
-        #TODO: make sure this is consistent with generation
-        return len(self.start_point_distr)
-
-class Alternative_Trip(Trip):
-    def __init__(self, json_segment):
-        super(self.__class__, self).__init__(json_segment)
-        self.parent_id = json_segment["parent_id"]
-        self.cost = json_segment.get("cost")
-
-class Canonical_Alternative_Trip(Alternative_Trip):
-    def __init__(self, canonical_trip_id, cost, json_segment):
-        super(self.__class__, self).__init__(json_segment)
-        self.canonical = True
-
-class Perturbed_Trip(Alternative_Trip, E_Mission_Trip):
-    def __init__(self, json_segment):
-        super(self.__class__, self).__init__(json_segment)
+        db = get_trip_db()
+        db.update_one({"_id": self._id}, 
+                      {"$set": {"pipelineFlags" : {'alternativesStarted': self.alternativesStarted, 'alternativesFinished': self.alternativesFinished}}},
+                       upsert)
 

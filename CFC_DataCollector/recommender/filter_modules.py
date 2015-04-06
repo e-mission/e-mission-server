@@ -14,7 +14,7 @@ from main.K_medoid_2 import kmedoids, user_route_data
 from main.route_matching import update_user_routeDistanceMatrix, update_user_routeClusters
 
 
-from get_database import get_section_db, get_routeCluster_db
+from get_database import get_section_db, get_trip_db, get_routeCluster_db
 import trip
 import random
 
@@ -62,7 +62,7 @@ def getCanonicalTrips(uid, number_returned = 10):
 #returns all trips to the user
 def getAllTrips(uid):
     #return [trip.E_Mission_Trip.trip_from_json(jsonStr) for jsonStr in get_section_db().find({'user_id' : uid})].__iter__()
-    return [trip.E_Mission_Trip(jsonStr) for jsonStr in get_section_db().find({'user_id' : uid})].__iter__()
+    return [trip.E_Mission_Trip(jsonStr) for jsonStr in get_trip_db().find({'user_id' : uid,'type':'move'})].__iter__()
 
 def getRecentTrips(uid, options = 10):
     return []
@@ -77,7 +77,7 @@ def getTripsThroughMode(uid, options = 10):
 def getTrainingTrips(uid):
     queryString = {'type':'move'}
     #return [trip.E_Mission_Trip.trip_from_json(jsonStr) for jsonStr in get_section_db().find(queryString)].__iter__()
-    return [trip.E_Mission_Trip(jsonStr) for jsonStr in get_section_db().find(queryString)].__iter__()
+    return [trip.E_Mission_Trip(jsonStr) for jsonStr in get_trip_db().find(queryString)].__iter__()
 
 def getTopAlternatives(uid, options = 10):
   return []
