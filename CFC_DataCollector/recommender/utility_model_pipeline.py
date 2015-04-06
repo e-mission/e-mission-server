@@ -9,6 +9,7 @@ import alternative_trips_module as atm
 from common import get_uuid_list
 from simple_cost_time_mode_model import SimpleCostTimeModeModel
 from modified_cost_time_emissions_mode_model import ModifiedCostTimeEmissionsModeModel
+import logging
 
 class UtilityModelPipeline:
     def __init__(self):
@@ -45,3 +46,13 @@ class UtilityModelPipeline:
             # userModel.store_in_db()
             modifiedUserModel = self.modify_user_utility_model(userModel)
             modifiedUserModel.store_in_db()
+
+if __name__ == "__main__":
+  import json
+
+  config_data = json.load(open('config.json'))
+  log_base_dir = config_data['paths']['log_base_dir']
+  logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
+                      filename="%s/pipeline.log" % log_base_dir, level=logging.DEBUG)
+  utilityModelPipeline = UtilityModelPipeline()
+  utilityModelPipeline.runPipeline()

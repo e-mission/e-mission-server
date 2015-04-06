@@ -1,5 +1,6 @@
 import tripiterator as ti
 from common import get_uuid_list
+import logging
 
 class RecommendationPipeline:
     def get_trips_to_improve(self, user_uuid):
@@ -35,4 +36,12 @@ class RecommendationPipeline:
                 self.recommend_trips(sel_user_model, alternatives_for_trips_to_improve)
             self.save_recommendations(recommended_trips)
 
+if __name__ == "__main__":
+  import json
 
+  config_data = json.load(open('config.json'))
+  log_base_dir = config_data['paths']['log_base_dir']
+  logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
+                      filename="%s/pipeline.log" % log_base_dir, level=logging.DEBUG)
+  recommendationPipeline = RecommendationPipeline()
+  recommendationPipeline.runPipeline()
