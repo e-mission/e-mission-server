@@ -5,7 +5,9 @@
 .DS_Store
 
 CFC_WebApp/config.json
-
 CFC_WebApp/keys.json
-
 CFC_WebApp/moves_collect.log
+
+CFC_DataCollector/config.json
+CFC_DataCollector/keys.json
+CFC_DataCollector/moves_collect.log
