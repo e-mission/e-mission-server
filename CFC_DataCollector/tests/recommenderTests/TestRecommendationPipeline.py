@@ -49,9 +49,9 @@ class TestRecommendationPipeline(unittest.TestCase):
     return json.load(fileHandle)
 
   def testRetrieveTripsToImprove(self):
-    #get a users trips, there should be 21
+    #updated to 15, since I am filtering out places
     trip_list = self.pipeline.get_trips_to_improve(self.testUUID)
-    self.assertEquals(len(trip_list), 22)
+    self.assertEquals(len(trip_list), 15)
     # Trip 20140407T175709-0700 has two sections
 
   def testRecommendTrip(self):

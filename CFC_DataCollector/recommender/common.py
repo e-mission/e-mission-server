@@ -6,20 +6,10 @@ from datetime import datetime, timedelta
 import random
 import json
 import jsonpickle
+from trip import E_Mission_Trip
 
 DATE_FORMAT = "%Y%m%dT%H%M%S-0700"
-class Coordinate:
-    def __init__(self, lat, lon):
-        self.lat = lat
-        self.lon = lon
 
-    def get_lat(self):
-        return self.lat
-
-    def get_lon(self):
-        return self.lon
-
-from trip import E_Mission_Trip
 def get_uuid_list():
 	uuid_list = [ ]
 	db = get_section_db()
@@ -37,19 +27,20 @@ def insert_into_pdb(pdb, my_id, new_perturbed_trip):
 '''
     
 def initialize_empty_perturbed_trips(_id, pdb):
-	db = get_section_db()
+	db = get_trip_db()
 	json_trip = db.find_one({"_id" : _id})
 	new_perturbed_trip = { }
-	trip = E_Mission_Trip(json_trip)
-	for pert in find_perturbed_trips(trip):
-		pert._id = pert._id.replace('.', '') 
-		new_perturbed_trip[pert._id] = None
-	#insert_into_pdb(pdb, trip._id, new_perturbed_trip)
-	_id = _id.replace('.', "")
-	to_insert = { }
-	to_insert['_id'] = _id
-	to_insert['trips'] = new_perturbed_trip
-	pdb.insert({'our_id': _id, "trips" : new_perturbed_trip})
+        if json_trip:
+	    trip = E_Mission_Trip.trip_from_json(json_trip)
+	    for pert in find_perturbed_trips(trip):
+	    	pert._id = pert._id.replace('.', '') 
+	    	new_perturbed_trip[pert._id] = None
+	    #insert_into_pdb(pdb, trip._id, new_perturbed_trip)
+	    _id = _id.replace('.', "")
+	    to_insert = { }
+	    to_insert['_id'] = _id
+	    to_insert['trips'] = new_perturbed_trip
+	    pdb.insert({'our_id': _id, "trips" : new_perturbed_trip})
 
 
 def update_perturbations(_id, perturbed_trip):
@@ -81,9 +72,9 @@ def find_perturbed_trips(trip, delta=2):
     to_return = [ ]
     time_delta = timedelta(minutes=delta)
     fifteen_min = timedelta(minutes=15)
-    original_delta = trip.trip_end_time - trip.trip_start_time
-    start = trip.trip_start_time - fifteen_min
-    end = trip.trip_end_time + fifteen_min
+    original_delta = trip.end_time- trip.start_time
+    start = trip.start_time - fifteen_min
+    end = trip.end_time + fifteen_min
     time = start
     while time < end:
     	_id = str(create_trip_id()) + str(trip._id) 
@@ -91,9 +82,9 @@ def find_perturbed_trips(trip, delta=2):
     	json_str['trip_start_time'] = datetime.strftime(time, DATE_FORMAT)
     	json_str['trip_end_time'] = datetime.strftime(time + original_delta, DATE_FORMAT)   ##Asuming the perturbed trip takes as long as the original trip
     	json_str['_id'] = _id 
-    	json_str['mode'] = trip.single_mode
+    	json_str['mode'] = trip.mode_list
     	json_str['track_points'] = None
-        new_trip = E_Mission_Trip(json_str)
+        new_trip = E_Mission_Trip.trip_from_json(json_str)
         to_return.append(new_trip)
         time += time_delta
     return to_return

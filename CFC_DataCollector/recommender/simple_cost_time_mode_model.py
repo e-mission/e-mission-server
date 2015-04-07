@@ -2,7 +2,7 @@
 
 from get_database import get_utility_model_db
 from datetime import datetime
-from common import calc_car_cost
+from common import calc_car_cost, DATE_FORMAT
 from main import common as cm
 from user_utility_model import UserUtilityModel
 
@@ -26,7 +26,7 @@ class SimpleCostTimeModeModel(UserUtilityModel):
   def extract_features(self, trip):
     # TODO: E-Mission trip does not have a "cost" feature
     # cost = trip.cost
-    time = cm.travel_time(trip.start_time, trip.end_time)  
+    time = cm.travel_time(datetime.strftime(trip.start_time, DATE_FORMAT), datetime.strftime(trip.end_time, DATE_FORMAT))
     # TODO: E-Mission trip does not have a "cost" feature
     # mode = trip.mode
 

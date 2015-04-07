@@ -64,9 +64,9 @@ class TestUtilityModelPipeline(unittest.TestCase):
     return json.load(fileHandle)
     
   def testRetrieveTrainingTrips(self):
-    #get a users trips, there should be 21
+    #now 15 since filtering places
     trip_list = self.pipeline.get_training_trips(self.testUUID)
-    self.assertEquals(len(list(trip_list)), 22) 
+    self.assertEquals(len(list(trip_list)), 15) 
 
   def testBuildUserModel(self):
     #get a users trips, there should be 21

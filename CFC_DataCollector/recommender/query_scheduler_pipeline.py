@@ -38,9 +38,12 @@ def schedule_queries(_id, trip_array):
 	#TODO: this will run every year, need to figure out if python crontab can support yearly configuration so it only runs once
 
 	for trip in trip_array:
-		start = trip.get_start_coordinates()
-		end = trip.get_end_coordinates()
-		time = trip.get_time()
+		#start = trip.get_start_coordinates()
+		#end = trip.get_end_coordinates()
+		#time = trip.get_time()
+                start = trip.trip_start_location
+                end = trip.trip_end_location
+                time = trip.start_time
 
 		cron = CronTab()
 		exec_str = python_location + ' ' + query_script_location + ' ' + _id

@@ -67,9 +67,10 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     return json.load(fileHandle)
     
   def testRetrieveAllUserTrips(self):
-    #get a users trips, there should be 21
+    #updated to 15 since filtering places
     trip_list = self.pipeline.get_trips_for_alternatives(self.testUUID)
-    self.assertEquals(len(list(trip_list)), 21) 
+    self.assertEquals(len(list(trip_list)), 15) 
+    
     # Trip 20140407T175709-0700 has two sections
 
   def testAugmentTrips(self):
