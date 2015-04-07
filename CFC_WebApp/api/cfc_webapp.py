@@ -17,6 +17,8 @@ import requests
 import oauth2client.client
 from oauth2client.crypt import AppIdentityError
 import traceback
+import xmltodict
+import urllib2
 
 config_file = open('config.json')
 config_data = json.load(config_file)
@@ -299,7 +301,7 @@ def getCarbonCompare():
     print("  %s: %s" % (key, val))
 
   from clients.default import default
-  
+
   if 'User' not in request.headers or request.headers.get('User') == '':
     return "Waiting for user data to become available..."
 
@@ -342,6 +344,16 @@ def javascriptCallback(clientName, method):
   client_key = request.query.client_key
   client.callJavascriptCallback(client_key, method, request.params)
   return {'status': 'ok'}
+
+# proxy used to request and process XML from an external API, then convert it to JSON
+# original URL should be encoded in UTF-8
+@get("/asJSON/<originalXMLWebserviceURL>")
+def xmlProxy(originalXMLWebserviceURL):
+  decodedURL = urllib2.unquote(originalXMLWebserviceURL)
+  f = urllib2.urlopen(decodedURL)
+  xml = f.read()
+  parsedXML = xmltodict.parse(xml)
+  return json.dumps(parsedXML)
 
 # Client related code END
 
