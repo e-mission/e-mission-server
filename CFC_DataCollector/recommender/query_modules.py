@@ -17,7 +17,7 @@ def getTopTrips(uid, options = 10):
 def getAllTrips(uid):
 
     #return [trip.E_Mission_Trip.trip_from_json(jsonStr) for jsonStr in get_section_db().find({'user_id' : uid})].__iter__()
-    return [trip.E_Mission_Trip(jsonStr) for jsonStr in get_section_db().find({'user_id' : uid})].__iter__()
+    return trip.E_Mission_Trip(jsonStr) for jsonStr in get_section_db().find({'user_id' : uid})
 
 
 def trip_comparator_date(less_than):
