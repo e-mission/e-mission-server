@@ -63,7 +63,4 @@ class UserUtilityModel(object):
   # return an array of feature values for the given trip
   # must be filled out in subclass
   def extract_features(self, trip):
-    # TODO: Change the pipeline test to use an concrete subclass instead of the
-    # abstract superclass so that we can go back to passing here
-    # pass
-    return list(range(5))
+    pass
