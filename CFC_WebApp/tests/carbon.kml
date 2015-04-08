@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
+    <Document id="feat_1">
+        <GroundOverlay id="feat_2">
+            <name>carbon</name>
+            <Icon id="link_0">
+                <href>carbon.png</href>
+            </Icon>
+            <LatLonBox>
+                <north>38.080194839300006</north>
+                <south>37.190999999999995</south>
+                <east>-121.88632</east>
+                <west>-122.49313000000001</west>
+            </LatLonBox>
+        </GroundOverlay>
+    </Document>
+</kml>

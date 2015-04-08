@@ -1,0 +1,10 @@
+CherryPy==3.6.0
+pygeocoder==1.2.5
+pymongo==2.8
+python-dateutil==2.4.0
+pytz==2014.10
+requests==2.5.1
+six==1.9.0
+utm==0.3.1
+wsgiref==0.1.2
+google-api-python-client==1.1

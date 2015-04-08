@@ -1,0 +1,13 @@
+{
+  "ssl_certificate" : "xxxxx-signed-cert.pem",
+  "private_key" : "xxxxx_privkey.key",
+  "client_key" : "Get from https://console.developers.google.com",
+  "__comment": "iOS client key to handle the fact that the google iOS API does not work. The open source API does not take the webclient app, so we have the iOS client ID here.",
+  "ios_client_key" : "Get from https://console.developers.google.com",
+  "moves" : {
+    "client_id": "Get from https://dev.moves-app.com",
+    "client_secret": "Get from https://dev.moves-app.com",
+    "https_redirect_url": "Value registered at https://dev.moves-app.com",
+    "ios_redirect_url": "Value registered at https://dev.moves-app.com"
+  }
+}
