@@ -208,7 +208,6 @@ def getRoute(section_id):
     route=[]
     Sections=get_section_db()
     section=Sections.find_one({'_id':section_id})
-    # print(section)
     for point in section['track_points']:
         route.append(point['track_location']['coordinates'])
     return route

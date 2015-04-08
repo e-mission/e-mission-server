@@ -21,7 +21,7 @@ def update_profiles(dummy_users=False):
     else:
         user_list = get_section_db().distinct('user_id')
     for user in user_list:
-        # print user
+        print user
         user_home=detect_home(user)
         # print user_home
         zip_is_valid = _check_zip_validity(user_home, user)
