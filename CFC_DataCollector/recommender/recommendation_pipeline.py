@@ -1,3 +1,4 @@
+from user_utility_model import UserUtilityModel
 import tripiterator as ti
 from common import get_uuid_list
 import logging
@@ -14,14 +15,13 @@ class RecommendationPipeline:
         return []
 
     def get_selected_user_utility_model(self, user_id):
-        return []
+        return UserUtilityModel.find_from_db(user_id)
 
     def recommend_trips(self, trip_id, utility_model):
         return []
 
     def _evaluate_trip(self, utility_model, trip):
-        #return an integer value for the score of a trip, based on a utility model
-        return 0
+        return utility_model.predict_utility(trip)
 
     def save_recommendations(self, recommendedTrips):
         pass
