@@ -302,7 +302,6 @@ def _cleanGPSData(old_points):
         inlier_mask = model_ransac.inlier_mask_
         outlier_mask = np.logical_not(inlier_mask)
         remove = [index for index,v in enumerate(outlier_mask) if v]
-        print "removed points size: ",  remove
         return [v for j,v in enumerate(old_points) if j not in frozenset(remove)]
     return old_points
 
