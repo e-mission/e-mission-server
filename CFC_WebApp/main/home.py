@@ -22,4 +22,6 @@ def detect_home(user_id):
 def detect_home_from_db(user_id):
     Profiles=get_profile_db()
     user_pro=Profiles.find_one({"$and":[{'source':'Shankari'},{'user_id':user_id}]})
+    if Profiles.find({'user_id':user_id}).count()==0:
+        return 'N/A'
     return user_pro['home']
