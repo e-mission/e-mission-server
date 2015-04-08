@@ -23,11 +23,14 @@ class SimpleCostTimeModeModel(UserUtilityModel):
     get_utility_model_db().update(model_query, model_object, upsert = True)
 
   # current features are cost, time, mode
-  def extract_features(self, trip):
-    # TODO: E-Mission trip does not have a "cost" feature
-    # cost = trip.cost
-    time = cm.travel_time(datetime.strftime(trip.start_time, DATE_FORMAT), datetime.strftime(trip.end_time, DATE_FORMAT))
-    # TODO: E-Mission trip does not have a "cost" feature
-    # mode = trip.mode
+  def extract_features(self, trips):
+    features = []
+    for trip in trips:
+        # TODO: E-Mission trip does not have a "cost" feature
+        cost = 0 # trip.cost
+        time = cm.travel_time(datetime.strftime(trip.start_time, DATE_FORMAT), datetime.strftime(trip.end_time, DATE_FORMAT))
+        # TODO: E-Mission trip does not have a "cost" feature
+        mode = 0 # trip.mode
+        features.append((cost, time, mode))
 
-    return (0, time, 0)
+    return features

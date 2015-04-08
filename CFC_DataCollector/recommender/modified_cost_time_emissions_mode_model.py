@@ -27,7 +27,7 @@ class ModifiedCostTimeEmissionsModeModel(UserUtilityModel):
   # current features are cost, time, mode
   def extract_features(trip):
     cost = trip.cost
-    time = cm.travel_time(trip.start_time, trip.end_time)  
+    time = cm.travel_time(trip.start_time, trip.end_time)
     mode = trip.mode
     # TODO: Add emissions here
     # for each section, find the emissions and add them up at the end

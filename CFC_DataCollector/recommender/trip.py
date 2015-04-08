@@ -1,6 +1,5 @@
 #maps team provided get_cost function
 #from common.featurecalc import get_cost
-import jsonpickle
 import datetime
 from get_database import *
 
@@ -13,10 +12,10 @@ class Coordinate:
 
     def get_lat(self):
         return self.lat
-    
+
     def get_lon(self):
         return self.lon
-    
+
 class Trip(object):
 
     def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location):
@@ -29,7 +28,7 @@ class Trip(object):
         self.trip_start_location = trip_start_location
         self.trip_end_location = trip_end_location
 
-    @classmethod 
+    @classmethod
     def trip_from_json(cls, json_segment):
         _id = json_segment.get("_id")
         user_id = json_segment.get("user_id")
@@ -40,7 +39,7 @@ class Trip(object):
         trip_start_location = cls._start_location(sections)
         trip_end_location = cls._end_location(sections)
         return cls(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location)
-    
+
     @classmethod
     def _init_sections(cls, user_id, trip_id, num_sections):
         sections = []
@@ -48,12 +47,12 @@ class Trip(object):
         json_object = db.find({'user_id': user_id, 'trip_id' : trip_id}, limit = num_sections)
         for section_json in json_object:
             sections.append(Section.section_from_json(section_json))
-        return sections 
+        return sections
 
     @classmethod
     def _start_location(cls, sections):
         return sections[0].section_start_location if sections else None
-         
+
     @classmethod
     def _end_location(cls, sections):
         return sections[-1].section_end_location if sections else None
@@ -97,14 +96,14 @@ class Section(object):
 
     def save_to_db(self):
         db = get_section_db()
-        db.update({"_id": self._id}, 
+        db.update({"_id": self._id},
                       {"$set": {"distance" : self.distance, "mode" : self.mode, "confirmed_mode" : self.confirmed_mode}},
                        upsert=False, multi=False)
 
 
 class E_Mission_Trip(Trip):
 
-    def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, alternatives, perturbed_trips, 
+    def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, alternatives, perturbed_trips,
                  mode_list, confirmed_mode_list):
         super(E_Mission_Trip, self).__init__(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location)
         self.alternatives = alternatives
@@ -116,7 +115,7 @@ class E_Mission_Trip(Trip):
         self.pipelineFlags = PipelineFlags(self._id)
 
     @classmethod
-    def trip_from_json(cls, json_segment): 
+    def trip_from_json(cls, json_segment):
         trip = Trip.trip_from_json(json_segment)
         trip.subtype = None
         trip.alternatives = cls._init_alternatives(trip.user_id, trip.trip_id, len(json_segment.get("alternatives"))) if json_segment.get("alternatives") else None
@@ -133,7 +132,7 @@ class E_Mission_Trip(Trip):
         json_object = db.find({'user_id' : user_id, 'trip_id' : trip_id}, limit = num_alternatives)
         for alternative_json in json_object:
             alternatives.append(Alternative_Trip(alternative_json))
-        return alternatives 
+        return alternatives
 
     @classmethod
     def _init_perturbed(self, user_id, trip_id, num_perturbed):
@@ -142,7 +141,7 @@ class E_Mission_Trip(Trip):
         json_object = db.find({'user_id' : user_id, 'trip_id' : trip_id}, limit = num_perturbed)
         for perturbed_json in json_object:
             perturbed.append(Perturbed_Trip(perturbed_json))
-        return perturbed 
+        return perturbed
 
     @classmethod
     def _init_mode_list(self, sections):
@@ -171,7 +170,7 @@ class E_Mission_Trip(Trip):
 
     def save_to_db(self):
         db = get_trip_db()
-        result = db.update({"_id": self._id}, 
+        result = db.update({"_id": self._id},
                       {"$set": {"mode" : self.mode_list, "confirmed_mode" : self.confirmed_mode_list}},
                        upsert=False,multi=False)
         print result
@@ -181,7 +180,7 @@ class E_Mission_Trip(Trip):
         self._save_perturbed(self.perturbed_trips)
 
     def _create_new(self, db):
-        db.insert({"_id": self._id, "user_id": self.user_id, 
+        db.insert({"_id": self._id, "user_id": self.user_id,
                 "trip_id": self.trip_id, "sections": self.sections, "trip_start_time": self.start_time,
                 "trip_end_time": self.end_time, "trip_start_location": self.trip_start_location, "trip_end_location": self.trip_end_location,
                 "alternatives": list(range(self.alternatives)), "perturbed_trips": list(range(self.perturbed_trips)),
@@ -198,8 +197,8 @@ class E_Mission_Trip(Trip):
                 perturbed.save_to_db()
 
 class Canonical_E_Mission_Trip(E_Mission_Trip):
-    #if there are no alternatives found, set alternatives list to None 
-    def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, 
+    #if there are no alternatives found, set alternatives list to None
+    def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location,
                  alternatives, perturbed_trips, mode_list, start_point_distr, end_point_distr, start_time_distr, end_time_distr):
         super(Canonical_E_Mission_Trip, self).__init__(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location)
         self.start_point_distr = start_point_distr
@@ -214,13 +213,13 @@ class Canonical_E_Mission_Trip(E_Mission_Trip):
         trip.end_point_distr = json_segment.get("end_point_distr")
         trip.start_time_distr = json_segment.get("start_time_distr")
         trip.end_time_distr = json_segment.get("end_time_distr")
-        return cls(trip._id, trip.user_id, trip.trip_id, trip.sections, trip.start_time, trip.end_time, trip.trip_start_location, trip.trip_end_location, 
-                   trip.alternatives, trip.perturbed_trips, trip.mode_list, trip.start_point_distr, trip.end_point_distr, 
+        return cls(trip._id, trip.user_id, trip.trip_id, trip.sections, trip.start_time, trip.end_time, trip.trip_start_location, trip.trip_end_location,
+                   trip.alternatives, trip.perturbed_trips, trip.mode_list, trip.start_point_distr, trip.end_point_distr,
                    trip.start_time_distr, strip.end_time_distr)
 
     def save_to_db(self):
         db = get_canonical_trips_db()
-        result = db.update({"_id": self._id}, 
+        result = db.update({"_id": self._id},
                 {"$set": {"start_point_distr" : self.start_point_distr, "end_point_distr" : self.end_point_distr, "start_time_distr": self.start_time_distr,
                     "end_time_distr": self.end_time_distr}},
                        upsert=False,multi=False)
@@ -232,23 +231,23 @@ class Canonical_E_Mission_Trip(E_Mission_Trip):
 
 class Alternative_Trip(Trip):
     def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, alternatives, perturbed_trips, mode_list):
-        super(self.__class__, self).__init__(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, alternatives, 
+        super(self.__class__, self).__init__(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, alternatives,
                                              perturbed_trips, mode_list)
-        self.parent_id = parent_id 
+        self.parent_id = parent_id
         self.cost = cost
 
     @classmethod
-    def trip_from_json(cls, json_segment): 
+    def trip_from_json(cls, json_segment):
         trip = Trip.trip_from_json(json_segment)
         trip.subtype = "alternative"
         trip.parent_id = json_segment.get("parent_id")
         trip.cost = json_segment.get("cost")
         return cls(trip._id, trip.user_id, trip.trip_id, trip.sections, trip.start_time, trip.end_time, trip.trip_start_location, trip.trip_end_location,
-                trip.subtype, trip.parent_id, trip.cost) 
+                trip.subtype, trip.parent_id, trip.cost)
 
     def save_to_db(self):
         db = get_alternatives_db()
-        result = db.update({"_id": self._id}, 
+        result = db.update({"_id": self._id},
                       {"$set": {"cost" : self.cost}},
                        upsert=False,multi=False)
         print result
@@ -256,7 +255,7 @@ class Alternative_Trip(Trip):
             self._create_new(db)
 
     def _create_new(self, db):
-        db.insert({"_id": self._id, "user_id": self.user_id, 
+        db.insert({"_id": self._id, "user_id": self.user_id,
                 "trip_id": self.trip_id, "sections": self.sections, "trip_start_time": self.start_time,
                 "trip_end_time": self.end_time, "trip_start_location": self.trip_start_location, "trip_end_location": self.trip_end_location,
                 "alternatives": list(range(self.alternatives)), "perturbed_trips": list(range(self.perturbed_trips)),
@@ -264,7 +263,7 @@ class Alternative_Trip(Trip):
 
 class Canonical_Alternative_Trip(Alternative_Trip):
     def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, alternatives, perturbed_trips, mode_list):
-        super(self.__class__, self).__init__(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, alternatives, 
+        super(self.__class__, self).__init__(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, alternatives,
                                              perturbed_trips, mode_list)
         self.subtype = "canonical_alternative"
 
@@ -298,10 +297,10 @@ class PipelineFlags(object):
                     self.alternativesStarted = True
                 if tf['alternativesFinished'] == 'True':
                     self.alternativesFinished = True
-    
+
     def savePipelineFlags(self, _id):
         db = get_trip_db()
-        db.update({"_id": self._id}, 
+        db.update({"_id": self._id},
                       {"$set": {"pipelineFlags" : {'alternativesStarted': self.alternativesStarted, 'alternativesFinished': self.alternativesFinished}}},
                        multi=False, upsert=False)
 

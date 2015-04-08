@@ -5,7 +5,7 @@ from get_database import *
 from datetime import datetime, timedelta
 import random
 import json
-import jsonpickle
+# import jsonpickle
 from trip import E_Mission_Trip
 
 DATE_FORMAT = "%Y%m%dT%H%M%S-0700"
@@ -25,7 +25,7 @@ def insert_into_pdb(pdb, my_id, new_perturbed_trip):
 	if '.' not in new_id:
 		pdb.insert({new_id : new_perturbed_trip})
 '''
-    
+
 def initialize_empty_perturbed_trips(_id, pdb):
 	db = get_trip_db()
 	json_trip = db.find_one({"_id" : _id})
@@ -33,7 +33,7 @@ def initialize_empty_perturbed_trips(_id, pdb):
         if json_trip:
 	    trip = E_Mission_Trip.trip_from_json(json_trip)
 	    for pert in find_perturbed_trips(trip):
-	    	pert._id = pert._id.replace('.', '') 
+	    	pert._id = pert._id.replace('.', '')
 	    	new_perturbed_trip[pert._id] = None
 	    #insert_into_pdb(pdb, trip._id, new_perturbed_trip)
 	    _id = _id.replace('.', "")
@@ -44,12 +44,13 @@ def initialize_empty_perturbed_trips(_id, pdb):
 
 
 def update_perturbations(_id, perturbed_trip):
-	db = get_perturbed_trips_db()
-	_id = _id.replace('.', '')
-	json_trip = db.find_one({"our_id" : _id})
-	json_trip[perturbed_trip._id] = jsonpickle.encode(perturbed_trip)
+# 	db = get_perturbed_trips_db()
+# 	_id = _id.replace('.', '')
+# 	json_trip = db.find_one({"our_id" : _id})
+# 	json_trip[perturbed_trip._id] = jsonpickle.encode(perturbed_trip)
 
 #def query_perturbed_trips()
+  pass
 
 
 def meters_to_miles(meters):
@@ -77,11 +78,11 @@ def find_perturbed_trips(trip, delta=2):
     end = trip.end_time + fifteen_min
     time = start
     while time < end:
-    	_id = str(create_trip_id()) + str(trip._id) 
+    	_id = str(create_trip_id()) + str(trip._id)
     	json_str = {}
     	json_str['trip_start_time'] = datetime.strftime(time, DATE_FORMAT)
     	json_str['trip_end_time'] = datetime.strftime(time + original_delta, DATE_FORMAT)   ##Asuming the perturbed trip takes as long as the original trip
-    	json_str['_id'] = _id 
+    	json_str['_id'] = _id
     	json_str['mode'] = trip.mode_list
     	json_str['track_points'] = None
         new_trip = E_Mission_Trip.trip_from_json(json_str)

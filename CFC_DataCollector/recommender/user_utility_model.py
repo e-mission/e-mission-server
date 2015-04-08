@@ -32,16 +32,12 @@ class UserUtilityModel(object):
   # for now, just create a new model and return it
   def update(self, trips = [], alternatives = []):
     assert(len(list(trips)) == len(alternatives))
-    for i in range(len(alternatives)):
-      trip_features = self.extract_features(trips[i])
-      alt_features = [self.extract_features(alt) for alt in alternatives[i]]
-      target_vector = [1] + ([0] * len(alternatives))
-      print trip_features, alt_features
-      # TODO: ValueError: X and y have incompatible shapes.
-      # X has 1 samples, but y has 23.
-      # self.regression.fit(trip_features + alt_features, target_vector)
-    # TODO: AttributeError: 'LogisticRegression' object has no attribute 'coef_'
-    # self.coefficients = self.regression.coef_
+    trip_features = self.extract_features(trips)
+    for trip_alternatives in alternatives:
+      alt_features = self.extract_features(trip_alternatives)
+      target_vector = [1] + ([0] * len(list(trip_alternatives)))
+      self.regression.fit(trip_features + alt_features, target_vector)
+    self.coefficients = self.regression.coef_
 
   # calculate the utility of trip using the model
   def predict_utility(self, trip):
