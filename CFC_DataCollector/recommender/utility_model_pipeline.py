@@ -21,6 +21,7 @@ class UtilityModelPipeline:
     def build_user_model(self, user_id, trips):
       model = UserUtilityModel.find_from_db(user_id)
       tripList = list(trips)
+      print tripList
       alternatives = []
       for trip in tripList:
         alternatives.append(atm.get_alternative_trips(trip._id))

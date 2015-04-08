@@ -120,24 +120,23 @@ class TestAlternativeTripPipeline(unittest.TestCase):
   def test_pipeline_e2e(self):
     self.pipeline.runPipeline()
     
-  def storeAlternativeTrips(self):
-    trip_list = self.pipeline.get_trip_for_alternatives(self.testUUID) 
-    self.assertEquals(type(trip_list), collections.Iterator)
-    self.assertNotEquals(len(trip_list), 21) 
-    self.assertEquals(type(trip_list[0]), E_Mission_Trip)
-    alternative_list = pipeline_module.get_alternative_trips(self.testUUID, trip_list[0]._id)
-    self.assertGreater(len(alternative_list), 0)
+  def testAlternativeTripStore(self):
+    trip_list = self.pipeline.get_trips_for_alternatives(self.testUUID) 
+    first_trip = trip_list.next()
+    self.assertEquals(type(first_trip), E_Mission_Trip)
+    alternative_list = pipeline_module.get_alternative_trips(trip_list)
     pipeline_module.store_alternative_trips(alternative_list)
-    self.assertEquals(type(alternative_list), list)
-
-
-def testLoadDatabse(self):
-    trip_list = pipeline.get_user_trips(self.testUUID, self.trip_filters)
-    alternative_list = pipeline.get_alternative_trips(self.testUUID, trip_list[0]._id)
-    pipeline.store_alternative_trips(alternative_list)
-    altTripsDB = get_alternative_trips_db()
-    json_trip = altTripsDB.find_one({"type" : "move"})
-    self.assertTrue(json_trip)
+    #self.assertGreater(len(list(alternative_list)), 0)
+  '''
+  def testLoadDatabse(self):
+      trip_list = self.pipeline.get_trips_for_alternatives(self.testUUID)
+      alternative_list = pipeline_module.get_alternative_trips(trip_list.next()._id)
+      pipeline.store_alternative_trips(alternative_list)
+      altTripsDB = get_alternative_trips_db()
+      json_trip = altTripsDB.find_one({"type" : "move"})
+      self.assertFalse("alalalalal")
+      self.assertTrue(json_trip)
+   '''
 
 if __name__ == '__main__':
     unittest.main()

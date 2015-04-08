@@ -5,8 +5,9 @@ sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
 from main.userclient import getClientSpecificQueryFilter
 from main.get_database import get_section_db
 import filter_modules
+from trip import *
 
-class TripIterator:
+class TripIterator(object):
     """
     Extracts Trip objects that can be passed
     into the Google Maps API section
@@ -64,4 +65,4 @@ class TripIterator:
         trip = next(self.storedIter)
         if trip is None:
             return None
-        return Trip(trip)
+        return trip
