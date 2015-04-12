@@ -6,12 +6,12 @@ import geojson
 sampleTrip = '{"date": "20140413", "lastUpdate": "20140414T064442Z", "segments": [], "summary": null}'
 sampleSegment = '{"place": {"type": "unknown", "id": 54095848, "location": {"lat": 37.3910149202, "lon": -122.0865010796}}, "endTime": "20140413T234434-0700", "type": "place", "startTime": "20140412T190446-0700", "lastUpdate": "20140414T064442Z"}'
 
-def kml_to_geojson(infile_path, outfile_path):
+def kml_to_geojson(infile_path, outfile_path, geojson_properties={}):
 	"""
 	Converts a KML file to geojson to store in an output file.
 	"""
 	coordinatePoints = geojson.MultiPoint(__get_coords(infile_path))
-	dump = geojson.dumps(geojson.Feature(geometry=coordinatePoints)) # can add properties and id to feature (perhaps trip/section id?)
+	dump = geojson.dumps(geojson.Feature(geometry=coordinatePoints, properties=geojson_properties)) # can add properties and id to feature (perhaps trip/section id?)
 	outfile = open(outfile_path, 'w')
 	outfile.write(dump)
 	outfile.close()
