@@ -1,0 +1,136 @@
+"""
+# Ground Truth pipeline #
+
+## Data clustering and formatting ##
+
+Note: All of this is done on a per-user basis, but the process can be modified later to be user agnostic
+
+### Import data for user ###
+
+Using the provided UUID's get all section data from each user.
+
+**Users** 
+* Shankari : 
+* Shankari's Husband : 
+* Culler : 
+* Zack : 
+
+### Cluster data for user ###
+
+* Update the route clusters for each user.
+* Create sets of KML files (maps) for EACH of the clusters. A maximum of 10 layers (sections) is allowed per KML, so a cluster may be split between KML files.
+
+**2 Options** 
+Option RANDOM: Randomly select representative samples from each cluster
+Option HUMAN: Use your good judgement to select the samples that best represent each cluster 
+
+### Option RANDOM ###
+
+Use the __NAME_HERE__ function to generate representative samples based on updated clusters. This function may create multiple KML files if there are more than 10 clusters for a given user.
+
+### Option HUMAN ###
+
+Look through each of the clusters and manually select one or more representative samples. Store the section id for each of the sections in your sample. And list them in a file entitled sampled_section_ids_human.json
+
+## Ground Truthifying ##
+
+For each of the representative trips, open them in MyMaps, and then adjust, add, and delete waypoints until you think the given trip is best represented. __INSERT_HUMANITY_HERE__.
+
+## Import Ground Truth ##
+
+* Place each of the modified kml files into a folder called "ground_truth"
+* Run __FUNCTION_NAME__ to import all of those modified KML files into the Stage_routeTruth collection
+* Maps will then be created of for each of these modified sections that compare the original section with its ground truth. If any issues are observed, then they can be modified and this importing process can be repeated.
+
+"""
+import os, sys, random
+sys.path.append("%s/../" % os.getcwd())
+from get_database import get_section_db, get_routeCluster_db
+from util import sections_to_kml, chunks
+
+def update_route_clusters():
+    from Profile import update_profiles
+    update_profiles()
+
+def cluster_to_kml(user, cluster, cluster_id):
+    """
+    Creates a single, or possibly multiple KML files a given cluster.
+    A KML file is limited by MyMaps to having only 10 layers, so only 
+    10 sections will be in a given KML file.
+
+    Responsibilty of caller to check existence and formatting of cluster 
+    """ 
+    Sections = get_section_db()
+    for i,chunk in enumerate(chunks(cluster,10)):    
+        sections = map(lambda section_id: Sections.find_one({'_id':section_id}), chunk)
+        sections_to_kml("%s_cluster_data_kml/CLUSTER_%s_%i" % (user, str(cluster_id), i), sections)
+        
+def all_user_clusters_to_kml(user, user_id):
+    """
+    Creates KML files for all of a given user's clusters
+    """
+    user_clusters = get_routeCluster_db().find_one({'$and':[{'user':user_id},{'method':"dtw"}]})
+    for idc, cluster in user_clusters['clusters'].items():
+        cluster_to_kml(user, cluster, idc)
+
+def __collect(user, user_id):
+    all_user_clusters_to_kml(user, user_uuids[user])
+    pass
+
+def __sample_representatives(user):
+    pass
+
+    
+def __import_truth(user, user_id):
+    pass
+
+if __name__ == "__main__":
+    import argparse
+    from uuid import UUID
+    parser = argparse.ArgumentParser(description='Ground truth')
+    parser.add_argument('user', metavar='U', type=str, choices=['zack', 'shankari'], 
+                        help='Type a user you want to ground truth')
+    parser.add_argument('-u', '--update', dest='update', action='store_const',
+                        const=True, default=False,
+                        help='Update user route clusters')
+    parser.add_argument('-f', '--force', dest='force', action='store_const',
+                        const=True, default=False,
+                        help='Force overwrite of stored data')
+    parser.add_argument('-s', '--single', type=str, choices=['collect', 'sample', 'import'], 
+                        help='Optionally select a single pipeline stage')
+
+    user_uuids = {
+        'shankari' : None,
+        'zack'     : None
+    }
+    args = parser.parse_args()
+    user, user_id = args.user, user_uuids[args.user]
+    single = args.single
+    if args.update:
+        update_route_clusters()        
+
+    if single == 'import':
+        exit('Import is not supported yet')
+    elif single == 'sample':
+        exit('Sampling is not supported yet')
+
+    abort = False
+    directory = '%s_cluster_data_kml' % user
+    dir_exists = os.path.exists(directory)
+    if not dir_exists:
+        os.makedirs(directory)
+    elif dir_exists and not args.force:
+        abort = True
+        put = raw_input("Are you sure you want to overwrite %s_cluster_data_kml? [Y/n]" % user)
+        if put.strip().lower() in ("yes", "y"):
+            abort = False        
+    if abort:
+        exit(0)    
+
+    if single == 'collect': 
+        __collect(user, user_id)
+        exit("You can view the generated data in %s_cluster_data_kml" % user)
+    else:
+        __collect(user, user_id)
+        __sample_representatives(user, user_id)
+        __import_truth(user, user_id)
