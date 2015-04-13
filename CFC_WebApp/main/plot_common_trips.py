@@ -1,6 +1,6 @@
 from get_database import get_section_db, get_routeCluster_db
 from route_matching import get_common_routes_for_user, getRoute
-import pygmaps
+import pygmaps_modified as pygmaps
 from gmap_display import drawSection
 from uuid import UUID
 import random
