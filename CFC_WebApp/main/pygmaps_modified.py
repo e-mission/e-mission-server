@@ -30,8 +30,9 @@ class maps:
 	def addradpoint(self, lat,lng,rad,color = '#0000FF'):
 		self.radpoints.append((lat,lng,rad,color, title))
 
-	def addpath(self,path,color = '#FF0000'):
+	def addpath(self,path,color = '#FF0000', id = ''):
 		path.append(color)
+		path.append(id)
 		self.paths.append(path)
 	
 	#create the html file which inlcude one google map and all points and paths
@@ -117,7 +118,7 @@ class maps:
 		c = 0
 		for path in paths:
 			#print path
-			self.drawPolyline(f,path[:-1], strokeColor = path[-1], polylineLabel = "path# " + str(c))
+			self.drawPolyline(f,path[:-2], strokeColor = path[-2], polylineLabel = path[-1])
 			c += 1
 
 	#############################################
