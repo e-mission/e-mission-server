@@ -5,6 +5,8 @@ from pykml.factory import KML_ElementMaker as KML
 from os import path
 import json
 import geojson
+from lxml import etree
+import sys, os
 
 
 sampleTrip = '{"date": "20140413", "lastUpdate": "20140414T064442Z", "segments": [], "summary": null}'
@@ -103,20 +105,27 @@ def section_to_kml(section, outfile_path="", write=True):
         
         if write:                
                 kml = KML.kml(KML.Document(fld))
-                outfile = file(str(section['user_id'])+'.kml','w')
+                path = os.path.join(outfile_path, str(section['user_id']) +'.kml')
+                outfile = file(path,'w')
                 outfile.write(etree.tostring(kml, pretty_print=True))
         else:
-                print etree.tostring(fld, pretty_print=True)
                 return fld
 
-def sections_to_kml(user_id, sections, outfile_path=""):
+def sections_to_kml(filename, sections, outfile_path=""):
         kml = KML.kml(KML.Document(*map(lambda section: section_to_kml(section, write=False) if len(section['track_points']) > 1 else None ,sections)))
-        outfile = file(str(user_id)+'.kml','w')
+        path = os.path.join(outfile_path, filename +'.kml')
+        outfile = file(path,'w')
         outfile.write(etree.tostring(kml, pretty_print=True))
-        
+
+
+def chunks(l,n):
+        """
+        Generates evenly sized chunks of a list
+        """
+        for i in xrange(0, len(l), n):
+                yield l[i:i+n]
+
 if __name__ == "__main__":
-        from lxml import etree
-        import sys, os
         sys.path.append("%s/../" % os.getcwd())
         from get_database import get_section_db
         from uuid import UUID
