@@ -73,13 +73,28 @@ def all_user_clusters_to_kml(user, user_id):
     for idc, cluster in user_clusters['clusters'].items():
         cluster_to_kml(user, cluster, idc)
 
+def read_uuids():
+    """
+    Reads in UUIDs from the file user_uuid.txt
+
+    Format of file:
+    name : UUID\n
+    ...
+    ...
+    """
+    from uuid import UUID
+    f = open("user_uuid.secret","r")
+    user_uuid = {}
+    for line in f:
+        user, uuid = map(lambda c: c.strip(), line.split(":"))
+        user_uuid[user] = UUID(uuid)
+    return user_uuid
+
 def __collect(user, user_id):
-    all_user_clusters_to_kml(user, user_uuids[user])
-    pass
+    all_user_clusters_to_kml(user, user_id)
 
-def __sample_representatives(user):
+def __sample_representatives(user, user_id):
     pass
-
     
 def __import_truth(user, user_id):
     pass
@@ -87,8 +102,9 @@ def __import_truth(user, user_id):
 if __name__ == "__main__":
     import argparse
     from uuid import UUID
+    user_uuid = read_uuids()
     parser = argparse.ArgumentParser(description='Ground truth')
-    parser.add_argument('user', metavar='U', type=str, choices=['zack', 'shankari'], 
+    parser.add_argument('user', metavar='U', type=str, choices=user_uuid.keys(), 
                         help='Type a user you want to ground truth')
     parser.add_argument('-u', '--update', dest='update', action='store_const',
                         const=True, default=False,
@@ -99,12 +115,8 @@ if __name__ == "__main__":
     parser.add_argument('-s', '--single', type=str, choices=['collect', 'sample', 'import'], 
                         help='Optionally select a single pipeline stage')
 
-    user_uuids = {
-        'shankari' : None,
-        'zack'     : None
-    }
     args = parser.parse_args()
-    user, user_id = args.user, user_uuids[args.user]
+    user, user_id = args.user, user_uuid[args.user]
     single = args.single
     if args.update:
         update_route_clusters()        
