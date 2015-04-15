@@ -66,6 +66,9 @@ def getCanonicalTrips(uid, number_returned = 10):
 
 #returns all trips to the user
 def getAllTrips(uid):
+    print uid
+    trips = list(get_trip_db().find({"user_id":uid, "type":"move"}))
+
     return [trip.E_Mission_Trip.trip_from_json(jsonStr) for jsonStr in get_trip_db().find({'user_id' : uid,'type':'move'})].__iter__()
 
 def getRecentTrips(uid, options = 10):
@@ -78,9 +81,15 @@ def getTripsThroughMode(uid, options = 10):
 # Currently this is:
 # - trips that have alternatives, and
 # - have not yet been included in a training set
+'''
 def getTrainingTrips(uid):
     queryString = {'type':'move'}
     return [trip.E_Mission_Trip.trip_from_json(jsonStr) for jsonStr in get_trip_db().find(queryString)].__iter__()
+'''
+def getTrainingTrips(uid):
+    queryString = {'type':'move', "trip_id":"20150202T185913-0800"}
+    return [trip.E_Mission_Trip.trip_from_json(jsonStr) for jsonStr in get_trip_db().find(queryString)].__iter__()
+
 
 def getTopAlternatives(uid, options = 10):
   return []

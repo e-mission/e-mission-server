@@ -6,16 +6,19 @@ from datetime import datetime, timedelta
 import random
 import json
 # import jsonpickle
-from trip import E_Mission_Trip
+from trip import *
 
-DATE_FORMAT = "%Y%m%dT%H%M%S-0700"
+DATE_FORMAT = "%Y%m%dT%H%M%S-%W00" #This is a great hack thought of by Shaun
 
 def get_uuid_list():
+	return ["b0d937d0-70ef-305e-9563-440369012b39"]
+	'''
 	uuid_list = [ ]
 	db = get_section_db()
 	for x in db.find():
    		uuid_list.append(x['_id'])
 	return uuid_list
+	'''
 '''
 def insert_into_pdb(pdb, my_id, new_perturbed_trip):
 	my_id = str(my_id)
@@ -41,6 +44,35 @@ def initialize_empty_perturbed_trips(_id, pdb):
 	    to_insert['_id'] = _id
 	    to_insert['trips'] = new_perturbed_trip
 	    pdb.insert({'our_id': _id, "trips" : new_perturbed_trip})
+
+
+def coerce_gmaps_time(time):
+	lst = time.split()
+	if len(lst) == 4:
+		return datetime.timedelta(hours=int(lst[0]), minutes=int(lst[2]))
+	elif len(lst) == 2:
+		return datetime.timedelta(minutes=int(lst[0]))
+
+def google_maps_to_our_trip(google_maps_json, _id, user_id, trip_id, mode, org_start_time):
+        sections = [ ]
+	time = org_start_time
+        for leg in google_maps_json['routes'][0]['legs']:
+		td = coerce_gmaps_time(leg['duration']['text'])	
+                distance = leg['distance']
+                start_location = Coordinate(leg['start_location']['lat'], leg['start_location']['lng'])
+                end_location = Coordinate(leg['end_location']['lat'], leg['end_location']['lng'])
+		end_time = time + td
+                section = Section(0, trip_id, distance, time, end_time, start_location, end_location, mode, mode)
+                sections.append(section)
+		time = end_time
+        start_trip = sections[0].section_start_location
+        end_trip = sections[-1].section_end_location
+	#TODO: actually calculate cost
+	cost = 0
+	parent_id = _id
+	mode_list = ["driving"]
+        return Alternative_Trip(_id, user_id, trip_id, sections, org_start_time, end_time, start_trip, end_trip, parent_id, cost, mode_list)
+
 
 
 def update_perturbations(_id, perturbed_trip):
@@ -80,8 +112,8 @@ def find_perturbed_trips(trip, delta=2):
     while time < end:
     	_id = str(create_trip_id()) + str(trip._id)
     	json_str = {}
-    	json_str['trip_start_time'] = datetime.strftime(time, DATE_FORMAT)
-    	json_str['trip_end_time'] = datetime.strftime(time + original_delta, DATE_FORMAT)   ##Asuming the perturbed trip takes as long as the original trip
+    	json_str['trip_start_time'] = time.strftime(DATE_FORMAT)
+    	json_str['trip_end_time'] = (time + original_delta).strftime(DATE_FORMAT)   ##Asuming the perturbed trip takes as long as the original trip
     	json_str['_id'] = _id
     	json_str['mode'] = trip.mode_list
     	json_str['track_points'] = None

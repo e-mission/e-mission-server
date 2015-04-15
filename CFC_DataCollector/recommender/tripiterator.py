@@ -38,8 +38,8 @@ class TripIterator(object):
                 option = filter_queries[2]
                 self.storedIter = query_function(user_uuid, option)
             else:
-                pass
                 # no options
+		print query_function
                 self.storedIter = query_function(user_uuid)
         except TypeError as e:
             print e
@@ -47,13 +47,13 @@ class TripIterator(object):
             traceback.print_exc()
             #logging.warn("Found no query function for filter_queries: ", filter_queries);
             self.storedIter = []
-
-        """
+	'''
         clientSpecificQuery = getClientSpecificQueryFilter(user_uuid)
         completeQuery = clientSpecificQuery + queryList
         Sections = get_section_db()
         self.cur = Sections.find({"and": completeQuery})
-        """
+	'''
+	
 
     def __iter__(self):
         return self.storedIter.__iter__()
