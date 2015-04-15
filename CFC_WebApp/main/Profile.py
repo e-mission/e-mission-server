@@ -53,10 +53,14 @@ def update_profiles(dummy_users=False):
             Profiles.update({"$and":[{'source':'Shankari'},
                                          {'user_id':user}]},{"$set":{key:detect_daily_work_office(user,day)}})
         ## update route clusters:
-        routes_user = user_route_data(user,get_section_db())
-        update_user_routeDistanceMatrix(user,routes_user,step1=100000,step2=100000,method='dtw')
-        clusters_user = kmedoids(routes_user,int(math.ceil(len(routes_user)/8) + 1),user,method='dtw')
-        update_user_routeClusters(user,clusters_user[2],method='dtw')
+        try:
+            routes_user = user_route_data(user,get_section_db())
+            #update_user_routeDistanceMatrix(user,routes_user,step1=100000,step2=100000,method='dtw')
+            clusters_user = kmedoids(routes_user,int(math.ceil(len(routes_user)/8) + 1),user,method='dtw')
+            update_user_routeClusters(user,clusters_user[2],method='dtw')
+
+        except Exception as e:
+            print("Error. Skipping this user.")
     # print(Profiles.find().count())
     # for profile in Profiles.find():
     #     print(profile)
