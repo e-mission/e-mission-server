@@ -480,6 +480,10 @@ def travel_time(time1,time2):
     travel_time = end_time-start_time
     return travel_time.seconds
 
+def travel_date_time(time1,time2):
+    travel_time = time2-time1
+    return travel_time.seconds
+
 def calDistance(point1, point2):
 
     earthRadius = 6371000

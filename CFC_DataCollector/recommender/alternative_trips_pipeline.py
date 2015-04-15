@@ -14,6 +14,7 @@ class AlternativeTripsPipeline:
     def runPipeline(self):
         for user_uuid in get_uuid_list():
             trips_with_no_alternatives = self.get_trips_for_alternatives(user_uuid)
+            print list(trips_with_no_alternatives)
             calc_alternative_trips(trips_with_no_alternatives)
 
 if __name__ == "__main__":

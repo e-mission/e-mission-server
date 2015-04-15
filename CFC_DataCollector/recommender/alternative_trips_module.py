@@ -1,5 +1,5 @@
 from common import find_perturbed_trips, initialize_empty_perturbed_trips, update_perturbations 
-from trip import E_Mission_Trip
+from trip import *
 #from get_database import get_perturbed_trips_db
 from get_database import *
 from query_scheduler_pipeline import schedule_queries
@@ -50,8 +50,11 @@ def get_alternative_trips(trip_it):
     # db = get_alternative_trips_db()
     # _id = tripObj.get_id()
     # return db.find(_id)
-    for trip in trip_it:
-        return [trip.Alternative_Trip.trip_from_json(jsonStr) for jsonStr in get_alternative_trips_db().find({'_id' : trip._id})].__iter__()
+    for _trip in trip_it:
+	print _trip
+        #return [trip.Alternative_Trip.trip_from_json(jsonStr) for jsonStr in get_alternatives_db().find({'_id' : trip._id})].__iter__()
+    	return [Alternative_Trip.trip_from_json(jsonStr) for jsonStr in get_alternatives_db().find({'trip_id' : _trip.trip_id})].__iter__()
+
 
 def store_perturbed_trips(tripObj):
     # store populated tripObj with _id (concatenated trip id and user id)

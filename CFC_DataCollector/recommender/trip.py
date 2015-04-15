@@ -2,8 +2,9 @@
 #from common.featurecalc import get_cost
 import datetime
 from get_database import *
+#from feature_calc
 
-DATE_FORMAT = "%Y%m%dT%H%M%S-0700"
+DATE_FORMAT = "%Y%m%dT%H%M%S-%W00"
 
 class Coordinate:
     def __init__(self, lat, lon):
@@ -15,6 +16,12 @@ class Coordinate:
 
     def get_lon(self):
         return self.lon
+
+    def maps_coordinate(self):
+	return str((float(self.lat), float(self.lon)))
+
+    def __str__(self):
+	return s
 
 class Trip(object):
 
@@ -34,8 +41,12 @@ class Trip(object):
         user_id = json_segment.get("user_id")
         trip_id = json_segment.get("trip_id")
         sections = cls._init_sections(user_id, trip_id, len(json_segment.get("sections"))) if json_segment.get("sections") else None
-        start_time = datetime.datetime.strptime(json_segment.get("trip_start_time"), DATE_FORMAT)
-        end_time = datetime.datetime.strptime(json_segment.get("trip_end_time"), DATE_FORMAT)
+	try:
+            start_time = datetime.datetime.strptime(json_segment.get("trip_start_time"), DATE_FORMAT)
+            end_time = datetime.datetime.strptime(json_segment.get("trip_end_time"), DATE_FORMAT)
+	except:
+            start_time = json_segment.get("trip_start_time")
+            end_time = json_segment.get("trip_end_time")
         trip_start_location = cls._start_location(sections)
         trip_end_location = cls._end_location(sections)
         return cls(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location)
@@ -56,6 +67,15 @@ class Trip(object):
     @classmethod
     def _end_location(cls, sections):
         return sections[-1].section_end_location if sections else None
+
+    def get_duration(self):
+	'''
+	return duration
+	'''
+        return self.end_time - self.start_time
+
+    def get_distance(self):
+	return  
 
     def save_to_db(self):
         pass
@@ -230,20 +250,36 @@ class Canonical_E_Mission_Trip(E_Mission_Trip):
         self._save_perturbed(self.perturbed_trips)
 
 class Alternative_Trip(Trip):
-    def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, alternatives, perturbed_trips, mode_list):
-        super(self.__class__, self).__init__(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, alternatives,
-                                             perturbed_trips, mode_list)
+    def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, parent_id, cost, mode_list):
+        super(self.__class__, self).__init__(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location)
+        self.subtype = "alternative"
         self.parent_id = parent_id
         self.cost = cost
+	self.mode_list = mode_list
 
     @classmethod
     def trip_from_json(cls, json_segment):
         trip = Trip.trip_from_json(json_segment)
-        trip.subtype = "alternative"
         trip.parent_id = json_segment.get("parent_id")
         trip.cost = json_segment.get("cost")
+        trip.mode_list = cls._init_mode_list(trip.sections)
+	print "_init"
         return cls(trip._id, trip.user_id, trip.trip_id, trip.sections, trip.start_time, trip.end_time, trip.trip_start_location, trip.trip_end_location,
-                trip.subtype, trip.parent_id, trip.cost)
+                   trip.parent_id, trip.cost, trip.mode_list)
+
+    @classmethod
+    def _init_mode_list(self, sections):
+        if not sections:
+            return None
+        mode_list = []
+        mode_set = set()
+        for section in sections:
+            mode_list.append(section.mode)
+            mode_set.add(section.mode)
+        if len(mode_set) == 1:
+            return mode_set.pop()
+	print mode_list
+        return mode_list
 
     def save_to_db(self):
         db = get_alternatives_db()
@@ -256,10 +292,12 @@ class Alternative_Trip(Trip):
 
     def _create_new(self, db):
         db.insert({"_id": self._id, "user_id": self.user_id,
-                "trip_id": self.trip_id, "sections": self.sections, "trip_start_time": self.start_time,
-                "trip_end_time": self.end_time, "trip_start_location": self.trip_start_location, "trip_end_location": self.trip_end_location,
-                "alternatives": list(range(self.alternatives)), "perturbed_trips": list(range(self.perturbed_trips)),
-                "mode": self.mode, "confirmed_mode": self.confirmed_mode})
+                "trip_id": self.trip_id, "trip_start_time": self.start_time.strftime(DATE_FORMAT),
+                "trip_end_time": self.end_time.strftime(DATE_FORMAT), "trip_start_location": self.trip_start_location.maps_coordinate(), "trip_end_location": self.trip_end_location.maps_coordinate(),
+                #"mode_list": self.mode_list})
+		})
+	for section in self.sections:
+	    section.save_to_db()
 
 class Canonical_Alternative_Trip(Alternative_Trip):
     def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, alternatives, perturbed_trips, mode_list):
