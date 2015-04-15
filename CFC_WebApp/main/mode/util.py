@@ -7,6 +7,7 @@ import json
 import geojson
 from lxml import etree
 import sys, os
+from random import randrange
 
 
 sampleTrip = '{"date": "20140413", "lastUpdate": "20140414T064442Z", "segments": [], "summary": null}'
@@ -65,11 +66,13 @@ def section_to_kml(section, outfile_path="", write=True):
         """
         Converts a section(s) into a kml file
         """
-        color = "1267FF"
+        color = "".join([hex(randrange(255))[-2:] for i in range(3)])
         make_coord = lambda p: (",".join(map(lambda x: str(x), 
                          p["track_location"]["coordinates"]) + ["0.0"]))
+        make_coord_point = lambda p: (",".join(map(lambda x: str(x), 
+                         p["coordinates"]) + ["0.0"]))
         pm = KML.Placemark(
-                KML.styleUrl("#line-1267FF-5"),
+                KML.styleUrl("#line-%s-5" % section["section_start_time"]),
                 KML.name(section['_id']),
                 KML.LineString(
                         KML.tessellate(1),                        
@@ -79,28 +82,35 @@ def section_to_kml(section, outfile_path="", write=True):
                 )
         )
         start_point = KML.Placemark(
+		KML.styleUrl("#icon-%s" % section["section_start_time"]),
                 KML.name("Start"),
-                KML.description("Starting point"),
-                KML.Point(KML.coordinates(make_coord(section['track_points'][0])))
+                KML.description(section['section_start_time']),
+                KML.Point(KML.coordinates(make_coord_point(section['section_start_point'])))
         )
         end_point = KML.Placemark(
+		KML.styleUrl("#icon-%s" % section["section_start_time"]),
                 KML.name("End"),
-                KML.description("Ending point"),
-                KML.Point(KML.coordinates(make_coord(section['track_points'][-1])))
+                KML.description(section['section_end_time']),
+                KML.Point(KML.coordinates(make_coord_point(section['section_end_point'])))
         )
         line_style = KML.Style(
                 KML.LineStyle(
-                        KML.color("FF6712"),
+                        KML.color(color),
                         KML.width("5")
                 )
         )
-        line_style.set("id","#line-1267FF-5")
+        line_style.set("id","line-%s-5" % section["section_start_time"])
+        icon_style = KML.Style(
+                KML.LineStyle(
+                        KML.color(color)
+                )
+        )
+        icon_style.set("id","icon-%s" % section["section_start_time"])
         fld = KML.Folder(
-                KML.name(section['user_id']),
+                KML.name(section['_id']),
                 pm,
                 start_point,
-                end_point,
-                line_style
+                end_point
         )
         
         if write:                
@@ -109,7 +119,7 @@ def section_to_kml(section, outfile_path="", write=True):
                 outfile = file(path,'w')
                 outfile.write(etree.tostring(kml, pretty_print=True))
         else:
-                return fld
+                return (fld, icon_style, line_style)
 
 def sections_to_kml(filename, sections, outfile_path=""):
         kml = KML.kml(KML.Document(*map(lambda section: section_to_kml(section, write=False) if len(section['track_points']) > 1 else None ,sections)))

@@ -48,9 +48,9 @@ sys.path.append("%s/../" % os.getcwd())
 from get_database import get_section_db, get_routeCluster_db
 from util import sections_to_kml, chunks
 
-def update_route_clusters():
-    from Profile import update_profiles
-    update_profiles()
+def update_route_clusters(user):
+    from Profile import generate_route_clusters
+    generate_route_clusters(user)
 
 def cluster_to_kml(user, cluster, cluster_id):
     """
@@ -75,7 +75,7 @@ def all_user_clusters_to_kml(user, user_id):
 
 def read_uuids():
     """
-    Reads in UUIDs from the file user_uuid.txt
+    Reads in UUIDs from the file user_uuid.secret
 
     Format of file:
     name : UUID\n
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     user, user_id = args.user, user_uuid[args.user]
     single = args.single
     if args.update:
-        update_route_clusters()        
+        update_route_clusters(user_id)        
 
     if single == 'import':
         exit('Import is not supported yet')
