@@ -10,10 +10,10 @@ Note: All of this is done on a per-user basis, but the process can be modified l
 Using the provided UUID's get all section data from each user.
 
 **Users** 
-* Shankari : 
-* Shankari's Husband : 
-* Culler : 
-* Zack : 
+* Shankari
+* Shankari's Husband
+* Culler
+* Zack 
 
 ### Cluster data for user ###
 
@@ -46,7 +46,7 @@ For each of the representative trips, open them in MyMaps, and then adjust, add,
 import os, sys, random
 sys.path.append("%s/../" % os.getcwd())
 from get_database import get_section_db, get_routeCluster_db
-from util import sections_to_kml, chunks
+from util import sections_to_kml, chunks, kml_multiple_to_geojson
 
 def update_route_clusters():
     from Profile import update_profiles
@@ -97,7 +97,11 @@ def __sample_representatives(user, user_id):
     pass
     
 def __import_truth(user, user_id):
-    pass
+    directory = "%s_cluster_data_kml" % user
+    for cluster in os.listdir(directory):
+        print cluster
+        path = os.path.join(directory,cluster)
+        kml_multiple_to_geojson(path, "%s_import_data_json" % user)
 
 if __name__ == "__main__":
     import argparse
@@ -112,18 +116,19 @@ if __name__ == "__main__":
     parser.add_argument('-f', '--force', dest='force', action='store_const',
                         const=True, default=False,
                         help='Force overwrite of stored data')
-    parser.add_argument('-s', '--single', type=str, choices=['collect', 'sample', 'import'], 
+    parser.add_argument('-s', '--stage', type=str, choices=['collect', 'sample', 'import'], 
                         help='Optionally select a single pipeline stage')
 
     args = parser.parse_args()
     user, user_id = args.user, user_uuid[args.user]
-    single = args.single
+    stage = args.stage
     if args.update:
-        update_route_clusters()        
+        update_route_clusters()
 
-    if single == 'import':
-        exit('Import is not supported yet')
-    elif single == 'sample':
+    if stage == 'import':
+        __import_truth(user, user_id)
+        exit('You can view the generated data in %s_import_data_json' % user)
+    elif stage == 'sample':
         exit('Sampling is not supported yet')
 
     abort = False
@@ -135,11 +140,11 @@ if __name__ == "__main__":
         abort = True
         put = raw_input("Are you sure you want to overwrite %s_cluster_data_kml? [Y/n]" % user)
         if put.strip().lower() in ("yes", "y"):
-            abort = False        
+            abort = False
     if abort:
-        exit(0)    
+        exit(0)
 
-    if single == 'collect': 
+    if stage == 'collect': 
         __collect(user, user_id)
         exit("You can view the generated data in %s_cluster_data_kml" % user)
     else:
