@@ -1,0 +1,46 @@
+
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      #map-canvas {
+        width: 500px;
+        height: 400px;
+      }
+    </style>
+	<style>
+	    .map-marker-label{
+	        position: absolute;
+	    color: blue;
+	    font-size: 16px;
+	    font-weight: bold;
+	    }
+	</style>
+
+    <script src="https://maps.googleapis.com/maps/api/js"></script>
+
+
+  </head>
+  <body>
+    <div id="map-canvas"></div>
+  </body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="gmaps_with_marker.js"></script>
+	<script>
+	var myLatlng = new google.maps.LatLng(-25.363882,131.044922);
+var mapOptions = {
+  zoom: 4,
+  center: myLatlng
+}
+var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+
+// To add the marker to the map, use the 'map' property
+var marker = new google.maps.Marker({
+    position: myLatlng,
+    map: map,
+    label:"1"
+});
+</script>
+
+</html>

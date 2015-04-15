@@ -8,6 +8,7 @@ import geojson
 from lxml import etree
 import sys, os, random
 from datetime import datetime
+from random import randrange
 
 
 sampleTrip = '{"date": "20140413", "lastUpdate": "20140414T064442Z", "segments": [], "summary": null}'
@@ -107,6 +108,9 @@ def section_to_kml(section, color, outfile_path="", write=True):
         end_icon_style_id = "icon-%s" % red        
         make_coord = lambda p: (",".join(map(lambda x: str(x), 
                          p["track_location"]["coordinates"]) + ["0.0"]))
+        make_coord_point = lambda p: (",".join(map(lambda x: str(x), 
+                         p["coordinates"]) + ["0.0"]))
+	style_id = "style-%s" % section['section_start_time']
         pm = KML.Placemark(
                 KML.styleUrl("#%s" % line_style_id),
                 KML.name(section['_id']),
@@ -122,6 +126,7 @@ def section_to_kml(section, color, outfile_path="", write=True):
         start_time = mongodate_to_datetime(start_track_point['time'])
         end_time = mongodate_to_datetime(end_track_point['time'])
         start_point = KML.Placemark(
+<<<<<<< HEAD
                 KML.styleUrl("#%s" % start_icon_style_id),                
                 KML.name("Start: %s" % start_time),
                 KML.description("Starting point"),
@@ -133,7 +138,7 @@ def section_to_kml(section, color, outfile_path="", write=True):
                 KML.description("Ending point"),
                 KML.Point(KML.coordinates(make_coord(end_track_point)))
         )
-        line_style = KML.Style(
+        style = KML.Style(
                 KML.LineStyle(
                         KML.color("ff%s" % color),
                         KML.width("5")
