@@ -18,10 +18,10 @@ class Coordinate:
         return self.lon
 
     def maps_coordinate(self):
-	return str((float(self.lat), float(self.lon)))
+        return str((float(self.lat), float(self.lon)))
 
     def __str__(self):
-	return s
+        return s
 
 class Trip(object):
 
@@ -75,7 +75,7 @@ class Trip(object):
         return self.end_time - self.start_time
 
     def get_distance(self):
-	return  
+	return
 
     def save_to_db(self):
         pass
