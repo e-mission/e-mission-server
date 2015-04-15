@@ -66,13 +66,14 @@ def section_to_kml(section, outfile_path="", write=True):
         """
         Converts a section(s) into a kml file
         """
-        color = "".join([hex(randrange(255))[-2:] for i in range(3)])
+        color = "".join(['ff'] + [hex(randrange(255))[-2:] for i in range(3)])
         make_coord = lambda p: (",".join(map(lambda x: str(x), 
                          p["track_location"]["coordinates"]) + ["0.0"]))
         make_coord_point = lambda p: (",".join(map(lambda x: str(x), 
                          p["coordinates"]) + ["0.0"]))
+	style_id = "style-%s" % section['section_start_time']
         pm = KML.Placemark(
-                KML.styleUrl("#line-%s-5" % section["section_start_time"]),
+                KML.styleUrl("#%s" % style_id),
                 KML.name(section['_id']),
                 KML.LineString(
                         KML.tessellate(1),                        
@@ -82,30 +83,31 @@ def section_to_kml(section, outfile_path="", write=True):
                 )
         )
         start_point = KML.Placemark(
-		KML.styleUrl("#icon-%s" % section["section_start_time"]),
+		KML.styleUrl("#%s" % style_id),
                 KML.name("Start"),
                 KML.description(section['section_start_time']),
                 KML.Point(KML.coordinates(make_coord_point(section['section_start_point'])))
         )
         end_point = KML.Placemark(
-		KML.styleUrl("#icon-%s" % section["section_start_time"]),
+		KML.styleUrl("#%s" % style_id),
                 KML.name("End"),
                 KML.description(section['section_end_time']),
                 KML.Point(KML.coordinates(make_coord_point(section['section_end_point'])))
         )
-        line_style = KML.Style(
+        style = KML.Style(
                 KML.LineStyle(
                         KML.color(color),
-                        KML.width("5")
+                        KML.width(3)
+                ),
+                KML.IconStyle(
+                        KML.color(color),
+			KML.scale(1.1),
+			KML.Icon(
+			   KML.href("http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png")
+			)
                 )
         )
-        line_style.set("id","line-%s-5" % section["section_start_time"])
-        icon_style = KML.Style(
-                KML.LineStyle(
-                        KML.color(color)
-                )
-        )
-        icon_style.set("id","icon-%s" % section["section_start_time"])
+        style.set("id",style_id)
         fld = KML.Folder(
                 KML.name(section['_id']),
                 pm,
@@ -119,10 +121,15 @@ def section_to_kml(section, outfile_path="", write=True):
                 outfile = file(path,'w')
                 outfile.write(etree.tostring(kml, pretty_print=True))
         else:
-                return (fld, icon_style, line_style)
+                return (fld, style)
 
 def sections_to_kml(filename, sections, outfile_path=""):
-        kml = KML.kml(KML.Document(*map(lambda section: section_to_kml(section, write=False) if len(section['track_points']) > 1 else None ,sections)))
+        # kml = KML.kml(KML.Document(*map(lambda section: section_to_kml(section, write=False) if len(section['track_points']) > 1 else None ,sections)))
+	foldersAndStyles = map(lambda section: section_to_kml(section, write=False) if len(section['track_points']) > 1 else None ,sections)
+	folders = [fs[0] for fs in foldersAndStyles]
+	styles = [fs[1] for fs in foldersAndStyles]
+
+        kml = KML.kml(KML.Document(*map(lambda fs: fs, folders + styles)))
         path = os.path.join(outfile_path, filename +'.kml')
         outfile = file(path,'w')
         outfile.write(etree.tostring(kml, pretty_print=True))
