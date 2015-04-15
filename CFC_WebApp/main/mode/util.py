@@ -126,7 +126,6 @@ def section_to_kml(section, color, outfile_path="", write=True):
         start_time = mongodate_to_datetime(start_track_point['time'])
         end_time = mongodate_to_datetime(end_track_point['time'])
         start_point = KML.Placemark(
-<<<<<<< HEAD
                 KML.styleUrl("#%s" % start_icon_style_id),                
                 KML.name("Start: %s" % start_time),
                 KML.description("Starting point"),
