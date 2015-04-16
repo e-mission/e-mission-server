@@ -137,7 +137,7 @@ def section_to_kml(section, color, outfile_path="", write=True):
                 KML.description("Ending point"),
                 KML.Point(KML.coordinates(make_coord(end_track_point)))
         )
-        line_style = KML.Style(
+        style = KML.Style(
                 KML.LineStyle(
                         KML.color("ff%s" % color),
                         KML.width("5")
@@ -147,20 +147,20 @@ def section_to_kml(section, color, outfile_path="", write=True):
         start_icon_style = KML.Style(
                 KML.IconStyle(
                         KML.color("ff%s" % green),
-                        KML.scale("1.1")
-                        # KML.Icon(
-                        #         KML.href("http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png")
-                        # )
+                        KML.scale("1.1"),
+                        KML.Icon(
+                                KML.href("http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png")
+                        )
                 )
         )
         start_icon_style.set("id", start_icon_style_id)
         end_icon_style = KML.Style(
                 KML.IconStyle(
                         KML.color("ff%s" % red),
-                        KML.scale("1.1")
-                        # KML.Icon(
-                        #         KML.href("http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png")
-                        # )                       
+                        KML.scale("1.1"),
+                        KML.Icon(
+                                KML.href("http://www.gstatic.com/mapspro/images/stock/503-wht-blank_maps.png")
+                        )                       
                 )
         )
         end_icon_style.set("id", end_icon_style_id)
