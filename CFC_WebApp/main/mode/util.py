@@ -104,8 +104,8 @@ def section_to_kml(section, color, outfile_path="", write=True):
         line_style_id = "line-%s-5" % color
         red = "FF1212"
         green = "00B80C"
-        start_icon_style_id = "icon-%s" % green
-        end_icon_style_id = "icon-%s" % red        
+        start_icon_style_id = "icon-%s" % color
+        end_icon_style_id = "icon-%s" % color        
         make_coord = lambda p: (",".join(map(lambda x: str(x), 
                          p["track_location"]["coordinates"]) + ["0.0"]))
         make_coord_point = lambda p: (",".join(map(lambda x: str(x), 
@@ -122,22 +122,22 @@ def section_to_kml(section, color, outfile_path="", write=True):
                 )
         )
         start_point = section['section_start_point']
-        end_point = section['']
+        end_point = section['section_end_point']
         start_time = mongodate_to_datetime(section["section_start_time"])
         end_time = mongodate_to_datetime(section["section_end_time"])
         start_point = KML.Placemark(
                 KML.styleUrl("#%s" % start_icon_style_id),                
                 KML.name("Start: %s" % start_time),
                 KML.description("Starting point"),
-                KML.Point(KML.coordinates(make_coord(start_point)))
+                KML.Point(KML.coordinates(make_coord_point(start_point)))
         )
         end_point = KML.Placemark(
                 KML.styleUrl("#%s" % end_icon_style_id),
                 KML.name("End: %s" % end_time),
                 KML.description("Ending point"),
-                KML.Point(KML.coordinates(make_coord(end_point)))
+                KML.Point(KML.coordinates(make_coord_point(end_point)))
         )
-        style = KML.Style(
+        line_style = KML.Style(
                 KML.LineStyle(
                         KML.color("ff%s" % color),
                         KML.width("5")
@@ -183,7 +183,7 @@ def sections_to_kml(filename, sections, outfile_path=""):
         r = lambda: random.randint(0,255)
         l_tuples = map(lambda section: section_to_kml(section, '%02X%02X%02X' % (r(),r(),r()),  write=False) if len(section['track_points']) > 1 else None ,sections)
         flat = []
-
+        
         for f,s,i_s,i_e in l_tuples:
                 flat.append(f)
                 flat.append(s)
