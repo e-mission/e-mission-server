@@ -31,6 +31,15 @@ def kml_multiple_to_geojson(infile_path, outdir_path, geojson_properties={}):
                 outfile.write(dump)
                 outfile.close()
 
+def get_kml_section_ids(infile_path):
+    """
+    Get the list of sections in a KML file
+    """
+    data = __read_file(infile_path)
+    coord_dict = __get_all_coords(data)
+    return coord_dict.keys()
+
+
 def kml_to_geojson(infile_path, outfile_path, geojson_properties={}):
 	"""
 	Converts a KML file to geojson to store in an output file.
@@ -79,12 +88,12 @@ def __get_all_coords(data):
         doc = parser.fromstring(data) 
         coords = {}     
         for folder in doc.Document.getchildren():
-                try:
-                        dataPoints = folder.Placemark.LineString.coordinates.text.split(" ") 
-                        section_id = folder.Placemark.name.text
-                        coords[section_id] = [[float(i) for i in x.split(",")[:2]] for x in dataPoints]
-                except (Exception):
-                        continue
+            try:
+               	dataPoints = folder.Placemark.LineString.coordinates.text.split(" ") 
+                section_id = folder.Placemark.name.text
+                coords[section_id] = [[float(i) for i in x.split(",")[:2]] for x in dataPoints]
+            except (Exception):
+                continue
         return coords
         
 def validate_kml(filepath, schema = "https://developers.google.com/kml/schema/kml21.xsd"):
