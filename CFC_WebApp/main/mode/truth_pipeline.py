@@ -48,26 +48,6 @@ sys.path.append("%s/../" % os.getcwd())
 from get_database import get_section_db, get_routeCluster_db, get_groundClusters_db
 from util import sections_to_kml, chunks, kml_multiple_to_geojson, get_kml_section_ids
 
-def update_dbs_with_cluster(infile_path):
-    gc_db = get_groundClusters_db();
-    c_db = get_routeCluster_db();
-    cluster_name = infile_path.split("/")[-1].split(".")[0][:-2] # infile kmls must be of format some_name_for_cluster_X.kml where X is number
-    cluster_sids = get_kml_section_ids(infile_path)
-    if(gc_db.count() == 0):
-        gc_db.collection.insert({"clusters":{}})
-    x = gc_db.collection.find_one({"clusters":{"$exists":True}})["clusters"]
-    if(cluster_name in x.keys()):
-        x[cluster_name] += cluster_sids
-    else:
-        x[cluster_name] = cluster_sids
-    c_db = c_db.find({"clusters":{"$exists":True}})
-    for db in c_db:
-        y = db["clusters"]
-        for c in cluster_sids:
-            for key, items in y.items():
-                if c in items:
-                    items.remove(c)
-
 def update_route_clusters(user):
     from Profile import generate_route_clusters
     generate_route_clusters(user)
