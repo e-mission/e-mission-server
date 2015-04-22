@@ -26,8 +26,13 @@ def check_named_clusters(path):
             return False, "%s is a directory" % f
         if not name_search(f):
             return False, "%s is not an appropriate name \n must follow .*_[0-9].kml convention" % f
+    return True, "%i: cleaned clusters" % len(os.listdir(path))
 
 def update_dbs_with_cluster(infile_path):
+    """
+    Updates the groundClusters collection with the sections 
+    stored in the KML file path
+    """
     gc_db = get_groundClusters_db();
     c_db = get_routeCluster_db();
     cluster_name = infile_path.split("/")[-1].split(".")[0][:-2] # infile kmls must be of format some_name_for_cluster_X.kml where X is number
