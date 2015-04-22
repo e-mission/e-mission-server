@@ -46,7 +46,7 @@ For each of the representative trips, open them in MyMaps, and then adjust, add,
 import os, sys, random
 sys.path.append("%s/../" % os.getcwd())
 from get_database import get_section_db, get_routeCluster_db, get_groundClusters_db
-from util import sections_to_kml, chunks, kml_multiple_to_geojson, get_kml_section_ids
+from util import sections_to_kml, chunks, kml_multiple_to_geojson, get_kml_section_ids, read_uuids
 
 def update_route_clusters(user):
     from Profile import generate_route_clusters
@@ -72,23 +72,6 @@ def all_user_clusters_to_kml(user, user_id):
     user_clusters = get_routeCluster_db().find_one({'$and':[{'user':user_id},{'method':"dtw"}]})
     for idc, cluster in user_clusters['clusters'].items():
         cluster_to_kml(user, cluster, idc)
-
-def read_uuids():
-    """
-    Reads in UUIDs from the file user_uuid.secret
-
-    Format of file:
-    name : UUID\n
-    ...
-    ...
-    """
-    from uuid import UUID
-    f = open("user_uuid.secret","r")
-    user_uuid = {}
-    for line in f:
-        user, uuid = map(lambda c: c.strip(), line.split(":"))
-        user_uuid[user] = UUID(uuid)
-    return user_uuid
 
 def __collect(user, user_id):
     all_user_clusters_to_kml(user, user_id)

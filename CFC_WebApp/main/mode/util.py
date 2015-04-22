@@ -216,6 +216,23 @@ def chunks(l,n):
 def mongodate_to_datetime(date):
         return datetime.strptime(date[:-5], "%Y%m%dT%H%M%S")
         
+def read_uuids():
+    """
+    Reads in UUIDs from the file user_uuid.secret
+
+    Format of file:
+    name : UUID\n
+    ...
+    ...
+    """
+    from uuid import UUID
+    f = open("user_uuid.secret","r")
+    user_uuid = {}
+    for line in f:
+        user, uuid = map(lambda c: c.strip(), line.split(":"))
+        user_uuid[user] = UUID(uuid)
+    return user_uuid
+
 
 if __name__ == "__main__":
         sys.path.append("%s/../" % os.getcwd())
