@@ -1,25 +1,3 @@
-"""
-#########################################################
-#Google Map Display Tool for E-Mission Trip/Section Data#
-#########################################################
-Author: En (Ryan) Lei
-A library of functions that allows the user to plot GPS coordinates data via Google Maps API(pygmap). 
-Plots are stored in HTML format and can be open using Chrome or Firefox web browser. For more inform
-ation please refer to the comments within the function.
-
-Color - Transportation Mode Mapping:
-
-walking - blue
-running - green
-cycling - yellow
-transport - red
-bus - aqua
-train - darkOrange
-car - grey 
-mixed - olive
-air - skyBlue
-"""
-
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
 import json
@@ -32,8 +10,6 @@ from pytz import timezone
 from dateutil import parser
 from home import detect_home, detect_home_from_db
 from work_place import  detect_work_office, detect_daily_work_office,detect_work_office_from_db,detect_daily_work_office_from_db
-from common import most_common, get_first_daily_point, Include_place,berkeley_area,getModeShare
-from distance import get_morning_commute_distance_pie,get_evening_commute_distance_pie
 from get_database import get_mode_db, get_section_db, get_trip_db, get_test_db
 import math
 import pygmaps
@@ -41,13 +17,15 @@ from datetime import date, timedelta
 from uuid import *
 from common import calDistance
 from pygeocoder import Geocoder
-
-
+from uuid import UUID
+from sys import exit
+import numpy as np
 
 POINTS = 'points'
 PATH = 'path'
 ALL = 'all'
-COLOR = {1:"#0000FF",       #walking - blue
+COLOR = {0:"#87CEFA", 
+         1:"#0000FF",       #walking - blue
          2:"#00FF00",       #running - green
          3:"#FFFF00",       #cycling - yellow
          4:"#FF0000",       #transport - red
@@ -58,10 +36,21 @@ COLOR = {1:"#0000FF",       #walking - blue
          9:"#87CEFA"        #air - skyBlue
         }
 
+clusterColor = {'b':"#0000FF",       #b - blue
+                'g':"#00FF00",       #g - green
+                'y':"#FFFF00",       #y - yellow
+                'r':"#FF0000",       #r - red
+                'aqua':"#00FFFF",       
+                'darkorange':"#FF8C00",       
+                'grey':"#778899",       
+                'olive':"#808000",      
+                'skyblue':"#87CEFA"     
+              }
+
 
 
 def display_home(): 
-        mymap_home = pygmaps.maps(37.8556475757, -122.248774009,14)
+        mymap_home = pygmaps.maps(37.8656475757, -122.258774009,14)
         for user in get_section_db().distinct('user_id'):
             print(user)
             user_home=detect_home(user)
@@ -81,8 +70,8 @@ def Date(date):
 
 #Description: Display on google map, this user's trip during the specified date
 #             Look for html file in gmap_display folder, file is named as "date
-#             _user.html" eg. '1234567890.html'
-#user: a string user id, eg. '1234567890'
+#             _user.html" eg. '05-12-2014_1cc03940-57f5-3e35-a189-55d067dc6460.h#             tml'
+#user: a string user id, eg. '1cc03940-57f5-3e35-a189-55d067dc6460'
 #date: a string specifying the date, eg. '05/30/14'
 #option: a string indicating how to display the trip
 #        eg. 'points' for point
@@ -112,8 +101,12 @@ def searchTrip(user, period, startpoint, endpoint, mode, option):
     sectionList = []
     startpoint = Geocoder.geocode(startpoint)[0].coordinates
     endpoint = Geocoder.geocode(endpoint)[0].coordinates
+    #gmap.addpoint(startpoint[0], startpoint[1], COLOR[4])
+    #gmap.addpoint(endpoint[0], endpoint[1], COLOR[1])
 
     for section in get_section_db().find({"$and":[
+        #{'user_id':user_id},
+        #{"section_start_datetime": {"$gte": start, "$lt":end}},
         {"mode": mode},
         {"mode": {"$ne": 'airplane'}},
         {"mode": {"$ne":7}},
@@ -163,10 +156,12 @@ def compareTrips(section1, section2):
 
 
 
-def drawTrip(trip_id, db, gmap):
+def drawTrip(trip_id, db, gmap, option = ALL):
+
     #Given trip_id, database where the trip is stored, and a pygmap.map object
     #drawTrip plots all sections associated with the trip_id on the map object
     #and returns the modified map object
+
     trip = None
     trip_cursor = db.Stage_Trips.find({'trip_id': trip_id})
 
@@ -179,8 +174,86 @@ def drawTrip(trip_id, db, gmap):
             print "Duplicated trip_id: " + trip_id
             exit()
     sections = db.Stage_Sections.find({'trip_id': trip_id})
-    drawSections(sections, ALL, gmap)
+    drawSections(sections, option, gmap)
     return gmap
+
+def plotSection(section_id, db, gmap, color = 'default', option = ALL):
+    
+    #Given section_id, database where the secytion is stored, and a pygmap.map o    #bject drawTrip plots the section on the map object and returns the modified    #map object
+
+    section = None
+    section_cursor = db.Stage_Sections.find({'_id': section_id})
+
+    if section_cursor.count() == 1:
+        section = section_cursor[0]
+    else:
+        print "Duplicated section_id: " + section_id
+        exit()
+    drawSection(section, option, gmap, color)
+    return gmap
+
+def drawCluster(cluster, db, gmap, color = 'default', option = ALL):
+    
+    if len(cluster) == 0:
+        print "ERROR: EMPTY CLUSTER"
+        exit()
+
+    currgmap = gmap
+    color_selector = 0
+    for section_id in cluster:
+        if color == 'default':
+            section_color = color
+        elif color == 'distinct':
+            section_color = COLOR[color_selector % 9]
+            color_selector += 1
+        elif color in clusterColor.values():
+            section_color = color
+        else:
+            section_color = clusterColor[color]
+        currgmap = plotSection(section_id, db, currgmap, section_color, option)
+
+    return currgmap
+
+def drawAllCluster(clusterList, db, gmap, option = PATH):
+    color_selector = 0
+    for centroid in clusterList:
+        drawCluster(clusterList[centroid], db, gmap, COLOR[color_selector % 9], PATH)
+        color_selector += 1
+    return gmap
+
+
+def getMapObj(section_id, db):
+    section_cursor =db.Stage_Sections.find({'_id': section_id})
+    if section_cursor.count() == 1:
+        section = section_cursor[0]
+    else:
+        print section_cursor.count()
+        print "Duplicated section_id: " + section_id
+        exit()
+    distance = section['distance']
+    startpoint = section['section_start_point']
+    if startpoint == None:
+        print "start_point missing corodinates"
+        exit()
+    else:
+        startCoord = startpoint['coordinates']
+        gmap = pygmaps.maps(startCoord[1], startCoord[0], min(15, 165000.0/distance))
+    return gmap
+
+def plotUserSections(user_id, db, gmap, color = 'default', option = PATH):
+    sections = db.Stage_Sections.find({'user_id': user_id})
+    if sections.count() == 0:
+        print "USER HAS NO SECTIONS"
+        exit(1)
+
+    for section in sections:
+        if section['track_points'] == []:
+            continue
+        drawSection(section, option, gmap, color)
+    return gmap
+
+
+
     
 def drawTripsForUser(user_uuid, db, gmap):
     """
