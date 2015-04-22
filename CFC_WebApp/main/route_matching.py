@@ -418,6 +418,8 @@ def matchTwoRoutes(route1,route2,step1=100000,step2=100000,method='lcs',radius1=
 def update_user_routeDistanceMatrix(user_id,data_feature,step1=100000,step2=100000,method='lcs',radius1=1000):
     ids = data_feature.keys()
     user_query=get_routeDistanceMatrix_db().find_one({'$and':[{'user':user_id},{'method':method}]})
+    #print("This is user query")
+    #print(user_query)
     if user_query==None:
         user_disMat={}
         for _id in ids:
@@ -429,15 +431,21 @@ def update_user_routeDistanceMatrix(user_id,data_feature,step1=100000,step2=1000
 
     # print(len(ids))
     for _id in ids:
-        # print(a)
+        #print(a)
         a+=1
         for key in ids:
             try:
                 user_disMat[_id][key]
+                #print("found it")
             except KeyError:
-                # print('start calculation')
+                #print('Updating matrix for the trip ' + _id + '. Doing calculations.')
                 dis=fullMatchDistance(data_feature[_id], data_feature[key],step1,step2,method,radius1)
+                #user_disMat[_id] = {}
+                if _id not in user_disMat:
+                    user_disMat[_id] = {}
                 user_disMat[_id][key] = dis
+                #print('Update successful.')
+                #print(user_disMat[_id])
 
     get_routeDistanceMatrix_db().update({'$and':[{'user':user_id},{'method':method}]},{'user':user_id,'method':method,'disMat':user_disMat})
     # for entry in get_routeDistanceMatrix_db().find():

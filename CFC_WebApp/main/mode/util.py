@@ -126,6 +126,7 @@ def section_to_kml(section, color, outfile_path="", write=True):
         pm = KML.Placemark(
                 KML.styleUrl("#%s" % line_style_id),
                 KML.name(section['_id']),
+		KML.description(section["section_id"]),
                 KML.LineString(
                         KML.tessellate(1),                        
                         KML.coordinates(" ".join(

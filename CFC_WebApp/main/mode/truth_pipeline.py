@@ -50,7 +50,8 @@ from util import sections_to_kml, chunks, kml_multiple_to_geojson, get_kml_secti
 
 def update_route_clusters(user):
     from Profile import generate_route_clusters
-    generate_route_clusters(user)
+    print "generating clusters for user %s" % user
+    generate_route_clusters(user, 20)
 
 def cluster_to_kml(user, cluster, cluster_id):
     """
@@ -70,6 +71,9 @@ def all_user_clusters_to_kml(user, user_id):
     Creates KML files for all of a given user's clusters
     """
     user_clusters = get_routeCluster_db().find_one({'$and':[{'user':user_id},{'method':"dtw"}]})
+    num_clusters = len(user_clusters['clusters'].items())
+
+    print("Writing " + str(num_clusters) + " clusters to disk for " + user + ".")
     for idc, cluster in user_clusters['clusters'].items():
         cluster_to_kml(user, cluster, idc)
 
@@ -87,6 +91,7 @@ def read_uuids():
     user_uuid = {}
     for line in f:
         user, uuid = map(lambda c: c.strip(), line.split(":"))
+	# print "About to convert UUID %s" % uuid
         user_uuid[user] = UUID(uuid)
     return user_uuid
 
