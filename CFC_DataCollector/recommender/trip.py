@@ -82,7 +82,7 @@ class Trip(object):
 
 class Section(object):
 
-    def __init__(self, _id, trip_id, distance, start_time, end_time, section_start_location, section_end_location, mode, confirmed_mode):
+    def __init__(self, _id, trip_id, distance, start_time, end_time, section_start_location, section_end_location, section_track_points, mode, confirmed_mode):
         self._id = _id
         self.trip_id = trip_id
         self.distance = distance
@@ -90,6 +90,7 @@ class Section(object):
         self.end_time = end_time
         self.section_start_location = section_start_location
         self.section_end_location = section_end_location
+        self.section_track_points = section_track_points
         self.mode = mode
         self.confirmed_mode = confirmed_mode
 
@@ -102,9 +103,11 @@ class Section(object):
         end_time = datetime.datetime.strptime(json_segment.get("section_end_time"), DATE_FORMAT)
         section_start_location = cls._start_location(json_segment.get("track_points"))
         section_end_location = cls._end_location(json_segment.get("track_points"))
+        # Confirm if these track points are in the right format, might have to wrap in Coordinate
+        section_track_points = json_segment.get("track_points")
         mode = json_segment.get("mode")
         confirmed_mode = json_segment.get("confirmed_mode")
-        return cls(_id, trip_id, distance, start_time, end_time, section_start_location, section_end_location, mode, confirmed_mode)
+        return cls(_id, trip_id, distance, start_time, end_time, section_start_location, section_end_location, section_track_points, mode, confirmed_mode)
 
     @classmethod
     def _start_location(cls, points):

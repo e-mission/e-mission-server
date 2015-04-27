@@ -61,8 +61,9 @@ def google_maps_to_our_trip(google_maps_json, _id, user_id, trip_id, mode, org_s
                 distance = leg['distance']
                 start_location = Coordinate(leg['start_location']['lat'], leg['start_location']['lng'])
                 end_location = Coordinate(leg['end_location']['lat'], leg['end_location']['lng'])
+                track_points = leg['polyline']
 		end_time = time + td
-                section = Section(0, trip_id, distance, time, end_time, start_location, end_location, mode, mode)
+                section = Section(0, trip_id, distance, time, end_time, start_location, end_location, track_points, mode, mode)
                 sections.append(section)
 		time = end_time
         start_trip = sections[0].section_start_location
@@ -70,7 +71,7 @@ def google_maps_to_our_trip(google_maps_json, _id, user_id, trip_id, mode, org_s
 	#TODO: actually calculate cost
 	cost = 0
 	parent_id = _id
-	mode_list = ["driving"]
+	mode_list = ["driving"] #why is this just driving?
         return Alternative_Trip(_id, user_id, trip_id, sections, org_start_time, end_time, start_trip, end_trip, parent_id, cost, mode_list)
 
 
