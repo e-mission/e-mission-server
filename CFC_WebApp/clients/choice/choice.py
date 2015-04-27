@@ -9,6 +9,7 @@ from uuid import UUID
 import time
 from clients.gamified import gamified
 from clients.default import default
+from clients.recommendation import recommendation
 
 # TODO: Consider subclassing to provide client specific user functions
 def setCurrView(uuid, newView):
@@ -44,12 +45,14 @@ def getResult(user_uuid):
   from dao.client import Client
 
   user = User.fromUUID(user_uuid)
+
   renderedTemplate = template("clients/choice/result_template.html",
                           variables = json.dumps({'curr_view': getCurrView(user_uuid),
                                        'uuid': str(user_uuid),
                                        'client_key': Client("choice").getClientKey()}),
                           gameResult = base64.b64encode(gamified.getResult(user_uuid)),
-                          dataResult = base64.b64encode(default.getResult(user_uuid)))
+                          dataResult = base64.b64encode(default.getResult(user_uuid)),
+                          recommendationResult = base64.b64encode(recommendation.getResult(user_uuid))
   return renderedTemplate
 
 # These are copy/pasted from our first client, the carshare study
