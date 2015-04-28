@@ -47,6 +47,7 @@ import os, sys, random
 sys.path.append("%s/../" % os.getcwd())
 from get_database import get_section_db, get_routeCluster_db, get_groundClusters_db
 from util import sections_to_kml, chunks, kml_multiple_to_geojson, get_kml_section_ids, read_uuids
+from cluster_groundtruth import check_named_clusters, update_db_with_clusters
 
 def update_route_clusters(user):
     from Profile import generate_route_clusters
@@ -78,11 +79,32 @@ def __collect(user, user_id):
 
 def __sample_representatives(user, user_id):
     pass
+
+def __read_user_clusters(user):
+    """
+    Imports cleaned trip clusters
     
+    Assumes that cleaned clusters are placed
+    into a directory called 
+    USER_clusters_cleaned 
+    where USER is the name associated with the 
+    user in the user_uuid file
+
+    Assumes that this directory is in the 
+    current directory
+    """
+    path = os.path.join(os.getcwd(), "%s_clusters_cleaned" % user)
+    success, message = check_named_clusters(path)
+    if not success:
+        exit(message)
+    print message
+    for kml in os.listdir(path):
+        infile_path = os.path.join(path, kml)
+        update_db_with_clusters(user, infile_path)
+        
 def __import_truth(user, user_id):
     directory = "%s_cluster_data_kml" % user
     for cluster in os.listdir(directory):
-        print cluster
         path = os.path.join(directory,cluster)
         kml_multiple_to_geojson(path, "%s_import_data_json" % user)
 
@@ -99,7 +121,7 @@ if __name__ == "__main__":
     parser.add_argument('-f', '--force', dest='force', action='store_const',
                         const=True, default=False,
                         help='Force overwrite of stored data')
-    parser.add_argument('-s', '--stage', type=str, choices=['collect', 'sample', 'import'], 
+    parser.add_argument('-s', '--stage', type=str, choices=['collect', 'sample', 'import', 'read'], 
                         help='Optionally select a single pipeline stage')
 
     args = parser.parse_args()
@@ -130,6 +152,8 @@ if __name__ == "__main__":
     if stage == 'collect': 
         __collect(user, user_id)
         exit("You can view the generated data in %s_cluster_data_kml" % user)
+    elif stage == 'read':
+        __read_user_clusters(user)
     else:
         __collect(user, user_id)
         __sample_representatives(user, user_id)
