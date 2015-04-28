@@ -195,7 +195,7 @@ def sections_to_kml(filename, sections, outfile_path=""):
         r = lambda: random.randint(0,255)
         l_tuples = map(lambda section: section_to_kml(section, '%02X%02X%02X' % (r(),r(),r()),  write=False) if len(section['track_points']) > 1 else None ,sections)
         flat = []
-        
+        assert (l_tuples is not None), "No sections for user!"
         for f,s,i_s,i_e in l_tuples:
                 flat.append(f)
                 flat.append(s)
