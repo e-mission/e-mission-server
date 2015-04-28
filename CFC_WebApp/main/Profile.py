@@ -59,16 +59,14 @@ def generate_user_home_work(user):
 
 def generate_route_clusters(user, nClusters = -1):
     ## update route clusters:
-    try:
-        routes_user = user_route_data(user,get_section_db())
-        #update_user_routeDistanceMatrix(user,routes_user,step1=100000,step2=100000,method='dtw')
-        if nClusters == -1:
-            nClusters = int(math.ceil(len(routes_user)/8) + 1)
-        clusters_user = kmedoids(routes_user,nClusters,user,method='dtw')
-        update_user_routeClusters(user,clusters_user[2],method='dtw')
-
-    except Exception as e:
-        print("Error. Skipping this user.")
+    print "In profile, generating route clusters for %s" % user
+    routes_user = user_route_data(user,get_section_db())
+    #print(routes_user.keys())
+    update_user_routeDistanceMatrix(user,routes_user,step1=100000,step2=100000,method='dtw')
+    if nClusters == -1:
+        nClusters = int(math.ceil(len(routes_user)/8) + 1)
+    clusters_user = kmedoids(routes_user,nClusters,user,method='dtw')
+    update_user_routeClusters(user,clusters_user[2],method='dtw')
 # print(Profiles.find().count())
 # for profile in Profiles.find():
 #     print(profile)

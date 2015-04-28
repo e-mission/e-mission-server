@@ -51,7 +51,8 @@ from cluster_groundtruth import check_named_clusters, update_db_with_clusters
 
 def update_route_clusters(user):
     from Profile import generate_route_clusters
-    generate_route_clusters(user)
+    print "generating clusters for user %s" % user
+    generate_route_clusters(user, 20)
 
 def cluster_to_kml(user, cluster, cluster_id):
     """
@@ -71,6 +72,9 @@ def all_user_clusters_to_kml(user, user_id):
     Creates KML files for all of a given user's clusters
     """
     user_clusters = get_routeCluster_db().find_one({'$and':[{'user':user_id},{'method':"dtw"}]})
+    num_clusters = len(user_clusters['clusters'].items())
+
+    print("Writing " + str(num_clusters) + " clusters to disk for " + user + ".")
     for idc, cluster in user_clusters['clusters'].items():
         cluster_to_kml(user, cluster, idc)
 
