@@ -19,6 +19,7 @@ from oauth2client.crypt import AppIdentityError
 import traceback
 import xmltodict
 import urllib2
+import pdb
 
 config_file = open('config.json')
 config_data = json.load(config_file)
@@ -372,6 +373,13 @@ def movesCallback():
   code = request.json['code']
   state = request.json['state']
   return auth.movesCallback(code, state, user_uuid)
+
+@post('/facebookCallback')
+def facebookCallback():
+  logging.debug("Request from user = %s" % request)
+  user_uuid = getUUID(request)
+  return social_network.social_network
+
 # Data source integration END
 
 @app.hook('before_request')

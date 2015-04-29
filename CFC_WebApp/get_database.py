@@ -99,3 +99,8 @@ def get_perturbed_trips_db():
     current_db = MongoClient().Stage_database
     Perturbed_trips=current_db.Stage_alternative_trips
     return Perturbed_trips
+
+def get_facebook_db():
+    current_db = MongoClient().Stage_database
+    Facebook_user_profiles = current_db.Stage_facebook_user_profiles
+    return Facebook_user_profiles

@@ -120,7 +120,7 @@ class User:
 
     # Combine profile settings and study settings.
     # We currently don't have any profile settings
-    retSettings = self.defaultSettings;
+    retSettings = self.defaultSettings
     studyList = self.getStudy()
     if len(studyList) > 0:
       logging.debug("To return user settings, combining %s data from %s" % (Client(studyList[0]).getSettings(), studyList[0]))

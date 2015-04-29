@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 set -e
 pushd "$PWD"/CFC_WebApp
 cp config.json.localhost.android config.json
