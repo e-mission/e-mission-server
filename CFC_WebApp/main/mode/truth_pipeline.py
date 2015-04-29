@@ -125,6 +125,7 @@ def __read_user_clusters_text(user):
     for l in cluster_file:
         if ':' in l:
             name = l.split(':')[0].strip()
+            name = "%s_%s" %(user, name)
             clusters[name] = []
         else:
             section_id = l.strip()
