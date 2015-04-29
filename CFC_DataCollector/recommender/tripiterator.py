@@ -11,9 +11,8 @@ class TripIterator(object):
     """
     Extracts Trip objects that can be passed
     into the Google Maps API section
-    """
 
-    """ filter_queries are a tuple ["module_name", "function_name"]
+    filter_queries are a tuple ["module_name", "function_name"]
     or ["module_name", "function_name", "options"] (see module.py)
 
 
@@ -21,17 +20,16 @@ class TripIterator(object):
         ["trips", "get top trips", 5]
 
     *** note: some functions do not allow/have options
-
     """
-    def __init__(self, user_uuid, filter_queries):
+    def __init__(self, user_uuid, filter_queries, trip_class=E_Mission_Trip):
         # Query section_db with queryList and
         # instantiate the cursor object
         # returned as an instance variable
         assert (len(filter_queries) >= 2), "filter_queries too short"
+        self.trip_class = trip_class
 
         mod, query = filter_queries[0], filter_queries[1]
         query_function = filter_modules.modules.get(mod).get(query)
-
         try:
             if len(filter_queries) == 3:
                 # options
@@ -39,7 +37,7 @@ class TripIterator(object):
                 self.storedIter = query_function(user_uuid, option)
             else:
                 # no options
-		print query_function
+                print "Query function: ", query_function
                 self.storedIter = query_function(user_uuid)
         except TypeError as e:
             print e
@@ -53,16 +51,9 @@ class TripIterator(object):
         Sections = get_section_db()
         self.cur = Sections.find({"and": completeQuery})
 	'''
-	
-
     def __iter__(self):
-        return self.storedIter.__iter__()
+        return self
 
     def next(self):
-        # Get next record from cursor and
-        # cast it to a Trip object, or one
-        # of the Trip subclasses.
-        trip = next(self.storedIter)
-        if trip is None:
-            return None
-        return trip
+        trip = self.storedIter.next()
+        return self.trip_class.trip_from_json(trip) if trip else []

@@ -1,50 +1,45 @@
 from __future__ import division
 import urllib2
-import xml.etree.ElementTree as ET
 from get_database import *
 from datetime import datetime, timedelta
-import random
 import json
-# import jsonpickle
 from trip import *
+import copy
+import uuid
 
 DATE_FORMAT = "%Y%m%dT%H%M%S-%W00" #This is a great hack thought of by Shaun
+CLASS_UUIDS = {
+  'b0d937d0-70ef-305e-9563-440369012b39': "Shankari's Husband",
+  '0763de67-f61e-3f5d-90e7-518e69793954': "Shankari Android",
+  '3a307244-ecf1-3e6e-a9a7-3aaf101b40fa': "Shankari iPhone",
+  '6245318c-d337-3530-9001-6b175dab73a7': "Jeff",
+  '1a65368b-888e-3e77-8f7c-1128f16da1df': "Gautham",
+  '5ecc845a-dbca-376f-8fb1-577bd7b18859': "Zack",
+  '6433c8cf-c4c5-3741-9144-5905379ece6e': "Jimmy",
+  'cc7f2ff0-8e73-3cfa-ab4c-647ebf025e42': "Shaun",
+  'f8fee20c-0f32-359d-ba75-bce97a7ac83b': "Shanthi"
+}
+
+# Helper for development
+def uuid_to_name(uuid):
+  return CLASS_UUIDS.get(uuid, "Unknown UUID")
 
 def get_uuid_list():
-	return ["b0d937d0-70ef-305e-9563-440369012b39"]
-	'''
-	uuid_list = [ ]
-	db = get_section_db()
-	for x in db.find():
-   		uuid_list.append(x['_id'])
-	return uuid_list
-	'''
-'''
-def insert_into_pdb(pdb, my_id, new_perturbed_trip):
-	my_id = str(my_id)
-	assert(type(my_id) == str)
-	new_id = my_id.replace('.', "")
-	assert(type(new_id) == str)
-	if '.' not in new_id:
-		pdb.insert({new_id : new_perturbed_trip})
-'''
+    uuids = set()
+    db = get_trip_db()
+    for x in db.find():
+        uuids.add(x['user_id'])
+    return uuids
 
-def initialize_empty_perturbed_trips(_id, pdb):
-	db = get_trip_db()
-	json_trip = db.find_one({"_id" : _id})
-	new_perturbed_trip = { }
-        if json_trip:
-	    trip = E_Mission_Trip.trip_from_json(json_trip)
-	    for pert in find_perturbed_trips(trip):
-	    	pert._id = pert._id.replace('.', '')
-	    	new_perturbed_trip[pert._id] = None
-	    #insert_into_pdb(pdb, trip._id, new_perturbed_trip)
-	    _id = _id.replace('.', "")
-	    to_insert = { }
-	    to_insert['_id'] = _id
-	    to_insert['trips'] = new_perturbed_trip
-	    pdb.insert({'our_id': _id, "trips" : new_perturbed_trip})
-
+def get_training_uuid_list():
+    uuids = set()
+    uuids.add(uuid.UUID("0763de67-f61e-3f5d-90e7-518e69793954"))
+    '''
+    db = get_trip_db()
+    for x in db.find():
+        uuids.add(x['user_id'])
+    '''
+    return uuids
 
 def coerce_gmaps_time(time):
 	lst = time.split()
@@ -58,51 +53,39 @@ def google_maps_to_our_trip(google_maps_json, _id, user_id, trip_id, mode, org_s
 	time = org_start_time
         for leg in google_maps_json['routes'][0]['legs']:
 		td = coerce_gmaps_time(leg['duration']['text'])	
+                coords = [ ]
+                for step in leg['steps']:
+                    coords.append(Coordinate(step['end_location']['lat'], step['end_location']['lng']))
                 distance = leg['distance']
                 start_location = Coordinate(leg['start_location']['lat'], leg['start_location']['lng'])
                 end_location = Coordinate(leg['end_location']['lat'], leg['end_location']['lng'])
 		end_time = time + td
                 section = Section(0, trip_id, distance, time, end_time, start_location, end_location, mode, mode)
+                section.points = coords
                 sections.append(section)
 		time = end_time
         start_trip = sections[0].section_start_location
         end_trip = sections[-1].section_end_location
 	#TODO: actually calculate cost
 	cost = 0
-	parent_id = _id
-	mode_list = ["driving"]
+	parent_id = trip_id
+	mode_list = [str(mode)]
         return Alternative_Trip(_id, user_id, trip_id, sections, org_start_time, end_time, start_trip, end_trip, parent_id, cost, mode_list)
-
-
-
-def update_perturbations(_id, perturbed_trip):
-# 	db = get_perturbed_trips_db()
-# 	_id = _id.replace('.', '')
-# 	json_trip = db.find_one({"our_id" : _id})
-# 	json_trip[perturbed_trip._id] = jsonpickle.encode(perturbed_trip)
-
-#def query_perturbed_trips()
-  pass
-
 
 def meters_to_miles(meters):
 	return meters * 0.000621371
 
-def calc_car_cost(trip_id, distance):
-	uuid = sectiondb.find_one({'trip_id': trip_id})['user_id']
-	our_user = User.fromUUID(uuid)
-	ave_mpg = our_user.getAvgMpg()
+def calc_car_cost(distance):
+	ave_mpg = 25
 	gallons =  meters_to_miles(distance) / ave_mpg
 	price = urllib2.urlopen('http://www.fueleconomy.gov/ws/rest/fuelprices')
 	xml = price.read()
 	p = ET.fromstring(xml)[-1]
 	return float(p.text)*gallons
 
-def create_trip_id():
-    return random.randint(100,999)
-
+'''
 def find_perturbed_trips(trip, delta=2):
-    to_return = [ ]
+    to_return = []
     time_delta = timedelta(minutes=delta)
     fifteen_min = timedelta(minutes=15)
     original_delta = trip.end_time- trip.start_time
@@ -121,8 +104,19 @@ def find_perturbed_trips(trip, delta=2):
         to_return.append(new_trip)
         time += time_delta
     return to_return
-
-
-def test_pt():
-	trip = E_Mission_Trip(12, True, [], 0, datetime(2015, 10, 10, 0), datetime(2015, 10, 10, 20), 29292, 29292)
-	print find_perturbed_trips(trip)
+'''
+'''
+#TODO: stop saving _ids it is useless
+def find_perturbed_trips(trip, delta=15, num_deltas=2):
+    perturbed_trips = []
+    start_time_delta = timedelta(minutes=delta)
+    start = trip.start_time 
+    end = trip.end_time
+    #Generates the original trip as well
+    for i in range(-num_deltas, num_deltas):
+        perturbed_trip = copy.deepcopy(trip)
+        perturbed_trip._id = perturbed_trip._id + str(create_trip_id())
+        perturbed_trip.start_time += i * start_time_delta
+        perturbed_trips.append(perturbed_trip)
+    return perturbed_trips
+'''

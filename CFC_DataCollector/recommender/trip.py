@@ -21,7 +21,7 @@ class Coordinate:
 	return str((float(self.lat), float(self.lon)))
 
     def __str__(self):
-	return s
+	return self.maps_coordinate()
 
 class Trip(object):
 
@@ -92,6 +92,7 @@ class Section(object):
         self.section_end_location = section_end_location
         self.mode = mode
         self.confirmed_mode = confirmed_mode
+	self.points = [ ]
 
     @classmethod
     def section_from_json(cls, json_segment):
@@ -286,7 +287,7 @@ class Alternative_Trip(Trip):
         result = db.update({"_id": self._id},
                       {"$set": {"cost" : self.cost}},
                        upsert=False,multi=False)
-        print result
+        #print result
         if not result["updatedExisting"]:
             self._create_new(db)
 
@@ -336,7 +337,7 @@ class PipelineFlags(object):
                 if tf['alternativesFinished'] == 'True':
                     self.alternativesFinished = True
 
-    def savePipelineFlags(self, _id):
+    def savePipelineFlags(self):
         db = get_trip_db()
         db.update({"_id": self._id},
                       {"$set": {"pipelineFlags" : {'alternativesStarted': self.alternativesStarted, 'alternativesFinished': self.alternativesFinished}}},

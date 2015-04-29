@@ -7,14 +7,14 @@ module_name { query_string: function_for_query }
 import sys
 import os
 import math
+import datetime
 sys.path.append("%s" % os.getcwd())
 sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
 
 from main.K_medoid_2 import kmedoids, user_route_data
 from main.route_matching import update_user_routeDistanceMatrix, update_user_routeClusters
 
-
-from get_database import get_section_db, get_trip_db, get_routeCluster_db
+from get_database import get_section_db, get_trip_db, get_routeCluster_db, get_alternatives_db
 import trip
 import random
 
@@ -60,41 +60,42 @@ def getCanonicalTrips(uid, number_returned = 10):
         if x <= number_returned:
             canonical_trip_list.append(random.choice(user_route_clusters[cid]))
             x+=1
-
     return iter(canonical_trip_list)
-
 
 #returns all trips to the user
 def getAllTrips(uid):
-    print uid
-    trips = list(get_trip_db().find({"user_id":uid, "type":"move"}))
-
-    return [trip.E_Mission_Trip.trip_from_json(jsonStr) for jsonStr in get_trip_db().find({'user_id' : uid,'type':'move'})].__iter__()
-
-def getRecentTrips(uid, options = 10):
-    return []
-
-def getTripsThroughMode(uid, options = 10):
-    return[]
+    #trips = list(get_trip_db().find({"user_id":uid, "type":"move"}))
+    #TODO: this code, in conjunction with common.py/get_user_id, is not returning all trips for user, but rather one trip at a time
+    d = datetime.datetime.now() - datetime.timedelta(days=6)
+    #query = {'_id':uid, 'type':'move','trip_start_datetime':{"$gt":d}}
+    query = {'user_id':uid, 'type':'move','trip_start_datetime':{"$gt":d}}
+    return get_trip_db().find(query)
 
 # Returns the trips that are suitable for training
 # Currently this is:
 # - trips that have alternatives, and
 # - have not yet been included in a training set
-'''
 def getTrainingTrips(uid):
-    queryString = {'type':'move'}
-    return [trip.E_Mission_Trip.trip_from_json(jsonStr) for jsonStr in get_trip_db().find(queryString)].__iter__()
-'''
-def getTrainingTrips(uid):
-    queryString = {'type':'move', "trip_id":"20150202T185913-0800"}
-    return [trip.E_Mission_Trip.trip_from_json(jsonStr) for jsonStr in get_trip_db().find(queryString)].__iter__()
+    d = datetime.datetime.now() - datetime.timedelta(days=7)
+    #query = {'_id':uid, 'type':'move','trip_start_datetime':{"$gt":d}}
+    #query = {"user_id":uid, "type":'move', "pipelineFlags":{"$exists":True}} 
+    print uid
+    query = {"user_id":uid, "type":"move"} 
+    #query = {'trip_id':uid, 'type':'move','trip_start_datetime':{"$gt":d}}
+    return get_trip_db().find(query)
 
+def getAlternativeTrips(trip_id):
+    d = datetime.datetime.now() - datetime.timedelta(days=7)
+    #query = {'_id':uid, 'type':'move','trip_start_datetime':{"$gt":d}}
+    #query = {"user_id":uid, "type":'move', "pipelineFlags":{"$exists":True}} 
+    query = {'trip_id':trip_id, 'type':'move','trip_start_datetime':{"$gt":d}}
+    return get_alternatives_db().find(query)
 
-def getTopAlternatives(uid, options = 10):
-  return []
+def getRecentTrips(uid):
+    raise "Not Implemented Error"
 
-
+def getTripsThroughMode(uid):
+    raise "Not Implemented Error"
 
 modules = {
    # Trip Module
@@ -103,17 +104,15 @@ modules = {
    'get_all': getAllTrips,
    'get_most_recent': getRecentTrips,
    'get_trips_by_mode': getTripsThroughMode},
-
    # Utility Module
    'utility': {
         'get_training': getTrainingTrips
     },
-
    #Pertubation Module
    'pertubation': {},
-
    #Alternatives Module
    # note: uses a different collection than section_db
    'alternatives': {
+       'get_alternatives': getAlternativeTrips
    }
- }
+}
