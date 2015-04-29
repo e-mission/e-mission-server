@@ -233,13 +233,3 @@ def read_uuids():
         user, uuid = map(lambda c: c.strip(), line.split(":"))
         user_uuid[user] = UUID(uuid)
     return user_uuid
-
-
-if __name__ == "__main__":
-        sys.path.append("%s/../" % os.getcwd())
-        from get_database import get_section_db
-        from uuid import UUID
-        Sections = get_section_db()
-        user_id = "__ID_GOES_HERE__"
-        sections = Sections.find({'$and': [{'user_id':user_id}]})
-        sections_to_kml(user_id,sections)
