@@ -115,4 +115,23 @@ angular.module('e-mission-choice', ['ionic'])
       $scope.$broadcast('scroll.refreshComplete');
     }, 1000);
   }
+
+  .controller('RecommendationCtrl', function($scope, $ionicModal) {
+
+  $scope.onRecommendationClicked = function() {
+    $scope.setCurrChoice("recommendation")
+  }
+
+  $scope.onRecommendationSelected = function() {
+    console.log("Recommendation tab selected");
+  }
+
+  $scope.onRefresh = function() {
+    // alert("GameCtrl.ON REFRESH");
+    console.log('ON REFRESH');
+
+    $timeout(function() {
+      $scope.$broadcast('scroll.refreshComplete');
+    }, 1000);
+  }
 });
