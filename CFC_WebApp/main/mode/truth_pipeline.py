@@ -47,7 +47,7 @@ import os, sys, random
 sys.path.append("%s/../" % os.getcwd())
 from get_database import get_section_db, get_routeCluster_db, get_groundClusters_db
 from util import sections_to_kml, chunks, kml_multiple_to_geojson, get_kml_section_ids, read_uuids
-from cluster_groundtruth import check_named_clusters, update_db_with_clusters
+from cluster_groundtruth import check_named_clusters, update_db_with_clusters, check_cluster_textfile
 
 def update_route_clusters(user):
     from Profile import generate_route_clusters
@@ -84,7 +84,7 @@ def __collect(user, user_id):
 def __sample_representatives(user, user_id):
     pass
 
-def __read_user_clusters(user):
+def __read_user_clusters_kml(user):
     """
     Imports cleaned trip clusters
     
@@ -105,7 +105,32 @@ def __read_user_clusters(user):
     for kml in os.listdir(path):
         infile_path = os.path.join(path, kml)
         update_db_with_clusters(user, infile_path)
-        
+
+def __read_user_clusters_text(user):
+    """
+    Reads cleaned user clusters from a text file 
+    of the format.
+    
+    trip_name_1:
+    section_id_1
+    section_id_2
+    section_id_n
+    trip_name_2:
+    ...    
+    """
+    path = os.path.join(os.getcwd(), "%s_cleaned_clusters.txt" % user)
+    check_cluster_textfile(path)
+    cluster_file = open(path, "r")
+    clusters = {}
+    for l in cluster_file:
+        if ':' in l:
+            name = l.split(':')[0].strip()
+            clusters[name] = []
+        else:
+            section_id = l.strip()
+            clusters[name].append(section_id)
+    update_db_with_clusters(user, clusters)
+
 def __import_truth(user, user_id):
     directory = "%s_cluster_data_kml" % user
     for cluster in os.listdir(directory):
@@ -125,7 +150,7 @@ if __name__ == "__main__":
     parser.add_argument('-f', '--force', dest='force', action='store_const',
                         const=True, default=False,
                         help='Force overwrite of stored data')
-    parser.add_argument('-s', '--stage', type=str, choices=['collect', 'sample', 'import', 'read'], 
+    parser.add_argument('-s', '--stage', type=str, choices=['collect', 'sample', 'import', 'read_kml', 'read_text'], 
                         help='Optionally select a single pipeline stage')
 
     args = parser.parse_args()
@@ -156,8 +181,10 @@ if __name__ == "__main__":
     if stage == 'collect': 
         __collect(user, user_id)
         exit("You can view the generated data in %s_cluster_data_kml" % user)
-    elif stage == 'read':
-        __read_user_clusters(user)
+    elif stage == 'read_kml':
+        __read_user_clusters_kml(user)
+    elif stage == 'read_text':
+        __read_user_clusters_text(user)
     else:
         __collect(user, user_id)
         __sample_representatives(user, user_id)
