@@ -33,7 +33,8 @@ def get_uuid_list():
 
 def get_training_uuid_list():
     uuids = set()
-    uuids.add(uuid.UUID("0763de67-f61e-3f5d-90e7-518e69793954"))
+    #uuids.add(uuid.UUID('cc7f2ff0-8e73-3cfa-ab4c-647ebf025e42'))
+    uuids.add(uuid.UUID('6433c8cf-c4c5-3741-9144-5905379ece6e'))
     '''
     db = get_trip_db()
     for x in db.find():

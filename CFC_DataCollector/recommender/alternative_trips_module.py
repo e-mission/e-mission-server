@@ -39,6 +39,7 @@ def get_alternative_trips(trip_it):
     # User Utility Pipeline calls this to get alternatve trips for one original trip (_id)
     alternatives = []
     for _trip in trip_it:
+        print _trip._id
         alternatives.append(TripIterator(_trip.trip_id, ["alternatives", "get_alternatives"], Alternative_Trip))
 
 def get_perturbed_trips(_id):

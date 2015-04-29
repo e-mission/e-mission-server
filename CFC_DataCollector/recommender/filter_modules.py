@@ -76,12 +76,13 @@ def getAllTrips(uid):
 # - trips that have alternatives, and
 # - have not yet been included in a training set
 def getTrainingTrips(uid):
-    d = datetime.datetime.now() - datetime.timedelta(days=7)
+    #d = datetime.datetime.now() - datetime.timedelta(days=7)
+    d = datetime.datetime.now() - datetime.timedelta(days=21)
     #query = {'_id':uid, 'type':'move','trip_start_datetime':{"$gt":d}}
     #query = {"user_id":uid, "type":'move', "pipelineFlags":{"$exists":True}} 
     print uid
-    query = {"user_id":uid, "type":"move"} 
-    #query = {'trip_id':uid, 'type':'move','trip_start_datetime':{"$gt":d}}
+    #query = {"user_id":uid, "type":"move"} 
+    query = {'user_id':uid, 'type':'move','trip_start_datetime':{"$gt":d}}
     return get_trip_db().find(query)
 
 def getAlternativeTrips(trip_id):

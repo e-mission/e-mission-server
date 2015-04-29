@@ -2,7 +2,6 @@
 Construct user utility model or retrieve from database and update with
 augmented trips. Store in database and return the model.
 """
-
 import json
 from user_utility_model import UserUtilityModel
 from tripiterator import TripIterator
@@ -64,20 +63,20 @@ class UtilityModelPipeline:
         for user_uuid in get_training_uuid_list():
             training_real_trips = self.get_training_trips(user_uuid)
             userModel = self.build_user_model(user_uuid, training_real_trips)
-            userModel.store_in_db()
-            #TODO: This is a recommendation thing---move this to the appropriate pipeline
-            self.recommend(userModel)
+            if userModel:
+                userModel.store_in_db()
+                #TODO: This is a recommendation thing---move this to the appropriate pipeline
+                self.recommend(userModel)
 
 
     def recommend(self, userModel):
-	if userModel:
-            # TODO: Should we store the user model or the modified user model in the DB?
-            modifiedUserModel = self.modify_user_utility_model(userModel)
-            alternatives = []
-            print list(atm.get_alternative_trips(training_real_trips))
-            alternatives.append(list(atm.get_alternative_trips(training_real_trips)))
-            modifiedUserModel.update(list(training_real_trips), alternatives)
-            modifiedUserModel.store_in_db()
+        # TODO: Should we store the user model or the modified user model in the DB?
+        modifiedUserModel = self.modify_user_utility_model(userModel)
+        alternatives = []
+        print list(atm.get_alternative_trips(training_real_trips))
+        alternatives.append(list(atm.get_alternative_trips(training_real_trips)))
+        modifiedUserModel.update(list(training_real_trips), alternatives)
+        modifiedUserModel.store_in_db()
 
 if __name__ == "__main__":
   config_data = json.load(open('config.json'))
