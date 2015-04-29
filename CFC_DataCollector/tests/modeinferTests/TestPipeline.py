@@ -3,7 +3,6 @@ import json
 import logging
 import numpy as np
 from get_database import get_db, get_mode_db, get_section_db
-import modeinfer
 from modeinfer import pipeline
 from datetime import datetime, timedelta
 import sys
@@ -12,7 +11,8 @@ import os
 # print "old path is %s" % sys.path
 sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
 sys.path.append("%s" % os.getcwd())
-# print "new path is %s" % sys.path
+print "new path is %s" % sys.path
+
 from utils import load_database_json, purge_database_json
 
 from dao.user import User

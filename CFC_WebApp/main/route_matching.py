@@ -6,12 +6,10 @@ import numpy as np
 from Frechet import Frechet
 from LCS import lcs,lcsScore
 from DTW import Dtw,dynamicTimeWarp,DtwAsym,DtwSym
-import urllib,simplejson,csv
+import urllib,json,csv
 import xml.etree.cElementTree as ET
 import urllib2
 import time
-import pygmaps
-from gmap_display import drawSection,drawSections
 
 
 
@@ -73,10 +71,10 @@ def route_matching(lst1,lst2,step,radius,len_match,min_score):
         if num_inter==0:
             lst1_extended.append(lst1[i]['track_location']['coordinates'])
         else:
-            lat_list=np.linspace(lst1[i]['track_location']['coordinates'][0],lst1[i+1]['track_location']['coordinates'][0],num_inter,False)
-            lon_list=np.linspace(lst1[i]['track_location']['coordinates'][1],lst1[i+1]['track_location']['coordinates'][1],num_inter,False)
-            for j in range(len(lat_list)):
-                lst1_extended.append([lat_list[j],lon_list[j]])
+            lon_list=np.linspace(lst1[i]['track_location']['coordinates'][0],lst1[i+1]['track_location']['coordinates'][0],num_inter,False)
+            lat_list=np.linspace(lst1[i]['track_location']['coordinates'][1],lst1[i+1]['track_location']['coordinates'][1],num_inter,False)
+            for j in range(len(lon_list)):
+                lst1_extended.append([lon_list[j],lat_list[j]])
     lst1_extended.append(end_pnt1['track_location']['coordinates'])
     lst2_extended=[]
     for i in range(len(lst2)-1):
@@ -85,10 +83,10 @@ def route_matching(lst1,lst2,step,radius,len_match,min_score):
         if num_inter==0:
             lst2_extended.append(lst2[i]['track_location']['coordinates'])
         else:
-            lat_list=np.linspace(lst2[i]['track_location']['coordinates'][0],lst2[i+1]['track_location']['coordinates'][0],num_inter,False)
-            lon_list=np.linspace(lst2[i]['track_location']['coordinates'][1],lst2[i+1]['track_location']['coordinates'][1],num_inter,False)
-            for j in range(len(lat_list)):
-                lst2_extended.append([lat_list[j],lon_list[j]])
+            lon_list=np.linspace(lst2[i]['track_location']['coordinates'][0],lst2[i+1]['track_location']['coordinates'][0],num_inter,False)
+            lat_list=np.linspace(lst2[i]['track_location']['coordinates'][1],lst2[i+1]['track_location']['coordinates'][1],num_inter,False)
+            for j in range(len(lon_list)):
+                lst2_extended.append([lon_list[j],lat_list[j]])
     lst2_extended.append(end_pnt2['track_location']['coordinates'])
 
     # print(len(lst1_extended))
@@ -169,10 +167,10 @@ def route_matching_2(lst1,lst2,step,radius,min_score):
         if num_inter==0:
             lst1_extended.append(lst1[i]['track_location']['coordinates'])
         else:
-            lat_list=np.linspace(lst1[i]['track_location']['coordinates'][0],lst1[i+1]['track_location']['coordinates'][0],num_inter,False)
-            lon_list=np.linspace(lst1[i]['track_location']['coordinates'][1],lst1[i+1]['track_location']['coordinates'][1],num_inter,False)
-            for j in range(len(lat_list)):
-                lst1_extended.append([lat_list[j],lon_list[j]])
+            lon_list=np.linspace(lst1[i]['track_location']['coordinates'][0],lst1[i+1]['track_location']['coordinates'][0],num_inter,False)
+            lat_list=np.linspace(lst1[i]['track_location']['coordinates'][1],lst1[i+1]['track_location']['coordinates'][1],num_inter,False)
+            for j in range(len(lon_list)):
+                lst1_extended.append([lon_list[j],lat_list[j]])
     lst1_extended.append(end_pnt1['track_location']['coordinates'])
     lst2_extended=[]
     for i in range(len(lst2)-1):
@@ -181,10 +179,10 @@ def route_matching_2(lst1,lst2,step,radius,min_score):
         if num_inter==0:
             lst2_extended.append(lst2[i]['track_location']['coordinates'])
         else:
-            lat_list=np.linspace(lst2[i]['track_location']['coordinates'][0],lst2[i+1]['track_location']['coordinates'][0],num_inter,False)
-            lon_list=np.linspace(lst2[i]['track_location']['coordinates'][1],lst2[i+1]['track_location']['coordinates'][1],num_inter,False)
-            for j in range(len(lat_list)):
-                lst2_extended.append([lat_list[j],lon_list[j]])
+            lon_list=np.linspace(lst2[i]['track_location']['coordinates'][0],lst2[i+1]['track_location']['coordinates'][0],num_inter,False)
+            lat_list=np.linspace(lst2[i]['track_location']['coordinates'][1],lst2[i+1]['track_location']['coordinates'][1],num_inter,False)
+            for j in range(len(lon_list)):
+                lst2_extended.append([lon_list[j],lat_list[j]])
     lst2_extended.append(end_pnt2['track_location']['coordinates'])
 
     # print(len(lst1_extended))
@@ -216,6 +214,9 @@ def getRoute(section_id):
     return route
 
 def refineRoute(lst1,step):
+    if lst1 ==[]:
+        return lst1
+
     # print(len(lst1))
     lst1_extended=[]
     for i in range(len(lst1)-1):
@@ -224,10 +225,10 @@ def refineRoute(lst1,step):
         if num_inter==0:
             lst1_extended.append(lst1[i])
         else:
-            lat_list=np.linspace(lst1[i][0],lst1[i+1][0],num_inter,False)
-            lon_list=np.linspace(lst1[i][1],lst1[i+1][1],num_inter,False)
-            for j in range(len(lat_list)):
-                lst1_extended.append([lat_list[j],lon_list[j]])
+            lon_list=np.linspace(lst1[i][0],lst1[i+1][0],num_inter,False)
+            lat_list=np.linspace(lst1[i][1],lst1[i+1][1],num_inter,False)
+            for j in range(len(lon_list)):
+                lst1_extended.append([lon_list[j],lat_list[j]])
     lst1_extended.append(lst1[-1])
     # print(len(lst1))
     # print(len(lst1_extended))
@@ -247,8 +248,8 @@ def storeTransitStop(type,route):
             print(row[0])
             for i in range(len(root[1])):
                 if row[0].replace(' / ','/').replace('Street','St.').replace('International',"Int'l")==root[1][i].find('name').text:
-                    print(float(root[1][i].find('gtfs_latitude').text),float(root[1][i].find('gtfs_longitude').text))
-                    stops.append([float(root[1][i].find('gtfs_latitude').text),float(root[1][i].find('gtfs_longitude').text)])
+                    print(float(root[1][i].find('gtfs_longitude').text),float(root[1][i].find('gtfs_latitude').text))
+                    stops.append([float(root[1][i].find('gtfs_longitude').text),float(root[1][i].find('gtfs_latitude').text)])
                     break
 
     todo['type']=type
@@ -273,10 +274,10 @@ def storeCalTrainStop():
             # print(add)
             url='https://maps.googleapis.com/maps/api/geocode/json?address='+urllib.quote_plus(row[0]+' caltrain station')
             print(url)
-            geo= simplejson.load(urllib.urlopen(url))
+            geo= json.load(urllib.urlopen(url))
             result=geo['results'][0]
             print(result['geometry']['location'])
-            stops.append([result['geometry']['location']['lat'],result['geometry']['location']['lng']])
+            stops.append([result['geometry']['location']['lng'],result['geometry']['location']['lat']])
 
     todo['type']='CalTrain'
     todo['route']='CalTrain'
@@ -290,6 +291,9 @@ def existingMatchDistance(route1,route2,step1=100000,step2=100000,method='lcs',r
     # print(lst[0],lst[-1])
     # print(route)
     dis=999999
+    if len(route1) < 2 or len(route2) < 2:
+        return dis
+
     for start_route2 in range(len(route2)):
         coverage_start=find_near(route1,route2[start_route2],radius1)
         if coverage_start!=[]:
@@ -305,7 +309,13 @@ def existingMatchDistance(route1,route2,step1=100000,step2=100000,method='lcs',r
         end_route1=coverage_end[-1]
 
         if abs(start_route1-end_route1)>=1:
-        ## using DTW
+        ## using DTW Iteration
+            if method=='dtw':
+                if start_route1<end_route1:
+                    new_dis=dynamicTimeWarp(refineRoute(route1[start_route1:end_route1+1],step1),refineRoute(route2[start_route2:end_route2+1],step2),calDistance)
+                elif end_route1<start_route1:
+                    new_dis=dynamicTimeWarp(refineRoute(route1[end_route1:start_route1+1][::-1],step1),refineRoute(route2[start_route2:end_route2+1],step2),calDistance)
+        ## using DTW Recursion
             if method=='DTW':
                 if start_route1<end_route1:
                     aa=Dtw(refineRoute(route1[start_route1:end_route1+1],step1),refineRoute(route2[start_route2:end_route2+1],step2),calDistance)
@@ -356,7 +366,13 @@ def fullMatchDistance(route1,route2,step1=100000,step2=100000,method='lcs',radiu
     # print(lst[0],lst[-1])
     # print(route)
     dis=999999
-## using DTW
+    if len(route1) < 2 or len(route2) < 2:
+        return dis
+
+## using DTW Iteration
+    if method=='dtw':
+        new_dis=dynamicTimeWarp(refineRoute(route1,step1),refineRoute(route2,step2),calDistance)
+## using DTW Recursion
     if method=='DTW':
         aa=Dtw(refineRoute(route1,step1),refineRoute(route2,step2),calDistance)
         new_dis=aa.calculate_distance()
@@ -414,7 +430,7 @@ def update_user_routeDistanceMatrix(user_id,data_feature,step1=100000,step2=1000
 
     # print(len(ids))
     for _id in ids:
-        print(a)
+        # print(a)
         a+=1
         for key in ids:
             try:
@@ -435,22 +451,6 @@ def update_user_routeClusters(user_id,clusters,method='lcs'):
     else:
         get_routeCluster_db().update({'user':user_id,'method':method},{'user':user_id,'method':method,'clusters':clusters})
 
-def plot_each_route_cluster_for_user(user_id,method='lcs'):
-    i=0
-    Sections = get_section_db()
-    user_route_clusters = get_routeCluster_db().find_one({'$and':[{'user':user_id},{'method':method}]})
-    # plot each cluster as a file.
-    for idx in user_route_clusters.keys():
-        gmap = pygmaps.maps(getRoute(idx)[0][0], getRoute(idx)[0][1], 14)
-        section=Sections.find_one({'_id': idx})
-        drawSection(section, 'path', gmap)
-        for idi in user_route_clusters[idx]:
-            # print(Sections.find({'_id': idi}).count())
-            section=Sections.find_one({'_id': idi})
-            drawSection(section, 'path', gmap)
-        gmap.draw(str(user_id) + '_'+ method+ '_'+str(i) + '.html')
-        i+=1
-
 
 def get_common_routes_for_user(user_id,method='lcs'):
     common_idxs = []
@@ -464,12 +464,3 @@ def get_common_routes_for_user(user_id,method='lcs'):
             if section['distance'] > 2000 and len(getRoute(idx)) > 10 and section['duration'] > 600:
                 common_idxs.append(idx)
     return common_idxs
-
-def plot_common_routes_for_user(user_id,method='lcs'):
-    Sections = get_section_db()
-    idxs = get_common_routes_for_user(user_id,method)
-    gmap = pygmaps.maps(37.8717, -122.2728, 14)
-    for idx in idxs:
-        section = Sections.find_one({'_id': idx})
-        drawSection(section,'path',gmap)
-    gmap.draw(str(user_id) + '_'+ method + '.html')

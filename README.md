@@ -29,29 +29,33 @@ Note: If you are using OSX: You want to install homebrew and then use homebrew t
     $ mongod
 Ubuntu: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
 
-### Installing Pip for Mac: ###
-1. Download get-pip.py (https://pip.pypa.io)
-2. Install pip:
-    $ python get-pip.py
+### Python distribution ###
+We will use a distribution of python that is optimized for scientific
+computing. The [anaconda](https://store.continuum.io/cshop/anaconda/)
+distribution is available for a wide variety of platforms and includes the
+python scientific computing libraries (numpy/scipy/scikit-learn) along with
+native implementations for performance. Using the distribution avoids native
+library inconsistencies between versions.
 
-### Python: ###
+The distribution also includes its own version of pip, and a separate package
+management tool called 'conda'.
+
+After you install the anaconda distribution, please ensure that it is in your
+path, and you are using the anaconda versions of common python tools such as
+`python` and `pip`, e.g.
+
+    $ which python
+    /Users/shankari/OSS/anaconda/bin/python
+
+    $ which pip
+    /Users/shankari/OSS/anaconda/bin/pip
+
+### Python dependencies: ###
 
     (You may need super user permissions to run these commands)
     $ pip install -r requirements.txt 
     # If you are running this in production over SSL, copy over the cherrypy-wsgiserver
     $ cp api/wsgiserver2.py <dist-packages>/cherrypy/wsgiserver/wsgiserver2.py
-
-### Using Pip on Windows: ###
-    # To install pip:
-    # Download or save get-pip.py file: https://bootstrap.pypa.io/get-pip.py
-    # From download directory, run:
-    $ python get-pip.py
-    
-    # To add pip to path (replace 'PythonXX' with actual Python directory name, e.g. 'Python27'):
-    $ python C:\PythonXX\Tools\Scripts\win_add2path.py
-    
-    # Finally, to install modules as above:
-    $ python -m pip install -r requirements.txt
 
 ## Development: ##
 -------------------
@@ -81,11 +85,23 @@ fill them in
 [http://localhost:8080](http://localhost:8080)
 or connect to it using the phone app
 
-1. Run unit tests
-        $ cd CFC_WebApp
-        $ python tests/TestCarbon.py
-        $ python tests/TestTripManager.py
-You might get an ImportError for the module utils. In this case you have to add PYTHONPATH to have the current directory in it. Try running "PYTHONPATH=. python tests/TestCarbon.py" instead.
+### Running unit tests ###
+
+1. Make sure that the anaconda python is in your path
+
+        $ which python
+        /Users/shankari/OSS/anaconda/bin/python
+
+1. Run all tests.
+
+        $ ./runAllTests.sh
+
+1. If you get import errors, you may need to add the current
+directory to PYTHONPATH.
+
+        $ PYTHONPATH=. ./runAllTests.sh
+
+### Running backend analysis scripts ###
 
 1. If you need to run any of the backend scripts, copy the config.json and
 keys.json files to that directory as well, and run the scripts:
@@ -99,6 +115,8 @@ keys.json files to that directory as well, and run the scripts:
    
 These repositories don't have the associated client keys checked in for
 security reasons.
+
+### Getting keys ###
 
 If you are associated with the e-mission project and will be integrating with
 our server, then you can get the key files from:
@@ -119,12 +137,16 @@ And then copy over the sample files from these locations and replace the values 
 * CFC\_WebApp/keys.json
 * CFC\_DataCollector/keys.json
 
+## TROUBLESHOOTING: ##
 
-TROUBLESHOOTING:
+1. If a python execution fails to import a module, make sure to add current
+directory to your PYTHONPATH.
 
-1. If a python execution fails to import a module, make sure to add current directory to your PYTHONPATH. 
+1. If starting the server gives a CONNECTION\_ERROR, make sure MongoDB is
+actively running when you attempt to start the server.
 
-1. If starting the server gives a CONNECTION_ERROR, make sure MongoDB is actively running when you attempt to start the server. Make sure to md c:\data\db\ if dbpath does not exist.
+1. On windows, if you get an error that `dbpath does not exist`, make sure to 
+    % md c:\data\db\ 
 
 ## Design decisions: ##
 ----------
@@ -157,6 +179,21 @@ of the wsgiserver file.
 TODO: clean up later
 
     $ cp api/wsgiserver2.py <dist-packages>/cherrypy/wsgiserver/wsgiserver2.py
+
+Also, now that we decode the JWTs locally, we need to use the oauth2client,
+which requires the PyOpenSSL library. This can be installed on ubuntu using the
+python-openssl package, but then it is not accessible using the anaconda
+distribution. In order to enable it for the conda distribution as well, use
+
+    $ conda install pyopenssl
+
+Also, installing via `requirements.txt` does not appear to install all of the
+requirements for the google-api-client. If you get mysterious "Invalid token"
+errors for tokens that are correctly validated by the backup URL method, try to
+uninstall and reinstall with the --update option.
+
+    $ pip uninstall google-api-python-client
+    $ pip install --upgrade google-api-python-client
 
 [CFC_WebApp_Structure]: https://raw.github.com/amplab/e-mission-server/master/figs/CFC_WebApp_Structure.png
 [CFC_DataCollector_Structure]: https://raw.github.com/amplab/e-mission-server/master/figs/CFC_DataCollector_Structure.png

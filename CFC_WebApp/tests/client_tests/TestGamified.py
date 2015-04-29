@@ -37,13 +37,12 @@ class TestGamified(unittest.TestCase):
         self.busOptimalCarbon = 92.0/1609
 
         self.allDriveExpect = (self.busExpect * self.driveCarbon + self.walkExpect * self.driveCarbon)/1000
-        self.myFootprintExpect = (self.busExpect * self.busCarbon)/1000
+        self.myFootprintExpect = float(self.busExpect * self.busCarbon)/1000
         self.sb375GoalExpect = 40.142892/7
 
         self.mineMinusOptimalExpect = 0
-        self.allDriveMinusMineExpect = (self.allDriveExpect - self.myFootprintExpect)/self.allDriveExpect
-        self.sb375DailyGoalMinusMineExpect = (self.sb375GoalExpect - self.myFootprintExpect)/self.sb375GoalExpect
-
+        self.allDriveMinusMineExpect = float(self.allDriveExpect - self.myFootprintExpect)/self.allDriveExpect
+        self.sb375DailyGoalMinusMineExpect = float(self.sb375GoalExpect - self.myFootprintExpect)/self.sb375GoalExpect
 
         self.now = datetime.now()
         self.twodaysago = self.now - timedelta(days=2)
@@ -110,9 +109,13 @@ class TestGamified(unittest.TestCase):
     def testUpdateScore(self):
         self.assertEqual(gamified.getStoredScore(self.user), (0, 0))
         components = gamified.updateScore(self.user.uuid)
+        print "self.allDriveMinusMineExpect = %s, self.sb375DailyGoalMinusMineExpect = %s" % \
+            (self.allDriveMinusMineExpect, self.sb375DailyGoalMinusMineExpect)
         expectedScore = 0.75 * 50 + 30 * self.allDriveMinusMineExpect + 20 * 0.0 + \
             10 * self.sb375DailyGoalMinusMineExpect
-        self.assertEqual(gamified.getStoredScore(self.user), (0, expectedScore))
+        storedScore = gamified.getStoredScore(self.user)
+        self.assertEqual(storedScore[0], 0)
+        self.assertAlmostEqual(storedScore[1], expectedScore, 6)
 
     def testGetLevel(self):
         self.assertEqual(gamified.getLevel(0), (1, 1))
@@ -132,6 +135,15 @@ class TestGamified(unittest.TestCase):
         self.assertEqual(gamified.getFileName(1, 1), "level_1_1.png")
         self.assertEqual(gamified.getFileName(1.0, 2.0), "level_1_2.png")
         self.assertEqual(gamified.getFileName(1.055, 2), "level_1_2.png")
+
+    def testRunBackgroundTasksForDay(self):
+        self.assertEqual(gamified.getStoredScore(self.user), (0, 0))
+        components = gamified.runBackgroundTasks(self.user.uuid)
+        expectedScore = 0.75 * 50 + 30 * self.allDriveMinusMineExpect + 20 * 0.0 + \
+            10 * self.sb375DailyGoalMinusMineExpect
+        storedScore = gamified.getStoredScore(self.user)
+        self.assertEqual(storedScore[0], 0)
+        self.assertAlmostEqual(storedScore[1], expectedScore, 6)
 
 if __name__ == '__main__':
     unittest.main()

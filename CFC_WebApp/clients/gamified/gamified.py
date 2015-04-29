@@ -34,19 +34,19 @@ def getScoreComponents(user_uuid, start, end):
   # The score is based on the following components:
   # - Percentage of trips classified. We are not auto-classifying high
   # confidence trips, so don't need to handle those here
-  user = user_uuid
+  user = User.fromUUID(user_uuid)
 
-  pctClassified = common.getClassifiedRatio(user, start, end)
+  pctClassified = common.getClassifiedRatio(user_uuid, start, end)
 
   (myModeShareCount, avgModeShareCount,
    myModeShareDistance, avgModeShareDistance,
    myModeCarbonFootprint, avgModeCarbonFootprint,
    myModeCarbonFootprintNoLongMotorized, avgModeCarbonFootprintNoLongMotorized,
    myOptimalCarbonFootprint, avgOptimalCarbonFootprint,
-   myOptimalCarbonFootprintNoLongMotorized, avgOptimalCarbonFootprintNoLongMotorized) = carbon.getFootprintCompareForRange(user, start, end)
+   myOptimalCarbonFootprintNoLongMotorized, avgOptimalCarbonFootprintNoLongMotorized) = carbon.getFootprintCompareForRange(user.uuid, start, end)
 
   carbon.delLongMotorizedModes(myModeShareDistance)
-  myAllDrive = carbon.getAllDrive(myModeShareDistance)
+  myAllDrive = carbon.getAllDrive(user.uuid, myModeShareDistance)
   myCarbonFootprintSum = sum(myModeCarbonFootprintNoLongMotorized.values())
   myOptimalFootprintSum = sum(myOptimalCarbonFootprintNoLongMotorized.values())
   logging.debug("myCarbonFootprintSum = %s, myOptimalFootprintSum = %s, myAllDrive = %s" %

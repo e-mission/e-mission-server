@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 import logging
+from datetime import datetime
 
 import sys
 import os
@@ -15,6 +16,7 @@ import scipy as sp
 from featurecalc import calDistance, calSpeed, calHeading, calAvgSpeed, calSpeeds, calAccels, getIthMaxSpeed, getIthMaxAccel, calHCR,\
 calSR, calVCR, mode_cluster, mode_start_end_coverage
 import time
+from datetime import datetime
 
 # We are not going to use the feature matrix for analysis unless we have at
 # least 50 points in the training set. 50 is arbitrary. We could also consider
