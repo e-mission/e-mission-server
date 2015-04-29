@@ -86,7 +86,7 @@ def update_db_with_clusters(user, infile_path):
     gc_db.remove({"clusters":{"$exists":True}})
     gc_db.insert({"clusters":x})
 
-def update_db_with_clusters(user, clusters):
+def update_db_with_clusters_dict(user, clusters):
     """
     Updates the groundClusters collection with the sections 
     represented in the clusters dict

@@ -47,7 +47,7 @@ import os, sys, random
 sys.path.append("%s/../" % os.getcwd())
 from get_database import get_section_db, get_routeCluster_db, get_groundClusters_db
 from util import sections_to_kml, chunks, kml_multiple_to_geojson, get_kml_section_ids, read_uuids
-from cluster_groundtruth import check_named_clusters, update_db_with_clusters, check_cluster_textfile
+from cluster_groundtruth import check_named_clusters, update_db_with_clusters, check_cluster_textfile, update_db_with_clusters_dict
 
 def update_route_clusters(user):
     from Profile import generate_route_clusters
@@ -130,7 +130,7 @@ def __read_user_clusters_text(user):
         else:
             section_id = l.strip()
             clusters[name].append(section_id)
-    update_db_with_clusters(user, clusters)
+    update_db_with_clusters_dict(user, clusters)
 
 def __import_truth(user, user_id):
     directory = "%s_cluster_data_kml" % user
