@@ -14,6 +14,23 @@ from random import randrange
 sampleTrip = '{"date": "20140413", "lastUpdate": "20140414T064442Z", "segments": [], "summary": null}'
 sampleSegment = '{"place": {"type": "unknown", "id": 54095848, "location": {"lat": 37.3910149202, "lon": -122.0865010796}}, "endTime": "20140413T234434-0700", "type": "place", "startTime": "20140412T190446-0700", "lastUpdate": "20140414T064442Z"}'
 
+def get_clusters_info():
+        sys.path.append("%s/../" % os.getcwd())
+        from get_database import get_routeCluster_db, get_section_db
+        c_db = get_routeCluster_db()
+        s_db = get_section_db()
+        x = c_db.find_one({"clusters":{"$exists":True}})["clusters"].values()
+        c_info = []
+        for col in x:
+                y = [[] for _ in range(4)]
+                for cluster in col:
+                        info = s_db.find_one({"_id":cluster})
+                        y[0].append(info["section_start_datetime"])
+                        y[1].append(info["section_end_datetime"])
+                        y[2].append(info["section_start_point"]["coordinates"])
+                        y[3].append(info["section_end_point"]["coordinates"])
+                c_info += y
+        return c_info
 
 def kml_multiple_to_geojson(infile_path, outdir_path, geojson_properties={}):
         """
@@ -233,3 +250,6 @@ def read_uuids():
         user, uuid = map(lambda c: c.strip(), line.split(":"))
         user_uuid[user] = UUID(uuid)
     return user_uuid
+
+if __name__ == "__main__":
+        get_clusters_info()
