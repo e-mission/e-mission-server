@@ -1,5 +1,5 @@
 from common import find_perturbed_trips, initialize_empty_perturbed_trips, update_perturbations 
-from trip import E_Mission_Trip
+from trip import *
 #from get_database import get_perturbed_trips_db
 from get_database import *
 from query_scheduler_pipeline import schedule_queries
@@ -38,18 +38,23 @@ def calc_alternative_trips(trip_iterator):
 #when we store in the database, they need to be able to associate the perturbed trips back to the original trip, 
 #otherwise the query made by the utility model team will be very difficult
 
-def store_alternative_trips(tripObj):
+def store_alternative_trips(trip_it):
     # store populated tripObj with _id (concatenated trip id and user id)
-    db = get_alternative_trips_db()
-    _id = tripObj.get_id()
-    db.insert_one({_id : tripObj})
+    for trip in trip_it:
+        db = get_alternative_trips_db()
+        _id = trip._id
+        db.insert_one({_id : trip})
 
-def get_alternative_trips(_id):
+def get_alternative_trips(trip_it):
     # User Utility Pipeline calls this to get alternatve trips for one original trip (_id)
     # db = get_alternative_trips_db()
     # _id = tripObj.get_id()
     # return db.find(_id)
-    return [trip.E_Mission_Trip.trip_from_json(jsonStr) for jsonStr in get_alternative_trips_db().find({'_id' : _id})].__iter__()
+    for _trip in trip_it:
+	print _trip
+        #return [trip.Alternative_Trip.trip_from_json(jsonStr) for jsonStr in get_alternatives_db().find({'_id' : trip._id})].__iter__()
+    	return [Alternative_Trip.trip_from_json(jsonStr) for jsonStr in get_alternatives_db().find({'trip_id' : _trip.trip_id})].__iter__()
+
 
 def store_perturbed_trips(tripObj):
     # store populated tripObj with _id (concatenated trip id and user id)

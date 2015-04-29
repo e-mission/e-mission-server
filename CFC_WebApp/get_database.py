@@ -90,7 +90,7 @@ def get_utility_model_db():
     Utility_Models = current_db.Stage_utility_models
     return Utility_Models
 
-def get_alternative_trips_db():
+def get_alternatives_db():
     current_db = MongoClient().Stage_database
     Alternative_trips=current_db.Stage_alternative_trips
     return Alternative_trips

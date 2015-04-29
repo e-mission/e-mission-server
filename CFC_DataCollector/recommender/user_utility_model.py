@@ -22,7 +22,7 @@ class UserUtilityModel(object):
   def __init__(self, user_id, trips, alternatives): # assuming alternatives a list of lists
     # TODO: Using list() here removes the performance benefits of an iterator.
     # Consider removing/relaxing the assert
-    print len(list(trips)), len(alternatives)
+    #print len(list(trips)), len(alternatives)
     assert(len(list(trips)) == len(alternatives))
     self.user_id = user_id
     self.regression = lm.LogisticRegression()
@@ -32,21 +32,36 @@ class UserUtilityModel(object):
   # for now, just create a new model and return it
   def update(self, trips = [], alternatives = []):
     assert(len(list(trips)) == len(alternatives))
-    for i in range(len(alternatives)):
-      trip_features = self.extract_features(trips[i])
-      alt_features = [self.extract_features(alt) for alt in alternatives[i]]
-      target_vector = [1] + ([0] * len(alternatives))
-      print trip_features, alt_features
-      # TODO: ValueError: X and y have incompatible shapes.
-      # X has 1 samples, but y has 23.
-      # self.regression.fit(trip_features + alt_features, target_vector)
-    # TODO: AttributeError: 'LogisticRegression' object has no attribute 'coef_'
-    # self.coefficients = self.regression.coef_
+    trip_features = self.extract_features(trips)
+    to_evaluate = []
+    for t_f in trip_features:
+        to_evaluate.append(t_f)
+    for trip_alternatives in alternatives:
+      alt_features = self.extract_features(trip_alternatives)
+      for a_f in alt_features:
+         to_evaluate.append(a_f)
+      target_vector = [1] + ([0] * len(list(trip_alternatives)))
+      self.regression.fit(trip_features + alt_features, target_vector)
+    self.coefficients = self.regression.coef_
+    print self.coefficients
+    best_trip = None
+    best_utility = float("-inf")
+    for trip_feature in to_evaluate:
+        utility = self.predict_utility(trip_feature)
+ 	if utility > best_utility:
+		best_trip = trip_feature	
+		best_utility = utility
+    if best_trip == to_evaluate[0]:
+        print "Model predicts best trip is: ORIGINAL TRIP", best_trip
+    else: 
+        print "Model predicts best trip is: Alternative TRIP", best_trip
 
   # calculate the utility of trip using the model
   def predict_utility(self, trip):
-    trip_features = extract_features(trip)
-    utility = sum(f * c for f, c in zip(trip_features, self.coefficients))
+    trip_features = trip
+    #trip_features = extract_features(trip)
+    utility = sum(f * c for f, c in zip(trip_features, self.coefficients[0]))
+    print trip, " Utility: ", utility
     return utility
 
   # find model params from DB and construct a model using these params
@@ -63,7 +78,4 @@ class UserUtilityModel(object):
   # return an array of feature values for the given trip
   # must be filled out in subclass
   def extract_features(self, trip):
-    # TODO: Change the pipeline test to use an concrete subclass instead of the
-    # abstract superclass so that we can go back to passing here
-    # pass
-    return list(range(5))
+    pass

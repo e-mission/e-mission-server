@@ -5,8 +5,9 @@ sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
 from main.userclient import getClientSpecificQueryFilter
 from main.get_database import get_section_db
 import filter_modules
+from trip import *
 
-class TripIterator:
+class TripIterator(object):
     """
     Extracts Trip objects that can be passed
     into the Google Maps API section
@@ -37,8 +38,8 @@ class TripIterator:
                 option = filter_queries[2]
                 self.storedIter = query_function(user_uuid, option)
             else:
-                pass
                 # no options
+		print query_function
                 self.storedIter = query_function(user_uuid)
         except TypeError as e:
             print e
@@ -46,13 +47,13 @@ class TripIterator:
             traceback.print_exc()
             #logging.warn("Found no query function for filter_queries: ", filter_queries);
             self.storedIter = []
-
-        """
+	'''
         clientSpecificQuery = getClientSpecificQueryFilter(user_uuid)
         completeQuery = clientSpecificQuery + queryList
         Sections = get_section_db()
         self.cur = Sections.find({"and": completeQuery})
-        """
+	'''
+	
 
     def __iter__(self):
         return self.storedIter.__iter__()
@@ -64,4 +65,4 @@ class TripIterator:
         trip = next(self.storedIter)
         if trip is None:
             return None
-        return Trip(trip)
+        return trip
