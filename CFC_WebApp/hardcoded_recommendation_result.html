@@ -29,15 +29,16 @@
       }
 
       #rec-info h1 {
-        margin: 0 auto 10px;
+        margin: 0;
       }
 
-      #rec-info p {
-        margin: 0;
-        text-transform: uppercase;
+      #rec-times {
+        margin: 10px auto 0;
       }
 
       #rec-reasons p {
+        font-size: 13px;
+        font-style: italic;
         display: none;
       }
 
@@ -50,11 +51,11 @@
   <body>
     <div id="rec-info">
       <h1>Recommended Trip</h1>
-      <p>Leave at <span id="departure-time">1:30 PM</span> and arrive at <span id="arrival-time">1:56 PM</span></p>
+      <p id="rec-times">Leave at <span id="departure-time">1:30 PM</span> and arrive at <span id="arrival-time">1:56 PM</span></p>
       <div id="rec-reasons">
         <p id="time-rec">Recommended because this trip is 4 minutes faster than your original trip.</p>
         <p id="distance-rec">Recommended because this trip is 2 miles faster than your original trip.</p>
-        <p id="emissions-rec">Recommended because this trip will create rougly 5X less carbon emissions than your original trip.</p>
+        <p id="emissions-rec">Recommended because this trip will create roughly 5X fewer carbon emissions than your original trip.</p>
       </div>
     </div>
 
@@ -62,42 +63,43 @@
 
     <script>
       var recommendation = {
+        reason: 'emissions',
         recommendedTrip: {
           sections: [
-            // {
-            //   mode: "walking",
-            //   points: [
-            //     [37.8682666505, -122.2628189859],
-            //     [37.8685993385, -122.2621347884],
-            //     [37.8681854678, -122.2615935802],
-            //     [37.8675361585, -122.2606013509],
-            //   ]
-            // },
             {
-              mode: "car",
+              mode: "walk",
               points: [
-                [37.772323, -122.214897],
-                [21.291982, -157.821856]
+                [37.8682666505, -122.2628189859],
+                [37.8685993385, -122.2621347884],
+                [37.8681854678, -122.2615935802],
+                [37.8675361585, -122.2606013509],
               ]
             },
-            {
-              mode: "bicycle",
-              points: [
-                [21.291982, -157.821856],
-                [-18.142599, 178.431],
-                [-27.46758, 153.027892]
-              ]
-            }
+            // {
+            //   mode: "air",
+            //   points: [
+            //     [37.772323, -122.214897],
+            //     [21.291982, -157.821856]
+            //   ]
+            // },
+            // {
+            //   mode: "air",
+            //   points: [
+            //     [21.291982, -157.821856],
+            //     [-18.142599, 178.431],
+            //     [-27.46758, 153.027892]
+            //   ]
+            // }
           ]
         }
       };
 
       var MODE_COLORS = {
-        bicycle: 'red',
-        car: 'blue',
-        flying: 'orange',
-        transit: 'purple',
-        walking: 'green'
+        air: 'red',
+        bicycle: 'blue',
+        car: 'orange',
+        transit: 'yellow',
+        walk: 'green'
       };
 
       function initialize() {
@@ -127,6 +129,8 @@
 
         map.fitBounds(bounds); // auto-zoom
         map.panToBounds(bounds); // auto-center
+
+        $('#' + recommendation.reason + '-rec').slideDown();
       }
 
       google.maps.event.addDomListener(window, 'load', initialize);
