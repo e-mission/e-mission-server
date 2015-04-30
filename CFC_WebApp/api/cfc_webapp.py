@@ -299,7 +299,7 @@ def getCarbonCompare():
     print("  %s: %s" % (key, val))
 
   from clients.default import default
-  
+
   if 'User' not in request.headers or request.headers.get('User') == '':
     return "Waiting for user data to become available..."
 

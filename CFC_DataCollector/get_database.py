@@ -1,6 +1,5 @@
 from pymongo import MongoClient
 
-
 def get_mode_db():
     current_db = MongoClient().Stage_database
     Modes=current_db.Stage_Modes
