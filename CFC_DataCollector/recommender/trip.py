@@ -21,7 +21,7 @@ class Coordinate:
         return str((float(self.lat), float(self.lon)))
 
     def __str__(self):
-        return s
+        return self.maps_coordinate()
 
 class Trip(object):
 
@@ -41,10 +41,10 @@ class Trip(object):
         user_id = json_segment.get("user_id")
         trip_id = json_segment.get("trip_id")
         sections = cls._init_sections(user_id, trip_id, len(json_segment.get("sections"))) if json_segment.get("sections") else None
-	try:
+        try:
             start_time = datetime.datetime.strptime(json_segment.get("trip_start_time"), DATE_FORMAT)
             end_time = datetime.datetime.strptime(json_segment.get("trip_end_time"), DATE_FORMAT)
-	except:
+        except:
             start_time = json_segment.get("trip_start_time")
             end_time = json_segment.get("trip_end_time")
         trip_start_location = cls._start_location(sections)
@@ -69,20 +69,18 @@ class Trip(object):
         return sections[-1].section_end_location if sections else None
 
     def get_duration(self):
-	'''
-	return duration
-	'''
+        # return duration
         return self.end_time - self.start_time
 
     def get_distance(self):
-	return
+        return
 
     def save_to_db(self):
         pass
 
 class Section(object):
 
-    def __init__(self, _id, trip_id, distance, start_time, end_time, section_start_location, section_end_location, section_track_points, mode, confirmed_mode):
+    def __init__(self, _id, trip_id, distance, start_time, end_time, section_start_location, section_end_location, mode, confirmed_mode):
         self._id = _id
         self.trip_id = trip_id
         self.distance = distance
@@ -90,9 +88,9 @@ class Section(object):
         self.end_time = end_time
         self.section_start_location = section_start_location
         self.section_end_location = section_end_location
-        self.section_track_points = section_track_points
         self.mode = mode
         self.confirmed_mode = confirmed_mode
+        self.points = []
 
     @classmethod
     def section_from_json(cls, json_segment):
@@ -103,11 +101,9 @@ class Section(object):
         end_time = datetime.datetime.strptime(json_segment.get("section_end_time"), DATE_FORMAT)
         section_start_location = cls._start_location(json_segment.get("track_points"))
         section_end_location = cls._end_location(json_segment.get("track_points"))
-        # Confirm if these track points are in the right format, might have to wrap in Coordinate
-        section_track_points = json_segment.get("track_points")
         mode = json_segment.get("mode")
         confirmed_mode = json_segment.get("confirmed_mode")
-        return cls(_id, trip_id, distance, start_time, end_time, section_start_location, section_end_location, section_track_points, mode, confirmed_mode)
+        return cls(_id, trip_id, distance, start_time, end_time, section_start_location, section_end_location, mode, confirmed_mode)
 
     @classmethod
     def _start_location(cls, points):
@@ -258,7 +254,7 @@ class Alternative_Trip(Trip):
         self.subtype = "alternative"
         self.parent_id = parent_id
         self.cost = cost
-	self.mode_list = mode_list
+        self.mode_list = mode_list
 
     @classmethod
     def trip_from_json(cls, json_segment):
@@ -266,7 +262,7 @@ class Alternative_Trip(Trip):
         trip.parent_id = json_segment.get("parent_id")
         trip.cost = json_segment.get("cost")
         trip.mode_list = cls._init_mode_list(trip.sections)
-	print "_init"
+        print "_init"
         return cls(trip._id, trip.user_id, trip.trip_id, trip.sections, trip.start_time, trip.end_time, trip.trip_start_location, trip.trip_end_location,
                    trip.parent_id, trip.cost, trip.mode_list)
 
@@ -281,7 +277,7 @@ class Alternative_Trip(Trip):
             mode_set.add(section.mode)
         if len(mode_set) == 1:
             return mode_set.pop()
-	print mode_list
+        print mode_list
         return mode_list
 
     def save_to_db(self):
@@ -289,18 +285,20 @@ class Alternative_Trip(Trip):
         result = db.update({"_id": self._id},
                       {"$set": {"cost" : self.cost}},
                        upsert=False,multi=False)
-        print result
+        #print result
         if not result["updatedExisting"]:
             self._create_new(db)
 
     def _create_new(self, db):
-        db.insert({"_id": self._id, "user_id": self.user_id,
-                "trip_id": self.trip_id, "trip_start_time": self.start_time.strftime(DATE_FORMAT),
-                "trip_end_time": self.end_time.strftime(DATE_FORMAT), "trip_start_location": self.trip_start_location.maps_coordinate(), "trip_end_location": self.trip_end_location.maps_coordinate(),
-                #"mode_list": self.mode_list})
-		})
-	for section in self.sections:
-	    section.save_to_db()
+        self._id = db.insert({"user_id": self.user_id, "trip_id": self.trip_id,
+            "trip_start_time": self.start_time.strftime(DATE_FORMAT),
+            "trip_end_time": self.end_time.strftime(DATE_FORMAT),
+            "trip_start_location": self.trip_start_location.maps_coordinate(),
+            "trip_end_location": self.trip_end_location.maps_coordinate(),
+            "mode_list": self.mode_list})
+
+        for section in self.sections:
+            section.save_to_db()
 
 class Canonical_Alternative_Trip(Alternative_Trip):
     def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, alternatives, perturbed_trips, mode_list):
@@ -339,7 +337,7 @@ class PipelineFlags(object):
                 if tf['alternativesFinished'] == 'True':
                     self.alternativesFinished = True
 
-    def savePipelineFlags(self, _id):
+    def savePipelineFlags(self):
         db = get_trip_db()
         db.update({"_id": self._id},
                       {"$set": {"pipelineFlags" : {'alternativesStarted': self.alternativesStarted, 'alternativesFinished': self.alternativesFinished}}},

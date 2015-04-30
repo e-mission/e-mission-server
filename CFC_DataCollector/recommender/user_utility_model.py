@@ -19,11 +19,9 @@ from sklearn import linear_model as lm
 class UserUtilityModel(object):
   # return user-specific weights for a given user based on logistic regression on
   # their past trips and potential alternatives
-  def __init__(self, user_id, trips, alternatives): # assuming alternatives a list of lists
-    # TODO: Using list() here removes the performance benefits of an iterator.
-    # Consider removing/relaxing the assert
-    #print len(list(trips)), len(alternatives)
-    assert(len(list(trips)) == len(alternatives))
+
+  def __init__(self, user_id, trips, alternatives): 
+    #assert(len(list(trips)) == len(alternatives))
     self.user_id = user_id
     self.regression = lm.LogisticRegression()
     self.update(trips, alternatives)
@@ -31,7 +29,7 @@ class UserUtilityModel(object):
   # update existing model using existing trips
   # for now, just create a new model and return it
   def update(self, trips = [], alternatives = []):
-    assert(len(list(trips)) == len(alternatives))
+    print "Alternatives to train with: ", list(alternatives[0])
     trip_features = self.extract_features(trips)
     to_evaluate = []
     for t_f in trip_features:

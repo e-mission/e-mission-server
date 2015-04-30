@@ -15,10 +15,9 @@ class ModifiedCostTimeEmissionsModeModel(UserUtilityModel):
     self.regression = ctm_model.regression
     # Let's make the emissions coef be the average of the other two to make sure that
     # is scaled in the same range
-    self.emissions = -1* ((ctm_model.cost + ctm_model.time) / 2)
+    self.emissions = -1 * ((ctm_model.cost + ctm_model.time) / 2)
     print "emissions weight: ", self.emissions
     self.user_id = ctm_model.user_id
-    pass
 
   def store_in_db(self):
     print "storing E_Missions model"
@@ -64,11 +63,11 @@ class ModifiedCostTimeEmissionsModeModel(UserUtilityModel):
     print "Returning total = %s, len = %s, avg = %s" % (total, len(mpg_array), avg)
     return avg
 
-# calculates emissions for trips
-  def getEmissionForTrip(trip):
+  # calculates emissions for trips
+  def getEmissionForTrip(self,trip):
     emissions = 0
-    mode = trip.mode
-    distance = self.distance
+    mode = trip.mode_list
+    distance = trip.distance
     footprint = 0
     if mode == 'driving':
         avgMetersPerGallon = self.getAvgMpg()*1.6093
@@ -83,4 +82,3 @@ class ModifiedCostTimeEmissionsModeModel(UserUtilityModel):
     totalDistance = distance / 1000
     emissions = totalDistance * footprint
     return emissions
-
