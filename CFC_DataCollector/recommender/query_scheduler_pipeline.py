@@ -24,7 +24,7 @@ python_location = sys.executable
 #query_script_location = '/Users/jeffdh5/Desktop/e-mission/recommender/query.py'
 query_script_location = os.path.join(os.getcwd(), 'recommender/query.py')
 
-def schedule_queries(_id, trip_array):
+def schedule_queries(trip_id, user_id, trip_array, immediate=False):
 	#_id: This is the original trip _id
 
 	#start, end must both be represented as strings which contain the latitude and longitude of the location
@@ -43,12 +43,17 @@ def schedule_queries(_id, trip_array):
 		#time = trip.get_time()
                 start = trip.trip_start_location
                 end = trip.trip_end_location
-                time = trip.start_time
+                if immediate:
+                    time = datetime.now() + datetime.timedelta(minutes=5)
+                else:
+                    time = trip.start_time
+                '''
                 #TODO: HACK FOR DEMO
                 time = time + datetime.timedelta(days=1)
+                '''
 
 		cron = CronTab("ubuntu")
-		exec_str = python_location + ' ' + query_script_location + ' ' + '--id ' + _id
+		exec_str = python_location + ' ' + query_script_location + ' --trip-id ' + trip_id + ' --user-id ' + str(user_id)
 		job = cron.new(command=exec_str)
 
 		job.month.on(time.month)

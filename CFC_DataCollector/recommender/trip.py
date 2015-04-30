@@ -23,6 +23,22 @@ class Coordinate:
     def __str__(self):
         return self.maps_coordinate()
 
+def calDistance(point1, point2):
+    earthRadius = 6371000
+    # SHANKARI: Why do we have two calDistance() functions?
+    # Need to combine into one
+    # points are now in geojson format (lng,lat)
+    dLat = math.radians(point1.lat - point2.lat)
+    dLon = math.radians(point1.lon -point2.lon)
+    lat1 = math.radians(point1.lat)
+    lat2 = math.radians(point2.lat)
+
+    a = (math.sin(dLat/2) ** 2) + ((math.sin(dLon/2) ** 2) * math.cos(lat1) * math.cos(lat2))
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    d = earthRadius * c 
+    return d
+
+
 class Trip(object):
 
     def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location):
@@ -73,7 +89,7 @@ class Trip(object):
         return self.end_time - self.start_time
 
     def get_distance(self):
-        return
+        return calDistance(self.trip_start_location, self.trip_end_location)
 
     def save_to_db(self):
         pass
@@ -262,7 +278,6 @@ class Alternative_Trip(Trip):
         trip.parent_id = json_segment.get("parent_id")
         trip.cost = json_segment.get("cost")
         trip.mode_list = cls._init_mode_list(trip.sections)
-        print "_init"
         return cls(trip._id, trip.user_id, trip.trip_id, trip.sections, trip.start_time, trip.end_time, trip.trip_start_location, trip.trip_end_location,
                    trip.parent_id, trip.cost, trip.mode_list)
 
@@ -282,7 +297,8 @@ class Alternative_Trip(Trip):
 
     def save_to_db(self):
         db = get_alternatives_db()
-        result = db.update({"_id": self._id},
+        #Unique key is combination of trip, user, and mode. Only one alternative per mode
+        result = db.update({"trip_id": self.trip_id, "user_id": self.user_id, "mode_list":self.mode_list},
                       {"$set": {"cost" : self.cost}},
                        upsert=False,multi=False)
         #print result
@@ -290,15 +306,17 @@ class Alternative_Trip(Trip):
             self._create_new(db)
 
     def _create_new(self, db):
+        point_list = []
+        for section in self.sections:
+            point_list.append([{'coordinates':[point.lon, point.lat]}
+                                for point in section.points])
         self._id = db.insert({"user_id": self.user_id, "trip_id": self.trip_id,
             "trip_start_time": self.start_time.strftime(DATE_FORMAT),
             "trip_end_time": self.end_time.strftime(DATE_FORMAT),
             "trip_start_location": self.trip_start_location.maps_coordinate(),
             "trip_end_location": self.trip_end_location.maps_coordinate(),
-            "mode_list": self.mode_list})
-
-        for section in self.sections:
-            section.save_to_db()
+            "mode_list": self.mode_list,
+            "track_points": point_list})
 
 class Canonical_Alternative_Trip(Alternative_Trip):
     def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, alternatives, perturbed_trips, mode_list):

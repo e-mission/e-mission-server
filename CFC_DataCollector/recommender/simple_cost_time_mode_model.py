@@ -5,11 +5,14 @@ from datetime import datetime
 from common import calc_car_cost, DATE_FORMAT
 from main import common as cm
 from user_utility_model import UserUtilityModel
+import numpy as np
+
+NUM_ALTERNATIVES = 4
 
 class SimpleCostTimeModeModel(UserUtilityModel):
-  def __init__(self, user_id, trips, alternatives):
+  def __init__(self, user_id, trips_with_alts):
     #print "len(trips) = %d, len(alternatives) = %d" % (len(trips), len(alternatives))
-    super(SimpleCostTimeModeModel, self).__init__(user_id, trips, alternatives)
+        super(SimpleCostTimeModeModel, self).__init__(user_id, trips_with_alts)
 
     # The coefficients are not available during __init__
     # TODO: Fix me
@@ -22,19 +25,29 @@ class SimpleCostTimeModeModel(UserUtilityModel):
     self.time = self.coefficients[0][1]
     self.mode = self.coefficients[0][2]
     model_query = {'user_id': self.user_id}
-    model_object = {'cost': self.cost, 'time': self.time, 'mode': self.mode, 'updated_at': datetime.now()} 
+    model_object = {'user_id': self.user_id, 'cost': self.cost, 'time': self.time, 'mode': self.mode, 'updated_at': datetime.now()} 
     get_utility_model_db().update(model_query, model_object, upsert = True)
 
-  # current features are cost, time, mode
-  def extract_features(self, trips):
-    features = []
-    for trip in trips:
-        # TODO: E-Mission trip does not have a "cost" feature
-        cost = 0 # trip.cost
+  def _extract_features(self, trip):
+        #cost = trip.cost
+        cost = 0
         time = 1.0 / cm.travel_date_time(trip.start_time, trip.end_time)
-        #time = cm.travel_date_time(datetime.strftime(trip.start_time, DATE_FORMAT), datetime.strftime(trip.end_time, DATE_FORMAT))
-        # TODO: E-Mission trip does not have a "cost" feature
         mode = 0 # trip.mode
-        features.append((cost, time, mode))
+        return np.array([cost, time, mode])
 
-    return features
+  # current features are cost, time, mode
+  def extract_features(self, trips_with_alts):
+    num_features = 3
+    feature_vector = np.empty((len(trips_with_alts * (NUM_ALTERNATIVES+1)), num_features)) 
+    label_vector = np.empty(len(trips_with_alts * (NUM_ALTERNATIVES+1)))
+    sample = 0
+    for trip,alt in trips_with_alts:
+        feature_vector[sample] = self._extract_features(trip)
+        label_vector[sample] = 1
+        sample += 1
+        for _alt in alt:
+            feature_vector[sample] = self._extract_features(_alt)
+            label_vector[sample] = 0
+            sample += 1
+    return (feature_vector, label_vector)
+

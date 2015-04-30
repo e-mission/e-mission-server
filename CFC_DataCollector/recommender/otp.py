@@ -91,9 +91,12 @@ class OTP:
 		
 		if "RAIL" in mode_list or "SUBWAY" in mode_list:#
                         #print our_json
-			print our_json['plan']['itineraries'][0]['fare'].keys()
-			cost = float(our_json['plan']['itineraries'][0]['fare']['fare']['regular']['cents']) / 100.0   #gives fare in cents 
-		elif "CAR" in mode_list:
+                        try:
+			    print our_json['plan']['itineraries'][0]['fare'].keys()
+			    cost = float(our_json['plan']['itineraries'][0]['fare']['fare']['regular']['cents']) / 100.0   #gives fare in cents 
+		        except:
+                            cost = 0
+                elif "CAR" in mode_list:
 			start_city_car = str(Geocoder().reverse_geocode(car_start_coordinates.get_lat(),car_start_coordinates.get_lon())).split(',')[1]
 			end_city_car = str(Geocoder().reverse_geocode(car_end_coordinates.get_lat(), car_end_coordinates.get_lon())).split(',')[1]
 			traffic_time = get_travel_time(start_city_car, end_city_car)
@@ -153,19 +156,17 @@ def just_train():
 	print "cost: " + str(new_trip.cost)
 
 
-
-
-print "Simple Drive:"
-simple_driving()
-
-print
-print "Walk to train: "
-just_train()
-
-print 
-print "You have a bike: "
-multi_modal()
-
+if __name__ == "__main__":
+    print "Simple Drive:"
+    simple_driving()
+    
+    print
+    print "Walk to train: "
+    just_train()
+    
+    print 
+    print "You have a bike: "
+    multi_modal()
 
 
 
