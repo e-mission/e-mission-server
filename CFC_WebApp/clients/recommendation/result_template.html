@@ -84,7 +84,7 @@
           section = recommendedTrip.track_points[i];
           sectionCoordinates = [];
           for (k = 0; k < section.length; k++) {
-            location = section[k]['track_location']['coordinates'];
+            location = section[k]['coordinates'];
             newCoord = new google.maps.LatLng(location[1], location[0]);
             sectionCoordinates.push(newCoord);
             bounds.extend(newCoord);

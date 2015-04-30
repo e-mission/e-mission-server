@@ -16,8 +16,8 @@ def getResult(user_uuid):
 
   user = User.fromUUID(user_uuid)
 
-  recommendedTrip = get_alternatives_db.find_one({ 'user_id': user.uuid], 'recommended': True })
-  originalTrip = get_trip_db().find_one({ 'trip_id': recommendedTrip['trip_id'] })
+  originalTrip = get_trip_db().find_one({'user_id': user.uuid, 'recommended_alternative': {'$exists': True} })
+  recommendedTrip = originalTrip['recommended_alternative']
   originalSections = list(get_section_db().find({ 'trip_id': originalTrip['trip_id'] }))
 
   renderedTemplate = template("clients/recommendation/result_template.html",

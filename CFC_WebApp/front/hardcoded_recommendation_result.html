@@ -77,12 +77,12 @@
         'trip_start_time': '20150430T045106-1700',
         'track_points': [
           [
-            {'track_location': {'type': 'Point', 'coordinates': [-122.2577897, 37.8652063]}},
-            {'track_location': {'type': 'Point', 'coordinates': [-122.251239, 37.8659016]}},
-            {'track_location': {'type': 'Point', 'coordinates': [-122.251733, 37.8676844]}},
-            {'track_location': {'type': 'Point', 'coordinates': [-122.2526502, 37.8714822]}},
-            {'track_location': {'type': 'Point', 'coordinates': [-122.2527744, 37.8712825]}},
-            {'track_location': {'type': 'Point', 'coordinates': [-122.2551926, 37.8710788]}}
+            {'type': 'Point', 'coordinates': [-122.2577897, 37.8652063]},
+            {'type': 'Point', 'coordinates': [-122.251239, 37.8659016]},
+            {'type': 'Point', 'coordinates': [-122.251733, 37.8676844]},
+            {'type': 'Point', 'coordinates': [-122.2526502, 37.8714822]},
+            {'type': 'Point', 'coordinates': [-122.2527744, 37.8712825]},
+            {'type': 'Point', 'coordinates': [-122.2551926, 37.8710788]}
           ]
         ],
         'cost': 0,
@@ -106,6 +106,53 @@
         '_id': '6433c8cf-c4c5-3741-9144-5905379ece6e_20150428T132810-0700',
         'sections': [0]
       }
+
+      // var recommendedTrip = {
+      //   'trip_end_location': [-122.2585818, 37.8643866],
+      //   'trip_start_location': [-122.2592115, 37.8689676],
+      //   'trip_start_time': '20150430T091059-1700',
+      //   'track_points': [
+      //     [
+      //       {'coordinates': [-122.2591604, 37.8687287]},
+      //       {'coordinates': [-122.2584315, 37.8651365]},
+      //       {'coordinates': [-122.2590939, 37.8650491]},
+      //       {'coordinates': [-122.2585818, 37.8643866]}
+      //     ]
+      //   ],
+      //   'trip_end_time': '20150430T091759-1700',
+      //   'trip_id': '20150427T160333-0700',
+      //   'mode_list': ['walking']
+      // };
+
+      // var originalTrip = {
+      //   'last_update_time': '',
+      //   'trip_id': '20150427T160333-0700',
+      //   // 'trip_start_datetime': datetime.datetime(2015, 4, 27, 23, 3, 33),
+      //   'type': 'move',
+      //   'trip_start_time': '20150427T160333-0700',
+      //   // 'trip_end_datetime': datetime.datetime(2015, 4, 27, 23, 36, 7),
+      //   'source': 'Shankari',
+      //   'recommended_alternative': {
+      //     'trip_end_location': [-122.2585818, 37.8643866],
+      //     'trip_start_location': [-122.2592115, 37.8689676],
+      //     'trip_start_time': '20150430T091059-1700',
+      //     'track_points': [
+      //       [
+      //         {'coordinates': [-122.2591604, 37.8687287]},
+      //         {'coordinates': [-122.2584315, 37.8651365]},
+      //         {'coordinates': [-122.2590939, 37.8650491]},
+      //         {'coordinates': [-122.2585818, 37.8643866]}
+      //       ]
+      //     ],
+      //     'trip_end_time': '20150430T091759-1700',
+      //     'trip_id': '20150427T160333-0700',
+      //     'mode_list': ['walking']
+      //   },
+      //   'place': {},
+      //   'trip_end_time': '20150427T163607-0700',
+      //   '_id': '6433c8cf-c4c5-3741-9144-5905379ece6e_20150427T160333-0700',
+      //   'sections': [0]
+      // }
 
       var originalSections = [
         {
@@ -171,7 +218,7 @@
           section = recommendedTrip.track_points[i];
           sectionCoordinates = [];
           for (k = 0; k < section.length; k++) {
-            location = section[k]['track_location']['coordinates'];
+            location = section[k]['coordinates'];
             newCoord = new google.maps.LatLng(location[1], location[0]);
             sectionCoordinates.push(newCoord);
             bounds.extend(newCoord);
