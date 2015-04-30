@@ -25,12 +25,12 @@ Overview of helper files relevant to this pipeline:
 """
 
 # Invoked in recommendation pipeline to get perturbed trips user should consider
-def calc_alternative_trips(user_trips):
+def calc_alternative_trips(user_trips, immediate):
     for existing_trip in user_trips:
         if not existing_trip.pipelineFlags.alternativesStarted:
             existing_trip.pipelineFlags.startAlternatives()
             existing_trip.pipelineFlags.savePipelineFlags()
-            schedule_queries(existing_trip.trip_id, existing_trip.user_id, [existing_trip])
+            schedule_queries(existing_trip.trip_id, existing_trip.user_id, [existing_trip], immediate)
 
 def get_alternative_trips(trip_it):
     # User Utility Pipeline calls this to get alternatve trips for one original trip (_id)

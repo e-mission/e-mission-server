@@ -2,6 +2,10 @@
 #from common.featurecalc import get_cost
 import datetime
 from get_database import *
+import sys
+import os
+sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
+from main import common as cm
 #from feature_calc
 
 DATE_FORMAT = "%Y%m%dT%H%M%S-%W00"
@@ -22,22 +26,6 @@ class Coordinate:
 
     def __str__(self):
         return self.maps_coordinate()
-
-def calDistance(point1, point2):
-    earthRadius = 6371000
-    # SHANKARI: Why do we have two calDistance() functions?
-    # Need to combine into one
-    # points are now in geojson format (lng,lat)
-    dLat = math.radians(point1.lat - point2.lat)
-    dLon = math.radians(point1.lon -point2.lon)
-    lat1 = math.radians(point1.lat)
-    lat2 = math.radians(point2.lat)
-
-    a = (math.sin(dLat/2) ** 2) + ((math.sin(dLon/2) ** 2) * math.cos(lat1) * math.cos(lat2))
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-    d = earthRadius * c 
-    return d
-
 
 class Trip(object):
 
@@ -89,7 +77,8 @@ class Trip(object):
         return self.end_time - self.start_time
 
     def get_distance(self):
-        return calDistance(self.trip_start_location, self.trip_end_location)
+        print "Getting Cal Distance"
+        return cm.calDistance(self.trip_start_location, self.trip_end_location, True)
 
     def save_to_db(self):
         pass

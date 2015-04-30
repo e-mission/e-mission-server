@@ -114,6 +114,10 @@ modules = {
    'utility': {
         'get_training': getTrainingTrips
     },
+   # Recommender Module
+   'recommender': {
+        'get_improve': getTrainingTrips
+    },
    #Pertubation Module
    'pertubation': {},
    #Alternatives Module

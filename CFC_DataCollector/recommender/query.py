@@ -12,43 +12,7 @@ import optparse
 from otp import OTP
 import uuid
 
-#usage:
-#(From terminal)
-#python query.py lat1,lon1 lat2,lon2
-def commandArgs(argv):
-    parser = optparse.OptionParser(description = '')
-    parser.add_option('--trip-id',
-                      dest = 'trip_id',
-                      help = 'Trip ID')
-    parser.add_option('--user-id',
-                      dest = 'user_id',
-                      help = 'User ID')
-    (options, args) = parser.parse_args(argv)  
-    if not options.trip_id:
-        raise Exception("No Trip ID given")
-    if not options.user_id:
-        raise Exception("No User ID given")
-    return (options.trip_id, uuid.UUID(options.user_id))
-
-def google_maps_trips(otp_mode, trip_id, user_id):
-        #modes = ['driving', 'walking', 'bicycling', 'transit']
-        otp_to_google_mode = {"CAR":"driving", "WALK":"walking", "BICYCLE":"bicycling", "TRANSIT":"transit"}
-        mode = otp_to_google_mode[otp_mode]
-        new_id = trip_id + "_" + mode
-        gmaps = googlemaps.GoogleMaps('AIzaSyBEkw4PXVv_bsAdUmrFwatEyS6xLw3Bd9c')
-        result = gmaps.directions(origin=start_coord, destination=end_coord, mode=mode)
-        gmaps_trip = google_maps_to_our_trip(result, new_id, user_id, trip_id, mode, curr_time)
-        gmaps_trip.save_to_db()
-
-def write_day(month, day, year):
-    return "%s-%s-%s" % (month, day, year)
-
-def write_time(hour, minute):
-    return "%s:%s" % (hour, minute) 
-
-if __name__ == '__main__':
-	(trip_id, user_id) = commandArgs(sys.argv)
-	new_id = trip_id
+def obtain_alternatives(trip_id, user_id):
 	db = get_trip_db()
         trip = E_Mission_Trip.trip_from_json(db.find_one({"trip_id": trip_id, "user_id": user_id}))
         print trip.sections
@@ -56,12 +20,6 @@ if __name__ == '__main__':
 	end_coord = trip.trip_end_location.maps_coordinate()
 	print "Start: ", start_coord
 	print "End: ", end_coord
-	'''
-	else:
-	    (start_lat, start_lon, end_lat, end_lon) = argsList
- 	    start_coord = str((float(start_lat), float(start_lon)))
- 	    end_coord = str((float(end_lat), float(end_lon)))
-	'''
 	    
 	curr_time = datetime.datetime.now()
 	curr_month = curr_time.month
@@ -72,18 +30,19 @@ if __name__ == '__main__':
 	otp_modes = ['CAR', 'WALK', 'BICYCLE', 'TRANSIT']
 	
         for mode in otp_modes:
-                #do something here related to saving the trip
-                #not really sure how to maintain unique ids??
-                #new_id = str(create_trip_id()) + str(_id)
-		#new_id = curr_time
-		new_id = trip_id + "_" + mode
                 try:
 		    otp_trip = OTP(start_coord, end_coord, mode, write_day(curr_month, curr_day, "2015"), write_time(curr_hour, curr_minute), False)
-     		    otp_trip = otp_trip.turn_into_trip(new_id, user_id, trip_id) 
+     		    otp_trip = otp_trip.turn_into_trip(None, user_id, trip_id) 
 		    otp_trip.save_to_db()
                 except Exception as e:
-                    print e, "\n\n\n"
-                    google_maps_trips(mode, trip_id, user_id)
+                    #modes = ['driving', 'walking', 'bicycling', 'transit']
+                    print "Defaulting to Google Maps"
+                    otp_to_google_mode = {"CAR":"driving", "WALK":"walking", "BICYCLE":"bicycling", "TRANSIT":"transit"}
+                    mode = otp_to_google_mode[mode]
+                    gmaps = googlemaps.GoogleMaps('AIzaSyBEkw4PXVv_bsAdUmrFwatEyS6xLw3Bd9c')
+                    result = gmaps.directions(origin=start_coord, destination=end_coord, mode=mode)
+                    gmaps_trip = google_maps_to_our_trip(result, None, user_id, trip_id, mode, curr_time)
+                    gmaps_trip.save_to_db()
 
         '''
 
@@ -108,5 +67,28 @@ if __name__ == '__main__':
 		trip.getpipelineFlags().finishAlternatives()
 
 	'''
-else:
-	print("Wrong number of input arguments.")
+
+def write_day(month, day, year):
+    return "%s-%s-%s" % (month, day, year)
+
+def write_time(hour, minute):
+    return "%s:%s" % (hour, minute) 
+
+def commandArgs(argv):
+    parser = optparse.OptionParser(description = '')
+    parser.add_option('--trip-id',
+                      dest = 'trip_id',
+                      help = 'Trip ID')
+    parser.add_option('--user-id',
+                      dest = 'user_id',
+                      help = 'User ID')
+    (options, args) = parser.parse_args(argv)  
+    if not options.trip_id:
+        raise Exception("No Trip ID given")
+    if not options.user_id:
+        raise Exception("No User ID given")
+    return (options.trip_id, uuid.UUID(options.user_id))
+
+if __name__ == '__main__':
+	(trip_id, user_id) = commandArgs(sys.argv)
+        obtain_alternatives(trip_id, user_id)

@@ -36,7 +36,8 @@ def schedule_queries(trip_id, user_id, trip_array, immediate=False):
 
 	#TODO: write regex to enforce that passed in locations are geocoded; i.e. lat1,lon1, lat2,lon2
 	#TODO: this will run every year, need to figure out if python crontab can support yearly configuration so it only runs once
-
+        stagger = 1
+        total_stagger = 0
 	for trip in trip_array:
 		#start = trip.get_start_coordinates()
 		#end = trip.get_end_coordinates()
@@ -44,7 +45,8 @@ def schedule_queries(trip_id, user_id, trip_array, immediate=False):
                 start = trip.trip_start_location
                 end = trip.trip_end_location
                 if immediate:
-                    time = datetime.now() + datetime.timedelta(minutes=5)
+                    time = datetime.datetime.now() + datetime.timedelta(minutes=5) + datetime.timedelta(minutes=total_stagger)
+                    total_stagger += stagger
                 else:
                     time = trip.start_time
                 '''

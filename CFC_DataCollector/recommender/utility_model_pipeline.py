@@ -8,7 +8,7 @@ from tripiterator import TripIterator
 import alternative_trips_module as atm
 from common import get_uuid_list, get_training_uuid_list
 from simple_cost_time_mode_model import SimpleCostTimeModeModel
-from modified_cost_time_emissions_mode_model import ModifiedCostTimeEmissionsModeModel
+from emissions_model import EmissionsModel
 import logging
 from trip import *
 
@@ -20,9 +20,9 @@ class UtilityModelPipeline:
         return TripIterator(user_id, ["utility", "get_training"], E_Mission_Trip)
 
     def build_user_model(self, user_id, trips):
-        model = UserUtilityModel.find_from_db(user_id)
+        model = UserUtilityModel.find_from_db(user_id, False)
         trips = list(trips)
-        trip_ids = [t.trip_id for t in trips]
+        #trip_ids = [t.trip_id for t in trips]
         #print trip_ids
         alternatives = atm.get_alternative_trips(trips)
         print alternatives
@@ -31,7 +31,13 @@ class UtilityModelPipeline:
             if model:
               model.update(trips_with_alts)
             else:
-              model = SimpleCostTimeModeModel(user_id, trips_with_alts)
+              print "Building Model"
+              model = SimpleCostTimeModeModel(trips_with_alts)
+              model.update()
+              model2 = EmissionsModel(model, trips_with_alts)
+              model2.update()
+            model.store_in_db(user_id)
+            model2.store_in_db(user_id)
             return model
         else:
             print "No alternatives found\n\n"
@@ -41,16 +47,6 @@ class UtilityModelPipeline:
         vector = zip(trips, alternatives)
         vector = [(trip,alts) for trip, alts in vector if alts]
         return vector
-
-    def build_modified_model(self, user_id, trips):
-        alternatives = atm.get_alternative_trips(trips)
-        if alternatives:
-            alternatives = [alternatives]
-            if model:
-              model.update(trips, alternatives)
-            else:
-              model = SimpleCostTimeModeModel(user_id, trips, alternatives)
-            return model
 
     '''
     def build_user_imp_model(self, user_id, trips):
@@ -75,9 +71,6 @@ class UtilityModelPipeline:
         for user_uuid in get_training_uuid_list():
             training_real_trips = self.get_training_trips(user_uuid)
             userModel = self.build_user_model(user_uuid, training_real_trips)
-            print userModel, "\n\n\n"
-            if userModel:
-                userModel.store_in_db()
                 #TODO: This is a recommendation thing---move this to the appropriate pipeline
                 #self.recommend(userModel)
 
