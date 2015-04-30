@@ -445,7 +445,7 @@ socket.setdefaulttimeout(float(socket_timeout))
 # The selection of SSL versus non-SSL should really be done through a config
 # option and not through editing source code, so let's make this keyed off the
 # port number
-if server_port == "443":
+if server_port == "443" or True:
   # We support SSL and want to use it
   run(host=server_host, port=server_port, server='cherrypy', debug=True,
       certfile=ssl_cert, keyfile=private_key, ssl_module='builtin')

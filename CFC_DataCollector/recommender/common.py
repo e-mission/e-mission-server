@@ -6,6 +6,7 @@ import json
 from trip import *
 import copy
 import uuid
+import xml.etree.ElementTree as ET
 
 DATE_FORMAT = "%Y%m%dT%H%M%S-%W00" #This is a great hack thought of by Shaun
 CLASS_UUIDS = {
@@ -26,14 +27,31 @@ def uuid_to_name(uuid):
 
 def get_uuid_list():
     uuids = set()
+    #uuids.add(uuid.UUID('cc7f2ff0-8e73-3cfa-ab4c-647ebf025e42'))
+    uuids.add(uuid.UUID('6433c8cf-c4c5-3741-9144-5905379ece6e'))
+    '''
+    uuids = set()
     db = get_trip_db()
     for x in db.find():
         uuids.add(x['user_id'])
+    '''
     return uuids
 
 def get_training_uuid_list():
     uuids = set()
-    uuids.add(uuid.UUID("0763de67-f61e-3f5d-90e7-518e69793954"))
+    #uuids.add(uuid.UUID('cc7f2ff0-8e73-3cfa-ab4c-647ebf025e42'))
+    uuids.add(uuid.UUID('6433c8cf-c4c5-3741-9144-5905379ece6e'))
+    '''
+    db = get_trip_db()
+    for x in db.find():
+        uuids.add(x['user_id'])
+    '''
+    return uuids
+
+def get_recommender_uuid_list():
+    uuids = set()
+    #uuids.add(uuid.UUID('cc7f2ff0-8e73-3cfa-ab4c-647ebf025e42'))
+    uuids.add(uuid.UUID('6433c8cf-c4c5-3741-9144-5905379ece6e'))
     '''
     db = get_trip_db()
     for x in db.find():

@@ -18,6 +18,11 @@ from get_database import get_section_db, get_trip_db, get_routeCluster_db, get_a
 import trip
 import random
 
+class AlternativesNotFound(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
 
 #returns the top trips for the user, defaulting to the top 10 trips
 def getCanonicalTrips(uid, number_returned = 10):
@@ -76,20 +81,21 @@ def getAllTrips(uid):
 # - trips that have alternatives, and
 # - have not yet been included in a training set
 def getTrainingTrips(uid):
-    d = datetime.datetime.now() - datetime.timedelta(days=7)
-    #query = {'_id':uid, 'type':'move','trip_start_datetime':{"$gt":d}}
-    #query = {"user_id":uid, "type":'move', "pipelineFlags":{"$exists":True}} 
-    print uid
-    query = {"user_id":uid, "type":"move"} 
-    #query = {'trip_id':uid, 'type':'move','trip_start_datetime':{"$gt":d}}
+    d = datetime.datetime.now() - datetime.timedelta(days=6)
+    query = {'user_id':uid, 'type':'move','trip_start_datetime':{"$gt":d}, "pipelineFlags":{"$exists":True}}
+    #query = {'user_id':uid, 'type':'move','trip_start_datetime':{"$gt":d}}
+    #print get_trip_db().find(query).count()
     return get_trip_db().find(query)
 
 def getAlternativeTrips(trip_id):
-    d = datetime.datetime.now() - datetime.timedelta(days=7)
-    #query = {'_id':uid, 'type':'move','trip_start_datetime':{"$gt":d}}
-    #query = {"user_id":uid, "type":'move', "pipelineFlags":{"$exists":True}} 
-    query = {'trip_id':trip_id, 'type':'move','trip_start_datetime':{"$gt":d}}
-    return get_alternatives_db().find(query)
+    #TODO: clean up datetime, and queries here
+    #d = datetime.datetime.now() - datetime.timedelta(days=6)
+    #query = {'trip_id':trip_id, 'trip_start_datetime':{"$gt":d}}
+    query = {'trip_id':trip_id}
+    alternatives = get_alternatives_db().find(query)
+    if alternatives.count() > 0:
+        return alternatives
+    raise AlternativesNotFound("No Alternatives Found")
 
 def getRecentTrips(uid):
     raise "Not Implemented Error"
@@ -107,6 +113,10 @@ modules = {
    # Utility Module
    'utility': {
         'get_training': getTrainingTrips
+    },
+   # Recommender Module
+   'recommender': {
+        'get_improve': getTrainingTrips
     },
    #Pertubation Module
    'pertubation': {},
