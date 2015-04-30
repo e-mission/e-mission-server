@@ -38,6 +38,7 @@ class UserUtilityModel(object):
     self.regression.fit(trip_features, labels)
     self.coefficients = self.regression.coef_
     self.save_coefficients()
+    '''
     best_trip = None
     best_utility = float("-inf")
     for i, trip_feature in enumerate(trip_features):
@@ -45,10 +46,11 @@ class UserUtilityModel(object):
  	if utility > best_utility:
 		best_trip = i
 		best_utility = utility
-    if labels[i] == 1:
+    if labels[best_trip] == 1:
         print "Model predicts best trip is: ORIGINAL TRIP", best_trip
     else: 
         print "Model predicts best trip is: Alternative TRIP", best_trip
+    '''
 
   # calculate the utility of trip using the model
   def predict_utility(self, trip):
@@ -63,6 +65,7 @@ class UserUtilityModel(object):
           db_model = get_utility_model_db().find_one({'user_id': user_id, 'type':'recommender'})
       else:
           db_model = get_utility_model_db().find_one({'user_id': user_id, 'type':'user'})
+      return db_model
     # contruct and return model using params from DB
 
 

@@ -24,6 +24,9 @@ class Coordinate:
     def maps_coordinate(self):
         return str((float(self.lat), float(self.lon)))
 
+    def coordinate_list(self):
+        return [float(self.lon), float(self.lat)]
+
     def __str__(self):
         return self.maps_coordinate()
 
@@ -261,12 +264,20 @@ class Alternative_Trip(Trip):
         self.cost = cost
         self.mode_list = mode_list
 
+        self.trip_start_location = trip_start_location
+        self.trip_end_location = trip_end_location
+
     @classmethod
     def trip_from_json(cls, json_segment):
         trip = Trip.trip_from_json(json_segment)
         trip.parent_id = json_segment.get("parent_id")
         trip.cost = json_segment.get("cost")
-        trip.mode_list = cls._init_mode_list(trip.sections)
+        #trip.mode_list = cls._init_mode_list(trip.sections)
+        trip.mode_list = json_segment.get("mode_list")
+
+        trip.trip_start_location = Coordinate(json_segment.get("trip_start_location")[1], json_segment.get("trip_start_location")[0])
+        trip.trip_end_location = Coordinate(json_segment.get("trip_end_location")[1], json_segment.get("trip_end_location")[0])
+
         return cls(trip._id, trip.user_id, trip.trip_id, trip.sections, trip.start_time, trip.end_time, trip.trip_start_location, trip.trip_end_location,
                    trip.parent_id, trip.cost, trip.mode_list)
 
@@ -283,6 +294,13 @@ class Alternative_Trip(Trip):
             return mode_set.pop()
         print mode_list
         return mode_list
+
+    def mark_recommended(self):
+        db = get_alternatives_db()
+        #Unique key is combination of trip, user, and mode. Only one alternative per mode
+        result = db.update({"trip_id": self.trip_id, "user_id": self.user_id, "mode_list":self.mode_list},
+                      {"$set": {"recommended" : True}},
+                       upsert=False,multi=False)
 
     def save_to_db(self):
         db = get_alternatives_db()
@@ -302,8 +320,8 @@ class Alternative_Trip(Trip):
         self._id = db.insert({"user_id": self.user_id, "trip_id": self.trip_id,
             "trip_start_time": self.start_time.strftime(DATE_FORMAT),
             "trip_end_time": self.end_time.strftime(DATE_FORMAT),
-            "trip_start_location": self.trip_start_location.maps_coordinate(),
-            "trip_end_location": self.trip_end_location.maps_coordinate(),
+            "trip_start_location": self.trip_start_location.coordinate_list(),
+            "trip_end_location": self.trip_end_location.coordinate_list(),
             "mode_list": self.mode_list,
             "track_points": point_list})
 

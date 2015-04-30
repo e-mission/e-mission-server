@@ -22,22 +22,24 @@ class UtilityModelPipeline:
     def build_user_model(self, user_id, trips):
         model = UserUtilityModel.find_from_db(user_id, False)
         trips = list(trips)
-        #trip_ids = [t.trip_id for t in trips]
-        #print trip_ids
         alternatives = atm.get_alternative_trips(trips)
         print alternatives
         trips_with_alts = self.prepare_feature_vectors(trips, alternatives)
+        #TODO: figure out json parsing for model creation
         if trips_with_alts:
+            '''
             if model:
               model.update(trips_with_alts)
-            else:
-              print "Building Model"
-              model = SimpleCostTimeModeModel(trips_with_alts)
-              model.update()
-              model2 = EmissionsModel(model, trips_with_alts)
-              model2.update()
+            '''
+            print "Building Model"
+            model = SimpleCostTimeModeModel(trips_with_alts)
+            model.update()
+            '''
+            model2 = EmissionsModel(model.cost, model.time, model.mode, trips_with_alts)
+            model2.update()
+            '''
             model.store_in_db(user_id)
-            model2.store_in_db(user_id)
+            #model2.store_in_db(user_id)
             return model
         else:
             print "No alternatives found\n\n"
@@ -71,18 +73,6 @@ class UtilityModelPipeline:
         for user_uuid in get_training_uuid_list():
             training_real_trips = self.get_training_trips(user_uuid)
             userModel = self.build_user_model(user_uuid, training_real_trips)
-                #TODO: This is a recommendation thing---move this to the appropriate pipeline
-                #self.recommend(userModel)
-
-
-    def recommend(self, userModel):
-        # TODO: Should we store the user model or the modified user model in the DB?
-        modifiedUserModel = self.modify_user_utility_model(userModel)
-        alternatives = []
-        #print list(atm.get_alternative_trips(training_real_trips))
-        alternatives.append(list(atm.get_alternative_trips(training_real_trips)))
-        modifiedUserModel.update(list(training_real_trips), alternatives)
-        modifiedUserModel.store_in_db()
 
 if __name__ == "__main__":
   config_data = json.load(open('config.json'))

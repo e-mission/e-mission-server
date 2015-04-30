@@ -1,4 +1,5 @@
 import json
+from get_database import get_utility_model_db
 from user_utility_model import UserUtilityModel
 from emissions_model import EmissionsModel
 from simple_cost_time_mode_model import SimpleCostTimeModeModel
@@ -22,9 +23,11 @@ class RecommendationPipeline:
     def get_selected_user_utility_model(self, user_id, trips_with_alts):
         #return UserUtilityModel.find_from_db(user_id)
         print user_id
-        model = SimpleCostTimeModeModel.find_from_db(uuid.UUID(user_id), True)
-        print model
-        model2 = EmissionsModel(model, trips_with_alts)
+        model_json = self.find_from_db(user_id, False)
+        cost_coeff = model_json.get("cost")
+        time_coeff = model_json.get("time")
+        mode_coeff = model_json.get("mode")
+        model2 = EmissionsModel(cost_coeff, time_coeff, mode_coeff, trips_with_alts)
         return model2
 
     def recommend_trips(self, trip_id, utility_model):
@@ -33,23 +36,31 @@ class RecommendationPipeline:
     def _evaluate_trip(self, utility_model, trip):
         return utility_model.predict_utility(trip)
 
-    def save_recommendations(self, recommended_trips):
-      for recommendation in recommended_trips:
-        recommendation.save_to_db()
-
     def runPipeline(self):
         for user_uuid in get_recommender_uuid_list():
             trips_to_improve = self.get_trips_to_improve(user_uuid)
             alternatives = atm.get_alternative_trips(trips_to_improve)
             trips_with_alts = self.prepare_feature_vectors(trips_to_improve, alternatives)
             user_model = self.get_selected_user_utility_model(user_uuid, trips_with_alts)
-            for trip in trips_with_alts:
+            for trip_with_alts in trips_with_alts:
                 recommended_trips = user_model.predict(trip_with_alts)
-            self.save_recommendations(recommended_trips)
+                print recommended_trips.__dict__
+                try:
+                    recommended_trips.mark_recommended()
+                except AttributeError:
+                    print "Original Trip is best"
+                
+ 
+    def find_from_db(self, user_id, modified):
+        if modified:
+            db_model = get_utility_model_db().find_one({'user_id': user_id, 'type':'recommender'})
+        else:
+            db_model = get_utility_model_db().find_one({'user_id': user_id, 'type':'user'})
+        return db_model
 
     def prepare_feature_vectors(self, trips, alternatives):
         vector = zip(trips, alternatives)
-        vector = [(trip,alts) for trip, alts in vector if alts] 
+        vector = [(trip,list(alts)) for trip, alts in vector if alts] 
         return vector
 
 
