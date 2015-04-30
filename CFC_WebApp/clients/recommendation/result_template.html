@@ -51,7 +51,7 @@
 
     <div id="rec-info">
       <h1>Recommended Trip</h1>
-      <p>Leave at <span id="departure-time">1:30 PM</span> and arrive at <span id="arrival-time">1:56 PM</span></p>
+      <!-- <p>Leave at <span id="departure-time">1:30 PM</span> and arrive at <span id="arrival-time">1:56 PM</span></p> -->
       <!-- <div id="rec-reasons">
         <p id="time-rec">Recommended because this trip is 4 minutes faster than your original trip.</p>
         <p id="distance-rec">Recommended because this trip is 2 miles faster than your original trip.</p>
@@ -70,9 +70,9 @@
         walk: 'green'
       };
 
-      var recommendedTrip = {{ recommendedTrip }},
-          originalTrip = {{ originalTrip }},
-          originalSections = {{ originalSections }};
+      var recommendedTrip = JSON.parse({{ recommendedTrip }}),
+          originalTrip = JSON.parse({{ originalTrip }}),
+          originalSections = JSON.parse({{ originalSections }});
 
       function initialize() {
         var map = new google.maps.Map(document.getElementById('map-canvas')),
