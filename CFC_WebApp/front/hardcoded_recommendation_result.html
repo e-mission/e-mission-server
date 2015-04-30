@@ -1,0 +1,267 @@
+<html>
+  <head>
+    <title>E-Mission</title>
+    <link href="front/nv.d3.css" rel="stylesheet" type="text/css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=visualization"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.2/d3.js" charset="utf-8"></script>
+    <script src="front/nv.d3.min.js" charset="utf-8"></script>
+    <script src="front/nv.d3.utils.js"></script>
+    <script src="front/nv.d3.models.pieChart.js"></script>
+    <script src="front/bullet.js"></script>
+
+    <style>
+      body {
+        margin: 0;
+      }
+
+      #rec-info {
+        background-color: rgba(255, 255, 255, 0.64);
+        width: 600px;
+        padding: 10px;
+        text-align: center;
+        font-family: "Helvetica";
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1;
+      }
+
+      #rec-info h1 {
+        margin: 0;
+      }
+
+      #rec-times {
+        margin: 10px auto 0;
+      }
+
+      #rec-reasons p {
+        font-size: 13px;
+        font-style: italic;
+        display: none;
+      }
+
+      #map-canvas {
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="rec-info">
+      <h1>Recommended Trip</h1>
+      <!-- <p id="rec-times">Leave at <span id="departure-time">1:30 PM</span> and arrive at <span id="arrival-time">1:56 PM</span></p> -->
+      <!-- <div id="rec-reasons">
+        <p id="time-rec">Recommended because this trip is 4 minutes faster than your original trip.</p>
+        <p id="distance-rec">Recommended because this trip is 2 miles faster than your original trip.</p>
+        <p id="emissions-rec">Recommended because this trip will create roughly 5X less carbon emissions than your original trip.</p>
+      </div> -->
+    </div>
+
+    <div id="map-canvas" />
+
+    <script>
+      var MODE_COLORS = {
+        air: 'red',
+        bicycle: 'blue',
+        driving: 'orange',
+        transit: 'yellow',
+        walk: 'green'
+      };
+
+      var recommendedTrip = {
+        'trip_end_location': '(37.8710788, -122.2551926)',
+        'user_id': '6433c8cf-c4c5-3741-9144-5905379ece6e',
+        'trip_start_location': '(37.865027, -122.2577789)',
+        'trip_start_time': '20150430T045106-1700',
+        'track_points': [
+          [
+            {'type': 'Point', 'coordinates': [-122.2577897, 37.8652063]},
+            {'type': 'Point', 'coordinates': [-122.251239, 37.8659016]},
+            {'type': 'Point', 'coordinates': [-122.251733, 37.8676844]},
+            {'type': 'Point', 'coordinates': [-122.2526502, 37.8714822]},
+            {'type': 'Point', 'coordinates': [-122.2527744, 37.8712825]},
+            {'type': 'Point', 'coordinates': [-122.2551926, 37.8710788]}
+          ]
+        ],
+        'cost': 0,
+        'trip_end_time': '20150430T045606-1700',
+        '_id': '5541b4ba1484c93bc13339cc',
+        'trip_id': '20150428T132810-0700',
+        'mode_list': ['driving']
+      };
+
+      var originalTrip = {
+        'last_update_time': '',
+        'trip_id': '20150428T132810-0700',
+        // 'trip_start_datetime': datetime.datetime(2015, 4, 28, 20, 28, 10),
+        'user_id': '6433c8cf-c4c5-3741-9144-5905379ece6e',
+        'type': 'move',
+        'trip_start_time': '20150428T132810-0700',
+        // 'trip_end_datetime': datetime.datetime(2015, 4, 28, 20, 37, 49),
+        'source': 'Shankari',
+        'place': {},
+        'trip_end_time': '20150428T133749-0700',
+        '_id': '6433c8cf-c4c5-3741-9144-5905379ece6e_20150428T132810-0700',
+        'sections': [0]
+      }
+
+      // var recommendedTrip = {
+      //   'trip_end_location': [-122.2585818, 37.8643866],
+      //   'trip_start_location': [-122.2592115, 37.8689676],
+      //   'trip_start_time': '20150430T091059-1700',
+      //   'track_points': [
+      //     [
+      //       {'coordinates': [-122.2591604, 37.8687287]},
+      //       {'coordinates': [-122.2584315, 37.8651365]},
+      //       {'coordinates': [-122.2590939, 37.8650491]},
+      //       {'coordinates': [-122.2585818, 37.8643866]}
+      //     ]
+      //   ],
+      //   'trip_end_time': '20150430T091759-1700',
+      //   'trip_id': '20150427T160333-0700',
+      //   'mode_list': ['walking']
+      // };
+
+      // var originalTrip = {
+      //   'last_update_time': '',
+      //   'trip_id': '20150427T160333-0700',
+      //   // 'trip_start_datetime': datetime.datetime(2015, 4, 27, 23, 3, 33),
+      //   'type': 'move',
+      //   'trip_start_time': '20150427T160333-0700',
+      //   // 'trip_end_datetime': datetime.datetime(2015, 4, 27, 23, 36, 7),
+      //   'source': 'Shankari',
+      //   'recommended_alternative': {
+      //     'trip_end_location': [-122.2585818, 37.8643866],
+      //     'trip_start_location': [-122.2592115, 37.8689676],
+      //     'trip_start_time': '20150430T091059-1700',
+      //     'track_points': [
+      //       [
+      //         {'coordinates': [-122.2591604, 37.8687287]},
+      //         {'coordinates': [-122.2584315, 37.8651365]},
+      //         {'coordinates': [-122.2590939, 37.8650491]},
+      //         {'coordinates': [-122.2585818, 37.8643866]}
+      //       ]
+      //     ],
+      //     'trip_end_time': '20150430T091759-1700',
+      //     'trip_id': '20150427T160333-0700',
+      //     'mode_list': ['walking']
+      //   },
+      //   'place': {},
+      //   'trip_end_time': '20150427T163607-0700',
+      //   '_id': '6433c8cf-c4c5-3741-9144-5905379ece6e_20150427T160333-0700',
+      //   'sections': [0]
+      // }
+
+      var originalSections = [
+        {
+          'distance': 779.263283113156,
+          // 'section_start_datetime': datetime.datetime(2015, 4, 28, 20, 28, 10),
+          'predicted_mode': {
+            'walking': 0.9,
+            'cycling': 0.1
+          },
+          'section_end_time': '20150428T133749-0700',
+          'section_end_point': {
+            'type': 'Point', 'coordinates': [-122.2559704294999, 37.87119508689757]
+          },
+          'section_start_point': {
+            'type': 'Point', 'coordinates': [-122.2578001209742, 37.86502621140132]
+          },
+          'section_id': 0,
+          'track_points': [
+            {
+              'track_location': {'type': 'Point', 'coordinates': [-122.2578001209742, 37.86502621140132]},
+              'time': '20150428T132810-0700'
+            }, {
+              'track_location': {'type': 'Point', 'coordinates': [-122.2567464319265, 37.86536375064204]},
+              'time': '20150428T132915-0700'
+            }, {
+              'track_location': {'type': 'Point', 'coordinates': [-122.2564224713689, 37.86623127762029]},
+              'time': '20150428T133032-0700'
+            }, {
+              'track_location': {'type': 'Point', 'coordinates': [-122.2565887683278, 37.86713933110038]},
+              'time': '20150428T133128-0700'
+            }, {
+              'track_location': {'type': 'Point', 'coordinates': [-122.2567825579292, 37.86806662104825]},
+              'time': '20150428T133241-0700'
+            }, {
+              'track_location': {'type': 'Point', 'coordinates': [-122.2569850647098, 37.8689576592649]},
+              'time': '20150428T133335-0700'
+            }, {
+              'track_location': {'type': 'Point', 'coordinates': [-122.2562278902838, 37.86975720454029]},
+              'time': '20150428T133442-0700'
+            }, {
+              'track_location': {'type': 'Point', 'coordinates': [-122.2559704294999, 37.87119508689757]},
+              'time': '20150428T133656-0700'
+            }
+          ],
+          'type': 'move',
+          'confirmed_mode': 1,
+          'mode': '',
+          'duration': 579,
+          'user_id': '6433c8cf-c4c5-3741-9144-5905379ece6e',
+          'trip_id': '20150428T132810-0700',
+          'section_start_time': '20150428T132810-0700'
+          // 'section_end_datetime': datetime.datetime(2015, 4, 28, 20, 37, 49)
+        }
+      ]
+
+      function initialize() {
+        var map = new google.maps.Map(document.getElementById('map-canvas')),
+            bounds  = new google.maps.LatLngBounds(),
+            section, sectionCoordinates, location, newCoord, polyline;
+
+        // create a lovely colored polyline for the recommended trip
+        for (i = 0; i < recommendedTrip.track_points.length; i++) {
+          section = recommendedTrip.track_points[i];
+          sectionCoordinates = [];
+          for (k = 0; k < section.length; k++) {
+            location = section[k]['coordinates'];
+            newCoord = new google.maps.LatLng(location[1], location[0]);
+            sectionCoordinates.push(newCoord);
+            bounds.extend(newCoord);
+          }
+
+          polyline = new google.maps.Polyline({
+            map: map,
+            path: sectionCoordinates,
+            geodesic: true,
+            strokeColor: MODE_COLORS[recommendedTrip['mode_list'][i]],
+            strokeOpacity: 1.0,
+            strokeWeight: 5
+          });
+        }
+
+        // create a sad grey polyline for the original trip
+        for (i = 0; i < originalSections.length; i++) {
+          section = originalSections[i].track_points;
+          sectionCoordinates = []
+          for (k = 0; k < section.length; k++) {
+            location = section[k]['track_location']['coordinates'];
+            newCoord = new google.maps.LatLng(location[1], location[0]);
+            sectionCoordinates.push(newCoord);
+            bounds.extend(newCoord);
+          }
+
+          polyline = new google.maps.Polyline({
+            map: map,
+            path: sectionCoordinates,
+            geodesic: true,
+            strokeColor: 'grey',
+            strokeOpacity: 1.0,
+            strokeWeight: 3
+          });
+        }
+
+        map.fitBounds(bounds); // auto-zoom
+        map.panToBounds(bounds); // auto-center
+
+        // $('#' + recommendation.reason + '-rec').slideDown();
+      }
+
+      google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+  </body>
+</html>

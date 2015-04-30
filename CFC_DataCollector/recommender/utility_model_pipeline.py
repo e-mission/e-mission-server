@@ -2,44 +2,53 @@
 Construct user utility model or retrieve from database and update with
 augmented trips. Store in database and return the model.
 """
-
 import json
 from user_utility_model import UserUtilityModel
 from tripiterator import TripIterator
 import alternative_trips_module as atm
 from common import get_uuid_list, get_training_uuid_list
 from simple_cost_time_mode_model import SimpleCostTimeModeModel
-from modified_cost_time_emissions_mode_model import ModifiedCostTimeEmissionsModeModel
+from emissions_model import EmissionsModel
 import logging
+from trip import *
 
 class UtilityModelPipeline:
     def __init__(self):
         pass
 
     def get_training_trips(self, user_id):
-        return TripIterator(user_id, ["utility", "get_training"])
+        return TripIterator(user_id, ["utility", "get_training"], E_Mission_Trip)
 
     def build_user_model(self, user_id, trips):
-        model = UserUtilityModel.find_from_db(user_id)
+        model = UserUtilityModel.find_from_db(user_id, False)
+        trips = list(trips)
         alternatives = atm.get_alternative_trips(trips)
-        if alternatives:
-            alternatives = [alternatives]
+        print alternatives
+        trips_with_alts = self.prepare_feature_vectors(trips, alternatives)
+        #TODO: figure out json parsing for model creation
+        if trips_with_alts:
+            '''
             if model:
-              model.update(trips, alternatives)
-            else:
-              model = SimpleCostTimeModeModel(user_id, trips, alternatives)
+              model.update(trips_with_alts)
+            '''
+            print "Building Model"
+            model = SimpleCostTimeModeModel(trips_with_alts)
+            model.update()
+            '''
+            model2 = EmissionsModel(model.cost, model.time, model.mode, trips_with_alts)
+            model2.update()
+            '''
+            model.store_in_db(user_id)
+            #model2.store_in_db(user_id)
             return model
-        return None
+        else:
+            print "No alternatives found\n\n"
+            return None
 
-    def build_modified_model(self, user_id, trips):
-        alternatives = atm.get_alternative_trips(trips)
-        if alternatives:
-            alternatives = [alternatives]
-            if model:
-              model.update(trips, alternatives)
-            else:
-              model = SimpleCostTimeModeModel(user_id, trips, alternatives)
-            return model
+    def prepare_feature_vectors(self, trips, alternatives):
+        vector = zip(trips, alternatives)
+        vector = [(trip,alts) for trip, alts in vector if alts]
+        return vector
 
     '''
     def build_user_imp_model(self, user_id, trips):
@@ -64,20 +73,6 @@ class UtilityModelPipeline:
         for user_uuid in get_training_uuid_list():
             training_real_trips = self.get_training_trips(user_uuid)
             userModel = self.build_user_model(user_uuid, training_real_trips)
-            userModel.store_in_db()
-            #TODO: This is a recommendation thing---move this to the appropriate pipeline
-            self.recommend(userModel)
-
-
-    def recommend(self, userModel):
-	if userModel:
-            # TODO: Should we store the user model or the modified user model in the DB?
-            modifiedUserModel = self.modify_user_utility_model(userModel)
-            alternatives = []
-            print list(atm.get_alternative_trips(training_real_trips))
-            alternatives.append(list(atm.get_alternative_trips(training_real_trips)))
-            modifiedUserModel.update(list(training_real_trips), alternatives)
-            modifiedUserModel.store_in_db()
 
 if __name__ == "__main__":
   config_data = json.load(open('config.json'))

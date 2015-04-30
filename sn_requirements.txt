@@ -1,0 +1,3 @@
+# Dependencies for Social Network Module
+- r requirements.txt
+facebook

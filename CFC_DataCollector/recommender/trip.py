@@ -2,6 +2,10 @@
 #from common.featurecalc import get_cost
 import datetime
 from get_database import *
+import sys
+import os
+sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
+from main import common as cm
 #from feature_calc
 
 DATE_FORMAT = "%Y%m%dT%H%M%S-%W00"
@@ -19,6 +23,9 @@ class Coordinate:
 
     def maps_coordinate(self):
         return str((float(self.lat), float(self.lon)))
+
+    def coordinate_list(self):
+        return [float(self.lon), float(self.lat)]
 
     def __str__(self):
         return self.maps_coordinate()
@@ -73,7 +80,8 @@ class Trip(object):
         return self.end_time - self.start_time
 
     def get_distance(self):
-        return
+        print "Getting Cal Distance"
+        return cm.calDistance(self.trip_start_location, self.trip_end_location, True)
 
     def save_to_db(self):
         pass
@@ -256,13 +264,20 @@ class Alternative_Trip(Trip):
         self.cost = cost
         self.mode_list = mode_list
 
+        self.trip_start_location = trip_start_location
+        self.trip_end_location = trip_end_location
+
     @classmethod
     def trip_from_json(cls, json_segment):
         trip = Trip.trip_from_json(json_segment)
         trip.parent_id = json_segment.get("parent_id")
         trip.cost = json_segment.get("cost")
-        trip.mode_list = cls._init_mode_list(trip.sections)
-        print "_init"
+        #trip.mode_list = cls._init_mode_list(trip.sections)
+        trip.mode_list = json_segment.get("mode_list")
+
+        trip.trip_start_location = Coordinate(json_segment.get("trip_start_location")[1], json_segment.get("trip_start_location")[0])
+        trip.trip_end_location = Coordinate(json_segment.get("trip_end_location")[1], json_segment.get("trip_end_location")[0])
+
         return cls(trip._id, trip.user_id, trip.trip_id, trip.sections, trip.start_time, trip.end_time, trip.trip_start_location, trip.trip_end_location,
                    trip.parent_id, trip.cost, trip.mode_list)
 
@@ -280,9 +295,17 @@ class Alternative_Trip(Trip):
         print mode_list
         return mode_list
 
+    def mark_recommended(self):
+        db = get_alternatives_db()
+        #Unique key is combination of trip, user, and mode. Only one alternative per mode
+        result = db.update({"trip_id": self.trip_id, "user_id": self.user_id, "mode_list":self.mode_list},
+                      {"$set": {"recommended" : True}},
+                       upsert=False,multi=False)
+
     def save_to_db(self):
         db = get_alternatives_db()
-        result = db.update({"_id": self._id},
+        #Unique key is combination of trip, user, and mode. Only one alternative per mode
+        result = db.update({"trip_id": self.trip_id, "user_id": self.user_id, "mode_list":self.mode_list},
                       {"$set": {"cost" : self.cost}},
                        upsert=False,multi=False)
         #print result
@@ -290,15 +313,17 @@ class Alternative_Trip(Trip):
             self._create_new(db)
 
     def _create_new(self, db):
+        point_list = []
+        for section in self.sections:
+            point_list.append([{'coordinates':[point.lon, point.lat]}
+                                for point in section.points])
         self._id = db.insert({"user_id": self.user_id, "trip_id": self.trip_id,
             "trip_start_time": self.start_time.strftime(DATE_FORMAT),
             "trip_end_time": self.end_time.strftime(DATE_FORMAT),
-            "trip_start_location": self.trip_start_location.maps_coordinate(),
-            "trip_end_location": self.trip_end_location.maps_coordinate(),
-            "mode_list": self.mode_list})
-
-        for section in self.sections:
-            section.save_to_db()
+            "trip_start_location": self.trip_start_location.coordinate_list(),
+            "trip_end_location": self.trip_end_location.coordinate_list(),
+            "mode_list": self.mode_list,
+            "track_points": point_list})
 
 class Canonical_Alternative_Trip(Alternative_Trip):
     def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, alternatives, perturbed_trips, mode_list):
