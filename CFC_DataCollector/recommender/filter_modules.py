@@ -14,7 +14,7 @@ from main.K_medoid_2 import kmedoids, user_route_data
 from main.route_matching import update_user_routeDistanceMatrix, update_user_routeClusters
 
 
-from get_database import get_section_db, get_routeCluster_db
+from get_database import get_section_db, get_trip_db, get_routeCluster_db
 import trip
 import random
 
@@ -24,10 +24,13 @@ def getCanonicalTrips(uid, number_returned = 10):
     canonical_trip_list = []
     x = 0
     # if route clusters return nothing, then get common routes for user
-    clusters = get_routeCluster_db().find_one({'$and':[{'user':uid},{'method':'lcs'}]})['clusters']
+    #clusters = get_routeCluster_db().find_one({'$and':[{'user':uid},{'method':'lcs'}]})
+    c = get_routeCluster_db().find_one({'$and':[{'user':uid},{'method':'lcs'}]})
+    clusters = c['clusters'] if c else [] 
+    #assert len(clusters) > 0, ("Could not get any route clusters for user with uid ", uid)
     print get_section_db().find({"user_id": uid}).count()
 
-    if len(clusters) == 0:
+    if not clusters:
         print "updating route clusters"
         # no clusters found for user, run algorithm to populate database
         routes_user = user_route_data(uid,get_section_db())
@@ -37,9 +40,11 @@ def getCanonicalTrips(uid, number_returned = 10):
         print "clusters_users = %s" % str(clusters_user)
         update_user_routeClusters(uid,clusters_user[2],method='lcs')
         #try getting clusters again
-        clusters = get_routeCluster_db().find_one({'$and':[{'user':uid},{'method':'lcs'}]})['clusters']
+        #clusters = get_routeCluster_db().find_one({'$and':[{'user':uid},{'method':'lcs'}]})['clusters']
+        c = get_routeCluster_db().find_one({'$and':[{'user':uid},{'method':'lcs'}]})
+        clusters = c['clusters'] if c else [] 
         #assert len(clusters) > 0, ("Could not get any route clusters for user with uid ", uid)
-        if len(clusters) == 0:
+        if not clusters:
             #TODO: returns a random ten trips right now if clusters aren't created
             for trip in get_section_db().find({"user_id":uid}):
                 if x <= number_returned:
@@ -61,18 +66,7 @@ def getCanonicalTrips(uid, number_returned = 10):
 
 #returns all trips to the user
 def getAllTrips(uid):
-    #return [trip.E_Mission_Trip.trip_from_json(jsonStr) for jsonStr in get_section_db().find({'user_id' : uid})].__iter__()
-    return [trip.E_Mission_Trip(jsonStr) for jsonStr in get_section_db().find({'user_id' : uid})].__iter__()
-
-def trip_comparator_date(less_than):
-    def compare(x, y):
-        if x.start_time < y.start_time:
-            return -1
-        elif y.start_time < x.start_time:
-            return 1
-        else:
-            return 0
-    return compare
+    return [trip.E_Mission_Trip.trip_from_json(jsonStr) for jsonStr in get_trip_db().find({'user_id' : uid,'type':'move'})].__iter__()
 
 def getRecentTrips(uid, options = 10):
     return []
@@ -86,8 +80,7 @@ def getTripsThroughMode(uid, options = 10):
 # - have not yet been included in a training set
 def getTrainingTrips(uid):
     queryString = {'type':'move'}
-    #return [trip.E_Mission_Trip.trip_from_json(jsonStr) for jsonStr in get_section_db().find(queryString)].__iter__()
-    return [trip.E_Mission_Trip(jsonStr) for jsonStr in get_section_db().find(queryString)].__iter__()
+    return [trip.E_Mission_Trip.trip_from_json(jsonStr) for jsonStr in get_trip_db().find(queryString)].__iter__()
 
 def getTopAlternatives(uid, options = 10):
   return []

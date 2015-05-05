@@ -1,5 +1,4 @@
-import get_trips
-from common import store_trip_in_db, find_perturbed_trips, initialize_empty_perturbed_trips, update_perturbations 
+from common import find_perturbed_trips, initialize_empty_perturbed_trips, update_perturbations 
 from trip import E_Mission_Trip
 #from get_database import get_perturbed_trips_db
 from get_database import *
@@ -26,15 +25,13 @@ Overview of helper files relevant to this pipeline:
 
 # Invoked in recommendation pipeline to get perturbed trips user should consider
 def calc_alternative_trips(trip_iterator):
-
     for curr_trip in trip_iterator:
-        if not curr_trip.getPipelineFlags().alternativesStarted:
-            curr_trip.getPipelineFlags().startAlternatives()
-            curr_unique_id = curr_trip.get_id()
+        if not curr_trip.pipelineFlags.alternativesStarted:
+            curr_trip.pipelineFlags.startAlternatives()
+            curr_unique_id = curr_trip._id
             list_of_perturbed_trips = find_perturbed_trips(curr_trip)
             initialize_empty_perturbed_trips(curr_unique_id, get_perturbed_trips_db())
             schedule_queries(curr_unique_id, list_of_perturbed_trips)
-
 
 #@TODO: put these methods in database_util.py
 #@TODO: These stubs need to be passed in a unique id as well as a trip ppboject

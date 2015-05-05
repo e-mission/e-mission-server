@@ -9,7 +9,7 @@ import re
 import sys
 import os
 from datetime import datetime, timedelta
-from recommender import recommendation_pipeline as pipeline
+from recommender.recommendation_pipeline import RecommendationPipeline
 # Needed to modify the pythonpath
 sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
 sys.path.append("%s" % os.getcwd())
@@ -17,7 +17,7 @@ from dao.user import User
 from dao.client import Client
 import tests.common
 from moves import collect
-from recommender.get_trips import TripIterator
+from recommender.tripiterator import TripIterator
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -35,11 +35,9 @@ class TestRecommendationPipeline(unittest.TestCase):
     for row in dataJSON:
       self.ModesColl.insert(row)
 
-    #TODO: add many trip filter functions to play with
-    self.trip_filters = None
-
     result = self.loadTestJSON("tests/data/missing_trip")
     collect.processResult(self.testUUID, result)
+    self.pipeline = RecommendationPipeline()
 
   def tearDown(self):
     get_section_db().remove({"user_id": self.testUUID})
@@ -51,15 +49,21 @@ class TestRecommendationPipeline(unittest.TestCase):
     return json.load(fileHandle)
 
   def testRetrieveTripsToImprove(self):
-    #get a users trips, there should be 21
-    trip_list = pipeline.get_trips_to_improve(self.testUUID, self.trip_filters)
-    self.assertEquals(len(trip_list), 22)
+    #updated to 15, since I am filtering out places
+    trip_list = self.pipeline.get_trips_to_improve(self.testUUID)
+    self.assertEquals(len(trip_list), 5)
     # Trip 20140407T175709-0700 has two sections
 
   def testRecommendTrip(self):
-    trip_list = pipeline.get_trips_to_improve(self.testUUID, self.trip_filters)
-    utility_model = pipeline.get_user_utility_models(self.testUUID)
-    recommended_trips = pipeline.recommend_trips(trip_list[0]._id, utility_model)
+    trip_list = self.pipeline.get_trips_to_improve(self.testUUID)
+    utility_model = self.pipeline.get_selected_user_utility_model(self.testUUID)
+    recommended_trips = self.pipeline.recommend_trips(trip_list[0]._id, utility_model)
+
+  def testCanonical(self):
+    canonical_trip_iter = TripIterator(self.testUUID, ['trips', 'get_canonical']).__iter__()
+
+  def test_pipeline_e2e(self):
+    self.pipeline.runPipeline()
 
   def testCanonical(self):
     canonical_trip_iter = TripIterator(self.testUUID, ['trips', 'get_canonical']).__iter__()

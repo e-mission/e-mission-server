@@ -1,5 +1,6 @@
 import os, sys
 import logging
+import traceback
 sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
 from main.userclient import getClientSpecificQueryFilter
 from main.get_database import get_section_db
@@ -41,8 +42,9 @@ class TripIterator:
                 self.storedIter = query_function(user_uuid)
         except TypeError as e:
             print e
-            print "initializing iterator"
-            logging.warn("Found no query function for filter_queries: ", filter_queries);
+            print "something went wrong, here is some info:"
+            traceback.print_exc()
+            #logging.warn("Found no query function for filter_queries: ", filter_queries);
             self.storedIter = []
 
         """

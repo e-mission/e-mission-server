@@ -1,4 +1,5 @@
 import unittest
+import traceback
 import json
 #from utils import load_database_json, purge_database_json
 #from main import tripManager
@@ -10,7 +11,7 @@ import sys
 import os
 from datetime import datetime, timedelta
 import recommender.alternative_trips_module as pipeline_module
-import recommender.alternative_trips_pipeline as pipeline 
+from recommender.alternative_trips_pipeline import AlternativeTripsPipeline
 from recommender.trip import *
 # Needed to modify the pythonpath
 sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
@@ -20,6 +21,7 @@ from dao.client import Client
 import tests.common
 from moves import collect
 from recommender.common import *
+import collections
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -47,15 +49,11 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     for row in dataJSON:
       self.ModesColl.insert(row)
     
-    #TODO: add many trip filter functions to play with
-    self.trip_filters = None
-
-    # import data from tests/data/testModeInferFiles
-    #self.pipeline = pipeline.ModeRecommendationPipeline()
-    #self.testRecommendationPipeline()
     # register each of the users and add sample trips to each user
     result = self.loadTestJSON("tests/data/missing_trip")
     collect.processResult(self.testUUID, result)
+    
+    self.pipeline = AlternativeTripsPipeline()
 
   def tearDown(self):
     get_section_db().remove({"user_id": self.testUUID})
@@ -69,13 +67,14 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     return json.load(fileHandle)
     
   def testRetrieveAllUserTrips(self):
-    #get a users trips, there should be 21
-    trip_list = pipeline.get_trips_for_alternatives(self.testUUID)
-    self.assertEquals(len(list(trip_list)), 21) 
+    #updated to 15 since filtering places
+    trip_list = self.pipeline.get_trips_for_alternatives(self.testUUID)
+    self.assertEquals(len(list(trip_list)), 5) 
+    
     # Trip 20140407T175709-0700 has two sections
 
   def testAugmentTrips(self):
-    trip_list = pipeline.get_trips_for_alternatives(self.testUUID)
+    trip_list = self.pipeline.get_trips_for_alternatives(self.testUUID)
     self.assertTrue(hasattr(trip_list, '__iter__'))
     # TODO: Why should this not be 21? Check with Shaun?
     # self.assertNotEquals(len(trip_list), 21) 
@@ -86,7 +85,7 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     # TODO: Figure out how to get this to work
     pipeline_module.calc_alternative_trips([firstElement].__iter__())
     # self.assertEquals(type(alternative_list), list)
-
+  '''
   def test_initialize_empty_perturbed_trips(self):
     db = get_section_db()
     i = 0
@@ -117,28 +116,28 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     our_id = temp['_id']
     initialize_empty_perturbed_trips(our_id, pdb)
     update_perturbations(our_id, trip)
+  '''
+  def test_pipeline_e2e(self):
+    self.pipeline.runPipeline()
     
-
-   	
   def storeAlternativeTrips(self):
-    trip_list = pipeline.get_user_trips(self.testUUID, self.trip_filters)
-    self.assertEquals(type(trip_list), list)
+    trip_list = self.pipeline.get_trip_for_alternatives(self.testUUID) 
+    self.assertEquals(type(trip_list), collections.Iterator)
     self.assertNotEquals(len(trip_list), 21) 
     self.assertEquals(type(trip_list[0]), E_Mission_Trip)
-    alternative_list = pipeline.get_alternative_trips(self.testUUID, trip_list[0]._id)
-    pipeline.store_alternative_trips(alternative_list)
+    alternative_list = pipeline_module.get_alternative_trips(self.testUUID, trip_list[0]._id)
+    self.assertGreater(len(alternative_list), 0)
+    pipeline_module.store_alternative_trips(alternative_list)
     self.assertEquals(type(alternative_list), list)
 
 
-  # def testLoadDatabse(self):
-  #   trip_list = pipeline.get_user_trips(self.testUUID, self.trip_filters)
-  #   alternative_list = pipeline.get_alternative_trips(self.testUUID, trip_list[0]._id)
-  #   pipeline.store_alternative_trips(alternative_list)
-  #   altTripsDB = get_alternative_trips_db()
-  #   json_trip = altTripsDB.find_one({"type" : "move"})
-  #   self.assertTrue(json_trip)
-
-
+def testLoadDatabse(self):
+    trip_list = pipeline.get_user_trips(self.testUUID, self.trip_filters)
+    alternative_list = pipeline.get_alternative_trips(self.testUUID, trip_list[0]._id)
+    pipeline.store_alternative_trips(alternative_list)
+    altTripsDB = get_alternative_trips_db()
+    json_trip = altTripsDB.find_one({"type" : "move"})
+    self.assertTrue(json_trip)
 
 if __name__ == '__main__':
     unittest.main()

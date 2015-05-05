@@ -24,6 +24,16 @@ def get_trip_db():
     Trips=current_db.Stage_Trips
     return Trips
 
+def get_alternatives_db():
+    current_db=MongoClient().Stage_database
+    Alternatives=current_db.Stage_Alternatives
+    return Alternatives
+
+def get_canonical_trips_db():
+    current_db=MongoClient().Stage_database
+    CanonicalTrips=current_db.Stage_Canonical
+    return CanonicalTrips
+
 def get_profile_db():
     current_db=MongoClient().Stage_database
     Profiles=current_db.Stage_Profiles
