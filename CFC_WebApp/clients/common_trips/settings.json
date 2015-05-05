@@ -1,0 +1,9 @@
+{
+  "name": "common_trips",
+  "start_date": "2015/05/05",
+  "end_date": "2015/06/01",
+  "key": "this_is_the_super_secret_id",
+  "client_settings": {
+    "result_url": "https://e-mission.eecs.berkeley.edu/compare"
+  }
+}
