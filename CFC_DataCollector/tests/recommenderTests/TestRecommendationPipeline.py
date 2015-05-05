@@ -65,8 +65,5 @@ class TestRecommendationPipeline(unittest.TestCase):
   def test_pipeline_e2e(self):
     self.pipeline.runPipeline()
 
-  def testCanonical(self):
-    canonical_trip_iter = TripIterator(self.testUUID, ['trips', 'get_canonical']).__iter__()
-
 if __name__ == '__main__':
     unittest.main()
