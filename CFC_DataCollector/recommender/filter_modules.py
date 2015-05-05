@@ -94,6 +94,7 @@ def getAlternativeTrips(trip_id):
     query = {'trip_id':trip_id}
     alternatives = get_alternatives_db().find(query)
     if alternatives.count() > 0:
+        print alternatives.count()
         return alternatives
     raise AlternativesNotFound("No Alternatives Found")
 

@@ -24,7 +24,8 @@ class UserUtilityModel(object):
   # their past trips and potential alternatives
 
   def __init__(self, trips_with_alts):
-    self.num_alternatives = 4
+    #self.num_alternatives = 4
+    self.num_alternatives = 8
     self.regression = lm.LogisticRegression()
     self.trips_with_alts = trips_with_alts
 
@@ -32,8 +33,14 @@ class UserUtilityModel(object):
   #Alternatives is a list of TripIterators
   def update(self):
     trip_features, labels = self.extract_features()
+    #TODO: why the hell is this happening..? absurd feature extraction
     trip_features[np.abs(trip_features) < .001] = 0
     trip_features[np.abs(trip_features) > 1000000] = 0
+    nonzero = ~np.all(trip_features==0, axis=1)
+    print nonzero
+    trip_features = trip_features[nonzero]
+    labels = labels[nonzero]
+
     print "Trip Features: ", trip_features
     self.regression.fit(trip_features, labels)
     self.coefficients = self.regression.coef_

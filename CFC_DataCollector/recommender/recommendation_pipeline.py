@@ -30,9 +30,6 @@ class RecommendationPipeline:
         model2 = EmissionsModel(cost_coeff, time_coeff, mode_coeff, trips_with_alts)
         return model2
 
-    def recommend_trips(self, trip_id, utility_model):
-        return []
-
     def _evaluate_trip(self, utility_model, trip):
         return utility_model.predict_utility(trip)
 
@@ -43,11 +40,13 @@ class RecommendationPipeline:
             trips_with_alts = self.prepare_feature_vectors(trips_to_improve, alternatives)
             user_model = self.get_selected_user_utility_model(user_uuid, trips_with_alts)
             for trip_with_alts in trips_with_alts:
-                recommended_trips = user_model.predict(trip_with_alts)
-                print recommended_trips.__dict__
-                try:
-                    recommended_trips.mark_recommended()
-                except AttributeError:
+                original_trip = trip_with_alts[0]
+                recommended_trip = user_model.predict(trip_with_alts)
+                print original_trip.__dict__
+                if original_trip != recommended_trip:
+                    print "recommending"
+                    original_trip.mark_recommended(recommended_trip)
+                else: 
                     print "Original Trip is best"
                 
  

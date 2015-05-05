@@ -67,6 +67,9 @@ class OTP:
 		print type(our_json)
 		#print our_json["plan"]["itineraries"]
 		for leg in our_json["plan"]["itineraries"][0]['legs']:
+                        coords = [ ]
+                        for step in leg['steps']:
+                               coords.append(Coordinate(step['lat'], step['lon'])) 
 			start_time = otp_time_to_ours(leg["startTime"])
 			end_time = otp_time_to_ours(leg["endTime"])
 			distance = float(leg['distance'])
@@ -75,6 +78,8 @@ class OTP:
 			mode = leg["mode"]
 			mode_list.add(mode)
 			section = Section(0, trip_id, distance, start_time, end_time, start_loc, end_loc, mode, mode)
+                        section.points = coords
+                        #print section.points
 			sections.append(section)
 			if mode == 'CAR':
 				car_dist = distance
@@ -97,13 +102,13 @@ class OTP:
 		        except:
                             cost = 0
                 elif "CAR" in mode_list:
-			start_city_car = str(Geocoder().reverse_geocode(car_start_coordinates.get_lat(),car_start_coordinates.get_lon())).split(',')[1]
-			end_city_car = str(Geocoder().reverse_geocode(car_end_coordinates.get_lat(), car_end_coordinates.get_lon())).split(',')[1]
-			traffic_time = get_travel_time(start_city_car, end_city_car)
+			#start_city_car = str(Geocoder().reverse_geocode(car_start_coordinates.get_lat(),car_start_coordinates.get_lon())).split(',')[1]
+			#end_city_car = str(Geocoder().reverse_geocode(car_end_coordinates.get_lat(), car_end_coordinates.get_lon())).split(',')[1]
+			#traffic_time = get_travel_time(start_city_car, end_city_car)
 			cost = calc_car_cost(car_dist)
-			if traffic_time > final_end_time - final_start_time:
-				print "Driving is bad: " + traffic_time
-				final_end_time = final_start_time + traffic_time
+			#if traffic_time > final_end_time - final_start_time:
+			#	print "Driving is bad: " + traffic_time
+			#	final_end_time = final_start_time + traffic_time
 		mode_list = list(mode_list)
 		return Alternative_Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc, 0, cost, mode_list)
 

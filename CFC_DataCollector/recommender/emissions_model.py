@@ -75,6 +75,11 @@ class EmissionsModel(UserUtilityModel):
     trip_features, labels = self.extract_features(trip_with_alts)
     trip_features[np.abs(trip_features) < .001] = 0 
     trip_features[np.abs(trip_features) > 1000000] = 0 
+    trip_features = np.nan_to_num(trip_features)
+    nonzero = ~np.all(trip_features==0, axis=1)
+    trip_features = trip_features[nonzero]
+    labels = labels[nonzero]      
+
     best_trip = None
     best_utility = float("-inf")
     for i, trip_feature in enumerate(trip_features):

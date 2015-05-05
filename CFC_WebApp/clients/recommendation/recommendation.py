@@ -9,7 +9,7 @@ import json
 import ast
 
 import sys, os
-sys.path.append("%s/../CFC_DataCollector/" % os.getcwd())
+sys.path.append("%s/../CFC_DataCollector/recommender/" % os.getcwd())
 sys.path.append("%s" % os.getcwd())
 from trip import E_Mission_Trip
 

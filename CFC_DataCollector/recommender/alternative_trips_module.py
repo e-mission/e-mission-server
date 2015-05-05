@@ -26,10 +26,16 @@ Overview of helper files relevant to this pipeline:
 
 # Invoked in recommendation pipeline to get perturbed trips user should consider
 def calc_alternative_trips(user_trips, immediate):
+    stagger = 1
+    total_stagger = 0
     for existing_trip in user_trips:
-        if not existing_trip.pipelineFlags.alternativesStarted:
-            existing_trip.pipelineFlags.startAlternatives()
-            existing_trip.pipelineFlags.savePipelineFlags()
+        #if not existing_trip.pipelineFlags.alternativesStarted:
+        existing_trip.pipelineFlags.startAlternatives()
+        existing_trip.pipelineFlags.savePipelineFlags()
+        if immediate:
+            schedule_queries(existing_trip.trip_id, existing_trip.user_id, [existing_trip], immediate, total_stagger)
+            total_stagger += stagger
+        else:
             schedule_queries(existing_trip.trip_id, existing_trip.user_id, [existing_trip], immediate)
 
 def get_alternative_trips(trip_it):

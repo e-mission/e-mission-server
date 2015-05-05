@@ -29,13 +29,16 @@ class SimpleCostTimeModeModel(UserUtilityModel):
     label_vector = np.empty(len(self.trips_with_alts * (self.num_alternatives+1)))
     sample = 0
     for trip,alt in self.trips_with_alts:
+        print trip._id
         feature_vector[sample] = self._extract_features(trip)
         label_vector[sample] = 1
         sample += 1
+        print sample
         for _alt in alt:
             feature_vector[sample] = self._extract_features(_alt)
             label_vector[sample] = 0
             sample += 1
+            print "Alt: ", sample
     return (feature_vector, label_vector)
 
   def _extract_features(self, trip):
