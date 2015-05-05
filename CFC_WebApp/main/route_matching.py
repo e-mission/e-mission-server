@@ -450,8 +450,9 @@ def update_user_routeDistanceMatrix(user_id,data_feature,step1=100000,step2=1000
                 #print(user_disMat[_id])
 
     #get_routeDistanceMatrix_db().update({'$and':[{'user':user_id},{'method':method}]},{'user':user_id,'method':method,'disMat':user_disMat})
-    update_routeDistanceMatrix_db(user_id, method, user_disMat)
-
+    print(type(user_disMat))
+    user_disMat = update_routeDistanceMatrix_db(user_id, method, user_disMat)
+    return user_disMat
 
     # for entry in get_routeDistanceMatrix_db().find():
     #     print(entry)

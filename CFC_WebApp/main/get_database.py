@@ -57,7 +57,8 @@ def update_routeDistanceMatrix_db(user_id, method, updatedMatrix):
     user_id = str(user_id)
     f = open('routeDistanceMatrices/' + user_id + '_' + method + '_routeDistanceMatrix.json', 'w+')
     f.write(json.dumps(updatedMatrix))
-    f.close()   
+    f.close()
+    return updatedMatrix   
 
 
 def get_client_db():
