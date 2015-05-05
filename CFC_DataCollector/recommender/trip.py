@@ -63,8 +63,9 @@ class Trip(object):
 
 class Section(object):
 
-    def __init__(self, _id, trip_id, distance, section_type, start_time, end_time, section_start_location, section_end_location, mode, confirmed_mode):
+    def __init__(self, _id, user_id, trip_id, distance, section_type, start_time, end_time, section_start_location, section_end_location, mode, confirmed_mode):
         self._id = _id
+        self.user_id = user_id
         self.trip_id = trip_id
         self.distance = distance
         self.section_type = section_type
@@ -88,6 +89,7 @@ class Section(object):
     @classmethod
     def section_from_json(cls, json_segment):
         _id = json_segment.get("_id")
+        user_id = json_segment.get("user_id")
         trip_id = json_segment.get("trip_id")
         distance = json_segment.get("distance")
         start_time = cls._date_from_json(json_segment.get("section_start_datetime"),
@@ -99,7 +101,7 @@ class Section(object):
         section_type = json_segment.get("type")
         mode = json_segment.get("mode")
         confirmed_mode = json_segment.get("confirmed_mode")
-        return cls(_id, trip_id, distance, section_type, start_time, end_time, section_start_location, section_end_location, mode, confirmed_mode)
+        return cls(_id, user_id, trip_id, distance, section_type, start_time, end_time, section_start_location, section_end_location, mode, confirmed_mode)
 
     @classmethod
     def _location_from_json(cls, locationJSON):
