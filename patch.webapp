@@ -1,0 +1,21 @@
+diff --git a/CFC_WebApp/api/cfc_webapp.py b/CFC_WebApp/api/cfc_webapp.py
+index 4eff5c1..c2c6810 100644
+--- a/CFC_WebApp/api/cfc_webapp.py
++++ b/CFC_WebApp/api/cfc_webapp.py
+@@ -301,12 +301,14 @@ def getCarbonCompare():
+     print("  %s: %s" % (key, val))
+ 
+   from clients.default import default
++  from clients.choice import choice
+ 
+-  if 'User' not in request.headers or request.headers.get('User') == '':
+-    return "Waiting for user data to become available..."
++  # if 'User' not in request.headers or request.headers.get('User') == '':
++  #   return "Waiting for user data to become available..."
+ 
+   user_uuid = getUUID(request, inHeader=True)
+   print ('UUID', user_uuid)
++  return choice.getResult(user_uuid)
+   clientResult = userclient.getClientSpecificResult(user_uuid)
+   if clientResult != None:
+     logging.debug("Found overriding client result for user %s, returning it" % user_uuid)
