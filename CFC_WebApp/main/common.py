@@ -480,16 +480,27 @@ def travel_time(time1,time2):
     travel_time = end_time-start_time
     return travel_time.seconds
 
-def calDistance(point1, point2):
+def travel_date_time(time1,time2):
+    travel_time = time2-time1
+    return travel_time.seconds
+
+def calDistance(point1, point2, coordinates=False):
 
     earthRadius = 6371000
     # SHANKARI: Why do we have two calDistance() functions?
     # Need to combine into one
     # points are now in geojson format (lng,lat)
-    dLat = math.radians(point1[1]-point2[1])
-    dLon = math.radians(point1[0]-point2[0])
-    lat1 = math.radians(point1[1])
-    lat2 = math.radians(point2[1])
+    if coordinates:
+        dLat = math.radians(point1.lat-point2.lat)
+        dLon = math.radians(point1.lon-point2.lon)
+        lat1 = math.radians(point1.lat)
+        lat2 = math.radians(point2.lat)
+    else:
+        dLat = math.radians(point1[1]-point2[1])
+        dLon = math.radians(point1[0]-point2[0])
+        lat1 = math.radians(point1[1])
+        lat2 = math.radians(point2[1])
+
 
     a = (math.sin(dLat/2) ** 2) + ((math.sin(dLon/2) ** 2) * math.cos(lat1) * math.cos(lat2))
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))

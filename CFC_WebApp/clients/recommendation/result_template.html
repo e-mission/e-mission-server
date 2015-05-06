@@ -1,0 +1,133 @@
+<html ng-app="e-mission-recommendation">
+  <head>
+    <meta charset="utf-8">
+    <title>E-Mission</title>
+    <link href="front/nv.d3.css" rel="stylesheet" type="text/css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=visualization"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.2/d3.js" charset="utf-8"></script>
+    <script src="front/nv.d3.min.js" charset="utf-8"></script>
+    <script src="front/nv.d3.utils.js"></script>
+    <script src="front/nv.d3.models.pieChart.js"></script>
+    <script src="front/bullet.js"></script>
+  </head>
+  <style>
+      body {
+        margin: 0;
+      }
+
+      #rec-info {
+        background-color: rgba(255, 255, 255, 0.64);
+        width: 600px;
+        padding: 10px;
+        text-align: center;
+        font-family: "Helvetica";
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1;
+      }
+
+      #rec-info h1 {
+        margin: 0 auto 10px;
+      }
+
+      #rec-info p {
+        margin: 0;
+        text-transform: uppercase;
+      }
+
+      #rec-reasons p {
+        display: none;
+      }
+
+      #map-canvas {
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+  <body ng-controller="RootCtrl" hide-nav-bar="true">
+
+    <div id="rec-info">
+      <h1>Recommended Trip</h1>
+      <!-- <p>Leave at <span id="departure-time">1:30 PM</span> and arrive at <span id="arrival-time">1:56 PM</span></p> -->
+      <!-- <div id="rec-reasons">
+        <p id="time-rec">Recommended because this trip is 4 minutes faster than your original trip.</p>
+        <p id="distance-rec">Recommended because this trip is 2 miles faster than your original trip.</p>
+        <p id="emissions-rec">Recommended because this trip will create rougly 5X less carbon emissions than your original trip.</p>
+      </div> -->
+    </div>
+
+    <div id="map-canvas" />
+
+    <script>
+      var MODE_COLORS = {
+        air: 'red',
+        bicycle: 'blue',
+        car: 'orange',
+        transit: 'yellow',
+        walk: 'green'
+      };
+
+      var recommendedTrip = JSON.parse({{ recommendedTrip }}),
+          originalTrip = JSON.parse({{ originalTrip }}),
+          originalSections = JSON.parse({{ originalSections }});
+
+      function initialize() {
+        var map = new google.maps.Map(document.getElementById('map-canvas')),
+            bounds  = new google.maps.LatLngBounds(),
+            section, sectionCoordinates, location, newCoord, polyline;
+
+        // create a lovely colored polyline for the recommended trip
+        for (i = 0; i < recommendedTrip.track_points.length; i++) {
+          section = recommendedTrip.track_points[i];
+          sectionCoordinates = [];
+          for (k = 0; k < section.length; k++) {
+            location = section[k]['coordinates'];
+            newCoord = new google.maps.LatLng(location[1], location[0]);
+            sectionCoordinates.push(newCoord);
+            bounds.extend(newCoord);
+          }
+
+          polyline = new google.maps.Polyline({
+            map: map,
+            path: sectionCoordinates,
+            geodesic: true,
+            strokeColor: MODE_COLORS[recommendedTrip['mode_list'][i]],
+            strokeOpacity: 1.0,
+            strokeWeight: 5
+          });
+        }
+
+        // create a sad grey polyline for the original trip
+        for (i = 0; i < originalSections.length; i++) {
+          section = originalSections[i].track_points;
+          sectionCoordinates = []
+          for (k = 0; k < section.length; k++) {
+            location = section[k]['track_location']['coordinates'];
+            newCoord = new google.maps.LatLng(location[1], location[0]);
+            sectionCoordinates.push(newCoord);
+            bounds.extend(newCoord);
+          }
+
+          polyline = new google.maps.Polyline({
+            map: map,
+            path: sectionCoordinates,
+            geodesic: true,
+            strokeColor: 'grey',
+            strokeOpacity: 1.0,
+            strokeWeight: 3
+          });
+        }
+
+        map.fitBounds(bounds); // auto-zoom
+        map.panToBounds(bounds); // auto-center
+
+        // $('#' + recommendation.reason + '-rec').slideDown();
+      }
+
+      google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+  </body>
+</html>
