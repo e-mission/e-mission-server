@@ -55,7 +55,7 @@ def getResult(user_uuid):
                                        'client_key': Client("choice").getClientKey()}),
                           gameResult = base64.b64encode(socialgame.getResult(user_uuid)),
                           leaderboardResult = base64.b64encode(leaderboard.getResult(user_uuid)),
-                          dataResult = base64.b64encode(default.getResult(user_uuid)))
+                          dataResult = base64.b64encode(default.getResult(user_uuid)), 
                           recommendationResult = base64.b64encode(recommendation.getResult(user_uuid)))
 
   return renderedTemplate
