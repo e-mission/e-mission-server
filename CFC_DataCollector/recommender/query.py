@@ -1,5 +1,4 @@
 import sys
-sys.path.append("/home/ubuntu/jimmy/e-mission-server/CFC_DataCollector/")
 import googlemaps 
 import datetime
 from get_database import *

@@ -4,7 +4,7 @@
 import urllib, urllib2, datetime, time
 from trip import Coordinate, Alternative_Trip, Section
 from common import calc_car_cost
-from traffic import get_travel_time
+# from traffic import get_travel_time
 from pygeocoder import Geocoder
 
 try:

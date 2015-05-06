@@ -3,7 +3,7 @@ import sys
 import json
 from alternative_trips_module import calc_alternative_trips
 import tripiterator as ti
-from common import get_uuid_list, uuid_to_name 
+from common import get_uuid_list
 import logging
 
 from trip import E_Mission_Trip
@@ -17,7 +17,7 @@ class AlternativeTripsPipeline:
 
     def runPipeline(self, immediate=False):
         for user_uuid in get_uuid_list():
-	    print "Finding Trips for User: ", uuid_to_name(str(user_uuid)), user_uuid
+	        logging.debug("Finding Trips for User: %s" % user_uuid)
             trips_with_no_alternatives = self.get_trips_for_alternatives(user_uuid)
             calc_alternative_trips(trips_with_no_alternatives, immediate)
 

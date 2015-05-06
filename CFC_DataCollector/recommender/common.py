@@ -9,54 +9,15 @@ import uuid
 import xml.etree.ElementTree as ET
 
 DATE_FORMAT = "%Y%m%dT%H%M%S-%W00" #This is a great hack thought of by Shaun
-CLASS_UUIDS = {
-  'b0d937d0-70ef-305e-9563-440369012b39': "Shankari's Husband",
-  '0763de67-f61e-3f5d-90e7-518e69793954': "Shankari Android",
-  '3a307244-ecf1-3e6e-a9a7-3aaf101b40fa': "Shankari iPhone",
-  '6245318c-d337-3530-9001-6b175dab73a7': "Jeff",
-  '1a65368b-888e-3e77-8f7c-1128f16da1df': "Gautham",
-  '5ecc845a-dbca-376f-8fb1-577bd7b18859': "Zack",
-  '6433c8cf-c4c5-3741-9144-5905379ece6e': "Jimmy",
-  'cc7f2ff0-8e73-3cfa-ab4c-647ebf025e42': "Shaun",
-  'f8fee20c-0f32-359d-ba75-bce97a7ac83b': "Shanthi"
-}
-
-# Helper for development
-def uuid_to_name(uuid):
-  return CLASS_UUIDS.get(uuid, "Unknown UUID")
 
 def get_uuid_list():
-    '''
-    uuids = set()
-    #uuids.add(uuid.UUID('cc7f2ff0-8e73-3cfa-ab4c-647ebf025e42'))
-    uuids.add(uuid.UUID('6433c8cf-c4c5-3741-9144-5905379ece6e'))
-    '''
-    uuids = set()
-    db = get_trip_db()
-    for x in db.find():
-        uuids.add(x['user_id'])
-    return uuids
+    return get_trip_db().find({}).distinct("user_id")
 
 def get_training_uuid_list():
-    '''
-    uuids = set()
-    #uuids.add(uuid.UUID('cc7f2ff0-8e73-3cfa-ab4c-647ebf025e42'))
-    uuids.add(uuid.UUID('6433c8cf-c4c5-3741-9144-5905379ece6e'))
-    '''
-    uuids = set()
-    db = get_trip_db()
-    for x in db.find():
-        uuids.add(x['user_id'])
-    return uuids
+    return get_trip_db().find({}).distinct("user_id")
 
 def get_recommender_uuid_list():
-    uuids = set()
-    #uuids.add(uuid.UUID('cc7f2ff0-8e73-3cfa-ab4c-647ebf025e42'))
-    #uuids.add(uuid.UUID('6433c8cf-c4c5-3741-9144-5905379ece6e'))
-    db = get_trip_db()
-    for x in db.find():
-        uuids.add(x['user_id'])
-    return uuids
+    return get_trip_db().find({}).distinct("user_id")
 
 def coerce_gmaps_time(time):
 	lst = time.split()
