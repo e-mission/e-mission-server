@@ -41,7 +41,20 @@
         </ion-content>
       </ion-tab>
 
-      <ion-tab title="Game"
+    <ion-tab title="Leaderboard"
+            icon="ion-star"
+            on-select="onLeaderboardSelected()"
+            ng-click="onLeaderboardClicked()"
+            ng-controller="LeaderboardCtrl">
+        <ion-content has-tabs="true" on-refresh="onRefresh()">
+           <div id="leaderboard-div">
+            <iframe inline-result src='data:text/html;base64,{{leaderboardResult}}' height="100%" width="100%" seamless>
+            </iframe>
+           </div>
+        </ion-content>
+      </ion-tab>
+
+    <ion-tab title="Game"
             icon="ion-game-controller-b"
             on-select="onGameSelected()"
             ng-click="onGameClicked()"

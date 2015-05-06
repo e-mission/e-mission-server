@@ -14,8 +14,8 @@ import socket
 import urllib
 import requests
 # For decoding JWTs on the client side
-import oauth2client.client
-from oauth2client.crypt import AppIdentityError
+#import oauth2client.client
+#from oauth2client.crypt import AppIdentityError
 import traceback
 import xmltodict
 import urllib2
@@ -301,12 +301,14 @@ def getCarbonCompare():
     print("  %s: %s" % (key, val))
 
   from clients.default import default
+  from clients.choice import choice
 
-  if 'User' not in request.headers or request.headers.get('User') == '':
-    return "Waiting for user data to become available..."
+  # if 'User' not in request.headers or request.headers.get('User') == '':
+  #   return "Waiting for user data to become available..."
 
   user_uuid = getUUID(request, inHeader=True)
   print ('UUID', user_uuid)
+  return choice.getResult(user_uuid)
   clientResult = userclient.getClientSpecificResult(user_uuid)
   if clientResult != None:
     logging.debug("Found overriding client result for user %s, returning it" % user_uuid)

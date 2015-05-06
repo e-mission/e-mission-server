@@ -92,16 +92,9 @@ def queryUnclassifiedSections(uuid):
 
 def getUnclassifiedSections(uuid):
     return_dict={}
-<<<<<<< HEAD
-    unclassifiedSections = queryUnclassifiedSections(uuid)
-    filtered_UnclassifiedSections=list(unclassifiedSections)
-    logging.debug("filtered_UnclassifiedSections = %s" % len(filtered_UnclassifiedSections))
-    stripped_filtered_UnclassifiedSections = stripoutNonSerializable(filtered_UnclassifiedSections)
-=======
     unclassifiedSections = list(queryUnclassifiedSections(uuid))
     logging.debug("filtered_UnclassifiedSections = %s" % len(unclassifiedSections))
     stripped_filtered_UnclassifiedSections = stripoutNonSerializable(unclassifiedSections)
->>>>>>> 17ecaf3702bdca7dc2a9c7faaf611b71cff71dc8
     logging.debug("stripped_filtered_UnclassifiedSections = %s" % len(stripped_filtered_UnclassifiedSections))
     return_dict["sections"]=stripped_filtered_UnclassifiedSections
     return return_dict

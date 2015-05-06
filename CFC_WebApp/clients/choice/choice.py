@@ -7,7 +7,8 @@ import math
 import json
 from uuid import UUID
 import time
-from clients.gamified import gamified
+from clients.socialgame import socialgame
+from clients.leaderboard import leaderboard
 from clients.default import default
 
 # TODO: Consider subclassing to provide client specific user functions
@@ -44,11 +45,13 @@ def getResult(user_uuid):
   from dao.client import Client
 
   user = User.fromUUID(user_uuid)
+  print "I am the social game"
   renderedTemplate = template("clients/choice/result_template.html",
                           variables = json.dumps({'curr_view': getCurrView(user_uuid),
                                        'uuid': str(user_uuid),
                                        'client_key': Client("choice").getClientKey()}),
-                          gameResult = base64.b64encode(gamified.getResult(user_uuid)),
+                          gameResult = base64.b64encode(socialgame.getResult(user_uuid)),
+                          leaderboardResult = base64.b64encode(leaderboard.getResult(user_uuid)),
                           dataResult = base64.b64encode(default.getResult(user_uuid)))
   return renderedTemplate
 
@@ -73,5 +76,6 @@ def runBackgroundTasks(uuid):
   runBackgroundTasksForDay(uuid, today)
 
 def runBackgroundTasksForDay(uuid, today):
-  gamified.runBackgroundTasksForDay(uuid, today)
+  socialgame.runBackgroundTasksForDay(uuid, today)
+  leaderboard.runBackgroundTasksForDay(uuid, today)
   default.runBackgroundTasksForDay(uuid, today)

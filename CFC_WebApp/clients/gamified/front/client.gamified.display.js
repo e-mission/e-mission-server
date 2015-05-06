@@ -17,7 +17,7 @@ angular.module('e-mission-gamified', ['ionic'])
             alertPopup.close(); //close the popup after 3 seconds for some reason
          }, 10000);
     }
-    $scope.displayScore = function() {
+    /*$scope.displayScore = function() {
         // alert("displayScore called");
         console.log("displayScore called with currScore = "+currScore+" and prevScore = "+prevScore);
 
@@ -53,7 +53,7 @@ angular.module('e-mission-gamified', ['ionic'])
           console.log("domains are "+d3.selectAll("path"));
           
           d3.selectAll("path").style("opacity", 0);
-    }
+    }*/
     /*
      * From http://stackoverflow.com/questions/3895478/does-javascript-have-a-range-equivalent
      * but not tested

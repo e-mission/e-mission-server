@@ -96,6 +96,27 @@ angular.module('e-mission-choice', ['ionic'])
   }
 })
 
+.controller('LeaderboardCtrl', function($scope, $ionicModal) {
+  // alert("GameCtrl called");
+
+  $scope.onLeaderboardClicked = function() {
+    $scope.setCurrChoice("leaderboard")
+  }
+
+  $scope.onLeaderboardSelected = function() {
+    console.log("Leaderboard tab selected");
+  }
+
+  $scope.onRefresh = function() {
+    // alert("GameCtrl.ON REFRESH");
+    console.log('ON REFRESH');
+
+    $timeout(function() {
+      $scope.$broadcast('scroll.refreshComplete');
+    }, 1000);
+  }
+})
+
 .controller('GameCtrl', function($scope, $ionicModal) {
   // alert("GameCtrl called");
 
