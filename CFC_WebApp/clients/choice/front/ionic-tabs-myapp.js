@@ -8,7 +8,7 @@ angular.module('e-mission-choice', ['ionic'])
   };
 
   $scope.getIndexForTab = function(label) {
-    var tabLabelMap = {'data': 0, 'game': 1};
+    var tabLabelMap = {'data': 0, 'game': 1, 'commontrips': 2};
     return tabLabelMap[label];
   }
 
@@ -26,7 +26,7 @@ angular.module('e-mission-choice', ['ionic'])
         // when the response is available
       }).
       error(function(data, status, headers, config) {
-        // alert("call error");
+        alert("call error");
         // called asynchronously if an error occurs
         // or server returns response with an error status.
       });
@@ -88,6 +88,28 @@ angular.module('e-mission-choice', ['ionic'])
 
   $scope.onRefresh = function() {
     // alert("DataCtrl.ON REFRESH");
+    console.log('ON REFRESH');
+
+    $timeout(function() {
+      $scope.$broadcast('scroll.refreshComplete');
+    }, 10000);
+  }
+})
+
+.controller('CommonTripsCtrl', function($scope, $http, $window, $timeout, $ionicModal,
+        $ionicActionSheet, $ionicTabsDelegate) {
+  // alert("CommonTripsCtrl called");
+
+  $scope.onCommonTripsClicked = function() {
+    $scope.setCurrChoice("commontrips")
+  }
+
+  $scope.onCommonTripsSelected = function() {
+    console.log("Common trip tab selected");
+  }
+
+  $scope.onRefresh = function() {
+    // alert("CommonTripsCtrl.ON REFRESH");
     console.log('ON REFRESH');
 
     $timeout(function() {

@@ -9,6 +9,7 @@ from uuid import UUID
 import time
 from clients.gamified import gamified
 from clients.data import data
+from clients.commontrips import commontrips
 
 # TODO: Consider subclassing to provide client specific user functions
 def setCurrView(uuid, newView):
@@ -45,13 +46,14 @@ def getResult(user_uuid):
 
   user = User.fromUUID(user_uuid)
   renderedTemplate = template("clients/choice/result_template.html",
-                          variables = json.dumps({'curr_view': getCurrView(user_uuid),
-                                       'uuid': str(user_uuid),
-                                       'client_key': Client("choice").getClientKey()}),
-                          gameResult = base64.b64encode(gamified.getResult(user_uuid)),
-                          dataResult = base64.b64encode(default.getResult(user_uuid)))
+                              variables = json.dumps({'curr_view': getCurrView(user_uuid),
+                                                      'uuid': str(user_uuid),
+                                                      'client_key': Client("choice").getClientKey()}),
+                              gameResult = base64.b64encode(gamified.getResult(user_uuid)),
+                              dataResult = base64.b64encode(data.getResult(user_uuid)),
+                              commonTripsResult = base64.b64encode(commontrips.getResult(user_uuid)))
   return renderedTemplate
-
+  
 # These are copy/pasted from our first client, the carshare study
 def getSectionFilter(uuid):
   # We are not planning to do any filtering for this study. Bring on the worst!

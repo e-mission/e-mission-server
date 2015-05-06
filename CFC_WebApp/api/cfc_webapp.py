@@ -297,6 +297,7 @@ def postCarbonCompare():
 
 @get('/compare')
 def getCarbonCompare():
+  from clients.choice import choice
   for key, val in request.headers.items():
     print("  %s: %s" % (key, val))
 
@@ -308,7 +309,8 @@ def getCarbonCompare():
 
   user_uuid = getUUID(request, inHeader=True)
   print ('UUID', user_uuid)
-
+  # TODO: Fix getClientSpecificResult so there is no need to return early
+  return choice.getResult(user_uuid)
   clientResult = userclient.getClientSpecificResult(user_uuid)
   if clientResult != None:
     logging.debug("Found overriding client result for user %s, returning it" % user_uuid)
