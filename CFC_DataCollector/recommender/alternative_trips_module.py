@@ -1,8 +1,10 @@
-from common import find_perturbed_trips, initialize_empty_perturbed_trips, update_perturbations 
-from trip import E_Mission_Trip
+#from common import find_perturbed_trips, initialize_empty_perturbed_trips, update_perturbations 
+from trip import *
+from tripiterator import TripIterator
 #from get_database import get_perturbed_trips_db
 from get_database import *
 from query_scheduler_pipeline import schedule_queries
+from filter_modules import AlternativesNotFound
 
 #import Profiles
 
@@ -22,40 +24,29 @@ Overview of helper files relevant to this pipeline:
     -database_util.py -> contains all the helper methods to abstract out interaction with the database
 """
 
-
 # Invoked in recommendation pipeline to get perturbed trips user should consider
-def calc_alternative_trips(trip_iterator):
-    for curr_trip in trip_iterator:
-        if not curr_trip.pipelineFlags.alternativesStarted:
-            curr_trip.pipelineFlags.startAlternatives()
-            curr_unique_id = curr_trip._id
-            list_of_perturbed_trips = find_perturbed_trips(curr_trip)
-            initialize_empty_perturbed_trips(curr_unique_id, get_perturbed_trips_db())
-            schedule_queries(curr_unique_id, list_of_perturbed_trips)
+def calc_alternative_trips(user_trips, immediate):
+    stagger = 1
+    total_stagger = 0
+    for existing_trip in user_trips:
+        #if not existing_trip.pipelineFlags.alternativesStarted:
+        existing_trip.pipelineFlags.startAlternatives()
+        existing_trip.pipelineFlags.savePipelineFlags()
+        if immediate:
+            schedule_queries(existing_trip.trip_id, existing_trip.user_id, [existing_trip], immediate, total_stagger)
+            total_stagger += stagger
+        else:
+            schedule_queries(existing_trip.trip_id, existing_trip.user_id, [existing_trip], immediate)
 
-#@TODO: put these methods in database_util.py
-#@TODO: These stubs need to be passed in a unique id as well as a trip ppboject
-#when we store in the database, they need to be able to associate the perturbed trips back to the original trip, 
-#otherwise the query made by the utility model team will be very difficult
-
-def store_alternative_trips(tripObj):
-    # store populated tripObj with _id (concatenated trip id and user id)
-    db = get_alternative_trips_db()
-    _id = tripObj.get_id()
-    db.insert_one({_id : tripObj})
-
-def get_alternative_trips(_id):
+def get_alternative_trips(trip_it):
     # User Utility Pipeline calls this to get alternatve trips for one original trip (_id)
-    # db = get_alternative_trips_db()
-    # _id = tripObj.get_id()
-    # return db.find(_id)
-    return [trip.E_Mission_Trip.trip_from_json(jsonStr) for jsonStr in get_alternative_trips_db().find({'_id' : _id})].__iter__()
-
-def store_perturbed_trips(tripObj):
-    # store populated tripObj with _id (concatenated trip id and user id)
-    db = get_perturbed_trips_db()
-    _id = tripObj.get_id()
-    db.insert_one({_id : tripObj})
+    alternatives = []
+    for _trip in trip_it:
+        try:
+            alternatives.append(TripIterator(_trip.trip_id, ["alternatives", "get_alternatives"], Alternative_Trip))
+        except AlternativesNotFound:
+            alternatives.append([])
+    return alternatives
 
 def get_perturbed_trips(_id):
     # User Utility Pipeline calls this to get alternatve trips for one original trip (_id)
