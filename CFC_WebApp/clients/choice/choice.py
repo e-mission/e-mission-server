@@ -1,5 +1,5 @@
 import logging
-from get_database import get_section_db
+from get_database import get_trip_db, get_section_db
 from main import carbon, common, stats
 from datetime import datetime, time, timedelta
 from dao.user import User
@@ -8,6 +8,7 @@ import json
 from uuid import UUID
 import time
 from clients.gamified import gamified
+from clients.recommendation import recommendation
 from clients.data import data
 
 # TODO: Consider subclassing to provide client specific user functions
@@ -44,12 +45,14 @@ def getResult(user_uuid):
   from dao.client import Client
 
   user = User.fromUUID(user_uuid)
+
   renderedTemplate = template("clients/choice/result_template.html",
                           variables = json.dumps({'curr_view': getCurrView(user_uuid),
                                        'uuid': str(user_uuid),
                                        'client_key': Client("choice").getClientKey()}),
                           gameResult = base64.b64encode(gamified.getResult(user_uuid)),
                           dataResult = base64.b64encode(data.getResult(user_uuid)))
+                          recommendationResult = base64.b64encode(recommendation.getResult(user_uuid)))
   return renderedTemplate
 
 # These are copy/pasted from our first client, the carshare study
