@@ -51,7 +51,7 @@ def getResult(user_uuid):
                                        'uuid': str(user_uuid),
                                        'client_key': Client("choice").getClientKey()}),
                           gameResult = base64.b64encode(gamified.getResult(user_uuid)),
-                          dataResult = base64.b64encode(data.getResult(user_uuid)))
+                          dataResult = base64.b64encode(data.getResult(user_uuid)),
                           recommendationResult = base64.b64encode(recommendation.getResult(user_uuid)))
   return renderedTemplate
 
