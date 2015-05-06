@@ -278,7 +278,7 @@ def setStats():
 
 @post('/compare')
 def postCarbonCompare():
-  from clients.default import default
+  from clients.data import data
 
   if request.json == None:
     return "Waiting for user data to become available..."
@@ -292,15 +292,15 @@ def postCarbonCompare():
     logging.debug("Found overriding client result for user %s, returning it" % user_uuid)
     return clientResult
   else:
-    logging.debug("No overriding client result for user %s, returning default" % user_uuid)
-  return default.getResult(user_uuid)
+    logging.debug("No overriding client result for user %s, returning choice " % user_uuid)
+  return choice.getResult(user_uuid)
 
 @get('/compare')
 def getCarbonCompare():
   for key, val in request.headers.items():
     print("  %s: %s" % (key, val))
 
-  from clients.default import default
+  from clients.data import data
 
   if not skipAuth:
     if 'User' not in request.headers or request.headers.get('User') == '':
@@ -314,7 +314,7 @@ def getCarbonCompare():
     logging.debug("Found overriding client result for user %s, returning it" % user_uuid)
     return clientResult
   else:
-    logging.debug("No overriding client result for user %s, returning default" % user_uuid)
+    logging.debug("No overriding client result for user %s, returning choice" % user_uuid)
   return choice.getResult(user_uuid)
 
 # Client related code START
