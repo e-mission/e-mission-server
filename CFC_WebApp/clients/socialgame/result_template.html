@@ -1,0 +1,23 @@
+<!doctype html>
+<html ng-app="e-mission-socialgame">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title>Game Results!</title>
+    <script src="clients/socialgame/front/d3.js" charset="utf-8"></script>
+    <script src="clients/socialgame/front/bullet.js"></script>
+    <script src="clients/choice/front/ionic.bundle.js" charset="utf-8"></script>
+    <script src="clients/socialgame/front/client.socialgame.display.js" charset="utf-8"></script>
+
+    <link rel="stylesheet" href="clients/choice/front/ionic.min.css">
+
+  </head>
+  <body ng-controller="RootCtrl" >
+    <a class="button button-icon icon ion-information-circled" style="color: lightgreen" ng-click="showAlert()"> </a>
+    <div class="item">{{currScore}}</div>
+    <script>
+        var currScore = {{currScore}};
+        var prevScore = {{prevScore}};
+    </script>
+  </body>
+</html>
