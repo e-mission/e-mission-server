@@ -15,9 +15,10 @@ Sections=get_section_db()
 def user_route_data(user_id, database):
     data_feature = {}
 
-    for section in database.find({'$and':[{'user_id': user_id},{'type': 'move'},{'confirmed_mode': {'$ne': ''}}]}):
+    # for section in database.find({'$and':[{'user_id': user_id},{'type': 'move'},{'confirmed_mode': {'$ne': ''}}]}):
+    for section in database.find({'$and':[{'user_id': user_id},{'type': 'move'}]}):
         data_feature[section['_id']] = getRoute(section['_id'])
-
+    #print(data_feature.keys())
     return data_feature
 
 
@@ -27,27 +28,35 @@ def totalCost(data_feature,disMat2,medoids_idx):
     '''
     # Init the cluster
     # print(type(disMat2))
+    #print("I am executing totalCost")
     total_cost = 0.0
     medoids = {}
     for idx in medoids_idx:
         medoids[idx] = []
-
+    #print(medoids)
     # Compute the distance and do the clustering
+ 
     for i in data_feature.keys():
         choice = -1
-        # Make a big number
+    	# Make a big number
         min_cost = float('inf')
 
         for m in medoids_idx:
+            #print(disMat2[m].keys())
+            disMat2[m][i]
+            disMat2[i][m]
             tmp = (disMat2[m][i]+disMat2[i][m])/2
             if tmp < min_cost:
                 choice = m
                 min_cost = tmp
-        # Done the clustering
-        medoids[choice].append(i)
-        total_cost += min_cost
+    	# Done the clustering
+    	medoids[choice].append(i)
+    	total_cost += min_cost
+        #print("TOTAL COST: " + str(total_cost))
 
     # Return the total cost and clustering
+    #print("TOTAL COST")
+    #print(total_cost)
     return(total_cost, medoids)
 
 
@@ -68,8 +77,9 @@ def kmedoids(data_feature, k, user_id,method='lcs'):
     if k >= len(data_feature):
         return (0, [], {})
 
-    disMat_user=get_routeDistanceMatrix_db().find_one({'$and':[{'user':user_id},{'method':method}]})['disMat']
-
+    #disMat_user=get_routeDistanceMatrix_db().find_one({'$and':[{'user':user_id},{'method':method}]})['disMat']
+    disMat_user = get_routeDistanceMatrix_db(user_id, method)
+    #print(len(disMat_user))
     medoids_idx = random.sample([i for i in data_feature.keys()], k)
 
     pre_cost, medoids = totalCost(data_feature,disMat_user,medoids_idx)
@@ -78,10 +88,15 @@ def kmedoids(data_feature, k, user_id,method='lcs'):
     best_choice = []
     best_res = {}
     iter_count = 0
-
+    #print("medoids idx")
+    #print(medoids_idx)
+    #print("medoids")
+    #print(medoids)
     while True:
-        # print(iter_count)
+
         for m in medoids_idx:
+            #print("This is length of medoid_idx")
+            #print(len(medoids_idx))
             for item in medoids[m]:
                 # NOTE: both m and item are idx!
                 if item != m:
@@ -91,6 +106,8 @@ def kmedoids(data_feature, k, user_id,method='lcs'):
                     swap_temp = medoids_idx[idx]
                     medoids_idx[idx] = item
                     tmp_cost, tmp_medoids = totalCost(data_feature,disMat_user,medoids_idx)
+                    #print("inside here")
+                    #print(len(medoids_idx))
                     # Find the lowest cost
                     if tmp_cost < current_cost:
                         best_choice = list(medoids_idx) # Make a copy
@@ -98,6 +115,8 @@ def kmedoids(data_feature, k, user_id,method='lcs'):
                         current_cost = tmp_cost
                     # Re-swap the m and o
                     medoids_idx[idx] = swap_temp
+        #print("This is length of medoid_idx")
+        #print(len(medoids_idx))
         # Increment the counter
         iter_count += 1
 
