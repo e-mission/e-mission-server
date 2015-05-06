@@ -35,8 +35,10 @@ class Trip(object):
         user_id = json_segment.get("user_id")
         trip_id = json_segment.get("trip_id")
         sections = cls._init_sections(user_id, trip_id, len(json_segment.get("sections"))) if json_segment.get("sections") else None
-        start_time = datetime.datetime.strptime(json_segment.get("trip_start_time"), DATE_FORMAT)
-        end_time = datetime.datetime.strptime(json_segment.get("trip_end_time"), DATE_FORMAT)
+        # start_time = datetime.datetime.strptime(json_segment.get("trip_start_time"), DATE_FORMAT)
+        # end_time = datetime.datetime.strptime(json_segment.get("trip_end_time"), DATE_FORMAT)
+        start_time = json_segment.get("trip_start_time")
+        end_time = json_segment.get("trip_end_time")
         trip_start_location = cls._start_location(sections)
         trip_end_location = cls._end_location(sections)
         return cls(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location)
@@ -200,8 +202,9 @@ class E_Mission_Trip(Trip):
 class Canonical_E_Mission_Trip(E_Mission_Trip):
     #if there are no alternatives found, set alternatives list to None 
     def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, 
-                 alternatives, perturbed_trips, mode_list, start_point_distr, end_point_distr, start_time_distr, end_time_distr):
-        super(Canonical_E_Mission_Trip, self).__init__(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location)
+                 alternatives, perturbed_trips, mode_list, start_point_distr, end_point_distr, start_time_distr, end_time_distr, confirmed_mode_list): # added confirmed_mode_list to this constructor
+        super(Canonical_E_Mission_Trip, self).__init__(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, 
+            alternatives, perturbed_trips, mode_list, confirmed_mode_list) # super expects more arguments than this
         self.start_point_distr = start_point_distr
         self.end_point_distr = end_point_distr
         self.start_time_distr = start_time_distr
@@ -214,9 +217,10 @@ class Canonical_E_Mission_Trip(E_Mission_Trip):
         trip.end_point_distr = json_segment.get("end_point_distr")
         trip.start_time_distr = json_segment.get("start_time_distr")
         trip.end_time_distr = json_segment.get("end_time_distr")
+        trip.confirmed_mode_list = json_segment.get("confirmed_mode_list")
         return cls(trip._id, trip.user_id, trip.trip_id, trip.sections, trip.start_time, trip.end_time, trip.trip_start_location, trip.trip_end_location, 
                    trip.alternatives, trip.perturbed_trips, trip.mode_list, trip.start_point_distr, trip.end_point_distr, 
-                   trip.start_time_distr, strip.end_time_distr)
+                   trip.start_time_distr, trip.end_time_distr, trip.confirmed_mode_list)
 
     def save_to_db(self):
         db = get_canonical_trips_db()
