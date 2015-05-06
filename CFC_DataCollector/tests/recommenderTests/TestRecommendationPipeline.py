@@ -51,7 +51,7 @@ class TestRecommendationPipeline(unittest.TestCase):
   def testRetrieveTripsToImprove(self):
     #updated to 15, since I am filtering out places
     trip_list = self.pipeline.get_trips_to_improve(self.testUUID)
-    self.assertEquals(len(trip_list), 5)
+    self.assertEquals(len(trip_list), 15)
     # Trip 20140407T175709-0700 has two sections
 
   def testRecommendTrip(self):
