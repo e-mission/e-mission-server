@@ -29,7 +29,7 @@ class Coordinate:
 
     def __str__(self):
         return self.maps_coordinate()
-    
+
     def __repr__(self):
         return self.maps_coordinate()
 
@@ -143,7 +143,7 @@ class E_Mission_Trip(Trip):
         self.subtype = None
         #Loads or initializes pipeline flags for trip
         self.pipelineFlags = PipelineFlags(self._id)
-        self.recommend_alternative = recommended_alternative
+        self.recommended_alternative = recommended_alternative
 
     @classmethod
     def trip_from_json(cls, json_segment):
@@ -302,7 +302,7 @@ class Alternative_Trip(Trip):
         trip.mode_list = json_segment.get("mode_list")
 
         trip.track_points = json_segment.get("track_points")
-    
+
         trip.trip_start_location = Coordinate(json_segment.get("trip_start_location")[1], json_segment.get("trip_start_location")[0])
         trip.trip_end_location = Coordinate(json_segment.get("trip_end_location")[1], json_segment.get("trip_end_location")[0])
 
