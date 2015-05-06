@@ -1,4 +1,19 @@
 <!doctype html>
+
+<style>
+
+  .alignleft {
+    float: left;
+    font-weight: bold;
+  }
+
+  .alignright {
+    float: right;
+  }
+=
+
+</style>
+
 <html ng-app="e-mission-leaderboard">
   <head>
     <meta charset="utf-8">
@@ -10,56 +25,20 @@
     <script src="clients/leaderboard/front/client.leaderboard.display.js" charset="utf-8"></script>
 
     <link rel="stylesheet" href="clients/choice/front/ionic.min.css">
-    <style>
-        * { margin: 0; padding: 0; }
-        html { 
-            background: url("clients/leaderboard/front/{{level_picture_filename}}") no-repeat center center fixed; 
-            background-repeat: no-repeat;
-            background-position: center center;
-            -webkit-background-size: cover;
-            -moz-background-size: cover;
-            -o-background-size: cover;
-            background-size: cover;
-        }
-    </style>
-    <style>
-        .bullet { font: 10px sans-serif; }
-        .bullet .marker { stroke: red; stroke-width: 4px; }
-        .bullet .submarker { stroke: #000; stroke-width: 2px; }
-        .bullet .tick line { stroke: lightgreen; stroke-width: 1px; }
-        .bullet .tick text { fill: lightgreen }
-        .bullet .range.s0 { fill: #eee; }
-        .bullet .range.s1 { fill: #ddd; }
-        .bullet .range.s2 { fill: #ccc; }
-        .bullet .measure.s0 { fill: lightgreen; }
-        .bullet .measure.s1 { fill: green; }
-        .bullet .title { font-size: 14px; font-weight: bold; }
-        .bullet .subtitle { fill: #999; }
-    </style>
-    <style>
-      .alignleft {
-        float: left;
-      }
-
-      .alignright {
-        float: right;
-      }
-
-      .image div img {
-        width: 50px;
-        height: 50px;
-        float: right;
-      }
-    </style>
   </head>
   <body ng-controller="RootCtrl" >
     <div class="list">
-        <div class="item"> {{currScore}}</div>
-        <div class="item"> {{prevScore}}</div>
+        <div class="item">
+            <div class="alignleft"> You </div>
+            <div class="alignright"> {{currScore}}</div>
+        </div>
+
+        <div class="item" ng-repeat"otherCurrScoreList in otherCurrScoreList">{{otherCurrScoreList}}</div>
     </div>
     <script>
         var currScore = {{currScore}};
         var prevScore = {{prevScore}};
+        var otherCurrScoreList = {{otherCurrScoreList}}
     </script>
   </body>
 </html>

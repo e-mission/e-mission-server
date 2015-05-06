@@ -6,6 +6,8 @@ from datetime import time as dttime
 import time
 from dao.user import User
 import math
+from get_database import get_uuid_db
+from main import userclient
 
 # sb375 is a weekly goal - we convert it to daily by dividing by 7
 sb375DailyGoal = 40.142892/7
@@ -94,6 +96,7 @@ def updateScore(user_uuid):
     updateScoreForDay(user_uuid, today)
 
 def updateScoreForDay(user_uuid, today):
+    pass
     yesterday = today - timedelta(days = 1)
     dayBeforeYesterday = today - timedelta(days = 2)
 
@@ -139,11 +142,17 @@ def getResult(user_uuid):
 
   (prevScore, currScore) = getStoredScore(User.fromUUID(user_uuid))
   (level, sublevel) = getLevel(currScore)
+
+  otherCurrScoreList = []
+  for user_uuid_dict in get_uuid_db().find({}, {'uuid': 1, '_id': 0}):
+            (currPrevScore, currCurrScore) = User.fromUUID(user_uuid_dict['uuid'])
+            otherCurrScoreList.append(currCurrScore)
   
   renderedTemplate = template("clients/socialgame/result_template.html",
                               level_picture_filename = getFileName(level, sublevel),
                               prevScore = prevScore,
-                              currScore = currScore)
+                              currScore = currScore,
+                              otherCurrScoreList = otherCurrScoreList)
   return renderedTemplate
 
 # These are copy/pasted from our first client, the carshare study

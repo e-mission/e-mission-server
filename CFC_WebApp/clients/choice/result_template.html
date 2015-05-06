@@ -14,9 +14,11 @@
         top: 0px;
         padding-top: 0px;
         background-position: center bottom;
+        color:##6ebd97;
     }
     .has-tabs-top {
         top: 49px;
+        color: ##6ebd97;
     }
   </style>
   <body ng-controller="RootCtrl" hide-nav-bar="true">
@@ -27,7 +29,7 @@
     </div>
     -->
     <!-- tabs-top to ensure that the tabs are not hidden on ios4 -->
-    <ion-tabs class="tabs-icon-only tabs-positive tabs-top" hide-nav-bar="true">
+    <ion-tabs class="tabs-icon-only tabs-top" hide-nav-bar="true">
       <ion-tab title="Data" 
                icon="ion-pie-graph" 
                on-select="onDataSelected()"
@@ -41,7 +43,7 @@
         </ion-content>
       </ion-tab>
 
-    <ion-tab title="Leaderboard"
+      <ion-tab title="Leaderboard"
             icon="ion-star"
             on-select="onLeaderboardSelected()"
             ng-click="onLeaderboardClicked()"
@@ -54,7 +56,7 @@
         </ion-content>
       </ion-tab>
 
-    <ion-tab title="Game"
+      <ion-tab title="Game"
             icon="ion-game-controller-b"
             on-select="onGameSelected()"
             ng-click="onGameClicked()"
