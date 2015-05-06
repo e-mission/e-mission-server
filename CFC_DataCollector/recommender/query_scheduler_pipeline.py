@@ -22,9 +22,9 @@ import os
 python_location = sys.executable
 #python_location = '/Users/jeffdh5/Desktop/e-mission/recommender/venv/bin/python'
 #query_script_location = '/Users/jeffdh5/Desktop/e-mission/recommender/query.py'
-query_script_location = os.path.join(os.getcwd(), 'query.py')
+query_script_location = os.path.join(os.getcwd(), 'recommender/query.py')
 
-def schedule_queries(_id, trip_array):
+def schedule_queries(trip_id, user_id, trip_array, immediate=False, stagger=0):
 	#_id: This is the original trip _id
 
 	#start, end must both be represented as strings which contain the latitude and longitude of the location
@@ -36,17 +36,24 @@ def schedule_queries(_id, trip_array):
 
 	#TODO: write regex to enforce that passed in locations are geocoded; i.e. lat1,lon1, lat2,lon2
 	#TODO: this will run every year, need to figure out if python crontab can support yearly configuration so it only runs once
-
 	for trip in trip_array:
 		#start = trip.get_start_coordinates()
 		#end = trip.get_end_coordinates()
 		#time = trip.get_time()
                 start = trip.trip_start_location
                 end = trip.trip_end_location
-                time = trip.start_time
+                if immediate:
+                    time = datetime.datetime.now() + datetime.timedelta(minutes=2) + datetime.timedelta(minutes=stagger)
+                else:
+                    time = trip.start_time
+                '''
+                #TODO: HACK FOR DEMO
+                time = time + datetime.timedelta(days=1)
+                '''
 
+		#cron = CronTab("ubuntu")
 		cron = CronTab()
-		exec_str = python_location + ' ' + query_script_location + ' ' + _id
+		exec_str = python_location + ' ' + query_script_location + ' --trip-id ' + trip_id + ' --user-id ' + str(user_id)
 		job = cron.new(command=exec_str)
 
 		job.month.on(time.month)
@@ -56,7 +63,7 @@ def schedule_queries(_id, trip_array):
 
 		job.enable()
 		cron.write()
-		print("You have successfully scheduled this CRON job.")
+		#print("You have successfully scheduled this CRON job.")
 
 # #Unit Test
 # home = '37.199024,-121.831479'
