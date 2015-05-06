@@ -8,8 +8,10 @@ from user_utility_model import UserUtilityModel
 import numpy as np
 
 class SimpleCostTimeModeModel(UserUtilityModel):
-  def __init__(self, trips_with_alts):
+  def __init__(self, trips_with_alts=None):
     #print "len(trips) = %d, len(alternatives) = %d" % (len(trips), len(alternatives))
+        if trips_with_alts is None:
+            trips_with_alts = []
         super(SimpleCostTimeModeModel, self).__init__(trips_with_alts)
 
   def store_in_db(self, user_id):

@@ -24,11 +24,13 @@ class RecommendationPipeline:
         #return UserUtilityModel.find_from_db(user_id)
         print user_id
         model_json = self.find_from_db(user_id, False)
-        cost_coeff = model_json.get("cost")
-        time_coeff = model_json.get("time")
-        mode_coeff = model_json.get("mode")
-        model2 = EmissionsModel(cost_coeff, time_coeff, mode_coeff, trips_with_alts)
-        return model2
+        if model_json:
+            cost_coeff = model_json.get("cost")
+            time_coeff = model_json.get("time")
+            mode_coeff = model_json.get("mode")
+            model2 = EmissionsModel(cost_coeff, time_coeff, mode_coeff, trips_with_alts)
+            return model2
+        return None
 
     def _evaluate_trip(self, utility_model, trip):
         return utility_model.predict_utility(trip)
@@ -39,15 +41,17 @@ class RecommendationPipeline:
             alternatives = atm.get_alternative_trips(trips_to_improve)
             trips_with_alts = self.prepare_feature_vectors(trips_to_improve, alternatives)
             user_model = self.get_selected_user_utility_model(user_uuid, trips_with_alts)
-            for trip_with_alts in trips_with_alts:
-                original_trip = trip_with_alts[0]
-                recommended_trip = user_model.predict(trip_with_alts)
-                print original_trip.__dict__
-                if original_trip != recommended_trip:
-                    print "recommending"
-                    original_trip.mark_recommended(recommended_trip)
-                else: 
-                    print "Original Trip is best"
+            if user_model:
+                for trip_with_alts in trips_with_alts:
+                    original_trip = trip_with_alts[0]
+                    recommended_trip = user_model.predict(trip_with_alts)
+                    print original_trip.__dict__
+                    if original_trip != recommended_trip:
+                        print "recommending"
+                        original_trip.mark_recommended(recommended_trip)
+                        recommend_trips.append(recommended_trip)
+                    else: 
+                        print "Original Trip is best"
                 
  
     def find_from_db(self, user_id, modified):

@@ -70,9 +70,12 @@ def getCanonicalTrips(uid, number_returned = 10):
 #returns all trips to the user
 def getAllTrips(uid):
     #trips = list(get_trip_db().find({"user_id":uid, "type":"move"}))
-    #TODO: this code, in conjunction with common.py/get_user_id, is not returning all trips for user, but rather one trip at a time
-    d = datetime.datetime.now() - datetime.timedelta(days=6)
-    #query = {'_id':uid, 'type':'move','trip_start_datetime':{"$gt":d}}
+    query = {'user_id':uid, 'type':'move'}
+    return get_trip_db().find(query)
+
+def getAllTrips_Date(uid, dys):
+    #trips = list(get_trip_db().find({"user_id":uid, "type":"move"}))
+    d = datetime.datetime.now() - datetime.timedelta(days=dys)
     query = {'user_id':uid, 'type':'move','trip_start_datetime':{"$gt":d}}
     return get_trip_db().find(query)
 
@@ -81,7 +84,11 @@ def getAllTrips(uid):
 # - trips that have alternatives, and
 # - have not yet been included in a training set
 def getTrainingTrips(uid):
-    d = datetime.datetime.now() - datetime.timedelta(days=6)
+    query = {'user_id':uid, 'type':'move'}
+    return get_trip_db().find(query)
+
+def getTrainingTrips_Date(uid, dys):
+    d = datetime.datetime.now() - datetime.timedelta(days=dys)
     query = {'user_id':uid, 'type':'move','trip_start_datetime':{"$gt":d}, "pipelineFlags":{"$exists":True}}
     #query = {'user_id':uid, 'type':'move','trip_start_datetime':{"$gt":d}}
     #print get_trip_db().find(query).count()
@@ -119,8 +126,8 @@ modules = {
    'recommender': {
         'get_improve': getTrainingTrips
     },
-   #Pertubation Module
-   'pertubation': {},
+   #Perturbation Module
+   'perturbation': {},
    #Alternatives Module
    # note: uses a different collection than section_db
    'alternatives': {

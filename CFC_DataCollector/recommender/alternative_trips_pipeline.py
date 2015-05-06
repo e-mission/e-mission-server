@@ -15,7 +15,7 @@ class AlternativeTripsPipeline:
     def get_trips_for_alternatives(self, user_uuid):
         return ti.TripIterator(user_uuid, ["trips", "get_all"])
 
-    def runPipeline(self, immediate):
+    def runPipeline(self, immediate=False):
         for user_uuid in get_uuid_list():
 	    print "Finding Trips for User: ", uuid_to_name(str(user_uuid)), user_uuid
             trips_with_no_alternatives = self.get_trips_for_alternatives(user_uuid)

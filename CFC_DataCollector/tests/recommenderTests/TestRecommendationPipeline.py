@@ -51,13 +51,14 @@ class TestRecommendationPipeline(unittest.TestCase):
   def testRetrieveTripsToImprove(self):
     #updated to 15, since I am filtering out places
     trip_list = self.pipeline.get_trips_to_improve(self.testUUID)
-    self.assertEquals(len(trip_list), 5)
+    self.assertEquals(len(trip_list), 15)
     # Trip 20140407T175709-0700 has two sections
 
   def testRecommendTrip(self):
-    trip_list = self.pipeline.get_trips_to_improve(self.testUUID)
-    utility_model = self.pipeline.get_selected_user_utility_model(self.testUUID)
-    recommended_trips = self.pipeline.recommend_trips(trip_list[0]._id, utility_model)
+    recommended_trips = self.pipeline.runPipeline()
+    #trip_list = self.pipeline.get_trips_to_improve(self.testUUID)
+    #utility_model = self.pipeline.get_selected_user_utility_model(self.testUUID)
+    #recommended_trips = self.pipeline.recommend_trips(trip_list[0]._id, utility_model)
 
   def testCanonical(self):
     canonical_trip_iter = TripIterator(self.testUUID, ['trips', 'get_canonical']).__iter__()

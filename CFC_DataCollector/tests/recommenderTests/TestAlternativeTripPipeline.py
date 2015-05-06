@@ -69,7 +69,7 @@ class TestAlternativeTripPipeline(unittest.TestCase):
   def testRetrieveAllUserTrips(self):
     #updated to 15 since filtering places
     trip_list = self.pipeline.get_trips_for_alternatives(self.testUUID)
-    self.assertEquals(len(list(trip_list)), 5) 
+    self.assertEquals(len(list(trip_list)), 15) 
     
     # Trip 20140407T175709-0700 has two sections
 
@@ -83,7 +83,8 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     # calc_alternative_trips merely schedules the alternative trip calculation at a later time
     # it can't return the alternative trips right now
     # TODO: Figure out how to get this to work
-    pipeline_module.calc_alternative_trips([firstElement].__iter__())
+    self.pipeline.runPipeline()
+    #pipeline_module.calc_alternative_trips([firstElement].__iter__())
     # self.assertEquals(type(alternative_list), list)
   '''
   def test_initialize_empty_perturbed_trips(self):
@@ -125,7 +126,9 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     first_trip = trip_list.next()
     self.assertEquals(type(first_trip), E_Mission_Trip)
     alternative_list = pipeline_module.get_alternative_trips(trip_list)
-    pipeline_module.store_alternative_trips(alternative_list)
+    for alt in alternative_list:
+        if alt:
+            alt.store_to_db()
     #self.assertGreater(len(list(alternative_list)), 0)
   '''
   def testLoadDatabse(self):

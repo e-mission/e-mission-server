@@ -51,7 +51,8 @@ def schedule_queries(trip_id, user_id, trip_array, immediate=False, stagger=0):
                 time = time + datetime.timedelta(days=1)
                 '''
 
-		cron = CronTab("ubuntu")
+		#cron = CronTab("ubuntu")
+		cron = CronTab()
 		exec_str = python_location + ' ' + query_script_location + ' --trip-id ' + trip_id + ' --user-id ' + str(user_id)
 		job = cron.new(command=exec_str)
 
