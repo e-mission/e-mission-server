@@ -142,17 +142,11 @@ def getResult(user_uuid):
 
   (prevScore, currScore) = getStoredScore(User.fromUUID(user_uuid))
   (level, sublevel) = getLevel(currScore)
-
-  otherCurrScoreList = []
-  for user_uuid_dict in get_uuid_db().find({}, {'uuid': 1, '_id': 0}):
-            (currPrevScore, currCurrScore) = User.fromUUID(user_uuid_dict['uuid'])
-            otherCurrScoreList.append(currCurrScore)
   
   renderedTemplate = template("clients/socialgame/result_template.html",
                               level_picture_filename = getFileName(level, sublevel),
                               prevScore = prevScore,
-                              currScore = currScore,
-                              otherCurrScoreList = otherCurrScoreList)
+                              currScore = currScore)
   return renderedTemplate
 
 # These are copy/pasted from our first client, the carshare study
