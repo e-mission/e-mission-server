@@ -144,8 +144,9 @@ def getResult(user_uuid):
 
    otherCurrScoreList = []
    for user_uuid_dict in get_uuid_db().find({}, {'uuid': 1, '_id': 0}):
-    (currPrevScore, currCurrScore) = getStoredScore(User.fromUUID(user_uuid_dict['uuid']))
-    otherCurrScoreList.append(currCurrScore)
+       (currPrevScore, currCurrScore) = getStoredScore(User.fromUUID(user_uuid_dict['uuid']))
+       otherCurrScoreList.append(currCurrScore)
+
 
    otherCurrScoreList.sort()
    renderedTemplate = template("clients/leaderboard/result_template.html",
