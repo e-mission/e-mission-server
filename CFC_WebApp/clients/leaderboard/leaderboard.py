@@ -138,23 +138,21 @@ def getResult(user_uuid):
   # This is in here, as opposed to the top level as recommended by the PEP
   # because then we don't have to worry about loading bottle in the unit tests
   from bottle import template
+  (prevScore, currScore) = getStoredScore(User.fromUUID(user_uuid))
+  (level, sublevel) = getLevel(currScore)
 
-   (prevScore, currScore) = getStoredScore(User.fromUUID(user_uuid))
-      (level, sublevel) = getLevel(currScore)
+  otherCurrScoreList = []
+  for user_uuid_dict in get_uuid_db().find({}, {'uuid': 1, '_id': 0}):
+    (currPrevScore, currCurrScore) = getStoredScore(User.fromUUID(user_uuid_dict['uuid']))
+    otherCurrScoreList.append(currCurrScore)
 
-   otherCurrScoreList = []
-   for user_uuid_dict in get_uuid_db().find({}, {'uuid': 1, '_id': 0}):
-       (currPrevScore, currCurrScore) = getStoredScore(User.fromUUID(user_uuid_dict['uuid']))
-       otherCurrScoreList.append(currCurrScore)
-
-
-   otherCurrScoreList.sort()
-   renderedTemplate = template("clients/leaderboard/result_template.html",
+  otherCurrScoreList.sort()
+  renderedTemplate = template("clients/leaderboard/result_template.html",
                                level_picture_filename = getFileName(level, sublevel),
                                prevScore = prevScore,
                                currScore = currScore,
                                otherCurrScoreList = otherCurrScoreList)
-   return renderedTemplate
+  return renderedTemplate
 
 # These are copy/pasted from our first client, the carshare study
 def getSectionFilter(uuid):
