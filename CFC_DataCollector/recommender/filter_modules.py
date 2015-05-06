@@ -73,43 +73,6 @@ def getCanonicalTrips(uid): # number returned isnt used
       cluster_json_list.append(json_dict)
     return [trip.Canonical_E_Mission_Trip.trip_from_json(c) for c in cluster_json_list]
 
-    # clusters = c['clusters'] if c else [] 
-    # #assert len(clusters) > 0, ("Could not get any route clusters for user with uid ", uid)
-    # print get_section_db().find({"user_id": uid}).count()
-
-    # if not clusters:
-    #     print "updating route clusters"
-    #     # no clusters found for user, run algorithm to populate database
-    #     routes_user = user_route_data(uid,get_section_db())
-    #     print "routes_user = %s" % routes_user
-    #     update_user_routeDistanceMatrix(uid,routes_user,step1=100000,step2=100000,method='lcs')
-    #     clusters_user = kmedoids(routes_user,int(math.ceil(len(routes_user)/8) + 1),uid,method='lcs')
-    #     print "clusters_users = %s" % str(clusters_user)
-    #     update_user_routeClusters(uid,clusters_user[2],method='lcs')
-    #     #try getting clusters again
-    #     #clusters = get_routeCluster_db().find_one({'$and':[{'user':uid},{'method':'lcs'}]})['clusters']
-    #     c = get_routeCluster_db().find_one({'$and':[{'user':uid},{'method':'lcs'}]})
-    #     clusters = c['clusters'] if c else [] 
-    #     #assert len(clusters) > 0, ("Could not get any route clusters for user with uid ", uid)
-    #     if not clusters:
-    #         #TODO: returns a random ten trips right now if clusters aren't created
-    #         for trip in get_section_db().find({"user_id":uid}):
-    #             if x <= number_returned:
-    #                 canonical_trip_list.append(trip)
-    #                 x+=1
-
-    #         return iter(canonical_trip_list)
-
-    # # sort user route clusters to get most popular trips
-    # print "After constructing clusters, list is %s" % clusters
-    # sorted_clusters = sorted(clusters, key=lambda cluster_key: len(user_route_clusters[cluster_key]), reverse=True)
-    # for cid in sorted_clusters:
-    #     if x <= number_returned:
-    #         canonical_trip_list.append(random.choice(user_route_clusters[cid]))
-    #         x+=1
-
-    # return iter(canonical_trip_list)
-
 #returns all trips to the user
 def getAllTrips(uid):
     #trips = list(get_trip_db().find({"user_id":uid, "type":"move"}))
