@@ -14,8 +14,6 @@ class PrecomputeResults:
         pass
 
     def precomputeResults(self):
-        # TODO: Ensure that the default client is "default", which will make
-        # life much easier overall
         for user_uuid_dict in get_uuid_db().find({}, {'uuid': 1, '_id': 0}):
             logging.info("Computing precomputed results for %s" % user_uuid_dict['uuid'])
             userclient.runClientSpecificBackgroundTasks(user_uuid_dict['uuid'])

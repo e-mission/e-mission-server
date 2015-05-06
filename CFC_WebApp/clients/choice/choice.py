@@ -49,7 +49,7 @@ def getResult(user_uuid):
                                        'uuid': str(user_uuid),
                                        'client_key': Client("choice").getClientKey()}),
                           gameResult = base64.b64encode(gamified.getResult(user_uuid)),
-                          dataResult = base64.b64encode(default.getResult(user_uuid)))
+                          dataResult = base64.b64encode(data.getResult(user_uuid)))
   return renderedTemplate
 
 # These are copy/pasted from our first client, the carshare study
@@ -74,4 +74,4 @@ def runBackgroundTasks(uuid):
 
 def runBackgroundTasksForDay(uuid, today):
   gamified.runBackgroundTasksForDay(uuid, today)
-  default.runBackgroundTasksForDay(uuid, today)
+  data.runBackgroundTasksForDay(uuid, today)
