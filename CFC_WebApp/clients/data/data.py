@@ -35,7 +35,7 @@ def getResult(user_uuid):
      myOptimalCarbonFootprint, avgOptimalCarbonFootprint,
      myOptimalCarbonFootprintNoLongMotorized, avgOptimalCarbonFootprintNoLongMotorized) = currFootprint
 
-  renderedTemplate = template("compare.html",
+  renderedTemplate = template("clients/data/result_template.html",
                       myModeShareCount = json.dumps(myModeShareCount),
                       avgModeShareCount = json.dumps(avgModeShareCount),
                       myModeShareDistance = json.dumps(myModeShareDistance),

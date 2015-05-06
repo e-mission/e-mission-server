@@ -8,8 +8,8 @@ import json
 from uuid import UUID
 import time
 from clients.gamified import gamified
-from clients.default import default
 from clients.recommendation import recommendation
+from clients.data import data
 
 # TODO: Consider subclassing to provide client specific user functions
 def setCurrView(uuid, newView):
