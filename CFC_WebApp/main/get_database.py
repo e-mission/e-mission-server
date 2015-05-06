@@ -1,6 +1,8 @@
 
 from pymongo import MongoClient
-
+import os
+import os.path
+import json
 
 def get_mode_db():
     current_db = MongoClient().Stage_database
@@ -37,10 +39,37 @@ def get_profile_db():
     Profiles=current_db.Stage_Profiles
     return Profiles
 
+"""
 def get_routeDistanceMatrix_db():
     current_db=MongoClient().Stage_database
     routeDistanceMatrix=current_db.Stage_routeDistanceMatrix
     return routeDistanceMatrix
+"""
+
+def get_routeDistanceMatrix_db(user_id, method):
+    if not os.path.exists('routeDistanceMatrices'):
+        os.makedirs('routeDistanceMatrices')
+    
+    routeDistanceMatrix = {}
+
+    user_id = str(user_id)
+    if not os.path.exists('routeDistanceMatrices/' + user_id + '_' + method + '_routeDistanceMatrix.json'):
+        data = {}
+        f = open('routeDistanceMatrices/' + user_id + '_' + method + '_routeDistanceMatrix.json', 'w+')
+        f.write(json.dumps({}))
+        f.close()
+    else:
+        f = open('routeDistanceMatrices/' + user_id + '_' + method + '_routeDistanceMatrix.json', 'r')
+        routeDistanceMatrix = json.loads(f.read())
+    return routeDistanceMatrix
+
+def update_routeDistanceMatrix_db(user_id, method, updatedMatrix):
+    user_id = str(user_id)
+    f = open('routeDistanceMatrices/' + user_id + '_' + method + '_routeDistanceMatrix.json', 'w+')
+    f.write(json.dumps(updatedMatrix))
+    f.close()
+    return updatedMatrix   
+
 
 def get_client_db():
     current_db=MongoClient().Stage_database
@@ -51,6 +80,11 @@ def get_routeCluster_db():
     current_db=MongoClient().Stage_database
     routeCluster=current_db.Stage_routeCluster
     return routeCluster
+
+def get_groundClusters_db():
+    current_db=MongoClient().Stage_database
+    groundClusters=current_db.Stage_groundClusters
+    return groundClusters
 
 def get_pending_signup_db():
     current_db=MongoClient().Stage_database
