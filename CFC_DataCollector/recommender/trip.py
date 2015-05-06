@@ -63,11 +63,10 @@ class Trip(object):
 
 class Section(object):
 
-    def __init__(self, _id, trip_id, distance, section_type, start_time, end_time, section_start_location, section_end_location, mode, confirmed_mode):
+    def __init__(self, _id, trip_id, distance, start_time, end_time, section_start_location, section_end_location, mode, confirmed_mode):
         self._id = _id
         self.trip_id = trip_id
         self.distance = distance
-        self.section_type = section_type
         self.start_time = start_time
         self.end_time = end_time
         self.section_start_location = section_start_location
@@ -76,37 +75,25 @@ class Section(object):
         self.confirmed_mode = confirmed_mode
 
     @classmethod
-    def _date_from_json(cls, datetimeObj, dateString):
-        if datetimeObj is not None:
-            return datetimeObj
-        else:
-            if dateString is not None:
-                return datetime.datetime.strptime(dateString, DATE_FORMAT)
-            else:
-                return None
-
-    @classmethod
     def section_from_json(cls, json_segment):
         _id = json_segment.get("_id")
         trip_id = json_segment.get("trip_id")
         distance = json_segment.get("distance")
-        start_time = cls._date_from_json(json_segment.get("section_start_datetime"),
-                                         json_segment.get("section_start_time"))
-        end_time = cls._date_from_json(json_segment.get("section_end_datetime"),
-                                       json_segment.get("section_end_time"))
-        section_start_location = cls._location_from_json(json_segment.get("section_start_point"))
-        section_end_location = cls._location_from_json(json_segment.get("section_end_point"))
-        section_type = json_segment.get("type")
+        start_time = datetime.datetime.strptime(json_segment.get("section_start_time"), DATE_FORMAT)
+        end_time = datetime.datetime.strptime(json_segment.get("section_end_time"), DATE_FORMAT)
+        section_start_location = cls._start_location(json_segment.get("track_points"))
+        section_end_location = cls._end_location(json_segment.get("track_points"))
         mode = json_segment.get("mode")
         confirmed_mode = json_segment.get("confirmed_mode")
-        return cls(_id, trip_id, distance, section_type, start_time, end_time, section_start_location, section_end_location, mode, confirmed_mode)
+        return cls(_id, trip_id, distance, start_time, end_time, section_start_location, section_end_location, mode, confirmed_mode)
 
     @classmethod
-    def _location_from_json(cls, locationJSON):
-        if locationJSON is None:
-            return None
-        else:
-            return Coordinate(locationJSON["coordinates"][1], locationJSON["coordinates"][0])
+    def _start_location(cls, points):
+        return Coordinate(points[0]["track_location"]["coordinates"][1], points[0]["track_location"]["coordinates"][0]) if points else None
+
+    @classmethod
+    def _end_location(cls, points):
+        return Coordinate(points[-1]["track_location"]["coordinates"][1], points[-1]["track_location"]["coordinates"][0]) if points else None
 
     def save_to_db(self):
         db = get_section_db()
