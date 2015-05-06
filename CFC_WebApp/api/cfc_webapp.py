@@ -292,8 +292,8 @@ def postCarbonCompare():
     logging.debug("Found overriding client result for user %s, returning it" % user_uuid)
     return clientResult
   else:
-    logging.debug("No overriding client result for user %s, returning data" % user_uuid)
-  return data.getResult(user_uuid)
+    logging.debug("No overriding client result for user %s, returning choice " % user_uuid)
+  return choice.getResult(user_uuid)
 
 @get('/compare')
 def getCarbonCompare():
