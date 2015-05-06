@@ -299,7 +299,7 @@ def getCarbonCompare():
     print("  %s: %s" % (key, val))
 
   from clients.default import default
-  
+
   if 'User' not in request.headers or request.headers.get('User') == '':
     return "Waiting for user data to become available..."
 
@@ -456,7 +456,7 @@ else:
   # running on localhost but still want to run without authentication. That is
   # not really an important use case now, and it makes people have to change
   # two values and increases the chance of bugs. So let's key the auth skipping from this as well.
-  skipAuth = True
+  skipAuth = False
   print "Running with HTTPS turned OFF, skipAuth = True"
 
   run(host=server_host, port=server_port, server='cherrypy', debug=True)
