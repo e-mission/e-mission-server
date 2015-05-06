@@ -1,5 +1,5 @@
 import logging
-from get_database import get_section_db
+from get_database import get_trip_db, get_section_db
 from main import carbon, common, stats
 from datetime import datetime, time, timedelta
 from dao.user import User
@@ -10,6 +10,9 @@ import time
 from clients.socialgame import socialgame
 from clients.leaderboard import leaderboard
 from clients.default import default
+from clients.gamified import gamified
+from clients.recommendation import recommendation
+from clients.data import data
 
 # TODO: Consider subclassing to provide client specific user functions
 def setCurrView(uuid, newView):
@@ -45,14 +48,24 @@ def getResult(user_uuid):
   from dao.client import Client
 
   user = User.fromUUID(user_uuid)
+<<<<<<< HEAD
   print "I am the social game"
+=======
+
+>>>>>>> 954e2660cea7e9a75677e848e5da6d2247b3517c
   renderedTemplate = template("clients/choice/result_template.html",
                           variables = json.dumps({'curr_view': getCurrView(user_uuid),
                                        'uuid': str(user_uuid),
                                        'client_key': Client("choice").getClientKey()}),
+<<<<<<< HEAD
                           gameResult = base64.b64encode(socialgame.getResult(user_uuid)),
                           leaderboardResult = base64.b64encode(leaderboard.getResult(user_uuid)),
                           dataResult = base64.b64encode(default.getResult(user_uuid)))
+=======
+                          gameResult = base64.b64encode(gamified.getResult(user_uuid)),
+                          dataResult = base64.b64encode(data.getResult(user_uuid)),
+                          recommendationResult = base64.b64encode(recommendation.getResult(user_uuid)))
+>>>>>>> 954e2660cea7e9a75677e848e5da6d2247b3517c
   return renderedTemplate
 
 # These are copy/pasted from our first client, the carshare study
@@ -76,6 +89,11 @@ def runBackgroundTasks(uuid):
   runBackgroundTasksForDay(uuid, today)
 
 def runBackgroundTasksForDay(uuid, today):
+<<<<<<< HEAD
   socialgame.runBackgroundTasksForDay(uuid, today)
   leaderboard.runBackgroundTasksForDay(uuid, today)
   default.runBackgroundTasksForDay(uuid, today)
+=======
+  gamified.runBackgroundTasksForDay(uuid, today)
+  data.runBackgroundTasksForDay(uuid, today)
+>>>>>>> 954e2660cea7e9a75677e848e5da6d2247b3517c

@@ -154,10 +154,13 @@ class ModeInferencePipeline:
 
       # So we limit the records to the size of the matrix that we have created
       for (i, section) in enumerate(self.confirmedSections.limit(featureMatrix.shape[0]).batch_size(300)):
-        self.updateFeatureMatrixRowWithSection(featureMatrix, i, section)
-        resultVector[i] = self.getGroundTruthMode(section)
-        if i % 100 == 0:
-            logging.debug("Processing record %s " % i)
+        try:
+            self.updateFeatureMatrixRowWithSection(featureMatrix, i, section)
+            resultVector[i] = self.getGroundTruthMode(section)
+            if i % 100 == 0:
+                logging.debug("Processing record %s " % i)
+        except Exception, e:
+            logging.debug("skipping section %s due to error %s " % (section, e))
       return (featureMatrix, resultVector)
 
   def getGroundTruthMode(self, section):
