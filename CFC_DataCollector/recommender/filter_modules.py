@@ -8,8 +8,10 @@ import sys
 import os
 import math
 import datetime
+import logging
 sys.path.append("%s" % os.getcwd())
 sys.path.append("%s/../../CFC_WebApp/" % os.getcwd())
+logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', level=logging.DEBUG)
 
 from main.K_medoid_2 import kmedoids, user_route_data
 from main.route_matching import update_user_routeDistanceMatrix, update_user_routeClusters
@@ -54,6 +56,11 @@ def getCanonicalTrips(uid): # number returned isnt used
     #clusters = get_routeCluster_db().find_one({'$and':[{'user':uid},{'method':'lcs'}]})
     # c = get_routeCluster_db().find_one({'$and':[{'user':uid},{'method':'lcs'}]})
 
+    logging.debug('UUID for canonical %s' % uid)
+    if uid == 'myuuidisverylongandcomplicated':
+        #TODO: How should this be handled?
+        logging.debug('Testing UUID found: %s' % uid)
+        return
     info = get_clusters_info(UUID(uid))
     cluster_json_list = []
     for cluster in info:
