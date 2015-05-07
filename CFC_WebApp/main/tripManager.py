@@ -72,14 +72,15 @@ def queryUnclassifiedSections(uuid):
 
     # totalUnclassifiedSections are for debugging only, can remove after we know that this works well
     totalUnclassifiedSections=Sections.find({"$and":[ {'source':'Shankari'},
+                                                 {'user_id':user_uuid},
                                                  {'confirmed_mode': ''},
                                                  { 'type': 'move' }]})
 
     unclassifiedSectionCount = unclassifiedSections.count()
     totalUnclassifiedSectionCount = totalUnclassifiedSections.count()
 
-    print('Unsec.count = %s' % unclassifiedSectionCount)
-    print('Total Unsec.count = %s' % totalUnclassifiedSectionCount)
+    logging.debug('Unsec.count = %s' % unclassifiedSectionCount)
+    logging.debug('Total Unsec.count = %s' % totalUnclassifiedSectionCount)
     # Keep track of what percent of sections are stripped out.
     # Sections can be stripped out for various reasons:
     # - they are too old
