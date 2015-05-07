@@ -28,19 +28,28 @@ from main.get_database import get_routeCluster_db, get_section_db
 def get_clusters_info(uid):
         c_db = get_routeCluster_db()
         s_db = get_section_db()
-        x = c_db.find_one({"clusters":{"$exists":True}, "user": uid})["clusters"].values()
+        clusterJson = c_db.find_one({"clusters":{"$exists":True}, "user": uid})
+        if clusterJson is None:
+            return []
         c_info = []
+        x = clusterJson["clusters"].values() 
         for col in x:
                 y = [[] for _ in range(5)]
                 for cluster in col:
                         info = s_db.find_one({"_id":cluster})
-                        y[0].append(info["section_start_datetime"])
-                        y[1].append(info["section_end_datetime"])
-                        y[2].append(info["section_start_point"]["coordinates"])
-                        y[3].append(info["section_end_point"]["coordinates"])
-                        y[4].append(info["confirmed_mode"])
+                        appendIfPresent(y[0], info, "section_start_datetime")
+                        appendIfPresent(y[1], info, "section_end_datetime")
+                        appendIfPresent(y[2], info, "section_start_point")
+                        appendIfPresent(y[3], info, "section_end_point")
+                        appendIfPresent(y[4], info, "confirmed_mode")
                 c_info += [y]
         return c_info
+
+def appendIfPresent(list,element,key):
+    if element is not None and key in element:
+        list.append(element[key])
+    else:
+        logging.debug("not appending element %s with key %s" % (element, key))
 
 class AlternativesNotFound(Exception):
     def __init__(self, value):
@@ -50,6 +59,9 @@ class AlternativesNotFound(Exception):
 
 #returns the top trips for the user, defaulting to the top 10 trips
 def getCanonicalTrips(uid): # number returned isnt used
+    """
+        uid is a UUID object, not a string
+    """
     # canonical_trip_list = []
     # x = 0
     # if route clusters return nothing, then get common routes for user
@@ -57,11 +69,7 @@ def getCanonicalTrips(uid): # number returned isnt used
     # c = get_routeCluster_db().find_one({'$and':[{'user':uid},{'method':'lcs'}]})
 
     logging.debug('UUID for canonical %s' % uid)
-    if uid == 'myuuidisverylongandcomplicated':
-        #TODO: How should this be handled?
-        logging.debug('Testing UUID found: %s' % uid)
-        return
-    info = get_clusters_info(UUID(uid))
+    info = get_clusters_info(uid)
     cluster_json_list = []
     for cluster in info:
       json_dict = dict()
@@ -71,7 +79,9 @@ def getCanonicalTrips(uid): # number returned isnt used
       json_dict["end_time_distr"] = cluster[1]
       json_dict["confirmed_mode_list"] = cluster[4]
       cluster_json_list.append(json_dict)
-    return [trip.Canonical_E_Mission_Trip.trip_from_json(c) for c in cluster_json_list]
+    toRet = cluster_json_list
+    print "About to return list %s" % toRet
+    return toRet.__iter__()
 
 #returns all trips to the user
 def getAllTrips(uid):
@@ -130,7 +140,7 @@ modules = {
     },
    # Recommender Module
    'recommender': {
-        'get_improve': getTrainingTrips
+        'get_improve': getCanonicalTrips
     },
    #Perturbation Module
    'perturbation': {},
