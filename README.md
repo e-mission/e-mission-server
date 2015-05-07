@@ -18,14 +18,10 @@ ensure reasonable performance.
 -------------------
 
 ### Database: ###
-<<<<<<< HEAD
-1. Install [Mongodb](http://www.mongodb.org/) (For Windows: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-windows/)
-=======
 1. Install [Mongodb](http://www.mongodb.org/) (Note: mongodb appears to be installed as a service on Windows devices and it starts automatically on reboot)
 Note: If you are using OSX: You want to install homebrew and then use homebrew to install mongodb. Follow these instruction on how to do so ---> (http://docs.mongodb.org/manual/tutorial/install-mongodb-on-os-x/)
 
->>>>>>> 17ecaf3702bdca7dc2a9c7faaf611b71cff71dc8
-1. Start it at the default port
+2. Start it at the default port
     $ mongod
 Ubuntu: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
 

@@ -47,6 +47,7 @@
               for (var i = numItems; i > 0; i--){
                   var listItemContainer = document.createElement("li");
                   listItemContainer.className = "item";
+                  listItemContainer.style.backgroundColor = "#d3d3d3";
                   var listItem = document.createElement("i");
                   listElement.appendChild(listItemContainer);
                   listItem.innerHTML = otherCurrScoreList[i-1];
@@ -55,6 +56,7 @@
                   if((currScore >= otherCurrScoreList[i-1]) && insert < 1){
                           var scoreContainer = document.createElement("li");
                           scoreContainer.className = "item";
+                          scoreContainer.style.backgroundColor="#7ebd96";
                           listElement.appendChild(scoreContainer);
                           var yourScore = document.createElement("i");
                           yourScore.innerHTML = currScore;
@@ -79,6 +81,7 @@
                   if (i == 1 && insert < 1){
                       var scoreContainer = document.createElement("li");
                       scoreContainer.className="item";
+                      scoreContainer.style.backgroundColor="#7ebd96";
                       listElement.appendChild(scoreContainer);
                       var yourScore = document.createElement("i");
                       yourScore.innerHTML = currScore;
