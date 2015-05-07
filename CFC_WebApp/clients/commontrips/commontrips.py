@@ -6,15 +6,15 @@ import sys, os, random
 # This is in here so the pygmaps associated functions can be imported 
 # from the webapp
 # sys.path.append("%s/../../CFC_WebApp/" % os.getcwd())
-# This is in here so the getCanonicalTrips function can be imported 
-# from the recommender pipeline
-sys.path.append("%s/../CFC_DataCollector/" % os.getcwd())
 from uuid import UUID 
     
 def getUserTour(user_uuid):
     """
     Gets a users "tour"
     """
+    # This is in here so the getCanonicalTrips function can be imported 
+    # from the recommender pipeline
+    sys.path.append("%s/../CFC_DataCollector/" % os.getcwd())
     from recommender.filter_modules import getCanonicalTrips
     canonical_trips = getCanonicalTrips(user_uuid, get_representative=True)
     for rep, cluster in canonical_trips:
@@ -24,6 +24,7 @@ def getUserTour(user_uuid):
         # print(cluster.end_time_distr)
         print rep['_id']
     canonical_trips = map(lambda x: x[0], canonical_trips)
+    sys.path.remove("%s/../CFC_DataCollector/" % os.getcwd())
 
     print "Number of canonical_trips: %i" % len(canonical_trips)
     return canonical_trips
