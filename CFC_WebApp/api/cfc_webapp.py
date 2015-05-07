@@ -280,7 +280,6 @@ def setStats():
 def postCarbonCompare():
   from clients.data import data
   from clients.choice import choice
-  from clients.recommendation import recommendation
 
   if request.json == None:
     return "Waiting for user data to become available..."
