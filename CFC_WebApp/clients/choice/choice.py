@@ -46,7 +46,8 @@ def getResult(user_uuid):
   from dao.user import User
   from dao.client import Client
 
-  user_uuid = "6433c8cf-c4c5-3741-9144-5905379ece6e"
+  # TODO: remove this hardcoded uuid
+  # user_uuid = "6433c8cf-c4c5-3741-9144-5905379ece6e"
   user = User.fromUUID(user_uuid)
   renderedTemplate = template("clients/choice/result_template.html",
                               variables = json.dumps({'curr_view': getCurrView(user_uuid),

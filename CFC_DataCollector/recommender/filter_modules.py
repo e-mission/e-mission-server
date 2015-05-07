@@ -32,14 +32,19 @@ def get_clusters_info(uid):
         c_info = []
         for col in x:
                 y = [[] for _ in range(5)]
+                first = True
                 for cluster in col:
                         info = s_db.find_one({"_id":cluster})
+                        if first:
+                                representative_trip = info
+                                first = False
                         y[0].append(info["section_start_datetime"])
                         y[1].append(info["section_end_datetime"])
                         y[2].append(info["section_start_point"]["coordinates"])
                         y[3].append(info["section_end_point"]["coordinates"])
                         y[4].append(info["confirmed_mode"])
-                c_info += [y]
+                #TODO: Improve representative_trip so it is not just the last trip in the cluster
+                c_info.append((y, representative_trip))
         return c_info
 
 class AlternativesNotFound(Exception):
@@ -49,7 +54,7 @@ class AlternativesNotFound(Exception):
         return repr(self.value)
 
 #returns the top trips for the user, defaulting to the top 10 trips
-def getCanonicalTrips(uid): # number returned isnt used
+def getCanonicalTrips(uid, get_representative=False): # number returned isnt used
     # canonical_trip_list = []
     # x = 0
     # if route clusters return nothing, then get common routes for user
@@ -61,16 +66,23 @@ def getCanonicalTrips(uid): # number returned isnt used
         #TODO: How should this be handled?
         logging.debug('Testing UUID found: %s' % uid)
         return
-    info = get_clusters_info(UUID(uid))
+    if type(uid) == str: 
+            uid = UUID(uid)
+    info = get_clusters_info(uid)
     cluster_json_list = []
-    for cluster in info:
+    for cluster,representative_trip in info:
       json_dict = dict()
+      json_dict["representative_trip"] = representative_trip
       json_dict["start_point_distr"] = cluster[2]
       json_dict["end_point_distr"] = cluster[3]
       json_dict["start_time_distr"] = cluster[0]
       json_dict["end_time_distr"] = cluster[1]
       json_dict["confirmed_mode_list"] = cluster[4]
       cluster_json_list.append(json_dict)
+    if get_representative:
+        # TODO Actually use trip_from_json constructor for E_Mission_Trip currently failing. See TODO in recommender/trip.py
+        return map(lambda c: (c["representative_trip"], trip.Canonical_E_Mission_Trip.trip_from_json(c)), cluster_json_list)
+        
     return [trip.Canonical_E_Mission_Trip.trip_from_json(c) for c in cluster_json_list]
 
 #returns all trips to the user

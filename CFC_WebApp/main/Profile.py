@@ -22,6 +22,7 @@ def update_profiles(dummy_users=False):
         user_list = get_section_db().distinct('user_id')
     for user in user_list:
         generate_user_home_work(user)    
+        generate_route_clusters(user)
 
 def generate_user_home_work(user):
     user_home=detect_home(user)
@@ -76,4 +77,3 @@ def _check_zip_validity(user_home, user):
 
 if __name__ == '__main__':
     update_profiles()
-
