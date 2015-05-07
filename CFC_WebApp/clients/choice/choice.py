@@ -10,7 +10,6 @@ import time
 from clients.gamified import gamified
 from clients.data import data
 from clients.commontrips import commontrips
-from clients.default import default
 from clients.recommendation import recommendation
 
 # TODO: Consider subclassing to provide client specific user functions
