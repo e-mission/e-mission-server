@@ -260,7 +260,12 @@ class Canonical_E_Mission_Trip(E_Mission_Trip):
 
     @classmethod
     def trip_from_json(cls, json_segment):
-        trip = E_Mission_Trip.trip_from_json(json_segment)
+        trip = E_Mission_Trip.trip_from_json(json_segment.get("representative_trip"))
+        # TODO Actually use trip_from_json constructor for E_Mission_Trip currently failing. Uncomment next 3 lines to see that trip.sections is None after construction. 
+        # print trip.__dict__.items()
+        # print 'printing sections'
+        # print trip.sections        
+
         trip.start_point_distr = json_segment.get("start_point_distr")
         trip.end_point_distr = json_segment.get("end_point_distr")
         trip.start_time_distr = json_segment.get("start_time_distr")

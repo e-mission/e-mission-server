@@ -297,23 +297,27 @@ def postCarbonCompare():
 
 @get('/compare')
 def getCarbonCompare():
+  from clients.choice import choice
   for key, val in request.headers.items():
     print("  %s: %s" % (key, val))
 
   from clients.default import default
 
-  if 'User' not in request.headers or request.headers.get('User') == '':
-    return "Waiting for user data to become available..."
+  if not skipAuth:
+    if 'User' not in request.headers or request.headers.get('User') == '':
+        return "Waiting for user data to become available..."
 
   user_uuid = getUUID(request, inHeader=True)
   print ('UUID', user_uuid)
+  # TODO: Fix getClientSpecificResult so there is no need to return early
+  return choice.getResult(user_uuid)
   clientResult = userclient.getClientSpecificResult(user_uuid)
   if clientResult != None:
     logging.debug("Found overriding client result for user %s, returning it" % user_uuid)
     return clientResult
   else:
     logging.debug("No overriding client result for user %s, returning default" % user_uuid)
-  return default.getResult(user_uuid)
+  return choice.getResult(user_uuid)
 
 # Client related code START
 @post("/client/<clientname>/<method>")
@@ -418,8 +422,6 @@ def verifyUserToken(token):
     logging.debug("Found user email %s" % tokenFields['email'])
     return tokenFields['email']
 
-
-
 def getUUIDFromToken(token):
     userEmail = verifyUserToken(token)
     user=User.fromEmail(userEmail)
@@ -433,11 +435,7 @@ def getUUID(request, inHeader=False):
   if skipAuth:
     from uuid import UUID
     from get_database import get_uuid_db
-    if get_uuid_db().find().count() == 1:
-      user_uuid = get_uuid_db().find_one()['uuid']
-    else:
-      # TODO: Figure out what we really want to do here
-      user_uuid = UUID('{3a307244-ecf1-3e6e-a9a7-3aaf101b40fa}')
+    user_uuid = get_uuid_db().find_one()['uuid']
     retUUID = user_uuid
     logging.debug("skipAuth = %s, returning fake UUID %s" % (skipAuth, user_uuid))
   else:

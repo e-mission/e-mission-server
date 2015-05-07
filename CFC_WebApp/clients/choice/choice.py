@@ -8,7 +8,8 @@ import json
 from uuid import UUID
 import time
 from clients.gamified import gamified
-from clients.default import default
+from clients.data import data
+from clients.commontrips import commontrips
 from clients.recommendation import recommendation
 
 # TODO: Consider subclassing to provide client specific user functions
@@ -44,8 +45,16 @@ def getResult(user_uuid):
   from dao.user import User
   from dao.client import Client
 
-  user_uuid = "6433c8cf-c4c5-3741-9144-5905379ece6e"
+  # TODO: remove this hardcoded uuid
+  # user_uuid = "6433c8cf-c4c5-3741-9144-5905379ece6e"
   user = User.fromUUID(user_uuid)
+  renderedTemplate = template("clients/choice/result_template.html",
+                              variables = json.dumps({'curr_view': getCurrView(user_uuid),
+                                                      'uuid': str(user_uuid),
+                                                      'client_key': Client("choice").getClientKey()}),
+                              gameResult = base64.b64encode(gamified.getResult(user_uuid)),
+                              dataResult = base64.b64encode(data.getResult(user_uuid)),
+                              commonTripsResult = base64.b64encode(commontrips.getResult(user_uuid)))
 
   # renderedTemplate = template("clients/choice/result_template.html",
   #                         variables = json.dumps({'curr_view': getCurrView(user_uuid),
@@ -57,17 +66,17 @@ def getResult(user_uuid):
   # return renderedTemplate
 
   # DEMO
-  originalTrip = get_trip_db().find_one({'user_id': UUID(user.uuid), 'recommended_alternative': {'$exists': True} })
-  recommendedTrip = originalTrip['recommended_alternative']
-  originalSections = list(get_section_db().find({ 'trip_id': originalTrip['trip_id'] }))
+  # originalTrip = get_trip_db().find_one({'user_id': UUID(user.uuid), 'recommended_alternative': {'$exists': True} })
+  # recommendedTrip = originalTrip['recommended_alternative']
+  # originalSections = list(get_section_db().find({ 'trip_id': originalTrip['trip_id'] }))
 
-  renderedTemplate = template("clients/recommendation/result_template.html",
-                              recommendedTrip = recommendedTrip,
-                              originalTrip = originalTrip,
-                              originalSections = originalSections)
+  # renderedTemplate = template("clients/recommendation/result_template.html",
+  #                             recommendedTrip = recommendedTrip,
+  #                             originalTrip = originalTrip,
+  #                             originalSections = originalSections)
 
   return renderedTemplate
-
+  
 # These are copy/pasted from our first client, the carshare study
 def getSectionFilter(uuid):
   # We are not planning to do any filtering for this study. Bring on the worst!

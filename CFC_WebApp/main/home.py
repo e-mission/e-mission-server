@@ -8,6 +8,7 @@ def detect_home(user_id):
     list_first_pnt=[]
     list_home_candidate=[]
     for section in Sections.find({"$and":[{"user_id": user_id},{ "section_start_point": { "$ne": None }}]}):
+        if len(section['track_points']) > 0:
             list_first_pnt.append(section['track_points'][0])
     # print(list_first_pnt)
     list_home_candidate=get_first_daily_point(list_first_pnt)

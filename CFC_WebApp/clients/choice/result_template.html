@@ -54,18 +54,27 @@
         </ion-content>
       </ion-tab>
 
-      <ion-tab title="Recommendation"
-            icon="ion-lightbulb"
-            on-select="onRecommendationSelected()"
-            ng-click="onRecommendationClicked()"
-            ng-controller="RecommendationCtrl">
+      <ion-tab title="CommonTrips"
+            icon="ion-map"
+            on-select="onCommonTripsSelected()"
+            ng-click="onCommonTripsClicked()"
+            ng-controller="CommonTripsCtrl">
         <ion-content has-tabs="true" on-refresh="onRefresh()">
-           <div id="recommendation-div">
-            <iframe inline-result src='data:text/html;base64,{{recommendationResult}}' height="100%" width="100%" seamless>
-            </iframe>
-           </div>
-        </ion-content>
-      </ion-tab>
+           <div id="commontrips-div">
+            <iframe inline-result src='data:text/html;base64,{{commonTripsResult}}' height="100%" width="100%" seamless>
+
+	      <!-- <ion-tab title="Recommendation"
+              icon="ion-lightbulb"
+              on-select="onRecommendationSelected()"
+              ng-click="onRecommendationClicked()"
+              ng-controller="RecommendationCtrl">
+              <ion-content has-tabs="true" on-refresh="onRefresh()">
+              <div id="recommendation-div">
+              <iframe inline-result src='data:text/html;base64,TODO:FILLINWITHVARIABLE!' height="100%" width="100%" seamless>
+              </iframe>
+              </div>
+              </ion-content>
+	      </ion-tab> -->
     </ion-tabs>
 
     <!-- Calling onInitDone() from anyplace in the ion-tabs view (ion-tabs, or
