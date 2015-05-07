@@ -8,7 +8,7 @@ angular.module('e-mission-choice', ['ionic'])
   };
 
   $scope.getIndexForTab = function(label) {
-    var tabLabelMap = {'data': 0, 'game': 1};
+    var tabLabelMap = {'data': 0, 'leaderboard': 1, 'game': 2};
     return tabLabelMap[label];
   }
 
@@ -93,6 +93,27 @@ angular.module('e-mission-choice', ['ionic'])
     $timeout(function() {
       $scope.$broadcast('scroll.refreshComplete');
     }, 10000);
+  }
+})
+
+.controller('LeaderboardCtrl', function($scope, $ionicModal) {
+  // alert("GameCtrl called");
+
+  $scope.onLeaderboardClicked = function() {
+    $scope.setCurrChoice("leaderboard")
+  }
+
+  $scope.onLeaderboardSelected = function() {
+    console.log("Leaderboard tab selected");
+  }
+
+  $scope.onRefresh = function() {
+    // alert("GameCtrl.ON REFRESH");
+    console.log('ON REFRESH');
+
+    $timeout(function() {
+      $scope.$broadcast('scroll.refreshComplete');
+    }, 1000);
   }
 })
 
