@@ -8,7 +8,7 @@ angular.module('e-mission-choice', ['ionic'])
   };
 
   $scope.getIndexForTab = function(label) {
-    var tabLabelMap = {'data': 0, 'game': 1, 'leaderboard': 2};
+    var tabLabelMap = {'data': 0, 'leaderboard': 1, 'game': 2, 'recommendation': 3};
     return tabLabelMap[label];
   }
 
