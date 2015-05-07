@@ -37,8 +37,9 @@ class TripIterator(object):
                 self.storedIter = query_function(user_uuid, option)
             else:
                 # no options
-                #print "Query function: ", query_function
+                print "Query function: ", query_function
                 self.storedIter = query_function(user_uuid)
+            print "storedIter = %s" % self.storedIter
         except TypeError as e:
             print e
             print "something went wrong, here is some info:"

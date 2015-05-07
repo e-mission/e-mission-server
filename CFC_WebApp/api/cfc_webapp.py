@@ -279,6 +279,7 @@ def setStats():
 @post('/compare')
 def postCarbonCompare():
   from clients.data import data
+  from clients.choice import choice
 
   if request.json == None:
     return "Waiting for user data to become available..."

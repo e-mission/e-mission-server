@@ -4,6 +4,7 @@ from user_utility_model import UserUtilityModel
 from emissions_model import EmissionsModel
 from simple_cost_time_mode_model import SimpleCostTimeModeModel
 import tripiterator as ti
+import trip as t
 from common import get_uuid_list, get_recommender_uuid_list
 import uuid
 import alternative_trips_module as atm
@@ -15,7 +16,7 @@ class RecommendationPipeline:
         # will make usage of canonical trip class
         # returns a list of trips implementing Trip interface, could be basic E_Mission_Trips or canonical
         # TODO: Stubbed out returning all move trips in order to allow tests to pass
-        return list(ti.TripIterator(user_uuid, ["recommender", "get_improve"]))
+        return list(ti.TripIterator(user_uuid, ["recommender", "get_improve"], trip_class=t.Canonical_E_Mission_Trip))
 
     def retrieve_alternative_trips(self, trip_list):
         return []
