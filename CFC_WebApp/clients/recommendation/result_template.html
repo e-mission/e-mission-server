@@ -10,16 +10,16 @@
     <script src="front/nv.d3.utils.js"></script>
     <script src="front/nv.d3.models.pieChart.js"></script>
     <script src="front/bullet.js"></script>
-  </head>
-  <style>
+
+    <style>
       body {
         margin: 0;
       }
 
       #rec-info {
         background-color: rgba(255, 255, 255, 0.64);
-        width: 600px;
-        padding: 10px;
+        width: 60%;
+        padding: 0.5em;
         text-align: center;
         font-family: "Helvetica";
         position: fixed;
@@ -30,15 +30,17 @@
       }
 
       #rec-info h1 {
-        margin: 0 auto 10px;
+        margin: 0;
+        font-size: 2em;
       }
 
-      #rec-info p {
-        margin: 0;
-        text-transform: uppercase;
+      #rec-times {
+        margin: 10px auto 0;
       }
 
       #rec-reasons p {
+        font-size: 13px;
+        font-style: italic;
         display: none;
       }
 
@@ -47,15 +49,15 @@
         width: 100%;
       }
     </style>
+  </head>
   <body ng-controller="RootCtrl" hide-nav-bar="true">
-
     <div id="rec-info">
       <h1>Recommended Trip</h1>
-      <!-- <p>Leave at <span id="departure-time">1:30 PM</span> and arrive at <span id="arrival-time">1:56 PM</span></p> -->
+      <!-- <p id="rec-times">Leave at <span id="departure-time">1:30 PM</span> and arrive at <span id="arrival-time">1:56 PM</span></p> -->
       <!-- <div id="rec-reasons">
         <p id="time-rec">Recommended because this trip is 4 minutes faster than your original trip.</p>
         <p id="distance-rec">Recommended because this trip is 2 miles faster than your original trip.</p>
-        <p id="emissions-rec">Recommended because this trip will create rougly 5X less carbon emissions than your original trip.</p>
+        <p id="emissions-rec">Recommended because this trip will create roughly 5X less carbon emissions than your original trip.</p>
       </div> -->
     </div>
 
