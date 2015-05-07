@@ -1,4 +1,3 @@
-import json
 from random import randrange
 from bottle import route, post, get, run, template, static_file, request, app, HTTPError, SimpleTemplate, abort, BaseRequest
 # import import_my_lib
@@ -14,8 +13,8 @@ import socket
 import urllib
 import requests
 # For decoding JWTs on the client side
-#import oauth2client.client
-#from oauth2client.crypt import AppIdentityError
+import oauth2client.client
+from oauth2client.crypt import AppIdentityError
 import traceback
 import xmltodict
 import urllib2
