@@ -137,6 +137,7 @@ angular.module('e-mission-choice', ['ionic'])
       $scope.$broadcast('scroll.refreshComplete');
     }, 1000);
   }
+})
 
   .controller('RecommendationCtrl', function($scope, $ionicModal) {
 
