@@ -37,10 +37,10 @@ def get_clusters_info(uid):
                 first = True
                 y = [[] for _ in range(5)]
                 for cluster in col:
+                        info = s_db.find_one({"_id":cluster})
                         if first:
                             rt = info
                             first = False
-                        info = s_db.find_one({"_id":cluster})
                         appendIfPresent(y[0], info, "section_start_datetime")
                         appendIfPresent(y[1], info, "section_end_datetime")
                         appendIfPresent(y[2], info, "section_start_point")
