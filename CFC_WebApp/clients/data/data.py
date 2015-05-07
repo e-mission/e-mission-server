@@ -65,8 +65,9 @@ def runBackgroundTasksForDay(user_uuid, today):
   # In [44]: testUser.setScores(('a','b', 'c', 'd'), ('s', 't', 'u', 'v'))
   # In [45]: testUser.getScore()
   # Out[45]: ([u'a', u'b', u'c', u'd'], [u's', u't', u'u', u'v'])
-  weekago = today_dt - timedelta(days=7)
+  weekago = today_dt - timedelta(days=60)
   carbonCompareResults = carbon.getFootprintCompareForRange(user_uuid, weekago, today_dt)
+  print "carbonCompareResults = ", carbonCompareResults
   setCarbonFootprint(user, carbonCompareResults)
 
   (myModeShareCount, avgModeShareCount,

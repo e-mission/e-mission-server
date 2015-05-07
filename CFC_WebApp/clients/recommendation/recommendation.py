@@ -18,16 +18,19 @@ def getResult(user_uuid):
 
   original_trip = get_trip_db().find_one({'user_id': UUID(user.uuid), 'recommended_alternative': {'$exists': True}})
 
-  del originalTrip['trip_start_datetime']
-  del originalTrip['trip_end_datetime']
-  del originalTrip['user_id']
-  del originalTrip['pipelineFlags']
-  del originalTrip['recommended_alternative']['user_id']
+  if original_trip is None:
+      return template("clients/recommendation/no_recommendation.html")
+
+  del original_trip['trip_start_datetime']
+  del original_trip['trip_end_datetime']
+  del original_trip['user_id']
+  del original_trip['pipelineFlags']
+  del original_trip['recommended_alternative']['user_id']
 
   recommended_trip = original_trip['recommended_alternative']
 
-  original_sections = get_section_db().find({'trip_id': original_trip['trip_id']})
-  for section in orignal_sections:
+  original_sections = list(get_section_db().find({'trip_id': original_trip['trip_id']}))
+  for section in original_sections:
     del section['user_id']
     del section['section_start_datetime']
     del section['section_end_datetime']

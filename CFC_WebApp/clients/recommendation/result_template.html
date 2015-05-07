@@ -18,7 +18,7 @@
 
       #rec-info {
         background-color: rgba(255, 255, 255, 0.64);
-        width: 60%;
+        width: 75%;
         padding: 0.5em;
         text-align: center;
         font-family: "Helvetica";
@@ -26,12 +26,13 @@
         top: 20px;
         left: 50%;
         transform: translateX(-50%);
+        -webkit-transform: translateX(-50%);
         z-index: 1;
       }
 
       #rec-info h1 {
         margin: 0;
-        font-size: 2em;
+        font-size: 1.5em;
       }
 
       #rec-times {
@@ -67,14 +68,13 @@
       var MODE_COLORS = {
         air: 'red',
         bicycle: 'blue',
-        car: 'orange',
+        driving: 'orange',
         transit: 'yellow',
         walk: 'green'
       };
 
-      var recommendedTrip = JSON.parse({{ recommendedTrip }}),
-          originalTrip = JSON.parse({{ originalTrip }}),
-          originalSections = JSON.parse({{ originalSections }});
+      var recommendedTrip = {{ recommendedTrip }},
+          originalSections = {{ originalSections }};
 
       function initialize() {
         var map = new google.maps.Map(document.getElementById('map-canvas')),
