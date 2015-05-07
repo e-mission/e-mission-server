@@ -8,7 +8,7 @@ angular.module('e-mission-choice', ['ionic'])
   };
 
   $scope.getIndexForTab = function(label) {
-    var tabLabelMap = {'data': 0, 'leaderboard': 1, 'game': 2};
+    var tabLabelMap = {'data': 0, 'game': 1, 'leaderboard': 2};
     return tabLabelMap[label];
   }
 
@@ -136,8 +136,9 @@ angular.module('e-mission-choice', ['ionic'])
       $scope.$broadcast('scroll.refreshComplete');
     }, 1000);
   }
+})
 
-  .controller('RecommendationCtrl', function($scope, $ionicModal) {
+.controller('RecommendationCtrl', function($scope, $ionicModal) {
 
   $scope.onRecommendationClicked = function() {
     $scope.setCurrChoice("recommendation")
