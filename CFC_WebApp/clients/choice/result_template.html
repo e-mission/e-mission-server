@@ -69,6 +69,19 @@
         </ion-content>
       </ion-tab>
 
+      <ion-tab title="Common Trips"
+            icon="ion-map"
+            on-select="onCommonTripsSelected()"
+            ng-click="onCommonTripsClicked()"
+            ng-controller="CommonTripsCtrl">
+        <ion-content has-tabs="true" on-refresh="onRefresh()">
+           <div id="commontrips-div">
+            <iframe inline-result src='data:text/html;base64,{{commonTripsResult}}' height="100%" width="100%" seamless>
+            </iframe>
+           </div>
+        </ion-content>
+      </ion-tab>
+
       <ion-tab title="Recommendation"
             icon="ion-lightbulb"
             on-select="onFoobarSelected()"

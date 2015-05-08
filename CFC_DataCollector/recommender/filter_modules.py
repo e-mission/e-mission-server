@@ -34,15 +34,19 @@ def get_clusters_info(uid):
         c_info = []
         x = clusterJson["clusters"].values() 
         for col in x:
+                first = True
                 y = [[] for _ in range(5)]
                 for cluster in col:
                         info = s_db.find_one({"_id":cluster})
+                        if first:
+                            rt = info
+                            first = False
                         appendIfPresent(y[0], info, "section_start_datetime")
                         appendIfPresent(y[1], info, "section_end_datetime")
                         appendIfPresent(y[2], info, "section_start_point")
                         appendIfPresent(y[3], info, "section_end_point")
                         appendIfPresent(y[4], info, "confirmed_mode")
-                c_info += [y]
+                c_info.append((y, rt))
         return c_info
 
 def appendIfPresent(list,element,key):
@@ -58,7 +62,7 @@ class AlternativesNotFound(Exception):
         return repr(self.value)
 
 #returns the top trips for the user, defaulting to the top 10 trips
-def getCanonicalTrips(uid): # number returned isnt used
+def getCanonicalTrips(uid, get_representative=False): # number returned isnt used
     """
         uid is a UUID object, not a string
     """
@@ -71,8 +75,9 @@ def getCanonicalTrips(uid): # number returned isnt used
     logging.debug('UUID for canonical %s' % uid)
     info = get_clusters_info(uid)
     cluster_json_list = []
-    for cluster in info:
+    for (cluster, rt) in info:
       json_dict = dict()
+      json_dict["representative_trip"] = rt
       json_dict["start_point_distr"] = cluster[2]
       json_dict["end_point_distr"] = cluster[3]
       json_dict["start_time_distr"] = cluster[0]
