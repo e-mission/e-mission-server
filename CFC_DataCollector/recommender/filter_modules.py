@@ -46,7 +46,7 @@ def get_clusters_info(uid):
                         appendIfPresent(y[2], info, "section_start_point")
                         appendIfPresent(y[3], info, "section_end_point")
                         appendIfPresent(y[4], info, "confirmed_mode")
-                c_info.append(y, rt)
+                c_info.append((y, rt))
         return c_info
 
 def appendIfPresent(list,element,key):
