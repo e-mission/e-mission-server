@@ -138,11 +138,11 @@ angular.module('e-mission-choice', ['ionic'])
   }
 })
 
-.controller('CommonTripsCtrl', function($scope, $ionicModal) {
+.controller('FooCtrl', function($scope, $ionicModal) {
   // alert("GameCtrl called");
 
   $scope.onCommonTripsClicked = function() {
-    $scope.setCurrChoice("commontrips")
+    $scope.setCurrChoice("commontrips");
   }
 
   $scope.onCommonTripsSelected = function() {
@@ -178,3 +178,4 @@ angular.module('e-mission-choice', ['ionic'])
     }, 1000);
   }
 });
+

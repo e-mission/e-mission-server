@@ -33,6 +33,7 @@ def generate_tour_map(user_uuid):
     """
     Generates tour map and saves it to result_template.html 
     """
+    sys.path.append("%s/../../CFC_WebApp/" % os.getcwd())
     import main.pygmaps_modified as pygmaps
     from main.gmap_display import drawSection
     from get_database import get_section_db, get_routeCluster_db
@@ -48,12 +49,13 @@ def generate_tour_map(user_uuid):
     except OSError:
         pass
     gmap.draw('clients/commontrips/result_template.html')
+    sys.path.remove("%s/../../CFC_WebApp/" % os.getcwd())
 
 def getResult(user_uuid):
   # This is in here, as opposed to the top level as recommended by the PEP
   # because then we don't have to worry about loading bottle in the unit tests
   from bottle import template
-  print "getResult UUID: %s" % user_uuid
+  print "common trips getResult UUID: %s" % user_uuid
   generate_tour_map(user_uuid)
   renderedTemplate = template("clients/commontrips/result_template.html")
   return renderedTemplate

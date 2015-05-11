@@ -13,10 +13,7 @@ def getResult(user_uuid):
   # because then we don't have to worry about loading bottle in the unit tests
   from bottle import template
 
-  user_uuid = "6433c8cf-c4c5-3741-9144-5905379ece6e"
-  user = User.fromUUID(user_uuid)
-
-  original_trip = get_trip_db().find_one({'user_id': UUID(user.uuid), 'recommended_alternative': {'$exists': True}})
+  original_trip = get_trip_db().find_one({'user_id': user_uuid, 'recommended_alternative': {'$exists': True}})
 
   if original_trip is None:
       return template("clients/recommendation/no_recommendation.html")
