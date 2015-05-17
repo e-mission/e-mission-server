@@ -7,7 +7,7 @@ angular.module('e-mission-leaderboard', ['ionic'])
      * From http://stackoverflow.com/questions/3895478/does-javascript-have-a-range-equivalent
      * but not tested
      */
-    $scope.function showscores() {
+    $scope.showscores = function() {
       var listContainer = document.createElement("div");
       document.getElementsByTagName("body")[0].appendChild(listContainer);
       var listElement = document.createElement("ul");

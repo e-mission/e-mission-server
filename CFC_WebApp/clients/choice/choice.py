@@ -10,6 +10,7 @@ import time
 from clients.leaderboard import leaderboard
 from clients.gamified import gamified
 from clients.recommendation import recommendation
+from clients.commontrips import commontrips
 from clients.data import data
 
 # TODO: Consider subclassing to provide client specific user functions
@@ -54,6 +55,7 @@ def getResult(user_uuid):
                           gameResult = base64.b64encode(gamified.getResult(user_uuid)),
                           leaderboardResult = base64.b64encode(leaderboard.getResult(user_uuid)),
                           dataResult = base64.b64encode(data.getResult(user_uuid)), 
+                          commonTripsResult = base64.b64encode(commontrips.getResult(user_uuid)),
                           recommendationResult = base64.b64encode(recommendation.getResult(user_uuid)))
 
   return renderedTemplate

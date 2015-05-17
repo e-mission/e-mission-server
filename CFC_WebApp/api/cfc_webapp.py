@@ -288,6 +288,7 @@ def postCarbonCompare():
     return "Waiting for user data to be become available.."
 
   user_uuid = getUUID(request)
+
   clientResult = userclient.getClientSpecificResult(user_uuid)
   if clientResult != None:
     logging.debug("Found overriding client result for user %s, returning it" % user_uuid)
@@ -306,10 +307,12 @@ def getCarbonCompare():
   if not skipAuth:
     if 'User' not in request.headers or request.headers.get('User') == '':
         return "Waiting for user data to become available..."
+  
+  from clients.choice import choice
 
   user_uuid = getUUID(request, inHeader=True)
   print ('UUID', user_uuid)
-
+  
   clientResult = userclient.getClientSpecificResult(user_uuid)
   if clientResult != None:
     logging.debug("Found overriding client result for user %s, returning it" % user_uuid)

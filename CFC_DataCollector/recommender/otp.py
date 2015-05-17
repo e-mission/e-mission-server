@@ -43,7 +43,7 @@ class OTP:
 			"date" : self.date,
 			"maxWalkDistance" : self.max_walk_distance,
 			"initIndex" : "0",
-			"showIntermediateStops" : "false",
+			"showIntermediateStops" : "true",
 			"arriveBy" : "false"
 		}
 
@@ -68,13 +68,18 @@ class OTP:
 		#print our_json["plan"]["itineraries"]
 		for leg in our_json["plan"]["itineraries"][0]['legs']:
                         coords = [ ]
-                        for step in leg['steps']:
-                               coords.append(Coordinate(step['lat'], step['lon'])) 
+                        var = 'steps'
+                        if leg['mode'] == 'RAIL' or leg['mode'] == 'SUBWAY':
+                                var = 'intermediateStops'
+                        for step in leg[var]:
+                                coords.append(Coordinate(step['lat'], step['lon'])) 
 			start_time = otp_time_to_ours(leg["startTime"])
 			end_time = otp_time_to_ours(leg["endTime"])
 			distance = float(leg['distance'])
 			start_loc = Coordinate(float(leg["from"]["lat"]), float(leg["from"]["lon"]))
 			end_loc = Coordinate(float(leg["to"]["lat"]), float(leg["to"]["lon"]))
+                        coords.insert(0, start_loc)
+                        coords.append(end_loc)
 			mode = leg["mode"]
 			mode_list.add(mode)
 			section = Section(0, trip_id, distance, start_time, end_time, start_loc, end_loc, mode, mode)
@@ -134,6 +139,9 @@ def multi_modal():
 	#print "end time: "  + str(new_trip.end_time)
 	print "duration : " + str(new_trip.end_time - new_trip.start_time)
 	print "cost: " + str(new_trip.cost)
+        for sec in new_trip.sections:
+                print "mode: " + str(sec.mode)
+                print "corrds: " + str(sec.points)
 	
 def simple_driving():
 	otp =  OTP("37.866678, -122.263224", "37.5114478, -122.3191384", "CAR", "4-25-15", "4:45pm", False)
@@ -146,7 +154,10 @@ def simple_driving():
         #print "end time: "  + str(new_trip.end_time)
 	print "duration: " + str(new_trip.end_time - new_trip.start_time)
 	print "cost: " + str(new_trip.cost)
-
+        for sec in new_trip.sections:
+                print "mode: " + str(sec.mode)
+                print "corrds: " + str(sec.points)
+	
 
 def just_train():
  	otp = OTP("37.866678, -122.263224", "37.5114478, -122.3191384", "TRANSIT", "4-25-15", "4:45pm", False)

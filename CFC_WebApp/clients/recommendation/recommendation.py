@@ -13,21 +13,21 @@ def getResult(user_uuid):
   # because then we don't have to worry about loading bottle in the unit tests
   from bottle import template
 
-  user_uuid = "6433c8cf-c4c5-3741-9144-5905379ece6e"
-  user = User.fromUUID(user_uuid)
+  original_trip = get_trip_db().find_one({'user_id': user_uuid, 'recommended_alternative': {'$exists': True}})
 
-  original_trip = get_trip_db().find_one({'user_id': UUID(user.uuid), 'recommended_alternative': {'$exists': True}})
+  if original_trip is None:
+      return template("clients/recommendation/no_recommendation.html")
 
-  del originalTrip['trip_start_datetime']
-  del originalTrip['trip_end_datetime']
-  del originalTrip['user_id']
-  del originalTrip['pipelineFlags']
-  del originalTrip['recommended_alternative']['user_id']
+  del original_trip['trip_start_datetime']
+  del original_trip['trip_end_datetime']
+  del original_trip['user_id']
+  del original_trip['pipelineFlags']
+  del original_trip['recommended_alternative']['user_id']
 
   recommended_trip = original_trip['recommended_alternative']
 
-  original_sections = get_section_db().find({'trip_id': original_trip['trip_id']})
-  for section in orignal_sections:
+  original_sections = list(get_section_db().find({'trip_id': original_trip['trip_id']}))
+  for section in original_sections:
     del section['user_id']
     del section['section_start_datetime']
     del section['section_end_datetime']

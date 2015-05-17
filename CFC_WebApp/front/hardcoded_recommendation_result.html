@@ -72,28 +72,6 @@
         walk: 'darkgreen'
       };
 
-      // var recommendedTrip = {
-      //   'trip_end_location': '(37.8710788, -122.2551926)',
-      //   'user_id': '6433c8cf-c4c5-3741-9144-5905379ece6e',
-      //   'trip_start_location': '(37.865027, -122.2577789)',
-      //   'trip_start_time': '20150430T045106-1700',
-      //   'track_points': [
-      //     [
-      //       {'type': 'Point', 'coordinates': [-122.2577897, 37.8652063]},
-      //       {'type': 'Point', 'coordinates': [-122.251239, 37.8659016]},
-      //       {'type': 'Point', 'coordinates': [-122.251733, 37.8676844]},
-      //       {'type': 'Point', 'coordinates': [-122.2526502, 37.8714822]},
-      //       {'type': 'Point', 'coordinates': [-122.2527744, 37.8712825]},
-      //       {'type': 'Point', 'coordinates': [-122.2551926, 37.8710788]}
-      //     ]
-      //   ],
-      //   'cost': 0,
-      //   'trip_end_time': '20150430T045606-1700',
-      //   '_id': '5541b4ba1484c93bc13339cc',
-      //   'trip_id': '20150428T132810-0700',
-      //   'mode_list': ['driving']
-      // };
-
       var recommendedTrip = {
         'track_points': [
           [
@@ -107,18 +85,37 @@
             {'type': 'Point', 'coordinates': [-122.25479130000001, 37.853632700000006]},
             {'type': 'Point', 'coordinates': [-122.25396490000001, 37.853743300000005]},
             {'type': 'Point', 'coordinates': [-122.25342920000001, 37.8511405]},
-            {'type': 'Point', 'coordinates': [-122.2524748, 37.851255800000004]}
-          ], [
             {'type': 'Point', 'coordinates': [-122.2524748, 37.851255800000004]},
+            {'type': 'Point', 'coordinates': [-122.251793, 37.844601]}
+          ], [
             {'type': 'Point', 'coordinates': [-122.251793, 37.844601]},
+            {'type': 'Point', 'coordinates': [-122.267227, 37.828415]},
+            {'type': 'Point', 'coordinates': [-122.269029, 37.80787]},
+            {'type': 'Point', 'coordinates': [-122.271604, 37.803664]},
+            {'type': 'Point', 'coordinates': [-122.2945822, 37.80467476]},
+            {'type': 'Point', 'coordinates': [-122.396742, 37.792976]},
+            {'type': 'Point', 'coordinates': [-122.401407, 37.789256]},
+            {'type': 'Point', 'coordinates': [-122.406857, 37.784991]},
+            {'type': 'Point', 'coordinates': [-122.413756, 37.779528]},
+            {'type': 'Point', 'coordinates': [-122.419694, 37.765062]},
+            {'type': 'Point', 'coordinates': [-122.418466, 37.752254]},
+            {'type': 'Point', 'coordinates': [-122.434092, 37.732921]},
+            {'type': 'Point', 'coordinates': [-122.4474142, 37.72198087]},
+            {'type': 'Point', 'coordinates': [-122.4690807, 37.70612055]},
+            {'type': 'Point', 'coordinates': [-122.466233, 37.684638]},
+            {'type': 'Point', 'coordinates': [-122.444116, 37.664174]},
+            {'type': 'Point', 'coordinates': [-122.416038, 37.637753]},
+            {'type': 'Point', 'coordinates': [-122.392612, 37.616035]},
             {'type': 'Point', 'coordinates': [-122.38666, 37.599787]}
           ], [
             {'type': 'Point', 'coordinates': [-122.38666, 37.599787]},
-            {'type': 'Point', 'coordinates': [-122.386832, 37.599797]},
+            {'type': 'Point', 'coordinates': [-122.324092, 37.568294]},
             {'type': 'Point', 'coordinates': [-122.297461, 37.537814]}
           ], [
             {'type': 'Point', 'coordinates': [-122.297461, 37.537814]},
             {'type': 'Point', 'coordinates': [-122.29726860000001, 37.5376744]},
+            {'type': 'Point', 'coordinates': [-122.29719870000001, 37.5374872]}
+          ], [
             {'type': 'Point', 'coordinates': [-122.29719870000001, 37.5374872]},
             {'type': 'Point', 'coordinates': [-122.29643600000001, 37.5380854]},
             {'type': 'Point', 'coordinates': [-122.29667660000001, 37.5377029]},
@@ -133,55 +130,12 @@
             {'type': 'Point', 'coordinates': [-122.30283170000001, 37.5207773]},
             {'type': 'Point', 'coordinates': [-122.3041706, 37.517863600000005]},
             {'type': 'Point', 'coordinates': [-122.3041051, 37.5123614]},
+            {'type': 'Point', 'coordinates': [-122.3191384, 37.5114478]}
           ]
         ],
         'cost': 8.25,
-        'mode_list': ['bicycle', 'subway', 'rail', 'bicycle']
+        'mode_list': ['bicycle', 'subway', 'rail', 'walk', 'bicycle']
       };
-
-      // var originalSections = [
-      //   {
-      //     'distance': 779.263283113156,
-      //     'predicted_mode': {
-      //       'walking': 0.9,
-      //       'cycling': 0.1
-      //     },
-      //     'section_end_time': '20150428T133749-0700',
-      //     'section_id': 0,
-      //     'track_points': [
-      //       {
-      //         'track_location': {'type': 'Point', 'coordinates': [-122.2578001209742, 37.86502621140132]},
-      //         'time': '20150428T132810-0700'
-      //       }, {
-      //         'track_location': {'type': 'Point', 'coordinates': [-122.2567464319265, 37.86536375064204]},
-      //         'time': '20150428T132915-0700'
-      //       }, {
-      //         'track_location': {'type': 'Point', 'coordinates': [-122.2564224713689, 37.86623127762029]},
-      //         'time': '20150428T133032-0700'
-      //       }, {
-      //         'track_location': {'type': 'Point', 'coordinates': [-122.2565887683278, 37.86713933110038]},
-      //         'time': '20150428T133128-0700'
-      //       }, {
-      //         'track_location': {'type': 'Point', 'coordinates': [-122.2567825579292, 37.86806662104825]},
-      //         'time': '20150428T133241-0700'
-      //       }, {
-      //         'track_location': {'type': 'Point', 'coordinates': [-122.2569850647098, 37.8689576592649]},
-      //         'time': '20150428T133335-0700'
-      //       }, {
-      //         'track_location': {'type': 'Point', 'coordinates': [-122.2562278902838, 37.86975720454029]},
-      //         'time': '20150428T133442-0700'
-      //       }, {
-      //         'track_location': {'type': 'Point', 'coordinates': [-122.2559704294999, 37.87119508689757]},
-      //         'time': '20150428T133656-0700'
-      //       }
-      //     ],
-      //     'type': 'move',
-      //     'confirmed_mode': 1,
-      //     'mode': '',
-      //     'duration': 579,
-      //     'section_start_time': '20150428T132810-0700'
-      //   }
-      // ]
 
       var originalSections = [
         {

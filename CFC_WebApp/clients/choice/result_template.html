@@ -5,7 +5,7 @@
     <title>Inline Tabs</title>
 
     <script src="clients/choice/front/ionic.bundle.js" charset="utf-8"></script>
-    <script src="clients/choice/front/ionic-tabs-myapp.js"></script>
+    <script src="clients/choice/front/ionic-tabs-myapp.js?v=1"></script>
 
     <link rel="stylesheet" href="clients/choice/front/ionic.min.css">
   </head>
@@ -69,9 +69,22 @@
         </ion-content>
       </ion-tab>
 
+      <ion-tab title="Common Trips"
+            icon="ion-map"
+            on-select="onCommonTripsSelected()"
+            ng-click="onCommonTripsClicked()"
+            ng-controller="FooCtrl">
+        <ion-content has-tabs="true" on-refresh="onRefresh()">
+           <div id="commontrips-div">
+            <iframe inline-result src='data:text/html;base64,{{commonTripsResult}}' height="100%" width="100%" seamless>
+            </iframe>
+           </div>
+        </ion-content>
+      </ion-tab>
+
       <ion-tab title="Recommendation"
             icon="ion-lightbulb"
-            on-select="onRecommendationSelected()"
+            on-select="onFoobarSelected()"
             ng-click="onRecommendationClicked()"
             ng-controller="RecommendationCtrl">
         <ion-content has-tabs="true" on-refresh="onRefresh()">
@@ -81,6 +94,7 @@
            </div>
         </ion-content>
       </ion-tab>
+
     </ion-tabs>
 
     <!-- Calling onInitDone() from anyplace in the ion-tabs view (ion-tabs, or
