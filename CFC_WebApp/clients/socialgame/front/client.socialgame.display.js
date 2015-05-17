@@ -1,8 +1,8 @@
-angular.module('e-mission-socailgame', ['ionic'])
+angular.module('e-mission-socialgame', ['ionic'])
 
 .controller('RootCtrl', function($scope, $timeout, $ionicPopup, $http, $ionicModal) {
     // alert("RootCtrl initialized");
-    $ionicModal.fromTemplateUrl('templates/modal.html', {
+    $ionicModal.fromTemplateUrl('socialgame/modal.html', {
     scope: $scope
   }).then(function(modal) {
     $scope.modal = modal;
