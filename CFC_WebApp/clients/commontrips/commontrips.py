@@ -16,14 +16,16 @@ def getUserTour(user_uuid):
     # from the recommender pipeline
     sys.path.append("%s/../CFC_DataCollector/" % os.getcwd())
     from recommender.filter_modules import getCanonicalTrips
-    canonical_trips = getCanonicalTrips(user_uuid, get_representative=True)
-    for rep, cluster in canonical_trips:
+    import recommender.tripiterator as ti
+    from recommender.trip import Canonical_E_Mission_Trip
+    canonical_trips = list(ti.TripIterator(user_uuid,["recommender", "get_improve"], Canonical_E_Mission_Trip))
+    for cluster in canonical_trips:
         print(cluster.start_point_distr)
         # print(cluster.end_point_distr)
         # print(cluster.start_time_distr)
         # print(cluster.end_time_distr)
-        print rep['_id']
-    canonical_trips = map(lambda x: x[0], canonical_trips)
+        print cluster._id
+    # representative_trips = map(lambda x: x.trip_id, canonical_trips)
     sys.path.remove("%s/../CFC_DataCollector/" % os.getcwd())
 
     print "Number of canonical_trips: %i" % len(canonical_trips)
@@ -42,12 +44,13 @@ def generate_tour_map(user_uuid):
     canonical_trips = getUserTour(user_uuid)
     for section in canonical_trips:        
         color = '#%02X%02X%02X' % (r(),r(),r())
-        print section['_id']
-        drawSection(section, 'path', gmap, color)
+        print section._id
+        section_json = get_section_db().find_one({'_id': section._id})
+	drawSection(section_json, 'path', gmap, color)
     try:
         os.remove('clients/commontrips/result_template.html')
-    except OSError:
-        pass
+    except OSError, e:
+        print "Result of removing the result template is %s" % e
     gmap.draw('clients/commontrips/result_template.html')
     sys.path.remove("%s/../../CFC_WebApp/" % os.getcwd())
 
