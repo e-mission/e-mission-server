@@ -5,6 +5,7 @@ from tripiterator import TripIterator
 from get_database import *
 from query_scheduler_pipeline import schedule_queries
 from filter_modules import AlternativesNotFound
+import logging
 
 #import Profiles
 
@@ -38,15 +39,28 @@ def calc_alternative_trips(user_trips, immediate):
         else:
             schedule_queries(existing_trip.trip_id, existing_trip.user_id, [existing_trip], immediate)
 
-def get_alternative_trips(trip_it):
+def get_alternative_for_trips(trip_it):
     # User Utility Pipeline calls this to get alternatve trips for one original trip (_id)
     alternatives = []
+    tripCnt = 0
     for _trip in trip_it:
+        logging.debug("Considering trip with id %s " % _trip.trip_id)
+	tripCnt = tripCnt + 1
         try:
-            alternatives.append(TripIterator(_trip.trip_id, ["alternatives", "get_alternatives"], Alternative_Trip))
+            ti = TripIterator(_trip.trip_id, ["alternatives", "get_alternatives"], Alternative_Trip)
+            alternatives.append(ti)
         except AlternativesNotFound:
             alternatives.append([])
+    logging.debug("tripCnt = %d, alternatives cnt = %d" % (tripCnt, len(alternatives)))
     return alternatives
+
+def get_alternative_for_trip(trip):
+    # User Utility Pipeline calls this to get alternatve trips for one original trip (_id)
+    try:
+        ti = TripIterator(trip.trip_id, ["alternatives", "get_alternatives"], Alternative_Trip)
+        return ti
+    except AlternativesNotFound:
+        return []
 
 def get_perturbed_trips(_id):
     # User Utility Pipeline calls this to get alternatve trips for one original trip (_id)

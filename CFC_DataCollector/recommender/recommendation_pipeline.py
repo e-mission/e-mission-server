@@ -16,20 +16,21 @@ class RecommendationPipeline:
         # will make usage of canonical trip class
         # returns a list of trips implementing Trip interface, could be basic E_Mission_Trips or canonical
         # TODO: Stubbed out returning all move trips in order to allow tests to pass
-        return list(ti.TripIterator(user_uuid, ["recommender", "get_improve"], trip_class=t.Canonical_E_Mission_Trip))
+        return ti.TripIterator(user_uuid, ["recommender", "get_improve"], t.Canonical_E_Mission_Trip)
 
     def retrieve_alternative_trips(self, trip_list):
         return []
 
-    def get_selected_user_utility_model(self, user_id, trips_with_alts):
+    def get_selected_user_utility_model(self, user_id, trips):
         #return UserUtilityModel.find_from_db(user_id)
-        print user_id
         model_json = self.find_from_db(user_id, False)
+        logging.debug("for user %s, existing model is %s" % (user_id, model_json))
         if model_json:
             cost_coeff = model_json.get("cost")
             time_coeff = model_json.get("time")
             mode_coeff = model_json.get("mode")
-            model2 = EmissionsModel(cost_coeff, time_coeff, mode_coeff, trips_with_alts)
+            model2 = EmissionsModel(cost_coeff, time_coeff, mode_coeff, trips)
+            logging.debug("for user %s, modified model is %s" % (user_id, model2))
             return model2
         return None
 
@@ -38,21 +39,32 @@ class RecommendationPipeline:
 
     def runPipeline(self):
         for user_uuid in get_recommender_uuid_list():
-            trips_to_improve = self.get_trips_to_improve(user_uuid)
-            alternatives = atm.get_alternative_trips(trips_to_improve)
+            recommend_trips = []
+	    # Converting to a list because otherwise, when we prepare feature
+	    # vectors, the iterator is all used up
+            trips_to_improve = list(self.get_trips_to_improve(user_uuid))
+            alternatives = atm.get_alternative_for_trips(trips_to_improve)
             trips_with_alts = self.prepare_feature_vectors(trips_to_improve, alternatives)
-            user_model = self.get_selected_user_utility_model(user_uuid, trips_with_alts)
+            logging.debug("trips_with_alts = %s" % trips_with_alts)
+            user_model = self.get_selected_user_utility_model(user_uuid, trips_to_improve)
             if user_model:
-                for trip_with_alts in trips_with_alts:
-                    original_trip = trip_with_alts[0]
-                    recommended_trip = user_model.predict(trip_with_alts)
-                    print original_trip.__dict__
+                for trip_to_improve in trips_to_improve:
+                    logging.debug("user_model = %s" % user_model)
+                    original_trip = trip_to_improve
+                    if (len(list(atm.get_alternative_for_trip(original_trip))) == 0):
+                        logging.debug("trip = %s has no alternatives, skipping..." % original_trip._id)
+                        continue;
+                    logging.debug("considering for recommendation, original trip = %s " % original_trip.__dict__)
+                    recommended_trip = user_model.predict(original_trip)
+                    logging.debug("recommended_trip = %s" % recommended_trip)
                     if original_trip != recommended_trip:
-                        print "recommending"
+                        logging.debug("recommended trip is different, setting it")
                         original_trip.mark_recommended(recommended_trip)
                         recommend_trips.append(recommended_trip)
                     else: 
-                        print "Original Trip is best"
+                        logging.debug("Original Trip is best")
+            else:
+                logging.debug("No user model found, skipping")
                 
  
     def find_from_db(self, user_id, modified):
@@ -63,8 +75,11 @@ class RecommendationPipeline:
         return db_model
 
     def prepare_feature_vectors(self, trips, alternatives):
+	logging.debug("Before zipping, trips, alternatives lengths are %d, %d " % (len(list(trips)), len(alternatives)))
         vector = zip(trips, alternatives)
+	logging.debug("After zipping, vector length is %d " % len(vector))
         vector = [(trip,list(alts)) for trip, alts in vector if alts] 
+	logging.debug("After preparing feature vectors, vector length is %d " % len(vector))
         return vector
 
 

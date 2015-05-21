@@ -51,9 +51,9 @@ def schedule_queries(trip_id, user_id, trip_array, immediate=False, stagger=0):
                 time = time + datetime.timedelta(days=1)
                 '''
 
-		#cron = CronTab("ubuntu")
-		cron = CronTab()
-		exec_str = python_location + ' ' + query_script_location + ' --trip-id ' + trip_id + ' --user-id ' + str(user_id)
+		cron = CronTab("ubuntu")
+		#cron = CronTab()
+		exec_str = "PYTHONPATH=/mnt/e-mission/e-mission-server/CFC_WebApp:/mnt/e-mission/e-mission-server/CFC_DataCollector:. " + python_location + ' ' + query_script_location + ' --trip-id ' + trip_id + ' --user-id ' + str(user_id) + ' >> /tmp/query_pipeline.stdinout 2>&1'
 		job = cron.new(command=exec_str)
 
 		job.month.on(time.month)
