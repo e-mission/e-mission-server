@@ -1,13 +1,12 @@
 import json
-from get_database import get_utility_model_db
-from user_utility_model import UserUtilityModel
-from emissions_model import EmissionsModel
-from simple_cost_time_mode_model import SimpleCostTimeModeModel
-import tripiterator as ti
-from common import get_uuid_list, get_recommender_uuid_list
-import uuid
-import alternative_trips_module as atm
 import logging
+
+from get_database import get_utility_model_db
+from emissions_model import EmissionsModel
+import tripiterator as ti
+from common import get_recommender_uuid_list
+import alternative_trips_module as atm
+
 
 class RecommendationPipeline:
     def get_trips_to_improve(self, user_uuid):
@@ -21,7 +20,7 @@ class RecommendationPipeline:
         return []
 
     def get_selected_user_utility_model(self, user_id, trips_with_alts):
-        #return UserUtilityModel.find_from_db(user_id)
+        # return UserUtilityModel.find_from_db(user_id)
         print user_id
         model_json = self.find_from_db(user_id, False)
         cost_coeff = model_json.get("cost")
@@ -49,26 +48,25 @@ class RecommendationPipeline:
                     recommended_trips.mark_recommended()
                 except AttributeError:
                     print "Original Trip is best"
-                
- 
+
+
     def find_from_db(self, user_id, modified):
         if modified:
-            db_model = get_utility_model_db().find_one({'user_id': user_id, 'type':'recommender'})
+            db_model = get_utility_model_db().find_one({'user_id': user_id, 'type': 'recommender'})
         else:
-            db_model = get_utility_model_db().find_one({'user_id': user_id, 'type':'user'})
+            db_model = get_utility_model_db().find_one({'user_id': user_id, 'type': 'user'})
         return db_model
 
     def prepare_feature_vectors(self, trips, alternatives):
         vector = zip(trips, alternatives)
-        vector = [(trip,list(alts)) for trip, alts in vector if alts] 
+        vector = [(trip, list(alts)) for trip, alts in vector if alts]
         return vector
 
 
 if __name__ == "__main__":
-
-  config_data = json.load(open('config.json'))
-  log_base_dir = config_data['paths']['log_base_dir']
-  logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
-                      filename="%s/pipeline.log" % log_base_dir, level=logging.DEBUG)
-  recommendationPipeline = RecommendationPipeline()
-  recommendationPipeline.runPipeline()
+    config_data = json.load(open('config.json'))
+    log_base_dir = config_data['paths']['log_base_dir']
+    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
+                        filename="%s/pipeline.log" % log_base_dir, level=logging.DEBUG)
+    recommendationPipeline = RecommendationPipeline()
+    recommendationPipeline.runPipeline()
