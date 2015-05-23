@@ -53,7 +53,7 @@ class TestRecommendationPipeline(unittest.TestCase):
 
   def testRetrieveTripsToImprove(self):
     #updated to 15, since I am filtering out places
-    trip_list = self.pipeline.get_trips_to_improve(self.testUUID)
+    trip_list = list(self.pipeline.get_trips_to_improve(self.testUUID))
     self.assertEquals(len(trip_list), 0)
 
   def testRetrieveTripsToImproveWithClusters(self):
@@ -62,7 +62,7 @@ class TestRecommendationPipeline(unittest.TestCase):
         "clusters": 
             {"cluster1": [s["_id"] for s in sectionList[0:10]],
              "cluster2": [s["_id"] for s in sectionList[10:20]]}})
-    trip_list = self.pipeline.get_trips_to_improve(self.testUUID)
+    trip_list = list(self.pipeline.get_trips_to_improve(self.testUUID))
     self.assertEquals(len(trip_list), 2)
 
   def testRecommendTrip(self):
