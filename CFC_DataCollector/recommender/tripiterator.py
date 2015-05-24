@@ -37,9 +37,9 @@ class TripIterator(object):
                 self.storedIter = query_function(user_uuid, option)
             else:
                 # no options
-                print "Query function: ", query_function
+                # print "Query function: ", query_function
                 self.storedIter = query_function(user_uuid)
-            print "storedIter = %s" % self.storedIter
+            # print "storedIter = %s" % self.storedIter
         except TypeError as e:
             print e
             print "something went wrong, here is some info:"
@@ -58,3 +58,10 @@ class TripIterator(object):
     def next(self):
         trip = self.storedIter.next()
         return self.trip_class.trip_from_json(trip) if trip else []
+
+    def close(self):
+        logging.debug("Closing query for class %s" % self.storedIter)
+        try:
+           self.storedIter.close()
+        except AttributeError:
+           logging.debug("Non cursor iterator, skipping close")

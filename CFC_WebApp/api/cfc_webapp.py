@@ -442,7 +442,11 @@ def getUUID(request, inHeader=False):
     logging.debug("skipAuth = %s, returning fake UUID %s" % (skipAuth, user_uuid))
   else:
     if inHeader:
-      userToken = request.headers.get('User').split()[1]
+      userHeaderSplitList = request.headers.get('User').split()
+      if len(userHeaderSplitList) == 1:
+          userToken = userHeaderSplitList[0]
+      else:
+          userToken = userHeaderSplitList[1]
     else:
       userToken = request.json['user']
     retUUID = getUUIDFromToken(userToken)

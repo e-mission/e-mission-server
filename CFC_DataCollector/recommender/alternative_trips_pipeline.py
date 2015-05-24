@@ -13,7 +13,7 @@ class AlternativeTripsPipeline:
         pass
 
     def get_trips_for_alternatives(self, user_uuid):
-        return ti.TripIterator(user_uuid, ["trips", "get_all"])
+        return ti.TripIterator(user_uuid, ["trips", "get_no_alternatives_past_month"])
 
     def runPipeline(self, immediate=False):
         for user_uuid in get_uuid_list():

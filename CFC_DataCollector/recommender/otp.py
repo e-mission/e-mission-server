@@ -82,7 +82,7 @@ class OTP:
                         coords.append(end_loc)
 			mode = leg["mode"]
 			mode_list.add(mode)
-			section = Section(0, trip_id, distance, start_time, end_time, start_loc, end_loc, mode, mode)
+			section = Section(0, user_id, trip_id, distance, start_time, end_time, start_loc, end_loc, mode, mode)
                         section.points = coords
                         #print section.points
 			sections.append(section)

@@ -31,7 +31,8 @@ def getResult(user_uuid):
     del section['user_id']
     del section['section_start_datetime']
     del section['section_end_datetime']
-    del section['retained']
+    if 'retained' in section:
+       del section['retained']
     del section['manual']
     del section['commute']
 
