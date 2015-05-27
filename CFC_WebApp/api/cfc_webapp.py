@@ -229,8 +229,6 @@ def storeSensedTrips():
   print "user_uuid %s" % user_uuid
   logging.debug("user_uuid %s" % user_uuid)
   sections = request.json['sections']
-  fileName = "%s/phone/%s" % (log_base_dir, time.time())
-  json.dump(sections, open(fileName, "w"))
   return tripManager.storeSensedTrips(user_uuid, sections)
 
 @post('/profile/create')
@@ -239,7 +237,10 @@ def createUserProfile():
   userToken = request.json['user']
   # This is the only place we should use the email, since we may not have a
   # UUID yet. All others should only use the UUID.
-  userEmail = verifyUserToken(userToken)
+  if skipAuth:
+    userEmail = userToken
+  else: 
+    userEmail = verifyUserToken(userToken)
   logging.debug("userEmail = %s" % userEmail)
   user = User.register(userEmail)
   logging.debug("Looked up user = %s" % user)
@@ -281,11 +282,11 @@ def postCarbonCompare():
   from clients.data import data
   from clients.choice import choice
 
-  if request.json == None:
-    return "Waiting for user data to become available..."
-
-  if 'user' not in request.json:
-    return "Waiting for user data to be become available.."
+  if not skipAuth:
+      if request.json == None:
+        return "Waiting for user data to become available..."
+      if 'user' not in request.json:
+        return "Waiting for user data to be become available.."
 
   user_uuid = getUUID(request)
 
@@ -426,21 +427,17 @@ def verifyUserToken(token):
 
 def getUUIDFromToken(token):
     userEmail = verifyUserToken(token)
+    return __getUUIDFromEmail__(userEmail)
+
+# This should not be used for general API calls
+def __getUUIDFromEmail__(userEmail):
     user=User.fromEmail(userEmail)
     if user is None:
       return None
     user_uuid=user.uuid
     return user_uuid
 
-def getUUID(request, inHeader=False):
-  retUUID = None
-  if skipAuth:
-    from uuid import UUID
-    from get_database import get_uuid_db
-    user_uuid = get_uuid_db().find_one()['uuid']
-    retUUID = user_uuid
-    logging.debug("skipAuth = %s, returning fake UUID %s" % (skipAuth, user_uuid))
-  else:
+def __getToken__(request, inHeader):
     if inHeader:
       userHeaderSplitList = request.headers.get('User').split()
       if len(userHeaderSplitList) == 1:
@@ -449,6 +446,28 @@ def getUUID(request, inHeader=False):
           userToken = userHeaderSplitList[1]
     else:
       userToken = request.json['user']
+
+    return userToken
+
+def getUUID(request, inHeader=False):
+  retUUID = None
+  if skipAuth:
+    if 'User' in request.headers or 'user' in request.json:
+        # skipAuth = true, so the email will be sent in plaintext
+        userEmail = __getToken__(request, inHeader)
+        retUUID = __getUUIDFromEmail__(userEmail)
+        logging.debug("skipAuth = %s, returning UUID directly from email %s" % (skipAuth, retUUID))
+    else:
+        # Return a random user to make it easy to experiment without having to specify a user
+        # TODO: Remove this if it is not actually used
+        from get_database import get_uuid_db
+        user_uuid = get_uuid_db().find_one()['uuid']
+        retUUID = user_uuid
+        logging.debug("skipAuth = %s, returning arbitrary UUID %s" % (skipAuth, retUUID))
+    if Client("choice").getClientKey() is None:
+        Client("choice").update(createKey = True)
+  else:
+    userToken = __getToken__(request, inHeader)
     retUUID = getUUIDFromToken(userToken)
   request.params.user_uuid = retUUID
   return retUUID

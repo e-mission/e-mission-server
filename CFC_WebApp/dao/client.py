@@ -96,6 +96,8 @@ class Client:
     return method(request)
 
   def getClientKey(self):
+    if self.clientJSON is None:
+        return None
     logging.debug("About to return %s from JSON %s" % (self.clientJSON['key'], self.clientJSON))
     return self.clientJSON['key']
 
