@@ -24,7 +24,7 @@ python_location = sys.executable
 #query_script_location = '/Users/jeffdh5/Desktop/e-mission/recommender/query.py'
 query_script_location = os.path.join(os.getcwd(), 'recommender/query.py')
 
-def schedule_queries(trip_id, user_id, trip_array, immediate=False):
+def schedule_queries(trip_id, user_id, trip_array, immediate=False, stagger=0):
 	#_id: This is the original trip _id
 
 	#start, end must both be represented as strings which contain the latitude and longitude of the location
@@ -36,8 +36,6 @@ def schedule_queries(trip_id, user_id, trip_array, immediate=False):
 
 	#TODO: write regex to enforce that passed in locations are geocoded; i.e. lat1,lon1, lat2,lon2
 	#TODO: this will run every year, need to figure out if python crontab can support yearly configuration so it only runs once
-        stagger = 1
-        total_stagger = 0
 	for trip in trip_array:
 		#start = trip.get_start_coordinates()
 		#end = trip.get_end_coordinates()
@@ -45,8 +43,7 @@ def schedule_queries(trip_id, user_id, trip_array, immediate=False):
                 start = trip.trip_start_location
                 end = trip.trip_end_location
                 if immediate:
-                    time = datetime.datetime.now() + datetime.timedelta(minutes=5) + datetime.timedelta(minutes=total_stagger)
-                    total_stagger += stagger
+                    time = datetime.datetime.now() + datetime.timedelta(minutes=2) + datetime.timedelta(minutes=stagger)
                 else:
                     time = trip.start_time
                 '''
@@ -54,8 +51,8 @@ def schedule_queries(trip_id, user_id, trip_array, immediate=False):
                 time = time + datetime.timedelta(days=1)
                 '''
 
-		cron = CronTab("ubuntu")
-		exec_str = python_location + ' ' + query_script_location + ' --trip-id ' + trip_id + ' --user-id ' + str(user_id)
+		cron = CronTab(user=True)
+		exec_str = "PYTHONPATH=/mnt/e-mission/e-mission-server/CFC_WebApp:/mnt/e-mission/e-mission-server/CFC_DataCollector:. " + python_location + ' ' + query_script_location + ' --trip-id ' + trip_id + ' --user-id ' + str(user_id) + ' >> /tmp/query_pipeline.stdinout 2>&1'
 		job = cron.new(command=exec_str)
 
 		job.month.on(time.month)

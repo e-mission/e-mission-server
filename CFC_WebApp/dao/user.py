@@ -36,7 +36,7 @@ class User:
     user = User(user_uuid)
     return user
 
-  def getProfile(self):
+  def getProfile(self, user_uuid):
     return get_profile_db().find_one({'user_id': self.uuid})
 
   # In the real system, we should always have a profile for the user. But

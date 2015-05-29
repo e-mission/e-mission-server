@@ -36,7 +36,7 @@ from common import most_common, get_first_daily_point, Include_place,berkeley_ar
 from distance import get_morning_commute_distance_pie,get_evening_commute_distance_pie
 from get_database import get_mode_db, get_section_db, get_trip_db, get_test_db
 import math
-import pygmaps
+import pygmaps_modified as pygmaps
 from datetime import date, timedelta
 from uuid import *
 from common import calDistance
@@ -132,6 +132,7 @@ def searchTrip(user, period, startpoint, endpoint, mode, option):
     
 def drawSection(section, option, gmap, Color = 'default'):
     track_points = section['track_points']
+    _id = section['_id']
     if track_points != []:
         path = []
         if Color != 'default':
@@ -147,7 +148,7 @@ def drawSection(section, option, gmap, Color = 'default'):
                 # coordinates are in GeoJSON format, ie lng, lat
                 gmap.addpoint(coordinate[1], coordinate[0], color)
         if option == PATH or option == ALL:
-            gmap.addpath(path, color)
+            gmap.addpath(path, color, _id)
 
 def drawSections(sections,option, gmap, Color = 'default'):
     for section in sections:

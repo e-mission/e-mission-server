@@ -8,7 +8,7 @@ angular.module('e-mission-choice', ['ionic'])
   };
 
   $scope.getIndexForTab = function(label) {
-    var tabLabelMap = {'data': 0, 'game': 1};
+    var tabLabelMap = {'data': 0, 'leaderboard': 1, 'game': 2, 'commontrips': 3, 'recommendation': 4};
     return tabLabelMap[label];
   }
 
@@ -26,7 +26,7 @@ angular.module('e-mission-choice', ['ionic'])
         // when the response is available
       }).
       error(function(data, status, headers, config) {
-        // alert("call error");
+        alert("call error");
         // called asynchronously if an error occurs
         // or server returns response with an error status.
       });
@@ -96,6 +96,27 @@ angular.module('e-mission-choice', ['ionic'])
   }
 })
 
+.controller('LeaderboardCtrl', function($scope, $ionicModal) {
+  // alert("GameCtrl called");
+
+  $scope.onLeaderboardClicked = function() {
+    $scope.setCurrChoice("leaderboard")
+  }
+
+  $scope.onLeaderboardSelected = function() {
+    console.log("Leaderboard tab selected");
+  }
+
+  $scope.onRefresh = function() {
+    // alert("GameCtrl.ON REFRESH");
+    console.log('ON REFRESH');
+
+    $timeout(function() {
+      $scope.$broadcast('scroll.refreshComplete');
+    }, 1000);
+  }
+})
+
 .controller('GameCtrl', function($scope, $ionicModal) {
   // alert("GameCtrl called");
 
@@ -115,8 +136,30 @@ angular.module('e-mission-choice', ['ionic'])
       $scope.$broadcast('scroll.refreshComplete');
     }, 1000);
   }
+})
 
-  .controller('RecommendationCtrl', function($scope, $ionicModal) {
+.controller('FooCtrl', function($scope, $ionicModal) {
+  // alert("GameCtrl called");
+
+  $scope.onCommonTripsClicked = function() {
+    $scope.setCurrChoice("commontrips");
+  }
+
+  $scope.onCommonTripsSelected = function() {
+    console.log("CommonTrip tab selected");
+  }
+
+  $scope.onRefresh = function() {
+    // alert("CommonTripsCtrl.ON REFRESH");
+    console.log('ON REFRESH');
+
+    $timeout(function() {
+      $scope.$broadcast('scroll.refreshComplete');
+    }, 1000);
+  }
+})
+
+.controller('RecommendationCtrl', function($scope, $ionicModal) {
 
   $scope.onRecommendationClicked = function() {
     $scope.setCurrChoice("recommendation")
@@ -135,3 +178,4 @@ angular.module('e-mission-choice', ['ionic'])
     }, 1000);
   }
 });
+

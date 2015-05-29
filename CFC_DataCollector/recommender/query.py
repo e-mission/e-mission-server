@@ -1,5 +1,4 @@
 import sys
-sys.path.append("/home/ubuntu/jimmy/e-mission-server/CFC_DataCollector/")
 import googlemaps 
 import datetime
 from get_database import *
@@ -11,15 +10,16 @@ from common import google_maps_to_our_trip
 import optparse
 from otp import OTP
 import uuid
+import logging
 
 def obtain_alternatives(trip_id, user_id):
 	db = get_trip_db()
-        trip = E_Mission_Trip.trip_from_json(db.find_one({"trip_id": trip_id, "user_id": user_id}))
-        print trip.sections
+	trip = E_Mission_Trip.trip_from_json(db.find_one({"trip_id": trip_id, "user_id": user_id}))
+	logging.debug(trip.sections)
 	start_coord = trip.trip_start_location.maps_coordinate()
 	end_coord = trip.trip_end_location.maps_coordinate()
-	print "Start: ", start_coord
-	print "End: ", end_coord
+	logging.debug("Start: %s " % start_coord)
+	logging.debug("End: %s " % end_coord)
 	    
 	curr_time = datetime.datetime.now()
 	curr_month = curr_time.month
@@ -36,7 +36,7 @@ def obtain_alternatives(trip_id, user_id):
 		    otp_trip.save_to_db()
                 except Exception as e:
                     #modes = ['driving', 'walking', 'bicycling', 'transit']
-                    print "Defaulting to Google Maps"
+                    logging.debug("Got error %s from OTP, defaulting to Google Maps" % e)
                     otp_to_google_mode = {"CAR":"driving", "WALK":"walking", "BICYCLE":"bicycling", "TRANSIT":"transit"}
                     mode = otp_to_google_mode[mode]
                     gmaps = googlemaps.GoogleMaps('AIzaSyBEkw4PXVv_bsAdUmrFwatEyS6xLw3Bd9c')

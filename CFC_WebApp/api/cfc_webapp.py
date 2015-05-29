@@ -279,7 +279,8 @@ def setStats():
 
 @post('/compare')
 def postCarbonCompare():
-  from clients.default import default
+  from clients.data import data
+  from clients.choice import choice
 
   if request.json == None:
     return "Waiting for user data to become available..."
@@ -288,33 +289,38 @@ def postCarbonCompare():
     return "Waiting for user data to be become available.."
 
   user_uuid = getUUID(request)
+
   clientResult = userclient.getClientSpecificResult(user_uuid)
   if clientResult != None:
     logging.debug("Found overriding client result for user %s, returning it" % user_uuid)
     return clientResult
   else:
-    logging.debug("No overriding client result for user %s, returning default" % user_uuid)
-  return default.getResult(user_uuid)
+    logging.debug("No overriding client result for user %s, returning choice " % user_uuid)
+  return choice.getResult(user_uuid)
 
 @get('/compare')
 def getCarbonCompare():
   for key, val in request.headers.items():
     print("  %s: %s" % (key, val))
 
-  from clients.default import default
+  from clients.data import data
 
-  if 'User' not in request.headers or request.headers.get('User') == '':
-    return "Waiting for user data to become available..."
+  if not skipAuth:
+    if 'User' not in request.headers or request.headers.get('User') == '':
+        return "Waiting for user data to become available..."
+  
+  from clients.choice import choice
 
   user_uuid = getUUID(request, inHeader=True)
   print ('UUID', user_uuid)
+  
   clientResult = userclient.getClientSpecificResult(user_uuid)
   if clientResult != None:
     logging.debug("Found overriding client result for user %s, returning it" % user_uuid)
     return clientResult
   else:
-    logging.debug("No overriding client result for user %s, returning default" % user_uuid)
-  return default.getResult(user_uuid)
+    logging.debug("No overriding client result for user %s, returning choice" % user_uuid)
+  return choice.getResult(user_uuid)
 
 # Client related code START
 @post("/client/<clientname>/<method>")
@@ -426,8 +432,6 @@ def verifyUserToken(token):
     logging.debug("Found user email %s" % tokenFields['email'])
     return tokenFields['email']
 
-
-
 def getUUIDFromToken(token):
     userEmail = verifyUserToken(token)
     user=User.fromEmail(userEmail)
@@ -441,16 +445,16 @@ def getUUID(request, inHeader=False):
   if skipAuth:
     from uuid import UUID
     from get_database import get_uuid_db
-    if get_uuid_db().find().count() == 1:
-      user_uuid = get_uuid_db().find_one()['uuid']
-    else:
-      # TODO: Figure out what we really want to do here
-      user_uuid = UUID('{3a307244-ecf1-3e6e-a9a7-3aaf101b40fa}')
+    user_uuid = get_uuid_db().find_one()['uuid']
     retUUID = user_uuid
     logging.debug("skipAuth = %s, returning fake UUID %s" % (skipAuth, user_uuid))
   else:
     if inHeader:
-      userToken = request.headers.get('User').split()[1]
+      userHeaderSplitList = request.headers.get('User').split()
+      if len(userHeaderSplitList) == 1:
+          userToken = userHeaderSplitList[0]
+      else:
+          userToken = userHeaderSplitList[1]
     else:
       userToken = request.json['user']
     retUUID = getUUIDFromToken(userToken)
@@ -476,7 +480,7 @@ else:
   # running on localhost but still want to run without authentication. That is
   # not really an important use case now, and it makes people have to change
   # two values and increases the chance of bugs. So let's key the auth skipping from this as well.
-  skipAuth = False
+  skipAuth = True
   print "Running with HTTPS turned OFF, skipAuth = True"
 
   run(host=server_host, port=server_port, server='cherrypy', debug=True)

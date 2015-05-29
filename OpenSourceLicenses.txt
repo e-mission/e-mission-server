@@ -14,6 +14,11 @@ Javascript libraries (copied and modified before use)
 Data collection code:
 * PyMoves (no license), Copyright Joost Plattel
 
-Pseudocode:
+Visualization:
+* pygmaps (GPL v3)
+
+pseudocode:
 * DTW courtesy http://jeremykun.com/2012/07/25/dynamic-time-warping/ and https://gist.github.com/socrateslee/3265694
 * LCS courtesy http://rosettacode.org/wiki/Longest_common_subsequence#Python
+
+

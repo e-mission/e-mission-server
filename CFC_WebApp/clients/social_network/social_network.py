@@ -2,7 +2,6 @@ import datetime
 import json
 from bottle import request
 import facebook
-from clients.default import default
 from dao.user import User
 from get_database import get_facebook_db, get_uuid_db
 from main import get_database

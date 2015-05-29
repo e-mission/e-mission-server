@@ -6,10 +6,13 @@ from datetime import datetime
 from common import calc_car_cost
 from main import common as cm
 from user_utility_model import UserUtilityModel
+import alternative_trips_module as atm
+import logging
 
 class EmissionsModel(UserUtilityModel):
-  def __init__(self, cost, time, mode, trips_with_alts):
-    super(EmissionsModel, self).__init__(trips_with_alts)
+  def __init__(self, cost, time, mode, trips):
+    super(EmissionsModel, self).__init__(trips)
+    self.feature_list = ["cost", "time", "mode", "emissions"]
     '''
     self.cost = ctm_model.cost
     self.time = ctm_model.time
@@ -22,38 +25,14 @@ class EmissionsModel(UserUtilityModel):
     # is scaled in the same range
     self.emissions = -100000 * ((self.cost + self.time) / 2)
     self.coefficients = [self.cost, self.time, self.mode, self.emissions]
-    print "emissions weight: ", self.emissions
+    logging.debug("emissions weight: %s" % self.emissions)
 
   def store_in_db(self, user_id):
-    print "storing E_Missions model"
+    logging.debug("storing E_Missions model")
     model_query = {'user_id': user_id, 'type':'recommender'}
     model_object = {'cost': self.cost, 'user_id':user_id, 'time': self.time, 
                     'mode': self.mode, 'emissions': self.emissions, 'updated_at': datetime.now(),'type':'recommender'}
     get_utility_model_db().update(model_query, model_object, upsert = True)
-
-  def extract_features(self, trip=None):
-    num_features = 4 
-    feature_vector = np.empty((len(self.trips_with_alts * (self.num_alternatives+1)), num_features)) 
-    label_vector = np.empty(len(self.trips_with_alts * (self.num_alternatives+1)))
-    sample = 0 
-    if trip:
-        feature_vector[sample] = self._extract_features(trip[0])
-        label_vector[sample] = 1 
-        sample += 1
-        for _alt in trip[1]:
-            print _alt.__dict__
-            feature_vector[sample] = self._extract_features(_alt)
-            label_vector[sample] = 0 
-    else:
-        for trip,alt in self.trips_with_alts:
-            feature_vector[sample] = self._extract_features(trip)
-            label_vector[sample] = 1 
-            sample += 1
-            for _alt in alt:
-                feature_vector[sample] = self._extract_features(_alt)
-                label_vector[sample] = 0 
-                sample += 1
-    return (feature_vector, label_vector)    
 
   def _extract_features(self, trip):
         if hasattr(trip, "cost") and isinstance(trip.cost, int):
@@ -70,11 +49,20 @@ class EmissionsModel(UserUtilityModel):
     # is user_id a uuid?
     return get_profile_db().find_one({'user_id': self.user_id})
 
-  def predict(self, trip_with_alts):
-    alts = list(trip_with_alts[1])
-    trip_features, labels = self.extract_features(trip_with_alts)
+  def predict(self, trip):
+    alts = list(atm.get_alternative_for_trip(trip))
+    trip_features, labels = self.extract_features_for_trips([trip])
+    trip_features = np.nan_to_num(trip_features)
     trip_features[np.abs(trip_features) < .001] = 0 
     trip_features[np.abs(trip_features) > 1000000] = 0 
+    logging.debug("trip_features = %s" % trip_features)
+    nonzero = ~np.all(trip_features==0, axis=1)
+    logging.debug("nonzero count = %d" % np.count_nonzero(nonzero))
+    trip_features = trip_features[nonzero]
+    labels = labels[nonzero]      
+    logging.debug("len(labels) = %d, len(alts) = %d" % (len(labels), len(alts)))
+    # assert(len(labels) == len(alts) + 1)
+
     best_trip = None
     best_utility = float("-inf")
     for i, trip_feature in enumerate(trip_features):
@@ -82,21 +70,23 @@ class EmissionsModel(UserUtilityModel):
         if utility > best_utility:
                 best_trip = i 
                 best_utility = utility
-    if labels[i] == 1:
-        print "Model predicts best trip is: ORIGINAL TRIP", best_trip
+    if labels[best_trip] == 1:
+        logging.debug("Model predicts best trip is: ORIGINAL TRIP (%d)" % best_trip)
     else: 
-        print "Model predicts best trip is: Alternative TRIP", best_trip
+        logging.debug("Model predicts best trip is: Alternative TRIP (%d)" % best_trip)
     if best_trip == 0:
-        return trip_with_alts[best_trip]
+        # Isn't this the same as the earlier check for labels[i]?
+        logging.debug("labels[best_trip] == %d" % labels[best_trip])
+        return trip
     else:
-        print best_trip
-        print trip_with_alts
+        logging.debug("best_trip = %s, out of %d alternatives " % (best_trip, len(alts)))
+	logging.debug("corresponding alternative = %s" % (alts[best_trip-1]))
         return alts[best_trip-1]
 
   # calculate the utility of trip using the model
   def predict_utility(self, trip):
     utility = sum(f * c for f, c in zip(trip, self.coefficients))
-    print trip, " Utility: ", utility 
+    logging.debug("%s Utility: %s" % (trip, utility))
     return utility
 
 
@@ -114,15 +104,18 @@ class EmissionsModel(UserUtilityModel):
     for mpg in mpg_array:
       total += mpg
     avg = total/len(mpg_array)
-    print "Returning total = %s, len = %s, avg = %s" % (total, len(mpg_array), avg)
+    logging.debug("Returning total = %s, len = %s, avg = %s" % (total, len(mpg_array), avg))
     return avg
 
   # calculates emissions for trips
   def getEmissionForTrip(self,trip):
     emissions = 0
     mode_list = trip.mode_list
+    if isinstance(mode_list, int):
+        print "WARNING! mode_list = %s, converting to a list with one element" % mode_list
+        mode_list = [mode_list]
     mode = mode_list[0] if mode_list else "driving"
-    print "Mode: ", mode
+    logging.debug("Mode: %s " % mode)
     distance = trip.get_distance()
     footprint = 0
     if mode == 'driving':

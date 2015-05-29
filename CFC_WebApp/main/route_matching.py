@@ -1,6 +1,6 @@
 from __future__ import division
 from common import Is_place_2,Include_place_2
-from get_database import get_section_db,get_transit_db, get_routeDistanceMatrix_db,get_routeCluster_db
+from get_database import get_section_db,get_transit_db, get_routeDistanceMatrix_db,get_routeCluster_db, update_routeDistanceMatrix_db
 from common import calDistance
 import numpy as np
 from Frechet import Frechet
@@ -208,7 +208,6 @@ def getRoute(section_id):
     route=[]
     Sections=get_section_db()
     section=Sections.find_one({'_id':section_id})
-    # print(section)
     for point in section['track_points']:
         route.append(point['track_location']['coordinates'])
     return route
@@ -418,6 +417,7 @@ def matchTwoRoutes(route1,route2,step1=100000,step2=100000,method='lcs',radius1=
 
 def update_user_routeDistanceMatrix(user_id,data_feature,step1=100000,step2=100000,method='lcs',radius1=1000):
     ids = data_feature.keys()
+    """
     user_query=get_routeDistanceMatrix_db().find_one({'$and':[{'user':user_id},{'method':method}]})
     if user_query==None:
         user_disMat={}
@@ -426,21 +426,35 @@ def update_user_routeDistanceMatrix(user_id,data_feature,step1=100000,step2=1000
         get_routeDistanceMatrix_db().insert({'user':user_id,'method':method,'disMat':user_disMat})
     else:
         user_disMat=user_query['disMat']
+    """
+    user_disMat = get_routeDistanceMatrix_db(user_id, method)
+
     a=0
 
     # print(len(ids))
     for _id in ids:
-        # print(a)
+        if a % 100 == 0:
+            print "In update_user_routeDistanceMatrix, a = %d" % a
         a+=1
         for key in ids:
             try:
                 user_disMat[_id][key]
+                #print("found it")
             except KeyError:
-                # print('start calculation')
+                #print('Updating matrix for the trip ' + _id + '. Doing calculations.')
                 dis=fullMatchDistance(data_feature[_id], data_feature[key],step1,step2,method,radius1)
+                #user_disMat[_id] = {}
+                if _id not in user_disMat:
+                    user_disMat[_id] = {}
                 user_disMat[_id][key] = dis
+                #print('Update successful.')
+                #print(user_disMat[_id])
 
-    get_routeDistanceMatrix_db().update({'$and':[{'user':user_id},{'method':method}]},{'user':user_id,'method':method,'disMat':user_disMat})
+    #get_routeDistanceMatrix_db().update({'$and':[{'user':user_id},{'method':method}]},{'user':user_id,'method':method,'disMat':user_disMat})
+    print(type(user_disMat))
+    user_disMat = update_routeDistanceMatrix_db(user_id, method, user_disMat)
+    return user_disMat
+
     # for entry in get_routeDistanceMatrix_db().find():
     #     print(entry)
 
