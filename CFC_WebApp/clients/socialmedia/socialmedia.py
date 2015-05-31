@@ -8,31 +8,21 @@ Instructions:
 """
 import datetime
 import json
-import logging
 from os.path import dirname
-
-
+from dao.socialmediauser import FacebookUser
+from get_database import get_client_db
 
 FB_BASE_DIR = dirname(dirname(__file__))
 
-def getResult(user):
-    datey = str(datetime.datetime.today())
-    if user:
-        from bottle import template
-        return template("clients/socialmedia/result_template.html",datey=json.dumps(datey))
+
+def getFacebookUser(cookies):
+    return FacebookUser.get_user_from_cookies(cookies)
 
 
-def registerUser(access_token):
-    from dao.SocialMediaUser import FacebookUser
-    # this is
-    logging.info("social_media.registerUser called for user %s" % access_token)
-    try:
-        fb = FacebookUser.fromAccessToken(access_token)
-
-    except:
-        pass
-
-
+def facebookLogin():
+    from bottle import template
+    return template("clients/socialmedia/result_template.tpl",client_key=get_client_db().find_one({
+        'name':'socialmedia'})['key'])
 
 
 

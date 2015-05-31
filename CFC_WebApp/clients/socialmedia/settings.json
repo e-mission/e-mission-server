@@ -2,9 +2,9 @@
   "name": "socialmedia",
   "start_date": "2014/10/13",
   "end_date": "2015/06/01",
-  "key": "c86153c9-f60b-4f02-b4d7-2e333de46d94",
+  "key": "dc23ad22-bc78-4fd6-9adf-ca2b04505916",
   "client_settings": {
-    "result_url": "https://e-mission.eecs.berkeley.edu/sociaMedia",
+    "result_url": "https://e-mission.eecs.berkeley.edu/socialmedia",
     "fb_app_secret": "051bb7402ba81dbbd3a7d11030567d07",
     "fb_app_id": "456261131199824"
   }

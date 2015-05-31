@@ -19,6 +19,8 @@ from oauth2client.crypt import AppIdentityError
 import traceback
 import xmltodict
 import urllib2
+from clients.socialmedia import socialmedia
+from clients.socialmedia.socialmedia import facebookLogin
 
 config_file = open('config.json')
 config_data = json.load(config_file)
@@ -351,6 +353,10 @@ def javascriptCallback(clientName, method):
   client_key = request.query.client_key
   client.callJavascriptCallback(client_key, method, request.params)
   return {'status': 'ok'}
+
+@get('/fbregister')
+def callFacebookRegister():
+  return facebookLogin()
 
 # proxy used to request and process XML from an external API, then convert it to JSON
 # original URL should be encoded in UTF-8
