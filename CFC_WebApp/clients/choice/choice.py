@@ -30,8 +30,11 @@ def getCurrView(uuid):
 
 def switchResultDisplay(params):
   logging.debug("params = %s" % (params))
-
-  uuid = UUID(params['uuid'])
+  print "params = %s" % (params['uuid'])
+  try:
+    uuid = UUID(params['uuid'])
+  except:
+    uuid = "temp" ## For testing purposes 
   newView = params['new_view']
   logging.debug("Changing choice for user %s to %s" % (uuid, newView))
   setCurrView(uuid, newView)
