@@ -21,7 +21,7 @@
     <title>Leaderboard</title>
     <script src="clients/choice/front/ionic.bundle.js" charset="utf-8"></script>
     <script src="clients/leaderboard/front/client.leaderboard.display.js" charset="utf-8"></script>
-
+    <script src="http://ajax.aspnetcdn.com/ajax/mobileservices/MobileServices.Web-1.2.7.min.js"></script>
     <link rel="stylesheet" href="clients/choice/front/ionic.min.css">
   </head>
   <body ng-controller="RootCtrl">
@@ -29,9 +29,13 @@
         <body onLoad='showscores()'></body>
     </div>
     <script>
+        var client = new WindowsAzure.MobileServiceClient(
+          "https://e-mission.azure-mobile.net/",
+          "pcLiiJecqFLoeUxVjrKeMaqjCPqPnx81"
+        );
         var currScore = {{currScore}};
         var prevScore = {{prevScore}};
-        var otherCurrScoreList = {{otherCurrScoreList}}
+        var otherCurrScoreList = {{otherCurrScoreList}};
         function showscores() {
           var listContainer = document.createElement("div");
           document.getElementsByTagName("body")[0].appendChild(listContainer);
@@ -49,6 +53,11 @@
             var listItem = document.createElement("i");
             listElement.appendChild(listItemContainer);
             listItem.innerHTML = otherCurrScoreList[i-1];
+            var usr = "User" + user;
+            var db_add = {usr: user};
+            client.getTable("Item").insert(db_add);
+            //listItem.innerHTML = i;
+            var db_item = {}
             listItem.style.color = "#545454";
             listItem.style.cssFloat = "right";
             if((currScore >= otherCurrScoreList[i-1]) && insert < 1){
@@ -57,22 +66,26 @@
               scoreContainer.style.backgroundColor="#7ebd96";
               listElement.appendChild(scoreContainer);
               var yourScore = document.createElement("i");
-              yourScore.innerHTML = currScore;
+              yourScore.innerHTML = 100;
               yourScore.style.fontWeight = "900";
               yourScore.style.cssFloat = "right";
               var youName = document.createElement("i");
               youName.style.fontWeight = "900";
               youName.style.cssFloat = "left";
-              youName.innerHTML = "You";
+              youName.innerHTML = "Josh2";
               scoreContainer.appendChild(youName);
               scoreContainer.appendChild(yourScore);
-              insert++;
+              insert ++;
           }
           prev = otherCurrScoreList[i-1];
           var anon = document.createElement("i");
           anon.style.color = "#545454";
           anon.style.cssFloat = "left";
-          anon.innerHTML = "User" + user;
+          var usr = "isThisAThing" + user;
+          var db_add = {usr: user};
+          client.getTable("Item").insert(db_add);
+          //document.write("is anything happening here???");
+          anon.innerHTML = usr;
           user ++;
           listItemContainer.appendChild(anon);
           listItemContainer.appendChild(listItem);
@@ -82,13 +95,13 @@
             scoreContainer.style.backgroundColor="#7ebd96";
             listElement.appendChild(scoreContainer);
             var yourScore = document.createElement("i");
-            yourScore.innerHTML = currScore;
+            yourScore.innerHTML = "100";
             yourScore.style.fontWeight = "900";
             yourScore.style.cssFloat = "right";
             var youName = document.createElement("i");
             youName.style.fontWeight = "900";
             youName.style.cssFloat = "left";
-            youName.innerHTML = "You";
+            youName.innerHTML = "Josh";
             scoreContainer.appendChild(youName);
             scoreContainer.appendChild(yourScore);
             }
