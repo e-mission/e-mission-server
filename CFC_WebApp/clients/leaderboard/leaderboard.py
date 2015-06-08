@@ -8,7 +8,7 @@ from dao.user import User
 import math
 from get_database import get_uuid_db
 from main import userclient
-import SQL
+#import SQL
 from couchbase.bucket import Bucket
 
 
@@ -94,7 +94,8 @@ def getScore(user_uuid, start, end):
     score = calcScore(components)
     print "Putting in DB"
     if cloud['AZURE']:
-        SQL.put(user_uuid, score)
+        #SQL.put(user_uuid, score)
+        pass
     elif cloud['COUCHBASE']:
         bucket.insert(user_uuid, score)
     else:
@@ -178,7 +179,8 @@ def getResult(user_uuid):
   otherCurrScoreList.sort()
   print "Putting in DB"
   if cloud['AZURE']:
-    SQL.put(user_uuid, score)
+    #SQL.put(user_uuid, score)
+    pass
   elif cloud['COUCHBASE']:
     bucket.insert(user_uuid, score)
   else:
