@@ -9,9 +9,23 @@ import math
 from get_database import get_uuid_db
 from main import userclient
 import SQL
+from couchbase.bucket import Bucket
+
+
+## The couchbase python library only compiles on Linux Machines so be careful 
+## pip install couchbase
+
+## Cloud abstraction choice
+cloud = { 
+          AZURE : False,
+          COUCHBASE : True,  
+          AMAZON : False
+        }
 
 # sb375 is a weekly goal - we convert it to daily by dividing by 7
 sb375DailyGoal = 40.142892/7
+if cloud['COUCHBASE']:
+  bucket = Bucket('http://10.1.10.63:8091')  ## Address of running server 
 
 # BEGIN: Code to get and set client specific fields in the profile (currentScore and previousScore)
 def getStoredScore(user):
@@ -78,8 +92,13 @@ def getScore(user_uuid, start, end):
     stats.storeResultEntry(user_uuid, stats.STAT_ALL_DRIVE_MINUS_MINE, time.time(), allDriveMinusMine)
     stats.storeResultEntry(user_uuid, stats.STAT_SB375_DAILY_GOAL, time.time(), sb375DailyGoal)
     score = calcScore(components)
-    print "SQLING"
-    SQL.put(user_uuid, score)
+    print "Putting in DB"
+    if cloud['AZURE']:
+        SQL.put(user_uuid, score)
+    elif cloud['COUCHBASE']:
+        bucket.insert(user_uuid, score)
+    else:
+        ## Do AWS option
     return score
 
 
@@ -156,8 +175,13 @@ def getResult(user_uuid):
     SQL.put(user_uuid_dict['uuid'], currCurrScore)
 
   otherCurrScoreList.sort()
-  print "SQLING"
-  SQL.put(user_uuid, currScore)
+  print "Putting in DB"
+  if cloud['AZURE']:
+    SQL.put(user_uuid, score)
+  elif cloud['COUCHBASE']:
+    bucket.insert(user_uuid, score)
+  else:
+      ## Do AWS option
   renderedTemplate = template("clients/leaderboard/result_template.html",
                                level_picture_filename = getFileName(level, sublevel),
                                prevScore = prevScore,
