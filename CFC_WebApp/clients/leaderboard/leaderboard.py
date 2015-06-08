@@ -98,6 +98,7 @@ def getScore(user_uuid, start, end):
     elif cloud['COUCHBASE']:
         bucket.insert(user_uuid, score)
     else:
+        pass
         ## Do AWS option
     return score
 
@@ -181,6 +182,7 @@ def getResult(user_uuid):
   elif cloud['COUCHBASE']:
     bucket.insert(user_uuid, score)
   else:
+      pass
       ## Do AWS option
   renderedTemplate = template("clients/leaderboard/result_template.html",
                                level_picture_filename = getFileName(level, sublevel),
