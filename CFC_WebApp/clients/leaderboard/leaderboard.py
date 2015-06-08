@@ -17,9 +17,9 @@ from couchbase.bucket import Bucket
 
 ## Cloud abstraction choice
 cloud = { 
-          AZURE : False,
-          COUCHBASE : True,  
-          AMAZON : False
+          "AZURE" : False,
+          "COUCHBASE" : True,  
+          "AMAZON" : False
         }
 
 # sb375 is a weekly goal - we convert it to daily by dividing by 7
