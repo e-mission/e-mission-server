@@ -25,7 +25,7 @@ cloud = {
 # sb375 is a weekly goal - we convert it to daily by dividing by 7
 sb375DailyGoal = 40.142892/7
 if cloud['COUCHBASE']:
-  bucket = Bucket('http://10.1.10.63:8091')  ## Address of running server 
+  bucket = Bucket('http://10.10.67.102:8091')  ## Address of running server 
 
 # BEGIN: Code to get and set client specific fields in the profile (currentScore and previousScore)
 def getStoredScore(user):
