@@ -1,6 +1,6 @@
 import unittest
 from get_database import get_section_db
-from utils.useful_queries import get_all_sections, get_trip_before, get_all_sections_for_user_day
+from trip_analysis.useful_queries import get_all_sections, get_trip_before, get_all_sections_for_user_day
 from datetime import datetime
 
 class UsefulQueriesTests(unittest.TestCase):
