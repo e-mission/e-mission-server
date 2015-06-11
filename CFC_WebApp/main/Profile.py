@@ -21,7 +21,8 @@ def update_profiles(dummy_users=False):
     else:
         user_list = get_section_db().distinct('user_id')
     for user in user_list:
-        generate_user_home_work(user)    
+        generate_user_home_work(user)
+        generate_route_clusters(user, 20)
 
 def generate_user_home_work(user):
     user_home=detect_home(user)

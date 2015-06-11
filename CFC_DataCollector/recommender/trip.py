@@ -52,11 +52,11 @@ class Trip(object):
         trip_id = json_segment.get("trip_id")
         sections = cls._init_sections(user_id, trip_id, len(json_segment.get("sections"))) if json_segment.get("sections") else None
         try:
+            start_time = json_segment["trip_start_datetime"]
+            end_time = json_segment["trip_end_datetime"]
+        except:
             start_time = datetime.datetime.strptime(json_segment.get("trip_start_time"), DATE_FORMAT)
             end_time = datetime.datetime.strptime(json_segment.get("trip_end_time"), DATE_FORMAT)
-        except:
-            start_time = json_segment.get("trip_start_time")
-            end_time = json_segment.get("trip_end_time")
         trip_start_location = cls._start_location(sections)
         trip_end_location = cls._end_location(sections)
         return cls(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location)
@@ -83,7 +83,6 @@ class Trip(object):
         return self.end_time - self.start_time
 
     def get_distance(self):
-        print "Getting Cal Distance"
         return cm.calDistance(self.trip_start_location, self.trip_end_location, True)
 
     def save_to_db(self):
@@ -96,6 +95,7 @@ class Section(object):
         self.user_id = user_id
         self.trip_id = trip_id
         self.distance = distance
+        self.section_type = section_type
         self.start_time = start_time
         self.end_time = end_time
         self.section_start_location = section_start_location
@@ -104,27 +104,53 @@ class Section(object):
         self.confirmed_mode = confirmed_mode
         self.points = []
 
+    def __str__(self):
+        return "%s:%s:%s" % (self.trip_id, self._id, self.section_type)
+
     @classmethod
     def section_from_json(cls, json_segment):
         _id = json_segment.get("_id")
         user_id = json_segment.get("user_id")
         trip_id = json_segment.get("trip_id")
         distance = json_segment.get("distance")
-        start_time = datetime.datetime.strptime(json_segment.get("section_start_time"), DATE_FORMAT)
-        end_time = datetime.datetime.strptime(json_segment.get("section_end_time"), DATE_FORMAT)
-        section_start_location = cls._start_location(json_segment.get("track_points"))
-        section_end_location = cls._end_location(json_segment.get("track_points"))
+        section_type = json_segment.get("type")
+        # This used to have a fallback to parsing the section_start_time, and section_end_time.
+        # However, we don't actually have any sections that would use the
+        # fallback, and our current code always parses the section times before
+        # storing to the database, so the complexity is not needed
+        # In [311]: get_section_db().find({'section_start_datetime': {'$exists': False}}).count()
+        # Out[311]: 0
+        # In [312]: get_section_db().find({'section_start_datetime': {'$exists': True}}).count()
+        # Out[312]: 97671
+        # In [313]: get_section_db().find({'section_end_datetime': {'$exists': False}}).count()
+        # Out[313]: 0
+        # In [314]: get_section_db().find({'section_end_datetime': {'$exists': True}}).count()
+        # Out[314]: 97671
+        # In [315]: get_section_db().find().count()
+        # Out[315]: 97671
+
+        start_time = cls._get_datetime(json_segment, "section_start_datetime")
+        end_time = cls._get_datetime(json_segment, "section_end_datetime")
+        section_start_location = cls._get_coordinate(json_segment, "section_start_point")
+        section_end_location = cls._get_coordinate(json_segment, "section_end_point")
         mode = json_segment.get("mode")
         confirmed_mode = json_segment.get("confirmed_mode")
         return cls(_id, user_id, trip_id, distance, section_type, start_time, end_time, section_start_location, section_end_location, mode, confirmed_mode)
 
     @classmethod
-    def _start_location(cls, points):
-        return Coordinate(points[0]["track_location"]["coordinates"][1], points[0]["track_location"]["coordinates"][0]) if points else None
+    def _get_coordinate(cls, json_segment, coord_key):
+        if coord_key in json_segment:
+            coord_json = json_segment[coord_key]["coordinates"]
+            return Coordinate(coord_json[1], coord_json[0])
+        else:
+            return None
 
     @classmethod
-    def _end_location(cls, points):
-        return Coordinate(points[-1]["track_location"]["coordinates"][1], points[-1]["track_location"]["coordinates"][0]) if points else None
+    def _get_datetime(cls, json_segment, coord_key):
+        if coord_key in json_segment:
+            return json_segment[coord_key]
+        else:
+            return None
 
     def save_to_db(self):
         db = get_section_db()
@@ -217,6 +243,7 @@ class E_Mission_Trip(Trip):
             "trip_end_location": alternative.trip_end_location.coordinate_list(),
             "mode_list": alternative.mode_list,
             "track_points": alternative.track_points}
+        print "recommending"
         result = db.update({"trip_id": self.trip_id, "user_id": self.user_id},
                       {"$set": {"recommended_alternative" : alternative_json}},
                        upsert=False,multi=False)
@@ -262,15 +289,15 @@ class Canonical_E_Mission_Trip(E_Mission_Trip):
 
     @classmethod
     def trip_from_json(cls, json_segment):
-        trip = E_Mission_Trip.trip_from_json(json_segment)
-        trip.start_point_distr = json_segment.get("start_point_distr")
-        trip.end_point_distr = json_segment.get("end_point_distr")
-        trip.start_time_distr = json_segment.get("start_time_distr")
-        trip.end_time_distr = json_segment.get("end_time_distr")
-        trip.confirmed_mode_list = json_segment.get("confirmed_mode_list")
-        return cls(trip._id, trip.user_id, trip.trip_id, trip.sections, trip.start_time, trip.end_time, trip.trip_start_location, trip.trip_end_location, 
-                   trip.alternatives, trip.perturbed_trips, trip.mode_list, trip.start_point_distr, trip.end_point_distr, 
-                   trip.start_time_distr, trip.end_time_distr, trip.confirmed_mode_list)
+        trip = Section.section_from_json(json_segment.get("representative_trip"))
+        start_point_distr = json_segment.get("start_point_distr")
+        end_point_distr = json_segment.get("end_point_distr")
+        start_time_distr = json_segment.get("start_time_distr")
+        end_time_distr = json_segment.get("end_time_distr")
+        confirmed_mode_list = json_segment.get("confirmed_mode_list")
+        return cls(trip._id, trip.user_id, trip.trip_id, [], trip.start_time, trip.end_time, trip.section_start_location, trip.section_end_location, 
+                   [], [], [], start_point_distr, end_point_distr, 
+                   start_time_distr, end_time_distr, confirmed_mode_list)
 
     def save_to_db(self):
         db = get_canonical_trips_db()
@@ -299,6 +326,7 @@ class Alternative_Trip(Trip):
 
     @classmethod
     def trip_from_json(cls, json_segment):
+	# print "json_segment = %s" % json_segment
         trip = Trip.trip_from_json(json_segment)
         trip.parent_id = json_segment.get("parent_id")
         trip.cost = json_segment.get("cost")
@@ -307,7 +335,8 @@ class Alternative_Trip(Trip):
 
         trip.track_points = json_segment.get("track_points")
 
-        trip.trip_start_location = Coordinate(json_segment.get("trip_start_location")[1], json_segment.get("trip_start_location")[0])
+	trip.trip_start_location = Coordinate(json_segment.get("trip_start_location")[1], json_segment.get("trip_start_location")[0])
+
         trip.trip_end_location = Coordinate(json_segment.get("trip_end_location")[1], json_segment.get("trip_end_location")[0])
 
         return cls(trip._id, trip.user_id, trip.trip_id, trip.sections, trip.start_time, trip.end_time, trip.trip_start_location, trip.trip_end_location,

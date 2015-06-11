@@ -1,7 +1,7 @@
 import unittest
 import json
 from utils import load_database_json, purge_database_json
-from clients.default import default
+from clients.data import data
 import logging
 from get_database import get_db, get_mode_db, get_section_db
 from datetime import datetime, timedelta
@@ -26,13 +26,13 @@ class TestDefault(unittest.TestCase):
         user = User.fromUUID(self.uuid)
         # Tuple of JSON objects, similar to the real footprint
         dummyCarbonFootprint = ({'myModeShareCount': 10}, {'avgModeShareCount': 20})
-        self.assertEquals(default.getCarbonFootprint(user), None)
-        default.setCarbonFootprint(user, dummyCarbonFootprint)
+        self.assertEquals(data.getCarbonFootprint(user), None)
+        data.setCarbonFootprint(user, dummyCarbonFootprint)
         # recall that pymongo converts tuples to lists somewhere down the line
-        self.assertEquals(default.getCarbonFootprint(user), list(dummyCarbonFootprint))
+        self.assertEquals(data.getCarbonFootprint(user), list(dummyCarbonFootprint))
     
     def testGetCategorySum(self):
-        calcSum = default.getCategorySum({'walking': 1, 'cycling': 2, 'bus': 3, 'train': 4, 'car': 5})
+        calcSum = data.getCategorySum({'walking': 1, 'cycling': 2, 'bus': 3, 'train': 4, 'car': 5})
         self.assertEqual(calcSum, 15)
 
     def testRunBackgroundTasksForDay(self):
@@ -54,7 +54,7 @@ class TestDefault(unittest.TestCase):
         test_uuid = self.uuid_list[0]
         test_user = User.fromUUID(test_uuid)
         self.assertNotIn('carbon_footprint', test_user.getProfile().keys())
-        default.runBackgroundTasks(test_user.uuid)
+        data.runBackgroundTasks(test_user.uuid)
         self.assertIn('carbon_footprint', test_user.getProfile().keys())
 
 if __name__ == '__main__':

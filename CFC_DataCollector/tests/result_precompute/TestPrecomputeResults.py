@@ -17,7 +17,7 @@ from dao.user import User
 from dao.client import Client
 import tests.common
 from clients.testclient import testclient
-from clients.default import default
+from clients.data import data
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -68,7 +68,7 @@ class TestPrecomputeResults(unittest.TestCase):
             currUser = User.fromEmail(email)
             self.assertEqual(currUser.getProfile().get("testfield1"), None)
             self.assertEqual(currUser.getProfile().get("testfield2"), None)
-            self.assertEqual(default.getCarbonFootprint(currUser), None)
+            self.assertEqual(data.getCarbonFootprint(currUser), None)
 
         fakeEmail = "fest@example.com"
 
@@ -89,7 +89,7 @@ class TestPrecomputeResults(unittest.TestCase):
             if email != fakeEmail:
                 currUser = User.fromEmail(email)
 
-                carbonFootprint = default.getCarbonFootprint(currUser)
+                carbonFootprint = data.getCarbonFootprint(currUser)
                 self.assertEqual(len(carbonFootprint), 12)
 
 if __name__ == '__main__':

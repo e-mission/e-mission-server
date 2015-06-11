@@ -21,7 +21,7 @@ ensure reasonable performance.
 1. Install [Mongodb](http://www.mongodb.org/) (Note: mongodb appears to be installed as a service on Windows devices and it starts automatically on reboot)
 Note: If you are using OSX: You want to install homebrew and then use homebrew to install mongodb. Follow these instruction on how to do so ---> (http://docs.mongodb.org/manual/tutorial/install-mongodb-on-os-x/)
 
-1. Start it at the default port
+2. Start it at the default port
     $ mongod
 Ubuntu: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
 
@@ -67,7 +67,7 @@ config.json, depending on which platform you are testing against.
 1. Copy keys.json.sample to keys.json, register for the appropriate keys, and
 fill them in
 
-1. Start the server
+1. Start the server (Note: mongodb appears to be installed as a service on Windows devices and it starts automatically on reboot)
 
         $ cd CFC_WebApp
         $ python api/cfc_webapp.py

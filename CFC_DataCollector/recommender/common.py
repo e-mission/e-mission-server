@@ -38,7 +38,7 @@ def google_maps_to_our_trip(google_maps_json, _id, user_id, trip_id, mode, org_s
                 start_location = Coordinate(leg['start_location']['lat'], leg['start_location']['lng'])
                 end_location = Coordinate(leg['end_location']['lat'], leg['end_location']['lng'])
 		end_time = time + td
-                section = Section(0, trip_id, distance, time, end_time, start_location, end_location, mode, mode)
+                section = Section(0, user_id, trip_id, distance, time, end_time, start_location, end_location, mode, mode)
                 section.points = coords
                 sections.append(section)
 		time = end_time
