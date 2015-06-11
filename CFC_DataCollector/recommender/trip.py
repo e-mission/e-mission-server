@@ -6,7 +6,7 @@ import sys
 import os
 sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
 from main import common as cm
-#from feature_calc
+import logging
 
 DATE_FORMAT = "%Y%m%dT%H%M%S-%W00"
 
@@ -139,9 +139,14 @@ class Section(object):
 
     @classmethod
     def _get_coordinate(cls, json_segment, coord_key):
-        if coord_key in json_segment:
-            coord_json = json_segment[coord_key]["coordinates"]
-            return Coordinate(coord_json[1], coord_json[0])
+        logging.debug("While retrieving %s from %s, in is %s" % (coord_key, json_segment, (coord_key in json_segment)))
+        if coord_key in json_segment and json_segment[coord_key] is not None:
+            if "coordinates" in json_segment[coord_key]:
+                coord_json = json_segment[coord_key]["coordinates"]
+                return Coordinate(coord_json[1], coord_json[0])
+            else:
+                logging.warn("Unable to get coordinates from key %s in segment %s " % (coord_key, json_segment))
+                return None
         else:
             return None
 

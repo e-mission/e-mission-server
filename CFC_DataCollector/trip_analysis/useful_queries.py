@@ -1,6 +1,7 @@
 from get_database import get_section_db
 from recommender.trip import Section
 from datetime import datetime, timedelta
+import logging
 
 def get_all_sections(section_id):
     """ Return all sections in the trip that the specified section is a part of
@@ -29,11 +30,15 @@ def get_trip_before(section_id):
     """ Return the trip just before the one that this section belongs to.
     """
     section = Section.section_from_json(get_section_db().find_one({'_id': section_id}))
+    logging.debug("Found section %s" % section)
     firstSection = Section.section_from_json(get_section_db().find_one({"trip_id": section.trip_id, "section_id": 0}))
+    logging.debug("First section %s" % firstSection)
     # First, try to find the seection assuming that data collection was continuous
     prevPlace = Section.section_from_json(get_section_db().find_one({"section_end_datetime": firstSection.start_time}))
+    logging.debug("prevPlace %s" % prevPlace)
     # This should be the "place" trip
     if prevPlace is not None:
+        logging.debug("prevPlace.section_type = %s" % prevPlace.section_type)
         if prevPlace.section_type != "place":
             return None
         else:

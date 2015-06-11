@@ -13,6 +13,9 @@ class UsefulQueriesTests(unittest.TestCase):
         get_section_db().remove({"_id": "foo_1"})
         get_section_db().remove({"_id": "foo_2"})
         get_section_db().remove({"_id": "foo_3"})
+        self.assertEqual(get_section_db().find({'_id': 'foo_1'}).count(), 0)
+        self.assertEqual(get_section_db().find({'_id': 'foo_2'}).count(), 0)
+        self.assertEqual(get_section_db().find({'_id': 'foo_3'}).count(), 0)
 
     def testGetAllSections(self):
         get_section_db().insert({"_id": "foo_1", "trip_id": "bar"})
@@ -26,19 +29,21 @@ class UsefulQueriesTests(unittest.TestCase):
         dt3 = datetime(2015, 1, 1, 3, 1, 1)
         get_section_db().insert({"_id": "foo_1",
             "type":"move",
+            "trip_id": "trip_1",
             "section_id": 3,
             "section_start_datetime": dt1,
             "section_end_datetime": dt2})
         get_section_db().insert({"_id": "foo_2",
             "type":"place",
+            "trip_id": "trip_2",
             "section_start_datetime": dt2,
             "section_end_datetime": dt3})
         get_section_db().insert({"_id": "foo_3",
             "type": "move",
+            "trip_id": "trip_3",
             "section_id": 0,
             "section_start_datetime": dt3})
         self.assertEqual(get_trip_before("foo_3")["_id"], "foo_1")
-
 
     def testGetTripBefore(self):
         dt1 = datetime(2015, 1, 1, 1, 1, 1)
