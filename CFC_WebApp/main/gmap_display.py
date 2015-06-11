@@ -132,6 +132,7 @@ def searchTrip(user, period, startpoint, endpoint, mode, option):
     
 def drawSection(section, option, gmap, Color = 'default'):
     track_points = section['track_points']
+    _id = section['_id']
     if track_points != []:
         path = []
         if Color != 'default':
@@ -147,7 +148,7 @@ def drawSection(section, option, gmap, Color = 'default'):
                 # coordinates are in GeoJSON format, ie lng, lat
                 gmap.addpoint(coordinate[1], coordinate[0], color)
         if option == PATH or option == ALL:
-            gmap.addpath(path, color)
+            gmap.addpath(path, color, _id)
 
 def drawSections(sections,option, gmap, Color = 'default'):
     for section in sections:

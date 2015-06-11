@@ -250,10 +250,11 @@ class E_Mission_Trip(Trip):
                 perturbed.save_to_db()
 
 class Canonical_E_Mission_Trip(E_Mission_Trip):
-    #if there are no alternatives found, set alternatives list to None
-    def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location,
-                 alternatives, perturbed_trips, mode_list, start_point_distr, end_point_distr, start_time_distr, end_time_distr):
-        super(Canonical_E_Mission_Trip, self).__init__(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location)
+    #if there are no alternatives found, set alternatives list to None 
+    def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, 
+                 alternatives, perturbed_trips, mode_list, start_point_distr, end_point_distr, start_time_distr, end_time_distr, confirmed_mode_list): # added confirmed_mode_list to this constructor
+        super(Canonical_E_Mission_Trip, self).__init__(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, 
+            alternatives, perturbed_trips, mode_list, confirmed_mode_list) # super expects more arguments than this
         self.start_point_distr = start_point_distr
         self.end_point_distr = end_point_distr
         self.start_time_distr = start_time_distr
@@ -266,9 +267,10 @@ class Canonical_E_Mission_Trip(E_Mission_Trip):
         trip.end_point_distr = json_segment.get("end_point_distr")
         trip.start_time_distr = json_segment.get("start_time_distr")
         trip.end_time_distr = json_segment.get("end_time_distr")
-        return cls(trip._id, trip.user_id, trip.trip_id, trip.sections, trip.start_time, trip.end_time, trip.trip_start_location, trip.trip_end_location,
-                   trip.alternatives, trip.perturbed_trips, trip.mode_list, trip.start_point_distr, trip.end_point_distr,
-                   trip.start_time_distr, strip.end_time_distr)
+        trip.confirmed_mode_list = json_segment.get("confirmed_mode_list")
+        return cls(trip._id, trip.user_id, trip.trip_id, trip.sections, trip.start_time, trip.end_time, trip.trip_start_location, trip.trip_end_location, 
+                   trip.alternatives, trip.perturbed_trips, trip.mode_list, trip.start_point_distr, trip.end_point_distr, 
+                   trip.start_time_distr, trip.end_time_distr, trip.confirmed_mode_list)
 
     def save_to_db(self):
         db = get_canonical_trips_db()
