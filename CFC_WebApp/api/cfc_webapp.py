@@ -229,8 +229,6 @@ def storeSensedTrips():
   print "user_uuid %s" % user_uuid
   logging.debug("user_uuid %s" % user_uuid)
   sections = request.json['sections']
-  fileName = "%s/phone/%s" % (log_base_dir, time.time())
-  json.dump(sections, open(fileName, "w"))
   return tripManager.storeSensedTrips(user_uuid, sections)
 
 @post('/profile/create')
@@ -239,7 +237,10 @@ def createUserProfile():
   userToken = request.json['user']
   # This is the only place we should use the email, since we may not have a
   # UUID yet. All others should only use the UUID.
-  userEmail = verifyUserToken(userToken)
+  if skipAuth:
+    userEmail = userToken
+  else: 
+    userEmail = verifyUserToken(userToken)
   logging.debug("userEmail = %s" % userEmail)
   user = User.register(userEmail)
   logging.debug("Looked up user = %s" % user)
@@ -278,42 +279,48 @@ def setStats():
 
 @post('/compare')
 def postCarbonCompare():
-  from clients.default import default
+  from clients.data import data
+  from clients.choice import choice
 
-  if request.json == None:
-    return "Waiting for user data to become available..."
-
-  if 'user' not in request.json:
-    return "Waiting for user data to be become available.."
+  if not skipAuth:
+      if request.json == None:
+        return "Waiting for user data to become available..."
+      if 'user' not in request.json:
+        return "Waiting for user data to be become available.."
 
   user_uuid = getUUID(request)
+
   clientResult = userclient.getClientSpecificResult(user_uuid)
   if clientResult != None:
     logging.debug("Found overriding client result for user %s, returning it" % user_uuid)
     return clientResult
   else:
-    logging.debug("No overriding client result for user %s, returning default" % user_uuid)
-  return default.getResult(user_uuid)
+    logging.debug("No overriding client result for user %s, returning choice " % user_uuid)
+  return choice.getResult(user_uuid)
 
 @get('/compare')
 def getCarbonCompare():
   for key, val in request.headers.items():
     print("  %s: %s" % (key, val))
 
-  from clients.default import default
+  from clients.data import data
 
-  if 'User' not in request.headers or request.headers.get('User') == '':
-    return "Waiting for user data to become available..."
+  if not skipAuth:
+    if 'User' not in request.headers or request.headers.get('User') == '':
+        return "Waiting for user data to become available..."
+  
+  from clients.choice import choice
 
   user_uuid = getUUID(request, inHeader=True)
   print ('UUID', user_uuid)
+  
   clientResult = userclient.getClientSpecificResult(user_uuid)
   if clientResult != None:
     logging.debug("Found overriding client result for user %s, returning it" % user_uuid)
     return clientResult
   else:
-    logging.debug("No overriding client result for user %s, returning default" % user_uuid)
-  return default.getResult(user_uuid)
+    logging.debug("No overriding client result for user %s, returning choice" % user_uuid)
+  return choice.getResult(user_uuid)
 
 # Client related code START
 @post("/client/<clientname>/<method>")
@@ -418,33 +425,49 @@ def verifyUserToken(token):
     logging.debug("Found user email %s" % tokenFields['email'])
     return tokenFields['email']
 
-
-
 def getUUIDFromToken(token):
     userEmail = verifyUserToken(token)
+    return __getUUIDFromEmail__(userEmail)
+
+# This should not be used for general API calls
+def __getUUIDFromEmail__(userEmail):
     user=User.fromEmail(userEmail)
     if user is None:
       return None
     user_uuid=user.uuid
     return user_uuid
 
+def __getToken__(request, inHeader):
+    if inHeader:
+      userHeaderSplitList = request.headers.get('User').split()
+      if len(userHeaderSplitList) == 1:
+          userToken = userHeaderSplitList[0]
+      else:
+          userToken = userHeaderSplitList[1]
+    else:
+      userToken = request.json['user']
+
+    return userToken
+
 def getUUID(request, inHeader=False):
   retUUID = None
   if skipAuth:
-    from uuid import UUID
-    from get_database import get_uuid_db
-    if get_uuid_db().find().count() == 1:
-      user_uuid = get_uuid_db().find_one()['uuid']
+    if 'User' in request.headers or 'user' in request.json:
+        # skipAuth = true, so the email will be sent in plaintext
+        userEmail = __getToken__(request, inHeader)
+        retUUID = __getUUIDFromEmail__(userEmail)
+        logging.debug("skipAuth = %s, returning UUID directly from email %s" % (skipAuth, retUUID))
     else:
-      # TODO: Figure out what we really want to do here
-      user_uuid = UUID('{3a307244-ecf1-3e6e-a9a7-3aaf101b40fa}')
-    retUUID = user_uuid
-    logging.debug("skipAuth = %s, returning fake UUID %s" % (skipAuth, user_uuid))
+        # Return a random user to make it easy to experiment without having to specify a user
+        # TODO: Remove this if it is not actually used
+        from get_database import get_uuid_db
+        user_uuid = get_uuid_db().find_one()['uuid']
+        retUUID = user_uuid
+        logging.debug("skipAuth = %s, returning arbitrary UUID %s" % (skipAuth, retUUID))
+    if Client("choice").getClientKey() is None:
+        Client("choice").update(createKey = True)
   else:
-    if inHeader:
-      userToken = request.headers.get('User').split()[1]
-    else:
-      userToken = request.json['user']
+    userToken = __getToken__(request, inHeader)
     retUUID = getUUIDFromToken(userToken)
   request.params.user_uuid = retUUID
   return retUUID
@@ -468,7 +491,7 @@ else:
   # running on localhost but still want to run without authentication. That is
   # not really an important use case now, and it makes people have to change
   # two values and increases the chance of bugs. So let's key the auth skipping from this as well.
-  skipAuth = False
+  skipAuth = True
   print "Running with HTTPS turned OFF, skipAuth = True"
 
   run(host=server_host, port=server_port, server='cherrypy', debug=True)

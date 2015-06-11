@@ -8,17 +8,18 @@ from common import google_maps_to_our_trip
 #from common import google_maps_to_our_trip, update_perturbations, get_perturbed_trips_db, find_perturbed_trips
 #from common import get_perturbed_trips_db, json_to_trip, find_perturbed_trips, initialize_empty_perturbed_trips, update_perturbations 
 import optparse
-from otp import OTP
+from otp import OTP, PathNotFoundException
 import uuid
+import logging
 
 def obtain_alternatives(trip_id, user_id):
 	db = get_trip_db()
-        trip = E_Mission_Trip.trip_from_json(db.find_one({"trip_id": trip_id, "user_id": user_id}))
-        print trip.sections
+	trip = E_Mission_Trip.trip_from_json(db.find_one({"trip_id": trip_id, "user_id": user_id}))
+	logging.debug(trip.sections)
 	start_coord = trip.trip_start_location.maps_coordinate()
 	end_coord = trip.trip_end_location.maps_coordinate()
-	print "Start: ", start_coord
-	print "End: ", end_coord
+	logging.debug("Start: %s " % start_coord)
+	logging.debug("End: %s " % end_coord)
 	    
 	curr_time = datetime.datetime.now()
 	curr_month = curr_time.month
@@ -30,12 +31,12 @@ def obtain_alternatives(trip_id, user_id):
 	
         for mode in otp_modes:
                 try:
-		    otp_trip = OTP(start_coord, end_coord, mode, write_day(curr_month, curr_day, "2015"), write_time(curr_hour, curr_minute), False)
-     		    otp_trip = otp_trip.turn_into_trip(None, user_id, trip_id) 
-		    otp_trip.save_to_db()
-                except Exception as e:
+                    otp_trip = OTP(start_coord, end_coord, mode, write_day(curr_month, curr_day, "2015"), write_time(curr_hour, curr_minute), False)
+                    otp_trip = otp_trip.turn_into_trip(None, user_id, trip_id) 
+                    otp_trip.save_to_db()
+                except PathNotFoundException as e:
                     #modes = ['driving', 'walking', 'bicycling', 'transit']
-                    print "Defaulting to Google Maps"
+                    logging.debug("Got error %s from OTP, defaulting to Google Maps" % e)
                     otp_to_google_mode = {"CAR":"driving", "WALK":"walking", "BICYCLE":"bicycling", "TRANSIT":"transit"}
                     mode = otp_to_google_mode[mode]
                     gmaps = googlemaps.GoogleMaps('AIzaSyBEkw4PXVv_bsAdUmrFwatEyS6xLw3Bd9c')

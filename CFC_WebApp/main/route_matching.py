@@ -433,7 +433,8 @@ def update_user_routeDistanceMatrix(user_id,data_feature,step1=100000,step2=1000
 
     # print(len(ids))
     for _id in ids:
-        print(a)
+        if a % 100 == 0:
+            print "In update_user_routeDistanceMatrix, a = %d" % a
         a+=1
         for key in ids:
             try:

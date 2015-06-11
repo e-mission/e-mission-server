@@ -36,7 +36,7 @@ from common import most_common, get_first_daily_point, Include_place,berkeley_ar
 from distance import get_morning_commute_distance_pie,get_evening_commute_distance_pie
 from get_database import get_mode_db, get_section_db, get_trip_db, get_test_db
 import math
-import pygmaps
+import pygmaps_modified as pygmaps
 from datetime import date, timedelta
 from uuid import *
 from common import calDistance

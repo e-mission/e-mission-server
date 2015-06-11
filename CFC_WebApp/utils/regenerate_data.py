@@ -21,7 +21,7 @@ sys.path.append(CFC_WEBAPP_PATH)
 
 from get_database import get_section_db, get_result_stats_db
 
-from clients.default import default
+from clients.data import data
 from clients.gamified import gamified
 from clients.choice import choice
 

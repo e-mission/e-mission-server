@@ -4,7 +4,7 @@ import json
 #from main import tripManager
 from pymongo import MongoClient
 import logging
-from get_database import get_db, get_mode_db, get_section_db, get_trip_db
+from get_database import get_db, get_mode_db, get_section_db, get_trip_db, get_routeCluster_db
 import re
 import sys
 import os
@@ -35,13 +35,16 @@ class TestRecommendationPipeline(unittest.TestCase):
     for row in dataJSON:
       self.ModesColl.insert(row)
 
+    get_section_db().remove({"user_id": self.testUUID})
     result = self.loadTestJSON("tests/data/missing_trip")
     collect.processResult(self.testUUID, result)
+    print get_section_db().find().count()
     self.pipeline = RecommendationPipeline()
 
   def tearDown(self):
     get_section_db().remove({"user_id": self.testUUID})
     self.ModesColl.remove()
+    get_routeCluster_db().remove()
     self.assertEquals(self.ModesColl.find().count(), 0)
 
   def loadTestJSON(self, fileName):
@@ -50,9 +53,17 @@ class TestRecommendationPipeline(unittest.TestCase):
 
   def testRetrieveTripsToImprove(self):
     #updated to 15, since I am filtering out places
-    trip_list = self.pipeline.get_trips_to_improve(self.testUUID)
-    # self.assertEquals(len(trip_list), 5)
-    # Trip 20140407T175709-0700 has two sections
+    trip_list = list(self.pipeline.get_trips_to_improve(self.testUUID))
+    self.assertEquals(len(trip_list), 0)
+
+  def testRetrieveTripsToImproveWithClusters(self):
+    sectionList = list(get_section_db().find())
+    get_routeCluster_db().insert({"user": self.testUUID,
+        "clusters": 
+            {"cluster1": [s["_id"] for s in sectionList[0:10]],
+             "cluster2": [s["_id"] for s in sectionList[10:20]]}})
+    trip_list = list(self.pipeline.get_trips_to_improve(self.testUUID))
+    self.assertEquals(len(trip_list), 2)
 
   def testRecommendTrip(self):
     recommended_trips = self.pipeline.runPipeline()

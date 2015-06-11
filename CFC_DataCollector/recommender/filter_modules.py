@@ -28,19 +28,37 @@ from main.get_database import get_routeCluster_db, get_section_db
 def get_clusters_info(uid):
         c_db = get_routeCluster_db()
         s_db = get_section_db()
-        x = c_db.find_one({"clusters":{"$exists":True}, "user": uid})["clusters"].values()
+        clusterJson = c_db.find_one({"clusters":{"$exists":True}, "user": uid})
+        if clusterJson is None:
+            return []
         c_info = []
-        for col in x:
-                y = [[] for _ in range(5)]
-                for cluster in col:
-                        info = s_db.find_one({"_id":cluster})
-                        y[0].append(info["section_start_datetime"])
-                        y[1].append(info["section_end_datetime"])
-                        y[2].append(info["section_start_point"]["coordinates"])
-                        y[3].append(info["section_end_point"]["coordinates"])
-                        y[4].append(info["confirmed_mode"])
-                c_info += [y]
+        clusterSectionLists= clusterJson["clusters"].values() 
+	logging.debug( "Number of section lists for user %s is %s" % (uid, len(clusterSectionLists)))
+        for sectionList in clusterSectionLists:
+                first = True
+		logging.debug( "Number of sections in sectionList for user %s is %s" % (uid, len(sectionList)))
+		if (len(sectionList) == 0):
+                    # There's no point in returning this cluster, let's move on
+                    continue
+                distributionArrays = [[] for _ in range(5)]
+                for section in sectionList:
+                        section_json = s_db.find_one({"_id":section})
+                        if first:
+                            representative_trip = section_json
+                            first = False
+                        appendIfPresent(distributionArrays[0], section_json, "section_start_datetime")
+                        appendIfPresent(distributionArrays[1], section_json, "section_end_datetime")
+                        appendIfPresent(distributionArrays[2], section_json, "section_start_point")
+                        appendIfPresent(distributionArrays[3], section_json, "section_end_point")
+                        appendIfPresent(distributionArrays[4], section_json, "confirmed_mode")
+                c_info.append((distributionArrays, representative_trip))
         return c_info
+
+def appendIfPresent(list,element,key):
+    if element is not None and key in element:
+        list.append(element[key])
+    else:
+        logging.debug("not appending element %s with key %s" % (element, key))
 
 class AlternativesNotFound(Exception):
     def __init__(self, value):
@@ -49,7 +67,10 @@ class AlternativesNotFound(Exception):
         return repr(self.value)
 
 #returns the top trips for the user, defaulting to the top 10 trips
-def getCanonicalTrips(uid): # number returned isnt used
+def getCanonicalTrips(uid, get_representative=False): # number returned isnt used
+    """
+        uid is a UUID object, not a string
+    """
     # canonical_trip_list = []
     # x = 0
     # if route clusters return nothing, then get common routes for user
@@ -57,21 +78,19 @@ def getCanonicalTrips(uid): # number returned isnt used
     # c = get_routeCluster_db().find_one({'$and':[{'user':uid},{'method':'lcs'}]})
 
     logging.debug('UUID for canonical %s' % uid)
-    if uid == 'myuuidisverylongandcomplicated':
-        #TODO: How should this be handled?
-        logging.debug('Testing UUID found: %s' % uid)
-        return
-    info = get_clusters_info(UUID(uid))
+    info = get_clusters_info(uid)
     cluster_json_list = []
-    for cluster in info:
+    for (cluster, rt) in info:
       json_dict = dict()
+      json_dict["representative_trip"] = rt
       json_dict["start_point_distr"] = cluster[2]
       json_dict["end_point_distr"] = cluster[3]
       json_dict["start_time_distr"] = cluster[0]
       json_dict["end_time_distr"] = cluster[1]
       json_dict["confirmed_mode_list"] = cluster[4]
       cluster_json_list.append(json_dict)
-    return [trip.Canonical_E_Mission_Trip.trip_from_json(c) for c in cluster_json_list]
+    toRet = cluster_json_list
+    return toRet.__iter__()
 
 #returns all trips to the user
 def getAllTrips(uid):
@@ -85,11 +104,28 @@ def getAllTrips_Date(uid, dys):
     query = {'user_id':uid, 'type':'move','trip_start_datetime':{"$gt":d}}
     return get_trip_db().find(query)
 
+#returns all trips with no alternatives to the user
+def getNoAlternatives(uid):
+    # If pipelineFlags exists then we have started alternatives, and so have
+    # already scheduled the query. No need to reschedule unless the query fails.
+    # TODO: If the query fails, then remove the pipelineFlags so that we will
+    # reschedule.
+    query = {'user_id':uid, 'type':'move', 'pipelineFlags': {'$exists': False}}
+    return get_trip_db().find(query)
+
+def getNoAlternativesPastMonth(uid):
+    d = datetime.datetime.now() - datetime.timedelta(days=30)
+    query = {'user_id':uid, 'type':'move', 
+		'trip_start_datetime':{"$gt":d},
+		'pipelineFlags': {'$exists': False}}
+    return get_trip_db().find(query)
+
 # Returns the trips that are suitable for training
 # Currently this is:
 # - trips that have alternatives, and
 # - have not yet been included in a training set
 def getTrainingTrips(uid):
+    return getTrainingTrips_Date(uid, 30)
     query = {'user_id':uid, 'type':'move'}
     return get_trip_db().find(query)
 
@@ -107,7 +143,7 @@ def getAlternativeTrips(trip_id):
     query = {'trip_id':trip_id}
     alternatives = get_alternatives_db().find(query)
     if alternatives.count() > 0:
-        print alternatives.count()
+        logging.debug("Number of alternatives for trip %s is %d" % (trip_id, alternatives.count()))
         return alternatives
     raise AlternativesNotFound("No Alternatives Found")
 
@@ -122,6 +158,8 @@ modules = {
    'trips': {
    'get_canonical': getCanonicalTrips,
    'get_all': getAllTrips,
+   'get_no_alternatives': getNoAlternatives,
+   'get_no_alternatives_past_month': getNoAlternativesPastMonth,
    'get_most_recent': getRecentTrips,
    'get_trips_by_mode': getTripsThroughMode},
    # Utility Module
@@ -130,7 +168,7 @@ modules = {
     },
    # Recommender Module
    'recommender': {
-        'get_improve': getTrainingTrips
+        'get_improve': getCanonicalTrips
     },
    #Perturbation Module
    'perturbation': {},
