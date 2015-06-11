@@ -6,7 +6,7 @@ import sys
 import os
 sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
 from main import common as cm
-#from feature_calc
+import logging
 
 DATE_FORMAT = "%Y%m%dT%H%M%S-%W00"
 
@@ -90,11 +90,12 @@ class Trip(object):
 
 class Section(object):
 
-    def __init__(self, _id, user_id, trip_id, distance, start_time, end_time, section_start_location, section_end_location, mode, confirmed_mode):
+    def __init__(self, _id, user_id, trip_id, distance, section_type, start_time, end_time, section_start_location, section_end_location, mode, confirmed_mode):
         self._id = _id
         self.user_id = user_id
         self.trip_id = trip_id
         self.distance = distance
+        self.section_type = section_type
         self.start_time = start_time
         self.end_time = end_time
         self.section_start_location = section_start_location
@@ -103,31 +104,58 @@ class Section(object):
         self.confirmed_mode = confirmed_mode
         self.points = []
 
+    def __str__(self):
+        return "%s:%s:%s" % (self.trip_id, self._id, self.section_type)
+
     @classmethod
     def section_from_json(cls, json_segment):
         _id = json_segment.get("_id")
-	user_id = json_segment.get("user_id")
+        user_id = json_segment.get("user_id")
         trip_id = json_segment.get("trip_id")
         distance = json_segment.get("distance")
-        try:
-            start_time = json_segment["section_start_datetime"]
-            end_time = json_segment["section_end_datetime"]
-        except:
-            start_time = datetime.datetime.strptime(json_segment.get("section_start_time"), DATE_FORMAT)
-            end_time = datetime.datetime.strptime(json_segment.get("section_end_time"), DATE_FORMAT)
-        section_start_location = cls._start_location(json_segment.get("track_points"))
-        section_end_location = cls._end_location(json_segment.get("track_points"))
+        section_type = json_segment.get("type")
+        # This used to have a fallback to parsing the section_start_time, and section_end_time.
+        # However, we don't actually have any sections that would use the
+        # fallback, and our current code always parses the section times before
+        # storing to the database, so the complexity is not needed
+        # In [311]: get_section_db().find({'section_start_datetime': {'$exists': False}}).count()
+        # Out[311]: 0
+        # In [312]: get_section_db().find({'section_start_datetime': {'$exists': True}}).count()
+        # Out[312]: 97671
+        # In [313]: get_section_db().find({'section_end_datetime': {'$exists': False}}).count()
+        # Out[313]: 0
+        # In [314]: get_section_db().find({'section_end_datetime': {'$exists': True}}).count()
+        # Out[314]: 97671
+        # In [315]: get_section_db().find().count()
+        # Out[315]: 97671
+
+        start_time = cls._get_datetime(json_segment, "section_start_datetime")
+        end_time = cls._get_datetime(json_segment, "section_end_datetime")
+        section_start_location = cls._get_coordinate(json_segment, "section_start_point")
+        section_end_location = cls._get_coordinate(json_segment, "section_end_point")
         mode = json_segment.get("mode")
         confirmed_mode = json_segment.get("confirmed_mode")
-        return cls(_id, user_id, trip_id, distance, start_time, end_time, section_start_location, section_end_location, mode, confirmed_mode)
+        return cls(_id, user_id, trip_id, distance, section_type, start_time, end_time, section_start_location, section_end_location, mode, confirmed_mode)
 
     @classmethod
-    def _start_location(cls, points):
-        return Coordinate(points[0]["track_location"]["coordinates"][1], points[0]["track_location"]["coordinates"][0]) if points else None
+    def _get_coordinate(cls, json_segment, coord_key):
+        logging.debug("While retrieving %s from %s, in is %s" % (coord_key, json_segment, (coord_key in json_segment)))
+        if coord_key in json_segment and json_segment[coord_key] is not None:
+            if "coordinates" in json_segment[coord_key]:
+                coord_json = json_segment[coord_key]["coordinates"]
+                return Coordinate(coord_json[1], coord_json[0])
+            else:
+                logging.warn("Unable to get coordinates from key %s in segment %s " % (coord_key, json_segment))
+                return None
+        else:
+            return None
 
     @classmethod
-    def _end_location(cls, points):
-        return Coordinate(points[-1]["track_location"]["coordinates"][1], points[-1]["track_location"]["coordinates"][0]) if points else None
+    def _get_datetime(cls, json_segment, coord_key):
+        if coord_key in json_segment:
+            return json_segment[coord_key]
+        else:
+            return None
 
     def save_to_db(self):
         db = get_section_db()
