@@ -1,6 +1,6 @@
 from main import gmap_display
 from pymongo import MongoClient
-import pygmaps
+from main import pygmaps_modified as pygmaps
 import webbrowser
 import sys
 import os

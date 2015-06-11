@@ -148,7 +148,7 @@ def drawSection(section, option, gmap, Color = 'default'):
                 # coordinates are in GeoJSON format, ie lng, lat
                 gmap.addpoint(coordinate[1], coordinate[0], color)
         if option == PATH or option == ALL:
-            gmap.addpath(path, color)
+            gmap.addpath(path, color, _id)
 
 def drawSections(sections,option, gmap, Color = 'default'):
     for section in sections:
