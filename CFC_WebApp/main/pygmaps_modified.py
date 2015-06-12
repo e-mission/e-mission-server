@@ -30,9 +30,9 @@ class maps:
 	def addradpoint(self, lat,lng,rad,color = '#0000FF'):
 		self.radpoints.append((lat,lng,rad,color, title))
 
-	def addpath(self,path,color = '#FF0000', id = ''):
+	def addpath(self,path,color = '#FF0000', _id = ''):
 		path.append(color)
-		path.append(id)
+		path.append(_id)
 		self.paths.append(path)
 	
 	#create the html file which inlcude one google map and all points and paths
