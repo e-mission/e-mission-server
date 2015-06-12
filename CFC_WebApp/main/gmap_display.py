@@ -130,25 +130,33 @@ def searchTrip(user, period, startpoint, endpoint, mode, option):
     print sectionList
 
     
-def drawSection(section, option, gmap, Color = 'default'):
+def drawSection(section, option, gmap, Color = 'default', title = None):
+    # print "Drawing section with id = %s and mode = %s" % (section["_id"], section["mode"])
     track_points = section['track_points']
     _id = section['_id']
     if track_points != []:
         path = []
-        if Color != 'default':
-            color = Color
-        else:
+        if Color == 'default':
             color = COLOR[section['mode']]
-        for point in track_points:
+        else:
+            if Color == "random":
+                import random
+                r = lambda: random.randint(0,255)
+                color = '#%02X%02X%02X' % (r(),r(),r())
+            else:
+                color = Color
+        for idx, point in enumerate(track_points):
             coordinate = point['track_location']['coordinates']
             
             coordinate_tuple = tuple([coordinate[1], coordinate[0]])
             path.append(coordinate_tuple)
             if option == POINTS or option == ALL:
                 # coordinates are in GeoJSON format, ie lng, lat
-                gmap.addpoint(coordinate[1], coordinate[0], color)
+                gmap.addpoint(coordinate[1], coordinate[0], color, "%s, %s, %s" % (coordinate[1], coordinate[0], idx))
         if option == PATH or option == ALL:
-            gmap.addpath(path, color, _id)
+            if title is None:
+                title = _id
+            gmap.addpath(path, color, title)
 
 def drawSections(sections,option, gmap, Color = 'default'):
     for section in sections:
@@ -189,3 +197,28 @@ def drawTripsForUser(user_uuid, db, gmap):
     """
     sections = db.Stage_Sections.find({'user_id': user_uuid})
     drawSections(sections, ALL, gmap)
+
+def drawSectionsFromList(sectionIdList, outPath):
+    sectionJsonList = [get_section_db().find_one({"_id": sid}) for sid in sectionIdList]
+
+    import trip_analysis.useful_queries as tauq
+    bounds = tauq.get_bounds(sectionJsonList)
+    gmap = pygmaps.maps((bounds[0].lat + bounds[1].lat)/2, (bounds[0].lon + bounds[1].lon)/2, 10)
+
+    drawSections(sectionJsonList, ALL, gmap, "random")
+    gmap.draw(outPath)
+
+def drawSectionsSeparately(sectionIdList, outPath):
+    try:
+        os.mkdir(outPath)
+    except OSError, e:
+        logging.warn("Error %s while creating result directory" % e)
+        pass
+
+    for sectionId in sectionIdList:
+        sectionJSON = get_section_db().find_one({"_id": sectionId})
+        import trip_analysis.useful_queries as taug
+        sectionCenter = taug.get_center_for_section(sectionJSON)
+        gmap = pygmaps.maps(sectionCenter[0], sectionCenter[1], 10)
+        drawSection(sectionJSON, ALL, gmap, "random")
+        gmap.draw("%s/%s.html" % (outPath, sectionId))
