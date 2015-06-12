@@ -106,7 +106,36 @@ def __read_user_clusters_kml(user):
         infile_path = os.path.join(path, kml)
         update_db_with_clusters(user, infile_path)
 
-def __read_user_clusters_text(user):
+def __read_user_clusters_text(user, path):
+    """
+    Reads cleaned user clusters from a text file 
+    of the format.
+    
+    trip_name_1:
+    section_id_1
+    section_id_2
+    section_id_n
+    trip_name_2:
+    ...    
+    """
+    check_cluster_textfile(path)
+    cluster_file = open(path, "r")
+    clusters = {}
+    for l in cluster_file:
+        sl = l.strip()
+        # Support blank lines by skipping them
+        if len(sl) == 0:
+            continue
+        if ':' in sl:
+            name = sl.split(':')[0].strip()
+            name = "%s_%s" %(user, name)
+            clusters[name] = []
+        else:
+            section_id = sl.strip()
+            clusters[name].append(section_id)
+    return clusters
+
+def __read_and_update_clusters_text(user):
     """
     Reads cleaned user clusters from a text file 
     of the format.
@@ -119,17 +148,7 @@ def __read_user_clusters_text(user):
     ...    
     """
     path = os.path.join(os.getcwd(), "%s_cleaned_clusters.txt" % user)
-    check_cluster_textfile(path)
-    cluster_file = open(path, "r")
-    clusters = {}
-    for l in cluster_file:
-        if ':' in l:
-            name = l.split(':')[0].strip()
-            name = "%s_%s" %(user, name)
-            clusters[name] = []
-        else:
-            section_id = l.strip()
-            clusters[name].append(section_id)
+    clusters = _read_user_clusters_text(user, path)
     update_db_with_clusters_dict(user, clusters)
 
 def __import_truth(user, user_id):
@@ -185,7 +204,7 @@ if __name__ == "__main__":
     elif stage == 'read_kml':
         __read_user_clusters_kml(user)
     elif stage == 'read_text':
-        __read_user_clusters_text(user)
+        __read_and_update_user_clusters_text(user)
     else:
         __collect(user, user_id)
         __sample_representatives(user, user_id)
