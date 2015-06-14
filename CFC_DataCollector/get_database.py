@@ -40,6 +40,12 @@ def get_routeCluster_db():
     routeCluster=current_db.Stage_routeCluster
     return routeCluster
 
+def get_groundClusters_db():
+    current_db=MongoClient().Stage_database
+    groundClusters=current_db.Stage_groundClusters
+    return groundClusters
+
+
 def get_pending_signup_db():
     current_db=MongoClient().Stage_database
     Pending_signups = current_db.Stage_pending_signups

@@ -47,16 +47,19 @@ def check_cluster_textfile(path):
     section_id_search = lambda line: re.search(r'^\w{8}-(\w{4}-){3}\w{12}_\w{15}-\w{4}_\w$', line) # Matches format of section_id
     for l in cluster_file:
         l = l.strip()        
+        # Support blank lines by skipping them
+        if len(l) == 0:
+            continue
         if ':' in l:
-            assert (not in_cluster), 'Must have at least one section per cluster' 
-            assert (l.split(':')[1].strip() == ''), 'Nothing should follow a colon'
-            assert (' ' not in l), 'Cluster names must not have spaces'        
+            assert (not in_cluster), '%s must have at least one section per cluster' % l
+            assert (l.split(':')[1].strip() == ''), '%s nothing should follow a colon' % l
+            assert (' ' not in l), '%s cluster names must not have spaces' % l
             name = l.split(':')[0].strip()
             assert (name not in names), '%s is not a unique name' % name
             names.append(name)
             in_cluster = True
         else:            
-            assert (' ' not in l), 'Section should not have spaces'        
+            assert (' ' not in l), '%s section should not have spaces' % l
             assert (section_id_search(l)), '%s is an invalid section id' % l
             in_cluster = False              
 

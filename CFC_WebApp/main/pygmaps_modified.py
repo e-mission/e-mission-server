@@ -53,6 +53,7 @@ class maps:
 		f.write('\tfunction initialize() {\n')
 		self.drawmap(f)
 		self.write_polyline_infowindow_js(f)
+		self.write_marker_infowindow_js(f)
 		self.drawgrids(f)
 		self.drawpoints(f)
 		self.drawradpoints(f)
@@ -128,6 +129,8 @@ class maps:
 	def write_polyline_infowindow_js(self, f):
 		f.write('function addPolylineInfoWindow(o, polylineLabel){var n=new google.maps.InfoWindow({content:""});eventPolygonMouseover=google.maps.event.addListener(o,"click",function(o){var e=new google.maps.Marker({position:o.latLng});console.log("fired"),n.setPosition(o.latLng),n.setContent(polylineLabel),n.open(map,e)})}')
 
+	def write_marker_infowindow_js(self, f):
+		f.write('function addMarkerInfoWindow(o, title){var n=new google.maps.InfoWindow({content: title});eventMarkerMouseover=google.maps.event.addListener(o,"click",function(){n.open(map,o)})}')
 
 
 	def drawmap(self, f):
@@ -142,15 +145,17 @@ class maps:
 
 
 
-	def drawpoint(self,f,lat,lon,color, label=None):
+	def drawpoint(self,f,lat,lon,color, title=None):
 		f.write('\t\tvar latlng = new google.maps.LatLng(%f, %f);\n'%(lat,lon))
 		f.write('\t\tvar img = new google.maps.MarkerImage(\'%s\');\n' % (self.coloricon.replace('XXXXXX',color)))
 		f.write('\t\tvar marker = new google.maps.Marker({\n')
 		f.write('\t\tposition: latlng,\n')
 		f.write('\t\tmap: map,\n')
-		#f.write('\t\tlabel: "'+re.escape(str(title))+'"\n')
+		f.write('\t\ttitle: "'+re.escape(str(title))+'"\n')
 		f.write('\t\t});\n')
 		f.write('\n')
+		if title is not None:
+			f.write('addMarkerInfoWindow(marker,"' + title + '");\n\n')
 		
 	def drawPolyline(self,f,path,\
 			clickable = True, \
