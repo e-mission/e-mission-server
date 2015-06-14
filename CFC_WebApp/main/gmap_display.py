@@ -41,7 +41,7 @@ from datetime import date, timedelta
 from uuid import *
 from common import calDistance
 from pygeocoder import Geocoder
-
+import trip_analysis.useful_queries as tauq
 
 
 POINTS = 'points'
@@ -201,7 +201,6 @@ def drawTripsForUser(user_uuid, db, gmap):
 def drawSectionsFromList(sectionIdList, outPath):
     sectionJsonList = [get_section_db().find_one({"_id": sid}) for sid in sectionIdList]
 
-    import trip_analysis.useful_queries as tauq
     bounds = tauq.get_bounds(sectionJsonList)
     gmap = pygmaps.maps((bounds[0].lat + bounds[1].lat)/2, (bounds[0].lon + bounds[1].lon)/2, 10)
 
@@ -217,8 +216,7 @@ def drawSectionsSeparately(sectionIdList, outPath):
 
     for sectionId in sectionIdList:
         sectionJSON = get_section_db().find_one({"_id": sectionId})
-        import trip_analysis.useful_queries as taug
-        sectionCenter = taug.get_center_for_section(sectionJSON)
+        sectionCenter = tauq.get_center_for_section(sectionJSON)
         gmap = pygmaps.maps(sectionCenter[0], sectionCenter[1], 10)
         drawSection(sectionJSON, ALL, gmap, "random")
         gmap.draw("%s/%s.html" % (outPath, sectionId))
