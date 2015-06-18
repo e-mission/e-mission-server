@@ -145,7 +145,9 @@ def calSpeeds(segment):
   trackpoints = segment['track_points']
   if len(trackpoints) == 0:
     return None
+  return calSpeedsForList(trackpoints)
 
+def calSpeedsForList(trackpoints):
   speeds = np.zeros(len(trackpoints) - 1)
   for (i, point) in enumerate(trackpoints[:-1]):
     currPoint = point
