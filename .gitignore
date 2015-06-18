@@ -13,3 +13,4 @@ CFC_DataCollector/keys.json
 CFC_DataCollector/moves_collect.log
 
 *.secret
+CFC_WebApp/clients/socialmedia/settings.json

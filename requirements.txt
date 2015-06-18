@@ -1,3 +1,4 @@
+facebook-sdk==0.40
 CherryPy==3.6.0
 pygeocoder==1.2.5
 pymongo==2.8
