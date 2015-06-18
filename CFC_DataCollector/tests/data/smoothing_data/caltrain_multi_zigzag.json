@@ -1,0 +1,792 @@
+[
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.0757404, 
+                37.3961405
+            ]
+        }, 
+        "time": "20150119T075756-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.0757354, 
+                37.3961256
+            ]
+        }, 
+        "time": "20150119T075801-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.075708, 
+                37.3960442
+            ]
+        }, 
+        "time": "20150119T075831-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.075708, 
+                37.3960442
+            ]
+        }, 
+        "time": "20150119T075858-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.084284, 
+                37.3975546
+            ]
+        }, 
+        "time": "20150119T075932-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.084284, 
+                37.3975546
+            ]
+        }, 
+        "time": "20150119T080000-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.0810362, 
+                37.4099965
+            ]
+        }, 
+        "time": "20150119T080037-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.0958532, 
+                37.410499
+            ]
+        }, 
+        "time": "20150119T080058-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1155459, 
+                37.4127312
+            ]
+        }, 
+        "time": "20150119T080130-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.121323, 
+                37.4157925
+            ]
+        }, 
+        "time": "20150119T080157-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1335969, 
+                37.4234927
+            ]
+        }, 
+        "time": "20150119T080230-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1429355, 
+                37.4295491
+            ]
+        }, 
+        "time": "20150119T080301-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1517476, 
+                37.4357913
+            ]
+        }, 
+        "time": "20150119T080331-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1388793, 
+                37.4328693
+            ]
+        }, 
+        "time": "20150119T080401-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1388793, 
+                37.4328693
+            ]
+        }, 
+        "time": "20150119T080433-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1388793, 
+                37.4328693
+            ]
+        }, 
+        "time": "20150119T080503-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1388793, 
+                37.4328693
+            ]
+        }, 
+        "time": "20150119T080534-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1388793, 
+                37.4328693
+            ]
+        }, 
+        "time": "20150119T080605-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1388793, 
+                37.4328693
+            ]
+        }, 
+        "time": "20150119T080635-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1388793, 
+                37.4328693
+            ]
+        }, 
+        "time": "20150119T080706-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1388793, 
+                37.4328693
+            ]
+        }, 
+        "time": "20150119T080737-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.185512, 
+                37.4571098
+            ]
+        }, 
+        "time": "20150119T080807-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.185512, 
+                37.4571098
+            ]
+        }, 
+        "time": "20150119T080833-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.2048249, 
+                37.4686343
+            ]
+        }, 
+        "time": "20150119T080906-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.2108585, 
+                37.4730094
+            ]
+        }, 
+        "time": "20150119T080933-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.2238498, 
+                37.4795092
+            ]
+        }, 
+        "time": "20150119T081010-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1388793, 
+                37.4328693
+            ]
+        }, 
+        "time": "20150119T081041-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1388793, 
+                37.4328693
+            ]
+        }, 
+        "time": "20150119T081111-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.2522411, 
+                37.5000945
+            ]
+        }, 
+        "time": "20150119T081147-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.2548795, 
+                37.5025983
+            ]
+        }, 
+        "time": "20150119T081210-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.2656186, 
+                37.5114191
+            ]
+        }, 
+        "time": "20150119T081241-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1388793, 
+                37.4328693
+            ]
+        }, 
+        "time": "20150119T081315-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1388793, 
+                37.4328693
+            ]
+        }, 
+        "time": "20150119T081345-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1388793, 
+                37.4328693
+            ]
+        }, 
+        "time": "20150119T081416-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1388793, 
+                37.4328693
+            ]
+        }, 
+        "time": "20150119T081446-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1388793, 
+                37.4328693
+            ]
+        }, 
+        "time": "20150119T081514-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1388793, 
+                37.4328693
+            ]
+        }, 
+        "time": "20150119T081547-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1388793, 
+                37.4328693
+            ]
+        }, 
+        "time": "20150119T081617-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1388793, 
+                37.4328693
+            ]
+        }, 
+        "time": "20150119T081648-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1388793, 
+                37.4328693
+            ]
+        }, 
+        "time": "20150119T081718-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3042225, 
+                37.5478572
+            ]
+        }, 
+        "time": "20150119T081750-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3067031, 
+                37.5474287
+            ]
+        }, 
+        "time": "20150119T081816-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3109978, 
+                37.556956
+            ]
+        }, 
+        "time": "20150119T081850-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3182553, 
+                37.562466
+            ]
+        }, 
+        "time": "20150119T081921-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1388793, 
+                37.4328693
+            ]
+        }, 
+        "time": "20150119T081952-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.1388793, 
+                37.4328693
+            ]
+        }, 
+        "time": "20150119T082024-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3269152, 
+                37.571132
+            ]
+        }, 
+        "time": "20150119T082053-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3300771, 
+                37.5738334
+            ]
+        }, 
+        "time": "20150119T082124-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3300771, 
+                37.5738334
+            ]
+        }, 
+        "time": "20150119T082152-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.337914, 
+                37.5775323
+            ]
+        }, 
+        "time": "20150119T082224-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3545965, 
+                37.5866681
+            ]
+        }, 
+        "time": "20150119T082253-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3545965, 
+                37.5866681
+            ]
+        }, 
+        "time": "20150119T082323-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3545965, 
+                37.5866681
+            ]
+        }, 
+        "time": "20150119T082354-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3545965, 
+                37.5866681
+            ]
+        }, 
+        "time": "20150119T082424-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3545965, 
+                37.5866681
+            ]
+        }, 
+        "time": "20150119T082455-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3545965, 
+                37.5866681
+            ]
+        }, 
+        "time": "20150119T082527-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3545965, 
+                37.5866681
+            ]
+        }, 
+        "time": "20150119T082555-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3961382, 
+                37.7758938
+            ]
+        }, 
+        "time": "20150119T082629-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3545965, 
+                37.5866681
+            ]
+        }, 
+        "time": "20150119T082659-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.389368, 
+                37.600544
+            ]
+        }, 
+        "time": "20150119T082730-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3545965, 
+                37.5866681
+            ]
+        }, 
+        "time": "20150119T082801-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3872845, 
+                37.5990397
+            ]
+        }, 
+        "time": "20150119T082833-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3872829, 
+                37.5990394
+            ]
+        }, 
+        "time": "20150119T082859-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3893697, 
+                37.6005449
+            ]
+        }, 
+        "time": "20150119T082934-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3545965, 
+                37.5866681
+            ]
+        }, 
+        "time": "20150119T083004-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3545965, 
+                37.5866681
+            ]
+        }, 
+        "time": "20150119T083034-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3545965, 
+                37.5866681
+            ]
+        }, 
+        "time": "20150119T083104-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3545965, 
+                37.5866681
+            ]
+        }, 
+        "time": "20150119T083136-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3545965, 
+                37.5866681
+            ]
+        }, 
+        "time": "20150119T083203-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.3733972, 
+                37.5952192
+            ]
+        }, 
+        "time": "20150119T083238-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.38937, 
+                37.6005432
+            ]
+        }, 
+        "time": "20150119T083304-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.38937, 
+                37.6005432
+            ]
+        }, 
+        "time": "20150119T083335-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.38937, 
+                37.6005432
+            ]
+        }, 
+        "time": "20150119T083409-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.38937, 
+                37.6005432
+            ]
+        }, 
+        "time": "20150119T083438-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.38937, 
+                37.6005432
+            ]
+        }, 
+        "time": "20150119T083509-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.38937, 
+                37.6005432
+            ]
+        }, 
+        "time": "20150119T083539-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.38937, 
+                37.6005432
+            ]
+        }, 
+        "time": "20150119T083612-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.38937, 
+                37.6005432
+            ]
+        }, 
+        "time": "20150119T083639-0800"
+    }, 
+    {
+        "track_location": {
+            "type": "Point", 
+            "coordinates": [
+                -122.38937, 
+                37.6005432
+            ]
+        }, 
+        "time": "20150119T083712-0800"
+    }
+]
