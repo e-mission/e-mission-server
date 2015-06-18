@@ -9,7 +9,7 @@ import math
 from get_database import get_uuid_db
 from main import userclient
 #import SQL
-from couchbase.bucket import Bucket
+#from couchbase.bucket import Bucket
 
 
 ## The couchbase python library only compiles on Linux Machines so be careful 
@@ -18,14 +18,14 @@ from couchbase.bucket import Bucket
 ## Cloud abstraction choice
 cloud = { 
           "AZURE" : False,
-          "COUCHBASE" : True,  
+          "COUCHBASE" : False,  
           "AMAZON" : False
         }
 
 # sb375 is a weekly goal - we convert it to daily by dividing by 7
 sb375DailyGoal = 40.142892/7
 if cloud['COUCHBASE']:
-  bucket = Bucket('http://10.10.67.102:8091')  ## Address of running server 
+  bucket = Bucket('http://50.17.111.19:8091')  ## Address of running server, currently the staging server
 
 # BEGIN: Code to get and set client specific fields in the profile (currentScore and previousScore)
 def getStoredScore(user):
@@ -93,14 +93,7 @@ def getScore(user_uuid, start, end):
     stats.storeResultEntry(user_uuid, stats.STAT_SB375_DAILY_GOAL, time.time(), sb375DailyGoal)
     score = calcScore(components)
     print "Putting in DB"
-    if cloud['AZURE']:
-        #SQL.put(user_uuid, score)
-        pass
-    elif cloud['COUCHBASE']:
-        bucket.insert(user_uuid, score)
-    else:
-        pass
-        ## Do AWS option
+    put_in_db(user_uuid, score)
     return score
 
 
@@ -142,7 +135,7 @@ def updateScoreForDay(user_uuid, today):
     stats.storeResultEntry(user_uuid, stats.STAT_GAME_SCORE, time.time(), newScore)
     setScores(user, prevScore, newScore)
     print "SQLING"
-    SQL.put(user_uuid, newScore)
+    put_in_db(user_uuid, newScore)
 
 def getLevel(score):
   if score < 100:
@@ -174,24 +167,28 @@ def getResult(user_uuid):
   for user_uuid_dict in get_uuid_db().find({}, {'uuid': 1, '_id': 0}):
     (currPrevScore, currCurrScore) = getStoredScore(User.fromUUID(user_uuid_dict['uuid']))
     otherCurrScoreList.append(currCurrScore)
-    SQL.put(user_uuid_dict['uuid'], currCurrScore)
+    if cloud['AZURE']:
+      SQL.put(user_uuid_dict['uuid'], currCurrScore)
 
   otherCurrScoreList.sort()
   print "Putting in DB"
-  if cloud['AZURE']:
-    #SQL.put(user_uuid, score)
-    pass
-  elif cloud['COUCHBASE']:
-    bucket.insert(user_uuid, score)
-  else:
-      pass
-      ## Do AWS option
+  put_in_db(user_uuid, currScore)
   renderedTemplate = template("clients/leaderboard/result_template.html",
                                level_picture_filename = getFileName(level, sublevel),
                                prevScore = prevScore,
                                currScore = currScore,
                                otherCurrScoreList = otherCurrScoreList)
   return renderedTemplate
+
+def put_in_db(key, value):
+  print "key :  %s   value :   %s " % (key, value)
+  if cloud['AZURE']:
+    pass
+  elif cloud['COUCHBASE']:
+    try:
+      bucket.insert(str(key), str(value))
+    except:
+      print "Already in DB"
 
 # These are copy/pasted from our first client, the carshare study
 def getSectionFilter(uuid):
