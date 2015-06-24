@@ -8,6 +8,10 @@ angular.module('e-mission-leaderboard', ['ionic'])
      * but not tested
      */
     $scope.showscores = function() {
+      var client = new WindowsAzure.MobileServiceClient(
+        "https://e-mission.azure-mobile.net/",
+        "pcLiiJecqFLoeUxVjrKeMaqjCPqPnx81"
+      );
       var listContainer = document.createElement("div");
       document.getElementsByTagName("body")[0].appendChild(listContainer);
       var listElement = document.createElement("ul");

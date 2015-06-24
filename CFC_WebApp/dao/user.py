@@ -1,5 +1,6 @@
 import json
 import logging
+import requests
 
 from get_database import get_profile_db, get_pending_signup_db, get_uuid_db
 
@@ -238,6 +239,14 @@ class User:
     # that don't have an associated profile and fix them
     study_list = Client.getPendingClientRegs(userEmail)
     writeResultProfile = User.createProfile(anonUUID, datetime.now(), study_list)
+
+
+    ## We also now have to add the user to the couchDB 
+    user_info = {'name' : user_email, 'email' : user_email, 'password' : 'password'}
+    jsn = json.dumps(user_info)
+    url = 'http://localhost:4985/db/_user/%s' % (self.uuid)
+    requests.put(url, jsn)
+
      
     if 'err' not in writeResultProfile:
       # update was successful!
