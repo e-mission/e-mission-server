@@ -207,16 +207,19 @@ def drawSectionsFromList(sectionIdList, outPath):
     drawSections(sectionJsonList, ALL, gmap, "random")
     gmap.draw(outPath)
 
-def drawSectionsSeparately(sectionIdList, outPath):
+def drawSectionsSeparatelyFromId(sectionIdList, outPath):
+    drawSectionsSeparately([get_section_db().find_one({"_id": sid}) for sid in sectionIdList], outPath)
+
+def drawSectionsSeparately(sectionJSONList, outPath):
     try:
         os.mkdir(outPath)
     except OSError, e:
         logging.warn("Error %s while creating result directory" % e)
         pass
 
-    for sectionId in sectionIdList:
-        sectionJSON = get_section_db().find_one({"_id": sectionId})
+    for sectionJSON in sectionJSONList:
+        print ("Drawing section %s" % sectionJSON)
         sectionCenter = tauq.get_center_for_section(sectionJSON)
         gmap = pygmaps.maps(sectionCenter[0], sectionCenter[1], 10)
-        drawSection(sectionJSON, ALL, gmap, "random")
-        gmap.draw("%s/%s.html" % (outPath, sectionId))
+        drawSection(sectionJSON, ALL, gmap, "#000000")
+        gmap.draw("%s/%s.html" % (outPath, sectionJSON["_id"]))
