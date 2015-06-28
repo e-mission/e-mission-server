@@ -13,3 +13,6 @@ d. Create an overall HTML file that combines smoothed and unsmoothed values side
 classification of trajectories based on whether they need smoothing or not,
 generate various potential features that will let us quickly identify "bad"
 trajectories and build a trajectory error model.
+
+3. `plot_error_types.py`: Generates the number of errors from each category,
+and some stats about the run length of the removed points.
