@@ -198,7 +198,8 @@ class TestPipeline(unittest.TestCase):
     self.assertEqual(self.pipeline.predictedProb[0,0], 1)
     self.assertTrue(round(self.pipeline.predictedProb[0,1],2) == 0 or 
         round(self.pipeline.predictedProb[0,1],2) == 0.1)
-    self.assertEqual(self.pipeline.predictedProb[1,0], 0)
+    self.assertTrue(round(self.pipeline.predictedProb[1,0],2) == 0 or
+        round(self.pipeline.predictedProb[0,1],2) == 0.1)
     self.assertEqual(self.pipeline.predictedProb[1,1], 1)
 
   def testConvertPredictedProbToMap(self):

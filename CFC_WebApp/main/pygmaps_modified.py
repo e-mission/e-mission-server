@@ -166,8 +166,8 @@ class maps:
 			polylineLabel = None
 			):
 		f.write('var PolylineCoordinates = [\n')
-		for coordinate in path:
-			f.write('new google.maps.LatLng(%f, %f),\n' % (coordinate[0],coordinate[1]))
+		for (i, coordinate) in enumerate(path):
+			f.write('new google.maps.LatLng(%f, %f), // %d \n' % (coordinate[0],coordinate[1], i))
 		f.write('];\n')
 		f.write('\n')
 
