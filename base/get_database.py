@@ -36,7 +36,7 @@ def get_routeDistanceMatrix_db():
 
 def get_routeDistanceMatrix_db(user_id, method):
     if not os.path.exists('routeDistanceMatrices'):
-        os.mkdirs('routeDistanceMatrices')
+        os.makedirs('routeDistanceMatrices')
     
     routeDistanceMatrix = {}
     if not os.path.exists('routeDistanceMatrices/' + user_id + '_' + method + '_routeDistanceMatrix.json'):
