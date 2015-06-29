@@ -1,4 +1,4 @@
-from moves import Moves
+from moves.moves_sdk import Moves
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
 from datetime import datetime, timedelta
