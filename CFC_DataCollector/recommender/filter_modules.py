@@ -21,7 +21,6 @@ import trip
 import random
 from uuid import UUID
 
-from main.get_database import get_routeCluster_db, get_section_db
 # 0763de67-f61e-3f5d-90e7-518e69793954
 # 0763de67-f61e-3f5d-90e7-518e69793954_20150421T230304-0700_0
 # helper for getCanonicalTrips

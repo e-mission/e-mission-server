@@ -37,7 +37,7 @@ class TestDatabaseUtils(unittest.TestCase):
     purge_database_json.purgeData('localhost', self.testUser)
     self.assertEqual(Sections.find({'user_id' : self.testUser}).count(), 0)
 
-    load_database_json.loadData(self.serverName, 'tests/data/testLoadFile')
+    load_database_json.loadData(self.serverName, 'CFC_WebApp/tests/data/testLoadFile')
     self.assertEqual(Sections.find({'user_id': self.testUser}).count(), 3)
 
     purge_database_json.purgeData('localhost', self.testUser)
@@ -56,15 +56,15 @@ class TestDatabaseUtils(unittest.TestCase):
     self.assertEqual(userRecord, None)
 
   def testDumpSections(self):
-    load_database_json.loadData(self.serverName, 'tests/data/testLoadFile')
+    load_database_json.loadData(self.serverName, 'CFC_WebApp/tests/data/testLoadFile')
     dump_database_json.dumpData('localhost', '/tmp/testDumpFile')
     dumpedStr = open('/tmp/testDumpFile').readline()
-    expectedStr = open('tests/data/expectedDumpFile').readline()
+    expectedStr = open('CFC_WebApp/tests/data/expectedDumpFile').readline()
     self.assertEqual(len(dumpedStr), len(expectedStr))
     self.assertEqual(dumpedStr, expectedStr)
 
   def testLoadTable(self):
-    load_database_json.loadTable(self.serverName, "Test_Groups", "../CFC_DataCollector/tests/data/groups.json")
+    load_database_json.loadTable(self.serverName, "Test_Groups", "CFC_DataCollector/tests/data/groups.json")
     Testdb = MongoClient(self.serverName).Test_database
     GroupsColl=Testdb.Test_Groups
     self.assertEqual(GroupsColl.find().count(), 5)
@@ -72,7 +72,7 @@ class TestDatabaseUtils(unittest.TestCase):
     self.assertEqual(GroupsColl.find().count(), 0)
 
   def testDumpTable(self):
-    rawFile = "../CFC_DataCollector/tests/data/groups.json"
+    rawFile = "CFC_DataCollector/tests/data/groups.json"
     dumpedFile = "/tmp/dumpedGroups"
 
     load_database_json.loadTable(self.serverName, "Test_Groups", rawFile)

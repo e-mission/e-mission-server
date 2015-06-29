@@ -3,7 +3,7 @@ import logging
 import traceback
 sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
 from main.userclient import getClientSpecificQueryFilter
-from main.get_database import get_section_db
+from get_database import get_section_db
 import filter_modules
 from trip import *
 

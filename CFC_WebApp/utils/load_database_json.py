@@ -38,4 +38,4 @@ if __name__ == '__main__':
       print ("USAGE: %s <serverName> <sectionsFileName>" % sys.argv[0])
     else:
       loadData(sys.argv[1], sys.argv[2])
-      loadTable(sys.argv[1], 'Stage_Modes', 'tests/data/modes.json')
+      loadTable(sys.argv[1], 'Stage_Modes', 'CFC_WebApp/tests/data/modes.json')
