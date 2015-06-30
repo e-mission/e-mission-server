@@ -57,6 +57,26 @@ class TestBuiltinUserCache(unittest.TestCase):
     self.assertTrue("my_score" in retrievedData["user"]["game"])
     self.assertTrue("other_scores" in retrievedData["user"]["game"])
 
+  def testGetTwoSetsOfUserDataForPhone(self):
+    user_data_from_phone = {
+        'user': {
+            'mode_confirmations': {
+                "section_1": "walking",
+                "section_2": "cycling",
+                "section_3": "driving"
+            },
+            'deleted_sections':
+                ['section_4', 'section_5']
+        }
+    }
+
+    mauc.sync_phone_to_server(self.testUserUUID, user_data_from_phone)
+
+    uc = ucauc.UserCache.getUserCache(self.testUserUUID)
+    self.assertEqual(uc.getUserDataFromPhone("deleted_sections"), ['section_4', 'section_5'])
+    self.assertEqual(len(uc.getUserDataFromPhone("mode_confirmations")), 3)
+    self.assertEqual(uc.getUserDataFromPhone("mode_confirmations")['section_1'], "walking")
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     unittest.main()

@@ -74,5 +74,6 @@ class BuiltinUserCache(ucauc.UserCache):
         phone -> server
         """
         embeddedKey = "phone_to_server.user.%s" % key
-        return self.db.find_one(self.uuid, {_id: False, embeddedKey: True})
+        retrievedData = self.db.find_one(self.uuid, {'_id': False, embeddedKey: True})
+        return retrievedData["phone_to_server"]["user"][key]
 
