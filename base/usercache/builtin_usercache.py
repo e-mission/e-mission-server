@@ -50,7 +50,42 @@ class BuiltinUserCache(ucauc.UserCache):
         server -> phone
         Note that this assumes that we have a single cache document per user.
         """
-        embeddedKey = "server_to_phone.user.%s" % key
+        fq_key = "server_to_phone.user.%s" % key
+        self._putIntoCache(fq_key, value)
+
+    def getUserDataFromPhone(self, key):
+        """
+        phone -> server
+        """
+        fq_key = "phone_to_server.user.%s" % key
+        retrievedData = self._getFromCache(fq_key)
+        return retrievedData["phone_to_server"]["user"][key]
+
+    def putBackgroundConfigForPhone(self, key, value):
+        """
+        server -> phone
+        Note that this assumes that we have a single cache document per user.
+        """
+        fq_key = "server_to_phone.background_config.%s" % key
+        return self._putIntoCache(fq_key, value)
+
+    def getBackgroundDataFromPhone(self, key):
+        """
+        phone -> server
+        """
+        fq_key = "phone_to_server.background.%s" % key
+        retrievedData = self._getFromCache(fq_key)
+        # We can move this into the generic method as well by parsing out the
+        # individual key pieces in the generic method. But this is easy enough
+        # to do for now.
+        return retrievedData["phone_to_server"]["background"][key]
+
+    def _putIntoCache(self, fq_key, value):
+        """
+            Put the value with the specified fully qualified name into the cache.
+            This is (currently) not intended to be used directly.
+            Instead, it is intended to be used by the other top level methods in here
+        """
         # If the field does not exist, $set will add a new field with the
         # specified value, provided that the new field does not violate a type
         # constraint. If you specify a dotted path for a non-existent field,
@@ -60,7 +95,7 @@ class BuiltinUserCache(ucauc.UserCache):
                       '$set': {
                           '_id': self.uuid,
                           'user_id': self.uuid,
-                          embeddedKey: value
+                          fq_key: value
                       }
                    }
         logging.debug("Updating %s spec to %s" % (self.uuid, document))
@@ -69,11 +104,11 @@ class BuiltinUserCache(ucauc.UserCache):
                                  upsert=True)
         logging.debug("Updated result = %s" % result)
 
-    def getUserDataFromPhone(self, key):
+    def _getFromCache(self, fq_key):
         """
-        phone -> server
+            Get the value with the specified fully qualified name from the cache.
+            This is (currently) not intended to be used directly.
+            Instead, it is intended to be used by the other top level methods in here
         """
-        embeddedKey = "phone_to_server.user.%s" % key
-        retrievedData = self.db.find_one(self.uuid, {'_id': False, embeddedKey: True})
-        return retrievedData["phone_to_server"]["user"][key]
+        return self.db.find_one(self.uuid, {'_id': False, fq_key: True})
 

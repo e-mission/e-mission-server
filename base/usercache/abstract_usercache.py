@@ -50,7 +50,7 @@ class UserCache(object):
         """
         pass
 
-    def getBackgroundDataFromPhone(self, key, value):
+    def getBackgroundDataFromPhone(self, key):
         """
         Get the data collected as part of background processing on the phone.
         These have been automatically retrieved from the phone
@@ -60,6 +60,9 @@ class UserCache(object):
     # For information that we are retrieving from the phone, we can clear the
     # cache once we have processed it.
     # TODO: Figure out whether we need versioning
+    # Also, TODO, figure out how we prevent a memory leak in the data that the
+    # plugins push? How do we ensure that they clean up after themselves?
+    # Some kind of auto-cleanup for both sides sounds like a good idea...
 
     def clearUserDataFromPhone(self, key_list):
         pass
