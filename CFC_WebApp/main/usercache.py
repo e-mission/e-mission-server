@@ -30,9 +30,9 @@ def sync_phone_to_server(uuid, data_from_phone):
                       'phone_to_server': data_from_phone
                   }
                }
-    result = self.db.update({'user_id': uuid},
-                             document,
-                             upsert=True)
+    result = get_usercache_db().update({'user_id': uuid},
+                                         document,
+                                         upsert=True)
     logging.debug("Updated result = %s" % result)
     if 'err' in result and result['err'] is not None:
         logging.error("In sync_phone_to_server, err = %s" % result['err'])

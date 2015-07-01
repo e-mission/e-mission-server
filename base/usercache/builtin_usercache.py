@@ -43,14 +43,50 @@ https://github.com/e-mission/e-mission-data-collection/wiki/Data-format-design
 class BuiltinUserCache(ucauc.UserCache):
     def __init__(self, uuid):
         super(BuiltinUserCache, self).__init__(uuid)
+        self.fq_user_data_to = lambda(key): "server_to_phone.user.%s" % key
+        self.fq_user_data_from = lambda(key): "phone_to_server.user.%s" % key
+        self.fq_background_to = lambda(key): "server_to_phone.background_config.%s" % key
+        self.fq_background_from = lambda(key): "phone_to_server.background.%s" % key
         self.db = get_usercache_db()
 
     def putUserDataForPhone(self, key, value):
         """
-        server -> phone
-        Note that this assumes that we have a single cache document per user.
+            server -> phone
+            Note that this assumes that we have a single cache document per user.
         """
-        embeddedKey = "server_to_phone.user.%s" % key
+        fq_key = self.fq_user_data_to(key)
+        self._putIntoCache(fq_key, value)
+
+    def getUserDataFromPhone(self, key):
+        """
+            phone -> server
+            Returns None if the key does not exist
+        """
+        fq_key = self.fq_user_data_from(key)
+        return self._getFromCache(fq_key)
+
+    def putBackgroundConfigForPhone(self, key, value):
+        """
+            server -> phone
+            Note that this assumes that we have a single cache document per user.
+        """
+        fq_key = self.fq_background_to(key)
+        return self._putIntoCache(fq_key, value)
+
+    def getBackgroundDataFromPhone(self, key):
+        """
+            phone -> server
+            Returns None if the key does not exist
+        """
+        fq_key = self.fq_background_from(key)
+        return self._getFromCache(fq_key)
+
+    def _putIntoCache(self, fq_key, value):
+        """
+            Put the value with the specified fully qualified name into the cache.
+            This is (currently) not intended to be used directly.
+            Instead, it is intended to be used by the other top level methods in here
+        """
         # If the field does not exist, $set will add a new field with the
         # specified value, provided that the new field does not violate a type
         # constraint. If you specify a dotted path for a non-existent field,
@@ -60,7 +96,7 @@ class BuiltinUserCache(ucauc.UserCache):
                       '$set': {
                           '_id': self.uuid,
                           'user_id': self.uuid,
-                          embeddedKey: value
+                          fq_key: value
                       }
                    }
         logging.debug("Updating %s spec to %s" % (self.uuid, document))
@@ -69,10 +105,39 @@ class BuiltinUserCache(ucauc.UserCache):
                                  upsert=True)
         logging.debug("Updated result = %s" % result)
 
-    def getUserDataFromPhone(self, key):
+    def _getFromCache(self, fq_key):
         """
-        phone -> server
+            Get the value with the specified fully qualified name from the cache.
+            This is (currently) not intended to be used directly.
+            Instead, it is intended to be used by the other top level methods in here
+            Returns None if the key does not exist
         """
-        embeddedKey = "phone_to_server.user.%s" % key
-        return self.db.find_one(self.uuid, {_id: False, embeddedKey: True})
+        key_parts = fq_key.split(".")
+        retrievedDoc = self.db.find_one(self.uuid, {'_id': False, fq_key: True})
+        returnedDoc = retrievedDoc
+        logging.debug("Returned doc = %s" % returnedDoc)
+        for key in key_parts:
+            logging.debug("Considering key %s" % key)
+            if key in returnedDoc:
+                returnedDoc = returnedDoc[key]
+            else:
+                returnedDoc = None
+        return returnedDoc
+            
+
+    # TODO: This name may be a bit confusing.
+    # This is the data that we got from the phone
+    # but we are clearing it from the cache, not from the phone (where it would
+    # have already been cleared)
+    def clearUserDataFromPhone(self, key_list):
+        for key in key_list:
+            self._clearFromCache(self.fq_user_data_from(key))
+
+    def clearBackgroundDataFromPhone(self, key_list):
+        for key in key_list:
+            self._clearFromCache(self.fq_background_from(key))
+
+    def _clearFromCache(self, fq_key):
+        document = {"$unset": {fq_key: ""}}
+        self.db.update({'user_id': self.uuid}, document)
 
