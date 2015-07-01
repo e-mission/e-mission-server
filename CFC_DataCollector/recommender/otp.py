@@ -64,7 +64,7 @@ class OTP:
         response = urllib2.urlopen(request)
         return json.loads(response.read())
 
-    def turn_into_trip(self, _id, user_id, trip_id):
+    def turn_into_trip(self, _id, user_id, trip_id, is_fake=None):
         sections = [ ]
         our_json = self.get_json()
         mode_list = set()
@@ -129,6 +129,8 @@ class OTP:
             #    final_end_time = final_start_time + traffic_time
 
         mode_list = list(mode_list)
+        if is_fake:
+            return Fake_Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc, 0, cost, mode_list)
         return Alternative_Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc, 0, cost, mode_list)
 
 def otp_time_to_ours(otp_str):

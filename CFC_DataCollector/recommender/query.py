@@ -22,6 +22,7 @@ def obtain_alternatives(trip_id, user_id):
 	logging.debug("End: %s " % end_coord)
 	    
 	curr_time = datetime.datetime.now()
+	curr_year = curr_time.year
 	curr_month = curr_time.month
 	curr_day = curr_time.day
 	curr_hour = curr_time.hour
@@ -31,7 +32,7 @@ def obtain_alternatives(trip_id, user_id):
 	
         for mode in otp_modes:
                 try:
-                    otp_trip = OTP(start_coord, end_coord, mode, write_day(curr_month, curr_day, "2015"), write_time(curr_hour, curr_minute), False)
+                    otp_trip = OTP(start_coord, end_coord, mode, write_day(curr_month, curr_day, curr_year), write_time(curr_hour, curr_minute), False)
                     otp_trip = otp_trip.turn_into_trip(None, user_id, trip_id) 
                     otp_trip.save_to_db()
                 except PathNotFoundException as e:
