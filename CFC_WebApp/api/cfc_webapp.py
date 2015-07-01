@@ -231,6 +231,22 @@ def storeSensedTrips():
   sections = request.json['sections']
   return tripManager.storeSensedTrips(user_uuid, sections)
 
+@post('usercache/get')
+def getFromCache():
+  logging.debug("Called userCache.get")
+  user_uuid=getUUID(request)
+  logging.debug("user_uuid %s" % user_uuid)
+  to_phone = usercache.sync_server_to_phone(uuid)
+  return to_phone
+
+@post('usercache/put')
+def putIntoCache():
+  logging.debug("Called userCache.put")
+  user_uuid=getUUID(request)
+  logging.debug("user_uuid %s" % user_uuid)
+  from_phone = request.json('phone_to_server')
+  return usercache.sync_phone_to_server(uuid, from_phone)
+
 @post('/profile/create')
 def createUserProfile():
   logging.debug("Called createUserProfile")
