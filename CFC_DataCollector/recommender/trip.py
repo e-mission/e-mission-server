@@ -88,6 +88,7 @@ class Trip(object):
     def save_to_db(self):
         pass
 
+
 class Section(object):
 
     def __init__(self, _id, user_id, trip_id, distance, section_type, start_time, end_time, section_start_location, section_end_location, mode, confirmed_mode):
@@ -315,6 +316,7 @@ class Canonical_E_Mission_Trip(E_Mission_Trip):
             self._create_new(db)
         self._save_alternatives(self.alternatives)
         self._save_perturbed(self.perturbed_trips)
+        
 
 class Alternative_Trip(Trip):
     def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, parent_id, cost, mode_list, track_points=None):
@@ -393,6 +395,16 @@ class Alternative_Trip(Trip):
             "mode_list": self.mode_list,
             "track_points": point_list})
 
+
+class Fake_Trip(Alternative_Trip):
+    """docstring for Fake_Trip"""
+    def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, parent_id, cost, mode_list, track_points=None):
+        super(Fake_Trip, self).__init__( _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, parent_id, cost, mode_list)
+    
+    def save_to_db(self):
+        db = get_fake_trips_db()
+        self._create_new(db)
+
 class Canonical_Alternative_Trip(Alternative_Trip):
     def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, alternatives, perturbed_trips, mode_list):
         super(self.__class__, self).__init__(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, alternatives,
@@ -403,6 +415,8 @@ class Perturbed_Trip(Alternative_Trip, E_Mission_Trip):
     def __init__(self, json_segment):
         super(self.__class__, self).__init__(json_segment)
         self.subtype = "perturbed"
+
+
 
 class PipelineFlags(object):
     def __init__(self, _id):
