@@ -63,6 +63,12 @@ class UserCache(object):
     # Also, TODO, figure out how we prevent a memory leak in the data that the
     # plugins push? How do we ensure that they clean up after themselves?
     # Some kind of auto-cleanup for both sides sounds like a good idea...
+    # Also, if we are manually going to call clear, then it is unclear how we can 
+    # avoid race conditions. The following race doesn't look like it can be avoided
+    # 1. we read version n of the data
+    # 2. new sync from the phone arrives and overrides data (version is now n+1)
+    # 3. we delete data. This deletes version n+1, so we never process it
+    # I think that we are going to have to include versioning
 
     def clearUserDataFromPhone(self, key_list):
         pass

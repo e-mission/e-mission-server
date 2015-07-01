@@ -134,6 +134,36 @@ class TestBuiltinUserCache(unittest.TestCase):
     self.assertEqual(uc.getBackgroundDataFromPhone("activities")[1]["time"], 33445)
     self.assertEqual(uc.getBackgroundDataFromPhone("accelerometer")[1]["time"], 11224)
 
+  def testClearBackgroundData(self):
+    background_data_from_phone = {
+        'background': {
+            'locations': [
+              {'mLat': 34.25, 'mLng': -122.45, 'time': 12345, 'elapsed_time': 2345, 'accuracy': 25},
+              {'mLat': 35.25, 'mLng': -123.45, 'time': 12355, 'elapsed_time': 2355, 'accuracy': 26},
+            ],
+            'activities': [
+              {"mode": "cycling", "confidence": 20, "time": 22334},
+              {"mode": "walking", "confidence": 20, "time": 33445},
+            ],
+            'accelerometer': [
+              {"time": 11223, "x": 123.4, "y": 234.5, "z": 345.6},
+              {"time": 11224, "x": 123.4, "y": 234.5, "z": 345.6}
+            ],
+        }
+    }
+
+    mauc.sync_phone_to_server(self.testUserUUID, background_data_from_phone)
+
+    uc = ucauc.UserCache.getUserCache(self.testUserUUID)
+    self.assertEqual(len(uc.getBackgroundDataFromPhone("locations")), 2)
+    self.assertEqual(len(uc.getBackgroundDataFromPhone("activities")), 2)
+    self.assertEqual(len(uc.getBackgroundDataFromPhone("accelerometer")), 2)
+  
+    uc.clearBackgroundDataFromPhone(["locations", "accelerometer"])
+    self.assertEqual(uc.getBackgroundDataFromPhone("locations"), None)
+    self.assertEqual(len(uc.getBackgroundDataFromPhone("activities")), 2)
+    self.assertEqual(uc.getBackgroundDataFromPhone("accelerometer"), None)
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     unittest.main()
