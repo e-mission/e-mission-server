@@ -1,9 +1,9 @@
 from recommender.otp import OTP, PathNotFoundException
-from pygeocoder import Geocoder
 import random, math
 from recommender.trip import Coordinate 
 import json
 import datetime
+from OurGeocoder import ReverseGeocode, Geocode
 
 class Address:
 
@@ -67,9 +67,10 @@ class Creator:
 
 def geocode_address(address):
     if address.cord is None:
-        business_geocoder = Geocoder()
-        results = business_geocoder.geocode(address.text)
-        address.cord = results
+        # business_geocoder = Geocoder()
+        # results = business_geocoder.geocode(address.text)
+        g = Geocode(address)
+        address.cord = g.get_coords()
     else:
         results = address.cord
     return Coordinate(results[0].coordinates[1], results[0].coordinates[0])
@@ -99,10 +100,6 @@ def get_one_random_point_in_radius(address, radius):
     x = float(x) / float(math.cos(y_0))   # To account for Earth something 
     return Coordinate(x + x_0, y + y_0)
 
-def test_get_random_point():
-    a = Address("2703 Hallmark Dr Belmont CA")
-    print "1 kilometer: %s" % get_one_random_point_in_radius(a, 1)
-    print "2 kms : %s" % get_one_random_point_in_radius(a, 2)
 
 def kilometers_to_degrees(km):
     ## From stackexchnage mentioned above 
