@@ -36,8 +36,10 @@ def getResult(user_uuid):
     del section['manual']
     del section['commute']
 
+  logging.debug("original sections = %s" % original_sections)
+  logging.debug("recommended trip = %s" % recommended_trip)
   renderedTemplate = template("clients/recommendation/result_template.html",
-                              originalSections = ast.literal_eval(json.dumps(original_sections)),
-                              recommendedTrip = ast.literal_eval(json.dumps(recommended_trip)))
+                              originalSections = json.dumps(original_sections),
+                              recommendedTrip = json.dumps(recommended_trip))
 
   return renderedTemplate

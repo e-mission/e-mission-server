@@ -127,7 +127,7 @@ def searchTrip(user, period, startpoint, endpoint, mode, option):
             gmap.addpoint(point_start[1], point_start[0], COLOR[1])
         drawSection(section, option, gmap)
     gmap.draw('gmap_display/' + 'SearchResult' + str(start)[:10] + '-' + str(end)[:10] + '_' + user + '.html')
-    print sectionList
+    # print sectionList
 
     
 def drawSection(section, option, gmap, Color = 'default', title = None):

@@ -85,6 +85,5 @@ def runBackgroundTasks(uuid):
 
 def runBackgroundTasksForDay(uuid, today):
   leaderboard.runBackgroundTasksForDay(uuid, today)
-  default.runBackgroundTasksForDay(uuid, today)
   gamified.runBackgroundTasksForDay(uuid, today)
   data.runBackgroundTasksForDay(uuid, today)

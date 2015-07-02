@@ -20,7 +20,7 @@ def getUserTour(user_uuid):
     from recommender.trip import Canonical_E_Mission_Trip
     canonical_trips = list(ti.TripIterator(user_uuid,["recommender", "get_improve"], Canonical_E_Mission_Trip))
     for cluster in canonical_trips:
-        print(cluster.start_point_distr)
+        # print(cluster.start_point_distr)
         # print(cluster.end_point_distr)
         # print(cluster.start_time_distr)
         # print(cluster.end_time_distr)
@@ -28,7 +28,7 @@ def getUserTour(user_uuid):
     # representative_trips = map(lambda x: x.trip_id, canonical_trips)
     sys.path.remove("%s/../CFC_DataCollector/" % os.getcwd())
 
-    print "Number of canonical_trips: %i" % len(canonical_trips)
+    # print "Number of canonical_trips: %i" % len(canonical_trips)
     return canonical_trips
             
 def generate_tour_map(user_uuid):
@@ -44,7 +44,7 @@ def generate_tour_map(user_uuid):
     canonical_trips = getUserTour(user_uuid)
     for section in canonical_trips:        
         color = '#%02X%02X%02X' % (r(),r(),r())
-        print section._id
+        # print section._id
         section_json = get_section_db().find_one({'_id': section._id})
 	drawSection(section_json, 'path', gmap, color)
     try:
