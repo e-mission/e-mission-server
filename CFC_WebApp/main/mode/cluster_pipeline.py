@@ -201,7 +201,8 @@ def plot_mds(clusters, user_disMat, method, user_id, is_ground_truth=False):
     else:
         f_name = 'mds_plots/' + str(user_id) + '_' + method + '.png'
     
-    plt.savefig(f_name)
+    
+    plt.savefig(f_name, dpi=900)
 
 #K MEANS HELPER FUNCTIONS
 
@@ -278,19 +279,24 @@ methods = ['dtw', 'lcs', 'Frechet'] #what metrics for distance to use
 
 #EXPERIMENT 1: KMeans with following features: start_lat, start_lng, end_lat, end_lng, duration, distance
 """
-print("Working on KMeans with simple features...")
-data = extract_features('kmeans', user_id)
-clusters = generate_clusters('kmeans', data, user_id)
-print("Finished.")
+for method in methods:
+    print("Working on KMeans with simple features...")
+    data = extract_features('kmeans', user_id)
+    clusters = generate_clusters('kmeans', data, user_id)
+    plot_mds(clusters, data, method, user_id)
+    print("Finished " + method + ".")
 """
+
 #EXPERIMENT 2-4: KMedoids with various methods of calculating distance between route A and route B
 
-for method in methods:
+#for method in methods:
+for i in range(1):
+    method = 'Frechet'
     print("Working on KMedoid with " + method + " as distance metric.")
     #user_disMat, clusters_user = generate_route_clusters(user_id, method=method, nClusters=-1)
     data = extract_features('kmedoid', user_id, method)
     clusters = generate_clusters('kmedoid', data, user_id, method)
-    print(data)
+    ##print(data)
     plot_mds(clusters, data, method, user_id)
     print("Finished " + method + ".")
 
