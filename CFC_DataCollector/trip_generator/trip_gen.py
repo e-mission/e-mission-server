@@ -121,13 +121,3 @@ def create_fake_trips():
     my_creator.get_trips_from_a_to_b()
     return my_creator
 
-def sanity_check():
-    c = create_fake_trips()
-    print "amount missed = %s" % c.amount_missed 
-
-    ##print "points = %s" % (c.points)
-    #print "a to b = %s" % c.a_to_b
-
-
-if __name__ == "__main__":
-    sanity_check()

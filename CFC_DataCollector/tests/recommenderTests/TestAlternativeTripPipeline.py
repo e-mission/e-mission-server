@@ -24,7 +24,6 @@ from moves import collect
 from recommender.common import *
 import collections
 from crontab import CronTab
-from trip_generator.fake_trip import create_fake_trips
 
 logging.basicConfig(level=logging.DEBUG)
 
