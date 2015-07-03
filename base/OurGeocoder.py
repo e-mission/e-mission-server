@@ -34,13 +34,14 @@ class ReverseGeocode:
 
 class Geocode:
 
-	def __init__(self, address):
-		self.address = address
-		self.coords = None
+	def __init__(self):
+		# self.address = address
+		# self.coords = None
+		pass
 
-	def make_url(self):
+	def make_url(self, address):
 		params = {
-			"q" : self.address,
+			"q" : address,
 			"format" : "json"
 		}
 
@@ -49,16 +50,14 @@ class Geocode:
 		url = query_url + encoded_params
 		return url
 
-	def get_json(self):
-		request = urllib2.Request(self.make_url())
+	def get_json(self, address):
+		request = urllib2.Request(self.make_url(address))
 		response = urllib2.urlopen(request)
 		return json.loads(response.read())
 
-	def get_coords(self):
-		if self.coords is None:
-			jsn = self.get_json()
-			lat = jsn[0]["lat"]
-			lon = jsn[0]["lon"]
-			self.coords = Coordinate(lat, lon)
-		return self.coords
+	def get_coords(self, address):
+		jsn = self.get_json(address)
+		lat = float(jsn[0]["lat"])
+		lon = float(jsn[0]["lon"])
+		return Coordinate(lat, lon)
 

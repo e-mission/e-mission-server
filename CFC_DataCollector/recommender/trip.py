@@ -396,14 +396,17 @@ class Alternative_Trip(Trip):
             "track_points": point_list})
 
 
-class Fake_Trip(Alternative_Trip):
+class Fake_Trip(Trip):
     """docstring for Fake_Trip"""
-    def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, parent_id, cost, mode_list, track_points=None):
-        super(Fake_Trip, self).__init__( _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, parent_id, cost, mode_list)
+    def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location):
+        super(self.__class__, self).__init__(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location)
     
     def save_to_db(self):
         db = get_fake_trips_db()
-        self._create_new(db)
+        print "trip start loc is %s" % self.trip_start_location
+        print "trip end loc is %s" % self.trip_end_location 
+        db.insert({"trip_start_location" : self.trip_start_location.coordinate_list(), 
+            "trip_end_location" : self.trip_end_location.coordinate_list()})
 
 class Canonical_Alternative_Trip(Alternative_Trip):
     def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, alternatives, perturbed_trips, mode_list):

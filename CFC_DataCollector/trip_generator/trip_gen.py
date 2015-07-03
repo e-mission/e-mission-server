@@ -3,7 +3,8 @@ import random, math
 from recommender.trip import Coordinate 
 import json
 import datetime
-from OurGeocoder import ReverseGeocode, Geocode
+#from OurGeocoder import ReverseGeocode, Geocode
+from pygeocoder import Geocoder
 
 class Address:
 
@@ -28,7 +29,7 @@ class Creator:
         self.amount_missed = 0
 
     def get_starting_ending_points(self):
-        city_file = open("trip_generator/input.json", "r") ## User (Naomi) specifies locations and radius they want
+        city_file = open("CFC_Datacollector/trip_generator/input.json", "r") ## User (Naomi) specifies locations and radius they want
         jsn = json.load(city_file)
         self.num_trips = jsn["number of trips"]
         self.radius = int(jsn["radius"])
@@ -44,6 +45,7 @@ class Creator:
             starting_point = self.starting_points[start_index]
             ending_point = self.ending_points[end_index]
             to_add = ( starting_point, ending_point )
+            print to_add
             self.a_to_b.add(to_add)
 
 
@@ -56,24 +58,36 @@ class Creator:
         curr_hour = curr_time.hour
         curr_minute = curr_time.minute
         for t in self.a_to_b:
-            mode = mode_tuple[random.randint(0, len(mode_tuple) - 1)] ## Unsophisticated mode choice
+            print t
+            mode = mode_tuple[random.randint(0, len(mode_tuple) - 1)] ## Unsophisticated mode choice, Alexi would throw up
             try:
+                if abs(t[0].get_lon()) < 30 or abs(t[0].get_lat()) < 30:
+                    print 
                 otp_trip = OTP(t[0], t[1], mode, write_day(curr_month, curr_day, curr_year), write_time(curr_hour, curr_minute), True)
-                alt_trip = otp_trip.turn_into_trip(0, 0, 0)   ## ids dont matter here 
+                alt_trip = otp_trip.turn_into_trip(0, 0, 0, True)   ## ids dont matter here 
                 alt_trip.save_to_db()
             except PathNotFoundException:
                 print "In the sea, skipping"
                 self.amount_missed += 1
 
+# def geocode_address(address):
+#     print address.text
+#     if address.cord is None:
+#         g = Geocode()
+#         address.cord = g.get_coords(address)
+#         results = address.cord
+#     else:
+#         results = address.cord
+#     return results
+
 def geocode_address(address):
     if address.cord is None:
-        # business_geocoder = Geocoder()
-        # results = business_geocoder.geocode(address.text)
-        g = Geocode(address)
-        address.cord = g.get_coords()
+        business_geocoder = Geocoder()
+        results = business_geocoder.geocode(address.text)
+        address.cord = results
     else:
         results = address.cord
-    return Coordinate(results[0].coordinates[1], results[0].coordinates[0])
+    return Coordinate(results[0].coordinates[0], results[0].coordinates[1])
 
 def generate_random_locations_in_radius(address, radius, num_points):
     # Input the desired radius in kilometers
@@ -88,6 +102,7 @@ def generate_random_locations_in_radius(address, radius, num_points):
 def get_one_random_point_in_radius(address, radius):
     # From https://gis.stackexchange.com/questions/25877/how-to-generate-random-locations-nearby-my-location
     crd = geocode_address(address)
+    print crd
     radius_in_degrees = kilometers_to_degrees(radius)
     x_0 = crd.get_lon()
     y_0 = crd.get_lat()
@@ -97,9 +112,16 @@ def get_one_random_point_in_radius(address, radius):
     t = 2 * math.pi * v
     x = w * math.cos(t)
     y = w * math.sin(t)
+    print "type of y is %s" % type(y_0)
+    print "x = %s" % x
     x = float(x) / float(math.cos(y_0))   # To account for Earth something 
-    return Coordinate(x + x_0, y + y_0)
+    to_return = Coordinate(y + y_0, x + x_0)
+    print to_return
+    if abs(to_return.get_lat()) < 30 or abs(to_return.get_lon() < 30):
+        print to_return.get_lon()
+        print to_return.get_lat()
 
+    return to_return
 
 def kilometers_to_degrees(km):
     ## From stackexchnage mentioned above 
