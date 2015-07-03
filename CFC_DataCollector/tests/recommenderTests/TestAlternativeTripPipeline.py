@@ -24,6 +24,7 @@ from moves import collect
 from recommender.common import *
 import collections
 from crontab import CronTab
+from trip_generator.trip_gen import create_fake_trips
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -55,12 +56,15 @@ class TestAlternativeTripPipeline(unittest.TestCase):
       self.ModesColl.insert(row)
     
     # register each of the users and add sample trips to each user
-    result = self.loadTestJSON("tests/data/missing_trip")
-    collect.processResult(self.testUUID, result)
-    for trip in get_trip_db().find():
+    # result = self.loadTestJSON("tests/data/missing_trip")
+    # collect.processResult(self.testUUID, result)
+
+    create_fake_trips()
+
+    for trip in get_fake_trips_db().find():
         trip['trip_start_datetime'] = pydt.datetime.now() + pydt.timedelta(hours=-5)
         trip['trip_end_datetime'] = pydt.datetime.now()
-        get_trip_db().update({"_id": trip["_id"]}, trip)
+        get_fake_trips_db().update({"_id": trip["_id"]}, trip)
 
     for section in get_section_db().find():
         section['section_start_datetime'] = pydt.datetime.now() + pydt.timedelta(hours=-5)

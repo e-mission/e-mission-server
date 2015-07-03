@@ -2,7 +2,7 @@
 ## Hopefully similiar to googlemaps.py
 
 import urllib, urllib2, datetime, time
-from trip import Coordinate, Alternative_Trip, Section
+from trip import Coordinate, Alternative_Trip, Section, Fake_Trip
 from common import calc_car_cost
 # from traffic import get_travel_time
 from pygeocoder import Geocoder
@@ -130,7 +130,7 @@ class OTP:
 
         mode_list = list(mode_list)
         if is_fake:
-            return Fake_Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc, 0, cost, mode_list)
+            return Fake_Trip(_id, user_id, trip_id, sections, start_time, end_time, final_start_loc, final_end_loc)
         return Alternative_Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc, 0, cost, mode_list)
 
 def otp_time_to_ours(otp_str):
