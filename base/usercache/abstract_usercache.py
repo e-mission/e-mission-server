@@ -14,6 +14,16 @@
 
 # Let's switch to new-style classes finally!!
 class UserCache(object):
+    class TimeQuery(object):
+        """
+            Object that encapsulates a query for a particular time (read_ts, write_ts, or processed_ts)
+        """
+        def __init__(self, timeType, startTs, endTs):
+            self.timeType = timeType
+            self.startTs = startTs
+            self.endTs = endTs
+
+
     @staticmethod
     def getUserCache(uuid):
         """
@@ -29,49 +39,41 @@ class UserCache(object):
     def __init__(self, uuid):
         self.uuid = uuid
 
-    def putUserDataForPhone(self, key, value):
+    def putDocument(self, key, value):
         """
-        Store this key-value pair into the user results part of the cache.
-        This will be automatically pushed to the phone at the appropriate time
+        Store this key-value pair into the server -> phone part of the cache.
+        This will be automatically pushed to the phone at the appropriate time.
+
+        We don't need to specify the entry type since it is implied by the
+        method name, and the server doesn't put read-write documents.
         """
         pass
 
-    def getUserDataFromPhone(self, key):
+    def getMessage(self, key, timeQuery = None):
         """
-        Retrieve user specified values from the cache.
-        These have been automatically retrieved from the phone
+        Retrieve values from the phone->server part of the cache.
+        These have been automatically retrieved from the phone.
+
+        We don't need to specify the entry type since it is implied by the method name.
+        We are, however, allowed to specify a time query (e.g. start_ts <
+        read_ts <= end_ts). Note that the current interface only allows a
+        single timeQuery to be specified, which is less rich than the current
+        metadata format.
+
+        However, we can easily extend this to a set of time queries if we need it.
         """
         pass
 
-    def putBackgroundConfigForPhone(self, key, value):
+    # TODO: Should we have a separate clear method, or should we just clear on get?
+    # I prefer a separate clear method, since it allows more flexibility in the
+    # consumption and the plugin architecture
+    def clearProcessedMessages(self, timeQuery, key_list = None):
         """
-        Store the configuration for background operation into the phone.
-        This will be automatically pushed to the phone at the appropriate time
+        Clear all messages that match the time query
+        We could specify the same time query as specified for "get", allowing
+        us to ensure that there are no race conditions.
+        
+        If we extended the timeQuery, we could also support 'read_ts' exists,
+        which would allow us to delete message that have already been read
         """
-        pass
-
-    def getBackgroundDataFromPhone(self, key):
-        """
-        Get the data collected as part of background processing on the phone.
-        These have been automatically retrieved from the phone
-        """
-        pass
-
-    # For information that we are retrieving from the phone, we can clear the
-    # cache once we have processed it.
-    # TODO: Figure out whether we need versioning
-    # Also, TODO, figure out how we prevent a memory leak in the data that the
-    # plugins push? How do we ensure that they clean up after themselves?
-    # Some kind of auto-cleanup for both sides sounds like a good idea...
-    # Also, if we are manually going to call clear, then it is unclear how we can 
-    # avoid race conditions. The following race doesn't look like it can be avoided
-    # 1. we read version n of the data
-    # 2. new sync from the phone arrives and overrides data (version is now n+1)
-    # 3. we delete data. This deletes version n+1, so we never process it
-    # I think that we are going to have to include versioning
-
-    def clearUserDataFromPhone(self, key_list):
-        pass
-
-    def clearBackgroundDataFromPhone(self, key_list):
         pass

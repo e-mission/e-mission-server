@@ -10,30 +10,30 @@ def sync_server_to_phone(uuid):
         Gets the blob to sync to send to the phone and sends it over
         Return None if there is no data
     """
-    retrievedData = get_usercache_db().find_one(uuid)
+    retrievedData = list(get_usercache_db().find({"user_id": uuid}, # query
+                                            {'_id': False, 'user_id': False})) # projection
+    
     logging.debug("retrievedData = %s" % retrievedData)
-    if "server_to_phone" not in retrievedData:
-        # Handle the case in which there is no "server_to_phone" field
-        # probably because the data has just been created
-        return None
-    else:
-        return retrievedData["server_to_phone"]
+    return retrievedData
 
 def sync_phone_to_server(uuid, data_from_phone):
     """
         Puts the blob from the phone into the cache
     """
-    document = {
-                  '$set': {
-                      '_id': uuid,
-                      'user_id': uuid,
-                      'phone_to_server': data_from_phone
-                  }
-               }
-    result = get_usercache_db().update({'user_id': uuid},
-                                         document,
-                                         upsert=True)
-    logging.debug("Updated result = %s" % result)
-    if 'err' in result and result['err'] is not None:
-        logging.error("In sync_phone_to_server, err = %s" % result['err'])
-        raise Exception()
+    for data in data_from_phone:
+        logging.debug("About to insert %s into the database" % data)
+        data.update({"user_id": uuid})
+        logging.debug("After updating with UUId, we get %s" % data)
+        document = {'$set': data}
+        update_query = {'user_id': uuid,
+                        'metadata.type': data["metadata"]["type"],
+                        'metadata.write_ts': data["metadata"]["write_ts"],
+                        'metadata.key': data["metadata"]["key"]}
+        result = get_usercache_db().update(update_query,
+                                           document,
+                                           upsert=True)
+        logging.debug("Updated result for key = %s, write_ts = %s = %s" % 
+            (data["metadata"]["key"], data["metadata"]["write_ts"], result))
+        if 'err' in result and result['err'] is not None:
+            logging.error("In sync_phone_to_server, err = %s" % result['err'])
+            raise Exception()
