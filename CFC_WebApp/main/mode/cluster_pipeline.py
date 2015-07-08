@@ -18,12 +18,17 @@ from util import read_uuids
 
 """
 Notes
+
 Usage: python cluster_pipeline.py <username>
+
 Username must be associated with UUID in user_uuid.secret 
+
 High level overview:
 -This script provides a series of tools to help you evaluate your clustering algorithm across different methods of calculating distance.
+
 -For a particular user that you pass in to this script, we will generate and plot clusters on a 2d-plane using MDS. colors correspond
 to a kmedoid generated clusters
+
 -we also compare kmedoid generated clusters to ground truth clusters and returns accuracy score
 """
 
