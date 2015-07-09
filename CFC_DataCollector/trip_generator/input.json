@@ -1,0 +1,15 @@
+{
+	"radius" : "1",
+	"starting centroids" :
+	[
+		"2703 Hallmark Dr Belmont Ca",
+		"ATT Park"
+
+	],
+	"ending centroids" :
+	[
+		"Skyline County Park Napa, CA",
+		"UC Berkeley"
+	],
+	"number of trips" : 100
+}
