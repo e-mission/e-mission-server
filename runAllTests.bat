@@ -2,7 +2,7 @@ pushd "%cd%"/CFC_WebApp
 cp config.json.sample keys.json 
 cp keys.json.sample keys.json 
 set PYTHONPATH=.;../CFC_DataCollector;../base
-py -m unittest discover -s tests -p Test || goto :error
+py -m unittest discover -s tests -p Test* || goto :error
 popd
 
 pushd "%cd%"/CFC_DataCollector
