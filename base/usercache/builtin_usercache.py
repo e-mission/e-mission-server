@@ -1,6 +1,7 @@
 import usercache.abstract_usercache as ucauc # ucauc = usercache.abstract_usercache
 from get_database import get_usercache_db
 import logging
+import time
 
 """
 Format of the usercache_db.
@@ -10,134 +11,119 @@ maybe one for the data from the phone and one for the data to the phone.
 We are going to go with the single object for now, since it is the easiest
 option, but we can restructure it in this class if we want to.
 
-As described in 
-https://github.com/e-mission/e-mission-data-collection/wiki/Data-format-design
+The logical structure is shown in 
+https://github.com/e-mission/e-mission-data-collection/wiki/User-cache-data-format-design-considerations
+and the physical structure is shown in
+https://github.com/e-mission/e-mission-data-collection/wiki/User-cache-data-format-design-considerations
 
     {
-        '_id': uuid,
-        'user_id': uuid,
-        'phone_to_server': 
-        {
-            'user':
-            {
-            },
-            'background':
-            {
-            }
-        }
-        'server_to_phone': 
-        {
-            'user':
-            {
-            },
-            'background_config':
-            {
-            },
-            'common':
-            {
-            }
-        }
+      "metadata": {
+        "write_ts": 1435856137,
+        "read_ts": 1435856138,
+        "type": "document",
+        "key": "data/carbon_footprint",
+        "plugin": "data"
+      },
+      "data" : {
+        "mine": 45.64,
+        "avg": 21.35,
+        "optimal": 44.21
+      }
+    },
+    {
+      "metadata": {
+        "write_ts": 1435856237,
+        "read_ts": 1435856238,
+        "type": "message",
+        "key": "background/location",
+        // processed_ts is not yet set because it hasn't yet been processed
+      },
+      "data" : {
+        "mLat": 45.64,
+        "mLng": 21.35,
+        "time": 1435856237,
+      }
     }
 """
 
 class BuiltinUserCache(ucauc.UserCache):
     def __init__(self, uuid):
         super(BuiltinUserCache, self).__init__(uuid)
-        self.fq_user_data_to = lambda(key): "server_to_phone.user.%s" % key
-        self.fq_user_data_from = lambda(key): "phone_to_server.user.%s" % key
-        self.fq_background_to = lambda(key): "server_to_phone.background_config.%s" % key
-        self.fq_background_from = lambda(key): "phone_to_server.background.%s" % key
+        self.key_query = lambda(key): {"metadata.key": key};
+        self.ts_query = lambda(tq): {"$and": [{"metadata.%s" % tq.timeType: {"$gte": tq.startTs}},
+                {"metadata.%s" % tq.timeType: {"$lte": tq.endTs}}]}
+        self.type_query = lambda(entry_type): {"metadata.type": entry_type}
+        # time.time() returns seconds. Our format requires milliseconds
+        self.get_utc_ts = lambda(_): int(time.time() * 1000)
         self.db = get_usercache_db()
 
-    def putUserDataForPhone(self, key, value):
+    def putDocument(self, key, value):
         """
             server -> phone
             Note that this assumes that we have a single cache document per user.
         """
-        fq_key = self.fq_user_data_to(key)
-        self._putIntoCache(fq_key, value)
-
-    def getUserDataFromPhone(self, key):
-        """
-            phone -> server
-            Returns None if the key does not exist
-        """
-        fq_key = self.fq_user_data_from(key)
-        return self._getFromCache(fq_key)
-
-    def putBackgroundConfigForPhone(self, key, value):
-        """
-            server -> phone
-            Note that this assumes that we have a single cache document per user.
-        """
-        fq_key = self.fq_background_to(key)
-        return self._putIntoCache(fq_key, value)
-
-    def getBackgroundDataFromPhone(self, key):
-        """
-            phone -> server
-            Returns None if the key does not exist
-        """
-        fq_key = self.fq_background_from(key)
-        return self._getFromCache(fq_key)
-
-    def _putIntoCache(self, fq_key, value):
-        """
-            Put the value with the specified fully qualified name into the cache.
-            This is (currently) not intended to be used directly.
-            Instead, it is intended to be used by the other top level methods in here
-        """
+        metadataDoc = {
+                        'write_ts': self.get_utc_ts("_"),
+                        'type': 'document',
+                        'key': key,
+                      }
         # If the field does not exist, $set will add a new field with the
         # specified value, provided that the new field does not violate a type
-        # constraint. If you specify a dotted path for a non-existent field,
-        # $set will create the embedded documents as needed to fulfill the
-        # dotted path to the field.
+        # constraint.
+        #
+        # TODO: Should we store the user_id in the metadata doc, or outside?
+        # If inside, we need to 
         document = {
                       '$set': {
-                          '_id': self.uuid,
                           'user_id': self.uuid,
-                          fq_key: value
+                          'metadata': metadataDoc,
+                          'data': value
                       }
                    }
-        logging.debug("Updating %s spec to %s" % (self.uuid, document))
-        result = self.db.update({'user_id': self.uuid},
-                                 document,
-                                 upsert=True)
-        logging.debug("Updated result = %s" % result)
 
-    def _getFromCache(self, fq_key):
+        queryDoc = {'user_id': self.uuid,
+                    'metadata.type': 'document',
+                    'metadata.key': key}
+        logging.debug("Updating %s spec to %s" % (self.uuid, document))
+        result = self.db.update(queryDoc,
+                                document,
+                                upsert=True)
+        logging.debug("Result = %s after updating document" % result)
+
+    def getMessage(self, key, timeQuery = None):
         """
-            Get the value with the specified fully qualified name from the cache.
-            This is (currently) not intended to be used directly.
-            Instead, it is intended to be used by the other top level methods in here
+            phone -> server
             Returns None if the key does not exist
         """
-        key_parts = fq_key.split(".")
-        retrievedDoc = self.db.find_one(self.uuid, {'_id': False, fq_key: True})
-        returnedDoc = retrievedDoc
-        logging.debug("Returned doc = %s" % returnedDoc)
-        for key in key_parts:
-            logging.debug("Considering key %s" % key)
-            if key in returnedDoc:
-                returnedDoc = returnedDoc[key]
-            else:
-                returnedDoc = None
-        return returnedDoc
-            
+        read_ts = self.get_utc_ts("_")
+        combo_query = {"user_id": self.uuid}
+        combo_query.update({"$or": [self.type_query("message"), self.type_query("rw-document")]})
+        combo_query.update(self.key_query(key))
+        if (timeQuery is not None):
+            combo_query.update(self.ts_query(timeQuery))
+        
+        # We first update the read timestamp and then actually read the messages
+        # This ensures that the values that we return have the read_ts set
+        # Is this important/useful? Dunno
+        update_read = {
+            '$set': {
+                'metadata.read_ts': read_ts
+            }
+        }
+        update_result = self.db.update(combo_query, update_read)
+        logging.debug("result = %s after updating read timestamp", update_result)
+        retrievedMsgs = list(self.db.find(combo_query))
+        logging.debug("Found %d messages in response to query %s" % (len(retrievedMsgs), combo_query))
+        return retrievedMsgs
 
-    # TODO: This name may be a bit confusing.
-    # This is the data that we got from the phone
-    # but we are clearing it from the cache, not from the phone (where it would
-    # have already been cleared)
-    def clearUserDataFromPhone(self, key_list):
-        for key in key_list:
-            self._clearFromCache(self.fq_user_data_from(key))
-
-    def clearBackgroundDataFromPhone(self, key_list):
-        for key in key_list:
-            self._clearFromCache(self.fq_background_from(key))
-
-    def _clearFromCache(self, fq_key):
-        document = {"$unset": {fq_key: ""}}
-        self.db.update({'user_id': self.uuid}, document)
-
+    def clearProcessedMessages(self, timeQuery, key_list=None):
+        del_query = self.ts_query(timeQuery)
+        if key_list is not None:
+            key_query_list = []
+            for key in key_list:
+                key_query_list.append(self.key_query(key))
+        if key_query_list is not None:
+            del_query.update({"$or": key_query_list})
+        logging.debug("About to delete messages matching query %s" % del_query)
+        del_result = self.db.remove(del_query)
+        logging.debug("Delete result = %s" % del_result)
