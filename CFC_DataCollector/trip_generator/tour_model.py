@@ -10,12 +10,20 @@ class Location(object):
         self.times_allowed_two = 0
         self.count = 0
         self.count_down = 0
+        self.parents_to_probs = { }
 
     def add_to_successors(self, loc):
-        self.successors.append(loc)
-        loc.times_allowed_one += 1
-        loc.times_allowed_two += 1
-        loc.count += 1
+        if type(loc) == list:
+            self.successors.extend(loc)
+        elif type(loc) == Location:
+            self.successors.append(loc)
+        # loc.times_allowed_one += 1
+        # loc.times_allowed_two += 1
+        # loc.count += 1
+
+    def get_prob_of_next(self, parent):
+        pass
+
 
     def get_successors(self):
         return self.successors
@@ -28,10 +36,6 @@ class Location(object):
 
     def __str__(self):
         return self.name
-
-    def __eq__(self, other):
-        return self.name == other.name
-
 
 class TourModel(object):
 
@@ -51,8 +55,7 @@ class TourModel(object):
         start = True
         while (curr_node != orig_place) or start:
             start = False
-            curr_node = get_next_node(place) ## Do a random walk around the FSM, fix this later??
-            print curr_node
+            curr_node = get_next_node(curr_node) ## Do a random walk around the FSM, fix this later??
             tour_model.append(curr_node)
         return tour_model
 
@@ -180,8 +183,44 @@ def test_case_three():
     print all_tms
 
 
+
+def complicated_tour():
+    ## Create locations
+    home = Location('home')
+    work = Location('work')
+    friend = Location('friend')
+    store = Location('store')
+    soccer = Location('soccer')
+    vegtables = Location('vegtables')
+    gas = Location('gas')
+
+    ## Set up successors 
+    home_successors = [work, friend, store]    
+    work_successors = [soccer, vegtables, friend]
+    friend_successors = vegtables
+    store_successors = [gas, home]
+    soccer_successors = [gas, home]
+    veg_successors = [gas, home]
+    gas_successors = home
+
+    ## Build Free State Machine
+    home.add_to_successors(home_successors)
+    work.add_to_successors(work_successors)
+    friend.add_to_successors(friend_successors)
+    store.add_to_successors(store_successors)
+    soccer.add_to_successors(soccer_successors)
+    vegtables.add_to_successors(veg_successors)
+    gas.add_to_successors(gas_successors)
+
+    tm = TourModel(home, "complicted free state machine")
+
+    print tm.get_tour_model_from(home)
+
+
+
 def run_all_test():
     test_something()
     test_case_one()
     test_case_two()
     test_case_three()
+    complicated_tour()
