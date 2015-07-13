@@ -11,3 +11,9 @@ cp ../CFC_WebApp/config.json config.json
 cp ../CFC_WebApp/keys.json.sample keys.json
 PYTHONPATH=.:../CFC_WebApp:../base python -m unittest discover -s tests -p Test*
 popd
+pushd "$PWD"/base
+# find . -name \*.pyc | xargs rm
+cp ../CFC_WebApp/config.json config.json
+cp ../CFC_WebApp/keys.json.sample keys.json
+PYTHONPATH=.:../CFC_WebApp:../CFC_DataCollector python -m unittest discover -s tests -p Test*
+popd
