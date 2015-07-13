@@ -57,7 +57,7 @@ logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
                   filename=config_data["paths"]["log_file"], level=logging.DEBUG)
 
 from main import modeshare, zipcode, distance, tripManager, auth,\
-                 carbon, commute, work_time, Berkeley, common, visualize, stats, userclient
+                 carbon, commute, work_time, Berkeley, common, visualize, stats, userclient, usercache
 from dao.client import Client
 from dao.user import User
 from get_database import get_uuid_db, get_mode_db
@@ -231,21 +231,21 @@ def storeSensedTrips():
   sections = request.json['sections']
   return tripManager.storeSensedTrips(user_uuid, sections)
 
-@post('usercache/get')
+@post('/usercache/get')
 def getFromCache():
   logging.debug("Called userCache.get")
   user_uuid=getUUID(request)
   logging.debug("user_uuid %s" % user_uuid)
-  to_phone = usercache.sync_server_to_phone(uuid)
-  return to_phone
+  to_phone = usercache.sync_server_to_phone(user_uuid)
+  return {'server_to_phone': to_phone}
 
-@post('usercache/put')
+@post('/usercache/put')
 def putIntoCache():
   logging.debug("Called userCache.put")
   user_uuid=getUUID(request)
   logging.debug("user_uuid %s" % user_uuid)
-  from_phone = request.json('phone_to_server')
-  return usercache.sync_phone_to_server(uuid, from_phone)
+  from_phone = request.json['phone_to_server']
+  return usercache.sync_phone_to_server(user_uuid, from_phone)
 
 @post('/profile/create')
 def createUserProfile():

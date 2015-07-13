@@ -53,7 +53,8 @@ class BuiltinUserCache(ucauc.UserCache):
         self.ts_query = lambda(tq): {"$and": [{"metadata.%s" % tq.timeType: {"$gte": tq.startTs}},
                 {"metadata.%s" % tq.timeType: {"$lte": tq.endTs}}]}
         self.type_query = lambda(entry_type): {"metadata.type": entry_type}
-        self.get_utc_ts = lambda(_): int(time.time())
+        # time.time() returns seconds. Our format requires milliseconds
+        self.get_utc_ts = lambda(_): int(time.time() * 1000)
         self.db = get_usercache_db()
 
     def putDocument(self, key, value):

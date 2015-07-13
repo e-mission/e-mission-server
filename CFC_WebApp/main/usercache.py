@@ -10,7 +10,7 @@ def sync_server_to_phone(uuid):
         Gets the blob to sync to send to the phone and sends it over
         Return None if there is no data
     """
-    retrievedData = list(get_usercache_db().find({"user_id": uuid}, # query
+    retrievedData = list(get_usercache_db().find({"user_id": uuid, "metadata.type": "document"}, # query
                                             {'_id': False, 'user_id': False})) # projection
     
     logging.debug("retrievedData = %s" % retrievedData)

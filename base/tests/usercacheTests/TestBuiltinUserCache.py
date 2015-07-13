@@ -92,7 +92,7 @@ class TestBuiltinUserCache(unittest.TestCase):
     self.assertEqual(msgs[0]["data"]["mode"], "walking")
 
   def testPutTwoSetsOfBackgroundConfigForPhone(self):
-    start_ts = int(time.time())
+    start_ts = int(time.time() * 1000)
     uc = ucauc.UserCache.getUserCache(self.testUserUUID)
 
     pull_probes_list = ["accelerometer", "gyrometer", "linear_accelerometer"]
@@ -104,7 +104,7 @@ class TestBuiltinUserCache(unittest.TestCase):
                       }
     uc.putDocument("config/location_config", location_config)
 
-    end_ts = int(time.time())
+    end_ts = int(time.time() * 1000)
 
     retrievedData = mauc.sync_server_to_phone(self.testUserUUID)
     logging.debug("retrievedData = %s" % retrievedData)
@@ -193,11 +193,11 @@ class TestBuiltinUserCache(unittest.TestCase):
     self.assertEqual(uc.getMessage("background/accelerometer")[1]["data"]["x"], 2345)
 
   def testClearBackgroundData(self):
-    start_ts = int(time.time())
+    start_ts = int(time.time() * 1000)
     background_data_from_phone = [
       {
         "metadata": {
-          "write_ts": int(time.time()),
+          "write_ts": int(time.time() * 1000),
           "type": "message",
           "key": "background/location",
         },
@@ -205,7 +205,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": int(time.time()),
+          "write_ts": int(time.time() * 1000),
           "type": "message",
           "key": "background/activity",
         },
@@ -213,7 +213,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": int(time.time()),
+          "write_ts": int(time.time() * 1000),
           "type": "message",
           "key": "background/accelerometer",
         },
@@ -221,12 +221,13 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
     ]
 
-    time.sleep(5)
+    # sleep() expects an argument in seconds. We want to sleep for 5 ms.
+    time.sleep(float(5)/1000)
 
     background_data_from_phone_2 = [
       {
         "metadata": {
-          "write_ts": int(time.time()),
+          "write_ts": int(time.time() * 1000),
           "type": "message",
           "key": "background/location",
         },
@@ -234,7 +235,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": int(time.time()),
+          "write_ts": int(time.time() * 1000),
           "type": "message",
           "key": "background/activity",
         },
@@ -242,7 +243,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": int(time.time()),
+          "write_ts": int(time.time() * 1000),
           "type": "message",
           "key": "background/accelerometer",
         },
@@ -250,14 +251,14 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
     ]
 
-    end_ts = int(time.time())
+    end_ts = int(time.time() * 1000)
 
-    time.sleep(5)
+    time.sleep(float(5)/ 1000)
 
     background_data_from_phone_3 = [
       {
         "metadata": {
-          "write_ts": int(time.time()),
+          "write_ts": int(time.time() * 1000),
           "type": "message",
           "key": "background/location",
         },
@@ -265,7 +266,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": int(time.time()) + 30,
+          "write_ts": int(time.time() * 1000) + 30,
           "type": "message",
           "key": "background/location",
         },
@@ -273,7 +274,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": int(time.time()),
+          "write_ts": int(time.time() * 1000),
           "type": "message",
           "key": "background/activity",
         },
@@ -281,7 +282,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": int(time.time()) + 30,
+          "write_ts": int(time.time() * 1000) + 30,
           "type": "message",
           "key": "background/activity",
         },
@@ -289,7 +290,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": int(time.time()),
+          "write_ts": int(time.time() * 1000),
           "type": "message",
           "key": "background/accelerometer",
         },
@@ -297,7 +298,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": int(time.time()) + 30,
+          "write_ts": int(time.time() * 1000) + 30,
           "type": "message",
           "key": "background/accelerometer",
         },
