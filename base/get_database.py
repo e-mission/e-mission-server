@@ -133,3 +133,8 @@ def get_usercache_db():
     current_db = MongoClient().Stage_database
     UserCache = current_db.Stage_usercache
     return UserCache
+
+def get_fake_trips_db():
+    current_db = MongoClient().Stage_database
+    FakeTrips = current_db.Stage_fake_trips
+    return FakeTrips
