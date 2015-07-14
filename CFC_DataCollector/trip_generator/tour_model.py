@@ -1,4 +1,5 @@
 import random
+from util import *
 
 class Location(object):
 
@@ -10,20 +11,21 @@ class Location(object):
         self.times_allowed_two = 0
         self.count = 0
         self.count_down = 0
-        self.parents_to_probs = { }
+        self.successors_counter = Counter()
 
-    def add_to_successors(self, loc):
-        if type(loc) == list:
-            self.successors.extend(loc)
+    def add_to_successors(self, loc, weight=None):
+        if isinstance(loc, dict):
+            print loc
+            for location, w in loc.iteritems():
+                self.successors_counter[location] = w
         elif type(loc) == Location:
-            self.successors.append(loc)
+            self.successors_to_probs[loc] = weight
+        else:
+            print "You can not input the location as type %s, please use a dictionary or location" % type(loc)
+
         # loc.times_allowed_one += 1
         # loc.times_allowed_two += 1
         # loc.count += 1
-
-    def get_prob_of_next(self, parent):
-        pass
-
 
     def get_successors(self):
         return self.successors
@@ -67,8 +69,9 @@ class TourModel(object):
         
 
 def get_next_node(place):
-    sucessor = choose_random_successor(place.get_successors())
-    return sucessor
+    # sucessor = choose_random_successor(place.get_successors())
+    # return sucessor
+    return sampleFromCounter(place.successors_counter)
 
 def choose_random_successor(successors):
     num_successors = len(successors)
@@ -195,13 +198,13 @@ def complicated_tour():
     gas = Location('gas')
 
     ## Set up successors 
-    home_successors = [work, friend, store]    
-    work_successors = [soccer, vegtables, friend]
-    friend_successors = vegtables
-    store_successors = [gas, home]
-    soccer_successors = [gas, home]
-    veg_successors = [gas, home]
-    gas_successors = home
+    home_successors = {work : 10, friend : 3, store : 1}    
+    work_successors = {soccer : 100, vegtables : 10, friend : 50}
+    friend_successors = {vegtables: 1}
+    store_successors = {gas : 2, home : 1}
+    soccer_successors = {gas : 1, home : 3}
+    veg_successors = {gas : 5, home : 73}
+    gas_successors = {home : 1}
 
     ## Build Free State Machine
     home.add_to_successors(home_successors)
