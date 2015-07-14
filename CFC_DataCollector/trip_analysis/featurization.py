@@ -2,31 +2,39 @@ import matplotlib.pyplot as plt
 import math
 import numpy
 from sklearn.cluster import KMeans
-#from base.get_database import get_fake_trips_db
 from kmedoid import kmedoids
 from sklearn import metrics
-from sklearn.cluster import DBSCAN
 from sklearn.metrics.cluster import homogeneity_score, completeness_score
 import sys, os
 sys.path.append("./base/")
 from get_database import get_fake_trips_db
 
+"""
+This class is used for featurizing data, clustering the data, and evaluating the clustering. 
+
+The input parameters of an instance of this class are:
+- data (optional): Pass in a list of trips, where each entry is a dictionary containing trip_start_location and trip_end_location. Default (for now) is to load from the fake trips database. 
+- ground_truth (optional): a boolean for determining if there is ground truth for this dataset. Default is false.
+- colors (optional): a list of the ground truth clusters for the data, in the form of a list of integers where different integers correspond to different clusters. If ground_truth is True and colors is not None, then ground truth will be loaded from colors. If ground_truth is True and colors is None, ground truth will be collected as the 'trip_id' field of each trip. 
+
+An example of running this class can be found in the main() function. 
+
+"""
 class featurization:
 
-    def __init__(self, data=None, colors=None, min=50, max=80, name='kmeans'):
+    def __init__(self, data=None, ground_truth=False, colors=None):
         if data == None:
             self.read_data()
         else:
             self.data = data
         self.calculate_points()
-        if colors == None:
-            self.calculate_colors()
-        else:
-            self.colors = colors
-        self.cluster(name, min, max)
-        #self.map_clusters()
-        self.check_clusters()
+        if ground_truth==True:
+            if colors == None:
+                self.calculate_colors()
+            else:
+                self.colors = colors
 
+    #load the data from the trip database. 
     def read_data(self):
         self.data = []
         db = get_fake_trips_db()
@@ -34,6 +42,7 @@ class featurization:
         for t in trips:
             self.data.append(t)
 
+    #calculate the points to use in the featurization. 
     def calculate_points(self):
         self.points = []
         for i in range(len(self.data)):
@@ -41,6 +50,7 @@ class featurization:
             end = self.data[i]['trip_end_location']
             self.points.append([start[0], start[1], end[0], end[1]])
 
+    #calculate the ground truth, if specified. 
     def calculate_colors(self):
         col = []
         locations = set()
@@ -58,59 +68,120 @@ class featurization:
         for i in range(len(col)):
             self.colors[i] = indices.index(col[i])
 
-    def cluster(self, name, min_clusters, max_clusters):
-        max = 0
+    #cluster the data. input options:
+    # - min_clusters (optional): the minimum number of clusters to test for. Must be at least 2. Default to 50. 
+    # - max_clusters (optional): the maximum number of clusters to test for. Default to 80. 
+    # - name (optional): the clustering algorithm to use. Options are 'kmeans' or 'kmedoids'. Default is kmeans.
+    # - initial (optional): the way you want to initialize the means in kmeans. Options are 'random', 'k-means++', or an ndarray. Default is k-means++. 
+    # - rad (optional): an option to use the custom distance metric in the kmedoid class. Default is False.
+    def cluster(self, name='kmeans', min_clusters=50, max_clusters=80, initial='k-means++', rad=False):
+        if min_clusters < 2:
+            raise Exception('Must have at least 2 clusters to cluster the data.')
+        if name != 'kmeans' and name != 'kmedoids':
+            raise Exception('Invalid clustering algorithm name.')
+        max = -2
         num = 0
         labely = []
         r = max_clusters - min_clusters+1
-        if name == 'kmedoids' or name == 'kmeans':
+
+        if name == 'kmedoids':
             for i in range(r):
                 num_clusters = i + min_clusters
-                if name == 'kmedoids':
-                    cl = kmedoids(self.data, num_clusters)
-                    self.labels = [0] * len(self.data)
-                    cluster = -1
-                    for key in cl[2]:
-                        cluster += 1
-                        for j in cl[2][key]:
-                            self.labels[j] = cluster
-                    sil = metrics.silhouette_score(numpy.array(self.points), numpy.array(self.labels))
-                    if sil > max:
-                        max = sil
-                        num = num_clusters
-                        labely = self.labels
-                elif name == 'kmeans':
-                    cl = KMeans(num_clusters, random_state=8)
-                    cl.fit(self.points)
-                    self.labels = cl.labels_
-                    print num_clusters
-                    sil = metrics.silhouette_score(numpy.array(self.points), self.labels)
-                    if sil > max:
-                        max = sil
-                        num = num_clusters
-                        labely = self.labels
-        elif name == 'dbscan':
-            cl = DBSCAN()
-            cl.fit(self.points)
-            labely = cl.labels_
-            num = len(set(labely))
-        self.clusters = num
-        print self.clusters
-        self.labels = labely
-        print self.labels
+                cl = kmedoids(self.points, num_clusters, rad)
+                self.labels = [0] * len(self.data)
+                cluster = -1
+                for key in cl[2]:
+                    cluster += 1
+                    for j in cl[2][key]:
+                        self.labels[j] = cluster
+                sil = metrics.silhouette_score(numpy.array(self.points), numpy.array(self.labels))
+                if sil > max:
+                    max = sil
+                    num = num_clusters
+                    labely = self.labels
 
+        elif name == 'kmeans':
+            for i in range(r):
+                num_clusters = i + min_clusters
+                cl = KMeans(num_clusters, random_state=8, init=initial)
+                cl.fit(self.points)
+                self.labels = cl.labels_
+                sil = metrics.silhouette_score(numpy.array(self.points), self.labels)
+                if sil > max:
+                    max = sil
+                    num = num_clusters
+                    labely = self.labels
+
+        self.clusters = num
+        print 'number of clusters is ' + str(self.clusters)
+        print 'silhouette score is ' + str(max)
+        self.labels = labely
+
+    #compute metrics to evaluate clusters
     def check_clusters(self):
-        """
-        num = 0
-        for i in range(len(set(self.colors))):
-            a = self.colors.count(i)
-            b = list(self.labels).count(self.labels[i+num])
-            num += a
-            print str(a) + ', ' + str(b)
-        """
+        labels = [0] * len(set(self.colors))
+        modes = [0] * len(set(self.colors))
+        distributions = [0] * len(set(self.colors))
+        for i in range(len(labels)):
+            labels[i] = []
+        for i in range(len(self.colors)):
+            labels[self.colors[i]].append(self.labels[i])
+        for i in range(len(labels)):
+            modes[i] = max(set(labels[i]), key=labels[i].count)
+        for i in range(len(labels)):
+            m = modes[i]
+            count = labels[i].count(m)
+            distributions[i] = float(count)/float(len(labels[i]))
+
+
+        N = len(distributions)
+        index = numpy.arange(N)
+        width = .8
+        fig, ax = plt.subplots()
+        plt.bar(index+width, distributions, width, color='m')
+        plt.suptitle('Percent of each cluster with same label')
+        ax.set_ylim([0,1])
+        #plt.savefig('percent_same_each_cluster' + str(len(set(self.labels))) + '.png')
+        plt.show()
+
+
         print 'homogeneity is ' + str(homogeneity_score(self.colors, self.labels))
         print 'completeness is ' + str(completeness_score(self.colors, self.labels))
 
+    #plot individual ground-truthed clusters on a map, where each map is one cluster defined 
+    #by the ground truth and if two trips are the same color on a map, then they are labeled 
+    #the same by the clustering algorithm
+    def map_individuals(self):
+        import pygmaps
+        from matplotlib import colors as matcol
+        colormap = plt.cm.get_cmap()
+        import random 
+        r = random.sample(range(len(set(self.labels))), len(set(self.labels)))
+        rand = []
+        for i in range(len(self.labels)):
+            rand.append(r[self.labels[i]]/float(self.clusters))
+        for color in set(self.colors):
+            first = True
+            num_paths = 0
+            for i in range(len(self.colors)):
+                if self.colors[i] == color:
+                    num_paths += 1
+                    start_lat = self.data[i]['trip_start_location'][1]
+                    start_lon = self.data[i]['trip_start_location'][0]
+                    end_lat = self.data[i]['trip_end_location'][1]
+                    end_lon = self.data[i]['trip_end_location'][0]
+                    if first:
+                        mymap = pygmaps.maps(start_lat, start_lon, 10)
+                        first = False
+                    path = [(start_lat, start_lon), (end_lat, end_lon)]
+                    mymap.addpath(path, matcol.rgb2hex(colormap(rand[i])))
+            if num_paths > 1:
+                mymap.draw('./mycluster' + str(color) + '.html')
+            else:
+                mymap.draw('./onemycluster' + str(color) + '.html') #clusters with only one trip
+
+    #plot all the clusters on the map. Outputs mymap.html, a map with colors defined by the ground 
+    #truth, and mylabels.html, a map with colors defined by the clustering algorithm. 
     def map_clusters(self):
         import pygmaps
         from matplotlib import colors as matcol
@@ -122,7 +193,7 @@ class featurization:
             end_lat = self.data[i]['trip_end_location'][1]
             end_lon = self.data[i]['trip_end_location'][0]
             path = [(start_lat, start_lon), (end_lat, end_lon)]
-            mymap.addpath(path, matcol.rgb2hex(colormap(float(self.colors[i])/self.clusters)))
+            mymap.addpath(path, matcol.rgb2hex(colormap(float(self.colors[i])/len(set(self.colors)))))
         mymap.draw('./mymap.html')
         mymap2 = pygmaps.maps(37.5, -122.32, 10)
         for i in range(len(self.points)):
@@ -134,6 +205,9 @@ class featurization:
             mymap2.addpath(path, matcol.rgb2hex(colormap(float(self.labels[i])/self.clusters)))
         mymap2.draw('./mylabels.html')
 
-if __name__ == "__main__":
-    clusteries = featurization()
+def main():
+    feat = featurization(ground_truth=True)
+    feat.cluster(name='kmeans', min_clusters=2, max_clusters=20)
+    feat.check_clusters()
+    feat.map_clusters()
 
