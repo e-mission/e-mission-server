@@ -5,20 +5,7 @@ from tour_model import Location, TourModel
 
 class TestTourModel(unittest.TestCase):
 
-    def test_something(self):
-        """ Basic Sanity Check """
-        home = Location("home")
-        work = Location("work")
-        coffee = Location("coffee")
-        home.is_home = True
-        home.add_to_successors(work)
-        work.add_to_successors(coffee)
-        tm = TourModel(home, "test")
-        tm_from_work = tm.get_tour_model_from(work)
-        should_be = [work, coffee]
-        self.assertEquals(tm_from_work, should_be)
-
-    def test_case_one(self):
+    def test_simple(self):
         """ 
         Work to coffee to lunch and then back to work; A simple day
         CHECK -- Works
@@ -33,58 +20,42 @@ class TestTourModel(unittest.TestCase):
         lunch.add_to_successors(work) ## Completes the cycle
         tm = TourModel(home, "work to coffe to lunch to work")
         tm_from_work = tm.get_tour_model_from(work)
-        should_be = [work, coffee, lunch, work]
-        self.assertEquals(tm_from_work, should_be)
+        print "test_case_one"
+        print tm_from_work
 
+    def test_complicated_tour(self):
+        ## Create locations
+        home = Location('home')
+        work = Location('work')
+        friend = Location('friend')
+        store = Location('store')
+        soccer = Location('soccer')
+        vegtables = Location('vegtables')
+        gas = Location('gas')
 
-    def test_case_two(self):
-        """ Work to coffee to work to lunch and then back to work; slightly more complex """
-        home = Location("home")
-        work = Location("work")
-        coffee = Location("coffee")
-        lunch = Location("lunch")
-        home.add_to_successors(work)
-        work.add_to_successors(coffee)
-        coffee.add_to_successors(work)
-        work.add_to_successors(lunch)
-        lunch.add_to_successors(work)
-        tm = TourModel(home, "work -> coffee -> work -> lunch -> work")
-        tm_from_work = tm.get_tour_model_from(work)
-        should_be = [work, coffee, work, lunch, work]
-        self.assertEquals(tm_from_work, should_be)
+        ## Set up successors 
+        home_successors = {work : 10, friend : 3, store : 1}    
+        work_successors = {soccer : 100, vegtables : 10, friend : 50}
+        friend_successors = {vegtables: 1}
+        store_successors = {gas : 2, home : 1}
+        soccer_successors = {gas : 1, home : 3}
+        veg_successors = {gas : 5, home : 73}
+        gas_successors = {home : 1}
 
+        ## Build Free State Machine
+        home.add_to_successors(home_successors)
+        work.add_to_successors(work_successors)
+        friend.add_to_successors(friend_successors)
+        store.add_to_successors(store_successors)
+        soccer.add_to_successors(soccer_successors)
+        vegtables.add_to_successors(veg_successors)
+        gas.add_to_successors(gas_successors)
 
-    def test_case_three(self):
-        """ Testing multiple tour models """
-        ## Weekday schedule 
-        home = Location("home")
-        work = Location("work")
-        coffee = Location("coffee")
-        lunch = Location("lunch")
-        
-        home.add_to_successors(work)
-        work.add_to_successors(coffee)
-        coffee.add_to_successors(work)
-        work.add_to_successors(lunch)
-        lunch.add_to_successors(work)
+        tm = TourModel(home, "complicted free state machine")
 
-        ## Weekend schedule 
-        weekend_home = Location("weekend_home")
-        beach = Location("beach")
-        restaraunt = Location("restaraunt")
-        another_place = Location("another_place")
+        print "ran complicted touir"
 
-        home.add_to_successors(weekend_home)
-        weekend_home.add_to_successors(beach)
-        beach.add_to_successors(restaraunt)
-        restaraunt.add_to_successors(weekend_home)
-
-        tm = TourModel(home, "work -> coffee -> work -> lunch -> work && weekend_home -> beach -> restaraunt -> weekend_home")
-        all_tms = tm.get_all_tour_models()
-        should_be = [[work, coffee, work, lunch, work], [weekend_home, beach, restaraunt, weekend_home]]
-        self.assertEquals(all_tms, should_be)
-
-
+        print tm.get_tour_model_from(home)
 
 
 

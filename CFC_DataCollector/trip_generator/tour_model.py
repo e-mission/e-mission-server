@@ -1,37 +1,62 @@
-import random
-from util import *
+from util import Counter, sampleFromCounter
 
 class Location(object):
 
+    """ A class representing a location in a user's tour model. """
+
     def __init__(self, name):
-        self.successors = [ ]
-        self.days_of_week = [ ]
         self.name = name
-        self.times_allowed_one = 0
-        self.times_allowed_two = 0
-        self.count = 0
-        self.count_down = 0
-        self.successors_counter = Counter()
+        self.successors_counter = Counter( )
 
     def add_to_successors(self, loc, weight=None):
+        """ 
+        This function adds successor locations to the current location along with the probability that the user will travel to that place next. 
+
+        You can input a dictionary with locations as keys and weights as values
+        For instance, if you are most likely to go home after work, and half as likely to go to safeway, 
+        and a fourth as likely to go pick up your kids, you would set up the succesors like this:
+        
+        >>> work = Location('work')
+        >>> home = Location('home')
+        >>> safeway = Location('safeway')
+        >>> pick_up_kids = Location('kids')
+        >>> work_successors = {home : 4, safeway : 2, pick_up_kids : 1}
+        >>> work.add_to_successors(work_successors)
+
+        If all are equally likely you can simply input them all in a list:
+        >>> work_successors = [home, safeway, pick_up_kids]
+        >>> work_successors.add_to_successors(work_successors) 
+
+        And if you want to add a place after originally adding locations you can do so by putting in the location and weight:
+        >>> burritos = Location('burritos')
+        >>> work.add_to_successors(burritos, 100)
+
+        The counter class is a dictionary type class, of which great documentation is provided in util.py. 
+        We use it here as an easy way to get the next state based on the historic probability of user going to that place next.
+
+        """
         if isinstance(loc, dict):
-            print loc
             for location, w in loc.iteritems():
                 self.successors_counter[location] = w
         elif type(loc) == Location:
-            self.successors_to_probs[loc] = weight
+            if weight is not None:
+                self.successors_counter[loc] = weight
+            else:
+                self.successors_counter[loc] = 1
+        elif type(loc) == list:
+            for location in loc:
+                self.successors_counter[location] = 1
         else:
-            print "You can not input the location as type %s, please use a dictionary or location" % type(loc)
+            raise TypeError("You can not input the location as type %s, please use a dictionary, list or single location and weight" % type(loc))
 
-        # loc.times_allowed_one += 1
-        # loc.times_allowed_two += 1
-        # loc.count += 1
+    def increment_weight_of_successor(self, successor):
+        self.successors_counter[successor] += 1
 
-    def get_successors(self):
-        return self.successors
+    def add_n_to_weight_of_successor(self, successor, n):
+        self.successors_counter[sucessor] += n
 
-    def visit(self):
-        self.times_allowed_one -= 1
+    def set_weight_of_successor(self, sucessor, weight):
+        self.successors_counter[sucessor] = weight
 
     def __repr__(self):
         return self.name
@@ -44,12 +69,8 @@ class TourModel(object):
     def __init__(self, home, name):
         self.home = home
         self.name = name
-        self.all_locs = set( )
-        for loc in self.home.get_successors():
-            loc.count -= 1
 
     def get_tour_model_from(self, place):
-        #return _dfs_search(self, place)
         tour_model = [ ]
         orig_place = place 
         curr_node = place
@@ -57,173 +78,12 @@ class TourModel(object):
         start = True
         while (curr_node != orig_place) or start:
             start = False
-            curr_node = get_next_node(curr_node) ## Do a random walk around the FSM, fix this later??
+            curr_node = get_next_node(curr_node)
             tour_model.append(curr_node)
         return tour_model
 
-    def get_all_tour_models(self):
-        tour_models = [ ]
-        for place in self.home.get_successors():
-            tour_models.append(self.get_tour_model_from(place))
-        return tour_models
-        
+    def get_tour_model_from_home(self):
+        return self.get_tour_model_from(self.home)
 
 def get_next_node(place):
-    # sucessor = choose_random_successor(place.get_successors())
-    # return sucessor
     return sampleFromCounter(place.successors_counter)
-
-def choose_random_successor(successors):
-    num_successors = len(successors)
-    index = random.randint(0, num_successors - 1)
-    return successors[index]
-
-
-def _dfs_search(TM, starting_point):
-    s = [ ]
-    came_from = { }
-    s.append(starting_point)
-    curr = None
-    while len(s) > 0:
-        node = s.pop()
-        node.visit()
-        TM.all_locs.add(node)
-        successors = node.get_successors()
-        for v in successors:
-            if v.times_allowed_one > 0:
-                s.append(v)
-                came_from["%s%s" % (v, v.times_allowed_one)] = node
-                curr = v
-    for node in TM.all_locs:
-        node.count_down = node.count
-    return _make_path(came_from, curr, starting_point)
-
-def _make_path(came_from, currNode, starting_point):
-    if ( ("%s%s" % (currNode, currNode.count_down) ) in came_from) and (currNode.times_allowed_two > 0):
-        currNode.count_down -= 1
-        currNode.times_allowed_two -= 1
-        temp = _make_path(came_from, came_from["%s%s" % (currNode, currNode.count_down+1)], starting_point)
-        return temp + [currNode]
-    else:
-        return [starting_point]
-
-
-
-
-def test_something():
-    """ Basic Sanity Check """
-    home = Location("home")
-    work = Location("work")
-    coffee = Location("coffee")
-    home.is_home = True
-    home.add_to_successors(work)
-    work.add_to_successors(coffee)
-    tm = TourModel(home, "test")
-    tm_from_work = tm.get_tour_model_from(work)
-    print tm_from_work
-
-def test_case_one():
-    """ 
-    Work to coffee to lunch and then back to work; A simple day
-    CHECK -- Works
-    """
-    home = Location("home")
-    work = Location("work")
-    coffee = Location("coffee")
-    lunch = Location("lunch")
-    home.add_to_successors(work)
-    work.add_to_successors(coffee)
-    coffee.add_to_successors(lunch)
-    lunch.add_to_successors(work) ## Completes the cycle
-    tm = TourModel(home, "work to coffe to lunch to work")
-    tm_from_work = tm.get_tour_model_from(work)
-    print tm_from_work
-
-
-def test_case_two():
-    """ Work to coffee to work to lunch and then back to work; slightly more complex """
-    home = Location("home")
-    work = Location("work")
-    coffee = Location("coffee")
-    lunch = Location("lunch")
-    home.add_to_successors(work)
-    work.add_to_successors(coffee)
-    coffee.add_to_successors(work)
-    work.add_to_successors(lunch)
-    lunch.add_to_successors(work)
-    tm = TourModel(home, "work -> coffee -> work -> lunch -> work")
-    tm_from_work = tm.get_tour_model_from(work)
-    print tm_from_work
-
-
-def test_case_three():
-    """ Testing multiple tour models """
-    ## Weekday schedule 
-    home = Location("home")
-    work = Location("work")
-    coffee = Location("coffee")
-    lunch = Location("lunch")
-    
-    home.add_to_successors(work)
-    work.add_to_successors(coffee)
-    coffee.add_to_successors(work)
-    work.add_to_successors(lunch)
-    lunch.add_to_successors(work)
-
-    ## Weekend schedule 
-    weekend_home = Location("weekend_home")
-    beach = Location("beach")
-    restaraunt = Location("restaraunt")
-    another_place = Location("another_place")
-
-    home.add_to_successors(weekend_home)
-    weekend_home.add_to_successors(beach)
-    beach.add_to_successors(restaraunt)
-    restaraunt.add_to_successors(weekend_home)
-
-    tm = TourModel(home, "work -> coffee -> work -> lunch -> work && weekend_home -> beach -> restaraunt -> weekend_home")
-    all_tms = tm.get_all_tour_models()
-    print all_tms
-
-
-
-def complicated_tour():
-    ## Create locations
-    home = Location('home')
-    work = Location('work')
-    friend = Location('friend')
-    store = Location('store')
-    soccer = Location('soccer')
-    vegtables = Location('vegtables')
-    gas = Location('gas')
-
-    ## Set up successors 
-    home_successors = {work : 10, friend : 3, store : 1}    
-    work_successors = {soccer : 100, vegtables : 10, friend : 50}
-    friend_successors = {vegtables: 1}
-    store_successors = {gas : 2, home : 1}
-    soccer_successors = {gas : 1, home : 3}
-    veg_successors = {gas : 5, home : 73}
-    gas_successors = {home : 1}
-
-    ## Build Free State Machine
-    home.add_to_successors(home_successors)
-    work.add_to_successors(work_successors)
-    friend.add_to_successors(friend_successors)
-    store.add_to_successors(store_successors)
-    soccer.add_to_successors(soccer_successors)
-    vegtables.add_to_successors(veg_successors)
-    gas.add_to_successors(gas_successors)
-
-    tm = TourModel(home, "complicted free state machine")
-
-    print tm.get_tour_model_from(home)
-
-
-
-def run_all_test():
-    test_something()
-    test_case_one()
-    test_case_two()
-    test_case_three()
-    complicated_tour()
