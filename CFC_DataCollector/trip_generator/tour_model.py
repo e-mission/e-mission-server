@@ -6,9 +6,12 @@ class Location(object):
 
     def __init__(self, name):
         self.name = name
-        self.successors_counter = Counter( )
+        self.successors_counters = [ ] ## A list of counters for each day of the week, or activity TODO decide that  
+        for day in xrange(7):
+            self.successors_counters.append( Counter( ) )
 
-    def add_to_successors(self, loc, weight=None):
+
+    def add_to_successors(self, loc, days_of_week, weight=None):
         """ 
         This function adds successor locations to the current location along with the probability that the user will travel to that place next. 
 
@@ -31,32 +34,41 @@ class Location(object):
         >>> burritos = Location('burritos')
         >>> work.add_to_successors(burritos, 100)
 
+        To update the weight of a succesor you can either call add_n_to_weight_of_successor:
+
+        >>> burritos.add_n_to_weight_of_successor(10)
+
+        or you can reset the weight totally 
+
+        >>> pick_up_kids.set_weight_of_successor(100)
+
         The counter class is a dictionary type class, of which great documentation is provided in util.py. 
         We use it here as an easy way to get the next state based on the historic probability of user going to that place next.
 
         """
         if isinstance(loc, dict):
-            for location, w in loc.iteritems():
-                self.successors_counter[location] = w
+            for day in days_of_week:
+                for location, w in loc.iteritems():
+                    self.successors_counters[day][location] = w
         elif type(loc) == Location:
             if weight is not None:
-                self.successors_counter[loc] = weight
+                self.successors_counters[days_of_week[0]][loc] = weight
             else:
-                self.successors_counter[loc] = 1
+                self.successors_counter[days_of_week[0]][loc] = 1
         elif type(loc) == list:
-            for location in loc:
-                self.successors_counter[location] = 1
+            for day in days_of_week:
+                for location in loc:
+                    self.successors_counter[day][location] = 1
         else:
             raise TypeError("You can not input the location as type %s, please use a dictionary, list or single location and weight" % type(loc))
 
-    def increment_weight_of_successor(self, successor):
-        self.successors_counter[successor] += 1
+    def add_n_to_weight_of_successor(self, successor, n, days_of_week):
+        for day in days_of_week:
+            self.successors_counter[day][sucessor] += n
 
-    def add_n_to_weight_of_successor(self, successor, n):
-        self.successors_counter[sucessor] += n
-
-    def set_weight_of_successor(self, sucessor, weight):
-        self.successors_counter[sucessor] = weight
+    def set_weight_of_successor(self, sucessor, weight, days_of_week):
+        for day in days_of_week:
+            self.successors_counter[day][sucessor] = weight
 
     def __repr__(self):
         return self.name
