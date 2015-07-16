@@ -53,13 +53,9 @@ class featurization:
     #calculate the ground truth, if specified. 
     def calculate_colors(self):
         col = []
-        locations = set()
         for i in range(len(self.data)):
-            color = self.data[i]['trip_id']
+            color = self.data[i]['label']
             col.append(color)
-            index = color.index(' to ')
-            locations.add(color[:index])
-            locations.add(color[index+4:])
         self.colors = [0] * len(col)
         indices = []
         for color in col:
@@ -112,27 +108,36 @@ class featurization:
                     num = num_clusters
                     labely = self.labels
 
+        self.sil = max
         self.clusters = num
-        print 'number of clusters is ' + str(self.clusters)
-        print 'silhouette score is ' + str(max)
         self.labels = labely
 
     #compute metrics to evaluate clusters
     def check_clusters(self):
+        print 'number of clusters is ' + str(self.clusters)
+        print 'silhouette score is ' + str(self.sil)
+        print 'homogeneity is ' + str(homogeneity_score(self.colors, self.labels))
+        print 'completeness is ' + str(completeness_score(self.colors, self.labels))
+
+    #calculate the distribution of each class under the clustering
+    #must have a field label in each point in data
+    #provide a filename to write the data to 
+    def distributions(self, filename):
         labels = [0] * len(set(self.colors))
         modes = [0] * len(set(self.colors))
         distributions = [0] * len(set(self.colors))
+        names = [0] * len(set(self.colors))
         for i in range(len(labels)):
             labels[i] = []
         for i in range(len(self.colors)):
             labels[self.colors[i]].append(self.labels[i])
+            names[self.colors[i]] = self.data[i]['label']
         for i in range(len(labels)):
             modes[i] = max(set(labels[i]), key=labels[i].count)
         for i in range(len(labels)):
             m = modes[i]
             count = labels[i].count(m)
             distributions[i] = float(count)/float(len(labels[i]))
-
 
         N = len(distributions)
         index = numpy.arange(N)
@@ -141,12 +146,23 @@ class featurization:
         plt.bar(index+width, distributions, width, color='m')
         plt.suptitle('Percent of each cluster with same label')
         ax.set_ylim([0,1])
-        #plt.savefig('percent_same_each_cluster' + str(len(set(self.labels))) + '.png')
         plt.show()
 
+        f = open(filename, 'w')
+        distributions = dict(enumerate(distributions))
+        sorteddistributions = sorted(distributions, key=lambda x: distributions[x])
+        for i in range(len(set(self.colors))):
+            num = sorteddistributions[i]
+            n = len(set(labels[num]))
+            percent = distributions[num]*100
+            percent = round(percent, 2)
+            percent_in_order = round(distributions[i]*100,2)
+            if percent == 100.0:
+                continue
+            f.write('In the ' + str(names[num]) + ' cluster, ' + str(percent) + '% of the labels are the same, with ' + str(n) + ' different labels\n')
+        f.close()
 
-        print 'homogeneity is ' + str(homogeneity_score(self.colors, self.labels))
-        print 'completeness is ' + str(completeness_score(self.colors, self.labels))
+
 
     #plot individual ground-truthed clusters on a map, where each map is one cluster defined 
     #by the ground truth and if two trips are the same color on a map, then they are labeled 
@@ -204,10 +220,3 @@ class featurization:
             path = [(start_lat, start_lon), (end_lat, end_lon)]
             mymap2.addpath(path, matcol.rgb2hex(colormap(float(self.labels[i])/self.clusters)))
         mymap2.draw('./mylabels.html')
-
-def main():
-    feat = featurization(ground_truth=True)
-    feat.cluster(name='kmeans', min_clusters=2, max_clusters=20)
-    feat.check_clusters()
-    feat.map_clusters()
-

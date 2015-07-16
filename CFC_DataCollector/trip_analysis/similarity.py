@@ -42,20 +42,17 @@ class similarity:
     #create the histogram
     def graph(self):
         bars = [0] * len(self.bins)
-        num = 0
+        sum = 0
         for i in range(len(self.bins)):
             bars[i] = len(self.bins[i])
-            num += bars[i]
-            if num >= self.size/2.0:
-                print i
-                print num
-                num = -num
-
+            if i <= math.ceil(len(self.bins)/2.0):
+                sum += bars[i]
         N = len(bars)
         index = numpy.arange(N)
         width = .1
         plt.bar(index+width, bars, color='m')
         plt.xlim([0, N])
+        print str(N) + ' bins, in top half of bins there are ' + str(sum) + ' items out of ' + str(self.size) 
         plt.savefig('histogram.png')
         plt.show()
         
@@ -87,14 +84,3 @@ class similarity:
         if d <= 300:
             return True
         return False
-
-def main():
-    from get_database import get_fake_trips_db
-    db = get_fake_trips_db()
-    trips = db.find()
-    data = []
-    for trip in trips:
-        data.append(trip)
-    sim = similarity(data)
-    sim.similar()
-    sim.graph()
