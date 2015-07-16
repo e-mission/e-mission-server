@@ -70,7 +70,7 @@ fill them in
 1. Start the server (Note: mongodb appears to be installed as a service on Windows devices and it starts automatically on reboot)
 
         $ cd CFC_WebApp
-        $ python api/cfc_webapp.py
+        $ PYTHONPATH=../base:../CFC_DataCollector/:. python api/cfc_webapp.py
 
    You may need to install some of the python dependencies from above
    Amongst the dependencies include:
