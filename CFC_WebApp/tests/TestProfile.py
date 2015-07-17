@@ -1,7 +1,7 @@
 import unittest
 import mock
 import json
-from utils import load_database_json, purge_database_json
+from utils import load_database_json
 from main import Profile
 from pymongo import MongoClient
 import logging
@@ -44,7 +44,7 @@ class TestProfile(unittest.TestCase):
 
   def tearDown(self):
     for testUser in self.testUsers:
-      purge_database_json.purgeData('localhost', testUser)
+      tests.common.purgeSectionData(get_section_db(), testUser)
     self.Profiles.remove()
     self.assertEquals(self.Profiles.find().count(), 0)
 

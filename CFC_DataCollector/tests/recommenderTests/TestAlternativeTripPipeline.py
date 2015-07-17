@@ -1,7 +1,6 @@
 import unittest
 import traceback
 import json
-#from utils import load_database_json, purge_database_json
 #from main import tripManager
 from pymongo import MongoClient
 import logging
@@ -73,8 +72,6 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     get_section_db().remove({"user_id": self.testUUID})
     self.ModesColl.remove()
     self.assertEquals(self.ModesColl.find().count(), 0)
-    #for testUser in self.testUsersEmails:
-    #  purge_database_json.purgeData('localhost', testUser)
 
   def loadTestJSON(self, fileName):
     fileHandle = open(fileName)
