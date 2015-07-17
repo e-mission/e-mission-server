@@ -6,21 +6,24 @@ import numpy
 This file implements the k-medoid clustering algorithm. 
 
 As input, this takes:
-- data = the data set to cluster
-- k = the number of clusters
-- rad = a boolean for whether or not to use the metric which takes into consideration the 100 meter geo-fence. 
+- data: the data set to cluster, as a list of four-dimensional points. 
+- k: the number of clusters
 
 This code runs slowly. I am working on making it faster. 
 
 code based on K_medoid_2.py in CFC_WebApp/main
-
+The changes that I made were a few small changes to make 
+the code run faster and provide a way to calculate and store 
+the distance matrix. 
 """
-def kmedoids(data, k, rad):
+
+#cluster based on the k-medoids algorithm
+def kmedoids(data, k):
     if k >= len(data):
         return (0, [], {})
 
     #compute distance matrix
-    mat = mat_dist(data, rad)
+    mat = mat_dist(data)
 
     #initialize with same random seed each time
     random.seed(8)
@@ -86,51 +89,26 @@ def totalCost(size, mat, medoids_idx):
 
     return (total_cost, medoids)
 
-def mat_dist(data, rad):
+#build the distance metric
+def mat_dist(data):
     size = len(data)
     mat = [0] * size
     for i in range(size):
         mat[i] = [0] * size
     for i in range(size):
         for j in range(i):
-            d = dist(i,j,data,rad)
+            d = dist(i,j,data)
             mat[i][j] = d
             mat[j][i] = d
     return numpy.array(mat)
 
-
-def norm(a, data):
-    dim_a = data[a]
-    sum = 0
-    for i in range(len(dim_a)):
-        sum += abs(dim_a[i])**2
-    return sum
-
-def dist(a,b, data, rad):
+#compute the distance between two points
+def dist(a,b, data):
     dim_a = data[a]
     dim_b = data[b]
     sum = 0
     for i in range(len(dim_a)):
         sum += abs(dim_a[i] - dim_b[i])**4
-    if rad:
-        start = distance(dim_a[1], dim_a[0], dim_b[1], dim_b[0])
-        end = distance(dim_a[3], dim_a[2], dim_b[3], dim_b[2])
-        return start + end
     return sum**(1/4.0)
-
-def distance(lat1, lon1, lat2, lon2):
-    import math
-    R = 6371000
-    rlat1 = math.radians(lat1)
-    rlat2 = math.radians(lat2)
-    lon = math.radians(lon2 - lon1);
-    lat = math.radians(lat2-lat1);
-    a = math.sin(lat/2.0)**2 + math.cos(rlat1)*math.cos(rlat2) * math.sin(lon/2.0)**2
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-    d = R * c
-    if d <= 100:
-        return 0
-    return .5
-
 
 
