@@ -11,7 +11,7 @@ import os
 sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
 sys.path.append("%s" % os.getcwd())
 # print "new path is %s" % sys.path
-from utils import load_database_json, purge_database_json
+from utils import load_database_json
 
 from dao.user import User
 from dao.client import Client

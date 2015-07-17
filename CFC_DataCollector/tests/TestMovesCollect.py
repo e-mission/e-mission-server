@@ -15,7 +15,7 @@ sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
 sys.path.append("%s" % os.getcwd())
 # print "new path is %s" % sys.path
 
-from utils import load_database_json, purge_database_json
+from utils import load_database_json
 from moves import collect
 
 class TestMovesCollect(unittest.TestCase):
@@ -34,8 +34,6 @@ class TestMovesCollect(unittest.TestCase):
     for row in dataJSON:
       self.ModesColl.insert(row)
 
-    # load_database_json.loadTable(self.serverName, "Test_Modes", "tests/data/modes.json")
-
   def tearDown(self):
     get_section_db().remove({"user_id": self.testUUID})
     self.ModesColl.remove()
@@ -44,11 +42,6 @@ class TestMovesCollect(unittest.TestCase):
   def loadTestJSON(self, fileName):
     fileHandle = open(fileName)
     return json.load(fileHandle)
-    # dataStr = fileHandle.readline()
-    # dataStr = load_database_json.fixFormat(dataStr)
-    # dataStr = re.sub(r'ObjectId\(\'(.*)\'\)', r'"\1"', dataStr)
-    # dataJSON = json.loads(dataStr)
-    # return dataJSON
 
   # Would be good to avoid duplicating this, change loadTestJSON to send in set
   # of additional preprocessing steps?

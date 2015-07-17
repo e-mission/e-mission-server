@@ -13,7 +13,7 @@ sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
 sys.path.append("%s" % os.getcwd())
 print "new path is %s" % sys.path
 
-from utils import load_database_json, purge_database_json
+from utils import load_database_json
 
 from dao.user import User
 from dao.client import Client
@@ -67,7 +67,7 @@ class TestPipeline(unittest.TestCase):
 
   def tearDown(self):
     for testUser in self.testUsers:
-      purge_database_json.purgeData('localhost', testUser)
+      tests.common.purgeSectionData(self.SectionsColl, testUser)
     logging.debug("Number of sections after purge is %d" % self.SectionsColl.find().count())
     self.ModesColl.remove()
     self.assertEquals(self.ModesColl.find().count(), 0)

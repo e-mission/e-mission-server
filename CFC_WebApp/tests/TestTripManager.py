@@ -1,6 +1,6 @@
 import unittest
 import json
-from utils import load_database_json, purge_database_json
+from utils import load_database_json
 from main import tripManager
 from pymongo import MongoClient
 import logging
@@ -51,7 +51,7 @@ class TestTripManager(unittest.TestCase):
 
   def tearDown(self):
     for testUser in self.testUsers:
-      purge_database_json.purgeData('localhost', testUser)
+      tests.common.purgeSectionData(get_section_db(), testUser)
     self.ModesColl.remove()
     self.assertEquals(self.ModesColl.find().count(), 0)
 

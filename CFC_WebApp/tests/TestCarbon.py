@@ -1,18 +1,18 @@
 import unittest
 import json
-from utils import load_database_json, purge_database_json
+from utils import load_database_json
 from main import carbon
 from pymongo import MongoClient
 import logging
 from get_database import get_db, get_mode_db, get_section_db
 import re
 from datetime import datetime, timedelta
+import tests.common
 
 logging.basicConfig(level=logging.DEBUG)
 
 class TestCarbon(unittest.TestCase):
   def setUp(self):
-    import tests.common
     from copy import copy
 
     self.testUsers = ["test@example.com", "best@example.com", "fest@example.com",
@@ -55,7 +55,7 @@ class TestCarbon(unittest.TestCase):
 
   def tearDown(self):
     for testUser in self.testUsers:
-      purge_database_json.purgeData('localhost', testUser)
+      tests.common.purgeSectionData(self.SectionsColl, testUser)
     self.ModesColl.remove()
     self.assertEquals(self.ModesColl.find().count(), 0)
 

@@ -4,7 +4,7 @@ import json
 import sys
 import os
 import mock
-from utils import load_database_json, purge_database_json
+from utils import load_database_json
 
 sys.path.append("%s" % os.getcwd())
 import get_database

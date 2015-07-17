@@ -1,0 +1,17 @@
+[
+    {
+        "userEmail" : "foo@bar.com",
+        "key": "config/sensors",
+        "value": ["battery", "accelerometer"]
+    }, 
+    {
+        "userEmail" : "boo@bar.com",
+        "key": "config/sensors",
+        "value": ["accelerometer"]
+    },
+    {
+        "userEmail" : "baz@bar.com",
+        "key": "config/sensors",
+        "value": ["fuel_consumption"]
+    }
+]

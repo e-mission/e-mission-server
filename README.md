@@ -81,6 +81,17 @@ fill them in
 [http://localhost:8080](http://localhost:8080)
 or connect to it using the phone app
 
+1. You might also want to create some users, e.g.
+        $ cd ..../e-mission-server
+        $ ./e-mission-py.bash bin/create_test_user.py shankari@berkeley.edu
+
+1. If you are testing the data collection of sensor other than location, you
+want to enable them.
+        $ cd ..../e-mission-server
+        $ cp bin/load_config.json.sample bin/load_config.json
+        $ vi bin/load_config.json # edit it
+        $ ./e-mission-py.bash bin/load_config.py bin/load_config.json
+
 ### Running unit tests ###
 
 1. Make sure that the anaconda python is in your path

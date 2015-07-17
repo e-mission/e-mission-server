@@ -1,6 +1,5 @@
 import unittest
 import json
-#from utils import load_database_json, purge_database_json
 #from main import tripManager
 from pymongo import MongoClient
 import logging

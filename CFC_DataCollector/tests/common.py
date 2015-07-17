@@ -34,6 +34,13 @@ def dropAllCollections(db):
       print "Dropping collection %s" % coll
       db.drop_collection(coll)
 
+def purgeSectionData(Sections, userName):
+    """
+    Deletes all sections for this user.
+    TODO: Need to extend it to delete entries across all collections
+    """
+    Sections.remove({'user_id' : userName})
+
 # Create a dummy section with the main stuff that we use in our code
 def createDummySection(startTime, endTime, startLoc, endLoc, predictedMode = None, confirmedMode = None):
   from get_database import get_section_db

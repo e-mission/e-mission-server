@@ -1,6 +1,6 @@
 import unittest
 import json
-from utils import load_database_json, purge_database_json
+from utils import load_database_json
 from clients.gamified import gamified
 import logging
 from get_database import get_db, get_mode_db, get_section_db

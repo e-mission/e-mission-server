@@ -4,7 +4,7 @@ import os
 from datetime import datetime, timedelta
 
 from get_database import get_db, get_client_db, get_profile_db, get_uuid_db, get_pending_signup_db, get_section_db
-from utils import load_database_json, purge_database_json
+from utils import load_database_json
 sys.path.append("%s" % os.getcwd())
 from dao.client import Client
 from tests import common
