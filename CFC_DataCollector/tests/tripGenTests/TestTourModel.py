@@ -1,7 +1,7 @@
 import sys
 sys.path.append("./../../trip_generator")
 import unittest
-from tour_model_1 import *
+from tour_model import *
 
 class TestTourModel(unittest.TestCase):
 
@@ -21,30 +21,48 @@ class TestTourModel(unittest.TestCase):
 
     def test_simple(self):
         """ 
-        Work to coffee to lunch and then back to work; A simple day
-        CHECK -- Works
+        I know this seems cumbersome, but no one will actually have to type all
+        of this out, it will all be automated. 
         """
-        home_start = Location("home", 0, 0)
-        work_1 = Location("work_1", 8, 0)
-        coffee = Location("coffee", 10, 0)
-        lunch = Location("lunch", 12, 0)
-        work_2 = Location("work", 13, 0)
-        home_end = Location("home", 18, 0) 
-        home_start.add_successors({work_1 : 1})
-        work_1.add_successors({coffee : 2})
-        coffee.add_successors({lunch : 3})
-        lunch.add_successors({work_2 : 4}) ## Completes the cycle
-        work_2.add_successors({home_end : 100})
+        # Monday 
+        home_start_mon = Location("home", 0, 0)
+        work_1_mon = Location("work_1", 8, 0)
+        coffee_mon = Location("coffee", 10, 0)
+        lunch_mon = Location("lunch", 12, 0)
+        work_2_mon = Location("work", 13, 0)
+        home_end_mon = Location("home", 18, 0) 
+        home_start_mon.add_successors({work_1_mon : 1})
+        work_1_mon.add_successors({coffee_mon : 2})
+        coffee_mon.add_successors({lunch_mon : 3})
+        lunch_mon.add_successors({work_2_mon : 4}) ## Completes the cycle
+        work_2_mon.add_successors({home_end_mon : 100})
 
-        monday = Day(0, home_start)
-        print monday.get_tour_model()
+        # Tuesday 
+        home_start_tues = Location("home", 0, 1)
+        work_1_tues = Location("work_1", 8, 1)
+        coffee_tues = Location("coffee", 10, 1)
+        lunch_tues = Location("lunch", 12, 1)
+        work_2_tues = Location("work", 13, 1)
+        home_end_tues = Location("home", 18, 1) 
+        home_start_tues.add_successors({work_1_tues : 1})
+        work_1_tues.add_successors({coffee_tues : 2})
+        coffee_tues.add_successors({lunch_tues : 3})
+        lunch_tues.add_successors({work_2_tues : 4}) ## Completes the cycle
+        work_2_tues.add_successors({home_end_tues : 100})
 
-        days = [monday, tuesday, ]
+        mon = Day(0, home_start_mon)
+        tues = Day(1, home_start_tues)
 
+        days = [mon, tues]
         week = TourModel("naomi", days)
-        week.build_tour_model()
+        tm_for_week = week.build_tour_model()
+        monday = [home_start_mon, work_1_mon, coffee_mon, lunch_mon, work_2_mon, home_end_mon]
+        tuesday = [home_start_tues, work_1_tues, coffee_tues, lunch_tues, work_2_tues, home_end_tues]
+        self.assertEquals([monday, tuesday], tm_for_week)  # This can only play out one way, a good sanity check
 
-    def test_complicated_tour(self):
+
+
+    def complicated_tour(self):
         ## Create locations
         home = Location('home')
         work = Location('work')
