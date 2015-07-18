@@ -1,35 +1,58 @@
 import random
 import sys
+import numpy
 
-#code based on K_medoid_2.py in CFC_WebApp/main
+"""
+This file implements the k-medoid clustering algorithm. 
+
+As input, this takes:
+- data: the data set to cluster, as a list of four-dimensional points. 
+- k: the number of clusters
+
+This code runs slowly. I am working on making it faster. 
+
+code based on K_medoid_2.py in CFC_WebApp/main
+The changes that I made were a few small changes to make 
+the code run faster and provide a way to calculate and store 
+the distance matrix. 
+"""
+
+#cluster based on the k-medoids algorithm
 def kmedoids(data, k):
     if k >= len(data):
         return (0, [], {})
 
+    #compute distance matrix
     mat = mat_dist(data)
 
+    #initialize with same random seed each time
     random.seed(8)
-    medoids_idx = random.sample(xrange(len(data)), k)
     
-    pre_cost, medoids = totalCost(data, mat, medoids_idx)
+    size = len(data)
 
-    current_cost = pre_cost
-    best_choice = []
-    best_res = {}
+
+    #indices of beginning medoids
+    medoids_idx = random.sample(xrange(size), k)
+    
+    #initial cost and list of items in each initial cluster
+    pre_cost, medoids = totalCost(size, mat, medoids_idx)
+
+    current_cost = pre_cost #cost
+    best_choice = [] #best choice of medoids
+    best_res = {} #best choice for list of each cluster
     iter_count = 0
     while True:
-        for m in medoids_idx:
+        for idx in range(len(medoids_idx)):
+            m = medoids_idx[idx]
             for item in medoids[m]:
                 if item != m:
-                    idx = medoids_idx.index(m)
-                    swap_temp = medoids_idx[idx]
                     medoids_idx[idx] = item
-                    tmp_cost, tmp_medoids = totalCost(data, mat, medoids_idx)
+                    tmp_cost, tmp_medoids = totalCost(size, mat, medoids_idx)
                     if tmp_cost < current_cost:
                         best_choice = list(medoids_idx)
                         best_res = dict(tmp_medoids)
                         current_cost = tmp_cost
-                    medoids_idx[idx] = swap_temp
+                    medoids_idx[idx] = m
         iter_count += 1
         if best_choice == medoids_idx:
             break
@@ -39,63 +62,34 @@ def kmedoids(data, k):
             medoids = best_res
             medoids_idx = best_choice
 
-    return(current_cost, best_choice, best_res)
-
-def cluster_num(mat):
-    size = len(mat[0])
-    max = 0
-    a = -1
-    b = -1
-    num = 0
-    check = True
-    while check:
-        check = False
-        for i in range(size):
-            for j in range(i):
-                if mat[i][j] > max:
-                    max = mat[i][j]
-                    a = i
-                    b = j
-        print a
-        print b
-        print mat[a][b]
-        num += 1
-        mat[a][b] = 0
-        for i in range(size):
-            if mat[a][i] < 100:
-                mat[a][i] = 0
-                mat[i][a] = 0
-        for i in range(size):
-            if check == True:
-                break
-            for j in range(i):
-                if mat[i][j] != 0:
-                    check = True
-                    break
-    print num
-
+    center_distances = [0] * len(data)
+    for key in best_res:
+        for val in best_res[key]:
+            center_distances[key] = mat[key,val]
+    return(current_cost, best_choice, best_res, center_distances)
 
 #compute total cost
-def totalCost(data, mat, medoids_idx):
+def totalCost(size, mat, medoids_idx):
     total_cost = 0.0
     medoids = {}
     for idx in medoids_idx:
         medoids[idx] = []
 
-    for i in range(len(data)):
+    for i in range(size):
         choice = -1
         min_cost = sys.maxint
 
         for m in medoids_idx:
-            tmp = mat[m][i]
+            tmp = mat[m,i]
             if tmp < min_cost:
                 choice = m
                 min_cost = tmp
         medoids[choice].append(i)
         total_cost += min_cost
 
-    return(total_cost, medoids)
+    return (total_cost, medoids)
 
+#build the distance metric
 def mat_dist(data):
     size = len(data)
     mat = [0] * size
@@ -106,17 +100,15 @@ def mat_dist(data):
             d = dist(i,j,data)
             mat[i][j] = d
             mat[j][i] = d
-    return mat
+    return numpy.array(mat)
 
-
+#compute the distance between two points
 def dist(a,b, data):
-    starta = data[a]['trip_start_location']
-    enda = data[a]['trip_end_location']
-    startb = data[b]['trip_start_location']
-    endb = data[b]['trip_end_location']
-    dim_a = [starta[0], starta[1], enda[0], enda[1]]
-    dim_b = [startb[0], startb[1], endb[0], endb[1]]
+    dim_a = data[a]
+    dim_b = data[b]
     sum = 0
     for i in range(len(dim_a)):
         sum += abs(dim_a[i] - dim_b[i])**4
     return sum**(1/4.0)
+
+
