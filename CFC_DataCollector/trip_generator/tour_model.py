@@ -1,89 +1,104 @@
 from util import Counter, sampleFromCounter
 
+
+## A File meant to represent tour models for individual users 
+## A tour model is a week of each users most popular travel destinations 
+
+# Monday 
+# >>> home_start_mon = Location("home", 0, 0)
+# >>> work_1_mon = Location("work_1", 8, 0)
+# >>> coffee_mon = Location("coffee", 10, 0)
+# >>> lunch_mon = Location("lunch", 12, 0)
+# >>> work_2_mon = Location("work", 13, 0)
+# >>> home_end_mon = Location("home", 18, 0) 
+# >>> home_start_mon.add_successors({work_1_mon : 1})
+# >>> work_1_mon.add_successors({coffee_mon : 2})
+# >>> coffee_mon.add_successors({lunch_mon : 3})
+# >>> lunch_mon.add_successors({work_2_mon : 4}) ## Completes the cycle
+# >>> work_2_mon.add_successors({home_end_mon : 100})
+
+# Tuesday 
+# >>> home_start_tues = Location("home", 0, 1)
+# >>> work_1_tues = Location("work_1", 8, 1)
+# >>> coffee_tues = Location("coffee", 10, 1)
+# >>> lunch_tues = Location("lunch", 12, 1)
+# >>> work_2_tues = Location("work", 13, 1)
+# >>> home_end_tues = Location("home", 18, 1) 
+# >>> home_start_tues.add_successors({work_1_tues : 1})
+# >>> work_1_tues.add_successors({coffee_tues : 2})
+# >>> coffee_tues.add_successors({lunch_tues : 3})
+# >>> lunch_tues.add_successors({work_2_tues : 4}) ## Completes the cycle
+# >>> work_2_tues.add_successors({home_end_tues : 100})
+
+# >>> mon = Day(0, home_start_mon)
+# >>> tues = Day(1, home_start_tues)
+
+# >>> days = [mon, tues]
+# >>> week = TourModel("naomi", days)
+# >>> tm_for_week = week.build_tour_model()
+
+# I know this seems like alot, but you shouldnt really be typing any of this out by hand
+# Maybe there is a better way to do this...
+
 class Location(object):
 
-    """ A class representing a location in a user's tour model. """
+    def __init__(self, name, hour, day):
+        self.hour = hour ## An int 0-23 representing the hour 
+        self.name = name ## The name of the place, important for equality
+        self.day = day ## 0-6 Monday-Sunday
+        self.counter = Counter( ) ## Reps successors and probabilities of each one
 
-    def __init__(self, name):
-        self.name = name
-        self.successors_counter = Counter( )
+    def add_successors(self, suc_dict):
+        for loc, weight in suc_dict.iteritems():
+            if (loc.hour < self.hour) or (loc.day < self.day):
+                raise Exception("You can not go backwards in time!")
+            self.counter[loc] = weight
 
-    def add_to_successors(self, loc, weight=None):
-        """ 
-        This function adds successor locations to the current location along with the probability that the user will travel to that place next. 
+    def get_successor(self):
+        return sampleFromCounter(self.counter)
 
-        You can input a dictionary with locations as keys and weights as values
-        For instance, if you are most likely to go home after work, and half as likely to go to safeway, 
-        and a fourth as likely to go pick up your kids, you would set up the succesors like this:
-        
-        >>> work = Location('work')
-        >>> home = Location('home')
-        >>> safeway = Location('safeway')
-        >>> pick_up_kids = Location('kids')
-        >>> work_successors = {home : 4, safeway : 2, pick_up_kids : 1}
-        >>> work.add_to_successors(work_successors)
+    def is_end(self):
+        return self.counter.totalCount() == 0
 
-        If all are equally likely you can simply input them all in a list:
-        >>> work_successors = [home, safeway, pick_up_kids]
-        >>> work_successors.add_to_successors(work_successors) 
+    def __eq__(self, other):
+        return (self.name == other.name) and (self.day == other.day)
 
-        And if you want to add a place after originally adding locations you can do so by putting in the location and weight:
-        >>> burritos = Location('burritos')
-        >>> work.add_to_successors(burritos, 100)
-
-        The counter class is a dictionary type class, of which great documentation is provided in util.py. 
-        We use it here as an easy way to get the next state based on the historic probability of user going to that place next.
-
-        """
-        if isinstance(loc, dict):
-            for location, w in loc.iteritems():
-                self.successors_counter[location] = w
-        elif type(loc) == Location:
-            if weight is not None:
-                self.successors_counter[loc] = weight
-            else:
-                self.successors_counter[loc] = 1
-        elif type(loc) == list:
-            for location in loc:
-                self.successors_counter[location] = 1
-        else:
-            raise TypeError("You can not input the location as type %s, please use a dictionary, list or single location and weight" % type(loc))
-
-    def increment_weight_of_successor(self, successor):
-        self.successors_counter[successor] += 1
-
-    def add_n_to_weight_of_successor(self, successor, n):
-        self.successors_counter[sucessor] += n
-
-    def set_weight_of_successor(self, sucessor, weight):
-        self.successors_counter[sucessor] = weight
+    def __ne__(self, other):
+        return not self == other
 
     def __repr__(self):
-        return self.name
+        return self.name 
 
     def __str__(self):
-        return self.name
+        return "At %s, at hour, %s on day %s" % (self.name, self.hour, self.day)
 
-class TourModel(object):
+class Day(object):
 
-    def __init__(self, home, name):
-        self.home = home
-        self.name = name
+    """ Represents a day of a tour, full of locations """
 
-    def get_tour_model_from(self, place):
+    def __init__(self, num_day, starting_point):
+        self.day = num_day
+        self.starting_point = starting_point
+
+    def get_tour_model(self):
         tour_model = [ ]
-        orig_place = place 
-        curr_node = place
+        curr_node = self.starting_point
         tour_model.append(curr_node)
-        start = True
-        while (curr_node != orig_place) or start:
-            start = False
-            curr_node = get_next_node(curr_node)
+        while not curr_node.is_end():
+            curr_node = curr_node.get_successor()
             tour_model.append(curr_node)
         return tour_model
 
-    def get_tour_model_from_home(self):
-        return self.get_tour_model_from(self.home)
+class TourModel(object):
 
-def get_next_node(place):
-    return sampleFromCounter(place.successors_counter)
+    """ A class that represents a canconical week of travel for a user of e-mission. """
+
+    def __init__(self, user, days):
+        self.user = user
+        self.days = days
+
+    def build_tour_model(self):
+        tour_model = [ ]
+        for day in self.days:
+            tour_model.append(day.get_tour_model())
+        return tour_model
