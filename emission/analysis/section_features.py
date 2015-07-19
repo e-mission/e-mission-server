@@ -1,4 +1,3 @@
-
 from __future__ import division
 import math
 import logging
@@ -6,33 +5,14 @@ import numpy as np
 from pymongo import MongoClient
 import utm
 from sklearn.cluster import DBSCAN
+from get_database import get_routeCluster_db,get_transit_db
+from uuid import UUID
+from route_matching import getRoute,fullMatchDistance,matchTransitRoutes,matchTransitStops
+from common import get_mode_share_by_count, calDistance, Include_place_2
 
 Sections = MongoClient('localhost').Stage_database.Stage_Sections
 Modes=MongoClient('localhost').Stage_database.Stage_Modes
-# Returns distance in m
-def Include_place(lst,place,radius):
-    # list of tracking points
-    count=0
-    for pnt in lst:
-        count=count+(1 if calDistance(pnt,place)<=radius else 0)
-    if count>0:
-        return True
-    else:
-        return False
 
-def calDistance(point1, point2):
-    earthRadius = 6371000
-    # Point is in GeoJSON format, ie (lng, lat)
-    dLat = math.radians(point1[1]-point2[1])
-    dLon = math.radians(point1[0]-point2[0])
-    lat1 = math.radians(point1[1])
-    lat2 = math.radians(point2[1])
-
-    a = (math.sin(dLat/2) ** 2) + ((math.sin(dLon/2) ** 2) * math.cos(lat1) * math.cos(lat2))
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-    d = earthRadius * c
-
-    return d
 
 # The speed is in m/s
 def calSpeed(trackpoint1, trackpoint2):
@@ -331,8 +311,8 @@ def mode_start_end_coverage(segment,cluster,eps):
     centers=cluster
     # print(centers)
     try:
-        if Include_place(centers,segment['section_start_point']['coordinates'],eps) and \
-                    Include_place(centers,segment['section_end_point']['coordinates'],eps):
+        if Include_place_2(centers,segment['section_start_point']['coordinates'],eps) and \
+                    Include_place_2(centers,segment['section_end_point']['coordinates'],eps):
             return 1
         else:
             return 0
@@ -340,3 +320,100 @@ def mode_start_end_coverage(segment,cluster,eps):
             return 0
 # print(mode_start_end_coverage(5,105,2))
 # print(mode_start_end_coverage(6,600,2))
+
+# This is currently only used in this file, so it is fine to use only really
+# user confirmed modes. We don't want to learn on trips where we don't have
+# ground truth.
+def get_mode_share_by_count(lst):
+    # input here is a list of sections
+    displayModeList = getDisplayModes()
+    # logging.debug(displayModeList)
+    modeCountMap = {}
+    for mode in displayModeList:
+        modeCountMap[mode['mode_name']] = 0
+        for section in lst:
+            if section['confirmed_mode']==mode['mode_id']:
+                modeCountMap[mode['mode_name']] +=1
+            elif section['mode']==mode['mode_id']:
+                modeCountMap[mode['mode_name']] +=1
+    return modeCountMap
+
+# This is currently only used in this file, so it is fine to use only really
+# user confirmed modes. We don't want to learn on trips where we don't have
+# ground truth.
+def get_mode_share_by_count(list_idx):
+    Sections=get_section_db()
+    ## takes a list of idx's
+    AllModeList = getAllModes()
+
+    MODE = {}
+    MODE2= {}
+    for mode in AllModeList:
+        MODE[mode['mode_id']]=0
+    for _id in list_idx:
+        section=Sections.find_one({'_id': _id})
+        mode_id = section['confirmed_mode']
+        try:
+            MODE[mode_id] += 1
+        except KeyError:
+            MODE[mode_id] = 1
+    # print(sum(MODE.values()))
+    if sum(MODE.values())==0:
+        for mode in AllModeList:
+            MODE2[mode['mode_id']]=0
+        # print(MODE2)
+    else:
+        for mode in AllModeList:
+            MODE2[mode['mode_id']]=MODE[mode['mode_id']]/sum(MODE.values())
+    return MODE2
+
+def cluster_route_match_score(segment,step1=100000,step2=100000,method='lcs',radius1=2000,threshold=0.5):
+    userRouteClusters=get_routeCluster_db().find_one({'$and':[{'user':segment['user_id']},{'method':method}]})['clusters']
+    route_seg = getRoute(segment['_id'])
+
+    dis=999999
+    medoid_ids=userRouteClusters.keys()
+    if len(medoid_ids)!=0:
+        choice=medoid_ids[0]
+        for idx in userRouteClusters.keys():
+            route_idx=getRoute(idx)
+            try:
+                dis_new=fullMatchDistance(route_seg,route_idx,step1,step2,method,radius1)
+            except RuntimeError:
+
+                dis_new=999999
+            if dis_new<dis:
+                dis=dis_new
+                choice=idx
+    # print(dis)
+    # print(userRouteClusters[choice])
+    if dis<=threshold:
+        cluster=userRouteClusters[choice]
+        cluster.append(choice)
+        ModePerc=get_mode_share_by_count(cluster)
+    else:
+        ModePerc=get_mode_share_by_count([])
+
+    return ModePerc
+
+def transit_route_match_score(segment,step1=100000,step2=100000,method='lcs',radius1=2500,threshold=0.5):
+    Transits=get_transit_db()
+    transitMatch={}
+    route_seg=getRoute(segment['_id'])
+    for type in Transits.distinct('type'):
+        for entry in Transits.find({'type':type}):
+            transitMatch[type]=matchTransitRoutes(route_seg,entry['stops'],step1,step2,method,radius1,threshold)
+            if transitMatch[entry['type']]==1:
+                break
+    return transitMatch
+
+def transit_stop_match_score(segment,radius1=300):
+    Transits=get_transit_db()
+    transitMatch={}
+    route_seg=getRoute(segment['_id'])
+    for type in Transits.distinct('type'):
+        for entry in Transits.find({'type':type}):
+            transitMatch[type]=matchTransitStops(route_seg,entry['stops'],radius1)
+            if transitMatch[entry['type']]==1:
+                break
+    return transitMatch
