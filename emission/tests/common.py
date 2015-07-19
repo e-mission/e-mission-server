@@ -1,6 +1,6 @@
+from datetime import datetime, timedelta
 
 def makeValid(client):
-  from datetime import datetime, timedelta
   from get_database import get_client_db
 
   client.clientJSON['start_date'] = str(datetime.now() + timedelta(days=-2))
@@ -9,7 +9,6 @@ def makeValid(client):
   client._Client__update(client.clientJSON)
 
 def makeExpired(client):
-  from datetime import datetime, timedelta
   from get_database import get_client_db
 
   client.clientJSON['start_date'] = str(datetime.now() + timedelta(days=-4))
@@ -18,7 +17,6 @@ def makeExpired(client):
   client._Client__update(client.clientJSON)
 
 def updateUserCreateTime(uuid):
-  from datetime import datetime, timedelta
   from dao.user import User
   
   user = User.fromUUID(uuid)
@@ -45,7 +43,9 @@ def purgeSectionData(Sections, userName):
 def createDummySection(startTime, endTime, startLoc, endLoc, predictedMode = None, confirmedMode = None):
   from get_database import get_section_db
 
-  section = {'section_start_datetime': startTime,
+  section = {
+             'source': 'Shankari',
+             'section_start_datetime': startTime,
              'section_end_datetime': endTime,
              'section_start_time': startTime.isoformat(),
              'section_end_time': endTime.isoformat(),
@@ -59,4 +59,22 @@ def createDummySection(startTime, endTime, startLoc, endLoc, predictedMode = Non
 
   get_section_db().insert(section)
   return section
-    
+
+def updateSections(testCase):
+    from dao.user import User
+    """
+    Updates sections with appropriate test data
+    Should be called anytime new data is loaded into the
+    'Stage_Sections' table
+    """
+    testCase.uuid_list = []
+    for section in testCase.SectionsColl.find():
+      section['section_start_datetime'] = testCase.dayago
+      section['section_end_datetime'] = testCase.dayago + timedelta(hours = 1)
+      section['predicted_mode'] = [0, 0.4, 0.6, 0]
+      section['confirmed_mode'] = ''
+      # Replace the user email with the UUID
+      curr_uuid = User.fromEmail(section['user_id']).uuid
+      section['user_id'] = curr_uuid
+      testCase.uuid_list.append(curr_uuid)
+      testCase.SectionsColl.save(section)
