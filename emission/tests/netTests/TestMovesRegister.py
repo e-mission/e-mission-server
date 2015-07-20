@@ -1,13 +1,12 @@
+# Standard imports
 import unittest
 import json
-import sys
-import os
 import uuid
 
-sys.path.append("%s" % os.getcwd())
-from main import auth
+# Our imports
+import emission.net.ext_services.moves.register as auth
 
-class TestAuthFunctions(unittest.TestCase):
+class TestMovesRegister(unittest.TestCase):
   def setUp(self):
     print "Test setup called"
     self.testUserUUID = uuid.uuid4()

@@ -1,10 +1,7 @@
 import unittest
-import sys
-import os
-
-sys.path.append("%s" % os.getcwd())
 from main import common
-from get_database import get_test_db
+
+from emission.core.get_database import get_test_db
 
 class TestGeoJSON(unittest.TestCase):
   def setUp(self):

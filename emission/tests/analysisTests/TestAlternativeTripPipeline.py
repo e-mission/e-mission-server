@@ -1,28 +1,24 @@
+# Standard imports
 import unittest
 import traceback
 import json
-#from main import tripManager
-from pymongo import MongoClient
 import logging
 from get_database import *
 import re
-import sys 
-import os
 import datetime as pydt
-import recommender.alternative_trips_module as pipeline_module
-from recommender.alternative_trips_pipeline import AlternativeTripsPipeline
-from recommender.trip import *
-from recommender import query
-# Needed to modify the pythonpath
-sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
-sys.path.append("%s" % os.getcwd())
-from dao.user import User
-from dao.client import Client
-import tests.common
-from moves import collect
-from recommender.common import *
-import collections
+
+# Our imports
+import emission.analysis.modelling.user_model.alternative_trips_module as pipeline_module
+from emission.analysis.modelling.user_model.alternative_trips_pipeline import AlternativeTripsPipeline
+import emission.core.wrapper.trip as ecwt
+from emission.analysis.modelling.user_model import query
+from emission.core.wrapper.user import User
+from emission.core.wrapper.client import Client
+from emission.net.ext_services.moves import collect
+# from emission.net.ext_services.gmaps.common import *
 from crontab import CronTab
+
+import tests.common
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -146,7 +142,7 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     json_trip = self.loadTestJSON("tests/data/testModeInferFile")
     #self.assertEquals(type(json_trip), json)
     #json_trip = json_trip.read()
-    trip = E_Mission_Trip(json_trip[0])
+    trip = ecwt.E_Mission_Trip(json_trip[0])
     db = get_section_db()
     pdb = get_perturbed_trips_db()
     temp = db.find_one({'type' : 'move'})

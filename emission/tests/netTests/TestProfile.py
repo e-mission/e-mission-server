@@ -1,18 +1,16 @@
+# Standard imports
 import unittest
 import mock
 import json
-from utils import load_database_json
-from main import Profile
-from pymongo import MongoClient
 import logging
-from get_database import get_db, get_mode_db, get_section_db, get_trip_db, get_profile_db
-import re
-# Needed to modify the pythonpath
-import sys
-import os
 from datetime import datetime, timedelta
-from dao.user import User
-from dao.client import Client
+import re
+
+# Our imports
+from emission.api.net import Profile
+from emission.common.get_database import get_db, get_mode_db, get_section_db, get_trip_db, get_profile_db
+from emission.core.wrapper.user import User
+from emission.core.wrapper.client import Client
 import tests.common
 
 logging.basicConfig(level=logging.DEBUG)
@@ -28,7 +26,7 @@ class TestProfile(unittest.TestCase):
     tests.common.dropAllCollections(get_db())
     self.Profiles = get_profile_db()
     self.assertEquals(self.Profiles.find().count(), 0)
-    load_database_json.loadTable(self.serverName, "Stage_Profiles", "tests/data/profiles.json")
+    tests.common.loadTable(self.serverName, "Stage_Profiles", "tests/data/profiles.json")
     self.assertEquals(self.Profiles.find().count(), 1)
     # Let's make sure that the users are registered so that they have profiles
     for userEmail in self.testUsers:

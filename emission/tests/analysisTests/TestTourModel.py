@@ -1,7 +1,9 @@
+# Standard imports
 import sys
-sys.path.append("./../../trip_generator")
 import unittest
-from tour_model import *
+
+# Our imports
+from emission.analysis.modelling.tour_model.tour_model import *
 
 class TestTourModel(unittest.TestCase):
 

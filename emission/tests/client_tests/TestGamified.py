@@ -1,10 +1,13 @@
+# Standard imports
 import unittest
 import json
-from utils import load_database_json
-from clients.gamified import gamified
 import logging
-from get_database import get_db, get_mode_db, get_section_db
 from datetime import datetime, timedelta
+
+# Our imports
+import tests.common
+from emission.clients.gamified import gamified
+from emission.core.get_database import get_db, get_mode_db, get_section_db
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -25,8 +28,8 @@ class TestGamified(unittest.TestCase):
 
         self.setupUserAndClient()
 
-        load_database_json.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
-        load_database_json.loadTable(self.serverName, "Stage_Sections", "tests/data/testCarbonFile")
+        tests.common.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
+        tests.common.loadTable(self.serverName, "Stage_Sections", "tests/data/testCarbonFile")
         self.SectionsColl = get_section_db()
 
         self.walkExpect = 1057.2524056424411

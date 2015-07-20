@@ -1,3 +1,4 @@
+# Standard imports
 import unittest
 import json
 import sys
@@ -6,6 +7,7 @@ import uuid
 import logging
 import time
 
+# Our imports
 import tests.common
 
 # Technically, unit tests should only test one piece of functionality
@@ -13,9 +15,9 @@ import tests.common
 # a) we get to ensure that the put and get are consistent
 # b) otherwise, we would have to replicate the "get" code here
 
-import usercache.abstract_usercache as ucauc # ucauc = usercache.abstract_usercache
-import main.usercache as mauc
-from get_database import get_db, get_usercache_db
+import emission.net.usercache.abstract_usercache as ucauc # ucauc = usercache.abstract_usercache
+import emission.net.api.usercache as mauc
+from emission.core.get_database import get_db, get_usercache_db
 
 class TestBuiltinUserCache(unittest.TestCase):
   def setUp(self):

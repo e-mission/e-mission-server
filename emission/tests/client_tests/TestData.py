@@ -1,12 +1,14 @@
+# Standard imports
 import unittest
 import json
-from utils import load_database_json
-from clients.data import data
 import logging
-from get_database import get_db, get_mode_db, get_section_db
 from datetime import datetime, timedelta
-from dao.user import User
+
+# Our imports
+from emission.core.get_database import get_db, get_mode_db, get_section_db
+from emission.core.wrapper.user import User
 import tests.common
+from emission.clients.data import data
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -38,8 +40,8 @@ class TestDefault(unittest.TestCase):
     def testRunBackgroundTasksForDay(self):
         self.testUsers = ["test@example.com", "best@example.com", "fest@example.com",
                           "rest@example.com", "nest@example.com"]
-        load_database_json.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
-        load_database_json.loadTable(self.serverName, "Stage_Sections", "tests/data/testCarbonFile")
+        tests.common.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
+        tests.common.loadTable(self.serverName, "Stage_Sections", "tests/data/testCarbonFile")
 
         # Let's make sure that the users are registered so that they have profiles
         for userEmail in self.testUsers:

@@ -1,16 +1,16 @@
+# Standard imports
 import unittest
 import sys
 import os
 from datetime import datetime, timedelta
-
-sys.path.append("%s" % os.getcwd())
-from dao.user import User
-from dao.client import Client
-from tests import common
-from main import userclient
-
 import logging
 logging.basicConfig(level=logging.DEBUG)
+
+# Our imports
+from emission.core.wrapper.user import User
+from emission.core.wrapper.client import Client
+from tests import common
+from emission.analysis.results import userclient
 
 class TestUser(unittest.TestCase):
   def setUp(self):

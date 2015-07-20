@@ -1,22 +1,14 @@
+# Standard imports
 import unittest
 import logging
 import json
-from pymongo import MongoClient
 import re
-from get_database import get_mode_db, get_section_db, get_trip_db
-# Needed to modify the pythonpath
-import sys
-import os
-
 logging.basicConfig(level=logging.DEBUG)
 
-# print "old path is %s" % sys.path
-sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
-sys.path.append("%s" % os.getcwd())
-# print "new path is %s" % sys.path
-
-from utils import load_database_json
-from moves import collect
+# Our imports
+import tests.common
+from emission.core.get_database import get_mode_db, get_section_db, get_trip_db
+from emission.net.ext_services.moves import collect
 
 class TestMovesCollect(unittest.TestCase):
   def setUp(self):
@@ -48,7 +40,7 @@ class TestMovesCollect(unittest.TestCase):
   def loadReplaceUser(self, fileName, origEmail, fakeEmail):
     fileHandle = open(fileName)
     dataStr = fileHandle.readline()
-    dataStr = load_database_json.fixFormat(dataStr)
+    dataStr = tests.common.fixFormat(dataStr)
     dataStr = dataStr.replace(origEmail, fakeEmail)
     dataJSON = json.loads(dataStr)
     return dataJSON

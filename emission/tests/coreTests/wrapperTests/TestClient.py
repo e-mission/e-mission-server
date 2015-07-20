@@ -1,16 +1,16 @@
+# Standard imports
 import unittest
 import sys
 import os
 from datetime import datetime, timedelta
-
-from get_database import get_db, get_client_db, get_profile_db, get_uuid_db, get_pending_signup_db, get_section_db
-from utils import load_database_json
-sys.path.append("%s" % os.getcwd())
-from dao.client import Client
-from tests import common
-
 import logging
 logging.basicConfig(level=logging.DEBUG)
+
+# Our imports
+from emission.core.get_database import get_db, get_client_db, get_profile_db, get_uuid_db, get_pending_signup_db, get_section_db
+from emission.core.wrapper.client import Client
+from tests import common
+
 
 class TestClient(unittest.TestCase):
   def setUp(self):
@@ -19,7 +19,7 @@ class TestClient(unittest.TestCase):
     common.dropAllCollections(get_db())
     logging.info("After setup, client count = %d, profile count = %d, uuid count = %d" % 
       (get_client_db().find().count(), get_profile_db().count(), get_uuid_db().count()))
-    load_database_json.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
+    common.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
     
   def testInitClient(self):
     emptyClient = Client("testclient")

@@ -1,10 +1,13 @@
+# Standard imports
 import unittest
-from get_database import get_section_db
-import trip_analysis.gps_smoothing as tags
 from datetime import datetime
 import logging
 import json
 import numpy as np
+
+# Our imports
+from emission.core.get_database import get_section_db
+import emission.analysis.classification.cleaning.gps_smoothing as tags
 
 class GpsSmoothingTests(unittest.TestCase):
     def setUp(self):

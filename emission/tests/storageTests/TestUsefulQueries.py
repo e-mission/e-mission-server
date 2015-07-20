@@ -1,8 +1,11 @@
+# Standard imports
 import unittest
-from get_database import get_section_db
-import trip_analysis.useful_queries as tauq
 from datetime import datetime
 import logging
+
+# Our imports
+from emission.core.get_database import get_section_db
+import emission.storage.decorations.useful_queries as tauq
 
 class UsefulQueriesTests(unittest.TestCase):
     def setUp(self):

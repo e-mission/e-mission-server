@@ -1,11 +1,12 @@
+# Standard imports
 import unittest
 import json
-from utils import load_database_json
-from main import visualize
-from pymongo import MongoClient
 import logging
-from get_database import get_db, get_mode_db, get_section_db
 from datetime import datetime, timedelta
+
+# Our imports
+from emission.core.get_database import get_db, get_mode_db, get_section_db
+from emission.net.api import visualize
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -24,8 +25,8 @@ class TestVisualize(unittest.TestCase):
     self.ModesColl = get_mode_db()
     self.assertEquals(self.ModesColl.find().count(), 0)
 
-    load_database_json.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
-    load_database_json.loadTable(self.serverName, "Stage_Sections", "tests/data/testCarbonFile")
+    tests.common.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
+    tests.common.loadTable(self.serverName, "Stage_Sections", "tests/data/testCarbonFile")
     self.SectionsColl = get_section_db()
 
     self.walkExpect = 1057.2524056424411

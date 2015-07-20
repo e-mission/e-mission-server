@@ -1,5 +1,5 @@
 import unittest
-import modeinfer.featurecalc as fc
+import emission.analysis.section_features as fc
 
 class TestFeatureCalc(unittest.TestCase):
   def testCalSpeedWithZeroTime(self):

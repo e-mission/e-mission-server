@@ -1,15 +1,14 @@
+# Standard imports
 import logging
 import unittest
 import json
-import sys
-import os
 import mock
-from utils import load_database_json
-
-sys.path.append("%s" % os.getcwd())
-import get_database
-from main import common
 from uuid import UUID
+
+# Our imports
+import emission.core.get_database
+import tests.common
+from emission.core import common
 from datetime import datetime, timedelta
 
 logging.basicConfig(level=logging.DEBUG)
@@ -24,7 +23,7 @@ class TestCommon(unittest.TestCase):
     tests.common.dropAllCollections(get_database.get_db())
     
     # Load modes, otherwise the queries won't work properly
-    load_database_json.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
+    tests.common.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
     self.dayago = datetime.now() - timedelta(days=1)
     self.now = datetime.now()
 

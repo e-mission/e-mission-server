@@ -1,18 +1,15 @@
+# Standard imports
 import unittest
 import json
-from utils import load_database_json
-from main import tripManager
-from pymongo import MongoClient
 import logging
-from get_database import get_db, get_mode_db, get_section_db, get_trip_db
-import re
-# Needed to modify the pythonpath
-import sys
-import os
 from datetime import datetime, timedelta
-from dao.user import User
-from dao.client import Client
+
+# Our imports
+from emission.core.wrapper.user import User
+from emission.core.wrapper.client import Client
 import tests.common
+from emission.core.get_database import get_db, get_mode_db, get_section_db, get_trip_db
+from emission.net.api import tripManager
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -33,8 +30,8 @@ class TestTripManager(unittest.TestCase):
     # self.SectionsColl.remove()
     self.assertEquals(self.SectionsColl.find().count(), 0)
 
-    load_database_json.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
-    load_database_json.loadTable(self.serverName, "Stage_Sections", "tests/data/testCarbonFile")
+    tests.common.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
+    tests.common.loadTable(self.serverName, "Stage_Sections", "tests/data/testCarbonFile")
 
     # Let's make sure that the users are registered so that they have profiles
     for userEmail in self.testUsers:
@@ -166,7 +163,7 @@ class TestTripManager(unittest.TestCase):
     # Clear previous Stage_Sections data and load new data
     # specific to filtering
     self.SectionsColl.remove()
-    load_database_json.loadTable(self.serverName, "Stage_Sections", "tests/data/testFilterFile")   
+    tests.common.loadTable(self.serverName, "Stage_Sections", "tests/data/testFilterFile")   
     tests.common.updateSections(self) 
     # Extra updates to Sections necessary for testing filtering
     for section in self.SectionsColl.find():

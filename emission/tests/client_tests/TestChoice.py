@@ -1,10 +1,13 @@
+# Standard imports
 import unittest
 import json
-from clients.choice import choice
 import logging
-from get_database import get_db, get_mode_db, get_section_db
 from datetime import datetime, timedelta
-from dao.user import User
+
+# Our imports
+from emission.clients.choice import choice
+from emission.core.get_database import get_db, get_mode_db, get_section_db
+from emission.core.wrapper.user import User
 
 logging.basicConfig(level=logging.DEBUG)
 

@@ -3,6 +3,7 @@ from pymongo.errors import DuplicateKeyError
 import json
 import sys
 from get_database import get_section_db, get_db
+import tests.common
 
 def fixFormat(dataStr):
   dataStr = dataStr.replace("u'", "'")
@@ -25,7 +26,6 @@ def loadData(serverName, fileName):
       Sections.insert(section)
     except DuplicateKeyError:
       print "Duplicate key found while loading, skipping..."
-      
 
 def loadTable(serverName, tableName, fileName):
   tableColl = get_db()[tableName]
@@ -38,4 +38,4 @@ if __name__ == '__main__':
       print ("USAGE: %s <serverName> <sectionsFileName>" % sys.argv[0])
     else:
       loadData(sys.argv[1], sys.argv[2])
-      loadTable(sys.argv[1], 'Stage_Modes', 'CFC_WebApp/tests/data/modes.json')
+      tests.common.loadTable(sys.argv[1], 'Stage_Modes', 'CFC_WebApp/tests/data/modes.json')

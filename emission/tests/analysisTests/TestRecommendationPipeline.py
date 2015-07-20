@@ -1,3 +1,4 @@
+# Standard imports
 import unittest
 import json
 #from main import tripManager
@@ -5,18 +6,15 @@ from pymongo import MongoClient
 import logging
 from get_database import get_db, get_mode_db, get_section_db, get_trip_db, get_routeCluster_db
 import re
-import sys
-import os
 from datetime import datetime, timedelta
-from recommender.recommendation_pipeline import RecommendationPipeline
-# Needed to modify the pythonpath
-sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
-sys.path.append("%s" % os.getcwd())
-from dao.user import User
-from dao.client import Client
+
+# Our imports
+from emission.analysis.results.recommendation.recommendation_pipeline import RecommendationPipeline
+from emission.core.wrapper.user import User
+from emission.core.wrapper.client import Client
+from emission.net.ext_services.moves import collect
+from emission.core.wrapper.tripiterator import TripIterator
 import tests.common
-from moves import collect
-from recommender.tripiterator import TripIterator
 
 logging.basicConfig(level=logging.DEBUG)
 

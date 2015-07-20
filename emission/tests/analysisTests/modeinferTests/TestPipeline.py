@@ -1,22 +1,15 @@
+#Standard imports
 import unittest
 import json
 import logging
 import numpy as np
-from get_database import get_db, get_mode_db, get_section_db
-from modeinfer import pipeline
 from datetime import datetime, timedelta
-import sys
-import os
 
-# print "old path is %s" % sys.path
-sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
-sys.path.append("%s" % os.getcwd())
-print "new path is %s" % sys.path
-
-from utils import load_database_json
-
-from dao.user import User
-from dao.client import Client
+# Our imports
+from emission.core.get_database import get_db, get_mode_db, get_section_db
+from emission.analysis.classification.inference.mode import pipeline
+from emission.core.wrapper.user import User
+from emission.core.wrapper.client import Client
 import tests.common
 
 logging.basicConfig(level=logging.DEBUG)
@@ -37,8 +30,8 @@ class TestPipeline(unittest.TestCase):
     self.SectionsColl = get_section_db()
     self.assertEquals(self.SectionsColl.find().count(), 0)
 
-    load_database_json.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
-    load_database_json.loadTable(self.serverName, "Stage_Sections", "tests/data/testModeInferFile")
+    tests.common.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
+    tests.common.loadTable(self.serverName, "Stage_Sections", "tests/data/testModeInferFile")
 
     # Let's make sure that the users are registered so that they have profiles
     for userEmail in self.testUsers:

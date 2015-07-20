@@ -39,6 +39,12 @@ def purgeSectionData(Sections, userName):
     """
     Sections.remove({'user_id' : userName})
 
+def loadTable(serverName, tableName, fileName):
+  tableColl = get_db()[tableName]
+  dataJSON = json.load(open(fileName))
+  for row in dataJSON:
+    tableColl.insert(row)
+
 # Create a dummy section with the main stuff that we use in our code
 def createDummySection(startTime, endTime, startLoc, endLoc, predictedMode = None, confirmedMode = None):
   from get_database import get_section_db

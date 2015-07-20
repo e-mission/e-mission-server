@@ -1,10 +1,12 @@
+# Standard imports
 import unittest
 import logging
 import json
-
-from get_database import get_client_stats_db, get_server_stats_db, get_result_stats_db
-from main import stats
 import time
+
+# Our imports
+from emission.core.get_database import get_client_stats_db, get_server_stats_db, get_result_stats_db
+from emission.net.api import stats
 
 logging.basicConfig(level=logging.DEBUG)
 
