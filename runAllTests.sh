@@ -1,19 +1,2 @@
 set -e
-pushd "$PWD"/CFC_WebApp
-# find . -name \*.pyc | xargs rm
-cp config.json.localhost.android config.json
-cp keys.json.sample keys.json
-PYTHONPATH=.:../CFC_DataCollector:../base python -m unittest discover -s tests -p Test*;
-popd
-pushd "$PWD"/CFC_DataCollector
-# find . -name \*.pyc | xargs rm
-cp ../CFC_WebApp/config.json config.json
-cp ../CFC_WebApp/keys.json.sample keys.json
-PYTHONPATH=.:../CFC_WebApp:../base python -m unittest discover -s tests -p Test*
-popd
-pushd "$PWD"/base
-# find . -name \*.pyc | xargs rm
-cp ../CFC_WebApp/config.json config.json
-cp ../CFC_WebApp/keys.json.sample keys.json
-PYTHONPATH=.:../CFC_WebApp:../CFC_DataCollector python -m unittest discover -s tests -p Test*
-popd
+# PYTHONPATH=. python -m unittest discover -s emission/tests -p Test*;
