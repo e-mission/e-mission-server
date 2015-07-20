@@ -1,6 +1,5 @@
 import os
 import json
-from pprint import pprint
 import numpy as np
 '''
 What we are interested in is called SECTIONS: components of trips

@@ -1,3 +1,4 @@
+# Standard imports
 import math
 import matplotlib.pyplot as plt
 import numpy

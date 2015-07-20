@@ -1,9 +1,12 @@
+# Standard imports
 from get_database import get_section_db, get_routeCluster_db
-from route_matching import get_common_routes_for_user, getRoute
-import pygmaps_modified as pygmaps
-from gmap_display import drawSection
 from uuid import UUID
 import random
+
+# Our imports
+from emission.analysis.modelling.tour_model.trajectory_matching.route_matching import get_common_routes_for_user, getRoute
+import pygmaps_modified as pygmaps
+from gmap_display import drawSection
 
 def plot_each_route_cluster_for_user(user_id,method='lcs'):
     i=0

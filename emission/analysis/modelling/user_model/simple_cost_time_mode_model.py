@@ -1,15 +1,16 @@
 # simple user utility model taking cost, time, and mode into account
 
-from get_database import get_utility_model_db
-from datetime import datetime
-from common import calc_car_cost, DATE_FORMAT
-from main import common as cm
-from user_utility_model import UserUtilityModel
+# Standard imports
 import numpy as np
 import logging
+from datetime import datetime
+
+# Our imports
+import emission.core.get_database as edb
+import emission.core.common as cm
 import alternative_trips_module as atm
 
-class SimpleCostTimeModeModel(UserUtilityModel):
+class SimpleCostTimeModeModel(user_utility_model.UserUtilityModel):
   def __init__(self, trips=None):
     #print "len(trips) = %d, len(alternatives) = %d" % (len(trips), len(alternatives))
         self.feature_list = ["cost", "time", "mode"]
@@ -20,7 +21,7 @@ class SimpleCostTimeModeModel(UserUtilityModel):
   def store_in_db(self, user_id):
     model_query = {'user_id': user_id, 'type':'user'}
     model_object = {'user_id': user_id, 'cost': self.cost, 'time': self.time, 'mode': self.mode, 'updated_at': datetime.now(), 'type':'user'} 
-    get_utility_model_db().update(model_query, model_object, upsert = True)
+    edb.get_utility_model_db().update(model_query, model_object, upsert = True)
 
   def save_coefficients(self):
     self.cost = self.coefficients[0][0]

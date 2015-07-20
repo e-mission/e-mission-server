@@ -1,25 +1,20 @@
-from __future__ import division
-from common import Is_place_2,Include_place_2
-from get_database import get_section_db,get_transit_db, get_routeDistanceMatrix_db,get_routeCluster_db, update_routeDistanceMatrix_db
-from common import calDistance
+# Standard imports
 import numpy as np
-from Frechet import Frechet
-from LCS import lcs,lcsScore
-from DTW import Dtw,dynamicTimeWarp,DtwAsym,DtwSym
 import urllib,json,csv
 import xml.etree.cElementTree as ET
 import urllib2
 import time
 
-
-
-
+# Our imports
+import emission.core.common as ec
+import emission.core.get_database as edb
+import emission.analysis.modelling.tour_model.trajectory_matching as eatm
 
 def find_near(lst,pnt,radius):
     near=[]
     for i in range(len(lst)):
-        # print(calDistance(lst[i],pnt))
-        if calDistance(lst[i],pnt)<radius:
+        # print(ec.calDistance(lst[i],pnt))
+        if ec.calDistance(lst[i],pnt)<radius:
             near.append(i)
     return near
 
@@ -27,8 +22,8 @@ def find_nearest(lst,pnt):
     nearest=lst[0]
     dis=99999999
     for i in range(len(lst)):
-        # print(calDistance(lst[i],pnt))
-        new_dis=calDistance(lst[i],pnt)
+        # print(ec.calDistance(lst[i],pnt))
+        new_dis=ec.calDistance(lst[i],pnt)
         if new_dis<dis:
             dis=new_dis
             nearest=lst[i]
@@ -49,7 +44,7 @@ def cal_matching_score(lst1,lst2,radius):
         # print(int(i/max_len*len2))
         # print(lst1[int(i/max_len*len1)])
         # print(lst2[int(i/max_len*len2)])
-        if Is_place_2(lst1[int(i/max_len*len1)],lst2[int(i/max_len*len2)],radius):
+        if ec.Is_place_2(lst1[int(i/max_len*len1)],lst2[int(i/max_len*len2)],radius):
             count+=1
     score=count/max_len
     return score
@@ -66,7 +61,7 @@ def route_matching(lst1,lst2,step,radius,len_match,min_score):
     # Case 1, lst2 is part of lst1:
     lst1_extended=[]
     for i in range(len(lst1)-1):
-        dis=calDistance(lst1[i]['track_location']['coordinates'],lst1[i+1]['track_location']['coordinates'])
+        dis=ec.calDistance(lst1[i]['track_location']['coordinates'],lst1[i+1]['track_location']['coordinates'])
         num_inter=int(round(dis/step))
         if num_inter==0:
             lst1_extended.append(lst1[i]['track_location']['coordinates'])
@@ -78,7 +73,7 @@ def route_matching(lst1,lst2,step,radius,len_match,min_score):
     lst1_extended.append(end_pnt1['track_location']['coordinates'])
     lst2_extended=[]
     for i in range(len(lst2)-1):
-        dis=calDistance(lst2[i]['track_location']['coordinates'],lst2[i+1]['track_location']['coordinates'])
+        dis=ec.calDistance(lst2[i]['track_location']['coordinates'],lst2[i+1]['track_location']['coordinates'])
         num_inter=int(round(dis/step))
         if num_inter==0:
             lst2_extended.append(lst2[i]['track_location']['coordinates'])
@@ -162,7 +157,7 @@ def route_matching_2(lst1,lst2,step,radius,min_score):
     # Case 1, lst2 is part of lst1:
     lst1_extended=[]
     for i in range(len(lst1)-1):
-        dis=calDistance(lst1[i]['track_location']['coordinates'],lst1[i+1]['track_location']['coordinates'])
+        dis=ec.calDistance(lst1[i]['track_location']['coordinates'],lst1[i+1]['track_location']['coordinates'])
         num_inter=int(round(dis/step))
         if num_inter==0:
             lst1_extended.append(lst1[i]['track_location']['coordinates'])
@@ -174,7 +169,7 @@ def route_matching_2(lst1,lst2,step,radius,min_score):
     lst1_extended.append(end_pnt1['track_location']['coordinates'])
     lst2_extended=[]
     for i in range(len(lst2)-1):
-        dis=calDistance(lst2[i]['track_location']['coordinates'],lst2[i+1]['track_location']['coordinates'])
+        dis=ec.calDistance(lst2[i]['track_location']['coordinates'],lst2[i+1]['track_location']['coordinates'])
         num_inter=int(round(dis/step))
         if num_inter==0:
             lst2_extended.append(lst2[i]['track_location']['coordinates'])
@@ -190,12 +185,12 @@ def route_matching_2(lst1,lst2,step,radius,min_score):
     best_score=[]
     score_2_in_1=0
     for point2 in lst2:
-        if Include_place_2(lst1_extended,point2['track_location']['coordinates'],radius):
+        if ec.Include_place_2(lst1_extended,point2['track_location']['coordinates'],radius):
             score_2_in_1+=1
     best_score.append(score_2_in_1/len(lst2))
     score_1_in_2=0
     for point1 in lst1:
-        if Include_place_2(lst2_extended,point1['track_location']['coordinates'],radius):
+        if ec.Include_place_2(lst2_extended,point1['track_location']['coordinates'],radius):
             score_1_in_2+=1
     best_score.append(score_1_in_2/len(lst1))
     print(best_score)
@@ -206,7 +201,7 @@ def route_matching_2(lst1,lst2,step,radius,min_score):
 
 def getRoute(section_id):
     route=[]
-    Sections=get_section_db()
+    Sections=edb.get_section_db()
     section=Sections.find_one({'_id':section_id})
     for point in section['track_points']:
         route.append(point['track_location']['coordinates'])
@@ -219,7 +214,7 @@ def refineRoute(lst1,step):
     # print(len(lst1))
     lst1_extended=[]
     for i in range(len(lst1)-1):
-        dis=calDistance(lst1[i],lst1[i+1])
+        dis=ec.calDistance(lst1[i],lst1[i+1])
         num_inter=int(round(dis/step))
         if num_inter==0:
             lst1_extended.append(lst1[i])
@@ -234,7 +229,7 @@ def refineRoute(lst1,step):
     return lst1_extended
 
 def storeTransitStop(type,route):
-    Transit=get_transit_db()
+    Transit=edb.get_transit_db()
     todo={}
     stops=[]
     tree = ET.ElementTree(file=urllib2.urlopen('http://api.bart.gov/api/stn.aspx?cmd=stns&key=MW9S-E7SL-26DU-VV8V'))
@@ -259,10 +254,10 @@ def storeTransitStop(type,route):
 
 def storeCalTrainStop():
 
-    Transit=get_transit_db()
+    Transit=edb.get_transit_db()
     todo={}
     stops=[]
-    get_transit_db().remove({'type':'CalTrain'})
+    edb.get_transit_db().remove({'type':'CalTrain'})
     # print(root[1][0].find('name').text)
     file_name='/Users/Mogeng/Berkeley/Semester2/E-Mission/Transit_routes/CalTrain.csv'
     with open(file_name, 'rU') as csvfile:
@@ -311,48 +306,48 @@ def existingMatchDistance(route1,route2,step1=100000,step2=100000,method='lcs',r
         ## using DTW Iteration
             if method=='dtw':
                 if start_route1<end_route1:
-                    new_dis=dynamicTimeWarp(refineRoute(route1[start_route1:end_route1+1],step1),refineRoute(route2[start_route2:end_route2+1],step2),calDistance)
+                    new_dis=eatm.DTW.dynamicTimeWarp(refineRoute(route1[start_route1:end_route1+1],step1),refineRoute(route2[start_route2:end_route2+1],step2),ec.calDistance)
                 elif end_route1<start_route1:
-                    new_dis=dynamicTimeWarp(refineRoute(route1[end_route1:start_route1+1][::-1],step1),refineRoute(route2[start_route2:end_route2+1],step2),calDistance)
+                    new_dis=eatm.DTW.dynamicTimeWarp(refineRoute(route1[end_route1:start_route1+1][::-1],step1),refineRoute(route2[start_route2:end_route2+1],step2),ec.calDistance)
         ## using DTW Recursion
             if method=='DTW':
                 if start_route1<end_route1:
-                    aa=Dtw(refineRoute(route1[start_route1:end_route1+1],step1),refineRoute(route2[start_route2:end_route2+1],step2),calDistance)
+                    aa=eatm.DTW.Dtw(refineRoute(route1[start_route1:end_route1+1],step1),refineRoute(route2[start_route2:end_route2+1],step2),ec.calDistance)
                 elif end_route1<start_route1:
-                    aa=Dtw(refineRoute(route1[end_route1:start_route1+1][::-1],step1),refineRoute(route2[start_route2:end_route2+1],step2),calDistance)
+                    aa=eatm.DTW.Dtw(refineRoute(route1[end_route1:start_route1+1][::-1],step1),refineRoute(route2[start_route2:end_route2+1],step2),ec.calDistance)
 
                 new_dis=aa.calculate_distance()
         ## using symmetric DTW
             if method=='DTWSym':
                 if start_route1<end_route1:
-                    aa=Dtw(refineRoute(route1[start_route1:end_route1+1],step1),refineRoute(route2[start_route2:end_route2+1],step2),calDistance)
+                    aa=eatm.DTW.Dtw(refineRoute(route1[start_route1:end_route1+1],step1),refineRoute(route2[start_route2:end_route2+1],step2),ec.calDistance)
                 elif end_route1<start_route1:
-                    aa=Dtw(refineRoute(route1[end_route1:start_route1+1][::-1],step1),refineRoute(route2[start_route2:end_route2+1],step2),calDistance)
+                    aa=eatm.DTW.Dtw(refineRoute(route1[end_route1:start_route1+1][::-1],step1),refineRoute(route2[start_route2:end_route2+1],step2),ec.calDistance)
 
                 new_dis=aa.calculate_distance()
         ## using DTW
             if method=='DTWAsym':
                 if start_route1<end_route1:
-                    aa=Dtw(refineRoute(route1[start_route1:end_route1+1],step1),refineRoute(route2[start_route2:end_route2+1],step2),calDistance)
+                    aa=eatm.DTW.Dtw(refineRoute(route1[start_route1:end_route1+1],step1),refineRoute(route2[start_route2:end_route2+1],step2),ec.calDistance)
                 elif end_route1<start_route1:
-                    aa=Dtw(refineRoute(route1[end_route1:start_route1+1][::-1],step1),refineRoute(route2[start_route2:end_route2+1],step2),calDistance)
+                    aa=eatm.DTW.Dtw(refineRoute(route1[end_route1:start_route1+1][::-1],step1),refineRoute(route2[start_route2:end_route2+1],step2),ec.calDistance)
 
                 new_dis=aa.calculate_distance()
         ## using Frechet
             if method=='Frechet':
                 if start_route1<end_route1:
-                    new_dis=Frechet(refineRoute(route1[start_route1:end_route1+1],step1),refineRoute(route2[start_route2:end_route2+1],step2))
+                    new_dis=eatm.Frechet.Frechet(refineRoute(route1[start_route1:end_route1+1],step1),refineRoute(route2[start_route2:end_route2+1],step2))
                 elif end_route1<start_route1:
-                    new_dis=Frechet(refineRoute(route1[end_route1:start_route1+1][::-1],step1),refineRoute(route2[start_route2:end_route2+1],step2))
+                    new_dis=eatm.Frechet.Frechet(refineRoute(route1[end_route1:start_route1+1][::-1],step1),refineRoute(route2[start_route2:end_route2+1],step2))
         ## using lcs
             if method=='lcs':
                 if start_route1<end_route1:
-                    new_dis=lcsScore(refineRoute(route1[start_route1:end_route1+1],step1),refineRoute(route2[start_route2:end_route2+1],step2),radius1)
+                    new_dis=eatm.LCS.lcsScore(refineRoute(route1[start_route1:end_route1+1],step1),refineRoute(route2[start_route2:end_route2+1],step2),radius1)
                 elif end_route1<start_route1:
                     # print(route1[start_route1:end_route1-1])
                     # print(start_route1,end_route1)
                     # print(len(route1[start_route1:end_route1-1:-1]))
-                    new_dis=lcsScore(refineRoute(route1[end_route1:start_route1+1][::-1],step1),refineRoute(route2[start_route2:end_route2+1],step2),radius1)
+                    new_dis=eatm.LCS.lcsScore(refineRoute(route1[end_route1:start_route1+1][::-1],step1),refineRoute(route2[start_route2:end_route2+1],step2),radius1)
             if new_dis<dis:
                 dis=new_dis
 
@@ -370,25 +365,25 @@ def fullMatchDistance(route1,route2,step1=100000,step2=100000,method='lcs',radiu
 
 ## using DTW Iteration
     if method=='dtw':
-        new_dis=dynamicTimeWarp(refineRoute(route1,step1),refineRoute(route2,step2),calDistance)
+        new_dis=eatm.DTW.dynamicTimeWarp(refineRoute(route1,step1),refineRoute(route2,step2),ec.calDistance)
 ## using DTW Recursion
     if method=='DTW':
-        aa=Dtw(refineRoute(route1,step1),refineRoute(route2,step2),calDistance)
+        aa=eatm.DTW.Dtw(refineRoute(route1,step1),refineRoute(route2,step2),ec.calDistance)
         new_dis=aa.calculate_distance()
 ## using symmetric DTW
     if method=='DTWSym':
-        aa=DtwSym(refineRoute(route1,step1),refineRoute(route2,step2),calDistance)
+        aa=eatm.DTW.DtwSym(refineRoute(route1,step1),refineRoute(route2,step2),ec.calDistance)
         new_dis=aa.calculate_distance()
 ## using Asymmetric DTW
     if method=='DTWAsym':
-        aa=DtwAsym(refineRoute(route1,step1),refineRoute(route2,step2),calDistance)
+        aa=eatm.DTW.DtwAsym(refineRoute(route1,step1),refineRoute(route2,step2),ec.calDistance)
         new_dis=aa.calculate_distance()
 ## using Frechet
     if method=='Frechet':
-        new_dis=Frechet(refineRoute(route1,step1),refineRoute(route2,step2))
+        new_dis=eatm.Frechet.Frechet(refineRoute(route1,step1),refineRoute(route2,step2))
 ## using lcs
     if method=='lcs':
-        new_dis=lcsScore(refineRoute(route1,step1),refineRoute(route2,step2),radius1)
+        new_dis=eatm.LCS.lcsScore(refineRoute(route1,step1),refineRoute(route2,step2),radius1)
     if new_dis<dis:
         dis=new_dis
 
@@ -403,7 +398,7 @@ def matchTransitRoutes(lst,route,step1=100000,step2=100000,method='lcs',radius1=
         return 0
 
 def matchTransitStops(lst,route,radius1=2000):
-    if Include_place_2(route,lst[0],radius1) and Include_place_2(route,lst[-1],radius1):
+    if ec.Include_place_2(route,lst[0],radius1) and ec.Include_place_2(route,lst[-1],radius1):
         return 1
     else:
         return 0
@@ -418,16 +413,16 @@ def matchTwoRoutes(route1,route2,step1=100000,step2=100000,method='lcs',radius1=
 def update_user_routeDistanceMatrix(user_id,data_feature,step1=100000,step2=100000,method='lcs',radius1=1000):
     ids = data_feature.keys()
     """
-    user_query=get_routeDistanceMatrix_db().find_one({'$and':[{'user':user_id},{'method':method}]})
+    user_query=edb.get_routeDistanceMatrix_db().find_one({'$and':[{'user':user_id},{'method':method}]})
     if user_query==None:
         user_disMat={}
         for _id in ids:
             user_disMat[_id] = {}
-        get_routeDistanceMatrix_db().insert({'user':user_id,'method':method,'disMat':user_disMat})
+        edb.get_routeDistanceMatrix_db().insert({'user':user_id,'method':method,'disMat':user_disMat})
     else:
         user_disMat=user_query['disMat']
     """
-    user_disMat = get_routeDistanceMatrix_db(user_id, method)
+    user_disMat = edb.get_routeDistanceMatrix_db(user_id, method)
 
     a=0
 
@@ -450,26 +445,26 @@ def update_user_routeDistanceMatrix(user_id,data_feature,step1=100000,step2=1000
                 #print('Update successful.')
                 #print(user_disMat[_id])
 
-    #get_routeDistanceMatrix_db().update({'$and':[{'user':user_id},{'method':method}]},{'user':user_id,'method':method,'disMat':user_disMat})
+    #edb.get_routeDistanceMatrix_db().update({'$and':[{'user':user_id},{'method':method}]},{'user':user_id,'method':method,'disMat':user_disMat})
     print(type(user_disMat))
     user_disMat = update_routeDistanceMatrix_db(user_id, method, user_disMat)
     return user_disMat
 
-    # for entry in get_routeDistanceMatrix_db().find():
+    # for entry in edb.get_routeDistanceMatrix_db().find():
     #     print(entry)
 
 def update_user_routeClusters(user_id,clusters,method='lcs'):
-    user_query=get_routeCluster_db().find_one({'$and':[{'user':user_id},{'method':method}]})
+    user_query=edb.get_routeCluster_db().find_one({'$and':[{'user':user_id},{'method':method}]})
     if user_query==None:
-        get_routeCluster_db().insert({'user':user_id,'method':method,'clusters':clusters})
+        edb.get_routeCluster_db().insert({'user':user_id,'method':method,'clusters':clusters})
     else:
-        get_routeCluster_db().update({'user':user_id,'method':method},{'user':user_id,'method':method,'clusters':clusters})
+        edb.get_routeCluster_db().update({'user':user_id,'method':method},{'user':user_id,'method':method,'clusters':clusters})
 
 
 def get_common_routes_for_user(user_id,method='lcs'):
     common_idxs = []
-    Sections = get_section_db()
-    user_route_clusters = get_routeCluster_db().find_one({'$and':[{'user':user_id},{'method':method}]})['clusters']
+    Sections = edb.get_section_db()
+    user_route_clusters = edb.get_routeCluster_db().find_one({'$and':[{'user':user_id},{'method':method}]})['clusters']
     for idx in user_route_clusters.keys():
         # print(idx)
         if len(user_route_clusters[idx]) >= 3:

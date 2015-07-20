@@ -4,22 +4,19 @@ structured:
 module_name { query_string: function_for_query }
 
 """
+# Standard imports
 import sys
 import os
 import math
 import datetime
 import logging
-sys.path.append("%s" % os.getcwd())
-sys.path.append("%s/../../CFC_WebApp/" % os.getcwd())
 logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', level=logging.DEBUG)
-
-from main.K_medoid_2 import kmedoids, user_route_data
-from main.route_matching import update_user_routeDistanceMatrix, update_user_routeClusters
-
-from get_database import get_section_db, get_trip_db, get_routeCluster_db, get_alternatives_db
-import trip
 import random
 from uuid import UUID
+
+# Our imports
+from emission.core.get_database import get_section_db, get_trip_db, get_routeCluster_db, get_alternatives_db
+import trip
 
 # 0763de67-f61e-3f5d-90e7-518e69793954
 # 0763de67-f61e-3f5d-90e7-518e69793954_20150421T230304-0700_0

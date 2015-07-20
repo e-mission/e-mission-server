@@ -1,23 +1,26 @@
+# Standard import
 from __future__ import division
 import urllib2
-from get_database import *
 from datetime import datetime, timedelta
 import json
-from trip import *
 import copy
 import uuid
 import xml.etree.ElementTree as ET
 
+# Our imports
+import emission.core.get_database as edb
+import emission.wrapper.trip as ewt
+
 DATE_FORMAT = "%Y%m%dT%H%M%S-%W00" #This is a great hack thought of by Shaun
 
 def get_uuid_list():
-    return get_trip_db().find({}).distinct("user_id")
+    return edb.get_trip_db().find({}).distinct("user_id")
 
 def get_training_uuid_list():
-    return get_trip_db().find({}).distinct("user_id")
+    return edb.get_trip_db().find({}).distinct("user_id")
 
 def get_recommender_uuid_list():
-    return get_trip_db().find({}).distinct("user_id")
+    return edb.get_trip_db().find({}).distinct("user_id")
 
 def coerce_gmaps_time(time):
 	lst = time.split()
@@ -48,7 +51,7 @@ def google_maps_to_our_trip(google_maps_json, _id, user_id, trip_id, mode, org_s
 	cost = 0
 	parent_id = trip_id
 	mode_list = [str(mode)]
-        return Alternative_Trip(_id, user_id, trip_id, sections, org_start_time, end_time, start_trip, end_trip, parent_id, cost, mode_list)
+        return ewt.Alternative_Trip(_id, user_id, trip_id, sections, org_start_time, end_time, start_trip, end_trip, parent_id, cost, mode_list)
 
 def meters_to_miles(meters):
 	return meters * 0.000621371
@@ -78,7 +81,7 @@ def find_perturbed_trips(trip, delta=2):
     	json_str['_id'] = _id
     	json_str['mode'] = trip.mode_list
     	json_str['track_points'] = None
-        new_trip = E_Mission_Trip.trip_from_json(json_str)
+        new_trip = ewt.E_Mission_Trip.trip_from_json(json_str)
         to_return.append(new_trip)
         time += time_delta
     return to_return

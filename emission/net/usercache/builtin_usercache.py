@@ -1,7 +1,10 @@
-import usercache.abstract_usercache as ucauc # ucauc = usercache.abstract_usercache
-from get_database import get_usercache_db
+# Standard imports
 import logging
 import time
+
+# Our imports
+import emission.net.usercache.abstract_usercache as ucauc # ucauc = usercache.abstract_usercache
+from emission.core.get_database import get_usercache_db
 
 """
 Format of the usercache_db.

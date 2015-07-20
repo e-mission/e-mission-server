@@ -1,7 +1,8 @@
 import json
 import logging
 
-from get_database import get_profile_db, get_pending_signup_db, get_uuid_db
+# Our imports
+from emission.core.get_database import get_profile_db, get_pending_signup_db, get_uuid_db
 
 defaultCarFootprint = 278.0/1609
 defaultMpg = 8.91/(1.6093 * defaultCarFootprint) # Should be roughly 32

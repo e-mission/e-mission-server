@@ -14,12 +14,15 @@
 # these trips are no longer static--in Phase 1, we can augment each trip with a
 # set of alternative routes. In Phase 2, this learning is time-dependent (think traffic).
 
-from get_database import get_utility_model_db
-import alternative_trips_module as atm
+# Standard imports
 from sklearn import linear_model as lm
-from sklearn.preprocessing import normalize
 import numpy as np
 import logging
+
+# Our imports
+import emission.core.get_database as edb
+import alternative_trips_module as atm
+
 
 class UserUtilityModel(object):
   # return user-specific weights for a given user based on logistic regression on
@@ -125,9 +128,9 @@ class UserUtilityModel(object):
   @staticmethod
   def find_from_db(user_id, modified):
       if modified:
-          db_model = get_utility_model_db().find_one({'user_id': user_id, 'type':'recommender'})
+          db_model = edb.get_utility_model_db().find_one({'user_id': user_id, 'type':'recommender'})
       else:
-          db_model = get_utility_model_db().find_one({'user_id': user_id, 'type':'user'})
+          db_model = edb.get_utility_model_db().find_one({'user_id': user_id, 'type':'user'})
       return db_model
     # contruct and return model using params from DB
 

@@ -1,17 +1,19 @@
+# Standard imports
 from __future__ import division
 import math
 import logging
 import numpy as np
-from pymongo import MongoClient
 import utm
 from sklearn.cluster import DBSCAN
-from get_database import get_routeCluster_db,get_transit_db
 from uuid import UUID
-from route_matching import getRoute,fullMatchDistance,matchTransitRoutes,matchTransitStops
-from common import get_mode_share_by_count, calDistance, Include_place_2
 
-Sections = MongoClient('localhost').Stage_database.Stage_Sections
-Modes=MongoClient('localhost').Stage_database.Stage_Modes
+# Our imports
+from emission.core.get_database import get_section_db, get_mode_db, get_routeCluster_db,get_transit_db
+from emission.modelling.tour_model.trajectory_matching.route_matching import getRoute,fullMatchDistance,matchTransitRoutes,matchTransitStops
+from emisson.core.common import get_mode_share_by_count, calDistance, Include_place_2
+
+Sections = get_section_db()
+Modes = get_mode_db()
 
 
 # The speed is in m/s

@@ -1,11 +1,12 @@
-#from common import find_perturbed_trips, initialize_empty_perturbed_trips, update_perturbations 
-from trip import *
-from tripiterator import TripIterator
-#from get_database import get_perturbed_trips_db
-from get_database import *
-from query_scheduler_pipeline import schedule_queries
-from filter_modules import AlternativesNotFound
+# Standard imports
 import logging
+
+# Our imports
+import emission.core.wrapper.trip as ect
+import emission.core.wrapper.tripiterator as ecti
+import emission.core.wrapper.filter_modules as ecfm
+import emission.core.get_database as edb
+import emission.analysis.modelling.user_model.query_scheduler_pipeline as eaqsp
 
 #import Profiles
 
@@ -34,10 +35,10 @@ def calc_alternative_trips(user_trips, immediate):
         existing_trip.pipelineFlags.startAlternatives()
         existing_trip.pipelineFlags.savePipelineFlags()
         if immediate:
-            schedule_queries(existing_trip.trip_id, existing_trip.user_id, [existing_trip], immediate, total_stagger)
+            eaqsp.schedule_queries(existing_trip.trip_id, existing_trip.user_id, [existing_trip], immediate, total_stagger)
             total_stagger += stagger
         else:
-            schedule_queries(existing_trip.trip_id, existing_trip.user_id, [existing_trip], immediate)
+            eaqsp.schedule_queries(existing_trip.trip_id, existing_trip.user_id, [existing_trip], immediate)
 
 def get_alternative_for_trips(trip_it):
     # User Utility Pipeline calls this to get alternatve trips for one original trip (_id)
@@ -47,9 +48,9 @@ def get_alternative_for_trips(trip_it):
         logging.debug("Considering trip with id %s " % _trip.trip_id)
 	tripCnt = tripCnt + 1
         try:
-            ti = TripIterator(_trip.trip_id, ["alternatives", "get_alternatives"], Alternative_Trip)
+            ti = ecti.TripIterator(_trip.trip_id, ["alternatives", "get_alternatives"], ect.Alternative_Trip)
             alternatives.append(ti)
-        except AlternativesNotFound:
+        except ecfm.AlternativesNotFound:
             alternatives.append([])
     logging.debug("tripCnt = %d, alternatives cnt = %d" % (tripCnt, len(alternatives)))
     return alternatives
@@ -57,14 +58,14 @@ def get_alternative_for_trips(trip_it):
 def get_alternative_for_trip(trip):
     # User Utility Pipeline calls this to get alternatve trips for one original trip (_id)
     try:
-        ti = TripIterator(trip.trip_id, ["alternatives", "get_alternatives"], Alternative_Trip)
+        ti = ecti.TripIterator(trip.trip_id, ["alternatives", "get_alternatives"], ect.Alternative_Trip)
         return ti
-    except AlternativesNotFound:
+    except ecfm.AlternativesNotFound:
         return []
 
 def get_perturbed_trips(_id):
     # User Utility Pipeline calls this to get alternatve trips for one original trip (_id)
-    # db = get_perturbed_trips_db()
+    # db = edb.get_perturbed_trips_db()
     # _id = tripObj.get_id()
     # return db.find(_id)
-    return [trip.E_Mission_Trip.trip_from_json(jsonStr) for jsonStr in get_perturbed_trips_db().find({'_id' : _id})].__iter__()
+    return [ect.E_Mission_Trip.trip_from_json(jsonStr) for jsonStr in edb.get_perturbed_trips_db().find({'_id' : _id})].__iter__()

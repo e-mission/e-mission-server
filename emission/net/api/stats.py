@@ -1,6 +1,9 @@
+# Standard imports
 import logging
 import time
-from get_database import get_client_stats_db, get_server_stats_db, get_result_stats_db
+
+# Our imports
+from emission.core.get_database import get_client_stats_db, get_server_stats_db, get_result_stats_db
 
 STAT_TRIP_MGR_PCT_SHOWN = "tripManager.pctShown"
 STAT_TRIP_MGR_TRIPS_FOR_DAY = "tripManager.tripsForDay"

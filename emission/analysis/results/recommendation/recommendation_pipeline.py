@@ -1,14 +1,17 @@
+# Standard imports
 import json
-from get_database import get_utility_model_db
-from user_utility_model import UserUtilityModel
-from emissions_model import EmissionsModel
-from simple_cost_time_mode_model import SimpleCostTimeModeModel
-import tripiterator as ti
-import trip as t
-from common import get_uuid_list, get_recommender_uuid_list
 import uuid
-import alternative_trips_module as atm
 import logging
+
+# Our imports
+from emission.core.get_database import get_utility_model_db
+from emission.analysis.modelling.user_model.user_utility_model import UserUtilityModel
+from emission.analysis.modelling.user_model.emissions_model import EmissionsModel
+from emission.analysis.modelling.user_model.simple_cost_time_mode_model import SimpleCostTimeModeModel
+import emission.core.wrapper.tripiterator as ti
+import emission.core.wrapper.trip as t
+from emission.core.common import get_uuid_list, get_recommender_uuid_list
+import emission.analysis.modelling.user_model.alternative_trips_module as atm
 
 class RecommendationPipeline:
     def get_trips_to_improve(self, user_uuid):

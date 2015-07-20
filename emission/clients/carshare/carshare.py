@@ -1,5 +1,5 @@
 import logging
-from get_database import get_section_db
+from emission.core.get_database import get_section_db
 
 def classifiedCount(request):
   print "carshare.classifiedCount called for user %s!" % request['user']

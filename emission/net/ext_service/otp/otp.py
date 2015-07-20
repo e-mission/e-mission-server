@@ -1,11 +1,14 @@
 ## Library to make calls to our Open Trip Planner server
 ## Hopefully similiar to googlemaps.py
 
+# Standard imports
 import urllib, urllib2, datetime, time
-from trip import Coordinate, Alternative_Trip, Section, Fake_Trip
-from common import calc_car_cost
 # from traffic import get_travel_time
 from pygeocoder import Geocoder
+
+# Our imports
+from emission.core.wrapper.trip import Coordinate, Alternative_Trip, Section, Fake_Trip
+from emission.core.common import calc_car_cost
 
 try:
     import json

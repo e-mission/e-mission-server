@@ -1,8 +1,11 @@
-from __future__ import division
+# Standard imports
 import numpy as np
-from common import calDistance
 import math
 from scipy.ndimage import measurements
+
+# Our imports
+import emission.core.common as ec
+
 # Tristan Ursell
 # Frechet Distance between two curves
 # May 2013
@@ -90,7 +93,7 @@ def Frechet(R1,R2,varargin=None):
     for i in range(L1):
         for j in range(L2):
             # frechet1[i,j]=math.sqrt(math.pow(R1[i][0]-R2[j][0],2)+math.pow(R1[i][1]-R2[j][1],2))
-            frechet1[i,j]=calDistance(R1[i],R2[j])
+            frechet1[i,j]=ec.calDistance(R1[i],R2[j])
     fmin=frechet1.min();
     fmax=frechet1.max();
     # print(fmin)

@@ -2,11 +2,7 @@ import json
 import sys
 import os
 
-# print "old path is %s" % sys.path
-sys.path.append("%s" % os.getcwd())
-print "new path is %s" % sys.path
-
-from moves.moves import Moves
+from emission.net.ext_services.moves.sdk import Moves
 
 # It is hard, if not impossible to test this properly.
 # First, we would need to write an integration test, not a unit test

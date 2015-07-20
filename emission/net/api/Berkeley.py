@@ -1,10 +1,11 @@
 __author__ = 'Yin'
-from pymongo import MongoClient
-from common import get_mode_share_by_distance, berkeley_area, Inside_polygon
-from get_database import get_section_db
+# Standard imports
 from pymongo import GEOSPHERE
 from dateutil import parser
 
+# Our imports
+from emission.core.get_database import get_section_db
+from emission.core.common import get_mode_share_by_distance, berkeley_area, Inside_polygon
 
 def get_berkeley_sections():
     Sections = get_section_db()

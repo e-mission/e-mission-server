@@ -1,16 +1,18 @@
-from moves.moves_sdk import Moves
-from pymongo import MongoClient
+# Standard imports
 from pymongo.errors import DuplicateKeyError
 from datetime import datetime, timedelta
 import logging
 import pytz
 import json
 from dateutil import parser
-from get_database import get_mode_db, get_section_db, get_trip_db, get_moves_db
 from time import sleep
 import numpy as np
 from sklearn import linear_model
 import math
+
+# Our imports
+from emission.net.ext_services.modes.sdk import Moves
+from emission.core.get_database import get_mode_db, get_section_db, get_trip_db, get_moves_db
 
 config_data = json.load(open('config.json'))
 log_base_dir = config_data['paths']['log_base_dir']

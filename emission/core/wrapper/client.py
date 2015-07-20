@@ -1,11 +1,11 @@
 import json
 import logging
-
-from get_database import get_profile_db, get_client_db, get_pending_signup_db
 import dateutil.parser
 from datetime import datetime
 
-import clients.common
+# Our imports
+from emission.core.get_database import get_profile_db, get_client_db, get_pending_signup_db
+import emission.clients.common
 
 class Client:
   def __init__(self, clientName):
@@ -223,7 +223,7 @@ class Client:
   # Read the design decisions for an example of how to improve this
   @staticmethod
   def getClientConfirmedModeQueries(mode):
-    queryList = clients.common.getConfirmFields()
+    queryList = emission.clients.common.getConfirmFields()
     queryListWithMode = [{query: mode} for query in queryList]
     return [{'$or': queryListWithMode}]
 

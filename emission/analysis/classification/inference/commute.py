@@ -1,28 +1,30 @@
 __author__ = 'Yin'
+# Standard imports
 from pymongo import MongoClient
-from home import detect_home
-from work_place import detect_daily_work_office
-from get_database import get_section_db
-from common import Is_date, Is_place
 from dateutil import parser
-from common import parse_time, travel_time
+
+# Our imports
+import emission.analysis.modelling.home as eamh
+import emission.analysis.modelling.work_place as eamw
+import emission.core.get_database as edb
+import emission.core.common as ec
 
 ########################################## morning commute ########################################################
 def get_daily_morning_commute_sections(user_id,day):
     # say should be from 1 to 5
     # get a list of all the sections for Mon, or ...
-    Sections=get_section_db()
+    Sections=edb.get_section_db()
     list_of_commute=[]
     candidate_sections=[]
-    home=detect_home(user_id)
-    work=detect_daily_work_office(user_id,day)
+    home=eamh.detect_home(user_id)
+    work=eamw.detect_daily_work_office(user_id,day)
     if work == 'N/A':
         return []
     else:
         # print(list_first_pnt)
         for section in Sections.find({"$and":[{"user_id": user_id},{ "section_start_point": { "$ne": None }},\
                                               {'commute':{ "$exists": False }}]}):
-            if Is_date(section['section_start_time'],day):
+            if ec.Is_date(section['section_start_time'],day):
                 candidate_sections.append(section)
 
         if len(candidate_sections)>0:
@@ -30,10 +32,10 @@ def get_daily_morning_commute_sections(user_id,day):
             max_sec=0
             for i in range(len(candidate_sections)):
                 if i>=max_sec:
-                    if Is_place(candidate_sections[i]['section_start_point'],home,200):
+                    if ec.Is_place(candidate_sections[i]['section_start_point'],home,200):
                         for j in range(i,len(candidate_sections)):
-                            if Is_place(candidate_sections[j]['section_end_point'],work,200) and \
-                                            travel_time(candidate_sections[i]['section_start_time'],\
+                            if ec.Is_place(candidate_sections[j]['section_end_point'],work,200) and \
+                                            ec.travel_time(candidate_sections[i]['section_start_time'],\
                                                         candidate_sections[j]['section_end_time'])<=24*60*60:
                                 sections_todo=[]
                                 sections_todo.extend(candidate_sections[i:j+1])
@@ -45,7 +47,7 @@ def get_daily_morning_commute_sections(user_id,day):
 def get_user_morning_commute_sections(user):
     # say should be from 1 to 5
     # get a list of all the sections for Mon, or ...
-    Sections=get_section_db()
+    Sections=edb.get_section_db()
     list_of_commute=[]
     for date in range(1,6):
         list_of_commute.extend(get_daily_morning_commute_sections(user,date))
@@ -58,20 +60,20 @@ def get_daily_evening_commute_sections(user_id,day):
     # get a list of all the sections for Mon, or ...
     earlist_start=5
     earlist_end=15
-    Sections=get_section_db()
+    Sections=edb.get_section_db()
     list_of_commute=[]
     candidate_sections=[]
-    home=detect_home(user_id)
-    work=detect_daily_work_office(user_id,day)
+    home=eamh.detect_home(user_id)
+    work=eamw.detect_daily_work_office(user_id,day)
     if work == 'N/A':
         return []
     else:
         # print(list_first_pnt)
         for section in Sections.find({"$and":[{"user_id": user_id},{ "section_start_point": { "$ne": None }},\
                                               {'commute':{ "$exists": False }}]}):
-            time2=parse_time(section['section_start_time'])
-            if (Is_date(section['section_start_time'],day) and (time2 - time2.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds()/3600>earlist_end) or \
-                    (Is_date(section['section_start_time'],day+1) and (time2 - time2.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds()/3600<earlist_start):
+            time2=ec.parse_time(section['section_start_time'])
+            if (ec.Is_date(section['section_start_time'],day) and (time2 - time2.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds()/3600>earlist_end) or \
+                    (ec.Is_date(section['section_start_time'],day+1) and (time2 - time2.replace(hour=0, minute=0, second=0, microsecond=0)).total_seconds()/3600<earlist_start):
                 candidate_sections.append(section)
 
         if len(candidate_sections)>0:
@@ -79,10 +81,10 @@ def get_daily_evening_commute_sections(user_id,day):
             min_sec=len(candidate_sections)
             for i in range(len(candidate_sections)-1,-1,-1):
                 if i<=min_sec:
-                    if Is_place(candidate_sections[i]['section_end_point'],home,200):
+                    if ec.Is_place(candidate_sections[i]['section_end_point'],home,200):
                         for j in range(i,-1,-1):
-                            if Is_place(candidate_sections[j]['section_start_point'],work,200) and \
-                                            travel_time(candidate_sections[j]['section_start_time'],\
+                            if ec.Is_place(candidate_sections[j]['section_start_point'],work,200) and \
+                                            ec.travel_time(candidate_sections[j]['section_start_time'],\
                                                         candidate_sections[i]['section_end_time'])<=24*60*60:
                                 sections_todo=[]
                                 sections_todo.extend(candidate_sections[j:i+1])
@@ -94,7 +96,7 @@ def get_daily_evening_commute_sections(user_id,day):
 def get_user_evening_commute_sections(user):
     # say should be from 1 to 5
     # get a list of all the sections for Mon, or ...
-    Sections=get_section_db()
+    Sections=edb.get_section_db()
     list_of_commute=[]
     for date in range(1,6):
         list_of_commute.extend(get_daily_evening_commute_sections(user,date))

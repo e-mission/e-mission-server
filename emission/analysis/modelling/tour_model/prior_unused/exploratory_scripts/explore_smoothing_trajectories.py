@@ -1,12 +1,15 @@
-import main.mode.truth_pipeline as tp
-from get_database import get_section_db
-import modeinfer.featurecalc as fc
-import main.gmap_display as mgp
+# Standard imports
 import json
 import logging
 import numpy as np
 import datetime as pydt
-import main.mode.exploratory_scripts.generate_smoothing_from_ground_truth_clusters as gsfgtc
+
+# Our imports
+import emission.analysis.modelling.tour_model.prior_unused.truth_pipeline as tp
+import emission.core.get_database as edb
+import emission.analysis.section_features as fc
+import emission.plotting.gmap_display as mgp
+import emission.analysis.modelling.tour_model.prior_unused.exploratory_scripts.generate_smoothing_from_ground_truth_clusters as gsfgtc
 
 query = {'type': 'move',
          'confirmed_mode': {'$ne': 9},
@@ -19,7 +22,7 @@ def find_other_sections_manual(needsSmoothing, findWithoutSmoothing):
     section_list = []
     maxSpeed_list = []
 
-    for section in get_section_db().find(query):
+    for section in edb.get_section_db().find(query):
         avg_speed = fc.calAvgSpeed(section)
         if len(maxSpeed_list) == 0 or fc.calAvgSpeed(section) > max(maxSpeed_list):
             maxSpeed_list.append(avg_speed)

@@ -1,10 +1,12 @@
+# Standard imports
 import logging
 import json
-from moves import Moves
-from pymongo import MongoClient
-from get_database import get_moves_db
 
-key_file = open('keys.json')
+# Our imports
+from emission.net.ext_services.moves.sdk import Moves
+from emission.core.get_database import get_moves_db
+
+key_file = open('conf/net/keys.json')
 key_data = json.load(key_file)
 client_id = key_data["moves"]["client_id"]
 client_secret = key_data["moves"]["client_secret"]

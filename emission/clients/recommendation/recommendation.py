@@ -1,12 +1,16 @@
+# Standard imports
 import logging
-from main import carbon, stats
-from dao.user import User
 import time as systime
 from datetime import datetime, time, timedelta
-from get_database import get_trip_db, get_section_db
 from uuid import UUID
 import json
-import ast
+ 
+# Our imports
+from emission.core.get_database import get_trip_db, get_section_db
+import emission.analysis.results.carbon as carbon
+import emission.net.api.stats as stats
+from emission.core.wrapper.user import User
+from emission.analysis.results import userclient
 
 def getResult(user_uuid):
   # This is in here, as opposed to the top level as recommended by the PEP

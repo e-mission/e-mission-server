@@ -1,8 +1,11 @@
+# Standard imports
 import similarity
-from get_database import get_section_db
-import featurization
 import sys
 import math
+
+# Our imports
+import emission.core.get_database import edb
+import featurization
 
 """
 This file reads the data from the section database, 
@@ -29,7 +32,7 @@ read_data.
 #read the data from the database. If ground_truth is true, it will 
 #take it from the 'color' field of each section in the database. 
 def read_data(uuid, ground_truth=False):
-    sectiondb = get_section_db()
+    sectiondb = edb.get_section_db()
     sections = sectiondb.find({'user_id' : uuid})
     if sections.count() == 0:
         raise Exception('no sections found for user ' + str(uuid))

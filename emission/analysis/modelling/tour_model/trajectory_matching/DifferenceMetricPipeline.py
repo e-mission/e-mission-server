@@ -1,10 +1,11 @@
+# Standard imports
 from pymongo import MongoClient
 import pygmaps
-from get_database import get_section_db
-from main import K_medoid, route_matching, DTW, tripManager, LCS, Frechet
 from uuid import UUID
 import time
 
+# Our imports
+import emission.analysis.modelling.tour_model as eamt
 
 def pipeline(groundTruth, cluster_func, diff_metric, K_option = 'manual'):
     routeDict = getRouteDict(groundTruth)
@@ -19,7 +20,7 @@ def getRouteDict(routeDB):
     routeDict = {}
     for cluster in routeDB:
         for _id in cluster['list']:
-            routeDict[_id] = route_matching.getRoute(_id)
+            routeDict[_id] = eamt.route_matching.getRoute(_id)
     return routeDict
 
 def getDifferenceDict(routeDict, diff_metric = 'DTW'):
@@ -35,30 +36,30 @@ def getDifferenceDict(routeDict, diff_metric = 'DTW'):
                 differences[key][_id]
             except KeyError:
                 if diff_metric == 'DTW':
-                    value = DTW.Dtw(routeDict[_id], routeDict[key], common.calDistance)
+                    value = eamt.DTW.Dtw(routeDict[_id], routeDict[key], common.calDistance)
                     value = value.calculate_distance()
                     differences[_id][key] = value
                     differences[key][_id] = value
                 if diff_metric == 'newDTW':
-                    value = DTW.dynamicTimeWarp(routeDict[_id], routeDict[key])
+                    value = eamt.DTW.dynamicTimeWarp(routeDict[_id], routeDict[key])
                     differences[_id][key] = value
                     differences[key][_id] = value
                 if diff_metric == 'DtwSym':
-                    value = DTW.DtwSym(routeDict[_id], routeDict[key], common.calDistance)
+                    value = eamt.DTW.DtwSym(routeDict[_id], routeDict[key], common.calDistance)
                     value = value.calculate_distance()
                     differences[_id][key] = value
                     differences[key][_id] = value
                 if diff_metric == 'DtwAsym':
-                    value = DTW.DtwAsym(routeDict[_id], routeDict[key], common.calDistance)
+                    value = eamt.DTW.DtwAsym(routeDict[_id], routeDict[key], common.calDistance)
                     value = value.calculate_distance()
                     differences[_id][key] = value
                     differences[key][_id] = value
                 if diff_metric == 'LCS':
-                    value = LCS.lcsScore(routeDict[_id], routeDict[key], 2000)
+                    value = eamt.LCS.lcsScore(routeDict[_id], routeDict[key], 2000)
                     differences[_id][key] = value
                     differences[key][_id] = value
                 if diff_metric == 'Frechet':
-                    value = Frechet.Frechet(routeDict[_id], routeDict[key])
+                    value = eamt.Frechet.Frechet(routeDict[_id], routeDict[key])
                     differences[_id][key] = value
                     differences[key][_id] = value
                 
@@ -112,7 +113,7 @@ if __name__ == '__main__':
         else:
             for metric in difference_metric:
                 start = time.time()
-                ccr = pipeline(user['clusters'], K_medoid.find_centers, metric, K_value_option)
+                ccr = pipeline(user['clusters'], eamt.kmedoid.find_centers, metric, K_value_option)
                 end = time.time()
                 print '...DIFFERENCE METRIC: ' + metric
                 print '...CLUSTER CORRECTNESS RATE: ' + str(round(ccr,2))

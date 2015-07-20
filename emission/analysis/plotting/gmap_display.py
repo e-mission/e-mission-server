@@ -19,9 +19,7 @@ car - grey
 mixed - olive
 air - skyBlue
 """
-
-from pymongo import MongoClient
-from pymongo.errors import DuplicateKeyError
+# Standard imports
 import json
 from datetime import tzinfo, datetime, timedelta
 import pytz
@@ -30,17 +28,17 @@ import logging
 from pygeocoder import Geocoder
 from pytz import timezone
 from dateutil import parser
-from home import detect_home, detect_home_from_db
-from work_place import  detect_work_office, detect_daily_work_office,detect_work_office_from_db,detect_daily_work_office_from_db
-from common import most_common, get_first_daily_point, Include_place,berkeley_area,getModeShare
-from distance import get_morning_commute_distance_pie,get_evening_commute_distance_pie
-from get_database import get_mode_db, get_section_db, get_trip_db, get_test_db
 import math
-import pygmaps_modified as pygmaps
 from datetime import date, timedelta
-from uuid import *
-from common import calDistance
 from pygeocoder import Geocoder
+from uuid import UUID
+
+# Our imports
+from emission.analysis.modelling.home import detect_home, detect_home_from_db
+from emission.analysis.modelling.work_place import  detect_work_office, detect_daily_work_office,detect_work_office_from_db,detect_daily_work_office_from_db
+from emission.core.get_database import get_section_db, get_trip_db, get_test_db
+import pygmaps_modified as pygmaps
+from emission.core.common import calDistance
 import trip_analysis.useful_queries as tauq
 
 

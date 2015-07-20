@@ -1,9 +1,10 @@
 __author__ = 'Yin'
-from pymongo import MongoClient
-from common import Is_date, Is_place, get_mode_share_by_distance, berkeley_area, travel_time
-from get_database import get_section_db,get_profile_db
-# from commute import get_morning_commute_sections
+# Standard imports
 from dateutil import parser
+
+# Our imports
+from emission.core.common import Is_date, Is_place, get_mode_share_by_distance, berkeley_area, travel_time
+from emission.core.get_database import get_section_db,get_profile_db
 
 def get_Alluser_mode_share_by_distance(flag,start,end):
     # start = datetime(2014, 3, 20)

@@ -11,7 +11,7 @@ Roads API
 
 See more on how to enable these here: https://github.com/googlemaps/google-maps-services-python
 """
-import googlemaps
+import emission.net.ext_services.gmaps.googlemaps as googlemaps
 import datetime
 from crontab import CronTab
 import sys

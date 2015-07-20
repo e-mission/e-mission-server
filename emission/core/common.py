@@ -1,23 +1,20 @@
+# Standard imports
 from __future__ import division
 from random import randrange
 import logging
-from pymongo import MongoClient
+import copy
 from datetime import datetime, timedelta
 from dateutil import parser
 from pytz import timezone
-from get_database import get_mode_db, get_section_db, get_trip_db, get_test_db
 import math
 
-# from pylab import *
-# from scipy.interpolate import Rbf
-# import simplekml
-# import matplotlib.cm as cm
-import copy
+# Our imports
+from emission.core.get_database import get_mode_db, get_section_db, get_trip_db, get_test_db
+
 skippedModeList = ["transport", "underground", "not a trip"]
 
 def getAllModes():
   Modes = get_mode_db()
-  # Modes = MongoClient().Test_database.Test_Modes
   modes = []
   for mode in Modes.find():
     modes.append(mode)
@@ -47,7 +44,6 @@ def convertToAvg(totalMap, nUsers):
 # TODO: We need to figure out whether to pass in mode or modeID
 def getQuerySpec(user, modeId,start,end):
   Sections = get_section_db()
-  # Sections=MongoClient().Test_database.Test_Sections
   queryComponents = []
   if modeId is not None:
     queryComponents.append(getConfirmationModeQuery(modeId))

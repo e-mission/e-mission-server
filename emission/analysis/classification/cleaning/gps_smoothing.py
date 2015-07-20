@@ -1,13 +1,16 @@
-import modeinfer.featurecalc as fc
+# Standard imports
 import numpy as np
-import main.gmap_display as mgp
-import main.pygmaps_modified as pygmaps
-import useful_queries as taug
 import json
-from get_database import get_section_db
 import logging
 from dateutil import parser
 import math
+
+# Our imports
+import emission.analysis.section_features as sf
+import emission.analysis.plotting.gmap_display as eapg
+import emission.analysis.plotting.pygmaps_modified as pygmaps
+import emission.decorations.useful_queries as taug
+import emission.core.get_database import edb
 
 class SmoothingEvalResult:
     def __str__(self):
@@ -71,7 +74,7 @@ def evaluate_smoothing_for_section(section, ground_truth_deleted_indices, smooth
 def evaluate_smoothing_for_technique(ground_truth_map, smooth_technique):
     result_list = []
     for (sid, ground_truth_deleted_indices) in ground_truth_map.iteritems():
-        sectionJSON = get_section_db().find_one({'_id': sid})
+        sectionJSON = edb.get_section_db().find_one({'_id': sid})
         if sectionJSON is None:
             logging.error("Unable to find section object for id %s" % sid)
         result_list.append(evaluate_smoothing_for_section(sectionJSON, ground_truth_deleted_indices, smooth_technique))
@@ -103,7 +106,7 @@ def print_result_maps(out_path, result_map):
                 section_map[result._id] = [result]
 
     for (sid, result_list) in section_map.iteritems():
-        section = get_section_db().find_one({'_id': sid})
+        section = edb.get_section_db().find_one({'_id': sid})
         sectionCenter = taug.get_center_for_section(section)
         orig_points = section["track_points"]
         get_color = lambda(x) : "#000000" if x == "smooth_max_boundary" else "#0000FF"
@@ -113,7 +116,7 @@ def print_result_maps(out_path, result_map):
             pruned_points = delete_points(orig_points, result.deleted_indices)
             section["track_points"] = pruned_points
             title = "%s: precision: %s, recall: %s" % (result.technique, result.precision, result.recall)
-            mgp.drawSection(section, mgp.ALL, gmap, get_color(result.technique), title)
+            eapg.drawSection(section, eapg.ALL, gmap, get_color(result.technique), title)
             print "%s len(orig_points) %s len(deleted_indices) %s len(retained_indices) %s" % (result, len(orig_points), len(result.deleted_indices), len(result.retained_indices))
             gmap.draw("%s/%s_%s.html" % (out_path, result.technique, section["_id"]))
 
@@ -146,7 +149,7 @@ def smooth_boundary(tp, already_removed_indices = None, maxSpeed = 150):
             # Don't have enough data yet, so don't make any decisions
             prev_pt = pt
         else:
-            currSpeed = fc.calSpeed(prev_pt, pt)
+            currSpeed = sf.calSpeed(prev_pt, pt)
             logging.debug("while considering point %s, speed = %s" % (i, currSpeed))
             # Should make this configurable
             if currSpeed > maxSpeed:
@@ -167,7 +170,7 @@ def smooth_deviation(tp):
         if i == 0:
             prev_pt = pt
         else:
-            currSpeed = fc.calSpeed(prev_pt, pt)
+            currSpeed = sf.calSpeed(prev_pt, pt)
             if len(last_3_speeds) < 3:
                 # We don't have enough data to filter, so let's keep adding
                 if currSpeed > 0:
@@ -182,7 +185,7 @@ def smooth_deviation(tp):
                          % (i, currSpeed, speed_array, avgSpeed, spdDeviation, avgSpeed + 3 * spdDeviation))
                 if currSpeed > (avgSpeed + 3 * spdDeviation):
                     # Check to see if it is greater than the 3 following speeds as well
-                    next_3_speeds = fc.calSpeedsForList(tp[i+1:i+4])
+                    next_3_speeds = sf.calSpeedsForList(tp[i+1:i+4])
                     next_3_speeds = next_3_speeds[np.nonzero(next_3_speeds)]
                     avgSpeedAfter = next_3_speeds.mean()
                     spdDeviationAfter = np.std(next_3_speeds)
@@ -234,7 +237,7 @@ def smooth_posdap(tp, already_deleted_indices = None, maxSpeed = 150):
             # Don't have enough data yet, so don't make any decisions
             prev_pt = pt
         else:
-            currSpeed = fc.calSpeed(prev_pt, pt)
+            currSpeed = sf.calSpeed(prev_pt, pt)
             logging.debug("while considering point %s, speed = %s" % (i, currSpeed))
             # Should make this configurable
             if currSpeed > maxSpeed:
@@ -266,10 +269,10 @@ def smooth_posdap(tp, already_deleted_indices = None, maxSpeed = 150):
             ref_idx = last_segment[-1]
             for curr_idx in curr_segment:
                 logging.debug("Comparing distance %s with speed %s * time %s = %s" % 
-                    (math.fabs(fc.calDistance(get_coords(ref_idx), get_coords(curr_idx))),
+                    (math.fabs(sf.calDistance(get_coords(ref_idx), get_coords(curr_idx))),
                      maxSpeed, abs(get_ts(ref_idx) - get_ts(curr_idx)).seconds,
                      maxSpeed * abs(get_ts(ref_idx) - get_ts(curr_idx)).seconds))
-                if (math.fabs(fc.calDistance(get_coords(ref_idx), get_coords(curr_idx))) > 
+                if (math.fabs(sf.calDistance(get_coords(ref_idx), get_coords(curr_idx))) > 
                     (maxSpeed * abs(get_ts(ref_idx) - get_ts(curr_idx)).seconds)):
                     logging.debug("Distance is greater than max speed * time, deleting %s" % curr_idx)
                     removed_indices.append(curr_idx)
@@ -278,10 +281,10 @@ def smooth_posdap(tp, already_deleted_indices = None, maxSpeed = 150):
             ref_idx = curr_segment[-1]
             for curr_idx in reversed(last_segment):
                 logging.debug("Comparing distance %s with speed %s * time %s = %s" % 
-                    (math.fabs(fc.calDistance(get_coords(ref_idx), get_coords(curr_idx))),
+                    (math.fabs(sf.calDistance(get_coords(ref_idx), get_coords(curr_idx))),
                      maxSpeed, abs(get_ts(ref_idx) - get_ts(curr_idx)).seconds,
                      maxSpeed * abs(get_ts(ref_idx) - get_ts(curr_idx)).seconds))
-                if (abs(fc.calDistance(get_coords(ref_idx), get_coords(curr_idx))) > 
+                if (abs(sf.calDistance(get_coords(ref_idx), get_coords(curr_idx))) > 
                     (maxSpeed *  abs(get_ts(ref_idx) - get_ts(curr_idx)).seconds)):
                     logging.debug("Distance is greater than max speed * time, deleting %s" % curr_idx)
                     removed_indices.append(curr_idx)
@@ -296,7 +299,7 @@ def smooth_max_boundary(tp, already_removed_indices=None):
     else:
         filtered_tp = delete_points(tp, already_removed_indices)
 
-    all_speeds = fc.calSpeedsForList(filtered_tp)
+    all_speeds = sf.calSpeedsForList(filtered_tp)
     all_nonzero_speeds = all_speeds[np.nonzero(all_speeds)]
     np.set_printoptions(suppress=True)
     logging.debug("all_nonzero_speeds = %s" % all_nonzero_speeds)
@@ -310,7 +313,7 @@ def smooth_max_posdap(tp, already_removed_indices = None):
         filtered_tp = tp
     else:
         filtered_tp = delete_points(tp, already_removed_indices)
-    all_speeds = fc.calSpeedsForList(filtered_tp)
+    all_speeds = sf.calSpeedsForList(filtered_tp)
     all_nonzero_speeds = all_speeds[np.nonzero(all_speeds)]
     np.set_printoptions(suppress=True)
     logging.debug("all_nonzero_speeds = %s" % all_nonzero_speeds)

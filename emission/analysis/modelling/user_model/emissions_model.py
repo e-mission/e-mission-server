@@ -1,15 +1,16 @@
 # simple user utility model taking cost, time, and mode into account
+# Standard imports
 import numpy as np
 import math
-from get_database import get_utility_model_db, get_profile_db
 from datetime import datetime
-from common import calc_car_cost
-from main import common as cm
-from user_utility_model import UserUtilityModel
-import alternative_trips_module as atm
 import logging
 
-class EmissionsModel(UserUtilityModel):
+# Our imports
+import emission.core.get_database as edb
+import emission.core.common as cm
+import alternative_trips_module as atm
+
+class EmissionsModel(user_utility_model.UserUtilityModel):
   def __init__(self, cost, time, mode, trips):
     super(EmissionsModel, self).__init__(trips)
     self.feature_list = ["cost", "time", "mode", "emissions"]
@@ -32,7 +33,7 @@ class EmissionsModel(UserUtilityModel):
     model_query = {'user_id': user_id, 'type':'recommender'}
     model_object = {'cost': self.cost, 'user_id':user_id, 'time': self.time, 
                     'mode': self.mode, 'emissions': self.emissions, 'updated_at': datetime.now(),'type':'recommender'}
-    get_utility_model_db().update(model_query, model_object, upsert = True)
+    edb.get_utility_model_db().update(model_query, model_object, upsert = True)
 
   def _extract_features(self, trip):
         if hasattr(trip, "cost") and isinstance(trip.cost, int):
@@ -47,7 +48,7 @@ class EmissionsModel(UserUtilityModel):
 
   def getProfile(self):
     # is user_id a uuid?
-    return get_profile_db().find_one({'user_id': self.user_id})
+    return edb.get_profile_db().find_one({'user_id': self.user_id})
 
   def predict(self, trip):
     alts = list(atm.get_alternative_for_trip(trip))

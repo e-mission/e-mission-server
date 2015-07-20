@@ -2,8 +2,11 @@
 # Since other services that we are planning to support (like couchdb or Azure) don't 
 # need to use the REST services on our server to sync, this is not in the generic interface
 
-from get_database import get_usercache_db
+# Standard imports
 import logging
+
+# Our imports
+from emission.core.get_database import get_usercache_db
 
 def sync_server_to_phone(uuid):
     """

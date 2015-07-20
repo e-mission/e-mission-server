@@ -2,25 +2,28 @@
 Construct user utility model or retrieve from database and update with
 augmented trips. Store in database and return the model.
 """
+# Standard imports
 import json
-from user_utility_model import UserUtilityModel
-from tripiterator import TripIterator
-import alternative_trips_module as atm
-from common import get_uuid_list, get_training_uuid_list
-from simple_cost_time_mode_model import SimpleCostTimeModeModel
 import logging
-from trip import *
 from pymongo.errors import ConnectionFailure
+
+# Our imports
+import user_utility_model
+import emission.core.wrapper.tripiterator as ti
+import alternative_trips_module as atm
+import emission.net.ext_service.gmaps.common as egcm
+import simple_cost_time_mode_model as sctm
+import emission.core.wrapper.trip as ecwt
 
 class UtilityModelPipeline:
     def __init__(self):
         pass
 
     def get_training_trips(self, user_id):
-        return TripIterator(user_id, ["utility", "get_training"], E_Mission_Trip)
+        return ti.TripIterator(user_id, ["utility", "get_training"], ecwt.E_Mission_Trip)
 
     def build_user_model(self, user_id, trips):
-        model = UserUtilityModel.find_from_db(user_id, False)
+        model = user_utility_model.UserUtilityModel.find_from_db(user_id, False)
         trips = list(trips)
         logging.debug("Building user model for %s with %d trips " % (user_id, len(trips)))
         # alternatives = atm.get_alternative_trips(trips)
@@ -35,7 +38,7 @@ class UtilityModelPipeline:
             logging.info("Building Model")
             # model = SimpleCostTimeModeModel(trips_with_alts)
             try:
-                model = SimpleCostTimeModeModel(trips)
+                model = sctm.SimpleCostTimeModeModel(trips)
                 model.update()
                 '''
                 model2 = EmissionsModel(model.cost, model.time, model.mode, trips_with_alts)
@@ -46,11 +49,11 @@ class UtilityModelPipeline:
                 return model
             except Exception, e:
                 logging.info("Exception %s while building model", e)
-                model = SimpleCostTimeModeModel()
+                model = sctm.SimpleCostTimeModeModel()
                 return model
         else:
             logging.info("No alternatives found")
-            model = SimpleCostTimeModeModel()
+            model = sctm.SimpleCostTimeModeModel()
             return model
             return None
 
@@ -71,7 +74,7 @@ class UtilityModelPipeline:
     '''
 
     def runPipeline(self):
-        for user_uuid in get_training_uuid_list():
+        for user_uuid in egcm.get_training_uuid_list():
             try:
                 training_real_trips = self.get_training_trips(user_uuid)
                 userModel = self.build_user_model(user_uuid, training_real_trips)

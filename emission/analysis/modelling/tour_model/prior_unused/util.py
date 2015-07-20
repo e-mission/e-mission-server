@@ -1,4 +1,4 @@
-
+# Standard imports
 from pykml import parser
 from pykml.parser import Schema
 from pykml.factory import KML_ElementMaker as KML

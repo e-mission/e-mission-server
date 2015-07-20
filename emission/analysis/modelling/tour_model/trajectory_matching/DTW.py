@@ -1,6 +1,9 @@
 __author__ = 'Mogeng'
-from common import calDistance
+# Standard imports
 import numpy as np
+
+# Our imports
+import emission.core.common as ec
 
 class Dtw(object):
     def __init__(self, seq1, seq2, distance_func=None):
@@ -89,7 +92,7 @@ class Dtw(object):
 
 import math
 
-def dynamicTimeWarp(seqA, seqB, d = calDistance):
+def dynamicTimeWarp(seqA, seqB, d = ec.calDistance):
     # create the cost matrix
     numRows, numCols = len(seqA), len(seqB)
     cost = [[0 for _ in range(numCols)] for _ in range(numRows)]

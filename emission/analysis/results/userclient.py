@@ -1,9 +1,9 @@
 # Functions that manipulate both user and client information. It seemed better
 # to call that out into a separate module, rather than decide whether to stick
 # it into User or into Client.
-from dao.user import User
-from dao.client import Client
-from get_database import get_profile_db
+from emission.core.wrapper.user import User
+from emission.core.wrapper.client import Client
+from emission.core.get_database import get_profile_db
 
 def getUserClient(user_uuid):
     study = User.fromUUID(user_uuid).getFirstStudy()

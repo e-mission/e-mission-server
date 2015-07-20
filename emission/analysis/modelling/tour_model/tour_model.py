@@ -1,4 +1,5 @@
-from util import Counter, sampleFromCounter
+# Our imports
+import emission.simulation.markov_model_counter as esmmc
 
 
 ## A File meant to represent tour models for individual users 
@@ -46,7 +47,7 @@ class Location(object):
         self.hour = hour ## An int 0-23 representing the hour 
         self.name = name ## The name of the place, important for equality
         self.day = day ## 0-6 Monday-Sunday
-        self.counter = Counter( ) ## Reps successors and probabilities of each one
+        self.counter = esmmc.Counter( ) ## Reps successors and probabilities of each one
 
     def add_successors(self, suc_dict):
         for loc, weight in suc_dict.iteritems():
@@ -55,7 +56,7 @@ class Location(object):
             self.counter[loc] = weight
 
     def get_successor(self):
-        return sampleFromCounter(self.counter)
+        return esmmc.sampleFromCounter(self.counter)
 
     def is_end(self):
         return self.counter.totalCount() == 0

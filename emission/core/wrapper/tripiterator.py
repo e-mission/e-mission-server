@@ -1,11 +1,12 @@
+# Standard imports
 import os, sys
 import logging
 import traceback
-sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
-from main.userclient import getClientSpecificQueryFilter
-from get_database import get_section_db
+
+# Our imports
+from emission.core.get_database import get_section_db
 import filter_modules
-from trip import *
+import trip
 
 class TripIterator(object):
     """
@@ -21,7 +22,7 @@ class TripIterator(object):
 
     *** note: some functions do not allow/have options
     """
-    def __init__(self, user_uuid, filter_queries, trip_class=E_Mission_Trip):
+    def __init__(self, user_uuid, filter_queries, trip_class=trip.E_Mission_Trip):
         # Query section_db with queryList and
         # instantiate the cursor object
         # returned as an instance variable

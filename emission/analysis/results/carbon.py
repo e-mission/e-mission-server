@@ -1,6 +1,9 @@
+# Standard imports
 import logging
-import distance
 from datetime import datetime, timedelta
+
+# Our imports
+import emission.net.api.distance as distance
 # from get_database import get_user_db
 from dao.user import User
 from common import getDistinctUserCount, getAllModes, getDisplayModes, getQuerySpec, addFilterToSpec, getTripCountForMode, getModeShare, getDistanceForMode,\

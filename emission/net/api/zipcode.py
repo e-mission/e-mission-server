@@ -1,12 +1,12 @@
+# Standard imports
 import logging
-from pymongo import MongoClient
-from home import detect_home,detect_home_from_db
-from common import getModeShare
-# from get_database import get_section_db
-# from commute import get_morning_commute_mode_share_by_distance
-from pygeocoder import Geocoder
 from collections import defaultdict
-from get_database import get_section_db,get_profile_db
+from pygeocoder import Geocoder
+
+# Our imports
+from home import detect_home,detect_home_from_db
+from emission.core.common import getModeShare
+from emission.core.get_database import get_section_db,get_profile_db
 from modeshare import get_user_mode_share_by_distance
 
 # zipcode_list = ["other", "94720", "94709", "94705", "94706", "94703", "94704"]

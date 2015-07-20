@@ -1,7 +1,10 @@
 __author__ = 'Yin'
-from carbon import getModeCarbonFootprint, carbonFootprintForMode
-from common import Inside_polygon,berkeley_area,getConfirmationModeQuery
-from get_database import get_section_db,get_profile_db
+# Standard imports
+
+# Our imports
+from emission.analysis.result.carbon import getModeCarbonFootprint, carbonFootprintForMode
+from emission.core.common import Inside_polygon,berkeley_area,getConfirmationModeQuery
+from emission.core.get_database import get_section_db,get_profile_db
 
 # Note that all the points here are returned in (lng, lat) format, which is the
 # GeoJSON format.

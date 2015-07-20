@@ -1,22 +1,17 @@
+# Standard imports
 from pymongo import MongoClient
 import logging
 from datetime import datetime
-
 import sys
 import os
-
-# On the server, we've installed miniconda for now, so we are just going to add
-# it to the python path
-sys.path.append("/home/ubuntu/miniconda/lib/python2.7/site-packages/")
-sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
-sys.path.append("%s" % os.getcwd())
-
 import numpy as np
 import scipy as sp
-from featurecalc import calDistance, calSpeed, calHeading, calAvgSpeed, calSpeeds, calAccels, getIthMaxSpeed, getIthMaxAccel, calHCR,\
-calSR, calVCR, mode_cluster, mode_start_end_coverage
 import time
 from datetime import datetime
+
+# Our imports
+import emission.analysis.section_features as easf
+import emission.core.get_database as edb
 
 # We are not going to use the feature matrix for analysis unless we have at
 # least 50 points in the training set. 50 is arbitrary. We could also consider
@@ -32,7 +27,7 @@ class ModeInferencePipeline:
                           "start lat", "start lng", "stop lat", "stop lng",
                           "start hour", "end hour", "close to bus stop", "close to train stop",
                           "close to airport"]
-    self.Sections = MongoClient('localhost').Stage_database.Stage_Sections
+    self.Sections = edb.get_section_db()
 
   def runPipeline(self):
     allConfirmedTripsQuery = ModeInferencePipeline.getSectionQueryWithGroundTruth({'$ne': ''})
@@ -107,7 +102,7 @@ class ModeInferencePipeline:
     logging.debug("Querying stage modes %s" % (datetime.now()))
     begin = time.time()
     modeList = []
-    for mode in MongoClient('localhost').Stage_database.Stage_Modes.find():
+    for mode in edb.get_mode_db().find():
         modeList.append(mode)
         logging.debug(mode)
     duration = time.time() - begin
@@ -130,9 +125,9 @@ class ModeInferencePipeline:
 
   # TODO: Should mode_cluster be in featurecalc or here?
   def generateBusAndTrainStopStep(self):
-    bus_cluster=mode_cluster(5,105,1)
-    train_cluster=mode_cluster(6,600,1)
-    air_cluster=mode_cluster(9,600,1)
+    bus_cluster=easf.mode_cluster(5,105,1)
+    train_cluster=easf.mode_cluster(6,600,1)
+    air_cluster=easf.mode_cluster(9,600,1)
     return (bus_cluster, train_cluster)
 
 # Feature matrix construction
@@ -206,8 +201,8 @@ class ModeInferencePipeline:
       featureMatrix[i, 2] = 0
 
     featureMatrix[i, 3] = section['section_id']
-    featureMatrix[i, 4] = calAvgSpeed(section)
-    speeds = calSpeeds(section)
+    featureMatrix[i, 4] = easf.calAvgSpeed(section)
+    speeds = easf.calSpeeds(section)
     if speeds != None and len(speeds) > 0:
         featureMatrix[i, 5] = np.mean(speeds)
         featureMatrix[i, 6] = np.std(speeds)
@@ -215,16 +210,16 @@ class ModeInferencePipeline:
     else:
         # They will remain zero
         pass
-    accels = calAccels(section)
+    accels = easf.calAccels(section)
     if accels != None and len(accels) > 0:
         featureMatrix[i, 8] = np.max(accels)
     else:
         # They will remain zero
         pass
     featureMatrix[i, 9] = ('commute' in section) and (section['commute'] == 'to' or section['commute'] == 'from')
-    featureMatrix[i, 10] = calHCR(section)
-    featureMatrix[i, 11] = calSR(section)
-    featureMatrix[i, 12] = calVCR(section)
+    featureMatrix[i, 10] = easf.calHCR(section)
+    featureMatrix[i, 11] = easf.calSR(section)
+    featureMatrix[i, 12] = easf.calVCR(section)
     if 'section_start_point' in section and section['section_start_point'] != None:
         startCoords = section['section_start_point']['coordinates']
         featureMatrix[i, 13] = startCoords[0]
@@ -239,11 +234,11 @@ class ModeInferencePipeline:
     featureMatrix[i, 18] = section['section_end_datetime'].time().hour
    
     if (hasattr(self, "bus_cluster")): 
-        featureMatrix[i, 19] = mode_start_end_coverage(section, self.bus_cluster,105)
+        featureMatrix[i, 19] = easf.mode_start_end_coverage(section, self.bus_cluster,105)
     if (hasattr(self, "train_cluster")): 
-        featureMatrix[i, 20] = mode_start_end_coverage(section, self.train_cluster,600)
+        featureMatrix[i, 20] = easf.mode_start_end_coverage(section, self.train_cluster,600)
     if (hasattr(self, "air_cluster")): 
-        featureMatrix[i, 21] = mode_start_end_coverage(section, self.air_cluster,600)
+        featureMatrix[i, 21] = easf.mode_start_end_coverage(section, self.air_cluster,600)
 
     # Replace NaN and inf by zeros so that it doesn't crash later
     featureMatrix[i] = np.nan_to_num(featureMatrix[i])

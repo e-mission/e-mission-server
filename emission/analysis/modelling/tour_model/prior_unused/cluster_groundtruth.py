@@ -2,10 +2,12 @@
 Portions of the pipeline related to defining 
 ground truth for clusters
 """
-
+# Standard imports
 import os, re
-from get_database import get_groundClusters_db, get_routeCluster_db
-from util import get_kml_section_ids
+
+# Our imports
+import emission.core.get_database as edb
+import emission.analysis.modelling.tour_model.prior_unused.util as etmu
 
 def check_named_clusters(path):
     """
@@ -75,10 +77,10 @@ def update_db_with_clusters(user, infile_path):
     ground truth clusters each time the code is run rather than
     inserting new ground truth entries, but we may not even be using this.
     """
-    gc_db = get_groundClusters_db();
+    gc_db = edb.get_groundClusters_db();
     cluster_name = infile_path.split("/")[-1].split(".")[0][:-2]
     cluster_name = "%s_%s" % (user, cluster_name)
-    cluster_sids = get_kml_section_ids(infile_path)
+    cluster_sids = etmu.get_kml_section_ids(infile_path)
     if(gc_db.count() == 0):
         gc_db.insert({"clusters":{}})
     x = gc_db.find_one({"clusters":{"$exists":True}})["clusters"]
@@ -98,7 +100,7 @@ def update_db_with_clusters_dict(user, clusters):
     ground truth clusters each time the code is run rather than
     inserting new ground truth entries, but we may not even be using this.
     """
-    gc_db = get_groundClusters_db();
+    gc_db = edb.get_groundClusters_db();
     assert (clusters != {}), "clusters must be nonempty"
     if(gc_db.count() == 0):
         gc_db.insert({"clusters":{}})

@@ -11,9 +11,8 @@ Roads API
 
 See more on how to enable these here: https://github.com/googlemaps/google-maps-services-python
 """
-import googlemaps
+import emission.net.ext_services.gmaps.googlemaps as googlemaps
 import datetime
-from crontab import CronTab
 import sys
 import os
 
@@ -51,7 +50,7 @@ def schedule_queries(trip_id, user_id, trip_array, immediate=False, stagger=0):
                 time = time + datetime.timedelta(days=1)
                 '''
 
-		cron = CronTab(user=True)
+		cron = crontab.CronTab(user=True)
 		exec_str = "PYTHONPATH=/mnt/e-mission/e-mission-server/CFC_WebApp:/mnt/e-mission/e-mission-server/CFC_DataCollector:. " + python_location + ' ' + query_script_location + ' --trip-id ' + trip_id + ' --user-id ' + str(user_id) + ' >> /tmp/query_pipeline.stdinout 2>&1'
 		job = cron.new(command=exec_str)
 

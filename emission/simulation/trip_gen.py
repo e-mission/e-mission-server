@@ -1,10 +1,12 @@
-from recommender.otp import OTP, PathNotFoundException
-import random, math
-from recommender.trip import Coordinate 
+# Standard imports
 import json
 import datetime
-#from OurGeocoder import ReverseGeocode, Geocode
 from pygeocoder import Geocoder
+import random, math
+
+# Our imports
+from emission.net.ext_services.otp.otp import OTP, PathNotFoundException
+from emission.core.wrapper.trip import Coordinate 
 
 class Address:
 

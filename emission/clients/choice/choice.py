@@ -1,17 +1,22 @@
+# Standard imports
 import logging
-from get_database import get_trip_db, get_section_db
-from main import carbon, common, stats
-from datetime import datetime, time, timedelta
-from dao.user import User
 import math
 import json
 from uuid import UUID
 import time
-from clients.leaderboard import leaderboard
-from clients.gamified import gamified
-from clients.recommendation import recommendation
-from clients.commontrips import commontrips
-from clients.data import data
+from datetime import datetime, time, timedelta
+
+# Our imports
+from emission.core.get_database import get_trip_db, get_section_db
+import emission.analysis.results.carbon as carbon
+import emission.core.common as common
+import emission.net.api.stats as stats
+from emission.core.wrapper.user import User
+from emission.clients.leaderboard import leaderboard
+from emission.clients.gamified import gamified
+from emission.clients.recommendation import recommendation
+from emission.clients.commontrips import commontrips
+from emission.clients.data import data
 
 # TODO: Consider subclassing to provide client specific user functions
 def setCurrView(uuid, newView):

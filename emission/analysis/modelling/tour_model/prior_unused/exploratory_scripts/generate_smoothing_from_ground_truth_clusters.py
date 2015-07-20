@@ -1,7 +1,10 @@
-import main.mode.truth_pipeline as tp
-from get_database import get_section_db
-import main.gmap_display as mgp
+# Standard imports
 import logging
+
+# Our imports
+import emission.analysis.modelling.tour_model.prior_unused.truth_pipeline as tp
+import emission.core.get_database as edb
+import main.gmap_display as mgp
 
 def make_original(s):
     s1 = s.copy()
@@ -67,9 +70,9 @@ def generate_cluster_comparison(sID_list, outPath):
 clusterDict = tp.__read_user_clusters_text("shankari", "/Users/shankari/cluster_ground_truth/ground_truthed_clusters/manual_ground_truths")
 caltrainSID = clusterDict["shankari_mtn_view_to_millbrae"]
 print "Found %d sections in ground truth" % len(caltrainSID)
-caltrainSIDInDb = [s for s in caltrainSID if get_section_db().find({'_id': s}).count() == 1]
+caltrainSIDInDb = [s for s in caltrainSID if edb.get_section_db().find({'_id': s}).count() == 1]
 print "Found %d ground truthed sections in DB" % len(caltrainSIDInDb)
 
-caltrainSectionsInDb = [get_section_db().find_one({"_id": sid}) for sid in caltrainSIDInDb]
+caltrainSectionsInDb = [edb.get_section_db().find_one({"_id": sid}) for sid in caltrainSIDInDb]
 generate_cluster_comparison(caltrainSectionsInDb, "/tmp")
 

@@ -1,12 +1,10 @@
-from dao.user import User
+# Standard imports
 import json 
-
 import sys, os, random
-
-# This is in here so the pygmaps associated functions can be imported 
-# from the webapp
-# sys.path.append("%s/../../CFC_WebApp/" % os.getcwd())
 from uuid import UUID 
+
+# Our imports
+import emission.core.wrapper.user import User
     
 def getUserTour(user_uuid):
     """

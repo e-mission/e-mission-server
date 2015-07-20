@@ -1,21 +1,17 @@
-from __future__ import division
+# Standard imports
 import numpy as np
-from pymongo import MongoClient
 import random
-from uuid import UUID
-from pygeocoder import Geocoder
-from route_matching import *
-from DTW import Dtw
-from common import calDistance
-from matplotlib import pyplot as plt
 
+# Our imports
+import emission.analysis.modelling.tour_model.trajectory_matching as etm
+import emission.core.common as ec
 
 def user_data(user_id, database):
     data_feature = {}
 
     for section in database.find({'$and':[{'user_id': user_id},{'type': 'move'}]}):
         if len(section['track_points'])< 153:
-            data_feature[section['_id']] = getRoute(section['_id'])
+            data_feature[section['_id']] = etm.route_matching.getRoute(section['_id'])
 
     return data_feature
 
@@ -32,7 +28,7 @@ def update_dtw(data_feature, DTW):
                 DTW[_id][key]
                 DTW[key][_id]
             except KeyError:
-                value = Dtw(data_feature[_id], data_feature[key], calDistance)
+                value = etm.DTW.Dtw(data_feature[_id], data_feature[key], ec.calDistance)
                 value = value.calculate()/len(value.get_path())
                 DTW[_id][key] = value
                 DTW[key][_id] = value

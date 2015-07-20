@@ -1,23 +1,16 @@
+# Standard imports
 import logging
 from dateutil import parser
 import json
 from get_database import get_mode_db, get_section_db
 from datetime import datetime, timedelta
-from userclient import getClientSpecificQueryFilter
-from common import calDistance, travel_time
-import stats
 import time
 
-# TODO: Argh! Until now, we just had the data collector import the webapp.
-# Now we have the webapp import the data collector. This badly needs
-# restructuring.
-import sys
-import os
-
-sys.path.append("%s" % os.getcwd())
-sys.path.append("%s/../CFC_DataCollector/moves" % os.getcwd())
-
-import collect
+# Our imports
+from emission.analysis.results.userclient import getClientSpecificQueryFilter
+from emission.core.common import calDistance, travel_time
+import stats
+import emission.net.ext_services.moves.collect as collect
 
 def max_Distance(points):
     # 'track_points':[{'track_location':{'type':'Point', 'coordinates':[point["lat"],point["lon"]]}, 'time':point["time"]}for point in seg_act_note["trackPoints"]] if "trackPoints" in seg_act_note else []}

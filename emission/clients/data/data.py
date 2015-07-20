@@ -1,9 +1,13 @@
+# Standard imports
 import logging
-from main import carbon, stats
-from dao.user import User
 import time as systime
 from datetime import datetime, time, timedelta
 import json
+
+# Our imports
+import emission.analysis.results.carbon as carbon
+import emission.net.api.stats as stats
+from emission.core.wrapper.user import User
 
 # BEGIN: Code to get and set client specific fields in the profile (currentScore and previousScore)
 def getCarbonFootprint(user):

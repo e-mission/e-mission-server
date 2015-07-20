@@ -43,11 +43,13 @@ For each of the representative trips, open them in MyMaps, and then adjust, add,
 * Maps will then be created of for each of these modified sections that compare the original section with its ground truth. If any issues are observed, then they can be modified and this importing process can be repeated.
 
 """
+# Standard imports
 import os, sys, random
-sys.path.append("%s/../" % os.getcwd())
-from get_database import get_section_db, get_routeCluster_db, get_groundClusters_db
-from util import sections_to_kml, chunks, kml_multiple_to_geojson, get_kml_section_ids, read_uuids
-from cluster_groundtruth import check_named_clusters, update_db_with_clusters, check_cluster_textfile, update_db_with_clusters_dict
+
+# Our imports
+import emission.core.get_database as edb
+import emission.analysis.modelling.tour_model.prior_unused.util as eaut
+import emission.analysis.modelling.tour_model.prior_unused.cluster_groundtruth as eacg
 
 def update_route_clusters(user):
     from Profile import generate_route_clusters
@@ -62,16 +64,16 @@ def cluster_to_kml(user, cluster, cluster_id):
 
     Responsibilty of caller to check existence and formatting of cluster 
     """ 
-    Sections = get_section_db()
-    for i,chunk in enumerate(chunks(cluster,10)):    
+    Sections = edb.get_section_db()
+    for i,chunk in enumerate(eaut.chunks(cluster,10)):    
         sections = map(lambda section_id: Sections.find_one({'_id':section_id}), chunk)
-        sections_to_kml("%s_cluster_data_kml/CLUSTER_%s_%i" % (user, str(cluster_id), i), sections)
+        eaut.sections_to_kml("%s_cluster_data_kml/CLUSTER_%s_%i" % (user, str(cluster_id), i), sections)
         
 def all_user_clusters_to_kml(user, user_id):
     """
     Creates KML files for all of a given user's clusters
     """
-    user_clusters = get_routeCluster_db().find_one({'$and':[{'user':user_id},{'method':"dtw"}]})
+    user_clusters = edb.get_routeCluster_db().find_one({'$and':[{'user':user_id},{'method':"dtw"}]})
     num_clusters = len(user_clusters['clusters'].items())
 
     print("Writing " + str(num_clusters) + " clusters to disk for " + user + ".")
@@ -98,13 +100,13 @@ def __read_user_clusters_kml(user):
     current directory
     """
     path = os.path.join(os.getcwd(), "%s_clusters_cleaned" % user)
-    success, message = check_named_clusters(path)
+    success, message = eacg.check_named_clusters(path)
     if not success:
         exit(message)
     print message
     for kml in os.listdir(path):
         infile_path = os.path.join(path, kml)
-        update_db_with_clusters(user, infile_path)
+        eacg.update_db_with_clusters(user, infile_path)
 
 def __read_user_clusters_text(user, path):
     """
@@ -118,7 +120,7 @@ def __read_user_clusters_text(user, path):
     trip_name_2:
     ...    
     """
-    check_cluster_textfile(path)
+    eacg.check_cluster_textfile(path)
     cluster_file = open(path, "r")
     clusters = {}
     for l in cluster_file:
@@ -149,18 +151,18 @@ def __read_and_update_clusters_text(user):
     """
     path = os.path.join(os.getcwd(), "%s_cleaned_clusters.txt" % user)
     clusters = _read_user_clusters_text(user, path)
-    update_db_with_clusters_dict(user, clusters)
+    eacg.update_db_with_clusters_dict(user, clusters)
 
 def __import_truth(user, user_id):
     directory = "%s_cluster_data_kml" % user
     for cluster in os.listdir(directory):
         path = os.path.join(directory,cluster)
-        kml_multiple_to_geojson(path, "%s_import_data_json" % user)
+        eaut.kml_multiple_to_geojson(path, "%s_import_data_json" % user)
 
 if __name__ == "__main__":
     import argparse
     from uuid import UUID
-    user_uuid = read_uuids()
+    user_uuid = eaut.read_uuids()
     parser = argparse.ArgumentParser(description='Ground truth')
     parser.add_argument('user', metavar='U', type=str, choices=user_uuid.keys(), 
                         help='Type a user you want to ground truth')

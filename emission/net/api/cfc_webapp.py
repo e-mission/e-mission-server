@@ -1,7 +1,7 @@
+# Standard imports
 import json
 from random import randrange
 from bottle import route, post, get, run, template, static_file, request, app, HTTPError, SimpleTemplate, abort, BaseRequest
-# import import_my_lib
 # To support dynamic loading of client-specific libraries
 import sys
 import os
@@ -20,7 +20,21 @@ import traceback
 import xmltodict
 import urllib2
 
-config_file = open('config.json')
+# Our imports
+import modeshare, zipcode, distance, tripManager, \
+                 Berkeley, visualize, stats, usercache
+import emission.net.ext_services.moves.register as auth
+import emission.analysis.results.carbon as carbon
+import emission.analysis.classification.inference.commute as commute
+import emission.analysis.modelling.work_time as work_time
+import emission.analysis.results.userclient as userclient
+import emission.core.common as common
+from emission.core.wrapper.client import Client
+from emission.core.wrapper.user import User
+from emission.core.get_database import get_uuid_db, get_mode_db
+
+
+config_file = open('conf/net/api/webserver.conf')
 config_data = json.load(config_file)
 static_path = config_data["paths"]["static_path"]
 python_path = config_data["paths"]["python_path"]
@@ -40,6 +54,8 @@ BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes
 
 skipAuth = False
+logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
+                  filename=config_data["paths"]["log_file"], level=logging.DEBUG)
 
 app = app()
 
@@ -49,18 +65,6 @@ app = app()
 # we run from the CFC_WebApp directory. Let's make sure to manually add it to
 # the python path so that we can keep our separation between the main code and
 # the webapp layer
-print("old path is %s" % sys.path)
-sys.path.append(os.getcwd())
-print("new path is %s" % sys.path)
-
-logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
-                  filename=config_data["paths"]["log_file"], level=logging.DEBUG)
-
-from main import modeshare, zipcode, distance, tripManager, auth,\
-                 carbon, commute, work_time, Berkeley, common, visualize, stats, userclient, usercache
-from dao.client import Client
-from dao.user import User
-from get_database import get_uuid_db, get_mode_db
 
 #Simple path that serves up a static landing page with javascript in it
 @route('/')

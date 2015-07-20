@@ -1,4 +1,4 @@
-from get_database import get_section_db
+# Standard imports
 import json
 import logging
 import numpy as np

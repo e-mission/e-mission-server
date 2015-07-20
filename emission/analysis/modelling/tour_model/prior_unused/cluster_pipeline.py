@@ -1,19 +1,20 @@
+# Standard imports
 import os, sys
-sys.path.append("%s/../" % os.getcwd())
-
-from route_matching import update_user_routeDistanceMatrix, update_user_routeClusters
-from K_medoid_2 import kmedoids, user_route_data
 import math
-from get_database import get_section_db,get_profile_db, get_groundClusters_db, get_routeCluster_db
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 import pygmaps 
 from sklearn.cluster import KMeans
 from sklearn import manifold
-from route_matching import getRoute
-from util import read_uuids
+import matplotlib.pyplot as plt
+
+# Our imports
+import emission.analysis.modelling.tour_model.prior_unused.route_matching as etmr
+import emission.analysis.modelling.tour_model.kmedoid as emkm
+import emission.core.get_database as edb
+import emission.analysis.modelling.tour_model.trajectory_matching.route_matching as eart
+import emission.analysis.modelling.tour_model.trajectory_matching.prior_unused.util as eaut
 
 
 """
@@ -67,22 +68,22 @@ def evaluate_clusters():
 
 
 def get_user_sections(user_id):
-    sections = list(get_section_db().find({'$and':[{'user_id': user_id},{'type': 'move'}]}))
+    sections = list(edb.get_section_db().find({'$and':[{'user_id': user_id},{'type': 'move'}]}))
     return sections
 
 def get_user_disMat(user, method, is_ground_truth=False):
     ## update route clusters:
     print "Generating route clusters for %s" % user
     if is_ground_truth:
-        cluster_section_ids = get_ground_truth_sections(user)
-        routes_user = user_route_data2(cluster_section_ids)
-        user_disMat = update_user_routeDistanceMatrix(str(user) + '_ground_truth',routes_user,step1=100000,step2=100000,method=method)
+        cluster_section_ids = edb.get_ground_truth_sections(user)
+        routes_user = emkm.user_route_data2(cluster_section_ids)
+        user_disMat = etmr.update_user_routeDistanceMatrix(str(user) + '_ground_truth',routes_user,step1=100000,step2=100000,method=method)
 
     else:
-        routes_user = user_route_data(user,get_section_db())
+        routes_user = user_route_data(user,edb.get_section_db())
         #print(routes_user)
 
-        user_disMat = update_user_routeDistanceMatrix(user,routes_user,step1=100000,step2=100000,method=method)
+        user_disMat = etmr.update_user_routeDistanceMatrix(user,routes_user,step1=100000,step2=100000,method=method)
         print(type(user_disMat))
     return user_disMat
 
@@ -90,11 +91,11 @@ def get_user_clusters(user, method, nClusters, is_ground_truth=False):
     if is_ground_truth:
         routes_user = user_route_data2(user)
     else:
-        routes_user = user_route_data(user,get_section_db())
+        routes_user = user_route_data(user,edb.get_section_db())
 
     if nClusters == -1:
         nClusters = int(math.ceil(len(routes_user)/8) + 1)
-    clusters_user = kmedoids(routes_user,nClusters,user,method=method)
+    clusters_user = emkm.kmedoids(routes_user,nClusters,user,method=method)
     #update_user_routeClusters(user,clusters_user[2],method=method)
     return clusters_user
 
@@ -102,7 +103,7 @@ def get_user_clusters(user, method, nClusters, is_ground_truth=False):
 
 def get_user_list():
 
-    user_list = get_section_db().distinct('user_id')
+    user_list = edb.get_section_db().distinct('user_id')
     return user_list
 
 def plot_cluster_trajectories():
@@ -254,7 +255,7 @@ def user_route_data2(section_ids):
     # for section in database.find({'$and':[{'user_id': user_id},{'type': 'move'},{'confirmed_mode': {'$ne': ''}}]}):
     for _id in section_ids:
         try:
-            data_feature[_id] = getRoute(_id)
+            data_feature[_id] = eart.getRoute(_id)
         except Exception as e:
             pass
     #print(data_feature.keys())
@@ -267,7 +268,7 @@ def user_route_data2(section_ids):
 
 #user_list = get_user_list()
 
-user_uuid = read_uuids()
+user_uuid = eaut.read_uuids()
 if len(sys.argv) == 2:
     user_id = user_uuid[sys.argv[1]]
 
@@ -299,7 +300,7 @@ def get_ground_truth_sections(username, section_collection):
     """
     Returns all of the routes associated with a username's ground truthed sections
     """
-    ground_cluster_collection = get_groundClusters_db()
+    ground_cluster_collection = edb.get_groundClusters_db()
     clusters = ground_cluster_collection.find_one({"clusters":{"$exists":True}})["clusters"]
     ground_truth_sections = []
     get_username = lambda x: x[0].split("_")[0]

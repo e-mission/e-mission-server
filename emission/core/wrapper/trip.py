@@ -1,12 +1,14 @@
 #maps team provided get_cost function
-#from common.featurecalc import get_cost
+
+# Standard imports
 import datetime
-from get_database import *
 import sys
 import os
-sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
-from main import common as cm
 import logging
+
+# Our imports
+import emission.core.get_database as edb
+import emission.core.common as cm
 
 DATE_FORMAT = "%Y%m%dT%H%M%S-%W00"
 
@@ -64,7 +66,7 @@ class Trip(object):
     @classmethod
     def _init_sections(cls, user_id, trip_id, num_sections):
         sections = []
-        db = get_section_db()
+        db = edb.get_section_db()
         json_object = db.find({'user_id': user_id, 'trip_id' : trip_id}, limit = num_sections)
         for section_json in json_object:
             sections.append(Section.section_from_json(section_json))
@@ -119,15 +121,15 @@ class Section(object):
         # However, we don't actually have any sections that would use the
         # fallback, and our current code always parses the section times before
         # storing to the database, so the complexity is not needed
-        # In [311]: get_section_db().find({'section_start_datetime': {'$exists': False}}).count()
+        # In [311]: edb.get_section_db().find({'section_start_datetime': {'$exists': False}}).count()
         # Out[311]: 0
-        # In [312]: get_section_db().find({'section_start_datetime': {'$exists': True}}).count()
+        # In [312]: edb.get_section_db().find({'section_start_datetime': {'$exists': True}}).count()
         # Out[312]: 97671
-        # In [313]: get_section_db().find({'section_end_datetime': {'$exists': False}}).count()
+        # In [313]: edb.get_section_db().find({'section_end_datetime': {'$exists': False}}).count()
         # Out[313]: 0
-        # In [314]: get_section_db().find({'section_end_datetime': {'$exists': True}}).count()
+        # In [314]: edb.get_section_db().find({'section_end_datetime': {'$exists': True}}).count()
         # Out[314]: 97671
-        # In [315]: get_section_db().find().count()
+        # In [315]: edb.get_section_db().find().count()
         # Out[315]: 97671
 
         start_time = cls._get_datetime(json_segment, "section_start_datetime")
@@ -159,7 +161,7 @@ class Section(object):
             return None
 
     def save_to_db(self):
-        db = get_section_db()
+        db = edb.get_section_db()
         db.update({"_id": self._id},
                       {"$set": {"distance" : self.distance, "mode" : self.mode, "confirmed_mode" : self.confirmed_mode}},
                        upsert=False, multi=False)
@@ -194,7 +196,7 @@ class E_Mission_Trip(Trip):
     @classmethod
     def _init_alternatives(self, user_id, trip_id, num_alternatives):
         alternatives = []
-        db = get_alternatives_db()
+        db = edb.get_alternatives_db()
         json_object = db.find({'user_id' : user_id, 'trip_id' : trip_id}, limit = num_alternatives)
         for alternative_json in json_object:
             alternatives.append(Alternative_Trip(alternative_json))
@@ -203,7 +205,7 @@ class E_Mission_Trip(Trip):
     @classmethod
     def _init_perturbed(self, user_id, trip_id, num_perturbed):
         perturbed = []
-        db = get_perturbed_db()
+        db = edb.get_perturbed_db()
         json_object = db.find({'user_id' : user_id, 'trip_id' : trip_id}, limit = num_perturbed)
         for perturbed_json in json_object:
             perturbed.append(Perturbed_Trip(perturbed_json))
@@ -235,7 +237,7 @@ class E_Mission_Trip(Trip):
             return mode_set.pop()
 
     def mark_recommended(self, alternative):
-        db = get_trip_db()
+        db = edb.get_trip_db()
         '''
         point_list = []
         for section in self.sections:
@@ -255,7 +257,7 @@ class E_Mission_Trip(Trip):
                        upsert=False,multi=False)
 
     def save_to_db(self):
-        db = get_trip_db()
+        db = edb.get_trip_db()
         result = db.update({"_id": self._id},
                       {"$set": {"mode" : self.mode_list, "confirmed_mode" : self.confirmed_mode_list}},
                        upsert=False,multi=False)
@@ -306,7 +308,7 @@ class Canonical_E_Mission_Trip(E_Mission_Trip):
                    start_time_distr, end_time_distr, confirmed_mode_list)
 
     def save_to_db(self):
-        db = get_canonical_trips_db()
+        db = edb.get_canonical_trips_db()
         result = db.update({"_id": self._id},
                 {"$set": {"start_point_distr" : self.start_point_distr, "end_point_distr" : self.end_point_distr, "start_time_distr": self.start_time_distr,
                     "end_time_distr": self.end_time_distr}},
@@ -365,7 +367,7 @@ class Alternative_Trip(Trip):
 
     '''
     def mark_recommended(self):
-        db = get_alternatives_db()
+        db = edb.get_alternatives_db()
         #Unique key is combination of trip, user, and mode. Only one alternative per mode
         result = db.update({"trip_id": self.trip_id, "user_id": self.user_id, "mode_list":self.mode_list},
                       {"$set": {"recommended" : True}},
@@ -373,7 +375,7 @@ class Alternative_Trip(Trip):
     '''
 
     def save_to_db(self):
-        db = get_alternatives_db()
+        db = edb.get_alternatives_db()
         #Unique key is combination of trip, user, and mode. Only one alternative per mode
         result = db.update({"trip_id": self.trip_id, "user_id": self.user_id, "mode_list":self.mode_list},
                       {"$set": {"cost" : self.cost}},
@@ -402,7 +404,7 @@ class Fake_Trip(Trip):
         super(self.__class__, self).__init__(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location)
     
     def save_to_db(self):
-        db = get_fake_trips_db()
+        db = edb.get_fake_trips_db()
         print "trip start loc is %s" % self.trip_start_location
         print "trip end loc is %s" % self.trip_end_location 
         db.insert({"trip_id" : self._id, "trip_start_location" : self.trip_start_location.coordinate_list(), 
@@ -435,7 +437,7 @@ class PipelineFlags(object):
         self.alternativesFinished = True
 
     def loadPipelineFlags(self, _id):
-        db = get_trip_db()
+        db = edb.get_trip_db()
         json_object = db.find_one({'_id': _id})
         if json_object:
             tf = json_object.get('pipelineFlags')
@@ -446,7 +448,7 @@ class PipelineFlags(object):
                     self.alternativesFinished = True
 
     def savePipelineFlags(self):
-        db = get_trip_db()
+        db = edb.get_trip_db()
         db.update({"_id": self._id},
                       {"$set": {"pipelineFlags" : {'alternativesStarted': self.alternativesStarted, 'alternativesFinished': self.alternativesFinished}}},
                        multi=False, upsert=False)

@@ -1,13 +1,12 @@
+# Standard imports
 import logging
-
 import sys
 import os
 
-sys.path.append("%s" % os.getcwd())
-sys.path.append("%s/../CFC_WebApp/" % os.getcwd())
+# Our imports
 
-from get_database import get_uuid_db
-from main import userclient
+from emission.core.get_database import get_uuid_db
+from emission.analysis.results.userclient as userclient
 
 class PrecomputeResults:
     def __init__(self):
