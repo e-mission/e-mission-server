@@ -8,7 +8,7 @@ import datetime as pydt
 import emission.analysis.modelling.tour_model.prior_unused.truth_pipeline as tp
 import emission.core.get_database as edb
 import emission.analysis.section_features as fc
-import emission.plotting.gmap_display as mgp
+import emission.plotting.gmaps.gmap_display as mgp
 import emission.analysis.modelling.tour_model.prior_unused.exploratory_scripts.generate_smoothing_from_ground_truth_clusters as gsfgtc
 
 query = {'type': 'move',
