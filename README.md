@@ -202,5 +202,18 @@ uninstall and reinstall with the --update option.
     $ pip uninstall google-api-python-client
     $ pip install --upgrade google-api-python-client
 
+If you are running the server on shared, cloud infrastructure such as AWS, then
+note that the data is accessible by AWS admins by directly looking at the disk.
+In order to avoid this, you want to encrypt the disk. You can do this by:
+- using an encrypted EBS store, but this doesn't appear to allow you to specify
+  your own encryption key
+- using a normal drive that is encrypted using cryptfs (http://sleepyhead.de/howto/?href=cryptpart, https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_a_non-root_file_system)
+
+In either of these cases, you need to reconfigure mongod.conf to point to data
+and log directories in the encrypted volume.
+
+directly
+reconfigure mongod.conf to point to 
+
 [CFC_WebApp_Structure]: https://raw.github.com/amplab/e-mission-server/master/figs/CFC_WebApp_Structure.png
 [CFC_DataCollector_Structure]: https://raw.github.com/amplab/e-mission-server/master/figs/CFC_DataCollector_Structure.png

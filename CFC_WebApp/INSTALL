@@ -1,4 +1,0 @@
-Install mongodb following instructions from here:
-http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
-
-Reconfigure mongod.conf to point to data and log directories in the encrypted volume.
