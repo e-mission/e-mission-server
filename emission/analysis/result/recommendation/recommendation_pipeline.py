@@ -10,7 +10,7 @@ from emission.analysis.modelling.user_model.emissions_model import EmissionsMode
 from emission.analysis.modelling.user_model.simple_cost_time_mode_model import SimpleCostTimeModeModel
 import emission.core.wrapper.tripiterator as ti
 import emission.core.wrapper.trip as t
-from emission.core.common import get_uuid_list, get_recommender_uuid_list
+from emission.net.ext_service.gmaps.common import get_uuid_list, get_recommender_uuid_list
 import emission.analysis.modelling.user_model.alternative_trips_module as atm
 
 class RecommendationPipeline:

@@ -6,24 +6,26 @@ import mock
 from uuid import UUID
 
 # Our imports
-import emission.core.get_database
-import tests.common
+import emission.core.get_database as get_database
+import emission.tests.common
 from emission.core import common
 from datetime import datetime, timedelta
+from emission.core.wrapper.user import User
+from emission.core.wrapper.client import Client
 
 logging.basicConfig(level=logging.DEBUG)
 
 class TestCommon(unittest.TestCase):
   def setUp(self):
-    import tests.common
+    import emission.tests.common
 
     self.serverName = 'localhost'
 
     # Make sure we start with a clean slate every time
-    tests.common.dropAllCollections(get_database.get_db())
+    emission.tests.common.dropAllCollections(get_database.get_db())
     
     # Load modes, otherwise the queries won't work properly
-    tests.common.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
+    emission.tests.common.loadTable(self.serverName, "Stage_Modes", "emission/tests/data/modes.json")
     self.dayago = datetime.now() - timedelta(days=1)
     self.now = datetime.now()
 
@@ -71,15 +73,12 @@ class TestCommon(unittest.TestCase):
   def setupClientTest(self):
     # At this point, the more important test is to execute the query and see
     # how well it works
-    from dao.user import User
-    from dao.client import Client
-    import tests.common
 
     fakeEmail = "fake@fake.com"
 
     client = Client("testclient")
     client.update(createKey = False)
-    tests.common.makeValid(client)
+    emission.tests.common.makeValid(client)
 
     (resultPre, resultReg) = client.preRegister("this_is_the_super_secret_id", fakeEmail)
     studyList = Client.getPendingClientRegs(fakeEmail)
@@ -89,7 +88,7 @@ class TestCommon(unittest.TestCase):
     self.assertEqual(user.getFirstStudy(), 'testclient')
 
     dummyPredModeMap = {'walking': 1.0}
-    dummySection = tests.common.createDummySection(
+    dummySection = emission.tests.common.createDummySection(
         startTime = datetime.now() - timedelta(seconds = 60 * 60),
         endTime = datetime.now(),
         startLoc = [-122, 34],
@@ -99,8 +98,6 @@ class TestCommon(unittest.TestCase):
 
 
   def testConfirmationModeQueryAutoNoManual(self):
-    from dao.client import Client
-
     (user, dummySection, dummyPredModeMap) = self.setupClientTest()
     clientSetQuery = Client(user.getFirstStudy()).clientSpecificSetters(user.uuid, dummySection, dummyPredModeMap)
 
@@ -115,8 +112,6 @@ class TestCommon(unittest.TestCase):
     self.assertEqual(retrieveByQuery.count(), 1)
 
   def testConfirmationModeQueryManualAndAuto(self):
-    from dao.client import Client
-
     (user, dummySection, dummyPredModeMap) = self.setupClientTest()
     clientSetQuery = Client(user.getFirstStudy()).clientSpecificSetters(user.uuid, dummySection, dummyPredModeMap)
 
@@ -138,8 +133,6 @@ class TestCommon(unittest.TestCase):
     self.assertEqual(retrieveByQuery.count(), 1)
 
   def testConfirmationModeQueryCorrectedManualAndAuto(self):
-    from dao.client import Client
-
     (user, dummySection, dummyPredModeMap) = self.setupClientTest()
     clientSetQuery = Client(user.getFirstStudy()).clientSpecificSetters(user.uuid, dummySection, dummyPredModeMap)
 
@@ -167,8 +160,6 @@ class TestCommon(unittest.TestCase):
     self.assertEqual(retrieveByQuery.count(), 1)
 
   def testConfirmationModeQueryManualNotAuto(self):
-    from dao.client import Client
-
     (user, dummySection, dummyPredModeMap) = self.setupClientTest()
     get_database.get_section_db().update({'_id': dummySection['_id']}, {'$set': {'confirmed_mode': 4}})
 
@@ -179,8 +170,6 @@ class TestCommon(unittest.TestCase):
     self.assertEqual(retrieveByQuery.count(), 1)
 
   def testConfirmationModeQueryNeither(self):
-    from dao.client import Client
-
     (user, dummySection, dummyPredModeMap) = self.setupClientTest()
     retrieveByQuery = get_database.get_section_db().find(common.getConfirmationModeQuery(1))
     self.assertEqual(retrieveByQuery.count(), 0)
@@ -190,9 +179,9 @@ class TestCommon(unittest.TestCase):
 
   @staticmethod
   def getDummySection(predictedMode, confirmedMode):
-    import tests.common
+    import emission.tests.common
 
-    return tests.common.createDummySection(
+    return emission.tests.common.createDummySection(
             datetime.now()+timedelta(hours = -1),
             datetime.now(),
             [1, -1], [-1, 1], predictedMode, confirmedMode)
@@ -276,9 +265,9 @@ class TestCommon(unittest.TestCase):
     # same as the get_database loaded here.
     # So I will leave this half-baked test in here, and will return to it after
     # fixing the mess around get_database loading
-    with mock.patch('get_database.get_section_db', side_effect=Exception("bson.errors.InvalidDocument")) as func1:
+    with mock.patch('emission.core.get_database.get_section_db', side_effect=Exception("bson.errors.InvalidDocument")) as func1:
         try:
-            get_database.get_section_db()
+            emission.core.get_database.get_section_db()
         except:
             print "Exception thrown!"
         # although the database was called

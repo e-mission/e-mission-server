@@ -3,12 +3,12 @@ import logging
 import math
 import json
 from uuid import UUID
+from datetime import datetime, timedelta
 import time
-from datetime import datetime, time, timedelta
 
 # Our imports
 from emission.core.get_database import get_trip_db, get_section_db
-import emission.analysis.results.carbon as carbon
+import emission.analysis.result.carbon as carbon
 import emission.core.common as common
 import emission.net.api.stats as stats
 from emission.core.wrapper.user import User

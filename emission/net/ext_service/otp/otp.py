@@ -8,7 +8,7 @@ from pygeocoder import Geocoder
 
 # Our imports
 from emission.core.wrapper.trip import Coordinate, Alternative_Trip, Section, Fake_Trip
-from emission.core.common import calc_car_cost
+from emission.net.ext_service.gmaps.common import calc_car_cost
 
 try:
     import json

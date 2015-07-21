@@ -4,7 +4,7 @@ import sys, os, random
 from uuid import UUID 
 
 # Our imports
-import emission.core.wrapper.user import User
+from emission.core.wrapper.user import User
     
 def getUserTour(user_uuid):
     """

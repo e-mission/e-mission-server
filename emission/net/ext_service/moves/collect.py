@@ -11,10 +11,10 @@ from sklearn import linear_model
 import math
 
 # Our imports
-from emission.net.ext_services.modes.sdk import Moves
+from sdk import Moves
 from emission.core.get_database import get_mode_db, get_section_db, get_trip_db, get_moves_db
 
-config_data = json.load(open('config.json'))
+config_data = json.load(open('conf/net/api/webserver.conf'))
 log_base_dir = config_data['paths']['log_base_dir']
 logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
                     filename="%s/moves_collect.log" % log_base_dir, level=logging.DEBUG)

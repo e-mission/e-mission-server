@@ -1,14 +1,14 @@
 # Standard imports
 import logging
 from datetime import datetime, timedelta
+from uuid import UUID
 
 # Our imports
 import emission.net.api.distance as distance
 # from get_database import get_user_db
-from dao.user import User
-from common import getDistinctUserCount, getAllModes, getDisplayModes, getQuerySpec, addFilterToSpec, getTripCountForMode, getModeShare, getDistanceForMode,\
+from emission.core.wrapper.user import User
+from emission.core.common import getDistinctUserCount, getAllModes, getDisplayModes, getQuerySpec, addFilterToSpec, getTripCountForMode, getModeShare, getDistanceForMode,\
     getModeShareDistance, convertToAvg
-from uuid import UUID
 
 # Although air is a motorized mode, we don't include it here because there is
 # not much point in finding < 5 km air trips to convert to non motorized trips

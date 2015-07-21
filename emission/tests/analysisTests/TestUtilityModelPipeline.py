@@ -4,17 +4,15 @@ import json
 #from main import tripManager
 from pymongo import MongoClient
 import logging
-from get_database import get_db, get_mode_db, get_section_db, get_trip_db
-import re
 from datetime import datetime, timedelta
 
 # Our imports
+from emission.core.get_database import get_db, get_mode_db, get_section_db, get_trip_db
 from emission.analysis.modelling.user_model.utility_model_pipeline import UtilityModelPipeline
 from emission.analysis.modelling.user_model.user_utility_model import UserUtilityModel
 from emission.core.wrapper.user import User
 from emission.core.wrapper.client import Client
-from emission.net.ext_services.moves import collect
-import tests.common
+from emission.net.ext_service.moves import collect
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -38,14 +36,14 @@ class TestUtilityModelPipeline(unittest.TestCase):
 
     self.assertEquals(self.ModesColl.find().count(), 0)
 
-    dataJSON = json.load(open("tests/data/modes.json"))
+    dataJSON = json.load(open("emission/tests/data/modes.json"))
     for row in dataJSON:
       self.ModesColl.insert(row)
     
     #TODO: add many trip filter functions to play with
     self.trip_filters = None
 
-    result = self.loadTestJSON("tests/data/missing_trip")
+    result = self.loadTestJSON("emission/tests/data/missing_trip")
     collect.processResult(self.testUUID, result)
     self.pipeline = UtilityModelPipeline()
 

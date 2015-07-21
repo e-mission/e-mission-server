@@ -7,9 +7,10 @@ from datetime import datetime, timedelta
 # Our imports
 from emission.core.wrapper.user import User
 from emission.core.wrapper.client import Client
-import tests.common
+import emission.tests.common
 from emission.core.get_database import get_db, get_mode_db, get_section_db, get_trip_db
 from emission.net.api import tripManager
+from emission.core.wrapper.user import User
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -21,7 +22,7 @@ class TestTripManager(unittest.TestCase):
 
     # Sometimes, we may have entries left behind in the database if one of the tests failed
     # or threw an exception, so let us start by cleaning up all entries
-    tests.common.dropAllCollections(get_db())
+    emission.tests.common.dropAllCollections(get_db())
     self.ModesColl = get_mode_db()
     # self.ModesColl.remove()
     self.assertEquals(self.ModesColl.find().count(), 0)
@@ -30,8 +31,8 @@ class TestTripManager(unittest.TestCase):
     # self.SectionsColl.remove()
     self.assertEquals(self.SectionsColl.find().count(), 0)
 
-    tests.common.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
-    tests.common.loadTable(self.serverName, "Stage_Sections", "tests/data/testCarbonFile")
+    emission.tests.common.loadTable(self.serverName, "Stage_Modes", "emission/tests/data/modes.json")
+    emission.tests.common.loadTable(self.serverName, "Stage_Sections", "emission/tests/data/testCarbonFile")
 
     # Let's make sure that the users are registered so that they have profiles
     for userEmail in self.testUsers:
@@ -44,11 +45,11 @@ class TestTripManager(unittest.TestCase):
     self.now = datetime.now()
     self.dayago = self.now - timedelta(days=1)
     self.weekago = self.now - timedelta(weeks = 1)
-    tests.common.updateSections(self)
+    emission.tests.common.updateSections(self)
 
   def tearDown(self):
     for testUser in self.testUsers:
-      tests.common.purgeSectionData(get_section_db(), testUser)
+      emission.tests.common.purgeSectionData(get_section_db(), testUser)
     self.ModesColl.remove()
     self.assertEquals(self.ModesColl.find().count(), 0)
 
@@ -83,13 +84,12 @@ class TestTripManager(unittest.TestCase):
     self.assertEqual(queriedUnclassifiedSections.count(), 2)
 
   def testQueryUnclassifiedSectionsLowConfidence(self):
-    from dao.user import User
 
     fakeEmail = "fest@example.com"
 
     client = Client("testclient")
     client.update(createKey = False)
-    tests.common.makeValid(client)
+    emission.tests.common.makeValid(client)
 
     (resultPre, resultReg) = client.preRegister("this_is_the_super_secret_id", fakeEmail)
     self.assertEqual(resultPre, 0)
@@ -107,7 +107,7 @@ class TestTripManager(unittest.TestCase):
       self.SectionsColl.update({'_id': section['_id']}, {'test_auto_confirmed': {'mode': section['mode'], 'prob': 0.95}})
 
     # Now, set the update timestamp to two weeks ago so that we will start filtering
-    tests.common.updateUserCreateTime(user.uuid)
+    emission.tests.common.updateUserCreateTime(user.uuid)
     queriedUnclassifiedSections = tripManager.queryUnclassifiedSections(User.fromEmail(fakeEmail).uuid)
     self.assertEqual(queriedUnclassifiedSections.count(), 0)
 
@@ -115,7 +115,7 @@ class TestTripManager(unittest.TestCase):
     fakeEmail = "fest@example.com"
     fakeUUID = User.fromEmail(fakeEmail).uuid
 
-    trip_array = json.load(open("tests/data/sensed_trips.json"))
+    trip_array = json.load(open("emission/tests/data/sensed_trips.json"))
     self.assertEqual(len(trip_array), 2)
     tripManager.storeSensedTrips(fakeUUID, trip_array)
     insertedTrips = [trip for trip in get_trip_db().find({"user_id": fakeUUID})]
@@ -163,20 +163,19 @@ class TestTripManager(unittest.TestCase):
     # Clear previous Stage_Sections data and load new data
     # specific to filtering
     self.SectionsColl.remove()
-    tests.common.loadTable(self.serverName, "Stage_Sections", "tests/data/testFilterFile")   
-    tests.common.updateSections(self) 
+    emission.tests.common.loadTable(self.serverName, "Stage_Sections", "emission/tests/data/testFilterFile")   
+    emission.tests.common.updateSections(self) 
     # Extra updates to Sections necessary for testing filtering
     for section in self.SectionsColl.find():
       section['section_start_point'] = "filler start point"
       section['section_end_point'] = "filler end point"   
       self.SectionsColl.save(section)
 
-    from dao.user import User
     fakeEmail = "fest@example.com"
 
     client = Client("testclient")
     client.update(createKey = False)
-    tests.common.makeValid(client)
+    emission.tests.common.makeValid(client)
 
     (resultPre, resultReg) = client.preRegister("this_is_the_super_secret_id", fakeEmail)
     self.assertEqual(resultPre, 0)

@@ -6,9 +6,9 @@ import re
 logging.basicConfig(level=logging.DEBUG)
 
 # Our imports
-import tests.common
+import emission.tests.common
 from emission.core.get_database import get_mode_db, get_section_db, get_trip_db
-from emission.net.ext_services.moves import collect
+from emission.net.ext_service.moves import collect
 
 class TestMovesCollect(unittest.TestCase):
   def setUp(self):
@@ -22,7 +22,7 @@ class TestMovesCollect(unittest.TestCase):
 
     self.assertEquals(self.ModesColl.find().count(), 0)
 
-    dataJSON = json.load(open("tests/data/modes.json"))
+    dataJSON = json.load(open("emission/tests/data/modes.json"))
     for row in dataJSON:
       self.ModesColl.insert(row)
 
@@ -40,7 +40,7 @@ class TestMovesCollect(unittest.TestCase):
   def loadReplaceUser(self, fileName, origEmail, fakeEmail):
     fileHandle = open(fileName)
     dataStr = fileHandle.readline()
-    dataStr = tests.common.fixFormat(dataStr)
+    dataStr = emission.tests.common.fixFormat(dataStr)
     dataStr = dataStr.replace(origEmail, fakeEmail)
     dataJSON = json.loads(dataStr)
     return dataJSON
@@ -48,7 +48,7 @@ class TestMovesCollect(unittest.TestCase):
   # This is a trip where we missed a cycling trip section. I recieved consent
   # to check this trip into the repository on Tuesday, Apr 8th, at 7:40am
   def testMissingSections(self):
-    result = self.loadTestJSON("tests/data/missing_trip")
+    result = self.loadTestJSON("emission/tests/data/missing_trip")
     collect.processResult(self.testUUID, result)
 
     SectionColl = get_section_db()
@@ -61,7 +61,7 @@ class TestMovesCollect(unittest.TestCase):
     
      
   def testDoubleLoad(self):
-    result = self.loadTestJSON("tests/data/missing_trip")
+    result = self.loadTestJSON("emission/tests/data/missing_trip")
     collect.processResult(self.testUUID, result)
     collect.processResult(self.testUUID, result)
 
@@ -74,8 +74,8 @@ class TestMovesCollect(unittest.TestCase):
     self.assertEquals(tripToWorkSections.count(), 5)
 
   def testPartialLoadUpdate(self):
-    resultAll = self.loadTestJSON("tests/data/missing_trip")
-    resultSubset = self.loadTestJSON("tests/data/missing_trip_subset")
+    resultAll = self.loadTestJSON("emission/tests/data/missing_trip")
+    resultSubset = self.loadTestJSON("emission/tests/data/missing_trip_subset")
     collect.processResult(self.testUUID, resultSubset)
 
     SectionColl = get_section_db()
@@ -89,7 +89,7 @@ class TestMovesCollect(unittest.TestCase):
     self.assertEquals(tripToWorkSections.count(), 5)
 
   def testBlankToday(self):
-    result = self.loadTestJSON("tests/data/test2_blank_today")
+    result = self.loadTestJSON("emission/tests/data/test2_blank_today")
     collect.processResult(self.testUUID, [result[0]])
     collect.processResult(self.testUUID, [result[1]])
     
@@ -97,18 +97,18 @@ class TestMovesCollect(unittest.TestCase):
     self.assertTrue(SectionColl.find({'user_id': self.testUUID}).count() > 0)
 
   def testWeirdLoadWithNoSections(self):
-    result = self.loadTestJSON("tests/data/test1_blank_today")
+    result = self.loadTestJSON("emission/tests/data/test1_blank_today")
     collect.processResult(self.testUUID, result)
 
   def testYesterdayForJustSignedUp(self):
-    result = self.loadTestJSON("tests/data/yesterday_for_justsignedup")
+    result = self.loadTestJSON("emission/tests/data/yesterday_for_justsignedup")
     collect.processResult(self.testUUID, result)
 
     SectionColl = get_section_db()
     self.assertEquals(SectionColl.find({"user_id": self.testUUID}).count(), 0)
 
   def testPlaceLoad(self):
-    result = self.loadTestJSON("tests/data/test20140410")
+    result = self.loadTestJSON("emission/tests/data/test20140410")
     collect.processResult(self.testUUID, result)
 
     # Check that the trips are loaded correctly
@@ -140,7 +140,7 @@ class TestMovesCollect(unittest.TestCase):
     self.assertNotEqual(sectionForTrip, None)
 
   def testUpdateSectionForExistingTrip(self):
-    result = self.loadTestJSON("tests/data/missing_trip")
+    result = self.loadTestJSON("emission/tests/data/missing_trip")
     collect.processResult(self.testUUID, result)
 
     SectionColl = get_section_db()

@@ -6,7 +6,7 @@ def classifiedCount(request):
 
 # These are copy/pasted from our first client, the carshare study
 def getSectionFilter(uuid):
-  from dao.user import User
+  from emission.core.wrapper.user import User
   from datetime import datetime, timedelta
 
   logging.info("testclient.getSectionFilter called for user %s" % uuid)
@@ -24,8 +24,8 @@ def getSectionFilter(uuid):
     return [{'test_auto_confirmed.prob': {'$lt': 0.9}}]
 
 def clientSpecificSetters(uuid, sectionId, predictedModeMap):
-  from main import common
-  from get_database import get_mode_db
+  from emission.core import common
+  from emission.core.get_database import get_mode_db
 
   maxMode = None
   maxProb = 0
@@ -47,7 +47,7 @@ def getClientConfirmedModeField():
   return "test_auto_confirmed.mode"
 
 def runBackgroundTasks(uuid):
-  from dao.user import User
+  from emission.core.wrapper.user import User
 
   testuser = User.fromUUID(uuid)
   testuser.setClientSpecificProfileFields({'testfield1': 'value1', 'testfield2': 'value2'})

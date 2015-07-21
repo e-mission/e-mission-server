@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 # Our imports
 from emission.core.get_database import get_db, get_mode_db, get_section_db
 from emission.core.wrapper.user import User
-import tests.common
+import emission.tests.common
 from emission.clients.data import data
 
 logging.basicConfig(level=logging.DEBUG)
@@ -16,7 +16,7 @@ class TestDefault(unittest.TestCase):
     def setUp(self):
         # Sometimes, we may have entries left behind in the database if one of the tests failed
         # or threw an exception, so let us start by cleaning up all entries
-        tests.common.dropAllCollections(get_db())
+        emission.tests.common.dropAllCollections(get_db())
         user = User.register("fake@fake.com")
         self.uuid = user.uuid
         self.serverName = "localhost"
@@ -40,15 +40,15 @@ class TestDefault(unittest.TestCase):
     def testRunBackgroundTasksForDay(self):
         self.testUsers = ["test@example.com", "best@example.com", "fest@example.com",
                           "rest@example.com", "nest@example.com"]
-        tests.common.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
-        tests.common.loadTable(self.serverName, "Stage_Sections", "tests/data/testCarbonFile")
+        emission.tests.common.loadTable(self.serverName, "Stage_Modes", "emission/tests/data/modes.json")
+        emission.tests.common.loadTable(self.serverName, "Stage_Sections", "emission/tests/data/testCarbonFile")
 
         # Let's make sure that the users are registered so that they have profiles
         for userEmail in self.testUsers:
           User.register(userEmail)
 
         self.SectionsColl = get_section_db()
-        tests.common.updateSections(self)
+        emission.tests.common.updateSections(self)
 
         self.assertNotEqual(len(self.uuid_list), 0)
         # Can access the zeroth element because we know that then length is greater than zero

@@ -29,11 +29,12 @@ def getClientSpecificResult(user_uuid):
       return client.getResult(user_uuid)
 
 def runClientSpecificBackgroundTasks(user_uuid):
-    from clients.default import default
+    from emission.clients.choice import choice
 
     client = getUserClient(user_uuid)
     if client == None:
-      default.runBackgroundTasks(user_uuid)
+      # default is choice
+      choice.runBackgroundTasks(user_uuid)
     else:
       client.runBackgroundTasks(user_uuid)
 

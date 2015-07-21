@@ -2,15 +2,15 @@
 import logging
 from dateutil import parser
 import json
-from get_database import get_mode_db, get_section_db
 from datetime import datetime, timedelta
 import time
 
 # Our imports
-from emission.analysis.results.userclient import getClientSpecificQueryFilter
+from emission.core.get_database import get_mode_db, get_section_db
+from emission.analysis.result.userclient import getClientSpecificQueryFilter
 from emission.core.common import calDistance, travel_time
 import stats
-import emission.net.ext_services.moves.collect as collect
+import emission.net.ext_service.moves.collect as collect
 
 def max_Distance(points):
     # 'track_points':[{'track_location':{'type':'Point', 'coordinates':[point["lat"],point["lon"]]}, 'time':point["time"]}for point in seg_act_note["trackPoints"]] if "trackPoints" in seg_act_note else []}

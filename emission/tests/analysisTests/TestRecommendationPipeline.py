@@ -4,17 +4,15 @@ import json
 #from main import tripManager
 from pymongo import MongoClient
 import logging
-from get_database import get_db, get_mode_db, get_section_db, get_trip_db, get_routeCluster_db
-import re
 from datetime import datetime, timedelta
 
 # Our imports
-from emission.analysis.results.recommendation.recommendation_pipeline import RecommendationPipeline
+from emission.core.get_database import get_db, get_mode_db, get_section_db, get_trip_db, get_routeCluster_db
+from emission.analysis.result.recommendation.recommendation_pipeline import RecommendationPipeline
 from emission.core.wrapper.user import User
 from emission.core.wrapper.client import Client
-from emission.net.ext_services.moves import collect
+from emission.net.ext_service.moves import collect
 from emission.core.wrapper.tripiterator import TripIterator
-import tests.common
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -28,12 +26,12 @@ class TestRecommendationPipeline(unittest.TestCase):
     self.ModesColl.remove()
     self.assertEquals(self.ModesColl.find().count(), 0)
 
-    dataJSON = json.load(open("tests/data/modes.json"))
+    dataJSON = json.load(open("emission/tests/data/modes.json"))
     for row in dataJSON:
       self.ModesColl.insert(row)
 
     get_section_db().remove({"user_id": self.testUUID})
-    result = self.loadTestJSON("tests/data/missing_trip")
+    result = self.loadTestJSON("emission/tests/data/missing_trip")
     collect.processResult(self.testUUID, result)
     print get_section_db().find().count()
     self.pipeline = RecommendationPipeline()

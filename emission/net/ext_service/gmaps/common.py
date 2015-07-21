@@ -9,7 +9,7 @@ import xml.etree.ElementTree as ET
 
 # Our imports
 import emission.core.get_database as edb
-import emission.wrapper.trip as ewt
+import emission.core.wrapper.trip as ewt
 
 DATE_FORMAT = "%Y%m%dT%H%M%S-%W00" #This is a great hack thought of by Shaun
 
@@ -25,9 +25,9 @@ def get_recommender_uuid_list():
 def coerce_gmaps_time(time):
 	lst = time.split()
 	if len(lst) == 4:
-		return datetime.timedelta(hours=int(lst[0]), minutes=int(lst[2]))
+		return timedelta(hours=int(lst[0]), minutes=int(lst[2]))
 	elif len(lst) == 2:
-		return datetime.timedelta(minutes=int(lst[0]))
+		return timedelta(minutes=int(lst[0]))
 
 def google_maps_to_our_trip(google_maps_json, _id, user_id, trip_id, mode, org_start_time):
         sections = [ ]
@@ -36,12 +36,12 @@ def google_maps_to_our_trip(google_maps_json, _id, user_id, trip_id, mode, org_s
 		td = coerce_gmaps_time(leg['duration']['text'])	
                 coords = [ ]
                 for step in leg['steps']:
-                    coords.append(Coordinate(step['end_location']['lat'], step['end_location']['lng']))
+                    coords.append(ewt.Coordinate(step['end_location']['lat'], step['end_location']['lng']))
                 distance = leg['distance']
-                start_location = Coordinate(leg['start_location']['lat'], leg['start_location']['lng'])
-                end_location = Coordinate(leg['end_location']['lat'], leg['end_location']['lng'])
+                start_location = ewt.Coordinate(leg['start_location']['lat'], leg['start_location']['lng'])
+                end_location = ewt.Coordinate(leg['end_location']['lat'], leg['end_location']['lng'])
 		end_time = time + td
-                section = Section(0, user_id, trip_id, distance, "move", time, end_time, start_location, end_location, mode, mode)
+                section = ewt.Section(0, user_id, trip_id, distance, "move", time, end_time, start_location, end_location, mode, mode)
                 section.points = coords
                 sections.append(section)
 		time = end_time

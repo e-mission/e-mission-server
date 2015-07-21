@@ -1,23 +1,24 @@
+# Standard imports
 from datetime import datetime, timedelta
+import json
+
+# Our imports
+from emission.core.get_database import get_client_db, get_db, get_section_db
 
 def makeValid(client):
-  from get_database import get_client_db
-
   client.clientJSON['start_date'] = str(datetime.now() + timedelta(days=-2))
   client.clientJSON['end_date'] = str(datetime.now() + timedelta(days=+2))
   # print (client.clientJSON)
   client._Client__update(client.clientJSON)
 
 def makeExpired(client):
-  from get_database import get_client_db
-
   client.clientJSON['start_date'] = str(datetime.now() + timedelta(days=-4))
   client.clientJSON['end_date'] = str(datetime.now() + timedelta(days=-2))
   # print (client.clientJSON)
   client._Client__update(client.clientJSON)
 
 def updateUserCreateTime(uuid):
-  from dao.user import User
+  from emission.core.wrapper.user import User
   
   user = User.fromUUID(uuid)
   user.changeUpdateTs(timedelta(days = -20))
@@ -47,8 +48,6 @@ def loadTable(serverName, tableName, fileName):
 
 # Create a dummy section with the main stuff that we use in our code
 def createDummySection(startTime, endTime, startLoc, endLoc, predictedMode = None, confirmedMode = None):
-  from get_database import get_section_db
-
   section = {
              'source': 'Shankari',
              'section_start_datetime': startTime,
@@ -67,7 +66,7 @@ def createDummySection(startTime, endTime, startLoc, endLoc, predictedMode = Non
   return section
 
 def updateSections(testCase):
-    from dao.user import User
+    from emission.core.wrapper.user import User
     """
     Updates sections with appropriate test data
     Should be called anytime new data is loaded into the

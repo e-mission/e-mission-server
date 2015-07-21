@@ -9,17 +9,14 @@ logging.basicConfig(level=logging.DEBUG)
 # Our imports
 from emission.core.wrapper.user import User
 from emission.core.wrapper.client import Client
-from tests import common
-from emission.analysis.results import userclient
+from emission.tests import common
+from emission.analysis.result import userclient
+import emission.tests.common as etc
+import emission.core.get_database as edb
 
 class TestUser(unittest.TestCase):
   def setUp(self):
-    from get_database import get_profile_db, get_uuid_db, get_client_db, get_pending_signup_db
-    # Make sure we start with a clean slate every time
-    get_client_db().remove()
-    get_profile_db().remove()
-    get_pending_signup_db().remove()
-    get_uuid_db().remove()
+    etc.dropAllCollections(edb.get_db());
 
   def testIsNotRegistered(self):
     self.assertFalse(User.isRegistered('fake@fake.com'))

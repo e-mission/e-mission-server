@@ -387,7 +387,7 @@ def Inside_polygon(pnt,poly):
     return inside
 
 def getClassifiedRatio(uuid, start, end):
-    from userclient import getClientSpecificQueryFilter
+    from emission.analysis.result.userclient import getClientSpecificQueryFilter
 
     defaultQueryList = [ {'source':'Shankari'},
                          {'user_id':uuid},
@@ -459,7 +459,7 @@ def getClassifiedRatio(uuid, start, end):
 #     # kml.save(filename+'.kml')
 
 def getConfirmationModeQuery(mode):
-  from dao.client import Client
+  from emission.core.wrapper.client import Client
   return {'$or': [{'corrected_mode': mode},
                   {'$and': [{'corrected_mode': {'$exists': False}}, {'confirmed_mode': mode}]}, 
                   {'$and': [{'corrected_mode': {'$exists': False}},

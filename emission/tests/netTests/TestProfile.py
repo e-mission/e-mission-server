@@ -7,11 +7,11 @@ from datetime import datetime, timedelta
 import re
 
 # Our imports
-from emission.api.net import Profile
-from emission.common.get_database import get_db, get_mode_db, get_section_db, get_trip_db, get_profile_db
+from emission.net.api import Profile
+from emission.core.get_database import get_db, get_mode_db, get_section_db, get_trip_db, get_profile_db
 from emission.core.wrapper.user import User
 from emission.core.wrapper.client import Client
-import tests.common
+import emission.tests.common
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -23,10 +23,10 @@ class TestProfile(unittest.TestCase):
 
     # Sometimes, we may have entries left behind in the database if one of the tests failed
     # or threw an exception, so let us start by cleaning up all entries
-    tests.common.dropAllCollections(get_db())
+    emission.tests.common.dropAllCollections(get_db())
     self.Profiles = get_profile_db()
     self.assertEquals(self.Profiles.find().count(), 0)
-    tests.common.loadTable(self.serverName, "Stage_Profiles", "tests/data/profiles.json")
+    emission.tests.common.loadTable(self.serverName, "Stage_Profiles", "emission/tests/data/profiles.json")
     self.assertEquals(self.Profiles.find().count(), 1)
     # Let's make sure that the users are registered so that they have profiles
     for userEmail in self.testUsers:
@@ -42,7 +42,7 @@ class TestProfile(unittest.TestCase):
 
   def tearDown(self):
     for testUser in self.testUsers:
-      tests.common.purgeSectionData(get_section_db(), testUser)
+      emission.tests.common.purgeSectionData(get_section_db(), testUser)
     self.Profiles.remove()
     self.assertEquals(self.Profiles.find().count(), 0)
 
@@ -51,8 +51,8 @@ class TestProfile(unittest.TestCase):
     prof_1 = self.Profiles.find_one({'user_id':'1'})
     self.assertEquals(prof_1['_id'],  '1')
     #zip creation phase, should make API call and obtain zipcode
-    with mock.patch('main.Profile.detect_home', return_value=(-122.259769,37.871758)) as func1:
-        with mock.patch('main.Profile.detect_home_from_db', return_value=(-122.259769,37.871758)) as func2:
+    with mock.patch('emission.net.api.Profile.detect_home', return_value=(-122.259769,37.871758)) as func1:
+        with mock.patch('emission.net.api.Profile.detect_home_from_db', return_value=(-122.259769,37.871758)) as func2:
             Profile.update_profiles(True)
             self.assertEquals(func1.called, True)
             self.assertEquals(func2.called, True)
@@ -61,7 +61,7 @@ class TestProfile(unittest.TestCase):
             prof_1 = self.Profiles.find_one({'user_id':'1'})
             self.assertEquals(prof_1['zip'],  '94709')
     #test new address/zipcode: database value does not equal home value
-    with mock.patch('main.Profile.detect_home', return_value=(-122.2584,37.8697)) as func1:
+    with mock.patch('emission.net.api.Profile.detect_home', return_value=(-122.2584,37.8697)) as func1:
             #new zip retrieval phase, should make API call and obtain zipcode
             Profile.update_profiles(True)
             self.assertEquals(func1.called, True)
@@ -75,8 +75,8 @@ class TestProfile(unittest.TestCase):
     prof_1 = self.Profiles.find_one({'user_id':'1'})
     self.assertEquals(prof_1['_id'],  '1')
     #zip creation phase, should make API call and obtain zipcode
-    with mock.patch('main.Profile.detect_home', return_value=(-122.259769,37.871758)) as func1:
-        with mock.patch('main.Profile.detect_home_from_db', return_value=(-122.259769,37.871758)) as func2:
+    with mock.patch('emission.net.api.Profile.detect_home', return_value=(-122.259769,37.871758)) as func1:
+        with mock.patch('emission.net.api.Profile.detect_home_from_db', return_value=(-122.259769,37.871758)) as func2:
             Profile.update_profiles(True)
             self.assertEquals(func1.called, True)
             self.assertEquals(func2.called, True)
@@ -85,17 +85,17 @@ class TestProfile(unittest.TestCase):
             prof_1 = self.Profiles.find_one({'user_id':'1'})
             self.assertEquals(prof_1['zip'],  '94709')
             #zip should be stored, no API call
-            with mock.patch('main.Profile.Geocoder.reverse_geocode', return_value=None) as func3:
+            with mock.patch('emission.net.api.Profile.Geocoder.reverse_geocode', return_value=None) as func3:
                 Profile.update_profiles(True)
                 self.assertEquals(func3.called, False)
                 prof_1 = self.Profiles.find_one({'user_id':'1'})
                 self.assertEquals(prof_1['zip'],  '94709')
-    with mock.patch('main.Profile.detect_home', return_value=(-122.2584,37.8697)) as func1:
+    with mock.patch('emission.net.api.Profile.detect_home', return_value=(-122.2584,37.8697)) as func1:
             #new zip retrieval phase, should make API call and obtain zipcode
                 Profile.update_profiles(True)
                 prof_1 = self.Profiles.find_one({'user_id':'1'})
                 self.assertEquals(prof_1['zip'],  '94720')
-                with mock.patch('main.Profile.Geocoder.reverse_geocode', return_value=None) as func3:
+                with mock.patch('emission.net.api.Profile.Geocoder.reverse_geocode', return_value=None) as func3:
                     #zip should be stored, no API call
                     Profile.update_profiles(True)
                     self.assertEquals(func3.called, False)

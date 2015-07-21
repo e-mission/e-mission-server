@@ -9,8 +9,8 @@ import math
 import emission.analysis.section_features as sf
 import emission.analysis.plotting.gmap_display as eapg
 import emission.analysis.plotting.pygmaps_modified as pygmaps
-import emission.decorations.useful_queries as taug
-import emission.core.get_database import edb
+import emission.storage.decorations.useful_queries as taug
+import emission.core.get_database as edb
 
 class SmoothingEvalResult:
     def __str__(self):

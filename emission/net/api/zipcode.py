@@ -4,7 +4,7 @@ from collections import defaultdict
 from pygeocoder import Geocoder
 
 # Our imports
-from home import detect_home,detect_home_from_db
+from emission.analysis.modelling.home import detect_home,detect_home_from_db
 from emission.core.common import getModeShare
 from emission.core.get_database import get_section_db,get_profile_db
 from modeshare import get_user_mode_share_by_distance

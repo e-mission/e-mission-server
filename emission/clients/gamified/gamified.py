@@ -7,7 +7,7 @@ import math
 
 # Our imports
 from emission.core.get_database import get_section_db
-import emission.analysis.results.carbon as carbon
+import emission.analysis.result.carbon as carbon
 import emission.core.common as common
 import emission.net.api.stats as stats
 from emission.core.wrapper.user import User

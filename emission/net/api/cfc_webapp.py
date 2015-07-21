@@ -24,10 +24,10 @@ import urllib2
 import modeshare, zipcode, distance, tripManager, \
                  Berkeley, visualize, stats, usercache
 import emission.net.ext_services.moves.register as auth
-import emission.analysis.results.carbon as carbon
+import emission.analysis.result.carbon as carbon
 import emission.analysis.classification.inference.commute as commute
 import emission.analysis.modelling.work_time as work_time
-import emission.analysis.results.userclient as userclient
+import emission.analysis.result.userclient as userclient
 import emission.core.common as common
 from emission.core.wrapper.client import Client
 from emission.core.wrapper.user import User

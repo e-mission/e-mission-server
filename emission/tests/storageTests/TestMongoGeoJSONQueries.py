@@ -1,6 +1,8 @@
+# Standard imports
 import unittest
-from main import common
 
+# Our imports
+from emission.core import common
 from emission.core.get_database import get_test_db
 
 class TestGeoJSON(unittest.TestCase):

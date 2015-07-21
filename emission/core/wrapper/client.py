@@ -12,7 +12,7 @@ class Client:
     # TODO: write background process to ensure that there is only one client with each name
     # Maybe clean up unused clients?
     self.clientName = clientName
-    self.settings_filename = "clients/%s/settings.json" % self.clientName
+    self.settings_filename = "emission/clients/%s/settings.json" % self.clientName
     self.__reload()
 
   def __reload(self):
@@ -84,7 +84,7 @@ class Client:
 
   def __loadModule(self):
     import importlib
-    clientModule = importlib.import_module("clients.%s.%s" % (self.clientName, self.clientName))
+    clientModule = importlib.import_module("emission.clients.%s.%s" % (self.clientName, self.clientName))
     return clientModule
 
   def callMethod(self, methodName, request):
@@ -131,8 +131,8 @@ class Client:
 # consistency model, since we will eventually clean it up again. The end
 # result will still be a NOP, though
   def __preRegister(self, userEmail):
-    from dao.user import User
-    from main import userclient
+    from emission.core.wrapper.user import User
+    from emission.analysis.result import userclient
 
     if User.isRegistered(userEmail):
       User.fromEmail(userEmail).setStudy(self.clientName)

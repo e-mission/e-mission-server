@@ -39,7 +39,7 @@ from emission.analysis.modelling.work_place import  detect_work_office, detect_d
 from emission.core.get_database import get_section_db, get_trip_db, get_test_db
 import pygmaps_modified as pygmaps
 from emission.core.common import calDistance
-import trip_analysis.useful_queries as tauq
+import emission.storage.decorations.useful_queries as tauq
 
 
 POINTS = 'points'

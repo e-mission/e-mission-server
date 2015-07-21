@@ -343,8 +343,8 @@ class ModeInferencePipeline:
       return currProbMap
 
   def savePredictionsStep(self):
-    from dao.user import User
-    from dao.client import Client
+    from emission.core.wrapper.user import User
+    from emission.core.wrapper.client import Client
 
     uniqueModes = sorted(set(self.cleanedResultVector))
 

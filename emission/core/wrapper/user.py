@@ -117,7 +117,7 @@ class User:
     return retDict
 
   def getSettings(self):
-    from dao.client import Client
+    from emission.core.wrapper.client import Client
 
     # Combine profile settings and study settings.
     # We currently don't have any profile settings
@@ -178,7 +178,7 @@ class User:
   def register(userEmail):
     import uuid
     from datetime import datetime
-    from dao.client import Client
+    from emission.core.wrapper.client import Client
 
     # We are accessing three databases here:
     # - The list of pending registrations (people who have filled out demographic

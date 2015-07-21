@@ -1,6 +1,5 @@
 # Standard imports
 import sys
-import googlemaps 
 import datetime
 import uuid
 import logging

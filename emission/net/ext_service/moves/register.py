@@ -3,7 +3,7 @@ import logging
 import json
 
 # Our imports
-from emission.net.ext_services.moves.sdk import Moves
+from sdk import Moves
 from emission.core.get_database import get_moves_db
 
 key_file = open('conf/net/keys.json')

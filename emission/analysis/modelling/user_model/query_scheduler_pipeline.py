@@ -11,10 +11,11 @@ Roads API
 
 See more on how to enable these here: https://github.com/googlemaps/google-maps-services-python
 """
-import emission.net.ext_services.gmaps.googlemaps as googlemaps
+import emission.net.ext_service.gmaps.googlemaps as googlemaps
 import datetime
 import sys
 import os
+import crontab
 
 #otherwise, you can just pass in an address
 

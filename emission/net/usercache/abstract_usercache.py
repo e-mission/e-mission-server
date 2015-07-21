@@ -33,8 +33,8 @@ class UserCache(object):
         # We put the import statement in here to avoid circular dependencies
         # It is also not needed anywhere else since this is a completely static
         # function otherwise
-        import usercache.builtin_usercache
-        return usercache.builtin_usercache.BuiltinUserCache(uuid)
+        import emission.net.usercache.builtin_usercache as biuc
+        return biuc.BuiltinUserCache(uuid)
 
     def __init__(self, uuid):
         self.uuid = uuid

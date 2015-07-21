@@ -1,12 +1,10 @@
 # Standard imports
 import logging
-import sys
-import os
 
 # Our imports
 
 from emission.core.get_database import get_uuid_db
-from emission.analysis.results.userclient as userclient
+import emission.analysis.result.userclient as userclient
 
 class PrecomputeResults:
     def __init__(self):

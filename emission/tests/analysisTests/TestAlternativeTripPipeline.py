@@ -3,7 +3,6 @@ import unittest
 import traceback
 import json
 import logging
-from get_database import *
 import re
 import datetime as pydt
 
@@ -14,11 +13,10 @@ import emission.core.wrapper.trip as ecwt
 from emission.analysis.modelling.user_model import query
 from emission.core.wrapper.user import User
 from emission.core.wrapper.client import Client
-from emission.net.ext_services.moves import collect
+from emission.net.ext_service.moves import collect
 # from emission.net.ext_services.gmaps.common import *
+import emission.core.get_database as edb
 from crontab import CronTab
-
-import tests.common
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -37,35 +35,35 @@ class TestAlternativeTripPipeline(unittest.TestCase):
 
     # Sometimes, we may have entries left behind in the database if one of the tests failed
     # or threw an exception, so let us start by cleaning up all entries
-    self.ModesColl = get_mode_db()
+    self.ModesColl = edb.get_mode_db()
     self.ModesColl.remove()
-    get_trip_db().remove()
-    get_section_db().remove()
-    get_alternatives_db().remove()
+    edb.get_trip_db().remove()
+    edb.get_section_db().remove()
+    edb.get_alternatives_db().remove()
 
     self.assertEquals(self.ModesColl.find().count(), 0)
 
-    dataJSON = json.load(open("tests/data/modes.json"))
+    dataJSON = json.load(open("emission/tests/data/modes.json"))
     for row in dataJSON:
       self.ModesColl.insert(row)
     
     # register each of the users and add sample trips to each user
-    result = self.loadTestJSON("tests/data/missing_trip")
+    result = self.loadTestJSON("emission/tests/data/missing_trip")
     collect.processResult(self.testUUID, result)
-    for trip in get_trip_db().find():
+    for trip in edb.get_trip_db().find():
         trip['trip_start_datetime'] = pydt.datetime.now() + pydt.timedelta(hours=-5)
         trip['trip_end_datetime'] = pydt.datetime.now()
-        get_trip_db().update({"_id": trip["_id"]}, trip)
+        edb.get_trip_db().update({"_id": trip["_id"]}, trip)
 
-    for section in get_section_db().find():
+    for section in edb.get_section_db().find():
         section['section_start_datetime'] = pydt.datetime.now() + pydt.timedelta(hours=-5)
         section['section_end_datetime'] = pydt.datetime.now()
-        get_section_db().update({"_id": section["_id"]}, section)
+        edb.get_section_db().update({"_id": section["_id"]}, section)
     
     self.pipeline = AlternativeTripsPipeline()
 
   def tearDown(self):
-    get_section_db().remove({"user_id": self.testUUID})
+    edb.get_section_db().remove({"user_id": self.testUUID})
     self.ModesColl.remove()
     self.assertEquals(self.ModesColl.find().count(), 0)
 
@@ -89,7 +87,7 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     self.assertTrue(hasattr(trip_iter, '__iter__'))
     trip_list = list(trip_iter)
     firstElement = trip_list[0]
-    self.assertTrue(isinstance(firstElement, E_Mission_Trip))
+    self.assertTrue(isinstance(firstElement, ecwt.E_Mission_Trip))
     # calc_alternative_trips merely schedules the alternative trip calculation at a later time
     # it can't return the alternative trips right now
     pipeline_module.calc_alternative_trips(trip_list, immediate=False)
@@ -109,7 +107,7 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     for trip in trip_list:
         query.obtain_alternatives(trip.trip_id, self.testUUID)
     firstElement = trip_list[0]
-    self.assertTrue(isinstance(firstElement, E_Mission_Trip))
+    self.assertTrue(isinstance(firstElement, ecwt.E_Mission_Trip))
 
     for trip in trip_list:
         alt_it = pipeline_module.get_alternative_for_trip(trip)
@@ -120,12 +118,12 @@ class TestAlternativeTripPipeline(unittest.TestCase):
 
   '''
   def test_initialize_empty_perturbed_trips(self):
-    db = get_section_db()
+    db = edb.get_section_db()
     i = 0
     temp = db.find_one({'type' : 'move'})
     _id = temp['_id']
     #self.assertEquals(type(our_id), str)
-    p_db = get_perturbed_trips_db()
+    p_db = edb.get_perturbed_trips_db()
     initialize_empty_perturbed_trips(_id, p_db)
     our_id = _id.replace('.', '')
     temp = p_db.find_one({"our_id" : our_id})
@@ -139,12 +137,12 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     # self.assertEquals(type(temp), dict)
 
   def test_update_perturbations(self):
-    json_trip = self.loadTestJSON("tests/data/testModeInferFile")
+    json_trip = self.loadTestJSON("emission/tests/data/testModeInferFile")
     #self.assertEquals(type(json_trip), json)
     #json_trip = json_trip.read()
     trip = ecwt.E_Mission_Trip(json_trip[0])
-    db = get_section_db()
-    pdb = get_perturbed_trips_db()
+    db = edb.get_section_db()
+    pdb = edb.get_perturbed_trips_db()
     temp = db.find_one({'type' : 'move'})
     our_id = temp['_id']
     initialize_empty_perturbed_trips(our_id, pdb)
@@ -156,7 +154,7 @@ class TestAlternativeTripPipeline(unittest.TestCase):
   def testAlternativeTripStore(self):
     trip_list = self.pipeline.get_trips_for_alternatives(self.testUUID) 
     first_trip = trip_list.next()
-    self.assertEquals(type(first_trip), E_Mission_Trip)
+    self.assertEquals(type(first_trip), ecwt.E_Mission_Trip)
     # alternative_list = pipeline_module.get_alternative_trips(trip_list)
     # for alt in alternative_list:
     #     if alt:
@@ -167,7 +165,7 @@ class TestAlternativeTripPipeline(unittest.TestCase):
       trip_list = self.pipeline.get_trips_for_alternatives(self.testUUID)
       alternative_list = pipeline_module.get_alternative_trips(trip_list.next()._id)
       pipeline.store_alternative_trips(alternative_list)
-      altTripsDB = get_alternative_trips_db()
+      altTripsDB = edb.get_alternative_trips_db()
       json_trip = altTripsDB.find_one({"type" : "move"})
       self.assertFalse("alalalalal")
       self.assertTrue(json_trip)

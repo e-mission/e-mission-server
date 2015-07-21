@@ -9,8 +9,8 @@ logging.basicConfig(level=logging.DEBUG)
 # Our imports
 from emission.core.get_database import get_db, get_client_db, get_profile_db, get_uuid_db, get_pending_signup_db, get_section_db
 from emission.core.wrapper.client import Client
-from tests import common
-
+from emission.tests import common
+from emission.core.wrapper.user import User
 
 class TestClient(unittest.TestCase):
   def setUp(self):
@@ -19,12 +19,12 @@ class TestClient(unittest.TestCase):
     common.dropAllCollections(get_db())
     logging.info("After setup, client count = %d, profile count = %d, uuid count = %d" % 
       (get_client_db().find().count(), get_profile_db().count(), get_uuid_db().count()))
-    common.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
+    common.loadTable(self.serverName, "Stage_Modes", "emission/tests/data/modes.json")
     
   def testInitClient(self):
     emptyClient = Client("testclient")
     self.assertEqual(emptyClient.clientName, "testclient")
-    self.assertEqual(emptyClient.settings_filename, "clients/testclient/settings.json")
+    self.assertEqual(emptyClient.settings_filename, "emission/clients/testclient/settings.json")
     self.assertEqual(emptyClient.clientJSON, None)
     self.assertEqual(emptyClient.startDatetime, None)
     self.assertEqual(emptyClient.endDatetime, None)
@@ -41,10 +41,10 @@ class TestClient(unittest.TestCase):
     client = Client("testclient")
     client.update(createKey = False)
     self.assertEqual(client.startDatetime, datetime(2014, 10, 13))
-    self.assertEqual(client.endDatetime, datetime(2014, 12, 25))
+    self.assertEqual(client.endDatetime, datetime(2016, 12, 25))
     self.assertEqual(client.isActive(datetime(2014, 11, 7)), True)
     self.assertEqual(client.getDates()[0], datetime(2014, 10, 13))
-    self.assertEqual(client.getDates()[1], datetime(2014, 12, 25))
+    self.assertEqual(client.getDates()[1], datetime(2016, 12, 25))
 
     # Reset the times in the client so that it will show as active and we will
     # get a valid set of settings    
@@ -58,7 +58,7 @@ class TestClient(unittest.TestCase):
 
   def testUpdateClient(self):
     client = Client("testclient")
-    self.updateWithTestSettings(client, "tests/dao/testclient/testclient_settings_update.json")
+    self.updateWithTestSettings(client, "emission/tests/coreTests/wrapperTests/testclient/testclient_settings_update.json")
 
     self.assertEqual(client.startDatetime, datetime(2015, 01, 13))
     self.assertEqual(client.endDatetime, datetime(2015, 04, 25))
@@ -80,8 +80,6 @@ class TestClient(unittest.TestCase):
     self.assertEqual(resultReg, 0)
 
   def testPreRegisterExistingUser(self):
-    from dao.user import User
-
     user = User.register("fake@fake.com")
 
     client = Client("testclient")
@@ -134,8 +132,6 @@ class TestClient(unittest.TestCase):
     self.assertEqual(afterDelList, [])
 
   def testGetSectionFilter(self):
-    from dao.user import User
-
     fakeEmail = "fake@fake.com"
 
     client = Client("testclient")
@@ -155,8 +151,6 @@ class TestClient(unittest.TestCase):
     self.assertEqual(client.getSectionFilter(user.uuid), [{'test_auto_confirmed.prob': {'$lt': 0.9}}])
 
   def testClientSpecificSettersWithOverride(self):
-    from dao.user import User
-
     fakeEmail = "fake@fake.com"
 
     client = Client("testclient")
@@ -187,7 +181,6 @@ class TestClient(unittest.TestCase):
     
 
   def testClientSpecificSettersNoOverride(self):
-    from dao.user import User
 
     fakeEmail = "fake@fake.com"
     user = User.register("fake@fake.com")

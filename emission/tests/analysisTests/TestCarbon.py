@@ -8,7 +8,8 @@ from datetime import datetime, timedelta
 # Our imports
 from emission.analysis.result import carbon
 from emission.core.get_database import get_db, get_mode_db, get_section_db
-import tests.common
+import emission.tests.common
+from emission.core import common
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -22,12 +23,12 @@ class TestCarbon(unittest.TestCase):
 
     # Sometimes, we may have entries left behind in the database if one of the tests failed
     # or threw an exception, so let us start by cleaning up all entries
-    tests.common.dropAllCollections(get_db())
+    emission.tests.common.dropAllCollections(get_db())
     self.ModesColl = get_mode_db()
     self.assertEquals(self.ModesColl.find().count(), 0)
 
-    tests.common.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
-    tests.common.loadTable(self.serverName, "Stage_Sections", "tests/data/testCarbonFile")
+    emission.tests.common.loadTable(self.serverName, "Stage_Modes", "emission/tests/data/modes.json")
+    emission.tests.common.loadTable(self.serverName, "Stage_Sections", "emission/tests/data/testCarbonFile")
     self.SectionsColl = get_section_db()
 
     self.walkExpect = 1057.2524056424411
@@ -56,12 +57,11 @@ class TestCarbon(unittest.TestCase):
 
   def tearDown(self):
     for testUser in self.testUsers:
-      tests.common.purgeSectionData(self.SectionsColl, testUser)
+      emission.tests.common.purgeSectionData(self.SectionsColl, testUser)
     self.ModesColl.remove()
     self.assertEquals(self.ModesColl.find().count(), 0)
 
   def getMyQuerySpec(self, user, modeId):
-    from main import common
     return common.getQuerySpec(user, modeId, self.weekago, self.now)
 
   def testGetModes(self):

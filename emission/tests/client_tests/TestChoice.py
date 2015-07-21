@@ -13,10 +13,10 @@ logging.basicConfig(level=logging.DEBUG)
 
 class TestChoice(unittest.TestCase):
     def setUp(self):
-        import tests.common
+        import emission.tests.common
         # Sometimes, we may have entries left behind in the database if one of the tests failed
         # or threw an exception, so let us start by cleaning up all entries
-        tests.common.dropAllCollections(get_db())
+        emission.tests.common.dropAllCollections(get_db())
         user = User.register("fake@fake.com")
         self.uuid = user.uuid
 

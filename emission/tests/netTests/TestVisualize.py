@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 class TestVisualize(unittest.TestCase):
   def setUp(self):
-    import tests.common
+    import emission.tests.common
     from copy import copy
 
     self.testUsers = ["test@example.com", "best@example.com", "fest@example.com",
@@ -21,12 +21,12 @@ class TestVisualize(unittest.TestCase):
 
     # Sometimes, we may have entries left behind in the database if one of the tests failed
     # or threw an exception, so let us start by cleaning up all entries
-    tests.common.dropAllCollections(get_db())
+    emission.tests.common.dropAllCollections(get_db())
     self.ModesColl = get_mode_db()
     self.assertEquals(self.ModesColl.find().count(), 0)
 
-    tests.common.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
-    tests.common.loadTable(self.serverName, "Stage_Sections", "tests/data/testCarbonFile")
+    emission.tests.common.loadTable(self.serverName, "Stage_Modes", "emission/tests/data/modes.json")
+    emission.tests.common.loadTable(self.serverName, "Stage_Sections", "emission/tests/data/testCarbonFile")
     self.SectionsColl = get_section_db()
 
     self.walkExpect = 1057.2524056424411

@@ -9,8 +9,9 @@ from datetime import datetime
 import emission.core.get_database as edb
 import emission.core.common as cm
 import alternative_trips_module as atm
+import user_utility_model as utm
 
-class SimpleCostTimeModeModel(user_utility_model.UserUtilityModel):
+class SimpleCostTimeModeModel(utm.UserUtilityModel):
   def __init__(self, trips=None):
     #print "len(trips) = %d, len(alternatives) = %d" % (len(trips), len(alternatives))
         self.feature_list = ["cost", "time", "mode"]

@@ -4,7 +4,7 @@ import json
 import uuid
 
 # Our imports
-import emission.net.ext_services.moves.register as auth
+import emission.net.ext_service.moves.register as auth
 
 class TestMovesRegister(unittest.TestCase):
   def setUp(self):

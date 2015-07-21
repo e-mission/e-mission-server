@@ -9,8 +9,9 @@ import logging
 import emission.core.get_database as edb
 import emission.core.common as cm
 import alternative_trips_module as atm
+import user_utility_model as utm
 
-class EmissionsModel(user_utility_model.UserUtilityModel):
+class EmissionsModel(utm.UserUtilityModel):
   def __init__(self, cost, time, mode, trips):
     super(EmissionsModel, self).__init__(trips)
     self.feature_list = ["cost", "time", "mode", "emissions"]

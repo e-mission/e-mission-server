@@ -5,15 +5,17 @@ import logging
 from datetime import datetime, timedelta
 
 # Our imports
-import tests.common
 from emission.clients.gamified import gamified
 from emission.core.get_database import get_db, get_mode_db, get_section_db
+from emission.core.wrapper.user import User
+from emission.core.wrapper.client import Client
+import emission.tests.common
 
 logging.basicConfig(level=logging.DEBUG)
 
 class TestGamified(unittest.TestCase):
     def setUp(self):
-        import tests.common
+        import emission.tests.common
         from copy import copy
 
         self.testUsers = ["test@example.com", "best@example.com", "fest@example.com",
@@ -22,14 +24,14 @@ class TestGamified(unittest.TestCase):
 
         # Sometimes, we may have entries left behind in the database if one of the tests failed
         # or threw an exception, so let us start by cleaning up all entries
-        tests.common.dropAllCollections(get_db())
+        emission.tests.common.dropAllCollections(get_db())
         self.ModesColl = get_mode_db()
         self.assertEquals(self.ModesColl.find().count(), 0)
 
         self.setupUserAndClient()
 
-        tests.common.loadTable(self.serverName, "Stage_Modes", "tests/data/modes.json")
-        tests.common.loadTable(self.serverName, "Stage_Sections", "tests/data/testCarbonFile")
+        emission.tests.common.loadTable(self.serverName, "Stage_Modes", "emission/tests/data/modes.json")
+        emission.tests.common.loadTable(self.serverName, "Stage_Sections", "emission/tests/data/testCarbonFile")
         self.SectionsColl = get_section_db()
 
         self.walkExpect = 1057.2524056424411
@@ -75,17 +77,12 @@ class TestGamified(unittest.TestCase):
     def setupUserAndClient(self):
         # At this point, the more important test is to execute the query and see
         # how well it works
-        from dao.user import User
-        from dao.client import Client
-        import tests.common
-        from datetime import datetime, timedelta
-        from get_database import get_section_db
 
         fakeEmail = "fest@example.com"
 
         client = Client("gamified")
         client.update(createKey = False)
-        tests.common.makeValid(client)
+        emission.tests.common.makeValid(client)
 
         (resultPre, resultReg) = client.preRegister("this_is_the_super_secret_id", fakeEmail)
         studyList = Client.getPendingClientRegs(fakeEmail)

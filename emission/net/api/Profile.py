@@ -1,15 +1,17 @@
+# Standard imports
 __author__ = 'Yin'
 import logging
-from home import detect_home, detect_home_from_db
-from zipcode import get_userZipcode
-from work_place import detect_work_office, detect_daily_work_office
-from get_database import get_section_db,get_profile_db
 from pygeocoder import Geocoder
-from common import calDistance
-from route_matching import update_user_routeDistanceMatrix, update_user_routeClusters
-from K_medoid_2 import kmedoids, user_route_data
 import math
 
+# Our imports
+from emission.analysis.modelling.home import detect_home, detect_home_from_db
+from zipcode import get_userZipcode
+from emission.analysis.modelling.work_place import detect_work_office, detect_daily_work_office
+from emission.core.get_database import get_section_db,get_profile_db
+from emission.core.common import calDistance
+from emission.analysis.modelling.tour_model.trajectory_matching.route_matching import update_user_routeDistanceMatrix, update_user_routeClusters
+from emission.analysis.modelling.tour_model.K_medoid import kmedoids, user_route_data
 
 logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', level=logging.DEBUG)
 Profiles=get_profile_db()

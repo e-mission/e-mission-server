@@ -3,7 +3,7 @@ __author__ = 'Yin'
 from dateutil import parser
 
 # Our imports
-import home
+import emission.analysis.modelling.home as eamh
 import emission.core.common as ec
 import emission.core.get_database as edb
 
@@ -11,7 +11,7 @@ def detect_work_office(user_id):
 
     Sections=edb.get_section_db()
     office_candidate=[]
-    home=home.detect_home(user_id)
+    home=eamh.detect_home(user_id)
 
     if home == 'N/A':
       return 'N/A'
@@ -48,7 +48,7 @@ def detect_daily_work_office(user_id,day):
     # say should be from 1 to 5
     Sections=edb.get_section_db()
     office_candidate=[]
-    home=home.detect_home(user_id)
+    home=eamh.detect_home(user_id)
 
     if home == 'N/A':
       return 'N/A'

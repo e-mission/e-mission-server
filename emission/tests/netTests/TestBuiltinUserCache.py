@@ -8,7 +8,7 @@ import logging
 import time
 
 # Our imports
-import tests.common
+import emission.tests.common
 
 # Technically, unit tests should only test one piece of functionality
 # I am breaking that rule here to test both the put and the get at the same time, because:
@@ -22,10 +22,10 @@ from emission.core.get_database import get_db, get_usercache_db
 class TestBuiltinUserCache(unittest.TestCase):
   def setUp(self):
     self.testUserUUID = uuid.uuid4()
-    tests.common.dropAllCollections(get_db())
+    emission.tests.common.dropAllCollections(get_db())
 
   def tearDown(self):
-    tests.common.dropAllCollections(get_db())
+    emission.tests.common.dropAllCollections(get_db())
 
   def testPutUserDataForPhone(self):
     uc = ucauc.UserCache.getUserCache(self.testUserUUID)

@@ -7,11 +7,8 @@ import logging
 # Our imports
 import emission.analysis.modelling.user_model.alternative_trips_module as eatm
 import emission.core.wrapper.tripiterator as ti
-import emission.core.common as ec
-
-# Our imports
-
-from trip import E_Mission_Trip
+import emission.net.ext_service.gmaps.common as ec
+from emission.core.wrapper.trip import E_Mission_Trip
 
 class AlternativeTripsPipeline:
     def __init__(self):

@@ -5,7 +5,7 @@ from datetime import datetime, time, timedelta
 import json
 
 # Our imports
-import emission.analysis.results.carbon as carbon
+import emission.analysis.result.carbon as carbon
 import emission.net.api.stats as stats
 from emission.core.wrapper.user import User
 

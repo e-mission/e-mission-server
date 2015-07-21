@@ -7,7 +7,7 @@ import emission.core.get_database as edb
 import emission.net.ext_services.gmaps.common as ec
 import emission.core.wrapper.trip as et
 import emission.net.ext_services.gmaps.googlemaps as sdk
-import emission.analysis.results.recommendation.perturb as ep
+import emission.analysis.result.recommendation.perturb as ep
 
 def set_up(_id):
 	#fake_alternative = open("testTrip.txt", "r")
