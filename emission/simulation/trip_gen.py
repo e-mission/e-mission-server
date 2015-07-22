@@ -5,7 +5,7 @@ from pygeocoder import Geocoder
 import random, math
 
 # Our imports
-from emission.net.ext_services.otp.otp import OTP, PathNotFoundException
+from emission.net.ext_service.otp.otp import OTP, PathNotFoundException
 from emission.core.wrapper.trip import Coordinate 
 
 class Address:
