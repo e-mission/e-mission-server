@@ -12,4 +12,6 @@ CFC_DataCollector/config.json
 CFC_DataCollector/keys.json
 CFC_DataCollector/moves_collect.log
 
+*.ipynb_checkpoints*
+
 *.secret
