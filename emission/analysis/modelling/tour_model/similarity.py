@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy
 from sklearn import metrics
 from sklearn.metrics.cluster import homogeneity_score, completeness_score
+import sys
 
 """
 This class organizes data into bins by similarity. It then orders the bins 
@@ -30,8 +31,14 @@ class similarity:
         self.data = data
         self.size = len(self.data)
         self.percent = float(percent)
+        if self.percent > 1:
+            sys.stderr.write('Percent must be less than or equal to 1.\n')
+            self.percent = 1.0
+        if self.percent < 0:
+            sys.stderr.write('Percent must be greater than or equal to 0.\n')
+            self.percent = 0.0
         self.bins = []
-        self.radius = radius
+        self.radius = float(radius)
         self.colors = colors
 
     #create bins
@@ -75,7 +82,7 @@ class similarity:
         plt.bar(index+width, bars, color='m')
         plt.xlim([0, N])
         print str(N) + ' bins, in top half of bins there are ' + str(sum) + ' items out of ' + str(self.size) 
-        plt.show()
+        plt.savefig('histogram.png')
 
     #plot the trips on a map, with different colors
     #indicating different bins
@@ -101,7 +108,7 @@ class similarity:
         for bin in self.bins:
             for b in bin:
                 self.labels.append(self.bins.index(bin))
-                if self.colors != None:                
+                if bool(self.colors):
                     newcolors.append(self.colors[b])
         self.colors = newcolors
                     
@@ -117,7 +124,7 @@ class similarity:
                 path = [start_lat, start_lon, end_lat, end_lon]
                 points.append(path)
 
-        if self.colors != None:
+        if bool(self.colors):
             a = metrics.silhouette_score(numpy.array(points), labels)
             b = homogeneity_score(colors, labels)
             c = completeness_score(colors, labels)
@@ -130,7 +137,7 @@ class similarity:
 
     #update the ground truth
     def update_colors(self, newcolors):
-        if self.colors != None:
+        if bool(self.colors):
             indices = [] * len(set(newcolors))
             for n in newcolors:
                 if n not in indices:
@@ -142,10 +149,10 @@ class similarity:
 
     #calculate the distance between two trips
     def distance_helper(self, a, b):
-        starta = self.data[a]['trip_start_location']
-        startb = self.data[b]['trip_start_location']
-        enda = self.data[a]['trip_end_location']
-        endb = self.data[b]['trip_end_location']
+        starta = self.data[a]['section_start_point']['coordinates']
+        startb = self.data[b]['section_start_point']['coordinates']
+        enda = self.data[a]['section_end_point']['coordinates']
+        endb = self.data[b]['section_end_point']['coordinates']
 
         start = self.distance(starta[1], starta[0], startb[1], startb[0])
         end = self.distance(enda[1], enda[0], endb[1], endb[0])
@@ -154,7 +161,7 @@ class similarity:
         return False
 
     #calculate the meter distance between two trips
-    def distance(self, lat1, lon1, lat2, lon2, option=False):
+    def distance(self, lat1, lon1, lat2, lon2):
         R = 6371000
         rlat1 = math.radians(lat1)
         rlat2 = math.radians(lat2)
@@ -163,8 +170,6 @@ class similarity:
         a = math.sin(lat/2.0)**2 + math.cos(rlat1)*math.cos(rlat2) * math.sin(lon/2.0)**2
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
         d = R * c
-        if option==True:
-            print d
         if d <= self.radius:
             return True
         return False
