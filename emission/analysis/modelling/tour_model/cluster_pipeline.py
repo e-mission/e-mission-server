@@ -1,11 +1,11 @@
 # Standard imports
-import similarity
 import sys
 import math
 
 # Our imports
-import emission.core.get_database import edb
-import featurization
+import emission.core.get_database as edb
+import emission.analysis.modelling.tour_model.similarity as similarity
+import emission.analysis.modelling.tour_model.featurization as featurization
 
 """
 This file reads the data from the section database, 
@@ -33,16 +33,14 @@ read_data.
 #take it from the 'color' field of each section in the database. 
 def read_data(uuid, ground_truth=False):
     sectiondb = edb.get_section_db()
-    sections = sectiondb.find({'user_id' : uuid})
+    sections = sectiondb.find({'user_id' : uuid, 'section_start_point' : {'$exists' : True}, 'section_end_point' : {'$exists' : True}})
     if sections.count() == 0:
-        raise Exception('no sections found for user ' + str(uuid))
+        raise KeyError('no sections found for user ' + str(uuid))
     data = []
     colors = []
     for section in sections:
         check(section)
-        start = map(float, section['section_start_point']['coordinates'])
-        end = map(float, section['section_end_point']['coordinates'])
-        data.append({'trip_start_location' : start, 'trip_end_location' : end})
+        data.append(section)
         if ground_truth:
             colors.append(section['color'])
 
@@ -50,7 +48,7 @@ def read_data(uuid, ground_truth=False):
         indices = [] * len(set(colors))
         for n in colors:
             if n not in indices:
-                    indices.append(n)
+                indices.append(n)
                     
         for i in range(len(colors)):
             colors[i] = indices.index(colors[i])
@@ -77,8 +75,6 @@ def find_in_dict(data, key, second_key = None):
 
 #put the data into bins and cut off the lower half of the bins
 def remove_noise(data, cutoff, radius, colors=None):
-    if colors == []: 
-        colors = None
     sim = similarity.similarity(data, cutoff, radius, colors=colors)
     sim.bin_data()
     sim.delete_bins()
@@ -89,10 +85,10 @@ def remove_noise(data, cutoff, radius, colors=None):
         for b in bin:
             d = sim.data[b]
             newdata.append(sim.data[b])
-            if colors != None:
+            if bool(colors):
                 newcolors.append(colors[b])
 
-    if colors != None:
+    if bool(colors):
         indices = [] * len(set(newcolors))
         for n in newcolors:
             if n not in indices:
@@ -105,14 +101,12 @@ def remove_noise(data, cutoff, radius, colors=None):
 
 #cluster the data using k-means
 def cluster(data, colors=None):
-    if colors == []:
-        colors = None
     feat = featurization.featurization(data, colors=colors)
     m = len(data)
     min = int(math.ceil(m/7.0))
     max = int(math.ceil(m/4.0))
     feat.cluster(min_clusters=min, max_clusters=max)
-    if colors != None:
+    if bool(colors):
         feat.check_clusters()
     return feat.clusters, feat.labels, feat.data
 
@@ -129,5 +123,6 @@ if __name__=='__main__':
     n, labels, data = cluster(data, colors=colors)
     print 'number of clusters is ' + str(n)
     print 'labels by clusters are ' + str(labels)
-    
+    repy = representatives.representatives(data, labels)
+
 
