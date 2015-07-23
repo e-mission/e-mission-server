@@ -6,7 +6,7 @@ import math
 import emission.core.get_database as edb
 import emission.analysis.modelling.tour_model.similarity as similarity
 import emission.analysis.modelling.tour_model.featurization as featurization
-
+import emission.analysis.modelling.tour_model.representatives as representatives
 """
 This file reads the data from the section database, 
 removes noise from the data, and clusters is. 
@@ -31,11 +31,17 @@ read_data.
 
 #read the data from the database. If ground_truth is true, it will 
 #take it from the 'color' field of each section in the database. 
-def read_data(uuid, ground_truth=False):
+def read_data(uuid=None, ground_truth=False):
     sectiondb = edb.get_section_db()
-    sections = sectiondb.find({'user_id' : uuid, 'section_start_point' : {'$exists' : True}, 'section_end_point' : {'$exists' : True}})
+    #sectiondb = edb.get_fake_trips_db()
+    if uuid != None:
+        sections = sectiondb.find({'user_id' : uuid})
+    else:
+        sections = sectiondb.find({'section_start_point' : {'$exists' : True}, 'section_end_point' : {'$exists' : True}})
+    
+
     if sections.count() == 0:
-        raise KeyError('no sections found for user ' + str(uuid))
+        raise KeyError('no sections found')
     data = []
     colors = []
     for section in sections:
@@ -59,7 +65,8 @@ def read_data(uuid, ground_truth=False):
 def check(section):
     a = find_in_dict(section, 'section_start_point', 'coordinates')
     b = find_in_dict(section, 'section_end_point', 'coordinates')
-    if not a and b:
+    c = find_in_dict(section, 'section_start_datetime')
+    if not (a and b and c):
         raise KeyError('Missing information from section '+ str(section))
 
 #helper function for finding an element in a dictionary and 
@@ -110,19 +117,24 @@ def cluster(data, colors=None):
         feat.check_clusters()
     return feat.clusters, feat.labels, feat.data
 
-if __name__=='__main__':
-
-    if len(sys.argv) != 2:
-        print "Please provide a uuid."
-        sys.exit(0)
-
-    uuid = sys.argv[1]
-
-    data, colors = read_data(uuid, ground_truth=False)
-    data, colors = remove_noise(data, .5, 300, colors = colors)
-    n, labels, data = cluster(data, colors=colors)
-    print 'number of clusters is ' + str(n)
-    print 'labels by clusters are ' + str(labels)
+def cluster_to_tour_model(data, labels):
     repy = representatives.representatives(data, labels)
+    repy.list_clusters()
+    repy.reps()
+    repy.locations()
+    repy.cluster_dict()
+
+def main(uuid=None):
+    data, colors = read_data(uuid, ground_truth=False)
+    print len(data)
+    data, colors = remove_noise(data, .5, 300, colors = colors)
+    print len(data)
+    n, labels, data = cluster(data, colors=colors)
+    print len(data)
+    tour_dict = cluster_to_tour_model(data, labels)
+    return tour_dict
+
+if __name__=='__main__':
+    main()
 
 

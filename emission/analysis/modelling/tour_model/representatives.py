@@ -1,5 +1,6 @@
 import numpy
 import math
+import matplotlib.pyplot as plt
 
 """
 This class creates a group of representatives for each cluster
@@ -20,6 +21,8 @@ class representatives:
     def __init__(self, data, labels):
         self.data = data
         self.labels = labels
+        if not data or not labels:
+            raise ValueError('Both data and labels must not be empty')
         if len(data) != len(labels):
             raise ValueError('Length of data must equal length of clustering labels.')
         self.num_clusters = len(set(labels))
@@ -100,6 +103,67 @@ class representatives:
             if not self.distance(pointa[1], pointa[0], pointb[1], pointb[0]):
                 return False
         return True
+
+    #tour graph visualization
+    def graph(self):
+        import networkx as nx
+        import datetime
+        G = nx.DiGraph()
+        for v in range(self.num_locations):
+            G.add_node(v)
+        for e in self.tour_dict:
+            a = e['start']
+            b = e['end']
+            G.add_edge(a,b,days=set(),times=set())
+            for s in e['sections']:
+                date = s['section_start_datetime']
+                G[a][b]['days'].add(date.isoweekday())
+                G[a][b]['times'].add(date.hour)
+        nx.draw_random(G)
+        plt.suptitle('Tour Graph')
+        plt.show()
+        plt.clf()
+
+        days = []
+        for d in range(7):
+            a = G.subgraph(G.nodes())
+            days.append(a)
+        for e in G.edges():
+            for i in range(7):
+                if i not in G[e[0]][e[1]]['days']:
+                    days[i].remove_edge(e[0],e[1])
+        for d in days:
+            for v in d.nodes():
+                if d.in_degree(v) == 0 and d.out_degree(v) == 0:
+                    d.remove_node(v)
+        titles = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+        for d in days:
+            if len(d.nodes()) == 0:
+                continue
+            nx.draw_random(d)
+            plt.suptitle(titles[days.index(d)])
+            plt.show()
+            plt.clf()
+        
+        times = []
+        for t in range(24):
+            a = G.subgraph(G.nodes())
+            times.append(a)
+        for e in G.edges():
+            for i in range(24):
+                if i not in G[e[0]][e[1]]['times']:
+                    times[i].remove_edge(e[0],e[1])
+        for d in times:
+            for v in d.nodes():
+                if d.in_degree(v) == 0 and d.out_degree(v) == 0:
+                    d.remove_node(v)
+        for d in times:
+            if len(d.nodes()) == 0:
+                continue
+            nx.draw_random(d)
+            plt.suptitle(str(times.index(d)) + ' o-clock')
+            plt.show()
+            plt.clf()
 
     #the meter distance between two points
     def distance(self, lat1, lon1, lat2, lon2):

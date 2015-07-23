@@ -7,7 +7,6 @@ import numpy
 def get_start_times(data):
     dist = []
     for d in data:
-        #if find_in_dict(d, 'section_start_datetime'):
         time = d['section_start_datetime']
         time = time.hour + time.minute/60.0 + time.second/3600.0
         dist.append(time)
@@ -22,9 +21,8 @@ def get_start_times(data):
 def get_durations(data):
     dist = []
     for d in data:
-        if find_in_dict(d, 'duration'):
-            dur = d['duration']
-            dist.append(dur)
+        dur = d['duration']
+        dist.append(dur)
     plt.suptitle('Durations')
     plt.plot(dist)
     plt.xlabel('Data Points')
@@ -35,9 +33,8 @@ def get_durations(data):
 def get_distances(data):
     dist = []
     for d in data:
-        if find_in_dict(d, 'distance'):
-            distance = d['distance']
-            dist.append(distance)
+        distance = d['distance']
+        dist.append(distance)
     plt.suptitle('Distances')
     plt.xlabel('Data Points')
     plt.ylabel('Distances (m)')
@@ -48,10 +45,9 @@ def get_distances(data):
 def get_days(data):
     dist = []
     for d in data:
-        if find_in_dict(d, 'section_start_datetime'):
-            time = d['section_start_datetime']
-            time = time.isoweekday()
-            dist.append(time)
+        time = d['section_start_datetime']
+        time = time.isoweekday()
+        dist.append(time)
             
     plt.suptitle('Days of the Week')
     plt.yticks(numpy.arange(7), ('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'))
@@ -60,16 +56,6 @@ def get_days(data):
     plt.plot(dist)
     plt.savefig('days.png')
     plt.clf()    
-
-def find_in_dict(data, key, second_key = None):
-    if key not in data:
-        return False
-    elif data[key] == None:
-        return False
-    if second_key != None:
-        return find_in_dict(data[key], second_key)
-    return True;
-
 
 if __name__=='__main__':
     db = edb.get_section_db()

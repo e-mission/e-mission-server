@@ -6,7 +6,7 @@ import emission.analysis.modelling.tour_model.cluster_pipeline as cp
 
 class ClusterPipelineTests(unittest.TestCase):
     def setUp(self):
-        db = edb.get_section_db()
+        db = edb.get_fake_trips_db()
         self.uuids = set()
         sections = db.find({'user_id' : {'$exists' : True}, 'section_start_point' : {'$exists' : True}, 'section_end_point' : {'$exists' : True}})
         for s in sections:
@@ -29,24 +29,23 @@ class ClusterPipelineTests(unittest.TestCase):
             self.assertTrue(len(data) == db.find({'user_id' : uuid}).count())
 
     def testRemoveNoise(self):
-        uuid = self.uuids.pop()
-        data, colors = cp.read_data(uuid)
+        data, colors = cp.read_data()
         newdata, newcolors = cp.remove_noise(data, 0, 100)
         self.assertTrue(len(newdata) == 0)
         newdata, newcolors = cp.remove_noise(data, 1, 100)
         self.assertTrue(len(newdata) == len(data))
-        self.uuids.add(uuid)
 
     def testCluster(self):
-        uuid = self.uuids.pop()
-        data, colors = cp.read_data(uuid)
+        data, colors = cp.read_data()
         clusters, labels, newdata = cp.cluster(data)
         self.assertTrue(len(data)/7.0 <= clusters <= len(data)/4.0)
         self.assertTrue(len(labels) == len(newdata))
         self.assertTrue(cmp(newdata, data) == 0)
         data, colors = cp.remove_noise(data, .5, 200)
         clusters, labels, newdata = cp.cluster(data)
-        self.uuids.add(uuid)
+
+    def testClusterToTourModel(self):
+        return
 
 if __name__ == "__main__":
     unittest.main()

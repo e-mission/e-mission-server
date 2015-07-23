@@ -34,7 +34,7 @@ class Creator:
         self.labels = []
 
     def get_starting_ending_points(self):
-        city_file = open("CFC_DataCollector/trip_generator/input.json", "r") ## User (Naomi) specifies locations and radius they want
+        city_file = open("emission/simulation/input.json", "r") ## User (Naomi) specifies locations and radius they want
         jsn = json.load(city_file)
         self.num_trips = jsn["number of trips"]
         self.radius = float(jsn["radius"])
