@@ -31,9 +31,9 @@ class featurization:
             raise ValueError('No data')
         self.points = []
         for i in range(len(self.data)):
-            start = self.data[i]['section_start_point']['coordinates']
-            end = self.data[i]['section_end_point']['coordinates']
-            self.points.append([start[0], start[1], end[0], end[1]])
+            start = self.data[i].trip_start_location
+            end = self.data[i].trip_end_location
+            self.points.append([start.lon, start.lat, end.lon, end.lat])
 
 
     #cluster the data. input options:
@@ -54,8 +54,7 @@ class featurization:
         if max_clusters > len(self.points):
             max_clusters = len(self.points)
         if max_clusters < min_clusters:
-            sys.stderr.write('Please provide a valid range of cluster sizes\n')
-            return
+            raise ValueError('Please provide a valid range of cluster sizes')
         if name != 'kmeans' and name != 'kmedoids':
             print 'Invalid clustering algorithm name. Defaulting to k-means'
             name='kmeans'
@@ -82,11 +81,15 @@ class featurization:
                     num = num_clusters
                     labely = self.labels
         elif name == 'kmeans':
+            import warnings
             for i in range(r):
                 num_clusters = i + min_clusters
                 cl = KMeans(num_clusters, random_state=8)
                 cl.fit(self.points)
                 self.labels = cl.labels_
+
+                warnings.filterwarnings("ignore")                
+
                 sil = metrics.silhouette_score(numpy.array(self.points), self.labels)
                 if sil > max:
                     max = sil
@@ -114,9 +117,6 @@ class featurization:
         print 'homogeneity is ' + str(homogeneity_score(self.colors, self.labels))
         print 'completeness is ' + str(completeness_score(self.colors, self.labels))
 
-    #plot individual ground-truthed clusters on a map, where each map is one cluster defined 
-    #by the ground truth and if two trips are the same color on a map, then they are labeled 
-    #the same by the clustering algorithm
     def map_individuals(self):
         if not self.labels:
             print 'Please cluster before mapping clusters.'
@@ -138,10 +138,10 @@ class featurization:
             for i in range(len(self.colors)):
                 if self.colors[i] == color:
                     num_paths += 1
-                    start_lat = self.data[i]['section_start_point']['coordinates'][1]
-                    start_lon = self.data[i]['section_start_point']['coordinates'][0]
-                    end_lat = self.data[i]['section_end_point']['coordinates'][1]
-                    end_lon = self.data[i]['section_end_point']['coordinates'][0]
+                    start_lat = self.data[i].trip_start_location
+                    start_lon = self.data[i].trip_start_location
+                    end_lat = self.data[i].trip_end_location
+                    end_lon = self.data[i].trip_end_location
                     if first:
                         mymap = pygmaps.maps(start_lat, start_lon, 10)
                         first = False
@@ -162,21 +162,20 @@ class featurization:
         if self.colors:
             mymap = pygmaps.maps(37.5, -122.32, 10)
             for i in range(len(self.points)):
-                start_lat = self.data[i]['section_start_point']['coordinates'][1]
-                start_lon = self.data[i]['section_start_point']['coordinates'][0]
-                end_lat = self.data[i]['section_end_point']['coordinates'][1]
-                end_lon = self.data[i]['section_end_point']['coordinates'][0]
+                start_lat = self.data[i].trip_start_location
+                start_lon = self.data[i].trip_start_location
+                end_lat = self.data[i].trip_end_location
+                end_lon = self.data[i].trip_end_location
                 path = [(start_lat, start_lon), (end_lat, end_lon)]
                 mymap.addpath(path, matcol.rgb2hex(colormap(float(self.colors[i])/len(set(self.colors)))))
             mymap.draw('./mymap.html')
         if self.labels:
             mymap2 = pygmaps.maps(37.5, -122.32, 10)
             for i in range(len(self.points)):
-                start_lat = self.data[i]['section_start_point']['coordinates'][1]
-                start_lon = self.data[i]['section_start_point']['coordinates'][0]
-                end_lat = self.data[i]['section_end_point']['coordinates'][1]
-                end_lon = self.data[i]['section_end_point']['coordinates'][0]
-                path = [(start_lat, start_lon), (end_lat, end_lon)]
+                start_lat = self.data[i].trip_start_location
+                start_lon = self.data[i].trip_start_location
+                end_lat = self.data[i].trip_end_location
+                end_lon = self.data[i].trip_end_location
                 mymap2.addpath(path, matcol.rgb2hex(colormap(float(self.labels[i])/self.clusters)))
             mymap2.draw('./mylabels.html')
 

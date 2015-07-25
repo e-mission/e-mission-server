@@ -60,6 +60,25 @@ class similarity:
         for i in range(len(self.bins) - num):
             self.bins.pop()
 
+        newdata = []
+        newcolors = []
+        for bin in self.bins:
+            for b in bin:
+                d = self.data[b]
+                newdata.append(self.data[b])
+                if bool(self.colors):
+                    newcolors.append(self.colors[b])
+        if bool(self.colors):
+            indices = [] * len(set(newcolors))
+            for n in newcolors:
+                if n not in indices:
+                    indices.append(n)
+        for i in range(len(newcolors)):
+            newcolors[i] = indices.index(newcolors[i])
+
+        self.data = newdata
+        self.colors = newcolors
+
 
     #check if two trips match
     def match(self,a,bin):
@@ -93,47 +112,42 @@ class similarity:
         mymap = pygmaps.maps(37.5, -122.32, 10)
         for bin in self.bins:
             for b in bin:
-                start_lat = self.data[b]['trip_start_location'][1]
-                start_lon = self.data[b]['trip_start_location'][0]
-                end_lat = self.data[b]['trip_end_location'][1]
-                end_lon = self.data[b]['trip_end_location'][0]
+                start_lat = self.data[b].trip_start_location.lat
+                start_lon = self.data[b].trip_start_location.lon
+                end_lat = self.data[b].trip_end_location.lat
+                end_lon = self.data[b].trip_end_location.lon
                 path = [(start_lat, start_lon), (end_lat, end_lon)]
                 mymap.addpath(path, matcol.rgb2hex(colormap(float(self.bins.index(bin))/len(self.bins))))
         mymap.draw('./mybins.html')
         
     #evaluate the bins as if they were a clustering on the data
     def evaluate_bins(self):
+        if not self.colors:
+            return
         self.labels = []
-        newcolors = []
         for bin in self.bins:
             for b in bin:
                 self.labels.append(self.bins.index(bin))
-                if bool(self.colors):
-                    newcolors.append(self.colors[b])
-        self.colors = newcolors
                     
         labels = numpy.array(self.labels)
         colors = numpy.array(self.colors)
         points = []
         for bin in self.bins:
             for b in bin:
-                start_lat = self.data[b]['trip_start_location'][1]
-                start_lon = self.data[b]['trip_start_location'][0]
-                end_lat = self.data[b]['trip_end_location'][1]
-                end_lon = self.data[b]['trip_end_location'][0]
+                start_lat = self.data[b].trip_start_location.lat
+                start_lon = self.data[b].trip_start_location.lon
+                end_lat = self.data[b].trip_end_location.lat
+                end_lon = self.data[b].trip_end_location.lon
                 path = [start_lat, start_lon, end_lat, end_lon]
                 points.append(path)
-
-        if bool(self.colors):
-            a = metrics.silhouette_score(numpy.array(points), labels)
-            b = homogeneity_score(colors, labels)
-            c = completeness_score(colors, labels)
-            
-            print 'number of bins is ' + str(len(self.bins))
-            print 'silhouette score is ' + str(a)
-            print 'homogeneity is ' + str(b)
-            print 'completeness is ' + str(c)
-            print 'accuracy is ' + str(((a+1)/2.0 + b + c)/3.0)
+        a = metrics.silhouette_score(numpy.array(points), labels)
+        b = homogeneity_score(colors, labels)
+        c = completeness_score(colors, labels)
+        print 'number of bins is ' + str(len(self.bins))
+        print 'silhouette score is ' + str(a)
+        print 'homogeneity is ' + str(b)
+        print 'completeness is ' + str(c)
+        print 'accuracy is ' + str(((a+1)/2.0 + b + c)/3.0)
 
     #update the ground truth
     def update_colors(self, newcolors):
@@ -149,13 +163,13 @@ class similarity:
 
     #calculate the distance between two trips
     def distance_helper(self, a, b):
-        starta = self.data[a]['section_start_point']['coordinates']
-        startb = self.data[b]['section_start_point']['coordinates']
-        enda = self.data[a]['section_end_point']['coordinates']
-        endb = self.data[b]['section_end_point']['coordinates']
+        starta = self.data[a].trip_start_location
+        startb = self.data[b].trip_start_location
+        enda = self.data[a].trip_end_location
+        endb = self.data[b].trip_end_location
 
-        start = self.distance(starta[1], starta[0], startb[1], startb[0])
-        end = self.distance(enda[1], enda[0], endb[1], endb[0])
+        start = self.distance(starta.lat, starta.lon, startb.lat, startb.lon)
+        end = self.distance(enda.lat, enda.lon, endb.lat, endb.lon)
         if start and end:
             return True
         return False

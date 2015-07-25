@@ -1,6 +1,9 @@
 import numpy
 import math
 import matplotlib.pyplot as plt
+import pygmaps
+from matplotlib import colors as matcol
+from emission.core.wrapper.trip import Trip, Coordinate
 
 """
 This class creates a group of representatives for each cluster
@@ -43,12 +46,13 @@ class representatives:
         for cluster in self.clusters:
             points = [[]]*4
             for c in cluster:
-                points[0].append(c['section_start_point']['coordinates'][1])
-                points[1].append(c['section_start_point']['coordinates'][0])
-                points[2].append(c['section_end_point']['coordinates'][1])
-                points[3].append(c['section_end_point']['coordinates'][0])
+                points[0].append(c.trip_start_location.lat)
+                points[1].append(c.trip_start_location.lon)
+                points[2].append(c.trip_end_location.lat)
+                points[3].append(c.trip_end_location.lon)
             centers = numpy.mean(points, axis=0)
-            a = {'section_start_point' : {'coordinates' : [centers[1], centers[0]]}, 'section_end_point' : {'coordinates' : [centers[3], centers[2]]}}
+            a = Trip(None, None, None, None, None, None, Coordinate(centers[0], centers[1]), Coordinate(centers[2], centers[3]))
+            #a = {'section_start_po' : {'coordinates' : [centers[1], centers.lon]}, 'section_end_point' : {'coordinates' : [centers[3], centers[2]]}}
             self.reps.append(a)
 
     #define the set of locations for the data
@@ -61,11 +65,9 @@ class representatives:
                 if self.match('start', a, bin):
                     bin.append(('start', a))
                     added_start = True
-                    break
                 if self.match('end', a, bin):
                     bin.append(('end', a))
                     added_end = True
-                    break
             if not added_start:
                 newbin = [('start', a)]
                 if self.match('end', a, newbin):
@@ -74,14 +76,16 @@ class representatives:
                 self.bins.append(newbin)
             if not added_end:
                 self.bins.append([('end', a)])
+
+        print len(self.bins)
         self.num_locations = len(self.bins)
-        
+
     #create the input to the tour graph
     def cluster_dict(self):
         self.tour_dict = [0] * self.num_clusters
         for i in range(self.num_clusters):
             a = {'sections' : self.clusters[i]}
-            self.tour_dict[i] = (a)
+            self.tour_dict[i] = a
         for i in range(self.num_locations):
             bin = self.bins[i]
             for b in bin:
@@ -92,15 +96,15 @@ class representatives:
     #check whether a point is close to all points in a bin
     def match(self, label, a, bin):
         if label == 'start':
-            pointa = self.reps[a]['section_start_point']['coordinates']
+            pointa = self.reps[a].trip_start_location
         elif label == 'end':
-            pointa = self.reps[a]['section_end_point']['coordinates']
+            pointa = self.reps[a].trip_end_location
         for b in bin:
             if b[0] == 'start':
-                pointb = self.reps[b[1]]['section_start_point']['coordinates']
+                pointb = self.reps[b[1]].trip_start_location
             else:
-                pointb = self.reps[b[1]]['section_end_point']['coordinates']
-            if not self.distance(pointa[1], pointa[0], pointb[1], pointb[0]):
+                pointb = self.reps[b[1]].trip_end_location
+            if not self.distance(pointa.lat, pointa.lon, pointb.lat, pointb.lon):
                 return False
         return True
 
@@ -121,49 +125,9 @@ class representatives:
                 G[a][b]['times'].add(date.hour)
         nx.draw_random(G)
         plt.suptitle('Tour Graph')
+        plt.savefig('tourgraph.png')
         plt.show()
         plt.clf()
-
-        days = []
-        for d in range(7):
-            a = G.subgraph(G.nodes())
-            days.append(a)
-        for e in G.edges():
-            for i in range(7):
-                if i not in G[e[0]][e[1]]['days']:
-                    days[i].remove_edge(e[0],e[1])
-        for d in days:
-            for v in d.nodes():
-                if d.in_degree(v) == 0 and d.out_degree(v) == 0:
-                    d.remove_node(v)
-        titles = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-        for d in days:
-            if len(d.nodes()) == 0:
-                continue
-            nx.draw_random(d)
-            plt.suptitle(titles[days.index(d)])
-            plt.show()
-            plt.clf()
-        
-        times = []
-        for t in range(24):
-            a = G.subgraph(G.nodes())
-            times.append(a)
-        for e in G.edges():
-            for i in range(24):
-                if i not in G[e[0]][e[1]]['times']:
-                    times[i].remove_edge(e[0],e[1])
-        for d in times:
-            for v in d.nodes():
-                if d.in_degree(v) == 0 and d.out_degree(v) == 0:
-                    d.remove_node(v)
-        for d in times:
-            if len(d.nodes()) == 0:
-                continue
-            nx.draw_random(d)
-            plt.suptitle(str(times.index(d)) + ' o-clock')
-            plt.show()
-            plt.clf()
 
     #the meter distance between two points
     def distance(self, lat1, lon1, lat2, lon2):
@@ -175,9 +139,63 @@ class representatives:
         a = math.sin(lat/2.0)**2 + math.cos(rlat1)*math.cos(rlat2) * math.sin(lon/2.0)**2
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
         d = R * c
-        if d <= 200:
+        if d <= 300:
             return True
         return False
 
 
+
+    def mapping(self):
+        for bin in self.bins:
+            first = True
+            for b in bin:
+                start_lat = self.reps[b[1]].trip_start_location.lat
+                start_lon = self.reps[b[1]].trip_start_location.lon
+                end_lat = self.reps[b[1]].trip_end_location.lat
+                end_lon = self.reps[b[1]].trip_end_location.lon
+                if first:
+                    mymap = pygmaps.maps(start_lat, start_lon, 10)
+                    first = False
+                path = [(start_lat, start_lon), (end_lat, end_lon)]
+                mymap.addpath(path)
+            mymap.draw('./mybins' + str(self.bins.index(bin)) + '.html')
+
+        mymap = pygmaps.maps(37.5, -122.32, 10)
+        for rep in self.reps:
+            start_lat = rep.trip_start_location.lat
+            start_lon = rep.trip_start_location.lon
+            end_lat = rep.trip_end_location.lat
+            end_lon = rep.trip_end_location.lon
+            path = [(start_lat, start_lon), (end_lat, end_lon)]
+            mymap.addpath(path)
+        mymap.draw('./myreps.html')
+
+        import pygmaps
+        self.locations = []
+        for bin in self.bins:
+            mymap = pygmaps.maps(37.5, -122.32, 10)
+            locs = []
+            for b in bin:
+                if b[0] == 'start':
+                    point = self.reps[b[1]].trip_start_location
+                if b[0] == 'end':
+                    point = self.reps[b[1]].trip_end_location
+                locs.append(point)
+                mymap.addpoint(point[1], point[0], '#FF0000')
+            locs = numpy.mean(locs, axis=0)
+            mymap.addpoint(locs[1], locs[0], '#0000FF')
+            self.locations.append([locs[0], locs[1]])
+            mymap.draw('./mylocs' + str(self.bins.index(bin)) + '.html')
+
+        colormap = plt.cm.get_cmap()
+        for i in range(self.num_locations):
+            mymap = pygmaps.maps(37.5, -122.32, 10)
+            for cluster in self.tour_dict:
+                if cluster['start'] == i or cluster['end'] == i:
+                    for c in cluster['sections']:
+                        start = c.trip_start_location
+                        end = c.trip_end_location
+                        path = [(start.lat, start.lon), (end.lat, end.lon)]
+                        mymap.addpath(path)
+            mymap.draw('./mytourdict' + str(i) + '.html')
 
