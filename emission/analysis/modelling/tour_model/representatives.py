@@ -1,7 +1,7 @@
 import numpy
 import math
 import matplotlib.pyplot as plt
-import pygmaps
+#import pygmaps
 from matplotlib import colors as matcol
 from emission.core.wrapper.trip import Trip, Coordinate
 

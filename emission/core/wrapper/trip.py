@@ -53,14 +53,21 @@ class Trip(object):
         user_id = json_segment.get("user_id")
         trip_id = json_segment.get("trip_id")
         sections = cls._init_sections(user_id, trip_id, len(json_segment.get("sections"))) if json_segment.get("sections") else None
+
         try:
             start_time = json_segment["trip_start_datetime"]
-            end_time = json_segment["trip_end_datetime"]
+            #end_time = json_segment["trip_end_datetime"]
+            end_time = 0
         except:
             start_time = datetime.datetime.strptime(json_segment.get("trip_start_time"), DATE_FORMAT)
             end_time = datetime.datetime.strptime(json_segment.get("trip_end_time"), DATE_FORMAT)
         trip_start_location = cls._start_location(sections)
         trip_end_location = cls._end_location(sections)
+        if not trip_start_location:
+            print json_segment.get("trip_start_point")
+            trip_start_location = Coordinate(json_segment.get("trip_start_point")['coordinates'][1], json_segment.get("trip_start_point")['coordinates'][0])
+        if not trip_end_location:
+            trip_end_location = Coordinate(json_segment.get("trip_end_point")['coordinates'][1], json_segment.get("trip_end_point")['coordinates'][0])
         return cls(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location)
 
     @classmethod
@@ -335,7 +342,7 @@ class Alternative_Trip(Trip):
 
     @classmethod
     def trip_from_json(cls, json_segment):
-	# print "json_segment = %s" % json_segment
+    # print "json_segment = %s" % json_segment
         trip = Trip.trip_from_json(json_segment)
         trip.parent_id = json_segment.get("parent_id")
         trip.cost = json_segment.get("cost")
@@ -344,7 +351,7 @@ class Alternative_Trip(Trip):
 
         trip.track_points = json_segment.get("track_points")
 
-	trip.trip_start_location = Coordinate(json_segment.get("trip_start_location")[1], json_segment.get("trip_start_location")[0])
+        trip.trip_start_location = Coordinate(json_segment.get("trip_start_location")[1], json_segment.get("trip_start_location")[0])
 
         trip.trip_end_location = Coordinate(json_segment.get("trip_end_location")[1], json_segment.get("trip_end_location")[0])
 
@@ -407,8 +414,8 @@ class Fake_Trip(Trip):
         db = edb.get_fake_trips_db()
         print "trip start loc is %s" % self.trip_start_location
         print "trip end loc is %s" % self.trip_end_location 
-        db.insert({"trip_id" : self._id, "section_start_point" : {'coordinates' : self.trip_start_location.coordinate_list()}, 
-            "section_end_point" : {'coordinates' : self.trip_end_location.coordinate_list()}, 'section_start_datetime' : self.start_time})
+        db.insert({"trip_id" : self._id, "trip_start_point" : {'coordinates' : self.trip_start_location.coordinate_list()}, 
+            "trip_end_point" : {'coordinates' : self.trip_end_location.coordinate_list()}, 'trip_start_datetime' : self.start_time})
 
 class Canonical_Alternative_Trip(Alternative_Trip):
     def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location, alternatives, perturbed_trips, mode_list):
