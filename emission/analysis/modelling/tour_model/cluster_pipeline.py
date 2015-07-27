@@ -34,30 +34,18 @@ read_data.
 
 #read the data from the database. If ground_truth is true, it will 
 #take it from the 'color' field of each section in the database. 
-def read_data(uuid=None, trips=True, ground_truth=False):
+def read_data(uuid=None, ground_truth=False):
     data = []
-    if trips:
-        db = edb.get_trip_db()
-        if uuid:
-            trips = db.find({'user_id' : uuid})
-        else:
-            trips = db.find()
-        for t in trips:
-            trip = Trip.trip_from_json(t)
-            if not (trip.trip_start_location and trip.trip_end_location and trip.start_time):
-                continue
-            data.append(trip)
+    db = edb.get_trip_db()
+    if uuid:
+        trips = db.find({'user_id' : uuid})
     else:
-        db = edb.get_section_db()
-        if uuid:
-            sections = db.find({'user_id': uuid})
-        else:
-            secions = db.find()
-        for s in sections:
-            section = Section.section_from_json(s)
-            if not (section.start_location and section.end_location and section.start_time):
-                continue
-            data.append(section)
+        trips = db.find()
+    for t in trips:
+        trip = Trip.trip_from_json(t)
+        if not (trip.trip_start_location and trip.trip_end_location and trip.start_time):
+            continue
+        data.append(trip)
 
     if len(data) == 0:
         raise KeyError('no trips found')
@@ -81,18 +69,19 @@ def remove_noise(data, cutoff, radius, colors=None):
     sim = similarity.similarity(data, cutoff, radius, colors=colors)
     sim.bin_data()
     sim.delete_bins()
+    print 'number of bins: ' + str(len(sim.bins))
     return sim.data, sim.colors, len(sim.bins)
 
 #cluster the data using k-means
 def cluster(data, bins, colors=None):
     feat = featurization.featurization(data, colors=colors)
     m = len(data)
-    min = int(math.ceil(.66 * bins))
+    min = bins
     max = int(math.ceil(1.33 * bins))
     feat.cluster(min_clusters=min, max_clusters=max)
     if bool(colors):
         feat.check_clusters()
-    print feat.clusters
+    print 'number of clusters: ' + str(feat.clusters)
     return feat.clusters, feat.labels, feat.data
 
 def cluster_to_tour_model(data, labels):
@@ -100,6 +89,7 @@ def cluster_to_tour_model(data, labels):
     repy.list_clusters()
     repy.reps()
     repy.locations()
+    print 'number of locations: ' + str(repy.num_locations)
     repy.cluster_dict()
 
 def main(uuid=None):

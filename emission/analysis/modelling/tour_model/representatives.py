@@ -77,7 +77,6 @@ class representatives:
             if not added_end:
                 self.bins.append([('end', a)])
 
-        print len(self.bins)
         self.num_locations = len(self.bins)
 
     #create the input to the tour graph
