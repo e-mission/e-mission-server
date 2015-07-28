@@ -102,6 +102,7 @@ def main(uuid=None):
     data, colors, bins = remove_noise(data, .5, 300, colors = colors)
     n, labels, data = cluster(data, bins, colors=colors)
     tour_dict = cluster_to_tour_model(data, labels)
+    tour_graph(tour_dict)
     return tour_dict
 
 if __name__=='__main__':
