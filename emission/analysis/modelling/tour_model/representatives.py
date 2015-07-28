@@ -79,6 +79,19 @@ class representatives:
 
         self.num_locations = len(self.bins)
 
+        self.locs = []
+        for bin in self.bins:
+            locs = []
+            for b in bin:
+                if b[0] == 'start':
+                    point = self.reps[b[1]].trip_start_location
+                if b[0] == 'end':
+                    point = self.reps[b[1]].trip_end_location
+                locs.append([point.lat, point.lon])
+            locs = numpy.mean(locs, axis=0)
+            coord = Coordinate(locs[0], locs[1])
+            self.locs.append(coord)
+
     #create the input to the tour graph
     def cluster_dict(self):
         self.tour_dict = [0] * self.num_clusters
@@ -91,6 +104,12 @@ class representatives:
                 cluster = b[1]
                 label = b[0]
                 self.tour_dict[cluster][label] = i
+        for i in range(self.num_clusters):
+            cluster = self.tour_dict[i]
+            start_coords = self.locs[cluster['start']]
+            end_coords = self.locs[cluster['end']]
+            self.tour_dict[i]['start_coords'] = start_coords
+            self.tour_dict[i]['end_coords'] = end_coords
 
     #check whether a point is close to all points in a bin
     def match(self, label, a, bin):
