@@ -36,19 +36,15 @@ read_data.
 #take it from the 'color' field of each section in the database. 
 def read_data(uuid=None, ground_truth=False):
     data = []
-    db = edb.get_fake_trips_db()
+    db = edb.get_trip_db()
     if uuid:
         trips = db.find({'user_id' : uuid})
     else:
         trips = db.find()
     for t in trips:
         trip = Trip.trip_from_json(t)
-        if not trip.trip_start_location:
-            print 1
-        if not trip.trip_end_location:
-            print 2
-        if not trip.start_time:
-            print 3
+        if not (trip.trip_start_location and trip.trip_end_location and trip.start_time):
+            continue
         data.append(trip)
 
     if len(data) == 0:
@@ -102,7 +98,6 @@ def main(uuid=None):
     data, colors, bins = remove_noise(data, .5, 300, colors = colors)
     n, labels, data = cluster(data, bins, colors=colors)
     tour_dict = cluster_to_tour_model(data, labels)
-    tour_graph(tour_dict)
     return tour_dict
 
 if __name__=='__main__':
