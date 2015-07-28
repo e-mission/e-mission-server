@@ -19,7 +19,7 @@ class Commute(object):
         self.starting_point = starting_point
         self.ending_point = ending_point
 
-    def increment_prob(self, hour, day):
+    def increment_prob(self, hour, day, mode):
         #print "increment_prob"
         self.probabilities[day, hour] += 1
 
@@ -58,7 +58,7 @@ class Location(object):
             commute = Commute(self, suc_obj)
             edge = self.tm.get_edge(commute)
             #print "hour is %s" % hour.hour
-            for temp_hour in xrange(hour, HOURS_IN_DAY):
+            for temp_hour in xrange(hour.hour, HOURS_IN_DAY):
                 counter_key = (suc_obj, temp_hour)
                 temp_counter[counter_key] = edge.probabilities[day, temp_hour]
                 if edge.probabilities[day, temp_hour] > 0:
@@ -77,7 +77,7 @@ class Location(object):
             commute = Commute(self, suc_obj)
             edge = self.tm.get_edge(commute)
             #print "hour is %s" % hour.hour
-            for temp_hour in xrange(hour, HOURS_IN_DAY):
+            for temp_hour in xrange(hour.hour, HOURS_IN_DAY):
                 counter_key = (suc_obj, temp_hour)
                 temp_counter[counter_key] = edge.probabilities[day, temp_hour]
                     #print temp_counter
