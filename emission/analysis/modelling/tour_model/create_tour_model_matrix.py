@@ -5,10 +5,11 @@ import emission.analysis.modelling.tour_model.cluster_pipeline as eamtcp
 from uuid import UUID
 import random
 
-def test():
+def main():
     list_of_cluster_data = eamtcp.main()
     print list_of_cluster_data
     new_tm = create_tour_model("Josh", list_of_cluster_data)
+    return new_tm
 
 def create_tour_model(user, list_of_cluster_data):
     # Highest level function, create tour model from the cluster data that nami gives me
@@ -41,12 +42,12 @@ def set_up(list_of_cluster_data, user_name):
 
 
 def get_start_hour(section_info):
-    return section_info.start_time
+    return section_info.start_time.hour
 
 
 def get_end_hour(section_info):
-    print section_info.end_time
-    return section_info.end_time
+    print section_info.end_time.hour
+    return section_info.end_time.hour
 
 
 def get_day(section_info):
@@ -92,10 +93,13 @@ def get_section_obj_from_cluster_data(section_info):
     return our_section
 
 def make_location_from_section(section, tour_model):
-    start_hour = section.start_time.hour    
+    start_hour = section.start_time.hour
 
 def make_graph_edge(start_point, end_point, tour_model):
     sp = tour_model.get_location(start_point)
     ep = tour_model.get_location(end_point)
     comm = tm.Commute(sp, ep)
     tour_model.get_edge(comm)
+
+if __name__=='__main__':
+    main()
