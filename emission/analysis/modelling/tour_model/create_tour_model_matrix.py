@@ -41,12 +41,12 @@ def set_up(list_of_cluster_data, user_name):
 
 
 def get_start_hour(section_info):
-    return section_info.start_time
+    return section_info.start_time.hour
 
 
 def get_end_hour(section_info):
     print section_info.end_time
-    return section_info.end_time
+    return section_info.end_time.hour
 
 
 def get_day(section_info):
@@ -82,7 +82,7 @@ def populate_prob_field_for_locatons(list_of_cluster_data, tour_model):
             end_loc_temp = tour_model.get_location(end_loc_temp)
             com = tm.Commute(start_loc_temp, end_loc_temp)
             tour_model.add_start_hour(start_loc_temp, get_start_hour(sec), get_day(sec))
-            start_loc_temp.increment_successor(end_loc_temp, get_end_hour(sec), get_day(sec))
+            start_loc_temp.increment_successor(end_loc_temp, get_start_hour(sec), get_day(sec))
             #print "counter for %s is : %s" % (start_loc_temp, start_loc_temp.counter)
 
 

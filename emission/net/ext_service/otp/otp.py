@@ -7,8 +7,7 @@ import urllib, urllib2, datetime, time, random
 from pygeocoder import Geocoder
 
 # Our imports
-from emission.core.wrapper.trip import Coordinate, Alternative_Trip, Section, Fake_Trip, Fake_Section
-from emission.net.ext_service.gmaps.common import calc_car_cost
+from emission.core.wrapper.trip import Coordinate, Alternative_Trip, Section, E_Mission_Trip
 
 try:
     import json
@@ -127,14 +126,14 @@ class OTP:
             #start_city_car = str(Geocoder().reverse_geocode(car_start_coordinates.get_lat(),car_start_coordinates.get_lon())).split(',')[1]
             #end_city_car = str(Geocoder().reverse_geocode(car_end_coordinates.get_lat(), car_end_coordinates.get_lon())).split(',')[1]
             #traffic_time = get_travel_time(start_city_car, end_city_car)
-            cost = calc_car_cost(car_dist)
+            cost = 0
             #if traffic_time > final_end_time - final_start_time:
             #    print "Driving is bad: " + traffic_time
             #    final_end_time = final_start_time + traffic_time
 
         mode_list = list(mode_list)
         if is_fake:
-            return E_Missions_Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc, mode_list)
+            return E_Mission_Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc, 0, 0, mode_list, mode_list)
         return Alternative_Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc, 0, cost, mode_list)
 
 def otp_time_to_ours(otp_str):

@@ -29,6 +29,9 @@ class Commute(object):
     def __repr__(self):
         return self.dict_key()
 
+    def get_duration(self):
+        return self.ending_point
+
 
 class Location(object):
 
@@ -58,7 +61,7 @@ class Location(object):
             commute = Commute(self, suc_obj)
             edge = self.tm.get_edge(commute)
             #print "hour is %s" % hour.hour
-            for temp_hour in xrange(hour.hour, HOURS_IN_DAY):
+            for temp_hour in xrange(hour, HOURS_IN_DAY):
                 counter_key = (suc_obj, temp_hour)
                 temp_counter[counter_key] = edge.probabilities[day, temp_hour]
                 if edge.probabilities[day, temp_hour] > 0:
