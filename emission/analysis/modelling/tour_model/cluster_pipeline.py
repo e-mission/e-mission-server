@@ -95,6 +95,7 @@ def cluster_to_tour_model(data, labels):
     repy.locations()
     print 'number of locations: ' + str(repy.num_locations)
     repy.cluster_dict()
+    return repy.tour_dict
 
 def main(uuid=None):
     data, colors = read_data(uuid, ground_truth=False)

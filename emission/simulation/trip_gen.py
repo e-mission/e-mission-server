@@ -8,6 +8,7 @@ import random, math
 from emission.net.ext_service.otp.otp import OTP, PathNotFoundException
 from emission.core.wrapper.trip import Coordinate 
 
+
 class Address:
 
     ## This class exists only for caching purposes
@@ -25,13 +26,13 @@ class Creator:
     def __init__(self):
         self.starting_points = [ ]
         self.ending_points = [ ]
-        self.a_to_b = []
+        self.a_to_b = [ ]
         self.num_trips = None
         self.radius = None
         self.amount_missed = 0
-        self.starting_addresses = []
-        self.ending_addresses = []
-        self.labels = []
+        self.starting_addresses = [ ]
+        self.ending_addresses = [ ]
+        self.labels = [ ]
 
     def get_starting_ending_points(self):
         city_file = open("emission/simulation/input.json", "r") ## User (Naomi) specifies locations and radius they want
@@ -41,12 +42,13 @@ class Creator:
         for address in jsn["starting centroids"]:            
             self.starting_points.extend(generate_random_locations_in_radius(Address(address), self.radius, self.num_trips/len(jsn["starting centroids"])))
             for i in range(self.num_trips/len(jsn["starting centroids"])):
+
                 self.starting_addresses.append(address)
         for address in jsn["ending centroids"]:
             self.ending_points.extend(generate_random_locations_in_radius(Address(address), self.radius, self.num_trips/len(jsn["starting centroids"])))
             for i in range(self.num_trips/len(jsn["starting centroids"])):
                 self.ending_addresses.append(address)
-     
+
     def make_a_to_b(self):
         for _ in xrange(self.num_trips ):  ## Based on very rough estimate of how many of these end up in the ocean
             start_index = random.randint(0, len(self.starting_points) - 1)
@@ -63,16 +65,14 @@ class Creator:
         curr_time = datetime.datetime.now()
         curr_month = curr_time.month
         curr_year = curr_time.year
-        curr_day = curr_time.day
-        curr_hour = curr_time.hour
         curr_minute = curr_time.minute
         for i in range(len(self.a_to_b)):
+            curr_day = random.randint(1, 28)
+            curr_hour = random.randint(0, 23)
             t = self.a_to_b[i]
             print t
             mode = mode_tuple[random.randint(0, len(mode_tuple) - 1)] ## Unsophisticated mode choice, Alexi would throw up
             try:
-                if abs(t[0].get_lon()) < 30 or abs(t[0].get_lat()) < 30:
-                    print 
                 otp_trip = OTP(t[0], t[1], mode, write_day(curr_month, curr_day, curr_year), write_time(curr_hour, curr_minute), True)
                 alt_trip = otp_trip.turn_into_trip(self.labels[i], 0, 0, True)   ## ids
                 alt_trip.save_to_db()
