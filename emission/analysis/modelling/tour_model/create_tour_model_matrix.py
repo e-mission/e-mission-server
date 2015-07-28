@@ -41,12 +41,12 @@ def set_up(list_of_cluster_data, user_name):
 
 
 def get_start_hour(section_info):
-    return section_info.start_time
+    return section_info.start_time.hour
 
 
 def get_end_hour(section_info):
-    print section_info.end_time
-    return section_info.end_time
+    print section_info.end_time.hour
+    return section_info.end_time.hour
 
 
 def get_day(section_info):
