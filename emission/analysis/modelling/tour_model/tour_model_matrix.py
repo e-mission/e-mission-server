@@ -15,13 +15,13 @@ class Commute(object):
     """ An edge in the graph """
 
     def __init__(self, starting_point, ending_point):
-        self.probabilities = np.zeros((DAYS_IN_WEEK, HOURS_IN_DAY, NUM_MODES))
+        self.probabilities = np.zeros((DAYS_IN_WEEK, HOURS_IN_DAY))
         self.starting_point = starting_point
         self.ending_point = ending_point
 
     def increment_prob(self, hour, day, mode):
         #print "increment_prob"
-        self.probabilities[day, hour, mode] += 1
+        self.probabilities[day, hour] += 1
 
     def dict_key(self):
         return "%s->%s" % (self.starting_point, self.ending_point)
@@ -40,11 +40,11 @@ class Location(object):
         self.successors = set( )
         self.edges = set( )
 
-    def increment_successor(self, suc, hour, day, mode):
+    def increment_successor(self, suc, hour, day):
         #print "INCREMENTING SUCCESSOR %s %s %s " % (hour, day, mode)
         edge = Commute(self, suc)
         the_edge = self.tm.get_edge(edge)
-        the_edge.increment_prob(hour, day, mode)
+        the_edge.increment_prob(hour, day)
         self.successors.add(str(suc))
         self.edges.add(str(edge))
 
@@ -59,11 +59,10 @@ class Location(object):
             edge = self.tm.get_edge(commute)
             #print "hour is %s" % hour.hour
             for temp_hour in xrange(hour.hour, HOURS_IN_DAY):
-                for temp_mode in xrange(NUM_MODES):
-                    counter_key = (suc_obj, temp_hour, temp_mode)
-                    temp_counter[counter_key] = edge.probabilities[day, temp_hour, temp_mode]
-                    if edge.probabilities[day, temp_hour, temp_mode] > 0:
-                        print "%s -> %d" % (counter_key, edge.probabilities[day, temp_hour, temp_mode])
+                counter_key = (suc_obj, temp_hour)
+                temp_counter[counter_key] = edge.probabilities[day, temp_hour]
+                if edge.probabilities[day, temp_hour] > 0:
+                    print "%s -> %d" % (counter_key, edge.probabilities[day, temp_hour])
 
                     #print temp_counter
         return esmmc.sampleFromCounter(temp_counter)
@@ -79,9 +78,8 @@ class Location(object):
             edge = self.tm.get_edge(commute)
             #print "hour is %s" % hour.hour
             for temp_hour in xrange(hour.hour, HOURS_IN_DAY):
-                for temp_mode in xrange(NUM_MODES):
-                    counter_key = (suc_obj, temp_hour, temp_mode)
-                    temp_counter[counter_key] = edge.probabilities[day, temp_hour, temp_mode]
+                counter_key = (suc_obj, temp_hour)
+                temp_counter[counter_key] = edge.probabilities[day, temp_hour]
                     #print temp_counter
         return temp_counter.totalCount() != 0
             

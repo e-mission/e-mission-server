@@ -9,7 +9,6 @@ def test():
     list_of_cluster_data = eamtcp.main()
     print list_of_cluster_data
     new_tm = create_tour_model("Josh", list_of_cluster_data)
-    new_tm.see_graph()
 
 def create_tour_model(user, list_of_cluster_data):
     # Highest level function, create tour model from the cluster data that nami gives me
@@ -83,7 +82,7 @@ def populate_prob_field_for_locatons(list_of_cluster_data, tour_model):
             end_loc_temp = tour_model.get_location(end_loc_temp)
             com = tm.Commute(start_loc_temp, end_loc_temp)
             tour_model.add_start_hour(start_loc_temp, get_start_hour(sec), get_day(sec))
-            start_loc_temp.increment_successor(end_loc_temp, get_end_hour(sec), get_day(sec), get_mode_num(sec))
+            start_loc_temp.increment_successor(end_loc_temp, get_end_hour(sec), get_day(sec))
             #print "counter for %s is : %s" % (start_loc_temp, start_loc_temp.counter)
 
 
