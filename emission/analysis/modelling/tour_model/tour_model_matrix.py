@@ -1,6 +1,7 @@
 # Our imports
 import emission.simulation.markov_model_counter as esmmc
 import numpy as np
+import math, datetime
 
 DAYS_IN_WEEK = 7
 HOURS_IN_DAY = 24
@@ -8,6 +9,7 @@ MODES_TO_NUMBERS = {"walking" : 0, "car" : 1, "train" : 2, "bart" : 3, "bike" : 
 
 
 NUM_MODES = len(MODES_TO_NUMBERS)
+
 
 
 class Commute(object):
@@ -18,8 +20,9 @@ class Commute(object):
         self.probabilities = np.zeros((DAYS_IN_WEEK, HOURS_IN_DAY))
         self.starting_point = starting_point
         self.ending_point = ending_point
+        self.trips = [ ]
 
-    def increment_prob(self, hour, day, mode):
+    def increment_prob(self, hour, day):
         #print "increment_prob"
         self.probabilities[day, hour] += 1
 
@@ -29,19 +32,26 @@ class Commute(object):
     def __repr__(self):
         return self.dict_key()
 
-    def get_duration(self):
-        return self.ending_point
+    def add_trip(self, trip):
+        self.trips.append(trip)
 
+    def get_rough_time_duration(self):
+        ## Based on a 40 mph guess
+        dist = starting_point.rep_coords.distance(ending_point.rep_coords)
+        miles = dist * 0.000621371192
+        return datetime.timedelta(hours=miles/float(40))
 
 class Location(object):
 
     """ A node in the grpah """
 
-    def __init__(self, name, tour_model):
+    def __init__(self, name, tour_model, rep_coords):
         self.tm = tour_model
         self.name = name
         self.successors = set( )
         self.edges = set( )
+        self.rep_coords = rep_coords ## coordinates that represent the location
+
 
     def increment_successor(self, suc, hour, day):
         #print "INCREMENTING SUCCESSOR %s %s %s " % (hour, day, mode)
@@ -53,16 +63,15 @@ class Location(object):
 
     def get_successor(self):
         temp_counter = esmmc.Counter( )
-        day = self.tm.day
-        hour = self.tm.time
+        time = self.tm.time
         #print "self.successors = %s" % self.successors
         for suc in self.successors:
             suc_obj = self.tm.get_location(suc)
             commute = Commute(self, suc_obj)
             edge = self.tm.get_edge(commute)
             #print "hour is %s" % hour.hour
-            for temp_hour in xrange(hour, HOURS_IN_DAY):
-                counter_key = (suc_obj, temp_hour)
+            for temp_hour in xrange(time.hour, HOURS_IN_DAY):
+                counter_key = (suc_obj, temp_hour, edge.get_rough_time_duration())
                 temp_counter[counter_key] = edge.probabilities[day, temp_hour]
                 if edge.probabilities[day, temp_hour] > 0:
                     print "%s -> %d" % (counter_key, edge.probabilities[day, temp_hour])
@@ -80,7 +89,7 @@ class Location(object):
             commute = Commute(self, suc_obj)
             edge = self.tm.get_edge(commute)
             #print "hour is %s" % hour.hour
-            for temp_hour in xrange(hour.hour, HOURS_IN_DAY):
+            for temp_hour in xrange(hour, HOURS_IN_DAY):
                 counter_key = (suc_obj, temp_hour)
                 temp_counter[counter_key] = edge.probabilities[day, temp_hour]
                     #print temp_counter
@@ -117,7 +126,6 @@ class TourModel(object):
         self.start_locs = { }
         self.end_locs = { } 
         self.min_of_each_day = [0, 0, 0, 0, 0, 0, 0]  ## Stores (location, hour) pairs as a way to find the day's starting point
-        self.day = day
         self.time = time
 
     def add_location(self, location, is_start):
@@ -128,14 +136,14 @@ class TourModel(object):
         else:
             self.end_locs[str(loc)] = loc
 
-    def add_start_hour(self, loc, hour, day):
+    def add_start_hour(self, loc, time):
         # print day
         # print "hour = %s, loc = %s" % (hour, loc)
         if self.min_of_each_day[day] == 0:
-            self.min_of_each_day[day] = (loc, hour)
+            self.min_of_each_day[day] = (loc, time)
         else:
-            if hour < self.min_of_each_day[day][1]:
-                self.min_of_each_day[day] = (loc, hour)
+            if time < self.min_of_each_day[day][1]:
+                self.min_of_each_day[day] = (loc, time)
 
     def get_tour_model_for_day(self, day):
         tour_model = [ ]
@@ -146,15 +154,13 @@ class TourModel(object):
             info = curr_node.get_successor()
             #print type(info)
             curr_node = info[0]
-            self.set_time(info[1])
+            self.set_time( datetime.time(hour=info[1]) + info[2] )
             tour_model.append(curr_node)
         return tour_model
 
     def set_time(self, time):
         self.time = time
 
-    def set_day(self, day):
-        self.day = day
 
     def get_location(self, location):
         #print "str(location) = %s" % str(location)

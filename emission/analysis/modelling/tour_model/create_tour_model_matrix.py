@@ -45,7 +45,7 @@ def get_start_hour(section_info):
 
 
 def get_end_hour(section_info):
-    print section_info.end_time
+    print section_info.end_time.hour
     return section_info.end_time.hour
 
 
@@ -67,7 +67,7 @@ def make_graph_edges(list_of_cluster_data, tour_model):
             start_loc_temp = tour_model.get_location(start_loc_temp)
             end_loc_temp = tm.Location(end_loc, tour_model)
             end_loc_temp = tour_model.get_location(end_loc_temp)
-            make_graph_edge(start_loc_temp, end_loc_temp, tour_model)
+            make_graph_edge(start_loc_temp, end_loc_temp, tour_model, sec)
             print "making edge from %s -> %s" % (start_loc_temp, end_loc_temp)
 
 def populate_prob_field_for_locatons(list_of_cluster_data, tour_model):
@@ -81,7 +81,7 @@ def populate_prob_field_for_locatons(list_of_cluster_data, tour_model):
             end_loc_temp = tm.Location(end_loc, tour_model)
             end_loc_temp = tour_model.get_location(end_loc_temp)
             com = tm.Commute(start_loc_temp, end_loc_temp)
-            tour_model.add_start_hour(start_loc_temp, get_start_hour(sec), get_day(sec))
+            tour_model.add_start_hour(start_loc_temp, sec.start_time)
             start_loc_temp.increment_successor(end_loc_temp, get_start_hour(sec), get_day(sec))
             #print "counter for %s is : %s" % (start_loc_temp, start_loc_temp.counter)
 
@@ -94,8 +94,9 @@ def get_section_obj_from_cluster_data(section_info):
 def make_location_from_section(section, tour_model):
     start_hour = section.start_time.hour    
 
-def make_graph_edge(start_point, end_point, tour_model):
+def make_graph_edge(start_point, end_point, tour_model, trip):
     sp = tour_model.get_location(start_point)
     ep = tour_model.get_location(end_point)
     comm = tm.Commute(sp, ep)
+    comm.add_trip(trip)
     tour_model.get_edge(comm)

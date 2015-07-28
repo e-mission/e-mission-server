@@ -29,11 +29,28 @@ class Coordinate:
     def coordinate_list(self):
         return [float(self.lon), float(self.lat)]
 
+    def distance(self, other):
+        ## Returns distance between 2 coordinates in meters
+        R = 6371000
+        lat1 = self.get_lat()
+        lat2 = other.get_lat()
+        lon1 = self.get_lon()
+        lon2 = other.get_lon()
+        rlat1 = math.radians(lat1)
+        rlat2 = math.radians(lat2)
+        lon = math.radians(lon2 - lon1);
+        lat = math.radians(lat2-lat1);
+        a = math.sin(lat/2.0)**2 + math.cos(rlat1)*math.cos(rlat2) * math.sin(lon/2.0)**2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+        return R * c
+
+
     def __str__(self):
         return self.maps_coordinate()
 
     def __repr__(self):
         return self.maps_coordinate()
+
 
 class Trip(object):
 
