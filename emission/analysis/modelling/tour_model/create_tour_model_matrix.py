@@ -33,10 +33,11 @@ def set_up(list_of_cluster_data, user_name):
         #print "dct is %s" % dct
         start_name = dct['start']
         end_name = dct['end']
+        start_coords = cd['start_coords']
+        end_coords = cd['end_coords']
         for sec in dct['sections']:
-            print sec
-            our_tour_model.add_location(start_name, True)
-            our_tour_model.add_location(end_name, False)
+            our_tour_model.add_location(start_name, True, start_coords)
+            our_tour_model.add_location(end_name, False, end_coords)
     return our_tour_model
 
 

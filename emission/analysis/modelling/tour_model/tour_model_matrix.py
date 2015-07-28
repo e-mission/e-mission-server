@@ -45,13 +45,16 @@ class Location(object):
 
     """ A node in the grpah """
 
-    def __init__(self, name, tour_model, rep_coords):
+    def __init__(self, name, tour_model):
         self.tm = tour_model
         self.name = name
         self.successors = set( )
         self.edges = set( )
-        self.rep_coords = rep_coords ## coordinates that represent the location
+        self.rep_coords = None ## coordinates that represent the location
 
+
+    def set_rep_coords(self, rep_coords):
+        self.rep_coords = rep_coords
 
     def increment_successor(self, suc, hour, day):
         #print "INCREMENTING SUCCESSOR %s %s %s " % (hour, day, mode)
@@ -128,9 +131,10 @@ class TourModel(object):
         self.min_of_each_day = [0, 0, 0, 0, 0, 0, 0]  ## Stores (location, hour) pairs as a way to find the day's starting point
         self.time = time
 
-    def add_location(self, location, is_start):
+    def add_location(self, location, is_start, coords):
         name = "%s" % location
         loc = Location(name, self)
+        loc.set_rep_coords(coords)
         if is_start:
             self.start_locs[str(loc)] = loc
         else:
