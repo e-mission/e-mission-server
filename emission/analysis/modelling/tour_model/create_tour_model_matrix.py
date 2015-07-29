@@ -65,14 +65,13 @@ def make_graph_edges(list_of_cluster_data, tour_model):
     for cd in list_of_cluster_data:
         start_loc = cd['start']
         end_loc = cd['end']
-        print cd
-        for sec in cd["sections"]:
-            start_loc_temp = tm.Location(start_loc, tour_model)
-            start_loc_temp = tour_model.get_location(start_loc_temp)
-            end_loc_temp = tm.Location(end_loc, tour_model)
-            end_loc_temp = tour_model.get_location(end_loc_temp)
-            make_graph_edge(start_loc_temp, end_loc_temp, tour_model, sec)
-            print "making edge from %s -> %s" % (start_loc_temp, end_loc_temp)
+        start_loc_temp = tm.Location(start_loc, tour_model)
+        start_loc_temp = tour_model.get_location(start_loc_temp)
+        end_loc_temp = tm.Location(end_loc, tour_model)
+        end_loc_temp = tour_model.get_location(end_loc_temp)
+        e = make_graph_edge(start_loc_temp, end_loc_temp, tour_model)
+        for trip in cd["sections"]:
+            e.add_trip(trip)
 
 def populate_prob_field_for_locatons(list_of_cluster_data, tour_model):
     for cd in list_of_cluster_data:
@@ -98,9 +97,8 @@ def get_section_obj_from_cluster_data(section_info):
 def make_location_from_section(section, tour_model):
     start_hour = section.start_time.hour    
 
-def make_graph_edge(start_point, end_point, tour_model, trip):
+def make_graph_edge(start_point, end_point, tour_model):
     sp = tour_model.get_location(start_point)
     ep = tour_model.get_location(end_point)
     comm = tm.Commute(sp, ep)
-    comm.add_trip(trip)
-    tour_model.get_edge(comm)
+    return tour_model.get_edge(comm)
