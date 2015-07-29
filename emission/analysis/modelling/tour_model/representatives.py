@@ -130,27 +130,6 @@ class representatives:
                 return False
         return True
 
-    #tour graph visualization
-    def graph(self):
-        import networkx as nx
-        import datetime
-        G = nx.DiGraph()
-        for v in range(self.num_locations):
-            G.add_node(v)
-        for e in self.tour_dict:
-            a = e['start']
-            b = e['end']
-            G.add_edge(a,b,days=set(),times=set())
-            for s in e['sections']:
-                date = s['section_start_datetime']
-                G[a][b]['days'].add(date.isoweekday())
-                G[a][b]['times'].add(date.hour)
-        nx.draw_random(G)
-        plt.suptitle('Tour Graph')
-        plt.savefig('tourgraph.png')
-        plt.show()
-        plt.clf()
-
     #the meter distance between two points
     def distance(self, lat1, lon1, lat2, lon2):
         R = 6371000
