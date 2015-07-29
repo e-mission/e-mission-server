@@ -138,3 +138,8 @@ def get_fake_trips_db():
     current_db = MongoClient().Stage_database
     FakeTrips = current_db.Stage_fake_trips
     return FakeTrips
+
+def get_fake_sections_db():
+    current_db = MongoClient().Stage_database
+    FakeSections = current_db.Stage_fake_sections
+    return FakeSections

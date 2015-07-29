@@ -37,7 +37,7 @@ class Commute(object):
 
     def get_rough_time_duration(self):
         ## Based on a 40 mph guess
-        dist = starting_point.rep_coords.distance(ending_point.rep_coords)
+        dist = self.starting_point.rep_coords.distance(self.ending_point.rep_coords)
         miles = dist * 0.000621371192
         return datetime.timedelta(hours=miles/float(40))
 
@@ -67,6 +67,7 @@ class Location(object):
     def get_successor(self):
         temp_counter = esmmc.Counter( )
         time = self.tm.time
+        day = time.day
         #print "self.successors = %s" % self.successors
         for suc in self.successors:
             suc_obj = self.tm.get_location(suc)
@@ -84,8 +85,8 @@ class Location(object):
 
     def hasSuccessor(self):
         temp_counter = esmmc.Counter( )
-        day = self.tm.day
-        hour = self.tm.time
+        hour = self.tm.time.hour
+        day = self.tm.time.day
         #print "self.successors = %s" % self.successors
         for suc in self.successors:
             suc_obj = self.tm.get_location(suc)
@@ -143,6 +144,8 @@ class TourModel(object):
     def add_start_hour(self, loc, time):
         # print day
         # print "hour = %s, loc = %s" % (hour, loc)
+
+        day = self.time.weekday()
         if self.min_of_each_day[day] == 0:
             self.min_of_each_day[day] = (loc, time)
         else:
@@ -151,6 +154,8 @@ class TourModel(object):
 
     def get_tour_model_for_day(self, day):
         tour_model = [ ]
+        if self.min_of_each_day[day] == 0:
+            return "No data for this day"
         curr_node = self.min_of_each_day[day][0]
         self.set_time(self.min_of_each_day[day][1])
         tour_model.append(curr_node)
@@ -158,7 +163,7 @@ class TourModel(object):
             info = curr_node.get_successor()
             #print type(info)
             curr_node = info[0]
-            self.set_time( datetime.time(hour=info[1]) + info[2] )
+            self.set_time( datetime.datetime(self.time.year, self.time.month, self.time.day, hour=info[1]) + info[2] )
             tour_model.append(curr_node)
         return tour_model
 

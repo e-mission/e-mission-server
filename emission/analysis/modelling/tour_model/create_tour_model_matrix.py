@@ -3,7 +3,7 @@ import emission.core.get_database as edb
 import emission.core.wrapper.trip as trip
 import emission.analysis.modelling.tour_model.cluster_pipeline as eamtcp
 from uuid import UUID
-import random
+import random, datetime
 
 def test():
     list_of_cluster_data = eamtcp.main()
@@ -27,14 +27,17 @@ def create_tour_model(user, list_of_cluster_data):
 
 ## Second level functions that are part of main
 def set_up(list_of_cluster_data, user_name):
-    our_tour_model = tm.TourModel(user_name, 0, 0)
+    now = datetime.datetime.now()
+    day = random.randint(0, 28)
+    time = datetime.datetime(now.year, now.month, day, 0)
+    our_tour_model = tm.TourModel(user_name, 0, time)
     #print list_of_cluster_data
     for dct in list_of_cluster_data:
         #print "dct is %s" % dct
         start_name = dct['start']
         end_name = dct['end']
-        start_coords = cd['start_coords']
-        end_coords = cd['end_coords']
+        start_coords = dct['start_coords']
+        end_coords = dct['end_coords']
         for sec in dct['sections']:
             our_tour_model.add_location(start_name, True, start_coords)
             our_tour_model.add_location(end_name, False, end_coords)
@@ -90,9 +93,6 @@ def populate_prob_field_for_locatons(list_of_cluster_data, tour_model):
 def get_section_obj_from_cluster_data(section_info):
     our_section = trip.Section.section_from_json(section_info)
     return our_section
-
-def make_location_from_section(section, tour_model):
-    start_hour = section.start_time.hour    
 
 def make_graph_edge(start_point, end_point, tour_model):
     sp = tour_model.get_location(start_point)

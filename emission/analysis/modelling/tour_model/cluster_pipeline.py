@@ -8,7 +8,7 @@ import emission.core.get_database as edb
 import emission.analysis.modelling.tour_model.similarity as similarity
 import emission.analysis.modelling.tour_model.featurization as featurization
 import emission.analysis.modelling.tour_model.representatives as representatives
-from emission.core.wrapper.trip import Trip, Section
+from emission.core.wrapper.trip import Trip, Section, Fake_Trip
 """
 This file reads the data from the section database, 
 removes noise from the data, and clusters is. 
@@ -36,13 +36,13 @@ read_data.
 #take it from the 'color' field of each section in the database. 
 def read_data(uuid=None, ground_truth=False):
     data = []
-    db = edb.get_trip_db()
+    db = edb.get_fake_trips_db()
     if uuid:
         trips = db.find({'user_id' : uuid})
     else:
         trips = db.find()
     for t in trips:
-        trip = Trip.trip_from_json(t)
+        trip = Fake_Trip.trip_from_json(t)
         if not (trip.trip_start_location and trip.trip_end_location and trip.start_time):
             continue
         data.append(trip)
