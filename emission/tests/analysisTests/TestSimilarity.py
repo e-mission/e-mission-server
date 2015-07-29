@@ -4,16 +4,15 @@ import sys
 import emission.analysis.modelling.tour_model.similarity as similarity
 import emission.simulation.trip_gen as tg
 import math
+from emission.core.wrapper.trip import Trip, Coordinate
+import emission.analysis.modelling.tour_model.cluster_pipeline as cp
+import datetime 
+import os, os.path
 
 class SimilarityTests(unittest.TestCase):
 
     def setUp(self):
-        #tg.create_fake_trips()
-        
-        db = edb.get_fake_trips_db()
-        
-        trips = db.find()
-        self.data = list(trips)
+        self.data = cp.read_data()
 
     def tearDown(self):
         return
@@ -57,6 +56,23 @@ class SimilarityTests(unittest.TestCase):
         for i in range(len(sim.bins)-1):
             self.assertTrue(len(sim.bins[i]) >= len(sim.bins[i+1]))
 
+        data = []
+        start = Coordinate(47,-122)
+        end = Coordinate(47,-123)
+        for i in range(10):
+            now = datetime.datetime.now()
+            a = Trip(None, None, None, None, now, now, start, end)
+            data.append(a)
+        start = Coordinate(41,-74)
+        end = Coordinate(42, -74)
+        for i in range(10):
+            now = datetime.datetime.now()
+            a = Trip(None, None, None, None, now, now, start, end)
+            data.append(a)
+        sim = similarity.similarity(data, .5, 300)
+        sim.bin_data()
+        self.assertTrue(len(sim.bins) == 2)
+
     def testDeleteBins(self):
         sim = similarity.similarity(self.data, .5, 300)
         sim.bin_data()
@@ -94,6 +110,8 @@ class SimilarityTests(unittest.TestCase):
         self.assertTrue(not sim.distance(start[1], start[0], end2[1], end2[0]))
 
     def testGraph(self):
+        if os.path.isfile('./histogram.png'):
+            os.remove('./histogram.png')
         sim = similarity.similarity([], .5, 300)
         sim.bin_data()
         sim.graph()
@@ -103,8 +121,12 @@ class SimilarityTests(unittest.TestCase):
         sim.graph()
         sim.delete_bins()
         sim.graph()
+        self.assertTrue(os.path.isfile('./histogram.png'))
+        os.remove('./histogram.png')
 
     def testMapBins(self):
+        if os.path.isfile('./mybins.html'):
+            os.remove('./mybins.html')
         sim = similarity.similarity([], .5, 300)
         sim.bin_data()
         sim.map_bins()
@@ -114,14 +136,21 @@ class SimilarityTests(unittest.TestCase):
         sim.map_bins()
         sim.delete_bins()
         sim.map_bins()
+        self.assertTrue(os.path.isfile('./mybins.html'))
+        os.remove('./mybins.html')
 
     def testEvaluateBins(self):
         sim = similarity.similarity([], .5, 300)
-        sim.evaluate_bins()
+        a = sim.evaluate_bins()
+        self.assertTrue(not a)
         sim = similarity.similarity(self.data, .5, 300)
-        sim.evaluate_bins()
+        b = sim.evaluate_bins()
+        self.assertTrue(not b)
         sim.bin_data()
-        sim.evaluate_bins()
+        c = sim.evaluate_bins()
+        sim.delete_bins()
+        d = sim.evaluate_bins()
+        self.assertTrue(c == d)
 
 if __name__ == "__main__":
     unittest.main()

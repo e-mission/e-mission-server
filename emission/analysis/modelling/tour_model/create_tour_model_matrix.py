@@ -3,12 +3,13 @@ import emission.core.get_database as edb
 import emission.core.wrapper.trip as trip
 import emission.analysis.modelling.tour_model.cluster_pipeline as eamtcp
 from uuid import UUID
-import random
+import random, datetime
 
 def test():
     list_of_cluster_data = eamtcp.main()
     print list_of_cluster_data
     new_tm = create_tour_model("Josh", list_of_cluster_data)
+    return new_tm
 
 def create_tour_model(user, list_of_cluster_data):
     # Highest level function, create tour model from the cluster data that nami gives me
@@ -27,14 +28,16 @@ def create_tour_model(user, list_of_cluster_data):
 
 ## Second level functions that are part of main
 def set_up(list_of_cluster_data, user_name):
-    our_tour_model = tm.TourModel(user_name, 0, 0)
+    curr_time = datetime.datetime.now()
+    time0 = datetime.datetime(curr_time.year, curr_time.month, curr_time.day, hour=0)
+    our_tour_model = tm.TourModel(user_name, 0, time0)
     #print list_of_cluster_data
     for dct in list_of_cluster_data:
         #print "dct is %s" % dct
         start_name = dct['start']
         end_name = dct['end']
-        start_coords = cd['start_coords']
-        end_coords = cd['end_coords']
+        start_coords = dct['start_coords']
+        end_coords = dct['end_coords']
         for sec in dct['sections']:
             our_tour_model.add_location(start_name, True, start_coords)
             our_tour_model.add_location(end_name, False, end_coords)

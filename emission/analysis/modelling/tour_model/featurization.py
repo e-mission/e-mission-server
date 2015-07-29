@@ -3,38 +3,41 @@ import matplotlib.pyplot as plt
 import math
 import numpy
 from sklearn.cluster import KMeans
-from kmedoid import kmedoids
 from sklearn import metrics
 from sklearn.metrics.cluster import homogeneity_score, completeness_score
 import sys, os
+
+# our imports
+from emission.core.wrapper.trip import Trip, Coordinate
+from kmedoid import kmedoids
 
 """
 This class is used for featurizing data, clustering the data, and evaluating the clustering. 
 
 The input parameters of an instance of this class are:
-- data: Pass in a list of trips in the format of the database. 
-- colors (optional): a list of the ground truth clusters for the data, in the form of a list of integers where different integers correspond to different clusters. If there is no ground truth, colors defaults to None. 
+- data: Pass in a list of trip objects that have a trip_start_location and a trip_end_location
 
 This class is run by cluster_pipeline.py
 """
 class featurization:
 
-    def __init__(self, data, colors=None):
+    def __init__(self, data):
         self.data = data
         self.calculate_points()
-        self.colors = colors
         self.labels = []
+        self.clusters = None
 
     #calculate the points to use in the featurization. 
     def calculate_points(self):
         if not self.data:
             raise ValueError('No data')
         self.points = []
-        for i in range(len(self.data)):
-            start = self.data[i].trip_start_location
-            end = self.data[i].trip_end_location
+        for trip in self.data:
+            start = trip.trip_start_location
+            end = trip.trip_end_location
+            if not (start and end):
+                raise AttributeError('each trip must have valid start and end locations')
             self.points.append([start.lon, start.lat, end.lon, end.lat])
-
 
     #cluster the data. input options:
     # - min_clusters (optional): the minimum number of clusters to test for. Must be at least 2. Default to 2.
@@ -45,14 +48,14 @@ class featurization:
             min_clusters = 2
         if min_clusters > len(self.points):
             sys.stderr.write('Maximum number of clusters is the number of data points.\n')
-            min_clusters = len(self.points)
+            min_clusters = len(self.points)-1
         if max_clusters == None:
-            max_clusters = len(self.points)
+            max_clusters = len(self.points)-1
         if max_clusters < 2:
             sys.stderr.write('Must have at least 2 clusters\n')
             max_clusters = 2
-        if max_clusters > len(self.points):
-            max_clusters = len(self.points)
+        if max_clusters >= len(self.points):
+            max_clusters = len(self.points)-1
         if max_clusters < min_clusters:
             raise ValueError('Please provide a valid range of cluster sizes')
         if name != 'kmeans' and name != 'kmedoids':
@@ -103,9 +106,6 @@ class featurization:
 
     #compute metrics to evaluate clusters
     def check_clusters(self):
-        if not self.colors:
-            sys.stderr.write('No ground truth, nothing to analyze\n')
-            return
         if not self.clusters:
             sys.stderr.write('No clusters to analyze\n')
             return
@@ -114,68 +114,22 @@ class featurization:
             return
         print 'number of clusters is ' + str(self.clusters)
         print 'silhouette score is ' + str(self.sil)
-        print 'homogeneity is ' + str(homogeneity_score(self.colors, self.labels))
-        print 'completeness is ' + str(completeness_score(self.colors, self.labels))
 
-    def map_individuals(self):
-        if not self.labels:
-            print 'Please cluster before mapping clusters.'
-            return
-        if not self.colors:
-            print 'This function is for use with ground truthed data.'
-            return
-        import pygmaps
-        from matplotlib import colors as matcol
-        colormap = plt.cm.get_cmap()
-        import random 
-        r = random.sample(range(len(set(self.labels))), len(set(self.labels)))
-        rand = []
-        for i in range(len(self.labels)):
-            rand.append(r[self.labels[i]]/float(self.clusters))
-        for color in set(self.colors):
-            first = True
-            num_paths = 0
-            for i in range(len(self.colors)):
-                if self.colors[i] == color:
-                    num_paths += 1
-                    start_lat = self.data[i].trip_start_location
-                    start_lon = self.data[i].trip_start_location
-                    end_lat = self.data[i].trip_end_location
-                    end_lon = self.data[i].trip_end_location
-                    if first:
-                        mymap = pygmaps.maps(start_lat, start_lon, 10)
-                        first = False
-                    path = [(start_lat, start_lon), (end_lat, end_lon)]
-                    mymap.addpath(path, matcol.rgb2hex(colormap(rand[i])))
-            if num_paths > 1:
-                mymap.draw('./mycluster' + str(color) + '.html')
-            else:
-                mymap.draw('./onemycluster' + str(color) + '.html') #clusters with only one trip
-
-    #plot all the clusters on the map. Outputs mymap.html, a map with colors defined by the ground 
-    #truth, and mylabels.html, a map with colors defined by the clustering algorithm. 
+    #plot all the clusters on the map. Outputs mylabels.html, a map with colors 
+    #defined by the clustering algorithm. 
     def map_clusters(self):
         import pygmaps
         from matplotlib import colors as matcol
         colormap = plt.cm.get_cmap()
 
-        if self.colors:
-            mymap = pygmaps.maps(37.5, -122.32, 10)
-            for i in range(len(self.points)):
-                start_lat = self.data[i].trip_start_location
-                start_lon = self.data[i].trip_start_location
-                end_lat = self.data[i].trip_end_location
-                end_lon = self.data[i].trip_end_location
-                path = [(start_lat, start_lon), (end_lat, end_lon)]
-                mymap.addpath(path, matcol.rgb2hex(colormap(float(self.colors[i])/len(set(self.colors)))))
-            mymap.draw('./mymap.html')
         if self.labels:
             mymap2 = pygmaps.maps(37.5, -122.32, 10)
             for i in range(len(self.points)):
-                start_lat = self.data[i].trip_start_location
-                start_lon = self.data[i].trip_start_location
-                end_lat = self.data[i].trip_end_location
-                end_lon = self.data[i].trip_end_location
+                start_lat = self.points[i][1]
+                start_lon = self.points[i][0]
+                end_lat = self.points[i][3]
+                end_lon = self.points[i][2]
+                path = [(start_lat, start_lon), (end_lat, end_lon)]
                 mymap2.addpath(path, matcol.rgb2hex(colormap(float(self.labels[i])/self.clusters)))
             mymap2.draw('./mylabels.html')
 

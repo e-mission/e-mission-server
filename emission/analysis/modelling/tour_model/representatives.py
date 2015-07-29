@@ -1,8 +1,9 @@
+#standard imports
 import numpy
 import math
 import matplotlib.pyplot as plt
-#import pygmaps
-from matplotlib import colors as matcol
+
+#our imports
 from emission.core.wrapper.trip import Trip, Coordinate
 
 """
@@ -41,18 +42,17 @@ class representatives:
             self.clusters[a].append(self.data[i])
 
     #get the representatives for each cluster
-    def reps(self):
+    def get_reps(self):
         self.reps = []
         for cluster in self.clusters:
-            points = [[]]*4
+            points = [[], [], [], []]
             for c in cluster:
                 points[0].append(c.trip_start_location.lat)
                 points[1].append(c.trip_start_location.lon)
                 points[2].append(c.trip_end_location.lat)
                 points[3].append(c.trip_end_location.lon)
-            centers = numpy.mean(points, axis=0)
+            centers = numpy.mean(points, axis=1)
             a = Trip(None, None, None, None, None, None, Coordinate(centers[0], centers[1]), Coordinate(centers[2], centers[3]))
-            #a = {'section_start_po' : {'coordinates' : [centers[1], centers.lon]}, 'section_end_point' : {'coordinates' : [centers[3], centers[2]]}}
             self.reps.append(a)
 
     #define the set of locations for the data
@@ -62,15 +62,15 @@ class representatives:
             added_start = False
             added_end = False
             for bin in self.bins:
-                if self.match('start', a, bin):
+                if self.match('start', a, bin) and not added_start:
                     bin.append(('start', a))
                     added_start = True
-                if self.match('end', a, bin):
+                if self.match('end', a, bin) and not added_end:
                     bin.append(('end', a))
                     added_end = True
             if not added_start:
                 newbin = [('start', a)]
-                if self.match('end', a, newbin):
+                if self.match('end', a, newbin) and not added_end:
                     newbin.append(('end', a))
                     added_end = True
                 self.bins.append(newbin)
@@ -110,6 +110,10 @@ class representatives:
             end_coords = self.locs[cluster['end']]
             self.tour_dict[i]['start_coords'] = start_coords
             self.tour_dict[i]['end_coords'] = end_coords
+        self.self_loops_tour_dict = self.tour_dict[:]
+        for cluster in self.tour_dict:
+            if cluster['start'] == cluster['end']:
+                self.tour_dict.remove(cluster)
 
     #check whether a point is close to all points in a bin
     def match(self, label, a, bin):
@@ -120,9 +124,9 @@ class representatives:
         for b in bin:
             if b[0] == 'start':
                 pointb = self.reps[b[1]].trip_start_location
-            else:
+            elif b[0] == 'end':
                 pointb = self.reps[b[1]].trip_end_location
-            if not self.distance(pointa.lat, pointa.lon, pointb.lat, pointb.lon):
+            if self.distance(pointa.lat, pointa.lon, pointb.lat, pointb.lon) > 300:
                 return False
         return True
 
@@ -157,63 +161,4 @@ class representatives:
         a = math.sin(lat/2.0)**2 + math.cos(rlat1)*math.cos(rlat2) * math.sin(lon/2.0)**2
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
         d = R * c
-        if d <= 300:
-            return True
-        return False
-
-
-
-    def mapping(self):
-        for bin in self.bins:
-            first = True
-            for b in bin:
-                start_lat = self.reps[b[1]].trip_start_location.lat
-                start_lon = self.reps[b[1]].trip_start_location.lon
-                end_lat = self.reps[b[1]].trip_end_location.lat
-                end_lon = self.reps[b[1]].trip_end_location.lon
-                if first:
-                    mymap = pygmaps.maps(start_lat, start_lon, 10)
-                    first = False
-                path = [(start_lat, start_lon), (end_lat, end_lon)]
-                mymap.addpath(path)
-            mymap.draw('./mybins' + str(self.bins.index(bin)) + '.html')
-
-        mymap = pygmaps.maps(37.5, -122.32, 10)
-        for rep in self.reps:
-            start_lat = rep.trip_start_location.lat
-            start_lon = rep.trip_start_location.lon
-            end_lat = rep.trip_end_location.lat
-            end_lon = rep.trip_end_location.lon
-            path = [(start_lat, start_lon), (end_lat, end_lon)]
-            mymap.addpath(path)
-        mymap.draw('./myreps.html')
-
-        import pygmaps
-        self.locations = []
-        for bin in self.bins:
-            mymap = pygmaps.maps(37.5, -122.32, 10)
-            locs = []
-            for b in bin:
-                if b[0] == 'start':
-                    point = self.reps[b[1]].trip_start_location
-                if b[0] == 'end':
-                    point = self.reps[b[1]].trip_end_location
-                locs.append(point)
-                mymap.addpoint(point[1], point[0], '#FF0000')
-            locs = numpy.mean(locs, axis=0)
-            mymap.addpoint(locs[1], locs[0], '#0000FF')
-            self.locations.append([locs[0], locs[1]])
-            mymap.draw('./mylocs' + str(self.bins.index(bin)) + '.html')
-
-        colormap = plt.cm.get_cmap()
-        for i in range(self.num_locations):
-            mymap = pygmaps.maps(37.5, -122.32, 10)
-            for cluster in self.tour_dict:
-                if cluster['start'] == i or cluster['end'] == i:
-                    for c in cluster['sections']:
-                        start = c.trip_start_location
-                        end = c.trip_end_location
-                        path = [(start.lat, start.lon), (end.lat, end.lon)]
-                        mymap.addpath(path)
-            mymap.draw('./mytourdict' + str(i) + '.html')
-
+        return d

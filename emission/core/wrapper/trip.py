@@ -5,6 +5,7 @@ import datetime
 import sys
 import os
 import logging
+import math
 
 # Our imports
 import emission.core.get_database as edb
