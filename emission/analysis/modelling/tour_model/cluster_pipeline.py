@@ -36,14 +36,15 @@ read_data.
 #take it from the 'color' field of each section in the database. 
 def read_data(uuid=None):
     data = []
-    db = edb.get_fake_trips_db()
+    db = edb.get_trip_db()
     if uuid:
         trips = db.find({'user_id' : uuid})
     else:
         trips = db.find()
     for t in trips:
-        trip = Fake_Trip.trip_from_json(t)
+        trip = Trip.trip_from_json(t)
         if not (trip.trip_start_location and trip.trip_end_location and trip.start_time):
+            print trip
             continue
         data.append(trip)
     if len(data) == 0:

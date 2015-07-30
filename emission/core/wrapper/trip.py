@@ -52,6 +52,7 @@ class Trip(object):
         self.end_time = end_time
         self.trip_start_location = trip_start_location
         self.trip_end_location = trip_end_location
+        self.mode_list = self._init_mode_list(sections)
 
     @classmethod
     def trip_from_json(cls, json_segment):
@@ -67,8 +68,26 @@ class Trip(object):
             start_time = datetime.datetime.strptime(json_segment.get("trip_start_time"), DATE_FORMAT)
             end_time = datetime.datetime.strptime(json_segment.get("trip_end_time"), DATE_FORMAT)
         trip_start_location = cls._start_location(sections)
+        if not trip_start_location:
+            trip_start_location = Coordinate(json_segment['trip_start_location'][1], json_segment['trip_start_location'][0])
         trip_end_location = cls._end_location(sections)
+        if not trip_end_location:
+            trip_end_location = Coordinate(json_segment['trip_end_location'][1], json_segment['trip_end_location'][0])
         return cls(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location)
+
+    @classmethod
+    def _init_mode_list(self, sections):
+        if not sections:
+            return None
+        mode_list = []
+        mode_set = set()
+        for section in sections:
+            mode_list.append(section.mode)
+            mode_set.add(section.mode)
+        if len(mode_set) == 1:
+            return mode_set.pop()
+        return mode_list
+
 
     @classmethod
     def _init_sections(cls, user_id, trip_id, num_sections):
@@ -95,7 +114,11 @@ class Trip(object):
         return cm.calDistance(self.trip_start_location, self.trip_end_location, True)
 
     def save_to_db(self):
-        pass
+        db = edb.get_trip_db()
+        db.insert({"_id": self._id, "user_id": self.user_id, "trip_id": self.trip_id, "sections": range(len(self.sections)), "trip_start_datetime": self.start_time,
+        "trip_end_datetime": self.end_time, "trip_start_location": self.trip_start_location.coordinate_list(), 
+        "trip_end_location": self.trip_end_location.coordinate_list(), "mode_list": self.mode_list})
+
 
         
 

@@ -1,15 +1,23 @@
 {
-	"radius" : "1",
+	"radius" : ".2",
 	"starting centroids" :
 	[
 		"2703 Hallmark Dr Belmont Ca",
-		"ATT Park"
+		"ATT Park", 
+		"Skyline County Park Napa, CA", 
+		"1400 Alameda de las Pulgas, Belmont, CA 94002",
+		"Stanford University", 
+		"UC Berkeley"
 
 	],
 	"ending centroids" :
 	[
 		"Skyline County Park Napa, CA",
+		"ATT Park", 
+		"2703 Hallmark Dr Belmont Ca", 
+		"1400 Alameda de las Pulgas, Belmont, CA 94002",
+		"Stanford University", 
 		"UC Berkeley"
 	],
-	"number of trips" : 500
+	"number of trips" : 200
 }

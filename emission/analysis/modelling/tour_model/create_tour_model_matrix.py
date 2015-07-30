@@ -9,7 +9,8 @@ def test():
     list_of_cluster_data = eamtcp.main()
     print list_of_cluster_data
     new_tm = create_tour_model("Josh", list_of_cluster_data)
-    return new_tm
+    print new_tm.build_tour_model()
+    new_tm.see_graph()
 
 def create_tour_model(user, list_of_cluster_data):
     # Highest level function, create tour model from the cluster data that nami gives me
@@ -30,7 +31,8 @@ def create_tour_model(user, list_of_cluster_data):
 def set_up(list_of_cluster_data, user_name):
 
     curr_time = datetime.datetime.now()
-    time0 = datetime.datetime(curr_time.year, curr_time.month, curr_time.day, hour=0)
+
+    time0 = datetime.datetime(1900, 1, 1, hour=0)
     our_tour_model = tm.TourModel(user_name, 0, time0)
     #print list_of_cluster_data
     for dct in list_of_cluster_data:
@@ -71,6 +73,7 @@ def make_graph_edges(list_of_cluster_data, tour_model):
         end_loc_temp = tm.Location(end_loc, tour_model)
         end_loc_temp = tour_model.get_location(end_loc_temp)
         e = make_graph_edge(start_loc_temp, end_loc_temp, tour_model)
+        print "making edge %s" % e
         for trip in cd["sections"]:
             e.add_trip(trip)
 
@@ -86,6 +89,7 @@ def populate_prob_field_for_locatons(list_of_cluster_data, tour_model):
             end_loc_temp = tour_model.get_location(end_loc_temp)
             com = tm.Commute(start_loc_temp, end_loc_temp)
             tour_model.add_start_hour(start_loc_temp, sec.start_time)
+            print "start loc is %s, hour is %s, day is %s" % (start_loc, sec.start_time.hour, sec.start_time.weekday())
             start_loc_temp.increment_successor(end_loc_temp, get_start_hour(sec), get_day(sec))
             #print "counter for %s is : %s" % (start_loc_temp, start_loc_temp.counter)
 

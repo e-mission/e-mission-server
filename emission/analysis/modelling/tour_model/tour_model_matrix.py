@@ -39,7 +39,10 @@ class Commute(object):
         ## Based on a 40 mph guess
         dist = self.starting_point.rep_coords.distance(self.ending_point.rep_coords)
         miles = dist * 0.000621371192
-        return datetime.timedelta(hours=miles/float(40))
+        time = hours=miles/float(40)
+        if time < 1.0/60.0:
+            time = 1.0/60.0
+        return datetime.timedelta(hours=time)
 
 class Location(object):
 
@@ -57,11 +60,14 @@ class Location(object):
         self.rep_coords = rep_coords
 
     def increment_successor(self, suc, hour, day):
-        #print "INCREMENTING SUCCESSOR %s %s %s " % (hour, day, mode)
+        print "INCREMENTING SUCCESSOR %s->%s on hour %s day %s " % (self.name, suc.name, hour, day)
         edge = Commute(self, suc)
         the_edge = self.tm.get_edge(edge)
         the_edge.increment_prob(hour, day)
-        self.successors.add(str(suc))
+        if type(suc) == str:
+            print "suc is a string %s" % suc
+        suc_key = Location.make_lookup_key(suc.name)
+        self.successors.add(suc_key)
         self.edges.add(str(edge))
 
     def get_successor(self):
@@ -79,7 +85,6 @@ class Location(object):
                 temp_counter[counter_key] = edge.probabilities[day, temp_hour]
                 if edge.probabilities[day, temp_hour] > 0:
                     print "%s -> %d" % (counter_key, edge.probabilities[day, temp_hour])
-
                     #print temp_counter
         return esmmc.sampleFromCounter(temp_counter)
 
@@ -89,16 +94,20 @@ class Location(object):
         time = self.tm.time
         #print "self.successors = %s" % self.successors
         for suc in self.successors:
+            print suc
             suc_obj = self.tm.get_location(suc)
             commute = Commute(self, suc_obj)
             edge = self.tm.get_edge(commute)
             #print "hour is %s" % hour.hour
             for temp_hour in xrange(time.hour, HOURS_IN_DAY):
-                counter_key = (suc_obj, temp_hour)
-                temp_counter[counter_key] = edge.probabilities[day, temp_hour]
-                    #print temp_counter
-        return temp_counter.totalCount() != 0
-            
+                if edge.probabilities[day, temp_hour] > 0:
+                    return True
+        return False
+
+    @classmethod
+    def make_lookup_key(cls, name):
+        return "At Location %s" % name 
+
     def is_end_of_day(self):
         return self.tm.hour == HOURS_IN_DAY - 1
 
@@ -127,8 +136,7 @@ class TourModel(object):
     def __init__(self, user, day, time):
         self.user = user
         self.edges = { }
-        self.start_locs = { }
-        self.end_locs = { } 
+        self.locs = { }
         self.min_of_each_day = [0, 0, 0, 0, 0, 0, 0]  ## Stores (location, hour) pairs as a way to find the day's starting point
         self.time = time
 
@@ -136,16 +144,14 @@ class TourModel(object):
         name = "%s" % location
         loc = Location(name, self)
         loc.set_rep_coords(coords)
-        if is_start:
-            self.start_locs[str(loc)] = loc
-        else:
-            self.end_locs[str(loc)] = loc
+        key = Location.make_lookup_key(loc.name)
+        self.locs[key] = loc
 
     def add_start_hour(self, loc, time):
         # print day
         # print "hour = %s, loc = %s" % (hour, loc)
 
-        day = self.time.weekday()
+        day = time.weekday()
         if self.min_of_each_day[day] == 0:
             self.min_of_each_day[day] = (loc, time)
         else:
@@ -158,30 +164,38 @@ class TourModel(object):
         if self.min_of_each_day[day] == 0:
             return "No data for this day"
         curr_node = self.min_of_each_day[day][0]
-        self.set_time(self.min_of_each_day[day][1])
+        self.time = self.min_of_each_day[day][1]
         tour_model.append(curr_node)
         while curr_node.hasSuccessor():
             info = curr_node.get_successor()
             #print type(info)
             curr_node = info[0]
-            self.set_time( datetime.datetime(self.time.year, self.time.month, self.time.day, hour=info[1]) + info[2] )
-            tour_model.append(curr_node)
+            print "new thing"
+            print self.time
+            print info[2]
+            self.time = datetime.datetime(self.time.year, self.time.month, self.time.day, hour=info[1], minute=self.time.minute) + info[2] 
+            print self.time
+            if curr_node != tour_model[-1]:
+                tour_model.append(curr_node)
         return tour_model
 
-    def set_time(self, time):
-        self.time = time
+
 
 
     def get_location(self, location):
         #print "str(location) = %s" % str(location)
-        if str(location) in self.start_locs.keys():
-            return self.start_locs[str(location)]
-        elif str(location) in self.end_locs.keys():
-            return self.end_locs[str(location)]
-
+        
+        if type(location) == str:
+            print "this is an str %s" % location
+            return self.locs[location]
+        #print "this is a %s called %s" % (type(location), location.name)
+        key = Location.make_lookup_key(location.name)
+        return self.locs[key]
+ 
     def build_tour_model(self):
         tour_model = [ ]
         for day in xrange(DAYS_IN_WEEK):
+            print "day %d" % day
             tour_model.append(self.get_tour_model_for_day(day))
         return tour_model 
 
@@ -194,16 +208,22 @@ class TourModel(object):
 
     def see_graph(self):
         vertices = set()
+        labels = {}
         import networkx as nx 
         import matplotlib.pyplot as plt
         G = nx.DiGraph()
-        for v in self.start_locs.values():
+        i = 0
+        for v in self.locs.itervalues():
             G.add_node(v)
-        for v in self.end_locs.values():
-            G.add_node(v)
+            labels[v] = v.name
+            i += 1
         for e in self.edges.values():
             start = e.starting_point
             end = e.ending_point
             G.add_edge(start,end)
-        nx.draw(G)
+        pos=nx.spring_layout(G)
+        nx.draw_networkx_nodes(G, pos)
+        nx.draw_networkx_edges(G, pos)
+        nx.draw_networkx_labels(G, pos, labels)
+        #nx.draw(G)
         plt.show()
