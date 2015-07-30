@@ -1,35 +1,28 @@
 # Standard imports
-import sys
 import math
-import datetime
 
 # Our imports
 import emission.core.get_database as edb
 import emission.analysis.modelling.tour_model.similarity as similarity
 import emission.analysis.modelling.tour_model.featurization as featurization
 import emission.analysis.modelling.tour_model.representatives as representatives
-from emission.core.wrapper.trip import Trip, Section
+from emission.core.wrapper.trip import Trip
 """
-This file reads the data from the section database, 
-removes noise from the data, and clusters is. 
+This file reads the data from the trip database, 
+removes noise from the data, clusters it, and returns a dictionary 
+to make the tour model. 
 
 The parameters and clustering methods can be easily changed, 
 but based on what works the best, the featurization and clustering 
 works as follows. First, the data is read from the database. 
-For featurization, each section is representated as a start point 
-and an end point. Then, the section is put into bins and the lower 
+For featurization, each trip is representated as a start point 
+and an end point. Then, the trips are put into bins and the lower 
 half of the bins are removed. Then, the data is clustered using 
 k-means. The parameter for k is currently tested in a range based 
-on the number of elements, but I plan to adjust this range. 
+on the number of bins. This parameter may change.
 
-As input, this file accepts an user's uuid from the command line. 
+As input, this file can accepts an user's uuid from the command line. 
 If no uuid is given, it will use all the trips from the trip database.
-
-Currently, this file is defaulted not to handle ground truth, but 
-for the purpose of tests, a parameter can be changed to collect ground 
-truth from the database and compare the clustering to ground truth. 
-To change this, in main, change ground_truth to True in the call to 
-read_data. 
 """
 
 #read the data from the database. If ground_truth is true, it will 

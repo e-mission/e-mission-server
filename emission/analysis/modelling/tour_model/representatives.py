@@ -1,9 +1,8 @@
-#standard imports
+# standard imports
 import numpy
 import math
-import matplotlib.pyplot as plt
 
-#our imports
+# our imports
 from emission.core.wrapper.trip import Trip, Coordinate
 
 """
@@ -14,10 +13,8 @@ The purpose of this class is to get the list of clusters with
 start and end points to create the tour graph.
 
 To use this class, as input it takes
-- data: the data that's clustered. Should be in the same format as the 
-section database data. 
-- labels: a list of integers that define the clusters on the data.
-
+- data: A list of trip objects
+- labels: A list of integers that define the clusters on the data.
 """
 
 class representatives:

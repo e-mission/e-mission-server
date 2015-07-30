@@ -1,36 +1,26 @@
-import emissions.analysis.modelling.cluster_pipeline as cp
+# standard imports
+from sklearn.metrics.cluster import homogeneity_score, completeness_score
+import numpy 
+import matplotlib.pyplot as plt
+
+# our imports
+import emission.analysis.modelling.tour_model.cluster_pipeline as cp
+import emission.analysis.modelling.tour_model.similarity as similarity
 
 """
 Functions to evaluate clustering based on groundtruth. To use these functions, 
 an array of the length of the data must be passed in, with different values in the
 array indicating different groundtruth clusters.
 These functions can be used alongside the cluster pipeline to evaluate clustering.
-An example of how to run this with the cluster pipeline is the following:
-
-data = cp.read_data() #get the data
-colors = get_colors(data, colors) #get the colors associated with the data, given a color array
-data, bins = cp.remove_noise() #remove noise from the data
-
-##### to evaluate bins, import similarity.py:
-sim = similarity.similarity(data, .5, 300)
-sim.bins = bins
-sim.evaluate_bins()
-colors = update_colors(bins, colors)
-labels = sim.labels
-evaluate(colors, labels)
-#####
-
-clusters, labels, data = cp.cluster(data, len(bins)) #cluster the data
-evaluate(colors, labels) #evaluate the clusters
-map_clusters_by_groundtruth(data, labels, colors) #map clusters
-
+An example of how to run this with the cluster pipeline is in the main method. To run it, 
+pass in a list of groundtruth.
 Note that the cluster pipeline works with trips, not sections, so to use the above 
 code the groundtruth has to also be by trips. 
 """
 #turns color array into an array of integers
 def get_colors(data, colors):
-    if (len(data) != len(colors)):
-        except ValueError('Data and groundtruth must have the same number of elements')
+    if len(data) != len(colors):
+        raise ValueError('Data and groundtruth must have the same number of elements')
     indices = [] * len(set(colors))
     for n in colors:
         if n not in indices:
@@ -51,6 +41,7 @@ def update_colors(bins, colors):
             indices.append(n)
     for i in range(len(newcolors)):
         newcolors[i] = indices.index(newcolors[i])
+    return newcolors
 
 #evaluates the cluster labels against the groundtruth colors
 def evaluate(colors, labels):
@@ -62,7 +53,7 @@ def evaluate(colors, labels):
 #maps the clusters, colored by the groundtruth
 #creates a map for each groundtruthed cluster and 
 #a map showing all the clusters. 
-def map_clusters_by_groundtruth(data, labels, colors):
+def map_clusters_by_groundtruth(data, labels, colors, map_individuals=False):
     import pygmaps
     from matplotlib import colors as matcol
     colormap = plt.cm.get_cmap()
@@ -72,29 +63,46 @@ def map_clusters_by_groundtruth(data, labels, colors):
     clusters = len(set(labels))
     for i in range(len(labels)):
         rand.append(r[labels[i]]/float(clusters))
-    for color in set(colors):
-        first = True
-        num_paths = 0
-        for i in range(len(colors)):
-            if colors[i] == color:
-                num_paths += 1
-                start_lat = data[i].trip_start_location
-                start_lon = data[i].trip_start_location
-                end_lat = data[i].trip_end_location
-                end_lon = data[i].trip_end_location
-                if first:
-                    mymap = pygmaps.maps(start_lat, start_lon, 10)
-                    first = False
-                path = [(start_lat, start_lon), (end_lat, end_lon)]
-                mymap.addpath(path, matcol.rgb2hex(colormap(rand[i])))
+    if map_individuals:
+        for color in set(colors):
+            first = True
+            num_paths = 0
+            for i in range(len(colors)):
+                if colors[i] == color:
+                    num_paths += 1
+                    start_lat = data[i].trip_start_location.lat
+                    start_lon = data[i].trip_start_location.lon
+                    end_lat = data[i].trip_end_location.lat
+                    end_lon = data[i].trip_end_location.lon
+                    if first:
+                        mymap = pygmaps.maps(start_lat, start_lon, 10)
+                        first = False
+                    path = [(start_lat, start_lon), (end_lat, end_lon)]
+                    mymap.addpath(path, matcol.rgb2hex(colormap(rand[i])))
             mymap.draw('./mycluster' + str(color) + '.html')
 
     mymap = pygmaps.maps(37.5, -122.32, 10)
-    for i in range(len(self.points)):
-        start_lat = self.data[i].trip_start_location
-        start_lon = self.data[i].trip_start_location
-        end_lat = self.data[i].trip_end_location
-        end_lon = self.data[i].trip_end_locatio
+    for i in range(len(data)):
+        start_lat = data[i].trip_start_location.lat
+        start_lon = data[i].trip_start_location.lon
+        end_lat = data[i].trip_end_location.lat
+        end_lon = data[i].trip_end_location.lon
         path = [(start_lat, start_lon), (end_lat, end_lon)]
-        mymap.addpath(path, matcol.rgb2hex(colormap(float(self.colors[i])/len(set(self.colors)))))
+        mymap.addpath(path, matcol.rgb2hex(colormap(float(colors[i])/len(set(colors)))))
     mymap.draw('./mymap.html')
+
+def main(colors):
+    data = cp.read_data() #get the data
+    colors = get_colors(data, colors) #make colors the right format
+    data, bins = cp.remove_noise(data, .5, 300) #remove noise from data
+    ###### the next few lines are to evaluate the binning
+    sim = similarity.similarity(data, .5, 300) #create a similarity object
+    sim.bins = bins #set the bins, since we calculated them above
+    sim.evaluate_bins() #evaluate them to create the labels
+    ######
+    colors = update_colors(bins, colors) #update the colors to reflect deleted bins
+    labels = sim.labels #get labels
+    evaluate(numpy.array(colors), numpy.array(labels)) #evaluate the bins
+    clusters, labels, data = cp.cluster(data, len(bins)) #cluster
+    evaluate(numpy.array(colors), numpy.array(labels)) #evaluate clustering
+    map_clusters_by_groundtruth(data, labels, colors, map_individuals=False) #map clusters, make last parameter true to map individual clusters

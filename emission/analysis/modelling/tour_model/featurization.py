@@ -4,8 +4,7 @@ import math
 import numpy
 from sklearn.cluster import KMeans
 from sklearn import metrics
-from sklearn.metrics.cluster import homogeneity_score, completeness_score
-import sys, os
+import sys
 
 # our imports
 from emission.core.wrapper.trip import Trip, Coordinate
@@ -40,9 +39,9 @@ class featurization:
             self.points.append([start.lon, start.lat, end.lon, end.lat])
 
     #cluster the data. input options:
+    # - name (optional): the clustering algorithm to use. Options are 'kmeans' or 'kmedoids'. Default is kmeans.
     # - min_clusters (optional): the minimum number of clusters to test for. Must be at least 2. Default to 2.
     # - max_clusters (optional): the maximum number of clusters to test for. Default to the number of points. 
-    # - name (optional): the clustering algorithm to use. Options are 'kmeans' or 'kmedoids'. Default is kmeans.
     def cluster(self, name='kmeans', min_clusters=2, max_clusters=None):
         if min_clusters < 2:
             min_clusters = 2

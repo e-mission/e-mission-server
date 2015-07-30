@@ -3,7 +3,6 @@ import math
 import matplotlib.pyplot as plt
 import numpy
 from sklearn import metrics
-from sklearn.metrics.cluster import homogeneity_score, completeness_score
 import sys
 
 """
@@ -14,8 +13,8 @@ Two trips are in the same bin if both their start points and end points
 are within a certain number of meters of each others. 
 
 As input, this class takes the following:
-- data: the data to put into bins. The data should be a list of trips, with 
-each trip as a dictionary containing a 'trip_start_location' and a 'trip_end_location'.
+- data: the data to put into bins. The data should be a list of Trip objects that have 
+start and end locations. 
 - percent: the percent of the bins to keep and return, after bins have been ordered
 - radius: the radius for determining how close the start points and end points of two 
 trips have to be for the trips to be put in the same bin
