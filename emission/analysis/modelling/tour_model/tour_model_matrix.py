@@ -67,7 +67,7 @@ class Location(object):
     def get_successor(self):
         temp_counter = esmmc.Counter( )
         time = self.tm.time
-        day = time.day
+        day = time.weekday()
         #print "self.successors = %s" % self.successors
         for suc in self.successors:
             suc_obj = self.tm.get_location(suc)
@@ -85,15 +85,15 @@ class Location(object):
 
     def hasSuccessor(self):
         temp_counter = esmmc.Counter( )
-        hour = self.tm.time.hour
-        day = self.tm.time.day
+        day = self.tm.time.weekday()
+        time = self.tm.time
         #print "self.successors = %s" % self.successors
         for suc in self.successors:
             suc_obj = self.tm.get_location(suc)
             commute = Commute(self, suc_obj)
             edge = self.tm.get_edge(commute)
             #print "hour is %s" % hour.hour
-            for temp_hour in xrange(hour, HOURS_IN_DAY):
+            for temp_hour in xrange(time.hour, HOURS_IN_DAY):
                 counter_key = (suc_obj, temp_hour)
                 temp_counter[counter_key] = edge.probabilities[day, temp_hour]
                     #print temp_counter
@@ -154,6 +154,7 @@ class TourModel(object):
 
     def get_tour_model_for_day(self, day):
         tour_model = [ ]
+
         if self.min_of_each_day[day] == 0:
             return "No data for this day"
         curr_node = self.min_of_each_day[day][0]

@@ -19,15 +19,12 @@ each trip as a dictionary containing a 'trip_start_location' and a 'trip_end_loc
 - percent: the percent of the bins to keep and return, after bins have been ordered
 - radius: the radius for determining how close the start points and end points of two 
 trips have to be for the trips to be put in the same bin
-- colors (optional): the ground truth, in the form of a list of integers where different integers 
-indicate different ground truth clusters. This is optional, and only for when ground truth exists
-for evaluating how well the data is 'clustered' into bins. 
 
 This is called by cluster_pipeline.py.
 """
 class similarity:
     
-    def __init__(self, data, percent, radius, colors=None):
+    def __init__(self, data, percent, radius):
         self.data = data
         self.size = len(self.data)
         self.percent = float(percent)
@@ -39,7 +36,6 @@ class similarity:
             self.percent = 0.0
         self.bins = []
         self.radius = float(radius)
-        self.colors = colors
 
     #create bins
     def bin_data(self):
@@ -59,26 +55,12 @@ class similarity:
         num = int(math.ceil(len(self.bins) * self.percent))
         for i in range(len(self.bins) - num):
             self.bins.pop()
-
         newdata = []
-        newcolors = []
         for bin in self.bins:
             for b in bin:
                 d = self.data[b]
                 newdata.append(self.data[b])
-                if bool(self.colors):
-                    newcolors.append(self.colors[b])
-        if bool(self.colors):
-            indices = [] * len(set(newcolors))
-            for n in newcolors:
-                if n not in indices:
-                    indices.append(n)
-        for i in range(len(newcolors)):
-            newcolors[i] = indices.index(newcolors[i])
-
-        self.data = newdata
-        self.colors = newcolors
-
+        self.newdata = newdata
 
     #check if two trips match
     def match(self,a,bin):
@@ -122,15 +104,16 @@ class similarity:
         
     #evaluate the bins as if they were a clustering on the data
     def evaluate_bins(self):
-        if not self.colors:
-            return
         self.labels = []
         for bin in self.bins:
             for b in bin:
                 self.labels.append(self.bins.index(bin))
-                    
+        if not self.data or self.bins:
+            return
+        if len(self.labels) < 2:
+            print 'Everything is in one bin.'
+            return
         labels = numpy.array(self.labels)
-        colors = numpy.array(self.colors)
         points = []
         for bin in self.bins:
             for b in bin:
@@ -141,25 +124,9 @@ class similarity:
                 path = [start_lat, start_lon, end_lat, end_lon]
                 points.append(path)
         a = metrics.silhouette_score(numpy.array(points), labels)
-        b = homogeneity_score(colors, labels)
-        c = completeness_score(colors, labels)
         print 'number of bins is ' + str(len(self.bins))
         print 'silhouette score is ' + str(a)
-        print 'homogeneity is ' + str(b)
-        print 'completeness is ' + str(c)
-        print 'accuracy is ' + str(((a+1)/2.0 + b + c)/3.0)
-
-    #update the ground truth
-    def update_colors(self, newcolors):
-        if bool(self.colors):
-            indices = [] * len(set(newcolors))
-            for n in newcolors:
-                if n not in indices:
-                    indices.append(n)
-            for i in range(len(newcolors)):
-                newcolors[i] = indices.index(newcolors[i])
-            self.colors = newcolors
-
+        return a
 
     #calculate the distance between two trips
     def distance_helper(self, a, b):

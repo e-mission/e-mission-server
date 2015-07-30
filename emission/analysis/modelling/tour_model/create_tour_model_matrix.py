@@ -9,6 +9,7 @@ def test():
     list_of_cluster_data = eamtcp.main()
     print list_of_cluster_data
     new_tm = create_tour_model("Josh", list_of_cluster_data)
+    return new_tm
 
 def create_tour_model(user, list_of_cluster_data):
     # Highest level function, create tour model from the cluster data that nami gives me
@@ -27,10 +28,10 @@ def create_tour_model(user, list_of_cluster_data):
 
 ## Second level functions that are part of main
 def set_up(list_of_cluster_data, user_name):
-    now = datetime.datetime.now()
-    day = random.randint(0, 28)
-    time = datetime.datetime(now.year, now.month, day, 0)
-    our_tour_model = tm.TourModel(user_name, 0, time)
+
+    curr_time = datetime.datetime.now()
+    time0 = datetime.datetime(curr_time.year, curr_time.month, curr_time.day, hour=0)
+    our_tour_model = tm.TourModel(user_name, 0, time0)
     #print list_of_cluster_data
     for dct in list_of_cluster_data:
         #print "dct is %s" % dct
