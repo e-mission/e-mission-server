@@ -54,7 +54,6 @@ def remove_noise(data, cutoff, radius):
 #cluster the data using k-means
 def cluster(data, bins):
     feat = featurization.featurization(data)
-    m = len(data)
     min = bins
     max = int(math.ceil(1.33 * bins))
     feat.cluster(min_clusters=min, max_clusters=max)

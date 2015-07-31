@@ -7,9 +7,10 @@ import random, datetime
 
 def test():
     list_of_cluster_data = eamtcp.main()
-    print list_of_cluster_data
+    #print list_of_cluster_data
     new_tm = create_tour_model("Josh", list_of_cluster_data)
-    return new_tm
+    new_tm.see_graph()
+    #return new_tm
 
 def create_tour_model(user, list_of_cluster_data):
     # Highest level function, create tour model from the cluster data that nami gives me
@@ -23,7 +24,7 @@ def create_tour_model(user, list_of_cluster_data):
     print "Got past populate_prob_field_for_locatons"
     print our_tm
     print "Got past populate_prob_field_for_modes"
-    print our_tm.build_tour_model()
+    #print our_tm.build_tour_model()
     return our_tm
 
 ## Second level functions that are part of main
@@ -102,3 +103,6 @@ def make_graph_edge(start_point, end_point, tour_model):
     ep = tour_model.get_location(end_point)
     comm = tm.Commute(sp, ep)
     return tour_model.get_edge(comm)
+
+if __name__=='__main__':
+    test()

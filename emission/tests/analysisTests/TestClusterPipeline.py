@@ -12,6 +12,7 @@ class ClusterPipelineTests(unittest.TestCase):
         db = edb.get_trip_db()
         if db.count() == 0:
             tg.create_fake_trips()##
+            db = edb.get_trip_db()
         trips = db.find()
         uuids = set()
         for t in trips:

@@ -39,7 +39,7 @@ class Commute(object):
         ## Based on a 40 mph guess
         dist = self.starting_point.rep_coords.distance(self.ending_point.rep_coords)
         miles = dist * 0.000621371192
-        return datetime.timedelta(hours=miles/float(40))
+        return datetime.timedelta(hours=1 + miles/float(40)) #changed by naomi
 
 class Location(object):
 
@@ -144,7 +144,7 @@ class TourModel(object):
     def add_start_hour(self, loc, time):
         # print day
         # print "hour = %s, loc = %s" % (hour, loc)
-        day = self.time.weekday()
+        day = time.weekday()
         if self.min_of_each_day[day] == 0:
             self.min_of_each_day[day] = (loc, time)
         else:
@@ -196,14 +196,56 @@ class TourModel(object):
         vertices = set()
         import networkx as nx 
         import matplotlib.pyplot as plt
-        G = nx.DiGraph()
+        G = nx.MultiGraph()
         for v in self.start_locs.values():
             G.add_node(v)
         for v in self.end_locs.values():
-            G.add_node(v)
+            G.add_node(v, name=v.name)
+        pos = {}
+        edge_colors = []
+        node_sizes = []
+        for v in G.nodes():
+            pos[v] = (v.rep_coords.lon, v.rep_coords.lat)
         for e in self.edges.values():
             start = e.starting_point
             end = e.ending_point
             G.add_edge(start,end)
-        nx.draw(G)
-        plt.show()
+        #for v in G.nodes():
+        #    sum = 0
+        #    for n in G.in_edges(v):
+        #        e = Commute(n[0], n[1])
+        #        e = self.get_edge(e)
+        #        sum += e.probabilities.sum()
+        #    node_sizes.append(100*sum)
+        #G = nx.MultiGraph(G)
+        sum = 0
+        for e in self.edges.values():
+
+
+            #e = Commute(n[0], n[1])
+            #e = self.get_edge(e)
+            weekend = False
+            weekday = False
+            for i in range(len(e.probabilities)):
+                if i == 0 or i == 1:
+                    if not weekend:
+                        for j in e.probabilities[i]:
+                            if j != 0:
+                                weekend = True
+                                break
+                else:
+                    if not weekday:
+                        for j in e.probabilities[i]:
+                            if j != 0:
+                                weekday = True
+            if weekend:
+                edge_colors.append('#FF007F')
+            else:
+                edge_colors.append('#0000FF')
+            #else:
+            #edge_colors.append('#00FF80')
+        nx.draw(G, pos, node_color='#00FF80', node_size=[10*G.degree(v) for v in G])
+        #nx.draw(G, pos, node_color='#FFFFFF', edge_color=edge_colors, node_size=node_sizes)
+        #nx.draw(G, pos, node_color='#FFFFFF', edge_color=edge_colors, node_size=[10*G.degree(v) for v in G])
+        #plt.legend(
+        #plt.show()

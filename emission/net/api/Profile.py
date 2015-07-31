@@ -8,10 +8,11 @@ import math
 from emission.analysis.modelling.home import detect_home, detect_home_from_db
 from zipcode import get_userZipcode
 from emission.analysis.modelling.work_place import detect_work_office, detect_daily_work_office
-from emission.core.get_database import get_section_db,get_profile_db
+from emission.core.get_database import get_trip_db, get_section_db,get_profile_db
 from emission.core.common import calDistance
 from emission.analysis.modelling.tour_model.trajectory_matching.route_matching import update_user_routeDistanceMatrix, update_user_routeClusters
 from emission.analysis.modelling.tour_model.K_medoid import kmedoids, user_route_data
+import emission.analysis.modelling.tour_model.cluster_pipeline as cp
 
 logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', level=logging.DEBUG)
 Profiles=get_profile_db()
@@ -59,6 +60,23 @@ def generate_user_home_work(user):
                                      {'user_id':user}]},{"$set":{key:detect_daily_work_office(user,day)}})
 
 def generate_route_clusters(user, nClusters = -1):
+    data = cp.read_data(uuid=user)
+    data, bins = cp.remove_noise(data, .5, 300)
+    num_clusters, labels, data = cp.cluster(data, len(bins))
+    print labels
+    clusters = {}
+    for i in range(num_clusters):
+        idx = labels.index(i)
+        tripid = data[idx].trip_id
+        clusters[tripid] = []
+        for j in range(labels):
+            if labels[j] == i:
+                clusters[tripid].append(data[j].trip_id)
+    print clusters
+
+
+    update_user_routeClusters(user, clusters)
+    """
     ## update route clusters:
     print "In profile, generating route clusters for %s" % user
     routes_user = user_route_data(user,get_section_db())
@@ -71,6 +89,7 @@ def generate_route_clusters(user, nClusters = -1):
 # print(Profiles.find().count())
 # for profile in Profiles.find():
 #     print(profile)
+   """
 
 def _check_zip_validity(user_home, user):
     if user_home != "N/A" and detect_home_from_db(user) != "N/A" and calDistance(user_home, detect_home_from_db(user)) < TOLERANCE:
