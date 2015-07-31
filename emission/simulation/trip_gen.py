@@ -76,8 +76,10 @@ class Creator:
             mode = mode_tuple[random.randint(0, len(mode_tuple) - 1)] ## Unsophisticated mode choice, Alexi would throw up
             try:
                 rand_id_addition = random.random()
+                rand_trip_id = random.random()
+                rand_user_id = random.random()
                 otp_trip = OTP(t[0], t[1], mode, write_day(curr_month, curr_day, curr_year), write_time(curr_hour, curr_minute), True)
-                alt_trip = otp_trip.turn_into_trip(self.labels[i] + str(rand_id_addition), 0, 0, True)   ## ids
+                alt_trip = otp_trip.turn_into_trip(self.labels[i] + str(rand_id_addition), rand_user_id, rand_trip_id, True)   ## ids
                 alt_trip.save_to_db()
             except PathNotFoundException:
                 print "In the sea, skipping"

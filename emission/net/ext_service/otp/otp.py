@@ -133,6 +133,7 @@ class OTP:
 
         mode_list = list(mode_list)
         if is_fake:
+            print len(sections)
             return Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc)
         return Alternative_Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc, 0, cost, mode_list)
 
