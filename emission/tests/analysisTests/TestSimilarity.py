@@ -1,6 +1,5 @@
 import unittest
 import emission.core.get_database as edb
-import sys
 import emission.analysis.modelling.tour_model.similarity as similarity
 import emission.simulation.trip_gen as tg
 import math

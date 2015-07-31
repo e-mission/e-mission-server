@@ -34,18 +34,22 @@ def read_data(uuid=None):
         trips = db.find({'user_id' : uuid})
     else:
         trips = db.find()
+    if trips.count() == 0: ##
+        return [] ##
     for t in trips:
         trip = Trip.trip_from_json(t)
         if not (trip.trip_start_location and trip.trip_end_location and trip.start_time):
             print trip
             continue
         data.append(trip)
-    if len(data) == 0:
-        raise KeyError('no trips found')
+    if len(data) == 0: ##
+        return [] ##
     return data
 
 #put the data into bins and cut off the lower half of the bins
 def remove_noise(data, cutoff, radius):
+    if not data:
+        return [], []
     sim = similarity.similarity(data, cutoff, radius)
     sim.bin_data()
     sim.delete_bins()
@@ -54,6 +58,8 @@ def remove_noise(data, cutoff, radius):
 
 #cluster the data using k-means
 def cluster(data, bins):
+    if not data:
+        return 0, [], []
     feat = featurization.featurization(data)
     min = bins
     max = int(math.ceil(1.33 * bins))
@@ -62,6 +68,8 @@ def cluster(data, bins):
     return feat.clusters, feat.labels, feat.data
 
 def cluster_to_tour_model(data, labels):
+    if not data:
+        return []
     repy = representatives.representatives(data, labels)
     repy.list_clusters()
     repy.get_reps()

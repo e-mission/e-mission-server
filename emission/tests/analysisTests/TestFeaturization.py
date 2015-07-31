@@ -14,20 +14,10 @@ class FeaturizationTests(unittest.TestCase):
         pass
 
     def testCalculatePoints(self):
-        try:
-            data = []
-            featurization.featurization(data)
-        except ValueError:
-            self.assertTrue(True)
-        except Exception:
-            self.assertTrue(False)
-        try:
-            data = None
-            featurization.featurization(data)
-        except ValueError:
-                self.assertTrue(True)
-        except Exception:
-                self.assertTrue(False)
+        feat = featurization.featurization([])
+        self.assertTrue(not feat.data)
+        feat = featurization.featurization(None)
+        self.assertTrue(not feat.data)
         trip = Trip(None, None, None, None, None, None, None, None)
         data = [trip]
         try:

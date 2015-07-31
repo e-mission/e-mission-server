@@ -1,6 +1,5 @@
 import unittest
 import emission.core.get_database as edb
-import sys
 import emission.analysis.modelling.tour_model.representatives as rep
 import emission.simulation.trip_gen as tg
 import emission.analysis.modelling.tour_model.featurization as feat
@@ -17,32 +16,18 @@ class RepresentativesTests(unittest.TestCase):
         return
 
     def testInit(self):
-        try:
-            rep.representatives(None, None)
-        except ValueError:
-            self.assertTrue(True)
-        except Exception:
-            self.assertTrue(False)
-        try:
-            rep.representatives(None, self.labels)
-        except ValueError:
-            self.assertTrue(True)
-        except Exception:
-            self.assertTrue(False)
-        try:
-            rep.representatives(self.data, None)
-        except ValueError:
-            self.assertTrue(True)
-        except Exception:
-            self.assertTrue(False)
-        try:
-            a = self.labels.pop()
-            rep.representatives(self.data, self.labels)
-        except ValueError:
-            self.assertTrue(True)
-            self.labels.append(a)
-        except Exception:
-            self.assertTrue(False)
+        repy = rep.representatives(None, None)
+        self.assertTrue(not repy.data)
+        self.assertTrue(not repy.labels)
+        if self.labels:
+            try:
+                a = self.labels.pop()
+                rep.representatives(self.data, self.labels)
+            except ValueError:
+                self.assertTrue(True)
+                self.labels.append(a)
+            except Exception:
+                self.assertTrue(False)
         repy = rep.representatives(self.data, self.labels)
 
     def testListClusters(self):

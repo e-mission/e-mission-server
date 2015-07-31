@@ -3,6 +3,7 @@ import json
 import datetime
 from pygeocoder import Geocoder
 import random, math
+import uuid
 
 # Our imports
 from emission.net.ext_service.otp.otp import OTP, PathNotFoundException
@@ -75,11 +76,11 @@ class Creator:
             print t
             mode = mode_tuple[random.randint(0, len(mode_tuple) - 1)] ## Unsophisticated mode choice, Alexi would throw up
             try:
-                rand_id_addition = random.random()
-                rand_trip_id = random.random()
-                rand_user_id = random.random()
+                id = str(random.random())
+                rand_user_id = str(uuid.uuid4())
+                rand_trip_id = rand_user_id + curr_time.strftime("%Y%m%dT%H%M%S-%W00")
                 otp_trip = OTP(t[0], t[1], mode, write_day(curr_month, curr_day, curr_year), write_time(curr_hour, curr_minute), True)
-                alt_trip = otp_trip.turn_into_trip(self.labels[i] + str(rand_id_addition), rand_user_id, rand_trip_id, True)   ## ids
+                alt_trip = otp_trip.turn_into_trip(self.labels[i] + id, rand_user_id, rand_trip_id, True)   ## ids
                 alt_trip.save_to_db()
             except PathNotFoundException:
                 print "In the sea, skipping"

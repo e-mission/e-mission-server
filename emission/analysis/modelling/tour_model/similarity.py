@@ -25,6 +25,8 @@ class similarity:
     
     def __init__(self, data, percent, radius):
         self.data = data
+        if not data:
+            self.data = []
         self.size = len(self.data)
         self.percent = float(percent)
         if self.percent > 1:

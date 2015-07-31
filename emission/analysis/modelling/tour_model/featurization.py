@@ -22,15 +22,17 @@ class featurization:
 
     def __init__(self, data):
         self.data = data
+        if not self.data:
+            self.data = []
         self.calculate_points()
         self.labels = []
         self.clusters = None
 
     #calculate the points to use in the featurization. 
     def calculate_points(self):
-        if not self.data:
-            raise ValueError('No data')
         self.points = []
+        if not self.data:
+            return
         for trip in self.data:
             start = trip.trip_start_location
             end = trip.trip_end_location
@@ -60,9 +62,11 @@ class featurization:
         if name != 'kmeans' and name != 'kmedoids':
             print 'Invalid clustering algorithm name. Defaulting to k-means'
             name='kmeans'
-        if not self.points:
-            raise ValueError("No data to cluster")
-            return
+        if not self.data:
+            self.sil = None
+            self.clusters = 0
+            self.labels = []
+            return []
         max = -2
         num = 0
         labely = []
