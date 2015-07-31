@@ -6,7 +6,7 @@ import emission.core.get_database as edb
 import emission.analysis.modelling.tour_model.similarity as similarity
 import emission.analysis.modelling.tour_model.featurization as featurization
 import emission.analysis.modelling.tour_model.representatives as representatives
-from emission.core.wrapper.trip import Trip
+from emission.core.wrapper.trip import Trip, Section, Fake_Trip
 """
 This file reads the data from the trip database, 
 removes noise from the data, clusters it, and returns a dictionary 
@@ -37,6 +37,7 @@ def read_data(uuid=None):
     for t in trips:
         trip = Trip.trip_from_json(t)
         if not (trip.trip_start_location and trip.trip_end_location and trip.start_time):
+            print trip
             continue
         data.append(trip)
     if len(data) == 0:

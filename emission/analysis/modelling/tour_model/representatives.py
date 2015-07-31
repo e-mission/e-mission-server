@@ -108,9 +108,14 @@ class representatives:
             self.tour_dict[i]['start_coords'] = start_coords
             self.tour_dict[i]['end_coords'] = end_coords
         self.self_loops_tour_dict = self.tour_dict[:]
+        self.tour_dict
         for cluster in self.tour_dict:
+            print cluster
             if cluster['start'] == cluster['end']:
+                print "removed"
+                print len(self.tour_dict)
                 self.tour_dict.remove(cluster)
+                print len(self.tour_dict)
 
     #check whether a point is close to all points in a bin
     def match(self, label, a, bin):
