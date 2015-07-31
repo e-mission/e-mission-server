@@ -49,8 +49,10 @@ class Creator:
             for i in range(self.num_trips/len(jsn["starting centroids"])):
                 self.ending_addresses.append(address)
 
+
+
     def make_a_to_b(self):
-        for _ in xrange(self.num_trips ):  ## Based on very rough estimate of how many of these end up in the ocean
+        for _ in xrange(self.num_trips):  ## Based on very rough estimate of how many of these end up in the ocean
             start_index = random.randint(0, len(self.starting_points) - 1)
             end_index = random.randint(0, len(self.ending_points) - 1)
             starting_point = self.starting_points[start_index]

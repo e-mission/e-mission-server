@@ -6,11 +6,10 @@ import math, datetime
 DAYS_IN_WEEK = 7
 HOURS_IN_DAY = 24
 MODES_TO_NUMBERS = {"walking" : 0, "car" : 1, "train" : 2, "bart" : 3, "bike" : 4}
-
-
 NUM_MODES = len(MODES_TO_NUMBERS)
 
-
+def is_weekday(day):
+    return not (day == 5 or day == 6)
 
 class Commute(object):
     
@@ -44,6 +43,15 @@ class Commute(object):
             time = 1.0/60.0
         return datetime.timedelta(hours=time)
 
+    def weight(self):
+        return len(self.trips)
+
+    def __gt__(self, other):
+        return self.weight() > other.weight()
+
+    def __lt__(self, other):
+        return self.weight() < other.weight()
+
 class Location(object):
 
     """ A node in the grpah """
@@ -60,12 +68,9 @@ class Location(object):
         self.rep_coords = rep_coords
 
     def increment_successor(self, suc, hour, day):
-        print "INCREMENTING SUCCESSOR %s->%s on hour %s day %s " % (self.name, suc.name, hour, day)
         edge = Commute(self, suc)
         the_edge = self.tm.get_edge(edge)
         the_edge.increment_prob(hour, day)
-        if type(suc) == str:
-            print "suc is a string %s" % suc
         suc_key = Location.make_lookup_key(suc.name)
         self.successors.add(suc_key)
         self.edges.add(str(edge))
@@ -74,7 +79,6 @@ class Location(object):
         temp_counter = esmmc.Counter( )
         time = self.tm.time
         day = time.weekday()
-        #print "self.successors = %s" % self.successors
         for suc in self.successors:
             suc_obj = self.tm.get_location(suc)
             commute = Commute(self, suc_obj)
@@ -137,8 +141,15 @@ class TourModel(object):
         self.user = user
         self.edges = { }
         self.locs = { }
-        self.min_of_each_day = [0, 0, 0, 0, 0, 0, 0]  ## Stores (location, hour) pairs as a way to find the day's starting point
+        self.min_of_each_day = [0]*DAYS_IN_WEEK  ## Stores (location, hour) pairs as a way to find the day's starting point
         self.time = time
+
+    def get_top_trips(self, n):
+        # sort edges by weight 
+        # return n most common trips
+        edges_list = list(self.edges)
+        edges_list.sort()
+        return edges_list[:n] 
 
     def add_location(self, location, is_start, coords):
         name = "%s" % location
@@ -148,9 +159,6 @@ class TourModel(object):
         self.locs[key] = loc
 
     def add_start_hour(self, loc, time):
-        # print day
-        # print "hour = %s, loc = %s" % (hour, loc)
-
         day = time.weekday()
         if self.min_of_each_day[day] == 0:
             self.min_of_each_day[day] = (loc, time)
@@ -160,7 +168,6 @@ class TourModel(object):
 
     def get_tour_model_for_day(self, day):
         tour_model = [ ]
-
         if self.min_of_each_day[day] == 0:
             return "No data for this day"
         curr_node = self.min_of_each_day[day][0]
@@ -168,34 +175,22 @@ class TourModel(object):
         tour_model.append(curr_node)
         while curr_node.hasSuccessor():
             info = curr_node.get_successor()
-            #print type(info)
             curr_node = info[0]
-            print "new thing"
-            print self.time
-            print info[2]
             self.time = datetime.datetime(self.time.year, self.time.month, self.time.day, hour=info[1], minute=self.time.minute) + info[2] 
             print self.time
             if curr_node != tour_model[-1]:
                 tour_model.append(curr_node)
         return tour_model
 
-
-
-
     def get_location(self, location):
-        #print "str(location) = %s" % str(location)
-        
         if type(location) == str:
-            print "this is an str %s" % location
             return self.locs[location]
-        #print "this is a %s called %s" % (type(location), location.name)
         key = Location.make_lookup_key(location.name)
         return self.locs[key]
  
     def build_tour_model(self):
         tour_model = [ ]
         for day in xrange(DAYS_IN_WEEK):
-            print "day %d" % day
             tour_model.append(self.get_tour_model_for_day(day))
         return tour_model 
 
@@ -225,5 +220,4 @@ class TourModel(object):
         nx.draw_networkx_nodes(G, pos)
         nx.draw_networkx_edges(G, pos)
         nx.draw_networkx_labels(G, pos, labels)
-        #nx.draw(G)
         plt.show()
