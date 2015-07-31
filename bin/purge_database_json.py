@@ -1,8 +1,8 @@
 from pymongo import MongoClient
 import json
 import sys
-from get_database import get_db, get_section_db
-from tests import common
+from emission.core.get_database import get_db, get_section_db
+from emission.tests import common
 
 def purgeData(userName):
   Sections=get_section_db()
