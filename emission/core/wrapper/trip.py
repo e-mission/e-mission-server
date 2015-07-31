@@ -32,19 +32,7 @@ class Coordinate:
 
     def distance(self, other):
         ## Returns distance between 2 coordinates in meters
-        R = 6371000
-        lat1 = self.get_lat()
-        lat2 = other.get_lat()
-        lon1 = self.get_lon()
-        lon2 = other.get_lon()
-        rlat1 = math.radians(lat1)
-        rlat2 = math.radians(lat2)
-        lon = math.radians(lon2 - lon1);
-        lat = math.radians(lat2-lat1);
-        a = math.sin(lat/2.0)**2 + math.cos(rlat1)*math.cos(rlat2) * math.sin(lon/2.0)**2
-        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-        return R * c
-
+        return cm.calDistance(self, other, True)
 
     def __str__(self):
         return self.maps_coordinate()
@@ -64,6 +52,7 @@ class Trip(object):
         self.end_time = end_time
         self.trip_start_location = trip_start_location
         self.trip_end_location = trip_end_location
+        self.mode_list = self._init_mode_list(sections)
 
     @classmethod
     def trip_from_json(cls, json_segment):
@@ -79,8 +68,26 @@ class Trip(object):
             start_time = datetime.datetime.strptime(json_segment.get("trip_start_time"), DATE_FORMAT)
             end_time = datetime.datetime.strptime(json_segment.get("trip_end_time"), DATE_FORMAT)
         trip_start_location = cls._start_location(sections)
+        if not trip_start_location:
+            trip_start_location = Coordinate(json_segment['trip_start_location'][1], json_segment['trip_start_location'][0])
         trip_end_location = cls._end_location(sections)
+        if not trip_end_location:
+            trip_end_location = Coordinate(json_segment['trip_end_location'][1], json_segment['trip_end_location'][0])
         return cls(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location)
+
+    @classmethod
+    def _init_mode_list(self, sections):
+        if not sections:
+            return None
+        mode_list = []
+        mode_set = set()
+        for section in sections:
+            mode_list.append(section.mode)
+            mode_set.add(section.mode)
+        if len(mode_set) == 1:
+            return mode_set.pop()
+        return mode_list
+
 
     @classmethod
     def _init_sections(cls, user_id, trip_id, num_sections):
@@ -107,7 +114,13 @@ class Trip(object):
         return cm.calDistance(self.trip_start_location, self.trip_end_location, True)
 
     def save_to_db(self):
-        pass
+        db = edb.get_trip_db()
+        db.insert({"_id": self._id, "user_id": self.user_id, "trip_id": self.trip_id, "sections": range(len(self.sections)), "trip_start_datetime": self.start_time,
+        "trip_end_datetime": self.end_time, "trip_start_location": self.trip_start_location.coordinate_list(), 
+        "trip_end_location": self.trip_end_location.coordinate_list(), "mode_list": self.mode_list})
+
+
+        
 
 
 class Section(object):
@@ -302,6 +315,72 @@ class E_Mission_Trip(Trip):
         if perturbeds:
             for perturbed in perturbeds:
                 perturbed.save_to_db()
+
+class Fake_Trip(Trip):
+    def __init__(self, _id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location):
+        super(Fake_Trip, self).__init__(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location)
+        self.mode_list = self._init_mode_list(sections)
+
+    @classmethod
+    def _init_mode_list(self, sections):
+        if not sections:
+            return None
+        mode_list = []
+        mode_set = set()
+        for section in sections:
+            mode_list.append(section.mode)
+            mode_set.add(section.mode)
+        if len(mode_set) == 1:
+            return mode_set.pop()
+        return mode_list
+
+    @classmethod
+    def _init_sections(cls, user_id, trip_id, num_sections):
+        sections = []
+        db = edb.get_fake_sections_db()
+        json_object = db.find({'user_id': user_id, 'trip_id' : trip_id}, limit = num_sections)
+        for section_json in json_object:
+            sections.append(Section.section_from_json(section_json))
+        return sections
+
+
+
+    def save_to_db(self):
+        db = edb.get_fake_trips_db()
+        db.insert({"_id": self._id, "user_id": self.user_id, "trip_id": self.trip_id, "sections": range(len(self.sections)), "trip_start_datetime": self.start_time,
+                "trip_end_datetime": self.end_time, "trip_start_location": self.trip_start_location.coordinate_list(), 
+                "trip_end_location": self.trip_end_location.coordinate_list(), "mode_list": self.mode_list})
+
+    @classmethod
+    def trip_from_json(cls, jsn):
+        _id = jsn['_id']
+        user_id = jsn['user_id']
+        trip_id = jsn['trip_id']
+        sections = cls._init_sections(user_id, trip_id, len(jsn['sections']))
+        start_time = jsn['trip_start_datetime']
+        end_time = jsn['trip_end_datetime']
+        trip_start_location = cls._start_location(sections)
+        if not trip_start_location:
+            trip_start_location = Coordinate(jsn["trip_start_location"][1], jsn['trip_start_location'][0])
+        trip_end_location = cls._end_location(sections)
+        if not trip_end_location:
+            trip_end_location = Coordinate(jsn['trip_end_location'][1], jsn['trip_end_location'][0])
+        mode_list = E_Mission_Trip._init_mode_list(sections)
+        return cls(_id, user_id, trip_id, sections, start_time, end_time, trip_end_location, trip_end_location)
+
+class Fake_Section(Section):
+
+    def __init__(self, _id, user_id, trip_id, distance, start_time, end_time, section_start_location, section_end_location, mode):
+        super(Fake_Section, self).__init__(_id, user_id, trip_id, distance, "fake", start_time, end_time, section_start_location, section_end_location, mode, mode)
+
+    def save_to_db(self):
+        db = edb.get_fake_section_db()
+        db.insert({"_id" : self._id, "user_id" : self.user_id, "trip_id" : self.trip_id, "distance" : self.distance, "section_type" : self.section_type,
+                    "section_start_datetime" : self.start_time, "section_end_datetime" : self.section_end_datetime, 
+                    "section_start_point" : self.section_start_location, "section_end_location" : self.section_end_location, "mode" : self.mode})
+
+
+
 
 class Canonical_E_Mission_Trip(E_Mission_Trip):
     #if there are no alternatives found, set alternatives list to None 

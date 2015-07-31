@@ -7,7 +7,7 @@ import urllib, urllib2, datetime, time, random
 from pygeocoder import Geocoder
 
 # Our imports
-from emission.core.wrapper.trip import Coordinate, Alternative_Trip, Section, E_Mission_Trip
+from emission.core.wrapper.trip import Coordinate, Alternative_Trip, Section, Trip
 
 try:
     import json
@@ -98,7 +98,7 @@ class OTP:
             mode = leg["mode"]
             mode_list.add(mode)
             fake_id = random.random()
-            section = Section(fake_id, user_id, trip_id, distance, "move", start_time, end_time, start_loc, end_loc, mode, mode)
+            section = Section(str(fake_id), user_id, trip_id, distance, "move", start_time, end_time, start_loc, end_loc, mode, mode)
             section.points = coords
             #print section.points
             sections.append(section)
@@ -133,7 +133,7 @@ class OTP:
 
         mode_list = list(mode_list)
         if is_fake:
-            return E_Mission_Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc, 0, 0, mode_list, mode_list)
+            return Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc)
         return Alternative_Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc, 0, cost, mode_list)
 
 def otp_time_to_ours(otp_str):
