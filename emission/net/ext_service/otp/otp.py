@@ -2,13 +2,12 @@
 ## Hopefully similiar to googlemaps.py
 
 # Standard imports
-import urllib, urllib2, datetime, time
+import urllib, urllib2, datetime, time, random
 # from traffic import get_travel_time
 from pygeocoder import Geocoder
 
 # Our imports
-from emission.core.wrapper.trip import Coordinate, Alternative_Trip, Section, Fake_Trip
-from emission.net.ext_service.gmaps.common import calc_car_cost
+from emission.core.wrapper.trip import Coordinate, Alternative_Trip, Section, Trip
 
 try:
     import json
@@ -98,7 +97,8 @@ class OTP:
             coords.append(end_loc)
             mode = leg["mode"]
             mode_list.add(mode)
-            section = Section(0, user_id, trip_id, distance, "move", start_time, end_time, start_loc, end_loc, mode, mode)
+            fake_id = random.random()
+            section = Section(str(fake_id), user_id, trip_id, distance, "move", start_time, end_time, start_loc, end_loc, mode, mode)
             section.points = coords
             #print section.points
             sections.append(section)
@@ -126,14 +126,15 @@ class OTP:
             #start_city_car = str(Geocoder().reverse_geocode(car_start_coordinates.get_lat(),car_start_coordinates.get_lon())).split(',')[1]
             #end_city_car = str(Geocoder().reverse_geocode(car_end_coordinates.get_lat(), car_end_coordinates.get_lon())).split(',')[1]
             #traffic_time = get_travel_time(start_city_car, end_city_car)
-            cost = calc_car_cost(car_dist)
+            cost = 0
             #if traffic_time > final_end_time - final_start_time:
             #    print "Driving is bad: " + traffic_time
             #    final_end_time = final_start_time + traffic_time
 
         mode_list = list(mode_list)
         if is_fake:
-            return Fake_Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc)
+            print len(sections)
+            return Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc)
         return Alternative_Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc, 0, cost, mode_list)
 
 def otp_time_to_ours(otp_str):
