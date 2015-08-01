@@ -43,10 +43,13 @@ class SimilarityTests(unittest.TestCase):
 
     def testBinData(self):
         sim = similarity.similarity([], .5, 300)
-        self.assertTrue(not bool(sim.bins))
+        self.assertTrue(not sim.bins)
         sim = similarity.similarity(self.data, .5, 300)
         sim.bin_data()
-        self.assertTrue(bool(sim.bins))
+        sum = 0
+        for bin in sim.bins:
+            sum += len(bin)
+        self.assertTrue(sum == len(sim.data))
         testbins = set()
         for bin in sim.bins:
             for b in bin:
@@ -122,21 +125,6 @@ class SimilarityTests(unittest.TestCase):
         sim.graph()
         self.assertTrue(os.path.isfile('./histogram.png'))
         os.remove('./histogram.png')
-
-    def testMapBins(self):
-        if os.path.isfile('./mybins.html'):
-            os.remove('./mybins.html')
-        sim = similarity.similarity([], .5, 300)
-        sim.bin_data()
-        sim.map_bins()
-        sim = similarity.similarity(self.data, .5, 300)
-        sim.map_bins()
-        sim.bin_data()
-        sim.map_bins()
-        sim.delete_bins()
-        sim.map_bins()
-        self.assertTrue(os.path.isfile('./mybins.html'))
-        os.remove('./mybins.html')
 
     def testEvaluateBins(self):
         sim = similarity.similarity([], .5, 300)

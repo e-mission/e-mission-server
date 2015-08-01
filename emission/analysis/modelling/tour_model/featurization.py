@@ -1,4 +1,6 @@
 # Standard imports
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import math
 import numpy
@@ -117,23 +119,4 @@ class featurization:
             return
         print 'number of clusters is ' + str(self.clusters)
         print 'silhouette score is ' + str(self.sil)
-
-    #plot all the clusters on the map. Outputs mylabels.html, a map with colors 
-    #defined by the clustering algorithm. 
-    def map_clusters(self):
-        import pygmaps
-        from matplotlib import colors as matcol
-        colormap = plt.cm.get_cmap()
-
-        if self.labels:
-            mymap2 = pygmaps.maps(37.5, -122.32, 10)
-            for i in range(len(self.points)):
-                start_lat = self.points[i][1]
-                start_lon = self.points[i][0]
-                end_lat = self.points[i][3]
-                end_lon = self.points[i][2]
-                path = [(start_lat, start_lon), (end_lat, end_lon)]
-                mymap2.addpath(path, matcol.rgb2hex(colormap(float(self.labels[i])/self.clusters)))
-            mymap2.draw('./mylabels.html')
-
 

@@ -52,8 +52,10 @@ class RepresentativesTests(unittest.TestCase):
         tripa = Trip(None, None, None, None, None, None, Coordinate(1,2), Coordinate(3,4))
         tripb = Trip(None, None, None, None, None, None, Coordinate(9,10), Coordinate(5,8))
         tripc = Trip(None, None, None, None, None, None, Coordinate(5,6), Coordinate(4,6))
-        clusters[0] = [tripa, tripb, tripc]
-        repy.clusters = clusters
+        data = [tripa, tripb, tripc]
+        labels = [0,0,0]
+        repy = rep.representatives(data, labels)
+        repy.list_clusters()
         repy.get_reps()
         self.assertTrue(repy.reps[0].trip_start_location.lat == 5)
         self.assertTrue(repy.reps[0].trip_start_location.lon == 6)

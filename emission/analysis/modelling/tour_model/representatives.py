@@ -103,6 +103,8 @@ class representatives:
     def cluster_dict(self):
         self.tour_dict = [0] * self.num_clusters
         if not self.data:
+            self.self_loops_tour_dict = []
+            self.tour_dict = []
             return
         for i in range(self.num_clusters):
             a = {'sections' : self.clusters[i]}
@@ -120,7 +122,6 @@ class representatives:
             self.tour_dict[i]['start_coords'] = start_coords
             self.tour_dict[i]['end_coords'] = end_coords
         self.self_loops_tour_dict = self.tour_dict[:]
-        self.tour_dict
         for cluster in self.tour_dict:
             if cluster['start'] == cluster['end']:
                 self.tour_dict.remove(cluster)

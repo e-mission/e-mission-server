@@ -79,18 +79,5 @@ class FeaturizationTests(unittest.TestCase):
         except Exception:
             self.assertTrue(False)
 
-    def testMapClusters(self):
-        if os.path.isfile('./mymap.html'):
-            os.remove('./mymap.html')
-        if os.path.isfile('./mylabels.html'):
-            os.remove('./mylabels.html')
-        feat = featurization.featurization(self.data)
-        feat.map_clusters()
-        feat.cluster(min_clusters=2, max_clusters=10)
-        feat.map_clusters()
-        self.assertTrue(not os.path.isfile('./mymap.html'))
-        self.assertTrue(os.path.isfile('./mylabels.html'))
-        os.remove('./mylabels.html')
-
 if __name__ == "__main__":
     unittest.main()

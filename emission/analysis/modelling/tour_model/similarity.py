@@ -1,5 +1,7 @@
 # Standard imports
 import math
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy
 from sklearn import metrics
@@ -86,23 +88,6 @@ class similarity:
         print str(N) + ' bins, in top half of bins there are ' + str(sum) + ' items out of ' + str(self.size) 
         plt.savefig('histogram.png')
 
-    #plot the trips on a map, with different colors
-    #indicating different bins
-    def map_bins(self):
-        import pygmaps
-        from matplotlib import colors as matcol
-        colormap = plt.cm.get_cmap()
-        mymap = pygmaps.maps(37.5, -122.32, 10)
-        for bin in self.bins:
-            for b in bin:
-                start_lat = self.data[b].trip_start_location.lat
-                start_lon = self.data[b].trip_start_location.lon
-                end_lat = self.data[b].trip_end_location.lat
-                end_lon = self.data[b].trip_end_location.lon
-                path = [(start_lat, start_lon), (end_lat, end_lon)]
-                mymap.addpath(path, matcol.rgb2hex(colormap(float(self.bins.index(bin))/len(self.bins))))
-        mymap.draw('./mybins.html')
-        
     #evaluate the bins as if they were a clustering on the data
     def evaluate_bins(self):
         self.labels = []
