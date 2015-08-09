@@ -108,6 +108,18 @@ directory to PYTHONPATH.
 
         $ PYTHONPATH=. ./runAllTests.sh
 
+## Analysis ##
+Several exploratory analysis scripts are checked in as ipython notebooks into
+`emission/analysis/notebooks`. All data in the notebooks is from members of the
+research team who have provided permission to use it. The results in the
+notebooks cannot be replicated in the absence of the raw data, but they can be
+run on data collected from your own instance as well.
+
+The notebooks are occasionally modified and simplified as code is moved out of
+them into utility functions. Original versions of the notebooks can be obtained
+by looking at other notebooks with the same name, or by looking at the history
+of the notebooks.
+
 ### Running backend analysis scripts ###
 
 1. If you need to run any of the backend scripts, copy the config.json and
