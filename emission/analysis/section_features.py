@@ -5,7 +5,6 @@ import logging
 import numpy as np
 import utm
 from sklearn.cluster import DBSCAN
-from uuid import UUID
 
 # Our imports
 from emission.core.get_database import get_section_db, get_mode_db, get_routeCluster_db,get_transit_db
