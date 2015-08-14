@@ -13,3 +13,4 @@ google-api-python-client==1.1
 xmltodict
 python-crontab
 attrdict
+enum34
