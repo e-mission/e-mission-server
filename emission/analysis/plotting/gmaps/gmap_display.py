@@ -25,10 +25,12 @@ from datetime import tzinfo, datetime, timedelta
 import pytz
 import math
 import logging
+from pygeocoder import Geocoder
 from pytz import timezone
 from dateutil import parser
 import math
 from datetime import date, timedelta
+from pygeocoder import Geocoder
 from uuid import UUID
 
 # Our imports
@@ -38,7 +40,7 @@ from emission.core.get_database import get_section_db, get_trip_db, get_test_db
 import pygmaps_modified as pygmaps
 from emission.core.common import calDistance
 import emission.storage.decorations.useful_queries as tauq
-from emission.core.our_geocoder import Geocoder
+
 
 POINTS = 'points'
 PATH = 'path'
@@ -106,8 +108,8 @@ def searchTrip(user, period, startpoint, endpoint, mode, option):
     gmap = pygmaps.maps(user_home[1], user_home[0], 14)
     start, end = Date(period)
     sectionList = []
-    startpoint = Geocoder.geocode(startpoint)
-    endpoint = Geocoder.geocode(endpoint)
+    startpoint = Geocoder.geocode(startpoint)[0].coordinates
+    endpoint = Geocoder.geocode(endpoint)[0].coordinates
 
     for section in get_section_db().find({"$and":[
         {"mode": mode},
@@ -115,9 +117,9 @@ def searchTrip(user, period, startpoint, endpoint, mode, option):
         {"mode": {"$ne":7}},
         {"section_start_point": {"$ne": None}},
         {"section_end_point": {"$ne": None}}]}):
-        point_start = Coordinate(section['section_start_point']['coordinates'][0], section['section_start_point']['coordinates'][1])
-        point_end = Coordinate(section['section_end_point']['coordinates'][0], section['section_end_point']['coordinates'][1])
-        if calDistance(startpoint, point_start, True) < 100 and calDistance(endpoint, point_end, True) < 100:
+        point_start = section['section_start_point']['coordinates']
+        point_end = section['section_end_point']['coordinates']
+        if calDistance(startpoint, point_start) < 100 and calDistance(endpoint, point_end) < 100:
             sectionList.append(section['_id'])
             gmap.addpoint(point_end[1], point_end[0], COLOR[1])
             gmap.addpoint(point_start[1], point_start[0], COLOR[1])

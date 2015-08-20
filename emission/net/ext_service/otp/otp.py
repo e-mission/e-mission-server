@@ -4,6 +4,7 @@
 # Standard imports
 import urllib, urllib2, datetime, time, random
 # from traffic import get_travel_time
+from pygeocoder import Geocoder
 
 # Our imports
 from emission.core.wrapper.trip import Coordinate, Alternative_Trip, Section, Trip

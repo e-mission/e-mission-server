@@ -1,11 +1,11 @@
 # Standard imports
+from pygeocoder import Geocoder
 import random, math, json, datetime
 
 # Our imports
 from emission.net.ext_service.otp.otp import OTP, PathNotFoundException
 from emission.core.wrapper.trip import Coordinate 
 import emission.simulation.markov_model_counter as esmmc
-from emission.core.our_geocoder import Geocoder
 
 class Address:
 
@@ -90,7 +90,7 @@ def geocode_address(address):
         address.cord = results
     else:
         results = address.cord
-    return results
+    return Coordinate(results[0].coordinates[0], results[0].coordinates[1])
 
 def generate_random_locations_in_radius(address, radius, num_points):
     # Input the desired radius in kilometers

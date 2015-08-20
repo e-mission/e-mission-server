@@ -29,7 +29,7 @@ class TestWorkDetection(unittest.TestCase):
             if user_work == 'N/A' or '':
                 print '--- USER WORK ADDRESS UNAVAILABLE ---'
             else:
-                print Geocoder.reverse_geocode(user_work[0], user_work[1])
+                print(Geocoder.reverse_geocode(user_work[0], user_work[1])[0])
                 workDetection.addpoint(user_work[0], user_work[1], "#FF0000")
             print '...'
         if not os.path.exists('gmap_display'):

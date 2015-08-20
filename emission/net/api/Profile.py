@@ -40,22 +40,25 @@ def generate_user_home_work(user):
                                      {'user_id':user}]},{"$set":{'home':user_home}})
     user_work=detect_work_office(user)
     Profiles.update({"$and":[{'source':'Shankari'},{'user_id':user}]},{"$set":{'work_place':user_work}})
-    user_zip = get_userZipcode(user, zip_is_valid)
+    user_zip=get_userZipcode(user, zip_is_valid)
     Profiles.update({"$and":[{'source':'Shankari'},{'user_id':user}]},{"$set":{'zip':user_zip}})
-    if user_zip != 'N/A':
-        geoinfo = Geocoder.geocode(user_zip)
-        zipCen = geoinfo.lat_lng_list()
+    if user_zip!='N/A':
+        geoinfo= Geocoder.geocode(user_zip)
+        # geocoder returns data in lat,lng format.
+        # we convert to lng,lat internally, since that is the format that the
+        # rest of our code is in
+        zipCen=[geoinfo[0].coordinates[1],geoinfo[0].coordinates[0]]
     else:
-        zipCen = 'N/A'
+        zipCen='N/A'
     Profiles.update({"$and":[{'source':'Shankari'},{'user_id':user}]},{"$set":{'zip_centroid':zipCen}})
 
 
-    for day in xrange(1,6):
-        key = 'work %s' % str(day)
+    for day in range(1,6):
+        key='work'+str(day)
         Profiles.update({"$and":[{'source':'Shankari'},
                                      {'user_id':user}]},{"$set":{key:detect_daily_work_office(user,day)}})
 
-def generate_route_clusters(user, nClusters=-1):
+def generate_route_clusters(user, nClusters = -1):
     ## update route clusters:
     print "In profile, generating route clusters for %s" % user
     routes_user = user_route_data(user,get_section_db())

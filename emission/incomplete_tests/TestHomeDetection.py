@@ -33,7 +33,7 @@ class TestHomeDetection(unittest.TestCase):
             if user_home == 'N/A' or '':
                 print '--- USER HOME ADDRESS UNAVAILABLE ---'
             else:
-                print Geocoder.reverse_geocode(user_home[0], user_home[1])
+                print(Geocoder.reverse_geocode(user_home[0], user_home[1])[0])
                 homeDetection.addpoint(user_home[0], user_home[1], "#FF0000")
             print '...'
         if not os.path.exists('gmap_display'):
