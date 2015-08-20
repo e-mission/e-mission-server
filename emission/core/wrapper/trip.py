@@ -30,6 +30,9 @@ class Coordinate:
     def coordinate_list(self):
         return [float(self.lon), float(self.lat)]
 
+    def lat_lng_lst(self):
+        return [float(self.lat), float(self.lon)]
+
     def distance(self, other):
         ## Returns distance between 2 coordinates in meters
         return cm.calDistance(self, other, True)
@@ -39,6 +42,9 @@ class Coordinate:
 
     def __repr__(self):
         return self.maps_coordinate()
+
+    def __getitem__(self, item):
+        return self.coordinate_list()[item]
 
 
 class Trip(object):
@@ -65,8 +71,12 @@ class Trip(object):
             start_time = json_segment["trip_start_datetime"]
             end_time = json_segment["trip_end_datetime"]
         except:
-            start_time = datetime.datetime.strptime(json_segment.get("trip_start_time"), DATE_FORMAT)
-            end_time = datetime.datetime.strptime(json_segment.get("trip_end_time"), DATE_FORMAT)
+            try:
+                start_time = datetime.datetime.strptime(json_segment.get("trip_start_time"), DATE_FORMAT)
+                end_time = datetime.datetime.strptime(json_segment.get("trip_end_time"), DATE_FORMAT)
+            except:
+                start_time = None
+                end_time = None
         trip_start_location = cls._start_location(sections)
         # if not trip_start_location:
         #     trip_start_location = Coordinate(json_segment['trip_start_location'][1], json_segment['trip_start_location'][0])

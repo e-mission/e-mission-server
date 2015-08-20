@@ -1,3 +1,4 @@
+# standard imports
 import random
 import sys
 import numpy
@@ -110,5 +111,4 @@ def dist(a,b, data):
     for i in range(len(dim_a)):
         sum += abs(dim_a[i] - dim_b[i])**4
     return sum**(1/4.0)
-
 

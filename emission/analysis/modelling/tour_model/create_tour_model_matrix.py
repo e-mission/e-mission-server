@@ -1,4 +1,4 @@
-import emission.analysis.modelling.tour_model.tour_model_matrix as tm
+import emission.analysis.modelling.tour_model.tour_model_matrix as tm ##here
 import emission.core.get_database as edb
 import emission.core.wrapper.trip as trip
 import emission.analysis.modelling.tour_model.cluster_pipeline as eamtcp
@@ -68,7 +68,7 @@ def get_start_hour(section_info):
     return section_info.start_time.hour
 
 def get_end_hour(section_info):
-    return section_info.end_time.hour
+    return section_info.start_time.hour
 
 def get_day(section_info):
     return section_info.start_time.weekday()
@@ -79,9 +79,12 @@ def get_mode_num(section_info):
     print section_info.sections
 
 
+final_tour_model = None
+
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         user = UUID(sys.argv[1])
     else:
         user = None
     list_of_cluster_data = eamtcp.main(user)
+    final_tour_model = create_tour_model("shankari", list_of_cluster_data)

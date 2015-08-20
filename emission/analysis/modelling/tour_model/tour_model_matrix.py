@@ -1,21 +1,18 @@
 # Our imports
 import emission.simulation.markov_model_counter as esmmc
+from emission.core.our_geocoder import Geocoder
 
 # Standard imports
 import numpy as np
-import math, datetime, folium
+import math, datetime, folium, heapq
 import networkx as nx
 import matplotlib.pyplot as plt
-from pygeocoder import Geocoder
 
 # Constants
 DAYS_IN_WEEK = 7
 HOURS_IN_DAY = 24
 MODES_TO_NUMBERS = {"walking" : 0, "car" : 1, "train" : 2, "bart" : 3, "bike" : 4}
 NUM_MODES = len(MODES_TO_NUMBERS)
-
-def is_weekday(day):
-    return not (day == 5 or day == 6)
 
 class Commute(object):
     
@@ -57,9 +54,12 @@ class Commute(object):
         dist = self.starting_point.rep_coords.distance(self.ending_point.rep_coords)
         miles = dist * 0.000621371192
         time = miles/float(40)
-        if time < 1.0/60.0:
-            time = 1.0/60.0
+        if time < 1.0/2.0:
+            time = 1.0/2.0   ## Pushes the random walk forward
         return datetime.timedelta(hours=time)
+
+    def get_distance(self):
+        return self.starting_point.rep_coords.distance(self.ending_point.rep_coords)
 
     def weight(self):
         return len(self.trips)
@@ -95,8 +95,8 @@ class Location(object):
         the_edge.increment_prob(hour, day)
         suc_key = Location.make_lookup_key(suc.name)
         edge_key = Commute.make_lookup_key(self, suc)
-        self.successors.add(suc_key)
-        self.edges.add(edge_key)
+        self.successors.add(self.tm.locs[suc_key])
+        self.edges.add(self.tm.edges[edge_key])
 
     def get_successor(self):
         temp_counter = esmmc.Counter( )
@@ -114,13 +114,20 @@ class Location(object):
         day = self.tm.time.weekday()
         time = self.tm.time
         for suc in self.successors:
-            print suc
             suc_obj = self.tm.get_location(suc)
             edge = self.tm.get_edge(self, suc_obj)
             for temp_hour in xrange(time.hour, HOURS_IN_DAY):
                 if edge.probabilities[day, temp_hour] > 0:
                     return True
         return False
+
+    def get_in_degree(self):
+        count = 0
+        for loc in self.tm.locs.values():
+            if loc in self.successors:
+                print "count inceasing"
+                count += 1
+        return count
 
     @classmethod
     def make_lookup_key(cls, name):
@@ -129,7 +136,7 @@ class Location(object):
     def __eq__(self, other):
         if type(other) != Location:
             return False
-        return (self.name == other.name)
+        return (self.name == other.name) or (self.rep_coords.distance(other.rep_coords) < 300)
 
     def __ne__(self, other):
         return not self == other
@@ -159,8 +166,13 @@ class TourModel(object):
         # sort edges by weight 
         # return n most common trips
         edges_list = list(self.edges.values())
-        edges_list.sort(reverse=True, key=lambda v: v.weight())
-        return edges_list[:n]
+        # edges_list.sort(reverse=True, key=lambda v: v.weight())
+        # return edges_list[:n]
+        return heapq.nlargest(n, edges_list, key=lambda v: v.weight())
+
+    def define_locations(self):
+        for loc in self.locs.itervalues():
+            print "%s : %s" % (loc.name, loc.get_address())
 
     def get_prob_of_place_x_at_time_y_on_date_z(x, y, z):
         loc_key = Location.make_lookup_key(x)
@@ -185,12 +197,15 @@ class TourModel(object):
             return "No data for this day"
         curr_node = self.min_of_each_day[day][0]
         self.time = self.min_of_each_day[day][1]
+        print "hour = %s | day = %s | place = %s" % (self.time.hour, self.time.weekday(), curr_node.name)
         tour_model.append(curr_node)
         while curr_node.hasSuccessor():
             info = curr_node.get_successor()
             curr_node = info[0]
-            self.time = datetime.datetime(self.time.year, self.time.month, self.time.day, hour=info[1], minute=self.time.minute) + info[2] 
-            print self.time
+            self.time = datetime.datetime(self.time.year, self.time.month, self.time.day, hour=info[1], minute=self.time.minute) + info[2]
+            if self.time.weekday() != day:
+                break
+            print "hour = %s | day = %s | place = %s" % (self.time.hour, self.time.weekday(), info[0].name)
             if curr_node != tour_model[-1]:
                 tour_model.append(curr_node)
         return tour_model
@@ -216,33 +231,50 @@ class TourModel(object):
         self.edges[key] = commute
 
     def see_graph(self):
-        vertices = set()
-        labels = {}
-        G = nx.DiGraph()
-        i = 0
-        for v in self.locs.itervalues():
+        pos = {}
+        edge_colors = []
+        node_sizes = []
+        plt.clf()
+        G = nx.MultiDiGraph()
+        labels = { }
+        for v in self.locs.values():
             G.add_node(v)
+            pos[v] = (v.rep_coords.lon, v.rep_coords.lat)
             labels[v] = v.get_address()
-            i += 1
         for e in self.edges.values():
             start = e.starting_point
             end = e.ending_point
             G.add_edge(start,end)
-        pos=nx.spring_layout(G)
-        nx.draw_networkx_nodes(G, pos)
-        nx.draw_networkx_edges(G, pos)
-        nx.draw_networkx_labels(G, pos, labels)
+        for v in G.nodes():
+            n = 0
+            for e in G.in_edges(v):
+                edge = self.get_edge(e[0], e[1])
+                n += edge.weight()
+            node_sizes.append(max(n,1)*30)
+        G = nx.MultiGraph(G)
+        nx.draw_networkx(G, pos, node_color='#00FF80', with_labels=True, node_size=node_sizes, width=3.5)
         plt.show()
 
-def plot_random_walk(walk_for_one_day):
+    def plot_leaflet(self):
+        arbitrary_center = self.locs.values()[0].rep_coords
+        map_obj = folium.Map(location=coord_list(arbitrary_center), tiles="OpenStreetMap")
+        for location in self.locs.itervalues():
+            coords = location.rep_coords
+            map_obj.circle_marker(location=coord_list(coords), radius=300, fill_color="#fb9f9f")
+        map_obj.line(locations=create_lines_list(self.locs.values()))
+        map_obj.create_map(path="%s.html" % self.user)
+
+def plot_random_walk(walk_for_one_day, user):
+    # Still have to do some hard coding if you want to see the moving point
     arbitrary_center = walk_for_one_day[0].rep_coords
     map_obj = folium.Map(location=coord_list(arbitrary_center), tiles="OpenStreetMap")
-    print len(walk_for_one_day)
     for location in walk_for_one_day:
-        coords = location.rep_coords
-        map_obj.circle_marker(location=coord_list(coords), radius=500, fill_color="#fb9f9f")
+        map_obj.circle_marker(location=coord_list(location.rep_coords), radius=500, fill_color="#fb9f9f")
     map_obj.line(locations=create_lines_list(walk_for_one_day))
-    map_obj.create_map(path="map.html")
+    map_obj.create_map(path="random_walk_for_%s" % user)
+
+
+## These are utility functions
 
 def coord_list(coords):
     return [coords.get_lat(), coords.get_lon()]
@@ -252,3 +284,6 @@ def create_lines_list(walk_for_one_day):
     for location in walk_for_one_day:
         lst.append(coord_list(location.rep_coords))
     return lst
+
+def is_weekday(day):
+    return not (day == 5 or day == 6)

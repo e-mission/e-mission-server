@@ -1,9 +1,9 @@
-#standard imports
+# standard imports
 import numpy
 import math
-import matplotlib.pyplot as plt
+import copy
 
-#our imports
+# our imports
 from emission.core.wrapper.trip import Trip, Coordinate
 
 """
@@ -14,26 +14,29 @@ The purpose of this class is to get the list of clusters with
 start and end points to create the tour graph.
 
 To use this class, as input it takes
-- data: the data that's clustered. Should be in the same format as the 
-section database data. 
-- labels: a list of integers that define the clusters on the data.
-
+- data: A list of trip objects
+- labels: A list of integers that define the clusters on the data.
 """
 
 class representatives:
 
     def __init__(self, data, labels):
         self.data = data
+        if not self.data:
+            self.data = []
         self.labels = labels
-        if not data or not labels:
-            raise ValueError('Both data and labels must not be empty')
-        if len(data) != len(labels):
+        if not self.labels:
+            self.labels = []
+        if len(self.data) != len(self.labels):
             raise ValueError('Length of data must equal length of clustering labels.')
-        self.num_clusters = len(set(labels))
-        self.size = len(data)
+        self.num_clusters = len(set(self.labels))
+        self.size = len(self.data)
 
     #get the list of clusters based on the labels
     def list_clusters(self):
+        if not self.data:
+            self.clusters = []
+            return
         self.clusters = [0] * self.num_clusters
         for i in range(self.num_clusters):
             self.clusters[i] = []
@@ -44,6 +47,8 @@ class representatives:
     #get the representatives for each cluster
     def get_reps(self):
         self.reps = []
+        if not self.data:
+            return
         for cluster in self.clusters:
             points = [[], [], [], []]
             for c in cluster:
@@ -55,9 +60,30 @@ class representatives:
             a = Trip(None, None, None, None, None, None, Coordinate(centers[0], centers[1]), Coordinate(centers[2], centers[3]))
             self.reps.append(a)
 
+    #map the representatives
+    def map(self):
+        pass
+        # import pygmaps
+        # mymap = pygmaps.maps(37.5, -122.32, 10)
+        # for t in self.reps:
+        #     start_lat = t.trip_start_location.lat
+        #     start_lon = t.trip_start_location.lon
+        #     end_lat = t.trip_end_location.lat
+        #     end_lon = t.trip_end_location.lon
+        #     path = [(start_lat, start_lon), (end_lat, end_lon)]
+        #     mymap.addpath(path)
+        # for l in self.locs:
+        #     mymap.addpoint(l.lat, l.lon, '#0000FF')
+        # mymap.draw('./myreps.html')
+
+
     #define the set of locations for the data
     def locations(self):
         self.bins = []
+        self.locs = []
+        if not self.data:
+            self.num_locations = 0
+            return
         for a in range(self.num_clusters):
             added_start = False
             added_end = False
@@ -95,6 +121,10 @@ class representatives:
     #create the input to the tour graph
     def cluster_dict(self):
         self.tour_dict = [0] * self.num_clusters
+        if not self.data:
+            self.tour_dict = []
+            self.self_loops_tour_dict = []
+            return
         for i in range(self.num_clusters):
             a = {'sections' : self.clusters[i]}
             self.tour_dict[i] = a
@@ -110,12 +140,23 @@ class representatives:
             end_coords = self.locs[cluster['end']]
             self.tour_dict[i]['start_coords'] = start_coords
             self.tour_dict[i]['end_coords'] = end_coords
-        self.self_loops_tour_dict = self.tour_dict[:]
-        self.tour_dict
-        for cluster in self.tour_dict:
-            print cluster
+
+        self.self_loops_tour_dict = copy.deepcopy(self.tour_dict)        
+
+        for i in range(len(self.tour_dict)-1, -1, -1):
+            cluster = self.tour_dict[i]
             if cluster['start'] == cluster['end']:
                 self.tour_dict.remove(cluster)
+
+        newlocs = []
+        for cluster in self.tour_dict:
+            if cluster['start'] not in newlocs:
+                newlocs.append(cluster['start'])
+            if cluster['end'] not in newlocs:
+                newlocs.append(cluster['end'])
+        for i in range(len(self.tour_dict)):
+            self.tour_dict[i]['start'] = newlocs.index(self.tour_dict[i]['start'])
+            self.tour_dict[i]['end'] = newlocs.index(self.tour_dict[i]['end'])
 
     #check whether a point is close to all points in a bin
     def match(self, label, a, bin):
