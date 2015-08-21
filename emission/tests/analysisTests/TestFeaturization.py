@@ -14,9 +14,9 @@ class FeaturizationTests(unittest.TestCase):
         super(FeaturizationTests, self).__init__(*args, **kwargs)
         self.data = cp.read_data(size=100)
         print 'there are ' + str(len(self.data))
-        if len(self.data) == 0:
-            tg.create_fake_trips()
-            self.data = cp.read_data(size=100)
+        #if len(self.data) == 0:
+        #    tg.create_fake_trips()
+        #    self.data = cp.read_data(size=100)
 
     def setUp(self):
         pass

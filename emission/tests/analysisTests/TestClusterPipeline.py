@@ -9,8 +9,8 @@ class ClusterPipelineTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         db = edb.get_trip_db()
-        if db.count() == 0:
-            tg.create_fake_trips()
+        #if db.count() == 0:
+        #    tg.create_fake_trips()
 
     def setUp(self):
         pass
@@ -19,7 +19,7 @@ class ClusterPipelineTests(unittest.TestCase):
         pass
 
     def testReadData(self):
-        db = edb.get_trip_db()
+        db = edb.get_fake_trips_db()
         trips = db.find()
         uuids = set()
         for t in trips:

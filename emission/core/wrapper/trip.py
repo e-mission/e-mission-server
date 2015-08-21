@@ -114,16 +114,7 @@ class Trip(object):
         return cm.calDistance(self.trip_start_location, self.trip_end_location, True)
 
     def save_to_db(self):
-        db = edb.get_trip_db()
-        for section in self.sections:
-            section.save_to_db()
-        db.insert({"user_id": self.user_id, "trip_id": self.trip_id, "sections": range(len(self.sections)), "trip_start_datetime": self.start_time,
-        "trip_end_datetime": self.end_time, "trip_start_location": self.trip_start_location.coordinate_list(), 
-        "trip_end_location": self.trip_end_location.coordinate_list(), "mode_list": self.mode_list})
-
-
-        
-
+        pass
 
 class Section(object):
 
@@ -196,13 +187,13 @@ class Section(object):
 
     def save_to_db(self):
         db = edb.get_section_db()
-        # db.update({"_id": self._id},
-        #               {"$set": {"distance" : self.distance, "mode" : self.mode, "confirmed_mode" : self.confirmed_mode}},
-        #                upsert=False, multi=False)
-        db.insert({"user_id" : self.user_id, "trip_id" : self.trip_id, "distance" : self.distance, "type" : self.section_type,
-                    "section_start_datetime" : self.start_time, "section_end_datetime" : self.end_time, 
-                    "section_start_point" : {"coordinates" : self.section_start_location.coordinate_list()},
-                    "section_end_point" : {"coordinates" : self.section_end_location.coordinate_list()}, "mode" : self.mode, "confirmed_mode" : self.confirmed_mode})
+        db.update({"_id": self._id},
+                      {"$set": {"distance" : self.distance, "mode" : self.mode, "confirmed_mode" : self.confirmed_mode}},
+                       upsert=False, multi=False)
+        #db.insert({"user_id" : self.user_id, "trip_id" : self.trip_id, "distance" : self.distance, "type" : self.section_type,
+        #            "section_start_datetime" : self.start_time, "section_end_datetime" : self.end_time, 
+        #            "section_start_point" : {"coordinates" : self.section_start_location.coordinate_list()},
+        #            "section_end_point" : {"coordinates" : self.section_end_location.coordinate_list()}, "mode" : self.mode, "confirmed_mode" : self.confirmed_mode})
 
 
 class E_Mission_Trip(Trip):

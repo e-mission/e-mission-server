@@ -11,9 +11,9 @@ class RepresentativesTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(RepresentativesTests, self).__init__(*args, **kwargs)
         self.data = cp.read_data(size=100)
-        if len(self.data) == 0:
-            tg.create_fake_trips()
-            self.data = cp.read_data(size=100)
+        #if len(self.data) == 0:
+        #    tg.create_fake_trips()
+        #    self.data = cp.read_data(size=100)
         print 'there are ' + str(len(self.data))
         n = len(self.data)/5
         self.labels = feat.featurization(self.data).cluster(min_clusters=n, max_clusters=n)        
