@@ -29,13 +29,14 @@ class ClusterPipelineTests(unittest.TestCase):
         self.uuids = uuids
 
         data = cp.read_data(size=10)
-        self.assertTrue(len(data) == 10 or len(data) == 0)
+        print 'there are ' + str(len(data))
+        self.assertTrue(len(data) == 10 or len(data) == 0) #len(data)==0 if the test is run on an empty database
         uuid = 'baduuid'
         data = cp.read_data(uuid=uuid)
         self.assertTrue(not data)
         uuid = self.uuids.pop()
         data = cp.read_data(uuid = uuid)
-        self.assertTrue(len(data) <= db.find({'user_id' : uuid}))
+        self.assertTrue(len(data) <= db.find({'user_id' : uuid}).count())
         self.uuids.add(uuid)
         sum = 0
         for uuid in self.uuids:
@@ -50,14 +51,14 @@ class ClusterPipelineTests(unittest.TestCase):
     def testRemoveNoise(self):
         data = cp.read_data(size=100)
         newdata, bins = cp.remove_noise(None, 200)
-        self.assertTrue(len(newdata) == len(bins) == 0)
+        self.assertTrue(len(newdata) == len(bins) == 0) #checking that the code doesn't crash on an empty dataset
         newdata, bins = cp.remove_noise(data, 100)
         self.assertTrue(len(newdata) <= len(data))
 
     def testCluster(self):
         data = cp.read_data(size=100)
         clusters, labels, newdata = cp.cluster([], 10)
-        self.assertTrue(len(newdata) == clusters == len(labels) == 0)
+        self.assertTrue(len(newdata) == clusters == len(labels) == 0) #checking that the code doesn't crash on an empty dataset
         clusters, labels, newdata = cp.cluster(data, 10)
         self.assertTrue(clusters == 0 or 10 <= clusters <= 15)
         self.assertTrue(len(labels) == len(newdata))
@@ -67,9 +68,9 @@ class ClusterPipelineTests(unittest.TestCase):
         self.assertTrue(clusters == 0 or 20 <= clusters <= 30)
 
     def testClusterToTourModel(self):
-        data = cp.cluster_to_tour_model(None, None)
-        self.assertTrue(not data)
-        data = cp.read_data(size=100)
+        data = cp.cluster_to_tour_model(None, None) #for a negative test case
+        self.assertTrue(not data) #checking that the code doesn't crash on an empty dataset
+        data = cp.read_data(size=100)#this and the following lines form the positive test case
         data, bins = cp.remove_noise(data, 300)
         n, labels, data = cp.cluster(data, len(bins))
         tour_dict = cp.main()

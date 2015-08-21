@@ -13,8 +13,10 @@ class FeaturizationTests(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(FeaturizationTests, self).__init__(*args, **kwargs)
         self.data = cp.read_data(size=100)
+        print 'there are ' + str(len(self.data))
         if len(self.data) == 0:
             tg.create_fake_trips()
+            self.data = cp.read_data(size=100)
 
     def setUp(self):
         pass
@@ -49,7 +51,7 @@ class FeaturizationTests(unittest.TestCase):
         self.assertTrue(len(feat.labels) == len(feat.points))
         self.assertTrue(feat.clusters == len(set(feat.labels)))
         b = feat.cluster(name='nonname', min_clusters=5, max_clusters=20)
-        self.assertTrue(a == b)
+        self.assertTrue(a == b) #defaults to kmeans with invalid clustering method
         feat.cluster(min_clusters=len(self.data)+1)
         c = feat.cluster(min_clusters = 0, max_clusters=20)
         d = feat.cluster(min_clusters = 2, max_clusters=20)

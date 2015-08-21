@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import numpy
 from sklearn import metrics
 import sys
-from scipy.optimize import curve_fit
 from numpy import cross
 from numpy.linalg import norm
 """
@@ -60,10 +59,14 @@ class similarity:
         if len(self.bins) <= 1:
             return
         num = self.elbow_distance()
+        sum = 0
         for i in range(len(self.bins)):
+            sum += len(self.bins[i])
             if len(self.bins[i]) <= len(self.bins[num]):
+                sum -= len(self.bins[i])
                 num = i
                 break
+        print 'the new number of trips is ' + str(sum)
         print 'the cutoff point is ' + str(num)
         self.num = num
         self.graph()
@@ -77,6 +80,15 @@ class similarity:
         self.newdata = newdata
 
     #calculate the cut-off point in the histogram
+    #This is motivated by the need to calculate the cut-off point 
+    #that separates the common trips from the infrequent trips. 
+    #This works by approximating the point of maximum curvature 
+    #from the curve formed by the points of the histogram. Since 
+    #it is a discrete set of points, we calculate the point of maximum
+    #distance from the line formed by connecting the height of the 
+    #tallest bin with that of the shortest bin, as described
+    #here: http://stackoverflow.com/questions/2018178/finding-the-best-trade-off-point-on-a-curve?lq=1
+    #We then remove all bins of lesser height than the one chosen.
     def elbow_distance(self):
         y = [0] * len(self.bins)
         for i in range(len(self.bins)):
@@ -114,7 +126,7 @@ class similarity:
         index = numpy.arange(N)
         width = .2
         plt.bar(index+width, bars, color='k')
-        try: 
+        try:
             plt.bar(self.num+width, bars[self.num], color='g')
         except Exception:
             pass

@@ -105,7 +105,4 @@ if __name__=='__main__':
     if len(sys.argv) == 2:
         uuid = sys.argv[1]
         uuid = uu.UUID(uuid)
-
     main(uuid=uuid)
-
-

@@ -15,7 +15,10 @@ start and end points to create the tour graph.
 
 To use this class, as input it takes
 - data: A list of trip objects
-- labels: A list of integers that define the clusters on the data.
+- labels: A list of integers that define the clusters on the data. 
+The labels are calculated in cluster pipeline from the clusters. The labels 
+should be a list of integers of the same length as the list of data, where 
+different numbers indicate different clusters. 
 """
 
 class representatives:

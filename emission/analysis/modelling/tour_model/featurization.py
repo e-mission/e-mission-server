@@ -120,6 +120,7 @@ class featurization:
         print 'silhouette score is ' + str(self.sil) 
 
     #map the clusters
+    #TODO - move this to a file in emission.analysis.plotting to map clusters from the database
     def map_clusters(self):
         import pygmaps
         from matplotlib import colors as matcol
@@ -133,5 +134,5 @@ class featurization:
                 end_lat = self.points[i][3]
                 end_lon = self.points[i][2]
                 path = [(start_lat, start_lon), (end_lat, end_lon)]
-            mymap2.addpath(path, matcol.rgb2hex(colormap(float(self.labels[i])/self.clusters)))
+                mymap2.addpath(path, matcol.rgb2hex(colormap(float(self.labels[i])/self.clusters)))
             mymap2.draw('./mylabels.html')
