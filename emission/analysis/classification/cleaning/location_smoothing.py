@@ -92,7 +92,7 @@ def add_heading_change(points_df):
     return with_hcs_df
 
 def get_section_points(section):
-    if section.source == "raw_auto":
+    if "source" in section and section.source == "raw_auto":
         section.user_id = section.id
         section.loc_filter = section.filter
     df = lq.get_points_for_section(section)
@@ -121,7 +121,8 @@ def filter_points(section_df, outlier_algo, filtering_algo):
         try:
             filtering_algo.filter(with_speeds_df)
             return accuracy_filtered_df[filtering_algo.inlier_mask_]
-        except:
-            print ("Caught error while processing section, skipping...")
+        except Exception as e:
+            print ("Caught error %s while processing section, skipping..." % e)
+            return accuracy_filtered_df
     else:
         return accuracy_filtered_df
