@@ -3,10 +3,12 @@ import json
 import datetime
 from pygeocoder import Geocoder
 import random, math
+import uuid
 
 # Our imports
-from emission.net.ext_services.otp.otp import OTP, PathNotFoundException
+from emission.net.ext_service.otp.otp import OTP, PathNotFoundException
 from emission.core.wrapper.trip import Coordinate 
+
 
 class Address:
 
@@ -25,30 +27,33 @@ class Creator:
     def __init__(self):
         self.starting_points = [ ]
         self.ending_points = [ ]
-        self.a_to_b = []
+        self.a_to_b = [ ]
         self.num_trips = None
         self.radius = None
         self.amount_missed = 0
-        self.starting_addresses = []
-        self.ending_addresses = []
-        self.labels = []
+        self.starting_addresses = [ ]
+        self.ending_addresses = [ ]
+        self.labels = [ ]
 
     def get_starting_ending_points(self):
-        city_file = open("CFC_DataCollector/trip_generator/input.json", "r") ## User (Naomi) specifies locations and radius they want
+        city_file = open("emission/simulation/input.json", "r") ## User (Naomi) specifies locations and radius they want
         jsn = json.load(city_file)
         self.num_trips = jsn["number of trips"]
         self.radius = float(jsn["radius"])
         for address in jsn["starting centroids"]:            
             self.starting_points.extend(generate_random_locations_in_radius(Address(address), self.radius, self.num_trips/len(jsn["starting centroids"])))
             for i in range(self.num_trips/len(jsn["starting centroids"])):
+
                 self.starting_addresses.append(address)
         for address in jsn["ending centroids"]:
             self.ending_points.extend(generate_random_locations_in_radius(Address(address), self.radius, self.num_trips/len(jsn["starting centroids"])))
             for i in range(self.num_trips/len(jsn["starting centroids"])):
                 self.ending_addresses.append(address)
-     
+
+
+
     def make_a_to_b(self):
-        for _ in xrange(self.num_trips ):  ## Based on very rough estimate of how many of these end up in the ocean
+        for _ in xrange(self.num_trips):  ## Based on very rough estimate of how many of these end up in the ocean
             start_index = random.randint(0, len(self.starting_points) - 1)
             end_index = random.randint(0, len(self.ending_points) - 1)
             starting_point = self.starting_points[start_index]
@@ -63,18 +68,19 @@ class Creator:
         curr_time = datetime.datetime.now()
         curr_month = curr_time.month
         curr_year = curr_time.year
-        curr_day = curr_time.day
-        curr_hour = curr_time.hour
         curr_minute = curr_time.minute
         for i in range(len(self.a_to_b)):
+            curr_day = random.randint(1, 28)
+            curr_hour = random.randint(0, 23)
             t = self.a_to_b[i]
             print t
             mode = mode_tuple[random.randint(0, len(mode_tuple) - 1)] ## Unsophisticated mode choice, Alexi would throw up
             try:
-                if abs(t[0].get_lon()) < 30 or abs(t[0].get_lat()) < 30:
-                    print 
+                id = str(random.random())
+                rand_user_id = str(uuid.uuid4())
+                rand_trip_id = rand_user_id + curr_time.strftime("%Y%m%dT%H%M%S-%W00")
                 otp_trip = OTP(t[0], t[1], mode, write_day(curr_month, curr_day, curr_year), write_time(curr_hour, curr_minute), True)
-                alt_trip = otp_trip.turn_into_trip(self.labels[i], 0, 0, True)   ## ids
+                alt_trip = otp_trip.turn_into_trip(self.labels[i] + id, rand_user_id, rand_trip_id, True)   ## ids
                 alt_trip.save_to_db()
             except PathNotFoundException:
                 print "In the sea, skipping"
@@ -152,4 +158,3 @@ def create_fake_trips():
     my_creator.make_a_to_b()
     my_creator.get_trips_from_a_to_b()
     return my_creator
-

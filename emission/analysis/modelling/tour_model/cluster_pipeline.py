@@ -1,133 +1,108 @@
 # Standard imports
-import similarity
-import sys
 import math
+import datetime
+import uuid as uu
+import sys
 
 # Our imports
-import emission.core.get_database import edb
-import featurization
-
+import emission.core.get_database as edb
+import emission.analysis.modelling.tour_model.similarity as similarity
+import emission.analysis.modelling.tour_model.featurization as featurization
+import emission.analysis.modelling.tour_model.representatives as representatives
+from emission.core.wrapper.trip import Trip, Section, Fake_Trip
 """
-This file reads the data from the section database, 
-removes noise from the data, and clusters is. 
+This file reads the data from the trip database, 
+removes noise from the data, clusters it, and returns a dictionary 
+to make the tour model. 
 
 The parameters and clustering methods can be easily changed, 
 but based on what works the best, the featurization and clustering 
 works as follows. First, the data is read from the database. 
-For featurization, each section is representated as a start point 
-and an end point. Then, the section is put into bins and the lower 
+For featurization, each trip is representated as a start point 
+and an end point. Then, the trips are put into bins and the lower 
 half of the bins are removed. Then, the data is clustered using 
 k-means. The parameter for k is currently tested in a range based 
-on the number of elements, but I plan to adjust this range. 
+on the number of bins. This parameter may change.
 
-As input, this file accepts an user's uuid from the command line. 
+As input, this file can accepts an user's uuid from the command line. 
+If no uuid is given, it will use all the trips from the trip database.
 
-Currently, this file is defaulted not to handle ground truth, but 
-for the purpose of tests, a parameter can be changed to collect ground 
-truth from the database and compare the clustering to ground truth. 
-To change this, in main, change ground_truth to True in the call to 
-read_data. 
+It also accepts a size parameter, which will limit the number of trips 
+read from the database. 
 """
 
-#read the data from the database. If ground_truth is true, it will 
-#take it from the 'color' field of each section in the database. 
-def read_data(uuid, ground_truth=False):
-    sectiondb = edb.get_section_db()
-    sections = sectiondb.find({'user_id' : uuid})
-    if sections.count() == 0:
-        raise Exception('no sections found for user ' + str(uuid))
+#read the data from the database. 
+def read_data(uuid=None,size=None):
     data = []
-    colors = []
-    for section in sections:
-        check(section)
-        start = map(float, section['section_start_point']['coordinates'])
-        end = map(float, section['section_end_point']['coordinates'])
-        data.append({'trip_start_location' : start, 'trip_end_location' : end})
-        if ground_truth:
-            colors.append(section['color'])
+    db = edb.get_trip_db()
+    if uuid:
+        trips = db.find({'user_id' : uuid, 'type' : 'move'})
+    else:
+        trips = db.find({'type' : 'move'})
+    if trips.count() == 0: 
+        return [] 
+    for t in trips:
+        try: 
+            trip = Trip.trip_from_json(t)
+        except:
+            continue
+        if not (trip.trip_start_location and trip.trip_end_location and trip.start_time):
+            continue
+        data.append(trip)
+        if size:
+            if len(data) == size:
+                break
+    if len(data) == 0: 
+        return [] 
+    return data
 
-    if ground_truth:
-        indices = [] * len(set(colors))
-        for n in colors:
-            if n not in indices:
-                    indices.append(n)
-                    
-        for i in range(len(colors)):
-            colors[i] = indices.index(colors[i])
-
-    return data, colors
-
-#checks that each section has the necessary information
-def check(section):
-    a = find_in_dict(section, 'section_start_point', 'coordinates')
-    b = find_in_dict(section, 'section_end_point', 'coordinates')
-    if not a and b:
-        raise KeyError('Missing information from section '+ str(section))
-
-#helper function for finding an element in a dictionary and 
-#making sure it is not None
-def find_in_dict(data, key, second_key = None):
-    if key not in data:
-        return False
-    elif data[key] == None:
-        return False
-    if second_key != None:
-        return find_in_dict(data[key], second_key)
-    return True;
-
-#put the data into bins and cut off the lower half of the bins
-def remove_noise(data, cutoff, radius, colors=None):
-    if colors == []: 
-        colors = None
-    sim = similarity.similarity(data, cutoff, radius, colors=colors)
+#put the data into bins and cut off the lower portion of the bins
+def remove_noise(data, radius):
+    if not data:
+        return [], []
+    sim = similarity.similarity(data, radius)
     sim.bin_data()
+    print 'number of bins before filtering: ' + str(len(sim.bins))
     sim.delete_bins()
-
-    newdata = []
-    newcolors = []
-    for bin in sim.bins:
-        for b in bin:
-            d = sim.data[b]
-            newdata.append(sim.data[b])
-            if colors != None:
-                newcolors.append(colors[b])
-
-    if colors != None:
-        indices = [] * len(set(newcolors))
-        for n in newcolors:
-            if n not in indices:
-                indices.append(n)
-
-        for i in range(len(newcolors)):
-            newcolors[i] = indices.index(newcolors[i])
-
-    return newdata, newcolors
+    print 'number of bins after filtering: ' + str(len(sim.bins))
+    return sim.newdata, sim.bins
 
 #cluster the data using k-means
-def cluster(data, colors=None):
-    if colors == []:
-        colors = None
-    feat = featurization.featurization(data, colors=colors)
-    m = len(data)
-    min = int(math.ceil(m/7.0))
-    max = int(math.ceil(m/4.0))
+def cluster(data, bins):
+    if not data:
+        return 0, [], []
+    feat = featurization.featurization(data)
+    min = bins
+    max = int(math.ceil(1.5 * bins))
     feat.cluster(min_clusters=min, max_clusters=max)
-    if colors != None:
-        feat.check_clusters()
+    feat.map_clusters()
+    print 'number of clusters: ' + str(feat.clusters)
     return feat.clusters, feat.labels, feat.data
 
+#prepare the data for the tour model
+def cluster_to_tour_model(data, labels):
+    if not data:
+        return []
+    repy = representatives.representatives(data, labels)
+    repy.list_clusters()
+    repy.get_reps()
+    repy.locations()
+    repy.map()
+    print 'number of locations: ' + str(repy.num_locations)
+    repy.cluster_dict()
+    return repy.tour_dict
+
+def main(uuid=None):
+    data = read_data(uuid)
+    print len(data)
+    data, bins = remove_noise(data, 300)
+    n, labels, data = cluster(data, len(bins))
+    tour_dict = cluster_to_tour_model(data, labels)
+    return tour_dict
+
 if __name__=='__main__':
-
-    if len(sys.argv) != 2:
-        print "Please provide a uuid."
-        sys.exit(0)
-
-    uuid = sys.argv[1]
-
-    data, colors = read_data(uuid, ground_truth=False)
-    data, colors = remove_noise(data, .5, 300, colors = colors)
-    n, labels, data = cluster(data, colors=colors)
-    print 'number of clusters is ' + str(n)
-    print 'labels by clusters are ' + str(labels)
-    
-
+    uuid = None
+    if len(sys.argv) == 2:
+        uuid = sys.argv[1]
+        uuid = uu.UUID(uuid)
+    main(uuid=uuid)
