@@ -4,7 +4,7 @@ from emission.core.our_geocoder import Geocoder
 
 # Standard imports
 import numpy as np
-import math, datetime, folium, heapq
+import math, datetime, heapq
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -255,23 +255,9 @@ class TourModel(object):
         nx.draw_networkx(G, pos, node_color='#00FF80', with_labels=True, node_size=node_sizes, width=3.5)
         plt.show()
 
-    def plot_leaflet(self):
-        arbitrary_center = self.locs.values()[0].rep_coords
-        map_obj = folium.Map(location=coord_list(arbitrary_center), tiles="OpenStreetMap")
-        for location in self.locs.itervalues():
-            coords = location.rep_coords
-            map_obj.circle_marker(location=coord_list(coords), radius=300, fill_color="#fb9f9f")
-        map_obj.line(locations=create_lines_list(self.locs.values()))
-        map_obj.create_map(path="%s.html" % self.user)
 
-def plot_random_walk(walk_for_one_day, user):
-    # Still have to do some hard coding if you want to see the moving point
-    arbitrary_center = walk_for_one_day[0].rep_coords
-    map_obj = folium.Map(location=coord_list(arbitrary_center), tiles="OpenStreetMap")
-    for location in walk_for_one_day:
-        map_obj.circle_marker(location=coord_list(location.rep_coords), radius=500, fill_color="#fb9f9f")
-    map_obj.line(locations=create_lines_list(walk_for_one_day))
-    map_obj.create_map(path="random_walk_for_%s" % user)
+
+
 
 
 ## These are utility functions
