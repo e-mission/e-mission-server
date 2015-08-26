@@ -41,10 +41,10 @@ def segment_into_sections(trip):
                                     "start_time": pydt.datetime.fromtimestamp(prev_ts/1000),
                                     "activity": row["activity"]})
             else:
-                print("At %s, retained existing activity %s" % 
+                print("At %s, retained existing activity %s because of low confidence" % 
                         (str(pydt.datetime.fromtimestamp(row["write_ts"]/1000)), curr_section.activity))
         else:
-            print("At %s, retained existing activity %s" % 
+            print("At %s, retained existing activity %s because of no change" % 
                     (str(pydt.datetime.fromtimestamp(row["write_ts"]/1000)), curr_section.activity))
 
     print("Detected trip end! Ending section at %s" % trip.end_time)        
@@ -52,4 +52,7 @@ def segment_into_sections(trip):
     curr_section.end_ts = trip.end_ts
     curr_section.end_time = trip.end_time
     section_list.append(curr_section)
+
+    # Merge short sections
+    # Sometimes, the sections flip-flop around 
     return section_list
