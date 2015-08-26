@@ -82,9 +82,25 @@ class SmoothZigzag(object):
 
     @staticmethod
     def shortest_non_cluster_segment(segment_list):
+        assert(len(segment_list) > 0)
         segment_distance_list = [[segment.distance, segment.is_cluster] for segment in segment_list]
         segment_distance_df = pd.DataFrame(segment_distance_list, columns = ["distance", "is_cluster"])
-        retVal = segment_distance_df[segment_distance_df.is_cluster == False].distance.argmin()
+        non_cluster_segments = segment_distance_df[segment_distance_df.is_cluster == False]
+        if len(non_cluster_segments) == 0:
+            # If every segment is a cluster, then it is very hard to
+            # distinguish between them for zigzags. Let us see if there is any
+            # one point cluster - i.e. where the distance is zero. If so, that is likely
+            # to be a bad cluster, so we return the one to the right or left of it
+            minDistanceCluster = segment_distance_df.distance.argmin()
+            if minDistanceCluster == 0:
+                goodCluster = minDistanceCluster + 1
+                assert(goodCluster < len(segment_list))
+                return goodCluster
+            else:
+                goodCluster = minDistanceCluster - 1
+                assert(goodCluster >= 0)
+                return goodCluster
+        retVal = non_cluster_segments.distance.argmin()
         logging.debug("shortest_non_cluster_segment = %s" % retVal)
         return retVal
 
@@ -181,6 +197,12 @@ class SmoothZigzag(object):
         self.inlier_mask_ = pd.Series([True] * with_speeds_df.shape[0])
         self.with_speeds_df = with_speeds_df
         self.find_segments()
+        logging.debug("After splitting, segment list is %s with size %s" % 
+                (self.segment_list, len(self.segment_list)))
+        if len(self.segment_list) == 1:
+            # there were no jumps, so there's nothing to do
+            logging.info("No jumps, nothing to filter")
+            return
         start_segment_idx = self.find_start_segment(self.segment_list)
         self.segment_list[start_segment_idx].state = Segment.State.GOOD
         self.mark_segment_states(start_segment_idx, SmoothZigzag.Direction.RIGHT)
@@ -194,6 +216,7 @@ class SmoothZigzag(object):
             self.inlier_mask_[segment.start:segment.end] = False
 
         logging.debug("after setting values, outlier_mask = %s" % np.nonzero(self.inlier_mask_ == False))
+        logging.debug("point details are %s" % with_speeds_df[["mLatitude", "mLongitude", "mAccuracy", "formatted_time"]][np.logical_not(self.inlier_mask_)])
 
         # TODO: This is not the right place for this - adds too many dependencies
         # Should do this in the outer class in general so that we can do
