@@ -29,7 +29,9 @@ def segment_into_trips(points_df):
             segmentation_points.append(currPoint)
 
         if just_ended:
-            curr_trip_start_point = currPoint
+            sel_point = currPoint
+            print("Setting new trip start point %s with idx %s" % (sel_point, sel_point.idx))
+            curr_trip_start_point = sel_point
             just_ended = False
             
         last5MinsPoints_df = filtered_points_df[np.logical_and(
@@ -59,10 +61,14 @@ def segment_into_trips(points_df):
             print("last5MinsDistances.max() = %s, last10PointsDistance.max() = %s" %
               (last5MinsDistances.max(), last10PointsDistances.max()))
             if (last5MinsDistances.max() < 100 and last10PointsDistances.max() < 100):
-                last_trip_end_index = min(last5MinsPoints_df.index.min(),
-                                       last10Points_df.index.min())
-                last_trip_end_point = filtered_points_df.loc[last_trip_end_index]
-                print "Appending currPoint because the current start point is None"
+                last_trip_end_index = int(min(np.median(last5MinsPoints_df.index),
+                                           np.median(last10Points_df.index)))
+                print("last5MinPoints.median = %s (%s), last10Points_df = %s (%s), sel index = %s" %
+                    (np.median(last5MinsPoints_df.index), last5MinsPoints_df.index,
+                     np.median(last10Points_df.index), last10Points_df.index,
+                     last_trip_end_index))
+                last_trip_end_point = filtered_points_df.iloc[last_trip_end_index]
+                print("Appending last_trip_end_point %s with index %s " % (last_trip_end_point, last_trip_end_point.name))
                 segmentation_points.append(last_trip_end_point)
                 print "Found trip end at %s" % str(pydt.datetime.fromtimestamp(last_trip_end_point.mTime/1000))
                 just_ended = True
