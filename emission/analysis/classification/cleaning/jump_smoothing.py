@@ -297,25 +297,25 @@ class SmoothPosdap(object):
                 for curr_idx in curr_segment:
                     print("Comparing distance %s with speed %s * time %s = %s" %
                         (math.fabs(ec.calDistance(get_coords(ref_idx), get_coords(curr_idx))),
-                         self.maxSpeed, abs(get_ts(ref_idx) - get_ts(curr_idx)),
-                         self.maxSpeed * abs(get_ts(ref_idx) - get_ts(curr_idx))))
+                         self.maxSpeed / 100, abs(get_ts(ref_idx) - get_ts(curr_idx)),
+                         self.maxSpeed / 100 * abs(get_ts(ref_idx) - get_ts(curr_idx))))
 
                     if (math.fabs(ec.calDistance(get_coords(ref_idx), get_coords(curr_idx))) >
-                        (self.maxSpeed * abs(get_ts(ref_idx) - get_ts(curr_idx)))):
+                        (self.maxSpeed / 1000 * abs(get_ts(ref_idx) - get_ts(curr_idx)))):
                         print("Distance is greater than max speed * time, deleting %s" % curr_idx)
-                        self.inlier_mark_[curr_idx] = False
+                        self.inlier_mask_[curr_idx] = False
             else:
                 print("prev segment %s is shorter, cut it" % last_segment)
                 ref_idx = curr_segment[-1]
                 for curr_idx in reversed(last_segment):
                     print("Comparing distance %s with speed %s * time %s = %s" %
                         (math.fabs(ec.calDistance(get_coords(ref_idx), get_coords(curr_idx))),
-                         self.maxSpeed, abs(get_ts(ref_idx) - get_ts(curr_idx)),
-                         self.maxSpeed * abs(get_ts(ref_idx) - get_ts(curr_idx))))
+                         self.maxSpeed / 1000 , abs(get_ts(ref_idx) - get_ts(curr_idx)),
+                         self.maxSpeed / 1000 * abs(get_ts(ref_idx) - get_ts(curr_idx))))
                     if (abs(ec.calDistance(get_coords(ref_idx), get_coords(curr_idx))) >
-                        (self.maxSpeed *  abs(get_ts(ref_idx) - get_ts(curr_idx)))):
+                        (self.maxSpeed / 1000 *  abs(get_ts(ref_idx) - get_ts(curr_idx)))):
                         print("Distance is greater than max speed * time, deleting %s" % curr_idx)
-                        self.inlier_mark_[curr_idx] = False
+                        self.inlier_mask_[curr_idx] = False
             last_segment = curr_segment
         logging.info("Filtering complete, removed indices = %s" % np.nonzero(self.inlier_mask_))
 
