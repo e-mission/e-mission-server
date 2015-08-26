@@ -18,7 +18,7 @@ from dateutil import parser
 import time
 import emission.core.get_database as edb
 
-to_ts = lambda(dt): time.mktime(dt.timetuple())
+to_ts = lambda(dt): time.mktime(dt.timetuple()) * 1000
 logging.basicConfig(level=logging.DEBUG)
 
 reconstructedTimeSeriesDb = edb.get_usercache_db()
