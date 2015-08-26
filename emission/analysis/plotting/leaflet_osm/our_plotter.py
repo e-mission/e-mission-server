@@ -1,9 +1,11 @@
 import pandas as pd
 import folium
-import emission.analysis.classification.cleaning.location_smoothing as ls
-import emission.storage.decorations.location_queries as lq
 import itertools
 import numpy as np
+import logging
+
+import emission.analysis.classification.cleaning.location_smoothing as ls
+import emission.storage.decorations.location_queries as lq
 
 all_color_list = ['black', 'brown', 'blue', 'chocolate', 'cyan', 'fuschia', 'green', 'lime', 'magenta', 'navy', 'pink', 'purple', 'red', 'snow', 'yellow']
 sel_color_list = ['black', 'blue', 'chocolate', 'cyan', 'fuschia', 'green', 'lime', 'magenta', 'pink', 'purple', 'red', 'yellow']
@@ -31,16 +33,23 @@ def get_map_list(df, potential_splits):
         mapList.append(get_map(trip))
     return mapList
 
-def get_map_list_after_segmentation(section_map):
+def get_map_list_after_segmentation(section_map, outlier_algo = None, filter_algo = None):
     mapList = []
     for trip, section_list in section_map:
+        logging.debug("%s %s -> %s %s" % ("=" * 20, trip.start_time, trip.end_time, "=" * 20))
         trip_df = lq.get_points_for_section(trip)
         curr_map = folium.Map([trip_df.mLatitude.mean(), trip_df.mLongitude.mean()])
         last_section_end = None
         for (i, section) in enumerate(section_list):
-            section_df = trip_df[np.logical_and(trip_df.mTime >= section.start_ts,
+            logging.debug("%s %s: %s -> %s %s" % 
+                ("-" * 20, i, section.start_time, section.end_time, "-" * 20))
+            raw_section_df = trip_df[np.logical_and(trip_df.mTime >= section.start_ts,
                                                 trip_df.mTime <= section.end_ts)]
-            print("for section %s, section_df.shape = %s, formatted_time.head() = %s" %
+            section_df = ls.filter_points(raw_section_df, outlier_algo, filter_algo)
+            if section_df.shape[0] == 0:
+                logging.info("Found empty df! skipping...")
+                continue
+            logging.debug("for section %s, section_df.shape = %s, formatted_time.head() = %s" %
                     (section, section_df.shape, section_df["formatted_time"].head()))
             update_map(curr_map, section_df, line_color = sel_color_list[section.activity.value],
                         popup = "%s" % (section.activity))
