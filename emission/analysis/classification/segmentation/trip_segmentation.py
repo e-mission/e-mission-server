@@ -25,6 +25,7 @@ def segment_into_trips(points_df):
         currPoint.update({"idx": idx})
         print "-" * 30 + str(currPoint.formatted_time) + "-" * 30
         if curr_trip_start_point is None:
+            print "Appending currPoint because the current start point is None"
             segmentation_points.append(currPoint)
 
         if just_ended:
@@ -61,6 +62,7 @@ def segment_into_trips(points_df):
                 last_trip_end_index = min(last5MinsPoints_df.index.min(),
                                        last10Points_df.index.min())
                 last_trip_end_point = filtered_points_df.loc[last_trip_end_index]
+                print "Appending currPoint because the current start point is None"
                 segmentation_points.append(last_trip_end_point)
                 print "Found trip end at %s" % str(pydt.datetime.fromtimestamp(last_trip_end_point.mTime/1000))
                 just_ended = True
