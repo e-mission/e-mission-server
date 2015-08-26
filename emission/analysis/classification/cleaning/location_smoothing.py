@@ -23,9 +23,9 @@ def filter_accuracy(points_df):
     a filtered dataframe with the original index because otherwise, we are not
     able to apply any further boolean filter masks to it.
     """
-    print "filtering points %s" % points_df[points_df.mAccuracy > 200].index
+    logging.debug("filtering points %s" % points_df[points_df.mAccuracy > 200].index)
     accuracy_filtered_df = pd.DataFrame(points_df[points_df.mAccuracy < 200].to_dict('records'))
-    print "filtered list size went from %s to %s" % (points_df.shape, accuracy_filtered_df.shape)
+    logging.debug("after accuracy filtering, filtered list size went from %s to %s" % (points_df.shape, accuracy_filtered_df.shape))
     return accuracy_filtered_df
 
 def recalc_speed(points_df):
