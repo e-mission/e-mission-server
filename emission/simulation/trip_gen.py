@@ -6,6 +6,7 @@ from emission.net.ext_service.otp.otp import OTP, PathNotFoundException
 from emission.core.wrapper.trip import Coordinate 
 import emission.simulation.markov_model_counter as esmmc
 from emission.core.our_geocoder import Geocoder
+from emission.core import get_database as edb
 
 class Address:
 
@@ -79,9 +80,18 @@ class Creator:
                 rand_user_id = random.random()
                 otp_trip = OTP(t[0], t[1], mode, write_day(curr_month, curr_day, curr_year), write_time(curr_hour, curr_minute), True)
                 alt_trip = otp_trip.turn_into_trip("%f%f" % (rand_user_id, rand_trip_id), rand_user_id, rand_trip_id, True)   ## ids
-                alt_trip.save_to_db()
+                save_trip_to_db(alt_trip)
             except PathNotFoundException:
                 self.amount_missed += 1
+
+
+def save_trip_to_db(trip):
+    db = edb.get_trip_db()
+    print "start loc = %s" % trip.trip_start_location.coordinate_list()
+    print "end loc = %s" % trip.trip_end_location.coordinate_list()
+    db.insert({"_id": trip._id, "user_id": trip.user_id, "trip_id": trip.trip_id, "type" : "move", "sections": range(len(trip.sections)), "trip_start_datetime": trip.start_time,
+            "trip_end_datetime": trip.end_time, "trip_start_location": trip.trip_start_location.coordinate_list(), 
+            "trip_end_location": trip.trip_end_location.coordinate_list(), "mode_list": trip.mode_list})
 
 def geocode_address(address):
     if address.cord is None:

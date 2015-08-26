@@ -130,6 +130,7 @@ class TestTourModel(unittest.TestCase):
         self.assertTrue(rw == [self.home, self.work])
 
     def testCreation(self):
+        # This is mostly just a sanity check
         db = get_trip_db()
         db.remove()
         create_fake_trips()
