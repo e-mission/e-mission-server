@@ -75,7 +75,6 @@ def cluster(data, bins):
     min = bins
     max = int(math.ceil(1.5 * bins))
     feat.cluster(min_clusters=min, max_clusters=max)
-    feat.map_clusters()
     print 'number of clusters: ' + str(feat.clusters)
     return feat.clusters, feat.labels, feat.data
 
@@ -87,7 +86,6 @@ def cluster_to_tour_model(data, labels):
     repy.list_clusters()
     repy.get_reps()
     repy.locations()
-    repy.map()
     print 'number of locations: ' + str(repy.num_locations)
     repy.cluster_dict()
     return repy.tour_dict
