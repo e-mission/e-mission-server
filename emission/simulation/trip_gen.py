@@ -1,5 +1,5 @@
 # Standard imports
-import random, math, json, datetime
+import random, math, json, datetime, urllib2
 
 # Our imports
 from emission.net.ext_service.otp.otp import OTP, PathNotFoundException
@@ -82,8 +82,11 @@ class Creator:
                 alt_trip = otp_trip.turn_into_trip("%f%f" % (rand_user_id, rand_trip_id), rand_user_id, rand_trip_id, True)   ## ids
                 save_trip_to_db(alt_trip)
             except PathNotFoundException:
+                print "path not found"
                 self.amount_missed += 1
-
+            except urllib2.HTTPError:
+                print "server error"
+                pass
 
 def save_trip_to_db(trip):
     db = edb.get_trip_db()
