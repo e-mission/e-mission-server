@@ -6,7 +6,7 @@ import urllib, urllib2, datetime, time, random
 # from traffic import get_travel_time
 
 # Our imports
-from emission.core.wrapper.trip import Coordinate, Alternative_Trip, Section, Fake_Trip
+from emission.core.wrapper.trip import Coordinate, Alternative_Trip, Section, Fake_Trip, Trip
 
 try:
     import json
@@ -117,7 +117,7 @@ class OTP:
             cost = 0
         mode_list = list(mode_list)
         if is_fake:
-            return Fake_Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc)
+            return Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc)
         return Alternative_Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc, 0, cost, mode_list)
 
 def otp_time_to_ours(otp_str):
