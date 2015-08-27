@@ -68,11 +68,7 @@ class Trip(object):
             start_time = datetime.datetime.strptime(json_segment.get("trip_start_time"), DATE_FORMAT)
             end_time = datetime.datetime.strptime(json_segment.get("trip_end_time"), DATE_FORMAT)
         trip_start_location = cls._start_location(sections)
-        if not trip_start_location:
-            trip_start_location = Coordinate(json_segment['trip_start_location'][1], json_segment['trip_start_location'][0])
         trip_end_location = cls._end_location(sections)
-        if not trip_end_location:
-            trip_end_location = Coordinate(json_segment['trip_end_location'][1], json_segment['trip_end_location'][0])
         return cls(_id, user_id, trip_id, sections, start_time, end_time, trip_start_location, trip_end_location)
 
     @classmethod

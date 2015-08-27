@@ -20,7 +20,7 @@
 	{
 		"CAR" : 100, 
 		"WALK" : 10, 
-		"BYCICLE" : 1, 
+		"BICYCLE" : 1, 
 		"TRANSIT" : 50
 	},
 	"number of trips" : 50

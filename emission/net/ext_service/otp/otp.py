@@ -28,9 +28,9 @@ class OTP:
         self.accepted_modes = {"CAR", "WALK", "BICYCLE", "TRANSIT"}
         self.start_point = start_point
         self.end_point = end_point
-        # if mode not in self.accepted_modes:
-        #     print "mode is %s" % mode
-        #     raise Exception("You are using a mode that doesnt exist")
+        if mode not in self.accepted_modes:
+            print "mode is %s" % mode
+            raise Exception("You are using a mode that doesnt exist")
         if mode == "TRANSIT" and bike:
             mode = "BICYCLE,TRANSIT"
         elif mode == "TRANSIT":
@@ -71,9 +71,9 @@ class OTP:
         mode_list = set()
         car_dist = 0
         if "plan" not in our_json:
-            # print("While querying alternatives from %s to %s" % (self.start_point, self.end_point))
-            # print("query URL is %s" % self.make_url())
-            # print("Response %s does not have a plan " % our_json)
+            print("While querying alternatives from %s to %s" % (self.start_point, self.end_point))
+            print("query URL is %s" % self.make_url())
+            print("Response %s does not have a plan " % our_json)
             raise PathNotFoundException(our_json['debugOutput'])
 
         for leg in our_json["plan"]["itineraries"][0]['legs']:

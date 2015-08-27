@@ -95,6 +95,15 @@ def save_trip_to_db(trip):
     db.insert({"_id": trip._id, "user_id": trip.user_id, "trip_id": trip.trip_id, "type" : "move", "sections": range(len(trip.sections)), "trip_start_datetime": trip.start_time,
             "trip_end_datetime": trip.end_time, "trip_start_location": trip.trip_start_location.coordinate_list(), 
             "trip_end_location": trip.trip_end_location.coordinate_list(), "mode_list": trip.mode_list})
+    for section in trip.sections:   
+        save_section_to_db(section)
+
+def save_section_to_db(section):
+    db = edb.get_section_db()
+    db.insert({"user_id" : section.user_id, "trip_id" : section.trip_id, "distance" : section.distance, "type" : section.section_type,
+           "section_start_datetime" : section.start_time, "section_end_datetime" : section.end_time, 
+           "section_start_point" : {"coordinates" : section.section_start_location.coordinate_list()},
+           "section_end_point" : {"coordinates" : section.section_end_location.coordinate_list()}, "mode" : section.mode, "confirmed_mode" : section.confirmed_mode})
 
 def geocode_address(address):
     if address.cord is None:
