@@ -1,102 +1,144 @@
 # Standard imports
 import sys
 import unittest
+import datetime
 
 # Our imports
-from emission.analysis.modelling.tour_model.tour_model import *
+from emission.analysis.modelling.tour_model.tour_model_matrix import Commute, TourModel, Location
+from emission.core.wrapper.trip import Coordinate, Trip
+from emission.simulation.trip_gen import create_fake_trips
+from emission.analysis.modelling.tour_model.create_tour_model_matrix import create_tour_model
+from emission.core.get_database import get_trip_db
+import emission.analysis.modelling.tour_model.cluster_pipeline as eamtcp
+
 
 class TestTourModel(unittest.TestCase):
 
+    def setUp(self):
+        time = datetime.datetime(2015, 4, 20, 0, 0, 0)
+        self.our_tm = TourModel("test_user", 0, time)
+        self.home = Location('home', self.our_tm)
+        self.work = Location('work', self.our_tm)
+        self.commute = Commute(self.home, self.work)
+        self.our_tm.add_location(self.home, Coordinate(37.868360, -122.252857))
+        self.our_tm.add_location(self.work, Coordinate(37.875715, -122.259049))
+        self.our_tm.add_edge(self.commute)
 
-    def test_utilities(self):
+    def tearDown(self):
+        pass
 
-        home_start = Location("home", 0, 0)
-        work_1 = Location("work_1", 8, 0)
-        coffee = Location("coffee", 10, 0)
-        lunch = Location("lunch", 12, 0)
-        work_2 = Location("work", 13, 0)
-        home_end = Location("home", 18, 0) 
+    def testGetLocation(self):
+        home_key = Location.make_lookup_key('home')
+        work_key = Location.make_lookup_key('work')
+        home_we_just_got = self.our_tm.get_location(home_key)
+        work_we_just_got = self.our_tm.get_location(work_key)
+        
+        self.assertTrue(home_we_just_got == self.home)
+        self.assertTrue(home_we_just_got is self.home)
 
-        self.assertEquals(home_start, home_end)
-        self.assertFalse(home_start == coffee)
+        self.assertTrue(work_we_just_got == self.work)
+        self.assertTrue(work_we_just_got is self.work)
 
+        new_home = self.our_tm.get_location(self.home)
+        self.assertTrue(new_home == self.home)
+        self.assertTrue(new_home is self.home)
 
-    def test_simple(self):
-        """ 
-        I know this seems cumbersome, but no one will actually have to type all
-        of this out, it will all be automated. 
-        """
-        # Monday 
-        home_start_mon = Location("home", 0, 0)
-        work_1_mon = Location("work_1", 8, 0)
-        coffee_mon = Location("coffee", 10, 0)
-        lunch_mon = Location("lunch", 12, 0)
-        work_2_mon = Location("work", 13, 0)
-        home_end_mon = Location("home", 18, 0) 
-        home_start_mon.add_successors({work_1_mon : 1})
-        work_1_mon.add_successors({coffee_mon : 2})
-        coffee_mon.add_successors({lunch_mon : 3})
-        lunch_mon.add_successors({work_2_mon : 4}) ## Completes the cycle
-        work_2_mon.add_successors({home_end_mon : 100})
-
-        # Tuesday 
-        home_start_tues = Location("home", 0, 1)
-        work_1_tues = Location("work_1", 8, 1)
-        coffee_tues = Location("coffee", 10, 1)
-        lunch_tues = Location("lunch", 12, 1)
-        work_2_tues = Location("work", 13, 1)
-        home_end_tues = Location("home", 18, 1) 
-        home_start_tues.add_successors({work_1_tues : 1})
-        work_1_tues.add_successors({coffee_tues : 2})
-        coffee_tues.add_successors({lunch_tues : 3})
-        lunch_tues.add_successors({work_2_tues : 4}) ## Completes the cycle
-        work_2_tues.add_successors({home_end_tues : 100})
-
-        mon = Day(0, home_start_mon)
-        tues = Day(1, home_start_tues)
-
-        days = [mon, tues]
-        week = TourModel("naomi", days)
-        tm_for_week = week.build_tour_model()
-        monday = [home_start_mon, work_1_mon, coffee_mon, lunch_mon, work_2_mon, home_end_mon]
-        tuesday = [home_start_tues, work_1_tues, coffee_tues, lunch_tues, work_2_tues, home_end_tues]
-        self.assertEquals([monday, tuesday], tm_for_week)  # This can only play out one way, a good sanity check
+        new_work = self.our_tm.get_location(self.work)
+        self.assertTrue(new_work == self.work)
+        self.assertTrue(new_work is self.work)
 
 
+    def testGetCommute(self):
+        commute_key = Commute.make_lookup_key(self.home, self.work)
+        self.assertEquals(commute_key, 'home->work')
 
-    def complicated_tour(self):
-        ## Create locations
-        home = Location('home')
-        work = Location('work')
-        friend = Location('friend')
-        store = Location('store')
-        soccer = Location('soccer')
-        vegtables = Location('vegtables')
-        gas = Location('gas')
+        commute_we_just_got = self.our_tm.get_edge(self.home, self.work)
+        self.assertTrue(commute_we_just_got == self.commute)
+        self.assertTrue(commute_we_just_got is self.commute)
 
-        ## Set up successors 
-        home_successors = {work : 10, friend : 3, store : 1}    
-        work_successors = {soccer : 100, vegtables : 10, friend : 50}
-        friend_successors = {vegtables: 1}
-        store_successors = {gas : 2, home : 1}
-        soccer_successors = {gas : 1, home : 3}
-        veg_successors = {gas : 5, home : 73}
-        gas_successors = {home : 1}
+        self.assertTrue(commute_we_just_got == self.commute)
+        self.assertTrue(commute_we_just_got is self.commute)
 
-        ## Build Free State Machine
-        home.add_to_successors(home_successors, "day", "week", 0)
-        work.add_to_successors(work_successors, "day", "week", 0)
-        friend.add_to_successors(friend_successors, "day", "week", 0)
-        store.add_to_successors(store_successors, "day", "week", 0)
-        soccer.add_to_successors(soccer_successors, "day", "week", 0)
-        vegtables.add_to_successors(veg_successors, "day", "week", 0)
-        gas.add_to_successors(gas_successors, "day", "week", 0)
 
-        tm = TourModel(home, "complicted free state machine")
+    def testWeight(self):
+        dummy_trip = Trip(0, 0, 0, 0, 0, 0, self.home.rep_coords, self.work.rep_coords)
+        self.assertEquals(self.commute.weight(), 0)
+        self.commute.add_trip(dummy_trip)
 
-        print "ran complicted touir"
+        self.assertEquals(self.commute.weight(), 1)
+        temp_com = self.our_tm.get_edge(self.home, self.work)
+        self.assertEquals(temp_com.weight(), 1)
 
-        print tm.get_tour_model_from(home, "day", "week", 0)
+    def testSuccessorProbCount(self):
+        self.home.increment_successor(self.work, 8, 3)
+        self.assertEquals(self.commute.probabilities[3, 8], 1)
+        self.assertEquals(self.commute.probabilities[1, 2], 0)
+
+        self.commute.increment_prob(8, 3)
+        com = self.our_tm.get_edge(self.home, self.work)
+        self.assertEquals(com.probabilities[3, 8], 2)
+
+    def testBasicGetSuccessor(self):
+        self.home.increment_successor(self.work, 8, 0)
+        self.assertTrue(self.home.hasSuccessor())
+        self.assertTrue(self.home.get_successor()[0] == self.work)
+        self.assertTrue(self.home.get_successor()[0] is self.work)
+        self.assertTrue(self.home.get_successor()[1] == 8)
+        self.assertFalse(self.work.hasSuccessor())
+
+    def testGetTopTrips(self):
+        dummy_trip0 = Trip(0, 0, 0, 0, 0, 0, self.home.rep_coords, self.work.rep_coords)
+        dummy_trip1 = Trip(0, 0, 0, 0, 0, 1, self.home.rep_coords, self.work.rep_coords)
+        dummy_trip2 = Trip(0, 0, 0, 0, 0, 2, self.home.rep_coords, self.work.rep_coords)
+        self.commute.add_trip(dummy_trip0)
+        self.commute.add_trip(dummy_trip1)
+        self.commute.add_trip(dummy_trip2)
+
+        coffee = Location('coffee', self.our_tm)
+        tea = Location('tea', self.our_tm)
+        dummy_trip3 = Trip(0, 0, 0, 0, 0, 3, coffee.rep_coords, tea.rep_coords)
+        self.our_tm.add_location(coffee, Coordinate(4, 20))
+        self.our_tm.add_location(tea, Coordinate(6, 9))
+        commute2 = Commute(coffee, tea)
+        commute2.add_trip(dummy_trip3)
+        self.our_tm.add_edge(commute2)
+
+        cheeseboard = Location('cheeseboard', self.our_tm)
+        sliver = Location('sliver', self.our_tm)
+        commute3 = Commute(cheeseboard, sliver)
+        self.our_tm.add_location(cheeseboard, Coordinate(0, 0))
+        self.our_tm.add_location(sliver, Coordinate(0, 0))
+        self.our_tm.add_edge(commute3)
+
+        self.assertTrue(self.our_tm.get_top_trips(1) == [self.commute])
+        self.assertTrue(self.our_tm.get_top_trips(2) == [self.commute, commute2])
+        self.assertTrue(self.our_tm.get_top_trips(3) == [self.commute, commute2, commute3])
+
+    def testFirstTrip(self):
+        self.home.increment_successor(self.work, 8, 0)
+        t = datetime.datetime(2015, 4, 20, 0)
+        self.our_tm.add_start_hour(self.home, t)
+        t1 = datetime.datetime(2015, 4, 20, 6)
+        place_after_home = Location('not home', t1)
+        self.assertTrue(self.our_tm.min_of_each_day[0] == (self.home, t))
+
+    def testRandomWalk(self):
+        self.home.increment_successor(self.work, 8, 0)
+        t = datetime.datetime(2015, 4, 20, 0)
+        self.our_tm.add_start_hour(self.home, t)
+        rw = self.our_tm.get_tour_model_for_day(0)
+        self.assertTrue(rw == [self.home, self.work])
+
+    def testCreation(self):
+        # This is mostly just a sanity check
+        db = get_trip_db()
+        db.remove()
+        create_fake_trips()
+        list_of_cluster_data = eamtcp.main()
+        tm = create_tour_model('test_user', list_of_cluster_data)
+        self.assertEquals(len(tm.get_top_trips(2)), 2)
+        tour = tm.build_tour_model()
+        self.assertEquals(len(tour), 7)
 
 
 
