@@ -87,7 +87,7 @@ def cluster_to_tour_model(data, labels):
     repy.list_clusters()
     repy.get_reps()
     repy.locations()
-    repy.map()
+    #repy.map()
     print 'number of locations: ' + str(repy.num_locations)
     repy.cluster_dict()
     return repy.tour_dict
