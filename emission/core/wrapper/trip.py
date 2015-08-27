@@ -60,7 +60,7 @@ class Trip(object):
         user_id = json_segment.get("user_id")
         trip_id = json_segment.get("trip_id")
         sections = cls._init_sections(user_id, trip_id, len(json_segment.get("sections"))) if json_segment.get("sections") else None
-        print len(sections)
+
         try:
             start_time = json_segment["trip_start_datetime"]
             end_time = json_segment["trip_end_datetime"]
@@ -341,9 +341,10 @@ class Fake_Trip(Trip):
         return sections
 
 
+
     def save_to_db(self):
-        db = edb.get_trip_db()
-        db.insert({"_id": self._id, "user_id": self.user_id, "trip_id": self.trip_id, "type" : "move", "sections": range(len(self.sections)), "trip_start_datetime": self.start_time,
+        db = edb.get_fake_trips_db()
+        db.insert({"_id": self._id, "user_id": self.user_id, "trip_id": self.trip_id, "sections": range(len(self.sections)), "trip_start_datetime": self.start_time,
                 "trip_end_datetime": self.end_time, "trip_start_location": self.trip_start_location.coordinate_list(), 
                 "trip_end_location": self.trip_end_location.coordinate_list(), "mode_list": self.mode_list})
 
@@ -534,4 +535,3 @@ class PipelineFlags(object):
         db.update({"_id": self._id},
                       {"$set": {"pipelineFlags" : {'alternativesStarted': self.alternativesStarted, 'alternativesFinished': self.alternativesFinished}}},
                        multi=False, upsert=False)
-
