@@ -75,7 +75,7 @@ def cluster(data, bins):
     min = bins
     max = int(math.ceil(1.5 * bins))
     feat.cluster(min_clusters=min, max_clusters=max)
-    feat.map_clusters()
+    #feat.map_clusters()
     print 'number of clusters: ' + str(feat.clusters)
     return feat.clusters, feat.labels, feat.data
 
