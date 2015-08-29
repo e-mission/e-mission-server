@@ -70,5 +70,14 @@ class TestBase(unittest.TestCase):
         with self.assertRaisesRegexp(AttributeError, ".*not defined.*"):
             self.assertEquals(test_tw.z, 1)
 
+    def testIPythonAutoComplete(self):
+        test_tw = TestWrapper({'a': 1, 'c': 3})
+        attributes = dir(test_tw)
+        self.assertIn("a", attributes)
+        self.assertIn("c", attributes)
+        self.assertIn("valid", attributes)
+        self.assertIn("invalid", attributes)
+        self.assertIn("b", attributes)
+
 if __name__ == '__main__':
     unittest.main()
