@@ -1,0 +1,74 @@
+# Test the base class enhancements over AttrDict
+# Since the base class should not really contain any properties, we create a
+# dummy subclass here and use it for testing.
+
+# Standard imports
+import unittest
+
+# Our imports
+import emission.core.wrapper.base as ecwb
+
+class TestWrapper(ecwb.WrapperBase):
+    props = {"a": ecwb.WrapperBase.Access.RO,
+             "b": ecwb.WrapperBase.Access.RO,
+             "c": ecwb.WrapperBase.Access.RO,
+             "invalid": ecwb.WrapperBase.Access.RO,
+             "valid": ecwb.WrapperBase.Access.RW}
+
+    def __init__(self, *args, **kwargs):
+        super(TestWrapper, self).__init__(*args, **kwargs)
+        # Add new properties called "invalid" and "valid" 
+        # with values from the input
+        # here, valid depends upon a and invalid depends upon b. Unfortunately, we cannot just do
+        # self.valid = True because that call the current setattr, and that will
+        # fail because dependent values are read-only. We can't even use the
+        # set_attr method of super, since that is WrapperBase and WrapperBase
+        # checks the "props" of the current class.  Instead, we call the
+        # set_attr method of WrapperBase's parent, which has no checks.
+        if "a" in self and self.a == 1:
+            super(ecwb.WrapperBase, self).__setattr__("valid", self.a)
+        if "b" in self and self.b == 2:
+            super(ecwb.WrapperBase, self).__setattr__("invalid", self.b)
+
+class TestBase(unittest.TestCase):
+    def testCreationABC(self):
+        test_tw = TestWrapper({'a': 1, 'b': 2, 'c': 3})
+        self.assertEquals(test_tw.valid, 1)
+        self.assertEquals(test_tw.invalid, 2)
+        self.assertTrue(str(test_tw).startswith("TestWrapper"))
+
+    def testCreationAB(self):
+        test_tw = TestWrapper({'a': 1, 'c': 3})
+        self.assertEquals(test_tw.valid, 1)
+        with self.assertRaises(AttributeError):
+            print ("test_tw.invalid = %s" % test_tw.invalid)
+        self.assertTrue(str(test_tw).startswith("TestWrapper"))
+
+    def testSetReadOnly(self):
+        test_tw = TestWrapper({'a': 1, 'c': 3})
+        self.assertEquals(test_tw.valid, 1)
+        with self.assertRaisesRegexp(AttributeError, ".*read-only.*"):
+            test_tw.invalid = 2
+
+    def testGetSetReadWrite(self):
+        test_tw = TestWrapper({'a': 1, 'c': 3})
+        self.assertEquals(test_tw.valid, 1)
+        test_tw.valid = 2
+        self.assertEquals(test_tw.valid, 2)
+
+    def testSetInvalid(self):
+        test_tw = TestWrapper({'a': 1, 'c': 3})
+        with self.assertRaisesRegexp(AttributeError, ".*not defined.*"):
+            self.assertEquals(test_tw.z, 1)
+
+    def testGetReadOnly(self):
+        test_tw = TestWrapper({'a': 1, 'c': 3})
+        self.assertEquals(test_tw.a, 1)
+
+    def testGetInvalid(self):
+        test_tw = TestWrapper({'a': 1, 'c': 3})
+        with self.assertRaisesRegexp(AttributeError, ".*not defined.*"):
+            self.assertEquals(test_tw.z, 1)
+
+if __name__ == '__main__':
+    unittest.main()
