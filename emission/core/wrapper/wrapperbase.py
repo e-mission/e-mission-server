@@ -1,7 +1,7 @@
 import logging
 import attrdict as ad
 import enum as enum
-
+import collections as coll
 
 class WrapperBase(ad.AttrDict):
   """
@@ -34,7 +34,15 @@ class WrapperBase(ad.AttrDict):
 
   def __getattr__(self, key):
     if key in self.props:
-        return super(WrapperBase, self).__getattr__(key)
+        # This code is copied from the base Attr code.
+        # This allows us to pass the key into _build as well instead of only the value
+        if key not in self or not self._valid_name(key):
+            raise AttributeError(
+                "'{cls}' instance has no attribute '{name}'".format(
+                    cls=self.__class__.__name__, name=key
+                )
+            )
+        return self._build(key, self[key])
     else:
         raise AttributeError("property %s is not defined for %s" % (key, self.__class__.__name__))
 
@@ -46,7 +54,6 @@ class WrapperBase(ad.AttrDict):
             raise AttributeError("property %s is read-only" % key)
     else:
         raise AttributeError("property %s is not defined for %s" % (key, self.__class__.__name__))
-
 
   def __repr__(self):
     """
@@ -62,3 +69,25 @@ class WrapperBase(ad.AttrDict):
     """
     parentResult = super(WrapperBase, self).__repr__()
     return parentResult.replace("AttrDict", self.__class__.__name__)
+
+  def __call__(self, key):
+    print("_call called with %s, %s" % (self, key))
+    return super(WrapperBase, self).__call__(key)
+
+  @staticmethod
+  def _get_class(wrapper_name):
+    import importlib
+
+    # Convention is to name the module with the wrapper name in lower case, and
+    # then have a class in the module with the name.
+    # e.g. The Location class will be in a module named location.
+    wrapperModule = importlib.import_module("emission.core.wrapper.%s" % (wrapper_name.lower()))
+    return getattr(wrapperModule, wrapper_name)
+
+  def _build(self, key, obj):
+    # print("_build called with %s, %s, %s" % (self, key, obj))
+    if isinstance(obj, coll.Mapping):
+        key_class = self._get_class(key)
+        return key_class._constructor(obj, self._configuration())
+    else:
+        return super(WrapperBase, self)._build(obj)

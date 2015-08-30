@@ -6,12 +6,13 @@
 import unittest
 
 # Our imports
-import emission.core.wrapper.base as ecwb
+import emission.core.wrapper.wrapperbase as ecwb
 
 class TestWrapper(ecwb.WrapperBase):
     props = {"a": ecwb.WrapperBase.Access.RO,
              "b": ecwb.WrapperBase.Access.RO,
              "c": ecwb.WrapperBase.Access.RO,
+             "WrapperBase": ecwb.WrapperBase.Access.RO,
              "invalid": ecwb.WrapperBase.Access.RO,
              "valid": ecwb.WrapperBase.Access.RW}
 
@@ -78,6 +79,17 @@ class TestBase(unittest.TestCase):
         self.assertIn("valid", attributes)
         self.assertIn("invalid", attributes)
         self.assertIn("b", attributes)
+
+    # The nested classes are hard to test because they load the wrappers automatically
+    # from the wrapper directory, and so in order to test them, we either need to:
+    # - use a module that is already in wrapper, OR
+    # - create a new test module in wrapper
+    # Trying to use WrapperBase for now to test. If that doesn't work, we will
+    # switch to something else once we really have it.
+
+    def testNestedClass(self):
+        test_tw = TestWrapper({'a': 1, 'c': 3, 'WrapperBase': {'a': 11, 'c': 13}})
+        # self.assertEqual(test_tw.WrapperBase.a, 11)
 
 if __name__ == '__main__':
     unittest.main()
