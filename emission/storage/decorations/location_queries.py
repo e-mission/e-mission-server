@@ -22,18 +22,6 @@ def get_plottable_df(user_id, loc_filter, start_dt, end_dt):
 
 from_micros = lambda x: pydt.datetime.fromtimestamp(x/1000)
 
-class Activities(Enum):
-    IN_VEHICLE = 0
-    ON_BICYCLE = 1
-    ON_FOOT = 2
-    STILL = 3
-    UNKNOWN = 4
-    TILTING = 5 
-    WALKING = 7
-    RUNNING = 8
-
-to_activity_enum = lambda i: Activities(i)
-
 def get_activities_for_section(section):
     query = {"user_id": section.user_id,
              "metadata.filter": section.loc_filter,
