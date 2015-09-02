@@ -16,8 +16,7 @@ class TestWrapper(ecwb.WrapperBase):
              "invalid": ecwb.WrapperBase.Access.RO,
              "valid": ecwb.WrapperBase.Access.RW}
 
-    def __init__(self, *args, **kwargs):
-        super(TestWrapper, self).__init__(*args, **kwargs)
+    def _populateDependencies(self):
         # Add new properties called "invalid" and "valid" 
         # with values from the input
         # here, valid depends upon a and invalid depends upon b. Unfortunately, we cannot just do
