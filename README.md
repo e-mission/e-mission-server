@@ -3,16 +3,14 @@ apps, and use them to provide an personalized carbon footprint, and aggregate
 them to make data available to urban planners and transportation engineers.
 
 It has two components, the backend server and the phone apps. This is the
-backend server - the phone apps are available in the [e-mission-phone repo](https://github.com/amplab/e-mission-phone)
+backend server - the phone apps are available in the [e-mission-phone
+repo](https://github.com/amplab/e-mission-phone)
 
 The backend in turn consists of two parts - a summary of their code structure is shown below.
+-![][Python_Structure]
 The webapp supports a REST API, and accesses data from the database to fulfill
-the queries.
-![][CFC_WebApp_Structure]
-
-A set of background scripts pull the data from moves, and preprocess results to
-ensure reasonable performance.
-![][CFC_DataCollector_Structure]
+the queries.  A set of background scripts pull the data from external sources, and
+preprocessing results ensures reasonable performance.
 
 ## Dependencies: ##
 -------------------
@@ -224,8 +222,4 @@ In order to avoid this, you want to encrypt the disk. You can do this by:
 In either of these cases, you need to reconfigure mongod.conf to point to data
 and log directories in the encrypted volume.
 
-directly
-reconfigure mongod.conf to point to 
-
-[CFC_WebApp_Structure]: https://raw.github.com/amplab/e-mission-server/master/figs/CFC_WebApp_Structure.png
-[CFC_DataCollector_Structure]: https://raw.github.com/amplab/e-mission-server/master/figs/CFC_DataCollector_Structure.png
+[Python_Structure]: https://raw.github.com/amplab/e-mission-server/master/figs/e-mission-server-module-structure.png
