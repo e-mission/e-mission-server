@@ -12,7 +12,8 @@ import emission.net.usercache.formatters.common as fc
 import attrdict as ad
 
 def format(entry):
-    assert(entry.metadata.key == "background/location")
+    assert(entry.metadata.key == "background/location" or 
+            entry.metadata.key == "background/filtered_location")
     if ("mLatitude" in entry.data):
         return format_location_raw(entry)
     else:
