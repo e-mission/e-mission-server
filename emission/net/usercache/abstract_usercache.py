@@ -23,7 +23,6 @@ class UserCache(object):
             self.startTs = startTs
             self.endTs = endTs
 
-
     @staticmethod
     def getUserCache(uuid):
         """
@@ -38,6 +37,11 @@ class UserCache(object):
 
     def __init__(self, uuid):
         self.uuid = uuid
+
+    @staticmethod
+    def get_uuid_list():
+        import emission.net.usercache.builtin_usercache as biuc
+        return biuc.BuiltinUserCache.get_uuid_list()
 
     def putDocument(self, key, value):
         """

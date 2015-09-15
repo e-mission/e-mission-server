@@ -8,13 +8,14 @@ class Metadata(ecwb.WrapperBase):
            "type": ecwb.WrapperBase.Access.RO,
            "write_ts": ecwb.WrapperBase.Access.RO,
            "write_dt": ecwb.WrapperBase.Access.RW,
-           "write_ts_formatted": ecwb.WrapperBase.Access.RW,
+           "time_zone": ecwb.WrapperBase.Access.RW,
+           "write_fmt_time": ecwb.WrapperBase.Access.RW,
            "read_ts": ecwb.WrapperBase.Access.RO}
 
+  enums = {}
+
   def _populateDependencies(self):
-    if self.write_ts is not None:
-      self.write_dt = pydt.datetime.fromtimestamp(self.write_ts)
-      self.write_ts_formatted = pydt.datetime.fromtimestamp(self.write_ts)
+    pass
 
   def isAndroid(self):
     return self.platform == "android"

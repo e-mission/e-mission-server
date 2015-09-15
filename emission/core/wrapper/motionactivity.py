@@ -12,14 +12,14 @@ class MotionTypes(enum.Enum):
     WALKING = 7
     RUNNING = 8
 
-to_activity_enum = lambda i: Activities(i)
-
 class Motionactivity(ecwb.WrapperBase):
     props = {"type": ecwb.WrapperBase.Access.RO,
              "confidence": ecwb.WrapperBase.Access.RO,
              "ts": ecwb.WrapperBase.Access.RO,
              "fmt_time": ecwb.WrapperBase.Access.RO
             }
+
+    enums = {"type": MotionTypes}
 
     def _populateDependencies(self):
         pass

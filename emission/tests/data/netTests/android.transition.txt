@@ -1,0 +1,9 @@
+{"_id": "55a429777d65cb39ee9737ce",
+ "data": {"currState": "local.state.waiting_for_trip_start",
+  "transition": "local.transition.initialize"},
+ "metadata": {"key": "statemachine/transition",
+  "platform": "android",
+  "read_ts": 0,
+  "type": "message",
+  "write_ts": 1436821510445},
+ "user_id": "0763de67-f61e-3f5d-90e7-518e69793954"}

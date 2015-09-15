@@ -89,12 +89,12 @@ class TestBuiltinUserCache(unittest.TestCase):
     mauc.sync_phone_to_server(self.testUserUUID, user_data_from_phone)
 
     uc = ucauc.UserCache.getUserCache(self.testUserUUID)
-    msgs = uc.getMessage("diary/mode-confirmation")
+    msgs = uc.getMessage(key_list = ["diary/mode-confirmation"])
     self.assertEqual(len(msgs), 2)
     self.assertEqual(msgs[0]["data"]["mode"], "walking")
 
   def testPutTwoSetsOfBackgroundConfigForPhone(self):
-    start_ts = int(time.time() * 1000)
+    start_ts = time.time()
     uc = ucauc.UserCache.getUserCache(self.testUserUUID)
 
     pull_probes_list = ["accelerometer", "gyrometer", "linear_accelerometer"]
@@ -106,7 +106,7 @@ class TestBuiltinUserCache(unittest.TestCase):
                       }
     uc.putDocument("config/location_config", location_config)
 
-    end_ts = int(time.time() * 1000)
+    end_ts = time.time()
 
     retrievedData = mauc.sync_server_to_phone(self.testUserUUID)
     logging.debug("retrievedData = %s" % retrievedData)
@@ -187,19 +187,19 @@ class TestBuiltinUserCache(unittest.TestCase):
     mauc.sync_phone_to_server(self.testUserUUID, background_data_from_phone)
 
     uc = ucauc.UserCache.getUserCache(self.testUserUUID)
-    self.assertEqual(len(uc.getMessage("background/location")), 2)
-    self.assertEqual(len(uc.getMessage("background/activity")), 2)
-    self.assertEqual(len(uc.getMessage("background/accelerometer")), 2)
-    self.assertEqual(uc.getMessage("background/location")[1]["data"]["mElapsedTime"], 142233)
-    self.assertEqual(uc.getMessage("background/activity")[1]["data"]["mode"], "cycling")
-    self.assertEqual(uc.getMessage("background/accelerometer")[1]["data"]["x"], 2345)
+    self.assertEqual(len(uc.getMessage(["background/location"])), 2)
+    self.assertEqual(len(uc.getMessage(["background/activity"])), 2)
+    self.assertEqual(len(uc.getMessage(["background/accelerometer"])), 2)
+    self.assertEqual(uc.getMessage(["background/location"])[1]["data"]["mElapsedTime"], 142233)
+    self.assertEqual(uc.getMessage(["background/activity"])[1]["data"]["mode"], "cycling")
+    self.assertEqual(uc.getMessage(["background/accelerometer"])[1]["data"]["x"], 2345)
 
   def testClearBackgroundData(self):
-    start_ts = int(time.time() * 1000)
+    start_ts = time.time()
     background_data_from_phone = [
       {
         "metadata": {
-          "write_ts": int(time.time() * 1000),
+          "write_ts": time.time(),
           "type": "message",
           "key": "background/location",
         },
@@ -207,7 +207,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": int(time.time() * 1000),
+          "write_ts": time.time(),
           "type": "message",
           "key": "background/activity",
         },
@@ -215,7 +215,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": int(time.time() * 1000),
+          "write_ts": time.time(),
           "type": "message",
           "key": "background/accelerometer",
         },
@@ -229,7 +229,7 @@ class TestBuiltinUserCache(unittest.TestCase):
     background_data_from_phone_2 = [
       {
         "metadata": {
-          "write_ts": int(time.time() * 1000),
+          "write_ts": time.time(),
           "type": "message",
           "key": "background/location",
         },
@@ -237,7 +237,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": int(time.time() * 1000),
+          "write_ts": time.time(),
           "type": "message",
           "key": "background/activity",
         },
@@ -245,7 +245,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": int(time.time() * 1000),
+          "write_ts": time.time(),
           "type": "message",
           "key": "background/accelerometer",
         },
@@ -253,14 +253,16 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
     ]
 
-    end_ts = int(time.time() * 1000)
-
     time.sleep(float(5)/ 1000)
+
+    # We look for entries that are > 5 secs old, so it is fine to set the
+    # end_ts after all the entries have been inserted.
+    end_ts = time.time()
 
     background_data_from_phone_3 = [
       {
         "metadata": {
-          "write_ts": int(time.time() * 1000),
+          "write_ts": time.time(),
           "type": "message",
           "key": "background/location",
         },
@@ -268,7 +270,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": int(time.time() * 1000) + 30,
+          "write_ts": time.time() + 30,
           "type": "message",
           "key": "background/location",
         },
@@ -276,7 +278,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": int(time.time() * 1000),
+          "write_ts": time.time(),
           "type": "message",
           "key": "background/activity",
         },
@@ -284,7 +286,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": int(time.time() * 1000) + 30,
+          "write_ts": time.time() + 30,
           "type": "message",
           "key": "background/activity",
         },
@@ -292,7 +294,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": int(time.time() * 1000),
+          "write_ts": time.time(),
           "type": "message",
           "key": "background/accelerometer",
         },
@@ -300,7 +302,7 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
       {
         "metadata": {
-          "write_ts": int(time.time() * 1000) + 30,
+          "write_ts": time.time() + 30,
           "type": "message",
           "key": "background/accelerometer",
         },
@@ -314,14 +316,19 @@ class TestBuiltinUserCache(unittest.TestCase):
 
     uc = ucauc.UserCache.getUserCache(self.testUserUUID)
     tq = ucauc.UserCache.TimeQuery("write_ts", start_ts, end_ts)
-    self.assertEqual(len(uc.getMessage("background/location", tq)), 2)
-    self.assertEqual(len(uc.getMessage("background/activity", tq)), 2)
-    self.assertEqual(len(uc.getMessage("background/accelerometer", tq)), 2)
+    self.assertEqual(len(uc.getMessage(["background/location"], tq)), 2)
+    self.assertEqual(len(uc.getMessage(["background/activity"], tq)), 2)
+    self.assertEqual(len(uc.getMessage(["background/accelerometer"], tq)), 2)
   
     uc.clearProcessedMessages(tq, ["background/location", "background/accelerometer"])
-    self.assertEqual(len(uc.getMessage("background/accelerometer", tq)), 0)
-    self.assertEqual(len(uc.getMessage("background/location", tq)), 0)
-    self.assertEqual(len(uc.getMessage("background/activity", tq)), 2)
+    self.assertEqual(len(uc.getMessage(["background/accelerometer"], tq)), 0)
+    self.assertEqual(len(uc.getMessage(["background/location"], tq)), 0)
+    self.assertEqual(len(uc.getMessage(["background/activity"], tq)), 2)
+
+  def testGetUUIDList(self):
+    self.testGetTwoSetsOfUserDataFromPhone()
+    uuid_list = ucauc.UserCache.get_uuid_list()
+    self.assertEquals(uuid_list, [self.testUserUUID])
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
