@@ -60,7 +60,6 @@ class Trip(object):
         user_id = json_segment.get("user_id")
         trip_id = json_segment.get("trip_id")
         sections = cls._init_sections(user_id, trip_id, len(json_segment.get("sections"))) if json_segment.get("sections") else None
-
         try:
             start_time = json_segment["trip_start_datetime"]
             end_time = json_segment["trip_end_datetime"]

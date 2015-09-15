@@ -3,15 +3,15 @@
 	"starting centroids" :
 	{
 		"2703 Hallmark Dr Belmont Ca" : 100,
-		"ATT Park" : 20, 
-		"Skyline County Park Napa, CA" : 10, 
-		"UC Berkeley" : 50
+		"ATT Park" : 100, 
+		"Skyline County Park Napa, CA" : 100, 
+		"UC Berkeley" : 100
 
 	},
 	"ending centroids" :
 	{
-		"Skyline County Park Napa, CA" : 10,
-		"ATT Park" : 100, 
+		"Skyline County Park Napa, CA" : 100,
+		"ATT Park" : 100,
 		"UC Berkeley" : 75,
 		"2703 Hallmark Dr Belmont Ca" : 100
 
@@ -23,5 +23,5 @@
 		"BICYCLE" : 1, 
 		"TRANSIT" : 50
 	},
-	"number of trips" : 50
+	"number of trips" : 200
 }

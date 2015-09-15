@@ -67,6 +67,8 @@ class Commute(object):
     def __eq__(self, other):
         return (self.starting_point == other.starting_point) and (self.ending_point == other.ending_point)
 
+
+
 class Location(object):
 
     """ A node in the graph, lots of cool functions, will add more for units """
@@ -125,7 +127,6 @@ class Location(object):
         count = 0
         for loc in self.tm.locs.values():
             if loc in self.successors:
-                print "count inceasing"
                 count += 1
         return count
 
@@ -166,8 +167,6 @@ class TourModel(object):
         # sort edges by weight 
         # return n most common trips
         edges_list = list(self.edges.values())
-        # edges_list.sort(reverse=True, key=lambda v: v.weight())
-        # return edges_list[:n]
         return heapq.nlargest(n, edges_list, key=lambda v: v.weight())
 
     def define_locations(self):
@@ -178,8 +177,9 @@ class TourModel(object):
         loc_key = Location.make_lookup_key(x)
         loc = self.get_location(loc_key)
 
-    def add_location(self, location, coords):
-        location.set_rep_coords(coords)
+    def add_location(self, location, coords=None):
+        if coords is not None:
+            location.set_rep_coords(coords)
         key = Location.make_lookup_key(location.name)
         self.locs[key] = location
 
@@ -191,14 +191,17 @@ class TourModel(object):
             if time < self.min_of_each_day[day][1]:
                 self.min_of_each_day[day] = (loc, time)
 
-    def get_tour_model_for_day(self, day):
+    def get_tour_model_for_day(self, day, need_time=False):
         tour_model = [ ]
         if self.min_of_each_day[day] == 0:
-            return "No data for this day"
+            return NoData()
         curr_node = self.min_of_each_day[day][0]
         self.time = self.min_of_each_day[day][1]
         print "hour = %s | day = %s | place = %s" % (self.time.hour, self.time.weekday(), curr_node.name)
-        tour_model.append(curr_node)
+        if need_time:
+            tour_model.append( (curr_node, self.time) )
+        else:
+            tour_model.append(curr_node)
         while curr_node.hasSuccessor():
             info = curr_node.get_successor()
             curr_node = info[0]
@@ -207,7 +210,10 @@ class TourModel(object):
                 break
             print "hour = %s | day = %s | place = %s" % (self.time.hour, self.time.weekday(), info[0].name)
             if curr_node != tour_model[-1]:
-                tour_model.append(curr_node)
+                if need_time:
+                    tour_model.append( (curr_node, self.time) ) ## Time of the commute
+                else:
+                    tour_model.append(curr_node)
         return tour_model
 
     def get_location(self, location):
@@ -216,14 +222,16 @@ class TourModel(object):
         key = Location.make_lookup_key(location.name)
         return self.locs[key]
  
-    def build_tour_model(self):
+    def build_tour_model(self, need_time=False):
         tour_model = [ ]
         for day in xrange(DAYS_IN_WEEK):
-            tour_model.append(self.get_tour_model_for_day(day))
+            tour_model.append(self.get_tour_model_for_day(day, need_time))
         return tour_model 
 
     def get_edge(self, starting_point, ending_point):
         key = Commute.make_lookup_key(starting_point, ending_point)
+        if key not in self.edges.keys():
+            self.add_edge(Commute(starting_point, ending_point))
         return self.edges[key]
 
     def add_edge(self, commute):
@@ -256,8 +264,18 @@ class TourModel(object):
         plt.show()
 
 
+class NoData(object):
 
+    """ A class that represent a derth of data for a day """
 
+    def __init__(self):
+        pass
+
+    def __repr__(self):
+        return "No data for this day."
+
+    def __len__(self):
+        return 0
 
 
 ## These are utility functions

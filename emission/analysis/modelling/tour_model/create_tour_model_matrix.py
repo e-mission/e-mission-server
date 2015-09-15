@@ -5,7 +5,7 @@ import emission.analysis.modelling.tour_model.cluster_pipeline as eamtcp
 from uuid import UUID
 import random, datetime, sys
 
-def create_tour_model(user, list_of_cluster_data):
+def create_tour_model_from_cluster_data(user, list_of_cluster_data):
     # Highest level function, create tour model from the cluster data that nami gives me
     our_tm = set_up(list_of_cluster_data, user)  ## Adds nodes to graph 
     make_graph_edges(list_of_cluster_data, our_tm)
@@ -56,6 +56,37 @@ def populate_prob_field_for_locatons(list_of_cluster_data, tour_model):
             start_loc_temp.increment_successor(end_loc_temp, get_start_hour(sec), get_day(sec))
 
 
+def generate_new_tour_model_from_tour_model(tour_model, fake_user_name, num_iterations):
+    ## Create more realistic fake data, hopefully this works, which would be cool
+    # so now we have a model of each day of travel, lets build a tour model for it
+    time0 = datetime.datetime(1900, 1, 1, hour=0)
+    new_tour_model = tm.TourModel(fake_user_name, 0, time0)
+    for _ in xrange(num_iterations):
+        generate_one_iteration_for_tour_model(tour_model, new_tour_model)
+    return new_tour_model
+
+def generate_one_iteration_for_tour_model(old_tm, new_tm):
+    trips = old_tm.build_tour_model(True)
+    for day in trips:
+        print day
+        add_locations(day, new_tm)
+        make_edges_from_day(day, new_tm)
+
+
+def make_edges_from_day(day, tour_model):
+    for loc_index in xrange(len(day) - 1):
+        loc1, loc2, our_hour, our_day = day[loc_index][0], day[loc_index + 1][0], day[loc_index][1].hour, day[loc_index][1].weekday()
+        comm = tm.Commute(loc1, loc2)
+        key = tm.Commute.make_lookup_key(loc1, loc2)
+        our_comm = tour_model.get_edge(loc1, loc2)
+        our_comm.increment_prob(our_hour, our_day)
+
+def add_locations(day, tour_model):
+    if type(day) == tm.NoData:
+        return
+    for loc in day:
+        tour_model.add_location(loc[0])
+
 ## Utility functions
 def make_graph_edge(start_point, end_point, tour_model):
     sp = tour_model.get_location(start_point)
@@ -87,4 +118,4 @@ if __name__ == "__main__":
     else:
         user = None
     list_of_cluster_data = eamtcp.main(user)
-    final_tour_model = create_tour_model("shankari", list_of_cluster_data)
+    final_tour_model = create_tour_model_from_cluster_data("shankari", list_of_cluster_data)

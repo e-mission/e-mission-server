@@ -7,7 +7,7 @@ import datetime
 from emission.analysis.modelling.tour_model.tour_model_matrix import Commute, TourModel, Location
 from emission.core.wrapper.trip import Coordinate, Trip
 from emission.simulation.trip_gen import create_fake_trips
-from emission.analysis.modelling.tour_model.create_tour_model_matrix import create_tour_model
+from emission.analysis.modelling.tour_model.create_tour_model_matrix import create_tour_model_from_cluster_data, generate_new_tour_model_from_tour_model
 from emission.core.get_database import get_trip_db
 import emission.analysis.modelling.tour_model.cluster_pipeline as eamtcp
 
@@ -23,6 +23,8 @@ class TestTourModel(unittest.TestCase):
         self.our_tm.add_location(self.home, Coordinate(37.868360, -122.252857))
         self.our_tm.add_location(self.work, Coordinate(37.875715, -122.259049))
         self.our_tm.add_edge(self.commute)
+
+
 
     def tearDown(self):
         pass
@@ -129,18 +131,31 @@ class TestTourModel(unittest.TestCase):
         rw = self.our_tm.get_tour_model_for_day(0)
         self.assertTrue(rw == [self.home, self.work])
 
-    def testCreation(self):
+    def testCreationFromFakeData(self):
         # This is mostly just a sanity check
         db = get_trip_db()
         db.remove()
         create_fake_trips()
         list_of_cluster_data = eamtcp.main()
-        tm = create_tour_model('test_user', list_of_cluster_data)
-        self.assertEquals(len(tm.get_top_trips(2)), 2)
-        tour = tm.build_tour_model()
+        self.tm_from_fake_data = create_tour_model_from_cluster_data('test_user', list_of_cluster_data)
+        self.assertEquals(len(self.tm_from_fake_data.get_top_trips(2)), 2)
+        tour = self.tm_from_fake_data.build_tour_model()
         self.assertEquals(len(tour), 7)
 
+    def testSelfEatingLoop(self):        
+        db = get_trip_db()
+        db.remove()
+        create_fake_trips()
+        list_of_cluster_data = eamtcp.main()
+        self.tm_from_fake_data = create_tour_model_from_cluster_data('test_user', list_of_cluster_data)
+
+        tm2 = generate_new_tour_model_from_tour_model(self.tm_from_fake_data, "fake", 10)
+
+        print "new is %s" % tm2.locs
+
+        self.assertEquals(len(tm2.get_top_trips(1)), 1)
 
 
 if __name__ == "__main__":
+
     unittest.main()
