@@ -13,5 +13,5 @@ In order to make a tour model from a user's e-mission location data, put all of 
 
 The flowchart below describes the process of how clustering works. 
 
-![Image of Flowchart](https://github.com/joshzarrabi/e-mission-server/tree/tourModel/emission/analysis/modelling/tour_model/flowchart.jpg)
+![Image of Flowchart](https://raw.githubusercontent.com/joshzarrabi/e-mission-server/tourModel/emission/analysis/modelling/tour_model/flowchart.JPG)
 
