@@ -5,12 +5,14 @@ import emission.net.usercache.formatters.common as fc
 import attrdict as ad
 
 state_map = {
+    "unknown": et.State.UNKNOWN,
     "local.state.start": et.State.START,
     "local.state.waiting_for_trip_start": et.State.WAITING_FOR_TRIP_START,
     "local.state.ongoing_trip": et.State.ONGOING_TRIP
 }
 
 transition_map = {
+    "booted": et.TransitionType.BOOTED,
     "local.transition.initialize": et.TransitionType.INITIALIZE,
     "local.transition.exited_geofence": et.TransitionType.EXITED_GEOFENCE,
     "local.transition.stopped_moving": et.TransitionType.STOPPED_MOVING,
