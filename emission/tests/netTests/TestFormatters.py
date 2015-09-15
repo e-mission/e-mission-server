@@ -5,6 +5,7 @@ import logging
 import json
 from uuid import UUID
 import attrdict as ad
+import geojson
 
 # Our imports
 import emission.net.usercache.formatters.formatter as enuf
@@ -31,6 +32,7 @@ class TestFormatters(unittest.TestCase):
         self.assertEquals(formatted_entry.data.accuracy, 52.5)
         self.assertEquals(formatted_entry.data.latitude, 37.3885529)
         self.assertEquals(formatted_entry.data.longitude, -122.0879696)
+        self.assertEquals(formatted_entry.data.loc, geojson.Point((-122.0879696, 37.3885529)))
         self.assertEquals(formatted_entry.data.ts, 1436826356.852)
         self.assertTrue(formatted_entry.data.fmt_time.startswith("2015-07-13 15:25:56.852"))
         self.assertEquals(formatted_entry.metadata.write_ts, 1436826357.115)
