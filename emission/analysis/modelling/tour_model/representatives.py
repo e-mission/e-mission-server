@@ -4,7 +4,7 @@ import math
 import copy
 
 # our imports
-from emission.core.wrapper.trip import Trip, Coordinate
+from emission.core.wrapper.trip_old import Trip, Coordinate
 
 """
 This class creates a group of representatives for each cluster

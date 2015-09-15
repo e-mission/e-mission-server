@@ -6,7 +6,7 @@ import urllib, urllib2, datetime, time, random
 # from traffic import get_travel_time
 
 # Our imports
-from emission.core.wrapper.trip import Coordinate, Alternative_Trip, Section, Fake_Trip, Trip
+from emission.core.wrapper.trip_old import Coordinate, Alternative_Trip, Section, Fake_Trip, Trip
 
 try:
     import json

@@ -13,7 +13,7 @@ import emission.core.wrapper.tripiterator as ti
 import alternative_trips_module as atm
 import emission.net.ext_service.gmaps.common as egcm
 import simple_cost_time_mode_model as sctm
-import emission.core.wrapper.trip as ecwt
+import emission.core.wrapper.trip_old as ecwt
 
 class UtilityModelPipeline:
     def __init__(self):

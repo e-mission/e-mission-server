@@ -2,7 +2,7 @@ import unittest
 import emission.core.get_database as edb
 import sys
 import emission.analysis.modelling.tour_model.featurization as featurization
-from emission.core.wrapper.trip import Trip, Coordinate
+from emission.core.wrapper.trip_old import Trip, Coordinate
 import emission.analysis.modelling.tour_model.cluster_pipeline as cp
 import emission.simulation.trip_gen as tg
 import datetime

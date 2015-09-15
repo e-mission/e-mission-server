@@ -16,7 +16,7 @@ from uuid import UUID
 
 # Our imports
 from emission.core.get_database import get_section_db, get_trip_db, get_routeCluster_db, get_alternatives_db
-import trip
+import trip_old as trip
 
 # 0763de67-f61e-3f5d-90e7-518e69793954
 # 0763de67-f61e-3f5d-90e7-518e69793954_20150421T230304-0700_0

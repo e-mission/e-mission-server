@@ -5,7 +5,7 @@ import datetime
 
 # Our imports
 from emission.analysis.modelling.tour_model.tour_model_matrix import Commute, TourModel, Location
-from emission.core.wrapper.trip import Coordinate, Trip
+from emission.core.wrapper.trip_old import Coordinate, Trip
 from emission.simulation.trip_gen import create_fake_trips
 from emission.analysis.modelling.tour_model.create_tour_model_matrix import create_tour_model
 from emission.core.get_database import get_trip_db

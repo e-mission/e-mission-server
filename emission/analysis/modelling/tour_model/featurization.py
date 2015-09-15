@@ -9,7 +9,7 @@ from sklearn import metrics
 import sys
 
 # our imports
-from emission.core.wrapper.trip import Trip, Coordinate
+from emission.core.wrapper.trip_old import Trip, Coordinate
 from kmedoid import kmedoids
 
 """

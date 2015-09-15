@@ -6,7 +6,7 @@ import traceback
 # Our imports
 from emission.core.get_database import get_section_db
 import filter_modules
-import trip
+import trip_old as trip
 
 class TripIterator(object):
     """

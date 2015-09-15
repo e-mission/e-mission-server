@@ -9,7 +9,7 @@ from emission.analysis.modelling.user_model.user_utility_model import UserUtilit
 from emission.analysis.modelling.user_model.emissions_model import EmissionsModel
 from emission.analysis.modelling.user_model.simple_cost_time_mode_model import SimpleCostTimeModeModel
 import emission.core.wrapper.tripiterator as ti
-import emission.core.wrapper.trip as t
+import emission.core.wrapper.trip_old as t
 from emission.net.ext_service.gmaps.common import get_uuid_list, get_recommender_uuid_list
 import emission.analysis.modelling.user_model.alternative_trips_module as atm
 

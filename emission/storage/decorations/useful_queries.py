@@ -4,7 +4,7 @@ import logging
 
 # Our imports
 from emission.core.get_database import get_section_db
-import emission.core.wrapper.trip as rt
+import emission.core.wrapper.trip_old as rt
 
 def get_all_sections(section_id):
     """ Return all sections in the trip that the specified section is a part of
