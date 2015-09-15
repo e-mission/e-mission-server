@@ -134,6 +134,21 @@ def get_usercache_db():
     UserCache = current_db.Stage_usercache
     return UserCache
 
+def get_timeseries_db():
+    current_db = MongoClient().Stage_database
+    TimeSeries = current_db.Stage_timeseries
+    return TimeSeries
+
+def get_timeseries_error_db():
+    current_db = MongoClient().Stage_database
+    TimeSeriesError = current_db.Stage_timeseries_error
+    return TimeSeriesError
+
+def get_pipeline_state_db():
+    current_db = MongoClient().Stage_database
+    PipelineState = current_db.Stage_pipeline_state
+    return PipelineState
+
 def get_fake_trips_db():
     current_db = MongoClient().Stage_database
     FakeTrips = current_db.Stage_fake_trips

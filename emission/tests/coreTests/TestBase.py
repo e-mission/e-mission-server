@@ -4,9 +4,15 @@
 
 # Standard imports
 import unittest
+import enum
 
 # Our imports
 import emission.core.wrapper.wrapperbase as ecwb
+
+class TestEnum(enum.Enum):
+    A = 0
+    B = 1
+    C = 2
 
 class TestWrapper(ecwb.WrapperBase):
     props = {"a": ecwb.WrapperBase.Access.RO,
@@ -14,7 +20,10 @@ class TestWrapper(ecwb.WrapperBase):
              "c": ecwb.WrapperBase.Access.RO,
              "WrapperBase": ecwb.WrapperBase.Access.RO,
              "invalid": ecwb.WrapperBase.Access.RO,
-             "valid": ecwb.WrapperBase.Access.RW}
+             "valid": ecwb.WrapperBase.Access.RW,
+             "write_a": ecwb.WrapperBase.Access.RW}
+
+    enums = {'a': TestEnum, 'b': TestEnum, 'write_a': TestEnum}
 
     def _populateDependencies(self):
         # Add new properties called "invalid" and "valid" 
@@ -25,36 +34,48 @@ class TestWrapper(ecwb.WrapperBase):
         # set_attr method of super, since that is WrapperBase and WrapperBase
         # checks the "props" of the current class.  Instead, we call the
         # set_attr method of WrapperBase's parent, which has no checks.
-        if "a" in self and self.a == 1:
+        if "a" in self and self.a == TestEnum.B:
             super(ecwb.WrapperBase, self).__setattr__("valid", self.a)
-        if "b" in self and self.b == 2:
+        if "b" in self and self.b == TestEnum.C:
             super(ecwb.WrapperBase, self).__setattr__("invalid", self.b)
 
 class TestBase(unittest.TestCase):
     def testCreationABC(self):
         test_tw = TestWrapper({'a': 1, 'b': 2, 'c': 3})
-        self.assertEquals(test_tw.valid, 1)
-        self.assertEquals(test_tw.invalid, 2)
+        self.assertEquals(test_tw.valid, TestEnum.B)
+        self.assertEquals(test_tw.invalid, TestEnum.C)
         self.assertTrue(str(test_tw).startswith("TestWrapper"))
 
     def testCreationAB(self):
         test_tw = TestWrapper({'a': 1, 'c': 3})
-        self.assertEquals(test_tw.valid, 1)
+        self.assertEquals(test_tw.valid, TestEnum.B)
         with self.assertRaises(AttributeError):
             print ("test_tw.invalid = %s" % test_tw.invalid)
         self.assertTrue(str(test_tw).startswith("TestWrapper"))
 
     def testSetReadOnly(self):
         test_tw = TestWrapper({'a': 1, 'c': 3})
-        self.assertEquals(test_tw.valid, 1)
+        self.assertEquals(test_tw.valid, TestEnum.B)
         with self.assertRaisesRegexp(AttributeError, ".*read-only.*"):
             test_tw.invalid = 2
 
     def testGetSetReadWrite(self):
         test_tw = TestWrapper({'a': 1, 'c': 3})
-        self.assertEquals(test_tw.valid, 1)
+        self.assertEquals(test_tw.valid, TestEnum.B)
         test_tw.valid = 2
         self.assertEquals(test_tw.valid, 2)
+
+    def testSetEnumPositive(self):
+        test_tw = TestWrapper({'a': 1, 'c': 3})
+        self.assertEquals(test_tw.valid, TestEnum.B)
+        test_tw.write_a = TestEnum.C
+        self.assertEquals(test_tw.write_a, TestEnum.C)
+
+    def testSetEnumNegative(self):
+        test_tw = TestWrapper({'a': 1, 'c': 3})
+        self.assertEquals(test_tw.valid, TestEnum.B)
+        with self.assertRaisesRegexp(AttributeError, ".*enum.*"):
+            test_tw.write_a = 2
 
     def testSetInvalid(self):
         test_tw = TestWrapper({'a': 1, 'c': 3})
@@ -63,7 +84,7 @@ class TestBase(unittest.TestCase):
 
     def testGetReadOnly(self):
         test_tw = TestWrapper({'a': 1, 'c': 3})
-        self.assertEquals(test_tw.a, 1)
+        self.assertEquals(test_tw.a, TestEnum.B)
 
     def testGetInvalid(self):
         test_tw = TestWrapper({'a': 1, 'c': 3})

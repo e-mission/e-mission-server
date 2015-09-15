@@ -1,0 +1,37 @@
+{
+    "user_id": "0763de67-f61e-3f5d-90e7-518e69793954",
+    "_id": "55a4418c7d65cb39ee9737cf",
+    "data": {
+        "mHasAccuracy": true, 
+        "mHasAltitude": false, 
+        "mLat2": 0, 
+        "mElapsedRealtimeNanos": 100623898000000, 
+        "mResults": [
+            0, 
+            0
+        ], 
+        "mLat1": 0, 
+        "mBearing": 0, 
+        "mAltitude": 0, 
+        "mIsFromMockProvider": false, 
+        "mLongitude": -122.0879696, 
+        "mHasBearing": false, 
+        "mSpeed": 0, 
+        "mInitialBearing": 0, 
+        "mAccuracy": 52.5, 
+        "mDistance": 0, 
+        "mTime": 1436826356852, 
+        "mLon1": 0, 
+        "mHasSpeed": false, 
+        "mProvider": "fused", 
+        "mLatitude": 37.3885529, 
+        "mLon2": 0
+    }, 
+    "metadata": {
+        "platform": "android", 
+        "read_ts": 0, 
+        "type": "message", 
+        "key": "background/location", 
+        "write_ts": 1436826357115
+    }
+}

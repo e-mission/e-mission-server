@@ -21,6 +21,9 @@ class WrapperBase(ad.AttrDict):
     All subclasses should define:
     - props: a map of valid properties, with a value indicating whether
       they are read-only or not
+    - enums: a list of properties that are enums and their appropropriate
+      class. This is important because enums cannot be stored directly into
+      mongodb, so we need to map these properties to/from their underlying values
     - _populateDependencies: a method to pre-populate fields based on the
       current field. This can be empty, and implemented by pass
   """
@@ -54,7 +57,13 @@ class WrapperBase(ad.AttrDict):
   def __setattr__(self, key, value):
     if key in self.props:
         if self.props[key] == WrapperBase.Access.RW:
-            return super(WrapperBase, self).__setattr__(key, value)
+            if key in self.enums:
+                if not isinstance(value, enum.Enum):
+                    raise AttributeError("property %s should be an enum" % key)
+                else:
+                    return super(WrapperBase, self).__setattr__(key, value.value)
+            else:
+                return super(WrapperBase, self).__setattr__(key, value)
         else:
             raise AttributeError("property %s is read-only" % key)
     else:
@@ -96,5 +105,7 @@ class WrapperBase(ad.AttrDict):
         key_class = self._get_class(key)
         # logging.debug("key_class = %s" % key_class)
         return key_class._constructor(obj, self._configuration())
+    elif key in self.enums:
+        return super(WrapperBase, self)._build(self.enums[key](obj))
     else:
         return super(WrapperBase, self)._build(obj)

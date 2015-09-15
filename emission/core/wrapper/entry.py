@@ -7,6 +7,8 @@ class Entry(ecwb.WrapperBase):
            "_id": ecwb.WrapperBase.Access.RO,
            "user_id": ecwb.WrapperBase.Access.RO}
 
+  enums = {}
+
   def _populateDependencies(self):
     # logging.debug("self = %s" % self)
     # logging.debug("metadata = %s" % self.metadata)
@@ -16,7 +18,8 @@ class Entry(ecwb.WrapperBase):
 
   def _getData2Wrapper(self):
     return {"background/location": "location",
-            "background/activity": "motionactivity"}
+            "background/filtered_location": "location",
+            "background/motion_activity": "motionactivity"}
 
   def _build(self, key, obj):
     # logging.debug("entry._build called with %s, %s, %s" % (self, key, obj))

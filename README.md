@@ -6,6 +6,9 @@ It has two components, the backend server and the phone apps. This is the
 backend server - the phone apps are available in the [e-mission-phone
 repo](https://github.com/amplab/e-mission-phone)
 
+The current build status is:
+[![Build Status](https://amplab.cs.berkeley.edu/jenkins/buildStatus/icon?job=e-mission-server)](https://amplab.cs.berkeley.edu/jenkins/view/E-Mission/job/e-mission-server/)
+
 The backend in turn consists of two parts - a summary of their code structure is shown below.
 -![][Python_Structure]
 The webapp supports a REST API, and accesses data from the database to fulfill

@@ -23,7 +23,6 @@ class UserCache(object):
             self.startTs = startTs
             self.endTs = endTs
 
-
     @staticmethod
     def getUserCache(uuid):
         """

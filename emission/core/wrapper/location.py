@@ -16,6 +16,7 @@ class Location(ecwb.WrapperBase):
              "heading": ecwb.WrapperBase.Access.RO,    # heading reported by the phone
              "vaccuracy": ecwb.WrapperBase.Access.RO,  # vertical accuracy of the point (only iOS)
              "floor": ecwb.WrapperBase.Access.RO}      # floor in a building that point is in (only iOS)
+    enums = {}
 
     def _populateDependencies(self):
         pass

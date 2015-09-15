@@ -53,12 +53,17 @@ class BuiltinUserCache(ucauc.UserCache):
     def __init__(self, uuid):
         super(BuiltinUserCache, self).__init__(uuid)
         self.key_query = lambda(key): {"metadata.key": key};
-        self.ts_query = lambda(tq): {"$and": [{"metadata.%s" % tq.timeType: {"$gte": tq.startTs}},
-                {"metadata.%s" % tq.timeType: {"$lte": tq.endTs}}]}
+        self.ts_query = lambda(tq): BuiltinUserCache._get_ts_query(tq)
         self.type_query = lambda(entry_type): {"metadata.type": entry_type}
-        # time.time() returns seconds. Our format requires milliseconds
-        self.get_utc_ts = lambda(_): int(time.time() * 1000)
         self.db = get_usercache_db()
+
+    @staticmethod
+    def _get_ts_query(tq):
+        time_key = "metadata.%s" % tq.timeType
+        ret_query = {time_key : {"$lt": tq.endTs}}
+        if (tq.startTs is not None):
+            ret_query[time_key].update({"$gte": tq.startTs})
+        return ret_query
 
     def putDocument(self, key, value):
         """
@@ -66,7 +71,7 @@ class BuiltinUserCache(ucauc.UserCache):
             Note that this assumes that we have a single cache document per user.
         """
         metadataDoc = {
-                        'write_ts': self.get_utc_ts("_"),
+                        'write_ts': time.time(),
                         'type': 'document',
                         'key': key,
                       }
@@ -93,17 +98,27 @@ class BuiltinUserCache(ucauc.UserCache):
                                 upsert=True)
         logging.debug("Result = %s after updating document" % result)
 
-    def getMessage(self, key, timeQuery = None):
+    def _get_msg_query(self, key_list = None, time_query = None):
+        ret_query = {"user_id": self.uuid}
+        ret_query.update({"$or": [self.type_query("message"),
+                                  self.type_query("sensor_data"),
+                                  self.type_query("rw-document")]})
+        if key_list is not None and len(key_list) > 0:
+            key_query_list = []
+            for key in key_list:
+                key_query_list.append(self.key_query(key))
+            ret_query.update({"$or": key_query_list})
+        if (time_query is not None):
+            ret_query.update(self.ts_query(time_query))
+        return ret_query
+
+    def getMessage(self, key_list = None, timeQuery = None):
         """
             phone -> server
             Returns None if the key does not exist
         """
-        read_ts = self.get_utc_ts("_")
-        combo_query = {"user_id": self.uuid}
-        combo_query.update({"$or": [self.type_query("message"), self.type_query("rw-document")]})
-        combo_query.update(self.key_query(key))
-        if (timeQuery is not None):
-            combo_query.update(self.ts_query(timeQuery))
+        read_ts = time.time()
+        combo_query = self._get_msg_query(key_list, timeQuery)
         
         # We first update the read timestamp and then actually read the messages
         # This ensures that the values that we return have the read_ts set
@@ -120,13 +135,7 @@ class BuiltinUserCache(ucauc.UserCache):
         return retrievedMsgs
 
     def clearProcessedMessages(self, timeQuery, key_list=None):
-        del_query = self.ts_query(timeQuery)
-        if key_list is not None:
-            key_query_list = []
-            for key in key_list:
-                key_query_list.append(self.key_query(key))
-        if key_query_list is not None:
-            del_query.update({"$or": key_query_list})
+        del_query = self._get_msg_query(key_list, timeQuery)
         logging.debug("About to delete messages matching query %s" % del_query)
         del_result = self.db.remove(del_query)
         logging.debug("Delete result = %s" % del_result)
