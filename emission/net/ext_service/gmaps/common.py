@@ -9,7 +9,7 @@ import xml.etree.ElementTree as ET
 
 # Our imports
 import emission.core.get_database as edb
-import emission.core.wrapper.trip as ewt
+import emission.core.wrapper.trip_old as ewt
 
 DATE_FORMAT = "%Y%m%dT%H%M%S-%W00" #This is a great hack thought of by Shaun
 

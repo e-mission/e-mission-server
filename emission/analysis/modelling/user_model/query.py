@@ -8,7 +8,7 @@ import optparse
 
 # Our imports
 import emission.core.get_database as edb
-import emission.core.wrapper.trip as ecwt
+import emission.core.wrapper.trip_old as ecwt
 import emission.net.ext_service.gmaps as gmaps_lib
 import emission.net.ext_service.otp.otp as otp
 

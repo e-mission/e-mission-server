@@ -5,7 +5,7 @@ import random
 # Our imports
 import emission.core.get_database as edb
 import emission.net.ext_services.gmaps.common as ec
-import emission.core.wrapper.trip as et
+import emission.core.wrapper.trip_old as et
 import emission.net.ext_services.gmaps.googlemaps as sdk
 import emission.analysis.result.recommendation.perturb as ep
 

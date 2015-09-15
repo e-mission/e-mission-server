@@ -4,7 +4,7 @@ import emission.analysis.modelling.tour_model.representatives as rep
 import emission.simulation.trip_gen as tg
 import emission.analysis.modelling.tour_model.featurization as feat
 import emission.analysis.modelling.tour_model.cluster_pipeline as cp
-from emission.core.wrapper.trip import Trip, Coordinate
+from emission.core.wrapper.trip_old import Trip, Coordinate
 
 class RepresentativesTests(unittest.TestCase):
 

@@ -3,7 +3,7 @@ import random, math, json, datetime, urllib2
 
 # Our imports
 from emission.net.ext_service.otp.otp import OTP, PathNotFoundException
-from emission.core.wrapper.trip import Coordinate 
+from emission.core.wrapper.trip_old import Coordinate 
 import emission.simulation.markov_model_counter as esmmc
 from emission.core.our_geocoder import Geocoder
 from emission.core import get_database as edb

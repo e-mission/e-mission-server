@@ -2,7 +2,7 @@
 import logging
 
 # Our imports
-import emission.core.wrapper.trip as ect
+import emission.core.wrapper.trip_old as ect
 import emission.core.wrapper.tripiterator as ecti
 import emission.core.wrapper.filter_modules as ecfm
 import emission.core.get_database as edb

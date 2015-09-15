@@ -9,7 +9,7 @@ import datetime as pydt
 # Our imports
 import emission.analysis.modelling.user_model.alternative_trips_module as pipeline_module
 from emission.analysis.modelling.user_model.alternative_trips_pipeline import AlternativeTripsPipeline
-import emission.core.wrapper.trip as ecwt
+import emission.core.wrapper.trip_old as ecwt
 from emission.analysis.modelling.user_model import query
 from emission.core.wrapper.user import User
 from emission.core.wrapper.client import Client
