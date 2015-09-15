@@ -30,12 +30,13 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         # stage is still marked successful. This means that the stage can never
         # be unsuccessful. We could try to keep it, but then the delete query
         # below will get significantly more complicated.
-        time_query = esp.get_time_range_for_usercache()
+        time_query = esp.get_time_range_for_usercache(self.uuid)
         uc = enua.UserCache.getUserCache(self.uuid)
         ts = etsa.TimeSeries.get_time_series(self.uuid)
 
         curr_entry_it = uc.getMessage(time_query)
         for entry_doc in curr_entry_it:
+            unified_entry = None
             try:
                 # We don't want to use our wrapper classes yet because they are based on the
                 # standard long-term formats, and we don't yet know whether the
@@ -46,7 +47,8 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
                 unified_entry = enuf.convert_to_common_format(entry)
                 ts.insert(unified_entry)
             except Exception as e:
-                logging.warn("Got error %s while saving entry %s"% (e, unified_entry))
+                logging.exception("Backtrace time")
+                logging.warn("Got error %s while saving entry %s -> %s"% (e, entry, unified_entry))
                 ts.insert_error(entry_doc)
         uc.clearProcessedMessages(time_query)
-        esp.mark_usercache_done()
+        esp.mark_usercache_done(self.uuid)
