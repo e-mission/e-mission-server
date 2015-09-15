@@ -5,6 +5,7 @@
 import logging
 import unittest
 from uuid import UUID
+import geojson as gj
 
 # Our imports
 import emission.core.wrapper.entry as ecwe
@@ -19,6 +20,7 @@ class TestEntry(unittest.TestCase):
           'elapsedRealtimeNanos': 100623898000000L,
           'latitude': 37.3885529,
           'longitude': -122.0879696,
+          'loc': {"coordinates": [-122.0879696, 37.3885529], "type": "Point"},
           'sensed_speed': 0,
           'ts': 1436826356.852},
          'metadata': {'key': 'background/location',
@@ -35,6 +37,8 @@ class TestEntry(unittest.TestCase):
         self.assertEquals(entry.metadata.type, 'message')
         self.assertEquals(entry.data.latitude, 37.3885529)
         self.assertEquals(entry.data.longitude, -122.0879696)
+        # self.assertEquals(entry.data.loc, gj.Point((-122.0879696, 37.3885529)))
+        self.assertTrue(isinstance(entry.data.loc, gj.Point))
         logging.debug("location time = %s, written at %s (%s)" % 
             (entry.data.ts, entry.metadata.write_ts, entry.metadata.write_fmt_time))
 

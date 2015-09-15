@@ -18,6 +18,7 @@ class PipelineState(ecwb.WrapperBase):
             }
 
     enums = {"pipeline_stage": PipelineStages}
+    geojson = []
 
     def _populateDependencies(self):
         pass

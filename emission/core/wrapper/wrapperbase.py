@@ -2,6 +2,7 @@ import logging
 import attrdict as ad
 import enum as enum
 import collections as coll
+import geojson as gj
 
 class WrapperBase(ad.AttrDict):
   """
@@ -24,6 +25,7 @@ class WrapperBase(ad.AttrDict):
     - enums: a list of properties that are enums and their appropropriate
       class. This is important because enums cannot be stored directly into
       mongodb, so we need to map these properties to/from their underlying values
+    - geojson: a list of geojson properties
     - _populateDependencies: a method to pre-populate fields based on the
       current field. This can be empty, and implemented by pass
   """
@@ -119,11 +121,13 @@ class WrapperBase(ad.AttrDict):
 
   def _build(self, key, obj):
     # logging.debug("_build called with %s, %s, %s" % (self, key, obj))
-    if isinstance(obj, coll.Mapping):
+    if key in self.geojson:
+        return gj.GeoJSON.to_instance(obj)
+    elif key in self.enums:
+        return super(WrapperBase, self)._build(self.enums[key](obj))
+    elif isinstance(obj, coll.Mapping):
         key_class = self._get_class(key)
         # logging.debug("key_class = %s" % key_class)
         return key_class._constructor(obj, self._configuration())
-    elif key in self.enums:
-        return super(WrapperBase, self)._build(self.enums[key](obj))
     else:
         return super(WrapperBase, self)._build(obj)

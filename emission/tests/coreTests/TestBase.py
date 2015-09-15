@@ -25,6 +25,7 @@ class TestWrapper(ecwb.WrapperBase):
              "unset": ecwb.WrapperBase.Access.WORM}
 
     enums = {'a': TestEnum, 'b': TestEnum, 'write_a': TestEnum}
+    geojson = []
 
     def _populateDependencies(self):
         # Add new properties called "invalid" and "valid" 
