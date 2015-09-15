@@ -38,6 +38,11 @@ class UserCache(object):
     def __init__(self, uuid):
         self.uuid = uuid
 
+    @staticmethod
+    def get_uuid_list():
+        import emission.net.usercache.builtin_usercache as biuc
+        return biuc.BuiltinUserCache.get_uuid_list()
+
     def putDocument(self, key, value):
         """
         Store this key-value pair into the server -> phone part of the cache.

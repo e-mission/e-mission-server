@@ -65,6 +65,10 @@ class BuiltinUserCache(ucauc.UserCache):
             ret_query[time_key].update({"$gte": tq.startTs})
         return ret_query
 
+    @staticmethod
+    def get_uuid_list():
+        return get_usercache_db().distinct("user_id")
+
     def putDocument(self, key, value):
         """
             server -> phone

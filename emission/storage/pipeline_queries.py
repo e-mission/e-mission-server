@@ -52,5 +52,3 @@ def get_current_state(user_id, stage):
     else:
         return None
 
-def get_uuid_list():
-    return edb.get_usercache_db().distinct("user_id")
