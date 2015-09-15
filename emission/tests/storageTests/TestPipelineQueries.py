@@ -27,7 +27,7 @@ class TestPipelineQueries(unittest.TestCase):
         new_state = epq.get_current_state(self.testUUID, ewps.PipelineStages.USERCACHE)
         self.assertIsNotNone(new_state)
         self.assertIsNotNone(new_state.curr_run_ts)
-        self.assertNotIn("last_ts_run", new_state)
+        self.assertIsNone(new_state.last_ts_run)
         new_state_diff_user = epq.get_current_state(uuid.uuid4(), ewps.PipelineStages.USERCACHE)
         self.assertIsNone(new_state_diff_user)
 
@@ -50,11 +50,6 @@ class TestPipelineQueries(unittest.TestCase):
         self.assertIsNotNone(new_state)
         self.assertIsNotNone(new_state.curr_run_ts)
         self.assertIsNotNone(new_state.last_ts_run)
-
-    def testGetUUIDList(self):
-        self.testStartProcessing()
-        uuid_list = epq.get_uuid_list()
-        self.assertEquals(uuid_list, [])
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)

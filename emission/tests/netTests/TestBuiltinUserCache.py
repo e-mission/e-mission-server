@@ -325,6 +325,11 @@ class TestBuiltinUserCache(unittest.TestCase):
     self.assertEqual(len(uc.getMessage(["background/location"], tq)), 0)
     self.assertEqual(len(uc.getMessage(["background/activity"], tq)), 2)
 
+  def testGetUUIDList(self):
+    self.testGetTwoSetsOfUserDataFromPhone()
+    uuid_list = ucauc.UserCache.get_uuid_list()
+    self.assertEquals(uuid_list, [self.testUserUUID])
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     unittest.main()
