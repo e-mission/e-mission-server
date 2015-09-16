@@ -1,4 +1,5 @@
 import logging
+import pandas as pd
 
 import emission.core.get_database as edb
 import emission.storage.timeseries.abstract_timeseries as esta
@@ -11,6 +12,10 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 {"metadata.%s" % tq.timeType: {"$lte": tq.endTs}}]}
         self.type_query = lambda(entry_type): {"metadata.type": entry_type}
 
+    @staticmethod
+    def get_uuid_list():
+        return edb.get_timeseries_db().distinct("user_id")
+
     def _get_query(self, key_list = None, time_query = None):
         ret_query = {'user_id': self.uuid} # UUID is mandatory
         if key_list is not None and len(key_list) > 0:
@@ -22,8 +27,17 @@ class BuiltinTimeSeries(esta.TimeSeries):
             ret_query.update(self.ts_query(time_query))
         return ret_query
 
+    @staticmethod
+    def _to_df_entry(entry):
+        return entry["data"]
+
     def find_entries(self, key_list = None, time_query = None):
         return edb.get_timeseries_db().find(self._get_query(key_list, time_query))
+
+    def get_data_df(self, key, time_query = None):
+        result_it = edb.get_timeseries_db().find(self._get_query([key], time_query), {"data": True})
+        # Dataframe doesn't like to work off an iterator - it wants everything in memory
+        return pd.DataFrame([BuiltinTimeSeries._to_df_entry(e) for e in list(result_it)])
 
     def insert(self, entry):
         """
