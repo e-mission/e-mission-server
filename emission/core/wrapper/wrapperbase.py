@@ -2,6 +2,7 @@ import logging
 import attrdict as ad
 import enum as enum
 import collections as coll
+import geojson as gj
 
 class WrapperBase(ad.AttrDict):
   """
@@ -24,10 +25,11 @@ class WrapperBase(ad.AttrDict):
     - enums: a list of properties that are enums and their appropropriate
       class. This is important because enums cannot be stored directly into
       mongodb, so we need to map these properties to/from their underlying values
+    - geojson: a list of geojson properties
     - _populateDependencies: a method to pre-populate fields based on the
       current field. This can be empty, and implemented by pass
   """
-  Access = enum.Enum("PropertyAccess", "RO RW")
+  Access = enum.Enum("PropertyAccess", "RO RW WORM")
 
 
   def __init__(self, *args, **kwargs):
@@ -37,9 +39,18 @@ class WrapperBase(ad.AttrDict):
   def __dir__(self):
     return dir(super) + self.props.keys()
 
+  def get_id(self):
+    """
+    Return the _id field of the current class. We cannot use the "_id" property
+    (i.e. trip._id) because valid properties cannot start with an underscore. We
+    can access it using trip["_id"] but that is cumbersome to use and can throw
+    if the _id field does not exist (which may or may not be what we want).
+    Let's abstract it out since this is a common use case.
+    """
+    return self["_id"]
+
   def __getattr__(self, key):
     # logging.debug("__getattr__ called for key = %s" % key)
-
     if key in self.props:
         # This code is copied from the base Attr code.
         # This allows us to pass the key into _build as well instead of only the value
@@ -54,9 +65,18 @@ class WrapperBase(ad.AttrDict):
     else:
         raise AttributeError("property %s is not defined for %s" % (key, self.__class__.__name__))
 
+  def _writable(self, key):
+    read_writeable = self.props[key] == WrapperBase.Access.RW
+    write_once_and_currently_unset = self.props[key] == WrapperBase.Access.WORM and key not in self
+    return read_writeable or write_once_and_currently_unset
+    
+
   def __setattr__(self, key, value):
     if key in self.props:
-        if self.props[key] == WrapperBase.Access.RW:
+        # WORM (write-once read-many) properties can be written once. They just
+        # cannot be overwritten.  This allows us to populate the objects during
+        # creation
+        if self._writable(key):
             if key in self.enums:
                 if not isinstance(value, enum.Enum):
                     raise AttributeError("property %s should be an enum" % key)
@@ -101,11 +121,13 @@ class WrapperBase(ad.AttrDict):
 
   def _build(self, key, obj):
     # logging.debug("_build called with %s, %s, %s" % (self, key, obj))
-    if isinstance(obj, coll.Mapping):
+    if key in self.geojson:
+        return gj.GeoJSON.to_instance(obj)
+    elif key in self.enums:
+        return super(WrapperBase, self)._build(self.enums[key](obj))
+    elif isinstance(obj, coll.Mapping):
         key_class = self._get_class(key)
         # logging.debug("key_class = %s" % key_class)
         return key_class._constructor(obj, self._configuration())
-    elif key in self.enums:
-        return super(WrapperBase, self)._build(self.enums[key](obj))
     else:
         return super(WrapperBase, self)._build(obj)

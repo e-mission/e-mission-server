@@ -6,6 +6,7 @@ import copy
 import attrdict as ad
 import pytz
 import datetime as pydt
+import geojson
 
 import emission.core.wrapper.location as ecwl
 import emission.net.usercache.formatters.common as fc
@@ -33,6 +34,7 @@ def format_location_raw(entry):
     data = ad.AttrDict()
     data.latitude = entry.data.mLatitude
     data.longitude = entry.data.mLongitude
+    data.loc = geojson.Point((data.longitude, data.latitude))
     data.ts = float(entry.data.mTime) / 1000 # convert the ms from the phone to secs
     data.fmt_time = str(pydt.datetime.utcfromtimestamp(data.ts).replace(tzinfo=pytz.utc)
                             .astimezone(pytz.timezone(formatted_entry.metadata.time_zone)))
@@ -58,6 +60,7 @@ def format_location_simple(entry):
 
     data = entry.data
     data.ts = data.ts / 1000 # convert from ms to seconds
+    data.loc = geojson.Point((data.longitude, data.latitude))
     data.heading = entry.data.bearing
     del data.bearing
     formatted_entry.data = data

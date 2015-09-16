@@ -21,9 +21,11 @@ class TestWrapper(ecwb.WrapperBase):
              "WrapperBase": ecwb.WrapperBase.Access.RO,
              "invalid": ecwb.WrapperBase.Access.RO,
              "valid": ecwb.WrapperBase.Access.RW,
-             "write_a": ecwb.WrapperBase.Access.RW}
+             "write_a": ecwb.WrapperBase.Access.RW,
+             "unset": ecwb.WrapperBase.Access.WORM}
 
     enums = {'a': TestEnum, 'b': TestEnum, 'write_a': TestEnum}
+    geojson = []
 
     def _populateDependencies(self):
         # Add new properties called "invalid" and "valid" 
@@ -99,6 +101,16 @@ class TestBase(unittest.TestCase):
         self.assertIn("valid", attributes)
         self.assertIn("invalid", attributes)
         self.assertIn("b", attributes)
+
+    def testFirstTimeWrite(self):
+        test_tw = TestWrapper({'a': 1, 'c': 3})
+        # This was originally unset and now we are setting it for the first time, so the write
+        # succeeds
+        test_tw.unset = 4
+        # Now that it is set, it cannot be changed since it is read-only, so an
+        # attempt to change it causes an exception
+        with self.assertRaisesRegexp(AttributeError, ".*read-only.*"):
+            test_tw.unset = 5
 
     # The nested classes are hard to test because they load the wrappers automatically
     # from the wrapper directory, and so in order to test them, we either need to:

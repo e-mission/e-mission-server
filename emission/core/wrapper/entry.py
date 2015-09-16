@@ -8,6 +8,7 @@ class Entry(ecwb.WrapperBase):
            "user_id": ecwb.WrapperBase.Access.RO}
 
   enums = {}
+  geojson = []
 
   def _populateDependencies(self):
     # logging.debug("self = %s" % self)

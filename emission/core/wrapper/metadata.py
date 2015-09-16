@@ -13,6 +13,7 @@ class Metadata(ecwb.WrapperBase):
            "read_ts": ecwb.WrapperBase.Access.RO}
 
   enums = {}
+  geojson = []
 
   def _populateDependencies(self):
     pass

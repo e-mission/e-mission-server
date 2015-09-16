@@ -4,6 +4,7 @@ import emission.core.wrapper.wrapperbase as ecwb
 class Location(ecwb.WrapperBase):
     props = {"latitude": ecwb.WrapperBase.Access.RO,  # latitude of the point
              "longitude": ecwb.WrapperBase.Access.RO, # longitude of the point
+             "loc": ecwb.WrapperBase.Access.RO,       # location of the point in geojson.
              "ts": ecwb.WrapperBase.Access.RO,        # timestamp (in seconds)
              "fmt_time": ecwb.WrapperBase.Access.RO,  # formatted time
              "altitude": ecwb.WrapperBase.Access.RO,  # altitude of the point
@@ -17,6 +18,7 @@ class Location(ecwb.WrapperBase):
              "vaccuracy": ecwb.WrapperBase.Access.RO,  # vertical accuracy of the point (only iOS)
              "floor": ecwb.WrapperBase.Access.RO}      # floor in a building that point is in (only iOS)
     enums = {}
+    geojson = ["loc"]
 
     def _populateDependencies(self):
         pass
