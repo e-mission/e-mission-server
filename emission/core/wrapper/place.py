@@ -15,6 +15,15 @@ class Place(ecwb.WrapperBase):
 
     enums = {}
     geojson = ["location"]
+    nullable = ["enter_ts", "enter_fmt_time", "ending_trip", # for the start of a chain
+                "exit_ts", "exit_fmt_time", "starting_trip"] # for the end of a chain
 
     def _populateDependencies(self):
         pass
+
+    def __getattr__(self, key):
+        # TODO: If this is a recurring pattern, might want to support a "nullable" list as well
+        if (key in self.nullable) and (key not in self):
+            return None
+        else:
+            return super(Place, self).__getattr__(key)
