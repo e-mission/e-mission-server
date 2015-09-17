@@ -27,14 +27,14 @@ class TestTimeSeries(unittest.TestCase):
 
     def testGetEntries(self):
         ts = esta.TimeSeries.get_time_series(self.testUUID)
-        tq = enua.UserCache.TimeQuery("write_ts", 1440201600, 1440288000)
+        tq = enua.UserCache.TimeQuery("write_ts", 1440658800, 1440745200)
         self.assertEqual(len(list(ts.find_entries(time_query = tq))), len(self.entries))
 
     def testGetDataDf(self):
         ts = esta.TimeSeries.get_time_series(self.testUUID)
-        tq = enua.UserCache.TimeQuery("write_ts", 1440201600, 1440288000)
+        tq = enua.UserCache.TimeQuery("write_ts", 1440658800, 1440745200)
         df = ts.get_data_df("background/filtered_location", tq)
-        self.assertEqual(len(df), 583)
+        self.assertEqual(len(df), 327)
         self.assertEqual(len(df.columns), 9)
         
 if __name__ == '__main__':
