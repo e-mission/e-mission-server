@@ -1,75 +1,151 @@
-# Standard imports
-import attrdict as ad
-import numpy as np
-import datetime as pydt
+import logging
 
-# Our imports
-import emission.analysis.classification.cleaning.location_smoothing as ls
-import emission.analysis.point_features as pf
+import emission.storage.timeseries.abstract_timeseries as esta
+import emission.storage.decorations.place_queries as esdp
+import emission.storage.decorations.trip_queries as esdt
+import emission.storage.pipeline_queries as epq
 
-def segment_into_trips(points_df):
-    """
-    What should the inputs be? Points for a day? All newly arrived points?
-    Need to figure out how to hook this up to a pipeline. For now, assume that
-    we have a set of points that we have identified.
-    """
-    filtered_accuracy_points_df = ls.add_speed(ls.filter_accuracy(points_df))
-    filtered_points_df = filtered_accuracy_points_df[filtered_accuracy_points_df.distance != 0].reset_index(drop=True)
+import emission.core.wrapper.transition as ecwt
+import emission.core.wrapper.location as ecwl
+import emission.core.wrapper.entry as ecwe
 
-    segmentation_points = []
-    last_trip_end_point = None
-    curr_trip_start_point = None
-    just_ended = True
-    for idx, row in filtered_points_df.iterrows():
-        currPoint = ad.AttrDict(row)
-        currPoint.update({"idx": idx})
-        print "-" * 30 + str(currPoint.formatted_time) + "-" * 30
-        if curr_trip_start_point is None:
-            print "Appending currPoint because the current start point is None"
-            segmentation_points.append(currPoint)
-
-        if just_ended:
-            sel_point = currPoint
-            print("Setting new trip start point %s with idx %s" % (sel_point, sel_point.idx))
-            curr_trip_start_point = sel_point
-            just_ended = False
-            
-        last5MinsPoints_df = filtered_points_df[np.logical_and(
-                                                                np.logical_and(
-                                                                        filtered_points_df.mTime > currPoint.mTime - 5 * 60 * 1000,
-                                                                        filtered_points_df.mTime < currPoint.mTime),
-                                                                filtered_points_df.mTime >= curr_trip_start_point.mTime)]
-        # Using .loc here causes problems if we have filtered out some points and so the index is non-consecutive.
-        # Using .iloc just ends up including points after this one.
-        # So we reset_index upstream and use it here.
-        # We are going to use the last 8 points for now.
-        # TODO: Change this back to last 10 points once we normalize phone and this
-        last10Points_df = filtered_points_df.iloc[max(idx-8, curr_trip_start_point.idx):idx+1]
-        distanceToLast = lambda(row): pf.calDistance(ad.AttrDict(row), currPoint)
-        last5MinsDistances = last5MinsPoints_df.apply(distanceToLast, axis=1)
-        print "last5MinsDistances = %s with length %d" % (last5MinsDistances.as_matrix(), len(last5MinsDistances))
-        last10PointsDistances = last10Points_df.apply(distanceToLast, axis=1)
-        print "last10PointsDistances = %s with length %d, shape %s" % (last10PointsDistances.as_matrix(),
-                                                                       len(last10PointsDistances),
-                                                                       last10PointsDistances.shape)
+class TripSegmentationMethod(object):
+    def segment_into_trips(self, timeseries, time_query):
+        """
+        Examines the timeseries database for a specific range and returns the
+        segmentation points. Note that the input is the entire timeseries and
+        the time range. This allows algorithms to use whatever combination of
+        data that they want from the sensor streams in order to determine the
+        segmentation points.
         
-        print("len(last10PointsDistances) = %d, len(last5MinsDistances) = %d" %
-              (len(last10PointsDistances), len(last5MinsDistances)))
-        if (len(last10PointsDistances) < 9 or len(last5MinsDistances) == 0):
-            print "Too few points to make a decision, continuing"
-        else:
-            print("last5MinsDistances.max() = %s, last10PointsDistance.max() = %s" %
-              (last5MinsDistances.max(), last10PointsDistances.max()))
-            if (last5MinsDistances.max() < 100 and last10PointsDistances.max() < 100):
-                last_trip_end_index = int(min(np.median(last5MinsPoints_df.index),
-                                           np.median(last10Points_df.index)))
-                print("last5MinPoints.median = %s (%s), last10Points_df = %s (%s), sel index = %s" %
-                    (np.median(last5MinsPoints_df.index), last5MinsPoints_df.index,
-                     np.median(last10Points_df.index), last10Points_df.index,
-                     last_trip_end_index))
-                last_trip_end_point = filtered_points_df.iloc[last_trip_end_index]
-                print("Appending last_trip_end_point %s with index %s " % (last_trip_end_point, last_trip_end_point.name))
-                segmentation_points.append(last_trip_end_point)
-                print "Found trip end at %s" % str(pydt.datetime.fromtimestamp(last_trip_end_point.mTime/1000))
-                just_ended = True
-    return segmentation_points
+        Returns array of location point tuples corresponding to the start and end of
+        trips in this time range. The first trip returned starts with the first
+        location point in the time range.
+    
+        i.e. [(start1, end1), (start2, end2)...]. Points between end1 and
+        start2 are assumed to be within place 2 and are generally ignored.
+
+        If there are no segments, returns an empty array.
+        If the method is not yet ready to segment the trips (e.g. maybe it is
+            waiting until the end of the day in order to use a clustering algorithm, returns None)
+        """
+        pass
+
+def segment_current_trips(uuid):
+    ts = esta.TimeSeries.get_time_series(uuid)
+    time_query = epq.get_time_range_for_segmentation(uuid)
+
+    import emission.analysis.intake.segmentation.trip_segmentation_methods.dwell_segmentation_time_filter as dstf
+    dstfsm = dstf.DwellSegmentationTimeFilter(time_threshold = 5 * 60, # 5 mins
+                                              point_threshold = 9,
+                                              distance_threshold = 100) # 100 m
+
+    segmentation_points = dstfsm.segment_into_trips(ts, time_query)
+    # Create and store trips and places based on the segmentation points
+    if segmentation_points is None:
+        epq.mark_segmentation_failed()
+    elif len(segmentation_points) == 0:
+        # no new segments, no need to keep looking at these again
+        epq.mark_segmentation_done()
+    else:
+        # new segments, need to deal with them
+        # First, retrieve the last place so that we can stitch it to the newly created trip.
+        # Again, there are easy and hard. In the easy case, the trip was
+        # continuous, was stopped when the trip end was detected, and there is
+        # no gap between the start of the trip and the last place. But there
+        # can be other issues caused by gaps in tracking. A more detailed
+        # description of dealing with gaps in tracking can be found in the wiki.
+        # Let us first deal with the easy case.
+        # restart_events_df = get_restart_events(ts, time_query)
+        last_place = esdp.get_last_place(uuid)
+        if last_place is None:
+            last_place = start_new_chain(uuid)
+            
+        # if is_easy_case(restart_events_df):
+        # Theoretically, we can do some sanity checks here to make sure
+        # that we are fairly close to the last point. Maybe mark some kind
+        # of confidence level based on that?
+        logging.debug("segmentation_point_list has length %s" % len(segmentation_points))
+        for (start_loc_doc, end_loc_doc) in segmentation_points:
+            logging.debug("start_loc_doc = %s, end_loc_doc = %s" % (start_loc_doc, end_loc_doc))
+            start_loc = ecwl.Location(start_loc_doc)
+            end_loc = ecwl.Location(end_loc_doc)
+            logging.debug("start_loc = %s, end_loc = %s" % (start_loc, end_loc))
+
+            # Stitch together the last place and the current trip
+            curr_trip = esdt.create_new_trip(uuid)
+            new_place = esdp.create_new_place(uuid)
+
+            stitch_together_start(last_place, curr_trip, start_loc)
+            stitch_together_end(new_place, curr_trip, end_loc)
+
+            esdp.save_place(last_place)
+            esdt.save_trip(curr_trip)
+
+            last_place = new_place
+
+        # The last last_place hasn't been stitched together yet, but we
+        # need to save it so that it can be the last_place for the next run
+        esdp.save_place(last_place)
+
+def start_new_chain(uuid):
+    """
+    Can't find the place that is the end of an existing chain, so we need to
+    create a new one.  This might correspond to the start of tracking, or to an
+    improperly terminated chain. For now, we deal with the start of tracking,
+    and add the checks for the improperly terminated chain later.
+    TODO: Add checks for improperly terminated chains later.
+    """
+    start_place = esdp.create_new_place(uuid)
+    logging.debug("Starting tracking, created new start of chain %s" % start_place)
+    return start_place
+
+def stitch_together_start(last_place, curr_trip, start_loc):
+    """
+    Stitch together the last place and the current trip at the start location.
+    Note that we don't actually know the time that we left the start place
+    because we are only invoked when we have exited the geofence. We can do
+    something fancy with extraploation based on average speed, but let's keep
+    the fuzz factor for now.
+    """
+    last_place.exit_ts = start_loc.ts
+    last_place.exit_fmt_time = start_loc.fmt_time
+    last_place.starting_trip = curr_trip.get_id()
+    if "enter_ts" in last_place:
+        last_place.duration = last_place.exit_ts - last_place.enter_ts
+    else:
+        logging.debug("Place %s is the start of tracking - duration not known" % last_place)
+
+    curr_trip.start_ts = start_loc.ts
+    curr_trip.start_fmt_time = start_loc.fmt_time
+    curr_trip.start_place = last_place.get_id()
+    curr_trip.start_loc = start_loc.loc
+    curr_trip.source = "DwellSegmentationTimeFilter"
+
+def stitch_together_end(new_place, curr_trip, end_loc):
+    """
+    Stitch together the last place and the current trip at the start location.
+    Note that we don't actually know the time that we left the start place
+    because we are only invoked when we have exited the geofence. We can do
+    something fancy with extraploation based on average speed, but let's keep
+    the fuzz factor for now.
+    """
+    curr_trip.end_ts = end_loc.ts
+    curr_trip.end_fmt_time = end_loc.fmt_time
+    curr_trip.end_place = new_place.get_id()
+    curr_trip.end_loc = end_loc.loc
+
+    new_place.enter_ts = end_loc.ts
+    new_place.enter_fmt_time = end_loc.fmt_time
+    new_place.ending_trip = curr_trip.get_id()
+    new_place.location = end_loc.loc
+    new_place.source = "DwellSegmentationTimeFilter"
+
+def get_restart_events(timeseries, time_query):
+    transition_df = timeseries.get_data_df("statemachine/transition", time_query)
+    restart_events_df = transition_df.query('transition' == ecwt.TransitionType.BOOTED.value or
+                                            'transition' == ecwt.TransitionType.INITIALIZE.value or
+                                            'transition' == ecwt.TransitionType.STOP_TRACKING.value)
+
+def is_easy_case(restart_events_df):
+    return len(restart_events_df) == 0

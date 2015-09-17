@@ -13,6 +13,7 @@ def get_last_place(user_id):
     """
     ret_place_doc = edb.get_place_db().find_one({'user_id': user_id,
                                                  'exit_ts' : {'$exists': False}})
+    logging.debug("last place doc = %s" % ret_place_doc)
     if ret_place_doc is None:
         return None
     ret_place = ecwp.Place(ret_place_doc)
@@ -21,8 +22,22 @@ def get_last_place(user_id):
     assert('starting_trip' not in ret_place)
     return ret_place
 
+def _get_ts_query(tq):
+    time_key = tq.timeType
+    ret_query = {time_key : {"$lt": tq.endTs}}
+    if (tq.startTs is not None):
+        ret_query[time_key].update({"$gte": tq.startTs})
+    return ret_query
+
+def get_places(user_id, time_query):
+    place_doc_cursor = edb.get_place_db().find(_get_ts_query(time_query))
+    logging.debug("%d places found in database" % place_doc_cursor.count())
+    # TODO: Fix "TripIterator" and return it instead of this list
+    return [ecwp.Place(doc) for doc in place_doc_cursor]
+
 def create_new_place(user_id):
     _id = edb.get_place_db().save({'user_id': user_id})
+    logging.debug("Created new place %s for user %s" % (_id, user_id))
     return ecwp.Place({"_id": _id, 'user_id': user_id})
 
 def save_place(place):
