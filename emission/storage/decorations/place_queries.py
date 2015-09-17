@@ -1,0 +1,29 @@
+import logging
+
+import emission.core.get_database as edb
+import emission.core.wrapper.place as ecwp
+
+def get_last_place(user_id):
+    """
+    There are many ways to find the last place.  One would be to find the one
+    with the max enter_ts.  But that is not performant because we would need to
+    retrieve all the enter_ts and find their max, which is expensive. Instead, we
+    use the property that we process data in chunks of trips, so the last place
+    would have been created and entered but not exited.
+    """
+    ret_place_doc = edb.get_place_db().find_one({'user_id': user_id,
+                                                 'exit_ts' : {'$exists': False}})
+    if ret_place_doc is None:
+        return None
+    ret_place = ecwp.Place(ret_place_doc)
+    assert('exit_ts' not in ret_place)
+    assert('exit_fmt_time' not in ret_place)
+    assert('starting_trip' not in ret_place)
+    return ret_place
+
+def create_new_place(user_id):
+    _id = edb.get_place_db().save({'user_id': user_id})
+    return ecwp.Place({"_id": _id, 'user_id': user_id})
+
+def save_place(place):
+    edb.get_place_db().save(place)

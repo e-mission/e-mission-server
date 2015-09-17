@@ -39,6 +39,14 @@ class TestPipelineQueries(unittest.TestCase):
         self.assertIsNone(final_state.curr_run_ts)
         self.assertIsNotNone(final_state.last_ts_run)
 
+    def testFailProcessing(self):
+        self.testStartProcessing()
+        epq.mark_stage_failed(self.testUUID, ewps.PipelineStages.USERCACHE)
+        final_state = epq.get_current_state(self.testUUID, ewps.PipelineStages.USERCACHE)
+        self.assertIsNotNone(final_state)
+        self.assertIsNone(final_state.curr_run_ts)
+        self.assertIsNone(final_state.last_ts_run)
+
     def testStartProcessingTwice(self):
         self.testStopProcessing()
         next_query = epq.get_time_range_for_stage(self.testUUID, ewps.PipelineStages.USERCACHE)

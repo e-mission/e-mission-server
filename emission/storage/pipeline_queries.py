@@ -9,12 +9,31 @@ def mark_usercache_done(user_id):
 def get_time_range_for_usercache(user_id):
     get_time_range_for_stage(user_id, ps.PipelineStages.USERCACHE)
 
+def get_time_range_for_segmentation(user_id):
+    get_time_range_for_stage(user_id, ps.PipelineStages.TRIP_SEGMENTATION)
+
+def mark_segmentation_done(user_id):
+    mark_stage_done(user_id, ps.PipelineStages.TRIP_SEGMENTATION)
+
+def mark_segmentation_failed(user_id):
+    mark_stage_failed(user_id, ps.PipelineStages.TRIP_SEGMENTATION)
+
 def mark_stage_done(user_id, stage):
     # We move failed entries to the error timeseries. So usercache runs never fail.
     curr_state = get_current_state(user_id, stage)
     assert(curr_state is not None)
     assert(curr_state.curr_run_ts is not None)
     curr_state.last_ts_run = curr_state.curr_run_ts
+    curr_state.curr_run_ts = None
+    edb.get_pipeline_state_db().save(curr_state)
+
+def mark_stage_failed(user_id, stage):
+    curr_state = get_current_state(user_id, stage)
+    assert(curr_state is not None)
+    assert(curr_state.curr_run_ts is not None)
+    # last_ts_run remains unchanged since this run did not succeed
+    # the next query will start from the start_ts of this run
+    # we also reset the curr_run_ts to indicate that we are not currently running
     curr_state.curr_run_ts = None
     edb.get_pipeline_state_db().save(curr_state)
 

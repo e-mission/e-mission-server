@@ -149,6 +149,16 @@ def get_pipeline_state_db():
     PipelineState = current_db.Stage_pipeline_state
     return PipelineState
 
+def get_place_db():
+    current_db = MongoClient().Stage_database
+    PipelineState = current_db.Stage_pipeline_state
+    return PipelineState
+
+def get_trip_new_db():
+    current_db = MongoClient().Stage_database
+    PipelineState = current_db.Stage_pipeline_state
+    return PipelineState
+
 def get_fake_trips_db():
     current_db = MongoClient().Stage_database
     FakeTrips = current_db.Stage_fake_trips

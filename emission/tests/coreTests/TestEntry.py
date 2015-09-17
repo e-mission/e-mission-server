@@ -6,10 +6,12 @@ import logging
 import unittest
 from uuid import UUID
 import geojson as gj
+import bson.objectid as bo
 
 # Our imports
 import emission.core.wrapper.entry as ecwe
 import emission.core.wrapper.motionactivity as ecwm
+import emission.core.wrapper.trip as ecwt
 
 class TestEntry(unittest.TestCase):
     def testWrapLocation(self):
@@ -66,6 +68,24 @@ class TestEntry(unittest.TestCase):
         self.assertEquals(entry.data.confidence, 100)
         logging.debug("activity time = %s, written at %s (%s)" % 
             (entry.data.ts, entry.metadata.write_ts, entry.metadata.write_fmt_time))
+
+    def testWrapTrip(self):
+        testTripJSON = {
+            '_id': bo.ObjectId("55d8c47b7d65cb39ee983c2d"),
+            'start_ts': 1436826360.200,
+            'start_fmt_time': '2015-07-13 15:26:00.200000-07:00',
+            'end_ts': 1436826360.493,
+            'end_fmt_time': '2015-07-13 15:26:00.493000-07:00',
+            'start_place': bo.ObjectId("55d8c47b7d65cb39ee983c2d"),
+            'end_place': bo.ObjectId("55d8c47b7d65cb39ee983c2d"),
+            'start_loc': {"coordinates": [-122, 37], "type": "Point"},
+            'user_id': UUID('0763de67-f61e-3f5d-90e7-518e69793954')
+        }
+        trip = ecwt.Trip(testTripJSON)
+        self.assertEquals(trip.get_id(), bo.ObjectId("55d8c47b7d65cb39ee983c2d"))
+        self.assertEquals(trip.start_place, bo.ObjectId("55d8c47b7d65cb39ee983c2d"))
+        self.assertEquals(trip.end_place, bo.ObjectId("55d8c47b7d65cb39ee983c2d"))
+        self.assertTrue(isinstance(trip.start_loc, gj.Point))
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)

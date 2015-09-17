@@ -189,6 +189,7 @@ class TestPipeline(unittest.TestCase):
     # I know this from looking at the output for this small dataset
     # self.assertAlmostEqual(self.pipeline.predictedProb[0,0], 0.9, places=3)
     self.assertEqual(self.pipeline.predictedProb[0,0], 1)
+    logging.debug("predicted prob = %s" % self.pipeline.predictedProb)
     self.assertTrue(round(self.pipeline.predictedProb[0,1],2) == 0 or 
         round(self.pipeline.predictedProb[0,1],2) == 0.1)
     self.assertTrue(round(self.pipeline.predictedProb[1,0],2) == 0 or

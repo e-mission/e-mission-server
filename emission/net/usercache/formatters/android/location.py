@@ -23,7 +23,7 @@ def format(entry):
 def format_location_raw(entry):
     formatted_entry = ad.AttrDict()
     formatted_entry["_id"] = entry["_id"]
-    formatted_entry.uuid = entry.user_id
+    formatted_entry.user_id = entry.user_id
 
     metadata = entry.metadata
     metadata.time_zone = "America/Los_Angeles"
@@ -49,7 +49,7 @@ def format_location_raw(entry):
 def format_location_simple(entry):
     formatted_entry = ad.AttrDict()
     formatted_entry["_id"] = entry["_id"]
-    formatted_entry.uuid = entry.user_id
+    formatted_entry.user_id = entry.user_id
 
     metadata = entry.metadata
     if "time_zone" not in metadata:

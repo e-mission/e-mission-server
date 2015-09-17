@@ -22,7 +22,7 @@ transition_map = {
 def format(entry):
     formatted_entry = ad.AttrDict()
     formatted_entry["_id"] = entry["_id"]
-    formatted_entry.uuid = entry.user_id
+    formatted_entry.user_id = entry.user_id
     
     m = entry.metadata
     if "time_zone" not in m:
