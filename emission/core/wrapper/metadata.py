@@ -14,6 +14,7 @@ class Metadata(ecwb.WrapperBase):
 
   enums = {}
   geojson = []
+  nullable = []
 
   def _populateDependencies(self):
     pass

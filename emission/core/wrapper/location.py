@@ -19,6 +19,7 @@ class Location(ecwb.WrapperBase):
              "floor": ecwb.WrapperBase.Access.RO}      # floor in a building that point is in (only iOS)
     enums = {}
     geojson = ["loc"]
+    nullable = []
 
     def _populateDependencies(self):
         pass

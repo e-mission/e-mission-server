@@ -9,6 +9,7 @@ class Entry(ecwb.WrapperBase):
 
   enums = {}
   geojson = []
+  nullable = []
 
   def _populateDependencies(self):
     # logging.debug("self = %s" % self)
