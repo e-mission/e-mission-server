@@ -26,6 +26,7 @@ class TestWrapper(ecwb.WrapperBase):
 
     enums = {'a': TestEnum, 'b': TestEnum, 'write_a': TestEnum}
     geojson = []
+    nullable = ["unset"]
 
     def _populateDependencies(self):
         # Add new properties called "invalid" and "valid" 
@@ -111,6 +112,14 @@ class TestBase(unittest.TestCase):
         # attempt to change it causes an exception
         with self.assertRaisesRegexp(AttributeError, ".*read-only.*"):
             test_tw.unset = 5
+
+    def testNullable(self):
+        test_tw = TestWrapper({'a': 1, 'c': 3})
+        # this is nullable, so returns none if it is not set
+        self.assertIsNone(test_tw.unset)
+        # this is not nullable, so throws if not set
+        with self.assertRaisesRegexp(AttributeError, ".*has no attribute.*"):
+            print("the value of b is %s" % test_tw.b)
 
     # The nested classes are hard to test because they load the wrappers automatically
     # from the wrapper directory, and so in order to test them, we either need to:

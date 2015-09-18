@@ -31,7 +31,6 @@ class WrapperBase(ad.AttrDict):
   """
   Access = enum.Enum("PropertyAccess", "RO RW WORM")
 
-
   def __init__(self, *args, **kwargs):
     super(WrapperBase, self).__init__(*args, **kwargs)
     self._populateDependencies()
@@ -55,11 +54,14 @@ class WrapperBase(ad.AttrDict):
         # This code is copied from the base Attr code.
         # This allows us to pass the key into _build as well instead of only the value
         if key not in self or not self._valid_name(key):
-            raise AttributeError(
-                "'{cls}' instance has no attribute '{name}'".format(
-                    cls=self.__class__.__name__, name=key
+            if key in self.nullable:
+                return None
+            else:
+                raise AttributeError(
+                    "'{cls}' instance has no attribute '{name}'".format(
+                        cls=self.__class__.__name__, name=key
+                    )
                 )
-            )
         # logging.debug("Returning self._build")
         return self._build(key, self[key])
     else:

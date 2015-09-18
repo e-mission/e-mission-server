@@ -21,9 +21,3 @@ class Place(ecwb.WrapperBase):
     def _populateDependencies(self):
         pass
 
-    def __getattr__(self, key):
-        # TODO: If this is a recurring pattern, might want to support a "nullable" list as well
-        if (key in self.nullable) and (key not in self):
-            return None
-        else:
-            return super(Place, self).__getattr__(key)
