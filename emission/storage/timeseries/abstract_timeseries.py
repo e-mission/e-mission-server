@@ -2,12 +2,12 @@ import logging
 
 class TimeSeries(object):
     @staticmethod
-    def get_time_series(uuid):
+    def get_time_series(user_id):
         import emission.storage.timeseries.builtin_timeseries as bits
-        return bits.BuiltinTimeSeries(uuid)
+        return bits.BuiltinTimeSeries(user_id)
 
-    def __init__(self, uuid):
-        self.uuid = uuid
+    def __init__(self, user_id):
+        self.user_id = user_id
 
     @staticmethod
     def get_uuid_list():
@@ -18,6 +18,9 @@ class TimeSeries(object):
         """
         Find the entries for the specified time query
         """
+        pass
+
+    def get_entry_at_ts(self, key, ts_key, ts):
         pass
 
     def get_data_df(self, key, time_query = None):
