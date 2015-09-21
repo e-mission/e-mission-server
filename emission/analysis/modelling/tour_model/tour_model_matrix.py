@@ -1,6 +1,7 @@
 # Our imports
 import emission.simulation.markov_model_counter as esmmc
 from emission.core.our_geocoder import Geocoder
+import emission.core.get_database as edb
 
 # Standard imports
 import numpy as np
@@ -67,7 +68,26 @@ class Commute(object):
     def __eq__(self, other):
         return (self.starting_point == other.starting_point) and (self.ending_point == other.ending_point)
 
+    def __ne__(self, other):
+        return not self == other
 
+    def _save_to_db(self):
+        db = edb.get_commute_db()
+        loc_list = [self.starting_point.name, self.ending_point.name]
+        trip_list = [trip._id for trip in self.trips]
+        str_array = np.array_str(self.probabilities)
+        db.insert({"tm" : self.starting_point.tm.get_id(), "loc_list" : loc_list, "trip_list" : trip_list, 'probs' : str_array})
+
+    @classmethod
+    def build_from_json(cls, jsn_object):
+        tm_id = jsn_object['tm']
+        sp_name, ep_name = jsn_object['loc_list'][0], jsn_object['loc_list'][1]
+        probs = jsn_object['probs']
+        start = Location.build_from_json(sp_name, tm_id)
+        end = Location.build_from_json(ep_name, tm_id)
+        com = Commute(starting_point, ending_point)
+        com.probabilities = np.array(np.mat(probs))
+        return com
 
 class Location(object):
 
@@ -130,6 +150,9 @@ class Location(object):
                 count += 1
         return count
 
+    def add_to_successors(self, successor):
+        self.successors.add(successor)
+
     @classmethod
     def make_lookup_key(cls, name):
         return "At Location %s" % name 
@@ -148,6 +171,19 @@ class Location(object):
     def __str__(self):
         return str(self.name)
 
+    def _save_to_db(self):
+        db = edb.get_location_db()
+        db.insert({"name" : self.name, "rep_coords" : coord_list(self.rep_coords), "tm" : self.tm.get_id()})
+
+    @classmethod
+    def build_from_json(cls, jsn_object, tour_model):
+        print jsn_object
+        name = jsn_object['name']
+        rep_coords = jsn_object['rep_coords']
+        loc = Location(name, tour_model)
+        loc.rep_coords = rep_coords
+        return loc
+
 class TourModel(object):
 
     """ 
@@ -156,12 +192,16 @@ class TourModel(object):
     
     """
 
-    def __init__(self, user, day, time):
+    def __init__(self, user, time):
         self.user = user
         self.edges = { }
         self.locs = { }
         self.min_of_each_day = [0]*DAYS_IN_WEEK  ## Stores (location, hour) pairs as a way to find the day's starting point
         self.time = time
+        self.orig_time = time
+
+    def get_id(self):
+        return self.user
 
     def get_top_trips(self, n):
         # sort edges by weight 
@@ -264,6 +304,29 @@ class TourModel(object):
         plt.show()
 
 
+    def save_to_db(self):
+        db = edb.get_tm_db()
+        for loc in self.locs.itervalues():
+            loc._save_to_db()
+        for com in self.edges.itervalues():
+            com._save_to_db()
+        db.insert({"tm" : self.get_id(), "time" : self.time})
+
+    def __eq__(self, other):
+        for a in self.edges.iteritems():
+            if a not in other.edges.items():
+                return False
+        for b in self.locs.iteritems():
+            if b not in other.edges.items():
+                return False
+        if len(self.edges.items()) != len(other.edges.items()):
+            return False
+        return len(self.locs.items()) == len(other.locs.items())
+
+    def __ne__(self, other):
+        return not self == other
+
+
 class NoData(object):
 
     """ A class that represent a derth of data for a day """
@@ -276,7 +339,6 @@ class NoData(object):
 
     def __len__(self):
         return 0
-
 
 ## These are utility functions
 

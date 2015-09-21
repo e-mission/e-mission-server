@@ -7,8 +7,8 @@ import datetime
 from emission.analysis.modelling.tour_model.tour_model_matrix import Commute, TourModel, Location
 from emission.core.wrapper.trip import Coordinate, Trip
 from emission.simulation.trip_gen import create_fake_trips
-from emission.analysis.modelling.tour_model.create_tour_model_matrix import create_tour_model_from_cluster_data, generate_new_tour_model_from_tour_model
-from emission.core.get_database import get_trip_db
+from emission.analysis.modelling.tour_model.create_tour_model_matrix import create_tour_model_from_cluster_data, generate_new_tour_model_from_tour_model, create_tour_model_from_fake_data, build_tm_from_db
+import emission.core.get_database as edb
 import emission.analysis.modelling.tour_model.cluster_pipeline as eamtcp
 
 
@@ -16,7 +16,7 @@ class TestTourModel(unittest.TestCase):
 
     def setUp(self):
         time = datetime.datetime(2015, 4, 20, 0, 0, 0)
-        self.our_tm = TourModel("test_user", 0, time)
+        self.our_tm = TourModel("test_user", time)
         self.home = Location('home', self.our_tm)
         self.work = Location('work', self.our_tm)
         self.commute = Commute(self.home, self.work)
@@ -133,22 +133,63 @@ class TestTourModel(unittest.TestCase):
 
     def testCreationFromFakeData(self):
         # This is mostly just a sanity check
-        db = get_trip_db()
-        db.remove()
-        create_fake_trips()
-        list_of_cluster_data = eamtcp.main()
-        self.tm_from_fake_data = create_tour_model_from_cluster_data('test_user', list_of_cluster_data)
+        self.tm_from_fake_data = create_tour_model_from_fake_data("fake_person")
         self.assertEquals(len(self.tm_from_fake_data.get_top_trips(2)), 2)
         tour = self.tm_from_fake_data.build_tour_model()
         self.assertEquals(len(tour), 7)
 
+
+    def test_equality(self):
+        dummy_trip0 = Trip(0, 0, 0, 0, 0, 0, self.home.rep_coords, self.work.rep_coords)
+        dummy_trip1 = Trip(0, 0, 0, 0, 0, 1, self.home.rep_coords, self.work.rep_coords)
+        dummy_trip2 = Trip(0, 0, 0, 0, 0, 2, self.home.rep_coords, self.work.rep_coords)
+        self.commute.add_trip(dummy_trip0)
+        self.commute.add_trip(dummy_trip1)
+        self.commute.add_trip(dummy_trip2)
+
+        coffee = Location('coffee', self.our_tm)
+        tea = Location('tea', self.our_tm)
+        dummy_trip3 = Trip(0, 0, 0, 0, 0, 3, coffee.rep_coords, tea.rep_coords)
+        self.our_tm.add_location(coffee, Coordinate(4, 20))
+        self.our_tm.add_location(tea, Coordinate(6, 9))
+        commute2 = Commute(coffee, tea)
+        commute2.add_trip(dummy_trip3)
+        self.our_tm.add_edge(commute2)
+
+        cheeseboard = Location('cheeseboard', self.our_tm)
+        sliver = Location('sliver', self.our_tm)
+        commute3 = Commute(cheeseboard, sliver)
+        self.our_tm.add_location(cheeseboard, Coordinate(0, 0))
+        self.our_tm.add_location(sliver, Coordinate(0, 0))
+        self.our_tm.add_edge(commute3)
+
+        self.assertTrue(self.our_tm == self.our_tm)
+
+    def test_commute_store(self):
+        db = edb.get_commute_db()
+        self.commute._save_to_db()
+        same_commute_json = db.find_one({"tm" : self.our_tm.get_id()})
+        same_commute = Commute.build_from_json(same_commute_json)
+        self.assertTrue(self.commute == same_commute)
+
+    def test_loc_store(self):
+        db = edb.get_location_db()
+        self.home._save_to_db()
+        same_home_json = db.find_one({"tm" : self.our_tm.get_id()})
+        same_home = Location.build_from_json(same_home_json, self.our_tm)
+        self.assertTrue(self.home == same_home)
+
+    def test_tm_store(self):
+        self.our_tm.save_to_db()
+        new_tm = build_tm_from_db(self.our_tm.get_id())
+        self.assertTrue(new_tm == self.our_tm)
+
     def testSelfEatingLoop(self):        
-        db = get_trip_db()
+        db = edb.get_trip_db()
         db.remove()
         create_fake_trips()
         list_of_cluster_data = eamtcp.main()
         self.tm_from_fake_data = create_tour_model_from_cluster_data('test_user', list_of_cluster_data)
-
         tm2 = generate_new_tour_model_from_tour_model(self.tm_from_fake_data, "fake", 10)
 
         print "new is %s" % tm2.locs

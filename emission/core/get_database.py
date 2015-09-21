@@ -143,3 +143,18 @@ def get_fake_sections_db():
     current_db = MongoClient().Stage_database
     FakeSections = current_db.Stage_fake_sections
     return FakeSections
+
+def get_commute_db():
+    current_db = MongoClient().Stage_database
+    Commutes = current_db.Stage_commutes
+    return Commutes
+
+def get_location_db():
+    current_db = MongoClient().Stage_database
+    Locations = current_db.Stage_locations
+    return Locations
+
+def get_tm_db():
+    current_db = MongoClient().Stage_database
+    tms = current_db.Stage_tms
+    return tms

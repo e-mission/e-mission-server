@@ -63,7 +63,7 @@ class Creator:
             to_add = ( starting_point, ending_point )
             self.a_to_b.append(to_add)
 
-    def get_trips_from_a_to_b(self):
+    def get_trips_from_a_to_b(self, user_id):
         curr_time = datetime.datetime.now()
         curr_month = curr_time.month
         curr_year = curr_time.year
@@ -77,9 +77,9 @@ class Creator:
                 self.prog_bar += "."
                 print self.prog_bar
                 rand_trip_id = random.random()
-                rand_user_id = random.random()
+                rand_user_id = user_id if user_id else random.random()
                 otp_trip = OTP(t[0], t[1], mode, write_day(curr_month, curr_day, curr_year), write_time(curr_hour, curr_minute), True)
-                alt_trip = otp_trip.turn_into_trip("%f%f" % (rand_user_id, rand_trip_id), rand_user_id, rand_trip_id, True)   ## ids
+                alt_trip = otp_trip.turn_into_trip("%s%s" % (rand_user_id, rand_trip_id), rand_user_id, rand_trip_id, True)   ## ids
                 save_trip_to_db(alt_trip)
             except PathNotFoundException:
                 print "path not found"
@@ -148,13 +148,13 @@ def write_day(month, day, year):
 def write_time(hour, minute):
     return "%s:%s" % (hour, minute) 
 
-def create_fake_trips():
+def create_fake_trips(user_name=None):
     ### This is the main function, its the only thing you need to run
     my_creator = Creator()
     my_creator.set_up()
     my_creator.get_starting_ending_points()
     my_creator.make_a_to_b()
-    my_creator.get_trips_from_a_to_b()
+    my_creator.get_trips_from_a_to_b(user_name)
     return my_creator
 
 if __name__ == "__main__":

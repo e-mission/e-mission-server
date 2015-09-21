@@ -1,7 +1,16 @@
 ### Tour Model Guide
 
-In order to make a tour model from a user's e-mission location data, put all of the data in your mongodb, and then run 'python create_tour_model_matrix.py [UUID]'.
+* In order to make a tour model from a user's e-mission location data, put all of the data in your mongodb, and then run 'python create_tour_model_matrix.py [UUID]'. 
 
+* To create a tour model from fake data run 'python create_tour_model_matrix.py --fake [fake_username]'
+
+* To simulate more tour models from your created tour models, run the following code:
+
+''' python
+>>> NUM_ITERATION = 10 ## number of times you want tour model simulation to be run
+>>> orig_tm = make_tour_model_for_user(desired_user_name)
+>>> generate_new_tour_model_from_tour_model(new_user_name, orig_tm, NUM_ITERATIONS)
+'''
 # The program is described below and illustrated in the flowchart at the bottom of the page.
 
 * Data is either generated for a fake user using a utility model defined in input.json, or real e-mission location data is taken from the database. These different types of data end up in the same format and are indistinguishable to the cluserting pipeline.
