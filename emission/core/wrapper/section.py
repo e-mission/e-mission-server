@@ -17,6 +17,7 @@ class Section(ecwb.WrapperBase):
              "end_loc": ecwb.WrapperBase.Access.WORM,      # location of end point in geojson format
              "duration": ecwb.WrapperBase.Access.WORM,     # duration of the trip in secs
              "distance": ecwb.WrapperBase.Access.WORM,     # distance of the trip in meters
+             "sensed_mode": ecwb.WrapperBase.Access.WORM,  # the sensed mode used for the segmentation
              "source": ecwb.WrapperBase.Access.WORM}       # the method used to generate this trip
 
     enums = {}
