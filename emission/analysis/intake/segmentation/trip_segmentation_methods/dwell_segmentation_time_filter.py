@@ -1,4 +1,5 @@
 # Standard imports
+import logging
 import attrdict as ad
 import numpy as np
 import datetime as pydt
@@ -57,9 +58,9 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         for idx, row in filtered_points_df.iterrows():
             currPoint = ad.AttrDict(row)
             currPoint.update({"idx": idx})
-            print "-" * 30 + str(currPoint.fmt_time) + "-" * 30
+            logging.debug("-" * 30 + str(currPoint.fmt_time) + "-" * 30)
             if curr_trip_start_point is None:
-                print "Appending currPoint because the current start point is None"
+                logging.debug("Appending currPoint because the current start point is None")
                 # segmentation_points.append(currPoint)
 
             if just_ended:
@@ -74,15 +75,16 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                 # points that are within the distance filter, and are at a
                 # delta of 30 secs, and ignore them instead of using them to
                 # start the new trip
-                prev_point = filtered_points_df.iloc[idx - 1]
-                print("Comparing with prev_point = %s" % prev_point)
+                prev_point = ad.AttrDict(filtered_points_df.iloc[idx - 1])
+                logging.debug("Comparing with prev_point = %s" % prev_point)
                 if pf.calDistance(prev_point, currPoint) < self.distance_threshold and \
                     currPoint.ts - prev_point.ts <= 60:
-                    print("Points %s and %s are within the distance filter and only 1 min apart so part of the same trip" % (prev_point, currPoint))
+                    logging.info("Points %s and %s are within the distance filter and only 1 min apart so part of the same trip" %
+                                 (prev_point, currPoint))
                     continue
                 # else: 
                 sel_point = currPoint
-                print("Setting new trip start point %s with idx %s" % (sel_point, sel_point.idx))
+                logging.debug("Setting new trip start point %s with idx %s" % (sel_point, sel_point.idx))
                 curr_trip_start_point = sel_point
                 just_ended = False
                 
@@ -99,30 +101,30 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             last10Points_df = filtered_points_df.iloc[max(idx-self.point_threshold, curr_trip_start_point.idx):idx+1]
             distanceToLast = lambda(row): pf.calDistance(ad.AttrDict(row), currPoint)
             last5MinsDistances = last5MinsPoints_df.apply(distanceToLast, axis=1)
-            print "last5MinsDistances = %s with length %d" % (last5MinsDistances.as_matrix(), len(last5MinsDistances))
+            logging.debug("last5MinsDistances = %s with length %d" % (last5MinsDistances.as_matrix(), len(last5MinsDistances)))
             last10PointsDistances = last10Points_df.apply(distanceToLast, axis=1)
-            print "last10PointsDistances = %s with length %d, shape %s" % (last10PointsDistances.as_matrix(),
+            logging.debug("last10PointsDistances = %s with length %d, shape %s" % (last10PointsDistances.as_matrix(),
                                                                            len(last10PointsDistances),
-                                                                           last10PointsDistances.shape)
+                                                                           last10PointsDistances.shape))
             
-            print("len(last10PointsDistances) = %d, len(last5MinsDistances) = %d" %
+            logging.debug("len(last10PointsDistances) = %d, len(last5MinsDistances) = %d" %
                   (len(last10PointsDistances), len(last5MinsDistances)))
             if (len(last10PointsDistances) < self.point_threshold - 1 or len(last5MinsDistances) == 0):
-                print "Too few points to make a decision, continuing"
+                logging.debug("Too few points to make a decision, continuing")
             else:
-                print("last5MinsDistances.max() = %s, last10PointsDistance.max() = %s" %
+                logging.debug("last5MinsDistances.max() = %s, last10PointsDistance.max() = %s" %
                   (last5MinsDistances.max(), last10PointsDistances.max()))
                 if (last5MinsDistances.max() < self.distance_threshold and 
                     last10PointsDistances.max() < self.distance_threshold):
                     last_trip_end_index = int(min(np.median(last5MinsPoints_df.index),
                                                np.median(last10Points_df.index)))
-                    print("last5MinPoints.median = %s (%s), last10Points_df = %s (%s), sel index = %s" %
+                    logging.debug("last5MinPoints.median = %s (%s), last10Points_df = %s (%s), sel index = %s" %
                         (np.median(last5MinsPoints_df.index), last5MinsPoints_df.index,
                          np.median(last10Points_df.index), last10Points_df.index,
                          last_trip_end_index))
                     last_trip_end_point_row = filtered_points_df.iloc[last_trip_end_index]
                     last_trip_end_point = ad.AttrDict(filtered_points_df.iloc[last_trip_end_index])
-                    print("Appending last_trip_end_point %s with index %s " % 
+                    logging.debug("Appending last_trip_end_point %s with index %s " %
                         (last_trip_end_point, last_trip_end_point_row.name))
                     segmentation_points.append((curr_trip_start_point, last_trip_end_point))
                     print "Found trip end at %s" % last_trip_end_point.fmt_time

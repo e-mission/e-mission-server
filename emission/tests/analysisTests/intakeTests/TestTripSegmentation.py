@@ -71,6 +71,18 @@ class TestTripSegmentation(unittest.TestCase):
         self.assertEqual(len(created_places), 8)
         self.assertEqual(len(created_trips), 8)
 
+        # Pick the first two trips and the first place and ensure that they are all linked correctly
+        # Note that this is the first place, not the second place because the true first place will not
+        # be retrieved by the query, as shown above
+        trip0 = created_trips[0]
+        trip1 = created_trips[1]
+        place0 = created_places[0]
+
+        self.assertEqual(trip0.end_place, place0.get_id())
+        self.assertEqual(trip1.start_place, place0.get_id())
+        self.assertEqual(place0.ending_trip, trip0.get_id())
+        self.assertEqual(place0.starting_trip, trip1.get_id())
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     unittest.main()
