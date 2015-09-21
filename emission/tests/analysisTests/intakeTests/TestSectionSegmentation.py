@@ -4,6 +4,7 @@ import datetime as pydt
 import logging
 import uuid
 import json
+import pymongo
 
 # Our imports
 import emission.core.get_database as edb
@@ -23,16 +24,31 @@ import emission.storage.decorations.section_queries as esds
 
 class TestTripSegmentation(unittest.TestCase):
     def setUp(self):
+        self.clearRelatedDb()
+        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
         self.entries = json.load(open("emission/tests/data/my_data_jul_22.txt"))
         self.testUUID = uuid.uuid4()
         for entry in self.entries:
             entry["user_id"] = self.testUUID
+            # print "Saving entry with write_ts = %s and ts = %s" % (entry["metadata"]["write_fmt_time"],
+            #                                                        entry["data"]["fmt_time"])
             edb.get_timeseries_db().save(entry)
+        logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
+        logging.debug("First few entries = %s" % [e["data"]["fmt_time"] for e in
+                                                  list(edb.get_timeseries_db().find().sort("data.write_ts",
+                                                                                           pymongo.ASCENDING).limit(10))])
 
     def tearDown(self):
-        edb.get_timeseries_db().remove({"user_id": self.testUUID}) 
-        edb.get_place_db().remove() 
-        edb.get_trip_new_db().remove() 
+        self.clearRelatedDb()
+
+    def clearRelatedDb(self):
+        edb.get_timeseries_db().remove()
+        edb.get_place_db().remove()
+        edb.get_stop_db().remove()
+
+        edb.get_trip_new_db().remove()
+        edb.get_section_new_db().remove()
+
         
     def testSegmentationPointsSmoothedHighConfidenceMotion(self):
         ts = esta.TimeSeries.get_time_series(self.testUUID)
@@ -114,13 +130,12 @@ class TestTripSegmentation(unittest.TestCase):
 
     def testSegmentationWrapperWithAutoTrip(self):
         eaist.segment_current_trips(self.testUUID)
+        eaiss.segment_current_sections(self.testUUID)
 
         tq_trip = enua.UserCache.TimeQuery("start_ts", 1440658800, 1440745200)
         created_trips = esdt.get_trips(self.testUUID, tq_trip)
 
         for i, trip in enumerate(created_trips):
-            eaiss.segment_trip_into_sections(self.testUUID, trip.get_id())
-
             created_stops = esdt.get_stops_for_trip(self.testUUID, trip.get_id())
             created_sections = esdt.get_sections_for_trip(self.testUUID, trip.get_id())
 
@@ -144,5 +159,5 @@ class TestTripSegmentation(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
     unittest.main()

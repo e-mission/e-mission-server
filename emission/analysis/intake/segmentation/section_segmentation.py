@@ -2,6 +2,7 @@
 import logging
 
 # Our imports
+import emission.storage.pipeline_queries as epq
 import emission.storage.decorations.trip_queries as esdt
 import emission.storage.decorations.section_queries as esds
 import emission.storage.decorations.stop_queries as esdst
@@ -32,6 +33,16 @@ class SectionSegmentationMethod(object):
         """
         pass
 
+def segment_current_sections(user_id):
+    time_query = epq.get_time_range_for_sectioning(user_id)
+    try:
+        trips_to_process = esdt.get_trips(user_id, time_query)
+        for trip in trips_to_process:
+            logging.info("+" * 20 + ("Processing trip %s for user %s" % (trip.get_id(), user_id)) + "+" * 20)
+            segment_trip_into_sections(user_id, trip.get_id())
+        epq.mark_sectioning_done(user_id)
+    except:
+        epq.mark_sectioning_failed(user_id)
 
 def segment_trip_into_sections(user_id, trip_id):
     ts = esta.TimeSeries.get_time_series(user_id)

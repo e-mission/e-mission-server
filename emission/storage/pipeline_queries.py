@@ -18,6 +18,35 @@ def mark_segmentation_done(user_id):
 def mark_segmentation_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.TRIP_SEGMENTATION)
 
+def get_time_range_for_sectioning(user_id):
+    # Returns the time range for the trips that have not yet been converted into sections.
+    # Note that this is a query against the trip database, so we cannot search using the
+    # "write_ts" query. Instead, we change the query to be against the trip's end_ts
+    tq = get_time_range_for_stage(user_id, ps.PipelineStages.SECTION_SEGMENTATION)
+    tq.timeType = "end_ts"
+    return tq
+
+def mark_sectioning_done(user_id):
+    mark_stage_done(user_id, ps.PipelineStages.SECTION_SEGMENTATION)
+
+def mark_sectioning_failed(user_id):
+    mark_stage_failed(user_id, ps.PipelineStages.SECTION_SEGMENTATION)
+
+def get_time_range_for_smoothing(user_id):
+    # Returns the time range for the trips that have not yet been converted into sections.
+    # Note that this is a query against the trip database, so we cannot search using the
+    # "write_ts" query. Instead, we change the query to be against the trip's end_ts
+    tq = get_time_range_for_stage(user_id, ps.PipelineStages.JUMP_SMOOTHING)
+    tq.timeType = "end_ts"
+    return tq
+
+def mark_smoothing_done(user_id):
+    mark_stage_done(user_id, ps.PipelineStages.JUMP_SMOOTHING)
+
+def mark_smoothing_failed(user_id):
+    mark_stage_failed(user_id, ps.PipelineStages.JUMP_SMOOTHING)
+
+
 def mark_stage_done(user_id, stage):
     # We move failed entries to the error timeseries. So usercache runs never fail.
     curr_state = get_current_state(user_id, stage)
