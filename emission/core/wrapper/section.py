@@ -1,5 +1,6 @@
 import logging
 import emission.core.wrapper.wrapperbase as ecwb
+import emission.core.wrapper.motionactivity as ecwm
 
 # TODO: Figure out whether we should parse the geojson back to a geojson object
 
@@ -20,7 +21,7 @@ class Section(ecwb.WrapperBase):
              "sensed_mode": ecwb.WrapperBase.Access.WORM,  # the sensed mode used for the segmentation
              "source": ecwb.WrapperBase.Access.WORM}       # the method used to generate this trip
 
-    enums = {}
+    enums = {"sensed_mode", ecwm.MotionTypes}
     geojson = ["start_loc", "end_loc"]
     nullable = ["start_stop", "end_stop"]
 
