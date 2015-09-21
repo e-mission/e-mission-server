@@ -30,6 +30,12 @@ class TestTimeSeries(unittest.TestCase):
         tq = enua.UserCache.TimeQuery("write_ts", 1440658800, 1440745200)
         self.assertEqual(len(list(ts.find_entries(time_query = tq))), len(self.entries))
 
+    def testGetEntryAtTs(self):
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        entry_doc = ts.get_entry_at_ts("background/filtered_location", "data.ts", 1440688739.672)
+        self.assertEqual(entry_doc["data"]["latitude"], 37.393415)
+        self.assertEqual(entry_doc["data"]["accuracy"], 43.5)
+
     def testGetDataDf(self):
         ts = esta.TimeSeries.get_time_series(self.testUUID)
         tq = enua.UserCache.TimeQuery("write_ts", 1440658800, 1440745200)

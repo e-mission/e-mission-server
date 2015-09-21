@@ -5,8 +5,8 @@ import emission.core.get_database as edb
 import emission.storage.timeseries.abstract_timeseries as esta
 
 class BuiltinTimeSeries(esta.TimeSeries):
-    def __init__(self, uuid):
-        super(BuiltinTimeSeries, self).__init__(uuid)
+    def __init__(self, user_id):
+        super(BuiltinTimeSeries, self).__init__(user_id)
         self.key_query = lambda(key): {"metadata.key": key}
         self.ts_query = lambda(tq): {"$and": [{"metadata.%s" % tq.timeType: {"$gte": tq.startTs}},
                 {"metadata.%s" % tq.timeType: {"$lte": tq.endTs}}]}
@@ -17,7 +17,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
         return edb.get_timeseries_db().distinct("user_id")
 
     def _get_query(self, key_list = None, time_query = None):
-        ret_query = {'user_id': self.uuid} # UUID is mandatory
+        ret_query = {'user_id': self.user_id} # UUID is mandatory
         if key_list is not None and len(key_list) > 0:
             key_query_list = []
             for key in key_list:
@@ -34,6 +34,11 @@ class BuiltinTimeSeries(esta.TimeSeries):
     def find_entries(self, key_list = None, time_query = None):
         return edb.get_timeseries_db().find(self._get_query(key_list, time_query))
 
+    def get_entry_at_ts(self, key, ts_key, ts):
+        return edb.get_timeseries_db().find_one({"user_id": self.user_id,
+                                                 "metadata.key": key,
+                                                 ts_key: ts})
+
     def get_data_df(self, key, time_query = None):
         result_it = edb.get_timeseries_db().find(self._get_query([key], time_query), {"data": True})
         # Dataframe doesn't like to work off an iterator - it wants everything in memory
@@ -44,9 +49,9 @@ class BuiltinTimeSeries(esta.TimeSeries):
         """
         logging.debug("insert called")
         if "user_id" not in entry:
-            entry["user_id"] = self.uuid
-        elif entry["user_id"] != self.uuid:
-            raise AttributeError("Saving entry for %s in timeseries for %s" % (entry["user_id"], self.uuid))
+            entry["user_id"] = self.user_id
+        elif entry["user_id"] != self.user_id:
+            raise AttributeError("Saving entry for %s in timeseries for %s" % (entry["user_id"], self.user_id))
         else:
             logging.debug("entry was fine, no need to fix it")
 
@@ -58,9 +63,9 @@ class BuiltinTimeSeries(esta.TimeSeries):
         """
         logging.debug("insert_error called")
         if "user_id" not in entry:
-            entry["user_id"] = self.uuid
-        elif entry["user_id"] != self.uuid:
-            raise AttributeError("Saving entry for %s in timeseries for %s" % (entry["user_id"], self.uuid))
+            entry["user_id"] = self.user_id
+        elif entry["user_id"] != self.user_id:
+            raise AttributeError("Saving entry for %s in timeseries for %s" % (entry["user_id"], self.user_id))
         else:
             logging.debug("entry was fine, no need to fix it")
 
