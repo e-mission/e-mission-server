@@ -7,8 +7,8 @@ import numpy as np
 
 # Our imports
 from emission.core.get_database import get_section_db
-import emission.analysis.intake.cleaning.jump_smoothing as cjs
-import emission.analysis.intake.cleaning.speed_outlier_detection as cso
+import emission.analysis.intake.cleaning.cleaning_methods.jump_smoothing as cjs
+import emission.analysis.intake.cleaning.cleaning_methods.speed_outlier_detection as cso
 import emission.analysis.intake.cleaning.location_smoothing as ls
 import emission.storage.compat.convert_moves_style_data as cmsd
 
