@@ -1,5 +1,6 @@
 import logging
 import pandas as pd
+import pymongo
 
 import emission.core.get_database as edb
 import emission.storage.timeseries.abstract_timeseries as esta
@@ -28,11 +29,20 @@ class BuiltinTimeSeries(esta.TimeSeries):
         return ret_query
 
     @staticmethod
+    def _get_sort_key(time_query = None):
+        if time_query is None:
+            return "metadata.write_ts"
+        else:
+            return "metadata.%s" % time_query.timeType
+
+    @staticmethod
     def _to_df_entry(entry):
         return entry["data"]
 
     def find_entries(self, key_list = None, time_query = None):
-        return edb.get_timeseries_db().find(self._get_query(key_list, time_query))
+        sort_key = self._get_sort_key(time_query)
+        logging.debug("sort_key = %s" % sort_key)
+        return edb.get_timeseries_db().find(self._get_query(key_list, time_query)).sort(sort_key, pymongo.ASCENDING)
 
     def get_entry_at_ts(self, key, ts_key, ts):
         return edb.get_timeseries_db().find_one({"user_id": self.user_id,
@@ -40,7 +50,10 @@ class BuiltinTimeSeries(esta.TimeSeries):
                                                  ts_key: ts})
 
     def get_data_df(self, key, time_query = None):
-        result_it = edb.get_timeseries_db().find(self._get_query([key], time_query), {"data": True})
+        sort_key = self._get_sort_key(time_query)
+        logging.debug("sort_key = %s" % sort_key)
+        result_it = edb.get_timeseries_db().find(self._get_query([key], time_query), {"data": True})\
+                                            .sort(sort_key, pymongo.ASCENDING)
         # Dataframe doesn't like to work off an iterator - it wants everything in memory
         return pd.DataFrame([BuiltinTimeSeries._to_df_entry(e) for e in list(result_it)])
 

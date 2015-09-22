@@ -1,4 +1,5 @@
 import logging
+import pymongo
 
 import emission.core.get_database as edb
 import emission.core.wrapper.section as ecws
@@ -20,18 +21,18 @@ def _get_ts_query(tq):
 def get_sections(user_id, time_query):
     curr_query = _get_ts_query(time_query)
     curr_query.update({"user_id": user_id})
-    return _get_sections_for_query(curr_query)
+    return _get_sections_for_query(curr_query, time_query.timeType)
 
 def get_sections_for_trip(user_id, trip_id):
     curr_query = {"user_id": user_id, "trip_id": trip_id}
-    return _get_sections_for_query(curr_query)
+    return _get_sections_for_query(curr_query, "start_ts")
 
 def get_sections_for_trip_list(user_id, trip_list):
     curr_query = {"user_id": user_id, "trip_id": {"$in": trip_list}}
-    return _get_sections_for_query(curr_query)
+    return _get_sections_for_query(curr_query, "start_ts")
 
-def _get_sections_for_query(section_query):
+def _get_sections_for_query(section_query, sort_field):
     logging.debug("Returning sections for query %s" % section_query)
-    section_doc_cursor = edb.get_section_new_db().find(section_query)
+    section_doc_cursor = edb.get_section_new_db().find(section_query).sort(sort_field, pymongo.ASCENDING)
     # TODO: Fix "TripIterator" and return it instead of this list
     return [ecws.Section(doc) for doc in section_doc_cursor]
