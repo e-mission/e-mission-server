@@ -31,9 +31,9 @@ class TripSegmentationMethod(object):
         """
         pass
 
-def segment_current_trips(uuid):
-    ts = esta.TimeSeries.get_time_series(uuid)
-    time_query = epq.get_time_range_for_segmentation(uuid)
+def segment_current_trips(user_id):
+    ts = esta.TimeSeries.get_time_series(user_id)
+    time_query = epq.get_time_range_for_segmentation(user_id)
 
     import emission.analysis.intake.segmentation.trip_segmentation_methods.dwell_segmentation_time_filter as dstf
     dstfsm = dstf.DwellSegmentationTimeFilter(time_threshold = 5 * 60, # 5 mins
@@ -43,50 +43,57 @@ def segment_current_trips(uuid):
     segmentation_points = dstfsm.segment_into_trips(ts, time_query)
     # Create and store trips and places based on the segmentation points
     if segmentation_points is None:
-        epq.mark_segmentation_failed()
+        epq.mark_segmentation_failed(user_id)
     elif len(segmentation_points) == 0:
         # no new segments, no need to keep looking at these again
-        epq.mark_segmentation_done()
+        epq.mark_segmentation_done(user_id)
     else:
-        # new segments, need to deal with them
-        # First, retrieve the last place so that we can stitch it to the newly created trip.
-        # Again, there are easy and hard. In the easy case, the trip was
-        # continuous, was stopped when the trip end was detected, and there is
-        # no gap between the start of the trip and the last place. But there
-        # can be other issues caused by gaps in tracking. A more detailed
-        # description of dealing with gaps in tracking can be found in the wiki.
-        # Let us first deal with the easy case.
-        # restart_events_df = get_restart_events(ts, time_query)
-        last_place = esdp.get_last_place(uuid)
-        if last_place is None:
-            last_place = start_new_chain(uuid)
-            
-        # if is_easy_case(restart_events_df):
-        # Theoretically, we can do some sanity checks here to make sure
-        # that we are fairly close to the last point. Maybe mark some kind
-        # of confidence level based on that?
-        logging.debug("segmentation_point_list has length %s" % len(segmentation_points))
-        for (start_loc_doc, end_loc_doc) in segmentation_points:
-            logging.debug("start_loc_doc = %s, end_loc_doc = %s" % (start_loc_doc, end_loc_doc))
-            start_loc = ecwl.Location(start_loc_doc)
-            end_loc = ecwl.Location(end_loc_doc)
-            logging.debug("start_loc = %s, end_loc = %s" % (start_loc, end_loc))
+        try:
+            create_places_and_trips(user_id, segmentation_points)
+            epq.mark_segmentation_done(user_id)
+        except:
+            epq.mark_segmentation_failed(user_id)
 
-            # Stitch together the last place and the current trip
-            curr_trip = esdt.create_new_trip(uuid)
-            new_place = esdp.create_new_place(uuid)
+def create_places_and_trips(user_id, segmentation_points):
+    # new segments, need to deal with them
+    # First, retrieve the last place so that we can stitch it to the newly created trip.
+    # Again, there are easy and hard. In the easy case, the trip was
+    # continuous, was stopped when the trip end was detected, and there is
+    # no gap between the start of the trip and the last place. But there
+    # can be other issues caused by gaps in tracking. A more detailed
+    # description of dealing with gaps in tracking can be found in the wiki.
+    # Let us first deal with the easy case.
+    # restart_events_df = get_restart_events(ts, time_query)
+    last_place = esdp.get_last_place(user_id)
+    if last_place is None:
+        last_place = start_new_chain(user_id)
 
-            stitch_together_start(last_place, curr_trip, start_loc)
-            stitch_together_end(new_place, curr_trip, end_loc)
+    # if is_easy_case(restart_events_df):
+    # Theoretically, we can do some sanity checks here to make sure
+    # that we are fairly close to the last point. Maybe mark some kind
+    # of confidence level based on that?
+    logging.debug("segmentation_point_list has length %s" % len(segmentation_points))
+    for (start_loc_doc, end_loc_doc) in segmentation_points:
+        logging.debug("start_loc_doc = %s, end_loc_doc = %s" % (start_loc_doc, end_loc_doc))
+        start_loc = ecwl.Location(start_loc_doc)
+        end_loc = ecwl.Location(end_loc_doc)
+        logging.debug("start_loc = %s, end_loc = %s" % (start_loc, end_loc))
 
-            esdp.save_place(last_place)
-            esdt.save_trip(curr_trip)
+        # Stitch together the last place and the current trip
+        curr_trip = esdt.create_new_trip(user_id)
+        new_place = esdp.create_new_place(user_id)
 
-            last_place = new_place
+        stitch_together_start(last_place, curr_trip, start_loc)
+        stitch_together_end(new_place, curr_trip, end_loc)
 
-        # The last last_place hasn't been stitched together yet, but we
-        # need to save it so that it can be the last_place for the next run
         esdp.save_place(last_place)
+        esdt.save_trip(curr_trip)
+
+        last_place = new_place
+
+    # The last last_place hasn't been stitched together yet, but we
+    # need to save it so that it can be the last_place for the next run
+    esdp.save_place(last_place)
 
 def start_new_chain(uuid):
     """

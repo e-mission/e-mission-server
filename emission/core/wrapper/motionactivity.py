@@ -21,6 +21,7 @@ class Motionactivity(ecwb.WrapperBase):
 
     enums = {"type": MotionTypes}
     geojson = []
+    nullable = []
 
     def _populateDependencies(self):
         pass

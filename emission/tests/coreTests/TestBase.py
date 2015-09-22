@@ -73,6 +73,7 @@ class TestBase(unittest.TestCase):
         self.assertEquals(test_tw.valid, TestEnum.B)
         test_tw.write_a = TestEnum.C
         self.assertEquals(test_tw.write_a, TestEnum.C)
+        self.assertEquals(test_tw["write_a"], 2)
 
     def testSetEnumNegative(self):
         test_tw = TestWrapper({'a': 1, 'c': 3})

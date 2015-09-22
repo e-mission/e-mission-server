@@ -1,4 +1,5 @@
 import logging
+import pymongo
 
 import emission.net.usercache.abstract_usercache as enua
 
@@ -28,7 +29,7 @@ def _get_ts_query(tq):
 def get_trips(user_id, time_query):
     curr_query = _get_ts_query(time_query)
     curr_query.update({"user_id": user_id})
-    trip_doc_cursor = edb.get_trip_new_db().find(_get_ts_query(time_query))
+    trip_doc_cursor = edb.get_trip_new_db().find(_get_ts_query(time_query)).sort(time_query.timeType, pymongo.ASCENDING)
     # TODO: Fix "TripIterator" and return it instead of this list
     return [ecwt.Trip(doc) for doc in trip_doc_cursor]
 
@@ -50,7 +51,7 @@ def get_sections_for_trip(user_id, trip_id):
     """
     Get the set of sections that are children of this trip.
     """
-    section_doc_cursor = edb.get_section_new_db().find({"user_id": user_id, "trip_id": trip_id})
+    section_doc_cursor = edb.get_section_new_db().find({"user_id": user_id, "trip_id": trip_id}).sort("start_ts", pymongo.ASCENDING)
     return [ecws.Section(doc) for doc in section_doc_cursor]
 
 
@@ -58,7 +59,7 @@ def get_stops_for_trip(user_id, trip_id):
     """
     Get the set of sections that are children of this trip.
     """
-    stop_doc_cursor = edb.get_stop_db().find({"user_id": user_id, "trip_id": trip_id})
+    stop_doc_cursor = edb.get_stop_db().find({"user_id": user_id, "trip_id": trip_id}).sort("enter_ts", pymongo.ASCENDING)
     logging.debug("About to execute query %s" % {"user_id": user_id, "trip_id": trip_id})
     return [ecwst.Stop(doc) for doc in stop_doc_cursor]
 

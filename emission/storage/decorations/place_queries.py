@@ -1,4 +1,5 @@
 import logging
+import pymongo
 
 import emission.core.get_database as edb
 import emission.core.wrapper.place as ecwp
@@ -30,7 +31,7 @@ def _get_ts_query(tq):
     return ret_query
 
 def get_places(user_id, time_query):
-    place_doc_cursor = edb.get_place_db().find(_get_ts_query(time_query))
+    place_doc_cursor = edb.get_place_db().find(_get_ts_query(time_query)).sort(time_query.timeType, pymongo.ASCENDING)
     logging.debug("%d places found in database" % place_doc_cursor.count())
     # TODO: Fix "TripIterator" and return it instead of this list
     return [ecwp.Place(doc) for doc in place_doc_cursor]
