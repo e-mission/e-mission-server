@@ -8,6 +8,7 @@ import emission.core.wrapper.trip as ecwt
 import emission.core.wrapper.section as ecws
 import emission.core.wrapper.stop as ecwst
 
+import emission.storage.decorations.timeline as esdt
 
 def create_new_trip(user_id):
     _id = edb.get_trip_new_db().save({"user_id": user_id})
@@ -68,6 +69,5 @@ def get_timeline_for_trip(user_id, trip_id):
     """
     Get an ordered sequence of sections and stops corresponding to this trip.
     """
-    pass
-    # return Timeline(get_stops_for_trip(user_id, trip_id),
-    #                 get_sections_for_trip(user_id, trip_id))
+    return esdt.Timeline(get_stops_for_trip(user_id, trip_id),
+                         get_sections_for_trip(user_id, trip_id))
