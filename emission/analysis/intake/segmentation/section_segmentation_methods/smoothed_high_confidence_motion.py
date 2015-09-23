@@ -6,6 +6,7 @@ import numpy as np
 # Our imports
 import emission.analysis.intake.segmentation.section_segmentation as eaiss
 import emission.core.wrapper.motionactivity as ecwm
+import emission.core.wrapper.location as ecwl
 
 class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
     """
