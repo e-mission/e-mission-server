@@ -1,6 +1,8 @@
 import logging
 import pymongo
 
+import emission.net.usercache.abstract_usercache as enua
+
 import emission.core.get_database as edb
 import emission.core.wrapper.stop as ecws
 
@@ -15,6 +17,14 @@ def get_stops(user_id, time_query):
     curr_query = _get_ts_query(time_query)
     curr_query.update({"user_id": user_id})
     return _get_stops_for_query(curr_query, time_query.timeType)
+
+def get_stop(stop_id):
+    return ecws.Stop(edb.get_stop_db().find_one({"_id": stop_id}))
+
+def get_time_query_for_stop(stop_id):
+    stop = get_stop(stop_id)
+    # logging.debug("for id %s, stop is %s" % (stop_id, stop))
+    return enua.UserCache.TimeQuery("write_ts", stop.enter_ts - 1, stop.exit_ts + 1)
 
 def create_new_stop(user_id, trip_id):
     _id = edb.get_stop_db().save({'user_id': user_id, "trip_id": trip_id})

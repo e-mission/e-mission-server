@@ -4,6 +4,8 @@ import pymongo
 import emission.core.get_database as edb
 import emission.core.wrapper.section as ecws
 
+import emission.net.usercache.abstract_usercache as enua
+
 def create_new_section(user_id, trip_id):
     _id = edb.get_section_new_db().save({"user_id": user_id, "trip_id": trip_id})
     return ecws.Section({"_id": _id, "user_id": user_id, "trip_id": trip_id})
@@ -17,6 +19,13 @@ def _get_ts_query(tq):
     if (tq.startTs is not None):
         ret_query[time_key].update({"$gte": tq.startTs})
     return ret_query
+
+def get_section(section_id):
+    return ecws.Section(edb.get_section_new_db().find_one({"_id": section_id}))
+
+def get_time_query_for_section(section_id):
+    section = get_section(section_id)
+    return enua.UserCache.TimeQuery("write_ts", section.start_ts, section.end_ts + 20)
 
 def get_sections(user_id, time_query):
     curr_query = _get_ts_query(time_query)
