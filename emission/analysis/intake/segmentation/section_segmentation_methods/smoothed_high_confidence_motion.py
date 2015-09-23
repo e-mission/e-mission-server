@@ -7,7 +7,6 @@ import numpy as np
 import emission.analysis.intake.segmentation.section_segmentation as eaiss
 import emission.core.wrapper.motionactivity as ecwm
 
-
 class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
     """
     Determines segmentation points within a trip. It does this by looking at
@@ -68,9 +67,9 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
                 assert (idx > 0)
                 logging.debug("At %s, found new activity %s compared to current %s - creating new section with start_time %s" %
                       (curr_motion.fmt_time, curr_motion.type, curr_start_motion.type,
-                       prev_motion.fmt_time))
+                       curr_motion.fmt_time))
                 # complete this section
-                motion_change_list.append((curr_start_motion, prev_motion))
+                motion_change_list.append((curr_start_motion, curr_motion))
                 curr_start_motion = curr_motion
             else:
                 logging.debug("At %s, retained existing activity %s because of no change" %
@@ -109,7 +108,7 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
             if len(raw_section_df) == 0:
                 logging.warn("Found no location points between %s and %s" % (start_motion, end_motion))
             else:
-                # Let us just return the start and end points this way for now -
-                # the "stop" can be used to paper over the gaps. Can revisit this once we are able to visualize it properly.
+                logging.debug("with iloc, section start point = %s, section end point = %s" %
+                              (ecwl.Location(raw_section_df.iloc[0]), ecwl.Location(raw_section_df.iloc[-1])))
                 section_list.append((raw_section_df.iloc[0], raw_section_df.iloc[-1], start_motion.type))
         return section_list
