@@ -9,8 +9,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
     def __init__(self, user_id):
         super(BuiltinTimeSeries, self).__init__(user_id)
         self.key_query = lambda(key): {"metadata.key": key}
-        self.ts_query = lambda(tq): {"$and": [{"metadata.%s" % tq.timeType: {"$gte": tq.startTs}},
-                {"metadata.%s" % tq.timeType: {"$lte": tq.endTs}}]}
+        self.ts_query = lambda(tq): {"metadata.%s" % tq.timeType: {"$gte": tq.startTs, "$lte": tq.endTs}}
         self.type_query = lambda(entry_type): {"metadata.type": entry_type}
 
     @staticmethod

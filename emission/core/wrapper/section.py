@@ -21,7 +21,7 @@ class Section(ecwb.WrapperBase):
              "sensed_mode": ecwb.WrapperBase.Access.WORM,  # the sensed mode used for the segmentation
              "source": ecwb.WrapperBase.Access.WORM}       # the method used to generate this trip
 
-    enums = {"sensed_mode", ecwm.MotionTypes}
+    enums = {"sensed_mode": ecwm.MotionTypes}
     geojson = ["start_loc", "end_loc"]
     nullable = ["start_stop", "end_stop"]
 
