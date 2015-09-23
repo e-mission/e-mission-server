@@ -14,7 +14,7 @@ def inline_map(map):
     map._build_map()
     return idisp.HTML('<iframe srcdoc="{srcdoc}" style="width: 100%; height: 510px; border: none"></iframe>'.format(srcdoc=map.HTML.replace('"', '&quot;')))
 
-def inline_maps(map_list, nRows, nCols):
+def inline_maps(map_list):
     """
     Embeds the HTML source of the map_list directly into the IPython notebook.
     
@@ -25,11 +25,13 @@ def inline_maps(map_list, nRows, nCols):
     nRows: Number of rows
     nCols: Number of columns
     """
+    nRows = len(map_list)
+    # nCols = max([len(row) for row in map_list])
     hb = hgen.HTML()
     t = hb.table(width="100%")
     for r in range(nRows):
         row = t.tr
-        for c in range(nCols):
+        for c in range(len(map_list[r])):
             currMap = map_list[r][c]
             currMap._build_map()
             row.td('<iframe srcdoc="{srcdoc}" style="width: 100%; height: 510px; border: none"></iframe>'.format(srcdoc=currMap.HTML.replace('"', '&quot;')))

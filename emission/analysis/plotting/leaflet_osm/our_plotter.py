@@ -3,9 +3,24 @@ import folium
 import itertools
 import numpy as np
 import logging
+import geojson as gj
+import copy
 
-import emission.analysis.classification.cleaning.location_smoothing as ls
+# import emission.analysis.classification.cleaning.location_smoothing as ls
+
 import emission.storage.decorations.location_queries as lq
+import emission.storage.decorations.timeline as esdtl
+import emission.storage.decorations.trip_queries as esdt
+import emission.storage.decorations.place_queries as esdp
+import emission.storage.decorations.stop_queries as esds
+import emission.storage.decorations.section_queries as esdsc
+
+import emission.storage.timeseries.abstract_timeseries as esta
+
+import emission.core.wrapper.stop as ecws
+import emission.core.wrapper.section as ecwsc
+
+import emission.net.usercache.abstract_usercache as enua
 
 all_color_list = ['black', 'brown', 'blue', 'chocolate', 'cyan', 'fuschia', 'green', 'lime', 'magenta', 'navy', 'pink', 'purple', 'red', 'snow', 'yellow']
 sel_color_list = ['black', 'blue', 'chocolate', 'cyan', 'fuschia', 'green', 'lime', 'magenta', 'pink', 'purple', 'red', 'yellow']
@@ -18,6 +33,92 @@ def df_to_string_list(df):
     # print "Converting df with size %s to string list" % df.shape[0]
     array_list = df.to_dict(orient='records')
     return [str(line) for line in array_list]
+
+def get_maps_for_range(user_id, start_ts, end_ts):
+    # First, get the timeline for that range.
+    ts = esta.TimeSeries.get_time_series(user_id)
+    trip_list = esdt.get_trips(user_id, enua.UserCache.TimeQuery("start_ts", start_ts, end_ts))
+    # TODO: Should the timeline support random access as well?
+    # If it did, we wouldn't need this additional map
+    # I think that it would be good to support a doubly linked list, i.e. prev and next in addition
+    # to the iteration interface
+    place_list = esdp.get_places(user_id, enua.UserCache.TimeQuery("exit_ts", start_ts, end_ts))
+    place_list = place_list + (esdp.get_places(user_id, enua.UserCache.TimeQuery("enter_ts", start_ts, end_ts)))
+    place_map = dict([(p.get_id(), p) for p in place_list])
+    map_list = []
+    flipped_midpoint = lambda(p1, p2): [(p1.coordinates[1] + p2.coordinates[1])/2,
+                                        (p1.coordinates[0] + p2.coordinates[0])/2]
+    for i, trip in enumerate(trip_list):
+        logging.debug("-" * 20 + trip.start_fmt_time + "=>" + trip.end_fmt_time
+                      + "(" + str(trip.end_ts - trip.start_ts) + ")")
+        if (len(esdt.get_sections_for_trip(user_id, trip.get_id())) == 0 and
+            len(esdt.get_stops_for_trip(user_id, trip.get_id())) == 0):
+            logging.debug("Skipping trip because it has no stops and no sections")
+            continue
+
+        start_point = gj.GeoJSON.to_instance(trip.start_loc)
+        end_point = gj.GeoJSON.to_instance(trip.end_loc)
+        curr_map = folium.Map(flipped_midpoint((start_point, end_point)))
+        map_list.append(curr_map)
+        logging.debug("About to display places %s and %s" % (trip.start_place, trip.end_place))
+        update_place(curr_map, trip.start_place, place_map, marker_color='green')
+        update_place(curr_map, trip.end_place, place_map, marker_color='red')
+        # TODO: Should get_timeline_for_trip work on a trip_id or on a trip object
+        # it seems stupid to convert trip object -> id -> trip object
+        curr_trip_timeline = esdt.get_timeline_for_trip(user_id, trip.get_id())
+        for i, trip_element in enumerate(curr_trip_timeline):
+            # logging.debug("Examining element %s of type %s" % (trip_element, type(trip_element)))
+            if type(trip_element) == ecws.Stop:
+                time_query = esds.get_time_query_for_stop(trip_element.get_id())
+                logging.debug("time_query for stop %s = %s" % (trip_element, time_query))
+                stop_points_df = ts.get_data_df("background/filtered_location", time_query)
+                # logging.debug("stop_points_df.head() = %s" % stop_points_df.head())
+                if len(stop_points_df) > 0:
+                    update_line(curr_map, stop_points_df, line_color = sel_color_list[-1],
+                                popup="%s -> %s" % (trip_element.enter_fmt_time, trip_element.exit_fmt_time))
+            else:
+                assert(type(trip_element) == ecwsc.Section)
+                time_query = esdsc.get_time_query_for_section(trip_element.get_id())
+                logging.debug("time_query for section %s = %s" %
+                              (trip_element, "[%s,%s,%s]" % (time_query.timeType, time_query.startTs, time_query.endTs)))
+                section_points_df = ts.get_data_df("background/filtered_location", time_query)
+                logging.debug("section_points_df.tail() = %s" % section_points_df.tail())
+                if len(section_points_df) > 0:
+                    update_line(curr_map, section_points_df, line_color = sel_color_list[trip_element.sensed_mode.value],
+                                popup="%s (%s -> %s)" % (trip_element.sensed_mode, trip_element.start_fmt_time,
+                                                         trip_element.end_fmt_time))
+                else:
+                    logging.warn("found no points for section %s" % trip_element)
+    return map_list
+
+
+def update_place(curr_map, place_id, place_map, marker_color='blue'):
+    if place_id is not None and place_id in place_map:
+        place = place_map[place_id]
+        logging.debug("Retrieved place %s" % place)
+        if hasattr(place, "location"):
+            coords = copy.copy(place.location.coordinates)
+            coords.reverse()
+            logging.debug("Displaying place at %s" % coords)
+            curr_map.simple_marker(location=coords, popup=str(place), marker_color=marker_color)
+        else:
+            logging.debug("starting place has no location, skipping")
+    else:
+        logging.warn("place not mapped because place_id = %s and place_id in place_map = %s" % (place_id, place_id in place_map))
+
+def update_line(currMap, line_points, line_color = None, popup=None):
+    currMap.div_markers(line_points[['latitude', 'longitude']].as_matrix().tolist(),
+        df_to_string_list(line_points), marker_size=5)
+    currMap.line(line_points[['latitude', 'longitude']].as_matrix().tolist(),
+        line_color = line_color,
+        popup = popup)
+
+
+########################## 
+# Everything below this line is from the time when we were evaluating
+# segmentation and can potentially be deleted. It is also likely to have bitrotted.
+#  Let's hold off a bit on that until we have the replacement, though
+##########################
 
 def get_map_list(df, potential_splits):
     mapList = []
