@@ -36,7 +36,10 @@ class BuiltinTimeSeries(esta.TimeSeries):
 
     @staticmethod
     def _to_df_entry(entry):
-        return entry["data"]
+        ret_val = entry["data"]
+        ret_val["_id"] = entry["_id"]
+        logging.debug("ret_val = %s " % ret_val)
+        return ret_val
 
     def find_entries(self, key_list = None, time_query = None):
         sort_key = self._get_sort_key(time_query)
