@@ -2,6 +2,21 @@ import logging
 import emission.net.usercache.abstract_usercache as enua
 
 def get_timeline(user_id, start_ts, end_ts):
+    """
+    Return a timeline of the trips and places from this start timestamp to this end timestamp.
+    Note that each place and each trip has *two* associated timestamps, so we need to define which trips need to be
+    returned. Right now, we define this as all places that are entered and all trips that are started within the
+    specified time frame. Note that this means that, by definition, this may not include the starting and ending places
+    for all trips, which is something that we need for our visualization. But we don't want the timeline to be
+    visualization specific.
+    Let's compromise by adding method to fill in start and end places which we will call if the timeline is used
+    for visualization and not if not. This also means that we can use the id map to avoid duplicates in case the
+    place does exist.
+    :param user_id: the user whose timeline we are considering
+    :param start_ts: the starting timestamp. we will include all places and trips that start after this.
+    :param end_ts: the ending timestamp. we will include all places and trips that end after this.
+    :return: a timeline object
+    """
     # These imports are in here to avoid circular import dependencies between
     # trip_queries and this file (timeline)
     import emission.storage.decorations.place_queries as esdp
@@ -9,6 +24,13 @@ def get_timeline(user_id, start_ts, end_ts):
 
     places = esdp.get_places(user_id, enua.UserCache.TimeQuery("enter_ts", start_ts, end_ts))
     trips = esdt.get_trips(user_id, enua.UserCache.TimeQuery("start_ts", start_ts, end_ts))
+
+    for place in places:
+        logging.debug("Considering place %s: %s -> %s " % (place.get_id(), place.enter_fmt_time, place.exit_fmt_time))
+    for trip in trips:
+        logging.debug("Considering trip %s: %s -> %s " % (trip.get_id(), trip.start_fmt_time, trip.end_fmt_time))
+
+
     return Timeline(places, trips)
 
 class Timeline(object):
@@ -42,7 +64,49 @@ class Timeline(object):
                 self.state = Timeline.State("place", self.places[0])
             else:
                 self.state = Timeline.State("trip", self.trips[0])
-        logging.debug("Starting with element of type %s, id %s, details %s" % (self.state.type, self.state.id, self.state.element))
+        logging.debug("Starting with element of type %s, id %s, details %s" %
+                      (self.state.type, self.state.id, self.state.element))
+
+    def fill_start_end_places(self):
+        """
+        Must be called before we start iterating over the values. If this is called in the middle of the iteration,
+        the results are undefined. In particular, they will be different depending on whether it was called when we
+        were iterating over a place versus a trip.
+        :return: None. The timeline is updated with the start and end place.
+        """
+        if len(self.trips) > 0:
+            logging.debug("len(trips) = %s, adding start_place %s and end_place %s" % (len(self.trips),
+                                                                                       self.trips[0].start_place,
+                                                                                       self.trips[-1].end_place))
+            start_place = self._addIfNotExists(self.trips[0].start_place)
+            end_place = self._addIfNotExists(self.trips[-1].end_place)
+            self.state = Timeline.State("place", start_place)  # Since this has been called before the iteration start
+
+    def get_object(self, element_id):
+        """
+        Return the object corresponding to the id from the in-memory map. This should be more efficient than
+        going to the database.
+        :param element_id: the id for which we want to retrieve the element
+        :return: the matching object
+        """
+        return self.id_map[element_id]
+
+    def _addIfNotExists(self, place_id):
+        """
+        Adds the place specified by the given place_id to the place list and the place map and returns it
+        :param place_id:
+        :return:
+        """
+        import emission.storage.decorations.place_queries as esdp
+
+        if place_id not in self.id_map:
+            place = esdp.get_place(self.trips[0].start_place)
+            self.places.append(place)
+            self.id_map[place_id] = place
+            return place
+        else:
+            return self.id_map[place_id]
+
 
     def __iter__(self):
         return self
