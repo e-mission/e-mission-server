@@ -83,9 +83,11 @@ class Commute(object):
         tm_id = jsn_object['tm']
         sp_name, ep_name = jsn_object['loc_list'][0], jsn_object['loc_list'][1]
         probs = jsn_object['probs']
-        start = Location.build_from_json(sp_name, tm_id)
-        end = Location.build_from_json(ep_name, tm_id)
-        com = Commute(starting_point, ending_point)
+        sp_json = edb.get_location_db().find_one({"name" : sp_name, "tm" : tm_id})
+        ep_json = edb.get_location_db().find_one({"name" : ep_name, "tm" : tm_id})
+        start = Location.build_from_json(sp_json, tm_id)
+        end = Location.build_from_json(ep_json, tm_id)
+        com = Commute(start, end)
         com.probabilities = np.array(np.mat(probs))
         return com
 
@@ -177,7 +179,7 @@ class Location(object):
 
     @classmethod
     def build_from_json(cls, jsn_object, tour_model):
-        print jsn_object
+        print "json object is : %s and type of json object is : %s" % (jsn_object, type(jsn_object))
         name = jsn_object['name']
         rep_coords = jsn_object['rep_coords']
         loc = Location(name, tour_model)
@@ -313,15 +315,18 @@ class TourModel(object):
         db.insert({"tm" : self.get_id(), "time" : self.time})
 
     def __eq__(self, other):
-        for a in self.edges.iteritems():
-            if a not in other.edges.items():
-                return False
-        for b in self.locs.iteritems():
-            if b not in other.edges.items():
-                return False
-        if len(self.edges.items()) != len(other.edges.items()):
-            return False
-        return len(self.locs.items()) == len(other.locs.items())
+        # Make something to compare
+        com_list_self = list(self.edges.keys())
+        com_list_self_sorted = sorted(com_list_self)
+        com_list_other = list(other.edges.keys())
+        com_list_other_sorted = sorted(com_list_other)
+
+        loc_list_self = list(self.locs.keys())
+        loc_list_self_sorted = sorted(loc_list_self)
+        loc_list_other = list(other.locs.keys())
+        loc_list_other_sorted = sorted(loc_list_other)
+
+        return (com_list_other_sorted == com_list_self_sorted) and (loc_list_self_sorted == loc_list_other_sorted)
 
     def __ne__(self, other):
         return not self == other

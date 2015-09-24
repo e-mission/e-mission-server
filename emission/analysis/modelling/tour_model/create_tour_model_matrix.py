@@ -103,18 +103,21 @@ def build_tm_from_db(user_name):
     commutes = edb.get_commute_db().find({"tm" : user_name})
     locations = edb.get_location_db().find({"tm" : user_name})
     time = edb.get_tm_db().find_one({"tm" : user_name})["time"]
+    new_tm = tm.TourModel(user_name, time)
+
     
     # Setting everything up
     coms = [ ]
     locs = [ ]
     for com in commutes:
+        print "com is %s" % com
         coms.append(tm.Commute.build_from_json(com))
     for loc in locations:
-        locs.append(tm.Location.build_from_json(loc))
+        print "loc is %s" % loc
+        locs.append(tm.Location.build_from_json(loc, new_tm))
     for com in coms:
-        com.start_point.add_to_successors(com.end_point)
+        com.starting_point.add_to_successors(com.ending_point)
     
-    new_tm = tm.TourModel(user_name, time)
 
     # Adding locs and commutes to db
     for com in coms:
