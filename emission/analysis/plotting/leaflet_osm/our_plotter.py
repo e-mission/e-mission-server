@@ -9,7 +9,6 @@ import copy
 # import emission.analysis.classification.cleaning.location_smoothing as ls
 
 import emission.storage.decorations.location_queries as lq
-import emission.storage.decorations.timeline as esdtl
 import emission.storage.decorations.trip_queries as esdt
 import emission.storage.decorations.place_queries as esdp
 import emission.storage.decorations.stop_queries as esds
@@ -19,6 +18,8 @@ import emission.storage.timeseries.abstract_timeseries as esta
 
 import emission.core.wrapper.stop as ecws
 import emission.core.wrapper.section as ecwsc
+
+import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
 
 import emission.net.usercache.abstract_usercache as enua
 
@@ -35,6 +36,18 @@ def df_to_string_list(df):
     return [str(line) for line in array_list]
 
 def get_maps_for_range(user_id, start_ts, end_ts):
+    map_list = []
+    geojson_list = gfc.get_geojson_for_range(user_id, start_ts, end_ts)
+
+    for trip_geojson in geojson_list:
+        logging.debug(trip_geojson)
+        curr_map = folium.Map()
+        curr_map.geo_json(geo_str=gj.dumps(trip_geojson))
+        map_list.append(curr_map)
+    return map_list
+
+
+def get_maps_for_range_old(user_id, start_ts, end_ts):
     # First, get the timeline for that range.
     ts = esta.TimeSeries.get_time_series(user_id)
     trip_list = esdt.get_trips(user_id, enua.UserCache.TimeQuery("start_ts", start_ts, end_ts))
