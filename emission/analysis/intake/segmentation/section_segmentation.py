@@ -120,7 +120,7 @@ def stitch_together(ending_section, stop, starting_section):
     stop.enter_fmt_time = ending_section.end_fmt_time
     stop.ending_section = ending_section.get_id()
 
-    stop.location = 0  # TODO: Need to replace with a "representative point". Maybe the midpoint of the starting and ending
+    stop.location = starting_section.start_loc
     stop.duration = starting_section.start_ts - ending_section.end_ts
     stop.source = "SmoothedHighConfidenceMotion"
 

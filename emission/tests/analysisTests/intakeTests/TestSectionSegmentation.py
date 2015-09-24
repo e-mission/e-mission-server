@@ -109,6 +109,7 @@ class TestTripSegmentation(unittest.TestCase):
         self.assertEqual(len(created_stops), 1)
         self.assertEqual(created_stops[0].enter_ts, 1440698066.704)
         self.assertEqual(created_stops[0].exit_ts, 1440698306.892)
+        self.assertEqual(created_stops[0].location, created_sections[1].start_loc)
         self.assertEqual(created_stops[0].ending_section, created_sections[0].get_id())
         self.assertEqual(created_stops[0].starting_section, created_sections[1].get_id())
 
