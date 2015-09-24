@@ -122,6 +122,10 @@ def stitch_together_start(last_place, curr_trip, start_loc):
         last_place.duration = last_place.exit_ts - last_place.enter_ts
     else:
         logging.debug("Place %s is the start of tracking - duration not known" % last_place)
+        # Since this is the first place, it didn't have its location set at the end of a trip
+        # in stitch_together_end. So we set it here. Note that this is likely to be off by
+        # a bit because this is actually the start of the trip, but it is not too bad.
+        last_place.location = start_loc.loc
 
     curr_trip.start_ts = start_loc.ts
     curr_trip.start_fmt_time = start_loc.fmt_time
@@ -141,6 +145,7 @@ def stitch_together_end(new_place, curr_trip, end_loc):
     curr_trip.end_fmt_time = end_loc.fmt_time
     curr_trip.end_place = new_place.get_id()
     curr_trip.end_loc = end_loc.loc
+    curr_trip.duration = curr_trip.end_ts - curr_trip.start_ts
 
     new_place.enter_ts = end_loc.ts
     new_place.enter_fmt_time = end_loc.fmt_time

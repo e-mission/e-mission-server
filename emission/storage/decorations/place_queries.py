@@ -30,8 +30,13 @@ def _get_ts_query(tq):
         ret_query[time_key].update({"$gte": tq.startTs})
     return ret_query
 
+def get_place(place_id):
+    return ecwp.Place(edb.get_place_db().find_one({"_id": place_id}))
+
 def get_places(user_id, time_query):
-    place_doc_cursor = edb.get_place_db().find(_get_ts_query(time_query)).sort(time_query.timeType, pymongo.ASCENDING)
+    curr_query = _get_ts_query(time_query)
+    curr_query.update({"user_id": user_id})
+    place_doc_cursor = edb.get_place_db().find(curr_query).sort(time_query.timeType, pymongo.ASCENDING)
     logging.debug("%d places found in database" % place_doc_cursor.count())
     # TODO: Fix "TripIterator" and return it instead of this list
     return [ecwp.Place(doc) for doc in place_doc_cursor]

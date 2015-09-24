@@ -41,7 +41,7 @@ class TestTimeSeries(unittest.TestCase):
         tq = enua.UserCache.TimeQuery("write_ts", 1440658800, 1440745200)
         df = ts.get_data_df("background/filtered_location", tq)
         self.assertEqual(len(df), 327)
-        self.assertEqual(len(df.columns), 9)
+        self.assertEqual(len(df.columns), 10)
         
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)

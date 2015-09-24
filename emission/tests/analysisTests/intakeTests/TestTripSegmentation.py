@@ -83,6 +83,11 @@ class TestTripSegmentation(unittest.TestCase):
         self.assertEqual(place0.ending_trip, trip0.get_id())
         self.assertEqual(place0.starting_trip, trip1.get_id())
 
+        self.assertEqual(round(trip0.duration), 11 * 60 + 9)
+        self.assertEqual(round(trip1.duration), 6 * 60 + 54)
+
+        self.assertIsNotNone(place0.location)
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     unittest.main()
