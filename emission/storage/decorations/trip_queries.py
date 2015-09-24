@@ -30,7 +30,7 @@ def _get_ts_query(tq):
 def get_trips(user_id, time_query):
     curr_query = _get_ts_query(time_query)
     curr_query.update({"user_id": user_id})
-    trip_doc_cursor = edb.get_trip_new_db().find(_get_ts_query(time_query)).sort(time_query.timeType, pymongo.ASCENDING)
+    trip_doc_cursor = edb.get_trip_new_db().find(curr_query).sort(time_query.timeType, pymongo.ASCENDING)
     # TODO: Fix "TripIterator" and return it instead of this list
     return [ecwt.Trip(doc) for doc in trip_doc_cursor]
 
