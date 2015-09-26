@@ -1,5 +1,5 @@
 import pandas as pd
-import folium
+import folium.folium as folium
 import itertools
 import numpy as np
 import logging
@@ -20,6 +20,7 @@ import emission.core.wrapper.stop as ecws
 import emission.core.wrapper.section as ecwsc
 
 import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
+import emission.analysis.plotting.leaflet_osm.folium_geojson_plugin as fgjp
 
 import emission.net.usercache.abstract_usercache as enua
 
@@ -41,11 +42,15 @@ def get_maps_for_range(user_id, start_ts, end_ts):
 
     for trip_geojson in geojson_list:
         logging.debug(trip_geojson)
-        curr_map = folium.Map()
-        curr_map.geo_json(geo_str=gj.dumps(trip_geojson))
+        flipped_midpoint = lambda(p1, p2): [(p1.coordinates[1] + p2.coordinates[1])/2,
+                                            (p1.coordinates[0] + p2.coordinates[0])/2]
+
+        curr_map = folium.Map(flipped_midpoint((trip_geojson.features[0].geometry,
+                                                trip_geojson.features[1].geometry)))
+        curr_plugin = fgjp.FoliumGeojsonPlugin(trip_geojson)
+        curr_map.add_plugin(curr_plugin)
         map_list.append(curr_map)
     return map_list
-
 
 def get_maps_for_range_old(user_id, start_ts, end_ts):
     # First, get the timeline for that range.

@@ -156,8 +156,13 @@ def trip_to_geojson(trip, tl):
     feature_array = []
     curr_start_place = tl.get_object(trip.start_place)
     curr_end_place = tl.get_object(trip.end_place)
-    feature_array.append(place_to_geojson(curr_start_place))
-    feature_array.append(place_to_geojson(curr_end_place))
+    start_place_geojson = place_to_geojson(curr_start_place)
+    start_place_geojson["properties"]["feature_type"] = "start_place"
+    feature_array.append(start_place_geojson)
+
+    end_place_geojson = place_to_geojson(curr_end_place)
+    end_place_geojson["properties"]["feature_type"] = "end_place"
+    feature_array.append(end_place_geojson)
 
     trip_tl = esdt.get_timeline_for_trip(trip.user_id, trip.get_id())
     stops = trip_tl.places
