@@ -79,14 +79,14 @@ class Commute(object):
         db.insert({"tm" : self.starting_point.tm.get_id(), "loc_list" : loc_list, "trip_list" : trip_list, 'probs' : str_array})
 
     @classmethod
-    def build_from_json(cls, jsn_object):
+    def build_from_json(cls, jsn_object, tour_model):
         tm_id = jsn_object['tm']
         sp_name, ep_name = jsn_object['loc_list'][0], jsn_object['loc_list'][1]
         probs = jsn_object['probs']
         sp_json = edb.get_location_db().find_one({"name" : sp_name, "tm" : tm_id})
         ep_json = edb.get_location_db().find_one({"name" : ep_name, "tm" : tm_id})
-        start = Location.build_from_json(sp_json, tm_id)
-        end = Location.build_from_json(ep_json, tm_id)
+        start = Location.build_from_json(sp_json, tour_model)
+        end = Location.build_from_json(ep_json, tour_model)
         com = Commute(start, end)
         com.probabilities = np.array(np.mat(probs))
         return com

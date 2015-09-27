@@ -168,8 +168,10 @@ class TestTourModel(unittest.TestCase):
     def test_commute_store(self):
         db = edb.get_commute_db()
         self.commute._save_to_db()
+        self.home._save_to_db()
+        self.work._save_to_db()
         same_commute_json = db.find_one({"tm" : self.our_tm.get_id()})
-        same_commute = Commute.build_from_json(same_commute_json)
+        same_commute = Commute.build_from_json(same_commute_json, self.our_tm)
         self.assertTrue(self.commute == same_commute)
 
     def test_loc_store(self):

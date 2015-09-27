@@ -111,7 +111,7 @@ def build_tm_from_db(user_name):
     locs = [ ]
     for com in commutes:
         print "com is %s" % com
-        coms.append(tm.Commute.build_from_json(com))
+        coms.append(tm.Commute.build_from_json(com, new_tm))
     for loc in locations:
         print "loc is %s" % loc
         locs.append(tm.Location.build_from_json(loc, new_tm))
