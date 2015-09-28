@@ -20,6 +20,7 @@
                 case "start_place": layer.bindPopup(feature.properties.exit_fmt_time); break;
                 case "end_place": layer.bindPopup(feature.properties.enter_fmt_time); break;
                 case "section": layer.bindPopup(getHumanReadable(feature.properties.sensed_mode)); break;
+                case "location": layer.bindPopup(JSON.stringify(feature.properties)); break
             }
           }
 
