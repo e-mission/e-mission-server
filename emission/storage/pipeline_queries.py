@@ -1,16 +1,23 @@
+import logging
+
 import emission.core.get_database as edb
 import emission.core.wrapper.pipelinestate as ps
 import emission.net.usercache.abstract_usercache as enua
+
 import time
 
 def mark_usercache_done(user_id):
     mark_stage_done(user_id, ps.PipelineStages.USERCACHE)
 
 def get_time_range_for_usercache(user_id):
-    get_time_range_for_stage(user_id, ps.PipelineStages.USERCACHE)
+    tq = get_time_range_for_stage(user_id, ps.PipelineStages.USERCACHE)
+    if tq.startTs is not None:
+        tq.startTs = tq.startTs * 1000
+    tq.endTs = tq.endTs * 1000
+    return tq
 
 def get_time_range_for_segmentation(user_id):
-    get_time_range_for_stage(user_id, ps.PipelineStages.TRIP_SEGMENTATION)
+    return get_time_range_for_stage(user_id, ps.PipelineStages.TRIP_SEGMENTATION)
 
 def mark_segmentation_done(user_id):
     mark_stage_done(user_id, ps.PipelineStages.TRIP_SEGMENTATION)
@@ -46,6 +53,8 @@ def mark_smoothing_done(user_id):
 def mark_smoothing_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.JUMP_SMOOTHING)
 
+def get_complete_ts(user_id):
+    return get_current_state(user_id, ps.PipelineStages.SECTION_SEGMENTATION).last_ts_run
 
 def mark_stage_done(user_id, stage):
     # We move failed entries to the error timeseries. So usercache runs never fail.
@@ -82,7 +91,7 @@ def get_time_range_for_stage(user_id, stage):
     else:
         start_ts = curr_state.last_ts_run
 
-    assert(curr_state.curr_run_ts is None)
+    assert curr_state.curr_run_ts is None, "curr_state.curr_run_ts = %s" % curr_state.curr_run_ts
 
     end_ts = time.time() - 5 # Let's pick a point 5 secs in the past to avoid race conditions
 
@@ -95,6 +104,7 @@ def get_time_range_for_stage(user_id, stage):
 def get_current_state(user_id, stage):
     curr_state_doc = edb.get_pipeline_state_db().find_one({"user_id": user_id,
                                                             "pipeline_stage": stage.value})
+    # logging.debug("returning curr_state_doc  %s for stage %s " % (curr_state_doc, stage))
     if curr_state_doc is not None:
         return ps.PipelineState(curr_state_doc)
     else:

@@ -34,13 +34,17 @@ def location_to_geojson(location):
     :param location: the location object
     :return: a geojson version of the location. the object is of type "Feature".
     """
-    ret_feature = gj.Feature()
-    ret_feature.id = str(location.get_id())
-    ret_feature.geometry = location.loc
-    ret_feature.properties = copy.copy(location)
-    ret_feature.properties["feature_type"] = "location"
-    _del_non_derializable(ret_feature.properties, ["loc"])
-    return ret_feature
+    try:
+        ret_feature = gj.Feature()
+        ret_feature.id = str(location.get_id())
+        ret_feature.geometry = location.loc
+        ret_feature.properties = copy.copy(location)
+        ret_feature.properties["feature_type"] = "location"
+        _del_non_derializable(ret_feature.properties, ["loc"])
+        return ret_feature
+    except Exception, e:
+        logging.exception(("Error while converting object %s" % location))
+        raise e
 
 def place_to_geojson(place):
     """
@@ -102,8 +106,11 @@ def section_to_geojson(section, tl):
 
     # Fudge the end point so that we don't have a gap because of the ts != write_ts mismatch
     if section_location_array[-1].loc != section.end_loc:
-        last_loc = ts.get_entry_at_ts("background/filtered_location", "data.ts", section.end_ts)
-        section_location_array.append(ecwe.Entry(last_loc).data)
+        last_loc_doc = ts.get_entry_at_ts("background/filtered_location", "data.ts", section.end_ts)
+        last_loc_data = ecwe.Entry(last_loc_doc).data
+        last_loc_data["_id"] = last_loc_doc["_id"]
+        section_location_array.append(last_loc_data)
+        logging.debug("Adding new entry %s to fill the end point gap" % last_loc_data)
 
     points_feature_array = [location_to_geojson(l) for l in section_location_array]
 
@@ -185,7 +192,11 @@ def get_geojson_for_range(user_id, start_ts, end_ts):
     tl.fill_start_end_places()
 
     for trip in tl.trips:
-        trip_geojson = trip_to_geojson(trip, tl)
-        geojson_list.append(trip_geojson)
+        try:
+            trip_geojson = trip_to_geojson(trip, tl)
+            geojson_list.append(trip_geojson)
+        except Exception, e:
+            logging.exception("Found error %s while processing trip %s" % (e, trip))
+            raise e
 
     return geojson_list

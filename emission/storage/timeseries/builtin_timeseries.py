@@ -9,12 +9,19 @@ class BuiltinTimeSeries(esta.TimeSeries):
     def __init__(self, user_id):
         super(BuiltinTimeSeries, self).__init__(user_id)
         self.key_query = lambda(key): {"metadata.key": key}
-        self.ts_query = lambda(tq): {"metadata.%s" % tq.timeType: {"$gte": tq.startTs, "$lte": tq.endTs}}
         self.type_query = lambda(entry_type): {"metadata.type": entry_type}
 
     @staticmethod
     def get_uuid_list():
         return edb.get_timeseries_db().distinct("user_id")
+
+    @staticmethod
+    def ts_query(tq):
+        time_key = "metadata.%s" % tq.timeType
+        ret_query = {time_key : {"$lt": tq.endTs}}
+        if (tq.startTs is not None):
+            ret_query[time_key].update({"$gte": tq.startTs})
+        return ret_query
 
     def _get_query(self, key_list = None, time_query = None):
         ret_query = {'user_id': self.user_id} # UUID is mandatory
@@ -38,7 +45,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
     def _to_df_entry(entry):
         ret_val = entry["data"]
         ret_val["_id"] = entry["_id"]
-        logging.debug("ret_val = %s " % ret_val)
+        # logging.debug("ret_val = %s " % ret_val)
         return ret_val
 
     def find_entries(self, key_list = None, time_query = None):
@@ -52,8 +59,9 @@ class BuiltinTimeSeries(esta.TimeSeries):
                                                  ts_key: ts})
 
     def get_data_df(self, key, time_query = None):
+
         sort_key = self._get_sort_key(time_query)
-        logging.debug("sort_key = %s" % sort_key)
+        logging.debug("curr_query = %s, sort_key = %s" % (self._get_query([key], time_query), sort_key))
         result_it = edb.get_timeseries_db().find(self._get_query([key], time_query), {"data": True})\
                                             .sort(sort_key, pymongo.ASCENDING)
         # Dataframe doesn't like to work off an iterator - it wants everything in memory

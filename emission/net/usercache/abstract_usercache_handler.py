@@ -13,10 +13,17 @@ class UserCacheHandler(object):
         import emission.net.usercache.builtin_usercache_handler as biuc
         return biuc.BuiltinUserCacheHandler(uuid)
 
-    def __init__(self, uuid):
-        self.uuid = uuid
+    def __init__(self, user_id):
+        self.user_id = user_id
 
     def moveToLongTerm(self):
+        """
+        Moves all messages that have arrived for the current user into long-term
+        storage, after converting into a platform-independent format.
+        """
+        pass
+
+    def storeViewsToCache(self):
         """
         Moves all messages that have arrived for the current user into long-term
         storage, after converting into a platform-independent format.

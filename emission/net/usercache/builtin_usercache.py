@@ -50,8 +50,8 @@ https://github.com/e-mission/e-mission-data-collection/wiki/User-cache-data-form
 """
 
 class BuiltinUserCache(ucauc.UserCache):
-    def __init__(self, uuid):
-        super(BuiltinUserCache, self).__init__(uuid)
+    def __init__(self, user_id):
+        super(BuiltinUserCache, self).__init__(user_id)
         self.key_query = lambda(key): {"metadata.key": key};
         self.ts_query = lambda(tq): BuiltinUserCache._get_ts_query(tq)
         self.type_query = lambda(entry_type): {"metadata.type": entry_type}
@@ -87,23 +87,23 @@ class BuiltinUserCache(ucauc.UserCache):
         # If inside, we need to 
         document = {
                       '$set': {
-                          'user_id': self.uuid,
+                          'user_id': self.user_id,
                           'metadata': metadataDoc,
                           'data': value
                       }
                    }
 
-        queryDoc = {'user_id': self.uuid,
+        queryDoc = {'user_id': self.user_id,
                     'metadata.type': 'document',
                     'metadata.key': key}
-        logging.debug("Updating %s spec to %s" % (self.uuid, document))
+        logging.debug("Updating %s spec to %s" % (self.user_id, document))
         result = self.db.update(queryDoc,
                                 document,
                                 upsert=True)
         logging.debug("Result = %s after updating document" % result)
 
     def _get_msg_query(self, key_list = None, time_query = None):
-        ret_query = {"user_id": self.uuid}
+        ret_query = {"user_id": self.user_id}
         ret_query.update({"$or": [self.type_query("message"),
                                   self.type_query("sensor_data"),
                                   self.type_query("rw-document")]})

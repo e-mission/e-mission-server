@@ -35,8 +35,8 @@ class UserCache(object):
         import emission.net.usercache.builtin_usercache as biuc
         return biuc.BuiltinUserCache(uuid)
 
-    def __init__(self, uuid):
-        self.uuid = uuid
+    def __init__(self, user_id):
+        self.user_id = user_id
 
     @staticmethod
     def get_uuid_list():

@@ -5,6 +5,8 @@ import numpy as np
 import logging
 import geojson as gj
 import copy
+import attrdict as ad
+from functional import seq
 
 # import emission.analysis.classification.cleaning.location_smoothing as ls
 
@@ -23,6 +25,7 @@ import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
 import emission.analysis.plotting.leaflet_osm.folium_geojson_plugin as fgjp
 
 import emission.net.usercache.abstract_usercache as enua
+import emission.net.api.usercache as enau
 
 all_color_list = ['black', 'brown', 'blue', 'chocolate', 'cyan', 'fuschia', 'green', 'lime', 'magenta', 'navy', 'pink', 'purple', 'red', 'snow', 'yellow']
 sel_color_list = ['black', 'blue', 'chocolate', 'cyan', 'fuschia', 'green', 'lime', 'magenta', 'pink', 'purple', 'red', 'yellow']
@@ -39,18 +42,33 @@ def df_to_string_list(df):
 def get_maps_for_range(user_id, start_ts, end_ts):
     map_list = []
     geojson_list = gfc.get_geojson_for_range(user_id, start_ts, end_ts)
+    return get_maps_for_geojson_list(geojson_list)
 
-    for trip_geojson in geojson_list:
-        logging.debug(trip_geojson)
+def get_maps_for_usercache(user_id):
+    data_to_phone = seq(enau.sync_server_to_phone(user_id))
+    logging.debug("Before pipeline, trips to phone list has length %d" % len(data_to_phone.to_list()))
+    trips_to_phone = data_to_phone.map(lambda e: ad.AttrDict(e))\
+                                    .filter(lambda e: e.metadata.key == "diary/trips")\
+                                    .map(lambda e: e.data)
+    logging.debug("After pipeline, trips to phone list has length %d" % len(trips_to_phone.to_list()))
+    assert(len(trips_to_phone.to_list()) == 1)
+    return get_maps_for_geojson_list(trips_to_phone[0])
+
+def get_maps_for_geojson_list(trip_geojson_list):
+    map_list = []
+    for trip_geojson in trip_geojson_list:
+        # logging.debug(trip_geojson)
+        logging.debug("centering based on start = %s, end = %s " % (trip_geojson.features[0], trip_geojson.features[1]))
         flipped_midpoint = lambda(p1, p2): [(p1.coordinates[1] + p2.coordinates[1])/2,
                                             (p1.coordinates[0] + p2.coordinates[0])/2]
 
         curr_map = folium.Map(flipped_midpoint((trip_geojson.features[0].geometry,
                                                 trip_geojson.features[1].geometry)))
-        curr_plugin = fgjp.FoliumGeojsonPlugin(trip_geojson)
+        curr_plugin = fgjp.FoliumGeojsonPlugin(dict(trip_geojson))
         curr_map.add_plugin(curr_plugin)
         map_list.append(curr_map)
     return map_list
+
 
 def get_maps_for_range_old(user_id, start_ts, end_ts):
     # First, get the timeline for that range.
