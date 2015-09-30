@@ -23,7 +23,7 @@ import urllib2
 # Our imports
 import modeshare, zipcode, distance, tripManager, \
                  Berkeley, visualize, stats, usercache
-import emission.net.ext_services.moves.register as auth
+import emission.net.ext_service.moves.register as auth
 import emission.analysis.result.carbon as carbon
 import emission.analysis.classification.inference.commute as commute
 import emission.analysis.modelling.work_time as work_time
@@ -43,7 +43,7 @@ server_port = config_data["server"]["port"]
 socket_timeout = config_data["server"]["timeout"]
 log_base_dir = config_data["paths"]["log_base_dir"]
 
-key_file = open('keys.json')
+key_file = open('conf/net/keys.json')
 key_data = json.load(key_file)
 ssl_cert = key_data["ssl_certificate"]
 private_key = key_data["private_key"]
@@ -57,6 +57,7 @@ skipAuth = False
 logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
                   filename=config_data["paths"]["log_file"], level=logging.DEBUG)
 
+print "Finished configuring logging for %s" % logging.getLogger()
 app = app()
 
 # On MacOS, the current working directory is always in the python path However,
@@ -237,9 +238,9 @@ def storeSensedTrips():
 
 @post('/usercache/get')
 def getFromCache():
-  logging.debug("Called userCache.get")
+  print("Called userCache.get")
   user_uuid=getUUID(request)
-  logging.debug("user_uuid %s" % user_uuid)
+  print("user_uuid %s" % user_uuid)
   to_phone = usercache.sync_server_to_phone(user_uuid)
   return {'server_to_phone': to_phone}
 
