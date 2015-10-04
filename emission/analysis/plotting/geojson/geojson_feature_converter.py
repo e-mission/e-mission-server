@@ -1,6 +1,7 @@
 import logging
 import geojson as gj
 import copy
+import attrdict as ad
 
 import emission.storage.timeseries.abstract_timeseries as esta
 
@@ -112,13 +113,26 @@ def section_to_geojson(section, tl):
         section_location_array.append(last_loc_data)
         logging.debug("Adding new entry %s to fill the end point gap" % last_loc_data)
 
-    points_feature_array = [location_to_geojson(l) for l in section_location_array]
+    # Find the list of points to filter
+    filtered_points_entry_doc = ts.get_entry_at_ts("analysis/smoothing", "data.section",
+                                                               section.get_id())
+    if filtered_points_entry_doc is None:
+        logging.debug("No filtered_points_entry, returning unchanged array")
+        filtered_section_location_array = section_location_array
+    else:
+        # TODO: Figure out how to make collections work for the wrappers and then change this to an Entry
+        filtered_points_entry = ad.AttrDict(filtered_points_entry_doc)
+        filtered_point_list = list(filtered_points_entry.data.deleted_points)
+        logging.debug("deleting %s points from section points" % len(filtered_point_list))
+        filtered_section_location_array = [l for l in section_location_array if l.get_id() not in filtered_point_list]
+
+    points_feature_array = [location_to_geojson(l) for l in filtered_section_location_array]
 
     points_line_string = gj.LineString()
-    # points_line_string.coordinates = [l.loc.coordinates for l in section_location_array]
+    # points_line_string.coordinates = [l.loc.coordinates for l in filtered_section_location_array]
     points_line_string.coordinates = []
 
-    for l in section_location_array:
+    for l in filtered_section_location_array:
         logging.debug("About to add %s to line_string " % l)
         points_line_string.coordinates.append(l.loc.coordinates)
 
@@ -130,6 +144,9 @@ def section_to_geojson(section, tl):
         parent_trip = tl.get_object(section.trip_id)
         start_place_of_parent_trip = tl.get_object(parent_trip.start_place)
         points_line_string.coordinates.insert(0, start_place_of_parent_trip.location.coordinates)
+
+    for i, point_feature in enumerate(points_feature_array):
+        point_feature.properties["idx"] = i
 
     points_line_feature = gj.Feature()
     points_line_feature.id = str(section.get_id())
