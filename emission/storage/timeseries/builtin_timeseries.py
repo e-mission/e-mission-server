@@ -64,6 +64,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
         logging.debug("curr_query = %s, sort_key = %s" % (self._get_query([key], time_query), sort_key))
         result_it = edb.get_timeseries_db().find(self._get_query([key], time_query), {"data": True})\
                                             .sort(sort_key, pymongo.ASCENDING)
+        logging.debug("Found %s results" % result_it.count())
         # Dataframe doesn't like to work off an iterator - it wants everything in memory
         return pd.DataFrame([BuiltinTimeSeries._to_df_entry(e) for e in list(result_it)])
 

@@ -54,7 +54,7 @@ def mark_smoothing_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.JUMP_SMOOTHING)
 
 def get_complete_ts(user_id):
-    return get_current_state(user_id, ps.PipelineStages.SECTION_SEGMENTATION).last_ts_run
+    return get_current_state(user_id, ps.PipelineStages.JUMP_SMOOTHING).last_ts_run
 
 def mark_stage_done(user_id, stage):
     # We move failed entries to the error timeseries. So usercache runs never fail.
