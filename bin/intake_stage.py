@@ -6,6 +6,7 @@ import emission.storage.timeseries.abstract_timeseries as esta
 
 import emission.analysis.intake.segmentation.trip_segmentation as eaist
 import emission.analysis.intake.segmentation.section_segmentation as eaiss
+import emission.analysis.intake.cleaning.location_smoothing as eaicl
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
@@ -26,6 +27,9 @@ if __name__ == '__main__':
 
         print("UUID %s: segmenting into sections" % uuid)
         eaiss.segment_current_sections(uuid)
+
+        print("UUID %s: smoothing sections" % uuid)
+        eaicl.filter_current_sections(uuid)
 
         print("UUID %s: storing views to cache" % uuid)
         uh = euah.UserCacheHandler.getUserCacheHandler(uuid)
