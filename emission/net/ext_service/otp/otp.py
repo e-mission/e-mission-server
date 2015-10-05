@@ -55,7 +55,10 @@ class OTP:
             "arriveBy" : "false"
         }
 
-        query_url = "http://50.17.58.240:8080/otp/routers/default/plan?"
+        add_file = open("emission/net/ext_service/otp/planner.json")
+        add_file_1 = json.loads(add_file.read())
+        address = add_file_1["open_trip_planner_instance_address"]
+        query_url = "%s/otp/routers/default/plan?" % address
         encoded_params = urllib.urlencode(params)
         url = query_url + encoded_params
         return url
