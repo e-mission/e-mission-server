@@ -19,7 +19,7 @@ def calHC(point1, point2, point3):
 
 def calSpeed(point1, point2):
     distanceDelta = calDistance(point1, point2)
-    timeDelta = point2.mTime - point1.mTime
+    timeDelta = point2.ts - point1.ts
     # print "Distance delta = %s and time delta = %s" % (distanceDelta, timeDelta)
     # assert(timeDelta != 0)
     if (timeDelta == 0):
@@ -27,6 +27,4 @@ def calSpeed(point1, point2):
         assert(distanceDelta < 0.01)
         return 0
 
-    # TODO: Once we perform the conversions from ms to secs as part of the
-    # usercache -> timeseries switch, we need to remove this division by 1000
-    return distanceDelta/(float(timeDelta)/1000)
+    return distanceDelta/timeDelta
