@@ -9,7 +9,6 @@ import attrdict as ad
 import datetime as pydt
 import time as time
 import pytz
-import tzlocal
 
 # Our imports
 import emission.analysis.point_features as pf
