@@ -59,7 +59,6 @@ class BuiltinTimeSeries(esta.TimeSeries):
                                                  ts_key: ts})
 
     def get_data_df(self, key, time_query = None):
-
         sort_key = self._get_sort_key(time_query)
         logging.debug("curr_query = %s, sort_key = %s" % (self._get_query([key], time_query), sort_key))
         result_it = edb.get_timeseries_db().find(self._get_query([key], time_query), {"data": True})\
@@ -67,6 +66,27 @@ class BuiltinTimeSeries(esta.TimeSeries):
         logging.debug("Found %s results" % result_it.count())
         # Dataframe doesn't like to work off an iterator - it wants everything in memory
         return pd.DataFrame([BuiltinTimeSeries._to_df_entry(e) for e in list(result_it)])
+
+    def get_max_value_for_field(self, key, field):
+        """
+        Currently used to get the max value of the location values so that we can send data
+        that actually exists into the usercache. Is that too corner of a use case? Do we want to do
+        this in some other way?
+        :param key: the metadata key for the entries, used to identify the stream
+        :param field: the field in the stream whose max value we want.
+        It is assumed that the values for the field are sortable.
+        :return: the max value for the field in the stream identified by key. -1 if there are no entries for the key.
+        """
+        result_it = edb.get_timeseries_db().find(self._get_query([key],time_query=None),
+                                                 {"_id": False, field: True}).sort(field, pymongo.DESCENDING).limit(1)
+        if result_it.count() == 0:
+            return -1
+
+        retVal = list(result_it)[0]
+        field_parts = field.split(".")
+        for part in field_parts:
+            retVal = retVal[part]
+        return retVal
 
     def insert(self, entry):
         """

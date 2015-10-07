@@ -9,8 +9,10 @@ class Section(ecwb.WrapperBase):
              "trip_id": ecwb.WrapperBase.Access.WORM, # the trip that this is part of
 
              "start_ts": ecwb.WrapperBase.Access.WORM, # start UTC timestamp (in secs)
+             "start_local_dt": ecwb.WrapperBase.Access.WORM, # searchable datatime in local time of start location
              "start_fmt_time": ecwb.WrapperBase.Access.WORM, # start formatted time (in timezone of point)
              "end_ts": ecwb.WrapperBase.Access.WORM, # end UTC timestamp (in secs)
+             "end_local_dt": ecwb.WrapperBase.Access.WORM, # searchable datetime in local time of end location
              "end_fmt_time": ecwb.WrapperBase.Access.WORM, # end formatted time (in timezone of point)
              "start_stop": ecwb.WrapperBase.Access.WORM,  # _id of place object before this one
              "end_stop": ecwb.WrapperBase.Access.WORM,    # _id of place object after this one

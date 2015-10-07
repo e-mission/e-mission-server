@@ -9,7 +9,8 @@ import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
 
 import emission.net.usercache.formatters.formatter as enuf
 import emission.storage.pipeline_queries as esp
-import emission.core.get_database as edb
+
+import emission.core.wrapper.trip as ecwt
 
 class BuiltinUserCacheHandler(enuah.UserCacheHandler):
     def __init__(self, user_id):
@@ -101,12 +102,12 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         # data in addition to metadata.
 
         # Finally, we don't really want to generate data for trips that we
-        # haven't finished analysis for. Right now, we only perform two
-        # kinds of analyses - trip and section segmentation, but later we
-        # may perform both mode and semantic analyses. We only want to send
-        # the data to the phone once analyses are complete. In particular,
-        # we don't want to send trips for which we haven't yet generated
-        # sections.
+        # haven't finished analysis for. Right now, we only perform three
+        # kinds of analyses - trip segmentation, section segmentation and
+        # smoothing, but later we may perform both mode and semantic analyses.
+        # We only want to send the data to the phone once analyses are
+        # complete. In particular, we don't want to send trips for which we
+        # haven't yet generated sections.
 
         # We could create a new pipeline state for this. But instead, we
         # just query starting from the last "done" ts of the last pipeline
@@ -114,9 +115,58 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         # pipeline were to run again
 
         start_ts = esp.get_complete_ts(self.user_id)
-        seventy_two_hours_ago_ts = start_ts - 60 * 24 * 60 * 60 # 3 days in seconds
-
-        trip_gj_list = gfc.get_geojson_for_range(self.user_id, seventy_two_hours_ago_ts, start_ts)
+        trip_gj_list = self.get_trip_list_for_seven_days(start_ts)
+        if len(trip_gj_list) == 0:
+            ts = etsa.TimeSeries.get_time_series(self.user_id)
+            max_loc_ts = ts.get_max_value_for_field("background/filtered_location", "data.ts")
+            if max_loc_ts == 1:
+                logging.warning("No entries for user %s, early return " % self.user_id)
+                return
+            if max_loc_ts > start_ts:
+                # We have locations, but no trips from them. That seems wrong.
+                # But we should get there eventually and then we will have trips.
+                logging.warning("No analysis has been doing on recent points! max_loc_ts %s > start_ts %s, early return" %
+                                (max_loc_ts, start_ts))
+                return
+            trip_gj_list = self.get_trip_list_for_seven_days(max_loc_ts)
+        day_list_bins = self.bin_into_days_by_local_time(trip_gj_list)
         uc = enua.UserCache.getUserCache(self.user_id)
 
-        uc.putDocument("diary/trips", trip_gj_list)
+        for day, day_gj_list in day_list_bins.iteritems():
+            logging.debug("Adding %s trips for day %s" % (len(day_gj_list), day))
+            uc.putDocument("diary/trips-%s"%day, day_gj_list)
+
+    def get_trip_list_for_seven_days(self, start_ts):
+        seventy_two_hours_ago_ts = start_ts - 7 * 24 * 60 * 60 # 7 days in seconds
+        # TODO: This is not strictly accurate, since it will skip trips that were in a later timezone but within the
+        # same requested date range.
+        trip_gj_list = gfc.get_geojson_for_range(self.user_id, seventy_two_hours_ago_ts, start_ts)
+        logging.debug("Found %s trips in three days starting from %s" % (len(trip_gj_list), start_ts))
+        return trip_gj_list
+
+    def bin_into_days_by_local_time(self, trip_gj_list):
+        """
+        While binning the trips into days, we really want to use local time. This is because that is what the user
+        experienced. For example, consider a hypothetical user who travels from the West Coast to the East Coast of the
+        US, leaving at 11pm local time, which would be 2am Eastern time. When the user looks at their timeline the next
+        day, when they are on East Coast local time, they still want to see the trip to the airport as occurring on
+        the previous day, not the same day, because that is when they experienced it. So, as corny as it seems, we are
+        going to use the start and end formatted times, split them and extract the date part.
+        :param trip_gj_list: List of trips
+        :return: Map of date string -> trips that start or end on date
+        """
+        ret_val = {}
+
+        for trip_gj in trip_gj_list:
+            trip = ecwt.Trip(trip_gj.properties)
+            # TODO: Consider extending for both start and end
+            day_string = trip.start_fmt_time.split("T")[0]
+            if day_string not in ret_val:
+                ret_val[day_string] = [trip_gj]
+            else:
+                list_for_curr_day = ret_val[day_string]
+                list_for_curr_day.append(trip_gj)
+
+        logging.debug("After binning, we have %s bins, of which %s are empty" %
+                      (len(ret_val), len([ds for ds,dl in ret_val.iteritems() if len(dl) == 0])))
+        return ret_val

@@ -36,8 +36,9 @@ def format_location_raw(entry):
     data.longitude = entry.data.mLongitude
     data.loc = geojson.Point((data.longitude, data.latitude))
     data.ts = float(entry.data.mTime) / 1000 # convert the ms from the phone to secs
-    data.fmt_time = str(pydt.datetime.utcfromtimestamp(data.ts).replace(tzinfo=pytz.utc)
-                            .astimezone(pytz.timezone(formatted_entry.metadata.time_zone)))
+    data.local_dt = pydt.datetime.utcfromtimestamp(data.ts).replace(tzinfo=pytz.utc) \
+                            .astimezone(pytz.timezone(formatted_entry.metadata.time_zone))
+    data.fmt_time = data.local_dt.isoformat()
     data.altitude = entry.data.mAltitude
     data.accuracy = entry.data.mAccuracy
     data.sensed_speed = entry.data.mSpeed
@@ -60,6 +61,10 @@ def format_location_simple(entry):
 
     data = entry.data
     data.ts = data.ts / 1000 # convert from ms to seconds
+    local_aware_dt = pydt.datetime.utcfromtimestamp(data.ts).replace(tzinfo=pytz.utc) \
+                            .astimezone(pytz.timezone(formatted_entry.metadata.time_zone))
+    data.local_dt = local_aware_dt.replace(tzinfo=None)
+    data.fmt_time = local_aware_dt.isoformat()
     data.loc = geojson.Point((data.longitude, data.latitude))
     data.heading = entry.data.bearing
     del data.bearing

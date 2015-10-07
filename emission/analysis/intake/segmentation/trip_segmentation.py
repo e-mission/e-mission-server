@@ -116,6 +116,7 @@ def stitch_together_start(last_place, curr_trip, start_loc):
     the fuzz factor for now.
     """
     last_place.exit_ts = start_loc.ts
+    last_place.exit_local_dt = start_loc.local_dt
     last_place.exit_fmt_time = start_loc.fmt_time
     last_place.starting_trip = curr_trip.get_id()
     if "enter_ts" in last_place:
@@ -128,6 +129,7 @@ def stitch_together_start(last_place, curr_trip, start_loc):
         last_place.location = start_loc.loc
 
     curr_trip.start_ts = start_loc.ts
+    curr_trip.start_local_dt = start_loc.local_dt
     curr_trip.start_fmt_time = start_loc.fmt_time
     curr_trip.start_place = last_place.get_id()
     curr_trip.start_loc = start_loc.loc
@@ -142,12 +144,14 @@ def stitch_together_end(new_place, curr_trip, end_loc):
     the fuzz factor for now.
     """
     curr_trip.end_ts = end_loc.ts
+    curr_trip.end_local_dt = end_loc.local_dt
     curr_trip.end_fmt_time = end_loc.fmt_time
     curr_trip.end_place = new_place.get_id()
     curr_trip.end_loc = end_loc.loc
     curr_trip.duration = curr_trip.end_ts - curr_trip.start_ts
 
     new_place.enter_ts = end_loc.ts
+    new_place.enter_local_dt = end_loc.local_dt
     new_place.enter_fmt_time = end_loc.fmt_time
     new_place.ending_trip = curr_trip.get_id()
     new_place.location = end_loc.loc

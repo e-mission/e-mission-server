@@ -96,11 +96,11 @@ class BuiltinUserCache(ucauc.UserCache):
         queryDoc = {'user_id': self.user_id,
                     'metadata.type': 'document',
                     'metadata.key': key}
-        logging.debug("Updating %s spec to %s" % (self.user_id, document))
+        # logging.debug("Updating %s spec to %s" % (self.user_id, document))
         result = self.db.update(queryDoc,
                                 document,
                                 upsert=True)
-        logging.debug("Result = %s after updating document" % result)
+        # logging.debug("Result = %s after updating document" % result)
 
     def _get_msg_query(self, key_list = None, time_query = None):
         ret_query = {"user_id": self.user_id}

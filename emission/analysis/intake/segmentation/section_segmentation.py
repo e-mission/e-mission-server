@@ -42,6 +42,7 @@ def segment_current_sections(user_id):
             segment_trip_into_sections(user_id, trip.get_id())
         epq.mark_sectioning_done(user_id)
     except:
+        logging.exception("Sectioning failed for user %s" % user_id)
         epq.mark_sectioning_failed(user_id)
 
 def segment_trip_into_sections(user_id, trip_id):
@@ -100,9 +101,11 @@ def segment_trip_into_sections(user_id, trip_id):
 
 def fill_section(section, start_loc, end_loc, sensed_mode):
     section.start_ts = start_loc.ts
+    section.start_local_dt = start_loc.local_dt
     section.start_fmt_time = start_loc.fmt_time
 
     section.end_ts = end_loc.ts
+    section.end_local_dt = end_loc.local_dt
     section.end_fmt_time = end_loc.fmt_time
 
     section.start_loc = start_loc.loc
@@ -117,14 +120,17 @@ def stitch_together(ending_section, stop, starting_section):
     ending_section.end_stop = stop.get_id()
 
     stop.enter_ts = ending_section.end_ts
+    stop.enter_local_dt = ending_section.end_local_dt
     stop.enter_fmt_time = ending_section.end_fmt_time
     stop.ending_section = ending_section.get_id()
 
-    stop.location = starting_section.start_loc
+    stop.enter_loc = ending_section.end_loc
+    stop.exit_loc = starting_section.start_loc
     stop.duration = starting_section.start_ts - ending_section.end_ts
     stop.source = "SmoothedHighConfidenceMotion"
 
     stop.exit_ts = starting_section.start_ts
+    stop.exit_local_dt = starting_section.start_local_dt
     stop.exit_fmt_time = starting_section.start_fmt_time
     stop.starting_section = starting_section.get_id()
 

@@ -1,7 +1,8 @@
 # Standard imports
 import json
 from random import randrange
-from bottle import route, post, get, run, template, static_file, request, app, HTTPError, SimpleTemplate, abort, BaseRequest
+from bottle import route, post, get, run, template, static_file, request, app, HTTPError, abort, BaseRequest, JSONPlugin
+import bottle as bt
 # To support dynamic loading of client-specific libraries
 import sys
 import os
@@ -19,6 +20,7 @@ from oauth2client.crypt import AppIdentityError
 import traceback
 import xmltodict
 import urllib2
+import bson.json_util
 
 # Our imports
 import modeshare, zipcode, distance, tripManager, \
@@ -497,6 +499,14 @@ def getUUID(request, inHeader=False):
 # We have see the sockets hang in practice. Let's set the socket timeout = 1
 # hour to be on the safe side, and see if it is hit.
 socket.setdefaulttimeout(float(socket_timeout))
+
+for plugin in app.plugins:
+    if isinstance(plugin, JSONPlugin):
+        print("Replaced json_dumps in plugin with the one from bson")
+        plugin.json_dumps = bson.json_util.dumps
+
+print("Changing bt.json_loads from %s to %s" % (bt.json_loads, bson.json_util.loads))
+bt.json_loads = bson.json_util.loads
 
 # The selection of SSL versus non-SSL should really be done through a config
 # option and not through editing source code, so let's make this keyed off the

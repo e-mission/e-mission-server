@@ -120,7 +120,7 @@ class SmoothZigzag(object):
                                 zip(segmentation_points, segmentation_points[1:])]
 
     def split_segment(self, i, curr_seg, direction):
-        import emission.analysis.classification.cleaning.location_smoothing as ls
+        import emission.analysis.intake.cleaning.location_smoothing as ls
 
         if direction == SmoothZigzag.Direction.RIGHT:
             recomputed_speed_df = ls.recalc_speed(curr_seg.segment_df)
@@ -216,13 +216,13 @@ class SmoothZigzag(object):
             self.inlier_mask_[segment.start:segment.end] = False
 
         logging.debug("after setting values, outlier_mask = %s" % np.nonzero(self.inlier_mask_ == False))
-        logging.debug("point details are %s" % with_speeds_df[["mLatitude", "mLongitude", "mAccuracy", "formatted_time"]][np.logical_not(self.inlier_mask_)])
+        # logging.debug("point details are %s" % with_speeds_df[np.logical_not(self.inlier_mask_)])
 
         # TODO: This is not the right place for this - adds too many dependencies
         # Should do this in the outer class in general so that we can do
         # multiple passes of any filtering algorithm
-        import emission.analysis.classification.cleaning.speed_outlier_detection as cso
-        import emission.analysis.classification.cleaning.location_smoothing as ls
+        import emission.analysis.intake.cleaning.cleaning_methods.speed_outlier_detection as cso
+        import emission.analysis.intake.cleaning.location_smoothing as ls
 
         recomputed_speeds_df = ls.recalc_speed(self.with_speeds_df[self.inlier_mask_])
         recomputed_threshold = cso.BoxplotOutlier(ignore_zeros = True).get_threshold(recomputed_speeds_df)

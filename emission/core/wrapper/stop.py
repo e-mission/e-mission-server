@@ -5,12 +5,15 @@ class Stop(ecwb.WrapperBase):
     props = {"user_id": ecwb.WrapperBase.Access.WORM, # start UTC timestamp (in secs)
              "trip_id": ecwb.WrapperBase.Access.WORM, # trip_id of the parent trip
              "enter_ts": ecwb.WrapperBase.Access.WORM,  # the timestamp of entry (in secs)
+             "enter_local_dt": ecwb.WrapperBase.Access.WORM,  # searchable datetime in timezone of entry
              "enter_fmt_time": ecwb.WrapperBase.Access.WORM, # formatted entry time in timezone of place
              "exit_ts": ecwb.WrapperBase.Access.WORM,        # the timestamp of exit (in secs)
+             "exit_local_dt": ecwb.WrapperBase.Access.WORM,  # searchable datetime in timezone of exit
              "exit_fmt_time": ecwb.WrapperBase.Access.WORM,  # formatted time in timezone of place
              "ending_section": ecwb.WrapperBase.Access.WORM,  # the id of the trip just before this
              "starting_section": ecwb.WrapperBase.Access.WORM,  # the id of the trip just after this
-             "location": ecwb.WrapperBase.Access.WORM, # the location in geojson format
+             "enter_loc": ecwb.WrapperBase.Access.WORM, # the location in geojson format
+             "exit_loc": ecwb.WrapperBase.Access.WORM, # the location in geojson format
              "source": ecwb.WrapperBase.Access.WORM,   # the method used to generate this place
              "duration": ecwb.WrapperBase.Access.WORM}    # the duration for which we were in this place
 

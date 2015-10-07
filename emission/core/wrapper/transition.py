@@ -19,6 +19,7 @@ class Transition(ecwb.WrapperBase):
     props = {"curr_state": ecwb.WrapperBase.Access.RO,
              "transition": ecwb.WrapperBase.Access.RO,
              "ts": ecwb.WrapperBase.Access.RO,
+             "local_dt": ecwb.WrapperBase.Access.RO,
              "fmt_time": ecwb.WrapperBase.Access.RO
             }
 

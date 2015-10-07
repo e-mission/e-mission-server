@@ -10,7 +10,7 @@ class Metadata(ecwb.WrapperBase):
            "platform": ecwb.WrapperBase.Access.WORM,
            "type": ecwb.WrapperBase.Access.WORM,
            "write_ts": ecwb.WrapperBase.Access.WORM,
-           "write_dt": ecwb.WrapperBase.Access.WORM,
+           "write_local_dt": ecwb.WrapperBase.Access.WORM,
            "time_zone": ecwb.WrapperBase.Access.WORM,
            "write_fmt_time": ecwb.WrapperBase.Access.WORM,
            "read_ts": ecwb.WrapperBase.Access.WORM}
@@ -28,9 +28,10 @@ class Metadata(ecwb.WrapperBase):
       m.key = key
       m.platform = "server"
       m.write_ts = time.time()
-      m.write_dt = pydt.datetime.utcfromtimestamp(m.write_ts).replace(tzinfo=pytz.utc)
       m.time_zone = "America/Los_Angeles"
-      m.write_fmt_time = str(m.write_dt.astimezone(pytz.timezone(m.time_zone)))
+      m.write_local_dt = pydt.datetime.utcfromtimestamp(m.write_ts).replace(tzinfo=pytz.utc) \
+                        .astimezone(pytz.timezone(m.time_zone))
+      m.write_fmt_time = m.write_local_dt.isoformat()
       return m
 
   def isAndroid(self):

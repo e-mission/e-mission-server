@@ -6,9 +6,25 @@ from dateutil import parser
 import math
 import pandas as pd
 import attrdict as ad
+import datetime as pydt
+import time as time
+import pytz
+import tzlocal
 
 # Our imports
 import emission.analysis.point_features as pf
+import emission.analysis.intake.cleaning.cleaning_methods.speed_outlier_detection as eaico
+import emission.analysis.intake.cleaning.cleaning_methods.jump_smoothing as eaicj
+
+import emission.storage.pipeline_queries as epq
+
+import emission.storage.decorations.section_queries as esds
+import emission.storage.timeseries.abstract_timeseries as esta
+
+import emission.core.wrapper.entry as ecwe
+import emission.core.wrapper.metadata as ecwm
+import emission.core.wrapper.smoothresults as ecws
+
 import emission.storage.decorations.useful_queries as taug
 import emission.storage.decorations.location_queries as lq
 import emission.core.get_database as edb
@@ -16,17 +32,6 @@ import emission.core.common as ec
 
 np.set_printoptions(suppress=True)
 
-def filter_accuracy(points_df):
-    """
-    Returns a data frame with the low accuracy points filtered.
-    We return a new dataframe that has been reindexed to the new set of points rather than
-    a filtered dataframe with the original index because otherwise, we are not
-    able to apply any further boolean filter masks to it.
-    """
-    logging.debug("filtering points %s" % points_df[points_df.mAccuracy > 200].index)
-    accuracy_filtered_df = pd.DataFrame(points_df[points_df.mAccuracy < 200].to_dict('records'))
-    logging.debug("after accuracy filtering, filtered list size went from %s to %s" % (points_df.shape, accuracy_filtered_df.shape))
-    return accuracy_filtered_df
 
 def recalc_speed(points_df):
     """
@@ -34,8 +39,6 @@ def recalc_speed(points_df):
     Drop them and recalculate speeds from the first point onwards.
     The speed column has the speed between each point and its previous point.
     The first row has a speed of zero.
-    Note that this is likely to be a subset of a larger dataframe.
-    In order to address that, we don't insert at 0, but at 
     """
     stripped_df = points_df.drop("speed", axis=1).drop("distance", axis=1)
     point_list = [ad.AttrDict(row) for row in points_df.to_dict('records')]
@@ -48,7 +51,7 @@ def recalc_speed(points_df):
     with_speeds_df = pd.concat([with_speeds_df, pd.Series(speeds, index=points_df.index, name="speed")], axis=1)
     return with_speeds_df
 
-def add_speed(points_df):
+def add_dist_heading_speed(points_df):
     """
     Returns a new dataframe with an added "speed" column.
     The speed column has the speed between each point and its previous point.
@@ -56,25 +59,17 @@ def add_speed(points_df):
     """
     point_list = [ad.AttrDict(row) for row in points_df.to_dict('records')]
     zipped_points_list = zip(point_list, point_list[1:])
+
     distances = [pf.calDistance(p1, p2) for (p1, p2) in zipped_points_list]
     distances.insert(0, 0)
-    with_speeds_df = pd.concat([points_df, pd.Series(distances, name="distance")], axis=1)
     speeds = [pf.calSpeed(p1, p2) for (p1, p2) in zipped_points_list]
     speeds.insert(0, 0)
-    with_speeds_df = pd.concat([with_speeds_df, pd.Series(speeds, name="speed")], axis=1)
-    return with_speeds_df
-
-def add_heading(points_df):
-    """
-    Returns a new dataframe with an added "heading_change" column.
-    The heading change column has the heading change between this point and the
-    two points preceding it. The first two rows have a speed of zero.
-    """
-    point_list = [ad.AttrDict(row) for row in points_df.to_dict('records')]
-    zipped_points_list = zip(point_list, point_list[1:])
     headings = [pf.calHeading(p1, p2) for (p1, p2) in zipped_points_list]
     headings.insert(0, 0)
-    with_headings_df = pd.concat([points_df, pd.Series(headings, name="heading")], axis=1)
+
+    with_distances_df = pd.concat([points_df, pd.Series(distances, name="distance")], axis=1)
+    with_speeds_df = pd.concat([with_distances_df, pd.Series(speeds, name="speed")], axis=1)
+    with_headings_df = pd.concat([with_speeds_df, pd.Series(headings, name="heading")], axis=1)
     return with_headings_df
 
 def add_heading_change(points_df):
@@ -91,14 +86,87 @@ def add_heading_change(points_df):
     with_hcs_df = pd.concat([points_df, pd.Series(hcs, name="heading_change")], axis=1)
     return with_hcs_df
 
-def get_section_points(section):
-    if "source" in section and section.source == "raw_auto":
-        section.user_id = section.id
-        section.loc_filter = section.filter
-    df = lq.get_points_for_section(section)
-    return df
+def filter_current_sections(user_id):
+    time_query = epq.get_time_range_for_smoothing(user_id)
+    try:
+        sections_to_process = esds.get_sections(user_id, time_query)
+        for section in sections_to_process:
+            logging.info("^" * 20 + ("Smoothing section %s for user %s" % (section.get_id(), user_id)) + "^"
+ * 20)
+            filter_jumps(user_id, section.get_id())
+        epq.mark_smoothing_done(user_id)
+    except:
+        logging.exception("Marking smoothing as failed")
+        epq.mark_smoothing_failed(user_id)
 
-def filter_points(section_df, outlier_algo, filtering_algo):
+def filter_jumps(user_id, section_id):
+    """
+    filters out any jumps in the points related to this section and stores a entry that lists the deleted points for
+    this trip and this section.
+    :param user_id: the user id to filter the trips for
+    :param section_id: the section_id to filter the trips for
+    :return: none. saves an entry with the filtered points into the database.
+    """
+
+    logging.debug("filter_jumps(%s, %s) called" % (user_id, section_id))
+    outlier_algo = eaico.BoxplotOutlier()
+    filtering_algo = eaicj.SmoothZigzag()
+
+    tq = esds.get_time_query_for_section(section_id)
+    ts = esta.TimeSeries.get_time_series(user_id)
+    section_points_df = ts.get_data_df("background/filtered_location", tq)
+    logging.debug("len(section_points_df) = %s" % len(section_points_df))
+    points_to_ignore_df = get_points_to_filter(section_points_df, outlier_algo, filtering_algo)
+    if points_to_ignore_df is None:
+        # There were no points to delete
+        return
+    deleted_point_id_list = list(points_to_ignore_df._id)
+    logging.debug("deleted %s points" % len(deleted_point_id_list))
+
+    filter_result = ecws.Smoothresults()
+    filter_result.section = section_id
+    filter_result.deleted_points = deleted_point_id_list
+    filter_result.outlier_algo = "BoxplotOutlier"
+    filter_result.filtering_algo = "SmoothZigzag"
+
+    result_entry = ecwe.Entry.create_entry(user_id, "analysis/smoothing", filter_result)
+    ts.insert(result_entry)
+
+def get_points_to_filter(section_points_df, outlier_algo, filtering_algo):
+    """
+    From the incoming dataframe, filter out large jumps using the specified outlier detection algorithm and
+    the specified filtering algorithm.
+    :param section_points_df: a dataframe of points for the current section
+    :param outlier_algo: the algorithm used to detect outliers
+    :param filtering_algo: the algorithm used to determine which of those outliers need to be filtered
+    :return: a dataframe of points that need to be stripped, if any.
+            None if none of them need to be stripped.
+    """
+    with_speeds_df = add_dist_heading_speed(section_points_df)
+    logging.debug("section_points_df.shape = %s, with_speeds_df.shape = %s" %
+                  (section_points_df.shape, with_speeds_df.shape))
+    # if filtering algo is none, there's nothing that can use the max speed
+    if outlier_algo is not None and filtering_algo is not None:
+        maxSpeed = outlier_algo.get_threshold(with_speeds_df)
+        # TODO: Is this the best way to do this? Or should I pass this in as an argument to filter?
+        # Or create an explicit set_speed() method?
+        # Or pass the outlier_algo as the parameter to the filtering_algo?
+        filtering_algo.maxSpeed = maxSpeed
+        logging.debug("maxSpeed = %s" % filtering_algo.maxSpeed)
+    if filtering_algo is not None:
+        try:
+            filtering_algo.filter(with_speeds_df)
+            to_delete_mask = np.logical_not(filtering_algo.inlier_mask_)
+            return with_speeds_df[to_delete_mask]
+        except Exception as e:
+            logging.debug("Caught error %s while processing section, skipping..." % e)
+            return None
+    else:
+        logging.debug("no filtering algo specified, returning None")
+        return None
+
+
+def get_filtered_points(section_df, outlier_algo, filtering_algo):
     """
     Filter the points that correspond to the section object that is passed in.
     The section object is an AttrDict with the startTs and endTs fields.
@@ -108,8 +176,7 @@ def filter_points(section_df, outlier_algo, filtering_algo):
     But really, we need to filter (at least for accuracy) before segmenting in
     order to avoid issues like https://github.com/e-mission/e-mission-data-collection/issues/45
     """
-    accuracy_filtered_df = filter_accuracy(section_df)
-    with_speeds_df = add_speed(accuracy_filtered_df)
+    with_speeds_df = add_dist_heading_speed(section_df)
     # if filtering algo is none, there's nothing that can use the max speed
     if outlier_algo is not None and filtering_algo is not None:
         maxSpeed = outlier_algo.get_threshold(with_speeds_df)
@@ -120,9 +187,9 @@ def filter_points(section_df, outlier_algo, filtering_algo):
     if filtering_algo is not None:
         try:
             filtering_algo.filter(with_speeds_df)
-            return accuracy_filtered_df[filtering_algo.inlier_mask_]
+            return with_speeds_df[filtering_algo.inlier_mask_]
         except Exception as e:
             print ("Caught error %s while processing section, skipping..." % e)
-            return accuracy_filtered_df
+            return with_speeds_df
     else:
-        return accuracy_filtered_df
+        return with_speeds_df

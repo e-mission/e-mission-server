@@ -37,6 +37,7 @@ def format(entry):
     logging.debug("Mapped %s -> %s" % (entry.data.currState, data.curr_state))
     data.transition = transition_map[entry.data.transition].value
     data.ts = formatted_entry.metadata.write_ts
+    data.local_dt = formatted_entry.metadata.write_local_dt
     data.fmt_time = formatted_entry.metadata.write_fmt_time
     formatted_entry.data = data
 
