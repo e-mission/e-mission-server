@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+import pymongo
 import os
 import json
 
@@ -137,6 +138,15 @@ def get_usercache_db():
 def get_timeseries_db():
     current_db = MongoClient().Stage_database
     TimeSeries = current_db.Stage_timeseries
+    TimeSeries.create_index([("user_id", pymongo.HASHED)])
+    TimeSeries.create_index([("metadata.key", pymongo.HASHED)])
+    TimeSeries.create_index([("metadata.write_ts", pymongo.DESCENDING)])
+    TimeSeries.create_index([("data.ts", pymongo.DESCENDING)], sparse=True)
+    TimeSeries.create_index([("data.start_ts", pymongo.DESCENDING)], sparse=True)
+    TimeSeries.create_index([("data.end_ts", pymongo.DESCENDING)], sparse=True)
+    TimeSeries.create_index([("data.enter_ts", pymongo.DESCENDING)], sparse=True)
+    TimeSeries.create_index([("data.exit_ts", pymongo.DESCENDING)], sparse=True)
+    TimeSeries.create_index([("data.loc", pymongo.GEOSPHERE)], sparse=True)
     return TimeSeries
 
 def get_timeseries_error_db():
