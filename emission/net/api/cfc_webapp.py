@@ -7,6 +7,10 @@ import bottle as bt
 import sys
 import os
 import logging
+logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
+                  filename='webserver_debug.log', level=logging.DEBUG)
+logging.debug("This should go to the log file")
+
 from datetime import datetime
 import time
 # So that we can set the socket timeout
@@ -56,9 +60,6 @@ BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes
 
 skipAuth = False
-logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
-                  filename=config_data["paths"]["log_file"], level=logging.DEBUG)
-
 print "Finished configuring logging for %s" % logging.getLogger()
 app = app()
 
@@ -230,7 +231,6 @@ def setSectionClassification():
 
 @post('/tripManager/storeSensedTrips')
 def storeSensedTrips():
-  print "Called storeSensedTrips"
   logging.debug("Called storeSensedTrips")
   user_uuid=getUUID(request)
   print "user_uuid %s" % user_uuid
@@ -240,9 +240,9 @@ def storeSensedTrips():
 
 @post('/usercache/get')
 def getFromCache():
-  print("Called userCache.get")
+  logging.debug("Called userCache.get")
   user_uuid=getUUID(request)
-  print("user_uuid %s" % user_uuid)
+  logging.debug("user_uuid %s" % user_uuid)
   to_phone = usercache.sync_server_to_phone(user_uuid)
   return {'server_to_phone': to_phone}
 

@@ -1,5 +1,7 @@
 import sys
 import logging
+logging.basicConfig(level=logging.DEBUG)
+
 import emission.net.usercache.abstract_usercache_handler as euah
 import emission.net.usercache.abstract_usercache as enua
 import emission.storage.timeseries.abstract_timeseries as esta
@@ -9,8 +11,6 @@ import emission.analysis.intake.segmentation.section_segmentation as eaiss
 import emission.analysis.intake.cleaning.location_smoothing as eaicl
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
-
     cache_uuid_list = enua.UserCache.get_uuid_list()
     print("cache UUID list = %s" % cache_uuid_list)
 
