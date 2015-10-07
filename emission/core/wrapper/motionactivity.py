@@ -16,6 +16,7 @@ class Motionactivity(ecwb.WrapperBase):
     props = {"type": ecwb.WrapperBase.Access.RO,
              "confidence": ecwb.WrapperBase.Access.RO,
              "ts": ecwb.WrapperBase.Access.RO,
+             "local_dt": ecwb.WrapperBase.Access.RO,
              "fmt_time": ecwb.WrapperBase.Access.RO
             }
 

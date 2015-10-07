@@ -6,6 +6,7 @@ class Location(ecwb.WrapperBase):
              "longitude": ecwb.WrapperBase.Access.RO, # longitude of the point
              "loc": ecwb.WrapperBase.Access.RO,       # location of the point in geojson.
              "ts": ecwb.WrapperBase.Access.RO,        # timestamp (in seconds)
+             "local_dt": ecwb.WrapperBase.Access.RO, # searchable datetime in local time
              "fmt_time": ecwb.WrapperBase.Access.RO,  # formatted time
              "altitude": ecwb.WrapperBase.Access.RO,  # altitude of the point
              "accuracy": ecwb.WrapperBase.Access.RO,  # horizontal accuracy of the point in meters.

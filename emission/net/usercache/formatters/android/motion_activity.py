@@ -20,6 +20,7 @@ def format(entry):
     data.type = ecwa.MotionTypes(entry.data.agb).value
     data.confidence = entry.data.agc
     data.ts = formatted_entry.metadata.write_ts
+    data.local_dt = formatted_entry.metadata.write_local_dt
     data.fmt_time = formatted_entry.metadata.write_fmt_time
     formatted_entry.data = data
 

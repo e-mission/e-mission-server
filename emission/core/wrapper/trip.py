@@ -7,8 +7,10 @@ class Trip(ecwb.WrapperBase):
     props = {"user_id": ecwb.WrapperBase.Access.WORM, # start UTC timestamp (in secs)
 
              "start_ts": ecwb.WrapperBase.Access.WORM, # start UTC timestamp (in secs)
+             "start_local_dt": ecwb.WrapperBase.Access.WORM, # start datetime in local time
              "start_fmt_time": ecwb.WrapperBase.Access.WORM, # start formatted time (in timezone of point)
              "end_ts": ecwb.WrapperBase.Access.WORM, # end UTC timestamp (in secs)
+             "end_local_dt": ecwb.WrapperBase.Access.WORM, # end datetime in local time
              "end_fmt_time": ecwb.WrapperBase.Access.WORM, # end formatted time (in timezone of point)
              "start_place": ecwb.WrapperBase.Access.WORM,  # _id of place object before this one
              "end_place": ecwb.WrapperBase.Access.WORM,    # _id of place object after this one
