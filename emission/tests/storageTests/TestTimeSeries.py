@@ -36,6 +36,10 @@ class TestTimeSeries(unittest.TestCase):
         self.assertEqual(entry_doc["data"]["latitude"], 37.393415)
         self.assertEqual(entry_doc["data"]["accuracy"], 43.5)
 
+    def testGetMaxValueForField(self):
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        self.assertEqual(ts.get_max_value_for_field("background/filtered_location", "data.ts"), 1440729334.797)
+
     def testGetDataDf(self):
         ts = esta.TimeSeries.get_time_series(self.testUUID)
         tq = enua.UserCache.TimeQuery("write_ts", 1440658800, 1440745200)
