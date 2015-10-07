@@ -2,6 +2,7 @@ import logging
 import geojson as gj
 import copy
 import attrdict as ad
+import pandas as pd
 
 import emission.storage.timeseries.abstract_timeseries as esta
 
@@ -11,6 +12,9 @@ import emission.storage.decorations.timeline as esdtl
 
 import emission.core.wrapper.location as ecwl
 import emission.core.wrapper.entry as ecwe
+
+# TODO: Move this to the section_features class instead
+import emission.analysis.intake.cleaning.location_smoothing as eaicl
 
 def _del_non_derializable(prop_dict, extra_keys):
     if "user_id" in prop_dict:
@@ -63,7 +67,7 @@ def place_to_geojson(place):
     ret_feature.properties = copy.copy(place)
     ret_feature.properties["feature_type"] = "place"
     # _stringify_foreign_key(ret_feature.properties, ["ending_trip", "starting_trip"])
-    _del_non_derializable(ret_feature.properties, ["location", "ending_trip", "starting_trip"])
+    _del_non_derializable(ret_feature.properties, ["location"])
     return ret_feature
 
 
@@ -79,12 +83,13 @@ def stop_to_geojson(stop):
 
     ret_feature = gj.Feature()
     ret_feature.id = str(stop.get_id())
-    ret_feature.geometry = stop.location
+    ret_feature.geometry = gj.LineString()
+    ret_feature.geometry.coordinates = [stop["enter_loc"]["coordinates"], stop["exit_loc"]["coordinates"]]
     ret_feature.properties = copy.copy(stop)
     ret_feature.properties["feature_type"] = "stop"
 
     # _stringify_foreign_key(ret_feature.properties, ["ending_section", "starting_section", "trip_id"])
-    _del_non_derializable(ret_feature.properties, ["location", "ending_section", "starting_section", "trip_id"])
+    _del_non_derializable(ret_feature.properties, ["location"])
     return ret_feature
 
 def section_to_geojson(section, tl):
@@ -100,18 +105,21 @@ def section_to_geojson(section, tl):
     points_df = ts.get_data_df("background/filtered_location", esds.get_time_query_for_section(section.get_id()))
     logging.debug("points_df.columns = %s" % points_df.columns)
 
+    # TODO: Rewrite to use dataframes throughout instead of python arrays. Why do we even need an array?
     feature_array = []
     section_location_array = [ecwl.Location(row) for idx, row in points_df.iterrows()]
 
     logging.debug("first element in section_location_array = %s" % section_location_array[0])
 
     # Fudge the end point so that we don't have a gap because of the ts != write_ts mismatch
+    # TODO: Fix this once we are able to query by the data timestamp instead of the metadata ts
     if section_location_array[-1].loc != section.end_loc:
         last_loc_doc = ts.get_entry_at_ts("background/filtered_location", "data.ts", section.end_ts)
         last_loc_data = ecwe.Entry(last_loc_doc).data
         last_loc_data["_id"] = last_loc_doc["_id"]
         section_location_array.append(last_loc_data)
-        logging.debug("Adding new entry %s to fill the end point gap" % last_loc_data)
+        logging.debug("Adding new entry %s to fill the end point gap between %s and %s"
+            % (last_loc_data.loc, section_location_array[-2].loc, section.end_loc))
 
     # Find the list of points to filter
     filtered_points_entry_doc = ts.get_entry_at_ts("analysis/smoothing", "data.section",
@@ -126,6 +134,13 @@ def section_to_geojson(section, tl):
         logging.debug("deleting %s points from section points" % len(filtered_point_list))
         filtered_section_location_array = [l for l in section_location_array if l.get_id() not in filtered_point_list]
 
+    with_speeds = eaicl.add_dist_heading_speed(pd.DataFrame(filtered_section_location_array))
+    speeds = list(with_speeds.speed)
+    distances = list(with_speeds.distance)
+    for idx, row in with_speeds.iterrows():
+        # TODO: Remove instance of setting value without going through wrapper class
+        filtered_section_location_array[idx]["speed"] = row["speed"]
+        filtered_section_location_array[idx]["distance"] = row["distance"]
     points_feature_array = [location_to_geojson(l) for l in filtered_section_location_array]
 
     points_line_string = gj.LineString()
@@ -154,9 +169,12 @@ def section_to_geojson(section, tl):
     points_line_feature.properties = copy.copy(section)
     points_line_feature.properties["feature_type"] = "section"
     points_line_feature.properties["sensed_mode"] = str(points_line_feature.properties.sensed_mode)
+    points_line_feature.properties["distance"] = sum(distances)
+    points_line_feature.properties["speeds"] = speeds
+    points_line_feature.properties["distances"] = distances
 
     # _stringify_foreign_key(points_line_feature.properties, ["start_stop", "end_stop", "trip_id"])
-    _del_non_derializable(points_line_feature.properties, ["start_loc", "end_loc", "start_stop", "end_stop", "trip_id"])
+    _del_non_derializable(points_line_feature.properties, ["start_loc", "end_loc"])
 
     feature_array.append(gj.FeatureCollection(points_feature_array))
     feature_array.append(points_line_feature)
@@ -193,15 +211,26 @@ def trip_to_geojson(trip, tl):
     for stop in stops:
         feature_array.append(stop_to_geojson(stop))
 
+    trip_distance = 0
     for i, section in enumerate(trip_tl.trips):
         # TODO: figure out whether we should do this at the model.
         # The first section starts with the start of the trip. But the trip itself starts at the first
         # point where we exit the geofence, not at the start place. That is because we don't really know when
         # we left the start place. We can fix this in the model through interpolation. For now, we assume that the
         # gap between the real departure time and the time that the trip starts is small, and just combine it here.
-        feature_array.append(section_to_geojson(section, tl))
-    return gj.FeatureCollection(features=feature_array)
+        section_gj = section_to_geojson(section, tl)
+        feature_array.append(section_gj)
+        # TODO: Fix me to use the wrapper
+        section_distance = [f["properties"]["distance"] for f in section_gj.features if
+            f.type == "Feature" and f.geometry.type == "LineString"]
+        logging.debug("found distance %s for section %s" % (section_distance, section.get_id()))
+        trip_distance = trip_distance + sum(section_distance)
 
+    trip_geojson = gj.FeatureCollection(features=feature_array, properties=trip)
+    trip_geojson.id = str(trip.get_id())
+    trip_geojson.properties["feature_type"] = "trip"
+    trip_geojson.properties["distance"] = trip_distance
+    return trip_geojson
 
 def get_geojson_for_range(user_id, start_ts, end_ts):
     geojson_list = []
@@ -211,7 +240,15 @@ def get_geojson_for_range(user_id, start_ts, end_ts):
     for trip in tl.trips:
         try:
             trip_geojson = trip_to_geojson(trip, tl)
-            geojson_list.append(trip_geojson)
+            # If the trip has no sections, it will have exactly two points - one for the start place and
+            # one for the stop place. If a trip has no sections, let us filter it out here because it is
+            # annoying to the user. But in that case, we need to merge the places.
+            # Let's make that a TODO after getting everything else to work.
+            if len(trip_geojson.features) == 2:
+                logging.info("Skipping zero section trip %s with distance %s (should be zero)" %
+                             (trip, trip_geojson.properties["distance"]))
+            else:
+                geojson_list.append(trip_geojson)
         except Exception, e:
             logging.exception("Found error %s while processing trip %s" % (e, trip))
             raise e
