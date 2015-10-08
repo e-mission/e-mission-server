@@ -105,7 +105,7 @@ class BuiltinUserCache(ucauc.UserCache):
     def _get_msg_query(self, key_list = None, time_query = None):
         ret_query = {"user_id": self.user_id}
         ret_query.update({"$or": [self.type_query("message"),
-                                  self.type_query("sensor_data"),
+                                  self.type_query("sensor-data"),
                                   self.type_query("rw-document")]})
         if key_list is not None and len(key_list) > 0:
             key_query_list = []
