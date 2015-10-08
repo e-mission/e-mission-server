@@ -43,6 +43,14 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
         """
         motion_df = timeseries.get_data_df("background/motion_activity", time_query)
         filter_mask = motion_df.apply(self.is_filtered, axis=1)
+        # Calling np.nonzero on the filter_mask even if it was related trips with zero sections
+        # has not been a problem before this - the subsequent check on the
+        # length of the filtered dataframe was sufficient. But now both Tom and
+        # I have hit it (on 18th and 21st of Sept) so let's handle it proactively here.
+        if filter_mask.shape == (0,0):
+            logging.warning("Found filter_mask with shape (0,0), returning blank")
+            return []
+
         logging.debug("filtered points %s" % np.nonzero(filter_mask))
         logging.debug("motion_df = %s" % motion_df.head())
         filtered_df = motion_df[filter_mask]
