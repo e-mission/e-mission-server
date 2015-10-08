@@ -52,6 +52,7 @@ def segment_current_trips(user_id):
             create_places_and_trips(user_id, segmentation_points)
             epq.mark_segmentation_done(user_id)
         except:
+            logging.exception("Trip generation failed for user " % user_id)
             epq.mark_segmentation_failed(user_id)
 
 def create_places_and_trips(user_id, segmentation_points):
