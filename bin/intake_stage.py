@@ -12,25 +12,25 @@ import emission.analysis.intake.cleaning.location_smoothing as eaicl
 
 if __name__ == '__main__':
     cache_uuid_list = enua.UserCache.get_uuid_list()
-    print("cache UUID list = %s" % cache_uuid_list)
+    logging.info("cache UUID list = %s" % cache_uuid_list)
 
     for uuid in cache_uuid_list:
-        print("UUID %s: moving to long term" % uuid)
+        logging.info("UUID %s: moving to long term" % uuid)
         uh = euah.UserCacheHandler.getUserCacheHandler(uuid)
         uh.moveToLongTerm()
 
     long_term_uuid_list = esta.TimeSeries.get_uuid_list()
-    print("long term UUID list = %s" % long_term_uuid_list)
+    logging.info("long term UUID list = %s" % long_term_uuid_list)
     for uuid in long_term_uuid_list:
-        print("UUID %s: segmenting into trips" % uuid)
+        logging.info("UUID %s: segmenting into trips" % uuid)
         eaist.segment_current_trips(uuid)
 
-        print("UUID %s: segmenting into sections" % uuid)
+        logging.info("UUID %s: segmenting into sections" % uuid)
         eaiss.segment_current_sections(uuid)
 
-        print("UUID %s: smoothing sections" % uuid)
+        logging.info("UUID %s: smoothing sections" % uuid)
         eaicl.filter_current_sections(uuid)
 
-        print("UUID %s: storing views to cache" % uuid)
+        logging.info("UUID %s: storing views to cache" % uuid)
         uh = euah.UserCacheHandler.getUserCacheHandler(uuid)
         uh.storeViewsToCache()
