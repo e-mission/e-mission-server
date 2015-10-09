@@ -1,5 +1,5 @@
 import urllib, urllib2
-from emission.core.wrapper.trip_old import Coordinate
+from emission.core.wrapper.trip import Coordinate
 import json
 from pygeocoder import Geocoder as pyGeo  ## We fall back on this if we have to
 
@@ -15,9 +15,10 @@ class Geocoder:
             "format" : "json"
         }
 
-        query_url = "http://nominatim.openstreetmap.org/search?"
+        query_url = "http://54.198.41.236/nominatim/search?"
         encoded_params = urllib.urlencode(params)
         url = query_url + encoded_params
+        print url
         return url
 
     @classmethod
@@ -29,14 +30,14 @@ class Geocoder:
 
     @classmethod
     def geocode(cls, address):
-        # try:
-        #     jsn = cls.get_json_geo(address)
-        #     lat = float(jsn[0]["lat"])
-        #     lon = float(jsn[0]["lon"])
-        #     return Coordinate(lat, lon)
-        # except:
-        #     print "defaulting"
-        return _do_google_geo(address) # If we fail ask the gods
+        try:
+            jsn = cls.get_json_geo(address)
+            lat = float(jsn[0]["lat"])
+            lon = float(jsn[0]["lon"])
+            return Coordinate(lat, lon)
+        except:
+            print "defaulting"
+            return _do_google_geo(address) # If we fail ask the gods
 
 
     @classmethod
@@ -47,9 +48,10 @@ class Geocoder:
             "format" : "json"
         }
 
-        query_url = "http://nominatim.openstreetmap.org/reverse?"
+        query_url = "http://54.198.41.236/nominatim/reverse?"
         encoded_params = urllib.urlencode(params)
         url = query_url + encoded_params
+        print url
         return url
 
     @classmethod
@@ -61,13 +63,14 @@ class Geocoder:
 
     @classmethod
     def reverse_geocode(cls, lat, lng):
-        # try:
-        #     jsn = cls.get_json_reverse(lat, lng)
-        #     address = jsn["display_name"]
-        # except:
-        #     print "defaulting"
-        return _do_google_reverse(lat, lng) # Just in case
-        return address
+        try:
+            jsn = cls.get_json_reverse(lat, lng)
+            address = jsn["display_name"]
+            return address
+
+        except:
+            print "defaulting"
+            return _do_google_reverse(lat, lng) # Just in case
 
 ## Failsafe section
 def _do_google_geo(address):
