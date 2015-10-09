@@ -1,5 +1,5 @@
 import urllib, urllib2
-from emission.core.wrapper.trip import Coordinate
+from emission.core.wrapper.trip_old import Coordinate
 import json
 from pygeocoder import Geocoder as pyGeo  ## We fall back on this if we have to
 
