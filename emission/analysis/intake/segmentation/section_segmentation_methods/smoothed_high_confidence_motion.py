@@ -85,7 +85,7 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
                       (curr_motion.fmt_time, curr_motion.type))
             prev_motion = curr_motion
 
-        print("Detected trip end! Ending section at %s" % curr_motion.fmt_time)
+        logging.info("Detected trip end! Ending section at %s" % curr_motion.fmt_time)
         motion_change_list.append((curr_start_motion, curr_motion))
 
         # Go from activities to

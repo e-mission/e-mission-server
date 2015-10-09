@@ -11,6 +11,7 @@ import emission.net.usercache.formatters.formatter as enuf
 import emission.storage.pipeline_queries as esp
 
 import emission.core.wrapper.trip as ecwt
+import emission.core.wrapper.entry as ecwe
 
 class BuiltinUserCacheHandler(enuah.UserCacheHandler):
     def __init__(self, user_id):
@@ -38,6 +39,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         ts = etsa.TimeSeries.get_time_series(self.user_id)
 
         curr_entry_it = uc.getMessage(None, time_query)
+        last_ts_processed = None
         for entry_doc in curr_entry_it:
             unified_entry = None
             try:
@@ -49,12 +51,13 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
                 entry = ad.AttrDict(entry_doc)
                 unified_entry = enuf.convert_to_common_format(entry)
                 ts.insert(unified_entry)
+                last_ts_processed = ecwe.Entry(unified_entry).metadata.write_ts
             except Exception as e:
                 logging.exception("Backtrace time")
                 logging.warn("Got error %s while saving entry %s -> %s"% (e, entry, unified_entry))
                 ts.insert_error(entry_doc)
         uc.clearProcessedMessages(time_query)
-        esp.mark_usercache_done(self.user_id)
+        esp.mark_usercache_done(self.user_id, last_ts_processed)
 
     def storeViewsToCache(self):
         """

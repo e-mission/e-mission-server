@@ -6,8 +6,8 @@ import emission.net.usercache.abstract_usercache as enua
 
 import time
 
-def mark_usercache_done(user_id):
-    mark_stage_done(user_id, ps.PipelineStages.USERCACHE)
+def mark_usercache_done(user_id, last_processed_ts):
+    mark_stage_done(user_id, ps.PipelineStages.USERCACHE, last_processed_ts)
 
 def get_time_range_for_usercache(user_id):
     tq = get_time_range_for_stage(user_id, ps.PipelineStages.USERCACHE)
@@ -19,8 +19,8 @@ def get_time_range_for_usercache(user_id):
 def get_time_range_for_segmentation(user_id):
     return get_time_range_for_stage(user_id, ps.PipelineStages.TRIP_SEGMENTATION)
 
-def mark_segmentation_done(user_id):
-    mark_stage_done(user_id, ps.PipelineStages.TRIP_SEGMENTATION)
+def mark_segmentation_done(user_id, last_processed_ts):
+    mark_stage_done(user_id, ps.PipelineStages.TRIP_SEGMENTATION, last_processed_ts)
 
 def mark_segmentation_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.TRIP_SEGMENTATION)
@@ -33,8 +33,11 @@ def get_time_range_for_sectioning(user_id):
     tq.timeType = "end_ts"
     return tq
 
-def mark_sectioning_done(user_id):
-    mark_stage_done(user_id, ps.PipelineStages.SECTION_SEGMENTATION)
+def mark_sectioning_done(user_id, last_trip_done):
+    if last_trip_done is None:
+        mark_stage_done(user_id, ps.PipelineStages.SECTION_SEGMENTATION, None)
+    else:
+        mark_stage_done(user_id, ps.PipelineStages.SECTION_SEGMENTATION, last_trip_done.end_ts)
 
 def mark_sectioning_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.SECTION_SEGMENTATION)
@@ -47,8 +50,12 @@ def get_time_range_for_smoothing(user_id):
     tq.timeType = "end_ts"
     return tq
 
-def mark_smoothing_done(user_id):
-    mark_stage_done(user_id, ps.PipelineStages.JUMP_SMOOTHING)
+def mark_smoothing_done(user_id, last_section_done):
+    if last_section_done is None:
+        mark_stage_done(user_id, ps.PipelineStages.JUMP_SMOOTHING, None)
+    else:
+        mark_stage_done(user_id, ps.PipelineStages.JUMP_SMOOTHING, last_section_done.end_ts)
+        
 
 def mark_smoothing_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.JUMP_SMOOTHING)
@@ -56,12 +63,22 @@ def mark_smoothing_failed(user_id):
 def get_complete_ts(user_id):
     return get_current_state(user_id, ps.PipelineStages.JUMP_SMOOTHING).last_ts_run
 
-def mark_stage_done(user_id, stage):
+def mark_stage_done(user_id, stage, last_processed_ts):
     # We move failed entries to the error timeseries. So usercache runs never fail.
     curr_state = get_current_state(user_id, stage)
     assert(curr_state is not None)
     assert(curr_state.curr_run_ts is not None)
     curr_state.last_ts_run = curr_state.curr_run_ts
+    # It is incorrect to assume that we have processed all the data until the
+    # start of the last run. In particular, due to network connectivity or
+    # other issues, it is possible that there is outstanding data on phones
+    # that was collected before the last run started. And if we set this, then
+    # that data will simply be skipped. The same logic applies to all
+    # decorators that are based on client collected data (trip start ts, etc) -
+    # it is only accurate for server generated data. So for maximum generality,
+    # let's allow the stage to pass in last_processed_ts.
+    if last_processed_ts is not None:
+        curr_state.last_processed_ts = last_processed_ts
     curr_state.curr_run_ts = None
     edb.get_pipeline_state_db().save(curr_state)
 
@@ -87,9 +104,10 @@ def get_time_range_for_stage(user_id, stage):
         curr_state.user_id = user_id
         curr_state.pipeline_stage = stage
         curr_state.curr_run_ts = None
+        curr_state.last_processed_ts = None
         curr_state.last_ts_run = None
     else:
-        start_ts = curr_state.last_ts_run
+        start_ts = curr_state.last_processed_ts
 
     assert curr_state.curr_run_ts is None, "curr_state.curr_run_ts = %s" % curr_state.curr_run_ts
 

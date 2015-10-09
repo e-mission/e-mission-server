@@ -51,6 +51,16 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         """
         filtered_points_df = timeseries.get_data_df("background/filtered_location", time_query)
 
+        if len(filtered_points_df) == 0:
+            self.last_ts_processed = None
+        else:
+            # TODO: Decide whether we should return the write_ts in the entry,
+            # or whether we should search by timestamp instead.
+            # Depends on final direction for the timequery
+            self.last_ts_processed = filtered_points_df.iloc[-1].metadata_write_ts
+
+        logging.info("Last ts processed = %s" % self.last_ts_processed)
+
         segmentation_points = []
         last_trip_end_point = None
         curr_trip_start_point = None
@@ -127,6 +137,6 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                     logging.debug("Appending last_trip_end_point %s with index %s " %
                         (last_trip_end_point, last_trip_end_point_row.name))
                     segmentation_points.append((curr_trip_start_point, last_trip_end_point))
-                    print "Found trip end at %s" % last_trip_end_point.fmt_time
+                    logging.info("Found trip end at %s" % last_trip_end_point.fmt_time)
                     just_ended = True
         return segmentation_points

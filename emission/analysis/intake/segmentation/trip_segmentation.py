@@ -46,13 +46,14 @@ def segment_current_trips(user_id):
         epq.mark_segmentation_failed(user_id)
     elif len(segmentation_points) == 0:
         # no new segments, no need to keep looking at these again
-        epq.mark_segmentation_done(user_id)
+        logging.debug("len(segmentation_points) == 0, early return")
+        epq.mark_segmentation_done(user_id, None)
     else:
         try:
             create_places_and_trips(user_id, segmentation_points)
-            epq.mark_segmentation_done(user_id)
+            epq.mark_segmentation_done(user_id, dstfsm.last_ts_processed)
         except:
-            logging.exception("Trip generation failed for user " % user_id)
+            logging.exception("Trip generation failed for user %s" % user_id)
             epq.mark_segmentation_failed(user_id)
 
 def create_places_and_trips(user_id, segmentation_points):
