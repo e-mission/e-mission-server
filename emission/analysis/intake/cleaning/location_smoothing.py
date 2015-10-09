@@ -93,7 +93,12 @@ def filter_current_sections(user_id):
             logging.info("^" * 20 + ("Smoothing section %s for user %s" % (section.get_id(), user_id)) + "^"
  * 20)
             filter_jumps(user_id, section.get_id())
-        epq.mark_smoothing_done(user_id)
+        if len(sections_to_process) == 0:
+            # Didn't process anything new so start at the same point next time
+            last_section_processed = None
+        else:    
+            last_section_processed = sections_to_process[-1]
+        epq.mark_smoothing_done(user_id, last_section_processed)
     except:
         logging.exception("Marking smoothing as failed")
         epq.mark_smoothing_failed(user_id)

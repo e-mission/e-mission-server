@@ -33,11 +33,14 @@ class TestPipelineQueries(unittest.TestCase):
 
     def testStopProcessing(self):
         self.testStartProcessing()
-        epq.mark_stage_done(self.testUUID, ewps.PipelineStages.USERCACHE)
+        TEST_DONE_TS = 999999
+        epq.mark_stage_done(self.testUUID, ewps.PipelineStages.USERCACHE, TEST_DONE_TS)
         final_state = epq.get_current_state(self.testUUID, ewps.PipelineStages.USERCACHE)
         self.assertIsNotNone(final_state)
         self.assertIsNone(final_state.curr_run_ts)
         self.assertIsNotNone(final_state.last_ts_run)
+        self.assertIsNotNone(final_state.last_processed_ts)
+        self.assertIsNotNone(final_state.last_processed_ts, TEST_DONE_TS)
 
     def testFailProcessing(self):
         self.testStartProcessing()

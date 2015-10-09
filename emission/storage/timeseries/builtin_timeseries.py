@@ -45,6 +45,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
     def _to_df_entry(entry):
         ret_val = entry["data"]
         ret_val["_id"] = entry["_id"]
+        ret_val["metadata_write_ts"] = entry["metadata"]["write_ts"]
         # logging.debug("ret_val = %s " % ret_val)
         return ret_val
 
@@ -61,23 +62,24 @@ class BuiltinTimeSeries(esta.TimeSeries):
     def get_data_df(self, key, time_query = None):
         sort_key = self._get_sort_key(time_query)
         logging.debug("curr_query = %s, sort_key = %s" % (self._get_query([key], time_query), sort_key))
-        result_it = edb.get_timeseries_db().find(self._get_query([key], time_query), {"data": True})\
-                                            .sort(sort_key, pymongo.ASCENDING)
+        result_it = edb.get_timeseries_db().find(self._get_query([key], time_query), {"data": True,
+                "metadata.write_ts": True}).sort(sort_key, pymongo.ASCENDING)
         logging.debug("Found %s results" % result_it.count())
         # Dataframe doesn't like to work off an iterator - it wants everything in memory
         return pd.DataFrame([BuiltinTimeSeries._to_df_entry(e) for e in list(result_it)])
 
-    def get_max_value_for_field(self, key, field):
+    def get_max_value_for_field(self, key, field, time_query=None):
         """
         Currently used to get the max value of the location values so that we can send data
         that actually exists into the usercache. Is that too corner of a use case? Do we want to do
         this in some other way?
         :param key: the metadata key for the entries, used to identify the stream
         :param field: the field in the stream whose max value we want.
+        :param time_query: the time range in which to search the stream
         It is assumed that the values for the field are sortable.
         :return: the max value for the field in the stream identified by key. -1 if there are no entries for the key.
         """
-        result_it = edb.get_timeseries_db().find(self._get_query([key],time_query=None),
+        result_it = edb.get_timeseries_db().find(self._get_query([key], time_query),
                                                  {"_id": False, field: True}).sort(field, pymongo.DESCENDING).limit(1)
         if result_it.count() == 0:
             return -1

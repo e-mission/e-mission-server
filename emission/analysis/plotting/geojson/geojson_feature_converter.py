@@ -148,7 +148,7 @@ def section_to_geojson(section, tl):
     points_line_string.coordinates = []
 
     for l in filtered_section_location_array:
-        logging.debug("About to add %s to line_string " % l)
+        # logging.debug("About to add %s to line_string " % l)
         points_line_string.coordinates.append(l.loc.coordinates)
 
     # If this is the first section, we already start from the trip start. But we actually need to start from the

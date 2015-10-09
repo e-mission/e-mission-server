@@ -40,7 +40,12 @@ def segment_current_sections(user_id):
         for trip in trips_to_process:
             logging.info("+" * 20 + ("Processing trip %s for user %s" % (trip.get_id(), user_id)) + "+" * 20)
             segment_trip_into_sections(user_id, trip.get_id())
-        epq.mark_sectioning_done(user_id)
+        if len(trips_to_process) == 0:
+            # Didn't process anything new so start at the same point next time
+            last_trip_processed = None
+        else:    
+            last_trip_processed = trips_to_process[-1]
+        epq.mark_sectioning_done(user_id, last_trip_processed)
     except:
         logging.exception("Sectioning failed for user %s" % user_id)
         epq.mark_sectioning_failed(user_id)
