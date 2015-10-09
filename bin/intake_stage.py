@@ -1,6 +1,7 @@
 import sys
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
+    level=logging.DEBUG)
 
 import emission.net.usercache.abstract_usercache_handler as euah
 import emission.net.usercache.abstract_usercache as enua
