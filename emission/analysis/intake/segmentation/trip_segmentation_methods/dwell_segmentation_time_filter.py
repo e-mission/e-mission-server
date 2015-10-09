@@ -128,10 +128,10 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                     last10PointsDistances.max() < self.distance_threshold):
                     last_trip_end_index = int(min(np.median(last5MinsPoints_df.index),
                                                np.median(last10Points_df.index)))
-                    logging.debug("last5MinPoints.median = %s (%s), last10Points_df = %s (%s), sel index = %s" %
-                        (np.median(last5MinsPoints_df.index), last5MinsPoints_df.index,
-                         np.median(last10Points_df.index), last10Points_df.index,
-                         last_trip_end_index))
+#                     logging.debug("last5MinPoints.median = %s (%s), last10Points_df = %s (%s), sel index = %s" %
+#                         (np.median(last5MinsPoints_df.index), last5MinsPoints_df.index,
+#                          np.median(last10Points_df.index), last10Points_df.index,
+#                          last_trip_end_index))
                     last_trip_end_point_row = filtered_points_df.iloc[last_trip_end_index]
                     last_trip_end_point = ad.AttrDict(filtered_points_df.iloc[last_trip_end_index])
                     logging.debug("Appending last_trip_end_point %s with index %s " %

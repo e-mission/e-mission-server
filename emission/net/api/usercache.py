@@ -16,7 +16,7 @@ def sync_server_to_phone(uuid):
     retrievedData = list(get_usercache_db().find({"user_id": uuid, "metadata.type": "document"}, # query
                                             {'_id': False, 'user_id': False})) # projection
     
-    logging.debug("retrievedData = %s" % retrievedData)
+    # logging.debug("retrievedData = %s" % retrievedData)
     return retrievedData
 
 def sync_phone_to_server(uuid, data_from_phone):
