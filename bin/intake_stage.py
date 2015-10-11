@@ -16,22 +16,22 @@ if __name__ == '__main__':
     logging.info("cache UUID list = %s" % cache_uuid_list)
 
     for uuid in cache_uuid_list:
-        logging.info("UUID %s: moving to long term" % uuid)
+        logging.info("*" * 10 + "UUID %s: moving to long term" % uuid + "*" * 10)
         uh = euah.UserCacheHandler.getUserCacheHandler(uuid)
         uh.moveToLongTerm()
 
     long_term_uuid_list = esta.TimeSeries.get_uuid_list()
-    logging.info("long term UUID list = %s" % long_term_uuid_list)
+    logging.info("*" * 10 + "long term UUID list = %s" % long_term_uuid_list)
     for uuid in long_term_uuid_list:
-        logging.info("UUID %s: segmenting into trips" % uuid)
+        logging.info("*" * 10 + "UUID %s: segmenting into trips" % uuid + "*" * 10)
         eaist.segment_current_trips(uuid)
 
-        logging.info("UUID %s: segmenting into sections" % uuid)
+        logging.info("*" * 10 + "UUID %s: segmenting into sections" % uuid + "*" * 10)
         eaiss.segment_current_sections(uuid)
 
-        logging.info("UUID %s: smoothing sections" % uuid)
+        logging.info("*" * 10 + "UUID %s: smoothing sections" % uuid + "*" * 10)
         eaicl.filter_current_sections(uuid)
 
-        logging.info("UUID %s: storing views to cache" % uuid)
+        logging.info("*" * 10 + "UUID %s: storing views to cache" % uuid + "*" * 10)
         uh = euah.UserCacheHandler.getUserCacheHandler(uuid)
         uh.storeViewsToCache()
