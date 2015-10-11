@@ -102,12 +102,16 @@ def section_to_geojson(section, tl):
     """
 
     ts = esta.TimeSeries.get_time_series(section.user_id)
-    points_df = ts.get_data_df("background/filtered_location", esds.get_time_query_for_section(section.get_id()))
-    logging.debug("points_df.columns = %s" % points_df.columns)
+    entry_it = ts.find_entries(["background/filtered_location"], esds.get_time_query_for_section(section.get_id()))
+    # points_df = ts.get_data_df("background/filtered_location", esds.get_time_query_for_section(section.get_id()))
+    # points_df = points_df.drop("elapsedRealTimeNanos", axis=1)
+    # logging.debug("points_df.columns = %s" % points_df.columns)
 
-    # TODO: Rewrite to use dataframes throughout instead of python arrays. Why do we even need an array?
+    # TODO: Decide whether we want to use Rewrite to use dataframes throughout instead of python arrays.
+    # dataframes insert nans. We could use fillna to fill with default values, but if we are not actually
+    # using dataframe features here, it is unclear how much that would help.
     feature_array = []
-    section_location_array = [ecwl.Location(row) for idx, row in points_df.iterrows()]
+    section_location_array = [ecwl.Location(ts._to_df_entry(entry)) for entry in entry_it]
 
     logging.debug("first element in section_location_array = %s" % section_location_array[0])
 
