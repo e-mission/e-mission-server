@@ -1,4 +1,5 @@
 import logging
+import datetime as pydt
 
 import emission.core.get_database as edb
 import emission.core.wrapper.pipelinestate as ps
@@ -6,8 +7,13 @@ import emission.net.usercache.abstract_usercache as enua
 
 import time
 
+END_FUZZ_AVOID_LTE = 5
+
 def mark_usercache_done(user_id, last_processed_ts):
-    mark_stage_done(user_id, ps.PipelineStages.USERCACHE, last_processed_ts)
+    if last_processed_ts is None:
+        mark_stage_done(user_id, ps.PipelineStages.USERCACHE, None)
+    else:
+        mark_stage_done(user_id, ps.PipelineStages.USERCACHE, last_processed_ts + END_FUZZ_AVOID_LTE)
 
 def get_time_range_for_usercache(user_id):
     tq = get_time_range_for_stage(user_id, ps.PipelineStages.USERCACHE)
@@ -20,7 +26,10 @@ def get_time_range_for_segmentation(user_id):
     return get_time_range_for_stage(user_id, ps.PipelineStages.TRIP_SEGMENTATION)
 
 def mark_segmentation_done(user_id, last_processed_ts):
-    mark_stage_done(user_id, ps.PipelineStages.TRIP_SEGMENTATION, last_processed_ts)
+    if last_processed_ts is None:
+        mark_stage_done(user_id, ps.PipelineStages.TRIP_SEGMENTATION, None)
+    else:
+        mark_stage_done(user_id, ps.PipelineStages.TRIP_SEGMENTATION, last_processed_ts + END_FUZZ_AVOID_LTE)
 
 def mark_segmentation_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.TRIP_SEGMENTATION)
@@ -37,7 +46,7 @@ def mark_sectioning_done(user_id, last_trip_done):
     if last_trip_done is None:
         mark_stage_done(user_id, ps.PipelineStages.SECTION_SEGMENTATION, None)
     else:
-        mark_stage_done(user_id, ps.PipelineStages.SECTION_SEGMENTATION, last_trip_done.end_ts)
+        mark_stage_done(user_id, ps.PipelineStages.SECTION_SEGMENTATION, last_trip_done.end_ts + END_FUZZ_AVOID_LTE)
 
 def mark_sectioning_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.SECTION_SEGMENTATION)
@@ -54,7 +63,7 @@ def mark_smoothing_done(user_id, last_section_done):
     if last_section_done is None:
         mark_stage_done(user_id, ps.PipelineStages.JUMP_SMOOTHING, None)
     else:
-        mark_stage_done(user_id, ps.PipelineStages.JUMP_SMOOTHING, last_section_done.end_ts)
+        mark_stage_done(user_id, ps.PipelineStages.JUMP_SMOOTHING, last_section_done.end_ts + END_FUZZ_AVOID_LTE)
         
 
 def mark_smoothing_failed(user_id):
@@ -78,7 +87,11 @@ def mark_stage_done(user_id, stage, last_processed_ts):
     # it is only accurate for server generated data. So for maximum generality,
     # let's allow the stage to pass in last_processed_ts.
     if last_processed_ts is not None:
+        logging.info("For stage %s, last_ts_processed = %s" %
+                     (stage, pydt.datetime.utcfromtimestamp(last_processed_ts).isoformat()))
         curr_state.last_processed_ts = last_processed_ts
+    else:
+        logging.info("For stage %s, last_ts_processed is unchanged" % stage)
     curr_state.curr_run_ts = None
     edb.get_pipeline_state_db().save(curr_state)
 
@@ -108,6 +121,11 @@ def get_time_range_for_stage(user_id, stage):
         curr_state.last_ts_run = None
     else:
         start_ts = curr_state.last_processed_ts
+
+    if start_ts is None:
+        logging.info("For stage %s, start_ts is None" % stage)
+    else:
+        logging.info("For stage %s, start_ts = %s" % (stage, pydt.datetime.utcfromtimestamp(start_ts).isoformat()))
 
     assert curr_state.curr_run_ts is None, "curr_state.curr_run_ts = %s" % curr_state.curr_run_ts
 
