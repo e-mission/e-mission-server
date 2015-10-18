@@ -2,7 +2,7 @@
 # This needs to be done every time we switch to a new database
 
 import sys
-from dao.user import User
+from emission.core.wrapper.user import User
 
 def create_fake_JWT_token(userEmail):
     """

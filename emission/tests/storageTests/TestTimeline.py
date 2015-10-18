@@ -2,7 +2,6 @@
 import unittest
 import logging
 import json
-import uuid
 
 # Our imports
 import emission.core.get_database as edb
@@ -17,18 +16,13 @@ import emission.core.wrapper.trip as ecwt
 import emission.core.wrapper.stop as ecws
 import emission.core.wrapper.section as ecwsc
 
+# Test imports
+import emission.tests.common as etc
 
 class TestTimeline(unittest.TestCase):
     def setUp(self):
         self.clearRelatedDb()
-        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
-        self.entries = json.load(open("emission/tests/data/my_data_jul_22.txt"))
-        self.testUUID = uuid.uuid4()
-        for entry in self.entries:
-            entry["user_id"] = self.testUUID
-            # print "Saving entry with write_ts = %s and ts = %s" % (entry["metadata"]["write_fmt_time"],
-            #                                                        entry["data"]["fmt_time"])
-            edb.get_timeseries_db().save(entry)
+        etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
         logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
         self.day_start_ts = 1440658800
         self.day_end_ts = 1440745200

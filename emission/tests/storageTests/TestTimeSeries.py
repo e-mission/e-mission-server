@@ -2,7 +2,6 @@
 import unittest
 import datetime as pydt
 import logging
-import uuid
 import json
 
 # Our imports
@@ -10,13 +9,12 @@ import emission.core.get_database as edb
 import emission.net.usercache.abstract_usercache as enua
 import emission.storage.timeseries.abstract_timeseries as esta
 
+# Test imports
+import emission.tests.common as etc
+
 class TestTimeSeries(unittest.TestCase):
     def setUp(self):
-        self.entries = json.load(open("emission/tests/data/my_data_jul_22.txt"))
-        self.testUUID = uuid.uuid4()
-        for entry in self.entries:
-            entry["user_id"] = self.testUUID
-            edb.get_timeseries_db().save(entry)
+        etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
 
     def tearDown(self):
         edb.get_timeseries_db().remove({"user_id": self.testUUID}) 
@@ -45,7 +43,7 @@ class TestTimeSeries(unittest.TestCase):
         tq = enua.UserCache.TimeQuery("write_ts", 1440658800, 1440745200)
         df = ts.get_data_df("background/filtered_location", tq)
         self.assertEqual(len(df), 327)
-        self.assertEqual(len(df.columns), 10)
+        self.assertEqual(len(df.columns), 12)
         
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)

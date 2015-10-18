@@ -2,7 +2,6 @@
 import unittest
 import datetime as pydt
 import logging
-import uuid
 import json
 
 # Our imports
@@ -18,13 +17,12 @@ import emission.analysis.intake.segmentation.trip_segmentation as eaist
 import emission.storage.decorations.place_queries as esdp
 import emission.storage.decorations.trip_queries as esdt
 
+# Test imports
+import emission.tests.common as etc
+
 class TestTripSegmentation(unittest.TestCase):
     def setUp(self):
-        self.entries = json.load(open("emission/tests/data/my_data_jul_22.txt"))
-        self.testUUID = uuid.uuid4()
-        for entry in self.entries:
-            entry["user_id"] = self.testUUID
-            edb.get_timeseries_db().save(entry)
+        etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
 
     def tearDown(self):
         edb.get_timeseries_db().remove({"user_id": self.testUUID}) 

@@ -1,0 +1,2090 @@
+[
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267c7d65cb39ee987ad9"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9073733, 
+                    37.321086
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:32:07.850000-07:00", 
+            "altitude": 0, 
+            "ts": 1441207927.85, 
+            "longitude": -121.9073733, 
+            "latitude": 37.321086, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 45
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441207928243
+            }, 
+            "write_fmt_time": "2015-09-02 08:32:08.243000-07:00", 
+            "write_ts": 1441207928.243, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267c7d65cb39ee987ada"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9073733, 
+                    37.321086
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:32:07.850000-07:00", 
+            "altitude": 0, 
+            "ts": 1441207927.85, 
+            "longitude": -121.9073733, 
+            "latitude": 37.321086, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 45
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441207928598
+            }, 
+            "write_fmt_time": "2015-09-02 08:32:08.598000-07:00", 
+            "write_ts": 1441207928.598, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/filtered_location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267c7d65cb39ee987adb"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9110359, 
+                    37.3168175
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:32:43.289000-07:00", 
+            "altitude": 0, 
+            "ts": 1441207963.289, 
+            "longitude": -121.9110359, 
+            "latitude": 37.3168175, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 30
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441207963686
+            }, 
+            "write_fmt_time": "2015-09-02 08:32:43.686000-07:00", 
+            "write_ts": 1441207963.686, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267c7d65cb39ee987adc"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9110359, 
+                    37.3168175
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:32:43.289000-07:00", 
+            "altitude": 0, 
+            "ts": 1441207963.289, 
+            "longitude": -121.9110359, 
+            "latitude": 37.3168175, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 30
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441207968076
+            }, 
+            "write_fmt_time": "2015-09-02 08:32:48.076000-07:00", 
+            "write_ts": 1441207968.076, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/filtered_location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267d7d65cb39ee987add"
+        }, 
+        "data": {
+            "confidence": 87, 
+            "type": 3, 
+            "ts": 1441207981.182, 
+            "fmt_time": "2015-09-02 08:33:01.182000-07:00"
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441207981182
+            }, 
+            "write_fmt_time": "2015-09-02 08:33:01.182000-07:00", 
+            "write_ts": 1441207981.182, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/motion_activity", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267d7d65cb39ee987ade"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9110875, 
+                    37.3167879
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:33:13.395000-07:00", 
+            "altitude": 0, 
+            "ts": 1441207993.395, 
+            "longitude": -121.9110875, 
+            "latitude": 37.3167879, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 30
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441207994132
+            }, 
+            "write_fmt_time": "2015-09-02 08:33:14.132000-07:00", 
+            "write_ts": 1441207994.132, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267d7d65cb39ee987adf"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9110875, 
+                    37.3167879
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:33:13.395000-07:00", 
+            "altitude": 0, 
+            "ts": 1441207993.395, 
+            "longitude": -121.9110875, 
+            "latitude": 37.3167879, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 30
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441207994422
+            }, 
+            "write_fmt_time": "2015-09-02 08:33:14.422000-07:00", 
+            "write_ts": 1441207994.422, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/filtered_location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267d7d65cb39ee987ae0"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9144915, 
+                    37.3137837
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:33:44.461000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208024.461, 
+            "longitude": -121.9144915, 
+            "latitude": 37.3137837, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 76.06
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208026004
+            }, 
+            "write_fmt_time": "2015-09-02 08:33:46.004000-07:00", 
+            "write_ts": 1441208026.004, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267d7d65cb39ee987ae1"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9144915, 
+                    37.3137837
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:33:44.461000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208024.461, 
+            "longitude": -121.9144915, 
+            "latitude": 37.3137837, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 76.06
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208026483
+            }, 
+            "write_fmt_time": "2015-09-02 08:33:46.483000-07:00", 
+            "write_ts": 1441208026.483, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/filtered_location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267d7d65cb39ee987ae2"
+        }, 
+        "data": {
+            "confidence": 92, 
+            "type": 0, 
+            "ts": 1441208046.979, 
+            "fmt_time": "2015-09-02 08:34:06.979000-07:00"
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208046979
+            }, 
+            "write_fmt_time": "2015-09-02 08:34:06.979000-07:00", 
+            "write_ts": 1441208046.979, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/motion_activity", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267d7d65cb39ee987ae3"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9471665, 
+                    37.2799802
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:34:15.955000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208055.955, 
+            "longitude": -121.9471665, 
+            "latitude": 37.2799802, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 28
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208057525
+            }, 
+            "write_fmt_time": "2015-09-02 08:34:17.525000-07:00", 
+            "write_ts": 1441208057.525, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267e7d65cb39ee987ae4"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9471665, 
+                    37.2799802
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:34:15.955000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208055.955, 
+            "longitude": -121.9471665, 
+            "latitude": 37.2799802, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 28
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208058051
+            }, 
+            "write_fmt_time": "2015-09-02 08:34:18.051000-07:00", 
+            "write_ts": 1441208058.051, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/filtered_location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267e7d65cb39ee987ae5"
+        }, 
+        "data": {
+            "confidence": 74, 
+            "type": 3, 
+            "ts": 1441208088.738, 
+            "fmt_time": "2015-09-02 08:34:48.738000-07:00"
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208088738
+            }, 
+            "write_fmt_time": "2015-09-02 08:34:48.738000-07:00", 
+            "write_ts": 1441208088.738, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/motion_activity", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267e7d65cb39ee987ae6"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9470935, 
+                    37.2800351
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:34:48.363000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208088.363, 
+            "longitude": -121.9470935, 
+            "latitude": 37.2800351, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 48
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208089986
+            }, 
+            "write_fmt_time": "2015-09-02 08:34:49.986000-07:00", 
+            "write_ts": 1441208089.986, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267e7d65cb39ee987ae7"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9470935, 
+                    37.2800351
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:34:48.363000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208088.363, 
+            "longitude": -121.9470935, 
+            "latitude": 37.2800351, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 48
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208090478
+            }, 
+            "write_fmt_time": "2015-09-02 08:34:50.478000-07:00", 
+            "write_ts": 1441208090.478, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/filtered_location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267e7d65cb39ee987ae8"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9221993, 
+                    37.3065425
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:35:20.568000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208120.568, 
+            "longitude": -121.9221993, 
+            "latitude": 37.3065425, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 43.5
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208121710
+            }, 
+            "write_fmt_time": "2015-09-02 08:35:21.710000-07:00", 
+            "write_ts": 1441208121.71, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267e7d65cb39ee987ae9"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9221993, 
+                    37.3065425
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:35:20.568000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208120.568, 
+            "longitude": -121.9221993, 
+            "latitude": 37.3065425, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 43.5
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208122202
+            }, 
+            "write_fmt_time": "2015-09-02 08:35:22.202000-07:00", 
+            "write_ts": 1441208122.202, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/filtered_location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267e7d65cb39ee987aea"
+        }, 
+        "data": {
+            "confidence": 80, 
+            "type": 0, 
+            "ts": 1441208147.097, 
+            "fmt_time": "2015-09-02 08:35:47.097000-07:00"
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208147097
+            }, 
+            "write_fmt_time": "2015-09-02 08:35:47.097000-07:00", 
+            "write_ts": 1441208147.097, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/motion_activity", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267f7d65cb39ee987aeb"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.927866, 
+                    37.3013596
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:35:50.579000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208150.579, 
+            "longitude": -121.927866, 
+            "latitude": 37.3013596, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 39
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208151432
+            }, 
+            "write_fmt_time": "2015-09-02 08:35:51.432000-07:00", 
+            "write_ts": 1441208151.432, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267f7d65cb39ee987aec"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.927866, 
+                    37.3013596
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:35:50.579000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208150.579, 
+            "longitude": -121.927866, 
+            "latitude": 37.3013596, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 39
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208151975
+            }, 
+            "write_fmt_time": "2015-09-02 08:35:51.975000-07:00", 
+            "write_ts": 1441208151.975, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/filtered_location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267f7d65cb39ee987aed"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.929239, 
+                    37.2997582
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:36:22.704000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208182.704, 
+            "longitude": -121.929239, 
+            "latitude": 37.2997582, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 45
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208183804
+            }, 
+            "write_fmt_time": "2015-09-02 08:36:23.804000-07:00", 
+            "write_ts": 1441208183.804, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267f7d65cb39ee987aee"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.929239, 
+                    37.2997582
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:36:22.704000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208182.704, 
+            "longitude": -121.929239, 
+            "latitude": 37.2997582, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 45
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208184354
+            }, 
+            "write_fmt_time": "2015-09-02 08:36:24.354000-07:00", 
+            "write_ts": 1441208184.354, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/filtered_location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267f7d65cb39ee987aef"
+        }, 
+        "data": {
+            "confidence": 61, 
+            "type": 3, 
+            "ts": 1441208210.037, 
+            "fmt_time": "2015-09-02 08:36:50.037000-07:00"
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208210037
+            }, 
+            "write_fmt_time": "2015-09-02 08:36:50.037000-07:00", 
+            "write_ts": 1441208210.037, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/motion_activity", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267f7d65cb39ee987af0"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9310777, 
+                    37.2988148
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:36:53.348000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208213.348, 
+            "longitude": -121.9310777, 
+            "latitude": 37.2988148, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 69
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208214324
+            }, 
+            "write_fmt_time": "2015-09-02 08:36:54.324000-07:00", 
+            "write_ts": 1441208214.324, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267f7d65cb39ee987af1"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9310777, 
+                    37.2988148
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:36:53.348000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208213.348, 
+            "longitude": -121.9310777, 
+            "latitude": 37.2988148, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 69
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208214883
+            }, 
+            "write_fmt_time": "2015-09-02 08:36:54.883000-07:00", 
+            "write_ts": 1441208214.883, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/filtered_location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e7267f7d65cb39ee987af2"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9331134, 
+                    37.2968197
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:37:24.406000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208244.406, 
+            "longitude": -121.9331134, 
+            "latitude": 37.2968197, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 55.5
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208245258
+            }, 
+            "write_fmt_time": "2015-09-02 08:37:25.258000-07:00", 
+            "write_ts": 1441208245.258, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726807d65cb39ee987af3"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9331134, 
+                    37.2968197
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:37:24.406000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208244.406, 
+            "longitude": -121.9331134, 
+            "latitude": 37.2968197, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 55.5
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208245847
+            }, 
+            "write_fmt_time": "2015-09-02 08:37:25.847000-07:00", 
+            "write_ts": 1441208245.847, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/filtered_location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726807d65cb39ee987af4"
+        }, 
+        "data": {
+            "confidence": 97, 
+            "type": 0, 
+            "ts": 1441208262.368, 
+            "fmt_time": "2015-09-02 08:37:42.368000-07:00"
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208262368
+            }, 
+            "write_fmt_time": "2015-09-02 08:37:42.368000-07:00", 
+            "write_ts": 1441208262.368, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/motion_activity", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726807d65cb39ee987af5"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9331134, 
+                    37.2968197
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:37:51.072000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208271.072, 
+            "longitude": -121.9331134, 
+            "latitude": 37.2968197, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 402.158
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208274610
+            }, 
+            "write_fmt_time": "2015-09-02 08:37:54.610000-07:00", 
+            "write_ts": 1441208274.61, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726807d65cb39ee987af6"
+        }, 
+        "data": {
+            "confidence": 62, 
+            "type": 0, 
+            "ts": 1441208305.825, 
+            "fmt_time": "2015-09-02 08:38:25.825000-07:00"
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208305825
+            }, 
+            "write_fmt_time": "2015-09-02 08:38:25.825000-07:00", 
+            "write_ts": 1441208305.825, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/motion_activity", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726807d65cb39ee987af7"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9347031, 
+                    37.2934674
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:38:25.591000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208305.591, 
+            "longitude": -121.9347031, 
+            "latitude": 37.2934674, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 38
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208307461
+            }, 
+            "write_fmt_time": "2015-09-02 08:38:27.461000-07:00", 
+            "write_ts": 1441208307.461, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726807d65cb39ee987af8"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9347031, 
+                    37.2934674
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:38:25.591000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208305.591, 
+            "longitude": -121.9347031, 
+            "latitude": 37.2934674, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 38
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208308115
+            }, 
+            "write_fmt_time": "2015-09-02 08:38:28.115000-07:00", 
+            "write_ts": 1441208308.115, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/filtered_location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726817d65cb39ee987af9"
+        }, 
+        "data": {
+            "confidence": 100, 
+            "type": 0, 
+            "ts": 1441208337.934, 
+            "fmt_time": "2015-09-02 08:38:57.934000-07:00"
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208337934
+            }, 
+            "write_fmt_time": "2015-09-02 08:38:57.934000-07:00", 
+            "write_ts": 1441208337.934, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/motion_activity", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726817d65cb39ee987afa"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9393642, 
+                    37.2919906
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:38:57.485000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208337.485, 
+            "longitude": -121.9393642, 
+            "latitude": 37.2919906, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 46.442
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208338970
+            }, 
+            "write_fmt_time": "2015-09-02 08:38:58.970000-07:00", 
+            "write_ts": 1441208338.97, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726817d65cb39ee987afb"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9393642, 
+                    37.2919906
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:38:57.485000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208337.485, 
+            "longitude": -121.9393642, 
+            "latitude": 37.2919906, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 46.442
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208339460
+            }, 
+            "write_fmt_time": "2015-09-02 08:38:59.460000-07:00", 
+            "write_ts": 1441208339.46, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/filtered_location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726817d65cb39ee987afc"
+        }, 
+        "data": {
+            "confidence": 85, 
+            "type": 0, 
+            "ts": 1441208370.075, 
+            "fmt_time": "2015-09-02 08:39:30.075000-07:00"
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208370075
+            }, 
+            "write_fmt_time": "2015-09-02 08:39:30.075000-07:00", 
+            "write_ts": 1441208370.075, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/motion_activity", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726817d65cb39ee987afd"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9421516, 
+                    37.28687
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:39:29.661000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208369.661, 
+            "longitude": -121.9421516, 
+            "latitude": 37.28687, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 30
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208371459
+            }, 
+            "write_fmt_time": "2015-09-02 08:39:31.459000-07:00", 
+            "write_ts": 1441208371.459, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726817d65cb39ee987afe"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9421516, 
+                    37.28687
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:39:29.661000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208369.661, 
+            "longitude": -121.9421516, 
+            "latitude": 37.28687, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 30
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208371972
+            }, 
+            "write_fmt_time": "2015-09-02 08:39:31.972000-07:00", 
+            "write_ts": 1441208371.972, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/filtered_location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726817d65cb39ee987aff"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9432719, 
+                    37.2854477
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:40:01.481000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208401.481, 
+            "longitude": -121.9432719, 
+            "latitude": 37.2854477, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 59.471
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208402713
+            }, 
+            "write_fmt_time": "2015-09-02 08:40:02.713000-07:00", 
+            "write_ts": 1441208402.713, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726817d65cb39ee987b00"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9432719, 
+                    37.2854477
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:40:01.481000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208401.481, 
+            "longitude": -121.9432719, 
+            "latitude": 37.2854477, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 59.471
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208403216
+            }, 
+            "write_fmt_time": "2015-09-02 08:40:03.216000-07:00", 
+            "write_ts": 1441208403.216, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/filtered_location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726827d65cb39ee987b01"
+        }, 
+        "data": {
+            "confidence": 97, 
+            "type": 3, 
+            "ts": 1441208428.114, 
+            "fmt_time": "2015-09-02 08:40:28.114000-07:00"
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208428114
+            }, 
+            "write_fmt_time": "2015-09-02 08:40:28.114000-07:00", 
+            "write_ts": 1441208428.114, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/motion_activity", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726827d65cb39ee987b02"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9445471, 
+                    37.2841741
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:40:31.532000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208431.532, 
+            "longitude": -121.9445471, 
+            "latitude": 37.2841741, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 45
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208432746
+            }, 
+            "write_fmt_time": "2015-09-02 08:40:32.746000-07:00", 
+            "write_ts": 1441208432.746, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726827d65cb39ee987b03"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9445471, 
+                    37.2841741
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:40:31.532000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208431.532, 
+            "longitude": -121.9445471, 
+            "latitude": 37.2841741, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 45
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208433137
+            }, 
+            "write_fmt_time": "2015-09-02 08:40:33.137000-07:00", 
+            "write_ts": 1441208433.137, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/filtered_location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726827d65cb39ee987b04"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9471218, 
+                    37.2808003
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:40:57.073000-07:00", 
+            "altitude": 29, 
+            "ts": 1441208457.073, 
+            "longitude": -121.9471218, 
+            "latitude": 37.2808003, 
+            "heading": 211, 
+            "sensed_speed": 9.25, 
+            "accuracy": 21
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208457335
+            }, 
+            "write_fmt_time": "2015-09-02 08:40:57.335000-07:00", 
+            "write_ts": 1441208457.335, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726827d65cb39ee987b05"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9471218, 
+                    37.2808003
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:40:57.073000-07:00", 
+            "altitude": 29, 
+            "ts": 1441208457.073, 
+            "longitude": -121.9471218, 
+            "latitude": 37.2808003, 
+            "heading": 211, 
+            "sensed_speed": 9.25, 
+            "accuracy": 21
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208457902
+            }, 
+            "write_fmt_time": "2015-09-02 08:40:57.902000-07:00", 
+            "write_ts": 1441208457.902, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/filtered_location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726827d65cb39ee987b06"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9472648, 
+                    37.2805677
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:41:03.141000-07:00", 
+            "altitude": 34.599998474121094, 
+            "ts": 1441208463.141, 
+            "longitude": -121.9472648, 
+            "latitude": 37.2805677, 
+            "heading": 208, 
+            "sensed_speed": 6, 
+            "accuracy": 5
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208463607
+            }, 
+            "write_fmt_time": "2015-09-02 08:41:03.607000-07:00", 
+            "write_ts": 1441208463.607, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726827d65cb39ee987b07"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9472648, 
+                    37.2805677
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:41:03.141000-07:00", 
+            "altitude": 34.599998474121094, 
+            "ts": 1441208463.141, 
+            "longitude": -121.9472648, 
+            "latitude": 37.2805677, 
+            "heading": 208, 
+            "sensed_speed": 6, 
+            "accuracy": 5
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208464236
+            }, 
+            "write_fmt_time": "2015-09-02 08:41:04.236000-07:00", 
+            "write_ts": 1441208464.236, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/filtered_location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726837d65cb39ee987b08"
+        }, 
+        "data": {
+            "confidence": 100, 
+            "type": 5, 
+            "ts": 1441208474.432, 
+            "fmt_time": "2015-09-02 08:41:14.432000-07:00"
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208474432
+            }, 
+            "write_fmt_time": "2015-09-02 08:41:14.432000-07:00", 
+            "write_ts": 1441208474.432, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/motion_activity", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726837d65cb39ee987b09"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9486285, 
+                    37.2792362
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:41:35.445000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208495.445, 
+            "longitude": -121.9486285, 
+            "latitude": 37.2792362, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 39
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208496843
+            }, 
+            "write_fmt_time": "2015-09-02 08:41:36.843000-07:00", 
+            "write_ts": 1441208496.843, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726837d65cb39ee987b0a"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9486285, 
+                    37.2792362
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:41:35.445000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208495.445, 
+            "longitude": -121.9486285, 
+            "latitude": 37.2792362, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 39
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208497355
+            }, 
+            "write_fmt_time": "2015-09-02 08:41:37.355000-07:00", 
+            "write_ts": 1441208497.355, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/filtered_location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726837d65cb39ee987b0b"
+        }, 
+        "data": {
+            "confidence": 46, 
+            "type": 4, 
+            "ts": 1441208500.676, 
+            "fmt_time": "2015-09-02 08:41:40.676000-07:00"
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208500676
+            }, 
+            "write_fmt_time": "2015-09-02 08:41:40.676000-07:00", 
+            "write_ts": 1441208500.676, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/motion_activity", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726837d65cb39ee987b0c"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9486669, 
+                    37.2792274
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:42:06.575000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208526.575, 
+            "longitude": -121.9486669, 
+            "latitude": 37.2792274, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 42
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208527097
+            }, 
+            "write_fmt_time": "2015-09-02 08:42:07.097000-07:00", 
+            "write_ts": 1441208527.097, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726837d65cb39ee987b0d"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9486669, 
+                    37.2792274
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:42:06.575000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208526.575, 
+            "longitude": -121.9486669, 
+            "latitude": 37.2792274, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 42
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208527433
+            }, 
+            "write_fmt_time": "2015-09-02 08:42:07.433000-07:00", 
+            "write_ts": 1441208527.433, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/filtered_location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726837d65cb39ee987b0e"
+        }, 
+        "data": {
+            "confidence": 65, 
+            "type": 2, 
+            "ts": 1441208551.462, 
+            "fmt_time": "2015-09-02 08:42:31.462000-07:00"
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208551462
+            }, 
+            "write_fmt_time": "2015-09-02 08:42:31.462000-07:00", 
+            "write_ts": 1441208551.462, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/motion_activity", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726847d65cb39ee987b0f"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9486284, 
+                    37.2792194
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:42:36.630000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208556.63, 
+            "longitude": -121.9486284, 
+            "latitude": 37.2792194, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 40.5
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208557180
+            }, 
+            "write_fmt_time": "2015-09-02 08:42:37.180000-07:00", 
+            "write_ts": 1441208557.18, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726847d65cb39ee987b10"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9486284, 
+                    37.2792194
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:42:36.630000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208556.63, 
+            "longitude": -121.9486284, 
+            "latitude": 37.2792194, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 40.5
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208558336
+            }, 
+            "write_fmt_time": "2015-09-02 08:42:38.336000-07:00", 
+            "write_ts": 1441208558.336, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/filtered_location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726847d65cb39ee987b11"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9486899, 
+                    37.2791961
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:43:07.722000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208587.722, 
+            "longitude": -121.9486899, 
+            "latitude": 37.2791961, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 48
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208592992
+            }, 
+            "write_fmt_time": "2015-09-02 08:43:12.992000-07:00", 
+            "write_ts": 1441208592.992, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726847d65cb39ee987b12"
+        }, 
+        "data": {
+            "loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9486899, 
+                    37.2791961
+                ]
+            }, 
+            "fmt_time": "2015-09-02 08:43:07.722000-07:00", 
+            "altitude": 0, 
+            "ts": 1441208587.722, 
+            "longitude": -121.9486899, 
+            "latitude": 37.2791961, 
+            "heading": 0, 
+            "sensed_speed": 0, 
+            "accuracy": 48
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208594024
+            }, 
+            "write_fmt_time": "2015-09-02 08:43:14.024000-07:00", 
+            "write_ts": 1441208594.024, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/filtered_location", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }, 
+    {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55e726847d65cb39ee987b13"
+        }, 
+        "data": {
+            "confidence": 67, 
+            "type": 4, 
+            "ts": 1441208614.116, 
+            "fmt_time": "2015-09-02 08:43:34.116000-07:00"
+        }, 
+        "metadata": {
+            "write_dt": {
+                "$date": 1441208614116
+            }, 
+            "write_fmt_time": "2015-09-02 08:43:34.116000-07:00", 
+            "write_ts": 1441208614.116, 
+            "time_zone": "America/Los_Angeles", 
+            "filter": "time", 
+            "platform": "android", 
+            "key": "background/motion_activity", 
+            "read_ts": 0, 
+            "type": "message"
+        }
+    }
+]

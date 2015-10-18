@@ -14,7 +14,9 @@ def export_timeline(user_id_str, day_str, file_name):
     logging.info("Extracting timeline for user %s day %s and saving to file %s" %
                  (user_id_str, day_str, file))
 
-    day_dt = pydt.datetime.strptime(day_str, "%Y-%m-%d").date()
+    # day_dt = pydt.datetime.strptime(day_str, "%Y-%m-%d").date()
+    day_dt = pydt.datetime.strptime(day_str, "%Y-%m-%d")
+    logging.debug("day_dt is %s" % day_dt)
     day_end_dt = day_dt + pydt.timedelta(days=1)
     # TODO: Convert to call to get_timeseries once we get that working
     # Or should we even do that?
