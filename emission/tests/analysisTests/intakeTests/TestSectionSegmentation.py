@@ -2,9 +2,7 @@
 import unittest
 import datetime as pydt
 import logging
-import uuid
 import json
-import pymongo
 
 # Our imports
 import emission.core.get_database as edb
@@ -22,21 +20,13 @@ import emission.storage.decorations.trip_queries as esdt
 import emission.storage.decorations.stop_queries as esdst
 import emission.storage.decorations.section_queries as esds
 
+# Test imports
+import emission.tests.common as etc
+
 class TestTripSegmentation(unittest.TestCase):
     def setUp(self):
         self.clearRelatedDb()
-        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
-        self.entries = json.load(open("emission/tests/data/my_data_jul_22.txt"))
-        self.testUUID = uuid.uuid4()
-        for entry in self.entries:
-            entry["user_id"] = self.testUUID
-            # print "Saving entry with write_ts = %s and ts = %s" % (entry["metadata"]["write_fmt_time"],
-            #                                                        entry["data"]["fmt_time"])
-            edb.get_timeseries_db().save(entry)
-        logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
-        logging.debug("First few entries = %s" % [e["data"]["fmt_time"] for e in
-                                                  list(edb.get_timeseries_db().find().sort("data.write_ts",
-                                                                                           pymongo.ASCENDING).limit(10))])
+        etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
 
     def tearDown(self):
         self.clearRelatedDb()
@@ -109,7 +99,7 @@ class TestTripSegmentation(unittest.TestCase):
         self.assertEqual(len(created_stops), 1)
         self.assertEqual(created_stops[0].enter_ts, 1440698066.704)
         self.assertEqual(created_stops[0].exit_ts, 1440698306.892)
-        self.assertEqual(created_stops[0].location, created_sections[1].start_loc)
+        self.assertEqual(created_stops[0].exit_loc, created_sections[1].start_loc)
         self.assertEqual(created_stops[0].ending_section, created_sections[0].get_id())
         self.assertEqual(created_stops[0].starting_section, created_sections[1].get_id())
 

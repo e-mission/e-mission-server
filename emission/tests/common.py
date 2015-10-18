@@ -1,9 +1,14 @@
 # Standard imports
+import logging
 from datetime import datetime, timedelta
 import json
+import bson.json_util as bju
+import uuid
+import pymongo
 
 # Our imports
 from emission.core.get_database import get_client_db, get_db, get_section_db
+import emission.core.get_database as edb
 
 def makeValid(client):
   client.clientJSON['start_date'] = str(datetime.now() + timedelta(days=-2))
@@ -83,3 +88,18 @@ def updateSections(testCase):
       section['user_id'] = curr_uuid
       testCase.uuid_list.append(curr_uuid)
       testCase.SectionsColl.save(section)
+
+def setupRealExample(testObj, dump_file):
+    logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
+    testObj.entries = json.load(open(dump_file), object_hook = bju.object_hook)
+    testObj.testUUID = uuid.uuid4()
+    for entry in testObj.entries:
+        entry["user_id"] = testObj.testUUID
+        # print "Saving entry with write_ts = %s and ts = %s" % (entry["metadata"]["write_fmt_time"],
+        #                                                        entry["data"]["fmt_time"])
+        edb.get_timeseries_db().save(entry)
+    logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
+    logging.debug("First few entries = %s" % [e["data"]["fmt_time"] for e in
+                                              list(edb.get_timeseries_db().find().sort("data.write_ts",
+                                                                                       pymongo.ASCENDING).limit(10))])
+
