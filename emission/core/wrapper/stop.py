@@ -18,7 +18,7 @@ class Stop(ecwb.WrapperBase):
              "duration": ecwb.WrapperBase.Access.WORM}    # the duration for which we were in this place
 
     enums = {}
-    geojson = ["location"]
+    geojson = ["enter_loc", "exit_loc"]
     nullable = ["enter_ts", "enter_fmt_time", "ending_section", # for the start of a chain
                 "exit_ts", "exit_fmt_time", "starting_section"] # for the end of a chain
 
