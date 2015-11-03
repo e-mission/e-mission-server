@@ -78,5 +78,4 @@ def _do_google_geo(address):
 def _do_google_reverse(lat, lng):
     geo = pyGeo()
     address = geo.reverse_geocode(lat, lng)
-    return address[0]
-    
+    return address[0] 
