@@ -69,6 +69,8 @@ class TestBuiltinUserCacheHandler(unittest.TestCase):
         # So we end up with all user1 entries in longterm
         self.assertEqual(len(self.uc1.getMessage()), 0)
         self.assertEqual(len(list(self.ts1.find_entries())), 30)
+        self.assertEqual(edb.get_timeseries_db().find().count(), 30);
+        self.assertEqual(edb.get_timeseries_error_db().find().count(), 0)
 
         # But all existing entries still in usercache for the second user
         self.assertEqual(len(self.uc2.getMessage()), 30)
