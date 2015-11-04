@@ -52,12 +52,14 @@ def get_maps_for_usercache(user_id):
                                     .map(lambda e: e.data)
     logging.debug("After pipeline, trips to phone list has length %d" % len(trips_to_phone.to_list()))
     assert(len(trips_to_phone.to_list()) == 1)
+    # logging.debug("trips_to_phone = %s" % trips_to_phone)
     return get_maps_for_geojson_list(trips_to_phone[0])
 
 def get_maps_for_geojson_list(trip_geojson_list):
     map_list = []
-    for trip_geojson in trip_geojson_list:
+    for trip_doc in trip_geojson_list:
         # logging.debug(trip_geojson)
+        trip_geojson = ad.AttrDict(trip_doc)
         logging.debug("centering based on start = %s, end = %s " % (trip_geojson.features[0], trip_geojson.features[1]))
         flipped_midpoint = lambda(p1, p2): [(p1.coordinates[1] + p2.coordinates[1])/2,
                                             (p1.coordinates[0] + p2.coordinates[0])/2]

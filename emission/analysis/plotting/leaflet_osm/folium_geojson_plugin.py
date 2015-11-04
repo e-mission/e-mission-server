@@ -1,10 +1,11 @@
 import folium.plugins.geo_json as fgj
+import bson.json_util
 
 class FoliumGeojsonPlugin(fgj.GeoJson):
     def __init__(self, data):
         from jinja2 import Environment, PackageLoader
 
-        super(FoliumGeojsonPlugin, self).__init__(data)
+        super(FoliumGeojsonPlugin, self).__init__(bson.json_util.dumps(data))
         self.plugin_name = 'FoliumGeojsonPlugin'
         # TODO: Introspect the package name instead of hardcoding it
         self.env = Environment(loader=PackageLoader('emission.analysis.plotting', 'leaflet_osm'))
