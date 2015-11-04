@@ -12,7 +12,7 @@ class Location(ecwb.WrapperBase):
              "accuracy": ecwb.WrapperBase.Access.RO,  # horizontal accuracy of the point in meters.
         # This is the radius of the 68% confidence, so a lower
         # number means better accuracy
-             "sensed_speed": ecwb.WrapperBase.Access.RO, # the speed reported by the phone
+             "sensed_speed": ecwb.WrapperBase.Access.RO, # the speed reported by the phone in m/s
              "speed": ecwb.WrapperBase.Access.RO,      # the speed calculated by us
              "distance": ecwb.WrapperBase.Access.RO,   # distance calculated by us
              "heading": ecwb.WrapperBase.Access.RO,    # heading reported by the phone
