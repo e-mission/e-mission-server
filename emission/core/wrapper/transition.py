@@ -13,7 +13,17 @@ class TransitionType(enum.Enum):
     EXITED_GEOFENCE = 1
     STOPPED_MOVING = 2
     STOP_TRACKING = 3
+    # android specific transitions
     BOOTED = 4
+    # iOS specific transitions
+    INIT_COMPLETE = 5
+    TRIP_STARTED = 6
+    RECEIVED_SILENT_PUSH = 7
+    TRIP_END_DETECTED = 8
+    TRIP_RESTARTED = 9
+    END_TRIP_TRACKING = 10
+    TRACKING_STOPPED = 11
+    NOP = 12
 
 class Transition(ecwb.WrapperBase):
     props = {"curr_state": ecwb.WrapperBase.Access.RO,
