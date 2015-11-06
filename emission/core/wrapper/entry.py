@@ -25,6 +25,7 @@ class Entry(ecwb.WrapperBase):
     return {"background/location": "location",
             "background/filtered_location": "location",
             "background/motion_activity": "motionactivity",
+            "statemachine/transition": "transition",
             "analysis/smoothing": "smoothresults"}
 
   @staticmethod

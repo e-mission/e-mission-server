@@ -1,0 +1,28 @@
+{
+    "user_id": {
+        "$uuid": "079e0f1ac4403d7cb0e7de160f748e35"
+    }, 
+    "_id": {
+        "$oid": "5639043a7d65cb39ee9a3ddc"
+    }, 
+    "data": {
+        "confidence": "high", 
+        "cycling": false, 
+        "unknown": false, 
+        "ts": 1446575026.229393, 
+        "walking": false, 
+        "running": false, 
+        "automotive": false, 
+        "stationary": false
+    }, 
+    "metadata": {
+        "write_ts": 1446575026.229393, 
+        "plugin": null, 
+        "time_zone": "America/Los_Angeles", 
+        "filter": "distance", 
+        "platform": "ios", 
+        "key": "background/motion_activity", 
+        "read_ts": 0, 
+        "type": "sensor-data"
+    }
+}

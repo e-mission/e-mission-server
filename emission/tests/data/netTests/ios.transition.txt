@@ -1,0 +1,22 @@
+{
+    "user_id": {
+        "$uuid": "079e0f1ac4403d7cb0e7de160f748e35"
+    }, 
+    "_id": {
+        "$oid": "563904397d65cb39ee9a3c9f"
+    }, 
+    "data": {
+        "transition": "T_TRIP_ENDED", 
+        "currState": "STATE_WAITING_FOR_TRIP_START"
+    }, 
+    "metadata": {
+        "write_ts": 1446577206.122407, 
+        "plugin": "none", 
+        "time_zone": "America/Los_Angeles", 
+        "filter": "distance", 
+        "platform": "ios", 
+        "key": "statemachine/transition", 
+        "read_ts": 0, 
+        "type": "message"
+    }
+}
