@@ -53,6 +53,14 @@ class TestFormatters(unittest.TestCase):
         enum = ioma.type_flags_to_enum(data)
         self.assertEqual(enum, ema.MotionTypes.STILL)
         
+    def testFlagsToEnumStoppedInVehicle(self):
+        import emission.net.usercache.formatters.ios.motion_activity as ioma
+        entry = json.load(open("emission/tests/data/netTests/ios.activity.txt"))
+        data = entry["data"]
+        data["automotive"] = True
+        enum = ioma.type_flags_to_enum(data)
+        self.assertEqual(enum, ema.MotionTypes.STOPPED_WHILE_IN_VEHICLE)
+        
     def testFlagsToEnumTwoEntries(self):
         import emission.net.usercache.formatters.ios.motion_activity as ioma
         entry = json.load(open("emission/tests/data/netTests/ios.activity.txt"))

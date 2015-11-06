@@ -44,9 +44,13 @@ def type_flags_to_enum(data):
         return ecwa.MotionTypes.NONE
         
     if np.count_nonzero(flags_df.state) > 1:
+        true_flags = flags_df[flags_df.state == True].flag.tolist()
         logging.info("Found two true modes %s for entry %s, skipping" % 
-            (flags_df[flags_df.state == True].flag, data))
-        raise RuntimeError("Cannot deal with two modes for one entry")
+            (true_flags, data))
+        if true_flags == ['stationary', 'automotive']:
+            return ecwa.MotionTypes.STOPPED_WHILE_IN_VEHICLE
+        else:
+            raise RuntimeError("Cannot deal with two modes for one entry")
     else:
         # Without the last [0], we return a series with one element, which
         # means that we can't look it up easily
