@@ -11,6 +11,14 @@ class MotionTypes(enum.Enum):
     TILTING = 5 
     WALKING = 7
     RUNNING = 8
+    # iOS only. Sometimes, the activity has all modes = false.
+    # I don't know how/why that should happen, but if it does,
+    # What we probably want to do is to ignore such entries,
+    # but we can't really do so while copying because every input
+    # in the user cache has an entry in long-term. So we create
+    # a "none" type to support it, and will ignore it when we 
+    # do the segmentation
+    NONE = 9
 
 class Motionactivity(ecwb.WrapperBase):
     props = {"type": ecwb.WrapperBase.Access.RO,

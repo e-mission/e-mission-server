@@ -16,7 +16,7 @@ def format(entry):
     formatted_entry.metadata = metadata
 
     data = entry.data
-    data.type = type_flags_to_enum(entry.data)
+    data.type = type_flags_to_enum(entry.data).value
     # TODO: for ios, the confidence is currently a string "high/medium/low".
     # should we convert it to a number to be consistent with the android version?
     # or should we leave it unchanged?
@@ -39,13 +39,18 @@ def type_flags_to_enum(data):
     flags_props = ["stationary", "walking", "running",
                    "cycling", "automotive", "unknown"]
     flags_df = map_flags(data, flags_props)
+    
+    if np.count_nonzero(flags_df.state) == 0:
+        return ecwa.MotionTypes.NONE
+        
     if np.count_nonzero(flags_df.state) > 1:
-        logging.info("Found two true modes for entry %s, skipping" % data)
+        logging.info("Found two true modes %s for entry %s, skipping" % 
+            (flags_df[flags_df.state == True].flag, data))
         raise RuntimeError("Cannot deal with two modes for one entry")
     else:
         # Without the last [0], we return a series with one element, which
         # means that we can't look it up easily
-        true_flag = flags_df[flags_df.state == True].flag[0]
+        true_flag = flags_df[flags_df.state == True].flag.iloc[0]
         logging.info("Found only one true mode %s, converting" % true_flag)
         return to_activity_enum(true_flag)
         

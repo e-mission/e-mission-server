@@ -61,12 +61,19 @@ class TestFormatters(unittest.TestCase):
         with self.assertRaisesRegexp(RuntimeError, ".*two modes.*"):
             enum = ioma.type_flags_to_enum(data)
             logging.warn("Got result num = %s instead of raising exception" % enum)
+    
+    def testFlagsToEnumNoEntries(self):
+        import emission.net.usercache.formatters.ios.motion_activity as ioma
+        entry = json.load(open("emission/tests/data/netTests/ios.activity.none.txt"))
+        data = entry["data"]
+        enum = ioma.type_flags_to_enum(data)
+        self.assertEqual(enum, ema.MotionTypes.NONE)
             
     def testConvertMotionActivity_ios(self):
         entry = json.load(open("emission/tests/data/netTests/ios.activity.txt"))
         formatted_entry = enuf.convert_to_common_format(ad.AttrDict(entry))
         self.assertEquals(formatted_entry.data.confidence, 100)
-        self.assertEquals(formatted_entry.data.type, ema.MotionTypes.STILL)
+        self.assertEquals(formatted_entry.data.type, ema.MotionTypes.STILL.value)
         self.assertEquals(formatted_entry.data.ts, 1446513827.479381)
         self.assertTrue(formatted_entry.data.fmt_time.startswith("2015-11-02T17:23:47"))
         
@@ -90,7 +97,6 @@ class TestFormatters(unittest.TestCase):
         self.assertEquals(formatted_entry.metadata.write_ts, 1446577206.122407)
         self.assertTrue(formatted_entry.data.fmt_time.startswith("2015-11-03T11:00:06.122"))
 
-        
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
