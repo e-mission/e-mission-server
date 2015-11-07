@@ -1,5 +1,7 @@
 import logging
 import attrdict as ad
+# This is only to allow us to catch the DuplicateKeyError
+import pymongo
 
 import emission.net.usercache.abstract_usercache_handler as enuah
 import emission.net.usercache.abstract_usercache as enua
@@ -52,6 +54,8 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
                 unified_entry = enuf.convert_to_common_format(entry)
                 ts.insert(unified_entry)
                 last_ts_processed = ecwe.Entry(unified_entry).metadata.write_ts
+            except pymongo.errors.DuplicateKeyError as e:
+                logging.info("document already present in timeseries, skipping since read-only")
             except Exception as e:
                 logging.exception("Backtrace time")
                 logging.warn("Got error %s while saving entry %s -> %s"% (e, entry, unified_entry))
