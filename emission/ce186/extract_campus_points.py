@@ -84,7 +84,7 @@ def get_elevation_change(pnt1, pnt2):
 
 
 def demo():
-    print "time is %s" % get_times_between_address("Cafe Strada", "Soda Hall", "BICYCLE")
+    print "time is %s" % get_times_between_point((37.8691323,-122.2549288), (37.8755814,-122.2589025), "BICYCLE")
     print "Loc change is %s" % str(get_ele_change_loc("Cafe Strada", "Soda Hall"))
                   
 #get_times_between_point((-122.27303, 37.81412), (-122.41173, 37.75497, ), "CAR")
