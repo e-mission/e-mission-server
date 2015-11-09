@@ -38,13 +38,21 @@ class UserModel:
 
         return get_top(lst_of_trips, scores)
 
-
-
     def get_score_for_trip(self, trip):
         """ The bulk of the project, stubbed out for now """
         noises = parse_noise()
         beuties = parse_beauty()
+        noises = normalize_scores(noises)
+        beauties = normalize_scores(beauties)
+        noise_score, beauty_score = 0, 0
+        
         for section in trip.sections:
+            noise_score += get_noise_score(self.section_start_location.get_lat(), self.section_end_location.get_lon(), noises)
+            beauty_score += get_beauty_score(self.section_start_location.get_lat(), self.section_end_location.get_lon(), beauties)
+
+        return self.utilities['noise']*noise_score + self.utilities['scenery']*beauty_score
+
+
 
 
     def get_top(self, lst_of_trips, scores):
@@ -104,4 +112,32 @@ def get_noise_score(lat, lng, noises):
         if noise_area.point_in_area(lat, lng):
             return noise_area.noise
     return float(tot) / float(len(noises)) ## if point isnt in any mapped area return the average
+
+def normalize_scores(areas):
+    counter = emmc.Counter()
+    for area in areas:
+        if area.beauty:
+            counter['name'] = area.beauty
+        elif area.noise:
+            counter['name'] = area.noise
+    counter.normalize()
+    
+    new_areas = [ ]
+    for name, value in counter.iteritems():
+        for area in areas:
+            if area.name == name:
+                if area.beauty:
+                    new_area = Area(name, area.bounding_box[0], area.bounding_box[1], beauty=value)
+                elif area.noise:
+                    new_area = Area(name, area.bounding_box[0], area.bounding_box[1], noise=value)
+                new_areas.append(new_area)
+
+    return new_areas
  
+def get_beauty_score(lat, lng, beauties):
+    tot = 0
+    for beauty_area in beauties:
+        tot += beauty_area.beauty
+        if beauty_area.point_in_area(lat, lng):
+            return beauty_area.beauty
+    return float(tot) / float(len(beauties)) ## if point isnt in any mapped area return the average
