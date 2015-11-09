@@ -11,13 +11,9 @@ def make_average_data_time_delta(time_period, our_file, given_delta, start_time)
 	total_now = 0
 	num_points_per_average = int(time_period // given_delta)
 	for line in data:
-		print line
 		num = int(line)
 		total_now += num
-		print "place is %s" % place
-		print "num_points_per_average is %s" % num_points_per_average
 		if place % num_points_per_average == 0:
-			print "here"
 			averages.append(total_now/num_points_per_average)
 			total_now = 0
 		place += 1

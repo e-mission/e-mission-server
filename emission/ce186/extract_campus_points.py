@@ -6,9 +6,9 @@ import json
 import googlemaps
 
 
-bounding_box = ( (37.87540, -122.26637),  (37.86938, -122.25251) )
+BOUNDING_BOX = ( (37.87540, -122.26637),  (37.86938, -122.25251) )
 
-def in_bounding_box(lat, lon):
+def in_bounding_box(lat, lon, bounding_box):
     return bounding_box[1][0] <= lat and lat <= bounding_box[0][0] and bounding_box[0][1] <= lon and lon <= bounding_box[1][1]
 
 def grab_loc_points_from_line(lne):
@@ -25,7 +25,7 @@ def extract_points():
     points = set()
     for l in osm_file:
         pnt = grab_loc_points_from_line(l)
-        if pnt and in_bounding_box(pnt[0], pnt[1]):
+        if pnt and in_bounding_box(pnt[0], pnt[1], BOUNDING_BOX):
             points.add(pnt)
             
     for pnt in points:
