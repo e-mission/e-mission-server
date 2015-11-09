@@ -15,6 +15,7 @@ class UserModel:
         self.utilities["scenery"] = 1
         self.utilities["social"] = 1
         self.utilities["time"] = 1
+        self.utilities["noise"] = 1
 
     def get_top_choice(self, start, end):
         curr_time = datetime.datetime.now()
@@ -41,7 +42,10 @@ class UserModel:
 
     def get_score_for_trip(self, trip):
         """ The bulk of the project, stubbed out for now """
-        return random.randint(1000)
+        noises = parse_noise()
+        beuties = parse_beauty()
+        for section in trip.sections:
+
 
     def get_top(self, lst_of_trips, scores):
         arg_max = 9999999999
@@ -63,7 +67,7 @@ class Area:
         self.beauty = beauty
         self.noise = noise
 
-    def in_area(self, lat, lng):
+    def point_in_area(self, lat, lng):
         return ecp.in_bounding_box(lat, lng, self.bounding_box)
 
     
@@ -92,3 +96,12 @@ def parse_beauty():
         a = Area(name, tl, br, beauty=beauty)
         beauty_areas.append(a)
     return beauty_areas
+
+def get_noise_score(lat, lng, noises):
+    tot = 0
+    for noise_area in noises:
+        tot += noise_area.noise
+        if noise_area.point_in_area(lat, lng):
+            return noise_area.noise
+    return float(tot) / float(len(noises)) ## if point isnt in any mapped area return the average
+ 
