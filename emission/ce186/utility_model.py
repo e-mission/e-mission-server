@@ -1,5 +1,6 @@
 import emission.simulation.markov_model_counter as emmc
 import emission.net.ext_service.otp.otp as otp
+import emission.ce186.extract_campus_points as ecp
 import random
 
 class UserModel:
@@ -38,8 +39,6 @@ class UserModel:
 
 
 
-
-
     def get_score_for_trip(self, trip):
         """ The bulk of the project, stubbed out for now """
         return random.randint(1000)
@@ -58,12 +57,38 @@ class UserModel:
 
 class Area:
 
-    def __init__(self, name, tl, tr, bl, br):
+    def __init__(self, name, tl, br, beauty=None, noise=None):
         self.name = name
-        self.bounding_box = (tl, tr, bl, br)
+        self.bounding_box = (tl, br)
+        self.beauty = beauty
+        self.noise = noise
 
+    def in_area(self, lat, lng):
+        return ecp.in_bounding_box(lat, lng, self.bounding_box)
 
+    
+def parse_noise():
+    noise_file = open("emission/ce186/NoiseLatLong.csv")
+    noise_areas = [ ]
+    for noise_line in noise_file:
+        noise_line = noise_line.split()
+        name = noise_line[0]
+        tl = (float(noise_line[1]), float(noise_line[2]))
+        br = (float(noise_line[3]), float(noise_line[4]))
+        noise = int(noise_line[5])
+        a = Area(name, tl, br, noise=noise)
+        noise_areas.append(a)
+    return noise_areas
 
-
-def in_bounding_box(lat, lng):
-    return True
+def parse_beauty():
+    beauty_file = open("emission/ce186/beauty.csv")
+    beauty_areas = [ ]
+    for beauty_line in beauty_file:
+        beauty_line = beauty_line.split()
+        name = beauty_line[0]
+        tl = (float(beauty_line[1]), float(beauty_line[2]))
+        br = (float(beauty_line[5]), float(beauty_line[6]))
+        beaty = int(beauty_line[7])
+        a = Area(name, tl, br, beauty=beauty)
+        beauty_areas.append(a)
+    return beauty_areas
