@@ -22,6 +22,18 @@ def get_time_range_for_usercache(user_id):
     tq.endTs = tq.endTs * 1000
     return tq
 
+def get_time_range_for_accuracy_filtering(user_id):
+    return get_time_range_for_stage(user_id, ps.PipelineStages.ACCURACY_FILTERING)
+
+def mark_accuracy_filtering_done(user_id, last_processed_ts):
+    if last_processed_ts is None:
+        mark_stage_done(user_id, ps.PipelineStages.ACCURACY_FILTERING, None)
+    else:
+        mark_stage_done(user_id, ps.PipelineStages.ACCURACY_FILTERING, last_processed_ts + END_FUZZ_AVOID_LTE)
+
+def mark_accuracy_filtering_failed(user_id):
+    mark_stage_failed(user_id, ps.PipelineStages.ACCURACY_FILTERING)
+
 def get_time_range_for_segmentation(user_id):
     return get_time_range_for_stage(user_id, ps.PipelineStages.TRIP_SEGMENTATION)
 

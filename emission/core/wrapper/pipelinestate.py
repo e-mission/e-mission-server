@@ -4,6 +4,7 @@ import enum as enum
 
 class PipelineStages(enum.Enum):
     USERCACHE = 0
+    ACCURACY_FILTERING = 6
     TRIP_SEGMENTATION = 1
     SECTION_SEGMENTATION = 2
     JUMP_SMOOTHING = 3

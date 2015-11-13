@@ -9,6 +9,7 @@ import attrdict as ad
 from functional import seq
 
 # import emission.analysis.classification.cleaning.location_smoothing as ls
+import bson.json_util as bju
 
 import emission.storage.decorations.location_queries as lq
 import emission.storage.decorations.trip_queries as esdt
@@ -47,8 +48,9 @@ def get_maps_for_range(user_id, start_ts, end_ts):
 def get_maps_for_usercache(user_id):
     data_to_phone = seq(enau.sync_server_to_phone(user_id))
     logging.debug("Before pipeline, trips to phone list has length %d" % len(data_to_phone.to_list()))
+    logging.debug("keys are %s" % data_to_phone.map(lambda e: ad.AttrDict(e).metadata.key))
     trips_to_phone = data_to_phone.map(lambda e: ad.AttrDict(e))\
-                                    .filter(lambda e: e.metadata.key == "diary/trips")\
+                                    .filter(lambda e: e.metadata.key.startswith("diary/trips")) \
                                     .map(lambda e: e.data)
     logging.debug("After pipeline, trips to phone list has length %d" % len(trips_to_phone.to_list()))
     assert(len(trips_to_phone.to_list()) == 1)
@@ -70,7 +72,43 @@ def get_maps_for_geojson_list(trip_geojson_list):
         curr_map.add_plugin(curr_plugin)
         map_list.append(curr_map)
     return map_list
+    
+def flipped(coord):
+    return (coord[1], coord[0])
+    
+def get_center_for_map(coords):
+    # logging.debug(trip_geojson)
+    midpoint = lambda(p1, p2): [(p1[0] + p2[0])/2,
+                                (p1[1] + p2[1])/2]
+    if len(coords) == 0:
+        return None
+    if len(coords) == 1:
+        return flipped(coords)
+    if len(coords) > 0:
+        logging.debug("Getting midpoint of %s and %s" % (coords[0], coords[-1]))
+        return flipped(midpoint((coords[0], coords[-1])))
+    
+def get_maps_for_geojson_unsectioned(feature_list):
+    map_list = []
+    for feature in feature_list:
+        # logging.debug("Getting map for feature %s" % bju.dumps(feature))
+        feature_coords = list(get_coords(feature))
+        # feature_coords = list(gj.utils.coords(feature))
+        curr_map = folium.Map(get_center_for_map(feature_coords))
+        curr_plugin = fgjp.FoliumGeojsonPlugin(dict(feature))
+        curr_map.add_plugin(curr_plugin)
+        map_list.append(curr_map)
+    return map_list
 
+def get_coords(feature):
+    # logging.debug("Getting coordinates for feature %s" % bju.dumps(feature))
+    if feature["type"] == "FeatureCollection":
+        retVal = []
+        for f in feature["features"]:
+            retVal.extend(get_coords(f))
+        return retVal
+    else:
+        return gj.utils.coords(feature)
 
 def get_maps_for_range_old(user_id, start_ts, end_ts):
     # First, get the timeline for that range.
