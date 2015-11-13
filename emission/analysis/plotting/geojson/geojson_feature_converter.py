@@ -147,14 +147,7 @@ def section_to_geojson(section, tl):
         filtered_section_location_array[idx]["distance"] = row["distance"]
     points_feature_array = [location_to_geojson(l) for l in filtered_section_location_array]
 
-    points_line_string = gj.LineString()
-    # points_line_string.coordinates = [l.loc.coordinates for l in filtered_section_location_array]
-    points_line_string.coordinates = []
-
-    for l in filtered_section_location_array:
-        # logging.debug("About to add %s to line_string " % l)
-        points_line_string.coordinates.append(l.loc.coordinates)
-
+    points_line_feature = point_array_to_line(filtered_section_location_array)
     # If this is the first section, we already start from the trip start. But we actually need to start from the
     # prior place. Fudge this too. Note also that we may want to figure out how to handle this properly in the model
     # without needing fudging. TODO: Unclear how exactly to do this
@@ -162,14 +155,12 @@ def section_to_geojson(section, tl):
         # This is the first section. So we need to find the start place of the parent trip
         parent_trip = tl.get_object(section.trip_id)
         start_place_of_parent_trip = tl.get_object(parent_trip.start_place)
-        points_line_string.coordinates.insert(0, start_place_of_parent_trip.location.coordinates)
+        points_line_feature.geometry.coordinates.insert(0, start_place_of_parent_trip.location.coordinates)
 
     for i, point_feature in enumerate(points_feature_array):
         point_feature.properties["idx"] = i
 
-    points_line_feature = gj.Feature()
     points_line_feature.id = str(section.get_id())
-    points_line_feature.geometry = points_line_string
     points_line_feature.properties = copy.copy(section)
     points_line_feature.properties["feature_type"] = "section"
     points_line_feature.properties["sensed_mode"] = str(points_line_feature.properties.sensed_mode)
@@ -177,7 +168,6 @@ def section_to_geojson(section, tl):
     points_line_feature.properties["speeds"] = speeds
     points_line_feature.properties["distances"] = distances
 
-    # _stringify_foreign_key(points_line_feature.properties, ["start_stop", "end_stop", "trip_id"])
     _del_non_derializable(points_line_feature.properties, ["start_loc", "end_loc"])
 
     feature_array.append(gj.FeatureCollection(points_feature_array))
@@ -185,6 +175,18 @@ def section_to_geojson(section, tl):
 
     return gj.FeatureCollection(feature_array)
 
+def point_array_to_line(point_array):
+    points_line_string = gj.LineString()
+    # points_line_string.coordinates = [l.loc.coordinates for l in filtered_section_location_array]
+    points_line_string.coordinates = []
+
+    for l in point_array:
+        # logging.debug("About to add %s to line_string " % l)
+        points_line_string.coordinates.append(l.loc.coordinates)
+    
+    points_line_feature = gj.Feature()
+    points_line_feature.geometry = points_line_string
+    return points_line_feature    
 
 def trip_to_geojson(trip, tl):
     """
@@ -224,6 +226,9 @@ def trip_to_geojson(trip, tl):
         # gap between the real departure time and the time that the trip starts is small, and just combine it here.
         section_gj = section_to_geojson(section, tl)
         feature_array.append(section_gj)
+        import bson.json_util as bju
+        for f in section_gj.features:
+            logging.debug("Section has feature %s" % bju.dumps(f))
         # TODO: Fix me to use the wrapper
         section_distance = [f["properties"]["distance"] for f in section_gj.features if
             f.type == "Feature" and f.geometry.type == "LineString"]
@@ -257,4 +262,23 @@ def get_geojson_for_range(user_id, start_ts, end_ts):
             logging.exception("Found error %s while processing trip %s" % (e, trip))
             raise e
 
-    return geojson_list
+    return geojson_list    
+    
+def get_all_points_for_range(user_id, key, start_ts, end_ts):
+    import emission.net.usercache.abstract_usercache as enua
+#     import emission.core.wrapper.location as ecwl 
+    
+    tq = enua.UserCache.TimeQuery("write_ts", start_ts, end_ts)
+    ts = esta.TimeSeries.get_time_series(user_id)
+    entry_it = ts.find_entries([key], tq)
+    points_array = [ecwl.Location(ts._to_df_entry(entry)) for entry in entry_it]
+    
+    points_feature_array = [location_to_geojson(l) for l in points_array]
+    print ("Found %d points" % len(points_feature_array))
+    
+    feature_array = []
+    feature_array.append(gj.FeatureCollection(points_feature_array))
+    feature_array.append(point_array_to_line(points_array))
+    feature_coll = gj.FeatureCollection(feature_array)
+        
+    return feature_coll
