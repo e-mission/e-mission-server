@@ -39,7 +39,8 @@ class TestFilterAccuracy(unittest.TestCase):
         self.assertEqual(len(unfiltered_points_df), 205)
 
         entry = unfiltered_points_df.iloc[5]
-        unfiltered_appended_df = pd.DataFrame([entry] * 5).append(unfiltered_points_df)
+        unfiltered_appended_df = pd.DataFrame([entry] * 5).append(unfiltered_points_df).reset_index()
+        logging.debug("unfiltered_appended_df = %s" % unfiltered_appended_df[["fmt_time"]].head())
 
         self.assertEqual(eaicf.check_prior_duplicate(unfiltered_appended_df, 5, entry), True)
         self.assertEqual(eaicf.check_prior_duplicate(unfiltered_points_df, 5, entry), False)
