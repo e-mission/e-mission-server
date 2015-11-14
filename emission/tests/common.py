@@ -99,7 +99,8 @@ def setupRealExample(testObj, dump_file):
         #                                                        entry["data"]["fmt_time"])
         edb.get_timeseries_db().save(entry)
     logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
-    logging.debug("First few entries = %s" % [e["data"]["fmt_time"] for e in
-                                              list(edb.get_timeseries_db().find().sort("data.write_ts",
+    logging.debug("First few entries = %s" % 
+                    [e["data"]["fmt_time"] for e in 
+                        list(edb.get_timeseries_db().find({"user_id": testObj.testUUID}).sort("data.write_ts",
                                                                                        pymongo.ASCENDING).limit(10))])
 
