@@ -30,17 +30,36 @@ class TripSegmentationMethod(object):
             waiting until the end of the day in order to use a clustering algorithm, returns None)
         """
         pass
-
+    
 def segment_current_trips(user_id):
     ts = esta.TimeSeries.get_time_series(user_id)
     time_query = epq.get_time_range_for_segmentation(user_id)
 
     import emission.analysis.intake.segmentation.trip_segmentation_methods.dwell_segmentation_time_filter as dstf
+    import emission.analysis.intake.segmentation.trip_segmentation_methods.dwell_segmentation_dist_filter as dsdf
     dstfsm = dstf.DwellSegmentationTimeFilter(time_threshold = 5 * 60, # 5 mins
                                               point_threshold = 9,
                                               distance_threshold = 100) # 100 m
 
-    segmentation_points = dstfsm.segment_into_trips(ts, time_query)
+    dsdfsm = dsdf.DwellSegmentationDistFilter(time_threshold = 10 * 60, # 5 mins
+                                              point_threshold = 9,
+                                              distance_threshold = 50) # 50 m
+
+    filter_methods = {"time": dstfsm, "distance": dsdfsm}
+    # We need to use the appropriate filter based on the incoming data
+    # So let's read in the location points for the specified query
+    loc_df = ts.get_data_df("background/filtered_location", time_query)
+    filters_in_df = loc_df["filter"].unique()
+    logging.debug("Filters in the dataframe = %s" % filters_in_df)
+    if len(filters_in_df) == 1:
+        # Common case - let's make it easy
+        
+        segmentation_points = filter_methods[filters_in_df[0]].segment_into_trips(ts,
+            time_query)
+    else:
+        segmentation_points = get_combined_segmentation_points(ts, loc_df, time_query,
+                                                               filters_in_df,
+                                                               filter_methods)
     # Create and store trips and places based on the segmentation points
     if segmentation_points is None:
         epq.mark_segmentation_failed(user_id)
@@ -51,10 +70,52 @@ def segment_current_trips(user_id):
     else:
         try:
             create_places_and_trips(user_id, segmentation_points)
-            epq.mark_segmentation_done(user_id, dstfsm.last_ts_processed)
+            epq.mark_segmentation_done(user_id, get_last_ts_processed(filter_methods))
         except:
             logging.exception("Trip generation failed for user %s" % user_id)
             epq.mark_segmentation_failed(user_id)
+            
+def get_combined_segmentation_points(ts, loc_df, time_query, filters_in_df, filter_methods):
+    """
+    We can have mixed filters in a particular time range for multiple reasons.
+    a) user switches phones from one platform to another
+    b) user signs in simultaneously to phones on both platforms
+    case (b) is not a supported case, and can happen even with the same platform - i.e. a user can sign in to two devices of the same platform
+    (e.g. tablet and phone) with the same ID and then the trips won't really
+    match up.
+    So let's handle case (a), which should be a supported use case, 
+    by creating separate time queries for the various types of filters and
+    combining them based on the order in which the filters appear in the dataframe.
+    Note that another option is to filter the dataframe inside the segmentation method
+    but then you would have to figure out how to recombine the segmentation points
+    maybe sort the resulting segmentation points by start_ts?
+    That might be the easier option after all
+    """
+    segmentation_map = {}
+    for curr_filter in filters_in_df:
+        time_query.startTs = loc_df[loc_df["filter"] == curr_filter].head(1).iloc[0].ts
+        time_query.endTs = loc_df[loc_df["filter"] == curr_filter].tail(1).iloc[0].ts
+        logging.debug("for filter %s, startTs = %d and endTs = %d" %
+            (curr_filter, time_query.startTs, time_query.endTs))
+        segmentation_map[time_query.startTs] = filter_methods[curr_filter].segment_into_trips(ts, time_query)
+    logging.debug("After filtering, segmentation_map has keys %s" % segmentation_map.keys())
+    sortedStartTsList = sorted(segmentation_map.keys())
+    segmentation_points = []
+    for startTs in sortedStartTsList:
+        segmentation_points.extend(segmentation_map[startTs])
+    return segmentation_points
+
+def get_last_ts_processed(filter_methods):
+    last_ts_processed = None
+    for method in filter_methods.itervalues():
+        try:
+            if last_ts_processed is None or method.last_ts_processed > last_ts_processed:
+                last_ts_processed = method.last_ts_processed
+                logging.debug("Set last_ts_processed = %s from method %s" % (last_ts_processed, method))
+        except AttributeError, e:
+            logging.debug("Processing method %s got error %s, skipping" % (method, e))
+    logging.info("Returning last_ts_processed = %s" % last_ts_processed)
+    return last_ts_processed
 
 def create_places_and_trips(user_id, segmentation_points):
     # new segments, need to deal with them
