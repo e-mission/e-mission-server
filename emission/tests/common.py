@@ -7,6 +7,9 @@ import uuid
 import pymongo
 
 # Our imports
+import emission.storage.timeseries.format_hacks.move_filter_field as estfm
+import emission.analysis.intake.cleaning.filter_accuracy as eaicf
+
 from emission.core.get_database import get_client_db, get_db, get_section_db
 import emission.core.get_database as edb
 
@@ -98,6 +101,10 @@ def setupRealExample(testObj, dump_file):
         # print "Saving entry with write_ts = %s and ts = %s" % (entry["metadata"]["write_fmt_time"],
         #                                                        entry["data"]["fmt_time"])
         edb.get_timeseries_db().save(entry)
+        
+    eaicf.filter_accuracy(testObj.testUUID)
+    estfm.move_all_filters_to_data()
+    
     logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
     logging.debug("First few entries = %s" % 
                     [e["data"]["fmt_time"] for e in 

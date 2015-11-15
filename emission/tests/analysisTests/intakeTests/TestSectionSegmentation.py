@@ -23,7 +23,7 @@ import emission.storage.decorations.section_queries as esds
 # Test imports
 import emission.tests.common as etc
 
-class TestTripSegmentation(unittest.TestCase):
+class TestSectionSegmentation(unittest.TestCase):
     def setUp(self):
         self.clearRelatedDb()
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")

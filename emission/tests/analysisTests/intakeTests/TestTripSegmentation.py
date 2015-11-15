@@ -29,9 +29,6 @@ class TestTripSegmentation(unittest.TestCase):
         self.androidUUID = self.testUUID
         etc.setupRealExample(self, "emission/tests/data/real_examples/iphone_2015-11-06")
         self.iosUUID = self.testUUID
-        eaicf.filter_accuracy(self.iosUUID)
-        estfm.move_all_filters_to_data()
-        
         logging.debug("androidUUID = %s, iosUUID = %s" % (self.androidUUID, self.iosUUID))
 
     def tearDown(self):
