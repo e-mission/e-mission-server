@@ -29,10 +29,10 @@ def check_prior_duplicate(df, idx, entry):
     # We need to stop at idx-1 because otherwise, the entry being checked will
     # be included in the results and we will think that everything has a
     # duplicate
-    logging.debug("When idx = %s, last entry checked = %s" % (idx, df.loc[0:idx-1].tail(2)))
+    # logging.debug("When idx = %s, last entry checked = %s" % (idx, df.loc[0:idx-1].tail(2)))
     duplicates = df.loc[0:idx-1].query("latitude == @entry.latitude and longitude == @entry.longitude")
-    logging.debug("for entry with fmt_time = %s, ts = %s, lat = %s, lng = %s, found %d duplicates" % 
-                    (entry.fmt_time, entry.ts, entry.latitude, entry.longitude, len(duplicates)))
+    # logging.debug("for entry with fmt_time = %s, ts = %s, lat = %s, lng = %s, found %d duplicates" % 
+    #                 (entry.fmt_time, entry.ts, entry.latitude, entry.longitude, len(duplicates)))
     if len(duplicates) == 1:
         logging.debug("duplicate fields are fmt_time = %s, ts = %s, lat = %s, lng = %s" %
                         (duplicates.fmt_time.iloc[0], duplicates.ts.iloc[0],
@@ -79,7 +79,7 @@ def filter_accuracy(user_id):
                 if check_existing_filtered_location(timeseries, entry):
                     logging.info("Found existing filtered location for entry at index = %s, id = %s, ts = %s, fmt_time = %s, skipping" % (idx, entry._id, entry.ts, entry.fmt_time))
                     continue
-                logging.debug("Inserting %s filtered entry %s into timeseries" % (idx, entry))
+                # logging.debug("Inserting %s filtered entry %s into timeseries" % (idx, entry))
                 entry_copy = convert_to_filtered(timeseries.get_entry_at_ts(
                                                     "background/location",
                                                     "metadata.write_ts",
