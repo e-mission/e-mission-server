@@ -58,7 +58,9 @@ def segment_trip_into_sections(user_id, trip_id):
     import emission.analysis.intake.segmentation.section_segmentation_methods.smoothed_high_confidence_motion as shcm
     shcmsm = shcm.SmoothedHighConfidenceMotion(60, [ecwm.MotionTypes.TILTING,
                                                     ecwm.MotionTypes.UNKNOWN,
-                                                    ecwm.MotionTypes.STILL])
+                                                    ecwm.MotionTypes.STILL,
+                                                    ecwm.MotionTypes.NONE, # iOS only
+                                                    ecwm.MotionTypes.STOPPED_WHILE_IN_VEHICLE]) # iOS only
     segmentation_points = shcmsm.segment_into_sections(ts, time_query)
 
     # Since we are segmenting an existing trip into sections, we do not need to worry about linking with

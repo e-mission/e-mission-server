@@ -20,13 +20,18 @@ import emission.storage.decorations.trip_queries as esdt
 import emission.storage.decorations.stop_queries as esdst
 import emission.storage.decorations.section_queries as esds
 
+import emission.storage.timeseries.format_hacks.move_filter_field as estfm
+import emission.analysis.intake.cleaning.filter_accuracy as eaicf
+
 # Test imports
 import emission.tests.common as etc
 
-class TestTripSegmentation(unittest.TestCase):
+class TestSectionSegmentation(unittest.TestCase):
     def setUp(self):
         self.clearRelatedDb()
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
+        eaicf.filter_accuracy(self.testUUID)
+        estfm.move_all_filters_to_data()
 
     def tearDown(self):
         self.clearRelatedDb()

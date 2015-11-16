@@ -98,6 +98,7 @@ def setupRealExample(testObj, dump_file):
         # print "Saving entry with write_ts = %s and ts = %s" % (entry["metadata"]["write_fmt_time"],
         #                                                        entry["data"]["fmt_time"])
         edb.get_timeseries_db().save(entry)
+        
     logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
     logging.debug("First few entries = %s" % 
                     [e["data"]["fmt_time"] for e in 

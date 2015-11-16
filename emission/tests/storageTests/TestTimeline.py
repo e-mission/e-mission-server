@@ -16,6 +16,9 @@ import emission.core.wrapper.trip as ecwt
 import emission.core.wrapper.stop as ecws
 import emission.core.wrapper.section as ecwsc
 
+import emission.analysis.intake.cleaning.filter_accuracy as eaicf
+import emission.storage.timeseries.format_hacks.move_filter_field as estfm
+
 # Test imports
 import emission.tests.common as etc
 
@@ -23,6 +26,8 @@ class TestTimeline(unittest.TestCase):
     def setUp(self):
         self.clearRelatedDb()
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
+        eaicf.filter_accuracy(self.testUUID)
+        estfm.move_all_filters_to_data()        
         logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
         self.day_start_ts = 1440658800
         self.day_end_ts = 1440745200
