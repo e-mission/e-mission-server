@@ -26,7 +26,7 @@ class TestTimeline(unittest.TestCase):
     def setUp(self):
         self.clearRelatedDb()
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
-        eaicf.filter_accuracy(self.iosUUID)
+        eaicf.filter_accuracy(self.testUUID)
         estfm.move_all_filters_to_data()        
         logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
         self.day_start_ts = 1440658800
