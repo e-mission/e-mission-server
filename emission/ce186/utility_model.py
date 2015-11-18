@@ -4,11 +4,13 @@ import emission.core.our_geocoder as geo
 import emission.core.wrapper.trip_old as to
 
 import datetime
+import random
 
 class UserBase:
 
     def __init__(self):
         self.users = {}
+        self.crowd_areas = {}
 
     def add_user(self, user):
         self.users[user.name] = user
@@ -16,12 +18,23 @@ class UserBase:
     def get_user(self, user_name):
         return self.users[user_name]
 
+    def add_crowd(self, area):
+        self.crowd_areas[area.name] = area
+
+    def get_crowd_info(self, area_name):
+        return self.crowd_areas[area_name]
+
+
+
 class UserModel:
 
-    def __init__(self, name, has_bike=False):
+    def __init__(self, name, user_base, has_bike=False):
         self.name = name
         self.utilities = emmc.Counter()
         self.has_bike = has_bike
+        self.user_base = user_base
+
+        user_base.add_user(self)
 
         ## Initialize utilities
         self.utilities["sweat"] = 1
@@ -37,8 +50,9 @@ class UserModel:
         end = our_geo.geocode(end_place)
         return self.get_top_choice_lat_lng(start, end)
 
-    def get_top_choice_lat_lng(self, start, end):
-        curr_time = datetime.datetime.now()
+    def get_top_choice_lat_lng(self, start, end, curr_time=None):
+        if curr_time is None:
+            curr_time = datetime.datetime.now()
         curr_month = curr_time.month
         curr_year = curr_time.year
         curr_minute = curr_time.minute
@@ -53,15 +67,20 @@ class UserModel:
         print "start is %s" % our_geo.reverse_geocode(start.get_lat(), start.get_lon())
         print "end is %s" % our_geo.reverse_geocode(end.get_lat(), end.get_lon())
 
+
+
         our_otp = otp.OTP(start, end, mode, write_day(curr_month, curr_day, curr_year), write_time(curr_hour, curr_minute), self.has_bike)
         lst_of_trips = our_otp.get_all_trips(0,0,0)
 
+        print "len(lst_of_trips) = %s" % len(lst_of_trips)
         scores = [ ]
 
         for trip in lst_of_trips:
             scores.append(self.get_score_for_trip(trip))
 
-        return self.get_top(lst_of_trips, scores)
+        top = self.get_top(lst_of_trips, scores)
+
+        return top
 
     def get_score_for_trip(self, trip):
         noises = parse_noise()
@@ -69,7 +88,10 @@ class UserModel:
 
         noises = normalize_scores(noises)
         beauties = normalize_scores(beauties)
-        noise_score, beauty_score = 0, 0
+        noise_score, beauty_score, crowd_score = 0, 0, 0
+        
+        # for crowd in crowds:
+        #     crowd.add_time(trip.end_time)
 
         print "length of trip.sections is %s" % len(trip.sections)
 
@@ -81,8 +103,16 @@ class UserModel:
                 noise_score += get_noise_score(point.get_lat(), point.get_lon(), noises)
                 beauty_score += get_beauty_score(point.get_lat(), point.get_lon(), beauties)
 
-        top_score = self.utilities['noise']*noise_score + self.utilities['scenery']*beauty_score
-        print "top score is %s" % top_score
+
+
+        for crowd in self.user_base.crowd_areas.itervalues():
+            crowd.update_times(trip.start_time)
+            crowd_score += crowd.get_crowd()
+
+
+
+        time = get_time_of_trip(trip)
+        top_score = self.utilities['noise']*noise_score + self.utilities['scenery']*beauty_score - self.utilities['crowded']*crowd_score
         return top_score
 
 
@@ -107,6 +137,11 @@ class UserModel:
         self.utilities.normalize()
 
 
+
+def get_time_of_trip(trip):
+    return trip.end_time - trip.start_time
+
+
 class Area:
 
     def __init__(self, name, tl, br, beauty=None, noise=None):
@@ -119,25 +154,19 @@ class Area:
     def point_in_area(self, lat, lng):
         return in_bounding_box(lat, lng, self.bounding_box)
 
-    def add_to_n_crowd(self, n):
-        self.crowd += n
-
-    def increment_crowd(self):
-        self.crowd += 1
-
     def add_time(self, time):
         self.times.add(time)
-
-    def add_now(self):
-        self.add_time(datetime.datetime.now())
 
     def get_crowd(self):
         return len(self.times)
 
-    def update_times(time_by):
+    def update_times(self, time_by):
         for time in self.times:
             if time < time_by:
                 self.times.remove(time)
+
+    def update_to_now(self):
+        self.update_times(datetime.datetime.now())
 
 
 def in_bounding_box(lat, lon, bounding_box):
@@ -169,6 +198,8 @@ def parse_beauty():
         beauty_areas.append(a)
     return beauty_areas
 
+
+
 def get_noise_score(lat, lng, noises):
     tot = 0
     for noise_area in noises:
@@ -185,8 +216,6 @@ def normalize_scores(areas):
             counter[area.name] = area.beauty
         elif area.noise:
             counter[area.name] = area.noise
-        elif area.crowd:
-            counter[area.name] = area.crowd
     counter.normalize()
     
     new_areas = [ ]
@@ -197,8 +226,6 @@ def normalize_scores(areas):
                     new_area = Area(name, area.bounding_box[0], area.bounding_box[1], beauty=value)
                 elif area.noise:
                     new_area = Area(name, area.bounding_box[0], area.bounding_box[1], noise=value)
-                elif area.crowd:
-                    new_area = Area(name, area.bounding_box[0], area.bounding_box[1], crowd=value)
                 new_areas.append(new_area)
 
     return new_areas
@@ -213,7 +240,8 @@ def get_beauty_score(lat, lng, beauties):
 
 
 def test():
-    josh = UserModel("josh")
+    base = UserBase()
+    josh = UserModel("josh", base)
     josh.increase_utility_by_n("scenery", 20)
     josh.increase_utility_by_n("noise", 10)
     top_choice = josh.get_top_choice_lat_lng(to.Coordinate(37.8691323,-122.2549288), to.Coordinate(37.8755814,-122.2589025))
@@ -239,3 +267,71 @@ def write_day(month, day, year):
 
 def write_time(hour, minute):
     return "%s:%s" % (hour, minute)
+
+
+
+PLACES = {"cafe_strada" : to.Coordinate(37.8691582,-122.2569807), "jacobs_hall" : to.Coordinate(37.8755764,-122.2584384), 
+            "li_ka_shing" : to.Coordinate(37.872931, -122.265220), "i_house" : to.Coordinate(37.869794, -122.252015)}
+
+def make_random_user(base):
+    name = str(random.random())
+    user = UserModel(name, base)
+    utilites = ("sweat", "scenery", "social", "time", "noise", "crowded")
+    for u in utilites:
+        new_utility = random.randint(1, 101)
+        user.increase_utility_by_n(u, new_utility)
+    return user
+
+def make_user_base(size):
+    user_base = UserBase()
+    crowds = parse_starting_pop()
+    for _ in xrange(size):
+        user = make_random_user(user_base)
+        user_base.add_user(user)
+    
+    for crowd in crowds:
+        user_base.add_crowd(crowd)
+
+    return user_base
+
+
+def parse_starting_pop():
+    beauty_file = open("emission/ce186/beauty.csv")
+    beauty_areas = [ ]
+    for beauty_line in beauty_file:
+        beauty_line = beauty_line.split(',')
+        name = beauty_line[0]
+        tl = (float(beauty_line[1]), float(beauty_line[2]))
+        br = (float(beauty_line[5]), float(beauty_line[6]))
+        a = Area(name, tl, br)
+        beauty_areas.append(a)
+    return beauty_areas
+
+def run_simulation():
+    print "creating users"
+    user_base = make_user_base(100)
+
+    print "putting 20 users on their way at 8am"
+    time_now = datetime.datetime(2015, 11, 18, 8, 0, 0)
+    user_num = 0
+    for user in user_base.users.itervalues():
+        if user_num > 19:
+            break
+        try:
+            user.get_top_choice_lat_lng(random.choice(PLACES.values()), random.choice(PLACES.values()), time_now)
+        except:
+            "error skipping"
+        user_num += 1
+
+    print "two minutes later, lets see how this effects routing"
+    time_now = datetime.datetime(2015, 11, 18, 8, 2, 0)
+    for user in user_base.users.itervalues():
+        if user_num > 49:
+            break
+        try:
+            user.get_top_choice_lat_lng(random.choice(PLACES.values()), random.choice(PLACES.values()), time_now)
+        except:
+            "error skipping"        
+        user_num += 1
+
+        
