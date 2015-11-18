@@ -59,14 +59,21 @@ class UserModel:
         beauties = normalize_scores(beauties)
         noise_score, beauty_score = 0, 0
 
+        print "length of trip.sections is %s" % len(trip.sections)
+
 
         for section in trip.sections:
+            print "length of section.points is %s" % len(section.points)
             for point in section.points:
+                print 
                 print point
                 noise_score += get_noise_score(point.get_lat(), point.get_lon(), noises)
                 beauty_score += get_beauty_score(point.get_lat(), point.get_lon(), beauties)
 
-        return self.utilities['noise']*noise_score + self.utilities['scenery']*beauty_score
+        top_score = self.utilities['noise']*noise_score + self.utilities['scenery']*beauty_score
+        print "top score is %s" % 
+        top_score
+        return top_score
 
 
     def get_top(self, lst_of_trips, scores):
@@ -101,7 +108,6 @@ class Area:
 
     def point_in_area(self, lat, lng):
         return in_bounding_box(lat, lng, self.bounding_box)
-
 
 
 def in_bounding_box(lat, lon, bounding_box):
@@ -170,7 +176,6 @@ def get_beauty_score(lat, lng, beauties):
         if beauty_area.point_in_area(lat, lng):
             return beauty_area.beauty
     return float(tot) / float(len(beauties)) ## if point isnt in any mapped area return the average
-
 
 
 def test():
