@@ -5,6 +5,17 @@ import emission.core.wrapper.trip_old as to
 
 import datetime
 
+class UserBase:
+
+    def __init__(self):
+        self.users = {}
+
+    def add_user(self, user):
+        self.users[user.name] = user
+
+    def get_user(self, user_name):
+        return self.users[user_name]
+
 class UserModel:
 
     def __init__(self, name, has_bike=False):
@@ -18,6 +29,7 @@ class UserModel:
         self.utilities["social"] = 1
         self.utilities["time"] = 1
         self.utilities["noise"] = 1
+        self.utilities["crowded"] = 1
 
     def get_top_choice_places(self, start_place, end_place):
         our_geo = geo.Geocoder()
@@ -61,7 +73,6 @@ class UserModel:
 
         print "length of trip.sections is %s" % len(trip.sections)
 
-
         for section in trip.sections:
             print "length of section.points is %s" % len(section.points)
             for point in section.points:
@@ -71,8 +82,7 @@ class UserModel:
                 beauty_score += get_beauty_score(point.get_lat(), point.get_lon(), beauties)
 
         top_score = self.utilities['noise']*noise_score + self.utilities['scenery']*beauty_score
-        print "top score is %s" % 
-        top_score
+        print "top score is %s" % top_score
         return top_score
 
 
@@ -91,8 +101,7 @@ class UserModel:
         self.utilities[which] += 1
 
     def increase_utility_by_n(self, which, n):
-        for i in xrange(n):
-            self.increment_utility(which)
+        self.utilities[which] += n
 
     def normalize_utilities(self):
         self.utilities.normalize()
@@ -105,9 +114,30 @@ class Area:
         self.bounding_box = (tl, br)
         self.beauty = beauty
         self.noise = noise
+        self.times = set()
 
     def point_in_area(self, lat, lng):
         return in_bounding_box(lat, lng, self.bounding_box)
+
+    def add_to_n_crowd(self, n):
+        self.crowd += n
+
+    def increment_crowd(self):
+        self.crowd += 1
+
+    def add_time(self, time):
+        self.times.add(time)
+
+    def add_now(self):
+        self.add_time(datetime.datetime.now())
+
+    def get_crowd(self):
+        return len(self.times)
+
+    def update_times(time_by):
+        for time in self.times:
+            if time < time_by:
+                self.times.remove(time)
 
 
 def in_bounding_box(lat, lon, bounding_box):
@@ -155,6 +185,8 @@ def normalize_scores(areas):
             counter[area.name] = area.beauty
         elif area.noise:
             counter[area.name] = area.noise
+        elif area.crowd:
+            counter[area.name] = area.crowd
     counter.normalize()
     
     new_areas = [ ]
@@ -165,6 +197,8 @@ def normalize_scores(areas):
                     new_area = Area(name, area.bounding_box[0], area.bounding_box[1], beauty=value)
                 elif area.noise:
                     new_area = Area(name, area.bounding_box[0], area.bounding_box[1], noise=value)
+                elif area.crowd:
+                    new_area = Area(name, area.bounding_box[0], area.bounding_box[1], crowd=value)
                 new_areas.append(new_area)
 
     return new_areas
@@ -185,12 +219,18 @@ def test():
     top_choice = josh.get_top_choice_lat_lng(to.Coordinate(37.8691323,-122.2549288), to.Coordinate(37.8755814,-122.2589025))
     print_path(top_choice)
 
+def find_route(user_base, user, start, end):
+    our_user = user_base.get_user(user)
+    our_user.get_top_choice_lat_lng(start, end)
+
 def print_path(trip):
     print len(trip.sections)
     for section in trip.sections:
         for point in section.points:
             print point.get_lat(), point.get_lon()
     print trip.trip_end_location.get_lat(), trip.trip_end_location.get_lon()
+
+
 
 
 
