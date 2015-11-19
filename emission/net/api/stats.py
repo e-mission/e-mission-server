@@ -46,22 +46,33 @@ def storeClientEntry(user, key, ts, reading, metadata):
   currEntry = createEntry(user, key, ts, reading)
   # Add the os and app versions from the metadata dict
   currEntry.update(metadata)
-  get_client_stats_db().insert(currEntry)
+  response = get_client_stats_db().insert(currEntry)
+  
+  return response != None
+
 
 # server measurements will call this directly since there's not much point in
 # batching in a different location and then making a call here since it runs on
 # the same server. Might change if we move engagement stats to a different server
 # Note also that there is no server metadata since we currently have no
 # versioning on the server. Should probably add some soon
+
 def storeServerEntry(user, key, ts, reading):
   logging.debug("storing server entry %s for user %s, key %s at timestamp %s" % (reading, user, key, ts))
   currEntry = createEntry(user, key, ts, reading)
-  get_server_stats_db().insert(currEntry)
+  response = get_server_stats_db().insert(currEntry)
+
+  # Return boolean that tells you whether the insertion was successful or not
+  return response != None
 
 def storeResultEntry(user, key, ts, reading):
   logging.debug("storing result entry %s for user %s, key %s at timestamp %s" % (reading, user, key, ts))
   currEntry = createEntry(user, key, ts, reading)
-  get_result_stats_db().insert(currEntry)
+  response = get_result_stats_db().insert(currEntry)
+
+  # Return boolean that tells you whether the insertion was successful or not
+  return response != None
+
 
 def getClientMeasurementCount(readings):
   retSum = 0
