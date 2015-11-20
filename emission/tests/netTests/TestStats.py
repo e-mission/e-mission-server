@@ -5,7 +5,8 @@ import json
 import time
 
 # Our imports
-from emission.core.get_database import get_client_stats_db, get_server_stats_db, get_result_stats_db, StatArchiver
+from emission.core.get_database import get_client_stats_db, get_server_stats_db, get_result_stats_db
+from emission.net.int_service.giles import archiver
 from emission.net.api import stats
 
 logging.basicConfig(level=logging.DEBUG)
@@ -13,11 +14,12 @@ logging.basicConfig(level=logging.DEBUG)
 class TestArchiver(unittest.TestCase):
   def setUp(self):
     self.path = '/archiver_test_path'
-    self.archiver = StatArchiver(self.path)
+    self.archiver = archiver.StatArchiver(self.path)
 
   def tearDown(self):
     self.archiver.remove()
 
+  # @TODO: Rewrite this test, it doesn't really test much
   def testInsertEntryWithMetadata(self):
     entry = {
         'user': '3a307244-ecf1-3e6e-a9a7-3aaf101b40fa',
@@ -29,6 +31,7 @@ class TestArchiver(unittest.TestCase):
     result = self.archiver.insert(entry)
     self.assertNotEqual(result, None)
 
+  # @TODO: Rewrite this test, it doesn't really test much
   def testInsertEntryWithoutMetadata(self):
     entry = {
         'user': '3a307244-ecf1-3e6e-a9a7-3aaf101b40fa',

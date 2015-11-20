@@ -2,8 +2,7 @@ from pymongo import MongoClient
 import pymongo
 import os
 import json
-import uuid
-import requests
+from emission.net.int_service.giles import archiver
 
 def get_mode_db():
     current_db = MongoClient().Stage_database
@@ -88,101 +87,23 @@ def get_uuid_db():
     UUIDs = current_db.Stage_uuids
     return UUIDs
 
-class StatArchiver:
-    QUERY_URL = "http://localhost:8079/api/query"
-    ARCHIVER_URL = "http://localhost:8079/add/apikey"
-
-    def __init__(self, path):
-        self.path = path
-
-    # @TODO: Currently, inserting multiple readings to the same stream will cause the 
-    #   stream to only save the last reading update. Figure out how to add readings 
-    #   rather than replace
-    # @TODO: Figure out how to support higher precision timestamps
-    # @TODO: Store generated UUIDs somewhere
-    # @TODO: Do some error-checking on Giles' response, to make sure the insertion
-    #   actually worked
-    def insert(self, entry):
-        assert type(entry) == dict
-        stat = entry['stat']
-        user_uuid = entry['user']
-
-        # TODO: Support more precise timestamps
-        # Giles has some problem unmarshalling floats
-        client_ts = int(entry['ts'])
-        reading = entry['reading']
-        stream_uuid = str(uuid.uuid5(uuid.NAMESPACE_DNS, stat + ',' + user_uuid))
-
-        smapMsg = {
-            self.path: {
-                "Metadata": {},
-                "Readings": [
-                    [
-                        client_ts,
-                        reading
-                    ]
-                ],
-                "uuid": stream_uuid
-            }
-        }
-        for key in entry:
-            if key != "reading" and key != 'ts':
-                smapMsg[self.path]["Metadata"][key] = entry[key]
-
-        try:
-            json.dumps(smapMsg)
-        except Exception as e:
-            print("Error storing entry for user %s, stat %s at timestamp %s: \
-                entry is not JSON serializable" % (user_uuid, stat, client_ts))
-            return None
-
-        # @TODO: Do some error-checking on the response to make sure it actually
-        # really did work
-        response = requests.post(self.ARCHIVER_URL, data=json.dumps(smapMsg))
-        return response
-
-    def remove(self):
-        queryMsg = 'delete where Path="' + self.path + '"'
-        response = requests.post(self.QUERY_URL, data=queryMsg)
-        return response
-
-    # Tags contain metadata associated with an entry
-    # Return all tags for all streams stored in archiver's current path
-    def query_tags(self):
-        queryMsg = 'select * where Path="' + self.path + '"'
-        response = requests.post(self.QUERY_URL, data=queryMsg) 
-        try:
-            return json.loads(response.content)
-        except Exception as e:
-            return response.content
-
-    # Return all readings for all streams stored in archiver's current path
-    def query_readings(self):
-        queryMsg = 'select data before now where Path="' + self.path + '"'
-        response = requests.post(self.QUERY_URL, data=queryMsg) 
-        try:
-            return json.loads(response.content)
-        except Exception as e:
-            return response.content
-
-
 def get_client_stats_db():
     #current_db=MongoClient().Stage_database
     #ClientStats = current_db.Stage_client_stats
     #return ClientStats
-    return StatArchiver('/client_stats')
+    return archiver.StatArchiver('/client_stats')
 
 def get_server_stats_db():
     #current_db=MongoClient().Stage_database
     #ServerStats = current_db.Stage_server_stats
     #return ServerStats
-    return StatArchiver('/server_stats')
+    return archiver.StatArchiver('/server_stats')
 
 def get_result_stats_db():
     #current_db=MongoClient().Stage_database
     #ResultStats = current_db.Stage_result_stats
     #return ResultStats
-    return StatArchiver('/result_stats')
+    return archiver.StatArchiver('/result_stats')
 
 def get_db():
     current_db=MongoClient('localhost').Stage_database
