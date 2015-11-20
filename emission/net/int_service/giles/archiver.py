@@ -3,7 +3,6 @@ import requests
 import json
 import os
 
-import json
 
 def get_conf_file():
     f = open("conf/net/int_service/giles_conf.json", "r")
