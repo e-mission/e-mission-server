@@ -30,6 +30,10 @@ def check_prior_duplicate(df, idx, entry):
     # be included in the results and we will think that everything has a
     # duplicate
     # logging.debug("When idx = %s, last entry checked = %s" % (idx, df.loc[0:idx-1].tail(2)))
+    logging.debug("check_prior_duplicate called with size = %d, entry = %d" % (len(df), idx))
+    if len(df) == 0:
+        logging.info("len(df) == 0, early return")
+        return False
     duplicates = df.loc[0:idx-1].query("latitude == @entry.latitude and longitude == @entry.longitude")
     # logging.debug("for entry with fmt_time = %s, ts = %s, lat = %s, lng = %s, found %d duplicates" % 
     #                 (entry.fmt_time, entry.ts, entry.latitude, entry.longitude, len(duplicates)))
@@ -62,11 +66,11 @@ def filter_accuracy(user_id):
     timeseries = esta.TimeSeries.get_time_series(user_id)
     try:
         unfiltered_points_df = timeseries.get_data_df("background/location", time_query)
-        filtered_from_unfiltered_df = unfiltered_points_df[unfiltered_points_df.accuracy < 200]
-        logging.info("filtered %d of %d points" % (len(filtered_from_unfiltered_df), len(unfiltered_points_df)))
         if len(unfiltered_points_df) == 0:
             epq.mark_accuracy_filtering_done(user_id, None) 
         else:        
+            filtered_from_unfiltered_df = unfiltered_points_df[unfiltered_points_df.accuracy < 200]
+            logging.info("filtered %d of %d points" % (len(filtered_from_unfiltered_df), len(unfiltered_points_df)))
             for idx, entry in filtered_from_unfiltered_df.iterrows():
                 # First, we check to see if this is a duplicate of an existing entry.
                 # If so, we will skip it since it is probably generated as a duplicate...
