@@ -49,6 +49,12 @@ def segment_current_trips(user_id):
     # We need to use the appropriate filter based on the incoming data
     # So let's read in the location points for the specified query
     loc_df = ts.get_data_df("background/filtered_location", time_query)
+    if len(loc_df) == 0:
+        # no new segments, no need to keep looking at these again
+        logging.debug("len(loc_df) == 0, early return")
+        epq.mark_segmentation_done(user_id, None)
+        return
+
     filters_in_df = loc_df["filter"].unique()
     logging.debug("Filters in the dataframe = %s" % filters_in_df)
     if len(filters_in_df) == 1:

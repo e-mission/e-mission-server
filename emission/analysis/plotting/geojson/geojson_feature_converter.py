@@ -226,9 +226,9 @@ def trip_to_geojson(trip, tl):
         # gap between the real departure time and the time that the trip starts is small, and just combine it here.
         section_gj = section_to_geojson(section, tl)
         feature_array.append(section_gj)
-        import bson.json_util as bju
-        for f in section_gj.features:
-            logging.debug("Section has feature %s" % bju.dumps(f))
+        # import bson.json_util as bju
+        # for f in section_gj.features:
+        #     logging.debug("Section has feature %s" % bju.dumps(f))
         # TODO: Fix me to use the wrapper
         section_distance = [f["properties"]["distance"] for f in section_gj.features if
             f.type == "Feature" and f.geometry.type == "LineString"]
@@ -258,6 +258,12 @@ def get_geojson_for_range(user_id, start_ts, end_ts):
                              (trip, trip_geojson.properties["distance"]))
             else:
                 geojson_list.append(trip_geojson)
+        except KeyError, e:
+            # We ran into key errors while dealing with mixed filter trips.
+            # I think those should be resolved for now, so we can raise the error again
+            # But if this is preventing us from making progress, we can comment out the raise
+            logging.exception("Found key error %s while processing trip %s" % (e, trip))
+            raise e
         except Exception, e:
             logging.exception("Found error %s while processing trip %s" % (e, trip))
             raise e

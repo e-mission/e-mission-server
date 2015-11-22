@@ -32,6 +32,23 @@ class TestFilterAccuracy(unittest.TestCase):
         import emission.core.get_database as edb
         edb.get_timeseries_db().remove({"user_id": self.testUUID})
         edb.get_pipeline_state_db().remove({"user_id": self.testUUID})
+        
+    def testEmptyCallToPriorDuplicate(self):
+        time_query = epq.get_time_range_for_accuracy_filtering(self.testUUID)
+        unfiltered_points_df = self.ts.get_data_df("background/location", time_query)
+        self.assertEqual(len(unfiltered_points_df), 205)
+
+        # Check call to check duplicate with a zero length dataframe
+        entry = unfiltered_points_df.iloc[5]
+        self.assertEqual(eaicf.check_prior_duplicate(pd.DataFrame(), 0, entry), False)
+
+    def testEmptyCall(self):
+        # Check call to the entire filter accuracy with a zero length timeseries
+        import emission.core.get_database as edb
+        edb.get_timeseries_db().remove({"user_id": self.testUUID})
+        # We expect that this should not throw
+        eaicf.filter_accuracy(self.testUUID)
+        self.assertEqual(len(self.ts.get_data_df("background/location")), 0)
 
     def testCheckPriorDuplicate(self):
         time_query = epq.get_time_range_for_accuracy_filtering(self.testUUID)
@@ -42,9 +59,10 @@ class TestFilterAccuracy(unittest.TestCase):
         unfiltered_appended_df = pd.DataFrame([entry] * 5).append(unfiltered_points_df).reset_index()
         logging.debug("unfiltered_appended_df = %s" % unfiltered_appended_df[["fmt_time"]].head())
 
+        self.assertEqual(eaicf.check_prior_duplicate(unfiltered_appended_df, 0, entry), False)
         self.assertEqual(eaicf.check_prior_duplicate(unfiltered_appended_df, 5, entry), True)
         self.assertEqual(eaicf.check_prior_duplicate(unfiltered_points_df, 5, entry), False)
-
+        
     def testConvertToFiltered(self):
         time_query = epq.get_time_range_for_accuracy_filtering(self.testUUID)
         unfiltered_points_df = self.ts.get_data_df("background/location", time_query)

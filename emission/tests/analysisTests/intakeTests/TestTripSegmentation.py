@@ -38,6 +38,12 @@ class TestTripSegmentation(unittest.TestCase):
         edb.get_timeseries_db().remove({"user_id": self.iosUUID}) 
         edb.get_place_db().remove() 
         edb.get_trip_new_db().remove() 
+
+    def testEmptyCall(self):
+        import uuid
+        dummyUserId = uuid.uuid4()
+        # We just expect that this won't raise an exception
+        eaist.segment_current_trips(dummyUserId)
         
     def testSegmentationPointsDwellSegmentationTimeFilter(self):
         ts = esta.TimeSeries.get_time_series(self.androidUUID)

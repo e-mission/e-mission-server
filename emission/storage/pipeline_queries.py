@@ -15,11 +15,12 @@ def mark_usercache_done(user_id, last_processed_ts):
     else:
         mark_stage_done(user_id, ps.PipelineStages.USERCACHE, last_processed_ts + END_FUZZ_AVOID_LTE)
 
-def get_time_range_for_usercache(user_id):
+def get_time_range_for_usercache(user_id, platform):
     tq = get_time_range_for_stage(user_id, ps.PipelineStages.USERCACHE)
-    if tq.startTs is not None:
-        tq.startTs = tq.startTs * 1000
-    tq.endTs = tq.endTs * 1000
+    if platform == "android":
+        if tq.startTs is not None:
+            tq.startTs = tq.startTs * 1000
+        tq.endTs = tq.endTs * 1000
     return tq
 
 def get_time_range_for_accuracy_filtering(user_id):

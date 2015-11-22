@@ -36,8 +36,18 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         # stage is still marked successful. This means that the stage can never
         # be unsuccessful. We could try to keep it, but then the delete query
         # below will get significantly more complicated.
-        time_query = esp.get_time_range_for_usercache(self.user_id)
         uc = enua.UserCache.getUserCache(self.user_id)
+        messages = uc.getMessage()
+        # Here, we assume that the user only has data from a single platform.
+        # Since this is a temporary hack, this is fine
+        if len(messages) == 0:
+            logging.debug("No messages to process")
+            esp.mark_usercache_done(None)
+            return
+
+        platform = messages[0]["metadata"]["platform"]
+        time_query = esp.get_time_range_for_usercache(self.user_id, platform)
+
         ts = etsa.TimeSeries.get_time_series(self.user_id)
 
         curr_entry_it = uc.getMessage(None, time_query)
