@@ -21,7 +21,8 @@ def get_giles_api_key():
 
 
 class StatArchiver:
-    GILES_BASE_URL = get_giles_base_url()
+    GILES_BASE_URL = get_giles_base_url()def get_conf_file():
+
     GILES_API_KEY = get_giles_api_key()
     #QUERY_URL = "http://localhost:8079/api/query"
     #ARCHIVER_URL = "http://localhost:8079/add/apikey"
