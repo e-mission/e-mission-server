@@ -4,7 +4,6 @@ import json
 import os
 
 
-def get_conf_file():
     f = open("conf/net/int_service/giles_conf.json", "r")
     conf = json.loads(f.read())
     f.close()
@@ -22,7 +21,8 @@ def get_giles_api_key():
 
 
 class StatArchiver:
-    GILES_BASE_URL = get_giles_base_url()
+    GILES_BASE_URL = get_giles_base_url()def get_conf_file():
+
     GILES_API_KEY = get_giles_api_key()
     #QUERY_URL = "http://localhost:8079/api/query"
     #ARCHIVER_URL = "http://localhost:8079/add/apikey"
@@ -53,7 +53,7 @@ class StatArchiver:
         # Giles has some problem unmarshalling floats
         client_ts = int(entry['ts'])
         reading = entry['reading']
-        stream_uuid = str(uuid.uuid5(uuid.NAMESPACE_DNS, stat + ',' + user_uuid))
+        stream_uuid = str(uuid.uuid5(uuid.NAMESPACE_DNS, stat + ',' + str(user_uuid)))
 
         smapMsg = {
             self.path: {
