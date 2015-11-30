@@ -493,6 +493,8 @@ def getUUID(request, inHeader=False):
   else:
     userToken = __getToken__(request, inHeader)
     retUUID = getUUIDFromToken(userToken)
+  if retUUID is None:
+     raise HTTPError(403, "token is valid, but no account found for user")
   request.params.user_uuid = retUUID
   return retUUID
 # Auth helpers END

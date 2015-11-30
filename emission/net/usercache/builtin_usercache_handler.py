@@ -42,7 +42,9 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         # Since this is a temporary hack, this is fine
         if len(messages) == 0:
             logging.debug("No messages to process")
-            esp.mark_usercache_done(None)
+            # Since we didn't get the current time range, there is no current 
+            # state, so we don't need to mark it as done
+            # esp.mark_usercache_done(None)
             return
 
         platform = messages[0]["metadata"]["platform"]
