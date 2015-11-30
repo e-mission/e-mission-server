@@ -24,6 +24,8 @@ class TransitionType(enum.Enum):
     END_TRIP_TRACKING = 10
     TRACKING_STOPPED = 11
     NOP = 12
+    VISIT_STARTED = 13
+    VISIT_ENDED = 14
 
 class Transition(ecwb.WrapperBase):
     props = {"curr_state": ecwb.WrapperBase.Access.RO,
