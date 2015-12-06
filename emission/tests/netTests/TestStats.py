@@ -40,12 +40,16 @@ class TestStats(unittest.TestCase):
     self.assertEquals(len(savedEntries), 2)
 
 
-    # @TODO: Improve this test to be more informative
     for savedEntry in savedEntries:
-      #print(savedEntry)
       self.assertEquals(savedEntry['Metadata']['client_app_version'], '2.0.1')
       self.assertEquals(savedEntry['Metadata']['client_os_version'], '4.3')
       self.assertAlmostEqual(savedEntry['Metadata']['reported_ts'], currTime, places = 0)
+
+
+    # @TODO: Query readings only returns the latest one; I have decided to not support
+    # time-range queries through the Python interface, because these queries are given 
+    # for free through the UPMU plotter, which talks directly to BTRDB, and it's not
+    # clear that there's a need for querying this on the backend yet.
 
       #if savedEntry['stat'] == 'sync_pull_list_size':
       #  self.assertIn(savedEntry['ts'], [1411418998701, 1411418998702, 1411418998703])

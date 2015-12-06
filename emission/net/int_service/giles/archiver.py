@@ -30,21 +30,10 @@ class StatArchiver:
         self.path = path
         self.query_url = os.path.join(self.GILES_BASE_URL, 'api', 'query')
         self.archiver_url = os.path.join(self.GILES_BASE_URL, 'add', self.GILES_API_KEY)
-        #print(self.query_url)
-        #print(self.archiver_url)
-        #print(self.GILES_BASE_URL)
-        #print(self.GILES_API_KEY)
-        #print(self.archiver_url)
-        #print(self.query_url)
 
-    # @TODO: Currently, inserting multiple readings to the same stream will cause the 
-    #   stream to only save the last reading update. Figure out how to add readings 
-    #   rather than replace
-    # @TODO: Figure out how to support higher precision timestamps
-    # @TODO: Store generated UUIDs somewhere
-    # @TODO: Do some error-checking on Giles' response, to make sure the insertion
-    #   actually worked
-
+    # NOTE: When we insert an entry to the Archiver, we associate that entry with a stream UUID, which is
+    # a function of the stat and user_uuid. 
+    # No mapping needs to be maintained since this UUID can be reconstructed as long as the above data is found.
     def insert(self, entry):
         assert type(entry) == dict
         stat = entry['stat']
@@ -52,10 +41,12 @@ class StatArchiver:
 
         # TODO: Support more precise timestamps
         # Giles has some problem unmarshalling floats
+        #client_ts = int(entry['ts'])
         client_ts = int(entry['ts'])
         reading = entry['reading']
-        stream_uuid = str(uuid.uuid5(uuid.NAMESPACE_DNS, stat + ',' + str(user_uuid)))
 
+        #UUID is a function of things which are stored already, so it seems unimportant to maintain the mapping.
+        stream_uuid = str(uuid.uuid5(uuid.NAMESPACE_DNS, stat + ',' + str(user_uuid)))
 
         smapMsg = {
             self.path: {
@@ -78,10 +69,10 @@ class StatArchiver:
                 "uuid": stream_uuid
             }
         }
+
         for key in entry:
             if key != "reading" and key != 'ts':
                 smapMsg[self.path]["Metadata"][key] = entry[key]
-        #print(smapMsg)
         try:
             json.dumps(smapMsg)
         except Exception as e:
@@ -92,7 +83,8 @@ class StatArchiver:
         # @TODO: Do some error-checking on the response to make sure it actually
         # really did work
         response = requests.post(self.archiver_url, data=json.dumps(smapMsg))
-        return response
+        success = response.content == ''
+        return success
 
     def remove(self):
         queryMsg = 'delete where Path="' + self.path + '"'
@@ -103,8 +95,8 @@ class StatArchiver:
     # Return all tags for all streams stored in archiver's current path
     def query_tags(self):
         queryMsg = 'select * where Path="' + self.path + '"'
-        print(queryMsg)
-        print(self.query_url)
+        #print(queryMsg)
+        #print(self.query_url)
 
         response = requests.post(self.query_url, data=queryMsg) 
         try:

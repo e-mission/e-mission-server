@@ -26,8 +26,8 @@ class TestArchiver(unittest.TestCase):
         'stat': 'POST /tripManager/getUnclassifiedSections',
         'metakey': 'metaval'
     }
-    result = self.archiver.insert(entry)
-    self.assertNotEqual(result, None)
+    success = self.archiver.insert(entry)
+    self.assertEqual(success, True)
 
   # @TODO: Rewrite this test, it doesn't really test much
   def testInsertEntryWithoutMetadata(self):
@@ -37,8 +37,8 @@ class TestArchiver(unittest.TestCase):
         'ts': 1417725167,
         'stat': 'POST /tripManager/getUnclassifiedSections'
     }
-    result = self.archiver.insert(entry)
-    self.assertNotEqual(result, None)
+    sucess = self.archiver.insert(entry)
+    self.assertEqual(sucess, True)
 
   def testQueryTags(self):
     entry = {
