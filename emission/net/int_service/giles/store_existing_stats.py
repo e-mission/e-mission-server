@@ -15,34 +15,42 @@ def loadEntries(fname):
 
 def storeClientEntries(fname):
 	df = pandas.read_csv(fname)
-
 	for c in range(len(df)):
 		try:
 			user = df['user'][c]
 			stat = df['stat'][c]
-			ts = int(df['client_ts'][c])
+			# float first, because int doesn't recognize floats represented as strings
+			ts = int(float(df['client_ts'][c]))
+			while ts > 9999999999:
+				ts = ts/10
+			print(df['client_ts'][c], ts)
 			reading = float(df['reading'][c])
 
 			metadata = {}
-			for key in entry:
+			for key in df:
 				if key not in ['user', 'stat', 'client_ts', 'reading']:
-					metadata[key] = entry[key]
-
+					metadata[key] = df[key][c]
 			storeClientEntry(user, stat, ts, reading, metadata)
 		except Exception as e:
 			print(e)
+			print(user, stat, ts, reading)
+
 
 def storeServerEntries(fname):
 	df = pandas.read_csv(fname)
 	for c in range(len(df)):
 		try:
+			print(c)
 			user = df['user'][c]
 			stat = df['stat'][c]
 			ts = int(df['client_ts'][c])
+			while ts > 9999999999:
+				ts = ts/10
 			reading = float(df['reading'][c])
 			storeServerEntry(user, stat, ts, reading)
 		except Exception as e:
 			print(e)
+			print("fail")
 
 def storeResultEntries(fname):
 	df = pandas.read_csv(fname)
@@ -58,6 +66,6 @@ def storeResultEntries(fname):
 
 
 if __name__ == '__main__':
-	storeResultEntries("emission/net/int_service/giles/result_stats_17_dec.csv")
+	#storeResultEntries("emission/net/int_service/giles/result_stats_17_dec.csv")
 	storeServerEntries("emission/net/int_service/giles/server_stats_17_dec.csv")
-	storeClientEntries("emission/net/int_service/giles/client_stats_17_dec.csv")
+	#storeClientEntries("emission/net/int_service/giles/client_stats_17_dec.csv")
