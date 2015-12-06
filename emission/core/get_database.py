@@ -88,22 +88,29 @@ def get_uuid_db():
     return UUIDs
 
 def get_client_stats_db():
-    #current_db=MongoClient().Stage_database
-    #ClientStats = current_db.Stage_client_stats
-    #return ClientStats
     return archiver.StatArchiver('/client_stats')
 
+def get_client_stats_db_backup():
+    current_db=MongoClient().Stage_database
+    ClientStats = current_db.Stage_client_stats
+    return ClientStats
+
 def get_server_stats_db():
-    #current_db=MongoClient().Stage_database
-    #ServerStats = current_db.Stage_server_stats
-    #return ServerStats
     return archiver.StatArchiver('/server_stats')
 
+def get_server_stats_db_backup():
+    current_db=MongoClient().Stage_database
+    ServerStats = current_db.Stage_server_stats
+    return ServerStats
+
 def get_result_stats_db():
-    #current_db=MongoClient().Stage_database
-    #ResultStats = current_db.Stage_result_stats
-    #return ResultStats
     return archiver.StatArchiver('/result_stats')
+
+def get_result_stats_db_backup():
+    current_db=MongoClient().Stage_database
+    ResultStats = current_db.Stage_result_stats
+    return ResultStats
+
 
 def get_db():
     current_db=MongoClient('localhost').Stage_database

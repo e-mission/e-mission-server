@@ -3,7 +3,7 @@ import logging
 import time
 
 # Our imports
-from emission.core.get_database import get_client_stats_db, get_server_stats_db, get_result_stats_db
+from emission.core.get_database import get_client_stats_db, get_server_stats_db, get_result_stats_db, get_client_stats_db_backup, get_server_stats_db_backup, get_result_stats_db_backup
 
 STAT_TRIP_MGR_PCT_SHOWN = "tripManager.pctShown"
 STAT_TRIP_MGR_TRIPS_FOR_DAY = "tripManager.tripsForDay"
@@ -43,13 +43,18 @@ def setClientMeasurements(user, reportedVals):
 # metadata format is 
 def storeClientEntry(user, key, ts, reading, metadata):
   logging.debug("storing client entry for user %s, key %s at timestamp %s" % (user, key, ts))
-  currEntry = createEntry(user, key, ts, reading)
-  # Add the os and app versions from the metadata dict
-  currEntry.update(metadata)
-  response = get_client_stats_db().insert(currEntry)
+  response = None
   
-  return response != None
+  try:
+    currEntry = createEntry(user, key, ts, reading)
+    # Add the os and app versions from the metadata dict
+    currEntry.update(metadata)
+    response = get_client_stats_db().insert(currEntry)
 
+  except Exception as e:
+    logging.debug("failed to store client entry for user %s, key %s at timestamp %s" % (user, key, ts))
+    get_client_stats_db_backup().insert(currEntry)
+  return response != None
 
 # server measurements will call this directly since there's not much point in
 # batching in a different location and then making a call here since it runs on
@@ -59,16 +64,31 @@ def storeClientEntry(user, key, ts, reading, metadata):
 
 def storeServerEntry(user, key, ts, reading):
   logging.debug("storing server entry %s for user %s, key %s at timestamp %s" % (reading, user, key, ts))
-  currEntry = createEntry(user, key, ts, reading)
-  response = get_server_stats_db().insert(currEntry)
+  response = None
+  try:
+
+    currEntry = createEntry(user, key, ts, reading)
+    response = get_server_stats_db().insert(currEntry)
+  except Exception as e:
+    print(e)
+    logging.debug("failed to store server entry %s for user %s, key %s at timestamp %s" % (reading, user, key, ts))
+    get_server_stats_db_backup().insert(currEntry)
 
   # Return boolean that tells you whether the insertion was successful or not
   return response != None
 
 def storeResultEntry(user, key, ts, reading):
   logging.debug("storing result entry %s for user %s, key %s at timestamp %s" % (reading, user, key, ts))
-  currEntry = createEntry(user, key, ts, reading)
-  response = get_result_stats_db().insert(currEntry)
+  response = None
+
+  try:
+    currEntry = createEntry(user, key, ts, reading)
+    response = get_result_stats_db().insert(currEntry)
+    print("ok")
+
+  except Exception as e:
+    logging.debug("failed to store result entry %s for user %s, key %s at timestamp %s" % (reading, user, key, ts))
+    get_result_stats_db_backup().insert(currEntry)
 
   # Return boolean that tells you whether the insertion was successful or not
   return response != None

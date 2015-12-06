@@ -30,6 +30,8 @@ class StatArchiver:
         self.path = path
         self.query_url = os.path.join(self.GILES_BASE_URL, 'api', 'query')
         self.archiver_url = os.path.join(self.GILES_BASE_URL, 'add', self.GILES_API_KEY)
+        #print(self.query_url)
+        #print(self.archiver_url)
         #print(self.GILES_BASE_URL)
         #print(self.GILES_API_KEY)
         #print(self.archiver_url)
@@ -54,9 +56,19 @@ class StatArchiver:
         reading = entry['reading']
         stream_uuid = str(uuid.uuid5(uuid.NAMESPACE_DNS, stat + ',' + str(user_uuid)))
 
+
         smapMsg = {
             self.path: {
-                "Metadata": {},
+                "Metadata": {
+                    "SourceName": stat,
+                },
+                "Properties": {
+                     "Timezone": "America/Los_Angeles",
+                     "ReadingType": "double",
+                     "UnitofTime": "s",
+                     "StreamType": "numeric",
+                     "UnitofMeasure": "Ambiguous"
+                },
                 "Readings": [
                     [
                         client_ts,
