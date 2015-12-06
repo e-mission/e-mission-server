@@ -44,8 +44,6 @@ def storeServerEntries(fname):
 			user = df['user'][c]
 			stat = df['stat'][c]
 			ts = int(df['client_ts'][c])
-			while ts > 9999999999:
-				ts = ts/10
 			reading = float(df['reading'][c])
 			storeServerEntry(user, stat, ts, reading)
 		except Exception as e:
@@ -60,12 +58,12 @@ def storeResultEntries(fname):
 			stat = df['stat'][c]
 			ts = int(df['ts'][c])
 			reading = float(df['reading'][c])
-			storeServerEntry(user, stat, ts, reading)
+			storeResultEntry(user, stat, ts, reading)
 		except Exception as e:
 			print(e)
 
 
 if __name__ == '__main__':
-	#storeResultEntries("emission/net/int_service/giles/result_stats_17_dec.csv")
-	storeServerEntries("emission/net/int_service/giles/server_stats_17_dec.csv")
+	storeResultEntries("emission/net/int_service/giles/result_stats_17_dec.csv")
+	#storeServerEntries("emission/net/int_service/giles/server_stats_17_dec.csv")
 	#storeClientEntries("emission/net/int_service/giles/client_stats_17_dec.csv")
