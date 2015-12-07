@@ -58,6 +58,8 @@ def storeClientEntry(user, key, ts, reading, metadata):
     response = get_client_stats_db().insert(currEntry)
   except Exception as e:
     logging.debug("failed to store client entry for user %s, key %s at timestamp %s" % (user, key, ts))
+    logging.debug("exception was: %s" % (e))
+
     currEntry = createEntry(user, key, ts, reading)
     get_client_stats_db_backup().insert(currEntry)
   return response != None
@@ -76,8 +78,9 @@ def storeServerEntry(user, key, ts, reading):
     currEntry = createEntry(user, key, ts, reading)
     response = get_server_stats_db().insert(currEntry)
   except Exception as e:
-    print(e)
     logging.debug("failed to store server entry %s for user %s, key %s at timestamp %s" % (reading, user, key, ts))
+    logging.debug("exception was: %s" % (e))
+
     currEntry = createEntry(user, key, ts, reading)
     get_server_stats_db_backup().insert(currEntry)
 
@@ -98,6 +101,8 @@ def storeResultEntry(user, key, ts, reading):
 
   except Exception as e:
     logging.debug("failed to store result entry %s for user %s, key %s at timestamp %s" % (reading, user, key, ts))
+    logging.debug("exception was: %s" % (e))
+
     currEntry = createEntry(user, key, ts, reading)
     get_result_stats_db_backup().insert(currEntry)
 
