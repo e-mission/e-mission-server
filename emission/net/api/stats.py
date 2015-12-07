@@ -44,13 +44,18 @@ def setClientMeasurements(user, reportedVals):
 def storeClientEntry(user, key, ts, reading, metadata):
   logging.debug("storing client entry for user %s, key %s at timestamp %s" % (user, key, ts))
   response = None
-  
   try:
+    # float first, because int doesn't recognize floats represented as strings.
+    # Android timestamps are in milliseconds, while Giles expects timestamps to be
+    # in seconds, so divide by 1000 when you hit this case.
+    # ios timestamps are in seconds.
+    if ts > 9999999999:
+      ts = ts/1000
+
     currEntry = createEntry(user, key, ts, reading)
     # Add the os and app versions from the metadata dict
     currEntry.update(metadata)
     response = get_client_stats_db().insert(currEntry)
-
   except Exception as e:
     logging.debug("failed to store client entry for user %s, key %s at timestamp %s" % (user, key, ts))
     get_client_stats_db_backup().insert(currEntry)
