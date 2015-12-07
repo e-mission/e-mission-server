@@ -19,10 +19,13 @@ def storeClientEntries(fname):
 		try:
 			user = df['user'][c]
 			stat = df['stat'][c]
-			# float first, because int doesn't recognize floats represented as strings
+			# float first, because int doesn't recognize floats represented as strings.
+			# Android timestamps are in milliseconds, while Giles expects timestamps to be
+			# in seconds, so divide by 1000 when you hit this case.
+			# ios timestamps are in seconds.
 			ts = int(float(df['client_ts'][c]))
-			while ts > 9999999999:
-				ts = ts/10
+			if ts > 9999999999:
+				ts = ts/1000
 			print(df['client_ts'][c], ts)
 			reading = float(df['reading'][c])
 
@@ -43,7 +46,7 @@ def storeServerEntries(fname):
 			print(c)
 			user = df['user'][c]
 			stat = df['stat'][c]
-			ts = int(df['client_ts'][c])
+			ts = int(df['ts'][c])
 			reading = float(df['reading'][c])
 			storeServerEntry(user, stat, ts, reading)
 		except Exception as e:
@@ -64,6 +67,7 @@ def storeResultEntries(fname):
 
 
 if __name__ == '__main__':
-	storeResultEntries("emission/net/int_service/giles/result_stats_17_dec.csv")
+	storeServerEntries("server_stats.csv")
+	#storeResultEntries("emission/net/int_service/giles/result_stats_17_dec.csv")
 	#storeServerEntries("emission/net/int_service/giles/server_stats_17_dec.csv")
 	#storeClientEntries("emission/net/int_service/giles/client_stats_17_dec.csv")

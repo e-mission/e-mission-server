@@ -81,10 +81,13 @@ def storeResultEntry(user, key, ts, reading):
   logging.debug("storing result entry %s for user %s, key %s at timestamp %s" % (reading, user, key, ts))
   response = None
 
+  # Sometimes timestamp comes in as a float, represented as seconds.[somethign else]; truncate digits after the
+  # decimal
+  ts = int(ts)
+
   try:
     currEntry = createEntry(user, key, ts, reading)
     response = get_result_stats_db().insert(currEntry)
-    print("ok")
 
   except Exception as e:
     logging.debug("failed to store result entry %s for user %s, key %s at timestamp %s" % (reading, user, key, ts))
