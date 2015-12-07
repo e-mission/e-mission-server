@@ -2,6 +2,7 @@ import uuid
 import requests
 import json
 import os
+import logging
 
 def get_conf_file():
     f = open("conf/net/int_service/giles_conf.json", "r")
@@ -37,7 +38,7 @@ class StatArchiver:
     def insert(self, entry):
         assert type(entry) == dict
         stat = entry['stat']
-        user_uuid = entry['user']
+        user_uuid = str(entry['user'])
 
         # TODO: Support more precise timestamps
         # Giles has some problem unmarshalling floats
@@ -46,7 +47,7 @@ class StatArchiver:
         reading = entry['reading']
 
         #UUID is a function of things which are stored already, so it seems unimportant to maintain the mapping.
-        stream_uuid = str(uuid.uuid5(uuid.NAMESPACE_DNS, stat + ',' + str(user_uuid)))
+        stream_uuid = str(uuid.uuid5(uuid.NAMESPACE_DNS, stat + ',' + user_uuid))
 
         smapMsg = {
             self.path: {
@@ -76,8 +77,9 @@ class StatArchiver:
         try:
             json.dumps(smapMsg)
         except Exception as e:
-            print("Error storing entry for user %s, stat %s at timestamp %s: \
+            logging.debug("Error storing entry for user %s, stat %s at timestamp %s: \
                 entry is not JSON serializable" % (user_uuid, stat, client_ts))
+            logging.debug("Exception: " + str(e))
             return None
 
         # @TODO: Do some error-checking on the response to make sure it actually
