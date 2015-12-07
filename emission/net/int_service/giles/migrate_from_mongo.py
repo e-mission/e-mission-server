@@ -24,7 +24,7 @@ def convert_to_row(headers, entry_json):
 def export_server_stats():
 	entries = list(get_server_stats_db_backup().find())
 	fname = "server_stats.csv"
-	headers = ["stat", "_id", "reading", "ts", "user"]
+	headers = ["stat", "_id", "reading", "client_ts", "user"]
 
 	write_stats(fname, headers, entries)
 
