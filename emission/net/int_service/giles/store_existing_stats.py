@@ -55,7 +55,7 @@ def storeResultEntries(fname):
 
 
 if __name__ == '__main__':
-	storeServerEntries("client_stats.csv")
+	storeClientEntries("client_stats.csv")
 	#storeResultEntries("emission/net/int_service/giles/result_stats_17_dec.csv")
 	#storeServerEntries("emission/net/int_service/giles/server_stats_17_dec.csv")
 	#storeClientEntries("emission/net/int_service/giles/client_stats_17_dec.csv")
