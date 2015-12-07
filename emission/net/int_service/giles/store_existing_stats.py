@@ -19,11 +19,11 @@ def storeClientEntries(fname):
 		try:
 			user = df['user'][c]
 			stat = df['stat'][c]
-			ts = int(float(df['client_ts'][c]))
+			ts = int(float(df['ts'][c]))
 			reading = float(df['reading'][c])
 			metadata = {}
 			for key in df:
-				if key not in ['user', 'stat', 'client_ts', 'reading']:
+				if key not in ['user', 'stat', 'ts', 'reading']:
 					metadata[key] = df[key][c]
 			storeClientEntry(user, stat, ts, reading, metadata)
 		except Exception as e:
