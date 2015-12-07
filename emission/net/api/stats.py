@@ -48,6 +48,8 @@ def storeClientEntry(user, key, ts, reading, metadata):
   # Android timestamps are in milliseconds, while Giles expects timestamps to be
   # in seconds, so divide by 1000 when you hit this case.
   # ios timestamps are in seconds.
+  ts = int(ts)
+
   if ts > 9999999999:
     ts = ts/1000
 
