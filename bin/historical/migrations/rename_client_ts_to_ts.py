@@ -5,5 +5,13 @@
 from pymongo import MongoClient
 client = MongoClient()
 db = client.Stage_database
+
 collection = db.Stage_client_stats
 collection.update({}, { '$rename': {"client_ts": "ts"}}, multi=True)
+
+collection = db.Stage_server_stats
+collection.update({}, { '$rename': {"client_ts": "ts"}}, multi=True)
+
+collection = db.Stage_result_stats
+collection.update({}, { '$rename': {"client_ts": "ts"}}, multi=True)
+
