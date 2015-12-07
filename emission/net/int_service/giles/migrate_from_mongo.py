@@ -44,6 +44,6 @@ def export_client_stats():
 	write_stats(fname, headers, entries)
 
 
-#export_server_stats()
-#export_result_stats()
+export_server_stats()
+export_result_stats()
 export_client_stats()

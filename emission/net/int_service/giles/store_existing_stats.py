@@ -19,15 +19,22 @@ def storeClientEntries(fname):
 		try:
 			user = df['user'][c]
 			stat = df['stat'][c]
-			ts = int(float(df['ts'][c]))
-			reading = float(df['reading'][c])
+			ts = int(float(df['client_ts'][c]))
+			reading = df['reading'][c]
+			if reading.lower() == 'none':
+				reading = 1.0
+			else:
+				reading = float(reading)
 			metadata = {}
 			for key in df:
-				if key not in ['user', 'stat', 'ts', 'reading']:
+				if key not in ['user', 'stat', 'client_ts', 'reading']:
 					metadata[key] = df[key][c]
 			storeClientEntry(user, stat, ts, reading, metadata)
 		except Exception as e:
 			print(e)
+			#print(df['reading'][c] == 'None')
+			print(df['reading'][c] == 'None')
+
 
 def storeServerEntries(fname):
 	df = pandas.read_csv(fname)
@@ -56,6 +63,8 @@ def storeResultEntries(fname):
 
 if __name__ == '__main__':
 	storeClientEntries("client_stats.csv")
+	storeResultEntries("result_stats.csv")
+	storeServerEntries("server_stats.csv")
 	#storeResultEntries("emission/net/int_service/giles/result_stats_17_dec.csv")
 	#storeServerEntries("emission/net/int_service/giles/server_stats_17_dec.csv")
 	#storeClientEntries("emission/net/int_service/giles/client_stats_17_dec.csv")
