@@ -113,5 +113,3 @@ class StatArchiver:
         except Exception as e:
             return response.content
 
-x = StatArchiver('/testpath')
-print x.query_tags()
