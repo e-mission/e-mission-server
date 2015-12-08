@@ -78,6 +78,12 @@ class StatArchiver:
             json.dumps(smapMsg)
         except Exception as e:
             logging.debug("Error storing entry for user %s, stat %s at timestamp %s, with reading %f: entry is not JSON serializable" % (user_uuid, stat, client_ts, reading))
+            metadataString = ['(' + str(metakey) + ',' + str(metaval) + '), ' for metakey, metaval in smapMsg[self.path]["Metadata"]]
+            
+            # if string not empty, truncate last comma
+            if len(metadataString) > 2:
+                metadataString = metadataString[0:-2]
+            logging.debug("Metadata values: %s" % (metadataString))
             logging.debug("Exception: " + str(e))
             return None
 
