@@ -1,5 +1,7 @@
 import emission.net.ext_service.otp.otp as otp
 import emission.core.our_geocoder as geo
+import emission.core.common as cm
+
 import datetime
 import random
 import json
@@ -51,6 +53,16 @@ def get_times_between_point(pnt1, pnt2, mode):
     t = trip.turn_into_trip(0,0,0)
     print t.end_time - t.start_time
 
+def get_dist_between_points(pnt1, pnt2):
+    curr_time = datetime.datetime.now()
+    curr_month = curr_time.month
+    curr_year = curr_time.year
+    curr_minute = curr_time.minute
+    curr_day = curr_time.day
+    curr_hour = curr_time.hour
+    trip = otp.OTP(pnt1, pnt2, "WALK", write_day(curr_month, curr_day, curr_year), write_time(curr_hour, curr_minute), True)
+    t = trip.turn_into_trip(0,0,0)
+
 
 def write_day(month, day, year):
     return "%s-%s-%s" % (month, day, year)
@@ -80,6 +92,12 @@ def get_elevation_change(pnt1, pnt2):
         prev = item['elevation']
     return (up, down)
 
+
+def get_distances():
+    places = [( (37.873508, -122.256512), (37.873745, -122.255493) ),  ( (37.873940, -122.257553), (37.873381, -122.257274) ), ((37.873326, -122.256791), (37.872246, -122.256485)) ]
+    for p in places:
+        print get_elevation_change(p[0], p[1])
+        print cm.calDistance(p[0], p[1], False)
 
 
 
