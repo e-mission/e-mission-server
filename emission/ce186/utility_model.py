@@ -13,6 +13,7 @@ import json
 import heapq
 import time
 import googlemaps
+import requests
 
 CENTER_OF_CAMPUS = to.Coordinate(37.871790, -122.260005)
 RANDOM_RADIUS = .3  # 300 meters around center of campus; for randomization
@@ -170,7 +171,7 @@ class UserModel:
             crowd_score += crowd.get_crowd()
 
         final_time = (self.utilities["time"]*normalized_time) / tot_points
-        final_sweat = (self.utilities["sweat"]*sweat_factor) / tot_points
+        final_sweat = (self.utilities["sweat"]*normalized_sweat) / tot_points
         final_beauty = (self.utilities['scenery']*beauty_score) / tot_points
         final_crowd = (self.utilities['social'] * ((noise_score + crowd_score) / 2.0)) / tot_points
 
@@ -192,8 +193,11 @@ class UserModel:
 
 
 def normalize_noises(noise_areas):
+    to_return = []
     for area in noise_areas:
         area.normalize_sounds()
+        to_return.append(area)
+    return to_return
 
 def get_time_of_trip(trip):
     return (trip.end_time - trip.start_time).seconds
@@ -361,9 +365,8 @@ def find_route(user_base, user, start, end):
     our_user.get_top_choice_lat_lng(start, end)
 
 def get_route_dict(trip):
-    r = get_route(trip)
     route = []
-    for point in r:
+    for point in trip:
         d = {"lat" : point[0], "lng" : point[1]}
         route.append(d)
     return route
