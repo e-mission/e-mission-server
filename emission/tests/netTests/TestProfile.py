@@ -59,7 +59,7 @@ class TestProfile(unittest.TestCase):
             func1.reset_mock()
             func2.reset_mock()
             prof_1 = self.Profiles.find_one({'user_id':'1'})
-            self.assertEquals(prof_1['zip'],  '94709')
+            self.assertEquals(prof_1['zip'],  '94704')
     #test new address/zipcode: database value does not equal home value
     with mock.patch('emission.net.api.Profile.detect_home', return_value=(-122.2584,37.8697)) as func1:
             #new zip retrieval phase, should make API call and obtain zipcode
@@ -67,7 +67,7 @@ class TestProfile(unittest.TestCase):
             self.assertEquals(func1.called, True)
             func1.reset_mock()
             prof_1 = self.Profiles.find_one({'user_id':'1'})
-            self.assertEquals(prof_1['zip'],  '94720')
+            self.assertEquals(prof_1['zip'],  '94704')
 
   def testZipAPI(self):
     # Check to make sure that the Geocoder API is not used if not needed
@@ -83,25 +83,25 @@ class TestProfile(unittest.TestCase):
             func1.reset_mock()
             func2.reset_mock()
             prof_1 = self.Profiles.find_one({'user_id':'1'})
-            self.assertEquals(prof_1['zip'],  '94709')
+            self.assertEquals(prof_1['zip'],  '94704')
             #zip should be stored, no API call
             with mock.patch('emission.net.api.Profile.Geocoder.reverse_geocode', return_value=None) as func3:
                 Profile.update_profiles(True)
                 self.assertEquals(func3.called, False)
                 prof_1 = self.Profiles.find_one({'user_id':'1'})
-                self.assertEquals(prof_1['zip'],  '94709')
+                self.assertEquals(prof_1['zip'],  '94704')
     with mock.patch('emission.net.api.Profile.detect_home', return_value=(-122.2584,37.8697)) as func1:
             #new zip retrieval phase, should make API call and obtain zipcode
                 Profile.update_profiles(True)
                 prof_1 = self.Profiles.find_one({'user_id':'1'})
-                self.assertEquals(prof_1['zip'],  '94720')
+                self.assertEquals(prof_1['zip'],  '94704')
                 with mock.patch('emission.net.api.Profile.Geocoder.reverse_geocode', return_value=None) as func3:
                     #zip should be stored, no API call
                     Profile.update_profiles(True)
                     self.assertEquals(func3.called, False)
                     func3.reset_mock()
                     prof_1 = self.Profiles.find_one({'user_id':'1'})
-                    self.assertEquals(prof_1['zip'],  '94720')
+                    self.assertEquals(prof_1['zip'],  '94704')
 
 if __name__ == '__main__':
     unittest.main()
