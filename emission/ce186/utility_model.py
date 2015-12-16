@@ -438,12 +438,17 @@ def loop(base):
     body = json.dumps(payload)
     # Form and send request. Set timeout to 2 minutes. Receive response.
     r = requests.request('post', send_data, data=body, params=query, headers=header, timeout=120 )
+    print r.json
 
 def main():
     base = UserBase()
     while True:
-        loop(base)
-        time.sleep(.1)
+        try:
+            loop(base)
+            time.sleep(1)
+        except:
+            print "failed"
+            pass
 
 
 
