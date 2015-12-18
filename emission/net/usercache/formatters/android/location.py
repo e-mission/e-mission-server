@@ -60,7 +60,7 @@ def format_location_simple(entry):
     formatted_entry.metadata = metadata
 
     data = entry.data
-    data.ts = data.ts / 1000 # convert from ms to seconds
+    data.ts = float(data.ts) / 1000 # convert from ms to seconds
     local_aware_dt = pydt.datetime.utcfromtimestamp(data.ts).replace(tzinfo=pytz.utc) \
                             .astimezone(pytz.timezone(formatted_entry.metadata.time_zone))
     data.local_dt = local_aware_dt.replace(tzinfo=None)
