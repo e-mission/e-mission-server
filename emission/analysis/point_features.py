@@ -23,8 +23,15 @@ def calSpeed(point1, point2):
     # print "Distance delta = %s and time delta = %s" % (distanceDelta, timeDelta)
     # assert(timeDelta != 0)
     if (timeDelta == 0):
-        logging.debug("timeDelta = 0, distanceDelta = %s, returning speed = 0")
-        assert(distanceDelta < 0.01)
+        # logging.debug("timeDelta = 0, distanceDelta = %s, returning speed = 0" % distanceDelta)
+        if (distanceDelta > 0.01):
+            # While converting ms -> secs on the server, we were treating the ms as a int.
+            # This meant that we frequently got the same value, specially with fast sampling.
+            # Let us turn off the assert and log an error message for now.
+            # Once the float is back, we can remove this and see if it recurs
+            logging.error("Distance between points %s, %s is %s, although the time delta = 0" %
+                (point1, point2, distanceDelta))
+            # assert(distanceDelta < 0.01)
         return 0
 
     return distanceDelta/timeDelta
