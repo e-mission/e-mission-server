@@ -133,6 +133,10 @@ def get_perturbed_trips_db():
 def get_usercache_db():
     current_db = MongoClient().Stage_database
     UserCache = current_db.Stage_usercache
+    UserCache.create_index([("user_id", pymongo.DESCENDING),
+                            ("metadata.type", pymongo.DESCENDING),
+                            ("metadata.write_ts", pymongo.DESCENDING),
+                            ("metadata.key", pymongo.DESCENDING)])
     return UserCache
 
 def get_timeseries_db():
