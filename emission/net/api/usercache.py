@@ -4,6 +4,7 @@
 
 # Standard imports
 import logging
+import pymongo
 
 # Our imports
 from emission.core.get_database import get_usercache_db
@@ -14,7 +15,7 @@ def sync_server_to_phone(uuid):
         Return None if there is no data
     """
     retrievedData = list(get_usercache_db().find({"user_id": uuid, "metadata.type": "document"}, # query
-                                            {'_id': False, 'user_id': False})) # projection
+                                            {'_id': False, 'user_id': False}).sort("metadata.write_ts", pymongo.ASCENDING)) # projection, sort
     
     # logging.debug("retrievedData = %s" % retrievedData)
     return retrievedData
