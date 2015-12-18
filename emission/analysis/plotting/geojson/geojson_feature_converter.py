@@ -278,7 +278,11 @@ def get_all_points_for_range(user_id, key, start_ts, end_ts):
     ts = esta.TimeSeries.get_time_series(user_id)
     entry_it = ts.find_entries([key], tq)
     points_array = [ecwl.Location(ts._to_df_entry(entry)) for entry in entry_it]
-    
+
+    return get_feature_list_for_point_array(points_array)
+
+
+def get_feature_list_for_point_array(points_array):
     points_feature_array = [location_to_geojson(l) for l in points_array]
     print ("Found %d points" % len(points_feature_array))
     
@@ -288,3 +292,19 @@ def get_all_points_for_range(user_id, key, start_ts, end_ts):
     feature_coll = gj.FeatureCollection(feature_array)
         
     return feature_coll
+
+def get_feature_list_from_df(loc_time_df, ts="ts", latitude="latitude", longitude="longitude"):
+    """
+    Input DF should have columns called "ts", "latitude" and "longitude", or the corresponding
+    columns can be passed in using the ts, latitude and longitude parameters
+    """
+    points_array = get_location_entry_list_from_df(loc_time_df, ts, latitude, longitude)
+    return get_feature_list_for_point_array(points_array)
+
+def get_location_entry_list_from_df(loc_time_df, ts="ts", latitude="latitude", longitude="longitude"):
+    location_entry_list = []
+    for idx, row in loc_time_df.iterrows():
+        retVal = {"latitude": row[latitude], "longitude": row[longitude], "ts": row["ts"],
+                  "_id": str(idx), "loc": gj.Point(coordinates=[row[longitude], row[latitude]])}
+        location_entry_list.append(ecwl.Location(retVal))
+    return location_entry_list
