@@ -1,0 +1,3638 @@
+Battery History:
+       -5h24m56s270ms 063 140a0030 status=charging health=good plug=usb temp=290 volt=4036 +plugged +gps +wifi +wifi_running signal_strength=good
+       -5h24m55s145ms 063 57120030 status=discharging plug=none temp=330 volt=3856 -plugged +screen +wifi_full_lock +wifi_scan +wake_lock
+       -5h24m53s725ms 063 14120030 -wifi_full_lock -wifi_scan -wake_lock
+       -5h24m49s027ms 063 54020030 -screen +wake_lock
+       -5h24m44s900ms 063 14020030 -wake_lock
+       -5h24m28s459ms 063 54020020 +wake_lock signal_strength=moderate
+       -5h24m27s906ms 063 14020020 -wake_lock
+       -5h24m25s555ms 063 14020010 signal_strength=poor
+       -5h24m23s341ms 063 54020020 +wake_lock signal_strength=moderate
+       -5h24m21s364ms 063 14020020 -wake_lock
+       -5h23m57s873ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h23m56s451ms 063 56020020 -wifi_scan +wake_lock
+       -5h23m56s384ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h23m26s354ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h23m24s922ms 063 56020020 -wifi_scan +wake_lock
+       -5h23m24s685ms 063 14020010 -wifi_full_lock -wake_lock signal_strength=poor
+       -5h23m24s386ms 063 14020020 signal_strength=moderate
+       -5h22m54s664ms 063 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -5h22m54s549ms 063 56020020 -wifi_scan
+       -5h22m53s125ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h22m24s652ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h22m23s210ms 063 56020020 -wifi_scan +wake_lock
+       -5h22m23s158ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h21m54s643ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h21m53s159ms 063 56020020 -wifi_scan +wake_lock
+       -5h21m53s109ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h21m23s078ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h21m21s614ms 063 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -5h21m21s560ms 063 14020020 -wake_lock
+       -5h20m53s068ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h20m51s641ms 063 56020020 -wifi_scan +wake_lock
+       -5h20m51s582ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h20m29s549ms 063 14020020
+       -5h19m56s665ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h19m55s247ms 063 56020020 -wifi_scan +wake_lock
+       -5h19m55s206ms 063 54020020 -wifi_full_lock
+       -5h19m55s189ms 063 14020020 -wake_lock
+       -5h19m27s547ms 063 14020010 signal_strength=poor
+       -5h19m25s174ms 063 17020020 +wifi_full_lock +wifi_scan signal_strength=moderate
+       -5h19m23s748ms 063 56020020 -wifi_scan +wake_lock
+       -5h19m23s693ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h18m55s161ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h18m53s735ms 063 56020020 -wifi_scan +wake_lock
+       -5h18m53s673ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h18m23s662ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h18m22s224ms 063 56020020 -wifi_scan +wake_lock
+       -5h18m22s178ms 063 54020020 -wifi_full_lock
+       -5h18m22s005ms 063 14020020 -wake_lock
+       -5h17m51s981ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h17m50s554ms 063 56020020 -wifi_scan +wake_lock
+       -5h17m50s501ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h16m50s937ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h16m49s509ms 063 56020020 -wifi_scan +wake_lock
+       -5h16m49s446ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h16m19s419ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h16m17s996ms 063 56020020 -wifi_scan +wake_lock
+       -5h16m17s913ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h15m49s406ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h15m47s973ms 063 56020020 -wifi_scan +wake_lock
+       -5h15m47s924ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h15m17s891ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h15m16s455ms 063 56020020 -wifi_scan +wake_lock
+       -5h15m16s402ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h14m47s870ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h14m46s439ms 063 56020020 -wifi_scan +wake_lock
+       -5h14m46s388ms 063 54020020 -wifi_full_lock
+       -5h14m46s375ms 063 14020020 -wake_lock
+       -5h14m16s354ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h14m14s914ms 063 56020020 -wifi_scan +wake_lock
+       -5h14m14s855ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h13m44s836ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h13m43s413ms 063 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -5h13m43s328ms 063 14020020 -wake_lock
+       -5h13m14s827ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h13m13s392ms 063 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -5h13m13s337ms 063 14020020 -wake_lock
+       -5h12m43s315ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h12m41s872ms 063 56020020 -wifi_scan +wake_lock
+       -5h12m41s823ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h12m13s306ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h12m11s869ms 063 56020020 -wifi_scan +wake_lock
+       -5h12m11s816ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h11m43s292ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h11m41s852ms 063 14020020 -wifi_full_lock -wifi_scan
+       -5h11m13s272ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h11m11s840ms 063 56020020 -wifi_scan +wake_lock
+       -5h11m11s589ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h10m41s554ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h10m40s120ms 063 14020020 -wifi_full_lock -wifi_scan
+       -5h10m10s042ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h10m08s613ms 063 56020020 -wifi_scan +wake_lock
+       -5h10m08s556ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h09m40s028ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h09m38s603ms 063 14020020 -wifi_full_lock -wifi_scan
+       -5h09m08s525ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h09m07s101ms 063 56020020 -wifi_scan +wake_lock
+       -5h09m07s037ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h08m38s518ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h08m37s086ms 063 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -5h08m37s028ms 063 14020020 -wake_lock
+       -5h08m08s500ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h08m07s074ms 063 56020020 -wifi_scan +wake_lock
+       -5h08m06s957ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h07m38s249ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h07m36s808ms 063 56020020 -wifi_scan +wake_lock
+       -5h07m36s755ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h07m06s723ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h07m05s288ms 063 56020020 -wifi_scan +wake_lock
+       -5h07m05s240ms 063 54020020 -wifi_full_lock
+       -5h07m05s225ms 063 14020020 -wake_lock
+       -5h06m35s210ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h06m33s765ms 063 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -5h06m33s697ms 063 14020020 -wake_lock
+       -5h06m05s199ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h06m03s767ms 063 56020020 -wifi_scan +wake_lock
+       -5h06m03s668ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h05m33s628ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h05m32s191ms 063 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -5h05m32s129ms 063 14020020 -wake_lock
+       -5h05m03s615ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h05m02s189ms 063 56020020 -wifi_scan +wake_lock
+       -5h05m02s127ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h04m33s604ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h04m32s163ms 063 56020020 -wifi_scan +wake_lock
+       -5h04m32s120ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h03m31s737ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h03m30s276ms 063 56020020 -wifi_scan +wake_lock
+       -5h03m30s200ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h03m00s039ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h02m58s615ms 063 56020020 -wifi_scan +wake_lock
+       -5h02m58s559ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h02m28s527ms 063 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -5h02m28s367ms 063 56020020 -wifi_scan
+       -5h02m27s032ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h01m58s521ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h01m57s107ms 063 56020020 -wifi_scan +wake_lock
+       -5h01m56s861ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h01m28s512ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h01m27s092ms 063 56020020 -wifi_scan +wake_lock
+       -5h01m27s019ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h00m56s997ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h00m55s563ms 063 56020020 -wifi_scan +wake_lock
+       -5h00m55s494ms 063 14020020 -wifi_full_lock -wake_lock
+       -5h00m26s978ms 063 17020020 +wifi_full_lock +wifi_scan
+       -5h00m25s557ms 063 56020020 -wifi_scan +wake_lock
+       -5h00m25s499ms 063 14020020 -wifi_full_lock -wake_lock
+       -4h59m55s470ms 063 17020020 +wifi_full_lock +wifi_scan
+       -4h59m54s020ms 063 56020020 -wifi_scan +wake_lock
+       -4h59m53s976ms 063 54020020 -wifi_full_lock
+       -4h59m53s958ms 063 54020020
+       -4h59m52s454ms 063 14020020 -wake_lock
+       -4h59m25s457ms 063 17020020 +wifi_full_lock +wifi_scan
+       -4h59m24s015ms 063 56020020 -wifi_scan +wake_lock
+       -4h59m23s958ms 063 14020020 -wifi_full_lock -wake_lock
+       -4h58m53s930ms 063 17020020 +wifi_full_lock +wifi_scan
+       -4h58m52s497ms 063 56020020 -wifi_scan +wake_lock
+       -4h58m52s456ms 063 14020020 -wifi_full_lock -wake_lock
+       -4h58m23s911ms 063 17020020 +wifi_full_lock +wifi_scan
+       -4h58m22s469ms 063 56020020 -wifi_scan +wake_lock
+       -4h58m22s418ms 063 14020020 -wifi_full_lock -wake_lock
+       -4h57m52s391ms 063 17020020 +wifi_full_lock +wifi_scan
+       -4h57m50s956ms 063 56020020 -wifi_scan +wake_lock
+       -4h57m50s870ms 063 14020020 -wifi_full_lock -wake_lock
+       -4h57m36s582ms 063 14120020 +screen
+       -4h57m33s022ms 063 14120010 signal_strength=poor
+       -4h57m22s385ms 063 17120010 +wifi_full_lock +wifi_scan
+       -4h57m20s952ms 063 56120010 -wifi_scan +wake_lock
+       -4h57m20s892ms 063 14120010 -wifi_full_lock -wake_lock
+       -4h57m03s565ms 063 14120000 signal_strength=none
+       -4h56m53s348ms 063 54020000 -screen +wake_lock
+       -4h56m50s864ms 063 57020000 +wifi_full_lock +wifi_scan
+       -4h56m49s437ms 063 14020000 -wifi_full_lock -wifi_scan -wake_lock
+       -4h56m44s638ms 063 54020010 +wake_lock signal_strength=poor
+       -4h56m43s800ms 063 14020010 -wake_lock
+       -4h56m38s503ms 063 54020020 +wake_lock signal_strength=moderate
+       -4h56m36s701ms 063 14020020 -wake_lock
+       -4h56m33s832ms 063 14020020
+       -4h56m33s252ms 063 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -4h56m30s914ms 063 56020010 -wifi_scan signal_strength=poor
+       -4h56m30s032ms 063 56020010
+       -4h56m28s586ms 063 56020010
+       -4h56m27s165ms 063 56020020 signal_strength=moderate
+       -4h56m25s749ms 062 56020020 temp=290 volt=3753
+       -4h56m24s324ms 062 56020020
+       -4h56m22s896ms 062 56020020
+       -4h56m21s460ms 062 56020020
+       -4h56m20s025ms 062 56020020
+       -4h56m18s592ms 062 56020020
+       -4h56m17s171ms 062 56020020
+       -4h56m15s728ms 062 56020020
+       -4h56m14s293ms 062 56020020
+       -4h56m12s855ms 062 56020020
+       -4h56m11s283ms 062 56020020
+       -4h56m09s849ms 062 56020020
+       -4h56m08s406ms 062 56020020
+       -4h56m06s969ms 062 56020020
+       -4h56m05s528ms 062 56020020
+       -4h56m04s094ms 062 56020020
+       -4h56m02s672ms 062 56020020
+       -4h56m01s250ms 062 56020020
+       -4h55m59s807ms 062 56020020
+       -4h55m58s367ms 062 56020020
+       -4h55m56s947ms 062 56020020
+       -4h55m55s474ms 062 56020020
+       -4h55m54s042ms 062 56020020
+       -4h55m52s616ms 062 56020020
+       -4h55m51s191ms 062 56020020
+       -4h55m49s769ms 062 56020020
+       -4h55m48s339ms 062 56020020
+       -4h55m46s900ms 062 56020020
+       -4h55m45s456ms 062 56020020
+       -4h55m44s030ms 062 56020020
+       -4h55m42s594ms 062 56020020
+       -4h55m41s169ms 062 56020020
+       -4h55m39s734ms 062 56020020
+       -4h55m38s292ms 062 56020020
+       -4h55m36s857ms 062 56020020
+       -4h55m35s417ms 062 56020020
+       -4h55m33s965ms 062 56020020
+       -4h55m32s513ms 062 56020020
+       -4h55m31s081ms 062 56020020
+       -4h55m29s648ms 062 56020020
+       -4h55m28s217ms 062 57020010 +wifi_scan signal_strength=poor
+       -4h55m27s643ms 062 56020020 -wifi_scan signal_strength=moderate
+       -4h55m26s780ms 062 56020020
+       -4h55m25s344ms 062 56020020
+       -4h55m23s878ms 062 56020020
+       -4h55m22s437ms 062 56020020
+       -4h55m21s000ms 062 56020020
+       -4h55m19s561ms 062 56020020
+       -4h55m18s142ms 062 56020020
+       -4h55m16s459ms 062 56020020
+       -4h55m15s010ms 062 56020020
+       -4h55m13s572ms 062 57020010 +wifi_scan signal_strength=poor
+       -4h55m12s289ms 062 56020020 -wifi_scan signal_strength=moderate
+       -4h55m12s139ms 062 56020020
+       -4h55m10s694ms 062 56020020
+       -4h55m09s271ms 062 56020020
+       -4h55m07s854ms 062 56020020
+       -4h55m06s421ms 062 56020020
+       -4h55m05s002ms 062 56020020
+       -4h55m03s518ms 062 56020020
+       -4h55m02s067ms 062 56020020
+       -4h55m00s626ms 062 56020020
+       -4h54m59s197ms 062 56020020
+       -4h54m57s745ms 062 56020020
+       -4h54m56s314ms 062 56020020
+       -4h54m54s878ms 062 56020020
+       -4h54m53s434ms 062 56020020
+       -4h54m52s004ms 062 56020020
+       -4h54m50s589ms 062 56020020
+       -4h54m49s152ms 062 56020020
+       -4h54m47s728ms 062 56020020
+       -4h54m46s295ms 062 56020020
+       -4h54m44s854ms 062 56020020
+       -4h54m43s410ms 062 56020020
+       -4h54m41s926ms 062 15120020 +screen -wifi_full_lock +wifi_scan -wake_lock
+       -4h54m40s513ms 062 54120020 -wifi_scan +wake_lock
+       -4h54m40s238ms 062 54120020
+       -4h54m37s707ms 062 54120010 signal_strength=poor
+       -4h54m36s033ms 062 54120010
+       -4h54m35s212ms 062 54020010 -screen
+       -4h54m33s841ms 062 54020010
+       -4h54m33s194ms 062 14020000 -wake_lock signal_strength=none
+       -4h54m18s558ms 062 16020010 +wifi_full_lock signal_strength=poor
+       -4h54m17s964ms 062 14020010 -wifi_full_lock
+       -4h53m53s922ms 062 17020010 +wifi_full_lock +wifi_scan
+       -4h53m52s503ms 062 56020010 -wifi_scan +wake_lock
+       -4h53m52s453ms 062 14020010 -wifi_full_lock -wake_lock
+       -4h53m34s934ms 062 14020020 signal_strength=moderate
+       -4h53m23s912ms 062 17020020 +wifi_full_lock +wifi_scan
+       -4h53m22s485ms 062 56020020 -wifi_scan +wake_lock
+       -4h53m22s418ms 062 14020020 -wifi_full_lock -wake_lock
+       -4h52m52s396ms 062 17020020 +wifi_full_lock +wifi_scan
+       -4h52m50s971ms 062 56020020 -wifi_scan +wake_lock
+       -4h52m50s908ms 062 14020020 -wifi_full_lock -wake_lock
+       -4h52m26s022ms 061 14020020 volt=3843
+       -4h51m57s533ms 061 54020010 +wake_lock signal_strength=poor
+       -4h51m57s228ms 061 14020010 -wake_lock
+       -4h51m52s519ms 061 17020010 +wifi_full_lock +wifi_scan
+       -4h51m51s090ms 061 56020010 -wifi_scan +wake_lock
+       -4h51m51s027ms 061 14020010 -wifi_full_lock -wake_lock
+       -4h51m41s745ms 061 17020010 +wifi_full_lock +wifi_scan
+       -4h51m40s324ms 061 54020010 -wifi_full_lock -wifi_scan +wake_lock
+       -4h51m40s244ms 061 14020010 -wake_lock
+       -4h51m36s740ms 061 17020010 +wifi_full_lock +wifi_scan
+       -4h51m35s297ms 061 56020010 -wifi_scan +wake_lock
+       -4h51m35s251ms 061 14020010 -wifi_full_lock -wake_lock
+       -4h51m25s727ms 061 54020020 +wake_lock signal_strength=moderate
+       -4h51m24s996ms 061 14020020 -wake_lock
+       -4h50m54s966ms 061 17020020 +wifi_full_lock +wifi_scan
+       -4h50m53s539ms 061 56020020 -wifi_scan +wake_lock
+       -4h50m53s497ms 061 54020020 -wifi_full_lock
+       -4h50m53s482ms 061 14020020 -wake_lock
+       -4h49m58s580ms 061 17020020 +wifi_full_lock +wifi_scan
+       -4h49m57s162ms 061 56020020 -wifi_scan +wake_lock
+       -4h49m57s107ms 061 14020020 -wifi_full_lock -wake_lock
+       -4h49m28s565ms 061 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -4h49m27s139ms 061 14020020 -wifi_full_lock -wifi_scan -wake_lock
+       -4h48m58s546ms 061 17020020 +wifi_full_lock +wifi_scan
+       -4h48m57s121ms 061 56020020 -wifi_scan +wake_lock
+       -4h48m57s072ms 061 14020020 -wifi_full_lock -wake_lock
+       -4h48m28s536ms 061 17020020 +wifi_full_lock +wifi_scan
+       -4h48m27s102ms 061 56020020 -wifi_scan +wake_lock
+       -4h48m27s058ms 061 54020020 -wifi_full_lock
+       -4h48m27s049ms 061 14020020 -wake_lock
+       -4h47m58s533ms 061 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -4h47m57s103ms 061 14020020 -wifi_full_lock -wifi_scan -wake_lock
+       -4h46m58s180ms 061 17020010 +wifi_full_lock +wifi_scan signal_strength=poor
+       -4h46m55s709ms 061 56020010 -wifi_scan +wake_lock
+       -4h46m55s630ms 061 14020010 -wifi_full_lock -wake_lock
+       -4h46m25s601ms 061 17020010 +wifi_full_lock +wifi_scan
+       -4h46m24s171ms 061 56020010 -wifi_scan +wake_lock
+       -4h46m24s117ms 061 14020010 -wifi_full_lock -wake_lock
+       -4h45m55s566ms 061 17020010 +wifi_full_lock +wifi_scan
+       -4h45m54s136ms 061 56020010 -wifi_scan +wake_lock
+       -4h45m54s076ms 061 14020010 -wifi_full_lock -wake_lock
+       -4h45m26s007ms 061 17020020 +wifi_full_lock +wifi_scan signal_strength=moderate
+       -4h45m22s632ms 061 56020020 -wifi_scan +wake_lock
+       -4h45m22s566ms 061 14020020 -wifi_full_lock -wake_lock
+       -4h45m03s198ms 061 14120020 +screen
+       -4h45m00s032ms 061 14020020 -screen
+       -4h44m54s044ms 061 17020010 +wifi_full_lock +wifi_scan signal_strength=poor
+       -4h44m52s621ms 061 56020010 -wifi_scan +wake_lock
+       -4h44m52s570ms 061 14020010 -wifi_full_lock -wake_lock
+       -4h44m29s653ms 061 14020020 signal_strength=moderate
+       -4h44m22s537ms 061 17020020 +wifi_full_lock +wifi_scan
+       -4h44m21s117ms 061 56020020 -wifi_scan +wake_lock
+       -4h44m21s063ms 061 14020020 -wifi_full_lock -wake_lock
+       -4h43m52s532ms 061 17020020 +wifi_full_lock +wifi_scan
+       -4h43m51s112ms 061 56020020 -wifi_scan +wake_lock
+       -4h43m51s055ms 061 14020020 -wifi_full_lock -wake_lock
+       -4h43m21s024ms 061 17020020 +wifi_full_lock +wifi_scan
+       -4h43m19s589ms 061 56020020 -wifi_scan +wake_lock
+       -4h43m19s530ms 061 14020020 -wifi_full_lock -wake_lock
+       -4h42m51s010ms 061 17020020 +wifi_full_lock +wifi_scan
+       -4h42m49s579ms 061 56020020 -wifi_scan +wake_lock
+       -4h42m49s524ms 061 14020020 -wifi_full_lock -wake_lock
+       -4h41m49s913ms 060 17020020 temp=280 +wifi_full_lock +wifi_scan
+       -4h41m48s497ms 060 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -4h41m48s435ms 060 14020020 -wake_lock
+       -4h41m19s903ms 060 17020020 +wifi_full_lock +wifi_scan
+       -4h41m18s481ms 060 56020020 -wifi_scan +wake_lock
+       -4h41m18s267ms 060 14020020 -wifi_full_lock -wake_lock
+       -4h40m36s633ms 060 54160020 +screen +phone_in_call +wake_lock
+       -4h40m35s677ms 060 54160020
+       -4h40m34s808ms 060 54160020
+       -4h40m33s807ms 060 54160020
+       -4h40m32s801ms 060 54160020
+       -4h40m31s790ms 060 54160020
+       -4h40m30s801ms 060 54160020
+       -4h40m29s529ms 060 54160020
+       -4h40m28s797ms 060 14060020 -screen -wake_lock
+       -4h40m28s125ms 060 54160020 +screen +wake_lock
+       -4h40m27s812ms 060 54160010 signal_strength=poor
+       -4h40m26s813ms 060 14160010 -wake_lock
+       -4h40m21s997ms 060 14160020 signal_strength=moderate
+       -4h40m19s894ms 060 17160020 +wifi_full_lock +wifi_scan
+       -4h40m18s471ms 060 56160020 -wifi_scan +wake_lock
+       -4h40m18s402ms 060 14160020 -wifi_full_lock -wake_lock
+       -4h40m12s693ms 060 14160020
+       -4h40m03s697ms 060 14160030 signal_strength=good
+       -4h39m55s516ms 060 14060030 -screen
+       -4h39m49s877ms 060 17060030 +wifi_full_lock +wifi_scan
+       -4h39m48s438ms 060 56060030 -wifi_scan +wake_lock
+       -4h39m47s863ms 060 14060030 -wifi_full_lock -wake_lock
+       -4h39m47s538ms 060 14060030
+       -4h39m45s436ms 060 14060040 signal_strength=great
+       -4h39m40s256ms 060 14060010 signal_strength=poor
+       -4h39m39s252ms 060 14060030 signal_strength=good
+       -4h39m27s564ms 060 54160030 +screen +wake_lock
+       -4h39m25s753ms 060 14120030 -phone_in_call -wake_lock
+       -4h39m22s690ms 060 14020030 -screen
+       -4h39m17s837ms 060 17020030 +wifi_full_lock +wifi_scan
+       -4h39m16s410ms 060 56020030 -wifi_scan +wake_lock
+       -4h39m16s367ms 060 14020030 -wifi_full_lock -wake_lock
+       -4h38m49s546ms 060 14020020 signal_strength=moderate
+       -4h38m46s682ms 060 14020030 signal_strength=good
+       -4h38m16s644ms 060 57020020 +wifi_full_lock +wifi_scan +wake_lock signal_strength=moderate
+       -4h38m15s215ms 060 14020010 -wifi_full_lock -wifi_scan -wake_lock signal_strength=poor
+       -4h38m13s394ms 060 54020020 +wake_lock signal_strength=moderate
+       -4h38m13s338ms 060 14020020 -wake_lock
+       -4h37m45s126ms 060 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -4h37m43s686ms 060 14020020 -wifi_full_lock -wifi_scan -wake_lock
+       -4h37m14s936ms 060 17020020 +wifi_full_lock +wifi_scan
+       -4h37m13s493ms 060 56020020 -wifi_scan +wake_lock
+       -4h37m13s428ms 060 14020020 -wifi_full_lock -wake_lock
+       -4h36m44s926ms 060 17020020 +wifi_full_lock +wifi_scan
+       -4h36m43s494ms 060 56020020 -wifi_scan +wake_lock
+       -4h36m43s432ms 060 14020020 -wifi_full_lock -wake_lock
+       -4h36m13s398ms 060 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -4h36m11s951ms 060 14020020 -wifi_full_lock -wifi_scan -wake_lock
+       -4h35m43s383ms 060 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -4h35m41s948ms 060 14020020 -wifi_full_lock -wifi_scan -wake_lock
+       -4h35m11s868ms 060 17020020 +wifi_full_lock +wifi_scan
+       -4h35m10s443ms 060 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -4h35m10s374ms 060 14020020 -wake_lock
+       -4h34m46s055ms 059 14020020 temp=300
+       -4h34m41s851ms 059 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -4h34m40s411ms 059 14020020 -wifi_full_lock -wifi_scan -wake_lock
+       -4h34m11s843ms 059 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -4h34m10s413ms 059 14020020 -wifi_full_lock -wifi_scan -wake_lock
+       -4h33m40s329ms 059 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -4h33m38s886ms 059 14020020 -wifi_full_lock -wifi_scan -wake_lock
+       -4h33m10s315ms 059 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -4h33m08s886ms 059 14020020 -wifi_full_lock -wifi_scan -wake_lock
+       -4h32m38s804ms 059 17020020 +wifi_full_lock +wifi_scan
+       -4h32m37s373ms 059 56020020 -wifi_scan +wake_lock
+       -4h32m37s324ms 059 14020020 -wifi_full_lock -wake_lock
+       -4h32m08s792ms 059 17020020 +wifi_full_lock +wifi_scan
+       -4h32m07s368ms 059 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -4h32m07s302ms 059 14020020 -wake_lock
+       -4h31m38s777ms 059 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -4h31m37s343ms 059 14020020 -wifi_full_lock -wifi_scan -wake_lock
+       -4h31m08s765ms 059 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -4h31m07s318ms 059 14020020 -wifi_full_lock -wifi_scan -wake_lock
+       -4h30m37s243ms 059 17020020 +wifi_full_lock +wifi_scan
+       -4h30m35s820ms 059 56020020 -wifi_scan +wake_lock
+       -4h30m35s768ms 059 14020020 -wifi_full_lock -wake_lock
+       -4h30m07s224ms 059 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -4h30m05s801ms 059 14020020 -wifi_full_lock -wifi_scan -wake_lock
+       -4h29m37s217ms 059 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -4h29m35s777ms 059 14020020 -wifi_full_lock -wifi_scan -wake_lock
+       -4h29m05s693ms 059 17020020 +wifi_full_lock +wifi_scan
+       -4h29m04s259ms 059 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -4h29m04s015ms 059 14020020 -wake_lock
+       -4h28m35s678ms 059 17020020 +wifi_full_lock +wifi_scan
+       -4h28m34s239ms 059 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -4h28m34s188ms 059 14020020 -wake_lock
+       -4h28m05s657ms 059 17020020 +wifi_full_lock +wifi_scan
+       -4h28m04s213ms 059 56020020 -wifi_scan +wake_lock
+       -4h28m04s172ms 059 14020020 -wifi_full_lock -wake_lock
+       -4h27m34s139ms 059 17020020 +wifi_full_lock +wifi_scan
+       -4h27m32s706ms 059 56020020 -wifi_scan +wake_lock
+       -4h27m32s646ms 059 14020020 -wifi_full_lock -wake_lock
+       -4h27m02s622ms 059 17020020 +wifi_full_lock +wifi_scan
+       -4h27m01s199ms 059 56020020 -wifi_scan +wake_lock
+       -4h27m01s138ms 059 14020020 -wifi_full_lock -wake_lock
+       -4h26m32s616ms 059 17020020 +wifi_full_lock +wifi_scan
+       -4h26m31s188ms 059 56020020 -wifi_scan +wake_lock
+       -4h26m31s143ms 059 14020020 -wifi_full_lock -wake_lock
+       -4h26m01s115ms 059 17020020 +wifi_full_lock +wifi_scan
+       -4h25m59s700ms 059 56020020 -wifi_scan +wake_lock
+       -4h25m59s632ms 059 14020020 -wifi_full_lock -wake_lock
+       -4h25m31s106ms 059 17020020 +wifi_full_lock +wifi_scan
+       -4h25m29s668ms 059 56020020 -wifi_scan +wake_lock
+       -4h25m29s610ms 059 14020020 -wifi_full_lock -wake_lock
+       -4h25m01s089ms 059 17020020 +wifi_full_lock +wifi_scan
+       -4h24m59s660ms 059 56020020 -wifi_scan +wake_lock
+       -4h24m59s613ms 059 14020020 -wifi_full_lock -wake_lock
+       -4h24m31s048ms 059 17020020 +wifi_full_lock +wifi_scan
+       -4h24m29s630ms 059 56020020 -wifi_scan +wake_lock
+       -4h24m29s578ms 059 54020020 -wifi_full_lock
+       -4h24m29s566ms 059 14020020 -wake_lock
+       -4h23m59s533ms 059 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -4h23m58s799ms 059 56020020 -wifi_scan
+       -4h23m58s064ms 059 54020020 -wifi_full_lock
+       -4h23m58s058ms 059 14020020 -wake_lock
+       -4h23m29s528ms 059 17020020 +wifi_full_lock +wifi_scan
+       -4h23m28s107ms 059 56020020 -wifi_scan +wake_lock
+       -4h23m28s060ms 059 54020020 -wifi_full_lock
+       -4h23m28s046ms 059 14020020 -wake_lock
+       -4h22m58s028ms 059 17020020 +wifi_full_lock +wifi_scan
+       -4h22m56s601ms 059 56020020 -wifi_scan +wake_lock
+       -4h22m56s548ms 059 14020020 -wifi_full_lock -wake_lock
+       -4h22m28s018ms 059 17020020 +wifi_full_lock +wifi_scan
+       -4h22m26s593ms 059 56020020 -wifi_scan +wake_lock
+       -4h22m26s555ms 059 54020020 -wifi_full_lock
+       -4h22m26s539ms 059 14020020 -wake_lock
+       -4h22m00s496ms 058 54020020 temp=290 +wake_lock
+       -4h22m00s482ms 058 54020020
+       -4h21m59s969ms 058 14020020 -wake_lock
+       -4h21m56s502ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h21m55s068ms 058 56020020 -wifi_scan +wake_lock
+       -4h21m55s026ms 058 54020020 -wifi_full_lock
+       -4h21m55s011ms 058 14020020 -wake_lock
+       -4h21m26s486ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h21m25s049ms 058 56020020 -wifi_scan +wake_lock
+       -4h21m24s989ms 058 14020020 -wifi_full_lock -wake_lock
+       -4h20m56s460ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h20m55s024ms 058 56020020 -wifi_scan +wake_lock
+       -4h20m54s987ms 058 54020020 -wifi_full_lock
+       -4h20m54s969ms 058 14020020 -wake_lock
+       -4h20m24s944ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h20m23s509ms 058 56020020 -wifi_scan +wake_lock
+       -4h20m23s467ms 058 54020020 -wifi_full_lock
+       -4h20m23s454ms 058 14020020 -wake_lock
+       -4h19m53s433ms 058 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -4h19m52s566ms 058 14020020 -wifi_full_lock -wifi_scan -wake_lock
+       -4h19m23s423ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h19m21s989ms 058 56020020 -wifi_scan +wake_lock
+       -4h19m21s925ms 058 54020020 -wifi_full_lock
+       -4h19m21s913ms 058 14020020 -wake_lock
+       -4h18m51s874ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h18m50s446ms 058 56020020 -wifi_scan +wake_lock
+       -4h18m50s399ms 058 14020020 -wifi_full_lock -wake_lock
+       -4h18m20s358ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h18m18s928ms 058 56020020 -wifi_scan +wake_lock
+       -4h18m18s855ms 058 54020020 -wifi_full_lock
+       -4h18m17s414ms 058 14020020 -wake_lock
+       -4h17m50s348ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h17m48s924ms 058 56020020 -wifi_scan +wake_lock
+       -4h17m48s720ms 058 14020020 -wifi_full_lock -wake_lock
+       -4h17m18s684ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h17m17s257ms 058 56020020 -wifi_scan +wake_lock
+       -4h17m17s200ms 058 14020020 -wifi_full_lock -wake_lock
+       -4h16m48s671ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h16m47s246ms 058 56020020 -wifi_scan +wake_lock
+       -4h16m47s197ms 058 14020020 -wifi_full_lock -wake_lock
+       -4h16m17s165ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h16m15s662ms 058 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -4h16m15s604ms 058 14020020 -wake_lock
+       -4h15m47s156ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h15m45s733ms 058 56020020 -wifi_scan +wake_lock
+       -4h15m45s689ms 058 54020020 -wifi_full_lock
+       -4h15m45s677ms 058 14020020 -wake_lock
+       -4h15m15s659ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h15m14s238ms 058 56020020 -wifi_scan +wake_lock
+       -4h15m14s174ms 058 14020020 -wifi_full_lock -wake_lock
+       -4h14m45s649ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h14m44s221ms 058 56020020 -wifi_scan +wake_lock
+       -4h14m44s177ms 058 54020020 -wifi_full_lock
+       -4h14m44s152ms 058 14020020 -wake_lock
+       -4h14m14s138ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h14m12s712ms 058 56020020 -wifi_scan +wake_lock
+       -4h14m12s648ms 058 54020020 -wifi_full_lock
+       -4h14m11s701ms 058 14020020 -wake_lock
+       -4h13m44s126ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h13m42s700ms 058 56020020 -wifi_scan +wake_lock
+       -4h13m42s645ms 058 14020020 -wifi_full_lock -wake_lock
+       -4h13m12s620ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h13m11s198ms 058 56020020 -wifi_scan +wake_lock
+       -4h13m11s157ms 058 14020020 -wifi_full_lock -wake_lock
+       -4h12m42s612ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h12m41s189ms 058 56020020 -wifi_scan +wake_lock
+       -4h12m41s134ms 058 14020020 -wifi_full_lock -wake_lock
+       -4h12m11s110ms 058 17020010 +wifi_full_lock +wifi_scan signal_strength=poor
+       -4h12m09s666ms 058 56020010 -wifi_scan +wake_lock
+       -4h12m09s450ms 058 14020010 -wifi_full_lock -wake_lock
+       -4h11m41s100ms 058 17020020 +wifi_full_lock +wifi_scan signal_strength=moderate
+       -4h11m39s668ms 058 56020020 -wifi_scan +wake_lock
+       -4h11m39s623ms 058 54020020 -wifi_full_lock
+       -4h11m39s611ms 058 14020020 -wake_lock
+       -4h11m09s592ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h11m08s168ms 058 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -4h11m08s099ms 058 14020020 -wake_lock
+       -4h10m39s404ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h10m37s973ms 058 56020020 -wifi_scan +wake_lock
+       -4h10m37s908ms 058 14020020 -wifi_full_lock -wake_lock
+       -4h09m38s779ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h09m37s350ms 058 56020020 -wifi_scan +wake_lock
+       -4h09m37s303ms 058 14020020 -wifi_full_lock -wake_lock
+       -4h09m07s269ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h09m05s837ms 058 56020020 -wifi_scan +wake_lock
+       -4h09m05s792ms 058 14020020 -wifi_full_lock -wake_lock
+       -4h08m37s250ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h08m35s825ms 058 56020020 -wifi_scan +wake_lock
+       -4h08m35s788ms 058 14020020 -wifi_full_lock -wake_lock
+       -4h08m05s755ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h08m04s336ms 058 56020020 -wifi_scan +wake_lock
+       -4h08m04s288ms 058 14020020 -wifi_full_lock -wake_lock
+       -4h07m35s746ms 058 17020020 +wifi_full_lock +wifi_scan
+       -4h07m34s314ms 058 56020020 -wifi_scan +wake_lock
+       -4h07m34s256ms 058 14020020 -wifi_full_lock -wake_lock
+       -4h07m06s097ms 057 17020020 temp=280 +wifi_full_lock +wifi_scan
+       -4h07m02s809ms 057 56020020 -wifi_scan +wake_lock
+       -4h07m02s756ms 057 14020020 -wifi_full_lock -wake_lock
+       -4h06m34s216ms 057 17020020 +wifi_full_lock +wifi_scan
+       -4h06m32s797ms 057 56020020 -wifi_scan +wake_lock
+       -4h06m32s754ms 057 54020020 -wifi_full_lock
+       -4h06m32s741ms 057 14020020 -wake_lock
+       -4h06m02s714ms 057 17020020 +wifi_full_lock +wifi_scan
+       -4h06m01s294ms 057 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -4h06m01s235ms 057 14020020 -wake_lock
+       -4h05m32s705ms 057 17020020 +wifi_full_lock +wifi_scan
+       -4h05m31s291ms 057 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -4h05m31s229ms 057 14020020 -wake_lock
+       -4h05m01s210ms 057 17020020 +wifi_full_lock +wifi_scan
+       -4h04m59s790ms 057 56020020 -wifi_scan +wake_lock
+       -4h04m59s741ms 057 14020020 -wifi_full_lock -wake_lock
+       -4h04m31s204ms 057 17020020 +wifi_full_lock +wifi_scan
+       -4h04m29s773ms 057 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -4h04m29s653ms 057 14020020 -wake_lock
+       -4h03m59s643ms 057 17020020 +wifi_full_lock +wifi_scan
+       -4h03m58s211ms 057 56020020 -wifi_scan +wake_lock
+       -4h03m58s165ms 057 14020020 -wifi_full_lock -wake_lock
+       -4h03m29s614ms 057 17020020 +wifi_full_lock +wifi_scan
+       -4h03m28s192ms 057 56020020 -wifi_scan +wake_lock
+       -4h03m28s137ms 057 14020020 -wifi_full_lock -wake_lock
+       -4h02m58s103ms 057 17020020 +wifi_full_lock +wifi_scan
+       -4h02m56s677ms 057 56020020 -wifi_scan +wake_lock
+       -4h02m56s631ms 057 14020020 -wifi_full_lock -wake_lock
+       -4h02m28s093ms 057 17020020 +wifi_full_lock +wifi_scan
+       -4h02m26s673ms 057 56020020 -wifi_scan +wake_lock
+       -4h02m26s602ms 057 14020020 -wifi_full_lock -wake_lock
+       -4h01m56s551ms 057 17020020 +wifi_full_lock +wifi_scan
+       -4h01m55s121ms 057 56020020 -wifi_scan +wake_lock
+       -4h01m55s070ms 057 14020020 -wifi_full_lock -wake_lock
+       -4h01m25s035ms 057 17020020 +wifi_full_lock +wifi_scan
+       -4h01m23s609ms 057 56020020 -wifi_scan +wake_lock
+       -4h01m23s533ms 057 14020020 -wifi_full_lock -wake_lock
+       -4h00m55s018ms 057 17020020 +wifi_full_lock +wifi_scan
+       -4h00m53s592ms 057 56020020 -wifi_scan +wake_lock
+       -4h00m53s531ms 057 14020020 -wifi_full_lock -wake_lock
+       -3h59m53s424ms 057 17020020 +wifi_full_lock +wifi_scan
+       -3h59m52s002ms 057 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -3h59m51s940ms 057 14020020 -wake_lock
+       -3h59m23s415ms 057 17020020 +wifi_full_lock +wifi_scan
+       -3h59m21s985ms 057 56020020 -wifi_scan +wake_lock
+       -3h59m21s942ms 057 14020020 -wifi_full_lock -wake_lock
+       -3h58m22s756ms 057 17020020 +wifi_full_lock +wifi_scan
+       -3h58m21s333ms 057 56020020 -wifi_scan +wake_lock
+       -3h58m21s098ms 057 14020020 -wifi_full_lock -wake_lock
+       -3h57m51s071ms 057 17020020 +wifi_full_lock +wifi_scan
+       -3h57m49s644ms 057 56020020 -wifi_scan +wake_lock
+       -3h57m49s574ms 057 14020020 -wifi_full_lock -wake_lock
+       -3h57m21s062ms 057 17020020 +wifi_full_lock +wifi_scan
+       -3h57m19s644ms 057 56020020 -wifi_scan +wake_lock
+       -3h57m19s600ms 057 14020020 -wifi_full_lock -wake_lock
+       -3h56m52s708ms 057 14020010 signal_strength=poor
+       -3h56m41s928ms 057 14020020 signal_strength=moderate
+       -3h56m34s164ms 057 17020020 +wifi_full_lock +wifi_scan
+       -3h56m32s728ms 057 56020020 -wifi_scan +wake_lock
+       -3h56m32s588ms 057 14020020 -wifi_full_lock -wake_lock
+       -3h56m04s143ms 057 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -3h56m03s774ms 057 56020020 -wifi_scan
+       -3h56m02s660ms 057 14020020 -wifi_full_lock -wake_lock
+       -3h55m32s626ms 057 17020020 +wifi_full_lock +wifi_scan
+       -3h55m31s204ms 057 56020020 -wifi_scan +wake_lock
+       -3h55m31s154ms 057 14020020 -wifi_full_lock -wake_lock
+       -3h54m30s431ms 057 17020020 +wifi_full_lock +wifi_scan
+       -3h54m29s006ms 057 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -3h54m28s755ms 057 14020020 -wake_lock
+       -3h53m58s744ms 057 17020020 +wifi_full_lock +wifi_scan
+       -3h53m57s292ms 057 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -3h53m57s225ms 057 14020020 -wake_lock
+       -3h53m28s734ms 057 17020020 +wifi_full_lock +wifi_scan
+       -3h53m27s309ms 057 56020020 -wifi_scan +wake_lock
+       -3h53m27s261ms 057 14020020 -wifi_full_lock -wake_lock
+       -3h52m58s727ms 057 17020020 +wifi_full_lock +wifi_scan
+       -3h52m57s268ms 057 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -3h52m57s193ms 057 14020020 -wake_lock
+       -3h52m27s177ms 057 17020020 +wifi_full_lock +wifi_scan
+       -3h52m25s752ms 057 56020020 -wifi_scan +wake_lock
+       -3h52m25s526ms 057 14020020 -wifi_full_lock -wake_lock
+       -3h51m57s165ms 057 17020020 +wifi_full_lock +wifi_scan
+       -3h51m55s738ms 057 56020020 -wifi_scan +wake_lock
+       -3h51m55s689ms 057 14020020 -wifi_full_lock -wake_lock
+       -3h51m27s593ms 057 17020010 +wifi_full_lock +wifi_scan signal_strength=poor
+       -3h51m25s726ms 057 56020010 -wifi_scan +wake_lock
+       -3h51m25s667ms 057 14020010 -wifi_full_lock -wake_lock
+       -3h51m04s590ms 056 14020020 temp=290 signal_strength=moderate
+       -3h50m55s623ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h50m54s202ms 056 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -3h50m54s149ms 056 14020020 -wake_lock
+       -3h50m25s614ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h50m24s186ms 056 56020020 -wifi_scan +wake_lock
+       -3h50m24s117ms 056 14020020 -wifi_full_lock -wake_lock
+       -3h50m03s141ms 056 14020010 signal_strength=poor
+       -3h50m00s548ms 056 14020020 signal_strength=moderate
+       -3h49m55s599ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h49m54s160ms 056 56020020 -wifi_scan +wake_lock
+       -3h49m54s101ms 056 14020020 -wifi_full_lock -wake_lock
+       -3h49m25s584ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h49m24s158ms 056 56020020 -wifi_scan +wake_lock
+       -3h49m24s109ms 056 14020020 -wifi_full_lock -wake_lock
+       -3h48m54s077ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h48m52s649ms 056 56020020 -wifi_scan +wake_lock
+       -3h48m52s605ms 056 54020020 -wifi_full_lock
+       -3h48m52s589ms 056 14020020 -wake_lock
+       -3h48m24s067ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h48m22s649ms 056 56020020 -wifi_scan +wake_lock
+       -3h48m22s603ms 056 14020020 -wifi_full_lock -wake_lock
+       -3h47m22s117ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h47m20s695ms 056 56020020 -wifi_scan +wake_lock
+       -3h47m20s494ms 056 54020020 -wifi_full_lock
+       -3h47m20s464ms 056 14020020 -wake_lock
+       -3h46m50s443ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h46m49s022ms 056 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -3h46m48s961ms 056 14020020 -wake_lock
+       -3h46m20s438ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h46m18s996ms 056 14020020 -wifi_full_lock -wifi_scan
+       -3h45m48s916ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h45m47s497ms 056 56020020 -wifi_scan +wake_lock
+       -3h45m47s441ms 056 14020020 -wifi_full_lock -wake_lock
+       -3h45m18s910ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h45m17s491ms 056 14020020 -wifi_full_lock -wifi_scan
+       -3h44m17s148ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h44m15s722ms 056 56020020 -wifi_scan +wake_lock
+       -3h44m15s677ms 056 54020020 -wifi_full_lock
+       -3h44m15s649ms 056 14020020 -wake_lock
+       -3h43m45s629ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h43m44s209ms 056 56020020 -wifi_scan +wake_lock
+       -3h43m44s144ms 056 14020020 -wifi_full_lock -wake_lock
+       -3h42m43s784ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h42m42s358ms 056 56020020 -wifi_scan +wake_lock
+       -3h42m42s302ms 056 14020020 -wifi_full_lock -wake_lock
+       -3h42m12s257ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h42m10s823ms 056 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -3h42m10s758ms 056 14020020 -wake_lock
+       -3h41m42s245ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h41m40s819ms 056 14020020 -wifi_full_lock -wifi_scan
+       -3h41m12s239ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h41m10s811ms 056 56020020 -wifi_scan +wake_lock
+       -3h41m10s757ms 056 14020020 -wifi_full_lock -wake_lock
+       -3h40m40s723ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h40m39s280ms 056 56020020 -wifi_scan +wake_lock
+       -3h40m39s230ms 056 14020020 -wifi_full_lock -wake_lock
+       -3h40m10s712ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h40m09s289ms 056 56020020 -wifi_scan +wake_lock
+       -3h40m09s235ms 056 14020020 -wifi_full_lock -wake_lock
+       -3h39m09s408ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h39m07s984ms 056 56020020 -wifi_scan +wake_lock
+       -3h39m07s934ms 056 14020020 -wifi_full_lock -wake_lock
+       -3h38m37s901ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h38m36s468ms 056 56020020 -wifi_scan +wake_lock
+       -3h38m36s420ms 056 14020020 -wifi_full_lock -wake_lock
+       -3h38m07s886ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h38m06s443ms 056 56020020 -wifi_scan +wake_lock
+       -3h38m06s361ms 056 14020020 -wifi_full_lock -wake_lock
+       -3h37m37s282ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h37m35s844ms 056 56020020 -wifi_scan +wake_lock
+       -3h37m35s790ms 056 14020020 -wifi_full_lock -wake_lock
+       -3h37m07s263ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h37m05s838ms 056 56020020 -wifi_scan +wake_lock
+       -3h37m05s786ms 056 14020020 -wifi_full_lock -wake_lock
+       -3h36m35s758ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h36m34s333ms 056 56020020 -wifi_scan +wake_lock
+       -3h36m34s279ms 056 14020020 -wifi_full_lock -wake_lock
+       -3h36m05s749ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h36m04s321ms 056 56020020 -wifi_scan +wake_lock
+       -3h36m04s262ms 056 14020020 -wifi_full_lock -wake_lock
+       -3h35m04s669ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h35m03s245ms 056 56020020 -wifi_scan +wake_lock
+       -3h35m03s198ms 056 54020020 -wifi_full_lock
+       -3h35m03s173ms 056 14020020 -wake_lock
+       -3h34m33s156ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h34m31s731ms 056 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -3h34m31s663ms 056 14020020 -wake_lock
+       -3h34m18s866ms 056 14120020 +screen
+       -3h34m16s030ms 056 14020020 -screen
+       -3h34m03s004ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h34m01s586ms 056 56020020 -wifi_scan +wake_lock
+       -3h34m01s540ms 056 54020020 -wifi_full_lock
+       -3h34m01s510ms 056 14020020 -wake_lock
+       -3h33m31s491ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h33m30s048ms 056 56020020 -wifi_scan +wake_lock
+       -3h33m29s991ms 056 14020020 -wifi_full_lock -wake_lock
+       -3h33m01s460ms 056 17020020 +wifi_full_lock +wifi_scan
+       -3h33m00s033ms 056 56020020 -wifi_scan +wake_lock
+       -3h32m59s955ms 056 14020020 -wifi_full_lock -wake_lock
+       -3h32m30s914ms 055 17020020 +wifi_full_lock +wifi_scan
+       -3h32m28s386ms 055 56020020 -wifi_scan +wake_lock
+       -3h32m28s328ms 055 14020020 -wifi_full_lock -wake_lock
+       -3h31m59s796ms 055 17020020 +wifi_full_lock +wifi_scan
+       -3h31m58s361ms 055 56020020 -wifi_scan +wake_lock
+       -3h31m58s281ms 055 14020020 -wifi_full_lock -wake_lock
+       -3h31m28s255ms 055 17020020 +wifi_full_lock +wifi_scan
+       -3h31m26s827ms 055 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -3h31m26s767ms 055 14020020 -wake_lock
+       -3h30m58s247ms 055 17020020 +wifi_full_lock +wifi_scan
+       -3h30m56s815ms 055 56020020 -wifi_scan +wake_lock
+       -3h30m56s767ms 055 54020020 -wifi_full_lock
+       -3h30m56s744ms 055 14020020 -wake_lock
+       -3h30m26s570ms 055 17020020 +wifi_full_lock +wifi_scan
+       -3h30m25s112ms 055 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -3h30m25s046ms 055 14020020 -wake_lock
+       -3h29m56s560ms 055 17020020 +wifi_full_lock +wifi_scan
+       -3h29m55s139ms 055 56020020 -wifi_scan +wake_lock
+       -3h29m55s089ms 055 14020020 -wifi_full_lock -wake_lock
+       -3h29m26s541ms 055 17020020 +wifi_full_lock +wifi_scan
+       -3h29m25s112ms 055 56020020 -wifi_scan +wake_lock
+       -3h29m25s066ms 055 14020020 -wifi_full_lock -wake_lock
+       -3h28m55s038ms 055 17020020 +wifi_full_lock +wifi_scan
+       -3h28m53s607ms 055 56020020 -wifi_scan +wake_lock
+       -3h28m53s505ms 055 14020020 -wifi_full_lock -wake_lock
+       -3h28m25s026ms 055 17020020 +wifi_full_lock +wifi_scan
+       -3h28m23s600ms 055 56020020 -wifi_scan +wake_lock
+       -3h28m23s403ms 055 14020020 -wifi_full_lock -wake_lock
+       -3h27m24s659ms 055 17020020 +wifi_full_lock +wifi_scan
+       -3h27m23s232ms 055 56020020 -wifi_scan +wake_lock
+       -3h27m23s181ms 055 14020020 -wifi_full_lock -wake_lock
+       -3h26m53s156ms 055 17020020 +wifi_full_lock +wifi_scan
+       -3h26m51s734ms 055 56020020 -wifi_scan +wake_lock
+       -3h26m51s689ms 055 14020020 -wifi_full_lock -wake_lock
+       -3h26m23s147ms 055 17020020 +wifi_full_lock +wifi_scan
+       -3h26m21s727ms 055 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -3h26m21s653ms 055 54020020
+       -3h26m20s838ms 055 14020020 -wake_lock
+       -3h26m08s256ms 055 14020030 signal_strength=good
+       -3h26m03s138ms 055 14020020 signal_strength=moderate
+       -3h25m53s137ms 055 17020020 +wifi_full_lock +wifi_scan
+       -3h25m51s707ms 055 56020020 -wifi_scan +wake_lock
+       -3h25m51s644ms 055 14020020 -wifi_full_lock -wake_lock
+       -3h25m34s790ms 055 14020020
+       -3h25m21s609ms 055 17020020 +wifi_full_lock +wifi_scan
+       -3h25m20s188ms 055 56020020 -wifi_scan +wake_lock
+       -3h25m20s140ms 055 14020020 -wifi_full_lock -wake_lock
+       -3h24m50s091ms 055 17020020 +wifi_full_lock +wifi_scan
+       -3h24m48s671ms 055 56020020 -wifi_scan +wake_lock
+       -3h24m48s619ms 055 14020020 -wifi_full_lock -wake_lock
+       -3h23m48s735ms 055 17020020 +wifi_full_lock +wifi_scan
+       -3h23m47s310ms 055 56020020 -wifi_scan +wake_lock
+       -3h23m47s242ms 055 14020020 -wifi_full_lock -wake_lock
+       -3h23m17s222ms 055 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -3h23m16s755ms 055 54020020 -wifi_full_lock -wifi_scan
+       -3h23m15s714ms 055 14020010 -wake_lock signal_strength=poor
+       -3h23m14s174ms 055 14020020 signal_strength=moderate
+       -3h22m47s207ms 055 17020020 +wifi_full_lock +wifi_scan
+       -3h22m45s766ms 055 14020020 -wifi_full_lock -wifi_scan
+       -3h21m45s475ms 055 17020020 +wifi_full_lock +wifi_scan
+       -3h21m44s048ms 055 56020020 -wifi_scan +wake_lock
+       -3h21m43s991ms 055 14020020 -wifi_full_lock -wake_lock
+       -3h21m41s541ms 055 14020010 signal_strength=poor
+       -3h21m34s343ms 055 14020020 signal_strength=moderate
+       -3h21m13s954ms 055 17020020 +wifi_full_lock +wifi_scan
+       -3h21m12s532ms 055 56020020 -wifi_scan +wake_lock
+       -3h21m12s469ms 055 14020020 -wifi_full_lock -wake_lock
+       -3h20m43s943ms 055 17020020 +wifi_full_lock +wifi_scan
+       -3h20m42s516ms 055 56020020 -wifi_scan +wake_lock
+       -3h20m42s468ms 055 14020020 -wifi_full_lock -wake_lock
+       -3h19m42s466ms 055 17020020 +wifi_full_lock +wifi_scan
+       -3h19m41s040ms 055 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -3h19m40s990ms 055 14020020 -wake_lock
+       -3h19m17s278ms 054 14020020
+       -3h19m12s453ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h19m10s996ms 054 56020020 -wifi_scan +wake_lock
+       -3h19m10s948ms 054 14020020 -wifi_full_lock -wake_lock
+       -3h18m42s433ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h18m41s001ms 054 56020020 -wifi_scan +wake_lock
+       -3h18m40s926ms 054 14020020 -wifi_full_lock -wake_lock
+       -3h18m10s868ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h18m09s434ms 054 56020020 -wifi_scan +wake_lock
+       -3h18m09s378ms 054 14020020 -wifi_full_lock -wake_lock
+       -3h17m40s859ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h17m39s437ms 054 56020020 -wifi_scan +wake_lock
+       -3h17m39s382ms 054 14020020 -wifi_full_lock -wake_lock
+       -3h17m09s353ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h17m07s918ms 054 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -3h17m07s859ms 054 14020020 -wake_lock
+       -3h16m39s343ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h16m37s914ms 054 56020020 -wifi_scan +wake_lock
+       -3h16m37s800ms 054 54020020 -wifi_full_lock
+       -3h16m37s779ms 054 14020020 -wake_lock
+       -3h16m07s762ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h16m06s347ms 054 56020020 -wifi_scan +wake_lock
+       -3h16m06s231ms 054 54020020 -wifi_full_lock
+       -3h16m06s202ms 054 14020020 -wake_lock
+       -3h15m37s753ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h15m36s333ms 054 56020020 -wifi_scan +wake_lock
+       -3h15m36s248ms 054 14020020 -wifi_full_lock -wake_lock
+       -3h15m06s205ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h15m04s773ms 054 56020020 -wifi_scan +wake_lock
+       -3h15m04s680ms 054 14020020 -wifi_full_lock -wake_lock
+       -3h14m36s199ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h14m34s779ms 054 56020020 -wifi_scan +wake_lock
+       -3h14m34s723ms 054 14020020 -wifi_full_lock -wake_lock
+       -3h14m04s676ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h14m03s240ms 054 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -3h14m03s163ms 054 14020020 -wake_lock
+       -3h13m34s667ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h13m33s236ms 054 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -3h13m32s998ms 054 14020020 -wake_lock
+       -3h13m02s974ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h13m01s537ms 054 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -3h13m01s471ms 054 14020020 -wake_lock
+       -3h12m32s964ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h12m31s534ms 054 56020020 -wifi_scan +wake_lock
+       -3h12m31s484ms 054 54020020 -wifi_full_lock
+       -3h12m31s455ms 054 14020020 -wake_lock
+       -3h12m01s438ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h12m00s016ms 054 56020020 -wifi_scan +wake_lock
+       -3h11m59s968ms 054 54020020 -wifi_full_lock
+       -3h11m59s957ms 054 14020020 -wake_lock
+       -3h11m31s428ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h11m29s988ms 054 56020020 -wifi_scan +wake_lock
+       -3h11m29s938ms 054 14020020 -wifi_full_lock -wake_lock
+       -3h10m59s905ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h10m58s483ms 054 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -3h10m58s422ms 054 14020020 -wake_lock
+       -3h10m29s879ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h10m28s445ms 054 56020020 -wifi_scan +wake_lock
+       -3h10m28s403ms 054 54020020 -wifi_full_lock
+       -3h10m28s396ms 054 14020020 -wake_lock
+       -3h09m58s359ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h09m56s928ms 054 56020020 -wifi_scan +wake_lock
+       -3h09m56s869ms 054 14020020 -wifi_full_lock -wake_lock
+       -3h09m28s345ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h09m26s908ms 054 56020020 -wifi_scan +wake_lock
+       -3h09m26s857ms 054 14020020 -wifi_full_lock -wake_lock
+       -3h08m58s329ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h08m56s898ms 054 56020020 -wifi_scan +wake_lock
+       -3h08m56s846ms 054 14020020 -wifi_full_lock -wake_lock
+       -3h08m26s661ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h08m25s233ms 054 56020020 -wifi_scan +wake_lock
+       -3h08m25s182ms 054 14020020 -wifi_full_lock -wake_lock
+       -3h07m55s152ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h07m53s716ms 054 56020020 -wifi_scan +wake_lock
+       -3h07m53s648ms 054 14020020 -wifi_full_lock -wake_lock
+       -3h07m25s143ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h07m23s719ms 054 56020020 -wifi_scan +wake_lock
+       -3h07m23s680ms 054 14020020 -wifi_full_lock -wake_lock
+       -3h06m23s473ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h06m22s046ms 054 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -3h06m21s979ms 054 14020020 -wake_lock
+       -3h05m53s458ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h05m52s014ms 054 56020020 -wifi_scan +wake_lock
+       -3h05m51s965ms 054 14020020 -wifi_full_lock -wake_lock
+       -3h05m23s439ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h05m22s011ms 054 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -3h05m21s931ms 054 14020020 -wake_lock
+       -3h04m51s921ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h04m50s487ms 054 56020020 -wifi_scan +wake_lock
+       -3h04m50s442ms 054 14020020 -wifi_full_lock -wake_lock
+       -3h04m21s911ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h04m20s494ms 054 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -3h04m20s284ms 054 14020020 -wake_lock
+       -3h03m24s387ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h03m22s965ms 054 56020020 -wifi_scan +wake_lock
+       -3h03m22s892ms 054 14020020 -wifi_full_lock -wake_lock
+       -3h02m52s875ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h02m51s377ms 054 56020020 -wifi_scan +wake_lock
+       -3h02m51s315ms 054 14020020 -wifi_full_lock -wake_lock
+       -3h02m22s843ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h02m21s407ms 054 56020020 -wifi_scan +wake_lock
+       -3h02m21s347ms 054 54020020 -wifi_full_lock
+       -3h02m21s336ms 054 14020020 -wake_lock
+       -3h01m52s821ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h01m51s391ms 054 56020020 -wifi_scan +wake_lock
+       -3h01m51s335ms 054 14020020 -wifi_full_lock -wake_lock
+       -3h01m21s146ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h01m19s705ms 054 56020020 -wifi_scan +wake_lock
+       -3h01m19s630ms 054 14020020 -wifi_full_lock -wake_lock
+       -3h00m51s130ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h00m49s700ms 054 56020020 -wifi_scan +wake_lock
+       -3h00m49s629ms 054 14020020 -wifi_full_lock -wake_lock
+       -3h00m19s596ms 054 17020020 +wifi_full_lock +wifi_scan
+       -3h00m18s169ms 054 56020020 -wifi_scan +wake_lock
+       -3h00m18s123ms 054 14020020 -wifi_full_lock -wake_lock
+       -2h59m49s366ms 054 17020020 +wifi_full_lock +wifi_scan
+       -2h59m47s945ms 054 56020020 -wifi_scan +wake_lock
+       -2h59m47s878ms 054 14020020 -wifi_full_lock -wake_lock
+       -2h59m17s854ms 054 17020020 +wifi_full_lock +wifi_scan
+       -2h59m16s434ms 054 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h59m16s377ms 054 14020020 -wake_lock
+       -2h58m47s832ms 054 17020020 +wifi_full_lock +wifi_scan
+       -2h58m46s396ms 054 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h58m46s335ms 054 14020020 -wake_lock
+       -2h58m17s809ms 054 17020020 +wifi_full_lock +wifi_scan
+       -2h58m16s386ms 054 56020020 -wifi_scan +wake_lock
+       -2h58m16s318ms 054 14020020 -wifi_full_lock -wake_lock
+       -2h57m46s285ms 054 17020020 +wifi_full_lock +wifi_scan
+       -2h57m44s855ms 054 56020020 -wifi_scan +wake_lock
+       -2h57m44s793ms 054 14020020 -wifi_full_lock -wake_lock
+       -2h57m16s277ms 054 17020020 +wifi_full_lock +wifi_scan
+       -2h57m14s845ms 054 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h57m14s782ms 054 14020020 -wake_lock
+       -2h56m46s263ms 053 17020020 volt=3816 +wifi_full_lock +wifi_scan
+       -2h56m44s844ms 053 56020020 -wifi_scan +wake_lock
+       -2h56m44s795ms 053 14020020 -wifi_full_lock -wake_lock
+       -2h56m14s765ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h56m13s339ms 053 56020020 -wifi_scan +wake_lock
+       -2h56m13s276ms 053 14020020 -wifi_full_lock -wake_lock
+       -2h55m44s541ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h55m43s112ms 053 56020020 -wifi_scan +wake_lock
+       -2h55m42s889ms 053 14020020 -wifi_full_lock -wake_lock
+       -2h55m14s526ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h55m13s087ms 053 56020020 -wifi_scan +wake_lock
+       -2h55m13s041ms 053 14020020 -wifi_full_lock -wake_lock
+       -2h54m44s501ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h54m43s067ms 053 56020020 -wifi_scan +wake_lock
+       -2h54m43s019ms 053 54020020 -wifi_full_lock
+       -2h54m43s001ms 053 14020020 -wake_lock
+       -2h54m12s985ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h54m11s556ms 053 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h54m11s495ms 053 14020020 -wake_lock
+       -2h53m42s974ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h53m41s547ms 053 56020020 -wifi_scan +wake_lock
+       -2h53m41s484ms 053 14020020 -wifi_full_lock -wake_lock
+       -2h53m12s964ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h53m11s539ms 053 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h53m11s474ms 053 14020020 -wake_lock
+       -2h52m41s454ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h52m40s021ms 053 56020020 -wifi_scan +wake_lock
+       -2h52m39s978ms 053 54020020 -wifi_full_lock
+       -2h52m39s960ms 053 14020020 -wake_lock
+       -2h52m11s444ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h52m10s013ms 053 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h52m09s944ms 053 54020020
+       -2h52m09s026ms 053 14020020 -wake_lock
+       -2h51m41s423ms 053 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -2h51m40s629ms 053 54020020 -wifi_full_lock -wifi_scan
+       -2h51m39s919ms 053 14020020 -wake_lock
+       -2h51m09s902ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h51m08s463ms 053 56020020 -wifi_scan +wake_lock
+       -2h51m08s406ms 053 14020020 -wifi_full_lock -wake_lock
+       -2h50m39s880ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h50m38s455ms 053 56020020 -wifi_scan +wake_lock
+       -2h50m38s409ms 053 14020020 -wifi_full_lock -wake_lock
+       -2h49m37s846ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h49m36s414ms 053 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h49m36s333ms 053 14020020 -wake_lock
+       -2h49m07s836ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h49m06s404ms 053 56020020 -wifi_scan +wake_lock
+       -2h49m06s360ms 053 14020020 -wifi_full_lock -wake_lock
+       -2h48m37s824ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h48m36s394ms 053 56020020 -wifi_scan +wake_lock
+       -2h48m36s339ms 053 14020020 -wifi_full_lock -wake_lock
+       -2h47m36s494ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h47m35s060ms 053 56020020 -wifi_scan +wake_lock
+       -2h47m34s987ms 053 14020020 -wifi_full_lock -wake_lock
+       -2h46m38s304ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h46m36s871ms 053 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h46m36s801ms 053 14020020 -wake_lock
+       -2h46m06s784ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h46m05s345ms 053 56020020 -wifi_scan +wake_lock
+       -2h46m05s121ms 053 14020020 -wifi_full_lock -wake_lock
+       -2h45m36s772ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h45m35s345ms 053 56020020 -wifi_scan +wake_lock
+       -2h45m35s303ms 053 14020020 -wifi_full_lock -wake_lock
+       -2h44m35s367ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h44m33s934ms 053 56020020 -wifi_scan +wake_lock
+       -2h44m33s890ms 053 14020020 -wifi_full_lock -wake_lock
+       -2h43m34s704ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h43m33s277ms 053 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h43m33s080ms 053 14020020 -wake_lock
+       -2h43m03s036ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h43m01s601ms 053 56020020 -wifi_scan +wake_lock
+       -2h43m01s555ms 053 54020020 -wifi_full_lock
+       -2h43m01s534ms 053 14020020 -wake_lock
+       -2h42m34s476ms 053 17020010 +wifi_full_lock +wifi_scan signal_strength=poor
+       -2h42m31s577ms 053 56020010 -wifi_scan +wake_lock
+       -2h42m31s535ms 053 54020010 -wifi_full_lock
+       -2h42m31s520ms 053 14020010 -wake_lock
+       -2h42m03s765ms 053 14020020 signal_strength=moderate
+       -2h42m01s501ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h42m00s066ms 053 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h42m00s003ms 053 14020020 -wake_lock
+       -2h41m31s486ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h41m30s062ms 053 56020020 -wifi_scan +wake_lock
+       -2h41m30s009ms 053 14020020 -wifi_full_lock -wake_lock
+       -2h40m59s975ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h40m58s556ms 053 56020020 -wifi_scan +wake_lock
+       -2h40m58s340ms 053 14020020 -wifi_full_lock -wake_lock
+       -2h40m29s964ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h40m28s519ms 053 56020020 -wifi_scan +wake_lock
+       -2h40m28s472ms 053 14020020 -wifi_full_lock -wake_lock
+       -2h39m59s952ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h39m58s513ms 053 56020020 -wifi_scan +wake_lock
+       -2h39m58s454ms 053 14020020 -wifi_full_lock -wake_lock
+       -2h39m28s429ms 053 17020020 +wifi_full_lock +wifi_scan
+       -2h39m26s992ms 053 56020020 -wifi_scan +wake_lock
+       -2h39m26s949ms 053 54020020 -wifi_full_lock
+       -2h39m26s936ms 053 14020020 -wake_lock
+       -2h38m56s913ms 053 17020010 +wifi_full_lock +wifi_scan signal_strength=poor
+       -2h38m55s482ms 053 54020010 -wifi_full_lock -wifi_scan +wake_lock
+       -2h38m55s417ms 053 14020010 -wake_lock
+       -2h38m49s235ms 053 14020020 signal_strength=moderate
+       -2h38m26s895ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h38m25s458ms 052 56020020 -wifi_scan +wake_lock
+       -2h38m25s410ms 052 54020020 -wifi_full_lock
+       -2h38m25s385ms 052 14020020 -wake_lock
+       -2h37m55s372ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h37m53s940ms 052 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h37m53s876ms 052 14020020 -wake_lock
+       -2h37m25s349ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h37m23s915ms 052 56020020 -wifi_scan +wake_lock
+       -2h37m23s862ms 052 14020010 -wifi_full_lock -wake_lock signal_strength=poor
+       -2h36m52s686ms 052 14020020 signal_strength=moderate
+       -2h36m25s043ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h36m23s601ms 052 56020020 -wifi_scan +wake_lock
+       -2h36m23s538ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h35m53s488ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h35m52s060ms 052 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h35m51s994ms 052 14020020 -wake_lock
+       -2h35m23s474ms 052 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -2h35m22s877ms 052 56020020 -wifi_scan
+       -2h35m22s004ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h34m53s465ms 052 17120010 +screen +wifi_full_lock +wifi_scan signal_strength=poor
+       -2h34m52s023ms 052 56120010 -wifi_scan +wake_lock
+       -2h34m51s949ms 052 14120010 -wifi_full_lock -wake_lock
+       -2h34m32s510ms 052 14020010 -screen
+       -2h34m26s725ms 052 54020020 +wake_lock signal_strength=moderate
+       -2h34m24s759ms 052 54020020
+       -2h34m23s718ms 052 57020020 +wifi_full_lock +wifi_scan
+       -2h34m20s784ms 052 56020020 -wifi_scan
+       -2h34m20s447ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h34m15s704ms 052 14020020
+       -2h33m50s419ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h33m48s999ms 052 56020020 -wifi_scan +wake_lock
+       -2h33m48s937ms 052 54020020 -wifi_full_lock
+       -2h33m48s913ms 052 14020020 -wake_lock
+       -2h33m18s898ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h33m17s470ms 052 56020020 -wifi_scan +wake_lock
+       -2h33m17s416ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h32m48s889ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h32m47s467ms 052 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h32m47s224ms 052 14020020 -wake_lock
+       -2h32m17s205ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h32m15s777ms 052 56020020 -wifi_scan +wake_lock
+       -2h32m15s730ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h31m47s195ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h31m45s758ms 052 56020020 -wifi_scan +wake_lock
+       -2h31m45s700ms 052 54020020 -wifi_full_lock
+       -2h31m45s681ms 052 14020020 -wake_lock
+       -2h31m15s658ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h31m14s216ms 052 56020020 -wifi_scan +wake_lock
+       -2h31m14s173ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h30m45s642ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h30m44s215ms 052 56020020 -wifi_scan +wake_lock
+       -2h30m44s162ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h30m14s138ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h30m12s710ms 052 56020020 -wifi_scan +wake_lock
+       -2h30m12s651ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h29m44s127ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h29m42s700ms 052 56020020 -wifi_scan +wake_lock
+       -2h29m42s648ms 052 54020020 -wifi_full_lock
+       -2h29m42s640ms 052 14020020 -wake_lock
+       -2h29m12s618ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h29m11s195ms 052 56020020 -wifi_scan +wake_lock
+       -2h29m10s971ms 052 54020020 -wifi_full_lock
+       -2h29m10s069ms 052 14020020 -wake_lock
+       -2h28m42s444ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h28m41s021ms 052 56020020 -wifi_scan +wake_lock
+       -2h28m40s960ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h28m10s932ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h28m09s508ms 052 56020020 -wifi_scan +wake_lock
+       -2h28m09s447ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h27m40s920ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h27m39s489ms 052 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h27m39s425ms 052 14020020 -wake_lock
+       -2h27m09s416ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h27m07s999ms 052 56020020 -wifi_scan +wake_lock
+       -2h27m07s944ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h26m45s361ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h26m43s926ms 052 56020020 -wifi_scan +wake_lock
+       -2h26m43s879ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h25m43s674ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h25m42s230ms 052 56020020 -wifi_scan +wake_lock
+       -2h25m42s185ms 052 54020020 -wifi_full_lock
+       -2h25m42s153ms 052 14020020 -wake_lock
+       -2h25m12s140ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h25m10s709ms 052 56020020 -wifi_scan +wake_lock
+       -2h25m10s657ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h24m42s124ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h24m40s686ms 052 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h24m40s451ms 052 54020020
+       -2h24m39s308ms 052 14020020 -wake_lock
+       -2h24m12s098ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h24m10s676ms 052 56020020 -wifi_scan +wake_lock
+       -2h24m10s633ms 052 54020020 -wifi_full_lock
+       -2h24m10s611ms 052 14020020 -wake_lock
+       -2h23m40s591ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h23m39s162ms 052 56020020 -wifi_scan +wake_lock
+       -2h23m39s046ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h23m10s578ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h23m09s139ms 052 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h23m09s067ms 052 14020020 -wake_lock
+       -2h22m39s051ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h22m37s625ms 052 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h22m37s363ms 052 14020020 -wake_lock
+       -2h22m09s039ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h22m07s597ms 052 56020020 -wifi_scan +wake_lock
+       -2h22m07s555ms 052 54020020 -wifi_full_lock
+       -2h22m07s533ms 052 14020020 -wake_lock
+       -2h21m37s498ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h21m36s066ms 052 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h21m35s849ms 052 14020020 -wake_lock
+       -2h21m07s494ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h21m06s068ms 052 56020020 -wifi_scan +wake_lock
+       -2h21m06s010ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h20m05s115ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h20m03s689ms 052 56020020 -wifi_scan +wake_lock
+       -2h20m03s647ms 052 54020020 -wifi_full_lock
+       -2h20m03s629ms 052 14020020 -wake_lock
+       -2h19m33s603ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h19m32s143ms 052 56020020 -wifi_scan +wake_lock
+       -2h19m32s084ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h19m03s408ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h19m01s979ms 052 56020020 -wifi_scan +wake_lock
+       -2h19m01s929ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h18m31s893ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h18m30s418ms 052 56020020 -wifi_scan +wake_lock
+       -2h18m30s327ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h18m01s880ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h18m00s450ms 052 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h18m00s389ms 052 14020020 -wake_lock
+       -2h17m04s891ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h17m03s460ms 052 56020020 -wifi_scan +wake_lock
+       -2h17m03s410ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h16m33s371ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h16m31s944ms 052 56020020 -wifi_scan +wake_lock
+       -2h16m31s886ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h16m01s852ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h16m00s426ms 052 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h16m00s359ms 052 14020020 -wake_lock
+       -2h15m40s205ms 052 14020020
+       -2h15m31s840ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h15m30s421ms 052 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h15m30s374ms 052 14020020 -wake_lock
+       -2h15m01s825ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h15m00s407ms 052 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h15m00s321ms 052 14020020 -wake_lock
+       -2h14m30s306ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h14m28s885ms 052 56020020 -wifi_scan +wake_lock
+       -2h14m28s839ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h13m58s800ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h13m57s378ms 052 56020020 -wifi_scan +wake_lock
+       -2h13m57s329ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h13m02s088ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h13m00s666ms 052 56020020 -wifi_scan +wake_lock
+       -2h13m00s612ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h12m30s577ms 052 17020020 +wifi_full_lock +wifi_scan
+       -2h12m29s159ms 052 56020020 -wifi_scan +wake_lock
+       -2h12m29s111ms 052 14020020 -wifi_full_lock -wake_lock
+       -2h12m00s569ms 051 17020020 temp=280 +wifi_full_lock +wifi_scan
+       -2h11m59s138ms 051 56020020 -wifi_scan +wake_lock
+       -2h11m59s075ms 051 14020020 -wifi_full_lock -wake_lock
+       -2h11m29s045ms 051 17020020 +wifi_full_lock +wifi_scan
+       -2h11m27s625ms 051 56020020 -wifi_scan +wake_lock
+       -2h11m27s576ms 051 14020020 -wifi_full_lock -wake_lock
+       -2h10m27s932ms 051 17020020 +wifi_full_lock +wifi_scan
+       -2h10m26s503ms 051 56020020 -wifi_scan +wake_lock
+       -2h10m26s459ms 051 54020020 -wifi_full_lock
+       -2h10m26s454ms 051 14020020 -wake_lock
+       -2h09m56s428ms 051 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -2h09m55s110ms 051 56020020 -wifi_scan
+       -2h09m54s783ms 051 14020020 -wifi_full_lock -wake_lock
+       -2h09m26s419ms 051 17020020 +wifi_full_lock +wifi_scan
+       -2h09m24s999ms 051 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h09m24s940ms 051 14020020 -wake_lock
+       -2h08m56s406ms 051 17020020 +wifi_full_lock +wifi_scan
+       -2h08m54s983ms 051 56020020 -wifi_scan +wake_lock
+       -2h08m54s935ms 051 54020020 -wifi_full_lock
+       -2h08m54s910ms 051 14020020 -wake_lock
+       -2h08m24s898ms 051 17020020 +wifi_full_lock +wifi_scan
+       -2h08m23s465ms 051 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h08m23s401ms 051 54020020
+       -2h08m22s549ms 051 14020020 -wake_lock
+       -2h07m54s887ms 051 17020020 +wifi_full_lock +wifi_scan
+       -2h07m53s450ms 051 56020020 -wifi_scan +wake_lock
+       -2h07m53s405ms 051 54020020 -wifi_full_lock
+       -2h07m53s377ms 051 14020020 -wake_lock
+       -2h07m23s364ms 051 17020020 +wifi_full_lock +wifi_scan
+       -2h07m21s943ms 051 56020020 -wifi_scan +wake_lock
+       -2h07m21s887ms 051 14020020 -wifi_full_lock -wake_lock
+       -2h06m53s191ms 051 17020020 +wifi_full_lock +wifi_scan
+       -2h06m51s757ms 051 56020020 -wifi_scan +wake_lock
+       -2h06m51s711ms 051 14020020 -wifi_full_lock -wake_lock
+       -2h06m22s596ms 051 17020020 +wifi_full_lock +wifi_scan
+       -2h06m21s169ms 051 56020020 -wifi_scan +wake_lock
+       -2h06m21s107ms 051 14020020 -wifi_full_lock -wake_lock
+       -2h05m52s363ms 051 17020020 +wifi_full_lock +wifi_scan
+       -2h05m50s938ms 051 56020020 -wifi_scan +wake_lock
+       -2h05m50s874ms 051 14020020 -wifi_full_lock -wake_lock
+       -2h05m20s847ms 051 17020020 +wifi_full_lock +wifi_scan
+       -2h05m19s402ms 051 56020020 -wifi_scan +wake_lock
+       -2h05m19s352ms 051 14020020 -wifi_full_lock -wake_lock
+       -2h04m50s831ms 051 17020020 +wifi_full_lock +wifi_scan
+       -2h04m49s405ms 051 56020020 -wifi_scan +wake_lock
+       -2h04m49s362ms 051 54020020 -wifi_full_lock
+       -2h04m49s346ms 051 14020020 -wake_lock
+       -2h04m19s323ms 051 17020020 +wifi_full_lock +wifi_scan
+       -2h04m17s894ms 051 56020020 -wifi_scan +wake_lock
+       -2h04m17s676ms 051 14020020 -wifi_full_lock -wake_lock
+       -2h03m49s315ms 051 17020020 +wifi_full_lock +wifi_scan
+       -2h03m47s884ms 051 56020020 -wifi_scan +wake_lock
+       -2h03m47s844ms 051 54020020 -wifi_full_lock
+       -2h03m47s819ms 051 14020020 -wake_lock
+       -2h03m17s791ms 051 17020020 +wifi_full_lock +wifi_scan
+       -2h03m16s365ms 051 56020020 -wifi_scan +wake_lock
+       -2h03m16s327ms 051 54020020 -wifi_full_lock
+       -2h03m16s315ms 051 14020020 -wake_lock
+       -2h02m47s782ms 051 17020020 +wifi_full_lock +wifi_scan
+       -2h02m46s357ms 051 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -2h02m46s300ms 051 14020020 -wake_lock
+       -2h01m46s748ms 051 17020020 +wifi_full_lock +wifi_scan
+       -2h01m45s318ms 051 56020020 -wifi_scan +wake_lock
+       -2h01m45s092ms 051 14020020 -wifi_full_lock -wake_lock
+       -2h01m15s056ms 051 17020020 +wifi_full_lock +wifi_scan
+       -2h01m13s632ms 051 56020020 -wifi_scan +wake_lock
+       -2h01m13s569ms 051 14020020 -wifi_full_lock -wake_lock
+       -2h00m45s042ms 051 17020020 +wifi_full_lock +wifi_scan
+       -2h00m43s612ms 051 56020020 -wifi_scan +wake_lock
+       -2h00m43s552ms 051 14020020 -wifi_full_lock -wake_lock
+       -2h00m15s033ms 051 17020020 +wifi_full_lock +wifi_scan
+       -2h00m13s613ms 051 56020020 -wifi_scan +wake_lock
+       -2h00m13s552ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h59m44s982ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h59m43s561ms 051 56020020 -wifi_scan +wake_lock
+       -1h59m43s516ms 051 54020020 -wifi_full_lock
+       -1h59m43s503ms 051 14020020 -wake_lock
+       -1h59m13s481ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h59m12s051ms 051 56020020 -wifi_scan +wake_lock
+       -1h59m11s999ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h58m43s476ms 051 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -1h58m42s105ms 051 56020020 -wifi_scan
+       -1h58m42s016ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h58m12s085ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h58m10s665ms 051 56020020 -wifi_scan +wake_lock
+       -1h58m10s602ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h57m42s074ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h57m40s651ms 051 56020020 -wifi_scan +wake_lock
+       -1h57m40s563ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h57m10s369ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h57m08s938ms 051 56020020 -wifi_scan +wake_lock
+       -1h57m08s878ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h56m40s357ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h56m38s931ms 051 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -1h56m38s865ms 051 14020020 -wake_lock
+       -1h56m08s848ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h56m07s428ms 051 56020020 -wifi_scan +wake_lock
+       -1h56m07s376ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h55m38s822ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h55m37s391ms 051 56020020 -wifi_scan +wake_lock
+       -1h55m37s272ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h55m07s251ms 051 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -1h55m06s425ms 051 56020020 -wifi_scan
+       -1h55m05s721ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h54m37s236ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h54m35s809ms 051 56020020 -wifi_scan +wake_lock
+       -1h54m35s750ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h54m05s709ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h54m04s278ms 051 56020020 -wifi_scan +wake_lock
+       -1h54m04s074ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h53m35s685ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h53m34s263ms 051 56020020 -wifi_scan +wake_lock
+       -1h53m34s205ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h52m33s500ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h52m32s078ms 051 56020020 -wifi_scan +wake_lock
+       -1h52m32s017ms 051 54020020 -wifi_full_lock
+       -1h52m31s992ms 051 14020020 -wake_lock
+       -1h52m01s988ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h52m00s535ms 051 56020020 -wifi_scan +wake_lock
+       -1h52m00s485ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h51m31s978ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h51m30s555ms 051 56020020 -wifi_scan +wake_lock
+       -1h51m30s502ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h51m00s466ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h50m59s036ms 051 56020020 -wifi_scan +wake_lock
+       -1h50m58s991ms 051 54020020 -wifi_full_lock
+       -1h50m58s971ms 051 14020020 -wake_lock
+       -1h50m30s449ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h50m29s017ms 051 56020020 -wifi_scan +wake_lock
+       -1h50m28s964ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h50m00s431ms 051 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -1h49m59s504ms 051 56020020 -wifi_scan
+       -1h49m58s947ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h49m28s915ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h49m27s487ms 051 56020020 -wifi_scan +wake_lock
+       -1h49m27s441ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h48m58s905ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h48m57s482ms 051 56020020 -wifi_scan +wake_lock
+       -1h48m57s424ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h47m58s955ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h47m57s526ms 051 56020020 -wifi_scan +wake_lock
+       -1h47m57s472ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h47m27s438ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h47m26s018ms 051 56020020 -wifi_scan +wake_lock
+       -1h47m25s971ms 051 54020020 -wifi_full_lock
+       -1h47m25s943ms 051 14020020 -wake_lock
+       -1h46m55s810ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h46m54s384ms 051 56020020 -wifi_scan +wake_lock
+       -1h46m54s338ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h45m54s009ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h45m52s571ms 051 56020020 -wifi_scan +wake_lock
+       -1h45m52s505ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h45m22s453ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h45m21s034ms 051 56020020 -wifi_scan +wake_lock
+       -1h45m20s993ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h44m19s744ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h44m18s315ms 051 56020020 -wifi_scan +wake_lock
+       -1h44m18s244ms 051 54020020 -wifi_full_lock
+       -1h44m17s598ms 051 14020020 -wake_lock
+       -1h43m49s733ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h43m48s312ms 051 56020020 -wifi_scan +wake_lock
+       -1h43m48s096ms 051 14020020 -wifi_full_lock -wake_lock
+       -1h42m48s437ms 051 17020020 +wifi_full_lock +wifi_scan
+       -1h42m47s008ms 051 56020020 -wifi_scan +wake_lock
+       -1h42m46s952ms 051 54020020 -wifi_full_lock
+       -1h42m46s927ms 051 14020020 -wake_lock
+       -1h42m16s910ms 050 17020020 volt=3785 +wifi_full_lock +wifi_scan
+       -1h42m15s479ms 050 56020020 -wifi_scan +wake_lock
+       -1h42m15s422ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h41m45s385ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h41m43s964ms 050 56020020 -wifi_scan +wake_lock
+       -1h41m43s915ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h40m58s114ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h40m56s685ms 050 56020020 -wifi_scan +wake_lock
+       -1h40m56s634ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h39m57s315ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h39m55s879ms 050 56020020 -wifi_scan +wake_lock
+       -1h39m55s831ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h39m25s785ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h39m24s355ms 050 56020020 -wifi_scan +wake_lock
+       -1h39m24s308ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h38m55s772ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h38m54s345ms 050 56020020 -wifi_scan +wake_lock
+       -1h38m54s286ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h38m24s257ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h38m22s816ms 050 56020020 -wifi_scan +wake_lock
+       -1h38m22s776ms 050 54020020 -wifi_full_lock
+       -1h38m22s603ms 050 14020020 -wake_lock
+       -1h37m54s251ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h37m52s816ms 050 56020020 -wifi_scan +wake_lock
+       -1h37m52s758ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h36m51s918ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h36m50s488ms 050 56020020 -wifi_scan +wake_lock
+       -1h36m50s432ms 050 54020020 -wifi_full_lock
+       -1h36m50s423ms 050 14020020 -wake_lock
+       -1h36m20s397ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h36m18s964ms 050 56020020 -wifi_scan +wake_lock
+       -1h36m18s907ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h35m50s378ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h35m48s942ms 050 56020020 -wifi_scan +wake_lock
+       -1h35m48s905ms 050 54020020 -wifi_full_lock
+       -1h35m48s887ms 050 14020020 -wake_lock
+       -1h35m18s863ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h35m17s435ms 050 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -1h35m17s371ms 050 14020020 -wake_lock
+       -1h34m48s853ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h34m47s420ms 050 56020020 -wifi_scan +wake_lock
+       -1h34m47s370ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h34m17s177ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h34m15s746ms 050 56020020 -wifi_scan +wake_lock
+       -1h34m15s679ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h33m45s482ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h33m44s057ms 050 56020020 -wifi_scan +wake_lock
+       -1h33m44s005ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h33m13s971ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h33m12s541ms 050 56020020 -wifi_scan +wake_lock
+       -1h33m12s481ms 050 54020020 -wifi_full_lock
+       -1h33m12s460ms 050 14020020 -wake_lock
+       -1h32m42s430ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h32m41s001ms 050 56020020 -wifi_scan +wake_lock
+       -1h32m40s955ms 050 54020020 -wifi_full_lock
+       -1h32m40s947ms 050 14020020 -wake_lock
+       -1h31m56s371ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h31m54s943ms 050 56020020 -wifi_scan +wake_lock
+       -1h31m54s903ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h31m24s859ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h31m23s430ms 050 56020020 -wifi_scan +wake_lock
+       -1h31m23s373ms 050 54020020 -wifi_full_lock
+       -1h31m23s353ms 050 14020020 -wake_lock
+       -1h30m53s336ms 050 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -1h30m52s897ms 050 56020020 -wifi_scan
+       -1h30m51s854ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h30m23s316ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h30m21s885ms 050 56020020 -wifi_scan +wake_lock
+       -1h30m21s843ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h29m51s802ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h29m50s378ms 050 56020020 -wifi_scan +wake_lock
+       -1h29m50s315ms 050 54020020 -wifi_full_lock
+       -1h29m50s302ms 050 14020020 -wake_lock
+       -1h29m20s284ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h29m18s861ms 050 56020020 -wifi_scan +wake_lock
+       -1h29m18s817ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h28m50s271ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h28m48s847ms 050 56020020 -wifi_scan +wake_lock
+       -1h28m48s794ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h28m18s767ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h28m17s335ms 050 56020020 -wifi_scan +wake_lock
+       -1h28m17s293ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h27m48s756ms 050 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -1h27m48s523ms 050 56020020 -wifi_scan
+       -1h27m47s270ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h27m18s746ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h27m17s315ms 050 56020020 -wifi_scan +wake_lock
+       -1h27m17s232ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h26m47s196ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h26m45s766ms 050 56020020 -wifi_scan +wake_lock
+       -1h26m45s725ms 050 54020020 -wifi_full_lock
+       -1h26m45s705ms 050 14020020 -wake_lock
+       -1h26m25s795ms 050 14020020
+       -1h26m15s692ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h26m14s277ms 050 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -1h26m14s212ms 050 14020020 -wake_lock
+       -1h25m45s615ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h25m44s186ms 050 56020020 -wifi_scan +wake_lock
+       -1h25m44s134ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h25m14s074ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h25m12s646ms 050 56020020 -wifi_scan +wake_lock
+       -1h25m12s602ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h24m12s145ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h24m10s724ms 050 56020020 -wifi_scan +wake_lock
+       -1h24m10s683ms 050 54020020 -wifi_full_lock
+       -1h24m10s669ms 050 14020020 -wake_lock
+       -1h23m40s645ms 050 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -1h23m40s517ms 050 56020020 -wifi_scan
+       -1h23m39s172ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h23m10s627ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h23m09s181ms 050 56020020 -wifi_scan +wake_lock
+       -1h23m09s121ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h22m40s611ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h22m39s177ms 050 56020020 -wifi_scan +wake_lock
+       -1h22m39s097ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h22m09s049ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h22m07s624ms 050 56020020 -wifi_scan +wake_lock
+       -1h22m07s563ms 050 54020020 -wifi_full_lock
+       -1h22m07s543ms 050 14020020 -wake_lock
+       -1h21m37s526ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h21m36s092ms 050 56020020 -wifi_scan +wake_lock
+       -1h21m36s051ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h21m07s518ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h21m06s095ms 050 56020020 -wifi_scan +wake_lock
+       -1h21m06s052ms 050 54020020 -wifi_full_lock
+       -1h21m06s037ms 050 14020020 -wake_lock
+       -1h20m36s015ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h20m34s586ms 050 56020020 -wifi_scan +wake_lock
+       -1h20m34s537ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h20m06s010ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h20m04s582ms 050 56020020 -wifi_scan +wake_lock
+       -1h20m04s519ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h19m35s998ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h19m34s579ms 050 56020020 -wifi_scan +wake_lock
+       -1h19m34s481ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h19m24s756ms 050 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -1h19m23s801ms 050 56020020 -wifi_scan
+       -1h19m23s090ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h19m19s749ms 050 57020020 +wifi_full_lock +wifi_scan +wake_lock
+       -1h19m18s688ms 050 54020020 -wifi_full_lock -wifi_scan
+       -1h19m18s251ms 050 14020020 -wake_lock
+       -1h18m49s739ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h18m48s320ms 050 56020020 -wifi_scan +wake_lock
+       -1h18m48s275ms 050 54020020 -wifi_full_lock
+       -1h18m48s239ms 050 14020020 -wake_lock
+       -1h18m18s222ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h18m16s792ms 050 56020020 -wifi_scan +wake_lock
+       -1h18m16s752ms 050 54020020 -wifi_full_lock
+       -1h18m16s731ms 050 14020020 -wake_lock
+       -1h17m46s713ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h17m45s266ms 050 56020020 -wifi_scan +wake_lock
+       -1h17m45s215ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h17m16s698ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h17m15s256ms 050 56020020 -wifi_scan +wake_lock
+       -1h17m15s202ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h16m46s087ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h16m44s651ms 050 56020020 -wifi_scan +wake_lock
+       -1h16m44s586ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h16m16s071ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h16m14s640ms 050 56020020 -wifi_scan +wake_lock
+       -1h16m14s593ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h15m44s555ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h15m43s116ms 050 56020020 -wifi_scan +wake_lock
+       -1h15m43s079ms 050 54020020 -wifi_full_lock
+       -1h15m43s061ms 050 14020020 -wake_lock
+       -1h15m14s548ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h15m13s102ms 050 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -1h15m13s039ms 050 14020020 -wake_lock
+       -1h14m43s017ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h14m41s578ms 050 56020020 -wifi_scan +wake_lock
+       -1h14m41s511ms 050 14020020 -wifi_full_lock -wake_lock
+       -1h14m13s005ms 050 17020020 +wifi_full_lock +wifi_scan
+       -1h14m11s570ms 050 56020020 -wifi_scan +wake_lock
+       -1h14m11s528ms 050 54020020 -wifi_full_lock
+       -1h14m11s515ms 050 14020020 -wake_lock
+       -1h13m45s493ms 049 54020020 temp=270 +wake_lock
+       -1h13m44s979ms 049 14020020 -wake_lock
+       -1h13m41s488ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h13m40s057ms 049 56020020 -wifi_scan +wake_lock
+       -1h13m40s005ms 049 14020020 -wifi_full_lock -wake_lock
+       -1h13m11s480ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h13m10s052ms 049 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -1h13m09s990ms 049 14020020 -wake_lock
+       -1h12m39s961ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h12m38s529ms 049 56020020 -wifi_scan +wake_lock
+       -1h12m38s479ms 049 14020020 -wifi_full_lock -wake_lock
+       -1h12m09s951ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h12m08s523ms 049 56020020 -wifi_scan +wake_lock
+       -1h12m08s468ms 049 14020020 -wifi_full_lock -wake_lock
+       -1h11m38s436ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h11m37s014ms 049 56020020 -wifi_scan +wake_lock
+       -1h11m36s955ms 049 14020020 -wifi_full_lock -wake_lock
+       -1h11m08s427ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h11m06s997ms 049 56020020 -wifi_scan +wake_lock
+       -1h11m06s959ms 049 54020020 -wifi_full_lock
+       -1h11m06s793ms 049 14020020 -wake_lock
+       -1h10m36s765ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h10m35s340ms 049 56020020 -wifi_scan +wake_lock
+       -1h10m35s296ms 049 54020020 -wifi_full_lock
+       -1h10m35s259ms 049 14020020 -wake_lock
+       -1h10m05s233ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h10m03s798ms 049 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -1h10m03s729ms 049 14020020 -wake_lock
+       -1h09m35s210ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h09m33s782ms 049 56020020 -wifi_scan +wake_lock
+       -1h09m33s735ms 049 54020020 -wifi_full_lock
+       -1h09m33s715ms 049 14020020 -wake_lock
+       -1h09m03s699ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h09m02s273ms 049 56020020 -wifi_scan +wake_lock
+       -1h09m02s222ms 049 14020020 -wifi_full_lock -wake_lock
+       -1h08m33s682ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h08m32s255ms 049 56020020 -wifi_scan +wake_lock
+       -1h08m32s208ms 049 54020020 -wifi_full_lock
+       -1h08m32s193ms 049 14020020 -wake_lock
+       -1h08m02s168ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h08m00s742ms 049 56020020 -wifi_scan +wake_lock
+       -1h08m00s671ms 049 54020020 -wifi_full_lock
+       -1h08m00s031ms 049 14020020 -wake_lock
+       -1h07m32s157ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h07m30s721ms 049 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -1h07m30s645ms 049 14020020 -wake_lock
+       -1h07m00s631ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h06m59s211ms 049 56020020 -wifi_scan +wake_lock
+       -1h06m59s153ms 049 14020020 -wifi_full_lock -wake_lock
+       -1h05m59s443ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h05m58s022ms 049 56020020 -wifi_scan +wake_lock
+       -1h05m57s972ms 049 14020020 -wifi_full_lock -wake_lock
+       -1h05m27s939ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h05m26s512ms 049 56020020 -wifi_scan +wake_lock
+       -1h05m26s307ms 049 14020020 -wifi_full_lock -wake_lock
+       -1h04m57s933ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h04m56s508ms 049 56020020 -wifi_scan +wake_lock
+       -1h04m56s456ms 049 14020020 -wifi_full_lock -wake_lock
+       -1h04m26s428ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h04m25s001ms 049 56020020 -wifi_scan +wake_lock
+       -1h04m24s924ms 049 54020020 -wifi_full_lock
+       -1h04m23s371ms 049 14020020 -wake_lock
+       -1h03m56s420ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h03m54s985ms 049 56020020 -wifi_scan +wake_lock
+       -1h03m54s939ms 049 14020020 -wifi_full_lock -wake_lock
+       -1h03m26s403ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h03m24s980ms 049 56020020 -wifi_scan +wake_lock
+       -1h03m24s936ms 049 54020020 -wifi_full_lock
+       -1h03m24s909ms 049 14020020 -wake_lock
+       -1h02m54s900ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h02m53s471ms 049 56020020 -wifi_scan +wake_lock
+       -1h02m53s408ms 049 54020020 -wifi_full_lock
+       -1h02m51s411ms 049 14020020 -wake_lock
+       -1h02m24s888ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h02m23s465ms 049 56020020 -wifi_scan +wake_lock
+       -1h02m23s259ms 049 14020020 -wifi_full_lock -wake_lock
+       -1h01m53s213ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h01m51s787ms 049 56020020 -wifi_scan +wake_lock
+       -1h01m51s729ms 049 14020020 -wifi_full_lock -wake_lock
+       -1h01m23s204ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h01m21s779ms 049 56020020 -wifi_scan +wake_lock
+       -1h01m21s699ms 049 14020020 -wifi_full_lock -wake_lock
+       -1h00m51s576ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h00m50s155ms 049 54020020 -wifi_full_lock -wifi_scan +wake_lock
+       -1h00m50s093ms 049 14020020 -wake_lock
+       -1h00m21s389ms 049 17020020 +wifi_full_lock +wifi_scan
+       -1h00m19s960ms 049 56020020 -wifi_scan +wake_lock
+       -1h00m19s897ms 049 14020020 -wifi_full_lock -wake_lock
+         -59m49s864ms 049 17020020 +wifi_full_lock +wifi_scan
+         -59m48s446ms 049 56020020 -wifi_scan +wake_lock
+         -59m48s393ms 049 14020020 -wifi_full_lock -wake_lock
+         -59m19s855ms 049 17020020 +wifi_full_lock +wifi_scan
+         -59m18s424ms 049 56020020 -wifi_scan +wake_lock
+         -59m18s371ms 049 14020020 -wifi_full_lock -wake_lock
+         -58m48s334ms 049 17020020 +wifi_full_lock +wifi_scan
+         -58m46s909ms 049 56020020 -wifi_scan +wake_lock
+         -58m46s859ms 049 14020020 -wifi_full_lock -wake_lock
+         -58m18s322ms 049 17020020 +wifi_full_lock +wifi_scan
+         -58m16s894ms 049 56020020 -wifi_scan +wake_lock
+         -58m16s830ms 049 14020020 -wifi_full_lock -wake_lock
+         -57m46s789ms 049 17020020 +wifi_full_lock +wifi_scan
+         -57m45s356ms 049 56020020 -wifi_scan +wake_lock
+         -57m45s306ms 049 14020020 -wifi_full_lock -wake_lock
+         -57m16s761ms 049 17020020 +wifi_full_lock +wifi_scan
+         -57m15s337ms 049 56020020 -wifi_scan +wake_lock
+         -57m15s282ms 049 14020020 -wifi_full_lock -wake_lock
+         -56m45s250ms 049 17020020 +wifi_full_lock +wifi_scan
+         -56m43s829ms 049 56020020 -wifi_scan +wake_lock
+         -56m43s786ms 049 14020020 -wifi_full_lock -wake_lock
+         -56m15s237ms 049 17020020 +wifi_full_lock +wifi_scan
+         -56m13s817ms 049 56020020 -wifi_scan +wake_lock
+         -56m13s721ms 049 14020020 -wifi_full_lock -wake_lock
+         -55m43s690ms 049 17020020 +wifi_full_lock +wifi_scan
+         -55m42s270ms 049 56020020 -wifi_scan +wake_lock
+         -55m42s227ms 049 14020020 -wifi_full_lock -wake_lock
+         -54m43s397ms 049 17020020 +wifi_full_lock +wifi_scan
+         -54m41s970ms 049 56020020 -wifi_scan +wake_lock
+         -54m41s909ms 049 14020020 -wifi_full_lock -wake_lock
+         -54m13s382ms 049 17020020 +wifi_full_lock +wifi_scan
+         -54m11s951ms 049 56020020 -wifi_scan +wake_lock
+         -54m11s894ms 049 54020020 -wifi_full_lock
+         -54m11s881ms 049 14020020 -wake_lock
+         -53m43s360ms 049 17020020 +wifi_full_lock +wifi_scan
+         -53m41s932ms 049 56020020 -wifi_scan +wake_lock
+         -53m41s873ms 049 14020020 -wifi_full_lock -wake_lock
+         -53m36s775ms 049 54020020 +wake_lock
+         -53m34s288ms 049 54020020
+         -53m31s689ms 049 14020020 -wake_lock
+         -52m41s808ms 049 17020020 +wifi_full_lock +wifi_scan
+         -52m40s386ms 049 56020020 -wifi_scan +wake_lock
+         -52m40s173ms 049 14020020 -wifi_full_lock -wake_lock
+         -52m30s899ms 049 14020010 signal_strength=poor
+         -52m28s377ms 049 14020020 signal_strength=moderate
+         -52m10s150ms 049 17020020 +wifi_full_lock +wifi_scan
+         -52m08s728ms 049 56020020 -wifi_scan +wake_lock
+         -52m08s685ms 049 54020020 -wifi_full_lock
+         -52m08s662ms 049 14020020 -wake_lock
+         -51m38s649ms 049 17020020 +wifi_full_lock +wifi_scan
+         -51m37s220ms 049 56020020 -wifi_scan +wake_lock
+         -51m37s163ms 049 14020020 -wifi_full_lock -wake_lock
+         -51m08s640ms 049 57020020 +wifi_full_lock +wifi_scan +wake_lock
+         -51m08s570ms 049 14020020 -wifi_full_lock -wifi_scan -wake_lock
+         -50m38s630ms 049 17020020 +wifi_full_lock +wifi_scan
+         -50m37s191ms 049 56020020 -wifi_scan +wake_lock
+         -50m37s150ms 049 54020020 -wifi_full_lock
+         -50m37s126ms 049 14020020 -wake_lock
+         -50m07s106ms 049 17020020 +wifi_full_lock +wifi_scan
+         -50m05s680ms 049 56020020 -wifi_scan +wake_lock
+         -50m05s637ms 049 14020020 -wifi_full_lock -wake_lock
+         -49m35s603ms 049 17020020 +wifi_full_lock +wifi_scan
+         -49m34s181ms 049 56020020 -wifi_scan +wake_lock
+         -49m34s125ms 049 14020020 -wifi_full_lock -wake_lock
+         -49m16s300ms 049 14020010 signal_strength=poor
+         -49m12s783ms 049 14020020 signal_strength=moderate
+         -49m05s591ms 049 57020020 +wifi_full_lock +wifi_scan +wake_lock
+         -49m05s536ms 049 57020020
+         -49m04s856ms 049 56020020 -wifi_scan
+         -49m04s115ms 049 14020020 -wifi_full_lock -wake_lock
+         -48m35s423ms 049 17020020 +wifi_full_lock +wifi_scan
+         -48m33s996ms 049 56020020 -wifi_scan +wake_lock
+         -48m33s929ms 049 14020020 -wifi_full_lock -wake_lock
+         -48m03s900ms 049 17020020 +wifi_full_lock +wifi_scan
+         -48m02s468ms 049 56020020 -wifi_scan +wake_lock
+         -48m02s414ms 049 14020020 -wifi_full_lock -wake_lock
+         -47m33s890ms 049 17020020 +wifi_full_lock +wifi_scan
+         -47m32s412ms 049 56020020 -wifi_scan +wake_lock
+         -47m32s346ms 049 14020020 -wifi_full_lock -wake_lock
+         -47m02s326ms 049 17020020 +wifi_full_lock +wifi_scan
+         -47m00s902ms 049 54020020 -wifi_full_lock -wifi_scan +wake_lock
+         -47m00s827ms 049 14020020 -wake_lock
+         -46m32s316ms 049 17020020 +wifi_full_lock +wifi_scan
+         -46m30s881ms 049 56020020 -wifi_scan +wake_lock
+         -46m30s815ms 049 54020020 -wifi_full_lock
+         -46m30s794ms 049 14020020 -wake_lock
+         -46m00s785ms 049 17020020 +wifi_full_lock +wifi_scan
+         -45m59s371ms 049 56020020 -wifi_scan +wake_lock
+         -45m59s316ms 049 14020020 -wifi_full_lock -wake_lock
+         -45m30s773ms 049 17020020 +wifi_full_lock +wifi_scan
+         -45m29s355ms 049 56020020 -wifi_scan +wake_lock
+         -45m29s302ms 049 54020020 -wifi_full_lock
+         -45m29s133ms 049 14020020 -wake_lock
+         -44m59s106ms 049 17020020 +wifi_full_lock +wifi_scan
+         -44m57s679ms 049 56020020 -wifi_scan +wake_lock
+         -44m57s620ms 049 14020020 -wifi_full_lock -wake_lock
+         -44m29s087ms 049 17020020 +wifi_full_lock +wifi_scan
+         -44m27s651ms 049 56020020 -wifi_scan +wake_lock
+         -44m27s605ms 049 14020020 -wifi_full_lock -wake_lock
+         -43m59s072ms 049 17020020 +wifi_full_lock +wifi_scan
+         -43m57s646ms 049 56020020 -wifi_scan +wake_lock
+         -43m57s590ms 049 54020020 -wifi_full_lock
+         -43m57s567ms 049 14020020 -wake_lock
+         -43m27s391ms 049 17020020 +wifi_full_lock +wifi_scan
+         -43m25s979ms 049 56020020 -wifi_scan +wake_lock
+         -43m25s939ms 049 54020020 -wifi_full_lock
+         -43m25s923ms 049 14020020 -wake_lock
+         -42m26s720ms 049 17020020 +wifi_full_lock +wifi_scan
+         -42m25s296ms 049 56020020 -wifi_scan +wake_lock
+         -42m25s248ms 049 14020020 -wifi_full_lock -wake_lock
+         -41m55s221ms 049 17020020 +wifi_full_lock +wifi_scan
+         -41m53s772ms 049 56020020 -wifi_scan +wake_lock
+         -41m53s717ms 049 14020020 -wifi_full_lock -wake_lock
+         -41m23s691ms 049 17020020 +wifi_full_lock +wifi_scan
+         -41m22s258ms 049 56020020 -wifi_scan +wake_lock
+         -41m22s206ms 049 14020020 -wifi_full_lock -wake_lock
+         -40m53s672ms 048 17020020 temp=280 +wifi_full_lock +wifi_scan
+         -40m52s224ms 048 56020020 -wifi_scan +wake_lock
+         -40m52s180ms 048 54020020 -wifi_full_lock
+         -40m52s166ms 048 14020020 -wake_lock
+         -40m23s623ms 048 17020020 +wifi_full_lock +wifi_scan
+         -40m22s187ms 048 54020020 -wifi_full_lock -wifi_scan +wake_lock
+         -40m22s132ms 048 14020020 -wake_lock
+         -39m52s112ms 048 17020020 +wifi_full_lock +wifi_scan
+         -39m50s671ms 048 56020020 -wifi_scan +wake_lock
+         -39m50s609ms 048 14020020 -wifi_full_lock -wake_lock
+         -39m22s103ms 048 17020020 +wifi_full_lock +wifi_scan
+         -39m20s680ms 048 56020020 -wifi_scan +wake_lock
+         -39m20s622ms 048 14020020 -wifi_full_lock -wake_lock
+         -38m20s769ms 048 17020020 +wifi_full_lock +wifi_scan
+         -38m19s340ms 048 54020020 -wifi_full_lock -wifi_scan +wake_lock
+         -38m19s284ms 048 14020020 -wake_lock
+         -37m49s261ms 048 17020020 +wifi_full_lock +wifi_scan
+         -37m47s836ms 048 56020020 -wifi_scan +wake_lock
+         -37m47s792ms 048 54020020 -wifi_full_lock
+         -37m47s773ms 048 14020020 -wake_lock
+         -37m19s251ms 048 17020020 +wifi_full_lock +wifi_scan
+         -37m17s826ms 048 56020020 -wifi_scan +wake_lock
+         -37m17s780ms 048 14020020 -wifi_full_lock -wake_lock
+         -36m17s775ms 048 17020020 +wifi_full_lock +wifi_scan
+         -36m16s351ms 048 56020020 -wifi_scan +wake_lock
+         -36m16s304ms 048 54020020 -wifi_full_lock
+         -36m16s296ms 048 14020020 -wake_lock
+         -35m46s272ms 048 17020020 +wifi_full_lock +wifi_scan
+         -35m44s839ms 048 56020020 -wifi_scan +wake_lock
+         -35m44s620ms 048 14020020 -wifi_full_lock -wake_lock
+         -35m17s535ms 048 17020010 +wifi_full_lock +wifi_scan signal_strength=poor
+         -35m14s836ms 048 56020010 -wifi_scan +wake_lock
+         -35m14s783ms 048 14020010 -wifi_full_lock -wake_lock
+         -34m44s756ms 048 17020020 +wifi_full_lock +wifi_scan signal_strength=moderate
+         -34m43s318ms 048 56020020 -wifi_scan +wake_lock
+         -34m43s257ms 048 14020020 -wifi_full_lock -wake_lock
+         -34m14s745ms 048 17020020 +wifi_full_lock +wifi_scan
+         -34m13s319ms 048 56020020 -wifi_scan +wake_lock
+         -34m13s268ms 048 54020020 -wifi_full_lock
+         -34m13s253ms 048 14020020 -wake_lock
+         -33m43s236ms 048 17020020 +wifi_full_lock +wifi_scan
+         -33m41s814ms 048 56020020 -wifi_scan +wake_lock
+         -33m41s762ms 048 14020020 -wifi_full_lock -wake_lock
+         -33m13s231ms 048 17020020 +wifi_full_lock +wifi_scan
+         -33m11s811ms 048 56020020 -wifi_scan +wake_lock
+         -33m11s746ms 048 14020020 -wifi_full_lock -wake_lock
+         -32m41s699ms 048 17020020 +wifi_full_lock +wifi_scan
+         -32m40s271ms 048 56020020 -wifi_scan +wake_lock
+         -32m40s227ms 048 54020020 -wifi_full_lock
+         -32m40s063ms 048 14020020 -wake_lock
+         -32m11s689ms 048 17020020 +wifi_full_lock +wifi_scan
+         -32m10s263ms 048 56020020 -wifi_scan +wake_lock
+         -32m10s210ms 048 54020020 -wifi_full_lock
+         -32m10s187ms 048 14020020 -wake_lock
+         -31m40s185ms 048 17020020 +wifi_full_lock +wifi_scan
+         -31m38s764ms 048 56020020 -wifi_scan +wake_lock
+         -31m38s697ms 048 14020020 -wifi_full_lock -wake_lock
+         -31m10s176ms 048 17020020 +wifi_full_lock +wifi_scan
+         -31m08s752ms 048 56020020 -wifi_scan +wake_lock
+         -31m08s697ms 048 14020020 -wifi_full_lock -wake_lock
+         -30m38s670ms 048 17020020 +wifi_full_lock +wifi_scan
+         -30m37s247ms 048 54020020 -wifi_full_lock -wifi_scan +wake_lock
+         -30m37s180ms 048 14020020 -wake_lock
+         -30m08s658ms 048 17020020 +wifi_full_lock +wifi_scan
+         -30m07s227ms 048 56020020 -wifi_scan +wake_lock
+         -30m07s182ms 048 14020020 -wifi_full_lock -wake_lock
+         -29m37s147ms 048 17020020 +wifi_full_lock +wifi_scan
+         -29m35s725ms 048 56020020 -wifi_scan +wake_lock
+         -29m35s671ms 048 14020020 -wifi_full_lock -wake_lock
+         -29m07s137ms 048 17020020 +wifi_full_lock +wifi_scan
+         -29m05s701ms 048 56020020 -wifi_scan +wake_lock
+         -29m05s659ms 048 14020020 -wifi_full_lock -wake_lock
+         -28m20s661ms 048 17020020 +wifi_full_lock +wifi_scan
+         -28m19s244ms 048 56020020 -wifi_scan +wake_lock
+         -28m19s195ms 048 14020020 -wifi_full_lock -wake_lock
+         -27m18s691ms 048 17020020 +wifi_full_lock +wifi_scan
+         -27m17s271ms 048 56020020 -wifi_scan +wake_lock
+         -27m17s220ms 048 14020020 -wifi_full_lock -wake_lock
+         -26m47s197ms 048 57020020 +wifi_full_lock +wifi_scan +wake_lock
+         -26m46s539ms 048 56020020 -wifi_scan
+         -26m45s724ms 048 14020020 -wifi_full_lock -wake_lock
+         -26m16s476ms 048 17020020 +wifi_full_lock +wifi_scan
+         -26m15s048ms 048 56020020 -wifi_scan +wake_lock
+         -26m14s958ms 048 14020020 -wifi_full_lock -wake_lock
+         -25m44s937ms 048 17020020 +wifi_full_lock +wifi_scan
+         -25m43s510ms 048 56020020 -wifi_scan +wake_lock
+         -25m43s446ms 048 14020020 -wifi_full_lock -wake_lock
+         -25m14s922ms 048 17020020 +wifi_full_lock +wifi_scan
+         -25m13s487ms 048 56020020 -wifi_scan +wake_lock
+         -25m13s423ms 048 14020020 -wifi_full_lock -wake_lock
+         -24m44s899ms 048 17020020 +wifi_full_lock +wifi_scan
+         -24m43s479ms 048 56020020 -wifi_scan +wake_lock
+         -24m43s438ms 048 54020020 -wifi_full_lock
+         -24m43s415ms 048 14020020 -wake_lock
+         -24m13s385ms 048 17020020 +wifi_full_lock +wifi_scan
+         -24m11s959ms 048 54020020 -wifi_full_lock -wifi_scan +wake_lock
+         -24m11s905ms 048 54020020
+         -24m10s860ms 048 14020020 -wake_lock
+         -23m43s369ms 048 17020020 +wifi_full_lock +wifi_scan
+         -23m41s944ms 048 56020020 -wifi_scan +wake_lock
+         -23m41s897ms 048 54020020 -wifi_full_lock
+         -23m41s880ms 048 14020020 -wake_lock
+         -23m12s195ms 048 17020010 +wifi_full_lock +wifi_scan signal_strength=poor
+         -23m10s429ms 048 56020010 -wifi_scan +wake_lock
+         -23m10s380ms 048 54020010 -wifi_full_lock
+         -23m10s354ms 048 14020010 -wake_lock
+         -22m54s278ms 048 14020020 signal_strength=moderate
+         -22m40s351ms 048 17020020 +wifi_full_lock +wifi_scan
+         -22m38s928ms 048 56020020 -wifi_scan +wake_lock
+         -22m38s884ms 048 14020020 -wifi_full_lock -wake_lock
+         -21m43s586ms 048 17020020 +wifi_full_lock +wifi_scan
+         -21m42s148ms 048 56020020 -wifi_scan +wake_lock
+         -21m42s096ms 048 14020020 -wifi_full_lock -wake_lock
+         -21m12s065ms 048 17020020 +wifi_full_lock +wifi_scan
+         -21m10s635ms 048 54020020 -wifi_full_lock -wifi_scan +wake_lock
+         -21m10s577ms 048 14020020 -wake_lock
+         -20m42s051ms 048 17020020 +wifi_full_lock +wifi_scan
+         -20m40s627ms 048 56020020 -wifi_scan +wake_lock
+         -20m40s582ms 048 54020020 -wifi_full_lock
+         -20m40s556ms 048 14020020 -wake_lock
+         -20m10s541ms 048 17020020 +wifi_full_lock +wifi_scan
+         -20m09s114ms 048 56020020 -wifi_scan +wake_lock
+         -20m09s047ms 048 14020020 -wifi_full_lock -wake_lock
+         -19m40s533ms 048 17020020 +wifi_full_lock +wifi_scan
+         -19m39s104ms 048 56020020 -wifi_scan +wake_lock
+         -19m39s049ms 048 14020020 -wifi_full_lock -wake_lock
+         -19m09s025ms 048 17020020 +wifi_full_lock +wifi_scan
+         -19m07s603ms 048 56020020 -wifi_scan +wake_lock
+         -19m07s565ms 048 54020020 -wifi_full_lock
+         -19m07s551ms 048 14020020 -wake_lock
+         -18m39s009ms 048 17020020 +wifi_full_lock +wifi_scan
+         -18m37s566ms 048 54020020 -wifi_full_lock -wifi_scan +wake_lock
+         -18m37s445ms 048 14020020 -wake_lock
+         -18m08s993ms 048 17020020 +wifi_full_lock +wifi_scan
+         -18m07s563ms 048 56020020 -wifi_scan +wake_lock
+         -18m07s488ms 048 14020020 -wifi_full_lock -wake_lock
+         -17m37s458ms 048 17020020 +wifi_full_lock +wifi_scan
+         -17m36s041ms 048 56020020 -wifi_scan +wake_lock
+         -17m36s000ms 048 54020020 -wifi_full_lock
+         -17m35s986ms 048 14020020 -wake_lock
+         -17m05s963ms 048 17020020 +wifi_full_lock +wifi_scan
+         -17m04s536ms 048 56020020 -wifi_scan +wake_lock
+         -17m04s492ms 048 54020020 -wifi_full_lock
+         -17m04s460ms 048 14020020 -wake_lock
+         -16m34s446ms 048 17020020 +wifi_full_lock +wifi_scan
+         -16m33s017ms 048 56020020 -wifi_scan +wake_lock
+         -16m32s971ms 048 14020020 -wifi_full_lock -wake_lock
+         -16m04s437ms 048 17020020 +wifi_full_lock +wifi_scan
+         -16m03s020ms 048 54020020 -wifi_full_lock -wifi_scan +wake_lock
+         -16m02s952ms 048 14020020 -wake_lock
+         -15m32s940ms 048 17020020 +wifi_full_lock +wifi_scan
+         -15m31s513ms 048 56020020 -wifi_scan +wake_lock
+         -15m31s456ms 048 14020020 -wifi_full_lock -wake_lock
+         -15m02s926ms 048 17020020 +wifi_full_lock +wifi_scan
+         -15m01s493ms 048 54020020 -wifi_full_lock -wifi_scan +wake_lock
+         -15m01s440ms 048 14020020 -wake_lock
+         -14m32s905ms 048 17020020 +wifi_full_lock +wifi_scan
+         -14m31s488ms 048 56020020 -wifi_scan +wake_lock
+         -14m31s430ms 048 14020020 -wifi_full_lock -wake_lock
+         -14m01s232ms 048 17020020 +wifi_full_lock +wifi_scan
+         -13m59s799ms 048 56020020 -wifi_scan +wake_lock
+         -13m59s751ms 048 54020020 -wifi_full_lock
+         -13m59s733ms 048 14020020 -wake_lock
+         -13m31s220ms 048 17020020 +wifi_full_lock +wifi_scan
+         -13m29s790ms 048 56020020 -wifi_scan +wake_lock
+         -13m29s718ms 048 14020020 -wifi_full_lock -wake_lock
+         -12m59s695ms 048 17020020 +wifi_full_lock +wifi_scan
+         -12m58s274ms 048 56020020 -wifi_scan +wake_lock
+         -12m58s218ms 048 54020020 -wifi_full_lock
+         -12m58s204ms 048 14020020 -wake_lock
+         -12m29s680ms 048 17020020 +wifi_full_lock +wifi_scan
+         -12m28s245ms 048 56020020 -wifi_scan +wake_lock
+         -12m28s186ms 048 14020020 -wifi_full_lock -wake_lock
+         -11m58s154ms 048 17020020 +wifi_full_lock +wifi_scan
+         -11m56s710ms 048 56020020 -wifi_scan +wake_lock
+         -11m56s668ms 048 14020020 -wifi_full_lock -wake_lock
+         -11m28s130ms 048 17020020 +wifi_full_lock +wifi_scan
+         -11m26s705ms 048 56020020 -wifi_scan +wake_lock
+         -11m26s639ms 048 14020020 -wifi_full_lock -wake_lock
+         -10m56s613ms 048 17020020 +wifi_full_lock +wifi_scan
+         -10m55s181ms 048 56020020 -wifi_scan +wake_lock
+         -10m55s123ms 048 14020020 -wifi_full_lock -wake_lock
+         -10m25s091ms 048 57020020 +wifi_full_lock +wifi_scan +wake_lock
+         -10m23s673ms 048 14020020 -wifi_full_lock -wifi_scan -wake_lock
+          -9m54s760ms 048 14020010 signal_strength=poor
+          -9m45s828ms 048 14020020 signal_strength=moderate
+          -9m24s441ms 048 17020020 +wifi_full_lock +wifi_scan
+          -9m23s009ms 048 54020020 -wifi_full_lock -wifi_scan +wake_lock
+          -9m22s944ms 048 14020020 -wake_lock
+          -8m52s933ms 048 57020020 +wifi_full_lock +wifi_scan +wake_lock
+          -8m52s341ms 048 14020020 -wifi_full_lock -wifi_scan -wake_lock
+          -8m22s917ms 048 17020020 +wifi_full_lock +wifi_scan
+          -8m21s493ms 048 56020020 -wifi_scan +wake_lock
+          -8m21s425ms 048 14020020 -wifi_full_lock -wake_lock
+          -7m51s390ms 048 17020020 +wifi_full_lock +wifi_scan
+          -7m49s975ms 048 56020020 -wifi_scan +wake_lock
+          -7m49s928ms 048 14020020 -wifi_full_lock -wake_lock
+          -7m21s992ms 047 14020020 temp=270
+          -7m19s891ms 047 17020020 +wifi_full_lock +wifi_scan
+          -7m18s434ms 047 56020020 -wifi_scan +wake_lock
+          -7m18s369ms 047 14020020 -wifi_full_lock -wake_lock
+          -6m49s883ms 047 17020020 +wifi_full_lock +wifi_scan
+          -6m48s461ms 047 56020020 -wifi_scan +wake_lock
+          -6m48s420ms 047 14020020 -wifi_full_lock -wake_lock
+          -6m18s385ms 047 17020020 +wifi_full_lock +wifi_scan
+          -6m16s954ms 047 56020020 -wifi_scan +wake_lock
+          -6m16s892ms 047 14020020 -wifi_full_lock -wake_lock
+          -5m48s375ms 047 17020020 +wifi_full_lock +wifi_scan
+          -5m46s949ms 047 56020020 -wifi_scan +wake_lock
+          -5m46s886ms 047 54020020 -wifi_full_lock
+          -5m46s719ms 047 14020020 -wake_lock
+          -5m18s364ms 047 17020020 +wifi_full_lock +wifi_scan
+          -5m16s936ms 047 54020020 -wifi_full_lock -wifi_scan +wake_lock
+          -5m16s867ms 047 14020020 -wake_lock
+          -4m46s853ms 047 17020020 +wifi_full_lock +wifi_scan
+          -4m45s424ms 047 56020020 -wifi_scan +wake_lock
+          -4m45s380ms 047 14020020 -wifi_full_lock -wake_lock
+          -4m16s843ms 047 17020020 +wifi_full_lock +wifi_scan
+          -4m15s421ms 047 56020020 -wifi_scan +wake_lock
+          -4m15s377ms 047 54020020 -wifi_full_lock
+          -4m15s355ms 047 14020020 -wake_lock
+          -3m45s332ms 047 17020020 +wifi_full_lock +wifi_scan
+          -3m43s903ms 047 56020020 -wifi_scan +wake_lock
+          -3m43s847ms 047 14020020 -wifi_full_lock -wake_lock
+          -3m15s311ms 047 17020020 +wifi_full_lock +wifi_scan
+          -3m13s886ms 047 56020020 -wifi_scan +wake_lock
+          -3m13s840ms 047 14020020 -wifi_full_lock -wake_lock
+          -2m51s804ms 047 54120020 +screen +wake_lock
+          -2m51s404ms 047 14120020 -wake_lock
+          -2m47s552ms 047 14020020 -screen
+          -2m38s284ms 047 14020010 signal_strength=poor
+          -2m21s374ms 047 17020010 +wifi_full_lock +wifi_scan
+          -2m19s936ms 047 56020010 -wifi_scan +wake_lock
+          -2m19s878ms 047 54020010 -wifi_full_lock
+          -2m19s871ms 047 14020010 -wake_lock
+          -2m07s550ms 047 14020020 signal_strength=moderate
+          -1m52s550ms 047 14020010 signal_strength=poor
+          -1m49s840ms 047 17020010 +wifi_full_lock +wifi_scan
+          -1m48s406ms 047 56020010 -wifi_scan +wake_lock
+          -1m48s354ms 047 14020020 -wifi_full_lock -wake_lock signal_strength=moderate
+          -1m19s831ms 047 17020020 +wifi_full_lock +wifi_scan
+          -1m18s383ms 047 56020020 -wifi_scan +wake_lock
+          -1m18s332ms 047 14020020 -wifi_full_lock -wake_lock
+          -1m03s779ms 047 17020020 +wifi_full_lock +wifi_scan
+          -1m02s357ms 047 54020020 -wifi_full_lock -wifi_scan +wake_lock
+          -1m02s270ms 047 14020020 -wake_lock
+            -58s578ms 047 17020020 +wifi_full_lock +wifi_scan
+            -57s127ms 047 56020020 -wifi_scan +wake_lock
+            -57s061ms 047 14020020 -wifi_full_lock -wake_lock
+            -50s317ms 047 141a0020 status=charging plug=usb temp=290 volt=3798 +plugged +screen
+            -47s922ms 047 141a0020
+            -43s075ms 047 141a0010 signal_strength=poor
+            -28s561ms 047 171a0010 +wifi_full_lock +wifi_scan
+            -28s012ms 047 541a0010 -wifi_full_lock -wifi_scan +wake_lock
+            -24s617ms 047 141a0010 -wake_lock
+            -19s564ms 047 140a0010 -screen
+            -19s065ms 047 560a0010 +wifi_full_lock +wake_lock
+            -16s165ms 047 160a0010 -wake_lock
+            -11s134ms 047 560a0010 +wake_lock
+             -7s652ms 047 560a0010
+             -6s724ms 047 160a0020 -wake_lock signal_strength=moderate
+
+Per-PID Stats:
+  PID 7376 wake time: +1m1s72ms
+  PID 7581 wake time: +8s470ms
+  PID 128 wake time: +1m45s614ms
+  PID 7593 wake time: +8s589ms
+  PID 341 wake time: +5s353ms
+  PID 7376 wake time: +11s718ms
+  PID 7376 wake time: +31ms
+  PID 7376 wake time: +31s111ms
+  PID 13348 wake time: +9s850ms
+  PID 25258 wake time: +5s435ms
+  PID 25315 wake time: +10m39s583ms
+  PID 26036 wake time: +9ms
+  PID 7376 wake time: +358ms
+  PID 7376 wake time: +84ms
+  PID 7376 wake time: +894ms
+  PID 32767 wake time: +218ms
+  PID 7376 wake time: +204ms
+  PID 7376 wake time: +53ms
+  PID 16987 wake time: +1s292ms
+  PID 30941 wake time: +489ms
+  PID 7376 wake time: +2s458ms
+  PID 7376 wake time: +3s627ms
+  PID 865 wake time: +27ms
+  PID 7376 wake time: +25s310ms
+  PID 7449 wake time: +137ms
+  PID 7376 wake time: +18s895ms
+  PID 906 wake time: +279ms
+  PID 25258 wake time: +4s361ms
+  PID 7376 wake time: +4s628ms
+  PID 21339 wake time: +3m59s25ms
+  PID 25315 wake time: +107ms
+  PID 391 wake time: +773ms
+  PID 7376 wake time: +1s766ms
+  PID 7376 wake time: +525ms
+  PID 7376 wake time: +1m16s308ms
+  PID 7376 wake time: +6m58s581ms
+  PID 25315 wake time: +17s91ms
+
+Statistics since last charge:
+  System starts: 0, currently on battery: false
+  Time on battery: 5h 24m 4s 35ms (0.5%) realtime, 2h 19m 2s 765ms (0.2%) uptime
+  Total run time: 43d 18h 33m 3s 249ms realtime, 32d 18h 18m 35s 361ms uptime, 
+  Screen on: 2m 10s 814ms (0.7%), Input events: 0, Active phone call: 1m 10s 880ms (0.4%)
+  Screen brightnesses: dark 2m 10s 814ms (100.0%)
+  Kernel Wake lock "gps-lock": 1h 23m 22s 580ms (355 times) realtime
+  Kernel Wake lock "PowerManagerService.WakeLocks": 35m 40s 111ms (6531 times) realtime
+  Kernel Wake lock "wlan_rx_wake": 26m 37s 84ms (1044 times) realtime
+  Kernel Wake lock "wlan_ctrl_wake": 24m 50s 308ms (579 times) realtime
+  Kernel Wake lock "alarm_rtc": 15m 18s 434ms (1396 times) realtime
+  Kernel Wake lock "wlan_wd_wake": 5m 52s 344ms (21807 times) realtime
+  Kernel Wake lock "mipi_link": 5m 28s 95ms (649 times) realtime
+  Kernel Wake lock "PowerManagerService.Display": 2m 40s 50ms (8 times) realtime
+  Kernel Wake lock "main": 2m 12s 540ms (11 times) realtime
+  Kernel Wake lock "radio-interface": 1m 51s 221ms (109 times) realtime
+  Kernel Wake lock "alarm": 1m 10s 137ms (2182 times) realtime
+  Kernel Wake lock "musb_autosuspend_wake_lock": 1m 0s 215ms (1250 times) realtime
+  Kernel Wake lock "wlan_wake": 59s 47ms (44075 times) realtime
+  Kernel Wake lock "event2-7376": 15s 796ms (1274 times) realtime
+  Kernel Wake lock "prx_wake_lock": 12s 179ms (4 times) realtime
+  Kernel Wake lock "vibrator": 7s 207ms (69 times) realtime
+  Kernel Wake lock "max17040-battery": 6s 439ms (321 times) realtime
+  Kernel Wake lock "PowerManagerService.Broadcasts": 5s 979ms (16 times) realtime
+  Kernel Wake lock "twl6030 adc": 4s 518ms (1763 times) realtime
+  Kernel Wake lock "nfc": 4s 176ms (8 times) realtime
+  Kernel Wake lock "vbus-tuna_otg": 1s 996ms (1 times) realtime
+  Kernel Wake lock "KeyEvents": 639ms (4695 times) realtime
+  Kernel Wake lock "secril_fmt-interface": 525ms (1839 times) realtime
+  Kernel Wake lock "mmc0_detect": 335ms (2418 times) realtime
+  Kernel Wake lock "gpio_input": 145ms (32 times) realtime
+  Kernel Wake lock "event1-7376": 53ms (729 times) realtime
+  Kernel Wake lock "power-supply": 9ms (18 times) realtime
+  Total received: 49.71MB, Total sent: 2.19MB
+  Total full wakelock time: 8s 675ms , Total partial wakelock time: 35m 40s 610ms 
+  Signal levels: none 33s 549ms (0.2%) 2x, poor 8m 38s 463ms (2.7%) 48x, moderate 5h 12m 36s 76ms (96.5%) 47x, good 2m 9s 765ms (0.7%) 7x, great 6s 181ms (0.0%) 2x
+  Signal scanning time: 0ms 
+  Radio types: none 5h 24m 4s 35ms (100.0%) 0x
+  Radio data uptime when unplugged: 0 ms
+  Wifi on: 5h 24m 4s 35ms (100.0%), Wifi running: 5h 24m 4s 35ms (100.0%), Bluetooth on: 0ms (0.0%)
+ 
+  Device battery use since last full charge
+    Amount discharged (lower bound): 15
+    Amount discharged (upper bound): 16
+    Amount discharged while screen on: 0
+    Amount discharged while screen off: 16
+
+  All partial wake locks:
+  Wake lock #10010 NlpWakeLock: 13m 40s 757ms (1746 times) realtime
+  Wake lock #10070 *sync*_edu.berkeley.eecs.cfc_tracker.provider_Account {name=dummy_account, type=openbms.org}: 5m 49s 312ms (9 times) realtime
+  Wake lock #10010 NlpCollectorWakeLock: 5m 26s 28ms (197 times) realtime
+  Wake lock #10064 Web Client: 3m 17s 113ms (9 times) realtime
+  Wake lock #1013 AudioOut_2: 1m 14s 163ms (21 times) realtime
+  Wake lock #1001 PhoneApp: 59s 973ms (2 times) realtime
+  Wake lock #10069 *sync*_edu.berkeley.eecs.e_mission.provider_Account {name=dummy_account, type=eecs.berkeley.edu}: 51s 587ms (2 times) realtime
+  Wake lock #1000 AlarmManager: 32s 389ms (724 times) realtime
+  Wake lock #10064 sendinactive: 22s 115ms (8 times) realtime
+  Wake lock #10010 *net_scheduler*: 20s 994ms (47 times) realtime
+  Wake lock #10010 GCoreFlp: 20s 767ms (5933 times) realtime
+  Wake lock #10005 StartingAlertService: 17s 983ms (4 times) realtime
+  Wake lock #10056 *sync*_gmail-ls_Account {name=shankari@berkeley.edu, type=com.google}: 14s 762ms (6 times) realtime
+  Wake lock #10064 wake:com.whatsapp/.AlarmService: 12s 197ms (7 times) realtime
+  Wake lock #10010 LocationManagerService: 11s 978ms (523 times) realtime
+  Wake lock #10010 AlarmManager: 11s 45ms (770 times) realtime
+  Wake lock #10045 *sync*_com.google.android.apps.plus.content.EsProvider_Account {name=tamtom2000@gmail.com, type=com.google}: 11s 3ms (5 times) realtime
+  Wake lock #10070 GCoreFlp: 8s 1ms (1395 times) realtime
+  Wake lock #10010 Wakeful StateMachine: GeofencerStateMachine: 7s 708ms (1049 times) realtime
+  Wake lock #10005 *sync*_com.android.calendar_Account {name=shankari@berkeley.edu, type=com.google}: 6s 789ms (6 times) realtime
+  Wake lock #1013 AudioOut_3: 5s 951ms (5 times) realtime
+  Wake lock #1001 RILJ: 4s 767ms (886 times) realtime
+  Wake lock #10010 Icing: 4s 591ms (19 times) realtime
+  Wake lock #1000 *backup*: 4s 194ms (18 times) realtime
+  Wake lock #1001 GsmConnection: 3s 966ms (1 times) realtime
+  Wake lock #10040 *backup*: 3s 464ms (5 times) realtime
+  Wake lock #1027 NfcService:mRoutingWakeLock: 3s 456ms (19 times) realtime
+  Wake lock #1000 ActivityManager-Launch: 2s 973ms (7 times) realtime
+  Wake lock #1000 NetworkStats: 2s 606ms (34 times) realtime
+  Wake lock #1000 LocationManagerService: 2s 505ms (463 times) realtime
+  Wake lock #10056 GmailProviderProviderChangedBroadcastWakeLock: 2s 286ms (3 times) realtime
+  Wake lock #10039 *sync*_com.google.android.apps.magazines_Account {name=tamtom2000@gmail.com, type=com.google}: 2s 285ms (2 times) realtime
+  Wake lock #10064 *vibrator*: 1s 763ms (4 times) realtime
+  Wake lock #10029 hangouts_rtcs: 1s 653ms (2 times) realtime
+  Wake lock #10010 GCM_CONN: 1s 630ms (34 times) realtime
+  Wake lock #10066 AlarmManager: 1s 597ms (12 times) realtime
+  Wake lock #1000 SyncLoopWakeLock: 1s 538ms (150 times) realtime
+  Wake lock #10045 *sync*_com.google.android.apps.plus.content.EsProvider_Account {name=shankari@berkeley.edu, type=com.google}: 1s 265ms (5 times) realtime
+  Wake lock #10006 ScheduleNextAlarmWakeLock: 992ms (2 times) realtime
+  Wake lock #10010 Event Log Service: 991ms (11 times) realtime
+  Wake lock #10010 ContextManagerWakeLock: 831ms (6 times) realtime
+  Wake lock #1000 show keyguard: 764ms (4 times) realtime
+  Wake lock #10010 *sync*_com.google.android.gms.fitness_Account {name=tamtom2000@gmail.com, type=com.google}: 700ms (5 times) realtime
+  Wake lock #10036 StartingAlertService: 637ms (4 times) realtime
+  Wake lock #10064 AlarmManager: 634ms (68 times) realtime
+  Wake lock #10010 *sync*_com.google.android.gms.fitness_Account {name=shankari@berkeley.edu, type=com.google}: 608ms (5 times) realtime
+  Wake lock #10019 AlarmManager: 483ms (1 times) realtime
+  Wake lock #10010 GOOGLE_C2DM: 477ms (18 times) realtime
+  Wake lock #10067 AlarmManager: 417ms (1 times) realtime
+  Wake lock #10037 com.google.android.music.playback.DevicePlayback.mAsyncWakeLock: 415ms (4 times) realtime
+  Wake lock #1000 ActivityManager-Sleep: 404ms (5 times) realtime
+  Wake lock #10010 GmsDownloadService: 404ms (1 times) realtime
+  Wake lock #10066 RTMStartingAlertService: 386ms (1 times) realtime
+  Wake lock #10012 AlarmManager: 336ms (19 times) realtime
+  Wake lock #1000 SyncManagerHandleSyncAlarm: 327ms (34 times) realtime
+  Wake lock #10037 wake:com.google.android.music/.leanback.AutoCacheSchedulingService: 230ms (4 times) realtime
+  Wake lock #10010 Event Log Handoff: 198ms (11 times) realtime
+  Wake lock #10064 AlarmService#updateNtp: 193ms (3 times) realtime
+  Wake lock #10064 AlarmService#dailyCron: 167ms (1 times) realtime
+  Wake lock #10029 AlarmManager: 162ms (2 times) realtime
+  Wake lock #10010 UlrDispSvcFastWL: 112ms (2 times) realtime
+  Wake lock #10019 wake:com.google.android.keep/.notification.AlertService: 109ms (1 times) realtime
+  Wake lock #10010 GCM_LIB: 85ms (8 times) realtime
+  Wake lock #1000 WifiSuspend: 84ms (8 times) realtime
+  Wake lock #10010 NetworkLocationLocator: 66ms (1 times) realtime
+  Wake lock #10010 GCM_HB_ALARM: 52ms (16 times) realtime
+  Wake lock #10034 AlarmManager: 38ms (3 times) realtime
+  Wake lock #10050 RingtonePlayer: 32ms (1 times) realtime
+  Wake lock #10064 GCoreFlp: 30ms (3 times) realtime
+  Wake lock #10010 wake:com.google.android.gms/.reminders.notification.NotificationService: 24ms (1 times) realtime
+  Wake lock #10010 WakefulIntentService[NotificationService]: 19ms (1 times) realtime
+  Wake lock #1000 keyguardWakeAndHandOff: 18ms (6 times) realtime
+  Wake lock #10006 AlarmManager: 16ms (2 times) realtime
+  Wake lock #1000 GpsLocationProvider: 8ms (6 times) realtime
+  Wake lock #10010 GTALK_IDLE_ALARM: 7ms (4 times) realtime
+  Wake lock #10010 NetworkLocationCallbackRunner: 3ms (1 times) realtime
+
+  #0:
+    Network: 5.21MB received, 211.85KB sent
+    Proc twl6030-irq:
+      CPU: 0ms usr + 400ms krn
+    Proc irq/379-rtc0:
+      CPU: 0ms usr + 360ms krn
+    Proc /init:
+      CPU: 2s 420ms usr + 11s 600ms krn
+    Proc ksoftirqd/0:
+      CPU: 0ms usr + 160ms krn
+    Proc dhd_cfg80211_ev:
+      CPU: 0ms usr + 1s 230ms krn
+    Proc irq/206-mms_ts:
+      CPU: 0ms usr + 220ms krn
+    Proc vold:
+      CPU: 640ms usr + 1s 150ms krn
+    Proc file-storage:
+      CPU: 0ms usr + 200ms krn
+    Proc kworker/u:4:
+      CPU: 0ms usr + 12s 260ms krn
+    Proc kworker/u:3:
+      CPU: 0ms usr + 8s 920ms krn
+    Proc kworker/u:5:
+      CPU: 0ms usr + 10s 700ms krn
+    Proc cfinteractive:
+      CPU: 0ms usr + 15s 570ms krn
+    Proc kthreadd:
+      CPU: 0ms usr + 3s 520ms krn
+    Proc netd:
+      CPU: 630ms usr + 1s 780ms krn
+    Proc mmcqd/0:
+      CPU: 0ms usr + 19s 640ms krn
+    Proc kworker/u:0:
+      CPU: 0ms usr + 8s 960ms krn
+    Proc kworker/0:0:
+      CPU: 10ms usr + 16s 990ms krn
+    Proc kworker/0:1:
+      CPU: 20ms usr + 5s 520ms krn
+    Proc kworker/0:2:
+      CPU: 0ms usr + 10s 560ms krn
+    Proc kworker/u:2:
+      CPU: 0ms usr + 1s 360ms krn
+    Proc kworker/u:1:
+      CPU: 0ms usr + 7s 640ms krn
+    Proc bdi-default:
+      CPU: 0ms usr + 210ms krn
+    Proc zygote:
+      CPU: 800ms usr + 1s 40ms krn
+    Proc debuggerd:
+      CPU: 10ms usr + 350ms krn
+    Proc kworker/1:2:
+      CPU: 0ms usr + 20ms krn
+    Proc flush-179:0:
+      CPU: 0ms usr + 1s 690ms krn
+    Proc kworker/1:1:
+      CPU: 30ms usr + 0ms krn
+    Proc flush-0:20:
+      CPU: 0ms usr + 60ms krn
+    Proc irq/131-ABE:
+      CPU: 0ms usr + 20ms krn
+    Proc ueventd:
+      CPU: 360ms usr + 840ms krn
+    Proc khubd:
+      CPU: 0ms usr + 10s 480ms krn
+    Proc jbd2/mmcblk0p12:
+      CPU: 0ms usr + 4s 750ms krn
+    Proc dhd_watchdog:
+      CPU: 0ms usr + 1s 790ms krn
+    Proc mmcqd/0boot0:
+      CPU: 20ms usr + 0ms krn
+    Proc mmcqd/0boot1:
+      CPU: 50ms usr + 0ms krn
+    Proc kswapd0:
+      CPU: 0ms usr + 1s 840ms krn
+    Proc jbd2/mmcblk0p11:
+      CPU: 0ms usr + 10ms krn
+    Proc sync_supers:
+      CPU: 0ms usr + 70ms krn
+    Proc dhd_dpc:
+      CPU: 0ms usr + 22s 500ms krn
+  #1000:
+    Network: 3.31MB received, 278.73KB sent
+    User activity: 76 other, 1 button, 47 touch
+    Wake lock GpsLocationProvider: 8ms partial (6 times) realtime
+    Wake lock SyncManagerHandleSyncAlarm: 327ms partial (34 times) realtime
+    Wake lock WifiSuspend: 84ms partial (8 times) realtime
+    Wake lock show keyguard: 764ms partial (4 times) realtime
+    Wake lock NetworkStats: 2s 606ms partial (34 times) realtime
+    Wake lock LocationManagerService: 2s 505ms partial (463 times) realtime
+    Wake lock ActivityManager-Launch: 2s 973ms partial (7 times) realtime
+    Wake lock *backup*: 4s 194ms partial (18 times) realtime
+    Wake lock keyguardWakeAndHandOff: 18ms partial (6 times) realtime
+    Wake lock AlarmManager: 32s 389ms partial (724 times) realtime
+    Wake lock ActivityManager-Sleep: 404ms partial (5 times) realtime
+    Wake lock SyncLoopWakeLock: 1s 538ms partial (150 times) realtime
+    TOTAL wake: 47s 810ms partial realtime
+    Sensor 4097: 1m 3s 327ms realtime (1 times)
+    Sensor 1: 2m 0s 301ms realtime (8 times)
+    Sensor 4096: 2m 31s 953ms realtime (8 times)
+    Vibrator: 220ms realtime (22 times)
+    Proc surfaceflinger:
+      CPU: 7s 320ms usr + 16s 560ms krn
+    Proc servicemanager:
+      CPU: 260ms usr + 2s 200ms krn
+    Apk android:
+      395 wakeup alarms
+  #1001:
+    User activity: 2 other
+    Wake lock PhoneApp: 8s 675ms full (2 times), 59s 973ms partial (2 times) realtime
+    Wake lock GsmConnection: 3s 966ms partial (1 times) realtime
+    Wake lock RILJ: 4s 767ms partial (886 times) realtime
+    TOTAL wake: 8s 675ms full, 1m 8s 706ms partial realtime
+    Sensor 1: 31s 724ms realtime (1 times)
+    Vibrator: 4s 0ms realtime (4 times)
+    Proc *wakelock*:
+      CPU: 440ms usr + 230ms krn
+    Proc rild:
+      CPU: 470ms usr + 1s 520ms krn
+  #1010:
+    Proc wpa_supplicant:
+      CPU: 1s 350ms usr + 3s 140ms krn
+  #1012:
+    Proc installd:
+      CPU: 0ms usr + 200ms krn
+  #1013:
+    Wake lock AudioOut_3: 5s 951ms partial (5 times) realtime
+    Wake lock AudioOut_2: 1m 14s 163ms partial (21 times) realtime
+    TOTAL wake: 1m 20s 114ms partial realtime
+    Proc *wakelock*:
+      CPU: 4s 890ms usr + 2s 860ms krn
+    Proc mediaserver:
+      CPU: 5s 910ms usr + 7s 700ms krn
+  #1014:
+    Proc dhcpcd:
+      CPU: 0ms usr + 1s 110ms krn
+  #1017:
+    Proc keystore:
+      CPU: 420ms usr + 390ms krn
+  #1019:
+    Proc drmserver:
+      CPU: 0ms usr + 1s 210ms krn
+  #1023:
+    Proc sdcard:
+      CPU: 70ms usr + 1s 860ms krn
+  #1026:
+    Proc tf_daemon:
+      CPU: 0ms usr + 210ms krn
+  #1027:
+    Wake lock NfcService:mRoutingWakeLock: 3s 456ms partial (19 times) realtime
+    Proc *wakelock*:
+      CPU: 1s 20ms usr + 470ms krn
+  #2000:
+    Proc adbd:
+      CPU: 70ms usr + 740ms krn
+  #10000:
+    Proc com.android.contacts:
+      CPU: 10ms usr + 40ms krn
+      1 proc starts
+    Apk com.android.contacts:
+      Service com.android.contacts.ViewNotificationService:
+        Created for: 695ms  uptime
+        Starts: 1, launches: 1
+  #10002:
+    (nothing executed)
+  #10003:
+    (nothing executed)
+  #10005:
+    Network: 15.32KB received, 11.46KB sent
+    Wake lock *sync*_com.android.calendar_Account {name=shankari@berkeley.edu, type=com.google}: 6s 789ms partial (6 times) realtime
+    Wake lock StartingAlertService: 17s 983ms partial (4 times) realtime
+    TOTAL wake: 24s 772ms partial realtime
+    Proc *wakelock*:
+      CPU: 910ms usr + 460ms krn
+    Proc com.google.android.calendar:
+      CPU: 470ms usr + 600ms krn
+      2 proc starts
+    Apk com.google.android.calendar:
+      Service com.android.calendar.alerts.AlertService:
+        Created for: 21s 177ms  uptime
+        Starts: 4, launches: 4
+      Service com.google.android.syncadapters.calendar.CalendarSyncAdapterService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 6
+  #10006:
+    Wake lock AlarmManager: 16ms partial (2 times) realtime
+    Wake lock ScheduleNextAlarmWakeLock: 992ms partial (2 times) realtime
+    TOTAL wake: 1s 8ms partial realtime
+    Proc com.android.providers.calendar:
+      CPU: 1s 80ms usr + 250ms krn
+      2 proc starts
+    Apk com.android.providers.calendar:
+      2 wakeup alarms
+      Service com.android.providers.calendar.CalendarProviderIntentService:
+        Created for: 1s 256ms  uptime
+        Starts: 2, launches: 2
+      Service com.android.providers.calendar.EmptyService:
+        Created for: 1m 1s 222ms  uptime
+        Starts: 4, launches: 4
+  #10010:
+    Network: 164.74KB received, 108.06KB sent
+    Wifi Running: 0ms (0.0%)
+    Full Wifi Lock: 14m 38s 812ms (4.5%)
+    Wifi Scan: 15m 33s 672ms (4.8%)
+    Wake lock UlrDispSvcFastWL: 112ms partial (2 times) realtime
+    Wake lock NlpWakeLock: 13m 40s 757ms partial (1746 times) realtime
+    Wake lock GCM_LIB: 85ms partial (8 times) realtime
+    Wake lock Wakeful StateMachine: GeofencerStateMachine: 7s 708ms partial (1049 times) realtime
+    Wake lock NetworkLocationCallbackRunner: 3ms partial (1 times) realtime
+    Wake lock Event Log Handoff: 198ms partial (11 times) realtime
+    Wake lock AlarmManager: 11s 45ms partial (770 times) realtime
+    Wake lock wake:com.google.android.gms/.reminders.notification.NotificationService: 24ms partial (1 times) realtime
+    Wake lock LocationManagerService: 11s 978ms partial (523 times) realtime
+    Wake lock *net_scheduler*: 20s 994ms partial (47 times) realtime
+    Wake lock NetworkLocationLocator: 66ms partial (1 times) realtime
+    Wake lock Icing: 4s 591ms partial (19 times) realtime
+    Wake lock WakefulIntentService[NotificationService]: 19ms partial (1 times) realtime
+    Wake lock *sync*_com.google.android.gms.fitness_Account {name=shankari@berkeley.edu, type=com.google}: 608ms partial (5 times) realtime
+    Wake lock GCoreFlp: 20s 767ms partial (5933 times) realtime
+    Wake lock GmsDownloadService: 404ms partial (1 times) realtime
+    Wake lock NlpCollectorWakeLock: 5m 26s 28ms partial (197 times) realtime
+    Wake lock ContextManagerWakeLock: 831ms partial (6 times) realtime
+    Wake lock GOOGLE_C2DM: 477ms partial (18 times) realtime
+    Wake lock *sync*_com.google.android.gms.fitness_Account {name=tamtom2000@gmail.com, type=com.google}: 700ms partial (5 times) realtime
+    Wake lock GCM_HB_ALARM: 52ms partial (16 times) realtime
+    Wake lock Event Log Service: 991ms partial (11 times) realtime
+    Wake lock GCM_CONN: 1s 630ms partial (34 times) realtime
+    Wake lock GTALK_IDLE_ALARM: 7ms partial (4 times) realtime
+    TOTAL wake: 20m 30s 75ms partial realtime
+    Sensor 0: 25s 824ms realtime (1 times)
+    Sensor 1: 4m 58s 816ms realtime (189 times)
+    Sensor 2: 25s 869ms realtime (1 times)
+    Sensor 4098: 25s 695ms realtime (1 times)
+    Sensor GPS: 5h 24m 4s 35ms realtime (0 times)
+    Proc *wakelock*:
+      CPU: 52s 230ms usr + 38s 920ms krn
+    Apk com.google.android.location:
+      1 wakeup alarms
+    Apk com.google.android.gsf:
+      4 wakeup alarms
+      Service com.google.android.gsf.subscribedfeeds.GCMIntentService:
+        Created for: 180ms  uptime
+        Starts: 8, launches: 8
+    Apk com.google.android.gms:
+      753 wakeup alarms
+      Service com.google.android.gms.auth.be.GoogleAccountDataService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 41
+      Service com.google.android.gms.phenotype.service.PhenotypeIntentService:
+        Created for: 12s 706ms  uptime
+        Starts: 13, launches: 13
+      Service com.google.android.gms.people.service.PeopleRequestProcessor:
+        Created for: 1s 901ms  uptime
+        Starts: 2, launches: 2
+      Service com.google.android.gms.clearcut.service.ClearcutLoggerIntentService:
+        Created for: 14s 95ms  uptime
+        Starts: 21, launches: 21
+      Service com.google.android.gms.reminders.service.RemindersService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 1
+      Service com.google.android.gms.reminders.service.RemindersIntentService:
+        Created for: 583ms  uptime
+        Starts: 1, launches: 1
+      Service com.google.android.gms.phenotype.service.sync.PhenotypeConfigurator:
+        Created for: 232ms  uptime
+        Starts: 1, launches: 1
+      Service com.google.android.gms.phenotype.service.PhenotypeService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 6
+      Service com.google.android.gms.fitness.store.maintenance.StoreMaintenanceService:
+        Created for: 91ms  uptime
+        Starts: 3, launches: 3
+      Service com.google.android.gms.herrevad.services.ProcessReportsService:
+        Created for: 1s 80ms  uptime
+        Starts: 4, launches: 4
+      Service com.google.android.gms.usagereporting.service.UsageReportingService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 12
+      Service com.google.android.gms.checkin.CheckinService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 1
+      Service com.google.android.gms.checkin.EventLogService:
+        Created for: 1s 316ms  uptime
+        Starts: 11, launches: 11
+      Service com.google.android.gms.common.analytics.CoreAnalyticsIntentService:
+        Created for: 1s 847ms  uptime
+        Starts: 1, launches: 1
+      Service com.google.android.gms.herrevad.services.LightweightNetworkQualityService$NetworkQualityWorkerService:
+        Created for: 9s 730ms  uptime
+        Starts: 16, launches: 16
+      Service com.google.android.gms.mdm.services.NetworkQualityAndroidService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 4
+      Service com.google.android.gms.playlog.service.MonitorService:
+        Created for: 16ms  uptime
+        Starts: 1, launches: 1
+      Service com.google.android.gms.common.download.DownloadService:
+        Created for: 456ms  uptime
+        Starts: 1, launches: 1
+      Service com.google.android.location.reporting.service.ReportingAndroidService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 4
+      Service com.google.android.gms.wearable.service.WearableService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 4
+      Service com.google.android.gms.gcm.http.GoogleHttpService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 25
+      Service com.google.android.gms.auth.GetToken:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 25
+      Service com.google.android.gms.reminders.notification.NotificationService:
+        Created for: 100ms  uptime
+        Starts: 1, launches: 1
+      Service com.google.android.gms.ads.identifier.service.AdvertisingIdService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 9
+      Service com.google.android.location.reporting.service.DispatchingService:
+        Created for: 722ms  uptime
+        Starts: 1, launches: 1
+      Service com.google.android.gms.playlog.service.PlayLogIntentService:
+        Created for: 5s 389ms  uptime
+        Starts: 8, launches: 8
+      Service com.google.android.gms.icing.service.IndexService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 7
+      Service com.google.android.gms.analytics.service.AnalyticsService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 5
+      Service com.google.android.gms.fitness.sync.FitnessSyncAdapterService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 10
+      Service com.google.android.gms.icing.service.LightweightIndexService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 7
+      Service com.google.android.gms.herrevad.services.NetworkQualityService$NetworkQualityWorkerService:
+        Created for: 2s 562ms  uptime
+        Starts: 4, launches: 4
+      Service com.google.android.gms.icing.service.IndexWorkerService:
+        Created for: 9s 134ms  uptime
+        Starts: 19, launches: 19
+      Service com.google.android.gms.herrevad.services.LightweightNetworkQualityAndroidService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 9
+      Service com.google.android.gms.config.ConfigService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 4
+      Service com.google.android.gms.herrevad.services.ImmediateProcessReportsService:
+        Created for: 592ms  uptime
+        Starts: 1, launches: 1
+      Service com.google.android.gms.people.service.PeopleService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 2
+      Service com.google.android.gms.pseudonymous.service.PseudonymousIdService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 1
+      Service com.google.android.gms.playlog.uploader.UploaderService:
+        Created for: 25s 639ms  uptime
+        Starts: 5, launches: 5
+      Service com.google.android.gms.icing.service.LightweightIndexService$LightweightWorkerService:
+        Created for: 6s 5ms  uptime
+        Starts: 10, launches: 10
+      Service com.google.android.gms.playlog.service.PlayLogBrokerService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 6
+  #10012:
+    Wake lock AlarmManager: 336ms partial (19 times) realtime
+    Proc com.google.android.deskclock:
+      CPU: 160ms usr + 830ms krn
+      4 proc starts
+    Apk com.google.android.deskclock:
+      Service com.android.alarmclock.DigitalAppWidgetService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 16
+  #10013:
+    Proc android.process.media:
+      CPU: 500ms usr + 930ms krn
+      6 proc starts
+    Apk com.android.providers.downloads:
+      Service com.android.providers.downloads.DownloadService:
+        Created for: 7s 966ms  uptime
+        Starts: 6, launches: 6
+    Apk com.android.providers.media:
+      Service com.android.providers.media.MtpService:
+        Created for: 0ms  uptime
+        Starts: 1, launches: 1
+  #10016:
+    Network: 504B received, 684B sent
+    Apk com.google.android.gallery3d:
+      (nothing executed)
+  #10017:
+    (nothing executed)
+  #10019:
+    Wake lock wake:com.google.android.keep/.notification.AlertService: 109ms partial (1 times) realtime
+    Wake lock AlarmManager: 483ms partial (1 times) realtime
+    TOTAL wake: 592ms partial realtime
+    Proc com.google.android.keep:
+      CPU: 30ms usr + 40ms krn
+      1 proc starts
+    Apk com.google.android.keep:
+      1 wakeup alarms
+      Service com.google.android.keep.service.CleanupService:
+        Created for: 335ms  uptime
+        Starts: 1, launches: 1
+      Service com.google.android.keep.notification.AlertService:
+        Created for: 222ms  uptime
+        Starts: 1, launches: 1
+  #10024:
+    (nothing executed)
+  #10029:
+    Network: 0B received, 72B sent
+    Wake lock hangouts_rtcs: 1s 653ms partial (2 times) realtime
+    Wake lock AlarmManager: 162ms partial (2 times) realtime
+    TOTAL wake: 1s 815ms partial realtime
+    Proc com.google.android.talk:
+      CPU: 1s 420ms usr + 1s 720ms krn
+      5 proc starts
+    Apk com.google.android.talk:
+      2 wakeup alarms
+      Service com.google.android.apps.hangouts.realtimechat.RealTimeChatService:
+        Created for: 1s 891ms  uptime
+        Starts: 2, launches: 2
+      Service com.google.android.apps.hangouts.requestwriter.RequestWriter:
+        Created for: 11s 535ms  uptime
+        Starts: 2, launches: 2
+  #10030:
+    Vibrator: 175ms realtime (35 times)
+    Apk com.google.android.inputmethod.latin:
+      Service com.android.inputmethod.dictionarypack.DictionaryService:
+        Created for: 27ms  uptime
+        Starts: 1, launches: 1
+      Service com.android.inputmethod.latin.spellcheck.AndroidSpellCheckerService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 1
+  #10031:
+    (nothing executed)
+  #10034:
+    Network: 19.44KB received, 9.70KB sent
+    Wake lock AlarmManager: 38ms partial (3 times) realtime
+    Proc com.google.android.apps.maps:
+      CPU: 2s 140ms usr + 1s 430ms krn
+      4 proc starts
+    Apk com.google.android.apps.maps:
+      4 wakeup alarms
+      Service com.google.android.apps.gmm.prefetch.PrefetcherService:
+        Created for: 47s 240ms  uptime
+        Starts: 4, launches: 4
+  #10035:
+    Proc com.google.android.apps.uploader:
+      CPU: 20ms usr + 200ms krn
+      1 proc starts
+  #10036:
+    Wake lock StartingAlertService: 637ms partial (4 times) realtime
+    Apk com.android.mms:
+      Service com.android.mms.transaction.SmsReceiverService:
+        Created for: 1s 248ms  uptime
+        Starts: 4, launches: 4
+  #10037:
+    Wake lock com.google.android.music.playback.DevicePlayback.mAsyncWakeLock: 415ms partial (4 times) realtime
+    Wake lock wake:com.google.android.music/.leanback.AutoCacheSchedulingService: 230ms partial (4 times) realtime
+    TOTAL wake: 645ms partial realtime
+    Proc com.google.android.music:main:
+      CPU: 1s 110ms usr + 3s 190ms krn
+      4 proc starts
+    Apk com.google.android.music:
+      Service com.google.android.music.download.cache.TrackCacheService:
+        Created for: 2s 128ms  uptime
+        Starts: 4, launches: 4
+      Service com.google.android.music.wear.WearMetadataSyncService:
+        Created for: 152ms  uptime
+        Starts: 4, launches: 4
+      Service com.google.android.music.download.cache.StorageMigrationService:
+        Created for: 2s 555ms  uptime
+        Starts: 4, launches: 4
+      Service com.google.android.music.download.TrackDownloadQueueService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 4
+      Service com.google.android.music.preferences.MusicPreferenceService$MusicPreferenceServiceBinder:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 4
+      Service com.google.android.music.leanback.AutoCacheSchedulingService:
+        Created for: 382ms  uptime
+        Starts: 4, launches: 4
+      Service com.google.android.music.download.cache.ArtCacheService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 4
+      Service com.google.android.music.download.ArtDownloadQueueService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 4
+      Service com.google.android.music.net.NetworkMonitor:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 4
+      Service com.google.android.music.download.artwork.ArtDownloadService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 4
+  #10039:
+    Wake lock *sync*_com.google.android.apps.magazines_Account {name=tamtom2000@gmail.com, type=com.google}: 2s 285ms partial (2 times) realtime
+    Proc com.google.android.apps.magazines:
+      CPU: 90ms usr + 140ms krn
+      2 proc starts
+    Apk com.google.android.apps.magazines:
+      Service com.google.apps.dots.android.newsstand.service.SyncAdapterService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 2
+  #10040:
+    Wake lock *backup*: 3s 464ms partial (5 times) realtime
+    Proc com.google.android.googlequicksearchbox:
+      CPU: 40ms usr + 360ms krn
+      5 proc starts
+    Apk com.google.android.googlequicksearchbox:
+      (nothing executed)
+  #10044:
+    Network: 145.09KB received, 22.40KB sent
+    Proc com.android.vending:
+      CPU: 1s 840ms usr + 1s 400ms krn
+      3 proc starts
+    Apk com.android.vending:
+      Service com.google.android.finsky.services.RestoreService:
+        Created for: 1s 154ms  uptime
+        Starts: 3, launches: 3
+      Service com.google.android.finsky.billing.iab.InAppBillingService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 1
+  #10045:
+    Network: 11.66KB received, 8.74KB sent
+    Wake lock *sync*_com.google.android.apps.plus.content.EsProvider_Account {name=shankari@berkeley.edu, type=com.google}: 1s 265ms partial (5 times) realtime
+    Wake lock *sync*_com.google.android.apps.plus.content.EsProvider_Account {name=tamtom2000@gmail.com, type=com.google}: 11s 3ms partial (5 times) realtime
+    TOTAL wake: 12s 268ms partial realtime
+    Proc *wakelock*:
+      CPU: 550ms usr + 300ms krn
+    Proc com.google.android.apps.plus:
+      CPU: 1s 160ms usr + 840ms krn
+      5 proc starts
+    Apk com.google.android.apps.plus:
+      Service com.google.android.apps.plus.service.EsSyncAdapterService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 10
+  #10050:
+    Wake lock RingtonePlayer: 32ms partial (1 times) realtime
+  #10056:
+    Network: 24.65KB received, 16.06KB sent
+    Wake lock GmailProviderProviderChangedBroadcastWakeLock: 2s 286ms partial (3 times) realtime
+    Wake lock *sync*_gmail-ls_Account {name=shankari@berkeley.edu, type=com.google}: 14s 762ms partial (6 times) realtime
+    TOTAL wake: 17s 48ms partial realtime
+    Proc *wakelock*:
+      CPU: 2s 680ms usr + 1s 20ms krn
+    Proc com.google.android.gm:
+      CPU: 4s 300ms usr + 1s 390ms krn
+      2 proc starts
+    Apk com.google.android.gm:
+      Service com.google.android.gm.EmailMigrationService:
+        Created for: 294ms  uptime
+        Starts: 2, launches: 2
+      Service com.android.mail.widget.BaseGmailWidgetProviderService:
+        Created for: 188ms  uptime
+        Starts: 12, launches: 12
+      Service com.google.android.gm.GmailIntentService:
+        Created for: 3s 401ms  uptime
+        Starts: 5, launches: 5
+      Service com.google.android.gm.provider.MailSyncAdapterService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 6
+  #10060:
+    Apk com.google.android.youtube:
+      Service com.google.android.apps.youtube.app.offline.transfer.OfflineTransferService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 1
+  #10062:
+    (nothing executed)
+  #10064:
+    Network: 82.30KB received, 78.72KB sent
+    Wake lock AlarmService#dailyCron: 167ms partial (1 times) realtime
+    Wake lock sendinactive: 22s 115ms partial (8 times) realtime
+    Wake lock GCoreFlp: 30ms partial (3 times) realtime
+    Wake lock Web Client: 3m 17s 113ms partial (9 times) realtime
+    Wake lock *vibrator*: 1s 763ms partial (4 times) realtime
+    Wake lock wake:com.whatsapp/.AlarmService: 12s 197ms partial (7 times) realtime
+    Wake lock AlarmService#updateNtp: 193ms partial (3 times) realtime
+    Wake lock AlarmManager: 634ms partial (68 times) realtime
+    TOTAL wake: 3m 54s 212ms partial realtime
+    Vibrator: 2s 800ms realtime (8 times)
+    Proc *wakelock*:
+      CPU: 3s 820ms usr + 2s 220ms krn
+    Proc com.whatsapp:
+      CPU: 16s 860ms usr + 8s 780ms krn
+      1 proc starts
+    Apk com.whatsapp:
+      63 wakeup alarms
+      Service com.whatsapp.AlarmService:
+        Created for: 17s 2ms  uptime
+        Starts: 7, launches: 7
+      Service com.whatsapp.memory.dump.MemoryDumpUploadService:
+        Created for: 1s 186ms  uptime
+        Starts: 1, launches: 1
+      Service com.whatsapp.c2dm.C2DMRegistrar:
+        Created for: 285ms  uptime
+        Starts: 12, launches: 12
+  #10066:
+    Network: 9.10KB received, 9.57KB sent
+    Wake lock RTMStartingAlertService: 386ms partial (1 times) realtime
+    Wake lock AlarmManager: 1s 597ms partial (12 times) realtime
+    TOTAL wake: 1s 983ms partial realtime
+    Proc com.rememberthemilk.MobileRTM:
+      CPU: 400ms usr + 720ms krn
+      9 proc starts
+    Apk com.rememberthemilk.MobileRTM:
+      1 wakeup alarms
+      Service com.rememberthemilk.MobileRTM.Services.RTMSyncService:
+        Created for: 5s 688ms  uptime
+        Starts: 11, launches: 11
+      Service com.rememberthemilk.MobileRTM.Services.RTMAlertService:
+        Created for: 770ms  uptime
+        Starts: 1, launches: 1
+  #10067:
+    Wake lock AlarmManager: 417ms partial (1 times) realtime
+    Proc com.popularapp.periodcalendar:
+      CPU: 40ms usr + 30ms krn
+      1 proc starts
+    Apk com.popularapp.periodcalendar:
+      1 wakeup alarms
+      Service com.popularapp.periodcalendar.service.NotificationPeriodService:
+        Created for: 26ms  uptime
+        Starts: 1, launches: 1
+      Service com.popularapp.periodcalendar.service.WidgetService:
+        Created for: 172ms  uptime
+        Starts: 1, launches: 1
+      Service com.popularapp.periodcalendar.service.NotificationPillService:
+        Created for: 136ms  uptime
+        Starts: 1, launches: 1
+  #10069:
+    Network: 7.42MB received, 116.51KB sent
+    Wake lock *sync*_edu.berkeley.eecs.e_mission.provider_Account {name=dummy_account, type=eecs.berkeley.edu}: 51s 587ms partial (2 times) realtime
+    Proc *wakelock*:
+      CPU: 15s 220ms usr + 2s 270ms krn
+    Proc edu.berkeley.eecs.e_mission:
+      CPU: 20ms usr + 240ms krn
+      2 proc starts
+    Proc edu.berkeley.eecs.e_mission:sync:
+      CPU: 18s 930ms usr + 1s 120ms krn
+      2 proc starts
+    Apk edu.berkeley.eecs.e_mission:
+      Service edu.berkeley.eecs.e_mission.data_sync.SyncService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 2
+  #10070:
+    Network: 33.31MB received, 1.33MB sent
+    Wake lock GCoreFlp: 8s 1ms partial (1395 times) realtime
+    Wake lock *sync*_edu.berkeley.eecs.cfc_tracker.provider_Account {name=dummy_account, type=openbms.org}: 5m 49s 312ms partial (9 times) realtime
+    TOTAL wake: 5m 57s 313ms partial realtime
+    Proc *wakelock*:
+      CPU: 53s 250ms usr + 17s 610ms krn
+    Proc edu.berkeley.eecs.cfc_tracker:sync:
+      CPU: 1m 10s 520ms usr + 6s 490ms krn
+      8 proc starts
+    Apk edu.berkeley.eecs.cfc_tracker:
+      Service edu.berkeley.eecs.cfc_tracker.smap.SyncService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 9
+      Service edu.berkeley.eecs.cfc_tracker.location.ActivityRecognitionChangeIntentService:
+        Created for: 1m 25s 838ms  uptime
+        Starts: 168, launches: 168
+      Service edu.berkeley.eecs.cfc_tracker.location.LocationChangeIntentService:
+        Created for: 6m 1s 445ms  uptime
+        Starts: 815, launches: 815
+
+Statistics since last unplugged:
+  Time on battery: 5h 24m 4s 35ms (99.7%) realtime, 2h 19m 2s 765ms (42.8%) uptime
+  Total run time: 5h 24m 55s 468ms realtime, 2h 19m 54s 199ms uptime, 
+  Screen on: 2m 10s 814ms (0.7%), Input events: 0, Active phone call: 1m 10s 880ms (0.4%)
+  Screen brightnesses: dark 2m 10s 814ms (100.0%)
+  Kernel Wake lock "gps-lock": 1h 23m 22s 580ms (355 times) realtime
+  Kernel Wake lock "PowerManagerService.WakeLocks": 35m 40s 111ms (6531 times) realtime
+  Kernel Wake lock "wlan_rx_wake": 26m 37s 84ms (1044 times) realtime
+  Kernel Wake lock "wlan_ctrl_wake": 24m 50s 308ms (579 times) realtime
+  Kernel Wake lock "alarm_rtc": 15m 18s 434ms (1396 times) realtime
+  Kernel Wake lock "wlan_wd_wake": 5m 52s 344ms (21807 times) realtime
+  Kernel Wake lock "mipi_link": 5m 28s 95ms (649 times) realtime
+  Kernel Wake lock "PowerManagerService.Display": 2m 40s 50ms (8 times) realtime
+  Kernel Wake lock "main": 2m 12s 540ms (11 times) realtime
+  Kernel Wake lock "radio-interface": 1m 51s 221ms (109 times) realtime
+  Kernel Wake lock "alarm": 1m 10s 137ms (2182 times) realtime
+  Kernel Wake lock "musb_autosuspend_wake_lock": 1m 0s 215ms (1250 times) realtime
+  Kernel Wake lock "wlan_wake": 59s 47ms (44075 times) realtime
+  Kernel Wake lock "event2-7376": 15s 796ms (1274 times) realtime
+  Kernel Wake lock "prx_wake_lock": 12s 179ms (4 times) realtime
+  Kernel Wake lock "vibrator": 7s 207ms (69 times) realtime
+  Kernel Wake lock "max17040-battery": 6s 439ms (321 times) realtime
+  Kernel Wake lock "PowerManagerService.Broadcasts": 5s 979ms (16 times) realtime
+  Kernel Wake lock "twl6030 adc": 4s 518ms (1763 times) realtime
+  Kernel Wake lock "nfc": 4s 176ms (8 times) realtime
+  Kernel Wake lock "vbus-tuna_otg": 1s 996ms (1 times) realtime
+  Kernel Wake lock "KeyEvents": 639ms (4695 times) realtime
+  Kernel Wake lock "secril_fmt-interface": 525ms (1839 times) realtime
+  Kernel Wake lock "mmc0_detect": 335ms (2418 times) realtime
+  Kernel Wake lock "gpio_input": 145ms (32 times) realtime
+  Kernel Wake lock "event1-7376": 53ms (729 times) realtime
+  Kernel Wake lock "power-supply": 9ms (18 times) realtime
+  Total received: 49.71MB, Total sent: 2.19MB
+  Total full wakelock time: 8s 675ms , Total partial wakelock time: 35m 40s 610ms 
+  Signal levels: none 33s 549ms (0.2%) 2x, poor 8m 38s 463ms (2.7%) 48x, moderate 5h 12m 36s 76ms (96.5%) 47x, good 2m 9s 765ms (0.7%) 7x, great 6s 181ms (0.0%) 2x
+  Signal scanning time: 0ms 
+  Radio types: none 5h 24m 4s 35ms (100.0%) 0x
+  Radio data uptime when unplugged: 0 ms
+  Wifi on: 5h 24m 4s 35ms (100.0%), Wifi running: 5h 24m 4s 35ms (100.0%), Bluetooth on: 0ms (0.0%)
+ 
+  Device is currently plugged into power
+    Last discharge cycle start level: 63
+    Last discharge cycle end level: 47
+    Amount discharged while screen on: 0
+    Amount discharged while screen off: 16
+ 
+  All partial wake locks:
+  Wake lock #10010 NlpWakeLock: 13m 40s 757ms (1745 times) realtime
+  Wake lock #10070 *sync*_edu.berkeley.eecs.cfc_tracker.provider_Account {name=dummy_account, type=openbms.org}: 5m 49s 312ms (9 times) realtime
+  Wake lock #10010 NlpCollectorWakeLock: 5m 26s 28ms (197 times) realtime
+  Wake lock #10064 Web Client: 3m 17s 113ms (9 times) realtime
+  Wake lock #1013 AudioOut_2: 1m 14s 163ms (21 times) realtime
+  Wake lock #1001 PhoneApp: 59s 973ms (2 times) realtime
+  Wake lock #10069 *sync*_edu.berkeley.eecs.e_mission.provider_Account {name=dummy_account, type=eecs.berkeley.edu}: 51s 587ms (2 times) realtime
+  Wake lock #1000 AlarmManager: 32s 389ms (724 times) realtime
+  Wake lock #10064 sendinactive: 22s 115ms (8 times) realtime
+  Wake lock #10010 *net_scheduler*: 20s 994ms (47 times) realtime
+  Wake lock #10010 GCoreFlp: 20s 767ms (5933 times) realtime
+  Wake lock #10005 StartingAlertService: 17s 983ms (4 times) realtime
+  Wake lock #10056 *sync*_gmail-ls_Account {name=shankari@berkeley.edu, type=com.google}: 14s 762ms (6 times) realtime
+  Wake lock #10064 wake:com.whatsapp/.AlarmService: 12s 197ms (7 times) realtime
+  Wake lock #10010 LocationManagerService: 11s 978ms (523 times) realtime
+  Wake lock #10010 AlarmManager: 11s 45ms (770 times) realtime
+  Wake lock #10045 *sync*_com.google.android.apps.plus.content.EsProvider_Account {name=tamtom2000@gmail.com, type=com.google}: 11s 3ms (5 times) realtime
+  Wake lock #10070 GCoreFlp: 8s 1ms (1395 times) realtime
+  Wake lock #10010 Wakeful StateMachine: GeofencerStateMachine: 7s 708ms (1049 times) realtime
+  Wake lock #10005 *sync*_com.android.calendar_Account {name=shankari@berkeley.edu, type=com.google}: 6s 789ms (5 times) realtime
+  Wake lock #1013 AudioOut_3: 5s 951ms (5 times) realtime
+  Wake lock #1001 RILJ: 4s 767ms (886 times) realtime
+  Wake lock #10010 Icing: 4s 591ms (19 times) realtime
+  Wake lock #1000 *backup*: 4s 194ms (18 times) realtime
+  Wake lock #1001 GsmConnection: 3s 966ms (1 times) realtime
+  Wake lock #10040 *backup*: 3s 464ms (5 times) realtime
+  Wake lock #1027 NfcService:mRoutingWakeLock: 3s 456ms (19 times) realtime
+  Wake lock #1000 ActivityManager-Launch: 2s 973ms (7 times) realtime
+  Wake lock #1000 NetworkStats: 2s 606ms (34 times) realtime
+  Wake lock #1000 LocationManagerService: 2s 505ms (463 times) realtime
+  Wake lock #10056 GmailProviderProviderChangedBroadcastWakeLock: 2s 286ms (3 times) realtime
+  Wake lock #10039 *sync*_com.google.android.apps.magazines_Account {name=tamtom2000@gmail.com, type=com.google}: 2s 285ms (2 times) realtime
+  Wake lock #10064 *vibrator*: 1s 763ms (4 times) realtime
+  Wake lock #10029 hangouts_rtcs: 1s 653ms (2 times) realtime
+  Wake lock #10010 GCM_CONN: 1s 630ms (34 times) realtime
+  Wake lock #10066 AlarmManager: 1s 597ms (12 times) realtime
+  Wake lock #1000 SyncLoopWakeLock: 1s 538ms (151 times) realtime
+  Wake lock #10045 *sync*_com.google.android.apps.plus.content.EsProvider_Account {name=shankari@berkeley.edu, type=com.google}: 1s 265ms (5 times) realtime
+  Wake lock #10006 ScheduleNextAlarmWakeLock: 992ms (2 times) realtime
+  Wake lock #10010 Event Log Service: 991ms (11 times) realtime
+  Wake lock #10010 ContextManagerWakeLock: 831ms (6 times) realtime
+  Wake lock #1000 show keyguard: 764ms (4 times) realtime
+  Wake lock #10010 *sync*_com.google.android.gms.fitness_Account {name=tamtom2000@gmail.com, type=com.google}: 700ms (5 times) realtime
+  Wake lock #10036 StartingAlertService: 637ms (4 times) realtime
+  Wake lock #10064 AlarmManager: 634ms (68 times) realtime
+  Wake lock #10010 *sync*_com.google.android.gms.fitness_Account {name=shankari@berkeley.edu, type=com.google}: 608ms (5 times) realtime
+  Wake lock #10019 AlarmManager: 483ms (1 times) realtime
+  Wake lock #10010 GOOGLE_C2DM: 477ms (18 times) realtime
+  Wake lock #10067 AlarmManager: 417ms (1 times) realtime
+  Wake lock #10037 com.google.android.music.playback.DevicePlayback.mAsyncWakeLock: 415ms (4 times) realtime
+  Wake lock #1000 ActivityManager-Sleep: 404ms (5 times) realtime
+  Wake lock #10010 GmsDownloadService: 404ms (1 times) realtime
+  Wake lock #10066 RTMStartingAlertService: 386ms (1 times) realtime
+  Wake lock #10012 AlarmManager: 336ms (19 times) realtime
+  Wake lock #1000 SyncManagerHandleSyncAlarm: 327ms (34 times) realtime
+  Wake lock #10037 wake:com.google.android.music/.leanback.AutoCacheSchedulingService: 230ms (4 times) realtime
+  Wake lock #10010 Event Log Handoff: 198ms (11 times) realtime
+  Wake lock #10064 AlarmService#updateNtp: 193ms (3 times) realtime
+  Wake lock #10064 AlarmService#dailyCron: 167ms (1 times) realtime
+  Wake lock #10029 AlarmManager: 162ms (2 times) realtime
+  Wake lock #10010 UlrDispSvcFastWL: 112ms (2 times) realtime
+  Wake lock #10019 wake:com.google.android.keep/.notification.AlertService: 109ms (1 times) realtime
+  Wake lock #10010 GCM_LIB: 85ms (8 times) realtime
+  Wake lock #1000 WifiSuspend: 84ms (8 times) realtime
+  Wake lock #10010 NetworkLocationLocator: 66ms (1 times) realtime
+  Wake lock #10010 GCM_HB_ALARM: 52ms (16 times) realtime
+  Wake lock #10034 AlarmManager: 38ms (3 times) realtime
+  Wake lock #10050 RingtonePlayer: 32ms (1 times) realtime
+  Wake lock #10064 GCoreFlp: 30ms (3 times) realtime
+  Wake lock #10010 wake:com.google.android.gms/.reminders.notification.NotificationService: 24ms (1 times) realtime
+  Wake lock #10010 WakefulIntentService[NotificationService]: 19ms (1 times) realtime
+  Wake lock #1000 keyguardWakeAndHandOff: 18ms (6 times) realtime
+  Wake lock #10006 AlarmManager: 16ms (2 times) realtime
+  Wake lock #1000 GpsLocationProvider: 8ms (6 times) realtime
+  Wake lock #10010 GTALK_IDLE_ALARM: 7ms (4 times) realtime
+  Wake lock #10010 NetworkLocationCallbackRunner: 3ms (1 times) realtime
+
+  #0:
+    Network: 5.21MB received, 211.85KB sent
+    Proc twl6030-irq:
+      CPU: 0ms usr + 400ms krn
+    Proc irq/379-rtc0:
+      CPU: 0ms usr + 360ms krn
+    Proc /init:
+      CPU: 2s 420ms usr + 11s 600ms krn
+    Proc ksoftirqd/0:
+      CPU: 0ms usr + 160ms krn
+    Proc dhd_cfg80211_ev:
+      CPU: 0ms usr + 1s 230ms krn
+    Proc irq/206-mms_ts:
+      CPU: 0ms usr + 220ms krn
+    Proc vold:
+      CPU: 640ms usr + 1s 150ms krn
+    Proc file-storage:
+      CPU: 0ms usr + 200ms krn
+    Proc kworker/u:4:
+      CPU: 0ms usr + 12s 260ms krn
+    Proc kworker/u:3:
+      CPU: 0ms usr + 8s 920ms krn
+    Proc kworker/u:5:
+      CPU: 0ms usr + 10s 700ms krn
+    Proc cfinteractive:
+      CPU: 0ms usr + 15s 570ms krn
+    Proc kthreadd:
+      CPU: 0ms usr + 3s 520ms krn
+    Proc netd:
+      CPU: 630ms usr + 1s 780ms krn
+    Proc mmcqd/0:
+      CPU: 0ms usr + 19s 640ms krn
+    Proc kworker/u:0:
+      CPU: 0ms usr + 8s 960ms krn
+    Proc kworker/0:0:
+      CPU: 10ms usr + 16s 990ms krn
+    Proc kworker/0:1:
+      CPU: 20ms usr + 5s 520ms krn
+    Proc kworker/0:2:
+      CPU: 0ms usr + 10s 560ms krn
+    Proc kworker/u:2:
+      CPU: 0ms usr + 1s 360ms krn
+    Proc kworker/u:1:
+      CPU: 0ms usr + 7s 640ms krn
+    Proc bdi-default:
+      CPU: 0ms usr + 210ms krn
+    Proc zygote:
+      CPU: 800ms usr + 1s 40ms krn
+    Proc debuggerd:
+      CPU: 10ms usr + 350ms krn
+    Proc kworker/1:2:
+      CPU: 0ms usr + 20ms krn
+    Proc flush-179:0:
+      CPU: 0ms usr + 1s 690ms krn
+    Proc kworker/1:1:
+      CPU: 30ms usr + 0ms krn
+    Proc flush-0:20:
+      CPU: 0ms usr + 60ms krn
+    Proc irq/131-ABE:
+      CPU: 0ms usr + 20ms krn
+    Proc ueventd:
+      CPU: 360ms usr + 840ms krn
+    Proc khubd:
+      CPU: 0ms usr + 10s 480ms krn
+    Proc jbd2/mmcblk0p12:
+      CPU: 0ms usr + 4s 750ms krn
+    Proc dhd_watchdog:
+      CPU: 0ms usr + 1s 790ms krn
+    Proc mmcqd/0boot0:
+      CPU: 20ms usr + 0ms krn
+    Proc mmcqd/0boot1:
+      CPU: 50ms usr + 0ms krn
+    Proc kswapd0:
+      CPU: 0ms usr + 1s 840ms krn
+    Proc jbd2/mmcblk0p11:
+      CPU: 0ms usr + 10ms krn
+    Proc sync_supers:
+      CPU: 0ms usr + 70ms krn
+    Proc dhd_dpc:
+      CPU: 0ms usr + 22s 500ms krn
+  #1000:
+    Network: 3.31MB received, 278.73KB sent
+    User activity: 76 other, 1 button, 47 touch
+    Wake lock GpsLocationProvider: 8ms partial (6 times) realtime
+    Wake lock SyncManagerHandleSyncAlarm: 327ms partial (34 times) realtime
+    Wake lock WifiSuspend: 84ms partial (8 times) realtime
+    Wake lock show keyguard: 764ms partial (4 times) realtime
+    Wake lock NetworkStats: 2s 606ms partial (34 times) realtime
+    Wake lock LocationManagerService: 2s 505ms partial (463 times) realtime
+    Wake lock ActivityManager-Launch: 2s 973ms partial (7 times) realtime
+    Wake lock *backup*: 4s 194ms partial (18 times) realtime
+    Wake lock keyguardWakeAndHandOff: 18ms partial (6 times) realtime
+    Wake lock AlarmManager: 32s 389ms partial (724 times) realtime
+    Wake lock ActivityManager-Sleep: 404ms partial (5 times) realtime
+    Wake lock SyncLoopWakeLock: 1s 538ms partial (151 times) realtime
+    TOTAL wake: 47s 810ms partial realtime
+    Sensor 4097: 1m 3s 327ms realtime (1 times)
+    Sensor 1: 2m 0s 301ms realtime (8 times)
+    Sensor 4096: 2m 31s 953ms realtime (8 times)
+    Vibrator: 220ms realtime (22 times)
+    Proc surfaceflinger:
+      CPU: 7s 320ms usr + 16s 560ms krn
+    Proc servicemanager:
+      CPU: 260ms usr + 2s 200ms krn
+    Apk android:
+      395 wakeup alarms
+  #1001:
+    User activity: 2 other
+    Wake lock PhoneApp: 8s 675ms full (2 times), 59s 973ms partial (2 times) realtime
+    Wake lock GsmConnection: 3s 966ms partial (1 times) realtime
+    Wake lock RILJ: 4s 767ms partial (886 times) realtime
+    TOTAL wake: 8s 675ms full, 1m 8s 706ms partial realtime
+    Sensor 1: 31s 724ms realtime (1 times)
+    Vibrator: 4s 0ms realtime (4 times)
+    Proc *wakelock*:
+      CPU: 440ms usr + 230ms krn
+    Proc rild:
+      CPU: 470ms usr + 1s 520ms krn
+  #1010:
+    Proc wpa_supplicant:
+      CPU: 1s 350ms usr + 3s 140ms krn
+  #1012:
+    Proc installd:
+      CPU: 0ms usr + 200ms krn
+  #1013:
+    Wake lock AudioOut_3: 5s 951ms partial (5 times) realtime
+    Wake lock AudioOut_2: 1m 14s 163ms partial (21 times) realtime
+    TOTAL wake: 1m 20s 114ms partial realtime
+    Proc *wakelock*:
+      CPU: 4s 890ms usr + 2s 860ms krn
+    Proc mediaserver:
+      CPU: 5s 910ms usr + 7s 700ms krn
+  #1014:
+    Proc dhcpcd:
+      CPU: 0ms usr + 1s 110ms krn
+  #1017:
+    Proc keystore:
+      CPU: 420ms usr + 390ms krn
+  #1019:
+    Proc drmserver:
+      CPU: 0ms usr + 1s 210ms krn
+  #1023:
+    Proc sdcard:
+      CPU: 70ms usr + 1s 860ms krn
+  #1026:
+    Proc tf_daemon:
+      CPU: 0ms usr + 210ms krn
+  #1027:
+    Wake lock NfcService:mRoutingWakeLock: 3s 456ms partial (19 times) realtime
+    Proc *wakelock*:
+      CPU: 1s 20ms usr + 470ms krn
+  #2000:
+    Proc adbd:
+      CPU: 70ms usr + 740ms krn
+  #10000:
+    Proc com.android.contacts:
+      CPU: 10ms usr + 40ms krn
+      1 proc starts
+    Apk com.android.contacts:
+      Service com.android.contacts.ViewNotificationService:
+        Created for: 695ms  uptime
+        Starts: 1, launches: 1
+  #10002:
+    (nothing executed)
+  #10003:
+    (nothing executed)
+  #10005:
+    Network: 15.32KB received, 11.46KB sent
+    Wake lock *sync*_com.android.calendar_Account {name=shankari@berkeley.edu, type=com.google}: 6s 789ms partial (5 times) realtime
+    Wake lock StartingAlertService: 17s 983ms partial (4 times) realtime
+    TOTAL wake: 24s 772ms partial realtime
+    Proc *wakelock*:
+      CPU: 910ms usr + 460ms krn
+    Proc com.google.android.calendar:
+      CPU: 470ms usr + 600ms krn
+      2 proc starts
+    Apk com.google.android.calendar:
+      Service com.android.calendar.alerts.AlertService:
+        Created for: 21s 177ms  uptime
+        Starts: 4, launches: 4
+      Service com.google.android.syncadapters.calendar.CalendarSyncAdapterService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 5
+  #10006:
+    Wake lock AlarmManager: 16ms partial (2 times) realtime
+    Wake lock ScheduleNextAlarmWakeLock: 992ms partial (2 times) realtime
+    TOTAL wake: 1s 8ms partial realtime
+    Proc com.android.providers.calendar:
+      CPU: 1s 80ms usr + 250ms krn
+      2 proc starts
+    Apk com.android.providers.calendar:
+      2 wakeup alarms
+      Service com.android.providers.calendar.CalendarProviderIntentService:
+        Created for: 1s 256ms  uptime
+        Starts: 2, launches: 2
+      Service com.android.providers.calendar.EmptyService:
+        Created for: 1m 1s 222ms  uptime
+        Starts: 3, launches: 3
+  #10010:
+    Network: 164.74KB received, 108.06KB sent
+    Wifi Running: 0ms (0.0%)
+    Full Wifi Lock: 14m 38s 812ms (4.5%)
+    Wifi Scan: 15m 33s 672ms (4.8%)
+    Wake lock UlrDispSvcFastWL: 112ms partial (2 times) realtime
+    Wake lock NlpWakeLock: 13m 40s 757ms partial (1745 times) realtime
+    Wake lock GCM_LIB: 85ms partial (8 times) realtime
+    Wake lock Wakeful StateMachine: GeofencerStateMachine: 7s 708ms partial (1049 times) realtime
+    Wake lock NetworkLocationCallbackRunner: 3ms partial (1 times) realtime
+    Wake lock Event Log Handoff: 198ms partial (11 times) realtime
+    Wake lock AlarmManager: 11s 45ms partial (770 times) realtime
+    Wake lock wake:com.google.android.gms/.reminders.notification.NotificationService: 24ms partial (1 times) realtime
+    Wake lock LocationManagerService: 11s 978ms partial (523 times) realtime
+    Wake lock *net_scheduler*: 20s 994ms partial (47 times) realtime
+    Wake lock NetworkLocationLocator: 66ms partial (1 times) realtime
+    Wake lock Icing: 4s 591ms partial (19 times) realtime
+    Wake lock WakefulIntentService[NotificationService]: 19ms partial (1 times) realtime
+    Wake lock *sync*_com.google.android.gms.fitness_Account {name=shankari@berkeley.edu, type=com.google}: 608ms partial (5 times) realtime
+    Wake lock GCoreFlp: 20s 767ms partial (5933 times) realtime
+    Wake lock GmsDownloadService: 404ms partial (1 times) realtime
+    Wake lock NlpCollectorWakeLock: 5m 26s 28ms partial (197 times) realtime
+    Wake lock ContextManagerWakeLock: 831ms partial (6 times) realtime
+    Wake lock GOOGLE_C2DM: 477ms partial (18 times) realtime
+    Wake lock *sync*_com.google.android.gms.fitness_Account {name=tamtom2000@gmail.com, type=com.google}: 700ms partial (5 times) realtime
+    Wake lock GCM_HB_ALARM: 52ms partial (16 times) realtime
+    Wake lock Event Log Service: 991ms partial (11 times) realtime
+    Wake lock GCM_CONN: 1s 630ms partial (34 times) realtime
+    Wake lock GTALK_IDLE_ALARM: 7ms partial (4 times) realtime
+    TOTAL wake: 20m 30s 75ms partial realtime
+    Sensor 0: 25s 824ms realtime (1 times)
+    Sensor 1: 4m 58s 816ms realtime (189 times)
+    Sensor 2: 25s 869ms realtime (1 times)
+    Sensor 4098: 25s 695ms realtime (1 times)
+    Sensor GPS: 5h 24m 4s 35ms realtime (0 times)
+    Proc *wakelock*:
+      CPU: 52s 230ms usr + 38s 920ms krn
+    Apk com.google.android.location:
+      1 wakeup alarms
+    Apk com.google.android.gsf:
+      4 wakeup alarms
+      Service com.google.android.gsf.subscribedfeeds.GCMIntentService:
+        Created for: 180ms  uptime
+        Starts: 8, launches: 8
+    Apk com.google.android.gms:
+      753 wakeup alarms
+      Service com.google.android.gms.auth.be.GoogleAccountDataService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 41
+      Service com.google.android.gms.phenotype.service.PhenotypeIntentService:
+        Created for: 12s 706ms  uptime
+        Starts: 13, launches: 13
+      Service com.google.android.gms.people.service.PeopleRequestProcessor:
+        Created for: 1s 901ms  uptime
+        Starts: 2, launches: 2
+      Service com.google.android.gms.clearcut.service.ClearcutLoggerIntentService:
+        Created for: 14s 95ms  uptime
+        Starts: 21, launches: 21
+      Service com.google.android.gms.reminders.service.RemindersService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 1
+      Service com.google.android.gms.reminders.service.RemindersIntentService:
+        Created for: 583ms  uptime
+        Starts: 1, launches: 1
+      Service com.google.android.gms.phenotype.service.sync.PhenotypeConfigurator:
+        Created for: 232ms  uptime
+        Starts: 1, launches: 1
+      Service com.google.android.gms.phenotype.service.PhenotypeService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 6
+      Service com.google.android.gms.fitness.store.maintenance.StoreMaintenanceService:
+        Created for: 91ms  uptime
+        Starts: 3, launches: 3
+      Service com.google.android.gms.herrevad.services.ProcessReportsService:
+        Created for: 1s 80ms  uptime
+        Starts: 4, launches: 4
+      Service com.google.android.gms.usagereporting.service.UsageReportingService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 12
+      Service com.google.android.gms.checkin.CheckinService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 1
+      Service com.google.android.gms.checkin.EventLogService:
+        Created for: 1s 316ms  uptime
+        Starts: 11, launches: 11
+      Service com.google.android.gms.common.analytics.CoreAnalyticsIntentService:
+        Created for: 1s 847ms  uptime
+        Starts: 1, launches: 1
+      Service com.google.android.gms.herrevad.services.LightweightNetworkQualityService$NetworkQualityWorkerService:
+        Created for: 9s 730ms  uptime
+        Starts: 16, launches: 16
+      Service com.google.android.gms.mdm.services.NetworkQualityAndroidService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 4
+      Service com.google.android.gms.playlog.service.MonitorService:
+        Created for: 16ms  uptime
+        Starts: 1, launches: 1
+      Service com.google.android.gms.common.download.DownloadService:
+        Created for: 456ms  uptime
+        Starts: 1, launches: 1
+      Service com.google.android.location.reporting.service.ReportingAndroidService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 4
+      Service com.google.android.gms.wearable.service.WearableService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 4
+      Service com.google.android.gms.gcm.http.GoogleHttpService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 25
+      Service com.google.android.gms.auth.GetToken:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 25
+      Service com.google.android.gms.reminders.notification.NotificationService:
+        Created for: 100ms  uptime
+        Starts: 1, launches: 1
+      Service com.google.android.gms.ads.identifier.service.AdvertisingIdService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 9
+      Service com.google.android.location.reporting.service.DispatchingService:
+        Created for: 722ms  uptime
+        Starts: 1, launches: 1
+      Service com.google.android.gms.playlog.service.PlayLogIntentService:
+        Created for: 5s 389ms  uptime
+        Starts: 8, launches: 8
+      Service com.google.android.gms.icing.service.IndexService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 7
+      Service com.google.android.gms.analytics.service.AnalyticsService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 5
+      Service com.google.android.gms.fitness.sync.FitnessSyncAdapterService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 10
+      Service com.google.android.gms.icing.service.LightweightIndexService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 7
+      Service com.google.android.gms.herrevad.services.NetworkQualityService$NetworkQualityWorkerService:
+        Created for: 2s 562ms  uptime
+        Starts: 4, launches: 4
+      Service com.google.android.gms.icing.service.IndexWorkerService:
+        Created for: 9s 134ms  uptime
+        Starts: 19, launches: 19
+      Service com.google.android.gms.herrevad.services.LightweightNetworkQualityAndroidService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 9
+      Service com.google.android.gms.config.ConfigService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 4
+      Service com.google.android.gms.herrevad.services.ImmediateProcessReportsService:
+        Created for: 592ms  uptime
+        Starts: 1, launches: 1
+      Service com.google.android.gms.people.service.PeopleService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 2
+      Service com.google.android.gms.pseudonymous.service.PseudonymousIdService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 1
+      Service com.google.android.gms.playlog.uploader.UploaderService:
+        Created for: 25s 639ms  uptime
+        Starts: 5, launches: 5
+      Service com.google.android.gms.icing.service.LightweightIndexService$LightweightWorkerService:
+        Created for: 6s 5ms  uptime
+        Starts: 10, launches: 10
+      Service com.google.android.gms.playlog.service.PlayLogBrokerService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 6
+  #10012:
+    Wake lock AlarmManager: 336ms partial (19 times) realtime
+    Proc com.google.android.deskclock:
+      CPU: 160ms usr + 830ms krn
+      4 proc starts
+    Apk com.google.android.deskclock:
+      Service com.android.alarmclock.DigitalAppWidgetService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 16
+  #10013:
+    Proc android.process.media:
+      CPU: 500ms usr + 930ms krn
+      6 proc starts
+    Apk com.android.providers.downloads:
+      Service com.android.providers.downloads.DownloadService:
+        Created for: 7s 966ms  uptime
+        Starts: 6, launches: 6
+    Apk com.android.providers.media:
+      Service com.android.providers.media.MtpService:
+        Created for: 0ms  uptime
+        Starts: 1, launches: 1
+  #10016:
+    Network: 504B received, 684B sent
+    Apk com.google.android.gallery3d:
+      (nothing executed)
+  #10017:
+    (nothing executed)
+  #10019:
+    Wake lock wake:com.google.android.keep/.notification.AlertService: 109ms partial (1 times) realtime
+    Wake lock AlarmManager: 483ms partial (1 times) realtime
+    TOTAL wake: 592ms partial realtime
+    Proc com.google.android.keep:
+      CPU: 30ms usr + 40ms krn
+      1 proc starts
+    Apk com.google.android.keep:
+      1 wakeup alarms
+      Service com.google.android.keep.service.CleanupService:
+        Created for: 335ms  uptime
+        Starts: 1, launches: 1
+      Service com.google.android.keep.notification.AlertService:
+        Created for: 222ms  uptime
+        Starts: 1, launches: 1
+  #10024:
+    (nothing executed)
+  #10029:
+    Network: 0B received, 72B sent
+    Wake lock hangouts_rtcs: 1s 653ms partial (2 times) realtime
+    Wake lock AlarmManager: 162ms partial (2 times) realtime
+    TOTAL wake: 1s 815ms partial realtime
+    Proc com.google.android.talk:
+      CPU: 1s 420ms usr + 1s 720ms krn
+      5 proc starts
+    Apk com.google.android.talk:
+      2 wakeup alarms
+      Service com.google.android.apps.hangouts.realtimechat.RealTimeChatService:
+        Created for: 1s 891ms  uptime
+        Starts: 2, launches: 2
+      Service com.google.android.apps.hangouts.requestwriter.RequestWriter:
+        Created for: 11s 535ms  uptime
+        Starts: 2, launches: 2
+  #10030:
+    Vibrator: 175ms realtime (35 times)
+    Apk com.google.android.inputmethod.latin:
+      Service com.android.inputmethod.dictionarypack.DictionaryService:
+        Created for: 27ms  uptime
+        Starts: 1, launches: 1
+      Service com.android.inputmethod.latin.spellcheck.AndroidSpellCheckerService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 1
+  #10031:
+    (nothing executed)
+  #10034:
+    Network: 19.44KB received, 9.70KB sent
+    Wake lock AlarmManager: 38ms partial (3 times) realtime
+    Proc com.google.android.apps.maps:
+      CPU: 2s 140ms usr + 1s 430ms krn
+      4 proc starts
+    Apk com.google.android.apps.maps:
+      4 wakeup alarms
+      Service com.google.android.apps.gmm.prefetch.PrefetcherService:
+        Created for: 47s 240ms  uptime
+        Starts: 4, launches: 4
+  #10035:
+    Proc com.google.android.apps.uploader:
+      CPU: 20ms usr + 200ms krn
+      1 proc starts
+  #10036:
+    Wake lock StartingAlertService: 637ms partial (4 times) realtime
+    Apk com.android.mms:
+      Service com.android.mms.transaction.SmsReceiverService:
+        Created for: 1s 248ms  uptime
+        Starts: 4, launches: 4
+  #10037:
+    Wake lock com.google.android.music.playback.DevicePlayback.mAsyncWakeLock: 415ms partial (4 times) realtime
+    Wake lock wake:com.google.android.music/.leanback.AutoCacheSchedulingService: 230ms partial (4 times) realtime
+    TOTAL wake: 645ms partial realtime
+    Proc com.google.android.music:main:
+      CPU: 1s 110ms usr + 3s 190ms krn
+      4 proc starts
+    Apk com.google.android.music:
+      Service com.google.android.music.download.cache.TrackCacheService:
+        Created for: 2s 128ms  uptime
+        Starts: 4, launches: 4
+      Service com.google.android.music.wear.WearMetadataSyncService:
+        Created for: 152ms  uptime
+        Starts: 4, launches: 4
+      Service com.google.android.music.download.cache.StorageMigrationService:
+        Created for: 2s 555ms  uptime
+        Starts: 4, launches: 4
+      Service com.google.android.music.download.TrackDownloadQueueService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 4
+      Service com.google.android.music.preferences.MusicPreferenceService$MusicPreferenceServiceBinder:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 4
+      Service com.google.android.music.leanback.AutoCacheSchedulingService:
+        Created for: 382ms  uptime
+        Starts: 4, launches: 4
+      Service com.google.android.music.download.cache.ArtCacheService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 4
+      Service com.google.android.music.download.ArtDownloadQueueService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 4
+      Service com.google.android.music.net.NetworkMonitor:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 4
+      Service com.google.android.music.download.artwork.ArtDownloadService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 4
+  #10039:
+    Wake lock *sync*_com.google.android.apps.magazines_Account {name=tamtom2000@gmail.com, type=com.google}: 2s 285ms partial (2 times) realtime
+    Proc com.google.android.apps.magazines:
+      CPU: 90ms usr + 140ms krn
+      2 proc starts
+    Apk com.google.android.apps.magazines:
+      Service com.google.apps.dots.android.newsstand.service.SyncAdapterService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 2
+  #10040:
+    Wake lock *backup*: 3s 464ms partial (5 times) realtime
+    Proc com.google.android.googlequicksearchbox:
+      CPU: 40ms usr + 360ms krn
+      5 proc starts
+    Apk com.google.android.googlequicksearchbox:
+      (nothing executed)
+  #10044:
+    Network: 145.09KB received, 22.40KB sent
+    Proc com.android.vending:
+      CPU: 1s 840ms usr + 1s 400ms krn
+      3 proc starts
+    Apk com.android.vending:
+      Service com.google.android.finsky.services.RestoreService:
+        Created for: 1s 154ms  uptime
+        Starts: 3, launches: 3
+      Service com.google.android.finsky.billing.iab.InAppBillingService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 1
+  #10045:
+    Network: 11.66KB received, 8.74KB sent
+    Wake lock *sync*_com.google.android.apps.plus.content.EsProvider_Account {name=shankari@berkeley.edu, type=com.google}: 1s 265ms partial (5 times) realtime
+    Wake lock *sync*_com.google.android.apps.plus.content.EsProvider_Account {name=tamtom2000@gmail.com, type=com.google}: 11s 3ms partial (5 times) realtime
+    TOTAL wake: 12s 268ms partial realtime
+    Proc *wakelock*:
+      CPU: 550ms usr + 300ms krn
+    Proc com.google.android.apps.plus:
+      CPU: 1s 160ms usr + 840ms krn
+      5 proc starts
+    Apk com.google.android.apps.plus:
+      Service com.google.android.apps.plus.service.EsSyncAdapterService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 10
+  #10050:
+    Wake lock RingtonePlayer: 32ms partial (1 times) realtime
+  #10056:
+    Network: 24.65KB received, 16.06KB sent
+    Wake lock GmailProviderProviderChangedBroadcastWakeLock: 2s 286ms partial (3 times) realtime
+    Wake lock *sync*_gmail-ls_Account {name=shankari@berkeley.edu, type=com.google}: 14s 762ms partial (6 times) realtime
+    TOTAL wake: 17s 48ms partial realtime
+    Proc *wakelock*:
+      CPU: 2s 680ms usr + 1s 20ms krn
+    Proc com.google.android.gm:
+      CPU: 4s 300ms usr + 1s 390ms krn
+      2 proc starts
+    Apk com.google.android.gm:
+      Service com.google.android.gm.EmailMigrationService:
+        Created for: 294ms  uptime
+        Starts: 2, launches: 2
+      Service com.android.mail.widget.BaseGmailWidgetProviderService:
+        Created for: 188ms  uptime
+        Starts: 12, launches: 12
+      Service com.google.android.gm.GmailIntentService:
+        Created for: 3s 401ms  uptime
+        Starts: 5, launches: 5
+      Service com.google.android.gm.provider.MailSyncAdapterService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 6
+  #10060:
+    Apk com.google.android.youtube:
+      Service com.google.android.apps.youtube.app.offline.transfer.OfflineTransferService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 1
+  #10062:
+    (nothing executed)
+  #10064:
+    Network: 82.30KB received, 78.72KB sent
+    Wake lock AlarmService#dailyCron: 167ms partial (1 times) realtime
+    Wake lock sendinactive: 22s 115ms partial (8 times) realtime
+    Wake lock GCoreFlp: 30ms partial (3 times) realtime
+    Wake lock Web Client: 3m 17s 113ms partial (9 times) realtime
+    Wake lock *vibrator*: 1s 763ms partial (4 times) realtime
+    Wake lock wake:com.whatsapp/.AlarmService: 12s 197ms partial (7 times) realtime
+    Wake lock AlarmService#updateNtp: 193ms partial (3 times) realtime
+    Wake lock AlarmManager: 634ms partial (68 times) realtime
+    TOTAL wake: 3m 54s 212ms partial realtime
+    Vibrator: 2s 800ms realtime (8 times)
+    Proc *wakelock*:
+      CPU: 3s 820ms usr + 2s 220ms krn
+    Proc com.whatsapp:
+      CPU: 16s 860ms usr + 8s 780ms krn
+      1 proc starts
+    Apk com.whatsapp:
+      63 wakeup alarms
+      Service com.whatsapp.AlarmService:
+        Created for: 17s 2ms  uptime
+        Starts: 7, launches: 7
+      Service com.whatsapp.memory.dump.MemoryDumpUploadService:
+        Created for: 1s 186ms  uptime
+        Starts: 1, launches: 1
+      Service com.whatsapp.c2dm.C2DMRegistrar:
+        Created for: 285ms  uptime
+        Starts: 12, launches: 12
+  #10066:
+    Network: 9.10KB received, 9.57KB sent
+    Wake lock RTMStartingAlertService: 386ms partial (1 times) realtime
+    Wake lock AlarmManager: 1s 597ms partial (12 times) realtime
+    TOTAL wake: 1s 983ms partial realtime
+    Proc com.rememberthemilk.MobileRTM:
+      CPU: 400ms usr + 720ms krn
+      9 proc starts
+    Apk com.rememberthemilk.MobileRTM:
+      1 wakeup alarms
+      Service com.rememberthemilk.MobileRTM.Services.RTMSyncService:
+        Created for: 5s 688ms  uptime
+        Starts: 11, launches: 11
+      Service com.rememberthemilk.MobileRTM.Services.RTMAlertService:
+        Created for: 770ms  uptime
+        Starts: 1, launches: 1
+  #10067:
+    Wake lock AlarmManager: 417ms partial (1 times) realtime
+    Proc com.popularapp.periodcalendar:
+      CPU: 40ms usr + 30ms krn
+      1 proc starts
+    Apk com.popularapp.periodcalendar:
+      1 wakeup alarms
+      Service com.popularapp.periodcalendar.service.NotificationPeriodService:
+        Created for: 26ms  uptime
+        Starts: 1, launches: 1
+      Service com.popularapp.periodcalendar.service.WidgetService:
+        Created for: 172ms  uptime
+        Starts: 1, launches: 1
+      Service com.popularapp.periodcalendar.service.NotificationPillService:
+        Created for: 136ms  uptime
+        Starts: 1, launches: 1
+  #10069:
+    Network: 7.42MB received, 116.51KB sent
+    Wake lock *sync*_edu.berkeley.eecs.e_mission.provider_Account {name=dummy_account, type=eecs.berkeley.edu}: 51s 587ms partial (2 times) realtime
+    Proc *wakelock*:
+      CPU: 15s 220ms usr + 2s 270ms krn
+    Proc edu.berkeley.eecs.e_mission:
+      CPU: 20ms usr + 240ms krn
+      2 proc starts
+    Proc edu.berkeley.eecs.e_mission:sync:
+      CPU: 18s 930ms usr + 1s 120ms krn
+      2 proc starts
+    Apk edu.berkeley.eecs.e_mission:
+      Service edu.berkeley.eecs.e_mission.data_sync.SyncService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 2
+  #10070:
+    Network: 33.31MB received, 1.33MB sent
+    Wake lock GCoreFlp: 8s 1ms partial (1395 times) realtime
+    Wake lock *sync*_edu.berkeley.eecs.cfc_tracker.provider_Account {name=dummy_account, type=openbms.org}: 5m 49s 312ms partial (9 times) realtime
+    TOTAL wake: 5m 57s 313ms partial realtime
+    Proc *wakelock*:
+      CPU: 53s 250ms usr + 17s 610ms krn
+    Proc edu.berkeley.eecs.cfc_tracker:sync:
+      CPU: 1m 10s 520ms usr + 6s 490ms krn
+      8 proc starts
+    Apk edu.berkeley.eecs.cfc_tracker:
+      Service edu.berkeley.eecs.cfc_tracker.smap.SyncService:
+        Created for: 0ms  uptime
+        Starts: 0, launches: 9
+      Service edu.berkeley.eecs.cfc_tracker.location.ActivityRecognitionChangeIntentService:
+        Created for: 1m 25s 838ms  uptime
+        Starts: 168, launches: 168
+      Service edu.berkeley.eecs.cfc_tracker.location.LocationChangeIntentService:
+        Created for: 6m 1s 445ms  uptime
+        Starts: 815, launches: 815

@@ -1,0 +1,867 @@
+5,0,i,uid,1000,com.android.inputdevices
+5,0,i,uid,1000,android
+5,0,i,uid,1000,com.android.settings
+5,0,i,uid,1000,com.android.keychain
+5,0,i,uid,1000,com.android.location.fused
+5,0,i,uid,1000,com.android.providers.settings
+5,0,i,uid,1000,com.google.android.backup
+5,0,i,uid,1001,com.android.phone
+5,0,i,uid,1001,com.android.stk
+5,0,i,uid,1001,com.android.providers.telephony
+5,0,i,uid,1027,com.android.nfc
+5,0,i,uid,2000,com.android.shell
+5,0,i,uid,10000,com.android.contacts
+5,0,i,uid,10000,com.android.providers.userdictionary
+5,0,i,uid,10000,com.android.providers.contacts
+5,0,i,uid,10000,com.android.providers.applications
+5,0,i,uid,10002,com.google.android.apps.books
+5,0,i,uid,10003,com.google.android.browser
+5,0,i,uid,10005,com.google.android.calendar
+5,0,i,uid,10006,com.android.providers.calendar
+5,0,i,uid,10008,com.google.android.exchange
+5,0,i,uid,10010,com.google.android.location
+5,0,i,uid,10010,com.google.android.gsf.login
+5,0,i,uid,10010,com.google.android.gms
+5,0,i,uid,10010,com.google.android.syncadapters.bookmarks
+5,0,i,uid,10010,com.google.android.gsf
+5,0,i,uid,10010,com.google.android.syncadapters.contacts
+5,0,i,uid,10012,com.google.android.deskclock
+5,0,i,uid,10013,com.android.providers.downloads.ui
+5,0,i,uid,10013,com.android.providers.media
+5,0,i,uid,10013,com.android.providers.drm
+5,0,i,uid,10013,com.android.providers.downloads
+5,0,i,uid,10016,com.google.android.gallery3d
+5,0,i,uid,10017,com.google.android.apps.genie.geniewidget
+5,0,i,uid,10019,com.google.android.keep
+5,0,i,uid,10020,com.google.earth
+5,0,i,uid,10022,com.google.android.partnersetup
+5,0,i,uid,10024,com.google.android.ears
+5,0,i,uid,10029,com.google.android.talk
+5,0,i,uid,10030,com.google.android.inputmethod.latin
+5,0,i,uid,10034,com.google.android.apps.maps
+5,0,i,uid,10035,com.google.android.apps.uploader
+5,0,i,uid,10036,com.android.mms
+5,0,i,uid,10037,com.google.android.music
+5,0,i,uid,10039,com.google.android.apps.magazines
+5,0,i,uid,10040,com.google.android.googlequicksearchbox
+5,0,i,uid,10044,com.android.vending
+5,0,i,uid,10045,com.google.android.apps.plus
+5,0,i,uid,10055,com.google.android.videos
+5,0,i,uid,10056,com.google.android.gm
+5,0,i,uid,10060,com.google.android.youtube
+5,0,i,uid,10062,com.google.android.configupdater
+5,0,i,uid,10064,com.whatsapp
+5,0,i,uid,10066,com.rememberthemilk.MobileRTM
+5,0,i,uid,10067,com.popularapp.periodcalendar
+5,0,i,uid,10069,edu.berkeley.eecs.e_mission
+5,0,t,bt,0,21373489,21373488,3783974944,2843808324
+5,0,t,m,30971,0,21373489,21373489,0,16722105,1006393,0,562659554,0
+5,0,t,br,30971,0,0,0,0
+5,0,t,sgt,0,1411225,19962263,0,0
+5,0,t,sst,0
+5,0,t,sgc,0,38,40,1,0
+5,0,t,dct,21373489,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+5,0,t,dcc,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+5,0,t,dc,7,8,0,8
+5,0,t,kwl,"event5-7376",0,0
+5,0,t,kwl,"wlan_wd_wake",88551,5469
+5,0,t,kwl,"wlan_ctrl_wake",4776,2
+5,0,t,kwl,"alarm",2745,585
+5,0,t,kwl,"event2-7376",0,0
+5,0,t,kwl,"alarm_rtc",0,0
+5,0,t,kwl,"secril_fmt-interface",411,1406
+5,0,t,kwl,"gps-lock",0,0
+5,0,t,kwl,"secril_rfs-interface",0,0
+5,0,t,kwl,"KeyEvents",104,714
+5,0,t,kwl,"tf_driver",0,0
+5,0,t,kwl,"PowerManagerService.WakeLocks",21373485,0
+5,0,t,kwl,"vbus-tuna_otg",112854,1
+5,0,t,kwl,"BTLowPower",0,0
+5,0,t,kwl,"musb_autosuspend_wake_lock",0,0
+5,0,t,kwl,"sec_jack_det",0,0
+5,0,t,kwl,"nfc",0,0
+5,0,t,kwl,"suspend_backoff",0,0
+5,0,t,kwl,"serial-debug",0,0
+5,0,t,kwl,"unknown_wakeups",0,0
+5,0,t,kwl,"PowerManagerService.Display",31060,1
+5,0,t,kwl,"pogo",0,0
+5,0,t,kwl,"mmc0_detect",0,0
+5,0,t,kwl,"wlan_wake",13897,11049
+5,0,t,kwl,"PowerManagerService.Broadcasts",2623,2
+5,0,t,kwl,"client-interface",0,0
+5,0,t,kwl,"power-supply",13,9
+5,0,t,kwl,"wlan_rx_wake",0,0
+5,0,t,kwl,"radio-interface",52336,52
+5,0,t,kwl,"mmc1_detect",0,0
+5,0,t,kwl,"twl6030 adc",5774,2081
+5,0,t,kwl,"deleted_wake_locks",0,0
+5,0,t,kwl,"max17040-battery",8911,411
+5,0,t,kwl,"main",31518,1
+5,0,t,kwl,"gpio_input",0,0
+5,0,t,kwl,"prx_wake_lock",0,0
+5,0,t,kwl,"event1-7376",0,0
+5,0,t,kwl,"sii9234(mhl)",0,0
+5,0,t,kwl,"vibrator",0,0
+5,0,t,kwl,"mipi_link",265625,528
+5,0,t,kwl,"dofstrim",0,0
+5,0,t,nt,155834,38428
+5,0,t,pr,ksoftirqd/0,0,30,0
+5,0,t,pr,ksoftirqd/1,0,40,0
+5,0,t,pr,vold,10,10,0
+5,0,t,pr,kworker/u:5,0,20,0
+5,0,t,pr,cfinteractive,0,3650,0
+5,0,t,pr,kthreadd,0,10,0
+5,0,t,pr,netd,70,250,0
+5,0,t,pr,mmcqd/0,0,16660,0
+5,0,t,pr,kworker/u:0,0,130,0
+5,0,t,pr,kworker/0:0,0,460,0
+5,0,t,pr,kworker/0:1,0,2690,0
+5,0,t,pr,kworker/0:2,0,610,0
+5,0,t,pr,kworker/u:2,0,340,0
+5,0,t,pr,kworker/u:1,10,170,0
+5,0,t,pr,bdi-default,0,10,0
+5,0,t,pr,zygote,1230,1480,0
+5,0,t,pr,kworker/1:1,20,1500,0
+5,0,t,pr,flush-179:0,20,320,0
+5,0,t,pr,ueventd,10,0,0
+5,0,t,pr,jbd2/mmcblk0p12,0,850,0
+5,0,t,pr,dhd_watchdog,0,380,0
+5,0,t,pr,fsnotify_mark,10,0,0
+5,0,t,pr,kswapd0,0,3290,0
+5,0,t,pr,sync_supers,0,150,0
+5,0,t,pr,dhd_dpc,0,4530,0
+5,1000,t,nt,25093,16919
+5,0,t,ua,8,0,0
+5,1000,t,wl,SyncManagerHandleSyncAlarm,0,f,0,173,p,27,0,w,0
+5,1000,t,wl,WifiSuspend,0,f,0,49,p,1,0,w,0
+5,1000,t,wl,NetworkStats,0,f,0,1416,p,18,0,w,0
+5,1000,t,wl,*backup*,0,f,0,4934,p,20,0,w,0
+5,1000,t,wl,AlarmManager,0,f,0,35261,p,402,0,w,0
+5,1000,t,wl,SyncLoopWakeLock,0,f,0,3614,p,306,0,w,0
+5,1000,t,sr,4096,30235,1
+5,1000,t,sr,1,30315,1
+5,1000,t,pr,surfaceflinger,1700,7630,0
+5,1000,t,pr,servicemanager,90,140,0
+5,1001,t,wl,RILJ,0,f,0,1391,p,141,0,w,0
+5,1001,t,pr,rild,230,560,0
+5,1010,t,pr,wpa_supplicant,150,660,0
+5,1013,t,wl,AudioOut_3,0,f,0,12611,p,11,0,w,0
+5,1013,t,wl,AudioOut_2,0,f,0,12606,p,11,0,w,0
+5,1013,t,pr,mediaserver,160,240,0
+5,1023,t,pr,sdcard,90,2300,0
+5,1027,t,wl,NfcService:mRoutingWakeLock,0,f,0,6,p,2,0,w,0
+5,2000,t,pr,adbd,0,60,0
+5,10000,t,pr,android.process.acore,1830,960,16
+5,10002,t,nt,21416,11598
+5,10002,t,wl,*sync*_com.google.android.apps.books_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,2051,p,1,0,w,0
+5,10002,t,wl,*sync*_com.google.android.apps.books_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,1316,p,1,0,w,0
+5,10002,t,pr,com.google.android.apps.books,880,310,2
+5,10002,t,apk,0,com.google.android.apps.books,com.google.android.apps.books.service.SyncService,0,0,2
+5,10003,t,pr,com.google.android.browser,0,0,2
+5,10005,t,nt,74189,48332
+5,10005,t,wl,*sync*_com.android.calendar_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,6754,p,6,0,w,0
+5,10005,t,wl,*sync*_com.android.calendar_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,11611,p,11,0,w,0
+5,10005,t,wl,StartingAlertService,0,f,0,43012,p,8,0,w,0
+5,10005,t,pr,*wakelock*,8950,4930,0
+5,10005,t,pr,com.google.android.calendar,3520,2010,7
+5,10005,t,apk,0,com.google.android.calendar,com.google.android.syncadapters.calendar.CalendarSyncAdapterService,0,0,17
+5,10005,t,apk,0,com.google.android.calendar,com.android.calendar.alerts.AlertService,101455,8,8
+5,10006,t,wl,AlarmManager,0,f,0,24,p,3,0,w,0
+5,10006,t,wl,ScheduleNextAlarmWakeLock,0,f,0,1685,p,3,0,w,0
+5,10006,t,pr,com.android.providers.calendar,3100,440,15
+5,10006,t,apk,3,com.android.providers.calendar,com.android.providers.calendar.CalendarProviderIntentService,2209,3,3
+5,10006,t,apk,3,com.android.providers.calendar,com.android.providers.calendar.EmptyService,109281,17,18
+5,10010,t,nt,211045,146918
+5,10010,t,wfl,10814000,2934000,0
+5,10010,t,wl,UlrDispSvcFastWL,0,f,0,2747,p,8,0,w,0
+5,10010,t,wl,*sync*_com.android.contacts_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,898,p,1,0,w,0
+5,10010,t,wl,*sync*_com.google.android.gms.plus.action_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,59,p,1,0,w,0
+5,10010,t,wl,*sync*_com.google.android.gms.auth.confirm_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,184,p,1,0,w,0
+5,10010,t,wl,*sync*_com.android.browser_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,227,p,1,0,w,0
+5,10010,t,wl,Wakeful StateMachine: GeofencerStateMachine,0,f,0,19,p,4,0,w,0
+5,10010,t,wl,NetworkLocationCallbackRunner,0,f,0,12,p,1,0,w,0
+5,10010,t,wl,*sync*_com.google.android.gms.auth.api.credentials_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,166,p,1,0,w,0
+5,10010,t,wl,*sync*_com.google.android.gms.auth.api.credentials_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,135,p,1,0,w,0
+5,10010,t,wl,wake:com.google.android.gms/.udc.service.UdcCleanupService,0,f,0,278,p,1,0,w,0
+5,10010,t,wl,*sync*_com.google.android.gms.appstate_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,97,p,1,0,w,0
+5,10010,t,wl,wake:com.google.android.gms/.auth.api.accountstatus.AccountsChangedService,0,f,0,1,p,1,0,w,0
+5,10010,t,wl,*sync*_com.google.android.gms.reminders_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,193,p,1,0,w,0
+5,10010,t,wl,*net_scheduler*,0,f,0,33244,p,48,0,w,0
+5,10010,t,wl,wake:com.google.android.gms/com.google.android.libraries.social.account.refresh.receiver.AccountsChangedService,0,f,0,50,p,1,0,w,0
+5,10010,t,wl,GCoreFlp,0,f,0,95,p,19,0,w,0
+5,10010,t,wl,*sync*_com.google.android.gms.drive.sync_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,97,p,1,0,w,0
+5,10010,t,wl,*sync*_subscribedfeeds_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,984,p,1,0,w,0
+5,10010,t,wl,GOOGLE_C2DM,0,f,0,2346,p,19,0,w,0
+5,10010,t,wl,Event Log Service,0,f,0,1025,p,12,0,w,0
+5,10010,t,wl,GTALK_IDLE_ALARM,0,f,0,0,p,1,0,w,0
+5,10010,t,wl,*sync*_com.google.android.gms.drive.sync_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,395,p,1,0,w,0
+5,10010,t,wl,wake:com.google.android.gms/.lockbox.LockboxAccountsChangedService,0,f,0,14,p,1,0,w,0
+5,10010,t,wl,NlpWakeLock,0,f,0,2482,p,5,0,w,0
+5,10010,t,wl,GCM_LIB,0,f,0,316,p,19,0,w,0
+5,10010,t,wl,*sync*_com.google.android.gms.plus.action_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,283,p,1,0,w,0
+5,10010,t,wl,MetadataSyncService,0,f,0,1732,p,2,0,w,0
+5,10010,t,wl,wake:com.google.android.gms/.auth.be.change.LoginAccountsChangedIntentService,0,f,0,187,p,1,0,w,0
+5,10010,t,wl,*sync*_com.google.android.gms.games_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,75,p,1,0,w,0
+5,10010,t,wl,*sync*_com.google.android.gms.games.background_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,81,p,1,0,w,0
+5,10010,t,wl,*sync*_com.android.contacts_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,2154,p,1,0,w,0
+5,10010,t,wl,*sync*_com.google.android.location.reporting_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,1019,p,1,0,w,0
+5,10010,t,wl,Event Log Handoff,0,f,0,101,p,12,0,w,0
+5,10010,t,wl,AlarmManager,0,f,0,2646,p,59,0,w,0
+5,10010,t,wl,*sync*_com.google.android.gms.reminders_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,339,p,1,0,w,0
+5,10010,t,wl,*sync*_com.android.browser_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,290,p,1,0,w,0
+5,10010,t,wl,*sync*_com.google.android.location.reporting_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,1085,p,1,0,w,0
+5,10010,t,wl,*sync*_subscribedfeeds_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,1198,p,1,0,w,0
+5,10010,t,wl,Icing,0,f,0,20646,p,70,0,w,0
+5,10010,t,wl,*sync*_com.google.android.gms.games.background_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,53,p,1,0,w,0
+5,10010,t,wl,*sync*_com.google.android.gms.auth.confirm_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,287,p,1,0,w,0
+5,10010,t,wl,*sync*_com.google.android.gms.appstate_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,320,p,1,0,w,0
+5,10010,t,wl,*sync*_com.google.android.gms.people_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,1927,p,1,0,w,0
+5,10010,t,wl,*sync*_com.google.android.gms.fitness_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,470,p,6,0,w,0
+5,10010,t,wl,NlpCollectorWakeLock,0,f,0,498,p,2,0,w,0
+5,10010,t,wl,ContextManagerWakeLock,0,f,0,667,p,9,0,w,0
+5,10010,t,wl,GCM_HB_ALARM,0,f,0,72,p,21,0,w,0
+5,10010,t,wl,*sync*_com.google.android.gms.fitness_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,580,p,6,0,w,0
+5,10010,t,wl,*sync*_com.google.android.gms.people_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,4653,p,1,0,w,0
+5,10010,t,wl,GCM_CONN,0,f,0,1742,p,41,0,w,0
+5,10010,t,pr,*wakelock*,2070,630,0
+5,10010,t,pr,com.google.android.gms,6660,2120,1
+5,10010,t,apk,1,com.google.android.gsf,com.google.android.gsf.subscribedfeeds.GCMIntentService,879,19,19
+5,10010,t,apk,0,com.google.android.syncadapters.contacts,com.google.android.syncadapters.contacts.ContactsSyncAdapterService,0,0,2
+5,10010,t,apk,0,com.google.android.syncadapters.bookmarks,com.google.android.syncadapters.bookmarks.BookmarksSyncAdapterService,0,0,2
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.lockbox.LockboxService,197,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.app.service.AccountBroadcastService,85,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.deviceconnection.service.DeviceConnectionAsyncService,542,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.ads.social.GcmSchedulerWakeupService,5611,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.auth.be.appcert.AppCertService,0,0,16
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.auth.be.account.AccountStatusChecker$InitializeService,51,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.security.snet.SnetService,422,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.clearcut.service.ClearcutLoggerIntentService,18783,21,21
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.auth.CredentialStateSyncService,0,0,2
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.reminders.service.RemindersService,0,0,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.phenotype.service.sync.PhenotypeConfigurator,387,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.location.geofencer.service.GeofenceProviderService,0,0,2
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.reminders.service.RemindersIntentService,661,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.lockbox.LockboxAccountsChangedService,114,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.usagereporting.service.UsageReportingService,0,0,13
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.checkin.EventLogService,1235,12,12
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.auth.api.credentials.sync.CredentialSyncService,0,0,2
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.herrevad.services.LightweightNetworkQualityService$NetworkQualityWorkerService,19868,26,26
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.mdm.services.NetworkQualityAndroidService,0,0,11
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.common.account.AccountNameUpdateIntentService,734,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.init.InitializeIntentService,180,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.udc.cache.CacheBootstrapService,1003,2,2
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.gcm.http.GoogleHttpService,0,0,19
+5,10010,t,apk,57,com.google.android.gms,com.google.android.location.fused.FusedLocationService,0,0,2
+5,10010,t,apk,57,com.google.android.gms,com.google.android.location.reporting.service.ReportingSyncService,0,0,2
+5,10010,t,apk,57,com.google.android.gms,com.google.android.location.reporting.service.DispatchingService,18280,4,4
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.playlog.service.PlayLogIntentService,5024,6,6
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.udc.service.UdcCleanupService,2041,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.config.ConfigService,0,0,2
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.herrevad.services.ImmediateProcessReportsService,2263,3,3
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.appstate.service.AppStateSyncService,0,0,2
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.fitness.disconnect.FitCleanupService,130,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.playlog.service.PlayLogBrokerService,0,0,12
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.drive.api.ApiService,0,0,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.auth.be.GoogleAccountDataService,0,0,80
+5,10010,t,apk,57,com.google.android.gms,com.google.android.location.geocode.GeocodeService,0,0,2
+5,10010,t,apk,57,com.google.android.gms,com.google.android.libraries.social.account.refresh.receiver.AccountsChangedService,392,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.games.chimera.GamesSyncServiceNotificationProxy,0,0,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.plus.service.OfflineActionSyncAdapterService,0,0,2
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.phenotype.service.PhenotypeIntentService,12377,16,16
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.signin.service.SignInAsyncService,2472,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.app.service.PackageBroadcastService,72,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.people.service.PeopleRequestProcessor,19241,12,12
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.auth.api.accountstatus.AccountsChangedService,12,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.subscribedfeeds.SyncService,0,0,2
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.phenotype.service.PhenotypeService,0,0,7
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.fitness.store.maintenance.StoreMaintenanceService,118,3,3
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.ads.jams.NegotiationService,613,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.herrevad.services.ProcessReportsService,332,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.drive.api.DriveAsyncService,2239,2,2
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.people.sync.PeopleSyncService,0,0,2
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.checkin.CheckinService,0,0,5
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.people.service.bg.PeopleBackgroundTasks,534,2,2
+5,10010,t,apk,57,com.google.android.gms,com.google.android.location.reporting.service.ReportingAndroidService,0,0,10
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.wearable.service.WearableService,0,0,13
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.drive.metadata.sync.syncadapter.MetadataSyncService,0,0,2
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.analytics.internal.PlayLogReportingService,110,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.reminders.sync.RemindersSyncService,0,0,2
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.auth.GetToken,0,0,24
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.ads.identifier.service.AdvertisingIdService,0,0,36
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.games.chimera.GamesSyncServiceMainProxy,0,0,2
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.auth.be.change.LoginAccountsChangedIntentService,1425,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.auth.crypto.ChannelBindingStateService,12,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.wearable.service.WearableControlService,58,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.icing.service.IndexService,0,0,29
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.analytics.service.AnalyticsService,0,0,12
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.fitness.sync.FitnessSyncAdapterService,0,0,12
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.drive.metadata.sync.syncadapter.SyncAdapterService,0,0,2
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.icing.service.LightweightIndexService,0,0,30
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.signin.service.SignInBrokerService,0,0,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.herrevad.services.NetworkQualityService$NetworkQualityWorkerService,8999,11,11
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.icing.service.IndexWorkerService,30353,70,70
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.herrevad.services.LightweightNetworkQualityAndroidService,0,0,20
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.gcm.gmsproc.GcmReceiverService,2718,1,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.people.service.PeopleService,0,0,7
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.pseudonymous.service.PseudonymousIdService,0,0,1
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.playlog.uploader.UploaderService,29332,6,6
+5,10010,t,apk,57,com.google.android.gms,com.google.android.gms.icing.service.LightweightIndexService$LightweightWorkerService,19724,32,32
+5,10012,t,wl,AlarmManager,0,f,0,30,p,22,0,w,0
+5,10012,t,pr,com.google.android.deskclock,0,0,1
+5,10012,t,apk,0,com.google.android.deskclock,com.android.alarmclock.DigitalAppWidgetService,0,0,1
+5,10013,t,nt,0,124
+5,10013,t,wl,DownloadManager,0,f,0,2073,p,1,0,w,0
+5,10013,t,pr,android.process.media,220,60,21
+5,10013,t,apk,0,com.android.providers.downloads,com.android.providers.downloads.DownloadService,38081,22,22
+5,10013,t,apk,0,com.android.providers.media,com.android.providers.media.MtpService,0,1,1
+5,10016,t,nt,1475378,117280
+5,10016,t,wl,*sync*_com.google.android.gallery3d.GooglePhotoProvider_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,1728,p,3,0,w,0
+5,10016,t,wl,*sync*_com.google.android.gallery3d.GooglePhotoProvider_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,11116,p,3,0,w,0
+5,10016,t,pr,*wakelock*,450,360,0
+5,10016,t,pr,com.google.android.gallery3d,170,70,7
+5,10016,t,apk,0,com.google.android.gallery3d,com.google.android.picasasync.PicasaSyncService,0,0,6
+5,10016,t,apk,0,com.google.android.gallery3d,com.android.gallery3d.app.PackagesMonitor$AsyncService,159,1,1
+5,10017,t,nt,278911,15465
+5,10017,t,wl,*sync*_com.google.android.apps.genie.geniewidget_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,601,p,1,0,w,0
+5,10017,t,wl,*sync*_com.google.android.apps.genie.geniewidget_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,7295,p,2,0,w,0
+5,10017,t,pr,com.google.android.apps.genie.geniewidget,1490,320,3
+5,10017,t,apk,0,com.google.android.apps.genie.geniewidget,com.google.android.apps.genie.geniewidget.sync.SyncAdapterService,0,0,3
+5,10019,t,nt,5576,2196
+5,10019,t,wl,*sync*_com.google.android.keep_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,0,p,-1,0,w,0
+5,10019,t,wl,*sync*_com.google.android.keep_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,1665,p,1,0,w,0
+5,10019,t,pr,com.google.android.keep,210,80,1
+5,10019,t,apk,0,com.google.android.keep,com.google.android.keep.service.CleanupService,386,1,1
+5,10019,t,apk,0,com.google.android.keep,com.google.android.keep.syncadapter.KeepSyncAdapterService,0,0,1
+5,10022,t,pr,com.google.android.partnersetup,0,0,3
+5,10024,t,nt,7490,3975
+5,10024,t,wl,*sync*_com.google.android.ears.heard.EarsContentProvider_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,932,p,2,0,w,0
+5,10024,t,pr,com.google.android.ears,0,0,2
+5,10024,t,apk,0,com.google.android.ears,com.google.android.ears.heard.EarsSyncAdapterService,0,0,2
+5,10029,t,wl,hangouts_rtcs,0,f,0,830,p,1,0,w,0
+5,10029,t,wl,wake:com.google.android.talk/com.google.android.libraries.social.account.refresh.receiver.AccountsChangedService,0,f,0,0,p,0,0,w,0
+5,10029,t,wl,wake:com.google.android.talk/com.google.android.apps.hangouts.service.LoginManagerAccountRefreshService,0,f,0,0,p,0,0,w,0
+5,10029,t,pr,com.google.android.talk,2610,360,11
+5,10029,t,apk,0,com.google.android.talk,com.google.android.apps.hangouts.realtimechat.RealTimeChatService,1115,1,1
+5,10029,t,apk,0,com.google.android.talk,com.google.android.apps.hangouts.requestwriter.RequestWriter,5829,1,1
+5,10030,t,wl,*sync*_com.android.inputmethod.latin.provider_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,105,p,1,0,w,0
+5,10030,t,apk,0,com.google.android.inputmethod.latin,com.android.inputmethod.latin.sync.BeanstalkAdapterService,0,0,1
+5,10034,t,nt,18567,7760
+5,10034,t,wl,AlarmManager,0,f,0,25,p,4,0,w,0
+5,10034,t,pr,com.google.android.apps.maps,2250,1040,5
+5,10034,t,apk,4,com.google.android.apps.maps,com.google.android.apps.gmm.prefetch.PrefetcherService,46578,4,4
+5,10035,t,pr,com.google.android.apps.uploader,0,0,1
+5,10037,t,nt,28595,13193
+5,10037,t,wl,com.google.android.music.playback.DevicePlayback.mAsyncWakeLock,0,f,0,845,p,11,0,w,0
+5,10037,t,wl,wake:com.google.android.music/.leanback.AutoCacheSchedulingService,0,f,0,622,p,12,0,w,0
+5,10037,t,wl,*sync*_com.google.android.music.MusicContent_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,2047,p,1,0,w,0
+5,10037,t,pr,com.google.android.music:main,730,210,11
+5,10037,t,apk,0,com.google.android.music,com.google.android.music.download.cache.TrackCacheService,5709,11,11
+5,10037,t,apk,0,com.google.android.music,com.google.android.music.download.cache.StorageMigrationService,6022,11,11
+5,10037,t,apk,0,com.google.android.music,com.google.android.music.download.TrackDownloadQueueService,0,0,11
+5,10037,t,apk,0,com.google.android.music,com.google.android.music.download.keepon.KeeponSchedulingService,341,1,1
+5,10037,t,apk,0,com.google.android.music,com.google.android.music.download.cache.ArtCacheService,0,0,11
+5,10037,t,apk,0,com.google.android.music,com.google.android.music.net.NetworkMonitor,0,0,11
+5,10037,t,apk,0,com.google.android.music,com.google.android.music.sync.SyncAdapterService,0,0,1
+5,10037,t,apk,0,com.google.android.music,com.google.android.music.download.artwork.ArtDownloadService,0,0,11
+5,10037,t,apk,0,com.google.android.music,com.google.android.music.wear.WearMetadataSyncService,1209,13,13
+5,10037,t,apk,0,com.google.android.music,com.google.android.music.preferences.MusicPreferenceService$MusicPreferenceServiceBinder,0,0,11
+5,10037,t,apk,0,com.google.android.music,com.google.android.music.leanback.AutoCacheSchedulingService,1078,12,12
+5,10037,t,apk,0,com.google.android.music,com.google.android.music.download.ArtDownloadQueueService,0,0,11
+5,10037,t,apk,0,com.google.android.music,com.google.android.music.store.KeepOnUpdater$SyncListener,40,1,1
+5,10039,t,wl,*sync*_com.google.android.apps.magazines_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,837,p,1,0,w,0
+5,10039,t,wl,*sync*_com.google.android.apps.magazines_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,2489,p,3,0,w,0
+5,10039,t,wl,BackgroundTaskService,0,f,0,106,p,1,0,w,0
+5,10039,t,pr,com.google.android.apps.magazines,80,0,5
+5,10039,t,apk,0,com.google.android.apps.magazines,com.google.android.libraries.social.async.BackgroundTaskService,5959,1,1
+5,10039,t,apk,0,com.google.android.apps.magazines,com.google.apps.dots.android.newsstand.service.SyncAdapterService,0,0,4
+5,10040,t,nt,10106,6818
+5,10040,t,wl,*backup*,0,f,0,2012,p,5,0,w,0
+5,10040,t,wl,AlarmManager,0,f,0,2,p,2,0,w,0
+5,10040,t,wl,wake:com.google.android.googlequicksearchbox/com.google.android.sidekick.main.AccountsChangedService,0,f,0,267,p,1,0,w,0
+5,10040,t,pr,com.google.android.googlequicksearchbox:search,1080,230,3
+5,10040,t,pr,com.google.android.googlequicksearchbox,20,0,5
+5,10040,t,apk,0,com.google.android.googlequicksearchbox,com.google.android.sidekick.main.AccountsChangedService,1628,1,1
+5,10040,t,apk,0,com.google.android.googlequicksearchbox,com.google.android.apps.gsa.search.core.icingsync.UpdateIcingCorporaService,4383,4,4
+5,10040,t,apk,0,com.google.android.googlequicksearchbox,com.google.android.velvet.VelvetBackgroundTasksImpl$Service,5665,1,1
+5,10044,t,nt,292100,47886
+5,10044,t,pr,com.android.vending,2370,510,16
+5,10044,t,apk,2,com.android.vending,com.google.android.finsky.services.ContentSyncService,3945,2,2
+5,10044,t,apk,2,com.android.vending,com.google.android.finsky.services.RestoreService,4795,17,17
+5,10044,t,apk,2,com.android.vending,com.google.android.finsky.billing.iab.InAppBillingService,0,0,6
+5,10044,t,apk,2,com.android.vending,com.google.android.finsky.services.ContentFiltersService,0,0,5
+5,10044,t,apk,2,com.android.vending,com.google.android.finsky.services.DailyHygiene,6816,1,1
+5,10045,t,nt,51213,35355
+5,10045,t,wl,wake:com.google.android.apps.plus/com.google.android.libraries.social.account.refresh.receiver.AccountsChangedService,0,f,0,95,p,1,0,w,0
+5,10045,t,wl,*sync*_com.google.android.apps.plus.content.EsProvider_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,12034,p,7,0,w,0
+5,10045,t,wl,*sync*_com.google.android.apps.plus.iu.EsGoogleIuProvider_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,644,p,2,0,w,0
+5,10045,t,wl,*sync*_com.google.android.apps.photos.GooglePhotoDownsyncProvider_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,6374,p,1,0,w,0
+5,10045,t,wl,wake:com.google.android.apps.plus/.service.PhotosAppTransitionService,0,f,0,49,p,1,0,w,0
+5,10045,t,wl,*sync*_com.google.android.apps.plus.content.EsProvider_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,4586,p,6,0,w,0
+5,10045,t,wl,*sync*_com.google.android.apps.plus.iu.EsGoogleIuProvider_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,1479,p,2,0,w,0
+5,10045,t,wl,AsyncService,0,f,0,13,p,1,0,w,0
+5,10045,t,wl,*sync*_com.google.android.apps.photos.GooglePhotoDownsyncProvider_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,86,p,1,0,w,0
+5,10045,t,pr,*wakelock*,2410,1460,0
+5,10045,t,pr,com.google.android.apps.plus,3990,1040,12
+5,10045,t,apk,0,com.google.android.apps.plus,com.google.android.apps.plus.service.PhotosAppTransitionService,59,1,1
+5,10045,t,apk,0,com.google.android.apps.plus,com.google.android.libraries.social.account.refresh.receiver.AccountsChangedService,482,1,1
+5,10045,t,apk,0,com.google.android.apps.plus,com.google.android.libraries.social.autobackup.AutoBackupSyncService,0,0,4
+5,10045,t,apk,0,com.google.android.apps.plus,com.google.android.apps.photos.service.GooglePhotoDownsyncService,0,0,2
+5,10045,t,apk,0,com.google.android.apps.plus,com.google.android.apps.plus.service.PackagesMediaMonitor$AsyncService,40,1,1
+5,10045,t,apk,0,com.google.android.apps.plus,com.google.android.apps.plus.service.EsSyncAdapterService,0,0,13
+5,10055,t,wl,*sync*_com.google.android.videos.sync_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,1128,p,1,0,w,0
+5,10055,t,wl,*sync*_com.google.android.videos.sync_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,460,p,1,0,w,0
+5,10055,t,pr,com.google.android.videos,0,0,3
+5,10055,t,apk,0,com.google.android.videos,com.google.android.videos.service.accounts.AccountsChangedService,3070,1,1
+5,10055,t,apk,0,com.google.android.videos,com.google.android.videos.service.pinning.TransferService,4798,3,3
+5,10055,t,apk,0,com.google.android.videos,com.google.android.videos.store.SyncService,0,0,2
+5,10056,t,nt,54656,50889
+5,10056,t,wl,*sync*_gmail-ls_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,5581,p,1,0,w,0
+5,10056,t,wl,GmailProviderProviderChangedBroadcastWakeLock,0,f,0,6159,p,5,0,w,0
+5,10056,t,wl,*sync*_gmail-ls_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,34156,p,15,0,w,0
+5,10056,t,pr,*wakelock*,1980,850,0
+5,10056,t,pr,com.google.android.gm,15620,3170,4
+5,10056,t,apk,0,com.google.android.gm,com.google.android.gm.EmailMigrationService,660,4,4
+5,10056,t,apk,0,com.google.android.gm,com.google.android.gm.provider.MailSyncAdapterService,0,0,16
+5,10056,t,apk,0,com.google.android.gm,com.android.mail.widget.BaseGmailWidgetProviderService,835,37,37
+5,10056,t,apk,0,com.google.android.gm,com.android.email.service.EmailBroadcastProcessorService,670,1,1
+5,10056,t,apk,0,com.google.android.gm,com.google.android.gm.GmailIntentService,31068,11,11
+5,10060,t,nt,20537,9861
+5,10060,t,wl,*net_scheduler*,0,f,0,4838,p,2,0,w,0
+5,10060,t,wl,kli,0,f,0,97,p,6,0,w,0
+5,10060,t,wl,wake:com.google.android.youtube/com.google.android.libraries.youtube.account.AccountsChangedService,0,f,0,47,p,1,0,w,0
+5,10060,t,pr,com.google.android.youtube,280,130,1
+5,10060,t,apk,0,com.google.android.youtube,com.google.android.apps.youtube.app.offline.transfer.OfflineTransferService,554,2,2
+5,10060,t,apk,0,com.google.android.youtube,com.google.android.libraries.youtube.account.AccountsChangedService,359,1,1
+5,10060,t,apk,0,com.google.android.youtube,com.google.android.libraries.youtube.common.gcore.gcoreclient.gcm.impl.GcmTaskServiceDelegator,5091,2,2
+5,10064,t,nt,10058,15206
+5,10064,t,wl,AlarmService#dailyCron,0,f,0,29,p,1,0,w,0
+5,10064,t,wl,wake:com.whatsapp/.AlarmService,0,f,0,25752,p,13,0,w,0
+5,10064,t,wl,*sync*_com.android.contacts_Account {name=WhatsApp, type=com.whatsapp},0,f,0,161,p,1,0,w,0
+5,10064,t,wl,backupdb,0,f,0,7529,p,1,0,w,0
+5,10064,t,wl,AlarmService#dailyCron#mediaCleanup,0,f,0,1222,p,1,0,w,0
+5,10064,t,wl,AlarmService#updateNtp,0,f,0,1264,p,13,0,w,0
+5,10064,t,wl,AlarmManager,0,f,0,1494,p,33,0,w,0
+5,10064,t,pr,com.whatsapp,10860,4070,6
+5,10064,t,apk,22,com.whatsapp,com.whatsapp.AlarmService,39894,16,16
+5,10064,t,apk,22,com.whatsapp,com.whatsapp.accountsync.ContactsSyncAdapterService,0,0,1
+5,10064,t,apk,22,com.whatsapp,com.whatsapp.c2dm.C2DMRegistrar,241,6,6
+5,10064,t,apk,22,com.whatsapp,com.whatsapp.memory.dump.MemoryDumpUploadService,5948,6,6
+5,10066,t,nt,12061,13658
+5,10066,t,wl,RTMStartingSyncService,0,f,0,1159,p,1,0,w,0
+5,10066,t,wl,AlarmManager,0,f,0,1631,p,13,0,w,0
+5,10066,t,pr,com.rememberthemilk.MobileRTM,340,110,7
+5,10066,t,apk,0,com.rememberthemilk.MobileRTM,com.rememberthemilk.MobileRTM.Services.RTMSyncService,8073,13,13
+5,10067,t,wl,AlarmManager,0,f,0,330,p,1,0,w,0
+5,10067,t,pr,com.popularapp.periodcalendar,0,10,1
+5,10069,t,nt,13969280,404532
+5,10069,t,wl,*sync*_edu.berkeley.eecs.e_mission.provider_Account {name=dummy_account, type=eecs.berkeley.edu},0,f,0,180954,p,4,0,w,0
+5,10069,t,pr,*wakelock*,35230,8700,0
+5,10069,t,pr,edu.berkeley.eecs.e_mission,0,10,4
+5,10069,t,pr,edu.berkeley.eecs.e_mission:sync,49140,2590,4
+5,10069,t,apk,0,edu.berkeley.eecs.e_mission,edu.berkeley.eecs.e_mission.data_sync.SyncService,0,0,4
+5,0,u,bt,N/A,21373489,21373488,21478506,21478506
+5,0,u,m,30971,0,21373489,21373489,0,16722105,1006393,0,562659554,0
+5,0,u,br,30971,0,0,0,0
+5,0,u,sgt,0,1411225,19962263,0,0
+5,0,u,sst,0
+5,0,u,sgc,0,39,39,1,0
+5,0,u,dct,21373489,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+5,0,u,dcc,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+5,0,u,lv,60,52
+5,0,u,dc,8,8,0,8
+5,0,u,kwl,"event5-7376",0,0
+5,0,u,kwl,"wlan_wd_wake",88551,5469
+5,0,u,kwl,"wlan_ctrl_wake",4776,2
+5,0,u,kwl,"alarm",2745,585
+5,0,u,kwl,"event2-7376",0,0
+5,0,u,kwl,"alarm_rtc",0,0
+5,0,u,kwl,"secril_fmt-interface",411,1406
+5,0,u,kwl,"gps-lock",0,0
+5,0,u,kwl,"secril_rfs-interface",0,0
+5,0,u,kwl,"KeyEvents",104,714
+5,0,u,kwl,"tf_driver",0,0
+5,0,u,kwl,"PowerManagerService.WakeLocks",21373485,0
+5,0,u,kwl,"vbus-tuna_otg",112854,1
+5,0,u,kwl,"BTLowPower",0,0
+5,0,u,kwl,"musb_autosuspend_wake_lock",0,0
+5,0,u,kwl,"sec_jack_det",0,0
+5,0,u,kwl,"nfc",0,0
+5,0,u,kwl,"suspend_backoff",0,0
+5,0,u,kwl,"serial-debug",0,0
+5,0,u,kwl,"unknown_wakeups",0,0
+5,0,u,kwl,"PowerManagerService.Display",31060,1
+5,0,u,kwl,"pogo",0,0
+5,0,u,kwl,"mmc0_detect",0,0
+5,0,u,kwl,"wlan_wake",13897,11049
+5,0,u,kwl,"PowerManagerService.Broadcasts",2623,2
+5,0,u,kwl,"client-interface",0,0
+5,0,u,kwl,"power-supply",13,9
+5,0,u,kwl,"wlan_rx_wake",0,0
+5,0,u,kwl,"radio-interface",52336,52
+5,0,u,kwl,"mmc1_detect",0,0
+5,0,u,kwl,"twl6030 adc",5774,2081
+5,0,u,kwl,"deleted_wake_locks",0,0
+5,0,u,kwl,"max17040-battery",8911,411
+5,0,u,kwl,"main",31518,1
+5,0,u,kwl,"gpio_input",0,0
+5,0,u,kwl,"prx_wake_lock",0,0
+5,0,u,kwl,"event1-7376",0,0
+5,0,u,kwl,"sii9234(mhl)",0,0
+5,0,u,kwl,"vibrator",0,0
+5,0,u,kwl,"mipi_link",265625,528
+5,0,u,kwl,"dofstrim",0,0
+5,0,u,nt,155834,38428
+5,0,u,pr,ksoftirqd/0,0,30,0
+5,0,u,pr,ksoftirqd/1,0,40,0
+5,0,u,pr,vold,10,10,0
+5,0,u,pr,kworker/u:5,0,20,0
+5,0,u,pr,cfinteractive,0,3650,0
+5,0,u,pr,kthreadd,0,10,0
+5,0,u,pr,netd,70,250,0
+5,0,u,pr,mmcqd/0,0,16660,0
+5,0,u,pr,kworker/u:0,0,130,0
+5,0,u,pr,kworker/0:0,0,460,0
+5,0,u,pr,kworker/0:1,0,2690,0
+5,0,u,pr,kworker/0:2,0,610,0
+5,0,u,pr,kworker/u:2,0,340,0
+5,0,u,pr,kworker/u:1,10,170,0
+5,0,u,pr,bdi-default,0,10,0
+5,0,u,pr,zygote,1230,1480,0
+5,0,u,pr,kworker/1:1,20,1500,0
+5,0,u,pr,flush-179:0,20,320,0
+5,0,u,pr,ueventd,10,0,0
+5,0,u,pr,jbd2/mmcblk0p12,0,850,0
+5,0,u,pr,dhd_watchdog,0,380,0
+5,0,u,pr,fsnotify_mark,10,0,0
+5,0,u,pr,kswapd0,0,3290,0
+5,0,u,pr,sync_supers,0,150,0
+5,0,u,pr,dhd_dpc,0,4530,0
+5,1000,u,nt,25093,16919
+5,0,u,ua,8,0,0
+5,1000,u,wl,SyncManagerHandleSyncAlarm,0,f,0,173,p,27,0,w,0
+5,1000,u,wl,WifiSuspend,0,f,0,49,p,1,0,w,0
+5,1000,u,wl,NetworkStats,0,f,0,1416,p,18,0,w,0
+5,1000,u,wl,*backup*,0,f,0,4934,p,20,0,w,0
+5,1000,u,wl,AlarmManager,0,f,0,35261,p,402,0,w,0
+5,1000,u,wl,SyncLoopWakeLock,0,f,0,3614,p,306,0,w,0
+5,1000,u,sr,4096,30235,1
+5,1000,u,sr,1,30315,1
+5,1000,u,pr,surfaceflinger,1700,7630,0
+5,1000,u,pr,servicemanager,90,140,0
+5,1001,u,wl,RILJ,0,f,0,1391,p,141,0,w,0
+5,1001,u,pr,rild,230,560,0
+5,1010,u,pr,wpa_supplicant,150,660,0
+5,1013,u,wl,AudioOut_3,0,f,0,12611,p,11,0,w,0
+5,1013,u,wl,AudioOut_2,0,f,0,12606,p,11,0,w,0
+5,1013,u,pr,mediaserver,160,240,0
+5,1023,u,pr,sdcard,90,2300,0
+5,1027,u,wl,NfcService:mRoutingWakeLock,0,f,0,6,p,2,0,w,0
+5,2000,u,pr,adbd,0,60,0
+5,10000,u,pr,android.process.acore,1830,960,16
+5,10002,u,nt,21416,11598
+5,10002,u,wl,*sync*_com.google.android.apps.books_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,2051,p,1,0,w,0
+5,10002,u,wl,*sync*_com.google.android.apps.books_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,1316,p,1,0,w,0
+5,10002,u,pr,com.google.android.apps.books,880,310,2
+5,10002,u,apk,0,com.google.android.apps.books,com.google.android.apps.books.service.SyncService,0,0,2
+5,10003,u,pr,com.google.android.browser,0,0,2
+5,10005,u,nt,74189,48332
+5,10005,u,wl,*sync*_com.android.calendar_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,6754,p,6,0,w,0
+5,10005,u,wl,*sync*_com.android.calendar_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,11611,p,11,0,w,0
+5,10005,u,wl,StartingAlertService,0,f,0,43012,p,8,0,w,0
+5,10005,u,pr,*wakelock*,8950,4930,0
+5,10005,u,pr,com.google.android.calendar,3520,2010,7
+5,10005,u,apk,0,com.google.android.calendar,com.google.android.syncadapters.calendar.CalendarSyncAdapterService,0,0,17
+5,10005,u,apk,0,com.google.android.calendar,com.android.calendar.alerts.AlertService,101455,8,8
+5,10006,u,wl,AlarmManager,0,f,0,24,p,3,0,w,0
+5,10006,u,wl,ScheduleNextAlarmWakeLock,0,f,0,1685,p,3,0,w,0
+5,10006,u,pr,com.android.providers.calendar,3100,440,15
+5,10006,u,apk,3,com.android.providers.calendar,com.android.providers.calendar.CalendarProviderIntentService,2209,3,3
+5,10006,u,apk,3,com.android.providers.calendar,com.android.providers.calendar.EmptyService,109281,17,18
+5,10010,u,nt,211045,146918
+5,10010,u,wfl,10814000,2934000,0
+5,10010,u,wl,UlrDispSvcFastWL,0,f,0,2747,p,8,0,w,0
+5,10010,u,wl,*sync*_com.android.contacts_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,898,p,0,0,w,0
+5,10010,u,wl,*sync*_com.google.android.gms.plus.action_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,59,p,1,0,w,0
+5,10010,u,wl,*sync*_com.google.android.gms.auth.confirm_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,184,p,1,0,w,0
+5,10010,u,wl,*sync*_com.android.browser_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,227,p,1,0,w,0
+5,10010,u,wl,Wakeful StateMachine: GeofencerStateMachine,0,f,0,19,p,4,0,w,0
+5,10010,u,wl,NetworkLocationCallbackRunner,0,f,0,12,p,1,0,w,0
+5,10010,u,wl,*sync*_com.google.android.gms.auth.api.credentials_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,166,p,1,0,w,0
+5,10010,u,wl,*sync*_com.google.android.gms.auth.api.credentials_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,135,p,1,0,w,0
+5,10010,u,wl,wake:com.google.android.gms/.udc.service.UdcCleanupService,0,f,0,278,p,1,0,w,0
+5,10010,u,wl,*sync*_com.google.android.gms.appstate_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,97,p,1,0,w,0
+5,10010,u,wl,wake:com.google.android.gms/.auth.api.accountstatus.AccountsChangedService,0,f,0,1,p,1,0,w,0
+5,10010,u,wl,*sync*_com.google.android.gms.reminders_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,193,p,1,0,w,0
+5,10010,u,wl,*net_scheduler*,0,f,0,33244,p,48,0,w,0
+5,10010,u,wl,wake:com.google.android.gms/com.google.android.libraries.social.account.refresh.receiver.AccountsChangedService,0,f,0,50,p,1,0,w,0
+5,10010,u,wl,GCoreFlp,0,f,0,95,p,19,0,w,0
+5,10010,u,wl,*sync*_com.google.android.gms.drive.sync_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,97,p,1,0,w,0
+5,10010,u,wl,*sync*_subscribedfeeds_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,984,p,1,0,w,0
+5,10010,u,wl,GOOGLE_C2DM,0,f,0,2346,p,19,0,w,0
+5,10010,u,wl,Event Log Service,0,f,0,1025,p,12,0,w,0
+5,10010,u,wl,GTALK_IDLE_ALARM,0,f,0,0,p,1,0,w,0
+5,10010,u,wl,*sync*_com.google.android.gms.drive.sync_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,395,p,1,0,w,0
+5,10010,u,wl,wake:com.google.android.gms/.lockbox.LockboxAccountsChangedService,0,f,0,14,p,1,0,w,0
+5,10010,u,wl,NlpWakeLock,0,f,0,2482,p,5,0,w,0
+5,10010,u,wl,GCM_LIB,0,f,0,316,p,19,0,w,0
+5,10010,u,wl,*sync*_com.google.android.gms.plus.action_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,283,p,1,0,w,0
+5,10010,u,wl,MetadataSyncService,0,f,0,1732,p,1,0,w,0
+5,10010,u,wl,wake:com.google.android.gms/.auth.be.change.LoginAccountsChangedIntentService,0,f,0,187,p,1,0,w,0
+5,10010,u,wl,*sync*_com.google.android.gms.games_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,75,p,1,0,w,0
+5,10010,u,wl,*sync*_com.google.android.gms.games.background_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,81,p,1,0,w,0
+5,10010,u,wl,*sync*_com.android.contacts_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,2154,p,1,0,w,0
+5,10010,u,wl,*sync*_com.google.android.location.reporting_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,1019,p,1,0,w,0
+5,10010,u,wl,Event Log Handoff,0,f,0,101,p,12,0,w,0
+5,10010,u,wl,AlarmManager,0,f,0,2646,p,59,0,w,0
+5,10010,u,wl,*sync*_com.google.android.gms.reminders_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,339,p,1,0,w,0
+5,10010,u,wl,*sync*_com.android.browser_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,290,p,1,0,w,0
+5,10010,u,wl,*sync*_com.google.android.location.reporting_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,1085,p,1,0,w,0
+5,10010,u,wl,*sync*_subscribedfeeds_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,1198,p,1,0,w,0
+5,10010,u,wl,Icing,0,f,0,20646,p,70,0,w,0
+5,10010,u,wl,*sync*_com.google.android.gms.games.background_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,53,p,1,0,w,0
+5,10010,u,wl,*sync*_com.google.android.gms.auth.confirm_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,287,p,1,0,w,0
+5,10010,u,wl,*sync*_com.google.android.gms.appstate_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,320,p,1,0,w,0
+5,10010,u,wl,*sync*_com.google.android.gms.people_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,1927,p,1,0,w,0
+5,10010,u,wl,*sync*_com.google.android.gms.fitness_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,470,p,6,0,w,0
+5,10010,u,wl,NlpCollectorWakeLock,0,f,0,498,p,2,0,w,0
+5,10010,u,wl,ContextManagerWakeLock,0,f,0,667,p,9,0,w,0
+5,10010,u,wl,GCM_HB_ALARM,0,f,0,72,p,21,0,w,0
+5,10010,u,wl,*sync*_com.google.android.gms.fitness_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,580,p,6,0,w,0
+5,10010,u,wl,*sync*_com.google.android.gms.people_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,4653,p,1,0,w,0
+5,10010,u,wl,GCM_CONN,0,f,0,1742,p,41,0,w,0
+5,10010,u,pr,*wakelock*,2070,630,0
+5,10010,u,pr,com.google.android.gms,6660,2120,1
+5,10010,u,apk,1,com.google.android.gsf,com.google.android.gsf.subscribedfeeds.GCMIntentService,879,19,19
+5,10010,u,apk,0,com.google.android.syncadapters.contacts,com.google.android.syncadapters.contacts.ContactsSyncAdapterService,0,0,1
+5,10010,u,apk,0,com.google.android.syncadapters.bookmarks,com.google.android.syncadapters.bookmarks.BookmarksSyncAdapterService,0,0,2
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.lockbox.LockboxService,197,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.app.service.AccountBroadcastService,85,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.deviceconnection.service.DeviceConnectionAsyncService,542,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.ads.social.GcmSchedulerWakeupService,5611,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.auth.be.appcert.AppCertService,0,0,16
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.auth.be.account.AccountStatusChecker$InitializeService,51,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.security.snet.SnetService,422,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.clearcut.service.ClearcutLoggerIntentService,18783,21,21
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.auth.CredentialStateSyncService,0,0,2
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.reminders.service.RemindersService,0,0,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.phenotype.service.sync.PhenotypeConfigurator,387,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.location.geofencer.service.GeofenceProviderService,0,0,2
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.reminders.service.RemindersIntentService,661,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.lockbox.LockboxAccountsChangedService,114,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.usagereporting.service.UsageReportingService,0,0,13
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.checkin.EventLogService,1235,12,12
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.auth.api.credentials.sync.CredentialSyncService,0,0,2
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.herrevad.services.LightweightNetworkQualityService$NetworkQualityWorkerService,19868,26,26
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.mdm.services.NetworkQualityAndroidService,0,0,11
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.common.account.AccountNameUpdateIntentService,734,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.init.InitializeIntentService,180,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.udc.cache.CacheBootstrapService,1003,2,2
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.gcm.http.GoogleHttpService,0,0,18
+5,10010,u,apk,57,com.google.android.gms,com.google.android.location.fused.FusedLocationService,0,0,2
+5,10010,u,apk,57,com.google.android.gms,com.google.android.location.reporting.service.ReportingSyncService,0,0,2
+5,10010,u,apk,57,com.google.android.gms,com.google.android.location.reporting.service.DispatchingService,18280,4,4
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.playlog.service.PlayLogIntentService,5024,6,6
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.udc.service.UdcCleanupService,2041,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.config.ConfigService,0,0,2
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.herrevad.services.ImmediateProcessReportsService,2263,3,3
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.appstate.service.AppStateSyncService,0,0,2
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.fitness.disconnect.FitCleanupService,130,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.playlog.service.PlayLogBrokerService,0,0,12
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.drive.api.ApiService,0,0,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.auth.be.GoogleAccountDataService,0,0,80
+5,10010,u,apk,57,com.google.android.gms,com.google.android.location.geocode.GeocodeService,0,0,2
+5,10010,u,apk,57,com.google.android.gms,com.google.android.libraries.social.account.refresh.receiver.AccountsChangedService,392,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.games.chimera.GamesSyncServiceNotificationProxy,0,0,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.plus.service.OfflineActionSyncAdapterService,0,0,2
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.phenotype.service.PhenotypeIntentService,12377,16,16
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.signin.service.SignInAsyncService,2472,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.app.service.PackageBroadcastService,72,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.people.service.PeopleRequestProcessor,19241,12,12
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.auth.api.accountstatus.AccountsChangedService,12,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.subscribedfeeds.SyncService,0,0,2
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.phenotype.service.PhenotypeService,0,0,7
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.fitness.store.maintenance.StoreMaintenanceService,118,3,3
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.ads.jams.NegotiationService,613,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.herrevad.services.ProcessReportsService,332,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.drive.api.DriveAsyncService,2239,2,2
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.people.sync.PeopleSyncService,0,0,2
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.checkin.CheckinService,0,0,5
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.people.service.bg.PeopleBackgroundTasks,534,2,2
+5,10010,u,apk,57,com.google.android.gms,com.google.android.location.reporting.service.ReportingAndroidService,0,0,10
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.wearable.service.WearableService,0,0,13
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.drive.metadata.sync.syncadapter.MetadataSyncService,0,0,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.analytics.internal.PlayLogReportingService,110,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.reminders.sync.RemindersSyncService,0,0,2
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.auth.GetToken,0,0,23
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.ads.identifier.service.AdvertisingIdService,0,0,35
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.games.chimera.GamesSyncServiceMainProxy,0,0,2
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.auth.be.change.LoginAccountsChangedIntentService,1425,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.auth.crypto.ChannelBindingStateService,12,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.wearable.service.WearableControlService,58,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.icing.service.IndexService,0,0,29
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.analytics.service.AnalyticsService,0,0,12
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.fitness.sync.FitnessSyncAdapterService,0,0,12
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.drive.metadata.sync.syncadapter.SyncAdapterService,0,0,2
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.icing.service.LightweightIndexService,0,0,29
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.signin.service.SignInBrokerService,0,0,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.herrevad.services.NetworkQualityService$NetworkQualityWorkerService,8999,11,11
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.icing.service.IndexWorkerService,30353,70,70
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.herrevad.services.LightweightNetworkQualityAndroidService,0,0,20
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.gcm.gmsproc.GcmReceiverService,2718,1,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.people.service.PeopleService,0,0,7
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.pseudonymous.service.PseudonymousIdService,0,0,1
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.playlog.uploader.UploaderService,29332,6,6
+5,10010,u,apk,57,com.google.android.gms,com.google.android.gms.icing.service.LightweightIndexService$LightweightWorkerService,19724,31,31
+5,10012,u,wl,AlarmManager,0,f,0,30,p,22,0,w,0
+5,10012,u,pr,com.google.android.deskclock,0,0,1
+5,10012,u,apk,0,com.google.android.deskclock,com.android.alarmclock.DigitalAppWidgetService,0,0,1
+5,10013,u,nt,0,124
+5,10013,u,wl,DownloadManager,0,f,0,2073,p,1,0,w,0
+5,10013,u,pr,android.process.media,220,60,21
+5,10013,u,apk,0,com.android.providers.downloads,com.android.providers.downloads.DownloadService,38081,22,22
+5,10013,u,apk,0,com.android.providers.media,com.android.providers.media.MtpService,0,1,1
+5,10016,u,nt,1475378,117280
+5,10016,u,wl,*sync*_com.google.android.gallery3d.GooglePhotoProvider_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,1728,p,3,0,w,0
+5,10016,u,wl,*sync*_com.google.android.gallery3d.GooglePhotoProvider_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,11116,p,3,0,w,0
+5,10016,u,pr,*wakelock*,450,360,0
+5,10016,u,pr,com.google.android.gallery3d,170,70,7
+5,10016,u,apk,0,com.google.android.gallery3d,com.google.android.picasasync.PicasaSyncService,0,0,6
+5,10016,u,apk,0,com.google.android.gallery3d,com.android.gallery3d.app.PackagesMonitor$AsyncService,159,1,1
+5,10017,u,nt,278911,15465
+5,10017,u,wl,*sync*_com.google.android.apps.genie.geniewidget_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,601,p,1,0,w,0
+5,10017,u,wl,*sync*_com.google.android.apps.genie.geniewidget_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,7295,p,2,0,w,0
+5,10017,u,pr,com.google.android.apps.genie.geniewidget,1490,320,3
+5,10017,u,apk,0,com.google.android.apps.genie.geniewidget,com.google.android.apps.genie.geniewidget.sync.SyncAdapterService,0,0,3
+5,10019,u,nt,5576,2196
+5,10019,u,wl,*sync*_com.google.android.keep_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,0,p,0,0,w,0
+5,10019,u,wl,*sync*_com.google.android.keep_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,1665,p,1,0,w,0
+5,10019,u,pr,com.google.android.keep,210,80,1
+5,10019,u,apk,0,com.google.android.keep,com.google.android.keep.service.CleanupService,386,1,1
+5,10019,u,apk,0,com.google.android.keep,com.google.android.keep.syncadapter.KeepSyncAdapterService,0,0,1
+5,10022,u,pr,com.google.android.partnersetup,0,0,3
+5,10024,u,nt,7490,3975
+5,10024,u,wl,*sync*_com.google.android.ears.heard.EarsContentProvider_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,932,p,2,0,w,0
+5,10024,u,pr,com.google.android.ears,0,0,2
+5,10024,u,apk,0,com.google.android.ears,com.google.android.ears.heard.EarsSyncAdapterService,0,0,2
+5,10029,u,wl,hangouts_rtcs,0,f,0,830,p,1,0,w,0
+5,10029,u,wl,wake:com.google.android.talk/com.google.android.libraries.social.account.refresh.receiver.AccountsChangedService,0,f,0,0,p,0,0,w,0
+5,10029,u,wl,wake:com.google.android.talk/com.google.android.apps.hangouts.service.LoginManagerAccountRefreshService,0,f,0,0,p,0,0,w,0
+5,10029,u,pr,com.google.android.talk,2610,360,11
+5,10029,u,apk,0,com.google.android.talk,com.google.android.apps.hangouts.realtimechat.RealTimeChatService,1115,1,1
+5,10029,u,apk,0,com.google.android.talk,com.google.android.apps.hangouts.requestwriter.RequestWriter,5829,1,1
+5,10030,u,wl,*sync*_com.android.inputmethod.latin.provider_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,105,p,1,0,w,0
+5,10030,u,apk,0,com.google.android.inputmethod.latin,com.android.inputmethod.latin.sync.BeanstalkAdapterService,0,0,1
+5,10034,u,nt,18567,7760
+5,10034,u,wl,AlarmManager,0,f,0,25,p,4,0,w,0
+5,10034,u,pr,com.google.android.apps.maps,2250,1040,5
+5,10034,u,apk,4,com.google.android.apps.maps,com.google.android.apps.gmm.prefetch.PrefetcherService,46578,4,4
+5,10035,u,pr,com.google.android.apps.uploader,0,0,1
+5,10037,u,nt,28595,13193
+5,10037,u,wl,com.google.android.music.playback.DevicePlayback.mAsyncWakeLock,0,f,0,845,p,11,0,w,0
+5,10037,u,wl,wake:com.google.android.music/.leanback.AutoCacheSchedulingService,0,f,0,622,p,12,0,w,0
+5,10037,u,wl,*sync*_com.google.android.music.MusicContent_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,2047,p,1,0,w,0
+5,10037,u,pr,com.google.android.music:main,730,210,11
+5,10037,u,apk,0,com.google.android.music,com.google.android.music.download.cache.TrackCacheService,5709,11,11
+5,10037,u,apk,0,com.google.android.music,com.google.android.music.download.cache.StorageMigrationService,6022,11,11
+5,10037,u,apk,0,com.google.android.music,com.google.android.music.download.TrackDownloadQueueService,0,0,11
+5,10037,u,apk,0,com.google.android.music,com.google.android.music.download.keepon.KeeponSchedulingService,341,1,1
+5,10037,u,apk,0,com.google.android.music,com.google.android.music.download.cache.ArtCacheService,0,0,11
+5,10037,u,apk,0,com.google.android.music,com.google.android.music.net.NetworkMonitor,0,0,11
+5,10037,u,apk,0,com.google.android.music,com.google.android.music.sync.SyncAdapterService,0,0,1
+5,10037,u,apk,0,com.google.android.music,com.google.android.music.download.artwork.ArtDownloadService,0,0,11
+5,10037,u,apk,0,com.google.android.music,com.google.android.music.wear.WearMetadataSyncService,1209,13,13
+5,10037,u,apk,0,com.google.android.music,com.google.android.music.preferences.MusicPreferenceService$MusicPreferenceServiceBinder,0,0,11
+5,10037,u,apk,0,com.google.android.music,com.google.android.music.leanback.AutoCacheSchedulingService,1078,12,12
+5,10037,u,apk,0,com.google.android.music,com.google.android.music.download.ArtDownloadQueueService,0,0,11
+5,10037,u,apk,0,com.google.android.music,com.google.android.music.store.KeepOnUpdater$SyncListener,40,1,1
+5,10039,u,wl,*sync*_com.google.android.apps.magazines_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,837,p,1,0,w,0
+5,10039,u,wl,*sync*_com.google.android.apps.magazines_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,2489,p,3,0,w,0
+5,10039,u,wl,BackgroundTaskService,0,f,0,106,p,1,0,w,0
+5,10039,u,pr,com.google.android.apps.magazines,80,0,5
+5,10039,u,apk,0,com.google.android.apps.magazines,com.google.android.libraries.social.async.BackgroundTaskService,5959,1,1
+5,10039,u,apk,0,com.google.android.apps.magazines,com.google.apps.dots.android.newsstand.service.SyncAdapterService,0,0,4
+5,10040,u,nt,10106,6818
+5,10040,u,wl,*backup*,0,f,0,2012,p,5,0,w,0
+5,10040,u,wl,AlarmManager,0,f,0,2,p,2,0,w,0
+5,10040,u,wl,wake:com.google.android.googlequicksearchbox/com.google.android.sidekick.main.AccountsChangedService,0,f,0,267,p,1,0,w,0
+5,10040,u,pr,com.google.android.googlequicksearchbox:search,1080,230,3
+5,10040,u,pr,com.google.android.googlequicksearchbox,20,0,5
+5,10040,u,apk,0,com.google.android.googlequicksearchbox,com.google.android.sidekick.main.AccountsChangedService,1628,1,1
+5,10040,u,apk,0,com.google.android.googlequicksearchbox,com.google.android.apps.gsa.search.core.icingsync.UpdateIcingCorporaService,4383,4,4
+5,10040,u,apk,0,com.google.android.googlequicksearchbox,com.google.android.velvet.VelvetBackgroundTasksImpl$Service,5665,1,1
+5,10044,u,nt,292100,47886
+5,10044,u,pr,com.android.vending,2370,510,16
+5,10044,u,apk,2,com.android.vending,com.google.android.finsky.services.ContentSyncService,3945,2,2
+5,10044,u,apk,2,com.android.vending,com.google.android.finsky.services.RestoreService,4795,17,17
+5,10044,u,apk,2,com.android.vending,com.google.android.finsky.billing.iab.InAppBillingService,0,0,6
+5,10044,u,apk,2,com.android.vending,com.google.android.finsky.services.ContentFiltersService,0,0,5
+5,10044,u,apk,2,com.android.vending,com.google.android.finsky.services.DailyHygiene,6816,0,0
+5,10045,u,nt,51213,35355
+5,10045,u,wl,wake:com.google.android.apps.plus/com.google.android.libraries.social.account.refresh.receiver.AccountsChangedService,0,f,0,95,p,1,0,w,0
+5,10045,u,wl,*sync*_com.google.android.apps.plus.content.EsProvider_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,12034,p,7,0,w,0
+5,10045,u,wl,*sync*_com.google.android.apps.plus.iu.EsGoogleIuProvider_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,644,p,2,0,w,0
+5,10045,u,wl,*sync*_com.google.android.apps.photos.GooglePhotoDownsyncProvider_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,6374,p,1,0,w,0
+5,10045,u,wl,wake:com.google.android.apps.plus/.service.PhotosAppTransitionService,0,f,0,49,p,1,0,w,0
+5,10045,u,wl,*sync*_com.google.android.apps.plus.content.EsProvider_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,4586,p,6,0,w,0
+5,10045,u,wl,*sync*_com.google.android.apps.plus.iu.EsGoogleIuProvider_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,1479,p,2,0,w,0
+5,10045,u,wl,AsyncService,0,f,0,13,p,1,0,w,0
+5,10045,u,wl,*sync*_com.google.android.apps.photos.GooglePhotoDownsyncProvider_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,86,p,1,0,w,0
+5,10045,u,pr,*wakelock*,2410,1460,0
+5,10045,u,pr,com.google.android.apps.plus,3990,1040,12
+5,10045,u,apk,0,com.google.android.apps.plus,com.google.android.apps.plus.service.PhotosAppTransitionService,59,1,1
+5,10045,u,apk,0,com.google.android.apps.plus,com.google.android.libraries.social.account.refresh.receiver.AccountsChangedService,482,1,1
+5,10045,u,apk,0,com.google.android.apps.plus,com.google.android.libraries.social.autobackup.AutoBackupSyncService,0,0,4
+5,10045,u,apk,0,com.google.android.apps.plus,com.google.android.apps.photos.service.GooglePhotoDownsyncService,0,0,2
+5,10045,u,apk,0,com.google.android.apps.plus,com.google.android.apps.plus.service.PackagesMediaMonitor$AsyncService,40,1,1
+5,10045,u,apk,0,com.google.android.apps.plus,com.google.android.apps.plus.service.EsSyncAdapterService,0,0,13
+5,10055,u,wl,*sync*_com.google.android.videos.sync_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,1128,p,1,0,w,0
+5,10055,u,wl,*sync*_com.google.android.videos.sync_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,460,p,1,0,w,0
+5,10055,u,pr,com.google.android.videos,0,0,3
+5,10055,u,apk,0,com.google.android.videos,com.google.android.videos.service.accounts.AccountsChangedService,3070,1,1
+5,10055,u,apk,0,com.google.android.videos,com.google.android.videos.service.pinning.TransferService,4798,3,3
+5,10055,u,apk,0,com.google.android.videos,com.google.android.videos.store.SyncService,0,0,2
+5,10056,u,nt,54656,50889
+5,10056,u,wl,*sync*_gmail-ls_Account {name=tamtom2000@gmail.com, type=com.google},0,f,0,5581,p,1,0,w,0
+5,10056,u,wl,GmailProviderProviderChangedBroadcastWakeLock,0,f,0,6159,p,5,0,w,0
+5,10056,u,wl,*sync*_gmail-ls_Account {name=shankari@berkeley.edu, type=com.google},0,f,0,34156,p,15,0,w,0
+5,10056,u,pr,*wakelock*,1980,850,0
+5,10056,u,pr,com.google.android.gm,15620,3170,4
+5,10056,u,apk,0,com.google.android.gm,com.google.android.gm.EmailMigrationService,660,4,4
+5,10056,u,apk,0,com.google.android.gm,com.google.android.gm.provider.MailSyncAdapterService,0,0,16
+5,10056,u,apk,0,com.google.android.gm,com.android.mail.widget.BaseGmailWidgetProviderService,835,37,37
+5,10056,u,apk,0,com.google.android.gm,com.android.email.service.EmailBroadcastProcessorService,670,1,1
+5,10056,u,apk,0,com.google.android.gm,com.google.android.gm.GmailIntentService,31068,11,11
+5,10060,u,nt,20537,9861
+5,10060,u,wl,*net_scheduler*,0,f,0,4838,p,2,0,w,0
+5,10060,u,wl,kli,0,f,0,97,p,6,0,w,0
+5,10060,u,wl,wake:com.google.android.youtube/com.google.android.libraries.youtube.account.AccountsChangedService,0,f,0,47,p,1,0,w,0
+5,10060,u,pr,com.google.android.youtube,280,130,1
+5,10060,u,apk,0,com.google.android.youtube,com.google.android.apps.youtube.app.offline.transfer.OfflineTransferService,554,2,1
+5,10060,u,apk,0,com.google.android.youtube,com.google.android.libraries.youtube.account.AccountsChangedService,359,1,1
+5,10060,u,apk,0,com.google.android.youtube,com.google.android.libraries.youtube.common.gcore.gcoreclient.gcm.impl.GcmTaskServiceDelegator,5091,2,2
+5,10064,u,nt,10058,15206
+5,10064,u,wl,AlarmService#dailyCron,0,f,0,29,p,1,0,w,0
+5,10064,u,wl,wake:com.whatsapp/.AlarmService,0,f,0,25752,p,13,0,w,0
+5,10064,u,wl,*sync*_com.android.contacts_Account {name=WhatsApp, type=com.whatsapp},0,f,0,161,p,1,0,w,0
+5,10064,u,wl,backupdb,0,f,0,7529,p,1,0,w,0
+5,10064,u,wl,AlarmService#dailyCron#mediaCleanup,0,f,0,1222,p,1,0,w,0
+5,10064,u,wl,AlarmService#updateNtp,0,f,0,1264,p,13,0,w,0
+5,10064,u,wl,AlarmManager,0,f,0,1494,p,33,0,w,0
+5,10064,u,pr,com.whatsapp,10860,4070,6
+5,10064,u,apk,22,com.whatsapp,com.whatsapp.AlarmService,39894,16,16
+5,10064,u,apk,22,com.whatsapp,com.whatsapp.accountsync.ContactsSyncAdapterService,0,0,1
+5,10064,u,apk,22,com.whatsapp,com.whatsapp.c2dm.C2DMRegistrar,241,6,6
+5,10064,u,apk,22,com.whatsapp,com.whatsapp.memory.dump.MemoryDumpUploadService,5948,6,6
+5,10066,u,nt,12061,13658
+5,10066,u,wl,RTMStartingSyncService,0,f,0,1159,p,1,0,w,0
+5,10066,u,wl,AlarmManager,0,f,0,1631,p,13,0,w,0
+5,10066,u,pr,com.rememberthemilk.MobileRTM,340,110,7
+5,10066,u,apk,0,com.rememberthemilk.MobileRTM,com.rememberthemilk.MobileRTM.Services.RTMSyncService,8073,13,13
+5,10067,u,wl,AlarmManager,0,f,0,330,p,1,0,w,0
+5,10067,u,pr,com.popularapp.periodcalendar,0,10,1
+5,10069,u,nt,13969280,404532
+5,10069,u,wl,*sync*_edu.berkeley.eecs.e_mission.provider_Account {name=dummy_account, type=eecs.berkeley.edu},0,f,0,180954,p,4,0,w,0
+5,10069,u,pr,*wakelock*,35230,8700,0
+5,10069,u,pr,edu.berkeley.eecs.e_mission,0,10,4
+5,10069,u,pr,edu.berkeley.eecs.e_mission:sync,49140,2590,4
+5,10069,u,apk,0,edu.berkeley.eecs.e_mission,edu.berkeley.eecs.e_mission.data_sync.SyncService,0,0,4
