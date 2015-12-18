@@ -23,6 +23,8 @@ transition_map = {
     "T_TRIP_ENDED": et.TransitionType.STOPPED_MOVING,
     "T_FORCE_STOP_TRACKING": et.TransitionType.STOP_TRACKING,
     "T_TRACKING_STOPPED": et.TransitionType.TRACKING_STOPPED,
+    "T_VISIT_STARTED": et.TransitionType.VISIT_STARTED,
+    "T_VISIT_ENDED": et.TransitionType.VISIT_ENDED,
     "T_NOP": et.TransitionType.NOP
 }
 
