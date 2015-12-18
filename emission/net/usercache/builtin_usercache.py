@@ -1,6 +1,7 @@
 # Standard imports
 import logging
 import time
+import pymongo
 
 # Our imports
 import emission.net.usercache.abstract_usercache as ucauc # ucauc = usercache.abstract_usercache
@@ -134,7 +135,11 @@ class BuiltinUserCache(ucauc.UserCache):
         }
         update_result = self.db.update(combo_query, update_read)
         logging.debug("result = %s after updating read timestamp", update_result)
-        retrievedMsgs = list(self.db.find(combo_query))
+        # In the handler, we assume that the messages are processed in order of
+        # the write timestamp, because we use the last_ts_processed to mark the
+        # beginning of the entry for the next query. So let's sort by the
+        # write_ts before returning.
+        retrievedMsgs = list(self.db.find(combo_query).sort("metadata.write_ts", pymongo.ASCENDING))
         logging.debug("Found %d messages in response to query %s" % (len(retrievedMsgs), combo_query))
         return retrievedMsgs
 
