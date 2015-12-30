@@ -38,8 +38,8 @@ def export_result_stats():
 def export_client_stats():
 
 	entries = list(get_client_stats_db_backup().find())
-	fname = "result_stats.csv"
-	headers = ['reported_ts', 'stat', 'reading', 'client_ts', 'client_os_version', 'client_app_version', 'user', '_id']
+	fname = "client_stats.csv"
+	headers = ['reported_ts', 'stat', 'reading', 'ts', 'client_os_version', 'client_app_version', 'user', '_id']
 
 	write_stats(fname, headers, entries)
 

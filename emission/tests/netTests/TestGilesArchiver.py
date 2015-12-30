@@ -11,8 +11,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 class TestArchiver(unittest.TestCase):
   def setUp(self):
-    self.path = '/archiver_test_path'
-    self.archiver = archiver.StatArchiver(self.path)
+    self.archiver = archiver.StatArchiver('test')
 
   def tearDown(self):
     self.archiver.remove()
@@ -37,8 +36,9 @@ class TestArchiver(unittest.TestCase):
         'ts': 1417725167,
         'stat': 'POST /tripManager/getUnclassifiedSections'
     }
-    sucess = self.archiver.insert(entry)
-    self.assertEqual(sucess, True)
+    success = self.archiver.insert(entry)
+    self.assertEqual(success, True)
+
 
   def testQueryTags(self):
     entry = {
@@ -53,7 +53,7 @@ class TestArchiver(unittest.TestCase):
     savedEntries = self.archiver.query_tags()
     self.assertEquals(len(savedEntries), 1)
     entry = savedEntries[0]
-    self.assertEquals(entry['Path'], self.path)
+    self.assertEquals(entry['Metadata']['Collection'], self.archiver.collection)
     self.assertEquals(entry['Metadata']['user'], '3a307244-ecf1-3e6e-a9a7-3aaf101b40fa')
     self.assertEquals(entry['Metadata']['stat'], 'POST /tripManager/getUnclassifiedSections')
     self.assertEquals(entry['Metadata']['metakey'], 'metaval')
@@ -84,6 +84,7 @@ class TestArchiver(unittest.TestCase):
     
     entry = savedEntries[1]
     self.assertEquals(entry['Readings'], [[1417725167, 0.36]])
+
 
 if __name__ == '__main__':
     unittest.main()
