@@ -20,17 +20,16 @@ def get_giles_api_key():
     api_key = conf['giles_api_key']
     return api_key
 
-
 class StatArchiver:
     GILES_BASE_URL = get_giles_base_url()
     GILES_API_KEY = get_giles_api_key()
     #QUERY_URL = "http://localhost:8079/api/query"
     #ARCHIVER_URL = "http://localhost:8079/add/apikey"
 
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, collection):
         self.query_url = os.path.join(self.GILES_BASE_URL, 'api', 'query')
         self.archiver_url = os.path.join(self.GILES_BASE_URL, 'add', self.GILES_API_KEY)
+        self.collection = collection
 
     # NOTE: When we insert an entry to the Archiver, we associate that entry with a stream UUID, which is
     # a function of the stat and user_uuid. 
@@ -53,6 +52,7 @@ class StatArchiver:
             path: {
                 "Metadata": {
                     "SourceName": stat,
+                    "Collection": self.collection,
                 },
                 "Properties": {
                      "Timezone": "America/Los_Angeles",
@@ -94,14 +94,14 @@ class StatArchiver:
         return success
 
     def remove(self):
-        queryMsg = 'delete where Path="' + self.path + '"'
+        queryMsg = 'delete where Metadata/Collection="' + self.collection + '"'
         response = requests.post(self.query_url, data=queryMsg)
         return response
 
     # Tags contain metadata associated with an entry
     # Return all tags for all streams stored in archiver's current path
     def query_tags(self):
-        queryMsg = 'select * where Path="' + self.path + '"'
+        queryMsg = 'select * where Metadata/Collection="' + self.collection + '"'
         #print(queryMsg)
         #print(self.query_url)
 
@@ -113,10 +113,11 @@ class StatArchiver:
 
     # Return all readings for all streams stored in archiver's current path
     def query_readings(self):
-        queryMsg = 'select data before now where Path="' + self.path + '"'
+        queryMsg = 'select data before now where Metadata/Collection="' + self.collection + '"'
         response = requests.post(self.query_url, data=queryMsg) 
         try:
             return json.loads(response.content)
         except Exception as e:
             return response.content
+
 
