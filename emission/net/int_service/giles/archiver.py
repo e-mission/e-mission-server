@@ -3,6 +3,9 @@ import requests
 import json
 import os
 import logging
+from emission.net.int_service.giles import timeout
+
+
 
 def get_conf_file():
     f = open("conf/net/int_service/giles_conf.json", "r")
@@ -34,9 +37,10 @@ class StatArchiver:
     # NOTE: When we insert an entry to the Archiver, we associate that entry with a stream UUID, which is
     # a function of the stat and user_uuid. 
     # No mapping needs to be maintained since this UUID can be reconstructed as long as the above data is found.
+    @timeout.timeout(seconds=60)
     def insert(self, entry):
         assert type(entry) == dict
-        stat = entry['stat']
+        stat = str(entry['stat'])
         user_uuid = str(entry['user'])
 
         # TODO: Support more precise timestamps
@@ -70,15 +74,18 @@ class StatArchiver:
                 "uuid": stream_uuid
             }
         }
+	logging.debug("smap_msg before adding metadata = %s" % smapMsg)
 
         for key in entry:
             if key != "reading" and key != 'ts':
-                smapMsg[path]["Metadata"][key] = entry[key]
+                smapMsg[path]["Metadata"][key] = str(entry[key])
+	logging.debug("smap_msg after adding metadata = %s" % smapMsg)
+
         try:
             json.dumps(smapMsg)
         except Exception as e:
             logging.debug("Error storing entry for user %s, stat %s at timestamp %s, with reading %f: entry is not JSON serializable" % (user_uuid, stat, client_ts, reading))
-            metadataString = ['(' + str(metakey) + ',' + str(metaval) + '), ' for metakey, metaval in smapMsg[self.path]["Metadata"].items()]
+            metadataString = ['(' + str(metakey) + ',' + str(metaval) + '), ' for metakey, metaval in smapMsg[path]["Metadata"].items()]
             
             # if string not empty, truncate last comma
             if len(metadataString) > 2:

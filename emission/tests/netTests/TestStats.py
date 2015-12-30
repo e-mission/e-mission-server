@@ -43,7 +43,7 @@ class TestStats(unittest.TestCase):
     for savedEntry in savedEntries:
       self.assertEquals(savedEntry['Metadata']['client_app_version'], '2.0.1')
       self.assertEquals(savedEntry['Metadata']['client_os_version'], '4.3')
-      self.assertAlmostEqual(savedEntry['Metadata']['reported_ts'], currTime, places = 0)
+      self.assertAlmostEqual(float(savedEntry['Metadata']['reported_ts']), currTime, places = 0)
 
 
     # @TODO: Query readings only returns the latest one; I have decided to not support
