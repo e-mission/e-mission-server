@@ -25,8 +25,8 @@ class TestArchiver(unittest.TestCase):
         'stat': 'POST /tripManager/getUnclassifiedSections',
         'metakey': 'metaval'
     }
-    success = self.archiver.insert(entry)
-    self.assertEqual(success, True)
+    response = self.archiver.insert(entry)
+    self.assertEqual(response, '')
 
   # @TODO: Rewrite this test, it doesn't really test much
   def testInsertEntryWithoutMetadata(self):
@@ -36,8 +36,8 @@ class TestArchiver(unittest.TestCase):
         'ts': 1417725167,
         'stat': 'POST /tripManager/getUnclassifiedSections'
     }
-    success = self.archiver.insert(entry)
-    self.assertEqual(success, True)
+    response = self.archiver.insert(entry)
+    self.assertEqual(response, '')
 
 
   def testQueryTags(self):
@@ -85,6 +85,16 @@ class TestArchiver(unittest.TestCase):
     entry = savedEntries[1]
     self.assertEquals(entry['Readings'], [[1417725167, 0.36]])
 
+  def testBadEntry(self):
+    entry1 = {
+        'user': '3a307244-ecf1-3e6e-a9a7-3aaf101b40fa',
+        'reading': 'abc',
+        'ts': 'def',
+        'stat': 'POST /tripManager/fakeendpoint1',
+        'metakey': 'metaval'
+    }    
+    response = self.archiver.insert(entry1)
+    self.assertEquals(response, None)
 
 if __name__ == '__main__':
     unittest.main()

@@ -6,7 +6,6 @@ import logging
 from emission.net.int_service.giles import timeout
 
 
-
 def get_conf_file():
     f = open("conf/net/int_service/giles_conf.json", "r")
     conf = json.loads(f.read())
@@ -40,14 +39,18 @@ class StatArchiver:
     @timeout.timeout(seconds=60)
     def insert(self, entry):
         assert type(entry) == dict
-        stat = str(entry['stat'])
-        user_uuid = str(entry['user'])
+        
+        try:
+            stat = str(entry['stat'])
+            user_uuid = str(entry['user'])
+            # TODO: Support more precise timestamps
+            # Giles has some problem unmarshalling floats
+            #client_ts = int(entry['ts'])
+            client_ts = int(entry['ts'])
 
-        # TODO: Support more precise timestamps
-        # Giles has some problem unmarshalling floats
-        #client_ts = int(entry['ts'])
-        client_ts = int(entry['ts'])
-        reading = entry['reading']
+            reading = entry['reading']
+        except Exception as e:
+            return None
 
         #UUID is a function of things which are stored already, so we don't need to maintain the mapping.
         stream_uuid = str(uuid.uuid5(uuid.NAMESPACE_DNS, stat + ',' + user_uuid))
@@ -74,12 +77,12 @@ class StatArchiver:
                 "uuid": stream_uuid
             }
         }
-	logging.debug("smap_msg before adding metadata = %s" % smapMsg)
+        logging.debug("smap_msg before adding metadata = %s" % smapMsg)
 
         for key in entry:
             if key != "reading" and key != 'ts':
                 smapMsg[path]["Metadata"][key] = str(entry[key])
-	logging.debug("smap_msg after adding metadata = %s" % smapMsg)
+	    logging.debug("smap_msg after adding metadata = %s" % smapMsg)
 
         try:
             json.dumps(smapMsg)
@@ -94,11 +97,11 @@ class StatArchiver:
             logging.debug("Exception: " + str(e))
             return None
 
-        # @TODO: Do some error-checking on the response to make sure it actually
-        # really did work
+        # If the POST failed, then return None
         response = requests.post(self.archiver_url, data=json.dumps(smapMsg))
-        success = response.content == ''
-        return success
+        if response.content != '':
+            return None
+        return ''
 
     def remove(self):
         queryMsg = 'delete where Metadata/Collection="' + self.collection + '"'
