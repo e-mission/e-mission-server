@@ -47,8 +47,7 @@ class StatArchiver:
             # Giles has some problem unmarshalling floats
             #client_ts = int(entry['ts'])
             client_ts = int(entry['ts'])
-
-            reading = entry['reading']
+            reading = float(entry['reading'])
         except Exception as e:
             return None
 
