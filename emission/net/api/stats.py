@@ -66,9 +66,6 @@ def storeClientEntry(user, key, ts, reading, metadata):
     logging.debug("exception was: %s" % (e))
     get_client_stats_db_backup().insert(currEntry)
 
-  if success == None:
-    get_client_stats_db_backup().insert(currEntry)
-
   return response != None
 
 # server measurements will call this directly since there's not much point in
