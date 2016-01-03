@@ -101,7 +101,7 @@ class BuiltinUserCache(ucauc.UserCache):
         result = self.db.update(queryDoc,
                                 document,
                                 upsert=True)
-        # logging.debug("Result = %s after updating document" % result)
+        logging.debug("Result = %s after updating document %s" % (result, key))
 
     def _get_msg_query(self, key_list = None, time_query = None):
         ret_query = {"user_id": self.user_id}
@@ -148,3 +148,29 @@ class BuiltinUserCache(ucauc.UserCache):
         logging.debug("About to delete messages matching query %s" % del_query)
         del_result = self.db.remove(del_query)
         logging.debug("Delete result = %s" % del_result)
+
+    def getDocumentKeyList(self):
+        return self.getKeyListForType("document")
+
+    def getSensorDataKeyList(self):
+        return self.getKeyListForType("sensor-data")
+
+    def getMessageKeyList(self):
+        return self.getKeyListForType("message")
+
+    def getKeyListForType(self, message_type):
+        return self.db.find({"metadata.type": message_type}).distinct("metadata.key")
+
+    def clearObsoleteDocument(self, key):
+        """
+        Just because we put a document into the cache once doesn't mean that it
+        needs to always be there. We can delete obsolete documents - e.g. old
+        entries in the cache. Currently, we delete entries by key - this
+        ensures that values are not pushed over and over again.
+        """
+        queryDoc = {'user_id': self.user_id,
+                    'metadata.type': 'document',
+                    'metadata.key': key}
+        
+        result = self.db.remove(queryDoc)
+        logging.debug("Result of removing document with key %s is %s" % (key, result))

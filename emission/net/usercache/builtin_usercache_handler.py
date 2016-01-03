@@ -144,7 +144,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
             if max_loc_ts > start_ts:
                 # We have locations, but no trips from them. That seems wrong.
                 # But we should get there eventually and then we will have trips.
-                logging.warning("No analysis has been doing on recent points! max_loc_ts %s > start_ts %s, early return" %
+                logging.warning("No analysis has been done on recent points! max_loc_ts %s > start_ts %s, early return" %
                                 (max_loc_ts, start_ts))
                 return
             trip_gj_list = self.get_trip_list_for_seven_days(max_loc_ts)
@@ -155,13 +155,59 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
             logging.debug("Adding %s trips for day %s" % (len(day_gj_list), day))
             uc.putDocument("diary/trips-%s"%day, day_gj_list)
 
+        self.delete_obsolete_entries(uc, day_list_bins.iterkeys())
+
+    def get_oldest_valid_ts(self, start_ts):
+        """
+        Get the oldest valid timestamp that we want to include.
+        Currently, this is 7 days ago, but we can change it by modifying this
+            one location.
+        """
+        return start_ts - 7 * 24 * 60 * 60 # 7 days in seconds
+
+    def delete_obsolete_entries(self, uc, valid_key_list):
+        for key in self.get_obsolete_entries(uc, valid_key_list):
+            uc.clearObsoleteDocument(key)
+
+    def get_obsolete_entries(self, uc, valid_key_list):
+        """
+        Delete the obsolete entries from the usercache
+        """
+        # Get all the current entries from the usercache
+        curr_key_list = uc.getDocumentKeyList()
+        # Technically, we could look to find all keys that are before the
+        # current one, but that would imply that we need to set an ordering on
+        # the keys. The current key generation should work fine with
+        # lexicographic ordering, but at the same time, this seems much easier
+        # and safer to deal with.
+        to_del_keys = set(curr_key_list) - set(valid_key_list)
+        logging.debug("obsolete keys are: %s" % to_del_keys)
+        return to_del_keys
+
     def get_trip_list_for_seven_days(self, start_ts):
-        seventy_two_hours_ago_ts = start_ts - 7 * 24 * 60 * 60 # 7 days in seconds
+        seventy_two_hours_ago_ts = self.get_oldest_valid_ts(start_ts)
         # TODO: This is not strictly accurate, since it will skip trips that were in a later timezone but within the
         # same requested date range.
         trip_gj_list = gfc.get_geojson_for_range(self.user_id, seventy_two_hours_ago_ts, start_ts)
-        logging.debug("Found %s trips in three days starting from %s" % (len(trip_gj_list), start_ts))
+        logging.debug("Found %s trips in seven days starting from %s" % (len(trip_gj_list), start_ts))
         return trip_gj_list
+
+    @staticmethod
+    def get_local_day_from_fmt_time(trip):
+        """
+        Returns the day, formatted as a human readable string.
+        i.e. "2016-01-01"
+        """
+        return trip.start_fmt_time.split("T")[0]
+
+    @staticmethod
+    def get_local_day_from_local_dt(trip):
+        """
+        Returns the day, formatted as a human readable string.
+        i.e. "2016-01-01"
+        """
+        ld = trip.start_local_dt
+        return ("%04d" % ld.year) + "-" + ("%02d" % ld.month) + "-" + ("%02d" % ld.day)
 
     def bin_into_days_by_local_time(self, trip_gj_list):
         """
@@ -179,7 +225,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         for trip_gj in trip_gj_list:
             trip = ecwt.Trip(trip_gj.properties)
             # TODO: Consider extending for both start and end
-            day_string = trip.start_fmt_time.split("T")[0]
+            day_string = get_local_day_from_fmt_time(trip)
             if day_string not in ret_val:
                 ret_val[day_string] = [trip_gj]
             else:

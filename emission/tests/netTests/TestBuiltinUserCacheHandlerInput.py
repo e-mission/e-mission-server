@@ -6,6 +6,7 @@ import json
 import uuid
 import attrdict as ad
 import time
+import geojson as gj
 
 # Our imports
 import emission.tests.common
@@ -15,12 +16,13 @@ import emission.net.usercache.abstract_usercache as enua
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.net.usercache.abstract_usercache_handler as enuah
 import emission.net.api.usercache as mauc
+import emission.core.wrapper.trip as ecwt
 
 # These are the current formatters, so they are included here for testing.
 # However, it is unclear whether or not we need to add other tests as we add other formatters,
 # specially if they follow the same pattern.
 
-class TestBuiltinUserCacheHandler(unittest.TestCase):
+class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
     def setUp(self):
         emission.tests.common.dropAllCollections(edb.get_db())
         self.testUserUUID1 = uuid.uuid4()
@@ -181,7 +183,6 @@ class TestBuiltinUserCacheHandler(unittest.TestCase):
         # 60 entries from android + 60 entries from ios = 120
         self.assertEqual(edb.get_timeseries_db().find().count(), 120)
         self.assertEqual(edb.get_timeseries_error_db().find().count(), 0)
-
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)

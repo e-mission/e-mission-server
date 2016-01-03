@@ -81,3 +81,24 @@ class UserCache(object):
         which would allow us to delete message that have already been read
         """
         pass
+
+    def getDocumentKeyList(self):
+        """
+        Get the list of keys for the "document" message types
+        """
+        pass
+
+    def getSensorDataKeyList(self):
+        """
+        Get the list of keys for the "sensor-data" message types
+        """
+        pass
+
+    def getMessageKeyList(self):
+        """
+        Get the list of keys for the "message" message types
+        """
+        pass
+
+    def clearObsoleteDocument(self, key):
+        pass

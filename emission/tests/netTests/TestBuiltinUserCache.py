@@ -60,6 +60,33 @@ class TestBuiltinUserCache(unittest.TestCase):
         if data["metadata"]["key"] == "data/game":
             self.assertEqual(data["data"]["my_score"], 30)
 
+  def testClearObsoleteDocument(self):
+    self.testPutTwoSetsOfUserDataForPhone()
+
+    uc = ucauc.UserCache.getUserCache(self.testUserUUID)
+    uc.clearObsoleteDocument("data/footprint")
+    uc.clearObsoleteDocument("data/game")
+
+    retrievedData = mauc.sync_server_to_phone(self.testUserUUID)
+    logging.debug("retrievedData = %s" % retrievedData)
+    
+    self.assertTrue(retrievedData is not None) # if it doesn't exist, the method returns None
+    self.assertEqual(len(retrievedData), 0)
+
+  def testGetDocumentKeyList(self):
+    self.testPutTwoSetsOfUserDataForPhone()
+
+    uc = ucauc.UserCache.getUserCache(self.testUserUUID)
+    self.assertEqual(uc.getDocumentKeyList(), ["data/footprint", "data/game"])
+    uc.clearObsoleteDocument("data/footprint")
+    uc.clearObsoleteDocument("data/game")
+
+    retrievedData = mauc.sync_server_to_phone(self.testUserUUID)
+    logging.debug("retrievedData = %s" % retrievedData)
+    
+    self.assertTrue(retrievedData is not None) # if it doesn't exist, the method returns None
+    self.assertEqual(len(retrievedData), 0)
+
   def testGetTwoSetsOfUserDataFromPhone(self):
     user_data_from_phone = [
       {
