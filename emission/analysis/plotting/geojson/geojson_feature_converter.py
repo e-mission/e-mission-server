@@ -241,10 +241,21 @@ def trip_to_geojson(trip, tl):
     trip_geojson.properties["distance"] = trip_distance
     return trip_geojson
 
-def get_geojson_for_range(user_id, start_ts, end_ts):
-    geojson_list = []
+def get_geojson_for_ts(user_id, start_ts, end_ts):
     tl = esdtl.get_timeline(user_id, start_ts, end_ts)
     tl.fill_start_end_places()
+    return get_geojson_for_timeline(user_id, tl)
+
+def get_geojson_for_dt(user_id, start_dt, end_dt):
+    tl = esdtl.get_timeline(user_id, start_dt, end_dt)
+    tl.fill_start_end_places()
+    return get_geojson_for_timeline(user_id, tl)
+
+def get_geojson_for_timeline(user_id, tl):
+    """
+    tl represents the "timeline" object that is queried for the trips and locations
+    """
+    geojson_list = []
 
     for trip in tl.trips:
         try:

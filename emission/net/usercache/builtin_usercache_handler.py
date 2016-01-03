@@ -188,7 +188,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         seventy_two_hours_ago_ts = self.get_oldest_valid_ts(start_ts)
         # TODO: This is not strictly accurate, since it will skip trips that were in a later timezone but within the
         # same requested date range.
-        trip_gj_list = gfc.get_geojson_for_range(self.user_id, seventy_two_hours_ago_ts, start_ts)
+        trip_gj_list = gfc.get_geojson_for_ts(self.user_id, seventy_two_hours_ago_ts, start_ts)
         logging.debug("Found %s trips in seven days starting from %s" % (len(trip_gj_list), start_ts))
         return trip_gj_list
 

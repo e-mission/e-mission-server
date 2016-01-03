@@ -1,6 +1,18 @@
 import logging
 import emission.net.usercache.abstract_usercache as enua
 
+def get_timeline_from_dt(user_id, start_dt, end_dt):
+    import emission.core.get_database as edb
+    import emission.core.wrapper.entry as ecwe
+
+    result_cursor = edb.get_timeseries_db().find({"data.local_dt": {"$gte": start_dt, "$lte": end_dt}}).sort("metadata.write_ts")
+    result_list = list(result_cursor)
+    start_ts = ecwe.Entry(result_list[0]).metadata.write_ts
+    end_ts = ecwe.Entry(result_list[-1]).metadata.write_ts
+    logging.debug("Converted datetime range %s -> %s to timestamp range %s -> %s" %
+        (start_dt, end_dt, start_ts, end_ts))
+    return get_timeline(user_id, start_ts, end_ts)
+
 def get_timeline(user_id, start_ts, end_ts):
     """
     Return a timeline of the trips and places from this start timestamp to this end timestamp.
@@ -29,7 +41,6 @@ def get_timeline(user_id, start_ts, end_ts):
         logging.debug("Considering place %s: %s -> %s " % (place.get_id(), place.enter_fmt_time, place.exit_fmt_time))
     for trip in trips:
         logging.debug("Considering trip %s: %s -> %s " % (trip.get_id(), trip.start_fmt_time, trip.end_fmt_time))
-
 
     return Timeline(places, trips)
 
