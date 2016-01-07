@@ -20,7 +20,7 @@
         "mInitialBearing": 0, 
         "mAccuracy": 52.5, 
         "mDistance": 0, 
-        "mTime": 1436826356852, 
+        "mTime": 1436826356.852, 
         "mLon1": 0, 
         "mHasSpeed": false, 
         "mProvider": "fused", 
@@ -32,6 +32,6 @@
         "read_ts": 0, 
         "type": "message", 
         "key": "background/location", 
-        "write_ts": 1436826357115
+        "write_ts": 1436826357.115
     }
 }

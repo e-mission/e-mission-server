@@ -29,7 +29,7 @@ def sync_phone_to_server(uuid, data_from_phone):
         # logging.debug("About to insert %s into the database" % data)
         data.update({"user_id": uuid})
         # Hack to deal with milliseconds until we have moved everything over
-        if ecc.isMillisecs(data["metadata"]["write_ts"]:
+        if ecc.isMillisecs(data["metadata"]["write_ts"]):
             data["metadata"]["write_ts"] = float(data["metadata"]["write_ts"]) / 1000
 
         if "ts" in data["data"] and ecc.isMillisecs(data["data"]["ts"]):
