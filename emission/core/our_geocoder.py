@@ -71,11 +71,11 @@ class Geocoder:
 
 ## Failsafe section
 def _do_google_geo(address):
-    geo = pyGeo()
+    geo = pyGeo("AIzaSyAFsQeO3Xj60s0nBVRcAS-I9FLw6KZPV-E")
     results = geo.geocode(address)
     return Coordinate(results[0].coordinates[0], results[0].coordinates[1])
 
 def _do_google_reverse(lat, lng):
-    geo = pyGeo()
+    geo = pyGeo("AIzaSyAFsQeO3Xj60s0nBVRcAS-I9FLw6KZPV-E")
     address = geo.reverse_geocode(lat, lng)
     return address[0]

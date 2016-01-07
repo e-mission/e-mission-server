@@ -411,7 +411,7 @@ class GoogleMaps(object):
             results['responseData']['results'] = results['responseData']['results'][:numresults]
         return results
 
-    def directions(self, origin, destination, **kwargs):
+    def directions(self, origin, destination, mode, waypoints=None):
         """
         Get driving directions from `origin` to `destination`.
 
@@ -450,9 +450,13 @@ class GoogleMaps(object):
             'destination':   destination,  
             'output':   'json',
             'oe':       'utf8',
+            "mode" : mode,
+            "alternatives" : "true",
             'key':      self.api_key,
         }
-        params.update(kwargs)
+        if waypoints:
+            params["waypoints"] =  waypoints 
+        #params.update(kwargs)
 
         url, response = fetch_json(self._DIRECTIONS_QUERY_URL, params=params)
         status_code = response['status']

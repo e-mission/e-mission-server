@@ -13,7 +13,7 @@ import emission.core.common as cm
 
 DATE_FORMAT = "%Y%m%dT%H%M%S-%W00"
 
-class Coordinate:
+class Coordinate(object):
     def __init__(self, lat, lon):
         self.lat = lat
         self.lon = lon
@@ -39,6 +39,14 @@ class Coordinate:
 
     def __repr__(self):
         return self.maps_coordinate()
+
+    def to_tuple(self):
+        return (float(self.lat), float(self.lon))
+
+    def __eq__(self, other):
+        if type(other) != Coordinate:
+            return False
+        return self.lat == other.lat and self.lon == other.lon
 
 
 class Trip(object):
@@ -114,7 +122,7 @@ class Trip(object):
 
 class Section(object):
 
-    def __init__(self, _id, user_id, trip_id, distance, section_type, start_time, end_time, section_start_location, section_end_location, mode, confirmed_mode):
+    def __init__(self, _id, user_id, trip_id, distance, section_type, start_time, end_time, section_start_location, section_end_location, mode, confirmed_mode, points=[]):
         self._id = _id
         self.user_id = user_id
         self.trip_id = trip_id
@@ -126,7 +134,7 @@ class Section(object):
         self.section_end_location = section_end_location
         self.mode = mode
         self.confirmed_mode = confirmed_mode
-        self.points = []
+        self.points = points
 
     def __str__(self):
         return "%s:%s:%s" % (self.trip_id, self._id, self.section_type)
@@ -159,6 +167,10 @@ class Section(object):
         section_end_location = cls._get_coordinate(json_segment, "section_end_point")
         mode = json_segment.get("mode")
         confirmed_mode = json_segment.get("confirmed_mode")
+        print "HERE"
+        for step in json_segment.get("steps"):
+            print "step is %s" % step
+            self.points.append(Coordinate(step["lat"], step['lon']))
         return cls(_id, user_id, trip_id, distance, section_type, start_time, end_time, section_start_location, section_end_location, mode, confirmed_mode)
 
     @classmethod
