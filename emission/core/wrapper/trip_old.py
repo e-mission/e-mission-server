@@ -167,10 +167,6 @@ class Section(object):
         section_end_location = cls._get_coordinate(json_segment, "section_end_point")
         mode = json_segment.get("mode")
         confirmed_mode = json_segment.get("confirmed_mode")
-        print "HERE"
-        for step in json_segment.get("steps"):
-            print "step is %s" % step
-            self.points.append(Coordinate(step["lat"], step['lon']))
         return cls(_id, user_id, trip_id, distance, section_type, start_time, end_time, section_start_location, section_end_location, mode, confirmed_mode)
 
     @classmethod
