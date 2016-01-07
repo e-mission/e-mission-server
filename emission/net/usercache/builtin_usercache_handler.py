@@ -47,8 +47,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
             # esp.mark_usercache_done(None)
             return
 
-        platform = messages[0]["metadata"]["platform"]
-        time_query = esp.get_time_range_for_usercache(self.user_id, platform)
+        time_query = esp.get_time_range_for_usercache(self.user_id)
 
         ts = etsa.TimeSeries.get_time_series(self.user_id)
 
