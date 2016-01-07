@@ -7,6 +7,7 @@ import urllib, urllib2, datetime, time, random
 
 # Our imports
 from emission.core.wrapper.trip_old import Coordinate, Alternative_Trip, Section, Fake_Trip, Trip
+import emission.core.our_geocoder as our_geo
 
 try:
     import json
@@ -25,7 +26,7 @@ class OTP:
     """ A class that exists to create an alternative trip object out of a call to our OTP server"""
 
     def __init__(self, start_point, end_point, mode, date, time, bike, max_walk_distance=10000000000000000000000000000000000):
-        self.accepted_modes = {"CAR", "WALK", "BICYCLE", "TRANSIT"}
+        self.accepted_modes = {"CAR", "WALK", "BICYCLE", "TRANSIT", "BICYCLE_RENT"}
         self.start_point = start_point
         self.end_point = end_point
         if mode not in self.accepted_modes:
@@ -61,6 +62,7 @@ class OTP:
         query_url = "%s/otp/routers/default/plan?" % address
         encoded_params = urllib.urlencode(params)
         url = query_url + encoded_params
+        print url
         return url
 
     def get_json(self):
@@ -68,7 +70,15 @@ class OTP:
         response = urllib2.urlopen(request)
         return json.loads(response.read())
 
-    def turn_into_trip(self, _id, user_id, trip_id, is_fake=False):
+    def get_all_trips(self, _id, user_id, trip_id):
+        trps = [ ]
+        our_json = self.get_json()
+        num_its = len(our_json["plan"]["itineraries"])
+        for itin in range(num_its):
+            trps.append(self.turn_into_trip(_id, user_id, trip_id, False, itin))
+        return trps
+
+    def turn_into_trip(self, _id, user_id, trip_id, is_fake=False, itinerary=0):
         sections = [ ]
         our_json = self.get_json()
         mode_list = set()
@@ -79,7 +89,7 @@ class OTP:
             print("Response %s does not have a plan " % our_json)
             raise PathNotFoundException(our_json['debugOutput'])
 
-        for leg in our_json["plan"]["itineraries"][0]['legs']:
+        for leg in our_json["plan"]["itineraries"][itinerary]['legs']:
             coords = [ ]
             var = 'steps'
             if leg['mode'] == 'RAIL' or leg['mode'] == 'SUBWAY':
@@ -97,8 +107,14 @@ class OTP:
             mode = leg["mode"]
             mode_list.add(mode)
             fake_id = random.random()
-            section = Section(str(fake_id), user_id, trip_id, distance, "move", start_time, end_time, start_loc, end_loc, mode, mode)
-            section.points = coords
+            points = [ ]
+            for step in leg['steps']:
+                c = Coordinate(step["lat"], step['lon'])
+                #print c
+                points.append(c)
+            #print "len of points is %s" % len(points)
+            section = Section(str(fake_id), user_id, trip_id, distance, "move", start_time, end_time, start_loc, end_loc, mode, mode, points)
+            #section.points = coords
             sections.append(section)
             if mode == 'CAR':
                 car_dist = distance
@@ -126,3 +142,10 @@ class OTP:
 def otp_time_to_ours(otp_str):
     t = time.gmtime(int(otp_str)/1000)
     return datetime.datetime(*t[:6])    
+
+
+
+def tester():
+    geo = our_geo.Geocoder()
+    otp = OTP( (37.79144, -122.40181) , (37.79629, -122.42829) , "TRANSIT", "11-6-15", "5:15pm", True)
+    print otp.make_url()
