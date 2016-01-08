@@ -2,6 +2,7 @@
 import unittest
 import logging
 import json
+import datetime as pydt
 
 # Our imports
 import emission.core.get_database as edb
@@ -31,6 +32,8 @@ class TestTimeline(unittest.TestCase):
         logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
         self.day_start_ts = 1440658800
         self.day_end_ts = 1440745200
+        self.day_start_dt = pydt.datetime(2015,8,27)
+        self.day_end_dt = pydt.datetime(2015,8,28)
 
     def tearDown(self):
         self.clearRelatedDb()
@@ -48,10 +51,7 @@ class TestTimeline(unittest.TestCase):
         logging.debug("getting type for %s" % element)
         return type(element)
 
-    def testPlaceTripTimeline(self):
-        eaist.segment_current_trips(self.testUUID)
-        tl = esdt.get_timeline(self.testUUID, self.day_start_ts, self.day_end_ts)
-
+    def checkPlaceTripConsistency(self, tl):
         prev_type = None
         prev_element = None
         checked_count = 0
@@ -69,6 +69,16 @@ class TestTimeline(unittest.TestCase):
             prev_type = curr_type
             prev_element = curr_element
         self.assertEqual(checked_count, i)
+
+    def testDatetimeTimeline(self):
+        eaist.segment_current_trips(self.testUUID)
+        tl = esdt.get_timeline_from_dt(self.testUUID, self.day_start_dt, self.day_end_dt)
+        self.checkPlaceTripConsistency(tl)
+
+    def testPlaceTripTimeline(self):
+        eaist.segment_current_trips(self.testUUID)
+        tl = esdt.get_timeline(self.testUUID, self.day_start_ts, self.day_end_ts)
+        self.checkPlaceTripConsistency(tl)
 
     def testStopSectionTimeline(self):
         eaist.segment_current_trips(self.testUUID)

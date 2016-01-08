@@ -20,6 +20,9 @@ def format(entry):
     else:
         return format_location_simple(entry)
 
+# TODO: Remove the RAW code since we don't really have any clients that 
+# are sending it. But while it is there, we should still convert ms to sec
+# since the old data did have that in place
 def format_location_raw(entry):
     formatted_entry = ad.AttrDict()
     formatted_entry["_id"] = entry["_id"]
@@ -55,12 +58,10 @@ def format_location_simple(entry):
     metadata = entry.metadata
     if "time_zone" not in metadata:
         metadata.time_zone = "America/Los_Angeles" 
-    metadata.write_ts = float(entry.metadata.write_ts) / 1000
     fc.expand_metadata_times(metadata)
     formatted_entry.metadata = metadata
 
     data = entry.data
-    data.ts = float(data.ts) / 1000 # convert from ms to seconds
     local_aware_dt = pydt.datetime.utcfromtimestamp(data.ts).replace(tzinfo=pytz.utc) \
                             .astimezone(pytz.timezone(formatted_entry.metadata.time_zone))
     data.local_dt = local_aware_dt.replace(tzinfo=None)

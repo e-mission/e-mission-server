@@ -255,6 +255,14 @@ def putIntoCache():
   from_phone = request.json['phone_to_server']
   return usercache.sync_phone_to_server(user_uuid, from_phone)
 
+@post('/timeline/getTrips/<day>')
+def getTrips(day):
+  logging.debug("Called timeline.getTrips/%s" % day)
+  user_uuid=getUUID(request)
+  force_refresh = request.query.get('refresh', False)
+  logging.debug("user_uuid %s" % user_uuid)
+  return timeline.get_trips_for_day(user_uuid, day, force_refresh)
+
 @post('/profile/create')
 def createUserProfile():
   logging.debug("Called createUserProfile")

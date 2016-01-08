@@ -12,7 +12,6 @@ def format(entry):
     metadata = entry.metadata
     if "time_zone" not in metadata:
         metadata.time_zone = "America/Los_Angeles" 
-    metadata.write_ts = float(entry.metadata.write_ts) / 1000
     fc.expand_metadata_times(metadata)
     formatted_entry.metadata = metadata
 

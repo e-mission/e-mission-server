@@ -42,7 +42,7 @@ def df_to_string_list(df):
 
 def get_maps_for_range(user_id, start_ts, end_ts):
     map_list = []
-    geojson_list = gfc.get_geojson_for_range(user_id, start_ts, end_ts)
+    geojson_list = gfc.get_geojson_for_ts(user_id, start_ts, end_ts)
     return get_maps_for_geojson_list(geojson_list)
 
 def get_maps_for_usercache(user_id):

@@ -8,6 +8,7 @@ import pymongo
 
 # Our imports
 from emission.core.get_database import get_usercache_db
+import emission.core.common as ecc
 
 def sync_server_to_phone(uuid):
     """
@@ -27,6 +28,13 @@ def sync_phone_to_server(uuid, data_from_phone):
     for data in data_from_phone:
         # logging.debug("About to insert %s into the database" % data)
         data.update({"user_id": uuid})
+        # Hack to deal with milliseconds until we have moved everything over
+        if ecc.isMillisecs(data["metadata"]["write_ts"]):
+            data["metadata"]["write_ts"] = float(data["metadata"]["write_ts"]) / 1000
+
+        if "ts" in data["data"] and ecc.isMillisecs(data["data"]["ts"]):
+            data["data"]["ts"] = float(data["data"]["ts"]) / 1000
+            
         # logging.debug("After updating with UUId, we get %s" % data)
         document = {'$set': data}
         update_query = {'user_id': uuid,

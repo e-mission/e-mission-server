@@ -4,6 +4,7 @@ import datetime as pydt
 import emission.core.get_database as edb
 import emission.core.wrapper.pipelinestate as ps
 import emission.net.usercache.abstract_usercache as enua
+import emission.core.common
 
 import time
 
@@ -15,12 +16,8 @@ def mark_usercache_done(user_id, last_processed_ts):
     else:
         mark_stage_done(user_id, ps.PipelineStages.USERCACHE, last_processed_ts + END_FUZZ_AVOID_LTE)
 
-def get_time_range_for_usercache(user_id, platform):
+def get_time_range_for_usercache(user_id):
     tq = get_time_range_for_stage(user_id, ps.PipelineStages.USERCACHE)
-    if platform == "android":
-        if tq.startTs is not None:
-            tq.startTs = tq.startTs * 1000
-        tq.endTs = tq.endTs * 1000
     return tq
 
 def get_time_range_for_accuracy_filtering(user_id):

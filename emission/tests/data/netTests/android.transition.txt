@@ -5,5 +5,5 @@
   "platform": "android",
   "read_ts": 0,
   "type": "message",
-  "write_ts": 1436821510445},
+  "write_ts": 1436821510.445},
  "user_id": "0763de67-f61e-3f5d-90e7-518e69793954"}

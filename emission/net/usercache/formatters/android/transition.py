@@ -27,7 +27,6 @@ def format(entry):
     m = entry.metadata
     if "time_zone" not in m:
         m.time_zone = "America/Los_Angeles" 
-    m.write_ts = float(entry.metadata.write_ts) / 1000
     logging.debug("Timestamp conversion: %s -> %s done" % (entry.metadata.write_ts, m.write_ts))
     fc.expand_metadata_times(m)
     formatted_entry.metadata = m

@@ -13,6 +13,9 @@ from emission.core.get_database import get_mode_db, get_section_db, get_trip_db,
 
 skippedModeList = ["transport", "underground", "not a trip"]
 
+def isMillisecs(ts):
+  return not (ts < 10 ** 11)
+
 def getAllModes():
   Modes = get_mode_db()
   modes = []
