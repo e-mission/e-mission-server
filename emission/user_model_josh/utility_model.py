@@ -21,7 +21,7 @@ RANDOM_RADIUS = .3  # 300 meters around center of campus; for randomization
 N_TOP_TRIPS = 3 # Number of top trips we return for the user to look at
 
 key_file = open("conf/net/keys.json")
-GOOGLE_MAPS_KEY = json.load(key_file)["clinet_key"]
+GOOGLE_MAPS_KEY = json.load(key_file)["client_key"]
 
 
 class UserBase:
