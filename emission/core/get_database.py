@@ -29,6 +29,11 @@ def get_profile_db():
     Profiles=current_db.Stage_Profiles
     return Profiles
 
+def get_utility_model_db():
+    current_db=MongoClient().Stage_database
+    Profiles=current_db.Stage_utility_models
+    return Profiles
+
 """
 def get_routeDistanceMatrix_db():
     current_db=MongoClient().Stage_database
@@ -125,11 +130,6 @@ def get_transit_db():
     current_db = MongoClient().Stage_database
     Transits=current_db.Stage_Transits
     return Transits
-
-def get_utility_model_db():
-    current_db = MongoClient().Stage_database
-    Utility_Models = current_db.Stage_utility_models
-    return Utility_Models
 
 def get_alternatives_db():
     current_db = MongoClient().Stage_database

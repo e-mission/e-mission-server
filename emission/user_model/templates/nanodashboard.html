@@ -1,0 +1,588 @@
+
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Berkeley Campus Router</title>
+        <link type="text/css" href="homestyle.css" rel="stylesheet" />
+
+        <link rel="stylesheet" href="main.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAA4BQYeqDTCuPtZ45Xc49AYFuHLccOwRY&signed_in=true&libraries=places,visualization&sensor=false"></script>
+    </head>
+    <body>   
+        <center>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+        <form id="form" target="/secondPage.html">
+        <input type="radio" name="mode" id="mode" value="walk" class="required" checked> <sz>I'm walking</sz>
+            <br>
+        <input type="radio" name="mode" id="mode" value="bike"> <sz>I'm taking my bike</sz>
+            <br>
+            <br>
+        <input class="controls" placeholder="where i'm at" type="text" id="origin">
+            <br>
+            <br>
+        <input class="controls" placeholder="where i'm going" type="text" id="destination">
+            <div class="radio-toolbar">
+            <br><br>
+            <input type="radio" name="deparr" id="deparr" value="leaveNow" class="required" checked> <sz>I'm leaving now </sz>
+                <br>
+                <p>or</p>
+            <input type="radio" name="deparr" id="deparr" value="leaveAt" > <sz>I'm leaving at</sz>
+                <br>
+            <input type="radio" name="deparr" id="deparr" value="thereBy"> <sz>I have to be there by</sz>
+            <br><br>
+            </div>
+        <input class="controls"  type="time"  id="timeInput" placeholder="Please specify a time">
+            <br><br>
+        <p>what do you care about?</p>
+            <br>
+        <sz>timeliness</sz>
+            <br><br>
+        <input type="range" id="time" min="0" max="10">
+            <br><br>
+        <sz>required energy</sz>
+            <br><br>
+        <input type="range" id="sweat" min="0" max="10">
+            <br><br>
+        <sz>scenery</sz>
+            <br><br>
+        <input type="range" id="scenic" min="0" max="10">
+            <br><br>
+        <sz>congestion of route</sz>
+            <br><br>
+        <input type="range" id="people" min="0" max="10">
+            <br>
+            <br>
+        <input type="submit" value="take me myway">
+        </form>
+        <h2 id ="yourway"></h2>
+        <div id="googleMapResult" style="width:500px;height:380px;"></div>
+        <br>
+        <table style="width:75%">
+            <tr align="center">
+                <td></td>
+                <td><b>time</b></td>      
+                <td><b>energy</b></td>
+                <td><b>scenery</b></td>
+                <td><b>congestion</b></td>
+            </tr>
+            <tr align="center">
+                <td><b id="route1"> Route 1</b></td>
+                <td><p id="time1"></p> </td>        
+                <td><p id="energy1"></p> </td>
+                <td><p id="scene1"></p> </td>
+                <td><p id="congestion1"></p> </td>
+
+            </tr>
+            <tr align="center">
+                <td><b id="route2">Route 2</b></td>
+                <td><p id="time2"></p> </td>        
+                <td><p id="energy2"></p> </td>
+                <td><p id="scene2"></p> </td>
+                <td><p id="congestion2"></p> </td>
+            </tr>           
+            <tr align="center">
+                <td><b id="route3">Route 3</b></td>
+                <td><p id="time3"></p> </td>        
+                <td><p id="energy3"></p> </td>
+                <td><p id="scene3"></p> </td>
+                <td><p id="congestion3"></p> </td>
+            </tr>
+        </table>
+        <br>
+        <h2>How it works</h2>
+        <p>
+After given your origin and destination, MyWay finds several route options, just as Google Maps would. The difference is that MyWay takes your preferences and uses them to weigh the corresponding attributes of each route to produce the optimal option.  Each attribute is defined differently in our system.  “Time” is very straightforward; simply defined by the time a route would take given an average walking speed.  “Scenery” is a little different; each area of campus is given a rating 1-5 with a route’s “scenic value” defined by the areas it directs you through.  The heat map below displays the data used by MyWay.  A route’s “Required Energy” is calculated using the elevation change experienced in each portion of the route multiplied by the average amount of energy exerted per elevation change. The average energy exerted was found through data collection by MyWay, using an eScooter to approximate energy usage. Finally, “Sociability” is a measure of the current congestion of a route.  It is approximated by real-time noise levels in different regions around campus.  In the end these attributes help define “your way”, a unique set of directions bound to turn your frantic rush to class into a leisurely stroll through campus.   </p>
+<br><br>
+
+        <h2>Campus elevations</h2>
+        <p>click on any location to determine elevation</p>
+        <div id="googleMapElevation" style="width:500px;height:380px;"></div>
+            <br>
+        <h2>Scenic Parts of Campus</h2>
+            <p></p>
+        <div id="googleMapHeat" style="width:500px;height:380px;"></div>
+            <br>
+            <!-- Map Initializations -->
+        <script>
+            function initialize() {
+                var mapPropElevation = {
+                    center:new google.maps.LatLng(37.872213, -122.258036),
+                    zoom:15,
+                    mapTypeId:google.maps.MapTypeId.TERRAIN
+                };
+                var mapPropHeat = {
+                    center:new google.maps.LatLng(37.872213, -122.258036),
+                    zoom:15,
+                    mapTypeId:google.maps.MapTypeId.ROADMAP
+                };
+                // Start maps
+                var mapElevation = new google.maps.Map(document.getElementById("googleMapElevation"),mapPropElevation);
+                var mapHeat = new google.maps.Map(document.getElementById("googleMapHeat"),mapPropHeat);
+
+                // Elevation Stuff
+                var elevator = new google.maps.ElevationService;
+                var infowindow = new google.maps.InfoWindow({map: mapElevation});
+
+                mapElevation.addListener('click', function(event) {
+                    displayLocationElevation(event.latLng, elevator, infowindow);
+                });
+                var heatMapData = [
+                    {location: new google.maps.LatLng(37.874472, -122.265973), weight: 1},
+                    {location: new google.maps.LatLng(37.873924, -122.265505), weight: 2},
+                    {location: new google.maps.LatLng(37.873911, -122.264824), weight: 2},
+                    {location: new google.maps.LatLng(37.874121, -122.263711), weight: 3},
+                    {location: new google.maps.LatLng(37.874199, -122.262531), weight: 4},
+                    {location: new google.maps.LatLng(37.873832, -122.261037), weight: 9},
+                    {location: new google.maps.LatLng(37.874317, -122.260322), weight: 10},
+                    {location: new google.maps.LatLng(37.874855, -122.261751), weight: 5},
+                    {location: new google.maps.LatLng(37.874881, -122.259475), weight: 8},
+                    {location: new google.maps.LatLng(37.874645, -122.258313), weight: 9},
+                    {location: new google.maps.LatLng(37.875128, -122.257289), weight: 4},
+                    {location: new google.maps.LatLng(37.875245, -122.256290), weight: 7},
+                    {location: new google.maps.LatLng(37.874404, -122.257289), weight: 6},
+                    {location: new google.maps.LatLng(37.873933, -122.256109), weight: 9},
+                    {location: new google.maps.LatLng(37.873654, -122.256993), weight: 10},
+                    {location: new google.maps.LatLng(37.874212, -122.258230), weight: 6},
+                    {location: new google.maps.LatLng(37.873616, -122.257812), weight: 5},
+                    {location: new google.maps.LatLng(37.873794, -122.258935), weight: 8},
+                    {location: new google.maps.LatLng(37.873192, -122.259154), weight: 10},
+                    {location: new google.maps.LatLng(37.873522, -122.260335), weight: 9},
+                    {location: new google.maps.LatLng(37.873073, -122.261547), weight: 8},
+                    {location: new google.maps.LatLng(37.873166, -122.262770), weight: 10},
+                    {location: new google.maps.LatLng(37.872955, -122.265592), weight: 7},
+                    {location: new google.maps.LatLng(37.872650, -122.264412), weight: 8},
+                    {location: new google.maps.LatLng(37.873353, -122.264294), weight: 9},
+                    {location: new google.maps.LatLng(37.871718, -122.265399), weight: 8},
+                    {location: new google.maps.LatLng(37.871396, -122.264154), weight: 10},
+                    {location: new google.maps.LatLng(37.871777, -122.261794), weight: 9},
+                    {location: new google.maps.LatLng(37.872523, -122.260635), weight: 6},
+                    {location: new google.maps.LatLng(37.871786, -122.260270), weight: 7},
+                    {location: new google.maps.LatLng(37.871964, -122.259369), weight: 10},
+                    {location: new google.maps.LatLng(37.871396, -122.259047), weight: 8},
+                    {location: new google.maps.LatLng(37.872616, -122.257341), weight: 6},
+                    {location: new google.maps.LatLng(37.872760, -122.256204), weight: 8},
+                    {location: new google.maps.LatLng(37.872827, -122.254691), weight: 7},
+                    {location: new google.maps.LatLng(37.871591, -122.253318), weight: 8},
+                    {location: new google.maps.LatLng(37.872226, -122.254337), weight: 1},
+                    {location: new google.maps.LatLng(37.871291, -122.254690), weight: 7},
+                    {location: new google.maps.LatLng(37.871689, -122.255881), weight: 9},
+                    {location: new google.maps.LatLng(37.871282, -122.256804), weight: 10},
+                    {location: new google.maps.LatLng(37.871180, -122.257855), weight: 4},
+                    {location: new google.maps.LatLng(37.869834, -122.260129), weight: 5},
+                    {location: new google.maps.LatLng(37.870130, -122.261546), weight: 3},
+                    {location: new google.maps.LatLng(37.869775, -122.261084), weight: 6},
+                    {location: new google.maps.LatLng(37.870223, -122.263434), weight: 1},
+                    {location: new google.maps.LatLng(37.870079, -122.264646), weight: 2},
+                    {location: new google.maps.LatLng(37.868775, -122.265805), weight: 4},
+                    {location: new google.maps.LatLng(37.868894, -122.264614), weight: 3},
+                    {location: new google.maps.LatLng(37.868064, -122.264678), weight: 1},
+                    {location: new google.maps.LatLng(37.868470, -122.262994), weight: 2},
+                    {location: new google.maps.LatLng(37.869317, -122.263573), weight: 6},
+                    {location: new google.maps.LatLng(37.869520, -122.261900), weight: 7},
+                    {location: new google.maps.LatLng(37.869004, -122.260677), weight: 8},
+                    {location: new google.maps.LatLng(37.868851, -122.259218), weight: 5},
+                    {location: new google.maps.LatLng(37.869597, -122.258928), weight: 6},
+                    {location: new google.maps.LatLng(37.870105, -122.259432), weight: 9},
+                    {location: new google.maps.LatLng(37.870664, -122.258188), weight: 8},
+                    {location: new google.maps.LatLng(37.870579, -122.257147), weight: 6},
+                    {location: new google.maps.LatLng(37.870884, -122.256439), weight: 7},
+                    {location: new google.maps.LatLng(37.870410, -122.256106), weight: 8},
+                    {location: new google.maps.LatLng(37.869986, -122.256825), weight: 6},
+                    {location: new google.maps.LatLng(37.870257, -122.254390), weight: 4},
+                    {location: new google.maps.LatLng(37.870452, -122.253145), weight: 2},
+                    {location: new google.maps.LatLng(37.870842, -122.254218), weight: 7},
+                    {location: new google.maps.LatLng(37.869868, -122.252619), weight: 5},
+                    {location: new google.maps.LatLng(37.869664, -122.253617), weight: 4},
+                    {location: new google.maps.LatLng(37.869902, -122.254432), weight: 8},
+                    {location: new google.maps.LatLng(37.869487, -122.254583), weight: 9},
+                    {location: new google.maps.LatLng(37.869681, -122.255141), weight: 7},
+                    {location: new google.maps.LatLng(37.869368, -122.255784), weight: 2},
+                    {location: new google.maps.LatLng(37.869427, -122.256825), weight: 5},
+                    {location: new google.maps.LatLng(37.869317, -122.258112), weight: 4},
+                    {location: new google.maps.LatLng(37.871485, -122.262180), weight: 5},
+                    {location: new google.maps.LatLng(37.871411, -122.262595), weight: 5},
+                    {location: new google.maps.LatLng(37.872120, -122.262903), weight: 5},
+                    {location: new google.maps.LatLng(37.872317, -122.262623), weight: 5},
+                    {location: new google.maps.LatLng(37.872359, -122.262151), weight: 5},
+                    {location: new google.maps.LatLng(37.872029, -122.262580), weight: 5},
+                    {location: new google.maps.LatLng(37.874561, -122.261507), weight: 5},
+                    {location: new google.maps.LatLng(37.874671, -122.261024), weight: 5},
+                    {location: new google.maps.LatLng(37.872545, -122.258200), weight: 8},
+                    {location: new google.maps.LatLng(37.872206, -122.257921), weight: 8},
+                    {location: new google.maps.LatLng(37.871765, -122.257835), weight: 8},
+                    {location: new google.maps.LatLng(37.870961, -122.260839), weight: 2},
+                    {location: new google.maps.LatLng(37.871325, -122.260850), weight: 4},
+                    {location: new google.maps.LatLng(37.870902, -122.261805), weight: 2},
+                    {location: new google.maps.LatLng(37.870749, -122.262266), weight: 3},
+                    {location: new google.maps.LatLng(37.870631, -122.263414), weight: 3},
+                    {location: new google.maps.LatLng(37.870546, -122.263908), weight: 3},
+                    {location: new google.maps.LatLng(37.870343, -122.264562), weight: 3},
+                    {location: new google.maps.LatLng(37.870224, -122.265045), weight: 3},
+                    {location: new google.maps.LatLng(37.870207, -122.265538), weight: 3},
+                    {location: new google.maps.LatLng(37.871079, -122.263671), weight: 5},
+                    {location: new google.maps.LatLng(37.870961, -122.264026), weight: 5},
+                    {location: new google.maps.LatLng(37.870868, -122.264433), weight: 5},
+                    {location: new google.maps.LatLng(37.870690, -122.264991), weight: 5},
+                    {location: new google.maps.LatLng(37.871046, -122.264862), weight: 5},
+                    {location: new google.maps.LatLng(37.871478, -122.264691), weight: 5},
+                    {location: new google.maps.LatLng(37.870631, -122.259949), weight: 2},
+                    {location: new google.maps.LatLng(37.869403, -122.264937), weight: 2},
+                    {location: new google.maps.LatLng(37.868581, -122.264712), weight: 2},
+                    {location: new google.maps.LatLng(37.869157, -122.259251), weight: 6},
+                    {location: new google.maps.LatLng(37.870537, -122.258318), weight: 3},
+                    {location: new google.maps.LatLng(37.870224, -122.262931), weight: 3},
+                    {location: new google.maps.LatLng(37.872147, -122.255410), weight: 2},
+                    {location: new google.maps.LatLng(37.872248, -122.255013), weight: 2},
+                    {location: new google.maps.LatLng(37.873036, -122.259670), weight: 8},
+                    {location: new google.maps.LatLng(37.872608, -122.263073), weight: 6},
+                    {location: new google.maps.LatLng(37.872735, -122.262130), weight: 6},
+                    {location: new google.maps.LatLng(37.872045, -122.256932), weight: 2},
+                    {location: new google.maps.LatLng(37.868750, -122.261785), weight: 3},
+                    {location: new google.maps.LatLng(37.869884, -122.257795), weight: 2},
+                ];
+                var heatmap = new google.maps.visualization.HeatmapLayer({
+                    data: heatMapData,
+                    radius: 22,
+                });
+                heatmap.setMap(mapHeat);
+            };  
+
+            <!-- Elevation Listener and Return Box --> 
+            google.maps.event.addDomListener(window, 'load', initialize);
+            function displayLocationElevation(location, elevator, infowindow) {
+                elevator.getElevationForLocations({
+                'locations': [location]
+            }, function(results, status) {
+            infowindow.setPosition(location);
+            if (status === google.maps.ElevationStatus.OK) {
+                if (results[0]) {
+                    infowindow.setContent('This point is <b>' +
+                    results[0].elevation + '</b> <br> meters high! WOW!');
+                } else {
+                    infowindow.setContent('No results found');
+                }
+            } else {
+                infowindow.setContent('Elevation service failed due to: ' + status);
+            }
+                });
+            }
+            
+            <!-- Polydraw -->
+            <!-- Heat Map -->
+                        <!-- Heat Map -->
+
+            <!-- Autocomplete Bounding --> 
+            var defaultBounds = new google.maps.LatLngBounds(
+              new google.maps.LatLng(37.880935, -122.246146),
+              new google.maps.LatLng(37.856139, -122.271364));
+            var options = {
+              bounds: defaultBounds
+            };
+            var input1 = document.getElementById('origin');
+            var input2 = document.getElementById('destination');
+            autocompleteOrigin = new google.maps.places.Autocomplete(input1,options);
+            autocompleteDestination = new google.maps.places.Autocomplete(input2,options);
+        </script>
+        <h2>About Us</h2>
+        <script>
+        google.maps.event.addDomListener(window, 'load', initialize);
+        </script>
+
+        <!-- Tableau Noise Chart --> 
+        <script type='text/javascript' src='https://public.tableau.com/javascripts/api/viz_v1.js'>
+        </script>
+        <div class='tableauPlaceholder' style='width: 500px; height: 600px;'>
+            <noscript>
+                <a href='#'>
+                    <img alt='Sheet 1 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;CE&#47;CE186Project_0&#47;Sheet1&#47;1_rss.png' style='border: none' />
+                </a>
+            </noscript>
+            <object class='tableauViz' width='500' height='600' style='display:none;'>
+                <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> 
+                <param name='site_root' value='' />
+                <param name='name' value='CE186Project_0&#47;Sheet1' />
+                <param name='tabs' value='no'/>
+                <param name='toolbar' value='no'/>
+                <param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;CE&#47;CE186Project_0&#47;Sheet1&#47;1.png' /> 
+                <param name='animate_transition' value='yes' />
+                <param name='display_static_image' value='yes' />
+                <param name='display_spinner' value='no' />
+                <param name='display_overlay' value='yes' />
+                <param name='display_count' value='no' />
+                <param name='showVizHome' value='no' />
+                <param name='showTabs' value='y' />
+                <param name='bootstrapWhenNotified' value='true' />
+            </object>
+        </div>
+
+        <br>
+        <h2>About Us</h2>
+        <p>
+MyWay was made possible thanks to CEE186, a project-based course with an emphasis in Cyber Physical Systems, taught at UC Berkeley.  We are a collective of undergraduate civil engineering and computer science students who hold an interest in developing technological networks that interact with the world around us.  Through studying the design of Cyber Physical Systems, we've developed an understanding of the technical process that integrates hardware and software into a reliable, connected service platform</p>
+<h2>Myway team</h2>
+<p>
+Natalie Chyba - Transportation and Systems Engineering<br>
+Patrick Lerchi - Structural Design, Dynamic Systems<br>
+Isabel Viegas de Lima - Transportation Systems Engineering <br>
+Josh Zarrabi - Computer Science, Programming</p>
+        </center>
+        
+        <!-- JQUERY and AJAX Getting Information from Form-->
+        <script>
+            $('form').submit(function (e) {
+                e.preventDefault();
+                // Get the Login Name value and trim it
+                var mode = $("input[name=mode]:checked").val();
+                var origin = $.trim($('#origin').val());
+                var destination = $.trim($('#destination').val());
+                var deparr = $("input[name=deparr]:checked").val();
+                var timeInput = $('#timeInput').val();
+                var time = $.trim($('#time').val());
+                var sweat = $.trim($('#sweat').val());
+                var scenic = $.trim($('#scenic').val());
+                var people = $.trim($('#people').val());
+
+                var formSubmit = "yes";
+                
+                // Code to check if the information is being collected properly 
+                // alert(origin);
+                // alert(destination);
+                // alert(deparr);
+                // alert(timeInput);
+                // alert(mode);
+                // alert(time);
+                // alert(sweat);
+                // alert(scenic);
+                // alert(people);
+                
+                // Code to send to server information once it is identified
+                $.ajax({
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        value: origin + ";" + destination + ";" + deparr + ";" + timeInput + ";" + mode + ";" + time + ";" + sweat + ";" + scenic + ";" + people
+                    }),
+                    processData: false,
+                    type: 'POST',
+                    url: 'http://127.0.0.1:5000/network/Project/object/Computer/stream/userData',
+                    dataType: 'json',
+                    success: function(data){
+                        // alert("device control succeeded");
+                    },
+                    error: function(){
+                        // alert("Device control failed");
+                    }
+                });
+
+            //                     <td><p id="time1"></p> </td>        
+            //     <td><p id="energy1"></p> </td>
+            //     <td><p id="scene1"></p> </td>
+            //     <td><p id="congestion1"></p> </td>
+            //     <td><p id="score1"></p> </td>
+            // </tr>
+            // <tr>
+            //     <td><b>Route 2</b></td>
+            //     <td><p id="time2"></p> </td>        
+            //     <td><p id="energy2"></p> </td>
+            //     <td><p id="scene2"></p> </td>
+            //     <td><p id="congestion2"></p> </td>
+            //     <td><p id="score2"></p> </td>
+            // </tr>           
+            // <tr>
+            //     <td><b>Route 3</b></td>
+            //     <td><p id="time3"></p> </td>        
+            //     <td><p id="energy3"></p> </td>
+            //     <td><p id="scene3"></p> </td>
+            //     <td><p id="congestion3"></p> </td>
+            //     <td><p id="score3"></p> </td>
+
+                //alert(formSubmit);
+                setTimeout(doStuff,3000)
+                document.getElementById("yourway").innerHTML = "Your Way";
+
+                    
+            });
+
+            var doStuff = function () {
+                //alert("in");
+                $.ajax({
+                    url: 'http://127.0.0.1:5000/network/Project/object/Computer/stream/processReturn',
+                    // data: {
+                    //     format: 'json'
+                    // },
+                    type: 'GET',
+                    error: function() {
+                        alert("nopeeee");
+                    },
+                    // dataType: 'jsonp',
+                    success: function(dataGet) {
+                        var dataGetSTR = JSON.stringify({ dataGet});
+                        // // var $description = $('<p>').text(data.talks[0].talk_description);
+                        // // $('#info')
+                        // //     .append($title)
+                        // //     .append($description);
+                        // // },
+                        // alert("Data: " + dataGetStr);
+      /*                  var dataGetSTR = JSON.parse('{"dataGet":{"network_id":"Project","objects":{"Computer":{"object_id":"Computer","streams":{"userData":{"points":[{"at":1449693934, "value": "0.0365162037037;0.5;0.25;0.5;10.5833333333;[(37.875567304667705, -122.25899180185543), (37.875243600000005, -122.2589245), (37.8750736, -122.2601499), (37.8749601, -122.2601254), (37.873361700000004, -122.2598861), (37.872376800000005, -122.2601719), (37.871878800000005, -122.2610489), (37.8715283, -122.2609056), (37.871274400000004, -122.26110460000001), (37.871138, -122.26168440000001), (37.869976900000005, -122.26177080000001), (37.8684251, -122.26146050000001)];0.0388425925926;0.4;0.25;0.4;14.0;[(37.8750344, -122.2601429), (37.87492719999999, -122.2601213), (37.8731151, -122.2610134), (37.8726703, -122.2616645), (37.87181959999999, -122.2610299), (37.87149300000001, -122.2609073), (37.8708708, -122.2618939), (37.8708275, -122.2617768), (37.8705461, -122.2616711), (37.87044789999999, -122.2618295), (37.8701829, -122.2617043), (37.8700908, -122.2618399), (37.8684357, -122.2614604), (37.8675165, -122.2612739), (37.867497, -122.2614309)];0.0388425925926;0.4;0.25;0.4;14.0;[(37.8750344, -122.2601429), (37.87492719999999, -122.2601213), (37.8731151, -122.2610134), (37.8726703, -122.2616645), (37.87181959999999, -122.2610299), (37.87149300000001, -122.2609073), (37.8708708, -122.2618939), (37.8708275, -122.2617768), (37.8705461, -122.2616711), (37.87044789999999, -122.2618295), (37.8701829, -122.2617043), (37.8700908, -122.2618399), (37.8684357, -122.2614604), (37.8675165, -122.2612739), (37.867497, -122.2614309)];"}],"stream_id":"userData"}}}}}}');
+
+
+*/
+                        
+                        console.log(dataGetSTR);
+
+                        dataGetSTR = JSON.parse(dataGetSTR)
+
+                        
+                        var dataGetStr= dataGetSTR["dataGet"]["objects"]["Computer"]["streams"]["processReturn"]["points"][0]["value"];
+                        console.log(dataGetStr);
+                        var parseData = dataGetStr.split(";");
+                        console.log(parseData);
+
+                        var scene1 = parseData[0];
+                        var SCENE1 = scene1.substr(0,5);
+                        var TIME1 = parseData[4];
+                        var SOCIAL1 = parseData[2];
+                        var SWEAT1 = parseData[3];
+                        var plan1 = parseData[5];
+                        var PLAN1 = plan1.substr(1,-1);
+                        var PERTIME1 = parseData[1];
+
+                        var scene2 = parseData[6];
+                        var SCENE2 = scene2.substr(0,5);
+                        var TIME2 = parseData[10];
+                        var SOCIAL2 = parseData[8];
+                        var SWEAT2 = parseData[9];
+                        var plan2 = parseData[11];
+                        var PERTIME2 = parseData[7];
+
+                        var scene3 = parseData[12];
+                        var SCENE3 = scene3.substr(0,5);
+                        var TIME3 = parseData[16];
+                        var SOCIAL3 = parseData[14];
+                        var SWEAT3 = parseData[15];
+                        var plan3 = parseData[17];
+                        var PERTIME3 = parseData[13];
+
+                        console.log(plan1);
+
+                        plan1 = plan1.split(",");
+                        var flightPlanCoordinates1 = [];
+                        var len = plan1.length;
+                        for (var i = 0; i < len - 1; i+=2) {
+                            ths = {"lat" : parseFloat(plan1[i]), "lng" : parseFloat(plan1[i+1])};
+                            flightPlanCoordinates1.push(ths);
+                        }
+                        flightPlanCoordinates1.pop();
+
+                        plan2 = plan2.split(",");
+                        var flightPlanCoordinates2 = [];
+                        var len = plan2.length;
+                        for (var i = 0; i < len - 1; i+=2) {
+                            ths = {"lat" : parseFloat(plan2[i]), "lng" : parseFloat(plan2[i+1])};
+                            flightPlanCoordinates2.push(ths);
+                        }
+                        flightPlanCoordinates2.pop();
+
+                        plan3 = plan3.split(",");
+                        var flightPlanCoordinates3 = [];
+                        var len = plan3.length;
+                        for (var i = 0; i < len - 1; i+=2) {
+                            ths = {"lat" : parseFloat(plan3[i]), "lng" : parseFloat(plan3[i+1])};
+                            flightPlanCoordinates3.push(ths);
+                        }
+                        flightPlanCoordinates3.pop();
+
+
+                        console.log(flightPlanCoordinates2)
+                        document.getElementById("time1").innerHTML = TIME1.substr(0,4);
+                        document.getElementById("energy1").innerHTML = SWEAT1;
+                        document.getElementById("scene1").innerHTML = SCENE1;
+                        document.getElementById("congestion1").innerHTML = SOCIAL1;
+
+                        document.getElementById("time2").innerHTML = TIME2.substr(0,4);
+                        document.getElementById("energy2").innerHTML = SWEAT2;
+                        document.getElementById("scene2").innerHTML = SCENE2;
+                        document.getElementById("congestion2").innerHTML = SOCIAL2;
+
+                        document.getElementById("time3").innerHTML = TIME3.substr(0,4);
+                        document.getElementById("energy3").innerHTML = SWEAT3;
+                        document.getElementById("scene3").innerHTML = SCENE3;
+                        document.getElementById("congestion3").innerHTML = SOCIAL3;
+
+
+                        var mapPropResult = {
+                            center:new google.maps.LatLng(37.872213, -122.258036),
+                            zoom:15,
+                            mapTypeId:google.maps.MapTypeId.ROADMAP
+                        }
+
+                        var flightPath1 = new google.maps.Polyline({
+                           path: flightPlanCoordinates1,
+                           geodesic: true,
+                           strokeColor: '#FF0000',
+                           strokeOpacity: 1.0,
+                           strokeWeight: 2
+                        });
+
+                        var flightPath2 = new google.maps.Polyline({
+                           path: flightPlanCoordinates2,
+                           geodesic: true,
+                           strokeColor: '#FF0000',
+                           strokeOpacity: 1.0,
+                           strokeWeight: 2
+                        });
+
+                        var flightPath3 = new google.maps.Polyline({
+                           path: flightPlanCoordinates3,
+                           geodesic: true,
+                           strokeColor: '#FF0000',
+                           strokeOpacity: 1.0,
+                           strokeWeight: 2
+                        });
+
+
+
+                        var mapResult = new google.maps.Map(document.getElementById("googleMapResult"),mapPropResult);
+
+                        var chosen_route = flightPath1;
+
+                        $( "#route1" ).click(function() {
+                              chosen_route.setMap(null);
+                              chosen_route = flightPath1;
+                              flightPath1.setMap(mapResult);
+                              console.log("route1 clicked");
+                        });
+
+                        $( "#route2" ).click(function() {
+                              chosen_route.setMap(null);
+                              chosen_route = flightPath2;
+                              flightPath2.setMap(mapResult);
+                              console.log("route2 clicked");
+                        });
+
+                        $( "#route3" ).click(function() {
+                              chosen_route.setMap(null);
+                              chosen_route = flightPath3;
+                              flightPath3.setMap(mapResult);
+                              console.log("route3 clicked");
+                        });
+
+
+
+                        chosen_route.setMap(mapResult);
+                    },
+                // alert(formSubmit),
+                });
+            };
+
+        </script>
+    </body>
+        
