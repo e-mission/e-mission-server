@@ -17,7 +17,7 @@ class UserModelTests(unittest.TestCase):
 
     def testDelta(self):
         base = eum.UserBase()
-        josh = eum.UserModel("josh", base)
+        josh = eum.UserModel(base)
         josh.increase_utility_by_n("scenery", 100)
         josh.increase_utility_by_n("noise", 10)
         start, end = (1, 1), (2, 2)  ## GPS points
@@ -36,14 +36,14 @@ class UserModelTests(unittest.TestCase):
         t2 = eum.CampusTrip((10, 20, 30, 40), 120, 2, "fake")
         t3 = eum.CampusTrip((100, 200, 300, 400), 180, 3, "fake")
         base = eum.UserBase()
-        josh = eum.UserModel("josh", base)
+        josh = eum.UserModel()
         self.assertEqual(josh.get_top_n((t1, t2, t3), 1), [t3])
         self.assertEqual(josh.get_top_n((t1, t2, t3), 2), [t3, t2])
 
 
     def testE2E(self):
         base = eum.UserBase()
-        josh = eum.UserModel("josh", base)
+        josh = eum.UserModel()
         josh.increase_utility_by_n("scenery", 100)
         josh.increase_utility_by_n("noise", 10)
         start, end = (37.504712, -122.314189), (37.509580, -122.321560)   ## GPS points
@@ -68,7 +68,7 @@ class UserModelTests(unittest.TestCase):
         start = (37.870637,-122.259722)
         end = (37.872277,-122.25639)
         base = eum.UserBase()
-        josh = eum.UserModel("josh", base)
+        josh = eum.UserModel()
         all_trips = josh.get_all_trips(start, end)
 
         normal_times = eum.get_normalized_times(all_trips)
@@ -92,7 +92,7 @@ class UserModelTests(unittest.TestCase):
         our_gmaps = gmaps.GoogleMaps("AIzaSyAFsQeO3Xj60s0nBVRcAS-I9FLw6KZPV-E") 
 
         jsn = our_gmaps.directions(start, end, 'walking')
-        gmaps_options = gmcommon.google_maps_to_our_trip(jsn, 0, 0, 0, "walking", curr_time)
+        gmaps_options = gmcommon.google_maps_to_our_trip_list(jsn, 0, 0, 0, "walking", curr_time)
         # self.assertEqual(gmaps_options[0].trip_start_location.to_tuple(), start)
         # self.assertEqual(gmaps_options[0].trip_end_location.to_tuple(), end) 
 

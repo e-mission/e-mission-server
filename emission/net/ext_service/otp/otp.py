@@ -143,9 +143,3 @@ def otp_time_to_ours(otp_str):
     t = time.gmtime(int(otp_str)/1000)
     return datetime.datetime(*t[:6])    
 
-
-
-def tester():
-    geo = our_geo.Geocoder()
-    otp = OTP( (37.79144, -122.40181) , (37.79629, -122.42829) , "TRANSIT", "11-6-15", "5:15pm", True)
-    print otp.make_url()

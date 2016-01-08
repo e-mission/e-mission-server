@@ -32,33 +32,14 @@ def coerce_gmaps_time(time):
 def google_maps_to_our_trip_list(google_maps_json, _id, user_id, trip_id, mode, org_start_time):
     routes = []
     for i in xrange(len(google_maps_json['routes'])):
-        sections = [ ]
-        time = org_start_time
-        for leg in google_maps_json['routes'][i]['legs']:
-            td = coerce_gmaps_time(leg['duration']['text']) 
-            coords = [ ]
-            for step in leg['steps']:
-                coords.append(ewt.Coordinate(step['end_location']['lat'], step['end_location']['lng']))
-            distance = leg['distance']
-            start_location = ewt.Coordinate(leg['start_location']['lat'], leg['start_location']['lng'])
-            end_location = ewt.Coordinate(leg['end_location']['lat'], leg['end_location']['lng'])
-            end_time = time + td
-            section = ewt.Section(0, user_id, trip_id, distance, "move", time, end_time, start_location, end_location, mode, mode)
-            section.points = coords
-            sections.append(section)
-            time = end_time
-        start_trip = ewt.Coordinate(float(google_maps_json['routes'][i]['legs'][0]["start_location"]['lat']), float(google_maps_json['routes'][i]['legs'][0]["start_location"]['lng']))
-        end_trip = ewt.Coordinate(float(google_maps_json['routes'][i]['legs'][-1]["start_location"]['lat']), float(google_maps_json['routes'][i]['legs'][-1]["start_location"]['lng']))
-        cost = 0
-        parent_id = trip_id
-        mode_list = [str(mode)]
-        routes.append(ewt.Alternative_Trip(_id, user_id, trip_id, sections, org_start_time, end_time, start_trip, end_trip, parent_id, cost, mode_list))
+        routes.append(google_maps_to_our_trip(google_maps_json, _id, user_id, trip_id, mode, org_start_time, i))
+    print "routes = %s" % routes
     return routes
 
-def google_maps_to_our_trip(google_maps_json, _id, user_id, trip_id, mode, org_start_time):
+def google_maps_to_our_trip(google_maps_json, _id, user_id, trip_id, mode, org_start_time, itinerary=0):
     sections = [ ]
     time = org_start_time
-    for leg in google_maps_json['routes'][0]['legs']:
+    for leg in google_maps_json['routes'][itinerary]['legs']:
         td = coerce_gmaps_time(leg['duration']['text']) 
         coords = [ ]
         for step in leg['steps']:

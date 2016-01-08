@@ -20,6 +20,9 @@ CENTER_OF_CAMPUS = to.Coordinate(37.871790, -122.260005)
 RANDOM_RADIUS = .3  # 300 meters around center of campus; for randomization
 N_TOP_TRIPS = 3 # Number of top trips we return for the user to look at
 
+key_file = open("keys.json")
+GOOGLE_MAPS_KEY = json.load(key_file)["googlemaps"]
+
 
 class UserBase:
 
@@ -29,17 +32,14 @@ class UserBase:
     """
 
     def __init__(self):
-        self.users = {}
+        self.users = []
         self.crowd_areas = {}
         self.last_info = {}  ## so we only call google maps if we change things
         self.old_trips = None
         self.geocode_cache = {} # fewer calls to google maps
 
     def add_user(self, user):
-        self.users[user.name] = user
-
-    def get_user(self, user_name):
-        return self.users[user_name]
+        self.users.append(user)
 
     def add_crowd(self, area):
         self.crowd_areas[area.name] = area
@@ -105,8 +105,7 @@ class UserModel:
     Can do lots of cool things
     """ 
 
-    def __init__(self, name, has_bike=False):
-        self.name = name
+    def __init__(self, has_bike=False):
         self.utilities = emmc.Counter()
         self.has_bike = has_bike
         self.user_base = the_base
@@ -126,7 +125,7 @@ class UserModel:
         return self.get_top_choices_lat_lng(start, end)
 
     def get_all_trips(self, start, end, curr_time=None):
-        c = googlemaps.client.Client('AIzaSyAFsQeO3Xj60s0nBVRcAS-I9FLw6KZPV-E')
+        c = googlemaps.client.Client(GOOGLE_MAPS_KEY)
         if curr_time is None:
             curr_time = datetime.datetime.now()
         curr_month = curr_time.month
@@ -141,7 +140,7 @@ class UserModel:
         walk_otp = otp.OTP(start, end, "WALK", write_day(curr_month, curr_day, curr_year), write_time(curr_hour, curr_minute), False)
         lst_of_trips = walk_otp.get_all_trips(0, 0, 0)
 
-        our_gmaps = gmaps.GoogleMaps("AIzaSyAFsQeO3Xj60s0nBVRcAS-I9FLw6KZPV-E") 
+        our_gmaps = gmaps.GoogleMaps(GOOGLE_MAPS_KEY) 
         mode = "walking"
         if self.has_bike:
             mode = "bicycling"
@@ -431,15 +430,6 @@ def write_day(month, day, year):
 def write_time(hour, minute):
     return "%s:%s" % (hour, minute)
 
-def make_random_user(base):
-    name = str(random.random())
-    user = UserModel(name)
-    utilites = ("sweat", "scenery", "social", "time", "noise", "crowded")
-    for u in utilites:
-        new_utility = random.randint(1, 101)
-        user.increase_utility_by_n(u, new_utility)
-    return user
-
 
 def get_one_random_point_in_radius(crd, radius):
     # From https://gis.stackexchange.com/questions/25877/how-to-generate-random-locations-nearby-my-location
@@ -464,79 +454,6 @@ def kilometers_to_degrees(km):
 def str_time_to_datetme(str_time):
     t = str_time.split(":")
     return datetime.datetime(2040, 10, 10, int(t[0]), int(t[1]), 0)
-
-def loop(base):
-    get_data = 'http://127.0.0.1:5000/network/Project/object/Computer/stream/userData'
-    send_data = 'http://127.0.0.1:5000/network/Project/object/Computer/stream/processReturn'
-    request = urllib2.Request(get_data)
-    response = urllib2.urlopen(request)
-    at = int((datetime.datetime.utcnow() - datetime.datetime.utcfromtimestamp(0)).total_seconds())
-    jsn = json.load(response)
-
-    print jsn
-    info = make_user_from_jsn(jsn, base)
-    user = info["user"]
-    #print info["time_info"]
-    if user.delta(info["start"], info["end"]):
-        #print "IN DELTA=TRUE"
-        trips = user.get_top_choices_lat_lng(info["start"], info["end"], info["time_info"]["when"])
-        user.user_base.old_trips = trips
-        user.add_to_last(info["start"], info["end"])
-    else:
-        trips = user.user_base.old_trips
-
-    #print "trips is %s" % trips
-
-    query = {}
-    header = {'Content-Type':'application/json'}
-
-    ts = ""
-    payload = []
-    #print "above ts . apppend"
-    for t in trips:
-        print t.sweat
-        #print t
-        ts += (str(t.make_for_browser()))
-        ts += ";"
-
-    payload = [{"value" : str(ts), "at" : at}]
-
-    body = json.dumps(payload)
-    r = requests.request('post', send_data, data=body, params=query, headers=header, timeout=120)
-    #print r.json
-
-def loop_mongo(base):
-    info = user_from_mongo()
-    if user.delta(info["start"], info["end"]):
-        #print "IN DELTA=TRUE"
-        trips = user.get_top_choices_lat_lng(info["start"], info["end"], info["time_info"]["when"])
-        user.user_base.old_trips = trips
-        user.add_to_last(info["start"], info["end"])
-    else:
-        trips = user.user_base.old_trips
-
-    at = int((datetime.datetime.utcnow() - datetime.datetime.utcfromtimestamp(0)).total_seconds())
-
-    final_json = {"at" : at, "pushing" : True, "trips" : []}
-    for t in trips:
-        final_json["trips"].append(t.make_jsn())
-
-    edb.get_utility_model_db().insert(json.dumps(final_json))
-
-
-def main():
-    base = UserBase()
-    #loop(base)
-    while True:
-        #print "here"
-        #loop(base)
-        try:
-            loop_mongo(base)
-            time.sleep(.5)
-        except Exception as e:
-            print e
-            pass
-
 
 
 def make_user_from_jsn(jsn, base):
@@ -563,9 +480,8 @@ def make_user_from_jsn(jsn, base):
         time_info["when"] = str_time_to_datetme(value_line[3])
         print "arriveAt"
 
-
     bike = get_bike_info(value_line[4])
-    user = UserModel("scottMoura", bike)
+    user = UserModel(bike)
     user.increase_utility_by_n("time", int(value_line[5]))
     user.increase_utility_by_n("sweat", int(value_line[6]))
     user.increase_utility_by_n("scenery", int(value_line[7]))
@@ -576,18 +492,6 @@ def make_user_from_jsn(jsn, base):
 
     return {"user" : user, "start" : start, "end" : end, "time_info" : time_info}
 
-def user_from_mongo():
-    db = edb.get_utility_model_db()
-    record = db.find({"pushing" : False}).sort({"at" : -1}).limit(1)
-    bike = record["bike"]
-
-    user = UserModel("person", bike)
-    user.increase_utility_by_n("time", record["time"])
-    user.increase_utility_by_n("sweat", record["sweat"])
-    user.increase_utility_by_n("scenery", record["scenery"])
-    user.increase_utility_by_n("social", record["social"])
-
-    return {"user" : user, "start" : record["start"], "end" : record["end"], "time_info" : record["time_info"]}   
 
 
 def get_bike_info(bike_str):
@@ -597,7 +501,7 @@ def get_bike_info(bike_str):
 
 def get_elevation_change(trip):
     time.sleep(1)
-    c = googlemaps.client.Client('AIzaSyAFsQeO3Xj60s0nBVRcAS-I9FLw6KZPV-E')
+    c = googlemaps.client.Client(GOOGLE_MAPS_KEY)
     print get_route(trip)
     jsn = googlemaps.elevation.elevation_along_path(c, get_route(trip), 200)
     up, down = 0, 0

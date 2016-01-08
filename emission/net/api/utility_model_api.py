@@ -3,7 +3,7 @@ import emission.core.get_database as edb
 
 import json
 
-def write_to_db_from_browser(info):
+def do_utility_analysis(info):
     db = edb.get_utility_model_db()
     at = int((datetime.datetime.utcnow() - datetime.datetime.utcfromtimestamp(0)).total_seconds())
     value_line = value_line.split(";")
