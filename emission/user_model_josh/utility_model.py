@@ -15,13 +15,14 @@ import heapq
 import time
 import googlemaps
 import requests
+import random
 
 CENTER_OF_CAMPUS = to.Coordinate(37.871790, -122.260005)
 RANDOM_RADIUS = .3  # 300 meters around center of campus; for randomization
 N_TOP_TRIPS = 3 # Number of top trips we return for the user to look at
 
-key_file = open("conf/net/keys.json")
-GOOGLE_MAPS_KEY = json.load(key_file)["client_key"]
+key_file = open("conf/net/ext_service/googlemaps.json")
+GOOGLE_MAPS_KEY = json.load(key_file)["api_key"]
 
 
 class UserBase:
@@ -157,14 +158,18 @@ class UserModel:
         return tot_trips
 
 
-    def get_top_choices_lat_lng(self, start, end, curr_time=None):
-        tot_trips = self.get_all_trips(start, end, curr_time)
+    def get_top_choices_lat_lng(self, start, end, curr_time=None, tot_trips=None):
+        testing = True
+        if tot_trips is None:
+            tot_trips = self.get_all_trips(start, end, curr_time)
+            testing = False
         scores = [ ]
         i = 0
         print "len = %s" % len(tot_trips)
         times = get_normalized_times(tot_trips)
+        print "times is %s" % times
         beauty = get_normalized_beauty(tot_trips)
-        sweat = get_normalized_sweat(tot_trips)
+        sweat = get_normalized_sweat(tot_trips, testing=testing)
 
         print "sweat = %s" % sweat
 
@@ -182,7 +187,7 @@ class UserModel:
             crowd.update_times(trip.start_time)
             crowd_score += crowd.get_crowd()
 
-        final_time =  -time * self.utilities["time"]
+        final_time =  -(time * self.utilities["time"])
         final_sweat = -sweat * self.utilities["sweat"]
         final_beauty = (self.utilities['scenery']*beauty)
         final_crowd = (self.utilities['social']*crowd_score)
@@ -246,16 +251,16 @@ def get_normalized_times(lst_of_trips):
         to_return.append(counter[i])
     return to_return
 
-def get_sweat_factor(trip):
-    chng = get_elevation_change(trip)
+def get_sweat_factor(trip, testing=False):
+    chng = get_elevation_change(trip, testing)
     print "chng : %s" % str(chng)
     return 71.112*chng[0] + 148.09
 
-def get_normalized_sweat(lst_of_trips):
+def get_normalized_sweat(lst_of_trips, testing=False):
     counter = emmc.Counter()
     i = 0
     for trip in lst_of_trips:
-        factor = get_sweat_factor(trip)
+        factor = get_sweat_factor(trip, testing)
         print "sweat_factor : %s" % factor
         counter[i] = factor
         i += 1
@@ -499,7 +504,11 @@ def get_bike_info(bike_str):
         return False
     return True
 
-def get_elevation_change(trip):
+def get_elevation_change(trip, testing=False):
+    if testing:
+        up = random.randint(1, 100)
+        down = random.randint(1, 100)
+        return (up, down)
     time.sleep(1)
     c = googlemaps.client.Client(GOOGLE_MAPS_KEY)
     print get_route(trip)
