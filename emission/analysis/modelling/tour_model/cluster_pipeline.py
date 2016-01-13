@@ -40,6 +40,7 @@ def read_data(uuid=None,size=None):
     else:
         trips = db.find({'type' : 'move'})
     if trips.count() == 0: 
+        print "no trips"
         return [] 
     for t in trips:
         try: 
@@ -53,6 +54,7 @@ def read_data(uuid=None,size=None):
             if len(data) == size:
                 break
     if len(data) == 0: 
+        print "no sections"
         return [] 
     return data
 
