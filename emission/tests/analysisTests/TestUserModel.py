@@ -108,9 +108,9 @@ class UserModelTests(unittest.TestCase):
         print "normal sweat = %s" % normal_sweat
         print "normal beauty = %s" % normal_beauty
 
-        self.assertEqual(sum(normal_times), 1)
-        self.assertEqual(sum(normal_sweat), 1)
-        self.assertEqual(sum(normal_beauty), 1)
+        self.assertAlmostEqual(sum(normal_times), 1)
+        self.assertAlmostEqual(sum(normal_sweat), 1)
+        self.assertAlmostEqual(sum(normal_beauty), 1)
 
 
 
