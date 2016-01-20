@@ -35,10 +35,11 @@ class Coordinate(object):
         return cm.calDistance(self, other, True)
 
     def __str__(self):
-        return self.maps_coordinate()
+        return "%f,%f" % (float(self.lat), float(self.lon))
+
 
     def __repr__(self):
-        return self.maps_coordinate()
+        return "%f,%f" % (float(self.lat), float(self.lon))
 
     def to_tuple(self):
         return (float(self.lat), float(self.lon))

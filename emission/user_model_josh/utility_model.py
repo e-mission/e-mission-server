@@ -51,10 +51,12 @@ class UserBase:
     def geocode_with_cache(self, place):
         coder = geo.Geocoder()
         if place in self.geocode_cache:
+            print self.geocode_cache[place]
             return self.geocode_cache[place]
         else:
             coded = coder.geocode(place)
             self.geocode_cache[place] = coded
+            print coded
             return coded
 
 
@@ -120,9 +122,8 @@ class UserModel:
         self.utilities["time"] = 0
 
     def get_top_choice_places(self, start_place, end_place):
-        our_geo = geo.Geocoder()
-        start = our_geo.geocode(start_place)
-        end = our_geo.geocode(end_place)
+        start = self.user_base.geocode_with_cache(start_place)
+        end = self.user_base.geocode_with_cache(end_place)
         return self.get_top_choices_lat_lng(start, end)
 
     def get_all_trips(self, start, end, curr_time=None):
@@ -164,15 +165,9 @@ class UserModel:
             tot_trips = self.get_all_trips(start, end, curr_time)
             testing = False
         scores = [ ]
-        i = 0
-        print "len = %s" % len(tot_trips)
         times = get_normalized_times(tot_trips)
-        print "times is %s" % times
         beauty = get_normalized_beauty(tot_trips)
         sweat = get_normalized_sweat(tot_trips, testing=testing)
-
-        print "sweat = %s" % sweat
-
         for i in range(len(times)):
             scores.append(self.get_score_for_trip(tot_trips[i], times[i], beauty[i], sweat[i]))
 
@@ -509,7 +504,7 @@ def get_elevation_change(trip, testing=False):
         up = random.randint(1, 100)
         down = random.randint(1, 100)
         return (up, down)
-    time.sleep(1)
+    time.sleep(1) # so we dont run out calls
     c = googlemaps.client.Client(GOOGLE_MAPS_KEY)
     print get_route(trip)
     jsn = googlemaps.elevation.elevation_along_path(c, get_route(trip), 200)
@@ -528,5 +523,3 @@ def get_elevation_change(trip, testing=False):
 
 if __name__ == "__main__":
     main()
-
-#[{"score (for each)": 0, "trip_duration" : 12, "points" : points list]

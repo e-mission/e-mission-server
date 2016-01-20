@@ -1,17 +1,15 @@
 import emission.user_model_josh.utility_model as eum
 import emission.core.get_database as edb
+import datetime
 
 import json
 
 def do_utility_analysis(info):
     db = edb.get_utility_model_db()
     at = int((datetime.datetime.utcnow() - datetime.datetime.utcfromtimestamp(0)).total_seconds())
-    value_line = value_line.split(";")
+    value_line = info.split(";")
     start = value_line[0]
     end = value_line[1]
-
-    start = base.geocode_with_cache(start)
-    end = base.geocode_with_cache(end)
     
     time_info = {}
     if value_line[2] == "leaveNow":
@@ -29,7 +27,7 @@ def do_utility_analysis(info):
 
     bike = get_bike_info(value_line[4])
 
-    user = UserModel("scottMoura", bike)
+    user = eum.UserModel(bike)
     user.increase_utility_by_n("time", int(value_line[5]))
     user.increase_utility_by_n("sweat", int(value_line[6]))
     user.increase_utility_by_n("scenery", int(value_line[7]))
@@ -40,7 +38,15 @@ def do_utility_analysis(info):
     scenery = int(value_line[7])
     social = int(value_line[8])
 
-    trips = user.get_top_choices_lat_lng(info["start"], info["end"], info["time_info"]["when"])
+    when = None
+
+    if time_info["leave"]:
+        when = time_info["when"]
+
+
+    trips = user.get_top_choice_places(start, end)
+
+    ts = ""
 
     for t in trips:
         ts += (str(t.make_for_browser()))

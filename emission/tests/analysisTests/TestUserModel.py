@@ -4,6 +4,7 @@ import googlemaps
 import emission.net.ext_service.otp.otp as otp
 import emission.net.ext_service.gmaps.googlemaps as gmaps
 import emission.net.ext_service.gmaps.common as gmcommon
+import emission.net.api.utility_model_api as umapi
 import datetime
 
 
@@ -111,6 +112,8 @@ class UserModelTests(unittest.TestCase):
         self.assertAlmostEqual(sum(normal_times), 1)
         self.assertAlmostEqual(sum(normal_sweat), 1)
         self.assertAlmostEqual(sum(normal_beauty), 1)
+
+
 
 
 
