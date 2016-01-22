@@ -3,6 +3,9 @@ from emission.core.wrapper.trip_old import Coordinate
 import json
 from pygeocoder import Geocoder as pyGeo  ## We fall back on this if we have to
 
+key_file = open("conf/net/ext_service/googlemaps.json")
+GOOGLE_MAPS_KEY = json.load(key_file)["api_key"]
+
 class Geocoder:
 
     def __init__(self):
@@ -71,11 +74,11 @@ class Geocoder:
 
 ## Failsafe section
 def _do_google_geo(address):
-    geo = pyGeo()
+    geo = pyGeo(GOOGLE_MAPS_KEY)
     results = geo.geocode(address)
     return Coordinate(results[0].coordinates[0], results[0].coordinates[1])
 
 def _do_google_reverse(lat, lng):
-    geo = pyGeo()
+    geo = pyGeo(GOOGLE_MAPS_KEY)
     address = geo.reverse_geocode(lat, lng)
     return address[0]
