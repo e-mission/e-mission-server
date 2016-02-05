@@ -8,27 +8,18 @@ import emission.core.get_database as edb
 def save_common_place(common_place):
     db = edb.get_common_place_db()
     db.save(common_place)
-    # db.insert({
-    #     "coords" : common_place.coords,
-    #     "edges" : common_place.edges,
-    #     "successors" : common_place.successors,
-    #     "user_id" : common_place.user_id
-    #     })
 
 def get_common_place_from_db(_id):
     db = edb.get_common_place_db()
     json_obj = db.find_one({"_id" : _id})
     return make_common_place_from_json(json_obj)
 
+def get_all_common_places_for_user(user_id):
+    db = edb.get_common_place_db()
+    return db.find({"user_id" : user_id})
+
 def make_common_place_from_json(json_obj):
-    props = {
-        "user_id" : json_obj.get("user_id"),
-        "_id" : json_obj.get("_id"),
-        "coords" : json_obj.get("coords"),
-        "edges" : json_obj.get("edges"),
-        "successors" : json_obj.get("successors")
-    }
-    return ecwcp.CommonPlace(props)
+    return ecwcp.CommonPlace(json_obj)
 
 def make_new_common_place(user_id, coords):
     props = {
@@ -36,10 +27,9 @@ def make_new_common_place(user_id, coords):
         "coords" : coords,
         "common_place_id" : "%s%s" % (user_id, coords["coordinates"]),
         "edges" : (),
-        "successors" : ()
+        "successors" : () 
     }
     return ecwcp.CommonPlace(props)
-
 
 def make_common_place(props):
     return ecwcp.CommonPlace(props)
@@ -65,19 +55,15 @@ def create_places(list_of_cluster_data, user_id):
             places_to_successors[start_place_id] = {"successors" : [], "coords" : start_coords}
         else:
             places_to_successors[start_place_id]["successors"].append(end_place_id)
-
         if end_place_id not in places_to_successors:
             places_to_successors[end_place_id] = {"successors" : [], "coords" : end_coords}
-
 
     for place_id, info in places_to_successors.iteritems():
         props = {
             "user_id" : user_id,
             "coords" : info["coords"],
             "successors" : info["successors"],
-            "_id" : place_id
+            "common_place_id" : place_id
         }
         start = make_common_place(props)
         save_common_place(start)
-
-

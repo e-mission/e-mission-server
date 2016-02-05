@@ -4,8 +4,6 @@ import emission.storage.decorations.common_place_queries as esdcpq
 import emission.storage.decorations.common_trip_queries as esdctq
 import emission.analysis.modelling.tour_model.cluster_pipeline as eamtmcp
 
-import numpy as np
-
 #################################################################################
 ############################ database functions #################################
 #################################################################################
@@ -48,4 +46,3 @@ def make_tour_model_from_raw_user_data(user_id):
     list_of_cluster_data = eamtmcp.main(user_id)
     esdcpq.create_places(user_id)
     esdctq.set_up_trips(user_id)
-    esdctq.add_probabilites(user_id)

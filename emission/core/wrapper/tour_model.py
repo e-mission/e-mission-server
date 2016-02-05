@@ -8,5 +8,10 @@ class TourModel(ecwb.WrapperBase):
              "commonTrips" : ecwb.WrapperBase.Access.WORM  # A list of CommonTrip objects in this tm
     }
 
+    geojson = []
+    enums = {}
+    nullable = []
+
+
     def _populateDependencies(self):
         pass
