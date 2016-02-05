@@ -10,6 +10,9 @@ import emission.analysis.modelling.tour_model.similarity as similarity
 import emission.analysis.modelling.tour_model.featurization as featurization
 import emission.analysis.modelling.tour_model.representatives as representatives
 from emission.core.wrapper.trip_old import Trip, Section, Fake_Trip
+import emission.core.wrapper.trip as ecwt
+import emission.core.wrapper.section as ecws
+
 """
 This file reads the data from the trip database, 
 removes noise from the data, clusters it, and returns a dictionary 
