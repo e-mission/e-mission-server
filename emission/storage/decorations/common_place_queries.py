@@ -1,5 +1,7 @@
 import emission.core.wrapper.common_place as ecwcp
 import emission.core.get_database as edb
+import emission.simulation.markov_model_counter as esmmc
+import emission.storage.decorations.common_trip_queries as esdctp
 
 #################################################################################
 ############################ database functions #################################
@@ -21,13 +23,12 @@ def get_all_common_places_for_user(user_id):
 def make_common_place_from_json(json_obj):
     return ecwcp.CommonPlace(json_obj)
 
-def make_new_common_place(user_id, coords):
+def make_new_common_place(user_id, coords, successors):
     props = {
         "user_id" : user_id,
         "coords" : coords,
         "common_place_id" : "%s%s" % (user_id, coords["coordinates"]),
-        "edges" : (),
-        "successors" : () 
+        "successors" : successors
     }
     return ecwcp.CommonPlace(props)
 
@@ -35,12 +36,6 @@ def make_common_place(props):
     return ecwcp.CommonPlace(props)
 
 ################################################################################
-
-def add_successor(common_place, new_place):
-    common_place.successors.append(new_place)
-
-def add_edge(common_place, edge):
-    common_place.edges.append(edge)
 
 def create_places(list_of_cluster_data, user_id):
     places_to_successors = {}
@@ -67,3 +62,17 @@ def create_places(list_of_cluster_data, user_id):
         }
         start = make_common_place(props)
         save_common_place(start)
+
+### Graph queries
+
+def get_succesor(user_id, place_id, time):
+    temp = esmmc.Counter()
+    day = time.weekday()
+    place = get_common_place_from_db(place_id)
+    for suc in place.successors:
+        _id = esdctp.make__id(user_id, place_id, suc)
+        trip = esdctp.get_common_trip(_id)
+        for temp_hour in xrange(time.hour, esdctp.HOURS_IN_DAY):
+            counter_key = (_id, temp_hour)
+            temp_counter[counter_key] = trip.probabilites[day, temp_hour]
+    return esmmc.sampleFromCounter(temp_counter)

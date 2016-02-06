@@ -46,3 +46,4 @@ def make_tour_model_from_raw_user_data(user_id):
     list_of_cluster_data = eamtmcp.main(user_id)
     esdcpq.create_places(user_id)
     esdctq.set_up_trips(user_id)
+
