@@ -11,7 +11,7 @@ import geojson
 import emission.net.usercache.formatters.common as fc
 
 def format(entry):
-    assert(entry.metadata.key == "background/location")
+    # assert(entry.metadata.key == "background/location")
     return format_location_simple(entry)
 
 def format_location_simple(entry):
