@@ -112,18 +112,18 @@ def section_to_geojson(section, tl):
     # using dataframe features here, it is unclear how much that would help.
     feature_array = []
     section_location_array = [ecwl.Location(ts._to_df_entry(entry)) for entry in entry_it]
+    if len(section_location_array) != 0:
+        logging.debug("first element in section_location_array = %s" % section_location_array[0])
 
-    logging.debug("first element in section_location_array = %s" % section_location_array[0])
-
-    # Fudge the end point so that we don't have a gap because of the ts != write_ts mismatch
-    # TODO: Fix this once we are able to query by the data timestamp instead of the metadata ts
-    if section_location_array[-1].loc != section.end_loc:
-        last_loc_doc = ts.get_entry_at_ts("background/filtered_location", "data.ts", section.end_ts)
-        last_loc_data = ecwe.Entry(last_loc_doc).data
-        last_loc_data["_id"] = last_loc_doc["_id"]
-        section_location_array.append(last_loc_data)
-        logging.debug("Adding new entry %s to fill the end point gap between %s and %s"
-            % (last_loc_data.loc, section_location_array[-2].loc, section.end_loc))
+        # Fudge the end point so that we don't have a gap because of the ts != write_ts mismatch
+        # TODO: Fix this once we are able to query by the data timestamp instead of the metadata ts
+        if section_location_array[-1].loc != section.end_loc:
+            last_loc_doc = ts.get_entry_at_ts("background/filtered_location", "data.ts", section.end_ts)
+            last_loc_data = ecwe.Entry(last_loc_doc).data
+            last_loc_data["_id"] = last_loc_doc["_id"]
+            section_location_array.append(last_loc_data)
+            logging.debug("Adding new entry %s to fill the end point gap between %s and %s"
+                % (last_loc_data.loc, section_location_array[-2].loc, section.end_loc))
 
     # Find the list of points to filter
     filtered_points_entry_doc = ts.get_entry_at_ts("analysis/smoothing", "data.section",
@@ -141,10 +141,13 @@ def section_to_geojson(section, tl):
     with_speeds = eaicl.add_dist_heading_speed(pd.DataFrame(filtered_section_location_array))
     speeds = list(with_speeds.speed)
     distances = list(with_speeds.distance)
-    for idx, row in with_speeds.iterrows():
-        # TODO: Remove instance of setting value without going through wrapper class
-        filtered_section_location_array[idx]["speed"] = row["speed"]
-        filtered_section_location_array[idx]["distance"] = row["distance"]
+
+    if len(filtered_section_location_array) != 0:
+        for idx, row in with_speeds.iterrows():
+            # TODO: Remove instance of setting value without going through wrapper class
+            filtered_section_location_array[idx]["speed"] = row["speed"]
+            filtered_section_location_array[idx]["distance"] = row["distance"]
+
     points_feature_array = [location_to_geojson(l) for l in filtered_section_location_array]
 
     points_line_feature = point_array_to_line(filtered_section_location_array)
@@ -274,7 +277,7 @@ def get_geojson_for_timeline(user_id, tl):
             # I think those should be resolved for now, so we can raise the error again
             # But if this is preventing us from making progress, we can comment out the raise
             logging.exception("Found key error %s while processing trip %s" % (e, trip))
-            raise e
+            # raise e
         except Exception, e:
             logging.exception("Found error %s while processing trip %s" % (e, trip))
             raise e
