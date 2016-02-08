@@ -2,6 +2,7 @@ import logging
 import attrdict as ad
 # This is only to allow us to catch the DuplicateKeyError
 import pymongo
+import datetime as pydt
 
 import emission.net.usercache.abstract_usercache_handler as enuah
 import emission.net.usercache.abstract_usercache as enua
@@ -133,6 +134,8 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         # pipeline were to run again
 
         start_ts = esp.get_complete_ts(self.user_id)
+	logging.debug("start ts from pipeline = %s, %s" % 
+           (start_ts, pydt.datetime.utcfromtimestamp(start_ts).isoformat()))
         trip_gj_list = self.get_trip_list_for_seven_days(start_ts)
         if len(trip_gj_list) == 0:
             ts = etsa.TimeSeries.get_time_series(self.user_id)
@@ -154,7 +157,8 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
             logging.debug("Adding %s trips for day %s" % (len(day_gj_list), day))
             uc.putDocument("diary/trips-%s"%day, day_gj_list)
 
-        self.delete_obsolete_entries(uc, day_list_bins.iterkeys())
+        valid_key_list = ["diary/trips-%s"%day for day in day_list_bins.iterkeys()]
+        self.delete_obsolete_entries(uc, valid_key_list)
 
     def get_oldest_valid_ts(self, start_ts):
         """
@@ -179,6 +183,8 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         # the keys. The current key generation should work fine with
         # lexicographic ordering, but at the same time, this seems much easier
         # and safer to deal with.
+        logging.debug("curr_key_list = %s, valid_key_list = %s" % 
+	    (curr_key_list, valid_key_list))
         to_del_keys = set(curr_key_list) - set(valid_key_list)
         logging.debug("obsolete keys are: %s" % to_del_keys)
         return to_del_keys
@@ -188,7 +194,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         # TODO: This is not strictly accurate, since it will skip trips that were in a later timezone but within the
         # same requested date range.
         trip_gj_list = gfc.get_geojson_for_ts(self.user_id, seventy_two_hours_ago_ts, start_ts)
-        logging.debug("Found %s trips in seven days starting from %s" % (len(trip_gj_list), start_ts))
+        logging.debug("Found %s trips in seven days starting from %s (%s)" % (len(trip_gj_list), start_ts, pydt.datetime.utcfromtimestamp(start_ts).isoformat()))
         return trip_gj_list
 
     @staticmethod
@@ -224,7 +230,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         for trip_gj in trip_gj_list:
             trip = ecwt.Trip(trip_gj.properties)
             # TODO: Consider extending for both start and end
-            day_string = get_local_day_from_fmt_time(trip)
+            day_string = BuiltinUserCacheHandler.get_local_day_from_fmt_time(trip)
             if day_string not in ret_val:
                 ret_val[day_string] = [trip_gj]
             else:

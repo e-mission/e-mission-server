@@ -10,6 +10,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
         super(BuiltinTimeSeries, self).__init__(user_id)
         self.key_query = lambda(key): {"metadata.key": key}
         self.type_query = lambda(entry_type): {"metadata.type": entry_type}
+        self.timeseries_db = edb.get_timeseries_db()
 
     @staticmethod
     def get_uuid_list():
@@ -52,17 +53,17 @@ class BuiltinTimeSeries(esta.TimeSeries):
     def find_entries(self, key_list = None, time_query = None):
         sort_key = self._get_sort_key(time_query)
         logging.debug("sort_key = %s" % sort_key)
-        return edb.get_timeseries_db().find(self._get_query(key_list, time_query)).sort(sort_key, pymongo.ASCENDING)
+        return self.timeseries_db.find(self._get_query(key_list, time_query)).sort(sort_key, pymongo.ASCENDING)
 
     def get_entry_at_ts(self, key, ts_key, ts):
-        return edb.get_timeseries_db().find_one({"user_id": self.user_id,
+        return self.timeseries_db.find_one({"user_id": self.user_id,
                                                  "metadata.key": key,
                                                  ts_key: ts})
 
     def get_data_df(self, key, time_query = None):
         sort_key = self._get_sort_key(time_query)
         logging.debug("curr_query = %s, sort_key = %s" % (self._get_query([key], time_query), sort_key))
-        result_it = edb.get_timeseries_db().find(self._get_query([key], time_query), {"data": True,
+        result_it = self.timeseries_db.find(self._get_query([key], time_query), {"data": True,
                 "metadata.write_ts": True}).sort(sort_key, pymongo.ASCENDING)
         logging.debug("Found %s results" % result_it.count())
         # Dataframe doesn't like to work off an iterator - it wants everything in memory
@@ -79,7 +80,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
         It is assumed that the values for the field are sortable.
         :return: the max value for the field in the stream identified by key. -1 if there are no entries for the key.
         """
-        result_it = edb.get_timeseries_db().find(self._get_query([key], time_query),
+        result_it = self.timeseries_db.find(self._get_query([key], time_query),
                                                  {"_id": False, field: True}).sort(field, pymongo.DESCENDING).limit(1)
         if result_it.count() == 0:
             return -1
@@ -102,7 +103,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
             logging.debug("entry was fine, no need to fix it")
 
         logging.debug("Inserting entry %s into timeseries" % entry)
-        edb.get_timeseries_db().insert(entry)
+        self.timeseries_db.insert(entry)
 
     def insert_error(self, entry):
         """

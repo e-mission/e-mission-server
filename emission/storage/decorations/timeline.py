@@ -111,9 +111,11 @@ class Timeline(object):
         import emission.storage.decorations.place_queries as esdp
 
         if place_id not in self.id_map:
-            place = esdp.get_place(self.trips[0].start_place)
+            logging.debug("place id %s is not in the map, searching in database" % place_id)
+            place = esdp.get_place(place_id)
             self.places.append(place)
             self.id_map[place_id] = place
+            logging.debug("retrieved object %s and added to id_map" % place)
             return place
         else:
             return self.id_map[place_id]

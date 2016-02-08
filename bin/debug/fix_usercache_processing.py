@@ -26,11 +26,13 @@ def fix_usercache_errors():
 def copy_to_usercache():       
     # Step 1: Copy data back to user cache
     error_it = edb.get_timeseries_error_db().find()
+    uc = edb.get_usercache_db()
+    te = edb.get_timeseries_error_db()
     logging.info("Found %d errors in this round" % error_it.count())
     for error in error_it:
         logging.debug("Copying entry %s" % error["metadata"])
-        save_result = edb.get_usercache_db().save(error)
-        remove_result = edb.get_timeseries_error_db().remove(error["_id"])    
+        save_result = uc.save(error)
+        remove_result = te.remove(error["_id"])    
         logging.debug("save_result = %s, remove_result = %s" % (save_result, remove_result))
     logging.info("step copy_to_usercache DONE")
     
