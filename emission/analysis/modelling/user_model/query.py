@@ -45,7 +45,7 @@ def obtain_alternatives(trip_id, user_id):
                         result = gmaps.directions(origin=start_coord, destination=end_coord, mode=mode)
                         gmaps_trip = gmaps_lib.common.google_maps_to_our_trip(result, None, user_id, trip_id, mode, curr_time)
                         gmaps_trip.save_to_db()
-                    except GoogleMapsError as ge:
+                    except gmaps_lib.googlemaps.GoogleMapsError as ge:
                         logging.info("No alternatives found in either OTP or google maps, saving nothing")
                         
         '''
