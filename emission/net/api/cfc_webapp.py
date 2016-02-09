@@ -28,7 +28,7 @@ import bson.json_util
 
 # Our imports
 import modeshare, zipcode, distance, tripManager, \
-                 Berkeley, visualize, stats, usercache
+                 Berkeley, visualize, stats, usercache, timeline
 import emission.net.ext_service.moves.register as auth
 import emission.analysis.result.carbon as carbon
 import emission.analysis.classification.inference.commute as commute
@@ -54,6 +54,7 @@ key_data = json.load(key_file)
 ssl_cert = key_data["ssl_certificate"]
 private_key = key_data["private_key"]
 client_key = key_data["client_key"]
+client_key_old = key_data["client_key_old"]
 ios_client_key = key_data["ios_client_key"]
 
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
@@ -261,7 +262,11 @@ def getTrips(day):
   user_uuid=getUUID(request)
   force_refresh = request.query.get('refresh', False)
   logging.debug("user_uuid %s" % user_uuid)
-  return timeline.get_trips_for_day(user_uuid, day, force_refresh)
+  ret_geojson = timeline.get_trips_for_day(user_uuid, day, force_refresh)
+  logging.debug("type(ret_geojson) = %s" % type(ret_geojson))
+  ret_dict = {"timeline": ret_geojson}
+  logging.debug("type(ret_dict) = %s" % type(ret_dict))
+  return ret_dict
 
 @post('/profile/create')
 def createUserProfile():
@@ -435,25 +440,30 @@ def after_request():
 def verifyUserToken(token):
     try:
         # attempt to validate token on the client-side
-        logging.debug("Using OAuth2Client to verify id token from android phones")
+        logging.debug("Using OAuth2Client to verify id token of length %d from android phones" % len(token))
         tokenFields = oauth2client.client.verify_id_token(token,client_key)
         logging.debug(tokenFields)
     except AppIdentityError as androidExp:
         try:
-            logging.debug("Using OAuth2Client to verify id token from iOS phones")
-            tokenFields = oauth2client.client.verify_id_token(token, ios_client_key)
+            logging.debug("Using OAuth2Client to verify id token of length %d from android phones using old token" % len(token))
+            tokenFields = oauth2client.client.verify_id_token(token,client_key_old)
             logging.debug(tokenFields)
-        except AppIdentityError as iOSExp:
-            traceback.print_exc()
-            logging.debug("OAuth failed to verify id token, falling back to constructedURL")
-            #fallback to verifying using Google API
-            constructedURL = ("https://www.googleapis.com/oauth2/v1/tokeninfo?id_token=%s" % token)
-            r = requests.get(constructedURL)
-            tokenFields = json.loads(r.content)
-            in_client_key = tokenFields['audience']
-            if (in_client_key != client_key):
-                if (in_client_key != ios_client_key):
-                    abort(401, "Invalid client key %s" % in_client_key)
+        except AppIdentityError as androidExpOld:
+            try:
+                logging.debug("Using OAuth2Client to verify id token from iOS phones")
+                tokenFields = oauth2client.client.verify_id_token(token, ios_client_key)
+                logging.debug(tokenFields)
+            except AppIdentityError as iOSExp:
+                traceback.print_exc()
+                logging.debug("OAuth failed to verify id token, falling back to constructedURL")
+                #fallback to verifying using Google API
+                constructedURL = ("https://www.googleapis.com/oauth2/v1/tokeninfo?id_token=%s" % token)
+                r = requests.get(constructedURL)
+                tokenFields = json.loads(r.content)
+                in_client_key = tokenFields['audience']
+                if (in_client_key != client_key):
+                    if (in_client_key != ios_client_key):
+                        abort(401, "Invalid client key %s" % in_client_key)
     logging.debug("Found user email %s" % tokenFields['email'])
     return tokenFields['email']
 

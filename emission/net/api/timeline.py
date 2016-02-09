@@ -10,7 +10,7 @@ import emission.core.get_database as edb
 import emission.net.usercache.abstract_usercache as enua
 import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
 
-def get_trips_for_day(user_uuid, day)
+def get_trips_for_day(user_uuid, day, force_refresh):
     """
     The day argument here is a string such as 2015-10-01 or 2016-01-01. We will
     parse this to a datetime, which we will use to query the data in the

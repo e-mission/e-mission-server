@@ -41,10 +41,13 @@ def obtain_alternatives(trip_id, user_id):
                     otp_to_google_mode = {"CAR":"driving", "WALK":"walking", "BICYCLE":"bicycling", "TRANSIT":"transit"}
                     mode = otp_to_google_mode[mode]
                     gmaps = gmaps_lib.googlemaps.GoogleMaps('AIzaSyBEkw4PXVv_bsAdUmrFwatEyS6xLw3Bd9c')
-                    result = gmaps.directions(origin=start_coord, destination=end_coord, mode=mode)
-                    gmaps_trip = gmaps_lib.common.google_maps_to_our_trip(result, None, user_id, trip_id, mode, curr_time)
-                    gmaps_trip.save_to_db()
-
+                    try:
+                        result = gmaps.directions(origin=start_coord, destination=end_coord, mode=mode)
+                        gmaps_trip = gmaps_lib.common.google_maps_to_our_trip(result, None, user_id, trip_id, mode, curr_time)
+                        gmaps_trip.save_to_db()
+                    except gmaps_lib.googlemaps.GoogleMapsError as ge:
+                        logging.info("No alternatives found in either OTP or google maps, saving nothing")
+                        
         '''
 
 	#remove job from cronjob

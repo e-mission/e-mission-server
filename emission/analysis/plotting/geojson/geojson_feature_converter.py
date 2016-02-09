@@ -250,7 +250,8 @@ def get_geojson_for_ts(user_id, start_ts, end_ts):
     return get_geojson_for_timeline(user_id, tl)
 
 def get_geojson_for_dt(user_id, start_dt, end_dt):
-    tl = esdtl.get_timeline(user_id, start_dt, end_dt)
+    logging.debug("Getting geojson for %s -> %s" % (start_dt, end_dt))
+    tl = esdtl.get_timeline_from_dt(user_id, start_dt, end_dt)
     tl.fill_start_end_places()
     return get_geojson_for_timeline(user_id, tl)
 
