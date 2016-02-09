@@ -5,8 +5,11 @@ def get_timeline_from_dt(user_id, start_dt, end_dt):
     import emission.core.get_database as edb
     import emission.core.wrapper.entry as ecwe
 
-    result_cursor = edb.get_timeseries_db().find({"data.local_dt": {"$gte": start_dt, "$lte": end_dt}}).sort("metadata.write_ts")
+    logging.info("About to query for %s -> %s" % (start_dt, end_dt))
+    result_cursor = edb.get_timeseries_db().find({"user_id": user_id, "data.local_dt": {"$gte": start_dt, "$lte": end_dt}}).sort("metadata.write_ts")
+    logging.debug("result cursor has %d entries" % result_cursor.count())
     result_list = list(result_cursor)
+    logging.debug("result list has %d entries" % len(result_list))
     start_ts = ecwe.Entry(result_list[0]).metadata.write_ts
     end_ts = ecwe.Entry(result_list[-1]).metadata.write_ts
     logging.debug("Converted datetime range %s -> %s to timestamp range %s -> %s" %
