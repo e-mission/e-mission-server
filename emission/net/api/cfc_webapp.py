@@ -54,6 +54,7 @@ key_data = json.load(key_file)
 ssl_cert = key_data["ssl_certificate"]
 private_key = key_data["private_key"]
 client_key = key_data["client_key"]
+client_key_old = key_data["client_key_old"]
 ios_client_key = key_data["ios_client_key"]
 
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
@@ -439,25 +440,30 @@ def after_request():
 def verifyUserToken(token):
     try:
         # attempt to validate token on the client-side
-        logging.debug("Using OAuth2Client to verify id token from android phones")
+        logging.debug("Using OAuth2Client to verify id token of length %d from android phones" % len(token))
         tokenFields = oauth2client.client.verify_id_token(token,client_key)
         logging.debug(tokenFields)
     except AppIdentityError as androidExp:
         try:
-            logging.debug("Using OAuth2Client to verify id token from iOS phones")
-            tokenFields = oauth2client.client.verify_id_token(token, ios_client_key)
+            logging.debug("Using OAuth2Client to verify id token of length %d from android phones using old token" % len(token))
+            tokenFields = oauth2client.client.verify_id_token(token,client_key_old)
             logging.debug(tokenFields)
-        except AppIdentityError as iOSExp:
-            traceback.print_exc()
-            logging.debug("OAuth failed to verify id token, falling back to constructedURL")
-            #fallback to verifying using Google API
-            constructedURL = ("https://www.googleapis.com/oauth2/v1/tokeninfo?id_token=%s" % token)
-            r = requests.get(constructedURL)
-            tokenFields = json.loads(r.content)
-            in_client_key = tokenFields['audience']
-            if (in_client_key != client_key):
-                if (in_client_key != ios_client_key):
-                    abort(401, "Invalid client key %s" % in_client_key)
+        except AppIdentityError as androidExpOld:
+            try:
+                logging.debug("Using OAuth2Client to verify id token from iOS phones")
+                tokenFields = oauth2client.client.verify_id_token(token, ios_client_key)
+                logging.debug(tokenFields)
+            except AppIdentityError as iOSExp:
+                traceback.print_exc()
+                logging.debug("OAuth failed to verify id token, falling back to constructedURL")
+                #fallback to verifying using Google API
+                constructedURL = ("https://www.googleapis.com/oauth2/v1/tokeninfo?id_token=%s" % token)
+                r = requests.get(constructedURL)
+                tokenFields = json.loads(r.content)
+                in_client_key = tokenFields['audience']
+                if (in_client_key != client_key):
+                    if (in_client_key != ios_client_key):
+                        abort(401, "Invalid client key %s" % in_client_key)
     logging.debug("Found user email %s" % tokenFields['email'])
     return tokenFields['email']
 
