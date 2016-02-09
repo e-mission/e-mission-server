@@ -28,7 +28,7 @@ import bson.json_util
 
 # Our imports
 import modeshare, zipcode, distance, tripManager, \
-                 Berkeley, visualize, stats, usercache
+                 Berkeley, visualize, stats, usercache, timeline
 import emission.net.ext_service.moves.register as auth
 import emission.analysis.result.carbon as carbon
 import emission.analysis.classification.inference.commute as commute
@@ -261,7 +261,11 @@ def getTrips(day):
   user_uuid=getUUID(request)
   force_refresh = request.query.get('refresh', False)
   logging.debug("user_uuid %s" % user_uuid)
-  return timeline.get_trips_for_day(user_uuid, day, force_refresh)
+  ret_geojson = timeline.get_trips_for_day(user_uuid, day, force_refresh)
+  logging.debug("type(ret_geojson) = %s" % type(ret_geojson))
+  ret_dict = {"timeline": ret_geojson}
+  logging.debug("type(ret_dict) = %s" % type(ret_dict))
+  return ret_dict
 
 @post('/profile/create')
 def createUserProfile():
