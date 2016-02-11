@@ -13,15 +13,12 @@ def save_common_place(common_place):
 
 def get_common_place_from_db(_id):
     db = edb.get_common_place_db()
-    json_obj = db.find_one({"_id" : _id})
+    json_obj = db.find_one({"common_place_id" : _id})
     return make_common_place_from_json(json_obj)
 
 def get_all_common_places_for_user(user_id):
     db = edb.get_common_place_db()
     return db.find({"user_id" : user_id})
-
-def make_common_place_from_json(json_obj):
-    return ecwcp.CommonPlace(json_obj)
 
 def make_new_common_place(user_id, coords, successors):
     props = {

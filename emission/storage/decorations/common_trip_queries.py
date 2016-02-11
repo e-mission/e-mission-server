@@ -16,22 +16,21 @@ HOURS_IN_DAY = 24
 ############################ database functions #################################
 #################################################################################
 
+
 def save_common_trip(common_trip):
     db = edb.get_common_trip_db()
     probs = _2d_array_to_mongo_format(common_trip.probabilites)
-    db.insert({
+    db.save({
         "user_id" : common_trip.user_id,
         "start_loc" : common_trip.start_loc,
         "end_loc" : common_trip.end_loc,
         "trips" : common_trip.trips,
         "probs" : probs,
-        "_id" : common_trip.common_trip_id
         }) 
 
-def get_common_trip_from_db(_id):
+def get_common_trip_from_db(user_id, start_place_id, end_place_id):
     db = edb.get_common_trip_db()
-    json_obj = db.find_one({"_id" : _id})
-    print json_obj
+    json_obj = db.find_one({"user_id" : user_id, "start_loc" : start_place_id, "end_loc" : end_place_id})
     return make_common_trip_from_json(json_obj)
 
 def get_all_common_trips_for_user(user_id):
@@ -39,11 +38,9 @@ def get_all_common_trips_for_user(user_id):
     return db.find({"user_id" : user_id})
 
 def make_common_trip_from_json(json_obj):
-    print "json_obj = %s" % json_obj
-    probs = _mongo_to_2d_array(json_obj.get(probs))
+    probs = _mongo_to_2d_array(json_obj.get("probs"))
     props = {
         "user_id" : json_obj.get("user_id"),
-        "common_trip_id" : json_obj.get("_id"),
         "start_loc" : json_obj.get("start_loc"),
         "end_loc" : json_obj.get("end_loc"),
         "trips" : json_obj.get("trips"),
@@ -63,7 +60,6 @@ def make_common_trip(props):
 def make_new_common_trip(user_id, start, end):
     props = {
         "user_id" : user_id,
-        "common_trip_id" : "%s%s%s" % (user_id, start, end),
         "start_loc" : start.common_place_id,
         "end_loc" : end.common_place_id,
         "trips" : (), 
@@ -104,13 +100,21 @@ def set_up_trips(list_of_cluster_data, user_id):
         end_coords = dct['end_coords']
         start_place_id = "%s%s" % (user_id, start_coords)
         end_place_id = "%s%s" % (user_id, end_coords)
+        #print 'dct["sections"].trip_id %s is' % dct["sections"][0]
+        for sec in dct["sections"]:
+            print "sec.trip_id is %s type is %s" % (sec.trip_id, type(sec.trip_id))
         trips = [sec.trip_id for sec in dct["sections"]]
+        assert (type(trips) == list)
+        trips = tuple(trips)
+        assert (type(trips) == tuple)
+        print "type(trips) is %s" % type(trips)
+        print "len(trips) is %s" % len(trips)
+        print "trips are" + str(trips)
         probabilites = np.zeros((DAYS_IN_WEEK, HOURS_IN_DAY))
         for sec in dct["sections"]:
             probabilites[get_day(sec), get_start_hour(sec)] += 1
         trip_props = {
             "user_id" : user_id,
-            "common_trip_id" : make__id(user_id, start_place_id, end_place_id),
             "start_loc" : start_place_id, 
             "end_loc" : end_place_id,
             "trips" : trips,
