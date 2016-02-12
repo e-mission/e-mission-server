@@ -10,26 +10,27 @@ import emission.simulation.trip_gen as tg
 import emission.core.get_database as edb
 import emission.storage.decorations.common_trip_queries as esdctp
 
-class TestCommonTripQueries(unittest.TestCase):
+class TestCommonPlaceQueries(unittest.TestCase):
     
     def setUp(self):
+        edb.get_common_place_db().drop()
+        edb.get_common_trip_db().drop()
         self.testUserId = uuid.uuid4()
         self.testLocation = gj.Point((122.1234, 37.1234))
         self.testEnd = esdcpq.make_new_common_place(uuid.uuid4(), gj.Point((1,2.092)), ())
         self.testStart = esdcpq.make_new_common_place(uuid.uuid4(), gj.Point((1,2)), (self.testEnd.common_place_id,))
+        esdcpq.save_common_place(self.testEnd)
+        esdcpq.save_common_place(self.testStart)
         self.time0 = datetime.datetime(1900, 1, 1, 1)
-        edb.get_common_trip_db().drop()
 
     def tearDown(self):
         edb.get_common_trip_db().drop()
+        edb.get_common_place_db().drop()
 
     def testCreation(self):
         place = esdcpq.make_new_common_place(self.testUserId, self.testLocation, ())
-        print place.coords
         self.assertEqual(type(place.coords), gj.Point)
-        #print "place.successors = %s" % place.successors
-        print place.coords
-        print "place.common_place_id = %s" % place.common_place_id
+        self.assertEqual(type(place.successors), tuple)
         self.assertIsNotNone(place.successors)
 
     def testCreatePlace(self):
@@ -41,21 +42,23 @@ class TestCommonTripQueries(unittest.TestCase):
             places_list.append(esdcpq.make_common_place(p))
         for place in places_list:
             self.assertIsNotNone(place.coords)
-            self.assertTrue(len(place.successors) > 0)
+            self.assertIsNotNone(place["successors"])
 
     def testGetSuccessor(self):
+        print "size of db is %s" % edb.get_common_place_db().find().count()
+        self.assertIsNotNone(edb.get_common_place_db().find_one({"common_place_id": self.testEnd.common_place_id}))
         probs = np.zeros( (7, 24) )
-        probs[3,3] = 10
+        probs[self.time0.weekday(), 3] = 10
         props = {
             "user_id" : self.testUserId,
             "start_loc" : self.testStart.common_place_id,
             "end_loc" : self.testEnd.common_place_id,
-            "common_trip_id" : esdctp.make__id(self.testUserId, self.testStart.common_place_id, self.testEnd.common_place_id),
-            "probabilites" : probs
+            "probabilites" : probs,
+            "trips" : ()
         }
-        trip = esdctp.make_common_trip(props)
+        trip = esdctp.make_new_common_trip(props)
         esdctp.save_common_trip(trip)
-        suc = esdcpq.get_successor(self.testUserId, self.testStart, self.time0)
+        suc = esdcpq.get_succesor(self.testUserId, self.testStart.common_place_id, self.time0)
         self.assertEqual(suc, self.testEnd.common_place_id)
 
 
