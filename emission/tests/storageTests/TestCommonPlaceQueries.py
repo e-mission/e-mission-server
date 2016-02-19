@@ -64,8 +64,8 @@ class TestCommonPlaceQueries(unittest.TestCase):
 
 def get_fake_data(user_name):
     # Call with a username unique to your database
-    tg.create_fake_trips(user_name)
-    return eamtcp.main(user_name)
+    tg.create_fake_trips(user_name, True)
+    return eamtcp.main(user_name, False)
 
 if __name__ == "__main__":
     unittest.main()

@@ -6,6 +6,8 @@ import bson
 
 import emission.core.wrapper.common_trip as ecwct
 import emission.core.get_database as edb
+import emission.storage.decorations.trip_queries as esdtq
+
 
 
 # constants
@@ -70,10 +72,10 @@ def add_real_trip_id(trip, _id):
     trip.trips.append(_id)
 
 def get_start_hour(section_info):
-    return section_info.start_time.hour
+    return section_info.start_local_dt.hour
 
 def get_day(section_info):
-    return section_info.start_time.weekday()
+    return section_info.start_local_dt.weekday()
 
 def increment_probability(trip, day, hour):
     trip.probabilites[day, hour] += 1
@@ -88,13 +90,13 @@ def set_up_trips(list_of_cluster_data, user_id):
         end_place_id = "%s%s" % (user_id, end_coords)
         #print 'dct["sections"].trip_id %s is' % dct["sections"][0]
         probabilites = np.zeros((DAYS_IN_WEEK, HOURS_IN_DAY))
-        trips = [sec.trip_id for sec in dct["sections"]]
         for sec in dct["sections"]:
+            sec = esdtq.get_trip(sec)
             probabilites[get_day(sec), get_start_hour(sec)] += 1
         trip = make_new_common_trip()
         trip.user_id = user_id
         trip.start_loc = start_place_id
         trip.end_loc = end_place_id
         trip.probabilites = probabilites
-        trip.trips = trips
+        trip.trips = dct["sections"]
         save_common_trip(trip)

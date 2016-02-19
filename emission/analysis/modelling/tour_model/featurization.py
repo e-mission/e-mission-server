@@ -11,6 +11,8 @@ import sys
 # our imports
 from emission.core.wrapper.trip_old import Trip, Coordinate
 from kmedoid import kmedoids
+import emission.storage.decorations.trip_queries as esdtq
+
 
 """
 This class is used for featurizing data, clustering the data, and evaluating the clustering. 
@@ -22,13 +24,16 @@ This class is run by cluster_pipeline.py
 """
 class featurization:
 
-    def __init__(self, data):
+    def __init__(self, data, old=True):
+        print "old is %s" % old
         self.data = data
+        self.is_old = old
         if not self.data:
             self.data = []
         self.calculate_points()
         self.labels = []
         self.clusters = None
+
 
     #calculate the points to use in the featurization. 
     def calculate_points(self):
@@ -36,11 +41,19 @@ class featurization:
         if not self.data:
             return
         for trip in self.data:
-            start = trip.trip_start_location
-            end = trip.trip_end_location
+            if self.is_old:
+                start = trip.trip_start_location
+                end = trip.trip_end_location
+            else:
+                trip = esdtq.get_trip(trip)
+                start = trip.start_loc["coordinates"]
+                end = trip.end_loc["coordinates"]
             if not (start and end):
                 raise AttributeError('each trip must have valid start and end locations')
-            self.points.append([start.lon, start.lat, end.lon, end.lat])
+            if self.is_old:
+                self.points.append([start.lon, start.lat, end.lon, end.lat])
+            else:
+                self.points.append([start[0], start[1], end[0], end[1]])
 
     #cluster the data. input options:
     # - name (optional): the clustering algorithm to use. Options are 'kmeans' or 'kmedoids'. Default is kmeans.
