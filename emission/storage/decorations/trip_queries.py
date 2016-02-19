@@ -71,3 +71,4 @@ def get_timeline_for_trip(user_id, trip_id):
     """
     return esdt.Timeline(get_stops_for_trip(user_id, trip_id),
                          get_sections_for_trip(user_id, trip_id))
+

@@ -184,6 +184,16 @@ def get_trip_new_db():
     Trips = current_db.Stage_trip_new
     return Trips
 
+def get_common_place_db():
+    current_db = MongoClient().Stage_database
+    CommonPlaces = current_db.Stage_common_place
+    return CommonPlaces
+
+def get_common_trip_db():
+    current_db = MongoClient().Stage_database
+    CommonTrips = current_db.Stage_common_trips
+    return CommonTrips
+
 def get_stop_db():
     current_db = MongoClient().Stage_database
     Stops = current_db.Stage_stop
