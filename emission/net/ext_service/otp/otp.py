@@ -3,11 +3,15 @@
 
 # Standard imports
 import urllib, urllib2, datetime, time, random
+import geojson as gj
 # from traffic import get_travel_time
 
 # Our imports
 from emission.core.wrapper.trip_old import Coordinate, Alternative_Trip, Section, Fake_Trip, Trip
 import emission.core.our_geocoder as our_geo
+import emission.storage.decorations.trip_queries as ecsdtq
+import emission.storage.decorations.section_queries as ecsdsq
+import emission.storage.decorations.place_queries as ecsdpq
 
 try:
     import json
@@ -78,6 +82,35 @@ class OTP:
             trps.append(self.turn_into_trip(_id, user_id, trip_id, False, itin))
         return trps
 
+    def turn_into_new_trip(self, user_id):
+        print "new trip"
+        trip = ecsdtq.create_new_trip(user_id)
+        sections = []
+        our_json = self.get_json()
+        mode_list = set ( )
+
+
+        if "plan" not in our_json:
+            print("While querying alternatives from %s to %s" % (self.start_point, self.end_point))
+            print("query URL is %s" % self.make_url())
+            print("Response %s does not have a plan " % our_json)
+            raise PathNotFoundException(our_json['debugOutput'])
+
+        trip.start_loc = gj.Point( (float(our_json["plan"]["from"]["lat"]), float(our_json["plan"]["from"]["lon"])) ) 
+        trip.end_loc = gj.Point( (float(our_json["plan"]["to"]["lat"]), float(our_json["plan"]["to"]["lon"])) ) 
+        trip.start_local_dt = otp_time_to_ours(our_json['plan']['itineraries'][0]["startTime"])
+        trip.end_local_dt = otp_time_to_ours(our_json['plan']['itineraries'][0]["endTime"])
+        ecsdtq.save_trip(trip)
+
+        for leg in our_json["plan"]["itineraries"][0]['legs']:
+            section = ecsdsq.create_new_section(user_id, trip["_id"])
+            section.start_local_dt = otp_time_to_ours(leg["startTime"])
+            section.end_local_dt = otp_time_to_ours(leg["endTime"])
+            section.distance = float(leg["distance"])
+            section.start_loc = gj.Point( (float(leg["from"]["lat"]), float(leg["from"]["lon"])) )
+            section.end_loc = gj.Point( (float(leg["to"]["lat"]), float(leg["to"]["lon"])) )
+            ecsdsq.save_section(section)
+ 
     def turn_into_trip(self, _id, user_id, trip_id, is_fake=False, itinerary=0):
         sections = [ ]
         our_json = self.get_json()
@@ -121,6 +154,7 @@ class OTP:
                 car_start_coordinates = Coordinate(float(leg["from"]["lat"]), float(leg["from"]["lon"]))    
                 car_end_coordinates = Coordinate(float(leg["to"]["lat"]), float(leg["to"]["lon"]))
         
+        print "len(sections) = %s" % len(sections)
         final_start_loc = Coordinate(float(our_json["plan"]["from"]["lat"]), float(our_json["plan"]["from"]["lon"]))         
         final_end_loc = Coordinate(float(our_json["plan"]["to"]["lat"]), float(our_json["plan"]["to"]["lon"]))
         final_start_time = otp_time_to_ours(our_json['plan']['itineraries'][0]["startTime"])

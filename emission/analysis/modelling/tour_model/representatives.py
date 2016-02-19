@@ -5,6 +5,8 @@ import copy
 
 # our imports
 from emission.core.wrapper.trip_old import Trip, Coordinate
+import emission.storage.decorations.trip_queries as esdtq
+
 
 """
 This class creates a group of representatives for each cluster
@@ -23,8 +25,9 @@ different numbers indicate different clusters.
 
 class representatives:
 
-    def __init__(self, data, labels):
+    def __init__(self, data, labels, old=True):
         self.data = data
+        self.is_old = old
         if not self.data:
             self.data = []
         self.labels = labels
@@ -55,10 +58,17 @@ class representatives:
         for cluster in self.clusters:
             points = [[], [], [], []]
             for c in cluster:
-                points[0].append(c.trip_start_location.lat)
-                points[1].append(c.trip_start_location.lon)
-                points[2].append(c.trip_end_location.lat)
-                points[3].append(c.trip_end_location.lon)
+                if self.is_old:
+                    points[0].append(c.trip_start_location.lat)
+                    points[1].append(c.trip_start_location.lon)
+                    points[2].append(c.trip_end_location.lat)
+                    points[3].append(c.trip_end_location.lon)
+                else:
+                    c = esdtq.get_trip(c)
+                    points[0].append(c.start_loc["coordinates"][0])
+                    points[1].append(c.start_loc["coordinates"][1])
+                    points[2].append(c.end_loc["coordinates"][0])
+                    points[3].append(c.end_loc["coordinates"][1])                    
             centers = numpy.mean(points, axis=1)
             a = Trip(None, None, None, None, None, None, Coordinate(centers[0], centers[1]), Coordinate(centers[2], centers[3]))
             self.reps.append(a)

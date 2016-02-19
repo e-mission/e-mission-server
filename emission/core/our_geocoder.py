@@ -67,10 +67,11 @@ class Geocoder:
         # try:
         #     jsn = cls.get_json_reverse(lat, lng)
         #     address = jsn["display_name"]
+        #     return address
+
         # except:
         #     print "defaulting"
         return _do_google_reverse(lat, lng) # Just in case
-        return address
 
 ## Failsafe section
 def _do_google_geo(address):
