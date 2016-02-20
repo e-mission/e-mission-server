@@ -45,6 +45,8 @@ class similarity:
                     end_lat = t.end_loc["coordinates"][0]
                     end_lon = t.end_loc["coordinates"][1]
                     print "start lat = %s" % start_lat
+                    if self.distance(start_lat, start_lon, end_lat, end_lon):
+                        self.data.remove(a)
                 except:
                     self.data.remove(a)
         else:
@@ -53,11 +55,9 @@ class similarity:
                 start_lon = self.data[a].trip_start_location.lon
                 end_lat = self.data[a].trip_end_location.lat
                 end_lon = self.data[a].trip_end_location.lon
-        if self.distance(start_lat, start_lon, end_lat, end_lon):
-            if old:
-                self.data.pop(a)
-            else:
-                self.data.remove(a)
+                if self.distance(start_lat, start_lon, end_lat, end_lon):
+                    self.data.pop(a)
+
         print 'After removing trips that are points, there are ' + str(len(self.data)) + ' data points'
         self.size = len(self.data)
 
@@ -92,7 +92,7 @@ class similarity:
         print 'the new number of trips is ' + str(sum)
         print 'the cutoff point is ' + str(num)
         self.num = num
-        self.graph()
+        #self.graph()
         for i in range(len(self.bins) - num):
             self.bins.pop()
         newdata = []
