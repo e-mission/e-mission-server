@@ -160,7 +160,7 @@ class ClusterPipelineTests(unittest.TestCase):
         data = cp.read_data(uuid=user_name, size=100, old=False) #this and the following lines form the positive test case
         data, bins = cp.remove_noise(data, 300, old=False)
         n, labels, data = cp.cluster(data, len(bins), old=False)
-        tour_dict = cp.main(old=False)
+        tour_dict = cp.main(uuid=user_name, old=False)
         print 'n = %s | len(tour_dict) = %s' % (n, len(tour_dict))
         self.assertTrue(len(tour_dict) <= n)
         
