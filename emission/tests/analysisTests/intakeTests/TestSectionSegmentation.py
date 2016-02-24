@@ -85,7 +85,7 @@ class TestSectionSegmentation(unittest.TestCase):
                 ]
             }
         esdt.save_trip(test_trip)
-        eaiss.segment_trip_into_sections(self.testUUID, test_trip.get_id())
+        eaiss.segment_trip_into_sections(self.testUUID, test_trip.get_id(), "DwellSegmentationTimeFilter")
 
         created_stops = esdt.get_stops_for_trip(self.testUUID, test_trip.get_id())
         created_sections = esdt.get_sections_for_trip(self.testUUID, test_trip.get_id())
