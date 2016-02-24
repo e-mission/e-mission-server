@@ -39,7 +39,7 @@ def segment_current_sections(user_id):
         trips_to_process = esdt.get_trips(user_id, time_query)
         for trip in trips_to_process:
             logging.info("+" * 20 + ("Processing trip %s for user %s" % (trip.get_id(), user_id)) + "+" * 20)
-            segment_trip_into_sections(user_id, trip.get_id())
+            segment_trip_into_sections(user_id, trip.get_id(), trip.source)
         if len(trips_to_process) == 0:
             # Didn't process anything new so start at the same point next time
             last_trip_processed = None
@@ -50,17 +50,26 @@ def segment_current_sections(user_id):
         logging.exception("Sectioning failed for user %s" % user_id)
         epq.mark_sectioning_failed(user_id)
 
-def segment_trip_into_sections(user_id, trip_id):
+def segment_trip_into_sections(user_id, trip_id, trip_source):
     ts = esta.TimeSeries.get_time_series(user_id)
     trip = esdt.get_trip(trip_id)
     time_query = esdt.get_time_query_for_trip(trip_id)
 
-    import emission.analysis.intake.segmentation.section_segmentation_methods.smoothed_high_confidence_motion as shcm
-    shcmsm = shcm.SmoothedHighConfidenceMotion(60, [ecwm.MotionTypes.TILTING,
-                                                    ecwm.MotionTypes.UNKNOWN,
-                                                    ecwm.MotionTypes.STILL,
-                                                    ecwm.MotionTypes.NONE, # iOS only
-                                                    ecwm.MotionTypes.STOPPED_WHILE_IN_VEHICLE]) # iOS only
+    if (trip_source == "DwellSegmentationTimeFilter"):
+        import emission.analysis.intake.segmentation.section_segmentation_methods.smoothed_high_confidence_motion as shcm
+        shcmsm = shcm.SmoothedHighConfidenceMotion(60, [ecwm.MotionTypes.TILTING,
+                                                        ecwm.MotionTypes.UNKNOWN,
+                                                        ecwm.MotionTypes.STILL])
+    else:
+        assert(trip_source == "DwellSegmentationDistFilter")
+        import emission.analysis.intake.segmentation.section_segmentation_methods.smoothed_high_confidence_with_visit_transitions as shcmvt
+        shcmsm = shcmvt.SmoothedHighConfidenceMotionWithVisitTransitions(
+                                                        49, [ecwm.MotionTypes.TILTING,
+                                                        ecwm.MotionTypes.UNKNOWN,
+                                                        ecwm.MotionTypes.STILL,
+                                                        ecwm.MotionTypes.NONE, # iOS only
+                                                        ecwm.MotionTypes.STOPPED_WHILE_IN_VEHICLE]) # iOS only
+        
     segmentation_points = shcmsm.segment_into_sections(ts, time_query)
 
     # Since we are segmenting an existing trip into sections, we do not need to worry about linking with
