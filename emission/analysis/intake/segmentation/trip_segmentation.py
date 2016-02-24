@@ -41,9 +41,9 @@ def segment_current_trips(user_id):
                                               point_threshold = 9,
                                               distance_threshold = 100) # 100 m
 
-    dsdfsm = dsdf.DwellSegmentationDistFilter(time_threshold = 5 * 60, # 5 mins
+    dsdfsm = dsdf.DwellSegmentationDistFilter(time_threshold = 10 * 60, # 10 mins
                                               point_threshold = 9,
-                                              distance_threshold = 25) # 50 m
+                                              distance_threshold = 50) # 50 m
 
     filter_methods = {"time": dstfsm, "distance": dsdfsm}
     filter_method_names = {"time": "DwellSegmentationTimeFilter", "distance": "DwellSegmentationDistFilter"}
