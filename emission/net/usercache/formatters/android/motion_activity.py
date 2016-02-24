@@ -16,8 +16,16 @@ def format(entry):
     formatted_entry.metadata = metadata
 
     data = ad.AttrDict()
-    data.type = ecwa.MotionTypes(entry.data.agb).value
-    data.confidence = entry.data.agc
+    if 'agb' in entry.data:
+        data.type = ecwa.MotionTypes(entry.data.agb).value
+    else:
+        data.type = ecwa.MotionTypes(entry.data.zzaEg).value
+
+    if 'agc' in entry.data:
+        data.confidence = entry.data.agc
+    else:
+        data.confidence = entry.data.zzaEh
+
     data.ts = formatted_entry.metadata.write_ts
     data.local_dt = formatted_entry.metadata.write_local_dt
     data.fmt_time = formatted_entry.metadata.write_fmt_time
