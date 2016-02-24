@@ -41,11 +41,12 @@ def segment_current_trips(user_id):
                                               point_threshold = 9,
                                               distance_threshold = 100) # 100 m
 
-    dsdfsm = dsdf.DwellSegmentationDistFilter(time_threshold = 10 * 60, # 5 mins
+    dsdfsm = dsdf.DwellSegmentationDistFilter(time_threshold = 5 * 60, # 5 mins
                                               point_threshold = 9,
-                                              distance_threshold = 50) # 50 m
+                                              distance_threshold = 25) # 50 m
 
     filter_methods = {"time": dstfsm, "distance": dsdfsm}
+    filter_method_names = {"time": "DwellSegmentationTimeFilter", "distance": "DwellSegmentationDistFilter"}
     # We need to use the appropriate filter based on the incoming data
     # So let's read in the location points for the specified query
     loc_df = ts.get_data_df("background/filtered_location", time_query)
@@ -75,7 +76,7 @@ def segment_current_trips(user_id):
         epq.mark_segmentation_done(user_id, None)
     else:
         try:
-            create_places_and_trips(user_id, segmentation_points)
+            create_places_and_trips(user_id, segmentation_points, filter_method_names[filters_in_df[0]])
             epq.mark_segmentation_done(user_id, get_last_ts_processed(filter_methods))
         except:
             logging.exception("Trip generation failed for user %s" % user_id)
@@ -123,7 +124,7 @@ def get_last_ts_processed(filter_methods):
     logging.info("Returning last_ts_processed = %s" % last_ts_processed)
     return last_ts_processed
 
-def create_places_and_trips(user_id, segmentation_points):
+def create_places_and_trips(user_id, segmentation_points, segmentation_method_name):
     # new segments, need to deal with them
     # First, retrieve the last place so that we can stitch it to the newly created trip.
     # Again, there are easy and hard. In the easy case, the trip was
@@ -136,6 +137,7 @@ def create_places_and_trips(user_id, segmentation_points):
     last_place = esdp.get_last_place(user_id)
     if last_place is None:
         last_place = start_new_chain(user_id)
+        last_place.source = segmentation_method_name
 
     # if is_easy_case(restart_events_df):
     # Theoretically, we can do some sanity checks here to make sure
@@ -150,7 +152,9 @@ def create_places_and_trips(user_id, segmentation_points):
 
         # Stitch together the last place and the current trip
         curr_trip = esdt.create_new_trip(user_id)
+        curr_trip.source = segmentation_method_name
         new_place = esdp.create_new_place(user_id)
+        new_place.source = segmentation_method_name
 
         stitch_together_start(last_place, curr_trip, start_loc)
         stitch_together_end(new_place, curr_trip, end_loc)
@@ -202,7 +206,6 @@ def stitch_together_start(last_place, curr_trip, start_loc):
     curr_trip.start_fmt_time = start_loc.fmt_time
     curr_trip.start_place = last_place.get_id()
     curr_trip.start_loc = start_loc.loc
-    curr_trip.source = "DwellSegmentationTimeFilter"
 
 def stitch_together_end(new_place, curr_trip, end_loc):
     """
@@ -224,7 +227,6 @@ def stitch_together_end(new_place, curr_trip, end_loc):
     new_place.enter_fmt_time = end_loc.fmt_time
     new_place.ending_trip = curr_trip.get_id()
     new_place.location = end_loc.loc
-    new_place.source = "DwellSegmentationTimeFilter"
 
 def get_restart_events(timeseries, time_query):
     transition_df = timeseries.get_data_df("statemachine/transition", time_query)
