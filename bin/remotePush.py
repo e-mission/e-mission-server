@@ -1,6 +1,6 @@
 import json,httplib
 
-config_file = open('conf/net/ext_service/parse.json')
+config_data = json.load(open('conf/net/ext_service/parse.json'))
 
 silent_push_msg = {
    "where": {
@@ -14,8 +14,8 @@ silent_push_msg = {
 }
 
 parse_headers = {
-   "X-Parse-Application-Id": config_file["emission_id"],
-   "X-Parse-REST-API-Key": config_file["emission_key"],
+   "X-Parse-Application-Id": config_data["emission_id"],
+   "X-Parse-REST-API-Key": config_data["emission_key"],
    "Content-Type": "application/json"
 }
 
