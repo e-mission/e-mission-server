@@ -19,12 +19,14 @@ preprocessing results ensures reasonable performance.
 -------------------
 
 ### Database: ###
-1. Install [Mongodb](http://www.mongodb.org/) (Note: mongodb appears to be installed as a service on Windows devices and it starts automatically on reboot)
-Note: If you are using OSX: You want to install homebrew and then use homebrew to install mongodb. Follow these instruction on how to do so ---> (http://docs.mongodb.org/manual/tutorial/install-mongodb-on-os-x/)
+1. Install [Mongodb](http://www.mongodb.org/)
+  2. *Windows*: mongodb appears to be installed as a service on Windows devices and it starts automatically on reboot
+  3. *OSX*: You want to install homebrew and then use homebrew to install mongodb. Follow these instruction on how to do so ---> (http://docs.mongodb.org/manual/tutorial/install-mongodb-on-os-x/)
+  4. *Ubuntu*: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
 
 2. Start it at the default port
-    $ mongod
-Ubuntu: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
+
+     `$ mongod`
 
 ### Python distribution ###
 We will use a distribution of python that is optimized for scientific
@@ -56,42 +58,51 @@ path, and you are using the anaconda versions of common python tools such as
 
 ## Development: ##
 -------------------
-In order to test out changes to the webapp, you should make the changes
-locally, test them and then push. Then, deployment is as simple as pulling from
-the repo to the real server.
+In order to test out changes to the webapp, you should make the changes locally, test them and then push. Then, deployment is as simple as pulling from the repo to the real server and changing the config files slightly.
 
 Here are the steps for doing this:
 
-1. Copy config.json.localhost.android or config.json.localhost.ios to
-config.json, depending on which platform you are testing against.
+1. On OSX, start the database  (Note: mongodb appears to be installed as a service on Windows devices and it starts automatically on reboot). 
 
-1. Copy keys.json.sample to keys.json, register for the appropriate keys, and
-fill them in
+        $ mongod
 
-1. Start the server (Note: mongodb appears to be installed as a service on Windows devices and it starts automatically on reboot)
+1. Start the server
 
-        $ cd CFC_WebApp
-        $ PYTHONPATH=../base:../CFC_DataCollector/:. python api/cfc_webapp.py
+        $ ./e-mission-py.bash emission/net/api/cfc_webapp.py
 
-   You may need to install some of the python dependencies from above
-   Amongst the dependencies include:
-   -cherrypy
-   -pygeocoder
+1. Test your connection to the server
+  * Using a web browser, go to [http://localhost:8080](http://localhost:8080)
+  * Using the iOS emulator, connect to [http://localhost:8080](http://localhost:8080)
+  * Using the android emulator:
+    * change `server.host` in `conf/net/api/webserver.conf` to 0.0.0.0, and 
+    * connect the app to the special IP for the current host in the android emulator - [10.0.2.2](https://developer.android.com/tools/devices/emulator.html#networkaddresses)
 
-1. Browse to 
-[http://localhost:8080](http://localhost:8080)
-or connect to it using the phone app
+### Loading test data ###
 
-1. You might also want to create some users, e.g.
-        $ cd ..../e-mission-server
-        $ ./e-mission-py.bash bin/create_test_user.py shankari@berkeley.edu
+You may also want to load some test data.
 
-1. If you are testing the data collection of sensor other than location, you
-want to enable them.
-        $ cd ..../e-mission-server
-        $ cp bin/load_config.json.sample bin/load_config.json
-        $ vi bin/load_config.json # edit it
-        $ ./e-mission-py.bash bin/load_config.py bin/load_config.json
+1. Sample timeline data from the data collection eval is available in the [data-collection-eval repo](https://github.com/shankari/data-collection-eval).
+2. You can choose to load either android data `results_dec_2015/ucb.sdb.android.{1,2,3}/timeseries/*` or iOS data `results_dec_2015/ucb.sdb.ios.{1,2,3}/timeseries/*`
+3. Data is loaded using the `bin/debug/load_timeline_for_day_and_user.py`.
+  * Running it with just a timeline file loads the data with the original user - e.g.
+
+            $ cd ..../e-mission-server
+            $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py /tmp/data-collection-eval/results_dec_2015/ucb.sdb.android.1/timeseries/active_day_2.2015-11-27
+        
+  * Running it with a timeline file and a user relabels the data as being from the specified user and then loads it - e.g.
+
+            $ cd ..../e-mission-server
+            $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py /tmp/data-collection-eval/results_dec_2015/ucb.sdb.android.1/timeseries/active_day_2.2015-11-27 -u shankari@eecs.berkeley.edu
+        
+4. Note that loading the data retains the object IDs. This means that if you load the same data twice with different user IDs, then only the second one will stick. In other words, if you load the file as `user1@foo.edu` and then load the same file as `user2@foo.edu`, you will only have data for `user2@foo.edu` in the database.
+
+### Running the analysis pipeline ###
+
+Once you have loaded the timeline, you probably want to segment it into trips and sections, smooth the sections, generate a timeline, etc. We have a unified script to do all of those, called the intake pipeline. You can run it like this.
+
+    $ ./e-mission-py.bash bin/intake_stage.py
+    
+Once the script is done running, places, trips, sections and stops would have been generated and stored in their respective mongodb tables, and the timelines for the last 7 days have been stored in the usercache.
 
 ### Running unit tests ###
 
@@ -121,41 +132,7 @@ them into utility functions. Original versions of the notebooks can be obtained
 by looking at other notebooks with the same name, or by looking at the history
 of the notebooks.
 
-### Running backend analysis scripts ###
 
-1. If you need to run any of the backend scripts, copy the config.json and
-keys.json files to that directory as well, and run the scripts:
-
-        cd CFC_DataCollector
-        cp ../CFC_WebApp/config.json .
-        cp ../CFC_WebApp/keys.json .
-
-        python moves/collect.py
-        python modeinfer/pipeline.py
-   
-These repositories don't have the associated client keys checked in for
-security reasons.
-
-### Getting keys ###
-
-If you are associated with the e-mission project and will be integrating with
-our server, then you can get the key files from:
-https://repo.eecs.berkeley.edu/git/users/shankari/e-mission-keys.git
-
-If not, please get your own copies of the following keys:
-
-* Google Developer Console
-  - Android key
-  - iOS key
-  - webApp key
-* Moves app
-  - Client key
-  - Client secret
-
-And then copy over the sample files from these locations and replace the values appropriately:
-
-* CFC\_WebApp/keys.json
-* CFC\_DataCollector/keys.json
 
 ## TROUBLESHOOTING: ##
 
@@ -191,7 +168,11 @@ easier to display simple graphs using D3.
 
 ## Deployment: ##
 ----------
-If you are running this in production, you should really run it over SSL.  We
+If you want to use this for anything other than deployment, you should really run it over SSL. In order to make the development flow smoother, *if the server is running over HTTP as opposed to HTTPS, it has no security*. The JWT basically consists of the user email *in plain text*. This means that anybody who knows a users' email access can download their detailed timeline. This is very bad.
+
+<font color="red">If you are using this to store real, non-test data, use SSL right now</font> 
+
+If you are running this in production, you should really run it over SSL. We
 use cherrypy to provide SSL support. The default version of cherrypy in the
 anaconda distribution had some issues, so I've checked in a working version
 of the wsgiserver file.
@@ -224,5 +205,19 @@ In order to avoid this, you want to encrypt the disk. You can do this by:
 
 In either of these cases, you need to reconfigure mongod.conf to point to data
 and log directories in the encrypted volume.
+
+### Getting keys ###
+
+If you are associated with the e-mission project and will be integrating with
+our server, then you can get the key files from:
+https://repo.eecs.berkeley.edu/git/users/shankari/e-mission-keys.git
+
+If not, please get your own copies of the following keys:
+
+* Google Developer Console (stored in conf/net/keys.json)
+  - iOS key (`ios_client_key`)
+  - webApp key (`client_key`)
+* Parse  (coming soon)
+
 
 [Python_Structure]: https://raw.github.com/amplab/e-mission-server/master/figs/e-mission-server-module-structure.png
