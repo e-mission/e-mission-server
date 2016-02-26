@@ -131,7 +131,8 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
         # data for efficiency reasons? Therefore, we also check to see if there
         # is a trip_end_detected in this timeframe after the last point. If so,
         # then we end the trip at the last point that we have.
-        stopped_moving_after_last = transition_df[(transition_df.ts > currPoint.ts) & (transition_df.transition == 2)]
-        if len(stopped_moving_after_last) > 0:
-            segmentation_points.append((curr_trip_start_point, currPoint))
+        if not just_ended:
+            stopped_moving_after_last = transition_df[(transition_df.ts > currPoint.ts) & (transition_df.transition == 2)]
+            if len(stopped_moving_after_last) > 0:
+                segmentation_points.append((curr_trip_start_point, currPoint))
         return segmentation_points
