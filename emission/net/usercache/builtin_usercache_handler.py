@@ -169,9 +169,9 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         """
         tour_model = esdtmpq.get_tour_model(self.user_id)
         uc = enua.UserCache.getUserCache(self.user_id)
-        logging.debug("Adding common trips for user_id %s" % self.user_id)
-        uc.putDocument("common_trips-%s" % tour_model.user_id, tour_model)
-        valid_key_list = ["common_trips-%s" % tour_model.user_id]
+        logging.debug("Adding common trips for day %s" % str(pydt.date.today()))
+        uc.putDocument("common_trips-%s" % str(pydt.date.today()),  tour_model)
+        valid_key_list = ["common_trips-%s" % str(pydt.date.today())]
         self.delete_obsolete_entries(uc, valid_key_list)
         
         
@@ -201,7 +201,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         # lexicographic ordering, but at the same time, this seems much easier
         # and safer to deal with.
         logging.debug("curr_key_list = %s, valid_key_list = %s" % 
-        (curr_key_list, valid_key_list))
+           (curr_key_list, valid_key_list))
         to_del_keys = set(curr_key_list) - set(valid_key_list)
         logging.debug("obsolete keys are: %s" % to_del_keys)
         return to_del_keys
