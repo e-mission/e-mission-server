@@ -12,9 +12,11 @@ import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
 
 import emission.net.usercache.formatters.formatter as enuf
 import emission.storage.pipeline_queries as esp
+import emission.storage.decorations.tour_model_queries as esdtmpq
 
 import emission.core.wrapper.trip as ecwt
 import emission.core.wrapper.entry as ecwe
+
 
 class BuiltinUserCacheHandler(enuah.UserCacheHandler):
     def __init__(self, user_id):
@@ -134,7 +136,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         # pipeline were to run again
 
         start_ts = esp.get_complete_ts(self.user_id)
-	logging.debug("start ts from pipeline = %s, %s" % 
+        logging.debug("start ts from pipeline = %s, %s" % 
            (start_ts, pydt.datetime.utcfromtimestamp(start_ts).isoformat()))
         trip_gj_list = self.get_trip_list_for_seven_days(start_ts)
         if len(trip_gj_list) == 0:
@@ -160,6 +162,21 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         valid_key_list = ["diary/trips-%s"%day for day in day_list_bins.iterkeys()]
         self.delete_obsolete_entries(uc, valid_key_list)
 
+    def storeCommonTripsToCache(self):
+        """ 
+        Determine which set of common trips to send to the usercache. 
+        As of now we will run the pipeline on the full set of data and send that up
+        """
+        tour_model = esdtmpq.get_tour_model(self.user_id)
+        uc = enua.UserCache.getUserCache(self.user_id)
+        logging.debug("Adding common trips for day %s" % str(pydt.date.today()))
+        uc.putDocument("common_trips-%s" % str(pydt.date.today()),  tour_model)
+        valid_key_list = ["common_trips-%s" % str(pydt.date.today())]
+        self.delete_obsolete_entries(uc, valid_key_list)
+        
+        
+
+
     def get_oldest_valid_ts(self, start_ts):
         """
         Get the oldest valid timestamp that we want to include.
@@ -184,7 +201,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         # lexicographic ordering, but at the same time, this seems much easier
         # and safer to deal with.
         logging.debug("curr_key_list = %s, valid_key_list = %s" % 
-	    (curr_key_list, valid_key_list))
+           (curr_key_list, valid_key_list))
         to_del_keys = set(curr_key_list) - set(valid_key_list)
         logging.debug("obsolete keys are: %s" % to_del_keys)
         return to_del_keys
