@@ -168,6 +168,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         As of now we will run the pipeline on the full set of data and send that up
         """
         tour_model = esdtmpq.get_tour_model(self.user_id)
+        print "tour_model is %s" % tour_model
         uc = enua.UserCache.getUserCache(self.user_id)
         logging.debug("Adding common trips for day %s" % str(pydt.date.today()))
         uc.putDocument("common_trips-%s" % str(pydt.date.today()),  tour_model)
