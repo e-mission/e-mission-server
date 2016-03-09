@@ -105,7 +105,6 @@ def main(uuid=None, old=True):
     data, bins = remove_noise(data, 300, old=old)
     n, labels, data = cluster(data, len(bins), old=old)
     tour_dict = cluster_to_tour_model(data, labels, old=old)
-    print "tour_dict is %s" % tour_dict
     return tour_dict
 
 if __name__=='__main__':

@@ -44,7 +44,6 @@ def get_common_trips(user_id):
 
 def make_tour_model_from_raw_user_data(user_id):
     list_of_cluster_data = eamtmcp.main(user_id, False)
-    print "list_of_cluster_data is %s" % list_of_cluster_data
     esdcpq.create_places(list_of_cluster_data, user_id)
     esdctq.set_up_trips(list_of_cluster_data, user_id)
 
