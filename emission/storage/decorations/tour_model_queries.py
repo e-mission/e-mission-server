@@ -33,17 +33,17 @@ def get_tour_model(user_id):
 def get_common_places(user_id):
     db = edb.get_common_place_db()
     place_jsons = db.find({"user_id" : user_id})
-    return [esdcpq.make_common_place_from_json(place_json) for place_json in place_jsons]
+    return [esdcpq.make_common_place(place_json) for place_json in place_jsons]
 
 def get_common_trips(user_id):
     db = edb.get_common_trip_db()
     trip_jsons = db.find({"user_id" : user_id})
-    return [esdctq.make_common_trip_from_json(trip_json) for trip_json in trip_jsons]
+    return [esdctq.make_new_common_trip(trip_json) for trip_json in trip_jsons]
 
 ##################################################################################
 
 def make_tour_model_from_raw_user_data(user_id):
-    list_of_cluster_data = eamtmcp.main(user_id)
-    esdcpq.create_places(user_id)
-    esdctq.set_up_trips(user_id)
+    list_of_cluster_data = eamtmcp.main(user_id, False)
+    esdcpq.create_places(list_of_cluster_data, user_id)
+    esdctq.set_up_trips(list_of_cluster_data, user_id)
 

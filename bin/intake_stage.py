@@ -6,12 +6,13 @@ logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
 import emission.net.usercache.abstract_usercache_handler as euah
 import emission.net.usercache.abstract_usercache as enua
 import emission.storage.timeseries.abstract_timeseries as esta
+import emission.storage.decorations.tour_model_queries as esdtmq
 
 import emission.analysis.intake.cleaning.filter_accuracy as eaicf
 import emission.analysis.intake.segmentation.trip_segmentation as eaist
 import emission.analysis.intake.segmentation.section_segmentation as eaiss
 import emission.analysis.intake.cleaning.location_smoothing as eaicl
-import emission.analysis.modelling.tour_model.cluster_pipeline as eamtmcp
+
 
 if __name__ == '__main__':
     cache_uuid_list = enua.UserCache.get_uuid_list()
@@ -44,7 +45,7 @@ if __name__ == '__main__':
         eaicl.filter_current_sections(uuid)
 
         logging.info("*" * 10 + "UUID %s: finding common trips" % uuid + "*" * 10)
-        eamtmcp.main(uuid, False)
+        esdtmq.make_tour_model_from_raw_user_data(uuid)
 
         logging.info("*" * 10 + "UUID %s: storing views to cache" % uuid + "*" * 10)
         uh = euah.UserCacheHandler.getUserCacheHandler(uuid)

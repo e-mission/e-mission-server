@@ -139,6 +139,7 @@ class representatives:
             return
         for i in range(self.num_clusters):
             a = {'sections' : self.clusters[i]}
+            print "self.tour_dict[%s] is %s" % (i, a) 
             self.tour_dict[i] = a
         for i in range(self.num_locations):
             bin = self.bins[i]
@@ -153,12 +154,14 @@ class representatives:
             self.tour_dict[i]['start_coords'] = start_coords
             self.tour_dict[i]['end_coords'] = end_coords
 
+
         self.self_loops_tour_dict = copy.deepcopy(self.tour_dict)        
 
         for i in range(len(self.tour_dict)-1, -1, -1):
             cluster = self.tour_dict[i]
-            if cluster['start'] == cluster['end']:
+            if cluster['start'] == cluster['end'] and len(self.tour_dict) > 1:
                 self.tour_dict.remove(cluster)
+
 
         newlocs = []
         for cluster in self.tour_dict:
