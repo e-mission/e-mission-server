@@ -10,6 +10,8 @@ def get_timeline_from_dt(user_id, start_dt, end_dt):
     logging.debug("result cursor has %d entries" % result_cursor.count())
     result_list = list(result_cursor)
     logging.debug("result list has %d entries" % len(result_list))
+    if len(result_list) == 0:
+       return get_timeline(user_id, 0, 0)
     start_ts = ecwe.Entry(result_list[0]).metadata.write_ts
     end_ts = ecwe.Entry(result_list[-1]).metadata.write_ts
     logging.debug("Converted datetime range %s -> %s to timestamp range %s -> %s" %

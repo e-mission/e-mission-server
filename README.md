@@ -118,6 +118,7 @@ run the script with
 
 Because this user data is specifically designed to test our tour model creation, you can create fake tour models easily by running the make_tour_model_from_fake_data function in emission/storage/decorations/tour_model_queries.py
 
+
 ### Running the analysis pipeline ###
 
 Once you have loaded the timeline, you probably want to segment it into trips and sections, smooth the sections, generate a timeline, etc. We have a unified script to do all of those, called the intake pipeline. You can run it like this.
@@ -240,6 +241,5 @@ If not, please get your own copies of the following keys:
   - iOS key (`ios_client_key`)
   - webApp key (`client_key`)
 * Parse  (coming soon)
-
 
 [Python_Structure]: https://raw.github.com/amplab/e-mission-server/master/figs/e-mission-server-module-structure.png

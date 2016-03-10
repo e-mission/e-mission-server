@@ -27,6 +27,7 @@ class TransitionType(enum.Enum):
     VISIT_STARTED = 13
     VISIT_ENDED = 14
     NONE = 15
+    DATA_PUSHED = 16
 
 class Transition(ecwb.WrapperBase):
     props = {"curr_state": ecwb.WrapperBase.Access.RO,

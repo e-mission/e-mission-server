@@ -93,6 +93,8 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
         # Sometimes, the sections flip-flop around 
         return motion_change_list
 
+    # Overridden in smoothed_high_confidence_with_visit_transitions.py.
+    # Consider porting any changes there as well if applicable.
     def segment_into_sections(self, timeseries, time_query):
         """
         Determine locations within the specified time that represent segmentation points for a trip.
