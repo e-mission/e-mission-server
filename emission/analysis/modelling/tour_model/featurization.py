@@ -45,8 +45,11 @@ class featurization:
                 end = trip.trip_end_location
             else:
                 trip = esdtq.get_trip(trip)
-                start = trip.start_loc["coordinates"]
-                end = trip.end_loc["coordinates"]
+                try:
+                    start = trip.start_loc["coordinates"]
+                    end = trip.end_loc["coordinates"]
+                except:
+                    continue
             if not (start and end):
                 raise AttributeError('each trip must have valid start and end locations')
             if self.is_old:
