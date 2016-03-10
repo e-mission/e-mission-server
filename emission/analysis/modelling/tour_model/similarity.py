@@ -37,7 +37,7 @@ class similarity:
         self.old = old
         if not old:
             for a in self.data:
-                print "a is %s" % a
+                # print "a is %s" % a
                 t = esdtq.get_trip(a)
                 try:
                     start_lat = t.start_loc["coordinates"][0]
