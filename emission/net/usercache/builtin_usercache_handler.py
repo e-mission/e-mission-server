@@ -170,12 +170,15 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         tour_model = esdtmpq.get_tour_model(self.user_id)
         uc = enua.UserCache.getUserCache(self.user_id)
         logging.debug("Adding common trips for day %s" % str(pydt.date.today()))
-        uc.putDocument("common_trips-%s" % str(pydt.date.today()),  tour_model)
-        valid_key_list = ["common_trips-%s" % str(pydt.date.today())]
-        self.delete_obsolete_entries(uc, valid_key_list)
-        
-        
-
+        # We don't really support day-specific common trips in any other format
+        # So it doesn't make sense to support it only for the cache, where it will
+        # accumulate on the phone uselessly
+        # IF we are going to support versioned common trips objects, we should
+        # do even outside the cache code
+        # uc.putDocument("common_trips-%s" % str(pydt.date.today()),  tour_model)
+        # valid_key_list = ["common_trips-%s" % str(pydt.date.today())]
+        # self.delete_obsolete_entries(uc, valid_key_list)
+        uc.putDocument("common-trips", tour_model)
 
     def get_oldest_valid_ts(self, start_ts):
         """
