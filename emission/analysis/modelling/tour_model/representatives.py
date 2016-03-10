@@ -139,7 +139,6 @@ class representatives:
             return
         for i in range(self.num_clusters):
             a = {'sections' : self.clusters[i]}
-            print "self.tour_dict[%s] is %s" % (i, a) 
             self.tour_dict[i] = a
         for i in range(self.num_locations):
             bin = self.bins[i]

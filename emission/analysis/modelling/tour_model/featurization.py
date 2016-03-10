@@ -25,7 +25,6 @@ This class is run by cluster_pipeline.py
 class featurization:
 
     def __init__(self, data, old=True):
-        print "old is %s" % old
         self.data = data
         self.is_old = old
         if not self.data:

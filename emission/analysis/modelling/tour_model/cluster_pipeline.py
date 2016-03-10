@@ -40,7 +40,6 @@ read from the database.
 def read_data(uuid=None, size=None, old=True):
     data = []
     db = edb.get_trip_db()
-    print "old is %s" % old
     if not old:
         print "not old"
         db = edb.get_trip_new_db()
