@@ -96,6 +96,7 @@ You may also want to load some test data.
         
 4. Note that loading the data retains the object IDs. This means that if you load the same data twice with different user IDs, then only the second one will stick. In other words, if you load the file as `user1@foo.edu` and then load the same file as `user2@foo.edu`, you will only have data for `user2@foo.edu` in the database.
 
+
 ### Creating fake user data ###
 
 You may need a larger or more diverse set of data than the given test data supplies.
@@ -116,7 +117,6 @@ run the script with
     $ python emission/simulation/trip_gen.py <user_name>
 
 Because this user data is specifically designed to test our tour model creation, you can create fake tour models easily by running the make_tour_model_from_fake_data function in emission/storage/decorations/tour_model_queries.py
-
 
 ### Running the analysis pipeline ###
 
