@@ -6,6 +6,9 @@ import logging
 from emission.analysis.result.carbon import getModeCarbonFootprint, carbonFootprintForMode
 from emission.core.common import Inside_polygon,berkeley_area,getConfirmationModeQuery
 from emission.core.get_database import get_section_db,get_profile_db
+import geojson as gj
+import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
+import emission.core.wrapper.motionactivity as ecwm
 
 # Note that all the points here are returned in (lng, lat) format, which is the
 # GeoJSON format.
@@ -59,6 +62,19 @@ def Commute_pop_route(modeId,start,end):
     return {"latlng": list_of_point}
 
 
-
-
-
+def pop_route_new(mode, start_dt, end_dt):
+    tl = get_aggregate_timeline_from_dt(start_dt, end_dt)
+    gj_list = gfc.get_geojson_for_timeline(None, tl)
+ 
+    list_of_point=[]
+ 
+    for gj in gj_list:
+      print "Found %d sections in the trip" % len(gj["features"])
+      for section_gj in gj["features"]:
+        if mode == 'all' or mode == section_jg["properties"]["sensed_mode"]:
+            points = section_gj["features"].map(gj.GeoJSON.to_instance).filter(lambda p: p.properties["feature_type"] == "location")
+            print "Found %d points in the section" % len(points)
+            list_of_point.extend(points.map(lambda p: p.geometry.coordinates))
+ 
+    logging.debug("Returning list of size %s" % len(list_of_point))
+    return {"latlng": list_of_point}

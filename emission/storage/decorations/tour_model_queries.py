@@ -46,12 +46,12 @@ def get_common_trips(user_id):
 ##################################################################################
 
 def make_tour_model_from_raw_user_data(user_id):
-    try:
-      list_of_cluster_data = eamtmcp.main(user_id, False)
-      esdcpq.create_places(list_of_cluster_data, user_id)
-      esdctq.set_up_trips(list_of_cluster_data, user_id)
-    except ValueError as e:
-      logging.debug("Got ValueError %s while creating tour model, skipping it..." % e)
+    # try:
+    list_of_cluster_data = eamtmcp.main(user_id, False)
+    esdcpq.create_places(list_of_cluster_data, user_id)
+    esdctq.set_up_trips(list_of_cluster_data, user_id)
+    # except ValueError as e:
+    #   logging.debug("Got ValueError %s while creating tour model, skipping it..." % e)
 
 def make_tour_model_from_fake_data(fake_user_id):
     estg.create_fake_trips(fake_user_id, True)
