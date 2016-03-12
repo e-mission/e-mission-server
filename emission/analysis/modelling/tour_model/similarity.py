@@ -100,7 +100,8 @@ class similarity:
             for b in bin:
                 d = self.data[b]
                 newdata.append(self.data[b])
-        self.newdata = newdata
+        self.newdata = newdata if len(newdata) > 1 else self.data
+
 
     #calculate the cut-off point in the histogram
     #This is motivated by the need to calculate the cut-off point 

@@ -96,6 +96,29 @@ You may also want to load some test data.
         
 4. Note that loading the data retains the object IDs. This means that if you load the same data twice with different user IDs, then only the second one will stick. In other words, if you load the file as `user1@foo.edu` and then load the same file as `user2@foo.edu`, you will only have data for `user2@foo.edu` in the database.
 
+
+### Creating fake user data ###
+
+You may need a larger or more diverse set of data than the given test data supplies.
+To create it you can run the trip generation script included in the project. 
+
+The script works by creating random noise around starting and ending points of trips.
+
+You can fill out options for the new data in emission/simulation/input.json. 
+The different options are as follows
+* radius - the number of kilometers of randomization around starting and ending points (the amount of noise)
+* starting centroids - addresses you want trips to start around, as well as a weight defining the relative probability a trip will start there
+* ending centroids - addresses you want trips to end around, as well as a weight defining the relative probability a trip will end there
+* modes - the relative probability a user will take a trip with the given mode
+* number of trips - the amount of trips the simulation should create
+
+run the script with 
+    
+    $ python emission/simulation/trip_gen.py <user_name>
+
+Because this user data is specifically designed to test our tour model creation, you can create fake tour models easily by running the make_tour_model_from_fake_data function in emission/storage/decorations/tour_model_queries.py
+
+
 ### Running the analysis pipeline ###
 
 Once you have loaded the timeline, you probably want to segment it into trips and sections, smooth the sections, generate a timeline, etc. We have a unified script to do all of those, called the intake pipeline. You can run it like this.
@@ -218,6 +241,5 @@ If not, please get your own copies of the following keys:
   - iOS key (`ios_client_key`)
   - webApp key (`client_key`)
 * Parse  (coming soon)
-
 
 [Python_Structure]: https://raw.github.com/amplab/e-mission-server/master/figs/e-mission-server-module-structure.png

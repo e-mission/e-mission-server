@@ -81,9 +81,7 @@ def increment_probability(trip, day, hour):
     trip.probabilites[day, hour] += 1
 
 def set_up_trips(list_of_cluster_data, user_id):
-    assert len(list_of_cluster_data) > 0
     for dct in list_of_cluster_data:
-        print "inside of here"
         start_coords = dct['start_coords']
         end_coords = dct['end_coords']
         start_place_id = "%s%s" % (user_id, start_coords)
