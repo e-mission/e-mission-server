@@ -25,7 +25,6 @@ This class is run by cluster_pipeline.py
 class featurization:
 
     def __init__(self, data, old=True):
-        print "old is %s" % old
         self.data = data
         self.is_old = old
         if not self.data:
@@ -46,8 +45,11 @@ class featurization:
                 end = trip.trip_end_location
             else:
                 trip = esdtq.get_trip(trip)
-                start = trip.start_loc["coordinates"]
-                end = trip.end_loc["coordinates"]
+                try:
+                    start = trip.start_loc["coordinates"]
+                    end = trip.end_loc["coordinates"]
+                except:
+                    continue
             if not (start and end):
                 raise AttributeError('each trip must have valid start and end locations')
             if self.is_old:

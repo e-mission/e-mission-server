@@ -4,6 +4,7 @@ import math
 import json 
 import datetime 
 import urllib2
+import sys
 
 # Our imports
 from emission.net.ext_service.otp.otp import OTP, PathNotFoundException
@@ -173,5 +174,7 @@ def create_fake_trips(user_name=None, new=False):
     my_creator.get_trips_from_a_to_b(user_name)
     return my_creator
 
+
 if __name__ == "__main__":
-    create_fake_trips()
+    user_id = sys.argv[1]
+    create_fake_trips(user_id, True)
