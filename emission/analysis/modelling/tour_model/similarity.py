@@ -1,4 +1,5 @@
 # Standard imports
+import logging
 import math
 import matplotlib
 matplotlib.use('Agg')
@@ -44,7 +45,7 @@ class similarity:
                     start_lat = t.start_loc["coordinates"][1]
                     end_lon = t.end_loc["coordinates"][0]
                     end_lat = t.end_loc["coordinates"][1]
-                    print "start lat = %s" % start_lat
+                    logging.debug("start lat = %s" % start_lat)
                     if self.distance(start_lat, start_lon, end_lat, end_lon):
                         self.data.remove(a)
                 except:
@@ -58,7 +59,7 @@ class similarity:
                 if self.distance(start_lat, start_lon, end_lat, end_lon):
                     self.data.pop(a)
 
-        print 'After removing trips that are points, there are ' + str(len(self.data)) + ' data points'
+        logging.debug('After removing trips that are points, there are %s data points' % len(self.data))
         self.size = len(self.data)
 
     #create bins
@@ -89,8 +90,8 @@ class similarity:
                 sum -= len(self.bins[i])
                 num = i
                 break
-        print 'the new number of trips is ' + str(sum)
-        print 'the cutoff point is ' + str(num)
+        logging.debug('the new number of trips is %d' % sum)
+        logging.debug('the cutoff point is %d' % num)
         self.num = num
         #self.graph()
         for i in range(len(self.bins) - num):
@@ -172,7 +173,7 @@ class similarity:
         if not self.data or not self.bins:
             return
         if len(self.labels) < 2:
-            print 'Everything is in one bin.'
+            logging.debug('Everything is in one bin.')
             return
         labels = numpy.array(self.labels)
         points = []
@@ -185,8 +186,8 @@ class similarity:
                 path = [start_lat, start_lon, end_lat, end_lon]
                 points.append(path)
         a = metrics.silhouette_score(numpy.array(points), labels)
-        print 'number of bins is ' + str(len(self.bins))
-        print 'silhouette score is ' + str(a)
+        logging.debug('number of bins is %d' % len(self.bins))
+        logging.debug('silhouette score is %d' % a)
         return a
 
     #calculate the distance between two trips

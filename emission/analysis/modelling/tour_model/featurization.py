@@ -83,7 +83,7 @@ class featurization:
         if max_clusters < min_clusters:
             raise ValueError('Please provide a valid range of cluster sizes')
         if name != 'kmeans' and name != 'kmedoids':
-            print 'Invalid clustering algorithm name. Defaulting to k-means'
+            logging.debug('Invalid clustering algorithm name. Defaulting to k-means')
             name='kmeans'
         if not self.data:
             self.sil = None
@@ -97,7 +97,7 @@ class featurization:
         if name == 'kmedoids':
             for i in range(r):
                 num_clusters = i + min_clusters
-                print 'testing ' + str(num_clusters) + ' clusters'
+                logging.debug('testing %s clusters' % str(num_clusters))
                 cl = kmedoids(self.points, num_clusters)
                 self.labels = [0] * len(self.data)
                 cluster = -1
@@ -135,10 +135,10 @@ class featurization:
             sys.stderr.write('No clusters to analyze\n')
             return
         if not self.labels:
-            print 'Please cluster before analyzing clusters.'
+            logging.debug('Please cluster before analyzing clusters.')
             return
-        print 'number of clusters is ' + str(self.clusters)
-        print 'silhouette score is ' + str(self.sil) 
+        logging.debug('number of clusters is %d' % str(self.clusters))
+        logging.debug('silhouette score is %d' % str(self.sil))
 
     #map the clusters
     #TODO - move this to a file in emission.analysis.plotting to map clusters from the database

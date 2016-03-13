@@ -3,6 +3,7 @@ import math
 import datetime
 import uuid as uu
 import sys
+import logging
 
 # Our imports
 import emission.core.get_database as edb
@@ -41,7 +42,7 @@ def read_data(uuid=None, size=None, old=True):
     data = []
     db = edb.get_trip_db()
     if not old:
-        print "not old"
+        logging.debug("not old")
         db = edb.get_trip_new_db()
         trips = db.find({"user_id" : uuid})
 
@@ -70,9 +71,9 @@ def remove_noise(data, radius, old=True):
         return [], []
     sim = similarity.similarity(data, radius, old)
     sim.bin_data()
-    print 'number of bins before filtering: ' + str(len(sim.bins))
+    logging.debug('number of bins before filtering: %d' % len(sim.bins))
     sim.delete_bins()
-    print 'number of bins after filtering: ' + str(len(sim.bins))
+    logging.debug('number of bins after filtering: %d' % len(sim.bins))
     return sim.newdata, sim.bins
 
 #cluster the data using k-means
@@ -83,7 +84,7 @@ def cluster(data, bins, old=True):
     min = bins
     max = int(math.ceil(1.5 * bins))
     feat.cluster(min_clusters=min, max_clusters=max)
-    print 'number of clusters: ' + str(feat.clusters)
+    logging.debug('number of clusters: %d' % feat.clusters)
     return feat.clusters, feat.labels, feat.data
 
 #prepare the data for the tour model
@@ -94,13 +95,13 @@ def cluster_to_tour_model(data, labels, old=True):
     repy.list_clusters()
     repy.get_reps()
     repy.locations()
-    print 'number of locations: ' + str(repy.num_locations)
+    logging.debug('number of locations: %d' % repy.num_locations)
     repy.cluster_dict()
     return repy.tour_dict
 
 def main(uuid=None, old=True):
     data = read_data(uuid, old=old)
-    print len(data)
+    logging.debug(len(data))
     data, bins = remove_noise(data, 300, old=old)
     n, labels, data = cluster(data, len(bins), old=old)
     tour_dict = cluster_to_tour_model(data, labels, old=old)

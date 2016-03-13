@@ -1,4 +1,5 @@
 # Standard imports
+import logging
 import os, sys
 import math
 import numpy as np
@@ -73,7 +74,7 @@ def get_user_sections(user_id):
 
 def get_user_disMat(user, method, is_ground_truth=False):
     ## update route clusters:
-    print "Generating route clusters for %s" % user
+    logging.debug("Generating route clusters for %s" % user)
     if is_ground_truth:
         cluster_section_ids = edb.get_ground_truth_sections(user)
         routes_user = emkm.user_route_data2(cluster_section_ids)
@@ -84,7 +85,7 @@ def get_user_disMat(user, method, is_ground_truth=False):
         #print(routes_user)
 
         user_disMat = etmr.update_user_routeDistanceMatrix(user,routes_user,step1=100000,step2=100000,method=method)
-        print(type(user_disMat))
+        logging.debug((type(user_disMat)))
     return user_disMat
 
 def get_user_clusters(user, method, nClusters, is_ground_truth=False):
@@ -272,7 +273,7 @@ user_uuid = eaut.read_uuids()
 if len(sys.argv) == 2:
     user_id = user_uuid[sys.argv[1]]
 
-print(user_id)
+logging.debug(user_id)
 
 #PARAMETERS
 methods = ['dtw', 'lcs', 'Frechet'] #what metrics for distance to use
@@ -287,13 +288,13 @@ print("Finished.")
 #EXPERIMENT 2-4: KMedoids with various methods of calculating distance between route A and route B
 
 for method in methods:
-    print("Working on KMedoid with " + method + " as distance metric.")
+    logging.debug("Working on KMedoid with %s as distance metric." % method)
     #user_disMat, clusters_user = generate_route_clusters(user_id, method=method, nClusters=-1)
     data = extract_features('kmedoid', user_id, method)
     clusters = generate_clusters('kmedoid', data, user_id, method)
-    print(data)
+    logging.debug(data)
     plot_mds(clusters, data, method, user_id)
-    print("Finished " + method + ".")
+    logging.debug("Finished %s." % method)
 
 
 def get_ground_truth_sections(username, section_collection):
@@ -314,7 +315,7 @@ def get_ground_truth_sections(username, section_collection):
         if section_data is not None:
             ground_truth_section_data[section_data['_id']] = getRoute(section_data['_id'])
         else:
-            print("%s not found" % section_id)
+            logging.debug("%s not found" % section_id)
     return ground_truth_section_data
 
 """

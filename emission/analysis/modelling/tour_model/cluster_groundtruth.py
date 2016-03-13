@@ -1,4 +1,5 @@
 # standard imports
+import logging
 from sklearn.metrics.cluster import homogeneity_score, completeness_score
 import numpy 
 import matplotlib.pyplot as plt
@@ -47,8 +48,8 @@ def update_colors(bins, colors):
 def evaluate(colors, labels):
     b = homogeneity_score(colors, labels)
     c = completeness_score(colors, labels)
-    print 'homogeneity is ' + str(b)
-    print 'completeness is ' + str(c)
+    logging.debug('homogeneity is %d' % b)
+    logging.debug('completeness is %d' % c)
 
 #maps the clusters, colored by the groundtruth
 #creates a map for each groundtruthed cluster and 

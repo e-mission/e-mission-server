@@ -1,4 +1,5 @@
 # Our imports
+import logging
 import emission.simulation.markov_model_counter as esmmc
 from emission.core.our_geocoder import Geocoder
 
@@ -125,7 +126,7 @@ class Location(object):
         count = 0
         for loc in self.tm.locs.values():
             if loc in self.successors:
-                print "count inceasing"
+                logging.debug("count inceasing")
                 count += 1
         return count
 
@@ -172,7 +173,7 @@ class TourModel(object):
 
     def define_locations(self):
         for loc in self.locs.itervalues():
-            print "%s : %s" % (loc.name, loc.get_address())
+            logging.debug("%s : %s" % (loc.name, loc.get_address()))
 
     def get_prob_of_place_x_at_time_y_on_date_z(x, y, z):
         loc_key = Location.make_lookup_key(x)
@@ -197,7 +198,7 @@ class TourModel(object):
             return "No data for this day"
         curr_node = self.min_of_each_day[day][0]
         self.time = self.min_of_each_day[day][1]
-        print "hour = %s | day = %s | place = %s" % (self.time.hour, self.time.weekday(), curr_node.name)
+        logging.debug("hour = %s | day = %s | place = %s" % (self.time.hour, self.time.weekday(), curr_node.name))
         tour_model.append(curr_node)
         while curr_node.hasSuccessor():
             info = curr_node.get_successor()
@@ -205,7 +206,7 @@ class TourModel(object):
             self.time = datetime.datetime(self.time.year, self.time.month, self.time.day, hour=info[1], minute=self.time.minute) + info[2]
             if self.time.weekday() != day:
                 break
-            print "hour = %s | day = %s | place = %s" % (self.time.hour, self.time.weekday(), info[0].name)
+            logging.debug("hour = %s | day = %s | place = %s" % (self.time.hour, self.time.weekday(), info[0].name))
             if curr_node != tour_model[-1]:
                 tour_model.append(curr_node)
         return tour_model
