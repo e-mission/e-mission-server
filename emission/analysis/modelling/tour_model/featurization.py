@@ -1,4 +1,5 @@
 # Standard imports
+import logging
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -62,17 +63,22 @@ class featurization:
     # - min_clusters (optional): the minimum number of clusters to test for. Must be at least 2. Default to 2.
     # - max_clusters (optional): the maximum number of clusters to test for. Default to the number of points. 
     def cluster(self, name='kmeans', min_clusters=2, max_clusters=None):
+        logging.debug("min_clusters = %d, max_clusters = %d, len(self.points) = %d" % 
+            (min_clusters, max_clusters, len(self.points)))
         if min_clusters < 2:
+            logging.debug("min_clusters < 2, setting min_clusters = 2")
             min_clusters = 2
         if min_clusters > len(self.points):
             sys.stderr.write('Maximum number of clusters is the number of data points.\n')
             min_clusters = len(self.points)-1
         if max_clusters == None:
+            logging.debug("max_clusters is None, setting max_clusters = %d" % len(self.points) - 1)
             max_clusters = len(self.points)-1
         if max_clusters < 2:
             sys.stderr.write('Must have at least 2 clusters\n')
             max_clusters = 2
         if max_clusters >= len(self.points):
+            logging.debug("max_clusters >= len(self.points), setting max_clusters = %d" % (len(self.points) - 1))
             max_clusters = len(self.points)-1
         if max_clusters < min_clusters:
             raise ValueError('Please provide a valid range of cluster sizes')
