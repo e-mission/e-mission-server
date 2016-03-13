@@ -20,8 +20,10 @@ class TestCommonTripQueries(unittest.TestCase):
         edb.get_section_new_db().drop()
         edb.get_trip_new_db().drop()
         self.testUserId = uuid.uuid4()
-        self.testEnd = esdcpq.make_new_common_place(uuid.uuid4(), gj.Point((1,2.092)), ())
-        self.testStart = esdcpq.make_new_common_place(uuid.uuid4(), gj.Point((1,2)), (self.testEnd.common_place_id,))
+        self.testEnd = esdcpq.make_new_common_place(uuid.uuid4(), gj.Point((1,2.092)))
+        self.testEnd.successors = ()
+        self.testStart = esdcpq.make_new_common_place(uuid.uuid4(), gj.Point((1,2)))
+        self.testStart = (self.testEnd.common_place_id,)
         self.time0 = datetime.datetime(1900, 1, 1, 1)
 
     def tearDown(self):
