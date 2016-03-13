@@ -178,8 +178,8 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         # uc.putDocument("common_trips-%s" % str(pydt.date.today()),  tour_model)
         # valid_key_list = ["common_trips-%s" % str(pydt.date.today())]
         # self.delete_obsolete_entries(uc, valid_key_list)
-        logging.debug("About to save model %s with len(trips) = %d and len(places) = %d" % 
-            len(tour_model["common_places"]), len(tour_model["common_trips"]))
+        logging.debug("About to save model with len(places) = %d and len(trips) = %d" % 
+            (len(tour_model["common_places"]), len(tour_model["common_trips"])))
         uc.putDocument("common-trips", tour_model)
 
     def get_oldest_valid_ts(self, start_ts):
