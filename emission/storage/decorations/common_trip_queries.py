@@ -68,6 +68,9 @@ def make_new_common_trip(props=None):
         return ecwct.CommonTrip(props)
     return ecwct.CommonTrip()
 
+def clear_existing_trips(user_id):
+    db = edb.get_common_trip_db()
+    db.remove({'user_id': user_id})
 
 ##############################################################################
 
@@ -91,6 +94,7 @@ def set_up_trips(list_of_cluster_data, user_id):
     # TODO: This should really be moved to a separate class that creates the
     # entire graph at one time
     import emission.storage.decorations.common_place_queries as esdcpq
+    clear_existing_trips(user_id)
     for dct in list_of_cluster_data:
         start_loc = gj.Point(dct['start_coords'].coordinate_list())
         end_loc = gj.Point(dct['end_coords'].coordinate_list())

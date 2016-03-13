@@ -35,6 +35,10 @@ def make_new_common_place(user_id, loc):
 def make_common_place(props):
     return ecwcp.CommonPlace(props)
 
+def clear_existing_places(user_id):
+    db = edb.get_common_place_db()
+    db.remove({'user_id': user_id})
+
 ################################################################################
 
 def create_places(list_of_cluster_data, user_id):
@@ -53,6 +57,7 @@ def create_places(list_of_cluster_data, user_id):
         if end_loc_str not in places_to_successors:
             places_to_successors[end_loc_str] = []
 
+    clear_existing_places(user_id)
     for loc_str in places_to_successors.iterkeys():
         start = make_new_common_place(user_id, gj.loads(loc_str))
         save_common_place(start)
