@@ -45,7 +45,7 @@ class similarity:
                     start_lat = t.start_loc["coordinates"][1]
                     end_lon = t.end_loc["coordinates"][0]
                     end_lat = t.end_loc["coordinates"][1]
-                    logging.debug("start lat = %s" % start_lat)
+                    # logging.debug("start lat = %s" % start_lat)
                     if self.distance(start_lat, start_lon, end_lat, end_lon):
                         self.data.remove(a)
                 except:
