@@ -1,6 +1,8 @@
 import geojson as gj
 import logging
 
+import bson.objectid as boi
+
 import emission.core.wrapper.common_place as ecwcp
 import emission.core.get_database as edb
 import emission.simulation.markov_model_counter as esmmc
@@ -82,7 +84,7 @@ def get_succesor(user_id, place_id, time):
         for temp_hour in xrange(time.hour, esdctp.HOURS_IN_DAY):
             counter_key = ("%s" % suc, temp_hour)
             temp[counter_key] = trip.probabilites[day, temp_hour]
-    return esmmc.sampleFromCounter(temp)[0]
+    return boi.ObjectId(esmmc.sampleFromCounter(temp)[0])
 
 def has_succesor(user_id, place_id, time):
     day = time.weekday()

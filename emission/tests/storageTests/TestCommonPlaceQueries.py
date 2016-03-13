@@ -1,3 +1,4 @@
+import logging
 import unittest
 import uuid
 import geojson as gj
@@ -17,8 +18,14 @@ class TestCommonPlaceQueries(unittest.TestCase):
         edb.get_common_trip_db().drop()
         self.testUserId = uuid.uuid4()
         self.testLocation = gj.Point((122.1234, 37.1234))
-        self.testEnd = esdcpq.make_new_common_place(uuid.uuid4(), gj.Point((1,2.092)), ())
-        self.testStart = esdcpq.make_new_common_place(uuid.uuid4(), gj.Point((1,2)), (self.testEnd.common_place_id,))
+        self.testEnd = esdcpq.make_new_common_place(uuid.uuid4(), gj.Point((1,2.092)))
+        esdcpq.save_common_place(self.testEnd)
+        self.testEnd = esdcpq.get_common_place_at_location(self.testEnd.location)
+        self.testEnd.successors = ()
+
+        self.testStart = esdcpq.make_new_common_place(uuid.uuid4(), gj.Point((1,2)))
+        self.testStart.successors = (self.testEnd.get_id(),)
+
         esdcpq.save_common_place(self.testEnd)
         esdcpq.save_common_place(self.testStart)
         self.time0 = datetime.datetime(1900, 1, 1, 1)
@@ -28,8 +35,9 @@ class TestCommonPlaceQueries(unittest.TestCase):
         edb.get_common_place_db().drop()
 
     def testCreation(self):
-        place = esdcpq.make_new_common_place(self.testUserId, self.testLocation, ())
-        self.assertEqual(type(place.coords), gj.Point)
+        place = esdcpq.make_new_common_place(self.testUserId, self.testLocation)
+        place.successors = ()
+        self.assertEqual(type(place.location), gj.Point)
         self.assertEqual(type(place.successors), tuple)
         self.assertIsNotNone(place.successors)
 
@@ -41,25 +49,27 @@ class TestCommonPlaceQueries(unittest.TestCase):
         for p in places:
             places_list.append(esdcpq.make_common_place(p))
         for place in places_list:
-            self.assertIsNotNone(place.coords)
+            self.assertIsNotNone(place.location)
             self.assertIsNotNone(place["successors"])
 
     def testGetSuccessor(self):
         print "size of db is %s" % edb.get_common_place_db().find().count()
-        self.assertIsNotNone(edb.get_common_place_db().find_one({"common_place_id": self.testEnd.common_place_id}))
+        self.assertIsNotNone(edb.get_common_place_db().find_one({"_id": self.testEnd.get_id()}))
         probs = np.zeros( (7, 24) )
         probs[self.time0.weekday(), 3] = 10
         props = {
             "user_id" : self.testUserId,
-            "start_loc" : self.testStart.common_place_id,
-            "end_loc" : self.testEnd.common_place_id,
+            "start_place" : self.testStart.get_id(),
+            "end_place" : self.testEnd.get_id(),
+            "start_loc" : self.testStart.location,
+            "end_loc" : self.testEnd.location,
             "probabilites" : probs,
             "trips" : ()
         }
         trip = esdctp.make_new_common_trip(props)
         esdctp.save_common_trip(trip)
-        suc = esdcpq.get_succesor(self.testUserId, self.testStart.common_place_id, self.time0)
-        self.assertEqual(suc, self.testEnd.common_place_id)
+        suc = esdcpq.get_succesor(self.testUserId, self.testStart.get_id(), self.time0)
+        self.assertEqual(suc, self.testEnd.get_id())
 
 
 def get_fake_data(user_name):
