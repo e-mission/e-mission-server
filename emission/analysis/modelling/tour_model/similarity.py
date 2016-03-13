@@ -40,10 +40,10 @@ class similarity:
                 # print "a is %s" % a
                 t = esdtq.get_trip(a)
                 try:
-                    start_lat = t.start_loc["coordinates"][0]
-                    start_lon = t.start_loc["coordinates"][1]
-                    end_lat = t.end_loc["coordinates"][0]
-                    end_lon = t.end_loc["coordinates"][1]
+                    start_lon = t.start_loc["coordinates"][0]
+                    start_lat = t.start_loc["coordinates"][1]
+                    end_lon = t.end_loc["coordinates"][0]
+                    end_lat = t.end_loc["coordinates"][1]
                     print "start lat = %s" % start_lat
                     if self.distance(start_lat, start_lon, end_lat, end_lon):
                         self.data.remove(a)
@@ -211,8 +211,9 @@ class similarity:
         enda = tripa.end_loc["coordinates"]
         endb = tripb.end_loc["coordinates"]
 
-        start = self.distance(starta[0], starta[1], startb[0], startb[1])
-        end = self.distance(enda[0], enda[1], endb[0], endb[1])
+        # Flip indices because points are in geojson (i.e. lon, lat)
+        start = self.distance(starta[1], starta[0], startb[1], startb[0])
+        end = self.distance(enda[1], enda[0], endb[1], endb[0])
 
         return True if start and end else False
 
