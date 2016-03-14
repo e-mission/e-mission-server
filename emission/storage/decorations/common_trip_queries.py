@@ -103,7 +103,6 @@ def set_up_trips(list_of_cluster_data, user_id):
         #print 'dct["sections"].trip_id %s is' % dct["sections"][0]
         probabilites = np.zeros((DAYS_IN_WEEK, HOURS_IN_DAY))
         for sec in dct["sections"]:
-            sec = esdtq.get_trip(sec)
             probabilites[get_day(sec), get_start_hour(sec)] += 1
 
         trip = make_new_common_trip()
