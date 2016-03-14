@@ -1,3 +1,5 @@
+import logging
+
 import emission.analysis.modelling.tour_model.tour_model_matrix as tm ##here
 import emission.core.get_database as edb
 import emission.core.wrapper.trip_old as trip
@@ -38,7 +40,7 @@ def make_graph_edges(list_of_cluster_data, tour_model):
         end_loc_temp = tm.Location(end_loc, tour_model)
         end_loc_temp = tour_model.get_location(end_loc_temp)
         e = make_graph_edge(start_loc_temp, end_loc_temp, tour_model)
-        print "making edge %s" % e
+        logging.debug("making edge %s" % e)
         for trip in cd["sections"]:
             e.add_trip(trip)
 
@@ -76,7 +78,7 @@ def get_day(section_info):
 def get_mode_num(section_info):
     map_modes_to_numbers = {"walking" : 0, "car" : 1, "train" : 2, "bart" : 3, "bike" : 4}
     return random.randint(0, 4)
-    print section_info.sections
+    logging.debug(section_info.sections)
 
 
 final_tour_model = None

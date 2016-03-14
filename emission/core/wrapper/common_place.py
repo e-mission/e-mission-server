@@ -3,13 +3,16 @@ import emission.core.wrapper.wrapperbase as ecwb
 
 class CommonPlace(ecwb.WrapperBase):
     props = {
-         "coords" : ecwb.WrapperBase.Access.WORM, # geojson coordinates that represent the place
-         "successors" : ecwb.WrapperBase.Access.WORM, # set of CommonPlaces connected to this location
+         "location" : ecwb.WrapperBase.Access.WORM, # location in geojson format
+         # TODO: Currently marking this as RW to get around the fact that I need
+         # to set the successors after creation.
+         # Need to revisit after I fix the model creation and multiple place generation
+         "successors" : ecwb.WrapperBase.Access.RW, # set of CommonPlaces connected to this location
+         "places": ecwb.WrapperBase.Access.WORM, # Set of place_ids that map to this common place
          "user_id" : ecwb.WrapperBase.Access.WORM,
-         "common_place_id" : ecwb.WrapperBase.Access.WORM
     }
 
-    geojson = ["coords"]
+    geojson = ["location"]
     enums = {}
     nullable = []
 

@@ -1,4 +1,5 @@
 # Standard imports
+import logging
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -62,22 +63,27 @@ class featurization:
     # - min_clusters (optional): the minimum number of clusters to test for. Must be at least 2. Default to 2.
     # - max_clusters (optional): the maximum number of clusters to test for. Default to the number of points. 
     def cluster(self, name='kmeans', min_clusters=2, max_clusters=None):
+        logging.debug("min_clusters = %s, max_clusters = %s, len(self.points) = %s" % 
+            (min_clusters, max_clusters, len(self.points)))
         if min_clusters < 2:
+            logging.debug("min_clusters < 2, setting min_clusters = 2")
             min_clusters = 2
         if min_clusters > len(self.points):
             sys.stderr.write('Maximum number of clusters is the number of data points.\n')
             min_clusters = len(self.points)-1
         if max_clusters == None:
+            logging.debug("max_clusters is None, setting max_clusters = %d" % (len(self.points) - 1))
             max_clusters = len(self.points)-1
         if max_clusters < 2:
             sys.stderr.write('Must have at least 2 clusters\n')
             max_clusters = 2
         if max_clusters >= len(self.points):
+            logging.debug("max_clusters >= len(self.points), setting max_clusters = %d" % (len(self.points) - 1))
             max_clusters = len(self.points)-1
         if max_clusters < min_clusters:
             raise ValueError('Please provide a valid range of cluster sizes')
         if name != 'kmeans' and name != 'kmedoids':
-            print 'Invalid clustering algorithm name. Defaulting to k-means'
+            logging.debug('Invalid clustering algorithm name. Defaulting to k-means')
             name='kmeans'
         if not self.data:
             self.sil = None
@@ -91,7 +97,7 @@ class featurization:
         if name == 'kmedoids':
             for i in range(r):
                 num_clusters = i + min_clusters
-                print 'testing ' + str(num_clusters) + ' clusters'
+                logging.debug('testing %s clusters' % str(num_clusters))
                 cl = kmedoids(self.points, num_clusters)
                 self.labels = [0] * len(self.data)
                 cluster = -1
@@ -129,10 +135,10 @@ class featurization:
             sys.stderr.write('No clusters to analyze\n')
             return
         if not self.labels:
-            print 'Please cluster before analyzing clusters.'
+            logging.debug('Please cluster before analyzing clusters.')
             return
-        print 'number of clusters is ' + str(self.clusters)
-        print 'silhouette score is ' + str(self.sil) 
+        logging.debug('number of clusters is %d' % str(self.clusters))
+        logging.debug('silhouette score is %d' % str(self.sil))
 
     #map the clusters
     #TODO - move this to a file in emission.analysis.plotting to map clusters from the database

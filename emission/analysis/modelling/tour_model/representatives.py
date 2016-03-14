@@ -65,10 +65,13 @@ class representatives:
                     points[3].append(c.trip_end_location.lon)
                 else:
                     c = esdtq.get_trip(c)
-                    points[0].append(c.start_loc["coordinates"][0])
-                    points[1].append(c.start_loc["coordinates"][1])
-                    points[2].append(c.end_loc["coordinates"][0])
-                    points[3].append(c.end_loc["coordinates"][1])                    
+                    # We want (lat, lon) to be consistent with old above.
+                    # But in the new, our data is in geojson so it is (lon, lat).
+                    # Fix it by flipping the order of the indices
+                    points[0].append(c.start_loc["coordinates"][1])
+                    points[1].append(c.start_loc["coordinates"][0])
+                    points[2].append(c.end_loc["coordinates"][1])
+                    points[3].append(c.end_loc["coordinates"][0])                    
             centers = numpy.mean(points, axis=1)
             a = Trip(None, None, None, None, None, None, Coordinate(centers[0], centers[1]), Coordinate(centers[2], centers[3]))
             self.reps.append(a)

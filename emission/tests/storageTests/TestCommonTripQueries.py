@@ -20,8 +20,16 @@ class TestCommonTripQueries(unittest.TestCase):
         edb.get_section_new_db().drop()
         edb.get_trip_new_db().drop()
         self.testUserId = uuid.uuid4()
-        self.testEnd = esdcpq.make_new_common_place(uuid.uuid4(), gj.Point((1,2.092)), ())
-        self.testStart = esdcpq.make_new_common_place(uuid.uuid4(), gj.Point((1,2)), (self.testEnd.common_place_id,))
+        self.testEnd = esdcpq.make_new_common_place(uuid.uuid4(), gj.Point((1,2.092)))
+        esdcpq.save_common_place(self.testEnd)
+        self.testEnd = esdcpq.get_common_place_at_location(self.testEnd.location)
+        self.testEnd.successors = ()
+
+        self.testStart = esdcpq.make_new_common_place(uuid.uuid4(), gj.Point((1,2)))
+        self.testStart.successors = (self.testEnd.get_id(),)
+
+        esdcpq.save_common_place(self.testEnd)
+        esdcpq.save_common_place(self.testStart)
         self.time0 = datetime.datetime(1900, 1, 1, 1)
 
     def tearDown(self):
@@ -32,8 +40,8 @@ class TestCommonTripQueries(unittest.TestCase):
     def testCreation(self):
         common_trip = esdctp.make_new_common_trip()
         common_trip.user_id = self.testUserId
-        common_trip.start_loc = self.testStart.user_id
-        common_trip.end_loc = self.testEnd.user_id
+        common_trip.start_loc = self.testStart.location
+        common_trip.end_loc = self.testEnd.location
         common_trip.trips = []
         self.assertIsNotNone(common_trip.start_loc)
         self.assertIsNotNone(common_trip.end_loc)
@@ -42,18 +50,21 @@ class TestCommonTripQueries(unittest.TestCase):
     def testSaveAndRecieve(self):
         common_trip = esdctp.make_new_common_trip()
         common_trip.user_id = self.testUserId
-        common_trip.start_loc = self.testStart.common_place_id
-        common_trip.end_loc = self.testEnd.common_place_id
+        common_trip.start_place = self.testStart.get_id()
+        common_trip.end_place = self.testEnd.get_id()
+        common_trip.start_loc = self.testStart.location
+        common_trip.end_loc = self.testEnd.location
         common_trip.probabilites = np.zeros((24, 7))
         common_trip.trips = []
         esdctp.save_common_trip(common_trip)
-        new_trip = esdctp.get_common_trip_from_db(self.testUserId, self.testStart.common_place_id, self.testEnd.common_place_id)
+        new_trip = esdctp.get_common_trip_from_db(self.testUserId, self.testStart.get_id(), self.testEnd.get_id())
         self.assertEqual(new_trip.user_id, common_trip.user_id)
-        self.assertEqual(new_trip.start_loc, common_trip.start_loc)
-        self.assertEqual(new_trip.end_loc, common_trip.end_loc)
+        self.assertEqual(gj.dumps(new_trip.start_loc), gj.dumps(common_trip.start_loc))
+        self.assertEqual(gj.dumps(new_trip.end_loc), gj.dumps(common_trip.end_loc))
 
     def testCreateFromData(self):
         fake_data = get_fake_data("test2")
+        esdcpq.create_places(fake_data, "test2")
         esdctp.set_up_trips(fake_data, "test2")
         trips = esdctp.get_all_common_trips_for_user("test2")
         trips_list = []
