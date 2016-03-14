@@ -63,7 +63,7 @@ def read_data(uuid=None, size=None, old=True):
                 if len(data) == size:
                     break
         return data
-    return [trip["_id"] for trip in trips]
+    return [ecwt.Trip(trip) for trip in trips]
 
 #put the data into bins and cut off the lower portion of the bins
 def remove_noise(data, radius, old=True):

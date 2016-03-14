@@ -39,7 +39,7 @@ class similarity:
         if not old:
             for a in self.data:
                 # print "a is %s" % a
-                t = esdtq.get_trip(a)
+                t = a
                 try:
                     start_lon = t.start_loc["coordinates"][0]
                     start_lat = t.start_loc["coordinates"][1]
@@ -204,8 +204,8 @@ class similarity:
         return False
 
     def distance_helper_new(self, a, b):
-        tripa = esdtq.get_trip(self.data[a])
-        tripb = esdtq.get_trip(self.data[b])
+        tripa = self.data[a]
+        tripb = self.data[b]
 
         starta = tripa.start_loc["coordinates"]
         startb = tripb.start_loc["coordinates"]

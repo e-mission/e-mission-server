@@ -45,7 +45,6 @@ class featurization:
                 start = trip.trip_start_location
                 end = trip.trip_end_location
             else:
-                trip = esdtq.get_trip(trip)
                 try:
                     start = trip.start_loc["coordinates"]
                     end = trip.end_loc["coordinates"]

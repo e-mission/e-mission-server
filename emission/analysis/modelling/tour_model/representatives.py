@@ -64,7 +64,6 @@ class representatives:
                     points[2].append(c.trip_end_location.lat)
                     points[3].append(c.trip_end_location.lon)
                 else:
-                    c = esdtq.get_trip(c)
                     # We want (lat, lon) to be consistent with old above.
                     # But in the new, our data is in geojson so it is (lon, lat).
                     # Fix it by flipping the order of the indices
