@@ -78,27 +78,27 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     
     # Trip 20140407T175709-0700 has two sections
 
-  def testScheduleAlternativeTrips(self):
-    user_crontab = CronTab(user=True)
-    user_crontab.remove_all()
-    user_crontab.write()
-
-    trip_iter = self.pipeline.get_trips_for_alternatives(self.testUUID)
-    self.assertTrue(hasattr(trip_iter, '__iter__'))
-    trip_list = list(trip_iter)
-    firstElement = trip_list[0]
-    self.assertTrue(isinstance(firstElement, ecwt.E_Mission_Trip))
-    # calc_alternative_trips merely schedules the alternative trip calculation at a later time
-    # it can't return the alternative trips right now
-    pipeline_module.calc_alternative_trips(trip_list, immediate=False)
-    for trip in trip_list:
-        self.assertEqual(trip.pipelineFlags.alternativesStarted, True)
-
-    # Re-open the crontab to see the new entries
-    user_crontab = CronTab(user=True)
-    jobs = [job for job in user_crontab]
-    self.assertEqual(len(jobs), len(trip_list))
-    self.assertEqual(jobs[0].hour, firstElement.start_time.hour)
+#   def testScheduleAlternativeTrips(self):
+#     user_crontab = CronTab(user=True)
+#     user_crontab.remove_all()
+#     user_crontab.write()
+# 
+#     trip_iter = self.pipeline.get_trips_for_alternatives(self.testUUID)
+#     self.assertTrue(hasattr(trip_iter, '__iter__'))
+#     trip_list = list(trip_iter)
+#     firstElement = trip_list[0]
+#     self.assertTrue(isinstance(firstElement, ecwt.E_Mission_Trip))
+#     # calc_alternative_trips merely schedules the alternative trip calculation at a later time
+#     # it can't return the alternative trips right now
+#     pipeline_module.calc_alternative_trips(trip_list, immediate=False)
+#     for trip in trip_list:
+#         self.assertEqual(trip.pipelineFlags.alternativesStarted, True)
+# 
+#     # Re-open the crontab to see the new entries
+#     user_crontab = CronTab(user=True)
+#     jobs = [job for job in user_crontab]
+#     self.assertEqual(len(jobs), len(trip_list))
+#     self.assertEqual(jobs[0].hour, firstElement.start_time.hour)
 
   def testQueryAndSaveAlternatives(self):
     trip_iter = self.pipeline.get_trips_for_alternatives(self.testUUID)
