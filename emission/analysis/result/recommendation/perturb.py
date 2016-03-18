@@ -42,18 +42,18 @@ def schedule_queries(_id, trip_array):
 		end = trip.get_end_coordinates()
 		time = trip.get_time()
 
-		cron = CronTab()
-		exec_str = python_location + ' ' + query_script_location + ' ' + _id
-		job = cron.new(command=exec_str)
-
-		job.month.on(perturbed_time.month)
-		job.day.on(perturbed_time.day)
-		job.hour.on(perturbed_time.hour)
-		job.minute.on(perturbed_time.minute)
-
-		job.enable()
-		cron.write()
-		print("You have successfully scheduled this CRON job.")
+# 		cron = CronTab()
+# 		exec_str = python_location + ' ' + query_script_location + ' ' + _id
+# 		job = cron.new(command=exec_str)
+# 
+# 		job.month.on(perturbed_time.month)
+# 		job.day.on(perturbed_time.day)
+# 		job.hour.on(perturbed_time.hour)
+# 		job.minute.on(perturbed_time.minute)
+# 
+# 		job.enable()
+# 		cron.write()
+# 		print("You have successfully scheduled this CRON job.")
 
 # #Unit Test
 # home = '37.199024,-121.831479'
