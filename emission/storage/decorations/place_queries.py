@@ -44,7 +44,6 @@ def get_places(user_id, time_query):
 def get_aggregate_places(time_query):
     curr_query = _get_ts_query(time_query)
     place_doc_cursor = edb.get_place_db().find(curr_query).sort(time_query.timeType, pymongo.ASCENDING)
-    print ("%d places found in database" % place_doc_cursor.count())
     return [ecwp.Place(doc) for doc in place_doc_cursor]
 
 def get_aggregate_places_in_box(time_query, box):

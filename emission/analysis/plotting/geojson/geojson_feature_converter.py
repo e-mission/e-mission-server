@@ -281,7 +281,6 @@ def get_geojson_for_timeline(user_id, tl):
             # I think those should be resolved for now, so we can raise the error again
             # But if this is preventing us from making progress, we can comment out the raise
             logging.exception("Found key error %s while processing trip %s" % (e, trip))
-            print "keyerror"
             # raise e
         except Exception, e:
             logging.exception("Found error %s while processing trip %s" % (e, trip))
