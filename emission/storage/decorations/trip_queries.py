@@ -34,6 +34,17 @@ def get_trips(user_id, time_query):
     # TODO: Fix "TripIterator" and return it instead of this list
     return [ecwt.Trip(doc) for doc in trip_doc_cursor]
 
+def get_aggregate_trips(time_query):
+    curr_query = _get_ts_query(time_query)
+    trip_doc_cursor = edb.get_trip_new_db().find(curr_query).sort(time_query.timeType, pymongo.ASCENDING)
+    print "trip_doc_cursor.count() is %d" % trip_doc_cursor.count()
+    return [ecwt.Trip(doc) for doc in trip_doc_cursor]
+
+def get_aggregate_trips_box(time_query, box):
+    curr_query = _get_ts_query(time_query)
+    curr_query.update({"loc" : {"$geoWithin" : {"$box": box}}})
+    trip_doc_cursor = edb.get_trip_new_db().find(curr_query).sort(time_query.timeType, pymongo.ASCENDING)
+    return [ecwt.Trip(doc) for doc in trip_doc_cursor]
 
 def get_trip(trip_id):
     """

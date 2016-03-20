@@ -38,6 +38,7 @@ import emission.core.common as common
 from emission.core.wrapper.client import Client
 from emission.core.wrapper.user import User
 from emission.core.get_database import get_uuid_db, get_mode_db
+import emission.core.wrapper.motionactivity as ecwm
 
 
 config_file = open('conf/net/api/webserver.conf')
@@ -198,11 +199,13 @@ def getCalPopRoute():
 
 @route("/result/heatmap/pop.route/commute/<selMode>")
 def getCommutePopRoute(selMode):
-  mode = get_mode_db().find_one({'mode_name': selMode})
+  print 'SELMODE is %s' % selMode
+  map_mode = {"car" : ecwm.MotionTypes.IN_VEHICLE, "train" : ecwm.MotionTypes.IN_VEHICLE, "walk" : ecwm.MotionTypes.ON_FOOT, "cycling" : ecwm.MotionTypes.BICYCLING, "bus": ecwm.MotionTypes.IN_VEHICLE}
   fromTs = request.query.from_ts
   toTs = request.query.to_ts
+  mode = map_mode[selMode]
   logging.debug("Filtering values for range %s -> %s" % (fromTs, toTs))
-  retVal = visualize.Commute_pop_route(mode['mode_id'],
+  retVal = visualize.Commute_pop_route(mode,
     datetime.fromtimestamp(float(fromTs)/1000), datetime.fromtimestamp(float(toTs)/1000))
   # retVal = common.generateRandomResult(['00-04', '04-08', '08-10'])
   # logging.debug("In getCalPopRoute, retVal is %s" % retVal)

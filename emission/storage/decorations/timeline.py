@@ -50,20 +50,50 @@ def get_timeline(user_id, start_ts, end_ts):
     return Timeline(places, trips)
 
 
-def get_aggregate_timeline_from_dt(user_id, start_dt, end_dt):
+
+def get_aggregate_timeline_from_dt_box(start_dt, end_dt, box):
     import emission.core.get_database as edb
     import emission.core.wrapper.entry as ecwe
+    import emission.storage.decorations.place_queries as esdp
+    import emission.storage.decorations.trip_queries as esdt
+
+    logging.info("About to query for %s -> %s in %s" % (start_dt, end_dt, box))
+    result_cursor = edb.get_timeseries_db().find({"data.local_dt": {"$gte": start_dt, "$lte": end_dt}}).sort("metadata.write_ts")
+    logging.debug("result cursor has %d entries" % result_cursor.count())
+    result_list = list(result_cursor)
+    logging.debug("result list has %d entries" % len(result_list))
+    if len(result_list) == 0:
+        return Timeline([], [])
+    start_ts = ecwe.Entry(result_list[0]).metadata.write_ts
+    end_ts = ecwe.Entry(result_list[-1]).metadata.write_ts
+    logging.debug("Converted datetime range %s -> %s to timestamp range %s -> %s" %
+            (start_dt, end_dt, start_ts, end_ts))
+    places = esdp.get_aggregate_places_in_box(enua.UserCache.TimeQuery("enter_ts", start_ts, end_ts), box)
+    trips = esdt.get_aggregate_trips_box(enua.UserCache.TimeQuery("start_ts", start_ts, end_ts), box)
+    return Timeline(places, trips)
+
+
+
+def get_aggregate_timeline_from_dt(start_dt, end_dt):
+    import emission.core.get_database as edb
+    import emission.core.wrapper.entry as ecwe
+    import emission.storage.decorations.place_queries as esdp
+    import emission.storage.decorations.trip_queries as esdt
 
     logging.info("About to query for %s -> %s" % (start_dt, end_dt))
     result_cursor = edb.get_timeseries_db().find({"data.local_dt": {"$gte": start_dt, "$lte": end_dt}}).sort("metadata.write_ts")
     logging.debug("result cursor has %d entries" % result_cursor.count())
     result_list = list(result_cursor)
     logging.debug("result list has %d entries" % len(result_list))
+    if len(result_list) == 0:
+        return Timeline([], [])
     start_ts = ecwe.Entry(result_list[0]).metadata.write_ts
     end_ts = ecwe.Entry(result_list[-1]).metadata.write_ts
     logging.debug("Converted datetime range %s -> %s to timestamp range %s -> %s" %
         (start_dt, end_dt, start_ts, end_ts))
-    return get_timeline(user_id, start_ts, end_ts)
+    places = esdp.get_aggregate_places(enua.UserCache.TimeQuery("enter_ts", start_ts, end_ts))
+    trips = esdt.get_aggregate_trips(enua.UserCache.TimeQuery("start_ts", start_ts, end_ts))
+    return Timeline(places, trips)
 
 class Timeline(object):
 
