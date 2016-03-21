@@ -73,7 +73,7 @@ app = app()
 #Simple path that serves up a static landing page with javascript in it
 @route('/')
 def index():
-  return static_file("server/index.html", static_path)
+  return static_file("server/home.html", static_path)
 
 # Bunch of static pages that constitute our website
 # Should we have gone for something like django instead after all?
