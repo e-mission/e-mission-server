@@ -1,0 +1,249 @@
+<!doctype html>
+<html>
+  <head>
+    <title>E-Mission</title>
+    <link href="front/common/nvd3/nv.d3.css" rel="stylesheet" type="text/css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.2/d3.js" charset="utf-8"></script>
+    <script src="front/common/nvd3/nv.d3.min.js" charset="utf-8"></script>
+    <script src="front/common/nvd3/nv.d3.utils.js"></script>
+    <script src="front/common/nvd3/nv.d3.models.pieChart.js"></script>
+
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+
+    <!-- Add in the bootstrap code to make our website look pretty -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+    <script src="//maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=visualization"></script>
+    <script src="front/common/cfc.display.js"></script>
+
+    <style>
+      body {
+        overflow-y:scroll;
+      }
+
+      text {
+        font: 12px sans-serif;
+      }
+      html, body, #mapcanvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+      }
+      #panel {
+        position: absolute;
+        top: 5px;
+        left: 50%;
+        margin-left: -180px;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+      }
+    </style>
+    <script>
+       $(function() {
+          $( "#from" ).datepicker({
+            dateFormat: "yy-mm-dd",
+            defaultDate: "+1w",
+            changeMonth: true,
+            numberOfMonths: 1,
+            onClose: function( selectedDate ) {
+              console.log("in onClose, selectedDate = "+selectedDate);
+              $( "#to" ).datepicker( "option", "minDate", selectedDate );
+            }
+          });
+
+          $( "#to" ).datepicker({
+            dateFormat: "yy-mm-dd",
+            defaultDate: "+1w",
+            changeMonth: true,
+            numberOfMonths: 1,
+            onClose: function( selectedDate ) {
+              $( "#from" ).datepicker( "option", "maxDate", selectedDate );
+            }
+          });
+       });
+    </script>
+  </head>
+  <body onload="firstLoad();">
+    <script>
+      function firstLoad() {
+        $("#from").datepicker("setDate", "-7");
+        $("#to").datepicker("setDate", "+0");
+        displayBar("result/carbon/all/summary",
+                   "Carbon footprints versus goals",
+                   "kg CO2 per week",
+                   "front/carbon_calc_details.html")
+      }
+      function modeshareForZipcode() {
+        zc = prompt("Enter the zip code")
+        operation = "result/commute.modeshare/zipcode"
+        fromDate = $("#from").datepicker("getDate");
+        toDate = $("#to").datepicker("getDate");
+        filteredOp = operation+"/"+zc+"?from_ts="+fromDate.getTime()+"&to_ts="+toDate.getTime();
+        $.getJSON(filteredOp, function(data, status) {
+            cfc.display.prepChart();
+            $("#result").text("Distance travelled in each mode while commuting from "+zc);
+            cfc.display.pieChart(cfc.display.convert(data));  
+        });
+      }
+      function displayPie(operation, message) {
+        fromDate = $("#from").datepicker("getDate");
+        toDate = $("#to").datepicker("getDate");
+        filteredOp = operation+"?from_ts="+fromDate.getTime()+"&to_ts="+toDate.getTime();
+        $.getJSON(filteredOp, function(data, status) {
+            cfc.display.prepChart();
+            $("#result").text(message);
+            cfc.display.pieChart(cfc.display.convert(data));  
+            $("#calc_details").hide()
+          });
+      }
+
+      function displayBar(operation, message, yAxisLabel, link) {
+        fromDate = $("#from").datepicker("getDate");
+        toDate = $("#to").datepicker("getDate");
+        filteredOp = operation+"?from_ts="+fromDate.getTime()+"&to_ts="+toDate.getTime();
+        $.getJSON(filteredOp, function(data, status) {
+            cfc.display.prepChart();
+            $("#result").text(message);
+            summaryDataSeries = {};
+            summaryDataSeries['key'] = message;
+            summaryDataSeries['values'] = cfc.display.convert(data).sort(cfc.display.sortLabels);
+            cfc.display.barChart([summaryDataSeries], yAxisLabel);
+            if (typeof link != "undefined") {
+              // Note that setting the href does not actually work.
+              // Need to debug later. Right now we have a single hardcoded href, which is all we
+              // really need
+              $("#calc_details a").attr("href", link)
+              $("#calc_details").show()
+            } else {
+              $("#calc_details").hide()
+            }
+            //cfc.display.pieChart(cfc.display.convert(data));  
+          });
+      }
+
+      function displayHeatmap(operation, message, weightLabel) {
+        fromDate = $("#from").datepicker("getDate");
+        toDate = $("#to").datepicker("getDate");
+        filteredOp = operation+"?from_ts="+fromDate.getTime()+"&to_ts="+toDate.getTime();
+        $.getJSON(filteredOp, function(data, status) {
+            cfc.display.prepMap();
+            $("#result").text(message);
+            cfc.display.convertAndDisplayHeatMap(data, weightLabel);
+        });
+      }
+    </script>
+      <div><center>
+        <table>
+        <tr><td>
+        <a href="https://play.google.com/store/apps/details?id=edu.berkeley.eecs.e_mission">
+          <img alt="Get it on Google Play"
+               src="https://developer.android.com/images/brand/en_generic_rgb_wo_45.png" />
+        </a>
+        </td>
+        <td>
+          <h2> E-Mission: Data driven carbon emission reduction </h2>
+        </td>
+        <td>
+        <a href="https://itunes.apple.com/us/app/e-mission/id861161809?mt=8">
+          <img alt="Download on the App Store"
+               src="front/app_store_badge.png" />
+        </a>
+        </td>
+        </tr>
+        </table>
+        </center>
+      </div>
+      <div><center>
+        <label for="from">From</label>
+        <input type="text" id="from" name="from">
+        <label for="to">to</label>
+        <input type="text" id="to" name="to">
+      </center></div>
+
+      <div><center> 
+        <button onclick='displayBar("result/carbon/all/summary",
+                                    "Carbon footprints versus goals",
+                                    "kg CO2 per week",
+                                    "front/carbon_calc_details.html")'>
+                                    Carbon footprint summary</button>
+        <button onclick='displayPie("result/commute.modeshare.distance",
+                                    "Distance travelled by each mode while commuting")'>
+                                    Commute Mode Share (Distance)</button>
+        <button onclick='displayPie("result/home.zipcode",
+                                    "Home zip code for E-Mission users")'>
+                                    Home zip code</button>
+        <button onclick='modeshareForZipcode()'>Mode share for a specified zip code</button>
+        <button onclick='displayBar("result/commute.distance.to",
+                                    "Number of users for various average commute distances to work",
+                                    "Number of users")'>Distance To Work</button>
+        <button onclick='displayBar("result/commute.distance.from",
+                                    "Number of users for various average commute distances from work",
+                                    "Number of users")'>Distance From Work</button>
+        <button onclick='displayBar("result/commute.arrivalTime",
+                                    "Distribution of arrival times at work",
+                                    "Number of trips")'>
+                                    Arrival Time</button>
+        <button onclick='displayBar("result/commute.departureTime",
+                                    "Distribution of departure times from work",
+                                    "Number of trips")'>
+                                    Departure Time</button>
+        <button onclick='displayPie("result/internal.modeshare.distance",
+                                    "Distance travelled by each mode for trips within UC Berkeley")'>
+                                    Mode share within UCB</button>
+        <button onclick='displayHeatmap("result/heatmap/carbon",
+                                    "Carbon footprint heatmap",
+                                    "carbon")'>
+                                    Carbon footprint heatmap</button>
+        <button onclick='displayHeatmap("result/heatmap/carbon",
+                                    "User density heatmap",
+                                    "weight")'>
+                                    User density heatmap</button>
+        <button onclick='displayHeatmap("result/heatmap/pop.route/cal",
+                                    "Popular routes within Cal",
+                                    "")'>
+                                    Popular routes within Cal</button>
+        <button onclick='displayHeatmap("result/heatmap/pop.route/commute/cycling",
+                                    "Popular bicycle routes",
+                                    "")'>
+                                    Popular bicycle routes</button>
+        <button onclick='displayHeatmap("result/heatmap/pop.route/commute/car",
+                                    "Popular car routes",
+                                    "")'>
+                                    Popular car routes</button>
+        <button onclick='displayHeatmap("result/heatmap/pop.route/commute/bus",
+                                    "Popular bus routes",
+                                    "")'>
+                                    Popular bus routes</button>
+        <button onclick='displayHeatmap("result/heatmap/pop.route/commute/train",
+                                    "Popular train routes",
+                                    "")'>
+                                    Popular train routes</button>
+      </center></div>
+
+      <div>
+        <center>
+          <h3 id="result">Press any button to get the aggregate results</h3>
+            <small id="calc_details"><a href="front/carbon_calc_details.html">Calculation Details</a></small>
+        </center>
+      </div>
+      <!--
+      <div id="charts">
+        <svg id="chart"></svg>
+      </div>
+      <div id=panel>
+        <button onclick='displayHeatmap("result/heatmap/carbon",
+                                    "Carbon footprint heatmap")'>
+                                    Carbon footprint heatmap</button>
+        <button onclick="displayMap([])">Initialize</button>
+      </div>
+      -->
+      <div id="chart"> </div>
+      <div id="mapcanvas"> </div>
+    </div>
+  </body>
+</html>
