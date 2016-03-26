@@ -82,6 +82,18 @@ def mark_smoothing_failed(user_id):
 def get_complete_ts(user_id):
     return get_current_state(user_id, ps.PipelineStages.JUMP_SMOOTHING).last_ts_run
 
+def get_time_range_for_output_gen(user_id):
+    return get_time_range_for_stage(user_id, ps.PipelineStages.OUTPUT_GEN)
+
+def mark_output_gen_done(user_id, last_processed_ts):
+    if last_processed_ts is None:
+        mark_stage_done(user_id, ps.PipelineStages.OUTPUT_GEN, None)
+    else:
+        mark_stage_done(user_id, ps.PipelineStages.OUTPUT_GEN, last_processed_ts + END_FUZZ_AVOID_LTE)
+
+def mark_output_gen_failed(user_id):
+    mark_stage_failed(user_id, ps.PipelineStages.OUTPUT_GEN)
+
 def mark_stage_done(user_id, stage, last_processed_ts):
     # We move failed entries to the error timeseries. So usercache runs never fail.
     curr_state = get_current_state(user_id, stage)
