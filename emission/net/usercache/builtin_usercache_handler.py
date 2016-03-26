@@ -9,7 +9,7 @@ import emission.net.usercache.abstract_usercache as enua
 import emission.storage.timeseries.abstract_timeseries as etsa
 
 import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
-import emission.analysis.configs.configs as eacc
+import emission.analysis.configs.config as eacc
 
 import emission.net.usercache.formatters.formatter as enuf
 import emission.storage.pipeline_queries as esp
