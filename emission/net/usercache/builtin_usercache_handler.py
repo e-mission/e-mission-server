@@ -9,6 +9,7 @@ import emission.net.usercache.abstract_usercache as enua
 import emission.storage.timeseries.abstract_timeseries as etsa
 
 import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
+import emission.analysis.configs.configs as eacc
 
 import emission.net.usercache.formatters.formatter as enuf
 import emission.storage.pipeline_queries as esp
@@ -181,6 +182,15 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         logging.debug("About to save model with len(places) = %d and len(trips) = %d" % 
             (len(tour_model["common_places"]), len(tour_model["common_trips"])))
         uc.putDocument("common-trips", tour_model)
+
+    def storeConfigsToCache(self):
+        """
+        Iterate through all configs, figure out the correct version to push to
+        the phone, and do so.
+        """
+        uc = enua.UserCache.getUserCache(self.user_id)
+        eacc.save_all_configs(self.user_id)
+        
 
     def get_oldest_valid_ts(self, start_ts):
         """

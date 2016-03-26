@@ -51,5 +51,6 @@ if __name__ == '__main__':
         uh = euah.UserCacheHandler.getUserCacheHandler(uuid)
         uh.storeViewsToCache()
         uh.storeCommonTripsToCache()
+        uh.storeConfigsToCache()
 
 
