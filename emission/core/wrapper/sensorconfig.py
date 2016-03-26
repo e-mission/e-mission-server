@@ -1,10 +1,6 @@
 import logging
 import emission.core.wrapper.wrapperbase as ecwb
 
-class FilterTypes(enum.Enum):
-    DISTANCE = 0
-    TIME = 1
-
 class Sensorconfig(ecwb.WrapperBase):
     props = {"is_duty_cycling": ecwb.WrapperBase.Access.RO,  # latitude of the point
              "accuracy": ecwb.WrapperBase.Access.RO, # longitude of the point
