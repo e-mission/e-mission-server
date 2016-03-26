@@ -142,7 +142,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         if len(trip_gj_list) == 0:
             ts = etsa.TimeSeries.get_time_series(self.user_id)
             max_loc_ts = ts.get_max_value_for_field("background/filtered_location", "data.ts")
-            if max_loc_ts == 1:
+            if max_loc_ts == -1:
                 logging.warning("No entries for user %s, early return " % self.user_id)
                 return
             if max_loc_ts > start_ts:
