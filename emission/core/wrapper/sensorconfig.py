@@ -3,6 +3,7 @@ import emission.core.wrapper.wrapperbase as ecwb
 
 class Sensorconfig(ecwb.WrapperBase):
     props = {"is_duty_cycling": ecwb.WrapperBase.Access.RO,  # latitude of the point
+             "simulate_user_interaction": ecwb.WrapperBase.Access.RO, # Simulate user interaction through generating notifications on every sync
              "accuracy": ecwb.WrapperBase.Access.RO, # longitude of the point
              "accuracy_threshold": ecwb.WrapperBase.Access.RO, # threshold for valid accuracies
              "filter_distance": ecwb.WrapperBase.Access.RO, # distance for the distance filter (unused on android)
@@ -13,7 +14,7 @@ class Sensorconfig(ecwb.WrapperBase):
              "ios_use_remote_push_for_sync": ecwb.WrapperBase.Access.RO,  # iOS only: whether we should use remote push for sync
              "android_geofence_responsiveness": ecwb.WrapperBase.Access.RO} # android only: geofence responsiveness
     enums = {}
-    geojson = ["loc"]
+    geojson = []
     nullable = []
 
     def _populateDependencies(self):
