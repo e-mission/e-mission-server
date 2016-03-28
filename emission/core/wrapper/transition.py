@@ -6,6 +6,7 @@ class State(enum.Enum):
     START = 0
     WAITING_FOR_TRIP_START = 1
     ONGOING_TRIP = 2
+    TRACKING_STOPPED = 3
     UNKNOWN = 3
 
 class TransitionType(enum.Enum):
@@ -28,6 +29,8 @@ class TransitionType(enum.Enum):
     VISIT_ENDED = 14
     NONE = 15
     DATA_PUSHED = 16
+    # joint transition again
+    START_TRACKING = 17
 
 class Transition(ecwb.WrapperBase):
     props = {"curr_state": ecwb.WrapperBase.Access.RO,
