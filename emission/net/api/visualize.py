@@ -36,7 +36,7 @@ def carbon_by_zip(start,end):
     return {"weightedLoc": carbon_list}
 
 def Berkeley_pop_route(start_dt, end_dt):
-    box = [ [-122.267443, 37.864693], [-122.250985, 37.880687]  ]
+    box = [ [-122.267443, 37.864693], [-122.250985, 37.880687] ]
     tl = esdt.get_aggregate_timeline_from_dt_box(start_dt, end_dt, box)
     gj_list = gfc.get_geojson_for_timeline_viz(None, tl)
     list_of_points=[]
@@ -53,8 +53,6 @@ def Berkeley_pop_route(start_dt, end_dt):
     return {"latlng": list_of_points}
 
 
-
-    
 def Commute_pop_route(mode, start_dt, end_dt):
     tl = esdt.get_aggregate_timeline_from_dt(start_dt, end_dt)
     gj_list = gfc.get_geojson_for_timeline_viz(None, tl)
@@ -63,6 +61,7 @@ def Commute_pop_route(mode, start_dt, end_dt):
     list_of_point=[]
  
     for gj in gj_list:
+        print "hrre"
         logging.debug("Found %d sections in the trip" % len(gj))
         for feature in gj:
             if feature['type'] == 'FeatureCollection':
@@ -70,7 +69,8 @@ def Commute_pop_route(mode, start_dt, end_dt):
                     if "properties" not in feat:
                         continue
                     if feat['properties']['feature_type'] == "section":
-                        if mode == 'all' or feat.properties.sensed_mode == mode:
+                        logging.debug("checking this %s" % feat.properties)
+                        if mode == 'all' or feat.properties["sensed_mode"] == mode:
                             points = feat.geometry.coordinates
                             list_of_point.extend(points)
     logging.debug("Returning list of size %s" % len(list_of_point))
