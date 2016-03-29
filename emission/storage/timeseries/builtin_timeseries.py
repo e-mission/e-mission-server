@@ -52,7 +52,8 @@ class BuiltinTimeSeries(esta.TimeSeries):
 
     def find_entries(self, key_list = None, time_query = None):
         sort_key = self._get_sort_key(time_query)
-        logging.debug("sort_key = %s" % sort_key)
+        logging.debug("curr_query = %s, sort_key = %s" % 
+            (self._get_query(key_list, time_query), sort_key))
         return self.timeseries_db.find(self._get_query(key_list, time_query)).sort(sort_key, pymongo.ASCENDING)
 
     def get_entry_at_ts(self, key, ts_key, ts):

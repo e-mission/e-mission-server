@@ -16,4 +16,5 @@ def get_last_entry(user_id, time_query, config_key):
     else:
         # entries are sorted by the write_ts, we can take the last value
         coe = ecwe.Entry(config_overrides[-1])
+        logging.debug("last entry is %s" % coe)
         return (coe.data, coe.metadata.write_ts)
