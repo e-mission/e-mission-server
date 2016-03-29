@@ -1,6 +1,17 @@
+import logging
+import copy
+
 import emission.core.wrapper.battery as ecwb
 import emission.net.usercache.formatters.common as fc
 import attrdict as ad
+
+status_map = {
+    1: ecwb.BatteryStatus.UNKNOWN,
+    2: ecwb.BatteryStatus.CHARGING,
+    3: ecwb.BatteryStatus.DISCHARGING,
+    4: ecwb.BatteryStatus.NOT_CHARGING,
+    5: ecwb.BatteryStatus.FULL
+}
 
 def format(entry):
     formatted_entry = ad.AttrDict()
@@ -13,22 +24,17 @@ def format(entry):
     formatted_entry.metadata = metadata
 
     data = ad.AttrDict()
-    # ios sets data in a ratio between 0 and 1, so let's convert to percent to be consistent
-    # with android
-    data.battery_level_pct = entry.data.battery_level_ratio * 100
+    # There are lots of fields incoming on android, so instead of copying each
+    # one over, let's just copy the whole thing
+    data = copy.copy(entry.data)
 
-    if entry.data.battery_status == 0:
-        data.battery_status = ecwb.BatteryStatus.UNKNOWN
-    elif entry.data.battery_status == 1:
-        data.battery_status = ecwb.BatteryStatus.DISCHARGING
-    elif entry.data.battery_status == 2:
-        data.battery_status = ecwb.BatteryStatus.CHARGING
-    elif entry.data.battery_status == 3:
-        data.battery_status = ecwb.BatteryStatus.FULL
+    data.battery_status = status_map[entry.data.battery_status].value
+    logging.debug("Mapped %s -> %s" % (entry.data.battery_status, data.battery_status))
 
     data.ts = formatted_entry.metadata.write_ts
     data.local_dt = formatted_entry.metadata.write_local_dt
     data.fmt_time = formatted_entry.metadata.write_fmt_time
     formatted_entry.data = data
+
 
     return formatted_entry
