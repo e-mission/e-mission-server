@@ -12,7 +12,8 @@ def get_last_entry(user_id, time_query, config_key):
     logging.debug("Found %d user overrides for user %s" % (len(config_overrides), user_id))
     if len(config_overrides) == 0:
         logging.warning("No user defined overrides for %s, early return" % user_id)
-        return None
+        return (None, None)
     else:
         # entries are sorted by the write_ts, we can take the last value
-        return ecwe.Entry(config_overrides[-1]).data
+        coe = ecwe.Entry(config_overrides[-1])
+        return (coe.data, coe.metadata.write_ts)

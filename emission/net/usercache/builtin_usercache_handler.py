@@ -86,8 +86,8 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         try:
             self.storeTimelineToCache(time_query)
             self.storeCommonTripsToCache(time_query)
-            self.storeConfigsToCache(time_query)
-            esp.mark_output_gen_done(self.user_id)
+            last_processed_ts = self.storeConfigsToCache(time_query)
+            esp.mark_output_gen_done(self.user_id, last_processed_ts)
         except:
             logging.exception("Storing views to cache failed for user %s" % self.user_id)
             esp.mark_output_gen_failed(self.user_id)
@@ -202,7 +202,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         the phone, and do so.
         """
         uc = enua.UserCache.getUserCache(self.user_id)
-        eacc.save_all_configs(self.user_id, time_query)
+        return eacc.save_all_configs(self.user_id, time_query)
         
 
     def get_oldest_valid_ts(self, start_ts):
