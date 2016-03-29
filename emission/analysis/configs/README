@@ -1,0 +1,9 @@
+This directory contains the configuration for data collection for each user.
+It is under analysis because the configuration can be a combination of:
+- user specification
+- server side overrides
+- what we think is best for gathering most information
+
+Right now, we allow the user to specify all the parameters in the input object.
+But later, we may allow them to specify policy and not mechanism and adjust the
+detailed parameters ourselves.

@@ -50,6 +50,3 @@ if __name__ == '__main__':
         logging.info("*" * 10 + "UUID %s: storing views to cache" % uuid + "*" * 10)
         uh = euah.UserCacheHandler.getUserCacheHandler(uuid)
         uh.storeViewsToCache()
-        uh.storeCommonTripsToCache()
-
-

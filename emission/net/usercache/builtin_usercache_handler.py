@@ -9,6 +9,7 @@ import emission.net.usercache.abstract_usercache as enua
 import emission.storage.timeseries.abstract_timeseries as etsa
 
 import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
+import emission.analysis.configs.config as eacc
 
 import emission.net.usercache.formatters.formatter as enuf
 import emission.storage.pipeline_queries as esp
@@ -79,8 +80,21 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
 
     def storeViewsToCache(self):
         """
-        Determine which "documents" need to be sent to the usercache. This
-        is currently the trips for the past three days. Any entries older than 3 days
+        Determine which "documents" need to be saved to the usercache.
+        """
+        time_query = esp.get_time_range_for_output_gen(self.user_id)
+        try:
+            self.storeTimelineToCache(time_query)
+            self.storeCommonTripsToCache(time_query)
+            last_processed_ts = self.storeConfigsToCache(time_query)
+            esp.mark_output_gen_done(self.user_id, last_processed_ts)
+        except:
+            logging.exception("Storing views to cache failed for user %s" % self.user_id)
+            esp.mark_output_gen_failed(self.user_id)
+
+    def storeTimelineToCache(self, time_query):
+        """
+        Store trips for the last week to the cache. Any entries older than 3 days
         should be purged. Note that this currently repeats information - the data that
         was from day before yesterday, for example, would have been sent at that point
         as well.  As an optimization, we could use something like CouchDB to only send
@@ -142,7 +156,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         if len(trip_gj_list) == 0:
             ts = etsa.TimeSeries.get_time_series(self.user_id)
             max_loc_ts = ts.get_max_value_for_field("background/filtered_location", "data.ts")
-            if max_loc_ts == 1:
+            if max_loc_ts == -1:
                 logging.warning("No entries for user %s, early return " % self.user_id)
                 return
             if max_loc_ts > start_ts:
@@ -162,7 +176,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         valid_key_list = ["diary/trips-%s"%day for day in day_list_bins.iterkeys()]
         self.delete_obsolete_entries(uc, valid_key_list)
 
-    def storeCommonTripsToCache(self):
+    def storeCommonTripsToCache(self, time_query):
         """ 
         Determine which set of common trips to send to the usercache. 
         As of now we will run the pipeline on the full set of data and send that up
@@ -181,6 +195,15 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         logging.debug("About to save model with len(places) = %d and len(trips) = %d" % 
             (len(tour_model["common_places"]), len(tour_model["common_trips"])))
         uc.putDocument("common-trips", tour_model)
+
+    def storeConfigsToCache(self, time_query):
+        """
+        Iterate through all configs, figure out the correct version to push to
+        the phone, and do so.
+        """
+        uc = enua.UserCache.getUserCache(self.user_id)
+        return eacc.save_all_configs(self.user_id, time_query)
+        
 
     def get_oldest_valid_ts(self, start_ts):
         """
@@ -205,6 +228,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         # the keys. The current key generation should work fine with
         # lexicographic ordering, but at the same time, this seems much easier
         # and safer to deal with.
+        valid_key_list.append('config/sensor_config')
         logging.debug("curr_key_list = %s, valid_key_list = %s" % 
            (curr_key_list, valid_key_list))
         to_del_keys = set(curr_key_list) - set(valid_key_list)
