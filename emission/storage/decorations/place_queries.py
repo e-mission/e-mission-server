@@ -41,16 +41,13 @@ def get_places(user_id, time_query):
     # TODO: Fix "TripIterator" and return it instead of this list
     return [ecwp.Place(doc) for doc in place_doc_cursor]
 
-def get_aggregate_places(time_query):
+def get_aggregate_places(time_query, box=None):
     curr_query = _get_ts_query(time_query)
+    if box:
+        curr_query.update({"location": {"$geoWithin" : {"$box" :box}}})
     place_doc_cursor = edb.get_place_db().find(curr_query).sort(time_query.timeType, pymongo.ASCENDING)
     return [ecwp.Place(doc) for doc in place_doc_cursor]
 
-def get_aggregate_places_in_box(time_query, box):
-    curr_query = _get_ts_query(time_query)
-    curr_query.update({"loc": {"$geoWithin" : {"$box" :box}}})
-    place_doc_cursor = edb.get_place_db().find(curr_query).sort(time_query.timeType, pymongo.ASCENDING)
-    return [ecwp.Place(doc) for doc in place_doc_cursor]
 
 def create_new_place(user_id):
     _id = edb.get_place_db().save({'user_id': user_id})
