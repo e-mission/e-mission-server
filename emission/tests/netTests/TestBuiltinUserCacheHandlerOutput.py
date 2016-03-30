@@ -116,6 +116,24 @@ class TestBuiltinUserCacheHandlerOutput(unittest.TestCase):
         # NOT include newly added entries
         self.assertEqual(uc.getDocumentKeyList(), ["2015-12-30", "2015-12-29"])
 
+    def testRetainSetConfig(self):
+        valid_bins = {"2015-12-30":[{"b": 2}],
+                      "2015-12-29":[{"b": 2}],
+                      "2015-12-31":[{"b": 2}]}
+        uc = enua.UserCache.getUserCache(self.testUserUUID1)
+        uch = enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUID1)
+        uc.putDocument("2015-12-30", {"a": 1})
+        uc.putDocument("2015-12-29", {"a": 1})
+        uc.putDocument("2015-12-28", {"a": 1})
+        uc.putDocument("2015-12-27", {"a": 1})
+        uc.putDocument("2015-12-26", {"a": 1})
+        uc.putDocument("config/sensor_config", {"a": 1})
+        uch.delete_obsolete_entries(uc, list(valid_bins.iterkeys()))
+        # the result should include entries that are in the past (28,27,26), but should 
+        # NOT include newly added entries
+        self.assertEqual(uc.getDocumentKeyList(), ["2015-12-30", "2015-12-29",
+            "config/sensor_config"])
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     unittest.main()
