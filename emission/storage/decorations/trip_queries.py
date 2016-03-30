@@ -40,7 +40,6 @@ def get_aggregate_trips(time_query, box=None):
         curr_query.update({"start_loc" : {"$geoWithin" : {"$box": box}}})
         curr_query.update({"end_loc" : {"$geoWithin" : {"$box": box}}})
     trip_doc_cursor = edb.get_trip_new_db().find(curr_query).sort(time_query.timeType, pymongo.ASCENDING)
-    print "trip_doc_cursor.count() is %d" % trip_doc_cursor.count()
     return [ecwt.Trip(doc) for doc in trip_doc_cursor]
 
 

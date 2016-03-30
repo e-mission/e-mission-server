@@ -203,7 +203,6 @@ def getCommutePopRoute(selMode):
   fromTs = request.query.from_ts
   toTs = request.query.to_ts
   mode = map_mode[selMode]
-  print "mode is %s" % mode
   logging.debug("Filtering values for range %s -> %s" % (fromTs, toTs))
   retVal = visualize.Commute_pop_route(mode,
     datetime.fromtimestamp(float(fromTs)/1000), datetime.fromtimestamp(float(toTs)/1000))

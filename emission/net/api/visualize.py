@@ -38,11 +38,8 @@ def carbon_by_zip(start,end):
 def Berkeley_pop_route(start_dt, end_dt):
     box = [ [-122.267443, 37.864693], [-122.250985, 37.880687] ]
     tl = esdt.get_aggregate_timeline_from_dt(start_dt, end_dt, box)
-    #tl = esdt.get_aggregate_timeline_from_dt(start_dt, end_dt)
-    print tl
-    gj_list = gfc.get_geojson_for_timeline_viz(None, tl)
+    gj_list = gfc.get_geojson_for_timeline(None, tl, viz=True)
     list_of_points=[]
-    print "gl_list.len is %d" % len(gj_list)
     for gj in gj_list:
         for feature in gj:
             if feature['type'] == 'FeatureCollection':
@@ -51,21 +48,18 @@ def Berkeley_pop_route(start_dt, end_dt):
                     if "properties" not in feat:
                         continue
                 if feat['properties']['feature_type'] == "section":
-                    print "adding"
                     points = feat.geometry.coordinates
                     list_of_points.extend(points)
     return {"latlng": list_of_points}
 
-
 def Commute_pop_route(mode, start_dt, end_dt):
     tl = esdt.get_aggregate_timeline_from_dt(start_dt, end_dt)
-    gj_list = gfc.get_geojson_for_timeline_viz(None, tl)
+    gj_list = gfc.get_geojson_for_timeline(None, tl, viz=True)
  
     logging.debug("len gl list is %d" % len(gj_list))
     list_of_point=[]
  
     for gj in gj_list:
-        logging.debug("Found %d sections in the trip" % len(gj))
         for feature in gj:
             if feature['type'] == 'FeatureCollection':
                 for feat in feature['features']:

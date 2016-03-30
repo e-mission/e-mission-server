@@ -255,7 +255,7 @@ def get_geojson_for_dt(user_id, start_dt, end_dt):
     tl.fill_start_end_places()
     return get_geojson_for_timeline(user_id, tl)
 
-def get_geojson_for_timeline(user_id, tl):
+def get_geojson_for_timeline(user_id, tl, viz=False):
     """
     tl represents the "timeline" object that is queried for the trips and locations
     """
@@ -275,7 +275,7 @@ def get_geojson_for_timeline(user_id, tl):
                              (trip, trip_geojson.properties["distance"]))
             else:
                 logging.debug("adding %s to list" % json.loads(json_util.dumps(trip_geojson.features)))
-                geojson_list.append(trip_geojson)
+                geojson_list.append(trip_geojson) if not viz else geojson_list.append(trip_geojson.features)
         except KeyError, e:
             # We ran into key errors while dealing with mixed filter trips.
             # I think those should be resolved for now, so we can raise the error again
@@ -288,40 +288,6 @@ def get_geojson_for_timeline(user_id, tl):
 
     return geojson_list    
     
-
-def get_geojson_for_timeline_viz(user_id, tl):
-    """
-    tl represents the "timeline" object that is queried for the trips and locations
-    """
-    from bson import json_util
-    import json
-    geojson_list = []
-
-    for trip in tl.trips:
-        try:
-            trip_geojson = trip_to_geojson(trip, tl)
-            # If the trip has no sections, it will have exactly two points - one for the start place and
-            # one for the stop place. If a trip has no sections, let us filter it out here because it is
-            # annoying to the user. But in that case, we need to merge the places.
-            # Let's make that a TODO after getting everything else to work.
-            if len(trip_geojson.features) == 2:
-                logging.info("Skipping zero section trip %s with distance %s (should be zero)" %
-                             (trip, trip_geojson.properties["distance"]))
-            else:
-                logging.debug("adding %s to list" % json.loads(json_util.dumps(trip_geojson.features)))
-                geojson_list.append(trip_geojson.features)
-        except KeyError, e:
-            # We ran into key errors while dealing with mixed filter trips.
-            # I think those should be resolved for now, so we can raise the error again
-            # But if this is preventing us from making progress, we can comment out the raise
-            logging.exception("Found key error %s while processing trip %s" % (e, trip))
-            print "keyerror"
-            # raise e
-        except Exception, e:
-            logging.exception("Found error %s while processing trip %s" % (e, trip))
-            raise e
-
-    return geojson_list  
 
 
 def get_all_points_for_range(user_id, key, start_ts, end_ts):
