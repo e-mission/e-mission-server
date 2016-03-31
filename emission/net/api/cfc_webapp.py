@@ -199,7 +199,7 @@ def getCalPopRoute():
 
 @route("/result/heatmap/pop.route/commute/<selMode>")
 def getCommutePopRoute(selMode):
-  map_mode = {"car" : "MotionTypes.IN_VEHICLE", "train" : "MotionTypes.IN_VEHICLE", "walk" : "MotionTypes.ON_FOOT", "cycling" : "MotionTypes.BICYCLING", "bus": "MotionTypes.IN_VEHICLE"}
+  map_mode = {"motorized" : "MotionTypes.IN_VEHICLE", "walking" : "MotionTypes.ON_FOOT", "cycling" : "MotionTypes.BICYCLING"}
   fromTs = request.query.from_ts
   toTs = request.query.to_ts
   mode = map_mode[selMode]
