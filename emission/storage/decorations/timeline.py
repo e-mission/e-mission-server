@@ -69,12 +69,8 @@ def get_aggregate_timeline_from_dt(start_dt, end_dt, box=None):
     end_ts = ecwe.Entry(result_list[-1]).metadata.write_ts
     logging.debug("Converted datetime range %s -> %s to timestamp range %s -> %s" %
         (start_dt, end_dt, start_ts, end_ts))
-    if box:
-       places = esdp.get_aggregate_places(enua.UserCache.TimeQuery("enter_ts", start_ts, end_ts), box=box)
-       trips = esdt.get_aggregate_trips(enua.UserCache.TimeQuery("start_ts", start_ts, end_ts), box=box)
-    else:
-        places = esdp.get_aggregate_places(enua.UserCache.TimeQuery("enter_ts", start_ts, end_ts))
-        trips = esdt.get_aggregate_trips(enua.UserCache.TimeQuery("start_ts", start_ts, end_ts))
+    places = esdp.get_aggregate_places(enua.UserCache.TimeQuery("enter_ts", start_ts, end_ts), box=box)
+    trips = esdt.get_aggregate_trips(enua.UserCache.TimeQuery("start_ts", start_ts, end_ts), box=box)
     return Timeline(places, trips)
 
 class Timeline(object):

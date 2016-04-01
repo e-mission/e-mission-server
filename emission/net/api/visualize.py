@@ -41,10 +41,9 @@ def Berkeley_pop_route(start_dt, end_dt):
     gj_list = gfc.get_geojson_for_timeline(None, tl, viz=True)
     list_of_points=[]
     for gj in gj_list:
-        for feature in gj:
+        for feature in gj.features:
             if feature['type'] == 'FeatureCollection':
                 for feat in feature['features']:
-
                     if "properties" not in feat:
                         continue
                 if feat['properties']['feature_type'] == "section":

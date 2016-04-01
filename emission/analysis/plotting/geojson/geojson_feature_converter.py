@@ -274,8 +274,8 @@ def get_geojson_for_timeline(user_id, tl, viz=False):
                 logging.info("Skipping zero section trip %s with distance %s (should be zero)" %
                              (trip, trip_geojson.properties["distance"]))
             else:
-                logging.debug("adding %s to list" % json.loads(json_util.dumps(trip_geojson.features)))
-                geojson_list.append(trip_geojson) if not viz else geojson_list.append(trip_geojson.features)
+                logging.debug("adding %s to list" % json.loads(json_util.dumps(trip_geojson)))
+                geojson_list.append(trip_geojson) #if not viz else geojson_list.append(trip_geojson.features)
         except KeyError, e:
             # We ran into key errors while dealing with mixed filter trips.
             # I think those should be resolved for now, so we can raise the error again
