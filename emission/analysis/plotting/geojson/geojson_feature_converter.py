@@ -255,10 +255,12 @@ def get_geojson_for_dt(user_id, start_dt, end_dt):
     tl.fill_start_end_places()
     return get_geojson_for_timeline(user_id, tl)
 
-def get_geojson_for_timeline(user_id, tl):
+def get_geojson_for_timeline(user_id, tl, viz=False):
     """
     tl represents the "timeline" object that is queried for the trips and locations
     """
+    from bson import json_util
+    import json
     geojson_list = []
 
     for trip in tl.trips:
@@ -272,7 +274,8 @@ def get_geojson_for_timeline(user_id, tl):
                 logging.info("Skipping zero section trip %s with distance %s (should be zero)" %
                              (trip, trip_geojson.properties["distance"]))
             else:
-                geojson_list.append(trip_geojson)
+                logging.debug("adding %s to list" % json.loads(json_util.dumps(trip_geojson)))
+                geojson_list.append(trip_geojson) if not viz else geojson_list.append(trip_geojson.features)
         except KeyError, e:
             # We ran into key errors while dealing with mixed filter trips.
             # I think those should be resolved for now, so we can raise the error again
@@ -285,6 +288,8 @@ def get_geojson_for_timeline(user_id, tl):
 
     return geojson_list    
     
+
+
 def get_all_points_for_range(user_id, key, start_ts, end_ts):
     import emission.net.usercache.abstract_usercache as enua
 #     import emission.core.wrapper.location as ecwl 
