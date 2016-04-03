@@ -80,16 +80,40 @@ def index():
 # If this gets to be too much, we should definitely consider that
 @route("/<filename>")
 def doc(filename):
-  if filename != "privacy" and filename != "support" and filename != "about" and filename != "consent":
+  if filename != "privacy" and filename != "home" and filename != "about" and filename != "index":
     return HTTPError(404, "Don't try to hack me, you evil spammer")
   else:
-    return static_file("%s.html" % filename, "%s/docs/" % static_path)
+    return static_file("%s.html" % filename, "%s/server/" % static_path)
 
 # Serve up javascript and css files properly
 @route('/front/<filename:path>')
 def server_static(filename):
   logging.debug("static filename = %s" % filename)
   return static_file(filename, static_path)
+
+@route('/assets/css/<filename>')
+def css_static(filename):
+  return static_file(filename, static_path + '/server/assets/css/')
+
+@route('/assets/css/images/<filename>')
+def css_images_static(filename):
+  return static_file(filename, static_path + '/server/assets/css/images')
+
+@route('/assets/js/<filename>')
+def js_static(filename):
+  return static_file(filename, static_path + '/server/assets/js/')
+
+@route('/assets/fonts/<filename>')
+def fonts_static(filename):
+  return static_file(filename, static_path + '/server/assets/fonts/')
+
+@route('/assets/css/images/<filename>')
+def assets_images_static(filename):
+  return static_file(filename, static_path + '/server/assets/css/images/')
+
+@route('/images/<filename>')
+def images_static(filename):
+  return static_file(filename, static_path + '/server/images/')
 
 @route('/clients/<clientname>/front/<filename>')
 def server_static(clientname, filename):
