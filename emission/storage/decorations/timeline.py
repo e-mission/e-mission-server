@@ -63,10 +63,9 @@ def get_aggregate_timeline_from_dt(start_dt, end_dt, box=None):
         logging.info("About to query for %s -> %s in %s" % (start_dt, end_dt, box))
     result_cursor = edb.get_timeseries_db().find({"data.local_dt": {"$gte": start_dt, "$lte": end_dt}}).sort("metadata.write_ts")
     logging.debug("result cursor has %d entries" % result_cursor.count())
-    #result_list = list(result_cursor)
-    #logging.debug("result list has %d entries" % len(result_list))
     if result_cursor.count() == 0:
         return Timeline([], [])
+    logging.debug("About to query for time data in result cursor")
     start_ts = ecwe.Entry(result_cursor[0]).metadata.write_ts
     end_ts = ecwe.Entry(result_cursor[result_cursor.count()-1]).metadata.write_ts
     logging.debug("Converted datetime range %s -> %s to timestamp range %s -> %s" %
