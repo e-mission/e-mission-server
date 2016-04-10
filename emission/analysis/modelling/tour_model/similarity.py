@@ -81,6 +81,7 @@ class similarity:
     #delete lower portion of bins
     def delete_bins(self):
         if len(self.bins) <= 1:
+            self.newdata = self.data
             return
         num = self.elbow_distance()
         sum = 0
