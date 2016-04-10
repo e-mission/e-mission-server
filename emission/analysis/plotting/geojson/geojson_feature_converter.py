@@ -313,18 +313,18 @@ def get_feature_list_for_point_array(points_array):
         
     return feature_coll
 
-def get_feature_list_from_df(loc_time_df, ts="ts", latitude="latitude", longitude="longitude"):
+def get_feature_list_from_df(loc_time_df, ts="ts", latitude="latitude", longitude="longitude", fmt_time="fmt_time"):
     """
     Input DF should have columns called "ts", "latitude" and "longitude", or the corresponding
     columns can be passed in using the ts, latitude and longitude parameters
     """
-    points_array = get_location_entry_list_from_df(loc_time_df, ts, latitude, longitude)
+    points_array = get_location_entry_list_from_df(loc_time_df, ts, latitude, longitude, fmt_time)
     return get_feature_list_for_point_array(points_array)
 
-def get_location_entry_list_from_df(loc_time_df, ts="ts", latitude="latitude", longitude="longitude"):
+def get_location_entry_list_from_df(loc_time_df, ts="ts", latitude="latitude", longitude="longitude", fmt_time="fmt_time"):
     location_entry_list = []
     for idx, row in loc_time_df.iterrows():
-        retVal = {"latitude": row[latitude], "longitude": row[longitude], "ts": row["ts"],
-                  "_id": str(idx), "loc": gj.Point(coordinates=[row[longitude], row[latitude]])}
+        retVal = {"latitude": row[latitude], "longitude": row[longitude], "ts": row[ts],
+                  "_id": str(idx), "fmt_time": row[fmt_time], "loc": gj.Point(coordinates=[row[longitude], row[latitude]])}
         location_entry_list.append(ecwl.Location(retVal))
     return location_entry_list
