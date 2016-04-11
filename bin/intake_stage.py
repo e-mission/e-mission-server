@@ -23,12 +23,6 @@ if __name__ == '__main__':
         uh = euah.UserCacheHandler.getUserCacheHandler(uuid)
         uh.moveToLongTerm()
 
-    # TODO: For now, move filters from metadata to data. Once we get the
-    # updated data collection clients to people, we don't need to do this any
-    # more
-    import emission.storage.timeseries.format_hacks.move_filter_field as estfm
-    estfm.move_all_filters_to_data()
-
     long_term_uuid_list = esta.TimeSeries.get_uuid_list()
     logging.info("*" * 10 + "long term UUID list = %s" % long_term_uuid_list)
     for uuid in long_term_uuid_list:
