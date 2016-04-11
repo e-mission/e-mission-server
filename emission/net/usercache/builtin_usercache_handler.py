@@ -76,6 +76,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
                 logging.exception("Backtrace time")
                 logging.warn("Got error %s while saving entry %s -> %s"% (e, entry, unified_entry))
                 ts.insert_error(entry_doc)
+        logging.debug("Deleting all entries for query %s" % time_query)
         uc.clearProcessedMessages(time_query)
         esp.mark_usercache_done(self.user_id, last_ts_processed)
 

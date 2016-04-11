@@ -61,7 +61,7 @@ class BuiltinUserCache(ucauc.UserCache):
     @staticmethod
     def _get_ts_query(tq):
         time_key = "metadata.%s" % tq.timeType
-        ret_query = {time_key : {"$lt": tq.endTs}}
+        ret_query = {time_key : {"$lte": tq.endTs}}
         if (tq.startTs is not None):
             ret_query[time_key].update({"$gte": tq.startTs})
         return ret_query
