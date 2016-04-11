@@ -7,7 +7,7 @@ import bottle as bt
 import sys
 import os
 import logging
-logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
+logging.basicConfig(format='%(asctime)s:%(levelname)s:%(thread)d:%(message)s',
                   filename='webserver_debug.log', level=logging.DEBUG)
 logging.debug("This should go to the log file")
 

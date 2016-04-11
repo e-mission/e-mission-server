@@ -61,7 +61,7 @@ class BuiltinUserCache(ucauc.UserCache):
     @staticmethod
     def _get_ts_query(tq):
         time_key = "metadata.%s" % tq.timeType
-        ret_query = {time_key : {"$lt": tq.endTs}}
+        ret_query = {time_key : {"$lte": tq.endTs}}
         if (tq.startTs is not None):
             ret_query[time_key].update({"$gte": tq.startTs})
         return ret_query
@@ -139,7 +139,7 @@ class BuiltinUserCache(ucauc.UserCache):
         # the write timestamp, because we use the last_ts_processed to mark the
         # beginning of the entry for the next query. So let's sort by the
         # write_ts before returning.
-        retrievedMsgs = list(self.db.find(combo_query).sort("metadata.write_ts", pymongo.ASCENDING))
+        retrievedMsgs = list(self.db.find(combo_query).sort("metadata.write_ts", pymongo.ASCENDING).limit(100000))
         logging.debug("Found %d messages in response to query %s" % (len(retrievedMsgs), combo_query))
         return retrievedMsgs
 

@@ -150,8 +150,13 @@ def get_time_range_for_stage(user_id, stage):
         logging.info("For stage %s, start_ts = %s" % (stage, pydt.datetime.utcfromtimestamp(start_ts).isoformat()))
 
     assert curr_state.curr_run_ts is None, "curr_state.curr_run_ts = %s" % curr_state.curr_run_ts
-
-    end_ts = time.time() - 5 # Let's pick a point 5 secs in the past to avoid race conditions
+    # Let's pick a point 5 secs in the past. If we don't do this, then we will
+    # read all entries upto the current ts and this may lead to lost data. For
+    # example, let us say that the current ts is t1. At the time that we read
+    # the data, we have 4 entries for t1. By the time we finish copying, we
+    # have 6 entries for t1, we will end up deleting all 6, which will lose 2
+    # entries.
+    end_ts = time.time() - END_FUZZ_AVOID_LTE
 
     ret_query = enua.UserCache.TimeQuery("write_ts", start_ts, end_ts)
 

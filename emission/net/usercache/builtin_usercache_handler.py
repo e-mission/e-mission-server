@@ -69,12 +69,14 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
                 unified_entry = enuf.convert_to_common_format(entry)
                 ts.insert(unified_entry)
                 last_ts_processed = ecwe.Entry(unified_entry).metadata.write_ts
+                time_query.endTs = last_ts_processed
             except pymongo.errors.DuplicateKeyError as e:
                 logging.info("document already present in timeseries, skipping since read-only")
             except Exception as e:
                 logging.exception("Backtrace time")
                 logging.warn("Got error %s while saving entry %s -> %s"% (e, entry, unified_entry))
                 ts.insert_error(entry_doc)
+        logging.debug("Deleting all entries for query %s" % time_query)
         uc.clearProcessedMessages(time_query)
         esp.mark_usercache_done(self.user_id, last_ts_processed)
 
