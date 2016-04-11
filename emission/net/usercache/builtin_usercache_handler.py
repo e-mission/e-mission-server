@@ -69,6 +69,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
                 unified_entry = enuf.convert_to_common_format(entry)
                 ts.insert(unified_entry)
                 last_ts_processed = ecwe.Entry(unified_entry).metadata.write_ts
+                time_query.endTs = last_ts_processed
             except pymongo.errors.DuplicateKeyError as e:
                 logging.info("document already present in timeseries, skipping since read-only")
             except Exception as e:
