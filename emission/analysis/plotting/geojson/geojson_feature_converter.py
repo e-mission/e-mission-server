@@ -274,7 +274,7 @@ def get_geojson_for_timeline(user_id, tl, viz=False):
                 logging.info("Skipping zero section trip %s with distance %s (should be zero)" %
                              (trip, trip_geojson.properties["distance"]))
             else:
-                logging.debug("adding %s to list" % json.loads(json_util.dumps(trip_geojson)))
+                # logging.debug("adding %s to list" % json.loads(json_util.dumps(trip_geojson)))
                 geojson_list.append(trip_geojson) if not viz else geojson_list.append(trip_geojson.features)
         except KeyError, e:
             # We ran into key errors while dealing with mixed filter trips.
@@ -313,18 +313,18 @@ def get_feature_list_for_point_array(points_array):
         
     return feature_coll
 
-def get_feature_list_from_df(loc_time_df, ts="ts", latitude="latitude", longitude="longitude"):
+def get_feature_list_from_df(loc_time_df, ts="ts", latitude="latitude", longitude="longitude", fmt_time="fmt_time"):
     """
     Input DF should have columns called "ts", "latitude" and "longitude", or the corresponding
     columns can be passed in using the ts, latitude and longitude parameters
     """
-    points_array = get_location_entry_list_from_df(loc_time_df, ts, latitude, longitude)
+    points_array = get_location_entry_list_from_df(loc_time_df, ts, latitude, longitude, fmt_time)
     return get_feature_list_for_point_array(points_array)
 
-def get_location_entry_list_from_df(loc_time_df, ts="ts", latitude="latitude", longitude="longitude"):
+def get_location_entry_list_from_df(loc_time_df, ts="ts", latitude="latitude", longitude="longitude", fmt_time="fmt_time"):
     location_entry_list = []
     for idx, row in loc_time_df.iterrows():
-        retVal = {"latitude": row[latitude], "longitude": row[longitude], "ts": row["ts"],
-                  "_id": str(idx), "loc": gj.Point(coordinates=[row[longitude], row[latitude]])}
+        retVal = {"latitude": row[latitude], "longitude": row[longitude], "ts": row[ts],
+                  "_id": str(idx), "fmt_time": row[fmt_time], "loc": gj.Point(coordinates=[row[longitude], row[latitude]])}
         location_entry_list.append(ecwl.Location(retVal))
     return location_entry_list

@@ -82,6 +82,18 @@ def mark_smoothing_failed(user_id):
 def get_complete_ts(user_id):
     return get_current_state(user_id, ps.PipelineStages.JUMP_SMOOTHING).last_ts_run
 
+def get_time_range_for_output_gen(user_id):
+    return get_time_range_for_stage(user_id, ps.PipelineStages.OUTPUT_GEN)
+
+def mark_output_gen_done(user_id, last_processed_ts):
+    if last_processed_ts is None:
+        mark_stage_done(user_id, ps.PipelineStages.OUTPUT_GEN, None)
+    else:
+        mark_stage_done(user_id, ps.PipelineStages.OUTPUT_GEN, last_processed_ts + END_FUZZ_AVOID_LTE)
+
+def mark_output_gen_failed(user_id):
+    mark_stage_failed(user_id, ps.PipelineStages.OUTPUT_GEN)
+
 def mark_stage_done(user_id, stage, last_processed_ts):
     # We move failed entries to the error timeseries. So usercache runs never fail.
     curr_state = get_current_state(user_id, stage)
@@ -138,8 +150,13 @@ def get_time_range_for_stage(user_id, stage):
         logging.info("For stage %s, start_ts = %s" % (stage, pydt.datetime.utcfromtimestamp(start_ts).isoformat()))
 
     assert curr_state.curr_run_ts is None, "curr_state.curr_run_ts = %s" % curr_state.curr_run_ts
-
-    end_ts = time.time() - 5 # Let's pick a point 5 secs in the past to avoid race conditions
+    # Let's pick a point 5 secs in the past. If we don't do this, then we will
+    # read all entries upto the current ts and this may lead to lost data. For
+    # example, let us say that the current ts is t1. At the time that we read
+    # the data, we have 4 entries for t1. By the time we finish copying, we
+    # have 6 entries for t1, we will end up deleting all 6, which will lose 2
+    # entries.
+    end_ts = time.time() - END_FUZZ_AVOID_LTE
 
     ret_query = enua.UserCache.TimeQuery("write_ts", start_ts, end_ts)
 

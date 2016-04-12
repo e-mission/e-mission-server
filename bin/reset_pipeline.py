@@ -55,6 +55,9 @@ def reset_pipeline_for_stage(stage, user_id, day_ts):
             print edb.get_pipeline_state_db().update({'user_id': user_id,
                     'pipeline_stage': stage.value},
                     {'$set': {'last_processed_ts': day_ts}}, upsert=False)
+            print edb.get_pipeline_state_db().update({'user_id': user_id,
+                    'pipeline_stage': stage.value},
+                    {'$set': {'curr_run_ts': None}}, upsert=False)
         else:
             print "day_ts is None, deleting stage %s for user %s" % (stage, user_id)
             print edb.get_pipeline_state_db().remove({'user_id': user_id,
@@ -64,6 +67,8 @@ def reset_pipeline_for_stage(stage, user_id, day_ts):
             print "Setting new pipeline stage %s for all users to %d" % (stage, day_ts)
             print edb.get_pipeline_state_db().update({'pipeline_stage': stage.value},
                     {'$set': {'last_processed_ts': day_ts}}, upsert=False)
+            print edb.get_pipeline_state_db().update({'pipeline_stage': stage.value},
+                    {'$set': {'curr_run_ts': day_ts}}, upsert=False)
         else:
             print "day_ts is None, deleting stage %s for all users" % (stage)
             print edb.get_pipeline_state_db().remove({'pipeline_stage': stage.value})
