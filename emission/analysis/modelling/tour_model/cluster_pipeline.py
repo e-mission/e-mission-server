@@ -40,17 +40,15 @@ read from the database.
 #read the data from the database. 
 def read_data(uuid=None, size=None, old=True):
     data = []
-    db = edb.get_trip_db()
+    trip_db = edb.get_trip_db()
     if not old:
-        logging.debug("not old")
-        db = edb.get_trip_new_db()
-        trips = db.find({"user_id" : uuid})
-
-    if old:
+        trip_db = edb.get_trip_new_db()
+        trips = trip_db.find({"user_id" : uuid})
+    else:
         if uuid:
-            trips = db.find({'user_id' : uuid, 'type' : 'move'})
+            trips = trip_db.find({'user_id' : uuid, 'type' : 'move'})
         else:
-            trips = db.find({'type' : 'move'})
+            trips = trip_db.find({'type' : 'move'})
         for t in trips:
             try: 
                 trip = Trip.trip_from_json(t)
@@ -101,7 +99,7 @@ def cluster_to_tour_model(data, labels, old=True):
 
 def main(uuid=None, old=True):
     data = read_data(uuid, old=old)
-    logging.debug(len(data))
+    logging.debug("len(data) is %d" % len(data))
     data, bins = remove_noise(data, 300, old=old)
     n, labels, data = cluster(data, len(bins), old=old)
     tour_dict = cluster_to_tour_model(data, labels, old=old)

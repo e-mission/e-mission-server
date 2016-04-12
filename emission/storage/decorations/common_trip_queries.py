@@ -113,5 +113,7 @@ def set_up_trips(list_of_cluster_data, user_id):
         trip.end_loc = end_loc
         trip.probabilites = probabilites
         trip.trips = [unc_trip.get_id() for unc_trip in dct["sections"]]
-
+        place_db = edb.get_place_db()
+        
+        
         save_common_trip(trip)
