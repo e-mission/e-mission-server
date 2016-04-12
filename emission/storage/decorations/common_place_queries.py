@@ -74,12 +74,10 @@ def create_places(list_of_cluster_data, user_id):
             places_to_successors[end_loc_str] = []
 
         if start_loc_str not in places_dct:
-            start_place_ids = [place for place in dct["start_places"]]
-            places_dct[start_loc_str] = start_place_ids
+            places_dct[start_loc_str] = dct["start_places"]
 
         if end_loc_str not in places_dct:
-            end_place_ids = [place for place in dct["end_places"]]
-            places_dct[end_loc_str] = end_place_ids
+            places_dct[end_loc_str] = dct["end_places"]
 
     clear_existing_places(user_id)
     logging.debug("After creating map, number of places is %d" % len(places_to_successors))
