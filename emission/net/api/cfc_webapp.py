@@ -191,8 +191,7 @@ def getCalPopRoute():
   fromTs = request.query.from_ts
   toTs = request.query.to_ts
   logging.debug("Filtering values for range %s -> %s" % (fromTs, toTs))
-  retVal = visualize.Berkeley_pop_route(
-    datetime.fromtimestamp(float(fromTs)/1000), datetime.fromtimestamp(float(toTs)/1000))
+  retVal = visualize.Berkeley_pop_route(fromTs, toTs)
   # retVal = common.generateRandomResult(['00-04', '04-08', '08-10'])
   # logging.debug("In getCalPopRoute, retVal is %s" % retVal)
   return retVal
@@ -204,8 +203,7 @@ def getCommutePopRoute(selMode):
   toTs = request.query.to_ts
   mode = map_mode[selMode]
   logging.debug("Filtering values for range %s -> %s" % (fromTs, toTs))
-  retVal = visualize.Commute_pop_route(mode,
-    datetime.fromtimestamp(float(fromTs)/1000), datetime.fromtimestamp(float(toTs)/1000))
+  retVal = visualize.range_mode_heatmap(mode, fromTs, toTs)
   # retVal = common.generateRandomResult(['00-04', '04-08', '08-10'])
   # logging.debug("In getCalPopRoute, retVal is %s" % retVal)
   return retVal

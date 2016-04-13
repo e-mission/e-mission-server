@@ -10,6 +10,7 @@ import geojson as gj
 import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.decorations.timeline as esdt
+import emission.storage.decorations.local_date_queries as esdl
 import emission.core.wrapper.trip as ecwt
 import emission.core.wrapper.section as ecws
 
@@ -35,8 +36,10 @@ def carbon_by_zip(start,end):
             carbon_list.append(tempdict)
     return {"weightedLoc": carbon_list}
 
-def Berkeley_pop_route(start_dt, end_dt):
+def Berkeley_pop_route(start_ts, end_ts):
     box = [ [-122.267443, 37.864693], [-122.250985, 37.880687] ]
+    start_dt = esdl.get_local_date(start_ts, "UTC")
+    end_dt = esdl.get_local_date(end_ts, "UTC")
     tl = esdt.get_aggregate_timeline_from_dt(start_dt, end_dt, box)
     gj_list = gfc.get_geojson_for_timeline(None, tl, viz=True)
     list_of_points=[]
@@ -51,7 +54,9 @@ def Berkeley_pop_route(start_dt, end_dt):
                     list_of_points.extend(points)
     return {"latlng": list_of_points}
 
-def Commute_pop_route(mode, start_dt, end_dt):
+def range_mode_heatmap(mode, start_ts, end_ts):
+    start_dt = esdl.get_local_date(start_ts, "UTC")
+    end_dt = esdl.get_local_date(end_ts, "UTC")
     tl = esdt.get_aggregate_timeline_from_dt(start_dt, end_dt)
     gj_list = gfc.get_geojson_for_timeline(None, tl, viz=True)
  

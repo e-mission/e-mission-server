@@ -4,6 +4,7 @@ import json
 import logging
 from datetime import datetime, timedelta
 import datetime as pydt
+import arrow
 
 # Our imports
 import emission.core.get_database as edb
@@ -28,8 +29,8 @@ class TestVisualize(unittest.TestCase):
     logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
     self.day_start_ts = 1440658800
     self.day_end_ts = 1440745200
-    self.day_start_dt = pydt.datetime(2015,8,27)
-    self.day_end_dt = pydt.datetime(2015,8,28)
+    self.day_start_dt = arrow.get(2015,8,27)
+    self.day_end_dt = arrow.get(2015,8,28)
 
   def clearRelatedDb(self):
     edb.get_timeseries_db().remove()
@@ -41,11 +42,11 @@ class TestVisualize(unittest.TestCase):
 
 
   def testCommutePopRoute(self):
-    points = visualize.Commute_pop_route("MotionTypes.BICYCLING", self.day_start_dt, self.day_end_dt)
+    points = visualize.Commute_pop_route("MotionTypes.BICYCLING", self.day_start_dt.timestamp, self.day_end_dt.timestamp)
     # I have to add test data with modes, I will do that tomorrow.
 
   def testBerkeleyPopRoute(self):
-    points = visualize.Berkeley_pop_route(self.day_start_dt, self.day_end_dt)
+    points = visualize.Berkeley_pop_route(self.day_start_dt.timestamp, self.day_end_dt.timestamp)
     self.assertTrue(len(['latlng']) > 0)
 
 if __name__ == '__main__':
