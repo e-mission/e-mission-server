@@ -16,7 +16,7 @@ import emission.core.wrapper.place as ecwp
 import emission.core.wrapper.trip as ecwt
 import emission.core.wrapper.stop as ecws
 import emission.core.wrapper.section as ecwsc
-import emission.core.wrapper.local_date as ecwl
+import emission.core.wrapper.localdate as ecwl
 
 import emission.analysis.intake.cleaning.filter_accuracy as eaicf
 import emission.storage.timeseries.format_hacks.move_filter_field as estfm
