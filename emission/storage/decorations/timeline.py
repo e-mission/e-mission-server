@@ -19,7 +19,7 @@ def get_timeline_from_dt(user_id, start_local_dt, end_local_dt):
     start_ts = ecwe.Entry(result_list[0]).metadata.write_ts
     end_ts = ecwe.Entry(result_list[-1]).metadata.write_ts
     logging.debug("Converted datetime range %s -> %s to timestamp range %s -> %s" %
-        (start_local_dt, end__local_dt, start_ts, end_ts))
+        (start_local_dt, end_local_dt, start_ts, end_ts))
     return get_timeline(user_id, start_ts, end_ts)
 
 def get_timeline(user_id, start_ts, end_ts):
