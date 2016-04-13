@@ -7,8 +7,10 @@ import attrdict as ad
 import pytz
 import datetime as pydt
 import geojson
+import arrow
 
 import emission.net.usercache.formatters.common as fc
+import emission.storage.decorations.local_date_queries as ecsdlq
 
 def format(entry):
     # assert(entry.metadata.key == "background/location")
@@ -24,10 +26,8 @@ def format_location_simple(entry):
     formatted_entry.metadata = metadata
 
     data = entry.data
-    local_aware_dt = pydt.datetime.utcfromtimestamp(data.ts).replace(tzinfo=pytz.utc) \
-                            .astimezone(pytz.timezone(formatted_entry.metadata.time_zone))
-    data.local_dt = local_aware_dt.replace(tzinfo=None)
-    data.fmt_time = local_aware_dt.isoformat()
+    data.local_dt = ecsdlq.get_local_date(data.ts, metadata.time_zone)
+    data.fmt_time = arrow.get(data.ts).to(metadata.time_zone).isoformat()
     data.loc = geojson.Point((data.longitude, data.latitude))
     data.heading = entry.data.bearing
     del data.bearing
