@@ -107,8 +107,8 @@ def save_trip_to_db(trip):
     print "RHRHRH"
     print "start loc = %s" % trip.trip_start_location.coordinate_list()
     print "end loc = %s" % trip.trip_end_location.coordinate_list()
-    db.insert({"_id": trip._id, "user_id": trip.user_id, "trip_id": trip.trip_id, "type" : "move", "sections": range(len(trip.sections)), "trip_start_datetime": trip.start_time,
-            "trip_end_datetime": trip.end_time, "trip_start_location": trip.trip_start_location.coordinate_list(), 
+    db.insert({"_id": trip._id, "user_id": trip.user_id, "trip_id": trip.trip_id, "type" : "move", "sections": range(len(trip.sections)), "trip_start_datetime": trip.start_time.datetime,
+            "trip_end_datetime": trip.end_time.datetime, "trip_start_location": trip.trip_start_location.coordinate_list(), 
             "trip_end_location": trip.trip_end_location.coordinate_list(), "mode_list": trip.mode_list})
     print "len(trip.sections) in trip gen is %s" % len(trip.sections)
     for section in trip.sections:   

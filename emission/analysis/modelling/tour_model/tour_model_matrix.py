@@ -102,7 +102,7 @@ class Location(object):
     def get_successor(self):
         temp_counter = esmmc.Counter( )
         time = self.tm.time
-        day = time.weekday
+        day = time.weekday()
         for suc in self.successors:
             suc_obj = self.tm.get_location(suc)
             edge = self.tm.get_edge(self, suc_obj)
@@ -185,7 +185,7 @@ class TourModel(object):
         self.locs[key] = location
 
     def add_start_hour(self, loc, time):
-        day = time.weekday
+        day = time.weekday()
         if self.min_of_each_day[day] == 0:
             self.min_of_each_day[day] = (loc, time)
         else:
