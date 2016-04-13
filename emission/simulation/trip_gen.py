@@ -118,7 +118,7 @@ def save_section_to_db(section):
     print "saving section to db"
     db = edb.get_section_db()
     db.insert({"user_id" : section.user_id, "trip_id" : section.trip_id, "distance" : section.distance, "type" : section.section_type,
-           "section_start_datetime" : section.start_time, "section_end_datetime" : section.end_time, 
+           "section_start_datetime" : section.start_time.datetime, "section_end_datetime" : section.end_time.datetime, 
            "section_start_point" : {"coordinates" : section.section_start_location.coordinate_list()},
            "section_end_point" : {"coordinates" : section.section_end_location.coordinate_list()}, "mode" : section.mode, "confirmed_mode" : section.confirmed_mode})
 
