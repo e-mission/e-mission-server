@@ -43,6 +43,7 @@ class Transition(ecwb.WrapperBase):
     enums = {"curr_state": State, "transition": TransitionType}
     geojson = []
     nullable = []
+    local_dates = ['local_dt']
 
     def _populateDependencies(self):
         pass

@@ -16,6 +16,7 @@ class Sensorconfig(ecwb.WrapperBase):
     enums = {}
     geojson = []
     nullable = []
+    local_dates = []
 
     def _populateDependencies(self):
         pass

@@ -21,6 +21,7 @@ class Stop(ecwb.WrapperBase):
     geojson = ["enter_loc", "exit_loc"]
     nullable = ["enter_ts", "enter_fmt_time", "ending_section", # for the start of a chain
                 "exit_ts", "exit_fmt_time", "starting_section"] # for the end of a chain
+    local_dates = ['enter_local_dt', 'exit_local_dt']
 
     def _populateDependencies(self):
         pass

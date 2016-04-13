@@ -18,6 +18,7 @@ class Metadata(ecwb.WrapperBase):
   enums = {}
   geojson = []
   nullable = []
+  local_dates = ['write_local_dt']
 
   def _populateDependencies(self):
     pass

@@ -23,6 +23,7 @@ class Trip(ecwb.WrapperBase):
     enums = {}
     geojson = ["start_loc", "end_loc"]
     nullable = []
+    local_dates = ['start_local_dt', 'end_local_dt']
 
     def _populateDependencies(self):
         pass

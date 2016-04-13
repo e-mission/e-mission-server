@@ -21,11 +21,12 @@ class Section(ecwb.WrapperBase):
              "duration": ecwb.WrapperBase.Access.WORM,     # duration of the trip in secs
              "distance": ecwb.WrapperBase.Access.WORM,     # distance of the trip in meters
              "sensed_mode": ecwb.WrapperBase.Access.WORM,  # the sensed mode used for the segmentation
-             "source": ecwb.WrapperBase.Access.WORM}       # the method used to generate this trip
+             "source": ecwb.WrapperBase.Access.WORM}        # the method used to generate this trip
 
     enums = {"sensed_mode": ecwm.MotionTypes}
     geojson = ["start_loc", "end_loc"]
     nullable = ["start_stop", "end_stop"]
+    local_dates = ['start_local_dt', 'end_local_dt']
 
     def _populateDependencies(self):
         pass

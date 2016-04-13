@@ -17,3 +17,4 @@ class CommonTrip(ecwb.WrapperBase):
     geojson = ['start_loc', 'end_loc']
     enums = {}
     nullable = []
+    local_dates = []
