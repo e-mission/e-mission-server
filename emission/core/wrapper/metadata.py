@@ -25,14 +25,16 @@ class Metadata(ecwb.WrapperBase):
 
   @staticmethod
   def create_metadata_for_result(key):
+      import emission.storage.decorations.local_date_queries as esdl
+      import arrow
+
       m = Metadata()
       m.key = key
       m.platform = "server"
       m.write_ts = time.time()
       m.time_zone = "America/Los_Angeles"
-      m.write_local_dt = pydt.datetime.utcfromtimestamp(m.write_ts).replace(tzinfo=pytz.utc) \
-                        .astimezone(pytz.timezone(m.time_zone))
-      m.write_fmt_time = m.write_local_dt.isoformat()
+      m.write_local_dt = esdl.get_local_date(m.write_ts, m.time_zone)
+      m.write_fmt_time = arrow.get(m.write_ts).to(m.time_zone).isoformat()
       return m
 
   def isAndroid(self):

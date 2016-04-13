@@ -19,7 +19,7 @@ def get_timeline_from_dt(user_id, start_local_dt, end_local_dt):
     start_ts = ecwe.Entry(result_list[0]).metadata.write_ts
     end_ts = ecwe.Entry(result_list[-1]).metadata.write_ts
     logging.debug("Converted datetime range %s -> %s to timestamp range %s -> %s" %
-        (start_dt, end_dt, start_ts, end_ts))
+        (start_local_dt, end__local_dt, start_ts, end_ts))
     return get_timeline(user_id, start_ts, end_ts)
 
 def get_timeline(user_id, start_ts, end_ts):
@@ -60,6 +60,7 @@ def get_aggregate_timeline_from_dt(start_dt, end_dt, box=None):
     import emission.core.wrapper.entry as ecwe
     import emission.storage.decorations.place_queries as esdp
     import emission.storage.decorations.trip_queries as esdt
+    import emission.storage.decorations.local_date_queries as esdl
 
     if not box:
         logging.info("About to query for %s -> %s" % (start_dt, end_dt))

@@ -102,7 +102,7 @@ class Location(object):
     def get_successor(self):
         temp_counter = esmmc.Counter( )
         time = self.tm.time
-        day = time.weekday()
+        day = time.weekday
         for suc in self.successors:
             suc_obj = self.tm.get_location(suc)
             edge = self.tm.get_edge(self, suc_obj)
@@ -112,7 +112,7 @@ class Location(object):
         return esmmc.sampleFromCounter(temp_counter)
 
     def hasSuccessor(self):
-        day = self.tm.time.weekday()
+        day = self.tm.time.weekday
         time = self.tm.time
         for suc in self.successors:
             suc_obj = self.tm.get_location(suc)
@@ -185,7 +185,7 @@ class TourModel(object):
         self.locs[key] = location
 
     def add_start_hour(self, loc, time):
-        day = time.weekday()
+        day = time.weekday
         if self.min_of_each_day[day] == 0:
             self.min_of_each_day[day] = (loc, time)
         else:
@@ -198,15 +198,15 @@ class TourModel(object):
             return "No data for this day"
         curr_node = self.min_of_each_day[day][0]
         self.time = self.min_of_each_day[day][1]
-        logging.debug("hour = %s | day = %s | place = %s" % (self.time.hour, self.time.weekday(), curr_node.name))
+        logging.debug("hour = %s | day = %s | place = %s" % (self.time.hour, self.time.weekday, curr_node.name))
         tour_model.append(curr_node)
         while curr_node.hasSuccessor():
             info = curr_node.get_successor()
             curr_node = info[0]
             self.time = datetime.datetime(self.time.year, self.time.month, self.time.day, hour=info[1], minute=self.time.minute) + info[2]
-            if self.time.weekday() != day:
+            if self.time.weekday != day:
                 break
-            logging.debug("hour = %s | day = %s | place = %s" % (self.time.hour, self.time.weekday(), info[0].name))
+            logging.debug("hour = %s | day = %s | place = %s" % (self.time.hour, self.time.weekday, info[0].name))
             if curr_node != tour_model[-1]:
                 tour_model.append(curr_node)
         return tour_model
