@@ -2,7 +2,7 @@
 import logging
 import math
 import matplotlib
-matplotlib.use('Agg')
+# matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy
 from sklearn import metrics
