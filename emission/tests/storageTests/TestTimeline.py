@@ -16,6 +16,7 @@ import emission.core.wrapper.place as ecwp
 import emission.core.wrapper.trip as ecwt
 import emission.core.wrapper.stop as ecws
 import emission.core.wrapper.section as ecwsc
+import emission.core.wrapper.local_date as ecwl
 
 import emission.analysis.intake.cleaning.filter_accuracy as eaicf
 import emission.storage.timeseries.format_hacks.move_filter_field as estfm
@@ -32,8 +33,8 @@ class TestTimeline(unittest.TestCase):
         logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
         self.day_start_ts = 1440658800
         self.day_end_ts = 1440745200
-        self.day_start_dt = pydt.datetime(2015,8,27)
-        self.day_end_dt = pydt.datetime(2015,8,28)
+        self.day_start_dt = ecwl.LocalDate({'year': 2015, 'month': 8, 'day': 27})
+        self.day_end_dt = ecwl.LocalDate({'year': 2015, 'month': 8, 'day': 27})
 
     def tearDown(self):
         self.clearRelatedDb()

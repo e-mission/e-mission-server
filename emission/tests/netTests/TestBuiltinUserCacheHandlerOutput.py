@@ -17,6 +17,7 @@ import emission.storage.timeseries.abstract_timeseries as esta
 import emission.net.usercache.abstract_usercache_handler as enuah
 import emission.net.api.usercache as mauc
 import emission.core.wrapper.trip as ecwt
+import emission.storage.decorations.local_date_queries as ecsdlq
 
 # These are the current formatters, so they are included here for testing.
 # However, it is unclear whether or not we need to add other tests as we add other formatters,
@@ -77,7 +78,7 @@ class TestBuiltinUserCacheHandlerOutput(unittest.TestCase):
     # But on the next call, if we are multiplying by 1000, it won't work any more.
     # Let's add a new test for this
     def testGetLocalDay(self):
-        test_dt = pydt.datetime(2016, 1, 1, 9, 46, 0, 0)
+        test_dt = ecsdlq.get_local_date(arrow.get(pydt.datetime(2016, 1, 1, 9, 46, 0, 0)).timestamp, "America/Los_Angeles")
         test_trip = ecwt.Trip({'start_local_dt': test_dt, 'start_fmt_time': test_dt.isoformat()})
         test_handler = enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUID1)
         self.assertEqual(test_handler.get_local_day_from_fmt_time(test_trip), "2016-01-01")
