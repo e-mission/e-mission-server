@@ -42,7 +42,7 @@ class TestVisualize(unittest.TestCase):
 
 
   def testCommutePopRoute(self):
-    points = visualize.Commute_pop_route("MotionTypes.BICYCLING", self.day_start_dt.timestamp, self.day_end_dt.timestamp)
+    points = visualize.range_mode_heatmap("MotionTypes.BICYCLING", self.day_start_dt.timestamp, self.day_end_dt.timestamp)
     # I have to add test data with modes, I will do that tomorrow.
 
   def testBerkeleyPopRoute(self):
