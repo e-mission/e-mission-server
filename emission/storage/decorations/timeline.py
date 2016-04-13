@@ -1,12 +1,16 @@
 import logging
 import emission.net.usercache.abstract_usercache as enua
 
-def get_timeline_from_dt(user_id, start_dt, end_dt):
+def get_timeline_from_dt(user_id, start_local_dt, end_local_dt):
     import emission.core.get_database as edb
     import emission.core.wrapper.entry as ecwe
+    import emission.storage.decorations.local_date_queries as esdl
 
-    logging.info("About to query for %s -> %s" % (start_dt, end_dt))
-    result_cursor = edb.get_timeseries_db().find({"user_id": user_id, "data.local_dt": {"$gte": start_dt, "$lte": end_dt}}).sort("metadata.write_ts")
+    logging.info("About to query for %s -> %s" % (start_local_dt, end_local_dt))
+    final_query = {"user_id": user_id}
+    final_query.update(esdl.get_range_query("data.local_dt", start_local_dt, end_local_dt))
+    logging.debug("final query = %s" % final_query)
+    result_cursor = edb.get_timeseries_db().find(final_query).sort("metadata.write_ts")
     logging.debug("result cursor has %d entries" % result_cursor.count())
     result_list = list(result_cursor)
     logging.debug("result list has %d entries" % len(result_list))
@@ -61,7 +65,12 @@ def get_aggregate_timeline_from_dt(start_dt, end_dt, box=None):
         logging.info("About to query for %s -> %s" % (start_dt, end_dt))
     else:
         logging.info("About to query for %s -> %s in %s" % (start_dt, end_dt, box))
-    result_cursor = edb.get_timeseries_db().find({"data.local_dt": {"$gte": start_dt, "$lte": end_dt}}).sort("metadata.write_ts")
+
+    final_query = {"user_id": user_id}
+    final_query.update(esdl.get_range_query("data.local_dt", start_dt, end_dt))
+    logging.debug("final query = %s" % final_query)
+    result_cursor = edb.get_timeseries_db().find(final_query).sort("metadata.write_ts").limit(1)
+
     logging.debug("about to query result_cursor.count()")
     result_cursor_count = result_cursor.count()
     logging.debug("result cursor has %d entries" % result_cursor_count)

@@ -27,6 +27,7 @@ def get_trips_for_day(user_uuid, day, force_refresh):
     # is no longer a cache - it is "storage" that is used internally. If we
     # want to do that, we should really store it as a materialized view and not
     # only in the usercache, which should be a cache of values stored elsewhere.
-    start_dt = dup.parse(day)
-    end_dt = start_dt + pydt.timedelta(days=1)
+    parsed_dt = dup.parse(day)
+    start_dt = ecwl.LocalDate({'year': parsed_dt.year, 'month': parsed_dt.month, 'day': parsed_dt.day})
+    end_dt = start_dt
     return gfc.get_geojson_for_dt(user_uuid, start_dt, end_dt)
