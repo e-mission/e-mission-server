@@ -2,6 +2,13 @@ import unittest
 
 import emission.storage.decorations.tour_model_queries as esdtmq
 import emission.core.get_database as edb
+import emission.tests.common as etc
+import emission.analysis.intake.segmentation.trip_segmentation as eaist
+import emission.analysis.intake.segmentation.section_segmentation as eaiss
+import emission.analysis.intake.cleaning.filter_accuracy as eaicf
+import emission.storage.timeseries.format_hacks.move_filter_field as estfm
+
+
 
 class TestTourModelQueries(unittest.TestCase):
 
