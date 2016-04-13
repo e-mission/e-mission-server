@@ -57,8 +57,8 @@ class TestLocationSmoothing(unittest.TestCase):
         import emission.core.get_database as edb
 
         edb.get_timeseries_db().remove({"user_id": self.testUUID})
-        edb.get_section_new_db().remove()
-        edb.get_trip_new_db().remove()
+        edb.get_section_new_db().remove({"user_id": self.testUUID})
+        edb.get_trip_new_db().remove({"user_id": self.testUUID})
 
     def loadPointsForTrip(self, trip_id):
         import emission.core.get_database as edb
