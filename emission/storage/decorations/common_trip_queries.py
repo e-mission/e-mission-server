@@ -86,6 +86,9 @@ def get_start_hour(section_info):
 def get_day(section_info):
     return section_info.start_local_dt.weekday()
 
+def get_start_time(section_info):
+    return section_info.start_local_dt
+
 def increment_probability(trip, day, hour):
     trip.probabilites[day, hour] += 1
 
@@ -96,6 +99,8 @@ def set_up_trips(list_of_cluster_data, user_id):
     import emission.storage.decorations.common_place_queries as esdcpq
     clear_existing_trips(user_id)
     for dct in list_of_cluster_data:
+        start_times = []
+        durations = []
         start_loc = gj.Point(dct['start_coords'].coordinate_list())
         end_loc = gj.Point(dct['end_coords'].coordinate_list())
         start_place_id = esdcpq.get_common_place_at_location(start_loc).get_id()
@@ -104,6 +109,8 @@ def set_up_trips(list_of_cluster_data, user_id):
         probabilites = np.zeros((DAYS_IN_WEEK, HOURS_IN_DAY))
         for sec in dct["sections"]:
             probabilites[get_day(sec), get_start_hour(sec)] += 1
+            start_times.append(get_start_time(sec))
+            durations.append(sec.duration)
 
         trip = make_new_common_trip()
         trip.user_id = user_id
@@ -113,6 +120,8 @@ def set_up_trips(list_of_cluster_data, user_id):
         trip.end_loc = end_loc
         trip.probabilites = probabilites
         trip.trips = [unc_trip.get_id() for unc_trip in dct["sections"]]
+        trip.start_times = start_times
+        trip.end_times = end_times
         place_db = edb.get_place_db()
         
         
