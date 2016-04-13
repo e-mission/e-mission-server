@@ -12,6 +12,7 @@ import emission.core.our_geocoder as our_geo
 import emission.storage.decorations.trip_queries as ecsdtq
 import emission.storage.decorations.section_queries as ecsdsq
 import emission.storage.decorations.place_queries as ecsdpq
+import emission.storage.decorations.local_date_queries as ecsdlq
 
 try:
     import json
@@ -174,6 +175,5 @@ class OTP:
         return Alternative_Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc, 0, cost, mode_list)
 
 def otp_time_to_ours(otp_str):
-    t = time.gmtime(int(otp_str)/1000)
-    return datetime.datetime(*t[:6])    
+    return ecsdlq.get_local_date(int(otp_str)/1000, "UTC")
 
