@@ -66,7 +66,7 @@ def get_aggregate_timeline_from_dt(start_dt, end_dt, box=None):
     else:
         logging.info("About to query for %s -> %s in %s" % (start_dt, end_dt, box))
 
-    final_query = {"user_id": user_id}
+    final_query = {}
     final_query.update(esdl.get_range_query("data.local_dt", start_dt, end_dt))
     logging.debug("final query = %s" % final_query)
     result_cursor = edb.get_timeseries_db().find(final_query).sort("metadata.write_ts").limit(1)

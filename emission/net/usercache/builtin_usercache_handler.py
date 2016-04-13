@@ -3,6 +3,7 @@ import attrdict as ad
 # This is only to allow us to catch the DuplicateKeyError
 import pymongo
 import datetime as pydt
+import arrow
 
 import emission.net.usercache.abstract_usercache_handler as enuah
 import emission.net.usercache.abstract_usercache as enua
