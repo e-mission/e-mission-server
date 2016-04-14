@@ -36,8 +36,8 @@ class TestTripSegmentation(unittest.TestCase):
     def tearDown(self):
         edb.get_timeseries_db().remove({"user_id": self.androidUUID}) 
         edb.get_timeseries_db().remove({"user_id": self.iosUUID}) 
-        edb.get_place_db().remove() 
-        edb.get_trip_new_db().remove() 
+        edb.get_place_db().remove({"user_id": self.androidUUID}) 
+        edb.get_trip_new_db().remove({"user_id": self.iosUUID}) 
 
     def testEmptyCall(self):
         import uuid

@@ -1,6 +1,8 @@
-import datetime as pydt
 import pytz
 import logging
+import arrow
+
+import emission.storage.decorations.local_date_queries as ecsdlq
 
 def expand_metadata_times(m):
     logging.debug("write_ts = %s" % m.write_ts)
@@ -11,6 +13,5 @@ def expand_metadata_times(m):
     # The timestamp is in UTC and doesn't know the local time.
     # The fmt_time is in local time, but is a string, so query ranges are hard
     # to search for
-    local_aware_dt = pydt.datetime.utcfromtimestamp(m.write_ts).replace(tzinfo=pytz.utc).astimezone(pytz.timezone(m.time_zone))
-    m.write_local_dt = local_aware_dt.replace(tzinfo=None)
-    m.write_fmt_time = local_aware_dt.isoformat()
+    m.write_local_dt = ecsdlq.get_local_date(m.write_ts, m.time_zone)
+    m.write_fmt_time = arrow.get(m.write_ts).to(m.time_zone).isoformat()

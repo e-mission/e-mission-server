@@ -7,10 +7,12 @@ import attrdict as ad
 import pytz
 import datetime as pydt
 import geojson
+import arrow
 
 import emission.core.wrapper.location as ecwl
 import emission.net.usercache.formatters.common as fc
 import attrdict as ad
+import emission.storage.decorations.local_date_queries as ecsdlq
 
 def format(entry):
     assert(entry.metadata.key == "background/location" or 
@@ -39,9 +41,8 @@ def format_location_raw(entry):
     data.longitude = entry.data.mLongitude
     data.loc = geojson.Point((data.longitude, data.latitude))
     data.ts = float(entry.data.mTime) / 1000 # convert the ms from the phone to secs
-    data.local_dt = pydt.datetime.utcfromtimestamp(data.ts).replace(tzinfo=pytz.utc) \
-                            .astimezone(pytz.timezone(formatted_entry.metadata.time_zone))
-    data.fmt_time = data.local_dt.isoformat()
+    data.local_dt = ecsdlq.get_local_date(data.ts, metadata.time_zone)
+    data.fmt_time = arrow.get(data.ts).to(metadata.time_zone).isoformat()
     data.altitude = entry.data.mAltitude
     data.accuracy = entry.data.mAccuracy
     data.sensed_speed = entry.data.mSpeed
@@ -62,10 +63,8 @@ def format_location_simple(entry):
     formatted_entry.metadata = metadata
 
     data = entry.data
-    local_aware_dt = pydt.datetime.utcfromtimestamp(data.ts).replace(tzinfo=pytz.utc) \
-                            .astimezone(pytz.timezone(formatted_entry.metadata.time_zone))
-    data.local_dt = local_aware_dt.replace(tzinfo=None)
-    data.fmt_time = local_aware_dt.isoformat()
+    data.local_dt = ecsdlq.get_local_date(data.ts, metadata.time_zone)
+    data.fmt_time = arrow.get(data.ts).to(metadata.time_zone).isoformat()
     data.loc = geojson.Point((data.longitude, data.latitude))
     data.heading = entry.data.bearing
     del data.bearing

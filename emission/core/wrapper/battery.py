@@ -24,6 +24,7 @@ class Battery(ecwb.WrapperBase):
     enums = {"battery_status": BatteryStatus}
     geojson = []
     nullable = []
+    local_dates = ['local_dt']
 
     def _populateDependencies(self):
         pass

@@ -84,7 +84,7 @@ def get_start_hour(section_info):
     return section_info.start_local_dt.hour
 
 def get_day(section_info):
-    return section_info.start_local_dt.weekday()
+    return section_info.start_local_dt.weekday
 
 def increment_probability(trip, day, hour):
     trip.probabilites[day, hour] += 1

@@ -11,6 +11,7 @@ class Smoothresults(ecwb.WrapperBase):
   enums = {}
   geojson = []
   nullable = []
+  local_dates = []
 
   def _populateDependencies(self):
     pass

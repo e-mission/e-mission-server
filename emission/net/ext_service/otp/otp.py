@@ -4,6 +4,7 @@
 # Standard imports
 import urllib, urllib2, datetime, time, random
 import geojson as gj
+import arrow
 # from traffic import get_travel_time
 
 # Our imports
@@ -12,6 +13,7 @@ import emission.core.our_geocoder as our_geo
 import emission.storage.decorations.trip_queries as ecsdtq
 import emission.storage.decorations.section_queries as ecsdsq
 import emission.storage.decorations.place_queries as ecsdpq
+import emission.storage.decorations.local_date_queries as ecsdlq
 
 try:
     import json
@@ -98,14 +100,18 @@ class OTP:
 
         trip.start_loc = gj.Point( (float(our_json["plan"]["from"]["lat"]), float(our_json["plan"]["from"]["lon"])) ) 
         trip.end_loc = gj.Point( (float(our_json["plan"]["to"]["lat"]), float(our_json["plan"]["to"]["lon"])) ) 
-        trip.start_local_dt = otp_time_to_ours(our_json['plan']['itineraries'][0]["startTime"])
-        trip.end_local_dt = otp_time_to_ours(our_json['plan']['itineraries'][0]["endTime"])
+        trip.start_local_dt = ecsdlq.get_local_date(otp_time_to_ours(
+            our_json['plan']['itineraries'][0]["startTime"]).timestamp, "UTC")
+        trip.end_local_dt = ecsdlq.get_local_date(otp_time_to_ours(
+            our_json['plan']['itineraries'][0]["endTime"]).timestamp, "UTC")
         ecsdtq.save_trip(trip)
 
         for leg in our_json["plan"]["itineraries"][0]['legs']:
             section = ecsdsq.create_new_section(user_id, trip["_id"])
-            section.start_local_dt = otp_time_to_ours(leg["startTime"])
-            section.end_local_dt = otp_time_to_ours(leg["endTime"])
+            section.start_local_dt = ecsdlq.get_local_date(otp_time_to_ours(
+                leg["startTime"]).timestamp, "UTC")
+            section.end_local_dt = ecsdlq.get_local_date(otp_time_to_ours(
+                leg["endTime"]).timestamp, "UTC")
             section.distance = float(leg["distance"])
             section.start_loc = gj.Point( (float(leg["from"]["lat"]), float(leg["from"]["lon"])) )
             section.end_loc = gj.Point( (float(leg["to"]["lat"]), float(leg["to"]["lon"])) )
@@ -174,6 +180,5 @@ class OTP:
         return Alternative_Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc, 0, cost, mode_list)
 
 def otp_time_to_ours(otp_str):
-    t = time.gmtime(int(otp_str)/1000)
-    return datetime.datetime(*t[:6])    
+    return arrow.get(int(otp_str)/1000)
 

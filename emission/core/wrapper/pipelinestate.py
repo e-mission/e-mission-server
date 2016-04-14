@@ -26,6 +26,7 @@ class PipelineState(ecwb.WrapperBase):
     enums = {"pipeline_stage": PipelineStages}
     geojson = []
     nullable = []
+    local_dates = []
 
     def _populateDependencies(self):
         pass

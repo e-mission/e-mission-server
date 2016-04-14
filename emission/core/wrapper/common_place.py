@@ -15,6 +15,7 @@ class CommonPlace(ecwb.WrapperBase):
     geojson = ["location"]
     enums = {}
     nullable = []
+    local_dates = []
 
     def _populateDependencies(self):
         pass

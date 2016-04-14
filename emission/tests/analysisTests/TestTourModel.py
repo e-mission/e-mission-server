@@ -2,6 +2,7 @@
 import sys
 import unittest
 import datetime
+import logging
 
 # Our imports
 from emission.analysis.modelling.tour_model.tour_model_matrix import Commute, TourModel, Location
@@ -127,7 +128,7 @@ class TestTourModel(unittest.TestCase):
         t = datetime.datetime(2015, 4, 20, 0)
         self.our_tm.add_start_hour(self.home, t)
         rw = self.our_tm.get_tour_model_for_day(0)
-        self.assertTrue(rw == [self.home, self.work])
+        self.assertEqual(rw, [self.home, self.work])
 
     def testCreation(self):
         # This is mostly just a sanity check
@@ -143,4 +144,5 @@ class TestTourModel(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
     unittest.main()
