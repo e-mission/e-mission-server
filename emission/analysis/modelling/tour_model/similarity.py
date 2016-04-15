@@ -41,10 +41,10 @@ class similarity:
                 # print "a is %s" % a
                 t = a
                 try:
-                    start_lon = t.start_loc["coordinates"][0]
-                    start_lat = t.start_loc["coordinates"][1]
-                    end_lon = t.end_loc["coordinates"][0]
-                    end_lat = t.end_loc["coordinates"][1]
+                    start_lon = t.start_place.location["coordinates"][0]
+                    start_lat = t.start_place.location["coordinates"][1]
+                    end_lon = t.end_place.location["coordinates"][0]
+                    end_lat = t.end_place.location["coordinates"][1]
                     # logging.debug("start lat = %s" % start_lat)
                     if self.distance(start_lat, start_lon, end_lat, end_lon):
                         self.data.remove(a)
