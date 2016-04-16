@@ -10,6 +10,11 @@ import emission.analysis.modelling.tour_model.cluster_pipeline as eamtcp
 import emission.simulation.trip_gen as tg
 import emission.core.get_database as edb
 import emission.storage.decorations.common_trip_queries as esdctp
+import emission.tests.common as etc
+import emission.analysis.intake.segmentation.trip_segmentation as eaist
+import emission.analysis.intake.segmentation.section_segmentation as eaiss
+import emission.analysis.intake.cleaning.filter_accuracy as eaicf
+import emission.storage.timeseries.format_hacks.move_filter_field as estfm
 
 class TestCommonPlaceQueries(unittest.TestCase):
     
@@ -42,9 +47,14 @@ class TestCommonPlaceQueries(unittest.TestCase):
         self.assertIsNotNone(place.successors)
 
     def testCreatePlace(self):
-        data = get_fake_data("test1")
-        esdcpq.create_places(data, "test1")
-        places = esdcpq.get_all_common_places_for_user("test1")
+        etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
+        eaicf.filter_accuracy(self.testUUID)
+        estfm.move_all_filters_to_data()
+        eaist.segment_current_trips(self.testUUID)
+        eaiss.segment_current_sections(self.testUUID)
+        data = eamtcp.main(self.testUUID, False)
+        esdcpq.create_places(data, self.testUUID)
+        places = esdcpq.get_all_common_places_for_user(self.testUUID)
         places_list = []
         for p in places:
             places_list.append(esdcpq.make_common_place(p))
@@ -53,7 +63,7 @@ class TestCommonPlaceQueries(unittest.TestCase):
             self.assertIsNotNone(place["successors"])
 
     def testGetSuccessor(self):
-        print "size of db is %s" % edb.get_common_place_db().find().count()
+        logging.debug("size of db is %s" % edb.get_common_place_db().find().count())
         self.assertIsNotNone(edb.get_common_place_db().find_one({"_id": self.testEnd.get_id()}))
         probs = np.zeros( (7, 24) )
         probs[self.time0.weekday(), 3] = 10
@@ -72,10 +82,7 @@ class TestCommonPlaceQueries(unittest.TestCase):
         self.assertEqual(suc, self.testEnd.get_id())
 
 
-def get_fake_data(user_name):
-    # Call with a username unique to your database
-    tg.create_fake_trips(user_name, True)
-    return eamtcp.main(user_name, False)
+
 
 if __name__ == "__main__":
     unittest.main()

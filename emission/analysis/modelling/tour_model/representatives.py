@@ -6,6 +6,7 @@ import copy
 # our imports
 from emission.core.wrapper.trip_old import Trip, Coordinate
 import emission.storage.decorations.trip_queries as esdtq
+import emission.storage.decorations.place_queries as esdpq
 
 
 """
@@ -142,6 +143,16 @@ class representatives:
         for i in range(self.num_clusters):
             a = {'sections' : self.clusters[i]}
             self.tour_dict[i] = a
+        for i in range(self.num_clusters):
+            start_places = []
+            end_places = []
+            for t in self.tour_dict[i]["sections"]:
+                start = esdpq.get_place(t.start_place)
+                end = esdpq.get_place(t.end_place)
+                start_places.append(start)
+                end_places.append(end)
+            self.tour_dict[i]["start_places"] = start_places
+            self.tour_dict[i]["end_places"] = end_places
         for i in range(self.num_locations):
             bin = self.bins[i]
             for b in bin:
@@ -173,6 +184,7 @@ class representatives:
         for i in range(len(self.tour_dict)):
             self.tour_dict[i]['start'] = newlocs.index(self.tour_dict[i]['start'])
             self.tour_dict[i]['end'] = newlocs.index(self.tour_dict[i]['end'])
+            
 
     #check whether a point is close to all points in a bin
     def match(self, label, a, bin):
