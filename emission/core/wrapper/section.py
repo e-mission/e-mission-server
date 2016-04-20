@@ -5,8 +5,7 @@ import emission.core.wrapper.motionactivity as ecwm
 # TODO: Figure out whether we should parse the geojson back to a geojson object
 
 class Section(ecwb.WrapperBase):
-    props = {"user_id": ecwb.WrapperBase.Access.WORM, # start UTC timestamp (in secs)
-             "trip_id": ecwb.WrapperBase.Access.WORM, # the trip that this is part of
+    props = {"trip_id": ecwb.WrapperBase.Access.WORM, # the trip that this is part of
 
              "start_ts": ecwb.WrapperBase.Access.WORM, # start UTC timestamp (in secs)
              "start_local_dt": ecwb.WrapperBase.Access.WORM, # searchable datatime in local time of start location
