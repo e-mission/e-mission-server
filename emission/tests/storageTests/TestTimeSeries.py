@@ -6,8 +6,11 @@ import json
 
 # Our imports
 import emission.core.get_database as edb
-import emission.net.usercache.abstract_usercache as enua
+import emission.storage.timeseries.timequery as estt
+import emission.storage.timeseries.tcquery as esttc
 import emission.storage.timeseries.abstract_timeseries as esta
+
+import emission.core.wrapper.localdate as ecwl
 
 # Test imports
 import emission.tests.common as etc
@@ -25,8 +28,14 @@ class TestTimeSeries(unittest.TestCase):
 
     def testGetEntries(self):
         ts = esta.TimeSeries.get_time_series(self.testUUID)
-        tq = enua.UserCache.TimeQuery("write_ts", 1440658800, 1440745200)
+        tq = estt.TimeQuery("metadata.write_ts", 1440658800, 1440745200)
         self.assertEqual(len(list(ts.find_entries(time_query = tq))), len(self.entries))
+
+    def testComponentQuery(self):
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        tq = esttc.TimeComponentQuery("metadata.write_local_dt",
+            ecwl.LocalDate({"hour": 8}), ecwl.LocalDate({"hour":9}))
+        self.assertEqual(len(list(ts.find_entries(time_query = tq))), 490)
 
     def testGetEntryAtTs(self):
         ts = esta.TimeSeries.get_time_series(self.testUUID)
@@ -40,7 +49,7 @@ class TestTimeSeries(unittest.TestCase):
 
     def testGetDataDf(self):
         ts = esta.TimeSeries.get_time_series(self.testUUID)
-        tq = enua.UserCache.TimeQuery("write_ts", 1440658800, 1440745200)
+        tq = estt.TimeQuery("metadata.write_ts", 1440658800, 1440745200)
         df = ts.get_data_df("background/filtered_location", tq)
         self.assertEqual(len(df), 327)
         self.assertEqual(len(df.columns), 12)

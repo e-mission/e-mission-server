@@ -1,26 +1,24 @@
 import logging
-import emission.net.usercache.abstract_usercache as enua
+import emission.storage.timeseries.timequery as estt
+import emission.storage.timeseries.tcquery as esttc
+import emission.storage.timeseries.geoquery as estg
+
+import emission.storage.decorations.analysis_timeseries_queries as esda
 
 def get_timeline_from_dt(user_id, start_local_dt, end_local_dt):
-    import emission.core.get_database as edb
-    import emission.core.wrapper.entry as ecwe
-    import emission.storage.decorations.local_date_queries as esdl
-
     logging.info("About to query for %s -> %s" % (start_local_dt, end_local_dt))
-    final_query = {"user_id": user_id}
-    final_query.update(esdl.get_range_query("data.local_dt", start_local_dt, end_local_dt))
-    logging.debug("final query = %s" % final_query)
-    result_cursor = edb.get_timeseries_db().find(final_query).sort("metadata.write_ts")
-    logging.debug("result cursor has %d entries" % result_cursor.count())
-    result_list = list(result_cursor)
-    logging.debug("result list has %d entries" % len(result_list))
-    if len(result_list) == 0:
-       return get_timeline(user_id, 0, 0)
-    start_ts = ecwe.Entry(result_list[0]).metadata.write_ts
-    end_ts = ecwe.Entry(result_list[-1]).metadata.write_ts
-    logging.debug("Converted datetime range %s -> %s to timestamp range %s -> %s" %
-        (start_local_dt, end_local_dt, start_ts, end_ts))
-    return get_timeline(user_id, start_ts, end_ts)
+
+    places = esda.get_objects(esda.RAW_PLACE_KEY, user_id,
+        esttc.TimeComponentQuery("data.enter_local_dt", start_local_dt, end_local_dt))
+    trips = esdt.get_trips(esda.RAW_TRIP_KEY, user_id,
+        esttc.TimeComponentQuery("data.start_local_dt", start_local_dt, end_local_dt))
+
+    for place in places:
+        logging.debug("Considering place %s: %s -> %s " % (place.get_id(), place.enter_fmt_time, place.exit_fmt_time))
+    for trip in trips:
+        logging.debug("Considering trip %s: %s -> %s " % (trip.get_id(), trip.start_fmt_time, trip.end_fmt_time))
+
+    return Timeline(places, trips)
 
 def get_timeline(user_id, start_ts, end_ts):
     """
@@ -38,13 +36,8 @@ def get_timeline(user_id, start_ts, end_ts):
     :param end_ts: the ending timestamp. we will include all places and trips that end after this.
     :return: a timeline object
     """
-    # These imports are in here to avoid circular import dependencies between
-    # trip_queries and this file (timeline)
-    import emission.storage.decorations.place_queries as esdp
-    import emission.storage.decorations.trip_queries as esdt
-
-    places = esdp.get_places(user_id, enua.UserCache.TimeQuery("enter_ts", start_ts, end_ts))
-    trips = esdt.get_trips(user_id, enua.UserCache.TimeQuery("start_ts", start_ts, end_ts))
+    places = esda.get_objects(esda.RAW_PLACE_KEY, user_id, estt.TimeQuery("data.enter_ts", start_ts, end_ts))
+    trips = esda.get_trips(esda.RAW_TRIP_KEY, user_id, estt.TimeQuery("data.start_ts", start_ts, end_ts))
 
     for place in places:
         logging.debug("Considering place %s: %s -> %s " % (place.get_id(), place.enter_fmt_time, place.exit_fmt_time))
@@ -55,36 +48,31 @@ def get_timeline(user_id, start_ts, end_ts):
 
 
 
-def get_aggregate_timeline_from_dt(start_dt, end_dt, box=None):
-    import emission.core.get_database as edb
-    import emission.core.wrapper.entry as ecwe
-    import emission.storage.decorations.place_queries as esdp
-    import emission.storage.decorations.trip_queries as esdt
-    import emission.storage.decorations.local_date_queries as esdl
+def get_aggregate_timeline_from_dt(start_dt, end_dt, geojson=None):
+    logging.info("About to query for %s -> %s in %s" % (start_dt, end_dt, geojson))
 
-    if not box:
-        logging.info("About to query for %s -> %s" % (start_dt, end_dt))
+    if geojson is not None:
+        place_gq = estg.GeoQuery(loc_field_list = ['data.location'], poly_region = geojson)
+        trip_gq = estg.GeoQuery(loc_field_list = ['data.start_loc', 'data.end_loc'], poly_region = geojson)
     else:
-        logging.info("About to query for %s -> %s in %s" % (start_dt, end_dt, box))
+        place_gq = None
+        trip_gq = None
 
-    final_query = {}
-    final_query.update(esdl.get_range_query("data.local_dt", start_dt, end_dt))
-    logging.debug("final query = %s" % final_query)
-    result_cursor = edb.get_timeseries_db().find(final_query).sort("metadata.write_ts").limit(1)
+    ts = esta.TimeSeries.get_aggregate_time_series()
+    places = ts.get_entries("segmentation/raw_place",
+        esttc.TimeComponentQuery("data.enter_local_dt", start_local_dt, end_local_dt),
+        place_gq)
+    trips = ts.get_entries("segmentation/raw_place",
+        esttc.TimeComponentQuery("data.start_local_dt", start_local_dt, end_local_dt),
+        trip_gq)
 
-    logging.debug("about to query result_cursor.count()")
-    result_cursor_count = result_cursor.count()
-    logging.debug("result cursor has %d entries" % result_cursor_count)
-    if result_cursor_count == 0:
-        return Timeline([], [])
-    logging.debug("About to query for time data in result cursor")
-    start_ts = ecwe.Entry(result_cursor[0]).metadata.write_ts
-    end_ts = ecwe.Entry(result_cursor[result_cursor_count - 1]).metadata.write_ts
-    logging.debug("Converted datetime range %s -> %s to timestamp range %s -> %s" %
-        (start_dt, end_dt, start_ts, end_ts))
-    places = esdp.get_aggregate_places(enua.UserCache.TimeQuery("enter_ts", start_ts, end_ts), box=box)
-    trips = esdt.get_aggregate_trips(enua.UserCache.TimeQuery("start_ts", start_ts, end_ts), box=box)
+    for place in places:
+        logging.debug("Considering place %s: %s -> %s " % (place.get_id(), place.enter_fmt_time, place.exit_fmt_time))
+    for trip in trips:
+        logging.debug("Considering trip %s: %s -> %s " % (trip.get_id(), trip.start_fmt_time, trip.end_fmt_time))
+
     return Timeline(places, trips)
+
 
 class Timeline(object):
 
