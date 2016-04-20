@@ -60,7 +60,7 @@ class TestTimeline(unittest.TestCase):
             # logging.debug("%s: %s" % (i, curr_element))
             curr_type = self.get_type(curr_element)
             if prev_type is not None:
-                checked_count = checked_count + 1
+                checked_count += 1
                 self.assertNotEqual(prev_type, curr_type)
                 if prev_type == ecwp.Place:
                     self.assertEqual(prev_element.starting_trip, curr_element.get_id())

@@ -14,8 +14,10 @@ import emission.storage.decorations.trip_queries as ecsdtq
 import emission.storage.decorations.section_queries as ecsdsq
 import emission.storage.decorations.place_queries as ecsdpq
 import emission.storage.decorations.local_date_queries as ecsdlq
+import emission.storage.timeseries.abstract_timeseries as esta
 import emission.core.wrapper.rawtrip as ecwrt
 import emission.core.wrapper.entry as ecwe
+import emission.core.wrapper.section as ecws
 
 try:
     import json
@@ -89,7 +91,7 @@ class OTP:
     def turn_into_new_trip(self, user_id):
         print "new trip"
         ts = esta.TimeSeries.get_time_series(user_id)
-        trip = new ecwrt.RawTrip()
+        trip = ecwrt.Rawtrip()
         sections = []
         our_json = self.get_json()
         mode_list = set ( )
@@ -107,10 +109,11 @@ class OTP:
             our_json['plan']['itineraries'][0]["startTime"]).timestamp, "UTC")
         trip.end_local_dt = ecsdlq.get_local_date(otp_time_to_ours(
             our_json['plan']['itineraries'][0]["endTime"]).timestamp, "UTC")
-        ts.insert(ecwe.Entry.create_entry(user_id, "segmentation/raw_trip", trip))
+        trip_id = ts.insert(ecwe.Entry.create_entry(user_id, "segmentation/raw_trip", trip))
 
         for leg in our_json["plan"]["itineraries"][0]['legs']:
-            section = ecsdsq.create_new_section(user_id, trip["_id"])
+            section = ecws.Section()
+            section.trip_id = trip_id
             section.start_local_dt = ecsdlq.get_local_date(otp_time_to_ours(
                 leg["startTime"]).timestamp, "UTC")
             section.end_local_dt = ecsdlq.get_local_date(otp_time_to_ours(
@@ -118,7 +121,7 @@ class OTP:
             section.distance = float(leg["distance"])
             section.start_loc = gj.Point( (float(leg["from"]["lat"]), float(leg["from"]["lon"])) )
             section.end_loc = gj.Point( (float(leg["to"]["lat"]), float(leg["to"]["lon"])) )
-            ecsdsq.save_section(section)
+            ts.insert_data(user_id, "segmentation/raw_section", section)
  
     def turn_into_trip(self, _id, user_id, trip_id, is_fake=False, itinerary=0):
         sections = [ ]

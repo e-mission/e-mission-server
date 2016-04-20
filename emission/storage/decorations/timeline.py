@@ -4,13 +4,14 @@ import emission.storage.timeseries.tcquery as esttc
 import emission.storage.timeseries.geoquery as estg
 
 import emission.storage.decorations.analysis_timeseries_queries as esda
+import emission.storage.timeseries.abstract_timeseries as esta
 
 def get_timeline_from_dt(user_id, start_local_dt, end_local_dt):
     logging.info("About to query for %s -> %s" % (start_local_dt, end_local_dt))
 
     places = esda.get_objects(esda.RAW_PLACE_KEY, user_id,
         esttc.TimeComponentQuery("data.enter_local_dt", start_local_dt, end_local_dt))
-    trips = esdt.get_trips(esda.RAW_TRIP_KEY, user_id,
+    trips = esda.get_objects(esda.RAW_TRIP_KEY, user_id,
         esttc.TimeComponentQuery("data.start_local_dt", start_local_dt, end_local_dt))
 
     for place in places:
@@ -37,7 +38,7 @@ def get_timeline(user_id, start_ts, end_ts):
     :return: a timeline object
     """
     places = esda.get_objects(esda.RAW_PLACE_KEY, user_id, estt.TimeQuery("data.enter_ts", start_ts, end_ts))
-    trips = esda.get_trips(esda.RAW_TRIP_KEY, user_id, estt.TimeQuery("data.start_ts", start_ts, end_ts))
+    trips = esda.get_objects(esda.RAW_TRIP_KEY, user_id, estt.TimeQuery("data.start_ts", start_ts, end_ts))
 
     for place in places:
         logging.debug("Considering place %s: %s -> %s " % (place.get_id(), place.enter_fmt_time, place.exit_fmt_time))
@@ -48,8 +49,8 @@ def get_timeline(user_id, start_ts, end_ts):
 
 
 
-def get_aggregate_timeline_from_dt(start_dt, end_dt, geojson=None):
-    logging.info("About to query for %s -> %s in %s" % (start_dt, end_dt, geojson))
+def get_aggregate_timeline_from_dt(start_local_dt, end_local_dt, geojson=None):
+    logging.info("About to query for %s -> %s in %s" % (start_local_dt, end_local_dt, geojson))
 
     if geojson is not None:
         place_gq = estg.GeoQuery(loc_field_list = ['data.location'], poly_region = geojson)
@@ -78,7 +79,7 @@ class Timeline(object):
 
     class State(object):
         def __init__(self, type, element):
-            self.type = type
+            self.element_type = type
             self.element = element
             if element is None:
                 self.id = None
@@ -106,7 +107,7 @@ class Timeline(object):
             else:
                 self.state = Timeline.State("trip", self.trips[0])
         logging.debug("Starting with element of type %s, id %s, details %s" %
-                      (self.state.type, self.state.id, self.state.element))
+                      (self.state.element_type, self.state.id, self.state.element))
 
     def fill_start_end_places(self):
         """
@@ -142,7 +143,7 @@ class Timeline(object):
 
         if place_id not in self.id_map:
             logging.debug("place id %s is not in the map, searching in database" % place_id)
-            place = esdp.get_place(place_id)
+            place = esda.get_object(esda.RAW_PLACE_KEY, place_id)
             self.places.append(place)
             self.id_map[place_id] = place
             logging.debug("retrieved object %s and added to id_map" % place)
@@ -169,7 +170,7 @@ class Timeline(object):
     def move_to_next(self):
         # TODO: restructure the data model to avoid this stupid if/then.
         # e.g. rename field to be "starting" for both trip and section
-        if self.state.type == "place":
+        if self.state.element_type == "place":
             if hasattr(self.state.element, "starting_trip"):
                 new_id = self.state.element.starting_trip
             else:
@@ -177,7 +178,7 @@ class Timeline(object):
                 new_id = self.state.element.starting_section
             new_type = "trip"
         else:
-            assert(self.state.type == "trip")
+            assert(self.state.element_type == "trip")
             if hasattr(self.state.element, "end_place"):
                 new_id = self.state.element.end_place
             else:

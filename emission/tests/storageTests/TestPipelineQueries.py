@@ -21,7 +21,7 @@ class TestPipelineQueries(unittest.TestCase):
         curr_state = epq.get_current_state(self.testUUID, ewps.PipelineStages.USERCACHE)
         self.assertIsNone(curr_state)
         curr_query = epq.get_time_range_for_stage(self.testUUID, ewps.PipelineStages.USERCACHE)
-        self.assertEquals(curr_query.timeType, "write_ts")
+        self.assertEquals(curr_query.timeType, "metadata.write_ts")
         self.assertIsNone(curr_query.startTs)
         self.assertIsNotNone(curr_query.endTs)
         new_state = epq.get_current_state(self.testUUID, ewps.PipelineStages.USERCACHE)
