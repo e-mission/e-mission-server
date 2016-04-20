@@ -21,7 +21,6 @@ logging.basicConfig(level=logging.DEBUG)
 
 class TestVisualize(unittest.TestCase):
     def setUp(self):
-        self.clearRelatedDb()
         etc.setupRealExample(self,
                              "emission/tests/data/real_examples/shankari_2015-aug-27")
         eaicf.filter_accuracy(self.testUUID)
@@ -32,6 +31,9 @@ class TestVisualize(unittest.TestCase):
         self.day_end_ts = 1440745200
         self.day_start_dt = arrow.get(2015, 8, 27)
         self.day_end_dt = arrow.get(2015, 8, 28)
+
+    def tearDown(self):
+        self.clearRelatedDb()
 
     def clearRelatedDb(self):
         edb.get_timeseries_db().remove({"user_id": self.testUUID})
