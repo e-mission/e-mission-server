@@ -6,7 +6,7 @@ import json
 
 # Our imports
 import emission.core.get_database as edb
-import emission.net.usercache.abstract_usercache as enua
+import emission.storage.timeseries.timequery as estt
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.pipeline_queries as epq
 import emission.core.wrapper.pipelinestate as ecwp
@@ -19,6 +19,7 @@ import emission.analysis.intake.cleaning.filter_accuracy as eaicf
 import emission.storage.timeseries.format_hacks.move_filter_field as estfm
 import emission.storage.decorations.place_queries as esdp
 import emission.storage.decorations.trip_queries as esdt
+import emission.storage.decorations.analysis_timeseries_queries as esda
 
 # Test imports
 import emission.tests.common as etc
@@ -30,14 +31,13 @@ class TestTripSegmentation(unittest.TestCase):
         etc.setupRealExample(self, "emission/tests/data/real_examples/iphone_2015-11-06")
         self.iosUUID = self.testUUID
         eaicf.filter_accuracy(self.iosUUID)
-        estfm.move_all_filters_to_data()
         logging.debug("androidUUID = %s, iosUUID = %s" % (self.androidUUID, self.iosUUID))
 
     def tearDown(self):
         edb.get_timeseries_db().remove({"user_id": self.androidUUID}) 
         edb.get_timeseries_db().remove({"user_id": self.iosUUID}) 
-        edb.get_place_db().remove({"user_id": self.androidUUID}) 
-        edb.get_trip_new_db().remove({"user_id": self.iosUUID}) 
+        edb.get_analysis_timeseries_db().remove({"user_id": self.androidUUID}) 
+        edb.get_analysis_timeseries_db().remove({"user_id": self.iosUUID}) 
 
     def testEmptyCall(self):
         import uuid
@@ -47,7 +47,7 @@ class TestTripSegmentation(unittest.TestCase):
         
     def testSegmentationPointsDwellSegmentationTimeFilter(self):
         ts = esta.TimeSeries.get_time_series(self.androidUUID)
-        tq = enua.UserCache.TimeQuery("write_ts", 1440658800, 1440745200)
+        tq = estt.TimeQuery("metadata.write_ts", 1440658800, 1440745200)
         dstfsm = dstf.DwellSegmentationTimeFilter(time_threshold = 5 * 60, # 5 mins
                                                   point_threshold = 10,
                                                   distance_threshold = 100) # 100 m
@@ -65,7 +65,7 @@ class TestTripSegmentation(unittest.TestCase):
 
     def testSegmentationPointsDwellSegmentationDistFilter(self):
         ts = esta.TimeSeries.get_time_series(self.iosUUID)
-        tq = enua.UserCache.TimeQuery("write_ts", 1446796800, 1446847600)
+        tq = estt.TimeQuery("metadata.write_ts", 1446796800, 1446847600)
         dstdsm = dsdf.DwellSegmentationDistFilter(time_threshold = 10 * 60, # 5 mins
                                                   point_threshold = 10,
                                                   distance_threshold = 100) # 100 m
@@ -85,79 +85,79 @@ class TestTripSegmentation(unittest.TestCase):
         # The previous line should have created places and trips and stored
         # them into the database. Now, we want to query to ensure that they
         # were created correctly.
-        tq_place = enua.UserCache.TimeQuery("enter_ts", 1440658800, 1440745200)
-        created_places = esdp.get_places(self.androidUUID, tq_place)
+        tq_place = estt.TimeQuery("data.enter_ts", 1440658800, 1440745200)
+        created_places_entries = esda.get_entries(esda.RAW_PLACE_KEY, self.androidUUID, tq_place)
 
-        tq_trip = enua.UserCache.TimeQuery("start_ts", 1440658800, 1440745200)
-        created_trips = esdt.get_trips(self.androidUUID, tq_trip)
+        tq_trip = estt.TimeQuery("data.start_ts", 1440658800, 1440745200)
+        created_trips_entries = esda.get_entries(esda.RAW_TRIP_KEY, self.androidUUID, tq_trip)
 
-        for i, place in enumerate(created_places):
-            logging.debug("Retrieved places %s: %s -> %s" % (i, place.enter_fmt_time, place.exit_fmt_time))
-        for i, trip in enumerate(created_trips):
-            logging.debug("Retrieved trips %s: %s -> %s" % (i, trip.start_fmt_time, trip.end_fmt_time))
+        for i, place in enumerate(created_places_entries):
+            logging.debug("Retrieved places %s: %s -> %s" % (i, place.data.enter_fmt_time, place.data.exit_fmt_time))
+        for i, trip in enumerate(created_trips_entries):
+            logging.debug("Retrieved trips %s: %s -> %s" % (i, trip.data.start_fmt_time, trip.data.end_fmt_time))
 
         # We expect there to be 9 places, but the first one is that start of
         # the chain, so it has a start_time of None and it won't be retrieved
         # by the query on the start_time that we show here.
-        self.assertEqual(len(created_places), 8)
-        self.assertEqual(len(created_trips), 8)
+        self.assertEqual(len(created_places_entries), 8)
+        self.assertEqual(len(created_trips_entries), 8)
 
         # Pick the first two trips and the first place and ensure that they are all linked correctly
         # Note that this is the first place, not the second place because the true first place will not
         # be retrieved by the query, as shown above
-        trip0 = created_trips[0]
-        trip1 = created_trips[1]
-        place0 = created_places[0]
+        trip0 = created_trips_entries[0]
+        trip1 = created_trips_entries[1]
+        place0 = created_places_entries[0]
 
-        self.assertEqual(trip0.end_place, place0.get_id())
-        self.assertEqual(trip1.start_place, place0.get_id())
-        self.assertEqual(place0.ending_trip, trip0.get_id())
-        self.assertEqual(place0.starting_trip, trip1.get_id())
+        self.assertEqual(trip0.data.end_place, place0.get_id())
+        self.assertEqual(trip1.data.start_place, place0.get_id())
+        self.assertEqual(place0.data.ending_trip, trip0.get_id())
+        self.assertEqual(place0.data.starting_trip, trip1.get_id())
 
-        self.assertEqual(round(trip0.duration), 11 * 60 + 9)
-        self.assertEqual(round(trip1.duration), 6 * 60 + 54)
+        self.assertEqual(round(trip0.data.duration), 11 * 60 + 9)
+        self.assertEqual(round(trip1.data.duration), 6 * 60 + 54)
 
-        self.assertIsNotNone(place0.location)
+        self.assertIsNotNone(place0.data.location)
         
     def testSegmentationWrapperIOS(self):
         eaist.segment_current_trips(self.iosUUID)
         # The previous line should have created places and trips and stored
         # them into the database. Now, we want to query to ensure that they
         # were created correctly.
-        tq_place = enua.UserCache.TimeQuery("enter_ts", 1446796800, 1446847600)
-        created_places = esdp.get_places(self.iosUUID, tq_place)
+        tq_place = estt.TimeQuery("data.enter_ts", 1446796800, 1446847600)
+        created_places_entries = esda.get_entries(esda.RAW_PLACE_KEY, self.iosUUID, tq_place)
 
-        tq_trip = enua.UserCache.TimeQuery("start_ts", 1446796800, 1446847600)
-        created_trips = esdt.get_trips(self.iosUUID, tq_trip)
+        tq_trip = estt.TimeQuery("data.start_ts", 1446796800, 1446847600)
+        created_trips_entries = esda.get_entries(esda.RAW_TRIP_KEY, self.iosUUID, tq_trip)
 
-        for i, place in enumerate(created_places):
-            logging.debug("Retrieved places %s: %s -> %s" % (i, place.enter_fmt_time, place.exit_fmt_time))
-        for i, trip in enumerate(created_trips):
-            logging.debug("Retrieved trips %s: %s -> %s" % (i, trip.start_fmt_time, trip.end_fmt_time))
+        for i, place in enumerate(created_places_entries):
+            logging.debug("Retrieved places %s: %s -> %s" % (i, place.data.enter_fmt_time, place.data.exit_fmt_time))
+        for i, trip in enumerate(created_trips_entries):
+            logging.debug("Retrieved trips %s: %s -> %s" % (i, trip.data.start_fmt_time, trip.data.end_fmt_time))
 
         # We expect there to be 4 places, but the first one is that start of
         # the chain, so it has a start_time of None and it won't be retrieved
         # by the query on the start_time that we show here.
-        self.assertEqual(len(created_places), 3)
-        self.assertEqual(len(created_trips), 3)
+        self.assertEqual(len(created_places_entries), 3)
+        self.assertEqual(len(created_trips_entries), 3)
 
         # Pick the first two trips and the first place and ensure that they are all linked correctly
         # Note that this is the first place, not the second place because the true first place will not
         # be retrieved by the query, as shown above
         # The first trip here is a dummy trip, so let's check the second and third trip instead
-        trip0 = created_trips[1]
-        trip1 = created_trips[2]
-        place0 = created_places[1]
+        trip0 = created_trips_entries[1]
+        trip1 = created_trips_entries[2]
+        place0 = created_places_entries[1]
 
-        self.assertEqual(trip0.end_place, place0.get_id())
-        self.assertEqual(trip1.start_place, place0.get_id())
-        self.assertEqual(place0.ending_trip, trip0.get_id())
-        self.assertEqual(place0.starting_trip, trip1.get_id())
+        self.assertEqual(trip0.data.end_place, place0.get_id())
+        self.assertEqual(trip1.data.start_place, place0.get_id())
+        self.assertEqual(place0.data.ending_trip, trip0.get_id())
+        self.assertEqual(place0.data.starting_trip, trip1.get_id())
 
-        self.assertEqual(round(trip0.duration), 58 * 60 + 51)
-        self.assertEqual(round(trip1.duration), 38 * 60 + 57)
+        self.assertEqual(round(trip0.data.duration), 58 * 60 + 51)
+        self.assertEqual(round(trip1.data.duration), 38 * 60 + 57)
 
-        self.assertIsNotNone(place0.location)
+        self.assertIsNotNone(place0.data.location)
     
     def testSegmentationWrapperCombined(self):
         # Change iOS entries to have the android UUID
@@ -169,57 +169,57 @@ class TestTripSegmentation(unittest.TestCase):
         # android and ios
         eaist.segment_current_trips(self.androidUUID)
 
-        tq_place = enua.UserCache.TimeQuery("enter_ts", 1440658800, 1446847600)
-        created_places = esdp.get_places(self.androidUUID, tq_place)
+        tq_place = estt.TimeQuery("data.enter_ts", 1440658800, 1446847600)
+        created_places_entries = esda.get_entries(esda.RAW_PLACE_KEY, self.androidUUID, tq_place)
 
-        tq_trip = enua.UserCache.TimeQuery("start_ts", 1440658800, 1446847600)
-        created_trips = esdt.get_trips(self.androidUUID, tq_trip)
+        tq_trip = estt.TimeQuery("data.start_ts", 1440658800, 1446847600)
+        created_trips_entries = esda.get_entries(esda.RAW_TRIP_KEY, self.androidUUID, tq_trip)
 
-        for i, place in enumerate(created_places):
-            logging.debug("Retrieved places %s: %s -> %s" % (i, place.enter_fmt_time, place.exit_fmt_time))
-        for i, trip in enumerate(created_trips):
-            logging.debug("Retrieved trips %s: %s -> %s" % (i, trip.start_fmt_time, trip.end_fmt_time))
+        for i, place in enumerate(created_places_entries):
+            logging.debug("Retrieved places %s: %s -> %s" % (i, place.data.enter_fmt_time, place.data.exit_fmt_time))
+        for i, trip in enumerate(created_trips_entries):
+            logging.debug("Retrieved trips %s: %s -> %s" % (i, trip.data.start_fmt_time, trip.data.end_fmt_time))
 
         # We expect there to be 12 places, but the first one is that start of
         # the chain, so it has a start_time of None and it won't be retrieved
         # by the query on the start_time that we show here.
-        self.assertEqual(len(created_places), 11)
-        self.assertEqual(len(created_trips), 11)
+        self.assertEqual(len(created_places_entries), 11)
+        self.assertEqual(len(created_trips_entries), 11)
 
         # Pick the first two trips and the first place and ensure that they are all linked correctly
         # Note that this is the first place, not the second place because the true first place will not
         # be retrieved by the query, as shown above
         # The first trip here is a dummy trip, so let's check the second and third trip instead
-        trip0time = created_trips[0]
-        trip1time = created_trips[1]
-        place0time = created_places[0]
+        trip0time = created_trips_entries[0]
+        trip1time = created_trips_entries[1]
+        place0time = created_places_entries[0]
         
-        self.assertEqual(trip0time.end_place, place0time.get_id())
-        self.assertEqual(trip1time.start_place, place0time.get_id())
-        self.assertEqual(place0time.ending_trip, trip0time.get_id())
-        self.assertEqual(place0time.starting_trip, trip1time.get_id())
+        self.assertEqual(trip0time.data.end_place, place0time.get_id())
+        self.assertEqual(trip1time.data.start_place, place0time.get_id())
+        self.assertEqual(place0time.data.ending_trip, trip0time.get_id())
+        self.assertEqual(place0time.data.starting_trip, trip1time.get_id())
 
-        self.assertEqual(round(trip0time.duration), 11 * 60 + 9)
-        self.assertEqual(round(trip1time.duration), 6 * 60 + 54)
+        self.assertEqual(round(trip0time.data.duration), 11 * 60 + 9)
+        self.assertEqual(round(trip1time.data.duration), 6 * 60 + 54)
 
-        self.assertIsNotNone(place0time.location)
+        self.assertIsNotNone(place0time.data.location)
         
         # There are 8 android trips first (index: 0-7).
         # index 8 is the short, bogus trip
         # So we want to check trips 9 and 10
-        trip0dist = created_trips[9]
-        trip1dist = created_trips[10]
-        place0dist = created_places[9]
+        trip0dist = created_trips_entries[9]
+        trip1dist = created_trips_entries[10]
+        place0dist = created_places_entries[9]
         
-        self.assertEqual(trip0dist.end_place, place0dist.get_id())
-        self.assertEqual(trip1dist.start_place, place0dist.get_id())
-        self.assertEqual(place0dist.ending_trip, trip0dist.get_id())
-        self.assertEqual(place0dist.starting_trip, trip1dist.get_id())
+        self.assertEqual(trip0dist.data.end_place, place0dist.get_id())
+        self.assertEqual(trip1dist.data.start_place, place0dist.get_id())
+        self.assertEqual(place0dist.data.ending_trip, trip0dist.get_id())
+        self.assertEqual(place0dist.data.starting_trip, trip1dist.get_id())
 
-        self.assertEqual(round(trip0dist.duration), 58 * 60 + 51)
-        self.assertEqual(round(trip1dist.duration), 38 * 60 + 57)
+        self.assertEqual(round(trip0dist.data.duration), 58 * 60 + 51)
+        self.assertEqual(round(trip1dist.data.duration), 38 * 60 + 57)
 
-        self.assertIsNotNone(place0dist.location)
+        self.assertIsNotNone(place0dist.data.location)
         
 
 if __name__ == '__main__':
