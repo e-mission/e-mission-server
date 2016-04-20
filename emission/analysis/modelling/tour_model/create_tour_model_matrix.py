@@ -41,21 +41,23 @@ def make_graph_edges(list_of_cluster_data, tour_model):
         end_loc_temp = tour_model.get_location(end_loc_temp)
         e = make_graph_edge(start_loc_temp, end_loc_temp, tour_model)
         logging.debug("making edge %s" % e)
-        for trip in cd["sections"]:
-            e.add_trip(trip)
+        for trip_entry in cd["sections"]:
+            e.add_trip(trip_entry)
 
 def populate_prob_field_for_locatons(list_of_cluster_data, tour_model):
     for cd in list_of_cluster_data:
         start_loc = cd['start']
         end_loc = cd['end']
-        for sec in cd["sections"]:
+        for trip_entry in cd["sections"]:
             start_loc_temp = tm.Location(start_loc, tour_model)
             start_loc_temp = tour_model.get_location(start_loc_temp)
             end_loc_temp = tm.Location(end_loc, tour_model)
             end_loc_temp = tour_model.get_location(end_loc_temp)
             com = tm.Commute(start_loc_temp, end_loc_temp)
-            tour_model.add_start_hour(start_loc_temp, sec.start_time)
-            start_loc_temp.increment_successor(end_loc_temp, get_start_hour(sec), get_day(sec))
+            tour_model.add_start_hour(start_loc_temp, trip_entry.data.start_time)
+            start_loc_temp.increment_successor(end_loc_temp,
+                                               get_start_hour(trip_entry.data),
+                                               get_day(trip_entry.data))
 
 
 ## Utility functions
@@ -78,7 +80,6 @@ def get_day(section_info):
 def get_mode_num(section_info):
     map_modes_to_numbers = {"walking" : 0, "car" : 1, "train" : 2, "bart" : 3, "bike" : 4}
     return random.randint(0, 4)
-    logging.debug(section_info.sections)
 
 
 final_tour_model = None

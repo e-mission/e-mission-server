@@ -9,17 +9,19 @@ import emission.storage.timeseries.abstract_timeseries as esta
 def get_timeline_from_dt(user_id, start_local_dt, end_local_dt):
     logging.info("About to query for %s -> %s" % (start_local_dt, end_local_dt))
 
-    places = esda.get_objects(esda.RAW_PLACE_KEY, user_id,
+    places_entries = esda.get_entries(esda.RAW_PLACE_KEY, user_id,
         esttc.TimeComponentQuery("data.enter_local_dt", start_local_dt, end_local_dt))
-    trips = esda.get_objects(esda.RAW_TRIP_KEY, user_id,
+    trips_entries = esda.get_entries(esda.RAW_TRIP_KEY, user_id,
         esttc.TimeComponentQuery("data.start_local_dt", start_local_dt, end_local_dt))
 
-    for place in places:
-        logging.debug("Considering place %s: %s -> %s " % (place.get_id(), place.enter_fmt_time, place.exit_fmt_time))
-    for trip in trips:
-        logging.debug("Considering trip %s: %s -> %s " % (trip.get_id(), trip.start_fmt_time, trip.end_fmt_time))
+    for place in places_entries:
+        logging.debug("Considering place %s: %s -> %s " %
+                      (place.get_id(), place.data.enter_fmt_time, place.data.exit_fmt_time))
+    for trip in trips_entries:
+        logging.debug("Considering trip %s: %s -> %s " %
+                      (trip.get_id(), trip.data.start_fmt_time, trip.data.end_fmt_time))
 
-    return Timeline(places, trips)
+    return Timeline(places_entries, trips_entries)
 
 def get_timeline(user_id, start_ts, end_ts):
     """
@@ -37,11 +39,12 @@ def get_timeline(user_id, start_ts, end_ts):
     :param end_ts: the ending timestamp. we will include all places and trips that end after this.
     :return: a timeline object
     """
-    places_entries = esda.get_entries(esda.RAW_PLACE_KEY, user_id, estt.TimeQuery("data.enter_ts", start_ts, end_ts))
-    trips_entries = esda.get_entries(esda.RAW_TRIP_KEY, user_id, estt.TimeQuery("data.start_ts", start_ts, end_ts))
-    places = [entry.data for entry in places_entries]
-    trips = [entry.data for entry in trips_entries]
-
+    places_entries = esda.get_entries(esda.RAW_PLACE_KEY, user_id=None,
+                                      time_query=estt.TimeQuery("data.enter_ts",
+                                                                start_ts, end_ts))
+    trips_entries = esda.get_entries(esda.RAW_TRIP_KEY, user_id=None,
+                                     time_query=estt.TimeQuery("data.start_ts",
+                                                               start_ts, end_ts))
     for place in places_entries:
         logging.debug("Considering place %s: %s -> %s " % (place.get_id(),
                         place.data.enter_fmt_time, place.data.exit_fmt_time))
@@ -49,7 +52,7 @@ def get_timeline(user_id, start_ts, end_ts):
         logging.debug("Considering trip %s: %s -> %s " % (trip.get_id(),
                         trip.data.start_fmt_time, trip.data.end_fmt_time))
 
-    return Timeline(places, trips)
+    return Timeline(places_entries, trips_entries)
 
 
 
@@ -64,19 +67,23 @@ def get_aggregate_timeline_from_dt(start_local_dt, end_local_dt, geojson=None):
         trip_gq = None
 
     ts = esta.TimeSeries.get_aggregate_time_series()
-    places = ts.get_entries("segmentation/raw_place",
+    places_entries = ts.find_entries("segmentation/raw_place",
         esttc.TimeComponentQuery("data.enter_local_dt", start_local_dt, end_local_dt),
         place_gq)
-    trips = ts.get_entries("segmentation/raw_place",
+    trips_entries = ts.find_entries("segmentation/raw_place",
         esttc.TimeComponentQuery("data.start_local_dt", start_local_dt, end_local_dt),
         trip_gq)
 
-    for place in places:
-        logging.debug("Considering place %s: %s -> %s " % (place.get_id(), place.enter_fmt_time, place.exit_fmt_time))
-    for trip in trips:
-        logging.debug("Considering trip %s: %s -> %s " % (trip.get_id(), trip.start_fmt_time, trip.end_fmt_time))
+    for place in places_entries:
+        logging.debug("Considering place %s: %s -> %s " % (place.get_id(),
+                                                           place.data.enter_fmt_time,
+                                                           place.data.exit_fmt_time))
+    for trip in trips_entries:
+        logging.debug("Considering trip %s: %s -> %s " % (trip.get_id(),
+                                                          trip.data.start_fmt_time,
+                                                          trip.data.end_fmt_time))
 
-    return Timeline(places, trips)
+    return Timeline(places_entries, trips_entries)
 
 
 class Timeline(object):
@@ -91,10 +98,11 @@ class Timeline(object):
                 self.id = element.get_id()
 
 
-    def __init__(self, places_or_stops, trips_or_sections):
-        logging.debug("len(places) = %s, len(trips) = %s" % (len(places_or_stops), len(trips_or_sections)))
-        self.places = places_or_stops
-        self.trips = trips_or_sections
+    def __init__(self, places_or_stops_entries, trips_or_sections_entries):
+        logging.debug("len(places) = %s, len(trips) = %s" %
+                      (len(places_or_stops_entries), len(trips_or_sections_entries)))
+        self.places = places_or_stops_entries
+        self.trips = trips_or_sections_entries
         self.id_map = dict((p.get_id(), p) for p in self.places)
         self.id_map.update(dict((t.get_id(), t) for t in self.trips))
 
@@ -106,7 +114,7 @@ class Timeline(object):
                 self.state = Timeline.State("place", self.places[0])
         else:
             assert (len(self.places) > 0 and len(self.trips) > 0)
-            if self.places[0].exit_ts < self.trips[0].start_ts:
+            if self.places[0].data.exit_ts < self.trips[0].data.start_ts:
                 self.state = Timeline.State("place", self.places[0])
             else:
                 self.state = Timeline.State("trip", self.trips[0])
@@ -147,11 +155,11 @@ class Timeline(object):
 
         if place_id not in self.id_map:
             logging.debug("place id %s is not in the map, searching in database" % place_id)
-            place = esda.get_object(esda.RAW_PLACE_KEY, place_id)
-            self.places.append(place)
-            self.id_map[place_id] = place
-            logging.debug("retrieved object %s and added to id_map" % place)
-            return place
+            place_entry = esda.get_entry(esda.RAW_PLACE_KEY, place_id)
+            self.places.append(place_entry)
+            self.id_map[place_id] = place_entry
+            logging.debug("retrieved object %s and added to id_map" % place_entry)
+            return place_entry
         else:
             return self.id_map[place_id]
 

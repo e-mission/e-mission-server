@@ -52,6 +52,7 @@ class TestTimeSeries(unittest.TestCase):
         tq = estt.TimeQuery("metadata.write_ts", 1440658800, 1440745200)
         df = ts.get_data_df("background/filtered_location", tq)
         self.assertEqual(len(df), 327)
+        logging.debug("df.columns = %s" % df.columns)
         self.assertEqual(len(df.columns), 12)
         
 if __name__ == '__main__':

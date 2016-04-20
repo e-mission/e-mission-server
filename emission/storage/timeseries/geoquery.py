@@ -9,11 +9,11 @@ class GeoQuery(object):
 
     def get_query(self):
         if self.loc_field_list is None or len(self.oc_field_list) == 0:
-            raise RuntimeException("loc_field_list = %s, need actual values",
+            raise AttributeError("loc_field_list = %s, need actual values",
                 self.loc_field_list)
         if self.region is None or "type" not in self.region or \
             not(self.region.type == 'Polygon' or self.region.type == 'MultiPolygon'):
-            raise RuntimeException("invalid poly region %s" % self.region)
+            raise AttributeError("invalid poly region %s" % self.region)
 
         ret_query = {}
         for field in self.loc_field_list:

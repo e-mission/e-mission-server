@@ -9,7 +9,7 @@ class TimeQuery(object):
 
     def get_query(self):
         time_key = self.timeType
-        ret_query = {time_key : {"$lt": self.endTs}}
+        ret_query = {time_key : {"$lte": self.endTs}}
         if (self.startTs is not None):
             ret_query[time_key].update({"$gte": self.startTs})
         return ret_query

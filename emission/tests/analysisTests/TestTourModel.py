@@ -10,6 +10,7 @@ from emission.core.wrapper.trip_old import Coordinate, Trip
 from emission.simulation.trip_gen import create_fake_trips
 from emission.analysis.modelling.tour_model.create_tour_model_matrix import create_tour_model
 from emission.core.get_database import get_trip_db
+import emission.core.wrapper.entry as ecwe
 import emission.analysis.modelling.tour_model.cluster_pipeline as eamtcp
 
 
@@ -63,8 +64,11 @@ class TestTourModel(unittest.TestCase):
 
     def testWeight(self):
         dummy_trip = Trip(0, 0, 0, 0, 0, 0, self.home.rep_coords, self.work.rep_coords)
+        dummy_entry = ecwe.Entry.create_entry("test_user",
+                                              "segmentation/raw_trip",
+                                              dummy_trip)
         self.assertEquals(self.commute.weight(), 0)
-        self.commute.add_trip(dummy_trip)
+        self.commute.add_trip(dummy_entry)
 
         self.assertEquals(self.commute.weight(), 1)
         temp_com = self.our_tm.get_edge(self.home, self.work)
@@ -91,9 +95,19 @@ class TestTourModel(unittest.TestCase):
         dummy_trip0 = Trip(0, 0, 0, 0, 0, 0, self.home.rep_coords, self.work.rep_coords)
         dummy_trip1 = Trip(0, 0, 0, 0, 0, 1, self.home.rep_coords, self.work.rep_coords)
         dummy_trip2 = Trip(0, 0, 0, 0, 0, 2, self.home.rep_coords, self.work.rep_coords)
-        self.commute.add_trip(dummy_trip0)
-        self.commute.add_trip(dummy_trip1)
-        self.commute.add_trip(dummy_trip2)
+        dummy_entry_0 = ecwe.Entry.create_entry("test_user",
+                                              "segmentation/raw_trip",
+                                              dummy_trip0)
+        dummy_entry_1 = ecwe.Entry.create_entry("test_user",
+                                              "segmentation/raw_trip",
+                                              dummy_trip1)
+        dummy_entry_2 = ecwe.Entry.create_entry("test_user",
+                                              "segmentation/raw_trip",
+                                              dummy_trip2)
+
+        self.commute.add_trip(dummy_entry_0)
+        self.commute.add_trip(dummy_entry_1)
+        self.commute.add_trip(dummy_entry_2)
 
         coffee = Location('coffee', self.our_tm)
         tea = Location('tea', self.our_tm)

@@ -18,7 +18,7 @@ def get_object(key, object_id):
 
 def get_entry(key, object_id):
     return esta.TimeSeries.get_aggregate_time_series().get_entry_from_id(
-        "segmentation/raw_place", object_id)
+        key, object_id)
 
 def get_objects(key, user_id, time_query, geo_query=None):
     return [entry.data for entry in get_entries(key, user_id=user_id,
