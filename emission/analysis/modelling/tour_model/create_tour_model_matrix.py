@@ -48,16 +48,16 @@ def populate_prob_field_for_locatons(list_of_cluster_data, tour_model):
     for cd in list_of_cluster_data:
         start_loc = cd['start']
         end_loc = cd['end']
-        for trip_entry in cd["sections"]:
+        for model_trip in cd["sections"]:
             start_loc_temp = tm.Location(start_loc, tour_model)
             start_loc_temp = tour_model.get_location(start_loc_temp)
             end_loc_temp = tm.Location(end_loc, tour_model)
             end_loc_temp = tour_model.get_location(end_loc_temp)
             com = tm.Commute(start_loc_temp, end_loc_temp)
-            tour_model.add_start_hour(start_loc_temp, trip_entry.data.start_time)
+            tour_model.add_start_hour(start_loc_temp, model_trip.start_time)
             start_loc_temp.increment_successor(end_loc_temp,
-                                               get_start_hour(trip_entry.data),
-                                               get_day(trip_entry.data))
+                                               get_start_hour(model_trip),
+                                               get_day(model_trip))
 
 
 ## Utility functions

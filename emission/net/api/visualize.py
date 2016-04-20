@@ -13,6 +13,7 @@ import emission.storage.decorations.timeline as esdt
 import emission.storage.decorations.local_date_queries as esdl
 import emission.core.wrapper.trip as ecwt
 import emission.core.wrapper.section as ecws
+import emission.storage.timeseries.geoquery as estg
 
 # Note that all the points here are returned in (lng, lat) format, which is the
 # GeoJSON format.
@@ -37,11 +38,18 @@ def carbon_by_zip(start,end):
     return {"weightedLoc": carbon_list}
 
 def Berkeley_pop_route(start_ts, end_ts):
-    box = [ [-122.267443, 37.864693], [-122.250985, 37.880687] ]
+    berkeley_json  = {"geometry": {
+      "type": "Polygon",
+      "coordinates": [[
+        [-122.267443, 37.864693], [-122.267443, 37.880687], [-122.250985, 37.880687], [-10.0, 10.0]
+        ]]
+      }
+    }
+    # box = [ [-122.267443, 37.864693], [-122.250985, 37.880687] ]
     start_dt = esdl.get_local_date(start_ts, "UTC")
     end_dt = esdl.get_local_date(end_ts, "UTC")
-    tl = esdt.get_aggregate_timeline_from_dt(start_dt, end_dt, box)
-    gj_list = gfc.get_geojson_for_timeline(None, tl, viz=True)
+    tl = esdt.get_aggregate_timeline_from_dt(start_dt, end_dt, berkeley_json)
+    gj_list = gfc.get_geojson_for_timeline(None, tl)
     list_of_points=[]
     for gj in gj_list:
         for feature in gj:
@@ -58,7 +66,7 @@ def range_mode_heatmap(mode, start_ts, end_ts):
     start_dt = esdl.get_local_date(start_ts, "UTC")
     end_dt = esdl.get_local_date(end_ts, "UTC")
     tl = esdt.get_aggregate_timeline_from_dt(start_dt, end_dt)
-    gj_list = gfc.get_geojson_for_timeline(None, tl, viz=True)
+    gj_list = gfc.get_geojson_for_timeline(None, tl)
  
     logging.debug("len gl list is %d" % len(gj_list))
     list_of_point=[]
