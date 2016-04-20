@@ -14,6 +14,8 @@ import emission.storage.decorations.trip_queries as ecsdtq
 import emission.storage.decorations.section_queries as ecsdsq
 import emission.storage.decorations.place_queries as ecsdpq
 import emission.storage.decorations.local_date_queries as ecsdlq
+import emission.core.wrapper.rawtrip as ecwrt
+import emission.core.wrapper.entry as ecwe
 
 try:
     import json
@@ -86,7 +88,8 @@ class OTP:
 
     def turn_into_new_trip(self, user_id):
         print "new trip"
-        trip = ecsdtq.create_new_trip(user_id)
+        ts = esta.TimeSeries.get_time_series(user_id)
+        trip = new ecwrt.RawTrip()
         sections = []
         our_json = self.get_json()
         mode_list = set ( )
@@ -104,7 +107,7 @@ class OTP:
             our_json['plan']['itineraries'][0]["startTime"]).timestamp, "UTC")
         trip.end_local_dt = ecsdlq.get_local_date(otp_time_to_ours(
             our_json['plan']['itineraries'][0]["endTime"]).timestamp, "UTC")
-        ecsdtq.save_trip(trip)
+        ts.insert(ecwe.Entry.create_entry(user_id, "segmentation/raw_trip", trip))
 
         for leg in our_json["plan"]["itineraries"][0]['legs']:
             section = ecsdsq.create_new_section(user_id, trip["_id"])
