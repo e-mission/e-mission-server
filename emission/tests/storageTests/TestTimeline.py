@@ -56,6 +56,7 @@ class TestTimeline(unittest.TestCase):
         prev_type = None
         prev_element = None
         checked_count = 0
+        i = 0
         for i, curr_element in enumerate(tl):
             # logging.debug("%s: %s" % (i, curr_element))
             curr_type = self.get_type(curr_element)

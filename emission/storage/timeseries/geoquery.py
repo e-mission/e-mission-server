@@ -8,7 +8,7 @@ class GeoQuery(object):
         self.region = poly_region
 
     def get_query(self):
-        if self.loc_field_list is None or len(self.oc_field_list) == 0:
+        if self.loc_field_list is None or len(self.loc_field_list) == 0:
             raise AttributeError("loc_field_list = %s, need actual values",
                 self.loc_field_list)
         if self.region is None or "type" not in self.region or \

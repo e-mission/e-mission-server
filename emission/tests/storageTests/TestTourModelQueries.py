@@ -17,7 +17,7 @@ class TestTourModelQueries(unittest.TestCase):
         edb.get_section_new_db().drop()
         edb.get_trip_new_db().drop()
 
-    def testE2E(self):
+    def     testE2E(self):
         fake_user_id = "fake_user_id"
         esdtmq.make_tour_model_from_fake_data(fake_user_id)
         tm = esdtmq.get_tour_model(fake_user_id)

@@ -67,10 +67,10 @@ def get_aggregate_timeline_from_dt(start_local_dt, end_local_dt, geojson=None):
         trip_gq = None
 
     ts = esta.TimeSeries.get_aggregate_time_series()
-    places_entries = ts.find_entries("segmentation/raw_place",
+    places_entries = ts.find_entries(["segmentation/raw_place"],
         esttc.TimeComponentQuery("data.enter_local_dt", start_local_dt, end_local_dt),
         place_gq)
-    trips_entries = ts.find_entries("segmentation/raw_place",
+    trips_entries = ts.find_entries(["segmentation/raw_place"],
         esttc.TimeComponentQuery("data.start_local_dt", start_local_dt, end_local_dt),
         trip_gq)
 
