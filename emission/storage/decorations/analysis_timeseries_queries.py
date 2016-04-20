@@ -26,7 +26,10 @@ def get_objects(key, user_id, time_query, geo_query=None):
                                                 geo_query=geo_query)]
 
 def get_entries(key, user_id, time_query, geo_query=None):
-    ts = esta.TimeSeries.get_time_series(user_id)
+    if user_id is None:
+        ts = esta.TimeSeries.get_time_series(user_id)
+    else:
+        ts = esta.TimeSeries.get_aggregate_time_series()
     doc_cursor = ts.find_entries([key], time_query, geo_query)
     # TODO: Fix "TripIterator" and return it instead of this list
     return [ecwe.Entry(doc) for doc in doc_cursor]

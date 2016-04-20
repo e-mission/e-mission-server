@@ -23,6 +23,7 @@ import emission.analysis.intake.cleaning.cleaning_methods.jump_smoothing as eaic
 
 import emission.storage.decorations.section_queries as esds
 import emission.storage.decorations.trip_queries as esdt
+import emission.storage.decorations.analysis_timeseries_queries as esda
 
 class TestLocationSmoothing(unittest.TestCase):
     def setUp(self):
@@ -79,7 +80,9 @@ class TestLocationSmoothing(unittest.TestCase):
         for i, section in enumerate(classicJumpSections1):
             logging.debug("-" * 20 + "Considering section %s" % i + "-" * 20)
 
-            section_df = self.ts.get_data_df("background/filtered_location", esds.get_time_query_for_section(section.get_id()))
+            section_df = self.ts.get_data_df("background/filtered_location",
+                            esda.get_time_query_for_trip_like(esda.RAW_SECTION_KEY,
+                                                              section.get_id()))
             with_speeds_df = eaicl.add_dist_heading_speed(section_df)
 
             maxSpeed = outlier_algo.get_threshold(with_speeds_df)
@@ -114,7 +117,9 @@ class TestLocationSmoothing(unittest.TestCase):
         for i, section in enumerate(classicJumpSections1):
             logging.debug("-" * 20 + "Considering section %s" % i + "-" * 20)
 
-            section_df = self.ts.get_data_df("background/filtered_location", esds.get_time_query_for_section(section.get_id()))
+            section_df = self.ts.get_data_df("background/filtered_location",
+                            esda.get_time_query_for_trip_like(esda.RAW_SECTION_KEY,
+                                                              section.get_id()))
             with_speeds_df = eaicl.add_dist_heading_speed(section_df)
 
             maxSpeed = outlier_algo.get_threshold(with_speeds_df)
@@ -145,7 +150,9 @@ class TestLocationSmoothing(unittest.TestCase):
         for i, section in enumerate(classicJumpSections1):
             logging.debug("-" * 20 + "Considering section %s" % i + "-" * 20)
 
-            section_df = self.ts.get_data_df("background/filtered_location", esds.get_time_query_for_section(section.get_id()))
+            section_df = self.ts.get_data_df("background/filtered_location",
+                            esda.get_time_query_for_trip_like(esda.RAW_SECTION_KEY,
+                                                              section.get_id()))
             with_speeds_df = eaicl.add_dist_heading_speed(section_df)
 
             maxSpeed = outlier_algo.get_threshold(with_speeds_df)

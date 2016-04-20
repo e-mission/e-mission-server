@@ -51,6 +51,7 @@ def recalc_speed(points_df):
     return with_speeds_df
 
 def add_dist_heading_speed(points_df):
+    # type: (pandas.DataFrame) -> pandas.DataFrame
     """
     Returns a new dataframe with an added "speed" column.
     The speed column has the speed between each point and its previous point.
@@ -116,7 +117,7 @@ def filter_jumps(user_id, section_id):
     outlier_algo = eaico.BoxplotOutlier()
     filtering_algo = eaicj.SmoothZigzag()
 
-    tq = esda.get_time_query_for_trip_like(section_id)
+    tq = esda.get_time_query_for_trip_like(esda.RAW_SECTION_KEY, section_id)
     ts = esta.TimeSeries.get_time_series(user_id)
     section_points_df = ts.get_data_df("background/filtered_location", tq)
     logging.debug("len(section_points_df) = %s" % len(section_points_df))

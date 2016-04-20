@@ -37,13 +37,17 @@ def get_timeline(user_id, start_ts, end_ts):
     :param end_ts: the ending timestamp. we will include all places and trips that end after this.
     :return: a timeline object
     """
-    places = esda.get_objects(esda.RAW_PLACE_KEY, user_id, estt.TimeQuery("data.enter_ts", start_ts, end_ts))
-    trips = esda.get_objects(esda.RAW_TRIP_KEY, user_id, estt.TimeQuery("data.start_ts", start_ts, end_ts))
+    places_entries = esda.get_entries(esda.RAW_PLACE_KEY, user_id, estt.TimeQuery("data.enter_ts", start_ts, end_ts))
+    trips_entries = esda.get_entries(esda.RAW_TRIP_KEY, user_id, estt.TimeQuery("data.start_ts", start_ts, end_ts))
+    places = [entry.data for entry in places_entries]
+    trips = [entry.data for entry in trips_entries]
 
-    for place in places:
-        logging.debug("Considering place %s: %s -> %s " % (place.get_id(), place.enter_fmt_time, place.exit_fmt_time))
-    for trip in trips:
-        logging.debug("Considering trip %s: %s -> %s " % (trip.get_id(), trip.start_fmt_time, trip.end_fmt_time))
+    for place in places_entries:
+        logging.debug("Considering place %s: %s -> %s " % (place.get_id(),
+                        place.data.enter_fmt_time, place.data.exit_fmt_time))
+    for trip in trips_entries:
+        logging.debug("Considering trip %s: %s -> %s " % (trip.get_id(),
+                        trip.data.start_fmt_time, trip.data.end_fmt_time))
 
     return Timeline(places, trips)
 

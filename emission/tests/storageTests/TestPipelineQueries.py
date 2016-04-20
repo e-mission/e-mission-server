@@ -54,7 +54,7 @@ class TestPipelineQueries(unittest.TestCase):
         self.testStopProcessing()
         next_query = epq.get_time_range_for_stage(self.testUUID, ewps.PipelineStages.USERCACHE)
         logging.debug("next_query = %s" % next_query)
-        self.assertEquals(next_query.timeType, "write_ts")
+        self.assertEquals(next_query.timeType, "metadata.write_ts")
         self.assertIsNotNone(next_query.startTs)
         self.assertIsNotNone(next_query.endTs)
         new_state = epq.get_current_state(self.testUUID, ewps.PipelineStages.USERCACHE)
