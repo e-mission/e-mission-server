@@ -91,9 +91,11 @@ class BuiltinTimeSeries(esta.TimeSeries):
             (self._get_query(key_list, time_query, geo_query), sort_key))
         (orig_ts_db_keys, analysis_ts_db_keys) = self._split_key_list(key_list)
         orig_ts_db_result = self.timeseries_db.find(
-            self._get_query(key_list, time_query, geo_query)).sort(sort_key, pymongo.ASCENDING)
+            self._get_query(orig_ts_db_keys, time_query, geo_query)).sort(
+            sort_key, pymongo.ASCENDING)
         analysis_ts_db_result = self.analysis_timeseries_db.find(
-            self._get_query(key_list, time_query, geo_query)).sort(sort_key, pymongo.ASCENDING)
+            self._get_query(analysis_ts_db_keys, time_query, geo_query)).sort(
+            sort_key, pymongo.ASCENDING)
         return itertools.chain(orig_ts_db_result, analysis_ts_db_result)
 
     def get_entry_at_ts(self, key, ts_key, ts):

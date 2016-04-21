@@ -2,7 +2,7 @@ from pymongo import MongoClient
 import pymongo
 import os
 import json
-from emission.net.int_service.giles import archiver
+# from emission.net.int_service.giles import archiver
 
 def get_mode_db():
     current_db = MongoClient().Stage_database
@@ -88,7 +88,7 @@ def get_uuid_db():
     return UUIDs
 
 def get_client_stats_db():
-    return archiver.StatArchiver('/client_stats')
+    # return archiver.StatArchiver('/client_stats')
     pass
 
 def get_client_stats_db_backup():
@@ -97,7 +97,7 @@ def get_client_stats_db_backup():
     return ClientStats
 
 def get_server_stats_db():
-    return archiver.StatArchiver('/server_stats')
+    # return archiver.StatArchiver('/server_stats')
     pass
 
 def get_server_stats_db_backup():
@@ -106,7 +106,7 @@ def get_server_stats_db_backup():
     return ServerStats
 
 def get_result_stats_db():
-    return archiver.StatArchiver('/result_stats')
+    # return archiver.StatArchiver('/result_stats')
     pass
 
 def get_result_stats_db_backup():

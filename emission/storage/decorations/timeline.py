@@ -6,6 +6,8 @@ import emission.storage.timeseries.geoquery as estg
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.timeseries.abstract_timeseries as esta
 
+import emission.core.wrapper.entry as ecwe
+
 def get_timeline_from_dt(user_id, start_local_dt, end_local_dt):
     logging.info("About to query for %s -> %s" % (start_local_dt, end_local_dt))
 
@@ -73,6 +75,9 @@ def get_aggregate_timeline_from_dt(start_local_dt, end_local_dt, geojson=None):
     trips_entries = ts.find_entries(["segmentation/raw_place"],
         esttc.TimeComponentQuery("data.start_local_dt", start_local_dt, end_local_dt),
         trip_gq)
+
+    places_entries = [ecwe.Entry(e) for e in places_entries]
+    trips_entries = [ecwe.Entry(e) for e in trips_entries]
 
     for place in places_entries:
         logging.debug("Considering place %s: %s -> %s " % (place.get_id(),
@@ -183,19 +188,19 @@ class Timeline(object):
         # TODO: restructure the data model to avoid this stupid if/then.
         # e.g. rename field to be "starting" for both trip and section
         if self.state.element_type == "place":
-            if hasattr(self.state.element, "starting_trip"):
-                new_id = self.state.element.starting_trip
+            if hasattr(self.state.element.data, "starting_trip"):
+                new_id = self.state.element.data.starting_trip
             else:
-                assert(hasattr(self.state.element, "starting_section"))
-                new_id = self.state.element.starting_section
+                assert(hasattr(self.state.element.data, "starting_section"))
+                new_id = self.state.element.data.starting_section
             new_type = "trip"
         else:
             assert(self.state.element_type == "trip")
-            if hasattr(self.state.element, "end_place"):
-                new_id = self.state.element.end_place
+            if hasattr(self.state.element.data, "end_place"):
+                new_id = self.state.element.data.end_place
             else:
-                assert(hasattr(self.state.element, "end_stop"))
-                new_id = self.state.element.end_stop
+                assert(hasattr(self.state.element.data, "end_stop"))
+                new_id = self.state.element.data.end_stop
             new_type = "place"
 
         if new_id is None:

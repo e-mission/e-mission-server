@@ -1,3 +1,5 @@
+import logging
+
 class GeoQuery(object):
     """
         Object that encapsulates a query for a particular GeoJSON polygon or
@@ -11,11 +13,18 @@ class GeoQuery(object):
         if self.loc_field_list is None or len(self.loc_field_list) == 0:
             raise AttributeError("loc_field_list = %s, need actual values",
                 self.loc_field_list)
-        if self.region is None or "type" not in self.region or \
-            not(self.region.type == 'Polygon' or self.region.type == 'MultiPolygon'):
-            raise AttributeError("invalid poly region %s" % self.region)
+        logging.debug("region is %s" % self.region)
+        if self.region is not None:
+            if "geometry" in self.region and "type" in self.region["geometry"]:
+                region_type = self.region["geometry"]["type"]
+                logging.debug("type = %s" % region_type)
+                if region_type is not None and (region_type != 'Polygon' and
+                                                region_type != 'MultiPolygon'):
+                    raise AttributeError("invalid poly region %s" % self.region)
 
+        mongo_region = {}
+        mongo_region['$geometry'] = self.region['geometry']
         ret_query = {}
         for field in self.loc_field_list:
-            ret_query.update({field: {"$geoWithin": self.region}})
+            ret_query.update({field: {"$geoWithin": mongo_region}})
         return ret_query
