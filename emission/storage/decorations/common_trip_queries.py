@@ -110,7 +110,7 @@ def set_up_trips(list_of_cluster_data, user_id):
         for sec in dct["sections"]:
             probabilites[get_day(sec), get_start_hour(sec)] += 1
             start_times.append(get_start_time(sec))
-            durations.append(sec.duration)
+            durations.append(sec.data.duration)
 
         trip = make_new_common_trip()
         trip.user_id = user_id
