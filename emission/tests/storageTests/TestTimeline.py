@@ -12,8 +12,8 @@ import emission.analysis.intake.segmentation.section_segmentation as eaiss
 import emission.storage.decorations.timeline as esdt
 import emission.storage.decorations.trip_queries as esdtq
 
-import emission.core.wrapper.place as ecwp
-import emission.core.wrapper.trip as ecwt
+import emission.core.wrapper.rawplace as ecwrp
+import emission.core.wrapper.rawtrip as ecwrt
 import emission.core.wrapper.stop as ecws
 import emission.core.wrapper.section as ecwsc
 import emission.core.wrapper.localdate as ecwl
@@ -26,7 +26,6 @@ import emission.tests.common as etc
 
 class TestTimeline(unittest.TestCase):
     def setUp(self):
-        self.clearRelatedDb()
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
         eaicf.filter_accuracy(self.testUUID)
         estfm.move_all_filters_to_data()        
@@ -40,12 +39,8 @@ class TestTimeline(unittest.TestCase):
         self.clearRelatedDb()
 
     def clearRelatedDb(self):
-        edb.get_timeseries_db().remove()
-        edb.get_place_db().remove()
-        edb.get_stop_db().remove()
-
-        edb.get_trip_new_db().remove()
-        edb.get_section_new_db().remove()
+        edb.get_timeseries_db().remove({"user_id": self.testUUID})
+        edb.get_analysis_timeseries_db().remove({"user_id": self.testUUID})
 
     @staticmethod
     def get_type(element):
@@ -59,22 +54,25 @@ class TestTimeline(unittest.TestCase):
         i = 0
         for i, curr_element in enumerate(tl):
             # logging.debug("%s: %s" % (i, curr_element))
-            curr_type = self.get_type(curr_element)
+            curr_type = self.get_type(curr_element.data)
             if prev_type is not None:
                 checked_count += 1
                 self.assertNotEqual(prev_type, curr_type)
-                if prev_type == ecwp.Place:
-                    self.assertEqual(prev_element.starting_trip, curr_element.get_id())
+                if prev_type == ecwrp.Rawplace:
+                    self.assertEqual(prev_element.data.starting_trip,
+                                     curr_element.get_id())
                 else:
-                    self.assertEqual(prev_type, ecwt.Trip)
-                    self.assertEqual(prev_element.end_place, curr_element.get_id())
+                    self.assertEqual(prev_type, ecwrt.Rawtrip)
+                    self.assertEqual(prev_element.data.end_place,
+                                     curr_element.get_id())
             prev_type = curr_type
             prev_element = curr_element
         self.assertEqual(checked_count, i)
 
     def testDatetimeTimeline(self):
         eaist.segment_current_trips(self.testUUID)
-        tl = esdt.get_timeline_from_dt(self.testUUID, self.day_start_dt, self.day_end_dt)
+        tl = esdt.get_timeline_from_dt(self.testUUID,
+                                       self.day_start_dt, self.day_end_dt)
         self.checkPlaceTripConsistency(tl)
 
     def testPlaceTripTimeline(self):
