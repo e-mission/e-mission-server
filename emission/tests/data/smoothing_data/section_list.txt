@@ -1,1260 +1,2135 @@
 [
     {
-        "user_id": {
-            "$uuid": "0763de67f61e3f5d90e7518e69793954"
-        }, 
-        "sensed_mode": 0, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.4426899, 
-                37.7280596
-            ]
-        }, 
-        "end_ts": 1440206778.427, 
-        "start_ts": 1440205576.905, 
-        "start_fmt_time": "2015-08-21 18:06:16.905000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.3871209, 
-                37.5993213
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-21 18:26:18.427000-07:00", 
-        "duration": 1201.5220000743866, 
-        "end_stop": {
-            "$oid": "56081ad3f6858f3a71f65e5e"
+        "data": {
+            "user_id": {
+                "$uuid": "0763de67f61e3f5d90e7518e69793954"
+            }, 
+            "sensed_mode": 0, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.4426899, 
+                    37.7280596
+                ]
+            }, 
+            "end_ts": 1440206778.427, 
+            "start_ts": 1440205576.905, 
+            "start_fmt_time": "2015-08-21 18:06:16.905000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.3871209, 
+                    37.5993213
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-21 18:26:18.427000-07:00", 
+            "duration": 1201.5220000743866, 
+            "end_stop": {
+                "$oid": "56081ad3f6858f3a71f65e5e"
+            }, 
+            "_id": {
+                "$oid": "56081ad3f6858f3a71f65e5c"
+            }, 
+            "trip_id": {
+                "$oid": "56081ad3f6858f3a71f65e1f"
+            }
         }, 
         "_id": {
             "$oid": "56081ad3f6858f3a71f65e5c"
         }, 
-        "trip_id": {
-            "$oid": "56081ad3f6858f3a71f65e1f"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "0763de67f61e3f5d90e7518e69793954"
         }, 
-        "sensed_mode": 2, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.3869599, 
-                37.5993011
-            ]
-        }, 
-        "end_ts": 1440207078.819, 
-        "start_ts": 1440206808.423, 
-        "start_fmt_time": "2015-08-21 18:26:48.423000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.3857696, 
-                37.5991049
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-21 18:31:18.819000-07:00", 
-        "duration": 270.39599990844727, 
-        "start_stop": {
-            "$oid": "56081ad3f6858f3a71f65e5e"
-        }, 
-        "end_stop": {
-            "$oid": "56081ad3f6858f3a71f65e60"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.824183-07:00", 
+            "write_ts": 1461205571.824183, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "0763de67f61e3f5d90e7518e69793954"
+            }, 
+            "sensed_mode": 2, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.3869599, 
+                    37.5993011
+                ]
+            }, 
+            "end_ts": 1440207078.819, 
+            "start_ts": 1440206808.423, 
+            "start_fmt_time": "2015-08-21 18:26:48.423000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.3857696, 
+                    37.5991049
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-21 18:31:18.819000-07:00", 
+            "duration": 270.39599990844727, 
+            "start_stop": {
+                "$oid": "56081ad3f6858f3a71f65e5e"
+            }, 
+            "end_stop": {
+                "$oid": "56081ad3f6858f3a71f65e60"
+            }, 
+            "_id": {
+                "$oid": "56081ad3f6858f3a71f65e5d"
+            }, 
+            "trip_id": {
+                "$oid": "56081ad3f6858f3a71f65e1f"
+            }
         }, 
         "_id": {
             "$oid": "56081ad3f6858f3a71f65e5d"
         }, 
-        "trip_id": {
-            "$oid": "56081ad3f6858f3a71f65e1f"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "0763de67f61e3f5d90e7518e69793954"
         }, 
-        "sensed_mode": 0, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.3238836, 
-                37.5681346
-            ]
-        }, 
-        "end_ts": 1440208790.662, 
-        "start_ts": 1440207379.659, 
-        "start_fmt_time": "2015-08-21 18:36:19.659000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0762597, 
-                37.3941335
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-21 18:59:50.662000-07:00", 
-        "duration": 1411.0030000209808, 
-        "start_stop": {
-            "$oid": "56081ad3f6858f3a71f65e60"
-        }, 
-        "end_stop": {
-            "$oid": "56081ad3f6858f3a71f65e62"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.826832-07:00", 
+            "write_ts": 1461205571.826832, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "0763de67f61e3f5d90e7518e69793954"
+            }, 
+            "sensed_mode": 0, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.3238836, 
+                    37.5681346
+                ]
+            }, 
+            "end_ts": 1440208790.662, 
+            "start_ts": 1440207379.659, 
+            "start_fmt_time": "2015-08-21 18:36:19.659000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0762597, 
+                    37.3941335
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-21 18:59:50.662000-07:00", 
+            "duration": 1411.0030000209808, 
+            "start_stop": {
+                "$oid": "56081ad3f6858f3a71f65e60"
+            }, 
+            "end_stop": {
+                "$oid": "56081ad3f6858f3a71f65e62"
+            }, 
+            "_id": {
+                "$oid": "56081ad3f6858f3a71f65e5f"
+            }, 
+            "trip_id": {
+                "$oid": "56081ad3f6858f3a71f65e1f"
+            }
         }, 
         "_id": {
             "$oid": "56081ad3f6858f3a71f65e5f"
         }, 
-        "trip_id": {
-            "$oid": "56081ad3f6858f3a71f65e1f"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "0763de67f61e3f5d90e7518e69793954"
         }, 
-        "sensed_mode": 2, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0762597, 
-                37.3941335
-            ]
-        }, 
-        "end_ts": 1440209000.782, 
-        "start_ts": 1440208824.19, 
-        "start_fmt_time": "2015-08-21 19:00:24.190000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0785894, 
-                37.39437
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-21 19:03:20.782000-07:00", 
-        "duration": 176.5920000076294, 
-        "start_stop": {
-            "$oid": "56081ad3f6858f3a71f65e62"
-        }, 
-        "end_stop": {
-            "$oid": "56081ad3f6858f3a71f65e64"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.828149-07:00", 
+            "write_ts": 1461205571.828149, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "0763de67f61e3f5d90e7518e69793954"
+            }, 
+            "sensed_mode": 2, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0762597, 
+                    37.3941335
+                ]
+            }, 
+            "end_ts": 1440209000.782, 
+            "start_ts": 1440208824.19, 
+            "start_fmt_time": "2015-08-21 19:00:24.190000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0785894, 
+                    37.39437
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-21 19:03:20.782000-07:00", 
+            "duration": 176.5920000076294, 
+            "start_stop": {
+                "$oid": "56081ad3f6858f3a71f65e62"
+            }, 
+            "end_stop": {
+                "$oid": "56081ad3f6858f3a71f65e64"
+            }, 
+            "_id": {
+                "$oid": "56081ad3f6858f3a71f65e61"
+            }, 
+            "trip_id": {
+                "$oid": "56081ad3f6858f3a71f65e1f"
+            }
         }, 
         "_id": {
             "$oid": "56081ad3f6858f3a71f65e61"
         }, 
-        "trip_id": {
-            "$oid": "56081ad3f6858f3a71f65e1f"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "0763de67f61e3f5d90e7518e69793954"
         }, 
-        "sensed_mode": 1, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0798011, 
-                37.3941812
-            ]
-        }, 
-        "end_ts": 1440209488.817, 
-        "start_ts": 1440209030.855, 
-        "start_fmt_time": "2015-08-21 19:03:50.855000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0862011, 
-                37.3910039
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-21 19:11:28.817000-07:00", 
-        "duration": 457.9619998931885, 
-        "start_stop": {
-            "$oid": "56081ad3f6858f3a71f65e64"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.829442-07:00", 
+            "write_ts": 1461205571.829442, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "0763de67f61e3f5d90e7518e69793954"
+            }, 
+            "sensed_mode": 1, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0798011, 
+                    37.3941812
+                ]
+            }, 
+            "end_ts": 1440209488.817, 
+            "start_ts": 1440209030.855, 
+            "start_fmt_time": "2015-08-21 19:03:50.855000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0862011, 
+                    37.3910039
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-21 19:11:28.817000-07:00", 
+            "duration": 457.9619998931885, 
+            "start_stop": {
+                "$oid": "56081ad3f6858f3a71f65e64"
+            }, 
+            "_id": {
+                "$oid": "56081ad3f6858f3a71f65e63"
+            }, 
+            "trip_id": {
+                "$oid": "56081ad3f6858f3a71f65e1f"
+            }
         }, 
         "_id": {
             "$oid": "56081ad3f6858f3a71f65e63"
         }, 
-        "trip_id": {
-            "$oid": "56081ad3f6858f3a71f65e1f"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "0763de67f61e3f5d90e7518e69793954"
         }, 
-        "sensed_mode": 1, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0814687, 
-                37.3918311
-            ]
-        }, 
-        "end_ts": 1440283952.002, 
-        "start_ts": 1440283226.712, 
-        "start_fmt_time": "2015-08-22 15:40:26.712000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0847274, 
-                37.3930518
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-22 15:52:32.002000-07:00", 
-        "duration": 725.2900002002716, 
-        "end_stop": {
-            "$oid": "56081ad5f6858f3a71f65e6c"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.830742-07:00", 
+            "write_ts": 1461205571.830742, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "0763de67f61e3f5d90e7518e69793954"
+            }, 
+            "sensed_mode": 1, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0814687, 
+                    37.3918311
+                ]
+            }, 
+            "end_ts": 1440283952.002, 
+            "start_ts": 1440283226.712, 
+            "start_fmt_time": "2015-08-22 15:40:26.712000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0847274, 
+                    37.3930518
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-22 15:52:32.002000-07:00", 
+            "duration": 725.2900002002716, 
+            "end_stop": {
+                "$oid": "56081ad5f6858f3a71f65e6c"
+            }, 
+            "_id": {
+                "$oid": "56081ad5f6858f3a71f65e6a"
+            }, 
+            "trip_id": {
+                "$oid": "56081ad3f6858f3a71f65e2d"
+            }
         }, 
         "_id": {
             "$oid": "56081ad5f6858f3a71f65e6a"
         }, 
-        "trip_id": {
-            "$oid": "56081ad3f6858f3a71f65e2d"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "0763de67f61e3f5d90e7518e69793954"
         }, 
-        "sensed_mode": 2, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.084914, 
-                37.3929512
-            ]
-        }, 
-        "end_ts": 1440284015.643, 
-        "start_ts": 1440283983.808, 
-        "start_fmt_time": "2015-08-22 15:53:03.808000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.084924, 
-                37.3929551
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-22 15:53:35.643000-07:00", 
-        "duration": 31.834999799728394, 
-        "start_stop": {
-            "$oid": "56081ad5f6858f3a71f65e6c"
-        }, 
-        "end_stop": {
-            "$oid": "56081ad5f6858f3a71f65e6e"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.832024-07:00", 
+            "write_ts": 1461205571.832024, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "0763de67f61e3f5d90e7518e69793954"
+            }, 
+            "sensed_mode": 2, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.084914, 
+                    37.3929512
+                ]
+            }, 
+            "end_ts": 1440284015.643, 
+            "start_ts": 1440283983.808, 
+            "start_fmt_time": "2015-08-22 15:53:03.808000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.084924, 
+                    37.3929551
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-22 15:53:35.643000-07:00", 
+            "duration": 31.834999799728394, 
+            "start_stop": {
+                "$oid": "56081ad5f6858f3a71f65e6c"
+            }, 
+            "end_stop": {
+                "$oid": "56081ad5f6858f3a71f65e6e"
+            }, 
+            "_id": {
+                "$oid": "56081ad5f6858f3a71f65e6b"
+            }, 
+            "trip_id": {
+                "$oid": "56081ad3f6858f3a71f65e2d"
+            }
         }, 
         "_id": {
             "$oid": "56081ad5f6858f3a71f65e6b"
         }, 
-        "trip_id": {
-            "$oid": "56081ad3f6858f3a71f65e2d"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "0763de67f61e3f5d90e7518e69793954"
         }, 
-        "sensed_mode": 1, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0850502, 
-                37.3928465
-            ]
-        }, 
-        "end_ts": 1440284077.135, 
-        "start_ts": 1440284047.474, 
-        "start_fmt_time": "2015-08-22 15:54:07.474000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0860199, 
-                37.3911957
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-22 15:54:37.135000-07:00", 
-        "duration": 29.66100001335144, 
-        "start_stop": {
-            "$oid": "56081ad5f6858f3a71f65e6e"
-        }, 
-        "end_stop": {
-            "$oid": "56081ad5f6858f3a71f65e70"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.833170-07:00", 
+            "write_ts": 1461205571.83317, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "0763de67f61e3f5d90e7518e69793954"
+            }, 
+            "sensed_mode": 1, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0850502, 
+                    37.3928465
+                ]
+            }, 
+            "end_ts": 1440284077.135, 
+            "start_ts": 1440284047.474, 
+            "start_fmt_time": "2015-08-22 15:54:07.474000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0860199, 
+                    37.3911957
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-22 15:54:37.135000-07:00", 
+            "duration": 29.66100001335144, 
+            "start_stop": {
+                "$oid": "56081ad5f6858f3a71f65e6e"
+            }, 
+            "end_stop": {
+                "$oid": "56081ad5f6858f3a71f65e70"
+            }, 
+            "_id": {
+                "$oid": "56081ad5f6858f3a71f65e6d"
+            }, 
+            "trip_id": {
+                "$oid": "56081ad3f6858f3a71f65e2d"
+            }
         }, 
         "_id": {
             "$oid": "56081ad5f6858f3a71f65e6d"
         }, 
-        "trip_id": {
-            "$oid": "56081ad3f6858f3a71f65e2d"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "0763de67f61e3f5d90e7518e69793954"
         }, 
-        "sensed_mode": 2, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0862347, 
-                37.3908994
-            ]
-        }, 
-        "end_ts": 1440284440.644, 
-        "start_ts": 1440284115.959, 
-        "start_fmt_time": "2015-08-22 15:55:15.959000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.088923, 
-                37.3911364
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-22 16:00:40.644000-07:00", 
-        "duration": 324.68499994277954, 
-        "start_stop": {
-            "$oid": "56081ad5f6858f3a71f65e70"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.834230-07:00", 
+            "write_ts": 1461205571.83423, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "0763de67f61e3f5d90e7518e69793954"
+            }, 
+            "sensed_mode": 2, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0862347, 
+                    37.3908994
+                ]
+            }, 
+            "end_ts": 1440284440.644, 
+            "start_ts": 1440284115.959, 
+            "start_fmt_time": "2015-08-22 15:55:15.959000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.088923, 
+                    37.3911364
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-22 16:00:40.644000-07:00", 
+            "duration": 324.68499994277954, 
+            "start_stop": {
+                "$oid": "56081ad5f6858f3a71f65e70"
+            }, 
+            "_id": {
+                "$oid": "56081ad5f6858f3a71f65e6f"
+            }, 
+            "trip_id": {
+                "$oid": "56081ad3f6858f3a71f65e2d"
+            }
         }, 
         "_id": {
             "$oid": "56081ad5f6858f3a71f65e6f"
         }, 
-        "trip_id": {
-            "$oid": "56081ad3f6858f3a71f65e2d"
+        "user_id": {
+            "$uuid": "0763de67f61e3f5d90e7518e69793954"
+        }, 
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.835290-07:00", 
+            "write_ts": 1461205571.83529, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
         }
     }, 
     {
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
-        }, 
-        "sensed_mode": 2, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.083262, 
-                37.4028433
-            ]
-        }, 
-        "end_ts": 1440430444.516, 
-        "start_ts": 1440430310.857, 
-        "start_fmt_time": "2015-08-24 08:31:50.857000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0776185, 
-                37.4001296
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-24 08:34:04.516000-07:00", 
-        "duration": 133.65899991989136, 
-        "end_stop": {
-            "$oid": "56082860f6858f3c7580ca0a"
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 2, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.083262, 
+                    37.4028433
+                ]
+            }, 
+            "end_ts": 1440430444.516, 
+            "start_ts": 1440430310.857, 
+            "start_fmt_time": "2015-08-24 08:31:50.857000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0776185, 
+                    37.4001296
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-24 08:34:04.516000-07:00", 
+            "duration": 133.65899991989136, 
+            "end_stop": {
+                "$oid": "56082860f6858f3c7580ca0a"
+            }, 
+            "_id": {
+                "$oid": "56082860f6858f3c7580ca08"
+            }, 
+            "trip_id": {
+                "$oid": "5608285cf6858f3c7580c8b9"
+            }
         }, 
         "_id": {
             "$oid": "56082860f6858f3c7580ca08"
         }, 
-        "trip_id": {
-            "$oid": "5608285cf6858f3c7580c8b9"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 1, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0779116, 
-                37.3990427
-            ]
-        }, 
-        "end_ts": 1440430537.559, 
-        "start_ts": 1440430475.271, 
-        "start_fmt_time": "2015-08-24 08:34:35.271000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0777983, 
-                37.3958024
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-24 08:35:37.559000-07:00", 
-        "duration": 62.28800010681152, 
-        "start_stop": {
-            "$oid": "56082860f6858f3c7580ca0a"
-        }, 
-        "end_stop": {
-            "$oid": "56082860f6858f3c7580ca0c"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.836701-07:00", 
+            "write_ts": 1461205571.836701, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 1, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0779116, 
+                    37.3990427
+                ]
+            }, 
+            "end_ts": 1440430537.559, 
+            "start_ts": 1440430475.271, 
+            "start_fmt_time": "2015-08-24 08:34:35.271000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0777983, 
+                    37.3958024
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-24 08:35:37.559000-07:00", 
+            "duration": 62.28800010681152, 
+            "start_stop": {
+                "$oid": "56082860f6858f3c7580ca0a"
+            }, 
+            "end_stop": {
+                "$oid": "56082860f6858f3c7580ca0c"
+            }, 
+            "_id": {
+                "$oid": "56082860f6858f3c7580ca09"
+            }, 
+            "trip_id": {
+                "$oid": "5608285cf6858f3c7580c8b9"
+            }
         }, 
         "_id": {
             "$oid": "56082860f6858f3c7580ca09"
         }, 
-        "trip_id": {
-            "$oid": "5608285cf6858f3c7580c8b9"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 2, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0778085, 
-                37.395746
-            ]
-        }, 
-        "end_ts": 1440430599.74, 
-        "start_ts": 1440430568.642, 
-        "start_fmt_time": "2015-08-24 08:36:08.642000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0768955, 
-                37.3970455
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-24 08:36:39.740000-07:00", 
-        "duration": 31.098000049591064, 
-        "start_stop": {
-            "$oid": "56082860f6858f3c7580ca0c"
-        }, 
-        "end_stop": {
-            "$oid": "56082860f6858f3c7580ca0e"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.838119-07:00", 
+            "write_ts": 1461205571.838119, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 2, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0778085, 
+                    37.395746
+                ]
+            }, 
+            "end_ts": 1440430599.74, 
+            "start_ts": 1440430568.642, 
+            "start_fmt_time": "2015-08-24 08:36:08.642000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0768955, 
+                    37.3970455
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-24 08:36:39.740000-07:00", 
+            "duration": 31.098000049591064, 
+            "start_stop": {
+                "$oid": "56082860f6858f3c7580ca0c"
+            }, 
+            "end_stop": {
+                "$oid": "56082860f6858f3c7580ca0e"
+            }, 
+            "_id": {
+                "$oid": "56082860f6858f3c7580ca0b"
+            }, 
+            "trip_id": {
+                "$oid": "5608285cf6858f3c7580c8b9"
+            }
         }, 
         "_id": {
             "$oid": "56082860f6858f3c7580ca0b"
         }, 
-        "trip_id": {
-            "$oid": "5608285cf6858f3c7580c8b9"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 1, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0777353, 
-                37.3955663
-            ]
-        }, 
-        "end_ts": 1440430726.322, 
-        "start_ts": 1440430630.286, 
-        "start_fmt_time": "2015-08-24 08:37:10.286000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.07776, 
-                37.3955898
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-24 08:38:46.322000-07:00", 
-        "duration": 96.03600001335144, 
-        "start_stop": {
-            "$oid": "56082860f6858f3c7580ca0e"
-        }, 
-        "end_stop": {
-            "$oid": "56082860f6858f3c7580ca10"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.839521-07:00", 
+            "write_ts": 1461205571.839521, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 1, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0777353, 
+                    37.3955663
+                ]
+            }, 
+            "end_ts": 1440430726.322, 
+            "start_ts": 1440430630.286, 
+            "start_fmt_time": "2015-08-24 08:37:10.286000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.07776, 
+                    37.3955898
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-24 08:38:46.322000-07:00", 
+            "duration": 96.03600001335144, 
+            "start_stop": {
+                "$oid": "56082860f6858f3c7580ca0e"
+            }, 
+            "end_stop": {
+                "$oid": "56082860f6858f3c7580ca10"
+            }, 
+            "_id": {
+                "$oid": "56082860f6858f3c7580ca0d"
+            }, 
+            "trip_id": {
+                "$oid": "5608285cf6858f3c7580c8b9"
+            }
         }, 
         "_id": {
             "$oid": "56082860f6858f3c7580ca0d"
         }, 
-        "trip_id": {
-            "$oid": "5608285cf6858f3c7580c8b9"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 2, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0777794, 
-                37.3956625
-            ]
-        }, 
-        "end_ts": 1440431444.931, 
-        "start_ts": 1440430758.322, 
-        "start_fmt_time": "2015-08-24 08:39:18.322000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0708444, 
-                37.3921075
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-24 08:50:44.931000-07:00", 
-        "duration": 686.6089999675751, 
-        "start_stop": {
-            "$oid": "56082860f6858f3c7580ca10"
-        }, 
-        "end_stop": {
-            "$oid": "56082860f6858f3c7580ca12"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.840842-07:00", 
+            "write_ts": 1461205571.840842, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 2, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0777794, 
+                    37.3956625
+                ]
+            }, 
+            "end_ts": 1440431444.931, 
+            "start_ts": 1440430758.322, 
+            "start_fmt_time": "2015-08-24 08:39:18.322000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0708444, 
+                    37.3921075
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-24 08:50:44.931000-07:00", 
+            "duration": 686.6089999675751, 
+            "start_stop": {
+                "$oid": "56082860f6858f3c7580ca10"
+            }, 
+            "end_stop": {
+                "$oid": "56082860f6858f3c7580ca12"
+            }, 
+            "_id": {
+                "$oid": "56082860f6858f3c7580ca0f"
+            }, 
+            "trip_id": {
+                "$oid": "5608285cf6858f3c7580c8b9"
+            }
         }, 
         "_id": {
             "$oid": "56082860f6858f3c7580ca0f"
         }, 
-        "trip_id": {
-            "$oid": "5608285cf6858f3c7580c8b9"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 0, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0647638, 
-                37.3902914
-            ]
-        }, 
-        "end_ts": 1440432183.741, 
-        "start_ts": 1440431475.368, 
-        "start_fmt_time": "2015-08-24 08:51:15.368000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -121.902722, 
-                37.3308447
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-24 09:03:03.741000-07:00", 
-        "duration": 708.3729999065399, 
-        "start_stop": {
-            "$oid": "56082860f6858f3c7580ca12"
-        }, 
-        "end_stop": {
-            "$oid": "56082860f6858f3c7580ca14"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.842119-07:00", 
+            "write_ts": 1461205571.842119, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 0, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0647638, 
+                    37.3902914
+                ]
+            }, 
+            "end_ts": 1440432183.741, 
+            "start_ts": 1440431475.368, 
+            "start_fmt_time": "2015-08-24 08:51:15.368000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.902722, 
+                    37.3308447
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-24 09:03:03.741000-07:00", 
+            "duration": 708.3729999065399, 
+            "start_stop": {
+                "$oid": "56082860f6858f3c7580ca12"
+            }, 
+            "end_stop": {
+                "$oid": "56082860f6858f3c7580ca14"
+            }, 
+            "_id": {
+                "$oid": "56082860f6858f3c7580ca11"
+            }, 
+            "trip_id": {
+                "$oid": "5608285cf6858f3c7580c8b9"
+            }
         }, 
         "_id": {
             "$oid": "56082860f6858f3c7580ca11"
         }, 
-        "trip_id": {
-            "$oid": "5608285cf6858f3c7580c8b9"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 2, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -121.902722, 
-                37.3308447
-            ]
-        }, 
-        "end_ts": 1440432439.533, 
-        "start_ts": 1440432211.391, 
-        "start_fmt_time": "2015-08-24 09:03:31.391000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -121.9036344, 
-                37.3284675
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-24 09:07:19.533000-07:00", 
-        "duration": 228.14199995994568, 
-        "start_stop": {
-            "$oid": "56082860f6858f3c7580ca14"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.843392-07:00", 
+            "write_ts": 1461205571.843392, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 2, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.902722, 
+                    37.3308447
+                ]
+            }, 
+            "end_ts": 1440432439.533, 
+            "start_ts": 1440432211.391, 
+            "start_fmt_time": "2015-08-24 09:03:31.391000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9036344, 
+                    37.3284675
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-24 09:07:19.533000-07:00", 
+            "duration": 228.14199995994568, 
+            "start_stop": {
+                "$oid": "56082860f6858f3c7580ca14"
+            }, 
+            "_id": {
+                "$oid": "56082860f6858f3c7580ca13"
+            }, 
+            "trip_id": {
+                "$oid": "5608285cf6858f3c7580c8b9"
+            }
         }, 
         "_id": {
             "$oid": "56082860f6858f3c7580ca13"
         }, 
-        "trip_id": {
-            "$oid": "5608285cf6858f3c7580c8b9"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 0, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0882077, 
-                37.3881928
-            ]
-        }, 
-        "end_ts": 1440518283.214, 
-        "start_ts": 1440517068.439, 
-        "start_fmt_time": "2015-08-25 08:37:48.439000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -121.9581249, 
-                37.2672553
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-25 08:58:03.214000-07:00", 
-        "duration": 1214.7750000953674, 
-        "end_stop": {
-            "$oid": "56082862f6858f3c7580ca32"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.844664-07:00", 
+            "write_ts": 1461205571.844664, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 0, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0882077, 
+                    37.3881928
+                ]
+            }, 
+            "end_ts": 1440518283.214, 
+            "start_ts": 1440517068.439, 
+            "start_fmt_time": "2015-08-25 08:37:48.439000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9581249, 
+                    37.2672553
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-25 08:58:03.214000-07:00", 
+            "duration": 1214.7750000953674, 
+            "end_stop": {
+                "$oid": "56082862f6858f3c7580ca32"
+            }, 
+            "_id": {
+                "$oid": "56082862f6858f3c7580ca30"
+            }, 
+            "trip_id": {
+                "$oid": "5608285df6858f3c7580c8c1"
+            }
         }, 
         "_id": {
             "$oid": "56082862f6858f3c7580ca30"
         }, 
-        "trip_id": {
-            "$oid": "5608285df6858f3c7580c8c1"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 2, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -121.9580543, 
-                37.2673721
-            ]
-        }, 
-        "end_ts": 1440544221.2, 
-        "start_ts": 1440518333.563, 
-        "start_fmt_time": "2015-08-25 08:58:53.563000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -121.9635608, 
-                37.259783
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-25 16:10:21.200000-07:00", 
-        "duration": 25887.637000083923, 
-        "start_stop": {
-            "$oid": "56082862f6858f3c7580ca32"
-        }, 
-        "end_stop": {
-            "$oid": "56082862f6858f3c7580ca34"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.845938-07:00", 
+            "write_ts": 1461205571.845938, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 2, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9580543, 
+                    37.2673721
+                ]
+            }, 
+            "end_ts": 1440544221.2, 
+            "start_ts": 1440518333.563, 
+            "start_fmt_time": "2015-08-25 08:58:53.563000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9635608, 
+                    37.259783
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-25 16:10:21.200000-07:00", 
+            "duration": 25887.637000083923, 
+            "start_stop": {
+                "$oid": "56082862f6858f3c7580ca32"
+            }, 
+            "end_stop": {
+                "$oid": "56082862f6858f3c7580ca34"
+            }, 
+            "_id": {
+                "$oid": "56082862f6858f3c7580ca31"
+            }, 
+            "trip_id": {
+                "$oid": "5608285df6858f3c7580c8c1"
+            }
         }, 
         "_id": {
             "$oid": "56082862f6858f3c7580ca31"
         }, 
-        "trip_id": {
-            "$oid": "5608285df6858f3c7580c8c1"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 0, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -121.99021, 
-                37.2706153
-            ]
-        }, 
-        "end_ts": 1440545197.339, 
-        "start_ts": 1440544330.421, 
-        "start_fmt_time": "2015-08-25 16:12:10.421000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0879948, 
-                37.3910872
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-25 16:26:37.339000-07:00", 
-        "duration": 866.9179999828339, 
-        "start_stop": {
-            "$oid": "56082862f6858f3c7580ca34"
-        }, 
-        "end_stop": {
-            "$oid": "56082862f6858f3c7580ca36"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.847086-07:00", 
+            "write_ts": 1461205571.847086, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 0, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.99021, 
+                    37.2706153
+                ]
+            }, 
+            "end_ts": 1440545197.339, 
+            "start_ts": 1440544330.421, 
+            "start_fmt_time": "2015-08-25 16:12:10.421000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0879948, 
+                    37.3910872
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-25 16:26:37.339000-07:00", 
+            "duration": 866.9179999828339, 
+            "start_stop": {
+                "$oid": "56082862f6858f3c7580ca34"
+            }, 
+            "end_stop": {
+                "$oid": "56082862f6858f3c7580ca36"
+            }, 
+            "_id": {
+                "$oid": "56082862f6858f3c7580ca33"
+            }, 
+            "trip_id": {
+                "$oid": "5608285df6858f3c7580c8c1"
+            }
         }, 
         "_id": {
             "$oid": "56082862f6858f3c7580ca33"
         }, 
-        "trip_id": {
-            "$oid": "5608285df6858f3c7580c8c1"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 2, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0881762, 
-                37.390765
-            ]
-        }, 
-        "end_ts": 1440545417.267, 
-        "start_ts": 1440545221.219, 
-        "start_fmt_time": "2015-08-25 16:27:01.219000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0877322, 
-                37.3887199
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-25 16:30:17.267000-07:00", 
-        "duration": 196.0479998588562, 
-        "start_stop": {
-            "$oid": "56082862f6858f3c7580ca36"
-        }, 
-        "end_stop": {
-            "$oid": "56082862f6858f3c7580ca38"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.848348-07:00", 
+            "write_ts": 1461205571.848348, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 2, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0881762, 
+                    37.390765
+                ]
+            }, 
+            "end_ts": 1440545417.267, 
+            "start_ts": 1440545221.219, 
+            "start_fmt_time": "2015-08-25 16:27:01.219000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0877322, 
+                    37.3887199
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-25 16:30:17.267000-07:00", 
+            "duration": 196.0479998588562, 
+            "start_stop": {
+                "$oid": "56082862f6858f3c7580ca36"
+            }, 
+            "end_stop": {
+                "$oid": "56082862f6858f3c7580ca38"
+            }, 
+            "_id": {
+                "$oid": "56082862f6858f3c7580ca35"
+            }, 
+            "trip_id": {
+                "$oid": "5608285df6858f3c7580c8c1"
+            }
         }, 
         "_id": {
             "$oid": "56082862f6858f3c7580ca35"
         }, 
-        "trip_id": {
-            "$oid": "5608285df6858f3c7580c8c1"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 0, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0879097, 
-                37.3886256
-            ]
-        }, 
-        "end_ts": 1440545964.213, 
-        "start_ts": 1440545449.414, 
-        "start_fmt_time": "2015-08-25 16:30:49.414000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0931936, 
-                37.3645939
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-25 16:39:24.213000-07:00", 
-        "duration": 514.7990000247955, 
-        "start_stop": {
-            "$oid": "56082862f6858f3c7580ca38"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.849405-07:00", 
+            "write_ts": 1461205571.849405, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 0, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0879097, 
+                    37.3886256
+                ]
+            }, 
+            "end_ts": 1440545964.213, 
+            "start_ts": 1440545449.414, 
+            "start_fmt_time": "2015-08-25 16:30:49.414000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0931936, 
+                    37.3645939
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-25 16:39:24.213000-07:00", 
+            "duration": 514.7990000247955, 
+            "start_stop": {
+                "$oid": "56082862f6858f3c7580ca38"
+            }, 
+            "_id": {
+                "$oid": "56082862f6858f3c7580ca37"
+            }, 
+            "trip_id": {
+                "$oid": "5608285df6858f3c7580c8c1"
+            }
         }, 
         "_id": {
             "$oid": "56082862f6858f3c7580ca37"
         }, 
-        "trip_id": {
-            "$oid": "5608285df6858f3c7580c8c1"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 1, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0850217, 
-                37.3928567
-            ]
-        }, 
-        "end_ts": 1440775525.884, 
-        "start_ts": 1440774944.444, 
-        "start_fmt_time": "2015-08-28 08:15:44.444000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0847203, 
-                37.4034896
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-28 08:25:25.884000-07:00", 
-        "duration": 581.4400000572205, 
-        "end_stop": {
-            "$oid": "56082868f6858f3c7580ca4b"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.850461-07:00", 
+            "write_ts": 1461205571.850461, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 1, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0850217, 
+                    37.3928567
+                ]
+            }, 
+            "end_ts": 1440775525.884, 
+            "start_ts": 1440774944.444, 
+            "start_fmt_time": "2015-08-28 08:15:44.444000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0847203, 
+                    37.4034896
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-28 08:25:25.884000-07:00", 
+            "duration": 581.4400000572205, 
+            "end_stop": {
+                "$oid": "56082868f6858f3c7580ca4b"
+            }, 
+            "_id": {
+                "$oid": "56082868f6858f3c7580ca49"
+            }, 
+            "trip_id": {
+                "$oid": "5608285df6858f3c7580c8e5"
+            }
         }, 
         "_id": {
             "$oid": "56082868f6858f3c7580ca49"
         }, 
-        "trip_id": {
-            "$oid": "5608285df6858f3c7580c8e5"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 2, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0843526, 
-                37.4036318
-            ]
-        }, 
-        "end_ts": 1440775741.8, 
-        "start_ts": 1440775556.927, 
-        "start_fmt_time": "2015-08-28 08:25:56.927000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0837477, 
-                37.4039396
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-08-28 08:29:01.800000-07:00", 
-        "duration": 184.87299990653992, 
-        "start_stop": {
-            "$oid": "56082868f6858f3c7580ca4b"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.851361-07:00", 
+            "write_ts": 1461205571.851361, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 2, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0843526, 
+                    37.4036318
+                ]
+            }, 
+            "end_ts": 1440775741.8, 
+            "start_ts": 1440775556.927, 
+            "start_fmt_time": "2015-08-28 08:25:56.927000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0837477, 
+                    37.4039396
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-08-28 08:29:01.800000-07:00", 
+            "duration": 184.87299990653992, 
+            "start_stop": {
+                "$oid": "56082868f6858f3c7580ca4b"
+            }, 
+            "_id": {
+                "$oid": "56082868f6858f3c7580ca4a"
+            }, 
+            "trip_id": {
+                "$oid": "5608285df6858f3c7580c8e5"
+            }
         }, 
         "_id": {
             "$oid": "56082868f6858f3c7580ca4a"
         }, 
-        "trip_id": {
-            "$oid": "5608285df6858f3c7580c8e5"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 0, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -121.9073733, 
-                37.321086
-            ]
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.852259-07:00", 
+            "write_ts": 1461205571.852259, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 0, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9073733, 
+                    37.321086
+                ]
+            }, 
+            "end_ts": 1441208617.707, 
+            "start_ts": 1441207927.85, 
+            "start_fmt_time": "2015-09-02 08:32:07.850000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.948556, 
+                    37.2792126
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-09-02 08:43:37.707000-07:00", 
+            "duration": 689.8570001125336, 
+            "_id": {
+                "$oid": "56082872f6858f3c7580ca8e"
+            }, 
+            "trip_id": {
+                "$oid": "5608285df6858f3c7580c91d"
+            }
         }, 
-        "end_ts": 1441208617.707, 
-        "start_ts": 1441207927.85, 
-        "start_fmt_time": "2015-09-02 08:32:07.850000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -121.948556, 
-                37.2792126
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-09-02 08:43:37.707000-07:00", 
-        "duration": 689.8570001125336, 
         "_id": {
             "$oid": "56082872f6858f3c7580ca8e"
         }, 
-        "trip_id": {
-            "$oid": "5608285df6858f3c7580c91d"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 1, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0847801, 
-                37.4013634
-            ]
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.853156-07:00", 
+            "write_ts": 1461205571.853156, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 1, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0847801, 
+                    37.4013634
+                ]
+            }, 
+            "end_ts": 1441294761.32, 
+            "start_ts": 1441294275.322, 
+            "start_fmt_time": "2015-09-03 08:31:15.322000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0862756, 
+                    37.3909557
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-09-03 08:39:21.320000-07:00", 
+            "duration": 485.9979999065399, 
+            "_id": {
+                "$oid": "56082875f6858f3c7580caa3"
+            }, 
+            "trip_id": {
+                "$oid": "5608285df6858f3c7580c931"
+            }
         }, 
-        "end_ts": 1441294761.32, 
-        "start_ts": 1441294275.322, 
-        "start_fmt_time": "2015-09-03 08:31:15.322000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0862756, 
-                37.3909557
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-09-03 08:39:21.320000-07:00", 
-        "duration": 485.9979999065399, 
         "_id": {
             "$oid": "56082875f6858f3c7580caa3"
         }, 
-        "trip_id": {
-            "$oid": "5608285df6858f3c7580c931"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 0, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0861897, 
-                37.3910416
-            ]
-        }, 
-        "end_ts": 1441325489.635, 
-        "start_ts": 1441325092.945, 
-        "start_fmt_time": "2015-09-03 17:04:52.945000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.080605, 
-                37.3923507
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-09-03 17:11:29.635000-07:00", 
-        "duration": 396.69000005722046, 
-        "end_stop": {
-            "$oid": "56082876f6858f3c7580caa8"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.854055-07:00", 
+            "write_ts": 1461205571.854055, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 0, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0861897, 
+                    37.3910416
+                ]
+            }, 
+            "end_ts": 1441325489.635, 
+            "start_ts": 1441325092.945, 
+            "start_fmt_time": "2015-09-03 17:04:52.945000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.080605, 
+                    37.3923507
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-09-03 17:11:29.635000-07:00", 
+            "duration": 396.69000005722046, 
+            "end_stop": {
+                "$oid": "56082876f6858f3c7580caa8"
+            }, 
+            "_id": {
+                "$oid": "56082876f6858f3c7580caa6"
+            }, 
+            "trip_id": {
+                "$oid": "5608285df6858f3c7580c939"
+            }
         }, 
         "_id": {
             "$oid": "56082876f6858f3c7580caa6"
         }, 
-        "trip_id": {
-            "$oid": "5608285df6858f3c7580c939"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 2, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0803711, 
-                37.3923188
-            ]
-        }, 
-        "end_ts": 1441325719.161, 
-        "start_ts": 1441325513.044, 
-        "start_fmt_time": "2015-09-03 17:11:53.044000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0801769, 
-                37.3921698
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-09-03 17:15:19.161000-07:00", 
-        "duration": 206.11700010299683, 
-        "start_stop": {
-            "$oid": "56082876f6858f3c7580caa8"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.854953-07:00", 
+            "write_ts": 1461205571.854953, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 2, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0803711, 
+                    37.3923188
+                ]
+            }, 
+            "end_ts": 1441325719.161, 
+            "start_ts": 1441325513.044, 
+            "start_fmt_time": "2015-09-03 17:11:53.044000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0801769, 
+                    37.3921698
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-09-03 17:15:19.161000-07:00", 
+            "duration": 206.11700010299683, 
+            "start_stop": {
+                "$oid": "56082876f6858f3c7580caa8"
+            }, 
+            "_id": {
+                "$oid": "56082876f6858f3c7580caa7"
+            }, 
+            "trip_id": {
+                "$oid": "5608285df6858f3c7580c939"
+            }
         }, 
         "_id": {
             "$oid": "56082876f6858f3c7580caa7"
         }, 
-        "trip_id": {
-            "$oid": "5608285df6858f3c7580c939"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 0, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0865169, 
-                37.3986848
-            ]
-        }, 
-        "end_ts": 1441644047.362, 
-        "start_ts": 1441639379.149, 
-        "start_fmt_time": "2015-09-07 08:22:59.149000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.3948396, 
-                37.7761944
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-09-07 09:40:47.362000-07:00", 
-        "duration": 4668.213000059128, 
-        "end_stop": {
-            "$oid": "5608287af6858f3c7580cac2"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.855889-07:00", 
+            "write_ts": 1461205571.855889, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 0, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0865169, 
+                    37.3986848
+                ]
+            }, 
+            "end_ts": 1441644047.362, 
+            "start_ts": 1441639379.149, 
+            "start_fmt_time": "2015-09-07 08:22:59.149000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.3948396, 
+                    37.7761944
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-09-07 09:40:47.362000-07:00", 
+            "duration": 4668.213000059128, 
+            "end_stop": {
+                "$oid": "5608287af6858f3c7580cac2"
+            }, 
+            "_id": {
+                "$oid": "5608287af6858f3c7580cac0"
+            }, 
+            "trip_id": {
+                "$oid": "5608285df6858f3c7580c94f"
+            }
         }, 
         "_id": {
             "$oid": "5608287af6858f3c7580cac0"
         }, 
-        "trip_id": {
-            "$oid": "5608285df6858f3c7580c94f"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 2, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.394767, 
-                37.7761847
-            ]
-        }, 
-        "end_ts": 1441644140.933, 
-        "start_ts": 1441644078.404, 
-        "start_fmt_time": "2015-09-07 09:41:18.404000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.394481, 
-                37.7766259
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-09-07 09:42:20.933000-07:00", 
-        "duration": 62.52900004386902, 
-        "start_stop": {
-            "$oid": "5608287af6858f3c7580cac2"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.856846-07:00", 
+            "write_ts": 1461205571.856846, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 2, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.394767, 
+                    37.7761847
+                ]
+            }, 
+            "end_ts": 1441644140.933, 
+            "start_ts": 1441644078.404, 
+            "start_fmt_time": "2015-09-07 09:41:18.404000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.394481, 
+                    37.7766259
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-09-07 09:42:20.933000-07:00", 
+            "duration": 62.52900004386902, 
+            "start_stop": {
+                "$oid": "5608287af6858f3c7580cac2"
+            }, 
+            "_id": {
+                "$oid": "5608287af6858f3c7580cac1"
+            }, 
+            "trip_id": {
+                "$oid": "5608285df6858f3c7580c94f"
+            }
         }, 
         "_id": {
             "$oid": "5608287af6858f3c7580cac1"
         }, 
-        "trip_id": {
-            "$oid": "5608285df6858f3c7580c94f"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 2, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0777908, 
-                37.3957365
-            ]
-        }, 
-        "end_ts": 1441916436.169, 
-        "start_ts": 1441916100.282, 
-        "start_fmt_time": "2015-09-10 13:15:00.282000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0806415, 
-                37.3990814
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-09-10 13:20:36.169000-07:00", 
-        "duration": 335.88699984550476, 
-        "end_stop": {
-            "$oid": "56082885f6858f3c7580caf0"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.857771-07:00", 
+            "write_ts": 1461205571.857771, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 2, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0777908, 
+                    37.3957365
+                ]
+            }, 
+            "end_ts": 1441916436.169, 
+            "start_ts": 1441916100.282, 
+            "start_fmt_time": "2015-09-10 13:15:00.282000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0806415, 
+                    37.3990814
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-09-10 13:20:36.169000-07:00", 
+            "duration": 335.88699984550476, 
+            "end_stop": {
+                "$oid": "56082885f6858f3c7580caf0"
+            }, 
+            "_id": {
+                "$oid": "56082885f6858f3c7580caee"
+            }, 
+            "trip_id": {
+                "$oid": "5608285df6858f3c7580c98b"
+            }
         }, 
         "_id": {
             "$oid": "56082885f6858f3c7580caee"
         }, 
-        "trip_id": {
-            "$oid": "5608285df6858f3c7580c98b"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 0, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0812412, 
-                37.3977716
-            ]
-        }, 
-        "end_ts": 1441916467.368, 
-        "start_ts": 1441916467.368, 
-        "start_fmt_time": "2015-09-10 13:21:07.368000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0812412, 
-                37.3977716
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-09-10 13:21:07.368000-07:00", 
-        "duration": 0.0, 
-        "start_stop": {
-            "$oid": "56082885f6858f3c7580caf0"
-        }, 
-        "end_stop": {
-            "$oid": "56082885f6858f3c7580caf2"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.858695-07:00", 
+            "write_ts": 1461205571.858695, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 0, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0812412, 
+                    37.3977716
+                ]
+            }, 
+            "end_ts": 1441916467.368, 
+            "start_ts": 1441916467.368, 
+            "start_fmt_time": "2015-09-10 13:21:07.368000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0812412, 
+                    37.3977716
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-09-10 13:21:07.368000-07:00", 
+            "duration": 0.0, 
+            "start_stop": {
+                "$oid": "56082885f6858f3c7580caf0"
+            }, 
+            "end_stop": {
+                "$oid": "56082885f6858f3c7580caf2"
+            }, 
+            "_id": {
+                "$oid": "56082885f6858f3c7580caef"
+            }, 
+            "trip_id": {
+                "$oid": "5608285df6858f3c7580c98b"
+            }
         }, 
         "_id": {
             "$oid": "56082885f6858f3c7580caef"
         }, 
-        "trip_id": {
-            "$oid": "5608285df6858f3c7580c98b"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 2, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0807356, 
-                37.3993239
-            ]
-        }, 
-        "end_ts": 1441917622.318, 
-        "start_ts": 1441916498.405, 
-        "start_fmt_time": "2015-09-10 13:21:38.405000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0862768, 
-                37.3909523
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-09-10 13:40:22.318000-07:00", 
-        "duration": 1123.9130001068115, 
-        "start_stop": {
-            "$oid": "56082885f6858f3c7580caf2"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.859622-07:00", 
+            "write_ts": 1461205571.859622, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 2, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0807356, 
+                    37.3993239
+                ]
+            }, 
+            "end_ts": 1441917622.318, 
+            "start_ts": 1441916498.405, 
+            "start_fmt_time": "2015-09-10 13:21:38.405000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0862768, 
+                    37.3909523
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-09-10 13:40:22.318000-07:00", 
+            "duration": 1123.9130001068115, 
+            "start_stop": {
+                "$oid": "56082885f6858f3c7580caf2"
+            }, 
+            "_id": {
+                "$oid": "56082885f6858f3c7580caf1"
+            }, 
+            "trip_id": {
+                "$oid": "5608285df6858f3c7580c98b"
+            }
         }, 
         "_id": {
             "$oid": "56082885f6858f3c7580caf1"
         }, 
-        "trip_id": {
-            "$oid": "5608285df6858f3c7580c98b"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 0, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0861761, 
-                37.3910551
-            ]
-        }, 
-        "end_ts": 1441919902.188, 
-        "start_ts": 1441918676.649, 
-        "start_fmt_time": "2015-09-10 13:57:56.649000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0805292, 
-                37.3999937
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-09-10 14:18:22.188000-07:00", 
-        "duration": 1225.5390000343323, 
-        "end_stop": {
-            "$oid": "56082886f6858f3c7580caf6"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.860898-07:00", 
+            "write_ts": 1461205571.860898, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 0, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0861761, 
+                    37.3910551
+                ]
+            }, 
+            "end_ts": 1441919902.188, 
+            "start_ts": 1441918676.649, 
+            "start_fmt_time": "2015-09-10 13:57:56.649000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0805292, 
+                    37.3999937
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-09-10 14:18:22.188000-07:00", 
+            "duration": 1225.5390000343323, 
+            "end_stop": {
+                "$oid": "56082886f6858f3c7580caf6"
+            }, 
+            "_id": {
+                "$oid": "56082886f6858f3c7580caf4"
+            }, 
+            "trip_id": {
+                "$oid": "5608285df6858f3c7580c98f"
+            }
         }, 
         "_id": {
             "$oid": "56082886f6858f3c7580caf4"
         }, 
-        "trip_id": {
-            "$oid": "5608285df6858f3c7580c98f"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 2, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0806988, 
-                37.3996232
-            ]
-        }, 
-        "end_ts": 1441920589.611, 
-        "start_ts": 1441919933.203, 
-        "start_fmt_time": "2015-09-10 14:18:53.203000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0806359, 
-                37.3998045
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-09-10 14:29:49.611000-07:00", 
-        "duration": 656.4079999923706, 
-        "start_stop": {
-            "$oid": "56082886f6858f3c7580caf6"
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.862358-07:00", 
+            "write_ts": 1461205571.862358, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 2, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0806988, 
+                    37.3996232
+                ]
+            }, 
+            "end_ts": 1441920589.611, 
+            "start_ts": 1441919933.203, 
+            "start_fmt_time": "2015-09-10 14:18:53.203000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0806359, 
+                    37.3998045
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-09-10 14:29:49.611000-07:00", 
+            "duration": 656.4079999923706, 
+            "start_stop": {
+                "$oid": "56082886f6858f3c7580caf6"
+            }, 
+            "_id": {
+                "$oid": "56082886f6858f3c7580caf5"
+            }, 
+            "trip_id": {
+                "$oid": "5608285df6858f3c7580c98f"
+            }
         }, 
         "_id": {
             "$oid": "56082886f6858f3c7580caf5"
         }, 
-        "trip_id": {
-            "$oid": "5608285df6858f3c7580c98f"
-        }
-    }, 
-    {
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "sensed_mode": 0, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0798907, 
-                37.3965131
-            ]
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.863773-07:00", 
+            "write_ts": 1461205571.863773, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
+        }
+    }, 
+    {
+        "data": {
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "sensed_mode": 0, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0798907, 
+                    37.3965131
+                ]
+            }, 
+            "end_ts": 1441930612.622, 
+            "start_ts": 1441930110.729, 
+            "start_fmt_time": "2015-09-10 17:08:30.729000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0881734, 
+                    37.3907896
+                ]
+            }, 
+            "source": "SmoothedHighConfidenceMotion", 
+            "end_fmt_time": "2015-09-10 17:16:52.622000-07:00", 
+            "duration": 501.89299988746643, 
+            "_id": {
+                "$oid": "56082888f6858f3c7580cafc"
+            }, 
+            "trip_id": {
+                "$oid": "5608285df6858f3c7580c999"
+            }
         }, 
-        "end_ts": 1441930612.622, 
-        "start_ts": 1441930110.729, 
-        "start_fmt_time": "2015-09-10 17:08:30.729000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0881734, 
-                37.3907896
-            ]
-        }, 
-        "source": "SmoothedHighConfidenceMotion", 
-        "end_fmt_time": "2015-09-10 17:16:52.622000-07:00", 
-        "duration": 501.89299988746643, 
         "_id": {
             "$oid": "56082888f6858f3c7580cafc"
         }, 
-        "trip_id": {
-            "$oid": "5608285df6858f3c7580c999"
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:26:11.865130-07:00", 
+            "write_ts": 1461205571.86513, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 11, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 26
+            }, 
+            "key": "segmentation/raw_section"
         }
     }
 ]
