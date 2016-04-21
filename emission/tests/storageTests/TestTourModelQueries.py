@@ -1,4 +1,5 @@
 import unittest
+import logging
 
 import emission.storage.decorations.tour_model_queries as esdtmq
 import emission.core.get_database as edb
@@ -34,9 +35,11 @@ class TestTourModelQueries(unittest.TestCase):
         fake_user_id = "new_fake"
         esdtmq.make_tour_model_from_raw_user_data(fake_user_id)
         tm = esdtmq.get_tour_model(fake_user_id)
+        logging.debug("in testNoData, tour model = %s" % tm)
         self.assertTrue(len(tm["common_places"]) == 0)
         self.assertTrue(len(tm["common_trips"]) == 0)
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
     unittest.main()
