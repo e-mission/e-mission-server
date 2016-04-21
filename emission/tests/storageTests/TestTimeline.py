@@ -89,7 +89,7 @@ class TestTimeline(unittest.TestCase):
         for i, element in enumerate(tl):
             logging.debug("%s: %s" % (i, type(element)))
             curr_type = self.get_type(element)
-            if curr_type == ecwt.Trip:
+            if curr_type == ecwrt.Rawtrip:
                 curr_tl = esdtq.get_timeline_for_trip(self.testUUID, element.get_id())
                 logging.debug("Got timeline %s for trip %s" % (curr_tl, element.start_fmt_time))
                 prev_sub_type = None
