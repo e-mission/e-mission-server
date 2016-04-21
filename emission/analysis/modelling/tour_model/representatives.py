@@ -5,8 +5,7 @@ import copy
 
 # our imports
 from emission.core.wrapper.trip_old import Trip, Coordinate
-import emission.storage.decorations.trip_queries as esdtq
-import emission.storage.decorations.place_queries as esdpq
+import emission.storage.decorations.analysis_timeseries_queries as esda
 
 
 """
@@ -147,8 +146,8 @@ class representatives:
             start_places = []
             end_places = []
             for t in self.tour_dict[i]["sections"]:
-                start = esdpq.get_place(t.start_place)
-                end = esdpq.get_place(t.end_place)
+                start = esda.get_object(esda.RAW_PLACE_KEY, t.data.start_place)
+                end = esda.get_object(esda.RAW_PLACE_KEY, t.data.end_place)
                 start_places.append(start)
                 end_places.append(end)
             self.tour_dict[i]["start_places"] = start_places

@@ -51,6 +51,7 @@ def read_data(uuid=None, size=None, old=True):
 
     if old:
         data = []
+        trip_db = db
         if uuid:
             trips = trip_db.find({'user_id' : uuid, 'type' : 'move'})
         else:
