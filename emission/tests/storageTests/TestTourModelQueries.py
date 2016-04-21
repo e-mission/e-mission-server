@@ -20,6 +20,8 @@ class TestTourModelQueries(unittest.TestCase):
     def tearDown(self):
         edb.get_timeseries_db().remove({"user_id": self.testUUID})
         edb.get_analysis_timeseries_db().remove({"user_id": self.testUUID})
+        edb.get_timeseries_db().remove({"user_id": "new_fake"})
+        edb.get_analysis_timeseries_db().remove({"user_id": "new_fake"})
         edb.get_common_trip_db().drop()
         edb.get_common_place_db().drop()
 
