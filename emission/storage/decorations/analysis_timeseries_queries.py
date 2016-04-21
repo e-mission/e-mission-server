@@ -31,11 +31,10 @@ def get_entries(key, user_id, time_query, geo_query=None):
     else:
         ts = esta.TimeSeries.get_aggregate_time_series()
     doc_cursor = ts.find_entries([key], time_query, geo_query)
-    logging.debug("get_entries returned %s results" % )
     # TODO: Fix "Tde    ipIterator" and return it instead of this list
-    curr_query = [ecwe.Entry(doc) for doc in doc_cursor]
-    logging.debug("Returning entry with length %d result" % curr_query)
-    return
+    curr_entry_list = [ecwe.Entry(doc) for doc in doc_cursor]
+    logging.debug("Returning entry with length %d result" % len(curr_entry_list))
+    return curr_entry_list
 
 def get_aggregate_places(key, time_query, geo_query=None):
     result_cursor = esta.TimeSeries.get_aggregate_time_series().find_entries(
