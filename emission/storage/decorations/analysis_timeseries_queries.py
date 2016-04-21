@@ -26,7 +26,7 @@ def get_objects(key, user_id, time_query, geo_query=None):
                                                 geo_query=geo_query)]
 
 def get_entries(key, user_id, time_query, geo_query=None):
-    if user_id is None:
+    if user_id is not None:
         ts = esta.TimeSeries.get_time_series(user_id)
     else:
         ts = esta.TimeSeries.get_aggregate_time_series()
