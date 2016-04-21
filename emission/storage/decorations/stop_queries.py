@@ -1,49 +1,26 @@
 import logging
 import pymongo
 
-import emission.net.usercache.abstract_usercache as enua
+import emission.storage.timeseries.timequery as estt
+import emission.storage.timeseries.abstract_timeseries as esta
 
 import emission.core.get_database as edb
 import emission.core.wrapper.stop as ecws
-
-def _get_ts_query(tq):
-    time_key = tq.timeType
-    ret_query = {time_key : {"$lt": tq.endTs}}
-    if (tq.startTs is not None):
-        ret_query[time_key].update({"$gte": tq.startTs})
-    return ret_query
-
-def get_stops(user_id, time_query):
-    curr_query = _get_ts_query(time_query)
-    curr_query.update({"user_id": user_id})
-    return _get_stops_for_query(curr_query, time_query.timeType)
-
-def get_stop(stop_id):
-    return ecws.Stop(edb.get_stop_db().find_one({"_id": stop_id}))
-
-def get_time_query_for_stop(stop_id):
-    stop = get_stop(stop_id)
-    # logging.debug("for id %s, stop is %s" % (stop_id, stop))
-    return enua.UserCache.TimeQuery("write_ts", stop.enter_ts - 1, stop.exit_ts + 1)
-
-def create_new_stop(user_id, trip_id):
-    _id = edb.get_stop_db().save({'user_id': user_id, "trip_id": trip_id})
-    logging.debug("Created new stop %s for user %s" % (_id, user_id))
-    return ecws.Stop({"_id": _id, 'user_id': user_id, "trip_id": trip_id})
-
-def save_stop(stop):
-    edb.get_stop_db().save(stop)
+import emission.core.wrapper.entry as ecwe
 
 def get_stops_for_trip(user_id, trip_id):
-    curr_query = {"user_id": user_id, "trip_id": trip_id}
-    return _get_stops_for_query(curr_query, "enter_ts")
+    curr_query = {"user_id": user_id, "data.trip_id": trip_id}
+    return _get_stops_for_query(curr_query, "data.enter_ts")
 
 def get_stops_for_trip_list(user_id, trip_list):
-    curr_query = {"user_id": user_id, "trip_id": {"$in": trip_list}}
-    return _get_stops_for_query(curr_query, "enter_ts")
+    curr_query = {"user_id": user_id, "data.trip_id": {"$in": trip_list}}
+    return _get_stops_for_query(curr_query, "data.enter_ts")
 
 def _get_stops_for_query(stop_query, sort_key):
     logging.debug("Returning stops for query %s" % stop_query)
-    stop_doc_cursor = edb.get_stop_db().find(stop_query).sort(sort_key, pymongo.ASCENDING)
-    # TODO: Fix "TripIterator" and return it instead of this list
-    return [ecws.Stop(doc) for doc in stop_doc_cursor]
+    stop_query.update({"metadata.key": "segmentation/raw_stop"})
+    logging.debug("updated query = %s" % stop_query)
+    stop_doc_cursor = edb.get_analysis_timeseries_db().find(stop_query).sort(
+        sort_key, pymongo.ASCENDING)
+    logging.debug("result count = %d" % stop_doc_cursor.count())
+    return [ecwe.Entry(doc) for doc in stop_doc_cursor]

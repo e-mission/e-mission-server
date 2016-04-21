@@ -5,8 +5,7 @@ import copy
 
 # our imports
 from emission.core.wrapper.trip_old import Trip, Coordinate
-import emission.storage.decorations.trip_queries as esdtq
-import emission.storage.decorations.place_queries as esdpq
+import emission.storage.decorations.analysis_timeseries_queries as esda
 
 
 """
@@ -68,10 +67,10 @@ class representatives:
                     # We want (lat, lon) to be consistent with old above.
                     # But in the new, our data is in geojson so it is (lon, lat).
                     # Fix it by flipping the order of the indices
-                    points[0].append(c.start_loc["coordinates"][1])
-                    points[1].append(c.start_loc["coordinates"][0])
-                    points[2].append(c.end_loc["coordinates"][1])
-                    points[3].append(c.end_loc["coordinates"][0])                    
+                    points[0].append(c.data.start_loc["coordinates"][1])
+                    points[1].append(c.data.start_loc["coordinates"][0])
+                    points[2].append(c.data.end_loc["coordinates"][1])
+                    points[3].append(c.data.end_loc["coordinates"][0])
             centers = numpy.mean(points, axis=1)
             a = Trip(None, None, None, None, None, None, Coordinate(centers[0], centers[1]), Coordinate(centers[2], centers[3]))
             self.reps.append(a)
@@ -147,8 +146,8 @@ class representatives:
             start_places = []
             end_places = []
             for t in self.tour_dict[i]["sections"]:
-                start = esdpq.get_place(t.start_place)
-                end = esdpq.get_place(t.end_place)
+                start = esda.get_object(esda.RAW_PLACE_KEY, t.data.start_place)
+                end = esda.get_object(esda.RAW_PLACE_KEY, t.data.end_place)
                 start_places.append(start)
                 end_places.append(end)
             self.tour_dict[i]["start_places"] = start_places

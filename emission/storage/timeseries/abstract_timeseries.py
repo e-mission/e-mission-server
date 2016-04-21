@@ -6,6 +6,11 @@ class TimeSeries(object):
         import emission.storage.timeseries.builtin_timeseries as bits
         return bits.BuiltinTimeSeries(user_id)
 
+    @staticmethod
+    def get_aggregate_time_series():
+        import emission.storage.timeseries.aggregate_timeseries as bita
+        return bita.AggregateTimeSeries()
+
     def __init__(self, user_id):
         self.user_id = user_id
 
@@ -47,5 +52,16 @@ class TimeSeries(object):
     def insert(self, entry):
         pass
 
+    def insert_data(self, user_id, key, data):
+        pass
+
     def insert_error(self, entry):
+        pass
+
+    @staticmethod
+    def update(entry):
+        pass
+
+    @staticmethod
+    def update_data(user_id, key, obj_id, data):
         pass

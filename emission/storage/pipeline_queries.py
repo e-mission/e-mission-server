@@ -3,7 +3,7 @@ import datetime as pydt
 
 import emission.core.get_database as edb
 import emission.core.wrapper.pipelinestate as ps
-import emission.net.usercache.abstract_usercache as enua
+import emission.storage.timeseries.timequery as estt
 import emission.core.common
 
 import time
@@ -62,9 +62,14 @@ def mark_sectioning_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.SECTION_SEGMENTATION)
 
 def get_time_range_for_smoothing(user_id):
+    # type: (uuid.UUID) -> emission.storage.timeseries.timequery.TimeQuery
     # Returns the time range for the trips that have not yet been converted into sections.
     # Note that this is a query against the trip database, so we cannot search using the
     # "write_ts" query. Instead, we change the query to be against the trip's end_ts
+    """
+
+    :rtype: emission.storage.timeseries.timequery.TimeQuery
+    """
     tq = get_time_range_for_stage(user_id, ps.PipelineStages.JUMP_SMOOTHING)
     tq.timeType = "end_ts"
     return tq
@@ -158,7 +163,7 @@ def get_time_range_for_stage(user_id, stage):
     # entries.
     end_ts = time.time() - END_FUZZ_AVOID_LTE
 
-    ret_query = enua.UserCache.TimeQuery("write_ts", start_ts, end_ts)
+    ret_query = estt.TimeQuery("metadata.write_ts", start_ts, end_ts)
 
     curr_state.curr_run_ts = end_ts
     edb.get_pipeline_state_db().save(curr_state)

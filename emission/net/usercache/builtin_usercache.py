@@ -60,11 +60,7 @@ class BuiltinUserCache(ucauc.UserCache):
 
     @staticmethod
     def _get_ts_query(tq):
-        time_key = "metadata.%s" % tq.timeType
-        ret_query = {time_key : {"$lte": tq.endTs}}
-        if (tq.startTs is not None):
-            ret_query[time_key].update({"$gte": tq.startTs})
-        return ret_query
+        return tq.get_query()
 
     @staticmethod
     def get_uuid_list():
@@ -114,7 +110,7 @@ class BuiltinUserCache(ucauc.UserCache):
                 key_query_list.append(self.key_query(key))
             ret_query.update({"$or": key_query_list})
         if (time_query is not None):
-            ret_query.update(self.ts_query(time_query))
+            ret_query.update(time_query.get_query())
         return ret_query
 
     def getMessage(self, key_list = None, timeQuery = None):

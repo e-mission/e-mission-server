@@ -1,76 +1,44 @@
 import logging
 import pymongo
 
-import emission.net.usercache.abstract_usercache as enua
+import emission.storage.timeseries.timequery as estt
 
 import emission.core.get_database as edb
-import emission.core.wrapper.trip as ecwt
-import emission.core.wrapper.section as ecws
-import emission.core.wrapper.stop as ecwst
+import emission.core.wrapper.rawtrip as ecwrt
+import emission.core.wrapper.entry as ecwe
 
+import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.timeline as esdt
 
-def create_new_trip(user_id):
-    _id = edb.get_trip_new_db().save({"user_id": user_id})
-    return ecwt.Trip({"_id": _id, "user_id": user_id})
-
-
-def save_trip(trip):
-    edb.get_trip_new_db().save(trip)
-
-
-def _get_ts_query(tq):
-    time_key = tq.timeType
-    ret_query = {time_key: {"$lt": tq.endTs}}
-    if (tq.startTs is not None):
-        ret_query[time_key].update({"$gte": tq.startTs})
-    return ret_query
-
-
-def get_trips(user_id, time_query):
-    curr_query = _get_ts_query(time_query)
-    curr_query.update({"user_id": user_id})
-    trip_doc_cursor = edb.get_trip_new_db().find(curr_query).sort(time_query.timeType, pymongo.ASCENDING)
-    # TODO: Fix "TripIterator" and return it instead of this list
-    return [ecwt.Trip(doc) for doc in trip_doc_cursor]
-
-def get_aggregate_trips(time_query, box=None):
-    curr_query = _get_ts_query(time_query)
-    if box:
-        curr_query.update({"start_loc" : {"$geoWithin" : {"$box": box}}})
-        curr_query.update({"end_loc" : {"$geoWithin" : {"$box": box}}})
-    trip_doc_cursor = edb.get_trip_new_db().find(curr_query).sort(time_query.timeType, pymongo.ASCENDING)
-    return [ecwt.Trip(doc) for doc in trip_doc_cursor]
-
-
-def get_trip(trip_id):
-    """
-    Returns the trip for specified trip id.
-    :rtype : emission.core.wrapper.Trip
-    """
-    return ecwt.Trip(edb.get_trip_new_db().find_one({"_id": trip_id}))
-
-
-def get_time_query_for_trip(trip_id):
-    trip = get_trip(trip_id)
-    return enua.UserCache.TimeQuery("write_ts", trip.start_ts, trip.end_ts)
-
-
 def get_sections_for_trip(user_id, trip_id):
+    # type: (UUID, object_id) -> list(sections)
     """
     Get the set of sections that are children of this trip.
     """
-    section_doc_cursor = edb.get_section_new_db().find({"user_id": user_id, "trip_id": trip_id}).sort("start_ts", pymongo.ASCENDING)
-    return [ecws.Section(doc) for doc in section_doc_cursor]
+    query = {"user_id": user_id, "data.trip_id": trip_id,
+             "metadata.key": "segmentation/raw_section"}
+    section_doc_cursor = edb.get_analysis_timeseries_db().find(query).sort(
+        "data.start_ts", pymongo.ASCENDING)
+    logging.debug("Results for section query %s = %s" % (query, list(section_doc_cursor)))
+    section_doc_cursor = edb.get_analysis_timeseries_db().find(query).sort(
+        "data.start_ts", pymongo.ASCENDING)
+    return [ecwe.Entry(doc) for doc in section_doc_cursor]
 
 
 def get_stops_for_trip(user_id, trip_id):
     """
     Get the set of sections that are children of this trip.
     """
-    stop_doc_cursor = edb.get_stop_db().find({"user_id": user_id, "trip_id": trip_id}).sort("enter_ts", pymongo.ASCENDING)
-    logging.debug("About to execute query %s" % {"user_id": user_id, "trip_id": trip_id})
-    return [ecwst.Stop(doc) for doc in stop_doc_cursor]
+    query = {"user_id": user_id, "data.trip_id": trip_id,
+             "metadata.key": "segmentation/raw_stop"}
+    stop_doc_cursor = edb.get_analysis_timeseries_db().find(query).sort(
+        "data.enter_ts", pymongo.ASCENDING)
+    logging.debug("About to execute query %s" % query)
+    logging.debug(
+        "Results for stop query %s = %s" % (query, list(stop_doc_cursor)))
+    stop_doc_cursor = edb.get_analysis_timeseries_db().find(query).sort(
+        "data.enter_ts", pymongo.ASCENDING)
+    return [ecwe.Entry(doc) for doc in stop_doc_cursor]
 
 
 def get_timeline_for_trip(user_id, trip_id):

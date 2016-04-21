@@ -25,7 +25,7 @@ import emission.core.wrapper.section as ecwsc
 import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
 import emission.analysis.plotting.leaflet_osm.folium_geojson_plugin as fgjp
 
-import emission.net.usercache.abstract_usercache as enua
+import emission.storage.timeseries.timequery as estt
 import emission.net.api.usercache as enau
 
 all_color_list = ['black', 'brown', 'blue', 'chocolate', 'cyan', 'fuschia', 'green', 'lime', 'magenta', 'navy', 'pink', 'purple', 'red', 'snow', 'yellow']
@@ -115,13 +115,13 @@ def get_coords(feature):
 def get_maps_for_range_old(user_id, start_ts, end_ts):
     # First, get the timeline for that range.
     ts = esta.TimeSeries.get_time_series(user_id)
-    trip_list = esdt.get_trips(user_id, enua.UserCache.TimeQuery("start_ts", start_ts, end_ts))
+    trip_list = esdt.get_trips(user_id, estt.TimeQuery("data.start_ts", start_ts, end_ts))
     # TODO: Should the timeline support random access as well?
     # If it did, we wouldn't need this additional map
     # I think that it would be good to support a doubly linked list, i.e. prev and next in addition
     # to the iteration interface
-    place_list = esdp.get_places(user_id, enua.UserCache.TimeQuery("exit_ts", start_ts, end_ts))
-    place_list = place_list + (esdp.get_places(user_id, enua.UserCache.TimeQuery("enter_ts", start_ts, end_ts)))
+    place_list = esdp.get_places(user_id, estt.TimeQuery("data.exit_ts", start_ts, end_ts))
+    place_list = place_list + (esdp.get_places(user_id, estt.TimeQuery("data.enter_ts", start_ts, end_ts)))
     place_map = dict([(p.get_id(), p) for p in place_list])
     map_list = []
     flipped_midpoint = lambda(p1, p2): [(p1.coordinates[1] + p2.coordinates[1])/2,
