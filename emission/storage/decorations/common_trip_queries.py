@@ -81,13 +81,13 @@ def add_real_trip_id(trip, _id):
     trip.trips.append(_id)
 
 def get_start_hour(section_info):
-    return section_info.start_local_dt.hour
+    return section_info.data.start_local_dt.hour
 
 def get_day(section_info):
-    return section_info.start_local_dt.weekday
+    return section_info.data.start_local_dt.weekday
 
 def get_start_time(section_info):
-    return section_info.start_local_dt
+    return section_info.data.start_local_dt
 
 def increment_probability(trip, day, hour):
     trip.probabilites[day, hour] += 1
@@ -110,7 +110,7 @@ def set_up_trips(list_of_cluster_data, user_id):
         for sec in dct["sections"]:
             probabilites[get_day(sec), get_start_hour(sec)] += 1
             start_times.append(get_start_time(sec))
-            durations.append(sec.duration)
+            durations.append(sec.data.duration)
 
         trip = make_new_common_trip()
         trip.user_id = user_id

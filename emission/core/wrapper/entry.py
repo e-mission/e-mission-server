@@ -1,4 +1,6 @@
 import logging
+import bson.objectid as boi
+
 import emission.core.wrapper.wrapperbase as ecwb
 import emission.core.wrapper.metadata as ecwm
 
@@ -29,11 +31,21 @@ class Entry(ecwb.WrapperBase):
             "background/battery": "battery",
             "statemachine/transition": "transition",
             "config/sensor_config": "sensorconfig",
-            "analysis/smoothing": "smoothresults"}
+            "segmentation/raw_trip": "rawtrip",
+            "segmentation/raw_place": "rawplace",
+            "segmentation/raw_section": "section",
+            "segmentation/raw_stop": "stop",
+            "analysis/smoothing": "smoothresults",
+            "analysis/cleaned_trip": "cleanedtrip",
+            "analysis/cleaned_place": "cleanedplace",
+            "analysis/recreated_location": "recreatedlocation"
+            }
 
   @staticmethod
-  def create_entry(user_id, key, data):
+  def create_entry(user_id, key, data, create_id = False):
+      # type: (UUID, string, emission.core.wrapper.WrapperBase) -> emission.core.wrapper.Entry
       result_entry = Entry()
+      result_entry['_id'] = boi.ObjectId()
       result_entry.user_id = user_id
       result_entry.metadata = ecwm.Metadata.create_metadata_for_result(key)
       result_entry.data = data

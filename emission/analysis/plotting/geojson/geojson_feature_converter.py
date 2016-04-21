@@ -118,12 +118,14 @@ def section_to_geojson(section, tl):
         # Fudge the end point so that we don't have a gap because of the ts != write_ts mismatch
         # TODO: Fix this once we are able to query by the data timestamp instead of the metadata ts
         if section_location_array[-1].loc != section.end_loc:
-            last_loc_doc = ts.get_entry_at_ts("background/filtered_location", "data.ts", section.end_ts)
-            last_loc_data = ecwe.Entry(last_loc_doc).data
-            last_loc_data["_id"] = last_loc_doc["_id"]
-            section_location_array.append(last_loc_data)
-            logging.debug("Adding new entry %s to fill the end point gap between %s and %s"
-                % (last_loc_data.loc, section_location_array[-2].loc, section.end_loc))
+            assert("section_location_array[-1].loc != section.end_loc even after df.ts fix",
+                (section_location_array[-1].loc, section.end_loc))
+#             last_loc_doc = ts.get_entry_at_ts("background/filtered_location", "data.ts", section.end_ts)
+#             last_loc_data = ecwe.Entry(last_loc_doc).data
+#             last_loc_data["_id"] = last_loc_doc["_id"]
+#             section_location_array.append(last_loc_data)
+#             logging.debug("Adding new entry %s to fill the end point gap between %s and %s"
+#                 % (last_loc_data.loc, section_location_array[-2].loc, section.end_loc))
 
     # Find the list of points to filter
     filtered_points_entry_doc = ts.get_entry_at_ts("analysis/smoothing", "data.section",
@@ -255,7 +257,7 @@ def get_geojson_for_dt(user_id, start_local_dt, end_local_dt):
     tl.fill_start_end_places()
     return get_geojson_for_timeline(user_id, tl)
 
-def get_geojson_for_timeline(user_id, tl, viz=False):
+def get_geojson_for_timeline(user_id, tl):
     """
     tl represents the "timeline" object that is queried for the trips and locations
     """
@@ -275,7 +277,7 @@ def get_geojson_for_timeline(user_id, tl, viz=False):
                              (trip, trip_geojson.properties["distance"]))
             else:
                 # logging.debug("adding %s to list" % json.loads(json_util.dumps(trip_geojson)))
-                geojson_list.append(trip_geojson) if not viz else geojson_list.append(trip_geojson.features)
+                geojson_list.append(trip_geojson)
         except KeyError, e:
             # We ran into key errors while dealing with mixed filter trips.
             # I think those should be resolved for now, so we can raise the error again
@@ -291,10 +293,10 @@ def get_geojson_for_timeline(user_id, tl, viz=False):
 
 
 def get_all_points_for_range(user_id, key, start_ts, end_ts):
-    import emission.net.usercache.abstract_usercache as enua
+    import emission.storage.timeseries.timequery as estt
 #     import emission.core.wrapper.location as ecwl 
     
-    tq = enua.UserCache.TimeQuery("write_ts", start_ts, end_ts)
+    tq = estt.TimeQuery("metadata.write_ts", start_ts, end_ts)
     ts = esta.TimeSeries.get_time_series(user_id)
     entry_it = ts.find_entries([key], tq)
     points_array = [ecwl.Location(ts._to_df_entry(entry)) for entry in entry_it]

@@ -14,15 +14,6 @@
 
 # Let's switch to new-style classes finally!!
 class UserCache(object):
-    class TimeQuery(object):
-        """
-            Object that encapsulates a query for a particular time (read_ts, write_ts, or processed_ts)
-        """
-        def __init__(self, timeType, startTs, endTs):
-            self.timeType = timeType
-            self.startTs = startTs
-            self.endTs = endTs
-
     @staticmethod
     def getUserCache(uuid):
         """

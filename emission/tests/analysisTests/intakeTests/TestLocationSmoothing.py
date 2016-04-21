@@ -23,6 +23,7 @@ import emission.analysis.intake.cleaning.cleaning_methods.jump_smoothing as eaic
 
 import emission.storage.decorations.section_queries as esds
 import emission.storage.decorations.trip_queries as esdt
+import emission.storage.decorations.analysis_timeseries_queries as esda
 
 class TestLocationSmoothing(unittest.TestCase):
     def setUp(self):
@@ -33,32 +34,28 @@ class TestLocationSmoothing(unittest.TestCase):
         import uuid
 
         self.testUUID = uuid.uuid4()
-
-        self.trips = json.load(open("emission/tests/data/smoothing_data/trip_list.txt"),
-                                 object_hook=bju.object_hook)
-        for trip in self.trips:
-            trip["user_id"] = self.testUUID
-            edb.get_trip_new_db().save(trip)
-
-        self.trips = [ecwt.Trip(t) for t in self.trips]
-
-        self.sections = json.load(open("emission/tests/data/smoothing_data/section_list.txt"),
-                                 object_hook=bju.object_hook)
-        for section in self.sections:
-            section["user_id"] = self.testUUID
-            edb.get_section_new_db().save(section)
-
-        self.sections = [ecws.Section(s) for s in self.sections]
-
         self.ts = esta.TimeSeries.get_time_series(self.testUUID)
 
+        self.trip_entries = json.load(open("emission/tests/data/smoothing_data/trip_list.txt"),
+                                      object_hook=bju.object_hook)
+        for trip_entry in self.trip_entries:
+            trip_entry["user_id"] = self.testUUID
+            self.ts.insert(trip_entry)
+
+        self.trip_entries = [ecwe.Entry(t) for t in self.trip_entries]
+
+        self.section_entries = json.load(open("emission/tests/data/smoothing_data/section_list.txt"),
+                                         object_hook=bju.object_hook)
+        for section_entry in self.section_entries:
+            section_entry["user_id"] = self.testUUID
+            self.ts.insert(section_entry)
+
+        self.section_entries = [ecwe.Entry(s) for s in self.section_entries]
 
     def tearDown(self):
         import emission.core.get_database as edb
-
         edb.get_timeseries_db().remove({"user_id": self.testUUID})
-        edb.get_section_new_db().remove({"user_id": self.testUUID})
-        edb.get_trip_new_db().remove({"user_id": self.testUUID})
+        edb.get_analysis_timeseries_db().remove({"user_id": self.testUUID})
 
     def loadPointsForTrip(self, trip_id):
         import emission.core.get_database as edb
@@ -70,16 +67,19 @@ class TestLocationSmoothing(unittest.TestCase):
             edb.get_timeseries_db().save(entry)
 
     def testPointFilteringShanghaiJump(self):
-        classicJumpTrip1 = self.trips[0]
+        classicJumpTrip1 = self.trip_entries[0]
         self.loadPointsForTrip(classicJumpTrip1.get_id())
-        classicJumpSections1 = [s for s in self.sections if s.trip_id == classicJumpTrip1.get_id()]
+        classicJumpSections1 = [s for s in self.section_entries
+                                if s.data.trip_id == classicJumpTrip1.get_id()]
         outlier_algo = eaics.BoxplotOutlier()
         jump_algo = eaicj.SmoothZigzag()
 
-        for i, section in enumerate(classicJumpSections1):
+        for i, section_entry in enumerate(classicJumpSections1):
             logging.debug("-" * 20 + "Considering section %s" % i + "-" * 20)
 
-            section_df = self.ts.get_data_df("background/filtered_location", esds.get_time_query_for_section(section.get_id()))
+            section_df = self.ts.get_data_df("background/filtered_location",
+                            esda.get_time_query_for_trip_like(esda.RAW_SECTION_KEY,
+                                                              section_entry.get_id()))
             with_speeds_df = eaicl.add_dist_heading_speed(section_df)
 
             maxSpeed = outlier_algo.get_threshold(with_speeds_df)
@@ -105,16 +105,19 @@ class TestLocationSmoothing(unittest.TestCase):
                 self.assertEqual([str(id) for id in delete_ids], ["55d8c4837d65cb39ee983cb4"])
 
     def testPointFilteringRichmondJump(self):
-        classicJumpTrip1 = self.trips[6]
+        classicJumpTrip1 = self.trip_entries[6]
         self.loadPointsForTrip(classicJumpTrip1.get_id())
-        classicJumpSections1 = [s for s in self.sections if s.trip_id == classicJumpTrip1.get_id()]
+        classicJumpSections1 = [s for s in self.section_entries
+                                if s.data.trip_id == classicJumpTrip1.get_id()]
         outlier_algo = eaics.BoxplotOutlier()
         jump_algo = eaicj.SmoothZigzag()
 
-        for i, section in enumerate(classicJumpSections1):
+        for i, section_entry in enumerate(classicJumpSections1):
             logging.debug("-" * 20 + "Considering section %s" % i + "-" * 20)
 
-            section_df = self.ts.get_data_df("background/filtered_location", esds.get_time_query_for_section(section.get_id()))
+            section_df = self.ts.get_data_df("background/filtered_location",
+                            esda.get_time_query_for_trip_like(esda.RAW_SECTION_KEY,
+                                                              section_entry.get_id()))
             with_speeds_df = eaicl.add_dist_heading_speed(section_df)
 
             maxSpeed = outlier_algo.get_threshold(with_speeds_df)
@@ -136,16 +139,19 @@ class TestLocationSmoothing(unittest.TestCase):
             self.assertEqual([str(id) for id in delete_ids], ["55e86dbb7d65cb39ee987e09"])
 
     def testPointFilteringZigzag(self):
-        classicJumpTrip1 = self.trips[8]
+        classicJumpTrip1 = self.trip_entries[8]
         self.loadPointsForTrip(classicJumpTrip1.get_id())
-        classicJumpSections1 = [s for s in self.sections if s.trip_id == classicJumpTrip1.get_id()]
+        classicJumpSections1 = [s for s in self.section_entries
+                                if s.data.trip_id == classicJumpTrip1.get_id()]
         outlier_algo = eaics.BoxplotOutlier()
         jump_algo = eaicj.SmoothZigzag()
 
-        for i, section in enumerate(classicJumpSections1):
+        for i, section_entry in enumerate(classicJumpSections1):
             logging.debug("-" * 20 + "Considering section %s" % i + "-" * 20)
 
-            section_df = self.ts.get_data_df("background/filtered_location", esds.get_time_query_for_section(section.get_id()))
+            section_df = self.ts.get_data_df("background/filtered_location",
+                            esda.get_time_query_for_trip_like(esda.RAW_SECTION_KEY,
+                                                              section_entry.get_id()))
             with_speeds_df = eaicl.add_dist_heading_speed(section_df)
 
             maxSpeed = outlier_algo.get_threshold(with_speeds_df)
@@ -181,18 +187,21 @@ class TestLocationSmoothing(unittest.TestCase):
                 self.assertEqual(len(delete_ids), 0)
 
     def testFilterSection(self):
-        jump_trips = [self.trips[0], self.trips[6], self.trips[8]]
+        jump_trips = [self.trip_entries[0], self.trip_entries[6], self.trip_entries[8]]
         for i, trip in enumerate(jump_trips):
             self.loadPointsForTrip(trip.get_id())
-            logging.debug("=" * 20 + "Considering trip %s: %s" % (i, trip.start_fmt_time) + "=" * 20)
-            curr_sections = [s for s in self.sections if s.trip_id == trip.get_id()]
+            logging.debug("=" * 20 + "Considering trip %s: %s" %
+                          (i, trip.data.start_fmt_time) + "=" * 20)
+            curr_sections = [s for s in self.section_entries
+                             if s.data.trip_id == trip.get_id()]
             # for j, section in enumerate(esdt.get_sections_for_trip(self.testUUID, trip.get_id())):
-            for j, section in enumerate(curr_sections):
-                logging.debug("-" * 20 + "Considering section %s: %s" % (j, section.start_fmt_time) + "-" * 20)
-                eaicl.filter_jumps(self.testUUID, section.get_id())
+            for j, section_entry in enumerate(curr_sections):
+                logging.debug("-" * 20 + "Considering section %s: %s" %
+                              (j, section_entry.data.start_fmt_time) + "-" * 20)
+                eaicl.filter_jumps(self.testUUID, section_entry.get_id())
                 # TODO: Figure out how to make collections work for the wrappers and then change this to an Entry
-                filtered_points_entry = ad.AttrDict(self.ts.get_entry_at_ts("analysis/smoothing", "data.section",
-                                                                           section.get_id()))
+                filtered_points_entry = ad.AttrDict(self.ts.get_entry_at_ts(
+                    "analysis/smoothing", "data.section", section_entry.get_id()))
                 logging.debug("filtered_points_entry = %s" % filtered_points_entry)
                 if i == 0 and j == 2:
                     # Shanghai jump

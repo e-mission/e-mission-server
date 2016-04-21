@@ -10,7 +10,7 @@ import uuid
 import emission.tests.common as etc
 import emission.analysis.configs.config as eacc
 
-import emission.net.usercache.abstract_usercache as enua
+import emission.storage.timeseries.timequery as estt
 import emission.storage.timeseries.format_hacks.move_filter_field as estfm
 import emission.analysis.intake.cleaning.filter_accuracy as eaicf
 import emission.core.get_database as edb
@@ -37,7 +37,7 @@ class TestSaveAllConfigs(unittest.TestCase):
         edb.get_trip_new_db().remove() 
 
     def testNoOverrides(self):
-        tq = enua.UserCache.TimeQuery("write_ts", 1440658800, 1440745200)
+        tq = estt.TimeQuery("metadata.write_ts", 1440658800, 1440745200)
         eacc.save_all_configs(self.androidUUID, tq)
         saved_entries = list(edb.get_usercache_db().find({'user_id': self.androidUUID, 'metadata.key': 'config/sensor_config'}))
         self.assertEqual(len(saved_entries), 0)
@@ -47,7 +47,7 @@ class TestSaveAllConfigs(unittest.TestCase):
         cfg_1['metadata']['write_ts'] = 1440700000
         edb.get_timeseries_db().insert(cfg_1)
 
-        tq = enua.UserCache.TimeQuery("write_ts", 1440658800, 1440745200)
+        tq = estt.TimeQuery("metadata.write_ts", 1440658800, 1440745200)
         eacc.save_all_configs(self.androidUUID, tq)
         saved_entries = list(edb.get_usercache_db().find({'user_id': self.androidUUID, 'metadata.key': 'config/sensor_config'}))
         self.assertEqual(len(saved_entries), 1)
@@ -64,7 +64,7 @@ class TestSaveAllConfigs(unittest.TestCase):
         cfg_2['data']['is_duty_cycling'] = False
         edb.get_timeseries_db().insert(cfg_2)
 
-        tq = enua.UserCache.TimeQuery("write_ts", 1440658800, 1440745200)
+        tq = estt.TimeQuery("metadata.write_ts", 1440658800, 1440745200)
         eacc.save_all_configs(self.androidUUID, tq)
         saved_entries = list(edb.get_usercache_db().find({'user_id': self.androidUUID, 'metadata.key': 'config/sensor_config'}))
         self.assertEqual(len(saved_entries), 1)
@@ -80,7 +80,7 @@ class TestSaveAllConfigs(unittest.TestCase):
         cfg_2['metadata']['write_ts'] = 1440610000
         edb.get_timeseries_db().insert(cfg_2)
 
-        tq = enua.UserCache.TimeQuery("write_ts", 1440658800, 1440745200)
+        tq = estt.TimeQuery("metadata.write_ts", 1440658800, 1440745200)
         eacc.save_all_configs(self.androidUUID, tq)
         saved_entries = list(edb.get_usercache_db().find({'user_id': self.androidUUID, 'metadata.key': 'config/sensor_config'}))
         self.assertEqual(len(saved_entries), 0)

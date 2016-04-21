@@ -1,26 +1,29 @@
 import logging
-import emission.net.usercache.abstract_usercache as enua
+import emission.storage.timeseries.timequery as estt
+import emission.storage.timeseries.tcquery as esttc
+import emission.storage.timeseries.geoquery as estg
+
+import emission.storage.decorations.analysis_timeseries_queries as esda
+import emission.storage.timeseries.abstract_timeseries as esta
+
+import emission.core.wrapper.entry as ecwe
 
 def get_timeline_from_dt(user_id, start_local_dt, end_local_dt):
-    import emission.core.get_database as edb
-    import emission.core.wrapper.entry as ecwe
-    import emission.storage.decorations.local_date_queries as esdl
-
     logging.info("About to query for %s -> %s" % (start_local_dt, end_local_dt))
-    final_query = {"user_id": user_id}
-    final_query.update(esdl.get_range_query("data.local_dt", start_local_dt, end_local_dt))
-    logging.debug("final query = %s" % final_query)
-    result_cursor = edb.get_timeseries_db().find(final_query).sort("metadata.write_ts")
-    logging.debug("result cursor has %d entries" % result_cursor.count())
-    result_list = list(result_cursor)
-    logging.debug("result list has %d entries" % len(result_list))
-    if len(result_list) == 0:
-       return get_timeline(user_id, 0, 0)
-    start_ts = ecwe.Entry(result_list[0]).metadata.write_ts
-    end_ts = ecwe.Entry(result_list[-1]).metadata.write_ts
-    logging.debug("Converted datetime range %s -> %s to timestamp range %s -> %s" %
-        (start_local_dt, end_local_dt, start_ts, end_ts))
-    return get_timeline(user_id, start_ts, end_ts)
+
+    places_entries = esda.get_entries(esda.RAW_PLACE_KEY, user_id,
+        esttc.TimeComponentQuery("data.enter_local_dt", start_local_dt, end_local_dt))
+    trips_entries = esda.get_entries(esda.RAW_TRIP_KEY, user_id,
+        esttc.TimeComponentQuery("data.start_local_dt", start_local_dt, end_local_dt))
+
+    for place in places_entries:
+        logging.debug("Considering place %s: %s -> %s " %
+                      (place.get_id(), place.data.enter_fmt_time, place.data.exit_fmt_time))
+    for trip in trips_entries:
+        logging.debug("Considering trip %s: %s -> %s " %
+                      (trip.get_id(), trip.data.start_fmt_time, trip.data.end_fmt_time))
+
+    return Timeline(places_entries, trips_entries)
 
 def get_timeline(user_id, start_ts, end_ts):
     """
@@ -38,59 +41,61 @@ def get_timeline(user_id, start_ts, end_ts):
     :param end_ts: the ending timestamp. we will include all places and trips that end after this.
     :return: a timeline object
     """
-    # These imports are in here to avoid circular import dependencies between
-    # trip_queries and this file (timeline)
-    import emission.storage.decorations.place_queries as esdp
-    import emission.storage.decorations.trip_queries as esdt
+    places_entries = esda.get_entries(esda.RAW_PLACE_KEY, user_id=None,
+                                      time_query=estt.TimeQuery("data.enter_ts",
+                                                                start_ts, end_ts))
+    trips_entries = esda.get_entries(esda.RAW_TRIP_KEY, user_id=None,
+                                     time_query=estt.TimeQuery("data.start_ts",
+                                                               start_ts, end_ts))
+    for place in places_entries:
+        logging.debug("Considering place %s: %s -> %s " % (place.get_id(),
+                        place.data.enter_fmt_time, place.data.exit_fmt_time))
+    for trip in trips_entries:
+        logging.debug("Considering trip %s: %s -> %s " % (trip.get_id(),
+                        trip.data.start_fmt_time, trip.data.end_fmt_time))
 
-    places = esdp.get_places(user_id, enua.UserCache.TimeQuery("enter_ts", start_ts, end_ts))
-    trips = esdt.get_trips(user_id, enua.UserCache.TimeQuery("start_ts", start_ts, end_ts))
-
-    for place in places:
-        logging.debug("Considering place %s: %s -> %s " % (place.get_id(), place.enter_fmt_time, place.exit_fmt_time))
-    for trip in trips:
-        logging.debug("Considering trip %s: %s -> %s " % (trip.get_id(), trip.start_fmt_time, trip.end_fmt_time))
-
-    return Timeline(places, trips)
+    return Timeline(places_entries, trips_entries)
 
 
 
-def get_aggregate_timeline_from_dt(start_dt, end_dt, box=None):
-    import emission.core.get_database as edb
-    import emission.core.wrapper.entry as ecwe
-    import emission.storage.decorations.place_queries as esdp
-    import emission.storage.decorations.trip_queries as esdt
-    import emission.storage.decorations.local_date_queries as esdl
+def get_aggregate_timeline_from_dt(start_local_dt, end_local_dt, geojson=None):
+    logging.info("About to query for %s -> %s in %s" % (start_local_dt, end_local_dt, geojson))
 
-    if not box:
-        logging.info("About to query for %s -> %s" % (start_dt, end_dt))
+    if geojson is not None:
+        place_gq = estg.GeoQuery(loc_field_list = ['data.location'], poly_region = geojson)
+        trip_gq = estg.GeoQuery(loc_field_list = ['data.start_loc', 'data.end_loc'], poly_region = geojson)
     else:
-        logging.info("About to query for %s -> %s in %s" % (start_dt, end_dt, box))
+        place_gq = None
+        trip_gq = None
 
-    final_query = {}
-    final_query.update(esdl.get_range_query("data.local_dt", start_dt, end_dt))
-    logging.debug("final query = %s" % final_query)
-    result_cursor = edb.get_timeseries_db().find(final_query).sort("metadata.write_ts").limit(1)
+    ts = esta.TimeSeries.get_aggregate_time_series()
+    places_entries = ts.find_entries(["segmentation/raw_place"],
+        esttc.TimeComponentQuery("data.enter_local_dt", start_local_dt, end_local_dt),
+        place_gq)
+    trips_entries = ts.find_entries(["segmentation/raw_place"],
+        esttc.TimeComponentQuery("data.start_local_dt", start_local_dt, end_local_dt),
+        trip_gq)
 
-    logging.debug("about to query result_cursor.count()")
-    result_cursor_count = result_cursor.count()
-    logging.debug("result cursor has %d entries" % result_cursor_count)
-    if result_cursor_count == 0:
-        return Timeline([], [])
-    logging.debug("About to query for time data in result cursor")
-    start_ts = ecwe.Entry(result_cursor[0]).metadata.write_ts
-    end_ts = ecwe.Entry(result_cursor[result_cursor_count - 1]).metadata.write_ts
-    logging.debug("Converted datetime range %s -> %s to timestamp range %s -> %s" %
-        (start_dt, end_dt, start_ts, end_ts))
-    places = esdp.get_aggregate_places(enua.UserCache.TimeQuery("enter_ts", start_ts, end_ts), box=box)
-    trips = esdt.get_aggregate_trips(enua.UserCache.TimeQuery("start_ts", start_ts, end_ts), box=box)
-    return Timeline(places, trips)
+    places_entries = [ecwe.Entry(e) for e in places_entries]
+    trips_entries = [ecwe.Entry(e) for e in trips_entries]
+
+    for place in places_entries:
+        logging.debug("Considering place %s: %s -> %s " % (place.get_id(),
+                                                           place.data.enter_fmt_time,
+                                                           place.data.exit_fmt_time))
+    for trip in trips_entries:
+        logging.debug("Considering trip %s: %s -> %s " % (trip.get_id(),
+                                                          trip.data.start_fmt_time,
+                                                          trip.data.end_fmt_time))
+
+    return Timeline(places_entries, trips_entries)
+
 
 class Timeline(object):
 
     class State(object):
         def __init__(self, type, element):
-            self.type = type
+            self.element_type = type
             self.element = element
             if element is None:
                 self.id = None
@@ -98,10 +103,11 @@ class Timeline(object):
                 self.id = element.get_id()
 
 
-    def __init__(self, places_or_stops, trips_or_sections):
-        logging.debug("len(places) = %s, len(trips) = %s" % (len(places_or_stops), len(trips_or_sections)))
-        self.places = places_or_stops
-        self.trips = trips_or_sections
+    def __init__(self, places_or_stops_entries, trips_or_sections_entries):
+        logging.debug("len(places) = %s, len(trips) = %s" %
+                      (len(places_or_stops_entries), len(trips_or_sections_entries)))
+        self.places = places_or_stops_entries
+        self.trips = trips_or_sections_entries
         self.id_map = dict((p.get_id(), p) for p in self.places)
         self.id_map.update(dict((t.get_id(), t) for t in self.trips))
 
@@ -113,12 +119,12 @@ class Timeline(object):
                 self.state = Timeline.State("place", self.places[0])
         else:
             assert (len(self.places) > 0 and len(self.trips) > 0)
-            if self.places[0].exit_ts < self.trips[0].start_ts:
+            if self.places[0].data.exit_ts < self.trips[0].data.start_ts:
                 self.state = Timeline.State("place", self.places[0])
             else:
                 self.state = Timeline.State("trip", self.trips[0])
         logging.debug("Starting with element of type %s, id %s, details %s" %
-                      (self.state.type, self.state.id, self.state.element))
+                      (self.state.element_type, self.state.id, self.state.element))
 
     def fill_start_end_places(self):
         """
@@ -154,11 +160,11 @@ class Timeline(object):
 
         if place_id not in self.id_map:
             logging.debug("place id %s is not in the map, searching in database" % place_id)
-            place = esdp.get_place(place_id)
-            self.places.append(place)
-            self.id_map[place_id] = place
-            logging.debug("retrieved object %s and added to id_map" % place)
-            return place
+            place_entry = esda.get_entry(esda.RAW_PLACE_KEY, place_id)
+            self.places.append(place_entry)
+            self.id_map[place_id] = place_entry
+            logging.debug("retrieved object %s and added to id_map" % place_entry)
+            return place_entry
         else:
             return self.id_map[place_id]
 
@@ -181,20 +187,20 @@ class Timeline(object):
     def move_to_next(self):
         # TODO: restructure the data model to avoid this stupid if/then.
         # e.g. rename field to be "starting" for both trip and section
-        if self.state.type == "place":
-            if hasattr(self.state.element, "starting_trip"):
-                new_id = self.state.element.starting_trip
+        if self.state.element_type == "place":
+            if hasattr(self.state.element.data, "starting_trip"):
+                new_id = self.state.element.data.starting_trip
             else:
-                assert(hasattr(self.state.element, "starting_section"))
-                new_id = self.state.element.starting_section
+                assert(hasattr(self.state.element.data, "starting_section"))
+                new_id = self.state.element.data.starting_section
             new_type = "trip"
         else:
-            assert(self.state.type == "trip")
-            if hasattr(self.state.element, "end_place"):
-                new_id = self.state.element.end_place
+            assert(self.state.element_type == "trip")
+            if hasattr(self.state.element.data, "end_place"):
+                new_id = self.state.element.data.end_place
             else:
-                assert(hasattr(self.state.element, "end_stop"))
-                new_id = self.state.element.end_stop
+                assert(hasattr(self.state.element.data, "end_stop"))
+                new_id = self.state.element.data.end_stop
             new_type = "place"
 
         if new_id is None:

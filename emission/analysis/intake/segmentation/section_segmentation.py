@@ -3,15 +3,15 @@ import logging
 
 # Our imports
 import emission.storage.pipeline_queries as epq
-import emission.storage.decorations.trip_queries as esdt
-import emission.storage.decorations.section_queries as esds
-import emission.storage.decorations.stop_queries as esdst
+import emission.storage.decorations.analysis_timeseries_queries as esda
 
 import emission.storage.timeseries.abstract_timeseries as esta
 
 import emission.core.wrapper.motionactivity as ecwm
 import emission.core.wrapper.location as ecwl
-
+import emission.core.wrapper.section as ecwc
+import emission.core.wrapper.stop as ecws
+import emission.core.wrapper.entry as ecwe
 
 class SectionSegmentationMethod(object):
     def segment_into_sections(self, timeseries, time_query):
@@ -36,7 +36,7 @@ class SectionSegmentationMethod(object):
 def segment_current_sections(user_id):
     time_query = epq.get_time_range_for_sectioning(user_id)
     try:
-        trips_to_process = esdt.get_trips(user_id, time_query)
+        trips_to_process = esda.get_objects(esda.RAW_TRIP_KEY, user_id, time_query)
         for trip in trips_to_process:
             logging.info("+" * 20 + ("Processing trip %s for user %s" % (trip.get_id(), user_id)) + "+" * 20)
             segment_trip_into_sections(user_id, trip.get_id(), trip.source)
@@ -52,8 +52,8 @@ def segment_current_sections(user_id):
 
 def segment_trip_into_sections(user_id, trip_id, trip_source):
     ts = esta.TimeSeries.get_time_series(user_id)
-    trip = esdt.get_trip(trip_id)
-    time_query = esdt.get_time_query_for_trip(trip_id)
+    trip = esda.get_object(esda.RAW_TRIP_KEY, trip_id)
+    time_query = esda.get_time_query_for_trip_like(esda.RAW_TRIP_KEY, trip_id)
 
     if (trip_source == "DwellSegmentationTimeFilter"):
         import emission.analysis.intake.segmentation.section_segmentation_methods.smoothed_high_confidence_motion as shcm
@@ -77,7 +77,7 @@ def segment_trip_into_sections(user_id, trip_id, trip_source):
     # So this is much simpler than the trip case.
     # Again, since this is segmenting a trip, we can just start with a section
 
-    prev_section = None
+    prev_section_entry = None
 
     # TODO: Should we link the locations to the trips this way, or by using a foreign key?
     # If we want to use a foreign key, then we need to include the object id in the data df as well so that we can
@@ -86,14 +86,17 @@ def segment_trip_into_sections(user_id, trip_id, trip_source):
     trip_end_loc = ecwl.Location(ts.get_entry_at_ts("background/filtered_location", "data.ts", trip.end_ts)["data"])
     logging.debug("trip_start_loc = %s, trip_end_loc = %s" % (trip_start_loc, trip_end_loc))
 
+    ts = esta.TimeSeries.get_time_series(user_id)
+
     for (i, (start_loc_doc, end_loc_doc, sensed_mode)) in enumerate(segmentation_points):
         logging.debug("start_loc_doc = %s, end_loc_doc = %s" % (start_loc_doc, end_loc_doc))
         start_loc = ecwl.Location(start_loc_doc)
         end_loc = ecwl.Location(end_loc_doc)
         logging.debug("start_loc = %s, end_loc = %s" % (start_loc, end_loc))
 
-        section = esds.create_new_section(user_id, trip_id)
-        if prev_section is None:
+        section = ecwc.Section()
+        section.trip_id = trip_id
+        if prev_section_entry is None:
             # This is the first point, so we want to start from the start of the trip, not the start of this segment
             start_loc = trip_start_loc
         if i == len(segmentation_points) - 1:
@@ -102,17 +105,28 @@ def segment_trip_into_sections(user_id, trip_id, trip_source):
             end_loc = trip_end_loc
 
         fill_section(section, start_loc, end_loc, sensed_mode)
+        # We create the entry after filling in the section so that we know
+        # that the data is included properly
+        section_entry = ecwe.Entry.create_entry(user_id, esda.RAW_SECTION_KEY,
+                                                section, create_id=True)
 
-        if prev_section is not None:
+        if prev_section_entry is not None:
             # If this is not the first section, create a stop to link the two sections together
             # The expectation is prev_section -> stop -> curr_section
-            stop = esdst.create_new_stop(user_id, trip_id)
-            stitch_together(prev_section, stop, section)
-            esdst.save_stop(stop)
-            esds.save_section(prev_section) # Because we have now linked it to the stop, we need to save it again
+            stop = ecws.Stop()
+            stop.trip_id = trip_id
+            stop_entry = ecwe.Entry.create_entry(user_id,
+                                                    esda.RAW_STOP_KEY,
+                                                    stop, create_id=True)
+            logging.debug("stop = %s, stop_entry = %s" % (stop, stop_entry))
+            stitch_together(prev_section_entry, stop_entry, section_entry)
+            ts.insert(stop_entry)
+            ts.update(prev_section_entry)
 
-        esds.save_section(section)
-        prev_section = section
+        # After we go through the loop, we will be left with the last section,
+        # which does not have an ending stop. We insert that too.
+        ts.insert(section_entry)
+        prev_section_entry = section_entry
 
 
 def fill_section(section, start_loc, end_loc, sensed_mode):
@@ -132,13 +146,17 @@ def fill_section(section, start_loc, end_loc, sensed_mode):
     section.sensed_mode = sensed_mode
 
 
-def stitch_together(ending_section, stop, starting_section):
-    ending_section.end_stop = stop.get_id()
+def stitch_together(ending_section_entry, stop_entry, starting_section_entry):
+    ending_section = ending_section_entry.data
+    stop = stop_entry.data
+    starting_section = starting_section_entry.data
+
+    ending_section.end_stop = stop_entry.get_id()
 
     stop.enter_ts = ending_section.end_ts
     stop.enter_local_dt = ending_section.end_local_dt
     stop.enter_fmt_time = ending_section.end_fmt_time
-    stop.ending_section = ending_section.get_id()
+    stop.ending_section = ending_section_entry.get_id()
 
     stop.enter_loc = ending_section.end_loc
     stop.exit_loc = starting_section.start_loc
@@ -148,6 +166,11 @@ def stitch_together(ending_section, stop, starting_section):
     stop.exit_ts = starting_section.start_ts
     stop.exit_local_dt = starting_section.start_local_dt
     stop.exit_fmt_time = starting_section.start_fmt_time
-    stop.starting_section = starting_section.get_id()
+    stop.starting_section = starting_section_entry.get_id()
 
-    starting_section.start_stop = stop.get_id()
+    starting_section.start_stop = stop_entry.get_id()
+
+    ending_section_entry["data"] = ending_section
+    stop_entry["data"] = stop
+    starting_section_entry["data"] = starting_section
+

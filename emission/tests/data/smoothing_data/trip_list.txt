@@ -1,410 +1,710 @@
 [
     {
-        "end_place": {
-            "$oid": "56081ad3f6858f3a71f65e20"
+        "data": {
+            "end_place": {
+                "$oid": "56081ad3f6858f3a71f65e20"
+            }, 
+            "user_id": {
+                "$uuid": "0763de67f61e3f5d90e7518e69793954"
+            }, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.4426899, 
+                    37.7280596
+                ]
+            }, 
+            "end_ts": 1440209488.817, 
+            "start_ts": 1440205576.905, 
+            "start_fmt_time": "2015-08-21 18:06:16.905000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0862011, 
+                    37.3910039
+                ]
+            }, 
+            "source": "DwellSegmentationTimeFilter", 
+            "start_place": {
+                "$oid": "56081ad3f6858f3a71f65e1e"
+            }, 
+            "end_fmt_time": "2015-08-21 19:11:28.817000-07:00", 
+            "duration": 3911.911999940872, 
+            "_id": {
+                "$oid": "56081ad3f6858f3a71f65e1f"
+            }
         }, 
-        "user_id": {
-            "$uuid": "0763de67f61e3f5d90e7518e69793954"
-        }, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.4426899, 
-                37.7280596
-            ]
-        }, 
-        "end_ts": 1440209488.817, 
-        "start_ts": 1440205576.905, 
-        "start_fmt_time": "2015-08-21 18:06:16.905000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0862011, 
-                37.3910039
-            ]
-        }, 
-        "source": "DwellSegmentationTimeFilter", 
-        "start_place": {
-            "$oid": "56081ad3f6858f3a71f65e1e"
-        }, 
-        "end_fmt_time": "2015-08-21 19:11:28.817000-07:00", 
-        "duration": 3911.911999940872, 
         "_id": {
             "$oid": "56081ad3f6858f3a71f65e1f"
-        }
-    }, 
-    {
-        "end_place": {
-            "$oid": "56081ad3f6858f3a71f65e2e"
         }, 
         "user_id": {
             "$uuid": "0763de67f61e3f5d90e7518e69793954"
         }, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0814687, 
-                37.3918311
-            ]
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:23:33.768392-07:00", 
+            "write_ts": 1461205413.768392, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 33, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 23
+            }, 
+            "key": "segmentation/raw_trip"
+        }
+    }, 
+    {
+        "data": {
+            "end_place": {
+                "$oid": "56081ad3f6858f3a71f65e2e"
+            }, 
+            "user_id": {
+                "$uuid": "0763de67f61e3f5d90e7518e69793954"
+            }, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0814687, 
+                    37.3918311
+                ]
+            }, 
+            "end_ts": 1440284440.644, 
+            "start_ts": 1440283226.712, 
+            "start_fmt_time": "2015-08-22 15:40:26.712000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.088923, 
+                    37.3911364
+                ]
+            }, 
+            "source": "DwellSegmentationTimeFilter", 
+            "start_place": {
+                "$oid": "56081ad3f6858f3a71f65e2c"
+            }, 
+            "end_fmt_time": "2015-08-22 16:00:40.644000-07:00", 
+            "duration": 1213.9320001602173, 
+            "_id": {
+                "$oid": "56081ad3f6858f3a71f65e2d"
+            }
         }, 
-        "end_ts": 1440284440.644, 
-        "start_ts": 1440283226.712, 
-        "start_fmt_time": "2015-08-22 15:40:26.712000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.088923, 
-                37.3911364
-            ]
-        }, 
-        "source": "DwellSegmentationTimeFilter", 
-        "start_place": {
-            "$oid": "56081ad3f6858f3a71f65e2c"
-        }, 
-        "end_fmt_time": "2015-08-22 16:00:40.644000-07:00", 
-        "duration": 1213.9320001602173, 
         "_id": {
             "$oid": "56081ad3f6858f3a71f65e2d"
+        }, 
+        "user_id": {
+            "$uuid": "0763de67f61e3f5d90e7518e69793954"
+        }, 
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:23:33.773995-07:00", 
+            "write_ts": 1461205413.773995, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 33, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 23
+            }, 
+            "key": "segmentation/raw_trip"
         }
     }, 
     {
-        "end_place": {
-            "$oid": "5608285cf6858f3c7580c8ba"
+        "data": {
+            "end_place": {
+                "$oid": "5608285cf6858f3c7580c8ba"
+            }, 
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.083262, 
+                    37.4028433
+                ]
+            }, 
+            "end_ts": 1440432439.533, 
+            "start_ts": 1440430310.857, 
+            "start_fmt_time": "2015-08-24 08:31:50.857000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9036344, 
+                    37.3284675
+                ]
+            }, 
+            "source": "DwellSegmentationTimeFilter", 
+            "start_place": {
+                "$oid": "5608285cf6858f3c7580c8b8"
+            }, 
+            "end_fmt_time": "2015-08-24 09:07:19.533000-07:00", 
+            "duration": 2128.675999879837, 
+            "_id": {
+                "$oid": "5608285cf6858f3c7580c8b9"
+            }
         }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
-        }, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.083262, 
-                37.4028433
-            ]
-        }, 
-        "end_ts": 1440432439.533, 
-        "start_ts": 1440430310.857, 
-        "start_fmt_time": "2015-08-24 08:31:50.857000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -121.9036344, 
-                37.3284675
-            ]
-        }, 
-        "source": "DwellSegmentationTimeFilter", 
-        "start_place": {
-            "$oid": "5608285cf6858f3c7580c8b8"
-        }, 
-        "end_fmt_time": "2015-08-24 09:07:19.533000-07:00", 
-        "duration": 2128.675999879837, 
         "_id": {
             "$oid": "5608285cf6858f3c7580c8b9"
-        }
-    }, 
-    {
-        "end_place": {
-            "$oid": "5608285df6858f3c7580c8c2"
         }, 
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0882077, 
-                37.3881928
-            ]
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:23:33.775139-07:00", 
+            "write_ts": 1461205413.775139, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 33, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 23
+            }, 
+            "key": "segmentation/raw_trip"
+        }
+    }, 
+    {
+        "data": {
+            "end_place": {
+                "$oid": "5608285df6858f3c7580c8c2"
+            }, 
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0882077, 
+                    37.3881928
+                ]
+            }, 
+            "end_ts": 1440545964.213, 
+            "start_ts": 1440517068.439, 
+            "start_fmt_time": "2015-08-25 08:37:48.439000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0931936, 
+                    37.3645939
+                ]
+            }, 
+            "source": "DwellSegmentationTimeFilter", 
+            "start_place": {
+                "$oid": "5608285cf6858f3c7580c8c0"
+            }, 
+            "end_fmt_time": "2015-08-25 16:39:24.213000-07:00", 
+            "duration": 28895.774000167847, 
+            "_id": {
+                "$oid": "5608285df6858f3c7580c8c1"
+            }
         }, 
-        "end_ts": 1440545964.213, 
-        "start_ts": 1440517068.439, 
-        "start_fmt_time": "2015-08-25 08:37:48.439000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0931936, 
-                37.3645939
-            ]
-        }, 
-        "source": "DwellSegmentationTimeFilter", 
-        "start_place": {
-            "$oid": "5608285cf6858f3c7580c8c0"
-        }, 
-        "end_fmt_time": "2015-08-25 16:39:24.213000-07:00", 
-        "duration": 28895.774000167847, 
         "_id": {
             "$oid": "5608285df6858f3c7580c8c1"
-        }
-    }, 
-    {
-        "end_place": {
-            "$oid": "5608285df6858f3c7580c8e6"
         }, 
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0850217, 
-                37.3928567
-            ]
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:23:33.776122-07:00", 
+            "write_ts": 1461205413.776122, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 33, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 23
+            }, 
+            "key": "segmentation/raw_trip"
+        }
+    }, 
+    {
+        "data": {
+            "end_place": {
+                "$oid": "5608285df6858f3c7580c8e6"
+            }, 
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0850217, 
+                    37.3928567
+                ]
+            }, 
+            "end_ts": 1440775741.8, 
+            "start_ts": 1440774944.444, 
+            "start_fmt_time": "2015-08-28 08:15:44.444000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0837477, 
+                    37.4039396
+                ]
+            }, 
+            "source": "DwellSegmentationTimeFilter", 
+            "start_place": {
+                "$oid": "5608285df6858f3c7580c8e4"
+            }, 
+            "end_fmt_time": "2015-08-28 08:29:01.800000-07:00", 
+            "duration": 797.3559999465942, 
+            "_id": {
+                "$oid": "5608285df6858f3c7580c8e5"
+            }
         }, 
-        "end_ts": 1440775741.8, 
-        "start_ts": 1440774944.444, 
-        "start_fmt_time": "2015-08-28 08:15:44.444000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0837477, 
-                37.4039396
-            ]
-        }, 
-        "source": "DwellSegmentationTimeFilter", 
-        "start_place": {
-            "$oid": "5608285df6858f3c7580c8e4"
-        }, 
-        "end_fmt_time": "2015-08-28 08:29:01.800000-07:00", 
-        "duration": 797.3559999465942, 
         "_id": {
             "$oid": "5608285df6858f3c7580c8e5"
-        }
-    }, 
-    {
-        "end_place": {
-            "$oid": "5608285df6858f3c7580c91e"
         }, 
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -121.9073733, 
-                37.321086
-            ]
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:23:33.777126-07:00", 
+            "write_ts": 1461205413.777126, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 33, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 23
+            }, 
+            "key": "segmentation/raw_trip"
+        }
+    }, 
+    {
+        "data": {
+            "end_place": {
+                "$oid": "5608285df6858f3c7580c91e"
+            }, 
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.9073733, 
+                    37.321086
+                ]
+            }, 
+            "end_ts": 1441208617.707, 
+            "start_ts": 1441207927.85, 
+            "start_fmt_time": "2015-09-02 08:32:07.850000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -121.948556, 
+                    37.2792126
+                ]
+            }, 
+            "source": "DwellSegmentationTimeFilter", 
+            "start_place": {
+                "$oid": "5608285df6858f3c7580c91c"
+            }, 
+            "end_fmt_time": "2015-09-02 08:43:37.707000-07:00", 
+            "duration": 689.8570001125336, 
+            "_id": {
+                "$oid": "5608285df6858f3c7580c91d"
+            }
         }, 
-        "end_ts": 1441208617.707, 
-        "start_ts": 1441207927.85, 
-        "start_fmt_time": "2015-09-02 08:32:07.850000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -121.948556, 
-                37.2792126
-            ]
-        }, 
-        "source": "DwellSegmentationTimeFilter", 
-        "start_place": {
-            "$oid": "5608285df6858f3c7580c91c"
-        }, 
-        "end_fmt_time": "2015-09-02 08:43:37.707000-07:00", 
-        "duration": 689.8570001125336, 
         "_id": {
             "$oid": "5608285df6858f3c7580c91d"
-        }
-    }, 
-    {
-        "end_place": {
-            "$oid": "5608285df6858f3c7580c932"
         }, 
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0847801, 
-                37.4013634
-            ]
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:23:33.778075-07:00", 
+            "write_ts": 1461205413.778075, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 33, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 23
+            }, 
+            "key": "segmentation/raw_trip"
+        }
+    }, 
+    {
+        "data": {
+            "end_place": {
+                "$oid": "5608285df6858f3c7580c932"
+            }, 
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0847801, 
+                    37.4013634
+                ]
+            }, 
+            "end_ts": 1441294761.32, 
+            "start_ts": 1441294275.322, 
+            "start_fmt_time": "2015-09-03 08:31:15.322000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0862756, 
+                    37.3909557
+                ]
+            }, 
+            "source": "DwellSegmentationTimeFilter", 
+            "start_place": {
+                "$oid": "5608285df6858f3c7580c930"
+            }, 
+            "end_fmt_time": "2015-09-03 08:39:21.320000-07:00", 
+            "duration": 485.9979999065399, 
+            "_id": {
+                "$oid": "5608285df6858f3c7580c931"
+            }
         }, 
-        "end_ts": 1441294761.32, 
-        "start_ts": 1441294275.322, 
-        "start_fmt_time": "2015-09-03 08:31:15.322000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0862756, 
-                37.3909557
-            ]
-        }, 
-        "source": "DwellSegmentationTimeFilter", 
-        "start_place": {
-            "$oid": "5608285df6858f3c7580c930"
-        }, 
-        "end_fmt_time": "2015-09-03 08:39:21.320000-07:00", 
-        "duration": 485.9979999065399, 
         "_id": {
             "$oid": "5608285df6858f3c7580c931"
-        }
-    }, 
-    {
-        "end_place": {
-            "$oid": "5608285df6858f3c7580c93a"
         }, 
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0861897, 
-                37.3910416
-            ]
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:23:33.779017-07:00", 
+            "write_ts": 1461205413.779017, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 33, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 23
+            }, 
+            "key": "segmentation/raw_trip"
+        }
+    }, 
+    {
+        "data": {
+            "end_place": {
+                "$oid": "5608285df6858f3c7580c93a"
+            }, 
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0861897, 
+                    37.3910416
+                ]
+            }, 
+            "end_ts": 1441325719.161, 
+            "start_ts": 1441325092.945, 
+            "start_fmt_time": "2015-09-03 17:04:52.945000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0801769, 
+                    37.3921698
+                ]
+            }, 
+            "source": "DwellSegmentationTimeFilter", 
+            "start_place": {
+                "$oid": "5608285df6858f3c7580c938"
+            }, 
+            "end_fmt_time": "2015-09-03 17:15:19.161000-07:00", 
+            "duration": 626.2160000801086, 
+            "_id": {
+                "$oid": "5608285df6858f3c7580c939"
+            }
         }, 
-        "end_ts": 1441325719.161, 
-        "start_ts": 1441325092.945, 
-        "start_fmt_time": "2015-09-03 17:04:52.945000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0801769, 
-                37.3921698
-            ]
-        }, 
-        "source": "DwellSegmentationTimeFilter", 
-        "start_place": {
-            "$oid": "5608285df6858f3c7580c938"
-        }, 
-        "end_fmt_time": "2015-09-03 17:15:19.161000-07:00", 
-        "duration": 626.2160000801086, 
         "_id": {
             "$oid": "5608285df6858f3c7580c939"
-        }
-    }, 
-    {
-        "end_place": {
-            "$oid": "5608285df6858f3c7580c950"
         }, 
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0865169, 
-                37.3986848
-            ]
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:23:33.779977-07:00", 
+            "write_ts": 1461205413.779977, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 33, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 23
+            }, 
+            "key": "segmentation/raw_trip"
+        }
+    }, 
+    {
+        "data": {
+            "end_place": {
+                "$oid": "5608285df6858f3c7580c950"
+            }, 
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0865169, 
+                    37.3986848
+                ]
+            }, 
+            "end_ts": 1441644140.933, 
+            "start_ts": 1441639379.149, 
+            "start_fmt_time": "2015-09-07 08:22:59.149000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.394481, 
+                    37.7766259
+                ]
+            }, 
+            "source": "DwellSegmentationTimeFilter", 
+            "start_place": {
+                "$oid": "5608285df6858f3c7580c94e"
+            }, 
+            "end_fmt_time": "2015-09-07 09:42:20.933000-07:00", 
+            "duration": 4761.78400015831, 
+            "_id": {
+                "$oid": "5608285df6858f3c7580c94f"
+            }
         }, 
-        "end_ts": 1441644140.933, 
-        "start_ts": 1441639379.149, 
-        "start_fmt_time": "2015-09-07 08:22:59.149000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.394481, 
-                37.7766259
-            ]
-        }, 
-        "source": "DwellSegmentationTimeFilter", 
-        "start_place": {
-            "$oid": "5608285df6858f3c7580c94e"
-        }, 
-        "end_fmt_time": "2015-09-07 09:42:20.933000-07:00", 
-        "duration": 4761.78400015831, 
         "_id": {
             "$oid": "5608285df6858f3c7580c94f"
-        }
-    }, 
-    {
-        "end_place": {
-            "$oid": "5608285df6858f3c7580c98c"
         }, 
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0777908, 
-                37.3957365
-            ]
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:23:33.780915-07:00", 
+            "write_ts": 1461205413.780915, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 33, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 23
+            }, 
+            "key": "segmentation/raw_trip"
+        }
+    }, 
+    {
+        "data": {
+            "end_place": {
+                "$oid": "5608285df6858f3c7580c98c"
+            }, 
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0777908, 
+                    37.3957365
+                ]
+            }, 
+            "end_ts": 1441917622.318, 
+            "start_ts": 1441916100.282, 
+            "start_fmt_time": "2015-09-10 13:15:00.282000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0862768, 
+                    37.3909523
+                ]
+            }, 
+            "source": "DwellSegmentationTimeFilter", 
+            "start_place": {
+                "$oid": "5608285df6858f3c7580c98a"
+            }, 
+            "end_fmt_time": "2015-09-10 13:40:22.318000-07:00", 
+            "duration": 1522.0360000133514, 
+            "_id": {
+                "$oid": "5608285df6858f3c7580c98b"
+            }
         }, 
-        "end_ts": 1441917622.318, 
-        "start_ts": 1441916100.282, 
-        "start_fmt_time": "2015-09-10 13:15:00.282000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0862768, 
-                37.3909523
-            ]
-        }, 
-        "source": "DwellSegmentationTimeFilter", 
-        "start_place": {
-            "$oid": "5608285df6858f3c7580c98a"
-        }, 
-        "end_fmt_time": "2015-09-10 13:40:22.318000-07:00", 
-        "duration": 1522.0360000133514, 
         "_id": {
             "$oid": "5608285df6858f3c7580c98b"
-        }
-    }, 
-    {
-        "end_place": {
-            "$oid": "5608285df6858f3c7580c990"
         }, 
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0861761, 
-                37.3910551
-            ]
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:23:33.781849-07:00", 
+            "write_ts": 1461205413.781849, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 33, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 23
+            }, 
+            "key": "segmentation/raw_trip"
+        }
+    }, 
+    {
+        "data": {
+            "end_place": {
+                "$oid": "5608285df6858f3c7580c990"
+            }, 
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0861761, 
+                    37.3910551
+                ]
+            }, 
+            "end_ts": 1441920589.611, 
+            "start_ts": 1441918676.649, 
+            "start_fmt_time": "2015-09-10 13:57:56.649000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0806359, 
+                    37.3998045
+                ]
+            }, 
+            "source": "DwellSegmentationTimeFilter", 
+            "start_place": {
+                "$oid": "5608285df6858f3c7580c98e"
+            }, 
+            "end_fmt_time": "2015-09-10 14:29:49.611000-07:00", 
+            "duration": 1912.962000131607, 
+            "_id": {
+                "$oid": "5608285df6858f3c7580c98f"
+            }
         }, 
-        "end_ts": 1441920589.611, 
-        "start_ts": 1441918676.649, 
-        "start_fmt_time": "2015-09-10 13:57:56.649000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0806359, 
-                37.3998045
-            ]
-        }, 
-        "source": "DwellSegmentationTimeFilter", 
-        "start_place": {
-            "$oid": "5608285df6858f3c7580c98e"
-        }, 
-        "end_fmt_time": "2015-09-10 14:29:49.611000-07:00", 
-        "duration": 1912.962000131607, 
         "_id": {
             "$oid": "5608285df6858f3c7580c98f"
-        }
-    }, 
-    {
-        "end_place": {
-            "$oid": "5608285df6858f3c7580c99a"
         }, 
         "user_id": {
             "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
-        "start_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0798907, 
-                37.3965131
-            ]
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:23:33.782838-07:00", 
+            "write_ts": 1461205413.782838, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 33, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 23
+            }, 
+            "key": "segmentation/raw_trip"
+        }
+    }, 
+    {
+        "data": {
+            "end_place": {
+                "$oid": "5608285df6858f3c7580c99a"
+            }, 
+            "user_id": {
+                "$uuid": "b0d937d070ef305e9563440369012b39"
+            }, 
+            "start_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0798907, 
+                    37.3965131
+                ]
+            }, 
+            "end_ts": 1441930612.622, 
+            "start_ts": 1441930110.729, 
+            "start_fmt_time": "2015-09-10 17:08:30.729000-07:00", 
+            "end_loc": {
+                "type": "Point", 
+                "coordinates": [
+                    -122.0881734, 
+                    37.3907896
+                ]
+            }, 
+            "source": "DwellSegmentationTimeFilter", 
+            "start_place": {
+                "$oid": "5608285df6858f3c7580c998"
+            }, 
+            "end_fmt_time": "2015-09-10 17:16:52.622000-07:00", 
+            "duration": 501.89299988746643, 
+            "_id": {
+                "$oid": "5608285df6858f3c7580c999"
+            }
         }, 
-        "end_ts": 1441930612.622, 
-        "start_ts": 1441930110.729, 
-        "start_fmt_time": "2015-09-10 17:08:30.729000-07:00", 
-        "end_loc": {
-            "type": "Point", 
-            "coordinates": [
-                -122.0881734, 
-                37.3907896
-            ]
-        }, 
-        "source": "DwellSegmentationTimeFilter", 
-        "start_place": {
-            "$oid": "5608285df6858f3c7580c998"
-        }, 
-        "end_fmt_time": "2015-09-10 17:16:52.622000-07:00", 
-        "duration": 501.89299988746643, 
         "_id": {
             "$oid": "5608285df6858f3c7580c999"
+        }, 
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "metadata": {
+            "write_fmt_time": "2016-04-20T19:23:33.783976-07:00", 
+            "write_ts": 1461205413.783976, 
+            "time_zone": "America/Los_Angeles", 
+            "platform": "server", 
+            "write_local_dt": {
+                "hour": 19, 
+                "month": 4, 
+                "second": 33, 
+                "weekday": 2, 
+                "year": 2016, 
+                "timezone": "America/Los_Angeles", 
+                "day": 20, 
+                "minute": 23
+            }, 
+            "key": "segmentation/raw_trip"
         }
     }
 ]
