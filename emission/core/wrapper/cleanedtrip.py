@@ -1,8 +1,11 @@
-import logging
 import emission.core.wrapper.trip as ecwt
+import emission.core.wrapper.wrapperbase as ecwb
 
 class Cleanedtrip(ecwt.Trip):
-    props = {"raw_trip": ecwb.WrapperBase.Access.WORM}
+    props = ecwt.Trip.props
+    props.update({"raw_trip": ecwb.WrapperBase.Access.WORM,
+                  "distance": ecwb.WrapperBase.Access.WORM,
+                  })
 
     def _populateDependencies(self):
-        self._setattr("type", ecwt.TripTypes.CLEANED)
+        super(Cleanedtrip, self)._populateDependencies()

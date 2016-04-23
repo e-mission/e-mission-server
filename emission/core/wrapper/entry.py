@@ -38,6 +38,8 @@ class Entry(ecwb.WrapperBase):
             "analysis/smoothing": "smoothresults",
             "analysis/cleaned_trip": "cleanedtrip",
             "analysis/cleaned_place": "cleanedplace",
+            "analysis/cleaned_section": "cleanedsection",
+            "analysis/cleaned_stop": "stop",
             "analysis/recreated_location": "recreatedlocation"
             }
 
