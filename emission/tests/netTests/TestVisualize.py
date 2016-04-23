@@ -14,6 +14,7 @@ import emission.analysis.intake.segmentation.trip_segmentation as eaist
 import emission.analysis.intake.segmentation.section_segmentation as eaiss
 import emission.analysis.intake.cleaning.filter_accuracy as eaicf
 import emission.storage.timeseries.format_hacks.move_filter_field as estfm
+import emission.core.wrapper.motionactivity as ecwm
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -41,9 +42,9 @@ class TestVisualize(unittest.TestCase):
 
 
     def testCommutePopRoute(self):
-        points = visualize.range_mode_heatmap("MotionTypes.BICYCLING",
-                                          self.day_start_dt.timestamp,
-                                          self.day_end_dt.timestamp)
+        points = visualize.range_mode_heatmap(ecwm.MotionTypes.BICYCLING,
+                                          self.day_start_ts,
+                                          self.day_end_ts)
         # I have to add test data with modes, I will do that tomorrow.
 
 
