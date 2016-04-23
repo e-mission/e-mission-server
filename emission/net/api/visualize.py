@@ -11,9 +11,13 @@ import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.decorations.timeline as esdt
 import emission.storage.decorations.local_date_queries as esdl
+import emission.storage.decorations.location_queries as esdlq
+
 import emission.core.wrapper.trip as ecwt
 import emission.core.wrapper.section as ecws
 import emission.storage.timeseries.geoquery as estg
+import emission.storage.timeseries.tcquery as esttc
+import emission.storage.decorations.analysis_timeseries_queries as esda
 
 # Note that all the points here are returned in (lng, lat) format, which is the
 # GeoJSON format.
@@ -48,41 +52,21 @@ def Berkeley_pop_route(start_ts, end_ts):
     # box = [ [-122.267443, 37.864693], [-122.250985, 37.880687] ]
     start_dt = esdl.get_local_date(start_ts, "UTC")
     end_dt = esdl.get_local_date(end_ts, "UTC")
-    tl = esdt.get_aggregate_timeline_from_dt(start_dt, end_dt, berkeley_json)
-    gj_list = gfc.get_geojson_for_timeline(None, tl)
-    list_of_points=[]
-    for gj in gj_list:
-        for feature in gj:
-            if feature['type'] == 'FeatureCollection':
-                for feat in feature['features']:
-                    if "properties" not in feat:
-                        continue
-                if feat['properties']['feature_type'] == "section":
-                    points = feat.geometry.coordinates
-                    list_of_points.extend(points)
-    return {"latlng": list_of_points}
+    time_query = esttc.TimeComponentQuery("data.ts", start_dt, end_dt)
+    geo_query = estg.GeoQuery(["data.loc"], berkeley_json)
+    loc_entry_list = esda.get_entries(esda.CLEANED_LOCATION_KEY, user_id=None,
+                                      time_query=time_query,
+                                      geo_query=geo_query)
+    return {"latlng": [e.data.loc.coordinates for e in loc_entry_list]}
 
 def range_mode_heatmap(mode, start_ts, end_ts):
     start_dt = esdl.get_local_date(start_ts, "UTC")
     end_dt = esdl.get_local_date(end_ts, "UTC")
-    tl = esdt.get_aggregate_timeline_from_dt(start_dt, end_dt)
-    gj_list = gfc.get_geojson_for_timeline(None, tl)
- 
-    logging.debug("len gl list is %d" % len(gj_list))
-    list_of_point=[]
- 
-    for gj in gj_list:
-        for feature in gj:
-            if feature['type'] == 'FeatureCollection':
-                for feat in feature['features']:
-                    if "properties" not in feat:
-                        continue
-                    if feat['properties']['feature_type'] == "section":
-                        if mode == 'all' or feat.properties["sensed_mode"] == mode:
-                            points = feat.geometry.coordinates
-                            list_of_point.extend(points)
-    logging.debug("Returning list of size %s" % len(list_of_point))
-    return {"latlng": list_of_point}
+    time_query = esttc.TimeComponentQuery("data.ts", start_dt, end_dt)
+    loc_entry_list = esda.get_entries(esda.CLEANED_LOCATION_KEY, user_id=None,
+                                      time_query=time_query, geo_query=None,
+                                      extra_query_list=[esdlq.get_mode_query(mode)])
+    return {"latlng": [e.data.loc.coordinates for e in loc_entry_list]}
 
 
 
