@@ -1,6 +1,8 @@
 import urllib, urllib2
-from emission.core.wrapper.trip_old import Coordinate
+import logging
 import json
+
+from emission.core.wrapper.trip_old import Coordinate
 from pygeocoder import Geocoder as pyGeo  ## We fall back on this if we have to
 
 key_file = open("conf/net/ext_service/googlemaps.json")
@@ -59,8 +61,9 @@ class Geocoder:
     def get_json_reverse(cls, lat, lng):
         request = urllib2.Request(cls.make_url_reverse(lat, lng))
         response = urllib2.urlopen(request)
-        print json.loads(response.read())
-        return json.loads(response.read())
+        parsed_response = json.loads(response.read())
+        logging.debug("parsed_response = %s" % parsed_response)
+        return parsed_response
 
     @classmethod
     def reverse_geocode(cls, lat, lng):
