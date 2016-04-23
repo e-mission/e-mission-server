@@ -14,6 +14,8 @@ import emission.core.wrapper.motionactivity as ecwm
 
 import emission.analysis.plotting.geojson.geojson_feature_converter as gjfc
 import emission.analysis.intake.segmentation.section_segmentation as eaiss
+import emission.analysis.intake.cleaning.location_smoothing as eaicl
+import emission.analysis.intake.cleaning.clean_and_resample as eaicr
 
 import emission.analysis.intake.segmentation.trip_segmentation as eaist
 
@@ -44,8 +46,10 @@ class TestGeojsonFeatureConverter(unittest.TestCase):
     def testTripGeojson(self):
         eaist.segment_current_trips(self.testUUID)
         eaiss.segment_current_sections(self.testUUID)
+        eaicl.filter_current_sections(self.testUUID)
+        eaicr.clean_and_resample(self.testUUID)
 
-        tl = esdtl.get_timeline(self.testUUID, 1440658800, 1440745200)
+        tl = esdtl.get_cleaned_timeline(self.testUUID, 1440658800, 1440745200)
         tl.fill_start_end_places()
 
         created_trips = tl.trips

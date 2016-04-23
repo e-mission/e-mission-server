@@ -85,8 +85,8 @@ class TestSectionSegmentation(unittest.TestCase):
             "segmentation/raw_trip", test_trip))
         eaiss.segment_trip_into_sections(self.testUUID, test_trip_id, "DwellSegmentationTimeFilter")
 
-        created_stops_entries = esdt.get_stops_for_trip(self.testUUID, test_trip_id)
-        created_sections_entries = esdt.get_sections_for_trip(self.testUUID, test_trip_id)
+        created_stops_entries = esdt.get_raw_stops_for_trip(self.testUUID, test_trip_id)
+        created_sections_entries = esdt.get_raw_sections_for_trip(self.testUUID, test_trip_id)
         created_stops = [entry.data for entry in created_stops_entries]
         created_sections = [entry.data for entry in created_sections_entries]
 
@@ -129,12 +129,13 @@ class TestSectionSegmentation(unittest.TestCase):
         eaiss.segment_current_sections(self.testUUID)
 
         tq_trip = estt.TimeQuery("data.start_ts", 1440658800, 1440745200)
-        created_trips = esda.get_entries(esda.RAW_TRIP_KEY, self.testUUID, tq_trip)
+        created_trips = esda.get_entries(esda.RAW_TRIP_KEY, self.testUUID,
+                                         tq_trip)
 
         for i, trip in enumerate(created_trips):
             logging.debug("current trip is %s" % trip)
-            created_stops = esdt.get_stops_for_trip(self.testUUID, trip.get_id())
-            created_sections = esdt.get_sections_for_trip(self.testUUID, trip.get_id())
+            created_stops = esdt.get_raw_stops_for_trip(self.testUUID, trip.get_id())
+            created_sections = esdt.get_raw_sections_for_trip(self.testUUID, trip.get_id())
 
             for j, stop in enumerate(created_stops):
                 logging.info("Retrieved stops %s: %s -> %s" % (j, stop.enter_fmt_time, stop.exit_fmt_time))

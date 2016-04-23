@@ -71,26 +71,26 @@ class TestTimeline(unittest.TestCase):
 
     def testDatetimeTimeline(self):
         eaist.segment_current_trips(self.testUUID)
-        tl = esdt.get_timeline_from_dt(self.testUUID,
-                                       self.day_start_dt, self.day_end_dt)
+        tl = esdt.get_raw_timeline_from_dt(self.testUUID,
+                                           self.day_start_dt, self.day_end_dt)
         self.checkPlaceTripConsistency(tl)
 
     def testPlaceTripTimeline(self):
         eaist.segment_current_trips(self.testUUID)
-        tl = esdt.get_timeline(self.testUUID, self.day_start_ts, self.day_end_ts)
+        tl = esdt.get_raw_timeline(self.testUUID, self.day_start_ts, self.day_end_ts)
         self.checkPlaceTripConsistency(tl)
 
     def testStopSectionTimeline(self):
         eaist.segment_current_trips(self.testUUID)
         eaiss.segment_current_sections(self.testUUID)
-        tl = esdt.get_timeline(self.testUUID, self.day_start_ts, self.day_end_ts)
+        tl = esdt.get_raw_timeline(self.testUUID, self.day_start_ts, self.day_end_ts)
 
 
         for i, element in enumerate(tl):
             logging.debug("%s: %s" % (i, type(element)))
             curr_type = self.get_type(element)
             if curr_type == ecwrt.Rawtrip:
-                curr_tl = esdtq.get_timeline_for_trip(self.testUUID, element.get_id())
+                curr_tl = esdtq.get_raw_timeline_for_trip(self.testUUID, element.get_id())
                 logging.debug("Got timeline %s for trip %s" % (curr_tl, element.start_fmt_time))
                 prev_sub_type = None
                 prev_element = None

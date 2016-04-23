@@ -86,10 +86,12 @@ class TestTripSegmentation(unittest.TestCase):
         # them into the database. Now, we want to query to ensure that they
         # were created correctly.
         tq_place = estt.TimeQuery("data.enter_ts", 1440658800, 1440745200)
-        created_places_entries = esda.get_entries(esda.RAW_PLACE_KEY, self.androidUUID, tq_place)
+        created_places_entries = esda.get_entries(esda.RAW_PLACE_KEY,
+                                                  self.androidUUID, tq_place)
 
         tq_trip = estt.TimeQuery("data.start_ts", 1440658800, 1440745200)
-        created_trips_entries = esda.get_entries(esda.RAW_TRIP_KEY, self.androidUUID, tq_trip)
+        created_trips_entries = esda.get_entries(esda.RAW_TRIP_KEY,
+                                                 self.androidUUID, tq_trip)
 
         for i, place in enumerate(created_places_entries):
             logging.debug("Retrieved places %s: %s -> %s" % (i, place.data.enter_fmt_time, place.data.exit_fmt_time))
@@ -125,10 +127,12 @@ class TestTripSegmentation(unittest.TestCase):
         # them into the database. Now, we want to query to ensure that they
         # were created correctly.
         tq_place = estt.TimeQuery("data.enter_ts", 1446796800, 1446847600)
-        created_places_entries = esda.get_entries(esda.RAW_PLACE_KEY, self.iosUUID, tq_place)
+        created_places_entries = esda.get_entries(esda.RAW_PLACE_KEY,
+                                                  self.iosUUID, tq_place)
 
         tq_trip = estt.TimeQuery("data.start_ts", 1446796800, 1446847600)
-        created_trips_entries = esda.get_entries(esda.RAW_TRIP_KEY, self.iosUUID, tq_trip)
+        created_trips_entries = esda.get_entries(esda.RAW_TRIP_KEY,
+                                                 self.iosUUID, tq_trip)
 
         for i, place in enumerate(created_places_entries):
             logging.debug("Retrieved places %s: %s -> %s" % (i, place.data.enter_fmt_time, place.data.exit_fmt_time))
@@ -161,7 +165,8 @@ class TestTripSegmentation(unittest.TestCase):
     
     def testSegmentationWrapperCombined(self):
         # Change iOS entries to have the android UUID
-        for entry in esta.TimeSeries.get_time_series(self.iosUUID).find_entries():
+        for entry in esta.TimeSeries.get_time_series(
+                self.iosUUID).find_entries():
             entry["user_id"] = self.androidUUID
             edb.get_timeseries_db().save(entry)
         
@@ -170,10 +175,12 @@ class TestTripSegmentation(unittest.TestCase):
         eaist.segment_current_trips(self.androidUUID)
 
         tq_place = estt.TimeQuery("data.enter_ts", 1440658800, 1446847600)
-        created_places_entries = esda.get_entries(esda.RAW_PLACE_KEY, self.androidUUID, tq_place)
+        created_places_entries = esda.get_entries(esda.RAW_PLACE_KEY,
+                                                  self.androidUUID, tq_place)
 
         tq_trip = estt.TimeQuery("data.start_ts", 1440658800, 1446847600)
-        created_trips_entries = esda.get_entries(esda.RAW_TRIP_KEY, self.androidUUID, tq_trip)
+        created_trips_entries = esda.get_entries(esda.RAW_TRIP_KEY,
+                                                 self.androidUUID, tq_trip)
 
         for i, place in enumerate(created_places_entries):
             logging.debug("Retrieved places %s: %s -> %s" % (i, place.data.enter_fmt_time, place.data.exit_fmt_time))
