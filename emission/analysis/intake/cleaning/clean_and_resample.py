@@ -196,13 +196,17 @@ def get_filtered_section(new_trip_entry, section):
     filtered_section_data.speeds = speeds
     filtered_section_data.distances = distances
     filtered_section_data.distance = sum(distances)
+    filtered_section_entry = ecwe.Entry.create_entry(section.user_id,
+                                    esda.CLEANED_SECTION_KEY,
+                                    filtered_section_data, create_id=True)
 
     ts = esta.TimeSeries.get_time_series(section.user_id)
     for row in with_speeds_df.to_dict('records'):
+        row["mode"] = section.data.sensed_mode
+        row["section"] = filtered_section_entry.get_id()
         ts.insert_data(section.user_id, esda.RAW_PLACE_KEY, row)
 
-    return ecwe.Entry.create_entry(section.user_id, esda.CLEANED_SECTION_KEY,
-                                   filtered_section_data, create_id=True)
+    return filtered_section_entry
 
 def get_filtered_stop(ts, new_trip_entry, stop):
     """
