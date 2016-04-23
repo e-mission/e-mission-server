@@ -129,8 +129,8 @@ def get_maps_for_range_old(user_id, start_ts, end_ts):
     for i, trip in enumerate(trip_list):
         logging.debug("-" * 20 + trip.start_fmt_time + "=>" + trip.end_fmt_time
                       + "(" + str(trip.end_ts - trip.start_ts) + ")")
-        if (len(esdt.get_sections_for_trip(user_id, trip.get_id())) == 0 and
-            len(esdt.get_stops_for_trip(user_id, trip.get_id())) == 0):
+        if (len(esdt.get_raw_sections_for_trip(user_id, trip.get_id())) == 0 and
+            len(esdt.get_raw_stops_for_trip(user_id, trip.get_id())) == 0):
             logging.debug("Skipping trip because it has no stops and no sections")
             continue
 
@@ -143,7 +143,7 @@ def get_maps_for_range_old(user_id, start_ts, end_ts):
         update_place(curr_map, trip.end_place, place_map, marker_color='red')
         # TODO: Should get_timeline_for_trip work on a trip_id or on a trip object
         # it seems stupid to convert trip object -> id -> trip object
-        curr_trip_timeline = esdt.get_timeline_for_trip(user_id, trip.get_id())
+        curr_trip_timeline = esdt.get_raw_timeline_for_trip(user_id, trip.get_id())
         for i, trip_element in enumerate(curr_trip_timeline):
             # logging.debug("Examining element %s of type %s" % (trip_element, type(trip_element)))
             if type(trip_element) == ecws.Stop:
