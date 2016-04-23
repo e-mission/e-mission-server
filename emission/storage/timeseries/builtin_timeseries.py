@@ -30,6 +30,8 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "analysis/smoothing": self.analysis_timeseries_db,
                 "analysis/cleaned_trip": self.analysis_timeseries_db,
                 "analysis/cleaned_place": self.analysis_timeseries_db,
+                "analysis/cleaned_section": self.analysis_timeseries_db,
+                "analysis/cleaned_stop": self.analysis_timeseries_db,
                 "analysis/recreated_location": self.analysis_timeseries_db,
             }
 
@@ -43,7 +45,9 @@ class BuiltinTimeSeries(esta.TimeSeries):
         Return the correct timeseries for the key. Analysis results go into the
         analysis timeseries and raw sensor data stays in the regular timeseries.
         """
-        return self.ts_map[key]
+        ret_val = self.ts_map[key]
+        logging.debug("Returning %s" % ret_val)
+        return ret_val
 
     def _get_query(self, key_list = None, time_query = None, geo_query = None,
                    extra_query_list = []):
@@ -86,7 +90,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
         orig_ts_db_keys = [key for key in key_list if 
             self.get_timeseries_db(key) == self.timeseries_db]
         analysis_ts_db_keys = [key for key in key_list if 
-            self.get_timeseries_db(key) == self.timeseries_db]
+            self.get_timeseries_db(key) == self.analysis_timeseries_db]
         return (orig_ts_db_keys, analysis_ts_db_keys)
 
     def find_entries(self, key_list = None, time_query = None, geo_query = None,
