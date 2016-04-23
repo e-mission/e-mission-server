@@ -19,16 +19,19 @@ class TimeSeries(object):
         import emission.storage.timeseries.builtin_timeseries as bits
         return bits.BuiltinTimeSeries.get_uuid_list()
 
-    def find_entries(self, key_list = None, time_query = None):
+    def find_entries(self, key_list=None, time_query=None, geo_query=None,
+                     extra_query_list=None):
         """
         Find the entries for the specified time query
+        :param geo_query:
+        :param extra_query_list:
         """
         pass
 
     def get_entry_at_ts(self, key, ts_key, ts):
         pass
 
-    def get_data_df(self, key, time_query = None):
+    def get_data_df(self, key, time_query = None, geo_query=None, extra_query_list=None):
         """
         Returns a dataframe of the specified entries. A single key is required,
         since we want to retrieve objects of the same type - the dataframe is
