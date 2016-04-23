@@ -35,6 +35,7 @@ import emission.core.wrapper.cleanedplace as ecwcp
 import emission.core.wrapper.cleanedsection as ecwcs
 import emission.core.wrapper.stop as ecwst
 import emission.core.wrapper.location as ecwl
+import emission.core.wrapper.recreatedlocation as ecwrl
 
 import emission.core.our_geocoder as eco
 
@@ -75,10 +76,11 @@ def save_cleaned_segments_for_ts(user_id, start_ts, end_ts):
     return save_cleaned_segments_for_timeline(user_id, tl)
 
 def save_cleaned_segments_for_timeline(user_id, tl):
+    ts = esta.TimeSeries.get_time_series(user_id)
     trip_map = {}
     for trip in tl.trips:
         try:
-            filtered_trip = get_filtered_trip(trip)
+            filtered_trip = get_filtered_trip(ts, trip)
             if filtered_trip is not None:
                 trip_map[trip.get_id()] = filtered_trip
         except KeyError, e:
@@ -91,14 +93,15 @@ def save_cleaned_segments_for_timeline(user_id, tl):
             logging.exception("Found error %s while processing trip %s" % (e, trip))
             raise e
 
-    ts = esta.TimeSeries.get_time_series(user_id)
     (last_cleaned_place, filtered_tl) = create_and_link_timeline(tl, user_id, trip_map)
 
     # We have updated the first place entry in the filtered_tl, but everything
     # else is new and needs to be inserted
-    ts.update(last_cleaned_place)
-    for entry in filtered_tl:
-        ts.insert(entry)
+    if last_cleaned_place is not None:
+        ts.update(last_cleaned_place)
+    if filtered_tl is not None:
+        for entry in filtered_tl:
+            ts.insert(entry)
 
     return tl.last_place()
 
@@ -129,12 +132,12 @@ def get_filtered_trip(ts, trip):
 
     stop_map = {}
     for stop in trip_tl.places:
-        stop_map[stop.get_id()] = get_filtered_stop(ts, filtered_trip_entry, stop)
+        stop_map[stop.get_id()] = get_filtered_stop(filtered_trip_entry, stop)
 
     # TODO: DO we need to add the stop distances too? They should be small...
     trip_distance = [section.data.distance for section in section_map.values()]
     filtered_trip_data.distance = trip_distance
-    filtered_trip_entry.data = filtered_trip_data
+    filtered_trip_entry["data"] = filtered_trip_data
 
     # After we have linked everything back together. NOW we can save the entries
     linked_tl = link_trip_timeline(trip_tl, section_map, stop_map)
@@ -151,13 +154,15 @@ def get_filtered_place(raw_place):
                        excluded_list=filtered_place_excluded)
 
     filtered_place_data.raw_places = []
-    filtered_place_data.raw_places.append(raw_place.get_id())
-    reverse_geocoded_json = eco.Geocoder.get_json_reverse(filtered_place_data.location.coordinates[1],
-                                                          filtered_place_data.location.coordinates[0])
-    if reverse_geocoded_json is not None:
-        filtered_place_data.display_Name = format_result(reverse_geocoded_json)
-        filtered_place_data.osm_type = reverse_geocoded_json["osm_type"]
-        filtered_place_data.osm_id = reverse_geocoded_json["osm_id"]
+    filtered_place_data.append_raw_place(raw_place.get_id())
+
+    try:
+        reverse_geocoded_json = eco.Geocoder.get_json_reverse(filtered_place_data.location.coordinates[1],
+                                                              filtered_place_data.location.coordinates[0])
+        if reverse_geocoded_json is not None:
+            filtered_place_data.display_name = format_result(reverse_geocoded_json)
+    except:
+        logging.exception("Unable to pre-fill reverse geocoded information, client has to do it")
 
     curr_cleaned_end_place = ecwe.Entry.create_entry(raw_place.user_id,
                                                      esda.CLEANED_PLACE_KEY,
@@ -202,23 +207,25 @@ def get_filtered_section(new_trip_entry, section):
 
     ts = esta.TimeSeries.get_time_series(section.user_id)
     for row in with_speeds_df.to_dict('records'):
-        row["mode"] = section.data.sensed_mode
-        row["section"] = filtered_section_entry.get_id()
-        ts.insert_data(section.user_id, esda.RAW_PLACE_KEY, row)
+        loc_row = ecwrl.Recreatedlocation(row)
+        loc_row.mode = section.data.sensed_mode
+        loc_row.section = filtered_section_entry.get_id()
+        ts.insert_data(section.user_id, esda.CLEANED_LOCATION_KEY, loc_row)
 
     return filtered_section_entry
 
-def get_filtered_stop(ts, new_trip_entry, stop):
+def get_filtered_stop(new_trip_entry, stop):
     """
     If we have filtered sections, I guess we need to have filtered stops as well.
     These should also point to the new trip
-    :param ts: the timeseries for this user
-    :param trip: the trip that this stop is part of
+
+    :param new_trip_trip: the trip that this stop is part of
     :param stop: the section that this is part of
     :return: None
     """
     filtered_stop_data = ecwst.Stop()
     filtered_stop_data['_id'] = new_trip_entry.get_id()
+    filtered_stop_data.trip_id = new_trip_entry.get_id()
     _copy_non_excluded(old_data=stop.data,
                        new_data=filtered_stop_data,
                        excluded_list=filtered_stop_excluded)
@@ -232,10 +239,10 @@ def get_filtered_points(section, filtered_section_data):
                                        esda.RAW_SECTION_KEY, section.get_id()))
 
     loc_entry_list = [ecwe.Entry(e) for e in loc_entry_it]
-    if loc_entry_list[-1].loc != section.data.end_loc:
-        assert (
-        "section_location_array[-1].loc != section.end_loc even after df.ts fix",
-        (loc_entry_list[-1].loc, section.end_loc))
+
+    assert (loc_entry_list[-1].data.loc == section.data.end_loc,
+            "section_location_array[-1].loc != section.end_loc even after df.ts fix",
+            (loc_entry_list[-1].data.loc, section.data.end_loc))
 
     # Find the list of points to filter
     filtered_points_entry_doc = ts.get_entry_at_ts("analysis/smoothing",
@@ -305,6 +312,7 @@ def resample(filtered_loc_list, interval):
     start_ts = loc_df.ts.iloc[0]
     end_ts = loc_df.ts.iloc[-1]
     tz_ranges_df = _get_tz_ranges(loc_df)
+    logging.debug("tz_ranges_df = %s" % tz_ranges_df)
 
     lat_fn = spi.interp1d(x=loc_df.ts, y=loc_df.latitude, bounds_error=False,
                           fill_value='extrapolate')
@@ -330,8 +338,11 @@ def resample(filtered_loc_list, interval):
     return loc_df_new
 
 def _get_timezone(ts, tz_ranges_df):
-    return tz_ranges_df[(tz_ranges_df.start_ts <= ts) &
-                        (ts <= tz_ranges_df.end_ts)].timezone
+    # TODO: change this to a dataframe query instead
+    sel_entry = tz_ranges_df[(tz_ranges_df.start_ts <= ts) &
+                        (tz_ranges_df.end_ts >= ts)]
+    assert len(sel_entry) == 1, "len(sel_entry = %d" % len(sel_entry)
+    return sel_entry.timezone.iloc[0]
 
 def _get_tz_ranges(loc_df):
     tz_ranges = []
@@ -340,14 +351,15 @@ def _get_tz_ranges(loc_df):
 
     # We know that there is at least one entry, so we can access it with impunity
     curr_start_ts = loc_df.ts.iloc[0]
-    curr_tz = loc_df.local_dt.iloc[0].timezone
+    curr_tz = loc_df.local_dt.iloc[0]["timezone"]
     for row in loc_df.to_dict('records'):
-        if row.local_dt.timezone != curr_tz:
+        loc_data = ecwl.Location(row)
+        if loc_data.local_dt["timezone"] != curr_tz:
             tz_ranges.append({'timezone': curr_tz,
                               'start_ts': curr_start_ts,
                               'end_ts': row.ts})
             curr_start_ts = row.ts
-            curr_tz = row.local_dt.timezone
+            curr_tz = loc_data.local_dt["timezone"]
 
     # At the end, always add an entry
     # For cases in which there is only one timezone (common case),
@@ -355,31 +367,48 @@ def _get_tz_ranges(loc_df):
     tz_ranges.append({'timezone': curr_tz,
                       'start_ts': curr_start_ts,
                       'end_ts': loc_df.ts.iloc[-1]})
+    logging.debug("tz_ranges = %s" % tz_ranges)
     return pd.DataFrame(tz_ranges)
 
 def link_trip_timeline(tl, section_map, stop_map):
-    filled_in_sections = [_fill_section(s, section_map[s], stop_map) for s in tl.trips]
-    filled_in_stops = [_fill_stop(s, stop_map[s], section_map) for s in tl.places]
-    return esdtl.Timeline(filled_in_sections, filled_in_stops)
+    filled_in_sections = [_fill_section(s, section_map[s.get_id()], stop_map) for s in tl.trips]
+    filled_in_stops = [_fill_stop(s, stop_map[s.get_id()], section_map) for s in tl.places]
+    return esdtl.Timeline(esda.CLEANED_STOP_KEY, esda.CLEANED_SECTION_KEY,
+                          filled_in_stops, filled_in_sections)
 
 def _fill_section(old_section, new_section, stop_map):
     section_data = new_section.data
-    section_data.start_stop = stop_map[old_section.data.start_stop].get_id()
-    section_data.end_stop = stop_map[old_section.data.end_stop].get_id()
-    new_section.data = section_data
+    # the first section will have the start_stop == None and the last section
+    # will have the end_stop == None, so we handle those by a simple check
+    if old_section.data.start_stop is not None:
+        section_data.start_stop = stop_map[old_section.data.start_stop].get_id()
+    if old_section.data.end_stop is not None:
+        section_data.end_stop = stop_map[old_section.data.end_stop].get_id()
+    new_section["data"] = section_data
     return new_section
 
 def _fill_stop(old_stop, new_stop, section_map):
     stop_data = new_stop.data
     stop_data.ending_section = section_map[old_stop.data.ending_section].get_id()
     stop_data.starting_section = section_map[old_stop.data.starting_section].get_id()
-    new_stop.data = stop_data
+    new_stop["data"] = stop_data
     return new_stop
 
 def create_and_link_timeline(tl, user_id, trip_map):
     last_cleaned_place = esdp.get_last_place_entry(esda.CLEANED_PLACE_KEY, user_id)
     cleaned_places = []
     curr_cleaned_start_place = last_cleaned_place
+    if curr_cleaned_start_place is None:
+        # If it is not present - maybe this user is getting started for the first
+        # time, we create an entry based on the first trip from the timeline
+        curr_cleaned_start_place = get_filtered_place(tl.first_place())
+        # We just created this place here, so lets add it to the created places
+        # and insert rather than update it
+        cleaned_places.append(curr_cleaned_start_place)
+
+    if curr_cleaned_start_place is None:
+        # If the timeline has no entries, we give up and return
+        return (None, None)
 
     for raw_trip in tl.trips:
         if raw_trip.get_id() in trip_map:
@@ -387,12 +416,12 @@ def create_and_link_timeline(tl, user_id, trip_map):
             # start to the curr_cleaned_start_place
             curr_cleaned_trip = trip_map[raw_trip.get_id()]
             raw_start_place = tl.get_object(raw_trip.data.start_place)
-            link_trip_start(curr_cleaned_trip, curr_cleaned_start_place, raw_trip, raw_start_place)
+            link_trip_start(curr_cleaned_trip, curr_cleaned_start_place, raw_start_place)
 
             raw_end_place = tl.get_object(raw_trip.data.end_place)
             curr_cleaned_end_place = get_filtered_place(raw_end_place)
             cleaned_places.append(curr_cleaned_end_place)
-            link_trip_end(curr_cleaned_trip, curr_cleaned_end_place, raw_trip, raw_end_place)
+            link_trip_end(curr_cleaned_trip, curr_cleaned_end_place, raw_end_place)
 
             curr_cleaned_start_place = curr_cleaned_end_place
         else:
@@ -404,46 +433,56 @@ def create_and_link_timeline(tl, user_id, trip_map):
             link_squished_place(curr_cleaned_start_place,
                                 tl.get_object(raw_trip.data.start_place))
 
-    return (last_cleaned_place, esdtl.Timeline(cleaned_places, trip_map.values()))
+    return (last_cleaned_place, esdtl.Timeline(esda.CLEANED_PLACE_KEY,
+                                               esda.CLEANED_TRIP_KEY,
+                                               cleaned_places,
+                                               trip_map.values()))
 
 def link_squished_place(cleaned_place, raw_place):
     cleaned_place_data = cleaned_place.data
-    cleaned_place_data.raw_places.append(raw_place.get_id())
-    cleaned_place.data = cleaned_place_data
+    cleaned_place_data.append_raw_place(raw_place.get_id())
+    cleaned_place["data"] = cleaned_place_data
 
-def link_trip_start(cleaned_trip, cleaned_start_place, raw_trip, raw_start_place):
+def link_trip_start(cleaned_trip, cleaned_start_place, raw_start_place):
+    logging.debug("for trip %s start, converting %s to %s" %
+                  (cleaned_trip, cleaned_start_place, raw_start_place))
     cleaned_start_place_data = cleaned_start_place.data
     cleaned_trip_data = cleaned_trip.data
 
     cleaned_trip_data.start_place = cleaned_start_place.get_id()
 
     # We have now reached the end of the squishing. Let's hook up the end information
-    for key in raw_start_place:
+    for key in raw_start_place.data:
         if key in ["exit_ts", "exit_local_dt", "exit_fmt_time"]:
             cleaned_start_place_data[key] = raw_start_place.data[key]
     cleaned_start_place_data.starting_trip = cleaned_trip.get_id()
-    cleaned_start_place_data.duration = cleaned_start_place_data.exit_ts - \
-                                        cleaned_start_place_data.enter_ts
+    if cleaned_start_place_data.enter_ts is not None:
+        logging.debug("Start of a new chain, unknown duration")
+        cleaned_start_place_data.duration = cleaned_start_place_data.exit_ts - \
+                                            cleaned_start_place_data.enter_ts
 
-    cleaned_start_place_data.raw_places.append(raw_trip.data.start_place)
+    # Appended while creating the start place, or while handling squished
+    # TODO: Don't think I need this?
+    # cleaned_start_place_data.append_raw_place(raw_trip.data.start_place)
 
-    cleaned_start_place.data = cleaned_start_place_data
-    cleaned_trip.data = cleaned_trip_data
+    cleaned_start_place["data"] = cleaned_start_place_data
+    cleaned_trip["data"] = cleaned_trip_data
 
-def link_trip_end(cleaned_trip, cleaned_end_place, raw_trip, raw_end_place):
+def link_trip_end(cleaned_trip, cleaned_end_place, raw_end_place):
     cleaned_end_place_data = cleaned_end_place.data
     cleaned_trip_data = cleaned_trip.data
 
     cleaned_trip_data.end_place = cleaned_end_place.get_id()
     cleaned_end_place_data.ending_trip = cleaned_trip.get_id()
 
-    cleaned_end_place.data = cleaned_end_place_data
-    cleaned_trip.data = cleaned_trip_data
+    cleaned_end_place["data"] = cleaned_end_place_data
+    cleaned_trip["data"] = cleaned_trip_data
 
 def format_result(rev_geo_result):
-    get_fine = lambda rgr: get_with_fallbacks(rgr, ["road", "neighbourhood"])
-    get_coarse = lambda rgr: get_with_fallbacks(rgr, ["city", "town", "county"])
+    get_fine = lambda rgr: get_with_fallbacks(rgr["address"], ["road", "neighbourhood"])
+    get_coarse = lambda rgr: get_with_fallbacks(rgr["address"], ["city", "town", "county"])
     name = "%s, %s" % (get_fine(rev_geo_result), get_coarse(rev_geo_result))
+    return name
 
 def get_with_fallbacks(json, fallback_key_list):
     for key in fallback_key_list:

@@ -17,10 +17,6 @@ import emission.core.wrapper.entry as ecwe
 import emission.analysis.intake.cleaning.location_smoothing as eaicl
 
 def _del_non_derializable(prop_dict, extra_keys):
-    if "user_id" in prop_dict:
-        # It is not in the location entries that are created from the data df
-        del prop_dict["user_id"]
-    del prop_dict["_id"]
     for key in extra_keys:
         if key in prop_dict:
             del prop_dict[key]
@@ -117,9 +113,10 @@ def section_to_geojson(section, tl):
 
         # Fudge the end point so that we don't have a gap because of the ts != write_ts mismatch
         # TODO: Fix this once we are able to query by the data timestamp instead of the metadata ts
-        if section_location_entries[-1].loc != section.end_loc:
-            assert("section_location_array[-1].loc != section.end_loc even after df.ts fix",
-                (section_location_entries[-1].loc, section.end_loc))
+
+        assert section_location_entries[-1].data.loc == section.data.end_loc, \
+                "section_location_array[-1].data.loc %s != section.data.end_loc %s even after df.ts fix" % \
+                    (section_location_entries[-1].data.loc, section.data.end_loc)
 #             last_loc_doc = ts.get_entry_at_ts("background/filtered_location", "data.ts", section.end_ts)
 #             last_loc_data = ecwe.Entry(last_loc_doc).data
 #             last_loc_data["_id"] = last_loc_doc["_id"]
@@ -133,7 +130,7 @@ def section_to_geojson(section, tl):
     # If this is the first section, we already start from the trip start. But we actually need to start from the
     # prior place. Fudge this too. Note also that we may want to figure out how to handle this properly in the model
     # without needing fudging. TODO: Unclear how exactly to do this
-    if section.start_stop is None:
+    if section.data.start_stop is None:
         # This is the first section. So we need to find the start place of the parent trip
         parent_trip = tl.get_object(section.data.trip_id)
         start_place_of_parent_trip = tl.get_object(parent_trip.data.start_place)
@@ -158,7 +155,7 @@ def point_array_to_line(point_array):
 
     for l in point_array:
         # logging.debug("About to add %s to line_string " % l)
-        points_line_string.coordinates.append(l.loc.coordinates)
+        points_line_string.coordinates.append(l.data.loc.coordinates)
     
     points_line_feature = gj.Feature()
     points_line_feature.geometry = points_line_string
@@ -240,13 +237,13 @@ def get_all_points_for_range(user_id, key, start_ts, end_ts):
     tq = estt.TimeQuery("metadata.write_ts", start_ts, end_ts)
     ts = esta.TimeSeries.get_time_series(user_id)
     entry_it = ts.find_entries([key], tq)
-    points_array = [ecwl.Location(ts._to_df_entry(entry)) for entry in entry_it]
+    points_array = [ecwe.Entry(entry) for entry in entry_it]
 
     return get_feature_list_for_point_array(points_array)
 
 
 def get_feature_list_for_point_array(points_array):
-    points_feature_array = [location_to_geojson(l) for l in points_array]
+    points_feature_array = [location_to_geojson(le.data) for le in points_array]
     print ("Found %d points" % len(points_feature_array))
     
     feature_array = []
@@ -269,5 +266,6 @@ def get_location_entry_list_from_df(loc_time_df, ts="ts", latitude="latitude", l
     for idx, row in loc_time_df.iterrows():
         retVal = {"latitude": row[latitude], "longitude": row[longitude], "ts": row[ts],
                   "_id": str(idx), "fmt_time": row[fmt_time], "loc": gj.Point(coordinates=[row[longitude], row[latitude]])}
-        location_entry_list.append(ecwl.Location(retVal))
+        location_entry_list.append(ecwe.Entry.create_entry(
+            "dummy_user", "dummy_entry", ecwl.Location(retVal)))
     return location_entry_list
