@@ -36,10 +36,10 @@ class SectionSegmentationMethod(object):
 def segment_current_sections(user_id):
     time_query = epq.get_time_range_for_sectioning(user_id)
     try:
-        trips_to_process = esda.get_objects(esda.RAW_TRIP_KEY, user_id, time_query)
+        trips_to_process = esda.get_entries(esda.RAW_TRIP_KEY, user_id, time_query)
         for trip in trips_to_process:
             logging.info("+" * 20 + ("Processing trip %s for user %s" % (trip.get_id(), user_id)) + "+" * 20)
-            segment_trip_into_sections(user_id, trip.get_id(), trip.source)
+            segment_trip_into_sections(user_id, trip.get_id(), trip.data.source)
         if len(trips_to_process) == 0:
             # Didn't process anything new so start at the same point next time
             last_trip_processed = None
