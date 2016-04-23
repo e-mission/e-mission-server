@@ -9,6 +9,7 @@ import emission.core.wrapper.entry as ecwe
 
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.timeline as esdt
+import emission.storage.decorations.analysis_timeseries_queries as esda
 
 def get_raw_sections_for_trip(user_id, trip_id):
     return get_sections_for_trip("segmentation/raw_section", user_id, trip_id)
@@ -26,14 +27,16 @@ def get_raw_timeline_for_trip(user_id, trip_id):
     """
     Get an ordered sequence of sections and stops corresponding to this trip.
     """
-    return esdt.Timeline(get_raw_stops_for_trip(user_id, trip_id),
+    return esdt.Timeline(esda.RAW_STOP_KEY, esda.RAW_SECTION_KEY,
+                         get_raw_stops_for_trip(user_id, trip_id),
                          get_raw_sections_for_trip(user_id, trip_id))
 
 def get_cleaned_timeline_for_trip(user_id, trip_id):
     """
     Get an ordered sequence of sections and stops corresponding to this trip.
     """
-    return esdt.Timeline(get_cleaned_stops_for_trip(user_id, trip_id),
+    return esdt.Timeline(esda.CLEANED_STOP_KEY, esda.CLEANED_SECTION_KEY,
+                         get_cleaned_stops_for_trip(user_id, trip_id),
                          get_cleaned_sections_for_trip(user_id, trip_id))
 
 def get_sections_for_trip(key, user_id, trip_id):
