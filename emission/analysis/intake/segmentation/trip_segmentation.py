@@ -2,7 +2,7 @@ import logging
 
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.place_queries as esdp
-import emission.storage.decorations.trip_queries as esdt
+import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.pipeline_queries as epq
 
 import emission.core.wrapper.transition as ecwt
@@ -137,7 +137,7 @@ def create_places_and_trips(user_id, segmentation_points, segmentation_method_na
     # Let us first deal with the easy case.
     # restart_events_df = get_restart_events(ts, time_query)
     ts = esta.TimeSeries.get_time_series(user_id)
-    last_place_entry = esdp.get_last_place_entry(user_id)
+    last_place_entry = esdp.get_last_place_entry(esda.RAW_PLACE_KEY, user_id)
     if last_place_entry is None:
         last_place = start_new_chain(user_id)
         last_place.source = segmentation_method_name

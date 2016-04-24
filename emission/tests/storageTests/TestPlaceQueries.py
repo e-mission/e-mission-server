@@ -32,13 +32,15 @@ class TestPlaceQueries(unittest.TestCase):
         esta.TimeSeries.get_time_series(self.testUserId).update(old_place_entry)
         # The place saved in the previous step has no exit_ts set, so it is the
         # last place
-        last_place_entry = esdp.get_last_place_entry(self.testUserId)
+        last_place_entry = esdp.get_last_place_entry(esda.RAW_PLACE_KEY,
+                                                     self.testUserId)
         last_place_entry["data"]["exit_ts"] = 6
         logging.debug("About to update entry to %s" % last_place_entry)
         esta.TimeSeries.get_time_series(self.testUserId).update(last_place_entry)
 
         # Now that I have set the exit_ts and saved it, there is no last place
-        last_place_entry = esdp.get_last_place_entry(self.testUserId)
+        last_place_entry = esdp.get_last_place_entry(esda.RAW_PLACE_KEY,
+                                                     self.testUserId)
         self.assertIsNone(last_place_entry)
 
 if __name__ == '__main__':

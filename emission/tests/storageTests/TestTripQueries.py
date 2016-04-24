@@ -42,7 +42,7 @@ class TestTripQueries(unittest.TestCase):
         new_section.end_ts = 6
         ts = esta.TimeSeries.get_time_series(self.testUserId)
         ts.insert_data(self.testUserId, esda.RAW_SECTION_KEY, new_section) 
-        ret_entries = esdt.get_sections_for_trip(self.testUserId, new_trip.get_id())
+        ret_entries = esdt.get_raw_sections_for_trip(self.testUserId, new_trip.get_id())
         self.assertEqual([entry.data for entry in ret_entries], [new_section])
 
     def testQueryStopsForTrip(self):
@@ -53,7 +53,7 @@ class TestTripQueries(unittest.TestCase):
         new_stop.exit_ts = 6
         ts = esta.TimeSeries.get_time_series(self.testUserId)
         ts.insert_data(self.testUserId, esda.RAW_STOP_KEY, new_stop) 
-        ret_entries = esdt.get_stops_for_trip(self.testUserId, new_trip.get_id())
+        ret_entries = esdt.get_raw_stops_for_trip(self.testUserId, new_trip.get_id())
         self.assertEqual([entry.data for entry in ret_entries], [new_stop])
 
 if __name__ == '__main__':

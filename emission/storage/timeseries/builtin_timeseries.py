@@ -30,6 +30,8 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "analysis/smoothing": self.analysis_timeseries_db,
                 "analysis/cleaned_trip": self.analysis_timeseries_db,
                 "analysis/cleaned_place": self.analysis_timeseries_db,
+                "analysis/cleaned_section": self.analysis_timeseries_db,
+                "analysis/cleaned_stop": self.analysis_timeseries_db,
                 "analysis/recreated_location": self.analysis_timeseries_db,
             }
 
@@ -43,9 +45,12 @@ class BuiltinTimeSeries(esta.TimeSeries):
         Return the correct timeseries for the key. Analysis results go into the
         analysis timeseries and raw sensor data stays in the regular timeseries.
         """
-        return self.ts_map[key]
+        ret_val = self.ts_map[key]
+        # logging.debug("Returning %s" % ret_val)
+        return ret_val
 
-    def _get_query(self, key_list = None, time_query = None, geo_query = None):
+    def _get_query(self, key_list = None, time_query = None, geo_query = None,
+                   extra_query_list = []):
         ret_query = self.user_query
         if key_list is not None and len(key_list) > 0:
             key_query_list = []
@@ -56,6 +61,9 @@ class BuiltinTimeSeries(esta.TimeSeries):
             ret_query.update(time_query.get_query())
         if geo_query is not None:
             ret_query.update(geo_query.get_query())
+        if extra_query_list is not None:
+            for extra_query in extra_query_list:
+                ret_query.update(extra_query)
         return ret_query
 
     @staticmethod
@@ -82,13 +90,15 @@ class BuiltinTimeSeries(esta.TimeSeries):
         orig_ts_db_keys = [key for key in key_list if 
             self.get_timeseries_db(key) == self.timeseries_db]
         analysis_ts_db_keys = [key for key in key_list if 
-            self.get_timeseries_db(key) == self.timeseries_db]
+            self.get_timeseries_db(key) == self.analysis_timeseries_db]
         return (orig_ts_db_keys, analysis_ts_db_keys)
 
-    def find_entries(self, key_list = None, time_query = None, geo_query = None):
+    def find_entries(self, key_list = None, time_query = None, geo_query = None,
+                     extra_query_list=None):
         sort_key = self._get_sort_key(time_query)
         logging.debug("curr_query = %s, sort_key = %s" % 
-            (self._get_query(key_list, time_query, geo_query), sort_key))
+            (self._get_query(key_list, time_query, geo_query,
+                             extra_query_list), sort_key))
         (orig_ts_db_keys, analysis_ts_db_keys) = self._split_key_list(key_list)
         orig_ts_db_result = self.timeseries_db.find(
             self._get_query(orig_ts_db_keys, time_query, geo_query)).sort(
@@ -103,10 +113,14 @@ class BuiltinTimeSeries(esta.TimeSeries):
                                                  "metadata.key": key,
                                                  ts_key: ts})
 
-    def get_data_df(self, key, time_query = None, geo_query = None):
+    def get_data_df(self, key, time_query = None, geo_query = None,
+                    extra_query_list=None):
         sort_key = self._get_sort_key(time_query)
-        logging.debug("curr_query = %s, sort_key = %s" % (self._get_query([key], time_query, geo_query), sort_key))
-        result_it = self.get_timeseries_db(key).find(self._get_query([key], time_query, geo_query),
+        logging.debug("curr_query = %s, sort_key = %s" %
+                      (self._get_query([key], time_query, geo_query, extra_query_list),
+                       sort_key))
+        result_it = self.get_timeseries_db(key).find(
+            self._get_query([key], time_query, geo_query, extra_query_list),
             {"data": True, "metadata.write_ts": True}).sort(sort_key, pymongo.ASCENDING)
         logging.debug("Found %s results" % result_it.count())
         # Dataframe doesn't like to work off an iterator - it wants everything in memory

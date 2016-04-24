@@ -39,7 +39,8 @@ def mark_segmentation_done(user_id, last_processed_ts):
     if last_processed_ts is None:
         mark_stage_done(user_id, ps.PipelineStages.TRIP_SEGMENTATION, None)
     else:
-        mark_stage_done(user_id, ps.PipelineStages.TRIP_SEGMENTATION, last_processed_ts + END_FUZZ_AVOID_LTE)
+        mark_stage_done(user_id, ps.PipelineStages.TRIP_SEGMENTATION,
+                        last_processed_ts + END_FUZZ_AVOID_LTE)
 
 def mark_segmentation_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.TRIP_SEGMENTATION)
@@ -49,14 +50,15 @@ def get_time_range_for_sectioning(user_id):
     # Note that this is a query against the trip database, so we cannot search using the
     # "write_ts" query. Instead, we change the query to be against the trip's end_ts
     tq = get_time_range_for_stage(user_id, ps.PipelineStages.SECTION_SEGMENTATION)
-    tq.timeType = "end_ts"
+    tq.timeType = "data.end_ts"
     return tq
 
 def mark_sectioning_done(user_id, last_trip_done):
     if last_trip_done is None:
         mark_stage_done(user_id, ps.PipelineStages.SECTION_SEGMENTATION, None)
     else:
-        mark_stage_done(user_id, ps.PipelineStages.SECTION_SEGMENTATION, last_trip_done.end_ts + END_FUZZ_AVOID_LTE)
+        mark_stage_done(user_id, ps.PipelineStages.SECTION_SEGMENTATION,
+                        last_trip_done.data.end_ts + END_FUZZ_AVOID_LTE)
 
 def mark_sectioning_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.SECTION_SEGMENTATION)
@@ -78,7 +80,8 @@ def mark_smoothing_done(user_id, last_section_done):
     if last_section_done is None:
         mark_stage_done(user_id, ps.PipelineStages.JUMP_SMOOTHING, None)
     else:
-        mark_stage_done(user_id, ps.PipelineStages.JUMP_SMOOTHING, last_section_done.end_ts + END_FUZZ_AVOID_LTE)
+        mark_stage_done(user_id, ps.PipelineStages.JUMP_SMOOTHING,
+                        last_section_done.end_ts + END_FUZZ_AVOID_LTE)
         
 
 def mark_smoothing_failed(user_id):
@@ -87,14 +90,38 @@ def mark_smoothing_failed(user_id):
 def get_complete_ts(user_id):
     return get_current_state(user_id, ps.PipelineStages.JUMP_SMOOTHING).last_ts_run
 
+def get_time_range_for_clean_resampling(user_id):
+    # type: (uuid.UUID) -> emission.storage.timeseries.timequery.TimeQuery
+    # Returns the time range for the trips that have not yet been converted into sections.
+    # Note that this is a query against the trip database, so we cannot search using the
+    # "write_ts" query. Instead, we change the query to be against the trip's end_ts
+    """
+
+    :rtype: emission.storage.timeseries.timequery.TimeQuery
+    """
+    tq = get_time_range_for_stage(user_id, ps.PipelineStages.CLEAN_RESAMPLING)
+    tq.timeType = "end_ts"
+    return tq
+
+def mark_clean_resampling_done(user_id, last_section_done):
+    if last_section_done is None:
+        mark_stage_done(user_id, ps.PipelineStages.CLEAN_RESAMPLING, None)
+    else:
+        mark_stage_done(user_id, ps.PipelineStages.CLEAN_RESAMPLING,
+                        last_section_done.data.enter_ts + END_FUZZ_AVOID_LTE)
+
+def mark_clean_resampling_failed(user_id):
+    mark_stage_failed(user_id, ps.PipelineStages.CLEAN_RESAMPLING)
+
 def get_time_range_for_output_gen(user_id):
     return get_time_range_for_stage(user_id, ps.PipelineStages.OUTPUT_GEN)
 
-def mark_output_gen_done(user_id, last_processed_ts):
-    if last_processed_ts is None:
+def mark_output_gen_done(user_id, last_place_done):
+    if last_place_done is None:
         mark_stage_done(user_id, ps.PipelineStages.OUTPUT_GEN, None)
     else:
-        mark_stage_done(user_id, ps.PipelineStages.OUTPUT_GEN, last_processed_ts + END_FUZZ_AVOID_LTE)
+        mark_stage_done(user_id, ps.PipelineStages.OUTPUT_GEN,
+                        last_place_done.data.enter_ts + END_FUZZ_AVOID_LTE)
 
 def mark_output_gen_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.OUTPUT_GEN)

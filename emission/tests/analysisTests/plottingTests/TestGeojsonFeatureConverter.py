@@ -4,6 +4,7 @@ import datetime as pydt
 import logging
 import json
 import geojson as gj
+import bson.json_util as bju
 
 # Our imports
 import emission.core.get_database as edb
@@ -14,6 +15,8 @@ import emission.core.wrapper.motionactivity as ecwm
 
 import emission.analysis.plotting.geojson.geojson_feature_converter as gjfc
 import emission.analysis.intake.segmentation.section_segmentation as eaiss
+import emission.analysis.intake.cleaning.location_smoothing as eaicl
+import emission.analysis.intake.cleaning.clean_and_resample as eaicr
 
 import emission.analysis.intake.segmentation.trip_segmentation as eaist
 
@@ -21,38 +24,50 @@ import emission.storage.decorations.trip_queries as esdt
 import emission.storage.decorations.stop_queries as esdst
 import emission.storage.decorations.section_queries as esds
 import emission.storage.decorations.timeline as esdtl
+import emission.analysis.intake.cleaning.filter_accuracy as eaicf
 
 # Test imports
 import emission.tests.common as etc
 
 class TestGeojsonFeatureConverter(unittest.TestCase):
     def setUp(self):
-        self.clearRelatedDb()
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
+        eaicf.filter_accuracy(self.testUUID)
 
     def tearDown(self):
         self.clearRelatedDb()
 
     def clearRelatedDb(self):
-        edb.get_timeseries_db().remove()
-        edb.get_place_db().remove()
-        edb.get_stop_db().remove()
-
-        edb.get_trip_new_db().remove()
-        edb.get_section_new_db().remove()
+        edb.get_timeseries_db().remove({"user_id": self.testUUID})
+        edb.get_analysis_timeseries_db().remove({"user_id": self.testUUID})
 
     def testTripGeojson(self):
         eaist.segment_current_trips(self.testUUID)
         eaiss.segment_current_sections(self.testUUID)
+        eaicl.filter_current_sections(self.testUUID)
+        tl = esdtl.get_raw_timeline(self.testUUID, 1440658800, 1440745200)
+        self.assertEquals(len(tl.trips), 8)
 
-        tl = esdtl.get_timeline(self.testUUID, 1440658800, 1440745200)
+        eaicr.clean_and_resample(self.testUUID)
+
+        tl = esdtl.get_cleaned_timeline(self.testUUID, 1440658800, 1440745200)
         tl.fill_start_end_places()
 
         created_trips = tl.trips
-        self.assertEquals(len(created_trips), 8)
+        self.assertEquals(len(created_trips), 7)
 
         trip_geojson = gjfc.trip_to_geojson(created_trips[0], tl)
-        logging.debug("trip_geojson = %s" % gj.dumps(trip_geojson, indent=4))
+        logging.debug("first trip_geojson = %s" % bju.dumps(trip_geojson, indent=4))
+
+        self.assertEquals(trip_geojson.type, "FeatureCollection")
+        self.assertEquals(trip_geojson.properties["feature_type"], "trip")
+        self.assertEquals(len(trip_geojson.features), 5)
+
+        day_geojson = gjfc.get_geojson_for_timeline(self.testUUID, tl)
+        self.assertEquals(len(day_geojson), 7)
+        self.assertEquals(day_geojson[-1].type, "FeatureCollection")
+        self.assertEquals(day_geojson[-1].properties["feature_type"], "trip")
+        self.assertEquals(len(day_geojson[-1].features), 5)
 
 
 if __name__ == '__main__':

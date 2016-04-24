@@ -29,13 +29,13 @@ class TestTimeSeries(unittest.TestCase):
     def testGetEntries(self):
         ts = esta.TimeSeries.get_time_series(self.testUUID)
         tq = estt.TimeQuery("metadata.write_ts", 1440658800, 1440745200)
-        self.assertEqual(len(list(ts.find_entries(time_query = tq))), len(self.entries))
+        self.assertEqual(len(list(ts.find_entries(time_query=tq))), len(self.entries))
 
     def testComponentQuery(self):
         ts = esta.TimeSeries.get_time_series(self.testUUID)
         tq = esttc.TimeComponentQuery("metadata.write_local_dt",
             ecwl.LocalDate({"hour": 8}), ecwl.LocalDate({"hour":9}))
-        self.assertEqual(len(list(ts.find_entries(time_query = tq))), 490)
+        self.assertEqual(len(list(ts.find_entries(time_query=tq))), 490)
 
     def testGetEntryAtTs(self):
         ts = esta.TimeSeries.get_time_series(self.testUUID)
