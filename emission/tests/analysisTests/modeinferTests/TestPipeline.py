@@ -198,7 +198,10 @@ class TestPipeline(unittest.TestCase):
         round(self.pipeline.predictedProb[1,0],2) == 0.1,
         "predictedProb[1,0] = %s, with rounding = %s" % (self.pipeline.predictedProb[1,0],
             round(self.pipeline.predictedProb[1,0])))
-    self.assertEqual(self.pipeline.predictedProb[1,1], 1)
+    self.assertTrue(round(self.pipeline.predictedProb[1,1],2) == 1 or
+        round(self.pipeline.predictedProb[1,1],2) == 0.9,
+        "predictedProb[1,1] = %s, with rounding = %s" % (self.pipeline.predictedProb[1,1],
+            round(self.pipeline.predictedProb[1,1])))
 
   def testConvertPredictedProbToMap(self):
     self.testPredictedProb()

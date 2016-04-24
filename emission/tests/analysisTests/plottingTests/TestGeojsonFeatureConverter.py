@@ -24,25 +24,22 @@ import emission.storage.decorations.trip_queries as esdt
 import emission.storage.decorations.stop_queries as esdst
 import emission.storage.decorations.section_queries as esds
 import emission.storage.decorations.timeline as esdtl
+import emission.analysis.intake.cleaning.filter_accuracy as eaicf
 
 # Test imports
 import emission.tests.common as etc
 
 class TestGeojsonFeatureConverter(unittest.TestCase):
     def setUp(self):
-        self.clearRelatedDb()
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
+        eaicf.filter_accuracy(self.testUUID)
 
     def tearDown(self):
         self.clearRelatedDb()
 
     def clearRelatedDb(self):
-        edb.get_timeseries_db().remove()
-        edb.get_place_db().remove()
-        edb.get_stop_db().remove()
-
-        edb.get_trip_new_db().remove()
-        edb.get_section_new_db().remove()
+        edb.get_timeseries_db().remove({"user_id": self.testUUID})
+        edb.get_analysis_timeseries_db().remove({"user_id": self.testUUID})
 
     def testTripGeojson(self):
         eaist.segment_current_trips(self.testUUID)

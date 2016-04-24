@@ -138,9 +138,13 @@ class TestSectionSegmentation(unittest.TestCase):
             created_sections = esdt.get_raw_sections_for_trip(self.testUUID, trip.get_id())
 
             for j, stop in enumerate(created_stops):
-                logging.info("Retrieved stops %s: %s -> %s" % (j, stop.enter_fmt_time, stop.exit_fmt_time))
+                logging.info("Retrieved stops %s: %s -> %s" %
+                             (j, stop.data.enter_fmt_time,
+                              stop.data.exit_fmt_time))
             for j, section in enumerate(created_sections):
-                logging.info("Retrieved sections %s: %s -> %s" % (j, section.start_fmt_time, section.end_fmt_time))
+                logging.info("Retrieved sections %s: %s -> %s" %
+                             (j, section.data.start_fmt_time,
+                              section.data.end_fmt_time))
 
             # self.assertEqual(len(created_stops), 1)
             # self.assertEqual(len(created_sections), 2)
