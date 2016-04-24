@@ -46,7 +46,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
         analysis timeseries and raw sensor data stays in the regular timeseries.
         """
         ret_val = self.ts_map[key]
-        logging.debug("Returning %s" % ret_val)
+        # logging.debug("Returning %s" % ret_val)
         return ret_val
 
     def _get_query(self, key_list = None, time_query = None, geo_query = None,
