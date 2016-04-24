@@ -49,7 +49,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       }
     }
   })
-
+/*
   .state('tab.chats', {
       url: '/chats',
       views: {
@@ -78,8 +78,9 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
       }
     }
   });
+    */
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/tab/dash');
+  $urlRouterProvider.otherwise('/tab/heatmap');
 
 });
