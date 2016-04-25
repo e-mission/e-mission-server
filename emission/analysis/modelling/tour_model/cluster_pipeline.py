@@ -45,7 +45,7 @@ def read_data(uuid=None, size=None, old=True):
     db = edb.get_trip_db()
     if not old:
         logging.debug("not old")
-        trips = esda.get_entries(esda.RAW_TRIP_KEY, uuid,
+        trips = esda.get_entries(esda.CLEANED_TRIP_KEY, uuid,
                                  time_query=None, geo_query=None)
         return trips
 

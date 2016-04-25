@@ -17,7 +17,21 @@ def get_range_query(field_name, start_local_dt, end_local_dt):
     query_result = {}
     for key in start_local_dt:
         curr_field = "%s.%s" % (field_name, key)
-        query_result.update({curr_field: {"$gte": start_local_dt[key],
-                                           "$lte": end_local_dt[key]}})
-    logging.debug("Returning query %s" % query_result)
+        gte_lte_query = {}
+        try:
+            gte_lte_query.update({'$gte': int(start_local_dt[key])})
+        except:
+            logging.info("start_local_dt[%s] = %s, not an integer, skipping" %
+                            (key, start_local_dt[key]))
+        try:
+            gte_lte_query.update({'$lte': int(end_local_dt[key])})
+        except:
+            logging.info("end_local_dt[%s] = %s, not an integer, skipping" %
+                            (key, end_local_dt[key]))
+        if len(gte_lte_query) > 0:
+            query_result.update({curr_field: gte_lte_query})
+        else:
+            logging.info("key %s exists, skipping because upper AND lower range are missing" % key)
+
+    logging.debug("In get_range_query, returning query %s" % query_result)
     return query_result

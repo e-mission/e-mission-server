@@ -106,6 +106,7 @@ def save_cleaned_segments_for_timeline(user_id, tl):
     return tl.last_place()
 
 def get_filtered_trip(ts, trip):
+    logging.debug("Filtering trip %s" % trip)
     trip_tl = esdtq.get_raw_timeline_for_trip(trip.user_id, trip.get_id())
     # trip_tl is the timeline for this particular trip, which contains the
     # section_entries and trip_entries
@@ -233,6 +234,7 @@ def get_filtered_stop(new_trip_entry, stop):
                                    filtered_stop_data, create_id=True)
 
 def get_filtered_points(section, filtered_section_data):
+    logging.debug("Getting filtered points for section %s" % section)
     ts = esta.TimeSeries.get_time_series(section.user_id)
     loc_entry_it = ts.find_entries(["background/filtered_location"],
                                    esda.get_time_query_for_trip_like(
@@ -309,6 +311,18 @@ def resample(filtered_loc_list, interval):
     :return:
     """
     loc_df = pd.DataFrame(filtered_loc_list)
+    # See https://github.com/e-mission/e-mission-server/issues/268 for log traces
+    #
+    # basically, on iOS, due to insufficient smoothing, it is possible for us to
+    # have very small segments. Some of these contain zero points, and we skip them
+    # in the segmentation stage. Some of them contain one point, and we don't.
+    # Ideally, we would strip these sections too and merge the stops on the two sides
+    # But that is going to take more time and effort than I have here.
+    #
+    # So let's just return the one point without resampling in that case, and move on for now
+    if len(loc_df) == 1:
+        return loc_df
+    logging.debug("Resampling entry list %s of size %s" % (loc_df.head(), len(filtered_loc_list)))
     start_ts = loc_df.ts.iloc[0]
     end_ts = loc_df.ts.iloc[-1]
     tz_ranges_df = _get_tz_ranges(loc_df)
@@ -341,7 +355,10 @@ def _get_timezone(ts, tz_ranges_df):
     # TODO: change this to a dataframe query instead
     sel_entry = tz_ranges_df[(tz_ranges_df.start_ts <= ts) &
                         (tz_ranges_df.end_ts >= ts)]
-    assert len(sel_entry) == 1, "len(sel_entry = %d" % len(sel_entry)
+    if len(sel_entry) != 1:
+        logging.warning("len(sel_entry) = %d, using the one with the bigger duration" % len(sel_entry))
+        sel_entry["duration"] = sel_entry.end_ts - sel_entry.start_ts
+        sel_entry = sel_entry[sel_entry.duration == sel_entry.duration.max()]
     return sel_entry.timezone.iloc[0]
 
 def _get_tz_ranges(loc_df):
@@ -357,8 +374,8 @@ def _get_tz_ranges(loc_df):
         if loc_data.local_dt["timezone"] != curr_tz:
             tz_ranges.append({'timezone': curr_tz,
                               'start_ts': curr_start_ts,
-                              'end_ts': row.ts})
-            curr_start_ts = row.ts
+                              'end_ts': loc_data.ts})
+            curr_start_ts = loc_data.ts
             curr_tz = loc_data.local_dt["timezone"]
 
     # At the end, always add an entry

@@ -57,16 +57,26 @@ def Berkeley_pop_route(start_ts, end_ts):
     loc_entry_list = esda.get_entries(esda.CLEANED_LOCATION_KEY, user_id=None,
                                       time_query=time_query,
                                       geo_query=geo_query)
-    return {"latlng": [e.data.loc.coordinates for e in loc_entry_list]}
+    return {"lnglat": [e.data.loc.coordinates for e in loc_entry_list]}
 
-def range_mode_heatmap(mode, start_ts, end_ts):
-    start_dt = esdl.get_local_date(start_ts, "UTC")
-    end_dt = esdl.get_local_date(end_ts, "UTC")
-    time_query = esttc.TimeComponentQuery("data.ts", start_dt, end_dt)
+def range_mode_heatmap(modes, from_ld, to_ld, region):
+    time_query = esttc.TimeComponentQuery("data.local_dt", from_ld, to_ld)
+
+    if region is None:
+        geo_query = None
+    else:
+        geo_query = estg.GeoQuery(["data.loc"], region)
+
+    if modes is None:
+        extra_query_list = None
+    else:
+        mode_enum_list = [ecwm.MotionTypes[mode] for mode in modes]
+        extra_query_list = [esdlq.get_mode_query(mode_enum_list)]
+
     loc_entry_list = esda.get_entries(esda.CLEANED_LOCATION_KEY, user_id=None,
-                                      time_query=time_query, geo_query=None,
-                                      extra_query_list=[esdlq.get_mode_query(mode)])
-    return {"latlng": [e.data.loc.coordinates for e in loc_entry_list]}
+                                      time_query=time_query, geo_query=geo_query,
+                                      extra_query_list=extra_query_list)
+    return {"lnglat": [e.data.loc.coordinates for e in loc_entry_list]}
 
 
 

@@ -75,23 +75,44 @@ app = app()
 #Simple path that serves up a static landing page with javascript in it
 @route('/')
 def index():
-  return static_file("server/index.html", static_path)
+  return static_file("index.html", static_path)
 
 # Bunch of static pages that constitute our website
 # Should we have gone for something like django instead after all?
 # If this gets to be too much, we should definitely consider that
-@route("/<filename>")
-def doc(filename):
+@route("/docs/<filename>")
+def docs(filename):
   if filename != "privacy" and filename != "support" and filename != "about" and filename != "consent":
     return HTTPError(404, "Don't try to hack me, you evil spammer")
   else:
-    return static_file("%s.html" % filename, "%s/docs/" % static_path)
+    return static_file("%s.html" % filename, static_path)
 
-# Serve up javascript and css files properly
-@route('/front/<filename:path>')
-def server_static(filename):
-  logging.debug("static filename = %s" % filename)
-  return static_file(filename, static_path)
+# Serve up the components of the webapp - library files, our javascript and css
+# files, and HTML templates, properly
+@route('/css/<filepath:path>')
+def server_css(filepath):
+    logging.debug("static filepath = %s" % filepath)
+    return static_file(filepath, "%s/%s" % (static_path, "css"))
+
+@route('/img/<filepath:path>')
+def server_img(filepath):
+    logging.debug("static filepath = %s" % filepath)
+    return static_file(filepath, "%s/%s" % (static_path, "img"))
+
+@route('/js/<filepath:path>')
+def server_js(filepath):
+    logging.debug("static filepath = %s" % filepath)
+    return static_file(filepath, "%s/%s" % (static_path, "js"))
+
+@route('/lib/<filepath:path>')
+def server_lib(filepath):
+    logging.debug("static filepath = %s" % filepath)
+    return static_file(filepath, "%s/%s" % (static_path, "lib"))
+
+@route('/templates/<filepath:path>')
+def server_templates(filepath):
+  logging.debug("static filepath = %s" % filepath)
+  return static_file(filepath, "%s/%s" % (static_path, "templates"))
 
 @route('/clients/<clientname>/front/<filename>')
 def server_static(clientname, filename):
@@ -186,24 +207,15 @@ def getCarbonHeatmap():
   # logging.debug("In getCarbonHeatmap, retVal is %s" % retVal)
   return retVal
 
-@route("/result/heatmap/pop.route/cal")
-def getCalPopRoute():
-  fromTs = request.query.from_ts
-  toTs = request.query.to_ts
-  logging.debug("Filtering values for range %s -> %s" % (fromTs, toTs))
-  retVal = visualize.Berkeley_pop_route(fromTs, toTs)
-  # retVal = common.generateRandomResult(['00-04', '04-08', '08-10'])
-  # logging.debug("In getCalPopRoute, retVal is %s" % retVal)
-  return retVal
-
-@route("/result/heatmap/pop.route/commute/<selMode>")
-def getCommutePopRoute(selMode):
-  map_mode = {"motorized" : "MotionTypes.IN_VEHICLE", "walking" : "MotionTypes.ON_FOOT", "cycling" : "MotionTypes.BICYCLING"}
-  fromTs = request.query.from_ts
-  toTs = request.query.to_ts
-  mode = map_mode[selMode]
-  logging.debug("Filtering values for range %s -> %s" % (fromTs, toTs))
-  retVal = visualize.range_mode_heatmap(mode, fromTs, toTs)
+@post("/result/heatmap/pop.route")
+def getPopRoute():
+  modes = request.json['modes']
+  from_ld = request.json['from_local_date']
+  to_ld = request.json['to_local_date']
+  region = request.json['sel_region']
+  logging.debug("Filtering values for range %s -> %s, region %s" % 
+        (from_ld, to_ld, region))
+  retVal = visualize.range_mode_heatmap(modes, from_ld, to_ld, region)
   # retVal = common.generateRandomResult(['00-04', '04-08', '08-10'])
   # logging.debug("In getCalPopRoute, retVal is %s" % retVal)
   return retVal

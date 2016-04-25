@@ -100,6 +100,9 @@ def get_potential_split_index(df):
 def filter_low_accuracy(df, threshold):
     return df[df.mAccuracy > threshold]
 
-def get_mode_query(mode_enum):
-    return {'data.mode': mode_enum.value}
+def get_mode_query(mode_enum_list):
+    mode_value_list = [me.value for me in mode_enum_list]
+    ret_val = {'data.mode': {'$in': mode_value_list}}
+    logging.debug("in get_mode_query, returning %s" % ret_val)
+    return ret_val
 

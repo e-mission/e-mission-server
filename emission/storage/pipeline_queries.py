@@ -116,12 +116,12 @@ def mark_clean_resampling_failed(user_id):
 def get_time_range_for_output_gen(user_id):
     return get_time_range_for_stage(user_id, ps.PipelineStages.OUTPUT_GEN)
 
-def mark_output_gen_done(user_id, last_place_done):
-    if last_place_done is None:
+def mark_output_gen_done(user_id, last_processed_ts):
+    if last_processed_ts is None:
         mark_stage_done(user_id, ps.PipelineStages.OUTPUT_GEN, None)
     else:
         mark_stage_done(user_id, ps.PipelineStages.OUTPUT_GEN,
-                        last_place_done.data.enter_ts + END_FUZZ_AVOID_LTE)
+                        last_processed_ts + END_FUZZ_AVOID_LTE)
 
 def mark_output_gen_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.OUTPUT_GEN)

@@ -8,6 +8,7 @@ import emission.tests.common as etc
 import emission.analysis.intake.cleaning.filter_accuracy as eaicf
 import emission.analysis.intake.segmentation.trip_segmentation as eaist
 import emission.analysis.intake.segmentation.section_segmentation as eaiss
+import emission.analysis.intake.cleaning.clean_and_resample as eaicr
 
 class TestTourModelQueries(unittest.TestCase):
 
@@ -28,6 +29,7 @@ class TestTourModelQueries(unittest.TestCase):
     def testE2E(self):
         eaist.segment_current_trips(self.testUUID)
         eaiss.segment_current_sections(self.testUUID)
+        eaicr.clean_and_resample(self.testUUID)
         esdtmq.make_tour_model_from_raw_user_data(self.testUUID)
         tm = esdtmq.get_tour_model(self.testUUID)
         self.assertTrue(len(tm["common_trips"]) > 0)
