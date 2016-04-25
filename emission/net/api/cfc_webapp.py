@@ -207,24 +207,15 @@ def getCarbonHeatmap():
   # logging.debug("In getCarbonHeatmap, retVal is %s" % retVal)
   return retVal
 
-@route("/result/heatmap/pop.route/cal")
-def getCalPopRoute():
-  fromTs = request.query.from_ts
-  toTs = request.query.to_ts
-  logging.debug("Filtering values for range %s -> %s" % (fromTs, toTs))
-  retVal = visualize.Berkeley_pop_route(fromTs, toTs)
-  # retVal = common.generateRandomResult(['00-04', '04-08', '08-10'])
-  # logging.debug("In getCalPopRoute, retVal is %s" % retVal)
-  return retVal
-
-@route("/result/heatmap/pop.route/commute/<selMode>")
-def getCommutePopRoute(selMode):
-  map_mode = {"motorized" : "MotionTypes.IN_VEHICLE", "walking" : "MotionTypes.ON_FOOT", "cycling" : "MotionTypes.BICYCLING"}
-  fromTs = request.query.from_ts
-  toTs = request.query.to_ts
-  mode = map_mode[selMode]
-  logging.debug("Filtering values for range %s -> %s" % (fromTs, toTs))
-  retVal = visualize.range_mode_heatmap(mode, fromTs, toTs)
+@post("/result/heatmap/pop.route")
+def getPopRoute():
+  modes = request.json['modes']
+  from_ld = request.json['from_local_date']
+  to_ld = request.json['to_local_date']
+  region = request.json['sel_region']
+  logging.debug("Filtering values for range %s -> %s, region %s" % 
+        (from_ld, to_ld, region))
+  retVal = visualize.range_mode_heatmap(modes, from_ld, to_ld, region)
   # retVal = common.generateRandomResult(['00-04', '04-08', '08-10'])
   # logging.debug("In getCalPopRoute, retVal is %s" % retVal)
   return retVal

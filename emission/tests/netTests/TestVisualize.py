@@ -15,6 +15,7 @@ import emission.analysis.intake.segmentation.section_segmentation as eaiss
 import emission.analysis.intake.cleaning.filter_accuracy as eaicf
 import emission.storage.timeseries.format_hacks.move_filter_field as estfm
 import emission.core.wrapper.motionactivity as ecwm
+import emission.storage.decorations.local_date_queries as esdldq
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -30,8 +31,8 @@ class TestVisualize(unittest.TestCase):
             "After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
         self.day_start_ts = 1440658800
         self.day_end_ts = 1440745200
-        self.day_start_dt = arrow.get(2015, 8, 27)
-        self.day_end_dt = arrow.get(2015, 8, 28)
+        self.day_start_dt = esdldq.get_local_date(self.day_start_ts, "America/Los_Angeles")
+        self.day_end_dt = esdldq.get_local_date(self.day_end_ts, "America/Los_Angeles")
 
     def tearDown(self):
         self.clearRelatedDb()
@@ -42,15 +43,16 @@ class TestVisualize(unittest.TestCase):
 
 
     def testCommutePopRoute(self):
-        points = visualize.range_mode_heatmap(ecwm.MotionTypes.BICYCLING,
-                                          self.day_start_ts,
-                                          self.day_end_ts)
+        points = visualize.range_mode_heatmap([ecwm.MotionTypes.BICYCLING],
+                                          self.day_start_dt,
+                                          self.day_end_dt, None)
+        self.assertTrue(len(['latlng']) > 0)
         # I have to add test data with modes, I will do that tomorrow.
 
 
     def testBerkeleyPopRoute(self):
-        points = visualize.Berkeley_pop_route(self.day_start_dt.timestamp,
-                                          self.day_end_dt.timestamp)
+        points = visualize.Berkeley_pop_route(self.day_start_ts,
+                                          self.day_end_ts)
         self.assertTrue(len(['latlng']) > 0)
 
 
