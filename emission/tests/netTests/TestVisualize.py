@@ -43,7 +43,7 @@ class TestVisualize(unittest.TestCase):
 
 
     def testCommutePopRoute(self):
-        points = visualize.range_mode_heatmap([ecwm.MotionTypes.BICYCLING],
+        points = visualize.range_mode_heatmap(["BICYCLING"],
                                           self.day_start_dt,
                                           self.day_end_dt, None)
         self.assertTrue(len(['latlng']) > 0)
