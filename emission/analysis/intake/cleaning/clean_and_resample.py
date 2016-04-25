@@ -357,8 +357,8 @@ def _get_tz_ranges(loc_df):
         if loc_data.local_dt["timezone"] != curr_tz:
             tz_ranges.append({'timezone': curr_tz,
                               'start_ts': curr_start_ts,
-                              'end_ts': row.ts})
-            curr_start_ts = row.ts
+                              'end_ts': loc_data.ts})
+            curr_start_ts = loc_data.ts
             curr_tz = loc_data.local_dt["timezone"]
 
     # At the end, always add an entry
