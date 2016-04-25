@@ -56,8 +56,12 @@ angular.module('starter.controllers', ['ui-leaflet'])
       var latlng = lnglat.map(function(cval, i, array){
         return cval.reverse();
       });
-      var heat = L.heatLayer(latlng).addTo(map);
-
+      if (angular.isUndefined($scope.heatLayer)) {
+        console.log("no existing heatLayer found, skipping remove...");
+      } else {
+        map.removeLayer($scope.heatLayer);
+      }
+      $scope.heatLayer = L.heatLayer(latlng).addTo(map);
       map.fitBounds(bounds);
     });
   }
