@@ -342,7 +342,10 @@ def _get_timezone(ts, tz_ranges_df):
     # TODO: change this to a dataframe query instead
     sel_entry = tz_ranges_df[(tz_ranges_df.start_ts <= ts) &
                         (tz_ranges_df.end_ts >= ts)]
-    assert len(sel_entry) == 1, "len(sel_entry = %d" % len(sel_entry)
+    if len(sel_entry) != 1:
+        logging.warning("len(sel_entry) = %d, using the one with the bigger duration" % len(sel_entry))
+        sel_entry["duration"] = sel_entry.end_ts - sel_entry.start_ts
+        sel_entry = sel_entry[sel_entry.duration == sel_entry.duration.max()]
     return sel_entry.timezone.iloc[0]
 
 def _get_tz_ranges(loc_df):
