@@ -106,6 +106,7 @@ def save_cleaned_segments_for_timeline(user_id, tl):
     return tl.last_place()
 
 def get_filtered_trip(ts, trip):
+    logging.debug("Filtering trip %s" % trip)
     trip_tl = esdtq.get_raw_timeline_for_trip(trip.user_id, trip.get_id())
     # trip_tl is the timeline for this particular trip, which contains the
     # section_entries and trip_entries

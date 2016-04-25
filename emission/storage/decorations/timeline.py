@@ -152,12 +152,12 @@ class Timeline(object):
         were iterating over a place versus a trip.
         :return: None. The timeline is updated with the start and end place.
         """
-        if len(self.trips) > 0:
-            logging.debug("len(trips) = %s, adding start_place %s and end_place %s" % (len(self.trips),
-                                                                                       self.first_trip().data.start_place,
-                                                                                       self.last_trip().data.end_place))
-            start_place = self._addIfNotExists(self.first_trip().data.start_place)
-            end_place = self._addIfNotExists(self.last_trip().data.end_place)
+        for trip in self.trips:
+            logging.debug("for trip = %s, adding start_place %s and end_place %s" % (trip.get_id(),
+                                                                                    trip.data.start_place,
+                                                                                    trip.data.end_place))
+            start_place = self._addIfNotExists(trip.data.start_place)
+            end_place = self._addIfNotExists(trip.data.end_place)
             self.state = Timeline.State("place", start_place)  # Since this has been called before the iteration start
 
     def get_object(self, element_id):
