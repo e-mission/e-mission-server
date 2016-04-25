@@ -233,6 +233,7 @@ def get_filtered_stop(new_trip_entry, stop):
                                    filtered_stop_data, create_id=True)
 
 def get_filtered_points(section, filtered_section_data):
+    logging.debug("Getting filtered points for section %s" % section)
     ts = esta.TimeSeries.get_time_series(section.user_id)
     loc_entry_it = ts.find_entries(["background/filtered_location"],
                                    esda.get_time_query_for_trip_like(
@@ -309,6 +310,17 @@ def resample(filtered_loc_list, interval):
     :return:
     """
     loc_df = pd.DataFrame(filtered_loc_list)
+    # See https://github.com/e-mission/e-mission-server/issues/268 for log traces
+    #
+    # basically, on iOS, due to insufficient smoothing, it is possible for us to
+    # have very small segments. Some of these contain zero points, and we skip them
+    # in the segmentation stage. Some of them contain one point, and we don't.
+    # Ideally, we would strip these sections too and merge the stops on the two sides
+    # But that is going to take more time and effort than I have here.
+    #
+    # So let's just return the one point without resampling in that case, and move on for now
+    if len(loc_df) == 1:
+        return loc_df
     logging.debug("Resampling entry list %s of size %s" % (loc_df.head(), len(filtered_loc_list)))
     start_ts = loc_df.ts.iloc[0]
     end_ts = loc_df.ts.iloc[-1]
