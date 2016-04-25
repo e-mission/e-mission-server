@@ -74,14 +74,22 @@ def fix_trips_or_sections(collection):
         end_loc_entry = tsdb.find_one({'user_id': entry['user_id'],
             'metadata.key': 'background/location', 'data.ts': entry['end_ts']})
 
-        logging.debug("Found entries with metadata = %s, %s" %
-            (start_loc_entry['metadata']['time_zone'],
-             end_loc_entry['metadata']['time_zone']))
+        if start_loc_entry is not None:
+            start_tz = start_loc_entry['metadata']['time_zone']
+        else:
+            logging.warn("No start_loc_entry found for trip %s, returning default" % entry)
+            start_tz = "America/Los_Angeles"
 
-        entry['start_local_dt'] = get_local_date(entry['start_fmt_time'],
-            start_loc_entry['metadata']['time_zone'])
-        entry['end_local_dt'] = get_local_date(entry['end_fmt_time'],
-            end_loc_entry['metadata']['time_zone'])
+        if end_loc_entry is not None:
+            end_tz = end_loc_entry['metadata']['time_zone']
+        else:
+            logging.warn("No end_loc_entry found for trip %s, returning default" % entry)
+            end_tz = "America/Los_Angeles"
+
+        logging.debug("Found entries with metadata = %s, %s" % (start_tz, end_tz))
+
+        entry['start_local_dt'] = get_local_date(entry['start_fmt_time'], start_tz)
+        entry['end_local_dt'] = get_local_date(entry['end_fmt_time'], end_tz)
 
         collection.save(entry)
 
@@ -91,25 +99,27 @@ def fix_stops_or_places(collection):
         if 'enter_ts' in entry:
             enter_loc_entry = tsdb.find_one({'user_id': entry['user_id'],
                 'metadata.key': 'background/location', 'data.ts': entry['enter_ts']})
+            if enter_loc_entry is not None:
+                enter_tz = enter_loc_entry['metadata']['time_zone']
+            else:
+                enter_tz = "America/Los_Angeles"
+            logging.debug("entry metadata timezone = %s" % enter_tz)
+            entry['enter_local_dt'] = get_local_date(entry['enter_fmt_time'],
+                enter_tz)
         else:
-            logging.info("No entry timestamp found, skipping")
+            logging.warning("No entry timestamp found, skipping")
         
         if 'exit_ts' in entry:
             exit_loc_entry = tsdb.find_one({'user_id': entry['user_id'],
                 'metadata.key': 'background/location', 'data.ts': entry['exit_ts']})
+            if exit_loc_entry is not None:
+                exit_tz = exit_loc_entry['metadata']['time_zone']
+            else:
+                exit_tz = "America/Los_Angeles"
+            logging.debug("exit metadata timezone = %s" % exit_tz)
+            entry['exit_local_dt'] = get_local_date(entry['exit_fmt_time'], exit_tz)
         else:
-            logging.info("No exit timestamp found, skipping")
-
-        logging.debug("Found entries with metadata = %s, %s" %
-            (enter_loc_entry['metadata']['time_zone'],
-             exit_loc_entry['metadata']['time_zone']))
-
-        if 'enter_local_dt' in entry:
-            entry['enter_local_dt'] = get_local_date(entry['enter_fmt_time'],
-                enter_loc_entry['metadata']['time_zone'])
-        if 'exit_local_dt' in entry:
-            entry['exit_local_dt'] = get_local_date(entry['exit_fmt_time'],
-                exit_loc_entry['metadata']['time_zone'])
+            logging.warning("No exit timestamp found, skipping")
 
         collection.save(entry)
 
