@@ -1,4 +1,5 @@
 # standard imports
+import logging
 import numpy
 import math
 import copy
@@ -67,10 +68,19 @@ class representatives:
                     # We want (lat, lon) to be consistent with old above.
                     # But in the new, our data is in geojson so it is (lon, lat).
                     # Fix it by flipping the order of the indices
-                    points[0].append(c.data.start_loc["coordinates"][1])
-                    points[1].append(c.data.start_loc["coordinates"][0])
-                    points[2].append(c.data.end_loc["coordinates"][1])
-                    points[3].append(c.data.end_loc["coordinates"][0])
+                    # Note also that we want to use the locations of the start
+                    # and end places, not of the start point of the trip, which
+                    # may be some distance away due to geofencing.
+                    start_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
+                                                 c.data.start_place)
+                    end_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
+                                                 c.data.end_place)
+                    points[0].append(start_place.data.location["coordinates"][1])
+                    points[1].append(start_place.data.location["coordinates"][0])
+                    points[2].append(end_place.data.location["coordinates"][1])
+                    points[3].append(end_place.data.location["coordinates"][0])
+                    logging.debug("in representatives, endpoints are = %s" %
+                                  points)
             centers = numpy.mean(points, axis=1)
             a = Trip(None, None, None, None, None, None, Coordinate(centers[0], centers[1]), Coordinate(centers[2], centers[3]))
             self.reps.append(a)
