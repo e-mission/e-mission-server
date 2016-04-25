@@ -29,6 +29,5 @@
   },
   "_source": "https://github.com/Leaflet/Leaflet.git",
   "_target": "^0.7.7",
-  "_originalSource": "leaflet",
-  "_direct": true
+  "_originalSource": "leaflet"
 }
