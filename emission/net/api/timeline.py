@@ -9,7 +9,6 @@ import time
 import emission.core.get_database as edb
 import emission.net.usercache.abstract_usercache as enua
 import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
-
 import emission.core.wrapper.localdate as ecwl
 
 def get_trips_for_day(user_uuid, day, force_refresh):
