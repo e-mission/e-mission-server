@@ -309,6 +309,7 @@ def resample(filtered_loc_list, interval):
     :return:
     """
     loc_df = pd.DataFrame(filtered_loc_list)
+    logging.debug("Resampling entry list %s of size %s" % (loc_df.head(), len(filtered_loc_list)))
     start_ts = loc_df.ts.iloc[0]
     end_ts = loc_df.ts.iloc[-1]
     tz_ranges_df = _get_tz_ranges(loc_df)
