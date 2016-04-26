@@ -70,7 +70,7 @@ angular.module('starter.controllers', ['ui-leaflet'])
       {text: "ALL", value:null},
       {text: "NONE", value:[]},
       {text: "BICYCLING", value:["BICYCLING"]},
-      {text: "WALKING", value:["WALKING"]},
+      {text: "WALKING", value:["WALKING", "ON_FOOT"]},
       {text: "IN_VEHICLE", value:["IN_VEHICLE"]}
     ];
 
