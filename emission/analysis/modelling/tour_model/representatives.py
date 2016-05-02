@@ -1,11 +1,12 @@
 # standard imports
+import logging
 import numpy
 import math
 import copy
 
 # our imports
 from emission.core.wrapper.trip_old import Trip, Coordinate
-import emission.storage.decorations.trip_queries as esdtq
+import emission.storage.decorations.analysis_timeseries_queries as esda
 
 
 """
@@ -67,10 +68,19 @@ class representatives:
                     # We want (lat, lon) to be consistent with old above.
                     # But in the new, our data is in geojson so it is (lon, lat).
                     # Fix it by flipping the order of the indices
-                    points[0].append(c.start_loc["coordinates"][1])
-                    points[1].append(c.start_loc["coordinates"][0])
-                    points[2].append(c.end_loc["coordinates"][1])
-                    points[3].append(c.end_loc["coordinates"][0])                    
+                    # Note also that we want to use the locations of the start
+                    # and end places, not of the start point of the trip, which
+                    # may be some distance away due to geofencing.
+                    start_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
+                                                 c.data.start_place)
+                    end_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
+                                                 c.data.end_place)
+                    points[0].append(start_place.data.location["coordinates"][1])
+                    points[1].append(start_place.data.location["coordinates"][0])
+                    points[2].append(end_place.data.location["coordinates"][1])
+                    points[3].append(end_place.data.location["coordinates"][0])
+                    logging.debug("in representatives, endpoints are = %s" %
+                                  points)
             centers = numpy.mean(points, axis=1)
             a = Trip(None, None, None, None, None, None, Coordinate(centers[0], centers[1]), Coordinate(centers[2], centers[3]))
             self.reps.append(a)
@@ -142,6 +152,16 @@ class representatives:
         for i in range(self.num_clusters):
             a = {'sections' : self.clusters[i]}
             self.tour_dict[i] = a
+        for i in range(self.num_clusters):
+            start_places = []
+            end_places = []
+            for t in self.tour_dict[i]["sections"]:
+                start = esda.get_object(esda.RAW_PLACE_KEY, t.data.start_place)
+                end = esda.get_object(esda.RAW_PLACE_KEY, t.data.end_place)
+                start_places.append(start)
+                end_places.append(end)
+            self.tour_dict[i]["start_places"] = start_places
+            self.tour_dict[i]["end_places"] = end_places
         for i in range(self.num_locations):
             bin = self.bins[i]
             for b in bin:
@@ -173,6 +193,7 @@ class representatives:
         for i in range(len(self.tour_dict)):
             self.tour_dict[i]['start'] = newlocs.index(self.tour_dict[i]['start'])
             self.tour_dict[i]['end'] = newlocs.index(self.tour_dict[i]['end'])
+            
 
     #check whether a point is close to all points in a bin
     def match(self, label, a, bin):

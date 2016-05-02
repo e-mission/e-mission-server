@@ -7,7 +7,8 @@ import attrdict as ad
 state_map = {
     "STATE_START": et.State.START,
     "STATE_WAITING_FOR_TRIP_START": et.State.WAITING_FOR_TRIP_START,
-    "STATE_ONGOING_TRIP": et.State.ONGOING_TRIP
+    "STATE_ONGOING_TRIP": et.State.ONGOING_TRIP,
+    "STATE_TRACKING_STOPPED": et.State.TRACKING_STOPPED
 }
 
 transition_map = {
@@ -26,7 +27,8 @@ transition_map = {
     "T_TRACKING_STOPPED": et.TransitionType.TRACKING_STOPPED,
     "T_VISIT_STARTED": et.TransitionType.VISIT_STARTED,
     "T_VISIT_ENDED": et.TransitionType.VISIT_ENDED,
-    "T_NOP": et.TransitionType.NOP
+    "T_NOP": et.TransitionType.NOP,
+    "T_START_TRACKING": et.TransitionType.START_TRACKING
 }
 
 def format(entry):

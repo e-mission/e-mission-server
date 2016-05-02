@@ -22,11 +22,13 @@ class TestWrapper(ecwb.WrapperBase):
              "invalid": ecwb.WrapperBase.Access.RO,
              "valid": ecwb.WrapperBase.Access.RW,
              "write_a": ecwb.WrapperBase.Access.RW,
-             "unset": ecwb.WrapperBase.Access.WORM}
+             "unset": ecwb.WrapperBase.Access.WORM,
+             "write_local_dt": ecwb.WrapperBase.Access.WORM}
 
     enums = {'a': TestEnum, 'b': TestEnum, 'write_a': TestEnum}
     geojson = []
     nullable = ["unset"]
+    local_dates = ['write_local_dt']
 
     def _populateDependencies(self):
         # Add new properties called "invalid" and "valid" 
@@ -132,6 +134,16 @@ class TestBase(unittest.TestCase):
     def testNestedClass(self):
         test_tw = TestWrapper({'a': 1, 'c': 3, 'WrapperBase': {'a': 11, 'c': 13}})
         # self.assertEqual(test_tw.WrapperBase.a, 11)
+
+    def testLocalDate(self):
+        import emission.core.wrapper.localdate as ecwl
+
+        test_local = TestWrapper({'a': 1, 'c': 3})
+        test_local.write_local_dt = ecwl.LocalDate({'year': 2016, 'month': 4})
+        self.assertEqual(test_local.write_local_dt.year, 2016)
+        self.assertEqual(test_local.write_local_dt.month, 4)
+        with self.assertRaisesRegexp(AttributeError, ".*has no attribute.*"):
+            print("the value of day is %s" % test_local.write_local_dt.day)
 
 if __name__ == '__main__':
     unittest.main()

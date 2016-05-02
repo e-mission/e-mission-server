@@ -16,6 +16,8 @@ import emission.tests.common
 # b) otherwise, we would have to replicate the "get" code here
 
 import emission.net.usercache.abstract_usercache as ucauc # ucauc = usercache.abstract_usercache
+import emission.storage.pipeline_queries as esp
+import emission.storage.timeseries.timequery as estt
 import emission.net.api.usercache as mauc
 from emission.core.get_database import get_db, get_usercache_db
 
@@ -280,11 +282,16 @@ class TestBuiltinUserCache(unittest.TestCase):
       },
     ]
 
-    time.sleep(float(5)/ 1000)
-
     # We look for entries that are > 5 secs old, so it is fine to set the
     # end_ts after all the entries have been inserted.
+    # If we don't add the fuzz factor of 5 seconds, then we sometimes end up
+    # with the first background entry having the same timestamp as end_ts
+    # and the counts don't work. We have a fuzz factor in the real world - lets'
+    # add one here as well
+
     end_ts = time.time()
+
+    time.sleep(float(5) / 1000)
 
     background_data_from_phone_3 = [
       {
@@ -342,7 +349,8 @@ class TestBuiltinUserCache(unittest.TestCase):
     mauc.sync_phone_to_server(self.testUserUUID, background_data_from_phone_3)
 
     uc = ucauc.UserCache.getUserCache(self.testUserUUID)
-    tq = ucauc.UserCache.TimeQuery("write_ts", start_ts, end_ts)
+
+    tq = estt.TimeQuery("metadata.write_ts", start_ts, end_ts)
     self.assertEqual(len(uc.getMessage(["background/location"], tq)), 2)
     self.assertEqual(len(uc.getMessage(["background/activity"], tq)), 2)
     self.assertEqual(len(uc.getMessage(["background/accelerometer"], tq)), 2)

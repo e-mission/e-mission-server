@@ -1,0 +1,30 @@
+import logging
+import emission.core.wrapper.wrapperbase as ecwb
+
+class LocalDate(ecwb.WrapperBase):
+    """
+    Supporting wrapper class that stores the expansions of the components
+    of a datetime in *the local timezone* to allow us to query heatmaps based
+    on local time. This is a recurring pattern, so we create a supporting
+    datastructure then we can index the entire document instead of indexing
+    each individual field.
+    """
+    props = {
+                "year": ecwb.WrapperBase.Access.WORM,
+                "month": ecwb.WrapperBase.Access.WORM,
+                "day": ecwb.WrapperBase.Access.WORM,
+                "hour": ecwb.WrapperBase.Access.WORM,
+                "minute": ecwb.WrapperBase.Access.WORM,
+                "second": ecwb.WrapperBase.Access.WORM,
+                "weekday": ecwb.WrapperBase.Access.WORM,
+                "timezone": ecwb.WrapperBase.Access.WORM
+            }
+
+    enums = {}
+    geojson = []
+    nullable = [] 
+    local_dates = []
+
+    def _populateDependencies(self):
+        pass
+

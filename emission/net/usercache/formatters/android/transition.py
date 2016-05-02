@@ -8,7 +8,8 @@ state_map = {
     "unknown": et.State.UNKNOWN,
     "local.state.start": et.State.START,
     "local.state.waiting_for_trip_start": et.State.WAITING_FOR_TRIP_START,
-    "local.state.ongoing_trip": et.State.ONGOING_TRIP
+    "local.state.ongoing_trip": et.State.ONGOING_TRIP,
+    "local.state.tracking_stopped": et.State.TRACKING_STOPPED
 }
 
 transition_map = {
@@ -16,7 +17,8 @@ transition_map = {
     "local.transition.initialize": et.TransitionType.INITIALIZE,
     "local.transition.exited_geofence": et.TransitionType.EXITED_GEOFENCE,
     "local.transition.stopped_moving": et.TransitionType.STOPPED_MOVING,
-    "local.transition.stop_tracking": et.TransitionType.STOP_TRACKING
+    "local.transition.stop_tracking": et.TransitionType.STOP_TRACKING,
+    "local.transition.start_tracking": et.TransitionType.START_TRACKING
 }
 
 def format(entry):

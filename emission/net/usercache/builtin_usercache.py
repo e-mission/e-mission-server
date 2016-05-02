@@ -60,11 +60,7 @@ class BuiltinUserCache(ucauc.UserCache):
 
     @staticmethod
     def _get_ts_query(tq):
-        time_key = "metadata.%s" % tq.timeType
-        ret_query = {time_key : {"$lt": tq.endTs}}
-        if (tq.startTs is not None):
-            ret_query[time_key].update({"$gte": tq.startTs})
-        return ret_query
+        return tq.get_query()
 
     @staticmethod
     def get_uuid_list():
@@ -114,7 +110,7 @@ class BuiltinUserCache(ucauc.UserCache):
                 key_query_list.append(self.key_query(key))
             ret_query.update({"$or": key_query_list})
         if (time_query is not None):
-            ret_query.update(self.ts_query(time_query))
+            ret_query.update(time_query.get_query())
         return ret_query
 
     def getMessage(self, key_list = None, timeQuery = None):
@@ -139,7 +135,7 @@ class BuiltinUserCache(ucauc.UserCache):
         # the write timestamp, because we use the last_ts_processed to mark the
         # beginning of the entry for the next query. So let's sort by the
         # write_ts before returning.
-        retrievedMsgs = list(self.db.find(combo_query).sort("metadata.write_ts", pymongo.ASCENDING))
+        retrievedMsgs = list(self.db.find(combo_query).sort("metadata.write_ts", pymongo.ASCENDING).limit(100000))
         logging.debug("Found %d messages in response to query %s" % (len(retrievedMsgs), combo_query))
         return retrievedMsgs
 

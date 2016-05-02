@@ -25,6 +25,8 @@ def sync_phone_to_server(uuid, data_from_phone):
     """
         Puts the blob from the phone into the cache
     """
+    usercache_db = get_usercache_db()
+
     for data in data_from_phone:
         # logging.debug("About to insert %s into the database" % data)
         data.update({"user_id": uuid})
@@ -41,7 +43,7 @@ def sync_phone_to_server(uuid, data_from_phone):
                         'metadata.type': data["metadata"]["type"],
                         'metadata.write_ts': data["metadata"]["write_ts"],
                         'metadata.key': data["metadata"]["key"]}
-        result = get_usercache_db().update(update_query,
+        result = usercache_db.update(update_query,
                                            document,
                                            upsert=True)
         logging.debug("Updated result for user = %s, key = %s, write_ts = %s = %s" % 

@@ -42,10 +42,22 @@ def clear_existing_places(user_id):
     db = edb.get_common_place_db()
     db.remove({'user_id': user_id})
 
+def get_all_place_objs(common_place):
+    trip.trips = [unc_trip.get_id() for unc_trip in dct["sections"]]
+    place_db = edb.get_place_db()
+    start_places = []
+    end_places = []
+    for t in trip.trips:
+        start = place_db.find_one({"_id" : t.start_place})
+        end = place_db.find_one({"_id" : t.end_place})
+        start_places.append(start)
+        end_places.append(end)
+
 ################################################################################
 
 def create_places(list_of_cluster_data, user_id):
     places_to_successors = {}
+    places_dct = {}
     logging.debug("About to create places for %d clusters" % len(list_of_cluster_data))
     for dct in list_of_cluster_data:
         start_name = dct['start']
@@ -61,16 +73,25 @@ def create_places(list_of_cluster_data, user_id):
         if end_loc_str not in places_to_successors:
             places_to_successors[end_loc_str] = []
 
+        if start_loc_str not in places_dct:
+            places_dct[start_loc_str] = dct["start_places"]
+
+        if end_loc_str not in places_dct:
+            places_dct[end_loc_str] = dct["end_places"]
+
     clear_existing_places(user_id)
     logging.debug("After creating map, number of places is %d" % len(places_to_successors))
     for loc_str in places_to_successors.iterkeys():
         start = make_new_common_place(user_id, gj.loads(loc_str))
+        logging.debug("Adding %d places for this place" % len(places_dct[loc_str]))
+        start.places = places_dct[loc_str]
         save_common_place(start)
 
     for loc_str, successors in places_to_successors.iteritems():
         start = get_common_place_at_location(gj.loads(loc_str))
         successor_places = map(lambda loc:get_common_place_at_location(loc), successors)
         start.successors = successor_places
+
         save_common_place(start)
 
 ### Graph queries

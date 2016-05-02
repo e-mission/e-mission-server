@@ -4,9 +4,7 @@ import emission.core.wrapper.wrapperbase as ecwb
 # TODO: Figure out whether we should parse the geojson back to a geojson object
 
 class Trip(ecwb.WrapperBase):
-    props = {"user_id": ecwb.WrapperBase.Access.WORM, # start UTC timestamp (in secs)
-
-             "start_ts": ecwb.WrapperBase.Access.WORM, # start UTC timestamp (in secs)
+    props = {"start_ts": ecwb.WrapperBase.Access.WORM, # start UTC timestamp (in secs)
              "start_local_dt": ecwb.WrapperBase.Access.WORM, # start datetime in local time
              "start_fmt_time": ecwb.WrapperBase.Access.WORM, # start formatted time (in timezone of point)
              "end_ts": ecwb.WrapperBase.Access.WORM, # end UTC timestamp (in secs)
@@ -23,6 +21,7 @@ class Trip(ecwb.WrapperBase):
     enums = {}
     geojson = ["start_loc", "end_loc"]
     nullable = []
+    local_dates = ['start_local_dt', 'end_local_dt']
 
     def _populateDependencies(self):
         pass

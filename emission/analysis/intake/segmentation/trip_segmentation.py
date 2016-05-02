@@ -2,11 +2,13 @@ import logging
 
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.place_queries as esdp
-import emission.storage.decorations.trip_queries as esdt
+import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.pipeline_queries as epq
 
 import emission.core.wrapper.transition as ecwt
 import emission.core.wrapper.location as ecwl
+import emission.core.wrapper.rawtrip as ecwrt
+import emission.core.wrapper.rawplace as ecwrp
 import emission.core.wrapper.entry as ecwe
 
 class TripSegmentationMethod(object):
@@ -134,10 +136,15 @@ def create_places_and_trips(user_id, segmentation_points, segmentation_method_na
     # description of dealing with gaps in tracking can be found in the wiki.
     # Let us first deal with the easy case.
     # restart_events_df = get_restart_events(ts, time_query)
-    last_place = esdp.get_last_place(user_id)
-    if last_place is None:
+    ts = esta.TimeSeries.get_time_series(user_id)
+    last_place_entry = esdp.get_last_place_entry(esda.RAW_PLACE_KEY, user_id)
+    if last_place_entry is None:
         last_place = start_new_chain(user_id)
         last_place.source = segmentation_method_name
+        last_place_entry = ecwe.Entry.create_entry(user_id,
+                                "segmentation/raw_place", last_place, create_id = True)
+    else:
+        last_place = last_place_entry.data
 
     # if is_easy_case(restart_events_df):
     # Theoretically, we can do some sanity checks here to make sure
@@ -151,22 +158,29 @@ def create_places_and_trips(user_id, segmentation_points, segmentation_method_na
         logging.debug("start_loc = %s, end_loc = %s" % (start_loc, end_loc))
 
         # Stitch together the last place and the current trip
-        curr_trip = esdt.create_new_trip(user_id)
+        curr_trip = ecwrt.Rawtrip()
         curr_trip.source = segmentation_method_name
-        new_place = esdp.create_new_place(user_id)
+        curr_trip_entry = ecwe.Entry.create_entry(user_id,
+                            "segmentation/raw_trip", curr_trip, create_id = True)
+
+        new_place = ecwrp.Rawplace()
         new_place.source = segmentation_method_name
+        new_place_entry = ecwe.Entry.create_entry(user_id,
+                            "segmentation/raw_place", new_place, create_id = True)
 
-        stitch_together_start(last_place, curr_trip, start_loc)
-        stitch_together_end(new_place, curr_trip, end_loc)
+        stitch_together_start(last_place_entry, curr_trip_entry, start_loc)
+        stitch_together_end(new_place_entry, curr_trip_entry, end_loc)
 
-        esdp.save_place(last_place)
-        esdt.save_trip(curr_trip)
-
-        last_place = new_place
+        ts.insert(curr_trip_entry)
+        # last_place is a copy of the data in this entry. So after we fix it
+        # the way we want, we need to assign it back to the entry, otherwise
+        # it will be lost
+        ts.update(last_place_entry)
+        last_place_entry = new_place_entry
 
     # The last last_place hasn't been stitched together yet, but we
     # need to save it so that it can be the last_place for the next run
-    esdp.save_place(last_place)
+    ts.insert(last_place_entry)
 
 def start_new_chain(uuid):
     """
@@ -176,11 +190,11 @@ def start_new_chain(uuid):
     and add the checks for the improperly terminated chain later.
     TODO: Add checks for improperly terminated chains later.
     """
-    start_place = esdp.create_new_place(uuid)
+    start_place = ecwrp.Rawplace()
     logging.debug("Starting tracking, created new start of chain %s" % start_place)
     return start_place
 
-def stitch_together_start(last_place, curr_trip, start_loc):
+def stitch_together_start(last_place_entry, curr_trip_entry, start_loc):
     """
     Stitch together the last place and the current trip at the start location.
     Note that we don't actually know the time that we left the start place
@@ -188,10 +202,13 @@ def stitch_together_start(last_place, curr_trip, start_loc):
     something fancy with extraploation based on average speed, but let's keep
     the fuzz factor for now.
     """
+    last_place = last_place_entry.data
+    curr_trip = curr_trip_entry.data
+
     last_place.exit_ts = start_loc.ts
     last_place.exit_local_dt = start_loc.local_dt
     last_place.exit_fmt_time = start_loc.fmt_time
-    last_place.starting_trip = curr_trip.get_id()
+    last_place.starting_trip = curr_trip_entry.get_id()
     if "enter_ts" in last_place:
         last_place.duration = last_place.exit_ts - last_place.enter_ts
     else:
@@ -204,10 +221,16 @@ def stitch_together_start(last_place, curr_trip, start_loc):
     curr_trip.start_ts = start_loc.ts
     curr_trip.start_local_dt = start_loc.local_dt
     curr_trip.start_fmt_time = start_loc.fmt_time
-    curr_trip.start_place = last_place.get_id()
+    curr_trip.start_place = last_place_entry.get_id()
     curr_trip.start_loc = start_loc.loc
 
-def stitch_together_end(new_place, curr_trip, end_loc):
+    # The wrapper class returns a copy of the data object, so any changes to it
+    # are not reflected in the original
+    last_place_entry["data"] = last_place
+    curr_trip_entry["data"] = curr_trip
+
+
+def stitch_together_end(new_place_entry, curr_trip_entry, end_loc):
     """
     Stitch together the last place and the current trip at the start location.
     Note that we don't actually know the time that we left the start place
@@ -215,18 +238,27 @@ def stitch_together_end(new_place, curr_trip, end_loc):
     something fancy with extraploation based on average speed, but let's keep
     the fuzz factor for now.
     """
+    new_place = new_place_entry.data
+    curr_trip = curr_trip_entry.data
+
     curr_trip.end_ts = end_loc.ts
     curr_trip.end_local_dt = end_loc.local_dt
     curr_trip.end_fmt_time = end_loc.fmt_time
-    curr_trip.end_place = new_place.get_id()
+    curr_trip.end_place = new_place_entry.get_id()
     curr_trip.end_loc = end_loc.loc
     curr_trip.duration = curr_trip.end_ts - curr_trip.start_ts
 
     new_place.enter_ts = end_loc.ts
     new_place.enter_local_dt = end_loc.local_dt
     new_place.enter_fmt_time = end_loc.fmt_time
-    new_place.ending_trip = curr_trip.get_id()
+    new_place.ending_trip = curr_trip_entry.get_id()
     new_place.location = end_loc.loc
+
+    # The wrapper class returns a copy of the data object, so any changes to it
+    # are not reflected in the original
+    new_place_entry["data"] = new_place
+    curr_trip_entry["data"] = curr_trip
+
 
 def get_restart_events(timeseries, time_query):
     transition_df = timeseries.get_data_df("statemachine/transition", time_query)

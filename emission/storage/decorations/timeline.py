@@ -1,24 +1,36 @@
 import logging
-import emission.net.usercache.abstract_usercache as enua
+import emission.storage.timeseries.timequery as estt
+import emission.storage.timeseries.tcquery as esttc
+import emission.storage.timeseries.geoquery as estg
 
-def get_timeline_from_dt(user_id, start_dt, end_dt):
-    import emission.core.get_database as edb
-    import emission.core.wrapper.entry as ecwe
+import emission.storage.decorations.analysis_timeseries_queries as esda
+import emission.storage.timeseries.abstract_timeseries as esta
 
-    logging.info("About to query for %s -> %s" % (start_dt, end_dt))
-    result_cursor = edb.get_timeseries_db().find({"user_id": user_id, "data.local_dt": {"$gte": start_dt, "$lte": end_dt}}).sort("metadata.write_ts")
-    logging.debug("result cursor has %d entries" % result_cursor.count())
-    result_list = list(result_cursor)
-    logging.debug("result list has %d entries" % len(result_list))
-    if len(result_list) == 0:
-       return get_timeline(user_id, 0, 0)
-    start_ts = ecwe.Entry(result_list[0]).metadata.write_ts
-    end_ts = ecwe.Entry(result_list[-1]).metadata.write_ts
-    logging.debug("Converted datetime range %s -> %s to timestamp range %s -> %s" %
-        (start_dt, end_dt, start_ts, end_ts))
-    return get_timeline(user_id, start_ts, end_ts)
+import emission.core.wrapper.entry as ecwe
 
-def get_timeline(user_id, start_ts, end_ts):
+def get_raw_timeline_from_dt(user_id, start_local_dt, end_local_dt,
+                             geojson=None, extra_query_list=None):
+    return get_timeline_from_dt(user_id, esda.RAW_PLACE_KEY, esda.RAW_TRIP_KEY,
+                                start_local_dt, end_local_dt, geojson, extra_query_list)
+
+def get_cleaned_timeline_from_dt(user_id, start_local_dt, end_local_dt,
+                                 geojson=None, extra_query_list=None):
+    return get_timeline_from_dt(user_id, esda.CLEANED_PLACE_KEY, esda.CLEANED_TRIP_KEY,
+                                start_local_dt, end_local_dt, geojson, extra_query_list)
+
+def get_raw_timeline(user_id, start_ts, end_ts,
+                     geojson=None, extra_query_list=None):
+    return get_timeline(user_id, esda.RAW_PLACE_KEY, esda.RAW_TRIP_KEY,
+                        start_ts, end_ts, geojson, extra_query_list)
+
+def get_cleaned_timeline(user_id, start_ts, end_ts,
+                         geojson=None, extra_query_list=None):
+    return get_timeline(user_id, esda.CLEANED_PLACE_KEY, esda.CLEANED_TRIP_KEY,
+                        start_ts, end_ts, geojson, extra_query_list)
+
+def get_timeline(user_id, place_key, trip_key, start_ts, end_ts,
+                 geojson=None, extra_query_list=None):
+    logging.info("About to query for timestamps %s -> %s" % (start_ts, end_ts))
     """
     Return a timeline of the trips and places from this start timestamp to this end timestamp.
     Note that each place and each trip has *two* associated timestamps, so we need to define which trips need to be
@@ -34,26 +46,71 @@ def get_timeline(user_id, start_ts, end_ts):
     :param end_ts: the ending timestamp. we will include all places and trips that end after this.
     :return: a timeline object
     """
-    # These imports are in here to avoid circular import dependencies between
-    # trip_queries and this file (timeline)
-    import emission.storage.decorations.place_queries as esdp
-    import emission.storage.decorations.trip_queries as esdt
+    (place_gq, trip_gq) = get_place_trip_geoquery(geojson)
+    places_entries = esda.get_entries(place_key, user_id=user_id,
+                                      time_query=estt.TimeQuery("data.enter_ts",
+                                                                start_ts,
+                                                                end_ts),
+                                      geo_query=place_gq,
+                                      extra_query_list=extra_query_list)
+    trips_entries = esda.get_entries(trip_key, user_id=user_id,
+                                     time_query=estt.TimeQuery("data.start_ts",
+                                                               start_ts,
+                                                               end_ts),
+                                     geo_query=trip_gq,
+                                     extra_query_list=extra_query_list)
+    for place in places_entries:
+        logging.debug("Considering place %s: %s -> %s " % (place.get_id(),
+                        place.data.enter_fmt_time, place.data.exit_fmt_time))
+    for trip in trips_entries:
+        logging.debug("Considering trip %s: %s -> %s " % (trip.get_id(),
+                        trip.data.start_fmt_time, trip.data.end_fmt_time))
 
-    places = esdp.get_places(user_id, enua.UserCache.TimeQuery("enter_ts", start_ts, end_ts))
-    trips = esdt.get_trips(user_id, enua.UserCache.TimeQuery("start_ts", start_ts, end_ts))
+    return Timeline(place_key, trip_key, places_entries, trips_entries)
 
-    for place in places:
-        logging.debug("Considering place %s: %s -> %s " % (place.get_id(), place.enter_fmt_time, place.exit_fmt_time))
-    for trip in trips:
-        logging.debug("Considering trip %s: %s -> %s " % (trip.get_id(), trip.start_fmt_time, trip.end_fmt_time))
+def get_timeline_from_dt(user_id, place_key, trip_key,
+                         start_local_dt, end_local_dt,
+                         geojson=None, extra_query_list=None):
+    logging.info("About to query for date components %s -> %s" % (start_local_dt, end_local_dt))
+    (place_gq, trip_gq) = get_place_trip_geoquery(geojson)
+    places_entries = esda.get_entries(place_key, user_id,
+                                      esttc.TimeComponentQuery(
+                                          "data.enter_local_dt", start_local_dt,
+                                          end_local_dt),
+                                      geo_query=place_gq,
+                                      extra_query_list=extra_query_list)
+    trips_entries = esda.get_entries(trip_key, user_id,
+                                     esttc.TimeComponentQuery(
+                                         "data.start_local_dt", start_local_dt,
+                                         end_local_dt),
+                                     geo_query=trip_gq,
+                                     extra_query_list=extra_query_list)
 
-    return Timeline(places, trips)
+    for place in places_entries:
+        logging.debug("Considering place %s: %s -> %s " %
+                      (place.get_id(), place.data.enter_fmt_time, place.data.exit_fmt_time))
+    for trip in trips_entries:
+        logging.debug("Considering trip %s: %s -> %s " %
+                      (trip.get_id(), trip.data.start_fmt_time, trip.data.end_fmt_time))
+
+    return Timeline(place_key, trip_key, places_entries, trips_entries)
+
+def get_place_trip_geoquery(geojson):
+    if geojson is not None:
+        place_gq = estg.GeoQuery(loc_field_list=['data.location'],
+                                 poly_region=geojson)
+        trip_gq = estg.GeoQuery(loc_field_list=['data.start_loc', 'data.end_loc'],
+                                poly_region=geojson)
+    else:
+        place_gq = None
+        trip_gq = None
+    return (place_gq, trip_gq)
 
 class Timeline(object):
 
     class State(object):
         def __init__(self, type, element):
-            self.type = type
+            self.element_type = type
             self.element = element
             if element is None:
                 self.id = None
@@ -61,10 +118,15 @@ class Timeline(object):
                 self.id = element.get_id()
 
 
-    def __init__(self, places_or_stops, trips_or_sections):
-        logging.debug("len(places) = %s, len(trips) = %s" % (len(places_or_stops), len(trips_or_sections)))
-        self.places = places_or_stops
-        self.trips = trips_or_sections
+    def __init__(self, place_or_stop_key, trip_or_section_key,
+                 places_or_stops_entries, trips_or_sections_entries):
+        logging.debug("keys = (%s, %s), len(places) = %s, len(trips) = %s" %
+                      (place_or_stop_key, trip_or_section_key,
+                       len(places_or_stops_entries), len(trips_or_sections_entries)))
+        self.place_key = place_or_stop_key
+        self.trip_key = trip_or_section_key
+        self.places = places_or_stops_entries
+        self.trips = trips_or_sections_entries
         self.id_map = dict((p.get_id(), p) for p in self.places)
         self.id_map.update(dict((t.get_id(), t) for t in self.trips))
 
@@ -76,12 +138,12 @@ class Timeline(object):
                 self.state = Timeline.State("place", self.places[0])
         else:
             assert (len(self.places) > 0 and len(self.trips) > 0)
-            if self.places[0].exit_ts < self.trips[0].start_ts:
+            if self.places[0].data.exit_ts < self.trips[0].data.start_ts:
                 self.state = Timeline.State("place", self.places[0])
             else:
                 self.state = Timeline.State("trip", self.trips[0])
         logging.debug("Starting with element of type %s, id %s, details %s" %
-                      (self.state.type, self.state.id, self.state.element))
+                      (self.state.element_type, self.state.id, self.state.element))
 
     def fill_start_end_places(self):
         """
@@ -90,12 +152,12 @@ class Timeline(object):
         were iterating over a place versus a trip.
         :return: None. The timeline is updated with the start and end place.
         """
-        if len(self.trips) > 0:
-            logging.debug("len(trips) = %s, adding start_place %s and end_place %s" % (len(self.trips),
-                                                                                       self.trips[0].start_place,
-                                                                                       self.trips[-1].end_place))
-            start_place = self._addIfNotExists(self.trips[0].start_place)
-            end_place = self._addIfNotExists(self.trips[-1].end_place)
+        for trip in self.trips:
+            logging.debug("for trip = %s, adding start_place %s and end_place %s" % (trip.get_id(),
+                                                                                    trip.data.start_place,
+                                                                                    trip.data.end_place))
+            start_place = self._addIfNotExists(trip.data.start_place)
+            end_place = self._addIfNotExists(trip.data.end_place)
             self.state = Timeline.State("place", start_place)  # Since this has been called before the iteration start
 
     def get_object(self, element_id):
@@ -117,11 +179,11 @@ class Timeline(object):
 
         if place_id not in self.id_map:
             logging.debug("place id %s is not in the map, searching in database" % place_id)
-            place = esdp.get_place(place_id)
-            self.places.append(place)
-            self.id_map[place_id] = place
-            logging.debug("retrieved object %s and added to id_map" % place)
-            return place
+            place_entry = esda.get_entry(self.place_key, place_id)
+            self.places.append(place_entry)
+            self.id_map[place_id] = place_entry
+            logging.debug("retrieved object %s and added to id_map" % place_entry)
+            return place_entry
         else:
             return self.id_map[place_id]
 
@@ -144,23 +206,43 @@ class Timeline(object):
     def move_to_next(self):
         # TODO: restructure the data model to avoid this stupid if/then.
         # e.g. rename field to be "starting" for both trip and section
-        if self.state.type == "place":
-            if hasattr(self.state.element, "starting_trip"):
-                new_id = self.state.element.starting_trip
+        if self.state.element_type == "place":
+            if hasattr(self.state.element.data, "starting_trip"):
+                new_id = self.state.element.data.starting_trip
             else:
-                assert(hasattr(self.state.element, "starting_section"))
-                new_id = self.state.element.starting_section
+                assert(hasattr(self.state.element.data, "starting_section"))
+                new_id = self.state.element.data.starting_section
             new_type = "trip"
         else:
-            assert(self.state.type == "trip")
-            if hasattr(self.state.element, "end_place"):
-                new_id = self.state.element.end_place
+            assert(self.state.element_type == "trip")
+            if hasattr(self.state.element.data, "end_place"):
+                new_id = self.state.element.data.end_place
             else:
-                assert(hasattr(self.state.element, "end_stop"))
-                new_id = self.state.element.end_stop
+                assert(hasattr(self.state.element.data, "end_stop"))
+                new_id = self.state.element.data.end_stop
             new_type = "place"
 
         if new_id is None:
             self.state = Timeline.State("unknown", None)
         else:
             self.state = Timeline.State(new_type, self.id_map[new_id])
+
+    def first_place(self):
+        if self.first_trip() is not None and \
+            self.first_trip().data.start_place is not None:
+            return self.get_object(self.first_trip().data.start_place)
+        else:
+            return None
+
+    def last_place(self):
+        if self.last_trip() is not None and \
+            self.last_trip().data.end_place is not None:
+            return self.get_object(self.last_trip().data.end_place)
+        else:
+            return None
+
+    def first_trip(self):
+        return self.trips[0] if len(self.trips) > 0 else None
+
+    def last_trip(self):
+        return self.trips[-1] if len(self.trips) > 0 else None

@@ -1,5 +1,4 @@
 # Standard imports
-from __future__ import division
 import math
 import logging
 import numpy as np

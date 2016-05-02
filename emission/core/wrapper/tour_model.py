@@ -9,6 +9,7 @@ class TourModel(ecwb.WrapperBase):
     geojson = []
     enums = {}
     nullable = []
+    local_dates = []
 
     def _populateDependencies(self):
         pass

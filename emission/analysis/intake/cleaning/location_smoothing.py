@@ -17,7 +17,7 @@ import emission.analysis.intake.cleaning.cleaning_methods.jump_smoothing as eaic
 
 import emission.storage.pipeline_queries as epq
 
-import emission.storage.decorations.section_queries as esds
+import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.timeseries.abstract_timeseries as esta
 
 import emission.core.wrapper.entry as ecwe
@@ -51,6 +51,7 @@ def recalc_speed(points_df):
     return with_speeds_df
 
 def add_dist_heading_speed(points_df):
+    # type: (pandas.DataFrame) -> pandas.DataFrame
     """
     Returns a new dataframe with an added "speed" column.
     The speed column has the speed between each point and its previous point.
@@ -88,7 +89,8 @@ def add_heading_change(points_df):
 def filter_current_sections(user_id):
     time_query = epq.get_time_range_for_smoothing(user_id)
     try:
-        sections_to_process = esds.get_sections(user_id, time_query)
+        sections_to_process = esda.get_objects(esda.RAW_SECTION_KEY, user_id,
+                                               time_query)
         for section in sections_to_process:
             logging.info("^" * 20 + ("Smoothing section %s for user %s" % (section.get_id(), user_id)) + "^"
  * 20)
@@ -116,7 +118,7 @@ def filter_jumps(user_id, section_id):
     outlier_algo = eaico.BoxplotOutlier()
     filtering_algo = eaicj.SmoothZigzag()
 
-    tq = esds.get_time_query_for_section(section_id)
+    tq = esda.get_time_query_for_trip_like(esda.RAW_SECTION_KEY, section_id)
     ts = esta.TimeSeries.get_time_series(user_id)
     section_points_df = ts.get_data_df("background/filtered_location", tq)
     logging.debug("len(section_points_df) = %s" % len(section_points_df))

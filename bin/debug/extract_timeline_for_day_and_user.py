@@ -17,11 +17,15 @@ def export_timeline(user_id_str, day_str, file_name):
     # day_dt = pydt.datetime.strptime(day_str, "%Y-%m-%d").date()
     day_dt = pydt.datetime.strptime(day_str, "%Y-%m-%d")
     logging.debug("day_dt is %s" % day_dt)
-    day_end_dt = day_dt + pydt.timedelta(days=1)
     # TODO: Convert to call to get_timeseries once we get that working
     # Or should we even do that?
-    entry_list = list(edb.get_timeseries_db().find({'user_id': uuid.UUID(user_id_str),
-                                                    'metadata.write_local_dt': {'$gt': day_dt, "$lt": day_end_dt}}))
+    user_query = {'user_id': uuid.UUID(user_id_str)}
+    date_query = {'metadata.write_local_dt.year': day_dt.year,
+	'metadata.write_local_dt.month': day_dt.month,
+	'metadata.write_local_dt.day': day_dt.day}
+    final_query = user_query
+    final_query.update(date_query)
+    entry_list = list(edb.get_timeseries_db().find(final_query))
     logging.info("Found %d entries" % len(entry_list))
     json.dump(entry_list, open(file_name, "w"), default=bju.default, allow_nan=False, indent=4)
 

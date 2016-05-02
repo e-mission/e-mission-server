@@ -21,6 +21,7 @@ class Location(ecwb.WrapperBase):
     enums = {}
     geojson = ["loc"]
     nullable = []
+    local_dates = ['local_dt']
 
     def _populateDependencies(self):
         pass

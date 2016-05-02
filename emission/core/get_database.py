@@ -89,6 +89,7 @@ def get_uuid_db():
 
 def get_client_stats_db():
     return archiver.StatArchiver('/client_stats')
+    pass
 
 def get_client_stats_db_backup():
     current_db=MongoClient().Stage_database
@@ -97,6 +98,7 @@ def get_client_stats_db_backup():
 
 def get_server_stats_db():
     return archiver.StatArchiver('/server_stats')
+    pass
 
 def get_server_stats_db_backup():
     current_db=MongoClient().Stage_database
@@ -105,6 +107,7 @@ def get_server_stats_db_backup():
 
 def get_result_stats_db():
     return archiver.StatArchiver('/result_stats')
+    pass
 
 def get_result_stats_db_backup():
     current_db=MongoClient().Stage_database
@@ -148,6 +151,7 @@ def get_usercache_db():
                             ("metadata.type", pymongo.ASCENDING),
                             ("metadata.write_ts", pymongo.ASCENDING),
                             ("metadata.key", pymongo.ASCENDING)])
+    UserCache.create_index([("metadata.write_ts", pymongo.DESCENDING)])
     return UserCache
 
 def get_timeseries_db():
@@ -157,17 +161,39 @@ def get_timeseries_db():
     TimeSeries.create_index([("metadata.key", pymongo.HASHED)])
     TimeSeries.create_index([("metadata.write_ts", pymongo.DESCENDING)])
     TimeSeries.create_index([("data.ts", pymongo.DESCENDING)], sparse=True)
-    TimeSeries.create_index([("data.start_ts", pymongo.DESCENDING)], sparse=True)
-    TimeSeries.create_index([("data.end_ts", pymongo.DESCENDING)], sparse=True)
-    TimeSeries.create_index([("data.enter_ts", pymongo.DESCENDING)], sparse=True)
-    TimeSeries.create_index([("data.exit_ts", pymongo.DESCENDING)], sparse=True)
     TimeSeries.create_index([("data.loc", pymongo.GEOSPHERE)], sparse=True)
+    TimeSeries.create_index([("data.local_dt", pymongo.DESCENDING)], sparse=True) # lots of sensed data
     return TimeSeries
 
 def get_timeseries_error_db():
     current_db = MongoClient().Stage_database
     TimeSeriesError = current_db.Stage_timeseries_error
     return TimeSeriesError
+
+def get_analysis_timeseries_db():
+    """
+    " Stores the results of the analysis performed on the raw timeseries
+    """
+    current_db = MongoClient().Stage_database
+    AnalysisTimeSeries = current_db.Stage_analysis_timeseries
+    AnalysisTimeSeries.create_index([("user_id", pymongo.HASHED)])
+    AnalysisTimeSeries.create_index([("metadata.key", pymongo.HASHED)])
+    AnalysisTimeSeries.create_index([("data.start_ts", pymongo.DESCENDING)], sparse=True) # trips and sections
+    AnalysisTimeSeries.create_index([("data.end_ts", pymongo.DESCENDING)], sparse=True)   # trips and sections
+    AnalysisTimeSeries.create_index([("data.start_local_dt", pymongo.DESCENDING)], sparse=True) # trips and sections
+    AnalysisTimeSeries.create_index([("data.end_local_dt", pymongo.DESCENDING)], sparse=True)   # trips and sections
+    AnalysisTimeSeries.create_index([("data.start_loc", pymongo.DESCENDING)], sparse=True) # trips and sections
+    AnalysisTimeSeries.create_index([("data.end_loc", pymongo.DESCENDING)], sparse=True)   # trips and sections
+    AnalysisTimeSeries.create_index([("data.enter_ts", pymongo.DESCENDING)], sparse=True) # places and stops
+    AnalysisTimeSeries.create_index([("data.exit_ts", pymongo.DESCENDING)], sparse=True)  # places and stops
+    AnalysisTimeSeries.create_index([("data.enter_local_dt", pymongo.DESCENDING)], sparse=True) # places and stops
+    AnalysisTimeSeries.create_index([("data.exit_local_dt", pymongo.DESCENDING)], sparse=True)  # places and stops
+    AnalysisTimeSeries.create_index([("data.location", pymongo.DESCENDING)], sparse=True) # places and stops
+    AnalysisTimeSeries.create_index([("data.duration", pymongo.DESCENDING)], sparse=True) # places and stops
+    AnalysisTimeSeries.create_index([("data.mode", pymongo.HASHED)], sparse=True) # recreated location, never sort
+    AnalysisTimeSeries.create_index([("data.section", pymongo.HASHED)], sparse=True) # recreated location, never sort
+    AnalysisTimeSeries.create_index([("data.local_dt", pymongo.DESCENDING)], sparse=True) # recreated location, embedded document, will query fields
+    return AnalysisTimeSeries
 
 def get_pipeline_state_db():
     current_db = MongoClient().Stage_database

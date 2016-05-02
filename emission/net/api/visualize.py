@@ -6,6 +6,18 @@ import logging
 from emission.analysis.result.carbon import getModeCarbonFootprint, carbonFootprintForMode
 from emission.core.common import Inside_polygon,berkeley_area,getConfirmationModeQuery
 from emission.core.get_database import get_section_db,get_profile_db
+import geojson as gj
+import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
+import emission.core.wrapper.motionactivity as ecwm
+import emission.storage.decorations.timeline as esdt
+import emission.storage.decorations.local_date_queries as esdl
+import emission.storage.decorations.location_queries as esdlq
+
+import emission.core.wrapper.trip as ecwt
+import emission.core.wrapper.section as ecws
+import emission.storage.timeseries.geoquery as estg
+import emission.storage.timeseries.tcquery as esttc
+import emission.storage.decorations.analysis_timeseries_queries as esda
 
 # Note that all the points here are returned in (lng, lat) format, which is the
 # GeoJSON format.
@@ -29,36 +41,42 @@ def carbon_by_zip(start,end):
             carbon_list.append(tempdict)
     return {"weightedLoc": carbon_list}
 
-def Berkeley_pop_route(start,end):
-    Sections = get_section_db()
-    list_of_point=[]
-    # print(berkeley_area())
-    for section in Sections.find({"$and":[{'In_UCB':True },{'type':'move'},{"section_start_datetime": {"$gte": start, "$lt": end}}]}):
-        for pnt in section['track_points']:
-                list_of_point.append(pnt['track_location']['coordinates'])
-    return {"latlng": list_of_point}
+def Berkeley_pop_route(start_ts, end_ts):
+    berkeley_json  = {"geometry": {
+      "type": "Polygon",
+      "coordinates": [[
+        [-122.267443, 37.864693], [-122.267443, 37.880687], [-122.250985, 37.880687], [-122.250985, 37.864693], [-122.267443, 37.864693]
+        ]]
+      }
+    }
+    # box = [ [-122.267443, 37.864693], [-122.250985, 37.880687] ]
+    start_dt = esdl.get_local_date(start_ts, "UTC")
+    end_dt = esdl.get_local_date(end_ts, "UTC")
+    time_query = esttc.TimeComponentQuery("data.ts", start_dt, end_dt)
+    geo_query = estg.GeoQuery(["data.loc"], berkeley_json)
+    loc_entry_list = esda.get_entries(esda.CLEANED_LOCATION_KEY, user_id=None,
+                                      time_query=time_query,
+                                      geo_query=geo_query)
+    return {"lnglat": [e.data.loc.coordinates for e in loc_entry_list]}
 
-def Commute_pop_route(modeId,start,end):
-    Sections = get_section_db()
-    list_of_point=[]
-    # print(berkeley_area())
-    commuteQuery = {"$or": [{'commute': 'to'}, {'commute': 'from'}]}
-    modeQuery = {"$or": [{'mode': modeId}, getConfirmationModeQuery(modeId)]}
-    dateTimeQuery = {"section_start_datetime": {"$gte": start, "$lt": end}}
-#   findQuery = {"$and":[modeQuery,dateTimeQuery,{'type':'move'}]}
-    findQuery = {"$and":[modeQuery,{'type':'move'}]}
-    logging.debug("About to execute query %s" % findQuery)
-    findQuery = {}
-    for section in Sections.find({"$and":[modeQuery,dateTimeQuery,{'type':'move'}]}):
-        if len(section['track_points']) > 5:
-          # skip routes that have less than 3 points
-          for pnt in section['track_points'][5:-5]:
-                  list_of_point.append(pnt['track_location']['coordinates'])
+def range_mode_heatmap(modes, from_ld, to_ld, region):
+    time_query = esttc.TimeComponentQuery("data.local_dt", from_ld, to_ld)
 
-    logging.debug("Returning list of size %s" % len(list_of_point))
-    return {"latlng": list_of_point}
+    if region is None:
+        geo_query = None
+    else:
+        geo_query = estg.GeoQuery(["data.loc"], region)
 
+    if modes is None:
+        extra_query_list = None
+    else:
+        mode_enum_list = [ecwm.MotionTypes[mode] for mode in modes]
+        extra_query_list = [esdlq.get_mode_query(mode_enum_list)]
 
+    loc_entry_list = esda.get_entries(esda.CLEANED_LOCATION_KEY, user_id=None,
+                                      time_query=time_query, geo_query=geo_query,
+                                      extra_query_list=extra_query_list)
+    return {"lnglat": [e.data.loc.coordinates for e in loc_entry_list]}
 
 
 

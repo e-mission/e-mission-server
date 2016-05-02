@@ -7,6 +7,7 @@ import uuid
 import attrdict as ad
 import time
 import geojson as gj
+import arrow
 
 # Our imports
 import emission.tests.common
@@ -17,6 +18,7 @@ import emission.storage.timeseries.abstract_timeseries as esta
 import emission.net.usercache.abstract_usercache_handler as enuah
 import emission.net.api.usercache as mauc
 import emission.core.wrapper.trip as ecwt
+import emission.storage.decorations.local_date_queries as ecsdlq
 
 # These are the current formatters, so they are included here for testing.
 # However, it is unclear whether or not we need to add other tests as we add other formatters,
@@ -77,8 +79,9 @@ class TestBuiltinUserCacheHandlerOutput(unittest.TestCase):
     # But on the next call, if we are multiplying by 1000, it won't work any more.
     # Let's add a new test for this
     def testGetLocalDay(self):
-        test_dt = pydt.datetime(2016, 1, 1, 9, 46, 0, 0)
-        test_trip = ecwt.Trip({'start_local_dt': test_dt, 'start_fmt_time': test_dt.isoformat()})
+        adt = arrow.get(pydt.datetime(2016, 1, 1, 9, 46, 0, 0))
+        test_dt = ecsdlq.get_local_date(adt.timestamp, "America/Los_Angeles")
+        test_trip = ecwt.Trip({'start_local_dt': test_dt, 'start_fmt_time': adt.isoformat()})
         test_handler = enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUID1)
         self.assertEqual(test_handler.get_local_day_from_fmt_time(test_trip), "2016-01-01")
         self.assertEqual(test_handler.get_local_day_from_local_dt(test_trip), "2016-01-01")
@@ -111,10 +114,28 @@ class TestBuiltinUserCacheHandlerOutput(unittest.TestCase):
         uc.putDocument("2015-12-28", {"a": 1})
         uc.putDocument("2015-12-27", {"a": 1})
         uc.putDocument("2015-12-26", {"a": 1})
-        uch.delete_obsolete_entries(uc, valid_bins.iterkeys())
+        uch.delete_obsolete_entries(uc, list(valid_bins.iterkeys()))
         # the result should include entries that are in the past (28,27,26), but should 
         # NOT include newly added entries
         self.assertEqual(uc.getDocumentKeyList(), ["2015-12-30", "2015-12-29"])
+
+    def testRetainSetConfig(self):
+        valid_bins = {"2015-12-30":[{"b": 2}],
+                      "2015-12-29":[{"b": 2}],
+                      "2015-12-31":[{"b": 2}]}
+        uc = enua.UserCache.getUserCache(self.testUserUUID1)
+        uch = enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUID1)
+        uc.putDocument("2015-12-30", {"a": 1})
+        uc.putDocument("2015-12-29", {"a": 1})
+        uc.putDocument("2015-12-28", {"a": 1})
+        uc.putDocument("2015-12-27", {"a": 1})
+        uc.putDocument("2015-12-26", {"a": 1})
+        uc.putDocument("config/sensor_config", {"a": 1})
+        uch.delete_obsolete_entries(uc, list(valid_bins.iterkeys()))
+        # the result should include entries that are in the past (28,27,26), but should 
+        # NOT include newly added entries
+        self.assertEqual(uc.getDocumentKeyList(), ["2015-12-30", "2015-12-29",
+            "config/sensor_config"])
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)

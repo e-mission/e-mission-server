@@ -12,6 +12,7 @@ import emission.analysis.intake.cleaning.filter_accuracy as eaicf
 import emission.analysis.intake.segmentation.trip_segmentation as eaist
 import emission.analysis.intake.segmentation.section_segmentation as eaiss
 import emission.analysis.intake.cleaning.location_smoothing as eaicl
+import emission.analysis.intake.cleaning.clean_and_resample as eaicr
 
 
 if __name__ == '__main__':
@@ -22,12 +23,6 @@ if __name__ == '__main__':
         logging.info("*" * 10 + "UUID %s: moving to long term" % uuid + "*" * 10)
         uh = euah.UserCacheHandler.getUserCacheHandler(uuid)
         uh.moveToLongTerm()
-
-    # TODO: For now, move filters from metadata to data. Once we get the
-    # updated data collection clients to people, we don't need to do this any
-    # more
-    import emission.storage.timeseries.format_hacks.move_filter_field as estfm
-    estfm.move_all_filters_to_data()
 
     long_term_uuid_list = esta.TimeSeries.get_uuid_list()
     logging.info("*" * 10 + "long term UUID list = %s" % long_term_uuid_list)
@@ -44,12 +39,12 @@ if __name__ == '__main__':
         logging.info("*" * 10 + "UUID %s: smoothing sections" % uuid + "*" * 10)
         eaicl.filter_current_sections(uuid)
 
+        logging.info("*" * 10 + "UUID %s: cleaning and resampling timeline" % uuid + "*" * 10)
+        eaicr.clean_and_resample(uuid)
+
         logging.info("*" * 10 + "UUID %s: finding common trips" % uuid + "*" * 10)
         esdtmq.make_tour_model_from_raw_user_data(uuid)
 
         logging.info("*" * 10 + "UUID %s: storing views to cache" % uuid + "*" * 10)
         uh = euah.UserCacheHandler.getUserCacheHandler(uuid)
         uh.storeViewsToCache()
-        uh.storeCommonTripsToCache()
-
-

@@ -2,8 +2,7 @@ import logging
 import emission.core.wrapper.wrapperbase as ecwb
 
 class Stop(ecwb.WrapperBase):
-    props = {"user_id": ecwb.WrapperBase.Access.WORM, # start UTC timestamp (in secs)
-             "trip_id": ecwb.WrapperBase.Access.WORM, # trip_id of the parent trip
+    props = {"trip_id": ecwb.WrapperBase.Access.WORM, # trip_id of the parent trip
              "enter_ts": ecwb.WrapperBase.Access.WORM,  # the timestamp of entry (in secs)
              "enter_local_dt": ecwb.WrapperBase.Access.WORM,  # searchable datetime in timezone of entry
              "enter_fmt_time": ecwb.WrapperBase.Access.WORM, # formatted entry time in timezone of place
@@ -21,6 +20,7 @@ class Stop(ecwb.WrapperBase):
     geojson = ["enter_loc", "exit_loc"]
     nullable = ["enter_ts", "enter_fmt_time", "ending_section", # for the start of a chain
                 "exit_ts", "exit_fmt_time", "starting_section"] # for the end of a chain
+    local_dates = ['enter_local_dt', 'exit_local_dt']
 
     def _populateDependencies(self):
         pass

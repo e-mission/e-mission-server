@@ -8,8 +8,13 @@ class PipelineStages(enum.Enum):
     TRIP_SEGMENTATION = 1
     SECTION_SEGMENTATION = 2
     JUMP_SMOOTHING = 3
+    CLEAN_RESAMPLING = 11
     MODE_INFERENCE = 4
     TOUR_MODEL = 5
+    ALTERNATIVES = 10
+    USER_MODEL = 7
+    RECOMMENDATION = 8
+    OUTPUT_GEN = 9
 
 class PipelineState(ecwb.WrapperBase):
     props = {"pipeline_stage": ecwb.WrapperBase.Access.RW,  # the value of the stage from the enum above
@@ -22,6 +27,7 @@ class PipelineState(ecwb.WrapperBase):
     enums = {"pipeline_stage": PipelineStages}
     geojson = []
     nullable = []
+    local_dates = []
 
     def _populateDependencies(self):
         pass

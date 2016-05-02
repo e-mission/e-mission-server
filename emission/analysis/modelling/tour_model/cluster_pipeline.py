@@ -10,11 +10,14 @@ import emission.core.get_database as edb
 import emission.analysis.modelling.tour_model.similarity as similarity
 import emission.analysis.modelling.tour_model.featurization as featurization
 import emission.analysis.modelling.tour_model.representatives as representatives
+
 from emission.core.wrapper.trip_old import Trip, Section, Fake_Trip
+
 import emission.core.wrapper.trip as ecwt
 import emission.core.wrapper.section as ecws
 import emission.storage.decorations.trip_queries as ecsdtq
 import emission.storage.decorations.section_queries as ecsdsq
+import emission.storage.decorations.analysis_timeseries_queries as esda
 
 """
 This file reads the data from the trip database, 
@@ -39,18 +42,20 @@ read from the database.
 
 #read the data from the database. 
 def read_data(uuid=None, size=None, old=True):
-    data = []
     db = edb.get_trip_db()
     if not old:
         logging.debug("not old")
-        db = edb.get_trip_new_db()
-        trips = db.find({"user_id" : uuid})
+        trips = esda.get_entries(esda.CLEANED_TRIP_KEY, uuid,
+                                 time_query=None, geo_query=None)
+        return trips
 
     if old:
+        data = []
+        trip_db = db
         if uuid:
-            trips = db.find({'user_id' : uuid, 'type' : 'move'})
+            trips = trip_db.find({'user_id' : uuid, 'type' : 'move'})
         else:
-            trips = db.find({'type' : 'move'})
+            trips = trip_db.find({'type' : 'move'})
         for t in trips:
             try: 
                 trip = Trip.trip_from_json(t)
@@ -63,7 +68,6 @@ def read_data(uuid=None, size=None, old=True):
                 if len(data) == size:
                     break
         return data
-    return [ecwt.Trip(trip) for trip in trips]
 
 #put the data into bins and cut off the lower portion of the bins
 def remove_noise(data, radius, old=True):
@@ -101,7 +105,7 @@ def cluster_to_tour_model(data, labels, old=True):
 
 def main(uuid=None, old=True):
     data = read_data(uuid, old=old)
-    logging.debug(len(data))
+    logging.debug("len(data) is %d" % len(data))
     data, bins = remove_noise(data, 300, old=old)
     n, labels, data = cluster(data, len(bins), old=old)
     tour_dict = cluster_to_tour_model(data, labels, old=old)

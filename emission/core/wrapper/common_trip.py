@@ -8,7 +8,9 @@ class CommonTrip(ecwb.WrapperBase):
              "end_loc" : ecwb.WrapperBase.Access.WORM, # JSON of the end location, duplicated for ease of access
              "trips" : ecwb.WrapperBase.Access.WORM, # List of trip_ids that are associated with this common trip
              "probabilites" : ecwb.WrapperBase.Access.WORM,  # a matrix that represents the probabilites for edge
-             "user_id" : ecwb.WrapperBase.Access.WORM}
+             "user_id" : ecwb.WrapperBase.Access.WORM,
+             "start_times" : ecwb.WrapperBase.Access.WORM,
+             "durations" : ecwb.WrapperBase.Access.WORM}
 
 
     def _populateDependencies(self):
@@ -17,3 +19,4 @@ class CommonTrip(ecwb.WrapperBase):
     geojson = ['start_loc', 'end_loc']
     enums = {}
     nullable = []
+    local_dates = []

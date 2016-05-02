@@ -1,7 +1,7 @@
 # Standard imports
 import logging
 import matplotlib
-matplotlib.use('Agg')
+# matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import math
 import numpy
@@ -46,8 +46,8 @@ class featurization:
                 end = trip.trip_end_location
             else:
                 try:
-                    start = trip.start_loc["coordinates"]
-                    end = trip.end_loc["coordinates"]
+                    start = trip.data.start_loc["coordinates"]
+                    end = trip.data.end_loc["coordinates"]
                 except:
                     continue
             if not (start and end):

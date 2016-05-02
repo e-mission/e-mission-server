@@ -4,6 +4,7 @@
 # Standard imports
 import urllib, urllib2, datetime, time, random
 import geojson as gj
+import arrow
 # from traffic import get_travel_time
 
 # Our imports
@@ -12,6 +13,11 @@ import emission.core.our_geocoder as our_geo
 import emission.storage.decorations.trip_queries as ecsdtq
 import emission.storage.decorations.section_queries as ecsdsq
 import emission.storage.decorations.place_queries as ecsdpq
+import emission.storage.decorations.local_date_queries as ecsdlq
+import emission.storage.timeseries.abstract_timeseries as esta
+import emission.core.wrapper.rawtrip as ecwrt
+import emission.core.wrapper.entry as ecwe
+import emission.core.wrapper.section as ecws
 
 try:
     import json
@@ -84,7 +90,8 @@ class OTP:
 
     def turn_into_new_trip(self, user_id):
         print "new trip"
-        trip = ecsdtq.create_new_trip(user_id)
+        ts = esta.TimeSeries.get_time_series(user_id)
+        trip = ecwrt.Rawtrip()
         sections = []
         our_json = self.get_json()
         mode_list = set ( )
@@ -98,18 +105,23 @@ class OTP:
 
         trip.start_loc = gj.Point( (float(our_json["plan"]["from"]["lat"]), float(our_json["plan"]["from"]["lon"])) ) 
         trip.end_loc = gj.Point( (float(our_json["plan"]["to"]["lat"]), float(our_json["plan"]["to"]["lon"])) ) 
-        trip.start_local_dt = otp_time_to_ours(our_json['plan']['itineraries'][0]["startTime"])
-        trip.end_local_dt = otp_time_to_ours(our_json['plan']['itineraries'][0]["endTime"])
-        ecsdtq.save_trip(trip)
+        trip.start_local_dt = ecsdlq.get_local_date(otp_time_to_ours(
+            our_json['plan']['itineraries'][0]["startTime"]).timestamp, "UTC")
+        trip.end_local_dt = ecsdlq.get_local_date(otp_time_to_ours(
+            our_json['plan']['itineraries'][0]["endTime"]).timestamp, "UTC")
+        trip_id = ts.insert(ecwe.Entry.create_entry(user_id, "segmentation/raw_trip", trip))
 
         for leg in our_json["plan"]["itineraries"][0]['legs']:
-            section = ecsdsq.create_new_section(user_id, trip["_id"])
-            section.start_local_dt = otp_time_to_ours(leg["startTime"])
-            section.end_local_dt = otp_time_to_ours(leg["endTime"])
+            section = ecws.Section()
+            section.trip_id = trip_id
+            section.start_local_dt = ecsdlq.get_local_date(otp_time_to_ours(
+                leg["startTime"]).timestamp, "UTC")
+            section.end_local_dt = ecsdlq.get_local_date(otp_time_to_ours(
+                leg["endTime"]).timestamp, "UTC")
             section.distance = float(leg["distance"])
             section.start_loc = gj.Point( (float(leg["from"]["lat"]), float(leg["from"]["lon"])) )
             section.end_loc = gj.Point( (float(leg["to"]["lat"]), float(leg["to"]["lon"])) )
-            ecsdsq.save_section(section)
+            ts.insert_data(user_id, "segmentation/raw_section", section)
  
     def turn_into_trip(self, _id, user_id, trip_id, is_fake=False, itinerary=0):
         sections = [ ]
@@ -174,6 +186,5 @@ class OTP:
         return Alternative_Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc, 0, cost, mode_list)
 
 def otp_time_to_ours(otp_str):
-    t = time.gmtime(int(otp_str)/1000)
-    return datetime.datetime(*t[:6])    
+    return arrow.get(int(otp_str)/1000)
 

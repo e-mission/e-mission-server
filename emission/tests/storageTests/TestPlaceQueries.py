@@ -7,38 +7,41 @@ import json
 
 # Our imports
 import emission.storage.decorations.place_queries as esdp
+import emission.storage.timeseries.abstract_timeseries as esta
+import emission.storage.decorations.analysis_timeseries_queries as esda
+
 import emission.core.get_database as edb
+import emission.core.wrapper.rawplace as ecwrp
 
-class TestTripQueries(unittest.TestCase):
+# Our test imports
+import emission.tests.storageTests.analysis_ts_common as etsa
+
+class TestPlaceQueries(unittest.TestCase):
     def setUp(self):
-        self.testUserId = uuid.uuid4()
-        edb.get_place_db().remove()
-
-    def testCreateNew(self):
-        new_place = esdp.create_new_place(self.testUserId)
-        self.assertIsNotNone(new_place.get_id())
-        self.assertEqual(new_place.user_id, self.testUserId)
-
-    def testSavePlace(self):
-        new_place = esdp.create_new_place(self.testUserId)
-        new_place.enter_ts = 5
-        esdp.save_place(new_place)
-        self.assertEqual(edb.get_place_db().find({"enter_ts": 5}).count(), 1)
-        self.assertEqual(edb.get_place_db().find_one({"enter_ts": 5})["_id"], new_place.get_id())
-        self.assertEqual(edb.get_place_db().find_one({"enter_ts": 5})["user_id"], self.testUserId)
+        self.testUserId = uuid.uuid3(uuid.NAMESPACE_URL, "mailto:test@test.me")
+        edb.get_analysis_timeseries_db().remove({'user_id': self.testUserId})
 
     def testGetLastPlace(self):
-        self.testSavePlace()
-    
+        old_place = ecwrp.Rawplace()
+        old_place.enter_ts = 5
+        old_place_id = esta.TimeSeries.get_time_series(
+            self.testUserId).insert_data(
+            self.testUserId, "segmentation/raw_place", old_place)
+        old_place_entry = esda.get_entry(esda.RAW_PLACE_KEY, old_place_id)
+        logging.debug("old place entry is %s "% old_place_entry)
+        esta.TimeSeries.get_time_series(self.testUserId).update(old_place_entry)
         # The place saved in the previous step has no exit_ts set, so it is the
         # last place
-        new_place = esdp.get_last_place(self.testUserId)
-        new_place.exit_ts = 6
-        esdp.save_place(new_place)
+        last_place_entry = esdp.get_last_place_entry(esda.RAW_PLACE_KEY,
+                                                     self.testUserId)
+        last_place_entry["data"]["exit_ts"] = 6
+        logging.debug("About to update entry to %s" % last_place_entry)
+        esta.TimeSeries.get_time_series(self.testUserId).update(last_place_entry)
 
         # Now that I have set the exit_ts and saved it, there is no last place
-        new_place = esdp.get_last_place(self.testUserId)
-        self.assertIsNone(new_place)
+        last_place_entry = esdp.get_last_place_entry(esda.RAW_PLACE_KEY,
+                                                     self.testUserId)
+        self.assertIsNone(last_place_entry)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)

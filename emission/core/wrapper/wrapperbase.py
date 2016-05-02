@@ -127,6 +127,9 @@ class WrapperBase(ad.AttrDict):
         return gj.GeoJSON.to_instance(obj)
     elif key in self.enums:
         return super(WrapperBase, self)._build(self.enums[key](obj))
+    elif key in self.local_dates:
+        import emission.core.wrapper.localdate as ecwl
+        return ecwl.LocalDate(obj)
     elif isinstance(obj, coll.Mapping):
         key_class = self._get_class(key)
         # logging.debug("key_class = %s" % key_class)
