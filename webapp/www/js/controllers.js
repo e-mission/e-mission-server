@@ -118,7 +118,7 @@ angular.module('starter.controllers', ['ui-leaflet'])
       {text: "ALL", value:null},
       {text: "NONE", value:[]},
       {text: "BICYCLING", value:["BICYCLING"]},
-      {text: "WALKING", value:["WALKING"]},
+      {text: "WALKING", value:["WALKING", "ON_FOOT"]},
       {text: "IN_VEHICLE", value:["IN_VEHICLE"]}
     ];
 
@@ -136,17 +136,22 @@ angular.module('starter.controllers', ['ui-leaflet'])
   };
 
   $scope.changeFromWeekday = function() {
-    return $scope.changeWeekday($scope.selectCtrl.fromDateWeekdayString,
+    return $scope.changeWeekday(function(newVal) {
+                                  $scope.selectCtrl.fromDateWeekdayString = newVal;
+                                },
                                 $scope.selectCtrl.fromDate);
   }
 
   $scope.changeToWeekday = function() {
-    return $scope.changeWeekday($scope.selectCtrl.toDateWeekdayString,
+    return $scope.changeWeekday(function(newVal) {
+                                  $scope.selectCtrl.toDateWeekdayString = newVal;
+                                },
                                 $scope.selectCtrl.toDate);
   }
 
-  $scope.changeWeekday = function(localDateString, localDateObj) {
+  $scope.changeWeekday = function(stringSetFunction, localDateObj) {
     var weekdayOptions = [
+      {text: "All", value: null},
       {text: "Monday", value: 0},
       {text: "Tuesday", value: 1},
       {text: "Wednesday", value: 2},
@@ -160,7 +165,7 @@ angular.module('starter.controllers', ['ui-leaflet'])
       titleText: "Select day of the week",
       cancelText: "Cancel",
       buttonClicked: function(index, button) {
-        localDateString = button.text;
+        stringSetFunction(button.text);
         localDateObj.weekday = button.value;
         return true;
       }
@@ -200,8 +205,14 @@ angular.module('starter.controllers', ['ui-leaflet'])
     $scope.selectCtrl.modeString = "ALL";
     $scope.selectCtrl.fromDate = moment2Localdate(dayago)
     $scope.selectCtrl.toDate = moment2Localdate(now);
-    $scope.selectCtrl.fromDateWeekdayString = "Mon..."
-    $scope.selectCtrl.toDateWeekdayString = "Mon..."
+    if ($scope.selectCtrl.toDate.day < $scope.selectCtrl.fromDate.day) {
+       var fd = $scope.selectCtrl.fromDate;
+       $scope.selectCtrl.toDate.day = moment(fd.year+"-"+fd.month,
+                                         "YYYY-MM").daysInMonth();
+       $scope.selectCtrl.toDate.month = fd.month;
+    }
+    $scope.selectCtrl.fromDateWeekdayString = "All"
+    $scope.selectCtrl.toDateWeekdayString = "All"
     $scope.selectCtrl.region = null;
   };
 
