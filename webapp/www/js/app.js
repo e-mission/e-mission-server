@@ -6,7 +6,7 @@
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic', 'starter.controllers', 'starter.services',
-                           'starter.directives'])
+                           'starter.directives', 'br.fullpage', 'ui.bootstrap'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -31,9 +31,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services',
   // Set up the various states which the app can be in.
   // Each state's controller can be found in controllers.js
   $stateProvider
+  .state('home', {
+    url: '/home',
+    templateUrl: 'templates/home.html',
+    controller: 'HomeCtrl'
+  })
 
   // setup an abstract state for the tabs directive
-    .state('tab', {
+  .state('tab', {
     url: '/tab',
     abstract: true,
     templateUrl: 'templates/tabs.html'
@@ -82,6 +87,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services',
     */
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/tab/heatmap');
+  $urlRouterProvider.otherwise('/home');
 
 });

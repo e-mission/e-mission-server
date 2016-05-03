@@ -49,7 +49,7 @@
             dateFormat: "yy-mm-dd",
             defaultDate: "+1w",
             changeMonth: true,
-            numberOfMonths: 3,
+            numberOfMonths: 1,
             onClose: function( selectedDate ) {
               console.log("in onClose, selectedDate = "+selectedDate);
               $( "#to" ).datepicker( "option", "minDate", selectedDate );
@@ -60,7 +60,7 @@
             dateFormat: "yy-mm-dd",
             defaultDate: "+1w",
             changeMonth: true,
-            numberOfMonths: 3,
+            numberOfMonths: 1,
             onClose: function( selectedDate ) {
               $( "#from" ).datepicker( "option", "maxDate", selectedDate );
             }

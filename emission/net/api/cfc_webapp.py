@@ -85,7 +85,14 @@ def docs(filename):
   if filename != "privacy" and filename != "support" and filename != "about" and filename != "consent":
     return HTTPError(404, "Don't try to hack me, you evil spammer")
   else:
-    return static_file("%s.html" % filename, static_path)
+    return static_file("%s.html" % filename, "%s/%s" % (static_path, "docs"))
+
+@route("/<filename>")
+def docs(filename):
+  if filename != "privacy" and filename != "support" and filename != "about" and filename != "consent":
+    return HTTPError(404, "Don't try to hack me, you evil spammer")
+  else:
+    return static_file("%s.html" % filename, "%s/%s" % (static_path, "docs"))
 
 # Serve up the components of the webapp - library files, our javascript and css
 # files, and HTML templates, properly

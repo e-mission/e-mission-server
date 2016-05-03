@@ -2,6 +2,54 @@
 
 angular.module('starter.controllers', ['ui-leaflet'])
 
+.controller('HomeCtrl', function($scope) {
+    $scope.active = 0;
+    $scope.aggregateSlides = [];
+    $scope.personalSlides = [];
+
+    var addAggregateSlides = function() {
+        $scope.aggregateSlides.push({
+            image: 'img/aggregate/bike_march_2016.png',
+            text: 'Bicycling trips in March 2016',
+            id: 0
+        });
+        $scope.aggregateSlides.push({
+            image: 'img/aggregate/bike_apr_2016.png',
+            text: 'Bicycling trips in Apr 2016',
+            id: 1
+        });
+    };
+
+    var addPersonalSlides = function() {
+        $scope.personalSlides.push({
+            image: 'img/personal/list_view.png',
+            text: 'Timeline for a particular day',
+            id: 0
+        });
+        $scope.personalSlides.push({
+            image: 'img/personal/detail_view.png',
+            text: 'Detail for a particular trip',
+            id: 1
+        });
+        $scope.personalSlides.push({
+            image: 'img/personal/common_trips.png',
+            text: 'Tour model',
+            id: 2
+        });
+        $scope.personalSlides.push({
+            image: 'img/personal/compare_with_common.png',
+            text: 'Changes from normal',
+            id: 3
+        });
+    };
+
+    addAggregateSlides();
+    addPersonalSlides();
+})
+
+.controller('DataCtrl', function($scope) {
+})
+
 .controller('HeatmapCtrl', function($scope, $ionicActionSheet, $http, leafletData) {
   $scope.mapCtrl = {};
 
