@@ -157,6 +157,12 @@ angular.module('starter.controllers', ['ui-leaflet'])
     $scope.selectCtrl.modeString = "ALL";
     $scope.selectCtrl.fromDate = moment2Localdate(dayago)
     $scope.selectCtrl.toDate = moment2Localdate(now);
+    if ($scope.selectCtrl.toDate.day < $scope.selectCtrl.fromDate.day) {
+       var fd = $scope.selectCtrl.fromDate;
+       $scope.selectCtrl.toDate.day = moment(fd.year+"-"+fd.month,
+                                         "YYYY-MM").daysInMonth();
+       $scope.selectCtrl.toDate.month = fd.month;
+    }
     $scope.selectCtrl.fromDateWeekdayString = "All"
     $scope.selectCtrl.toDateWeekdayString = "All"
     $scope.selectCtrl.region = null;
