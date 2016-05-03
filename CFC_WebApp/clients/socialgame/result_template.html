@@ -1,0 +1,66 @@
+<!doctype html>
+<html ng-app="e-mission-socialgame">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <title>Gamification Results!</title>
+    <script src="clients/socialgame/front/d3.js" charset="utf-8"></script>
+    <script src="clients/socialgame/front/bullet.js"></script>
+    <script src="clients/choice/front/ionic.bundle.js" charset="utf-8"></script>
+    <script src="clients/socialgame/front/client.socialgame.display.js" charset="utf-8"></script>
+
+    <link rel="stylesheet" href="clients/choice/front/ionic.min.css">
+    <style>
+        * { margin: 0; padding: 0; }
+        html { 
+            background: url("clients/socialgame/front/{{level_picture_filename}}") no-repeat center center fixed; 
+            background-repeat: no-repeat;
+            background-position: center center;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+        }
+    </style>
+    <style>
+        .bullet { font: 10px sans-serif; }
+        .bullet .marker { stroke: red; stroke-width: 4px; }
+        .bullet .submarker { stroke: #000; stroke-width: 2px; }
+        .bullet .tick line { stroke: lightgreen; stroke-width: 1px; }
+        .bullet .tick text { fill: lightgreen }
+        .bullet .range.s0 { fill: #eee; }
+        .bullet .range.s1 { fill: #ddd; }
+        .bullet .range.s2 { fill: #ccc; }
+        .bullet .measure.s0 { fill: lightgreen; }
+        .bullet .measure.s1 { fill: green; }
+        .bullet .title { font-size: 14px; font-weight: bold; }
+        .bullet .subtitle { fill: #999; }
+    </style>
+  </head>
+  <body ng-controller="RootCtrl">
+    <a class="button button-icon icon ion-information-circled" style="color: lightgreen" ng-click="showAlert()"> </a>
+    <div align = "center">
+    <div class="spacer" style="width: 0px; height: 69px;"></div>
+      <b> Here's How This Works: </b>
+      <div class="spacer" style="width: 0px; height: 10px;"></div>
+      <p>1) Create a game</p>
+
+      <p>2) Invite your friends to join the game</p>
+
+      <p>3) Set goals for your team</p>
+
+      <p>4) High-five your friends if they're doing great or give them a nudge for a friendly reminder</p>
+
+      <p>5) Meet your goal by the set deadline</p>
+
+      <p>6) Save the world</p>
+
+      <div class="spacer" style="width: 0px; height: 69px;"></div>
+      <button id="startGame()" class="button button-positive button-block" href="#/tab/modal" ng-click="modal.show()">Create a Game</button>
+    </div>
+    <script>
+        var currScore = {{currScore}};
+        var prevScore = {{prevScore}};
+    </script>
+  </body>
+</html>
