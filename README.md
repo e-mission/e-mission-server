@@ -51,10 +51,14 @@ path, and you are using the anaconda versions of common python tools such as
 
 ### Python dependencies: ###
 
-    (You may need super user permissions to run these commands)
     $ pip install -r requirements.txt 
     # If you are running this in production over SSL, copy over the cherrypy-wsgiserver
     $ cp api/wsgiserver2.py <dist-packages>/cherrypy/wsgiserver/wsgiserver2.py
+
+### Javascript dependencies ###
+
+    $ cd webapp
+    $ bower update
 
 ## Development: ##
 -------------------
@@ -184,10 +188,9 @@ chose [Bottle](http://bottlepy.org/docs/dev/index.html) because it was simple, d
 wasn't heavy weight, could easily be replaced with something more heavyweight
 later.
 
-The front-end is javascript based - I will experiment with Angular later, but
-right now, it uses jquery and NVD3, which is a wrapper layer that makes it
-easier to display simple graphs using D3.
-
+The front-end is javascript based. In order to be consistent with the phone, it
+also uses angular + ionic. javascript components are largely managed using
+bower.
 
 ## Deployment: ##
 ----------
