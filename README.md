@@ -39,6 +39,9 @@ library inconsistencies between versions.
 The distribution also includes its own version of pip, and a separate package
 management tool called 'conda'.
 
+Make sure you install Python 2.7 because some libraries used in this code 
+repository do not support Python 3.5 yet.
+
 After you install the anaconda distribution, please ensure that it is in your
 path, and you are using the anaconda versions of common python tools such as
 `python` and `pip`, e.g.
@@ -56,6 +59,7 @@ path, and you are using the anaconda versions of common python tools such as
     $ cp api/wsgiserver2.py <dist-packages>/cherrypy/wsgiserver/wsgiserver2.py
 
 ### Javascript dependencies ###
+Run "bower install" instead if you are prompted password for 'https://github.com' after running "bower update".
 
     $ cd webapp
     $ bower update
@@ -166,11 +170,19 @@ of the notebooks.
 1. If a python execution fails to import a module, make sure to add current
 directory to your PYTHONPATH.
 
-1. If starting the server gives a CONNECTION\_ERROR, make sure MongoDB is
+2. If starting the server gives a CONNECTION\_ERROR, make sure MongoDB is
 actively running when you attempt to start the server.
 
-1. On windows, if you get an error that `dbpath does not exist`, make sure to 
-    % md c:\data\db\ 
+3. After running MongoDB, if you get an error that says `dbpath does not exist` (on Windows) or `Data directory /data/db not found` (on Mac), make sure to manually create the data directory as follows.
+
+        on Windows
+        % md c:\data\db\  
+or
+
+        on Mac (the user account running mongod must have read and write permissions for the data directory)
+        $ mkdir -p /data/db
+        $ chmod 777 /data/db
+
 
 ## Design decisions: ##
 ----------
