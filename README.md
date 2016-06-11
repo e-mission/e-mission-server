@@ -173,13 +173,13 @@ directory to your PYTHONPATH.
 2. If starting the server gives a CONNECTION\_ERROR, make sure MongoDB is
 actively running when you attempt to start the server.
 
-3. After starting MongoDB, if you get an error that says `dbpath does not exist` (on Windows) or `Data directory /data/db not found` (on Mac), make sure to manually create the data directory as follows.
+3. After running MongoDB, if you get an error that says `dbpath does not exist` (on Windows) or `Data directory /data/db not found` (on Mac), make sure to manually create the data directory as follows.
 
         on Windows
         % md c:\data\db\  
 or
 
-        on Mac
+        on Mac (give the user account running mongod read and write permissions for the data directory)
         $ mkdir -p /data/db
         $ chmod 777 /data/db
 
