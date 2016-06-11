@@ -179,7 +179,7 @@ actively running when you attempt to start the server.
         % md c:\data\db\  
 or
 
-        on Mac (give the user account running mongod read and write permissions for the data directory)
+        on Mac (the user account running mongod must have read and write permissions for the data directory)
         $ mkdir -p /data/db
         $ chmod 777 /data/db
 
