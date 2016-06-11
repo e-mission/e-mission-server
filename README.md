@@ -178,6 +178,7 @@ actively running when you attempt to start the server.
         on Windows
         % md c:\data\db\  
 or
+
         on Mac
         $ mkdir -p /data/db
         $ chmod 777 /data/db
