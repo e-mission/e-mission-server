@@ -56,7 +56,8 @@ path, and you are using the anaconda versions of common python tools such as
     $ cp api/wsgiserver2.py <dist-packages>/cherrypy/wsgiserver/wsgiserver2.py
 
 ### Javascript dependencies ###
-*run "bower install" instead if you are prompted password for 'https://github.com' after running "bower update"
+Run "bower install" instead if you are prompted password for 'https://github.com' after running "bower update"
+
     $ cd webapp
     $ bower update
 
