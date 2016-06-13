@@ -18,16 +18,31 @@
 }
 */
 
-h1.intro {
-    font-size: 6em;
+img {
+    max-width: 150%;
+    height: auto;
+    width: auto; 
 }
-p.intro {
-    font-size: 2em;
-    color: brown;
+.firstPar{
+  padding-left: 15%;
+  padding-right: 15%;
 }
-ul.intro {
-    font-size: 2em;
-    color: brown;
+
+.introH {
+    max-width: 100%
+    font-family: 'Helvetica';
+    font-size: 3rm;
+    color: black;
+    height: auto;
+    width: auto; 
+}
+.intro {
+    max-width: 100%
+    font-family: 'Helvetica';
+    font-size: 20px;
+    color: #585858;
+    height: auto;
+    width: auto; 
 }
 section {
     text-align:center;

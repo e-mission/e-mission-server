@@ -9,32 +9,32 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">emission</a>
+            <a class="navbar-brand" href="#" style="color: #585858 ">emission</a>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
                 <li>
-                    <a fullpage-href="summary">
+                    <a fullpage-href="summary" style="color:#585858">
                         Summary
                     </a>
                 </li>
                 <li>
-                    <a fullpage-href="personal">
+                    <a fullpage-href="personal" style="color:#585858">
                         Personal
                     </a>
                 </li>
                 <li>
-                    <a fullpage-href="aggregate">
+                    <a fullpage-href="aggregate" style="color:#585858">
                         Aggregate
                     </a>
                 </li>
                 <li>
-                    <a fullpage-href="code">
+                    <a fullpage-href="code" style="color:#585858">
                         Code
                     </a>
                 </li>
                 <li>
-                    <a fullpage-href="join">
+                    <a fullpage-href="join" style="color:#585858">
                         Join us!
                     </a>
                 </li>
@@ -45,43 +45,43 @@
 <fullpage class="instant-size" page-class="page">
     <section class="page" id="summary">
         <section class="container">
-            <h1>E-Mission</h1>
             <div class="row">
             <div class="col-md-2">
-               <img ng-src="img/personal/compare_with_common.png" style="opacity: 0.5" height="480em">
+               <img ng-src="img/personal/compare_with_common.png" style="opacity: 0.7; float:left;" height="480vw">
             </div>
             <div class="col-md-8" id="main-back">
-            <p class="intro" style="color:brown;">E-Mission is a research project at UC Berkeley that allows all of us to share our travel patterns and experiences with our community and with urban planners.</p>
-            <p class="intro" style="color:brown;">Our goal is to enable personal and structural shifts to sustainable transportation.</p>
-            <p class="intro" style="color:brown;">The project consists of a smartphone application that functions as a personal travel diary, and an aggregate data analysis platform that enables interactive exploration of the collected data.</p>
+            <h1 class="introH">E-Mission</h1>
+            <p class="intro firstPar">E-Mission is a research project at UC Berkeley that allows all of us to share our travel patterns and experiences with our community and with urban planners.</p>
+            <p class="intro firstPar">Our goal is to enable personal and structural shifts to sustainable transportation.</p>
+            <p class="intro firstPar" >The project consists of a smartphone application that functions as a personal travel diary, and an aggregate data analysis platform that enables interactive exploration of the collected data.</p>
             </div>
             <div class="col-md-2">
-               <img ng-src="img/personal/compare_with_common.png" style="opacity: 0.5" height="480em">
+               <img ng-src="img/personal/compare_with_common.png" style="opacity: 0.7; float:right" height="480vw">
             </div>
             </div>
         </section>
     </section>
     <section class="page" id="personal">
         <section class="container">
-          <h1>Personal</h1>
           <div class="row" style="height: 480em">
             <div class="col-md-4">
                 <uib-carousel id="personalCarousel" active="active" interval="myInterval" no-wrap="noWrapSlides">
                 <uib-slide ng-repeat="slide in personalSlides track by slide.id" index="slide.id">
                 <img ng-src="{{slide.image}}" style="margin:auto;">
-                <div class="carousel-caption" style="color:brown">
-                  <p style="color:brown">{{slide.text}}</p>
+                <div class="carousel-caption">
+                  <p>{{slide.text}}</p>
                 </div>
                 </uib-slide>
                 </uib-carousel>
             </div>
             <div class="col-md-6">
-              <p class="intro" style="color:brown;">The phone app provides a
+                <h1 class="introH">Personal</h1>
+                <p class="intro">The phone app provides a
                 personalized travel diary, with information about times,
-distances, trajectories and travel modes. Since we track travel patterns over
-time, we are able to build data-driven tour models that we can use to track
-personalized trends over time:
-                <ul class='intro' style='color:brown'>
+                distances, trajectories and travel modes. Since we track travel patterns over
+                time, we are able to build data-driven tour models that we can use to track
+                personalized trends over time:
+                <ul class='intro'>
                 <li> are your trips taking longer?
                 <li> are you leaving for work later?
                 <li> are you using different transportation modes?
@@ -94,10 +94,10 @@ personalized trends over time:
     </section>
     <section class="page" id="aggregate">
         <section class="container">
-            <h1>Aggregate</h1>
             <div class="row">
               <div class="col-md-12">
-                <p class="intro" style="font-size:1.5em;color:brown;">The webapp provides an aggregate
+                <h1 class="introH">Aggregate</h1>
+                <p class="intro">The webapp provides an aggregate
                  view of travel patterns and supports filters by mode, month, day,
                  weekday and time of day. This enables fine-grained visibility into changes over
                  time. The maps here show the heatmap for <b>bicycling</b> trips in the
@@ -113,8 +113,8 @@ personalized trends over time:
                     <uib-carousel active="active" interval="myInterval" no-wrap="noWrapSlides">
                     <uib-slide ng-repeat="slide in aggregateSlides track by slide.id" index="slide.id">
                       <img ng-src="{{slide.image}}" style="align:center;margin:auto;">
-                         <div class="carousel-caption" style="color:brown">
-                           <p style="color:brown">{{slide.text}}</p>
+                         <div class="carousel-caption">
+                           <p>{{slide.text}}</p>
                          </div>
                      </uib-slide>
                     </uib-carousel>
@@ -124,15 +124,15 @@ personalized trends over time:
     </section>
     <section class="page" id="code">
         <section class="container">
-            <h1>Code</h1>
-            <p class="intro" style="color:brown;">The code is available on github under an open source BSD license. So you have complete visibility into the data that we collect, the analysis that we perform on it, and the results that we display.</p>
+            <h1 class="introH">Code</h1>
+            <p class="intro">The code is available on github under an open source BSD license. So you have complete visibility into the data that we collect, the analysis that we perform on it, and the results that we display.</p>
             <p><a class="button button-assertive" href="https://github.com/e-mission/e-mission-server">View on GitHub</a>
             </p>
-            <p class="intro" style="color:brown">You can even join our list of contributors. </p>
-            <p class="intro" style="color:brown"><a href="https://github.com/e-mission/e-mission-server/graphs/contributors">Server code</a> </p>
-            <p class="intro" style="color:brown"><a href="https://github.com/e-mission/e-mission-phone/graphs/contributors">Phone code</a></p>
-            <p class="intro" style="color:brown">Cordova plugins for:
-            <ul class="intro" style="color:brown">
+            <p class="intro">You can even join our list of contributors. </p>
+            <p class="intro"><a href="https://github.com/e-mission/e-mission-server/graphs/contributors">Server code</a> </p>
+            <p class="intro"><a href="https://github.com/e-mission/e-mission-phone/graphs/contributors">Phone code</a></p>
+            <p class="intro">Cordova plugins for:
+            <ul class="intro">
                 <li> <a href="https://github.com/e-mission/e-mission-data-collection/graphs/contributors">energy-efficient data collection</a> </li>
                 <li> <a href="https://github.com/e-mission/cordova-usercache/graphs/contributors">bi-directional offline storage and processing</a></li>
                 <li> and more: <a href="https://github.com/e-mission/">https://github.com/e-mission/</a></li>
@@ -141,17 +141,17 @@ personalized trends over time:
     </section>
     <section class="page" id="join">
         <section class="container">
-            <h1>Join us!</h1>
-            <h2>Aggregate analysis</h2>
-            <p class="intro" style="color:brown"><a
+            <h1 class="introH">Join us!</h1>
+            <h2 class="introH" style="font-size:2rm">Aggregate analysis</h2>
+            <p class="intro"><a
                 href="tab/heatmap">Aggregate heatmap analysis based</a> on our current
                 installed user base is publicly available.
                 Enjoy. As we add more analyses, we will evaluate if/how we want
                 to provide access to them. The decision will largely be driven
                 by privacy implications. 
             </p>
-            <h2>Personalized analysis</h2>
-            <p class="intro" style="color:brown">The personal data collection
+            <h2 class="intro">Personalized analysis</h2>
+            <p class="intro">The personal data collection
             apps for android and iOS are currently in private alpha. If you
             would like an invitation, please email <a
             href="mailto:shankari@eecs.berkeley.edu">shankari@eecs.berkeley.edu</a>
@@ -160,7 +160,7 @@ personalized trends over time:
                 <li> whether you are using android or iOS, and <li>
                 <li> the address to send the invitation to - gmail account on android, apple ID on iOS
             </ul>
-            <p class="intro" style="color:brown">Since TestFlight <a
+            <p class="intro">Since TestFlight <a
                 href="https://developer.apple.com/testflight/">limits the number of users in
                 private alpha</a>, we have only ~ 15 slots currently available for iOS testers.
                 So reply soon if you want to participate!</p>
