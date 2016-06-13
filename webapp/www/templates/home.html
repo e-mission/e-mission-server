@@ -45,8 +45,8 @@
 <fullpage class="instant-size" page-class="page">
     <section class="page" id="summary">
         <section class="container">
-            <div class="row">
-            <div class="col-md-2">
+            <div class="row card" style="padding:1%;">
+            <div class="col-md-2 ">
                <img ng-src="img/personal/compare_with_common.png" style="opacity: 0.7; float:left;" height="480vw">
             </div>
             <div class="col-md-8" id="main-back">
@@ -63,7 +63,7 @@
     </section>
     <section class="page" id="personal">
         <section class="container">
-          <div class="row" style="height: 480em">
+          <div class="row card" style="padding:1%;">
             <div class="col-md-4">
                 <uib-carousel id="personalCarousel" active="active" interval="myInterval" no-wrap="noWrapSlides">
                 <uib-slide ng-repeat="slide in personalSlides track by slide.id" index="slide.id">
@@ -95,7 +95,7 @@
     <section class="page" id="aggregate">
         <section class="container">
             <div class="row">
-              <div class="col-md-12">
+              <div class="col-md-12 card" style="padding:1%";>
                 <h1 class="introH">Aggregate</h1>
                 <p class="intro">The webapp provides an aggregate
                  view of travel patterns and supports filters by mode, month, day,
@@ -105,25 +105,21 @@
                  months of <b>March and April</b>. It looks like somebody used to bike around the South
                  side in March and then stopped!!
                  <a class="button button-assertive" href="/tab/heatmap">Explore now!</a>
-                </p>
-              </div>
-            </div>
-            <div class="row">
-                  <div class="col-md-12">
-                    <uib-carousel active="active" interval="myInterval" no-wrap="noWrapSlides">
+                 </p>
+                <uib-carousel active="active" interval="myInterval" no-wrap="noWrapSlides">
                     <uib-slide ng-repeat="slide in aggregateSlides track by slide.id" index="slide.id">
-                      <img ng-src="{{slide.image}}" style="align:center;margin:auto;">
-                         <div class="carousel-caption">
-                           <p>{{slide.text}}</p>
-                         </div>
-                     </uib-slide>
-                    </uib-carousel>
-                 </div>
+                        <img ng-src="{{slide.image}}" style="align:center;margin:auto;height:90%;width:90%">
+                            <div class="carousel-caption">
+                                <p>{{slide.text}}</p>
+                            </div>
+                    </uib-slide>
+                </uib-carousel>
+              </div>
             </div>
         </section>
     </section>
-    <section class="page" id="code">
-        <section class="container">
+    <section class="page " id="code">
+        <section class="container card" style="padding:1%";>
             <h1 class="introH">Code</h1>
             <p class="intro">The code is available on github under an open source BSD license. So you have complete visibility into the data that we collect, the analysis that we perform on it, and the results that we display.</p>
             <p><a class="button button-assertive" href="https://github.com/e-mission/e-mission-server">View on GitHub</a>
@@ -140,9 +136,9 @@
         </section>
     </section>
     <section class="page" id="join">
-        <section class="container">
+        <section class="container card" style="padding:1%";>
             <h1 class="introH">Join us!</h1>
-            <h2 class="introH" style="font-size:2rm">Aggregate analysis</h2>
+            <h2 class="introH" style="font-size:2em">Aggregate analysis</h2>
             <p class="intro"><a
                 href="tab/heatmap">Aggregate heatmap analysis based</a> on our current
                 installed user base is publicly available.
@@ -150,7 +146,7 @@
                 to provide access to them. The decision will largely be driven
                 by privacy implications. 
             </p>
-            <h2 class="intro">Personalized analysis</h2>
+            <h2 class="introH" style="font-size:2em">Personalized analysis</h2>
             <p class="intro">The personal data collection
             apps for android and iOS are currently in private alpha. If you
             would like an invitation, please email <a
