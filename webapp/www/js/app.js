@@ -36,32 +36,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services',
     templateUrl: 'templates/home.html',
     controller: 'HomeCtrl'
   })
-
-  // setup an abstract state for the tabs directive
-  .state('tab', {
-    url: '/tab',
-    abstract: true,
-    templateUrl: 'templates/tabs.html'
-  })
-
-  // Each tab has its own nav history stack:
-  .state('tab.heatmap', {
+  .state('heatmap', {
     url: '/heatmap',
-    views: {
-      'tab-heatmap': {
-        templateUrl: 'templates/tab-heatmap.html',
-        controller: 'HeatmapCtrl'
-      }
-    }
+    templateUrl: 'templates/heatmap.html',
+    controller: 'HeatmapCtrl'
   })
-
-    .state('tab.trip-planning', {
+  .state('trip-planning', {
     url: '/trip-planning',
-    views: {
-      'tab-trip-planning': {
-        templateUrl: 'templates/tab-trip-planning.html'
-      }
-    }
+    templateUrl: 'templates/trip-planning.html'
   })
 /*
   .state('tab.chats', {
