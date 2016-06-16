@@ -45,13 +45,21 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services',
   })
 
   // Each tab has its own nav history stack:
-
   .state('tab.heatmap', {
     url: '/heatmap',
     views: {
       'tab-heatmap': {
         templateUrl: 'templates/tab-heatmap.html',
         controller: 'HeatmapCtrl'
+      }
+    }
+  })
+
+    .state('tab.trip-planning', {
+    url: '/trip-planning',
+    views: {
+      'tab-trip-planning': {
+        templateUrl: 'templates/tab-trip-planning.html'
       }
     }
   })

@@ -10,7 +10,6 @@
     <link href="lib/leaflet/dist/leaflet.css" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <link href="lib/br-fullpage/dist/br-fullpage.min.css" rel="stylesheet">
-    <link href='https://fonts.googleapis.com/css?family=Roboto:400,700,500,300' rel='stylesheet' type='text/css'>
     <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
     <link href="css/ionic.app.css" rel="stylesheet">
     -->
@@ -40,13 +39,13 @@
     <!--
       The nav bar that will be updated as we navigate between views.
     -->
-    <ion-nav-bar class="bar-stable">
+    <ion-nav-bar class="bar-position">
       <ion-nav-back-button>
       </ion-nav-back-button>
       <ion-nav-buttons side="primary">
         <a class="button button-block button-calm icon-left ion-home" ui-sref="home">Home</a>
         <a class="button button-block button-calm icon-left ion-ios-analytics" ui-sref="tab.heatmap">Analysis</a>
-        <a class="button button-block button-calm icon-left ion-map" href="http://54.162.140.55:8080">Trip Planning</a>
+        <a class="button button-block button-calm icon-left ion-map" ui-sref="tab.trip-planning">Trip Planning</a>
       </ion-nav-buttons>
     </ion-nav-bar>
     <!--
