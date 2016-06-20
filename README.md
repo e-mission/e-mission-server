@@ -155,6 +155,16 @@ them into utility functions. Original versions of the notebooks can be obtained
 by looking at other notebooks with the same name, or by looking at the history
 of the notebooks.
 
+## JS Testing ##
+
+From the webapp directory
+    $ npm install karma --save-dev
+    $ npm install angular-mocks
+    $ npm install karma-jasmine karma-chrome-launcher --save-dev
+
+Write tests in www/js/test
+To run tests, run 
+    $ karma start my.conf.js in the root directory
 
 
 ## TROUBLESHOOTING: ##
