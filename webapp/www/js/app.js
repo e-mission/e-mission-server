@@ -6,7 +6,7 @@
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic', 'starter.controllers', 'starter.services',
-                           'starter.directives', 'br.fullpage', 'ui.bootstrap'])
+                           'starter.directives', 'ui.bootstrap'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
