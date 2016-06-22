@@ -158,13 +158,17 @@ of the notebooks.
 ## JS Testing ##
 
 From the webapp directory
+
     $ npm install karma --save-dev
     $ npm install angular-mocks
     $ npm install karma-jasmine karma-chrome-launcher --save-dev
 
 Write tests in www/js/test
 To run tests, run 
-    $ karma start my.conf.js in the root directory
+
+    $ karma start my.conf.js 
+    
+in the webapp directory
 
 
 ## TROUBLESHOOTING: ##
