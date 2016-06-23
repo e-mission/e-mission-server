@@ -160,7 +160,6 @@ of the notebooks.
 From the webapp directory
 
     $ npm install karma --save-dev
-    $ npm install angular-mocks
     $ npm install karma-jasmine karma-chrome-launcher --save-dev
 
 Write tests in www/js/test
@@ -175,7 +174,7 @@ To run tests if you have karma globally set, run
 in the webapp directory. If you didn't run the -g command, you can run
 tests with 
 
-    $ /node_modules/karma/bin/karma start
+    $ ./node_modules/karma/bin/karma start
     
 in the webapp directory
 
