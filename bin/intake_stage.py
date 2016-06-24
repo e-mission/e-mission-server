@@ -27,6 +27,9 @@ if __name__ == '__main__':
     long_term_uuid_list = esta.TimeSeries.get_uuid_list()
     logging.info("*" * 10 + "long term UUID list = %s" % long_term_uuid_list)
     for uuid in long_term_uuid_list:
+        if uuid is None:
+            continue
+
         logging.info("*" * 10 + "UUID %s: filter accuracy if needed" % uuid + "*" * 10)
         eaicf.filter_accuracy(uuid)
         
