@@ -113,6 +113,8 @@ class featurization:
             import warnings
             for i in range(r):
                 num_clusters = i + min_clusters
+                if num_clusters == 0:
+                   continue
                 cl = KMeans(num_clusters, random_state=8)
                 cl.fit(self.points)
                 self.labels = cl.labels_

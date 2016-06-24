@@ -193,6 +193,13 @@ def get_analysis_timeseries_db():
     AnalysisTimeSeries.create_index([("data.mode", pymongo.HASHED)], sparse=True) # recreated location, never sort
     AnalysisTimeSeries.create_index([("data.section", pymongo.HASHED)], sparse=True) # recreated location, never sort
     AnalysisTimeSeries.create_index([("data.local_dt", pymongo.DESCENDING)], sparse=True) # recreated location, embedded document, will query fields
+    AnalysisTimeSeries.create_index([("data.local_dt.year", pymongo.DESCENDING)], sparse=True) # recreated location, embedded document, will query fields
+    AnalysisTimeSeries.create_index([("data.local_dt.month", pymongo.DESCENDING)], sparse=True) # recreated location, embedded document, will query fields
+    AnalysisTimeSeries.create_index([("data.local_dt.day", pymongo.DESCENDING)], sparse=True) # recreated location, embedded document, will query fields
+    AnalysisTimeSeries.create_index([("data.local_dt.hour", pymongo.DESCENDING)], sparse=True) # recreated location, embedded document, will query fields
+    AnalysisTimeSeries.create_index([("data.local_dt.minute", pymongo.DESCENDING)], sparse=True) # recreated location, embedded document, will query fields
+    AnalysisTimeSeries.create_index([("data.local_dt.second", pymongo.DESCENDING)], sparse=True) # recreated location, embedded document, will query fields
+    AnalysisTimeSeries.create_index([("data.local_dt.weekday", pymongo.DESCENDING)], sparse=True) # recreated location, embedded document, will query fields
     return AnalysisTimeSeries
 
 def get_pipeline_state_db():

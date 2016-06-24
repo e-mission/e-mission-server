@@ -79,8 +79,8 @@ class representatives:
                     points[1].append(start_place.data.location["coordinates"][0])
                     points[2].append(end_place.data.location["coordinates"][1])
                     points[3].append(end_place.data.location["coordinates"][0])
-                    logging.debug("in representatives, endpoints are = %s" %
-                                  points)
+                    logging.debug("in representatives, endpoints have len = %s" %
+                                  len(points))
             centers = numpy.mean(points, axis=1)
             a = Trip(None, None, None, None, None, None, Coordinate(centers[0], centers[1]), Coordinate(centers[2], centers[3]))
             self.reps.append(a)
@@ -156,8 +156,8 @@ class representatives:
             start_places = []
             end_places = []
             for t in self.tour_dict[i]["sections"]:
-                start = esda.get_object(esda.RAW_PLACE_KEY, t.data.start_place)
-                end = esda.get_object(esda.RAW_PLACE_KEY, t.data.end_place)
+                start = esda.get_object(esda.CLEANED_PLACE_KEY, t.data.start_place)
+                end = esda.get_object(esda.CLEANED_PLACE_KEY, t.data.end_place)
                 start_places.append(start)
                 end_places.append(end)
             self.tour_dict[i]["start_places"] = start_places

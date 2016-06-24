@@ -11,6 +11,7 @@ from numpy import cross
 from numpy.linalg import norm
 import emission.storage.decorations.trip_queries as esdtq
 import emission.storage.decorations.section_queries as esdsq
+import emission.storage.decorations.analysis_timeseries_queries as esda
 
 """
 This class organizes data into bins by similarity. It then orders the bins 
@@ -41,15 +42,20 @@ class similarity:
                 # print "a is %s" % a
                 t = a
                 try:
-                    start_lon = t.data.start_place.location["coordinates"][0]
-                    start_lat = t.data.start_place.location["coordinates"][1]
-                    end_lon = t.data.end_place.location["coordinates"][0]
-                    end_lat = t.data.end_place.location["coordinates"][1]
+                    start_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
+                                                 t.data.start_place)
+                    end_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
+                                                 t.data.end_place)
+                    start_lon = start_place.data.location["coordinates"][0]
+                    start_lat = start_place.data.location["coordinates"][1]
+                    end_lon = end_place.data.location["coordinates"][0]
+                    end_lat = end_place.data.location["coordinates"][1]
                     logging.debug("endpoints are = (%s, %s) and (%s, %s)" %
                                   (start_lon, start_lat, end_lon, end_lat))
                     if self.distance(start_lat, start_lon, end_lat, end_lon):
                         self.data.remove(a)
                 except:
+                    logging.exception("exception while getting start and end places for %s" % t)
                     self.data.remove(a)
         else:
             for a in range(len(self.data)-1, -1, -1):

@@ -47,10 +47,10 @@ filtered_trip_excluded = ["start_place", "end_place"]
 # we may want to squish a bunch of places together, and then the end information
 # will come from the final squished place
 filtered_place_excluded = ["exit_ts", "exit_local_dt", "exit_fmt_time",
-                           "starting_trip", "ending_trip", "duration"]
-filtered_section_excluded = ["trip_id", "start_stop", "end_stop", "distance"]
-filtered_stop_excluded = ["trip_id", "ending_section", "starting_section"]
-filtered_location_excluded = ["speed", "distance"]
+                           "starting_trip", "ending_trip", "duration", "_id"]
+filtered_section_excluded = ["trip_id", "start_stop", "end_stop", "distance", "_id"]
+filtered_stop_excluded = ["trip_id", "ending_section", "starting_section", "_id"]
+filtered_location_excluded = ["speed", "distance", "_id"]
 
 def clean_and_resample(user_id):
     time_query = epq.get_time_range_for_clean_resampling(user_id)
@@ -98,6 +98,8 @@ def save_cleaned_segments_for_timeline(user_id, tl):
     # We have updated the first place entry in the filtered_tl, but everything
     # else is new and needs to be inserted
     if last_cleaned_place is not None:
+        logging.debug("last cleaned_place %s was already in database, updating..." % 
+            last_cleaned_place)
         ts.update(last_cleaned_place)
     if filtered_tl is not None:
         for entry in filtered_tl:
@@ -136,7 +138,7 @@ def get_filtered_trip(ts, trip):
         stop_map[stop.get_id()] = get_filtered_stop(filtered_trip_entry, stop)
 
     # TODO: DO we need to add the stop distances too? They should be small...
-    trip_distance = [section.data.distance for section in section_map.values()]
+    trip_distance = sum([section.data.distance for section in section_map.values()])
     filtered_trip_data.distance = trip_distance
     filtered_trip_entry["data"] = filtered_trip_data
 
@@ -165,6 +167,7 @@ def get_filtered_place(raw_place):
     except:
         logging.exception("Unable to pre-fill reverse geocoded information, client has to do it")
 
+    logging.debug("raw_place.user_id = %s" % raw_place.user_id)
     curr_cleaned_end_place = ecwe.Entry.create_entry(raw_place.user_id,
                                                      esda.CLEANED_PLACE_KEY,
                                                      filtered_place_data,
@@ -242,9 +245,11 @@ def get_filtered_points(section, filtered_section_data):
 
     loc_entry_list = [ecwe.Entry(e) for e in loc_entry_it]
 
-    assert (loc_entry_list[-1].data.loc == section.data.end_loc,
-            "section_location_array[-1].loc != section.end_loc even after df.ts fix",
-            (loc_entry_list[-1].data.loc, section.data.end_loc))
+    # We know that the assertion fails in the geojson conversion code and we
+    # handle it there, so we are just going to comment this out for now.
+    # assert (loc_entry_list[-1].data.loc == section.data.end_loc,
+    #         "section_location_array[-1].loc != section.end_loc even after df.ts fix",
+    #         (loc_entry_list[-1].data.loc, section.data.end_loc))
 
     # Find the list of points to filter
     filtered_points_entry_doc = ts.get_entry_at_ts("analysis/smoothing",
@@ -274,7 +279,10 @@ def get_filtered_points(section, filtered_section_data):
 
     with_speeds_df = eaicl.add_dist_heading_speed(resampled_loc_df)
     with_speeds_df["idx"] = np.arange(0, len(with_speeds_df))
-    return with_speeds_df
+    with_speeds_df_nona = with_speeds_df.dropna()
+    logging.info("removed %d entries containing n/a" % 
+        (len(with_speeds_df_nona) - len(with_speeds_df)))
+    return with_speeds_df_nona
 
 def _copy_non_excluded(old_data, new_data, excluded_list):
     for key in old_data:
@@ -320,7 +328,7 @@ def resample(filtered_loc_list, interval):
     # But that is going to take more time and effort than I have here.
     #
     # So let's just return the one point without resampling in that case, and move on for now
-    if len(loc_df) == 1:
+    if len(loc_df) == 0 or len(loc_df) == 1:
         return loc_df
     logging.debug("Resampling entry list %s of size %s" % (loc_df.head(), len(filtered_loc_list)))
     start_ts = loc_df.ts.iloc[0]
@@ -338,6 +346,7 @@ def resample(filtered_loc_list, interval):
                           fill_value='extrapolate')
 
     ts_new = np.append(np.arange(start_ts, end_ts, 30), [end_ts])
+    logging.debug("After resampling, using %d points" % ts_new.size)
     lat_new = lat_fn(ts_new)
     lng_new = lng_fn(ts_new)
     alt_new = altitude_fn(ts_new)
@@ -419,9 +428,12 @@ def create_and_link_timeline(tl, user_id, trip_map):
         # If it is not present - maybe this user is getting started for the first
         # time, we create an entry based on the first trip from the timeline
         curr_cleaned_start_place = get_filtered_place(tl.first_place())
+        logging.debug("no last cleaned place found, created place with id %s" % curr_cleaned_start_place.get_id())
         # We just created this place here, so lets add it to the created places
         # and insert rather than update it
         cleaned_places.append(curr_cleaned_start_place)
+    else:
+        logging.debug("Cleaned place %s found, using it" % curr_cleaned_start_place.get_id())
 
     if curr_cleaned_start_place is None:
         # If the timeline has no entries, we give up and return
@@ -450,6 +462,7 @@ def create_and_link_timeline(tl, user_id, trip_map):
             link_squished_place(curr_cleaned_start_place,
                                 tl.get_object(raw_trip.data.start_place))
 
+    logging.debug("Finished creating and linking timeline, returning %d places and %d trips" % (len(cleaned_places), len(trip_map.values())))
     return (last_cleaned_place, esdtl.Timeline(esda.CLEANED_PLACE_KEY,
                                                esda.CLEANED_TRIP_KEY,
                                                cleaned_places,
@@ -473,10 +486,13 @@ def link_trip_start(cleaned_trip, cleaned_start_place, raw_start_place):
         if key in ["exit_ts", "exit_local_dt", "exit_fmt_time"]:
             cleaned_start_place_data[key] = raw_start_place.data[key]
     cleaned_start_place_data.starting_trip = cleaned_trip.get_id()
-    if cleaned_start_place_data.enter_ts is not None:
-        logging.debug("Start of a new chain, unknown duration")
-        cleaned_start_place_data.duration = cleaned_start_place_data.exit_ts - \
+    if cleaned_start_place_data.enter_ts is not None and \
+		cleaned_start_place_data.exit_ts is not None:
+           cleaned_start_place_data.duration = cleaned_start_place_data.exit_ts - \
                                             cleaned_start_place_data.enter_ts
+    else:
+           logging.debug("enter_ts = %s, exit_ts = %s, unknown duration" % 
+		(cleaned_start_place_data.enter_ts, cleaned_start_place_data.enter_ts))
 
     # Appended while creating the start place, or while handling squished
     # TODO: Don't think I need this?

@@ -73,6 +73,8 @@ class TestCommonTripQueries(unittest.TestCase):
         common_trip.end_loc = self.testEnd.location
         common_trip.probabilites = np.zeros((24, 7))
         common_trip.trips = []
+        common_trip.start_times = [123456, 345789]
+        common_trip.durations = [123,456,789]
         esdctp.save_common_trip(common_trip)
         new_trip = esdctp.get_common_trip_from_db(self.testUserId, self.testStart.get_id(), self.testEnd.get_id())
         self.assertEqual(new_trip.user_id, common_trip.user_id)

@@ -74,7 +74,9 @@ class TestCommonPlaceQueries(unittest.TestCase):
             "start_loc" : self.testStart.location,
             "end_loc" : self.testEnd.location,
             "probabilites" : probs,
-            "trips" : ()
+            "trips" : (),
+            "start_times": [],
+            "durations": []
         }
         trip = esdctp.make_new_common_trip(props)
         esdctp.save_common_trip(trip)
