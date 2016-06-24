@@ -21,7 +21,7 @@ HOURS_IN_DAY = 24
 
 def save_common_trip(common_trip):
     db = edb.get_common_trip_db()
-    probs = _2d_array_to_mongo_format(common_trip.probabilites)
+    probs = _np_array_to_json_format(common_trip.probabilites)
     db.insert({
         "user_id" : common_trip.user_id,
         "start_place" : common_trip.start_place,
@@ -46,7 +46,7 @@ def get_all_common_trips_for_user(user_id):
     return db.find({"user_id" : user_id})
 
 def make_common_trip_from_json(json_obj):
-    probs = _mongo_to_2d_array(json_obj["probabilites"])
+    probs = _json_to_np_array(json_obj["probabilites"])
     props = {
         "user_id" : json_obj["user_id"],
         "start_place" : json_obj["start_place"],
@@ -59,10 +59,10 @@ def make_common_trip_from_json(json_obj):
     return ecwct.CommonTrip(props)
 
 
-def _2d_array_to_mongo_format(array):
+def _np_array_to_json_format(array):
     return array.tolist()
 
-def _mongo_to_2d_array(mongo_thing):
+def _json_to_np_array(mongo_thing):
     return np.array(mongo_thing)
 
 def make_new_common_trip(props=None):
