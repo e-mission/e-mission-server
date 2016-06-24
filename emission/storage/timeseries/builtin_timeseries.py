@@ -23,6 +23,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "background/battery": self.timeseries_db,
                 "statemachine/transition": self.timeseries_db,
                 "config/sensor_config": self.timeseries_db,
+                "config/sync_config": self.timeseries_db,
                 "segmentation/raw_trip": self.analysis_timeseries_db,
                 "segmentation/raw_place": self.analysis_timeseries_db,
                 "segmentation/raw_section": self.analysis_timeseries_db,
