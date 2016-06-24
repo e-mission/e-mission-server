@@ -29,7 +29,9 @@ def save_common_trip(common_trip):
         "start_loc" : common_trip.start_loc,
         "end_loc" : common_trip.end_loc,
         "trips" : common_trip["trips"],
-        "probabilites" : probs
+        "probabilites" : probs,
+        "start_times": common_trip["start_times"],
+        "durations": common_trip["durations"]
         }) 
 
 def get_common_trip_from_db(user_id, start_place_id, end_place_id):
