@@ -3,12 +3,20 @@ import importlib
 
 import emission.net.usercache.abstract_usercache as enua
 
-config_list = ["sensor_config"]
+config_list = ["sensor_config", "sync_config"]
 
 def save_all_configs(user_id, time_query):
     uc = enua.UserCache.getUserCache(user_id)
-    config_name = config_list[0]
-    return save_config(user_id, uc, time_query, config_name)
+    # This is tricky to extend to beyond one type of config because it is not
+    # clear which ts we should return. We cannot return two values because only
+    # one of them can be stored in our current pipeline states.  We should be
+    # able to return the max of them, since these are all from the same user,
+    # so if we have received a later config, we know that we have processed all 
+    # prior configs
+    # Let's test it out and see if it works!
+    last_processed_ts_list = [save_config(user_id, uc, time_query, config_name) 
+        for config_name in config_list]
+    return max(last_processed_ts_list)
 
 def save_config(user_id, uc, time_query, module_name):
     config_fn = get_configurator("emission.analysis.configs.%s" % module_name)
