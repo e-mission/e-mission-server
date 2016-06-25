@@ -1,11 +1,18 @@
 import json,httplib
+import sys
 
 config_data = json.load(open('conf/net/ext_service/parse.json'))
+
+interval = sys.argv[1]
+print "pushing for interval %s" % interval
 
 silent_push_msg = {
    "where": {
      "deviceType": "ios"
    },
+   "channels": [
+     interval
+   ],
    "data": {
      # "alert": "The Mets scored! The game is now tied 1-1.",
      "content-available": 1,
@@ -26,4 +33,5 @@ connection.request('POST', '/1/push', json.dumps(silent_push_msg), parse_headers
 
 result = json.loads(connection.getresponse().read())
 print result
+
 
