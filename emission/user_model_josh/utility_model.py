@@ -504,9 +504,9 @@ def get_elevation_change(trip, testing=False):
         down = random.randint(1, 100)
         return (up, down)
     time.sleep(1) # so we dont run out calls
-    c = googlemaps.client.Client(GOOGLE_MAPS_KEY)
+    c = gmaps.client.Client(GOOGLE_MAPS_KEY)
     print get_route(trip)
-    jsn = googlemaps.elevation.elevation_along_path(c, get_route(trip), 200)
+    jsn = gmaps.elevation.elevation_along_path(c, get_route(trip), 200)
     up, down = 0, 0
     prev = None
     for item in jsn:
