@@ -42,17 +42,6 @@ def clear_existing_places(user_id):
     db = edb.get_common_place_db()
     db.remove({'user_id': user_id})
 
-def get_all_place_objs(common_place):
-    trip.trips = [unc_trip.get_id() for unc_trip in dct["sections"]]
-    place_db = edb.get_place_db()
-    start_places = []
-    end_places = []
-    for t in trip.trips:
-        start = place_db.find_one({"_id" : t.start_place})
-        end = place_db.find_one({"_id" : t.end_place})
-        start_places.append(start)
-        end_places.append(end)
-
 ################################################################################
 
 def create_places(list_of_cluster_data, user_id):
@@ -60,10 +49,11 @@ def create_places(list_of_cluster_data, user_id):
     places_dct = {}
     logging.debug("About to create places for %d clusters" % len(list_of_cluster_data))
     for dct in list_of_cluster_data:
+        logging.debug("Current coords = %s" % dct)
         start_name = dct['start']
         end_name = dct['end']
-        start_loc = gj.Point(dct['start_coords'].coordinate_list())
-        end_loc = gj.Point(dct['end_coords'].coordinate_list())
+        start_loc = gj.Point(dct['start_coords'])
+        end_loc = gj.Point(dct['end_coords'])
         start_loc_str = gj.dumps(start_loc, sort_keys=True)
         end_loc_str = gj.dumps(end_loc, sort_keys=True)
         if start_loc_str not in places_to_successors:
