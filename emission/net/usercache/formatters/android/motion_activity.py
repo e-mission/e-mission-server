@@ -18,13 +18,18 @@ def format(entry):
     data = ad.AttrDict()
     if 'agb' in entry.data:
         data.type = ecwa.MotionTypes(entry.data.agb).value
-    else:
+    elif 'zzaEg' in entry.data:
         data.type = ecwa.MotionTypes(entry.data.zzaEg).value
+    else:
+        data.type = ecwa.MotionTypes(entry.data.zzaKM).value
+
 
     if 'agc' in entry.data:
         data.confidence = entry.data.agc
-    else:
+    elif 'zzaEh' in entry.data:
         data.confidence = entry.data.zzaEh
+    else:
+        data.confidence = entry.data.zzaKN
 
     data.ts = formatted_entry.metadata.write_ts
     data.local_dt = formatted_entry.metadata.write_local_dt
