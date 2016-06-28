@@ -1,6 +1,5 @@
 # Standard imports
 import math
-import datetime
 import uuid as uu
 import sys
 import logging
@@ -10,13 +9,6 @@ import emission.core.get_database as edb
 import emission.analysis.modelling.tour_model.similarity as similarity
 import emission.analysis.modelling.tour_model.featurization as featurization
 import emission.analysis.modelling.tour_model.representatives as representatives
-
-from emission.core.wrapper.trip_old import Trip, Section, Fake_Trip
-
-import emission.core.wrapper.trip as ecwt
-import emission.core.wrapper.section as ecws
-import emission.storage.decorations.trip_queries as ecsdtq
-import emission.storage.decorations.section_queries as ecsdsq
 import emission.storage.decorations.analysis_timeseries_queries as esda
 
 """
@@ -41,39 +33,18 @@ read from the database.
 """
 
 #read the data from the database. 
-def read_data(uuid=None, size=None, old=True):
+def read_data(uuid=None):
     db = edb.get_trip_db()
-    if not old:
-        logging.debug("not old")
-        trips = esda.get_entries(esda.CLEANED_TRIP_KEY, uuid,
-                                 time_query=None, geo_query=None)
-        return trips
-
-    if old:
-        data = []
-        trip_db = db
-        if uuid:
-            trips = trip_db.find({'user_id' : uuid, 'type' : 'move'})
-        else:
-            trips = trip_db.find({'type' : 'move'})
-        for t in trips:
-            try: 
-                trip = Trip.trip_from_json(t)
-            except:
-                continue
-            if not (trip.trip_start_location and trip.trip_end_location and trip.start_time):
-                continue
-            data.append(trip)
-            if size:
-                if len(data) == size:
-                    break
-        return data
+    trips = esda.get_entries(esda.CLEANED_TRIP_KEY, uuid,
+                             time_query=None, geo_query=None)
+    logging.info("After reading data, returning %s trips" % len(trips))
+    return trips
 
 #put the data into bins and cut off the lower portion of the bins
-def remove_noise(data, radius, old=True):
+def remove_noise(data, radius):
     if not data:
         return [], []
-    sim = similarity.similarity(data, radius, old)
+    sim = similarity.similarity(data, radius)
     sim.bin_data()
     logging.debug('number of bins before filtering: %d' % len(sim.bins))
     sim.delete_bins()
@@ -81,10 +52,10 @@ def remove_noise(data, radius, old=True):
     return sim.newdata, sim.bins
 
 #cluster the data using k-means
-def cluster(data, bins, old=True):
+def cluster(data, bins):
     if not data:
         return 0, [], []
-    feat = featurization.featurization(data, old=old)
+    feat = featurization.featurization(data)
     min = bins
     max = int(math.ceil(1.5 * bins))
     feat.cluster(min_clusters=min, max_clusters=max)
@@ -92,10 +63,10 @@ def cluster(data, bins, old=True):
     return feat.clusters, feat.labels, feat.data
 
 #prepare the data for the tour model
-def cluster_to_tour_model(data, labels, old=True):
+def cluster_to_tour_model(data, labels):
     if not data:
         return []
-    repy = representatives.representatives(data, labels, old=old)
+    repy = representatives.representatives(data, labels)
     repy.list_clusters()
     repy.get_reps()
     repy.locations()
@@ -103,12 +74,12 @@ def cluster_to_tour_model(data, labels, old=True):
     repy.cluster_dict()
     return repy.tour_dict
 
-def main(uuid=None, old=True):
-    data = read_data(uuid, old=old)
+def main(uuid=None):
+    data = read_data(uuid)
     logging.debug("len(data) is %d" % len(data))
-    data, bins = remove_noise(data, 300, old=old)
-    n, labels, data = cluster(data, len(bins), old=old)
-    tour_dict = cluster_to_tour_model(data, labels, old=old)
+    data, bins = remove_noise(data, 300)
+    n, labels, data = cluster(data, len(bins))
+    tour_dict = cluster_to_tour_model(data, labels)
     return tour_dict
 
 if __name__=='__main__':
