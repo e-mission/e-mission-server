@@ -5,7 +5,7 @@ from emission.core.our_geocoder import Geocoder
 
 # Standard imports
 import numpy as np
-import math, datetime, heapq
+import datetime, heapq
 import networkx as nx
 import matplotlib.pyplot as plt
 

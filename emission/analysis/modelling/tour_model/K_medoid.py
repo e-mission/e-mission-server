@@ -1,16 +1,10 @@
 # Standard imports
 from __future__ import division
-import logging
-import numpy as np
-import math
 import random
-import time
 
 # Our imports
-from emission.core.get_database import get_routeDistanceMatrix_db,get_routeCluster_db,get_section_db
-from emission.core.common import calDistance, getDisplayModes
+from emission.core.get_database import get_routeDistanceMatrix_db,get_section_db
 from emission.analysis.modelling.tour_model.trajectory_matching.route_matching import fullMatchDistance,getRoute
-from emission.analysis.modelling.tour_model.trajectory_matching.LCS import lcsScore
 
 Sections=get_section_db()
 

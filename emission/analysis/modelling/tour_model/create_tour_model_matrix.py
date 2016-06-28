@@ -1,8 +1,6 @@
 import logging
 
-import emission.analysis.modelling.tour_model.tour_model_matrix as tm ##here
-import emission.core.get_database as edb
-import emission.core.wrapper.trip_old as trip
+import emission.analysis.modelling.tour_model.tour_model_matrix as tm
 import emission.analysis.modelling.tour_model.cluster_pipeline as eamtcp
 from uuid import UUID
 import random, datetime, sys
