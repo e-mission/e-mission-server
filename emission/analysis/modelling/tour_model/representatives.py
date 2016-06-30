@@ -3,9 +3,11 @@ import logging
 import numpy
 import math
 import copy
+import geojson as gj
 
 # our imports
-from emission.core.wrapper.trip_old import Trip, Coordinate
+import emission.core.wrapper.trip as ecwt
+import emission.core.wrapper.entry as ecwe
 import emission.storage.decorations.analysis_timeseries_queries as esda
 
 
@@ -26,9 +28,8 @@ different numbers indicate different clusters.
 
 class representatives:
 
-    def __init__(self, data, labels, old=True):
+    def __init__(self, data, labels):
         self.data = data
-        self.is_old = old
         if not self.data:
             self.data = []
         self.labels = labels
@@ -52,37 +53,46 @@ class representatives:
             self.clusters[a].append(self.data[i])
 
     #get the representatives for each cluster
+    #I don't understand wtf this does
+    # Why are we getting the mean of the start and end points in the cluster and
+    # creating a fake trip from it? Why not just pick a real representative of
+    # of the trips? Alternatively, why not create a new data structure to represent
+    # that this is a reconstructed trip that has no bearing in reality? What does
+    # it even mean that we have a trip with only a start and end point and no
+    # actual start or end times?
     def get_reps(self):
         self.reps = []
         if not self.data:
             return
-        for cluster in self.clusters:
+        for i, cluster in enumerate(self.clusters):
+            logging.debug("Considering cluster %d = %s" % (i, cluster))
             points = [[], [], [], []]
-            for c in cluster:
-                if self.is_old:
-                    points[0].append(c.trip_start_location.lat)
-                    points[1].append(c.trip_start_location.lon)
-                    points[2].append(c.trip_end_location.lat)
-                    points[3].append(c.trip_end_location.lon)
-                else:
-                    # We want (lat, lon) to be consistent with old above.
-                    # But in the new, our data is in geojson so it is (lon, lat).
-                    # Fix it by flipping the order of the indices
-                    # Note also that we want to use the locations of the start
-                    # and end places, not of the start point of the trip, which
-                    # may be some distance away due to geofencing.
-                    start_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
-                                                 c.data.start_place)
-                    end_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
-                                                 c.data.end_place)
-                    points[0].append(start_place.data.location["coordinates"][1])
-                    points[1].append(start_place.data.location["coordinates"][0])
-                    points[2].append(end_place.data.location["coordinates"][1])
-                    points[3].append(end_place.data.location["coordinates"][0])
-                    logging.debug("in representatives, endpoints have len = %s" %
-                                  len(points))
+
+            # If this cluster has no points, we skip it
+            if len(cluster) == 0:
+                logging.info("Cluster %d = %s, has length %d, skipping" %
+                             (i, cluster, len(cluster)))
+                continue
+
+            for j, c in enumerate(cluster):
+                logging.debug("Consider point %d = %s" % (j, c))
+                start_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
+                                             c.data.start_place)
+                end_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
+                                             c.data.end_place)
+                points[0].append(start_place.data.location["coordinates"][1]) # lat
+                points[1].append(start_place.data.location["coordinates"][0]) # lng
+                points[2].append(end_place.data.location["coordinates"][1]) # lat
+                points[3].append(end_place.data.location["coordinates"][0]) # lng
+                logging.debug("in representatives, endpoints have len = %s" %
+                              len(points))
             centers = numpy.mean(points, axis=1)
-            a = Trip(None, None, None, None, None, None, Coordinate(centers[0], centers[1]), Coordinate(centers[2], centers[3]))
+            logging.debug("For cluster %d, centers are %s" % (i, centers))
+            t = ecwt.Trip({
+                "start_loc": gj.Point([centers[1], centers[0]]),
+                "end_loc": gj.Point([centers[3], centers[2]])
+            })
+            a = ecwe.Entry.create_entry(c.user_id, "analysis/cleaned_trip", t)
             self.reps.append(a)
 
     #map the representatives
@@ -134,12 +144,12 @@ class representatives:
             locs = []
             for b in bin:
                 if b[0] == 'start':
-                    point = self.reps[b[1]].trip_start_location
+                    point = self.reps[b[1]].data.start_loc
                 if b[0] == 'end':
-                    point = self.reps[b[1]].trip_end_location
-                locs.append([point.lat, point.lon])
+                    point = self.reps[b[1]].data.end_loc
+                locs.append(point.coordinates)
             locs = numpy.mean(locs, axis=0)
-            coord = Coordinate(locs[0], locs[1])
+            coord = [locs[0], locs[1]]
             self.locs.append(coord)
 
     #create the input to the tour graph
@@ -198,15 +208,16 @@ class representatives:
     #check whether a point is close to all points in a bin
     def match(self, label, a, bin):
         if label == 'start':
-            pointa = self.reps[a].trip_start_location
+            pointa = self.reps[a].data.start_loc
         elif label == 'end':
-            pointa = self.reps[a].trip_end_location
+            pointa = self.reps[a].data.end_loc
         for b in bin:
             if b[0] == 'start':
-                pointb = self.reps[b[1]].trip_start_location
+                pointb = self.reps[b[1]].data.start_loc
             elif b[0] == 'end':
-                pointb = self.reps[b[1]].trip_end_location
-            if self.distance(pointa.lat, pointa.lon, pointb.lat, pointb.lon) > 300:
+                pointb = self.reps[b[1]].data.end_loc
+            if self.distance(pointa.coordinates[1], pointa.coordinates[0],
+                             pointb.coordinates[1], pointb.coordinates[0]) > 300:
                 return False
         return True
 

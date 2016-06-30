@@ -1,10 +1,6 @@
 import unittest
 import emission.user_model_josh.utility_model as eum
-import googlemaps
 import emission.net.ext_service.otp.otp as otp
-import emission.net.ext_service.gmaps.googlemaps as gmaps
-import emission.net.ext_service.gmaps.common as gmcommon
-import emission.net.api.utility_model_api as umapi
 import datetime
 
 
