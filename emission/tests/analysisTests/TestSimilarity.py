@@ -95,7 +95,7 @@ class SimilarityTests(unittest.TestCase):
 
     def testElbowDistance(self):
         start = [-122,47]
-        end = [-133,47]
+        end = [-123,47]
         now = time.time()
         t = etatc._createTripEntry(self, now, now, start, end)
         data = [t] * 11
