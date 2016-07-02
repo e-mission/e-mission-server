@@ -3,13 +3,10 @@ import sys
 
 config_data = json.load(open('conf/net/ext_service/parse.json'))
 
-interval = sys.argv[1]
+interval = "interval_%s" % sys.argv[1]
 print "pushing for interval %s" % interval
 
 silent_push_msg = {
-   "where": {
-     "deviceType": "ios"
-   },
    "channels": [
      interval
    ],
