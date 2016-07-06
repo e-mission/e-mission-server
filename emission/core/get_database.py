@@ -14,6 +14,11 @@ def get_moves_db():
     MovesAuth=current_db.Stage_user_moves_access
     return MovesAuth
 
+def get_habitica_db():
+    current_db = MongoClient('localhost').Stage_database
+    HabiticaAuth=current_db.Stage_user_habitica_access
+    return HabiticaAuth
+
 def get_section_db():
     current_db=MongoClient('localhost').Stage_database
     Sections=current_db.Stage_Sections
