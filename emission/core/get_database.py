@@ -200,7 +200,7 @@ def get_analysis_timeseries_db():
 
     # recreated location
     AnalysisTimeSeries.create_index([("data.loc", pymongo.GEOSPHERE)], sparse=True)
-    _create_local_dt(AnalysisTimeSeries, "data.local_dt") # recreated location
+    _create_local_dt_indices(AnalysisTimeSeries, "data.local_dt") # recreated location
     return AnalysisTimeSeries
 
 def _create_local_dt_indices(time_series, key_prefix):
