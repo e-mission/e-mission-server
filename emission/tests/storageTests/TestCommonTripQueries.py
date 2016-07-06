@@ -23,7 +23,7 @@ import emission.storage.timeseries.format_hacks.move_filter_field as estfm
 class TestCommonTripQueries(unittest.TestCase):
     
     def setUp(self):
-        # self.clearRelatedDb()
+        self.clearRelatedDb()
         self.testUserId = uuid.uuid4()
         self.testEnd = esdcpq.make_new_common_place(uuid.uuid4(), gj.Point((1,2.092)))
         esdcpq.save_common_place(self.testEnd)
@@ -41,11 +41,12 @@ class TestCommonTripQueries(unittest.TestCase):
     def tearDown(self):
         edb.get_common_trip_db().remove({'user_id': self.testUserId})
         edb.get_analysis_timeseries_db().remove({'user_id': self.testUserId})
-        edb.get_common_trip_db().remove({'user_id': self.testUserId})
+        edb.get_common_place_db().remove({'user_id': self.testUserId})
 
     def clearRelatedDb(self):
-        edb.get_timeseries_db().remove({'user_id': self.testUserId})
-        edb.get_analysis_timeseries_db().remove({'user_id': self.testUserId})
+        edb.get_timeseries_db().drop()
+        edb.get_analysis_timeseries_db().drop()
+        edb.get_common_place_db().drop()
 
     def testCreation(self):
         common_trip = esdctp.make_new_common_trip()
