@@ -25,8 +25,6 @@ class TestCommonTripQueries(unittest.TestCase):
     def setUp(self):
         self.clearRelatedDb()
         edb.get_common_trip_db().drop()
-        edb.get_section_new_db().drop()
-        edb.get_trip_new_db().drop()
         self.testUserId = uuid.uuid4()
         self.testEnd = esdcpq.make_new_common_place(uuid.uuid4(), gj.Point((1,2.092)))
         esdcpq.save_common_place(self.testEnd)
@@ -42,17 +40,12 @@ class TestCommonTripQueries(unittest.TestCase):
 
 
     def tearDown(self):
-        edb.get_common_trip_db().drop()
-        edb.get_section_new_db().drop()
-        edb.get_trip_new_db().drop()
+        edb.get_common_trip_db().remove({'user_id': self.testUserId})
+        edb.get_analysis_timeseries_db().remove({'user_id': self.testUserId})
 
     def clearRelatedDb(self):
-        edb.get_timeseries_db().remove()
-        edb.get_place_db().remove()
-        edb.get_stop_db().remove()
-
-        edb.get_trip_new_db().remove()
-        edb.get_section_new_db().remove() 
+        edb.get_timeseries_db().remove({'user_id': self.testUserId})
+        edb.get_analysis_timeseries_db().remove({'user_id': self.testUserId})
 
     def testCreation(self):
         common_trip = esdctp.make_new_common_trip()

@@ -1,3 +1,8 @@
+# Note that this script is only retained for historical purposes,
+# to document how we expanded the local date entries. It will not run
+# any more, since we have removed the trip, place, section and stop
+# collections and merged them into the analysis database
+
 import logging
 # logging.basicConfig(level=logging.DEBUG)
 
@@ -61,7 +66,7 @@ def fix_file(filename):
                 entry['metadata']['time_zone'])
         else:
             if data_local_dt == True:
-                logging.info("not overriding local_dt for key %s" % key)
+                logging.info("not overriding local_dt for file %s" % filename)
                 data_local_dt = False
     logging.debug("Finished converting %s entries" % len(timeseries))
     json.dump(timeseries, open(filename, "w"), indent=4)

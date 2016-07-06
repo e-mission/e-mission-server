@@ -27,11 +27,7 @@ class TestLocalDateQueries(unittest.TestCase):
 
     def clearRelatedDb(self):
         edb.get_timeseries_db().remove({'user_id': self.testUUID})
-        edb.get_place_db().remove({'user_id': self.testUUID})
-        edb.get_stop_db().remove({'user_id': self.testUUID})
-
-        edb.get_trip_new_db().remove({'user_id': self.testUUID})
-        edb.get_section_new_db().remove({'user_id': self.testUUID})
+        edb.get_analysis_timeseries_db().remove({'user_id': self.testUUID})
 
     def testLocalDateReadWrite(self):
         ts = esta.TimeSeries.get_time_series(self.testUUID)
