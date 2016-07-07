@@ -15,12 +15,7 @@ class TestHabiticaRegister(unittest.TestCase):
     self.testUserUUID = uuid.uuid4()
     self.sampleAuthMessage1 = {'username': '99999999999995543', 'email': '99999999999995543@test.com', 'password': 'aa!A15551', 'our_uuid': self.testUserUUID}
 
-  # One part of this is the communication with habitica. That is an integration test, not a unit test,
-  # so we don't test that here. Instead, we test the save and retrieval of the datastructure 
-  # that we get back from habitica. Some sample auth messages are shown above
 
-  # TODO: See if we can use Mock to create a mock habitica server that can allow
-  # us to integration test as well.
   def testAddNewUser(self):
     sampleAuthMessage1Ad = ad.AttrDict(self.sampleAuthMessage1)
     reg.habiticaRegister(sampleAuthMessage1Ad.username, sampleAuthMessage1Ad.email, 

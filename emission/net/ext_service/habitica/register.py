@@ -4,7 +4,6 @@ import requests
 import logging
 
 # Our imports
-from sdk import Habitica
 from emission.core.get_database import get_habitica_db
 
 key_file = open('conf/net/keys.json')
@@ -19,6 +18,10 @@ def habiticaRegister(username, email, password, our_uuid):
   user_dict = json.loads(u.text)
   logging.debug("parsed json from habitica = %s" % user_dict)
 
-  user_access_table = get_habitica_db()
-  user_access_table.insert({'user_id': our_uuid, 'habitica_username': username, 'habitica_id': user_dict['data']['_id'], 'habitica_token': user_dict['data']['apiToken']})
-
+  #Since we are randomly generating the password, we store it in case users 
+  #want to access their Habitica account from the browser
+  #Need to create a way from them to retrieve username/password
+  habitica_user_table = get_habitica_db()
+  habitica_user_table.insert({'user_id': our_uuid, 'habitica_username': username, 
+    'habitica_password': password, 'habitica_id': user_dict['data']['_id'], 
+    'habitica_token': user_dict['data']['apiToken']})
