@@ -12,18 +12,23 @@ import emission.storage.timeseries.abstract_timeseries as esta
 
 def _createTripEntry(self, start_ts, end_ts, start_loc, end_loc):
     t = ecwct.Cleanedtrip()
+    sp = ecwcp.Cleanedplace()
+    ep = ecwcp.Cleanedplace()
+
     t.start_ts = start_ts
     t.end_ts = end_ts
+
     if start_loc is not None:
         t.start_loc = gj.Point(start_loc)
+        sp.location = t.start_loc
+
     if end_loc is not None:
         t.end_loc = gj.Point(end_loc)
-    sp = ecwcp.Cleanedplace()
-    sp.location = t.start_loc
+        ep.location = t.end_loc
+
     sp.exit_ts = start_ts
-    ep = ecwcp.Cleanedplace()
-    ep.location = t.end_loc
     ep.enter_ts = end_ts
+
     spe = ecwe.Entry.create_entry(self.testUUID, "analysis/cleaned_place", sp, create_id=True)
     epe = ecwe.Entry.create_entry(self.testUUID, "analysis/cleaned_place", ep, create_id=True)
     t.start_place = spe.get_id()
