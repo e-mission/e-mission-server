@@ -30,6 +30,7 @@ import bson.json_util
 import modeshare, zipcode, distance, tripManager, \
                  Berkeley, visualize, stats, usercache, timeline
 import emission.net.ext_service.moves.register as auth
+import emission.net.ext_service.habitica.register as habitreg
 import emission.analysis.result.carbon as carbon
 import emission.analysis.classification.inference.commute as commute
 import emission.analysis.modelling.work_time as work_time
@@ -435,6 +436,21 @@ def movesCallback():
   code = request.json['code']
   state = request.json['state']
   return auth.movesCallback(code, state, user_uuid)
+
+@post('/habiticaRegister')
+def habiticaRegister():
+  logging.debug("habitica registration request %s from user = %s" %
+                (request.json, request))
+  user_uuid = getUUID(request)
+  assert(user_uuid is not None)
+  user = User.fromUUID(user_uuid)
+  username = request.json['username']
+  # TODO: Figure out whether this should be the same as the email
+  # used to register the user, or whether we should allow the user
+  # to override
+  email = request.json['email']
+  password = "autogenerate_me"
+  return habitreg.habiticaRegister(username, email, password, user_uuid)
 # Data source integration END
 
 @app.hook('before_request')
@@ -521,7 +537,7 @@ def getUUID(request, inHeader=False):
     else:
         # Return a random user to make it easy to experiment without having to specify a user
         # TODO: Remove this if it is not actually used
-        from get_database import get_uuid_db
+        from emission.core.get_database import get_uuid_db
         user_uuid = get_uuid_db().find_one()['uuid']
         retUUID = user_uuid
         logging.debug("skipAuth = %s, returning arbitrary UUID %s" % (skipAuth, retUUID))
