@@ -1,35 +1,36 @@
 import unittest
+import time
+import uuid
+import logging
+
 import emission.core.get_database as edb
-import sys
 import emission.analysis.modelling.tour_model.featurization as featurization
-from emission.core.wrapper.trip_old import Trip, Coordinate
 import emission.analysis.modelling.tour_model.cluster_pipeline as cp
-import emission.simulation.trip_gen as tg
-import datetime
-import os, os.path
+import emission.storage.timeseries.abstract_timeseries as esta
+
+import emission.tests.analysisTests.tourModelTests.common as etatc
 
 class FeaturizationTests(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
         super(FeaturizationTests, self).__init__(*args, **kwargs)
-        self.data = cp.read_data(size=100)
-        print 'there are ' + str(len(self.data))
-        #if len(self.data) == 0:
-        #    tg.create_fake_trips()
-        #    self.data = cp.read_data(size=100)
 
     def setUp(self):
-        pass
+        self.data = cp.read_data()
+        self.testUUID = uuid.uuid4()
+        self.ts = esta.TimeSeries.get_time_series(self.testUUID)
+        print 'there are ' + str(len(self.data))
 
     def tearDown(self):
-        pass
+        edb.get_timeseries_db().remove({'user_id': self.testUUID})
+        edb.get_analysis_timeseries_db().remove({'user_id': self.testUUID})
 
     def testCalculatePoints(self):
         feat = featurization.featurization([])
         self.assertTrue(not feat.data)
         feat = featurization.featurization(None)
         self.assertTrue(not feat.data)
-        trip = Trip(None, None, None, None, None, None, None, None)
+        trip = etatc._createTripEntry(self, None, None, None, None)
         data = [trip]
         try:
             feat = featurization.featurization(data)
@@ -64,17 +65,16 @@ class FeaturizationTests(unittest.TestCase):
             self.assertTrue(False)
 
         data = []
-        start = Coordinate(47,-122)
-        end = Coordinate(47,-123)
+        start = [-122, 47]
+        end = [-123,47]
+        now = time.time()
         for i in range(10):
-            now = datetime.datetime.now()
-            a = Trip(None, None, None, None, now, now, start, end)
+            a = etatc._createTripEntry(self, now, now, start, end)
             data.append(a)
-        start = Coordinate(41,-74)
-        end = Coordinate(42, -74)
+        start = [-74, 41]
+        end = [-74, 42]
         for i in range(10):
-            now = datetime.datetime.now()
-            a = Trip(None, None, None, None, now, now, start, end)
+            a = etatc._createTripEntry(self, now, now, start, end)
             data.append(a)
         feat = featurization.featurization(data)
         feat.cluster()
@@ -87,8 +87,10 @@ class FeaturizationTests(unittest.TestCase):
         feat.cluster(min_clusters=2, max_clusters=10)
         try:
             feat.check_clusters()
-        except Exception:
+        except Exception, e:
+            logging.exception(e.message)
             self.assertTrue(False)
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
     unittest.main()

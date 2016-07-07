@@ -13,7 +13,6 @@ import urllib2
 import json
 import heapq
 import time
-import googlemaps
 import requests
 import random
 
@@ -127,7 +126,7 @@ class UserModel:
         return self.get_top_choices_lat_lng(start, end)
 
     def get_all_trips(self, start, end, curr_time=None):
-        c = googlemaps.client.Client(GOOGLE_MAPS_KEY)
+        c = gmaps.client.Client(GOOGLE_MAPS_KEY)
         if curr_time is None:
             curr_time = datetime.datetime.now()
         curr_month = curr_time.month
@@ -505,9 +504,9 @@ def get_elevation_change(trip, testing=False):
         down = random.randint(1, 100)
         return (up, down)
     time.sleep(1) # so we dont run out calls
-    c = googlemaps.client.Client(GOOGLE_MAPS_KEY)
+    c = gmaps.client.Client(GOOGLE_MAPS_KEY)
     print get_route(trip)
-    jsn = googlemaps.elevation.elevation_along_path(c, get_route(trip), 200)
+    jsn = gmaps.elevation.elevation_along_path(c, get_route(trip), 200)
     up, down = 0, 0
     prev = None
     for item in jsn:

@@ -103,8 +103,8 @@ def set_up_trips(list_of_cluster_data, user_id):
     for dct in list_of_cluster_data:
         start_times = []
         durations = []
-        start_loc = gj.Point(dct['start_coords'].coordinate_list())
-        end_loc = gj.Point(dct['end_coords'].coordinate_list())
+        start_loc = gj.Point(dct['start_coords'])
+        end_loc = gj.Point(dct['end_coords'])
         start_place_id = esdcpq.get_common_place_at_location(start_loc).get_id()
         end_place_id = esdcpq.get_common_place_at_location(end_loc).get_id()
         #print 'dct["sections"].trip_id %s is' % dct["sections"][0]
