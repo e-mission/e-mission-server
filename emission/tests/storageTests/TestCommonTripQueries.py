@@ -23,7 +23,7 @@ import emission.storage.timeseries.format_hacks.move_filter_field as estfm
 class TestCommonTripQueries(unittest.TestCase):
     
     def setUp(self):
-        self.clearRelatedDb()
+        # self.clearRelatedDb()
         self.testUserId = uuid.uuid4()
         self.testEnd = esdcpq.make_new_common_place(uuid.uuid4(), gj.Point((1,2.092)))
         esdcpq.save_common_place(self.testEnd)

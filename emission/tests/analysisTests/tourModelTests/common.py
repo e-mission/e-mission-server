@@ -14,8 +14,10 @@ def _createTripEntry(self, start_ts, end_ts, start_loc, end_loc):
     t = ecwct.Cleanedtrip()
     t.start_ts = start_ts
     t.end_ts = end_ts
-    t.start_loc = gj.Point(start_loc)
-    t.end_loc = gj.Point(end_loc)
+    if start_loc is not None:
+        t.start_loc = gj.Point(start_loc)
+    if end_loc is not None:
+        t.end_loc = gj.Point(end_loc)
     sp = ecwcp.Cleanedplace()
     sp.location = t.start_loc
     sp.exit_ts = start_ts
