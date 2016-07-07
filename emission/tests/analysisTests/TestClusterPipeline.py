@@ -19,9 +19,7 @@ class ClusterPipelineTests(unittest.TestCase):
 	self.RADIUS = 200
 
     def clearRelevantSections(self):
-	edb.get_section_new_db().drop()
-	edb.get_trip_new_db().drop()
-	edb.get_place_db().drop()
+	edb.get_analysis_timeseries_db().drop()
 
     def import_test_info(self):
 	etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")

@@ -124,7 +124,6 @@ def set_up_trips(list_of_cluster_data, user_id):
         trip.trips = [unc_trip.get_id() for unc_trip in dct["sections"]]
         trip.start_times = start_times
         trip.durations = durations
-        place_db = edb.get_place_db()
-        
+
         
         save_common_trip(trip)
