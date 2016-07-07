@@ -5,7 +5,7 @@ import os
 import logging
 
 def get_conf_file():
-    f = open("conf/net/int_service/giles_conf.json", "r")
+    f = open("/Users/yawen/Desktop/E-mission/e-mission-server/conf/net/int_service/giles_conf.json", "r")
     conf = json.loads(f.read())
     f.close()
     return conf
