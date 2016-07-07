@@ -33,8 +33,8 @@ class TestSaveAllConfigs(unittest.TestCase):
         edb.get_timeseries_db().remove({"user_id": self.iosUUID}) 
         edb.get_usercache_db().remove({"user_id": self.androidUUID}) 
         edb.get_usercache_db().remove({"user_id": self.iosUUID}) 
-        edb.get_place_db().remove() 
-        edb.get_trip_new_db().remove() 
+        edb.get_analysis_timeseries_db().remove({"user_id": self.androidUUID})
+        edb.get_analysis_timeseries_db().remove({"user_id": self.iosUUID})
 
     def testNoOverrides(self):
         tq = estt.TimeQuery("metadata.write_ts", 1440658800, 1440745200)

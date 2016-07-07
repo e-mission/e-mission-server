@@ -166,8 +166,9 @@ def get_timeseries_db():
     TimeSeries.create_index([("metadata.key", pymongo.HASHED)])
     TimeSeries.create_index([("metadata.write_ts", pymongo.DESCENDING)])
     TimeSeries.create_index([("data.ts", pymongo.DESCENDING)], sparse=True)
+
     TimeSeries.create_index([("data.loc", pymongo.GEOSPHERE)], sparse=True)
-    TimeSeries.create_index([("data.local_dt", pymongo.DESCENDING)], sparse=True) # lots of sensed data
+
     return TimeSeries
 
 def get_timeseries_error_db():
@@ -183,44 +184,46 @@ def get_analysis_timeseries_db():
     AnalysisTimeSeries = current_db.Stage_analysis_timeseries
     AnalysisTimeSeries.create_index([("user_id", pymongo.HASHED)])
     AnalysisTimeSeries.create_index([("metadata.key", pymongo.HASHED)])
-    AnalysisTimeSeries.create_index([("data.start_ts", pymongo.DESCENDING)], sparse=True) # trips and sections
-    AnalysisTimeSeries.create_index([("data.end_ts", pymongo.DESCENDING)], sparse=True)   # trips and sections
-    AnalysisTimeSeries.create_index([("data.start_local_dt", pymongo.DESCENDING)], sparse=True) # trips and sections
-    AnalysisTimeSeries.create_index([("data.end_local_dt", pymongo.DESCENDING)], sparse=True)   # trips and sections
-    AnalysisTimeSeries.create_index([("data.start_loc", pymongo.DESCENDING)], sparse=True) # trips and sections
-    AnalysisTimeSeries.create_index([("data.end_loc", pymongo.DESCENDING)], sparse=True)   # trips and sections
-    AnalysisTimeSeries.create_index([("data.enter_ts", pymongo.DESCENDING)], sparse=True) # places and stops
-    AnalysisTimeSeries.create_index([("data.exit_ts", pymongo.DESCENDING)], sparse=True)  # places and stops
-    AnalysisTimeSeries.create_index([("data.enter_local_dt", pymongo.DESCENDING)], sparse=True) # places and stops
-    AnalysisTimeSeries.create_index([("data.exit_local_dt", pymongo.DESCENDING)], sparse=True)  # places and stops
-    AnalysisTimeSeries.create_index([("data.location", pymongo.DESCENDING)], sparse=True) # places and stops
-    AnalysisTimeSeries.create_index([("data.duration", pymongo.DESCENDING)], sparse=True) # places and stops
-    AnalysisTimeSeries.create_index([("data.mode", pymongo.HASHED)], sparse=True) # recreated location, never sort
-    AnalysisTimeSeries.create_index([("data.section", pymongo.HASHED)], sparse=True) # recreated location, never sort
-    AnalysisTimeSeries.create_index([("data.local_dt", pymongo.DESCENDING)], sparse=True) # recreated location, embedded document, will query fields
-    AnalysisTimeSeries.create_index([("data.local_dt.year", pymongo.DESCENDING)], sparse=True) # recreated location, embedded document, will query fields
-    AnalysisTimeSeries.create_index([("data.local_dt.month", pymongo.DESCENDING)], sparse=True) # recreated location, embedded document, will query fields
-    AnalysisTimeSeries.create_index([("data.local_dt.day", pymongo.DESCENDING)], sparse=True) # recreated location, embedded document, will query fields
-    AnalysisTimeSeries.create_index([("data.local_dt.hour", pymongo.DESCENDING)], sparse=True) # recreated location, embedded document, will query fields
-    AnalysisTimeSeries.create_index([("data.local_dt.minute", pymongo.DESCENDING)], sparse=True) # recreated location, embedded document, will query fields
-    AnalysisTimeSeries.create_index([("data.local_dt.second", pymongo.DESCENDING)], sparse=True) # recreated location, embedded document, will query fields
-    AnalysisTimeSeries.create_index([("data.local_dt.weekday", pymongo.DESCENDING)], sparse=True) # recreated location, embedded document, will query fields
+
+    # trips and sections
+    AnalysisTimeSeries.create_index([("data.start_ts", pymongo.DESCENDING)], sparse=True)
+    AnalysisTimeSeries.create_index([("data.end_ts", pymongo.DESCENDING)], sparse=True)
+    AnalysisTimeSeries.create_index([("data.start_loc", pymongo.GEOSPHERE)], sparse=True)
+    AnalysisTimeSeries.create_index([("data.end_loc", pymongo.GEOSPHERE)], sparse=True)
+    _create_local_dt_indices(AnalysisTimeSeries, "data.start_local_dt")
+    _create_local_dt_indices(AnalysisTimeSeries, "data.end_local_dt")
+
+    # places and stops
+    AnalysisTimeSeries.create_index([("data.enter_ts", pymongo.DESCENDING)], sparse=True)
+    AnalysisTimeSeries.create_index([("data.exit_ts", pymongo.DESCENDING)], sparse=True)
+    _create_local_dt_indices(AnalysisTimeSeries, "data.enter_local_dt")
+    _create_local_dt_indices(AnalysisTimeSeries, "data.exit_local_dt")
+    AnalysisTimeSeries.create_index([("data.location", pymongo.GEOSPHERE)], sparse=True)
+    AnalysisTimeSeries.create_index([("data.duration", pymongo.DESCENDING)], sparse=True)
+    AnalysisTimeSeries.create_index([("data.mode", pymongo.HASHED)], sparse=True)
+    AnalysisTimeSeries.create_index([("data.section", pymongo.HASHED)], sparse=True)
+
+    # recreated location
+    AnalysisTimeSeries.create_index([("data.loc", pymongo.GEOSPHERE)], sparse=True)
+    _create_local_dt_indices(AnalysisTimeSeries, "data.local_dt") # recreated location
     return AnalysisTimeSeries
+
+def _create_local_dt_indices(time_series, key_prefix):
+    """
+    local_dt is an embedded document, but we will query it using the individual fields
+    """
+    time_series.create_index([("%s.year" % key_prefix, pymongo.DESCENDING)], sparse=True)
+    time_series.create_index([("%s.month" % key_prefix, pymongo.DESCENDING)], sparse=True)
+    time_series.create_index([("%s.day" % key_prefix, pymongo.DESCENDING)], sparse=True)
+    time_series.create_index([("%s.hour" % key_prefix, pymongo.DESCENDING)], sparse=True)
+    time_series.create_index([("%s.minute" % key_prefix, pymongo.DESCENDING)], sparse=True)
+    time_series.create_index([("%s.second" % key_prefix, pymongo.DESCENDING)], sparse=True)
+    time_series.create_index([("%s.weekday" % key_prefix, pymongo.DESCENDING)], sparse=True)
 
 def get_pipeline_state_db():
     current_db = MongoClient().Stage_database
     PipelineState = current_db.Stage_pipeline_state
     return PipelineState
-
-def get_place_db():
-    current_db = MongoClient().Stage_database
-    Places = current_db.Stage_place
-    return Places
-
-def get_trip_new_db():
-    current_db = MongoClient().Stage_database
-    Trips = current_db.Stage_trip_new
-    return Trips
 
 def get_common_place_db():
     current_db = MongoClient().Stage_database
@@ -231,16 +234,6 @@ def get_common_trip_db():
     current_db = MongoClient().Stage_database
     CommonTrips = current_db.Stage_common_trips
     return CommonTrips
-
-def get_stop_db():
-    current_db = MongoClient().Stage_database
-    Stops = current_db.Stage_stop
-    return Stops
-
-def get_section_new_db():
-    current_db = MongoClient().Stage_database
-    Sections = current_db.Stage_section_new
-    return Sections
 
 def get_fake_trips_db():
     current_db = MongoClient().Stage_database
