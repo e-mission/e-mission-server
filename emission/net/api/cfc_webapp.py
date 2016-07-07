@@ -443,14 +443,18 @@ def habiticaRegister():
                 (request.json, request))
   user_uuid = getUUID(request)
   assert(user_uuid is not None)
-  user = User.fromUUID(user_uuid)
   username = request.json['username']
-  # TODO: Figure out whether this should be the same as the email
-  # used to register the user, or whether we should allow the user
-  # to override
-  email = request.json['email']
-  password = "autogenerate_me"
-  return habitreg.habiticaRegister(username, email, password, user_uuid)
+  # This is the second place we use the email, since we need to pass
+  # it to habitica to complete registration. I'm not even refactoring
+  # this into a method - hopefully this makes it less likely to be reused
+  userToken = request.json['user']
+  if skipAuth:
+      userEmail = userToken
+  else:
+      userEmail = verifyUserToken(userToken)
+  autogen_password = "autogenerate_me"
+  return habitreg.habiticaRegister(username, userEmail,
+                                   autogen_password, user_uuid)
 # Data source integration END
 
 @app.hook('before_request')
