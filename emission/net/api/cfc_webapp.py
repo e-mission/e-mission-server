@@ -443,7 +443,7 @@ def habiticaRegister():
                 (request.json, request))
   user_uuid = getUUID(request)
   assert(user_uuid is not None)
-  username = request.json['username']
+  username = request.json['regConfig']['username']
   # This is the second place we use the email, since we need to pass
   # it to habitica to complete registration. I'm not even refactoring
   # this into a method - hopefully this makes it less likely to be reused
