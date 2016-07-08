@@ -74,8 +74,15 @@ class BuiltinTimeSeries(esta.TimeSeries):
             return time_query.timeType
 
     @staticmethod
-    def _to_df_entry(entry):
-        ret_val = entry["data"]
+    def _to_df_entry(entry_dict):
+        entry = ecwe.Entry(entry_dict)
+        ret_val = entry.data
+        for ld_key in ret_val.local_dates:
+            for field_key in ret_val[ld_key]:
+                expanded_key = "%s_%s" % (ld_key,field_key)
+                print("About to expand %s" % expanded_key)
+                ret_val[expanded_key] = ret_val[ld_key][field_key]
+            del ret_val[ld_key]
         ret_val["_id"] = entry["_id"]
         ret_val["metadata_write_ts"] = entry["metadata"]["write_ts"]
         # logging.debug("ret_val = %s " % ret_val)
@@ -106,22 +113,39 @@ class BuiltinTimeSeries(esta.TimeSeries):
         (orig_ts_db_keys, analysis_ts_db_keys) = self._split_key_list(key_list)
         logging.debug("orig_ts_db_keys = %s, analysis_ts_db_keys = %s" % 
             (orig_ts_db_keys, analysis_ts_db_keys))
-	# workaround for https://github.com/e-mission/e-mission-server/issues/271
-        # during the migration
-        if orig_ts_db_keys is None or len(orig_ts_db_keys) > 0:
-          orig_ts_db_result = self.timeseries_db.find(
-            self._get_query(orig_ts_db_keys, time_query, geo_query)).sort(
-            sort_key, pymongo.ASCENDING)
-        else:
-          orig_ts_db_result = [].__iter__()
 
-        analysis_ts_db_cursor = self.analysis_timeseries_db.find(
-            self._get_query(analysis_ts_db_keys, time_query, geo_query))
-        if sort_key is None:
-            analysis_ts_db_result = analysis_ts_db_cursor
-        else:
-	    analysis_ts_db_result = analysis_ts_db_cursor.sort(sort_key, pymongo.ASCENDING)
+        orig_ts_db_result = self._get_entries_for_timeseries(self.timeseries_db,
+                                                             orig_ts_db_keys,
+                                                             time_query,
+                                                             geo_query,
+                                                             extra_query_list,
+                                                             sort_key)
+
+        analysis_ts_db_result = self._get_entries_for_timeseries(self.analysis_timeseries_db,
+                                                                 analysis_ts_db_keys,
+                                                                 time_query,
+                                                                 geo_query,
+                                                                 extra_query_list,
+                                                                 sort_key)
         return itertools.chain(orig_ts_db_result, analysis_ts_db_result)
+
+    def _get_entries_for_timeseries(self, tsdb, key_list, time_query, geo_query,
+                                    extra_query_list, sort_key):
+        # workaround for https://github.com/e-mission/e-mission-server/issues/271
+        # during the migration
+        if key_list is None or len(key_list) > 0:
+            ts_db_cursor = tsdb.find(
+                self._get_query(key_list, time_query, geo_query,
+                                extra_query_list))
+            if sort_key is None:
+                ts_db_result = ts_db_cursor
+            else:
+                ts_db_result = ts_db_cursor.sort(sort_key, pymongo.ASCENDING)
+        else:
+            ts_db_result = [].__iter__()
+
+        logging.debug("finished querying values for %s" % key_list)
+        return ts_db_result
 
     def get_entry_at_ts(self, key, ts_key, ts):
         return self.get_timeseries_db(key).find_one({"user_id": self.user_id,
@@ -129,17 +153,27 @@ class BuiltinTimeSeries(esta.TimeSeries):
                                                  ts_key: ts})
 
     def get_data_df(self, key, time_query = None, geo_query = None,
-                    extra_query_list=None):
-        sort_key = self._get_sort_key(time_query)
-        logging.debug("curr_query = %s, sort_key = %s" %
-                      (self._get_query([key], time_query, geo_query, extra_query_list),
-                       sort_key))
-        result_it = self.get_timeseries_db(key).find(
-            self._get_query([key], time_query, geo_query, extra_query_list),
-            {"data": True, "metadata.write_ts": True}).sort(sort_key, pymongo.ASCENDING)
-        logging.debug("Found %s results" % result_it.count())
+                    extra_query_list=None,
+                    map_fn = None):
+        """
+        Retuns a dataframe for the specified query.
+        :param key: the metadata key we are querying for. Only supports one key
+        since a dataframe pretty much implies that all entries have the same structure
+        :param time_query: the query for the time
+        :param geo_query: the query for a geographical area
+        :param extra_query_list: any additional filters (used to filter out the
+        test phones, for example)
+        :param map_fn: the function that maps the entry to a suitable dict for dataframe conversion
+        entry -> dict
+        :return:
+        """
+        result_it = self.find_entries([key], time_query, geo_query, extra_query_list)
+        if map_fn is None:
+            map_fn = BuiltinTimeSeries._to_df_entry
         # Dataframe doesn't like to work off an iterator - it wants everything in memory
-        return pd.DataFrame([BuiltinTimeSeries._to_df_entry(e) for e in list(result_it)])
+        df = pd.DataFrame([map_fn(e) for e in list(result_it)])
+        logging.debug("Found %s results" % len(df))
+        return df
 
     def get_max_value_for_field(self, key, field, time_query=None):
         """
