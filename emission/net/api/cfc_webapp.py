@@ -30,7 +30,7 @@ import bson.json_util
 import modeshare, zipcode, distance, tripManager, \
                  Berkeley, visualize, stats, usercache, timeline
 import emission.net.ext_service.moves.register as auth
-import emission.net.ext_service.habitica.register as habitreg
+import emission.net.ext_service.habitica.proxy as habitproxy
 import emission.analysis.result.carbon as carbon
 import emission.analysis.classification.inference.commute as commute
 import emission.analysis.modelling.work_time as work_time
@@ -453,8 +453,20 @@ def habiticaRegister():
   else:
       userEmail = verifyUserToken(userToken)
   autogen_password = "autogenerate_me"
-  return habitreg.habiticaRegister(username, userEmail,
+  return habitproxy.habiticaRegister(username, userEmail,
                                    autogen_password, user_uuid)
+
+@post('/habiticaProxy')
+def habiticaProxy():
+    logging.debug("habitica registration request %s from user = %s" %
+                  (request.json, request))
+    user_uuid = getUUID(request)
+    assert(user_uuid is not None)
+    method = request.json['callOpts']['method']
+    method_url = request.json['callOpts']['method_url']
+    method_args = request.json['callOpts']['method_args']
+    return habitproxy.habiticaProxy(user_uuid, method, method_url,
+                                    method_args)
 # Data source integration END
 
 @app.hook('before_request')
