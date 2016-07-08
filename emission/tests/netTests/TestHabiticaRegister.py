@@ -4,6 +4,7 @@ import logging
 import json
 import uuid
 import attrdict as ad
+import random
 
 # Our imports
 import emission.net.ext_service.habitica.register as reg
@@ -13,7 +14,10 @@ class TestHabiticaRegister(unittest.TestCase):
   def setUp(self):
     print "Test setup called"
     self.testUserUUID = uuid.uuid4()
-    self.sampleAuthMessage1 = {'username': '99999999999995543', 'email': '99999999999995543@test.com', 'password': 'aa!A15551', 'our_uuid': self.testUserUUID}
+    autogen_string = randomGen()
+    autogen_email = randomGen() + '@test.com'
+    self.sampleAuthMessage1 = {'username': autogen_string, 'email': autogen_email, 
+      'password': autogen_string, 'our_uuid': self.testUserUUID}
 
 
   def testAddNewUser(self):
@@ -28,6 +32,14 @@ class TestHabiticaRegister(unittest.TestCase):
     self.assertIsNotNone(user_val['habitica_id'])
     self.assertEqual(user_val['habitica_username'], sampleAuthMessage1Ad.username)
   
+  def randomGen():
+    alphabet = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    length = 5
+    string = ""
+    for i in range(length):
+      next_index = random.randrange(len(alphabet))
+      string = string + alphabet[next_index]
+    return string
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
