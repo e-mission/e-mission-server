@@ -15,10 +15,9 @@ class TestHabiticaRegister(unittest.TestCase):
     print "Test setup called"
     self.testUserUUID = uuid.uuid4()
     autogen_string = randomGen()
-    autogen_email = randomGen() + '@test.com'
+    autogen_email = autogen_string + '@test.com'
     self.sampleAuthMessage1 = {'username': autogen_string, 'email': autogen_email, 
       'password': autogen_string, 'our_uuid': self.testUserUUID}
-
 
   def testAddNewUser(self):
     sampleAuthMessage1Ad = ad.AttrDict(self.sampleAuthMessage1)
@@ -32,7 +31,8 @@ class TestHabiticaRegister(unittest.TestCase):
     self.assertIsNotNone(user_val['habitica_id'])
     self.assertEqual(user_val['habitica_username'], sampleAuthMessage1Ad.username)
   
-  def randomGen():
+
+def randomGen():
     alphabet = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     length = 5
     string = ""
