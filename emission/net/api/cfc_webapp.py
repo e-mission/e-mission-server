@@ -454,12 +454,11 @@ def habiticaRegister():
       userEmail = verifyUserToken(userToken)
   autogen_password = "autogenerate_me"
   return habitproxy.habiticaRegister(username, userEmail,
-                                   autogen_password, user_uuid)
+                              autogen_password, user_uuid)
 
 @post('/habiticaProxy')
 def habiticaProxy():
-    logging.debug("habitica registration request %s from user = %s" %
-                  (request.json, request))
+    logging.debug("habitica registration request %s" % (request))
     user_uuid = getUUID(request)
     assert(user_uuid is not None)
     method = request.json['callOpts']['method']
