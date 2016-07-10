@@ -29,9 +29,29 @@
                 "$oid": "56081ad3f6858f3a71f65e1e"
             }, 
             "end_fmt_time": "2015-08-21 19:11:28.817000-07:00", 
+            "end_local_dt": {
+                "hour": 19, 
+                "month": 8, 
+                "second": 28, 
+                "weekday": 4, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 21, 
+                "minute": 11
+            }, 
             "duration": 3911.911999940872, 
             "_id": {
                 "$oid": "56081ad3f6858f3a71f65e1f"
+            }, 
+            "start_local_dt": {
+                "hour": 18, 
+                "month": 8, 
+                "second": 16, 
+                "weekday": 4, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 21, 
+                "minute": 6
             }
         }, 
         "_id": {
@@ -88,9 +108,29 @@
                 "$oid": "56081ad3f6858f3a71f65e2c"
             }, 
             "end_fmt_time": "2015-08-22 16:00:40.644000-07:00", 
+            "end_local_dt": {
+                "hour": 16, 
+                "month": 8, 
+                "second": 40, 
+                "weekday": 5, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 22, 
+                "minute": 0
+            }, 
             "duration": 1213.9320001602173, 
             "_id": {
                 "$oid": "56081ad3f6858f3a71f65e2d"
+            }, 
+            "start_local_dt": {
+                "hour": 15, 
+                "month": 8, 
+                "second": 26, 
+                "weekday": 5, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 22, 
+                "minute": 40
             }
         }, 
         "_id": {
@@ -147,9 +187,29 @@
                 "$oid": "5608285cf6858f3c7580c8b8"
             }, 
             "end_fmt_time": "2015-08-24 09:07:19.533000-07:00", 
+            "end_local_dt": {
+                "hour": 9, 
+                "month": 8, 
+                "second": 19, 
+                "weekday": 0, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 24, 
+                "minute": 7
+            }, 
             "duration": 2128.675999879837, 
             "_id": {
                 "$oid": "5608285cf6858f3c7580c8b9"
+            }, 
+            "start_local_dt": {
+                "hour": 8, 
+                "month": 8, 
+                "second": 50, 
+                "weekday": 0, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 24, 
+                "minute": 31
             }
         }, 
         "_id": {
@@ -206,9 +266,29 @@
                 "$oid": "5608285cf6858f3c7580c8c0"
             }, 
             "end_fmt_time": "2015-08-25 16:39:24.213000-07:00", 
+            "end_local_dt": {
+                "hour": 16, 
+                "month": 8, 
+                "second": 24, 
+                "weekday": 1, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 25, 
+                "minute": 39
+            }, 
             "duration": 28895.774000167847, 
             "_id": {
                 "$oid": "5608285df6858f3c7580c8c1"
+            }, 
+            "start_local_dt": {
+                "hour": 8, 
+                "month": 8, 
+                "second": 48, 
+                "weekday": 1, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 25, 
+                "minute": 37
             }
         }, 
         "_id": {
@@ -265,9 +345,29 @@
                 "$oid": "5608285df6858f3c7580c8e4"
             }, 
             "end_fmt_time": "2015-08-28 08:29:01.800000-07:00", 
+            "end_local_dt": {
+                "hour": 8, 
+                "month": 8, 
+                "second": 1, 
+                "weekday": 4, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 28, 
+                "minute": 29
+            }, 
             "duration": 797.3559999465942, 
             "_id": {
                 "$oid": "5608285df6858f3c7580c8e5"
+            }, 
+            "start_local_dt": {
+                "hour": 8, 
+                "month": 8, 
+                "second": 44, 
+                "weekday": 4, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 28, 
+                "minute": 15
             }
         }, 
         "_id": {
@@ -324,9 +424,29 @@
                 "$oid": "5608285df6858f3c7580c91c"
             }, 
             "end_fmt_time": "2015-09-02 08:43:37.707000-07:00", 
+            "end_local_dt": {
+                "hour": 8, 
+                "month": 9, 
+                "second": 37, 
+                "weekday": 2, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 2, 
+                "minute": 43
+            }, 
             "duration": 689.8570001125336, 
             "_id": {
                 "$oid": "5608285df6858f3c7580c91d"
+            }, 
+            "start_local_dt": {
+                "hour": 8, 
+                "month": 9, 
+                "second": 7, 
+                "weekday": 2, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 2, 
+                "minute": 32
             }
         }, 
         "_id": {
@@ -383,9 +503,29 @@
                 "$oid": "5608285df6858f3c7580c930"
             }, 
             "end_fmt_time": "2015-09-03 08:39:21.320000-07:00", 
+            "end_local_dt": {
+                "hour": 8, 
+                "month": 9, 
+                "second": 21, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 3, 
+                "minute": 39
+            }, 
             "duration": 485.9979999065399, 
             "_id": {
                 "$oid": "5608285df6858f3c7580c931"
+            }, 
+            "start_local_dt": {
+                "hour": 8, 
+                "month": 9, 
+                "second": 15, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 3, 
+                "minute": 31
             }
         }, 
         "_id": {
@@ -442,9 +582,29 @@
                 "$oid": "5608285df6858f3c7580c938"
             }, 
             "end_fmt_time": "2015-09-03 17:15:19.161000-07:00", 
+            "end_local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 19, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 3, 
+                "minute": 15
+            }, 
             "duration": 626.2160000801086, 
             "_id": {
                 "$oid": "5608285df6858f3c7580c939"
+            }, 
+            "start_local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 52, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 3, 
+                "minute": 4
             }
         }, 
         "_id": {
@@ -501,9 +661,29 @@
                 "$oid": "5608285df6858f3c7580c94e"
             }, 
             "end_fmt_time": "2015-09-07 09:42:20.933000-07:00", 
+            "end_local_dt": {
+                "hour": 9, 
+                "month": 9, 
+                "second": 20, 
+                "weekday": 0, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 7, 
+                "minute": 42
+            }, 
             "duration": 4761.78400015831, 
             "_id": {
                 "$oid": "5608285df6858f3c7580c94f"
+            }, 
+            "start_local_dt": {
+                "hour": 8, 
+                "month": 9, 
+                "second": 59, 
+                "weekday": 0, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 7, 
+                "minute": 22
             }
         }, 
         "_id": {
@@ -560,9 +740,29 @@
                 "$oid": "5608285df6858f3c7580c98a"
             }, 
             "end_fmt_time": "2015-09-10 13:40:22.318000-07:00", 
+            "end_local_dt": {
+                "hour": 13, 
+                "month": 9, 
+                "second": 22, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 40
+            }, 
             "duration": 1522.0360000133514, 
             "_id": {
                 "$oid": "5608285df6858f3c7580c98b"
+            }, 
+            "start_local_dt": {
+                "hour": 13, 
+                "month": 9, 
+                "second": 0, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 15
             }
         }, 
         "_id": {
@@ -619,9 +819,29 @@
                 "$oid": "5608285df6858f3c7580c98e"
             }, 
             "end_fmt_time": "2015-09-10 14:29:49.611000-07:00", 
+            "end_local_dt": {
+                "hour": 14, 
+                "month": 9, 
+                "second": 49, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 29
+            }, 
             "duration": 1912.962000131607, 
             "_id": {
                 "$oid": "5608285df6858f3c7580c98f"
+            }, 
+            "start_local_dt": {
+                "hour": 13, 
+                "month": 9, 
+                "second": 56, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 57
             }
         }, 
         "_id": {
@@ -678,9 +898,29 @@
                 "$oid": "5608285df6858f3c7580c998"
             }, 
             "end_fmt_time": "2015-09-10 17:16:52.622000-07:00", 
+            "end_local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 52, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 16
+            }, 
             "duration": 501.89299988746643, 
             "_id": {
                 "$oid": "5608285df6858f3c7580c999"
+            }, 
+            "start_local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 30, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 8
             }
         }, 
         "_id": {

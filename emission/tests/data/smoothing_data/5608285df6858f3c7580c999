@@ -12,6 +12,16 @@
             "altitude": 0, 
             "ts": 1441930110.729, 
             "longitude": -122.0798907, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 30, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 8
+            }, 
             "latitude": 37.3965131, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -51,6 +61,16 @@
         "data": {
             "curr_state": 1, 
             "transition": 1, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 32, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 8
+            }, 
             "ts": 1441930112.398, 
             "fmt_time": "2015-09-10 17:08:32.398000-07:00"
         }, 
@@ -97,6 +117,16 @@
             "altitude": 0, 
             "ts": 1441930110.729, 
             "longitude": -122.0798907, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 30, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 8
+            }, 
             "latitude": 37.3965131, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -145,6 +175,16 @@
             "altitude": 0, 
             "ts": 1441930110.729, 
             "longitude": -122.0798907, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 30, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 8
+            }, 
             "latitude": 37.3965131, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -193,6 +233,16 @@
             "altitude": 0, 
             "ts": 1441930125.065, 
             "longitude": -122.0802485, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 45, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 8
+            }, 
             "latitude": 37.396693, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -241,6 +291,16 @@
             "altitude": 0, 
             "ts": 1441930125.065, 
             "longitude": -122.0802485, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 45, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 8
+            }, 
             "latitude": 37.396693, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -278,6 +338,16 @@
     }, 
     {
         "data": {
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 6, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 9
+            }, 
             "confidence": 77, 
             "type": 0, 
             "ts": 1441930146.333, 
@@ -326,6 +396,16 @@
             "altitude": 0, 
             "ts": 1441930162.484, 
             "longitude": -122.077798, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 22, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 9
+            }, 
             "latitude": 37.3958855, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -374,6 +454,16 @@
             "altitude": 0, 
             "ts": 1441930162.484, 
             "longitude": -122.077798, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 22, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 9
+            }, 
             "latitude": 37.3958855, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -411,6 +501,16 @@
     }, 
     {
         "data": {
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 38, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 9
+            }, 
             "confidence": 100, 
             "type": 5, 
             "ts": 1441930178.0, 
@@ -448,6 +548,16 @@
     }, 
     {
         "data": {
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 58, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 9
+            }, 
             "confidence": 46, 
             "type": 4, 
             "ts": 1441930198.378, 
@@ -496,6 +606,16 @@
             "altitude": 0, 
             "ts": 1441930184.553, 
             "longitude": -122.0813401, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 44, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 9
+            }, 
             "latitude": 37.3975994, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -544,6 +664,16 @@
             "altitude": 0, 
             "ts": 1441930184.553, 
             "longitude": -122.0813401, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 44, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 9
+            }, 
             "latitude": 37.3975994, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -592,6 +722,16 @@
             "altitude": 0, 
             "ts": 1441930236.18, 
             "longitude": -122.0813401, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 36, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 10
+            }, 
             "latitude": 37.3975994, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -629,6 +769,16 @@
     }, 
     {
         "data": {
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 4, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 11
+            }, 
             "confidence": 42, 
             "type": 2, 
             "ts": 1441930264.739, 
@@ -677,6 +827,16 @@
             "altitude": 0, 
             "ts": 1441930252.22, 
             "longitude": -122.0813244, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 52, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 10
+            }, 
             "latitude": 37.3975955, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -725,6 +885,16 @@
             "altitude": 0, 
             "ts": 1441930252.22, 
             "longitude": -122.0813244, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 52, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 10
+            }, 
             "latitude": 37.3975955, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -762,6 +932,16 @@
     }, 
     {
         "data": {
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 41, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 11
+            }, 
             "confidence": 100, 
             "type": 5, 
             "ts": 1441930301.266, 
@@ -810,6 +990,16 @@
             "altitude": 0, 
             "ts": 1441930297.536, 
             "longitude": -122.0813244, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 37, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 11
+            }, 
             "latitude": 37.3975955, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -847,6 +1037,16 @@
     }, 
     {
         "data": {
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 45, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 11
+            }, 
             "confidence": 100, 
             "type": 5, 
             "ts": 1441930305.997, 
@@ -884,6 +1084,16 @@
     }, 
     {
         "data": {
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 3, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 12
+            }, 
             "confidence": 39, 
             "type": 0, 
             "ts": 1441930323.119, 
@@ -932,6 +1142,16 @@
             "altitude": 0, 
             "ts": 1441930312.261, 
             "longitude": -122.0777584, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 52, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 11
+            }, 
             "latitude": 37.3959368, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -980,6 +1200,16 @@
             "altitude": 0, 
             "ts": 1441930312.261, 
             "longitude": -122.0777584, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 52, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 11
+            }, 
             "latitude": 37.3959368, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -1017,6 +1247,16 @@
     }, 
     {
         "data": {
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 43, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 12
+            }, 
             "confidence": 100, 
             "type": 0, 
             "ts": 1441930363.131, 
@@ -1065,6 +1305,16 @@
             "altitude": 0, 
             "ts": 1441930359.323, 
             "longitude": -122.0777584, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 39, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 12
+            }, 
             "latitude": 37.3959368, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -1113,6 +1363,16 @@
             "altitude": 0, 
             "ts": 1441930388.477, 
             "longitude": -122.0831444, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 8, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 13
+            }, 
             "latitude": 37.3958259, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -1161,6 +1421,16 @@
             "altitude": 0, 
             "ts": 1441930388.477, 
             "longitude": -122.0831444, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 8, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 13
+            }, 
             "latitude": 37.3958259, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -1198,6 +1468,16 @@
     }, 
     {
         "data": {
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 13, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 13
+            }, 
             "confidence": 46, 
             "type": 0, 
             "ts": 1441930393.82, 
@@ -1246,6 +1526,16 @@
             "altitude": 0, 
             "ts": 1441930407.735, 
             "longitude": -122.0836995, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 27, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 13
+            }, 
             "latitude": 37.3949067, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -1294,6 +1584,16 @@
             "altitude": 0, 
             "ts": 1441930407.735, 
             "longitude": -122.0836995, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 27, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 13
+            }, 
             "latitude": 37.3949067, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -1331,6 +1631,16 @@
     }, 
     {
         "data": {
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 10, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 14
+            }, 
             "confidence": 73, 
             "type": 0, 
             "ts": 1441930450.929, 
@@ -1379,6 +1689,16 @@
             "altitude": 0, 
             "ts": 1441930452.185, 
             "longitude": -122.0861753, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 12, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 14
+            }, 
             "latitude": 37.3910393, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -1427,6 +1747,16 @@
             "altitude": 0, 
             "ts": 1441930452.185, 
             "longitude": -122.0861753, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 12, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 14
+            }, 
             "latitude": 37.3910393, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -1475,6 +1805,16 @@
             "altitude": 0, 
             "ts": 1441930483.32, 
             "longitude": -122.0877208, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 43, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 14
+            }, 
             "latitude": 37.3909629, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -1523,6 +1863,16 @@
             "altitude": 0, 
             "ts": 1441930483.32, 
             "longitude": -122.0877208, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 43, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 14
+            }, 
             "latitude": 37.3909629, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -1560,6 +1910,16 @@
     }, 
     {
         "data": {
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 56, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 14
+            }, 
             "confidence": 100, 
             "type": 5, 
             "ts": 1441930496.754, 
@@ -1597,6 +1957,16 @@
     }, 
     {
         "data": {
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 56, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 14
+            }, 
             "confidence": 100, 
             "type": 5, 
             "ts": 1441930496.916, 
@@ -1634,6 +2004,16 @@
     }, 
     {
         "data": {
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 3, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 15
+            }, 
             "confidence": 75, 
             "type": 2, 
             "ts": 1441930503.919, 
@@ -1682,6 +2062,16 @@
             "altitude": 0, 
             "ts": 1441930518.52, 
             "longitude": -122.0881443, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 18, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 15
+            }, 
             "latitude": 37.3907636, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -1730,6 +2120,16 @@
             "altitude": 0, 
             "ts": 1441930518.52, 
             "longitude": -122.0881443, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 18, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 15
+            }, 
             "latitude": 37.3907636, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -1778,6 +2178,16 @@
             "altitude": 0, 
             "ts": 1441930549.593, 
             "longitude": -122.0881441, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 49, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 15
+            }, 
             "latitude": 37.3907865, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -1815,6 +2225,16 @@
     }, 
     {
         "data": {
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 26, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 16
+            }, 
             "confidence": 87, 
             "type": 3, 
             "ts": 1441930586.334, 
@@ -1863,6 +2283,16 @@
             "altitude": 0, 
             "ts": 1441930549.593, 
             "longitude": -122.0881441, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 49, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 15
+            }, 
             "latitude": 37.3907865, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -1911,6 +2341,16 @@
             "altitude": 0, 
             "ts": 1441930580.64, 
             "longitude": -122.0881781, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 20, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 16
+            }, 
             "latitude": 37.3907666, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -1959,6 +2399,16 @@
             "altitude": 0, 
             "ts": 1441930580.64, 
             "longitude": -122.0881781, 
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 20, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 16
+            }, 
             "latitude": 37.3907666, 
             "heading": 0, 
             "sensed_speed": 0, 
@@ -1996,6 +2446,16 @@
     }, 
     {
         "data": {
+            "local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 29, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 16
+            }, 
             "confidence": 47, 
             "type": 3, 
             "ts": 1441930589.781, 
