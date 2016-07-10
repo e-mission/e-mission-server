@@ -53,7 +53,7 @@ class TestTimeSeries(unittest.TestCase):
         df = ts.get_data_df("background/filtered_location", tq)
         self.assertEqual(len(df), 327)
         logging.debug("df.columns = %s" % df.columns)
-        self.assertEqual(len(df.columns), 13)
+        self.assertEqual(len(df.columns), 20)
         
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
