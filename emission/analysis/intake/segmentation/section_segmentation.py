@@ -82,16 +82,18 @@ def segment_trip_into_sections(user_id, trip_id, trip_source):
     # TODO: Should we link the locations to the trips this way, or by using a foreign key?
     # If we want to use a foreign key, then we need to include the object id in the data df as well so that we can
     # set it properly.
-    trip_start_loc = ecwl.Location(ts.get_entry_at_ts("background/filtered_location", "data.ts", trip.start_ts)["data"])
-    trip_end_loc = ecwl.Location(ts.get_entry_at_ts("background/filtered_location", "data.ts", trip.end_ts)["data"])
-    logging.debug("trip_start_loc = %s, trip_end_loc = %s" % (trip_start_loc, trip_end_loc))
-
     ts = esta.TimeSeries.get_time_series(user_id)
+
+    get_loc_for_ts = lambda time: ecwl.Location(ts.get_entry_at_ts("background/filtered_location", "data.ts", time)["data"])
+    trip_start_loc = get_loc_for_ts(trip.start_ts)
+    trip_end_loc = get_loc_for_ts(trip.end_ts)
+    logging.debug("trip_start_loc = %s, trip_end_loc = %s" % (trip_start_loc, trip_end_loc))
 
     for (i, (start_loc_doc, end_loc_doc, sensed_mode)) in enumerate(segmentation_points):
         logging.debug("start_loc_doc = %s, end_loc_doc = %s" % (start_loc_doc, end_loc_doc))
-        start_loc = ecwl.Location(start_loc_doc)
-        end_loc = ecwl.Location(end_loc_doc)
+        get_loc_for_row = lambda row: ts.df_row_to_entry("background/filtered_location", row).data
+        start_loc = get_loc_for_row(start_loc_doc)
+        end_loc = get_loc_for_row(end_loc_doc)
         logging.debug("start_loc = %s, end_loc = %s" % (start_loc, end_loc))
 
         section = ecwc.Section()
@@ -135,7 +137,10 @@ def fill_section(section, start_loc, end_loc, sensed_mode):
     section.start_fmt_time = start_loc.fmt_time
 
     section.end_ts = end_loc.ts
-    section.end_local_dt = end_loc.local_dt
+    try:
+        section.end_local_dt = end_loc.local_dt
+    except AttributeError, e:
+        print end_loc
     section.end_fmt_time = end_loc.fmt_time
 
     section.start_loc = start_loc.loc

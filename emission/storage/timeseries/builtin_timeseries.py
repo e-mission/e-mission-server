@@ -95,6 +95,9 @@ class BuiltinTimeSeries(esta.TimeSeries):
         # logging.debug("ret_val = %s " % ret_val)
         return ret_val
 
+    def df_row_to_entry(self, key, row):
+        return self.get_entry_from_id(key, row['_id'])
+
     def get_entry_from_id(self, key, entry_id):
         entry_doc = self.get_timeseries_db(key).find_one({"_id": entry_id})
         if entry_doc is None:
