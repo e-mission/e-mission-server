@@ -19,6 +19,7 @@ import emission.core.wrapper.section as ecws
 import emission.storage.timeseries.geoquery as estg
 import emission.storage.timeseries.tcquery as esttc
 import emission.storage.decorations.analysis_timeseries_queries as esda
+import emission.storage.timeseries.aggregate_timeseries as estag
 
 # Note that all the points here are returned in (lng, lat) format, which is the
 # GeoJSON format.
@@ -68,16 +69,7 @@ def range_mode_heatmap(modes, from_ld, to_ld, region):
     else:
         geo_query = estg.GeoQuery(["data.loc"], region)
 
-    test_phone_ids = [UUID("079e0f1a-c440-3d7c-b0e7-de160f748e35"),
-                      UUID("c76a0487-7e5a-3b17-a449-47be666b36f6"),
-                      UUID("c528bcd2-a88b-3e82-be62-ef4f2396967a"),
-                      UUID("95e70727-a04e-3e33-b7fe-34ab19194f8b"),
-                      UUID("e471711e-bd14-3dbe-80b6-9c7d92ecc296"),
-                      UUID("fd7b4c2e-2c8b-3bfa-94f0-d1e3ecbd5fb7"),
-                      UUID("86842c35-da28-32ed-a90e-2da6663c5c73"),
-                      UUID("3bc0f91f-7660-34a2-b005-5c399598a369")]
-                      
-    test_phones_query = {"user_id": {"$nin": test_phone_ids}}
+    test_phones_query = estag.get_ignore_test_phone_extra_query()
     extra_query_list = [test_phones_query]
 
     if modes is not None:
