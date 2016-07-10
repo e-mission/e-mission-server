@@ -34,5 +34,4 @@ def get_ignore_test_phone_extra_query():
                       UUID("3bc0f91f-7660-34a2-b005-5c399598a369")]
 
     test_phones_query = {"user_id": {"$nin": test_phone_ids}}
-    extra_query_list = [test_phones_query]
-    return extra_query_list
+    return test_phones_query
