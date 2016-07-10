@@ -15,6 +15,14 @@ CLEANED_PLACE_KEY = "analysis/cleaned_place"
 CLEANED_SECTION_KEY = "analysis/cleaned_section"
 CLEANED_STOP_KEY = "analysis/cleaned_stop"
 CLEANED_LOCATION_KEY = "analysis/recreated_location"
+METRICS_DAILY_USER_COUNT = "metrics/daily_user_count"
+METRICS_DAILY_MEAN_COUNT = "metrics/daily_mean_count"
+METRICS_DAILY_USER_DISTANCE = "metrics/daily_user_distance"
+METRICS_DAILY_MEAN_DISTANCE = "metrics/daily_mean_distance"
+METRICS_DAILY_USER_DURATION = "metrics/daily_user_duration"
+METRICS_DAILY_MEAN_DURATION = "metrics/daily_mean_duration"
+METRICS_DAILY_USER_MEDIAN_SPEED = "metrics/daily_user_median_speed"
+METRICS_DAILY_MEAN_MEDIAN_SPEED = "metrics/daily_mean_median_speed"
 
 # General methods
 

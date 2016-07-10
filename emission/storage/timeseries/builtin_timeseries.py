@@ -34,6 +34,14 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "analysis/cleaned_section": self.analysis_timeseries_db,
                 "analysis/cleaned_stop": self.analysis_timeseries_db,
                 "analysis/recreated_location": self.analysis_timeseries_db,
+                "metrics/daily_user_count": self.analysis_timeseries_db,
+                "metrics/daily_mean_count": self.analysis_timeseries_db,
+                "metrics/daily_user_distance": self.analysis_timeseries_db,
+                "metrics/daily_mean_distance": self.analysis_timeseries_db,
+                "metrics/daily_user_duration": self.analysis_timeseries_db,
+                "metrics/daily_mean_duration": self.analysis_timeseries_db,
+                "metrics/daily_user_median_speed": self.analysis_timeseries_db,
+                "metrics/daily_mean_median_speed": self.analysis_timeseries_db
             }
 
 
@@ -80,7 +88,6 @@ class BuiltinTimeSeries(esta.TimeSeries):
         for ld_key in ret_val.local_dates:
             for field_key in ret_val[ld_key]:
                 expanded_key = "%s_%s" % (ld_key,field_key)
-                print("About to expand %s" % expanded_key)
                 ret_val[expanded_key] = ret_val[ld_key][field_key]
             del ret_val[ld_key]
         ret_val["_id"] = entry["_id"]
