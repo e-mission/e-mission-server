@@ -6,11 +6,8 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy
 from sklearn import metrics
-import sys
-from numpy import cross
 from numpy.linalg import norm
-import emission.storage.decorations.trip_queries as esdtq
-import emission.storage.decorations.section_queries as esdsq
+import emission.storage.decorations.analysis_timeseries_queries as esda
 
 """
 This class organizes data into bins by similarity. It then orders the bins 
@@ -29,36 +26,30 @@ This is called by cluster_pipeline.py.
 """
 class similarity:
     
-    def __init__(self, data, radius, old=True):
+    def __init__(self, data, radius):
         self.data = data
         if not data:
             self.data = []
         self.bins = []
         self.radius = float(radius)
-        self.old = old
-        if not old:
-            for a in self.data:
-                # print "a is %s" % a
-                t = a
-                try:
-                    start_lon = t.data.start_place.location["coordinates"][0]
-                    start_lat = t.data.start_place.location["coordinates"][1]
-                    end_lon = t.data.end_place.location["coordinates"][0]
-                    end_lat = t.data.end_place.location["coordinates"][1]
-                    logging.debug("endpoints are = (%s, %s) and (%s, %s)" %
-                                  (start_lon, start_lat, end_lon, end_lat))
-                    if self.distance(start_lat, start_lon, end_lat, end_lon):
-                        self.data.remove(a)
-                except:
-                    self.data.remove(a)
-        else:
-            for a in range(len(self.data)-1, -1, -1):
-                start_lat = self.data[a].trip_start_location.lat
-                start_lon = self.data[a].trip_start_location.lon
-                end_lat = self.data[a].trip_end_location.lat
-                end_lon = self.data[a].trip_end_location.lon
+        for t in self.data:
+            logging.debug("Considering trip %s" % t)
+            try:
+                start_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
+                                             t.data.start_place)
+                end_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
+                                             t.data.end_place)
+                start_lon = start_place.data.location["coordinates"][0]
+                start_lat = start_place.data.location["coordinates"][1]
+                end_lon = end_place.data.location["coordinates"][0]
+                end_lat = end_place.data.location["coordinates"][1]
+                logging.debug("endpoints are = (%s, %s) and (%s, %s)" %
+                              (start_lon, start_lat, end_lon, end_lat))
                 if self.distance(start_lat, start_lon, end_lat, end_lon):
-                    self.data.pop(a)
+                    self.data.remove(t)
+            except:
+                logging.exception("exception while getting start and end places for %s" % t)
+                self.data.remove(t)
 
         logging.debug('After removing trips that are points, there are %s data points' % len(self.data))
         self.size = len(self.data)
@@ -140,12 +131,8 @@ class similarity:
     #check if two trips match
     def match(self,a,bin):
         for b in bin:
-            if not self.old:
-                if not self.distance_helper_new(a,b):
-                    return False
-            else:
-                if not self.distance_helper(a,b):
-                    return False
+            if not self.distance_helper(a, b):
+                return False
         return True
 
     #create the histogram
@@ -181,12 +168,19 @@ class similarity:
         points = []
         for bin in self.bins:
             for b in bin:
-                start_lat = self.data[b].trip_start_location.lat
-                start_lon = self.data[b].trip_start_location.lon
-                end_lat = self.data[b].trip_end_location.lat
-                end_lon = self.data[b].trip_end_location.lon
+                tb = self.data[b]
+                start_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
+                                             tb.data.start_place)
+                end_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
+                                           tb.data.end_place)
+                start_lon = start_place.data.location["coordinates"][0]
+                start_lat = start_place.data.location["coordinates"][1]
+                end_lon = end_place.data.location["coordinates"][0]
+                end_lat = end_place.data.location["coordinates"][1]
                 path = [start_lat, start_lon, end_lat, end_lon]
                 points.append(path)
+        logging.debug("number of labels are %d, number of points are = %d" %
+                      (len(labels), len(points)))
         a = metrics.silhouette_score(numpy.array(points), labels)
         logging.debug('number of bins is %d' % len(self.bins))
         logging.debug('silhouette score is %d' % a)
@@ -194,20 +188,8 @@ class similarity:
 
     #calculate the distance between two trips
     def distance_helper(self, a, b):
-        starta = self.data[a].trip_start_location
-        startb = self.data[b].trip_start_location
-        enda = self.data[a].trip_end_location
-        endb = self.data[b].trip_end_location
-
-        start = self.distance(starta.lat, starta.lon, startb.lat, startb.lon)
-        end = self.distance(enda.lat, enda.lon, endb.lat, endb.lon)
-        if start and end:
-            return True
-        return False
-
-    def distance_helper_new(self, a, b):
-        tripa = self.data[a]
-        tripb = self.data[b]
+        tripa = self.data[a].data
+        tripb = self.data[b].data
 
         starta = tripa.start_loc["coordinates"]
         startb = tripb.start_loc["coordinates"]

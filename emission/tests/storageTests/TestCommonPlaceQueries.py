@@ -52,7 +52,7 @@ class TestCommonPlaceQueries(unittest.TestCase):
         estfm.move_all_filters_to_data()
         eaist.segment_current_trips(self.testUUID)
         eaiss.segment_current_sections(self.testUUID)
-        data = eamtcp.main(self.testUUID, False)
+        data = eamtcp.main(self.testUUID)
         esdcpq.create_places(data, self.testUUID)
         places = esdcpq.get_all_common_places_for_user(self.testUUID)
         places_list = []
@@ -74,7 +74,9 @@ class TestCommonPlaceQueries(unittest.TestCase):
             "start_loc" : self.testStart.location,
             "end_loc" : self.testEnd.location,
             "probabilites" : probs,
-            "trips" : ()
+            "trips" : (),
+            "start_times": [],
+            "durations": []
         }
         trip = esdctp.make_new_common_trip(props)
         esdctp.save_common_trip(trip)

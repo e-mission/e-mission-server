@@ -21,7 +21,7 @@ HOURS_IN_DAY = 24
 
 def save_common_trip(common_trip):
     db = edb.get_common_trip_db()
-    probs = _2d_array_to_mongo_format(common_trip.probabilites)
+    probs = _np_array_to_json_format(common_trip.probabilites)
     db.insert({
         "user_id" : common_trip.user_id,
         "start_place" : common_trip.start_place,
@@ -29,7 +29,9 @@ def save_common_trip(common_trip):
         "start_loc" : common_trip.start_loc,
         "end_loc" : common_trip.end_loc,
         "trips" : common_trip["trips"],
-        "probabilites" : probs
+        "probabilites" : probs,
+        "start_times": common_trip["start_times"],
+        "durations": common_trip["durations"]
         }) 
 
 def get_common_trip_from_db(user_id, start_place_id, end_place_id):
@@ -44,7 +46,7 @@ def get_all_common_trips_for_user(user_id):
     return db.find({"user_id" : user_id})
 
 def make_common_trip_from_json(json_obj):
-    probs = _mongo_to_2d_array(json_obj["probabilites"])
+    probs = _json_to_np_array(json_obj["probabilites"])
     props = {
         "user_id" : json_obj["user_id"],
         "start_place" : json_obj["start_place"],
@@ -57,10 +59,10 @@ def make_common_trip_from_json(json_obj):
     return ecwct.CommonTrip(props)
 
 
-def _2d_array_to_mongo_format(array):
+def _np_array_to_json_format(array):
     return array.tolist()
 
-def _mongo_to_2d_array(mongo_thing):
+def _json_to_np_array(mongo_thing):
     return np.array(mongo_thing)
 
 def make_new_common_trip(props=None):
@@ -101,8 +103,8 @@ def set_up_trips(list_of_cluster_data, user_id):
     for dct in list_of_cluster_data:
         start_times = []
         durations = []
-        start_loc = gj.Point(dct['start_coords'].coordinate_list())
-        end_loc = gj.Point(dct['end_coords'].coordinate_list())
+        start_loc = gj.Point(dct['start_coords'])
+        end_loc = gj.Point(dct['end_coords'])
         start_place_id = esdcpq.get_common_place_at_location(start_loc).get_id()
         end_place_id = esdcpq.get_common_place_at_location(end_loc).get_id()
         #print 'dct["sections"].trip_id %s is' % dct["sections"][0]
@@ -122,7 +124,6 @@ def set_up_trips(list_of_cluster_data, user_id):
         trip.trips = [unc_trip.get_id() for unc_trip in dct["sections"]]
         trip.start_times = start_times
         trip.durations = durations
-        place_db = edb.get_place_db()
-        
+
         
         save_common_trip(trip)

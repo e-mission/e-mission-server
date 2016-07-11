@@ -30,6 +30,7 @@ import bson.json_util
 import modeshare, zipcode, distance, tripManager, \
                  Berkeley, visualize, stats, usercache, timeline
 import emission.net.ext_service.moves.register as auth
+import emission.net.ext_service.habitica.proxy as habitproxy
 import emission.analysis.result.carbon as carbon
 import emission.analysis.classification.inference.commute as commute
 import emission.analysis.modelling.work_time as work_time
@@ -435,6 +436,36 @@ def movesCallback():
   code = request.json['code']
   state = request.json['state']
   return auth.movesCallback(code, state, user_uuid)
+
+@post('/habiticaRegister')
+def habiticaRegister():
+  logging.debug("habitica registration request %s from user = %s" %
+                (request.json, request))
+  user_uuid = getUUID(request)
+  assert(user_uuid is not None)
+  username = request.json['regConfig']['username']
+  # This is the second place we use the email, since we need to pass
+  # it to habitica to complete registration. I'm not even refactoring
+  # this into a method - hopefully this makes it less likely to be reused
+  userToken = request.json['user']
+  if skipAuth:
+      userEmail = userToken
+  else:
+      userEmail = verifyUserToken(userToken)
+  autogen_password = "autogenerate_me"
+  return habitproxy.habiticaRegister(username, userEmail,
+                              autogen_password, user_uuid)
+
+@post('/habiticaProxy')
+def habiticaProxy():
+    logging.debug("habitica registration request %s" % (request))
+    user_uuid = getUUID(request)
+    assert(user_uuid is not None)
+    method = request.json['callOpts']['method']
+    method_url = request.json['callOpts']['method_url']
+    method_args = request.json['callOpts']['method_args']
+    return habitproxy.habiticaProxy(user_uuid, method, method_url,
+                                    method_args)
 # Data source integration END
 
 @app.hook('before_request')
@@ -521,7 +552,7 @@ def getUUID(request, inHeader=False):
     else:
         # Return a random user to make it easy to experiment without having to specify a user
         # TODO: Remove this if it is not actually used
-        from get_database import get_uuid_db
+        from emission.core.get_database import get_uuid_db
         user_uuid = get_uuid_db().find_one()['uuid']
         retUUID = user_uuid
         logging.debug("skipAuth = %s, returning arbitrary UUID %s" % (skipAuth, retUUID))

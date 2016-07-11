@@ -22,7 +22,7 @@ def export_timeline(user_id_str, start_day_str, end_day_str, file_name):
     # Or should we even do that?
     query = {'user_id': uuid.UUID(user_id_str), 'start_local_dt': {'$gt': start_day_dt, "$lt": end_day_dt}}
     print "query = %s" % query
-    entry_list = list(edb.get_trip_new_db().find(query))
+    entry_list = list(edb.get_analysis_timeseries_db().find(query))
     logging.info("Found %d entries" % len(entry_list))
     json.dump(entry_list, open(file_name, "w"), default=bju.default, allow_nan=False, indent=4)
 

@@ -47,7 +47,7 @@ def get_common_trips(user_id):
 
 def make_tour_model_from_raw_user_data(user_id):
     try:
-        list_of_cluster_data = eamtmcp.main(user_id, False)
+        list_of_cluster_data = eamtmcp.main(user_id)
         esdcpq.create_places(list_of_cluster_data, user_id)
         esdctq.set_up_trips(list_of_cluster_data, user_id)
     except ValueError as e:

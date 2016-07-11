@@ -23,10 +23,7 @@ import emission.storage.timeseries.format_hacks.move_filter_field as estfm
 class TestCommonTripQueries(unittest.TestCase):
     
     def setUp(self):
-        self.clearRelatedDb()
-        edb.get_common_trip_db().drop()
-        edb.get_section_new_db().drop()
-        edb.get_trip_new_db().drop()
+        # self.clearRelatedDb()
         self.testUserId = uuid.uuid4()
         self.testEnd = esdcpq.make_new_common_place(uuid.uuid4(), gj.Point((1,2.092)))
         esdcpq.save_common_place(self.testEnd)
@@ -42,17 +39,14 @@ class TestCommonTripQueries(unittest.TestCase):
 
 
     def tearDown(self):
-        edb.get_common_trip_db().drop()
-        edb.get_section_new_db().drop()
-        edb.get_trip_new_db().drop()
+        edb.get_common_trip_db().remove({'user_id': self.testUserId})
+        edb.get_analysis_timeseries_db().remove({'user_id': self.testUserId})
+        edb.get_common_place_db().remove({'user_id': self.testUserId})
 
     def clearRelatedDb(self):
-        edb.get_timeseries_db().remove()
-        edb.get_place_db().remove()
-        edb.get_stop_db().remove()
-
-        edb.get_trip_new_db().remove()
-        edb.get_section_new_db().remove() 
+        edb.get_timeseries_db().drop()
+        edb.get_analysis_timeseries_db().drop()
+        edb.get_common_place_db().drop()
 
     def testCreation(self):
         common_trip = esdctp.make_new_common_trip()
@@ -73,6 +67,8 @@ class TestCommonTripQueries(unittest.TestCase):
         common_trip.end_loc = self.testEnd.location
         common_trip.probabilites = np.zeros((24, 7))
         common_trip.trips = []
+        common_trip.start_times = [123456, 345789]
+        common_trip.durations = [123,456,789]
         esdctp.save_common_trip(common_trip)
         new_trip = esdctp.get_common_trip_from_db(self.testUserId, self.testStart.get_id(), self.testEnd.get_id())
         self.assertEqual(new_trip.user_id, common_trip.user_id)
@@ -104,7 +100,7 @@ class TestCommonTripQueries(unittest.TestCase):
 def get_fake_data(user_name):
     # Call with a username unique to your database
     tg.create_fake_trips(user_name, True)
-    return eamtcp.main(user_name, old=False)
+    return eamtcp.main(user_name)
 
 
 if __name__ == "__main__":

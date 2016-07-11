@@ -114,17 +114,18 @@ def section_to_geojson(section, tl):
         # Fudge the end point so that we don't have a gap because of the ts != write_ts mismatch
         # TODO: Fix this once we are able to query by the data timestamp instead of the metadata ts
 
-        assert section_location_entries[-1].data.loc == section.data.end_loc, \
-                "section_location_array[-1].data.loc %s != section.data.end_loc %s even after df.ts fix" % \
-                    (section_location_entries[-1].data.loc, section.data.end_loc)
-#             last_loc_doc = ts.get_entry_at_ts("background/filtered_location", "data.ts", section.end_ts)
-#             last_loc_data = ecwe.Entry(last_loc_doc).data
-#             last_loc_data["_id"] = last_loc_doc["_id"]
-#             section_location_array.append(last_loc_data)
-#             logging.debug("Adding new entry %s to fill the end point gap between %s and %s"
-#                 % (last_loc_data.loc, section_location_array[-2].loc, section.end_loc))
-
-    # points_feature_array = [location_to_geojson(l) for l in filtered_section_location_array]
+        if section_location_entries[-1].data.loc != section.data.end_loc:
+            logging.info("section_location_array[-1].data.loc %s != section.data.end_loc %s even after df.ts fix, filling gap" % \
+                    (section_location_entries[-1].data.loc, section.data.end_loc))
+            last_loc_doc = ts.get_entry_at_ts("background/filtered_location", "data.ts", section.data.end_ts)
+            if last_loc_doc is None:
+                logging.warning("can't find entry to patch gap, leaving gap")
+            else:
+                last_loc_entry = ecwe.Entry(last_loc_doc)
+                logging.debug("Adding new entry %s to fill the end point gap between %s and %s"
+                   % (last_loc_entry.data.loc, section_location_entries[-1].data.loc,
+                        section.data.end_loc))
+                section_location_entries.append(last_loc_entry)
 
     points_line_feature = point_array_to_line(section_location_entries)
     # If this is the first section, we already start from the trip start. But we actually need to start from the

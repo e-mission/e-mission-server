@@ -76,7 +76,10 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
             except Exception as e:
                 logging.exception("Backtrace time")
                 logging.warn("Got error %s while saving entry %s -> %s"% (e, entry, unified_entry))
-                ts.insert_error(entry_doc)
+                try:
+                    ts.insert_error(entry_doc)
+                except pymongo.errors.DuplicateKeyError as e:
+                    logging.info("document already present in error timeseries, skipping since read-only")
         logging.debug("Deleting all entries for query %s" % time_query)
         uc.clearProcessedMessages(time_query)
         esp.mark_usercache_done(self.user_id, last_ts_processed)

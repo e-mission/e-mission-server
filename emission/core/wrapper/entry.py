@@ -31,6 +31,7 @@ class Entry(ecwb.WrapperBase):
             "background/battery": "battery",
             "statemachine/transition": "transition",
             "config/sensor_config": "sensorconfig",
+            "config/sync_config": "syncconfig",
             "segmentation/raw_trip": "rawtrip",
             "segmentation/raw_place": "rawplace",
             "segmentation/raw_section": "section",

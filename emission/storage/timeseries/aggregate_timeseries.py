@@ -10,3 +10,5 @@ class AggregateTimeSeries(bits.BuiltinTimeSeries):
         super(AggregateTimeSeries, self).__init__(None)
         self.user_query = {}
 
+    def _get_sort_key(self, time_query = None):
+        return None

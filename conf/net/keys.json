@@ -10,5 +10,8 @@
     "client_secret": "Get from https://dev.moves-app.com",
     "https_redirect_url": "Value registered at https://dev.moves-app.com",
     "ios_redirect_url": "Value registered at https://dev.moves-app.com"
+  },
+  "habitica" : {
+    "url": "http://54.159.38.241:3000"
   }
 }

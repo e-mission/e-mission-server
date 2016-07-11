@@ -23,6 +23,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "background/battery": self.timeseries_db,
                 "statemachine/transition": self.timeseries_db,
                 "config/sensor_config": self.timeseries_db,
+                "config/sync_config": self.timeseries_db,
                 "segmentation/raw_trip": self.analysis_timeseries_db,
                 "segmentation/raw_place": self.analysis_timeseries_db,
                 "segmentation/raw_section": self.analysis_timeseries_db,
@@ -66,8 +67,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 ret_query.update(extra_query)
         return ret_query
 
-    @staticmethod
-    def _get_sort_key(time_query = None):
+    def _get_sort_key(self, time_query = None):
         if time_query is None:
             return "metadata.write_ts"
         else:
@@ -82,7 +82,11 @@ class BuiltinTimeSeries(esta.TimeSeries):
         return ret_val
 
     def get_entry_from_id(self, key, entry_id):
-        return ecwe.Entry(self.get_timeseries_db(key).find_one({"_id": entry_id}))
+        entry_doc = self.get_timeseries_db(key).find_one({"_id": entry_id})
+        if entry_doc is None:
+            return None
+        else:
+            return ecwe.Entry(entry_doc)
 
     def _split_key_list(self, key_list):
         if key_list is None:
@@ -100,12 +104,23 @@ class BuiltinTimeSeries(esta.TimeSeries):
             (self._get_query(key_list, time_query, geo_query,
                              extra_query_list), sort_key))
         (orig_ts_db_keys, analysis_ts_db_keys) = self._split_key_list(key_list)
-        orig_ts_db_result = self.timeseries_db.find(
+        logging.debug("orig_ts_db_keys = %s, analysis_ts_db_keys = %s" % 
+            (orig_ts_db_keys, analysis_ts_db_keys))
+	# workaround for https://github.com/e-mission/e-mission-server/issues/271
+        # during the migration
+        if orig_ts_db_keys is None or len(orig_ts_db_keys) > 0:
+          orig_ts_db_result = self.timeseries_db.find(
             self._get_query(orig_ts_db_keys, time_query, geo_query)).sort(
             sort_key, pymongo.ASCENDING)
-        analysis_ts_db_result = self.analysis_timeseries_db.find(
-            self._get_query(analysis_ts_db_keys, time_query, geo_query)).sort(
-            sort_key, pymongo.ASCENDING)
+        else:
+          orig_ts_db_result = [].__iter__()
+
+        analysis_ts_db_cursor = self.analysis_timeseries_db.find(
+            self._get_query(analysis_ts_db_keys, time_query, geo_query))
+        if sort_key is None:
+            analysis_ts_db_result = analysis_ts_db_cursor
+        else:
+	    analysis_ts_db_result = analysis_ts_db_cursor.sort(sort_key, pymongo.ASCENDING)
         return itertools.chain(orig_ts_db_result, analysis_ts_db_result)
 
     def get_entry_at_ts(self, key, ts_key, ts):
@@ -155,10 +170,11 @@ class BuiltinTimeSeries(esta.TimeSeries):
         logging.debug("insert called")
         if type(entry) == dict:
             entry = ecwe.Entry(entry)
-        if "user_id" not in entry:
+        if "user_id" not in entry or entry["user_id"] is None:
             entry["user_id"] = self.user_id
-        elif entry["user_id"] != self.user_id:
-            raise AttributeError("Saving entry for %s in timeseries for %s" % (entry["user_id"], self.user_id))
+        if entry["user_id"] != self.user_id:
+            raise AttributeError("Saving entry %s for %s in timeseries for %s" % 
+		(entry, entry["user_id"], self.user_id))
         else:
             logging.debug("entry was fine, no need to fix it")
 

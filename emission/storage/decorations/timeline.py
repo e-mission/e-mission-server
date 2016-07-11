@@ -138,7 +138,7 @@ class Timeline(object):
                 self.state = Timeline.State("place", self.places[0])
         else:
             assert (len(self.places) > 0 and len(self.trips) > 0)
-            if self.places[0].data.exit_ts < self.trips[0].data.start_ts:
+            if self.places[0].data.exit_ts is not None and self.places[0].data.exit_ts <= self.trips[0].data.start_ts:
                 self.state = Timeline.State("place", self.places[0])
             else:
                 self.state = Timeline.State("trip", self.trips[0])

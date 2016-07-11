@@ -1,18 +1,13 @@
 # Standard imports
 import logging
-import matplotlib
-# matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import math
 import numpy
 from sklearn.cluster import KMeans
 from sklearn import metrics
 import sys
 
 # our imports
-from emission.core.wrapper.trip_old import Trip, Coordinate
 from kmedoid import kmedoids
-import emission.storage.decorations.trip_queries as esdtq
 
 
 """
@@ -25,9 +20,8 @@ This class is run by cluster_pipeline.py
 """
 class featurization:
 
-    def __init__(self, data, old=True):
+    def __init__(self, data):
         self.data = data
-        self.is_old = old
         if not self.data:
             self.data = []
         self.calculate_points()
@@ -41,21 +35,14 @@ class featurization:
         if not self.data:
             return
         for trip in self.data:
-            if self.is_old:
-                start = trip.trip_start_location
-                end = trip.trip_end_location
-            else:
-                try:
-                    start = trip.data.start_loc["coordinates"]
-                    end = trip.data.end_loc["coordinates"]
-                except:
-                    continue
+            try:
+                start = trip.data.start_loc["coordinates"]
+                end = trip.data.end_loc["coordinates"]
+            except:
+                continue
             if not (start and end):
                 raise AttributeError('each trip must have valid start and end locations')
-            if self.is_old:
-                self.points.append([start.lon, start.lat, end.lon, end.lat])
-            else:
-                self.points.append([start[0], start[1], end[0], end[1]])
+            self.points.append([start[0], start[1], end[0], end[1]])
 
     #cluster the data. input options:
     # - name (optional): the clustering algorithm to use. Options are 'kmeans' or 'kmedoids'. Default is kmeans.
@@ -68,7 +55,7 @@ class featurization:
             logging.debug("min_clusters < 2, setting min_clusters = 2")
             min_clusters = 2
         if min_clusters > len(self.points):
-            sys.stderr.write('Maximum number of clusters is the number of data points.\n')
+            sys.stderr.write('Minimum number of clusters %d is greater than the number of data points %d.\n' % (min_clusters, len(self.points)))
             min_clusters = len(self.points)-1
         if max_clusters == None:
             logging.debug("max_clusters is None, setting max_clusters = %d" % (len(self.points) - 1))
@@ -113,6 +100,8 @@ class featurization:
             import warnings
             for i in range(r):
                 num_clusters = i + min_clusters
+                if num_clusters == 0:
+                   continue
                 cl = KMeans(num_clusters, random_state=8)
                 cl.fit(self.points)
                 self.labels = cl.labels_
@@ -136,8 +125,8 @@ class featurization:
         if not self.labels:
             logging.debug('Please cluster before analyzing clusters.')
             return
-        logging.debug('number of clusters is %d' % str(self.clusters))
-        logging.debug('silhouette score is %d' % str(self.sil))
+        logging.debug('number of clusters is %d' % self.clusters)
+        logging.debug('silhouette score is %s' % self.sil)
 
     #map the clusters
     #TODO - move this to a file in emission.analysis.plotting to map clusters from the database

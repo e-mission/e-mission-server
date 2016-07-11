@@ -163,6 +163,28 @@ them into utility functions. Original versions of the notebooks can be obtained
 by looking at other notebooks with the same name, or by looking at the history
 of the notebooks.
 
+## JS Testing ##
+
+From the webapp directory
+
+    $ npm install karma --save-dev
+    $ npm install karma-jasmine karma-chrome-launcher --save-dev
+
+Write tests in www/js/test
+If you're interested in having karma in your path and globally set, run 
+
+    $ npm install -g karma-cli
+
+To run tests if you have karma globally set, run 
+
+    $ karma start my.conf.js 
+    
+in the webapp directory. If you didn't run the -g command, you can run
+tests with 
+
+    $ ./node_modules/karma/bin/karma start
+    
+in the webapp directory
 
 
 ## TROUBLESHOOTING: ##
