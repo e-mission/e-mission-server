@@ -27,17 +27,14 @@ def inline_maps(map_list):
     """
     nRows = len(map_list)
     # nCols = max([len(row) for row in map_list])
-    
-    t = '<html><body><table width="100%">'
+    hb = hgen.HTML()
+    t = hb.table(width="100%")
     for r in range(nRows):
-        t = t + '<tr>'
+        row = t.tr
         for c in range(len(map_list[r])):
             currMap = map_list[r][c]
             currMap._build_map()
-            #print currMap.HTML
-            t = t + '<td><iframe srcdoc="{srcdoc}" style="width: 100%; height: 510px; border: none"></iframe>'.format(srcdoc=currMap.HTML.replace('"', '&quot;'))+"</td>"
-        t = t + "</tr>"
-    t = t + "</table></body></html>"
+            row.td('<iframe srcdoc="{srcdoc}" style="width: 100%; height: 510px; border: none"></iframe>'.format(srcdoc=currMap.HTML.replace('"', '&quot;')))
     return idisp.HTML('<iframe srcdoc="{srcdoc}" style="width: 100%; height: {ht}px; border: none"></iframe>'.format(srcdoc=str(t).replace('"', '&quot;'), ht=510*nRows))
  
 def embed_map(map, path="map.html"):
