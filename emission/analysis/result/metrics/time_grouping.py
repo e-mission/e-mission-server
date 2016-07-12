@@ -118,8 +118,10 @@ def _get_local_key_to_fill_fn(local_freq):
 #
 # For now, we use the start of the day in the timezone of the first section of
 # the day.
-# Since timestamps do increase monotonically, and we know that the
-# user was in the last timezone at the end of the day, this seems to make sense.
+# Since timestamps do increase monotonically, sections are binned by start time,
+# and we know that the user was in the first timezone at the beginning of the day,
+# this seems to make sense.
+#
 # Concretely, India is 5 hours ahead of UTC and the US West Coast is 7-8 hours
 # behind UTC.
 # So it is possible to fly from India to the US and arrive at the same local time
@@ -144,37 +146,37 @@ def _get_local_key_to_fill_fn(local_freq):
 # So the end timestamp for that very long day would be 1456905599
 
 def local_dt_fill_times_daily(key, section_group_df, metric_summary):
-    last_tz = _get_tz(section_group_df)
+    first_tz = _get_tz(section_group_df)
     ld = ecwl.LocalDate({'year': key[0],
                          'month': key[1],
                          'day': key[2],
-                         'timezone': last_tz})
-    dt = arrow.Arrow(ld.year, ld.month, ld.day, tzinfo=last_tz
-                     ).ceil('day')
+                         'timezone': first_tz})
+    dt = arrow.Arrow(ld.year, ld.month, ld.day, tzinfo=first_tz
+                     ).floor('day')
     metric_summary.ts = dt.timestamp
     metric_summary.local_dt = ld
     metric_summary.fmt_time = dt.format("YYYY-MM-DD")
 
 def local_dt_fill_times_monthly(key, section_group_df, metric_summary):
-    last_tz = _get_tz(section_group_df)
+    first_tz = _get_tz(section_group_df)
     ld = ecwl.LocalDate({'year': key[0],
                          'month': key[1],
-                         'timezone': last_tz})
+                         'timezone': first_tz})
     dt = arrow.Arrow(ld.year, ld.month, 1,
-                     tzinfo=last_tz).ceil('month')
+                     tzinfo=first_tz).floor('month')
     metric_summary.ts = dt.timestamp
     metric_summary.local_dt = ld
     metric_summary.fmt_time = dt.format("YYYY-MM")
 
 def local_dt_fill_times_yearly(key, section_group_df, metric_summary):
-    last_tz = _get_tz(section_group_df)
+    first_tz = _get_tz(section_group_df)
     ld = ecwl.LocalDate({'year': key[0],
-                         'timezone': last_tz})
-    dt = arrow.Arrow(ld.year, 1, 1, tzinfo=last_tz
-                     ).ceil('year')
+                         'timezone': first_tz})
+    dt = arrow.Arrow(ld.year, 1, 1, tzinfo=first_tz
+                     ).floor('year')
     metric_summary.ts = dt.timestamp
     metric_summary.local_dt = ld
     metric_summary.fmt_time = dt.format("YYYY")
 
 def _get_tz(section_group_df):
-    return section_group_df.sort_values(by='start_ts').tail(1).end_local_dt_timezone.iloc[0]
+    return section_group_df.sort_values(by='start_ts').head(1).start_local_dt_timezone.iloc[0]

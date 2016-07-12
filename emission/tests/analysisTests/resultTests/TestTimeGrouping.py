@@ -17,6 +17,7 @@ import emission.core.wrapper.entry as ecwe
 import emission.core.wrapper.section as ecws
 import emission.core.wrapper.modestattimesummary as ecwms
 import emission.core.wrapper.motionactivity as ecwm
+import emission.core.wrapper.localdate as ecwl
 
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.analysis_timeseries_queries as esda
@@ -97,7 +98,7 @@ class TestTimeGrouping(unittest.TestCase):
         ms = ecwms.ModeStatTimeSummary()
         earmt.local_dt_fill_times_daily(key, section_group_df, ms)
         logging.debug("before starting checks, ms = %s" % ms)
-        self.assertEqual(ms.ts, 1462345199)
+        self.assertEqual(ms.ts, 1462258800)
         self.assertEqual(ms.local_dt.day, 3)
         self.assertEqual(ms.local_dt.timezone, PST)
 
@@ -141,9 +142,9 @@ class TestTimeGrouping(unittest.TestCase):
                          [1462217400, 1462273200])
         self.assertEqual(next_day_first_trip.data.start_ts, 1462345200)
 
-        # The timezone for the end time is EST since that's where we ended
-        # the last trip
-        self.assertEqual(earmt._get_tz(section_group_df), PST)
+        # The timezone for the end time is IST since that's where we started
+        # the first trip
+        self.assertEqual(earmt._get_tz(section_group_df), IST)
 
         ms = ecwms.ModeStatTimeSummary()
         earmt.local_dt_fill_times_daily(key, section_group_df, ms)
@@ -176,9 +177,9 @@ class TestTimeGrouping(unittest.TestCase):
         # e.g. reverse trip
         # maybe using the end of the section is best after all
 
-        self.assertEqual(ms.ts, 1462345199)
+        self.assertEqual(ms.ts, 1462213800)
         self.assertEqual(ms.local_dt.day, 3)
-        self.assertEqual(ms.local_dt.timezone, PST)
+        self.assertEqual(ms.local_dt.timezone, IST)
         self.assertGreater(next_day_first_trip.data.start_ts, ms.ts)
 
     def testLocalDtFillTimesDailyMultiTzGoingEast(self):
@@ -233,17 +234,17 @@ class TestTimeGrouping(unittest.TestCase):
         self.assertEqual(section_group_df.start_ts.tolist(),
                          [1462262400, 1462294800])
 
-        # The timezone for the end time is EST since that's where we started
-        # the last trip from
-        self.assertEqual(earmt._get_tz(section_group_df), BST)
+        # The timezone for the end time is PST since that's where we started
+        # the first trip from
+        self.assertEqual(earmt._get_tz(section_group_df), PST)
 
         ms = ecwms.ModeStatTimeSummary()
         earmt.local_dt_fill_times_daily(key, section_group_df, ms)
         logging.debug("before starting checks, ms = %s" % ms)
 
-        self.assertEqual(ms.ts, 1462316399)
+        self.assertEqual(ms.ts, 1462258800)
         self.assertEqual(ms.local_dt.day, 3)
-        self.assertEqual(ms.local_dt.timezone, BST)
+        self.assertEqual(ms.local_dt.timezone, PST)
 
         # This test fails if it is not BST
         self.assertGreater(next_day_first_trip.data.start_ts, ms.ts)
@@ -260,7 +261,98 @@ class TestTimeGrouping(unittest.TestCase):
             s['data'] = dw
             self.ts.update(s)
 
-    def testGroupedByTimestamp(self):
+
+    def testGroupedByOneLocalDayOneUTCDay(self):
+        key = (2016, 5, 3)
+        test_section_list = []
+        #
+        # Since PST is UTC-7, all of these will be in the same UTC day
+        # 13:00, 17:00, 21:00
+        # so we expect the local date and UTC bins to be the same
+        test_section_list.append(
+            self._createTestSection(arrow.Arrow(2016,5,3,6, tzinfo=tz.gettz(PST)),
+                                    PST))
+        test_section_list.append(
+            self._createTestSection(arrow.Arrow(2016,5,3,10, tzinfo=tz.gettz(PST)),
+                                    PST))
+        test_section_list.append(
+            self._createTestSection(arrow.Arrow(2016,5,3,14, tzinfo=tz.gettz(PST)),
+                                    PST))
+
+        self._fillModeDistanceDuration(test_section_list)
+        logging.debug("durations = %s" %
+                      [s.data.duration for s in test_section_list])
+
+        summary_ts = earmt.group_by_timestamp(self.testUUID,
+                                           arrow.Arrow(2016,5,1).timestamp,
+                                           arrow.Arrow(2016,6,1).timestamp,
+                                           'd', earmts.get_count)
+        summary_ld = earmt.group_by_local_date(self.testUUID,
+                                               ecwl.LocalDate({'year': 2016, 'month': 5}),
+                                               ecwl.LocalDate({'year': 2016, 'month': 6}),
+                                               earmt.LocalFreq.DAILY, earmts.get_count)
+
+        self.assertEqual(len(summary_ts), len(summary_ld)) # local date and UTC results are the same
+        self.assertEqual(len(summary_ts), 1) # spans one day
+        self.assertEqual(summary_ts[0].BICYCLING, summary_ld[0].BICYCLING)
+        self.assertEqual(summary_ts[0].BICYCLING, 3)
+        # Note that the timestamps are not guaranteed to be equal since
+        # the UTC range starts at midnight UTC while the local time range
+        # starts at midnight PDT
+        # self.assertEqual(summary_ts[0].ts, summary_ld[0].ts)
+        self.assertEqual(summary_ts[0].ts, 1462233600)
+        self.assertEqual(summary_ld[0].ts, 1462258800)
+        self.assertEqual(summary_ts[0].local_dt.day, 3)
+        self.assertEqual(summary_ts[0].local_dt.day, summary_ld[0].local_dt.day)
+
+
+    def testGroupedByOneLocalDayMultiUTCDay(self):
+        key = (2016, 5, 3)
+        test_section_list = []
+
+        test_section_list.append(
+            self._createTestSection(arrow.Arrow(2016,5,3,6, tzinfo=tz.gettz(PST)),
+                                    PST))
+        test_section_list.append(
+            self._createTestSection(arrow.Arrow(2016,5,3,10, tzinfo=tz.gettz(PST)),
+                                    PST))
+        test_section_list.append(
+            self._createTestSection(arrow.Arrow(2016,5,3,23, tzinfo=tz.gettz(PST)),
+                                    PST))
+
+        self._fillModeDistanceDuration(test_section_list)
+        logging.debug("durations = %s" %
+                      [s.data.duration for s in test_section_list])
+
+        # There's only one local date, so it will be consistent with
+        # results in testGroupedByOneLocalDayOneUTCDay
+        summary_ld = earmt.group_by_local_date(self.testUUID,
+                                               ecwl.LocalDate({'year': 2016, 'month': 5}),
+                                               ecwl.LocalDate({'year': 2016, 'month': 6}),
+                                               earmt.LocalFreq.DAILY, earmts.get_count)
+
+        self.assertEqual(len(summary_ld), 1) # spans one day
+        self.assertEqual(summary_ld[0].BICYCLING, 3)
+        self.assertEqual(summary_ld[0].ts, 1462258800)
+        self.assertEqual(summary_ld[0].local_dt.day, 3)
+
+        summary_ts = earmt.group_by_timestamp(self.testUUID,
+                                           arrow.Arrow(2016,5,1).timestamp,
+                                           arrow.Arrow(2016,6,1).timestamp,
+                                           'd', earmts.get_count)
+
+        # But 23:00 PDT is 6am on the 4th in UTC,
+        # so the results are different for this
+
+        self.assertEqual(len(summary_ts), 2) # spans two days in UTC
+        self.assertEqual(summary_ts[0].BICYCLING, 2) # 2 trips on the first day
+        self.assertEqual(summary_ts[1].BICYCLING, 1) # 1 trips on the second day
+        self.assertEqual(summary_ts[0].local_dt.day, 3) # because it is the second in UTC
+        self.assertEqual(summary_ts[1].local_dt.day, 4) # because it is the second in UTC
+        self.assertEqual(summary_ts[0].ts, 1462233600) # timestamp for midnight 3nd May
+        self.assertEqual(summary_ts[1].ts, 1462320000) # timestamp for midnight 4rd May
+
+    def testGroupedByOneLocalDayMultiTzGoingWest(self):
         key = (2016, 5, 3)
         test_section_list = []
         # This is perhaps an extreme use case, but it is actually a fairly
@@ -278,7 +370,97 @@ class TestTimeGrouping(unittest.TestCase):
             self._createTestSection(arrow.Arrow(2016,5,3,7, tzinfo=tz.gettz(EST)),
                                     EST))
 
+        # Step 3: user starts a trip out of SFO a midnight of the 4th PST
+        # (earliest possible trip)
+        # for our timestamp algo to be correct, this has to be after the
+        # timestamp for the range
+        next_day_first_trip = self._createTestSection(
+            arrow.Arrow(2016,5,4,0, tzinfo=tz.gettz(PST)),
+        PST)
+
         self._fillModeDistanceDuration(test_section_list)
+        self._fillModeDistanceDuration([next_day_first_trip])
+        logging.debug("durations = %s" %
+                      [s.data.duration for s in test_section_list])
+
+        summary_ts = earmt.group_by_timestamp(self.testUUID,
+                                           arrow.Arrow(2016,5,1).timestamp,
+                                           arrow.Arrow(2016,6,1).timestamp,
+                                           'd', earmts.get_count)
+
+        logging.debug(summary_ts)
+
+        self.assertEqual(len(summary_ts), 3) # spans two days in UTC
+        self.assertEqual(summary_ts[0].BICYCLING, 1) # trip leaving India
+        self.assertEqual(summary_ts[1].BICYCLING, 1) # trip from New York
+        self.assertEqual(summary_ts[2].BICYCLING, 1) # trip in SF
+        self.assertEqual(summary_ts[0].local_dt.day, 2) # because it is the second in UTC
+        self.assertEqual(summary_ts[1].local_dt.day, 3)
+        self.assertEqual(summary_ts[2].local_dt.day, 4)
+        self.assertEqual(summary_ts[0].local_dt.hour, 0) # timestamp fills out all vals
+        self.assertEqual(summary_ts[0].ts, 1462147200) # timestamp for start of 2nd May in UTC
+        self.assertEqual(summary_ts[1].ts, 1462233600) # timestamp for start of 2nd May in UTC
+
+        # There's only one local date, but it starts in IST this time
+        summary_ld = earmt.group_by_local_date(self.testUUID,
+                                               ecwl.LocalDate({'year': 2016, 'month': 5}),
+                                               ecwl.LocalDate({'year': 2016, 'month': 6}),
+                                               earmt.LocalFreq.DAILY, earmts.get_count)
+
+        self.assertEqual(len(summary_ld), 2) # spans one day + 1 trip at midnight
+        self.assertEqual(summary_ld[0].BICYCLING, 2) # two plane trips
+        self.assertEqual(summary_ld[1].BICYCLING, 1) # trip SFO
+        self.assertEqual(summary_ld[0].ts, 1462213800) # start of the 3rd in IST
+        self.assertEqual(summary_ld[0].local_dt.day, 3)
+        self.assertEqual(summary_ld[1].ts, 1462345200) # start of the 4th in IST
+        self.assertEqual(summary_ld[1].local_dt.day, 4)
+
+    def testGroupedByOneLocalDayMultiTzGoingEast(self):
+        key = (2016, 5, 3)
+        test_section_list = []
+        # This is perhaps an extreme use case, but it is actually a fairly
+        # common one with air travel
+
+        # Step 1: user leaves SFO at 1am on the 3rd for JFK on a cross-country flight
+        test_section_list.append(
+            self._createTestSection(arrow.Arrow(2016,5,3,1, tzinfo=tz.gettz(PST)),
+                                    PST))
+        # cross-country takes 8 hours, so she arrives in New York at 9:00 IST = 12:00am EDT
+        # (taking into account the time difference)
+        test_section_list[0]['data'] = self._fillDates(test_section_list[0].data, "end_",
+                                                       arrow.Arrow(2016,5,3,9,tzinfo=tz.gettz(PST)),
+                                                       EST)
+
+        # Step 2: user leaves JFK for LHR at 1pm EST.
+        test_section_list.append(
+            self._createTestSection(arrow.Arrow(2016,5,3,13, tzinfo=tz.gettz(EST)),
+                                    EST))
+
+        # cross-atlantic flight takes 7 hours, so she arrives at LHR at 8:00pm EDT
+        # = 2am on the 4th local time
+        test_section_list[1]['data'] = self._fillDates(test_section_list[1].data, "end_",
+                                                       arrow.Arrow(2016,5,3,21,tzinfo=tz.gettz(EST)),
+                                                       BST)
+
+        # Then, she catches the train from the airport to her hotel in London
+        # at 3am local time = 9:00pm EST
+        # So as per local time, this is a new trip
+        #
+        # This clearly indicates why we need to use the timezone of the end of
+        # last section to generate the timestamp for the range. If we use the
+        # timezone of the beginning of the trip, we will say that the range ends
+        # at midnight EST. But then it should include the next_day_first_trip,
+        # which starts at 9pm EST, but it does not.
+        # So we should use midnight BST instead. Note that midnight BST was
+        # actually during the trip, but then it is no different from a regular
+        # trip (in one timezone) where the trip spans the date change
+        next_day_first_trip = self._createTestSection(
+            arrow.Arrow(2016,5,4,3, tzinfo=tz.gettz(BST)),
+            BST)
+
+        self._fillModeDistanceDuration(test_section_list)
+        self._fillModeDistanceDuration([next_day_first_trip])
+
         logging.debug("durations = %s" %
                       [s.data.duration for s in test_section_list])
 
@@ -290,14 +472,27 @@ class TestTimeGrouping(unittest.TestCase):
         logging.debug(summary)
 
         self.assertEqual(len(summary), 2) # spans two days in UTC
-        self.assertEqual(summary[0].BICYCLING, 1) # trip leaving India
-        self.assertEqual(summary[0].local_dt.day, 2) # because it is the second in UTC
-        self.assertEqual(summary[0].local_dt.hour, 0) # because it is the second in UTC
-        self.assertEqual(summary[0].ts, 1462147200) # timestamp for
+        self.assertEqual(summary[0].BICYCLING, 2) # trip leaving SFO and JFK
+        self.assertEqual(summary[1].BICYCLING, 1) # trip in GMT
+        self.assertEqual(summary[0].local_dt.day, 3) # because it is the second in UTC
+        self.assertEqual(summary[1].local_dt.day, 4)
+        self.assertEqual(summary[0].local_dt.hour, 0) # timestamp fills out all vals
+        self.assertEqual(summary[0].ts, 1462233600) # timestamp for start of 2nd May in UTC
+        self.assertEqual(summary[1].ts, 1462320000) # timestamp for start of 2nd May in UTC
 
+        # There's only one local date, but it starts in IST this time
+        summary_ld = earmt.group_by_local_date(self.testUUID,
+                                               ecwl.LocalDate({'year': 2016, 'month': 5}),
+                                               ecwl.LocalDate({'year': 2016, 'month': 6}),
+                                               earmt.LocalFreq.DAILY, earmts.get_count)
 
-
-
+        self.assertEqual(len(summary_ld), 2) # spans one day + 1 trip on the next day
+        self.assertEqual(summary_ld[0].BICYCLING, 2) # two plane trips
+        self.assertEqual(summary_ld[1].BICYCLING, 1) # trip SFO
+        self.assertEqual(summary_ld[0].ts, 1462258800) # start of the 3rd in IST
+        self.assertEqual(summary_ld[0].local_dt.day, 3)
+        self.assertEqual(summary_ld[1].ts, 1462316400) # start of the 4th in BST
+        self.assertEqual(summary_ld[1].local_dt.day, 4)
 
 
 if __name__ == '__main__':
