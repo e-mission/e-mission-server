@@ -179,4 +179,7 @@ def local_dt_fill_times_yearly(key, section_group_df, metric_summary):
     metric_summary.fmt_time = dt.format("YYYY")
 
 def _get_tz(section_group_df):
-    return section_group_df.sort_values(by='start_ts').head(1).start_local_dt_timezone.iloc[0]
+    # return section_group_df.sort_values(by='start_ts').head(1).start_local_dt_timezone.iloc[0]
+    # Jenkins version of pandas doesn't support sort_values.
+    # So let's go back to sort in spite of the deprecation warning
+    return section_group_df.sort('start_ts').head(1).start_local_dt_timezone.iloc[0]
