@@ -25,7 +25,7 @@ class ModeStatTimeSummary(ecwb.WrapperBase):
     enums = {}
     geojson = []
     nullable = []
-    local_dates = ['end_local_dt']
+    local_dates = ['local_dt']
 
     def _populateDependencies(self):
         pass
