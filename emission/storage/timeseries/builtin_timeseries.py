@@ -86,10 +86,11 @@ class BuiltinTimeSeries(esta.TimeSeries):
         entry = ecwe.Entry(entry_dict)
         ret_val = entry.data
         for ld_key in ret_val.local_dates:
-            for field_key in ret_val[ld_key]:
-                expanded_key = "%s_%s" % (ld_key,field_key)
-                ret_val[expanded_key] = ret_val[ld_key][field_key]
-            del ret_val[ld_key]
+            if ld_key in ret_val:
+                for field_key in ret_val[ld_key]:
+                    expanded_key = "%s_%s" % (ld_key,field_key)
+                    ret_val[expanded_key] = ret_val[ld_key][field_key]
+                del ret_val[ld_key]
         ret_val["_id"] = entry["_id"]
         ret_val["metadata_write_ts"] = entry["metadata"]["write_ts"]
         # logging.debug("ret_val = %s " % ret_val)
