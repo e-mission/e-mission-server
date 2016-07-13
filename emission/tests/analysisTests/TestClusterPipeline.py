@@ -24,10 +24,7 @@ class ClusterPipelineTests(unittest.TestCase):
     def import_test_info(self):
 	etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
         eaicf.filter_accuracy(self.testUUID)
-	estfm.move_all_filters_to_data()
-	eaist.segment_current_trips(self.testUUID)
-        eaiss.segment_current_sections(self.testUUID)
-	eaicr.clean_and_resample(self.testUUID)
+	etc.runIntakePipeline(self.testUUID)
 
     def testSanity(self):
 		cp.main(self.testUUID)
