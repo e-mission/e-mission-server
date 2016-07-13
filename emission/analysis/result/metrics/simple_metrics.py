@@ -2,14 +2,10 @@ import numpy as np
 
 def get_summary_fn(key):
     summary_fn_map = {
-        "metrics/daily_user_count": get_count,
-        "metrics/daily_mean_count": get_count,
-        "metrics/daily_user_distance": get_distance,
-        "metrics/daily_mean_distance": get_distance,
-        "metrics/daily_user_duration": get_duration,
-        "metrics/daily_mean_duration": get_duration,
-        "metrics/daily_user_median_speed": get_median_speed,
-        "metrics/daily_mean_median_speed": get_median_speed
+        "count": get_count,
+        "distance": get_distance,
+        "duration": get_duration,
+        "median_speed": get_median_speed
     }
     return summary_fn_map[key]
 

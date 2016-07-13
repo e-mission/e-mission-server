@@ -36,7 +36,7 @@ class TestMetrics(unittest.TestCase):
     def testCountTimestampMetrics(self):
         met_result = metrics.summarize_by_timestamp(self.testUUID,
                                        self.day_start_ts, self.day_end_ts,
-                                       'd', 'metrics/daily_user_count')
+                                       'd', 'count')
         logging.debug(met_result)
 
         self.assertEqual(met_result.keys(), ['aggregate_metrics', 'user_metrics'])
@@ -59,7 +59,7 @@ class TestMetrics(unittest.TestCase):
         met_result = metrics.summarize_by_local_date(self.testUUID,
                                                      ecwl.LocalDate({'year': 2015, 'month': 8}),
                                                      ecwl.LocalDate({'year': 2015, 'month': 9}),
-                                                     'DAILY', 'metrics/daily_user_count')
+                                                     'DAILY', 'count')
         self.assertEqual(met_result.keys(), ['aggregate_metrics', 'user_metrics'])
         user_met_result = met_result['user_metrics']
         agg_met_result = met_result['aggregate_metrics']
