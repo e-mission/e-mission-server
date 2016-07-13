@@ -28,9 +28,9 @@ angular.module('starter.metrics', ['nvd3'])
             // clipVoronoi: false,
 
             xAxis: {
-                axisLabel: 'X Axis',
+                axisLabel: 'Date',
                 tickFormat: function(d) {
-                    return d3.time.format('%m/%d/%y')(new Date(d * 1000))
+                    return d3.time.format('%y-%m-%d')(new Date(d * 1000))
                 },
                 showMaxMin: false,
                 staggerLabels: true
@@ -88,16 +88,16 @@ angular.module('starter.metrics', ['nvd3'])
             val_arrays = 
             $scope.data.push({key: mode, values: mode_bins[mode]});
         }
-        $scope.options.
-        $scope.options.yAxis.axisLabel = $scope.metricLabelMap[$scope.selectCtrl.metricString];
-    };
 
-    $scope.metricLabelMap = [
-      {text: "COUNT", value:'Number'},
-      {text: "DISTANCE", value: 'km'},
-      {text: "DURATION", value: 'secs'},
-      {text: "MEDIAN_SPEED", value: 'km/sec'}
-    ];
+        var metricLabelMap = {
+           "COUNT":'Number',
+           "DISTANCE": 'm',
+           "DURATION": 'secs',
+           "MEDIAN_SPEED": 'm/sec'
+        };
+
+        $scope.options.chart.yAxis.axisLabel = metricLabelMap[$scope.selectCtrl.metricString];
+    };
 
     $scope.metricOptions = [
       {text: "COUNT", value:'count'},
