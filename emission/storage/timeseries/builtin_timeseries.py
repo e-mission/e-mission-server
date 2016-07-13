@@ -70,7 +70,8 @@ class BuiltinTimeSeries(esta.TimeSeries):
         :param extra_query_list: additional queries for mode, etc
         :return:
         """
-        ret_query = self.user_query
+        ret_query = {}
+        ret_query.update(self.user_query)
         if key_list is not None and len(key_list) > 0:
             key_query_list = []
             for key in key_list:
@@ -86,6 +87,8 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 curr_keys = set(ret_query.keys())
                 overlap_keys = eq_keys.intersection(curr_keys)
                 if len(overlap_keys) != 0:
+                    logging.info("eq_keys = %s, curr_keys = %s, overlap_keys = %s" %
+                                 (eq_keys, curr_keys, overlap_keys))
                     raise AttributeError("extra query would overwrite keys %s" %
                                          list(overlap_keys))
                 else:
