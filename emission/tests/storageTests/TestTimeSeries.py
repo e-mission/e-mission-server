@@ -57,7 +57,7 @@ class TestTimeSeries(unittest.TestCase):
         df = ts.get_data_df("background/filtered_location", tq)
         self.assertEqual(len(df), 327)
         logging.debug("df.columns = %s" % df.columns)
-        self.assertEqual(len(df.columns), 20)
+        self.assertEqual(len(df.columns), 21)
 
     def testExtraQueries(self):
         ts = esta.TimeSeries.get_time_series(self.testUUID)

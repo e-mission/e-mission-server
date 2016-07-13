@@ -19,7 +19,10 @@ class ModeStatTimeSummary(ecwb.WrapperBase):
     props.update(
         {'ts': ecwb.WrapperBase.Access.WORM,  # YYYY-MM-DD
          'local_dt': ecwb.WrapperBase.Access.WORM,
-         'fmt_time': ecwb.WrapperBase.Access.WORM}    # YYYY-MM-DD
+         'fmt_time': ecwb.WrapperBase.Access.WORM,
+         'nUsers': ecwb.WrapperBase.Access.WORM} # Relevant in the
+        # aggregate case, when we want to see how many users we have
+        # aggregated data from so that we can compute avg, etc
     )
 
     enums = {}

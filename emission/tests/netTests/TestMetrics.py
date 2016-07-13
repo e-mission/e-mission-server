@@ -50,6 +50,7 @@ class TestMetrics(unittest.TestCase):
         agg_met_result = met_result['aggregate_metrics']
 
         self.assertEqual(len(user_met_result), 2)
+        self.assertEqual([m.nUsers for m in user_met_result], [1,1])
         self.assertEqual(user_met_result[0].local_dt.day, 27)
         self.assertEqual(user_met_result[1].local_dt.day, 28)
         self.assertEqual(user_met_result[0].ON_FOOT, 4)
@@ -61,6 +62,8 @@ class TestMetrics(unittest.TestCase):
         # data for two days in the database, the aggregate data
         # must be at least that much larger than the original data.
         self.assertEqual(len(agg_met_result), 8)
+        # no overlap between users at the daily level
+        self.assertEqual([m.nUsers for m in agg_met_result], [1,1,0,0,0,0,1,1])
 
 
     def testCountLocalDateMetrics(self):
@@ -76,12 +79,15 @@ class TestMetrics(unittest.TestCase):
 
         # local timezone means that we only have one entry
         self.assertEqual(len(user_met_result), 1)
+        self.assertEqual(user_met_result[0].nUsers, 1)
         self.assertEqual(user_met_result[0].ON_FOOT, 6)
         self.assertEqual(user_met_result[0].BICYCLING, 4)
         self.assertEqual(user_met_result[0].IN_VEHICLE, 5)
         # We are not going to make assertions about the aggregate values since
         # they are affected by other entries in the database but we expect them
         # to be at least as much as the user values
+        self.assertEqual(len(agg_met_result), 1)
+        self.assertEqual(agg_met_result[0].nUsers, 2)
         self.assertGreaterEqual(agg_met_result[0].BICYCLING,
                                 user_met_result[0].BICYCLING + 1) # 21s has one bike trip
         self.assertGreaterEqual(agg_met_result[0].ON_FOOT,

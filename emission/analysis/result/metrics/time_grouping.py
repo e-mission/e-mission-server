@@ -83,6 +83,7 @@ def grouped_to_summary(time_grouped_df, key_to_fill_fn, summary_fn):
     for key, section_group_df in time_grouped_df:
         curr_msts = ecwms.ModeStatTimeSummary()
         key_to_fill_fn(key, section_group_df, curr_msts)
+        curr_msts.nUsers = len(section_group_df.user_id.unique())
         mode_grouped_df = section_group_df.groupby('sensed_mode')
         mode_results = summary_fn(mode_grouped_df)
         for mode, result in mode_results.iteritems():
