@@ -1,5 +1,6 @@
 import unittest
 import logging
+import arrow
 
 import emission.core.get_database as edb
 import emission.core.wrapper.localdate as ecwl
@@ -87,6 +88,26 @@ class TestMetrics(unittest.TestCase):
                                 user_met_result[0].ON_FOOT + 3) # 21s has one bike trip
         self.assertGreaterEqual(agg_met_result[0].IN_VEHICLE,
                                 user_met_result[0].IN_VEHICLE + 3) # 21s has one bike trip
+
+    def testCountNoEntries(self):
+        # Ensure that we don't crash if we don't find any entries
+        # Should return empty array instead
+        # Unlike in https://amplab.cs.berkeley.edu/jenkins/job/e-mission-server-prb/591/
+        met_result_ld = metrics.summarize_by_local_date(self.testUUID,
+                                                     ecwl.LocalDate({'year': 2000}),
+                                                     ecwl.LocalDate({'year': 2001}),
+                                                     'MONTHLY', 'count')
+        self.assertEqual(met_result_ld.keys(), ['aggregate_metrics', 'user_metrics'])
+        self.assertEqual(met_result_ld['aggregate_metrics'], [])
+        self.assertEqual(met_result_ld['user_metrics'], [])
+
+        met_result_ts = metrics.summarize_by_timestamp(self.testUUID,
+                                                       arrow.get(2000,1,1).timestamp,
+                                                       arrow.get(2001,1,1).timestamp,
+                                                        'm', 'count')
+        self.assertEqual(met_result_ts.keys(), ['aggregate_metrics', 'user_metrics'])
+        self.assertEqual(met_result_ts['aggregate_metrics'], [])
+        self.assertEqual(met_result_ts['user_metrics'], [])
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)

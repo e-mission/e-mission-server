@@ -32,6 +32,9 @@ def group_by_timestamp(user_id, start_ts, end_ts, freq, summary_fn):
     section_df = esda.get_data_df(esda.CLEANED_SECTION_KEY,
                                   user_id=user_id, time_query=time_query,
                                   geo_query=None)
+    if len(section_df) == 0:
+        logging.info("Found no entries for user %s, time_query %s" % (user_id, time_query))
+        return []
     logging.debug("first row is %s" % section_df.iloc[0])
     secs_to_nanos = lambda x: x * 10 ** 9
     section_df['start_dt'] = pd.to_datetime(secs_to_nanos(section_df.start_ts))
@@ -66,6 +69,9 @@ def group_by_local_date(user_id, from_dt, to_dt, freq, summary_fn):
     section_df = esda.get_data_df(esda.CLEANED_SECTION_KEY,
                                   user_id=user_id, time_query=time_query,
                                   geo_query=None)
+    if len(section_df) == 0:
+        logging.info("Found no entries for user %s, time_query %s" % (user_id, time_query))
+        return []
     groupby_arr = _get_local_group_by(freq)
     time_grouped_df = section_df.groupby(groupby_arr)
     local_dt_fill_fn = _get_local_key_to_fill_fn(freq)
