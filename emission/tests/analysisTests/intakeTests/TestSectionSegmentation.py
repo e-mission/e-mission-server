@@ -64,6 +64,15 @@ class TestSectionSegmentation(unittest.TestCase):
         test_trip = ecwrt.Rawtrip()
         test_trip.start_ts = 1440695152.989
         test_trip.start_fmt_time = "2015-08-27 10:05:52.989000-07:00"
+        test_trip.start_local_dt = {
+            'year': 2015,
+            'month': 8,
+            'day': 27,
+            'hour': 10,
+            'minute': 5,
+            'second': 52,
+            'timezone': "America/Los_Angeles"
+        }
         test_trip.start_loc = {
                 "type": "Point",
                 "coordinates": [
@@ -74,6 +83,15 @@ class TestSectionSegmentation(unittest.TestCase):
 
         test_trip.end_ts = 1440699266.669
         test_trip.end_fmt_time = "2015-08-27 11:14:26.669000-07:00"
+        test_trip.end_local_dt = {
+            'year': 2015,
+            'month': 8,
+            'day': 27,
+            'hour': 11,
+            'minute': 14,
+            'second': 26,
+            'timezone': "America/Los_Angeles"
+        }
         test_trip.end_loc = {
                 "type": "Point",
                 "coordinates": [

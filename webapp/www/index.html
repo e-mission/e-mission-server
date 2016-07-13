@@ -10,6 +10,7 @@
     <link href="lib/leaflet/dist/leaflet.css" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,700,500,300' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="lib/nvd3/build/nv.d3.css">
     <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
     <link href="css/ionic.app.css" rel="stylesheet">
     -->
@@ -24,6 +25,9 @@
     <script src="lib/ui-leaflet/dist/ui-leaflet.min.js"></script>
     <script src="lib/simple-leaflet-plugins/leaflet-heat.js"></script>
     <script src="lib/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+    <script src="lib/d3/d3.js"></script>
+    <script src="lib/nvd3/build/nv.d3.js"></script> <!-- or use another assembly -->
+    <script src="lib/angular-nvd3/dist/angular-nvd3.js"></script>
 
     <!-- cordova script (this will be a 404 during development) -->
     <script src="cordova.js"></script>
@@ -33,6 +37,8 @@
     <script src="js/controllers.js"></script>
     <script src="js/services.js"></script>
     <script src="js/directives.js"></script>
+    <script src="js/heatmap.js"></script>
+    <script src="js/metrics.js"></script>
   </head>
   <body ng-app="starter">
     <!--
@@ -43,7 +49,8 @@
       </ion-nav-back-button-->
       <ion-nav-buttons side="primary">
         <a class="button button-block button-calm icon-left ion-home" ui-sref="home">Home</a>
-        <a class="button button-block button-calm icon-left ion-ios-analytics" ui-sref="heatmap">Analysis</a>
+        <a class="button button-block button-calm icon-left ion-fireball" ui-sref="heatmap">Analysis</a>
+        <a class="button button-block button-calm icon-left ion-ios-analytics" ui-sref="metrics">Metrics</a>
         <a class="button button-block button-calm icon-left ion-android-compass" ui-sref="trip-planning">Trip Planning</a>
       </ion-nav-buttons>
     </ion-nav-bar>

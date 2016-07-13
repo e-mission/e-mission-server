@@ -9,6 +9,7 @@ import emission.core.get_database as edb
 import emission.storage.timeseries.timequery as estt
 import emission.storage.timeseries.tcquery as esttc
 import emission.storage.timeseries.abstract_timeseries as esta
+import emission.storage.timeseries.aggregate_timeseries as estag
 
 import emission.core.wrapper.localdate as ecwl
 
@@ -17,6 +18,9 @@ import emission.tests.common as etc
 
 class TestTimeSeries(unittest.TestCase):
     def setUp(self):
+        etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-21")
+        self.testUUID1 = self.testUUID
+        self.entries1 = self.entries
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
 
     def tearDown(self):
@@ -53,8 +57,17 @@ class TestTimeSeries(unittest.TestCase):
         df = ts.get_data_df("background/filtered_location", tq)
         self.assertEqual(len(df), 327)
         logging.debug("df.columns = %s" % df.columns)
-        self.assertEqual(len(df.columns), 13)
-        
+        self.assertEqual(len(df.columns), 21)
+
+    def testExtraQueries(self):
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        # Query for all of Aug
+        tq = estt.TimeQuery("metadata.write_ts", 1438387200, 1441065600)
+        ignored_phones = estag._get_ignore_test_phone_extra_query()
+        # user_id is in both the extra query and the base query
+        with self.assertRaises(AttributeError):
+            list(ts.find_entries(time_query=tq, extra_query_list=[ignored_phones]))
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     unittest.main()

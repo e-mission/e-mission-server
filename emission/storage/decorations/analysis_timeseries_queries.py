@@ -15,6 +15,14 @@ CLEANED_PLACE_KEY = "analysis/cleaned_place"
 CLEANED_SECTION_KEY = "analysis/cleaned_section"
 CLEANED_STOP_KEY = "analysis/cleaned_stop"
 CLEANED_LOCATION_KEY = "analysis/recreated_location"
+METRICS_DAILY_USER_COUNT = "metrics/daily_user_count"
+METRICS_DAILY_MEAN_COUNT = "metrics/daily_mean_count"
+METRICS_DAILY_USER_DISTANCE = "metrics/daily_user_distance"
+METRICS_DAILY_MEAN_DISTANCE = "metrics/daily_mean_distance"
+METRICS_DAILY_USER_DURATION = "metrics/daily_user_duration"
+METRICS_DAILY_MEAN_DURATION = "metrics/daily_mean_duration"
+METRICS_DAILY_USER_MEDIAN_SPEED = "metrics/daily_user_median_speed"
+METRICS_DAILY_MEAN_MEDIAN_SPEED = "metrics/daily_mean_median_speed"
 
 # General methods
 
@@ -32,23 +40,30 @@ def get_objects(key, user_id, time_query, geo_query=None):
 
 def get_entries(key, user_id, time_query, geo_query=None,
                 extra_query_list=None):
-    if user_id is not None:
-        ts = esta.TimeSeries.get_time_series(user_id)
-    else:
-        ts = esta.TimeSeries.get_aggregate_time_series()
+    ts = get_timeseries_for_user(user_id)
     doc_cursor = ts.find_entries([key], time_query, geo_query, extra_query_list)
     # TODO: Fix "TripIterator" and return it instead of this list
     curr_entry_list = [ecwe.Entry(doc) for doc in doc_cursor]
     logging.debug("Returning entry with length %d result" % len(curr_entry_list))
     return curr_entry_list
 
-def get_aggregate_places(key, time_query, geo_query=None):
-    result_cursor = esta.TimeSeries.get_aggregate_time_series().find_entries(
-        key_list=["data.location"], time_query=time_query)
-    return [ecwe.Entry(doc).data for doc in result_cursor]
+def get_data_df(key, user_id, time_query, geo_query=None,
+                extra_query_list=None):
+    ts = get_timeseries_for_user(user_id)
+    data_df = ts.get_data_df(key, time_query,
+                     geo_query, extra_query_list)
+    logging.debug("Returning entry with length %d result" % len(data_df))
+    return data_df
+
+def get_timeseries_for_user(user_id):
+    if user_id is not None:
+        ts = esta.TimeSeries.get_time_series(user_id)
+    else:
+        ts = esta.TimeSeries.get_aggregate_time_series()
+    logging.debug("for user %s, returning timeseries %s" % (user_id, ts))
+    return ts
 
 # Object-specific associations
-
 
 def get_time_query_for_trip_like(key, trip_like_id):
     """

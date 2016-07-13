@@ -3,6 +3,7 @@ import unittest
 import arrow
 import logging
 import uuid
+import pymongo
 
 # Our imports
 import emission.core.get_database as edb
@@ -56,7 +57,7 @@ class TestLocalDateQueries(unittest.TestCase):
         self.assertEqual(ret_entry.data.local_dt.weekday, 2)
         self.assertEqual(ret_entry.data.fmt_time, "2016-04-13T15:32:09-07:00")
 
-    def testLocalRangeQuery(self):
+    def testLocalRangeStandardQuery(self):
         """
         Search for all entries between 8:18 and 8:20 local time, both inclusive
         """
@@ -66,6 +67,27 @@ class TestLocalDateQueries(unittest.TestCase):
         final_query.update(esdl.get_range_query("data.local_dt", start_local_dt, end_local_dt))
         entries = edb.get_timeseries_db().find(final_query)
         self.assertEquals(15, entries.count())
+
+    def testLocalRangeRolloverQuery(self):
+        """
+        Search for all entries between 8:18 and 8:20 local time, both inclusive
+        """
+        start_local_dt = ecwl.LocalDate({'year': 2015, 'month': 8, 'hour': 8, 'minute': 18})
+        end_local_dt = ecwl.LocalDate({'year': 2015, 'month': 8, 'hour': 9, 'minute': 8})
+        final_query = {"user_id": self.testUUID}
+        final_query.update(esdl.get_range_query("data.local_dt", start_local_dt, end_local_dt))
+        entries = edb.get_timeseries_db().find(final_query).sort('data.ts', pymongo.ASCENDING)
+        self.assertEquals(448, entries.count())
+
+        entries_list = list(entries)
+
+        # Note that since this is a set of filters, as opposed to a range, this
+        # returns all entries between 18 and 8 in both hours.
+        # so 8:18 is valid, but so is 9:57
+        self.assertEqual(ecwe.Entry(entries_list[0]).data.local_dt.hour, 8)
+        self.assertEqual(ecwe.Entry(entries_list[0]).data.local_dt.minute, 18)
+        self.assertEqual(ecwe.Entry(entries_list[-1]).data.local_dt.hour, 9)
+        self.assertEqual(ecwe.Entry(entries_list[-1]).data.local_dt.minute, 57)
 
     def testLocalMatchingQuery(self):
         """

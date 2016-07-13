@@ -41,7 +41,15 @@ class Entry(ecwb.WrapperBase):
             "analysis/cleaned_place": "cleanedplace",
             "analysis/cleaned_section": "cleanedsection",
             "analysis/cleaned_stop": "stop",
-            "analysis/recreated_location": "recreatedlocation"
+            "analysis/recreated_location": "recreatedlocation",
+            "metrics/daily_user_count": "modestattimesummary",
+            "metrics/daily_mean_count": "modestattimesummary",
+            "metrics/daily_user_distance": "modestattimesummary",
+            "metrics/daily_mean_distance": "modestattimesummary",
+            "metrics/daily_user_duration": "modestattimesummary",
+            "metrics/daily_mean_duration": "modestattimesummary",
+            "metrics/daily_user_median_speed": "modestattimesummary",
+            "metrics/daily_mean_median_speed": "modestattimesummary"
             }
 
   @staticmethod

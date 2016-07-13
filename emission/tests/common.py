@@ -10,6 +10,12 @@ import pymongo
 from emission.core.get_database import get_client_db, get_db, get_section_db
 import emission.core.get_database as edb
 
+import emission.analysis.intake.cleaning.filter_accuracy as eaicf
+import emission.storage.timeseries.format_hacks.move_filter_field as estfm
+import emission.analysis.intake.segmentation.trip_segmentation as eaist
+import emission.analysis.intake.segmentation.section_segmentation as eaiss
+import emission.analysis.intake.cleaning.clean_and_resample as eaicr
+
 def makeValid(client):
   client.clientJSON['start_date'] = str(datetime.now() + timedelta(days=-2))
   client.clientJSON['end_date'] = str(datetime.now() + timedelta(days=+2))
@@ -104,4 +110,9 @@ def setupRealExample(testObj, dump_file):
                     [e["data"]["fmt_time"] for e in 
                         list(edb.get_timeseries_db().find({"user_id": testObj.testUUID}).sort("data.write_ts",
                                                                                        pymongo.ASCENDING).limit(10))])
-
+def runIntakePipeline(uuid):
+    eaicf.filter_accuracy(uuid)
+    estfm.move_all_filters_to_data()
+    eaist.segment_current_trips(uuid)
+    eaiss.segment_current_sections(uuid)
+    eaicr.clean_and_resample(uuid)

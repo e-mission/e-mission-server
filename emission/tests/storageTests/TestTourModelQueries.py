@@ -27,9 +27,7 @@ class TestTourModelQueries(unittest.TestCase):
         edb.get_common_place_db().drop()
 
     def testE2E(self):
-        eaist.segment_current_trips(self.testUUID)
-        eaiss.segment_current_sections(self.testUUID)
-        eaicr.clean_and_resample(self.testUUID)
+        etc.runIntakePipeline(self.testUUID)
         esdtmq.make_tour_model_from_raw_user_data(self.testUUID)
         tm = esdtmq.get_tour_model(self.testUUID)
         self.assertTrue(len(tm["common_trips"]) > 0)

@@ -1,0 +1,120 @@
+import unittest
+import logging
+import arrow
+
+import emission.core.get_database as edb
+import emission.core.wrapper.localdate as ecwl
+
+import emission.tests.common as etc
+
+import emission.analysis.intake.cleaning.filter_accuracy as eaicf
+
+import emission.storage.timeseries.format_hacks.move_filter_field as estfm
+import emission.storage.decorations.local_date_queries as esdldq
+
+from emission.net.api import metrics
+
+class TestMetrics(unittest.TestCase):
+    def setUp(self):
+        etc.setupRealExample(self,
+                             "emission/tests/data/real_examples/shankari_2015-aug-21")
+        self.testUUID1 = self.testUUID
+        etc.setupRealExample(self,
+                             "emission/tests/data/real_examples/shankari_2015-aug-27")
+        etc.runIntakePipeline(self.testUUID1)
+        etc.runIntakePipeline(self.testUUID)
+        logging.info(
+            "After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
+        self.aug_start_ts = 1438387200
+        self.aug_end_ts = 1441065600
+        self.day_start_dt = esdldq.get_local_date(self.aug_start_ts, "America/Los_Angeles")
+        self.day_end_dt = esdldq.get_local_date(self.aug_end_ts, "America/Los_Angeles")
+
+    def tearDown(self):
+        self.clearRelatedDb()
+
+    def clearRelatedDb(self):
+        edb.get_timeseries_db().remove({"user_id": self.testUUID})
+        edb.get_analysis_timeseries_db().remove({"user_id": self.testUUID})
+        edb.get_timeseries_db().remove({"user_id": self.testUUID1})
+        edb.get_analysis_timeseries_db().remove({"user_id": self.testUUID1})
+
+    def testCountTimestampMetrics(self):
+        met_result = metrics.summarize_by_timestamp(self.testUUID,
+                                                    self.aug_start_ts, self.aug_end_ts,
+                                       'd', 'count')
+        logging.debug(met_result)
+
+        self.assertEqual(met_result.keys(), ['aggregate_metrics', 'user_metrics'])
+        user_met_result = met_result['user_metrics']
+        agg_met_result = met_result['aggregate_metrics']
+
+        self.assertEqual(len(user_met_result), 2)
+        self.assertEqual([m.nUsers for m in user_met_result], [1,1])
+        self.assertEqual(user_met_result[0].local_dt.day, 27)
+        self.assertEqual(user_met_result[1].local_dt.day, 28)
+        self.assertEqual(user_met_result[0].ON_FOOT, 4)
+        self.assertEqual(user_met_result[0].BICYCLING, 2)
+        self.assertEqual(user_met_result[0].IN_VEHICLE, 3)
+        # We are not going to make absolute value assertions about
+        # the aggregate values since they are affected by other
+        # entries in the database. However, because we have at least
+        # data for two days in the database, the aggregate data
+        # must be at least that much larger than the original data.
+        self.assertEqual(len(agg_met_result), 8)
+        # no overlap between users at the daily level
+        self.assertEqual([m.nUsers for m in agg_met_result], [1,1,0,0,0,0,1,1])
+
+
+    def testCountLocalDateMetrics(self):
+        met_result = metrics.summarize_by_local_date(self.testUUID,
+                                                     ecwl.LocalDate({'year': 2015, 'month': 8}),
+                                                     ecwl.LocalDate({'year': 2015, 'month': 9}),
+                                                     'MONTHLY', 'count')
+        self.assertEqual(met_result.keys(), ['aggregate_metrics', 'user_metrics'])
+        user_met_result = met_result['user_metrics']
+        agg_met_result = met_result['aggregate_metrics']
+
+        logging.debug(met_result)
+
+        # local timezone means that we only have one entry
+        self.assertEqual(len(user_met_result), 1)
+        self.assertEqual(user_met_result[0].nUsers, 1)
+        self.assertEqual(user_met_result[0].ON_FOOT, 6)
+        self.assertEqual(user_met_result[0].BICYCLING, 4)
+        self.assertEqual(user_met_result[0].IN_VEHICLE, 5)
+        # We are not going to make assertions about the aggregate values since
+        # they are affected by other entries in the database but we expect them
+        # to be at least as much as the user values
+        self.assertEqual(len(agg_met_result), 1)
+        self.assertEqual(agg_met_result[0].nUsers, 2)
+        self.assertGreaterEqual(agg_met_result[0].BICYCLING,
+                                user_met_result[0].BICYCLING + 1) # 21s has one bike trip
+        self.assertGreaterEqual(agg_met_result[0].ON_FOOT,
+                                user_met_result[0].ON_FOOT + 3) # 21s has one bike trip
+        self.assertGreaterEqual(agg_met_result[0].IN_VEHICLE,
+                                user_met_result[0].IN_VEHICLE + 3) # 21s has one bike trip
+
+    def testCountNoEntries(self):
+        # Ensure that we don't crash if we don't find any entries
+        # Should return empty array instead
+        # Unlike in https://amplab.cs.berkeley.edu/jenkins/job/e-mission-server-prb/591/
+        met_result_ld = metrics.summarize_by_local_date(self.testUUID,
+                                                     ecwl.LocalDate({'year': 2000}),
+                                                     ecwl.LocalDate({'year': 2001}),
+                                                     'MONTHLY', 'count')
+        self.assertEqual(met_result_ld.keys(), ['aggregate_metrics', 'user_metrics'])
+        self.assertEqual(met_result_ld['aggregate_metrics'], [])
+        self.assertEqual(met_result_ld['user_metrics'], [])
+
+        met_result_ts = metrics.summarize_by_timestamp(self.testUUID,
+                                                       arrow.get(2000,1,1).timestamp,
+                                                       arrow.get(2001,1,1).timestamp,
+                                                        'm', 'count')
+        self.assertEqual(met_result_ts.keys(), ['aggregate_metrics', 'user_metrics'])
+        self.assertEqual(met_result_ts['aggregate_metrics'], [])
+        self.assertEqual(met_result_ts['user_metrics'], [])
+
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
+    unittest.main()

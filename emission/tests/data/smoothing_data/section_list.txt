@@ -24,6 +24,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-21 18:26:18.427000-07:00", 
+            "end_local_dt": {
+                "hour": 18, 
+                "month": 8, 
+                "second": 18, 
+                "weekday": 4, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 21, 
+                "minute": 26
+            }, 
             "duration": 1201.5220000743866, 
             "end_stop": {
                 "$oid": "56081ad3f6858f3a71f65e5e"
@@ -33,6 +43,16 @@
             }, 
             "trip_id": {
                 "$oid": "56081ad3f6858f3a71f65e1f"
+            }, 
+            "start_local_dt": {
+                "hour": 18, 
+                "month": 8, 
+                "second": 16, 
+                "weekday": 4, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 21, 
+                "minute": 6
             }
         }, 
         "_id": {
@@ -84,6 +104,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-21 18:31:18.819000-07:00", 
+            "end_local_dt": {
+                "hour": 18, 
+                "month": 8, 
+                "second": 18, 
+                "weekday": 4, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 21, 
+                "minute": 31
+            }, 
             "duration": 270.39599990844727, 
             "start_stop": {
                 "$oid": "56081ad3f6858f3a71f65e5e"
@@ -96,6 +126,16 @@
             }, 
             "trip_id": {
                 "$oid": "56081ad3f6858f3a71f65e1f"
+            }, 
+            "start_local_dt": {
+                "hour": 18, 
+                "month": 8, 
+                "second": 48, 
+                "weekday": 4, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 21, 
+                "minute": 26
             }
         }, 
         "_id": {
@@ -147,6 +187,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-21 18:59:50.662000-07:00", 
+            "end_local_dt": {
+                "hour": 18, 
+                "month": 8, 
+                "second": 50, 
+                "weekday": 4, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 21, 
+                "minute": 59
+            }, 
             "duration": 1411.0030000209808, 
             "start_stop": {
                 "$oid": "56081ad3f6858f3a71f65e60"
@@ -159,6 +209,16 @@
             }, 
             "trip_id": {
                 "$oid": "56081ad3f6858f3a71f65e1f"
+            }, 
+            "start_local_dt": {
+                "hour": 18, 
+                "month": 8, 
+                "second": 19, 
+                "weekday": 4, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 21, 
+                "minute": 36
             }
         }, 
         "_id": {
@@ -210,6 +270,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-21 19:03:20.782000-07:00", 
+            "end_local_dt": {
+                "hour": 19, 
+                "month": 8, 
+                "second": 20, 
+                "weekday": 4, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 21, 
+                "minute": 3
+            }, 
             "duration": 176.5920000076294, 
             "start_stop": {
                 "$oid": "56081ad3f6858f3a71f65e62"
@@ -222,6 +292,16 @@
             }, 
             "trip_id": {
                 "$oid": "56081ad3f6858f3a71f65e1f"
+            }, 
+            "start_local_dt": {
+                "hour": 19, 
+                "month": 8, 
+                "second": 24, 
+                "weekday": 4, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 21, 
+                "minute": 0
             }
         }, 
         "_id": {
@@ -273,6 +353,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-21 19:11:28.817000-07:00", 
+            "end_local_dt": {
+                "hour": 19, 
+                "month": 8, 
+                "second": 28, 
+                "weekday": 4, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 21, 
+                "minute": 11
+            }, 
             "duration": 457.9619998931885, 
             "start_stop": {
                 "$oid": "56081ad3f6858f3a71f65e64"
@@ -282,6 +372,16 @@
             }, 
             "trip_id": {
                 "$oid": "56081ad3f6858f3a71f65e1f"
+            }, 
+            "start_local_dt": {
+                "hour": 19, 
+                "month": 8, 
+                "second": 50, 
+                "weekday": 4, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 21, 
+                "minute": 3
             }
         }, 
         "_id": {
@@ -333,6 +433,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-22 15:52:32.002000-07:00", 
+            "end_local_dt": {
+                "hour": 15, 
+                "month": 8, 
+                "second": 32, 
+                "weekday": 5, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 22, 
+                "minute": 52
+            }, 
             "duration": 725.2900002002716, 
             "end_stop": {
                 "$oid": "56081ad5f6858f3a71f65e6c"
@@ -342,6 +452,16 @@
             }, 
             "trip_id": {
                 "$oid": "56081ad3f6858f3a71f65e2d"
+            }, 
+            "start_local_dt": {
+                "hour": 15, 
+                "month": 8, 
+                "second": 26, 
+                "weekday": 5, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 22, 
+                "minute": 40
             }
         }, 
         "_id": {
@@ -393,6 +513,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-22 15:53:35.643000-07:00", 
+            "end_local_dt": {
+                "hour": 15, 
+                "month": 8, 
+                "second": 35, 
+                "weekday": 5, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 22, 
+                "minute": 53
+            }, 
             "duration": 31.834999799728394, 
             "start_stop": {
                 "$oid": "56081ad5f6858f3a71f65e6c"
@@ -405,6 +535,16 @@
             }, 
             "trip_id": {
                 "$oid": "56081ad3f6858f3a71f65e2d"
+            }, 
+            "start_local_dt": {
+                "hour": 15, 
+                "month": 8, 
+                "second": 3, 
+                "weekday": 5, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 22, 
+                "minute": 53
             }
         }, 
         "_id": {
@@ -456,6 +596,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-22 15:54:37.135000-07:00", 
+            "end_local_dt": {
+                "hour": 15, 
+                "month": 8, 
+                "second": 37, 
+                "weekday": 5, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 22, 
+                "minute": 54
+            }, 
             "duration": 29.66100001335144, 
             "start_stop": {
                 "$oid": "56081ad5f6858f3a71f65e6e"
@@ -468,6 +618,16 @@
             }, 
             "trip_id": {
                 "$oid": "56081ad3f6858f3a71f65e2d"
+            }, 
+            "start_local_dt": {
+                "hour": 15, 
+                "month": 8, 
+                "second": 7, 
+                "weekday": 5, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 22, 
+                "minute": 54
             }
         }, 
         "_id": {
@@ -519,6 +679,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-22 16:00:40.644000-07:00", 
+            "end_local_dt": {
+                "hour": 16, 
+                "month": 8, 
+                "second": 40, 
+                "weekday": 5, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 22, 
+                "minute": 0
+            }, 
             "duration": 324.68499994277954, 
             "start_stop": {
                 "$oid": "56081ad5f6858f3a71f65e70"
@@ -528,6 +698,16 @@
             }, 
             "trip_id": {
                 "$oid": "56081ad3f6858f3a71f65e2d"
+            }, 
+            "start_local_dt": {
+                "hour": 15, 
+                "month": 8, 
+                "second": 15, 
+                "weekday": 5, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 22, 
+                "minute": 55
             }
         }, 
         "_id": {
@@ -579,6 +759,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-24 08:34:04.516000-07:00", 
+            "end_local_dt": {
+                "hour": 8, 
+                "month": 8, 
+                "second": 4, 
+                "weekday": 0, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 24, 
+                "minute": 34
+            }, 
             "duration": 133.65899991989136, 
             "end_stop": {
                 "$oid": "56082860f6858f3c7580ca0a"
@@ -588,6 +778,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285cf6858f3c7580c8b9"
+            }, 
+            "start_local_dt": {
+                "hour": 8, 
+                "month": 8, 
+                "second": 50, 
+                "weekday": 0, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 24, 
+                "minute": 31
             }
         }, 
         "_id": {
@@ -639,6 +839,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-24 08:35:37.559000-07:00", 
+            "end_local_dt": {
+                "hour": 8, 
+                "month": 8, 
+                "second": 37, 
+                "weekday": 0, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 24, 
+                "minute": 35
+            }, 
             "duration": 62.28800010681152, 
             "start_stop": {
                 "$oid": "56082860f6858f3c7580ca0a"
@@ -651,6 +861,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285cf6858f3c7580c8b9"
+            }, 
+            "start_local_dt": {
+                "hour": 8, 
+                "month": 8, 
+                "second": 35, 
+                "weekday": 0, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 24, 
+                "minute": 34
             }
         }, 
         "_id": {
@@ -702,6 +922,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-24 08:36:39.740000-07:00", 
+            "end_local_dt": {
+                "hour": 8, 
+                "month": 8, 
+                "second": 39, 
+                "weekday": 0, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 24, 
+                "minute": 36
+            }, 
             "duration": 31.098000049591064, 
             "start_stop": {
                 "$oid": "56082860f6858f3c7580ca0c"
@@ -714,6 +944,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285cf6858f3c7580c8b9"
+            }, 
+            "start_local_dt": {
+                "hour": 8, 
+                "month": 8, 
+                "second": 8, 
+                "weekday": 0, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 24, 
+                "minute": 36
             }
         }, 
         "_id": {
@@ -765,6 +1005,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-24 08:38:46.322000-07:00", 
+            "end_local_dt": {
+                "hour": 8, 
+                "month": 8, 
+                "second": 46, 
+                "weekday": 0, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 24, 
+                "minute": 38
+            }, 
             "duration": 96.03600001335144, 
             "start_stop": {
                 "$oid": "56082860f6858f3c7580ca0e"
@@ -777,6 +1027,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285cf6858f3c7580c8b9"
+            }, 
+            "start_local_dt": {
+                "hour": 8, 
+                "month": 8, 
+                "second": 10, 
+                "weekday": 0, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 24, 
+                "minute": 37
             }
         }, 
         "_id": {
@@ -828,6 +1088,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-24 08:50:44.931000-07:00", 
+            "end_local_dt": {
+                "hour": 8, 
+                "month": 8, 
+                "second": 44, 
+                "weekday": 0, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 24, 
+                "minute": 50
+            }, 
             "duration": 686.6089999675751, 
             "start_stop": {
                 "$oid": "56082860f6858f3c7580ca10"
@@ -840,6 +1110,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285cf6858f3c7580c8b9"
+            }, 
+            "start_local_dt": {
+                "hour": 8, 
+                "month": 8, 
+                "second": 18, 
+                "weekday": 0, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 24, 
+                "minute": 39
             }
         }, 
         "_id": {
@@ -891,6 +1171,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-24 09:03:03.741000-07:00", 
+            "end_local_dt": {
+                "hour": 9, 
+                "month": 8, 
+                "second": 3, 
+                "weekday": 0, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 24, 
+                "minute": 3
+            }, 
             "duration": 708.3729999065399, 
             "start_stop": {
                 "$oid": "56082860f6858f3c7580ca12"
@@ -903,6 +1193,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285cf6858f3c7580c8b9"
+            }, 
+            "start_local_dt": {
+                "hour": 8, 
+                "month": 8, 
+                "second": 15, 
+                "weekday": 0, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 24, 
+                "minute": 51
             }
         }, 
         "_id": {
@@ -954,6 +1254,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-24 09:07:19.533000-07:00", 
+            "end_local_dt": {
+                "hour": 9, 
+                "month": 8, 
+                "second": 19, 
+                "weekday": 0, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 24, 
+                "minute": 7
+            }, 
             "duration": 228.14199995994568, 
             "start_stop": {
                 "$oid": "56082860f6858f3c7580ca14"
@@ -963,6 +1273,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285cf6858f3c7580c8b9"
+            }, 
+            "start_local_dt": {
+                "hour": 9, 
+                "month": 8, 
+                "second": 31, 
+                "weekday": 0, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 24, 
+                "minute": 3
             }
         }, 
         "_id": {
@@ -1014,6 +1334,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-25 08:58:03.214000-07:00", 
+            "end_local_dt": {
+                "hour": 8, 
+                "month": 8, 
+                "second": 3, 
+                "weekday": 1, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 25, 
+                "minute": 58
+            }, 
             "duration": 1214.7750000953674, 
             "end_stop": {
                 "$oid": "56082862f6858f3c7580ca32"
@@ -1023,6 +1353,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285df6858f3c7580c8c1"
+            }, 
+            "start_local_dt": {
+                "hour": 8, 
+                "month": 8, 
+                "second": 48, 
+                "weekday": 1, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 25, 
+                "minute": 37
             }
         }, 
         "_id": {
@@ -1074,6 +1414,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-25 16:10:21.200000-07:00", 
+            "end_local_dt": {
+                "hour": 16, 
+                "month": 8, 
+                "second": 21, 
+                "weekday": 1, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 25, 
+                "minute": 10
+            }, 
             "duration": 25887.637000083923, 
             "start_stop": {
                 "$oid": "56082862f6858f3c7580ca32"
@@ -1086,6 +1436,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285df6858f3c7580c8c1"
+            }, 
+            "start_local_dt": {
+                "hour": 8, 
+                "month": 8, 
+                "second": 53, 
+                "weekday": 1, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 25, 
+                "minute": 58
             }
         }, 
         "_id": {
@@ -1137,6 +1497,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-25 16:26:37.339000-07:00", 
+            "end_local_dt": {
+                "hour": 16, 
+                "month": 8, 
+                "second": 37, 
+                "weekday": 1, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 25, 
+                "minute": 26
+            }, 
             "duration": 866.9179999828339, 
             "start_stop": {
                 "$oid": "56082862f6858f3c7580ca34"
@@ -1149,6 +1519,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285df6858f3c7580c8c1"
+            }, 
+            "start_local_dt": {
+                "hour": 16, 
+                "month": 8, 
+                "second": 10, 
+                "weekday": 1, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 25, 
+                "minute": 12
             }
         }, 
         "_id": {
@@ -1200,6 +1580,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-25 16:30:17.267000-07:00", 
+            "end_local_dt": {
+                "hour": 16, 
+                "month": 8, 
+                "second": 17, 
+                "weekday": 1, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 25, 
+                "minute": 30
+            }, 
             "duration": 196.0479998588562, 
             "start_stop": {
                 "$oid": "56082862f6858f3c7580ca36"
@@ -1212,6 +1602,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285df6858f3c7580c8c1"
+            }, 
+            "start_local_dt": {
+                "hour": 16, 
+                "month": 8, 
+                "second": 1, 
+                "weekday": 1, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 25, 
+                "minute": 27
             }
         }, 
         "_id": {
@@ -1263,6 +1663,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-25 16:39:24.213000-07:00", 
+            "end_local_dt": {
+                "hour": 16, 
+                "month": 8, 
+                "second": 24, 
+                "weekday": 1, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 25, 
+                "minute": 39
+            }, 
             "duration": 514.7990000247955, 
             "start_stop": {
                 "$oid": "56082862f6858f3c7580ca38"
@@ -1272,6 +1682,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285df6858f3c7580c8c1"
+            }, 
+            "start_local_dt": {
+                "hour": 16, 
+                "month": 8, 
+                "second": 49, 
+                "weekday": 1, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 25, 
+                "minute": 30
             }
         }, 
         "_id": {
@@ -1323,6 +1743,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-28 08:25:25.884000-07:00", 
+            "end_local_dt": {
+                "hour": 8, 
+                "month": 8, 
+                "second": 25, 
+                "weekday": 4, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 28, 
+                "minute": 25
+            }, 
             "duration": 581.4400000572205, 
             "end_stop": {
                 "$oid": "56082868f6858f3c7580ca4b"
@@ -1332,6 +1762,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285df6858f3c7580c8e5"
+            }, 
+            "start_local_dt": {
+                "hour": 8, 
+                "month": 8, 
+                "second": 44, 
+                "weekday": 4, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 28, 
+                "minute": 15
             }
         }, 
         "_id": {
@@ -1383,6 +1823,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-08-28 08:29:01.800000-07:00", 
+            "end_local_dt": {
+                "hour": 8, 
+                "month": 8, 
+                "second": 1, 
+                "weekday": 4, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 28, 
+                "minute": 29
+            }, 
             "duration": 184.87299990653992, 
             "start_stop": {
                 "$oid": "56082868f6858f3c7580ca4b"
@@ -1392,6 +1842,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285df6858f3c7580c8e5"
+            }, 
+            "start_local_dt": {
+                "hour": 8, 
+                "month": 8, 
+                "second": 56, 
+                "weekday": 4, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 28, 
+                "minute": 25
             }
         }, 
         "_id": {
@@ -1443,12 +1903,32 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-09-02 08:43:37.707000-07:00", 
+            "end_local_dt": {
+                "hour": 8, 
+                "month": 9, 
+                "second": 37, 
+                "weekday": 2, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 2, 
+                "minute": 43
+            }, 
             "duration": 689.8570001125336, 
             "_id": {
                 "$oid": "56082872f6858f3c7580ca8e"
             }, 
             "trip_id": {
                 "$oid": "5608285df6858f3c7580c91d"
+            }, 
+            "start_local_dt": {
+                "hour": 8, 
+                "month": 9, 
+                "second": 7, 
+                "weekday": 2, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 2, 
+                "minute": 32
             }
         }, 
         "_id": {
@@ -1500,12 +1980,32 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-09-03 08:39:21.320000-07:00", 
+            "end_local_dt": {
+                "hour": 8, 
+                "month": 9, 
+                "second": 21, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 3, 
+                "minute": 39
+            }, 
             "duration": 485.9979999065399, 
             "_id": {
                 "$oid": "56082875f6858f3c7580caa3"
             }, 
             "trip_id": {
                 "$oid": "5608285df6858f3c7580c931"
+            }, 
+            "start_local_dt": {
+                "hour": 8, 
+                "month": 9, 
+                "second": 15, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 3, 
+                "minute": 31
             }
         }, 
         "_id": {
@@ -1557,6 +2057,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-09-03 17:11:29.635000-07:00", 
+            "end_local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 29, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 3, 
+                "minute": 11
+            }, 
             "duration": 396.69000005722046, 
             "end_stop": {
                 "$oid": "56082876f6858f3c7580caa8"
@@ -1566,6 +2076,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285df6858f3c7580c939"
+            }, 
+            "start_local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 52, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 3, 
+                "minute": 4
             }
         }, 
         "_id": {
@@ -1617,6 +2137,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-09-03 17:15:19.161000-07:00", 
+            "end_local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 19, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 3, 
+                "minute": 15
+            }, 
             "duration": 206.11700010299683, 
             "start_stop": {
                 "$oid": "56082876f6858f3c7580caa8"
@@ -1626,6 +2156,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285df6858f3c7580c939"
+            }, 
+            "start_local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 53, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 3, 
+                "minute": 11
             }
         }, 
         "_id": {
@@ -1677,6 +2217,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-09-07 09:40:47.362000-07:00", 
+            "end_local_dt": {
+                "hour": 9, 
+                "month": 9, 
+                "second": 47, 
+                "weekday": 0, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 7, 
+                "minute": 40
+            }, 
             "duration": 4668.213000059128, 
             "end_stop": {
                 "$oid": "5608287af6858f3c7580cac2"
@@ -1686,6 +2236,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285df6858f3c7580c94f"
+            }, 
+            "start_local_dt": {
+                "hour": 8, 
+                "month": 9, 
+                "second": 59, 
+                "weekday": 0, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 7, 
+                "minute": 22
             }
         }, 
         "_id": {
@@ -1737,6 +2297,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-09-07 09:42:20.933000-07:00", 
+            "end_local_dt": {
+                "hour": 9, 
+                "month": 9, 
+                "second": 20, 
+                "weekday": 0, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 7, 
+                "minute": 42
+            }, 
             "duration": 62.52900004386902, 
             "start_stop": {
                 "$oid": "5608287af6858f3c7580cac2"
@@ -1746,6 +2316,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285df6858f3c7580c94f"
+            }, 
+            "start_local_dt": {
+                "hour": 9, 
+                "month": 9, 
+                "second": 18, 
+                "weekday": 0, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 7, 
+                "minute": 41
             }
         }, 
         "_id": {
@@ -1797,6 +2377,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-09-10 13:20:36.169000-07:00", 
+            "end_local_dt": {
+                "hour": 13, 
+                "month": 9, 
+                "second": 36, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 20
+            }, 
             "duration": 335.88699984550476, 
             "end_stop": {
                 "$oid": "56082885f6858f3c7580caf0"
@@ -1806,6 +2396,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285df6858f3c7580c98b"
+            }, 
+            "start_local_dt": {
+                "hour": 13, 
+                "month": 9, 
+                "second": 0, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 15
             }
         }, 
         "_id": {
@@ -1857,6 +2457,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-09-10 13:21:07.368000-07:00", 
+            "end_local_dt": {
+                "hour": 13, 
+                "month": 9, 
+                "second": 7, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 21
+            }, 
             "duration": 0.0, 
             "start_stop": {
                 "$oid": "56082885f6858f3c7580caf0"
@@ -1869,6 +2479,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285df6858f3c7580c98b"
+            }, 
+            "start_local_dt": {
+                "hour": 13, 
+                "month": 9, 
+                "second": 7, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 21
             }
         }, 
         "_id": {
@@ -1920,6 +2540,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-09-10 13:40:22.318000-07:00", 
+            "end_local_dt": {
+                "hour": 13, 
+                "month": 9, 
+                "second": 22, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 40
+            }, 
             "duration": 1123.9130001068115, 
             "start_stop": {
                 "$oid": "56082885f6858f3c7580caf2"
@@ -1929,6 +2559,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285df6858f3c7580c98b"
+            }, 
+            "start_local_dt": {
+                "hour": 13, 
+                "month": 9, 
+                "second": 38, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 21
             }
         }, 
         "_id": {
@@ -1980,6 +2620,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-09-10 14:18:22.188000-07:00", 
+            "end_local_dt": {
+                "hour": 14, 
+                "month": 9, 
+                "second": 22, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 18
+            }, 
             "duration": 1225.5390000343323, 
             "end_stop": {
                 "$oid": "56082886f6858f3c7580caf6"
@@ -1989,6 +2639,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285df6858f3c7580c98f"
+            }, 
+            "start_local_dt": {
+                "hour": 13, 
+                "month": 9, 
+                "second": 56, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 57
             }
         }, 
         "_id": {
@@ -2040,6 +2700,16 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-09-10 14:29:49.611000-07:00", 
+            "end_local_dt": {
+                "hour": 14, 
+                "month": 9, 
+                "second": 49, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 29
+            }, 
             "duration": 656.4079999923706, 
             "start_stop": {
                 "$oid": "56082886f6858f3c7580caf6"
@@ -2049,6 +2719,16 @@
             }, 
             "trip_id": {
                 "$oid": "5608285df6858f3c7580c98f"
+            }, 
+            "start_local_dt": {
+                "hour": 14, 
+                "month": 9, 
+                "second": 53, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 18
             }
         }, 
         "_id": {
@@ -2100,12 +2780,32 @@
             }, 
             "source": "SmoothedHighConfidenceMotion", 
             "end_fmt_time": "2015-09-10 17:16:52.622000-07:00", 
+            "end_local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 52, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 16
+            }, 
             "duration": 501.89299988746643, 
             "_id": {
                 "$oid": "56082888f6858f3c7580cafc"
             }, 
             "trip_id": {
                 "$oid": "5608285df6858f3c7580c999"
+            }, 
+            "start_local_dt": {
+                "hour": 17, 
+                "month": 9, 
+                "second": 30, 
+                "weekday": 3, 
+                "year": 2015, 
+                "timezone": "America/Los_Angeles", 
+                "day": 10, 
+                "minute": 8
             }
         }, 
         "_id": {
