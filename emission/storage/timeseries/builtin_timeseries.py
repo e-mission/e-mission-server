@@ -60,6 +60,16 @@ class BuiltinTimeSeries(esta.TimeSeries):
 
     def _get_query(self, key_list = None, time_query = None, geo_query = None,
                    extra_query_list = []):
+        """
+        The extra query list cannot contain a top level field from
+        one of the existing queries, otherwise it will be overwritten
+        by the extra query
+        :param key_list: list of metadata keys to query
+        :param time_query: time range or time components (filter)
+        :param geo_query: $geoWithin query
+        :param extra_query_list: additional queries for mode, etc
+        :return:
+        """
         ret_query = self.user_query
         if key_list is not None and len(key_list) > 0:
             key_query_list = []
@@ -72,7 +82,14 @@ class BuiltinTimeSeries(esta.TimeSeries):
             ret_query.update(geo_query.get_query())
         if extra_query_list is not None:
             for extra_query in extra_query_list:
-                ret_query.update(extra_query)
+                eq_keys = set(extra_query.keys())
+                curr_keys = set(ret_query.keys())
+                overlap_keys = eq_keys.intersection(curr_keys)
+                if len(overlap_keys) != 0:
+                    raise AttributeError("extra query would overwrite keys %s" %
+                                         list(overlap_keys))
+                else:
+                    ret_query.update(extra_query)
         return ret_query
 
     def _get_sort_key(self, time_query = None):

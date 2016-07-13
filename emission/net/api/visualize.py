@@ -69,9 +69,7 @@ def range_mode_heatmap(modes, from_ld, to_ld, region):
     else:
         geo_query = estg.GeoQuery(["data.loc"], region)
 
-    test_phones_query = estag.get_ignore_test_phone_extra_query()
-    extra_query_list = [test_phones_query]
-
+    extra_query_list = []
     if modes is not None:
         mode_enum_list = [ecwm.MotionTypes[mode] for mode in modes]
         extra_query_list.append(esdlq.get_mode_query(mode_enum_list))

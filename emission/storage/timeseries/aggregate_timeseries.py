@@ -10,7 +10,7 @@ import emission.storage.timeseries.builtin_timeseries as bits
 class AggregateTimeSeries(bits.BuiltinTimeSeries):
     def __init__(self):
         super(AggregateTimeSeries, self).__init__(None)
-        self.user_query = {}
+        self.user_query = _get_ignore_test_phone_extra_query()
 
     def _get_sort_key(self, time_query = None):
         return None
@@ -20,10 +20,10 @@ class AggregateTimeSeries(bits.BuiltinTimeSeries):
         query_to_use = self._get_query(key_list, time_query, geo_query,
                                        extra_query_list)
         logging.debug("query_to_use = %s" % query_to_use)
-        return self.analysis_timeseries_db().find(query_to_use).distinct('user_id')
+        return self.analysis_timeseries_db.find(query_to_use).distinct('user_id')
 
 
-def get_ignore_test_phone_extra_query():
+def _get_ignore_test_phone_extra_query():
     test_phone_ids = [UUID("079e0f1a-c440-3d7c-b0e7-de160f748e35"),
                       UUID("c76a0487-7e5a-3b17-a449-47be666b36f6"),
                       UUID("c528bcd2-a88b-3e82-be62-ef4f2396967a"),

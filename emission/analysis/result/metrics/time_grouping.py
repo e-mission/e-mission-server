@@ -8,7 +8,8 @@ import emission.storage.decorations.local_date_queries as esdl
 
 import emission.storage.timeseries.tcquery as esttc
 import emission.storage.timeseries.timequery as estt
-import emission.storage.timeseries.aggregate_timeseries as esta
+import emission.storage.timeseries.abstract_timeseries as esta
+import emission.storage.timeseries.aggregate_timeseries as estag
 import emission.core.wrapper.motionactivity as ecwm
 import emission.core.wrapper.modestattimesummary as ecwms
 import emission.core.wrapper.localdate as ecwl
@@ -30,8 +31,7 @@ def group_by_timestamp(user_id, start_ts, end_ts, freq, summary_fn):
     time_query = estt.TimeQuery("data.start_ts", start_ts, end_ts)
     section_df = esda.get_data_df(esda.CLEANED_SECTION_KEY,
                                   user_id=user_id, time_query=time_query,
-                                  geo_query=None,
-                                  extra_query_list=[esta.get_ignore_test_phone_extra_query()])
+                                  geo_query=None)
     logging.debug("first row is %s" % section_df.iloc[0])
     secs_to_nanos = lambda x: x * 10 ** 9
     section_df['start_dt'] = pd.to_datetime(secs_to_nanos(section_df.start_ts))
@@ -65,8 +65,7 @@ def group_by_local_date(user_id, from_dt, to_dt, freq, summary_fn):
     time_query = esttc.TimeComponentQuery("data.start_local_dt", from_dt, to_dt)
     section_df = esda.get_data_df(esda.CLEANED_SECTION_KEY,
                                   user_id=user_id, time_query=time_query,
-                                  geo_query=None,
-                                  extra_query_list=[esta.get_ignore_test_phone_extra_query()])
+                                  geo_query=None)
     groupby_arr = _get_local_group_by(freq)
     time_grouped_df = section_df.groupby(groupby_arr)
     local_dt_fill_fn = _get_local_key_to_fill_fn(freq)
