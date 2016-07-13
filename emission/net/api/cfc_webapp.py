@@ -28,7 +28,8 @@ import bson.json_util
 
 # Our imports
 import modeshare, zipcode, distance, tripManager, \
-                 Berkeley, visualize, stats, usercache, timeline
+                 Berkeley, visualize, stats, usercache, timeline, \
+                 metrics
 import emission.net.ext_service.moves.register as auth
 import emission.net.ext_service.habitica.proxy as habitproxy
 import emission.analysis.result.carbon as carbon
@@ -379,6 +380,22 @@ def getCarbonCompare():
     logging.debug("No overriding client result for user %s, returning choice" % user_uuid)
   return choice.getResult(user_uuid)
 
+@post('/result/metrics/<time_type>')
+def summarize_metrics(time_type):
+    user_uuid = getUUID(request)
+    start_time = request.json['start_time']
+    end_time = request.json['end_time']
+    freq_name = request.json['freq']
+    metric_name = request.json['metric']
+    time_type_map = {
+        'timestamp': metrics.summarize_by_timestamp,
+        'local_date': metrics.summarize_by_local_date
+    }
+    metric_fn = time_type_map[time_type]
+    return metric_fn(user_uuid,
+              start_time, end_time,
+              freq_name, metric_name)
+
 # Client related code START
 @post("/client/<clientname>/<method>")
 def callStudy(clientname, method):
@@ -526,7 +543,7 @@ def getUUIDFromToken(token):
 def __getUUIDFromEmail__(userEmail):
     user=User.fromEmail(userEmail)
     if user is None:
-      return None
+        return None
     user_uuid=user.uuid
     return user_uuid
 
@@ -551,12 +568,8 @@ def getUUID(request, inHeader=False):
         retUUID = __getUUIDFromEmail__(userEmail)
         logging.debug("skipAuth = %s, returning UUID directly from email %s" % (skipAuth, retUUID))
     else:
-        # Return a random user to make it easy to experiment without having to specify a user
-        # TODO: Remove this if it is not actually used
-        from emission.core.get_database import get_uuid_db
-        user_uuid = get_uuid_db().find_one()['uuid']
-        retUUID = user_uuid
-        logging.debug("skipAuth = %s, returning arbitrary UUID %s" % (skipAuth, retUUID))
+        logging.debug("skipAuth = %s, returning None")
+        return None
     if Client("choice").getClientKey() is None:
         Client("choice").update(createKey = True)
   else:
