@@ -13,6 +13,7 @@ logging.debug("This should go to the log file")
 
 from datetime import datetime
 import time
+import arrow
 from uuid import UUID
 # So that we can set the socket timeout
 import socket
@@ -384,16 +385,14 @@ def getCarbonCompare():
 
 
 #Pulling public data from the server  
-@get('/getData')
-def getData():
+@get('/eval/publicData/timeseries')
+
+def getPublicData():
   from_date = request.query.from_date
   to_date = request.query.to_date
+  from_ts = arrow.get(from_date).timestamp
+  to_ts = arrow.get(to_date).timestamp
 
-  from_dt = datetime.strptime(from_date, "%Y-%m-%d")
-  to_dt = datetime.strptime(to_date, "%Y-%m-%d")
-  
-  from_ts = int(from_dt.strftime("%s"))
-  to_ts = int(to_dt.strftime("%s"))
   time_range = estt.TimeQuery("metadata.write_ts", from_ts, to_ts)
   time_query = time_range.get_query()
 
