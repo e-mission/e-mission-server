@@ -40,7 +40,6 @@ tsdb = edb.get_timeseries_db()
 print "Loading data from " + from_date + " to " + to_date + " (local time)"
 print "..."
 
-import datetime
 for index, entry_list in enumerate(phone_list):
 	if index < 4:
 		logging.debug("iphone" + str(index%4+1) + " first entry:")
@@ -51,7 +50,6 @@ for index, entry_list in enumerate(phone_list):
 		logging.debug("...has no data...")
 	else:
 		logging.debug(str(entry_list[0]))
-
 
 	for entry in entry_list:
 		tsdb.save(entry)
