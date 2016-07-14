@@ -6,6 +6,7 @@ import argparse
 import logging
 import arrow 
 
+# This script pulls public data from the server and then loads it to a local server 
 parser = argparse.ArgumentParser()
 parser.add_argument("from_date",
         help="from_date (local time) in the format of YYYY-MM-DD")
@@ -36,7 +37,7 @@ phone_list = iphone_list + android_list
 
 tsdb = edb.get_timeseries_db()
 
-print "Loading data from " + from_date + " to " + to_date 
+print "Loading data from " + from_date + " to " + to_date + " (local time)"
 print "..."
 
 import datetime

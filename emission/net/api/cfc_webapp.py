@@ -384,9 +384,8 @@ def getCarbonCompare():
   return choice.getResult(user_uuid)
 
 
-#Pulling public data from the server  
+# Pulling public data from the server  
 @get('/eval/publicData/timeseries')
-
 def getPublicData():
   from_date = request.query.from_date
   to_date = request.query.to_date
