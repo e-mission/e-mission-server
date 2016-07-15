@@ -4,34 +4,39 @@ import os
 import json
 from emission.net.int_service.giles import archiver
 
+_current_db = MongoClient('localhost').Stage_database
+
+def _get_current_db():
+    return _current_db
+
 def get_mode_db():
-    current_db = MongoClient().Stage_database
-    Modes=current_db.Stage_Modes
+    # #current_db = MongoClient().Stage_database
+    Modes= _get_current_db().Stage_Modes
     return Modes
 
 def get_moves_db():
-    current_db = MongoClient('localhost').Stage_database
-    MovesAuth=current_db.Stage_user_moves_access
+    # #current_db = MongoClient('localhost').Stage_database
+    MovesAuth= _get_current_db().Stage_user_moves_access
     return MovesAuth
 
 def get_habitica_db():
-    current_db = MongoClient('localhost').Stage_database
-    HabiticaAuth=current_db.Stage_user_habitica_access
+    # #current_db = MongoClient('localhost').Stage_database
+    HabiticaAuth= _get_current_db().Stage_user_habitica_access
     return HabiticaAuth
 
 def get_section_db():
-    current_db=MongoClient('localhost').Stage_database
-    Sections=current_db.Stage_Sections
+    # current_db=MongoClient('localhost').Stage_database
+    Sections= _get_current_db().Stage_Sections
     return Sections
 
 def get_trip_db():
-    current_db=MongoClient().Stage_database
-    Trips=current_db.Stage_Trips
+    # current_db=MongoClient().Stage_database
+    Trips=_get_current_db().Stage_Trips
     return Trips
 
 def get_profile_db():
-    current_db=MongoClient().Stage_database
-    Profiles=current_db.Stage_Profiles
+    # current_db=MongoClient().Stage_database
+    Profiles=_get_current_db().Stage_Profiles
     return Profiles
 
 """
@@ -63,33 +68,33 @@ def update_routeDistanceMatrix_db(user_id, method, updatedMatrix):
 
 
 def get_client_db():
-    current_db=MongoClient().Stage_database
-    Clients = current_db.Stage_clients
+    # current_db=MongoClient().Stage_database
+    Clients = _get_current_db().Stage_clients
     return Clients
 
 def get_routeCluster_db():
-    current_db=MongoClient().Stage_database
-    routeCluster=current_db.Stage_routeCluster
+    # current_db=MongoClient().Stage_database
+    routeCluster= _get_current_db().Stage_routeCluster
     return routeCluster
 
 def get_groundClusters_db():
-    current_db=MongoClient().Stage_database
-    groundClusters=current_db.Stage_groundClusters
+    # current_db=MongoClient().Stage_database
+    groundClusters= _get_current_db().Stage_groundClusters
     return groundClusters
 
 def get_pending_signup_db():
-    current_db=MongoClient().Stage_database
-    Pending_signups = current_db.Stage_pending_signups
+    # current_db=MongoClient().Stage_database
+    Pending_signups = _get_current_db().Stage_pending_signups
     return Pending_signups
 
 def get_worktime_db():
-    current_db=MongoClient().Stage_database
-    Worktimes=current_db.Stage_Worktime
+    # current_db=MongoClient().Stage_database
+    Worktimes= _get_current_db().Stage_Worktime
     return Worktimes
 
 def get_uuid_db():
-    current_db=MongoClient().Stage_database
-    UUIDs = current_db.Stage_uuids
+    # current_db=MongoClient().Stage_database
+    UUIDs = _get_current_db().Stage_uuids
     return UUIDs
 
 def get_client_stats_db():
@@ -97,8 +102,8 @@ def get_client_stats_db():
     pass
 
 def get_client_stats_db_backup():
-    current_db=MongoClient().Stage_database
-    ClientStats = current_db.Stage_client_stats
+    # current_db=MongoClient().Stage_database
+    ClientStats = _get_current_db().Stage_client_stats
     return ClientStats
 
 def get_server_stats_db():
@@ -106,8 +111,8 @@ def get_server_stats_db():
     pass
 
 def get_server_stats_db_backup():
-    current_db=MongoClient().Stage_database
-    ServerStats = current_db.Stage_server_stats
+    # current_db=MongoClient().Stage_database
+    ServerStats = _get_current_db().Stage_server_stats
     return ServerStats
 
 def get_result_stats_db():
@@ -115,8 +120,8 @@ def get_result_stats_db():
     pass
 
 def get_result_stats_db_backup():
-    current_db=MongoClient().Stage_database
-    ResultStats = current_db.Stage_result_stats
+    # current_db=MongoClient().Stage_database
+    ResultStats = _get_current_db().Stage_result_stats
     return ResultStats
 
 
@@ -126,32 +131,32 @@ def get_db():
 
 def get_test_db():
     current_db=MongoClient().Test2
-    Trips=current_db.Test_Trips
+    Trips=_get_current_db().Test_Trips
     return Trips
 
 def get_transit_db():
-    current_db = MongoClient().Stage_database
-    Transits=current_db.Stage_Transits
+    # #current_db = MongoClient().Stage_database
+    Transits=_get_current_db().Stage_Transits
     return Transits
 
 def get_utility_model_db():
-    current_db = MongoClient().Stage_database
-    Utility_Models = current_db.Stage_utility_models
+    # #current_db = MongoClient().Stage_database
+    Utility_Models = _get_current_db().Stage_utility_models
     return Utility_Models
 
 def get_alternatives_db():
-    current_db = MongoClient().Stage_database
-    Alternative_trips=current_db.Stage_alternative_trips
+    #current_db = MongoClient().Stage_database
+    Alternative_trips=_get_current_db().Stage_alternative_trips
     return Alternative_trips
 
 def get_perturbed_trips_db():
-    current_db = MongoClient().Stage_database
-    Perturbed_trips=current_db.Stage_alternative_trips
+    #current_db = MongoClient().Stage_database
+    Perturbed_trips=_get_current_db().Stage_alternative_trips
     return Perturbed_trips
 
 def get_usercache_db():
-    current_db = MongoClient().Stage_database
-    UserCache = current_db.Stage_usercache
+    #current_db = MongoClient().Stage_database
+    UserCache = _get_current_db().Stage_usercache
     UserCache.create_index([("user_id", pymongo.ASCENDING),
                             ("metadata.type", pymongo.ASCENDING),
                             ("metadata.write_ts", pymongo.ASCENDING),
@@ -160,8 +165,8 @@ def get_usercache_db():
     return UserCache
 
 def get_timeseries_db():
-    current_db = MongoClient().Stage_database
-    TimeSeries = current_db.Stage_timeseries
+    #current_db = MongoClient().Stage_database
+    TimeSeries = _get_current_db().Stage_timeseries
     TimeSeries.create_index([("user_id", pymongo.HASHED)])
     TimeSeries.create_index([("metadata.key", pymongo.HASHED)])
     TimeSeries.create_index([("metadata.write_ts", pymongo.DESCENDING)])
@@ -172,16 +177,16 @@ def get_timeseries_db():
     return TimeSeries
 
 def get_timeseries_error_db():
-    current_db = MongoClient().Stage_database
-    TimeSeriesError = current_db.Stage_timeseries_error
+    #current_db = MongoClient().Stage_database
+    TimeSeriesError = _get_current_db().Stage_timeseries_error
     return TimeSeriesError
 
 def get_analysis_timeseries_db():
     """
     " Stores the results of the analysis performed on the raw timeseries
     """
-    current_db = MongoClient().Stage_database
-    AnalysisTimeSeries = current_db.Stage_analysis_timeseries
+    #current_db = MongoClient().Stage_database
+    AnalysisTimeSeries = _get_current_db().Stage_analysis_timeseries
     AnalysisTimeSeries.create_index([("user_id", pymongo.HASHED)])
     AnalysisTimeSeries.create_index([("metadata.key", pymongo.HASHED)])
 
@@ -221,26 +226,26 @@ def _create_local_dt_indices(time_series, key_prefix):
     time_series.create_index([("%s.weekday" % key_prefix, pymongo.DESCENDING)], sparse=True)
 
 def get_pipeline_state_db():
-    current_db = MongoClient().Stage_database
-    PipelineState = current_db.Stage_pipeline_state
+    #current_db = MongoClient().Stage_database
+    PipelineState = _get_current_db().Stage_pipeline_state
     return PipelineState
 
 def get_common_place_db():
-    current_db = MongoClient().Stage_database
-    CommonPlaces = current_db.Stage_common_place
+    #current_db = MongoClient().Stage_database
+    CommonPlaces = _get_current_db().Stage_common_place
     return CommonPlaces
 
 def get_common_trip_db():
-    current_db = MongoClient().Stage_database
-    CommonTrips = current_db.Stage_common_trips
+    #current_db = MongoClient().Stage_database
+    CommonTrips = _get_current_db().Stage_common_trips
     return CommonTrips
 
 def get_fake_trips_db():
-    current_db = MongoClient().Stage_database
-    FakeTrips = current_db.Stage_fake_trips
+    #current_db = MongoClient().Stage_database
+    FakeTrips = _get_current_db().Stage_fake_trips
     return FakeTrips
 
 def get_fake_sections_db():
-    current_db = MongoClient().Stage_database
-    FakeSections = current_db.Stage_fake_sections
+    #current_db = MongoClient().Stage_database
+    FakeSections = _get_current_db().Stage_fake_sections
     return FakeSections
