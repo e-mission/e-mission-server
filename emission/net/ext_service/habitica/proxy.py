@@ -2,6 +2,7 @@
 import json
 import requests
 import logging
+import arrow
 
 # Our imports
 import emission.core.get_database as edb
@@ -26,8 +27,11 @@ def habiticaRegister(username, email, password, our_uuid):
   #want to access their Habitica account from the browser
   #Need to create a way from them to retrieve username/password
   habitica_user_table = edb.get_habitica_db()
-  habitica_user_table.insert({'user_id': our_uuid, 'habitica_username': username, 
-    'habitica_password': password, 'habitica_id': user_dict['data']['_id'], 
+  habitica_user_table.insert({'user_id': our_uuid, 
+    'last_timestamp': arrow.utcnow().timestamp,
+    'habitica_username': username, 
+    'habitica_password': password, 
+    'habitica_id': user_dict['data']['_id'], 
     'habitica_token': user_dict['data']['apiToken']})
   return user_dict
 
