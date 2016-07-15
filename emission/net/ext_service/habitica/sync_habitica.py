@@ -16,13 +16,12 @@ import emission.analysis.result.metrics.time_grouping as earmt
 def create_habit(user_id, new_habit):
   method_uri = "/api/v3/tasks/user"
   #how to pass in params? https://habitica.com/apidoc/#api-Task-GetUserTasks
-  #FIX! right now it's returning all types of tasks
+  #FIX! right now it's returning all types of tasks, I want it to return only "habits"
   params = {'type': "habits"}
   result = proxy.habiticaProxy(user_id, 'GET', method_uri, params)
   habits = result.json()
   for habit in habits['data']:
     if habit['text'] == new_habit['text']:
-      #FIX! this is returning all of the tasks instead of just the one that matches what we want
       return habit['_id']
   #if habit not found, create habit
   response = proxy.habiticaProxy(user_id, 'POST', method_uri, new_habit)
@@ -45,14 +44,14 @@ def reward_active_transportation(self, user_id):
   timestamp_from_db = user_val['last_timestamp']
   timestamp_now = arrow.utcnow().timestamp
   
-  #FIX! how do I change the frequency to be just one block?
+  #FIX! how do I change the frequency to be just one segment? For now I just left it as yearly
   summary_ts = earmt.group_by_timestamp(user, timestamp_from_db, timestamp_now, earmt.LocalFreq.YEARLY, earmts.get_distance)
 
-  #is this getting the distances properly? HIs it possible to have a function that calls "create sample data" to test the metrics
+  #FIX! is this getting the distances properly? Is it possible to have a function that calls "create sample data" to test the metrics
   bike_distance = summary_ts[0].BICYCLING
   walk_distance = summary_ts[0].ON_FOOT
 
-  #FIX! consider saving the mod to count towards the next reading
+  #FIX! consider saving the mod (eg bike_distance%3000) to count towards the next reading
   #FIX! consider creating separate function to "score_habit"
   #reward user by + habits
   # Walk: 1 plus for every km
@@ -65,6 +64,5 @@ def reward_active_transportation(self, user_id):
 
 
 def auto_complete_tasks(user_id):
-  create_habit(user_id)
   reward_active_transportation(user_id)
 
