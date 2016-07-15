@@ -15,13 +15,13 @@ import emission.analysis.result.metrics.time_grouping as earmt
 
 def create_habit(user_id, new_habit):
   method_uri = "/api/v3/tasks/user"
-  #how to pass in params? https://habitica.com/apidoc/#api-Task-GetUserTasks
-  #FIX! right now it's returning all types of tasks, I want it to return only "habits"
-  params = {'type': "habits"}
-  result = proxy.habiticaProxy(user_id, 'GET', method_uri, params)
+  get_habits_uri = method_uri + "?type=habits"
+  #First, get all habits and check if the habit requested already exists
+  result = proxy.habiticaProxy(user_id, 'GET', get_habits_uri, None)
   habits = result.json()
   for habit in habits['data']:
     if habit['text'] == new_habit['text']:
+      #if the habit requested already exists, return it
       return habit['_id']
   #if habit not found, create habit
   response = proxy.habiticaProxy(user_id, 'POST', method_uri, new_habit)
@@ -51,6 +51,8 @@ def reward_active_transportation(self, user_id):
   bike_distance = summary_ts[0].BICYCLING
   walk_distance = summary_ts[0].ON_FOOT
 
+  method_uri_walk = "/api/v3/tasks/"+ walk_habit_id + "/score/up"
+  method_uri_bike = "/api/v3/tasks/"+ bike_habit_id + "/score/up"
   #FIX! consider saving the mod (eg bike_distance%3000) to count towards the next reading
   #FIX! consider creating separate function to "score_habit"
   #reward user by + habits
