@@ -15,6 +15,7 @@ from emission.analysis.modelling.tour_model.K_medoid import kmedoids, user_route
 import emission.analysis.modelling.tour_model.cluster_pipeline as cp
 
 TOLERANCE = 200 #How much movement we allow before updating zip codes again. Should be pretty large.. this is conservative
+Profiles=get_profile_db()
 
 def update_profiles(dummy_users=False):
     if dummy_users:
@@ -82,6 +83,5 @@ def _check_zip_validity(user_home, user):
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', level=logging.DEBUG)
-    Profiles=get_profile_db()
     update_profiles()
 
