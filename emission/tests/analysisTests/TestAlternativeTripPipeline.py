@@ -17,8 +17,7 @@ from emission.net.ext_service.moves import collect
 # from emission.net.ext_services.gmaps.common import *
 import emission.core.get_database as edb
 from crontab import CronTab
-
-logging.basicConfig(level=logging.DEBUG)
+import emission.tests.common as etc
 
 class TestAlternativeTripPipeline(unittest.TestCase):
   def setUp(self):
@@ -172,4 +171,5 @@ class TestAlternativeTripPipeline(unittest.TestCase):
    '''
 
 if __name__ == '__main__':
-    unittest.main()
+  etc.configLogging()
+  unittest.main()

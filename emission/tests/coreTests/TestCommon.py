@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from emission.core.wrapper.user import User
 from emission.core.wrapper.client import Client
 
-logging.basicConfig(level=logging.DEBUG)
+import emission.tests.common as etc
 
 class TestCommon(unittest.TestCase):
   def setUp(self):
@@ -275,4 +275,5 @@ class TestCommon(unittest.TestCase):
         func1.resetMock()
 
 if __name__ == '__main__':
+    etc.configLogging()
     unittest.main()

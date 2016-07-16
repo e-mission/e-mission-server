@@ -69,5 +69,6 @@ class TestTimeSeries(unittest.TestCase):
             list(ts.find_entries(time_query=tq, extra_query_list=[ignored_phones]))
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    import emission.tests.common as etc
+    etc.configLogging()
     unittest.main()

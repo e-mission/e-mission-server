@@ -7,8 +7,6 @@ import time
 # Our imports
 from emission.net.int_service.giles import archiver
 
-logging.basicConfig(level=logging.DEBUG)
-
 class TestArchiver(unittest.TestCase):
   def setUp(self):
     self.archiver = archiver.StatArchiver('test')
@@ -93,5 +91,8 @@ class TestArchiver(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    import emission.tests.common as etc
+
+    etc.configLogging()
     unittest.main()
 

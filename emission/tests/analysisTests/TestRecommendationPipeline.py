@@ -14,7 +14,7 @@ from emission.core.wrapper.client import Client
 from emission.net.ext_service.moves import collect
 from emission.core.wrapper.tripiterator import TripIterator
 
-logging.basicConfig(level=logging.DEBUG)
+import emission.tests.common as etc
 
 class TestRecommendationPipeline(unittest.TestCase):
   def setUp(self):
@@ -73,4 +73,5 @@ class TestRecommendationPipeline(unittest.TestCase):
     self.pipeline.runPipeline()
 
 if __name__ == '__main__':
+    etc.configLogging()
     unittest.main()

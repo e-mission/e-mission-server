@@ -9,7 +9,7 @@ from emission.clients.choice import choice
 from emission.core.get_database import get_db, get_mode_db, get_section_db
 from emission.core.wrapper.user import User
 
-logging.basicConfig(level=logging.DEBUG)
+import emission.tests.common as etc
 
 class TestChoice(unittest.TestCase):
     def setUp(self):
@@ -36,4 +36,5 @@ class TestChoice(unittest.TestCase):
         self.assertEquals(choice.getCurrView(self.uuid), "game")
 
 if __name__ == '__main__':
+    etc.configLogging()
     unittest.main()

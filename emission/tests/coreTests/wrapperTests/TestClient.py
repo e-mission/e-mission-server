@@ -4,13 +4,14 @@ import sys
 import os
 from datetime import datetime, timedelta
 import logging
-logging.basicConfig(level=logging.DEBUG)
 
 # Our imports
 from emission.core.get_database import get_db, get_client_db, get_profile_db, get_uuid_db, get_pending_signup_db, get_section_db
 from emission.core.wrapper.client import Client
 from emission.tests import common
 from emission.core.wrapper.user import User
+
+import emission.tests.common as etc
 
 class TestClient(unittest.TestCase):
   def setUp(self):
@@ -217,4 +218,5 @@ class TestClient(unittest.TestCase):
     self.assertEqual(client.getClientConfirmedModeQuery(4), {'test_auto_confirmed.mode': 4})
 
 if __name__ == '__main__':
+    etc.configLogging()
     unittest.main()

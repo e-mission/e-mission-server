@@ -107,5 +107,6 @@ class UsefulQueriesTests(unittest.TestCase):
         self.assertEqual(bounds[1].lon, 11)
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    import emission.tests.common as etc
+    etc.configLogging()
     unittest.main()

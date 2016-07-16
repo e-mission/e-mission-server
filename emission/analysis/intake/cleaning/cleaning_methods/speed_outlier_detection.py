@@ -4,8 +4,6 @@
 # Standard imports
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
-
 class BoxplotOutlier(object):
     MINOR = 1.5
     MAJOR = 3

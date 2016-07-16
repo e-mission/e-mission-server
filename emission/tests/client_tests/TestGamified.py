@@ -9,9 +9,8 @@ from emission.clients.gamified import gamified
 from emission.core.get_database import get_db, get_mode_db, get_section_db
 from emission.core.wrapper.user import User
 from emission.core.wrapper.client import Client
-import emission.tests.common
+import emission.tests.common as etc
 
-logging.basicConfig(level=logging.DEBUG)
 
 class TestGamified(unittest.TestCase):
     def setUp(self):
@@ -82,7 +81,7 @@ class TestGamified(unittest.TestCase):
 
         client = Client("gamified")
         client.update(createKey = False)
-        emission.tests.common.makeValid(client)
+        etc.makeValid(client)
 
         (resultPre, resultReg) = client.preRegister("this_is_the_super_secret_id", fakeEmail)
         studyList = Client.getPendingClientRegs(fakeEmail)
@@ -146,4 +145,5 @@ class TestGamified(unittest.TestCase):
         self.assertAlmostEqual(storedScore[1], expectedScore, 6)
 
 if __name__ == '__main__':
+    etc.configLogging()
     unittest.main()

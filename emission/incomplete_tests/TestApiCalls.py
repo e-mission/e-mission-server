@@ -17,5 +17,3 @@ class TestCarbon(unittest.TestCase):
         self.server_port = config_data["server"]["port"]
         self.log_base_dir = config_data["paths"]["log_base_dir"]
 
-    def testStoreSensedTrips(self):
-        

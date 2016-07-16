@@ -14,10 +14,6 @@ from emission.analysis.modelling.tour_model.trajectory_matching.route_matching i
 from emission.analysis.modelling.tour_model.K_medoid import kmedoids, user_route_data
 import emission.analysis.modelling.tour_model.cluster_pipeline as cp
 
-logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', level=logging.DEBUG)
-Profiles=get_profile_db()
-TOLERANCE = 200 #How much movement we allow before updating zip codes again. Should be pretty large.. this is conservative
-
 def update_profiles(dummy_users=False):
     if dummy_users:
         user_list = ['1']
@@ -83,5 +79,9 @@ def _check_zip_validity(user_home, user):
     return False
 
 if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', level=logging.DEBUG)
+    Profiles=get_profile_db()
+    TOLERANCE = 200 #How much movement we allow before updating zip codes again. Should be pretty large.. this is conservative
+
     update_profiles()
 

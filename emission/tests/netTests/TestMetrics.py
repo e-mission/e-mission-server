@@ -63,7 +63,14 @@ class TestMetrics(unittest.TestCase):
         # must be at least that much larger than the original data.
         self.assertEqual(len(agg_met_result), 8)
         # no overlap between users at the daily level
+        # bunch of intermediate entries with no users since this binning works
+        # by range
         self.assertEqual([m.nUsers for m in agg_met_result], [1,1,0,0,0,0,1,1])
+        # If there are no users, there are no values for any of the fields
+        # since these are never negative, it implies that their sum is zero
+        self.assertTrue('ON_FOOT' not in agg_met_result[2] and
+                         'BICYCLING' not in agg_met_result[2] and
+                         'IN_VEHICLE' not in agg_met_result[2])
 
 
     def testCountLocalDateMetrics(self):
@@ -116,5 +123,6 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual(met_result_ts['user_metrics'], [])
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    import emission.tests.common as etc
+    etc.configLogging()
     unittest.main()

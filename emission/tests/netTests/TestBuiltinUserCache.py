@@ -366,5 +366,7 @@ class TestBuiltinUserCache(unittest.TestCase):
     self.assertEquals(uuid_list, [self.testUserUUID])
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    import emission.tests.common as etc
+
+    etc.configLogging()
     unittest.main()

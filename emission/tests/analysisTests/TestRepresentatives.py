@@ -7,6 +7,8 @@ import emission.analysis.modelling.tour_model.featurization as feat
 
 import emission.tests.analysisTests.tourModelTests.common as etatc
 
+import emission.tests.common as etc
+
 class RepresentativesTests(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
@@ -159,5 +161,5 @@ class RepresentativesTests(unittest.TestCase):
         self.assertTrue(not repy.match('end', 2, bin))
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
+    etc.configLogging()
     unittest.main()

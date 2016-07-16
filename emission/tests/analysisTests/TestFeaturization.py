@@ -9,6 +9,7 @@ import emission.analysis.modelling.tour_model.cluster_pipeline as cp
 import emission.storage.timeseries.abstract_timeseries as esta
 
 import emission.tests.analysisTests.tourModelTests.common as etatc
+import emission.tests.common as etc
 
 class FeaturizationTests(unittest.TestCase):
 
@@ -92,5 +93,5 @@ class FeaturizationTests(unittest.TestCase):
             self.assertTrue(False)
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
+    etc.configLogging()
     unittest.main()

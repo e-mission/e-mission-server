@@ -14,11 +14,6 @@ import math
 from sdk import Moves
 from emission.core.get_database import get_mode_db, get_section_db, get_trip_db, get_moves_db
 
-config_data = json.load(open('conf/net/api/webserver.conf'))
-log_base_dir = config_data['paths']['log_base_dir']
-logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
-                    filename="%s/moves_collect.log" % log_base_dir, level=logging.DEBUG)
-
 def collect():
   key_file = open('keys.json')
   key_data = json.load(key_file)
@@ -308,5 +303,10 @@ def _cleanGPSData(old_points):
     return old_points
 
 if __name__ == "__main__":
-  collect()
+    config_data = json.load(open('conf/net/api/webserver.conf'))
+    log_base_dir = config_data['paths']['log_base_dir']
+    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
+                    filename="%s/moves_collect.log" % log_base_dir, level=logging.DEBUG)
+
+    collect()
 

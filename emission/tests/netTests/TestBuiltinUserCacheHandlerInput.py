@@ -185,5 +185,7 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
         self.assertEqual(edb.get_timeseries_error_db().find().count(), 0)
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    import emission.tests.common as etc
+
+    etc.configLogging()
     unittest.main()

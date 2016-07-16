@@ -14,7 +14,7 @@ from enum import Enum
 
 import emission.analysis.point_features as pf
 import emission.core.common as ec
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 class SmoothBoundary(object):
     def __init__(self, maxSpeed = 100):

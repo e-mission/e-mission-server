@@ -10,7 +10,7 @@ from emission.core.wrapper.user import User
 import emission.tests.common
 from emission.clients.data import data
 
-logging.basicConfig(level=logging.DEBUG)
+import emission.tests.common as etc
 
 class TestDefault(unittest.TestCase):
     def setUp(self):
@@ -60,4 +60,5 @@ class TestDefault(unittest.TestCase):
         self.assertIn('carbon_footprint', test_user.getProfile().keys())
 
 if __name__ == '__main__':
+    etc.configLogging()
     unittest.main()

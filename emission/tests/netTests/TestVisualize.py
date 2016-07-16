@@ -17,9 +17,6 @@ import emission.storage.timeseries.format_hacks.move_filter_field as estfm
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.decorations.local_date_queries as esdldq
 
-logging.basicConfig(level=logging.DEBUG)
-
-
 
 class TestVisualize(unittest.TestCase):
     def setUp(self):
@@ -57,4 +54,7 @@ class TestVisualize(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    import emission.tests.common as etc
+    etc.configLogging()
+
     unittest.main()

@@ -138,5 +138,7 @@ class TestBuiltinUserCacheHandlerOutput(unittest.TestCase):
             "config/sensor_config"])
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    import emission.tests.common as etc
+
+    etc.configLogging()
     unittest.main()

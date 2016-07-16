@@ -49,5 +49,6 @@ class TestAnalysisTimeseriesQueries(unittest.TestCase):
         etsa.queryPlaceLike(self, esda.RAW_STOP_KEY, ecws.Stop)
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    import emission.tests.common as etc
+    etc.configLogging()
     unittest.main()
