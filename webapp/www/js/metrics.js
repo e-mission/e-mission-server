@@ -3,7 +3,7 @@ angular.module('starter.metrics', ['nvd3'])
 .controller('MetricsCtrl', function($scope, $ionicActionSheet, $http) {
     $scope.options = {
         chart: {
-            type: 'lineChart',
+            type: 'multiBarChart',
             height: 450,
             margin : {
                 top: 20,
@@ -11,6 +11,8 @@ angular.module('starter.metrics', ['nvd3'])
                 bottom: 40,
                 left: 55
             },
+            showValues: true,
+            stacked: false,
             x: function(d){ return d[0]; },
             y: function(d){ return d[1]; },
             /*
@@ -28,9 +30,9 @@ angular.module('starter.metrics', ['nvd3'])
             // clipVoronoi: false,
 
             xAxis: {
-                axisLabel: 'X Axis',
+                axisLabel: 'Date',
                 tickFormat: function(d) {
-                    return d3.time.format('%m/%d/%y')(new Date(d * 1000))
+                    return d3.time.format('%y-%m-%d')(new Date(d * 1000))
                 },
                 showMaxMin: false,
                 staggerLabels: true
@@ -84,20 +86,19 @@ angular.module('starter.metrics', ['nvd3'])
             }
         });
         $scope.data = [];
-        for (mode in mode_bins) {
-            val_arrays = 
+        for (var mode in mode_bins) {
             $scope.data.push({key: mode, values: mode_bins[mode]});
         }
-        $scope.options.
-        $scope.options.yAxis.axisLabel = $scope.metricLabelMap[$scope.selectCtrl.metricString];
-    };
 
-    $scope.metricLabelMap = [
-      {text: "COUNT", value:'Number'},
-      {text: "DISTANCE", value: 'km'},
-      {text: "DURATION", value: 'secs'},
-      {text: "MEDIAN_SPEED", value: 'km/sec'}
-    ];
+        var metricLabelMap = {
+           "COUNT":'Number',
+           "DISTANCE": 'm',
+           "DURATION": 'secs',
+           "MEDIAN_SPEED": 'm/sec'
+        };
+
+        $scope.options.chart.yAxis.axisLabel = metricLabelMap[$scope.selectCtrl.metricString];
+    };
 
     $scope.metricOptions = [
       {text: "COUNT", value:'count'},
@@ -105,6 +106,43 @@ angular.module('starter.metrics', ['nvd3'])
       {text: "DURATION", value: 'duration'},
       {text: "MEDIAN_SPEED", value: 'median_speed'}
     ];
+
+    $scope.changeFromWeekday = function() {
+      return $scope.changeWeekday(function(newVal) {
+                                    $scope.selectCtrl.fromDateWeekdayString = newVal;
+                                  },
+                                  $scope.selectCtrl.fromDate);
+    }
+  
+    $scope.changeToWeekday = function() {
+      return $scope.changeWeekday(function(newVal) {
+                                    $scope.selectCtrl.toDateWeekdayString = newVal;
+                                  },
+                                  $scope.selectCtrl.toDate);
+    }
+  
+    $scope.changeWeekday = function(stringSetFunction, localDateObj) {
+      var weekdayOptions = [
+        {text: "All", value: null},
+        {text: "Monday", value: 0},
+        {text: "Tuesday", value: 1},
+        {text: "Wednesday", value: 2},
+        {text: "Thursday", value: 3},
+        {text: "Friday", value: 4},
+        {text: "Saturday", value: 5},
+        {text: "Sunday", value: 6}
+      ];
+      $ionicActionSheet.show({
+        buttons: weekdayOptions,
+        titleText: "Select day of the week",
+        cancelText: "Cancel",
+        buttonClicked: function(index, button) {
+          stringSetFunction(button.text);
+          localDateObj.weekday = button.value;
+          return true;
+        }
+      });
+    };
 
     $scope.changeMetric = function() {
         $ionicActionSheet.show({
