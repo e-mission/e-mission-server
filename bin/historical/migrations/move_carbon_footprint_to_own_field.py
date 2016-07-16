@@ -15,20 +15,21 @@ from dao.user import User
 from clients.default import default
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
 
-for user_uuid_dict in get_uuid_db().find({}, {'uuid': 1, '_id': 0}):
-    currUUID = user_uuid_dict['uuid']
-    logging.info("Fixing results for %s" % currUUID)
-    currUser = User.fromUUID(currUUID)
-    if currUser.getFirstStudy() is None:
-        currFootprint = currUser.getProfile().get("currentScore", None)
-        default.setCarbonFootprint(currUser, currFootprint)
-        get_profile_db().update({'user_id': currUUID}, {'$unset': {'previousScore': "",
-                                                                    'currentScore': ""}})
-        logging.debug("After change, currentScore = %s, currFootprint = %s" % (
-            currUser.getProfile().get("currentScore"),
-            default.getCarbonFootprint(currUser)))
+    for user_uuid_dict in get_uuid_db().find({}, {'uuid': 1, '_id': 0}):
+        currUUID = user_uuid_dict['uuid']
+        logging.info("Fixing results for %s" % currUUID)
+        currUser = User.fromUUID(currUUID)
+        if currUser.getFirstStudy() is None:
+            currFootprint = currUser.getProfile().get("currentScore", None)
+            default.setCarbonFootprint(currUser, currFootprint)
+            get_profile_db().update({'user_id': currUUID}, {'$unset': {'previousScore': "",
+                                                                        'currentScore': ""}})
+            logging.debug("After change, currentScore = %s, currFootprint = %s" % (
+                currUser.getProfile().get("currentScore"),
+                default.getCarbonFootprint(currUser)))
 
 # Informal testing from the command line since this is a one-time script
 # Can be pulled out into a unit test if reworked
