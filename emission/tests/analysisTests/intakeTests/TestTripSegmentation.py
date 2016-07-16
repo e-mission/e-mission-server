@@ -165,10 +165,11 @@ class TestTripSegmentation(unittest.TestCase):
     
     def testSegmentationWrapperCombined(self):
         # Change iOS entries to have the android UUID
+        tsdb = edb.get_timeseries_db()
         for entry in esta.TimeSeries.get_time_series(
                 self.iosUUID).find_entries():
             entry["user_id"] = self.androidUUID
-            edb.get_timeseries_db().save(entry)
+            tsdb.save(entry)
         
         # Now, segment the data for the combined UUID, which will include both
         # android and ios
@@ -230,5 +231,5 @@ class TestTripSegmentation(unittest.TestCase):
         
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    etc.configLogging()
     unittest.main()

@@ -25,6 +25,8 @@ import emission.storage.decorations.section_queries as esds
 import emission.storage.decorations.trip_queries as esdt
 import emission.storage.decorations.analysis_timeseries_queries as esda
 
+import emission.tests.common as etc
+
 class TestLocationSmoothing(unittest.TestCase):
     def setUp(self):
         # We need to access the database directly sometimes in order to
@@ -62,9 +64,10 @@ class TestLocationSmoothing(unittest.TestCase):
 
         entries = json.load(open("emission/tests/data/smoothing_data/%s" % trip_id),
                                  object_hook=bju.object_hook)
+        tsdb = edb.get_timeseries_db()
         for entry in entries:
             entry["user_id"] = self.testUUID
-            edb.get_timeseries_db().save(entry)
+            tsdb.save(entry)
 
     def testPointFilteringShanghaiJump(self):
         classicJumpTrip1 = self.trip_entries[0]
@@ -244,7 +247,7 @@ class TestLocationSmoothing(unittest.TestCase):
                     self.assertEqual(len(filtered_points_entry.data.deleted_points), 0)
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    etc.configLogging()
     unittest.main()
 
 
