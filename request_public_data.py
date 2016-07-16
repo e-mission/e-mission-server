@@ -4,12 +4,14 @@ import requests
 import json
 import argparse
 import logging
+import arrow 
 
+# This script pulls public data from the server and then loads it to a local server 
 parser = argparse.ArgumentParser()
 parser.add_argument("from_date",
-        help="from_date in the format of YYYY-MM-DD")
+        help="from_date (local time) in the format of YYYY-MM-DD")
 parser.add_argument("to_date",
-        help="to_date in the format of YYYY-MM-DD")
+        help="to_date (local time) in the format of YYYY-MM-DD")
 parser.add_argument("server_url",
         help="url of the server to pull data from i.e. localhost:8080")
 parser.add_argument("-v", "--verbose", 
@@ -23,16 +25,19 @@ server_url = args.server_url
 if args.verbose:
 	logging.basicConfig(level=logging.DEBUG)
 
-r = requests.get("http://" + server_url + "/getData?from_date=" + from_date + "&to_date=" + to_date)
+from_date_UTC = arrow.get(from_date).replace(tzinfo='local').to('utc').format('YYYY-MM-DD HH:mm:ss')
+to_date_UTC = arrow.get(to_date).replace(tzinfo='local').to('utc').format('YYYY-MM-DD HH:mm:ss')
 
-dic = r.json() 
+r = requests.get("http://" + server_url + "/eval/publicData/timeseries?from_date=" + from_date_UTC + "&to_date=" + to_date_UTC)
+
+dic = json.loads(r.text, object_hook = bju.object_hook)
 iphone_list = dic['iphone_data'] 
 android_list = dic['android_data']
 phone_list = iphone_list + android_list 
 
 tsdb = edb.get_timeseries_db()
 
-print "Loading data from " + from_date + " to " + to_date 
+print "Loading data from " + from_date + " to " + to_date + " (local time)"
 print "..."
 
 for index, entry_list in enumerate(phone_list):
@@ -46,9 +51,9 @@ for index, entry_list in enumerate(phone_list):
 	else:
 		logging.debug(str(entry_list[0]))
 
-	json_str = json.dumps(entry_list, default=bju.default, allow_nan=False, indent=4)
-	entries = json.loads(json_str, object_hook = bju.object_hook)
-	for entry in entries:
+	for entry in entry_list:
 		tsdb.save(entry)
 
 print "Data loaded to local server!"
+
+
