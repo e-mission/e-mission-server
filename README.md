@@ -261,7 +261,14 @@ note that the data is accessible by AWS admins by directly looking at the disk.
 In order to avoid this, you want to encrypt the disk. You can do this by:
 - using an encrypted EBS store, but this doesn't appear to allow you to specify
   your own encryption key
-- using a normal drive that is encrypted using cryptfs (http://sleepyhead.de/howto/?href=cryptpart, https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_a_non-root_file_system)
+- using a normal drive that is encrypted using cryptfs (http://sleepyhead.de/howto/?href=cryptpart, https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_a_non-root_file_system). The standard AWS ubuntu AMI appears to have LUKS enabled, so you can follow the instructions with LUKS.
+
+```
+ubuntu@ip-10-203-173-119:/home/e-mission$ cryptsetup --help | grep luks
+                                      for luksFormat
+  -M, --type=STRING                   Type of device metadata: luks, plain,
+...
+```
 
 In either of these cases, you need to reconfigure mongod.conf to point to data
 and log directories in the encrypted volume.
