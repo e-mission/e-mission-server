@@ -21,6 +21,9 @@ angular.module('starter.heatmap', ['ui-leaflet'])
   });
 
   $scope.getPopRoute = function() {
+    $ionicLoading.show({
+        template: 'Loading...'
+    });
     var data = {
       modes: $scope.selectCtrl.modes,
       from_local_date: $scope.selectCtrl.fromDate,
@@ -30,6 +33,7 @@ angular.module('starter.heatmap', ['ui-leaflet'])
     console.log("Sending data "+JSON.stringify(data));
     $http.post("/result/heatmap/pop.route", data)
     .then(function(response) {
+      $ionicLoading.hide();
       if (angular.isDefined(response.data.lnglat)) {
         console.log("Got points in heatmap "+response.data.lnglat.length);
         $scope.showHeatmap(response.data.lnglat);
@@ -37,6 +41,7 @@ angular.module('starter.heatmap', ['ui-leaflet'])
         console.log("did not find latlng in response data "+JSON.stringify(response.data));
       }
     }, function(error) {
+      $ionicLoading.hide();
       console.log("Got error %s while trying to read heatmap data" +
         JSON.stringify(error));
     });
