@@ -1,6 +1,6 @@
 angular.module('starter.metrics', ['nvd3'])
 
-.controller('MetricsCtrl', function($scope, $ionicActionSheet, $http) {
+.controller('MetricsCtrl', function($scope, $ionicActionSheet, $ionicLoading, $http) {
     $scope.options = {
         chart: {
             type: 'multiBarChart',
@@ -48,14 +48,18 @@ angular.module('starter.metrics', ['nvd3'])
 
     $scope.getMetrics = function() {
       var data = {
-        freq: 'DAILY',
+        freq: $scope.selectCtrl.freq,
         start_time: $scope.selectCtrl.fromDate,
         end_time: $scope.selectCtrl.toDate,
         metric: $scope.selectCtrl.metric
       };
       console.log("Sending data "+JSON.stringify(data));
+      $ionicLoading.show({
+        template: 'Loading...'
+      });
       $http.post("/result/metrics/local_date", data)
       .then(function(response) {
+        $ionicLoading.hide();
         if (angular.isDefined(response.data.aggregate_metrics)) {
           console.log("Got aggregate result "+response.data.aggregate_metrics.length);
           $scope.showCharts(response.data.aggregate_metrics)
@@ -64,6 +68,7 @@ angular.module('starter.metrics', ['nvd3'])
           console.log("did not find aggregate result in response data "+JSON.stringify(response.data));
         }
       }, function(error) {
+        $ionicLoading.hide();
         console.log("Got error %s while trying to read metric data" +
           JSON.stringify(error));
       });
@@ -105,6 +110,12 @@ angular.module('starter.metrics', ['nvd3'])
       {text: "DISTANCE", value: 'distance'},
       {text: "DURATION", value: 'duration'},
       {text: "MEDIAN_SPEED", value: 'median_speed'}
+    ];
+
+    $scope.freqOptions = [
+      {text: "DAILY", value:'DAILY'},
+      {text: "MONTHLY", value: 'MONTHLY'},
+      {text: "YEARLY", value: 'YEARLY'}
     ];
 
     $scope.changeFromWeekday = function() {
@@ -157,11 +168,27 @@ angular.module('starter.metrics', ['nvd3'])
         });
     };
 
+    $scope.changeFreq = function() {
+        $ionicActionSheet.show({
+          buttons: $scope.freqOptions,
+          titleText: "Select summary freq",
+          cancelText: "Cancel",
+          buttonClicked: function(index, button) {
+            $scope.selectCtrl.freqString = button.text;
+            $scope.selectCtrl.freq = button.value;
+            return true;
+          }
+        });
+    };
+
+
     var initSelect = function() {
       var now = moment();
       var monthago = moment().subtract(3, 'M');
       $scope.selectCtrl.metric = 'count';
       $scope.selectCtrl.metricString = "COUNT";
+      $scope.selectCtrl.freq = 'MONTHLY';
+      $scope.selectCtrl.freqString = "MONTHLY";
       $scope.selectCtrl.fromDate = moment2Localdate(monthago)
       $scope.selectCtrl.toDate = moment2Localdate(now);
       $scope.selectCtrl.fromDateWeekdayString = "All"
