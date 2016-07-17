@@ -379,7 +379,10 @@ def getCarbonCompare():
 
 @post('/result/metrics/<time_type>')
 def summarize_metrics(time_type):
-    user_uuid = getUUID(request)
+    if 'user' in request.json:
+        user_uuid = getUUID(request)
+    else:
+        user_uuid = None
     start_time = request.json['start_time']
     end_time = request.json['end_time']
     freq_name = request.json['freq']
@@ -389,9 +392,11 @@ def summarize_metrics(time_type):
         'local_date': metrics.summarize_by_local_date
     }
     metric_fn = time_type_map[time_type]
-    return metric_fn(user_uuid,
+    ret_val = metric_fn(user_uuid,
               start_time, end_time,
               freq_name, metric_name)
+    # logging.debug("ret_val = %s" % bson.json_util.dumps(ret_val))
+    return ret_val
 
 # Client related code START
 @post("/client/<clientname>/<method>")

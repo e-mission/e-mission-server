@@ -1,4 +1,6 @@
 import numpy as np
+import logging
+import pandas as pd
 
 def get_summary_fn(key):
     summary_fn_map = {
@@ -30,7 +32,11 @@ def get_duration(mode_section_grouped_df):
 def get_median_speed(mode_section_grouped_df):
     ret_dict = {}
     for (mode, mode_section_df) in mode_section_grouped_df:
-        median_speeds = [np.median(sl) for sl
+        median_speeds = [pd.Series(sl).dropna().median() for sl
                             in mode_section_df.speeds]
-        ret_dict[mode] = np.median(median_speeds)
+        mode_median = pd.Series(median_speeds).dropna().median()
+        if np.isnan(mode_median):
+            logging.debug("still found nan for mode %s, skipping")
+        else:
+            ret_dict[mode] = mode_median
     return ret_dict
