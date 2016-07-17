@@ -4,13 +4,14 @@ import sys
 import os
 from datetime import datetime, timedelta
 import logging
-logging.basicConfig(level=logging.DEBUG)
 
 # Our imports
 from emission.core.wrapper.user import User
 from emission.core.wrapper.client import Client
 from emission.tests import common
 from emission.analysis.result import userclient
+
+import emission.tests.common as etc
 
 class TestUserClient(unittest.TestCase):
   def setUp(self):
@@ -39,4 +40,5 @@ class TestUserClient(unittest.TestCase):
     self.assertEquals(userclient.getClientQuery('testclient'), {'study_list': {'$in': ['testclient']}});
 
 if __name__ == '__main__':
+    etc.configLogging()
     unittest.main()

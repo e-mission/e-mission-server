@@ -13,8 +13,6 @@ from emission.core.wrapper.user import User
 from emission.core.wrapper.client import Client
 import emission.tests.common
 
-logging.basicConfig(level=logging.DEBUG)
-
 class TestProfile(unittest.TestCase):
   def setUp(self):
     self.testUsers = ["test@example.com", "best@example.com", "fest@example.com",
@@ -104,4 +102,7 @@ class TestProfile(unittest.TestCase):
                     self.assertEquals(prof_1['zip'],  '94720')
 
 if __name__ == '__main__':
+    import emission.tests.common as etc
+    etc.configLogging()
+
     unittest.main()

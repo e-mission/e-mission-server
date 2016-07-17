@@ -10,9 +10,7 @@ from emission.core.get_database import get_db, get_mode_db, get_section_db
 import emission.analysis.classification.inference.mode as pipeline
 from emission.core.wrapper.user import User
 from emission.core.wrapper.client import Client
-import emission.tests.common
-
-logging.basicConfig(level=logging.DEBUG)
+import emission.tests.common as etc
 
 class TestPipeline(unittest.TestCase):
   def setUp(self):
@@ -22,7 +20,7 @@ class TestPipeline(unittest.TestCase):
 
     # Sometimes, we may have entries left behind in the database if one of the tests failed
     # or threw an exception, so let us start by cleaning up all entries
-    emission.tests.common.dropAllCollections(get_db())
+    etc.dropAllCollections(get_db())
 
     self.ModesColl = get_mode_db()
     self.assertEquals(self.ModesColl.find().count(), 0)
@@ -30,8 +28,8 @@ class TestPipeline(unittest.TestCase):
     self.SectionsColl = get_section_db()
     self.assertEquals(self.SectionsColl.find().count(), 0)
 
-    emission.tests.common.loadTable(self.serverName, "Stage_Modes", "emission/tests/data/modes.json")
-    emission.tests.common.loadTable(self.serverName, "Stage_Sections", "emission/tests/data/testModeInferFile")
+    etc.loadTable(self.serverName, "Stage_Modes", "emission/tests/data/modes.json")
+    etc.loadTable(self.serverName, "Stage_Sections", "emission/tests/data/testModeInferFile")
 
     # Let's make sure that the users are registered so that they have profiles
     for userEmail in self.testUsers:
@@ -60,7 +58,7 @@ class TestPipeline(unittest.TestCase):
 
   def tearDown(self):
     for testUser in self.testUsers:
-      emission.tests.common.purgeSectionData(self.SectionsColl, testUser)
+      etc.purgeSectionData(self.SectionsColl, testUser)
     logging.debug("Number of sections after purge is %d" % self.SectionsColl.find().count())
     self.ModesColl.remove()
     self.assertEquals(self.ModesColl.find().count(), 0)
@@ -238,7 +236,7 @@ class TestPipeline(unittest.TestCase):
 
     client = Client("testclient")
     client.update(createKey = False)
-    emission.tests.common.makeValid(client)
+    etc.makeValid(client)
 
     (resultPre, resultReg) = client.preRegister("this_is_the_super_secret_id", fakeEmail)
     self.assertEqual(resultPre, 0)
@@ -282,4 +280,5 @@ class TestPipeline(unittest.TestCase):
     self.assertIsNotNone(test_id_1_sec['distance'])
 
 if __name__ == '__main__':
+    etc.configLogging()
     unittest.main()

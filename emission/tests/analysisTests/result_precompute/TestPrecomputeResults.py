@@ -13,7 +13,7 @@ import emission.tests.common
 from emission.clients.testclient import testclient
 from emission.clients.data import data
 
-logging.basicConfig(level=logging.DEBUG)
+import emission.tests.common as etc
 
 class TestPrecomputeResults(unittest.TestCase):
     def setUp(self):
@@ -87,4 +87,5 @@ class TestPrecomputeResults(unittest.TestCase):
                 self.assertEqual(len(carbonFootprint), 12)
 
 if __name__ == '__main__':
+    etc.configLogging()
     unittest.main()

@@ -8,8 +8,6 @@ import time
 from emission.core.get_database import get_client_stats_db, get_server_stats_db, get_result_stats_db
 from emission.net.api import stats
 
-logging.basicConfig(level=logging.DEBUG)
-
 class TestStats(unittest.TestCase):
   def setUp(self):
     get_client_stats_db().remove()
@@ -92,4 +90,7 @@ class TestStats(unittest.TestCase):
     self.assertEquals(stats.getClientMeasurementCount(self.testInputJSON['Readings']), 6)
 
 if __name__ == '__main__':
+    import emission.tests.common as etc
+    etc.configLogging()
+
     unittest.main()

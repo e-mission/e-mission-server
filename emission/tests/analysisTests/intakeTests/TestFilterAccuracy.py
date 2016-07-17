@@ -12,6 +12,8 @@ import emission.analysis.intake.cleaning.filter_accuracy as eaicf
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.pipeline_queries as epq
 
+import emission.tests.common as etc
+
 class TestFilterAccuracy(unittest.TestCase):
     def setUp(self):
         # We need to access the database directly sometimes in order to
@@ -23,9 +25,10 @@ class TestFilterAccuracy(unittest.TestCase):
         self.testUUID = uuid.uuid4()
         self.entries = json.load(open("emission/tests/data/smoothing_data/tablet_2015-11-03"),
                                  object_hook=bju.object_hook)
+        tsdb = edb.get_timeseries_db()
         for entry in self.entries:
             entry["user_id"] = self.testUUID
-            edb.get_timeseries_db().save(entry)
+            tsdb.save(entry)
         self.ts = esta.TimeSeries.get_time_series(self.testUUID)
 
     def tearDown(self):
@@ -99,5 +102,5 @@ class TestFilterAccuracy(unittest.TestCase):
         self.assertEqual(len(filtered_points_df), 124)
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    etc.configLogging()
     unittest.main()

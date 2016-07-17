@@ -23,6 +23,8 @@ import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.decorations.local_date_queries as esdl
 
+import emission.tests.common as etc
+
 PST = "America/Los_Angeles"
 EST = "America/New_York"
 IST = "Asia/Calcutta"
@@ -496,5 +498,5 @@ class TestTimeGrouping(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    etc.configLogging()
     unittest.main()

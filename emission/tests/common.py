@@ -99,11 +99,12 @@ def setupRealExample(testObj, dump_file):
     logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
     testObj.entries = json.load(open(dump_file), object_hook = bju.object_hook)
     testObj.testUUID = uuid.uuid4()
+    tsdb = edb.get_timeseries_db()
     for entry in testObj.entries:
         entry["user_id"] = testObj.testUUID
         # print "Saving entry with write_ts = %s and ts = %s" % (entry["metadata"]["write_fmt_time"],
         #                                                        entry["data"]["fmt_time"])
-        edb.get_timeseries_db().save(entry)
+        tsdb.save(entry)
         
     logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
     logging.debug("First few entries = %s" % 
@@ -116,3 +117,18 @@ def runIntakePipeline(uuid):
     eaist.segment_current_trips(uuid)
     eaiss.segment_current_sections(uuid)
     eaicr.clean_and_resample(uuid)
+
+def configLogging():
+    """
+    Standard function to be called from the test cases to turn on logging.
+    We really want the tests to configure logging in their main method so
+    that individual tests can be run when they fail. But we also want a standard
+    method that we can change quickly and easily.
+
+    This is a simple way to meet both requirements.
+
+    :return: None
+    """
+    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(thread)d:%(message)s',
+                    level=logging.DEBUG)
+

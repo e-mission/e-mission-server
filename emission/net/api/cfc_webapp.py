@@ -7,9 +7,6 @@ import bottle as bt
 import sys
 import os
 import logging
-logging.basicConfig(format='%(asctime)s:%(levelname)s:%(thread)d:%(message)s',
-                  filename='webserver_debug.log', level=logging.DEBUG)
-logging.debug("This should go to the log file")
 
 from datetime import datetime
 import time
@@ -386,7 +383,10 @@ def getCarbonCompare():
 
 @post('/result/metrics/<time_type>')
 def summarize_metrics(time_type):
-    user_uuid = getUUID(request)
+    if 'user' in request.json:
+        user_uuid = getUUID(request)
+    else:
+        user_uuid = None
     start_time = request.json['start_time']
     end_time = request.json['end_time']
     freq_name = request.json['freq']
@@ -396,9 +396,11 @@ def summarize_metrics(time_type):
         'local_date': metrics.summarize_by_local_date
     }
     metric_fn = time_type_map[time_type]
-    return metric_fn(user_uuid,
+    ret_val = metric_fn(user_uuid,
               start_time, end_time,
               freq_name, metric_name)
+    # logging.debug("ret_val = %s" % bson.json_util.dumps(ret_val))
+    return ret_val
 
 # Pulling public data from the server  
 @get('/eval/publicData/timeseries')
@@ -614,35 +616,40 @@ def getUUID(request, inHeader=False):
   return retUUID
 # Auth helpers END
 
-# We have see the sockets hang in practice. Let's set the socket timeout = 1
-# hour to be on the safe side, and see if it is hit.
-socket.setdefaulttimeout(float(socket_timeout))
+if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(thread)d:%(message)s',
+                        filename='webserver_debug.log', level=logging.DEBUG)
+    logging.debug("This should go to the log file")
 
-for plugin in app.plugins:
-    if isinstance(plugin, JSONPlugin):
-        print("Replaced json_dumps in plugin with the one from bson")
-        plugin.json_dumps = bson.json_util.dumps
+    # We have see the sockets hang in practice. Let's set the socket timeout = 1
+    # hour to be on the safe side, and see if it is hit.
+    socket.setdefaulttimeout(float(socket_timeout))
 
-print("Changing bt.json_loads from %s to %s" % (bt.json_loads, bson.json_util.loads))
-bt.json_loads = bson.json_util.loads
+    for plugin in app.plugins:
+        if isinstance(plugin, JSONPlugin):
+            print("Replaced json_dumps in plugin with the one from bson")
+            plugin.json_dumps = bson.json_util.dumps
 
-# The selection of SSL versus non-SSL should really be done through a config
-# option and not through editing source code, so let's make this keyed off the
-# port number
-if server_port == "443":
-  # We support SSL and want to use it
-  run(host=server_host, port=server_port, server='cherrypy', debug=True,
-      certfile=ssl_cert, keyfile=private_key, ssl_module='builtin')
-else:
-  # Non SSL option for testing on localhost
-  # We can theoretically use a separate skipAuth flag specified in the config file,
-  # but then we have to define the behavior if SSL is true and we are not
-  # running on localhost but still want to run without authentication. That is
-  # not really an important use case now, and it makes people have to change
-  # two values and increases the chance of bugs. So let's key the auth skipping from this as well.
-  skipAuth = True
-  print "Running with HTTPS turned OFF, skipAuth = True"
+    print("Changing bt.json_loads from %s to %s" % (bt.json_loads, bson.json_util.loads))
+    bt.json_loads = bson.json_util.loads
 
-  run(host=server_host, port=server_port, server='cherrypy', debug=True)
+    # The selection of SSL versus non-SSL should really be done through a config
+    # option and not through editing source code, so let's make this keyed off the
+    # port number
+    if server_port == "443":
+      # We support SSL and want to use it
+      run(host=server_host, port=server_port, server='cherrypy', debug=True,
+          certfile=ssl_cert, keyfile=private_key, ssl_module='builtin')
+    else:
+      # Non SSL option for testing on localhost
+      # We can theoretically use a separate skipAuth flag specified in the config file,
+      # but then we have to define the behavior if SSL is true and we are not
+      # running on localhost but still want to run without authentication. That is
+      # not really an important use case now, and it makes people have to change
+      # two values and increases the chance of bugs. So let's key the auth skipping from this as well.
+      skipAuth = True
+      print "Running with HTTPS turned OFF, skipAuth = True"
 
-# run(host="0.0.0.0", port=server_port, server='cherrypy', debug=True)
+      run(host=server_host, port=server_port, server='cherrypy', debug=True)
+
+    # run(host="0.0.0.0", port=server_port, server='cherrypy', debug=True)

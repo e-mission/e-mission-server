@@ -6,6 +6,7 @@ import datetime
 import os, os.path
 
 import emission.tests.analysisTests.tourModelTests.common as etatc
+import emission.tests.common as etc
 
 import emission.core.get_database as edb
 
@@ -150,5 +151,5 @@ class SimilarityTests(unittest.TestCase):
             self.assertTrue(c)
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
+    etc.configLogging()
     unittest.main()

@@ -23,12 +23,13 @@ class TestMoveFilterField(unittest.TestCase):
         edb.get_timeseries_db().remove({"user_id": self.testUUID,
                                         "metadata.key": "background/filtered_location"})
 
+        tsdb = edb.get_timeseries_db()
         for entry in edb.get_timeseries_db().find({'user_id': self.testUUID,
             'metadata.filter': 'time',
             "metadata.key": "background/location"}):
             del entry["_id"]
             entry["metadata"]["key"] = "background/filtered_location"
-            edb.get_timeseries_db().insert(entry)
+            tsdb.insert(entry)
 
         self.assertEquals(edb.get_timeseries_db().find({'user_id': self.testUUID,
             'metadata.filter': 'time',
@@ -87,13 +88,14 @@ class TestMoveFilterField(unittest.TestCase):
     def testInsertFilters(self):
         edb.get_timeseries_db().remove({"user_id": self.testUUID,
                                         "metadata.key": "background/filtered_location"})
+        tsdb = edb.get_timeseries_db()
         for entry in edb.get_timeseries_db().find({'user_id': self.testUUID,
             'metadata.filter': 'time',
             "metadata.key": "background/location"}):
             del entry["_id"]
             del entry["metadata"]["filter"]
             entry["metadata"]["key"] = "background/filtered_location"
-            edb.get_timeseries_db().insert(entry)
+            tsdb.insert(entry)
 
         # At this point, all the filtered_location entries will not have any filters
         self.assertEquals(edb.get_timeseries_db().find({'user_id': self.testUUID,
@@ -118,5 +120,6 @@ class TestMoveFilterField(unittest.TestCase):
             "metadata.key": "background/filtered_location"}).count(), 738)
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    import emission.tests.common as etc
+    etc.configLogging()
     unittest.main()

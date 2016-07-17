@@ -20,7 +20,8 @@ def is_location_entry(entry):
     return curr_key == "background/location" or curr_key == "background/filtered_location"
 
 def move_all_filters_to_data():
-    for entry in edb.get_timeseries_db().find():
+    tsdb = edb.get_timeseries_db()
+    for entry in tsdb.find():
         if "filter" in entry["metadata"]:
             curr_filter = entry["metadata"]["filter"]
             if is_location_entry(entry):
@@ -30,7 +31,7 @@ def move_all_filters_to_data():
 
             # For all cases, including the location one, we want to delete the filter from metadata
             del entry["metadata"]["filter"]
-            edb.get_timeseries_db().save(entry)
+            tsdb.save(entry)
             logging.debug("for entry %s, for key %s, deleted filter %s from metadata" % 
                             (entry["_id"], get_curr_key(entry), curr_filter))
         else:
@@ -43,4 +44,4 @@ def move_all_filters_to_data():
             # so set it to time in this case
             entry["data"]["filter"] = "time"
             logging.debug("No entry found in either data or metadata, for key %s setting to 'time'" % entry["metadata"]["key"])
-            edb.get_timeseries_db().save(entry)
+            tsdb.save(entry)

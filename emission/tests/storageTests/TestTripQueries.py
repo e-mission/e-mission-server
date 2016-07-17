@@ -57,5 +57,6 @@ class TestTripQueries(unittest.TestCase):
         self.assertEqual([entry.data for entry in ret_entries], [new_stop])
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    import emission.tests.common as etc
+    etc.configLogging()
     unittest.main()

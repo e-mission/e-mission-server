@@ -43,11 +43,6 @@ class TestCommonTripQueries(unittest.TestCase):
         edb.get_analysis_timeseries_db().remove({'user_id': self.testUserId})
         edb.get_common_place_db().remove({'user_id': self.testUserId})
 
-    def clearRelatedDb(self):
-        edb.get_timeseries_db().drop()
-        edb.get_analysis_timeseries_db().drop()
-        edb.get_common_place_db().drop()
-
     def testCreation(self):
         common_trip = esdctp.make_new_common_trip()
         common_trip.user_id = self.testUserId
@@ -104,5 +99,6 @@ def get_fake_data(user_name):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
+    import emission.tests.common as etc
+    etc.configLogging()
     unittest.main()

@@ -3,7 +3,6 @@
 # As history begins to accumulate, we may want to specify a point to reset the
 # pipeline to instead of deleting everything
 import logging
-logging.basicConfig(level=logging.DEBUG)
 
 import argparse
 import uuid
@@ -100,6 +99,8 @@ def reset_pipeline(args):
         reset_pipeline_for_stage(stage, user_id, day_ts)
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
+
     parser = argparse.ArgumentParser()
     parser.add_argument("user_id",
         help="user to reset the pipeline for. use 'all' for all users")

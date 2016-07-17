@@ -71,5 +71,5 @@ class TestGeojsonFeatureConverter(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    etc.configLogging()
     unittest.main()

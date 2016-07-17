@@ -14,7 +14,7 @@ from emission.core.wrapper.user import User
 from emission.core.wrapper.client import Client
 from emission.net.ext_service.moves import collect
 
-logging.basicConfig(level=logging.DEBUG)
+import emission.tests.common as etc
 
 class TestUtilityModelPipeline(unittest.TestCase):
   def setUp(self):

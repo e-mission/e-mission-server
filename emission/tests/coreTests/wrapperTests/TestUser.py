@@ -4,7 +4,6 @@ import sys
 import os
 from datetime import datetime, timedelta
 import logging
-logging.basicConfig(level=logging.DEBUG)
 
 # Our imports
 from emission.core.wrapper.user import User
@@ -14,9 +13,11 @@ from emission.analysis.result import userclient
 import emission.tests.common as etc
 import emission.core.get_database as edb
 
+import emission.tests.common as etc
+
 class TestUser(unittest.TestCase):
   def setUp(self):
-    etc.dropAllCollections(edb.get_db());
+    etc.dropAllCollections(edb.get_db())
 
   def testIsNotRegistered(self):
     self.assertFalse(User.isRegistered('fake@fake.com'))
@@ -189,4 +190,5 @@ class TestUser(unittest.TestCase):
     self.assertTrue(user.getProfile().get('test_field', 'blank'), {'something': 'beautiful'})
     
 if __name__ == '__main__':
+    etc.configLogging()
     unittest.main()

@@ -13,6 +13,8 @@ import emission.core.wrapper.entry as ecwe
 import emission.core.wrapper.motionactivity as ecwm
 import emission.core.wrapper.trip as ecwt
 
+import emission.tests.common as etc
+
 class TestEntry(unittest.TestCase):
     def testWrapLocation(self):
         testEntryJSON = {'_id': '55a4418c7d65cb39ee9737cf',
@@ -88,5 +90,5 @@ class TestEntry(unittest.TestCase):
         self.assertTrue(isinstance(trip.start_loc, gj.Point))
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    etc.configLogging()
     unittest.main()

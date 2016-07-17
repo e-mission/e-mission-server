@@ -3,7 +3,6 @@ import unittest
 import logging
 import json
 import re
-logging.basicConfig(level=logging.DEBUG)
 
 # Our imports
 import emission.tests.common
@@ -317,4 +316,7 @@ class TestMovesCollect(unittest.TestCase):
     self.assertEquals(newSec['retained'], False)
 
 if __name__ == '__main__':
+    import emission.tests.common as etc
+
+    etc.configLogging()
     unittest.main()

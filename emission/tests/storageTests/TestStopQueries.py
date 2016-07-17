@@ -38,5 +38,6 @@ class TestStopQueries(unittest.TestCase):
         self.assertEqual([entry.data for entry in ret_arr_list], ret_arr_time)
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    import emission.tests.common as etc
+    etc.configLogging()
     unittest.main()

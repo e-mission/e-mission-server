@@ -15,6 +15,8 @@ import emission.storage.timeseries.format_hacks.move_filter_field as estfm
 import emission.analysis.intake.cleaning.filter_accuracy as eaicf
 import emission.core.get_database as edb
 
+import emission.tests.common as etc
+
 class TestSaveAllConfigs(unittest.TestCase):
     def setUp(self):
         self.androidUUID = uuid.uuid4()
@@ -86,5 +88,5 @@ class TestSaveAllConfigs(unittest.TestCase):
         self.assertEqual(len(saved_entries), 0)
         
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
+    etc.configLogging()
     unittest.main()

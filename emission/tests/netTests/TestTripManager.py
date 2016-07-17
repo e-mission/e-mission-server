@@ -12,8 +12,6 @@ from emission.core.get_database import get_db, get_mode_db, get_section_db, get_
 from emission.net.api import tripManager
 from emission.core.wrapper.user import User
 
-logging.basicConfig(level=logging.DEBUG)
-
 class TestTripManager(unittest.TestCase):
   def setUp(self):
     self.testUsers = ["test@example.com", "best@example.com", "fest@example.com",
@@ -193,4 +191,7 @@ class TestTripManager(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+  import emission.tests.common as etc
+  etc.configLogging()
+
+  unittest.main()
