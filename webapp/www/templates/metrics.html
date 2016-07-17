@@ -1,11 +1,11 @@
 <ion-view view-title="Metrics">
   <ion-content class="has-header padding">
     <div class="row">
-      <div class="col col-25">
+      <div class="col col-20">
       <button class="button button-stable button-block row"
                 ng-click="changeMetric()">{{selectCtrl.metricString}}</button>
       </div>
-      <div class="col col-66">
+      <div class="col col-50">
         <div class="row">
           <div class="col">
           <button class="button button-small" ng-disabled="true" style="text-align:right">From:</button>
@@ -47,6 +47,10 @@
           </div> <!-- col-->
         </div> <!-- row -->
       </div> <!-- col -->
+      <div class="col col-20">
+      <button class="button button-stable button-block row"
+                ng-click="changeFreq()">{{selectCtrl.freqString}}</button>
+      </div>
       <div class="col col-10">
         <button class="button button-assertive"
                 ng-click="getMetrics()">Get!</button>
