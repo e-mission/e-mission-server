@@ -1,6 +1,6 @@
 angular.module('starter.heatmap', ['ui-leaflet'])
 
-.controller('HeatmapCtrl', function($scope, $ionicActionSheet, $http, leafletData) {
+.controller('HeatmapCtrl', function($scope, $ionicActionSheet, $http, $ionicLoading, leafletData) {
   $scope.mapCtrl = {};
 
   angular.extend($scope.mapCtrl, {
