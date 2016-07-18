@@ -45,11 +45,13 @@ def reward_active_transportation(user_id):
   timestamp_now = arrow.utcnow().timestamp
   
   #Get metrics
-  summary_ts = earmt.group_by_timestamp(user, timestamp_from_db, timestamp_now, earmt.LocalFreq.YEARLY, earmts.get_distance)
+  summary_ts = earmt.group_by_timestamp(user_id, timestamp_from_db, timestamp_now, None, earmts.get_distance)
 
   #get distances leftover from last timestamp
-  bike_distance = user_val['bike_count']
-  walk_distance = user_val['walk_count']
+  bike_distance = 0
+  #user_val['bike_count']
+  walk_distance = 0
+  #user_val['walk_count']
 
   #iterate over summary_ts and look for bike/on foot
   for item in summary_ts:
@@ -66,10 +68,12 @@ def reward_active_transportation(user_id):
   method_uri_bike = "/api/v3/tasks/"+ bike_habit_id + "/score/up"
   #reward user by scoring + habits
   # Walk: +1 for every km
-  for i in range(walk_distance//1000):
+  walk_pts = int(walk_distance//1000)
+  for i in range(walk_pts):
     res = proxy.habiticaProxy(user_id, 'POST', method_uri_walk, None)
   # Bike: +1 for every 3 km
-  for i in range(bike_distance//3000):
+  bike_pts = int(bike_distance//3000)
+  for i in range(bike_pts):
     res2 = proxy.habiticaProxy(user_id, 'POST', method_uri_bike, None)
 
   #update the timestamp and bike/walk counts in db
