@@ -26,14 +26,17 @@ def habiticaRegister(username, email, password, our_uuid):
   #Since we are randomly generating the password, we store it in case users 
   #want to access their Habitica account from the browser
   #Need to create a way from them to retrieve username/password
+  #metrics_data is used to calculate points based on km biked/walked
+  #last_timestamp is the last time the user got points, and bike/walk_count are the leftover km
   habitica_user_table = edb.get_habitica_db()
   habitica_user_table.insert({'user_id': our_uuid, 
-    'last_timestamp': arrow.utcnow().timestamp,
+    'metrics_data': {'last_timestamp': arrow.utcnow().timestamp, 'bike_count': 0, 'walk_count': 0},
     'habitica_username': username, 
     'habitica_password': password, 
     'habitica_id': user_dict['data']['_id'], 
     'habitica_token': user_dict['data']['apiToken']})
   return user_dict
+  response = proxy.habiticaProxy(uid, 'DELETE', "/api/v3/user", {'password': password})
 
 def habiticaProxy(user_uuid, method, method_url, method_args):
   logging.debug("For user %s, about to proxy %s method %s with args %s" %
