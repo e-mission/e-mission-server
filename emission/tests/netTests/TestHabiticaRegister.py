@@ -24,6 +24,7 @@ class TestHabiticaRegister(unittest.TestCase):
     del_result = proxy.habiticaProxy(self.testUserUUID, "DELETE",
                                      "/api/v3/user",
                                      {'password': self.sampleAuthMessage1['password']})
+    edb.get_habitica_db().remove({'user_id': self.testUserUUID})
     logging.debug("in tear_down, result = %s" % del_result)
 
   def testAddNewUser(self):
