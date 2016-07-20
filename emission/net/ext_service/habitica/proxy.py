@@ -6,7 +6,6 @@ import arrow
 
 # Our imports
 import emission.core.get_database as edb
-import emission.net.ext_service.habitica.setup as assist
 
 key_file = open('conf/net/keys.json')
 key_data = json.load(key_file)
