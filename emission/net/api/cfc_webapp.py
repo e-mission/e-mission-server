@@ -31,6 +31,8 @@ import modeshare, zipcode, distance, tripManager, \
                  metrics
 import emission.net.ext_service.moves.register as auth
 import emission.net.ext_service.habitica.proxy as habitproxy
+import emission.net.ext_service.habitica.setup as habitassist
+
 import emission.analysis.result.carbon as carbon
 import emission.analysis.classification.inference.commute as commute
 import emission.analysis.modelling.work_time as work_time
@@ -518,6 +520,12 @@ def habiticaProxy():
     return habitproxy.habiticaProxy(user_uuid, method, method_url,
                                     method_args)
 # Data source integration END
+@post('/habiticaSetup')
+def habiticaSetup():
+    logging.debug("habitica setup request %s" % (request))
+    user_uuid = getUUID(request)
+    assert(user_uuid is not None)
+    return habitassist.user_setup(user_uuid)
 
 @app.hook('before_request')
 def before_request():

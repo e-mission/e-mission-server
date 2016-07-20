@@ -34,9 +34,9 @@ def habiticaRegister(username, email, password, our_uuid):
     'habitica_username': username, 
     'habitica_password': password, 
     'habitica_id': user_dict['data']['_id'], 
-    'habitica_token': user_dict['data']['apiToken']})
+    'habitica_token': user_dict['data']['apiToken'],
+    'habitica_group_id': ""})
   return user_dict
-  response = proxy.habiticaProxy(uid, 'DELETE', "/api/v3/user", {'password': password})
 
 def habiticaProxy(user_uuid, method, method_url, method_args):
   logging.debug("For user %s, about to proxy %s method %s with args %s" %
