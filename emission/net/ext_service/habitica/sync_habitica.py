@@ -48,10 +48,8 @@ def reward_active_transportation(user_id):
   summary_ts = earmt.group_by_timestamp(user_id, timestamp_from_db, timestamp_now, None, earmts.get_distance)
 
   #get distances leftover from last timestamp
-  bike_distance = 0
-  #user_val['bike_count']
-  walk_distance = 0
-  #user_val['walk_count']
+  bike_distance = user_val['bike_count']
+  walk_distance = user_val['walk_count']
 
   #iterate over summary_ts and look for bike/on foot
   for item in summary_ts:
