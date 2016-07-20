@@ -24,7 +24,7 @@ if __name__ == '__main__':
         'metrics_data': {'bike_count': 0, 'last_timestamp': 1469020093, 'walk_count': 0}, 
         'user_id': su_uuid})
 
-    sh_email = "shankari@eecs.berkeley.edu"
+    sh_email = "shankari@berkeley.edu"
     sh_uuid = edb.get_uuid_db().find_one({'user_email': sh_email})['uuid']
     logging.debug("Found Shankari's uuid %s" % sh_uuid)
     edb.get_habitica_db().insert({'habitica_id': "e5d31351-a18c-4898-9b56-21c3dd58c834", 
