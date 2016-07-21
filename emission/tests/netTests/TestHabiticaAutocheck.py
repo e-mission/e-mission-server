@@ -22,6 +22,7 @@ import emission.core.wrapper.section as ecws
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.decorations.local_date_queries as esdl
+import emission.net.ext_service.habitica.create_party_leaders_script as party
 
 PST = "America/Los_Angeles"
 
@@ -45,7 +46,7 @@ class TestHabiticaRegister(unittest.TestCase):
     walk_habit = {'type': "habit", 'text': "Walk", 'up': True, 'down': False, 'priority': 2}
     walk_habit_id = proxy.create_habit(self.testUUID, walk_habit)
     logging.debug("in setUp, result = %s" % self.ts)
-
+    party.create_party_leaders()
 
   def tearDown(self):
     edb.get_analysis_timeseries_db().remove({'user_id': self.testUUID})

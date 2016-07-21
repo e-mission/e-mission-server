@@ -51,24 +51,29 @@ def habiticaRegister(username, email, password, our_uuid):
       login_url = url + '/api/v3/user/auth/local/login'
       user_request = {'username': username,'email': email,'password': password}
       logging.debug("About to login %s"% user_request)
-      u = requests.post(login_url, json=user_request)
-      user_auth = json.loads(u.text)
-      logging.debug("parsed json from habitica has keys = %s" % user_auth['data'])
-      #login only returns user auth headers, so now get authenticated user and put it in user_dict
-      auth_headers = {'x-api-user': user_auth['data']['habitica_id'], 'x-api-key': user_auth['data']['habitica_token']}
-      logging.debug("auth_headers = %s" % auth_headers['data'])
-      get_user_url = url + '/api/v3/user'
-      result = requests.request('GET', get_user_url, headers=auth_headers, json={})
-      logging.debug("result = %s" % result)
-      result.raise_for_status()
-      user_dict = result.json()
-      logging.debug("parsed json from GET habitica user = %s" % user_dict)
+      login_response = requests.post(login_url, json=user_request)
+      if login_response.status_code == 401:
+        user_dict = newHabiticaUser(username, email, password, our_uuid)
+      else:
+        logging.debug("habitica http response from login = %s" % login_response)
+        user_auth = json.loads(login_response.text)
+        logging.debug("parsed json from habitica has keys = %s" % user_auth)
+        #login only returns user auth headers, so now get authenticated user and put it in user_dict
+        auth_headers = {'x-api-user': user_auth['data']['id'], 'x-api-key': user_auth['data']['apiToken']}
+        get_user_url = url + '/api/v3/user'
+        result = requests.request('GET', get_user_url, headers=auth_headers, json={})
+        logging.debug("result = %s" % result)
+        result.raise_for_status()
+        user_dict = result.json()
+        user_dict['data']['apiToken'] = user_auth['data']['apiToken']
+        logging.debug("parsed json from GET habitica user = %s" % user_dict)
 
     #if it fails, then user is also not in Habitica, so needs to create new account and put it in user_dict
     #FIX!! throw except only if u returns a 401 error
     except:
-      user_dict = newHabiticaUser(username, email, password, our_uuid)
-      
+      pass
+    
+    logging.debug("habitica user to be created in our db = %s" % user_dict['data'])  
     #Now save new user (user_dict) to our db
     #Since we are randomly generating the password, we store it in case users 
     #want to access their Habitica account from the browser
@@ -80,7 +85,7 @@ def habiticaRegister(username, email, password, our_uuid):
       'metrics_data': {'last_timestamp': arrow.utcnow().timestamp, 'bike_count': 0, 'walk_count': 0},
       'habitica_username': username, 
       'habitica_password': password, 
-      'habitica_id': user_dict['data']['_id'], 
+      'habitica_id': user_dict['data']['id'], 
       'habitica_token': user_dict['data']['apiToken'],
       'habitica_group_id': None})
 
