@@ -12,6 +12,7 @@ import random
 import emission.core.get_database as edb
 
 
+
 key_file = open('conf/net/keys.json')
 key_data = json.load(key_file)
 url = key_data["habitica"]["url"]
@@ -31,6 +32,15 @@ def habiticaRegister(username, email, password, our_uuid):
     #FIX! Still need to test if this will throw an error correctly
     except urllib2.HTTPError:
       user_dict = newHabiticaUser(username, email, password, our_uuid)
+      edb.get_habitica_db().update({"user_id": our_uuid},{"$set": {'metrics_data': {'last_timestamp': arrow.utcnow().timestamp, 'bike_count': 0, 'walk_count': 0},
+      'habitica_username': username, 
+      'habitica_password': password, 
+      'habitica_id': user_dict['data']['_id'], 
+      'habitica_token': user_dict['data']['apiToken'],
+      'habitica_group_id': None}})
+      if user_dict['data']['party']['_id']:
+        edb.get_habitica_db().update({"user_id": our_uuid},{"$set": {'habitica_group_id': user_dict['data']['party']['_id']}})
+
 
     #now we have the user data in user_dict, so check if db is correct
     #Fix! should prob check here if our db is right, if it's in group, etc
