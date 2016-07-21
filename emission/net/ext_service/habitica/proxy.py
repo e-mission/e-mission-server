@@ -89,7 +89,7 @@ def habiticaRegister(username, email, password, our_uuid):
     #And invite new user to a group, or retrieve group id if user is already in one
     group_id = setup_party(our_uuid)
     edb.get_habitica_db().update({"user_id": our_uuid},{"$set": {'habitica_group_id': group_id}})
-  
+    user_dict['habitica_group_id'] = group_id
   return user_dict
 
 
