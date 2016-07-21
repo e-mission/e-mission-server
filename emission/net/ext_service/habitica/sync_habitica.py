@@ -13,31 +13,14 @@ import emission.analysis.result.metrics.time_grouping as earmt
 
 
 
-def create_habit(user_id, new_habit):
-  method_uri = "/api/v3/tasks/user"
-  get_habits_uri = method_uri + "?type=habits"
-  #First, get all habits and check if the habit requested already exists
-  result = proxy.habiticaProxy(user_id, 'GET', get_habits_uri, None)
-  habits = result.json()
-  for habit in habits['data']:
-    if habit['text'] == new_habit['text']:
-      #if the habit requested already exists, return it
-      return habit['_id']
-  #if habit not found, create habit
-  response = proxy.habiticaProxy(user_id, 'POST', method_uri, new_habit)
-  habit_created = response.json()
-  return habit_created['data']['_id']
-
-
-
 def reward_active_transportation(user_id):
   #make sure habits exist
   #bike
   bike_habit = {'type': "habit", 'text': "Bike", 'up': True, 'down': False, 'priority': 2}
-  bike_habit_id = create_habit(user_id, bike_habit)
+  bike_habit_id = proxy.create_habit(user_id, bike_habit)
   #walk
   walk_habit = {'type': "habit", 'text': "Walk", 'up': True, 'down': False, 'priority': 2}
-  walk_habit_id = create_habit(user_id, walk_habit)
+  walk_habit_id = proxy.create_habit(user_id, walk_habit)
 
   #get timestamps
   user_val = list(edb.get_habitica_db().find({"user_id": user_id}))[0]['metrics_data']
