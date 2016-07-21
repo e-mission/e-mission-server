@@ -30,6 +30,7 @@ PST = "America/Los_Angeles"
 class TestHabiticaRegister(unittest.TestCase):
   def setUp(self):
     #load test user
+    party.create_party_leaders()
     self.testUUID = uuid.uuid4()
     autogen_string = randomGen()
     autogen_email = autogen_string + '@test.com'
@@ -46,7 +47,7 @@ class TestHabiticaRegister(unittest.TestCase):
     walk_habit = {'type': "habit", 'text': "Walk", 'up': True, 'down': False, 'priority': 2}
     walk_habit_id = proxy.create_habit(self.testUUID, walk_habit)
     logging.debug("in setUp, result = %s" % self.ts)
-    party.create_party_leaders()
+
 
   def tearDown(self):
     edb.get_analysis_timeseries_db().remove({'user_id': self.testUUID})
