@@ -131,13 +131,12 @@ def setup_party(user_id):
       group = random.randint(0, 2)
       leader_val = list(edb.get_habitica_db().find({"habitica_username": parties[group]}))[0]
       logging.debug("party leader = %s" % leader_val)
-      leader = leader_val['user_id']
       group_id = leader_val['habitica_group_id']
       invite_uri = "/api/v3/groups/"+group_id+"/invite"
       logging.debug("invite user to party api url = %s" % invite_uri)
       user_val = list(edb.get_habitica_db().find({"user_id": user_id}))[0]
       method_args = {'uuids': [user_val['habitica_id']], 'inviter': parties[group], 'emails': []}
-      response = habiticaProxy(leader, 'POST', invite_uri, method_args)
+      response = habiticaProxy(leader_val['user_id'], 'POST', invite_uri, method_args)
       logging.debug("invite user to party response = %s" % response)
       response.raise_for_status()
       edb.get_habitica_db().update({"user_id": user_id},{"$set": {'habitica_group_id': group_id}})
