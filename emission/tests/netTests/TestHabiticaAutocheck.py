@@ -22,6 +22,7 @@ import emission.core.wrapper.section as ecws
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.decorations.local_date_queries as esdl
+import emission.net.ext_service.habitica.create_party_leaders_script as party
 
 PST = "America/Los_Angeles"
 
@@ -29,6 +30,7 @@ PST = "America/Los_Angeles"
 class TestHabiticaRegister(unittest.TestCase):
   def setUp(self):
     #load test user
+    party.create_party_leaders()
     self.testUUID = uuid.uuid4()
     autogen_string = randomGen()
     autogen_email = autogen_string + '@test.com'
@@ -41,9 +43,9 @@ class TestHabiticaRegister(unittest.TestCase):
 
     self.ts = esta.TimeSeries.get_time_series(self.testUUID)
     bike_habit = {'type': "habit", 'text': "Bike", 'up': True, 'down': False, 'priority': 2}
-    bike_habit_id = autocheck.create_habit(self.testUUID, bike_habit)
+    bike_habit_id = proxy.create_habit(self.testUUID, bike_habit)
     walk_habit = {'type': "habit", 'text': "Walk", 'up': True, 'down': False, 'priority': 2}
-    walk_habit_id = autocheck.create_habit(self.testUUID, walk_habit)
+    walk_habit_id = proxy.create_habit(self.testUUID, walk_habit)
     logging.debug("in setUp, result = %s" % self.ts)
 
 
@@ -59,7 +61,7 @@ class TestHabiticaRegister(unittest.TestCase):
   def testCreateExistingHabit(self):
     #try to create Bike
     existing_habit = {'type': "habit", 'text': "Bike"}
-    habit_id = autocheck.create_habit(self.testUUID, existing_habit)
+    habit_id = proxy.create_habit(self.testUUID, existing_habit)
     logging.debug("in testCreateExistingHabit, the new habit id is = %s" % habit_id)
     #search this user's habits for the habit and check if there's exactly one
     response = proxy.habiticaProxy(self.testUUID, 'GET', "/api/v3/tasks/user?type=habits", None)
@@ -75,7 +77,7 @@ class TestHabiticaRegister(unittest.TestCase):
 
   def testCreateNewHabit(self):
     new_habit = {'type': "habit", 'text': randomGen()}
-    habit_id = autocheck.create_habit(self.testUUID, new_habit)
+    habit_id = proxy.create_habit(self.testUUID, new_habit)
     logging.debug("in testCreateNewHabit, the new habit id is = %s" % habit_id)
     #Get user's list of habits and check that new habit is there
     response = proxy.habiticaProxy(self.testUUID, 'GET', "/api/v3/tasks/user?type=habits", None)
