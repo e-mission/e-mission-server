@@ -176,7 +176,7 @@ def local_dt_fill_times_monthly(key, section_group_df, metric_summary):
 
 def local_dt_fill_times_yearly(key, section_group_df, metric_summary):
     first_tz = _get_tz(section_group_df)
-    ld = ecwl.LocalDate({'year': key[0],
+    ld = ecwl.LocalDate({'year': key,
                          'timezone': first_tz})
     dt = arrow.Arrow(ld.year, 1, 1, tzinfo=first_tz
                      ).floor('year')
