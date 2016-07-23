@@ -40,9 +40,9 @@ class SmoothedHighConfidenceMotionWithVisitTransitions(eaisms.SmoothedHighConfid
         new_mc = ecwm.Motionactivity({
             'type': motion_change.type,
             'confidence': motion_change.confidence,
-            'ts': location_point.ts,
-            'local_dt': location_point.local_dt,
-            'fmt_time': location_point.fmt_time
+            'ts': location_point.data.ts,
+            'local_dt': location_point.data.local_dt,
+            'fmt_time': location_point.data.fmt_time
         })
         return new_mc
 
@@ -84,9 +84,13 @@ class SmoothedHighConfidenceMotionWithVisitTransitions(eaisms.SmoothedHighConfid
         # So let us extend the first motion change to the beginning of the
         # trip, and the last motion change to the end of the trip
         motion_changes[0] = (self.extend_activity_to_location(motion_changes[0][0],
-            location_points.iloc[0]), motion_changes[0][1])
+                timeseries.df_row_to_entry("background/filtered_location",
+                                           location_points.iloc[0])),
+                             motion_changes[0][1])
         motion_changes[-1] = (motion_changes[-1][0],
-            self.extend_activity_to_location(motion_changes[-1][1], location_points.iloc[-1]))
+            self.extend_activity_to_location(motion_changes[-1][1],
+                timeseries.df_row_to_entry("background/filtered_location",
+                                           location_points.iloc[-1])))
 
         for (start_motion, end_motion) in motion_changes:
             logging.debug("Considering %s from %s -> %s" %
