@@ -73,7 +73,7 @@ def get_time_range_for_smoothing(user_id):
     :rtype: emission.storage.timeseries.timequery.TimeQuery
     """
     tq = get_time_range_for_stage(user_id, ps.PipelineStages.JUMP_SMOOTHING)
-    tq.timeType = "end_ts"
+    tq.timeType = "data.end_ts"
     return tq
 
 def mark_smoothing_done(user_id, last_section_done):
@@ -100,7 +100,7 @@ def get_time_range_for_clean_resampling(user_id):
     :rtype: emission.storage.timeseries.timequery.TimeQuery
     """
     tq = get_time_range_for_stage(user_id, ps.PipelineStages.CLEAN_RESAMPLING)
-    tq.timeType = "end_ts"
+    tq.timeType = "data.end_ts"
     return tq
 
 def mark_clean_resampling_done(user_id, last_section_done):
