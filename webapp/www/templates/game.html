@@ -1,7 +1,24 @@
 <ion-view view-title="Game">
+  <ion-nav-buttons side="left">
+    <button class="button button-icon" ui-sref="home">
+        <i class="icon-left ion-home"></i> Home
+    </button>
+    <button class="button button-icon" ui-sref="heatmap">
+        <i class="icon-left ion-fireball"></i> Analysis
+    </button>
+    <button class="button button-icon" ui-sref="metrics">
+        <i class="icon-left ion-ios-analytics"></i> Metrics
+    </button>
+    <button class="button button-icon" ui-sref="trip-planning">
+        <i class="icon-left ion-android-compass"></i> Trip Planning
+    </button>
+    <button class="button button-icon" ui-sref="game">
+        <i class="icon-left ion-checkmark"></i> Game
+    </button>
+  </ion-nav-buttons>
 	<ion-content>
 		<ion-item>
-			<iframe src='http://54.159.38.241:3000/static/front' width="100%" height="550" frameborder="0" allowfullscreen>
+			<iframe src='https://em-game.eecs.berkeley.edu/' width="100%" height="550" frameborder="0" allowfullscreen>
 			</iframe>
 		</ion-item>
 	</ion-content>
