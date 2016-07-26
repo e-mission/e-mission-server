@@ -58,7 +58,7 @@ def reward_active_transportation(user_id):
     res2 = proxy.habiticaProxy(user_id, 'POST', method_uri_bike, None)
 
   #update the timestamp and bike/walk counts in db
-  edb.get_habitica_db().update({"user_id": user_id},{"$set": {'metrics_data': {'last_timestamp': arrow.utcnow().timestamp, 'bike_count': bike_distance%3000, 'walk_count': walk_distance%1000}}})
+  edb.get_habitica_db().update({"user_id": user_id},{"$set": {'metrics_data': {'last_timestamp': arrow.utcnow().timestamp, 'bike_count': bike_distance%3000, 'walk_count': walk_distance%1000}}},upsert=True)
 
 
 
