@@ -14,7 +14,9 @@ import emission.analysis.result.metrics.time_grouping as earmt
 
 
 def reward_active_transportation(user_id):
+  logging.debug("Entering habitica autocheck for user %s" % user_id)
   if edb.get_habitica_db().find({'user_id': user_id}).count() == 1:
+    logging.debug("Habitica user: %s" % list(edb.get_habitica_db().find({'user_id': user_id})))
     #make sure habits exist
     #bike
     bike_habit = {'type': "habit", 'text': "Bike", 'up': True, 'down': False, 'priority': 2}
@@ -30,6 +32,7 @@ def reward_active_transportation(user_id):
     
     #Get metrics
     summary_ts = earmt.group_by_timestamp(user_id, timestamp_from_db, timestamp_now, None, earmts.get_distance)
+    logging.debug("Metrics response: %s" % summary_ts)
 
     #get distances leftover from last timestamp
     bike_distance = user_val['bike_count']
@@ -53,13 +56,16 @@ def reward_active_transportation(user_id):
     walk_pts = int(walk_distance//1000)
     for i in range(walk_pts):
       res = proxy.habiticaProxy(user_id, 'POST', method_uri_walk, None)
+      logging.debug("Request to score walk points %s" % res)
     # Bike: +1 for every 3 km
     bike_pts = int(bike_distance//3000)
     for i in range(bike_pts):
       res2 = proxy.habiticaProxy(user_id, 'POST', method_uri_bike, None)
+      logging.debug("Request to score bike points %s" % res2)
 
     #update the timestamp and bike/walk counts in db
     edb.get_habitica_db().update({"user_id": user_id},{"$set": {'metrics_data': {'last_timestamp': arrow.utcnow().timestamp, 'bike_count': bike_distance%3000, 'walk_count': walk_distance%1000}}},upsert=True)
+    logging.debug("Habitica user after update: %s" % list(edb.get_habitica_db().find({'user_id': user_id})))
 
 
 
