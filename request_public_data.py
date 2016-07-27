@@ -9,9 +9,9 @@ import arrow
 # This script pulls public data from the server and then loads it to a local server 
 parser = argparse.ArgumentParser()
 parser.add_argument("from_date",
-        help="from_date (local time, inclusive) in the format of YYYY-MM-DD")
+        help="from_date (local time, inclusive) in the format of YYYY-MM-DD-HH")
 parser.add_argument("to_date",
-        help="to_date (local time, exclusive) in the format of YYYY-MM-DD")
+        help="to_date (local time, exclusive) in the format of YYYY-MM-DD-HH")
 parser.add_argument("server_url",
         help="url of the server to pull data from i.e. localhost:8080")
 parser.add_argument("-v", "--verbose", 
