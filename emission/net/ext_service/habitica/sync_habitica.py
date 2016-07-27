@@ -46,10 +46,20 @@ def reward_active_transportation(user_id):
       except AttributeError:
           logging.debug("no bike")
       try:
-          walk_distance = item.ON_FOOT
+          walk_distance += item.ON_FOOT
           logging.debug("walk_distance += %s" % item.ON_FOOT)
       except AttributeError:
-          logging.debug("no walk")
+          logging.debug("no Android walk")
+      try:
+          walk_distance += item.WALKING
+          logging.debug("walk_distance += %s" % item.WALKING)
+      except AttributeError:
+          logging.debug("no ios walk")
+      try:
+          walk_distance += item.RUNNING
+          logging.debug("walk_distance += %s" % item.RUNNING)
+      except AttributeError:
+          logging.debug("no running")
     
     logging.debug("Finished with bike_distance == %s" % bike_distance)
     logging.debug("Finished with walk_distance == %s" % walk_distance)
