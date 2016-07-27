@@ -9,9 +9,9 @@ import arrow
 # This script pulls public data from the server and then loads it to a local server 
 parser = argparse.ArgumentParser()
 parser.add_argument("from_date",
-        help="from_date (local time, inclusive) in the format of YYYY-MM-DD")
+        help="from_date (local time, inclusive) in the format of YYYY-MM-DD-HH")
 parser.add_argument("to_date",
-        help="to_date (local time, exclusive) in the format of YYYY-MM-DD")
+        help="to_date (local time, exclusive) in the format of YYYY-MM-DD-HH")
 parser.add_argument("server_url",
         help="url of the server to pull data from i.e. localhost:8080")
 parser.add_argument("-v", "--verbose", 
@@ -25,13 +25,15 @@ server_url = args.server_url
 if args.verbose:
 	logging.basicConfig(level=logging.DEBUG)
 
-from_ts = arrow.get(from_date).replace(tzinfo='local').timestamp
-to_ts = arrow.get(to_date).replace(tzinfo='local').timestamp
+from_ts = arrow.get(from_date, 'YYYY-MM-DD-HH').replace(tzinfo='local').timestamp
+to_ts = arrow.get(to_date, 'YYYY-MM-DD-HH').replace(tzinfo='local').timestamp
 
 logging.debug("from_ts = " + str(from_ts))
 logging.debug("to_ts = " + str(to_ts))
 
 r = requests.get("http://" + server_url + "/eval/publicData/timeseries?from_ts=" + str(from_ts) + "&to_ts=" + str(to_ts))
+
+print r 
 
 dic = json.loads(r.text, object_hook = bju.object_hook)
 iphone_list = dic['iphone_data'] 
@@ -45,9 +47,9 @@ print "..."
 
 for index, entry_list in enumerate(phone_list):
 	if index < 4:
-		logging.debug("iphone" + str(index%4+1) + " first entry:")
+		logging.debug("iphone" + str(index+1) + " first entry:")
 	else:
-		logging.debug("android" + str(index%4+1) + " first entry:")
+		logging.debug("android" + str(index-3) + " first entry:")
 
 	if len(entry_list) == 0:
 		logging.debug("...has no data...")
