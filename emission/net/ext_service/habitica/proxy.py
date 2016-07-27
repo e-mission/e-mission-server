@@ -37,9 +37,9 @@ def habiticaRegister(username, email, password, our_uuid):
       'habitica_password': password, 
       'habitica_id': user_dict['data']['_id'], 
       'habitica_token': user_dict['data']['apiToken'],
-      'habitica_group_id': None}})
+      'habitica_group_id': None}},upsert=True)
       if user_dict['data']['party']['_id']:
-        edb.get_habitica_db().update({"user_id": our_uuid},{"$set": {'habitica_group_id': user_dict['data']['party']['_id']}})
+        edb.get_habitica_db().update({"user_id": our_uuid},{"$set": {'habitica_group_id': user_dict['data']['party']['_id']}},upsert=True)
 
 
     #now we have the user data in user_dict, so check if db is correct
@@ -93,7 +93,7 @@ def habiticaRegister(username, email, password, our_uuid):
     setup_default_habits(our_uuid)
     #And invite new user to a group, or retrieve group id if user is already in one
     group_id = setup_party(our_uuid)
-    edb.get_habitica_db().update({"user_id": our_uuid},{"$set": {'habitica_group_id': group_id}})
+    edb.get_habitica_db().update({"user_id": our_uuid},{"$set": {'habitica_group_id': group_id}},upsert=True)
     user_dict['habitica_group_id'] = group_id
   return user_dict
 
@@ -138,7 +138,7 @@ def setup_party(user_id):
       result = habiticaProxy(user_id, 'GET', method_url, None)
       data = result.json()
       group_id = data['data']['party']['_id']
-      edb.get_habitica_db().update({"user_id": user_id},{"$set": {'habitica_group_id': group_id}})
+      edb.get_habitica_db().update({"user_id": user_id},{"$set": {'habitica_group_id': group_id}},upsert=True)
 
     except KeyError:
       #parties = [{"leader": "Juliana", "group_id": "488cae51-aeee-4004-9fa0-dd4219a3a77e"}, {"leader": "Sunil", "group_id": "751e5f9a-bd2d-4c4c-ba81-6fb89bccdf5d"}, {"leader": "Shankari", "group_id": "93c35a70-f70e-4d6e-ac2b-3e1c81fedf0f"}]
@@ -154,7 +154,7 @@ def setup_party(user_id):
       response = habiticaProxy(leader_val['user_id'], 'POST', invite_uri, method_args)
       logging.debug("invite user to party response = %s" % response)
       response.raise_for_status()
-      edb.get_habitica_db().update({"user_id": user_id},{"$set": {'habitica_group_id': group_id}})
+      edb.get_habitica_db().update({"user_id": user_id},{"$set": {'habitica_group_id': group_id}},upsert=True)
   return group_id
 
 def setup_default_habits(user_id):

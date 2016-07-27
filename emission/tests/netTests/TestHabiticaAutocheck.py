@@ -39,7 +39,7 @@ class TestHabiticaRegister(unittest.TestCase):
     sampleAuthMessage1Ad = ad.AttrDict(self.sampleAuthMessage1)
     proxy.habiticaRegister(sampleAuthMessage1Ad.username, sampleAuthMessage1Ad.email,
                            sampleAuthMessage1Ad.password, sampleAuthMessage1Ad.our_uuid)
-    edb.get_habitica_db().update({"user_id": self.testUUID},{"$set": {'metrics_data.last_timestamp': arrow.Arrow(2016,5,1).timestamp}})
+    edb.get_habitica_db().update({"user_id": self.testUUID},{"$set": {'metrics_data.last_timestamp': arrow.Arrow(2016,5,1).timestamp}},upsert=True)
 
     self.ts = esta.TimeSeries.get_time_series(self.testUUID)
     bike_habit = {'type': "habit", 'text': "Bike", 'up': True, 'down': False, 'priority': 2}
