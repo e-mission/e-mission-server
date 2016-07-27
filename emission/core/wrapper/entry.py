@@ -32,6 +32,7 @@ class Entry(ecwb.WrapperBase):
             "statemachine/transition": "transition",
             "config/sensor_config": "sensorconfig",
             "config/sync_config": "syncconfig",
+            "config/consent": "consentconfig",
             "segmentation/raw_trip": "rawtrip",
             "segmentation/raw_place": "rawplace",
             "segmentation/raw_section": "section",

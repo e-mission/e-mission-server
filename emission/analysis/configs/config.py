@@ -3,7 +3,7 @@ import importlib
 
 import emission.net.usercache.abstract_usercache as enua
 
-config_list = ["sensor_config", "sync_config"]
+config_list = ["sensor_config", "sync_config", "consent"]
 
 def save_all_configs(user_id, time_query):
     uc = enua.UserCache.getUserCache(user_id)

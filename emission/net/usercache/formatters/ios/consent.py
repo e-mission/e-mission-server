@@ -2,7 +2,7 @@ import logging
 import copy
 import pytz
 
-import emission.core.wrapper.syncconfig as ecws
+import emission.core.wrapper.consentconfig as ecws
 import emission.net.usercache.formatters.common as fc
 
 # Currently, we just reflect this back to the user, so not much editing to do
