@@ -42,13 +42,18 @@ def reward_active_transportation(user_id):
     for item in summary_ts:
       try:
           bike_distance += item.BICYCLING
+          logging.debug("bike_distance += %s" % item.BICYCLING)
       except AttributeError:
-          pass
+          logging.debug("no bike")
       try:
           walk_distance = item.ON_FOOT
+          logging.debug("walk_distance += %s" % item.ON_FOOT)
       except AttributeError:
-          pass
+          logging.debug("no walk")
     
+    logging.debug("Finished with bike_distance == %s" % bike_distance)
+    logging.debug("Finished with walk_distance == %s" % walk_distance)
+
     method_uri_walk = "/api/v3/tasks/"+ walk_habit_id + "/score/up"
     method_uri_bike = "/api/v3/tasks/"+ bike_habit_id + "/score/up"
     #reward user by scoring + habits
