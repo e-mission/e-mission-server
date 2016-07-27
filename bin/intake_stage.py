@@ -50,7 +50,7 @@ if __name__ == '__main__':
         esdtmq.make_tour_model_from_raw_user_data(uuid)
 
         logging.info("*" * 10 + "UUID %s: checking active mode trips to autocheck habits" % uuid + "*" * 10)
-        autocheck.auto_complete_tasks(uuid)
+        autocheck.reward_active_transportation(uuid)
 
         logging.info("*" * 10 + "UUID %s: storing views to cache" % uuid + "*" * 10)
         uh = euah.UserCacheHandler.getUserCacheHandler(uuid)

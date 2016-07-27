@@ -22,7 +22,7 @@ url = key_data["habitica"]["url"]
 def habiticaRegister(username, email, password, our_uuid):
   user_dict = {}
   #if user is already in e-mission db, try to load user data
-  if edb.get_habitica_db().find({'user_id': our_uuid}).count() > 0:
+  if edb.get_habitica_db().find({'user_id': our_uuid}).count() == 1:
     try:
       result = habiticaProxy(our_uuid, 'GET', '/api/v3/user', None)
       user_dict = result.json()
@@ -114,7 +114,7 @@ def habiticaProxy(user_uuid, method, method_url, method_args):
   logging.debug("For user %s, about to proxy %s method %s with args %s" %
                 (user_uuid, method, method_url, method_args))
   user_query = {'user_id': user_uuid}
-  assert(edb.get_habitica_db().find(user_query).count() > 0)
+  assert(edb.get_habitica_db().find(user_query).count() == 1)
   stored_cfg = edb.get_habitica_db().find_one(user_query)
   auth_headers = {'x-api-user': stored_cfg['habitica_id'],
                   'x-api-key': stored_cfg['habitica_token']}
