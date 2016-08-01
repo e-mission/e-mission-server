@@ -19,10 +19,10 @@ def reward_active_transportation(user_id):
     logging.debug("Habitica user: %s" % list(edb.get_habitica_db().find({'user_id': user_id})))
     #make sure habits exist
     #bike
-    bike_habit = {'type': "habit", 'text': "Bike", 'up': True, 'down': False, 'priority': 2}
+    bike_habit = {'type': "habit", 'text': "Bike", 'notes': "3 km = 1+ (calculated automatically)", 'up': True, 'down': False, 'priority': 2}
     bike_habit_id = proxy.create_habit(user_id, bike_habit)
     #walk
-    walk_habit = {'type': "habit", 'text': "Walk", 'up': True, 'down': False, 'priority': 2}
+    walk_habit = {'type': "habit", 'text': "Walk", 'notes': "1 km = 1+ (calculated automatically)", 'up': True, 'down': False, 'priority': 2}
     walk_habit_id = proxy.create_habit(user_id, walk_habit)
 
     #get timestamps
