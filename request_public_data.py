@@ -64,7 +64,7 @@ for index, entry_list in enumerate(phone_list):
 	if len(entry_list) == 0:
 		logging.debug("...has no data...")
 	else:
-		logging.debug(str(entry_list[0]))
+		logging.debug(str(entry_list[0].get('metadata').get('write_fmt_time')))
 
 	for entry in entry_list:
 		tsdb.save(entry)
