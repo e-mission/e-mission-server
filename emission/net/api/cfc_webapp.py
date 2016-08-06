@@ -388,7 +388,6 @@ def getCarbonCompare():
 @get('/eval/publicData/timeseries')
 def getPublicData():
   ids = request.json['phone_ids']
-  print ids 
   uuids = map(lambda id: UUID(id), ids)
 
   from_ts = request.query.from_ts
