@@ -46,16 +46,26 @@
       The nav bar that will be updated as we navigate between views.
     -->
     <ion-nav-bar class="bar-position">
+      <ion-nav-buttons side="left">
+        <button class="button button-icon" ui-sref="home">
+        <i class="icon-left ion-home"></i> Home
+        </button>
+        <button class="button button-icon" ui-sref="heatmap">
+            <i class="icon-left ion-fireball"></i> Analysis
+        </button>
+        <button class="button button-icon" ui-sref="metrics">
+            <i class="icon-left ion-ios-analytics"></i> Metrics
+        </button>
+        <button class="button button-icon" ui-sref="trip-planning">
+            <i class="icon-left ion-android-compass"></i> Trip Planning
+        </button>
+        <button class="button button-icon" ui-sref="game">
+            <i class="icon-left ion-checkmark"></i> Game
+        </button>
+      </ion-nav-buttons-->
     </ion-nav-bar>
       <!--ion-nav-back-button>
       </ion-nav-back-button-->
-      <!--ion-nav-buttons side="primary">
-        <a class="button button-block button-calm icon-left ion-home" ui-sref="home">Home</a>
-        <a class="button button-block button-calm icon-left ion-fireball" ui-sref="heatmap">Analysis</a>
-        <a class="button button-block button-calm icon-left ion-ios-analytics" ui-sref="metrics">Metrics</a>
-        <a class="button button-block button-calm icon-left ion-android-compass" ui-sref="trip-planning">Trip Planning</a>
-        <a class="button button-block button-calm icon-left ion-checkmark" ui-sref="game">Game</a>
-      </ion-nav-buttons-->
     <!--
       The views will be rendered in the <ion-nav-view> directive below
       Templates are in the /templates folder (but you could also
