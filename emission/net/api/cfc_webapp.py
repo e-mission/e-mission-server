@@ -85,10 +85,11 @@ def index():
 # If this gets to be too much, we should definitely consider that
 @route("/docs/<filename>")
 def docs(filename):
-  if filename != "privacy" and filename != "support" and filename != "about" and filename != "consent":
+  if filename != "privacy.html" and filename != "support.html" and filename != "about.html" and filename != "consent.html" and filename != "approval_letter.pdf":
+    logging.error("Request for unknown filename "% filename)
     return HTTPError(404, "Don't try to hack me, you evil spammer")
   else:
-    return static_file("%s.html" % filename, "%s/%s" % (static_path, "docs"))
+    return static_file(filename, "%s/%s" % (static_path, "docs"))
 
 @route("/<filename>")
 def docs(filename):
