@@ -78,9 +78,12 @@ def save_cleaned_segments_for_ts(user_id, start_ts, end_ts):
 def save_cleaned_segments_for_timeline(user_id, tl):
     ts = esta.TimeSeries.get_time_series(user_id)
     trip_map = {}
+    id_or_none = lambda wrapper: wrapper.get_id() if wrapper is not None else None
     for trip in tl.trips:
         try:
             filtered_trip = get_filtered_trip(ts, trip)
+            logging.debug("For raw trip %s, found filtered trip %s" %
+                          (id_or_none(trip), id_or_none(filtered_trip)))
             if filtered_trip is not None:
                 trip_map[trip.get_id()] = filtered_trip
         except KeyError, e:
@@ -439,6 +442,8 @@ def create_and_link_timeline(tl, user_id, trip_map):
         # If the timeline has no entries, we give up and return
         return (None, None)
 
+    unsquished_trips = []
+
     for raw_trip in tl.trips:
         if raw_trip.get_id() in trip_map:
             # there is a clean representation for this trip, so we can link its
@@ -453,12 +458,17 @@ def create_and_link_timeline(tl, user_id, trip_map):
             link_trip_end(curr_cleaned_trip, curr_cleaned_end_place, raw_end_place)
 
             curr_cleaned_start_place = curr_cleaned_end_place
+            logging.debug("Found mapping %s -> %s, added links" %
+                          (raw_trip.get_id(), curr_cleaned_trip.get_id()))
+            unsquished_trips.append(curr_cleaned_trip)
         else:
             # this is a squished trip, so we combine the start place with the
             # current start place we do not need to combine both start and end
             # places, since the end place of one trip is the start place of another. We combine start places instead of end places
             # because when the squishy part ends, we combine the start place of the un-squished trip
             # with the existing cleaned start and create a new entry for the un-squished end
+            logging.debug("Found squished trip, linking raw start place %s to new cleaned place %s" %
+                          (raw_trip.data.start_place, curr_cleaned_start_place.get_id()))
             link_squished_place(curr_cleaned_start_place,
                                 tl.get_object(raw_trip.data.start_place))
 
@@ -466,7 +476,7 @@ def create_and_link_timeline(tl, user_id, trip_map):
     return (last_cleaned_place, esdtl.Timeline(esda.CLEANED_PLACE_KEY,
                                                esda.CLEANED_TRIP_KEY,
                                                cleaned_places,
-                                               trip_map.values()))
+                                               unsquished_trips))
 
 def link_squished_place(cleaned_place, raw_place):
     cleaned_place_data = cleaned_place.data
