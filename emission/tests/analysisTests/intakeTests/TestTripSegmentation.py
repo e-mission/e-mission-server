@@ -61,7 +61,7 @@ class TestTripSegmentation(unittest.TestCase):
                           1440699933.687, 1440716367.376, 1440720239.012, 1440728519.971])
         self.assertEqual([end.ts for (start, end) in segmentation_points],
                          [1440689408.302, 1440690108.678, 1440694424.894, 1440699298.535,
-                          1440700040.477, 1440719699.470, 1440723334.898, 1440729184.411])
+                          1440700070.129, 1440719699.470, 1440723334.898, 1440729184.411])
 
     def testSegmentationPointsDwellSegmentationDistFilter(self):
         ts = esta.TimeSeries.get_time_series(self.iosUUID)
