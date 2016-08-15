@@ -110,16 +110,28 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             # TODO: Change this back to last 10 points once we normalize phone and this
             last10Points_df = filtered_points_df.iloc[max(idx-self.point_threshold, curr_trip_start_point.idx):idx+1]
             distanceToLast = lambda(row): pf.calDistance(ad.AttrDict(row), currPoint)
+            timeToLast = lambda(row): currPoint.ts - ad.AttrDict(row).ts
             last5MinsDistances = last5MinsPoints_df.apply(distanceToLast, axis=1)
             logging.debug("last5MinsDistances = %s with length %d" % (last5MinsDistances.as_matrix(), len(last5MinsDistances)))
             last10PointsDistances = last10Points_df.apply(distanceToLast, axis=1)
             logging.debug("last10PointsDistances = %s with length %d, shape %s" % (last10PointsDistances.as_matrix(),
                                                                            len(last10PointsDistances),
                                                                            last10PointsDistances.shape))
+
+            # Fix for https://github.com/e-mission/e-mission-server/issues/348
+            last5MinTimes = last5MinsPoints_df.apply(timeToLast, axis=1)
             
             logging.debug("len(last10PointsDistances) = %d, len(last5MinsDistances) = %d" %
                   (len(last10PointsDistances), len(last5MinsDistances)))
-            if (len(last10PointsDistances) < self.point_threshold - 1 or len(last5MinsDistances) == 0):
+            logging.debug("last5MinsTimes.max() = %s, time_threshold = %s" %
+                          (last5MinTimes.max(), self.time_threshold))
+
+            # The -30 is a fuzz factor intended to compensate for older clients
+            # where data collection stopped after 5 mins, so that we never actually
+            # see 5 mins of data
+            if (len(last10PointsDistances) < self.point_threshold - 1 or
+                        len(last5MinsDistances) == 0 or
+                        last5MinTimes.max() < self.time_threshold - 30):
                 logging.debug("Too few points to make a decision, continuing")
             else:
                 logging.debug("last5MinsDistances.max() = %s, last10PointsDistance.max() = %s" %
