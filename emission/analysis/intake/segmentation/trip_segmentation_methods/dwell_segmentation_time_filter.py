@@ -74,25 +74,9 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                 # segmentation_points.append(currPoint)
 
             if just_ended:
-                # Normally, at this point, since the logic here and the
-                # logic on the phone are the same, if we have detected a trip
-                # end, any points after this are part of the new trip.
-                #
-                #
-                # However, in some circumstances, notably in my data from 27th
-                # August, there appears to be a mismatch and we get a couple of
-                # points past the end that we detected here.  So let's look for
-                # points that are within the distance filter, and are at a
-                # delta of 30 secs, and ignore them instead of using them to
-                # start the new trip
-                prev_point = ad.AttrDict(filtered_points_df.iloc[idx - 1])
-                logging.debug("Comparing with prev_point = %s" % prev_point)
-                if pf.calDistance(prev_point, currPoint) < self.distance_threshold and \
-                    currPoint.ts - prev_point.ts <= 60:
-                    logging.info("Points %s and %s are within the distance filter and only 1 min apart so part of the same trip" %
-                                 (prev_point, currPoint))
+                if self.continue_just_ended(idx, currPoint, filtered_points_df):
                     continue
-                # else: 
+                # else:
                 sel_point = currPoint
                 logging.debug("Setting new trip start point %s with idx %s" % (sel_point, sel_point.idx))
                 curr_trip_start_point = sel_point
@@ -152,3 +136,29 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                     logging.info("Found trip end at %s" % last_trip_end_point.fmt_time)
                     just_ended = True
         return segmentation_points
+
+    # Normally, since the logic here and the
+    # logic on the phone are the same, if we have detected a trip
+    # end, any points after this are part of the new trip.
+    #
+    #
+    # However, in some circumstances, notably in my data from 27th
+    # August, there appears to be a mismatch and we get a couple of
+    # points past the end that we detected here.  So let's look for
+    # points that are within the distance filter, and are at a
+    # delta of a minute, and join them to the just ended trip instead of using them to
+    # start the new trip
+
+    def continue_just_ended(self, idx, currPoint, filtered_points_df):
+        if idx == 0:
+            return False
+        else:
+            prev_point = ad.AttrDict(filtered_points_df.iloc[idx - 1])
+            logging.debug("Comparing with prev_point = %s" % prev_point)
+            if pf.calDistance(prev_point, currPoint) < self.distance_threshold and \
+                                    currPoint.ts - prev_point.ts <= 60:
+                logging.info("Points %s and %s are within the distance filter and only 1 min apart so part of the same trip" %
+                             (prev_point, currPoint))
+                return True
+            else:
+                return False
