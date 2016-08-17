@@ -99,6 +99,8 @@ class BuiltinTimeSeries(esta.TimeSeries):
     def _get_sort_key(self, time_query = None):
         if time_query is None:
             return "metadata.write_ts"
+        elif time_query.timeType.endswith("local_dt"):
+            return time_query.timeType.replace("local_dt", "ts")
         else:
             return time_query.timeType
 
