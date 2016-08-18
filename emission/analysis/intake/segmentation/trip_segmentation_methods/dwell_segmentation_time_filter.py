@@ -182,18 +182,27 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         # Another mismatch between phone and server. Phone stops tracking too soon,
         # so the distance is still greater than the threshold at the end of the trip.
         # But then the next point is a long time away, so we can split again (similar to a distance filter)
-        if (prev_point is not None and
-                curr_point.ts - prev_point.ts > 2 * self.time_threshold and # We have been here for a while
-                pf.calDistance(prev_point, curr_point) < 2 * self.distance_threshold): # we haven't moved very much
-            logging.debug("prev_point.ts = %s, curr_point.ts = %s, threshold = %s, large gap = %s, ending trip" %
-                          (prev_point.ts, curr_point.ts,self.time_threshold, curr_point.ts - prev_point.ts))
-            return True
+        if prev_point is None:
+            logging.debug("prev_point is None, continuing trip")
         else:
-            if prev_point is None:
-                logging.debug("prev_point is None, continuing trip")
+            timeDelta = curr_point.ts - prev_point.ts
+            distDelta = pf.calDistance(prev_point, curr_point)
+            if timeDelta > 0:
+                speedDelta = distDelta / timeDelta
             else:
-                logging.debug("prev_point.ts = %s, curr_point.ts = %s, threshold = %s, small gap = %s, continuing trip" %
+                speedDelta = np.nan
+            speedThreshold = float(self.distance_threshold) / self.time_threshold
+            if (timeDelta > 2 * self.time_threshold and # We have been here for a while
+                 speedDelta < speedThreshold): # we haven't moved very much
+                logging.debug("prev_point.ts = %s, curr_point.ts = %s, threshold = %s, large gap = %s, ending trip" %
                               (prev_point.ts, curr_point.ts,self.time_threshold, curr_point.ts - prev_point.ts))
+                return True
+            else:
+                logging.debug("prev_point.ts = %s, curr_point.ts = %s, time gap = %s (vs %s), distance_gap = %s (vs %s), speed_gap = %s (vs %s) continuing trip" %
+                              (prev_point.ts, curr_point.ts,
+                               timeDelta, self.time_threshold,
+                               distDelta, self.distance_threshold,
+                               speedDelta, speedThreshold))
 
         # The -30 is a fuzz factor intended to compensate for older clients
         # where data collection stopped after 5 mins, so that we never actually
