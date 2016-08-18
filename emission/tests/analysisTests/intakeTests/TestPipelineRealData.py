@@ -37,8 +37,8 @@ class TestPipelineRealData(unittest.TestCase):
         self.assertEqual(len(result), len(expect))
         for rt, et in zip(result, expect):
             logging.debug("======= Comparing trip =========")
-            logging.debug(rt.properties)
-            logging.debug(et.properties)
+            logging.debug(json.dumps(rt.properties, indent=4, default=bju.default))
+            logging.debug(json.dumps(et.properties, indent=4, default=bju.default))
             # Highly user visible
             self.assertEqual(rt.properties.start_ts, et.properties.start_ts)
             self.assertEqual(rt.properties.end_ts, et.properties.end_ts)
@@ -49,8 +49,8 @@ class TestPipelineRealData(unittest.TestCase):
 
             for rs, es in zip(rt.features, et.features):
                 logging.debug("------- Comparing trip feature ---------")
-                logging.debug(rs)
-                logging.debug(es)
+                logging.debug(json.dumps(rs, indent=4, default=bju.default))
+                logging.debug(json.dumps(es, indent=4, default=bju.default))
                 self.assertEqual(rs.type, es.type)
                 if rs.type == "Feature":
                     # The first place will not have an enter time, so we can't check it
@@ -75,7 +75,7 @@ class TestPipelineRealData(unittest.TestCase):
                 logging.debug(20 * "-")
             logging.debug(20 * "=")
 
-    def testJun21(self):
+    def testJun20(self):
         # This is a fairly straightforward day. Tests mainly:
         # - ordering of trips
         # - handling repeated location entries with different write timestamps
@@ -83,6 +83,31 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-06-20"
         ld = ecwl.LocalDate({'year': 2016, 'month': 6, 'day': 20})
         cacheKey = "diary/trips-2016-06-20"
+        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        # runIntakePipeline does not run the common trips, habitica or store views to cache
+        # So let's manually store to the cache
+        # tc_query = estt.TimeComponentQuery("data.star_local_dt", ld, ld)
+        # enuah.UserCacheHandler.getUserCacheHandler(self.testUUID).storeTimelineToCache(tc_query)
+
+        # cached_result = edb.get_usercache_db().find_one({'user_id': self.testUUID,
+        #                                                  "metadata.key": cacheKey})
+        api_result = gfc.get_geojson_for_dt(self.testUUID, ld, ld)
+
+        # self.compare_result(cached_result, ground_truth)
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth).data)
+
+    def testJun21(self):
+        # This is a more complex day. Tests:
+        # PR #357 (spurious trip at 14:00 should be segmented and skipped)
+        # PR #358 (trip back from bella's house at 16:00)
+
+        dataFile = "emission/tests/data/real_examples/shankari_2016-06-21"
+        ld = ecwl.LocalDate({'year': 2016, 'month': 6, 'day': 21})
+        cacheKey = "diary/trips-2016-06-21"
         ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
