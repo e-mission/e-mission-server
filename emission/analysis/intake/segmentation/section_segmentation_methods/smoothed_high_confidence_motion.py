@@ -130,13 +130,13 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
             if len(motion_changes) == 1:
                 (start_motion, end_motion) = motion_changes[0]
 
-            if start_motion.type == end_motion.type:
-                logging.debug("No section because start_motion == end_motion, creating one dummy section")
-                section_list.append((fp, lp, start_motion.type))
-            # if len(motion_changes) == 0:
-            # # there are no high confidence motions useful motions, so we add a section of type NONE
-            # # as long as it is a discernable trip (end != start) and not a spurious trip
-            # logging.debug("No high confidence motions, creating dummy section of type NONE")
-            # section_list.append((fp, lp, ecwm.MotionTypes.NONE))
+                if start_motion.type == end_motion.type:
+                    logging.debug("No section because start_motion == end_motion, creating one dummy section")
+                    section_list.append((fp, lp, start_motion.type))
+                # if len(motion_changes) == 0:
+                # there are no high confidence motions useful motions, so we add a section of type NONE
+                # as long as it is a discernable trip (end != start) and not a spurious trip
+                    # logging.debug("No high confidence motions, creating dummy section of type NONE")
+                    # section_list.append((fp, lp, ecwm.MotionTypes.NONE))
 
         return section_list
