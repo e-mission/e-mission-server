@@ -106,6 +106,9 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
         motion_changes = self.segment_into_motion_changes(timeseries, time_query)
         location_points = timeseries.get_data_df("background/filtered_location", time_query)
 
+        fp = location_points.iloc[0]
+        lp = location_points.iloc[-1]
+
         # Create sections for each motion. At this point, we need to decide a policy on how to deal with the gaps.
         # Let's pick a reasonable default for now.
         # TODO: Restructure into policy that can be passed in.
@@ -122,4 +125,18 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
                 logging.debug("with iloc, section start point = %s, section end point = %s" %
                               (ecwl.Location(raw_section_df.iloc[0]), ecwl.Location(raw_section_df.iloc[-1])))
                 section_list.append((raw_section_df.iloc[0], raw_section_df.iloc[-1], start_motion.type))
+
+        if len(section_list) == 0:
+            if len(motion_changes) == 1:
+                (start_motion, end_motion) = motion_changes[0]
+
+            if start_motion.type == end_motion.type:
+                logging.debug("No section because start_motion == end_motion, creating one dummy section")
+                section_list.append((fp, lp, start_motion.type))
+            # if len(motion_changes) == 0:
+            # # there are no high confidence motions useful motions, so we add a section of type NONE
+            # # as long as it is a discernable trip (end != start) and not a spurious trip
+            # logging.debug("No high confidence motions, creating dummy section of type NONE")
+            # section_list.append((fp, lp, ecwm.MotionTypes.NONE))
+
         return section_list
