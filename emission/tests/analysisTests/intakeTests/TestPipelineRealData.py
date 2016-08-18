@@ -44,7 +44,7 @@ class TestPipelineRealData(unittest.TestCase):
             self.assertEqual(rt.properties.end_ts, et.properties.end_ts)
             self.assertEqual(rt.properties.start_loc, et.properties.start_loc)
             self.assertEqual(rt.properties.end_loc, et.properties.end_loc)
-            self.assertEqual(rt.properties.distance, et.properties.distance)
+            self.assertAlmostEqual(rt.properties.distance, et.properties.distance, places=2)
             self.assertEqual(len(rt.features), len(et.features))
 
             for rs, es in zip(rt.features, et.features):
