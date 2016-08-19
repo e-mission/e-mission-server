@@ -244,8 +244,9 @@ def get_all_points_for_range(user_id, key, start_ts, end_ts):
 
 
 def get_feature_list_for_point_array(points_array):
-    points_feature_array = [location_to_geojson(le.data) for le in points_array]
-    print ("Found %d points" % len(points_feature_array))
+    points_feature_array = [location_to_geojson(le) for le in points_array]
+    print ("Found %d features from %d points" %
+           (len(points_feature_array), len(points_array)))
     
     feature_array = []
     feature_array.append(gj.FeatureCollection(points_feature_array))
@@ -268,5 +269,5 @@ def get_location_entry_list_from_df(loc_time_df, ts="ts", latitude="latitude", l
         retVal = {"latitude": row[latitude], "longitude": row[longitude], "ts": row[ts],
                   "_id": str(idx), "fmt_time": row[fmt_time], "loc": gj.Point(coordinates=[row[longitude], row[latitude]])}
         location_entry_list.append(ecwe.Entry.create_entry(
-            "dummy_user", "dummy_entry", ecwl.Location(retVal)))
+            "dummy_user", "background/location", ecwl.Location(retVal)))
     return location_entry_list
