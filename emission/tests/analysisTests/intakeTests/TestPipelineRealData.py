@@ -20,6 +20,7 @@ class TestPipelineRealData(unittest.TestCase):
         pass
 
     def tearDown(self):
+        logging.debug("Clearing related databases")
         self.clearRelatedDb()
 
     def clearRelatedDb(self):
@@ -108,6 +109,58 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-06-21"
         ld = ecwl.LocalDate({'year': 2016, 'month': 6, 'day': 21})
         cacheKey = "diary/trips-2016-06-21"
+        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        # runIntakePipeline does not run the common trips, habitica or store views to cache
+        # So let's manually store to the cache
+        # tc_query = estt.TimeComponentQuery("data.star_local_dt", ld, ld)
+        # enuah.UserCacheHandler.getUserCacheHandler(self.testUUID).storeTimelineToCache(tc_query)
+
+        # cached_result = edb.get_usercache_db().find_one({'user_id': self.testUUID,
+        #                                                  "metadata.key": cacheKey})
+        api_result = gfc.get_geojson_for_dt(self.testUUID, ld, ld)
+
+        # self.compare_result(cached_result, ground_truth)
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth).data)
+
+    def testAug10(self):
+        # This is a more complex day. Tests:
+        # PR #302 (trip to optometrist)
+        # PR #352 (split optometrist trip)
+
+        dataFile = "emission/tests/data/real_examples/shankari_2016-08-10"
+        ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 10})
+        cacheKey = "diary/trips-2016-08-10"
+        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        # runIntakePipeline does not run the common trips, habitica or store views to cache
+        # So let's manually store to the cache
+        # tc_query = estt.TimeComponentQuery("data.star_local_dt", ld, ld)
+        # enuah.UserCacheHandler.getUserCacheHandler(self.testUUID).storeTimelineToCache(tc_query)
+
+        # cached_result = edb.get_usercache_db().find_one({'user_id': self.testUUID,
+        #                                                  "metadata.key": cacheKey})
+        api_result = gfc.get_geojson_for_dt(self.testUUID, ld, ld)
+
+        # self.compare_result(cached_result, ground_truth)
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth).data)
+
+    def testAug11(self):
+        # This is a more complex day. Tests:
+        # PR #352 (should not split trip to Oakland)
+        # PR #348 (trip from station to OAK DOT)
+        # PR #357 (trip to Radio Shack is complete and not truncated)
+        # PR #345 (no cleaned trips are skipped)
+
+        dataFile = "emission/tests/data/real_examples/shankari_2016-08-11"
+        ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 11})
+        cacheKey = "diary/trips-2016-08-11"
         ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
