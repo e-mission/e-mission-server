@@ -99,6 +99,9 @@ def setupRealExample(testObj, dump_file):
     logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
     testObj.entries = json.load(open(dump_file), object_hook = bju.object_hook)
     testObj.testUUID = uuid.uuid4()
+    setupRealExampleWithEntries(testObj)
+
+def setupRealExampleWithEntries(testObj):
     tsdb = edb.get_timeseries_db()
     for entry in testObj.entries:
         entry["user_id"] = testObj.testUUID
