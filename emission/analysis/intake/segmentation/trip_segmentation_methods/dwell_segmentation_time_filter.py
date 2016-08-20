@@ -2,6 +2,7 @@
 import logging
 import attrdict as ad
 import numpy as np
+import pandas as pd
 import datetime as pydt
 
 # Our imports
@@ -50,6 +51,8 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         segmentation points.
         """
         filtered_points_df = timeseries.get_data_df("background/filtered_location", time_query)
+        transition_df = timeseries.get_data_df("statemachine/transition", time_query)
+        logging.debug("transition_df = %s" % transition_df)
 
         if len(filtered_points_df) == 0:
             self.last_ts_processed = None
@@ -112,26 +115,11 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                           (last5MinTimes.max() if len(last5MinTimes) > 0 else np.NaN, self.time_threshold))
 
             if self.has_trip_ended(prevPoint, currPoint, last10PointsDistances, last5MinsDistances, last5MinTimes):
-                last10PointsMedian = np.median(last10Points_df.index)
-                last5MinsPointsMedian = np.median(last5MinsPoints_df.index)
-                if np.isnan(last5MinsPointsMedian):
-                    last_trip_end_index = int(last10PointsMedian)
-                    logging.debug("last5MinsPoints not found, last_trip_end_index = %s" % last_trip_end_index)
-                else:
-                    last_trip_end_index = int(min(last5MinsPointsMedian, last10PointsMedian))
-                    logging.debug("last5MinsPoints and last10PointsMedian found, last_trip_end_index = %s" % last_trip_end_index)
-#                     logging.debug("last5MinPoints.median = %s (%s), last10Points_df = %s (%s), sel index = %s" %
-#                         (np.median(last5MinsPoints_df.index), last5MinsPoints_df.index,
-#                          np.median(last10Points_df.index), last10Points_df.index,
-#                          last_trip_end_index))
-
-                last_trip_end_point_row = filtered_points_df.iloc[last_trip_end_index]
-                last_trip_end_point = ad.AttrDict(filtered_points_df.iloc[last_trip_end_index])
-                logging.debug("Appending last_trip_end_point %s with index %s " %
-                    (last_trip_end_point, last_trip_end_point_row.name))
+                (ended_before_this, last_trip_end_point) = self.get_last_trip_end_point(filtered_points_df,
+                                                                                       last10Points_df, last5MinsPoints_df)
                 segmentation_points.append((curr_trip_start_point, last_trip_end_point))
                 logging.info("Found trip end at %s" % last_trip_end_point.fmt_time)
-                if np.isnan(last5MinsPointsMedian):
+                if ended_before_this:
                     # in this case, we end a trip at the previous point, and the next trip starts at this
                     # point, not the next one
                     just_ended = False
@@ -145,6 +133,14 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                     prevPoint = None
             else:
                 prevPoint = currPoint
+
+        if not just_ended and len(transition_df) > 0:
+            stopped_moving_after_last = transition_df[(transition_df.ts > currPoint.ts) & (transition_df.transition == 2)]
+            if len(stopped_moving_after_last) > 0:
+                (unused, last_trip_end_point) = self.get_last_trip_end_point(filtered_points_df,
+                                                                             last10Points_df, None)
+                segmentation_points.append((curr_trip_start_point, last_trip_end_point))
+
         return segmentation_points
 
     def continue_just_ended(self, idx, currPoint, filtered_points_df):
@@ -221,5 +217,28 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             last10PointsDistances.max() < self.distance_threshold):
                 return True
 
+
+    def get_last_trip_end_point(self, filtered_points_df, last10Points_df, last5MinsPoints_df):
+        ended_before_this = last5MinsPoints_df is None or len(last5MinsPoints_df) == 0
+        if ended_before_this:
+            logging.debug("trip end transition, so last 10 points are %s" % last10Points_df.index)
+            last10PointsMedian = np.median(last10Points_df.index)
+            last_trip_end_index = int(last10PointsMedian)
+            logging.debug("last5MinsPoints not found, last_trip_end_index = %s" % last_trip_end_index)
+        else:
+            last10PointsMedian = np.median(last10Points_df.index)
+            last5MinsPointsMedian = np.median(last5MinsPoints_df.index)
+            last_trip_end_index = int(min(last5MinsPointsMedian, last10PointsMedian))
+            logging.debug("last5MinsPoints and last10PointsMedian found, last_trip_end_index = %s" % last_trip_end_index)
+        #                     logging.debug("last5MinPoints.median = %s (%s), last10Points_df = %s (%s), sel index = %s" %
+        #                         (np.median(last5MinsPoints_df.index), last5MinsPoints_df.index,
+        #                          np.median(last10Points_df.index), last10Points_df.index,
+        #                          last_trip_end_index))
+
+        last_trip_end_point_row = filtered_points_df.iloc[last_trip_end_index]
+        last_trip_end_point = ad.AttrDict(filtered_points_df.iloc[last_trip_end_index])
+        logging.debug("Appending last_trip_end_point %s with index %s " %
+                      (last_trip_end_point, last_trip_end_point_row.name))
+        return (ended_before_this, last_trip_end_point)
 
 
