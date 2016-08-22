@@ -28,7 +28,7 @@ def request_data(server_url, from_ts, to_ts, phone_ids, debug):
 				if len(entry_list) == 0:
 					logging.debug("...has no data...")
 				else:
-					logging.debug(str(entry_list[0]))
+					logging.debug(str(entry_list[0].get('metadata').get('write_fmt_time')))
 
 			for entry in entry_list:
 				tsdb.save(entry)
