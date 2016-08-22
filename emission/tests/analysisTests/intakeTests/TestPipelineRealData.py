@@ -232,6 +232,24 @@ class TestPipelineRealData(unittest.TestCase):
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth).data)
 
+    def testFeb22ShortTripsDistance(self):
+        # Re-run, but with multiple calls to sync data
+        # This tests the effect of online versus offline analysis and segmentation with potentially partial data
+
+        dataFile = "emission/tests/data/real_examples/iphone_3_2016-02-22"
+        start_ld = ecwl.LocalDate({'year': 2016, 'month': 2, 'day': 22})
+        end_ld = ecwl.LocalDate({'year': 2016, 'month': 2, 'day': 22})
+        cacheKey = "diary/trips-2016-02-22"
+        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, end_ld)
+
+        # Although we process the day's data in two batches, we should get the same result
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                                   ad.AttrDict(ground_truth).data)
+
     def testAug10MultiSyncEndDetected(self):
         # Re-run, but with multiple calls to sync data
         # This tests the effect of online versus offline analysis and segmentation with potentially partial data
