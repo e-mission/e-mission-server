@@ -308,6 +308,83 @@ class TestPipelineRealData(unittest.TestCase):
         self.compare_approx_result(ad.AttrDict({'result': api_result}).result,
                                    ad.AttrDict(ground_truth).data, time_fuzz=60, distance_fuzz=100)
 
+    def testAug10MultiSyncEndNotDetected(self):
+        # Re-run, but with multiple calls to sync data
+        # This tests the effect of online versus offline analysis and segmentation with potentially partial data
+
+        dataFile = "emission/tests/data/real_examples/shankari_2016-08-10"
+        start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 9})
+        end_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 10})
+        cacheKey = "diary/trips-2016-08-10"
+        ground_truth = json.load(open("emission/tests/data/real_examples/shankari_2016-08-910.ground_truth"),
+                                 object_hook=bju.object_hook)
+
+        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
+        all_entries = json.load(open(dataFile), object_hook = bju.object_hook)
+        ts_1030 = arrow.get("2016-08-10T10:30:00-07:00").timestamp
+        logging.debug("ts_1030 = %s, converted back = %s" % (ts_1030, arrow.get(ts_1030).to("America/Los_Angeles")))
+        before_1030_entries = [e for e in all_entries if ad.AttrDict(e).metadata.write_ts <= ts_1030]
+        after_1030_entries = [e for e in all_entries if ad.AttrDict(e).metadata.write_ts > ts_1030]
+
+        # First load all data from the 9th. Otherwise, the missed trip is the first trip,
+        # and we don't set the last_ts_processed
+        # See the code around "logging.debug("len(segmentation_points) == 0, early return")"
+        etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2016-08-09")
+
+        # Sync at 10:30 to capture all the points on the trip *to* the optometrist
+        # Skip the last few points to ensure that the trip end is skipped
+        self.entries = before_1030_entries[0:-2]
+        etc.setupRealExampleWithEntries(self)
+        etc.runIntakePipeline(self.testUUID)
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, end_ld)
+
+        # Then sync after 10:30
+        self.entries = after_1030_entries
+        etc.setupRealExampleWithEntries(self)
+        etc.runIntakePipeline(self.testUUID)
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, end_ld)
+
+        # Although we process the day's data in two batches, we should get the same result
+        self.compare_approx_result(ad.AttrDict({'result': api_result}).result,
+                                   ad.AttrDict(ground_truth).data, time_fuzz=60, distance_fuzz=100)
+
+    def testFeb22MultiSyncEndNotDetected(self):
+        # Re-run, but with multiple calls to sync data
+        # This tests the effect of online versus offline analysis and segmentation with potentially partial data
+
+        dataFile = "emission/tests/data/real_examples/iphone_2016-02-22"
+        start_ld = ecwl.LocalDate({'year': 2016, 'month': 2, 'day': 22})
+        end_ld = ecwl.LocalDate({'year': 2016, 'month': 2, 'day': 22})
+        cacheKey = "diary/trips-2016-02-22"
+        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+
+        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
+        all_entries = json.load(open(dataFile), object_hook = bju.object_hook)
+        # 18:01 because the transition was at 2016-02-22T18:00:09.623404-08:00, so right after
+        # 18:00
+        ts_1800 = arrow.get("2016-02-22T18:00:30-08:00").timestamp
+        logging.debug("ts_1800 = %s, converted back = %s" % (ts_1800, arrow.get(ts_1800).to("America/Los_Angeles")))
+        before_1800_entries = [e for e in all_entries if ad.AttrDict(e).metadata.write_ts <= ts_1800]
+        after_1800_entries = [e for e in all_entries if ad.AttrDict(e).metadata.write_ts > ts_1800]
+
+        # Sync at 18:00 to capture all the points on the trip *to* the optometrist
+        # Skip the last few points to ensure that the trip end is skipped
+        import uuid
+        self.testUUID = uuid.uuid4()
+        self.entries = before_1800_entries[0:-2]
+        etc.setupRealExampleWithEntries(self)
+        etc.runIntakePipeline(self.testUUID)
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, end_ld)
+
+        # Then sync after 18:00
+        self.entries = after_1800_entries
+        etc.setupRealExampleWithEntries(self)
+        etc.runIntakePipeline(self.testUUID)
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, end_ld)
+
+        # Although we process the day's data in two batches, we should get the same result
+        self.compare_approx_result(ad.AttrDict({'result': api_result}).result,
+                                   ad.AttrDict(ground_truth).data, time_fuzz=60, distance_fuzz=100)
 
 if __name__ == '__main__':
     etc.configLogging()

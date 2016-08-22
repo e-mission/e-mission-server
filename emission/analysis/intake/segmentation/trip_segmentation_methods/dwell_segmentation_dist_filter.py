@@ -36,14 +36,9 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
         """
         filtered_points_df = timeseries.get_data_df("background/filtered_location", time_query)
         transition_df = timeseries.get_data_df("statemachine/transition", time_query)
+        logging.debug("transition_df = %s" % transition_df[["fmt_time", "transition"]])
 
-        if len(filtered_points_df) == 0:
-            self.last_ts_processed = None
-        else:
-            # TODO: Decide whether we should return the write_ts in the entry,
-            # or whether we should search by timestamp instead.
-            # Depends on final direction for the timequery
-            self.last_ts_processed = filtered_points_df.iloc[-1].metadata_write_ts
+        self.last_ts_processed = None
 
         logging.info("Last ts processed = %s" % self.last_ts_processed)
 
@@ -61,6 +56,8 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
 
             if just_ended:
                 if self.continue_just_ended(idx, currPoint, filtered_points_df):
+                    # We have "processed" the currPoint by deciding to glom it
+                    self.last_ts_processed = currPoint.ts
                     continue
                 # else: 
                 # Here's where we deal with the start trip. At this point, the
@@ -94,6 +91,8 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
                         (last_trip_end_point, idx-1))
                     segmentation_points.append((curr_trip_start_point, last_trip_end_point))
                     logging.info("Found trip end at %s" % last_trip_end_point.fmt_time)
+                    # We have processed everything up to the trip end by marking it as a completed trip
+                    self.last_ts_processed = currPoint.ts
                     just_ended = True
                     # Now, we have finished processing the previous point as a trip
                     # end or not. But we still need to process this point by seeing
@@ -133,9 +132,11 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
         # then we end the trip at the last point that we have.
         if not just_ended and len(transition_df) > 0:
             stopped_moving_after_last = transition_df[(transition_df.ts > currPoint.ts) & (transition_df.transition == 2)]
+            logging.debug("stopped_moving_after_last = %s" % stopped_moving_after_last[["fmt_time", "transition"]])
             if len(stopped_moving_after_last) > 0:
                 logging.debug("Found %d transitions after last point, ending trip..." % len(stopped_moving_after_last))
                 segmentation_points.append((curr_trip_start_point, currPoint))
+                self.last_ts_processed = currPoint.ts
             else:
                 logging.debug("Found %d transitions after last point, not ending trip..." % len(stopped_moving_after_last))
         return segmentation_points
