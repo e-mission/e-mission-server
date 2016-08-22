@@ -19,7 +19,7 @@ parser.add_argument("from_date",
 parser.add_argument("to_date",
         help="to_date (local time, exclusive) in the format of YYYY-MM-DD-HH")
 parser.add_argument("server_url",
-        help="url of the server to pull data from i.e. 'http://localhost:8080' or 'http://e-mission.eecs.berkeley.edu'")
+        help="url of the server to pull data from i.e. 'http://localhost:8080' or 'https://e-mission.eecs.berkeley.edu'")
 parser.add_argument("-v", "--verbose", 
 		help="turn on debugging", action="store_true")
 
@@ -44,5 +44,3 @@ print "Pulling data from " + from_date + " to " + to_date + " (local time)"
 print "..."
 
 public_data.request_batched_data(server_url, from_ts, to_ts, phone_ids)
-
-print "Data loaded to local server!"

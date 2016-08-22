@@ -28,7 +28,7 @@ def request_data(server_url, from_ts, to_ts, phone_ids, debug):
 				if len(entry_list) == 0:
 					logging.debug("...has no data...")
 				else:
-					logging.debug(str(entry_list[0].get('metadata').get('write_fmt_time')))
+					logging.debug(str(entry_list[0]))
 
 			for entry in entry_list:
 				tsdb.save(entry)
@@ -43,3 +43,4 @@ def request_batched_data(server_url, from_ts, to_ts, phone_ids):
 		request_data(server_url, t1, t2, phone_ids, debug)
 		t1 = t2 
 		debug = False
+	print "Data loaded to local server!"
