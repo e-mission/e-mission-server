@@ -403,8 +403,14 @@ def getPublicData():
 
   data_list = map(lambda q: list(edb.get_timeseries_db().find(q).sort("metadata.write_ts")), user_queries)
 
-  logging.debug("public data retrieved")
+  num_entries = map(lambda q: len(q), data_list)
+  total_entries = sum(num_entries)
+  logging.debug("Total entries retrieved %d" % total_entries)
 
+  threshold = 200000 
+  if total_entries > threshold:
+    data_list = None
+   
   return {'phone_data': data_list}
 
 

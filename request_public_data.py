@@ -1,11 +1,8 @@
-import emission.core.get_database as edb
-import bson.json_util as bju
-import requests
-import json
 import argparse
 import logging
 import arrow 
 from uuid import UUID
+import public_data 
 
 # List of UUIDs of phones to pull data for 
 iphone_ids = ["079e0f1a-c440-3d7c-b0e7-de160f748e35", "c76a0487-7e5a-3b17-a449-47be666b36f6", 
@@ -22,7 +19,7 @@ parser.add_argument("from_date",
 parser.add_argument("to_date",
         help="to_date (local time, exclusive) in the format of YYYY-MM-DD-HH")
 parser.add_argument("server_url",
-        help="url of the server to pull data from i.e. 'localhost:8080' or 'e-mission.eecs.berkeley.edu'")
+        help="url of the server to pull data from i.e. 'http://localhost:8080' or 'http://e-mission.eecs.berkeley.edu'")
 parser.add_argument("-v", "--verbose", 
 		help="turn on debugging", action="store_true")
 
@@ -42,33 +39,10 @@ to_ts = arrow.get(to_date, 'YYYY-MM-DD-HH').replace(tzinfo='local').timestamp
 logging.debug("from_ts = " + str(from_ts))
 logging.debug("to_ts = " + str(to_ts))
 
-url = "http://" + server_url + "/eval/publicData/timeseries?from_ts=" + str(from_ts) + "&to_ts=" + str(to_ts)
-ids = {'phone_ids': phone_ids}
-headers = {'Content-Type': 'application/json'}
-
-r = requests.get(url, data=json.dumps(ids), headers = headers)
-
-print r 
-
-dic = json.loads(r.text, object_hook = bju.object_hook)
-phone_list = dic['phone_data']
-
-tsdb = edb.get_timeseries_db()
-
-print "Loading data from " + from_date + " to " + to_date + " (local time)"
+# Pulling public data in batches 
+print "Pulling data from " + from_date + " to " + to_date + " (local time)"
 print "..."
 
-for index, entry_list in enumerate(phone_list):
-	logging.debug("phone" + str(index+1) + " first entry:")
-
-	if len(entry_list) == 0:
-		logging.debug("...has no data...")
-	else:
-		logging.debug(str(entry_list[0].get('metadata').get('write_fmt_time')))
-
-	for entry in entry_list:
-		tsdb.save(entry)
+public_data.request_batched_data(server_url, from_ts, to_ts, phone_ids)
 
 print "Data loaded to local server!"
-
-
