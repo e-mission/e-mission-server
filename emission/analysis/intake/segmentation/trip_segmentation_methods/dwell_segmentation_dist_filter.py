@@ -60,17 +60,7 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
                 # segmentation_points.append(currPoint)
 
             if just_ended:
-                lastPoint = ad.AttrDict(filtered_points_df.iloc[idx-1])
-                logging.debug("Comparing with lastPoint = %s, distance = %s, time = %s" % 
-                    (lastPoint, pf.calDistance(lastPoint, currPoint) < self.distance_threshold,
-                     currPoint.ts - lastPoint.ts <= self.time_threshold))
-                # Unlike the time filter, with the distance filter, we concatenate all points
-                # that are within the distance threshold with the previous trip
-                # end, since because of the distance filter, even noisy points
-                # can occur at an arbitrary time in the future
-                if pf.calDistance(lastPoint, currPoint) < self.distance_threshold:
-                    logging.info("Points %s and %s are within the distance filter so part of the same trip" %
-                                 (lastPoint, currPoint))
+                if self.continue_just_ended(idx, currPoint, filtered_points_df):
                     continue
                 # else: 
                 # Here's where we deal with the start trip. At this point, the
@@ -105,6 +95,16 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
                     segmentation_points.append((curr_trip_start_point, last_trip_end_point))
                     logging.info("Found trip end at %s" % last_trip_end_point.fmt_time)
                     just_ended = True
+                    # Now, we have finished processing the previous point as a trip
+                    # end or not. But we still need to process this point by seeing
+                    # whether it should represent a new trip start, or a glom to the
+                    # previous trip
+                    if not self.continue_just_ended(idx, currPoint, filtered_points_df):
+                        sel_point = currPoint
+                        logging.debug("Setting new trip start point %s with idx %s" % (sel_point, sel_point.idx))
+                        curr_trip_start_point = sel_point
+                        just_ended = False
+
         # Since we only end a trip when we start a new trip, this means that
         # the last trip that was pushed is ignored. Consider the example of
         # 2016-02-22 when I took kids to karate. We arrived shortly after 4pm,
@@ -134,5 +134,45 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
         if not just_ended and len(transition_df) > 0:
             stopped_moving_after_last = transition_df[(transition_df.ts > currPoint.ts) & (transition_df.transition == 2)]
             if len(stopped_moving_after_last) > 0:
+                logging.debug("Found %d transitions after last point, ending trip..." % len(stopped_moving_after_last))
                 segmentation_points.append((curr_trip_start_point, currPoint))
+            else:
+                logging.debug("Found %d transitions after last point, not ending trip..." % len(stopped_moving_after_last))
         return segmentation_points
+
+    def continue_just_ended(self, idx, currPoint, filtered_points_df):
+        """
+        Normally, since the logic here and the
+        logic on the phone are the same, if we have detected a trip
+        end, any points after this are part of the new trip.
+
+        However, in some circumstances, notably in my data from 27th
+        August, there appears to be a mismatch and we get a couple of
+        points past the end that we detected here.  So let's look for
+        points that are within the distance filter, and are at a
+        delta of a minute, and join them to the just ended trip instead of using them to
+        start the new trip
+
+        :param idx: Index of the current point
+        :param currPoint: current point
+        :param filtered_points_df: dataframe of filtered points
+        :return: True if we should continue the just ended trip, False otherwise
+        """
+        if idx == 0:
+            return False
+        else:
+            lastPoint = ad.AttrDict(filtered_points_df.iloc[idx - 1])
+            logging.debug("Comparing with lastPoint = %s, distance = %s, time = %s" %
+                          (lastPoint, pf.calDistance(lastPoint, currPoint) < self.distance_threshold,
+                           currPoint.ts - lastPoint.ts <= self.time_threshold))
+            # Unlike the time filter, with the distance filter, we concatenate all points
+            # that are within the distance threshold with the previous trip
+            # end, since because of the distance filter, even noisy points
+            # can occur at an arbitrary time in the future
+            if pf.calDistance(lastPoint, currPoint) < self.distance_threshold:
+                logging.info("Points %s and %s are within the distance filter so part of the same trip" %
+                             (lastPoint, currPoint))
+                return True
+            else:
+                return False
+
