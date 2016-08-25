@@ -55,7 +55,9 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual(user_met_result[1].local_dt.day, 28)
         self.assertEqual(user_met_result[0].ON_FOOT, 4)
         self.assertEqual(user_met_result[0].BICYCLING, 2)
-        self.assertEqual(user_met_result[0].IN_VEHICLE, 3)
+        # Changed from 3 to 4 - investigation at
+        # https://github.com/e-mission/e-mission-server/issues/288#issuecomment-242531798
+        self.assertEqual(user_met_result[0].IN_VEHICLE, 4)
         # We are not going to make absolute value assertions about
         # the aggregate values since they are affected by other
         # entries in the database. However, because we have at least
