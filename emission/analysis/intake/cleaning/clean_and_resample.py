@@ -37,20 +37,27 @@ import emission.core.wrapper.stop as ecwst
 import emission.core.wrapper.location as ecwl
 import emission.core.wrapper.recreatedlocation as ecwrl
 
+import emission.core.common as ecc
+
 import emission.core.our_geocoder as eco
 
 import attrdict as ad
 
 
-filtered_trip_excluded = ["start_place", "end_place"]
+filtered_trip_excluded = ["start_place", "end_place",
+                          "start_ts", "start_fmt_time", "start_local_dt", "start_loc",
+                          "_id"]
 # We are not copying over any of the exit information from the raw place because
 # we may want to squish a bunch of places together, and then the end information
 # will come from the final squished place
 filtered_place_excluded = ["exit_ts", "exit_local_dt", "exit_fmt_time",
                            "starting_trip", "ending_trip", "duration", "_id"]
-filtered_section_excluded = ["trip_id", "start_stop", "end_stop", "distance", "_id"]
+filtered_section_excluded = ["trip_id", "start_stop", "end_stop", "distance", "duration",
+                             "start_ts", "start_fmt_time", "start_local_dt","start_loc",
+                             "_id"]
 filtered_stop_excluded = ["trip_id", "ending_section", "starting_section", "_id"]
 filtered_location_excluded = ["speed", "distance", "_id"]
+extrapolated_location_excluded = ["ts", "fmt_time", "local_dt", "_id"]
 
 def clean_and_resample(user_id):
     time_query = epq.get_time_range_for_clean_resampling(user_id)
@@ -139,6 +146,14 @@ def get_filtered_trip(ts, trip):
     stop_map = {}
     for stop in trip_tl.places:
         stop_map[stop.get_id()] = get_filtered_stop(filtered_trip_entry, stop)
+
+    # Set the start point and time for the trip from the start point and time
+    # from the first section
+    first_cleaned_section = section_map[trip_tl.trips[0].get_id()]
+    logging.debug("Copying start_ts %s, start_fmt_time %s, start_local_dt from %s to %s" %
+                  (first_cleaned_section.data.start_ts, first_cleaned_section.data.start_fmt_time,
+                   first_cleaned_section.get_id(), filtered_trip_data))
+    _set_extrapolated_start_for_trip(filtered_trip_data, first_cleaned_section)
 
     # TODO: DO we need to add the stop distances too? They should be small...
     trip_distance = sum([section.data.distance for section in section_map.values()])
@@ -241,6 +256,7 @@ def get_filtered_stop(new_trip_entry, stop):
 
 def get_filtered_points(section, filtered_section_data):
     logging.debug("Getting filtered points for section %s" % section)
+    logging.debug("Saving entries into cleaned section %s" % filtered_section_data)
     ts = esta.TimeSeries.get_time_series(section.user_id)
     loc_entry_it = ts.find_entries(["background/filtered_location"],
                                    esda.get_time_query_for_trip_like(
@@ -271,14 +287,53 @@ def get_filtered_points(section, filtered_section_data):
 
     filtered_loc_list = remove_outliers(loc_entry_list, filtered_point_id_list)
 
+    if section.data.start_stop is None:
+        logging.debug("Found first section, need to extrapolate start point")
+        raw_trip = ts.get_entry_from_id(esda.RAW_TRIP_KEY, section.data.trip_id)
+        raw_start_place = ts.get_entry_from_id(esda.RAW_PLACE_KEY, raw_trip.data.start_place)
+        if raw_start_place.data.enter_ts is not None:
+            raw_start_place_enter_loc_entry = ecwe.Entry(
+                ts.get_entry_at_ts("background/filtered_location", "data.ts",
+                                   raw_start_place.data.enter_ts))
+        else:
+            dummy_section_start_loc = ecwl.Location()
+            dummy_section_start_loc.loc = raw_start_place.data.location
+            dummy_section_start_loc.latitude = raw_start_place.data.location.coordinates[1]
+            dummy_section_start_loc.longitude = raw_start_place.data.location.coordinates[0]
+
+            # These are not strictly accurate because the exit ts for the place
+            # corresponds to the ts of the first point in the section. We are trying
+            # to determine the correct exit_ts here. But its a reasonable estimate,
+            # at least for the time zone, which is required when we extrapolate
+            # note that this will fail for the specific case in which the first point outside
+            # the geofence of the first place in a trip chain is in a different timezone
+            # than the point itself. We can work around that by storing the enter_ts even
+            # for the first place.
+            dummy_section_start_loc.ts = raw_start_place.data.exit_ts
+            dummy_section_start_loc.fmt_time = raw_start_place.data.exit_fmt_time
+            dummy_section_start_loc.local_dt = raw_start_place.data.exit_local_dt
+            raw_start_place_enter_loc_entry = ecwe.Entry.create_entry(raw_trip.user_id,
+                                                  "background/filtered_location",
+                                                  dummy_section_start_loc)
+
+        logging.debug("Start place is %s and corresponding location is %s" %
+                      (raw_start_place.get_id(), raw_start_place_enter_loc_entry.get_id()))
+        filtered_loc_list = _add_start_point(filtered_loc_list, raw_start_place_enter_loc_entry)
+
+    # Can move this up to get_filtered_section if we don't want ensure that we
+    # don't touch filtered_section_data in here
+    logging.debug("Setting section start values of %s to first point %s" %
+                  (filtered_section_data, filtered_loc_list[0]))
+    _set_extrapolated_start_for_section(filtered_section_data, filtered_loc_list[0])
+
+    # if section.data.start_stop is None:
+    #     first_point = filtered_loc_list.pop(0)
+    #     logging.debug("first section - removing %s to avoid badly interpolated results" % first_point)
+
+    logging.debug("Resampling data of size %s" % len(filtered_loc_list))
     # filtered_loc_list has removed the outliers. Now, we resample the data at
     # 30 sec intervals
     resampled_loc_df = resample(filtered_loc_list, interval=30)
-    # If this is the first section, we need to find the start place of the parent trip
-    # and actually start from there. That will fix the distances but not the duration
-    # because we haven't yet figured out how to get the correct start time.
-    # TODO: Fix this!!
-    # For now, we will fudge this in the geojson converter, as always
 
     with_speeds_df = eaicl.add_dist_heading_speed(resampled_loc_df)
     with_speeds_df["idx"] = np.arange(0, len(with_speeds_df))
@@ -291,6 +346,56 @@ def _copy_non_excluded(old_data, new_data, excluded_list):
     for key in old_data:
         if key not in excluded_list:
             new_data[key] = old_data[key]
+
+def _add_start_point(filtered_loc_list, raw_start_place_enter_loc_entry):
+    curr_first_point = filtered_loc_list[0]
+    add_dist = ecc.calDistance(curr_first_point.loc.coordinates,
+                               raw_start_place_enter_loc_entry.data.loc.coordinates)
+    loc_df = pd.DataFrame(filtered_loc_list)
+    with_speeds_df = eaicl.add_dist_heading_speed(loc_df)
+
+    logging.debug("Adding distance %s to original %s to extend section start from %s to %s" %
+                  (add_dist, with_speeds_df.distance.sum(),
+                   curr_first_point.loc.coordinates, raw_start_place_enter_loc_entry.data.loc.coordinates))
+    # speed is in m/s. We want to compute secs for covering ad meters
+    # speed m = 1 sec, ad m = ? ad/speed secs
+    if with_speeds_df.speed.median() > 0:
+        del_time = add_dist / with_speeds_df.speed.median()
+    else:
+        logging.info("speeds for this section are %s, median is %s, skipping" %
+                     (with_speeds_df.speed, with_speeds_df.speed.median()))
+        del_time = 0
+
+    new_start_ts = curr_first_point.ts - del_time
+    logging.debug("After subtracting time %s from original %s to cover additional distance %s at speed %s, new_start_ts = %s" %
+                  (del_time, loc_df.ts.iloc[-1] - loc_df.ts.iloc[0],
+                   add_dist, with_speeds_df.speed.median(), new_start_ts))
+
+    new_first_point_data = ecwl.Location()
+    _copy_non_excluded(old_data=raw_start_place_enter_loc_entry.data,
+                       new_data=new_first_point_data,
+                       excluded_list=extrapolated_location_excluded)
+
+    logging.debug("After copy, new data = %s" % new_first_point_data)
+    new_first_point_data.ts = new_start_ts
+    tz = raw_start_place_enter_loc_entry.data.local_dt.timezone
+    new_first_point_data.local_dt = esdl.get_local_date(new_start_ts, tz)
+    new_first_point_data.fmt_time = arrow.get(new_start_ts).to(tz).isoformat()
+    filtered_loc_list.insert(0, new_first_point_data)
+    return filtered_loc_list
+
+def _set_extrapolated_start_for_section(filtered_section_data, fixed_first_loc):
+    filtered_section_data.start_ts = fixed_first_loc.ts
+    filtered_section_data.start_local_dt = fixed_first_loc.local_dt
+    filtered_section_data.start_fmt_time = fixed_first_loc.fmt_time
+    filtered_section_data.start_loc = fixed_first_loc.loc
+    filtered_section_data.duration = filtered_section_data.end_ts - filtered_section_data.start_ts
+
+def _set_extrapolated_start_for_trip(filtered_trip_data, first_section):
+    filtered_trip_data.start_ts = first_section.data.start_ts
+    filtered_trip_data.start_fmt_time = first_section.data.start_fmt_time
+    filtered_trip_data.start_local_dt = first_section.data.start_local_dt
+    filtered_trip_data.start_loc = first_section.data.start_loc
 
 def remove_outliers(raw_loc_entry_list, filtered_point_id_list):
     filtered_loc_list = []
@@ -492,10 +597,11 @@ def link_trip_start(cleaned_trip, cleaned_start_place, raw_start_place):
     cleaned_trip_data.start_place = cleaned_start_place.get_id()
 
     # We have now reached the end of the squishing. Let's hook up the end information
-    for key in raw_start_place.data:
-        if key in ["exit_ts", "exit_local_dt", "exit_fmt_time"]:
-            cleaned_start_place_data[key] = raw_start_place.data[key]
     cleaned_start_place_data.starting_trip = cleaned_trip.get_id()
+    cleaned_start_place_data.exit_ts = cleaned_trip_data.start_ts
+    cleaned_start_place_data.exit_fmt_time = cleaned_trip_data.start_fmt_time
+    cleaned_start_place_data.exit_local_dt = cleaned_trip_data.start_local_dt
+
     if cleaned_start_place_data.enter_ts is not None and \
 		cleaned_start_place_data.exit_ts is not None:
            cleaned_start_place_data.duration = cleaned_start_place_data.exit_ts - \

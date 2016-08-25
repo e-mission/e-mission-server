@@ -2,12 +2,12 @@ import logging
 import emission.core.wrapper.wrapperbase as ecwb
 
 class Location(ecwb.WrapperBase):
-    props = {"latitude": ecwb.WrapperBase.Access.RO,  # latitude of the point
-             "longitude": ecwb.WrapperBase.Access.RO, # longitude of the point
-             "loc": ecwb.WrapperBase.Access.RO,       # location of the point in geojson.
-             "ts": ecwb.WrapperBase.Access.RO,        # timestamp (in seconds)
-             "local_dt": ecwb.WrapperBase.Access.RO, # searchable datetime in local time
-             "fmt_time": ecwb.WrapperBase.Access.RO,  # formatted time
+    props = {"latitude": ecwb.WrapperBase.Access.WORM,  # latitude of the point
+             "longitude": ecwb.WrapperBase.Access.WORM, # longitude of the point
+             "loc": ecwb.WrapperBase.Access.WORM,       # location of the point in geojson.
+             "ts": ecwb.WrapperBase.Access.WORM,        # timestamp (in seconds)
+             "local_dt": ecwb.WrapperBase.Access.WORM, # searchable datetime in local time
+             "fmt_time": ecwb.WrapperBase.Access.WORM,  # formatted time
              "altitude": ecwb.WrapperBase.Access.RO,  # altitude of the point
              "accuracy": ecwb.WrapperBase.Access.RO,  # horizontal accuracy of the point in meters.
         # This is the radius of the 68% confidence, so a lower
