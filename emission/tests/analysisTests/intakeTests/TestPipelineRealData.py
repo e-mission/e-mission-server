@@ -125,8 +125,10 @@ class TestPipelineRealData(unittest.TestCase):
                     self.assertAlmostEqual(rs.features[0].properties.start_ts, es.features[0].properties.start_ts, delta=time_fuzz)
                     self.assertAlmostEqual(rs.features[0].properties.end_ts, es.features[0].properties.end_ts, delta=time_fuzz)
                     self.assertEqual(rs.features[0].properties.sensed_mode, es.features[0].properties.sensed_mode)
-                    self.assertEqual(len(rs.features[0].properties.speeds), len(es.features[0].properties.speeds))
-                    self.assertEqual(len(rs.features[0].geometry.coordinates), len(es.features[0].geometry.coordinates))
+                    # Fuzz for resampled data as well
+                    # https://github.com/e-mission/e-mission-server/issues/288#issuecomment-242450106
+                    self.assertAlmostEqual(len(rs.features[0].properties.speeds), len(es.features[0].properties.speeds), delta=2)
+                    self.assertAlmostEqual(len(rs.features[0].geometry.coordinates), len(es.features[0].geometry.coordinates), delta=2)
                 logging.debug(20 * "-")
             logging.debug(20 * "=")
 
