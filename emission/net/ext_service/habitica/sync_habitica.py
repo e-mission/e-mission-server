@@ -19,10 +19,10 @@ def reward_active_transportation(user_id):
     logging.debug("Habitica user: %s" % list(edb.get_habitica_db().find({'user_id': user_id})))
     #make sure habits exist
     #bike
-    bike_habit = {'type': "habit", 'text': "Bike", 'notes': "3 km = 1+ (calculated automatically)", 'up': True, 'down': False, 'priority': 2}
+    bike_habit = {'type': "habit", 'text': "Bike", 'up': True, 'down': False, 'priority': 2}
     bike_habit_id = proxy.create_habit(user_id, bike_habit)
     #walk
-    walk_habit = {'type': "habit", 'text': "Walk", 'notes': "1 km = 1+ (calculated automatically)", 'up': True, 'down': False, 'priority': 2}
+    walk_habit = {'type': "habit", 'text': "Walk", 'up': True, 'down': False, 'priority': 2}
     walk_habit_id = proxy.create_habit(user_id, walk_habit)
 
     #get timestamps
@@ -39,7 +39,7 @@ def reward_active_transportation(user_id):
     walk_distance = user_val['walk_count']
 
     #iterate over summary_ts and look for bike/on foot
-    for item in summary_ts:
+    for item in summary_ts["result"]:
       try:
           bike_distance += item.BICYCLING
           logging.debug("bike_distance += %s" % item.BICYCLING)
@@ -79,7 +79,7 @@ def reward_active_transportation(user_id):
       logging.debug("Request to score bike points %s" % res2)
 
     #update the timestamp and bike/walk counts in db
-    edb.get_habitica_db().update({"user_id": user_id},{"$set": {'metrics_data': {'last_timestamp': arrow.utcnow().timestamp, 'bike_count': bike_distance%3000, 'walk_count': walk_distance%1000}}},upsert=True)
+    edb.get_habitica_db().update({"user_id": user_id},{"$set": {'metrics_data': {'last_timestamp': summary_ts["last_ts_processed"], 'bike_count': bike_distance%3000, 'walk_count': walk_distance%1000}}},upsert=True)
     logging.debug("Habitica user after update: %s" % list(edb.get_habitica_db().find({'user_id': user_id})))
 
 
