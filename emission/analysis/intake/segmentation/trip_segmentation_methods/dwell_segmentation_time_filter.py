@@ -2,6 +2,7 @@
 import logging
 import attrdict as ad
 import numpy as np
+import pandas as pd
 import datetime as pydt
 
 # Our imports
@@ -50,14 +51,10 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         segmentation points.
         """
         filtered_points_df = timeseries.get_data_df("background/filtered_location", time_query)
+        transition_df = timeseries.get_data_df("statemachine/transition", time_query)
+        logging.debug("transition_df = %s" % transition_df[["fmt_time", "transition"]])
 
-        if len(filtered_points_df) == 0:
-            self.last_ts_processed = None
-        else:
-            # TODO: Decide whether we should return the write_ts in the entry,
-            # or whether we should search by timestamp instead.
-            # Depends on final direction for the timequery
-            self.last_ts_processed = filtered_points_df.iloc[-1].metadata_write_ts
+        self.last_ts_processed = None
 
         logging.info("Last ts processed = %s" % self.last_ts_processed)
 
@@ -65,6 +62,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         last_trip_end_point = None
         curr_trip_start_point = None
         just_ended = True
+        prevPoint = None
         for idx, row in filtered_points_df.iterrows():
             currPoint = ad.AttrDict(row)
             currPoint.update({"idx": idx})
@@ -74,30 +72,16 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                 # segmentation_points.append(currPoint)
 
             if just_ended:
-                # Normally, at this point, since the logic here and the
-                # logic on the phone are the same, if we have detected a trip
-                # end, any points after this are part of the new trip.
-                #
-                #
-                # However, in some circumstances, notably in my data from 27th
-                # August, there appears to be a mismatch and we get a couple of
-                # points past the end that we detected here.  So let's look for
-                # points that are within the distance filter, and are at a
-                # delta of 30 secs, and ignore them instead of using them to
-                # start the new trip
-                prev_point = ad.AttrDict(filtered_points_df.iloc[idx - 1])
-                logging.debug("Comparing with prev_point = %s" % prev_point)
-                if pf.calDistance(prev_point, currPoint) < self.distance_threshold and \
-                    currPoint.ts - prev_point.ts <= 60:
-                    logging.info("Points %s and %s are within the distance filter and only 1 min apart so part of the same trip" %
-                                 (prev_point, currPoint))
+                if self.continue_just_ended(idx, currPoint, filtered_points_df):
+                    # We have "processed" the currPoint by deciding to glom it
+                    self.last_ts_processed = currPoint.ts
                     continue
-                # else: 
+                # else:
                 sel_point = currPoint
                 logging.debug("Setting new trip start point %s with idx %s" % (sel_point, sel_point.idx))
                 curr_trip_start_point = sel_point
                 just_ended = False
-                
+
             last5MinsPoints_df = filtered_points_df[np.logical_and(
                                                         np.logical_and(
                                                                 filtered_points_df.ts > currPoint.ts - self.time_threshold,
@@ -110,33 +94,152 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             # TODO: Change this back to last 10 points once we normalize phone and this
             last10Points_df = filtered_points_df.iloc[max(idx-self.point_threshold, curr_trip_start_point.idx):idx+1]
             distanceToLast = lambda(row): pf.calDistance(ad.AttrDict(row), currPoint)
+            timeToLast = lambda(row): currPoint.ts - ad.AttrDict(row).ts
             last5MinsDistances = last5MinsPoints_df.apply(distanceToLast, axis=1)
             logging.debug("last5MinsDistances = %s with length %d" % (last5MinsDistances.as_matrix(), len(last5MinsDistances)))
             last10PointsDistances = last10Points_df.apply(distanceToLast, axis=1)
             logging.debug("last10PointsDistances = %s with length %d, shape %s" % (last10PointsDistances.as_matrix(),
                                                                            len(last10PointsDistances),
                                                                            last10PointsDistances.shape))
+
+            # Fix for https://github.com/e-mission/e-mission-server/issues/348
+            last5MinTimes = last5MinsPoints_df.apply(timeToLast, axis=1)
             
             logging.debug("len(last10PointsDistances) = %d, len(last5MinsDistances) = %d" %
                   (len(last10PointsDistances), len(last5MinsDistances)))
-            if (len(last10PointsDistances) < self.point_threshold - 1 or len(last5MinsDistances) == 0):
-                logging.debug("Too few points to make a decision, continuing")
-            else:
-                logging.debug("last5MinsDistances.max() = %s, last10PointsDistance.max() = %s" %
-                  (last5MinsDistances.max(), last10PointsDistances.max()))
-                if (last5MinsDistances.max() < self.distance_threshold and 
-                    last10PointsDistances.max() < self.distance_threshold):
-                    last_trip_end_index = int(min(np.median(last5MinsPoints_df.index),
-                                               np.median(last10Points_df.index)))
-#                     logging.debug("last5MinPoints.median = %s (%s), last10Points_df = %s (%s), sel index = %s" %
-#                         (np.median(last5MinsPoints_df.index), last5MinsPoints_df.index,
-#                          np.median(last10Points_df.index), last10Points_df.index,
-#                          last_trip_end_index))
-                    last_trip_end_point_row = filtered_points_df.iloc[last_trip_end_index]
-                    last_trip_end_point = ad.AttrDict(filtered_points_df.iloc[last_trip_end_index])
-                    logging.debug("Appending last_trip_end_point %s with index %s " %
-                        (last_trip_end_point, last_trip_end_point_row.name))
-                    segmentation_points.append((curr_trip_start_point, last_trip_end_point))
-                    logging.info("Found trip end at %s" % last_trip_end_point.fmt_time)
+            logging.debug("last5MinsTimes.max() = %s, time_threshold = %s" %
+                          (last5MinTimes.max() if len(last5MinTimes) > 0 else np.NaN, self.time_threshold))
+
+            if self.has_trip_ended(prevPoint, currPoint, last10PointsDistances, last5MinsDistances, last5MinTimes):
+                (ended_before_this, last_trip_end_point) = self.get_last_trip_end_point(filtered_points_df,
+                                                                                       last10Points_df, last5MinsPoints_df)
+                segmentation_points.append((curr_trip_start_point, last_trip_end_point))
+                logging.info("Found trip end at %s" % last_trip_end_point.fmt_time)
+                # We have processed everything up to the trip end by marking it as a completed trip
+                self.last_ts_processed = currPoint.ts
+                if ended_before_this:
+                    # in this case, we end a trip at the previous point, and the next trip starts at this
+                    # point, not the next one
+                    just_ended = False
+                    prevPoint = currPoint
+                    curr_trip_start_point = currPoint
+                    logging.debug("Setting new trip start point %s with idx %s" %
+                                  (currPoint, currPoint.idx))
+                else:
+                    # We end a trip at the current point, and the next trip starts at the next point
                     just_ended = True
+                    prevPoint = None
+            else:
+                prevPoint = currPoint
+
+        if not just_ended and len(transition_df) > 0:
+            stopped_moving_after_last = transition_df[(transition_df.ts > currPoint.ts) & (transition_df.transition == 2)]
+            if len(stopped_moving_after_last) > 0:
+                (unused, last_trip_end_point) = self.get_last_trip_end_point(filtered_points_df,
+                                                                             last10Points_df, None)
+                segmentation_points.append((curr_trip_start_point, last_trip_end_point))
+                logging.debug("Found trip end at %s" % last_trip_end_point.fmt_time)
+                # We have processed everything up to the trip end by marking it as a completed trip
+                self.last_ts_processed = currPoint.ts
+
         return segmentation_points
+
+    def continue_just_ended(self, idx, currPoint, filtered_points_df):
+        """
+        Normally, since the logic here and the
+        logic on the phone are the same, if we have detected a trip
+        end, any points after this are part of the new trip.
+
+        However, in some circumstances, notably in my data from 27th
+        August, there appears to be a mismatch and we get a couple of
+        points past the end that we detected here.  So let's look for
+        points that are within the distance filter, and are at a
+        delta of a minute, and join them to the just ended trip instead of using them to
+        start the new trip
+
+        :param idx: Index of the current point
+        :param currPoint: current point
+        :param filtered_points_df: dataframe of filtered points
+        :return: True if we should continue the just ended trip, False otherwise
+        """
+        if idx == 0:
+            return False
+        else:
+            prev_point = ad.AttrDict(filtered_points_df.iloc[idx - 1])
+            logging.debug("Comparing with prev_point = %s" % prev_point)
+            if pf.calDistance(prev_point, currPoint) < self.distance_threshold and \
+                                    currPoint.ts - prev_point.ts <= 60:
+                logging.info("Points %s and %s are within the distance filter and only 1 min apart so part of the same trip" %
+                             (prev_point, currPoint))
+                return True
+            else:
+                return False
+
+    def has_trip_ended(self, prev_point, curr_point, last10PointsDistances, last5MinsDistances, last5MinTimes):
+        # Another mismatch between phone and server. Phone stops tracking too soon,
+        # so the distance is still greater than the threshold at the end of the trip.
+        # But then the next point is a long time away, so we can split again (similar to a distance filter)
+        if prev_point is None:
+            logging.debug("prev_point is None, continuing trip")
+        else:
+            timeDelta = curr_point.ts - prev_point.ts
+            distDelta = pf.calDistance(prev_point, curr_point)
+            if timeDelta > 0:
+                speedDelta = distDelta / timeDelta
+            else:
+                speedDelta = np.nan
+            speedThreshold = float(self.distance_threshold) / self.time_threshold
+            if (timeDelta > 2 * self.time_threshold and # We have been here for a while
+                 speedDelta < speedThreshold): # we haven't moved very much
+                logging.debug("prev_point.ts = %s, curr_point.ts = %s, threshold = %s, large gap = %s, ending trip" %
+                              (prev_point.ts, curr_point.ts,self.time_threshold, curr_point.ts - prev_point.ts))
+                return True
+            else:
+                logging.debug("prev_point.ts = %s, curr_point.ts = %s, time gap = %s (vs %s), distance_gap = %s (vs %s), speed_gap = %s (vs %s) continuing trip" %
+                              (prev_point.ts, curr_point.ts,
+                               timeDelta, self.time_threshold,
+                               distDelta, self.distance_threshold,
+                               speedDelta, speedThreshold))
+
+        # The -30 is a fuzz factor intended to compensate for older clients
+        # where data collection stopped after 5 mins, so that we never actually
+        # see 5 mins of data
+
+        if (len(last10PointsDistances) < self.point_threshold - 1 or
+                    len(last5MinsDistances) == 0 or
+                    last5MinTimes.max() < self.time_threshold - 30):
+            logging.debug("Too few points to make a decision, continuing")
+            return False
+
+        # Normal end-of-trip case
+        logging.debug("last5MinsDistances.max() = %s, last10PointsDistance.max() = %s" %
+                      (last5MinsDistances.max(), last10PointsDistances.max()))
+        if (last5MinsDistances.max() < self.distance_threshold and
+            last10PointsDistances.max() < self.distance_threshold):
+                return True
+
+
+    def get_last_trip_end_point(self, filtered_points_df, last10Points_df, last5MinsPoints_df):
+        ended_before_this = last5MinsPoints_df is None or len(last5MinsPoints_df) == 0
+        if ended_before_this:
+            logging.debug("trip end transition, so last 10 points are %s" % last10Points_df.index)
+            last10PointsMedian = np.median(last10Points_df.index)
+            last_trip_end_index = int(last10PointsMedian)
+            logging.debug("last5MinsPoints not found, last_trip_end_index = %s" % last_trip_end_index)
+        else:
+            last10PointsMedian = np.median(last10Points_df.index)
+            last5MinsPointsMedian = np.median(last5MinsPoints_df.index)
+            last_trip_end_index = int(min(last5MinsPointsMedian, last10PointsMedian))
+            logging.debug("last5MinsPoints and last10PointsMedian found, last_trip_end_index = %s" % last_trip_end_index)
+        #                     logging.debug("last5MinPoints.median = %s (%s), last10Points_df = %s (%s), sel index = %s" %
+        #                         (np.median(last5MinsPoints_df.index), last5MinsPoints_df.index,
+        #                          np.median(last10Points_df.index), last10Points_df.index,
+        #                          last_trip_end_index))
+
+        last_trip_end_point_row = filtered_points_df.iloc[last_trip_end_index]
+        last_trip_end_point = ad.AttrDict(filtered_points_df.iloc[last_trip_end_index])
+        logging.debug("Appending last_trip_end_point %s with index %s " %
+                      (last_trip_end_point, last_trip_end_point_row.name))
+        return (ended_before_this, last_trip_end_point)
+
+

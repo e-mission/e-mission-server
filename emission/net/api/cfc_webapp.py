@@ -85,10 +85,11 @@ def index():
 # If this gets to be too much, we should definitely consider that
 @route("/docs/<filename>")
 def docs(filename):
-  if filename != "privacy" and filename != "support" and filename != "about" and filename != "consent":
+  if filename != "privacy.html" and filename != "support.html" and filename != "about.html" and filename != "consent.html" and filename != "approval_letter.pdf":
+    logging.error("Request for unknown filename "% filename)
     return HTTPError(404, "Don't try to hack me, you evil spammer")
   else:
-    return static_file("%s.html" % filename, "%s/%s" % (static_path, "docs"))
+    return static_file(filename, "%s/%s" % (static_path, "docs"))
 
 @route("/<filename>")
 def docs(filename):
@@ -405,31 +406,31 @@ def summarize_metrics(time_type):
 # Pulling public data from the server  
 @get('/eval/publicData/timeseries')
 def getPublicData():
+  ids = request.json['phone_ids']
+  uuids = map(lambda id: UUID(id), ids)
+
   from_ts = request.query.from_ts
   to_ts = request.query.to_ts
 
   time_range = estt.TimeQuery("metadata.write_ts", float(from_ts), float(to_ts))
   time_query = time_range.get_query()
-
-  iphone_ids = [UUID("079e0f1a-c440-3d7c-b0e7-de160f748e35"), UUID("c76a0487-7e5a-3b17-a449-47be666b36f6"), 
-              UUID("c528bcd2-a88b-3e82-be62-ef4f2396967a"), UUID("95e70727-a04e-3e33-b7fe-34ab19194f8b")]
-  android_ids = [UUID("e471711e-bd14-3dbe-80b6-9c7d92ecc296"), UUID("fd7b4c2e-2c8b-3bfa-94f0-d1e3ecbd5fb7"),
-               UUID("86842c35-da28-32ed-a90e-2da6663c5c73"), UUID("3bc0f91f-7660-34a2-b005-5c399598a369"),
-               UUID("273efe85-937e-3622-9b34-19cb64653a9f")]
   
-  iphone_user_queries = map(lambda id: {'user_id': id}, iphone_ids)
-  android_user_queries = map(lambda id: {'user_id': id}, android_ids)
+  user_queries = map(lambda id: {'user_id': id}, uuids)
 
-  for q in iphone_user_queries:
+  for q in user_queries:
     q.update(time_query)
+  
+  num_entries = map(lambda q: edb.get_timeseries_db().find(q).count(), user_queries)
+  total_entries = sum(num_entries)
+  logging.debug("Total entries requested: %d" % total_entries)
 
-  for q in android_user_queries:
-    q.update(time_query)
-
-  iphone_list = map(lambda q: list(edb.get_timeseries_db().find(q).sort("metadata.write_ts")), iphone_user_queries)
-  android_list = map(lambda q: list(edb.get_timeseries_db().find(q).sort("metadata.write_ts")), android_user_queries)
-
-  return {'iphone_data': iphone_list, 'android_data': android_list}
+  threshold = 200000 
+  if total_entries > threshold:
+    data_list = None
+  else:
+    data_list = map(lambda q: list(edb.get_timeseries_db().find(q).sort("metadata.write_ts")), user_queries)
+   
+  return {'phone_data': data_list}
 
 # Client related code START
 @post("/client/<clientname>/<method>")

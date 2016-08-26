@@ -123,6 +123,11 @@ class Timeline(object):
         logging.debug("keys = (%s, %s), len(places) = %s, len(trips) = %s" %
                       (place_or_stop_key, trip_or_section_key,
                        len(places_or_stops_entries), len(trips_or_sections_entries)))
+        logging.debug("places_or_stops = %s " %
+                        [p.get_id() for p in places_or_stops_entries])
+        logging.debug("trips_or_sections = %s " %
+                      [s.get_id() for s in trips_or_sections_entries])
+
         self.place_key = place_or_stop_key
         self.trip_key = trip_or_section_key
         self.places = places_or_stops_entries
@@ -138,6 +143,8 @@ class Timeline(object):
                 self.state = Timeline.State("place", self.places[0])
         else:
             assert (len(self.places) > 0 and len(self.trips) > 0)
+            logging.debug("to find start, comparing place %s with trip %s" %
+                          (self.places[0].get_id(), self.trips[0].get_id()))
             if self.places[0].data.exit_ts is not None and self.places[0].data.exit_ts <= self.trips[0].data.start_ts:
                 self.state = Timeline.State("place", self.places[0])
             else:

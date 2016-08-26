@@ -61,7 +61,7 @@ class TestTripSegmentation(unittest.TestCase):
                           1440699933.687, 1440716367.376, 1440720239.012, 1440728519.971])
         self.assertEqual([end.ts for (start, end) in segmentation_points],
                          [1440689408.302, 1440690108.678, 1440694424.894, 1440699298.535,
-                          1440700040.477, 1440719699.470, 1440723334.898, 1440729184.411])
+                          1440700070.129, 1440719699.470, 1440723334.898, 1440729184.411])
 
     def testSegmentationPointsDwellSegmentationDistFilter(self):
         ts = esta.TimeSeries.get_time_series(self.iosUUID)
@@ -75,7 +75,7 @@ class TestTripSegmentation(unittest.TestCase):
         self.assertIsNotNone(segmentation_points)
         self.assertEqual(len(segmentation_points), 3)
         self.assertEqual([start.ts for (start, end) in segmentation_points],
-                         [1446797042.282652, 1446821561.559255, 1446825879.933473])
+                         [1446797042.282652, 1446821561.559255, 1446825828.465837])
         self.assertEqual([end.ts for (start, end) in segmentation_points],
                          [1446797923.682973, 1446825092.302420, 1446828217.125328])
 
@@ -159,7 +159,7 @@ class TestTripSegmentation(unittest.TestCase):
         self.assertEqual(place0.data.starting_trip, trip1.get_id())
 
         self.assertEqual(round(trip0.data.duration), 58 * 60 + 51)
-        self.assertEqual(round(trip1.data.duration), 38 * 60 + 57)
+        self.assertEqual(round(trip1.data.duration), 39 * 60 + 49)
 
         self.assertIsNotNone(place0.data.location)
     
@@ -225,7 +225,7 @@ class TestTripSegmentation(unittest.TestCase):
         self.assertEqual(place0dist.data.starting_trip, trip1dist.get_id())
 
         self.assertEqual(round(trip0dist.data.duration), 58 * 60 + 51)
-        self.assertEqual(round(trip1dist.data.duration), 38 * 60 + 57)
+        self.assertEqual(round(trip1dist.data.duration), 39 * 60 + 49)
 
         self.assertIsNotNone(place0dist.data.location)
         
