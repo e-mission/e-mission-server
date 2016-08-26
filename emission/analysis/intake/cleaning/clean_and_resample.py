@@ -155,8 +155,8 @@ def get_filtered_trip(ts, trip):
                    first_cleaned_section.get_id(), filtered_trip_data))
     _set_extrapolated_start_for_trip(filtered_trip_data, first_cleaned_section)
 
-    # TODO: DO we need to add the stop distances too? They should be small...
-    trip_distance = sum([section.data.distance for section in section_map.values()])
+    trip_distance = sum([section.data.distance for section in section_map.values()]) + \
+        sum([stop.data.distance for stop in stop_map.values()])
     filtered_trip_data.distance = trip_distance
     filtered_trip_entry["data"] = filtered_trip_data
 

@@ -13,6 +13,8 @@ import emission.core.wrapper.section as ecwc
 import emission.core.wrapper.stop as ecws
 import emission.core.wrapper.entry as ecwe
 
+import emission.core.common as ecc
+
 class SectionSegmentationMethod(object):
     def segment_into_sections(self, timeseries, time_query):
         """
@@ -166,6 +168,8 @@ def stitch_together(ending_section_entry, stop_entry, starting_section_entry):
     stop.enter_loc = ending_section.end_loc
     stop.exit_loc = starting_section.start_loc
     stop.duration = starting_section.start_ts - ending_section.end_ts
+    stop.distance = ecc.calDistance(stop.enter_loc.coordinates,
+                                    stop.exit_loc.coordinates)
     stop.source = "SmoothedHighConfidenceMotion"
 
     stop.exit_ts = starting_section.start_ts
