@@ -221,7 +221,8 @@ class BuiltinTimeSeries(esta.TimeSeries):
         if len(df) > 0:
             dedup_check_list = [item for item in ecwe.Entry.get_dedup_list(key)
                                 if item in df.columns] + ["metadata_write_ts"]
-            deduped_df = df.drop_duplicates(subset=dedup_check_list)
+            numeric_check_list = [col for col in dedup_check_list if df[col].dtype != 'object']
+            deduped_df = df.drop_duplicates(subset=numeric_check_list)
             logging.debug("After de-duping, converted %s points to %s " %
                           (len(df), len(deduped_df)))
         else:
