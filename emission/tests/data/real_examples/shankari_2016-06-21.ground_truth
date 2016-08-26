@@ -11,7 +11,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57be2f21f6858fe90d508c24", 
+                    "id": "57c0d459f6858f710125d2f0", 
                     "properties": {
                         "exit_local_dt": {
                             "hour": 15, 
@@ -23,19 +23,18 @@
                             "day": 21, 
                             "minute": 22
                         }, 
-                        "display_name": "South Shoreline Boulevard, Mountain View", 
                         "feature_type": "start_place", 
                         "exit_fmt_time": "2016-06-21T15:22:14.086228-07:00", 
                         "starting_trip": {
-                            "$oid": "57be2f1ff6858fe90d508ba4"
+                            "$oid": "57c0d457f6858f710125d26c"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "raw_places": [
                             {
-                                "$oid": "57be2f1ef6858fe90d508b84"
+                                "$oid": "57c0d456f6858f710125d24c"
                             }, 
                             {
-                                "$oid": "57be2f1ef6858fe90d508b84"
+                                "$oid": "57c0d456f6858f710125d24c"
                             }
                         ], 
                         "exit_ts": 1466547734.0862284
@@ -50,7 +49,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57be2f22f6858fe90d508c25", 
+                    "id": "57c0d459f6858f710125d2f1", 
                     "properties": {
                         "enter_fmt_time": "2016-06-21T15:54:37.544000-07:00", 
                         "exit_local_dt": {
@@ -63,7 +62,6 @@
                             "day": 21, 
                             "minute": 59
                         }, 
-                        "display_name": "Jessie Lane, Mountain View", 
                         "feature_type": "end_place", 
                         "exit_fmt_time": "2016-06-21T15:59:24.591445-07:00", 
                         "enter_local_dt": {
@@ -77,17 +75,17 @@
                             "minute": 54
                         }, 
                         "ending_trip": {
-                            "$oid": "57be2f1ff6858fe90d508ba4"
+                            "$oid": "57c0d457f6858f710125d26c"
                         }, 
                         "starting_trip": {
-                            "$oid": "57be2f20f6858fe90d508bed"
+                            "$oid": "57c0d458f6858f710125d2b6"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1466549677.544, 
                         "duration": 287.0474452972412, 
                         "raw_places": [
                             {
-                                "$oid": "57be2f1ef6858fe90d508b88"
+                                "$oid": "57c0d456f6858f710125d250"
                             }
                         ], 
                         "exit_ts": 1466549964.5914452
@@ -108,9 +106,10 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57be2f20f6858fe90d508beb", 
+                    "id": "57c0d458f6858f710125d2b4", 
                     "properties": {
                         "enter_fmt_time": "2016-06-21T15:34:16.888000-07:00", 
+                        "distance": 46.94534438615829, 
                         "exit_local_dt": {
                             "hour": 15, 
                             "month": 6, 
@@ -123,10 +122,10 @@
                         }, 
                         "feature_type": "stop", 
                         "ending_section": {
-                            "$oid": "57be2f1ff6858fe90d508ba5"
+                            "$oid": "57c0d457f6858f710125d26e"
                         }, 
                         "starting_section": {
-                            "$oid": "57be2f20f6858fe90d508bc0"
+                            "$oid": "57c0d457f6858f710125d289"
                         }, 
                         "exit_fmt_time": "2016-06-21T15:34:57.738000-07:00", 
                         "enter_local_dt": {
@@ -157,10 +156,10 @@
                         "enter_ts": 1466548456.888, 
                         "duration": 40.84999990463257, 
                         "_id": {
-                            "$oid": "57be2f1ff6858fe90d508ba4"
+                            "$oid": "57c0d457f6858f710125d26c"
                         }, 
                         "trip_id": {
-                            "$oid": "57be2f1ff6858fe90d508ba4"
+                            "$oid": "57c0d457f6858f710125d26c"
                         }, 
                         "exit_ts": 1466548497.738
                     }
@@ -180,9 +179,10 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57be2f20f6858fe90d508bec", 
+                    "id": "57c0d458f6858f710125d2b5", 
                     "properties": {
                         "enter_fmt_time": "2016-06-21T15:44:22.801000-07:00", 
+                        "distance": 44.94068784621103, 
                         "exit_local_dt": {
                             "hour": 15, 
                             "month": 6, 
@@ -195,10 +195,10 @@
                         }, 
                         "feature_type": "stop", 
                         "ending_section": {
-                            "$oid": "57be2f20f6858fe90d508bc0"
+                            "$oid": "57c0d457f6858f710125d289"
                         }, 
                         "starting_section": {
-                            "$oid": "57be2f20f6858fe90d508bd5"
+                            "$oid": "57c0d458f6858f710125d29e"
                         }, 
                         "exit_fmt_time": "2016-06-21T15:44:41.301000-07:00", 
                         "enter_local_dt": {
@@ -229,10 +229,10 @@
                         "enter_ts": 1466549062.801, 
                         "duration": 18.5, 
                         "_id": {
-                            "$oid": "57be2f1ff6858fe90d508ba4"
+                            "$oid": "57c0d457f6858f710125d26c"
                         }, 
                         "trip_id": {
-                            "$oid": "57be2f1ff6858fe90d508ba4"
+                            "$oid": "57c0d457f6858f710125d26c"
                         }, 
                         "exit_ts": 1466549081.301
                     }
@@ -351,7 +351,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57be2f1ff6858fe90d508ba5", 
+                            "id": "57c0d457f6858f710125d26e", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -401,10 +401,10 @@
                                 }, 
                                 "duration": 722.8017716407776, 
                                 "end_stop": {
-                                    "$oid": "57be2f20f6858fe90d508beb"
+                                    "$oid": "57c0d458f6858f710125d2b4"
                                 }, 
                                 "trip_id": {
-                                    "$oid": "57be2f1ff6858fe90d508ba4"
+                                    "$oid": "57c0d457f6858f710125d26c"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 15, 
@@ -538,7 +538,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57be2f20f6858fe90d508bc0", 
+                            "id": "57c0d457f6858f710125d289", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -581,13 +581,13 @@
                                 }, 
                                 "duration": 565.063000202179, 
                                 "start_stop": {
-                                    "$oid": "57be2f20f6858fe90d508beb"
+                                    "$oid": "57c0d458f6858f710125d2b4"
                                 }, 
                                 "end_stop": {
-                                    "$oid": "57be2f20f6858fe90d508bec"
+                                    "$oid": "57c0d458f6858f710125d2b5"
                                 }, 
                                 "trip_id": {
-                                    "$oid": "57be2f1ff6858fe90d508ba4"
+                                    "$oid": "57c0d457f6858f710125d26c"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 15, 
@@ -720,7 +720,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57be2f20f6858fe90d508bd5", 
+                            "id": "57c0d458f6858f710125d29e", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -764,10 +764,10 @@
                                 }, 
                                 "duration": 596.242999792099, 
                                 "start_stop": {
-                                    "$oid": "57be2f20f6858fe90d508bec"
+                                    "$oid": "57c0d458f6858f710125d2b5"
                                 }, 
                                 "trip_id": {
-                                    "$oid": "57be2f1ff6858fe90d508ba4"
+                                    "$oid": "57c0d457f6858f710125d26c"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 15, 
@@ -809,14 +809,14 @@
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57be2f1ff6858fe90d508ba4", 
+            "id": "57c0d457f6858f710125d26c", 
             "properties": {
-                "distance": 2968.847307379425, 
+                "distance": 3060.7333396117942, 
                 "end_place": {
-                    "$oid": "57be2f22f6858fe90d508c25"
+                    "$oid": "57c0d459f6858f710125d2f1"
                 }, 
                 "raw_trip": {
-                    "$oid": "57be2f1ef6858fe90d508b87"
+                    "$oid": "57c0d456f6858f710125d24f"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -838,7 +838,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57be2f21f6858fe90d508c24"
+                    "$oid": "57c0d459f6858f710125d2f0"
                 }, 
                 "end_fmt_time": "2016-06-21T15:54:37.544000-07:00", 
                 "end_local_dt": {
@@ -875,7 +875,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57be2f22f6858fe90d508c25", 
+                    "id": "57c0d459f6858f710125d2f1", 
                     "properties": {
                         "enter_fmt_time": "2016-06-21T15:54:37.544000-07:00", 
                         "exit_local_dt": {
@@ -888,7 +888,6 @@
                             "day": 21, 
                             "minute": 59
                         }, 
-                        "display_name": "Jessie Lane, Mountain View", 
                         "feature_type": "start_place", 
                         "exit_fmt_time": "2016-06-21T15:59:24.591445-07:00", 
                         "enter_local_dt": {
@@ -902,17 +901,17 @@
                             "minute": 54
                         }, 
                         "ending_trip": {
-                            "$oid": "57be2f1ff6858fe90d508ba4"
+                            "$oid": "57c0d457f6858f710125d26c"
                         }, 
                         "starting_trip": {
-                            "$oid": "57be2f20f6858fe90d508bed"
+                            "$oid": "57c0d458f6858f710125d2b6"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1466549677.544, 
                         "duration": 287.0474452972412, 
                         "raw_places": [
                             {
-                                "$oid": "57be2f1ef6858fe90d508b88"
+                                "$oid": "57c0d456f6858f710125d250"
                             }
                         ], 
                         "exit_ts": 1466549964.5914452
@@ -927,7 +926,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57be2f22f6858fe90d508c26", 
+                    "id": "57c0d459f6858f710125d2f2", 
                     "properties": {
                         "enter_fmt_time": "2016-06-21T16:06:20.105000-07:00", 
                         "exit_local_dt": {
@@ -940,7 +939,6 @@
                             "day": 21, 
                             "minute": 13
                         }, 
-                        "display_name": "South Shoreline Boulevard, Mountain View", 
                         "feature_type": "end_place", 
                         "exit_fmt_time": "2016-06-21T17:13:32.568113-07:00", 
                         "enter_local_dt": {
@@ -954,26 +952,26 @@
                             "minute": 6
                         }, 
                         "ending_trip": {
-                            "$oid": "57be2f20f6858fe90d508bed"
+                            "$oid": "57c0d458f6858f710125d2b6"
                         }, 
                         "starting_trip": {
-                            "$oid": "57be2f20f6858fe90d508bfe"
+                            "$oid": "57c0d458f6858f710125d2c8"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1466550380.105, 
                         "duration": 4032.463112592697, 
                         "raw_places": [
                             {
-                                "$oid": "57be2f1ef6858fe90d508b8a"
+                                "$oid": "57c0d456f6858f710125d252"
                             }, 
                             {
-                                "$oid": "57be2f1ef6858fe90d508b8a"
+                                "$oid": "57c0d456f6858f710125d252"
                             }, 
                             {
-                                "$oid": "57be2f1ef6858fe90d508b8c"
+                                "$oid": "57c0d456f6858f710125d254"
                             }, 
                             {
-                                "$oid": "57be2f1ef6858fe90d508b8e"
+                                "$oid": "57c0d456f6858f710125d256"
                             }
                         ], 
                         "exit_ts": 1466554412.5681126
@@ -1049,7 +1047,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57be2f20f6858fe90d508bee", 
+                            "id": "57c0d458f6858f710125d2b8", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -1087,7 +1085,7 @@
                                 }, 
                                 "duration": 415.51355481147766, 
                                 "trip_id": {
-                                    "$oid": "57be2f20f6858fe90d508bed"
+                                    "$oid": "57c0d458f6858f710125d2b6"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 15, 
@@ -1123,14 +1121,14 @@
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57be2f20f6858fe90d508bed", 
+            "id": "57c0d458f6858f710125d2b6", 
             "properties": {
                 "distance": 1215.4362785397498, 
                 "end_place": {
-                    "$oid": "57be2f22f6858fe90d508c26"
+                    "$oid": "57c0d459f6858f710125d2f2"
                 }, 
                 "raw_trip": {
-                    "$oid": "57be2f1ef6858fe90d508b89"
+                    "$oid": "57c0d456f6858f710125d251"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -1152,7 +1150,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57be2f22f6858fe90d508c25"
+                    "$oid": "57c0d459f6858f710125d2f1"
                 }, 
                 "end_fmt_time": "2016-06-21T16:06:20.105000-07:00", 
                 "end_local_dt": {
@@ -1189,7 +1187,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57be2f22f6858fe90d508c26", 
+                    "id": "57c0d459f6858f710125d2f2", 
                     "properties": {
                         "enter_fmt_time": "2016-06-21T16:06:20.105000-07:00", 
                         "exit_local_dt": {
@@ -1202,7 +1200,6 @@
                             "day": 21, 
                             "minute": 13
                         }, 
-                        "display_name": "South Shoreline Boulevard, Mountain View", 
                         "feature_type": "start_place", 
                         "exit_fmt_time": "2016-06-21T17:13:32.568113-07:00", 
                         "enter_local_dt": {
@@ -1216,26 +1213,26 @@
                             "minute": 6
                         }, 
                         "ending_trip": {
-                            "$oid": "57be2f20f6858fe90d508bed"
+                            "$oid": "57c0d458f6858f710125d2b6"
                         }, 
                         "starting_trip": {
-                            "$oid": "57be2f20f6858fe90d508bfe"
+                            "$oid": "57c0d458f6858f710125d2c8"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1466550380.105, 
                         "duration": 4032.463112592697, 
                         "raw_places": [
                             {
-                                "$oid": "57be2f1ef6858fe90d508b8a"
+                                "$oid": "57c0d456f6858f710125d252"
                             }, 
                             {
-                                "$oid": "57be2f1ef6858fe90d508b8a"
+                                "$oid": "57c0d456f6858f710125d252"
                             }, 
                             {
-                                "$oid": "57be2f1ef6858fe90d508b8c"
+                                "$oid": "57c0d456f6858f710125d254"
                             }, 
                             {
-                                "$oid": "57be2f1ef6858fe90d508b8e"
+                                "$oid": "57c0d456f6858f710125d256"
                             }
                         ], 
                         "exit_ts": 1466554412.5681126
@@ -1250,7 +1247,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57be2f22f6858fe90d508c27", 
+                    "id": "57c0d459f6858f710125d2f3", 
                     "properties": {
                         "enter_fmt_time": "2016-06-21T17:22:27.766000-07:00", 
                         "exit_local_dt": {
@@ -1263,7 +1260,6 @@
                             "day": 21, 
                             "minute": 44
                         }, 
-                        "display_name": "Franklin Street, Mountain View", 
                         "feature_type": "end_place", 
                         "exit_fmt_time": "2016-06-21T18:44:29.156000-07:00", 
                         "enter_local_dt": {
@@ -1277,23 +1273,23 @@
                             "minute": 22
                         }, 
                         "ending_trip": {
-                            "$oid": "57be2f20f6858fe90d508bfe"
+                            "$oid": "57c0d458f6858f710125d2c8"
                         }, 
                         "starting_trip": {
-                            "$oid": "57be2f21f6858fe90d508c13"
+                            "$oid": "57c0d458f6858f710125d2de"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1466554947.766, 
                         "duration": 4921.389999866486, 
                         "raw_places": [
                             {
-                                "$oid": "57be2f1ef6858fe90d508b92"
+                                "$oid": "57c0d456f6858f710125d25a"
                             }, 
                             {
-                                "$oid": "57be2f1ef6858fe90d508b92"
+                                "$oid": "57c0d456f6858f710125d25a"
                             }, 
                             {
-                                "$oid": "57be2f1ef6858fe90d508b94"
+                                "$oid": "57c0d456f6858f710125d25c"
                             }
                         ], 
                         "exit_ts": 1466559869.156
@@ -1385,7 +1381,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57be2f20f6858fe90d508bff", 
+                            "id": "57c0d458f6858f710125d2ca", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -1427,7 +1423,7 @@
                                 }, 
                                 "duration": 535.1978874206543, 
                                 "trip_id": {
-                                    "$oid": "57be2f20f6858fe90d508bfe"
+                                    "$oid": "57c0d458f6858f710125d2c8"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 17, 
@@ -1467,14 +1463,14 @@
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57be2f20f6858fe90d508bfe", 
+            "id": "57c0d458f6858f710125d2c8", 
             "properties": {
                 "distance": 457.5097816244489, 
                 "end_place": {
-                    "$oid": "57be2f22f6858fe90d508c27"
+                    "$oid": "57c0d459f6858f710125d2f3"
                 }, 
                 "raw_trip": {
-                    "$oid": "57be2f1ef6858fe90d508b91"
+                    "$oid": "57c0d456f6858f710125d259"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -1496,7 +1492,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57be2f22f6858fe90d508c26"
+                    "$oid": "57c0d459f6858f710125d2f2"
                 }, 
                 "end_fmt_time": "2016-06-21T17:22:27.766000-07:00", 
                 "end_local_dt": {
@@ -1533,7 +1529,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57be2f22f6858fe90d508c27", 
+                    "id": "57c0d459f6858f710125d2f3", 
                     "properties": {
                         "enter_fmt_time": "2016-06-21T17:22:27.766000-07:00", 
                         "exit_local_dt": {
@@ -1546,7 +1542,6 @@
                             "day": 21, 
                             "minute": 44
                         }, 
-                        "display_name": "Franklin Street, Mountain View", 
                         "feature_type": "start_place", 
                         "exit_fmt_time": "2016-06-21T18:44:29.156000-07:00", 
                         "enter_local_dt": {
@@ -1560,23 +1555,23 @@
                             "minute": 22
                         }, 
                         "ending_trip": {
-                            "$oid": "57be2f20f6858fe90d508bfe"
+                            "$oid": "57c0d458f6858f710125d2c8"
                         }, 
                         "starting_trip": {
-                            "$oid": "57be2f21f6858fe90d508c13"
+                            "$oid": "57c0d458f6858f710125d2de"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1466554947.766, 
                         "duration": 4921.389999866486, 
                         "raw_places": [
                             {
-                                "$oid": "57be2f1ef6858fe90d508b92"
+                                "$oid": "57c0d456f6858f710125d25a"
                             }, 
                             {
-                                "$oid": "57be2f1ef6858fe90d508b92"
+                                "$oid": "57c0d456f6858f710125d25a"
                             }, 
                             {
-                                "$oid": "57be2f1ef6858fe90d508b94"
+                                "$oid": "57c0d456f6858f710125d25c"
                             }
                         ], 
                         "exit_ts": 1466559869.156
@@ -1591,10 +1586,9 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57be2f23f6858fe90d508c28", 
+                    "id": "57c0d459f6858f710125d2f4", 
                     "properties": {
                         "enter_fmt_time": "2016-06-21T18:52:02.144000-07:00", 
-                        "display_name": "South Shoreline Boulevard, Mountain View", 
                         "feature_type": "end_place", 
                         "enter_local_dt": {
                             "hour": 18, 
@@ -1607,13 +1601,13 @@
                             "minute": 52
                         }, 
                         "ending_trip": {
-                            "$oid": "57be2f21f6858fe90d508c13"
+                            "$oid": "57c0d458f6858f710125d2de"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1466560322.144, 
                         "raw_places": [
                             {
-                                "$oid": "57be2f1ef6858fe90d508b98"
+                                "$oid": "57c0d456f6858f710125d260"
                             }
                         ]
                     }
@@ -1688,7 +1682,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57be2f21f6858fe90d508c14", 
+                            "id": "57c0d458f6858f710125d2e0", 
                             "properties": {
                                 "distances": [
                                     8.688990096914626, 
@@ -1726,7 +1720,7 @@
                                 }, 
                                 "duration": 452.98800015449524, 
                                 "trip_id": {
-                                    "$oid": "57be2f21f6858fe90d508c13"
+                                    "$oid": "57c0d458f6858f710125d2de"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 18, 
@@ -1762,14 +1756,14 @@
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57be2f21f6858fe90d508c13", 
+            "id": "57c0d458f6858f710125d2de", 
             "properties": {
                 "distance": 431.38290577067465, 
                 "end_place": {
-                    "$oid": "57be2f23f6858fe90d508c28"
+                    "$oid": "57c0d459f6858f710125d2f4"
                 }, 
                 "raw_trip": {
-                    "$oid": "57be2f1ef6858fe90d508b97"
+                    "$oid": "57c0d456f6858f710125d25f"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -1791,7 +1785,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57be2f22f6858fe90d508c27"
+                    "$oid": "57c0d459f6858f710125d2f3"
                 }, 
                 "end_fmt_time": "2016-06-21T18:52:02.144000-07:00", 
                 "end_local_dt": {
@@ -1819,7 +1813,7 @@
         }
     ], 
     "_id": {
-        "$oid": "57be2f24115514afcd793540"
+        "$oid": "57c0d45a115514afcd7935ee"
     }, 
     "user_id": {
         "$uuid": "0763de67f61e3f5d90e7518e69793954"
@@ -1827,6 +1821,6 @@
     "metadata": {
         "type": "document", 
         "key": "diary/trips-2016-06-21", 
-        "write_ts": 1472081700.189162
+        "write_ts": 1472255066.15881
     }
 }
