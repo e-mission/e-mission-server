@@ -92,8 +92,8 @@ class TestTimeGrouping(unittest.TestCase):
             self._createTestSection(arrow.Arrow(2016,5,3,23, tzinfo=tz.gettz(PST)),
                                     PST))
 
-        section_group_df = pd.DataFrame(
-            [self.ts._to_df_entry(s) for s in test_section_list])
+        section_group_df = self.ts.to_data_df(esda.CLEANED_SECTION_KEY,
+                                              test_section_list)
         logging.debug("First row of section_group_df = %s" % section_group_df.iloc[0])
         self.assertEqual(earmt._get_tz(section_group_df), PST)
 
@@ -136,8 +136,8 @@ class TestTimeGrouping(unittest.TestCase):
             arrow.Arrow(2016,5,4,0, tzinfo=tz.gettz(PST)),
                                     PST)
 
-        section_group_df = pd.DataFrame(
-            [self.ts._to_df_entry(s) for s in test_section_list])
+        section_group_df = self.ts.to_data_df(esda.CLEANED_SECTION_KEY,
+                                              test_section_list)
 
         # Timestamps are monotonically increasing
         self.assertEqual(section_group_df.start_ts.tolist(),
@@ -227,9 +227,7 @@ class TestTimeGrouping(unittest.TestCase):
             arrow.Arrow(2016,5,4,3, tzinfo=tz.gettz(BST)),
             BST)
 
-        section_group_df = pd.DataFrame(
-            [self.ts._to_df_entry(s) for s in test_section_list])
-
+        section_group_df = self.ts.to_data_df(esda.CLEANED_SECTION_KEY, test_section_list)
         logging.debug("first row is %s" % section_group_df.loc[0])
 
         # Timestamps are monotonically increasing

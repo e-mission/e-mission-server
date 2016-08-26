@@ -203,12 +203,31 @@ class BuiltinTimeSeries(esta.TimeSeries):
         :return:
         """
         result_it = self.find_entries([key], time_query, geo_query, extra_query_list)
+        return self.to_data_df(key, result_it, map_fn)
+
+    @staticmethod
+    def to_data_df(key, entry_it, map_fn = None):
+        """
+        Converts the specified iterator into a dataframe
+        :param key: The key whose entries are in the iterator
+        :param it: The iterator to be converted
+        :return: A dataframe composed of the entries in the iterator
+        """
         if map_fn is None:
             map_fn = BuiltinTimeSeries._to_df_entry
         # Dataframe doesn't like to work off an iterator - it wants everything in memory
-        df = pd.DataFrame([map_fn(e) for e in list(result_it)])
+        df = pd.DataFrame([map_fn(e) for e in entry_it])
         logging.debug("Found %s results" % len(df))
-        return df
+        if len(df) > 0:
+            dedup_check_list = [item for item in ecwe.Entry.get_dedup_list(key)
+                                if item in df.columns] + ["metadata_write_ts"]
+            deduped_df = df.drop_duplicates(subset=dedup_check_list)
+            logging.debug("After de-duping, converted %s points to %s " %
+                          (len(df), len(deduped_df)))
+        else:
+            deduped_df = df
+        return deduped_df.reset_index(drop=True)
+
 
     def get_max_value_for_field(self, key, field, time_query=None):
         """
