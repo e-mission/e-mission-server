@@ -1,3 +1,20 @@
+# This test compares the output of the intake pipeline
+# with known ground truth output.
+# The way to add a new test is:
+# - load the test timeline
+# $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py emission/tests/data/real_examples/iphone_2016-02-22
+# - run the intake pipeline
+# $ ./e-mission-py.bash bin/intake_stage.py
+# - log in via the phone and check that all is well
+# - generate ground truth
+# >>> tj = edb.get_usercache_db().find_one({'metadata.key': 'diary/trips-2016-02-22'})
+# >>> import attrdict as ad
+# >>> import json
+# >>> import bson.json_util as bju
+# >>> json.dump(tj, open("/tmp/iphone_2016-02-22.ground_truth", "w"), indent=4, default=bju.default)
+# - move the ground truth back
+# $ mv /tmp/iphone_2016-02-22.ground_truth emission/tests/data/real_examples
+
 import unittest
 import logging
 import json
