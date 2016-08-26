@@ -285,14 +285,23 @@ class TestTimeGrouping(unittest.TestCase):
         logging.debug("durations = %s" %
                       [s.data.duration for s in test_section_list])
 
-        summary_ts = earmt.group_by_timestamp(self.testUUID,
+        summary_ts_dict = earmt.group_by_timestamp(self.testUUID,
                                            arrow.Arrow(2016,5,1).timestamp,
                                            arrow.Arrow(2016,6,1).timestamp,
                                            'd', earmts.get_count)
-        summary_ld = earmt.group_by_local_date(self.testUUID,
+        summary_ld_dict = earmt.group_by_local_date(self.testUUID,
                                                ecwl.LocalDate({'year': 2016, 'month': 5}),
                                                ecwl.LocalDate({'year': 2016, 'month': 6}),
                                                earmt.LocalFreq.DAILY, earmts.get_count)
+
+        summary_ts_last = summary_ts_dict["last_ts_processed"]
+        summary_ld_last = summary_ld_dict["last_ts_processed"]
+
+        summary_ts = summary_ts_dict["result"]
+        summary_ld = summary_ld_dict["result"]
+
+        self.assertEqual(summary_ts_last, arrow.Arrow(2016,5,3,14, tzinfo=tz.gettz(PST)).timestamp)
+        self.assertEqual(summary_ld_last, arrow.Arrow(2016,5,3,14, tzinfo=tz.gettz(PST)).timestamp)
 
         self.assertEqual(len(summary_ts), len(summary_ld)) # local date and UTC results are the same
         self.assertEqual(len(summary_ts), 1) # spans one day

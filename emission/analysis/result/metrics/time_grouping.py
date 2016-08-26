@@ -39,7 +39,10 @@ def group_by_timestamp(user_id, start_ts, end_ts, freq, summary_fn):
     secs_to_nanos = lambda x: x * 10 ** 9
     section_df['start_dt'] = pd.to_datetime(secs_to_nanos(section_df.start_ts))
     time_grouped_df = section_df.groupby(pd.Grouper(freq=freq, key='start_dt'))
-    return grouped_to_summary(time_grouped_df, timestamp_fill_times, summary_fn)
+    return {
+        "last_ts_processed": section_df.iloc[-1].start_ts,
+        "result": grouped_to_summary(time_grouped_df, timestamp_fill_times, summary_fn)
+    }
 
 def timestamp_fill_times(key, ignored, metric_summary):
     dt = arrow.get(key)
@@ -75,7 +78,10 @@ def group_by_local_date(user_id, from_dt, to_dt, freq, summary_fn):
     groupby_arr = _get_local_group_by(freq)
     time_grouped_df = section_df.groupby(groupby_arr)
     local_dt_fill_fn = _get_local_key_to_fill_fn(freq)
-    return grouped_to_summary(time_grouped_df, local_dt_fill_fn, summary_fn)
+    return {
+        "last_ts_processed": section_df.iloc[-1].start_ts,
+        "result": grouped_to_summary(time_grouped_df, local_dt_fill_fn, summary_fn)
+    }
 
 def grouped_to_summary(time_grouped_df, key_to_fill_fn, summary_fn):
     ret_list = []
