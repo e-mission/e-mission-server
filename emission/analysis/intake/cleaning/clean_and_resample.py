@@ -291,34 +291,7 @@ def get_filtered_points(section, filtered_section_data):
         logging.debug("Found first section, need to extrapolate start point")
         raw_trip = ts.get_entry_from_id(esda.RAW_TRIP_KEY, section.data.trip_id)
         raw_start_place = ts.get_entry_from_id(esda.RAW_PLACE_KEY, raw_trip.data.start_place)
-        if raw_start_place.data.enter_ts is not None:
-            raw_start_place_enter_loc_entry = ecwe.Entry(
-                ts.get_entry_at_ts("background/filtered_location", "data.ts",
-                                   raw_start_place.data.enter_ts))
-        else:
-            # These are not strictly accurate because the exit ts for the place
-            # corresponds to the ts of the first point in the section. We are trying
-            # to determine the correct exit_ts here. But its a reasonable estimate,
-            # at least for the time zone, which is required when we extrapolate
-            # note that this will fail for the specific case in which the first point outside
-            # the geofence of the first place in a trip chain is in a different timezone
-            # than the point itself. We can work around that by storing the enter_ts even
-            # for the first place.
-            dummy_section_start_loc_doc = {
-                "loc": raw_start_place.data.location,
-                "latitude": raw_start_place.data.location.coordinates[1],
-                "longitude": raw_start_place.data.location.coordinates[0],
-                "ts": raw_start_place.data.exit_ts,
-                "fmt_time": raw_start_place.data.exit_fmt_time,
-                "local_dt": raw_start_place.data.exit_local_dt
-            }
-            raw_start_place_enter_loc_entry = ecwe.Entry.create_entry(raw_trip.user_id,
-                                                  "background/filtered_location",
-                                                  dummy_section_start_loc_doc)
-
-        logging.debug("Start place is %s and corresponding location is %s" %
-                      (raw_start_place.get_id(), raw_start_place_enter_loc_entry.get_id()))
-        filtered_loc_df = _add_start_point(filtered_loc_df, raw_start_place_enter_loc_entry)
+        filtered_loc_df = _add_start_point(filtered_loc_df, raw_start_place, ts)
 
     # Can move this up to get_filtered_section if we don't want ensure that we
     # don't touch filtered_section_data in here
@@ -348,7 +321,8 @@ def _copy_non_excluded(old_data, new_data, excluded_list):
         if key not in excluded_list:
             new_data[key] = old_data[key]
 
-def _add_start_point(filtered_loc_df, raw_start_place_enter_loc_entry):
+def _add_start_point(filtered_loc_df, raw_start_place, ts):
+    raw_start_place_enter_loc_entry = _get_raw_start_place_enter_loc_entry(ts, raw_start_place)
     curr_first_point = filtered_loc_df.iloc[0]
     curr_first_loc = gj.GeoJSON.to_instance(curr_first_point["loc"])
     add_dist = ecc.calDistance(curr_first_loc.coordinates,
@@ -368,6 +342,12 @@ def _add_start_point(filtered_loc_df, raw_start_place_enter_loc_entry):
         del_time = 0
 
     new_start_ts = curr_first_point.ts - del_time
+    prev_enter_ts = raw_start_place.data.enter_ts if "enter_ts" in raw_start_place.data else None
+    if prev_enter_ts is not None and new_start_ts < raw_start_place.data.enter_ts:
+        logging.debug("Much extrapolation! new_start_ts %s < prev_enter_ts %s" %
+                      (new_start_ts, prev_enter_ts))
+        new_start_ts = raw_start_place.data.enter_ts + 3 * 60
+        logging.debug("changed new_start_ts to %s" % (new_start_ts))
     logging.debug("After subtracting time %s from original %s to cover additional distance %s at speed %s, new_start_ts = %s" %
                   (del_time, filtered_loc_df.ts.iloc[-1] - filtered_loc_df.ts.iloc[0],
                    add_dist, with_speeds_df.speed.median(), new_start_ts))
@@ -386,6 +366,35 @@ def _add_start_point(filtered_loc_df, raw_start_place_enter_loc_entry):
                             "background/filtered_location",
                             new_first_point_data)
     return _prepend_new_entry(filtered_loc_df, new_first_point)
+
+def _get_raw_start_place_enter_loc_entry(ts, raw_start_place):
+    if raw_start_place.data.enter_ts is not None:
+        raw_start_place_enter_loc_entry = ecwe.Entry(
+            ts.get_entry_at_ts("background/filtered_location", "data.ts",
+                               raw_start_place.data.enter_ts))
+    else:
+        # These are not strictly accurate because the exit ts for the place
+        # corresponds to the ts of the first point in the section. We are trying
+        # to determine the correct exit_ts here. But its a reasonable estimate,
+        # at least for the time zone, which is required when we extrapolate
+        # note that this will fail for the specific case in which the first point outside
+        # the geofence of the first place in a trip chain is in a different timezone
+        # than the point itself. We can work around that by storing the enter_ts even
+        # for the first place.
+        dummy_section_start_loc_doc = {
+            "loc": raw_start_place.data.location,
+            "latitude": raw_start_place.data.location.coordinates[1],
+            "longitude": raw_start_place.data.location.coordinates[0],
+            "ts": raw_start_place.data.exit_ts,
+            "fmt_time": raw_start_place.data.exit_fmt_time,
+            "local_dt": raw_start_place.data.exit_local_dt
+        }
+        raw_start_place_enter_loc_entry = ecwe.Entry.create_entry(raw_start_place.user_id,
+                                                                  "background/filtered_location",
+                                                                  dummy_section_start_loc_doc)
+    logging.debug("Start place is %s and corresponding location is %s" %
+                  (raw_start_place.get_id(), raw_start_place_enter_loc_entry.get_id()))
+    return raw_start_place_enter_loc_entry
 
 def _prepend_new_entry(loc_df, entry):
     import emission.storage.timeseries.builtin_timeseries as estb
