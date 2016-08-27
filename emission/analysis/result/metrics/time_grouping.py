@@ -26,7 +26,10 @@ def group_by_timestamp(user_id, start_ts, end_ts, freq, summary_fn):
     http://pandas.pydata.org/pandas-docs/stable/timeseries.html#offset-aliases
     The canonical list can be found at:
     > pandas.tseries.offsets.prefix_mapping
-    :return: a list of ModeStatTimeSummary objects
+    :return: a dict containing the last start_ts of the last section processed
+        and a result list of ModeStatTimeSummary objects
+        If there were no matching sections, the last start_ts is None
+        and the list is empty.
     """
     time_query = estt.TimeQuery("data.start_ts", start_ts, end_ts)
     section_df = esda.get_data_df(esda.CLEANED_SECTION_KEY,
@@ -34,7 +37,10 @@ def group_by_timestamp(user_id, start_ts, end_ts, freq, summary_fn):
                                   geo_query=None)
     if len(section_df) == 0:
         logging.info("Found no entries for user %s, time_query %s" % (user_id, time_query))
-        return []
+        return {
+            "last_ts_processed": None,
+            "result": []
+        }
     logging.debug("first row is %s" % section_df.iloc[0])
     secs_to_nanos = lambda x: x * 10 ** 9
     section_df['start_dt'] = pd.to_datetime(secs_to_nanos(section_df.start_ts))
@@ -66,7 +72,10 @@ def group_by_local_date(user_id, from_dt, to_dt, freq, summary_fn):
     :param freq: since we only expand certain local_dt fields, we can only
     support frequencies corresponding to them. These are represented in the
     `LocalFreq` enum.
-    :return: pandas.core.groupby.DataFrameGroupBy object
+    :return: a dict containing the last start_ts of the last section processed
+        and a result list of ModeStatTimeSummary objects
+        If there were no matching sections, the last start_ts is None
+        and the list is empty.
     """
     time_query = esttc.TimeComponentQuery("data.start_local_dt", from_dt, to_dt)
     section_df = esda.get_data_df(esda.CLEANED_SECTION_KEY,
@@ -74,7 +83,10 @@ def group_by_local_date(user_id, from_dt, to_dt, freq, summary_fn):
                                   geo_query=None)
     if len(section_df) == 0:
         logging.info("Found no entries for user %s, time_query %s" % (user_id, time_query))
-        return []
+        return {
+            "last_ts_processed": None,
+            "result": []
+        }
     groupby_arr = _get_local_group_by(freq)
     time_grouped_df = section_df.groupby(groupby_arr)
     local_dt_fill_fn = _get_local_key_to_fill_fn(freq)
