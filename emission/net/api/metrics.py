@@ -17,11 +17,11 @@ def _call_group_fn(group_fn, user_id, start_time, end_time, freq, metric_name):
     logging.debug("%s -> %s" % (metric_name, summary_fn))
     aggregate_metrics = group_fn(None, start_time, end_time,
                                  freq, summary_fn)
-    ret_dict = {"aggregate_metrics": aggregate_metrics}
+    ret_dict = {"aggregate_metrics": aggregate_metrics["result"]}
     if user_id is not None:
         user_metrics = group_fn(user_id, start_time, end_time,
                                      freq, summary_fn)
-        ret_dict.update({"user_metrics": user_metrics})
+        ret_dict.update({"user_metrics": user_metrics["result"]})
     return ret_dict
 
 

@@ -283,14 +283,23 @@ class TestTimeGrouping(unittest.TestCase):
         logging.debug("durations = %s" %
                       [s.data.duration for s in test_section_list])
 
-        summary_ts = earmt.group_by_timestamp(self.testUUID,
+        summary_ts_dict = earmt.group_by_timestamp(self.testUUID,
                                            arrow.Arrow(2016,5,1).timestamp,
                                            arrow.Arrow(2016,6,1).timestamp,
                                            'd', earmts.get_count)
-        summary_ld = earmt.group_by_local_date(self.testUUID,
+        summary_ld_dict = earmt.group_by_local_date(self.testUUID,
                                                ecwl.LocalDate({'year': 2016, 'month': 5}),
                                                ecwl.LocalDate({'year': 2016, 'month': 6}),
                                                earmt.LocalFreq.DAILY, earmts.get_count)
+
+        summary_ts_last = summary_ts_dict["last_ts_processed"]
+        summary_ld_last = summary_ld_dict["last_ts_processed"]
+
+        summary_ts = summary_ts_dict["result"]
+        summary_ld = summary_ld_dict["result"]
+
+        self.assertEqual(summary_ts_last, arrow.Arrow(2016,5,3,14, tzinfo=tz.gettz(PST)).timestamp)
+        self.assertEqual(summary_ld_last, arrow.Arrow(2016,5,3,14, tzinfo=tz.gettz(PST)).timestamp)
 
         self.assertEqual(len(summary_ts), len(summary_ld)) # local date and UTC results are the same
         self.assertEqual(len(summary_ts), 1) # spans one day
@@ -326,24 +335,31 @@ class TestTimeGrouping(unittest.TestCase):
 
         # There's only one local date, so it will be consistent with
         # results in testGroupedByOneLocalDayOneUTCDay
-        summary_ld = earmt.group_by_local_date(self.testUUID,
+        summary_ld_dict = earmt.group_by_local_date(self.testUUID,
                                                ecwl.LocalDate({'year': 2016, 'month': 5}),
                                                ecwl.LocalDate({'year': 2016, 'month': 6}),
                                                earmt.LocalFreq.DAILY, earmts.get_count)
 
+        summary_ld = summary_ld_dict["result"]
+        summary_ld_last = summary_ld_dict["last_ts_processed"]
+        self.assertEqual(summary_ld_last,
+                         arrow.Arrow(2016,5,3,23, tzinfo=tz.gettz(PST)).timestamp)
         self.assertEqual(len(summary_ld), 1) # spans one day
         self.assertEqual(summary_ld[0].BICYCLING, 3)
         self.assertEqual(summary_ld[0].ts, 1462258800)
         self.assertEqual(summary_ld[0].local_dt.day, 3)
 
-        summary_ts = earmt.group_by_timestamp(self.testUUID,
+        summary_ts_dict = earmt.group_by_timestamp(self.testUUID,
                                            arrow.Arrow(2016,5,1).timestamp,
                                            arrow.Arrow(2016,6,1).timestamp,
                                            'd', earmts.get_count)
+        summary_ts = summary_ts_dict["result"]
+        summary_ts_last = summary_ts_dict["last_ts_processed"]
 
         # But 23:00 PDT is 6am on the 4th in UTC,
         # so the results are different for this
-
+        self.assertEqual(summary_ts_last,
+                         arrow.Arrow(2016,5,3,23, tzinfo=tz.gettz(PST)).timestamp)
         self.assertEqual(len(summary_ts), 2) # spans two days in UTC
         self.assertEqual(summary_ts[0].BICYCLING, 2) # 2 trips on the first day
         self.assertEqual(summary_ts[1].BICYCLING, 1) # 1 trips on the second day
@@ -383,13 +399,18 @@ class TestTimeGrouping(unittest.TestCase):
         logging.debug("durations = %s" %
                       [s.data.duration for s in test_section_list])
 
-        summary_ts = earmt.group_by_timestamp(self.testUUID,
+        summary_ts_dict = earmt.group_by_timestamp(self.testUUID,
                                            arrow.Arrow(2016,5,1).timestamp,
                                            arrow.Arrow(2016,6,1).timestamp,
                                            'd', earmts.get_count)
 
+        summary_ts_last = summary_ts_dict["last_ts_processed"]
+        summary_ts = summary_ts_dict["result"]
+
         logging.debug(summary_ts)
 
+        self.assertEqual(summary_ts_last,
+                         arrow.Arrow(2016,5,4,0, tzinfo=tz.gettz(PST)).timestamp) # spans two days in UTC
         self.assertEqual(len(summary_ts), 3) # spans two days in UTC
         self.assertEqual(summary_ts[0].BICYCLING, 1) # trip leaving India
         self.assertEqual(summary_ts[1].BICYCLING, 1) # trip from New York
@@ -402,11 +423,16 @@ class TestTimeGrouping(unittest.TestCase):
         self.assertEqual(summary_ts[1].ts, 1462233600) # timestamp for start of 2nd May in UTC
 
         # There's only one local date, but it starts in IST this time
-        summary_ld = earmt.group_by_local_date(self.testUUID,
+        summary_ld_dict = earmt.group_by_local_date(self.testUUID,
                                                ecwl.LocalDate({'year': 2016, 'month': 5}),
                                                ecwl.LocalDate({'year': 2016, 'month': 6}),
                                                earmt.LocalFreq.DAILY, earmts.get_count)
 
+        summary_ld = summary_ld_dict["result"]
+        summary_ld_last = summary_ld_dict["last_ts_processed"]
+
+        self.assertEqual(summary_ld_last,
+                         arrow.Arrow(2016,5,4,0, tzinfo=tz.gettz(PST)).timestamp) # spans two days in UTC
         self.assertEqual(len(summary_ld), 2) # spans one day + 1 trip at midnight
         self.assertEqual(summary_ld[0].BICYCLING, 2) # two plane trips
         self.assertEqual(summary_ld[1].BICYCLING, 1) # trip SFO
@@ -464,12 +490,17 @@ class TestTimeGrouping(unittest.TestCase):
         logging.debug("durations = %s" %
                       [s.data.duration for s in test_section_list])
 
-        summary = earmt.group_by_timestamp(self.testUUID,
+        summary_dict = earmt.group_by_timestamp(self.testUUID,
                                            arrow.Arrow(2016,5,1).timestamp,
                                            arrow.Arrow(2016,6,1).timestamp,
                                            'd', earmts.get_count)
+        summary_last = summary_dict["last_ts_processed"]
+        summary = summary_dict["result"]
 
         logging.debug(summary)
+
+        self.assertEqual(summary_last,
+                         arrow.Arrow(2016,5,4,3, tzinfo=tz.gettz(BST)).timestamp)
 
         self.assertEqual(len(summary), 2) # spans two days in UTC
         self.assertEqual(summary[0].BICYCLING, 2) # trip leaving SFO and JFK
@@ -481,11 +512,16 @@ class TestTimeGrouping(unittest.TestCase):
         self.assertEqual(summary[1].ts, 1462320000) # timestamp for start of 2nd May in UTC
 
         # There's only one local date, but it starts in IST this time
-        summary_ld = earmt.group_by_local_date(self.testUUID,
+        summary_ld_dict = earmt.group_by_local_date(self.testUUID,
                                                ecwl.LocalDate({'year': 2016, 'month': 5}),
                                                ecwl.LocalDate({'year': 2016, 'month': 6}),
                                                earmt.LocalFreq.DAILY, earmts.get_count)
 
+        summary_ld_last = summary_ld_dict["last_ts_processed"]
+        summary_ld = summary_ld_dict["result"]
+
+        self.assertEqual(summary_ld_last,
+                         arrow.Arrow(2016,5,4,3, tzinfo=tz.gettz(BST)).timestamp)
         self.assertEqual(len(summary_ld), 2) # spans one day + 1 trip on the next day
         self.assertEqual(summary_ld[0].BICYCLING, 2) # two plane trips
         self.assertEqual(summary_ld[1].BICYCLING, 1) # trip SFO
