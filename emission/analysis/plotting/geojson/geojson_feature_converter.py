@@ -128,15 +128,6 @@ def section_to_geojson(section, tl):
                 section_location_entries.append(last_loc_entry)
 
     points_line_feature = point_array_to_line(section_location_entries)
-    # If this is the first section, we already start from the trip start. But we actually need to start from the
-    # prior place. Fudge this too. Note also that we may want to figure out how to handle this properly in the model
-    # without needing fudging. TODO: Unclear how exactly to do this
-    if section.data.start_stop is None:
-        # This is the first section. So we need to find the start place of the parent trip
-        parent_trip = tl.get_object(section.data.trip_id)
-        start_place_of_parent_trip = tl.get_object(parent_trip.data.start_place)
-        points_line_feature.geometry.coordinates.insert(0, start_place_of_parent_trip.data.location.coordinates)
-
     points_line_feature.id = str(section.get_id())
     points_line_feature.properties = copy.copy(section.data)
     points_line_feature.properties["feature_type"] = "section"

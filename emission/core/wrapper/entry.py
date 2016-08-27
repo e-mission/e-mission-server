@@ -64,6 +64,14 @@ class Entry(ecwb.WrapperBase):
       result_entry._populateDependencies()
       return result_entry
 
+  @staticmethod
+  def get_dedup_list(key):
+      key_class = ecwb.WrapperBase._get_class(Entry._getData2Wrapper()[key])
+      all_keys = key_class.props.keys()
+      valid_keys = [item for item in all_keys if item not in key_class.geojson
+                    and item not in key_class.local_dates]
+      return valid_keys
+
   def _build(self, key, obj):
     # logging.debug("entry._build called with %s, %s, %s" % (self, key, obj))
     if key == "data":

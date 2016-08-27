@@ -14,7 +14,8 @@ class Stop(ecwb.WrapperBase):
              "enter_loc": ecwb.WrapperBase.Access.WORM, # the location in geojson format
              "exit_loc": ecwb.WrapperBase.Access.WORM, # the location in geojson format
              "source": ecwb.WrapperBase.Access.WORM,   # the method used to generate this place
-             "duration": ecwb.WrapperBase.Access.WORM}    # the duration for which we were in this place
+             "duration": ecwb.WrapperBase.Access.WORM, # the duration for which we were in this place
+             "distance": ecwb.WrapperBase.Access.WORM} # the distance covered during the transition
 
     enums = {}
     geojson = ["enter_loc", "exit_loc"]
