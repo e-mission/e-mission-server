@@ -159,6 +159,11 @@ def get_filtered_trip(ts, trip):
         sum([stop.data.distance for stop in stop_map.values()])
     filtered_trip_data.distance = trip_distance
     filtered_trip_entry["data"] = filtered_trip_data
+    if filtered_trip_data.distance < 100:
+        logging.info("Skipped single point trip %s (%s -> %s) of length %s" %
+                     (trip.get_id(), trip.data.start_fmt_time,
+                      trip.data.end_fmt_time, filtered_trip_data.distance))
+        return None
 
     # After we have linked everything back together. NOW we can save the entries
     linked_tl = link_trip_timeline(trip_tl, section_map, stop_map)
