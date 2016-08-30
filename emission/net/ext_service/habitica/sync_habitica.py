@@ -33,54 +33,57 @@ def reward_active_transportation(user_id):
     #Get metrics
     summary_ts = earmt.group_by_timestamp(user_id, timestamp_from_db, timestamp_now, None, earmts.get_distance)
     logging.debug("Metrics response: %s" % summary_ts)
-
-    #get distances leftover from last timestamp
-    bike_distance = user_val['bike_count']
-    walk_distance = user_val['walk_count']
-
-    #iterate over summary_ts and look for bike/on foot
-    for item in summary_ts["result"]:
-      try:
-          bike_distance += item.BICYCLING
-          logging.debug("bike_distance += %s" % item.BICYCLING)
-      except AttributeError:
-          logging.debug("no bike")
-      try:
-          walk_distance += item.ON_FOOT
-          logging.debug("walk_distance += %s" % item.ON_FOOT)
-      except AttributeError:
-          logging.debug("no Android walk")
-      try:
-          walk_distance += item.WALKING
-          logging.debug("walk_distance += %s" % item.WALKING)
-      except AttributeError:
-          logging.debug("no ios walk")
-      try:
-          walk_distance += item.RUNNING
-          logging.debug("walk_distance += %s" % item.RUNNING)
-      except AttributeError:
-          logging.debug("no running")
     
-    logging.debug("Finished with bike_distance == %s" % bike_distance)
-    logging.debug("Finished with walk_distance == %s" % walk_distance)
+    if summary_ts["last_ts_processed"] != None:
+      #get distances leftover from last timestamp
+      bike_distance = user_val['bike_count']
+      walk_distance = user_val['walk_count']
 
-    method_uri_walk = "/api/v3/tasks/"+ walk_habit_id + "/score/up"
-    method_uri_bike = "/api/v3/tasks/"+ bike_habit_id + "/score/up"
-    #reward user by scoring + habits
-    # Walk: +1 for every km
-    walk_pts = int(walk_distance//1000)
-    for i in range(walk_pts):
-      res = proxy.habiticaProxy(user_id, 'POST', method_uri_walk, None)
-      logging.debug("Request to score walk points %s" % res)
-    # Bike: +1 for every 3 km
-    bike_pts = int(bike_distance//3000)
-    for i in range(bike_pts):
-      res2 = proxy.habiticaProxy(user_id, 'POST', method_uri_bike, None)
-      logging.debug("Request to score bike points %s" % res2)
+      #iterate over summary_ts and look for bike/on foot
+      for item in summary_ts["result"]:
+        try:
+            bike_distance += item.BICYCLING
+            logging.debug("bike_distance += %s" % item.BICYCLING)
+        except AttributeError:
+            logging.debug("no bike")
+        try:
+            walk_distance += item.ON_FOOT
+            logging.debug("walk_distance += %s" % item.ON_FOOT)
+        except AttributeError:
+            logging.debug("no Android walk")
+        try:
+            walk_distance += item.WALKING
+            logging.debug("walk_distance += %s" % item.WALKING)
+        except AttributeError:
+            logging.debug("no ios walk")
+        try:
+            walk_distance += item.RUNNING
+            logging.debug("walk_distance += %s" % item.RUNNING)
+        except AttributeError:
+            logging.debug("no running")
+      
+      logging.debug("Finished with bike_distance == %s" % bike_distance)
+      logging.debug("Finished with walk_distance == %s" % walk_distance)
 
-    #update the timestamp and bike/walk counts in db
-    edb.get_habitica_db().update({"user_id": user_id},{"$set": {'metrics_data': {'last_timestamp': summary_ts["last_ts_processed"], 'bike_count': bike_distance%3000, 'walk_count': walk_distance%1000}}},upsert=True)
-    logging.debug("Habitica user after update: %s" % list(edb.get_habitica_db().find({'user_id': user_id})))
+      method_uri_walk = "/api/v3/tasks/"+ walk_habit_id + "/score/up"
+      method_uri_bike = "/api/v3/tasks/"+ bike_habit_id + "/score/up"
+      #reward user by scoring + habits
+      # Walk: +1 for every km
+      walk_pts = int(walk_distance//1000)
+      for i in range(walk_pts):
+        res = proxy.habiticaProxy(user_id, 'POST', method_uri_walk, None)
+        logging.debug("Request to score walk points %s" % res)
+      # Bike: +1 for every 3 km
+      bike_pts = int(bike_distance//3000)
+      for i in range(bike_pts):
+        res2 = proxy.habiticaProxy(user_id, 'POST', method_uri_bike, None)
+        logging.debug("Request to score bike points %s" % res2)
+
+      #update the timestamp and bike/walk counts in db
+      edb.get_habitica_db().update({"user_id": user_id},{"$set": {'metrics_data': 
+        {'last_timestamp': summary_ts["last_ts_processed"], 'bike_count': bike_distance%3000, 
+        'walk_count': walk_distance%1000}}}, upsert=True)
+      logging.debug("Habitica user after update: %s" % list(edb.get_habitica_db().find({'user_id': user_id})))
 
 
 
