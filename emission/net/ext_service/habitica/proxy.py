@@ -158,9 +158,9 @@ def setup_party(user_id):
   return group_id
 
 def setup_default_habits(user_id):
-  bike_habit = {'type': "habit", 'text': "Bike", 'up': True, 'down': False, 'priority': 2}
+  bike_habit = {'type': "habit", 'text': "Bike", 'notes': "3 km = 1+ (calculated automatically)", 'up': True, 'down': False, 'priority': 2}
   bike_habit_id = create_habit(user_id, bike_habit)
-  walk_habit = {'type': "habit", 'text': "Walk", 'up': True, 'down': False, 'priority': 2}
+  walk_habit = {'type': "habit", 'text': "Walk", 'notes': "1 km = 1+ (calculated automatically)", 'up': True, 'down': False, 'priority': 2}
   walk_habit_id = create_habit(user_id, walk_habit)
 
 def create_habit(user_id, new_habit):
