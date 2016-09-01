@@ -10,25 +10,25 @@ import emission.core.wrapper.entry as ecwe
 
 def get_raw_timeline_from_dt(user_id, start_local_dt, end_local_dt,
                              geojson=None, extra_query_list=None):
-    return get_timeline_from_dt(user_id, esda.RAW_PLACE_KEY, esda.RAW_TRIP_KEY,
+    return get_timeline_from_dt(user_id, esda.RAW_PLACE_KEY, esda.RAW_TRIP_KEY, esda.RAW_UNTRACKED_KEY,
                                 start_local_dt, end_local_dt, geojson, extra_query_list)
 
 def get_cleaned_timeline_from_dt(user_id, start_local_dt, end_local_dt,
                                  geojson=None, extra_query_list=None):
-    return get_timeline_from_dt(user_id, esda.CLEANED_PLACE_KEY, esda.CLEANED_TRIP_KEY,
+    return get_timeline_from_dt(user_id, esda.CLEANED_PLACE_KEY, esda.CLEANED_TRIP_KEY, esda.CLEANED_UNTRACKED_KEY,
                                 start_local_dt, end_local_dt, geojson, extra_query_list)
 
 def get_raw_timeline(user_id, start_ts, end_ts,
                      geojson=None, extra_query_list=None):
-    return get_timeline(user_id, esda.RAW_PLACE_KEY, esda.RAW_TRIP_KEY,
+    return get_timeline(user_id, esda.RAW_PLACE_KEY, esda.RAW_TRIP_KEY, esda.RAW_UNTRACKED_KEY,
                         start_ts, end_ts, geojson, extra_query_list)
 
 def get_cleaned_timeline(user_id, start_ts, end_ts,
                          geojson=None, extra_query_list=None):
-    return get_timeline(user_id, esda.CLEANED_PLACE_KEY, esda.CLEANED_TRIP_KEY,
+    return get_timeline(user_id, esda.CLEANED_PLACE_KEY, esda.CLEANED_TRIP_KEY, esda.CLEANED_UNTRACKED_KEY,
                         start_ts, end_ts, geojson, extra_query_list)
 
-def get_timeline(user_id, place_key, trip_key, start_ts, end_ts,
+def get_timeline(user_id, place_key, trip_key, untracked_key, start_ts, end_ts,
                  geojson=None, extra_query_list=None):
     logging.info("About to query for timestamps %s -> %s" % (start_ts, end_ts))
     """
@@ -54,6 +54,7 @@ def get_timeline(user_id, place_key, trip_key, start_ts, end_ts,
                                       geo_query=place_gq,
                                       extra_query_list=extra_query_list)
     trips_entries = esda.get_entries(trip_key, user_id=user_id,
+                                     untracked_key=untracked_key,
                                      time_query=estt.TimeQuery("data.start_ts",
                                                                start_ts,
                                                                end_ts),
@@ -68,7 +69,7 @@ def get_timeline(user_id, place_key, trip_key, start_ts, end_ts,
 
     return Timeline(place_key, trip_key, places_entries, trips_entries)
 
-def get_timeline_from_dt(user_id, place_key, trip_key,
+def get_timeline_from_dt(user_id, place_key, trip_key, untracked_key,
                          start_local_dt, end_local_dt,
                          geojson=None, extra_query_list=None):
     logging.info("About to query for date components %s -> %s" % (start_local_dt, end_local_dt))
@@ -80,7 +81,8 @@ def get_timeline_from_dt(user_id, place_key, trip_key,
                                       geo_query=place_gq,
                                       extra_query_list=extra_query_list)
     trips_entries = esda.get_entries(trip_key, user_id,
-                                     esttc.TimeComponentQuery(
+                                     untracked_key=untracked_key,
+                                     time_query= esttc.TimeComponentQuery(
                                          "data.start_local_dt", start_local_dt,
                                          end_local_dt),
                                      geo_query=trip_gq,
