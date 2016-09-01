@@ -10,6 +10,9 @@ import emission.core.wrapper.location as ecwl
 import emission.core.wrapper.rawtrip as ecwrt
 import emission.core.wrapper.rawplace as ecwrp
 import emission.core.wrapper.entry as ecwe
+import emission.core.wrapper.untrackedtime as ecwut
+
+import emission.core.common as ecc
 
 class TripSegmentationMethod(object):
     def segment_into_trips(self, timeseries, time_query):
@@ -169,27 +172,96 @@ def create_places_and_trips(user_id, segmentation_points, segmentation_method_na
         new_place_entry = ecwe.Entry.create_entry(user_id,
                             "segmentation/raw_place", new_place, create_id = True)
 
-        stitch_together_start(last_place_entry, curr_trip_entry, start_loc)
-        stitch_together_end(new_place_entry, curr_trip_entry, end_loc)
+        if found_untracked_period(ts, last_place_entry.data, start_loc):
+            # Fill in the gap in the chain with an untracked period
+            curr_untracked = ecwut.Untrackedtime()
+            curr_untracked.source = segmentation_method_name
+            curr_untracked_entry = ecwe.Entry.create_entry(user_id,
+                            "segmentation/raw_untracked", curr_untracked, create_id=True)
 
-        ts.insert(curr_trip_entry)
-        # last_place is a copy of the data in this entry. So after we fix it
-        # the way we want, we need to assign it back to the entry, otherwise
-        # it will be lost
-        ts.update(last_place_entry)
+            restarted_place = ecwrp.Rawplace()
+            restarted_place.source = segmentation_method_name
+            restarted_place_entry = ecwe.Entry.create_entry(user_id,
+                            "segmentation/raw_place", restarted_place, create_id=True)
+
+            untracked_start_loc = ecwe.Entry(ts.get_entry_at_ts("background/filtered_location",
+                                                     "data.ts", last_place_entry.data.enter_ts)).data
+            _link_and_save(ts, last_place_entry, curr_untracked_entry, restarted_place_entry,
+                           untracked_start_loc, start_loc)
+            logging.debug("Created untracked period %s from %s to %s" %
+                          (curr_untracked_entry.get_id(), curr_untracked_entry.data.start_ts, curr_untracked_entry.data.end_ts))
+            logging.debug("Resetting last_place_entry from %s to %s" %
+                          (last_place_entry, restarted_place_entry))
+            last_place_entry = restarted_place_entry
+
+        _link_and_save(ts, last_place_entry, curr_trip_entry, new_place_entry, start_loc, end_loc)
         last_place_entry = new_place_entry
 
     # The last last_place hasn't been stitched together yet, but we
     # need to save it so that it can be the last_place for the next run
     ts.insert(last_place_entry)
 
+def _link_and_save(ts, last_place_entry, curr_trip_entry, new_place_entry, start_loc, end_loc):
+    stitch_together_start(last_place_entry, curr_trip_entry, start_loc)
+    stitch_together_end(new_place_entry, curr_trip_entry, end_loc)
+
+    ts.insert(curr_trip_entry)
+    # last_place is a copy of the data in this entry. So after we fix it
+    # the way we want, we need to assign it back to the entry, otherwise
+    # it will be lost
+    ts.update(last_place_entry)
+
+def found_untracked_period(timeseries, last_place, start_loc):
+    """
+    Check to see whether the two places are the same.
+    This is a fix for https://github.com/e-mission/e-mission-server/issues/378
+    Note both last_place and start_loc are data wrappers (e.g. RawPlace and Location objects)
+    NOT entries. So field access should not be preceeded by "data"
+
+    :return: True if we should create a new start place instead of linking to
+    the last_place, False otherwise
+    """
+    # Implementing logic from https://github.com/e-mission/e-mission-server/issues/378
+    if last_place.enter_ts is None:
+        logging.debug("last_place.enter_ts = %s" % (last_place.enter_ts))
+        logging.debug("start of a chain, unable to check for restart from previous trip end, assuming not restarted")
+        return False
+
+    if _is_tracking_restarted(last_place, start_loc, timeseries):
+        logging.debug("tracking has been restarted, returning True")
+        return True
+
+    transition_distance = ecc.calDistance(last_place.location.coordinates,
+                       start_loc.loc.coordinates)
+    logging.debug("while determining new_start_place, transition_distance = %s" % transition_distance)
+    if transition_distance < 1000:
+        logging.debug("transition_distance %s < 1000, returning False", transition_distance)
+        return False
+
+    time_delta = start_loc.ts - last_place.enter_ts
+    transition_speed = transition_distance / time_delta
+    logging.debug("while determining new_start_place, time_delta = %s, transition_speed = %s"
+                  % (time_delta, transition_speed))
+
+    # android uses 100 m in 5 mins
+    # iOS uses 50 m in 10 mins
+    # Let's go with the slower option
+    speed_threshold = float(50) / (10*60)
+
+    if transition_speed > speed_threshold:
+        logging.debug("transition_speed %s > %s, returning False" %
+                      (transition_speed, speed_threshold))
+        return False
+    else:
+        logging.debug("transition_speed %s <= %s, 'stopped', returning True" %
+                        (transition_speed, speed_threshold))
+        return True
+
 def start_new_chain(uuid):
     """
     Can't find the place that is the end of an existing chain, so we need to
     create a new one.  This might correspond to the start of tracking, or to an
-    improperly terminated chain. For now, we deal with the start of tracking,
-    and add the checks for the improperly terminated chain later.
-    TODO: Add checks for improperly terminated chains later.
+    improperly terminated chain.
     """
     start_place = ecwrp.Rawplace()
     logging.debug("Starting tracking, created new start of chain %s" % start_place)
@@ -248,6 +320,8 @@ def stitch_together_end(new_place_entry, curr_trip_entry, end_loc):
     curr_trip.end_place = new_place_entry.get_id()
     curr_trip.end_loc = end_loc.loc
     curr_trip.duration = curr_trip.end_ts - curr_trip.start_ts
+    curr_trip.distance = ecc.calDistance(curr_trip.end_loc.coordinates,
+                                         curr_trip.start_loc.coordinates)
 
     new_place.enter_ts = end_loc.ts
     new_place.enter_local_dt = end_loc.local_dt
@@ -260,12 +334,79 @@ def stitch_together_end(new_place_entry, curr_trip_entry, end_loc):
     new_place_entry["data"] = new_place
     curr_trip_entry["data"] = curr_trip
 
+def _is_tracking_restarted(last_place, start_loc, timeseries):
+    import emission.storage.timeseries.timequery as estt
 
-def get_restart_events(timeseries, time_query):
-    transition_df = timeseries.get_data_df("statemachine/transition", time_query)
-    restart_events_df = transition_df.query('transition' == ecwt.TransitionType.BOOTED.value or
-                                            'transition' == ecwt.TransitionType.INITIALIZE.value or
-                                            'transition' == ecwt.TransitionType.STOP_TRACKING.value)
+    tq = estt.TimeQuery(timeType="data.ts", startTs=last_place.enter_ts,
+                        endTs=start_loc.ts)
+    transition_df = timeseries.get_data_df("statemachine/transition", tq)
+    if len(transition_df) == 0:
+        logging.debug("In range %s -> %s found no transitions" %
+                      (tq.startTs, tq.endTs))
+        return False
+    logging.debug("In range %s -> %s found transitions %s" %
+                  (tq.startTs, tq.endTs, transition_df[["fmt_time", "curr_state", "transition"]]))
+    return _is_tracking_restarted_android(transition_df) or \
+           _is_tracking_restarted_ios(transition_df)
 
-def is_easy_case(restart_events_df):
-    return len(restart_events_df) == 0
+def _is_tracking_restarted_android(transition_df):
+    """
+    Life is fairly simple on android. There are two main cases that cause tracking
+    to be off. Either the phone is turned off, or the user manually turns tracking off
+    tracking.
+    - If the phone is turned off and turned on again, then we receive a REBOOT transition,
+    and we INITIALIZE the FSM.
+    - If the tracking is turned off and on manually, we should receive a STOP_TRACKING + START_TRACKING
+    transition, followed by an INITIALIZE
+
+    Should we use the special transitions or INITIALIZE? We also call INITIALIZE when we
+    change the data collection config, which doesn't necessarily require a break in the chain.
+    Let's use the real transitions for now.
+    :param transition_df: the set of transitions for this time range
+    :return: whether the tracking was restarted in that time range
+    """
+    restart_events_df = transition_df[(transition_df.transition == ecwt.TransitionType.BOOTED.value) |
+                                      (transition_df.transition == ecwt.TransitionType.STOP_TRACKING.value)]
+    if len(restart_events_df) > 0:
+        logging.debug("On android, found restart events %s" % restart_events_df)
+    return len(restart_events_df) > 0
+
+def _is_tracking_restarted_ios(transition_df):
+    """
+    Unfortunately, life is not as simple on iOS. There is no way to sign up for a
+    reboot transition. So we don't know when the phone rebooted. Instead, geofences
+    are persisted across reboots. So the cases are:
+    - phone runs out of battery in:
+        - waiting_for_geofence:
+            - we turn on phone in a different location: geofence is triggered,
+             we are OUTSIDE geofence, we start tracking, we detect we are not moving,
+             we turn off tracking. There doesn't appear to be anything that we can
+             use here to distinguish from a spurious trip without reboot, except that
+             in a spurious trip, the new location is the same while in this, it is different.
+             but that is covered by the distance checks above.
+
+           - we turn on phone in the same location: nothing to distinguish whatsoever.
+             Have to let this go
+        - ongoing_trip:
+           - turn on as part of the same trip - will be initialized with the significant
+             location changes API. no way to distinguish between significant and
+             standard location changes, so it will just look like a big gap in points
+             (greater than the distance filter)
+           - turn on at home - barring visit notifications, will have tracking turned off
+             until next trip starts and we get a significant location changes API update.
+             Need to test how visit tracking interacts with all this
+
+    Experimental results at:
+    https://github.com/e-mission/e-mission-server/issues/378
+
+    :param transition_df: the set of transitions for this time range
+    :return: whether the tracking was restarted in that time range
+    """
+    restart_events_df = transition_df[(transition_df.transition == ecwt.TransitionType.STOP_TRACKING.value) |
+                                      (transition_df.curr_state == ecwt.State.WAITING_FOR_TRIP_START.value &
+                                       transition_df.transition == ecwt.TransitionType.VISIT_ENDED)]
+    if len(restart_events_df) > 0:
+        logging.debug("On iOS, found restart events %s" % restart_events_df)
+    return len(restart_events_df) > 0
+
+
