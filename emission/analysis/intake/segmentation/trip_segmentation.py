@@ -403,8 +403,8 @@ def _is_tracking_restarted_ios(transition_df):
     :return: whether the tracking was restarted in that time range
     """
     restart_events_df = transition_df[(transition_df.transition == ecwt.TransitionType.STOP_TRACKING.value) |
-                                      (transition_df.curr_state == ecwt.State.WAITING_FOR_TRIP_START.value &
-                                       transition_df.transition == ecwt.TransitionType.VISIT_ENDED)]
+                                      ((transition_df.curr_state == ecwt.State.WAITING_FOR_TRIP_START.value) &
+                                       (transition_df.transition == ecwt.TransitionType.VISIT_ENDED.value))]
     if len(restart_events_df) > 0:
         logging.debug("On iOS, found restart events %s" % restart_events_df)
     return len(restart_events_df) > 0
