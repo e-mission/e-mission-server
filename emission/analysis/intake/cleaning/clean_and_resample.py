@@ -37,6 +37,7 @@ import emission.core.wrapper.stop as ecwst
 import emission.core.wrapper.location as ecwl
 import emission.core.wrapper.recreatedlocation as ecwrl
 import emission.core.wrapper.untrackedtime as ecwut
+import emission.core.wrapper.motionactivity as ecwm
 
 import emission.core.common as ecc
 
@@ -56,7 +57,7 @@ filtered_place_excluded = ["exit_ts", "exit_local_dt", "exit_fmt_time",
                            "starting_trip", "ending_trip", "duration", "_id"]
 filtered_section_excluded = ["trip_id", "start_stop", "end_stop", "distance", "duration",
                              "start_ts", "start_fmt_time", "start_local_dt","start_loc",
-                             "_id"]
+                             "sensed_mode", "_id"]
 filtered_stop_excluded = ["trip_id", "ending_section", "starting_section", "_id"]
 filtered_location_excluded = ["speed", "distance", "_id"]
 extrapolated_location_excluded = ["ts", "fmt_time", "local_dt", "_id"]
@@ -247,6 +248,12 @@ def get_filtered_section(new_trip_entry, section):
     filtered_section_data.speeds = speeds
     filtered_section_data.distances = distances
     filtered_section_data.distance = sum(distances)
+
+    if is_air_section(filtered_section_data, with_speeds_df):
+        filtered_section_data.sensed_mode = ecwm.MotionTypes.AIR
+    else:
+        filtered_section_data.sensed_mode = section.data.sensed_mode
+
     filtered_section_entry = ecwe.Entry.create_entry(section.user_id,
                                     esda.CLEANED_SECTION_KEY,
                                     filtered_section_data, create_id=True)
@@ -346,6 +353,35 @@ def _copy_non_excluded(old_data, new_data, excluded_list):
     for key in old_data:
         if key not in excluded_list:
             new_data[key] = old_data[key]
+
+def is_air_section(filtered_section_data, with_speeds_df):
+    HUNDRED_KMPH = float(100 * 1000) / (60 * 60) # m/s
+    ONE_FIFTY_KMPH = float(100 * 1000) / (60 * 60) # m/s
+    end_to_end_distance = filtered_section_data.distance
+    end_to_end_time = filtered_section_data.duration
+    end_to_end_speed = end_to_end_distance / end_to_end_time
+    logging.debug("air check: end_to_end_distance = %s, end_to_end_time = %s, so end_to_end_speed = %s" %
+                  (end_to_end_distance, end_to_end_time, end_to_end_speed))
+    if end_to_end_speed > ONE_FIFTY_KMPH:
+        logging.debug("air check: end_to_end_speed %s > ONE_FIFTY_KMPH %s, returning True " %
+                      (end_to_end_speed, ONE_FIFTY_KMPH))
+        return True
+
+    logging.debug("first check failed, speed distribution is %s" %
+                  with_speeds_df.speed.describe(percentiles=[0.9,0.95,0.97,0.99]))
+
+    if end_to_end_speed > HUNDRED_KMPH and \
+        with_speeds_df.speed.quantile(0.9) > ONE_FIFTY_KMPH:
+        logging.debug("air check: end_to_end_speed %s > HUNDRED_KMPH %s, and 0.9 percentile %s > ONE_FIFTY_KMPH %s, returning True " %
+                      (end_to_end_speed, HUNDRED_KMPH,
+                       with_speeds_df.speed.quantile(0.9), ONE_FIFTY_KMPH))
+        return True
+
+    logging.debug("air check: end_to_end_speed %s < HUNDRED_KMPH %s or"
+                  "0.9 percentile %s < ONE_FIFTY_KMPH %s, returning False" %
+                  (end_to_end_speed, HUNDRED_KMPH,
+                   with_speeds_df.speed.quantile(0.9), ONE_FIFTY_KMPH))
+    return False
 
 def _add_start_point(filtered_loc_df, raw_start_place, ts):
     raw_start_place_enter_loc_entry = _get_raw_start_place_enter_loc_entry(ts, raw_start_place)
