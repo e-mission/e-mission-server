@@ -64,7 +64,7 @@ class TestGeojsonFeatureConverter(unittest.TestCase):
         self.assertEquals(len(trip_geojson.features), 5)
 
         day_geojson = gjfc.get_geojson_for_timeline(self.testUUID, tl)
-        self.assertEquals(len(day_geojson), 8)
+        self.assertEquals(len(day_geojson), 7)
         self.assertEquals(day_geojson[-1].type, "FeatureCollection")
         self.assertEquals(day_geojson[-1].properties["feature_type"], "trip")
         self.assertEquals(len(day_geojson[-1].features), 5)
