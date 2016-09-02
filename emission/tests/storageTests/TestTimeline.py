@@ -17,6 +17,7 @@ import emission.core.wrapper.rawtrip as ecwrt
 import emission.core.wrapper.stop as ecws
 import emission.core.wrapper.section as ecwsc
 import emission.core.wrapper.localdate as ecwl
+import emission.core.wrapper.untrackedtime as ecwut
 
 import emission.analysis.intake.cleaning.filter_accuracy as eaicf
 import emission.storage.timeseries.format_hacks.move_filter_field as estfm
@@ -62,7 +63,8 @@ class TestTimeline(unittest.TestCase):
                     self.assertEqual(prev_element.data.starting_trip,
                                      curr_element.get_id())
                 else:
-                    self.assertEqual(prev_type, ecwrt.Rawtrip)
+                    self.assertTrue(prev_type == ecwrt.Rawtrip or
+                                    prev_type == ecwut.Untrackedtime)
                     self.assertEqual(prev_element.data.end_place,
                                      curr_element.get_id())
             prev_type = curr_type

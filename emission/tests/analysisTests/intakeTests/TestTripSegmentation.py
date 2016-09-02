@@ -101,7 +101,7 @@ class TestTripSegmentation(unittest.TestCase):
         # We expect there to be 9 places, but the first one is that start of
         # the chain, so it has a start_time of None and it won't be retrieved
         # by the query on the start_time that we show here.
-        self.assertEqual(len(created_places_entries), 8)
+        self.assertEqual(len(created_places_entries), 9)
         self.assertEqual(len(created_trips_entries), 8)
 
         # Pick the first two trips and the first place and ensure that they are all linked correctly
@@ -191,7 +191,7 @@ class TestTripSegmentation(unittest.TestCase):
         # We expect there to be 12 places, but the first one is that start of
         # the chain, so it has a start_time of None and it won't be retrieved
         # by the query on the start_time that we show here.
-        self.assertEqual(len(created_places_entries), 11)
+        self.assertEqual(len(created_places_entries), 12)
         self.assertEqual(len(created_trips_entries), 11)
 
         # Pick the first two trips and the first place and ensure that they are all linked correctly
