@@ -183,17 +183,22 @@ def trip_to_geojson(trip, tl):
         feature_array.append(stop_to_geojson(stop))
 
     for i, section in enumerate(trip_tl.trips):
-        # TODO: figure out whether we should do this at the model.
-        # The first section starts with the start of the trip. But the trip itself starts at the first
-        # point where we exit the geofence, not at the start place. That is because we don't really know when
-        # we left the start place. We can fix this in the model through interpolation. For now, we assume that the
-        # gap between the real departure time and the time that the trip starts is small, and just combine it here.
         section_gj = section_to_geojson(section, tl)
         feature_array.append(section_gj)
 
     trip_geojson = gj.FeatureCollection(features=feature_array, properties=trip.data)
     trip_geojson.id = str(trip.get_id())
-    trip_geojson.properties["feature_type"] = "trip"
+    if trip.metadata.key == esda.CLEANED_UNTRACKED_KEY:
+        # trip_geojson.properties["feature_type"] = "untracked"
+        # Since the "untracked" type is not correctly handled on the phone, we just
+        # skip these trips until
+        # https://github.com/e-mission/e-mission-phone/issues/118
+        # is fixed
+        # TODO: Once it is fixed, re-introduce the first line in this block
+        # and remove the None check in get_geojson_for_timeline
+        return None
+    else:
+        trip_geojson.properties["feature_type"] = "trip"
     return trip_geojson
 
 def get_geojson_for_ts(user_id, start_ts, end_ts):
@@ -216,10 +221,13 @@ def get_geojson_for_timeline(user_id, tl):
     for trip in tl.trips:
         try:
             trip_geojson = trip_to_geojson(trip, tl)
-            geojson_list.append(trip_geojson)
+            if trip_geojson is not None:
+                geojson_list.append(trip_geojson)
         except Exception, e:
             logging.exception("Found error %s while processing trip %s" % (e, trip))
             raise e
+    logging.debug("trip count = %d, geojson count = %d" %
+                  (len(tl.trips), len(geojson_list)))
     return geojson_list
 
 def get_all_points_for_range(user_id, key, start_ts, end_ts):

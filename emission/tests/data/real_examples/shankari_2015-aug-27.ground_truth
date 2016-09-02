@@ -11,7 +11,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0e420f6858f03bbe41b82", 
+                    "id": "57c85c65f6858f61713e4cc8", 
                     "properties": {
                         "exit_local_dt": {
                             "hour": 8, 
@@ -23,15 +23,16 @@
                             "day": 27, 
                             "minute": 18
                         }, 
+                        "display_name": "California Street, Mountain View", 
                         "feature_type": "start_place", 
                         "exit_fmt_time": "2015-08-27T08:18:27.867000-07:00", 
                         "starting_trip": {
-                            "$oid": "57c0e41bf6858f03bbe4191f"
+                            "$oid": "57c85c5ff6858f61713e4a6f"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "raw_places": [
                             {
-                                "$oid": "57c0e419f6858f03bbe418f4"
+                                "$oid": "57c85c5df6858f61713e4a42"
                             }
                         ], 
                         "exit_ts": 1440688707.867
@@ -46,7 +47,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0e420f6858f03bbe41b83", 
+                    "id": "57c85c65f6858f61713e4cc9", 
                     "properties": {
                         "enter_fmt_time": "2015-08-27T08:30:08.302000-07:00", 
                         "exit_local_dt": {
@@ -59,6 +60,7 @@
                             "day": 27, 
                             "minute": 32
                         }, 
+                        "display_name": "San Pierre Way, Mountain View", 
                         "feature_type": "end_place", 
                         "exit_fmt_time": "2015-08-27T08:32:20.701227-07:00", 
                         "enter_local_dt": {
@@ -72,17 +74,17 @@
                             "minute": 30
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0e41bf6858f03bbe4191f"
+                            "$oid": "57c85c5ff6858f61713e4a6f"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0e41bf6858f03bbe4193c"
+                            "$oid": "57c85c60f6858f61713e4a8c"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1440689408.302, 
                         "duration": 132.39922738075256, 
                         "raw_places": [
                             {
-                                "$oid": "57c0e419f6858f03bbe418f6"
+                                "$oid": "57c85c5df6858f61713e4a44"
                             }
                         ], 
                         "exit_ts": 1440689540.7012274
@@ -103,7 +105,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0e41bf6858f03bbe4193b", 
+                    "id": "57c85c60f6858f61713e4a8b", 
                     "properties": {
                         "enter_fmt_time": "2015-08-27T08:27:45.092000-07:00", 
                         "distance": 20.484032507971882, 
@@ -119,10 +121,10 @@
                         }, 
                         "feature_type": "stop", 
                         "ending_section": {
-                            "$oid": "57c0e41bf6858f03bbe41922"
+                            "$oid": "57c85c5ff6858f61713e4a72"
                         }, 
                         "starting_section": {
-                            "$oid": "57c0e41bf6858f03bbe41935"
+                            "$oid": "57c85c60f6858f61713e4a85"
                         }, 
                         "exit_fmt_time": "2015-08-27T08:28:16.912000-07:00", 
                         "enter_local_dt": {
@@ -153,10 +155,10 @@
                         "enter_ts": 1440689265.092, 
                         "duration": 31.819999933242798, 
                         "_id": {
-                            "$oid": "57c0e41bf6858f03bbe4191f"
+                            "$oid": "57c85c5ff6858f61713e4a6f"
                         }, 
                         "trip_id": {
-                            "$oid": "57c0e41bf6858f03bbe4191f"
+                            "$oid": "57c85c5ff6858f61713e4a6f"
                         }, 
                         "exit_ts": 1440689296.912
                     }
@@ -243,7 +245,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0e41bf6858f03bbe41922", 
+                            "id": "57c85c5ff6858f61713e4a72", 
                             "properties": {
                                 "distances": [
                                     171.18132140558205, 
@@ -285,10 +287,10 @@
                                 }, 
                                 "duration": 557.2249999046326, 
                                 "end_stop": {
-                                    "$oid": "57c0e41bf6858f03bbe4193b"
+                                    "$oid": "57c85c60f6858f61713e4a8b"
                                 }, 
                                 "trip_id": {
-                                    "$oid": "57c0e41bf6858f03bbe4191f"
+                                    "$oid": "57c85c5ff6858f61713e4a6f"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 8, 
@@ -354,7 +356,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0e41bf6858f03bbe41935", 
+                            "id": "57c85c60f6858f61713e4a85", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -382,10 +384,10 @@
                                 }, 
                                 "duration": 111.39000010490417, 
                                 "start_stop": {
-                                    "$oid": "57c0e41bf6858f03bbe4193b"
+                                    "$oid": "57c85c60f6858f61713e4a8b"
                                 }, 
                                 "trip_id": {
-                                    "$oid": "57c0e41bf6858f03bbe4191f"
+                                    "$oid": "57c85c5ff6858f61713e4a6f"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 8, 
@@ -411,14 +413,14 @@
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57c0e41bf6858f03bbe4191f", 
+            "id": "57c85c5ff6858f61713e4a6f", 
             "properties": {
                 "distance": 1713.744521073306, 
                 "end_place": {
-                    "$oid": "57c0e420f6858f03bbe41b83"
+                    "$oid": "57c85c65f6858f61713e4cc9"
                 }, 
                 "raw_trip": {
-                    "$oid": "57c0e419f6858f03bbe418f5"
+                    "$oid": "57c85c5df6858f61713e4a43"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -440,7 +442,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57c0e420f6858f03bbe41b82"
+                    "$oid": "57c85c65f6858f61713e4cc8"
                 }, 
                 "end_fmt_time": "2015-08-27T08:30:08.302000-07:00", 
                 "end_local_dt": {
@@ -477,7 +479,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0e420f6858f03bbe41b83", 
+                    "id": "57c85c65f6858f61713e4cc9", 
                     "properties": {
                         "enter_fmt_time": "2015-08-27T08:30:08.302000-07:00", 
                         "exit_local_dt": {
@@ -490,6 +492,7 @@
                             "day": 27, 
                             "minute": 32
                         }, 
+                        "display_name": "San Pierre Way, Mountain View", 
                         "feature_type": "start_place", 
                         "exit_fmt_time": "2015-08-27T08:32:20.701227-07:00", 
                         "enter_local_dt": {
@@ -503,17 +506,17 @@
                             "minute": 30
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0e41bf6858f03bbe4191f"
+                            "$oid": "57c85c5ff6858f61713e4a6f"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0e41bf6858f03bbe4193c"
+                            "$oid": "57c85c60f6858f61713e4a8c"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1440689408.302, 
                         "duration": 132.39922738075256, 
                         "raw_places": [
                             {
-                                "$oid": "57c0e419f6858f03bbe418f6"
+                                "$oid": "57c85c5df6858f61713e4a44"
                             }
                         ], 
                         "exit_ts": 1440689540.7012274
@@ -528,7 +531,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0e420f6858f03bbe41b84", 
+                    "id": "57c85c66f6858f61713e4cca", 
                     "properties": {
                         "enter_fmt_time": "2015-08-27T08:41:16.784000-07:00", 
                         "exit_local_dt": {
@@ -541,6 +544,7 @@
                             "day": 27, 
                             "minute": 51
                         }, 
+                        "display_name": "Moffett Boulevard, Mountain View", 
                         "feature_type": "end_place", 
                         "exit_fmt_time": "2015-08-27T08:51:18.159111-07:00", 
                         "enter_local_dt": {
@@ -554,17 +558,17 @@
                             "minute": 41
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0e41bf6858f03bbe4193c"
+                            "$oid": "57c85c60f6858f61713e4a8c"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0e41cf6858f03bbe41952"
+                            "$oid": "57c85c60f6858f61713e4aa2"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1440690076.784, 
                         "duration": 601.3751113414764, 
                         "raw_places": [
                             {
-                                "$oid": "57c0e419f6858f03bbe418f8"
+                                "$oid": "57c85c5df6858f61713e4a46"
                             }
                         ], 
                         "exit_ts": 1440690678.1591113
@@ -656,7 +660,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0e41bf6858f03bbe4193e", 
+                            "id": "57c85c60f6858f61713e4a8e", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -698,7 +702,7 @@
                                 }, 
                                 "duration": 536.0827724933624, 
                                 "trip_id": {
-                                    "$oid": "57c0e41bf6858f03bbe4193c"
+                                    "$oid": "57c85c60f6858f61713e4a8c"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 8, 
@@ -738,14 +742,14 @@
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57c0e41bf6858f03bbe4193c", 
+            "id": "57c85c60f6858f61713e4a8c", 
             "properties": {
                 "distance": 1248.5157783247416, 
                 "end_place": {
-                    "$oid": "57c0e420f6858f03bbe41b84"
+                    "$oid": "57c85c66f6858f61713e4cca"
                 }, 
                 "raw_trip": {
-                    "$oid": "57c0e419f6858f03bbe418f7"
+                    "$oid": "57c85c5df6858f61713e4a45"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -767,7 +771,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57c0e420f6858f03bbe41b83"
+                    "$oid": "57c85c65f6858f61713e4cc9"
                 }, 
                 "end_fmt_time": "2015-08-27T08:41:16.784000-07:00", 
                 "end_local_dt": {
@@ -780,7 +784,7 @@
                     "day": 27, 
                     "minute": 41
                 }, 
-                "duration": 413.84099984169006, 
+                "duration": 536.0827724933624, 
                 "start_local_dt": {
                     "hour": 8, 
                     "month": 8, 
@@ -804,7 +808,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0e420f6858f03bbe41b84", 
+                    "id": "57c85c66f6858f61713e4cca", 
                     "properties": {
                         "enter_fmt_time": "2015-08-27T08:41:16.784000-07:00", 
                         "exit_local_dt": {
@@ -817,6 +821,7 @@
                             "day": 27, 
                             "minute": 51
                         }, 
+                        "display_name": "Moffett Boulevard, Mountain View", 
                         "feature_type": "start_place", 
                         "exit_fmt_time": "2015-08-27T08:51:18.159111-07:00", 
                         "enter_local_dt": {
@@ -830,17 +835,17 @@
                             "minute": 41
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0e41bf6858f03bbe4193c"
+                            "$oid": "57c85c60f6858f61713e4a8c"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0e41cf6858f03bbe41952"
+                            "$oid": "57c85c60f6858f61713e4aa2"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1440690076.784, 
                         "duration": 601.3751113414764, 
                         "raw_places": [
                             {
-                                "$oid": "57c0e419f6858f03bbe418f8"
+                                "$oid": "57c85c5df6858f61713e4a46"
                             }
                         ], 
                         "exit_ts": 1440690678.1591113
@@ -855,7 +860,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0e420f6858f03bbe41b85", 
+                    "id": "57c85c66f6858f61713e4ccb", 
                     "properties": {
                         "enter_fmt_time": "2015-08-27T09:53:44.894000-07:00", 
                         "exit_local_dt": {
@@ -868,6 +873,7 @@
                             "day": 27, 
                             "minute": 2
                         }, 
+                        "display_name": "Camino Millenia, Millbrae", 
                         "feature_type": "end_place", 
                         "exit_fmt_time": "2015-08-27T10:02:16.470599-07:00", 
                         "enter_local_dt": {
@@ -881,17 +887,17 @@
                             "minute": 53
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0e41cf6858f03bbe41952"
+                            "$oid": "57c85c60f6858f61713e4aa2"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0e41cf6858f03bbe419d6"
+                            "$oid": "57c85c61f6858f61713e4b26"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1440694424.894, 
                         "duration": 511.57659935951233, 
                         "raw_places": [
                             {
-                                "$oid": "57c0e419f6858f03bbe418fa"
+                                "$oid": "57c85c5ef6858f61713e4a48"
                             }
                         ], 
                         "exit_ts": 1440694936.4705994
@@ -912,7 +918,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0e41cf6858f03bbe419d5", 
+                    "id": "57c85c61f6858f61713e4b25", 
                     "properties": {
                         "enter_fmt_time": "2015-08-27T09:52:14.783000-07:00", 
                         "distance": 11.289935021388207, 
@@ -928,10 +934,10 @@
                         }, 
                         "feature_type": "stop", 
                         "ending_section": {
-                            "$oid": "57c0e41cf6858f03bbe41954"
+                            "$oid": "57c85c60f6858f61713e4aa4"
                         }, 
                         "starting_section": {
-                            "$oid": "57c0e41cf6858f03bbe419d0"
+                            "$oid": "57c85c61f6858f61713e4b20"
                         }, 
                         "exit_fmt_time": "2015-08-27T09:52:44.740000-07:00", 
                         "enter_local_dt": {
@@ -962,10 +968,10 @@
                         "enter_ts": 1440694334.783, 
                         "duration": 29.957000017166138, 
                         "_id": {
-                            "$oid": "57c0e41cf6858f03bbe41952"
+                            "$oid": "57c85c60f6858f61713e4aa2"
                         }, 
                         "trip_id": {
-                            "$oid": "57c0e41cf6858f03bbe41952"
+                            "$oid": "57c85c60f6858f61713e4aa2"
                         }, 
                         "exit_ts": 1440694364.74
                     }
@@ -1472,7 +1478,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0e41cf6858f03bbe41954", 
+                            "id": "57c85c60f6858f61713e4aa4", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -1619,10 +1625,10 @@
                                 }, 
                                 "duration": 3656.623888731003, 
                                 "end_stop": {
-                                    "$oid": "57c0e41cf6858f03bbe419d5"
+                                    "$oid": "57c85c61f6858f61713e4b25"
                                 }, 
                                 "trip_id": {
-                                    "$oid": "57c0e41cf6858f03bbe41952"
+                                    "$oid": "57c85c60f6858f61713e4aa2"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 8, 
@@ -1789,7 +1795,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0e41cf6858f03bbe419d0", 
+                            "id": "57c85c61f6858f61713e4b20", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -1816,10 +1822,10 @@
                                 }, 
                                 "duration": 60.15400004386902, 
                                 "start_stop": {
-                                    "$oid": "57c0e41cf6858f03bbe419d5"
+                                    "$oid": "57c85c61f6858f61713e4b25"
                                 }, 
                                 "trip_id": {
-                                    "$oid": "57c0e41cf6858f03bbe41952"
+                                    "$oid": "57c85c60f6858f61713e4aa2"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 9, 
@@ -1844,14 +1850,14 @@
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57c0e41cf6858f03bbe41952", 
+            "id": "57c85c60f6858f61713e4aa2", 
             "properties": {
                 "distance": 38158.321602003176, 
                 "end_place": {
-                    "$oid": "57c0e420f6858f03bbe41b85"
+                    "$oid": "57c85c66f6858f61713e4ccb"
                 }, 
                 "raw_trip": {
-                    "$oid": "57c0e419f6858f03bbe418f9"
+                    "$oid": "57c85c5df6858f61713e4a47"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -1873,7 +1879,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57c0e420f6858f03bbe41b84"
+                    "$oid": "57c85c66f6858f61713e4cca"
                 }, 
                 "end_fmt_time": "2015-08-27T09:53:44.894000-07:00", 
                 "end_local_dt": {
@@ -1886,7 +1892,7 @@
                     "day": 27, 
                     "minute": 53
                 }, 
-                "duration": 3706.1260001659393, 
+                "duration": 3746.734888792038, 
                 "start_local_dt": {
                     "hour": 8, 
                     "month": 8, 
@@ -1910,7 +1916,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0e420f6858f03bbe41b85", 
+                    "id": "57c85c66f6858f61713e4ccb", 
                     "properties": {
                         "enter_fmt_time": "2015-08-27T09:53:44.894000-07:00", 
                         "exit_local_dt": {
@@ -1923,6 +1929,7 @@
                             "day": 27, 
                             "minute": 2
                         }, 
+                        "display_name": "Camino Millenia, Millbrae", 
                         "feature_type": "start_place", 
                         "exit_fmt_time": "2015-08-27T10:02:16.470599-07:00", 
                         "enter_local_dt": {
@@ -1936,17 +1943,17 @@
                             "minute": 53
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0e41cf6858f03bbe41952"
+                            "$oid": "57c85c60f6858f61713e4aa2"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0e41cf6858f03bbe419d6"
+                            "$oid": "57c85c61f6858f61713e4b26"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1440694424.894, 
                         "duration": 511.57659935951233, 
                         "raw_places": [
                             {
-                                "$oid": "57c0e419f6858f03bbe418fa"
+                                "$oid": "57c85c5ef6858f61713e4a48"
                             }
                         ], 
                         "exit_ts": 1440694936.4705994
@@ -1961,21 +1968,22 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0e420f6858f03bbe41b86", 
+                    "id": "57c85c67f6858f61713e4ccc", 
                     "properties": {
                         "enter_fmt_time": "2015-08-27T11:14:26.669000-07:00", 
                         "exit_local_dt": {
-                            "hour": 15, 
+                            "hour": 11, 
                             "month": 8, 
-                            "second": 49, 
+                            "second": 50, 
                             "weekday": 3, 
                             "year": 2015, 
                             "timezone": "America/Los_Angeles", 
                             "day": 27, 
-                            "minute": 54
+                            "minute": 27
                         }, 
+                        "display_name": "Hearst Avenue, Berkeley", 
                         "feature_type": "end_place", 
-                        "exit_fmt_time": "2015-08-27T15:54:49.467144-07:00", 
+                        "exit_fmt_time": "2015-08-27T11:27:50.129000-07:00", 
                         "enter_local_dt": {
                             "hour": 11, 
                             "month": 8, 
@@ -1987,23 +1995,23 @@
                             "minute": 14
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0e41cf6858f03bbe419d6"
+                            "$oid": "57c85c61f6858f61713e4b26"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0e41df6858f03bbe41a66"
+                            "$oid": "57c85c62f6858f61713e4bb6"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1440699266.669, 
-                        "duration": 16822.798144340515, 
+                        "duration": 803.460000038147, 
                         "raw_places": [
                             {
-                                "$oid": "57c0e419f6858f03bbe418fc"
+                                "$oid": "57c85c5ef6858f61713e4a4a"
                             }, 
                             {
-                                "$oid": "57c0e419f6858f03bbe418fc"
+                                "$oid": "57c85c5ef6858f61713e4a4a"
                             }
                         ], 
-                        "exit_ts": 1440716089.4671443
+                        "exit_ts": 1440700070.129
                     }
                 }, 
                 {
@@ -2021,7 +2029,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0e41df6858f03bbe41a65", 
+                    "id": "57c85c62f6858f61713e4bb5", 
                     "properties": {
                         "enter_fmt_time": "2015-08-27T10:54:26.704000-07:00", 
                         "distance": 2904.4651460936093, 
@@ -2037,10 +2045,10 @@
                         }, 
                         "feature_type": "stop", 
                         "ending_section": {
-                            "$oid": "57c0e41df6858f03bbe419d8"
+                            "$oid": "57c85c61f6858f61713e4b28"
                         }, 
                         "starting_section": {
-                            "$oid": "57c0e41df6858f03bbe41a43"
+                            "$oid": "57c85c62f6858f61713e4b93"
                         }, 
                         "exit_fmt_time": "2015-08-27T10:58:26.892000-07:00", 
                         "enter_local_dt": {
@@ -2071,10 +2079,10 @@
                         "enter_ts": 1440698066.704, 
                         "duration": 240.18799996376038, 
                         "_id": {
-                            "$oid": "57c0e41cf6858f03bbe419d6"
+                            "$oid": "57c85c61f6858f61713e4b26"
                         }, 
                         "trip_id": {
-                            "$oid": "57c0e41cf6858f03bbe419d6"
+                            "$oid": "57c85c61f6858f61713e4b26"
                         }, 
                         "exit_ts": 1440698306.892
                     }
@@ -2513,7 +2521,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0e41df6858f03bbe419d8", 
+                            "id": "57c85c61f6858f61713e4b28", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -2643,10 +2651,10 @@
                                 }, 
                                 "duration": 3130.233400583267, 
                                 "end_stop": {
-                                    "$oid": "57c0e41df6858f03bbe41a65"
+                                    "$oid": "57c85c62f6858f61713e4bb5"
                                 }, 
                                 "trip_id": {
-                                    "$oid": "57c0e41cf6858f03bbe419d6"
+                                    "$oid": "57c85c61f6858f61713e4b26"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 10, 
@@ -2912,7 +2920,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0e41df6858f03bbe41a43", 
+                            "id": "57c85c62f6858f61713e4b93", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -2968,10 +2976,10 @@
                                 }, 
                                 "duration": 959.7769999504089, 
                                 "start_stop": {
-                                    "$oid": "57c0e41df6858f03bbe41a65"
+                                    "$oid": "57c85c62f6858f61713e4bb5"
                                 }, 
                                 "trip_id": {
-                                    "$oid": "57c0e41cf6858f03bbe419d6"
+                                    "$oid": "57c85c61f6858f61713e4b26"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 10, 
@@ -3025,14 +3033,14 @@
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57c0e41cf6858f03bbe419d6", 
+            "id": "57c85c61f6858f61713e4b26", 
             "properties": {
                 "distance": 44122.97498643092, 
                 "end_place": {
-                    "$oid": "57c0e420f6858f03bbe41b86"
+                    "$oid": "57c85c67f6858f61713e4ccc"
                 }, 
                 "raw_trip": {
-                    "$oid": "57c0e419f6858f03bbe418fb"
+                    "$oid": "57c85c5ef6858f61713e4a49"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -3054,7 +3062,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57c0e420f6858f03bbe41b85"
+                    "$oid": "57c85c66f6858f61713e4ccb"
                 }, 
                 "end_fmt_time": "2015-08-27T11:14:26.669000-07:00", 
                 "end_local_dt": {
@@ -3067,7 +3075,7 @@
                     "day": 27, 
                     "minute": 14
                 }, 
-                "duration": 4113.679999828339, 
+                "duration": 4330.1984004974365, 
                 "start_local_dt": {
                     "hour": 10, 
                     "month": 8, 
@@ -3086,54 +3094,52 @@
                     "geometry": {
                         "type": "Point", 
                         "coordinates": [
-                            -122.2603947, 
-                            37.875023
+                            -122.2714736, 
+                            37.8471355
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0e420f6858f03bbe41b86", 
+                    "id": "57c85c67f6858f61713e4ccd", 
                     "properties": {
-                        "enter_fmt_time": "2015-08-27T11:14:26.669000-07:00", 
+                        "enter_fmt_time": "2015-08-27T15:59:27.376000-07:00", 
                         "exit_local_dt": {
                             "hour": 15, 
                             "month": 8, 
-                            "second": 49, 
+                            "second": 27, 
                             "weekday": 3, 
                             "year": 2015, 
                             "timezone": "America/Los_Angeles", 
                             "day": 27, 
-                            "minute": 54
+                            "minute": 59
                         }, 
+                        "display_name": "Adeline Street, Berkeley", 
                         "feature_type": "start_place", 
-                        "exit_fmt_time": "2015-08-27T15:54:49.467144-07:00", 
+                        "exit_fmt_time": "2015-08-27T15:59:27.376000-07:00", 
                         "enter_local_dt": {
-                            "hour": 11, 
+                            "hour": 15, 
                             "month": 8, 
-                            "second": 26, 
+                            "second": 27, 
                             "weekday": 3, 
                             "year": 2015, 
                             "timezone": "America/Los_Angeles", 
                             "day": 27, 
-                            "minute": 14
+                            "minute": 59
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0e41cf6858f03bbe419d6"
+                            "$oid": "57c85c62f6858f61713e4bb6"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0e41df6858f03bbe41a66"
+                            "$oid": "57c85c62f6858f61713e4bb7"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
-                        "enter_ts": 1440699266.669, 
-                        "duration": 16822.798144340515, 
+                        "enter_ts": 1440716367.376, 
+                        "duration": 0.0, 
                         "raw_places": [
                             {
-                                "$oid": "57c0e419f6858f03bbe418fc"
-                            }, 
-                            {
-                                "$oid": "57c0e419f6858f03bbe418fc"
+                                "$oid": "57c85c5ef6858f61713e4a50"
                             }
                         ], 
-                        "exit_ts": 1440716089.4671443
+                        "exit_ts": 1440716367.376
                     }
                 }, 
                 {
@@ -3145,7 +3151,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0e420f6858f03bbe41b87", 
+                    "id": "57c85c67f6858f61713e4cce", 
                     "properties": {
                         "enter_fmt_time": "2015-08-27T16:54:59.470000-07:00", 
                         "exit_local_dt": {
@@ -3158,6 +3164,7 @@
                             "day": 27, 
                             "minute": 57
                         }, 
+                        "display_name": "Serra Avenue, Millbrae", 
                         "feature_type": "end_place", 
                         "exit_fmt_time": "2015-08-27T16:57:59.470000-07:00", 
                         "enter_local_dt": {
@@ -3171,17 +3178,17 @@
                             "minute": 54
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0e41df6858f03bbe41a66"
+                            "$oid": "57c85c62f6858f61713e4bb7"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0e41ef6858f03bbe41ae5"
+                            "$oid": "57c85c63f6858f61713e4c2b"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1440719699.47, 
                         "duration": 180.0, 
                         "raw_places": [
                             {
-                                "$oid": "57c0e419f6858f03bbe41900"
+                                "$oid": "57c85c5ef6858f61713e4a4e"
                             }
                         ], 
                         "exit_ts": 1440719879.47
@@ -3202,7 +3209,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0e41ef6858f03bbe41ae4", 
+                    "id": "57c85c63f6858f61713e4c2a", 
                     "properties": {
                         "enter_fmt_time": "2015-08-27T16:51:59.226000-07:00", 
                         "distance": 2.251187528064414, 
@@ -3218,10 +3225,10 @@
                         }, 
                         "feature_type": "stop", 
                         "ending_section": {
-                            "$oid": "57c0e41ef6858f03bbe41a68"
+                            "$oid": "57c85c63f6858f61713e4bb9"
                         }, 
                         "starting_section": {
-                            "$oid": "57c0e41ef6858f03bbe41add"
+                            "$oid": "57c85c63f6858f61713e4c23"
                         }, 
                         "exit_fmt_time": "2015-08-27T16:52:59.435000-07:00", 
                         "enter_local_dt": {
@@ -3252,10 +3259,10 @@
                         "enter_ts": 1440719519.226, 
                         "duration": 60.20899987220764, 
                         "_id": {
-                            "$oid": "57c0e41df6858f03bbe41a66"
+                            "$oid": "57c85c62f6858f61713e4bb7"
                         }, 
                         "trip_id": {
-                            "$oid": "57c0e41df6858f03bbe41a66"
+                            "$oid": "57c85c62f6858f61713e4bb7"
                         }, 
                         "exit_ts": 1440719579.435
                     }
@@ -3268,324 +3275,280 @@
                                 "type": "LineString", 
                                 "coordinates": [
                                     [
-                                        -122.2589186, 
-                                        37.8752735
+                                        -122.26786632623609, 
+                                        37.83616163476735
                                     ], 
                                     [
-                                        -122.26027390046023, 
-                                        37.872236029322984
+                                        -122.2675080224559, 
+                                        37.83247665018014
                                     ], 
                                     [
-                                        -122.26162920092045, 
-                                        37.86919855864598
-                                    ], 
-                                    [
-                                        -122.26298450138069, 
-                                        37.86616108796896
-                                    ], 
-                                    [
-                                        -122.2643398018409, 
-                                        37.86312361729195
-                                    ], 
-                                    [
-                                        -122.26569510230114, 
-                                        37.86008614661493
-                                    ], 
-                                    [
-                                        -122.26705040276137, 
-                                        37.857048675937925
-                                    ], 
-                                    [
-                                        -122.26840570322159, 
-                                        37.85401120526091
-                                    ], 
-                                    [
-                                        -122.26976100368182, 
-                                        37.850973734583896
-                                    ], 
-                                    [
-                                        -122.27111630414204, 
-                                        37.84793626390689
-                                    ], 
-                                    [
-                                        -122.27047906424573, 
-                                        37.84305482651795
-                                    ], 
-                                    [
-                                        -122.26848797826918, 
-                                        37.83750619452613
-                                    ], 
-                                    [
-                                        -122.26749552099173, 
-                                        37.83337242158392
-                                    ], 
-                                    [
-                                        -122.26754294174897, 
-                                        37.82997456692428
+                                        -122.26755544321314, 
+                                        37.8290787955205
                                     ], 
                                     [
                                         -122.2675635, 
                                         37.8285015
                                     ], 
                                     [
-                                        -122.26759160353716, 
-                                        37.82823209367825
+                                        -122.26760443194355, 
+                                        37.82810911792033
                                     ], 
                                     [
-                                        -122.26827456844036, 
-                                        37.82494684519473
+                                        -122.26858367466076, 
+                                        37.82350724449178
                                     ], 
                                     [
-                                        -122.26923731947537, 
-                                        37.82013178727551
+                                        -122.26944815465468, 
+                                        37.818994679273544
                                     ], 
                                     [
-                                        -122.27003706290702, 
-                                        37.81581849070599
+                                        -122.27024789808634, 
+                                        37.81468138270404
                                     ], 
                                     [
-                                        -122.27086075125969, 
-                                        37.813102997787034
+                                        -122.27108281999597, 
+                                        37.8127154858414
                                     ], 
                                     [
-                                        -122.27170310600239, 
-                                        37.81163308117149
+                                        -122.27192517473868, 
+                                        37.81124556922586
                                     ], 
                                     [
-                                        -122.2725454607451, 
-                                        37.81016316455596
+                                        -122.2727675294814, 
+                                        37.80977565261033
                                     ], 
                                     [
-                                        -122.27338781548782, 
-                                        37.808693247940425
+                                        -122.27360988422411, 
+                                        37.80830573599479
                                     ], 
                                     [
-                                        -122.27423017023054, 
-                                        37.80722333132489
+                                        -122.27445223896682, 
+                                        37.80683581937926
                                     ], 
                                     [
-                                        -122.27507252497324, 
-                                        37.80575341470936
+                                        -122.27529459370953, 
+                                        37.805365902763725
                                     ], 
                                     [
-                                        -122.27591487971596, 
-                                        37.80428349809382
+                                        -122.27613694845225, 
+                                        37.803895986148184
                                     ], 
                                     [
-                                        -122.27675723445867, 
-                                        37.80281358147828
+                                        -122.27697930319496, 
+                                        37.80242606953265
                                     ], 
                                     [
-                                        -122.27759958920139, 
-                                        37.80134366486275
+                                        -122.27782165793766, 
+                                        37.80095615291712
                                     ], 
                                     [
-                                        -122.27844194394409, 
-                                        37.799873748247215
+                                        -122.27866401268038, 
+                                        37.79948623630158
                                     ], 
                                     [
-                                        -122.28073034634791, 
-                                        37.7999230435577
+                                        -122.28164793791302, 
+                                        37.80026624513196
                                     ], 
                                     [
-                                        -122.28496134825374, 
-                                        37.80152749951458
+                                        -122.28624065032594, 
+                                        37.80201657433343
                                     ], 
                                     [
-                                        -122.28981401768344, 
-                                        37.80338266607286
+                                        -122.29109331975565, 
+                                        37.803871740891715
                                     ], 
                                     [
-                                        -122.29311568500833, 
-                                        37.80453339132447
+                                        -122.2936441887295, 
+                                        37.80468146507711
                                     ], 
                                     [
-                                        -122.29419231991496, 
-                                        37.8047096045723
+                                        -122.29427078705407, 
+                                        37.804670765971565
                                     ], 
                                     [
-                                        -122.297520233528, 
-                                        37.80565990994512
+                                        -122.2990713418114, 
+                                        37.8061544933156
                                     ], 
                                     [
-                                        -122.30391248979782, 
-                                        37.8073855360997
+                                        -122.30571109965662, 
+                                        37.80780690783083
                                     ], 
                                     [
-                                        -122.30894183737323, 
-                                        37.80686746272269
+                                        -122.30986702322102, 
+                                        37.80625795616244
                                     ], 
                                     [
-                                        -122.31245126738035, 
-                                        37.804555472523965
+                                        -122.31337645322813, 
+                                        37.80394596596371
                                     ], 
                                     [
-                                        -122.31596069738747, 
-                                        37.80224348232524
+                                        -122.31688588323524, 
+                                        37.801633975764986
                                     ], 
                                     [
-                                        -122.31947012739458, 
-                                        37.79993149212651
+                                        -122.32039531324237, 
+                                        37.79932198556626
                                     ], 
                                     [
-                                        -122.3229795574017, 
-                                        37.79761950192778
+                                        -122.32390474324949, 
+                                        37.797009995367524
                                     ], 
                                     [
-                                        -122.32648898740881, 
-                                        37.79530751172905
+                                        -122.3274141732566, 
+                                        37.7946980051688
                                     ], 
                                     [
-                                        -122.32999841741594, 
-                                        37.79299552153032
+                                        -122.33092360326371, 
+                                        37.79238601497007
                                     ], 
                                     [
-                                        -122.33350784742305, 
-                                        37.790683531331595
+                                        -122.33443303327083, 
+                                        37.79007402477134
                                     ], 
                                     [
-                                        -122.33701727743016, 
-                                        37.78837154113287
+                                        -122.33794246327795, 
+                                        37.78776203457261
                                     ], 
                                     [
-                                        -122.34052670743728, 
-                                        37.786059550934134
+                                        -122.34145189328507, 
+                                        37.78545004437388
                                     ], 
                                     [
-                                        -122.34403613744439, 
-                                        37.78374756073541
+                                        -122.34496132329218, 
+                                        37.783138054175154
                                     ], 
                                     [
-                                        -122.34754556745152, 
-                                        37.78143557053668
+                                        -122.3484707532993, 
+                                        37.78082606397643
                                     ], 
                                     [
-                                        -122.35105499745863, 
-                                        37.77912358033795
+                                        -122.35198018330641, 
+                                        37.7785140737777
                                     ], 
                                     [
-                                        -122.35456442746575, 
-                                        37.77681159013922
+                                        -122.35548961331354, 
+                                        37.776202083578966
                                     ], 
                                     [
-                                        -122.35807385747286, 
-                                        37.77449959994049
+                                        -122.35899904332065, 
+                                        37.77389009338024
                                     ], 
                                     [
-                                        -122.36158328747997, 
-                                        37.77218760974176
+                                        -122.36250847332776, 
+                                        37.77157810318151
                                     ], 
                                     [
-                                        -122.3650927174871, 
-                                        37.769875619543036
+                                        -122.36601790333488, 
+                                        37.769266112982784
                                     ], 
                                     [
-                                        -122.36860214749422, 
-                                        37.76756362934431
+                                        -122.36952733334199, 
+                                        37.76695412278406
                                     ], 
                                     [
-                                        -122.37211157750133, 
-                                        37.765251639145575
+                                        -122.37303676334912, 
+                                        37.76464213258532
                                     ], 
                                     [
-                                        -122.37562100750844, 
-                                        37.76293964894685
+                                        -122.37654619335623, 
+                                        37.762330142386595
                                     ], 
                                     [
-                                        -122.37913043751556, 
-                                        37.76062765874812
+                                        -122.38005562336335, 
+                                        37.76001815218787
                                     ], 
                                     [
-                                        -122.38263986752268, 
-                                        37.75831566854939
+                                        -122.38356505337046, 
+                                        37.75770616198914
                                     ], 
                                     [
-                                        -122.3861492975298, 
-                                        37.756003678350666
+                                        -122.38707448337757, 
+                                        37.755394171790414
                                     ], 
                                     [
-                                        -122.38965872753691, 
-                                        37.75369168815193
+                                        -122.3905839133847, 
+                                        37.75308218159168
                                     ], 
                                     [
-                                        -122.39316815754403, 
-                                        37.751379697953205
+                                        -122.39409334339182, 
+                                        37.75077019139295
                                     ], 
                                     [
-                                        -122.39667758755114, 
-                                        37.74906770775448
+                                        -122.39760277339893, 
+                                        37.748458201194225
                                     ], 
                                     [
-                                        -122.40018701755827, 
-                                        37.74675571755575
+                                        -122.40111220340604, 
+                                        37.7461462109955
                                     ], 
                                     [
-                                        -122.40369644756538, 
-                                        37.74444372735702
+                                        -122.40462163341316, 
+                                        37.743834220796764
                                     ], 
                                     [
-                                        -122.4072058775725, 
-                                        37.74213173715829
+                                        -122.40813106342029, 
+                                        37.74152223059804
                                     ], 
                                     [
-                                        -122.41071530757961, 
-                                        37.73981974695956
+                                        -122.4116404934274, 
+                                        37.73921024039931
                                     ], 
                                     [
-                                        -122.41422473758672, 
-                                        37.737507756760834
+                                        -122.41514992343451, 
+                                        37.73689825020058
                                     ], 
                                     [
-                                        -122.41773416759385, 
-                                        37.73519576656211
+                                        -122.41865935344163, 
+                                        37.734586260001855
                                     ], 
                                     [
-                                        -122.42124359760096, 
-                                        37.73288377636337
+                                        -122.42216878344874, 
+                                        37.73227426980312
                                     ], 
                                     [
-                                        -122.42475302760808, 
-                                        37.730571786164646
+                                        -122.42567821345587, 
+                                        37.72996227960439
                                     ], 
                                     [
-                                        -122.42826245761519, 
-                                        37.72825979596592
+                                        -122.42918764346298, 
+                                        37.727650289405666
                                     ], 
                                     [
-                                        -122.4317718876223, 
-                                        37.72594780576719
+                                        -122.4326970734701, 
+                                        37.72533829920694
                                     ], 
                                     [
-                                        -122.43528131762943, 
-                                        37.723635815568464
+                                        -122.43620650347721, 
+                                        37.72302630900821
                                     ], 
                                     [
-                                        -122.43879074763655, 
-                                        37.72132382536973
+                                        -122.43971593348432, 
+                                        37.72071431880948
                                     ], 
                                     [
-                                        -122.44230017764366, 
-                                        37.719011835171
+                                        -122.44322536349145, 
+                                        37.71840232861075
                                     ], 
                                     [
-                                        -122.44580960765077, 
-                                        37.716699844972275
+                                        -122.44673479349856, 
+                                        37.71609033841202
                                     ], 
                                     [
-                                        -122.44931903765789, 
-                                        37.71438785477355
+                                        -122.45024422350568, 
+                                        37.713778348213296
                                     ], 
                                     [
-                                        -122.45282846766501, 
-                                        37.71207586457482
+                                        -122.45375365351279, 
+                                        37.71146635801457
                                     ], 
                                     [
-                                        -122.45533439420115, 
-                                        37.710830883916785
+                                        -122.45578716957253, 
+                                        37.71072368402514
                                     ], 
                                     [
-                                        -122.45705186910484, 
-                                        37.710424251544055
+                                        -122.45750464447623, 
+                                        37.7103170516524
                                     ], 
                                     [
                                         -122.4578115, 
@@ -3600,132 +3563,132 @@
                                         37.7102444
                                     ], 
                                     [
-                                        -122.45651092540835, 
-                                        37.708198110179076
+                                        -122.4559282497936, 
+                                        37.70728134370753
                                     ], 
                                     [
-                                        -122.45430071078852, 
-                                        37.70472061668685
+                                        -122.45371803517376, 
+                                        37.7038038502153
                                     ], 
                                     [
-                                        -122.45209049616868, 
-                                        37.70124312319463
+                                        -122.45150782055393, 
+                                        37.70032635672308
                                     ], 
                                     [
-                                        -122.44988028154886, 
-                                        37.6977656297024
+                                        -122.44929760593409, 
+                                        37.696848863230855
                                     ], 
                                     [
-                                        -122.44767006692902, 
-                                        37.69428813621018
+                                        -122.44708739131426, 
+                                        37.693371369738635
                                     ], 
                                     [
-                                        -122.44545985230918, 
-                                        37.690810642717956
+                                        -122.44487717669443, 
+                                        37.68989387624641
                                     ], 
                                     [
-                                        -122.44324963768935, 
-                                        37.687333149225736
+                                        -122.4426669620746, 
+                                        37.68641638275419
                                     ], 
                                     [
-                                        -122.44103942306951, 
-                                        37.68385565573351
+                                        -122.44045674745476, 
+                                        37.68293888926196
                                     ], 
                                     [
-                                        -122.43882920844969, 
-                                        37.68037816224129
+                                        -122.43824653283492, 
+                                        37.67946139576974
                                     ], 
                                     [
-                                        -122.43661899382985, 
-                                        37.67690066874906
+                                        -122.4360363182151, 
+                                        37.675983902277515
                                     ], 
                                     [
-                                        -122.43440877921002, 
-                                        37.67342317525684
+                                        -122.43382610359527, 
+                                        37.67250640878529
                                     ], 
                                     [
-                                        -122.43219856459018, 
-                                        37.66994568176462
+                                        -122.43161588897543, 
+                                        37.66902891529307
                                     ], 
                                     [
-                                        -122.42998834997036, 
-                                        37.6664681882724
+                                        -122.42940567435559, 
+                                        37.66555142180084
                                     ], 
                                     [
-                                        -122.42777813535052, 
-                                        37.66299069478017
+                                        -122.42719545973576, 
+                                        37.66207392830862
                                     ], 
                                     [
-                                        -122.42556792073069, 
-                                        37.65951320128795
+                                        -122.42498524511593, 
+                                        37.658596434816396
                                     ], 
                                     [
-                                        -122.42335770611085, 
-                                        37.65603570779572
+                                        -122.4227750304961, 
+                                        37.655118941324176
                                     ], 
                                     [
-                                        -122.42114749149101, 
-                                        37.652558214303504
+                                        -122.42056481587626, 
+                                        37.65164144783195
                                     ], 
                                     [
-                                        -122.41893727687119, 
-                                        37.64908072081128
+                                        -122.41835460125642, 
+                                        37.64816395433973
                                     ], 
                                     [
-                                        -122.41672706225135, 
-                                        37.64560322731906
+                                        -122.41614438663659, 
+                                        37.6446864608475
                                     ], 
                                     [
-                                        -122.41451684763152, 
-                                        37.64212573382683
+                                        -122.41393417201677, 
+                                        37.64120896735528
                                     ], 
                                     [
-                                        -122.41230663301168, 
-                                        37.63864824033461
+                                        -122.41172395739693, 
+                                        37.637731473863056
                                     ], 
                                     [
-                                        -122.41009641839184, 
-                                        37.635170746842384
+                                        -122.4095137427771, 
+                                        37.634253980370836
                                     ], 
                                     [
-                                        -122.40788620377202, 
-                                        37.63169325335016
+                                        -122.40730352815726, 
+                                        37.63077648687861
                                     ], 
                                     [
-                                        -122.40567598915219, 
-                                        37.62821575985794
+                                        -122.40509331353744, 
+                                        37.62729899338639
                                     ], 
                                     [
-                                        -122.40346577453235, 
-                                        37.62473826636571
+                                        -122.4028830989176, 
+                                        37.62382149989416
                                     ], 
                                     [
-                                        -122.40125555991251, 
-                                        37.62126077287349
+                                        -122.40067288429776, 
+                                        37.62034400640194
                                     ], 
                                     [
-                                        -122.39904534529268, 
-                                        37.617783279381264
+                                        -122.39846266967793, 
+                                        37.616866512909716
                                     ], 
                                     [
-                                        -122.39683513067286, 
-                                        37.614305785889044
+                                        -122.39625245505809, 
+                                        37.6133890194175
                                     ], 
                                     [
-                                        -122.39462491605302, 
-                                        37.61082829239682
+                                        -122.39404224043827, 
+                                        37.60991152592527
                                     ], 
                                     [
-                                        -122.39241470143318, 
-                                        37.6073507989046
+                                        -122.39183202581843, 
+                                        37.60643403243305
                                     ], 
                                     [
-                                        -122.39020448681335, 
-                                        37.60387330541237
+                                        -122.3896218111986, 
+                                        37.60295653894082
                                     ], 
                                     [
-                                        -122.38799427219352, 
-                                        37.60039581192015
+                                        -122.38741159657876, 
+                                        37.599479045448604
                                     ], 
                                     [
                                         -122.3872753, 
@@ -3734,132 +3697,121 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0e41ef6858f03bbe41a68", 
+                            "id": "57c85c63f6858f61713e4bb9", 
                             "properties": {
                                 "distances": [
-                                    0.0, 
-                                    358.0883840297351, 
-                                    358.09001342205386, 
-                                    358.0916427653755, 
-                                    358.0932720557891, 
-                                    358.09490129568, 
-                                    358.09653048304205, 
-                                    358.0981596200931, 
-                                    358.0997887058236, 
-                                    358.1014177385577, 
-                                    545.6674978911908, 
-                                    641.2755606439994, 
-                                    467.84464933461356, 
-                                    377.8471519104518, 
-                                    163.80751971382054, 
-                                    30.058129918133474, 
-                                    370.1950827076632, 
-                                    542.0467935207242, 
-                                    484.73409636414726, 
-                                    310.49738412270847, 
-                                    179.41767912787387, 
-                                    179.41828672555445, 
-                                    179.4188943133905, 
-                                    179.41950189117563, 
-                                    179.42010945839334, 
-                                    179.42071701730677, 
-                                    179.42132456421032, 
-                                    179.4219321017767, 
-                                    179.42253962876958, 
-                                    201.13682675716535, 
-                                    412.332224583864, 
-                                    473.6302242304946, 
-                                    317.04066036354175, 
-                                    96.59668108966284, 
-                                    310.8835050448085, 
-                                    593.4580773012291, 
-                                    445.58158955559287, 
-                                    401.43684168531, 
-                                    401.44425495539934, 
-                                    401.45166793602266, 
-                                    401.4590806266949, 
-                                    401.4664930258658, 
-                                    401.47390513598043, 
-                                    401.48131695362315, 
-                                    401.48872848163927, 
-                                    401.4961397195432, 
-                                    401.50355066578516, 
-                                    401.51096132281, 
-                                    401.51837168720164, 
-                                    401.5257817623118, 
-                                    401.53319154563144, 
-                                    401.5406010386459, 
-                                    401.54801024177664, 
-                                    401.5554191521131, 
-                                    401.56282777300737, 
-                                    401.57023610195034, 
-                                    401.57764414042737, 
-                                    401.5850518888603, 
-                                    401.59245934433756, 
-                                    401.5998665102121, 
-                                    401.60727338397487, 
-                                    401.61467996711093, 
-                                    401.6220862600423, 
-                                    401.62949225985705, 
-                                    401.63689796990855, 
-                                    401.64430338768767, 
-                                    401.65170851467934, 
-                                    401.659113351306, 
-                                    401.6665178951607, 
-                                    401.6739221475747, 
-                                    401.68132610907276, 
-                                    401.68872977911724, 
-                                    401.6961331586363, 
-                                    401.7035362452224, 
-                                    401.71093904020756, 
-                                    401.7183415441164, 
-                                    401.725743756411, 
-                                    401.7331456780199, 
-                                    260.30188052693643, 
-                                    157.702768257335, 
-                                    69.75142975792811, 
+                                    616.904173329822, 
+                                    410.95802603243146, 
+                                    377.8471524677576, 
+                                    64.19623295203787, 
+                                    43.77874846473474, 
+                                    518.882701012275, 
+                                    507.487180865965, 
+                                    484.7342531905478, 
+                                    230.57378817099993, 
+                                    179.41783930949697, 
+                                    179.41844690401348, 
+                                    179.41905448919997, 
+                                    179.4196620638202, 
+                                    179.42026962941745, 
+                                    179.42087718516515, 
+                                    179.42148472941756, 
+                                    179.42209226381738, 
+                                    179.42269978918839, 
+                                    276.14608069647124, 
+                                    448.0004509626269, 
+                                    473.62768288938776, 
+                                    241.51971275853097, 
+                                    55.06306685887056, 
+                                    452.8729366468228, 
+                                    611.5759586912512, 
+                                    403.69573284082264, 
+                                    401.43879606223294, 
+                                    401.44620925671995, 
+                                    401.45362216173265, 
+                                    401.4610347748677, 
+                                    401.46844709745216, 
+                                    401.4758591300125, 
+                                    401.4832708720108, 
+                                    401.4906823248798, 
+                                    401.4980934841922, 
+                                    401.50550435431114, 
+                                    401.512914933739, 
+                                    401.520325222444, 
+                                    401.52773522185913, 
+                                    401.53514492755636, 
+                                    401.5425543438994, 
+                                    401.5499634693907, 
+                                    401.5573723039983, 
+                                    401.5647808491553, 
+                                    401.5721891004334, 
+                                    401.5795970621965, 
+                                    401.5870047329475, 
+                                    401.59441211265374, 
+                                    401.60181920274897, 
+                                    401.6092259988041, 
+                                    401.61663250518393, 
+                                    401.62403872039084, 
+                                    401.631444644898, 
+                                    401.6388502781166, 
+                                    401.6462556186513, 
+                                    401.6536606688445, 
+                                    401.661065427704, 
+                                    401.6684698957033, 
+                                    401.6758740722537, 
+                                    401.6832779559591, 
+                                    401.69068154916283, 
+                                    401.69808485087214, 
+                                    401.70548786156087, 
+                                    401.7128905806403, 
+                                    401.7202930067139, 
+                                    401.7276951421253, 
+                                    401.735096985882, 
+                                    197.02412315205953, 
+                                    157.70297763960681, 
+                                    28.176349668486797, 
                                     0.0, 
                                     0.0, 
-                                    254.68184286330717, 
-                                    432.8131347763498, 
-                                    432.81723316807467, 
-                                    432.82133139231377, 
-                                    432.825429447873, 
-                                    432.8295273358353, 
-                                    432.83362505388305, 
-                                    432.83772260478435, 
-                                    432.8418199850982, 
-                                    432.8459171992781, 
-                                    432.8500142427595, 
-                                    432.8541111188718, 
-                                    432.85820782417443, 
-                                    432.862304363121, 
-                                    432.86640073114654, 
-                                    432.8704969315808, 
-                                    432.87459296154515, 
-                                    432.8786888232446, 
-                                    432.88278451548786, 
-                                    432.8868800393551, 
-                                    432.8909753925302, 
-                                    432.8950705777807, 
-                                    432.89916559237116, 
-                                    432.9032604379338, 
-                                    432.90735511484263, 
-                                    432.9114496207817, 
-                                    432.91554395851836, 
-                                    432.91963812461154, 
-                                    432.92373212351697, 
-                                    432.9278259506678, 
-                                    432.93191960939413, 
-                                    432.93601309625484, 
-                                    140.83288672334058
+                                    368.7833323045045, 
+                                    432.81421524582737, 
+                                    432.8183135931796, 
+                                    432.8224117735929, 
+                                    432.8265097841885, 
+                                    432.8306076271722, 
+                                    432.8347053013505, 
+                                    432.83880280780573, 
+                                    432.84290014422083, 
+                                    432.8469973128014, 
+                                    432.8510943130607, 
+                                    432.8551911432568, 
+                                    432.8592878060137, 
+                                    432.8633842984527, 
+                                    432.86748062277894, 
+                                    432.8715767778007, 
+                                    432.8756727645987, 
+                                    432.87976858085653, 
+                                    432.8838642293418, 
+                                    432.8879597066131, 
+                                    432.8920550171259, 
+                                    432.89615015631375, 
+                                    432.90024512750676, 
+                                    432.9043399272639, 
+                                    432.90843456004035, 
+                                    432.9125290212698, 
+                                    432.91662331428216, 
+                                    432.92071743619925, 
+                                    432.9248113892254, 
+                                    432.9289051721709, 
+                                    432.9329987861145, 
+                                    432.9370922287407, 
+                                    26.69792341463841
                                 ], 
                                 "end_ts": 1440719519.226, 
                                 "feature_type": "section", 
-                                "distance": 42389.63802238451, 
+                                "distance": 38495.24301610827, 
                                 "sensed_mode": "MotionTypes.IN_VEHICLE", 
-                                "start_ts": 1440716089.4671443, 
-                                "start_fmt_time": "2015-08-27T15:54:49.467144-07:00", 
+                                "start_ts": 1440716367.376, 
+                                "start_fmt_time": "2015-08-27T15:59:27.376000-07:00", 
                                 "source": "SmoothedHighConfidenceMotion", 
                                 "end_fmt_time": "2015-08-27T16:51:59.226000-07:00", 
                                 "end_local_dt": {
@@ -3872,140 +3824,129 @@
                                     "day": 27, 
                                     "minute": 51
                                 }, 
-                                "duration": 3429.758855819702, 
+                                "duration": 3151.850000143051, 
                                 "end_stop": {
-                                    "$oid": "57c0e41ef6858f03bbe41ae4"
+                                    "$oid": "57c85c63f6858f61713e4c2a"
                                 }, 
                                 "trip_id": {
-                                    "$oid": "57c0e41df6858f03bbe41a66"
+                                    "$oid": "57c85c62f6858f61713e4bb7"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 15, 
                                     "month": 8, 
-                                    "second": 49, 
+                                    "second": 27, 
                                     "weekday": 3, 
                                     "year": 2015, 
                                     "timezone": "America/Los_Angeles", 
                                     "day": 27, 
-                                    "minute": 54
+                                    "minute": 59
                                 }, 
                                 "speeds": [
-                                    0.0, 
-                                    11.936279467657837, 
-                                    11.93633378073513, 
-                                    11.936388092179184, 
-                                    11.936442401859637, 
-                                    11.936496709856, 
-                                    11.9365510161014, 
-                                    11.93660532066977, 
-                                    11.936659623527452, 
-                                    11.93671392461859, 
-                                    18.188916596373026, 
-                                    21.375852021466645, 
-                                    15.59482164448712, 
-                                    12.594905063681727, 
-                                    5.460250657127351, 
-                                    1.0019376639377824, 
-                                    12.339836090255439, 
-                                    18.06822645069081, 
-                                    16.15780321213824, 
-                                    10.349912804090282, 
-                                    5.9805893042624625, 
-                                    5.9806095575184814, 
-                                    5.98062981044635, 
-                                    5.980650063039188, 
-                                    5.980670315279778, 
-                                    5.980690567243559, 
-                                    5.980710818807011, 
-                                    5.980731070059223, 
-                                    5.980751320958986, 
-                                    6.704560891905512, 
-                                    13.7444074861288, 
-                                    15.787674141016486, 
-                                    10.568022012118059, 
-                                    3.219889369655428, 
-                                    10.362783501493617, 
-                                    19.781935910040968, 
-                                    14.852719651853096, 
-                                    13.381228056177001, 
-                                    13.381475165179978, 
-                                    13.381722264534089, 
-                                    13.381969354223164, 
-                                    13.382216434195527, 
-                                    13.382463504532682, 
-                                    13.382710565120771, 
-                                    13.382957616054643, 
-                                    13.383204657318107, 
-                                    13.383451688859505, 
-                                    13.383698710760333, 
-                                    13.383945722906722, 
-                                    13.384192725410394, 
-                                    13.384439718187714, 
-                                    13.384686701288196, 
-                                    13.384933674725888, 
-                                    13.385180638403769, 
-                                    13.38542759243358, 
-                                    13.385674536731678, 
-                                    13.38592147134758, 
-                                    13.386168396295343, 
-                                    13.386415311477919, 
-                                    13.38666221700707, 
-                                    13.386909112799163, 
-                                    13.387155998903697, 
-                                    13.387402875334743, 
-                                    13.387649741995235, 
-                                    13.387896598996951, 
-                                    13.388143446256256, 
-                                    13.388390283822645, 
-                                    13.388637111710201, 
-                                    13.388883929838691, 
-                                    13.389130738252488, 
-                                    13.389377536969091, 
-                                    13.389624325970575, 
-                                    13.389871105287877, 
-                                    13.390117874840746, 
-                                    13.390364634673585, 
-                                    13.390611384803881, 
-                                    13.3908581252137, 
-                                    13.391104855933998, 
-                                    8.676729350897881, 
-                                    5.256758941911167, 
-                                    2.3250476585976037, 
+                                    20.5634724443274, 
+                                    13.698600867747716, 
+                                    12.594905082258586, 
+                                    2.139874431734596, 
+                                    1.459291615491158, 
+                                    17.296090033742498, 
+                                    16.916239362198834, 
+                                    16.157808439684928, 
+                                    7.685792939033331, 
+                                    5.980594643649899, 
+                                    5.980614896800449, 
+                                    5.9806351496399985, 
+                                    5.98065540212734, 
+                                    5.980675654313915, 
+                                    5.980695906172172, 
+                                    5.980716157647252, 
+                                    5.980736408793913, 
+                                    5.980756659639613, 
+                                    9.204869356549041, 
+                                    14.933348365420898, 
+                                    15.787589429646259, 
+                                    8.050657091951033, 
+                                    1.8354355619623521, 
+                                    15.095764554894092, 
+                                    20.385865289708374, 
+                                    13.456524428027421, 
+                                    13.381293202074431, 
+                                    13.381540308557332, 
+                                    13.381787405391089, 
+                                    13.38203449249559, 
+                                    13.382281569915072, 
+                                    13.382528637667084, 
+                                    13.382775695733693, 
+                                    13.38302274416266, 
+                                    13.383269782806407, 
+                                    13.383516811810372, 
+                                    13.383763831124634, 
+                                    13.384010840748134, 
+                                    13.384257840728639, 
+                                    13.384504830918546, 
+                                    13.384751811463312, 
+                                    13.384998782313025, 
+                                    13.38524574346661, 
+                                    13.385492694971843, 
+                                    13.385739636681112, 
+                                    13.385986568739884, 
+                                    13.386233491098249, 
+                                    13.386480403755124, 
+                                    13.3867273067583, 
+                                    13.386974199960138, 
+                                    13.38722108350613, 
+                                    13.387467957346361, 
+                                    13.3877148214966, 
+                                    13.38796167593722, 
+                                    13.38820852062171, 
+                                    13.38845535562815, 
+                                    13.388702180923467, 
+                                    13.388948996523444, 
+                                    13.389195802408457, 
+                                    13.38944259853197, 
+                                    13.389689384972094, 
+                                    13.389936161695738, 
+                                    13.390182928718696, 
+                                    13.390429686021344, 
+                                    13.39067643355713, 
+                                    13.390923171404177, 
+                                    13.3911698995294, 
+                                    6.567470771735318, 
+                                    5.256765921320227, 
+                                    0.9392116556162265, 
                                     0.0, 
                                     0.0, 
-                                    8.489394762110239, 
-                                    14.427104492544993, 
-                                    14.427241105602489, 
-                                    14.427377713077126, 
-                                    14.4275143149291, 
-                                    14.42765091119451, 
-                                    14.427787501796102, 
-                                    14.427924086826145, 
-                                    14.428060666169939, 
-                                    14.428197239975937, 
-                                    14.428333808091985, 
-                                    14.42847037062906, 
-                                    14.428606927472481, 
-                                    14.4287434787707, 
-                                    14.428880024371551, 
-                                    14.429016564386027, 
-                                    14.42915309871817, 
-                                    14.429289627441486, 
-                                    14.429426150516262, 
-                                    14.429562667978503, 
-                                    14.429699179751006, 
-                                    14.429835685926024, 
-                                    14.429972186412373, 
-                                    14.43010868126446, 
-                                    14.430245170494754, 
-                                    14.430381654026057, 
-                                    14.430518131950612, 
-                                    14.430654604153718, 
-                                    14.430791070783899, 
-                                    14.430927531688926, 
-                                    14.431063986979805, 
-                                    14.431200436541827, 
-                                    14.431290852664628
+                                    12.292777743483482, 
+                                    14.427140508194245, 
+                                    14.427277119772652, 
+                                    14.42741372578643, 
+                                    14.427550326139617, 
+                                    14.427686920905739, 
+                                    14.427823510045016, 
+                                    14.427960093593525, 
+                                    14.428096671474028, 
+                                    14.428233243760047, 
+                                    14.428369810435356, 
+                                    14.428506371441893, 
+                                    14.428642926867123, 
+                                    14.42877947661509, 
+                                    14.428916020759297, 
+                                    14.429052559260024, 
+                                    14.429189092153289, 
+                                    14.429325619361885, 
+                                    14.429462140978059, 
+                                    14.429598656887103, 
+                                    14.429735167237531, 
+                                    14.429871671877125, 
+                                    14.430008170916892, 
+                                    14.43014466424213, 
+                                    14.430281152001346, 
+                                    14.430417634042326, 
+                                    14.430554110476072, 
+                                    14.430690581206642, 
+                                    14.430827046307513, 
+                                    14.430963505739031, 
+                                    14.431099959537152, 
+                                    14.43123640762469, 
+                                    14.431308837958444
                                 ]
                             }
                         }
@@ -4045,7 +3986,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0e41ef6858f03bbe41add", 
+                            "id": "57c85c63f6858f61713e4c23", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -4074,10 +4015,10 @@
                                 }, 
                                 "duration": 120.03500008583069, 
                                 "start_stop": {
-                                    "$oid": "57c0e41ef6858f03bbe41ae4"
+                                    "$oid": "57c85c63f6858f61713e4c2a"
                                 }, 
                                 "trip_id": {
-                                    "$oid": "57c0e41df6858f03bbe41a66"
+                                    "$oid": "57c85c62f6858f61713e4bb7"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 16, 
@@ -4104,26 +4045,26 @@
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57c0e41df6858f03bbe41a66", 
+            "id": "57c85c62f6858f61713e4bb7", 
             "properties": {
-                "distance": 42411.33606045893, 
+                "distance": 38516.94105418269, 
                 "end_place": {
-                    "$oid": "57c0e420f6858f03bbe41b87"
+                    "$oid": "57c85c67f6858f61713e4cce"
                 }, 
                 "raw_trip": {
-                    "$oid": "57c0e419f6858f03bbe418ff"
+                    "$oid": "57c85c5ef6858f61713e4a4d"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
                     "type": "Point", 
                     "coordinates": [
-                        -122.2589186, 
-                        37.8752735
+                        -122.2714736, 
+                        37.8471355
                     ]
                 }, 
                 "end_ts": 1440719699.47, 
-                "start_ts": 1440716089.4671443, 
-                "start_fmt_time": "2015-08-27T15:54:49.467144-07:00", 
+                "start_ts": 1440716367.376, 
+                "start_fmt_time": "2015-08-27T15:59:27.376000-07:00", 
                 "end_loc": {
                     "type": "Point", 
                     "coordinates": [
@@ -4133,7 +4074,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57c0e420f6858f03bbe41b86"
+                    "$oid": "57c85c67f6858f61713e4ccd"
                 }, 
                 "end_fmt_time": "2015-08-27T16:54:59.470000-07:00", 
                 "end_local_dt": {
@@ -4150,12 +4091,12 @@
                 "start_local_dt": {
                     "hour": 15, 
                     "month": 8, 
-                    "second": 49, 
+                    "second": 27, 
                     "weekday": 3, 
                     "year": 2015, 
                     "timezone": "America/Los_Angeles", 
                     "day": 27, 
-                    "minute": 54
+                    "minute": 59
                 }
             }
         }, 
@@ -4170,7 +4111,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0e420f6858f03bbe41b87", 
+                    "id": "57c85c67f6858f61713e4cce", 
                     "properties": {
                         "enter_fmt_time": "2015-08-27T16:54:59.470000-07:00", 
                         "exit_local_dt": {
@@ -4183,6 +4124,7 @@
                             "day": 27, 
                             "minute": 57
                         }, 
+                        "display_name": "Serra Avenue, Millbrae", 
                         "feature_type": "start_place", 
                         "exit_fmt_time": "2015-08-27T16:57:59.470000-07:00", 
                         "enter_local_dt": {
@@ -4196,17 +4138,17 @@
                             "minute": 54
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0e41df6858f03bbe41a66"
+                            "$oid": "57c85c62f6858f61713e4bb7"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0e41ef6858f03bbe41ae5"
+                            "$oid": "57c85c63f6858f61713e4c2b"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1440719699.47, 
                         "duration": 180.0, 
                         "raw_places": [
                             {
-                                "$oid": "57c0e419f6858f03bbe41900"
+                                "$oid": "57c85c5ef6858f61713e4a4e"
                             }
                         ], 
                         "exit_ts": 1440719879.47
@@ -4221,7 +4163,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0e420f6858f03bbe41b88", 
+                    "id": "57c85c68f6858f61713e4ccf", 
                     "properties": {
                         "enter_fmt_time": "2015-08-27T17:55:34.898000-07:00", 
                         "exit_local_dt": {
@@ -4234,6 +4176,7 @@
                             "day": 27, 
                             "minute": 20
                         }, 
+                        "display_name": "San Pierre Way, Mountain View", 
                         "feature_type": "end_place", 
                         "exit_fmt_time": "2015-08-27T19:20:58.752785-07:00", 
                         "enter_local_dt": {
@@ -4247,17 +4190,17 @@
                             "minute": 55
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0e41ef6858f03bbe41ae5"
+                            "$oid": "57c85c63f6858f61713e4c2b"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0e41ff6858f03bbe41b64"
+                            "$oid": "57c85c64f6858f61713e4caa"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1440723334.898, 
                         "duration": 5123.854784727097, 
                         "raw_places": [
                             {
-                                "$oid": "57c0e419f6858f03bbe41902"
+                                "$oid": "57c85c5ef6858f61713e4a52"
                             }
                         ], 
                         "exit_ts": 1440728458.7527847
@@ -4278,7 +4221,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0e41ff6858f03bbe41b61", 
+                    "id": "57c85c64f6858f61713e4ca7", 
                     "properties": {
                         "enter_fmt_time": "2015-08-27T17:43:04.229000-07:00", 
                         "distance": 258.74285107438715, 
@@ -4294,10 +4237,10 @@
                         }, 
                         "feature_type": "stop", 
                         "ending_section": {
-                            "$oid": "57c0e41ef6858f03bbe41ae7"
+                            "$oid": "57c85c63f6858f61713e4c2d"
                         }, 
                         "starting_section": {
-                            "$oid": "57c0e41ff6858f03bbe41b44"
+                            "$oid": "57c85c64f6858f61713e4c8a"
                         }, 
                         "exit_fmt_time": "2015-08-27T17:43:34.285000-07:00", 
                         "enter_local_dt": {
@@ -4328,10 +4271,10 @@
                         "enter_ts": 1440722584.229, 
                         "duration": 30.055999994277954, 
                         "_id": {
-                            "$oid": "57c0e41ef6858f03bbe41ae5"
+                            "$oid": "57c85c63f6858f61713e4c2b"
                         }, 
                         "trip_id": {
-                            "$oid": "57c0e41ef6858f03bbe41ae5"
+                            "$oid": "57c85c63f6858f61713e4c2b"
                         }, 
                         "exit_ts": 1440722614.285
                     }
@@ -4351,7 +4294,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0e41ff6858f03bbe41b62", 
+                    "id": "57c85c64f6858f61713e4ca8", 
                     "properties": {
                         "enter_fmt_time": "2015-08-27T17:51:04.721000-07:00", 
                         "distance": 40.833879313803244, 
@@ -4367,10 +4310,10 @@
                         }, 
                         "feature_type": "stop", 
                         "ending_section": {
-                            "$oid": "57c0e41ff6858f03bbe41b44"
+                            "$oid": "57c85c64f6858f61713e4c8a"
                         }, 
                         "starting_section": {
-                            "$oid": "57c0e41ff6858f03bbe41b56"
+                            "$oid": "57c85c64f6858f61713e4c9c"
                         }, 
                         "exit_fmt_time": "2015-08-27T17:51:34.715000-07:00", 
                         "enter_local_dt": {
@@ -4401,10 +4344,10 @@
                         "enter_ts": 1440723064.721, 
                         "duration": 29.99399995803833, 
                         "_id": {
-                            "$oid": "57c0e41ef6858f03bbe41ae5"
+                            "$oid": "57c85c63f6858f61713e4c2b"
                         }, 
                         "trip_id": {
-                            "$oid": "57c0e41ef6858f03bbe41ae5"
+                            "$oid": "57c85c63f6858f61713e4c2b"
                         }, 
                         "exit_ts": 1440723094.715
                     }
@@ -4424,7 +4367,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0e41ff6858f03bbe41b63", 
+                    "id": "57c85c64f6858f61713e4ca9", 
                     "properties": {
                         "enter_fmt_time": "2015-08-27T17:52:04.657000-07:00", 
                         "distance": 281.50303421327163, 
@@ -4440,10 +4383,10 @@
                         }, 
                         "feature_type": "stop", 
                         "ending_section": {
-                            "$oid": "57c0e41ff6858f03bbe41b56"
+                            "$oid": "57c85c64f6858f61713e4c9c"
                         }, 
                         "starting_section": {
-                            "$oid": "57c0e41ff6858f03bbe41b59"
+                            "$oid": "57c85c64f6858f61713e4c9f"
                         }, 
                         "exit_fmt_time": "2015-08-27T17:53:04.822000-07:00", 
                         "enter_local_dt": {
@@ -4474,10 +4417,10 @@
                         "enter_ts": 1440723124.657, 
                         "duration": 60.16499996185303, 
                         "_id": {
-                            "$oid": "57c0e41ef6858f03bbe41ae5"
+                            "$oid": "57c85c63f6858f61713e4c2b"
                         }, 
                         "trip_id": {
-                            "$oid": "57c0e41ef6858f03bbe41ae5"
+                            "$oid": "57c85c63f6858f61713e4c2b"
                         }, 
                         "exit_ts": 1440723184.822
                     }
@@ -4860,7 +4803,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0e41ef6858f03bbe41ae7", 
+                            "id": "57c85c63f6858f61713e4c2d", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -4976,10 +4919,10 @@
                                 }, 
                                 "duration": 2704.7590000629425, 
                                 "end_stop": {
-                                    "$oid": "57c0e41ff6858f03bbe41b61"
+                                    "$oid": "57c85c64f6858f61713e4ca7"
                                 }, 
                                 "trip_id": {
-                                    "$oid": "57c0e41ef6858f03bbe41ae5"
+                                    "$oid": "57c85c63f6858f61713e4c2b"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 16, 
@@ -5167,7 +5110,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0e41ff6858f03bbe41b44", 
+                            "id": "57c85c64f6858f61713e4c8a", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -5207,13 +5150,13 @@
                                 }, 
                                 "duration": 450.4359998703003, 
                                 "start_stop": {
-                                    "$oid": "57c0e41ff6858f03bbe41b61"
+                                    "$oid": "57c85c64f6858f61713e4ca7"
                                 }, 
                                 "end_stop": {
-                                    "$oid": "57c0e41ff6858f03bbe41b62"
+                                    "$oid": "57c85c64f6858f61713e4ca8"
                                 }, 
                                 "trip_id": {
-                                    "$oid": "57c0e41ef6858f03bbe41ae5"
+                                    "$oid": "57c85c63f6858f61713e4c2b"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 17, 
@@ -5267,7 +5210,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0e41ff6858f03bbe41b56", 
+                            "id": "57c85c64f6858f61713e4c9c", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -5292,13 +5235,13 @@
                                 }, 
                                 "duration": 29.942000150680542, 
                                 "start_stop": {
-                                    "$oid": "57c0e41ff6858f03bbe41b62"
+                                    "$oid": "57c85c64f6858f61713e4ca8"
                                 }, 
                                 "end_stop": {
-                                    "$oid": "57c0e41ff6858f03bbe41b63"
+                                    "$oid": "57c85c64f6858f61713e4ca9"
                                 }, 
                                 "trip_id": {
-                                    "$oid": "57c0e41ef6858f03bbe41ae5"
+                                    "$oid": "57c85c63f6858f61713e4c2b"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 17, 
@@ -5357,7 +5300,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0e41ff6858f03bbe41b59", 
+                            "id": "57c85c64f6858f61713e4c9f", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -5387,10 +5330,10 @@
                                 }, 
                                 "duration": 150.07599997520447, 
                                 "start_stop": {
-                                    "$oid": "57c0e41ff6858f03bbe41b63"
+                                    "$oid": "57c85c64f6858f61713e4ca9"
                                 }, 
                                 "trip_id": {
-                                    "$oid": "57c0e41ef6858f03bbe41ae5"
+                                    "$oid": "57c85c63f6858f61713e4c2b"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 17, 
@@ -5418,14 +5361,14 @@
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57c0e41ef6858f03bbe41ae5", 
+            "id": "57c85c63f6858f61713e4c2b", 
             "properties": {
-                "distance": 37830.496342360595, 
+                "distance": 37830.4963423606, 
                 "end_place": {
-                    "$oid": "57c0e420f6858f03bbe41b88"
+                    "$oid": "57c85c68f6858f61713e4ccf"
                 }, 
                 "raw_trip": {
-                    "$oid": "57c0e419f6858f03bbe41901"
+                    "$oid": "57c85c5ef6858f61713e4a51"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -5447,7 +5390,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57c0e420f6858f03bbe41b87"
+                    "$oid": "57c85c67f6858f61713e4cce"
                 }, 
                 "end_fmt_time": "2015-08-27T17:55:34.898000-07:00", 
                 "end_local_dt": {
@@ -5460,7 +5403,7 @@
                     "day": 27, 
                     "minute": 55
                 }, 
-                "duration": 3095.885999917984, 
+                "duration": 3455.427999973297, 
                 "start_local_dt": {
                     "hour": 16, 
                     "month": 8, 
@@ -5484,7 +5427,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0e420f6858f03bbe41b88", 
+                    "id": "57c85c68f6858f61713e4ccf", 
                     "properties": {
                         "enter_fmt_time": "2015-08-27T17:55:34.898000-07:00", 
                         "exit_local_dt": {
@@ -5497,6 +5440,7 @@
                             "day": 27, 
                             "minute": 20
                         }, 
+                        "display_name": "San Pierre Way, Mountain View", 
                         "feature_type": "start_place", 
                         "exit_fmt_time": "2015-08-27T19:20:58.752785-07:00", 
                         "enter_local_dt": {
@@ -5510,17 +5454,17 @@
                             "minute": 55
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0e41ef6858f03bbe41ae5"
+                            "$oid": "57c85c63f6858f61713e4c2b"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0e41ff6858f03bbe41b64"
+                            "$oid": "57c85c64f6858f61713e4caa"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1440723334.898, 
                         "duration": 5123.854784727097, 
                         "raw_places": [
                             {
-                                "$oid": "57c0e419f6858f03bbe41902"
+                                "$oid": "57c85c5ef6858f61713e4a52"
                             }
                         ], 
                         "exit_ts": 1440728458.7527847
@@ -5535,9 +5479,10 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0e420f6858f03bbe41b89", 
+                    "id": "57c85c68f6858f61713e4cd0", 
                     "properties": {
                         "enter_fmt_time": "2015-08-27T19:32:22.709000-07:00", 
+                        "display_name": "South Shoreline Boulevard, Mountain View", 
                         "feature_type": "end_place", 
                         "enter_local_dt": {
                             "hour": 19, 
@@ -5550,13 +5495,13 @@
                             "minute": 32
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0e41ff6858f03bbe41b64"
+                            "$oid": "57c85c64f6858f61713e4caa"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1440729142.709, 
                         "raw_places": [
                             {
-                                "$oid": "57c0e419f6858f03bbe41904"
+                                "$oid": "57c85c5ef6858f61713e4a54"
                             }
                         ]
                     }
@@ -5576,7 +5521,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0e41ff6858f03bbe41b81", 
+                    "id": "57c85c64f6858f61713e4cc7", 
                     "properties": {
                         "enter_fmt_time": "2015-08-27T19:26:34.308000-07:00", 
                         "distance": 242.80424743721912, 
@@ -5592,10 +5537,10 @@
                         }, 
                         "feature_type": "stop", 
                         "ending_section": {
-                            "$oid": "57c0e41ff6858f03bbe41b66"
+                            "$oid": "57c85c64f6858f61713e4cac"
                         }, 
                         "starting_section": {
-                            "$oid": "57c0e41ff6858f03bbe41b74"
+                            "$oid": "57c85c64f6858f61713e4cba"
                         }, 
                         "exit_fmt_time": "2015-08-27T19:27:04.315000-07:00", 
                         "enter_local_dt": {
@@ -5626,10 +5571,10 @@
                         "enter_ts": 1440728794.308, 
                         "duration": 30.006999969482422, 
                         "_id": {
-                            "$oid": "57c0e41ff6858f03bbe41b64"
+                            "$oid": "57c85c64f6858f61713e4caa"
                         }, 
                         "trip_id": {
-                            "$oid": "57c0e41ff6858f03bbe41b64"
+                            "$oid": "57c85c64f6858f61713e4caa"
                         }, 
                         "exit_ts": 1440728824.315
                     }
@@ -5696,7 +5641,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0e41ff6858f03bbe41b66", 
+                            "id": "57c85c64f6858f61713e4cac", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -5733,10 +5678,10 @@
                                 }, 
                                 "duration": 335.55521535873413, 
                                 "end_stop": {
-                                    "$oid": "57c0e41ff6858f03bbe41b81"
+                                    "$oid": "57c85c64f6858f61713e4cc7"
                                 }, 
                                 "trip_id": {
-                                    "$oid": "57c0e41ff6858f03bbe41b64"
+                                    "$oid": "57c85c64f6858f61713e4caa"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 19, 
@@ -5825,7 +5770,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0e41ff6858f03bbe41b74", 
+                            "id": "57c85c64f6858f61713e4cba", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -5860,10 +5805,10 @@
                                 }, 
                                 "duration": 318.39400005340576, 
                                 "start_stop": {
-                                    "$oid": "57c0e41ff6858f03bbe41b81"
+                                    "$oid": "57c85c64f6858f61713e4cc7"
                                 }, 
                                 "trip_id": {
-                                    "$oid": "57c0e41ff6858f03bbe41b64"
+                                    "$oid": "57c85c64f6858f61713e4caa"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 19, 
@@ -5896,14 +5841,14 @@
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57c0e41ff6858f03bbe41b64", 
+            "id": "57c85c64f6858f61713e4caa", 
             "properties": {
                 "distance": 2425.464671815585, 
                 "end_place": {
-                    "$oid": "57c0e420f6858f03bbe41b89"
+                    "$oid": "57c85c68f6858f61713e4cd0"
                 }, 
                 "raw_trip": {
-                    "$oid": "57c0e419f6858f03bbe41903"
+                    "$oid": "57c85c5ef6858f61713e4a53"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -5925,7 +5870,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57c0e420f6858f03bbe41b88"
+                    "$oid": "57c85c68f6858f61713e4ccf"
                 }, 
                 "end_fmt_time": "2015-08-27T19:32:22.709000-07:00", 
                 "end_local_dt": {
@@ -5938,7 +5883,7 @@
                     "day": 27, 
                     "minute": 32
                 }, 
-                "duration": 622.7380001544952, 
+                "duration": 683.9562153816223, 
                 "start_local_dt": {
                     "hour": 19, 
                     "month": 8, 
@@ -5953,7 +5898,7 @@
         }
     ], 
     "_id": {
-        "$oid": "57c0e422115514afcd793603"
+        "$oid": "57c85c6a115514afcd7936e1"
     }, 
     "user_id": {
         "$uuid": "0763de67f61e3f5d90e7518e69793954"
@@ -5961,6 +5906,6 @@
     "metadata": {
         "type": "document", 
         "key": "diary/trips-2015-08-27", 
-        "write_ts": 1472259106.499904
+        "write_ts": 1472748650.430084
     }
 }

@@ -36,6 +36,7 @@ import emission.core.wrapper.cleanedsection as ecwcs
 import emission.core.wrapper.stop as ecwst
 import emission.core.wrapper.location as ecwl
 import emission.core.wrapper.recreatedlocation as ecwrl
+import emission.core.wrapper.untrackedtime as ecwut
 
 import emission.core.common as ecc
 
@@ -46,7 +47,8 @@ import attrdict as ad
 
 filtered_trip_excluded = ["start_place", "end_place",
                           "start_ts", "start_fmt_time", "start_local_dt", "start_loc",
-                          "_id"]
+                          "duration", "distance", "_id"]
+filtered_untracked_excluded = ["start_place", "end_place", "_id"]
 # We are not copying over any of the exit information from the raw place because
 # we may want to squish a bunch of places together, and then the end information
 # will come from the final squished place
@@ -88,7 +90,10 @@ def save_cleaned_segments_for_timeline(user_id, tl):
     id_or_none = lambda wrapper: wrapper.get_id() if wrapper is not None else None
     for trip in tl.trips:
         try:
-            filtered_trip = get_filtered_trip(ts, trip)
+            if trip.metadata.key == esda.RAW_UNTRACKED_KEY:
+                filtered_trip = get_filtered_untracked(ts, trip)
+            else:
+                filtered_trip = get_filtered_trip(ts, trip)
             logging.debug("For raw trip %s, found filtered trip %s" %
                           (id_or_none(trip), id_or_none(filtered_trip)))
             if filtered_trip is not None:
@@ -116,6 +121,20 @@ def save_cleaned_segments_for_timeline(user_id, tl):
             ts.insert(entry)
 
     return tl.last_place()
+
+def get_filtered_untracked(ts, untracked):
+    # untracked time is very simple, but we need to map them in a basic way to avoid
+    # holes in the timeline
+    logging.debug("Found untracked entry %s (%s -> %s), skipping processing" %
+                  (untracked.get_id(), untracked.data.start_fmt_time, untracked.data.end_fmt_time))
+    filtered_untracked_data = ecwut.Untrackedtime()
+    _copy_non_excluded(old_data=untracked.data,
+                       new_data=filtered_untracked_data,
+                       excluded_list=filtered_untracked_excluded)
+    filtered_untracked_entry = ecwe.Entry.create_entry(untracked.user_id, esda.CLEANED_UNTRACKED_KEY,
+                                                  filtered_untracked_data,
+                                                  create_id = True)
+    return filtered_untracked_entry
 
 def get_filtered_trip(ts, trip):
     logging.debug("Filtering trip %s" % trip)
@@ -316,6 +335,8 @@ def get_filtered_points(section, filtered_section_data):
 
     with_speeds_df = eaicl.add_dist_heading_speed(resampled_loc_df)
     with_speeds_df["idx"] = np.arange(0, len(with_speeds_df))
+    logging.debug("with_speeds_df = %s" %
+                  with_speeds_df[["idx", "ts", "fmt_time", "longitude", "latitude"]].head())
     with_speeds_df_nona = with_speeds_df.dropna()
     logging.info("removed %d entries containing n/a" % 
         (len(with_speeds_df_nona) - len(with_speeds_df)))
@@ -434,6 +455,7 @@ def _set_extrapolated_start_for_trip(filtered_trip_data, first_section):
     filtered_trip_data.start_fmt_time = first_section.data.start_fmt_time
     filtered_trip_data.start_local_dt = first_section.data.start_local_dt
     filtered_trip_data.start_loc = first_section.data.start_loc
+    filtered_trip_data.duration = filtered_trip_data.end_ts - filtered_trip_data.start_ts
 
 def remove_outliers(raw_loc_entry_list, filtered_point_id_list):
     import emission.storage.timeseries.builtin_timeseries as estb
@@ -450,7 +472,7 @@ def remove_outliers(raw_loc_entry_list, filtered_point_id_list):
                    len(loc_df.columns), len(filtered_loc_df.columns)))
     return filtered_loc_df
 
-def resample(filtered_loc_list, interval):
+def resample(filtered_loc_df, interval):
     """
     TODO: There is a problem with working on this on a section by section basis.
     Namely, how do we deal with the ends. In particular, note that our sections
@@ -464,11 +486,11 @@ def resample(filtered_loc_list, interval):
     end location points. But we can also have a gap if the duration of the section
     is not a multiple of the interval, as it is likely to be. In this case, we will
     manually add the last entry to ensure that we adequately capture the end point.
-    :param filtered_loc_list:
+    :param filtered_loc_df:
     :param interval:
     :return:
     """
-    loc_df = pd.DataFrame(filtered_loc_list)
+    loc_df = filtered_loc_df
     # See https://github.com/e-mission/e-mission-server/issues/268 for log traces
     #
     # basically, on iOS, due to insufficient smoothing, it is possible for us to
@@ -480,7 +502,8 @@ def resample(filtered_loc_list, interval):
     # So let's just return the one point without resampling in that case, and move on for now
     if len(loc_df) == 0 or len(loc_df) == 1:
         return loc_df
-    logging.debug("Resampling entry list %s of size %s" % (loc_df.head(), len(filtered_loc_list)))
+    logging.debug("Resampling entry list %s of size %s" %
+                  (loc_df[["fmt_time", "ts", "longitude", "latitude"]].head(), len(filtered_loc_df)))
     start_ts = loc_df.ts.iloc[0]
     end_ts = loc_df.ts.iloc[-1]
     tz_ranges_df = _get_tz_ranges(loc_df)
@@ -496,7 +519,8 @@ def resample(filtered_loc_list, interval):
                           fill_value='extrapolate')
 
     ts_new = np.append(np.arange(start_ts, end_ts, 30), [end_ts])
-    logging.debug("After resampling, using %d points" % ts_new.size)
+    logging.debug("After resampling, using %d points from %s -> %s" %
+                  (ts_new.size, ts_new[0], ts_new[-1]))
     lat_new = lat_fn(ts_new)
     lng_new = lng_fn(ts_new)
     alt_new = altitude_fn(ts_new)
@@ -650,7 +674,7 @@ def link_trip_start(cleaned_trip, cleaned_start_place, raw_start_place):
                                             cleaned_start_place_data.enter_ts
     else:
            logging.debug("enter_ts = %s, exit_ts = %s, unknown duration" % 
-		(cleaned_start_place_data.enter_ts, cleaned_start_place_data.enter_ts))
+		(cleaned_start_place_data.enter_ts, cleaned_start_place_data.exit_ts))
 
     # Appended while creating the start place, or while handling squished
     # TODO: Don't think I need this?

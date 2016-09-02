@@ -57,7 +57,7 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
             if just_ended:
                 if self.continue_just_ended(idx, currPoint, filtered_points_df):
                     # We have "processed" the currPoint by deciding to glom it
-                    self.last_ts_processed = currPoint.ts
+                    self.last_ts_processed = currPoint.metadata_write_ts
                     continue
                 # else: 
                 # Here's where we deal with the start trip. At this point, the
@@ -92,7 +92,7 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
                     segmentation_points.append((curr_trip_start_point, last_trip_end_point))
                     logging.info("Found trip end at %s" % last_trip_end_point.fmt_time)
                     # We have processed everything up to the trip end by marking it as a completed trip
-                    self.last_ts_processed = currPoint.ts
+                    self.last_ts_processed = currPoint.metadata_write_ts
                     just_ended = True
                     # Now, we have finished processing the previous point as a trip
                     # end or not. But we still need to process this point by seeing
@@ -136,7 +136,7 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
             if len(stopped_moving_after_last) > 0:
                 logging.debug("Found %d transitions after last point, ending trip..." % len(stopped_moving_after_last))
                 segmentation_points.append((curr_trip_start_point, currPoint))
-                self.last_ts_processed = currPoint.ts
+                self.last_ts_processed = currPoint.metadata_write_ts
             else:
                 logging.debug("Found %d transitions after last point, not ending trip..." % len(stopped_moving_after_last))
         return segmentation_points

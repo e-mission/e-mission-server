@@ -101,7 +101,7 @@ class TestTripSegmentation(unittest.TestCase):
         # We expect there to be 9 places, but the first one is that start of
         # the chain, so it has a start_time of None and it won't be retrieved
         # by the query on the start_time that we show here.
-        self.assertEqual(len(created_places_entries), 8)
+        self.assertEqual(len(created_places_entries), 9)
         self.assertEqual(len(created_trips_entries), 8)
 
         # Pick the first two trips and the first place and ensure that they are all linked correctly
@@ -181,7 +181,8 @@ class TestTripSegmentation(unittest.TestCase):
 
         tq_trip = estt.TimeQuery("data.start_ts", 1440658800, 1446847600)
         created_trips_entries = esda.get_entries(esda.RAW_TRIP_KEY,
-                                                 self.androidUUID, tq_trip)
+                                                 self.androidUUID, tq_trip,
+                                                 untracked_key=esda.RAW_UNTRACKED_KEY)
 
         for i, place in enumerate(created_places_entries):
             logging.debug("Retrieved places %s: %s -> %s" % (i, place.data.enter_fmt_time, place.data.exit_fmt_time))
@@ -191,8 +192,8 @@ class TestTripSegmentation(unittest.TestCase):
         # We expect there to be 12 places, but the first one is that start of
         # the chain, so it has a start_time of None and it won't be retrieved
         # by the query on the start_time that we show here.
-        self.assertEqual(len(created_places_entries), 11)
-        self.assertEqual(len(created_trips_entries), 11)
+        self.assertEqual(len(created_places_entries), 12)
+        self.assertEqual(len(created_trips_entries), 12)
 
         # Pick the first two trips and the first place and ensure that they are all linked correctly
         # Note that this is the first place, not the second place because the true first place will not
@@ -212,12 +213,12 @@ class TestTripSegmentation(unittest.TestCase):
 
         self.assertIsNotNone(place0time.data.location)
         
-        # There are 8 android trips first (index: 0-7).
-        # index 8 is the short, bogus trip
-        # So we want to check trips 9 and 10
-        trip0dist = created_trips_entries[9]
-        trip1dist = created_trips_entries[10]
-        place0dist = created_places_entries[9]
+        # There are 9 android "trips" first (index: 0-8), including the untracked time
+        # index 9 is the short, bogus trip
+        # So we want to check trips 10 and 11
+        trip0dist = created_trips_entries[10]
+        trip1dist = created_trips_entries[11]
+        place0dist = created_places_entries[10]
         
         self.assertEqual(trip0dist.data.end_place, place0dist.get_id())
         self.assertEqual(trip1dist.data.start_place, place0dist.get_id())
