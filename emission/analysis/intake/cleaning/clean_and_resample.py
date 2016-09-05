@@ -417,6 +417,14 @@ def _add_start_point(filtered_loc_df, raw_start_place, ts):
                      (with_speeds_df.speed, with_speeds_df.speed.median()))
         del_time = 0
 
+    if add_dist == 0 and del_time == 0:
+        #
+        logging.debug("curr_first_point %s, %s == start_place exit %s, %s"
+                      "skipping add of first point" %
+                      (curr_first_point.fmt_time, curr_first_point.loc,
+                       raw_start_place.data.exit_fmt_time, raw_start_place.data.location))
+        return filtered_loc_df
+
     new_start_ts = curr_first_point.ts - del_time
     prev_enter_ts = raw_start_place.data.enter_ts if "enter_ts" in raw_start_place.data else None
     if prev_enter_ts is not None and new_start_ts < raw_start_place.data.enter_ts:
