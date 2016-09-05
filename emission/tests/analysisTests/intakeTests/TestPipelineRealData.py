@@ -326,6 +326,48 @@ class TestPipelineRealData(unittest.TestCase):
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth).data)
 
+    def testJumpSmoothingSectionEnd(self):
+        dataFile = "emission/tests/data/real_examples/shankari_2016-independence_day"
+        start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 15})
+        cacheKey = "diary/trips-2016-08-15"
+        ground_truth = json.load(open("emission/tests/data/real_examples/shankari_2016-independence_day.ground_truth"), object_hook=bju.object_hook)
+
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
+        # Although we process the day's data in two batches, we should get the same result
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth).data)
+
+    def testJumpSmoothingSectionsStraddle(self):
+        dataFile = "emission/tests/data/real_examples/shankari_2016-independence_day_jump_straddle"
+        start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 15})
+        cacheKey = "diary/trips-2016-08-15"
+        ground_truth = json.load(open("emission/tests/data/real_examples/shankari_2016-independence_day.ground_truth"), object_hook=bju.object_hook)
+
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
+        # Although we process the day's data in two batches, we should get the same result
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth).data)
+
+    def testJumpSmoothingSectionStart(self):
+        dataFile = "emission/tests/data/real_examples/shankari_2016-independence_day_jump_bus_start"
+        start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 15})
+        cacheKey = "diary/trips-2016-08-15"
+        ground_truth = json.load(open("emission/tests/data/real_examples/shankari_2016-independence_day.ground_truth"), object_hook=bju.object_hook)
+
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
+        # Although we process the day's data in two batches, we should get the same result
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth).data)
+
     def testAug10MultiSyncEndDetected(self):
         # Re-run, but with multiple calls to sync data
         # This tests the effect of online versus offline analysis and segmentation with potentially partial data
