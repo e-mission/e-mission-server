@@ -57,8 +57,12 @@ filtered_place_excluded = ["exit_ts", "exit_local_dt", "exit_fmt_time",
                            "starting_trip", "ending_trip", "duration", "_id"]
 filtered_section_excluded = ["trip_id", "start_stop", "end_stop", "distance", "duration",
                              "start_ts", "start_fmt_time", "start_local_dt","start_loc",
+                             "end_ts", "end_fmt_time", "end_local_dt", "end_loc",
                              "sensed_mode", "_id"]
-filtered_stop_excluded = ["trip_id", "ending_section", "starting_section", "_id"]
+filtered_stop_excluded = ["trip_id", "ending_section", "starting_section",
+                          "enter_ts", "enter_fmt_time", "enter_local_dt", "enter_loc",
+                          "exit_ts", "exit_fmt_time", "exit_local_dt", "exit_loc",
+                          "duration", "distance", "_id"]
 filtered_location_excluded = ["speed", "distance", "_id"]
 extrapolated_location_excluded = ["ts", "fmt_time", "local_dt", "_id"]
 
@@ -170,13 +174,21 @@ def get_filtered_trip(ts, trip):
     # Set the start point and time for the trip from the start point and time
     # from the first section
     first_cleaned_section = section_map[trip_tl.trips[0].get_id()]
+    last_cleaned_section = section_map[trip_tl.trips[-1].get_id()]
     logging.debug("Copying start_ts %s, start_fmt_time %s, start_local_dt from %s to %s" %
                   (first_cleaned_section.data.start_ts, first_cleaned_section.data.start_fmt_time,
                    first_cleaned_section.get_id(), filtered_trip_data))
-    _set_extrapolated_start_for_trip(filtered_trip_data, first_cleaned_section)
+    _set_extrapolated_start_for_trip(filtered_trip_data, first_cleaned_section, last_cleaned_section)
 
+    # After we have linked everything back together. NOW we can save the entries
+    linked_tl = link_trip_timeline(trip_tl, section_map, stop_map)
+
+    # We potentially overwrite the stop distance as part of the linking,
+    # as we copy over values from the underlying section. Since the trip
+    # distance includes the stop distance, we need to compute the trip distance
+    # after computing the stop distance.
     trip_distance = sum([section.data.distance for section in section_map.values()]) + \
-        sum([stop.data.distance for stop in stop_map.values()])
+                    sum([stop.data.distance for stop in stop_map.values()])
     filtered_trip_data.distance = trip_distance
     filtered_trip_entry["data"] = filtered_trip_data
     if filtered_trip_data.distance < 100:
@@ -185,8 +197,10 @@ def get_filtered_trip(ts, trip):
                       trip.data.end_fmt_time, filtered_trip_data.distance))
         return None
 
-    # After we have linked everything back together. NOW we can save the entries
-    linked_tl = link_trip_timeline(trip_tl, section_map, stop_map)
+    # But then we want to check the stop distance to determine whether the trip is valid
+    # or not, and to not store any of the sections or stops if it is not. So the validity
+    # check should be before the insert
+
     for entry in linked_tl:
         ts.insert(entry)
 
@@ -277,7 +291,6 @@ def get_filtered_stop(new_trip_entry, stop):
     :return: None
     """
     filtered_stop_data = ecwst.Stop()
-    filtered_stop_data['_id'] = new_trip_entry.get_id()
     filtered_stop_data.trip_id = new_trip_entry.get_id()
     _copy_non_excluded(old_data=stop.data,
                        new_data=filtered_stop_data,
@@ -324,12 +337,13 @@ def get_filtered_points(section, filtered_section_data):
         raw_start_place = ts.get_entry_from_id(esda.RAW_PLACE_KEY, raw_trip.data.start_place)
         filtered_loc_df = _add_start_point(filtered_loc_df, raw_start_place, ts)
 
-    # Can move this up to get_filtered_section if we don't want ensure that we
+    # Can move this up to get_filtered_section if we want to ensure that we
     # don't touch filtered_section_data in here
     logging.debug("Setting section start values of %s to first point %s" %
                   (filtered_section_data, filtered_loc_df.iloc[0]))
-    _set_extrapolated_start_for_section(filtered_section_data,
-                                        filtered_loc_df.iloc[0])
+    _set_extrapolated_vals_for_section(filtered_section_data,
+                                        filtered_loc_df.iloc[0],
+                                        filtered_loc_df.iloc[-1])
 
     # if section.data.start_stop is None:
     #     first_point = filtered_loc_list.pop(0)
@@ -478,20 +492,22 @@ def _prepend_new_entry(loc_df, entry):
     appended_loc_df = loc_df.sort_index().reset_index(drop=True)
     return appended_loc_df
 
-def _set_extrapolated_start_for_section(filtered_section_data, fixed_first_loc):
-    filtered_section_data.start_ts = fixed_first_loc.ts
-    filtered_section_data.start_local_dt = esdl.get_local_date(fixed_first_loc.ts,
-                                                               fixed_first_loc.local_dt_timezone)
-    filtered_section_data.start_fmt_time = fixed_first_loc.fmt_time
-    filtered_section_data.start_loc = fixed_first_loc["loc"]
+def _set_extrapolated_vals_for_section(filtered_section_data, fixed_start_loc, fixed_end_loc):
+    _overwrite_from_loc_row(filtered_section_data, fixed_start_loc, "start")
+    _overwrite_from_loc_row(filtered_section_data, fixed_end_loc, "end")
     filtered_section_data.duration = filtered_section_data.end_ts - filtered_section_data.start_ts
 
-def _set_extrapolated_start_for_trip(filtered_trip_data, first_section):
-    filtered_trip_data.start_ts = first_section.data.start_ts
-    filtered_trip_data.start_fmt_time = first_section.data.start_fmt_time
-    filtered_trip_data.start_local_dt = first_section.data.start_local_dt
-    filtered_trip_data.start_loc = first_section.data.start_loc
+def _set_extrapolated_start_for_trip(filtered_trip_data, first_section, last_section):
+    _copy_prefixed_fields(filtered_trip_data, "start", first_section.data, "start")
+    _copy_prefixed_fields(filtered_trip_data, "end", last_section.data, "end")
     filtered_trip_data.duration = filtered_trip_data.end_ts - filtered_trip_data.start_ts
+
+def _overwrite_from_loc_row(filtered_section_data, fixed_loc, prefix):
+    filtered_section_data[prefix+"_ts"] = fixed_loc.ts
+    filtered_section_data[prefix+"_local_dt"] = esdl.get_local_date(fixed_loc.ts,
+                                                                    fixed_loc.local_dt_timezone)
+    filtered_section_data[prefix+"_fmt_time"] = fixed_loc.fmt_time
+    filtered_section_data[prefix+"_loc"] = fixed_loc["loc"]
 
 def remove_outliers(raw_loc_entry_list, filtered_point_id_list):
     import emission.storage.timeseries.builtin_timeseries as estb
@@ -625,10 +641,31 @@ def _fill_section(old_section, new_section, stop_map):
 
 def _fill_stop(old_stop, new_stop, section_map):
     stop_data = new_stop.data
-    stop_data.ending_section = section_map[old_stop.data.ending_section].get_id()
-    stop_data.starting_section = section_map[old_stop.data.starting_section].get_id()
+    new_ending_section = section_map[old_stop.data.ending_section]
+    stop_data.ending_section = new_ending_section.get_id()
+
+    new_starting_section = section_map[old_stop.data.starting_section]
+    stop_data.starting_section = new_starting_section.get_id()
+    # We filter section points in this step, so it is possible to filter the first
+    # or last point as well. And if we do, then the start/stop position of the stop,
+    # which was linked to the section. Since we are working outward from sections,
+    # and we haven't done any processing on stops, lets just set the stop values
+    # to the section values
+    _copy_prefixed_fields(stop_data, "enter", new_ending_section.data, "end")
+    _copy_prefixed_fields(stop_data, "exit", new_starting_section.data, "start")
+
+    stop_data.duration = stop_data.exit_ts - stop_data.enter_ts
+    stop_data.distance = ecc.calDistance(stop_data.exit_loc.coordinates,
+                                         stop_data.enter_loc.coordinates)
+
     new_stop["data"] = stop_data
     return new_stop
+
+def _copy_prefixed_fields(stop_data, stop_prefix, section_data, section_prefix):
+    stop_data[stop_prefix+"_ts"] = section_data[section_prefix+"_ts"]
+    stop_data[stop_prefix+"_local_dt"] = section_data[section_prefix+"_local_dt"]
+    stop_data[stop_prefix+"_fmt_time"] = section_data[section_prefix+"_fmt_time"]
+    stop_data[stop_prefix+"_loc"] = section_data[section_prefix+"_loc"]
 
 def create_and_link_timeline(tl, user_id, trip_map):
     last_cleaned_place = esdp.get_last_place_entry(esda.CLEANED_PLACE_KEY, user_id)
