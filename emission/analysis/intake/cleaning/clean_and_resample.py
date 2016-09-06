@@ -337,6 +337,12 @@ def get_filtered_points(section, filtered_section_data):
         raw_start_place = ts.get_entry_from_id(esda.RAW_PLACE_KEY, raw_trip.data.start_place)
         filtered_loc_df = _add_start_point(filtered_loc_df, raw_start_place, ts)
 
+    if section.data.end_stop is None:
+        logging.debug("Found last section, may need to extrapolate end point")
+        raw_trip = ts.get_entry_from_id(esda.RAW_TRIP_KEY, section.data.trip_id)
+        raw_end_place = ts.get_entry_from_id(esda.RAW_PLACE_KEY, raw_trip.data.end_place)
+        filtered_loc_df = _add_end_point(filtered_loc_df, raw_end_place, ts)
+
     # Can move this up to get_filtered_section if we want to ensure that we
     # don't touch filtered_section_data in here
     logging.debug("Setting section start values of %s to first point %s" %
@@ -398,7 +404,7 @@ def is_air_section(filtered_section_data, with_speeds_df):
     return False
 
 def _add_start_point(filtered_loc_df, raw_start_place, ts):
-    raw_start_place_enter_loc_entry = _get_raw_start_place_enter_loc_entry(ts, raw_start_place)
+    raw_start_place_enter_loc_entry = _get_raw_place_enter_loc_entry(ts, raw_start_place)
     curr_first_point = filtered_loc_df.iloc[0]
     curr_first_loc = gj.GeoJSON.to_instance(curr_first_point["loc"])
     add_dist = ecc.calDistance(curr_first_loc.coordinates,
@@ -449,13 +455,39 @@ def _add_start_point(filtered_loc_df, raw_start_place, ts):
     new_first_point = ecwe.Entry.create_entry(curr_first_point.user_id,
                             "background/filtered_location",
                             new_first_point_data)
-    return _prepend_new_entry(filtered_loc_df, new_first_point)
+    return _insert_new_entry(-1, filtered_loc_df, new_first_point)
 
-def _get_raw_start_place_enter_loc_entry(ts, raw_start_place):
-    if raw_start_place.data.enter_ts is not None:
+def _add_end_point(filtered_loc_df, raw_end_place, ts):
+    raw_end_place_enter_loc_entry = _get_raw_place_enter_loc_entry(ts, raw_end_place)
+    curr_last_point = filtered_loc_df.iloc[-1]
+    curr_last_loc = gj.GeoJSON.to_instance(curr_last_point["loc"])
+    add_dist = ecc.calDistance(curr_last_loc.coordinates,
+                               raw_end_place_enter_loc_entry.data.loc.coordinates)
+    if add_dist == 0:
+        logging.debug("section end %s = place enter %s, nothing to fix" %
+                      (curr_last_loc, raw_end_place_enter_loc_entry))
+        return filtered_loc_df
+
+    # Note that, unlike _add_start_point, we don't need to extrapolate the time here
+    # we know the time at which the next place was entered, and we have the entry
+    # right here. In particular, if the enter information is missing (e.g. at the
+    # start of a chain, we won't have any trip/section before it, and won't try
+    # to extrapolate to the place
+
+    # Assert that we haven't done the hack for estimating the enter_ts using the exit_ts
+    # because the enter_ts is None
+    assert(raw_end_place.data.enter_ts is not None)
+    logging.debug("Found mismatch of %s in last section %s -> %s, "
+                   "appending location %s, %s to fill the gap" %
+                  (add_dist, curr_last_loc.coordinates, raw_end_place_enter_loc_entry.data.loc.coordinates,
+                   raw_end_place_enter_loc_entry.data.loc.coordinates, raw_end_place_enter_loc_entry.data.fmt_time))
+    return _insert_new_entry(len(filtered_loc_df), filtered_loc_df, raw_end_place_enter_loc_entry)
+
+def _get_raw_place_enter_loc_entry(ts, raw_place):
+    if raw_place.data.enter_ts is not None:
         raw_start_place_enter_loc_entry = ecwe.Entry(
             ts.get_entry_at_ts("background/filtered_location", "data.ts",
-                               raw_start_place.data.enter_ts))
+                               raw_place.data.enter_ts))
     else:
         # These are not strictly accurate because the exit ts for the place
         # corresponds to the ts of the first point in the section. We are trying
@@ -466,37 +498,37 @@ def _get_raw_start_place_enter_loc_entry(ts, raw_start_place):
         # than the point itself. We can work around that by storing the enter_ts even
         # for the first place.
         dummy_section_start_loc_doc = {
-            "loc": raw_start_place.data.location,
-            "latitude": raw_start_place.data.location.coordinates[1],
-            "longitude": raw_start_place.data.location.coordinates[0],
-            "ts": raw_start_place.data.exit_ts,
-            "fmt_time": raw_start_place.data.exit_fmt_time,
-            "local_dt": raw_start_place.data.exit_local_dt
+            "loc": raw_place.data.location,
+            "latitude": raw_place.data.location.coordinates[1],
+            "longitude": raw_place.data.location.coordinates[0],
+            "ts": raw_place.data.exit_ts,
+            "fmt_time": raw_place.data.exit_fmt_time,
+            "local_dt": raw_place.data.exit_local_dt
         }
-        raw_start_place_enter_loc_entry = ecwe.Entry.create_entry(raw_start_place.user_id,
+        raw_start_place_enter_loc_entry = ecwe.Entry.create_entry(raw_place.user_id,
                                                                   "background/filtered_location",
                                                                   dummy_section_start_loc_doc)
     logging.debug("Start place is %s and corresponding location is %s" %
-                  (raw_start_place.get_id(), raw_start_place_enter_loc_entry.get_id()))
+                  (raw_place.get_id(), raw_start_place_enter_loc_entry.get_id()))
     return raw_start_place_enter_loc_entry
 
-def _prepend_new_entry(loc_df, entry):
+def _insert_new_entry(index, loc_df, entry):
     import emission.storage.timeseries.builtin_timeseries as estb
 
-    new_first_point_row = estb.BuiltinTimeSeries._to_df_entry(entry)
-    del new_first_point_row["_id"]
-    missing_cols = set(loc_df.columns) - set(new_first_point_row.keys())
+    new_point_row = estb.BuiltinTimeSeries._to_df_entry(entry)
+    del new_point_row["_id"]
+    missing_cols = set(loc_df.columns) - set(new_point_row.keys())
     logging.debug("Missing cols = %s" % missing_cols)
     for col in missing_cols:
-        new_first_point_row[col] = 0
+        new_point_row[col] = 0
 
-    still_missing_cols = set(loc_df.columns) - set(new_first_point_row.keys())
+    still_missing_cols = set(loc_df.columns) - set(new_point_row.keys())
     logging.debug("Missing cols = %s" % still_missing_cols)
 
-    still_missing_cols = set(new_first_point_row.keys()) - set(loc_df.columns)
+    still_missing_cols = set(new_point_row.keys()) - set(loc_df.columns)
     logging.debug("Missing cols switched around = %s" % still_missing_cols)
 
-    loc_df.loc[-1] = new_first_point_row
+    loc_df.loc[index] = new_point_row
     appended_loc_df = loc_df.sort_index().reset_index(drop=True)
     return appended_loc_df
 
