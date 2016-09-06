@@ -419,15 +419,16 @@ def _add_start_point(filtered_loc_df, raw_start_place, ts):
     if with_speeds_df.speed.median() > 0:
         del_time = add_dist / with_speeds_df.speed.median()
     else:
-        logging.info("speeds for this section are %s, median is %s, using median nonzero instead" %
+        logging.info("speeds for this section are %s, median is %s, trying median nonzero instead" %
                      (with_speeds_df.speed, with_speeds_df.speed.median()))
         speed_nonzero = (with_speeds_df.speed[with_speeds_df.speed != 0])
-        if np.isnan(speed_nonzero.median()):
-            logging.info("nonzero speeds = %s, median is %s, using median nonzero instead" %
+        if not np.isnan(speed_nonzero.median()):
+            logging.info("nonzero speeds = %s, median is %s" %
                          (speed_nonzero, speed_nonzero.median()))
             del_time = add_dist / speed_nonzero.median()
         else:
-            logging.info("no non_zero speeds, unsure what this even means, skipping")
+            logging.info("non_zero speeds = %s, median is %s, unsure what this even means, skipping" %
+                         (speed_nonzero, speed_nonzero.median()))
             del_time = 0
 
 
