@@ -16,8 +16,9 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
     filtering out certain transitions, such as TILTING or UNKNOWN.
     """
 
-    def __init__(self, confidence_threshold, ignore_modes_list):
+    def __init__(self, confidence_threshold, distance_threshold, ignore_modes_list):
         self.confidence_threshold = confidence_threshold
+        self.distance_threshold = distance_threshold
         self.ignore_modes_list = ignore_modes_list
 
     def is_filtered(self, curr_activity_doc):
@@ -95,7 +96,7 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
 
     # Overridden in smoothed_high_confidence_with_visit_transitions.py.
     # Consider porting any changes there as well if applicable.
-    def segment_into_sections(self, timeseries, time_query):
+    def segment_into_sections(self, timeseries, distance_from_place, time_query):
         """
         Determine locations within the specified time that represent segmentation points for a trip.
         :param timeseries: the time series for this user
@@ -133,10 +134,13 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
                 if start_motion.type == end_motion.type:
                     logging.debug("No section because start_motion == end_motion, creating one dummy section")
                     section_list.append((fp, lp, start_motion.type))
-                # if len(motion_changes) == 0:
+                if len(motion_changes) == 0:
                 # there are no high confidence motions useful motions, so we add a section of type NONE
                 # as long as it is a discernable trip (end != start) and not a spurious trip
-                    # logging.debug("No high confidence motions, creating dummy section of type NONE")
-                    # section_list.append((fp, lp, ecwm.MotionTypes.NONE))
+                    if distance_from_place > self.distance_threshold:
+                        logging.debug("No high confidence motions, but "
+                            "distance %s > threshold %s, creating dummy section of type UNKNOWN" %
+                                      (distance_from_place, self.distance_threshold))
+                        section_list.append((fp, lp, ecwm.MotionTypes.UNKNOWN))
 
         return section_list
