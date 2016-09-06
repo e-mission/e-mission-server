@@ -264,7 +264,7 @@ def get_filtered_section(new_trip_entry, section):
     filtered_section_data.distance = sum(distances)
 
     if is_air_section(filtered_section_data, with_speeds_df):
-        filtered_section_data.sensed_mode = ecwm.MotionTypes.AIR
+        filtered_section_data.sensed_mode = ecwm.MotionTypes.AIR_OR_HSR
     else:
         filtered_section_data.sensed_mode = section.data.sensed_mode
 
