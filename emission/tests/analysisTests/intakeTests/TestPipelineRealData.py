@@ -326,6 +326,33 @@ class TestPipelineRealData(unittest.TestCase):
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth).data)
 
+    def testSunilShortTrips(self):
+        dataFile = "emission/tests/data/real_examples/sunil_2016-07-27"
+        start_ld = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 27})
+        cacheKey = "diary/trips-2016-07-27"
+        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
+        # Although we process the day's data in two batches, we should get the same result
+        self.assertEqual(api_result, [])
+
+    def testGabeShortTrips(self):
+        dataFile = "emission/tests/data/real_examples/gabe_2016-06-15"
+        start_ld = ecwl.LocalDate({'year': 2016, 'month': 6, 'day': 15})
+        cacheKey = "diary/trips-2016-06-15"
+        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
+        # Although we process the day's data in two batches, we should get the same result
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth).data)
+
     def testJumpSmoothingSectionEnd(self):
         dataFile = "emission/tests/data/real_examples/shankari_2016-independence_day"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 15})
