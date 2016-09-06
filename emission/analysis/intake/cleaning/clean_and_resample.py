@@ -419,13 +419,19 @@ def _add_start_point(filtered_loc_df, raw_start_place, ts):
     if with_speeds_df.speed.median() > 0:
         del_time = add_dist / with_speeds_df.speed.median()
     else:
-        logging.info("speeds for this section are %s, median is %s, skipping" %
+        logging.info("speeds for this section are %s, median is %s, using median nonzero instead" %
                      (with_speeds_df.speed, with_speeds_df.speed.median()))
-        del_time = 0
+        speed_nonzero = (with_speeds_df.speed[with_speeds_df.speed != 0])
+        if np.isnan(speed_nonzero.median()):
+            logging.info("nonzero speeds = %s, median is %s, using median nonzero instead" %
+                         (speed_nonzero, speed_nonzero.median()))
+            del_time = add_dist / speed_nonzero.median()
+        else:
+            logging.info("no non_zero speeds, unsure what this even means, skipping")
+            del_time = 0
 
 
-    if add_dist == 0 and del_time == 0:
-        #
+    if del_time == 0:
         logging.debug("curr_first_point %s, %s == start_place exit %s, %s"
                       "skipping add of first point" %
                       (curr_first_point.fmt_time, curr_first_point.loc,
@@ -902,14 +908,21 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
                               esda.get_time_query_for_trip_like(esda.CLEANED_SECTION_KEY, first_section.get_id()))
     loc_df.rename(columns={"speed": "from_points_speed", "distance": "from_points_distance"}, inplace=True)
     with_speeds_df = eaicl.add_dist_heading_speed(loc_df)
-    assert(with_speeds_df.speed.tolist() == first_section_data["speeds"],
-          "%s != %s" % (with_speeds_df.speed.tolist()[:10], first_section_data["speeds"][:10]))
-    assert(with_speeds_df.distance.tolist() == first_section_data["distances"],
-           "%s != %s" % (with_speeds_df.distance.tolist()[:10], first_section_data["distances"][:10]))
-    assert(with_speeds_df.speed.tolist() == with_speeds_df.from_points_speed.tolist(),
-           "%s != %s" % (with_speeds_df.speed.tolist()[:10], with_speeds_df.from_points_speed.tolist()[:10]))
-    assert(with_speeds_df.distance.tolist() == with_speeds_df.from_points_distance.tolist(),
-          "%s != %s" % (with_speeds_df.distance.tolist()[:10], with_speeds_df.from_points_distance.tolist()[:10]))
+    if with_speeds_df.speed.tolist() != first_section_data["speeds"]:
+        logging.error("%s != %s" % (with_speeds_df.speed.tolist()[:10], first_section_data["speeds"][:10]))
+        assert False
+
+    if with_speeds_df.distance.tolist() != first_section_data["distances"]:
+        logging.error("%s != %s" % (with_speeds_df.distance.tolist()[:10], first_section_data["distances"][:10]))
+        assert False
+
+    if with_speeds_df.speed.tolist() != with_speeds_df.from_points_speed.tolist():
+        logging.error("%s != %s" % (with_speeds_df.speed.tolist()[:10], with_speeds_df.from_points_speed.tolist()[:10]))
+        assert False
+
+    if with_speeds_df.distance.tolist() != with_speeds_df.from_points_distance.tolist():
+        logging.error("%s != %s" % (with_speeds_df.distance.tolist()[:10], with_speeds_df.from_points_distance.tolist()[:10]))
+        assert False
 
 def format_result(rev_geo_result):
     get_fine = lambda rgr: get_with_fallbacks(rgr["address"], ["road", "neighbourhood"])
