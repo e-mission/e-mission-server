@@ -108,7 +108,8 @@ class TestSectionSegmentation(unittest.TestCase):
             }
         test_trip_id = ts.insert(ecwe.Entry.create_entry(self.androidUUID,
             "segmentation/raw_trip", test_trip))
-        eaiss.segment_trip_into_sections(self.androidUUID, test_trip_id, "DwellSegmentationTimeFilter")
+        test_trip_entry = ts.get_entry_from_id(esda.RAW_TRIP_KEY, test_trip_id)
+        eaiss.segment_trip_into_sections(self.androidUUID, test_trip_entry, "DwellSegmentationTimeFilter")
 
         created_stops_entries = esdt.get_raw_stops_for_trip(self.androidUUID, test_trip_id)
         created_sections_entries = esdt.get_raw_sections_for_trip(self.androidUUID, test_trip_id)
