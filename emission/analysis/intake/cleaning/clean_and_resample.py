@@ -423,6 +423,7 @@ def _add_start_point(filtered_loc_df, raw_start_place, ts):
                      (with_speeds_df.speed, with_speeds_df.speed.median()))
         del_time = 0
 
+
     if add_dist == 0 and del_time == 0:
         #
         logging.debug("curr_first_point %s, %s == start_place exit %s, %s"
@@ -543,11 +544,15 @@ def _set_extrapolated_start_for_trip(filtered_trip_data, first_section, last_sec
     filtered_trip_data.duration = filtered_trip_data.end_ts - filtered_trip_data.start_ts
 
 def _overwrite_from_loc_row(filtered_section_data, fixed_loc, prefix):
-    filtered_section_data[prefix+"_ts"] = fixed_loc.ts
-    filtered_section_data[prefix+"_local_dt"] = esdl.get_local_date(fixed_loc.ts,
-                                                                    fixed_loc.local_dt_timezone)
-    filtered_section_data[prefix+"_fmt_time"] = fixed_loc.fmt_time
-    filtered_section_data[prefix+"_loc"] = fixed_loc["loc"]
+    _overwrite_from_timestamp(filtered_section_data, prefix,
+                              fixed_loc.ts, fixed_loc.local_dt_timezone,
+                              fixed_loc["loc"])
+
+def _overwrite_from_timestamp(filtered_trip_like, prefix, ts, tz, loc):
+    filtered_trip_like[prefix+"_ts"] = ts
+    filtered_trip_like[prefix+"_local_dt"] = esdl.get_local_date(ts, tz)
+    filtered_trip_like[prefix+"_fmt_time"] = arrow.get(ts).to(tz).isoformat()
+    filtered_trip_like[prefix+"_loc"] = loc
 
 def remove_outliers(raw_loc_entry_list, filtered_point_id_list):
     import emission.storage.timeseries.builtin_timeseries as estb
@@ -708,6 +713,7 @@ def _copy_prefixed_fields(stop_data, stop_prefix, section_data, section_prefix):
     stop_data[stop_prefix+"_loc"] = section_data[section_prefix+"_loc"]
 
 def create_and_link_timeline(tl, user_id, trip_map):
+    ts = esta.TimeSeries.get_time_series(user_id)
     last_cleaned_place = esdp.get_last_place_entry(esda.CLEANED_PLACE_KEY, user_id)
     cleaned_places = []
     curr_cleaned_start_place = last_cleaned_place
@@ -734,7 +740,7 @@ def create_and_link_timeline(tl, user_id, trip_map):
             # start to the curr_cleaned_start_place
             curr_cleaned_trip = trip_map[raw_trip.get_id()]
             raw_start_place = tl.get_object(raw_trip.data.start_place)
-            link_trip_start(curr_cleaned_trip, curr_cleaned_start_place, raw_start_place)
+            link_trip_start(ts, curr_cleaned_trip, curr_cleaned_start_place, raw_start_place)
 
             raw_end_place = tl.get_object(raw_trip.data.end_place)
             curr_cleaned_end_place = get_filtered_place(raw_end_place)
@@ -768,13 +774,27 @@ def link_squished_place(cleaned_place, raw_place):
     cleaned_place_data.append_raw_place(raw_place.get_id())
     cleaned_place["data"] = cleaned_place_data
 
-def link_trip_start(cleaned_trip, cleaned_start_place, raw_start_place):
+def link_trip_start(ts, cleaned_trip, cleaned_start_place, raw_start_place):
     logging.debug("for trip %s start, converting %s to %s" %
                   (cleaned_trip, cleaned_start_place, raw_start_place))
     cleaned_start_place_data = cleaned_start_place.data
     cleaned_trip_data = cleaned_trip.data
 
     cleaned_trip_data.start_place = cleaned_start_place.get_id()
+
+    # It may be that we are linking to a cleaned place that wasn't generated from
+    # this raw place - e.g.
+    # trip 1: valid - create cp1 for start and cp2 for end
+    # trip 2: squished - link cp2 to start
+    # trip 3: valid - link cp2 to start
+    # Note that cp2 was originally created from the end place of trip 1 = start place
+    # of trip 2. Now it is being linked to the start place of trip 3. While these
+    # have to be < 100 m away, they are not guaranteed to be identical.
+    # Let's handle this case (https://github.com/e-mission/e-mission-server/issues/385#issuecomment-244793203)
+    if (cleaned_start_place_data.location.coordinates !=
+                       raw_start_place.data.location.coordinates):
+        _fix_squished_place_mismatch(cleaned_trip.user_id, cleaned_trip.get_id(),
+                                     ts, cleaned_trip_data, cleaned_start_place_data)
 
     # We have now reached the end of the squishing. Let's hook up the end information
     cleaned_start_place_data.starting_trip = cleaned_trip.get_id()
@@ -791,8 +811,7 @@ def link_trip_start(cleaned_trip, cleaned_start_place, raw_start_place):
         (cleaned_start_place_data.enter_ts, cleaned_start_place_data.exit_ts))
 
     # Appended while creating the start place, or while handling squished
-    # TODO: Don't think I need this?
-    # cleaned_start_place_data.append_raw_place(raw_trip.data.start_place)
+    cleaned_start_place_data.append_raw_place(raw_start_place.get_id())
 
     cleaned_start_place["data"] = cleaned_start_place_data
     cleaned_trip["data"] = cleaned_trip_data
@@ -806,6 +825,84 @@ def link_trip_end(cleaned_trip, cleaned_end_place, raw_end_place):
 
     cleaned_end_place["data"] = cleaned_end_place_data
     cleaned_trip["data"] = cleaned_trip_data
+
+def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleaned_start_place_data):
+    distance_delta = ecc.calDistance(cleaned_trip_data.start_loc.coordinates,
+                                     cleaned_start_place_data.location.coordinates)
+    logging.debug("squishing mismatch: resetting trip start_loc %s to cleaned_start_place.location %s" %
+                  (cleaned_trip_data.start_loc.coordinates, cleaned_start_place_data.location.coordinates))
+    # In order to make everything line up, we need to:
+    # 1) compute the new trip start ~ 50m at 5km/hr = 36 secs
+    # We will approximate to 30 secs to make it consistent with the other locations
+    new_ts = cleaned_trip_data.start_ts - 30
+    # 2) Reset trip start location and ts
+    _overwrite_from_timestamp(cleaned_trip_data, "start",
+                              new_ts, cleaned_trip_data.start_local_dt.timezone,
+                              cleaned_start_place_data.location)
+    # 3) Fix other trip stats
+    cleaned_trip_data["distance"] = cleaned_trip_data.distance + distance_delta
+    cleaned_trip_data["duration"] = cleaned_trip_data.distance + 30
+
+    # 4) Reset section
+    section_entries = esdtq.get_cleaned_sections_for_trip(user_id, trip_id)
+    first_section = section_entries[0]
+    first_section_data = first_section.data
+    _overwrite_from_timestamp(first_section_data, "start",
+                              new_ts, cleaned_trip_data.start_local_dt.timezone,
+                              cleaned_start_place_data.location)
+
+    # 5) Fix other section stats
+    first_section_data["distance"] = first_section_data.distance + distance_delta
+    first_section_data["duration"] = first_section_data.distance + 30
+    # including the distances array (move everything by the delta and add a 0 entry at the beginning)
+    # [0.0, 13.727242885636501, 13.727251206018853, -> [0.0, distance_delta, 13.727242885636501, 13.727251206018853,
+    distances_list = first_section_data["distances"]
+    distances_list.insert(1, distance_delta)
+    # and the speed array (insert an entry for this first 30 secs)
+    # [0.0, 0.45757476285455007, 0.4575750402006284, -> [0.0, distance_delta/30, 0.45757476285455007, 0.4575750402006284,
+    speed_list = first_section_data["speeds"]
+    speed_list.insert(1, float(distance_delta)/30)
+    first_section_data["distances"] = distances_list
+    first_section_data["speeds"] = speed_list
+
+    first_section["data"] = first_section_data
+    ts.update(first_section)
+
+    # 4) Add a new ReconstructedLocation to match the new start point
+    orig_location = ts.get_entry_at_ts("background/filtered_location", "data.ts", cleaned_start_place_data.enter_ts)
+    orig_location_data = ad.AttrDict(orig_location).data
+    # keep the location, override the time
+    orig_location_data.ts = new_ts
+    orig_location_data.local_dt = first_section_data.start_local_dt
+    orig_location_data.fmt_time = first_section_data.start_fmt_time
+    orig_location_data.speed = 0
+    orig_location_data.distance = 0
+    loc_row = ecwrl.Recreatedlocation(orig_location_data)
+    loc_row.mode = first_section_data.sensed_mode
+    loc_row.section = first_section.get_id()
+    ts.insert_data(user_id, esda.CLEANED_LOCATION_KEY, loc_row)
+
+    # 5) Update previous first location data to have the correct speed and distance
+    prev_first_loc = ecwe.Entry(ts.get_entry_at_ts(esda.CLEANED_LOCATION_KEY, "data.ts", cleaned_trip_data.start_ts))
+    prev_first_loc_data = prev_first_loc.data
+    prev_first_loc_data["distance"] = distance_delta
+    prev_first_loc_data["speed"] = float(distance_delta) / 30
+    prev_first_loc["data"] = prev_first_loc_data
+    ts.update(prev_first_loc)
+
+    # Validate the distance and speed calculations. Can remove this after validation
+    loc_df = esda.get_data_df(esda.CLEANED_LOCATION_KEY, user_id,
+                              esda.get_time_query_for_trip_like(esda.CLEANED_SECTION_KEY, first_section.get_id()))
+    loc_df.rename(columns={"speed": "from_points_speed", "distance": "from_points_distance"}, inplace=True)
+    with_speeds_df = eaicl.add_dist_heading_speed(loc_df)
+    assert(with_speeds_df.speed.tolist() == first_section_data["speeds"],
+          "%s != %s" % (with_speeds_df.speed.tolist()[:10], first_section_data["speeds"][:10]))
+    assert(with_speeds_df.distance.tolist() == first_section_data["distances"],
+           "%s != %s" % (with_speeds_df.distance.tolist()[:10], first_section_data["distances"][:10]))
+    assert(with_speeds_df.speed.tolist() == with_speeds_df.from_points_speed.tolist(),
+           "%s != %s" % (with_speeds_df.speed.tolist()[:10], with_speeds_df.from_points_speed.tolist()[:10]))
+    assert(with_speeds_df.distance.tolist() == with_speeds_df.from_points_distance.tolist(),
+          "%s != %s" % (with_speeds_df.distance.tolist()[:10], with_speeds_df.from_points_distance.tolist()[:10]))
 
 def format_result(rev_geo_result):
     get_fine = lambda rgr: get_with_fallbacks(rgr["address"], ["road", "neighbourhood"])
