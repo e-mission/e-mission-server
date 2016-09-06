@@ -829,6 +829,8 @@ def link_trip_end(cleaned_trip, cleaned_end_place, raw_end_place):
 def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleaned_start_place_data):
     distance_delta = ecc.calDistance(cleaned_trip_data.start_loc.coordinates,
                                      cleaned_start_place_data.location.coordinates)
+    curr_first_loc = ecwe.Entry(ts.get_entry_at_ts(esda.CLEANED_LOCATION_KEY, "data.ts",
+                                                   cleaned_trip_data.start_ts))
     logging.debug("squishing mismatch: resetting trip start_loc %s to cleaned_start_place.location %s" %
                   (cleaned_trip_data.start_loc.coordinates, cleaned_start_place_data.location.coordinates))
     # In order to make everything line up, we need to:
@@ -869,26 +871,31 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
     ts.update(first_section)
 
     # 4) Add a new ReconstructedLocation to match the new start point
-    orig_location = ts.get_entry_at_ts("background/filtered_location", "data.ts", cleaned_start_place_data.enter_ts)
-    orig_location_data = ad.AttrDict(orig_location).data
+    if cleaned_start_place_data.enter_ts is not None:
+        orig_location = ts.get_entry_at_ts("background/filtered_location", "data.ts", cleaned_start_place_data.enter_ts)
+    else:
+        first_raw_place = ecwe.Entry(ts.get_entry_from_id(esda.RAW_PLACE_KEY,
+                                                          cleaned_start_place_data["raw_places"][0]))
+        orig_location = ts.get_entry_at_ts("background/filtered_location", "data.ts", first_raw_place.data.exit_ts)
+
+    orig_location_data = ecwe.Entry(orig_location).data
     # keep the location, override the time
-    orig_location_data.ts = new_ts
-    orig_location_data.local_dt = first_section_data.start_local_dt
-    orig_location_data.fmt_time = first_section_data.start_fmt_time
-    orig_location_data.speed = 0
-    orig_location_data.distance = 0
+    orig_location_data["ts"] = new_ts
+    orig_location_data["local_dt"] = first_section_data.start_local_dt
+    orig_location_data["fmt_time"] = first_section_data.start_fmt_time
+    orig_location_data["speed"] = 0
+    orig_location_data["distance"] = 0
     loc_row = ecwrl.Recreatedlocation(orig_location_data)
     loc_row.mode = first_section_data.sensed_mode
     loc_row.section = first_section.get_id()
     ts.insert_data(user_id, esda.CLEANED_LOCATION_KEY, loc_row)
 
     # 5) Update previous first location data to have the correct speed and distance
-    prev_first_loc = ecwe.Entry(ts.get_entry_at_ts(esda.CLEANED_LOCATION_KEY, "data.ts", cleaned_trip_data.start_ts))
-    prev_first_loc_data = prev_first_loc.data
-    prev_first_loc_data["distance"] = distance_delta
-    prev_first_loc_data["speed"] = float(distance_delta) / 30
-    prev_first_loc["data"] = prev_first_loc_data
-    ts.update(prev_first_loc)
+    curr_first_loc_data = curr_first_loc.data
+    curr_first_loc_data["distance"] = distance_delta
+    curr_first_loc_data["speed"] = float(distance_delta) / 30
+    curr_first_loc["data"] = curr_first_loc_data
+    ts.update(curr_first_loc)
 
     # Validate the distance and speed calculations. Can remove this after validation
     loc_df = esda.get_data_df(esda.CLEANED_LOCATION_KEY, user_id,

@@ -185,9 +185,9 @@ class BuiltinTimeSeries(esta.TimeSeries):
         return ts_db_result
 
     def get_entry_at_ts(self, key, ts_key, ts):
-        return self.get_timeseries_db(key).find_one({"user_id": self.user_id,
-                                                 "metadata.key": key,
-                                                 ts_key: ts})
+        query = {"user_id": self.user_id, "metadata.key": key, ts_key: ts}
+        logging.debug("get_entry_at_ts query = %s" % query)
+        return self.get_timeseries_db(key).find_one(query)
 
     def get_data_df(self, key, time_query = None, geo_query = None,
                     extra_query_list=None,
