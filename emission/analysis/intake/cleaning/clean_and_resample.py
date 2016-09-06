@@ -715,12 +715,13 @@ def create_and_link_timeline(tl, user_id, trip_map):
             unsquished_trips.append(curr_cleaned_trip)
         else:
             # this is a squished trip, so we combine the start place with the
-            # current start place we do not need to combine both start and end
-            # places, since the end place of one trip is the start place of another. We combine start places instead of end places
-            # because when the squishy part ends, we combine the start place of the un-squished trip
+            # current start place. We do not need to combine both start and end
+            # places, since the end place of one trip is the start place of another.
+            # We combine start places instead of end places because when the squishy part ends,
+            # we combine the start place of the un-squished trip
             # with the existing cleaned start and create a new entry for the un-squished end
-            logging.debug("Found squished trip, linking raw start place %s to new cleaned place %s" %
-                          (raw_trip.data.start_place, curr_cleaned_start_place.get_id()))
+            logging.debug("Found squished trip %s, linking raw start place %s to existing cleaned place %s" %
+                          (raw_trip.get_id(), raw_trip.data.start_place, curr_cleaned_start_place.get_id()))
             link_squished_place(curr_cleaned_start_place,
                                 tl.get_object(raw_trip.data.start_place))
 
@@ -750,12 +751,12 @@ def link_trip_start(cleaned_trip, cleaned_start_place, raw_start_place):
     cleaned_start_place_data.exit_local_dt = cleaned_trip_data.start_local_dt
 
     if cleaned_start_place_data.enter_ts is not None and \
-		cleaned_start_place_data.exit_ts is not None:
+        cleaned_start_place_data.exit_ts is not None:
            cleaned_start_place_data.duration = cleaned_start_place_data.exit_ts - \
                                             cleaned_start_place_data.enter_ts
     else:
            logging.debug("enter_ts = %s, exit_ts = %s, unknown duration" % 
-		(cleaned_start_place_data.enter_ts, cleaned_start_place_data.exit_ts))
+        (cleaned_start_place_data.enter_ts, cleaned_start_place_data.exit_ts))
 
     # Appended while creating the start place, or while handling squished
     # TODO: Don't think I need this?
