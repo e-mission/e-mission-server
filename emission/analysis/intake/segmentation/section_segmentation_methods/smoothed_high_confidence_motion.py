@@ -127,6 +127,7 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
                               (ecwl.Location(raw_section_df.iloc[0]), ecwl.Location(raw_section_df.iloc[-1])))
                 section_list.append((raw_section_df.iloc[0], raw_section_df.iloc[-1], start_motion.type))
 
+        logging.debug("len(section_list) == %s" % len(section_list))
         if len(section_list) == 0:
             if len(motion_changes) == 1:
                 (start_motion, end_motion) = motion_changes[0]
@@ -134,13 +135,14 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
                 if start_motion.type == end_motion.type:
                     logging.debug("No section because start_motion == end_motion, creating one dummy section")
                     section_list.append((fp, lp, start_motion.type))
-                if len(motion_changes) == 0:
-                # there are no high confidence motions useful motions, so we add a section of type NONE
-                # as long as it is a discernable trip (end != start) and not a spurious trip
-                    if distance_from_place > self.distance_threshold:
-                        logging.debug("No high confidence motions, but "
-                            "distance %s > threshold %s, creating dummy section of type UNKNOWN" %
-                                      (distance_from_place, self.distance_threshold))
-                        section_list.append((fp, lp, ecwm.MotionTypes.UNKNOWN))
+
+            if len(motion_changes) == 0:
+            # there are no high confidence motions useful motions, so we add a section of type NONE
+            # as long as it is a discernable trip (end != start) and not a spurious trip
+                if distance_from_place > self.distance_threshold:
+                    logging.debug("No high confidence motions, but "
+                        "distance %s > threshold %s, creating dummy section of type UNKNOWN" %
+                                  (distance_from_place, self.distance_threshold))
+                    section_list.append((fp, lp, ecwm.MotionTypes.UNKNOWN))
 
         return section_list
