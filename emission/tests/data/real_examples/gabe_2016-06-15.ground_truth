@@ -11,7 +11,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0f34af6858f1343b2d055", 
+                    "id": "57cf6676f6858f4e2c238221", 
                     "properties": {
                         "exit_local_dt": {
                             "hour": 9, 
@@ -27,12 +27,15 @@
                         "feature_type": "start_place", 
                         "exit_fmt_time": "2016-06-15T09:27:47.237000-07:00", 
                         "starting_trip": {
-                            "$oid": "57c0f346f6858f1343b2cf82"
+                            "$oid": "57cf6672f6858f4e2c23814c"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "raw_places": [
                             {
-                                "$oid": "57c0f344f6858f1343b2cf5a"
+                                "$oid": "57cf666ff6858f4e2c23811b"
+                            }, 
+                            {
+                                "$oid": "57cf666ff6858f4e2c23811b"
                             }
                         ], 
                         "exit_ts": 1466008067.237
@@ -47,7 +50,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0f34af6858f1343b2d056", 
+                    "id": "57cf6676f6858f4e2c238222", 
                     "properties": {
                         "enter_fmt_time": "2016-06-15T09:35:51.871000-07:00", 
                         "exit_local_dt": {
@@ -74,17 +77,20 @@
                             "minute": 35
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0f346f6858f1343b2cf82"
+                            "$oid": "57cf6672f6858f4e2c23814c"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0f346f6858f1343b2cf96"
+                            "$oid": "57cf6672f6858f4e2c238161"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1466008551.871, 
                         "duration": 6226.407031059265, 
                         "raw_places": [
                             {
-                                "$oid": "57c0f344f6858f1343b2cf5c"
+                                "$oid": "57cf666ff6858f4e2c23811d"
+                            }, 
+                            {
+                                "$oid": "57cf666ff6858f4e2c23811d"
                             }
                         ], 
                         "exit_ts": 1466014778.278031
@@ -97,6 +103,14 @@
                             "geometry": {
                                 "type": "LineString", 
                                 "coordinates": [
+                                    [
+                                        -122.2662991, 
+                                        37.8743918
+                                    ], 
+                                    [
+                                        -122.26606466875425, 
+                                        37.87437443138947
+                                    ], 
                                     [
                                         -122.26554089833081, 
                                         37.874365975016936
@@ -164,9 +178,11 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0f346f6858f1343b2cf85", 
+                            "id": "57cf6672f6858f4e2c23814e", 
                             "properties": {
                                 "distances": [
+                                    0.0, 
+                                    20.66709423413364, 
                                     45.98235577264359, 
                                     8.162079738326751, 
                                     79.83981593190936, 
@@ -185,10 +201,11 @@
                                     4.161280998945467
                                 ], 
                                 "feature_type": "section", 
-                                "sensed_mode": "MotionTypes.ON_FOOT", 
+                                "distance": 646.7187188727137, 
                                 "end_ts": 1466008551.871, 
                                 "start_ts": 1466008067.237, 
                                 "start_fmt_time": "2016-06-15T09:27:47.237000-07:00", 
+                                "sensed_mode": "MotionTypes.ON_FOOT", 
                                 "source": "SmoothedHighConfidenceMotion", 
                                 "end_fmt_time": "2016-06-15T09:35:51.871000-07:00", 
                                 "end_local_dt": {
@@ -203,7 +220,7 @@
                                 }, 
                                 "duration": 484.6340000629425, 
                                 "trip_id": {
-                                    "$oid": "57c0f346f6858f1343b2cf82"
+                                    "$oid": "57cf6672f6858f4e2c23814c"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 9, 
@@ -216,6 +233,8 @@
                                     "minute": 27
                                 }, 
                                 "speeds": [
+                                    0.0, 
+                                    0.6889031411377879, 
                                     1.5327451924214528, 
                                     0.2720693246108917, 
                                     2.6613271977303117, 
@@ -232,22 +251,21 @@
                                     0.4002159873615776, 
                                     0.7019678412578779, 
                                     0.8979889819645644
-                                ], 
-                                "distance": 626.0516246385799
+                                ]
                             }
                         }
                     ]
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57c0f346f6858f1343b2cf82", 
+            "id": "57cf6672f6858f4e2c23814c", 
             "properties": {
-                "distance": 626.0516246385799, 
+                "distance": 646.7187188727137, 
                 "end_place": {
-                    "$oid": "57c0f34af6858f1343b2d056"
+                    "$oid": "57cf6676f6858f4e2c238222"
                 }, 
                 "raw_trip": {
-                    "$oid": "57c0f344f6858f1343b2cf5b"
+                    "$oid": "57cf666ff6858f4e2c23811c"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -269,7 +287,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57c0f34af6858f1343b2d055"
+                    "$oid": "57cf6676f6858f4e2c238221"
                 }, 
                 "end_fmt_time": "2016-06-15T09:35:51.871000-07:00", 
                 "end_local_dt": {
@@ -306,7 +324,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0f34af6858f1343b2d056", 
+                    "id": "57cf6676f6858f4e2c238222", 
                     "properties": {
                         "enter_fmt_time": "2016-06-15T09:35:51.871000-07:00", 
                         "exit_local_dt": {
@@ -333,17 +351,20 @@
                             "minute": 35
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0f346f6858f1343b2cf82"
+                            "$oid": "57cf6672f6858f4e2c23814c"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0f346f6858f1343b2cf96"
+                            "$oid": "57cf6672f6858f4e2c238161"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1466008551.871, 
                         "duration": 6226.407031059265, 
                         "raw_places": [
                             {
-                                "$oid": "57c0f344f6858f1343b2cf5c"
+                                "$oid": "57cf666ff6858f4e2c23811d"
+                            }, 
+                            {
+                                "$oid": "57cf666ff6858f4e2c23811d"
                             }
                         ], 
                         "exit_ts": 1466014778.278031
@@ -358,7 +379,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0f34af6858f1343b2d057", 
+                    "id": "57cf6676f6858f4e2c238223", 
                     "properties": {
                         "enter_fmt_time": "2016-06-15T11:26:49.560000-07:00", 
                         "exit_local_dt": {
@@ -385,17 +406,20 @@
                             "minute": 26
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0f346f6858f1343b2cf96"
+                            "$oid": "57cf6672f6858f4e2c238161"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0f347f6858f1343b2cfa9"
+                            "$oid": "57cf6673f6858f4e2c238174"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1466015209.56, 
                         "duration": 6158.296237230301, 
                         "raw_places": [
                             {
-                                "$oid": "57c0f344f6858f1343b2cf5e"
+                                "$oid": "57cf666ff6858f4e2c23811f"
+                            }, 
+                            {
+                                "$oid": "57cf666ff6858f4e2c23811f"
                             }
                         ], 
                         "exit_ts": 1466021367.8562372
@@ -475,7 +499,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0f347f6858f1343b2cf98", 
+                            "id": "57cf6673f6858f4e2c238163", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -496,10 +520,11 @@
                                     3.0559836005540886
                                 ], 
                                 "feature_type": "section", 
-                                "sensed_mode": "MotionTypes.ON_FOOT", 
+                                "distance": 121.55806934646698, 
                                 "end_ts": 1466015209.56, 
                                 "start_ts": 1466014778.278031, 
                                 "start_fmt_time": "2016-06-15T11:19:38.278031-07:00", 
+                                "sensed_mode": "MotionTypes.ON_FOOT", 
                                 "source": "SmoothedHighConfidenceMotion", 
                                 "end_fmt_time": "2016-06-15T11:26:49.560000-07:00", 
                                 "end_local_dt": {
@@ -514,7 +539,7 @@
                                 }, 
                                 "duration": 431.281968832016, 
                                 "trip_id": {
-                                    "$oid": "57c0f346f6858f1343b2cf96"
+                                    "$oid": "57cf6672f6858f4e2c238161"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 11, 
@@ -543,22 +568,21 @@
                                     0.2608863114082853, 
                                     0.4579444513528064, 
                                     0.27087325324652667
-                                ], 
-                                "distance": 121.55806934646698
+                                ]
                             }
                         }
                     ]
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57c0f346f6858f1343b2cf96", 
+            "id": "57cf6672f6858f4e2c238161", 
             "properties": {
                 "distance": 121.55806934646698, 
                 "end_place": {
-                    "$oid": "57c0f34af6858f1343b2d057"
+                    "$oid": "57cf6676f6858f4e2c238223"
                 }, 
                 "raw_trip": {
-                    "$oid": "57c0f344f6858f1343b2cf5d"
+                    "$oid": "57cf666ff6858f4e2c23811e"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -580,7 +604,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57c0f34af6858f1343b2d056"
+                    "$oid": "57cf6676f6858f4e2c238222"
                 }, 
                 "end_fmt_time": "2016-06-15T11:26:49.560000-07:00", 
                 "end_local_dt": {
@@ -593,7 +617,7 @@
                     "day": 15, 
                     "minute": 26
                 }, 
-                "duration": 62.75499987602234, 
+                "duration": 431.281968832016, 
                 "start_local_dt": {
                     "hour": 11, 
                     "month": 6, 
@@ -617,7 +641,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0f34af6858f1343b2d057", 
+                    "id": "57cf6676f6858f4e2c238223", 
                     "properties": {
                         "enter_fmt_time": "2016-06-15T11:26:49.560000-07:00", 
                         "exit_local_dt": {
@@ -644,17 +668,20 @@
                             "minute": 26
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0f346f6858f1343b2cf96"
+                            "$oid": "57cf6672f6858f4e2c238161"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0f347f6858f1343b2cfa9"
+                            "$oid": "57cf6673f6858f4e2c238174"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1466015209.56, 
                         "duration": 6158.296237230301, 
                         "raw_places": [
                             {
-                                "$oid": "57c0f344f6858f1343b2cf5e"
+                                "$oid": "57cf666ff6858f4e2c23811f"
+                            }, 
+                            {
+                                "$oid": "57cf666ff6858f4e2c23811f"
                             }
                         ], 
                         "exit_ts": 1466021367.8562372
@@ -669,22 +696,22 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0f34bf6858f1343b2d058", 
+                    "id": "57cf6677f6858f4e2c238224", 
                     "properties": {
                         "enter_fmt_time": "2016-06-15T13:25:46.208000-07:00", 
                         "exit_local_dt": {
                             "hour": 17, 
                             "month": 6, 
-                            "second": 12, 
+                            "second": 42, 
                             "weekday": 2, 
                             "year": 2016, 
                             "timezone": "America/Los_Angeles", 
                             "day": 15, 
-                            "minute": 47
+                            "minute": 46
                         }, 
                         "display_name": "Le Roy Avenue, Berkeley", 
                         "feature_type": "end_place", 
-                        "exit_fmt_time": "2016-06-15T17:47:12.439580-07:00", 
+                        "exit_fmt_time": "2016-06-15T17:46:42.439580-07:00", 
                         "enter_local_dt": {
                             "hour": 13, 
                             "month": 6, 
@@ -696,32 +723,35 @@
                             "minute": 25
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0f347f6858f1343b2cfa9"
+                            "$oid": "57cf6673f6858f4e2c238174"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0f348f6858f1343b2cfda"
+                            "$oid": "57cf6674f6858f4e2c2381a6"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1466022346.208, 
-                        "duration": 15686.231580257416, 
+                        "duration": 15656.231580257416, 
                         "raw_places": [
                             {
-                                "$oid": "57c0f344f6858f1343b2cf60"
+                                "$oid": "57cf666ff6858f4e2c238121"
                             }, 
                             {
-                                "$oid": "57c0f344f6858f1343b2cf60"
+                                "$oid": "57cf666ff6858f4e2c238121"
                             }, 
                             {
-                                "$oid": "57c0f344f6858f1343b2cf62"
+                                "$oid": "57cf666ff6858f4e2c238123"
                             }, 
                             {
-                                "$oid": "57c0f344f6858f1343b2cf64"
+                                "$oid": "57cf666ff6858f4e2c238125"
                             }, 
                             {
-                                "$oid": "57c0f344f6858f1343b2cf66"
+                                "$oid": "57cf666ff6858f4e2c238127"
+                            }, 
+                            {
+                                "$oid": "57cf666ff6858f4e2c238129"
                             }
                         ], 
-                        "exit_ts": 1466038032.4395802
+                        "exit_ts": 1466038002.4395802
                     }
                 }, 
                 {
@@ -870,7 +900,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0f347f6858f1343b2cfab", 
+                            "id": "57cf6673f6858f4e2c238176", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -909,10 +939,11 @@
                                     5.0848878719859565
                                 ], 
                                 "feature_type": "section", 
-                                "sensed_mode": "MotionTypes.ON_FOOT", 
+                                "distance": 507.0487647218281, 
                                 "end_ts": 1466022346.208, 
                                 "start_ts": 1466021367.8562372, 
                                 "start_fmt_time": "2016-06-15T13:09:27.856237-07:00", 
+                                "sensed_mode": "MotionTypes.ON_FOOT", 
                                 "source": "SmoothedHighConfidenceMotion", 
                                 "end_fmt_time": "2016-06-15T13:25:46.208000-07:00", 
                                 "end_local_dt": {
@@ -927,7 +958,7 @@
                                 }, 
                                 "duration": 978.3517627716064, 
                                 "trip_id": {
-                                    "$oid": "57c0f347f6858f1343b2cfa9"
+                                    "$oid": "57cf6673f6858f4e2c238174"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 13, 
@@ -974,22 +1005,21 @@
                                     0.0, 
                                     0.1436492062141699, 
                                     0.2770789888289758
-                                ], 
-                                "distance": 507.0487647218281
+                                ]
                             }
                         }
                     ]
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57c0f347f6858f1343b2cfa9", 
+            "id": "57cf6673f6858f4e2c238174", 
             "properties": {
                 "distance": 507.0487647218281, 
                 "end_place": {
-                    "$oid": "57c0f34bf6858f1343b2d058"
+                    "$oid": "57cf6677f6858f4e2c238224"
                 }, 
                 "raw_trip": {
-                    "$oid": "57c0f344f6858f1343b2cf5f"
+                    "$oid": "57cf666ff6858f4e2c238120"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -1011,7 +1041,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57c0f34af6858f1343b2d057"
+                    "$oid": "57cf6676f6858f4e2c238223"
                 }, 
                 "end_fmt_time": "2016-06-15T13:25:46.208000-07:00", 
                 "end_local_dt": {
@@ -1024,7 +1054,7 @@
                     "day": 15, 
                     "minute": 25
                 }, 
-                "duration": 967.2070000171661, 
+                "duration": 978.3517627716064, 
                 "start_local_dt": {
                     "hour": 13, 
                     "month": 6, 
@@ -1048,22 +1078,22 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0f34bf6858f1343b2d058", 
+                    "id": "57cf6677f6858f4e2c238224", 
                     "properties": {
                         "enter_fmt_time": "2016-06-15T13:25:46.208000-07:00", 
                         "exit_local_dt": {
                             "hour": 17, 
                             "month": 6, 
-                            "second": 12, 
+                            "second": 42, 
                             "weekday": 2, 
                             "year": 2016, 
                             "timezone": "America/Los_Angeles", 
                             "day": 15, 
-                            "minute": 47
+                            "minute": 46
                         }, 
                         "display_name": "Le Roy Avenue, Berkeley", 
                         "feature_type": "start_place", 
-                        "exit_fmt_time": "2016-06-15T17:47:12.439580-07:00", 
+                        "exit_fmt_time": "2016-06-15T17:46:42.439580-07:00", 
                         "enter_local_dt": {
                             "hour": 13, 
                             "month": 6, 
@@ -1075,32 +1105,35 @@
                             "minute": 25
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0f347f6858f1343b2cfa9"
+                            "$oid": "57cf6673f6858f4e2c238174"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0f348f6858f1343b2cfda"
+                            "$oid": "57cf6674f6858f4e2c2381a6"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1466022346.208, 
-                        "duration": 15686.231580257416, 
+                        "duration": 15656.231580257416, 
                         "raw_places": [
                             {
-                                "$oid": "57c0f344f6858f1343b2cf60"
+                                "$oid": "57cf666ff6858f4e2c238121"
                             }, 
                             {
-                                "$oid": "57c0f344f6858f1343b2cf60"
+                                "$oid": "57cf666ff6858f4e2c238121"
                             }, 
                             {
-                                "$oid": "57c0f344f6858f1343b2cf62"
+                                "$oid": "57cf666ff6858f4e2c238123"
                             }, 
                             {
-                                "$oid": "57c0f344f6858f1343b2cf64"
+                                "$oid": "57cf666ff6858f4e2c238125"
                             }, 
                             {
-                                "$oid": "57c0f344f6858f1343b2cf66"
+                                "$oid": "57cf666ff6858f4e2c238127"
+                            }, 
+                            {
+                                "$oid": "57cf666ff6858f4e2c238129"
                             }
                         ], 
-                        "exit_ts": 1466038032.4395802
+                        "exit_ts": 1466038002.4395802
                     }
                 }, 
                 {
@@ -1112,7 +1145,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0f34bf6858f1343b2d059", 
+                    "id": "57cf6677f6858f4e2c238226", 
                     "properties": {
                         "enter_fmt_time": "2016-06-15T17:56:35.178000-07:00", 
                         "exit_local_dt": {
@@ -1139,17 +1172,20 @@
                             "minute": 56
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0f348f6858f1343b2cfda"
+                            "$oid": "57cf6674f6858f4e2c2381a6"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0f348f6858f1343b2cff1"
+                            "$oid": "57cf6674f6858f4e2c2381bd"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1466038595.178, 
                         "duration": 7766.456825256348, 
                         "raw_places": [
                             {
-                                "$oid": "57c0f344f6858f1343b2cf6a"
+                                "$oid": "57cf666ff6858f4e2c23812b"
+                            }, 
+                            {
+                                "$oid": "57cf666ff6858f4e2c23812b"
                             }
                         ], 
                         "exit_ts": 1466046361.6348252
@@ -1162,6 +1198,10 @@
                             "geometry": {
                                 "type": "LineString", 
                                 "coordinates": [
+                                    [
+                                        -122.2586978, 
+                                        37.875621
+                                    ], 
                                     [
                                         -122.2585206, 
                                         37.875452
@@ -1245,10 +1285,11 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0f348f6858f1343b2cfdc", 
+                            "id": "57cf6674f6858f4e2c2381a8", 
                             "properties": {
                                 "distances": [
                                     0.0, 
+                                    24.39334430583936, 
                                     57.955294066164015, 
                                     57.955387979558154, 
                                     64.26252256061599, 
@@ -1270,10 +1311,11 @@
                                     21.980474632671044
                                 ], 
                                 "feature_type": "section", 
-                                "sensed_mode": "MotionTypes.ON_FOOT", 
+                                "distance": 1010.8754839039323, 
                                 "end_ts": 1466038595.178, 
-                                "start_ts": 1466038032.4395802, 
-                                "start_fmt_time": "2016-06-15T17:47:12.439580-07:00", 
+                                "start_ts": 1466038002.4395802, 
+                                "start_fmt_time": "2016-06-15T17:46:42.439580-07:00", 
+                                "sensed_mode": "MotionTypes.ON_FOOT", 
                                 "source": "SmoothedHighConfidenceMotion", 
                                 "end_fmt_time": "2016-06-15T17:56:35.178000-07:00", 
                                 "end_local_dt": {
@@ -1286,22 +1328,23 @@
                                     "day": 15, 
                                     "minute": 56
                                 }, 
-                                "duration": 562.7384197711945, 
+                                "duration": 1040.8754839039323, 
                                 "trip_id": {
-                                    "$oid": "57c0f348f6858f1343b2cfda"
+                                    "$oid": "57cf6674f6858f4e2c2381a6"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 17, 
                                     "month": 6, 
-                                    "second": 12, 
+                                    "second": 42, 
                                     "weekday": 2, 
                                     "year": 2016, 
                                     "timezone": "America/Los_Angeles", 
                                     "day": 15, 
-                                    "minute": 47
+                                    "minute": 46
                                 }, 
                                 "speeds": [
                                     0.0, 
+                                    0.813111476861312, 
                                     1.9318431355388006, 
                                     1.9318462659852718, 
                                     2.1420840853538663, 
@@ -1321,34 +1364,33 @@
                                     0.519033512507335, 
                                     1.5563007865170804, 
                                     0.9666667628555439
-                                ], 
-                                "distance": 986.4821395980929
+                                ]
                             }
                         }
                     ]
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57c0f348f6858f1343b2cfda", 
+            "id": "57cf6674f6858f4e2c2381a6", 
             "properties": {
-                "distance": 986.4821395980929, 
+                "distance": 1010.8754839039323, 
                 "end_place": {
-                    "$oid": "57c0f34bf6858f1343b2d059"
+                    "$oid": "57cf6677f6858f4e2c238226"
                 }, 
                 "raw_trip": {
-                    "$oid": "57c0f344f6858f1343b2cf69"
+                    "$oid": "57cf666ff6858f4e2c23812a"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
                     "type": "Point", 
                     "coordinates": [
-                        -122.2585206, 
-                        37.875452
+                        -122.2586978, 
+                        37.875621
                     ]
                 }, 
                 "end_ts": 1466038595.178, 
-                "start_ts": 1466038032.4395802, 
-                "start_fmt_time": "2016-06-15T17:47:12.439580-07:00", 
+                "start_ts": 1466038002.4395802, 
+                "start_fmt_time": "2016-06-15T17:46:42.439580-07:00", 
                 "end_loc": {
                     "type": "Point", 
                     "coordinates": [
@@ -1358,7 +1400,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57c0f34bf6858f1343b2d058"
+                    "$oid": "57cf6677f6858f4e2c238224"
                 }, 
                 "end_fmt_time": "2016-06-15T17:56:35.178000-07:00", 
                 "end_local_dt": {
@@ -1371,16 +1413,16 @@
                     "day": 15, 
                     "minute": 56
                 }, 
-                "duration": 484.55200004577637, 
+                "duration": 1040.8754839039323, 
                 "start_local_dt": {
                     "hour": 17, 
                     "month": 6, 
-                    "second": 12, 
+                    "second": 42, 
                     "weekday": 2, 
                     "year": 2016, 
                     "timezone": "America/Los_Angeles", 
                     "day": 15, 
-                    "minute": 47
+                    "minute": 46
                 }
             }
         }, 
@@ -1395,7 +1437,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0f34bf6858f1343b2d059", 
+                    "id": "57cf6677f6858f4e2c238226", 
                     "properties": {
                         "enter_fmt_time": "2016-06-15T17:56:35.178000-07:00", 
                         "exit_local_dt": {
@@ -1422,17 +1464,20 @@
                             "minute": 56
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0f348f6858f1343b2cfda"
+                            "$oid": "57cf6674f6858f4e2c2381a6"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0f348f6858f1343b2cff1"
+                            "$oid": "57cf6674f6858f4e2c2381bd"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1466038595.178, 
                         "duration": 7766.456825256348, 
                         "raw_places": [
                             {
-                                "$oid": "57c0f344f6858f1343b2cf6a"
+                                "$oid": "57cf666ff6858f4e2c23812b"
+                            }, 
+                            {
+                                "$oid": "57cf666ff6858f4e2c23812b"
                             }
                         ], 
                         "exit_ts": 1466046361.6348252
@@ -1447,7 +1492,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0f34cf6858f1343b2d05a", 
+                    "id": "57cf6678f6858f4e2c238227", 
                     "properties": {
                         "enter_fmt_time": "2016-06-15T20:18:28.733000-07:00", 
                         "exit_local_dt": {
@@ -1474,17 +1519,20 @@
                             "minute": 18
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0f348f6858f1343b2cff1"
+                            "$oid": "57cf6674f6858f4e2c2381bd"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0f348f6858f1343b2d00e"
+                            "$oid": "57cf6674f6858f4e2c2381da"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1466047108.733, 
                         "duration": 408.19451332092285, 
                         "raw_places": [
                             {
-                                "$oid": "57c0f344f6858f1343b2cf6c"
+                                "$oid": "57cf666ff6858f4e2c23812d"
+                            }, 
+                            {
+                                "$oid": "57cf666ff6858f4e2c23812d"
                             }
                         ], 
                         "exit_ts": 1466047516.9275134
@@ -1604,7 +1652,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0f348f6858f1343b2cff3", 
+                            "id": "57cf6674f6858f4e2c2381bf", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -1635,10 +1683,11 @@
                                     7.156281720210358
                                 ], 
                                 "feature_type": "section", 
-                                "sensed_mode": "MotionTypes.ON_FOOT", 
+                                "distance": 900.7397229769708, 
                                 "end_ts": 1466047108.733, 
                                 "start_ts": 1466046361.6348252, 
                                 "start_fmt_time": "2016-06-15T20:06:01.634825-07:00", 
+                                "sensed_mode": "MotionTypes.ON_FOOT", 
                                 "source": "SmoothedHighConfidenceMotion", 
                                 "end_fmt_time": "2016-06-15T20:18:28.733000-07:00", 
                                 "end_local_dt": {
@@ -1653,7 +1702,7 @@
                                 }, 
                                 "duration": 747.0981748104095, 
                                 "trip_id": {
-                                    "$oid": "57c0f348f6858f1343b2cff1"
+                                    "$oid": "57cf6674f6858f4e2c2381bd"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 20, 
@@ -1692,22 +1741,21 @@
                                     1.628247162205643, 
                                     0.2640872210475123, 
                                     0.2640872224892922
-                                ], 
-                                "distance": 900.7397229769708
+                                ]
                             }
                         }
                     ]
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57c0f348f6858f1343b2cff1", 
+            "id": "57cf6674f6858f4e2c2381bd", 
             "properties": {
                 "distance": 900.7397229769708, 
                 "end_place": {
-                    "$oid": "57c0f34cf6858f1343b2d05a"
+                    "$oid": "57cf6678f6858f4e2c238227"
                 }, 
                 "raw_trip": {
-                    "$oid": "57c0f344f6858f1343b2cf6b"
+                    "$oid": "57cf666ff6858f4e2c23812c"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -1729,7 +1777,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57c0f34bf6858f1343b2d059"
+                    "$oid": "57cf6677f6858f4e2c238226"
                 }, 
                 "end_fmt_time": "2016-06-15T20:18:28.733000-07:00", 
                 "end_local_dt": {
@@ -1742,7 +1790,7 @@
                     "day": 15, 
                     "minute": 18
                 }, 
-                "duration": 641.5590000152588, 
+                "duration": 747.0981748104095, 
                 "start_local_dt": {
                     "hour": 20, 
                     "month": 6, 
@@ -1766,7 +1814,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0f34cf6858f1343b2d05a", 
+                    "id": "57cf6678f6858f4e2c238227", 
                     "properties": {
                         "enter_fmt_time": "2016-06-15T20:18:28.733000-07:00", 
                         "exit_local_dt": {
@@ -1793,17 +1841,20 @@
                             "minute": 18
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0f348f6858f1343b2cff1"
+                            "$oid": "57cf6674f6858f4e2c2381bd"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0f348f6858f1343b2d00e"
+                            "$oid": "57cf6674f6858f4e2c2381da"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1466047108.733, 
                         "duration": 408.19451332092285, 
                         "raw_places": [
                             {
-                                "$oid": "57c0f344f6858f1343b2cf6c"
+                                "$oid": "57cf666ff6858f4e2c23812d"
+                            }, 
+                            {
+                                "$oid": "57cf666ff6858f4e2c23812d"
                             }
                         ], 
                         "exit_ts": 1466047516.9275134
@@ -1818,22 +1869,22 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0f34cf6858f1343b2d05b", 
+                    "id": "57cf6678f6858f4e2c238228", 
                     "properties": {
                         "enter_fmt_time": "2016-06-15T20:28:48.074000-07:00", 
                         "exit_local_dt": {
                             "hour": 22, 
                             "month": 6, 
-                            "second": 7, 
+                            "second": 37, 
                             "weekday": 2, 
                             "year": 2016, 
                             "timezone": "America/Los_Angeles", 
                             "day": 15, 
-                            "minute": 11
+                            "minute": 10
                         }, 
                         "display_name": "Vine Street, Berkeley", 
                         "feature_type": "end_place", 
-                        "exit_fmt_time": "2016-06-15T22:11:07.174402-07:00", 
+                        "exit_fmt_time": "2016-06-15T22:10:37.174402-07:00", 
                         "enter_local_dt": {
                             "hour": 20, 
                             "month": 6, 
@@ -1845,23 +1896,26 @@
                             "minute": 28
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0f348f6858f1343b2d00e"
+                            "$oid": "57cf6674f6858f4e2c2381da"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0f348f6858f1343b2d01a"
+                            "$oid": "57cf6674f6858f4e2c2381e6"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1466047728.074, 
-                        "duration": 6139.100402355194, 
+                        "duration": 6109.100402355194, 
                         "raw_places": [
                             {
-                                "$oid": "57c0f344f6858f1343b2cf6e"
+                                "$oid": "57cf666ff6858f4e2c23812f"
                             }, 
                             {
-                                "$oid": "57c0f344f6858f1343b2cf6e"
+                                "$oid": "57cf666ff6858f4e2c23812f"
+                            }, 
+                            {
+                                "$oid": "57cf666ff6858f4e2c238131"
                             }
                         ], 
-                        "exit_ts": 1466053867.1744022
+                        "exit_ts": 1466053837.1744022
                     }
                 }, 
                 {
@@ -1910,7 +1964,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0f348f6858f1343b2d010", 
+                            "id": "57cf6674f6858f4e2c2381dc", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -1924,10 +1978,11 @@
                                     1.3769157083955916
                                 ], 
                                 "feature_type": "section", 
-                                "sensed_mode": "MotionTypes.ON_FOOT", 
+                                "distance": 179.77365039203676, 
                                 "end_ts": 1466047728.074, 
                                 "start_ts": 1466047516.9275134, 
                                 "start_fmt_time": "2016-06-15T20:25:16.927513-07:00", 
+                                "sensed_mode": "MotionTypes.ON_FOOT", 
                                 "source": "SmoothedHighConfidenceMotion", 
                                 "end_fmt_time": "2016-06-15T20:28:48.074000-07:00", 
                                 "end_local_dt": {
@@ -1942,7 +1997,7 @@
                                 }, 
                                 "duration": 211.1464865207672, 
                                 "trip_id": {
-                                    "$oid": "57c0f348f6858f1343b2d00e"
+                                    "$oid": "57cf6674f6858f4e2c2381da"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 20, 
@@ -1964,22 +2019,21 @@
                                     1.473296037050664, 
                                     1.2018929095640083, 
                                     1.2009872627845462
-                                ], 
-                                "distance": 179.77365039203676
+                                ]
                             }
                         }
                     ]
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57c0f348f6858f1343b2d00e", 
+            "id": "57cf6674f6858f4e2c2381da", 
             "properties": {
                 "distance": 179.77365039203676, 
                 "end_place": {
-                    "$oid": "57c0f34cf6858f1343b2d05b"
+                    "$oid": "57cf6678f6858f4e2c238228"
                 }, 
                 "raw_trip": {
-                    "$oid": "57c0f344f6858f1343b2cf6d"
+                    "$oid": "57cf666ff6858f4e2c23812e"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -2001,7 +2055,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57c0f34cf6858f1343b2d05a"
+                    "$oid": "57cf6678f6858f4e2c238227"
                 }, 
                 "end_fmt_time": "2016-06-15T20:28:48.074000-07:00", 
                 "end_local_dt": {
@@ -2014,7 +2068,7 @@
                     "day": 15, 
                     "minute": 28
                 }, 
-                "duration": 93.12899994850159, 
+                "duration": 211.1464865207672, 
                 "start_local_dt": {
                     "hour": 20, 
                     "month": 6, 
@@ -2038,22 +2092,22 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0f34cf6858f1343b2d05b", 
+                    "id": "57cf6678f6858f4e2c238228", 
                     "properties": {
                         "enter_fmt_time": "2016-06-15T20:28:48.074000-07:00", 
                         "exit_local_dt": {
                             "hour": 22, 
                             "month": 6, 
-                            "second": 7, 
+                            "second": 37, 
                             "weekday": 2, 
                             "year": 2016, 
                             "timezone": "America/Los_Angeles", 
                             "day": 15, 
-                            "minute": 11
+                            "minute": 10
                         }, 
                         "display_name": "Vine Street, Berkeley", 
                         "feature_type": "start_place", 
-                        "exit_fmt_time": "2016-06-15T22:11:07.174402-07:00", 
+                        "exit_fmt_time": "2016-06-15T22:10:37.174402-07:00", 
                         "enter_local_dt": {
                             "hour": 20, 
                             "month": 6, 
@@ -2065,23 +2119,26 @@
                             "minute": 28
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0f348f6858f1343b2d00e"
+                            "$oid": "57cf6674f6858f4e2c2381da"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0f348f6858f1343b2d01a"
+                            "$oid": "57cf6674f6858f4e2c2381e6"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1466047728.074, 
-                        "duration": 6139.100402355194, 
+                        "duration": 6109.100402355194, 
                         "raw_places": [
                             {
-                                "$oid": "57c0f344f6858f1343b2cf6e"
+                                "$oid": "57cf666ff6858f4e2c23812f"
                             }, 
                             {
-                                "$oid": "57c0f344f6858f1343b2cf6e"
+                                "$oid": "57cf666ff6858f4e2c23812f"
+                            }, 
+                            {
+                                "$oid": "57cf666ff6858f4e2c238131"
                             }
                         ], 
-                        "exit_ts": 1466053867.1744022
+                        "exit_ts": 1466053837.1744022
                     }
                 }, 
                 {
@@ -2093,7 +2150,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0f34cf6858f1343b2d05c", 
+                    "id": "57cf6678f6858f4e2c23822a", 
                     "properties": {
                         "enter_fmt_time": "2016-06-15T22:27:23.075000-07:00", 
                         "exit_local_dt": {
@@ -2120,17 +2177,20 @@
                             "minute": 27
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0f348f6858f1343b2d01a"
+                            "$oid": "57cf6674f6858f4e2c2381e6"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0f349f6858f1343b2d03f"
+                            "$oid": "57cf6675f6858f4e2c23820b"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1466054843.075, 
                         "duration": 303.3136582374573, 
                         "raw_places": [
                             {
-                                "$oid": "57c0f344f6858f1343b2cf72"
+                                "$oid": "57cf666ff6858f4e2c238133"
+                            }, 
+                            {
+                                "$oid": "57cf666ff6858f4e2c238133"
                             }
                         ], 
                         "exit_ts": 1466055146.3886583
@@ -2143,6 +2203,10 @@
                             "geometry": {
                                 "type": "LineString", 
                                 "coordinates": [
+                                    [
+                                        -122.2684367, 
+                                        37.8805553
+                                    ], 
                                     [
                                         -122.2684776, 
                                         37.8806626
@@ -2282,10 +2346,11 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0f349f6858f1343b2d01c", 
+                            "id": "57cf6675f6858f4e2c2381e8", 
                             "properties": {
                                 "distances": [
                                     0.0, 
+                                    12.459499510454268, 
                                     56.36548648398092, 
                                     56.36550891633687, 
                                     56.36553134889076, 
@@ -2321,10 +2386,11 @@
                                     0.0
                                 ], 
                                 "feature_type": "section", 
-                                "sensed_mode": "MotionTypes.ON_FOOT", 
+                                "distance": 1630.1031299496283, 
                                 "end_ts": 1466054843.075, 
-                                "start_ts": 1466053867.1744022, 
-                                "start_fmt_time": "2016-06-15T22:11:07.174402-07:00", 
+                                "start_ts": 1466053837.1744022, 
+                                "start_fmt_time": "2016-06-15T22:10:37.174402-07:00", 
+                                "sensed_mode": "MotionTypes.ON_FOOT", 
                                 "source": "SmoothedHighConfidenceMotion", 
                                 "end_fmt_time": "2016-06-15T22:27:23.075000-07:00", 
                                 "end_local_dt": {
@@ -2337,22 +2403,23 @@
                                     "day": 15, 
                                     "minute": 27
                                 }, 
-                                "duration": 975.9005978107452, 
+                                "duration": 1660.1031299496283, 
                                 "trip_id": {
-                                    "$oid": "57c0f348f6858f1343b2d01a"
+                                    "$oid": "57cf6674f6858f4e2c2381e6"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 22, 
                                     "month": 6, 
-                                    "second": 7, 
+                                    "second": 37, 
                                     "weekday": 2, 
                                     "year": 2016, 
                                     "timezone": "America/Los_Angeles", 
                                     "day": 15, 
-                                    "minute": 11
+                                    "minute": 10
                                 }, 
                                 "speeds": [
                                     0.0, 
+                                    0.4153166503484756, 
                                     1.8788495494660309, 
                                     1.878850297211229, 
                                     1.8788510449630254, 
@@ -2386,34 +2453,33 @@
                                     0.11920575668032608, 
                                     0.0, 
                                     0.0
-                                ], 
-                                "distance": 1617.643630439174
+                                ]
                             }
                         }
                     ]
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57c0f348f6858f1343b2d01a", 
+            "id": "57cf6674f6858f4e2c2381e6", 
             "properties": {
-                "distance": 1617.643630439174, 
+                "distance": 1630.1031299496283, 
                 "end_place": {
-                    "$oid": "57c0f34cf6858f1343b2d05c"
+                    "$oid": "57cf6678f6858f4e2c23822a"
                 }, 
                 "raw_trip": {
-                    "$oid": "57c0f344f6858f1343b2cf71"
+                    "$oid": "57cf666ff6858f4e2c238132"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
                     "type": "Point", 
                     "coordinates": [
-                        -122.2684776, 
-                        37.8806626
+                        -122.2684367, 
+                        37.8805553
                     ]
                 }, 
                 "end_ts": 1466054843.075, 
-                "start_ts": 1466053867.1744022, 
-                "start_fmt_time": "2016-06-15T22:11:07.174402-07:00", 
+                "start_ts": 1466053837.1744022, 
+                "start_fmt_time": "2016-06-15T22:10:37.174402-07:00", 
                 "end_loc": {
                     "type": "Point", 
                     "coordinates": [
@@ -2423,7 +2489,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57c0f34cf6858f1343b2d05b"
+                    "$oid": "57cf6678f6858f4e2c238228"
                 }, 
                 "end_fmt_time": "2016-06-15T22:27:23.075000-07:00", 
                 "end_local_dt": {
@@ -2436,16 +2502,16 @@
                     "day": 15, 
                     "minute": 27
                 }, 
-                "duration": 885.0940001010895, 
+                "duration": 1660.1031299496283, 
                 "start_local_dt": {
                     "hour": 22, 
                     "month": 6, 
-                    "second": 7, 
+                    "second": 37, 
                     "weekday": 2, 
                     "year": 2016, 
                     "timezone": "America/Los_Angeles", 
                     "day": 15, 
-                    "minute": 11
+                    "minute": 10
                 }
             }
         }, 
@@ -2460,7 +2526,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0f34cf6858f1343b2d05c", 
+                    "id": "57cf6678f6858f4e2c23822a", 
                     "properties": {
                         "enter_fmt_time": "2016-06-15T22:27:23.075000-07:00", 
                         "exit_local_dt": {
@@ -2487,17 +2553,20 @@
                             "minute": 27
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0f348f6858f1343b2d01a"
+                            "$oid": "57cf6674f6858f4e2c2381e6"
                         }, 
                         "starting_trip": {
-                            "$oid": "57c0f349f6858f1343b2d03f"
+                            "$oid": "57cf6675f6858f4e2c23820b"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1466054843.075, 
                         "duration": 303.3136582374573, 
                         "raw_places": [
                             {
-                                "$oid": "57c0f344f6858f1343b2cf72"
+                                "$oid": "57cf666ff6858f4e2c238133"
+                            }, 
+                            {
+                                "$oid": "57cf666ff6858f4e2c238133"
                             }
                         ], 
                         "exit_ts": 1466055146.3886583
@@ -2512,7 +2581,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57c0f34df6858f1343b2d05d", 
+                    "id": "57cf6679f6858f4e2c23822b", 
                     "properties": {
                         "enter_fmt_time": "2016-06-15T22:41:21-07:00", 
                         "display_name": "Oxford Street, Berkeley", 
@@ -2528,13 +2597,13 @@
                             "minute": 41
                         }, 
                         "ending_trip": {
-                            "$oid": "57c0f349f6858f1343b2d03f"
+                            "$oid": "57cf6675f6858f4e2c23820b"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1466055681, 
                         "raw_places": [
                             {
-                                "$oid": "57c0f344f6858f1343b2cf74"
+                                "$oid": "57cf666ff6858f4e2c238135"
                             }
                         ]
                     }
@@ -2625,7 +2694,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57c0f349f6858f1343b2d041", 
+                            "id": "57cf6675f6858f4e2c23820d", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -2649,10 +2718,11 @@
                                     29.002399532807278
                                 ], 
                                 "feature_type": "section", 
-                                "sensed_mode": "MotionTypes.ON_FOOT", 
-                                "end_ts": 1466055681, 
+                                "distance": 832.8339475891978, 
+                                "end_ts": 1466055681.0, 
                                 "start_ts": 1466055146.3886583, 
                                 "start_fmt_time": "2016-06-15T22:32:26.388658-07:00", 
+                                "sensed_mode": "MotionTypes.ON_FOOT", 
                                 "source": "SmoothedHighConfidenceMotion", 
                                 "end_fmt_time": "2016-06-15T22:41:21-07:00", 
                                 "end_local_dt": {
@@ -2667,7 +2737,7 @@
                                 }, 
                                 "duration": 534.611341714859, 
                                 "trip_id": {
-                                    "$oid": "57c0f349f6858f1343b2d03f"
+                                    "$oid": "57cf6675f6858f4e2c23820b"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 22, 
@@ -2699,22 +2769,21 @@
                                     1.1487633816849838, 
                                     0.7084143847862039, 
                                     1.1784160274080946
-                                ], 
-                                "distance": 832.8339475891978
+                                ]
                             }
                         }
                     ]
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57c0f349f6858f1343b2d03f", 
+            "id": "57cf6675f6858f4e2c23820b", 
             "properties": {
                 "distance": 832.8339475891978, 
                 "end_place": {
-                    "$oid": "57c0f34df6858f1343b2d05d"
+                    "$oid": "57cf6679f6858f4e2c23822b"
                 }, 
                 "raw_trip": {
-                    "$oid": "57c0f344f6858f1343b2cf73"
+                    "$oid": "57cf666ff6858f4e2c238134"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -2724,7 +2793,7 @@
                         37.8698884
                     ]
                 }, 
-                "end_ts": 1466055681, 
+                "end_ts": 1466055681.0, 
                 "start_ts": 1466055146.3886583, 
                 "start_fmt_time": "2016-06-15T22:32:26.388658-07:00", 
                 "end_loc": {
@@ -2736,7 +2805,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57c0f34cf6858f1343b2d05c"
+                    "$oid": "57cf6678f6858f4e2c23822a"
                 }, 
                 "end_fmt_time": "2016-06-15T22:41:21-07:00", 
                 "end_local_dt": {
@@ -2749,7 +2818,7 @@
                     "day": 15, 
                     "minute": 41
                 }, 
-                "duration": 399.07100009918213, 
+                "duration": 534.611341714859, 
                 "start_local_dt": {
                     "hour": 22, 
                     "month": 6, 
@@ -2764,7 +2833,7 @@
         }
     ], 
     "_id": {
-        "$oid": "57c0f34e115514afcd79360c"
+        "$oid": "57cf667b115514afcd793ca9"
     }, 
     "user_id": {
         "$uuid": "4754956be415318ab586a8c95751ed7b"
@@ -2772,6 +2841,6 @@
     "metadata": {
         "type": "document", 
         "key": "diary/trips-2016-06-15", 
-        "write_ts": 1472262990.611642
+        "write_ts": 1473209979.334714
     }
 }
