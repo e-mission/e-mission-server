@@ -16,7 +16,7 @@ import emission.core.wrapper.entry as ecwe
 import emission.core.common as ecc
 
 class SectionSegmentationMethod(object):
-    def segment_into_sections(self, timeseries, time_query):
+    def segment_into_sections(self, timeseries, distance_from_place, time_query):
         """
         Examines the timeseries database for a specific range and returns the
         points at which the trip needs to be segmented. Again, this allows
@@ -39,9 +39,9 @@ def segment_current_sections(user_id):
     time_query = epq.get_time_range_for_sectioning(user_id)
     try:
         trips_to_process = esda.get_entries(esda.RAW_TRIP_KEY, user_id, time_query)
-        for trip in trips_to_process:
-            logging.info("+" * 20 + ("Processing trip %s for user %s" % (trip.get_id(), user_id)) + "+" * 20)
-            segment_trip_into_sections(user_id, trip.get_id(), trip.data.source)
+        for trip_entry in trips_to_process:
+            logging.info("+" * 20 + ("Processing trip %s for user %s" % (trip_entry.get_id(), user_id)) + "+" * 20)
+            segment_trip_into_sections(user_id, trip_entry, trip_entry.data.source)
         if len(trips_to_process) == 0:
             # Didn't process anything new so start at the same point next time
             last_trip_processed = None
@@ -52,27 +52,27 @@ def segment_current_sections(user_id):
         logging.exception("Sectioning failed for user %s" % user_id)
         epq.mark_sectioning_failed(user_id)
 
-def segment_trip_into_sections(user_id, trip_id, trip_source):
+def segment_trip_into_sections(user_id, trip_entry, trip_source):
     ts = esta.TimeSeries.get_time_series(user_id)
-    trip = esda.get_object(esda.RAW_TRIP_KEY, trip_id)
-    time_query = esda.get_time_query_for_trip_like(esda.RAW_TRIP_KEY, trip_id)
+    time_query = esda.get_time_query_for_trip_like(esda.RAW_TRIP_KEY, trip_entry.get_id())
+    distance_from_place = _get_distance_from_start_place_to_end(trip_entry)
 
     if (trip_source == "DwellSegmentationTimeFilter"):
         import emission.analysis.intake.segmentation.section_segmentation_methods.smoothed_high_confidence_motion as shcm
-        shcmsm = shcm.SmoothedHighConfidenceMotion(60, [ecwm.MotionTypes.TILTING,
+        shcmsm = shcm.SmoothedHighConfidenceMotion(60, 100, [ecwm.MotionTypes.TILTING,
                                                         ecwm.MotionTypes.UNKNOWN,
                                                         ecwm.MotionTypes.STILL])
     else:
         assert(trip_source == "DwellSegmentationDistFilter")
         import emission.analysis.intake.segmentation.section_segmentation_methods.smoothed_high_confidence_with_visit_transitions as shcmvt
         shcmsm = shcmvt.SmoothedHighConfidenceMotionWithVisitTransitions(
-                                                        49, [ecwm.MotionTypes.TILTING,
+                                                        49, 50, [ecwm.MotionTypes.TILTING,
                                                         ecwm.MotionTypes.UNKNOWN,
                                                         ecwm.MotionTypes.STILL,
                                                         ecwm.MotionTypes.NONE, # iOS only
                                                         ecwm.MotionTypes.STOPPED_WHILE_IN_VEHICLE]) # iOS only
         
-    segmentation_points = shcmsm.segment_into_sections(ts, time_query)
+    segmentation_points = shcmsm.segment_into_sections(ts, distance_from_place, time_query)
 
     # Since we are segmenting an existing trip into sections, we do not need to worry about linking with
     # a prior place, since it will be linked through the trip object.
@@ -87,8 +87,8 @@ def segment_trip_into_sections(user_id, trip_id, trip_source):
     ts = esta.TimeSeries.get_time_series(user_id)
 
     get_loc_for_ts = lambda time: ecwl.Location(ts.get_entry_at_ts("background/filtered_location", "data.ts", time)["data"])
-    trip_start_loc = get_loc_for_ts(trip.start_ts)
-    trip_end_loc = get_loc_for_ts(trip.end_ts)
+    trip_start_loc = get_loc_for_ts(trip_entry.data.start_ts)
+    trip_end_loc = get_loc_for_ts(trip_entry.data.end_ts)
     logging.debug("trip_start_loc = %s, trip_end_loc = %s" % (trip_start_loc, trip_end_loc))
 
     for (i, (start_loc_doc, end_loc_doc, sensed_mode)) in enumerate(segmentation_points):
@@ -99,7 +99,7 @@ def segment_trip_into_sections(user_id, trip_id, trip_source):
         logging.debug("start_loc = %s, end_loc = %s" % (start_loc, end_loc))
 
         section = ecwc.Section()
-        section.trip_id = trip_id
+        section.trip_id = trip_entry.get_id()
         if prev_section_entry is None:
             # This is the first point, so we want to start from the start of the trip, not the start of this segment
             start_loc = trip_start_loc
@@ -118,7 +118,7 @@ def segment_trip_into_sections(user_id, trip_id, trip_source):
             # If this is not the first section, create a stop to link the two sections together
             # The expectation is prev_section -> stop -> curr_section
             stop = ecws.Stop()
-            stop.trip_id = trip_id
+            stop.trip_id = trip_entry.get_id()
             stop_entry = ecwe.Entry.create_entry(user_id,
                                                     esda.RAW_STOP_KEY,
                                                     stop, create_id=True)
@@ -182,4 +182,15 @@ def stitch_together(ending_section_entry, stop_entry, starting_section_entry):
     ending_section_entry["data"] = ending_section
     stop_entry["data"] = stop
     starting_section_entry["data"] = starting_section
+
+def _get_distance_from_start_place_to_end(raw_trip_entry):
+    import emission.core.common as ecc
+
+    start_place_id = raw_trip_entry.data.start_place
+    start_place = esda.get_object(esda.RAW_PLACE_KEY, start_place_id)
+    dist = ecc.calDistance(start_place.location.coordinates,
+                           raw_trip_entry.data.end_loc.coordinates)
+    logging.debug("Distance from raw_place %s to the end of raw_trip_entry %s = %s" %
+                  (start_place_id, raw_trip_entry.get_id(), dist))
+    return dist
 

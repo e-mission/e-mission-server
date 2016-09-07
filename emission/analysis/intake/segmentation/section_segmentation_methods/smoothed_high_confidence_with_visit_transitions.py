@@ -11,11 +11,11 @@ class SmoothedHighConfidenceMotionWithVisitTransitions(eaisms.SmoothedHighConfid
         assert(len(location_points_df) > 0)
         return (location_points_df.iloc[0], location_points_df.iloc[-1], ecwm.MotionTypes.UNKNOWN)
 
-    def get_section_if_applicable(self, timeseries, time_query, location_points):
+    def get_section_if_applicable(self, timeseries, distance_from_start, time_query, location_points):
         # We don't have any motion changes. So let's check to see if we
         # have a visit transition, which will help us distinguish between
         # real and fake trips.
-        
+
         # Yech! This feels really hacky, but if we have a really short trip,
         # then we may get the visit ending message after the trip has ended.
         # So let's expand the time query by 5 minutes.
@@ -25,6 +25,11 @@ class SmoothedHighConfidenceMotionWithVisitTransitions(eaisms.SmoothedHighConfid
         if len(transition_df) == 0:
             logging.debug("there are no transitions, which means no visit transitions, not creating a section")
             return None
+
+        if distance_from_start > self.distance_threshold:
+            logging.debug("found distance %s > threshold %s, returning dummy section" %
+                          (distance_from_start, self.distance_threshold))
+            return self.create_unknown_section(location_points)
 
         visit_ended_transition_df = transition_df[transition_df.transition == 14]
         if len(visit_ended_transition_df) == 0:
@@ -46,7 +51,7 @@ class SmoothedHighConfidenceMotionWithVisitTransitions(eaisms.SmoothedHighConfid
         })
         return new_mc
 
-    def segment_into_sections(self, timeseries, time_query):
+    def segment_into_sections(self, timeseries, distance_from_place, time_query):
         """
         Determine locations within the specified time that represent segmentation points for a trip.
         :param timeseries: the time series for this user
@@ -61,7 +66,8 @@ class SmoothedHighConfidenceMotionWithVisitTransitions(eaisms.SmoothedHighConfid
             return []
 
         if len(motion_changes) == 0:
-            dummy_sec = self.get_section_if_applicable(timeseries, time_query, location_points) 
+            dummy_sec = self.get_section_if_applicable(timeseries, distance_from_place,
+                                                       time_query, location_points)
             if dummy_sec is not None:
                 return [dummy_sec]
             else:

@@ -101,7 +101,7 @@ class TestMetrics(unittest.TestCase):
                                 user_met_result[0].BICYCLING + 1) # 21s has one bike trip
         self.assertGreaterEqual(agg_met_result[0].ON_FOOT,
                                 user_met_result[0].ON_FOOT + 3) # 21s has three bike trips
-        self.assertGreaterEqual(agg_met_result[0].IN_VEHICLE + agg_met_result[0].AIR,
+        self.assertGreaterEqual(agg_met_result[0].IN_VEHICLE,
                                 user_met_result[0].IN_VEHICLE + 3) # 21s has three motorized trips
 
     def testCountNoEntries(self):

@@ -111,12 +111,10 @@ def section_to_geojson(section, tl):
     if len(section_location_entries) != 0:
         logging.debug("first element in section_location_array = %s" % section_location_entries[0])
 
-        # Fudge the end point so that we don't have a gap because of the ts != write_ts mismatch
-        # TODO: Fix this once we are able to query by the data timestamp instead of the metadata ts
-
         if section_location_entries[-1].data.loc != section.data.end_loc:
             logging.info("section_location_array[-1].data.loc %s != section.data.end_loc %s even after df.ts fix, filling gap" % \
                     (section_location_entries[-1].data.loc, section.data.end_loc))
+            assert(False)
             last_loc_doc = ts.get_entry_at_ts("background/filtered_location", "data.ts", section.data.end_ts)
             if last_loc_doc is None:
                 logging.warning("can't find entry to patch gap, leaving gap")

@@ -112,12 +112,16 @@ class SmoothZigzag(object):
     def find_segments(self):
         segmentation_points = self.with_speeds_df[self.with_speeds_df.speed > self.maxSpeed].index
         segmentation_points = segmentation_points.insert(0, 0)
-        last_point = self.with_speeds_df.shape[0] - 1
+        last_point = self.with_speeds_df.shape[0]
         if last_point not in segmentation_points:
-            segmentation_points = segmentation_points.insert(len(segmentation_points), last_point) 
+            logging.debug("smoothing: last_point index %s not in found points %s" %
+                          (last_point, segmentation_points))
+            segmentation_points = segmentation_points.insert(len(segmentation_points), last_point)
+            logging.debug("smoothing: added new entry %s" % segmentation_points[-1])
 
         self.segment_list = [Segment(start, end, self) for (start, end) in 
                                 zip(segmentation_points, segmentation_points[1:])]
+        logging.debug("smoothing: segment_list = %s" % self.segment_list)
 
     def split_segment(self, i, curr_seg, direction):
         import emission.analysis.intake.cleaning.location_smoothing as ls

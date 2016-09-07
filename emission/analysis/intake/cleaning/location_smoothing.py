@@ -89,11 +89,10 @@ def add_heading_change(points_df):
 def filter_current_sections(user_id):
     time_query = epq.get_time_range_for_smoothing(user_id)
     try:
-        sections_to_process = esda.get_objects(esda.RAW_SECTION_KEY, user_id,
+        sections_to_process = esda.get_entries(esda.RAW_SECTION_KEY, user_id,
                                                time_query)
         for section in sections_to_process:
-            logging.info("^" * 20 + ("Smoothing section %s for user %s" % (section.get_id(), user_id)) + "^"
- * 20)
+            logging.info("^" * 20 + ("Smoothing section %s for user %s" % (section.get_id(), user_id)) + "^" * 20)
             filter_jumps(user_id, section.get_id())
         if len(sections_to_process) == 0:
             # Didn't process anything new so start at the same point next time
@@ -165,7 +164,7 @@ def get_points_to_filter(section_points_df, outlier_algo, filtering_algo):
             to_delete_mask = np.logical_not(filtering_algo.inlier_mask_)
             return with_speeds_df[to_delete_mask]
         except Exception as e:
-            logging.debug("Caught error %s while processing section, skipping..." % e)
+            logging.exception("Caught error %s while processing section, skipping..." % e)
             return None
     else:
         logging.debug("no filtering algo specified, returning None")
