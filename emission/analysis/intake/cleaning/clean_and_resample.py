@@ -343,8 +343,6 @@ def get_filtered_points(section, filtered_section_data):
         raw_end_place = ts.get_entry_from_id(esda.RAW_PLACE_KEY, raw_trip.data.end_place)
         filtered_loc_df = _add_end_point(filtered_loc_df, raw_end_place, ts)
 
-    logging.debug("After extrapolating, filtered_loc_df = %s" % filtered_loc_df)
-
     # Can move this up to get_filtered_section if we want to ensure that we
     # don't touch filtered_section_data in here
     logging.debug("Setting section start and end values of %s to first point %s"
@@ -444,11 +442,28 @@ def _add_start_point(filtered_loc_df, raw_start_place, ts):
 
     new_start_ts = curr_first_point.ts - del_time
     prev_enter_ts = raw_start_place.data.enter_ts if "enter_ts" in raw_start_place.data else None
+
     if prev_enter_ts is not None and new_start_ts < raw_start_place.data.enter_ts:
         logging.debug("Much extrapolation! new_start_ts %s < prev_enter_ts %s" %
                       (new_start_ts, prev_enter_ts))
-        new_start_ts = raw_start_place.data.enter_ts + 3 * 60
+        if raw_start_place.data.duration == 0:
+            ts = esta.TimeSeries.get_time_series(raw_start_place.user_id)
+            ending_trip_entry = ecwe.Entry(
+                ts.get_entry_from_id(esda.RAW_TRIP_KEY,
+                                     raw_start_place.data.ending_trip))
+            if ending_trip_entry is None or ending_trip_entry.metadata.key != "segmentation/raw_untracked":
+                logging.debug("place %s has zero duration but is after %s!" % 
+                             (raw_start_place.get_id(), ending_trip_entry))
+                assert False
+            else:
+                logging.debug("place %s is after untracked_time %s, has zero duration!" %
+                             (raw_start_place.get_id(), ending_trip_entry.get_id()))
+            new_start_ts = raw_start_place.data.enter_ts
+        else:
+            new_start_ts = raw_start_place.data.enter_ts + 3 * 60
+
         logging.debug("changed new_start_ts to %s" % (new_start_ts))
+
     logging.debug("After subtracting time %s from original %s to cover additional distance %s at speed %s, new_start_ts = %s" %
                   (del_time, filtered_loc_df.ts.iloc[-1] - filtered_loc_df.ts.iloc[0],
                    add_dist, with_speeds_df.speed.median(), new_start_ts))
@@ -485,7 +500,6 @@ def _add_end_point(filtered_loc_df, raw_end_place, ts):
     # start of a chain, we won't have any trip/section before it, and won't try
     # to extrapolate to the place
 
-    # Assert that we haven't done the hack for estimating the enter_ts using the exit_ts
     # because the enter_ts is None
     assert(raw_end_place.data.enter_ts is not None)
     logging.debug("Found mismatch of %s in last section %s -> %s, "
