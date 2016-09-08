@@ -343,10 +343,13 @@ def get_filtered_points(section, filtered_section_data):
         raw_end_place = ts.get_entry_from_id(esda.RAW_PLACE_KEY, raw_trip.data.end_place)
         filtered_loc_df = _add_end_point(filtered_loc_df, raw_end_place, ts)
 
+    logging.debug("After extrapolating, filtered_loc_df = %s" % filtered_loc_df)
+
     # Can move this up to get_filtered_section if we want to ensure that we
     # don't touch filtered_section_data in here
-    logging.debug("Setting section start values of %s to first point %s" %
-                  (filtered_section_data, filtered_loc_df.iloc[0]))
+    logging.debug("Setting section start and end values of %s to first point %s"
+                  "and last point %s" %
+                  (filtered_section_data, filtered_loc_df.iloc[0], filtered_loc_df.iloc[-1]))
     _set_extrapolated_vals_for_section(filtered_section_data,
                                         filtered_loc_df.iloc[0],
                                         filtered_loc_df.iloc[-1])
@@ -486,10 +489,10 @@ def _add_end_point(filtered_loc_df, raw_end_place, ts):
     # because the enter_ts is None
     assert(raw_end_place.data.enter_ts is not None)
     logging.debug("Found mismatch of %s in last section %s -> %s, "
-                   "appending location %s, %s to fill the gap" %
+                   "appending location %s, %s, %s to fill the gap" %
                   (add_dist, curr_last_loc.coordinates, raw_end_place_enter_loc_entry.data.loc.coordinates,
-                   raw_end_place_enter_loc_entry.data.loc.coordinates, raw_end_place_enter_loc_entry.data.fmt_time))
-    return _insert_new_entry(len(filtered_loc_df), filtered_loc_df, raw_end_place_enter_loc_entry)
+                   raw_end_place_enter_loc_entry.data.loc.coordinates, raw_end_place_enter_loc_entry.data.fmt_time, raw_end_place_enter_loc_entry.data.ts))
+    return _insert_new_entry(filtered_loc_df.index[-1]+1, filtered_loc_df, raw_end_place_enter_loc_entry)
 
 def _get_raw_place_enter_loc_entry(ts, raw_place):
     if raw_place.data.enter_ts is not None:
@@ -516,7 +519,7 @@ def _get_raw_place_enter_loc_entry(ts, raw_place):
         raw_start_place_enter_loc_entry = ecwe.Entry.create_entry(raw_place.user_id,
                                                                   "background/filtered_location",
                                                                   dummy_section_start_loc_doc)
-    logging.debug("Start place is %s and corresponding location is %s" %
+    logging.debug("Raw place is %s and corresponding location is %s" %
                   (raw_place.get_id(), raw_start_place_enter_loc_entry.get_id()))
     return raw_start_place_enter_loc_entry
 
