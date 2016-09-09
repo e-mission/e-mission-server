@@ -853,8 +853,7 @@ def link_trip_end(cleaned_trip, cleaned_end_place, raw_end_place):
 def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleaned_start_place_data):
     distance_delta = ecc.calDistance(cleaned_trip_data.start_loc.coordinates,
                                      cleaned_start_place_data.location.coordinates)
-    curr_first_loc = ecwe.Entry(ts.get_entry_at_ts(esda.CLEANED_LOCATION_KEY, "data.ts",
-                                                   cleaned_trip_data.start_ts))
+    orig_start_ts = cleaned_trip_data.start_ts
     logging.debug("squishing mismatch: resetting trip start_loc %s to cleaned_start_place.location %s" %
                   (cleaned_trip_data.start_loc.coordinates, cleaned_start_place_data.location.coordinates))
     # In order to make everything line up, we need to:
@@ -871,6 +870,10 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
 
     # 4) Reset section
     section_entries = esdtq.get_cleaned_sections_for_trip(user_id, trip_id)
+    if len(section_entries) == 0:
+        logging.debug("No sections found, must be untracked time, skipping section and location fixes")
+        return
+
     first_section = section_entries[0]
     first_section_data = first_section.data
     _overwrite_from_timestamp(first_section_data, "start",
@@ -915,6 +918,8 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
     ts.insert_data(user_id, esda.CLEANED_LOCATION_KEY, loc_row)
 
     # 5) Update previous first location data to have the correct speed and distance
+    curr_first_loc = ecwe.Entry(ts.get_entry_at_ts(esda.CLEANED_LOCATION_KEY, "data.ts",
+                                                   orig_start_ts))
     curr_first_loc_data = curr_first_loc.data
     curr_first_loc_data["distance"] = distance_delta
     curr_first_loc_data["speed"] = float(distance_delta) / 30
@@ -926,21 +931,25 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
                               esda.get_time_query_for_trip_like(esda.CLEANED_SECTION_KEY, first_section.get_id()))
     loc_df.rename(columns={"speed": "from_points_speed", "distance": "from_points_distance"}, inplace=True)
     with_speeds_df = eaicl.add_dist_heading_speed(loc_df)
-    if with_speeds_df.speed.tolist() != first_section_data["speeds"]:
+    if not compare_rounded_arrays(with_speeds_df.speed.tolist(), first_section_data["speeds"], 10):
         logging.error("%s != %s" % (with_speeds_df.speed.tolist()[:10], first_section_data["speeds"][:10]))
         assert False
 
-    if with_speeds_df.distance.tolist() != first_section_data["distances"]:
+    if not compare_rounded_arrays(with_speeds_df.distance.tolist(), first_section_data["distances"], 10):
         logging.error("%s != %s" % (with_speeds_df.distance.tolist()[:10], first_section_data["distances"][:10]))
         assert False
 
-    if with_speeds_df.speed.tolist() != with_speeds_df.from_points_speed.tolist():
+    if not compare_rounded_arrays(with_speeds_df.speed.tolist(), with_speeds_df.from_points_speed.tolist(), 10):
         logging.error("%s != %s" % (with_speeds_df.speed.tolist()[:10], with_speeds_df.from_points_speed.tolist()[:10]))
         assert False
 
-    if with_speeds_df.distance.tolist() != with_speeds_df.from_points_distance.tolist():
+    if not compare_rounded_arrays(with_speeds_df.distance.tolist(), with_speeds_df.from_points_distance.tolist(), 10):
         logging.error("%s != %s" % (with_speeds_df.distance.tolist()[:10], with_speeds_df.from_points_distance.tolist()[:10]))
         assert False
+
+def compare_rounded_arrays(arr1, arr2, digits):
+    round2n = lambda x: round(x, digits)
+    return map(round2n, arr1) == map(round2n, arr2)
 
 def format_result(rev_geo_result):
     get_fine = lambda rgr: get_with_fallbacks(rgr["address"], ["road", "neighbourhood"])
