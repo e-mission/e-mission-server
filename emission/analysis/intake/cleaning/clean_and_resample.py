@@ -336,6 +336,10 @@ def get_filtered_points(section, filtered_section_data):
         raw_trip = ts.get_entry_from_id(esda.RAW_TRIP_KEY, section.data.trip_id)
         raw_start_place = ts.get_entry_from_id(esda.RAW_PLACE_KEY, raw_trip.data.start_place)
         filtered_loc_df = _add_start_point(filtered_loc_df, raw_start_place, ts)
+        if _is_unknown_mark_needed(filtered_section_data, section, filtered_loc_df):
+            # UGLY! UGLY! Fix when we fix
+            # https://github.com/e-mission/e-mission-server/issues/388
+            section["data"]["sensed_mode"] = ecwm.MotionTypes.UNKNOWN
 
     if section.data.end_stop is None:
         logging.debug("Found last section, may need to extrapolate end point")
@@ -369,6 +373,27 @@ def get_filtered_points(section, filtered_section_data):
     logging.info("removed %d entries containing n/a" % 
         (len(with_speeds_df_nona) - len(with_speeds_df)))
     return with_speeds_df_nona
+
+def _is_unknown_mark_needed(filtered_section_data, section, filtered_loc_df):
+    import emission.analysis.intake.cleaning.cleaning_methods.speed_outlier_detection as eaiccs
+
+    if filtered_loc_df.ts.iloc[0] == section.data.start_ts:
+        logging.debug("No extrapolation, no UNKNOWN")
+        return False
+
+    with_speeds_df = eaicl.add_dist_heading_speed(filtered_loc_df)
+    logging.debug("with_speeds_df = %s")
+
+    extrapolated_speed = with_speeds_df.speed.iloc[1]
+    remaining_speeds = with_speeds_df.iloc[2:]
+    threshold = eaiccs.BoxplotOutlier(eaiccs.BoxplotOutlier.MINOR, ignore_zeros=False).get_threshold(remaining_speeds)
+
+    if extrapolated_speed > threshold:
+        logging.debug("extrapolated_speed %s > threshold %s, marking section as UNKNOWN")
+        return True
+    else:
+        logging.debug("extrapolated_speed %s < threshold %s, leaving section untouched")
+        return False
 
 def _copy_non_excluded(old_data, new_data, excluded_list):
     for key in old_data:
