@@ -243,10 +243,8 @@ def found_untracked_period(timeseries, last_place, start_loc):
     logging.debug("while determining new_start_place, time_delta = %s, transition_speed = %s"
                   % (time_delta, transition_speed))
 
-    # android uses 100 m in 5 mins
-    # iOS uses 50 m in 10 mins
-    # Let's go with the slower option
-    speed_threshold = float(50) / (10*60)
+    # Let's use a little less than walking speed 3km/hr < 3mph (4.83 kmph)
+    speed_threshold = float(3000) / (60*60)
 
     if transition_speed > speed_threshold:
         logging.debug("transition_speed %s > %s, returning False" %
