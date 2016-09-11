@@ -11,7 +11,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57cf097ef6858f4fff773745", 
+                    "id": "57d5bbaaf6858f76cd149a16", 
                     "properties": {
                         "exit_local_dt": {
                             "hour": 10, 
@@ -23,19 +23,19 @@
                             "day": 4, 
                             "minute": 3
                         }, 
-                        "display_name": "Kahakai Boulevard, Hawaiian Beaches CDP", 
+                        "display_name": ", ", 
                         "feature_type": "start_place", 
                         "exit_fmt_time": "2016-08-04T10:03:51.235000-10:00", 
                         "starting_trip": {
-                            "$oid": "57cf0976f6858f4fff7734aa"
+                            "$oid": "57d5bba3f6858f76cd14977b"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "raw_places": [
                             {
-                                "$oid": "57cf096ef6858f4fff77347a"
+                                "$oid": "57d5bb9ef6858f76cd14974b"
                             }, 
                             {
-                                "$oid": "57cf096ef6858f4fff77347a"
+                                "$oid": "57d5bb9ef6858f76cd14974b"
                             }
                         ], 
                         "exit_ts": 1470341031.235
@@ -50,7 +50,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57cf097ef6858f4fff773746", 
+                    "id": "57d5bbaaf6858f76cd149a17", 
                     "properties": {
                         "enter_fmt_time": "2016-08-04T10:35:12-10:00", 
                         "exit_local_dt": {
@@ -63,7 +63,7 @@
                             "day": 4, 
                             "minute": 41
                         }, 
-                        "display_name": "Old Volcano Road, Keaau", 
+                        "display_name": ", ", 
                         "feature_type": "end_place", 
                         "exit_fmt_time": "2016-08-04T10:41:32.136385-10:00", 
                         "enter_local_dt": {
@@ -77,20 +77,20 @@
                             "minute": 35
                         }, 
                         "ending_trip": {
-                            "$oid": "57cf0976f6858f4fff7734aa"
+                            "$oid": "57d5bba3f6858f76cd14977b"
                         }, 
                         "starting_trip": {
-                            "$oid": "57cf0977f6858f4fff7734ed"
+                            "$oid": "57d5bba4f6858f76cd1497be"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1470342912, 
                         "duration": 380.13638520240784, 
                         "raw_places": [
                             {
-                                "$oid": "57cf096ef6858f4fff77347c"
+                                "$oid": "57d5bb9ef6858f76cd14974d"
                             }, 
                             {
-                                "$oid": "57cf096ef6858f4fff77347c"
+                                "$oid": "57d5bb9ef6858f76cd14974d"
                             }
                         ], 
                         "exit_ts": 1470343292.1363852
@@ -362,7 +362,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57cf0976f6858f4fff7734ac", 
+                            "id": "57d5bba4f6858f76cd14977d", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -450,7 +450,7 @@
                                 }, 
                                 "duration": 1880.7650001049042, 
                                 "trip_id": {
-                                    "$oid": "57cf0976f6858f4fff7734aa"
+                                    "$oid": "57d5bba3f6858f76cd14977b"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 10, 
@@ -534,14 +534,14 @@
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57cf0976f6858f4fff7734aa", 
+            "id": "57d5bba3f6858f76cd14977b", 
             "properties": {
                 "distance": 24806.987825634333, 
                 "end_place": {
-                    "$oid": "57cf097ef6858f4fff773746"
+                    "$oid": "57d5bbaaf6858f76cd149a17"
                 }, 
                 "raw_trip": {
-                    "$oid": "57cf096ef6858f4fff77347b"
+                    "$oid": "57d5bb9ef6858f76cd14974c"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -563,7 +563,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57cf097ef6858f4fff773745"
+                    "$oid": "57d5bbaaf6858f76cd149a16"
                 }, 
                 "end_fmt_time": "2016-08-04T10:35:12-10:00", 
                 "end_local_dt": {
@@ -600,7 +600,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57cf097ef6858f4fff773746", 
+                    "id": "57d5bbaaf6858f76cd149a17", 
                     "properties": {
                         "enter_fmt_time": "2016-08-04T10:35:12-10:00", 
                         "exit_local_dt": {
@@ -613,7 +613,7 @@
                             "day": 4, 
                             "minute": 41
                         }, 
-                        "display_name": "Old Volcano Road, Keaau", 
+                        "display_name": ", ", 
                         "feature_type": "start_place", 
                         "exit_fmt_time": "2016-08-04T10:41:32.136385-10:00", 
                         "enter_local_dt": {
@@ -627,20 +627,20 @@
                             "minute": 35
                         }, 
                         "ending_trip": {
-                            "$oid": "57cf0976f6858f4fff7734aa"
+                            "$oid": "57d5bba3f6858f76cd14977b"
                         }, 
                         "starting_trip": {
-                            "$oid": "57cf0977f6858f4fff7734ed"
+                            "$oid": "57d5bba4f6858f76cd1497be"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1470342912, 
                         "duration": 380.13638520240784, 
                         "raw_places": [
                             {
-                                "$oid": "57cf096ef6858f4fff77347c"
+                                "$oid": "57d5bb9ef6858f76cd14974d"
                             }, 
                             {
-                                "$oid": "57cf096ef6858f4fff77347c"
+                                "$oid": "57d5bb9ef6858f76cd14974d"
                             }
                         ], 
                         "exit_ts": 1470343292.1363852
@@ -655,7 +655,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57cf097ff6858f4fff773747", 
+                    "id": "57d5bbaaf6858f76cd149a18", 
                     "properties": {
                         "enter_fmt_time": "2016-08-04T12:55:48.721000-10:00", 
                         "exit_local_dt": {
@@ -668,7 +668,7 @@
                             "day": 4, 
                             "minute": 10
                         }, 
-                        "display_name": "Honaunau Beach Road, Honaunau-Napoopoo CDP", 
+                        "display_name": ", ", 
                         "feature_type": "end_place", 
                         "exit_fmt_time": "2016-08-04T13:10:38.739684-10:00", 
                         "enter_local_dt": {
@@ -682,23 +682,23 @@
                             "minute": 55
                         }, 
                         "ending_trip": {
-                            "$oid": "57cf0977f6858f4fff7734ed"
+                            "$oid": "57d5bba4f6858f76cd1497be"
                         }, 
                         "starting_trip": {
-                            "$oid": "57cf0979f6858f4fff7735fe"
+                            "$oid": "57d5bba6f6858f76cd1498cf"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1470351348.721, 
                         "duration": 890.018684387207, 
                         "raw_places": [
                             {
-                                "$oid": "57cf096ef6858f4fff77347e"
+                                "$oid": "57d5bb9ef6858f76cd14974f"
                             }, 
                             {
-                                "$oid": "57cf096ef6858f4fff77347e"
+                                "$oid": "57d5bb9ef6858f76cd14974f"
                             }, 
                             {
-                                "$oid": "57cf096ef6858f4fff773480"
+                                "$oid": "57d5bb9ef6858f76cd149751"
                             }
                         ], 
                         "exit_ts": 1470352238.7396843
@@ -1794,7 +1794,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57cf0978f6858f4fff7734ef", 
+                            "id": "57d5bba5f6858f76cd1497c0", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -2088,7 +2088,7 @@
                                 }, 
                                 "duration": 8056.584614753723, 
                                 "trip_id": {
-                                    "$oid": "57cf0977f6858f4fff7734ed"
+                                    "$oid": "57d5bba4f6858f76cd1497be"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 10, 
@@ -2378,14 +2378,14 @@
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57cf0977f6858f4fff7734ed", 
+            "id": "57d5bba4f6858f76cd1497be", 
             "properties": {
                 "distance": 157827.54864780518, 
                 "end_place": {
-                    "$oid": "57cf097ff6858f4fff773747"
+                    "$oid": "57d5bbaaf6858f76cd149a18"
                 }, 
                 "raw_trip": {
-                    "$oid": "57cf096ef6858f4fff77347d"
+                    "$oid": "57d5bb9ef6858f76cd14974e"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -2407,7 +2407,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57cf097ef6858f4fff773746"
+                    "$oid": "57d5bbaaf6858f76cd149a17"
                 }, 
                 "end_fmt_time": "2016-08-04T12:55:48.721000-10:00", 
                 "end_local_dt": {
@@ -2444,7 +2444,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57cf097ff6858f4fff773747", 
+                    "id": "57d5bbaaf6858f76cd149a18", 
                     "properties": {
                         "enter_fmt_time": "2016-08-04T12:55:48.721000-10:00", 
                         "exit_local_dt": {
@@ -2457,7 +2457,7 @@
                             "day": 4, 
                             "minute": 10
                         }, 
-                        "display_name": "Honaunau Beach Road, Honaunau-Napoopoo CDP", 
+                        "display_name": ", ", 
                         "feature_type": "start_place", 
                         "exit_fmt_time": "2016-08-04T13:10:38.739684-10:00", 
                         "enter_local_dt": {
@@ -2471,23 +2471,23 @@
                             "minute": 55
                         }, 
                         "ending_trip": {
-                            "$oid": "57cf0977f6858f4fff7734ed"
+                            "$oid": "57d5bba4f6858f76cd1497be"
                         }, 
                         "starting_trip": {
-                            "$oid": "57cf0979f6858f4fff7735fe"
+                            "$oid": "57d5bba6f6858f76cd1498cf"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1470351348.721, 
                         "duration": 890.018684387207, 
                         "raw_places": [
                             {
-                                "$oid": "57cf096ef6858f4fff77347e"
+                                "$oid": "57d5bb9ef6858f76cd14974f"
                             }, 
                             {
-                                "$oid": "57cf096ef6858f4fff77347e"
+                                "$oid": "57d5bb9ef6858f76cd14974f"
                             }, 
                             {
-                                "$oid": "57cf096ef6858f4fff773480"
+                                "$oid": "57d5bb9ef6858f76cd149751"
                             }
                         ], 
                         "exit_ts": 1470352238.7396843
@@ -2502,7 +2502,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57cf097ff6858f4fff773749", 
+                    "id": "57d5bbabf6858f76cd149a1a", 
                     "properties": {
                         "enter_fmt_time": "2016-08-04T13:20:44-10:00", 
                         "exit_local_dt": {
@@ -2515,7 +2515,7 @@
                             "day": 4, 
                             "minute": 39
                         }, 
-                        "display_name": "State Route 163, Honaunau-Napoopoo CDP", 
+                        "display_name": ", ", 
                         "feature_type": "end_place", 
                         "exit_fmt_time": "2016-08-04T13:39:09.626500-10:00", 
                         "enter_local_dt": {
@@ -2529,23 +2529,23 @@
                             "minute": 20
                         }, 
                         "ending_trip": {
-                            "$oid": "57cf0979f6858f4fff7735fe"
+                            "$oid": "57d5bba6f6858f76cd1498cf"
                         }, 
                         "starting_trip": {
-                            "$oid": "57cf097af6858f4fff773616"
+                            "$oid": "57d5bba6f6858f76cd1498e7"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1470352844, 
                         "duration": 1105.6265001296997, 
                         "raw_places": [
                             {
-                                "$oid": "57cf096ef6858f4fff773482"
+                                "$oid": "57d5bb9ef6858f76cd149753"
                             }, 
                             {
-                                "$oid": "57cf096ef6858f4fff773482"
+                                "$oid": "57d5bb9ef6858f76cd149753"
                             }, 
                             {
-                                "$oid": "57cf096ef6858f4fff773484"
+                                "$oid": "57d5bb9ef6858f76cd149755"
                             }
                         ], 
                         "exit_ts": 1470353949.6265001
@@ -2649,7 +2649,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57cf0979f6858f4fff773600", 
+                            "id": "57d5bba6f6858f76cd1498d1", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -2695,7 +2695,7 @@
                                 }, 
                                 "duration": 329.07376498948594, 
                                 "trip_id": {
-                                    "$oid": "57cf0979f6858f4fff7735fe"
+                                    "$oid": "57d5bba6f6858f76cd1498cf"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 13, 
@@ -2737,14 +2737,14 @@
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57cf0979f6858f4fff7735fe", 
+            "id": "57d5bba6f6858f76cd1498cf", 
             "properties": {
                 "distance": 299.07376498948594, 
                 "end_place": {
-                    "$oid": "57cf097ff6858f4fff773749"
+                    "$oid": "57d5bbabf6858f76cd149a1a"
                 }, 
                 "raw_trip": {
-                    "$oid": "57cf096ef6858f4fff773481"
+                    "$oid": "57d5bb9ef6858f76cd149752"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -2766,7 +2766,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57cf097ff6858f4fff773747"
+                    "$oid": "57d5bbaaf6858f76cd149a18"
                 }, 
                 "end_fmt_time": "2016-08-04T13:20:44-10:00", 
                 "end_local_dt": {
@@ -2803,7 +2803,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57cf097ff6858f4fff773749", 
+                    "id": "57d5bbabf6858f76cd149a1a", 
                     "properties": {
                         "enter_fmt_time": "2016-08-04T13:20:44-10:00", 
                         "exit_local_dt": {
@@ -2816,7 +2816,7 @@
                             "day": 4, 
                             "minute": 39
                         }, 
-                        "display_name": "State Route 163, Honaunau-Napoopoo CDP", 
+                        "display_name": ", ", 
                         "feature_type": "start_place", 
                         "exit_fmt_time": "2016-08-04T13:39:09.626500-10:00", 
                         "enter_local_dt": {
@@ -2830,23 +2830,23 @@
                             "minute": 20
                         }, 
                         "ending_trip": {
-                            "$oid": "57cf0979f6858f4fff7735fe"
+                            "$oid": "57d5bba6f6858f76cd1498cf"
                         }, 
                         "starting_trip": {
-                            "$oid": "57cf097af6858f4fff773616"
+                            "$oid": "57d5bba6f6858f76cd1498e7"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1470352844, 
                         "duration": 1105.6265001296997, 
                         "raw_places": [
                             {
-                                "$oid": "57cf096ef6858f4fff773482"
+                                "$oid": "57d5bb9ef6858f76cd149753"
                             }, 
                             {
-                                "$oid": "57cf096ef6858f4fff773482"
+                                "$oid": "57d5bb9ef6858f76cd149753"
                             }, 
                             {
-                                "$oid": "57cf096ef6858f4fff773484"
+                                "$oid": "57d5bb9ef6858f76cd149755"
                             }
                         ], 
                         "exit_ts": 1470353949.6265001
@@ -2861,7 +2861,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57cf0980f6858f4fff77374b", 
+                    "id": "57d5bbabf6858f76cd149a1c", 
                     "properties": {
                         "enter_fmt_time": "2016-08-04T13:42:52.709000-10:00", 
                         "exit_local_dt": {
@@ -2874,7 +2874,7 @@
                             "day": 4, 
                             "minute": 46
                         }, 
-                        "display_name": "State Route 163, Honaunau-Napoopoo CDP", 
+                        "display_name": ", ", 
                         "feature_type": "end_place", 
                         "exit_fmt_time": "2016-08-04T13:46:26.561801-10:00", 
                         "enter_local_dt": {
@@ -2888,20 +2888,20 @@
                             "minute": 42
                         }, 
                         "ending_trip": {
-                            "$oid": "57cf097af6858f4fff773616"
+                            "$oid": "57d5bba6f6858f76cd1498e7"
                         }, 
                         "starting_trip": {
-                            "$oid": "57cf097af6858f4fff773621"
+                            "$oid": "57d5bba6f6858f76cd1498f2"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1470354172.709, 
                         "duration": 213.85280060768127, 
                         "raw_places": [
                             {
-                                "$oid": "57cf096ef6858f4fff773486"
+                                "$oid": "57d5bb9ef6858f76cd149757"
                             }, 
                             {
-                                "$oid": "57cf096ef6858f4fff773486"
+                                "$oid": "57d5bb9ef6858f76cd149757"
                             }
                         ], 
                         "exit_ts": 1470354386.5618007
@@ -2953,7 +2953,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57cf097af6858f4fff773618", 
+                            "id": "57d5bba6f6858f76cd1498e9", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -2986,7 +2986,7 @@
                                 }, 
                                 "duration": 227.58540452948253, 
                                 "trip_id": {
-                                    "$oid": "57cf097af6858f4fff773616"
+                                    "$oid": "57d5bba6f6858f76cd1498e7"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 13, 
@@ -3015,14 +3015,14 @@
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57cf097af6858f4fff773616", 
+            "id": "57d5bba6f6858f76cd1498e7", 
             "properties": {
                 "distance": 197.58540452948253, 
                 "end_place": {
-                    "$oid": "57cf0980f6858f4fff77374b"
+                    "$oid": "57d5bbabf6858f76cd149a1c"
                 }, 
                 "raw_trip": {
-                    "$oid": "57cf096ef6858f4fff773485"
+                    "$oid": "57d5bb9ef6858f76cd149756"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -3044,7 +3044,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57cf097ff6858f4fff773749"
+                    "$oid": "57d5bbabf6858f76cd149a1a"
                 }, 
                 "end_fmt_time": "2016-08-04T13:42:52.709000-10:00", 
                 "end_local_dt": {
@@ -3081,7 +3081,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57cf0980f6858f4fff77374b", 
+                    "id": "57d5bbabf6858f76cd149a1c", 
                     "properties": {
                         "enter_fmt_time": "2016-08-04T13:42:52.709000-10:00", 
                         "exit_local_dt": {
@@ -3094,7 +3094,7 @@
                             "day": 4, 
                             "minute": 46
                         }, 
-                        "display_name": "State Route 163, Honaunau-Napoopoo CDP", 
+                        "display_name": ", ", 
                         "feature_type": "start_place", 
                         "exit_fmt_time": "2016-08-04T13:46:26.561801-10:00", 
                         "enter_local_dt": {
@@ -3108,20 +3108,20 @@
                             "minute": 42
                         }, 
                         "ending_trip": {
-                            "$oid": "57cf097af6858f4fff773616"
+                            "$oid": "57d5bba6f6858f76cd1498e7"
                         }, 
                         "starting_trip": {
-                            "$oid": "57cf097af6858f4fff773621"
+                            "$oid": "57d5bba6f6858f76cd1498f2"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1470354172.709, 
                         "duration": 213.85280060768127, 
                         "raw_places": [
                             {
-                                "$oid": "57cf096ef6858f4fff773486"
+                                "$oid": "57d5bb9ef6858f76cd149757"
                             }, 
                             {
-                                "$oid": "57cf096ef6858f4fff773486"
+                                "$oid": "57d5bb9ef6858f76cd149757"
                             }
                         ], 
                         "exit_ts": 1470354386.5618007
@@ -3136,7 +3136,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57cf0980f6858f4fff77374c", 
+                    "id": "57d5bbabf6858f76cd149a1d", 
                     "properties": {
                         "enter_fmt_time": "2016-08-04T13:58:52-10:00", 
                         "exit_local_dt": {
@@ -3149,7 +3149,7 @@
                             "day": 4, 
                             "minute": 7
                         }, 
-                        "display_name": "Honaunau Beach Road, Honaunau-Napoopoo CDP", 
+                        "display_name": ", ", 
                         "feature_type": "end_place", 
                         "exit_fmt_time": "2016-08-04T14:07:05.184000-10:00", 
                         "enter_local_dt": {
@@ -3163,23 +3163,23 @@
                             "minute": 58
                         }, 
                         "ending_trip": {
-                            "$oid": "57cf097af6858f4fff773621"
+                            "$oid": "57d5bba6f6858f76cd1498f2"
                         }, 
                         "starting_trip": {
-                            "$oid": "57cf097bf6858f4fff77363e"
+                            "$oid": "57d5bba7f6858f76cd14990f"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1470355132, 
                         "duration": 493.1840000152588, 
                         "raw_places": [
                             {
-                                "$oid": "57cf096ff6858f4fff773488"
+                                "$oid": "57d5bb9ef6858f76cd149759"
                             }, 
                             {
-                                "$oid": "57cf096ff6858f4fff773488"
+                                "$oid": "57d5bb9ef6858f76cd149759"
                             }, 
                             {
-                                "$oid": "57cf096ff6858f4fff77348a"
+                                "$oid": "57d5bb9ef6858f76cd14975b"
                             }
                         ], 
                         "exit_ts": 1470355625.184
@@ -3299,7 +3299,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57cf097af6858f4fff773623", 
+                            "id": "57d5bba7f6858f76cd1498f4", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -3349,7 +3349,7 @@
                                 }, 
                                 "duration": 745.4381992816925, 
                                 "trip_id": {
-                                    "$oid": "57cf097af6858f4fff773621"
+                                    "$oid": "57d5bba6f6858f76cd1498f2"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 13, 
@@ -3395,14 +3395,14 @@
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57cf097af6858f4fff773621", 
+            "id": "57d5bba6f6858f76cd1498f2", 
             "properties": {
                 "distance": 1401.0643734125963, 
                 "end_place": {
-                    "$oid": "57cf0980f6858f4fff77374c"
+                    "$oid": "57d5bbabf6858f76cd149a1d"
                 }, 
                 "raw_trip": {
-                    "$oid": "57cf096ff6858f4fff773487"
+                    "$oid": "57d5bb9ef6858f76cd149758"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -3424,7 +3424,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57cf0980f6858f4fff77374b"
+                    "$oid": "57d5bbabf6858f76cd149a1c"
                 }, 
                 "end_fmt_time": "2016-08-04T13:58:52-10:00", 
                 "end_local_dt": {
@@ -3461,7 +3461,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57cf0980f6858f4fff77374c", 
+                    "id": "57d5bbabf6858f76cd149a1d", 
                     "properties": {
                         "enter_fmt_time": "2016-08-04T13:58:52-10:00", 
                         "exit_local_dt": {
@@ -3474,7 +3474,7 @@
                             "day": 4, 
                             "minute": 7
                         }, 
-                        "display_name": "Honaunau Beach Road, Honaunau-Napoopoo CDP", 
+                        "display_name": ", ", 
                         "feature_type": "start_place", 
                         "exit_fmt_time": "2016-08-04T14:07:05.184000-10:00", 
                         "enter_local_dt": {
@@ -3488,23 +3488,23 @@
                             "minute": 58
                         }, 
                         "ending_trip": {
-                            "$oid": "57cf097af6858f4fff773621"
+                            "$oid": "57d5bba6f6858f76cd1498f2"
                         }, 
                         "starting_trip": {
-                            "$oid": "57cf097bf6858f4fff77363e"
+                            "$oid": "57d5bba7f6858f76cd14990f"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1470355132, 
                         "duration": 493.1840000152588, 
                         "raw_places": [
                             {
-                                "$oid": "57cf096ff6858f4fff773488"
+                                "$oid": "57d5bb9ef6858f76cd149759"
                             }, 
                             {
-                                "$oid": "57cf096ff6858f4fff773488"
+                                "$oid": "57d5bb9ef6858f76cd149759"
                             }, 
                             {
-                                "$oid": "57cf096ff6858f4fff77348a"
+                                "$oid": "57d5bb9ef6858f76cd14975b"
                             }
                         ], 
                         "exit_ts": 1470355625.184
@@ -3519,7 +3519,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57cf0981f6858f4fff77374e", 
+                    "id": "57d5bbabf6858f76cd149a1f", 
                     "properties": {
                         "enter_fmt_time": "2016-08-04T14:12:04.251000-10:00", 
                         "exit_local_dt": {
@@ -3532,7 +3532,7 @@
                             "day": 4, 
                             "minute": 18
                         }, 
-                        "display_name": "State Route 163, Honaunau-Napoopoo CDP", 
+                        "display_name": ", ", 
                         "feature_type": "end_place", 
                         "exit_fmt_time": "2016-08-04T14:18:35.840464-10:00", 
                         "enter_local_dt": {
@@ -3546,20 +3546,20 @@
                             "minute": 12
                         }, 
                         "ending_trip": {
-                            "$oid": "57cf097bf6858f4fff77363e"
+                            "$oid": "57d5bba7f6858f76cd14990f"
                         }, 
                         "starting_trip": {
-                            "$oid": "57cf097bf6858f4fff77364b"
+                            "$oid": "57d5bba7f6858f76cd14991c"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1470355924.251, 
                         "duration": 391.58946442604065, 
                         "raw_places": [
                             {
-                                "$oid": "57cf096ff6858f4fff77348c"
+                                "$oid": "57d5bb9ef6858f76cd14975d"
                             }, 
                             {
-                                "$oid": "57cf096ff6858f4fff77348c"
+                                "$oid": "57d5bb9ef6858f76cd14975d"
                             }
                         ], 
                         "exit_ts": 1470356315.8404644
@@ -3619,7 +3619,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57cf097bf6858f4fff773640", 
+                            "id": "57d5bba7f6858f76cd149911", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -3639,7 +3639,7 @@
                                 "end_ts": 1470355924.251, 
                                 "start_ts": 1470355625.184, 
                                 "start_fmt_time": "2016-08-04T14:07:05.184000-10:00", 
-                                "sensed_mode": "MotionTypes.ON_FOOT", 
+                                "sensed_mode": "MotionTypes.UNKNOWN", 
                                 "source": "SmoothedHighConfidenceMotion", 
                                 "end_fmt_time": "2016-08-04T14:12:04.251000-10:00", 
                                 "end_local_dt": {
@@ -3654,7 +3654,7 @@
                                 }, 
                                 "duration": 209.5944552546443, 
                                 "trip_id": {
-                                    "$oid": "57cf097bf6858f4fff77363e"
+                                    "$oid": "57d5bba7f6858f76cd14990f"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 14, 
@@ -3685,14 +3685,14 @@
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57cf097bf6858f4fff77363e", 
+            "id": "57d5bba7f6858f76cd14990f", 
             "properties": {
                 "distance": 179.5944552546443, 
                 "end_place": {
-                    "$oid": "57cf0981f6858f4fff77374e"
+                    "$oid": "57d5bbabf6858f76cd149a1f"
                 }, 
                 "raw_trip": {
-                    "$oid": "57cf096ff6858f4fff77348b"
+                    "$oid": "57d5bb9ef6858f76cd14975c"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -3714,7 +3714,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57cf0980f6858f4fff77374c"
+                    "$oid": "57d5bbabf6858f76cd149a1d"
                 }, 
                 "end_fmt_time": "2016-08-04T14:12:04.251000-10:00", 
                 "end_local_dt": {
@@ -3751,7 +3751,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57cf0981f6858f4fff77374e", 
+                    "id": "57d5bbabf6858f76cd149a1f", 
                     "properties": {
                         "enter_fmt_time": "2016-08-04T14:12:04.251000-10:00", 
                         "exit_local_dt": {
@@ -3764,7 +3764,7 @@
                             "day": 4, 
                             "minute": 18
                         }, 
-                        "display_name": "State Route 163, Honaunau-Napoopoo CDP", 
+                        "display_name": ", ", 
                         "feature_type": "start_place", 
                         "exit_fmt_time": "2016-08-04T14:18:35.840464-10:00", 
                         "enter_local_dt": {
@@ -3778,20 +3778,20 @@
                             "minute": 12
                         }, 
                         "ending_trip": {
-                            "$oid": "57cf097bf6858f4fff77363e"
+                            "$oid": "57d5bba7f6858f76cd14990f"
                         }, 
                         "starting_trip": {
-                            "$oid": "57cf097bf6858f4fff77364b"
+                            "$oid": "57d5bba7f6858f76cd14991c"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1470355924.251, 
                         "duration": 391.58946442604065, 
                         "raw_places": [
                             {
-                                "$oid": "57cf096ff6858f4fff77348c"
+                                "$oid": "57d5bb9ef6858f76cd14975d"
                             }, 
                             {
-                                "$oid": "57cf096ff6858f4fff77348c"
+                                "$oid": "57d5bb9ef6858f76cd14975d"
                             }
                         ], 
                         "exit_ts": 1470356315.8404644
@@ -3806,7 +3806,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57cf0981f6858f4fff77374f", 
+                    "id": "57d5bbacf6858f76cd149a20", 
                     "properties": {
                         "enter_fmt_time": "2016-08-04T14:34:12.571000-10:00", 
                         "exit_local_dt": {
@@ -3819,7 +3819,7 @@
                             "day": 4, 
                             "minute": 39
                         }, 
-                        "display_name": "State Route 163, Honaunau-Napoopoo CDP", 
+                        "display_name": ", ", 
                         "feature_type": "end_place", 
                         "exit_fmt_time": "2016-08-04T14:39:38.288795-10:00", 
                         "enter_local_dt": {
@@ -3833,20 +3833,20 @@
                             "minute": 34
                         }, 
                         "ending_trip": {
-                            "$oid": "57cf097bf6858f4fff77364b"
+                            "$oid": "57d5bba7f6858f76cd14991c"
                         }, 
                         "starting_trip": {
-                            "$oid": "57cf097bf6858f4fff77366f"
+                            "$oid": "57d5bba8f6858f76cd149940"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1470357252.571, 
                         "duration": 325.7177948951721, 
                         "raw_places": [
                             {
-                                "$oid": "57cf096ff6858f4fff77348e"
+                                "$oid": "57d5bb9ef6858f76cd14975f"
                             }, 
                             {
-                                "$oid": "57cf096ff6858f4fff77348e"
+                                "$oid": "57d5bb9ef6858f76cd14975f"
                             }
                         ], 
                         "exit_ts": 1470357578.288795
@@ -3994,7 +3994,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57cf097bf6858f4fff77364d", 
+                            "id": "57d5bba7f6858f76cd14991e", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -4051,7 +4051,7 @@
                                 }, 
                                 "duration": 936.7305357456207, 
                                 "trip_id": {
-                                    "$oid": "57cf097bf6858f4fff77364b"
+                                    "$oid": "57d5bba7f6858f76cd14991c"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 14, 
@@ -4104,14 +4104,14 @@
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57cf097bf6858f4fff77364b", 
+            "id": "57d5bba7f6858f76cd14991c", 
             "properties": {
                 "distance": 1316.3118354165358, 
                 "end_place": {
-                    "$oid": "57cf0981f6858f4fff77374f"
+                    "$oid": "57d5bbacf6858f76cd149a20"
                 }, 
                 "raw_trip": {
-                    "$oid": "57cf096ff6858f4fff77348d"
+                    "$oid": "57d5bb9ef6858f76cd14975e"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -4133,7 +4133,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57cf0981f6858f4fff77374e"
+                    "$oid": "57d5bbabf6858f76cd149a1f"
                 }, 
                 "end_fmt_time": "2016-08-04T14:34:12.571000-10:00", 
                 "end_local_dt": {
@@ -4170,7 +4170,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57cf0981f6858f4fff77374f", 
+                    "id": "57d5bbacf6858f76cd149a20", 
                     "properties": {
                         "enter_fmt_time": "2016-08-04T14:34:12.571000-10:00", 
                         "exit_local_dt": {
@@ -4183,7 +4183,7 @@
                             "day": 4, 
                             "minute": 39
                         }, 
-                        "display_name": "State Route 163, Honaunau-Napoopoo CDP", 
+                        "display_name": ", ", 
                         "feature_type": "start_place", 
                         "exit_fmt_time": "2016-08-04T14:39:38.288795-10:00", 
                         "enter_local_dt": {
@@ -4197,20 +4197,20 @@
                             "minute": 34
                         }, 
                         "ending_trip": {
-                            "$oid": "57cf097bf6858f4fff77364b"
+                            "$oid": "57d5bba7f6858f76cd14991c"
                         }, 
                         "starting_trip": {
-                            "$oid": "57cf097bf6858f4fff77366f"
+                            "$oid": "57d5bba8f6858f76cd149940"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1470357252.571, 
                         "duration": 325.7177948951721, 
                         "raw_places": [
                             {
-                                "$oid": "57cf096ff6858f4fff77348e"
+                                "$oid": "57d5bb9ef6858f76cd14975f"
                             }, 
                             {
-                                "$oid": "57cf096ff6858f4fff77348e"
+                                "$oid": "57d5bb9ef6858f76cd14975f"
                             }
                         ], 
                         "exit_ts": 1470357578.288795
@@ -4225,7 +4225,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57cf0981f6858f4fff773750", 
+                    "id": "57d5bbacf6858f76cd149a21", 
                     "properties": {
                         "enter_fmt_time": "2016-08-04T16:18:54.709000-10:00", 
                         "exit_local_dt": {
@@ -4238,7 +4238,7 @@
                             "day": 4, 
                             "minute": 34
                         }, 
-                        "display_name": "Terminal Drive, Kalaoa CDP", 
+                        "display_name": ", ", 
                         "feature_type": "end_place", 
                         "exit_fmt_time": "2016-08-04T16:34:45.744782-10:00", 
                         "enter_local_dt": {
@@ -4252,23 +4252,23 @@
                             "minute": 18
                         }, 
                         "ending_trip": {
-                            "$oid": "57cf097bf6858f4fff77366f"
+                            "$oid": "57d5bba8f6858f76cd149940"
                         }, 
                         "starting_trip": {
-                            "$oid": "57cf097df6858f4fff77373a"
+                            "$oid": "57d5bba9f6858f76cd149a0b"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1470363534.709, 
                         "duration": 951.0357818603516, 
                         "raw_places": [
                             {
-                                "$oid": "57cf096ff6858f4fff773490"
+                                "$oid": "57d5bb9ef6858f76cd149761"
                             }, 
                             {
-                                "$oid": "57cf096ff6858f4fff773490"
+                                "$oid": "57d5bb9ef6858f76cd149761"
                             }, 
                             {
-                                "$oid": "57cf096ff6858f4fff773492"
+                                "$oid": "57d5bb9ef6858f76cd149763"
                             }
                         ], 
                         "exit_ts": 1470364485.744782
@@ -5084,7 +5084,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57cf097cf6858f4fff773671", 
+                            "id": "57d5bba8f6858f76cd149942", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -5308,7 +5308,7 @@
                                 }, 
                                 "duration": 5956.420205116272, 
                                 "trip_id": {
-                                    "$oid": "57cf097bf6858f4fff77366f"
+                                    "$oid": "57d5bba8f6858f76cd149940"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 14, 
@@ -5528,14 +5528,14 @@
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57cf097bf6858f4fff77366f", 
+            "id": "57d5bba8f6858f76cd149940", 
             "properties": {
                 "distance": 48630.60382206579, 
                 "end_place": {
-                    "$oid": "57cf0981f6858f4fff773750"
+                    "$oid": "57d5bbacf6858f76cd149a21"
                 }, 
                 "raw_trip": {
-                    "$oid": "57cf096ff6858f4fff77348f"
+                    "$oid": "57d5bb9ef6858f76cd149760"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -5557,7 +5557,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57cf0981f6858f4fff77374f"
+                    "$oid": "57d5bbacf6858f76cd149a20"
                 }, 
                 "end_fmt_time": "2016-08-04T16:18:54.709000-10:00", 
                 "end_local_dt": {
@@ -5594,7 +5594,7 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57cf0981f6858f4fff773750", 
+                    "id": "57d5bbacf6858f76cd149a21", 
                     "properties": {
                         "enter_fmt_time": "2016-08-04T16:18:54.709000-10:00", 
                         "exit_local_dt": {
@@ -5607,7 +5607,7 @@
                             "day": 4, 
                             "minute": 34
                         }, 
-                        "display_name": "Terminal Drive, Kalaoa CDP", 
+                        "display_name": ", ", 
                         "feature_type": "start_place", 
                         "exit_fmt_time": "2016-08-04T16:34:45.744782-10:00", 
                         "enter_local_dt": {
@@ -5621,23 +5621,23 @@
                             "minute": 18
                         }, 
                         "ending_trip": {
-                            "$oid": "57cf097bf6858f4fff77366f"
+                            "$oid": "57d5bba8f6858f76cd149940"
                         }, 
                         "starting_trip": {
-                            "$oid": "57cf097df6858f4fff77373a"
+                            "$oid": "57d5bba9f6858f76cd149a0b"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1470363534.709, 
                         "duration": 951.0357818603516, 
                         "raw_places": [
                             {
-                                "$oid": "57cf096ff6858f4fff773490"
+                                "$oid": "57d5bb9ef6858f76cd149761"
                             }, 
                             {
-                                "$oid": "57cf096ff6858f4fff773490"
+                                "$oid": "57d5bb9ef6858f76cd149761"
                             }, 
                             {
-                                "$oid": "57cf096ff6858f4fff773492"
+                                "$oid": "57d5bb9ef6858f76cd149763"
                             }
                         ], 
                         "exit_ts": 1470364485.744782
@@ -5652,10 +5652,10 @@
                         ]
                     }, 
                     "type": "Feature", 
-                    "id": "57cf0982f6858f4fff773752", 
+                    "id": "57d5bbacf6858f76cd149a23", 
                     "properties": {
                         "enter_fmt_time": "2016-08-04T16:38:38.348000-10:00", 
-                        "display_name": "Terminal Drive, Kalaoa CDP", 
+                        "display_name": ", ", 
                         "feature_type": "end_place", 
                         "enter_local_dt": {
                             "hour": 16, 
@@ -5668,13 +5668,13 @@
                             "minute": 38
                         }, 
                         "ending_trip": {
-                            "$oid": "57cf097df6858f4fff77373a"
+                            "$oid": "57d5bba9f6858f76cd149a0b"
                         }, 
                         "source": "DwellSegmentationTimeFilter", 
                         "enter_ts": 1470364718.348, 
                         "raw_places": [
                             {
-                                "$oid": "57cf096ff6858f4fff773494"
+                                "$oid": "57d5bb9ef6858f76cd149765"
                             }
                         ]
                     }
@@ -5725,7 +5725,7 @@
                                 ]
                             }, 
                             "type": "Feature", 
-                            "id": "57cf097df6858f4fff77373c", 
+                            "id": "57d5bba9f6858f76cd149a0d", 
                             "properties": {
                                 "distances": [
                                     0.0, 
@@ -5758,7 +5758,7 @@
                                 }, 
                                 "duration": 376.3349064026148, 
                                 "trip_id": {
-                                    "$oid": "57cf097df6858f4fff77373a"
+                                    "$oid": "57d5bba9f6858f76cd149a0b"
                                 }, 
                                 "start_local_dt": {
                                     "hour": 16, 
@@ -5787,14 +5787,14 @@
                 }
             ], 
             "type": "FeatureCollection", 
-            "id": "57cf097df6858f4fff77373a", 
+            "id": "57d5bba9f6858f76cd149a0b", 
             "properties": {
                 "distance": 346.3349064026148, 
                 "end_place": {
-                    "$oid": "57cf0982f6858f4fff773752"
+                    "$oid": "57d5bbacf6858f76cd149a23"
                 }, 
                 "raw_trip": {
-                    "$oid": "57cf096ff6858f4fff773493"
+                    "$oid": "57d5bb9ef6858f76cd149764"
                 }, 
                 "feature_type": "trip", 
                 "start_loc": {
@@ -5816,7 +5816,7 @@
                 }, 
                 "source": "DwellSegmentationTimeFilter", 
                 "start_place": {
-                    "$oid": "57cf0981f6858f4fff773750"
+                    "$oid": "57d5bbacf6858f76cd149a21"
                 }, 
                 "end_fmt_time": "2016-08-04T16:38:38.348000-10:00", 
                 "end_local_dt": {
@@ -5844,7 +5844,7 @@
         }
     ], 
     "_id": {
-        "$oid": "57cf0984115514afcd793c45"
+        "$oid": "57d5bbae115514afcd793d70"
     }, 
     "user_id": {
         "$uuid": "0763de67f61e3f5d90e7518e69793954"
@@ -5852,6 +5852,6 @@
     "metadata": {
         "type": "document", 
         "key": "diary/trips-2016-08-04", 
-        "write_ts": 1473186180.031458
+        "write_ts": 1473625006.181035
     }
 }

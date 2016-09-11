@@ -107,6 +107,10 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
         motion_changes = self.segment_into_motion_changes(timeseries, time_query)
         location_points = timeseries.get_data_df("background/filtered_location", time_query)
 
+        if len(location_points) == 0:
+            logging.debug("No location points found for query %s, returning []" % time_query)
+            return []
+
         fp = location_points.iloc[0]
         lp = location_points.iloc[-1]
 
