@@ -186,6 +186,7 @@ def create_places_and_trips(user_id, segmentation_points, segmentation_method_na
 
             untracked_start_loc = ecwe.Entry(ts.get_entry_at_ts("background/filtered_location",
                                                      "data.ts", last_place_entry.data.enter_ts)).data
+            untracked_start_loc["ts"] = untracked_start_loc.ts + epq.END_FUZZ_AVOID_LTE
             _link_and_save(ts, last_place_entry, curr_untracked_entry, restarted_place_entry,
                            untracked_start_loc, start_loc)
             logging.debug("Created untracked period %s from %s to %s" %
