@@ -1,6 +1,14 @@
 [
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eac87d65cb39ee988d47"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 77, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -11,16 +19,8 @@
                 "day": 10, 
                 "minute": 15
             }, 
-            "confidence": 77, 
-            "type": 2, 
             "ts": 1441916100.698, 
             "fmt_time": "2015-09-10 13:15:00.698000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eac87d65cb39ee988d47"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:15:00.698000-07:00", 
@@ -42,11 +42,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eac87d65cb39ee988d48"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -59,6 +64,7 @@
             "altitude": 0, 
             "ts": 1441916100.282, 
             "longitude": -122.0777908, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -73,12 +79,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 40.5
-        }, 
-        "_id": {
-            "$oid": "55f1eac87d65cb39ee988d48"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:15:00.797000-07:00", 
@@ -100,11 +100,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eac87d65cb39ee988d49"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -117,6 +122,7 @@
             "altitude": 0, 
             "ts": 1441916100.282, 
             "longitude": -122.0777908, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -131,12 +137,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 40.5
-        }, 
-        "_id": {
-            "$oid": "55f1eac87d65cb39ee988d49"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:15:27.946000-07:00", 
@@ -158,11 +158,16 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eac87d65cb39ee988d4a"
+        }, 
         "data": {
             "curr_state": 2, 
             "transition": 2, 
@@ -178,12 +183,6 @@
             }, 
             "ts": 1441916128.057, 
             "fmt_time": "2015-09-10 13:15:28.057000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eac87d65cb39ee988d4a"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:15:28.057000-07:00", 
@@ -205,11 +204,16 @@
             }, 
             "key": "statemachine/transition", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eac87d65cb39ee988d4b"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -222,6 +226,7 @@
             "altitude": 0, 
             "ts": 1441916196.218, 
             "longitude": -122.0807784, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -236,12 +241,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 124.545
-        }, 
-        "_id": {
-            "$oid": "55f1eac87d65cb39ee988d4b"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:16:36.763000-07:00", 
@@ -263,11 +262,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eac87d65cb39ee988d4c"
+        }, 
         "data": {
             "curr_state": 1, 
             "transition": 1, 
@@ -283,12 +287,6 @@
             }, 
             "ts": 1441916210.048, 
             "fmt_time": "2015-09-10 13:16:50.048000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eac87d65cb39ee988d4c"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:16:50.048000-07:00", 
@@ -310,12 +308,19 @@
             }, 
             "key": "statemachine/transition", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eac97d65cb39ee988d4d"
+        }, 
         "data": {
+            "type": 5, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -326,16 +331,8 @@
                 "day": 10, 
                 "minute": 16
             }, 
-            "confidence": 100, 
-            "type": 5, 
             "ts": 1441916214.137, 
             "fmt_time": "2015-09-10 13:16:54.137000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eac97d65cb39ee988d4d"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:16:54.137000-07:00", 
@@ -357,11 +354,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eac97d65cb39ee988d4e"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -374,6 +376,7 @@
             "altitude": 0, 
             "ts": 1441916213.842, 
             "longitude": -122.0813846, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -388,12 +391,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 111
-        }, 
-        "_id": {
-            "$oid": "55f1eac97d65cb39ee988d4e"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:16:54.139000-07:00", 
@@ -415,11 +412,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eac97d65cb39ee988d4f"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -432,6 +434,7 @@
             "altitude": 0, 
             "ts": 1441916213.842, 
             "longitude": -122.0813846, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -446,12 +449,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 111
-        }, 
-        "_id": {
-            "$oid": "55f1eac97d65cb39ee988d4f"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:16:54.707000-07:00", 
@@ -473,12 +470,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eac97d65cb39ee988d50"
+        }, 
         "data": {
+            "type": 5, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -489,16 +493,8 @@
                 "day": 10, 
                 "minute": 17
             }, 
-            "confidence": 100, 
-            "type": 5, 
             "ts": 1441916230.75, 
             "fmt_time": "2015-09-10 13:17:10.750000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eac97d65cb39ee988d50"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:17:10.750000-07:00", 
@@ -520,11 +516,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eac97d65cb39ee988d51"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -537,6 +538,7 @@
             "altitude": 0, 
             "ts": 1441916244.937, 
             "longitude": -122.0813833, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -551,12 +553,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 34.5
-        }, 
-        "_id": {
-            "$oid": "55f1eac97d65cb39ee988d51"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:17:25.262000-07:00", 
@@ -578,11 +574,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eac97d65cb39ee988d52"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -595,6 +596,7 @@
             "altitude": 0, 
             "ts": 1441916244.937, 
             "longitude": -122.0813833, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -609,12 +611,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 34.5
-        }, 
-        "_id": {
-            "$oid": "55f1eac97d65cb39ee988d52"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:17:41.650000-07:00", 
@@ -636,11 +632,16 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eac97d65cb39ee988d53"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -653,6 +654,7 @@
             "altitude": 0, 
             "ts": 1441916275.929, 
             "longitude": -122.0813842, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -667,12 +669,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 36
-        }, 
-        "_id": {
-            "$oid": "55f1eac97d65cb39ee988d53"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:17:56.070000-07:00", 
@@ -694,12 +690,19 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eac97d65cb39ee988d54"
+        }, 
         "data": {
+            "type": 5, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -710,16 +713,8 @@
                 "day": 10, 
                 "minute": 17
             }, 
-            "confidence": 100, 
-            "type": 5, 
             "ts": 1441916276.207, 
             "fmt_time": "2015-09-10 13:17:56.207000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eac97d65cb39ee988d54"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:17:56.207000-07:00", 
@@ -741,11 +736,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eac97d65cb39ee988d55"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -758,6 +758,7 @@
             "altitude": 0, 
             "ts": 1441916275.929, 
             "longitude": -122.0813842, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -772,12 +773,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 36
-        }, 
-        "_id": {
-            "$oid": "55f1eac97d65cb39ee988d55"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:17:56.736000-07:00", 
@@ -799,12 +794,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eac97d65cb39ee988d56"
+        }, 
         "data": {
+            "type": 5, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -815,16 +817,8 @@
                 "day": 10, 
                 "minute": 17
             }, 
-            "confidence": 100, 
-            "type": 5, 
             "ts": 1441916279.859, 
             "fmt_time": "2015-09-10 13:17:59.859000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eac97d65cb39ee988d56"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:17:59.859000-07:00", 
@@ -846,12 +840,19 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eac97d65cb39ee988d57"
+        }, 
         "data": {
+            "type": 5, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -862,16 +863,8 @@
                 "day": 10, 
                 "minute": 18
             }, 
-            "confidence": 100, 
-            "type": 5, 
             "ts": 1441916283.563, 
             "fmt_time": "2015-09-10 13:18:03.563000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eac97d65cb39ee988d57"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:18:03.563000-07:00", 
@@ -893,12 +886,19 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eac97d65cb39ee988d58"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 84, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -909,16 +909,8 @@
                 "day": 10, 
                 "minute": 18
             }, 
-            "confidence": 84, 
-            "type": 2, 
             "ts": 1441916283.826, 
             "fmt_time": "2015-09-10 13:18:03.826000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eac97d65cb39ee988d58"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:18:03.826000-07:00", 
@@ -940,12 +932,19 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eac97d65cb39ee988d59"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -956,16 +955,8 @@
                 "day": 10, 
                 "minute": 18
             }, 
-            "confidence": 100, 
-            "type": 2, 
             "ts": 1441916308.364, 
             "fmt_time": "2015-09-10 13:18:28.364000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eac97d65cb39ee988d59"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:18:28.364000-07:00", 
@@ -987,11 +978,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eac97d65cb39ee988d5a"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -1004,6 +1000,7 @@
             "altitude": 0, 
             "ts": 1441916307.958, 
             "longitude": -122.0813842, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -1018,12 +1015,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 37.5
-        }, 
-        "_id": {
-            "$oid": "55f1eac97d65cb39ee988d5a"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:18:28.734000-07:00", 
@@ -1045,11 +1036,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eaca7d65cb39ee988d5b"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -1062,6 +1058,7 @@
             "altitude": 0, 
             "ts": 1441916307.958, 
             "longitude": -122.0813842, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -1076,12 +1073,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 37.5
-        }, 
-        "_id": {
-            "$oid": "55f1eaca7d65cb39ee988d5b"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:18:29.202000-07:00", 
@@ -1103,12 +1094,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eaca7d65cb39ee988d5c"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 92, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -1119,16 +1117,8 @@
                 "day": 10, 
                 "minute": 18
             }, 
-            "confidence": 92, 
-            "type": 2, 
             "ts": 1441916339.66, 
             "fmt_time": "2015-09-10 13:18:59.660000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eaca7d65cb39ee988d5c"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:18:59.660000-07:00", 
@@ -1150,11 +1140,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eaca7d65cb39ee988d5d"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -1167,6 +1162,7 @@
             "altitude": 0, 
             "ts": 1441916339.274, 
             "longitude": -122.0808443, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -1181,12 +1177,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 64.5
-        }, 
-        "_id": {
-            "$oid": "55f1eaca7d65cb39ee988d5d"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:19:00.053000-07:00", 
@@ -1208,11 +1198,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eaca7d65cb39ee988d5e"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -1225,6 +1220,7 @@
             "altitude": 0, 
             "ts": 1441916339.274, 
             "longitude": -122.0808443, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -1239,12 +1235,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 64.5
-        }, 
-        "_id": {
-            "$oid": "55f1eaca7d65cb39ee988d5e"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:19:20.953000-07:00", 
@@ -1266,12 +1256,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eaca7d65cb39ee988d5f"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -1282,16 +1279,8 @@
                 "day": 10, 
                 "minute": 19
             }, 
-            "confidence": 100, 
-            "type": 2, 
             "ts": 1441916371.301, 
             "fmt_time": "2015-09-10 13:19:31.301000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eaca7d65cb39ee988d5f"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:19:31.301000-07:00", 
@@ -1313,11 +1302,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eaca7d65cb39ee988d60"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -1330,6 +1324,7 @@
             "altitude": 0, 
             "ts": 1441916371.038, 
             "longitude": -122.0807615, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -1344,12 +1339,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 49.5
-        }, 
-        "_id": {
-            "$oid": "55f1eaca7d65cb39ee988d60"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:19:31.683000-07:00", 
@@ -1371,11 +1360,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eaca7d65cb39ee988d61"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -1388,6 +1382,7 @@
             "altitude": 0, 
             "ts": 1441916371.038, 
             "longitude": -122.0807615, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -1402,12 +1397,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 49.5
-        }, 
-        "_id": {
-            "$oid": "55f1eaca7d65cb39ee988d61"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:19:33.136000-07:00", 
@@ -1429,12 +1418,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eaca7d65cb39ee988d62"
+        }, 
         "data": {
+            "type": 5, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -1445,16 +1441,8 @@
                 "day": 10, 
                 "minute": 20
             }, 
-            "confidence": 100, 
-            "type": 5, 
             "ts": 1441916403.431, 
             "fmt_time": "2015-09-10 13:20:03.431000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eaca7d65cb39ee988d62"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:20:03.431000-07:00", 
@@ -1476,11 +1464,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eaca7d65cb39ee988d63"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -1493,6 +1486,7 @@
             "altitude": 0, 
             "ts": 1441916403.072, 
             "longitude": -122.0807682, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -1507,12 +1501,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 37.5
-        }, 
-        "_id": {
-            "$oid": "55f1eaca7d65cb39ee988d63"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:20:03.612000-07:00", 
@@ -1534,11 +1522,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eaca7d65cb39ee988d64"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -1551,6 +1544,7 @@
             "altitude": 0, 
             "ts": 1441916403.072, 
             "longitude": -122.0807682, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -1565,12 +1559,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 37.5
-        }, 
-        "_id": {
-            "$oid": "55f1eaca7d65cb39ee988d64"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:20:04.094000-07:00", 
@@ -1592,12 +1580,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eaca7d65cb39ee988d65"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 72, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -1608,16 +1603,8 @@
                 "day": 10, 
                 "minute": 20
             }, 
-            "confidence": 72, 
-            "type": 2, 
             "ts": 1441916410.282, 
             "fmt_time": "2015-09-10 13:20:10.282000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eaca7d65cb39ee988d65"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:20:10.282000-07:00", 
@@ -1639,12 +1626,19 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eaca7d65cb39ee988d66"
+        }, 
         "data": {
+            "type": 5, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -1655,16 +1649,8 @@
                 "day": 10, 
                 "minute": 20
             }, 
-            "confidence": 100, 
-            "type": 5, 
             "ts": 1441916436.341, 
             "fmt_time": "2015-09-10 13:20:36.341000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eaca7d65cb39ee988d66"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:20:36.341000-07:00", 
@@ -1686,11 +1672,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eaca7d65cb39ee988d67"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -1703,6 +1694,7 @@
             "altitude": 0, 
             "ts": 1441916436.169, 
             "longitude": -122.0806415, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -1717,12 +1709,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 37.5
-        }, 
-        "_id": {
-            "$oid": "55f1eaca7d65cb39ee988d67"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:20:38.864000-07:00", 
@@ -1744,11 +1730,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eaca7d65cb39ee988d68"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -1761,6 +1752,7 @@
             "altitude": 0, 
             "ts": 1441916436.169, 
             "longitude": -122.0806415, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -1775,12 +1767,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 37.5
-        }, 
-        "_id": {
-            "$oid": "55f1eaca7d65cb39ee988d68"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:20:39.418000-07:00", 
@@ -1802,12 +1788,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacb7d65cb39ee988d69"
+        }, 
         "data": {
+            "type": 0, 
+            "confidence": 62, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -1818,16 +1811,8 @@
                 "day": 10, 
                 "minute": 20
             }, 
-            "confidence": 62, 
-            "type": 0, 
             "ts": 1441916449.787, 
             "fmt_time": "2015-09-10 13:20:49.787000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eacb7d65cb39ee988d69"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:20:49.787000-07:00", 
@@ -1849,12 +1834,19 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacb7d65cb39ee988d6a"
+        }, 
         "data": {
+            "type": 5, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -1865,16 +1857,8 @@
                 "day": 10, 
                 "minute": 21
             }, 
-            "confidence": 100, 
-            "type": 5, 
             "ts": 1441916468.23, 
             "fmt_time": "2015-09-10 13:21:08.230000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eacb7d65cb39ee988d6a"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:21:08.230000-07:00", 
@@ -1896,11 +1880,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacb7d65cb39ee988d6b"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -1913,6 +1902,7 @@
             "altitude": 0, 
             "ts": 1441916467.368, 
             "longitude": -122.0812412, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -1927,12 +1917,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 58.5
-        }, 
-        "_id": {
-            "$oid": "55f1eacb7d65cb39ee988d6b"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:21:08.272000-07:00", 
@@ -1954,11 +1938,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacb7d65cb39ee988d6c"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -1971,6 +1960,7 @@
             "altitude": 0, 
             "ts": 1441916467.368, 
             "longitude": -122.0812412, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -1985,12 +1975,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 58.5
-        }, 
-        "_id": {
-            "$oid": "55f1eacb7d65cb39ee988d6c"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:21:08.639000-07:00", 
@@ -2012,12 +1996,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacb7d65cb39ee988d6d"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -2028,16 +2019,8 @@
                 "day": 10, 
                 "minute": 21
             }, 
-            "confidence": 100, 
-            "type": 2, 
             "ts": 1441916475.178, 
             "fmt_time": "2015-09-10 13:21:15.178000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eacb7d65cb39ee988d6d"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:21:15.178000-07:00", 
@@ -2059,12 +2042,19 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacb7d65cb39ee988d6e"
+        }, 
         "data": {
+            "type": 5, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -2075,16 +2065,8 @@
                 "day": 10, 
                 "minute": 21
             }, 
-            "confidence": 100, 
-            "type": 5, 
             "ts": 1441916498.565, 
             "fmt_time": "2015-09-10 13:21:38.565000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eacb7d65cb39ee988d6e"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:21:38.565000-07:00", 
@@ -2106,11 +2088,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacb7d65cb39ee988d6f"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -2123,6 +2110,7 @@
             "altitude": 0, 
             "ts": 1441916498.405, 
             "longitude": -122.0807356, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -2137,12 +2125,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 58.5
-        }, 
-        "_id": {
-            "$oid": "55f1eacb7d65cb39ee988d6f"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:21:38.672000-07:00", 
@@ -2164,11 +2146,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacb7d65cb39ee988d70"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -2181,6 +2168,7 @@
             "altitude": 0, 
             "ts": 1441916498.405, 
             "longitude": -122.0807356, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -2195,12 +2183,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 58.5
-        }, 
-        "_id": {
-            "$oid": "55f1eacb7d65cb39ee988d70"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:21:39.307000-07:00", 
@@ -2222,12 +2204,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacb7d65cb39ee988d71"
+        }, 
         "data": {
+            "type": 5, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -2238,16 +2227,8 @@
                 "day": 10, 
                 "minute": 21
             }, 
-            "confidence": 100, 
-            "type": 5, 
             "ts": 1441916507.463, 
             "fmt_time": "2015-09-10 13:21:47.463000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eacb7d65cb39ee988d71"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:21:47.463000-07:00", 
@@ -2269,12 +2250,19 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacb7d65cb39ee988d72"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 75, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -2285,16 +2273,8 @@
                 "day": 10, 
                 "minute": 21
             }, 
-            "confidence": 75, 
-            "type": 2, 
             "ts": 1441916514.503, 
             "fmt_time": "2015-09-10 13:21:54.503000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eacb7d65cb39ee988d72"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:21:54.503000-07:00", 
@@ -2316,12 +2296,19 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacb7d65cb39ee988d73"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -2332,16 +2319,8 @@
                 "day": 10, 
                 "minute": 22
             }, 
-            "confidence": 100, 
-            "type": 2, 
             "ts": 1441916530.412, 
             "fmt_time": "2015-09-10 13:22:10.412000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eacb7d65cb39ee988d73"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:22:10.412000-07:00", 
@@ -2363,11 +2342,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacb7d65cb39ee988d74"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -2380,6 +2364,7 @@
             "altitude": 0, 
             "ts": 1441916530.073, 
             "longitude": -122.0811705, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -2394,12 +2379,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 51
-        }, 
-        "_id": {
-            "$oid": "55f1eacb7d65cb39ee988d74"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:22:10.589000-07:00", 
@@ -2421,11 +2400,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacb7d65cb39ee988d75"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -2438,6 +2422,7 @@
             "altitude": 0, 
             "ts": 1441916530.073, 
             "longitude": -122.0811705, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -2452,12 +2437,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 51
-        }, 
-        "_id": {
-            "$oid": "55f1eacb7d65cb39ee988d75"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:22:11.182000-07:00", 
@@ -2479,12 +2458,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacc7d65cb39ee988d76"
+        }, 
         "data": {
+            "type": 5, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -2495,16 +2481,8 @@
                 "day": 10, 
                 "minute": 22
             }, 
-            "confidence": 100, 
-            "type": 5, 
             "ts": 1441916562.511, 
             "fmt_time": "2015-09-10 13:22:42.511000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eacc7d65cb39ee988d76"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:22:42.511000-07:00", 
@@ -2526,11 +2504,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacc7d65cb39ee988d77"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -2543,6 +2526,7 @@
             "altitude": 0, 
             "ts": 1441916562.088, 
             "longitude": -122.0813409, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -2557,12 +2541,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 57
-        }, 
-        "_id": {
-            "$oid": "55f1eacc7d65cb39ee988d77"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:22:42.858000-07:00", 
@@ -2584,11 +2562,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacc7d65cb39ee988d78"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -2601,6 +2584,7 @@
             "altitude": 0, 
             "ts": 1441916562.088, 
             "longitude": -122.0813409, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -2615,12 +2599,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 57
-        }, 
-        "_id": {
-            "$oid": "55f1eacc7d65cb39ee988d78"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:22:43.465000-07:00", 
@@ -2642,12 +2620,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacc7d65cb39ee988d79"
+        }, 
         "data": {
+            "type": 5, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -2658,16 +2643,8 @@
                 "day": 10, 
                 "minute": 22
             }, 
-            "confidence": 100, 
-            "type": 5, 
             "ts": 1441916565.667, 
             "fmt_time": "2015-09-10 13:22:45.667000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eacc7d65cb39ee988d79"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:22:45.667000-07:00", 
@@ -2689,12 +2666,19 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacc7d65cb39ee988d7a"
+        }, 
         "data": {
+            "type": 0, 
+            "confidence": 50, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -2705,16 +2689,8 @@
                 "day": 10, 
                 "minute": 23
             }, 
-            "confidence": 50, 
-            "type": 0, 
             "ts": 1441916582.557, 
             "fmt_time": "2015-09-10 13:23:02.557000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eacc7d65cb39ee988d7a"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:23:02.557000-07:00", 
@@ -2736,11 +2712,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacc7d65cb39ee988d7b"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -2753,6 +2734,7 @@
             "altitude": 0, 
             "ts": 1441916592.123, 
             "longitude": -122.0777793, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -2767,12 +2749,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 31.5
-        }, 
-        "_id": {
-            "$oid": "55f1eacc7d65cb39ee988d7b"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:23:12.380000-07:00", 
@@ -2794,11 +2770,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacc7d65cb39ee988d7c"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -2811,6 +2792,7 @@
             "altitude": 0, 
             "ts": 1441916592.123, 
             "longitude": -122.0777793, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -2825,12 +2807,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 31.5
-        }, 
-        "_id": {
-            "$oid": "55f1eacc7d65cb39ee988d7c"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:23:12.982000-07:00", 
@@ -2852,11 +2828,16 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacc7d65cb39ee988d7d"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -2869,6 +2850,7 @@
             "altitude": 0, 
             "ts": 1441916623.287, 
             "longitude": -122.0807497, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -2883,12 +2865,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 55.5
-        }, 
-        "_id": {
-            "$oid": "55f1eacc7d65cb39ee988d7d"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:23:43.462000-07:00", 
@@ -2910,11 +2886,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacc7d65cb39ee988d7e"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -2927,6 +2908,7 @@
             "altitude": 0, 
             "ts": 1441916623.287, 
             "longitude": -122.0807497, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -2941,12 +2923,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 55.5
-        }, 
-        "_id": {
-            "$oid": "55f1eacc7d65cb39ee988d7e"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:23:44.052000-07:00", 
@@ -2968,12 +2944,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacc7d65cb39ee988d7f"
+        }, 
         "data": {
+            "type": 0, 
+            "confidence": 48, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -2984,16 +2967,8 @@
                 "day": 10, 
                 "minute": 24
             }, 
-            "confidence": 48, 
-            "type": 0, 
             "ts": 1441916649.002, 
             "fmt_time": "2015-09-10 13:24:09.002000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eacc7d65cb39ee988d7f"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:24:09.002000-07:00", 
@@ -3015,11 +2990,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacc7d65cb39ee988d80"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -3032,6 +3012,7 @@
             "altitude": 0, 
             "ts": 1441916649.999, 
             "longitude": -122.0807497, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -3046,12 +3027,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 402.756
-        }, 
-        "_id": {
-            "$oid": "55f1eacc7d65cb39ee988d80"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:24:13.754000-07:00", 
@@ -3073,12 +3048,19 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacc7d65cb39ee988d81"
+        }, 
         "data": {
+            "type": 5, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -3089,16 +3071,8 @@
                 "day": 10, 
                 "minute": 24
             }, 
-            "confidence": 100, 
-            "type": 5, 
             "ts": 1441916684.981, 
             "fmt_time": "2015-09-10 13:24:44.981000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eacc7d65cb39ee988d81"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:24:44.981000-07:00", 
@@ -3120,11 +3094,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacc7d65cb39ee988d82"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -3137,6 +3116,7 @@
             "altitude": 0, 
             "ts": 1441916684.625, 
             "longitude": -122.0807426, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -3151,12 +3131,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 40.5
-        }, 
-        "_id": {
-            "$oid": "55f1eacc7d65cb39ee988d82"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:24:45.188000-07:00", 
@@ -3178,11 +3152,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacc7d65cb39ee988d83"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -3195,6 +3174,7 @@
             "altitude": 0, 
             "ts": 1441916684.625, 
             "longitude": -122.0807426, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -3209,12 +3189,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 40.5
-        }, 
-        "_id": {
-            "$oid": "55f1eacc7d65cb39ee988d83"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:24:45.734000-07:00", 
@@ -3236,12 +3210,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacc7d65cb39ee988d84"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 82, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -3252,16 +3233,8 @@
                 "day": 10, 
                 "minute": 24
             }, 
-            "confidence": 82, 
-            "type": 2, 
             "ts": 1441916692.069, 
             "fmt_time": "2015-09-10 13:24:52.069000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eacc7d65cb39ee988d84"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:24:52.069000-07:00", 
@@ -3283,12 +3256,19 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacd7d65cb39ee988d85"
+        }, 
         "data": {
+            "type": 5, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -3299,16 +3279,8 @@
                 "day": 10, 
                 "minute": 25
             }, 
-            "confidence": 100, 
-            "type": 5, 
             "ts": 1441916715.943, 
             "fmt_time": "2015-09-10 13:25:15.943000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eacd7d65cb39ee988d85"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:25:15.943000-07:00", 
@@ -3330,11 +3302,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacd7d65cb39ee988d86"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -3347,6 +3324,7 @@
             "altitude": 0, 
             "ts": 1441916715.724, 
             "longitude": -122.0777784, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -3361,12 +3339,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 39
-        }, 
-        "_id": {
-            "$oid": "55f1eacd7d65cb39ee988d86"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:25:16.057000-07:00", 
@@ -3388,11 +3360,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacd7d65cb39ee988d87"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -3405,6 +3382,7 @@
             "altitude": 0, 
             "ts": 1441916715.724, 
             "longitude": -122.0777784, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -3419,12 +3397,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 39
-        }, 
-        "_id": {
-            "$oid": "55f1eacd7d65cb39ee988d87"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:25:16.693000-07:00", 
@@ -3446,12 +3418,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacd7d65cb39ee988d88"
+        }, 
         "data": {
+            "type": 0, 
+            "confidence": 48, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -3462,16 +3441,8 @@
                 "day": 10, 
                 "minute": 25
             }, 
-            "confidence": 48, 
-            "type": 0, 
             "ts": 1441916741.911, 
             "fmt_time": "2015-09-10 13:25:41.911000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eacd7d65cb39ee988d88"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:25:41.911000-07:00", 
@@ -3493,11 +3464,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacd7d65cb39ee988d89"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -3510,6 +3486,7 @@
             "altitude": 0, 
             "ts": 1441916746.101, 
             "longitude": -122.0777784, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -3524,12 +3501,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 39
-        }, 
-        "_id": {
-            "$oid": "55f1eacd7d65cb39ee988d89"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:25:46.309000-07:00", 
@@ -3551,11 +3522,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacd7d65cb39ee988d8a"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -3568,6 +3544,7 @@
             "altitude": 0, 
             "ts": 1441916746.101, 
             "longitude": -122.0777784, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -3582,12 +3559,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 39
-        }, 
-        "_id": {
-            "$oid": "55f1eacd7d65cb39ee988d8a"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:25:46.803000-07:00", 
@@ -3609,11 +3580,16 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacd7d65cb39ee988d8b"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -3626,6 +3602,7 @@
             "altitude": 0, 
             "ts": 1441916777.14, 
             "longitude": -122.080734, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -3640,12 +3617,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 67.5
-        }, 
-        "_id": {
-            "$oid": "55f1eacd7d65cb39ee988d8b"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:26:17.253000-07:00", 
@@ -3667,11 +3638,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacd7d65cb39ee988d8c"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -3684,6 +3660,7 @@
             "altitude": 0, 
             "ts": 1441916777.14, 
             "longitude": -122.080734, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -3698,12 +3675,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 67.5
-        }, 
-        "_id": {
-            "$oid": "55f1eacd7d65cb39ee988d8c"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:26:17.559000-07:00", 
@@ -3725,12 +3696,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacd7d65cb39ee988d8d"
+        }, 
         "data": {
+            "type": 4, 
+            "confidence": 54, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -3741,16 +3719,8 @@
                 "day": 10, 
                 "minute": 26
             }, 
-            "confidence": 54, 
-            "type": 4, 
             "ts": 1441916785.831, 
             "fmt_time": "2015-09-10 13:26:25.831000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eacd7d65cb39ee988d8d"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:26:25.831000-07:00", 
@@ -3772,11 +3742,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacd7d65cb39ee988d8e"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -3789,6 +3764,7 @@
             "altitude": 0, 
             "ts": 1441916805.018, 
             "longitude": -122.080734, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -3803,12 +3779,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 429.901
-        }, 
-        "_id": {
-            "$oid": "55f1eacd7d65cb39ee988d8e"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:26:49.395000-07:00", 
@@ -3830,12 +3800,19 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacd7d65cb39ee988d8f"
+        }, 
         "data": {
+            "type": 0, 
+            "confidence": 45, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -3846,16 +3823,8 @@
                 "day": 10, 
                 "minute": 27
             }, 
-            "confidence": 45, 
-            "type": 0, 
             "ts": 1441916838.763, 
             "fmt_time": "2015-09-10 13:27:18.763000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eacd7d65cb39ee988d8f"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:27:18.763000-07:00", 
@@ -3877,11 +3846,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacd7d65cb39ee988d90"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -3894,6 +3868,7 @@
             "altitude": 0, 
             "ts": 1441916838.593, 
             "longitude": -122.0807443, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -3908,12 +3883,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 36
-        }, 
-        "_id": {
-            "$oid": "55f1eacd7d65cb39ee988d90"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:27:18.909000-07:00", 
@@ -3935,11 +3904,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacd7d65cb39ee988d91"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -3952,6 +3926,7 @@
             "altitude": 0, 
             "ts": 1441916838.593, 
             "longitude": -122.0807443, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -3966,12 +3941,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 36
-        }, 
-        "_id": {
-            "$oid": "55f1eacd7d65cb39ee988d91"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:27:19.467000-07:00", 
@@ -3993,11 +3962,16 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacd7d65cb39ee988d92"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -4010,6 +3984,7 @@
             "altitude": 0, 
             "ts": 1441916869.419, 
             "longitude": -122.0807471, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -4024,12 +3999,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 49.5
-        }, 
-        "_id": {
-            "$oid": "55f1eacd7d65cb39ee988d92"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:27:49.600000-07:00", 
@@ -4051,11 +4020,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacd7d65cb39ee988d93"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -4068,6 +4042,7 @@
             "altitude": 0, 
             "ts": 1441916869.419, 
             "longitude": -122.0807471, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -4082,12 +4057,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 49.5
-        }, 
-        "_id": {
-            "$oid": "55f1eacd7d65cb39ee988d93"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:27:50.089000-07:00", 
@@ -4109,12 +4078,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eace7d65cb39ee988d94"
+        }, 
         "data": {
+            "type": 0, 
+            "confidence": 40, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -4125,16 +4101,8 @@
                 "day": 10, 
                 "minute": 28
             }, 
-            "confidence": 40, 
-            "type": 0, 
             "ts": 1441916893.506, 
             "fmt_time": "2015-09-10 13:28:13.506000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eace7d65cb39ee988d94"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:28:13.506000-07:00", 
@@ -4156,11 +4124,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eace7d65cb39ee988d95"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -4173,6 +4146,7 @@
             "altitude": 0, 
             "ts": 1441916899.497, 
             "longitude": -122.077781, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -4187,12 +4161,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 61.5
-        }, 
-        "_id": {
-            "$oid": "55f1eace7d65cb39ee988d95"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:28:19.767000-07:00", 
@@ -4214,11 +4182,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eace7d65cb39ee988d96"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -4231,6 +4204,7 @@
             "altitude": 0, 
             "ts": 1441916899.497, 
             "longitude": -122.077781, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -4245,12 +4219,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 61.5
-        }, 
-        "_id": {
-            "$oid": "55f1eace7d65cb39ee988d96"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:28:20.390000-07:00", 
@@ -4272,12 +4240,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eace7d65cb39ee988d97"
+        }, 
         "data": {
+            "type": 5, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -4288,16 +4263,8 @@
                 "day": 10, 
                 "minute": 28
             }, 
-            "confidence": 100, 
-            "type": 5, 
             "ts": 1441916932.472, 
             "fmt_time": "2015-09-10 13:28:52.472000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eace7d65cb39ee988d97"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:28:52.472000-07:00", 
@@ -4319,11 +4286,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eace7d65cb39ee988d98"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -4336,6 +4308,7 @@
             "altitude": 0, 
             "ts": 1441916928.773, 
             "longitude": -122.077781, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -4350,12 +4323,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 442.088
-        }, 
-        "_id": {
-            "$oid": "55f1eace7d65cb39ee988d98"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:28:52.600000-07:00", 
@@ -4377,12 +4344,19 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eace7d65cb39ee988d99"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -4393,16 +4367,8 @@
                 "day": 10, 
                 "minute": 28
             }, 
-            "confidence": 100, 
-            "type": 2, 
             "ts": 1441916939.482, 
             "fmt_time": "2015-09-10 13:28:59.482000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eace7d65cb39ee988d99"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:28:59.482000-07:00", 
@@ -4424,12 +4390,19 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eace7d65cb39ee988d9a"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 85, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -4440,16 +4413,8 @@
                 "day": 10, 
                 "minute": 29
             }, 
-            "confidence": 85, 
-            "type": 2, 
             "ts": 1441916964.527, 
             "fmt_time": "2015-09-10 13:29:24.527000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eace7d65cb39ee988d9a"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:29:24.527000-07:00", 
@@ -4471,11 +4436,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eace7d65cb39ee988d9b"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -4488,6 +4458,7 @@
             "altitude": 0, 
             "ts": 1441916964.12, 
             "longitude": -122.0777743, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -4502,12 +4473,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 30
-        }, 
-        "_id": {
-            "$oid": "55f1eace7d65cb39ee988d9b"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:29:24.734000-07:00", 
@@ -4529,11 +4494,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eace7d65cb39ee988d9c"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -4546,6 +4516,7 @@
             "altitude": 0, 
             "ts": 1441916964.12, 
             "longitude": -122.0777743, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -4560,12 +4531,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 30
-        }, 
-        "_id": {
-            "$oid": "55f1eace7d65cb39ee988d9c"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:29:50.652000-07:00", 
@@ -4587,12 +4552,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eace7d65cb39ee988d9d"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -4603,16 +4575,8 @@
                 "day": 10, 
                 "minute": 29
             }, 
-            "confidence": 100, 
-            "type": 2, 
             "ts": 1441916995.68, 
             "fmt_time": "2015-09-10 13:29:55.680000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eace7d65cb39ee988d9d"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:29:55.680000-07:00", 
@@ -4634,11 +4598,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eace7d65cb39ee988d9e"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -4651,6 +4620,7 @@
             "altitude": 0, 
             "ts": 1441916991.872, 
             "longitude": -122.0777743, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -4665,12 +4635,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 71.628
-        }, 
-        "_id": {
-            "$oid": "55f1eace7d65cb39ee988d9e"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:29:55.840000-07:00", 
@@ -4692,11 +4656,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eace7d65cb39ee988d9f"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -4709,6 +4678,7 @@
             "altitude": 0, 
             "ts": 1441916991.872, 
             "longitude": -122.0777743, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -4723,12 +4693,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 71.628
-        }, 
-        "_id": {
-            "$oid": "55f1eace7d65cb39ee988d9f"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:30:09.150000-07:00", 
@@ -4750,12 +4714,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eace7d65cb39ee988da0"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -4766,16 +4737,8 @@
                 "day": 10, 
                 "minute": 30
             }, 
-            "confidence": 100, 
-            "type": 2, 
             "ts": 1441917026.92, 
             "fmt_time": "2015-09-10 13:30:26.920000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eace7d65cb39ee988da0"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:30:26.920000-07:00", 
@@ -4797,11 +4760,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eace7d65cb39ee988da1"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -4814,6 +4782,7 @@
             "altitude": 0, 
             "ts": 1441917023.19, 
             "longitude": -122.0777743, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -4828,12 +4797,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 118.605
-        }, 
-        "_id": {
-            "$oid": "55f1eace7d65cb39ee988da1"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:30:27.095000-07:00", 
@@ -4855,11 +4818,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacf7d65cb39ee988da2"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -4872,6 +4840,7 @@
             "altitude": 0, 
             "ts": 1441917023.19, 
             "longitude": -122.0777743, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -4886,12 +4855,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 118.605
-        }, 
-        "_id": {
-            "$oid": "55f1eacf7d65cb39ee988da2"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:30:27.538000-07:00", 
@@ -4913,12 +4876,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacf7d65cb39ee988da3"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -4929,16 +4899,8 @@
                 "day": 10, 
                 "minute": 30
             }, 
-            "confidence": 100, 
-            "type": 2, 
             "ts": 1441917058.094, 
             "fmt_time": "2015-09-10 13:30:58.094000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eacf7d65cb39ee988da3"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:30:58.094000-07:00", 
@@ -4960,11 +4922,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacf7d65cb39ee988da4"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -4977,6 +4944,7 @@
             "altitude": 0, 
             "ts": 1441917057.778, 
             "longitude": -122.0833185, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -4991,12 +4959,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 67.5
-        }, 
-        "_id": {
-            "$oid": "55f1eacf7d65cb39ee988da4"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:30:58.327000-07:00", 
@@ -5018,11 +4980,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacf7d65cb39ee988da5"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -5035,6 +5002,7 @@
             "altitude": 0, 
             "ts": 1441917057.778, 
             "longitude": -122.0833185, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -5049,12 +5017,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 67.5
-        }, 
-        "_id": {
-            "$oid": "55f1eacf7d65cb39ee988da5"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:30:58.893000-07:00", 
@@ -5076,12 +5038,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacf7d65cb39ee988da6"
+        }, 
         "data": {
+            "type": 5, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -5092,16 +5061,8 @@
                 "day": 10, 
                 "minute": 31
             }, 
-            "confidence": 100, 
-            "type": 5, 
             "ts": 1441917089.286, 
             "fmt_time": "2015-09-10 13:31:29.286000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eacf7d65cb39ee988da6"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:31:29.286000-07:00", 
@@ -5123,11 +5084,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacf7d65cb39ee988da7"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -5140,6 +5106,7 @@
             "altitude": 0, 
             "ts": 1441917088.909, 
             "longitude": -122.0830159, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -5154,12 +5121,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 33
-        }, 
-        "_id": {
-            "$oid": "55f1eacf7d65cb39ee988da7"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:31:29.840000-07:00", 
@@ -5181,11 +5142,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacf7d65cb39ee988da8"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -5198,6 +5164,7 @@
             "altitude": 0, 
             "ts": 1441917088.909, 
             "longitude": -122.0830159, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -5212,12 +5179,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 33
-        }, 
-        "_id": {
-            "$oid": "55f1eacf7d65cb39ee988da8"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:31:30.517000-07:00", 
@@ -5239,12 +5200,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacf7d65cb39ee988da9"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 92, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -5255,16 +5223,8 @@
                 "day": 10, 
                 "minute": 31
             }, 
-            "confidence": 92, 
-            "type": 2, 
             "ts": 1441917096.707, 
             "fmt_time": "2015-09-10 13:31:36.707000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eacf7d65cb39ee988da9"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:31:36.707000-07:00", 
@@ -5286,12 +5246,19 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacf7d65cb39ee988daa"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 77, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -5302,16 +5269,8 @@
                 "day": 10, 
                 "minute": 32
             }, 
-            "confidence": 77, 
-            "type": 2, 
             "ts": 1441917120.536, 
             "fmt_time": "2015-09-10 13:32:00.536000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eacf7d65cb39ee988daa"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:32:00.536000-07:00", 
@@ -5333,11 +5292,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacf7d65cb39ee988dab"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -5350,6 +5314,7 @@
             "altitude": 0, 
             "ts": 1441917120.01, 
             "longitude": -122.0831477, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -5364,12 +5329,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 45
-        }, 
-        "_id": {
-            "$oid": "55f1eacf7d65cb39ee988dab"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:32:00.676000-07:00", 
@@ -5391,11 +5350,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacf7d65cb39ee988dac"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -5408,6 +5372,7 @@
             "altitude": 0, 
             "ts": 1441917120.01, 
             "longitude": -122.0831477, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -5422,12 +5387,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 45
-        }, 
-        "_id": {
-            "$oid": "55f1eacf7d65cb39ee988dac"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:32:27.939000-07:00", 
@@ -5449,12 +5408,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacf7d65cb39ee988dad"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -5465,16 +5431,8 @@
                 "day": 10, 
                 "minute": 32
             }, 
-            "confidence": 100, 
-            "type": 2, 
             "ts": 1441917151.603, 
             "fmt_time": "2015-09-10 13:32:31.603000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1eacf7d65cb39ee988dad"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:32:31.603000-07:00", 
@@ -5496,11 +5454,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacf7d65cb39ee988dae"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -5513,6 +5476,7 @@
             "altitude": 0, 
             "ts": 1441917150.985, 
             "longitude": -122.0831606, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -5527,12 +5491,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 49.5
-        }, 
-        "_id": {
-            "$oid": "55f1eacf7d65cb39ee988dae"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:32:31.746000-07:00", 
@@ -5554,11 +5512,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1eacf7d65cb39ee988daf"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -5571,6 +5534,7 @@
             "altitude": 0, 
             "ts": 1441917150.985, 
             "longitude": -122.0831606, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -5585,12 +5549,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 49.5
-        }, 
-        "_id": {
-            "$oid": "55f1eacf7d65cb39ee988daf"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:32:57.920000-07:00", 
@@ -5612,12 +5570,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead07d65cb39ee988db0"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -5628,16 +5593,8 @@
                 "day": 10, 
                 "minute": 33
             }, 
-            "confidence": 100, 
-            "type": 2, 
             "ts": 1441917182.658, 
             "fmt_time": "2015-09-10 13:33:02.658000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1ead07d65cb39ee988db0"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:33:02.658000-07:00", 
@@ -5659,11 +5616,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead07d65cb39ee988db1"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -5676,6 +5638,7 @@
             "altitude": 0, 
             "ts": 1441917182.326, 
             "longitude": -122.0834373, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -5690,12 +5653,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 30
-        }, 
-        "_id": {
-            "$oid": "55f1ead07d65cb39ee988db1"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:33:05.515000-07:00", 
@@ -5717,11 +5674,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead07d65cb39ee988db2"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -5734,6 +5696,7 @@
             "altitude": 0, 
             "ts": 1441917182.326, 
             "longitude": -122.0834373, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -5748,12 +5711,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 30
-        }, 
-        "_id": {
-            "$oid": "55f1ead07d65cb39ee988db2"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:33:06.080000-07:00", 
@@ -5775,12 +5732,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead07d65cb39ee988db3"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -5791,16 +5755,8 @@
                 "day": 10, 
                 "minute": 33
             }, 
-            "confidence": 100, 
-            "type": 2, 
             "ts": 1441917214.395, 
             "fmt_time": "2015-09-10 13:33:34.395000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1ead07d65cb39ee988db3"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:33:34.395000-07:00", 
@@ -5822,11 +5778,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead07d65cb39ee988db4"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -5839,6 +5800,7 @@
             "altitude": 0, 
             "ts": 1441917214.048, 
             "longitude": -122.0836277, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -5853,12 +5815,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 30
-        }, 
-        "_id": {
-            "$oid": "55f1ead07d65cb39ee988db4"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:33:34.529000-07:00", 
@@ -5880,11 +5836,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead07d65cb39ee988db5"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -5897,6 +5858,7 @@
             "altitude": 0, 
             "ts": 1441917214.048, 
             "longitude": -122.0836277, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -5911,12 +5873,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 30
-        }, 
-        "_id": {
-            "$oid": "55f1ead07d65cb39ee988db5"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:33:34.849000-07:00", 
@@ -5938,12 +5894,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead07d65cb39ee988db6"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -5954,16 +5917,8 @@
                 "day": 10, 
                 "minute": 34
             }, 
-            "confidence": 100, 
-            "type": 2, 
             "ts": 1441917248.578, 
             "fmt_time": "2015-09-10 13:34:08.578000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1ead07d65cb39ee988db6"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:34:08.578000-07:00", 
@@ -5985,11 +5940,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead07d65cb39ee988db7"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -6002,6 +5962,7 @@
             "altitude": 0, 
             "ts": 1441917248.126, 
             "longitude": -122.0839794, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -6016,12 +5977,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 39
-        }, 
-        "_id": {
-            "$oid": "55f1ead07d65cb39ee988db7"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:34:08.703000-07:00", 
@@ -6043,11 +5998,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead07d65cb39ee988db8"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -6060,6 +6020,7 @@
             "altitude": 0, 
             "ts": 1441917248.126, 
             "longitude": -122.0839794, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -6074,12 +6035,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 39
-        }, 
-        "_id": {
-            "$oid": "55f1ead07d65cb39ee988db8"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:34:33.196000-07:00", 
@@ -6101,12 +6056,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead07d65cb39ee988db9"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -6117,16 +6079,8 @@
                 "day": 10, 
                 "minute": 34
             }, 
-            "confidence": 100, 
-            "type": 2, 
             "ts": 1441917279.615, 
             "fmt_time": "2015-09-10 13:34:39.615000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1ead07d65cb39ee988db9"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:34:39.615000-07:00", 
@@ -6148,11 +6102,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead07d65cb39ee988dba"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -6165,6 +6124,7 @@
             "altitude": 0, 
             "ts": 1441917279.318, 
             "longitude": -122.0845131, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -6179,12 +6139,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 31.5
-        }, 
-        "_id": {
-            "$oid": "55f1ead07d65cb39ee988dba"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:34:39.920000-07:00", 
@@ -6206,11 +6160,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead07d65cb39ee988dbb"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -6223,6 +6182,7 @@
             "altitude": 0, 
             "ts": 1441917279.318, 
             "longitude": -122.0845131, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -6237,12 +6197,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 31.5
-        }, 
-        "_id": {
-            "$oid": "55f1ead07d65cb39ee988dbb"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:35:04.944000-07:00", 
@@ -6264,12 +6218,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead07d65cb39ee988dbc"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -6280,16 +6241,8 @@
                 "day": 10, 
                 "minute": 35
             }, 
-            "confidence": 100, 
-            "type": 2, 
             "ts": 1441917310.737, 
             "fmt_time": "2015-09-10 13:35:10.737000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1ead07d65cb39ee988dbc"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:35:10.737000-07:00", 
@@ -6311,11 +6264,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead07d65cb39ee988dbd"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -6328,6 +6286,7 @@
             "altitude": 0, 
             "ts": 1441917310.418, 
             "longitude": -122.0849416, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -6342,12 +6301,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 48
-        }, 
-        "_id": {
-            "$oid": "55f1ead07d65cb39ee988dbd"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:35:11.261000-07:00", 
@@ -6369,11 +6322,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead07d65cb39ee988dbe"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -6386,6 +6344,7 @@
             "altitude": 0, 
             "ts": 1441917310.418, 
             "longitude": -122.0849416, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -6400,12 +6359,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 48
-        }, 
-        "_id": {
-            "$oid": "55f1ead07d65cb39ee988dbe"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:35:11.664000-07:00", 
@@ -6427,12 +6380,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead17d65cb39ee988dbf"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 85, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -6443,16 +6403,8 @@
                 "day": 10, 
                 "minute": 35
             }, 
-            "confidence": 85, 
-            "type": 2, 
             "ts": 1441917341.912, 
             "fmt_time": "2015-09-10 13:35:41.912000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1ead17d65cb39ee988dbf"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:35:41.912000-07:00", 
@@ -6474,11 +6426,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead17d65cb39ee988dc0"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -6491,6 +6448,7 @@
             "altitude": 0, 
             "ts": 1441917341.613, 
             "longitude": -122.0848831, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -6505,12 +6463,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 39
-        }, 
-        "_id": {
-            "$oid": "55f1ead17d65cb39ee988dc0"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:35:42.150000-07:00", 
@@ -6532,11 +6484,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead17d65cb39ee988dc1"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -6549,6 +6506,7 @@
             "altitude": 0, 
             "ts": 1441917341.613, 
             "longitude": -122.0848831, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -6563,12 +6521,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 39
-        }, 
-        "_id": {
-            "$oid": "55f1ead17d65cb39ee988dc1"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:35:42.542000-07:00", 
@@ -6590,12 +6542,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead17d65cb39ee988dc2"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -6606,16 +6565,8 @@
                 "day": 10, 
                 "minute": 36
             }, 
-            "confidence": 100, 
-            "type": 2, 
             "ts": 1441917373.697, 
             "fmt_time": "2015-09-10 13:36:13.697000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1ead17d65cb39ee988dc2"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:36:13.697000-07:00", 
@@ -6637,11 +6588,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead17d65cb39ee988dc3"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -6654,6 +6610,7 @@
             "altitude": 0, 
             "ts": 1441917373.255, 
             "longitude": -122.0850376, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -6668,12 +6625,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 31.5
-        }, 
-        "_id": {
-            "$oid": "55f1ead17d65cb39ee988dc3"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:36:13.794000-07:00", 
@@ -6695,11 +6646,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead17d65cb39ee988dc4"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -6712,6 +6668,7 @@
             "altitude": 0, 
             "ts": 1441917373.255, 
             "longitude": -122.0850376, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -6726,12 +6683,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 31.5
-        }, 
-        "_id": {
-            "$oid": "55f1ead17d65cb39ee988dc4"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:36:40.581000-07:00", 
@@ -6753,12 +6704,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead17d65cb39ee988dc5"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 92, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -6769,16 +6727,8 @@
                 "day": 10, 
                 "minute": 36
             }, 
-            "confidence": 92, 
-            "type": 2, 
             "ts": 1441917404.718, 
             "fmt_time": "2015-09-10 13:36:44.718000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1ead17d65cb39ee988dc5"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:36:44.718000-07:00", 
@@ -6800,11 +6750,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead17d65cb39ee988dc6"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -6817,6 +6772,7 @@
             "altitude": 0, 
             "ts": 1441917404.437, 
             "longitude": -122.08514, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -6831,12 +6787,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 60
-        }, 
-        "_id": {
-            "$oid": "55f1ead17d65cb39ee988dc6"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:37:10.657000-07:00", 
@@ -6858,11 +6808,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead17d65cb39ee988dc7"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -6875,6 +6830,7 @@
             "altitude": 0, 
             "ts": 1441917404.437, 
             "longitude": -122.08514, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -6889,12 +6845,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 60
-        }, 
-        "_id": {
-            "$oid": "55f1ead17d65cb39ee988dc7"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:37:11.040000-07:00", 
@@ -6916,12 +6866,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead17d65cb39ee988dc8"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 54, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -6932,16 +6889,8 @@
                 "day": 10, 
                 "minute": 37
             }, 
-            "confidence": 54, 
-            "type": 2, 
             "ts": 1441917435.828, 
             "fmt_time": "2015-09-10 13:37:15.828000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1ead17d65cb39ee988dc8"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:37:15.828000-07:00", 
@@ -6963,11 +6912,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead17d65cb39ee988dc9"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -6980,6 +6934,7 @@
             "altitude": 0, 
             "ts": 1441917435.476, 
             "longitude": -122.0854993, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -6994,12 +6949,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 31.5
-        }, 
-        "_id": {
-            "$oid": "55f1ead17d65cb39ee988dc9"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:37:16.575000-07:00", 
@@ -7021,11 +6970,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead17d65cb39ee988dca"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -7038,6 +6992,7 @@
             "altitude": 0, 
             "ts": 1441917435.476, 
             "longitude": -122.0854993, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -7052,12 +7007,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 31.5
-        }, 
-        "_id": {
-            "$oid": "55f1ead17d65cb39ee988dca"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:37:17.235000-07:00", 
@@ -7079,12 +7028,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead17d65cb39ee988dcb"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -7095,16 +7051,8 @@
                 "day": 10, 
                 "minute": 37
             }, 
-            "confidence": 100, 
-            "type": 2, 
             "ts": 1441917467.229, 
             "fmt_time": "2015-09-10 13:37:47.229000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1ead17d65cb39ee988dcb"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:37:47.229000-07:00", 
@@ -7126,11 +7074,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead17d65cb39ee988dcc"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -7143,6 +7096,7 @@
             "altitude": 0, 
             "ts": 1441917466.539, 
             "longitude": -122.0855365, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -7157,12 +7111,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 37.5
-        }, 
-        "_id": {
-            "$oid": "55f1ead17d65cb39ee988dcc"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:37:47.446000-07:00", 
@@ -7184,11 +7132,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead17d65cb39ee988dcd"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -7201,6 +7154,7 @@
             "altitude": 0, 
             "ts": 1441917466.539, 
             "longitude": -122.0855365, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -7215,12 +7169,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 37.5
-        }, 
-        "_id": {
-            "$oid": "55f1ead17d65cb39ee988dcd"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:38:14.867000-07:00", 
@@ -7242,12 +7190,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead27d65cb39ee988dce"
+        }, 
         "data": {
+            "type": 2, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -7258,16 +7213,8 @@
                 "day": 10, 
                 "minute": 38
             }, 
-            "confidence": 100, 
-            "type": 2, 
             "ts": 1441917498.508, 
             "fmt_time": "2015-09-10 13:38:18.508000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1ead27d65cb39ee988dce"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:38:18.508000-07:00", 
@@ -7289,11 +7236,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead27d65cb39ee988dcf"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -7306,6 +7258,7 @@
             "altitude": 0, 
             "ts": 1441917498.178, 
             "longitude": -122.0862674, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -7320,12 +7273,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 40.5
-        }, 
-        "_id": {
-            "$oid": "55f1ead27d65cb39ee988dcf"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:38:33.552000-07:00", 
@@ -7347,11 +7294,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead27d65cb39ee988dd0"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -7364,6 +7316,7 @@
             "altitude": 0, 
             "ts": 1441917498.178, 
             "longitude": -122.0862674, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -7378,12 +7331,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 40.5
-        }, 
-        "_id": {
-            "$oid": "55f1ead27d65cb39ee988dd0"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:38:34.201000-07:00", 
@@ -7405,12 +7352,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead27d65cb39ee988dd1"
+        }, 
         "data": {
+            "type": 5, 
+            "confidence": 100, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -7421,16 +7375,8 @@
                 "day": 10, 
                 "minute": 38
             }, 
-            "confidence": 100, 
-            "type": 5, 
             "ts": 1441917529.473, 
             "fmt_time": "2015-09-10 13:38:49.473000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1ead27d65cb39ee988dd1"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:38:49.473000-07:00", 
@@ -7452,11 +7398,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead27d65cb39ee988dd2"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -7469,6 +7420,7 @@
             "altitude": 0, 
             "ts": 1441917529.095, 
             "longitude": -122.0862764, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -7483,12 +7435,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 34.5
-        }, 
-        "_id": {
-            "$oid": "55f1ead27d65cb39ee988dd2"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:38:49.743000-07:00", 
@@ -7510,11 +7456,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead27d65cb39ee988dd3"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -7527,6 +7478,7 @@
             "altitude": 0, 
             "ts": 1441917529.095, 
             "longitude": -122.0862764, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -7541,12 +7493,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 34.5
-        }, 
-        "_id": {
-            "$oid": "55f1ead27d65cb39ee988dd3"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:38:55.214000-07:00", 
@@ -7568,12 +7514,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead27d65cb39ee988dd4"
+        }, 
         "data": {
+            "type": 3, 
+            "confidence": 48, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -7584,16 +7537,8 @@
                 "day": 10, 
                 "minute": 39
             }, 
-            "confidence": 48, 
-            "type": 3, 
             "ts": 1441917555.589, 
             "fmt_time": "2015-09-10 13:39:15.589000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1ead27d65cb39ee988dd4"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:39:15.589000-07:00", 
@@ -7615,11 +7560,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead27d65cb39ee988dd5"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -7632,6 +7582,7 @@
             "altitude": 0, 
             "ts": 1441917559.094, 
             "longitude": -122.0862755, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -7646,12 +7597,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 39
-        }, 
-        "_id": {
-            "$oid": "55f1ead27d65cb39ee988dd5"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:39:19.446000-07:00", 
@@ -7673,11 +7618,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead27d65cb39ee988dd6"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -7690,6 +7640,7 @@
             "altitude": 0, 
             "ts": 1441917559.094, 
             "longitude": -122.0862755, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -7704,12 +7655,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 39
-        }, 
-        "_id": {
-            "$oid": "55f1ead27d65cb39ee988dd6"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:39:48.357000-07:00", 
@@ -7731,12 +7676,19 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead27d65cb39ee988dd7"
+        }, 
         "data": {
+            "type": 3, 
+            "confidence": 77, 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -7747,16 +7699,8 @@
                 "day": 10, 
                 "minute": 39
             }, 
-            "confidence": 77, 
-            "type": 3, 
             "ts": 1441917591.718, 
             "fmt_time": "2015-09-10 13:39:51.718000-07:00"
-        }, 
-        "_id": {
-            "$oid": "55f1ead27d65cb39ee988dd7"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:39:51.718000-07:00", 
@@ -7778,11 +7722,16 @@
             }, 
             "key": "background/motion_activity", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead27d65cb39ee988dd8"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -7795,6 +7744,7 @@
             "altitude": 0, 
             "ts": 1441917591.232, 
             "longitude": -122.0862608, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -7809,12 +7759,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 40.5
-        }, 
-        "_id": {
-            "$oid": "55f1ead27d65cb39ee988dd8"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:39:51.916000-07:00", 
@@ -7836,11 +7780,16 @@
             }, 
             "key": "background/location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }, 
     {
+        "user_id": {
+            "$uuid": "b0d937d070ef305e9563440369012b39"
+        }, 
+        "_id": {
+            "$oid": "55f1ead27d65cb39ee988dd9"
+        }, 
         "data": {
             "loc": {
                 "type": "Point", 
@@ -7853,6 +7802,7 @@
             "altitude": 0, 
             "ts": 1441917591.232, 
             "longitude": -122.0862608, 
+            "filter": "time", 
             "local_dt": {
                 "hour": 13, 
                 "month": 9, 
@@ -7867,12 +7817,6 @@
             "heading": 0, 
             "sensed_speed": 0, 
             "accuracy": 40.5
-        }, 
-        "_id": {
-            "$oid": "55f1ead27d65cb39ee988dd9"
-        }, 
-        "user_id": {
-            "$uuid": "b0d937d070ef305e9563440369012b39"
         }, 
         "metadata": {
             "write_fmt_time": "2015-09-10 13:40:12.993000-07:00", 
@@ -7894,8 +7838,7 @@
             }, 
             "key": "background/filtered_location", 
             "read_ts": 0, 
-            "type": "message", 
-            "filter": "time"
+            "type": "message"
         }
     }
 ]
