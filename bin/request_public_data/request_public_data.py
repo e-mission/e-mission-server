@@ -4,9 +4,14 @@ import arrow
 from uuid import UUID
 import public_data 
 
+# List of email accounts of phones to pull data for 
+iphone_ids = ["ucb.sdb.iphone.1@gmail.com", "ucb.sdb.iphone.2@gmail.com", 
+				"ucb.sdb.iphone.3@gmail.com", "ucb.sdb.iphone.4@gmail.com"]
+android_ids = ["ucb.sdb.android.1@gmail.com", "ucb.sdb.android.2@gmail.com", 
+				"ucb.sdb.android.3@gmail.com", "ucb.sdb.androi.4@gmail.com", 
+				"ucb.sdb.androi.5@gmail.com"]
+
 # List of UUIDs of phones to pull data for 
-iphone_ids = ["ucb.sdb.iphone.1@gmail.com"]
-android_ids = ["ucb.sdb.android.1@gmail.com"]
 #iphone_ids = ["079e0f1a-c440-3d7c-b0e7-de160f748e35", "c76a0487-7e5a-3b17-a449-47be666b36f6", 
  #             "c528bcd2-a88b-3e82-be62-ef4f2396967a", "95e70727-a04e-3e33-b7fe-34ab19194f8b"]
 #android_ids = ["e471711e-bd14-3dbe-80b6-9c7d92ecc296", "fd7b4c2e-2c8b-3bfa-94f0-d1e3ecbd5fb7",
