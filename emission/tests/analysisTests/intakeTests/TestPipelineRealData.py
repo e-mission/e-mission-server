@@ -395,6 +395,51 @@ class TestPipelineRealData(unittest.TestCase):
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth).data)
 
+    def testIndexLengthChange(self):
+        # Test for 94f67b4848611fa01c4327a0fa0cab97c2247744
+        dataFile = "emission/tests/data/real_examples/shankari_2015-08-23"
+        start_ld = ecwl.LocalDate({'year': 2015, 'month': 8, 'day': 23})
+        cacheKey = "diary/trips-2015-08-23"
+        ground_truth = json.load(open("emission/tests/data/real_examples/shankari_2015-08-23.ground_truth"), object_hook=bju.object_hook)
+
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
+        # Although we process the day's data in two batches, we should get the same result
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth).data)
+
+    def testSquishedMismatchForUntrackedTime(self):
+        # Test for a2c0ee4e3ceafa822425ceef299dcdb01c9b32c9
+        dataFile = "emission/tests/data/real_examples/shankari_2015-07-22"
+        start_ld = ecwl.LocalDate({'year': 2015, 'month': 7, 'day': 22})
+        cacheKey = "diary/trips-2015-07-22"
+        ground_truth = json.load(open("emission/tests/data/real_examples/shankari_2015-07-22.ground_truth"), object_hook=bju.object_hook)
+
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
+        # Although we process the day's data in two batches, we should get the same result
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth).data)
+
+    def testUnknownTrips(self):
+        # Test for a2c0ee4e3ceafa822425ceef299dcdb01c9b32c9
+        dataFile = "emission/tests/data/real_examples/shankari_2016-09-03"
+        start_ld = ecwl.LocalDate({'year': 2016, 'month': 9, 'day': 3})
+        cacheKey = "diary/trips-2016-09-03"
+        ground_truth = json.load(open("emission/tests/data/real_examples/shankari_2016-09-03.ground_truth"), object_hook=bju.object_hook)
+
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
+        # Although we process the day's data in two batches, we should get the same result
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth).data)
+
     def testAug10MultiSyncEndDetected(self):
         # Re-run, but with multiple calls to sync data
         # This tests the effect of online versus offline analysis and segmentation with potentially partial data
@@ -574,6 +619,59 @@ class TestPipelineRealData(unittest.TestCase):
         # Although we process the day's data in two batches, we should get the same result
         self.compare_approx_result(ad.AttrDict({'result': api_result}).result,
                                    ad.AttrDict(ground_truth).data, time_fuzz=60, distance_fuzz=100)
+
+    def testZeroDurationPlaceInterpolationSingleSync(self):
+        # Test for 545114feb5ac15caac4110d39935612525954b71
+        dataFile_1 = "emission/tests/data/real_examples/shankari_2016-01-12"
+        dataFile_2 = "emission/tests/data/real_examples/shankari_2016-01-13"
+        start_ld_1 = ecwl.LocalDate({'year': 2016, 'month': 1, 'day': 12})
+        start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 1, 'day': 13})
+        cacheKey_1 = "diary/trips-2016-01-12"
+        cacheKey_2 = "diary/trips-2016-01-13"
+        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=bju.object_hook)
+        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=bju.object_hook)
+
+        etc.setupRealExample(self, dataFile_1)
+        self.entries = json.load(open(dataFile_2), object_hook = bju.object_hook)
+        etc.setupRealExampleWithEntries(self)
+        etc.runIntakePipeline(self.testUUID)
+
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_1, start_ld_1)
+        # Although we process the day's data in two batches, we should get the same result
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth_1).data)
+
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_2, start_ld_2)
+        # Although we process the day's data in two batches, we should get the same result
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth_2).data)
+
+    def testZeroDurationPlaceInterpolationMultiSync(self):
+        # Test for 545114feb5ac15caac4110d39935612525954b71
+        dataFile_1 = "emission/tests/data/real_examples/shankari_2016-01-12"
+        dataFile_2 = "emission/tests/data/real_examples/shankari_2016-01-13"
+        start_ld_1 = ecwl.LocalDate({'year': 2016, 'month': 1, 'day': 12})
+        start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 1, 'day': 13})
+        cacheKey_1 = "diary/trips-2016-01-12"
+        cacheKey_2 = "diary/trips-2016-01-13"
+        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=bju.object_hook)
+        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=bju.object_hook)
+
+        etc.setupRealExample(self, dataFile_1)
+        etc.runIntakePipeline(self.testUUID)
+        self.entries = json.load(open(dataFile_2), object_hook = bju.object_hook)
+        etc.setupRealExampleWithEntries(self)
+        etc.runIntakePipeline(self.testUUID)
+
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_1, start_ld_1)
+        # Although we process the day's data in two batches, we should get the same result
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth_1).data)
+
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_2, start_ld_2)
+        # Although we process the day's data in two batches, we should get the same result
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth_2).data)
 
 if __name__ == '__main__':
     etc.configLogging()
