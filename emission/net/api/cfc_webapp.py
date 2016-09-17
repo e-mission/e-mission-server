@@ -403,6 +403,19 @@ def summarize_metrics(time_type):
     # logging.debug("ret_val = %s" % bson.json_util.dumps(ret_val))
     return ret_val
 
+@post('/join.group/<group_id>')
+def habiticaJoinGroup(group_id):
+    if 'user' in request.json:
+        user_uuid = getUUID(request)
+    else:
+        user_uuid = None
+    inviter_id = request.json['inviter']
+    logging.debug("%s about to join party %s after invite from %s" %
+                  (user_uuid, group_id, inviter_id))
+    ret_val = habitproxy.setup_party(user_uuid, group_id, inviter_id)
+    logging.debug("ret_val = %s after joining group" % bson.json_util.dumps(ret_val))
+    return {'joined_group': ret_val}
+
 # Pulling public data from the server  
 @get('/eval/publicData/timeseries')
 def getPublicData():
