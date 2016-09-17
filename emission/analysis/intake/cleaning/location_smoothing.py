@@ -9,6 +9,7 @@ import attrdict as ad
 import datetime as pydt
 import time as time
 import pytz
+import geojson as gj
 
 # Our imports
 import emission.analysis.point_features as pf
@@ -23,6 +24,7 @@ import emission.storage.timeseries.abstract_timeseries as esta
 import emission.core.wrapper.entry as ecwe
 import emission.core.wrapper.metadata as ecwm
 import emission.core.wrapper.smoothresults as ecws
+import emission.core.common as ecc
 
 import emission.storage.decorations.useful_queries as taug
 import emission.storage.decorations.location_queries as lq
@@ -120,12 +122,21 @@ def filter_jumps(user_id, section_id):
     tq = esda.get_time_query_for_trip_like(esda.RAW_SECTION_KEY, section_id)
     ts = esta.TimeSeries.get_time_series(user_id)
     section_points_df = ts.get_data_df("background/filtered_location", tq)
+    if section_points_df["filter"].unique().tolist() == ["distance"]:
+        logging.debug("Found iOS section, filling in gaps with fake data")
+        section_points_df = _ios_fill_fake_data(section_points_df)
     logging.debug("len(section_points_df) = %s" % len(section_points_df))
     points_to_ignore_df = get_points_to_filter(section_points_df, outlier_algo, filtering_algo)
     if points_to_ignore_df is None:
         # There were no points to delete
         return
-    deleted_point_id_list = list(points_to_ignore_df._id)
+    points_to_ignore_df_filtered = points_to_ignore_df._id.dropna()
+    logging.debug("after filtering ignored points, %s -> %s" %
+                  (len(points_to_ignore_df), len(points_to_ignore_df_filtered)))
+    # We shouldn't really filter any fuzzed points because they represent 100m in 60 secs
+    # but let's actually check for that
+    assert len(points_to_ignore_df) == len(points_to_ignore_df_filtered)
+    deleted_point_id_list = list(points_to_ignore_df_filtered)
     logging.debug("deleted %s points" % len(deleted_point_id_list))
 
     filter_result = ecws.Smoothresults()
@@ -198,3 +209,51 @@ def get_filtered_points(section_df, outlier_algo, filtering_algo):
             return with_speeds_df
     else:
         return with_speeds_df
+
+def _ios_fill_fake_data(locs_df):
+    # This is what we use in the segmentation code to see if the points are "the same"
+    DEFAULT_SAME_POINT_DISTANCE = 100
+    diff_ts = locs_df.ts.diff()
+    fill_ends = diff_ts[diff_ts > 60].index
+    if len(fill_ends) == 0:
+        logging.debug("No large gaps found, no gaps to fill")
+        return locs_df
+
+    for end in fill_ends:
+        logging.debug("Found large gap ending at %s, filling it" % end)
+        assert end > 0
+        start = end - 1
+        start_point = locs_df.iloc[start]["loc"]["coordinates"]
+        end_point = locs_df.iloc[end]["loc"]["coordinates"]
+        if ecc.calDistance(start_point, end_point) > DEFAULT_SAME_POINT_DISTANCE:
+            logging.debug("Distance between %s and %s = %s, adding noise is not enough, skipping..." %
+                          (start_point, end_point, ecc.calDistance(start_point, end_point)))
+            return locs_df
+
+        # else
+        # Design from https://github.com/e-mission/e-mission-server/issues/391#issuecomment-247246781
+        ts_fill = locs_df.ts[end] + np.arange(locs_df.ts[start] + 60, locs_df.ts[end], 60)
+        # We only pick entries that are *greater than* 60 apart
+        assert len(ts_fill) > 0
+        dist_fill = np.random.uniform(low=0, high=100, size=len(ts_fill))
+        angle_fill = np.random.uniform(low=0, high=2 * np.pi, size=len(ts_fill))
+        # Formula from http://gis.stackexchange.com/questions/5821/calculating-latitude-longitude-x-miles-from-point
+        lat_fill = locs_df.latitude[end] + np.multiply(dist_fill, np.sin(
+            angle_fill) / 111111)
+        cl = np.cos(locs_df.latitude[end])
+        lng_fill = locs_df.longitude[end] + np.multiply(dist_fill, np.cos(
+            angle_fill) / cl / 111111)
+        logging.debug("Fill lengths are: dist %s, angle %s, lat %s, lng %s" %
+                      (len(dist_fill), len(angle_fill), len(lat_fill), len(lng_fill)))
+
+        # Unsure if this is needed, but lets put it in just in case
+        loc_fill = [gj.Point(l) for l in zip(lng_fill, lat_fill)]
+        fill_df = pd.DataFrame(
+            {"ts": ts_fill, "longitude": lng_fill, "latitude": lat_fill,
+             "loc": loc_fill})
+        filled_df = pd.concat([locs_df, fill_df]).reset_index().sort("ts")
+        logging.debug("after filling, returning head = %s, tail = %s" %
+                      (filled_df[["fmt_time", "ts", "latitude", "longitude", "metadata_write_ts"]].head(),
+                       filled_df[["fmt_time", "ts", "latitude", "longitude", "metadata_write_ts"]].tail()))
+        return filled_df
+

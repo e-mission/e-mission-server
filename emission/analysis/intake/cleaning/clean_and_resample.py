@@ -792,7 +792,7 @@ def create_and_link_timeline(tl, user_id, trip_map):
     unsquished_trips = []
 
     for raw_trip in tl.trips:
-        if raw_trip.get_id() in trip_map:
+        if raw_trip.get_id() in trip_map and not _is_squished_untracked(raw_trip, tl.trips, trip_map):
             # there is a clean representation for this trip, so we can link its
             # start to the curr_cleaned_start_place
             curr_cleaned_trip = trip_map[raw_trip.get_id()]
@@ -982,6 +982,44 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
     if not compare_rounded_arrays(with_speeds_df.distance.tolist(), with_speeds_df.from_points_distance.tolist(), 10):
         logging.error("%s != %s" % (with_speeds_df.distance.tolist()[:10], with_speeds_df.from_points_distance.tolist()[:10]))
         assert False
+
+def _is_squished_untracked(raw_trip, raw_trip_list, trip_map):
+    if raw_trip.metadata.key != esda.RAW_UNTRACKED_KEY:
+        logging.debug("_is_squished_untracked: %s is a %s, not %s, returning False" %
+                      (raw_trip.get_id(), raw_trip.metadata.key, esda.RAW_UNTRACKED_KEY))
+        return False
+
+    cleaned_untracked = trip_map[raw_trip.get_id()]
+
+    index_list = [rt.get_id() for rt in raw_trip_list]
+    curr_index = index_list.index(raw_trip.get_id())
+    squished_list = [idx in trip_map for idx in index_list]
+    try:
+        next_unsquished_index = squished_list.index(True, curr_index+1)
+    except ValueError, e:
+        logging.debug("no unsquished trips found after %s in %s, returning True" %
+                      (squished_list, curr_index))
+        return True
+
+    next_unsquished_trip = trip_map[raw_trip_list[next_unsquished_index].get_id()]
+    logging.debug("curr_index = %s, next unsquished trip = %s at index %s" %
+                  (curr_index, next_unsquished_trip.get_id(), next_unsquished_index))
+
+    next_distance = ecc.calDistance(cleaned_untracked.data.start_loc.coordinates,
+                       next_unsquished_trip.data.start_loc.coordinates)
+    logging.debug("_is_squished_untracked: distance to next clean start (%s) = %s" %
+                  (next_unsquished_trip.get_id(), next_distance))
+
+    # 100 is a nice compromise, and what we use elsewhere, notably while determining
+    # what is a short trip and should be squished
+    if next_distance > 100:
+        logging.debug("_is_squished_untracked: distance to next clean start (%s) = %s >= 100, returning False" %
+                      (next_unsquished_trip.get_id(), next_distance))
+        return False
+
+    logging.debug("_is_squished_untracked: distance to next clean start (%s) = %s < 100, returning True" %
+                  (next_unsquished_trip.get_id(), next_distance))
+    return True
 
 def compare_rounded_arrays(arr1, arr2, digits):
     round2n = lambda x: round(x, digits)
