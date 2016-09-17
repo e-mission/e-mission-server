@@ -995,7 +995,7 @@ def _is_squished_untracked(raw_trip, raw_trip_list, trip_map):
     curr_index = index_list.index(raw_trip.get_id())
     squished_list = [idx in trip_map for idx in index_list]
     try:
-        next_unsquished_index = squished_list.index(True, curr_index)
+        next_unsquished_index = squished_list.index(True, curr_index+1)
     except ValueError, e:
         logging.debug("no unsquished trips found after %s in %s, returning True" %
                       (squished_list, curr_index))
