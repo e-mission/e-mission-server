@@ -91,11 +91,7 @@ def habiticaRegister(username, email, password, our_uuid):
 
     #Since we have a new user in our db, create its default habits (walk, bike)
     setup_default_habits(our_uuid)
-    #And invite new user to a group, or retrieve group id if user is already in one
-    group_id = setup_party(our_uuid)
-    edb.get_habitica_db().update({"user_id": our_uuid},{"$set": {'habitica_group_id': group_id}},upsert=True)
-    user_dict['habitica_group_id'] = group_id
-  return user_dict
+   return user_dict
 
 
 def newHabiticaUser(username, email, password, our_uuid):
