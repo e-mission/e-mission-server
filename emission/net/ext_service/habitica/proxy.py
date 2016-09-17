@@ -52,6 +52,7 @@ def habiticaRegister(username, email, password, our_uuid):
       user_request = {'username': username,'email': email,'password': password}
       logging.debug("About to login %s"% user_request)
       login_response = requests.post(login_url, json=user_request)
+      logging.debug("response = %s" % login_response)
       if login_response.status_code == 401:
         user_dict = newHabiticaUser(username, email, password, our_uuid)
       else:
@@ -71,7 +72,7 @@ def habiticaRegister(username, email, password, our_uuid):
     #if it fails, then user is also not in Habitica, so needs to create new account and put it in user_dict
     #FIX!! throw except only if u returns a 401 error
     except:
-      pass
+      logging.exception("Exception while trying to login!")
     
     logging.debug("habitica user to be created in our db = %s" % user_dict['data'])  
     #Now save new user (user_dict) to our db
@@ -91,10 +92,6 @@ def habiticaRegister(username, email, password, our_uuid):
 
     #Since we have a new user in our db, create its default habits (walk, bike)
     setup_default_habits(our_uuid)
-    #And invite new user to a group, or retrieve group id if user is already in one
-    group_id = setup_party(our_uuid)
-    edb.get_habitica_db().update({"user_id": our_uuid},{"$set": {'habitica_group_id': group_id}},upsert=True)
-    user_dict['habitica_group_id'] = group_id
   return user_dict
 
 
@@ -128,8 +125,7 @@ def habiticaProxy(user_uuid, method, method_url, method_args):
   return result
 
 
-
-def setup_party(user_id):
+def setup_party(user_id, group_id_from_url, inviterId):
   group_id = list(edb.get_habitica_db().find({"user_id": user_id}))[0]['habitica_group_id']
   if group_id is None:
     #check if user is already in a party
@@ -141,26 +137,24 @@ def setup_party(user_id):
       edb.get_habitica_db().update({"user_id": user_id},{"$set": {'habitica_group_id': group_id}},upsert=True)
 
     except KeyError:
-      #parties = [{"leader": "Juliana", "group_id": "488cae51-aeee-4004-9fa0-dd4219a3a77e"}, {"leader": "Sunil", "group_id": "751e5f9a-bd2d-4c4c-ba81-6fb89bccdf5d"}, {"leader": "Shankari", "group_id": "93c35a70-f70e-4d6e-ac2b-3e1c81fedf0f"}]
-      parties = ["Juliana", "Sunil", "Shankari"]
-      group = random.randint(0, 2)
-      leader_val = list(edb.get_habitica_db().find({"habitica_username": parties[group]}))[0]
-      logging.debug("party leader = %s" % leader_val)
-      group_id = leader_val['habitica_group_id']
+      group_id = group_id_from_url
       invite_uri = "/api/v3/groups/"+group_id+"/invite"
       logging.debug("invite user to party api url = %s" % invite_uri)
       user_val = list(edb.get_habitica_db().find({"user_id": user_id}))[0]
-      method_args = {'uuids': [user_val['habitica_id']], 'inviter': parties[group], 'emails': []}
-      response = habiticaProxy(leader_val['user_id'], 'POST', invite_uri, method_args)
+      method_args = {'uuids': [inviterId], 'inviter': group_id, 'emails': []}
+      response = habiticaProxy(inviterId, 'POST', invite_uri, method_args)
       logging.debug("invite user to party response = %s" % response)
+      join_url = "/api/v3/groups/"+group_id+"/join"
+      response2 = habiticaProxy(user_id, 'POST', join_url, {})
       response.raise_for_status()
+      response2.raise_for_status()
       edb.get_habitica_db().update({"user_id": user_id},{"$set": {'habitica_group_id': group_id}},upsert=True)
   return group_id
 
 def setup_default_habits(user_id):
-  bike_habit = {'type': "habit", 'text': "Bike", 'up': True, 'down': False, 'priority': 2}
+  bike_habit = {'type': "habit", 'text': "Bike", 'notes': "3 km = 1+ (calculated automatically)", 'up': True, 'down': False, 'priority': 2}
   bike_habit_id = create_habit(user_id, bike_habit)
-  walk_habit = {'type': "habit", 'text': "Walk", 'up': True, 'down': False, 'priority': 2}
+  walk_habit = {'type': "habit", 'text': "Walk", 'notes': "1 km = 1+ (calculated automatically)", 'up': True, 'down': False, 'priority': 2}
   walk_habit_id = create_habit(user_id, walk_habit)
 
 def create_habit(user_id, new_habit):
