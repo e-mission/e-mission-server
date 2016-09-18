@@ -141,8 +141,9 @@ def setup_party(user_id, group_id_from_url, inviterId):
       invite_uri = "/api/v3/groups/"+group_id+"/invite"
       logging.debug("invite user to party api url = %s" % invite_uri)
       user_val = list(edb.get_habitica_db().find({"user_id": user_id}))[0]
-      method_args = {'uuids': [inviterId], 'inviter': group_id, 'emails': []}
-      response = habiticaProxy(inviterId, 'POST', invite_uri, method_args)
+      method_args = {'uuids': [user_val['habitica_id']], 'inviter': group_id, 'emails': []}
+      emInviterId = edb.get_habitica_db().find_one({"habitica_id": inviterId})["user_id"]
+      response = habiticaProxy(emInviterId, 'POST', invite_uri, method_args)
       logging.debug("invite user to party response = %s" % response)
       join_url = "/api/v3/groups/"+group_id+"/join"
       response2 = habiticaProxy(user_id, 'POST', join_url, {})
