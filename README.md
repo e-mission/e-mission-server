@@ -133,7 +133,7 @@ run the script with
     
     $ python emission/simulation/trip_gen.py <user_name>
 
-Because this user data is specifically designed to test our tour model creation, you can create fake tour models easily by running the make_tour_model_from_fake_data function in emission/storage/decorations/tour_model_queries.py
+Because this user data is specifically designed to test our tour model creation, you can create fake tour models easily by running the `make_tour_model_from_fake_data` function in `emission/storage/decorations/tour_model_queries.py`
 
 
 ### Running the analysis pipeline ###
@@ -143,6 +143,10 @@ Once you have loaded the timeline, you probably want to segment it into trips an
     $ ./e-mission-py.bash bin/intake_stage.py
     
 Once the script is done running, places, trips, sections and stops would have been generated and stored in their respective mongodb tables, and the timelines for the last 7 days have been stored in the usercache.
+
+We also do some modelling on the generated data. This is much more time-intensive than the intake, but also does not need to run at the same frequency as the intake pipeline. So it is pulled out to its own pipeline. If you want to work on the modelling, you need to run this pipeline as well.
+
+    $ ./e-mission-py.bash bin/model_stage.py
 
 ### Running unit tests ###
 

@@ -1,0 +1,39 @@
+{
+    'version': 1,
+    'formatters': {
+        'detailed': {
+            'class': 'logging.Formatter',
+            'format': '%(asctime)s:%(levelname)s:%(thread)d:%(message)s'
+        }
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'level': 'INFO',
+        },
+        'file': {
+            'class': 'logging.RotatingFileHandler',
+            'filename': '/var/log/intake.log',
+            'mode': 'w',
+            'maxBytes': 1073741824,
+            'backupCount': 8,
+            'formatter': 'detailed',
+            'encoding': 'bz2',
+        },
+        'errors': {
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/intake-errors.log',
+            'mode': 'w',
+            'level': 'ERROR',
+            'formatter': 'detailed',
+            'maxBytes': 1073741824,
+            'backupCount': 2,
+            'formatter': 'detailed',
+            'encoding': 'bz2',
+        },
+    },
+    'root': {
+        'level': 'DEBUG',
+        'handlers': ['console', 'file', 'errors']
+    },
+}
