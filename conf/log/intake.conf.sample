@@ -1,39 +1,42 @@
 {
-    'version': 1,
-    'formatters': {
-        'detailed': {
-            'class': 'logging.Formatter',
-            'format': '%(asctime)s:%(levelname)s:%(thread)d:%(message)s'
+    "handlers": {
+        "errors": {
+            "encoding": "bz2", 
+            "backupCount": 2, 
+            "mode": "a", 
+            "level": "ERROR", 
+            "formatter": "detailed", 
+            "class": "logging.handlers.RotatingFileHandler", 
+            "maxBytes": 1073741824, 
+            "filename": "/var/tmp/intake-errors.log"
+        }, 
+        "console": {
+            "class": "logging.StreamHandler", 
+            "level": "INFO"
+        }, 
+        "file": {
+            "backupCount": 8, 
+            "encoding": "bz2", 
+            "filename": "/var/tmp/intake.log", 
+            "maxBytes": 1073741824, 
+            "mode": "a", 
+            "formatter": "detailed", 
+            "class": "logging.handlers.RotatingFileHandler"
         }
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'level': 'INFO',
-        },
-        'file': {
-            'class': 'logging.RotatingFileHandler',
-            'filename': '/var/log/intake.log',
-            'mode': 'w',
-            'maxBytes': 1073741824,
-            'backupCount': 8,
-            'formatter': 'detailed',
-            'encoding': 'bz2',
-        },
-        'errors': {
-            'class': 'logging.FileHandler',
-            'filename': '/var/log/intake-errors.log',
-            'mode': 'w',
-            'level': 'ERROR',
-            'formatter': 'detailed',
-            'maxBytes': 1073741824,
-            'backupCount': 2,
-            'formatter': 'detailed',
-            'encoding': 'bz2',
-        },
-    },
-    'root': {
-        'level': 'DEBUG',
-        'handlers': ['console', 'file', 'errors']
-    },
+    }, 
+    "version": 1, 
+    "root": {
+        "handlers": [
+            "console", 
+            "file", 
+            "errors"
+        ], 
+        "level": "DEBUG"
+    }, 
+    "formatters": {
+        "detailed": {
+            "class": "logging.Formatter", 
+            "format": "%(asctime)s:%(levelname)s:%(thread)d:%(message)s"
+        }
+    }
 }
