@@ -209,6 +209,7 @@ def get_analysis_timeseries_db():
     AnalysisTimeSeries.create_index([("data.section", pymongo.HASHED)], sparse=True)
 
     # recreated location
+    AnalysisTimeSeries.create_index([("data.ts", pymongo.DESCENDING)], sparse=True)
     AnalysisTimeSeries.create_index([("data.loc", pymongo.GEOSPHERE)], sparse=True)
     _create_local_dt_indices(AnalysisTimeSeries, "data.local_dt") # recreated location
     return AnalysisTimeSeries
