@@ -74,6 +74,15 @@ Here are the steps for doing this:
 
         $ mongod
 
+1. Copy the following sample files. You should also configure the servers and keys in them if you wish to test the associated features, but can leave them filled with dummy values if you don't.
+
+        # For the location -> name reverse lookup. Client will lookup if not populated.
+        $ cp conf/net/ext_service/nominatim.json.sample conf/net/ext_service/nominatim.json
+        # Store entries to the stats database. Currently required, dependency should be removed soon
+        $ cp conf/net/int_service/giles_conf.json.sample conf/net/int_service/giles_conf.json
+        # Game integration.
+        $ cp conf/net/ext_service/habitica.json.sample conf/net/int_service/habitica.json
+
 1. Start the server
 
         $ ./e-mission-py.bash emission/net/api/cfc_webapp.py

@@ -5,10 +5,14 @@ import os
 import logging
 
 def get_conf_file():
-    f = open("conf/net/int_service/giles_conf.json", "r")
-    conf = json.loads(f.read())
-    f.close()
-    return conf
+    try:
+        f = open("conf/net/int_service/giles_conf.json", "r")
+        conf = json.loads(f.read())
+        f.close()
+        return conf
+    except:
+        logging.exception("archiver not configured, stats will be stored locally")
+        return {"giles_base_url": "unknown", "giles_api_key": "i want everything"}
 
 def get_giles_base_url():
     conf = get_conf_file()

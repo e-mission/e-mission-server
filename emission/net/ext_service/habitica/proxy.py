@@ -12,11 +12,12 @@ import random
 import emission.core.get_database as edb
 
 
-
-key_file = open('conf/net/keys.json')
-key_data = json.load(key_file)
-url = key_data["habitica"]["url"]
-
+try:
+    key_file = open('conf/net/ext_service/habitica.json')
+    key_data = json.load(key_file)
+    url = key_data["url"]
+except:
+    logging.exception("habitica not configured, game functions not supported")
 
 
 def habiticaRegister(username, email, password, our_uuid):
