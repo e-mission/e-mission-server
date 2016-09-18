@@ -1,7 +1,7 @@
 import json
 
 sample_path = "conf/net/int_service/giles_conf.json.sample"
-f = open(path, "r")
+f = open(sample_path, "r")
 data = json.loads(f.read())
 f.close()
 
