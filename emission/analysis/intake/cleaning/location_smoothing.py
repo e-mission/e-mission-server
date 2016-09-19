@@ -135,7 +135,7 @@ def filter_jumps(user_id, section_id):
                   (len(points_to_ignore_df), len(points_to_ignore_df_filtered)))
     # We shouldn't really filter any fuzzed points because they represent 100m in 60 secs
     # but let's actually check for that
-    assert len(points_to_ignore_df) == len(points_to_ignore_df_filtered)
+    # assert len(points_to_ignore_df) == len(points_to_ignore_df_filtered)
     deleted_point_id_list = list(points_to_ignore_df_filtered)
     logging.debug("deleted %s points" % len(deleted_point_id_list))
 
@@ -232,7 +232,9 @@ def _ios_fill_fake_data(locs_df):
 
         # else
         # Design from https://github.com/e-mission/e-mission-server/issues/391#issuecomment-247246781
-        ts_fill = locs_df.ts[end] + np.arange(locs_df.ts[start] + 60, locs_df.ts[end], 60)
+        logging.debug("start = %s, end = %s, generating entries between %s and %s" %
+            (start, end, locs_df.ts[start], locs_df.ts[end]))
+        ts_fill = np.arange(locs_df.ts[start] + 60, locs_df.ts[end], 60)
         # We only pick entries that are *greater than* 60 apart
         assert len(ts_fill) > 0
         dist_fill = np.random.uniform(low=0, high=100, size=len(ts_fill))
@@ -251,7 +253,7 @@ def _ios_fill_fake_data(locs_df):
         fill_df = pd.DataFrame(
             {"ts": ts_fill, "longitude": lng_fill, "latitude": lat_fill,
              "loc": loc_fill})
-        filled_df = pd.concat([locs_df, fill_df]).reset_index().sort("ts")
+        filled_df = pd.concat([locs_df, fill_df]).sort("ts").reset_index()
         logging.debug("after filling, returning head = %s, tail = %s" %
                       (filled_df[["fmt_time", "ts", "latitude", "longitude", "metadata_write_ts"]].head(),
                        filled_df[["fmt_time", "ts", "latitude", "longitude", "metadata_write_ts"]].tail()))
