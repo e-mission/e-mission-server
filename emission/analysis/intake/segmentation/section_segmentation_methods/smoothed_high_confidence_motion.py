@@ -49,7 +49,7 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
         # length of the filtered dataframe was sufficient. But now both Tom and
         # I have hit it (on 18th and 21st of Sept) so let's handle it proactively here.
         if filter_mask.shape == (0,0):
-            logging.warning("Found filter_mask with shape (0,0), returning blank")
+            logging.info("Found filter_mask with shape (0,0), returning blank")
             return []
 
         logging.debug("filtered points %s" % np.nonzero(filter_mask))
