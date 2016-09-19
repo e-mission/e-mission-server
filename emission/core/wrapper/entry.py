@@ -41,7 +41,8 @@ class Entry(ecwb.WrapperBase):
             "analysis/cleaned_place": "cleanedplace",
             "analysis/cleaned_section": "cleanedsection",
             "analysis/cleaned_stop": "stop",
-            "analysis/recreated_location": "recreatedlocation"
+            "analysis/recreated_location": "recreatedlocation",
+            "eval/public_device": "publicdevice"   
             }
 
   @staticmethod

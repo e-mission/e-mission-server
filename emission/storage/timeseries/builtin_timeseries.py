@@ -34,6 +34,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "analysis/cleaned_section": self.analysis_timeseries_db,
                 "analysis/cleaned_stop": self.analysis_timeseries_db,
                 "analysis/recreated_location": self.analysis_timeseries_db,
+                "eval/public_device": self.analysis_timeseries_db
             }
 
 
