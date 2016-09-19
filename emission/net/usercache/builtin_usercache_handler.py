@@ -234,7 +234,9 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         # the keys. The current key generation should work fine with
         # lexicographic ordering, but at the same time, this seems much easier
         # and safer to deal with.
-        valid_key_list.append('config/sensor_config', 'config/sync_config', 'config/consent')
+        valid_key_list.append('config/sensor_config')
+        valid_key_list.append('config/sync_config')
+        valid_key_list.append('config/consent')
         logging.debug("curr_key_list = %s, valid_key_list = %s" % 
            (curr_key_list, valid_key_list))
         to_del_keys = set(curr_key_list) - set(valid_key_list)
