@@ -41,6 +41,7 @@ from emission.core.wrapper.user import User
 from emission.core.get_database import get_uuid_db, get_mode_db
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.timeseries.timequery as estt
+import emission.storage.timeseries.aggregate_timeseries as estag
 import emission.core.get_database as edb
 
 
@@ -420,7 +421,8 @@ def habiticaJoinGroup(group_id):
 @get('/eval/publicData/timeseries')
 def getPublicData():
   ids = request.json['phone_ids']
-  uuids = map(lambda id: UUID(id), ids)
+  all_uuids = map(lambda id: UUID(id), ids)
+  uuids = [uuid for uuid in all_uuids if uuid in estag.TEST_PHONE_IDS]
 
   from_ts = request.query.from_ts
   to_ts = request.query.to_ts
