@@ -5,8 +5,17 @@ import json
 from emission.core.wrapper.trip_old import Coordinate
 from pygeocoder import Geocoder as pyGeo  ## We fall back on this if we have to
 
-key_file = open("conf/net/ext_service/googlemaps.json")
-GOOGLE_MAPS_KEY = json.load(key_file)["api_key"]
+try:
+    googlemaps_key_file = open("conf/net/ext_service/googlemaps.json")
+    GOOGLE_MAPS_KEY = json.load(googlemaps_key_file)["api_key"]
+except:
+    logging.exception("google maps key not configured, falling back to nominatim")
+
+try:
+    nominatim_file = open("conf/net/ext_service/nominatim.json")
+    NOMINATIM_QUERY_URL = json.load(nominatim_file)["query_url"]
+except:
+    logging.exception("nominatim not configured either, place decoding must happen on the client")
 
 class Geocoder:
 
@@ -20,7 +29,7 @@ class Geocoder:
             "format" : "json"
         }
 
-        query_url = "http://nominatim.openstreetmap.org/search?"
+        query_url = NOMINATIM_QUERY_URL + "/search?"
         encoded_params = urllib.urlencode(params)
         url = query_url + encoded_params
         return url
@@ -52,7 +61,7 @@ class Geocoder:
             "format" : "json"
         }
 
-        query_url = "http://nominatim.openstreetmap.org/reverse?"
+        query_url = NOMINATIM_QUERY_URL + "/reverse?"
         encoded_params = urllib.urlencode(params)
         url = query_url + encoded_params
         return url
