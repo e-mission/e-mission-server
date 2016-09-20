@@ -1,6 +1,7 @@
 import sys
 import json
 import logging
+import numpy as np
 
 import emission.net.usercache.abstract_usercache_handler as euah
 import emission.net.usercache.abstract_usercache as enua
@@ -23,6 +24,7 @@ if __name__ == '__main__':
         intake_log_config = json.load(open("conf/log/intake.conf.sample", "r"))
 
     logging.config.dictConfig(intake_log_config)
+    # np.random.seed(61297777)
 
     cache_uuid_list = enua.UserCache.get_uuid_list()
     logging.info("cache UUID list = %s" % cache_uuid_list)

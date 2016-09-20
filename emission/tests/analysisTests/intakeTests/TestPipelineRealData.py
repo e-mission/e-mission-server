@@ -3,6 +3,13 @@
 # The way to add a new test is:
 # - load the test timeline
 # $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py emission/tests/data/real_examples/iphone_2016-02-22
+#
+# Note that there is some randomness in the tests, due to
+# a56adddc5dc8c94cbe98964aafb17df3bc3f724c, so we need to use a random seed
+# The tests use a seed of 61297777 - if the intake pipeline is being run to
+# generate ground truth, the line setting the seed in the intake pipeline
+# needs to be re-instituted.
+
 # - run the intake pipeline
 # $ ./e-mission-py.bash bin/intake_stage.py
 # - log in via the phone and check that all is well
@@ -21,6 +28,7 @@ import json
 import bson.json_util as bju
 import attrdict as ad
 import arrow
+import numpy as np
 
 # Our imports
 import emission.core.get_database as edb
@@ -36,7 +44,8 @@ import emission.tests.common as etc
 
 class TestPipelineRealData(unittest.TestCase):
     def setUp(self):
-        pass
+        # Thanks to M&J for the number!
+        np.random.seed(61297777)
 
     def tearDown(self):
         logging.debug("Clearing related databases")
