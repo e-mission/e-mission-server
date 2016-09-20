@@ -122,9 +122,7 @@ def save_cleaned_segments_for_timeline(user_id, tl):
             last_cleaned_place)
         ts.update(last_cleaned_place)
     if filtered_tl is not None:
-        for entry in filtered_tl:
-            ts.insert(entry)
-
+        ts.bulk_insert(filtered_tl, esta.EntryType.ANALYSIS_TYPE)
     return tl.last_place()
 
 def get_filtered_untracked(ts, untracked):
@@ -201,9 +199,7 @@ def get_filtered_trip(ts, trip):
     # or not, and to not store any of the sections or stops if it is not. So the validity
     # check should be before the insert
 
-    for entry in linked_tl:
-        ts.insert(entry)
-
+    ts.bulk_insert(linked_tl, esta.EntryType.ANALYSIS_TYPE)
     return filtered_trip_entry
 
 def get_filtered_place(raw_place):
@@ -273,11 +269,14 @@ def get_filtered_section(new_trip_entry, section):
                                     filtered_section_data, create_id=True)
 
     ts = esta.TimeSeries.get_time_series(section.user_id)
+    entry_list = []
     for row in with_speeds_df.to_dict('records'):
         loc_row = ecwrl.Recreatedlocation(row)
         loc_row.mode = section.data.sensed_mode
         loc_row.section = filtered_section_entry.get_id()
-        ts.insert_data(section.user_id, esda.CLEANED_LOCATION_KEY, loc_row)
+        entry_list.append(ecwe.Entry.create_entry(section.user_id, esda.CLEANED_LOCATION_KEY, loc_row))
+
+    ts.bulk_insert(entry_list, esta.EntryType.ANALYSIS_TYPE)
 
     return filtered_section_entry
 

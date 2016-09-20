@@ -8,14 +8,19 @@ import emission.storage.timeseries.abstract_timeseries as esta
 
 import emission.core.wrapper.entry as ecwe
 
+ts_enum_map = {
+    esta.EntryType.DATA_TYPE: edb.get_timeseries_db(),
+    esta.EntryType.ANALYSIS_TYPE: edb.get_analysis_timeseries_db()
+}
+
 class BuiltinTimeSeries(esta.TimeSeries):
     def __init__(self, user_id):
         super(BuiltinTimeSeries, self).__init__(user_id)
         self.key_query = lambda(key): {"metadata.key": key}
         self.type_query = lambda(entry_type): {"metadata.type": entry_type}
         self.user_query = {"user_id": self.user_id} # UUID is mandatory for this version
-        self.timeseries_db = edb.get_timeseries_db()
-        self.analysis_timeseries_db = edb.get_analysis_timeseries_db()
+        self.timeseries_db = ts_enum_map[esta.EntryType.DATA_TYPE]
+        self.analysis_timeseries_db = ts_enum_map[esta.EntryType.ANALYSIS_TYPE]
         self.ts_map = {
                 "background/location": self.timeseries_db,
                 "background/filtered_location": self.timeseries_db,
@@ -253,6 +258,15 @@ class BuiltinTimeSeries(esta.TimeSeries):
         for part in field_parts:
             retVal = retVal[part]
         return retVal
+
+    def bulk_insert(self, entries, data_type = None):
+        if data_type is None:
+            keyfunc = lambda e: e.metadata.key
+            sorted_data = sorted(entries, key=keyfunc)
+            for k, g in itertools.groupby(sorted_data, keyfunc):
+                self.get_timeseries_db(k).insert(g)
+        else:
+            ts_enum_map[data_type].insert(entries)
 
     def insert(self, entry):
         """
