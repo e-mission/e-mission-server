@@ -2,7 +2,6 @@ from pymongo import MongoClient
 import pymongo
 import os
 import json
-from emission.net.int_service.giles import archiver
 
 _current_db = MongoClient('localhost').Stage_database
 
@@ -97,33 +96,20 @@ def get_uuid_db():
     UUIDs = _get_current_db().Stage_uuids
     return UUIDs
 
-def get_client_stats_db():
-    return archiver.StatArchiver('/client_stats')
-    pass
-
 def get_client_stats_db_backup():
     # current_db=MongoClient().Stage_database
     ClientStats = _get_current_db().Stage_client_stats
     return ClientStats
-
-def get_server_stats_db():
-    return archiver.StatArchiver('/server_stats')
-    pass
 
 def get_server_stats_db_backup():
     # current_db=MongoClient().Stage_database
     ServerStats = _get_current_db().Stage_server_stats
     return ServerStats
 
-def get_result_stats_db():
-    return archiver.StatArchiver('/result_stats')
-    pass
-
 def get_result_stats_db_backup():
     # current_db=MongoClient().Stage_database
     ResultStats = _get_current_db().Stage_result_stats
     return ResultStats
-
 
 def get_db():
     current_db=MongoClient('localhost').Stage_database
