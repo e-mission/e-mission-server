@@ -59,6 +59,9 @@ class UserCache(object):
         """
         pass
 
+    def getMessageCount(self):
+        pass
+
     # TODO: Should we have a separate clear method, or should we just clear on get?
     # I prefer a separate clear method, since it allows more flexibility in the
     # consumption and the plugin architecture

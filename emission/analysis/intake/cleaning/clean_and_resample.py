@@ -121,7 +121,7 @@ def save_cleaned_segments_for_timeline(user_id, tl):
         logging.debug("last cleaned_place %s was already in database, updating..." % 
             last_cleaned_place)
         ts.update(last_cleaned_place)
-    if filtered_tl is not None:
+    if filtered_tl is not None and not filtered_tl.is_empty():
         ts.bulk_insert(filtered_tl, esta.EntryType.ANALYSIS_TYPE)
     return tl.last_place()
 
