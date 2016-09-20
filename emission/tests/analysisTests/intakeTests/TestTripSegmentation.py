@@ -3,6 +3,8 @@ import unittest
 import datetime as pydt
 import logging
 import json
+import uuid
+import bson.json_util as bju
 
 # Our imports
 import emission.core.get_database as edb
@@ -28,15 +30,20 @@ class TestTripSegmentation(unittest.TestCase):
     def setUp(self):
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
         self.androidUUID = self.testUUID
-        etc.setupRealExample(self, "emission/tests/data/real_examples/iphone_2015-11-06")
+
+        self.testUUID = uuid.UUID("c76a0487-7e5a-3b17-a449-47be666b36f6")
+        self.entries = json.load(open("emission/tests/data/real_examples/iphone_2015-11-06"), object_hook = bju.object_hook)
+        etc.setupRealExampleWithEntries(self)
         self.iosUUID = self.testUUID
         eaicf.filter_accuracy(self.iosUUID)
         logging.debug("androidUUID = %s, iosUUID = %s" % (self.androidUUID, self.iosUUID))
 
     def tearDown(self):
         edb.get_timeseries_db().remove({"user_id": self.androidUUID}) 
-        edb.get_timeseries_db().remove({"user_id": self.iosUUID}) 
-        edb.get_analysis_timeseries_db().remove({"user_id": self.androidUUID}) 
+        edb.get_timeseries_db().remove({"user_id": self.iosUUID})
+        edb.get_pipeline_state_db().remove({"user_id": self.androidUUID})
+        edb.get_pipeline_state_db().remove({"user_id": self.iosUUID})
+        edb.get_analysis_timeseries_db().remove({"user_id": self.androidUUID})
         edb.get_analysis_timeseries_db().remove({"user_id": self.iosUUID}) 
 
     def testEmptyCall(self):

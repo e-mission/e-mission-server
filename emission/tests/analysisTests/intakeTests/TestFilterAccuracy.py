@@ -6,6 +6,7 @@ import pymongo
 import json
 import bson.json_util as bju
 import pandas as pd
+from uuid import UUID
 
 # Our imports
 import emission.analysis.intake.cleaning.filter_accuracy as eaicf
@@ -22,7 +23,7 @@ class TestFilterAccuracy(unittest.TestCase):
         import emission.core.get_database as edb
         import uuid
 
-        self.testUUID = uuid.uuid4()
+        self.testUUID = UUID('079e0f1a-c440-3d7c-b0e7-de160f748e35')
         self.entries = json.load(open("emission/tests/data/smoothing_data/tablet_2015-11-03"),
                                  object_hook=bju.object_hook)
         tsdb = edb.get_timeseries_db()
