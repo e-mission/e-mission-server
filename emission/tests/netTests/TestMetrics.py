@@ -36,8 +36,10 @@ class TestMetrics(unittest.TestCase):
     def clearRelatedDb(self):
         edb.get_timeseries_db().remove({"user_id": self.testUUID})
         edb.get_analysis_timeseries_db().remove({"user_id": self.testUUID})
+        edb.get_pipeline_state_db().remove({"user_id": self.testUUID})
         edb.get_timeseries_db().remove({"user_id": self.testUUID1})
         edb.get_analysis_timeseries_db().remove({"user_id": self.testUUID1})
+        edb.get_pipeline_state_db().remove({"user_id": self.testUUID1})
 
     def testCountTimestampMetrics(self):
         met_result = metrics.summarize_by_timestamp(self.testUUID,
