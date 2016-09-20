@@ -61,7 +61,7 @@ def segment_current_trips(user_id):
         epq.mark_segmentation_done(user_id, None)
         return
 
-    filters_in_df = loc_df["filter"].unique()
+    filters_in_df = loc_df["filter"].dropna().unique()
     logging.debug("Filters in the dataframe = %s" % filters_in_df)
     if len(filters_in_df) == 1:
         # Common case - let's make it easy
