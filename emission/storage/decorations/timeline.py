@@ -236,6 +236,9 @@ class Timeline(object):
         else:
             self.state = Timeline.State(new_type, self.id_map[new_id])
 
+    def is_empty(self):
+        return len(self.trips) == 0 and len(self.places) == 0
+
     def first_place(self):
         if self.first_trip() is not None and \
             self.first_trip().data.start_place is not None:
