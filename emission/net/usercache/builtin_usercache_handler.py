@@ -58,6 +58,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
 
         curr_entry_it = uc.getMessage(None, time_query)
         last_ts_processed = None
+        unified_entry_list = []
         for entry_doc in curr_entry_it:
             unified_entry = None
             try:
@@ -68,7 +69,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
                 # generic attrdict for now.
                 entry = ad.AttrDict(entry_doc)
                 unified_entry = enuf.convert_to_common_format(entry)
-                ts.insert(unified_entry)
+                unified_entry_list.append(unified_entry)
                 last_ts_processed = ecwe.Entry(unified_entry).metadata.write_ts
                 time_query.endTs = last_ts_processed
             except pymongo.errors.DuplicateKeyError as e:
@@ -80,6 +81,8 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
                     ts.insert_error(entry_doc)
                 except pymongo.errors.DuplicateKeyError as e:
                     logging.info("document already present in error timeseries, skipping since read-only")
+
+        ts.bulk_insert(unified_entry_list, etsa.EntryType.DATA_TYPE)
         logging.debug("Deleting all entries for query %s" % time_query)
         uc.clearProcessedMessages(time_query)
         esp.mark_usercache_done(self.user_id, last_ts_processed)
