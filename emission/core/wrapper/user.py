@@ -201,10 +201,14 @@ class User:
 
     # This is the UUID that will be stored in the trip database
     # in order to do some fig leaf of anonymity
-    # If we have an existing entry, should we change the UUID or not? If we
-    # change the UUID, then there will be a break in the trip history. Let's
-    # change for now since it makes the math easier.
-    anonUUID = uuid.uuid3(uuid.NAMESPACE_URL, "mailto:%s" % userEmail.encode("UTF-8"))
+    # Since we now generate truly anonymized UUIDs, and we expect that the
+    # register operation is idempotent, we need to check and ensure that we don't
+    # change the UUID if it already exists.
+    existing_entry = get_uuid_db().find_one({"user_email": userEmail})
+    if existing_entry is None:
+        anonUUID = uuid.uuid4()
+    else:
+        anonUUID = existing_entry['uuid']
     emailUUIDObject = {'user_email': userEmail, 'uuid': anonUUID, 'update_ts': datetime.now()}
     writeResultMap = get_uuid_db().update(userEmailQuery, emailUUIDObject, upsert=True)
     # Note, if we did want the create_ts to not be overwritten, we can use the
