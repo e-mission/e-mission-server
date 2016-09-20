@@ -645,8 +645,12 @@ def getUUID(request, inHeader=False):
 # Auth helpers END
 
 if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(thread)d:%(message)s',
-                        filename='webserver_debug.log', level=logging.DEBUG)
+    try:
+        webserver_log_config = json.load(open("conf/log/webserver.conf", "r"))
+    except:
+        webserver_log_config = json.load(open("conf/log/webserver.conf.sample", "r"))
+
+    logging.config.dictConfig(webserver_log_config)
     logging.debug("This should go to the log file")
 
     # We have see the sockets hang in practice. Let's set the socket timeout = 1
