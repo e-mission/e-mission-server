@@ -100,19 +100,17 @@ You may also want to load some test data.
 
 1. Sample timeline data from the data collection eval is available in the [data-collection-eval repo](https://github.com/shankari/data-collection-eval).
 2. You can choose to load either android data `results_dec_2015/ucb.sdb.android.{1,2,3}/timeseries/*` or iOS data `results_dec_2015/ucb.sdb.ios.{1,2,3}/timeseries/*`
-3. Data is loaded using the `bin/debug/load_timeline_for_day_and_user.py`.
-  * Running it with just a timeline file loads the data with the original user - e.g.
+3. Data is loaded using the `bin/debug/load_timeline_for_day_and_user.py`. It
+requires a timeline file and a user that the timeline is being loaded as. If
+you wish to view this timeline in the UI after processing it, you need to
+login with this email.
 
             $ cd ..../e-mission-server
-            $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py /tmp/data-collection-eval/results_dec_2015/ucb.sdb.android.1/timeseries/active_day_2.2015-11-27
+            $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py /tmp/data-collection-eval/results_dec_2015/ucb.sdb.android.1/timeseries/active_day_2.2015-11-27 shankari@eecs.berkeley.edu
         
-  * Running it with a timeline file and a user relabels the data as being from the specified user and then loads it - e.g.
+4. Note that loading the data retains the object IDs. This means that if you load the same data twice with different user IDs, then only the second one will stick. In other words, if you load the file as `user1@foo.edu` and then load the same file as `user2@foo.edu`, you will only have data for `user2@foo.edu` in the database. This can be overwritten using the `--make-new` flag - e.g.
 
-            $ cd ..../e-mission-server
-            $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py /tmp/data-collection-eval/results_dec_2015/ucb.sdb.android.1/timeseries/active_day_2.2015-11-27 -u shankari@eecs.berkeley.edu
-        
-4. Note that loading the data retains the object IDs. This means that if you load the same data twice with different user IDs, then only the second one will stick. In other words, if you load the file as `user1@foo.edu` and then load the same file as `user2@foo.edu`, you will only have data for `user2@foo.edu` in the database.
-
+            $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py -n /tmp/data-collection-eval/results_dec_2015/ucb.sdb.android.1/timeseries/active_day_2.2015-11-27 shankari@eecs.berkeley.edu
 
 ### Creating fake user data ###
 
