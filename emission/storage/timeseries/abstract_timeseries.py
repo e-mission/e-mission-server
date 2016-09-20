@@ -1,4 +1,9 @@
 import logging
+import enum as enum
+
+class EntryType(enum.Enum):
+    DATA_TYPE = 0
+    ANALYSIS_TYPE = 1
 
 class TimeSeries(object):
     @staticmethod
@@ -49,6 +54,22 @@ class TimeSeries(object):
         :param field: the field in the stream whose max value we want.
         It is assumed that the values for the field are sortable.
         :return: the max value for the field in the stream identified by key.  -1 if there are no entries for the key.
+        """
+        pass
+
+    def bulk_insert(self, entries, entry_type=None):
+        """
+        Inserts the specified interable into the specified database, using
+        the bulk insert operation of the underlying timeseries.
+        :param entries: The iterable of entry objects to be inserted
+        :param entry_type: The database (data or analysis) to be inserted into. If
+        not specified, we will automatically figure out the database based on the
+        keys. However, this will make the operation slower, since we need to group
+        entries by their key, and group_by requires a sorted array.
+
+        However, specifying a database requires all entries to be stored into
+        the same database, but inferring the database allows greater flexibility.
+        :return:
         """
         pass
 
