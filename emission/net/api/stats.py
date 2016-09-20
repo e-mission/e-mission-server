@@ -3,7 +3,7 @@ import logging
 import time
 
 # Our imports
-from emission.core.get_database import get_client_stats_db, get_server_stats_db, get_result_stats_db, get_client_stats_db_backup, get_server_stats_db_backup, get_result_stats_db_backup
+from emission.core.get_database import get_client_stats_db_backup, get_server_stats_db_backup, get_result_stats_db_backup
 
 STAT_TRIP_MGR_PCT_SHOWN = "tripManager.pctShown"
 STAT_TRIP_MGR_TRIPS_FOR_DAY = "tripManager.tripsForDay"

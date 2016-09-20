@@ -5,8 +5,18 @@ import json
 import time
 
 # Our imports
-from emission.core.get_database import get_client_stats_db, get_server_stats_db, get_result_stats_db
+from emission.core.get_database import get_client_stats_db_backup, get_server_stats_db_backup, get_result_stats_db_backup
+import emission.net.int_service.giles.archiver as eniga
 from emission.net.api import stats
+
+def get_client_stats_db():
+  return eniga.StatArchiver('/client_stats')
+
+def get_server_stats_db():
+  return eniga.StatArchiver('/server_stats')
+
+def get_result_stats_db():
+  return eniga.StatArchiver('/result_stats')
 
 class TestStats(unittest.TestCase):
   def setUp(self):
@@ -23,6 +33,7 @@ class TestStats(unittest.TestCase):
   def tearDown(self):
     get_client_stats_db().remove()
     pass
+
 
   def testCreateEntry(self):
     currEntry = stats.createEntry("testuser", "testkey", "testTs", "testVal")
