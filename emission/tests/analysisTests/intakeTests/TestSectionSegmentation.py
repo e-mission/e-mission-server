@@ -206,7 +206,7 @@ class TestSectionSegmentation(unittest.TestCase):
         created_trips = esda.get_entries(esda.RAW_TRIP_KEY, self.iosUUID,
                                          tq_trip)
 
-        self.assertEqual(len(created_trips), 3)
+        self.assertEqual(len(created_trips), 2)
         logging.debug("created trips = %s" % created_trips)
 
         sections_stops = [(len(esdt.get_raw_sections_for_trip(self.iosUUID, trip.get_id())),
@@ -216,7 +216,7 @@ class TestSectionSegmentation(unittest.TestCase):
         self.assertEqual(len(sections_stops), len(created_trips))
         # The expected value was copy-pasted from the debug statement above
         self.assertEqual(sections_stops,
-                         [(0, 0), (6, 5), (6, 5)])
+                         [(0, 0), (11, 10)])
 
 
 if __name__ == '__main__':
