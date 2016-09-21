@@ -264,9 +264,9 @@ class BuiltinTimeSeries(esta.TimeSeries):
             keyfunc = lambda e: e.metadata.key
             sorted_data = sorted(entries, key=keyfunc)
             for k, g in itertools.groupby(sorted_data, keyfunc):
-                self.get_timeseries_db(k).insert(g)
+                return self.get_timeseries_db(k).insert(g, continue_on_error=True)
         else:
-            ts_enum_map[data_type].insert(entries)
+            return ts_enum_map[data_type].insert(entries, continue_on_error=True)
 
     def insert(self, entry):
         """
