@@ -199,7 +199,8 @@ def get_filtered_trip(ts, trip):
     # or not, and to not store any of the sections or stops if it is not. So the validity
     # check should be before the insert
 
-    ts.bulk_insert(linked_tl, esta.EntryType.ANALYSIS_TYPE)
+    if not linked_tl.is_empty():
+        ts.bulk_insert(linked_tl, esta.EntryType.ANALYSIS_TYPE)
     return filtered_trip_entry
 
 def get_filtered_place(raw_place):
@@ -259,8 +260,9 @@ def get_filtered_section(new_trip_entry, section):
     filtered_section_data.distances = distances
     filtered_section_data.distance = sum(distances)
 
-    if is_air_section(filtered_section_data, with_speeds_df):
-        filtered_section_data.sensed_mode = ecwm.MotionTypes.AIR_OR_HSR
+    overridden_mode = get_overriden_mode(section.data, filtered_section_data, with_speeds_df)
+    if overridden_mode is not None:
+        filtered_section_data.sensed_mode = overridden_mode
     else:
         filtered_section_data.sensed_mode = section.data.sensed_mode
 
@@ -276,7 +278,8 @@ def get_filtered_section(new_trip_entry, section):
         loc_row.section = filtered_section_entry.get_id()
         entry_list.append(ecwe.Entry.create_entry(section.user_id, esda.CLEANED_LOCATION_KEY, loc_row))
 
-    ts.bulk_insert(entry_list, esta.EntryType.ANALYSIS_TYPE)
+    if len(entry_list) > 0:
+        ts.bulk_insert(entry_list, esta.EntryType.ANALYSIS_TYPE)
 
     return filtered_section_entry
 
@@ -405,7 +408,31 @@ def _copy_non_excluded(old_data, new_data, excluded_list):
         if key not in excluded_list:
             new_data[key] = old_data[key]
 
-def is_air_section(filtered_section_data, with_speeds_df):
+def get_overriden_mode(raw_section_data, filtered_section_data, with_speeds_df):
+    if is_air_section(filtered_section_data, with_speeds_df):
+        return ecwm.MotionTypes.AIR_OR_HSR
+
+    end_to_end_distance = filtered_section_data.distance
+    end_to_end_time = filtered_section_data.duration
+    overall_speed = end_to_end_distance / end_to_end_time
+    TEN_KMPH = float(10 * 1000) / (60 * 60) # m/s
+    FORTY_KMPH = float(40 * 1000) / (60 * 60) # m/s
+    logging.debug("end_to_end_distance = %s, end_to_end_time = %s, overall_speed = %s" %
+                  (end_to_end_distance, end_to_end_time, overall_speed))
+
+    # Hardcoded hack as per
+    # https://github.com/e-mission/e-mission-server/issues/407#issuecomment-248524098
+    if raw_section_data.sensed_mode == ecwm.MotionTypes.ON_FOOT:
+        if end_to_end_distance > 10 * 1000 and overall_speed > TEN_KMPH:
+            return ecwm.MotionTypes.UNKNOWN
+
+    if raw_section_data.sensed_mode == ecwm.MotionTypes.BICYCLING:
+        if end_to_end_distance > 100 * 1000 and overall_speed > FORTY_KMPH:
+            return ecwm.MotionTypes.UNKNOWN
+
+    return None
+
+def is_air_section(filtered_section_data,with_speeds_df):
     HUNDRED_KMPH = float(100 * 1000) / (60 * 60) # m/s
     ONE_FIFTY_KMPH = float(100 * 1000) / (60 * 60) # m/s
     end_to_end_distance = filtered_section_data.distance
@@ -436,6 +463,12 @@ def is_air_section(filtered_section_data, with_speeds_df):
 
 def _add_start_point(filtered_loc_df, raw_start_place, ts):
     raw_start_place_enter_loc_entry = _get_raw_place_enter_loc_entry(ts, raw_start_place)
+    if len(filtered_loc_df) == 0:
+        logging.debug("filtered_loc_df is empty - inserting the start_place_enter_loc_entry %s" %
+                      raw_start_place_enter_loc_entry)
+        _insert_new_entry(-1, filtered_loc_df, raw_start_place_enter_loc_entry)
+        return filtered_loc_df
+
     curr_first_point = filtered_loc_df.iloc[0]
     curr_first_loc = gj.GeoJSON.to_instance(curr_first_point["loc"])
     add_dist = ecc.calDistance(curr_first_loc.coordinates,
@@ -888,6 +921,11 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
     orig_start_ts = cleaned_trip_data.start_ts
     logging.debug("squishing mismatch: resetting trip start_loc %s to cleaned_start_place.location %s" %
                   (cleaned_trip_data.start_loc.coordinates, cleaned_start_place_data.location.coordinates))
+    if distance_delta > 100:
+        logging.debug("distance_delta = %s > 100, abandoning squish" %
+                      (distance_delta))
+        return
+
     # In order to make everything line up, we need to:
     # 1) compute the new trip start ~ 50m at 5km/hr = 36 secs
     # We will approximate to 30 secs to make it consistent with the other locations
