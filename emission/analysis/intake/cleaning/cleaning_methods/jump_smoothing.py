@@ -232,7 +232,7 @@ class SmoothZigzag(object):
         recomputed_threshold = cso.BoxplotOutlier(ignore_zeros = True).get_threshold(recomputed_speeds_df)
         # assert recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold].shape[0] == 0, "After first round, still have outliers %s" % recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold] 
         if recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold].shape[0] != 0:
-            logging.warn("After first round, still have outliers %s" % recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold])
+            logging.info("After first round, still have outliers %s" % recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold])
 
 
 class SmoothPosdap(object):

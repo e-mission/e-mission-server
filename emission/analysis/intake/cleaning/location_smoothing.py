@@ -175,7 +175,7 @@ def get_points_to_filter(section_points_df, outlier_algo, filtering_algo):
             to_delete_mask = np.logical_not(filtering_algo.inlier_mask_)
             return with_speeds_df[to_delete_mask]
         except Exception as e:
-            logging.exception("Caught error %s while processing section, skipping..." % e)
+            logging.info("Caught error %s while processing section, skipping..." % e)
             return None
     else:
         logging.debug("no filtering algo specified, returning None")
@@ -205,7 +205,7 @@ def get_filtered_points(section_df, outlier_algo, filtering_algo):
             filtering_algo.filter(with_speeds_df)
             return with_speeds_df[filtering_algo.inlier_mask_]
         except Exception as e:
-            print ("Caught error %s while processing section, skipping..." % e)
+            logging.info("Caught error %s while processing section, skipping..." % e)
             return with_speeds_df
     else:
         return with_speeds_df

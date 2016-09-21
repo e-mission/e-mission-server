@@ -189,6 +189,16 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             else:
                 speedDelta = np.nan
             speedThreshold = float(self.distance_threshold) / self.time_threshold
+            # http://www.huffingtonpost.com/hoppercom/the-worlds-20-longest-non-stop-flights_b_5994268.html
+            # Longest flight is 17 hours, which is the longest you can go without cell reception
+            # And even if you split an air flight that long into two, you will get some untracked time in the
+            # middle, so that's good.
+            TWELVE_HOURS = 12 * 60 * 60
+            if timeDelta > TWELVE_HOURS:
+                logging.debug("prev_point.ts = %s, curr_point.ts = %s, TWELVE_HOURS = %s, large gap = %s, ending trip" %
+                              (prev_point.ts, curr_point.ts, TWELVE_HOURS, curr_point.ts - prev_point.ts))
+                return True
+
             if (timeDelta > 2 * self.time_threshold and # We have been here for a while
                  speedDelta < speedThreshold): # we haven't moved very much
                 logging.debug("prev_point.ts = %s, curr_point.ts = %s, threshold = %s, large gap = %s, ending trip" %

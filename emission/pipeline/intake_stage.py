@@ -2,6 +2,9 @@ import sys
 import json
 import logging
 import numpy as np
+import arrow
+
+import emission.core.get_database as edb
 
 import emission.net.usercache.abstract_usercache_handler as euah
 import emission.net.usercache.abstract_usercache as enua
@@ -46,28 +49,51 @@ def run_intake_pipeline(process_number, uuid_list):
         if uuid is None:
             continue
 
+        # Hack until we delete these spurious entries
+        # https://github.com/e-mission/e-mission-server/issues/407#issuecomment-2484868
+
+        if edb.get_timeseries_db().find({"user_id": uuid}).count() == 0:
+            logging.debug("Found no entries for %s, skipping")
+            continue
+
         uh = euah.UserCacheHandler.getUserCacheHandler(uuid)
 
         logging.info("*" * 10 + "UUID %s: moving to long term" % uuid + "*" * 10)
+        print(str(arrow.now()) + "*" * 10 + "UUID %s: moving to long term" % uuid + "*" * 10)
+
         uh.moveToLongTerm()
 
+
         logging.info("*" * 10 + "UUID %s: filter accuracy if needed" % uuid + "*" * 10)
+        print(str(arrow.now()) + "*" * 10 + "UUID %s: filter accuracy if needed" % uuid + "*" * 10)
         eaicf.filter_accuracy(uuid)
+
         
         logging.info("*" * 10 + "UUID %s: segmenting into trips" % uuid + "*" * 10)
+        print(str(arrow.now()) + "*" * 10 + "UUID %s: segmenting into trips" % uuid + "*" * 10)
         eaist.segment_current_trips(uuid)
 
+
         logging.info("*" * 10 + "UUID %s: segmenting into sections" % uuid + "*" * 10)
+        print(str(arrow.now()) + "*" * 10 + "UUID %s: segmenting into sections" % uuid + "*" * 10)
         eaiss.segment_current_sections(uuid)
 
+
         logging.info("*" * 10 + "UUID %s: smoothing sections" % uuid + "*" * 10)
+        print(str(arrow.now()) + "*" * 10 + "UUID %s: smoothing sections" % uuid + "*" * 10)
         eaicl.filter_current_sections(uuid)
 
+
         logging.info("*" * 10 + "UUID %s: cleaning and resampling timeline" % uuid + "*" * 10)
+        print(str(arrow.now()) + "*" * 10 + "UUID %s: cleaning and resampling timeline" % uuid + "*" * 10)
         eaicr.clean_and_resample(uuid)
 
+
         logging.info("*" * 10 + "UUID %s: checking active mode trips to autocheck habits" % uuid + "*" * 10)
+        print(str(arrow.now()) + "*" * 10 + "UUID %s: checking active mode trips to autocheck habits" % uuid + "*" * 10)
         autocheck.reward_active_transportation(uuid)
 
+
         logging.info("*" * 10 + "UUID %s: storing views to cache" % uuid + "*" * 10)
+        print(str(arrow.now()) + "*" * 10 + "UUID %s: storing views to cache" % uuid + "*" * 10)
         uh.storeViewsToCache()

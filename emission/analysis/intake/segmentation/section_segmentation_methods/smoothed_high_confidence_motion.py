@@ -125,7 +125,7 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
             raw_section_df = location_points[(location_points.ts >= start_motion.ts) &
                                              (location_points.ts <= end_motion.ts)]
             if len(raw_section_df) == 0:
-                logging.warn("Found no location points between %s and %s" % (start_motion, end_motion))
+                logging.info("Found no location points between %s and %s" % (start_motion, end_motion))
             else:
                 logging.debug("with iloc, section start point = %s, section end point = %s" %
                               (ecwl.Location(raw_section_df.iloc[0]), ecwl.Location(raw_section_df.iloc[-1])))
