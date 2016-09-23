@@ -7,6 +7,7 @@ import uuid
 import attrdict as ad
 import time
 import geojson as gj
+import bson.objectid as boi
 
 # Our imports
 import emission.tests.common
@@ -50,12 +51,12 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
         self.curr_ts = int(time.time())
         for offset in range(self.curr_ts - 5 * 60, self.curr_ts, 30):
             for entry in self.entry_list:
-                entry["metadata"]["write_ts"] = offset * 1000
+                entry["metadata"]["write_ts"] = offset
             mauc.sync_phone_to_server(self.testUserUUID1, self.entry_list)
 
         for offset in range(self.curr_ts - 7 * 60 + 1, self.curr_ts - 2 * 60 + 1, 30):
             for entry in self.entry_list:
-                entry["metadata"]["write_ts"] = offset * 1000
+                entry["metadata"]["write_ts"] = offset
             mauc.sync_phone_to_server(self.testUserUUID2, self.entry_list)
             
         self.ios_activity_entry = json.load(open("emission/tests/data/netTests/ios.activity.txt"))
@@ -72,6 +73,10 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
                 entry["metadata"]["write_ts"] = offset
             mauc.sync_phone_to_server(self.testUserUUIDios, self.ios_entry_list)
 
+    def tearDown(self):
+        edb.get_usercache_db().remove({"user_id": self.testUserUUID1})
+        edb.get_usercache_db().remove({"user_id": self.testUserUUID2})
+        edb.get_usercache_db().remove({"user_id": self.testUserUUIDios})
 
     def testMoveToLongTerm(self):
         # 5 mins of data, every 30 secs = 10 entries per entry type. There are
@@ -108,7 +113,87 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
         # But all existing entries still in usercache for the second user
         self.assertEqual(len(self.uc2.getMessage()), 30)
         self.assertEqual(len(list(self.ts2.find_entries())), 0)
-    
+
+    def testMoveWhenEmpty(self):
+        # 5 mins of data, every 30 secs = 10 entries per entry type. There are
+        # 3 entry types, so 30 entries
+
+        # First all the entries are in the usercache
+        self.assertEqual(len(self.uc1.getMessage()), 30)
+        self.assertEqual(len(list(self.ts1.find_entries())), 0)
+
+        # Then we move entries for user1 into longterm
+        enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUID1).moveToLongTerm()
+
+        # So we end up with all user1 entries in longterm
+        self.assertEqual(len(self.uc1.getMessage()), 0)
+        self.assertEqual(len(list(self.ts1.find_entries())), 30)
+
+        # Add an invalid type
+        edb.get_usercache_db().insert({
+            'user_id': self.testUserUUID1,
+            '_id': boi.ObjectId('572d3621d282b8f30def7e85'),
+            'data': {u'transition': None,
+                     'currState': u'STATE_ONGOING_TRIP'},
+            'metadata': {'plugin': 'none',
+                         'write_ts': self.curr_ts - 25,
+                         'time_zone': u'America/Los_Angeles',
+                         'platform': u'ios',
+                         'key': u'statemachine/transition',
+                         'read_ts': self.curr_ts - 27,
+                         'type': u'message'}})
+
+
+        # Re-run long-term for the user
+        enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUID1).moveToLongTerm()
+
+        # That was stored in error_db, no errors in main body
+        self.assertEqual(edb.get_timeseries_error_db().find({"user_id": self.testUserUUID1}).count(), 1)
+        self.assertEqual(len(self.uc1.getMessage()), 0)
+        self.assertEqual(len(list(self.ts1.find_entries())), 30)
+
+    def testMoveDuplicateKey(self):
+        # 5 mins of data, every 30 secs = 10 entries per entry type. There are
+        # 3 entry types, so 30 entries
+
+        # First all the entries are in the usercache
+        self.assertEqual(len(self.uc1.getMessage()), 30)
+        self.assertEqual(len(list(self.ts1.find_entries())), 0)
+
+        # Store the entries before the move so that we can duplicate them later
+        entries_before_move = self.uc1.getMessage()
+
+        # Then we move entries for user1 into longterm
+        enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUID1).moveToLongTerm()
+
+        # So we end up with all user1 entries in longterm
+        self.assertEqual(len(self.uc1.getMessage()), 0)
+        self.assertEqual(len(list(self.ts1.find_entries())), 30)
+
+        # Put the same entries (with the same object IDs into the cache again)
+        edb.get_usercache_db().insert(entries_before_move)
+        self.assertEqual(len(self.uc1.getMessage()), 30)
+
+        self.assertEqual(len(self.uc2.getMessage()), 30)
+        # Also reset the user2 cache to be user1 so that we have a fresh supply of entries
+        update_result = edb.get_usercache_db().update({"user_id": self.testUserUUID2},
+                                      {"$set": {"user_id": self.testUserUUID1}},
+                                      multi=True)
+        logging.debug("update_result = %s" % update_result)
+
+        # Now, we should have 60 entries in the usercache (30 duplicates + 30 from user2)
+        self.assertEqual(len(self.uc1.getMessage()), 60)
+        self.assertEqual(len(list(self.ts1.find_entries())), 30)
+
+        edb.get_pipeline_state_db().remove({"user_id": self.testUserUUID1})
+
+        # Then we move entries for user1 into longterm again
+        enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUID1).moveToLongTerm()
+
+        # All the duplicates should have been ignored, and the new entries moved into the timeseries
+        self.assertEqual(len(self.uc1.getMessage()), 0)
+        self.assertEqual(len(list(self.ts1.find_entries())), 60)
+
     # The first query for every platform is likely to work 
     # because startTs = None and endTs, at least for iOS, is way out there
     # But on the next call, if we are multiplying by 1000, it won't work any more.
