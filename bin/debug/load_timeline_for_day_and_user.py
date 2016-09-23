@@ -14,6 +14,9 @@ if __name__ == '__main__':
     parser.add_argument("-n", "--make_new", action="store_true",
         help="specify whether the entries should overwrite existing ones (default) or create new ones")
 
+    parser.add_argument("-v", "--verbose",
+        help="after how many lines we should print a status message.")
+
     args = parser.parse_args()
     fn = args.timeline_filename
     print fn
@@ -23,8 +26,10 @@ if __name__ == '__main__':
     override_uuid = user.uuid
     print("After registration, %s -> %s" % (args.user_email, override_uuid))
     entries = json.load(open(fn), object_hook = bju.object_hook)
-    for entry in entries:
+    for i, entry in enumerate(entries):
         entry["user_id"] = override_uuid
         if args.make_new:
             del entry["_id"]
+        if args.verbose is not None and i % args.verbose == 0:
+            print "About to save %s" % entry
         tsdb.save(entry)

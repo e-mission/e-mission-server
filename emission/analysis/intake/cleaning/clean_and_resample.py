@@ -218,6 +218,9 @@ def get_filtered_place(raw_place):
                                                               filtered_place_data.location.coordinates[0])
         if reverse_geocoded_json is not None:
             filtered_place_data.display_name = format_result(reverse_geocoded_json)
+    except KeyError as e:
+        logging.info("nominatim result does not have an address, skipping")
+        logging.info(e)
     except:
         logging.exception("Unable to pre-fill reverse geocoded information, client has to do it")
 
@@ -332,22 +335,39 @@ def get_filtered_points(section, filtered_section_data):
             filtered_point_id_list))
 
     filtered_loc_df = remove_outliers(loc_entry_list, filtered_point_id_list)
+    if len(filtered_loc_df) == 0:
+        import emission.storage.timeseries.builtin_timeseries as estb
+
+        logging.info("Removed all locations from the list."
+            "Setting cleaned start + end = raw section start, so effectively zero distance")
+        section_start_loc = ts.get_entry_at_ts("background/filtered_location",
+                                               "data.ts", section.data.start_ts)
+        section_start_loc_df = ts.to_data_df("background/filtered_location", [section_start_loc])
+        logging.debug("section_start_loc_df = %s" % section_start_loc_df.iloc[0])
+        _set_extrapolated_vals_for_section(filtered_section_data,
+                                           section_start_loc_df.iloc[0],
+                                           section_start_loc_df.iloc[-1])
+        with_speeds_df = eaicl.add_dist_heading_speed(filtered_loc_df).dropna()
+        logging.info("Early return with df = %s" % with_speeds_df)
+        return with_speeds_df
 
     if section.data.start_stop is None:
-        logging.debug("Found first section, need to extrapolate start point")
+        logging.debug("Found first section, may need to extrapolate start point")
         raw_trip = ts.get_entry_from_id(esda.RAW_TRIP_KEY, section.data.trip_id)
         raw_start_place = ts.get_entry_from_id(esda.RAW_PLACE_KEY, raw_trip.data.start_place)
-        filtered_loc_df = _add_start_point(filtered_loc_df, raw_start_place, ts)
-        if _is_unknown_mark_needed(filtered_section_data, section, filtered_loc_df):
-            # UGLY! UGLY! Fix when we fix
-            # https://github.com/e-mission/e-mission-server/issues/388
-            section["data"]["sensed_mode"] = ecwm.MotionTypes.UNKNOWN
+        if not is_place_bogus(loc_entry_list, 0, filtered_point_id_list, raw_start_place):
+            filtered_loc_df = _add_start_point(filtered_loc_df, raw_start_place, ts)
+            if _is_unknown_mark_needed(filtered_section_data, section, filtered_loc_df):
+                # UGLY! UGLY! Fix when we fix
+                # https://github.com/e-mission/e-mission-server/issues/388
+                section["data"]["sensed_mode"] = ecwm.MotionTypes.UNKNOWN
 
     if section.data.end_stop is None:
         logging.debug("Found last section, may need to extrapolate end point")
         raw_trip = ts.get_entry_from_id(esda.RAW_TRIP_KEY, section.data.trip_id)
         raw_end_place = ts.get_entry_from_id(esda.RAW_PLACE_KEY, raw_trip.data.end_place)
-        filtered_loc_df = _add_end_point(filtered_loc_df, raw_end_place, ts)
+        if not is_place_bogus(loc_entry_list, -1, filtered_point_id_list, raw_end_place):
+            filtered_loc_df = _add_end_point(filtered_loc_df, raw_end_place, ts)
 
     # Can move this up to get_filtered_section if we want to ensure that we
     # don't touch filtered_section_data in here
@@ -377,6 +397,23 @@ def get_filtered_points(section, filtered_section_data):
     logging.debug("get_filtered_points(%s points) = %s points" %
                   (len(loc_entry_list), len(with_speeds_df_nona)))
     return with_speeds_df_nona
+
+def is_place_bogus(loc_entry_list, loc_index, filtered_point_id_list, raw_start_place):
+    curr_loc = loc_entry_list[loc_index]
+    logging.debug("At index %s, loc is %s" % (loc_index, curr_loc.get_id()))
+    if curr_loc.get_id() in filtered_point_id_list:
+        logging.debug("First point %s (%s) was filtered, raw_start_place %s (%s) may be bogus" %
+                      (curr_loc.get_id(), curr_loc.data.loc.coordinates,
+                      raw_start_place.get_id(), raw_start_place.data.location.coordinates))
+        place_to_point_dist = ecc.calDistance(curr_loc.data.loc.coordinates,
+                                              raw_start_place.data.location.coordinates)
+        # If the start place is also bogus, no point in joining to it
+        if place_to_point_dist < 100:
+            logging.debug("place_to_point_dist = %s, previous place is also bogus, skipping extrapolation" %
+                          place_to_point_dist)
+            return True
+    #else
+    return False
 
 def _is_unknown_mark_needed(filtered_section_data, section, filtered_loc_df):
     import emission.analysis.intake.cleaning.cleaning_methods.speed_outlier_detection as eaiccs
@@ -463,11 +500,6 @@ def is_air_section(filtered_section_data,with_speeds_df):
 
 def _add_start_point(filtered_loc_df, raw_start_place, ts):
     raw_start_place_enter_loc_entry = _get_raw_place_enter_loc_entry(ts, raw_start_place)
-    if len(filtered_loc_df) == 0:
-        logging.debug("filtered_loc_df is empty - inserting the start_place_enter_loc_entry %s" %
-                      raw_start_place_enter_loc_entry)
-        _insert_new_entry(-1, filtered_loc_df, raw_start_place_enter_loc_entry)
-        return filtered_loc_df
 
     curr_first_point = filtered_loc_df.iloc[0]
     curr_first_loc = gj.GeoJSON.to_instance(curr_first_point["loc"])
@@ -1004,19 +1036,19 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
                               esda.get_time_query_for_trip_like(esda.CLEANED_SECTION_KEY, first_section.get_id()))
     loc_df.rename(columns={"speed": "from_points_speed", "distance": "from_points_distance"}, inplace=True)
     with_speeds_df = eaicl.add_dist_heading_speed(loc_df)
-    if not compare_rounded_arrays(with_speeds_df.speed.tolist(), first_section_data["speeds"], 10):
+    if not ecc.compare_rounded_arrays(with_speeds_df.speed.tolist(), first_section_data["speeds"], 10):
         logging.error("%s != %s" % (with_speeds_df.speed.tolist()[:10], first_section_data["speeds"][:10]))
         assert False
 
-    if not compare_rounded_arrays(with_speeds_df.distance.tolist(), first_section_data["distances"], 10):
+    if not ecc.compare_rounded_arrays(with_speeds_df.distance.tolist(), first_section_data["distances"], 10):
         logging.error("%s != %s" % (with_speeds_df.distance.tolist()[:10], first_section_data["distances"][:10]))
         assert False
 
-    if not compare_rounded_arrays(with_speeds_df.speed.tolist(), with_speeds_df.from_points_speed.tolist(), 10):
+    if not ecc.compare_rounded_arrays(with_speeds_df.speed.tolist(), with_speeds_df.from_points_speed.tolist(), 10):
         logging.error("%s != %s" % (with_speeds_df.speed.tolist()[:10], with_speeds_df.from_points_speed.tolist()[:10]))
         assert False
 
-    if not compare_rounded_arrays(with_speeds_df.distance.tolist(), with_speeds_df.from_points_distance.tolist(), 10):
+    if not ecc.compare_rounded_arrays(with_speeds_df.distance.tolist(), with_speeds_df.from_points_distance.tolist(), 10):
         logging.error("%s != %s" % (with_speeds_df.distance.tolist()[:10], with_speeds_df.from_points_distance.tolist()[:10]))
         assert False
 
@@ -1057,10 +1089,6 @@ def _is_squished_untracked(raw_trip, raw_trip_list, trip_map):
     logging.debug("_is_squished_untracked: distance to next clean start (%s) = %s < 100, returning True" %
                   (next_unsquished_trip.get_id(), next_distance))
     return True
-
-def compare_rounded_arrays(arr1, arr2, digits):
-    round2n = lambda x: round(x, digits)
-    return map(round2n, arr1) == map(round2n, arr2)
 
 def format_result(rev_geo_result):
     get_fine = lambda rgr: get_with_fallbacks(rgr["address"], ["road", "neighbourhood"])

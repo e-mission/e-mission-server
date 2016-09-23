@@ -75,7 +75,7 @@ class TestLocationSmoothing(unittest.TestCase):
         classicJumpSections1 = [s for s in self.section_entries
                                 if s.data.trip_id == classicJumpTrip1.get_id()]
         outlier_algo = eaics.BoxplotOutlier()
-        jump_algo = eaicj.SmoothZigzag()
+        jump_algo = eaicj.SmoothZigzag(False, 100)
 
         for i, section_entry in enumerate(classicJumpSections1):
             logging.debug("-" * 20 + "Considering section %s" % i + "-" * 20)
@@ -113,7 +113,7 @@ class TestLocationSmoothing(unittest.TestCase):
         classicJumpSections1 = [s for s in self.section_entries
                                 if s.data.trip_id == classicJumpTrip1.get_id()]
         outlier_algo = eaics.BoxplotOutlier()
-        jump_algo = eaicj.SmoothZigzag()
+        jump_algo = eaicj.SmoothZigzag(False, 100)
 
         for i, section_entry in enumerate(classicJumpSections1):
             logging.debug("-" * 20 + "Considering section %s" % i + "-" * 20)
@@ -147,7 +147,7 @@ class TestLocationSmoothing(unittest.TestCase):
         classicJumpSections1 = [s for s in self.section_entries
                                 if s.data.trip_id == classicJumpTrip1.get_id()]
         outlier_algo = eaics.BoxplotOutlier()
-        jump_algo = eaicj.SmoothZigzag()
+        jump_algo = eaicj.SmoothZigzag(False, 100)
 
         for i, section_entry in enumerate(classicJumpSections1):
             logging.debug("-" * 20 + "Considering section %s" % i + "-" * 20)

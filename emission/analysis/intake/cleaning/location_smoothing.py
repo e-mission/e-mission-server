@@ -33,6 +33,8 @@ import emission.core.common as ec
 
 np.set_printoptions(suppress=True)
 
+# This is what we use in the segmentation code to see if the points are "the same"
+DEFAULT_SAME_POINT_DISTANCE = 100
 
 def recalc_speed(points_df):
     """
@@ -117,14 +119,16 @@ def filter_jumps(user_id, section_id):
 
     logging.debug("filter_jumps(%s, %s) called" % (user_id, section_id))
     outlier_algo = eaico.BoxplotOutlier()
-    filtering_algo = eaicj.SmoothZigzag()
 
     tq = esda.get_time_query_for_trip_like(esda.RAW_SECTION_KEY, section_id)
     ts = esta.TimeSeries.get_time_series(user_id)
     section_points_df = ts.get_data_df("background/filtered_location", tq)
-    if section_points_df["filter"].unique().tolist() == ["distance"]:
+    is_ios = section_points_df["filter"].dropna().unique().tolist() == ["distance"]
+    if is_ios:
         logging.debug("Found iOS section, filling in gaps with fake data")
         section_points_df = _ios_fill_fake_data(section_points_df)
+    filtering_algo = eaicj.SmoothZigzag(is_ios, DEFAULT_SAME_POINT_DISTANCE)
+
     logging.debug("len(section_points_df) = %s" % len(section_points_df))
     points_to_ignore_df = get_points_to_filter(section_points_df, outlier_algo, filtering_algo)
     if points_to_ignore_df is None:
@@ -211,13 +215,16 @@ def get_filtered_points(section_df, outlier_algo, filtering_algo):
         return with_speeds_df
 
 def _ios_fill_fake_data(locs_df):
-    # This is what we use in the segmentation code to see if the points are "the same"
-    DEFAULT_SAME_POINT_DISTANCE = 100
     diff_ts = locs_df.ts.diff()
-    fill_ends = diff_ts[diff_ts > 60].index
+    fill_ends = diff_ts[diff_ts > 60].index.tolist()
+
     if len(fill_ends) == 0:
         logging.debug("No large gaps found, no gaps to fill")
         return locs_df
+    else:
+        logging.debug("Found %s large gaps, filling them all" % len(fill_ends))
+
+    filled_df = locs_df
 
     for end in fill_ends:
         logging.debug("Found large gap ending at %s, filling it" % end)
@@ -228,7 +235,7 @@ def _ios_fill_fake_data(locs_df):
         if ecc.calDistance(start_point, end_point) > DEFAULT_SAME_POINT_DISTANCE:
             logging.debug("Distance between %s and %s = %s, adding noise is not enough, skipping..." %
                           (start_point, end_point, ecc.calDistance(start_point, end_point)))
-            return locs_df
+            continue
 
         # else
         # Design from https://github.com/e-mission/e-mission-server/issues/391#issuecomment-247246781
@@ -253,9 +260,11 @@ def _ios_fill_fake_data(locs_df):
         fill_df = pd.DataFrame(
             {"ts": ts_fill, "longitude": lng_fill, "latitude": lat_fill,
              "loc": loc_fill})
-        filled_df = pd.concat([locs_df, fill_df]).sort("ts").reset_index()
-        logging.debug("after filling, returning head = %s, tail = %s" %
-                      (filled_df[["fmt_time", "ts", "latitude", "longitude", "metadata_write_ts"]].head(),
-                       filled_df[["fmt_time", "ts", "latitude", "longitude", "metadata_write_ts"]].tail()))
-        return filled_df
+        filled_df = pd.concat([filled_df, fill_df])
+
+    sorted_filled_df = filled_df.sort("ts").reset_index()
+    logging.debug("after filling, returning head = %s, tail = %s" %
+                  (sorted_filled_df[["fmt_time", "ts", "latitude", "longitude", "metadata_write_ts"]].head(),
+                   sorted_filled_df[["fmt_time", "ts", "latitude", "longitude", "metadata_write_ts"]].tail()))
+    return sorted_filled_df
 
