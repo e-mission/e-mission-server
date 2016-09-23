@@ -352,20 +352,22 @@ def get_filtered_points(section, filtered_section_data):
         return with_speeds_df
 
     if section.data.start_stop is None:
-        logging.debug("Found first section, need to extrapolate start point")
+        logging.debug("Found first section, may need to extrapolate start point")
         raw_trip = ts.get_entry_from_id(esda.RAW_TRIP_KEY, section.data.trip_id)
         raw_start_place = ts.get_entry_from_id(esda.RAW_PLACE_KEY, raw_trip.data.start_place)
-        filtered_loc_df = _add_start_point(filtered_loc_df, raw_start_place, ts)
-        if _is_unknown_mark_needed(filtered_section_data, section, filtered_loc_df):
-            # UGLY! UGLY! Fix when we fix
-            # https://github.com/e-mission/e-mission-server/issues/388
-            section["data"]["sensed_mode"] = ecwm.MotionTypes.UNKNOWN
+        if not is_place_bogus(loc_entry_list, 0, filtered_point_id_list, raw_start_place):
+            filtered_loc_df = _add_start_point(filtered_loc_df, raw_start_place, ts)
+            if _is_unknown_mark_needed(filtered_section_data, section, filtered_loc_df):
+                # UGLY! UGLY! Fix when we fix
+                # https://github.com/e-mission/e-mission-server/issues/388
+                section["data"]["sensed_mode"] = ecwm.MotionTypes.UNKNOWN
 
     if section.data.end_stop is None:
         logging.debug("Found last section, may need to extrapolate end point")
         raw_trip = ts.get_entry_from_id(esda.RAW_TRIP_KEY, section.data.trip_id)
         raw_end_place = ts.get_entry_from_id(esda.RAW_PLACE_KEY, raw_trip.data.end_place)
-        filtered_loc_df = _add_end_point(filtered_loc_df, raw_end_place, ts)
+        if not is_place_bogus(loc_entry_list, -1, filtered_point_id_list, raw_end_place):
+            filtered_loc_df = _add_end_point(filtered_loc_df, raw_end_place, ts)
 
     # Can move this up to get_filtered_section if we want to ensure that we
     # don't touch filtered_section_data in here
@@ -395,6 +397,23 @@ def get_filtered_points(section, filtered_section_data):
     logging.debug("get_filtered_points(%s points) = %s points" %
                   (len(loc_entry_list), len(with_speeds_df_nona)))
     return with_speeds_df_nona
+
+def is_place_bogus(loc_entry_list, loc_index, filtered_point_id_list, raw_start_place):
+    curr_loc = loc_entry_list[loc_index]
+    logging.debug("At index %s, loc is %s" % (loc_index, curr_loc.get_id()))
+    if curr_loc.get_id() in filtered_point_id_list:
+        logging.debug("First point %s (%s) was filtered, raw_start_place %s (%s) may be bogus" %
+                      (curr_loc.get_id(), curr_loc.data.loc.coordinates,
+                      raw_start_place.get_id(), raw_start_place.data.location.coordinates))
+        place_to_point_dist = ecc.calDistance(curr_loc.data.loc.coordinates,
+                                              raw_start_place.data.location.coordinates)
+        # If the start place is also bogus, no point in joining to it
+        if place_to_point_dist < 100:
+            logging.debug("place_to_point_dist = %s, previous place is also bogus, skipping extrapolation" %
+                          place_to_point_dist)
+            return True
+    #else
+    return False
 
 def _is_unknown_mark_needed(filtered_section_data, section, filtered_loc_df):
     import emission.analysis.intake.cleaning.cleaning_methods.speed_outlier_detection as eaiccs
