@@ -80,7 +80,14 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
                 except pymongo.errors.DuplicateKeyError as e:
                     logging.info("document already present in error timeseries, skipping since read-only")
 
-        ts.bulk_insert(unified_entry_list, etsa.EntryType.DATA_TYPE)
+        if len(unified_entry_list) > 0:
+            try:
+                ts.bulk_insert(unified_entry_list, etsa.EntryType.DATA_TYPE)
+            except pymongo.errors.DuplicateKeyError as e:
+                logging.info("document already present in timeseries, skipping since read-only")
+        else:
+            logging.info("In moveToLongTerm, no entries to save")
+
         logging.debug("Deleting all entries for query %s" % time_query)
         uc.clearProcessedMessages(time_query)
         esp.mark_usercache_done(self.user_id, last_ts_processed)
