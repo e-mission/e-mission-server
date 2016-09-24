@@ -20,6 +20,7 @@ import logging
 # Our imports
 import emission.storage.pipeline_queries as epq
 import emission.storage.timeseries.abstract_timeseries as esta
+import emission.storage.timeseries.aggregate_timeseries as estag
 
 def check_prior_duplicate(df, idx, entry):
     """
@@ -61,9 +62,17 @@ def convert_to_filtered(entry):
     entry["metadata"]["key"] = "background/filtered_location"
     return entry
 
+def continuous_collection_in_range(timeseries):
+    return timeseries.user_id in estag.TEST_PHONE_IDS
+
 def filter_accuracy(user_id):
     time_query = epq.get_time_range_for_accuracy_filtering(user_id)
     timeseries = esta.TimeSeries.get_time_series(user_id)
+    if not continuous_collection_in_range(timeseries):
+        logging.debug("Not a public phone, must already have filtered data, early return")
+        epq.mark_accuracy_filtering_done(user_id, None)
+        return
+
     try:
         unfiltered_points_df = timeseries.get_data_df("background/location", time_query)
         if len(unfiltered_points_df) == 0:

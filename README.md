@@ -74,6 +74,15 @@ Here are the steps for doing this:
 
         $ mongod
 
+1. Copy the following sample files. You should also configure the servers and keys in them if you wish to test the associated features, but can leave them filled with dummy values if you don't.
+
+        # For the location -> name reverse lookup. Client will lookup if not populated.
+        $ cp conf/net/ext_service/nominatim.json.sample conf/net/ext_service/nominatim.json
+        # Store entries to the stats database. Currently required, dependency should be removed soon
+        $ cp conf/net/int_service/giles_conf.json.sample conf/net/int_service/giles_conf.json
+        # Game integration.
+        $ cp conf/net/ext_service/habitica.json.sample conf/net/int_service/habitica.json
+
 1. Start the server
 
         $ ./e-mission-py.bash emission/net/api/cfc_webapp.py
@@ -91,19 +100,17 @@ You may also want to load some test data.
 
 1. Sample timeline data from the data collection eval is available in the [data-collection-eval repo](https://github.com/shankari/data-collection-eval).
 2. You can choose to load either android data `results_dec_2015/ucb.sdb.android.{1,2,3}/timeseries/*` or iOS data `results_dec_2015/ucb.sdb.ios.{1,2,3}/timeseries/*`
-3. Data is loaded using the `bin/debug/load_timeline_for_day_and_user.py`.
-  * Running it with just a timeline file loads the data with the original user - e.g.
+3. Data is loaded using the `bin/debug/load_timeline_for_day_and_user.py`. It
+requires a timeline file and a user that the timeline is being loaded as. If
+you wish to view this timeline in the UI after processing it, you need to
+login with this email.
 
             $ cd ..../e-mission-server
-            $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py /tmp/data-collection-eval/results_dec_2015/ucb.sdb.android.1/timeseries/active_day_2.2015-11-27
+            $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py /tmp/data-collection-eval/results_dec_2015/ucb.sdb.android.1/timeseries/active_day_2.2015-11-27 shankari@eecs.berkeley.edu
         
-  * Running it with a timeline file and a user relabels the data as being from the specified user and then loads it - e.g.
+4. Note that loading the data retains the object IDs. This means that if you load the same data twice with different user IDs, then only the second one will stick. In other words, if you load the file as `user1@foo.edu` and then load the same file as `user2@foo.edu`, you will only have data for `user2@foo.edu` in the database. This can be overwritten using the `--make-new` flag - e.g.
 
-            $ cd ..../e-mission-server
-            $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py /tmp/data-collection-eval/results_dec_2015/ucb.sdb.android.1/timeseries/active_day_2.2015-11-27 -u shankari@eecs.berkeley.edu
-        
-4. Note that loading the data retains the object IDs. This means that if you load the same data twice with different user IDs, then only the second one will stick. In other words, if you load the file as `user1@foo.edu` and then load the same file as `user2@foo.edu`, you will only have data for `user2@foo.edu` in the database.
-
+            $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py -n /tmp/data-collection-eval/results_dec_2015/ucb.sdb.android.1/timeseries/active_day_2.2015-11-27 shankari@eecs.berkeley.edu
 
 ### Creating fake user data ###
 
@@ -124,7 +131,7 @@ run the script with
     
     $ python emission/simulation/trip_gen.py <user_name>
 
-Because this user data is specifically designed to test our tour model creation, you can create fake tour models easily by running the make_tour_model_from_fake_data function in emission/storage/decorations/tour_model_queries.py
+Because this user data is specifically designed to test our tour model creation, you can create fake tour models easily by running the `make_tour_model_from_fake_data` function in `emission/storage/decorations/tour_model_queries.py`
 
 
 ### Running the analysis pipeline ###
@@ -134,6 +141,10 @@ Once you have loaded the timeline, you probably want to segment it into trips an
     $ ./e-mission-py.bash bin/intake_stage.py
     
 Once the script is done running, places, trips, sections and stops would have been generated and stored in their respective mongodb tables, and the timelines for the last 7 days have been stored in the usercache.
+
+We also do some modelling on the generated data. This is much more time-intensive than the intake, but also does not need to run at the same frequency as the intake pipeline. So it is pulled out to its own pipeline. If you want to work on the modelling, you need to run this pipeline as well.
+
+    $ ./e-mission-py.bash bin/model_stage.py
 
 ### Running unit tests ###
 

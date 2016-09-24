@@ -25,12 +25,17 @@ def calSpeed(point1, point2):
     if (timeDelta == 0):
         # logging.debug("timeDelta = 0, distanceDelta = %s, returning speed = 0" % distanceDelta)
         if (distanceDelta > 0.01):
-            # While converting ms -> secs on the server, we were treating the ms as a int.
-            # This meant that we frequently got the same value, specially with fast sampling.
-            # Let us turn off the assert and log an error message for now.
-            # Once the float is back, we can remove this and see if it recurs
-            logging.error("Distance between points %s, %s is %s, although the time delta = 0" %
-                (point1, point2, distanceDelta))
+            # The float is back, but the error persists, specially on iOS data.
+            # [-117.8805108778835, 33.89008340952731]
+            # [-117.8805008149502, 33.88954523082551]
+            # u'ts': 1466115972.178098,
+            # u'ts': 1466115972.178098,
+            # Distance between points ... 59.8499494256
+            # happens fairly frequently actually
+            # https://github.com/e-mission/e-mission-server/issues/407#issuecomment-248974661
+            # logging.debug("Distance between points %s, %s is %s, although the time delta = 0" %
+            #     (point1, point2, distanceDelta))
+            pass
             # assert(distanceDelta < 0.01)
         return 0
 

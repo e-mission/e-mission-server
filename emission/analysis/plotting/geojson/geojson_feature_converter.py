@@ -12,6 +12,7 @@ import emission.storage.decorations.timeline as esdtl
 
 import emission.core.wrapper.location as ecwl
 import emission.core.wrapper.entry as ecwe
+import emission.core.common as ecc
 
 # TODO: Move this to the section_features class instead
 import emission.analysis.intake.cleaning.location_smoothing as eaicl
@@ -111,7 +112,9 @@ def section_to_geojson(section, tl):
     if len(section_location_entries) != 0:
         logging.debug("first element in section_location_array = %s" % section_location_entries[0])
 
-        if section_location_entries[-1].data.loc != section.data.end_loc:
+        if not ecc.compare_rounded_arrays(section.data.end_loc.coordinates,
+                                      section_location_entries[-1].data.loc.coordinates,
+                                      digits=4):
             logging.info("section_location_array[-1].data.loc %s != section.data.end_loc %s even after df.ts fix, filling gap" % \
                     (section_location_entries[-1].data.loc, section.data.end_loc))
             assert(False)

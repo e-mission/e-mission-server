@@ -507,3 +507,7 @@ def calDistance(point1, point2, coordinates=False):
 
     return d
 
+def compare_rounded_arrays(arr1, arr2, digits):
+    round2n = lambda x: round(x, digits)
+    return map(round2n, arr1) == map(round2n, arr2)
+

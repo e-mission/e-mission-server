@@ -21,7 +21,8 @@ def del_objects(args):
     trip_query = copy.copy(del_query)
     trip_query.update({"metadata.key": {
         "$in": ["segmentation/raw_trip", "analysis/cleaned_trip",
-                "segmentation/raw_section", "analysis/cleaned_section"]}})
+                "segmentation/raw_section", "analysis/cleaned_section",
+                "segmentation/raw_untracked", "analysis/cleaned_untracked"]}})
 
     place_query = copy.copy(del_query)
     place_query.update({"metadata.key": {

@@ -33,6 +33,8 @@ import emission.core.common as ec
 
 np.set_printoptions(suppress=True)
 
+# This is what we use in the segmentation code to see if the points are "the same"
+DEFAULT_SAME_POINT_DISTANCE = 100
 
 def recalc_speed(points_df):
     """
@@ -117,14 +119,16 @@ def filter_jumps(user_id, section_id):
 
     logging.debug("filter_jumps(%s, %s) called" % (user_id, section_id))
     outlier_algo = eaico.BoxplotOutlier()
-    filtering_algo = eaicj.SmoothZigzag()
 
     tq = esda.get_time_query_for_trip_like(esda.RAW_SECTION_KEY, section_id)
     ts = esta.TimeSeries.get_time_series(user_id)
     section_points_df = ts.get_data_df("background/filtered_location", tq)
-    if section_points_df["filter"].unique().tolist() == ["distance"]:
+    is_ios = section_points_df["filter"].dropna().unique().tolist() == ["distance"]
+    if is_ios:
         logging.debug("Found iOS section, filling in gaps with fake data")
         section_points_df = _ios_fill_fake_data(section_points_df)
+    filtering_algo = eaicj.SmoothZigzag(is_ios, DEFAULT_SAME_POINT_DISTANCE)
+
     logging.debug("len(section_points_df) = %s" % len(section_points_df))
     points_to_ignore_df = get_points_to_filter(section_points_df, outlier_algo, filtering_algo)
     if points_to_ignore_df is None:
@@ -135,7 +139,7 @@ def filter_jumps(user_id, section_id):
                   (len(points_to_ignore_df), len(points_to_ignore_df_filtered)))
     # We shouldn't really filter any fuzzed points because they represent 100m in 60 secs
     # but let's actually check for that
-    assert len(points_to_ignore_df) == len(points_to_ignore_df_filtered)
+    # assert len(points_to_ignore_df) == len(points_to_ignore_df_filtered)
     deleted_point_id_list = list(points_to_ignore_df_filtered)
     logging.debug("deleted %s points" % len(deleted_point_id_list))
 
@@ -175,7 +179,7 @@ def get_points_to_filter(section_points_df, outlier_algo, filtering_algo):
             to_delete_mask = np.logical_not(filtering_algo.inlier_mask_)
             return with_speeds_df[to_delete_mask]
         except Exception as e:
-            logging.exception("Caught error %s while processing section, skipping..." % e)
+            logging.info("Caught error %s while processing section, skipping..." % e)
             return None
     else:
         logging.debug("no filtering algo specified, returning None")
@@ -205,19 +209,22 @@ def get_filtered_points(section_df, outlier_algo, filtering_algo):
             filtering_algo.filter(with_speeds_df)
             return with_speeds_df[filtering_algo.inlier_mask_]
         except Exception as e:
-            print ("Caught error %s while processing section, skipping..." % e)
+            logging.info("Caught error %s while processing section, skipping..." % e)
             return with_speeds_df
     else:
         return with_speeds_df
 
 def _ios_fill_fake_data(locs_df):
-    # This is what we use in the segmentation code to see if the points are "the same"
-    DEFAULT_SAME_POINT_DISTANCE = 100
     diff_ts = locs_df.ts.diff()
-    fill_ends = diff_ts[diff_ts > 60].index
+    fill_ends = diff_ts[diff_ts > 60].index.tolist()
+
     if len(fill_ends) == 0:
         logging.debug("No large gaps found, no gaps to fill")
         return locs_df
+    else:
+        logging.debug("Found %s large gaps, filling them all" % len(fill_ends))
+
+    filled_df = locs_df
 
     for end in fill_ends:
         logging.debug("Found large gap ending at %s, filling it" % end)
@@ -228,11 +235,13 @@ def _ios_fill_fake_data(locs_df):
         if ecc.calDistance(start_point, end_point) > DEFAULT_SAME_POINT_DISTANCE:
             logging.debug("Distance between %s and %s = %s, adding noise is not enough, skipping..." %
                           (start_point, end_point, ecc.calDistance(start_point, end_point)))
-            return locs_df
+            continue
 
         # else
         # Design from https://github.com/e-mission/e-mission-server/issues/391#issuecomment-247246781
-        ts_fill = locs_df.ts[end] + np.arange(locs_df.ts[start] + 60, locs_df.ts[end], 60)
+        logging.debug("start = %s, end = %s, generating entries between %s and %s" %
+            (start, end, locs_df.ts[start], locs_df.ts[end]))
+        ts_fill = np.arange(locs_df.ts[start] + 60, locs_df.ts[end], 60)
         # We only pick entries that are *greater than* 60 apart
         assert len(ts_fill) > 0
         dist_fill = np.random.uniform(low=0, high=100, size=len(ts_fill))
@@ -251,9 +260,11 @@ def _ios_fill_fake_data(locs_df):
         fill_df = pd.DataFrame(
             {"ts": ts_fill, "longitude": lng_fill, "latitude": lat_fill,
              "loc": loc_fill})
-        filled_df = pd.concat([locs_df, fill_df]).reset_index().sort("ts")
-        logging.debug("after filling, returning head = %s, tail = %s" %
-                      (filled_df[["fmt_time", "ts", "latitude", "longitude", "metadata_write_ts"]].head(),
-                       filled_df[["fmt_time", "ts", "latitude", "longitude", "metadata_write_ts"]].tail()))
-        return filled_df
+        filled_df = pd.concat([filled_df, fill_df])
+
+    sorted_filled_df = filled_df.sort("ts").reset_index()
+    logging.debug("after filling, returning head = %s, tail = %s" %
+                  (sorted_filled_df[["fmt_time", "ts", "latitude", "longitude", "metadata_write_ts"]].head(),
+                   sorted_filled_df[["fmt_time", "ts", "latitude", "longitude", "metadata_write_ts"]].tail()))
+    return sorted_filled_df
 

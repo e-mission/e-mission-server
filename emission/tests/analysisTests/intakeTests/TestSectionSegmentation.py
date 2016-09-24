@@ -3,6 +3,8 @@ import unittest
 import datetime as pydt
 import logging
 import json
+import bson.json_util as bju
+import uuid
 
 # Our imports
 import emission.core.get_database as edb
@@ -35,7 +37,9 @@ class TestSectionSegmentation(unittest.TestCase):
         self.androidUUID = self.testUUID
         eaicf.filter_accuracy(self.androidUUID)
 
-        etc.setupRealExample(self, "emission/tests/data/real_examples/iphone_2015-11-06")
+        self.testUUID = uuid.UUID("c76a0487-7e5a-3b17-a449-47be666b36f6")
+        self.entries = json.load(open("emission/tests/data/real_examples/iphone_2015-11-06"), object_hook = bju.object_hook)
+        etc.setupRealExampleWithEntries(self)
         self.iosUUID = self.testUUID
         eaicf.filter_accuracy(self.iosUUID)
 
@@ -45,8 +49,10 @@ class TestSectionSegmentation(unittest.TestCase):
     def clearRelatedDb(self):
         edb.get_timeseries_db().remove({"user_id": self.androidUUID})
         edb.get_analysis_timeseries_db().remove({"user_id": self.androidUUID})
+        edb.get_pipeline_state_db().remove({"user_id": self.androidUUID})
         edb.get_timeseries_db().remove({"user_id": self.iosUUID})
         edb.get_analysis_timeseries_db().remove({"user_id": self.iosUUID})
+        edb.get_pipeline_state_db().remove({"user_id": self.iosUUID})
 
     def testSegmentationPointsSmoothedHighConfidenceMotion(self):
         ts = esta.TimeSeries.get_time_series(self.androidUUID)
@@ -200,7 +206,7 @@ class TestSectionSegmentation(unittest.TestCase):
         created_trips = esda.get_entries(esda.RAW_TRIP_KEY, self.iosUUID,
                                          tq_trip)
 
-        self.assertEqual(len(created_trips), 3)
+        self.assertEqual(len(created_trips), 2)
         logging.debug("created trips = %s" % created_trips)
 
         sections_stops = [(len(esdt.get_raw_sections_for_trip(self.iosUUID, trip.get_id())),
@@ -210,7 +216,7 @@ class TestSectionSegmentation(unittest.TestCase):
         self.assertEqual(len(sections_stops), len(created_trips))
         # The expected value was copy-pasted from the debug statement above
         self.assertEqual(sections_stops,
-                         [(0, 0), (6, 5), (6, 5)])
+                         [(0, 0), (11, 10)])
 
 
 if __name__ == '__main__':

@@ -12,11 +12,12 @@ import random
 import emission.core.get_database as edb
 
 
-
-key_file = open('conf/net/keys.json')
-key_data = json.load(key_file)
-url = key_data["habitica"]["url"]
-
+try:
+    key_file = open('conf/net/ext_service/habitica.json')
+    key_data = json.load(key_file)
+    url = key_data["url"]
+except:
+    logging.exception("habitica not configured, game functions not supported")
 
 
 def habiticaRegister(username, email, password, our_uuid):
@@ -141,8 +142,9 @@ def setup_party(user_id, group_id_from_url, inviterId):
       invite_uri = "/api/v3/groups/"+group_id+"/invite"
       logging.debug("invite user to party api url = %s" % invite_uri)
       user_val = list(edb.get_habitica_db().find({"user_id": user_id}))[0]
-      method_args = {'uuids': [inviterId], 'inviter': group_id, 'emails': []}
-      response = habiticaProxy(inviterId, 'POST', invite_uri, method_args)
+      method_args = {'uuids': [user_val['habitica_id']], 'inviter': group_id, 'emails': []}
+      emInviterId = edb.get_habitica_db().find_one({"habitica_id": inviterId})["user_id"]
+      response = habiticaProxy(emInviterId, 'POST', invite_uri, method_args)
       logging.debug("invite user to party response = %s" % response)
       join_url = "/api/v3/groups/"+group_id+"/join"
       response2 = habiticaProxy(user_id, 'POST', join_url, {})

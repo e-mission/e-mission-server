@@ -3,6 +3,8 @@ import unittest
 import datetime as pydt
 import logging
 import json
+import uuid
+import bson.json_util as bju
 
 # Our imports
 import emission.core.get_database as edb
@@ -28,15 +30,20 @@ class TestTripSegmentation(unittest.TestCase):
     def setUp(self):
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
         self.androidUUID = self.testUUID
-        etc.setupRealExample(self, "emission/tests/data/real_examples/iphone_2015-11-06")
+
+        self.testUUID = uuid.UUID("c76a0487-7e5a-3b17-a449-47be666b36f6")
+        self.entries = json.load(open("emission/tests/data/real_examples/iphone_2015-11-06"), object_hook = bju.object_hook)
+        etc.setupRealExampleWithEntries(self)
         self.iosUUID = self.testUUID
         eaicf.filter_accuracy(self.iosUUID)
         logging.debug("androidUUID = %s, iosUUID = %s" % (self.androidUUID, self.iosUUID))
 
     def tearDown(self):
         edb.get_timeseries_db().remove({"user_id": self.androidUUID}) 
-        edb.get_timeseries_db().remove({"user_id": self.iosUUID}) 
-        edb.get_analysis_timeseries_db().remove({"user_id": self.androidUUID}) 
+        edb.get_timeseries_db().remove({"user_id": self.iosUUID})
+        edb.get_pipeline_state_db().remove({"user_id": self.androidUUID})
+        edb.get_pipeline_state_db().remove({"user_id": self.iosUUID})
+        edb.get_analysis_timeseries_db().remove({"user_id": self.androidUUID})
         edb.get_analysis_timeseries_db().remove({"user_id": self.iosUUID}) 
 
     def testEmptyCall(self):
@@ -73,11 +80,11 @@ class TestTripSegmentation(unittest.TestCase):
         for (start, end) in segmentation_points:
             logging.debug("trip is from %s (%f) -> %s (%f)" % (start.fmt_time, start.ts, end.fmt_time, end.ts))
         self.assertIsNotNone(segmentation_points)
-        self.assertEqual(len(segmentation_points), 3)
+        self.assertEqual(len(segmentation_points), 2)
         self.assertEqual([start.ts for (start, end) in segmentation_points],
-                         [1446797042.282652, 1446821561.559255, 1446825828.465837])
+                         [1446797042.282652, 1446821561.559255])
         self.assertEqual([end.ts for (start, end) in segmentation_points],
-                         [1446797923.682973, 1446825092.302420, 1446828217.125328])
+                         [1446797923.682973, 1446828217.125328])
 
 
     def testSegmentationWrapperAndroid(self):
@@ -142,24 +149,24 @@ class TestTripSegmentation(unittest.TestCase):
         # We expect there to be 4 places, but the first one is that start of
         # the chain, so it has a start_time of None and it won't be retrieved
         # by the query on the start_time that we show here.
-        self.assertEqual(len(created_places_entries), 3)
-        self.assertEqual(len(created_trips_entries), 3)
+        self.assertEqual(len(created_places_entries), 2)
+        self.assertEqual(len(created_trips_entries), 2)
 
         # Pick the first two trips and the first place and ensure that they are all linked correctly
         # Note that this is the first place, not the second place because the true first place will not
         # be retrieved by the query, as shown above
         # The first trip here is a dummy trip, so let's check the second and third trip instead
-        trip0 = created_trips_entries[1]
-        trip1 = created_trips_entries[2]
-        place0 = created_places_entries[1]
+        trip0 = created_trips_entries[0]
+        trip1 = created_trips_entries[1]
+        place0 = created_places_entries[0]
 
         self.assertEqual(trip0.data.end_place, place0.get_id())
         self.assertEqual(trip1.data.start_place, place0.get_id())
         self.assertEqual(place0.data.ending_trip, trip0.get_id())
         self.assertEqual(place0.data.starting_trip, trip1.get_id())
 
-        self.assertEqual(round(trip0.data.duration), 58 * 60 + 51)
-        self.assertEqual(round(trip1.data.duration), 39 * 60 + 49)
+        self.assertEqual(round(trip0.data.duration), 14 * 60 + 41)
+        self.assertEqual(round(trip1.data.duration), 1 * 60 * 60 + 50 * 60 + 56)
 
         self.assertIsNotNone(place0.data.location)
     
@@ -192,8 +199,8 @@ class TestTripSegmentation(unittest.TestCase):
         # We expect there to be 12 places, but the first one is that start of
         # the chain, so it has a start_time of None and it won't be retrieved
         # by the query on the start_time that we show here.
-        self.assertEqual(len(created_places_entries), 12)
-        self.assertEqual(len(created_trips_entries), 12)
+        self.assertEqual(len(created_places_entries), 11)
+        self.assertEqual(len(created_trips_entries), 11)
 
         # Pick the first two trips and the first place and ensure that they are all linked correctly
         # Note that this is the first place, not the second place because the true first place will not
@@ -216,17 +223,17 @@ class TestTripSegmentation(unittest.TestCase):
         # There are 9 android "trips" first (index: 0-8), including the untracked time
         # index 9 is the short, bogus trip
         # So we want to check trips 10 and 11
-        trip0dist = created_trips_entries[10]
-        trip1dist = created_trips_entries[11]
-        place0dist = created_places_entries[10]
+        trip0dist = created_trips_entries[9]
+        trip1dist = created_trips_entries[10]
+        place0dist = created_places_entries[9]
         
         self.assertEqual(trip0dist.data.end_place, place0dist.get_id())
         self.assertEqual(trip1dist.data.start_place, place0dist.get_id())
         self.assertEqual(place0dist.data.ending_trip, trip0dist.get_id())
         self.assertEqual(place0dist.data.starting_trip, trip1dist.get_id())
 
-        self.assertEqual(round(trip0dist.data.duration), 58 * 60 + 51)
-        self.assertEqual(round(trip1dist.data.duration), 39 * 60 + 49)
+        self.assertEqual(round(trip0dist.data.duration), 14 * 60 + 41)
+        self.assertEqual(round(trip1dist.data.duration), 1 * 60 * 60 + 50 * 60 + 56)
 
         self.assertIsNotNone(place0dist.data.location)
         

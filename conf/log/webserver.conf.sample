@@ -1,0 +1,42 @@
+{
+    "handlers": {
+        "errors": {
+            "encoding": "bz2", 
+            "backupCount": 2, 
+            "mode": "a", 
+            "level": "ERROR", 
+            "formatter": "detailed", 
+            "class": "logging.handlers.RotatingFileHandler", 
+            "maxBytes": 1073741824, 
+            "filename": "/var/tmp/webserver-errors.log.gz"
+        }, 
+        "console": {
+            "class": "logging.StreamHandler", 
+            "level": "WARNING"
+        }, 
+        "file": {
+            "backupCount": 3, 
+            "encoding": "bz2", 
+            "filename": "/var/tmp/webserver.log.gz", 
+            "maxBytes": 1073741824, 
+            "mode": "a", 
+            "formatter": "detailed", 
+            "class": "logging.handlers.RotatingFileHandler"
+        }
+    }, 
+    "version": 1, 
+    "root": {
+        "handlers": [
+            "console", 
+            "file", 
+            "errors"
+        ], 
+        "level": "DEBUG"
+    }, 
+    "formatters": {
+        "detailed": {
+            "class": "logging.Formatter", 
+            "format": "%(asctime)s:%(levelname)s:%(thread)d:%(message)s"
+        }
+    }
+}

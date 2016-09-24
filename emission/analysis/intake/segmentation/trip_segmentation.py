@@ -61,7 +61,21 @@ def segment_current_trips(user_id):
         epq.mark_segmentation_done(user_id, None)
         return
 
-    filters_in_df = loc_df["filter"].unique()
+    out_of_order_points = loc_df[loc_df.ts.diff() < 0]
+    if len(out_of_order_points) > 0:
+        logging.info("Found out of order points!")
+        logging.info("%s" % out_of_order_points)
+        # drop from the table
+        loc_df = loc_df.drop(out_of_order_points.index.tolist())
+        # delete from the database. Should be generally discouraged, so we
+        # are kindof putting it in here secretively
+        import emission.core.get_database as edb
+
+        out_of_order_id_list = out_of_order_points["_id"].tolist()
+        logging.debug("out_of_order_id_list = %s" % out_of_order_id_list)
+        edb.get_timeseries_db().remove({"_id": {"$in": out_of_order_id_list}})
+
+    filters_in_df = loc_df["filter"].dropna().unique()
     logging.debug("Filters in the dataframe = %s" % filters_in_df)
     if len(filters_in_df) == 1:
         # Common case - let's make it easy

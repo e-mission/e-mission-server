@@ -1,7 +1,7 @@
 # Standard imports
 import json
 from random import randrange
-from bottle import route, post, get, run, template, static_file, request, app, HTTPError, abort, BaseRequest, JSONPlugin
+from bottle import route, post, get, run, template, static_file, request, app, HTTPError, abort, BaseRequest, JSONPlugin, response
 import bottle as bt
 # To support dynamic loading of client-specific libraries
 import sys
@@ -41,6 +41,7 @@ from emission.core.wrapper.user import User
 from emission.core.get_database import get_uuid_db, get_mode_db
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.timeseries.timequery as estt
+import emission.storage.timeseries.aggregate_timeseries as estag
 import emission.core.get_database as edb
 
 
@@ -403,11 +404,25 @@ def summarize_metrics(time_type):
     # logging.debug("ret_val = %s" % bson.json_util.dumps(ret_val))
     return ret_val
 
+@post('/join.group/<group_id>')
+def habiticaJoinGroup(group_id):
+    if 'user' in request.json:
+        user_uuid = getUUID(request)
+    else:
+        user_uuid = None
+    inviter_id = request.json['inviter']
+    logging.debug("%s about to join party %s after invite from %s" %
+                  (user_uuid, group_id, inviter_id))
+    ret_val = habitproxy.setup_party(user_uuid, group_id, inviter_id)
+    logging.debug("ret_val = %s after joining group" % bson.json_util.dumps(ret_val))
+    return {'result': ret_val}
+
 # Pulling public data from the server  
 @get('/eval/publicData/timeseries')
 def getPublicData():
   ids = request.json['phone_ids']
-  uuids = map(lambda id: UUID(id), ids)
+  all_uuids = map(lambda id: UUID(id), ids)
+  uuids = [uuid for uuid in all_uuids if uuid in estag.TEST_PHONE_IDS]
 
   from_ts = request.query.from_ts
   to_ts = request.query.to_ts
@@ -431,6 +446,19 @@ def getPublicData():
     data_list = map(lambda q: list(edb.get_timeseries_db().find(q).sort("metadata.write_ts")), user_queries)
    
   return {'phone_data': data_list}
+
+# Redirect to custom URL. $%$%$$ gmail
+@get('/redirect/<route>')
+def getCustomURL(route):
+  # print route
+  # print urllib.urlencode(request.query)
+  redirected_url = 'emission://%s?%s' % (route, urllib.urlencode(request.query))
+  response.status = 303
+  response.set_header('Location', redirected_url)
+  # response.set_header('Location', 'mailto://%s@%s' % (route, urllib.urlencode(request.query)))
+  logging.debug("Redirecting to URL %s" % redirected_url)
+  return {'redirect': 'success'}
+
 
 # Client related code START
 @post("/client/<clientname>/<method>")
@@ -617,8 +645,12 @@ def getUUID(request, inHeader=False):
 # Auth helpers END
 
 if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(thread)d:%(message)s',
-                        filename='webserver_debug.log', level=logging.DEBUG)
+    try:
+        webserver_log_config = json.load(open("conf/log/webserver.conf", "r"))
+    except:
+        webserver_log_config = json.load(open("conf/log/webserver.conf.sample", "r"))
+
+    logging.config.dictConfig(webserver_log_config)
     logging.debug("This should go to the log file")
 
     # We have see the sockets hang in practice. Let's set the socket timeout = 1

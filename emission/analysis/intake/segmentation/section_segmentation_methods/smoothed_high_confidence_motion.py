@@ -49,7 +49,7 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
         # length of the filtered dataframe was sufficient. But now both Tom and
         # I have hit it (on 18th and 21st of Sept) so let's handle it proactively here.
         if filter_mask.shape == (0,0):
-            logging.warning("Found filter_mask with shape (0,0), returning blank")
+            logging.info("Found filter_mask with shape (0,0), returning blank")
             return []
 
         logging.debug("filtered points %s" % np.nonzero(filter_mask))
@@ -125,7 +125,7 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
             raw_section_df = location_points[(location_points.ts >= start_motion.ts) &
                                              (location_points.ts <= end_motion.ts)]
             if len(raw_section_df) == 0:
-                logging.warn("Found no location points between %s and %s" % (start_motion, end_motion))
+                logging.info("Found no location points between %s and %s" % (start_motion, end_motion))
             else:
                 logging.debug("with iloc, section start point = %s, section end point = %s" %
                               (ecwl.Location(raw_section_df.iloc[0]), ecwl.Location(raw_section_df.iloc[-1])))

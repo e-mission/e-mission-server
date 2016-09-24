@@ -72,20 +72,7 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
                 # So we reset_index upstream and use it here.
                 last10Points_df = filtered_points_df.iloc[max(idx-self.point_threshold, curr_trip_start_point.idx):idx+1]
                 lastPoint = ad.AttrDict(filtered_points_df.iloc[idx-1])
-                logging.debug("lastPoint = %s, time difference = %s dist difference %s" %
-                    (lastPoint, currPoint.ts - lastPoint.ts, pf.calDistance(lastPoint, currPoint)))
-                if currPoint.ts - lastPoint.ts > self.time_threshold:
-                    # We have been at this location for more than the time filter.
-                    # So we must not have been moving for the last _time filter_
-                    # points. So the trip must have ended
-                    # Since this is a distance filter, we detect that the last
-                    # trip has ended at the time that the new trip starts. So
-                    # if the last_trip_end_point is lastPoint, then
-                    # curr_trip_start_point should be currPoint. But then we will
-                    # have problems with the spurious, noisy points that are
-                    # generated until the geofence is turned on, if ever
-                    # So we will continue to defer new trip starting until we
-                    # have worked through all of those.
+                if self.has_trip_ended(lastPoint, currPoint):
                     last_trip_end_point = lastPoint
                     logging.debug("Appending last_trip_end_point %s with index %s " %
                         (last_trip_end_point, idx-1))
@@ -141,6 +128,59 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
                 logging.debug("Found %d transitions after last point, not ending trip..." % len(stopped_moving_after_last))
         return segmentation_points
 
+    def has_trip_ended(self, lastPoint, currPoint):
+        # So we must not have been moving for the last _time filter_
+        # points. So the trip must have ended
+        # Since this is a distance filter, we detect that the last
+        # trip has ended at the time that the new trip starts. So
+        # if the last_trip_end_point is lastPoint, then
+        # curr_trip_start_point should be currPoint. But then we will
+        # have problems with the spurious, noisy points that are
+        # generated until the geofence is turned on, if ever
+        # So we will continue to defer new trip starting until we
+        # have worked through all of those.
+        timeDelta = currPoint.ts - lastPoint.ts
+        distDelta = pf.calDistance(lastPoint, currPoint)
+        logging.debug("lastPoint = %s, time difference = %s dist difference %s" %
+                      (lastPoint, timeDelta, distDelta))
+        if timeDelta > self.time_threshold:
+            # We have been at this location for more than the time filter.
+            # This could be because we have not been moving for the last
+            # _time filter_ points, or because we didn't get points for
+            # that duration, (e.g. because we were underground)
+            if timeDelta > 0:
+                speedDelta = distDelta / timeDelta
+            else:
+                speedDelta = np.nan
+            # this is way too slow. On ios, we use 5meters in 10 minutes.
+            # On android, we use 10 meters in 5 mins, which seems to work better
+            # for this kind of test
+            speedThreshold = float(self.distance_threshold * 2) / (self.time_threshold / 2)
+
+            # http://www.huffingtonpost.com/hoppercom/the-worlds-20-longest-non-stop-flights_b_5994268.html
+            # Longest flight is 17 hours, which is the longest you can go without cell reception
+            # And even if you split an air flight that long into two, you will get some untracked time in the
+            # middle, so that's good.
+            TWELVE_HOURS = 12 * 60 * 60
+            if timeDelta > TWELVE_HOURS:
+                logging.debug("lastPoint.ts = %s, currPoint.ts = %s, TWELVE_HOURS = %s, large gap = %s, ending trip" %
+                              (lastPoint.ts, currPoint.ts, TWELVE_HOURS, currPoint.ts - lastPoint.ts))
+                return True
+
+            if (timeDelta > self.time_threshold and # We have been here for a while
+                        speedDelta < speedThreshold): # we haven't moved very much
+                logging.debug("lastPoint.ts = %s, currPoint.ts = %s, threshold = %s, large gap = %s, ending trip" %
+                              (lastPoint.ts, currPoint.ts,self.time_threshold, currPoint.ts - lastPoint.ts))
+                return True
+            else:
+                logging.debug("lastPoint.ts = %s, currPoint.ts = %s, time gap = %s (vs %s), distance_gap = %s (vs %s), speed_gap = %s (vs %s) continuing trip" %
+                              (lastPoint.ts, currPoint.ts,
+                               timeDelta, self.time_threshold,
+                               distDelta, self.distance_threshold,
+                               speedDelta, speedThreshold))
+                return False
+
+
     def continue_just_ended(self, idx, currPoint, filtered_points_df):
         """
         Normally, since the logic here and the
@@ -163,16 +203,19 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
             return False
         else:
             lastPoint = ad.AttrDict(filtered_points_df.iloc[idx - 1])
-            logging.debug("Comparing with lastPoint = %s, distance = %s, time = %s" %
-                          (lastPoint, pf.calDistance(lastPoint, currPoint) < self.distance_threshold,
-                           currPoint.ts - lastPoint.ts <= self.time_threshold))
+
+            deltaDist = pf.calDistance(lastPoint, currPoint)
+            deltaTime = currPoint.ts - lastPoint.ts
+            logging.debug("Comparing with lastPoint = %s, distance = %s < threshold %s, time = %s < threshold %s" %
+                          (lastPoint, deltaDist, self.distance_threshold,
+                            deltaTime, self.time_threshold))
             # Unlike the time filter, with the distance filter, we concatenate all points
             # that are within the distance threshold with the previous trip
             # end, since because of the distance filter, even noisy points
             # can occur at an arbitrary time in the future
-            if pf.calDistance(lastPoint, currPoint) < self.distance_threshold:
-                logging.info("Points %s and %s are within the distance filter so part of the same trip" %
-                             (lastPoint, currPoint))
+            if deltaDist < self.distance_threshold:
+                logging.info("Points %s (%s) and %s (%s) are %d apart, within the distance filter so part of the same trip" %
+                             (lastPoint["_id"], lastPoint.loc, currPoint["_id"], currPoint.loc, deltaDist))
                 return True
             else:
                 return False

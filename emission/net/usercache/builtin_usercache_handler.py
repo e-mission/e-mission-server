@@ -58,6 +58,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
 
         curr_entry_it = uc.getMessage(None, time_query)
         last_ts_processed = None
+        unified_entry_list = []
         for entry_doc in curr_entry_it:
             unified_entry = None
             try:
@@ -68,18 +69,25 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
                 # generic attrdict for now.
                 entry = ad.AttrDict(entry_doc)
                 unified_entry = enuf.convert_to_common_format(entry)
-                ts.insert(unified_entry)
+                unified_entry_list.append(unified_entry)
                 last_ts_processed = ecwe.Entry(unified_entry).metadata.write_ts
                 time_query.endTs = last_ts_processed
-            except pymongo.errors.DuplicateKeyError as e:
-                logging.info("document already present in timeseries, skipping since read-only")
             except Exception as e:
-                logging.exception("Backtrace time")
+                logging.warning("Backtrace time %s" % e)
                 logging.warn("Got error %s while saving entry %s -> %s"% (e, entry, unified_entry))
                 try:
                     ts.insert_error(entry_doc)
                 except pymongo.errors.DuplicateKeyError as e:
                     logging.info("document already present in error timeseries, skipping since read-only")
+
+        if len(unified_entry_list) > 0:
+            try:
+                ts.bulk_insert(unified_entry_list, etsa.EntryType.DATA_TYPE)
+            except pymongo.errors.DuplicateKeyError as e:
+                logging.info("document already present in timeseries, skipping since read-only")
+        else:
+            logging.info("In moveToLongTerm, no entries to save")
+
         logging.debug("Deleting all entries for query %s" % time_query)
         uc.clearProcessedMessages(time_query)
         esp.mark_usercache_done(self.user_id, last_ts_processed)
@@ -235,6 +243,8 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         # lexicographic ordering, but at the same time, this seems much easier
         # and safer to deal with.
         valid_key_list.append('config/sensor_config')
+        valid_key_list.append('config/sync_config')
+        valid_key_list.append('config/consent')
         logging.debug("curr_key_list = %s, valid_key_list = %s" % 
            (curr_key_list, valid_key_list))
         to_del_keys = set(curr_key_list) - set(valid_key_list)
