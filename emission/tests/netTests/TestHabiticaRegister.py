@@ -9,7 +9,6 @@ import random
 # Our imports
 import emission.net.ext_service.habitica.proxy as proxy
 import emission.core.get_database as edb
-import emission.net.ext_service.habitica.create_party_leaders_script as party
 
 
 
@@ -21,7 +20,6 @@ class TestHabiticaRegister(unittest.TestCase):
     autogen_email = autogen_string + '@test.com'
     self.sampleAuthMessage1 = {'username': autogen_string, 'email': autogen_email, 
       'password': autogen_string, 'our_uuid': self.testUserUUID}
-    party.create_party_leaders()
 
   def tearDown(self):
     # https: // habitica.com / apidoc /  # api-User-UserDelete
