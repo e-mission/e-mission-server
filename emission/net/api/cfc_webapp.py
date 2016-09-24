@@ -525,16 +525,13 @@ def habiticaRegister():
   user_uuid = getUUID(request)
   assert(user_uuid is not None)
   username = request.json['regConfig']['username']
-  # This is the second place we use the email, since we need to pass
-  # it to habitica to complete registration. I'm not even refactoring
-  # this into a method - hopefully this makes it less likely to be reused
-  userToken = request.json['user']
-  if skipAuth:
-      userEmail = userToken
-  else:
-      userEmail = verifyUserToken(userToken)
-  autogen_password = "autogenerate_me"
-  return habitproxy.habiticaRegister(username, userEmail,
+  # TODO: Move this logic into register since there is no point in
+  # regenerating the password if we already have the user
+  autogen_id = requests.get("http://www.dinopass.com/password/simple").text
+  logging.debug("generated id %s through dinopass" % autogen_id)
+  autogen_email = "%s@save.world" % autogen_id
+  autogen_password = autogen_id
+  return habitproxy.habiticaRegister(username, autogen_email,
                               autogen_password, user_uuid)
 
 @post('/habiticaProxy')
