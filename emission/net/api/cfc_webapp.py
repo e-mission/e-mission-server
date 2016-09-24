@@ -30,7 +30,7 @@ import bson.json_util
 
 # Our imports
 import modeshare, zipcode, distance, tripManager, \
-                 Berkeley, visualize, stats, usercache, timeline
+                 Berkeley, visualize, stats, usercache, timeline, evaluation
 import emission.net.ext_service.moves.register as auth
 import emission.net.ext_service.habitica.proxy as habitproxy
 import emission.analysis.result.carbon as carbon
@@ -44,7 +44,6 @@ from emission.core.get_database import get_uuid_db, get_mode_db
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.timeseries.timequery as estt
 import emission.core.get_database as edb
-import emission.storage.timeseries.abstract_timeseries as esta
 
 
 config_file = open('conf/net/api/webserver.conf')
@@ -394,26 +393,7 @@ def getPublicData():
   from_ts = request.query.from_ts
   to_ts = request.query.to_ts
 
-  public_queries = map(lambda id: {'user_id': id, "metadata.key":  "eval/public_device"}, uuids)
-  public_ranges = map(list(edb.get_timeseries_db().find(q))["data"], public_queries)
-
-  user_queries = map(lambda id: {'user_id': id}, uuids)
-
-  for i, q in enumerate(user_queries):
-    if public_ranges["is_public"] == 1: 
-      # requested phone is pubic, return data for the overlapped time range  
-      public_ts1 = public_ranges["start_ts"] 
-      public_ts2 = public_ranges["end_ts"]
-      ts1 = max(from_ts, public_ts1)
-      ts2 = min(to_ts, public_ts2)
-      if ts1 < ts2:
-        time_range = estt.TimeQuery("metadata.write_ts", float(ts1), float(ts2))
-        time_query = time_range.get_query()
-        q.update(time_query)
-      else: 
-        q = None
-    else: 
-      q = None
+  user_queries = evaluation.get_user_queries(uuids, from_ts, to_ts)
 
   num_entries = map(lambda q: edb.get_timeseries_db().find(q).count() if q!=None else 0 , user_queries)
   total_entries = sum(num_entries)
@@ -423,7 +403,7 @@ def getPublicData():
   if total_entries > threshold:
     data_list = None
   else:
-    data_list = map(lambda q: list(edb.get_timeseries_db().find(q).sort("metadata.write_ts")) if q!=None else None, user_queries)
+    data_list = map(lambda q: list(edb.get_timeseries_db().find(q).sort("metadata.write_ts")) if q!=None else [], user_queries)
    
   return {'phone_data': data_list}
 
@@ -432,14 +412,26 @@ def getPublicData():
 @post("/registerPublic") 
 def registerPublic():
   user_uuid = getUUID(request)
+  user_ts = esta.TimeSeries.get_time_series(user_uuid)
+  user_list = list(user_ts.find_entries(["eval/public_device"]))
+  # check that the phone has not been registered as public
+  if len(user_list) == 0:
+    current_ts = arrow.utcnow().timestamp
+    public_range = {"ts": current_ts}
+    user_ts.insert_data(user_uuid, "eval/public_device", public_range)
 
 
 # Un-registering a phone as public 
 @post("/unregisterPublic") 
 def unregisterPublic():
   user_uuid = getUUID(request)
-
-
+  user_ts = esta.TimeSeries.get_time_series(user_uuid)
+  user_list = list(user_ts.find_entries(["eval/public_device"]))
+  # check that the phone has been registered as public
+  if len(user_list) == 1:
+    current_ts = arrow.utcnow().timestamp
+    public_range = {"ts": current_ts}
+    user_ts.insert_data(user_uuid, "eval/public_device", public_range)
 
 
 # Client related code START
