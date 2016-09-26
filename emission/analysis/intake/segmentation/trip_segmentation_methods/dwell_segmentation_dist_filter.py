@@ -9,6 +9,8 @@ import emission.analysis.point_features as pf
 import emission.analysis.intake.segmentation.trip_segmentation as eaist
 import emission.core.wrapper.location as ecwl
 
+import emission.analysis.intake.segmentation.restart_checking as eaisr
+
 class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
     def __init__(self, time_threshold, point_threshold, distance_threshold):
         """
@@ -72,7 +74,7 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
                 # So we reset_index upstream and use it here.
                 last10Points_df = filtered_points_df.iloc[max(idx-self.point_threshold, curr_trip_start_point.idx):idx+1]
                 lastPoint = ad.AttrDict(filtered_points_df.iloc[idx-1])
-                if self.has_trip_ended(lastPoint, currPoint):
+                if self.has_trip_ended(lastPoint, currPoint, timeseries):
                     last_trip_end_point = lastPoint
                     logging.debug("Appending last_trip_end_point %s with index %s " %
                         (last_trip_end_point, idx-1))
@@ -128,7 +130,7 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
                 logging.debug("Found %d transitions after last point, not ending trip..." % len(stopped_moving_after_last))
         return segmentation_points
 
-    def has_trip_ended(self, lastPoint, currPoint):
+    def has_trip_ended(self, lastPoint, currPoint, timeseries):
         # So we must not have been moving for the last _time filter_
         # points. So the trip must have ended
         # Since this is a distance filter, we detect that the last
@@ -156,6 +158,19 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
             # On android, we use 10 meters in 5 mins, which seems to work better
             # for this kind of test
             speedThreshold = float(self.distance_threshold * 2) / (self.time_threshold / 2)
+
+            if eaisr.is_tracking_restarted_in_range(lastPoint.ts, currPoint.ts, timeseries):
+                logging.debug("tracking was restarted, ending trip")
+                return True
+
+            # In general, we get multiple locations between each motion activity. If we see a bunch of motion activities
+            # between two location points, and there is a large gap between the last location and the first
+            # motion activity as well, let us just assume that there was a restart
+            ongoing_motion_check = len(eaisr.get_ongoing_motion_in_range(lastPoint.ts, currPoint.ts, timeseries)) > 0
+            if timeDelta > self.time_threshold and not ongoing_motion_check:
+                logging.debug("lastPoint.ts = %s, currPoint.ts = %s, threshold = %s, large gap = %s, ongoing_motion_in_range = %s, ending trip" %
+                              (lastPoint.ts, currPoint.ts,self.time_threshold, currPoint.ts - lastPoint.ts, ongoing_motion_check))
+                return True
 
             # http://www.huffingtonpost.com/hoppercom/the-worlds-20-longest-non-stop-flights_b_5994268.html
             # Longest flight is 17 hours, which is the longest you can go without cell reception
