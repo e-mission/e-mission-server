@@ -162,8 +162,11 @@ def get_filtered_trip(ts, trip):
 
     # Map from old section id -> new section object
     section_map = {}
+    point_map = {}
     for section in trip_tl.trips:
-        section_map[section.get_id()] = get_filtered_section(filtered_trip_entry, section)
+        (filtered_section_entry, point_list) = get_filtered_section(filtered_trip_entry, section)
+        section_map[section.get_id()] = filtered_section_entry
+        point_map[section.get_id()] = point_list
 
     stop_map = {}
     for stop in trip_tl.places:
@@ -171,6 +174,7 @@ def get_filtered_trip(ts, trip):
 
     # Set the start point and time for the trip from the start point and time
     # from the first section
+    # section map values are (section, points_map) tuples
     first_cleaned_section = section_map[trip_tl.trips[0].get_id()]
     last_cleaned_section = section_map[trip_tl.trips[-1].get_id()]
     logging.debug("Copying start_ts %s, start_fmt_time %s, start_local_dt from %s to %s" %
@@ -199,6 +203,13 @@ def get_filtered_trip(ts, trip):
     # or not, and to not store any of the sections or stops if it is not. So the validity
     # check should be before the insert
 
+    for section_id, points in point_map.items():
+        # We should have filtered out zero point sections already
+        logging.debug("About to store %s points for section %s" %
+                      (len(points), section_id))
+        if len(points) > 0:
+            ts.bulk_insert(points, esta.EntryType.ANALYSIS_TYPE)
+
     if not linked_tl.is_empty():
         ts.bulk_insert(linked_tl, esta.EntryType.ANALYSIS_TYPE)
     return filtered_trip_entry
@@ -222,7 +233,7 @@ def get_filtered_place(raw_place):
         logging.info("nominatim result does not have an address, skipping")
         logging.info(e)
     except:
-        logging.exception("Unable to pre-fill reverse geocoded information, client has to do it")
+        logging.info("Unable to pre-fill reverse geocoded information, client has to do it")
 
     logging.debug("raw_place.user_id = %s" % raw_place.user_id)
     curr_cleaned_end_place = ecwe.Entry.create_entry(raw_place.user_id,
@@ -281,10 +292,7 @@ def get_filtered_section(new_trip_entry, section):
         loc_row.section = filtered_section_entry.get_id()
         entry_list.append(ecwe.Entry.create_entry(section.user_id, esda.CLEANED_LOCATION_KEY, loc_row))
 
-    if len(entry_list) > 0:
-        ts.bulk_insert(entry_list, esta.EntryType.ANALYSIS_TYPE)
-
-    return filtered_section_entry
+    return (filtered_section_entry, entry_list)
 
 def get_filtered_stop(new_trip_entry, stop):
     """
@@ -642,11 +650,16 @@ def _insert_new_entry(index, loc_df, entry):
     for col in missing_cols:
         new_point_row[col] = 0
 
+    extra_cols = set(new_point_row.keys()) - set(loc_df.columns)
+    logging.debug("Extra cols = %s" % extra_cols)
+    for ec in extra_cols:
+        del new_point_row[ec]
+
     still_missing_cols = set(loc_df.columns) - set(new_point_row.keys())
     logging.debug("Missing cols = %s" % still_missing_cols)
 
-    still_missing_cols = set(new_point_row.keys()) - set(loc_df.columns)
-    logging.debug("Missing cols switched around = %s" % still_missing_cols)
+    still_extra_cols = set(new_point_row.keys()) - set(loc_df.columns)
+    logging.debug("Retained extra cols = %s" % still_extra_cols)
 
     loc_df.loc[index] = new_point_row
     appended_loc_df = loc_df.sort_index().reset_index(drop=True)
