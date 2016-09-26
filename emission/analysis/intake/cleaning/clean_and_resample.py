@@ -650,11 +650,16 @@ def _insert_new_entry(index, loc_df, entry):
     for col in missing_cols:
         new_point_row[col] = 0
 
+    extra_cols = set(new_point_row.keys()) - set(loc_df.columns)
+    logging.debug("Extra cols = %s" % extra_cols)
+    for ec in extra_cols:
+        del new_point_row[ec]
+
     still_missing_cols = set(loc_df.columns) - set(new_point_row.keys())
     logging.debug("Missing cols = %s" % still_missing_cols)
 
-    still_missing_cols = set(new_point_row.keys()) - set(loc_df.columns)
-    logging.debug("Missing cols switched around = %s" % still_missing_cols)
+    still_extra_cols = set(new_point_row.keys()) - set(loc_df.columns)
+    logging.debug("Retained extra cols = %s" % still_extra_cols)
 
     loc_df.loc[index] = new_point_row
     appended_loc_df = loc_df.sort_index().reset_index(drop=True)
