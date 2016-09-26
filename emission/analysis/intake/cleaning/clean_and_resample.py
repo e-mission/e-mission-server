@@ -461,7 +461,7 @@ def get_overriden_mode(raw_section_data, filtered_section_data, with_speeds_df):
     end_to_end_time = filtered_section_data.duration
     overall_speed = end_to_end_distance / end_to_end_time
     TEN_KMPH = float(10 * 1000) / (60 * 60) # m/s
-    FORTY_KMPH = float(40 * 1000) / (60 * 60) # m/s
+    TWENTY_KMPH = float(20 * 1000) / (60 * 60) # m/s
     logging.debug("end_to_end_distance = %s, end_to_end_time = %s, overall_speed = %s" %
                   (end_to_end_distance, end_to_end_time, overall_speed))
 
@@ -472,7 +472,7 @@ def get_overriden_mode(raw_section_data, filtered_section_data, with_speeds_df):
             return ecwm.MotionTypes.UNKNOWN
 
     if raw_section_data.sensed_mode == ecwm.MotionTypes.BICYCLING:
-        if end_to_end_distance > 100 * 1000 and overall_speed > FORTY_KMPH:
+        if end_to_end_distance > 100 * 1000 and overall_speed > TWENTY_KMPH:
             return ecwm.MotionTypes.UNKNOWN
 
     return None
