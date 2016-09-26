@@ -22,7 +22,6 @@ import emission.core.wrapper.section as ecws
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.decorations.local_date_queries as esdl
-import emission.net.ext_service.habitica.create_party_leaders_script as party
 
 PST = "America/Los_Angeles"
 
@@ -30,7 +29,6 @@ PST = "America/Los_Angeles"
 class TestHabiticaRegister(unittest.TestCase):
   def setUp(self):
     #load test user
-    party.create_party_leaders()
     self.testUUID = uuid.uuid4()
     autogen_string = randomGen()
     autogen_email = autogen_string + '@test.com'
