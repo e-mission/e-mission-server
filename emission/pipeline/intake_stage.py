@@ -53,9 +53,16 @@ def run_intake_pipeline(process_number, uuid_list):
         # https://github.com/e-mission/e-mission-server/issues/407#issuecomment-2484868
 
         if edb.get_timeseries_db().find({"user_id": uuid}).count() == 0:
-            logging.debug("Found no entries for %s, skipping")
+            logging.debug("Found no entries for %s, skipping" % uuid)
             continue
 
+        try:
+            run_intake_pipeline_for_user(uuid)
+        except Exception as e:
+            logging.exception("Found error %s while processing pipeline "
+                              "for user %s, skipping" % (e, uuid))
+
+def run_intake_pipeline_for_user(uuid):
         uh = euah.UserCacheHandler.getUserCacheHandler(uuid)
 
         logging.info("*" * 10 + "UUID %s: moving to long term" % uuid + "*" * 10)
