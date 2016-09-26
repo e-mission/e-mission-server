@@ -207,8 +207,8 @@ def get_filtered_trip(ts, trip):
         # We should have filtered out zero point sections already
         logging.debug("About to store %s points for section %s" %
                       (len(points), section_id))
-        assert(len(points) > 0)
-        ts.bulk_insert(points, esta.EntryType.ANALYSIS_TYPE)
+        if len(points) > 0:
+            ts.bulk_insert(points, esta.EntryType.ANALYSIS_TYPE)
 
     if not linked_tl.is_empty():
         ts.bulk_insert(linked_tl, esta.EntryType.ANALYSIS_TYPE)
