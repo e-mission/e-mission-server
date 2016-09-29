@@ -10,6 +10,8 @@ import emission.analysis.point_features as pf
 import emission.analysis.intake.segmentation.trip_segmentation as eaist
 import emission.core.wrapper.location as ecwl
 
+import emission.analysis.intake.segmentation.restart_checking as eaisr
+
 class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
     def __init__(self, time_threshold, point_threshold, distance_threshold):
         """
@@ -110,7 +112,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             logging.debug("last5MinsTimes.max() = %s, time_threshold = %s" %
                           (last5MinTimes.max() if len(last5MinTimes) > 0 else np.NaN, self.time_threshold))
 
-            if self.has_trip_ended(prevPoint, currPoint, last10PointsDistances, last5MinsDistances, last5MinTimes):
+            if self.has_trip_ended(prevPoint, currPoint, timeseries, last10PointsDistances, last5MinsDistances, last5MinTimes):
                 (ended_before_this, last_trip_end_point) = self.get_last_trip_end_point(filtered_points_df,
                                                                                        last10Points_df, last5MinsPoints_df)
                 segmentation_points.append((curr_trip_start_point, last_trip_end_point))
@@ -175,7 +177,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             else:
                 return False
 
-    def has_trip_ended(self, prev_point, curr_point, last10PointsDistances, last5MinsDistances, last5MinTimes):
+    def has_trip_ended(self, prev_point, curr_point, timeseries, last10PointsDistances, last5MinsDistances, last5MinTimes):
         # Another mismatch between phone and server. Phone stops tracking too soon,
         # so the distance is still greater than the threshold at the end of the trip.
         # But then the next point is a long time away, so we can split again (similar to a distance filter)
@@ -189,6 +191,17 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             else:
                 speedDelta = np.nan
             speedThreshold = float(self.distance_threshold) / self.time_threshold
+
+            if eaisr.is_tracking_restarted_in_range(prev_point.ts, curr_point.ts, timeseries):
+                logging.debug("tracking was restarted, ending trip")
+                return True
+
+            ongoing_motion_check = len(eaisr.get_ongoing_motion_in_range(prev_point.ts, curr_point.ts, timeseries)) > 0
+            if timeDelta > 2 * self.time_threshold and not ongoing_motion_check:
+                logging.debug("lastPoint.ts = %s, currPoint.ts = %s, threshold = %s, large gap = %s, ongoing_motion_in_range = %s, ending trip" %
+                              (prev_point.ts, curr_point.ts,self.time_threshold, curr_point.ts - prev_point.ts, ongoing_motion_check))
+                return True
+
             # http://www.huffingtonpost.com/hoppercom/the-worlds-20-longest-non-stop-flights_b_5994268.html
             # Longest flight is 17 hours, which is the longest you can go without cell reception
             # And even if you split an air flight that long into two, you will get some untracked time in the
