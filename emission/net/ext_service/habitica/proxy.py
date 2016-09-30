@@ -33,12 +33,9 @@ def habiticaRegister(username, email, password, our_uuid):
     #FIX! Still need to test if this will throw an error correctly
     except urllib2.HTTPError:
       user_dict = newHabiticaUser(username, email, password, our_uuid)
-      edb.get_habitica_db().update({"user_id": our_uuid},{"$set": {'metrics_data': {'last_timestamp': arrow.utcnow().timestamp, 'bike_count': 0, 'walk_count': 0},
-      'habitica_username': username, 
-      'habitica_password': password, 
-      'habitica_id': user_dict['data']['_id'], 
-      'habitica_token': user_dict['data']['apiToken'],
-      'habitica_group_id': None}},upsert=True)
+      edb.get_habitica_db().update({"user_id": our_uuid},{"$set":
+        initUserDoc(our_uuid, username, password, user_dict)
+      },upsert=True)
       if user_dict['data']['party']['_id']:
         edb.get_habitica_db().update({"user_id": our_uuid},{"$set": {'habitica_group_id': user_dict['data']['party']['_id']}},upsert=True)
 
@@ -83,17 +80,21 @@ def habiticaRegister(username, email, password, our_uuid):
     #metrics_data is used to calculate points based on km biked/walked
     #last_timestamp is the last time the user got points, and bike/walk_count are the leftover km
     habitica_user_table = edb.get_habitica_db()
-    habitica_user_table.insert({'user_id': our_uuid, 
-      'metrics_data': {'last_timestamp': arrow.utcnow().timestamp, 'bike_count': 0, 'walk_count': 0},
-      'habitica_username': username, 
-      'habitica_password': password, 
-      'habitica_id': user_dict['data']['id'], 
-      'habitica_token': user_dict['data']['apiToken'],
-      'habitica_group_id': None})
+    insert_doc = initUserDoc(our_uuid, username, password, user_dict)
+    insert_doc.update({'user_id': our_uuid})
+    habitica_user_table.insert(insert_doc)
 
     #Since we have a new user in our db, create its default habits (walk, bike)
     setup_default_habits(our_uuid)
   return user_dict
+
+def initUserDoc(user_id, username, password, user_dict):
+  return {'task_state': {},
+       'habitica_username': username,
+       'habitica_password': password,
+       'habitica_id': user_dict['data']['_id'],
+       'habitica_token': user_dict['data']['apiToken'],
+       'habitica_group_id': None}
 
 
 def newHabiticaUser(username, email, password, our_uuid):

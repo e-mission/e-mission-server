@@ -114,7 +114,11 @@ def get_task_state(user_id, task):
     if "task_state" not in user_entry:
         return None
     task_states = user_entry["task_state"]
-    return task_states[task.task_id]
+    logging.debug("Found states for tasks %s" % task_states)
+    if task.task_id in task_states:
+        return task_states[task.task_id]
+    else:
+        return None
 
 def save_task_state(user_id, task, new_state):
     user_entry = hp.get_user_entry(user_id)

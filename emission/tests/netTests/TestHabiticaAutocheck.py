@@ -14,16 +14,18 @@ import emission.core.get_database as edb
 import emission.core.wrapper.entry as ecwe
 import emission.core.wrapper.motionactivity as ecwm
 import emission.core.wrapper.section as ecws
-import emission.net.ext_service.habitica.proxy as proxy
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.decorations.local_date_queries as esdl
 import emission.storage.timeseries.abstract_timeseries as esta
-import net.ext_service.habitica.auto_tasks.active_distance as autocheck
+
+import emission.net.ext_service.habitica.proxy as proxy
+import emission.net.ext_service.habitica.executor as autocheck
+import emission.net.ext_service.habitica.auto_tasks.task as enehat
 
 PST = "America/Los_Angeles"
 
 
-class TestHabiticaRegister(unittest.TestCase):
+class TestHabiticaAutocheck(unittest.TestCase):
   def setUp(self):
     #load test user
     self.testUUID = uuid.uuid4()
@@ -34,7 +36,6 @@ class TestHabiticaRegister(unittest.TestCase):
     sampleAuthMessage1Ad = ad.AttrDict(self.sampleAuthMessage1)
     proxy.habiticaRegister(sampleAuthMessage1Ad.username, sampleAuthMessage1Ad.email,
                            sampleAuthMessage1Ad.password, sampleAuthMessage1Ad.our_uuid)
-    edb.get_habitica_db().update({"user_id": self.testUUID},{"$set": {'metrics_data.last_timestamp': arrow.Arrow(2016,5,1).timestamp}},upsert=True)
 
     self.ts = esta.TimeSeries.get_time_series(self.testUUID)
     bike_habit = {'type': "habit", 'text': "Bike", 'up': True, 'down': False, 'priority': 2}
@@ -53,25 +54,10 @@ class TestHabiticaRegister(unittest.TestCase):
     logging.debug("in tearDown, result = %s" % del_result)
 
 
-  def testCreateExistingHabit(self):
-    #try to create Bike
-    existing_habit = {'type': "habit", 'text': "Bike"}
-    habit_id = proxy.create_habit(self.testUUID, existing_habit)
-    logging.debug("in testCreateExistingHabit, the new habit id is = %s" % habit_id)
-    #search this user's habits for the habit and check if there's exactly one
-    response = proxy.habiticaProxy(self.testUUID, 'GET', "/api/v3/tasks/user?type=habits", None)
-    logging.debug("in testCreateExistingHabit, GET habits response = %s" % response)
-    habits = response.json()
-    logging.debug("in testCreateExistingHabit, this user's list of habits = %s" % habits)
-    self.assertTrue(habit['_id'] == habit_id for habit in habits['data'])
-    self.assertTrue(habit['text'] == new_habit['text'] for habit in habits['data'])
-    #search this user's habits for the habit and check if there's exactly one
-    occurrences = (1 for habit in habits['data'] if habit['text'] == existing_habit['text'])
-    self.assertEqual(sum(occurrences), 1)
-
-
   def testCreateNewHabit(self):
-    new_habit = {'type': "habit", 'text': randomGen()}
+    new_habit = {'type': "habit", 'text': randomGen(),
+                 'notes': 'AUTOCHECK: {"mapper": "active_distance",'
+                          '"args": {"walk_scale": 1000, "bike_scale": 3000}}'}
     habit_id = proxy.create_habit(self.testUUID, new_habit)
     logging.debug("in testCreateNewHabit, the new habit id is = %s" % habit_id)
     #Get user's list of habits and check that new habit is there
@@ -116,6 +102,19 @@ class TestHabiticaRegister(unittest.TestCase):
 
 
   def testAutomaticRewardActiveTransportation(self):
+    # Create a task that we can retrieve later
+
+    new_task_text = randomGen()
+    new_habit = {'type': "habit", 'text': new_task_text,
+                 'notes': 'AUTOCHECK: {"mapper": "active_distance",'
+                          '"args": {"walk_scale": 1000, "bike_scale": 3000}}'}
+    habit_id = proxy.create_habit(self.testUUID, new_habit)
+
+    dummy_task = enehat.Task()
+    dummy_task.task_id = habit_id
+    logging.debug("in testAutomaticRewardActiveTransportation,"
+        "the new habit id is = %s and task is %s" % (habit_id, dummy_task))
+
     #Create test data -- code copied from TestTimeGrouping
     key = (2016, 5, 3)
     test_section_list = []
@@ -143,20 +142,26 @@ class TestHabiticaRegister(unittest.TestCase):
     logging.debug("in testAutomaticRewardActiveTransportation, result = %s" % summary_ts)
     
     #Get user data before scoring
-    user_before = list(edb.get_habitica_db().find({'user_id': self.testUUID}))[0]['metrics_data']
-    self.assertEqual(int(user_before['bike_count']),0)
+    user_before = autocheck.get_task_state(self.testUUID, dummy_task)
+    self.assertIsNone(user_before)
+
+    # Needed to work, otherwise sections from may won't show up in the query!
+    modification = {"last_timestamp": arrow.Arrow(2016,5,1).timestamp, "bike_count": 0, "walk_count":0}
+    autocheck.save_task_state(self.testUUID, dummy_task, modification)
+
+    user_before = autocheck.get_task_state(self.testUUID, dummy_task)
+    self.assertEqual(int(user_before['bike_count']), 0)
+
     habits_before = proxy.habiticaProxy(self.testUUID, 'GET', "/api/v3/tasks/user?type=habits", None).json()
-    bike_pts_before = [habit['history'] for habit in habits_before['data'] if habit['text'] == "Bike"]
+    bike_pts_before = [habit['history'] for habit in habits_before['data'] if habit['text'] == new_task_text]
     #Score points
-    autocheck.reward_active_transportation(self.testUUID)
+    autocheck.give_points_for_all_tasks(self.testUUID)
     #Get user data after scoring and check results
-    user_after = list(edb.get_habitica_db().find({'user_id': self.testUUID}))[0]['metrics_data']
+    user_after = autocheck.get_task_state(self.testUUID, dummy_task)
     self.assertEqual(int(user_after['bike_count']),1500)
     habits_after = proxy.habiticaProxy(self.testUUID, 'GET', "/api/v3/tasks/user?type=habits", None).json()
-    bike_pts_after = [habit['history'] for habit in habits_after['data'] if habit['text'] == "Bike"]
+    bike_pts_after = [habit['history'] for habit in habits_after['data'] if habit['text'] == new_task_text]
     self.assertTrue(len(bike_pts_after[0]) - len(bike_pts_before[0]) == 2)
-
-
 
 def randomGen():
     alphabet = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
