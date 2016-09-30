@@ -1,10 +1,10 @@
 import argparse
-import sys
 import logging
 
 import emission.core.get_database as edb
 import emission.net.ext_service.habitica.proxy as proxy
-import emission.net.ext_service.habitica.sync_habitica as autocheck
+import net.ext_service.habitica.executor as autocheck
+
 
 def reset_user(reset_em_uuid):
     del_result = proxy.habiticaProxy(reset_em_uuid, "POST",
@@ -27,6 +27,6 @@ if __name__ == '__main__':
         logging.debug("Processing emission user id %s" % reset_uuid)
         reset_user(reset_uuid)
         if args.restore:
-            autocheck.reward_active_transportation(reset_uuid)
+            autocheck.give_points_for_all_tasks(reset_uuid)
 
 

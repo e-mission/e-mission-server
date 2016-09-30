@@ -111,9 +111,7 @@ def newHabiticaUser(username, email, password, our_uuid):
 def habiticaProxy(user_uuid, method, method_url, method_args):
   logging.debug("For user %s, about to proxy %s method %s with args %s" %
                 (user_uuid, method, method_url, method_args))
-  user_query = {'user_id': user_uuid}
-  assert(edb.get_habitica_db().find(user_query).count() == 1)
-  stored_cfg = edb.get_habitica_db().find_one(user_query)
+  stored_cfg = get_user_entry(user_uuid)
   auth_headers = {'x-api-user': stored_cfg['habitica_id'],
                   'x-api-key': stored_cfg['habitica_token']}
   logging.debug("auth_headers = %s" % auth_headers)
@@ -173,3 +171,17 @@ def create_habit(user_id, new_habit):
   response = habiticaProxy(user_id, 'POST', method_uri, new_habit)
   habit_created = response.json()
   return habit_created['data']['_id']
+
+# Should we have an accessor class for this?
+# Part of the integration, not part of the standard timeseries
+
+def get_user_entry(user_id):
+  user_query = {'user_id': user_id}
+  # TODO: Raise a real, descriptive exception here instead of asserting
+  assert(edb.get_habitica_db().find(user_query).count() == 1)
+  stored_cfg = edb.get_habitica_db().find_one(user_query)
+  return stored_cfg
+
+def save_user_entry(user_id, user_entry):
+  assert(user_entry["user_id"] == user_id)
+  return edb.get_habitica_db().save(user_entry)

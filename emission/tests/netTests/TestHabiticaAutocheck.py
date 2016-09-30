@@ -1,27 +1,24 @@
 # Standard imports
-import unittest
 import logging
-import json
-import uuid
-import attrdict as ad
 import random
+import unittest
+import uuid
+
 import arrow
+import attrdict as ad
 import dateutil.tz as tz
 
-# Our imports
-import emission.net.ext_service.habitica.proxy as proxy
-import emission.net.ext_service.habitica.sync_habitica as autocheck
-import emission.core.get_database as edb
-import emission.storage.timeseries.abstract_timeseries as esta
-
-import emission.analysis.result.metrics.time_grouping as earmt
 import emission.analysis.result.metrics.simple_metrics as earmts
-
+import emission.analysis.result.metrics.time_grouping as earmt
+import emission.core.get_database as edb
 import emission.core.wrapper.entry as ecwe
-import emission.core.wrapper.section as ecws
 import emission.core.wrapper.motionactivity as ecwm
+import emission.core.wrapper.section as ecws
+import emission.net.ext_service.habitica.proxy as proxy
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.decorations.local_date_queries as esdl
+import emission.storage.timeseries.abstract_timeseries as esta
+import net.ext_service.habitica.auto_tasks.active_distance as autocheck
 
 PST = "America/Los_Angeles"
 

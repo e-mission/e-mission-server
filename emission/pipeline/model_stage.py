@@ -10,7 +10,7 @@ import emission.analysis.intake.segmentation.trip_segmentation as eaist
 import emission.analysis.intake.segmentation.section_segmentation as eaiss
 import emission.analysis.intake.cleaning.location_smoothing as eaicl
 import emission.analysis.intake.cleaning.clean_and_resample as eaicr
-import emission.net.ext_service.habitica.sync_habitica as autocheck
+import emission.net.ext_service.habitica.executor as autocheck
 
 
 if __name__ == '__main__':
