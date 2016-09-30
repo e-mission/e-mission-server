@@ -11,33 +11,39 @@ import emission.net.ext_service.habitica.proxy as proxy
 import emission.analysis.result.metrics.simple_metrics as earmts
 import emission.analysis.result.metrics.time_grouping as earmt
 
+# AUTOCHECK: {"mapper": "active_distance", "args": {"walk_scale": 1000,
+#                                                   "bike_scale": 3000}}
 
-
-def reward_active_transportation(user_id):
-  logging.debug("Entering habitica autocheck for user %s" % user_id)
-  if edb.get_habitica_db().find({'user_id': user_id}).count() == 1:
-    logging.debug("Habitica user: %s" % list(edb.get_habitica_db().find({'user_id': user_id})))
-    #make sure habits exist
-    #bike
-    bike_habit = {'type': "habit", 'text': "Bike", 'up': True, 'down': False, 'priority': 2}
-    bike_habit_id = proxy.create_habit(user_id, bike_habit)
-    #walk
-    walk_habit = {'type': "habit", 'text': "Walk", 'up': True, 'down': False, 'priority': 2}
-    walk_habit_id = proxy.create_habit(user_id, walk_habit)
+def give_points(user_id, task, curr_state):
 
     #get timestamps
-    user_val = list(edb.get_habitica_db().find({"user_id": user_id}))[0]['metrics_data']
-    timestamp_from_db = user_val['last_timestamp']
+    # user_val = list(edb.get_habitica_db().find({"user_id": user_id}))[0]['metrics_data']
+
+    # Note that
+    walk_scale = task["args"]["walk_scale"]
+    bike_scale = task["args"]["bike_scale"]
+
+    if curr_state is None:
+        timestamp_from_db = arrow.utcnow().timestamp
+        leftover_bike = 0
+        leftover_walk = 0
+    else:
+        timestamp_from_db = curr_state['last_timestamp']
+        leftover_bike = curr_state["bike_count"]
+        leftover_walk = curr_state["walk_count"]
+
     timestamp_now = arrow.utcnow().timestamp
     
     #Get metrics
     summary_ts = earmt.group_by_timestamp(user_id, timestamp_from_db, timestamp_now, None, earmts.get_distance)
     logging.debug("Metrics response: %s" % summary_ts)
     
-    if summary_ts["last_ts_processed"] != None:
+    if summary_ts["last_ts_processed"] == None:
+      new_state = curr_state
+    else:
       #get distances leftover from last timestamp
-      bike_distance = user_val['bike_count']
-      walk_distance = user_val['walk_count']
+      bike_distance = leftover_bike
+      walk_distance = leftover_walk
 
       #iterate over summary_ts and look for bike/on foot
       for item in summary_ts["result"]:
@@ -65,25 +71,26 @@ def reward_active_transportation(user_id):
       logging.debug("Finished with bike_distance == %s" % bike_distance)
       logging.debug("Finished with walk_distance == %s" % walk_distance)
 
-      method_uri_walk = "/api/v3/tasks/"+ walk_habit_id + "/score/up"
-      method_uri_bike = "/api/v3/tasks/"+ bike_habit_id + "/score/up"
+      method_uri_active_distance = "/api/v3/tasks/"+ task.task_id + "/score/up"
       #reward user by scoring + habits
       # Walk: +1 for every km
-      walk_pts = int(walk_distance//1000)
+      walk_pts = int(walk_distance//walk_scale)
       for i in range(walk_pts):
-        res = proxy.habiticaProxy(user_id, 'POST', method_uri_walk, None)
+        res = proxy.habiticaProxy(user_id, 'POST', method_uri_active_distance, None)
         logging.debug("Request to score walk points %s" % res)
       # Bike: +1 for every 3 km
-      bike_pts = int(bike_distance//3000)
+      bike_pts = int(bike_distance//bike_scale)
       for i in range(bike_pts):
-        res2 = proxy.habiticaProxy(user_id, 'POST', method_uri_bike, None)
+        res2 = proxy.habiticaProxy(user_id, 'POST', method_uri_active_distance, None)
         logging.debug("Request to score bike points %s" % res2)
 
       #update the timestamp and bike/walk counts in db
-      edb.get_habitica_db().update({"user_id": user_id},{"$set": {'metrics_data': 
-        {'last_timestamp': summary_ts["last_ts_processed"], 'bike_count': bike_distance%3000, 
-        'walk_count': walk_distance%1000}}}, upsert=True)
-      logging.debug("Habitica user after update: %s" % list(edb.get_habitica_db().find({'user_id': user_id})))
+      new_state = {'last_timestamp': summary_ts["last_ts_processed"],
+              'bike_count': bike_distance%bike_scale,
+              'walk_count': walk_distance%walk_scale}
+
+    logging.debug("Returning %s" % new_state)
+    return new_state
 
 
 
