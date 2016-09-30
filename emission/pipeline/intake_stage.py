@@ -1,4 +1,3 @@
-import sys
 import json
 import logging
 import numpy as np
@@ -16,7 +15,7 @@ import emission.analysis.intake.segmentation.trip_segmentation as eaist
 import emission.analysis.intake.segmentation.section_segmentation as eaiss
 import emission.analysis.intake.cleaning.location_smoothing as eaicl
 import emission.analysis.intake.cleaning.clean_and_resample as eaicr
-import emission.net.ext_service.habitica.sync_habitica as autocheck
+import emission.net.ext_service.habitica.executor as autocheck
 
 
 def run_intake_pipeline(process_number, uuid_list):
@@ -98,7 +97,7 @@ def run_intake_pipeline_for_user(uuid):
 
         logging.info("*" * 10 + "UUID %s: checking active mode trips to autocheck habits" % uuid + "*" * 10)
         print(str(arrow.now()) + "*" * 10 + "UUID %s: checking active mode trips to autocheck habits" % uuid + "*" * 10)
-        autocheck.reward_active_transportation(uuid)
+        autocheck.give_points_for_all_tasks(uuid)
 
 
         logging.info("*" * 10 + "UUID %s: storing views to cache" % uuid + "*" * 10)

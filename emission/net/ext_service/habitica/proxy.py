@@ -33,12 +33,9 @@ def habiticaRegister(username, email, password, our_uuid):
     #FIX! Still need to test if this will throw an error correctly
     except urllib2.HTTPError:
       user_dict = newHabiticaUser(username, email, password, our_uuid)
-      edb.get_habitica_db().update({"user_id": our_uuid},{"$set": {'metrics_data': {'last_timestamp': arrow.utcnow().timestamp, 'bike_count': 0, 'walk_count': 0},
-      'habitica_username': username, 
-      'habitica_password': password, 
-      'habitica_id': user_dict['data']['_id'], 
-      'habitica_token': user_dict['data']['apiToken'],
-      'habitica_group_id': None}},upsert=True)
+      edb.get_habitica_db().update({"user_id": our_uuid},{"$set":
+        initUserDoc(our_uuid, username, password, user_dict)
+      },upsert=True)
       if user_dict['data']['party']['_id']:
         edb.get_habitica_db().update({"user_id": our_uuid},{"$set": {'habitica_group_id': user_dict['data']['party']['_id']}},upsert=True)
 
@@ -83,17 +80,21 @@ def habiticaRegister(username, email, password, our_uuid):
     #metrics_data is used to calculate points based on km biked/walked
     #last_timestamp is the last time the user got points, and bike/walk_count are the leftover km
     habitica_user_table = edb.get_habitica_db()
-    habitica_user_table.insert({'user_id': our_uuid, 
-      'metrics_data': {'last_timestamp': arrow.utcnow().timestamp, 'bike_count': 0, 'walk_count': 0},
-      'habitica_username': username, 
-      'habitica_password': password, 
-      'habitica_id': user_dict['data']['id'], 
-      'habitica_token': user_dict['data']['apiToken'],
-      'habitica_group_id': None})
+    insert_doc = initUserDoc(our_uuid, username, password, user_dict)
+    insert_doc.update({'user_id': our_uuid})
+    habitica_user_table.insert(insert_doc)
 
     #Since we have a new user in our db, create its default habits (walk, bike)
     setup_default_habits(our_uuid)
   return user_dict
+
+def initUserDoc(user_id, username, password, user_dict):
+  return {'task_state': {},
+       'habitica_username': username,
+       'habitica_password': password,
+       'habitica_id': user_dict['data']['_id'],
+       'habitica_token': user_dict['data']['apiToken'],
+       'habitica_group_id': None}
 
 
 def newHabiticaUser(username, email, password, our_uuid):
@@ -111,9 +112,7 @@ def newHabiticaUser(username, email, password, our_uuid):
 def habiticaProxy(user_uuid, method, method_url, method_args):
   logging.debug("For user %s, about to proxy %s method %s with args %s" %
                 (user_uuid, method, method_url, method_args))
-  user_query = {'user_id': user_uuid}
-  assert(edb.get_habitica_db().find(user_query).count() == 1)
-  stored_cfg = edb.get_habitica_db().find_one(user_query)
+  stored_cfg = get_user_entry(user_uuid)
   auth_headers = {'x-api-user': stored_cfg['habitica_id'],
                   'x-api-key': stored_cfg['habitica_token']}
   logging.debug("auth_headers = %s" % auth_headers)
@@ -173,3 +172,17 @@ def create_habit(user_id, new_habit):
   response = habiticaProxy(user_id, 'POST', method_uri, new_habit)
   habit_created = response.json()
   return habit_created['data']['_id']
+
+# Should we have an accessor class for this?
+# Part of the integration, not part of the standard timeseries
+
+def get_user_entry(user_id):
+  user_query = {'user_id': user_id}
+  # TODO: Raise a real, descriptive exception here instead of asserting
+  assert(edb.get_habitica_db().find(user_query).count() == 1)
+  stored_cfg = edb.get_habitica_db().find_one(user_query)
+  return stored_cfg
+
+def save_user_entry(user_id, user_entry):
+  assert(user_entry["user_id"] == user_id)
+  return edb.get_habitica_db().save(user_entry)
