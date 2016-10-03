@@ -413,9 +413,13 @@ def habiticaJoinGroup(group_id):
     inviter_id = request.json['inviter']
     logging.debug("%s about to join party %s after invite from %s" %
                   (user_uuid, group_id, inviter_id))
-    ret_val = habitproxy.setup_party(user_uuid, group_id, inviter_id)
-    logging.debug("ret_val = %s after joining group" % bson.json_util.dumps(ret_val))
-    return {'result': ret_val}
+    try:
+        ret_val = habitproxy.setup_party(user_uuid, group_id, inviter_id)
+        logging.debug("ret_val = %s after joining group" % bson.json_util.dumps(ret_val))
+        return {'result': ret_val}
+    except RuntimeError as e:
+        logging.info("Aborting call with message %s" % e.message)
+        abort(400, e.message)
 
 # Pulling public data from the server  
 @get('/eval/publicData/timeseries')

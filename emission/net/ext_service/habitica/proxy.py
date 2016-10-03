@@ -150,7 +150,11 @@ def setup_party(user_id, group_id_from_url, inviterId):
       response.raise_for_status()
       response2.raise_for_status()
       edb.get_habitica_db().update({"user_id": user_id},{"$set": {'habitica_group_id': group_id}},upsert=True)
+  else:
+    logging.info("User %s is already part of group %s" % (user_id, group_id))
+    raise RuntimeError("User %s is already a part of group %s" % (user_id, group_id))
   return group_id
+
 
 def setup_default_habits(user_id):
   bike_habit = {'type': "habit", 'text': "Bike", 'notes': "3 km = 1+ (calculated automatically)", 'up': True, 'down': False, 'priority': 2}
