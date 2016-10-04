@@ -392,7 +392,20 @@ def summarize_metrics(time_type):
     start_time = request.json['start_time']
     end_time = request.json['end_time']
     freq_name = request.json['freq']
-    metric_name = request.json['metric']
+    old_style = False
+    if 'metric' in request.json:
+        old_style = True
+        metric_list = [request.json['metric']]
+    else:
+        metric_list = request.json['metric_list']
+
+    logging.debug("metric_list = %s" % metric_list)
+
+    if 'is_return_aggregate' in request.json:
+        is_return_aggregate = request.json['is_return_aggregate']
+    else:
+        old_style = True
+        is_return_aggregate = True
     time_type_map = {
         'timestamp': metrics.summarize_by_timestamp,
         'local_date': metrics.summarize_by_local_date
@@ -400,8 +413,13 @@ def summarize_metrics(time_type):
     metric_fn = time_type_map[time_type]
     ret_val = metric_fn(user_uuid,
               start_time, end_time,
-              freq_name, metric_name)
+              freq_name, metric_list, is_return_aggregate)
     # logging.debug("ret_val = %s" % bson.json_util.dumps(ret_val))
+    if old_style:
+        logging.debug("old_style metrics found, returning array of entries instead of array of arrays")
+        assert(len(metric_list) == 1)
+        ret_val['user_metrics'] = ret_val['user_metrics'][0]
+        ret_val['aggregate_metrics'] = ret_val['aggregate_metrics'][0]
     return ret_val
 
 @post('/join.group/<group_id>')

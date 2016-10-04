@@ -286,11 +286,11 @@ class TestTimeGrouping(unittest.TestCase):
         summary_ts_dict = earmt.group_by_timestamp(self.testUUID,
                                            arrow.Arrow(2016,5,1).timestamp,
                                            arrow.Arrow(2016,6,1).timestamp,
-                                           'd', earmts.get_count)
+                                           'd', [earmts.get_count])[0]
         summary_ld_dict = earmt.group_by_local_date(self.testUUID,
                                                ecwl.LocalDate({'year': 2016, 'month': 5}),
                                                ecwl.LocalDate({'year': 2016, 'month': 6}),
-                                               earmt.LocalFreq.DAILY, earmts.get_count)
+                                               earmt.LocalFreq.DAILY, [earmts.get_count])[0]
 
         summary_ts_last = summary_ts_dict["last_ts_processed"]
         summary_ld_last = summary_ld_dict["last_ts_processed"]
@@ -338,7 +338,7 @@ class TestTimeGrouping(unittest.TestCase):
         summary_ld_dict = earmt.group_by_local_date(self.testUUID,
                                                ecwl.LocalDate({'year': 2016, 'month': 5}),
                                                ecwl.LocalDate({'year': 2016, 'month': 6}),
-                                               earmt.LocalFreq.DAILY, earmts.get_count)
+                                               earmt.LocalFreq.DAILY, [earmts.get_count])[0]
 
         summary_ld = summary_ld_dict["result"]
         summary_ld_last = summary_ld_dict["last_ts_processed"]
@@ -352,7 +352,7 @@ class TestTimeGrouping(unittest.TestCase):
         summary_ts_dict = earmt.group_by_timestamp(self.testUUID,
                                            arrow.Arrow(2016,5,1).timestamp,
                                            arrow.Arrow(2016,6,1).timestamp,
-                                           'd', earmts.get_count)
+                                           'd', [earmts.get_count])[0]
         summary_ts = summary_ts_dict["result"]
         summary_ts_last = summary_ts_dict["last_ts_processed"]
 
@@ -402,7 +402,7 @@ class TestTimeGrouping(unittest.TestCase):
         summary_ts_dict = earmt.group_by_timestamp(self.testUUID,
                                            arrow.Arrow(2016,5,1).timestamp,
                                            arrow.Arrow(2016,6,1).timestamp,
-                                           'd', earmts.get_count)
+                                           'd', [earmts.get_count])[0]
 
         summary_ts_last = summary_ts_dict["last_ts_processed"]
         summary_ts = summary_ts_dict["result"]
@@ -426,7 +426,7 @@ class TestTimeGrouping(unittest.TestCase):
         summary_ld_dict = earmt.group_by_local_date(self.testUUID,
                                                ecwl.LocalDate({'year': 2016, 'month': 5}),
                                                ecwl.LocalDate({'year': 2016, 'month': 6}),
-                                               earmt.LocalFreq.DAILY, earmts.get_count)
+                                               earmt.LocalFreq.DAILY, [earmts.get_count])[0]
 
         summary_ld = summary_ld_dict["result"]
         summary_ld_last = summary_ld_dict["last_ts_processed"]
@@ -493,7 +493,7 @@ class TestTimeGrouping(unittest.TestCase):
         summary_dict = earmt.group_by_timestamp(self.testUUID,
                                            arrow.Arrow(2016,5,1).timestamp,
                                            arrow.Arrow(2016,6,1).timestamp,
-                                           'd', earmts.get_count)
+                                           'd', [earmts.get_count])[0]
         summary_last = summary_dict["last_ts_processed"]
         summary = summary_dict["result"]
 
@@ -515,7 +515,7 @@ class TestTimeGrouping(unittest.TestCase):
         summary_ld_dict = earmt.group_by_local_date(self.testUUID,
                                                ecwl.LocalDate({'year': 2016, 'month': 5}),
                                                ecwl.LocalDate({'year': 2016, 'month': 6}),
-                                               earmt.LocalFreq.DAILY, earmts.get_count)
+                                               earmt.LocalFreq.DAILY, [earmts.get_count])[0]
 
         summary_ld_last = summary_ld_dict["last_ts_processed"]
         summary_ld = summary_ld_dict["result"]
