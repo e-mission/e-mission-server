@@ -16,6 +16,7 @@ class Task(ecwb.WrapperBase):
                 "habitica_task": ecwb.WrapperBase.Access.WORM
             }
 
+    enums = {}
     geojson = []
     nullable = []
     local_dates = []
