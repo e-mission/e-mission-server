@@ -14,7 +14,7 @@ import emission.core.wrapper.motionactivity as ecwm
 import emission.core.wrapper.modestattimesummary as ecwms
 import emission.core.wrapper.localdate as ecwl
 
-def group_by_timestamp(user_id, start_ts, end_ts, freq, summary_fn):
+def group_by_timestamp(user_id, start_ts, end_ts, freq, summary_fn_list):
     """
     Get grouped dataframes for the specific time range and at the specified frequency
     :param user_id: The user for whom we are computing this information. None for all users.
@@ -39,7 +39,7 @@ def group_by_timestamp(user_id, start_ts, end_ts, freq, summary_fn):
         logging.info("Found no entries for user %s, time_query %s" % (user_id, time_query))
         return {
             "last_ts_processed": None,
-            "result": []
+            "result": [[] for i in range(len(summary_fn_list))]
         }
     logging.debug("first row is %s" % section_df.iloc[0])
     secs_to_nanos = lambda x: x * 10 ** 9
@@ -47,7 +47,8 @@ def group_by_timestamp(user_id, start_ts, end_ts, freq, summary_fn):
     time_grouped_df = section_df.groupby(pd.Grouper(freq=freq, key='start_dt'))
     return {
         "last_ts_processed": section_df.iloc[-1].start_ts,
-        "result": grouped_to_summary(time_grouped_df, timestamp_fill_times, summary_fn)
+        "result": [grouped_to_summary(time_grouped_df, timestamp_fill_times, summary_fn)
+                   for summary_fn in summary_fn_list]
     }
 
 def timestamp_fill_times(key, ignored, metric_summary):
@@ -61,7 +62,7 @@ class LocalFreq(enum.Enum):
     MONTHLY = 1
     YEARLY = 2
 
-def group_by_local_date(user_id, from_dt, to_dt, freq, summary_fn):
+def group_by_local_date(user_id, from_dt, to_dt, freq, summary_fn_list):
     """
     Get grouped data frames for the specified local date range and frequency
     :param user_id: id for the user. None for aggregate.
@@ -85,14 +86,15 @@ def group_by_local_date(user_id, from_dt, to_dt, freq, summary_fn):
         logging.info("Found no entries for user %s, time_query %s" % (user_id, time_query))
         return {
             "last_ts_processed": None,
-            "result": []
+            "result": [[] for i in range(len(summary_fn_list))]
         }
     groupby_arr = _get_local_group_by(freq)
     time_grouped_df = section_df.groupby(groupby_arr)
     local_dt_fill_fn = _get_local_key_to_fill_fn(freq)
     return {
         "last_ts_processed": section_df.iloc[-1].start_ts,
-        "result": grouped_to_summary(time_grouped_df, local_dt_fill_fn, summary_fn)
+        "result": [grouped_to_summary(time_grouped_df, local_dt_fill_fn, summary_fn)
+                        for summary_fn in summary_fn_list]
     }
 
 def grouped_to_summary(time_grouped_df, key_to_fill_fn, summary_fn):

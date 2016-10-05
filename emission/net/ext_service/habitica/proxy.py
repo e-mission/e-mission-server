@@ -125,17 +125,16 @@ def habiticaProxy(user_uuid, method, method_url, method_args):
 
 
 def setup_party(user_id, group_id_from_url, inviterId):
-  #group_id = list(edb.get_habitica_db().find({"user_id": user_id}))[0]['habitica_group_id']
-  #if group_id is None:
   #check if user is already in a party
-  try:
-    method_url = "/api/v3/user"
-    result = habiticaProxy(user_id, 'GET', method_url, None)
-    data = result.json()
+  method_url = "/api/v3/user"
+  result = habiticaProxy(user_id, 'GET', method_url, None)
+  data = result.json()
+  if '_id' in data['data']['party']:
     group_id = data['data']['party']['_id']
-    #edb.get_habitica_db().update({"user_id": user_id},{"$set": {'habitica_group_id': group_id}},upsert=True)
-
-  except KeyError:
+    logging.info("User %s is already part of group %s" % (user_id, group_id))
+    raise RuntimeError("User %s is already a part of group %s" % (user_id, group_id))
+  #if the user is not already in a party, then add them to the party to which they were invited
+  else:
     group_id = group_id_from_url
     invite_uri = "/api/v3/groups/"+group_id+"/invite"
     logging.debug("invite user to party api url = %s" % invite_uri)
@@ -148,8 +147,8 @@ def setup_party(user_id, group_id_from_url, inviterId):
     response2 = habiticaProxy(user_id, 'POST', join_url, {})
     response.raise_for_status()
     response2.raise_for_status()
-    #edb.get_habitica_db().update({"user_id": user_id},{"$set": {'habitica_group_id': group_id}},upsert=True)
   return group_id
+
 
 def setup_default_habits(user_id):
   bike_walk_habit = {'type': "habit", 'text': "Bike and Walk", 'notes': "Automatically get points for every 1 km walked or 3 km biked. ***=== DO NOT EDIT BELOW THIS POINT ===*** AUTOCHECK: {\"mapper\": \"active_distance\", \"args\": {\"walk_scale\": 1000, \"bike_scale\": 3000}}", 'up': True, 'down': False, 'priority': 2}
