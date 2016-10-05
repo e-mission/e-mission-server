@@ -117,7 +117,6 @@ def setupRealExampleWithEntries(testObj):
                                                                                        pymongo.ASCENDING).limit(10))])
 def runIntakePipeline(uuid):
     eaicf.filter_accuracy(uuid)
-    estfm.move_all_filters_to_data()
     eaist.segment_current_trips(uuid)
     eaiss.segment_current_sections(uuid)
     eaicl.filter_current_sections(uuid)
