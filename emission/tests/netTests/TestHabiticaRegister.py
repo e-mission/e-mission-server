@@ -72,7 +72,8 @@ class TestHabiticaRegister(unittest.TestCase):
       group_id_returned = proxy.setup_party(self.testUserUUID, inviter_group_id, inviter_id)
       self.assertEqual(group_id_returned, inviter_group_id)
       #Now try to join again, it should throw an error
-      #proxy.setup_party(self.testUserUUID, inviter_group_id, inviter_id)
+      with self.assertRaises(RuntimeError):
+        proxy.setup_party(self.testUserUUID, inviter_group_id, inviter_id)
       delete_inviter = proxy.habiticaProxy(inviterUUID, "DELETE", "/api/v3/user", {'password': inviter})
       edb.get_habitica_db().remove({'user_id': inviterUUID})
       
