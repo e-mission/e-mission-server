@@ -138,7 +138,7 @@ class TestHabiticaAutocheck(unittest.TestCase):
     summary_ts = earmt.group_by_timestamp(self.testUUID,
                                        arrow.Arrow(2016,5,1).timestamp,
                                        arrow.Arrow(2016,6,1).timestamp,
-                                       None, earmts.get_distance)
+                                       None, [earmts.get_distance])
     logging.debug("in testAutomaticRewardActiveTransportation, result = %s" % summary_ts)
     
     #Get user data before scoring
