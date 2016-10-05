@@ -48,8 +48,8 @@ class TestMetrics(unittest.TestCase):
         logging.debug(met_result)
 
         self.assertEqual(met_result.keys(), ['aggregate_metrics', 'user_metrics'])
-        user_met_result = met_result['user_metrics']
-        agg_met_result = met_result['aggregate_metrics']
+        user_met_result = met_result['user_metrics'][0]
+        agg_met_result = met_result['aggregate_metrics'][0]
 
         self.assertEqual(len(user_met_result), 2)
         self.assertEqual([m.nUsers for m in user_met_result], [1,1])
@@ -116,15 +116,15 @@ class TestMetrics(unittest.TestCase):
                                                      'MONTHLY', ['count'], True)
         self.assertEqual(met_result_ld.keys(), ['aggregate_metrics', 'user_metrics'])
         self.assertEqual(met_result_ld['aggregate_metrics'][0], [])
-        self.assertEqual(met_result_ld['user_metrics'][1], [])
+        self.assertEqual(met_result_ld['user_metrics'][0], [])
 
         met_result_ts = metrics.summarize_by_timestamp(self.testUUID,
                                                        arrow.get(2000,1,1).timestamp,
                                                        arrow.get(2001,1,1).timestamp,
                                                         'm', ['count'], True)
         self.assertEqual(met_result_ts.keys(), ['aggregate_metrics', 'user_metrics'])
-        self.assertEqual(met_result_ts['aggregate_metrics'], [])
-        self.assertEqual(met_result_ts['user_metrics'], [])
+        self.assertEqual(met_result_ts['aggregate_metrics'][0], [])
+        self.assertEqual(met_result_ts['user_metrics'][0], [])
 
 if __name__ == '__main__':
     import emission.tests.common as etc
