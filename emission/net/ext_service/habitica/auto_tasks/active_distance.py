@@ -37,7 +37,7 @@ def give_points(user_id, task, curr_state):
     
     #Get metrics
     summary_ts = earmt.group_by_timestamp(user_id, timestamp_from_db, timestamp_now,
-                                          None, [earmts.get_distance])[0]
+                                          None, [earmts.get_distance])
     logging.debug("Metrics response: %s" % summary_ts)
     
     if summary_ts["last_ts_processed"] == None:
@@ -48,7 +48,7 @@ def give_points(user_id, task, curr_state):
       walk_distance = leftover_walk
 
       #iterate over summary_ts and look for bike/on foot
-      for item in summary_ts["result"]:
+      for item in summary_ts["result"][0]:
         try:
             bike_distance += item.BICYCLING
             logging.debug("bike_distance += %s" % item.BICYCLING)

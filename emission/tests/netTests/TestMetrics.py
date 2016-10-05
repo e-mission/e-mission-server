@@ -44,7 +44,7 @@ class TestMetrics(unittest.TestCase):
     def testCountTimestampMetrics(self):
         met_result = metrics.summarize_by_timestamp(self.testUUID,
                                                     self.aug_start_ts, self.aug_end_ts,
-                                       'd', 'count')
+                                       'd', ['count'], True)
         logging.debug(met_result)
 
         self.assertEqual(met_result.keys(), ['aggregate_metrics', 'user_metrics'])
@@ -81,7 +81,7 @@ class TestMetrics(unittest.TestCase):
         met_result = metrics.summarize_by_local_date(self.testUUID,
                                                      ecwl.LocalDate({'year': 2015, 'month': 8}),
                                                      ecwl.LocalDate({'year': 2015, 'month': 9}),
-                                                     'MONTHLY', 'count')
+                                                     'MONTHLY', ['count'], True)
         self.assertEqual(met_result.keys(), ['aggregate_metrics', 'user_metrics'])
         user_met_result = met_result['user_metrics']
         agg_met_result = met_result['aggregate_metrics']
@@ -113,7 +113,7 @@ class TestMetrics(unittest.TestCase):
         met_result_ld = metrics.summarize_by_local_date(self.testUUID,
                                                      ecwl.LocalDate({'year': 2000}),
                                                      ecwl.LocalDate({'year': 2001}),
-                                                     'MONTHLY', 'count')
+                                                     'MONTHLY', ['count'], True)
         self.assertEqual(met_result_ld.keys(), ['aggregate_metrics', 'user_metrics'])
         self.assertEqual(met_result_ld['aggregate_metrics'], [])
         self.assertEqual(met_result_ld['user_metrics'], [])
@@ -121,7 +121,7 @@ class TestMetrics(unittest.TestCase):
         met_result_ts = metrics.summarize_by_timestamp(self.testUUID,
                                                        arrow.get(2000,1,1).timestamp,
                                                        arrow.get(2001,1,1).timestamp,
-                                                        'm', 'count')
+                                                        'm', ['count'], True)
         self.assertEqual(met_result_ts.keys(), ['aggregate_metrics', 'user_metrics'])
         self.assertEqual(met_result_ts['aggregate_metrics'], [])
         self.assertEqual(met_result_ts['user_metrics'], [])
