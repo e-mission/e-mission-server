@@ -36,12 +36,11 @@ def habiticaRegister(username, email, password, our_uuid):
       edb.get_habitica_db().update({"user_id": our_uuid},{"$set":
         initUserDoc(our_uuid, username, password, user_dict)
       },upsert=True)
-      if user_dict['data']['party']['_id']:
-        edb.get_habitica_db().update({"user_id": our_uuid},{"$set": {'habitica_group_id': user_dict['data']['party']['_id']}},upsert=True)
-
+      #if user_dict['data']['party']['_id']:
+        #edb.get_habitica_db().update({"user_id": our_uuid},{"$set": {'habitica_group_id': user_dict['data']['party']['_id']}},upsert=True)
 
     #now we have the user data in user_dict, so check if db is correct
-    #Fix! should prob check here if our db is right, if it's in group, etc
+    #Fix! should prob check here if our db is right
 
   #if user is not in db, try to log in using email and password
   else:
@@ -93,8 +92,7 @@ def initUserDoc(user_id, username, password, user_dict):
        'habitica_username': username,
        'habitica_password': password,
        'habitica_id': user_dict['data']['_id'],
-       'habitica_token': user_dict['data']['apiToken'],
-       'habitica_group_id': None}
+       'habitica_token': user_dict['data']['apiToken']}
 
 
 def newHabiticaUser(username, email, password, our_uuid):
@@ -126,30 +124,30 @@ def habiticaProxy(user_uuid, method, method_url, method_args):
 
 
 def setup_party(user_id, group_id_from_url, inviterId):
-  group_id = list(edb.get_habitica_db().find({"user_id": user_id}))[0]['habitica_group_id']
-  if group_id is None:
-    #check if user is already in a party
-    try:
-      method_url = "/api/v3/user"
-      result = habiticaProxy(user_id, 'GET', method_url, None)
-      data = result.json()
-      group_id = data['data']['party']['_id']
-      edb.get_habitica_db().update({"user_id": user_id},{"$set": {'habitica_group_id': group_id}},upsert=True)
+  #group_id = list(edb.get_habitica_db().find({"user_id": user_id}))[0]['habitica_group_id']
+  #if group_id is None:
+  #check if user is already in a party
+  try:
+    method_url = "/api/v3/user"
+    result = habiticaProxy(user_id, 'GET', method_url, None)
+    data = result.json()
+    group_id = data['data']['party']['_id']
+    #edb.get_habitica_db().update({"user_id": user_id},{"$set": {'habitica_group_id': group_id}},upsert=True)
 
-    except KeyError:
-      group_id = group_id_from_url
-      invite_uri = "/api/v3/groups/"+group_id+"/invite"
-      logging.debug("invite user to party api url = %s" % invite_uri)
-      user_val = list(edb.get_habitica_db().find({"user_id": user_id}))[0]
-      method_args = {'uuids': [user_val['habitica_id']], 'inviter': group_id, 'emails': []}
-      emInviterId = edb.get_habitica_db().find_one({"habitica_id": inviterId})["user_id"]
-      response = habiticaProxy(emInviterId, 'POST', invite_uri, method_args)
-      logging.debug("invite user to party response = %s" % response)
-      join_url = "/api/v3/groups/"+group_id+"/join"
-      response2 = habiticaProxy(user_id, 'POST', join_url, {})
-      response.raise_for_status()
-      response2.raise_for_status()
-      edb.get_habitica_db().update({"user_id": user_id},{"$set": {'habitica_group_id': group_id}},upsert=True)
+  except KeyError:
+    group_id = group_id_from_url
+    invite_uri = "/api/v3/groups/"+group_id+"/invite"
+    logging.debug("invite user to party api url = %s" % invite_uri)
+    user_val = list(edb.get_habitica_db().find({"user_id": user_id}))[0]
+    method_args = {'uuids': [user_val['habitica_id']], 'inviter': group_id, 'emails': []}
+    emInviterId = edb.get_habitica_db().find_one({"habitica_id": inviterId})["user_id"]
+    response = habiticaProxy(emInviterId, 'POST', invite_uri, method_args)
+    logging.debug("invite user to party response = %s" % response)
+    join_url = "/api/v3/groups/"+group_id+"/join"
+    response2 = habiticaProxy(user_id, 'POST', join_url, {})
+    response.raise_for_status()
+    response2.raise_for_status()
+    #edb.get_habitica_db().update({"user_id": user_id},{"$set": {'habitica_group_id': group_id}},upsert=True)
   return group_id
 
 def setup_default_habits(user_id):
