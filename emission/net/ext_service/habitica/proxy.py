@@ -50,6 +50,8 @@ def habiticaRegister(username, email, password, our_uuid):
       logging.debug("About to login %s"% user_request)
       login_response = requests.post(login_url, json=user_request)
       logging.debug("response = %s" % login_response)
+
+      #if 401 error, then user is not in Habitica, so create new account and pass user to user_dict
       if login_response.status_code == 401:
         user_dict = newHabiticaUser(username, email, password, our_uuid)
       else:
@@ -66,10 +68,9 @@ def habiticaRegister(username, email, password, our_uuid):
         user_dict['data']['apiToken'] = user_auth['data']['apiToken']
         logging.debug("parsed json from GET habitica user = %s" % user_dict)
 
-    #if it fails, then user is also not in Habitica, so needs to create new account and put it in user_dict
-    #FIX!! throw except only if u returns a 401 error
+    #If if fails to login AND to create new user, throw exception
     except:
-      logging.exception("Exception while trying to login!")
+      logging.exception("Exception while trying to login/signup!")
     
     logging.debug("habitica user to be created in our db = %s" % user_dict['data'])  
     #Now save new user (user_dict) to our db
@@ -153,7 +154,7 @@ def setup_party(user_id, group_id_from_url, inviterId):
 def setup_default_habits(user_id):
   bike_walk_habit = {'type': "habit", 'text': "Bike and Walk", 'notes': "Automatically get points for every 1 km walked or 3 km biked. ***=== DO NOT EDIT BELOW THIS POINT ===*** AUTOCHECK: {\"mapper\": \"active_distance\", \"args\": {\"walk_scale\": 1000, \"bike_scale\": 3000}}", 'up': True, 'down': False, 'priority': 2}
   bike_walk_habit_id = create_habit(user_id, bike_walk_habit)
-  invite_friends = {'type': "habit", 'text': "Spread the word", 'notes': "Get points for inviting your friends! We're better together. ***=== DO NOT EDIT BELOW THIS POINT ===*** AUTOCHECK: {\"mapper\": \"invite_friends\", \"args\": {}}", 'up': True, 'down': False, 'priority': 2}
+  invite_friends = {'type': "habit", 'text': "Spread the word", 'notes': "Get points for inviting your friends! We're better together.", 'up': True, 'down': False, 'priority': 2}
   invite_friends_id = create_habit(user_id, invite_friends)
 
 def create_habit(user_id, new_habit):
