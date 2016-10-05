@@ -151,7 +151,7 @@ def setup_party(user_id, group_id_from_url, inviterId):
   return group_id
 
 def setup_default_habits(user_id):
-  bike_walk_habit = {'type': "habit", 'text': "Bike and Walk", 'notes': "Automatically get points for every 1 km walked or 3 km biked. ***=== DO NOT EDIT BELOW THIS POINT ===*** AUTOCHECK: {\"mapper\": \"invite_friends\", \"args\": {\"walk_scale\": 1000, \"bike_scale\": 3000}}", 'up': True, 'down': False, 'priority': 2}
+  bike_walk_habit = {'type': "habit", 'text': "Bike and Walk", 'notes': "Automatically get points for every 1 km walked or 3 km biked. ***=== DO NOT EDIT BELOW THIS POINT ===*** AUTOCHECK: {\"mapper\": \"active_distance\", \"args\": {\"walk_scale\": 1000, \"bike_scale\": 3000}}", 'up': True, 'down': False, 'priority': 2}
   bike_walk_habit_id = create_habit(user_id, bike_walk_habit)
   invite_friends = {'type': "habit", 'text': "Spread the word", 'notes': "Get points for inviting your friends! We're better together. ***=== DO NOT EDIT BELOW THIS POINT ===*** AUTOCHECK: {\"mapper\": \"invite_friends\", \"args\": {}}", 'up': True, 'down': False, 'priority': 2}
   invite_friends_id = create_habit(user_id, invite_friends)
