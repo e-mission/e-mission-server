@@ -4,13 +4,6 @@ import enum
 import logging
 import emission.core.wrapper.wrapperbase as ecwb
 
-class ParticipantType(enum.Enum):
-    INDIVIDUAL = 0
-    GROUP = 1
-    # TODO: Eventually we should support an "org" level as well, so that
-    # we can do an inter-campus challenge, for example. Too advanced
-    # for this time, though
-
 class Task(ecwb.WrapperBase):
     props = {
         # The mapper from the metrics to habitica points.
@@ -23,7 +16,6 @@ class Task(ecwb.WrapperBase):
                 "habitica_task": ecwb.WrapperBase.Access.WORM
             }
 
-    enums = {"type": ParticipantType}
     geojson = []
     nullable = []
     local_dates = []
