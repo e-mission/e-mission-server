@@ -53,13 +53,6 @@ def run_intake_pipeline(process_number, uuid_list):
         if uuid == UUID("2c3996d1-49b1-4dce-82f8-d0cda85d3475"):
             continue
 
-        # Hack until we delete these spurious entries
-        # https://github.com/e-mission/e-mission-server/issues/407#issuecomment-2484868
-
-        if edb.get_timeseries_db().find({"user_id": uuid}).count() == 0:
-            logging.debug("Found no entries for %s, skipping" % uuid)
-            continue
-
         try:
             run_intake_pipeline_for_user(uuid)
         except Exception as e:
@@ -74,6 +67,12 @@ def run_intake_pipeline_for_user(uuid):
 
         uh.moveToLongTerm()
 
+        # Hack until we delete these spurious entries
+        # https://github.com/e-mission/e-mission-server/issues/407#issuecomment-2484868
+
+        if edb.get_timeseries_db().find({"user_id": uuid}).count() == 0:
+            logging.debug("Found no entries for %s, skipping" % uuid)
+            return
 
         logging.info("*" * 10 + "UUID %s: filter accuracy if needed" % uuid + "*" * 10)
         print(str(arrow.now()) + "*" * 10 + "UUID %s: filter accuracy if needed" % uuid + "*" * 10)
