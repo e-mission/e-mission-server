@@ -7,7 +7,7 @@ import emission.net.usercache.abstract_usercache as enua
 import emission.storage.timeseries.aggregate_timeseries as estag
 import emission.pipeline.intake_stage as epi
 
-def get_split_uuid_lists(n_splits):
+def get_split_uuid_lists(n_splits, is_public_pipeline):
     get_count = lambda u: enua.UserCache.getUserCache(u).getMessageCount()
 
     """
@@ -28,13 +28,17 @@ def get_split_uuid_lists(n_splits):
     """
 
     all_uuids = [e["uuid"] for e in edb.get_uuid_db().find()]
-    non_public_uuids = [u for u in all_uuids if u not in estag.TEST_PHONE_IDS]
-    non_public_jobs = [(u, get_count(u)) for u in non_public_uuids]
-    # non_zero_jobs = [j for j in non_public_jobs if j[1] !=0 ]
+    if is_public_pipeline:
+        sel_uuids = [u for u in all_uuids if u in estag.TEST_PHONE_IDS]
+    else:
+        sel_uuids = [u for u in all_uuids if u not in estag.TEST_PHONE_IDS]
+
+    sel_jobs = [(u, get_count(u)) for u in sel_uuids]
+    # non_zero_jobs = [j for j in sel_jobs if j[1] !=0 ]
     # Not filtering for now
-    non_zero_jobs = non_public_jobs
-    logging.debug("all_uuids = %s, non_public_uuids = %s, non_public_jobs = %s, non_zero_jobs = %s" %
-                  (len(all_uuids), len(non_public_uuids), len(non_public_jobs), len(non_zero_jobs)))
+    non_zero_jobs = sel_jobs
+    logging.debug("all_uuids = %s, sel_uuids = %s, sel_jobs = %s, non_zero_jobs = %s" %
+                  (len(all_uuids), len(sel_uuids), len(sel_jobs), len(non_zero_jobs)))
 
     non_zero_jobs_df = pd.DataFrame(non_zero_jobs, columns=['user_id', 'count']).sort("count")
     ret_splits = []

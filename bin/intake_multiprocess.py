@@ -20,8 +20,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("n_workers", type=int,
                         help="the number of worker processors to use")
+    parser.add_argument("-p", "--public", action="store_true",
+        help="pipeline for public (as opposed to regular) phones")
     args = parser.parse_args()
 
-    split_lists = eps.get_split_uuid_lists(args.n_workers)
+    split_lists = eps.get_split_uuid_lists(args.n_workers, args.public)
     logging.info("Finished generating split lists %s" % split_lists)
     eps.dispatch(split_lists)
