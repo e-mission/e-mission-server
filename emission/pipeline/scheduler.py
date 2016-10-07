@@ -55,11 +55,12 @@ def get_split_uuid_lists(n_splits, is_public_pipeline):
     logging.debug("Split values are %s" % ret_splits)
     return ret_splits
 
-def dispatch(split_lists):
+def dispatch(split_lists, is_public_pipeline):
     process_list = []
     for i, uuid_list in enumerate(split_lists):
         logging.debug("Dispatching list %s" % uuid_list)
-        p = mp.Process(target=epi.run_intake_pipeline, args=(i, uuid_list))
+        pid = "public_%s" % i if is_public_pipeline else i
+        p = mp.Process(target=epi.run_intake_pipeline, args=(pid, uuid_list))
         logging.info("Created process %s to process %s list of size %s" %
                      (p, i, len(uuid_list)))
         p.start()

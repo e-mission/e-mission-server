@@ -26,4 +26,4 @@ if __name__ == '__main__':
 
     split_lists = eps.get_split_uuid_lists(args.n_workers, args.public)
     logging.info("Finished generating split lists %s" % split_lists)
-    eps.dispatch(split_lists)
+    eps.dispatch(split_lists, args.public)
