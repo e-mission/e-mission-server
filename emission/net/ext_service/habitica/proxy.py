@@ -36,12 +36,11 @@ def habiticaRegister(username, email, password, our_uuid):
       edb.get_habitica_db().update({"user_id": our_uuid},{"$set":
         initUserDoc(our_uuid, username, password, user_dict)
       },upsert=True)
-      if user_dict['data']['party']['_id']:
-        edb.get_habitica_db().update({"user_id": our_uuid},{"$set": {'habitica_group_id': user_dict['data']['party']['_id']}},upsert=True)
-
+      #if user_dict['data']['party']['_id']:
+        #edb.get_habitica_db().update({"user_id": our_uuid},{"$set": {'habitica_group_id': user_dict['data']['party']['_id']}},upsert=True)
 
     #now we have the user data in user_dict, so check if db is correct
-    #Fix! should prob check here if our db is right, if it's in group, etc
+    #Fix! should prob check here if our db is right
 
   #if user is not in db, try to log in using email and password
   else:
@@ -51,6 +50,8 @@ def habiticaRegister(username, email, password, our_uuid):
       logging.debug("About to login %s"% user_request)
       login_response = requests.post(login_url, json=user_request)
       logging.debug("response = %s" % login_response)
+
+      #if 401 error, then user is not in Habitica, so create new account and pass user to user_dict
       if login_response.status_code == 401:
         user_dict = newHabiticaUser(username, email, password, our_uuid)
       else:
@@ -67,10 +68,9 @@ def habiticaRegister(username, email, password, our_uuid):
         user_dict['data']['apiToken'] = user_auth['data']['apiToken']
         logging.debug("parsed json from GET habitica user = %s" % user_dict)
 
-    #if it fails, then user is also not in Habitica, so needs to create new account and put it in user_dict
-    #FIX!! throw except only if u returns a 401 error
+    #If if fails to login AND to create new user, throw exception
     except:
-      logging.exception("Exception while trying to login!")
+      logging.exception("Exception while trying to login/signup!")
     
     logging.debug("habitica user to be created in our db = %s" % user_dict['data'])  
     #Now save new user (user_dict) to our db
@@ -93,8 +93,7 @@ def initUserDoc(user_id, username, password, user_dict):
        'habitica_username': username,
        'habitica_password': password,
        'habitica_id': user_dict['data']['_id'],
-       'habitica_token': user_dict['data']['apiToken'],
-       'habitica_group_id': None}
+       'habitica_token': user_dict['data']['apiToken']}
 
 
 def newHabiticaUser(username, email, password, our_uuid):
@@ -126,37 +125,36 @@ def habiticaProxy(user_uuid, method, method_url, method_args):
 
 
 def setup_party(user_id, group_id_from_url, inviterId):
-  group_id = list(edb.get_habitica_db().find({"user_id": user_id}))[0]['habitica_group_id']
-  if group_id is None:
-    #check if user is already in a party
-    try:
-      method_url = "/api/v3/user"
-      result = habiticaProxy(user_id, 'GET', method_url, None)
-      data = result.json()
-      group_id = data['data']['party']['_id']
-      edb.get_habitica_db().update({"user_id": user_id},{"$set": {'habitica_group_id': group_id}},upsert=True)
-
-    except KeyError:
-      group_id = group_id_from_url
-      invite_uri = "/api/v3/groups/"+group_id+"/invite"
-      logging.debug("invite user to party api url = %s" % invite_uri)
-      user_val = list(edb.get_habitica_db().find({"user_id": user_id}))[0]
-      method_args = {'uuids': [user_val['habitica_id']], 'inviter': group_id, 'emails': []}
-      emInviterId = edb.get_habitica_db().find_one({"habitica_id": inviterId})["user_id"]
-      response = habiticaProxy(emInviterId, 'POST', invite_uri, method_args)
-      logging.debug("invite user to party response = %s" % response)
-      join_url = "/api/v3/groups/"+group_id+"/join"
-      response2 = habiticaProxy(user_id, 'POST', join_url, {})
-      response.raise_for_status()
-      response2.raise_for_status()
-      edb.get_habitica_db().update({"user_id": user_id},{"$set": {'habitica_group_id': group_id}},upsert=True)
+  #check if user is already in a party
+  method_url = "/api/v3/user"
+  result = habiticaProxy(user_id, 'GET', method_url, None)
+  data = result.json()
+  if '_id' in data['data']['party']:
+    group_id = data['data']['party']['_id']
+    logging.info("User %s is already part of group %s" % (user_id, group_id))
+    raise RuntimeError("User %s is already a part of group %s" % (user_id, group_id))
+  #if the user is not already in a party, then add them to the party to which they were invited
+  else:
+    group_id = group_id_from_url
+    invite_uri = "/api/v3/groups/"+group_id+"/invite"
+    logging.debug("invite user to party api url = %s" % invite_uri)
+    user_val = list(edb.get_habitica_db().find({"user_id": user_id}))[0]
+    method_args = {'uuids': [user_val['habitica_id']], 'inviter': group_id, 'emails': []}
+    emInviterId = edb.get_habitica_db().find_one({"habitica_id": inviterId})["user_id"]
+    response = habiticaProxy(emInviterId, 'POST', invite_uri, method_args)
+    logging.debug("invite user to party response = %s" % response)
+    join_url = "/api/v3/groups/"+group_id+"/join"
+    response2 = habiticaProxy(user_id, 'POST', join_url, {})
+    response.raise_for_status()
+    response2.raise_for_status()
   return group_id
 
+
 def setup_default_habits(user_id):
-  bike_habit = {'type': "habit", 'text': "Bike", 'notes': "3 km = 1+ (calculated automatically)", 'up': True, 'down': False, 'priority': 2}
-  bike_habit_id = create_habit(user_id, bike_habit)
-  walk_habit = {'type': "habit", 'text': "Walk", 'notes': "1 km = 1+ (calculated automatically)", 'up': True, 'down': False, 'priority': 2}
-  walk_habit_id = create_habit(user_id, walk_habit)
+  bike_walk_habit = {'type': "habit", 'text': "Bike and Walk", 'notes': "Automatically get points for every 1 km walked or 3 km biked. ***=== DO NOT EDIT BELOW THIS POINT ===*** AUTOCHECK: {\"mapper\": \"active_distance\", \"args\": {\"walk_scale\": 1000, \"bike_scale\": 3000}}", 'up': True, 'down': False, 'priority': 2}
+  bike_walk_habit_id = create_habit(user_id, bike_walk_habit)
+  invite_friends = {'type': "habit", 'text': "Spread the word", 'notes': "Get points for inviting your friends! We're better together.", 'up': True, 'down': False, 'priority': 2}
+  invite_friends_id = create_habit(user_id, invite_friends)
 
 def create_habit(user_id, new_habit):
   method_uri = "/api/v3/tasks/user"

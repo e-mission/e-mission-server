@@ -286,17 +286,17 @@ class TestTimeGrouping(unittest.TestCase):
         summary_ts_dict = earmt.group_by_timestamp(self.testUUID,
                                            arrow.Arrow(2016,5,1).timestamp,
                                            arrow.Arrow(2016,6,1).timestamp,
-                                           'd', earmts.get_count)
+                                           'd', [earmts.get_count])
         summary_ld_dict = earmt.group_by_local_date(self.testUUID,
                                                ecwl.LocalDate({'year': 2016, 'month': 5}),
                                                ecwl.LocalDate({'year': 2016, 'month': 6}),
-                                               earmt.LocalFreq.DAILY, earmts.get_count)
+                                               earmt.LocalFreq.DAILY, [earmts.get_count])
 
         summary_ts_last = summary_ts_dict["last_ts_processed"]
         summary_ld_last = summary_ld_dict["last_ts_processed"]
 
-        summary_ts = summary_ts_dict["result"]
-        summary_ld = summary_ld_dict["result"]
+        summary_ts = summary_ts_dict["result"][0]
+        summary_ld = summary_ld_dict["result"][0]
 
         self.assertEqual(summary_ts_last, arrow.Arrow(2016,5,3,14, tzinfo=tz.gettz(PST)).timestamp)
         self.assertEqual(summary_ld_last, arrow.Arrow(2016,5,3,14, tzinfo=tz.gettz(PST)).timestamp)
@@ -338,9 +338,9 @@ class TestTimeGrouping(unittest.TestCase):
         summary_ld_dict = earmt.group_by_local_date(self.testUUID,
                                                ecwl.LocalDate({'year': 2016, 'month': 5}),
                                                ecwl.LocalDate({'year': 2016, 'month': 6}),
-                                               earmt.LocalFreq.DAILY, earmts.get_count)
+                                               earmt.LocalFreq.DAILY, [earmts.get_count])
 
-        summary_ld = summary_ld_dict["result"]
+        summary_ld = summary_ld_dict["result"][0]
         summary_ld_last = summary_ld_dict["last_ts_processed"]
         self.assertEqual(summary_ld_last,
                          arrow.Arrow(2016,5,3,23, tzinfo=tz.gettz(PST)).timestamp)
@@ -352,8 +352,8 @@ class TestTimeGrouping(unittest.TestCase):
         summary_ts_dict = earmt.group_by_timestamp(self.testUUID,
                                            arrow.Arrow(2016,5,1).timestamp,
                                            arrow.Arrow(2016,6,1).timestamp,
-                                           'd', earmts.get_count)
-        summary_ts = summary_ts_dict["result"]
+                                           'd', [earmts.get_count])
+        summary_ts = summary_ts_dict["result"][0]
         summary_ts_last = summary_ts_dict["last_ts_processed"]
 
         # But 23:00 PDT is 6am on the 4th in UTC,
@@ -402,10 +402,10 @@ class TestTimeGrouping(unittest.TestCase):
         summary_ts_dict = earmt.group_by_timestamp(self.testUUID,
                                            arrow.Arrow(2016,5,1).timestamp,
                                            arrow.Arrow(2016,6,1).timestamp,
-                                           'd', earmts.get_count)
+                                           'd', [earmts.get_count])
 
         summary_ts_last = summary_ts_dict["last_ts_processed"]
-        summary_ts = summary_ts_dict["result"]
+        summary_ts = summary_ts_dict["result"][0]
 
         logging.debug(summary_ts)
 
@@ -426,9 +426,9 @@ class TestTimeGrouping(unittest.TestCase):
         summary_ld_dict = earmt.group_by_local_date(self.testUUID,
                                                ecwl.LocalDate({'year': 2016, 'month': 5}),
                                                ecwl.LocalDate({'year': 2016, 'month': 6}),
-                                               earmt.LocalFreq.DAILY, earmts.get_count)
+                                               earmt.LocalFreq.DAILY, [earmts.get_count])
 
-        summary_ld = summary_ld_dict["result"]
+        summary_ld = summary_ld_dict["result"][0]
         summary_ld_last = summary_ld_dict["last_ts_processed"]
 
         self.assertEqual(summary_ld_last,
@@ -493,9 +493,9 @@ class TestTimeGrouping(unittest.TestCase):
         summary_dict = earmt.group_by_timestamp(self.testUUID,
                                            arrow.Arrow(2016,5,1).timestamp,
                                            arrow.Arrow(2016,6,1).timestamp,
-                                           'd', earmts.get_count)
+                                           'd', [earmts.get_count])
         summary_last = summary_dict["last_ts_processed"]
-        summary = summary_dict["result"]
+        summary = summary_dict["result"][0]
 
         logging.debug(summary)
 
@@ -515,10 +515,10 @@ class TestTimeGrouping(unittest.TestCase):
         summary_ld_dict = earmt.group_by_local_date(self.testUUID,
                                                ecwl.LocalDate({'year': 2016, 'month': 5}),
                                                ecwl.LocalDate({'year': 2016, 'month': 6}),
-                                               earmt.LocalFreq.DAILY, earmts.get_count)
+                                               earmt.LocalFreq.DAILY, [earmts.get_count])
 
         summary_ld_last = summary_ld_dict["last_ts_processed"]
-        summary_ld = summary_ld_dict["result"]
+        summary_ld = summary_ld_dict["result"][0]
 
         self.assertEqual(summary_ld_last,
                          arrow.Arrow(2016,5,4,3, tzinfo=tz.gettz(BST)).timestamp)
