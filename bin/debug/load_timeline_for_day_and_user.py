@@ -11,7 +11,7 @@ if __name__ == '__main__':
     parser.add_argument("user_email",
         help="specify the user email to load the data as")
 
-    parser.add_argument("-n", "--make_new", action="store_true",
+    parser.add_argument("-r", "--retain", action="store_true",
         help="specify whether the entries should overwrite existing ones (default) or create new ones")
 
     parser.add_argument("-v", "--verbose",
@@ -28,7 +28,7 @@ if __name__ == '__main__':
     entries = json.load(open(fn), object_hook = bju.object_hook)
     for i, entry in enumerate(entries):
         entry["user_id"] = override_uuid
-        if args.make_new:
+        if not args.retain:
             del entry["_id"]
         if args.verbose is not None and i % args.verbose == 0:
             print "About to save %s" % entry
