@@ -52,7 +52,7 @@ def get_tasks_from_habitica(user_id):
         result = hp.habiticaProxy(user_id, 'GET', tasks_uri, None)
         tasks = result.json()
     except AssertionError as e:
-        logging.exception("Got error %s while returning tasks" % e)
+        logging.info("User %s has not registered for habitica, returning empty tasks" % user_id)
         tasks = {"data": []}
 
     logging.debug("For user %s, retrieved %s tasks from habitica" %
