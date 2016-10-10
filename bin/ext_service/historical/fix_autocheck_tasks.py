@@ -48,10 +48,10 @@ def delete_tasks(uuid, task_list):
 
 def create_new_tasks(uuid):
     bike_walk_habit = {'type': "habit", 'text': "Bike and Walk", 'notes': "Automatically get points for every 1 km walked or biked. ***=== DO NOT EDIT BELOW THIS POINT ===*** AUTOCHECK: {\"mapper\": \"active_distance\", \"args\": {\"walk_scale\": 1000, \"bike_scale\": 1000}}", 'up': True, 'down': False, 'priority': 2}
-    bike_walk_habit_id = proxy.create_habit(user_id, bike_walk_habit)
+    bike_walk_habit_id = proxy.create_habit(uuid, bike_walk_habit)
 
     invite_friends = {'type': "habit", 'text': "Spread the word", 'notes': "Get points for inviting your friends! We're better together.", 'up': True, 'down': False, 'priority': 2}
-    invite_friends_id = proxy.create_habit(user_id, invite_friends)
+    invite_friends_id = proxy.create_habit(uuid, invite_friends)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)

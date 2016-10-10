@@ -54,7 +54,10 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         """
         filtered_points_df = timeseries.get_data_df("background/filtered_location", time_query)
         transition_df = timeseries.get_data_df("statemachine/transition", time_query)
-        logging.debug("transition_df = %s" % transition_df[["fmt_time", "transition"]])
+        if len(transition_df) > 0:
+            logging.debug("transition_df = %s" % transition_df[["fmt_time", "transition"]])
+        else:
+            logging.debug("no transitions found. This can happen for continuous sensing")
 
         self.last_ts_processed = None
 
