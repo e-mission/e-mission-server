@@ -79,18 +79,18 @@ def to_autocheck_wrapper(task_doc):
     # We're going to put the task information into the notes, after the word AUTOCHECK.
     task_doc_ad = ad.AttrDict(task_doc)
     note = task_doc_ad.notes
-    print note
+    logging.debug("Considering note = %s" % note)
     if "AUTOCHECK:" in note:
         autocheck_formula_start = note.find(":")
         autocheck_formula_str = note[autocheck_formula_start+1:]
-        print autocheck_formula_str
+        logging.debug("Found autocheck formula %s" % autocheck_formula_str)
         autocheck_formula = json.loads(autocheck_formula_str)
         t = enehat.Task(autocheck_formula)
         t.habitica_task = task_doc
         t.task_id = task_doc_ad.id
         return t
     else:
-        print "no autocheck"
+        logging.debug("no autocheck found")
         return None
 
 # Function to map the name to code
