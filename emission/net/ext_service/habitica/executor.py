@@ -123,6 +123,8 @@ def get_task_state(user_id, task):
 
 def save_task_state(user_id, task, new_state):
     user_entry = hp.get_user_entry(user_id)
+    if "task_state" not in user_entry:
+        user_entry["task_state"] = {}
     task_states = user_entry["task_state"]
     task_states[task.task_id] = new_state
     hp.save_user_entry(user_id, user_entry)

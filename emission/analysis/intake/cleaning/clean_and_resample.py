@@ -563,7 +563,8 @@ def _add_start_point(filtered_loc_df, raw_start_place, ts):
                              (raw_start_place.get_id(), ending_trip_entry.get_id()))
             new_start_ts = raw_start_place.data.enter_ts
         else:
-            new_start_ts = raw_start_place.data.enter_ts + 3 * 60
+            new_start_ts = min(raw_start_place.data.enter_ts + raw_start_place.data.duration / 2,
+                                  raw_start_place.data.enter_ts + 3 * 60)
 
         logging.debug("changed new_start_ts to %s" % (new_start_ts))
 

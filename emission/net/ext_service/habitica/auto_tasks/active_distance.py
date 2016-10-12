@@ -28,6 +28,9 @@ def give_points(user_id, task, curr_state):
         timestamp_from_db = arrow.utcnow().timestamp
         leftover_bike = 0
         leftover_walk = 0
+        curr_state = {'last_timestamp': timestamp_from_db,
+                     'bike_count': leftover_bike,
+                     'walk_count': leftover_walk}
     else:
         timestamp_from_db = curr_state['last_timestamp']
         leftover_bike = curr_state["bike_count"]
