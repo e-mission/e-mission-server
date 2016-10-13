@@ -183,6 +183,16 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 ts_db_result = ts_db_cursor
             else:
                 ts_db_result = ts_db_cursor.sort(sort_key, pymongo.ASCENDING)
+            # We send the results from the phone in batches of 10,000
+            # And we support reading upto 100 times that amount at a time, so over
+            # This is more than the number of entries across all metadata types for
+            # normal user processing for over a year
+            # In [590]: edb.get_timeseries_db().find({"user_id": UUID('08b31565-f990-4d15-a4a7-89b3ba6b1340')}).count()
+            # Out[590]: 625272
+            #
+            # In [593]: edb.get_timeseries_db().find({"user_id": UUID('ea59084e-11d4-4076-9252-3b9a29ce35e0')}).count()
+            # Out[593]: 449869
+            ts_db_result.limit(25 * 10000)
         else:
             ts_db_result = [].__iter__()
 
