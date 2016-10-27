@@ -418,7 +418,8 @@ def summarize_metrics(time_type):
     if old_style:
         logging.debug("old_style metrics found, returning array of entries instead of array of arrays")
         assert(len(metric_list) == 1)
-        ret_val['user_metrics'] = ret_val['user_metrics'][0]
+        if 'user_metrics' in ret_val:
+            ret_val['user_metrics'] = ret_val['user_metrics'][0]
         ret_val['aggregate_metrics'] = ret_val['aggregate_metrics'][0]
     return ret_val
 
