@@ -8,8 +8,7 @@ import emission.net.usercache.abstract_usercache as enua
 import emission.storage.timeseries.aggregate_timeseries as estag
 import emission.pipeline.intake_stage as epi
 
-TEMP_HANDLED_PUBLIC_PHONES = [UUID("079e0f1a-c440-3d7c-b0e7-de160f748e35"),
-                         UUID("95e70727-a04e-3e33-b7fe-34ab19194f8b"),
+TEMP_HANDLED_PUBLIC_PHONES = [UUID("95e70727-a04e-3e33-b7fe-34ab19194f8b"),
                          UUID("fd7b4c2e-2c8b-3bfa-94f0-d1e3ecbd5fb7"),
                          UUID("3bc0f91f-7660-34a2-b005-5c399598a369")]
 
