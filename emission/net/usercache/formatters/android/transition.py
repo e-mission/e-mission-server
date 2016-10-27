@@ -18,7 +18,8 @@ transition_map = {
     "local.transition.exited_geofence": et.TransitionType.EXITED_GEOFENCE,
     "local.transition.stopped_moving": et.TransitionType.STOPPED_MOVING,
     "local.transition.stop_tracking": et.TransitionType.STOP_TRACKING,
-    "local.transition.start_tracking": et.TransitionType.START_TRACKING
+    "local.transition.start_tracking": et.TransitionType.START_TRACKING,
+    "local.transition.tracking_error": et.TransitionType.TRACKING_ERROR
 }
 
 def format(entry):

@@ -63,7 +63,9 @@ def convert_to_filtered(entry):
     return entry
 
 def continuous_collection_in_range(timeseries):
-    return timeseries.user_id in estag.TEST_PHONE_IDS
+    import emission.pipeline.scheduler as eps
+    return timeseries.user_id in estag.TEST_PHONE_IDS and \
+           timeseries.user_id not in eps.TEMP_HANDLED_PUBLIC_PHONES
 
 def filter_accuracy(user_id):
     time_query = epq.get_time_range_for_accuracy_filtering(user_id)
