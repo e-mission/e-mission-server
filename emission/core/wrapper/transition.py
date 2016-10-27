@@ -16,6 +16,7 @@ class TransitionType(enum.Enum):
     STOP_TRACKING = 3
     # android specific transitions
     BOOTED = 4
+    TRACKING_ERROR = 18
     # iOS specific transitions
     INIT_COMPLETE = 5
     TRIP_STARTED = 6
