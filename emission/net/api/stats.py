@@ -98,3 +98,30 @@ def createEntry(user, stat, ts, reading):
            'ts': float(ts),
            'reading': reading}
 
+# Dummy functions to keep the old, obsolete code happy.
+# Will do a big purge over winter break
+
+STAT_TRIP_MGR_PCT_SHOWN = "tripManager.pctShown"
+STAT_TRIP_MGR_TRIPS_FOR_DAY = "tripManager.tripsForDay"
+
+STAT_MY_CARBON_FOOTPRINT = "footprint.my_carbon"
+STAT_MY_CARBON_FOOTPRINT_NO_AIR = "footprint.my_carbon.no_air"
+STAT_MY_OPTIMAL_FOOTPRINT = "footprint.optimal"
+STAT_MY_OPTIMAL_FOOTPRINT_NO_AIR = "footprint.optimal.no_air"
+STAT_MY_ALLDRIVE_FOOTPRINT = "footprint.alldrive"
+
+STAT_PCT_CLASSIFIED = "game.score.pct_classified"
+STAT_MINE_MINUS_OPTIMAL = "game.score.mine_minus_optimal"
+STAT_ALL_DRIVE_MINUS_MINE = "game.score.all_drive_minus_mine"
+STAT_SB375_DAILY_GOAL = "game.score.sb375_daily_goal"
+
+STAT_MEAN_FOOTPRINT = "footprint.mean"
+STAT_MEAN_FOOTPRINT_NO_AIR = "footprint.mean.no_air"
+STAT_GAME_SCORE = "game.score"
+STAT_VIEW_CHOICE = "view.choice"
+
+def storeServerEntry(user, stat, ts, reading):
+    pass
+
+def storeResultEntry(user, stat, ts, reading):
+    pass
