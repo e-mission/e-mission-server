@@ -42,8 +42,8 @@ from emission.core.get_database import get_uuid_db, get_mode_db
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.timeseries.timequery as estt
 import emission.storage.timeseries.aggregate_timeseries as estag
+import emission.core.timer as ect
 import emission.core.get_database as edb
-
 
 config_file = open('conf/net/api/webserver.conf')
 config_data = json.load(config_file)
@@ -573,16 +573,25 @@ def habiticaProxy():
 def before_request():
   print("START %s %s %s" % (datetime.now(), request.method, request.path))
   request.params.start_ts = time.time()
+  request.params.timer = ect.Timer()
+  request.params.timer.__enter__()
   logging.debug("START %s %s" % (request.method, request.path))
 
 @app.hook('after_request')
 def after_request():
   msTimeNow = time.time()
+  request.params.timer.__exit__()
   duration = msTimeNow - request.params.start_ts
+  new_duration = request.params.timer.elapsed
+  if round(duration - new_duration, 3) > 0:
+    logging.error("old style duration %s != timer based duration %s" % (duration, new_duration))
+    stats.store_server_api_error(request.params.user_uuid, "MISMATCH_%s_%s" %
+                                 (request.method, request.path), msTimeNow, duration - new_duration)
+    
   print("END %s %s %s %s %s " % (datetime.now(), request.method, request.path, request.params.user_uuid, duration))
   logging.debug("END %s %s %s %s " % (request.method, request.path, request.params.user_uuid, duration))
   # Keep track of the time and duration for each call
-  stats.storeServerEntry(request.params.user_uuid, "%s %s" % (request.method, request.path),
+  stats.store_server_api_time(request.params.user_uuid, "%s_%s" % (request.method, request.path),
         msTimeNow, duration)
 
 # Auth helpers BEGIN

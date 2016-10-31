@@ -37,7 +37,7 @@ def get_split_uuid_lists(n_splits, is_public_pipeline):
         sel_uuids = [u for u in all_uuids if u in estag.TEST_PHONE_IDS]
     else:
         sel_uuids = [u for u in all_uuids if u not in estag.TEST_PHONE_IDS]
-	# Add back the test phones for now so that we can test the data
+    # Add back the test phones for now so that we can test the data
 	# collection changes before deploying them in the wild
 	sel_uuids.extend(TEMP_HANDLED_PUBLIC_PHONES)
 

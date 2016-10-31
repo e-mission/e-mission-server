@@ -21,6 +21,16 @@ class BuiltinTimeSeries(esta.TimeSeries):
         self.user_query = {"user_id": self.user_id} # UUID is mandatory for this version
         self.timeseries_db = ts_enum_map[esta.EntryType.DATA_TYPE]
         self.analysis_timeseries_db = ts_enum_map[esta.EntryType.ANALYSIS_TYPE]
+        # Design question: Should the stats be a separate database, or should it be part
+        # of the timeseries database? Technically, it should be part of the timeseries
+        # database. However, I am concerned about the performance of the database
+        # with even more entries - it already takes 10 seconds to query for a document
+        # and I am not sure that adding a ton more data is going to make that better
+        # it is going to be easier to copy entries into the same database instead of
+        # splitting out, and we already support multiple indices, so I am tempted to put
+        # it separately. On the other hand, then the load/store from timeseries won't work
+        # if it is a separate database. Let's do the right thing and change the storage/
+        # shift to a different timeseries if we need to
         self.ts_map = {
                 "background/location": self.timeseries_db,
                 "background/filtered_location": self.timeseries_db,
@@ -30,6 +40,12 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "config/sensor_config": self.timeseries_db,
                 "config/sync_config": self.timeseries_db,
                 "config/consent": self.timeseries_db,
+                "stats/server_api_time": self.timeseries_db,
+                "stats/server_api_error": self.timeseries_db,
+                "stats/pipeline_time": self.timeseries_db,
+                "stats/pipeline_error": self.timeseries_db,
+                "stats/client_time": self.timeseries_db,
+                "stats/client_nav_event": self.timeseries_db,
                 "segmentation/raw_trip": self.analysis_timeseries_db,
                 "segmentation/raw_place": self.analysis_timeseries_db,
                 "segmentation/raw_section": self.analysis_timeseries_db,
