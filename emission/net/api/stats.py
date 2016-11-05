@@ -47,13 +47,13 @@ def old2new(old_style_data):
     import emission.core.wrapper.statsevent as ecws
     import emission.core.wrapper.battery as ecwb
 
-    int_with_none = lambda s: float(s) if s is not None else None
+    float_with_none = lambda s: float(s) if s is not None else None
 
     user_id = old_style_data["user"]
     del old_style_data["user"]
     if old_style_data["stat"] == "battery_level":
         new_style_data = ecwb.Battery({
-            "battery_level_pct" : int_with_none(old_style_data["reading"]),
+            "battery_level_pct" : float_with_none(old_style_data["reading"]),
             "ts": old_style_data["ts"]
         })
         new_key = "background/battery"
@@ -61,7 +61,7 @@ def old2new(old_style_data):
         new_style_data = ecws.Statsevent()
         new_style_data.name = old_style_data["stat"]
         new_style_data.ts = old_style_data["ts"]
-        new_style_data.reading = int_with_none(old_style_data["reading"])
+        new_style_data.reading = float_with_none(old_style_data["reading"])
         new_style_data.client_app_version = old_style_data["client_app_version"]
         new_style_data.client_os_version = old_style_data["client_os_version"]
         new_key = stat2key(old_style_data["stat"])
