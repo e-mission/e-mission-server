@@ -2,7 +2,7 @@ import argparse
 import logging
 import arrow 
 from uuid import UUID
-import public_data 
+import emission.public.pull_and_load_public_data as plpd
 
 # List of UUIDs of phones to pull data for 
 iphone_ids = ["079e0f1a-c440-3d7c-b0e7-de160f748e35", "c76a0487-7e5a-3b17-a449-47be666b36f6", 
@@ -43,4 +43,4 @@ logging.debug("to_ts = " + str(to_ts))
 print "Pulling data from " + from_date + " to " + to_date + " (local time)"
 print "..."
 
-public_data.request_batched_data(server_url, from_ts, to_ts, phone_ids)
+plpd.request_batched_data(server_url, from_ts, to_ts, phone_ids)
