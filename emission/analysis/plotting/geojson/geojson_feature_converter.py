@@ -130,9 +130,9 @@ def section_to_geojson(section, tl):
 
     points_line_feature = point_array_to_line(section_location_entries)
     points_line_feature.id = str(section.get_id())
-    points_line_feature.properties = copy.copy(section.data)
+    points_line_feature.properties.update(copy.copy(section.data))
     points_line_feature.properties["feature_type"] = "section"
-    points_line_feature.properties["sensed_mode"] = str(points_line_feature.properties.sensed_mode)
+    points_line_feature.properties["sensed_mode"] = str(points_line_feature.properties["sensed_mode"])
 
     _del_non_derializable(points_line_feature.properties, ["start_loc", "end_loc"])
 
@@ -145,13 +145,17 @@ def point_array_to_line(point_array):
     points_line_string = gj.LineString()
     # points_line_string.coordinates = [l.loc.coordinates for l in filtered_section_location_array]
     points_line_string.coordinates = []
+    points_times = []
 
     for l in point_array:
         # logging.debug("About to add %s to line_string " % l)
         points_line_string.coordinates.append(l.data.loc.coordinates)
+        points_times.append(l.data.ts)
     
     points_line_feature = gj.Feature()
     points_line_feature.geometry = points_line_string
+    points_line_feature.properties = {}
+    points_line_feature.properties["times"] = points_times
     return points_line_feature    
 
 def trip_to_geojson(trip, tl):
