@@ -40,6 +40,7 @@ class Entry(ecwb.WrapperBase):
             "stats/client_time": "statsevent",
             "stats/client_nav_event": "statsevent",
             "stats/client_error": "statsevent",
+            "manual/incident": "incident",
             "segmentation/raw_trip": "rawtrip",
             "segmentation/raw_place": "rawplace",
             "segmentation/raw_section": "section",
