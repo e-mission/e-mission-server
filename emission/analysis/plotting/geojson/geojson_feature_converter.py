@@ -5,6 +5,8 @@ import attrdict as ad
 import pandas as pd
 
 import emission.storage.timeseries.abstract_timeseries as esta
+import emission.net.usercache.abstract_usercache as enua
+import emission.storage.timeseries.timequery as estt
 
 import emission.storage.decorations.trip_queries as esdt
 import emission.storage.decorations.analysis_timeseries_queries as esda
@@ -141,6 +143,28 @@ def section_to_geojson(section, tl):
 
     return gj.FeatureCollection(feature_array)
 
+def incident_to_geojson(incident):
+    ret_feature = gj.Feature()
+    ret_feature.id = str(incident.get_id())
+    ret_feature.geometry = gj.Point()
+    ret_feature.geometry.coordinates = incident.data.loc.coordinates
+    ret_feature.properties = copy.copy(incident.data)
+    ret_feature.properties["feature_type"] = "incident"
+
+    # _stringify_foreign_key(ret_feature.properties, ["ending_section", "starting_section", "trip_id"])
+    _del_non_derializable(ret_feature.properties, ["loc"])
+    return ret_feature
+
+def geojson_incidents_in_range(user_id, start_ts, end_ts):
+    MANUAL_INCIDENT_KEY = "manual/incident"
+    ts = esta.TimeSeries.get_time_series(user_id)
+    uc = enua.UserCache.getUserCache(user_id)
+    tq = estt.TimeQuery("data.ts", start_ts, end_ts)
+    incident_entry_docs = list(ts.find_entries([MANUAL_INCIDENT_KEY], time_query=tq)) \
+        + list(uc.getMessage([MANUAL_INCIDENT_KEY], tq))
+    incidents = [ecwe.Entry(doc) for doc in incident_entry_docs]
+    return map(incident_to_geojson, incidents)
+
 def point_array_to_line(point_array):
     points_line_string = gj.LineString()
     # points_line_string.coordinates = [l.loc.coordinates for l in filtered_section_location_array]
@@ -193,6 +217,10 @@ def trip_to_geojson(trip, tl):
 
     trip_geojson = gj.FeatureCollection(features=feature_array, properties=trip.data)
     trip_geojson.id = str(trip.get_id())
+
+    feature_array.extend(geojson_incidents_in_range(trip.user_id,
+                                              curr_start_place.data.exit_ts,
+                                              curr_end_place.data.enter_ts))
     if trip.metadata.key == esda.CLEANED_UNTRACKED_KEY:
         # trip_geojson.properties["feature_type"] = "untracked"
         # Since the "untracked" type is not correctly handled on the phone, we just
