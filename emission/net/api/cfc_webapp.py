@@ -256,7 +256,14 @@ def getStressMap(time_type):
     else:
         user_uuid = None
 
-    modes = request.json['modes']
+    # modes = request.json['modes']
+    # hardcode modes to None because we currently don't store
+    # mode information along with the incidents
+    # we need to have some kind of cleaned incident that:
+    # has a mode
+    # maybe has a count generated from clustering....
+    # but then what about times?
+    modes = None
     start_time = request.json['start_time']
     end_time = request.json['end_time']
     region = request.json['sel_region']
