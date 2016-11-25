@@ -2,7 +2,6 @@
 import json
 import requests
 import logging
-import arrow
 import urllib2
 import uuid
 import random
