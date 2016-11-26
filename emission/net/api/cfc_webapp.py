@@ -264,8 +264,12 @@ def getStressMap(time_type):
     # maybe has a count generated from clustering....
     # but then what about times?
     modes = None
-    start_time = request.json['start_time']
-    end_time = request.json['end_time']
+    if 'from_local_date' in request.json and 'to_local_date' in request.json:
+        start_time = request.json['from_local_date']
+        end_time = request.json['to_local_date']
+    else:
+        start_time = request.json['start_time']
+        end_time = request.json['end_time']
     region = request.json['sel_region']
     logging.debug("Filtering values for %s, range %s -> %s, region %s" %
                   (user_uuid, start_time, end_time, region))
