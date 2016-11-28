@@ -13,6 +13,7 @@ import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.decorations.timeline as esdtl
 
 import emission.core.wrapper.location as ecwl
+import emission.core.wrapper.cleanedsection as ecwcs
 import emission.core.wrapper.entry as ecwe
 import emission.core.common as ecc
 
@@ -133,8 +134,11 @@ def section_to_geojson(section, tl):
     points_line_feature = point_array_to_line(section_location_entries)
     points_line_feature.id = str(section.get_id())
     points_line_feature.properties.update(copy.copy(section.data))
+    # Update works on dicts, convert back to a section object to make the modes
+    # work properly
+    points_line_feature.properties = ecwcs.Cleanedsection(points_line_feature.properties)
     points_line_feature.properties["feature_type"] = "section"
-    points_line_feature.properties["sensed_mode"] = str(points_line_feature.properties["sensed_mode"])
+    points_line_feature.properties["sensed_mode"] = str(points_line_feature.properties.sensed_mode)
 
     _del_non_derializable(points_line_feature.properties, ["start_loc", "end_loc"])
 
