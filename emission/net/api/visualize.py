@@ -17,9 +17,15 @@ import emission.storage.decorations.location_queries as esdlq
 import emission.core.wrapper.trip as ecwt
 import emission.core.wrapper.section as ecws
 import emission.storage.timeseries.geoquery as estg
+import emission.storage.timeseries.timequery as estt
 import emission.storage.timeseries.tcquery as esttc
 import emission.storage.decorations.analysis_timeseries_queries as esda
+
+import emission.net.usercache.abstract_usercache as enua
+
 import emission.storage.timeseries.aggregate_timeseries as estag
+
+MANUAL_INCIDENT_KEY = "manual/incident"
 
 # Note that all the points here are returned in (lng, lat) format, which is the
 # GeoJSON format.
@@ -61,8 +67,15 @@ def Berkeley_pop_route(start_ts, end_ts):
                                       geo_query=geo_query)
     return {"lnglat": [e.data.loc.coordinates for e in loc_entry_list]}
 
-def range_mode_heatmap(modes, from_ld, to_ld, region):
+def range_mode_heatmap_local_date(user_uuid, modes, from_ld, to_ld, region):
     time_query = esttc.TimeComponentQuery("data.local_dt", from_ld, to_ld)
+    return range_mode_heatmap(user_uuid, modes, time_query, region)
+
+def range_mode_heatmap_timestamp(user_uuid, modes, from_ts, to_ts, region):
+    time_query = estt.TimeQuery("data.ts", from_ts, to_ts)
+    return range_mode_heatmap(user_uuid, modes, time_query, region)
+
+def range_mode_heatmap(user_uuid, modes, time_query, region):
 
     if region is None:
         geo_query = None
@@ -74,10 +87,52 @@ def range_mode_heatmap(modes, from_ld, to_ld, region):
         mode_enum_list = [ecwm.MotionTypes[mode] for mode in modes]
         extra_query_list.append(esdlq.get_mode_query(mode_enum_list))
 
-    loc_entry_list = esda.get_entries(esda.CLEANED_LOCATION_KEY, user_id=None,
+    loc_entry_list = esda.get_entries(esda.CLEANED_LOCATION_KEY, user_id=user_uuid,
                                       time_query=time_query, geo_query=geo_query,
                                       extra_query_list=extra_query_list)
     return {"lnglat": [e.data.loc.coordinates for e in loc_entry_list]}
 
+def incident_heatmap_local_date(user_uuid, modes, from_ld, to_ld, region):
+    time_query = esttc.TimeComponentQuery("data.local_dt", from_ld, to_ld)
+    return incident_heatmap(user_uuid, modes, time_query, region)
 
+def incident_heatmap_timestamp(user_uuid, modes, from_ts, to_ts, region):
+    time_query = estt.TimeQuery("data.ts", from_ts, to_ts)
+    return incident_heatmap(user_uuid, modes, time_query, region)
 
+def incident_heatmap(user_uuid, modes, time_query, region):
+    """
+    Return a list of geojson points with properties for the time and the stress level
+    related to incidents. This should not return full entries because that can
+    expose the user_id in the aggregate case. Maybe it can return the data part only?
+    Or should we put the other entries into the properties?
+    :param modes: The modes that we want to query for
+    :param time_query: The time query, in either local date or timestamp
+    :param region: The region of interest
+    :return: list of `incident` objects, with all metadata stripped out
+    """
+
+    if region is None:
+        geo_query = None
+    else:
+        geo_query = estg.GeoQuery(["data.loc"], region)
+
+    extra_query_list = []
+    if modes is not None:
+        mode_enum_list = [ecwm.MotionTypes[mode] for mode in modes]
+        extra_query_list.append(esdlq.get_mode_query(mode_enum_list))
+
+    incident_entry_list = esda.get_entries(MANUAL_INCIDENT_KEY, user_id=None,
+                                      time_query=time_query, geo_query=geo_query,
+                                      extra_query_list=extra_query_list)
+    all_incidents_list = incident_entry_list
+    if user_uuid is not None:
+        # We don't support aggregate queries on the usercache. And that is
+        # actually fine, because we don't expect immediate results for the
+        # aggregate case. We just want to query the usercache to ensure that
+        # the incidents don't magically disappear just because they got pushed
+        # to the server but are not yet processed
+        incident_usercache_list = enua.UserCache.getUserCache(user_uuid).getMessage(
+            [MANUAL_INCIDENT_KEY], time_query)
+        all_incidents_list.extend(incident_usercache_list)
+    return {"incidents": [e.data for e in all_incidents_list]}

@@ -220,17 +220,68 @@ def getCarbonHeatmap():
   return retVal
 
 @post("/result/heatmap/pop.route")
-def getPopRoute():
+def getPopRouteLegacy():
+  return getPopRoute("local_date")
+
+@post("/result/heatmap/pop.route/<time_type>")
+def getPopRoute(time_type):
+  if 'user' in request.json:
+     user_uuid = getUUID(request)
+  else:
+     user_uuid = None
+
+  if 'from_local_date' in request.json and 'to_local_date' in request.json:
+      start_time = request.json['from_local_date']
+      end_time = request.json['to_local_date']
+  else:
+      start_time = request.json['start_time']
+      end_time = request.json['end_time']
+
   modes = request.json['modes']
-  from_ld = request.json['from_local_date']
-  to_ld = request.json['to_local_date']
   region = request.json['sel_region']
-  logging.debug("Filtering values for range %s -> %s, region %s" % 
-        (from_ld, to_ld, region))
-  retVal = visualize.range_mode_heatmap(modes, from_ld, to_ld, region)
-  # retVal = common.generateRandomResult(['00-04', '04-08', '08-10'])
-  # logging.debug("In getCalPopRoute, retVal is %s" % retVal)
+  logging.debug("Filtering values for user %s, range %s -> %s, region %s" %
+        (user_uuid, start_time, end_time, region))
+  time_type_map = {
+      'timestamp': visualize.range_mode_heatmap_timestamp,
+      'local_date': visualize.range_mode_heatmap_local_date
+  }
+  viz_fn = time_type_map[time_type]
+  retVal = viz_fn(user_uuid, modes, start_time, end_time, region)
   return retVal
+
+@post("/result/heatmap/incidents/<time_type>")
+def getStressMap(time_type):
+    if 'user' in request.json:
+        user_uuid = getUUID(request)
+    else:
+        user_uuid = None
+
+    # modes = request.json['modes']
+    # hardcode modes to None because we currently don't store
+    # mode information along with the incidents
+    # we need to have some kind of cleaned incident that:
+    # has a mode
+    # maybe has a count generated from clustering....
+    # but then what about times?
+    modes = None
+    if 'from_local_date' in request.json and 'to_local_date' in request.json:
+        start_time = request.json['from_local_date']
+        end_time = request.json['to_local_date']
+    else:
+        start_time = request.json['start_time']
+        end_time = request.json['end_time']
+    region = request.json['sel_region']
+    logging.debug("Filtering values for %s, range %s -> %s, region %s" %
+                  (user_uuid, start_time, end_time, region))
+    time_type_map = {
+        'timestamp': visualize.incident_heatmap_timestamp,
+        'local_date': visualize.incident_heatmap_local_date
+    }
+    viz_fn = time_type_map[time_type]
+    retVal = viz_fn(user_uuid, modes, start_time, end_time, region)
+    # retVal = common.generateRandomResult(['00-04', '04-08', '08-10'])
+    # logging.debug("In getCalPopRoute, retVal is %s" % retVal)
+    return retVal
 
 @get('/result/carbon/all/summary')
 def carbonSummaryAllTrips():
@@ -291,6 +342,8 @@ def getTrips(day):
   ret_dict = {"timeline": ret_geojson}
   logging.debug("type(ret_dict) = %s" % type(ret_dict))
   return ret_dict
+
+@post('/incidents/')
 
 @post('/profile/create')
 def createUserProfile():
