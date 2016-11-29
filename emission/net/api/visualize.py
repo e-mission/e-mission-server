@@ -17,6 +17,7 @@ import emission.storage.decorations.location_queries as esdlq
 import emission.core.wrapper.trip as ecwt
 import emission.core.wrapper.section as ecws
 import emission.storage.timeseries.geoquery as estg
+import emission.storage.timeseries.timequery as estt
 import emission.storage.timeseries.tcquery as esttc
 import emission.storage.decorations.analysis_timeseries_queries as esda
 
@@ -71,7 +72,7 @@ def range_mode_heatmap_local_date(user_uuid, modes, from_ld, to_ld, region):
     return range_mode_heatmap(user_uuid, modes, time_query, region)
 
 def range_mode_heatmap_timestamp(user_uuid, modes, from_ts, to_ts, region):
-    time_query = esttc.TimeComponentQuery("data.ts", from_ts, to_ts)
+    time_query = estt.TimeQuery("data.ts", from_ts, to_ts)
     return range_mode_heatmap(user_uuid, modes, time_query, region)
 
 def range_mode_heatmap(user_uuid, modes, time_query, region):
@@ -96,7 +97,7 @@ def incident_heatmap_local_date(user_uuid, modes, from_ld, to_ld, region):
     return incident_heatmap(user_uuid, modes, time_query, region)
 
 def incident_heatmap_timestamp(user_uuid, modes, from_ts, to_ts, region):
-    time_query = esttc.TimeComponentQuery("data.ts", from_ts, to_ts)
+    time_query = estt.TimeQuery("data.ts", from_ts, to_ts)
     return incident_heatmap(user_uuid, modes, time_query, region)
 
 def incident_heatmap(user_uuid, modes, time_query, region):
