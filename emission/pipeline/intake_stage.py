@@ -80,8 +80,14 @@ def run_intake_pipeline_for_user(uuid):
 
         # Hack until we delete these spurious entries
         # https://github.com/e-mission/e-mission-server/issues/407#issuecomment-2484868
-
-        if edb.get_timeseries_db().find({"user_id": uuid}).count() == 0:
+        # Hack no longer works after the stats are in the timeseries because
+        # every user, even really old ones, have the pipeline run for them,
+        # which inserts pipeline_time stats.
+        # Let's strip out users who only have pipeline_time entries in the timeseries
+        # I wonder if this (distinct versus count) is the reason that the pipeline has
+        # become so much slower recently. Let's try to actually delete the
+        # spurious entries or at least mark them as obsolete and see if that helps.
+        if edb.get_timeseries_db().find({"user_id": uuid}).distinct("metadata.key") == ["stats/pipeline_time"]:
             logging.debug("Found no entries for %s, skipping" % uuid)
             return
 
