@@ -15,3 +15,7 @@ def expand_metadata_times(m):
     # to search for
     m.write_local_dt = ecsdlq.get_local_date(m.write_ts, m.time_zone)
     m.write_fmt_time = arrow.get(m.write_ts).to(m.time_zone).isoformat()
+
+def expand_data_times(d,m):
+    d.local_dt = ecsdlq.get_local_date(d.ts, m.time_zone)
+    d.fmt_time = arrow.get(m.ts).to(m.time_zone).isoformat()

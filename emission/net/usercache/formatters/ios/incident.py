@@ -18,6 +18,7 @@ def format(entry):
     formatted_entry.metadata = metadata
 
     data = entry.data
+    fc.expand_data_times(data, metadata)
     data.local_dt = ecsdlq.get_local_date(data.ts, metadata.time_zone)
     data.fmt_time = arrow.get(data.ts).to(metadata.time_zone).isoformat()
     formatted_entry.data = data
