@@ -99,13 +99,14 @@ Here are the steps for doing this:
 You may also want to load some test data.
 
 1. Sample timeline data from the test phones can be retrieved using the `bin/public/request_public_data.py` script. You can see the inputs to pass to the script by using
-```
-$ bin/public/request_public_data.py --help
-```
+   ```
+   $ bin/public/request_public_data.py --help
+   ```
 2. The script loads the data into your mongodb instance using the test phone UUIDs. If you want to play with the raw data, you are good.
 3. If you want to run the existing pipeline, you need to either enable the pipeline for test phones, OR re-load the data as a normal user.
-  a. To enable the pipeline for test phones, edit `emission/pipeline/scheduler.py` to add the test phones to the `TEMP_HANDLED_PUBLIC_PHONES` array.
-  b. To reload the data as a normal user, save the data as a timeline file using `bin/debug/extract_timeline_for_day_and_user.py` with one of the test phone UUIDs and the time range that you downloaded the data for. This saves the data into a json file. You can then load the data using the `bin/debug/load_timeline_for_day_and_user.py` script. It requires a timeline file and a user that the timeline is being loaded as. If you wish to view this timeline in the UI after processing it, you need to
+
+  1. To enable the pipeline for test phones, edit `emission/pipeline/scheduler.py` to add the test phones to the `TEMP_HANDLED_PUBLIC_PHONES` array.
+  2. To reload the data as a normal user, save the data as a timeline file using `bin/debug/extract_timeline_for_day_and_user.py` with one of the test phone UUIDs and the time range that you downloaded the data for. This saves the data into a json file. You can then load the data using the `bin/debug/load_timeline_for_day_and_user.py` script. It requires a timeline file and a user that the timeline is being loaded as. If you wish to view this timeline in the UI after processing it, you need to
 login with this email.
 
             $ cd ..../e-mission-server
