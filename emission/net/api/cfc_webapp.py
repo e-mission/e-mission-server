@@ -42,6 +42,7 @@ from emission.core.get_database import get_uuid_db, get_mode_db
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.timeseries.timequery as estt
 import emission.storage.timeseries.aggregate_timeseries as estag
+import emission.storage.timeseries.cache_series as esdc
 import emission.core.timer as ect
 import emission.core.get_database as edb
 
@@ -283,6 +284,34 @@ def getStressMap(time_type):
     # logging.debug("In getCalPopRoute, retVal is %s" % retVal)
     return retVal
 
+@post("/datastreams/find_entries/<time_type>")
+def getTimeseriesEntries(time_type):
+    if 'user' not in request.json:
+        abort(401, "only a user can read his/her data")
+
+    user_uuid = getUUID(request)
+
+    key_list = request.json['key_list']
+    if 'from_local_date' in request.json and 'to_local_date' in request.json:
+        start_time = request.json['from_local_date']
+        end_time = request.json['to_local_date']
+        time_query = esttc.TimeComponentQuery("metadata.write_ts",
+                                              start_time,
+                                              end_time)
+    else:
+        start_time = request.json['start_time']
+        end_time = request.json['end_time']
+        time_query = estt.TimeQuery("metadata.write_ts",
+                                              start_time,
+                                              end_time)
+    # Note that queries from usercache are limited to 100,000 entries
+    # and entries from timeseries are limited to 250,000, so we will
+    # return at most 350,000 entries. So this means that we don't need
+    # additional filtering, but this should be documented in
+    # the API
+    data_list = esdc.find_entries(user_uuid, key_list, time_query)
+    return {'phone_data': data_list}
+
 @get('/result/carbon/all/summary')
 def carbonSummaryAllTrips():
   fromTs = request.query.from_ts
@@ -353,7 +382,7 @@ def createUserProfile():
   # UUID yet. All others should only use the UUID.
   if skipAuth:
     userEmail = userToken
-  else: 
+  else:
     userEmail = verifyUserToken(userToken)
   logging.debug("userEmail = %s" % userEmail)
   user = User.register(userEmail)
@@ -422,12 +451,12 @@ def getCarbonCompare():
   if not skipAuth:
     if 'User' not in request.headers or request.headers.get('User') == '':
         return "Waiting for user data to become available..."
-  
+
   from clients.choice import choice
 
   user_uuid = getUUID(request, inHeader=True)
   print ('UUID', user_uuid)
-  
+
   clientResult = userclient.getClientSpecificResult(user_uuid)
   if clientResult != None:
     logging.debug("Found overriding client result for user %s, returning it" % user_uuid)
@@ -493,7 +522,7 @@ def habiticaJoinGroup(group_id):
         logging.info("Aborting call with message %s" % e.message)
         abort(400, e.message)
 
-# Pulling public data from the server  
+# Pulling public data from the server
 @get('/eval/publicData/timeseries')
 def getPublicData():
   ids = request.json['phone_ids']
@@ -505,22 +534,23 @@ def getPublicData():
 
   time_range = estt.TimeQuery("metadata.write_ts", float(from_ts), float(to_ts))
   time_query = time_range.get_query()
-  
+
   user_queries = map(lambda id: {'user_id': id}, uuids)
 
   for q in user_queries:
     q.update(time_query)
-  
-  num_entries = map(lambda q: edb.get_timeseries_db().find(q).count(), user_queries)
-  total_entries = sum(num_entries)
+
+  num_entries_ts = map(lambda q: edb.get_timeseries_db().find(q).count(), user_queries)
+  num_entries_uc = map(lambda q: edb.get_usercache_db().find(q).count(), user_queries)
+  total_entries = sum(num_entries_ts + num_entries_uc)
   logging.debug("Total entries requested: %d" % total_entries)
 
-  threshold = 200000 
+  threshold = 200000
   if total_entries > threshold:
     data_list = None
   else:
-    data_list = map(lambda q: list(edb.get_timeseries_db().find(q).sort("metadata.write_ts")), user_queries)
-   
+    data_list = map(lambda u: esdc.find_entries(u, None, time_query), ids)
+
   return {'phone_data': data_list}
 
 # Redirect to custom URL. $%$%$$ gmail
@@ -640,7 +670,7 @@ def after_request():
     logging.error("old style duration %s != timer based duration %s" % (duration, new_duration))
     stats.store_server_api_error(request.params.user_uuid, "MISMATCH_%s_%s" %
                                  (request.method, request.path), msTimeNow, duration - new_duration)
-    
+
   print("END %s %s %s %s %s " % (datetime.now(), request.method, request.path, request.params.user_uuid, duration))
   logging.debug("END %s %s %s %s " % (request.method, request.path, request.params.user_uuid, duration))
   # Keep track of the time and duration for each call

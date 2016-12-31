@@ -24,6 +24,7 @@ import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.net.usercache.abstract_usercache as enua
 
 import emission.storage.timeseries.aggregate_timeseries as estag
+import emission.storage.timeseries.cache_series as estc
 
 MANUAL_INCIDENT_KEY = "manual/incident"
 
@@ -122,17 +123,15 @@ def incident_heatmap(user_uuid, modes, time_query, region):
         mode_enum_list = [ecwm.MotionTypes[mode] for mode in modes]
         extra_query_list.append(esdlq.get_mode_query(mode_enum_list))
 
-    incident_entry_list = esda.get_entries(MANUAL_INCIDENT_KEY, user_id=None,
-                                      time_query=time_query, geo_query=geo_query,
-                                      extra_query_list=extra_query_list)
-    all_incidents_list = incident_entry_list
-    if user_uuid is not None:
+    if user_uuid is None:
+        incident_entry_list = esda.get_entries(MANUAL_INCIDENT_KEY, user_id=None,
+                                          time_query=time_query, geo_query=geo_query,
+                                          extra_query_list=extra_query_list)
+    else:
         # We don't support aggregate queries on the usercache. And that is
         # actually fine, because we don't expect immediate results for the
         # aggregate case. We just want to query the usercache to ensure that
         # the incidents don't magically disappear just because they got pushed
         # to the server but are not yet processed
-        incident_usercache_list = enua.UserCache.getUserCache(user_uuid).getMessage(
-            [MANUAL_INCIDENT_KEY], time_query)
-        all_incidents_list.extend(incident_usercache_list)
-    return {"incidents": [e.data for e in all_incidents_list]}
+        incident_entry_list = estc.find_entries([MANUAL_INCIDENT_KEY], time_query)
+    return {"incidents": [e.data for e in incident_entry_list]}
