@@ -52,7 +52,13 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         data that they want from the sensor streams in order to determine the
         segmentation points.
         """
-        filtered_points_df = timeseries.get_data_df("background/filtered_location", time_query)
+        filtered_points_pre_ts_diff_df = timeseries.get_data_df("background/filtered_location", time_query)
+        # Sometimes, we can get bogus points because data.ts and
+        # metadata.write_ts are off by a lot. If we don't do this, we end up
+        # appearing to travel back in time
+        # https://github.com/e-mission/e-mission-server/issues/457
+        filtered_points_df = filtered_points_pre_ts_diff_df[(filtered_points_pre_ts_diff_df.metadata_write_ts - filtered_points_pre_ts_diff_df.ts) < 1000]
+        filtered_points_df.reset_index(inplace=True)
         transition_df = timeseries.get_data_df("statemachine/transition", time_query)
         if len(transition_df) > 0:
             logging.debug("transition_df = %s" % transition_df[["fmt_time", "transition"]])
