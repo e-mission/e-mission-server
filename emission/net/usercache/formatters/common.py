@@ -18,4 +18,4 @@ def expand_metadata_times(m):
 
 def expand_data_times(d,m):
     d.local_dt = ecsdlq.get_local_date(d.ts, m.time_zone)
-    d.fmt_time = arrow.get(m.ts).to(m.time_zone).isoformat()
+    d.fmt_time = arrow.get(d.ts).to(m.time_zone).isoformat()
