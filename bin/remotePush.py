@@ -38,13 +38,14 @@ print "parse.com %s" % result
 parse_headers = {
    "X-Parse-Application-Id": config_data["emission_id"],
    "X-Parse-REST-API-Key": config_data["emission_key"],
+   "X-Parse-Master-Key": config_data["emission_master_key"],
    "Content-Type": "application/json"
 }
 
-connection = httplib.HTTPConnection('aws-parse-push-server', 1337)
+connection = httplib.HTTPSConnection('parseapi.back4app.com', 443)
 connection.connect()
 
-connection.request('POST', '/parse/push', json.dumps(silent_push_msg), parse_headers)
+connection.request('POST', '/push', json.dumps(silent_push_msg), parse_headers)
 
 result = json.loads(connection.getresponse().read())
 print "open parse server %s" % result
