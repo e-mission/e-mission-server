@@ -1,4 +1,7 @@
 {
-    "emission_id": "Get from https://www.parse.com",
-    "emission_key": "Get from https://www.parse.com"
+    "emission_id_legacy": "Obsolete since parse.com has shut down. Only for backwards compatibility.",
+    "emission_key_legacy": "Obsolete since parse.com has shut down. Only for backwards compatibility",
+    "push_server": "Create while installing server from https://github.com/ParsePlatform/parse-server",
+    "emission_id": "Choose while starting push_server above",
+    "emission_key": "Choose while starting push_server above"
 }
