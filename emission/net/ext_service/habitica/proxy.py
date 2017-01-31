@@ -85,7 +85,6 @@ def habiticaRegister(username, email, password, our_uuid):
 
     #Since we have a new user in our db, create its default habits (walk, bike)
     setup_default_habits(our_uuid)
-
   return user_dict
 
 def initUserDoc(user_id, username, password, user_dict):
