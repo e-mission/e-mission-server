@@ -1,4 +1,4 @@
-  # Standard imports
+# Standard imports
 import json
 import requests
 import logging
