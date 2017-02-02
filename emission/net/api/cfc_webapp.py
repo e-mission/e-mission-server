@@ -41,6 +41,7 @@ from emission.core.wrapper.user import User
 from emission.core.get_database import get_uuid_db, get_mode_db
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.timeseries.timequery as estt
+import emission.storage.timeseries.tcquery as esttc
 import emission.storage.timeseries.aggregate_timeseries as estag
 import emission.storage.timeseries.cache_series as esdc
 import emission.core.timer as ect
@@ -549,7 +550,7 @@ def getPublicData():
   if total_entries > threshold:
     data_list = None
   else:
-    data_list = map(lambda u: esdc.find_entries(u, None, time_query), ids)
+    data_list = map(lambda u: esdc.find_entries(u, None, time_range), all_uuids)
 
   return {'phone_data': data_list}
 
