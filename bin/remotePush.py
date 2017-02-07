@@ -17,22 +17,6 @@ silent_push_msg = {
    }
 }
 
-parse_headers = {
-   "X-Parse-Application-Id": config_data["emission_id_legacy"],
-   "X-Parse-REST-API-Key": config_data["emission_key_legacy"],
-   "Content-Type": "application/json"
-}
-
-# Sending messages to standard parse.com
-# This is obsolete after 30th Jan
-connection = httplib.HTTPSConnection('api.parse.com', 443)
-connection.connect()
-
-connection.request('POST', '/1/push', json.dumps(silent_push_msg), parse_headers)
-
-result = json.loads(connection.getresponse().read())
-print "parse.com %s" % result
-
 # Sending messages to open source parse server
 # This is the long-term one used while going forward
 parse_headers = {
