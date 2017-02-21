@@ -1,35 +1,16 @@
-import json,httplib
-import sys
+import json
+import logging
+import argparse
 
-config_data = json.load(open('conf/net/ext_service/parse.json'))
+import emission.net.ext_service.push.notify_usage as pnu
 
-interval = "interval_%s" % sys.argv[1]
-print "pushing for interval %s" % interval
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(prog="silent_ios_push")
+    parser.add_argument("interval",
+        help="specify the sync interval that the phones have subscribed to",
+        type=int)
 
-silent_push_msg = {
-   "channels": [
-     interval
-   ],
-   "data": {
-     # "alert": "The Mets scored! The game is now tied 1-1.",
-     "content-available": 1,
-     "sound": "",
-   }
-}
-
-# Sending messages to open source parse server
-# This is the long-term one used while going forward
-parse_headers = {
-   "X-Parse-Application-Id": config_data["emission_id"],
-   "X-Parse-REST-API-Key": config_data["emission_key"],
-   "X-Parse-Master-Key": config_data["emission_master_key"],
-   "Content-Type": "application/json"
-}
-
-connection = httplib.HTTPSConnection('parseapi.back4app.com', 443)
-connection.connect()
-
-connection.request('POST', '/push', json.dumps(silent_push_msg), parse_headers)
-
-result = json.loads(connection.getresponse().read())
-print "open parse server %s" % result
+    args = parser.parse_args()
+    logging.debug("About to send notification to phones with interval %d" % args.interval)
+    response = pnu.send_silent_notification_to_ios_with_interval(args.interval, dev=True)
+    pnu.display_response(reponse)
