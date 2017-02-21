@@ -27,7 +27,7 @@ def send_silent_notification_to_ios_with_interval(interval, dev=False):
     query = pnq.combine_queries([pnq.get_platform_query("ios"),
                                  pnq.get_sync_interval_query(interval)])
     token_list = pnq.get_matching_tokens(query)
-    logging.debug("found %d tokens for ios with interval "+interval)
+    logging.debug("found %d tokens for ios with interval %d" % (len(token_list), interval))
     return pni.send_silent_notification(token_list, {}, dev)
 
 def display_response(response):
