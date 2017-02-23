@@ -1,9 +1,11 @@
 # Standard imports
 import json
+import copy
 import requests
 import logging
 import uuid
 import random
+import time
 
 # Our imports
 import emission.core.get_database as edb
@@ -64,6 +66,11 @@ def send_visible_notification(token_list, title, message, json_data, dev=False):
     return response
     
 def send_silent_notification(token_list, json_data, dev=False):
+    ios_raw_data = copy.copy(json_data)
+    # multiplying by 10^6 gives us the maximum resolution possible while still
+    # being not a float. Have to see if that is too big.
+    # Hopefully we will never send a push notification a millisecond to a single phone
+    ios_raw_data.update({"notId": int(time.time() * 10**6)})
     message_dict = {
         "tokens": token_list,
         "profile": "devpush",
@@ -76,8 +83,8 @@ def send_silent_notification(token_list, json_data, dev=False):
             "ios": {
                 "content_available": 1,
                 "priority": 10,
-                "data": json_data,
-                "payload": json_data
+                "data": ios_raw_data,
+                "payload": ios_raw_data
             }
         }
     }
