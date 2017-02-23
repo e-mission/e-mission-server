@@ -2,6 +2,7 @@
     "alert_type": "survey",
     "title": "Bike lanes along Hearst?",
     "message": "1 question survey - approx 10 secs",
+    "image": "icon",
     "spec": {
       "url": "https://berkeley.qualtrics.com/SE/?SID=SV_9t6KnGlK1qxOGGN",
       "uuidElementId": "QR~QID3"
