@@ -78,6 +78,10 @@ class User:
     logging.debug("Setting MPG array for user %s to : %s" % (self.uuid, mpg_array))
     get_profile_db().update({'user_id': self.uuid}, {'$set': {'mpg_array': mpg_array}})
 
+  def update(self, update_doc):
+    logging.debug("Updating user %s with fields %s" % (self.uuid, update_doc))
+    get_profile_db().update({'user_id': self.uuid}, {'$set': update_doc})
+
   def getCarbonFootprintForMode(self):
     logging.debug("Setting Carbon Footprint map for user %s to" % (self.uuid))
     #using conversion: 8.91 kg CO2 for one gallon
