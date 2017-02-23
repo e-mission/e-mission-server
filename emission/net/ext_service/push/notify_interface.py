@@ -47,7 +47,7 @@ def send_visible_notification(token_list, title, message, json_data, dev=False):
         "profile": "devpush",
         "notification": {
             "title": title,
-            "message": message,  # but on android, the title and message are null!
+            "message": message,
             "android": {
                 "data": json_data,
                 "payload": json_data,
