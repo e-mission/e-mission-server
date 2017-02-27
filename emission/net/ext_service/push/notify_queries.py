@@ -24,6 +24,7 @@ def combine_queries(query_list):
 def get_matching_tokens(query):
     logging.debug("Getting tokens matching query %s" % query)
     ret_cursor = edb.get_profile_db().find(query, {"_id": False, "device_token": True})
-    ret_list = map(lambda e: e["device_token"], ret_cursor)
+    mapped_list = map(lambda e: e.get("device_token"), ret_cursor)
+    ret_list = [item for item in mapped_list if item is not None]
     return ret_list
 

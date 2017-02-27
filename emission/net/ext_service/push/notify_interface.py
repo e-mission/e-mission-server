@@ -44,9 +44,16 @@ def get_and_invalidate_entries():
     invalidate_entries(ret_tokens_list)
 
 def send_visible_notification(token_list, title, message, json_data, dev=False):
+    if len(token_list) == 0:
+        logging.info("len(token_list) == 0, early return to save api calls")
+        return
+
+    profile_to_use = "devpush" if dev == True else "prodpush";
+    logging.debug("dev = %s, using profile = %s" % (dev, profile_to_use))
+
     message_dict = {
         "tokens": token_list,
-        "profile": "devpush",
+        "profile": profile_to_use,
         "notification": {
             "title": title,
             "message": message,
@@ -66,14 +73,22 @@ def send_visible_notification(token_list, title, message, json_data, dev=False):
     return response
     
 def send_silent_notification(token_list, json_data, dev=False):
+    if len(token_list) == 0:
+        logging.info("len(token_list) == 0, early return to save api calls")
+        return
+
     ios_raw_data = copy.copy(json_data)
     # multiplying by 10^6 gives us the maximum resolution possible while still
     # being not a float. Have to see if that is too big.
     # Hopefully we will never send a push notification a millisecond to a single phone
     ios_raw_data.update({"notId": int(time.time() * 10**6)})
+
+    profile_to_use = "devpush" if dev == True else "prodpush";
+    logging.debug("dev = %s, using profile = %s" % (dev, profile_to_use))
+
     message_dict = {
         "tokens": token_list,
-        "profile": "devpush",
+        "profile": profile_to_use,
         "notification": {
             "android": {
                 "content_available": 1,
