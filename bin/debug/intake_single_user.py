@@ -1,5 +1,6 @@
 import json
 import logging
+from logging import config
 import argparse
 import numpy as np
 import uuid
