@@ -36,7 +36,10 @@ class User:
   def fromUUID(user_uuid):
     user = User(user_uuid)
     uuid2Email = get_uuid_db().find_one({'uuid': user_uuid})
-    user.__email = uuid2Email['user_email']
+    # Remove once we remove obsolete code/tests that doesn't create an email ->
+    # uuid mapping
+    if 'user_email' in uuid2Email:
+      user.__email = uuid2Email['user_email']
     return user
 
   def getProfile(self):
