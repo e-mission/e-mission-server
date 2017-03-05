@@ -38,7 +38,7 @@ class User:
     uuid2Email = get_uuid_db().find_one({'uuid': user_uuid})
     # Remove once we remove obsolete code/tests that doesn't create an email ->
     # uuid mapping
-    if 'user_email' in uuid2Email:
+    if uuid2Email is not None and 'user_email' in uuid2Email:
       user.__email = uuid2Email['user_email']
     return user
 
