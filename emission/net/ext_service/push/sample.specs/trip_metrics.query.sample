@@ -16,15 +16,15 @@
             "hour": 20,
             "weekday": 4
         },
-        "freq": 'DAILY',
+        "freq": "DAILY",
         "checks": [
             {
-                "modes": ['WALKING', 'ON_FOOT'],
+                "modes": ["WALKING", "ON_FOOT"],
                 "metric": "distance",
                 "threshold": {"$gt": 1000}
             },
             {
-                "modes": ['WALKING', 'ON_FOOT'],
+                "modes": ["WALKING", "ON_FOOT"],
                 "metric": "count",
                 "threshold": {"$lt": 10}
             }
