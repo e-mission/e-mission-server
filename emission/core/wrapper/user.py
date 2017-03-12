@@ -35,6 +35,11 @@ class User:
   @staticmethod
   def fromUUID(user_uuid):
     user = User(user_uuid)
+    uuid2Email = get_uuid_db().find_one({'uuid': user_uuid})
+    # Remove once we remove obsolete code/tests that doesn't create an email ->
+    # uuid mapping
+    if uuid2Email is not None and 'user_email' in uuid2Email:
+      user.__email = uuid2Email['user_email']
     return user
 
   def getProfile(self):
@@ -77,6 +82,10 @@ class User:
   def setMpgArray(self, mpg_array):
     logging.debug("Setting MPG array for user %s to : %s" % (self.uuid, mpg_array))
     get_profile_db().update({'user_id': self.uuid}, {'$set': {'mpg_array': mpg_array}})
+
+  def update(self, update_doc):
+    logging.debug("Updating user %s with fields %s" % (self.uuid, update_doc))
+    get_profile_db().update({'user_id': self.uuid}, {'$set': update_doc})
 
   def getCarbonFootprintForMode(self):
     logging.debug("Setting Carbon Footprint map for user %s to" % (self.uuid))

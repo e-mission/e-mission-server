@@ -23,7 +23,7 @@ import emission.core.wrapper.entry as ecwe
 class BuiltinUserCacheHandler(enuah.UserCacheHandler):
     def __init__(self, user_id):
         super(BuiltinUserCacheHandler, self).__init__(user_id)
-       
+
     def moveToLongTerm(self):
         """
         In order to move to the long term, we need to do the following:
@@ -47,7 +47,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         # Since this is a temporary hack, this is fine
         if len(messages) == 0:
             logging.debug("No messages to process")
-            # Since we didn't get the current time range, there is no current 
+            # Since we didn't get the current time range, there is no current
             # state, so we don't need to mark it as done
             # esp.mark_usercache_done(None)
             return
@@ -73,7 +73,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
                 last_ts_processed = ecwe.Entry(unified_entry).metadata.write_ts
                 time_query.endTs = last_ts_processed
             except Exception as e:
-                logging.warning("Backtrace time %s" % e)
+                # logging.exception("Error while saving entry %s" % entry)
                 logging.warn("Got error %s while saving entry %s -> %s"% (e, entry, unified_entry))
                 try:
                     ts.insert_error(entry_doc)
@@ -164,7 +164,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         # pipeline were to run again
 
         start_ts = esp.get_complete_ts(self.user_id)
-        logging.debug("start ts from pipeline = %s, %s" % 
+        logging.debug("start ts from pipeline = %s, %s" %
            (start_ts, pydt.datetime.utcfromtimestamp(start_ts).isoformat()))
         trip_gj_list = self.get_trip_list_for_seven_days(start_ts)
         if len(trip_gj_list) == 0:
@@ -191,8 +191,8 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         self.delete_obsolete_entries(uc, valid_key_list)
 
     def storeCommonTripsToCache(self, time_query):
-        """ 
-        Determine which set of common trips to send to the usercache. 
+        """
+        Determine which set of common trips to send to the usercache.
         As of now we will run the pipeline on the full set of data and send that up
         """
         tour_model = esdtmpq.get_tour_model(self.user_id)
@@ -206,7 +206,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         # uc.putDocument("common_trips-%s" % str(pydt.date.today()),  tour_model)
         # valid_key_list = ["common_trips-%s" % str(pydt.date.today())]
         # self.delete_obsolete_entries(uc, valid_key_list)
-        logging.debug("About to save model with len(places) = %d and len(trips) = %d" % 
+        logging.debug("About to save model with len(places) = %d and len(trips) = %d" %
             (len(tour_model["common_places"]), len(tour_model["common_trips"])))
         uc.putDocument("common-trips", tour_model)
 
@@ -217,7 +217,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         """
         uc = enua.UserCache.getUserCache(self.user_id)
         return eacc.save_all_configs(self.user_id, time_query)
-        
+
 
     def get_oldest_valid_ts(self, start_ts):
         """
@@ -245,7 +245,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         valid_key_list.append('config/sensor_config')
         valid_key_list.append('config/sync_config')
         valid_key_list.append('config/consent')
-        logging.debug("curr_key_list = %s, valid_key_list = %s" % 
+        logging.debug("curr_key_list = %s, valid_key_list = %s" %
            (curr_key_list, valid_key_list))
         to_del_keys = set(curr_key_list) - set(valid_key_list)
         logging.debug("obsolete keys are: %s" % to_del_keys)

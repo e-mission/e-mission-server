@@ -1,0 +1,33 @@
+{
+    "query_type": "point_count",
+    "spec": {
+        "time_type": "local_date",
+        "from_local_date": {
+            "year": 2017,
+            "month": 2,
+            "day": 1,
+            "hour": 15,
+            "weekday": 0
+        },
+        "to_local_date": {
+            "year": 2017,
+            "month": 2,
+            "day": 28,
+            "hour": 20,
+            "weekday": 4
+        },
+        "modes": ["WALKING", "ON_FOOT", "BICYCLING"],
+        "sel_region": {
+          "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+              [ [ -122.2603598, 37.8760974], 
+                [-122.2570364, 37.8764663],
+                [-122.2565865, 37.8748711],
+                [-122.260005, 37.874398],
+                [-122.2603598, 37.8760974] ]
+              ]
+           }
+        }
+    }
+}

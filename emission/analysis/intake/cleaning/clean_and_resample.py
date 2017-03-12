@@ -87,6 +87,14 @@ def save_cleaned_segments_for_ts(user_id, start_ts, end_ts):
     """
     tl = esdtl.get_raw_timeline(user_id, start_ts, end_ts)
     tl.fill_start_end_places()
+    # For really old users who have data stored in the old format, or for
+    # really new users who have no data yet, we may have no data in the
+    # timeline, and no start place. If we don't have this check, we continue
+    # trying to process the information for this user and end up with 
+    # `raw_place = None` in `create_and_link_timeline`
+    if tl.is_empty():
+        logging.info("Raw timeline is empty, early return")
+        return None
     return save_cleaned_segments_for_timeline(user_id, tl)
 
 def save_cleaned_segments_for_timeline(user_id, tl):

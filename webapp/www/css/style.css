@@ -91,3 +91,70 @@ section {
     background-position: top left, center center;
 }
 
+
+.hvcenter {
+  display: flex;           /* establish flex container */
+  flex-direction: column;  /* make main axis vertical */
+  justify-content: center; /* center items vertically, in this case */
+  align-items: center;     /* center items horizontally, in this case */
+}
+
+.metric-half {
+ float: left;
+  width: 100%;
+  border-radius: 5px;
+  background-color: white;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.03), 0 2px 3px rgba(0, 0, 0, 0.05);  color: #01D0A7;
+  height: 30px;
+  overflow: hidden;
+  position: relative;
+}
+
+.metric-chart-button {
+  width: 50%;
+  position: absolute;
+  left: 50%;
+  height: 30px;
+  font-weight: 700;
+  overflow: hidden;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+.metric-chart-button-active {
+  width: 50%;
+  position: absolute;
+  left: 50%;
+  height: 30px;
+  background-color: #01D0A7;
+  color: white;
+  font-weight: 700;
+  overflow: hidden;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+.metric-summary-button {
+  width: 50%;
+  position: absolute;
+  border-right-color: #ccc;
+  border-right-style: solid;
+  border-right-width: 1px;
+  height: 30px;
+  font-weight: 700;
+  overflow: hidden;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+.metric-summary-button-active {
+  width: 50%;
+  position: absolute;
+  border-right-color: #ccc;
+  border-right-style: solid;
+  border-right-width: 1px;
+  height: 30px;
+  background-color: #01D0A7;
+  color: white;
+  font-weight: 700;
+  overflow: hidden;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}

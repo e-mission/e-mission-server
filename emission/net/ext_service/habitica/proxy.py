@@ -2,7 +2,6 @@
 import json
 import requests
 import logging
-import arrow
 import urllib2
 import uuid
 import random
@@ -121,6 +120,11 @@ def habiticaProxy(user_uuid, method, method_url, method_args):
                             json=method_args)
   logging.debug("result = %s" % result)
   result.raise_for_status()
+  # result['testing'] = 'test'
+  temp = result.json()
+  temp['auth'] = {'apiId': stored_cfg['habitica_id'],
+                  'apiToken': stored_cfg['habitica_token']}
+  result.encoding, result._content = 'utf8', json.dumps(temp)
   return result
 
 

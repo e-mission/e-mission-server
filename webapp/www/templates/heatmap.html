@@ -1,5 +1,13 @@
 <ion-view view-title="Heatmap">
   <ion-content class="has-header padding">
+    <div style="height: 40px; width: 100%; padding: 10px;"> <!-- visualization control -->
+      <div class="metric-half">
+        <div class="row">
+            <div ng-class="countButtonClass()" ng-click="showCounts()">Counts</div>
+            <div ng-class="stressButtonClass()" ng-click="showStress()">Stress</div>
+        </div>
+      </div>
+    </div>
     <div class="row">
       <div class="col col-25">
       <button class="button button-stable button-block row"
@@ -41,7 +49,7 @@
       </div> <!-- col -->
       <div class="col col-10">
         <button class="button button-assertive"
-                ng-click="getPopRoute()">Get!</button>
+                ng-click="getHeatmaps()">Get!</button>
       </div>
 
       <!--
@@ -52,6 +60,6 @@
         <button style="" class="button button-stable button-block  icon ion-checkmark">Valid</button>
       -->
     </div> <!-- row -->
-    <leaflet id='heatmap' width="100%" height="480px" defaults="mapCtrl.defaults"></leaflet>
+    <leaflet id='heatmap' width="100%" height="480px" defaults="mapCtrl.defaults" data-tap-disabled="true"></leaflet>
   </ion-content>
 </ion-view>

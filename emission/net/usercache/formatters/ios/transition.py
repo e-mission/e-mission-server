@@ -55,9 +55,15 @@ def format(entry):
     data.transition = transition_map[entry.data.transition].value
     logging.debug("Mapped %s -> %s" % (entry.data.transition, data.transition))
     
-    data.ts = formatted_entry.metadata.write_ts
-    data.local_dt = formatted_entry.metadata.write_local_dt
-    data.fmt_time = formatted_entry.metadata.write_fmt_time
+    if "ts" not in data:
+        data.ts = formatted_entry.metadata.write_ts
+        logging.debug("No existing timestamp, copyied from metadata%s" % data.ts)
+        data.local_dt = formatted_entry.metadata.write_local_dt
+        data.fmt_time = formatted_entry.metadata.write_fmt_time
+    else: 
+        logging.debug("Retaining existing timestamp %s" % data.ts)
+        fc.expand_data_times(data, metadata)
+
     formatted_entry.data = data
 
     return formatted_entry

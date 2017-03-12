@@ -41,9 +41,11 @@ from emission.core.wrapper.user import User
 from emission.core.get_database import get_uuid_db, get_mode_db
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.timeseries.timequery as estt
+import emission.storage.timeseries.tcquery as esttc
 import emission.storage.timeseries.aggregate_timeseries as estag
+import emission.storage.timeseries.cache_series as esdc
+import emission.core.timer as ect
 import emission.core.get_database as edb
-
 
 config_file = open('conf/net/api/webserver.conf')
 config_data = json.load(config_file)
@@ -220,17 +222,96 @@ def getCarbonHeatmap():
   return retVal
 
 @post("/result/heatmap/pop.route")
-def getPopRoute():
+def getPopRouteLegacy():
+  return getPopRoute("local_date")
+
+@post("/result/heatmap/pop.route/<time_type>")
+def getPopRoute(time_type):
+  if 'user' in request.json:
+     user_uuid = getUUID(request)
+  else:
+     user_uuid = None
+
+  if 'from_local_date' in request.json and 'to_local_date' in request.json:
+      start_time = request.json['from_local_date']
+      end_time = request.json['to_local_date']
+  else:
+      start_time = request.json['start_time']
+      end_time = request.json['end_time']
+
   modes = request.json['modes']
-  from_ld = request.json['from_local_date']
-  to_ld = request.json['to_local_date']
   region = request.json['sel_region']
-  logging.debug("Filtering values for range %s -> %s, region %s" % 
-        (from_ld, to_ld, region))
-  retVal = visualize.range_mode_heatmap(modes, from_ld, to_ld, region)
-  # retVal = common.generateRandomResult(['00-04', '04-08', '08-10'])
-  # logging.debug("In getCalPopRoute, retVal is %s" % retVal)
+  logging.debug("Filtering values for user %s, range %s -> %s, region %s" %
+        (user_uuid, start_time, end_time, region))
+  time_type_map = {
+      'timestamp': visualize.range_mode_heatmap_timestamp,
+      'local_date': visualize.range_mode_heatmap_local_date
+  }
+  viz_fn = time_type_map[time_type]
+  retVal = viz_fn(user_uuid, modes, start_time, end_time, region)
   return retVal
+
+@post("/result/heatmap/incidents/<time_type>")
+def getStressMap(time_type):
+    if 'user' in request.json:
+        user_uuid = getUUID(request)
+    else:
+        user_uuid = None
+
+    # modes = request.json['modes']
+    # hardcode modes to None because we currently don't store
+    # mode information along with the incidents
+    # we need to have some kind of cleaned incident that:
+    # has a mode
+    # maybe has a count generated from clustering....
+    # but then what about times?
+    modes = None
+    if 'from_local_date' in request.json and 'to_local_date' in request.json:
+        start_time = request.json['from_local_date']
+        end_time = request.json['to_local_date']
+    else:
+        start_time = request.json['start_time']
+        end_time = request.json['end_time']
+    region = request.json['sel_region']
+    logging.debug("Filtering values for %s, range %s -> %s, region %s" %
+                  (user_uuid, start_time, end_time, region))
+    time_type_map = {
+        'timestamp': visualize.incident_heatmap_timestamp,
+        'local_date': visualize.incident_heatmap_local_date
+    }
+    viz_fn = time_type_map[time_type]
+    retVal = viz_fn(user_uuid, modes, start_time, end_time, region)
+    # retVal = common.generateRandomResult(['00-04', '04-08', '08-10'])
+    # logging.debug("In getCalPopRoute, retVal is %s" % retVal)
+    return retVal
+
+@post("/datastreams/find_entries/<time_type>")
+def getTimeseriesEntries(time_type):
+    if 'user' not in request.json:
+        abort(401, "only a user can read his/her data")
+
+    user_uuid = getUUID(request)
+
+    key_list = request.json['key_list']
+    if 'from_local_date' in request.json and 'to_local_date' in request.json:
+        start_time = request.json['from_local_date']
+        end_time = request.json['to_local_date']
+        time_query = esttc.TimeComponentQuery("metadata.write_ts",
+                                              start_time,
+                                              end_time)
+    else:
+        start_time = request.json['start_time']
+        end_time = request.json['end_time']
+        time_query = estt.TimeQuery("metadata.write_ts",
+                                              start_time,
+                                              end_time)
+    # Note that queries from usercache are limited to 100,000 entries
+    # and entries from timeseries are limited to 250,000, so we will
+    # return at most 350,000 entries. So this means that we don't need
+    # additional filtering, but this should be documented in
+    # the API
+    data_list = esdc.find_entries(user_uuid, key_list, time_query)
+    return {'phone_data': data_list}
 
 @get('/result/carbon/all/summary')
 def carbonSummaryAllTrips():
@@ -292,6 +373,8 @@ def getTrips(day):
   logging.debug("type(ret_dict) = %s" % type(ret_dict))
   return ret_dict
 
+@post('/incidents/')
+
 @post('/profile/create')
 def createUserProfile():
   logging.debug("Called createUserProfile")
@@ -300,7 +383,7 @@ def createUserProfile():
   # UUID yet. All others should only use the UUID.
   if skipAuth:
     userEmail = userToken
-  else: 
+  else:
     userEmail = verifyUserToken(userToken)
   logging.debug("userEmail = %s" % userEmail)
   user = User.register(userEmail)
@@ -313,9 +396,15 @@ def updateUserProfile():
   logging.debug("Called updateUserProfile")
   user_uuid = getUUID(request)
   user = User.fromUUID(user_uuid)
-  mpg_array = request.json['mpg_array']
-  return user.setMpgArray(mpg_array)
+  new_fields = request.json['update_doc']
+  return user.update(new_fields)
 
+@post('/profile/get')
+def getUserProfile():
+  logging.debug("Called getUserProfile")
+  user_uuid = getUUID(request)
+  user = User.fromUUID(user_uuid)
+  return user.getProfile()
 
 @post('/profile/consent')
 def setConsentInProfile():
@@ -369,12 +458,12 @@ def getCarbonCompare():
   if not skipAuth:
     if 'User' not in request.headers or request.headers.get('User') == '':
         return "Waiting for user data to become available..."
-  
+
   from clients.choice import choice
 
   user_uuid = getUUID(request, inHeader=True)
   print ('UUID', user_uuid)
-  
+
   clientResult = userclient.getClientSpecificResult(user_uuid)
   if clientResult != None:
     logging.debug("Found overriding client result for user %s, returning it" % user_uuid)
@@ -418,7 +507,8 @@ def summarize_metrics(time_type):
     if old_style:
         logging.debug("old_style metrics found, returning array of entries instead of array of arrays")
         assert(len(metric_list) == 1)
-        ret_val['user_metrics'] = ret_val['user_metrics'][0]
+        if 'user_metrics' in ret_val:
+            ret_val['user_metrics'] = ret_val['user_metrics'][0]
         ret_val['aggregate_metrics'] = ret_val['aggregate_metrics'][0]
     return ret_val
 
@@ -439,7 +529,7 @@ def habiticaJoinGroup(group_id):
         logging.info("Aborting call with message %s" % e.message)
         abort(400, e.message)
 
-# Pulling public data from the server  
+# Pulling public data from the server
 @get('/eval/publicData/timeseries')
 def getPublicData():
   ids = request.json['phone_ids']
@@ -451,22 +541,23 @@ def getPublicData():
 
   time_range = estt.TimeQuery("metadata.write_ts", float(from_ts), float(to_ts))
   time_query = time_range.get_query()
-  
+
   user_queries = map(lambda id: {'user_id': id}, uuids)
 
   for q in user_queries:
     q.update(time_query)
-  
-  num_entries = map(lambda q: edb.get_timeseries_db().find(q).count(), user_queries)
-  total_entries = sum(num_entries)
+
+  num_entries_ts = map(lambda q: edb.get_timeseries_db().find(q).count(), user_queries)
+  num_entries_uc = map(lambda q: edb.get_usercache_db().find(q).count(), user_queries)
+  total_entries = sum(num_entries_ts + num_entries_uc)
   logging.debug("Total entries requested: %d" % total_entries)
 
-  threshold = 200000 
+  threshold = 200000
   if total_entries > threshold:
     data_list = None
   else:
-    data_list = map(lambda q: list(edb.get_timeseries_db().find(q).sort("metadata.write_ts")), user_queries)
-   
+    data_list = map(lambda u: esdc.find_entries(u, None, time_range), all_uuids)
+
   return {'phone_data': data_list}
 
 # Redirect to custom URL. $%$%$$ gmail
@@ -572,17 +663,28 @@ def habiticaProxy():
 def before_request():
   print("START %s %s %s" % (datetime.now(), request.method, request.path))
   request.params.start_ts = time.time()
+  request.params.timer = ect.Timer()
+  request.params.timer.__enter__()
   logging.debug("START %s %s" % (request.method, request.path))
 
 @app.hook('after_request')
 def after_request():
   msTimeNow = time.time()
+  request.params.timer.__exit__()
   duration = msTimeNow - request.params.start_ts
+  new_duration = request.params.timer.elapsed
+  if round((duration - new_duration) / new_duration > 100) > 0:
+    logging.error("old style duration %s != timer based duration %s" % (duration, new_duration))
+    stats.store_server_api_error(request.params.user_uuid, "MISMATCH_%s_%s" %
+                                 (request.method, request.path), msTimeNow, duration - new_duration)
+
   print("END %s %s %s %s %s " % (datetime.now(), request.method, request.path, request.params.user_uuid, duration))
   logging.debug("END %s %s %s %s " % (request.method, request.path, request.params.user_uuid, duration))
   # Keep track of the time and duration for each call
-  stats.storeServerEntry(request.params.user_uuid, "%s %s" % (request.method, request.path),
+  stats.store_server_api_time(request.params.user_uuid, "%s_%s" % (request.method, request.path),
         msTimeNow, duration)
+  stats.store_server_api_time(request.params.user_uuid, "%s_%s_cputime" % (request.method, request.path),
+        msTimeNow, new_duration)
 
 # Auth helpers BEGIN
 # This should only be used by createUserProfile since we may not have a UUID
