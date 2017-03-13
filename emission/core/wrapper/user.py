@@ -186,6 +186,20 @@ class User:
   @staticmethod
   def register(userEmail):
     import uuid
+    # This is the UUID that will be stored in the trip database
+    # in order to do some fig leaf of anonymity
+    # Since we now generate truly anonymized UUIDs, and we expect that the
+    # register operation is idempotent, we need to check and ensure that we don't
+    # change the UUID if it already exists.
+    existing_entry = get_uuid_db().find_one({"user_email": userEmail})
+    if existing_entry is None:
+        anonUUID = uuid.uuid4()
+    else:
+        anonUUID = existing_entry['uuid']
+    return User.registerWithUUID(userEmail, anonUUID)
+
+  @staticmethod
+  def registerWithUUID(userEmail, anonUUID):
     from datetime import datetime
     from emission.core.wrapper.client import Client
 
@@ -208,16 +222,7 @@ class User:
     # because that allows us to use upsert :)
     # A bonus fix is that if something is messed up in the DB, calling create again will fix it.
 
-    # This is the UUID that will be stored in the trip database
-    # in order to do some fig leaf of anonymity
-    # Since we now generate truly anonymized UUIDs, and we expect that the
-    # register operation is idempotent, we need to check and ensure that we don't
-    # change the UUID if it already exists.
-    existing_entry = get_uuid_db().find_one({"user_email": userEmail})
-    if existing_entry is None:
-        anonUUID = uuid.uuid4()
-    else:
-        anonUUID = existing_entry['uuid']
+
     emailUUIDObject = {'user_email': userEmail, 'uuid': anonUUID, 'update_ts': datetime.now()}
     writeResultMap = get_uuid_db().update(userEmailQuery, emailUUIDObject, upsert=True)
     # Note, if we did want the create_ts to not be overwritten, we can use the
