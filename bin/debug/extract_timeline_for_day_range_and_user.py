@@ -24,7 +24,10 @@ def export_timeline(user_id_str, start_day_str, end_day_str, file_name):
         (start_day_ts, arrow.get(start_day_ts),
          end_day_ts, arrow.get(end_day_ts)))
 
-    ts = esta.TimeSeries.get_time_series(uuid.UUID(user_id_str))
+    if user_id_str == "all":
+        ts = esta.TimeSeries.get_aggregate_time_series(uuid.UUID(user_id_str))
+    else:
+        ts = esta.TimeSeries.get_time_series(uuid.UUID(user_id_str))
     loc_time_query = estt.TimeQuery("data.ts", start_day_ts, end_day_ts)
     loc_entry_list = list(ts.find_entries(key_list=None, time_query=loc_time_query))
     trip_time_query = estt.TimeQuery("data.start_ts", start_day_ts, end_day_ts)

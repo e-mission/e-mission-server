@@ -14,7 +14,7 @@ if __name__ == '__main__':
     parser.add_argument("-r", "--retain", action="store_true",
         help="specify whether the entries should overwrite existing ones (default) or create new ones")
 
-    parser.add_argument("-v", "--verbose",
+    parser.add_argument("-v", "--verbose", type=int,
         help="after how many lines we should print a status message.")
 
     args = parser.parse_args()

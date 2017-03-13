@@ -292,7 +292,9 @@ class BuiltinTimeSeries(esta.TimeSeries):
             keyfunc = lambda e: e.metadata.key
             sorted_data = sorted(entries, key=keyfunc)
             for k, g in itertools.groupby(sorted_data, keyfunc):
-                return self.get_timeseries_db(k).insert(g, continue_on_error=True)
+                glist = list(g)
+                logging.debug("Inserting %s entries for key %s" % (len(glist), k))
+                self.get_timeseries_db(k).insert(glist, continue_on_error=False)
         else:
             return ts_enum_map[data_type].insert(entries, continue_on_error=True)
 
@@ -305,7 +307,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
             entry = ecwe.Entry(entry)
         if "user_id" not in entry or entry["user_id"] is None:
             entry["user_id"] = self.user_id
-        if entry["user_id"] != self.user_id:
+        if self.user_id is not None and entry["user_id"] != self.user_id:
             raise AttributeError("Saving entry %s for %s in timeseries for %s" % 
 		(entry, entry["user_id"], self.user_id))
         else:
