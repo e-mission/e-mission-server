@@ -122,6 +122,18 @@ $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py -n /tmp/data-c
    
 #### Other data sources ####
 1. Get your own data. You can export your timeline for a particular day via email (Profile -> Download json dump) and then load and view it as above.
+
+1. Request access to anonymized data for research purposes by sending email to @shankari. You will be asked to consent to data retention and usage policies and will get an encrypted timeline with data from multiple users. Since this data contains information from mutiple users, and you presumably want to retain the uuids, to correlate with other surveys that you might have performed, you should use the `load_multi_timeline_for_range.py` script.
+
+   ```
+   ./e-mission-py.bash bin/debug/load_multi_timeline_for_range.py all_users_sep_dec_2016
+   ```
+   
+   You can also remove the data by using `bin/purge_database_json.py`, which will delete everything, or `bin/debug/purge_multi_timeline_for_range.py`, which will only delete the entries in that timeline - e.g.
+   
+   ```
+   ./e-mission-py.bash bin/debug/purge_multi_timeline_for_range.py all_users_sep_dec_2016
+   ```
    
 1. Sample timeline data from the test phones can be retrieved using the `bin/public/request_public_data.py` script. You can see the inputs to pass to the script by using
    ```
