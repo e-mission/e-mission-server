@@ -128,6 +128,11 @@ $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py -n /tmp/data-c
    ```
    ./e-mission-py.bash bin/debug/load_multi_timeline_for_range.py all_users_sep_dec_2016
    ```
+   In general, these timelines also contain analysis results, so there is no need to re-run the intake pipeline. The script will automatically detect this and print the following line.
+   
+   ```
+   timeline contains analysis results, no need to run the intake pipeline
+   ```
    
    You can also remove the data by using `bin/purge_database_json.py`, which will delete everything, or `bin/debug/purge_multi_timeline_for_range.py`, which will only delete the entries in that timeline - e.g.
    
