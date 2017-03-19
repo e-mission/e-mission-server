@@ -28,7 +28,7 @@ import bson.json_util
 # Our imports
 import modeshare, zipcode, distance, tripManager, \
                  Berkeley, visualize, stats, usercache, timeline, \
-                 metrics
+                 metrics, pipeline
 import emission.net.ext_service.moves.register as auth
 import emission.net.ext_service.habitica.proxy as habitproxy
 import emission.analysis.result.carbon as carbon
@@ -284,6 +284,11 @@ def getStressMap(time_type):
     # retVal = common.generateRandomResult(['00-04', '04-08', '08-10'])
     # logging.debug("In getCalPopRoute, retVal is %s" % retVal)
     return retVal
+
+@post("/pipeline/get_complete_ts")
+def getPipelineState():
+    user_uuid = getUUID(request)
+    return {"complete_ts": pipeline.get_complete_ts(user_uuid)}
 
 @post("/datastreams/find_entries/<time_type>")
 def getTimeseriesEntries(time_type):
