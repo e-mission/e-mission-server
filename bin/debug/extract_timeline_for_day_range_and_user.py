@@ -25,7 +25,7 @@ def export_timeline(user_id_str, start_day_str, end_day_str, file_name):
          end_day_ts, arrow.get(end_day_ts)))
 
     if user_id_str == "all":
-        ts = esta.TimeSeries.get_aggregate_time_series(uuid.UUID(user_id_str))
+        ts = esta.TimeSeries.get_aggregate_time_series()
     else:
         ts = esta.TimeSeries.get_time_series(uuid.UUID(user_id_str))
     loc_time_query = estt.TimeQuery("data.ts", start_day_ts, end_day_ts)
