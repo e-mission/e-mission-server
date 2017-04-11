@@ -2,6 +2,10 @@ import logging
 import emission.core.get_database as edb
 import emission.storage.timeseries.abstract_timeseries as esta
 import pandas as pd
+
+import matplotlib as mpl
+mpl.use('AGG')
+
 import matplotlib.pyplot as plt
 import datetime as dt
 import matplotlib.dates as mdates
