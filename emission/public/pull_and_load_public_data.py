@@ -33,7 +33,8 @@ def request_data(server_url, from_ts, to_ts, phone_ids, debug):
                 else:
                     logging.debug(str(
                         entry_list[0].get('metadata').get('write_fmt_time')))
-                    # logging.debug("saving %d entries" % len(entry_list))
+
+                logging.debug("saving %d entries" % len(entry_list))
 
             for entry in entry_list:
                 tsdb.save(entry)
