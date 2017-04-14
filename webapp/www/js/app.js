@@ -53,6 +53,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services',
   .state('game', {
     url: '/game',
     templateUrl: 'templates/game.html',
+  })
+  .state('partners', {
+    url: '/partners',
+    templateUrl: 'templates/partners.html',
+  })
+  .state('download', {
+    url: '/download',
+    templateUrl: 'templates/download.html',
   });
 
   // if none of the above states are matched, use this as the fallback
