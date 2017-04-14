@@ -19,6 +19,7 @@ import logging
 
 # Our imports
 import emission.storage.pipeline_queries as epq
+import emission.storage.decorations.user_queries as esdu
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.aggregate_timeseries as estag
 
@@ -63,9 +64,8 @@ def convert_to_filtered(entry):
     return entry
 
 def continuous_collection_in_range(timeseries):
-    import emission.pipeline.scheduler as eps
     return timeseries.user_id in estag.TEST_PHONE_IDS and \
-           timeseries.user_id not in eps.TEMP_HANDLED_PUBLIC_PHONES
+           timeseries.user_id not in esdu.TEMP_HANDLED_PUBLIC_PHONES
 
 def filter_accuracy(user_id):
     time_query = epq.get_time_range_for_accuracy_filtering(user_id)
