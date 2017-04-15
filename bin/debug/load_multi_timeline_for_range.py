@@ -7,6 +7,8 @@ import argparse
 import common
 import os
 
+import gzip
+
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.core.wrapper.user as ecwu
 import emission.core.wrapper.entry as ecwe
@@ -91,9 +93,9 @@ if __name__ == '__main__':
         logging.info("=" * 50)
         logging.info("Loading data from file %s" % filename)
         
-        entries = json.load(open(filename), object_hook = bju.object_hook)
+        entries = json.load(gzip.open(filename), object_hook = bju.object_hook)
 
-# Obtain uuid and rerun information from entries
+        # Obtain uuid and rerun information from entries
         curr_uuid_list, needs_rerun = common.analyse_timeline(entries)
         if len(curr_uuid_list) > 1:
             logging.warning("Found %d users, %s in filename, aborting! " % 
