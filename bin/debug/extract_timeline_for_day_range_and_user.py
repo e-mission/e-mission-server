@@ -3,6 +3,7 @@
 import sys
 import logging
 logging.basicConfig(level=logging.DEBUG)
+import gzip
 
 import uuid
 import datetime as pydt
@@ -44,9 +45,9 @@ def export_timeline(user_id, start_day_str, end_day_str, file_name):
     if len(combined_list) == 0 or unique_key_list == set(['stats/pipeline_time']):
         logging.info("No entries found in range for user %s, skipping save" % user_id)
     else:
-        combined_filename = "%s_%s" % (file_name, user_id)
+        combined_filename = "%s_%s.gz" % (file_name, user_id)
         json.dump(combined_list,
-            open(combined_filename, "w"), default=bju.default, allow_nan=False, indent=4)
+            gzip.open(combined_filename, "wb"), default=bju.default, allow_nan=False, indent=4)
 
 def validate_truncation(loc_entry_list, trip_entry_list, place_entry_list):
     MAX_LIMIT = 25 * 10000
