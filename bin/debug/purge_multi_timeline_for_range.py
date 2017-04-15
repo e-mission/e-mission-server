@@ -29,26 +29,36 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     fn = args.timeline_filename
-    logging.info("Loading file %s" % fn)
+    logging.info("Loading file or prefix %s" % fn)
+    sel_file_list = common.read_files_with_prefix(fn)
 
-    entries = json.load(open(fn), object_hook = bju.object_hook)
+    ts_db = edb.get_timeseries_db()
+    ats_db = edb.get_analysis_timeseries_db()
+    udb = edb.get_uuid_db()
 
-    unique_user_list = common.analyse_timeline(entries)
-    if not args.info_only:
-        ts_db = edb.get_timeseries_db()
-        ats_db = edb.get_analysis_timeseries_db()
-        udb = edb.get_uuid_db()
+    for i, filename in enumerate(sel_file_list):
+        logging.info("=" * 50)
+        logging.info("Deleting data from file %s" % filename)
 
-        for i, uuid in enumerate(unique_user_list):
-            
-            logging.info("For uuid = %s, deleting entries from the timeseries" % uuid)
-            timeseries_del_result = ts_db.remove({"user_id": uuid})
+        entries = json.load(open(filename), object_hook = bju.object_hook)
+
+        # Obtain uuid and rerun information from entries
+        curr_uuid_list, needs_rerun = common.analyse_timeline(entries)
+        if len(curr_uuid_list) > 1:
+            logging.warning("Found %d users, %s in filename, aborting! " % 
+                (len(curr_uuid_list), curr_uuid_list))
+            raise RuntimeException("Found %d users, %s in filename, expecting 1, %s" %
+                (len(curr_uuid_list), curr_uuid_list, common.split_user_id(filename)))
+        curr_uuid = curr_uuid_list[0]
+        if not args.info_only:
+            logging.info("For uuid = %s, deleting entries from the timeseries" % curr_uuid)
+            timeseries_del_result = ts_db.remove({"user_id": curr_uuid})
             logging.info("result = %s" % timeseries_del_result)
 
-            logging.info("For uuid = %s, deleting entries from the analysis_timeseries" % uuid)
-            analysis_timeseries_del_result = ats_db.remove({"user_id": uuid})
+            logging.info("For uuid = %s, deleting entries from the analysis_timeseries" % curr_uuid)
+            analysis_timeseries_del_result = ats_db.remove({"user_id": curr_uuid})
             logging.info("result = %s" % analysis_timeseries_del_result)
 
-            logging.info("For uuid %s, deleting entries from the user_db" % uuid)
-            user_db_del_result = udb.remove({"uuid": uuid})
+            logging.info("For uuid %s, deleting entries from the user_db" % curr_uuid)
+            user_db_del_result = udb.remove({"uuid": curr_uuid})
             logging.info("result = %s" % user_db_del_result)
