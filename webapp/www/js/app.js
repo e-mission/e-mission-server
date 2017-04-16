@@ -58,9 +58,9 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services',
     url: '/partners',
     templateUrl: 'templates/partners.html',
   })
-  .state('download', {
-    url: '/download',
-    templateUrl: 'templates/download.html',
+  .state('setup', {
+    url: '/setup/:groupId',
+    templateUrl: 'templates/setup.html',
   });
 
   // if none of the above states are matched, use this as the fallback
