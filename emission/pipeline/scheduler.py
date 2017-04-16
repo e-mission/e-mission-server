@@ -38,8 +38,8 @@ def get_split_uuid_lists(n_splits, is_public_pipeline):
     # non_zero_jobs = [j for j in sel_jobs if j[1] !=0 ]
     # Not filtering for now
     non_zero_jobs = sel_jobs
-    logging.debug("all_uuids = %s, sel_uuids = %s, sel_jobs = %s, non_zero_jobs = %s" %
-                  (len(all_uuids), len(sel_uuids), len(sel_jobs), len(non_zero_jobs)))
+    logging.debug("sel_uuids = %s, sel_jobs = %s, non_zero_jobs = %s" %
+                  (len(sel_uuids), len(sel_jobs), len(non_zero_jobs)))
 
     non_zero_jobs_df = pd.DataFrame(non_zero_jobs, columns=['user_id', 'count']).sort("count")
     ret_splits = []
