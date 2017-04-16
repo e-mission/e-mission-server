@@ -50,5 +50,7 @@ angular.module('starter.controllers', ['starter.heatmap', 'starter.metrics'])
 .controller('SetupCtrl', function($scope, $stateParams) {
     console.log("in setup, routeParams = "+JSON.stringify($stateParams));
     $scope.groupId = $stateParams.groupId;
+    $scope.hasGroup = $scope.groupId != "";
+    console.log("in setup, groupdId = "+$scope.groupId +" hasGroup = "+$scope.hasGroup);
 })
 
