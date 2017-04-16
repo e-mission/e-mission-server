@@ -47,6 +47,8 @@ angular.module('starter.controllers', ['starter.heatmap', 'starter.metrics'])
     addPersonalSlides();
 })
 
-.controller('DataCtrl', function($scope) {
+.controller('SetupCtrl', function($scope, $stateParams) {
+    console.log("in setup, routeParams = "+JSON.stringify($stateParams));
+    $scope.groupId = $stateParams.groupId;
 })
 
