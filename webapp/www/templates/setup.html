@@ -1,4 +1,4 @@
-<ion-view view-title="Download">
+<ion-view view-title="Setup">
   <ion-content>
       <div class="redirect">
         <div>
@@ -6,6 +6,41 @@
         </div>
         <div>
           <h1>Welcome to E-mission!</h1>
+          <a href="#/home">e-mission</a> is a tool to instrument the end-to-end
+            multi-modal travel experience, from the personal to the societal
+            scale. It automatically 
+            <br>
+            <br>
+            <table>
+            <colgroup>
+               <col span="1" style="width: 20%;">
+               <col span="1" style="width: 20%;">
+               <col span="1" style="width: 20%;">
+               <col span="1" style="width: 20%;">
+               <col span="1" style="width: 20%;">
+            </colgroup>
+            <tr> 
+                <td> generates a personal travel profile</td>
+                <td> collects user reported perceptual data </td>
+                <td> makes the aggregate <a href="#/heatmap">heatmaps</a> </td>
+                <td> and <a href="#/metrics">metrics</a> available for public use </td>
+                <td> and includes an integration with a <a href="#/game">game</a> for motivation.</td>
+            </tr>
+            <tr> 
+                <td> <img src="img/personal/list_view.png"/> </td>
+                <td> <img src="img/personal/detail_view.png"/> </td>
+                <td> <img src="img/aggregate/heatmap_short_time_scale_phone.png"/> </td>
+                <td> <img src="img/aggregate/metrics.png"/> </td>
+                <td> <img src="img/personal/game.png"/></td>
+            </tr>
+    </table>
+<br>
+<br>
+The links below are for installing and configuring the phone app, and are
+intended to be used <b>on the phone</b>. If you have opened this message on
+your desktop, please forward the message to your phone and click them there.
+Alternatively, you can use the QR codes below each step with a QR code reader
+on your phone.
         </div>
         <div>
           <svg width="58px" height="49px" viewBox="0 0 58 49" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -26,11 +61,16 @@
           <h3>Install E-mission</h3>
         </div>
         <div>
-          <p>Tap one of the buttons below from your iPhone or Android device to install E-mission.</p>
+          <p>If you need to install the app, tap one of the buttons below from your phone.</p>
         </div>
-        <div id="downloadRow">
-          <a href='https://play.google.com/store/apps/details?id=edu.berkeley.eecs.emission'><img style="height:75px;" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
-          <a href="https://itunes.apple.com/us/app/emission/id1084198445?&mt=8"><img ng-src="img/apple-badge.svg"></a>
+        <div class="row responsive-sm">
+          <a class="col" href='https://play.google.com/store/apps/details?id=edu.berkeley.eecs.emission'><img style="height:75px;" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
+          <a class="col" href="https://itunes.apple.com/us/app/emission/id1084198445?&mt=8"><img ng-src="img/apple-badge.svg"></a>
+            <!-- <br style="clear:both;"/> -->
+        </div>
+        <div class="row responsive-sm">
+          <qrcode class="col" data="https://play.google.com/store/apps/details?id=edu.berkeley.eecs.emission" size="200"></qrcode>
+          <qrcode class="col" data="https://itunes.apple.com/us/app/emission/id1084198445?&mt=8" size="200"></qrcode>
             <!-- <br style="clear:both;"/> -->
         </div>
         <div ng-if="hasGroup">
@@ -54,9 +94,11 @@
         </div>
         <div id="downloadRow">
           <a id="groupLink" href="emission://join/groupid={{groupId}}">
-            <p style="color: #417505;">Please open this link on your phone:</p>
+            <p style="color: #417505;">Opening this link on your phone will
+launch the app and join the group:</p>
             <p style="color: black;">emission://join/groupid={{groupId}}</p>
           </a>
+          <qrcode data="emission://join/groupid={{groupId}}" size="200"></qrcode>
         </div>
       </div>
       </div>
