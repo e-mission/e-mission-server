@@ -572,10 +572,7 @@ def getCustomURL(route):
   print urllib.urlencode(request.query)
   logging.debug("route = %s, query params = %s" % (route, request.query))
   if route == "join":
-    if server_port == "443":
-        redirected_url = "https://%s/#/setup/%s" % (server_host, request.query["groupid"])
-    else:
-        redirected_url = "http://%s:%s/#/setup/%s" % (server_host, server_port, request.query["groupid"])
+    redirected_url = "/#/setup?%s" % (urllib.urlencode(request.query))
   else:
     redirected_url = 'emission://%s?%s' % (route, urllib.urlencode(request.query))
   response.status = 303

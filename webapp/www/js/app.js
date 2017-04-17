@@ -60,7 +60,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services',
     templateUrl: 'templates/partners.html',
   })
   .state('setup', {
-    url: '/setup/:groupId',
+    url: '/setup?groupid&userid',
     templateUrl: 'templates/setup.html',
     controller: 'SetupCtrl'
   });
