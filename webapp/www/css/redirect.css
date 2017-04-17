@@ -1,0 +1,72 @@
+.redirect div {
+  padding: 10px 25% 5px 25%;
+}
+
+.redirect h1 {
+  /* Welcome to E-mission: */
+  text-align: center;
+  font-family: AvenirNext-Bold;
+  color: #4A4A4A;
+  margin-bottom: 50px;
+}
+
+.redirect h3 {
+  /* Install E-mission: */
+  font-family: AvenirNext-DemiBold;
+  color: #4A4A4A;
+  display: inline-block;
+  line-height: 49px;
+  margin: 0;
+  padding: 0;
+  vertical-align: middle;
+}
+
+.redirect svg {
+  vertical-align: middle;
+  margin-right: 30px;
+}
+
+.redirect img {
+  display: block;
+  margin: auto;
+}
+
+#logo {
+  width: 96px;
+}
+
+#downloadButton {
+  height: 65px;
+  padding: 0;
+}
+
+.redirect p {
+  font-family: AvenirNext-Regular;
+  color: #4A4A4A;
+  padding-left: 76px;
+}
+
+.redirect a {
+  display: inline-block;
+  padding: 0 10px 0 10px;
+}
+
+#downloadRow {
+  display: block;
+  margin: auto;
+  text-align: center;
+}
+
+#groupLink {
+  /* Rectangle 2: */
+  background: rgba(216,216,216,0.62);
+  border: 1px solid #417505;
+  border-radius: 8px;
+  text-align: center;
+  padding: 10px 10% 5px 10%;
+}
+
+#groupLink p {
+  font-family: AvenirNext-DemiBold;
+  padding: 0;
+}
