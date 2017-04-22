@@ -1,0 +1,8 @@
+{
+    "alert_type": "notify",
+    "title": "One-time re-login necessary",
+    "message": "The most recent update (v2.1.0) will prompt to re-login. Don't worry, this is a one-time requirement because google is shifting from UIWebView to SFSafariViewController for greater security.",
+    "image": "icon",
+    "spec": {
+    }
+}
