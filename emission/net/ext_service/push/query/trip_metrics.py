@@ -16,6 +16,7 @@ import emission.net.api.metrics as enam
 
 import emission.storage.decorations.local_date_queries as esdl
 import emission.storage.decorations.location_queries as esdlq
+import emission.storage.decorations.user_queries as esdu
 import emission.storage.timeseries.geoquery as estg
 import emission.storage.timeseries.timequery as estt
 import emission.storage.timeseries.tcquery as esttc
@@ -96,16 +97,7 @@ def is_matched_user(user_id, spec):
   return np.all(check_results)
 
 def query(spec):
-  # Copied from `emission/pipeline/scheduler.py`
-  # Refactor and pull out, possibly in user?
-  import emission.core.get_database as edb
-
-  all_uuids = [e["uuid"] for e in edb.get_uuid_db().find()] 
-  # Add back the test phones for now so that we can test the data
-  # collection changes before deploying them in the wild
-  # sel_uuids.extend(TEMP_HANDLED_PUBLIC_PHONES)
-  sel_uuids = all_uuids
-
+  sel_uuids = esdu.get_all_uuids()
   matched_uuid_list = [uuid for uuid in sel_uuids if is_matched_user(uuid, spec)]
   logging.info("matched matched_uuid_list of length = %s = %s" % 
     (len(matched_uuid_list), matched_uuid_list))

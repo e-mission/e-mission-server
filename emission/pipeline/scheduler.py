@@ -6,20 +6,8 @@ from uuid import UUID
 import emission.core.get_database as edb
 import emission.net.usercache.abstract_usercache as enua
 import emission.storage.timeseries.aggregate_timeseries as estag
+import emission.storage.decorations.user_queries as esdu
 import emission.pipeline.intake_stage as epi
-
-# Comment this out and comment in the stuff below in production
-TEMP_HANDLED_PUBLIC_PHONES = []
-
-#TEMP_HANDLED_PUBLIC_PHONES = [UUID("079e0f1a-c440-3d7c-b0e7-de160f748e35"), # iphone 1
-#                         UUID("c76a0487-7e5a-3b17-a449-47be666b36f6"), # iphone 2
-#                         UUID("c528bcd2-a88b-3e82-be62-ef4f2396967a"), # iphone 3
-#                         UUID("95e70727-a04e-3e33-b7fe-34ab19194f8b"), # iphone 4
-#                         UUID("e471711e-bd14-3dbe-80b6-9c7d92ecc296"), # android 1
-#                         UUID("fd7b4c2e-2c8b-3bfa-94f0-d1e3ecbd5fb7"), # android 2
-#                         UUID("86842c35-da28-32ed-a90e-2da6663c5c73"), # android 3
-#                         UUID("3bc0f91f-7660-34a2-b005-5c399598a369")] # android 4
-
 
 def get_split_uuid_lists(n_splits, is_public_pipeline):
     get_count = lambda u: enua.UserCache.getUserCache(u).getMessageCount()
@@ -41,21 +29,17 @@ def get_split_uuid_lists(n_splits, is_public_pipeline):
     users based on that.
     """
 
-    all_uuids = [e["uuid"] for e in edb.get_uuid_db().find()]
     if is_public_pipeline:
-        sel_uuids = [u for u in all_uuids if u in estag.TEST_PHONE_IDS]
+        sel_uuids = esdu.get_test_phone_uuids()
     else:
-        sel_uuids = [u for u in all_uuids if u not in estag.TEST_PHONE_IDS]
-    # Add back the test phones for now so that we can test the data
-	# collection changes before deploying them in the wild
-	sel_uuids.extend(TEMP_HANDLED_PUBLIC_PHONES)
+        sel_uuids = esdu.get_non_test_phone_uuids()
 
     sel_jobs = [(u, get_count(u)) for u in sel_uuids]
     # non_zero_jobs = [j for j in sel_jobs if j[1] !=0 ]
     # Not filtering for now
     non_zero_jobs = sel_jobs
-    logging.debug("all_uuids = %s, sel_uuids = %s, sel_jobs = %s, non_zero_jobs = %s" %
-                  (len(all_uuids), len(sel_uuids), len(sel_jobs), len(non_zero_jobs)))
+    logging.debug("sel_uuids = %s, sel_jobs = %s, non_zero_jobs = %s" %
+                  (len(sel_uuids), len(sel_jobs), len(non_zero_jobs)))
 
     non_zero_jobs_df = pd.DataFrame(non_zero_jobs, columns=['user_id', 'count']).sort("count")
     ret_splits = []

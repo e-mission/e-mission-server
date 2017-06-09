@@ -28,7 +28,7 @@ import bson.json_util
 # Our imports
 import modeshare, zipcode, distance, tripManager, \
                  Berkeley, visualize, stats, usercache, timeline, \
-                 metrics
+                 metrics, pipeline
 import emission.net.ext_service.moves.register as auth
 import emission.net.ext_service.habitica.proxy as habitproxy
 import emission.analysis.result.carbon as carbon
@@ -63,6 +63,7 @@ private_key = key_data["private_key"]
 client_key = key_data["client_key"]
 client_key_old = key_data["client_key_old"]
 ios_client_key = key_data["ios_client_key"]
+ios_client_key_new = key_data["ios_client_key_new"]
 
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes
@@ -284,6 +285,11 @@ def getStressMap(time_type):
     # retVal = common.generateRandomResult(['00-04', '04-08', '08-10'])
     # logging.debug("In getCalPopRoute, retVal is %s" % retVal)
     return retVal
+
+@post("/pipeline/get_complete_ts")
+def getPipelineState():
+    user_uuid = getUUID(request)
+    return {"complete_ts": pipeline.get_complete_ts(user_uuid)}
 
 @post("/datastreams/find_entries/<time_type>")
 def getTimeseriesEntries(time_type):
@@ -563,13 +569,18 @@ def getPublicData():
 # Redirect to custom URL. $%$%$$ gmail
 @get('/redirect/<route>')
 def getCustomURL(route):
-  # print route
-  # print urllib.urlencode(request.query)
-  redirected_url = 'emission://%s?%s' % (route, urllib.urlencode(request.query))
+  print route
+  print urllib.urlencode(request.query)
+  logging.debug("route = %s, query params = %s" % (route, request.query))
+  if route == "join":
+    redirected_url = "/#/setup?%s" % (urllib.urlencode(request.query))
+  else:
+    redirected_url = 'emission://%s?%s' % (route, urllib.urlencode(request.query))
   response.status = 303
   response.set_header('Location', redirected_url)
   # response.set_header('Location', 'mailto://%s@%s' % (route, urllib.urlencode(request.query)))
   logging.debug("Redirecting to URL %s" % redirected_url)
+  print("Redirecting to URL %s" % redirected_url)
   return {'redirect': 'success'}
 
 
@@ -706,16 +717,22 @@ def verifyUserToken(token):
                 tokenFields = oauth2client.client.verify_id_token(token, ios_client_key)
                 logging.debug(tokenFields)
             except AppIdentityError as iOSExp:
-                traceback.print_exc()
-                logging.debug("OAuth failed to verify id token, falling back to constructedURL")
-                #fallback to verifying using Google API
-                constructedURL = ("https://www.googleapis.com/oauth2/v1/tokeninfo?id_token=%s" % token)
-                r = requests.get(constructedURL)
-                tokenFields = json.loads(r.content)
-                in_client_key = tokenFields['audience']
-                if (in_client_key != client_key):
-                    if (in_client_key != ios_client_key):
-                        abort(401, "Invalid client key %s" % in_client_key)
+                try:
+                    logging.debug("Using OAuth2Client to verify id token from newer iOS phones")
+                    tokenFields = oauth2client.client.verify_id_token(token, ios_client_key_new)
+                    logging.debug(tokenFields)
+                except AppIdentityError as iOSExp:
+                    traceback.print_exc()
+                    logging.debug("OAuth failed to verify id token, falling back to constructedURL")
+                    #fallback to verifying using Google API
+                    constructedURL = ("https://www.googleapis.com/oauth2/v1/tokeninfo?id_token=%s" % token)
+                    r = requests.get(constructedURL)
+                    tokenFields = json.loads(r.content)
+                    in_client_key = tokenFields['audience']
+                    if (in_client_key != client_key):
+                        if (in_client_key != ios_client_key and 
+                            in_client_key != ios_client_key_new):
+                            abort(401, "Invalid client key %s" % in_client_key)
     logging.debug("Found user email %s" % tokenFields['email'])
     return tokenFields['email']
 

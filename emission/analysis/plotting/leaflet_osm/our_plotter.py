@@ -6,7 +6,6 @@ import logging
 import geojson as gj
 import copy
 import attrdict as ad
-from functional import seq
 
 # import emission.analysis.classification.cleaning.location_smoothing as ls
 import bson.json_util as bju
@@ -46,6 +45,8 @@ def get_maps_for_range(user_id, start_ts, end_ts):
     return get_maps_for_geojson_list(geojson_list)
 
 def get_maps_for_usercache(user_id):
+    from functional import seq
+
     data_to_phone = seq(enau.sync_server_to_phone(user_id))
     logging.debug("Before pipeline, trips to phone list has length %d" % len(data_to_phone.to_list()))
     logging.debug("keys are %s" % data_to_phone.map(lambda e: ad.AttrDict(e).metadata.key))

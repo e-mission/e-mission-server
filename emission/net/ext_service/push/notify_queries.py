@@ -28,3 +28,9 @@ def get_matching_tokens(query):
     ret_list = [item for item in mapped_list if item is not None]
     return ret_list
 
+def get_matching_user_ids(query):
+    logging.debug("Getting tokens matching query %s" % query)
+    ret_cursor = edb.get_profile_db().find(query, {"_id": False, "user_id": True})
+    mapped_list = map(lambda e: e.get("user_id"), ret_cursor)
+    ret_list = [item for item in mapped_list if item is not None]
+    return ret_list
