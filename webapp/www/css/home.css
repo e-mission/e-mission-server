@@ -8,7 +8,7 @@
 
         .emission-docs-masthead {
             text-align: center;
-            height: 90vh;
+            height: 95vh;
             position: relative;
             padding: 0px 0px;
             color: #cdbfe3;
@@ -23,18 +23,34 @@
             background-repeat: repeat-x;
         }
 
-        .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
-
-        img {
-          display: block;
-          width: auto;
-          height: auto;
-          max-width: 100vh;
-          max-height: 90vh;
-          margin: 20px auto;
+        .carousel .carousel-inner {
+            height:100%
         }
 
-        uib-carousel {
-            width: 100vh;
-            height: 90vh;
+        .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+
+        .intro-img {
+          display: block;
+          width: auto;
+          height: 95vh;
+          margin: auto auto;
+          align: center;
+        }
+
+        .intro-slide {
+            margin: 0;
+            padding: 0px 0px;
+            height: 100%;
+            color: #cdbfe3;
+            background-color: #54DCC1;
+            background-image: -webkit-gradient(linear,left top,left bottom,from(#54DCC1),to(#01D0A7));
+            background-image: -webkit-linear-gradient(top,#54DCC1 0,#01D0A7 100%);
+            background-image: -o-linear-gradient(top,#54DCC1 0,#01D0A7 100%);
+            background-image: linear-gradient(to bottom,#54DCC1 0,#01D0A7 100%);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#54DCC1', endColorstr='#01D0A7', GradientType=0);
+        }
+
+        #home-content {
+            width: 100vw;
+            height: 95vh;
         }
