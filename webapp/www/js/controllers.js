@@ -14,13 +14,31 @@ angular.module('starter.controllers', ['starter.heatmap', 'starter.metrics'])
             text: 'background data collection of trips and user reported incident data',
             id: 0
         });
-        /*
         $scope.introSlides.push({
             image: 'img/intro/heatmap_explain.png',
             text: 'heatmaps for counting trips and visualizing stress',
             id: 1
         });
-        */
+        $scope.introSlides.push({
+            image: 'img/intro/game_explain.png',
+            text: 'habitica integration automatically gives points for every km walked and biked',
+            id: 2
+        });
+        $scope.introSlides.push({
+            image: 'img/intro/incident_report_explain.png',
+            text: 'users are prompted at the end of every trip to report incidents',
+            id: 3
+        });
+        $scope.introSlides.push({
+            image: 'img/intro/targeted_survey_explain.png',
+            text: 'targeted surveys can be sent to regular users to capture public input',
+            id: 4
+        });
+        $scope.introSlides.push({
+            image: 'img/intro/extension_explain.png',
+            text: 'customizing the UI while retaining native functionality is simple',
+            id: 5
+        });
     };
 
     var addAggregateSlides = function() {
