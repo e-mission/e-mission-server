@@ -6,6 +6,20 @@ angular.module('starter.controllers', ['starter.heatmap', 'starter.metrics'])
     $scope.active = 0;
     $scope.aggregateSlides = [];
     $scope.personalSlides = [];
+    $scope.introSlides = [];
+
+    var addIntroSlides = function() {
+        $scope.introSlides.push({
+            image: 'img/intro/diary_explain.png',
+            text: 'background data collection of trips and user reported incident data',
+            id: 0
+        });
+        $scope.introSlides.push({
+            image: 'img/intro/heatmap_explain.png',
+            text: 'heatmaps for counting trips and visualizing stress',
+            id: 1
+        });
+    };
 
     var addAggregateSlides = function() {
         $scope.aggregateSlides.push({
@@ -45,6 +59,7 @@ angular.module('starter.controllers', ['starter.heatmap', 'starter.metrics'])
 
     addAggregateSlides();
     addPersonalSlides();
+    addIntroSlides();
 })
 
 .controller('SetupCtrl', function($scope, $stateParams) {

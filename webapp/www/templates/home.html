@@ -1,8 +1,24 @@
 <ion-view view-title="Home">
     <ion-content>
         <section>
-            <section id="summary" style="padding-top:70px;">
-                <section class="container card center" style="padding-left:4%; padding-top:1%; padding-bottom:1%">
+            <section id="summary" class="emission-docs-masthead" role="main">
+                <section class="container center">
+                    <uib-carousel 
+                        active="active"
+                        interval=10000
+                        no-wrap="false">
+
+                        <uib-slide ng-repeat="slide in introSlides track by slide.id" index="slide.id">
+                            <img ng-src="{{slide.image}}" style="align:center">
+                            <div class="carousel-caption">
+                                <p>{{slide.text}}</p>
+                            </div>
+                        </uib-slide>
+                    </uib-carousel>
+                </section>
+            </section>
+            <section class="page" id="personal">
+                <section class="container">
                     <div class="">
                         <div class="row">
                             <div class="col-md-2 ">
