@@ -70,10 +70,6 @@ section {
     position: relative;
 }
 
-.carousel-caption {
-    background: rgba(0, 0, 0, 0.1);
-}
-
 .carousel-control {
   height: 80px;
   margin-top: 0;

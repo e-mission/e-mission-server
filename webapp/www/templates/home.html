@@ -1,8 +1,22 @@
 <ion-view view-title="Home">
-    <ion-content>
-        <section>
-            <section id="summary" style="padding-top:70px;">
-                <section class="container card center" style="padding-left:4%; padding-top:1%; padding-bottom:1%">
+    <ion-content id="home-content">
+            <section id="summary" class="emission-docs-masthead" role="main">
+                <h3 style="color: white">e-mission: the first open-source, extensible mobilityscope platform</h3>
+                <uib-carousel 
+                    active="active"
+                    interval=10000
+                    no-wrap="false">
+
+                    <uib-slide ng-repeat="slide in introSlides track by slide.id" index="slide.id" class="intro-slide">
+                        <img ng-src="{{slide.image}}" class="intro-img" style="height:90vh">
+                        <div class="carousel-caption">
+                            <p class="caption-text">{{slide.text}}</p>
+                        </div>
+                    </uib-slide>
+                </uib-carousel>
+            </section>
+            <section class="page" id="personal">
+                <section class="container">
                     <div class="">
                         <div class="row">
                             <div class="col-md-2 ">
@@ -111,6 +125,5 @@
                </div>
                     </section>
                 </section>
-            </section>  
         </ion-content>
     </ion-view>
