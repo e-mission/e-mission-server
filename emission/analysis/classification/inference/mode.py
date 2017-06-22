@@ -95,7 +95,8 @@ class ModeInferencePipeline:
         
     logging.debug("Querying confirmedSections %s" % (datetime.now()))
     begin = time.time()
-    confirmedSections = sectionDb.find(sectionQuery)
+    confirmedSections = sectionDb.find(sectionQuery).sort('_id', 1)
+
     duration = time.time() - begin
     logging.debug("Querying confirmedSection took %s" % (duration))
     
