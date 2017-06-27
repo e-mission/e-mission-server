@@ -38,6 +38,10 @@ def get_profile_db():
     Profiles=_get_current_db().Stage_Profiles
     return Profiles
 
+def get_prediction_db():
+    Predictions=_get_current_db().Stage_Predictions
+    return Predictions
+
 """
 def get_routeDistanceMatrix_db():
     current_db=MongoClient().Stage_database
