@@ -15,17 +15,39 @@ Modes = get_mode_db()
 
 
 # The speed is in m/s
-def calSpeed(trackpoint1, trackpoint2):
+def calSpeed(section):
   from dateutil import parser
-  distanceDelta = calDistance(trackpoint1['track_location']['coordinates'],
-                              trackpoint2['track_location']['coordinates'])
-  timeDelta = parser.parse(trackpoint2['time']) - parser.parse(trackpoint1['time'])
+
+  if ((not section['start_loc']) or (not section['end_loc'])):
+    return None
+
+  try:
+      distanceDelta = calDistance(section['start_loc']['coordinates'],
+                                  section['end_loc']['coordinates'])
+     
+  
+  except:
+    return None
+
+  timeDelta = section['end_ts'] - section['start_ts']
   # logging.debug("while calculating speed form %s -> %s, distanceDelta = %s, timeDelta = %s" %
   #               (trackpoint1, trackpoint2, distanceDelta, timeDelta))
-  if timeDelta.total_seconds() != 0:
-    return distanceDelta / timeDelta.total_seconds()
+  if timeDelta != 0:
+    return distanceDelta / timeDelta
   else:
     return None
+
+# def calSpeed(trackpoint1, trackpoint2):
+#   from dateutil import parser
+#   distanceDelta = calDistance(trackpoint1['track_location']['coordinates'],
+#                               trackpoint2['track_location']['coordinates'])
+#   timeDelta = parser.parse(trackpoint2['time']) - parser.parse(trackpoint1['time'])
+#   # logging.debug("while calculating speed form %s -> %s, distanceDelta = %s, timeDelta = %s" %
+#   #               (trackpoint1, trackpoint2, distanceDelta, timeDelta))
+#   if timeDelta.total_seconds() != 0:
+#     return distanceDelta / timeDelta.total_seconds()
+#   else:
+#     return None
 
 # This formula is from:
 # http://www.movable-type.co.uk/scripts/latlong.html
@@ -154,13 +176,37 @@ def calAvgSpeed(segment):
 # segment0: speed0 / (t1 - t0), segment1: (speed1 - speed0)/(t2-t1),
 # segment2: (speed2 - speed1) / (t3-t2)
 
+# def calAccels(segment):
+#   from dateutil import parser
+
+#   speeds = calSpeeds(segment)
+#   trackpoints = segment['track_points']
+
+#   if speeds is None or len(speeds) == 0:
+#     return None
+
+#   accel = np.zeros(len(speeds) - 1)
+#   prevSpeed = 0
+#   for (i, speed) in enumerate(speeds[0:-1]):
+#     currSpeed = speed # speed0
+#     speedDelta = currSpeed - prevSpeed # (speed0 - 0)
+#     # t1 - t0
+#     timeDelta = parser.parse(trackpoints[i+1]['time']) - parser.parse(trackpoints[i]['time'])
+#     # logging.debug("while calculating accels from %s -> %s, speedDelta = %s, timeDelta = %s" %
+#     #   (trackpoints[i+1], trackpoints[i], speedDelta, timeDelta))
+#     if timeDelta.total_seconds() != 0:
+#       accel[i] = speedDelta/(timeDelta.total_seconds())
+#       # logging.debug("resulting acceleration is %s" % accel[i])
+#     prevSpeed = currSpeed
+#   return accel
+
 def calAccels(segment):
   from dateutil import parser
 
-  speeds = calSpeeds(segment)
-  trackpoints = segment['track_points']
+  speed = calSpeed(segment)
+  
 
-  if speeds is None or len(speeds) == 0:
+  if speeds is None:
     return None
 
   accel = np.zeros(len(speeds) - 1)
@@ -248,8 +294,7 @@ def calSpeedDistParams(speeds):
 def mode_cluster(mode,eps,sam):
     mode_change_pnts=[]
     # print(tran_mat)
-    query = {"$and": [{'type': 'move'},\
-                      {'confirmed_mode':mode}]}
+    query = {'confirmed_mode':mode}
     # print(Sections.find(query).count())
     logging.debug("Trying to find cluster locations for %s trips" % (Sections.find(query).count()))
     for section in Sections.find(query).sort("section_start_datetime",1):

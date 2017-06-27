@@ -50,8 +50,7 @@ class ModeInferencePipeline:
     (self.featureMatrix, self.resultVector) = self.generateFeatureMatrixAndResultVectorStep()
     logging.info("generateFeatureMatrixAndResultVectorStep DONE")
     (self.cleanedFeatureMatrix, self.cleanedResultVector) = self.cleanDataStep()
-    print "Cleaned feature matrix"
-    print self.cleanedFeatureMatrix
+   
     logging.info("cleanDataStep DONE")
     self.selFeatureIndices = self.selectFeatureIndicesStep()
     logging.info("selectFeatureIndicesStep DONE")
@@ -91,10 +90,7 @@ class ModeInferencePipeline:
 
   def runPipeline(self):
     allConfirmedTripsQuery = ModeInferencePipeline.getSectionQueryWithGroundTruth({'$ne': ''})
-    print "\n\nConfirmed Trips Query\n\n"
-    print allConfirmedTripsQuery
-
-
+    
     (self.modeList, self.confirmedSections) = self.loadTrainingDataStep(allConfirmedTripsQuery)
     logging.debug("confirmedSections.count() = %s" % (self.confirmedSections.count()))
     
@@ -109,8 +105,7 @@ class ModeInferencePipeline:
     (self.featureMatrix, self.resultVector) = self.generateFeatureMatrixAndResultVectorStep()
     logging.info("generateFeatureMatrixAndResultVectorStep DONE")
     (self.cleanedFeatureMatrix, self.cleanedResultVector) = self.cleanDataStep()
-    print "Cleaned feature matrix"
-    print self.cleanedFeatureMatrix
+ 
     logging.info("cleanDataStep DONE")
     self.selFeatureIndices = self.selectFeatureIndicesStep()
     logging.info("selectFeatureIndicesStep DONE")
@@ -200,7 +195,7 @@ class ModeInferencePipeline:
         sectionDb.find(ModeInferencePipeline.getSectionQueryWithGroundTruth(mode['mode_id']))))
     duration = time.time() - begin
     logging.debug("Getting section query with ground truth took %s" % (duration))
-    #print list(confirmedSections)
+ 
 
     duration = time.time() - begin
     return (modeList, confirmedSections)
@@ -228,24 +223,19 @@ class ModeInferencePipeline:
 
       # This will crash the script because we will try to access a record that
       # doesn't exist.
-      # print "COUNT: " 
-      # print self.confirmedSections.count()
+
       # So we limit the records to the size of the matrix that we have created
       for (i, section) in enumerate(self.confirmedSections.limit(featureMatrix.shape[0]).batch_size(300)):
-       # try:
+       try:
         self.updateFeatureMatrixRowWithSection(featureMatrix, i, section)
         resultVector[i] = self.getGroundTruthMode(section)
-        # print "SECTION"
-        # print section
+    
 
         if i % 100 == 0:
             logging.debug("Processing record %s " % i)
-      # except Exception, e:
-      #     print "skipping section %s due to error %s " % (section, e)
-      #     logging.debug("skipping section %s due to error %s " % (section, e))
-      # print "GENERATE"
-      # print featureMatrix
-      # print resultVector
+      except Exception, e:
+        logging.debug("skipping section %s due to error %s " % (section, e))
+    
       return (featureMatrix, resultVector)
 
   def getGroundTruthMode(self, section):
@@ -285,9 +275,7 @@ class ModeInferencePipeline:
       featureMatrix[i,0] = section['distance']
     else:
       featureMatrix[i, 0] = easf.calDistance(section['start_loc']['coordinates'], section['end_loc']['coordinates'])  #####would need to calculate this
-    # print "HERE\n\n"
-    # print section.keys()
-    # print "\n\n"
+
     featureMatrix[i, 1] = (section['end_ts'] - section['start_ts'])
 
     # Deal with unknown modes like "airplane"
@@ -300,7 +288,7 @@ class ModeInferencePipeline:
     #featureMatrix[i, 4] = easf.calAvgSpeed(section)
     #AAAspeeds = easf.calSpeeds(section)
     speeds = easf.calSpeed(section)
-    #print speeds
+ 
     if speeds != None: #and len(speeds) > 0:
         featureMatrix[i, 5] = np.mean(speeds)
         featureMatrix[i, 6] = np.std(speeds)
@@ -342,8 +330,7 @@ class ModeInferencePipeline:
     featureMatrix[i] = np.nan_to_num(featureMatrix[i])
 
   def cleanDataStep(self):
-    # print "Result Vector"
-    # print self.resultVector
+ 
     runIndices = self.resultVector == 2
     transportIndices = self.resultVector == 4
     mixedIndices = self.resultVector == 8
@@ -355,21 +342,16 @@ class ModeInferencePipeline:
       np.count_nonzero(mixedIndices), np.count_nonzero(unknownIndices),
       np.count_nonzero(strippedIndices)))
 
-    # print "Feature Matrix:"
-    # print self.featureMatrix
+  
     strippedFeatureMatrix = self.featureMatrix[strippedIndices]
     strippedResultVector = self.resultVector[strippedIndices]
 
-    # print strippedIndices
-    # print "stripped:"
-    # print strippedFeatureMatrix
+    
     # In spite of stripping out the values, we see that there are clear
     # outliers. This is almost certainly a mis-classified trip, because the
     # distance and speed are both really large, but the mode is walking. Let's
     # manually filter out this outlier.
-    print "FEATURE MATRIX"
-    print strippedFeatureMatrix
-
+ 
     distanceOutliers = strippedFeatureMatrix[:,0] > 500000
     speedOutliers = strippedFeatureMatrix[:,4] > 100
     speedMeanOutliers = strippedFeatureMatrix[:,5] > 80
@@ -381,8 +363,7 @@ class ModeInferencePipeline:
             np.nonzero(maxSpeedOutliers)))
     nonOutlierIndices = np.logical_not(distanceOutliers | speedOutliers | speedMeanOutliers | speedVarianceOutliers | maxSpeedOutliers)
     logging.debug("nonOutlierIndices.shape = %s" % nonOutlierIndices.shape)
-    print "nonOutlierIndices"
-    print nonOutlierIndices
+
     return (strippedFeatureMatrix[nonOutlierIndices],
             strippedResultVector[nonOutlierIndices])
 
@@ -427,10 +408,7 @@ class ModeInferencePipeline:
       self.updateFeatureMatrixRowWithSection(featureMatrix, i, section)
       sectionIds.append(section['_id'])
       sectionUserIds.append(section['user_id'])
-    # print "Hey now\n\n\n"
-    # print featureMatrix
-    print self.selFeatureIndices
-    print featureMatrix[:,self.selFeatureIndices]
+
     return (featureMatrix[:,self.selFeatureIndices], sectionIds, sectionUserIds)
 
   def predictModesStep(self):
