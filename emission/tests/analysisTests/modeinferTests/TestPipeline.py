@@ -7,11 +7,17 @@ from datetime import datetime, timedelta
 
 # Our imports
 from emission.core.get_database import get_db, get_mode_db, get_section_db
-import emission.analysis.classification.inference.oldMode as pipeline
+import emission.analysis.classification.inference.mode as pipeline
 from emission.core.wrapper.user import User
 from emission.core.wrapper.client import Client
 import emission.tests.common as etc
+import emission.core.get_database as edb
 
+'''
+TODO:
+    Create some outliers and make sure they're stripped out
+
+'''
 class TestPipeline(unittest.TestCase):
   def setUp(self):
     self.testUsers = ["test@example.com", "best@example.com", "fest@example.com",
@@ -29,7 +35,7 @@ class TestPipeline(unittest.TestCase):
     self.assertEquals(self.SectionsColl.find().count(), 0)
 
     etc.loadTable(self.serverName, "Stage_Modes", "emission/tests/data/modes.json")
-    etc.loadTable(self.serverName, "Stage_Sections", "emission/tests/data/testModeInferFile")
+    etc.loadTable(self.serverName, "Stage_Sections", "emission/tests/data/newTestModeInferFilePlacesDeleted")
 
     # Let's make sure that the users are registered so that they have profiles
     for userEmail in self.testUsers:
@@ -42,13 +48,11 @@ class TestPipeline(unittest.TestCase):
     for section in self.SectionsColl.find():
       section['section_start_datetime'] = self.dayago
       section['section_end_datetime'] = self.dayago + timedelta(hours = 1)
-      if (section['confirmed_mode'] == 5):
+      if (('confirmed_mode' in section and section['confirmed_mode'] == 5) or ('sensed_mode' in section and section['sensed_mode'] == 5)):
         # We only cluster bus and train trips
         # And our test data only has bus trips
         section['section_start_point'] = {u'type': u'Point', u'coordinates': [-122.270039042, 37.8800285728]}
         section['section_end_point'] = {u'type': u'Point', u'coordinates': [-122.2690412952, 37.8739578595]}
-      # print("Section start = %s, section end = %s" %
-      #   (section['section_start_datetime'], section['section_end_datetime']))
       # Replace the user email with the UUID
       section['user_id'] = User.fromEmail(section['user_id']).uuid
       self.SectionsColl.save(section)
@@ -66,6 +70,7 @@ class TestPipeline(unittest.TestCase):
   def testLoadTrainingData(self):
     allConfirmedTripsQuery = pipeline.ModeInferencePipeline.getSectionQueryWithGroundTruth({'$ne': ''})
     (self.pipeline.modeList, self.pipeline.confirmedSections) = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery)
+    
     self.assertEquals(self.pipeline.confirmedSections.count(), len(self.testUsers) * 2)
 
   def testGenerateBusAndTrainStops(self):
@@ -76,23 +81,49 @@ class TestPipeline(unittest.TestCase):
     self.assertEquals(len(self.pipeline.train_cluster), 0)
     self.assertEquals(len(self.pipeline.bus_cluster), 2)
 
+
   def testFeatureGenWithOnePoint(self):
-    trackpoint1 = {"track_location": {"coordinates": [-122.0861645, 37.3910201]},
-                   "time" : "20150127T203305-0800"}
+    trackpoint1 = {u'coordinates': [0,0]}
     now = datetime.now()
 
     # ensure that the start and end datetimes are the same, since the average calculation uses
     # the total distance and the total duration
-    testSeg = {"track_points": [trackpoint1],
-               "distance": 500,
-               "section_start_datetime": now,
-               "section_end_datetime": now,
-               "mode": 1,
-               "section_id": 2}
-
+    # testSeg = {"track_points": [trackpoint1],
+    #            "distance": 500,
+    #            "section_start_datetime": now,
+    #            "section_end_datetime": now,
+    #            "sensed_mode": 1,
+    #            "section_id": 2}
+    testSeg = {"start_loc": trackpoint1,
+                "end_loc": trackpoint1,
+                "distance": 500,
+                "start_local_dt": {'hour': now.hour,
+                                 "minute": now.minute,
+                                  "second": now.second,
+                                  "weekday": now.weekday(),
+                                  "year": now.year, 
+                                  "month": now.month,
+                                  "day": now.day,
+                                  "timezone": "America/Los_Angeles"},
+                "end_local_dt": {"hour": now.hour,
+                                 "minute": now.minute,
+                                  "second": now.second,
+                                  "weekday": now.weekday(),
+                                  "year": now.year, 
+                                  "month": now.month,
+                                  "day": now.day,
+                                  "timezone": "America/Los_Angeles"},
+                "sensed_mode": 1,
+                "duration": 150,
+                "start_ts": (now - datetime(1970, 1, 1)).total_seconds(),
+                "end_ts": (now - datetime(1970, 1, 1)).total_seconds(),
+                "_id": 2,
+                "speeds":[],
+                "distances":[],
+                }
     featureMatrix = np.zeros([1, len(self.pipeline.featureLabels)])
     resultVector = np.zeros(1)
-    self.pipeline.updateFeatureMatrixRowWithSection(featureMatrix, 0, testSeg)
+    self.pipeline.updateFeatureMatrixRowWithSection(featureMatrix, 0, testSeg) 
     self.assertEqual(np.count_nonzero(featureMatrix[0][4:16]), 0)
     self.assertEqual(np.count_nonzero(featureMatrix[0][19:21]), 0)
 
@@ -101,44 +132,41 @@ class TestPipeline(unittest.TestCase):
     self.testGenerateBusAndTrainStops()
 
     (self.pipeline.featureMatrix, self.pipeline.resultVector) = self.pipeline.generateFeatureMatrixAndResultVectorStep()
-    print "Number of sections = %s" % self.pipeline.confirmedSections.count()
-    print "Feature Matrix shape = %s" % str(self.pipeline.featureMatrix.shape)
     self.assertEquals(self.pipeline.featureMatrix.shape[0], self.pipeline.confirmedSections.count())
     self.assertEquals(self.pipeline.featureMatrix.shape[1], len(self.pipeline.featureLabels))
 
   def testCleanDataStep(self):
     # Add in some entries that should be cleaned by duplicating existing sections
-    runSec = self.SectionsColl.find_one({'type':'move'})
+    #AAArunSec = self.SectionsColl.find_one({'type':'move'})
+    allConfirmedTripsQuery = {'confirmed_mode': {'$ne': ''}}
+
+    (self.pipeline.modeList, self.pipeline.confirmedSections) = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery)
+    runSec = self.SectionsColl.find_one({'confirmed_mode' : {'$ne' : ''}})
     runSec['_id'] = 'clean_me_1'
     runSec['confirmed_mode'] = 2
     logging.debug("Inserting runSec %s" % runSec)
     self.SectionsColl.insert(runSec)
 
     # Outlier trip
-    longTripSec = self.SectionsColl.find_one({'type':'move'})
+    #AAAlongTripSec = self.SectionsColl.find_one({'type':'move'})
+    longTripSec = self.SectionsColl.find_one({'confirmed_mode' : {'$ne' : ''}})
+
     longTripSec['_id'] = 'clean_me_2'
     longTripSec['distance'] = 5000000
     logging.debug("Inserting longTripSec %s" % longTripSec)
     self.SectionsColl.insert(longTripSec)
 
-    unknownTripSec = self.SectionsColl.find_one({'type':'move'})
+    unknownTripSec = self.SectionsColl.find_one({'confirmed_mode' : {'$ne' : ''}})
     unknownTripSec['_id'] = 'clean_me_3'
-    unknownTripSec['mode'] = 'airplane'
+    #AAAunknownTripSec['mode'] = 'airplane'
+    unknownTripSec['sensed_mode'] = 'airplane'
     logging.debug("Inserting unknownTripSec %s" % unknownTripSec)
     self.SectionsColl.insert(unknownTripSec)
     
-    allConfirmedTripsQuery = {"$and": [{'type': 'move'}, {'confirmed_mode': {'$ne': ''}}]}
     (self.pipeline.modeList, self.pipeline.confirmedSections) = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery)
     self.testGenerateBusAndTrainStops()
     (self.pipeline.featureMatrix, self.pipeline.resultVector) = self.pipeline.generateFeatureMatrixAndResultVectorStep()
-    print "ConfirmedSections"
-    print self.pipeline.confirmedSections.distinct('_id')
-    print self.pipeline.confirmedSections.count()
-
     (self.pipeline.cleanedFeatureMatrix, self.pipeline.cleanedResultVector) = self.pipeline.cleanDataStep()
-
-    print self.pipeline.cleanedFeatureMatrix.shape
-
     self.assertEquals(self.pipeline.cleanedFeatureMatrix.shape[0], self.pipeline.confirmedSections.count() - 2)
 
   def testSelectFeatureIndicesStep(self):
@@ -160,13 +188,20 @@ class TestPipeline(unittest.TestCase):
   def setupTestTrips(self):
     # Generate some test data by taking existing training data and stripping out the labels
     test_id_1 = self.SectionsColl.find_one({'confirmed_mode':1})
+    #BBBtest_id_1 = self.SectionsColl.find_one({'sensed_mode':1})
+
     test_id_1['_id'] = 'test_id_1'
+    #BBBtest_id_1['sensed_mode'] = ''
     test_id_1['confirmed_mode'] = ''
+
     logging.debug("Inserting test_id_1 %s" % test_id_1)
     self.SectionsColl.insert(test_id_1)
 
+    #BBBtest_id_2 = self.SectionsColl.find_one({'sensed_mode': 4})  #There are none in the test data that are sensed_mode 5, so I changed it to 4
     test_id_2 = self.SectionsColl.find_one({'confirmed_mode':5})
+
     test_id_2['_id'] = 'test_id_2'
+    #BBBtest_id_2['sensed_mode'] = ''
     test_id_2['confirmed_mode'] = ''
     logging.debug("Inserting test_id_2 %s" % test_id_2)
     self.SectionsColl.insert(test_id_2)
@@ -174,7 +209,7 @@ class TestPipeline(unittest.TestCase):
   def testGenerateFeatureMatrixAndIds(self):
     self.setupTestTrips()
     self.testBuildModelStep()
-    toPredictTripsQuery = {"$and": [{'type': 'move'}, {'confirmed_mode': ''},
+    toPredictTripsQuery = {"$and": [{'confirmed_mode': ''},
     # TODO: Change to does not exist
       {'predicted_mode': None}]}
 

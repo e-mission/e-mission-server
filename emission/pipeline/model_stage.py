@@ -11,7 +11,27 @@ import emission.analysis.intake.segmentation.section_segmentation as eaiss
 import emission.analysis.intake.cleaning.location_smoothing as eaicl
 import emission.analysis.intake.cleaning.clean_and_resample as eaicr
 import emission.net.ext_service.habitica.executor as autocheck
+import emission.analysis.classification.inference.mode as pipeline
 
+from uuid import UUID
+
+def run_mode_pipeline(process_number, uuid_list):
+
+	MIP = pipeline.ModelInferencePipeline()
+	for user_id in uuid_list:
+		try:
+			run_mode_pipeline_for_user(MIP, user_id)
+		except e:
+			logging.debug("Skipping user %s because of error" % user_id)
+			logging.debug("error %s" % e)
+			mark_mode_failed_for_user(user_id)
+
+def run_mode_pipeline_for_user(MIP, uuid):
+
+	timerange = get_time_range_for_mode_inference(uuid)
+	MIP.runPipelineModelStage(uuid, timerange)
+	mark_mode_done_for_user(uuid, timerange) # I know this timerange should be something else, but I'm not sure what.
+	#											maybe the most recent end ts grabbed? In that case, I may need to return that from runPipelineModelStage
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
