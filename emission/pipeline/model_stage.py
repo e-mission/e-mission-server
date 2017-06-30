@@ -30,7 +30,7 @@ def run_mode_pipeline_for_user(MIP, uuid):
 
 	timerange = get_time_range_for_mode_inference(uuid)
 	MIP.runPipelineModelStage(uuid, timerange)
-	mark_mode_done_for_user(uuid, timerange) # I know this timerange should be something else, but I'm not sure what.
+	mark_mode_inference_done_for_user(uuid, MIP.getLastTimestamp}) # I know this timerange should be something else, but I'm not sure what.
 	#											maybe the most recent end ts grabbed? In that case, I may need to return that from runPipelineModelStage
 
 if __name__ == '__main__':

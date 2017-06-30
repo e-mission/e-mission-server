@@ -35,12 +35,12 @@ class TestPipeline(unittest.TestCase):
     self.assertEquals(self.SectionsColl.find().count(), 0)
 
     etc.loadTable(self.serverName, "Stage_Modes", "emission/tests/data/modes.json")
-    etc.loadTable(self.serverName, "Stage_Sections", "emission/tests/data/newTestModeInferFilePlacesDeleted")
 
     # Let's make sure that the users are registered so that they have profiles
     for userEmail in self.testUsers:
       User.register(userEmail)
 
+    etc.setupRealExample(self, "emission/tests/data/newTestModeInferFileData")
     self.now = datetime.now()
     self.dayago = self.now - timedelta(days=1)
     self.weekago = self.now - timedelta(weeks = 1)

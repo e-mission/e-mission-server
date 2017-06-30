@@ -35,6 +35,51 @@ class ModeInferencePipeline:
                           "start hour", "end hour", "close to bus stop", "close to train stop",
                           "close to airport"]
     self.Sections = edb.get_section_db()
+    self.last_timestamp = 0
+
+  def getLastTimestamp(self):
+    return self.last_timestamp
+  def runModelBuildingStage(self, uuid=None, algorithm_id=1):
+
+    if uuid == None:
+      allConfirmedTripsQuery = ModeInferencePipeline.getSectionQueryWithGroundTruth({'$ne': ''})
+    else:
+       allConfirmedTripsQuery = {'$and': [{'user_id': uuid}, ModeInferencePipeline.getSectionQueryWithGroundTruth({'$ne': ''})]}
+
+    (self.modeList, self.confirmedSections) = self.loadTrainingDataStep(allConfirmedTripsQuery)
+    logging.debug("confirmedSections.count() = %s" % (self.confirmedSections.count()))
+  
+
+    if (self.confirmedSections.count() < minTrainingSetSize):
+      logging.info("initial loadTrainingDataStep DONE")
+      logging.debug("current training set too small, reloading from backup!")
+      backupSections = MongoClient('localhost').Backup_database.Stage_Sections
+      (self.modeList, self.confirmedSections) = self.loadTrainingDataStep(allConfirmedTripsQuery, backupSections)
+    logging.info("loadTrainingDataStep DONE")
+    (self.bus_cluster, self.train_cluster) = self.generateBusAndTrainStopStep() 
+    logging.info("generateBusAndTrainStopStep DONE")
+    (self.featureMatrix, self.resultVector) = self.generateFeatureMatrixAndResultVectorStep()
+    logging.info("generateFeatureMatrixAndResultVectorStep DONE")
+    (self.cleanedFeatureMatrix, self.cleanedResultVector) = self.cleanDataStep()
+    logging.info("cleanDataStep DONE")
+    self.selFeatureIndices = self.selectFeatureIndicesStep()
+    logging.info("selectFeatureIndicesStep DONE")
+    self.selFeatureMatrix = self.cleanedFeatureMatrix[:,self.selFeatureIndices]
+    self.model = self.buildSpecificModelStep(algorithm_id)
+
+
+  def runModeInferenceStage(self, uuid, timerange):
+    ts = esta.TimeSeries.get_time_series(uuid)
+    toPredictTrips_it = ts.find_entries(['analysis/cleaned_section'], time_query=timerange)
+
+    (self.toPredictFeatureMatrix, self.sectionIds, self.sectionUserIds) = self.generateFeatureMatrixAndIDsStep(toPredictTrips_it)
+    logging.info("generateFeatureMatrixAndIDsStep DONE")
+    self.predictedProb = self.predictModesStep()
+    #This is a matrix of the entries and their corresponding probabilities for each classification
+
+    logging.info("predictModesStep DONE")
+    self.savePredictionsStep()
+    logging.info("savePredictionsStep DONE")
 
   def runPipelineModelStage(self, uuid, timerange):
 
@@ -108,11 +153,7 @@ class ModeInferencePipeline:
     
     toPredictTripsQuery = {"$and": [ModeInferencePipeline.getModeQuery(''), {'predicted_mode': None}]}
     #We're going to need to either query the section database to see which section does not have a prediction in the
-    #   prediction database, or we need to grab all the ids of the predictions whose algorithm_id is zero.
-
-    #    toPredictTripsQuery = {"$and": [ModeInferencePipeline.getModeQuery(''), {'predicted_mode': None}]}
-
-
+    #   prediction database, or we need to grab all the ids of the predictions whose algorithm_id is zero
 
     (self.toPredictFeatureMatrix, self.sectionIds, self.sectionUserIds) = self.generateFeatureMatrixAndIDsStep(toPredictTripsQuery)
     logging.info("generateFeatureMatrixAndIDsStep DONE")
@@ -137,7 +178,7 @@ class ModeInferencePipeline:
   @staticmethod
   def getSectionQueryWithGroundTruth(groundTruthMode):
     # return {"$and": [{'type': 'move'},
-    return {ModeInferencePipeline.getModeQuery(groundTruthMode)]}
+    return {ModeInferencePipeline.getModeQuery(groundTruthMode)}
 
   @staticmethod
   def getSectionQueryWithGroundTruthUser(groundTruthMode, uuid):
@@ -263,20 +304,16 @@ class ModeInferencePipeline:
 # 21. both start and end close to airport
   def updateFeatureMatrixRowWithSection(self, featureMatrix, i, section): 
     
-    featureMatrix[i,0] = section['distance']
-    
-    
-    featureMatrix[i, 1] = section['duration']
+    featureMatrix[i,0] = section.distance
+    featureMatrix[i, 1] = section.duration
   
     # Deal with unknown modes like "airplane"
-    try:
-      featureMatrix[i, 2] = section['sensed_mode']
+    try: featureMatrix[i, 2] = section['sensed_mode']
     except ValueError:
       featureMatrix[i, 2] = 0
 
     #featureMatrix[i, 3] = section['_id']   ####
     featureMatrix[i, 4] = easf.calAvgSpeed(section)
-    #AAAspeeds = easf.calSpeeds(section)
     speeds = easf.calSpeeds(section)
  
     if speeds != None and len(speeds) > 0:
@@ -316,6 +353,8 @@ class ModeInferencePipeline:
     if (hasattr(self, "air_cluster")): 
         featureMatrix[i, 21] = easf.mode_start_end_coverage(section, self.air_cluster,600)
 
+    if self.last_timestamp < section.data.end_ts:
+      self.last_timestamp = section.data.end_ts
     # Replace NaN and inf by zeros so that it doesn't crash later
     featureMatrix[i] = np.nan_to_num(featureMatrix[i])
 

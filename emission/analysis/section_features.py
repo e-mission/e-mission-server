@@ -21,12 +21,12 @@ Modes = get_mode_db()
 
 
 # The speed is in m/s
-def calSpeed(section):
+def calSegmentSpeed(section):
   from dateutil import parser
 
-  distanceDelta = section['distance']
+  distanceDelta = section.distance
 
-  timeDelta = section['duration']
+  timeDelta = section.duration
   # logging.debug("while calculating speed form %s -> %s, distanceDelta = %s, timeDelta = %s" %
   #               (trackpoint1, trackpoint2, distanceDelta, timeDelta))
   if timeDelta != 0:
@@ -34,17 +34,17 @@ def calSpeed(section):
   else:
     return None
 
-# def calSpeed(trackpoint1, trackpoint2):
-#   from dateutil import parser
-#   distanceDelta = calDistance(trackpoint1['track_location']['coordinates'],
-#                               trackpoint2['track_location']['coordinates'])
-#   timeDelta = parser.parse(trackpoint2['time']) - parser.parse(trackpoint1['time'])
-#   # logging.debug("while calculating speed form %s -> %s, distanceDelta = %s, timeDelta = %s" %
-#   #               (trackpoint1, trackpoint2, distanceDelta, timeDelta))
-#   if timeDelta.total_seconds() != 0:
-#     return distanceDelta / timeDelta.total_seconds()
-#   else:
-#     return None
+def calSpeed(point1, point2):
+  from dateutil import parser
+  distanceDelta = calDistance(point1['data']['loc']['coordinates'],
+                              point2['data']['loc']['coordinates'])
+  timeDelta = point2['data']['ts'] - point1['data']['ts']
+  # logging.debug("while calculating speed form %s -> %s, distanceDelta = %s, timeDelta = %s" %
+  #               (trackpoint1, trackpoint2, distanceDelta, timeDelta))
+  if timeDelta.total_seconds() != 0:
+    return distanceDelta / timeDelta.total_seconds()
+  else:
+    return None
 
 # This formula is from:
 # http://www.movable-type.co.uk/scripts/latlong.html
@@ -68,8 +68,8 @@ def calHC(point1, point2, point3):
 
 def calHCR(segment):
     try:
-        ts = esta.TimeSeries.get_time_series(segment['user_id'])
-        locations = list(ts.find_entries(['background/location'], time_query=None))
+        ts = esta.TimeSeries.get_time_series(segment.user_id)
+        locations = list(ts.find_entries(['background/filtered_location'], time_query=None))
     except:
         return 0
   
@@ -86,7 +86,7 @@ def calHCR(segment):
                        nexNextPt['data']['loc']['coordinates'])
             if HC >= 15:
                 HCNum += 1
-        segmentDist = segment['distance']
+        segmentDist = segment.distance
         if segmentDist!= None and segmentDist != 0:
             HCR = HCNum/segmentDist
             return HCR
@@ -95,18 +95,19 @@ def calHCR(segment):
 
 
 def calSR(segment):
-    if 'speeds' not in segment: return 0
-    trackpoints = segment['speeds']
-    if len(trackpoints) < 2:
+    if 'speeds' not in segment:
+        return 0
+    speeds = segment.speeds
+    if len(speeds) < 2:
 		return 0
     else:
         stopNum = 0
-        for (i, speed) in enumerate(trackpoints[:-1]):
+        for (i, speed) in enumerate(speeds[:-1]):
             currVelocity = speed
             if currVelocity != None and currVelocity <= 0.75:
                 stopNum += 1
 
-        segmentDist = segment['distance']
+        segmentDist = segment.distance
         if segmentDist != None and segmentDist != 0:
             return stopNum/segmentDist
         else:
@@ -132,49 +133,19 @@ def calSR(segment):
 #         else:
 #             return 0
 
-def calVCR(segment):
-    if 'speeds' not in segment: return 0
-    trackpoints = segment['speeds']
-    if len(trackpoints) < 3:
-		return 0
-    else:
-        Pv = 0
-        for (i, speed) in enumerate(trackpoints[:-2]):
-            currPoint = point
-            nextPoint = trackpoints[i+1]
-            nexNextPt = trackpoints[i+2]
-            velocity1 = float(nextPoint +currPoint)/2.0
-            velocity2 = float((nextPoint +  nexNextPt)/2.0)
-            if velocity1 != None and velocity2 != None:
-                if velocity1 != 0:
-                    VC = abs(velocity2 - velocity1)/velocity1
-                else:
-                    VC = 0
-            else:
-                VC = 0
-
-            if VC > 0.7:
-                Pv += 1
-
-        segmentDist = segment['distance']
-        if segmentDist != None and segmentDist != 0:
-            return Pv/segmentDist
-        else:
-            return 0
-
-
 # def calVCR(segment):
-#     trackpoints = segment['track_points']
+#     if 'speeds' not in segment: return 0
+#     trackpoints = segment['speeds']
 #     if len(trackpoints) < 3:
-#         return 0
+# 		return 0
 #     else:
 #         Pv = 0
-#         for (i, point) in enumerate(trackpoints[:-2]):
+#         for (i, speed) in enumerate(trackpoints[:-2]):
 #             currPoint = point
 #             nextPoint = trackpoints[i+1]
 #             nexNextPt = trackpoints[i+2]
-#             velocity1 = calSpeed(currPoint, nextPoint)
-#             velocity2 = calSpeed(nextPoint, nexNextPt)
+#             velocity1 = float(nextPoint +currPoint)/2.0
+#             velocity2 = float((nextPoint +  nexNextPt)/2.0)
 #             if velocity1 != None and velocity2 != None:
 #                 if velocity1 != 0:
 #                     VC = abs(velocity2 - velocity1)/velocity1
@@ -191,8 +162,43 @@ def calVCR(segment):
 #             return Pv/segmentDist
 #         else:
 #             return 0
+
+
+def calVCR(segment):
+    try:
+        ts = esta.TimeSeries.get_time_series(segment.user_id)
+        locations = list(ts.find_entries(['background/filtered_location'], time_query=None))
+    except:
+        return 0
+    speeds = segment.speeds
+    if len(speeds) < 3:
+        return 0
+    else:
+        Pv = 0
+        for (i, point) in enumerate(locations[:-2]):
+            currPoint = point
+            nextPoint = locations[i+1]
+            nexNextPt = locations[i+2]
+            velocity1 = calSpeed(currPoint, nextPoint)
+            velocity2 = calSpeed(nextPoint, nexNextPt)
+            if velocity1 != None and velocity2 != None:
+                if velocity1 != 0:
+                    VC = abs(velocity2 - velocity1)/velocity1
+                else:
+                    VC = 0
+            else:
+                VC = 0
+
+            if VC > 0.7:
+                Pv += 1
+
+        segmentDist = segment.distance
+        if segmentDist != None and segmentDist != 0:
+            return Pv/segmentDist
+        else:
+            return 0
 def calSegmentDistance(segment):
-  return segment['distance']
+  return segment.distance
 
 # def calSpeeds(segment):
 #   trackpoints = (segment['speeds'], segment['distances'])
