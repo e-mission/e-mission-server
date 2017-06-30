@@ -15,6 +15,21 @@ import emission.analysis.classification.inference.mode as pipeline
 
 from uuid import UUID
 
+def update_model_for_user(uuid, algorithm_id=1):
+
+	MIP = pipeline.ModelInferencePipeline()
+	MIP.runModelBuildingStage(uuid = uuid, algorithm_id= algorithm_id)
+	#user.model = MIP.getModel
+
+def predict_for_user(uuid, timerange, model=None):
+
+	if model is None:
+		pass
+		#model = user.model
+	MIP = pipeline.ModelInferencePipeline()
+	MIP.runModeInferenceStage(uuid, timerange, model=model)
+
+
 def run_mode_pipeline(process_number, uuid_list):
 
 	MIP = pipeline.ModelInferencePipeline()
@@ -30,8 +45,8 @@ def run_mode_pipeline_for_user(MIP, uuid):
 
 	timerange = get_time_range_for_mode_inference(uuid)
 	MIP.runPipelineModelStage(uuid, timerange)
-	mark_mode_inference_done_for_user(uuid, MIP.getLastTimestamp}) # I know this timerange should be something else, but I'm not sure what.
-	#											maybe the most recent end ts grabbed? In that case, I may need to return that from runPipelineModelStage
+	mark_mode_inference_done_for_user(uuid, MIP.getLastTimestamp})
+
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',

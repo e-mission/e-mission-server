@@ -41,6 +41,7 @@ class ModeInferencePipeline:
     return self.last_timestamp
   def runModelBuildingStage(self, uuid=None, algorithm_id=1):
 
+    #This needs to be changed to query the timeseries instead. Would we have to loop through all the users? Or can we query without a specific one?
     if uuid == None:
       allConfirmedTripsQuery = ModeInferencePipeline.getSectionQueryWithGroundTruth({'$ne': ''})
     else:
@@ -65,10 +66,13 @@ class ModeInferencePipeline:
     self.selFeatureIndices = self.selectFeatureIndicesStep()
     logging.info("selectFeatureIndicesStep DONE")
     self.selFeatureMatrix = self.cleanedFeatureMatrix[:,self.selFeatureIndices]
-    self.model = self.buildSpecificModelStep(algorithm_id)
+    self.model = self.buildSpecificModelStep(algorithm_id) #This builds whichever model we pass it. Right now, we only have the default random forest.
 
 
-  def runModeInferenceStage(self, uuid, timerange):
+  def runModeInferenceStage(self, uuid, timerange,  model=None):
+    #uuid is a UUID, timerange is a time_query
+    if model is not None:
+      self.model = model
     ts = esta.TimeSeries.get_time_series(uuid)
     toPredictTrips_it = ts.find_entries(['analysis/cleaned_section'], time_query=timerange)
 
@@ -107,9 +111,6 @@ class ModeInferencePipeline:
     self.model = self.buildModelStep()
     logging.info("buildModelStep DONE")
 
-    Algorithm_to_be_used_to_predict = 0
-
-
     ts = esta.TimeSeries.get_time_series(user_id)
     toPredictTrips_it = ts.find_entries(['analysis/cleaned_section'], time_query=timerange)
 
@@ -121,6 +122,10 @@ class ModeInferencePipeline:
     logging.info("predictModesStep DONE")
     self.savePredictionsStep()
     logging.info("savePredictionsStep DONE")
+
+  def getModel(self):
+
+    return self.model
 
 
   def runPipeline(self):
