@@ -18,10 +18,10 @@ def get_cleaned_sections_for_trip(user_id, trip_id):
     return get_sections_for_trip("analysis/cleaned_section", user_id, trip_id)
 
 def get_raw_stops_for_trip(user_id, trip_id):
-    return get_sections_for_trip("segmentation/raw_stop", user_id, trip_id)
+    return get_stops_for_trip("segmentation/raw_stop", user_id, trip_id)
 
 def get_cleaned_stops_for_trip(user_id, trip_id):
-    return get_sections_for_trip("analysis/cleaned_stop", user_id, trip_id)
+    return get_stops_for_trip("analysis/cleaned_stop", user_id, trip_id)
 
 def get_raw_timeline_for_trip(user_id, trip_id):
     """
@@ -46,9 +46,9 @@ def get_sections_for_trip(key, user_id, trip_id):
     """
     query = {"user_id": user_id, "data.trip_id": trip_id,
              "metadata.key": key}
+    logging.debug("About to execute query %s with sort_key %s" % (query, "data.start_ts"))
     section_doc_cursor = edb.get_analysis_timeseries_db().find(query).sort(
         "data.start_ts", pymongo.ASCENDING)
-    logging.debug("About to execute query %s" % query)
     return [ecwe.Entry(doc) for doc in section_doc_cursor]
 
 def get_stops_for_trip(key, user_id, trip_id):
@@ -57,7 +57,7 @@ def get_stops_for_trip(key, user_id, trip_id):
     """
     query = {"user_id": user_id, "data.trip_id": trip_id,
              "metadata.key": key}
-    logging.debug("About to execute query %s" % query)
+    logging.debug("About to execute query %s with sort_key %s" % (query, "data.enter_ts"))
     stop_doc_cursor = edb.get_analysis_timeseries_db().find(query).sort(
         "data.enter_ts", pymongo.ASCENDING)
     return [ecwe.Entry(doc) for doc in stop_doc_cursor]

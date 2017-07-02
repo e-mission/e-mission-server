@@ -89,6 +89,20 @@ class TestEntry(unittest.TestCase):
         self.assertEquals(trip.end_place, bo.ObjectId("55d8c47b7d65cb39ee983c2d"))
         self.assertTrue(isinstance(trip.start_loc, gj.Point))
 
+    def testDedupList(self):
+        import emission.core.wrapper.location as ecwl
+        import emission.core.wrapper.transition as ecwt
+
+        self.assertEqual(type(ecwe.Entry.get_dedup_list("background/filtered_location")),
+                         list)
+        self.assertIn("latitude", ecwe.Entry.get_dedup_list("background/filtered_location"))
+        self.assertIn("ts", ecwe.Entry.get_dedup_list("background/filtered_location"))
+
+        self.assertEqual(type(ecwe.Entry.get_dedup_list("statemachine/transition")),
+                         list)
+        self.assertIn("curr_state", ecwe.Entry.get_dedup_list("statemachine/transition"))
+        self.assertIn("ts", ecwe.Entry.get_dedup_list("statemachine/transition"))
+
 if __name__ == '__main__':
     etc.configLogging()
     unittest.main()

@@ -1,4 +1,6 @@
+import logging
 import copy
+import pytz
 
 import emission.core.wrapper.syncconfig as ecws
 import emission.net.usercache.formatters.common as fc
@@ -12,7 +14,7 @@ def format(entry):
     metadata = entry.metadata
     try:
         valid_tz = pytz.timezone(entry.metadata.time_zone)
-    except UnknownTimeZoneError, e:
+    except pytz.UnknownTimeZoneError, e:
         logging.warn("Got error %s while checking format validity" % e)
         # Default timezone in for the Bay Area, which is probably a fairly safe
         # assumption for now

@@ -1,0 +1,33 @@
+{
+    "query_type": "trip_metrics",
+    "spec": {
+        "time_type": "local_date",
+        "from_local_date": {
+            "year": 2017,
+            "month": 2,
+            "day": 1,
+            "hour": 15,
+            "weekday": 0
+        },
+        "to_local_date": {
+            "year": 2017,
+            "month": 2,
+            "day": 28,
+            "hour": 20,
+            "weekday": 4
+        },
+        "freq": "DAILY",
+        "checks": [
+            {
+                "modes": ["WALKING", "ON_FOOT"],
+                "metric": "distance",
+                "threshold": {"$gt": 1000}
+            },
+            {
+                "modes": ["WALKING", "ON_FOOT"],
+                "metric": "count",
+                "threshold": {"$lt": 10}
+            }
+        ]
+    }
+}

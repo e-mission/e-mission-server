@@ -3,6 +3,8 @@ import unittest
 import datetime as pydt
 import logging
 import json
+import bson.json_util as bju
+import uuid
 
 # Our imports
 import emission.core.get_database as edb
@@ -35,7 +37,9 @@ class TestSectionSegmentation(unittest.TestCase):
         self.androidUUID = self.testUUID
         eaicf.filter_accuracy(self.androidUUID)
 
-        etc.setupRealExample(self, "emission/tests/data/real_examples/iphone_2015-11-06")
+        self.testUUID = uuid.UUID("c76a0487-7e5a-3b17-a449-47be666b36f6")
+        self.entries = json.load(open("emission/tests/data/real_examples/iphone_2015-11-06"), object_hook = bju.object_hook)
+        etc.setupRealExampleWithEntries(self)
         self.iosUUID = self.testUUID
         eaicf.filter_accuracy(self.iosUUID)
 
@@ -45,16 +49,18 @@ class TestSectionSegmentation(unittest.TestCase):
     def clearRelatedDb(self):
         edb.get_timeseries_db().remove({"user_id": self.androidUUID})
         edb.get_analysis_timeseries_db().remove({"user_id": self.androidUUID})
+        edb.get_pipeline_state_db().remove({"user_id": self.androidUUID})
         edb.get_timeseries_db().remove({"user_id": self.iosUUID})
         edb.get_analysis_timeseries_db().remove({"user_id": self.iosUUID})
+        edb.get_pipeline_state_db().remove({"user_id": self.iosUUID})
 
     def testSegmentationPointsSmoothedHighConfidenceMotion(self):
         ts = esta.TimeSeries.get_time_series(self.androidUUID)
         tq = estt.TimeQuery("metadata.write_ts", 1440695152.989, 1440699266.669)
-        shcmsm = shcm.SmoothedHighConfidenceMotion(60, [ecwm.MotionTypes.TILTING,
+        shcmsm = shcm.SmoothedHighConfidenceMotion(60, 100, [ecwm.MotionTypes.TILTING,
                                                         ecwm.MotionTypes.UNKNOWN,
                                                         ecwm.MotionTypes.STILL])
-        segmentation_points = shcmsm.segment_into_sections(ts, tq)
+        segmentation_points = shcmsm.segment_into_sections(ts, 0, tq)
 
         for (start, end, motion) in segmentation_points:
             logging.info("section is from %s (%f) -> %s (%f) using mode %s" %
@@ -106,9 +112,23 @@ class TestSectionSegmentation(unittest.TestCase):
                     37.875023
                 ]
             }
+
+        test_place = ecwrp.Rawplace()
+        test_place.location = test_trip.start_loc
+        test_place.exit_ts = test_trip.start_ts
+        test_place.exit_local_dt = test_trip.start_local_dt
+        test_place.exit_fmt_time = test_trip.start_fmt_time
+        test_place_entry = ecwe.Entry.create_entry(self.androidUUID,
+            "segmentation/raw_place", test_place)
+        test_trip.start_place = test_place_entry.get_id()
+
         test_trip_id = ts.insert(ecwe.Entry.create_entry(self.androidUUID,
             "segmentation/raw_trip", test_trip))
-        eaiss.segment_trip_into_sections(self.androidUUID, test_trip_id, "DwellSegmentationTimeFilter")
+        test_trip_entry = ts.get_entry_from_id(esda.RAW_TRIP_KEY, test_trip_id)
+        test_place.starting_trip = test_trip_id
+        ts.insert(test_place_entry)
+
+        eaiss.segment_trip_into_sections(self.androidUUID, test_trip_entry, "DwellSegmentationTimeFilter")
 
         created_stops_entries = esdt.get_raw_stops_for_trip(self.androidUUID, test_trip_id)
         created_sections_entries = esdt.get_raw_sections_for_trip(self.androidUUID, test_trip_id)
@@ -166,7 +186,7 @@ class TestSectionSegmentation(unittest.TestCase):
         self.assertEqual(len(sections_stops), len(created_trips))
         # The expected value was copy-pasted from the debug statement above
         self.assertEqual(sections_stops,
-                         [(2, 1), (1, 0), (2, 1), (2, 1), (0, 0), (2, 1),
+                         [(2, 1), (1, 0), (2, 1), (2, 1), (1, 0), (2, 1),
                           (4, 3), (2, 1)])
 
         # tq_stop = estt.TimeQuery("data.enter_ts", 1440658800, 1440745200)
@@ -186,7 +206,7 @@ class TestSectionSegmentation(unittest.TestCase):
         created_trips = esda.get_entries(esda.RAW_TRIP_KEY, self.iosUUID,
                                          tq_trip)
 
-        self.assertEqual(len(created_trips), 3)
+        self.assertEqual(len(created_trips), 2)
         logging.debug("created trips = %s" % created_trips)
 
         sections_stops = [(len(esdt.get_raw_sections_for_trip(self.iosUUID, trip.get_id())),
@@ -196,7 +216,7 @@ class TestSectionSegmentation(unittest.TestCase):
         self.assertEqual(len(sections_stops), len(created_trips))
         # The expected value was copy-pasted from the debug statement above
         self.assertEqual(sections_stops,
-                         [(0, 0), (6, 5), (6, 5)])
+                         [(0, 0), (11, 10)])
 
 
 if __name__ == '__main__':

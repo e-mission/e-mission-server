@@ -36,18 +36,20 @@ class TestMetrics(unittest.TestCase):
     def clearRelatedDb(self):
         edb.get_timeseries_db().remove({"user_id": self.testUUID})
         edb.get_analysis_timeseries_db().remove({"user_id": self.testUUID})
+        edb.get_pipeline_state_db().remove({"user_id": self.testUUID})
         edb.get_timeseries_db().remove({"user_id": self.testUUID1})
         edb.get_analysis_timeseries_db().remove({"user_id": self.testUUID1})
+        edb.get_pipeline_state_db().remove({"user_id": self.testUUID1})
 
     def testCountTimestampMetrics(self):
         met_result = metrics.summarize_by_timestamp(self.testUUID,
                                                     self.aug_start_ts, self.aug_end_ts,
-                                       'd', 'count')
+                                       'd', ['count'], True)
         logging.debug(met_result)
 
         self.assertEqual(met_result.keys(), ['aggregate_metrics', 'user_metrics'])
-        user_met_result = met_result['user_metrics']
-        agg_met_result = met_result['aggregate_metrics']
+        user_met_result = met_result['user_metrics'][0]
+        agg_met_result = met_result['aggregate_metrics'][0]
 
         self.assertEqual(len(user_met_result), 2)
         self.assertEqual([m.nUsers for m in user_met_result], [1,1])
@@ -55,7 +57,9 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual(user_met_result[1].local_dt.day, 28)
         self.assertEqual(user_met_result[0].ON_FOOT, 4)
         self.assertEqual(user_met_result[0].BICYCLING, 2)
-        self.assertEqual(user_met_result[0].IN_VEHICLE, 3)
+        # Changed from 3 to 4 - investigation at
+        # https://github.com/e-mission/e-mission-server/issues/288#issuecomment-242531798
+        self.assertEqual(user_met_result[0].IN_VEHICLE, 4)
         # We are not going to make absolute value assertions about
         # the aggregate values since they are affected by other
         # entries in the database. However, because we have at least
@@ -77,10 +81,10 @@ class TestMetrics(unittest.TestCase):
         met_result = metrics.summarize_by_local_date(self.testUUID,
                                                      ecwl.LocalDate({'year': 2015, 'month': 8}),
                                                      ecwl.LocalDate({'year': 2015, 'month': 9}),
-                                                     'MONTHLY', 'count')
+                                                     'MONTHLY', ['count'], True)
         self.assertEqual(met_result.keys(), ['aggregate_metrics', 'user_metrics'])
-        user_met_result = met_result['user_metrics']
-        agg_met_result = met_result['aggregate_metrics']
+        user_met_result = met_result['user_metrics'][0]
+        agg_met_result = met_result['aggregate_metrics'][0]
 
         logging.debug(met_result)
 
@@ -98,9 +102,9 @@ class TestMetrics(unittest.TestCase):
         self.assertGreaterEqual(agg_met_result[0].BICYCLING,
                                 user_met_result[0].BICYCLING + 1) # 21s has one bike trip
         self.assertGreaterEqual(agg_met_result[0].ON_FOOT,
-                                user_met_result[0].ON_FOOT + 3) # 21s has one bike trip
+                                user_met_result[0].ON_FOOT + 3) # 21s has three bike trips
         self.assertGreaterEqual(agg_met_result[0].IN_VEHICLE,
-                                user_met_result[0].IN_VEHICLE + 3) # 21s has one bike trip
+                                user_met_result[0].IN_VEHICLE + 3) # 21s has three motorized trips
 
     def testCountNoEntries(self):
         # Ensure that we don't crash if we don't find any entries
@@ -109,18 +113,18 @@ class TestMetrics(unittest.TestCase):
         met_result_ld = metrics.summarize_by_local_date(self.testUUID,
                                                      ecwl.LocalDate({'year': 2000}),
                                                      ecwl.LocalDate({'year': 2001}),
-                                                     'MONTHLY', 'count')
+                                                     'MONTHLY', ['count'], True)
         self.assertEqual(met_result_ld.keys(), ['aggregate_metrics', 'user_metrics'])
-        self.assertEqual(met_result_ld['aggregate_metrics'], [])
-        self.assertEqual(met_result_ld['user_metrics'], [])
+        self.assertEqual(met_result_ld['aggregate_metrics'][0], [])
+        self.assertEqual(met_result_ld['user_metrics'][0], [])
 
         met_result_ts = metrics.summarize_by_timestamp(self.testUUID,
                                                        arrow.get(2000,1,1).timestamp,
                                                        arrow.get(2001,1,1).timestamp,
-                                                        'm', 'count')
+                                                        'm', ['count'], True)
         self.assertEqual(met_result_ts.keys(), ['aggregate_metrics', 'user_metrics'])
-        self.assertEqual(met_result_ts['aggregate_metrics'], [])
-        self.assertEqual(met_result_ts['user_metrics'], [])
+        self.assertEqual(met_result_ts['aggregate_metrics'][0], [])
+        self.assertEqual(met_result_ts['user_metrics'][0], [])
 
 if __name__ == '__main__':
     import emission.tests.common as etc

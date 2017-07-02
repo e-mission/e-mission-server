@@ -1,7 +1,7 @@
 # Standard imports
 import json
 from random import randrange
-from bottle import route, post, get, run, template, static_file, request, app, HTTPError, abort, BaseRequest, JSONPlugin
+from bottle import route, post, get, run, template, static_file, request, app, HTTPError, abort, BaseRequest, JSONPlugin, response
 import bottle as bt
 # To support dynamic loading of client-specific libraries
 import sys
@@ -28,7 +28,7 @@ import bson.json_util
 # Our imports
 import modeshare, zipcode, distance, tripManager, \
                  Berkeley, visualize, stats, usercache, timeline, \
-                 metrics
+                 metrics, pipeline
 import emission.net.ext_service.moves.register as auth
 import emission.net.ext_service.habitica.proxy as habitproxy
 import emission.analysis.result.carbon as carbon
@@ -41,8 +41,11 @@ from emission.core.wrapper.user import User
 from emission.core.get_database import get_uuid_db, get_mode_db
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.timeseries.timequery as estt
+import emission.storage.timeseries.tcquery as esttc
+import emission.storage.timeseries.aggregate_timeseries as estag
+import emission.storage.timeseries.cache_series as esdc
+import emission.core.timer as ect
 import emission.core.get_database as edb
-
 
 config_file = open('conf/net/api/webserver.conf')
 config_data = json.load(config_file)
@@ -60,6 +63,7 @@ private_key = key_data["private_key"]
 client_key = key_data["client_key"]
 client_key_old = key_data["client_key_old"]
 ios_client_key = key_data["ios_client_key"]
+ios_client_key_new = key_data["ios_client_key_new"]
 
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes
@@ -85,10 +89,11 @@ def index():
 # If this gets to be too much, we should definitely consider that
 @route("/docs/<filename>")
 def docs(filename):
-  if filename != "privacy" and filename != "support" and filename != "about" and filename != "consent":
+  if filename != "privacy.html" and filename != "support.html" and filename != "about.html" and filename != "consent.html" and filename != "approval_letter.pdf":
+    logging.error("Request for unknown filename "% filename)
     return HTTPError(404, "Don't try to hack me, you evil spammer")
   else:
-    return static_file("%s.html" % filename, "%s/%s" % (static_path, "docs"))
+    return static_file(filename, "%s/%s" % (static_path, "docs"))
 
 @route("/<filename>")
 def docs(filename):
@@ -218,17 +223,101 @@ def getCarbonHeatmap():
   return retVal
 
 @post("/result/heatmap/pop.route")
-def getPopRoute():
+def getPopRouteLegacy():
+  return getPopRoute("local_date")
+
+@post("/result/heatmap/pop.route/<time_type>")
+def getPopRoute(time_type):
+  if 'user' in request.json:
+     user_uuid = getUUID(request)
+  else:
+     user_uuid = None
+
+  if 'from_local_date' in request.json and 'to_local_date' in request.json:
+      start_time = request.json['from_local_date']
+      end_time = request.json['to_local_date']
+  else:
+      start_time = request.json['start_time']
+      end_time = request.json['end_time']
+
   modes = request.json['modes']
-  from_ld = request.json['from_local_date']
-  to_ld = request.json['to_local_date']
   region = request.json['sel_region']
-  logging.debug("Filtering values for range %s -> %s, region %s" % 
-        (from_ld, to_ld, region))
-  retVal = visualize.range_mode_heatmap(modes, from_ld, to_ld, region)
-  # retVal = common.generateRandomResult(['00-04', '04-08', '08-10'])
-  # logging.debug("In getCalPopRoute, retVal is %s" % retVal)
+  logging.debug("Filtering values for user %s, range %s -> %s, region %s" %
+        (user_uuid, start_time, end_time, region))
+  time_type_map = {
+      'timestamp': visualize.range_mode_heatmap_timestamp,
+      'local_date': visualize.range_mode_heatmap_local_date
+  }
+  viz_fn = time_type_map[time_type]
+  retVal = viz_fn(user_uuid, modes, start_time, end_time, region)
   return retVal
+
+@post("/result/heatmap/incidents/<time_type>")
+def getStressMap(time_type):
+    if 'user' in request.json:
+        user_uuid = getUUID(request)
+    else:
+        user_uuid = None
+
+    # modes = request.json['modes']
+    # hardcode modes to None because we currently don't store
+    # mode information along with the incidents
+    # we need to have some kind of cleaned incident that:
+    # has a mode
+    # maybe has a count generated from clustering....
+    # but then what about times?
+    modes = None
+    if 'from_local_date' in request.json and 'to_local_date' in request.json:
+        start_time = request.json['from_local_date']
+        end_time = request.json['to_local_date']
+    else:
+        start_time = request.json['start_time']
+        end_time = request.json['end_time']
+    region = request.json['sel_region']
+    logging.debug("Filtering values for %s, range %s -> %s, region %s" %
+                  (user_uuid, start_time, end_time, region))
+    time_type_map = {
+        'timestamp': visualize.incident_heatmap_timestamp,
+        'local_date': visualize.incident_heatmap_local_date
+    }
+    viz_fn = time_type_map[time_type]
+    retVal = viz_fn(user_uuid, modes, start_time, end_time, region)
+    # retVal = common.generateRandomResult(['00-04', '04-08', '08-10'])
+    # logging.debug("In getCalPopRoute, retVal is %s" % retVal)
+    return retVal
+
+@post("/pipeline/get_complete_ts")
+def getPipelineState():
+    user_uuid = getUUID(request)
+    return {"complete_ts": pipeline.get_complete_ts(user_uuid)}
+
+@post("/datastreams/find_entries/<time_type>")
+def getTimeseriesEntries(time_type):
+    if 'user' not in request.json:
+        abort(401, "only a user can read his/her data")
+
+    user_uuid = getUUID(request)
+
+    key_list = request.json['key_list']
+    if 'from_local_date' in request.json and 'to_local_date' in request.json:
+        start_time = request.json['from_local_date']
+        end_time = request.json['to_local_date']
+        time_query = esttc.TimeComponentQuery("metadata.write_ts",
+                                              start_time,
+                                              end_time)
+    else:
+        start_time = request.json['start_time']
+        end_time = request.json['end_time']
+        time_query = estt.TimeQuery("metadata.write_ts",
+                                              start_time,
+                                              end_time)
+    # Note that queries from usercache are limited to 100,000 entries
+    # and entries from timeseries are limited to 250,000, so we will
+    # return at most 350,000 entries. So this means that we don't need
+    # additional filtering, but this should be documented in
+    # the API
+    data_list = esdc.find_entries(user_uuid, key_list, time_query)
+    return {'phone_data': data_list}
 
 @get('/result/carbon/all/summary')
 def carbonSummaryAllTrips():
@@ -290,6 +379,8 @@ def getTrips(day):
   logging.debug("type(ret_dict) = %s" % type(ret_dict))
   return ret_dict
 
+@post('/incidents/')
+
 @post('/profile/create')
 def createUserProfile():
   logging.debug("Called createUserProfile")
@@ -298,7 +389,7 @@ def createUserProfile():
   # UUID yet. All others should only use the UUID.
   if skipAuth:
     userEmail = userToken
-  else: 
+  else:
     userEmail = verifyUserToken(userToken)
   logging.debug("userEmail = %s" % userEmail)
   user = User.register(userEmail)
@@ -311,9 +402,15 @@ def updateUserProfile():
   logging.debug("Called updateUserProfile")
   user_uuid = getUUID(request)
   user = User.fromUUID(user_uuid)
-  mpg_array = request.json['mpg_array']
-  return user.setMpgArray(mpg_array)
+  new_fields = request.json['update_doc']
+  return user.update(new_fields)
 
+@post('/profile/get')
+def getUserProfile():
+  logging.debug("Called getUserProfile")
+  user_uuid = getUUID(request)
+  user = User.fromUUID(user_uuid)
+  return user.getProfile()
 
 @post('/profile/consent')
 def setConsentInProfile():
@@ -367,12 +464,12 @@ def getCarbonCompare():
   if not skipAuth:
     if 'User' not in request.headers or request.headers.get('User') == '':
         return "Waiting for user data to become available..."
-  
+
   from clients.choice import choice
 
   user_uuid = getUUID(request, inHeader=True)
   print ('UUID', user_uuid)
-  
+
   clientResult = userclient.getClientSpecificResult(user_uuid)
   if clientResult != None:
     logging.debug("Found overriding client result for user %s, returning it" % user_uuid)
@@ -390,7 +487,20 @@ def summarize_metrics(time_type):
     start_time = request.json['start_time']
     end_time = request.json['end_time']
     freq_name = request.json['freq']
-    metric_name = request.json['metric']
+    old_style = False
+    if 'metric' in request.json:
+        old_style = True
+        metric_list = [request.json['metric']]
+    else:
+        metric_list = request.json['metric_list']
+
+    logging.debug("metric_list = %s" % metric_list)
+
+    if 'is_return_aggregate' in request.json:
+        is_return_aggregate = request.json['is_return_aggregate']
+    else:
+        old_style = True
+        is_return_aggregate = True
     time_type_map = {
         'timestamp': metrics.summarize_by_timestamp,
         'local_date': metrics.summarize_by_local_date
@@ -398,37 +508,81 @@ def summarize_metrics(time_type):
     metric_fn = time_type_map[time_type]
     ret_val = metric_fn(user_uuid,
               start_time, end_time,
-              freq_name, metric_name)
+              freq_name, metric_list, is_return_aggregate)
     # logging.debug("ret_val = %s" % bson.json_util.dumps(ret_val))
+    if old_style:
+        logging.debug("old_style metrics found, returning array of entries instead of array of arrays")
+        assert(len(metric_list) == 1)
+        if 'user_metrics' in ret_val:
+            ret_val['user_metrics'] = ret_val['user_metrics'][0]
+        ret_val['aggregate_metrics'] = ret_val['aggregate_metrics'][0]
     return ret_val
 
-# Pulling public data from the server  
+@post('/join.group/<group_id>')
+def habiticaJoinGroup(group_id):
+    if 'user' in request.json:
+        user_uuid = getUUID(request)
+    else:
+        user_uuid = None
+    inviter_id = request.json['inviter']
+    logging.debug("%s about to join party %s after invite from %s" %
+                  (user_uuid, group_id, inviter_id))
+    try:
+        ret_val = habitproxy.setup_party(user_uuid, group_id, inviter_id)
+        logging.debug("ret_val = %s after joining group" % bson.json_util.dumps(ret_val))
+        return {'result': ret_val}
+    except RuntimeError as e:
+        logging.info("Aborting call with message %s" % e.message)
+        abort(400, e.message)
+
+# Pulling public data from the server
 @get('/eval/publicData/timeseries')
 def getPublicData():
+  ids = request.json['phone_ids']
+  all_uuids = map(lambda id: UUID(id), ids)
+  uuids = [uuid for uuid in all_uuids if uuid in estag.TEST_PHONE_IDS]
+
   from_ts = request.query.from_ts
   to_ts = request.query.to_ts
 
   time_range = estt.TimeQuery("metadata.write_ts", float(from_ts), float(to_ts))
   time_query = time_range.get_query()
 
-  iphone_ids = [UUID("079e0f1a-c440-3d7c-b0e7-de160f748e35"), UUID("c76a0487-7e5a-3b17-a449-47be666b36f6"), 
-              UUID("c528bcd2-a88b-3e82-be62-ef4f2396967a"), UUID("95e70727-a04e-3e33-b7fe-34ab19194f8b")]
-  android_ids = [UUID("e471711e-bd14-3dbe-80b6-9c7d92ecc296"), UUID("fd7b4c2e-2c8b-3bfa-94f0-d1e3ecbd5fb7"),
-               UUID("86842c35-da28-32ed-a90e-2da6663c5c73"), UUID("3bc0f91f-7660-34a2-b005-5c399598a369")]
-  
-  iphone_user_queries = map(lambda id: {'user_id': id}, iphone_ids)
-  android_user_queries = map(lambda id: {'user_id': id}, android_ids)
+  user_queries = map(lambda id: {'user_id': id}, uuids)
 
-  for q in iphone_user_queries:
+  for q in user_queries:
     q.update(time_query)
 
-  for q in android_user_queries:
-    q.update(time_query)
+  num_entries_ts = map(lambda q: edb.get_timeseries_db().find(q).count(), user_queries)
+  num_entries_uc = map(lambda q: edb.get_usercache_db().find(q).count(), user_queries)
+  total_entries = sum(num_entries_ts + num_entries_uc)
+  logging.debug("Total entries requested: %d" % total_entries)
 
-  iphone_list = map(lambda q: list(edb.get_timeseries_db().find(q).sort("metadata.write_ts")), iphone_user_queries)
-  android_list = map(lambda q: list(edb.get_timeseries_db().find(q).sort("metadata.write_ts")), android_user_queries)
+  threshold = 200000
+  if total_entries > threshold:
+    data_list = None
+  else:
+    data_list = map(lambda u: esdc.find_entries(u, None, time_range), all_uuids)
 
-  return {'iphone_data': iphone_list, 'android_data': android_list}
+  return {'phone_data': data_list}
+
+# Redirect to custom URL. $%$%$$ gmail
+@get('/redirect/<route>')
+def getCustomURL(route):
+  print route
+  print urllib.urlencode(request.query)
+  logging.debug("route = %s, query params = %s" % (route, request.query))
+  if route == "join":
+    redirected_url = "/#/setup?%s" % (urllib.urlencode(request.query))
+  else:
+    redirected_url = 'emission://%s?%s' % (route, urllib.urlencode(request.query))
+  response.status = 303
+  response.set_header('Location', redirected_url)
+  # response.set_header('Location', 'mailto://%s@%s' % (route, urllib.urlencode(request.query)))
+  logging.debug("Redirecting to URL %s" % redirected_url)
+  print("Redirecting to URL %s" % redirected_url)
+  return {'redirect': 'success'}
+
 
 # Client related code START
 @post("/client/<clientname>/<method>")
@@ -495,16 +649,13 @@ def habiticaRegister():
   user_uuid = getUUID(request)
   assert(user_uuid is not None)
   username = request.json['regConfig']['username']
-  # This is the second place we use the email, since we need to pass
-  # it to habitica to complete registration. I'm not even refactoring
-  # this into a method - hopefully this makes it less likely to be reused
-  userToken = request.json['user']
-  if skipAuth:
-      userEmail = userToken
-  else:
-      userEmail = verifyUserToken(userToken)
-  autogen_password = "autogenerate_me"
-  return habitproxy.habiticaRegister(username, userEmail,
+  # TODO: Move this logic into register since there is no point in
+  # regenerating the password if we already have the user
+  autogen_id = requests.get("http://www.dinopass.com/password/simple").text
+  logging.debug("generated id %s through dinopass" % autogen_id)
+  autogen_email = "%s@save.world" % autogen_id
+  autogen_password = autogen_id
+  return habitproxy.habiticaRegister(username, autogen_email,
                               autogen_password, user_uuid)
 
 @post('/habiticaProxy')
@@ -523,17 +674,28 @@ def habiticaProxy():
 def before_request():
   print("START %s %s %s" % (datetime.now(), request.method, request.path))
   request.params.start_ts = time.time()
+  request.params.timer = ect.Timer()
+  request.params.timer.__enter__()
   logging.debug("START %s %s" % (request.method, request.path))
 
 @app.hook('after_request')
 def after_request():
   msTimeNow = time.time()
+  request.params.timer.__exit__()
   duration = msTimeNow - request.params.start_ts
+  new_duration = request.params.timer.elapsed
+  if round((duration - new_duration) / new_duration > 100) > 0:
+    logging.error("old style duration %s != timer based duration %s" % (duration, new_duration))
+    stats.store_server_api_error(request.params.user_uuid, "MISMATCH_%s_%s" %
+                                 (request.method, request.path), msTimeNow, duration - new_duration)
+
   print("END %s %s %s %s %s " % (datetime.now(), request.method, request.path, request.params.user_uuid, duration))
   logging.debug("END %s %s %s %s " % (request.method, request.path, request.params.user_uuid, duration))
   # Keep track of the time and duration for each call
-  stats.storeServerEntry(request.params.user_uuid, "%s %s" % (request.method, request.path),
+  stats.store_server_api_time(request.params.user_uuid, "%s_%s" % (request.method, request.path),
         msTimeNow, duration)
+  stats.store_server_api_time(request.params.user_uuid, "%s_%s_cputime" % (request.method, request.path),
+        msTimeNow, new_duration)
 
 # Auth helpers BEGIN
 # This should only be used by createUserProfile since we may not have a UUID
@@ -555,16 +717,22 @@ def verifyUserToken(token):
                 tokenFields = oauth2client.client.verify_id_token(token, ios_client_key)
                 logging.debug(tokenFields)
             except AppIdentityError as iOSExp:
-                traceback.print_exc()
-                logging.debug("OAuth failed to verify id token, falling back to constructedURL")
-                #fallback to verifying using Google API
-                constructedURL = ("https://www.googleapis.com/oauth2/v1/tokeninfo?id_token=%s" % token)
-                r = requests.get(constructedURL)
-                tokenFields = json.loads(r.content)
-                in_client_key = tokenFields['audience']
-                if (in_client_key != client_key):
-                    if (in_client_key != ios_client_key):
-                        abort(401, "Invalid client key %s" % in_client_key)
+                try:
+                    logging.debug("Using OAuth2Client to verify id token from newer iOS phones")
+                    tokenFields = oauth2client.client.verify_id_token(token, ios_client_key_new)
+                    logging.debug(tokenFields)
+                except AppIdentityError as iOSExp:
+                    traceback.print_exc()
+                    logging.debug("OAuth failed to verify id token, falling back to constructedURL")
+                    #fallback to verifying using Google API
+                    constructedURL = ("https://www.googleapis.com/oauth2/v1/tokeninfo?id_token=%s" % token)
+                    r = requests.get(constructedURL)
+                    tokenFields = json.loads(r.content)
+                    in_client_key = tokenFields['audience']
+                    if (in_client_key != client_key):
+                        if (in_client_key != ios_client_key and 
+                            in_client_key != ios_client_key_new):
+                            abort(401, "Invalid client key %s" % in_client_key)
     logging.debug("Found user email %s" % tokenFields['email'])
     return tokenFields['email']
 
@@ -615,8 +783,12 @@ def getUUID(request, inHeader=False):
 # Auth helpers END
 
 if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(thread)d:%(message)s',
-                        filename='webserver_debug.log', level=logging.DEBUG)
+    try:
+        webserver_log_config = json.load(open("conf/log/webserver.conf", "r"))
+    except:
+        webserver_log_config = json.load(open("conf/log/webserver.conf.sample", "r"))
+
+    logging.config.dictConfig(webserver_log_config)
     logging.debug("This should go to the log file")
 
     # We have see the sockets hang in practice. Let's set the socket timeout = 1

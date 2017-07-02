@@ -8,14 +8,29 @@ import emission.storage.timeseries.abstract_timeseries as esta
 
 import emission.core.wrapper.entry as ecwe
 
+ts_enum_map = {
+    esta.EntryType.DATA_TYPE: edb.get_timeseries_db(),
+    esta.EntryType.ANALYSIS_TYPE: edb.get_analysis_timeseries_db()
+}
+
 class BuiltinTimeSeries(esta.TimeSeries):
     def __init__(self, user_id):
         super(BuiltinTimeSeries, self).__init__(user_id)
         self.key_query = lambda(key): {"metadata.key": key}
         self.type_query = lambda(entry_type): {"metadata.type": entry_type}
         self.user_query = {"user_id": self.user_id} # UUID is mandatory for this version
-        self.timeseries_db = edb.get_timeseries_db()
-        self.analysis_timeseries_db = edb.get_analysis_timeseries_db()
+        self.timeseries_db = ts_enum_map[esta.EntryType.DATA_TYPE]
+        self.analysis_timeseries_db = ts_enum_map[esta.EntryType.ANALYSIS_TYPE]
+        # Design question: Should the stats be a separate database, or should it be part
+        # of the timeseries database? Technically, it should be part of the timeseries
+        # database. However, I am concerned about the performance of the database
+        # with even more entries - it already takes 10 seconds to query for a document
+        # and I am not sure that adding a ton more data is going to make that better
+        # it is going to be easier to copy entries into the same database instead of
+        # splitting out, and we already support multiple indices, so I am tempted to put
+        # it separately. On the other hand, then the load/store from timeseries won't work
+        # if it is a separate database. Let's do the right thing and change the storage/
+        # shift to a different timeseries if we need to
         self.ts_map = {
                 "background/location": self.timeseries_db,
                 "background/filtered_location": self.timeseries_db,
@@ -24,15 +39,26 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "statemachine/transition": self.timeseries_db,
                 "config/sensor_config": self.timeseries_db,
                 "config/sync_config": self.timeseries_db,
+                "config/consent": self.timeseries_db,
+                "stats/server_api_time": self.timeseries_db,
+                "stats/server_api_error": self.timeseries_db,
+                "stats/pipeline_time": self.timeseries_db,
+                "stats/pipeline_error": self.timeseries_db,
+                "stats/client_time": self.timeseries_db,
+                "stats/client_nav_event": self.timeseries_db,
+                "stats/client_error": self.timeseries_db,
+                "manual/incident": self.timeseries_db,
                 "segmentation/raw_trip": self.analysis_timeseries_db,
                 "segmentation/raw_place": self.analysis_timeseries_db,
                 "segmentation/raw_section": self.analysis_timeseries_db,
                 "segmentation/raw_stop": self.analysis_timeseries_db,
+                "segmentation/raw_untracked": self.analysis_timeseries_db,
                 "analysis/smoothing": self.analysis_timeseries_db,
                 "analysis/cleaned_trip": self.analysis_timeseries_db,
                 "analysis/cleaned_place": self.analysis_timeseries_db,
                 "analysis/cleaned_section": self.analysis_timeseries_db,
                 "analysis/cleaned_stop": self.analysis_timeseries_db,
+                "analysis/cleaned_untracked": self.analysis_timeseries_db,
                 "analysis/recreated_location": self.analysis_timeseries_db,
                 "metrics/daily_user_count": self.analysis_timeseries_db,
                 "metrics/daily_mean_count": self.analysis_timeseries_db,
@@ -98,6 +124,8 @@ class BuiltinTimeSeries(esta.TimeSeries):
     def _get_sort_key(self, time_query = None):
         if time_query is None:
             return "metadata.write_ts"
+        elif time_query.timeType.endswith("local_dt"):
+            return time_query.timeType.replace("local_dt", "ts")
         else:
             return time_query.timeType
 
@@ -173,6 +201,16 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 ts_db_result = ts_db_cursor
             else:
                 ts_db_result = ts_db_cursor.sort(sort_key, pymongo.ASCENDING)
+            # We send the results from the phone in batches of 10,000
+            # And we support reading upto 100 times that amount at a time, so over
+            # This is more than the number of entries across all metadata types for
+            # normal user processing for over a year
+            # In [590]: edb.get_timeseries_db().find({"user_id": UUID('08b31565-f990-4d15-a4a7-89b3ba6b1340')}).count()
+            # Out[590]: 625272
+            #
+            # In [593]: edb.get_timeseries_db().find({"user_id": UUID('ea59084e-11d4-4076-9252-3b9a29ce35e0')}).count()
+            # Out[593]: 449869
+            ts_db_result.limit(25 * 10000)
         else:
             ts_db_result = [].__iter__()
 
@@ -180,9 +218,9 @@ class BuiltinTimeSeries(esta.TimeSeries):
         return ts_db_result
 
     def get_entry_at_ts(self, key, ts_key, ts):
-        return self.get_timeseries_db(key).find_one({"user_id": self.user_id,
-                                                 "metadata.key": key,
-                                                 ts_key: ts})
+        query = {"user_id": self.user_id, "metadata.key": key, ts_key: ts}
+        logging.debug("get_entry_at_ts query = %s" % query)
+        return self.get_timeseries_db(key).find_one(query)
 
     def get_data_df(self, key, time_query = None, geo_query = None,
                     extra_query_list=None,
@@ -200,12 +238,32 @@ class BuiltinTimeSeries(esta.TimeSeries):
         :return:
         """
         result_it = self.find_entries([key], time_query, geo_query, extra_query_list)
+        return self.to_data_df(key, result_it, map_fn)
+
+    @staticmethod
+    def to_data_df(key, entry_it, map_fn = None):
+        """
+        Converts the specified iterator into a dataframe
+        :param key: The key whose entries are in the iterator
+        :param it: The iterator to be converted
+        :return: A dataframe composed of the entries in the iterator
+        """
         if map_fn is None:
             map_fn = BuiltinTimeSeries._to_df_entry
         # Dataframe doesn't like to work off an iterator - it wants everything in memory
-        df = pd.DataFrame([map_fn(e) for e in list(result_it)])
+        df = pd.DataFrame([map_fn(e) for e in entry_it])
         logging.debug("Found %s results" % len(df))
-        return df
+        if len(df) > 0:
+            dedup_check_list = [item for item in ecwe.Entry.get_dedup_list(key)
+                                if item in df.columns] + ["metadata_write_ts"]
+            numeric_check_list = [col for col in dedup_check_list if df[col].dtype != 'object']
+            deduped_df = df.drop_duplicates(subset=numeric_check_list)
+            logging.debug("After de-duping, converted %s points to %s " %
+                          (len(df), len(deduped_df)))
+        else:
+            deduped_df = df
+        return deduped_df.reset_index(drop=True)
+
 
     def get_max_value_for_field(self, key, field, time_query=None):
         """
@@ -229,6 +287,17 @@ class BuiltinTimeSeries(esta.TimeSeries):
             retVal = retVal[part]
         return retVal
 
+    def bulk_insert(self, entries, data_type = None):
+        if data_type is None:
+            keyfunc = lambda e: e.metadata.key
+            sorted_data = sorted(entries, key=keyfunc)
+            for k, g in itertools.groupby(sorted_data, keyfunc):
+                glist = list(g)
+                logging.debug("Inserting %s entries for key %s" % (len(glist), k))
+                self.get_timeseries_db(k).insert(glist, continue_on_error=False)
+        else:
+            return ts_enum_map[data_type].insert(entries, continue_on_error=True)
+
     def insert(self, entry):
         """
         Inserts the specified entry and returns the object ID 
@@ -238,7 +307,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
             entry = ecwe.Entry(entry)
         if "user_id" not in entry or entry["user_id"] is None:
             entry["user_id"] = self.user_id
-        if entry["user_id"] != self.user_id:
+        if self.user_id is not None and entry["user_id"] != self.user_id:
             raise AttributeError("Saving entry %s for %s in timeseries for %s" % 
 		(entry, entry["user_id"], self.user_id))
         else:

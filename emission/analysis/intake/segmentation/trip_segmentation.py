@@ -10,6 +10,11 @@ import emission.core.wrapper.location as ecwl
 import emission.core.wrapper.rawtrip as ecwrt
 import emission.core.wrapper.rawplace as ecwrp
 import emission.core.wrapper.entry as ecwe
+import emission.core.wrapper.untrackedtime as ecwut
+
+import emission.analysis.intake.segmentation.restart_checking as eaisr
+
+import emission.core.common as ecc
 
 class TripSegmentationMethod(object):
     def segment_into_trips(self, timeseries, time_query):
@@ -58,7 +63,21 @@ def segment_current_trips(user_id):
         epq.mark_segmentation_done(user_id, None)
         return
 
-    filters_in_df = loc_df["filter"].unique()
+    out_of_order_points = loc_df[loc_df.ts.diff() < 0]
+    if len(out_of_order_points) > 0:
+        logging.info("Found out of order points!")
+        logging.info("%s" % out_of_order_points)
+        # drop from the table
+        loc_df = loc_df.drop(out_of_order_points.index.tolist())
+        # delete from the database. Should be generally discouraged, so we
+        # are kindof putting it in here secretively
+        import emission.core.get_database as edb
+
+        out_of_order_id_list = out_of_order_points["_id"].tolist()
+        logging.debug("out_of_order_id_list = %s" % out_of_order_id_list)
+        edb.get_timeseries_db().remove({"_id": {"$in": out_of_order_id_list}})
+
+    filters_in_df = loc_df["filter"].dropna().unique()
     logging.debug("Filters in the dataframe = %s" % filters_in_df)
     if len(filters_in_df) == 1:
         # Common case - let's make it easy
@@ -169,27 +188,95 @@ def create_places_and_trips(user_id, segmentation_points, segmentation_method_na
         new_place_entry = ecwe.Entry.create_entry(user_id,
                             "segmentation/raw_place", new_place, create_id = True)
 
-        stitch_together_start(last_place_entry, curr_trip_entry, start_loc)
-        stitch_together_end(new_place_entry, curr_trip_entry, end_loc)
+        if found_untracked_period(ts, last_place_entry.data, start_loc):
+            # Fill in the gap in the chain with an untracked period
+            curr_untracked = ecwut.Untrackedtime()
+            curr_untracked.source = segmentation_method_name
+            curr_untracked_entry = ecwe.Entry.create_entry(user_id,
+                            "segmentation/raw_untracked", curr_untracked, create_id=True)
 
-        ts.insert(curr_trip_entry)
-        # last_place is a copy of the data in this entry. So after we fix it
-        # the way we want, we need to assign it back to the entry, otherwise
-        # it will be lost
-        ts.update(last_place_entry)
+            restarted_place = ecwrp.Rawplace()
+            restarted_place.source = segmentation_method_name
+            restarted_place_entry = ecwe.Entry.create_entry(user_id,
+                            "segmentation/raw_place", restarted_place, create_id=True)
+
+            untracked_start_loc = ecwe.Entry(ts.get_entry_at_ts("background/filtered_location",
+                                                     "data.ts", last_place_entry.data.enter_ts)).data
+            untracked_start_loc["ts"] = untracked_start_loc.ts + epq.END_FUZZ_AVOID_LTE
+            _link_and_save(ts, last_place_entry, curr_untracked_entry, restarted_place_entry,
+                           untracked_start_loc, start_loc)
+            logging.debug("Created untracked period %s from %s to %s" %
+                          (curr_untracked_entry.get_id(), curr_untracked_entry.data.start_ts, curr_untracked_entry.data.end_ts))
+            logging.debug("Resetting last_place_entry from %s to %s" %
+                          (last_place_entry, restarted_place_entry))
+            last_place_entry = restarted_place_entry
+
+        _link_and_save(ts, last_place_entry, curr_trip_entry, new_place_entry, start_loc, end_loc)
         last_place_entry = new_place_entry
 
     # The last last_place hasn't been stitched together yet, but we
     # need to save it so that it can be the last_place for the next run
     ts.insert(last_place_entry)
 
+def _link_and_save(ts, last_place_entry, curr_trip_entry, new_place_entry, start_loc, end_loc):
+    stitch_together_start(last_place_entry, curr_trip_entry, start_loc)
+    stitch_together_end(new_place_entry, curr_trip_entry, end_loc)
+
+    ts.insert(curr_trip_entry)
+    # last_place is a copy of the data in this entry. So after we fix it
+    # the way we want, we need to assign it back to the entry, otherwise
+    # it will be lost
+    ts.update(last_place_entry)
+
+def found_untracked_period(timeseries, last_place, start_loc):
+    """
+    Check to see whether the two places are the same.
+    This is a fix for https://github.com/e-mission/e-mission-server/issues/378
+    Note both last_place and start_loc are data wrappers (e.g. RawPlace and Location objects)
+    NOT entries. So field access should not be preceeded by "data"
+
+    :return: True if we should create a new start place instead of linking to
+    the last_place, False otherwise
+    """
+    # Implementing logic from https://github.com/e-mission/e-mission-server/issues/378
+    if last_place.enter_ts is None:
+        logging.debug("last_place.enter_ts = %s" % (last_place.enter_ts))
+        logging.debug("start of a chain, unable to check for restart from previous trip end, assuming not restarted")
+        return False
+
+    if _is_tracking_restarted(last_place, start_loc, timeseries):
+        logging.debug("tracking has been restarted, returning True")
+        return True
+
+    transition_distance = ecc.calDistance(last_place.location.coordinates,
+                       start_loc.loc.coordinates)
+    logging.debug("while determining new_start_place, transition_distance = %s" % transition_distance)
+    if transition_distance < 1000:
+        logging.debug("transition_distance %s < 1000, returning False", transition_distance)
+        return False
+
+    time_delta = start_loc.ts - last_place.enter_ts
+    transition_speed = transition_distance / time_delta
+    logging.debug("while determining new_start_place, time_delta = %s, transition_speed = %s"
+                  % (time_delta, transition_speed))
+
+    # Let's use a little less than walking speed 3km/hr < 3mph (4.83 kmph)
+    speed_threshold = float(3000) / (60*60)
+
+    if transition_speed > speed_threshold:
+        logging.debug("transition_speed %s > %s, returning False" %
+                      (transition_speed, speed_threshold))
+        return False
+    else:
+        logging.debug("transition_speed %s <= %s, 'stopped', returning True" %
+                        (transition_speed, speed_threshold))
+        return True
+
 def start_new_chain(uuid):
     """
     Can't find the place that is the end of an existing chain, so we need to
     create a new one.  This might correspond to the start of tracking, or to an
-    improperly terminated chain. For now, we deal with the start of tracking,
-    and add the checks for the improperly terminated chain later.
-    TODO: Add checks for improperly terminated chains later.
+    improperly terminated chain.
     """
     start_place = ecwrp.Rawplace()
     logging.debug("Starting tracking, created new start of chain %s" % start_place)
@@ -248,6 +335,8 @@ def stitch_together_end(new_place_entry, curr_trip_entry, end_loc):
     curr_trip.end_place = new_place_entry.get_id()
     curr_trip.end_loc = end_loc.loc
     curr_trip.duration = curr_trip.end_ts - curr_trip.start_ts
+    curr_trip.distance = ecc.calDistance(curr_trip.end_loc.coordinates,
+                                         curr_trip.start_loc.coordinates)
 
     new_place.enter_ts = end_loc.ts
     new_place.enter_local_dt = end_loc.local_dt
@@ -260,12 +349,6 @@ def stitch_together_end(new_place_entry, curr_trip_entry, end_loc):
     new_place_entry["data"] = new_place
     curr_trip_entry["data"] = curr_trip
 
+def _is_tracking_restarted(last_place, start_loc, timeseries):
+    return eaisr.is_tracking_restarted_in_range(last_place.enter_ts, start_loc.ts, timeseries)
 
-def get_restart_events(timeseries, time_query):
-    transition_df = timeseries.get_data_df("statemachine/transition", time_query)
-    restart_events_df = transition_df.query('transition' == ecwt.TransitionType.BOOTED.value or
-                                            'transition' == ecwt.TransitionType.INITIALIZE.value or
-                                            'transition' == ecwt.TransitionType.STOP_TRACKING.value)
-
-def is_easy_case(restart_events_df):
-    return len(restart_events_df) == 0

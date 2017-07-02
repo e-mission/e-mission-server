@@ -32,15 +32,26 @@ class Entry(ecwb.WrapperBase):
             "statemachine/transition": "transition",
             "config/sensor_config": "sensorconfig",
             "config/sync_config": "syncconfig",
+            "config/consent": "consentconfig",
+            "stats/server_api_time": "statsevent",
+            "stats/server_api_error": "statsevent",
+            "stats/pipeline_time": "statsevent",
+            "stats/pipeline_error": "statsevent",
+            "stats/client_time": "statsevent",
+            "stats/client_nav_event": "statsevent",
+            "stats/client_error": "statsevent",
+            "manual/incident": "incident",
             "segmentation/raw_trip": "rawtrip",
             "segmentation/raw_place": "rawplace",
             "segmentation/raw_section": "section",
             "segmentation/raw_stop": "stop",
+            "segmentation/raw_untracked": "untrackedtime",
             "analysis/smoothing": "smoothresults",
             "analysis/cleaned_trip": "cleanedtrip",
             "analysis/cleaned_place": "cleanedplace",
             "analysis/cleaned_section": "cleanedsection",
             "analysis/cleaned_stop": "stop",
+            "analysis/cleaned_untracked": "untrackedtime",
             "analysis/recreated_location": "recreatedlocation",
             "metrics/daily_user_count": "modestattimesummary",
             "metrics/daily_mean_count": "modestattimesummary",
@@ -62,6 +73,14 @@ class Entry(ecwb.WrapperBase):
       result_entry.data = data
       result_entry._populateDependencies()
       return result_entry
+
+  @staticmethod
+  def get_dedup_list(key):
+      key_class = ecwb.WrapperBase._get_class(Entry._getData2Wrapper()[key])
+      all_keys = key_class.props.keys()
+      valid_keys = [item for item in all_keys if item not in key_class.geojson
+                    and item not in key_class.local_dates]
+      return valid_keys
 
   def _build(self, key, obj):
     # logging.debug("entry._build called with %s, %s, %s" % (self, key, obj))

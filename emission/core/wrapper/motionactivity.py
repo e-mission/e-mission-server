@@ -34,6 +34,9 @@ class MotionTypes(enum.Enum):
     # for now. If we see other combinations in the future, we can figure out 
     # how to deal with it at that time.
     STOPPED_WHILE_IN_VEHICLE = 10
+    # Detected during the clean and resample stage. NOT detected from the
+    # phone. Initial version of more general mode inference
+    AIR_OR_HSR = 11
 
 class Motionactivity(ecwb.WrapperBase):
     props = {"type": ecwb.WrapperBase.Access.RO,

@@ -14,6 +14,7 @@ import emission.analysis.intake.cleaning.filter_accuracy as eaicf
 import emission.storage.timeseries.format_hacks.move_filter_field as estfm
 import emission.analysis.intake.segmentation.trip_segmentation as eaist
 import emission.analysis.intake.segmentation.section_segmentation as eaiss
+import emission.analysis.intake.cleaning.location_smoothing as eaicl
 import emission.analysis.intake.cleaning.clean_and_resample as eaicr
 
 def makeValid(client):
@@ -99,6 +100,9 @@ def setupRealExample(testObj, dump_file):
     logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
     testObj.entries = json.load(open(dump_file), object_hook = bju.object_hook)
     testObj.testUUID = uuid.uuid4()
+    setupRealExampleWithEntries(testObj)
+
+def setupRealExampleWithEntries(testObj):
     tsdb = edb.get_timeseries_db()
     for entry in testObj.entries:
         entry["user_id"] = testObj.testUUID
@@ -108,14 +112,14 @@ def setupRealExample(testObj, dump_file):
         
     logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
     logging.debug("First few entries = %s" % 
-                    [e["data"]["fmt_time"] for e in 
+                    [e["data"]["fmt_time"] if "fmt_time" in e["data"] else e["metadata"]["write_fmt_time"] for e in 
                         list(edb.get_timeseries_db().find({"user_id": testObj.testUUID}).sort("data.write_ts",
                                                                                        pymongo.ASCENDING).limit(10))])
 def runIntakePipeline(uuid):
     eaicf.filter_accuracy(uuid)
-    estfm.move_all_filters_to_data()
     eaist.segment_current_trips(uuid)
     eaiss.segment_current_sections(uuid)
+    eaicl.filter_current_sections(uuid)
     eaicr.clean_and_resample(uuid)
 
 def configLogging():

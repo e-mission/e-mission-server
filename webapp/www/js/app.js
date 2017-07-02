@@ -6,7 +6,7 @@
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic', 'starter.controllers', 'starter.services',
-                           'starter.directives', 'ui.bootstrap'])
+                           'starter.directives', 'ui.bootstrap', 'monospaced.qrcode'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -24,12 +24,13 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services',
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
+.config(function($stateProvider, $urlRouterProvider, $compileProvider) {
 
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router
   // Set up the various states which the app can be in.
   // Each state's controller can be found in controllers.js
+  $compileProvider.aHrefSanitizationWhitelist(/^\s*(http?|https?|emission):/);
   $stateProvider
   .state('home', {
     url: '/home',
@@ -50,6 +51,19 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services',
     templateUrl: 'templates/metrics.html',
     controller: 'MetricsCtrl'
   })
+  .state('game', {
+    url: '/game',
+    templateUrl: 'templates/game.html',
+  })
+  .state('partners', {
+    url: '/partners',
+    templateUrl: 'templates/partners.html',
+  })
+  .state('setup', {
+    url: '/setup?groupid&userid',
+    templateUrl: 'templates/setup.html',
+    controller: 'SetupCtrl'
+  });
 
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/home');

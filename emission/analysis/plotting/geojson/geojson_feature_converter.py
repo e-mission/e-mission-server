@@ -5,13 +5,17 @@ import attrdict as ad
 import pandas as pd
 
 import emission.storage.timeseries.abstract_timeseries as esta
+import emission.net.usercache.abstract_usercache as enua
+import emission.storage.timeseries.timequery as estt
 
 import emission.storage.decorations.trip_queries as esdt
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.decorations.timeline as esdtl
 
 import emission.core.wrapper.location as ecwl
+import emission.core.wrapper.cleanedsection as ecwcs
 import emission.core.wrapper.entry as ecwe
+import emission.core.common as ecc
 
 # TODO: Move this to the section_features class instead
 import emission.analysis.intake.cleaning.location_smoothing as eaicl
@@ -111,12 +115,12 @@ def section_to_geojson(section, tl):
     if len(section_location_entries) != 0:
         logging.debug("first element in section_location_array = %s" % section_location_entries[0])
 
-        # Fudge the end point so that we don't have a gap because of the ts != write_ts mismatch
-        # TODO: Fix this once we are able to query by the data timestamp instead of the metadata ts
-
-        if section_location_entries[-1].data.loc != section.data.end_loc:
+        if not ecc.compare_rounded_arrays(section.data.end_loc.coordinates,
+                                      section_location_entries[-1].data.loc.coordinates,
+                                      digits=4):
             logging.info("section_location_array[-1].data.loc %s != section.data.end_loc %s even after df.ts fix, filling gap" % \
                     (section_location_entries[-1].data.loc, section.data.end_loc))
+            assert(False)
             last_loc_doc = ts.get_entry_at_ts("background/filtered_location", "data.ts", section.data.end_ts)
             if last_loc_doc is None:
                 logging.warning("can't find entry to patch gap, leaving gap")
@@ -128,17 +132,11 @@ def section_to_geojson(section, tl):
                 section_location_entries.append(last_loc_entry)
 
     points_line_feature = point_array_to_line(section_location_entries)
-    # If this is the first section, we already start from the trip start. But we actually need to start from the
-    # prior place. Fudge this too. Note also that we may want to figure out how to handle this properly in the model
-    # without needing fudging. TODO: Unclear how exactly to do this
-    if section.data.start_stop is None:
-        # This is the first section. So we need to find the start place of the parent trip
-        parent_trip = tl.get_object(section.data.trip_id)
-        start_place_of_parent_trip = tl.get_object(parent_trip.data.start_place)
-        points_line_feature.geometry.coordinates.insert(0, start_place_of_parent_trip.data.location.coordinates)
-
     points_line_feature.id = str(section.get_id())
-    points_line_feature.properties = copy.copy(section.data)
+    points_line_feature.properties.update(copy.copy(section.data))
+    # Update works on dicts, convert back to a section object to make the modes
+    # work properly
+    points_line_feature.properties = ecwcs.Cleanedsection(points_line_feature.properties)
     points_line_feature.properties["feature_type"] = "section"
     points_line_feature.properties["sensed_mode"] = str(points_line_feature.properties.sensed_mode)
 
@@ -149,17 +147,43 @@ def section_to_geojson(section, tl):
 
     return gj.FeatureCollection(feature_array)
 
+def incident_to_geojson(incident):
+    ret_feature = gj.Feature()
+    ret_feature.id = str(incident.get_id())
+    ret_feature.geometry = gj.Point()
+    ret_feature.geometry.coordinates = incident.data.loc.coordinates
+    ret_feature.properties = copy.copy(incident.data)
+    ret_feature.properties["feature_type"] = "incident"
+
+    # _stringify_foreign_key(ret_feature.properties, ["ending_section", "starting_section", "trip_id"])
+    _del_non_derializable(ret_feature.properties, ["loc"])
+    return ret_feature
+
+def geojson_incidents_in_range(user_id, start_ts, end_ts):
+    MANUAL_INCIDENT_KEY = "manual/incident"
+    ts = esta.TimeSeries.get_time_series(user_id)
+    uc = enua.UserCache.getUserCache(user_id)
+    tq = estt.TimeQuery("data.ts", start_ts, end_ts)
+    incident_entry_docs = list(ts.find_entries([MANUAL_INCIDENT_KEY], time_query=tq)) \
+        + list(uc.getMessage([MANUAL_INCIDENT_KEY], tq))
+    incidents = [ecwe.Entry(doc) for doc in incident_entry_docs]
+    return map(incident_to_geojson, incidents)
+
 def point_array_to_line(point_array):
     points_line_string = gj.LineString()
     # points_line_string.coordinates = [l.loc.coordinates for l in filtered_section_location_array]
     points_line_string.coordinates = []
+    points_times = []
 
     for l in point_array:
         # logging.debug("About to add %s to line_string " % l)
         points_line_string.coordinates.append(l.data.loc.coordinates)
+        points_times.append(l.data.ts)
     
     points_line_feature = gj.Feature()
     points_line_feature.geometry = points_line_string
+    points_line_feature.properties = {}
+    points_line_feature.properties["times"] = points_times
     return points_line_feature    
 
 def trip_to_geojson(trip, tl):
@@ -192,17 +216,26 @@ def trip_to_geojson(trip, tl):
         feature_array.append(stop_to_geojson(stop))
 
     for i, section in enumerate(trip_tl.trips):
-        # TODO: figure out whether we should do this at the model.
-        # The first section starts with the start of the trip. But the trip itself starts at the first
-        # point where we exit the geofence, not at the start place. That is because we don't really know when
-        # we left the start place. We can fix this in the model through interpolation. For now, we assume that the
-        # gap between the real departure time and the time that the trip starts is small, and just combine it here.
         section_gj = section_to_geojson(section, tl)
         feature_array.append(section_gj)
 
     trip_geojson = gj.FeatureCollection(features=feature_array, properties=trip.data)
     trip_geojson.id = str(trip.get_id())
-    trip_geojson.properties["feature_type"] = "trip"
+
+    feature_array.extend(geojson_incidents_in_range(trip.user_id,
+                                              curr_start_place.data.exit_ts,
+                                              curr_end_place.data.enter_ts))
+    if trip.metadata.key == esda.CLEANED_UNTRACKED_KEY:
+        # trip_geojson.properties["feature_type"] = "untracked"
+        # Since the "untracked" type is not correctly handled on the phone, we just
+        # skip these trips until
+        # https://github.com/e-mission/e-mission-phone/issues/118
+        # is fixed
+        # TODO: Once it is fixed, re-introduce the first line in this block
+        # and remove the None check in get_geojson_for_timeline
+        return None
+    else:
+        trip_geojson.properties["feature_type"] = "trip"
     return trip_geojson
 
 def get_geojson_for_ts(user_id, start_ts, end_ts):
@@ -225,10 +258,13 @@ def get_geojson_for_timeline(user_id, tl):
     for trip in tl.trips:
         try:
             trip_geojson = trip_to_geojson(trip, tl)
-            geojson_list.append(trip_geojson)
+            if trip_geojson is not None:
+                geojson_list.append(trip_geojson)
         except Exception, e:
             logging.exception("Found error %s while processing trip %s" % (e, trip))
             raise e
+    logging.debug("trip count = %d, geojson count = %d" %
+                  (len(tl.trips), len(geojson_list)))
     return geojson_list
 
 def get_all_points_for_range(user_id, key, start_ts, end_ts):
@@ -244,8 +280,9 @@ def get_all_points_for_range(user_id, key, start_ts, end_ts):
 
 
 def get_feature_list_for_point_array(points_array):
-    points_feature_array = [location_to_geojson(le.data) for le in points_array]
-    print ("Found %d points" % len(points_feature_array))
+    points_feature_array = [location_to_geojson(le) for le in points_array]
+    print ("Found %d features from %d points" %
+           (len(points_feature_array), len(points_array)))
     
     feature_array = []
     feature_array.append(gj.FeatureCollection(points_feature_array))
@@ -268,5 +305,5 @@ def get_location_entry_list_from_df(loc_time_df, ts="ts", latitude="latitude", l
         retVal = {"latitude": row[latitude], "longitude": row[longitude], "ts": row[ts],
                   "_id": str(idx), "fmt_time": row[fmt_time], "loc": gj.Point(coordinates=[row[longitude], row[latitude]])}
         location_entry_list.append(ecwe.Entry.create_entry(
-            "dummy_user", "dummy_entry", ecwl.Location(retVal)))
+            "dummy_user", "background/location", ecwl.Location(retVal)))
     return location_entry_list

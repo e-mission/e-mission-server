@@ -10,10 +10,12 @@ RAW_TRIP_KEY = "segmentation/raw_trip"
 RAW_PLACE_KEY = "segmentation/raw_place"
 RAW_SECTION_KEY = "segmentation/raw_section"
 RAW_STOP_KEY = "segmentation/raw_stop"
+RAW_UNTRACKED_KEY = "segmentation/raw_untracked"
 CLEANED_TRIP_KEY = "analysis/cleaned_trip"
 CLEANED_PLACE_KEY = "analysis/cleaned_place"
 CLEANED_SECTION_KEY = "analysis/cleaned_section"
 CLEANED_STOP_KEY = "analysis/cleaned_stop"
+CLEANED_UNTRACKED_KEY = "analysis/cleaned_untracked"
 CLEANED_LOCATION_KEY = "analysis/recreated_location"
 METRICS_DAILY_USER_COUNT = "metrics/daily_user_count"
 METRICS_DAILY_MEAN_COUNT = "metrics/daily_mean_count"
@@ -38,10 +40,15 @@ def get_objects(key, user_id, time_query, geo_query=None):
             get_entries(key, user_id=user_id, time_query=time_query,
                         geo_query=geo_query)]
 
-def get_entries(key, user_id, time_query, geo_query=None,
+def get_entries(key, user_id, time_query, untracked_key = None,
+                geo_query=None,
                 extra_query_list=None):
     ts = get_timeseries_for_user(user_id)
-    doc_cursor = ts.find_entries([key], time_query, geo_query, extra_query_list)
+    key_list = [key] if untracked_key is None else [key, untracked_key]
+    if untracked_key is not None:
+        logging.debug("after appending untracked_key %s, key_list is %s" %
+                      (untracked_key, key_list))
+    doc_cursor = ts.find_entries(key_list, time_query, geo_query, extra_query_list)
     # TODO: Fix "TripIterator" and return it instead of this list
     curr_entry_list = [ecwe.Entry(doc) for doc in doc_cursor]
     logging.debug("Returning entry with length %d result" % len(curr_entry_list))

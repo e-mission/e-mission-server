@@ -16,8 +16,9 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
     filtering out certain transitions, such as TILTING or UNKNOWN.
     """
 
-    def __init__(self, confidence_threshold, ignore_modes_list):
+    def __init__(self, confidence_threshold, distance_threshold, ignore_modes_list):
         self.confidence_threshold = confidence_threshold
+        self.distance_threshold = distance_threshold
         self.ignore_modes_list = ignore_modes_list
 
     def is_filtered(self, curr_activity_doc):
@@ -48,7 +49,7 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
         # length of the filtered dataframe was sufficient. But now both Tom and
         # I have hit it (on 18th and 21st of Sept) so let's handle it proactively here.
         if filter_mask.shape == (0,0):
-            logging.warning("Found filter_mask with shape (0,0), returning blank")
+            logging.info("Found filter_mask with shape (0,0), returning blank")
             return []
 
         logging.debug("filtered points %s" % np.nonzero(filter_mask))
@@ -95,7 +96,7 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
 
     # Overridden in smoothed_high_confidence_with_visit_transitions.py.
     # Consider porting any changes there as well if applicable.
-    def segment_into_sections(self, timeseries, time_query):
+    def segment_into_sections(self, timeseries, distance_from_place, time_query):
         """
         Determine locations within the specified time that represent segmentation points for a trip.
         :param timeseries: the time series for this user
@@ -105,6 +106,13 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
         """
         motion_changes = self.segment_into_motion_changes(timeseries, time_query)
         location_points = timeseries.get_data_df("background/filtered_location", time_query)
+
+        if len(location_points) == 0:
+            logging.debug("No location points found for query %s, returning []" % time_query)
+            return []
+
+        fp = location_points.iloc[0]
+        lp = location_points.iloc[-1]
 
         # Create sections for each motion. At this point, we need to decide a policy on how to deal with the gaps.
         # Let's pick a reasonable default for now.
@@ -117,9 +125,28 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
             raw_section_df = location_points[(location_points.ts >= start_motion.ts) &
                                              (location_points.ts <= end_motion.ts)]
             if len(raw_section_df) == 0:
-                logging.warn("Found no location points between %s and %s" % (start_motion, end_motion))
+                logging.info("Found no location points between %s and %s" % (start_motion, end_motion))
             else:
                 logging.debug("with iloc, section start point = %s, section end point = %s" %
                               (ecwl.Location(raw_section_df.iloc[0]), ecwl.Location(raw_section_df.iloc[-1])))
                 section_list.append((raw_section_df.iloc[0], raw_section_df.iloc[-1], start_motion.type))
+
+        logging.debug("len(section_list) == %s" % len(section_list))
+        if len(section_list) == 0:
+            if len(motion_changes) == 1:
+                (start_motion, end_motion) = motion_changes[0]
+
+                if start_motion.type == end_motion.type:
+                    logging.debug("No section because start_motion == end_motion, creating one dummy section")
+                    section_list.append((fp, lp, start_motion.type))
+
+            if len(motion_changes) == 0:
+            # there are no high confidence motions useful motions, so we add a section of type NONE
+            # as long as it is a discernable trip (end != start) and not a spurious trip
+                if distance_from_place > self.distance_threshold:
+                    logging.debug("No high confidence motions, but "
+                        "distance %s > threshold %s, creating dummy section of type UNKNOWN" %
+                                  (distance_from_place, self.distance_threshold))
+                    section_list.append((fp, lp, ecwm.MotionTypes.UNKNOWN))
+
         return section_list

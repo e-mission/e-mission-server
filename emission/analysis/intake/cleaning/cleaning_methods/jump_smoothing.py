@@ -104,20 +104,50 @@ class SmoothZigzag(object):
         logging.debug("shortest_non_cluster_segment = %s" % retVal)
         return retVal
 
-    def __init__(self, maxSpeed = 100):
+    def __init__(self, is_ios, same_point_distance, maxSpeed = 100):
+        self.is_ios = is_ios
+        self.same_point_distance = same_point_distance
         self.maxSpeed = maxSpeed
         self.cal_distance = self.end_points_distance
         self.find_start_segment = self.shortest_non_cluster_segment
 
     def find_segments(self):
-        segmentation_points = self.with_speeds_df[self.with_speeds_df.speed > self.maxSpeed].index
-        segmentation_points = segmentation_points.insert(0, 0)
-        last_point = self.with_speeds_df.shape[0] - 1
+        if self.is_ios:
+            segmentation_points = self.get_segmentation_points_ios()
+        else:
+            segmentation_points = self.get_segmentation_points_android()
+
+        segmentation_points.insert(0, 0)
+        last_point = self.with_speeds_df.shape[0]
         if last_point not in segmentation_points:
-            segmentation_points = segmentation_points.insert(len(segmentation_points), last_point) 
+            logging.debug("smoothing: last_point index %s not in found points %s" %
+                          (last_point, segmentation_points))
+            segmentation_points.insert(len(segmentation_points), last_point)
+            logging.debug("smoothing: added new entry %s" % segmentation_points[-1])
 
         self.segment_list = [Segment(start, end, self) for (start, end) in 
                                 zip(segmentation_points, segmentation_points[1:])]
+        logging.debug("smoothing: segment_list = %s" % self.segment_list)
+
+    def get_segmentation_points_android(self):
+        return self.with_speeds_df[self.with_speeds_df.speed > self.maxSpeed].index.tolist()
+
+    def get_segmentation_points_ios(self):
+        jump_indices = self.with_speeds_df[self.with_speeds_df.speed > self.maxSpeed].index
+        # On iOS, as seen in ...., this is likely to be the jump back. We now need to find
+        # the jump to
+        jumps = self.with_speeds_df[(self.with_speeds_df.speed > self.maxSpeed) &
+                                    (self.with_speeds_df.distance > 100)].index
+        logging.debug("After first step, jumps = %s" % jumps)
+        all_jumps = []
+        for jump in jumps.tolist():
+            jump_to = self.with_speeds_df[(self.with_speeds_df.index < jump) & (
+                self.with_speeds_df.distance > 100)].index[-1]
+            logging.debug("for jump %s, jump_to = %s" % (jump, jump_to))
+            all_jumps.append(jump_to)
+            all_jumps.append(jump)
+        logging.debug("for ios, returning all_jumps = %s" % all_jumps)
+        return all_jumps
 
     def split_segment(self, i, curr_seg, direction):
         import emission.analysis.intake.cleaning.location_smoothing as ls
@@ -228,7 +258,7 @@ class SmoothZigzag(object):
         recomputed_threshold = cso.BoxplotOutlier(ignore_zeros = True).get_threshold(recomputed_speeds_df)
         # assert recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold].shape[0] == 0, "After first round, still have outliers %s" % recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold] 
         if recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold].shape[0] != 0:
-            logging.warn("After first round, still have outliers %s" % recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold])
+            logging.info("After first round, still have outliers %s" % recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold])
 
 
 class SmoothPosdap(object):

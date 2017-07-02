@@ -1,0 +1,3521 @@
+{
+    "data": [
+        {
+            "features": [
+                {
+                    "geometry": {
+                        "type": "Point", 
+                        "coordinates": [
+                            -122.0816621790811, 
+                            37.39020049373536
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e4a1f6858fd4d91ccddf", 
+                    "properties": {
+                        "exit_local_dt": {
+                            "hour": 8, 
+                            "month": 2, 
+                            "second": 38, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 58
+                        }, 
+                        "display_name": "Mercy Street, Mountain View", 
+                        "feature_type": "start_place", 
+                        "exit_fmt_time": "2016-02-22T08:58:38.727512-08:00", 
+                        "starting_trip": {
+                            "$oid": "57e4e49ef6858fd4d91ccd22"
+                        }, 
+                        "source": "DwellSegmentationDistFilter", 
+                        "raw_places": [
+                            {
+                                "$oid": "57e4e49cf6858fd4d91ccceb"
+                            }, 
+                            {
+                                "$oid": "57e4e49cf6858fd4d91ccceb"
+                            }
+                        ], 
+                        "exit_ts": 1456160318.727512
+                    }
+                }, 
+                {
+                    "geometry": {
+                        "type": "Point", 
+                        "coordinates": [
+                            -122.0812194754829, 
+                            37.38939195184179
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e4a1f6858fd4d91ccde0", 
+                    "properties": {
+                        "enter_fmt_time": "2016-02-22T09:02:37.006508-08:00", 
+                        "exit_local_dt": {
+                            "hour": 10, 
+                            "month": 2, 
+                            "second": 8, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 2
+                        }, 
+                        "display_name": "Castro Street, Mountain View", 
+                        "feature_type": "end_place", 
+                        "exit_fmt_time": "2016-02-22T10:02:08.085492-08:00", 
+                        "enter_local_dt": {
+                            "hour": 9, 
+                            "month": 2, 
+                            "second": 37, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 2
+                        }, 
+                        "ending_trip": {
+                            "$oid": "57e4e49ef6858fd4d91ccd22"
+                        }, 
+                        "starting_trip": {
+                            "$oid": "57e4e49ef6858fd4d91ccd2e"
+                        }, 
+                        "source": "DwellSegmentationDistFilter", 
+                        "enter_ts": 1456160557.006508, 
+                        "duration": 3571.0789835453033, 
+                        "raw_places": [
+                            {
+                                "$oid": "57e4e49cf6858fd4d91ccced"
+                            }, 
+                            {
+                                "$oid": "57e4e49cf6858fd4d91ccced"
+                            }
+                        ], 
+                        "exit_ts": 1456164128.0854917
+                    }
+                }, 
+                {
+                    "type": "FeatureCollection", 
+                    "features": [
+                        {
+                            "geometry": {
+                                "type": "LineString", 
+                                "coordinates": [
+                                    [
+                                        -122.0816621790811, 
+                                        37.39020049373536
+                                    ], 
+                                    [
+                                        -122.08168936886433, 
+                                        37.390421994569536
+                                    ], 
+                                    [
+                                        -122.08154727727567, 
+                                        37.3900639330021
+                                    ], 
+                                    [
+                                        -122.08148274537865, 
+                                        37.38983344149651
+                                    ], 
+                                    [
+                                        -122.08149789783623, 
+                                        37.38971743523499
+                                    ], 
+                                    [
+                                        -122.0815130502938, 
+                                        37.38960142897348
+                                    ], 
+                                    [
+                                        -122.08152820275137, 
+                                        37.38948542271196
+                                    ], 
+                                    [
+                                        -122.08140439205359, 
+                                        37.38942361339635
+                                    ], 
+                                    [
+                                        -122.0812194754829, 
+                                        37.38939195184179
+                                    ]
+                                ]
+                            }, 
+                            "type": "Feature", 
+                            "id": "57e4e49ef6858fd4d91ccd24", 
+                            "properties": {
+                                "distances": [
+                                    0.0, 
+                                    24.746629782196194, 
+                                    41.74673039687925, 
+                                    26.25593317226489, 
+                                    12.968584568651197, 
+                                    12.968584781563784, 
+                                    12.96858499630706, 
+                                    12.918352216520603, 
+                                    16.711931466071558
+                                ], 
+                                "feature_type": "section", 
+                                "distance": 161.28533138045455, 
+                                "end_ts": 1456160557.006508, 
+                                "start_ts": 1456160318.727512, 
+                                "start_fmt_time": "2016-02-22T08:58:38.727512-08:00", 
+                                "sensed_mode": "MotionTypes.WALKING", 
+                                "source": "SmoothedHighConfidenceMotion", 
+                                "end_fmt_time": "2016-02-22T09:02:37.006508-08:00", 
+                                "end_local_dt": {
+                                    "hour": 9, 
+                                    "month": 2, 
+                                    "second": 37, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 2
+                                }, 
+                                "duration": 238.27899622917175, 
+                                "trip_id": {
+                                    "$oid": "57e4e49ef6858fd4d91ccd22"
+                                }, 
+                                "start_local_dt": {
+                                    "hour": 8, 
+                                    "month": 2, 
+                                    "second": 38, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 58
+                                }, 
+                                "speeds": [
+                                    0.0, 
+                                    0.8248876594065399, 
+                                    1.391557679895975, 
+                                    0.8751977724088297, 
+                                    0.43228615228837325, 
+                                    0.4322861593854595, 
+                                    0.43228616654356866, 
+                                    0.43061174055068674, 
+                                    0.590966218554534
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ], 
+            "type": "FeatureCollection", 
+            "id": "57e4e49ef6858fd4d91ccd22", 
+            "properties": {
+                "distance": 161.28533138045455, 
+                "end_place": {
+                    "$oid": "57e4e4a1f6858fd4d91ccde0"
+                }, 
+                "raw_trip": {
+                    "$oid": "57e4e49cf6858fd4d91cccec"
+                }, 
+                "feature_type": "trip", 
+                "start_loc": {
+                    "type": "Point", 
+                    "coordinates": [
+                        -122.0816621790811, 
+                        37.39020049373536
+                    ]
+                }, 
+                "end_ts": 1456160557.006508, 
+                "start_ts": 1456160318.727512, 
+                "start_fmt_time": "2016-02-22T08:58:38.727512-08:00", 
+                "end_loc": {
+                    "type": "Point", 
+                    "coordinates": [
+                        -122.0812194754829, 
+                        37.38939195184179
+                    ]
+                }, 
+                "source": "DwellSegmentationDistFilter", 
+                "start_place": {
+                    "$oid": "57e4e4a1f6858fd4d91ccddf"
+                }, 
+                "end_fmt_time": "2016-02-22T09:02:37.006508-08:00", 
+                "end_local_dt": {
+                    "hour": 9, 
+                    "month": 2, 
+                    "second": 37, 
+                    "weekday": 0, 
+                    "year": 2016, 
+                    "timezone": "America/Los_Angeles", 
+                    "day": 22, 
+                    "minute": 2
+                }, 
+                "duration": 238.27899622917175, 
+                "start_local_dt": {
+                    "hour": 8, 
+                    "month": 2, 
+                    "second": 38, 
+                    "weekday": 0, 
+                    "year": 2016, 
+                    "timezone": "America/Los_Angeles", 
+                    "day": 22, 
+                    "minute": 58
+                }
+            }
+        }, 
+        {
+            "features": [
+                {
+                    "geometry": {
+                        "type": "Point", 
+                        "coordinates": [
+                            -122.0812194754829, 
+                            37.38939195184179
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e4a1f6858fd4d91ccde0", 
+                    "properties": {
+                        "enter_fmt_time": "2016-02-22T09:02:37.006508-08:00", 
+                        "exit_local_dt": {
+                            "hour": 10, 
+                            "month": 2, 
+                            "second": 8, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 2
+                        }, 
+                        "display_name": "Castro Street, Mountain View", 
+                        "feature_type": "start_place", 
+                        "exit_fmt_time": "2016-02-22T10:02:08.085492-08:00", 
+                        "enter_local_dt": {
+                            "hour": 9, 
+                            "month": 2, 
+                            "second": 37, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 2
+                        }, 
+                        "ending_trip": {
+                            "$oid": "57e4e49ef6858fd4d91ccd22"
+                        }, 
+                        "starting_trip": {
+                            "$oid": "57e4e49ef6858fd4d91ccd2e"
+                        }, 
+                        "source": "DwellSegmentationDistFilter", 
+                        "enter_ts": 1456160557.006508, 
+                        "duration": 3571.0789835453033, 
+                        "raw_places": [
+                            {
+                                "$oid": "57e4e49cf6858fd4d91ccced"
+                            }, 
+                            {
+                                "$oid": "57e4e49cf6858fd4d91ccced"
+                            }
+                        ], 
+                        "exit_ts": 1456164128.0854917
+                    }
+                }, 
+                {
+                    "geometry": {
+                        "type": "Point", 
+                        "coordinates": [
+                            -122.0834267792498, 
+                            37.38637934908027
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e4a2f6858fd4d91ccde1", 
+                    "properties": {
+                        "enter_fmt_time": "2016-02-22T10:07:00.000028-08:00", 
+                        "exit_local_dt": {
+                            "hour": 10, 
+                            "month": 2, 
+                            "second": 0, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 27
+                        }, 
+                        "display_name": "Fairmont Avenue, Mountain View", 
+                        "feature_type": "end_place", 
+                        "exit_fmt_time": "2016-02-22T10:27:00.178051-08:00", 
+                        "enter_local_dt": {
+                            "hour": 10, 
+                            "month": 2, 
+                            "second": 0, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 7
+                        }, 
+                        "ending_trip": {
+                            "$oid": "57e4e49ef6858fd4d91ccd2e"
+                        }, 
+                        "starting_trip": {
+                            "$oid": "57e4e49ff6858fd4d91ccd3c"
+                        }, 
+                        "source": "DwellSegmentationDistFilter", 
+                        "enter_ts": 1456164420.000028, 
+                        "duration": 1200.1780235767365, 
+                        "raw_places": [
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccef"
+                            }, 
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccef"
+                            }
+                        ], 
+                        "exit_ts": 1456165620.1780515
+                    }
+                }, 
+                {
+                    "type": "FeatureCollection", 
+                    "features": [
+                        {
+                            "geometry": {
+                                "type": "LineString", 
+                                "coordinates": [
+                                    [
+                                        -122.0812194754829, 
+                                        37.38939195184179
+                                    ], 
+                                    [
+                                        -122.08150149711821, 
+                                        37.389109274857
+                                    ], 
+                                    [
+                                        -122.08178351875351, 
+                                        37.38882659787222
+                                    ], 
+                                    [
+                                        -122.08206554038883, 
+                                        37.38854392088743
+                                    ], 
+                                    [
+                                        -122.08234756202414, 
+                                        37.38826124390265
+                                    ], 
+                                    [
+                                        -122.08262958365945, 
+                                        37.38797856691786
+                                    ], 
+                                    [
+                                        -122.08291160529475, 
+                                        37.38769588993308
+                                    ], 
+                                    [
+                                        -122.08319362693007, 
+                                        37.38741321294829
+                                    ], 
+                                    [
+                                        -122.08347564856538, 
+                                        37.38713053596351
+                                    ], 
+                                    [
+                                        -122.08331056380024, 
+                                        37.386626137992764
+                                    ], 
+                                    [
+                                        -122.0834267792498, 
+                                        37.38637934908027
+                                    ]
+                                ]
+                            }, 
+                            "type": "Feature", 
+                            "id": "57e4e49ff6858fd4d91ccd30", 
+                            "properties": {
+                                "distances": [
+                                    0.0, 
+                                    40.10971386808103, 
+                                    40.10977222631961, 
+                                    40.10983058711473, 
+                                    40.10988894565002, 
+                                    40.109947305182, 
+                                    40.11000566245412, 
+                                    40.110064022282785, 
+                                    40.11012237985158, 
+                                    57.95192659872186, 
+                                    29.299688122345923
+                                ], 
+                                "feature_type": "section", 
+                                "distance": 408.1309597180037, 
+                                "end_ts": 1456164420.000028, 
+                                "start_ts": 1456164128.0854917, 
+                                "start_fmt_time": "2016-02-22T10:02:08.085492-08:00", 
+                                "sensed_mode": "MotionTypes.UNKNOWN", 
+                                "source": "SmoothedHighConfidenceMotion", 
+                                "end_fmt_time": "2016-02-22T10:07:00.000028-08:00", 
+                                "end_local_dt": {
+                                    "hour": 10, 
+                                    "month": 2, 
+                                    "second": 0, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 7
+                                }, 
+                                "duration": 291.9145362377167, 
+                                "trip_id": {
+                                    "$oid": "57e4e49ef6858fd4d91ccd2e"
+                                }, 
+                                "start_local_dt": {
+                                    "hour": 10, 
+                                    "month": 2, 
+                                    "second": 8, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 2
+                                }, 
+                                "speeds": [
+                                    0.0, 
+                                    1.3369904622693676, 
+                                    1.3369924075439872, 
+                                    1.3369943529038244, 
+                                    1.336996298188334, 
+                                    1.3369982435060666, 
+                                    1.3370001887484706, 
+                                    1.337002134076093, 
+                                    1.3370040793283862, 
+                                    1.9317308866240621, 
+                                    1.3369978631771733
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ], 
+            "type": "FeatureCollection", 
+            "id": "57e4e49ef6858fd4d91ccd2e", 
+            "properties": {
+                "distance": 408.1309597180037, 
+                "end_place": {
+                    "$oid": "57e4e4a2f6858fd4d91ccde1"
+                }, 
+                "raw_trip": {
+                    "$oid": "57e4e49cf6858fd4d91cccee"
+                }, 
+                "feature_type": "trip", 
+                "start_loc": {
+                    "type": "Point", 
+                    "coordinates": [
+                        -122.0812194754829, 
+                        37.38939195184179
+                    ]
+                }, 
+                "end_ts": 1456164420.000028, 
+                "start_ts": 1456164128.0854917, 
+                "start_fmt_time": "2016-02-22T10:02:08.085492-08:00", 
+                "end_loc": {
+                    "type": "Point", 
+                    "coordinates": [
+                        -122.0834267792498, 
+                        37.38637934908027
+                    ]
+                }, 
+                "source": "DwellSegmentationDistFilter", 
+                "start_place": {
+                    "$oid": "57e4e4a1f6858fd4d91ccde0"
+                }, 
+                "end_fmt_time": "2016-02-22T10:07:00.000028-08:00", 
+                "end_local_dt": {
+                    "hour": 10, 
+                    "month": 2, 
+                    "second": 0, 
+                    "weekday": 0, 
+                    "year": 2016, 
+                    "timezone": "America/Los_Angeles", 
+                    "day": 22, 
+                    "minute": 7
+                }, 
+                "duration": 291.9145362377167, 
+                "start_local_dt": {
+                    "hour": 10, 
+                    "month": 2, 
+                    "second": 8, 
+                    "weekday": 0, 
+                    "year": 2016, 
+                    "timezone": "America/Los_Angeles", 
+                    "day": 22, 
+                    "minute": 2
+                }
+            }
+        }, 
+        {
+            "features": [
+                {
+                    "geometry": {
+                        "type": "Point", 
+                        "coordinates": [
+                            -122.0834267792498, 
+                            37.38637934908027
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e4a2f6858fd4d91ccde1", 
+                    "properties": {
+                        "enter_fmt_time": "2016-02-22T10:07:00.000028-08:00", 
+                        "exit_local_dt": {
+                            "hour": 10, 
+                            "month": 2, 
+                            "second": 0, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 27
+                        }, 
+                        "display_name": "Fairmont Avenue, Mountain View", 
+                        "feature_type": "start_place", 
+                        "exit_fmt_time": "2016-02-22T10:27:00.178051-08:00", 
+                        "enter_local_dt": {
+                            "hour": 10, 
+                            "month": 2, 
+                            "second": 0, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 7
+                        }, 
+                        "ending_trip": {
+                            "$oid": "57e4e49ef6858fd4d91ccd2e"
+                        }, 
+                        "starting_trip": {
+                            "$oid": "57e4e49ff6858fd4d91ccd3c"
+                        }, 
+                        "source": "DwellSegmentationDistFilter", 
+                        "enter_ts": 1456164420.000028, 
+                        "duration": 1200.1780235767365, 
+                        "raw_places": [
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccef"
+                            }, 
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccef"
+                            }
+                        ], 
+                        "exit_ts": 1456165620.1780515
+                    }
+                }, 
+                {
+                    "geometry": {
+                        "type": "Point", 
+                        "coordinates": [
+                            -122.0865191986059, 
+                            37.39084250297154
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e4a2f6858fd4d91ccde2", 
+                    "properties": {
+                        "enter_fmt_time": "2016-02-22T10:30:15.000020-08:00", 
+                        "exit_local_dt": {
+                            "hour": 13, 
+                            "month": 2, 
+                            "second": 52, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 5
+                        }, 
+                        "display_name": "South Shoreline Boulevard, Mountain View", 
+                        "feature_type": "end_place", 
+                        "exit_fmt_time": "2016-02-22T13:05:52.977628-08:00", 
+                        "enter_local_dt": {
+                            "hour": 10, 
+                            "month": 2, 
+                            "second": 15, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 30
+                        }, 
+                        "ending_trip": {
+                            "$oid": "57e4e49ff6858fd4d91ccd3c"
+                        }, 
+                        "starting_trip": {
+                            "$oid": "57e4e49ff6858fd4d91ccd4c"
+                        }, 
+                        "source": "DwellSegmentationDistFilter", 
+                        "enter_ts": 1456165815.00002, 
+                        "duration": 9337.977608442307, 
+                        "raw_places": [
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccf1"
+                            }, 
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccf1"
+                            }
+                        ], 
+                        "exit_ts": 1456175152.9776285
+                    }
+                }, 
+                {
+                    "geometry": {
+                        "type": "LineString", 
+                        "coordinates": [
+                            [
+                                -122.0844027680551, 
+                                37.38734385467822
+                            ], 
+                            [
+                                -122.0849175845479, 
+                                37.38753110639507
+                            ]
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e49ff6858fd4d91ccd4a", 
+                    "properties": {
+                        "enter_fmt_time": "2016-02-22T10:27:33.000020-08:00", 
+                        "distance": 50.02314577182571, 
+                        "exit_local_dt": {
+                            "hour": 10, 
+                            "month": 2, 
+                            "second": 44, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 27
+                        }, 
+                        "feature_type": "stop", 
+                        "ending_section": {
+                            "$oid": "57e4e49ff6858fd4d91ccd3e"
+                        }, 
+                        "starting_section": {
+                            "$oid": "57e4e49ff6858fd4d91ccd42"
+                        }, 
+                        "exit_fmt_time": "2016-02-22T10:27:44.000019-08:00", 
+                        "enter_local_dt": {
+                            "hour": 10, 
+                            "month": 2, 
+                            "second": 33, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 27
+                        }, 
+                        "exit_loc": {
+                            "type": "Point", 
+                            "coordinates": [
+                                -122.0849175845479, 
+                                37.38753110639507
+                            ]
+                        }, 
+                        "source": "SmoothedHighConfidenceMotion", 
+                        "enter_loc": {
+                            "type": "Point", 
+                            "coordinates": [
+                                -122.0844027680551, 
+                                37.38734385467822
+                            ]
+                        }, 
+                        "enter_ts": 1456165653.00002, 
+                        "duration": 10.999999046325684, 
+                        "trip_id": {
+                            "$oid": "57e4e49ff6858fd4d91ccd3c"
+                        }, 
+                        "exit_ts": 1456165664.000019
+                    }
+                }, 
+                {
+                    "geometry": {
+                        "type": "LineString", 
+                        "coordinates": [
+                            [
+                                -122.0863302705084, 
+                                37.39041540309544
+                            ], 
+                            [
+                                -122.0865191986059, 
+                                37.39084250297154
+                            ]
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e49ff6858fd4d91ccd4b", 
+                    "properties": {
+                        "enter_fmt_time": "2016-02-22T10:29:42.000019-08:00", 
+                        "distance": 50.33902748418953, 
+                        "exit_local_dt": {
+                            "hour": 10, 
+                            "month": 2, 
+                            "second": 15, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 30
+                        }, 
+                        "feature_type": "stop", 
+                        "ending_section": {
+                            "$oid": "57e4e49ff6858fd4d91ccd42"
+                        }, 
+                        "starting_section": {
+                            "$oid": "57e4e49ff6858fd4d91ccd48"
+                        }, 
+                        "exit_fmt_time": "2016-02-22T10:30:15.000020-08:00", 
+                        "enter_local_dt": {
+                            "hour": 10, 
+                            "month": 2, 
+                            "second": 42, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 29
+                        }, 
+                        "exit_loc": {
+                            "type": "Point", 
+                            "coordinates": [
+                                -122.0865191986059, 
+                                37.39084250297154
+                            ]
+                        }, 
+                        "source": "SmoothedHighConfidenceMotion", 
+                        "enter_loc": {
+                            "type": "Point", 
+                            "coordinates": [
+                                -122.0863302705084, 
+                                37.39041540309544
+                            ]
+                        }, 
+                        "enter_ts": 1456165782.000019, 
+                        "duration": 33.000000953674316, 
+                        "trip_id": {
+                            "$oid": "57e4e49ff6858fd4d91ccd3c"
+                        }, 
+                        "exit_ts": 1456165815.00002
+                    }
+                }, 
+                {
+                    "type": "FeatureCollection", 
+                    "features": [
+                        {
+                            "geometry": {
+                                "type": "LineString", 
+                                "coordinates": [
+                                    [
+                                        -122.0834267792498, 
+                                        37.38637934908027
+                                    ], 
+                                    [
+                                        -122.08427136230468, 
+                                        37.38727704439079
+                                    ], 
+                                    [
+                                        -122.0844027680551, 
+                                        37.38734385467822
+                                    ]
+                                ]
+                            }, 
+                            "type": "Feature", 
+                            "id": "57e4e49ff6858fd4d91ccd3e", 
+                            "properties": {
+                                "distances": [
+                                    0.0, 
+                                    124.62703573249489, 
+                                    13.783109024454125
+                                ], 
+                                "end_ts": 1456165653.00002, 
+                                "feature_type": "section", 
+                                "distance": 138.41014475694902, 
+                                "sensed_mode": "MotionTypes.WALKING", 
+                                "start_ts": 1456165620.1780515, 
+                                "start_fmt_time": "2016-02-22T10:27:00.178051-08:00", 
+                                "source": "SmoothedHighConfidenceMotion", 
+                                "end_fmt_time": "2016-02-22T10:27:33.000020-08:00", 
+                                "end_local_dt": {
+                                    "hour": 10, 
+                                    "month": 2, 
+                                    "second": 33, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 27
+                                }, 
+                                "duration": 32.82196855545044, 
+                                "end_stop": {
+                                    "$oid": "57e4e49ff6858fd4d91ccd4a"
+                                }, 
+                                "trip_id": {
+                                    "$oid": "57e4e49ff6858fd4d91ccd3c"
+                                }, 
+                                "start_local_dt": {
+                                    "hour": 10, 
+                                    "month": 2, 
+                                    "second": 0, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 27
+                                }, 
+                                "speeds": [
+                                    0.0, 
+                                    4.154234524416497, 
+                                    4.884217791099405
+                                ]
+                            }
+                        }
+                    ]
+                }, 
+                {
+                    "type": "FeatureCollection", 
+                    "features": [
+                        {
+                            "geometry": {
+                                "type": "LineString", 
+                                "coordinates": [
+                                    [
+                                        -122.0849175845479, 
+                                        37.38753110639507
+                                    ], 
+                                    [
+                                        -122.08588773396063, 
+                                        37.3882510001188
+                                    ], 
+                                    [
+                                        -122.08476629119559, 
+                                        37.38912127915526
+                                    ], 
+                                    [
+                                        -122.08533495766284, 
+                                        37.38976006401736
+                                    ], 
+                                    [
+                                        -122.0863302705084, 
+                                        37.39041540309544
+                                    ]
+                                ]
+                            }, 
+                            "type": "Feature", 
+                            "id": "57e4e49ff6858fd4d91ccd42", 
+                            "properties": {
+                                "distances": [
+                                    0.0, 
+                                    117.27869492572326, 
+                                    138.49510783879504, 
+                                    87.0016248450867, 
+                                    114.20249842470064
+                                ], 
+                                "feature_type": "section", 
+                                "sensed_mode": "MotionTypes.IN_VEHICLE", 
+                                "end_ts": 1456165782.000019, 
+                                "start_ts": 1456165664.000019, 
+                                "start_fmt_time": "2016-02-22T10:27:44.000019-08:00", 
+                                "source": "SmoothedHighConfidenceMotion", 
+                                "end_fmt_time": "2016-02-22T10:29:42.000019-08:00", 
+                                "end_local_dt": {
+                                    "hour": 10, 
+                                    "month": 2, 
+                                    "second": 42, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 29
+                                }, 
+                                "duration": 118.0, 
+                                "start_stop": {
+                                    "$oid": "57e4e49ff6858fd4d91ccd4a"
+                                }, 
+                                "end_stop": {
+                                    "$oid": "57e4e49ff6858fd4d91ccd4b"
+                                }, 
+                                "trip_id": {
+                                    "$oid": "57e4e49ff6858fd4d91ccd3c"
+                                }, 
+                                "start_local_dt": {
+                                    "hour": 10, 
+                                    "month": 2, 
+                                    "second": 44, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 27
+                                }, 
+                                "speeds": [
+                                    0.0, 
+                                    3.9092898308574417, 
+                                    4.616503594626502, 
+                                    2.9000541615028896, 
+                                    4.078660658025023
+                                ], 
+                                "distance": 456.97792603430565
+                            }
+                        }
+                    ]
+                }, 
+                {
+                    "type": "FeatureCollection", 
+                    "features": [
+                        {
+                            "geometry": {
+                                "type": "LineString", 
+                                "coordinates": [
+                                    [
+                                        -122.0865191986059, 
+                                        37.39084250297154
+                                    ]
+                                ]
+                            }, 
+                            "type": "Feature", 
+                            "id": "57e4e49ff6858fd4d91ccd48", 
+                            "properties": {
+                                "distances": [
+                                    0
+                                ], 
+                                "feature_type": "section", 
+                                "sensed_mode": "MotionTypes.BICYCLING", 
+                                "end_ts": 1456165815.00002, 
+                                "start_ts": 1456165815.00002, 
+                                "start_fmt_time": "2016-02-22T10:30:15.000020-08:00", 
+                                "source": "SmoothedHighConfidenceMotion", 
+                                "end_fmt_time": "2016-02-22T10:30:15.000020-08:00", 
+                                "end_local_dt": {
+                                    "hour": 10, 
+                                    "month": 2, 
+                                    "second": 15, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 30
+                                }, 
+                                "duration": 0.0, 
+                                "start_stop": {
+                                    "$oid": "57e4e49ff6858fd4d91ccd4b"
+                                }, 
+                                "trip_id": {
+                                    "$oid": "57e4e49ff6858fd4d91ccd3c"
+                                }, 
+                                "start_local_dt": {
+                                    "hour": 10, 
+                                    "month": 2, 
+                                    "second": 15, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 30
+                                }, 
+                                "speeds": [
+                                    0
+                                ], 
+                                "distance": 0
+                            }
+                        }
+                    ]
+                }
+            ], 
+            "type": "FeatureCollection", 
+            "id": "57e4e49ff6858fd4d91ccd3c", 
+            "properties": {
+                "distance": 695.7502440472699, 
+                "end_place": {
+                    "$oid": "57e4e4a2f6858fd4d91ccde2"
+                }, 
+                "raw_trip": {
+                    "$oid": "57e4e49cf6858fd4d91cccf0"
+                }, 
+                "feature_type": "trip", 
+                "start_loc": {
+                    "type": "Point", 
+                    "coordinates": [
+                        -122.0834267792498, 
+                        37.38637934908027
+                    ]
+                }, 
+                "end_ts": 1456165815.00002, 
+                "start_ts": 1456165620.1780515, 
+                "start_fmt_time": "2016-02-22T10:27:00.178051-08:00", 
+                "end_loc": {
+                    "type": "Point", 
+                    "coordinates": [
+                        -122.0865191986059, 
+                        37.39084250297154
+                    ]
+                }, 
+                "source": "DwellSegmentationDistFilter", 
+                "start_place": {
+                    "$oid": "57e4e4a2f6858fd4d91ccde1"
+                }, 
+                "end_fmt_time": "2016-02-22T10:30:15.000020-08:00", 
+                "end_local_dt": {
+                    "hour": 10, 
+                    "month": 2, 
+                    "second": 15, 
+                    "weekday": 0, 
+                    "year": 2016, 
+                    "timezone": "America/Los_Angeles", 
+                    "day": 22, 
+                    "minute": 30
+                }, 
+                "duration": 194.82196855545044, 
+                "start_local_dt": {
+                    "hour": 10, 
+                    "month": 2, 
+                    "second": 0, 
+                    "weekday": 0, 
+                    "year": 2016, 
+                    "timezone": "America/Los_Angeles", 
+                    "day": 22, 
+                    "minute": 27
+                }
+            }
+        }, 
+        {
+            "features": [
+                {
+                    "geometry": {
+                        "type": "Point", 
+                        "coordinates": [
+                            -122.0865191986059, 
+                            37.39084250297154
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e4a2f6858fd4d91ccde2", 
+                    "properties": {
+                        "enter_fmt_time": "2016-02-22T10:30:15.000020-08:00", 
+                        "exit_local_dt": {
+                            "hour": 13, 
+                            "month": 2, 
+                            "second": 52, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 5
+                        }, 
+                        "display_name": "South Shoreline Boulevard, Mountain View", 
+                        "feature_type": "start_place", 
+                        "exit_fmt_time": "2016-02-22T13:05:52.977628-08:00", 
+                        "enter_local_dt": {
+                            "hour": 10, 
+                            "month": 2, 
+                            "second": 15, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 30
+                        }, 
+                        "ending_trip": {
+                            "$oid": "57e4e49ff6858fd4d91ccd3c"
+                        }, 
+                        "starting_trip": {
+                            "$oid": "57e4e49ff6858fd4d91ccd4c"
+                        }, 
+                        "source": "DwellSegmentationDistFilter", 
+                        "enter_ts": 1456165815.00002, 
+                        "duration": 9337.977608442307, 
+                        "raw_places": [
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccf1"
+                            }, 
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccf1"
+                            }
+                        ], 
+                        "exit_ts": 1456175152.9776285
+                    }
+                }, 
+                {
+                    "geometry": {
+                        "type": "Point", 
+                        "coordinates": [
+                            -122.0841398277526, 
+                            37.40355206656959
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e4a2f6858fd4d91ccde3", 
+                    "properties": {
+                        "enter_fmt_time": "2016-02-22T13:13:16.999949-08:00", 
+                        "exit_local_dt": {
+                            "hour": 15, 
+                            "month": 2, 
+                            "second": 40, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 34
+                        }, 
+                        "display_name": "Montecito Avenue, Mountain View", 
+                        "feature_type": "end_place", 
+                        "exit_fmt_time": "2016-02-22T15:34:40.262400-08:00", 
+                        "enter_local_dt": {
+                            "hour": 13, 
+                            "month": 2, 
+                            "second": 16, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 13
+                        }, 
+                        "ending_trip": {
+                            "$oid": "57e4e49ff6858fd4d91ccd4c"
+                        }, 
+                        "starting_trip": {
+                            "$oid": "57e4e49ff6858fd4d91ccd5f"
+                        }, 
+                        "source": "DwellSegmentationDistFilter", 
+                        "enter_ts": 1456175596.999949, 
+                        "duration": 8483.262451410294, 
+                        "raw_places": [
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccf3"
+                            }, 
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccf3"
+                            }
+                        ], 
+                        "exit_ts": 1456184080.2624004
+                    }
+                }, 
+                {
+                    "type": "FeatureCollection", 
+                    "features": [
+                        {
+                            "geometry": {
+                                "type": "LineString", 
+                                "coordinates": [
+                                    [
+                                        -122.0865191986059, 
+                                        37.39084250297154
+                                    ], 
+                                    [
+                                        -122.08483482670582, 
+                                        37.39324959251073
+                                    ], 
+                                    [
+                                        -122.08315045480573, 
+                                        37.395656682049925
+                                    ], 
+                                    [
+                                        -122.08146608290566, 
+                                        37.398063771589115
+                                    ], 
+                                    [
+                                        -122.08230515452676, 
+                                        37.39997712593276
+                                    ], 
+                                    [
+                                        -122.08505388149597, 
+                                        37.40071810147998
+                                    ], 
+                                    [
+                                        -122.0847985660798, 
+                                        37.40286831922117
+                                    ], 
+                                    [
+                                        -122.08473515393221, 
+                                        37.402991704076435
+                                    ], 
+                                    [
+                                        -122.08472429661184, 
+                                        37.40305461308189
+                                    ], 
+                                    [
+                                        -122.08471343929148, 
+                                        37.40311752208734
+                                    ], 
+                                    [
+                                        -122.0847025819711, 
+                                        37.40318043109279
+                                    ], 
+                                    [
+                                        -122.08469172465072, 
+                                        37.40324334009824
+                                    ], 
+                                    [
+                                        -122.08468086733036, 
+                                        37.40330624910369
+                                    ], 
+                                    [
+                                        -122.08467001000999, 
+                                        37.40336915810914
+                                    ], 
+                                    [
+                                        -122.08440951193391, 
+                                        37.40346610607557
+                                    ], 
+                                    [
+                                        -122.0841398277526, 
+                                        37.40355206656959
+                                    ]
+                                ]
+                            }, 
+                            "type": "Feature", 
+                            "id": "57e4e49ff6858fd4d91ccd4e", 
+                            "properties": {
+                                "distances": [
+                                    0.0, 
+                                    306.2394694793334, 
+                                    306.2371476365395, 
+                                    306.23482572110436, 
+                                    225.296756014053, 
+                                    256.4058485983382, 
+                                    240.15460230535345, 
+                                    14.819125554137988, 
+                                    7.060598783193067, 
+                                    7.060598672874077, 
+                                    7.06059856367879, 
+                                    7.060598454312933, 
+                                    7.060598344776508, 
+                                    7.06059823558102, 
+                                    25.41007380209878, 
+                                    25.667522181594258
+                                ], 
+                                "feature_type": "section", 
+                                "distance": 1748.8289623469689, 
+                                "end_ts": 1456175596.999949, 
+                                "start_ts": 1456175152.9776285, 
+                                "start_fmt_time": "2016-02-22T13:05:52.977628-08:00", 
+                                "sensed_mode": "MotionTypes.WALKING", 
+                                "source": "SmoothedHighConfidenceMotion", 
+                                "end_fmt_time": "2016-02-22T13:13:16.999949-08:00", 
+                                "end_local_dt": {
+                                    "hour": 13, 
+                                    "month": 2, 
+                                    "second": 16, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 13
+                                }, 
+                                "duration": 444.0223205089569, 
+                                "trip_id": {
+                                    "$oid": "57e4e49ff6858fd4d91ccd4c"
+                                }, 
+                                "start_local_dt": {
+                                    "hour": 13, 
+                                    "month": 2, 
+                                    "second": 52, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 5
+                                }, 
+                                "speeds": [
+                                    0.0, 
+                                    10.20798231597778, 
+                                    10.207904921217983, 
+                                    10.207827524036812, 
+                                    7.509891867135099, 
+                                    8.546861619944606, 
+                                    8.005153410178448, 
+                                    0.4939708518045996, 
+                                    0.23535329277310224, 
+                                    0.23535328909580258, 
+                                    0.23535328545595965, 
+                                    0.23535328181043108, 
+                                    0.23535327815921694, 
+                                    0.23535327451936733, 
+                                    0.8470024600699593, 
+                                    1.0684863759112664
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ], 
+            "type": "FeatureCollection", 
+            "id": "57e4e49ff6858fd4d91ccd4c", 
+            "properties": {
+                "distance": 1748.8289623469689, 
+                "end_place": {
+                    "$oid": "57e4e4a2f6858fd4d91ccde3"
+                }, 
+                "raw_trip": {
+                    "$oid": "57e4e49cf6858fd4d91cccf2"
+                }, 
+                "feature_type": "trip", 
+                "start_loc": {
+                    "type": "Point", 
+                    "coordinates": [
+                        -122.0865191986059, 
+                        37.39084250297154
+                    ]
+                }, 
+                "end_ts": 1456175596.999949, 
+                "start_ts": 1456175152.9776285, 
+                "start_fmt_time": "2016-02-22T13:05:52.977628-08:00", 
+                "end_loc": {
+                    "type": "Point", 
+                    "coordinates": [
+                        -122.0841398277526, 
+                        37.40355206656959
+                    ]
+                }, 
+                "source": "DwellSegmentationDistFilter", 
+                "start_place": {
+                    "$oid": "57e4e4a2f6858fd4d91ccde2"
+                }, 
+                "end_fmt_time": "2016-02-22T13:13:16.999949-08:00", 
+                "end_local_dt": {
+                    "hour": 13, 
+                    "month": 2, 
+                    "second": 16, 
+                    "weekday": 0, 
+                    "year": 2016, 
+                    "timezone": "America/Los_Angeles", 
+                    "day": 22, 
+                    "minute": 13
+                }, 
+                "duration": 444.0223205089569, 
+                "start_local_dt": {
+                    "hour": 13, 
+                    "month": 2, 
+                    "second": 52, 
+                    "weekday": 0, 
+                    "year": 2016, 
+                    "timezone": "America/Los_Angeles", 
+                    "day": 22, 
+                    "minute": 5
+                }
+            }
+        }, 
+        {
+            "features": [
+                {
+                    "geometry": {
+                        "type": "Point", 
+                        "coordinates": [
+                            -122.0841398277526, 
+                            37.40355206656959
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e4a2f6858fd4d91ccde3", 
+                    "properties": {
+                        "enter_fmt_time": "2016-02-22T13:13:16.999949-08:00", 
+                        "exit_local_dt": {
+                            "hour": 15, 
+                            "month": 2, 
+                            "second": 40, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 34
+                        }, 
+                        "display_name": "Montecito Avenue, Mountain View", 
+                        "feature_type": "start_place", 
+                        "exit_fmt_time": "2016-02-22T15:34:40.262400-08:00", 
+                        "enter_local_dt": {
+                            "hour": 13, 
+                            "month": 2, 
+                            "second": 16, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 13
+                        }, 
+                        "ending_trip": {
+                            "$oid": "57e4e49ff6858fd4d91ccd4c"
+                        }, 
+                        "starting_trip": {
+                            "$oid": "57e4e49ff6858fd4d91ccd5f"
+                        }, 
+                        "source": "DwellSegmentationDistFilter", 
+                        "enter_ts": 1456175596.999949, 
+                        "duration": 8483.262451410294, 
+                        "raw_places": [
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccf3"
+                            }, 
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccf3"
+                            }
+                        ], 
+                        "exit_ts": 1456184080.2624004
+                    }
+                }, 
+                {
+                    "geometry": {
+                        "type": "Point", 
+                        "coordinates": [
+                            -122.0864227229004, 
+                            37.39093579355384
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e4a2f6858fd4d91ccde4", 
+                    "properties": {
+                        "enter_fmt_time": "2016-02-22T15:37:35.000060-08:00", 
+                        "exit_local_dt": {
+                            "hour": 15, 
+                            "month": 2, 
+                            "second": 43, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 49
+                        }, 
+                        "display_name": "South Shoreline Boulevard, Mountain View", 
+                        "feature_type": "end_place", 
+                        "exit_fmt_time": "2016-02-22T15:49:43.156439-08:00", 
+                        "enter_local_dt": {
+                            "hour": 15, 
+                            "month": 2, 
+                            "second": 35, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 37
+                        }, 
+                        "ending_trip": {
+                            "$oid": "57e4e49ff6858fd4d91ccd5f"
+                        }, 
+                        "starting_trip": {
+                            "$oid": "57e4e49ff6858fd4d91ccd69"
+                        }, 
+                        "source": "DwellSegmentationDistFilter", 
+                        "enter_ts": 1456184255.00006, 
+                        "duration": 728.1563787460327, 
+                        "raw_places": [
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccf5"
+                            }, 
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccf5"
+                            }
+                        ], 
+                        "exit_ts": 1456184983.1564388
+                    }
+                }, 
+                {
+                    "type": "FeatureCollection", 
+                    "features": [
+                        {
+                            "geometry": {
+                                "type": "LineString", 
+                                "coordinates": [
+                                    [
+                                        -122.0841398277526, 
+                                        37.40355206656959
+                                    ], 
+                                    [
+                                        -122.08391041634104, 
+                                        37.40052358779167
+                                    ], 
+                                    [
+                                        -122.08368100492947, 
+                                        37.39749510901375
+                                    ], 
+                                    [
+                                        -122.08336302778528, 
+                                        37.39575149187299
+                                    ], 
+                                    [
+                                        -122.0843508704699, 
+                                        37.394091971423656
+                                    ], 
+                                    [
+                                        -122.08643334138475, 
+                                        37.39085564855461
+                                    ], 
+                                    [
+                                        -122.0864227229004, 
+                                        37.39093579355384
+                                    ]
+                                ]
+                            }, 
+                            "type": "Feature", 
+                            "id": "57e4e49ff6858fd4d91ccd61", 
+                            "properties": {
+                                "distances": [
+                                    0.0, 
+                                    337.3606457968521, 
+                                    337.36069499117576, 
+                                    195.90564785195548, 
+                                    204.12477081931678, 
+                                    404.1624917864943, 
+                                    8.96095588244852
+                                ], 
+                                "feature_type": "section", 
+                                "distance": 1487.875207128243, 
+                                "end_ts": 1456184255.00006, 
+                                "start_ts": 1456184080.2624004, 
+                                "start_fmt_time": "2016-02-22T15:34:40.262400-08:00", 
+                                "sensed_mode": "MotionTypes.IN_VEHICLE", 
+                                "source": "SmoothedHighConfidenceMotion", 
+                                "end_fmt_time": "2016-02-22T15:37:35.000060-08:00", 
+                                "end_local_dt": {
+                                    "hour": 15, 
+                                    "month": 2, 
+                                    "second": 35, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 37
+                                }, 
+                                "duration": 174.73765969276428, 
+                                "trip_id": {
+                                    "$oid": "57e4e49ff6858fd4d91ccd5f"
+                                }, 
+                                "start_local_dt": {
+                                    "hour": 15, 
+                                    "month": 2, 
+                                    "second": 40, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 34
+                                }, 
+                                "speeds": [
+                                    0.0, 
+                                    11.24535485989507, 
+                                    11.245356499705858, 
+                                    6.530188261731849, 
+                                    6.804159027310559, 
+                                    13.47208305954981, 
+                                    0.36223943548991344
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ], 
+            "type": "FeatureCollection", 
+            "id": "57e4e49ff6858fd4d91ccd5f", 
+            "properties": {
+                "distance": 1487.875207128243, 
+                "end_place": {
+                    "$oid": "57e4e4a2f6858fd4d91ccde4"
+                }, 
+                "raw_trip": {
+                    "$oid": "57e4e49cf6858fd4d91cccf4"
+                }, 
+                "feature_type": "trip", 
+                "start_loc": {
+                    "type": "Point", 
+                    "coordinates": [
+                        -122.0841398277526, 
+                        37.40355206656959
+                    ]
+                }, 
+                "end_ts": 1456184255.00006, 
+                "start_ts": 1456184080.2624004, 
+                "start_fmt_time": "2016-02-22T15:34:40.262400-08:00", 
+                "end_loc": {
+                    "type": "Point", 
+                    "coordinates": [
+                        -122.0864227229004, 
+                        37.39093579355384
+                    ]
+                }, 
+                "source": "DwellSegmentationDistFilter", 
+                "start_place": {
+                    "$oid": "57e4e4a2f6858fd4d91ccde3"
+                }, 
+                "end_fmt_time": "2016-02-22T15:37:35.000060-08:00", 
+                "end_local_dt": {
+                    "hour": 15, 
+                    "month": 2, 
+                    "second": 35, 
+                    "weekday": 0, 
+                    "year": 2016, 
+                    "timezone": "America/Los_Angeles", 
+                    "day": 22, 
+                    "minute": 37
+                }, 
+                "duration": 174.73765969276428, 
+                "start_local_dt": {
+                    "hour": 15, 
+                    "month": 2, 
+                    "second": 40, 
+                    "weekday": 0, 
+                    "year": 2016, 
+                    "timezone": "America/Los_Angeles", 
+                    "day": 22, 
+                    "minute": 34
+                }
+            }
+        }, 
+        {
+            "features": [
+                {
+                    "geometry": {
+                        "type": "Point", 
+                        "coordinates": [
+                            -122.0864227229004, 
+                            37.39093579355384
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e4a2f6858fd4d91ccde4", 
+                    "properties": {
+                        "enter_fmt_time": "2016-02-22T15:37:35.000060-08:00", 
+                        "exit_local_dt": {
+                            "hour": 15, 
+                            "month": 2, 
+                            "second": 43, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 49
+                        }, 
+                        "display_name": "South Shoreline Boulevard, Mountain View", 
+                        "feature_type": "start_place", 
+                        "exit_fmt_time": "2016-02-22T15:49:43.156439-08:00", 
+                        "enter_local_dt": {
+                            "hour": 15, 
+                            "month": 2, 
+                            "second": 35, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 37
+                        }, 
+                        "ending_trip": {
+                            "$oid": "57e4e49ff6858fd4d91ccd5f"
+                        }, 
+                        "starting_trip": {
+                            "$oid": "57e4e49ff6858fd4d91ccd69"
+                        }, 
+                        "source": "DwellSegmentationDistFilter", 
+                        "enter_ts": 1456184255.00006, 
+                        "duration": 728.1563787460327, 
+                        "raw_places": [
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccf5"
+                            }, 
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccf5"
+                            }
+                        ], 
+                        "exit_ts": 1456184983.1564388
+                    }
+                }, 
+                {
+                    "geometry": {
+                        "type": "Point", 
+                        "coordinates": [
+                            -122.1079592687284, 
+                            37.41655755325911
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e4a2f6858fd4d91ccde5", 
+                    "properties": {
+                        "enter_fmt_time": "2016-02-22T16:04:02.000039-08:00", 
+                        "exit_local_dt": {
+                            "hour": 16, 
+                            "month": 2, 
+                            "second": 29, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 49
+                        }, 
+                        "display_name": "Middlefield Road, Palo Alto", 
+                        "feature_type": "end_place", 
+                        "exit_fmt_time": "2016-02-22T16:49:29.955565-08:00", 
+                        "enter_local_dt": {
+                            "hour": 16, 
+                            "month": 2, 
+                            "second": 2, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 4
+                        }, 
+                        "ending_trip": {
+                            "$oid": "57e4e49ff6858fd4d91ccd69"
+                        }, 
+                        "starting_trip": {
+                            "$oid": "57e4e4a0f6858fd4d91ccd8a"
+                        }, 
+                        "source": "DwellSegmentationDistFilter", 
+                        "enter_ts": 1456185842.000039, 
+                        "duration": 2727.955525636673, 
+                        "raw_places": [
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccf7"
+                            }, 
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccf7"
+                            }
+                        ], 
+                        "exit_ts": 1456188569.9555647
+                    }
+                }, 
+                {
+                    "type": "FeatureCollection", 
+                    "features": [
+                        {
+                            "geometry": {
+                                "type": "LineString", 
+                                "coordinates": [
+                                    [
+                                        -122.0864227229004, 
+                                        37.39093579355384
+                                    ], 
+                                    [
+                                        -122.08714335975075, 
+                                        37.391762648733526
+                                    ], 
+                                    [
+                                        -122.08606732629806, 
+                                        37.39342429709213
+                                    ], 
+                                    [
+                                        -122.08566904181588, 
+                                        37.39326916018654
+                                    ], 
+                                    [
+                                        -122.08542618255584, 
+                                        37.393206506339375
+                                    ], 
+                                    [
+                                        -122.08524829270291, 
+                                        37.39318251140093
+                                    ], 
+                                    [
+                                        -122.08507040285, 
+                                        37.39315851646249
+                                    ], 
+                                    [
+                                        -122.08489251299709, 
+                                        37.39313452152405
+                                    ], 
+                                    [
+                                        -122.08345714800704, 
+                                        37.39511279692482
+                                    ], 
+                                    [
+                                        -122.08327397599514, 
+                                        37.39538193886015
+                                    ], 
+                                    [
+                                        -122.08316334411121, 
+                                        37.39553225228376
+                                    ], 
+                                    [
+                                        -122.0825152285375, 
+                                        37.39627620198081
+                                    ], 
+                                    [
+                                        -122.08100018701147, 
+                                        37.3974225280048
+                                    ], 
+                                    [
+                                        -122.08379739009357, 
+                                        37.398135422579024
+                                    ], 
+                                    [
+                                        -122.0898516781414, 
+                                        37.400416135591136
+                                    ], 
+                                    [
+                                        -122.0905517771883, 
+                                        37.40069471045176
+                                    ], 
+                                    [
+                                        -122.09543733608304, 
+                                        37.4026603544317
+                                    ], 
+                                    [
+                                        -122.09693671248087, 
+                                        37.40318512289121
+                                    ], 
+                                    [
+                                        -122.09719107601208, 
+                                        37.4032717831262
+                                    ], 
+                                    [
+                                        -122.09808685408728, 
+                                        37.403601460414194
+                                    ], 
+                                    [
+                                        -122.10270808150662, 
+                                        37.405414951761706
+                                    ], 
+                                    [
+                                        -122.10513698118697, 
+                                        37.40660102590904
+                                    ], 
+                                    [
+                                        -122.10699080539541, 
+                                        37.40881473638878
+                                    ], 
+                                    [
+                                        -122.10561375988864, 
+                                        37.41233950049574
+                                    ], 
+                                    [
+                                        -122.10356202621378, 
+                                        37.41566717506384
+                                    ], 
+                                    [
+                                        -122.10346830743616, 
+                                        37.415896208184286
+                                    ], 
+                                    [
+                                        -122.10337458865855, 
+                                        37.41612524130473
+                                    ], 
+                                    [
+                                        -122.10588218261105, 
+                                        37.41745562758672
+                                    ], 
+                                    [
+                                        -122.10716873177779, 
+                                        37.41641472591593
+                                    ], 
+                                    [
+                                        -122.1079592687284, 
+                                        37.41655755325911
+                                    ]
+                                ]
+                            }, 
+                            "type": "Feature", 
+                            "id": "57e4e4a0f6858fd4d91ccd6b", 
+                            "properties": {
+                                "distances": [
+                                    0.0, 
+                                    111.83266859102909, 
+                                    207.78673463991478, 
+                                    39.18672396010157, 
+                                    22.55765852278474, 
+                                    15.94018972319009, 
+                                    15.94019468272348, 
+                                    15.940199641280978, 
+                                    253.90465843482914, 
+                                    34.02174893470227, 
+                                    19.36174442739921, 
+                                    100.60430083480561, 
+                                    184.82351762598657, 
+                                    259.5017353429365, 
+                                    591.8923264988329, 
+                                    69.16675120510207, 
+                                    483.74880004504837, 
+                                    144.72666574023592, 
+                                    24.447414462320534, 
+                                    87.2042306532861, 
+                                    455.28345574787477, 
+                                    251.8350612350943, 
+                                    295.63902052265115, 
+                                    410.3731590731839, 
+                                    412.0081577559761, 
+                                    26.77856223013801, 
+                                    26.778554405846407, 
+                                    266.3226290581328, 
+                                    162.1921011989236, 
+                                    71.60019371599896
+                                ], 
+                                "feature_type": "section", 
+                                "distance": 5061.39915891033, 
+                                "end_ts": 1456185842.000039, 
+                                "start_ts": 1456184983.1564388, 
+                                "start_fmt_time": "2016-02-22T15:49:43.156439-08:00", 
+                                "sensed_mode": "MotionTypes.IN_VEHICLE", 
+                                "source": "SmoothedHighConfidenceMotion", 
+                                "end_fmt_time": "2016-02-22T16:04:02.000039-08:00", 
+                                "end_local_dt": {
+                                    "hour": 16, 
+                                    "month": 2, 
+                                    "second": 2, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 4
+                                }, 
+                                "duration": 858.8436002731323, 
+                                "trip_id": {
+                                    "$oid": "57e4e49ff6858fd4d91ccd69"
+                                }, 
+                                "start_local_dt": {
+                                    "hour": 15, 
+                                    "month": 2, 
+                                    "second": 43, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 49
+                                }, 
+                                "speeds": [
+                                    0.0, 
+                                    3.72775561970097, 
+                                    6.9262244879971595, 
+                                    1.3062241320033856, 
+                                    0.7519219507594914, 
+                                    0.5313396574396696, 
+                                    0.5313398227574493, 
+                                    0.5313399880426993, 
+                                    8.463488614494304, 
+                                    1.134058297823409, 
+                                    0.645391480913307, 
+                                    3.3534766944935206, 
+                                    6.160783920866219, 
+                                    8.65005784476455, 
+                                    19.72974421662776, 
+                                    2.3055583735034024, 
+                                    16.124960001501613, 
+                                    4.824222191341197, 
+                                    0.8149138154106844, 
+                                    2.90680768844287, 
+                                    15.176115191595825, 
+                                    8.39450204116981, 
+                                    9.854634017421706, 
+                                    13.679105302439464, 
+                                    13.733605258532537, 
+                                    0.8926187410046004, 
+                                    0.8926184801948802, 
+                                    8.877420968604428, 
+                                    5.4064033732974535, 
+                                    3.7997087965237886
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ], 
+            "type": "FeatureCollection", 
+            "id": "57e4e49ff6858fd4d91ccd69", 
+            "properties": {
+                "distance": 5061.39915891033, 
+                "end_place": {
+                    "$oid": "57e4e4a2f6858fd4d91ccde5"
+                }, 
+                "raw_trip": {
+                    "$oid": "57e4e49cf6858fd4d91cccf6"
+                }, 
+                "feature_type": "trip", 
+                "start_loc": {
+                    "type": "Point", 
+                    "coordinates": [
+                        -122.0864227229004, 
+                        37.39093579355384
+                    ]
+                }, 
+                "end_ts": 1456185842.000039, 
+                "start_ts": 1456184983.1564388, 
+                "start_fmt_time": "2016-02-22T15:49:43.156439-08:00", 
+                "end_loc": {
+                    "type": "Point", 
+                    "coordinates": [
+                        -122.1079592687284, 
+                        37.41655755325911
+                    ]
+                }, 
+                "source": "DwellSegmentationDistFilter", 
+                "start_place": {
+                    "$oid": "57e4e4a2f6858fd4d91ccde4"
+                }, 
+                "end_fmt_time": "2016-02-22T16:04:02.000039-08:00", 
+                "end_local_dt": {
+                    "hour": 16, 
+                    "month": 2, 
+                    "second": 2, 
+                    "weekday": 0, 
+                    "year": 2016, 
+                    "timezone": "America/Los_Angeles", 
+                    "day": 22, 
+                    "minute": 4
+                }, 
+                "duration": 858.8436002731323, 
+                "start_local_dt": {
+                    "hour": 15, 
+                    "month": 2, 
+                    "second": 43, 
+                    "weekday": 0, 
+                    "year": 2016, 
+                    "timezone": "America/Los_Angeles", 
+                    "day": 22, 
+                    "minute": 49
+                }
+            }
+        }, 
+        {
+            "features": [
+                {
+                    "geometry": {
+                        "type": "Point", 
+                        "coordinates": [
+                            -122.1079592687284, 
+                            37.41655755325911
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e4a2f6858fd4d91ccde5", 
+                    "properties": {
+                        "enter_fmt_time": "2016-02-22T16:04:02.000039-08:00", 
+                        "exit_local_dt": {
+                            "hour": 16, 
+                            "month": 2, 
+                            "second": 29, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 49
+                        }, 
+                        "display_name": "Middlefield Road, Palo Alto", 
+                        "feature_type": "start_place", 
+                        "exit_fmt_time": "2016-02-22T16:49:29.955565-08:00", 
+                        "enter_local_dt": {
+                            "hour": 16, 
+                            "month": 2, 
+                            "second": 2, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 4
+                        }, 
+                        "ending_trip": {
+                            "$oid": "57e4e49ff6858fd4d91ccd69"
+                        }, 
+                        "starting_trip": {
+                            "$oid": "57e4e4a0f6858fd4d91ccd8a"
+                        }, 
+                        "source": "DwellSegmentationDistFilter", 
+                        "enter_ts": 1456185842.000039, 
+                        "duration": 2727.955525636673, 
+                        "raw_places": [
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccf7"
+                            }, 
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccf7"
+                            }
+                        ], 
+                        "exit_ts": 1456188569.9555647
+                    }
+                }, 
+                {
+                    "geometry": {
+                        "type": "Point", 
+                        "coordinates": [
+                            -122.0864089802965, 
+                            37.39077901331944
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e4a3f6858fd4d91ccde6", 
+                    "properties": {
+                        "enter_fmt_time": "2016-02-22T16:57:04.000037-08:00", 
+                        "exit_local_dt": {
+                            "hour": 19, 
+                            "month": 2, 
+                            "second": 55, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 36
+                        }, 
+                        "display_name": "South Shoreline Boulevard, Mountain View", 
+                        "feature_type": "end_place", 
+                        "exit_fmt_time": "2016-02-22T19:36:55.044106-08:00", 
+                        "enter_local_dt": {
+                            "hour": 16, 
+                            "month": 2, 
+                            "second": 4, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 57
+                        }, 
+                        "ending_trip": {
+                            "$oid": "57e4e4a0f6858fd4d91ccd8a"
+                        }, 
+                        "starting_trip": {
+                            "$oid": "57e4e4a0f6858fd4d91ccd9e"
+                        }, 
+                        "source": "DwellSegmentationDistFilter", 
+                        "enter_ts": 1456189024.000037, 
+                        "duration": 9591.044068574905, 
+                        "raw_places": [
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccf9"
+                            }, 
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccf9"
+                            }
+                        ], 
+                        "exit_ts": 1456198615.0441055
+                    }
+                }, 
+                {
+                    "type": "FeatureCollection", 
+                    "features": [
+                        {
+                            "geometry": {
+                                "type": "LineString", 
+                                "coordinates": [
+                                    [
+                                        -122.1079592687284, 
+                                        37.41655755325911
+                                    ], 
+                                    [
+                                        -122.10659561553862, 
+                                        37.41658511210559
+                                    ], 
+                                    [
+                                        -122.10578272652924, 
+                                        37.417371545358144
+                                    ], 
+                                    [
+                                        -122.10448414488663, 
+                                        37.416774324873195
+                                    ], 
+                                    [
+                                        -122.10318880015762, 
+                                        37.4160922625072
+                                    ], 
+                                    [
+                                        -122.10003219311528, 
+                                        37.41391485362548
+                                    ], 
+                                    [
+                                        -122.09585227487813, 
+                                        37.41166667847103
+                                    ], 
+                                    [
+                                        -122.09064346558603, 
+                                        37.41084069199641
+                                    ], 
+                                    [
+                                        -122.08567133131451, 
+                                        37.40943583136093
+                                    ], 
+                                    [
+                                        -122.0813608502802, 
+                                        37.40765343500925
+                                    ], 
+                                    [
+                                        -122.07823735462539, 
+                                        37.405718692054776
+                                    ], 
+                                    [
+                                        -122.07830416196282, 
+                                        37.40282988163632
+                                    ], 
+                                    [
+                                        -122.08040609262225, 
+                                        37.400475814190585
+                                    ], 
+                                    [
+                                        -122.08189607175468, 
+                                        37.39744125306204
+                                    ], 
+                                    [
+                                        -122.08426273972175, 
+                                        37.394233582581386
+                                    ], 
+                                    [
+                                        -122.08622818639847, 
+                                        37.391057560423796
+                                    ], 
+                                    [
+                                        -122.0864089802965, 
+                                        37.39077901331944
+                                    ]
+                                ]
+                            }, 
+                            "type": "Feature", 
+                            "id": "57e4e4a0f6858fd4d91ccd8c", 
+                            "properties": {
+                                "distances": [
+                                    0.0, 
+                                    120.47047377800945, 
+                                    113.14095309490325, 
+                                    132.5232303978365, 
+                                    137.2556938520454, 
+                                    369.2429057428597, 
+                                    445.8463584953386, 
+                                    469.12896022735964, 
+                                    466.1098138635498, 
+                                    429.2204230812489, 
+                                    349.85310638007564, 
+                                    321.27526172770723, 
+                                    320.9232266647019, 
+                                    362.18927325786086, 
+                                    413.43549835564266, 
+                                    393.5342472520538, 
+                                    34.84887323635392
+                                ], 
+                                "feature_type": "section", 
+                                "distance": 4878.998299407546, 
+                                "end_ts": 1456189024.000037, 
+                                "start_ts": 1456188569.9555647, 
+                                "start_fmt_time": "2016-02-22T16:49:29.955565-08:00", 
+                                "sensed_mode": "MotionTypes.IN_VEHICLE", 
+                                "source": "SmoothedHighConfidenceMotion", 
+                                "end_fmt_time": "2016-02-22T16:57:04.000037-08:00", 
+                                "end_local_dt": {
+                                    "hour": 16, 
+                                    "month": 2, 
+                                    "second": 4, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 57
+                                }, 
+                                "duration": 454.0444722175598, 
+                                "trip_id": {
+                                    "$oid": "57e4e4a0f6858fd4d91ccd8a"
+                                }, 
+                                "start_local_dt": {
+                                    "hour": 16, 
+                                    "month": 2, 
+                                    "second": 29, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 49
+                                }, 
+                                "speeds": [
+                                    0.0, 
+                                    4.015682459266982, 
+                                    3.7713651031634416, 
+                                    4.417441013261216, 
+                                    4.57518979506818, 
+                                    12.308096858095324, 
+                                    14.861545283177954, 
+                                    15.637632007578654, 
+                                    15.536993795451659, 
+                                    14.30734743604163, 
+                                    11.661770212669188, 
+                                    10.709175390923575, 
+                                    10.697440888823396, 
+                                    12.072975775262028, 
+                                    13.781183278521421, 
+                                    13.117808241735126, 
+                                    8.616420477572122
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ], 
+            "type": "FeatureCollection", 
+            "id": "57e4e4a0f6858fd4d91ccd8a", 
+            "properties": {
+                "distance": 4878.998299407546, 
+                "end_place": {
+                    "$oid": "57e4e4a3f6858fd4d91ccde6"
+                }, 
+                "raw_trip": {
+                    "$oid": "57e4e49cf6858fd4d91cccf8"
+                }, 
+                "feature_type": "trip", 
+                "start_loc": {
+                    "type": "Point", 
+                    "coordinates": [
+                        -122.1079592687284, 
+                        37.41655755325911
+                    ]
+                }, 
+                "end_ts": 1456189024.000037, 
+                "start_ts": 1456188569.9555647, 
+                "start_fmt_time": "2016-02-22T16:49:29.955565-08:00", 
+                "end_loc": {
+                    "type": "Point", 
+                    "coordinates": [
+                        -122.0864089802965, 
+                        37.39077901331944
+                    ]
+                }, 
+                "source": "DwellSegmentationDistFilter", 
+                "start_place": {
+                    "$oid": "57e4e4a2f6858fd4d91ccde5"
+                }, 
+                "end_fmt_time": "2016-02-22T16:57:04.000037-08:00", 
+                "end_local_dt": {
+                    "hour": 16, 
+                    "month": 2, 
+                    "second": 4, 
+                    "weekday": 0, 
+                    "year": 2016, 
+                    "timezone": "America/Los_Angeles", 
+                    "day": 22, 
+                    "minute": 57
+                }, 
+                "duration": 454.0444722175598, 
+                "start_local_dt": {
+                    "hour": 16, 
+                    "month": 2, 
+                    "second": 29, 
+                    "weekday": 0, 
+                    "year": 2016, 
+                    "timezone": "America/Los_Angeles", 
+                    "day": 22, 
+                    "minute": 49
+                }
+            }
+        }, 
+        {
+            "features": [
+                {
+                    "geometry": {
+                        "type": "Point", 
+                        "coordinates": [
+                            -122.0864089802965, 
+                            37.39077901331944
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e4a3f6858fd4d91ccde6", 
+                    "properties": {
+                        "enter_fmt_time": "2016-02-22T16:57:04.000037-08:00", 
+                        "exit_local_dt": {
+                            "hour": 19, 
+                            "month": 2, 
+                            "second": 55, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 36
+                        }, 
+                        "display_name": "South Shoreline Boulevard, Mountain View", 
+                        "feature_type": "start_place", 
+                        "exit_fmt_time": "2016-02-22T19:36:55.044106-08:00", 
+                        "enter_local_dt": {
+                            "hour": 16, 
+                            "month": 2, 
+                            "second": 4, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 57
+                        }, 
+                        "ending_trip": {
+                            "$oid": "57e4e4a0f6858fd4d91ccd8a"
+                        }, 
+                        "starting_trip": {
+                            "$oid": "57e4e4a0f6858fd4d91ccd9e"
+                        }, 
+                        "source": "DwellSegmentationDistFilter", 
+                        "enter_ts": 1456189024.000037, 
+                        "duration": 9591.044068574905, 
+                        "raw_places": [
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccf9"
+                            }, 
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccf9"
+                            }
+                        ], 
+                        "exit_ts": 1456198615.0441055
+                    }
+                }, 
+                {
+                    "geometry": {
+                        "type": "Point", 
+                        "coordinates": [
+                            -122.079851729909, 
+                            37.39237743898983
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e4a3f6858fd4d91ccde7", 
+                    "properties": {
+                        "enter_fmt_time": "2016-02-22T19:48:14.999756-08:00", 
+                        "exit_local_dt": {
+                            "hour": 19, 
+                            "month": 2, 
+                            "second": 6, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 58
+                        }, 
+                        "display_name": "Castro Street, Mountain View", 
+                        "feature_type": "end_place", 
+                        "exit_fmt_time": "2016-02-22T19:58:06.796141-08:00", 
+                        "enter_local_dt": {
+                            "hour": 19, 
+                            "month": 2, 
+                            "second": 14, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 48
+                        }, 
+                        "ending_trip": {
+                            "$oid": "57e4e4a0f6858fd4d91ccd9e"
+                        }, 
+                        "starting_trip": {
+                            "$oid": "57e4e4a1f6858fd4d91ccdbd"
+                        }, 
+                        "source": "DwellSegmentationDistFilter", 
+                        "enter_ts": 1456199294.999756, 
+                        "duration": 591.7963845729828, 
+                        "raw_places": [
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccfb"
+                            }, 
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccfb"
+                            }
+                        ], 
+                        "exit_ts": 1456199886.7961407
+                    }
+                }, 
+                {
+                    "geometry": {
+                        "type": "LineString", 
+                        "coordinates": [
+                            [
+                                -122.0837376640384, 
+                                37.39093872721995
+                            ], 
+                            [
+                                -122.0832565427963, 
+                                37.3906859290203
+                            ]
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e4a0f6858fd4d91ccdbb", 
+                    "properties": {
+                        "enter_fmt_time": "2016-02-22T19:41:02.000037-08:00", 
+                        "distance": 50.959197366789596, 
+                        "exit_local_dt": {
+                            "hour": 19, 
+                            "month": 2, 
+                            "second": 41, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 41
+                        }, 
+                        "feature_type": "stop", 
+                        "ending_section": {
+                            "$oid": "57e4e4a0f6858fd4d91ccda0"
+                        }, 
+                        "starting_section": {
+                            "$oid": "57e4e4a0f6858fd4d91ccdab"
+                        }, 
+                        "exit_fmt_time": "2016-02-22T19:41:41.000092-08:00", 
+                        "enter_local_dt": {
+                            "hour": 19, 
+                            "month": 2, 
+                            "second": 2, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 41
+                        }, 
+                        "exit_loc": {
+                            "type": "Point", 
+                            "coordinates": [
+                                -122.0832565427963, 
+                                37.3906859290203
+                            ]
+                        }, 
+                        "source": "SmoothedHighConfidenceMotion", 
+                        "enter_loc": {
+                            "type": "Point", 
+                            "coordinates": [
+                                -122.0837376640384, 
+                                37.39093872721995
+                            ]
+                        }, 
+                        "enter_ts": 1456198862.000037, 
+                        "duration": 39.00005507469177, 
+                        "trip_id": {
+                            "$oid": "57e4e4a0f6858fd4d91ccd9e"
+                        }, 
+                        "exit_ts": 1456198901.000092
+                    }
+                }, 
+                {
+                    "geometry": {
+                        "type": "LineString", 
+                        "coordinates": [
+                            [
+                                -122.0832565427963, 
+                                37.3906859290203
+                            ], 
+                            [
+                                -122.0827141498421, 
+                                37.3905202187946
+                            ]
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e4a0f6858fd4d91ccdbc", 
+                    "properties": {
+                        "enter_fmt_time": "2016-02-22T19:41:41.000092-08:00", 
+                        "distance": 51.3388588901177, 
+                        "exit_local_dt": {
+                            "hour": 19, 
+                            "month": 2, 
+                            "second": 16, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 42
+                        }, 
+                        "feature_type": "stop", 
+                        "ending_section": {
+                            "$oid": "57e4e4a0f6858fd4d91ccdab"
+                        }, 
+                        "starting_section": {
+                            "$oid": "57e4e4a0f6858fd4d91ccdad"
+                        }, 
+                        "exit_fmt_time": "2016-02-22T19:42:16.000092-08:00", 
+                        "enter_local_dt": {
+                            "hour": 19, 
+                            "month": 2, 
+                            "second": 41, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 41
+                        }, 
+                        "exit_loc": {
+                            "type": "Point", 
+                            "coordinates": [
+                                -122.0827141498421, 
+                                37.3905202187946
+                            ]
+                        }, 
+                        "source": "SmoothedHighConfidenceMotion", 
+                        "enter_loc": {
+                            "type": "Point", 
+                            "coordinates": [
+                                -122.0832565427963, 
+                                37.3906859290203
+                            ]
+                        }, 
+                        "enter_ts": 1456198901.000092, 
+                        "duration": 35.0, 
+                        "trip_id": {
+                            "$oid": "57e4e4a0f6858fd4d91ccd9e"
+                        }, 
+                        "exit_ts": 1456198936.000092
+                    }
+                }, 
+                {
+                    "type": "FeatureCollection", 
+                    "features": [
+                        {
+                            "geometry": {
+                                "type": "LineString", 
+                                "coordinates": [
+                                    [
+                                        -122.0864089802965, 
+                                        37.39077901331944
+                                    ], 
+                                    [
+                                        -122.08607888807857, 
+                                        37.39080466212059
+                                    ], 
+                                    [
+                                        -122.08574879586064, 
+                                        37.390830310921736
+                                    ], 
+                                    [
+                                        -122.08541870364272, 
+                                        37.39085595972289
+                                    ], 
+                                    [
+                                        -122.0850886114248, 
+                                        37.39088160852404
+                                    ], 
+                                    [
+                                        -122.08475851920687, 
+                                        37.39090725732519
+                                    ], 
+                                    [
+                                        -122.08442842698894, 
+                                        37.39093290612634
+                                    ], 
+                                    [
+                                        -122.08409833477101, 
+                                        37.390958554927494
+                                    ], 
+                                    [
+                                        -122.08376824255309, 
+                                        37.39098420372864
+                                    ], 
+                                    [
+                                        -122.0837376640384, 
+                                        37.39093872721995
+                                    ]
+                                ]
+                            }, 
+                            "type": "Feature", 
+                            "id": "57e4e4a0f6858fd4d91ccda0", 
+                            "properties": {
+                                "distances": [
+                                    0.0, 
+                                    29.3013666965938, 
+                                    29.301356767506142, 
+                                    29.301346835990596, 
+                                    29.301336905564966, 
+                                    29.301326975210458, 
+                                    29.301317046099662, 
+                                    29.30130711456098, 
+                                    29.301297184112215, 
+                                    5.733128225052057
+                                ], 
+                                "end_ts": 1456198862.000037, 
+                                "feature_type": "section", 
+                                "distance": 240.14378375069091, 
+                                "sensed_mode": "MotionTypes.BICYCLING", 
+                                "start_ts": 1456198615.0441055, 
+                                "start_fmt_time": "2016-02-22T19:36:55.044106-08:00", 
+                                "source": "SmoothedHighConfidenceMotion", 
+                                "end_fmt_time": "2016-02-22T19:41:02.000037-08:00", 
+                                "end_local_dt": {
+                                    "hour": 19, 
+                                    "month": 2, 
+                                    "second": 2, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 41
+                                }, 
+                                "duration": 246.9559314250946, 
+                                "end_stop": {
+                                    "$oid": "57e4e4a0f6858fd4d91ccdbb"
+                                }, 
+                                "trip_id": {
+                                    "$oid": "57e4e4a0f6858fd4d91ccd9e"
+                                }, 
+                                "start_local_dt": {
+                                    "hour": 19, 
+                                    "month": 2, 
+                                    "second": 55, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 36
+                                }, 
+                                "speeds": [
+                                    0.0, 
+                                    0.9767122232197933, 
+                                    0.9767118922502047, 
+                                    0.9767115611996865, 
+                                    0.9767112301854989, 
+                                    0.9767108991736819, 
+                                    0.976710568203322, 
+                                    0.9767102371520326, 
+                                    0.9767099061370739, 
+                                    0.824207122624715
+                                ]
+                            }
+                        }
+                    ]
+                }, 
+                {
+                    "type": "FeatureCollection", 
+                    "features": [
+                        {
+                            "geometry": {
+                                "type": "LineString", 
+                                "coordinates": [
+                                    [
+                                        -122.0832565427963, 
+                                        37.3906859290203
+                                    ]
+                                ]
+                            }, 
+                            "type": "Feature", 
+                            "id": "57e4e4a0f6858fd4d91ccdab", 
+                            "properties": {
+                                "distances": [
+                                    0
+                                ], 
+                                "feature_type": "section", 
+                                "sensed_mode": "MotionTypes.RUNNING", 
+                                "end_ts": 1456198901.000092, 
+                                "start_ts": 1456198901.000092, 
+                                "start_fmt_time": "2016-02-22T19:41:41.000092-08:00", 
+                                "source": "SmoothedHighConfidenceMotion", 
+                                "end_fmt_time": "2016-02-22T19:41:41.000092-08:00", 
+                                "end_local_dt": {
+                                    "hour": 19, 
+                                    "month": 2, 
+                                    "second": 41, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 41
+                                }, 
+                                "duration": 0.0, 
+                                "start_stop": {
+                                    "$oid": "57e4e4a0f6858fd4d91ccdbb"
+                                }, 
+                                "end_stop": {
+                                    "$oid": "57e4e4a0f6858fd4d91ccdbc"
+                                }, 
+                                "trip_id": {
+                                    "$oid": "57e4e4a0f6858fd4d91ccd9e"
+                                }, 
+                                "start_local_dt": {
+                                    "hour": 19, 
+                                    "month": 2, 
+                                    "second": 41, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 41
+                                }, 
+                                "speeds": [
+                                    0
+                                ], 
+                                "distance": 0
+                            }
+                        }
+                    ]
+                }, 
+                {
+                    "type": "FeatureCollection", 
+                    "features": [
+                        {
+                            "geometry": {
+                                "type": "LineString", 
+                                "coordinates": [
+                                    [
+                                        -122.0827141498421, 
+                                        37.3905202187946
+                                    ], 
+                                    [
+                                        -122.08246698004659, 
+                                        37.3906268612664
+                                    ], 
+                                    [
+                                        -122.08221981025109, 
+                                        37.390733503738204
+                                    ], 
+                                    [
+                                        -122.08199909465624, 
+                                        37.39108361943958
+                                    ], 
+                                    [
+                                        -122.08175886163384, 
+                                        37.39147080637753
+                                    ], 
+                                    [
+                                        -122.08156909976047, 
+                                        37.39156207652938
+                                    ], 
+                                    [
+                                        -122.08139297715833, 
+                                        37.39157793372171
+                                    ], 
+                                    [
+                                        -122.08121685455617, 
+                                        37.39159379091404
+                                    ], 
+                                    [
+                                        -122.08093582291353, 
+                                        37.391629428637586
+                                    ], 
+                                    [
+                                        -122.0805632474819, 
+                                        37.39168995775697
+                                    ], 
+                                    [
+                                        -122.08019796907217, 
+                                        37.391970406376025
+                                    ], 
+                                    [
+                                        -122.08001211523364, 
+                                        37.3921811785716
+                                    ], 
+                                    [
+                                        -122.079851729909, 
+                                        37.39237743898983
+                                    ]
+                                ]
+                            }, 
+                            "type": "Feature", 
+                            "id": "57e4e4a0f6858fd4d91ccdad", 
+                            "properties": {
+                                "distances": [
+                                    0.0, 
+                                    24.8484512543002, 
+                                    24.84842395529074, 
+                                    43.54136520478598, 
+                                    48.000143208299036, 
+                                    19.597085980912127, 
+                                    15.659106457400286, 
+                                    15.659103188113457, 
+                                    25.141929932154987, 
+                                    33.5961556070728, 
+                                    44.87589137749087, 
+                                    28.61591798360013, 
+                                    26.019476991061193
+                                ], 
+                                "feature_type": "section", 
+                                "sensed_mode": "MotionTypes.WALKING", 
+                                "end_ts": 1456199294.999756, 
+                                "start_ts": 1456198936.000092, 
+                                "start_fmt_time": "2016-02-22T19:42:16.000092-08:00", 
+                                "source": "SmoothedHighConfidenceMotion", 
+                                "end_fmt_time": "2016-02-22T19:48:14.999756-08:00", 
+                                "end_local_dt": {
+                                    "hour": 19, 
+                                    "month": 2, 
+                                    "second": 14, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 48
+                                }, 
+                                "duration": 358.99966406822205, 
+                                "start_stop": {
+                                    "$oid": "57e4e4a0f6858fd4d91ccdbc"
+                                }, 
+                                "trip_id": {
+                                    "$oid": "57e4e4a0f6858fd4d91ccd9e"
+                                }, 
+                                "start_local_dt": {
+                                    "hour": 19, 
+                                    "month": 2, 
+                                    "second": 16, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 42
+                                }, 
+                                "speeds": [
+                                    0.0, 
+                                    0.8282817084766734, 
+                                    0.8282807985096914, 
+                                    1.4513788401595327, 
+                                    1.6000047736099678, 
+                                    0.6532361993637376, 
+                                    0.5219702152466762, 
+                                    0.5219701062704486, 
+                                    0.8380643310718329, 
+                                    1.1198718535690935, 
+                                    1.4958630459163624, 
+                                    0.953863932786671, 
+                                    0.8972337379443456
+                                ], 
+                                "distance": 350.4030511404818
+                            }
+                        }
+                    ]
+                }
+            ], 
+            "type": "FeatureCollection", 
+            "id": "57e4e4a0f6858fd4d91ccd9e", 
+            "properties": {
+                "distance": 692.84489114808, 
+                "end_place": {
+                    "$oid": "57e4e4a3f6858fd4d91ccde7"
+                }, 
+                "raw_trip": {
+                    "$oid": "57e4e49cf6858fd4d91cccfa"
+                }, 
+                "feature_type": "trip", 
+                "start_loc": {
+                    "type": "Point", 
+                    "coordinates": [
+                        -122.0864089802965, 
+                        37.39077901331944
+                    ]
+                }, 
+                "end_ts": 1456199294.999756, 
+                "start_ts": 1456198615.0441055, 
+                "start_fmt_time": "2016-02-22T19:36:55.044106-08:00", 
+                "end_loc": {
+                    "type": "Point", 
+                    "coordinates": [
+                        -122.079851729909, 
+                        37.39237743898983
+                    ]
+                }, 
+                "source": "DwellSegmentationDistFilter", 
+                "start_place": {
+                    "$oid": "57e4e4a3f6858fd4d91ccde6"
+                }, 
+                "end_fmt_time": "2016-02-22T19:48:14.999756-08:00", 
+                "end_local_dt": {
+                    "hour": 19, 
+                    "month": 2, 
+                    "second": 14, 
+                    "weekday": 0, 
+                    "year": 2016, 
+                    "timezone": "America/Los_Angeles", 
+                    "day": 22, 
+                    "minute": 48
+                }, 
+                "duration": 679.9556505680084, 
+                "start_local_dt": {
+                    "hour": 19, 
+                    "month": 2, 
+                    "second": 55, 
+                    "weekday": 0, 
+                    "year": 2016, 
+                    "timezone": "America/Los_Angeles", 
+                    "day": 22, 
+                    "minute": 36
+                }
+            }
+        }, 
+        {
+            "features": [
+                {
+                    "geometry": {
+                        "type": "Point", 
+                        "coordinates": [
+                            -122.079851729909, 
+                            37.39237743898983
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e4a3f6858fd4d91ccde7", 
+                    "properties": {
+                        "enter_fmt_time": "2016-02-22T19:48:14.999756-08:00", 
+                        "exit_local_dt": {
+                            "hour": 19, 
+                            "month": 2, 
+                            "second": 6, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 58
+                        }, 
+                        "display_name": "Castro Street, Mountain View", 
+                        "feature_type": "start_place", 
+                        "exit_fmt_time": "2016-02-22T19:58:06.796141-08:00", 
+                        "enter_local_dt": {
+                            "hour": 19, 
+                            "month": 2, 
+                            "second": 14, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 48
+                        }, 
+                        "ending_trip": {
+                            "$oid": "57e4e4a0f6858fd4d91ccd9e"
+                        }, 
+                        "starting_trip": {
+                            "$oid": "57e4e4a1f6858fd4d91ccdbd"
+                        }, 
+                        "source": "DwellSegmentationDistFilter", 
+                        "enter_ts": 1456199294.999756, 
+                        "duration": 591.7963845729828, 
+                        "raw_places": [
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccfb"
+                            }, 
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccfb"
+                            }
+                        ], 
+                        "exit_ts": 1456199886.7961407
+                    }
+                }, 
+                {
+                    "geometry": {
+                        "type": "Point", 
+                        "coordinates": [
+                            -122.0866099746172, 
+                            37.39067566118892
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e4a3f6858fd4d91ccde8", 
+                    "properties": {
+                        "enter_fmt_time": "2016-02-22T20:11:47.000001-08:00", 
+                        "display_name": "South Shoreline Boulevard, Mountain View", 
+                        "feature_type": "end_place", 
+                        "enter_local_dt": {
+                            "hour": 20, 
+                            "month": 2, 
+                            "second": 47, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 11
+                        }, 
+                        "ending_trip": {
+                            "$oid": "57e4e4a1f6858fd4d91ccdbd"
+                        }, 
+                        "source": "DwellSegmentationDistFilter", 
+                        "enter_ts": 1456200707.000001, 
+                        "raw_places": [
+                            {
+                                "$oid": "57e4e49cf6858fd4d91cccfd"
+                            }
+                        ]
+                    }
+                }, 
+                {
+                    "geometry": {
+                        "type": "LineString", 
+                        "coordinates": [
+                            [
+                                -122.0814853628372, 
+                                37.39015749193485
+                            ], 
+                            [
+                                -122.0819336270188, 
+                                37.38988000903036
+                            ]
+                        ]
+                    }, 
+                    "type": "Feature", 
+                    "id": "57e4e4a1f6858fd4d91ccdde", 
+                    "properties": {
+                        "enter_fmt_time": "2016-02-22T20:03:10.003355-08:00", 
+                        "distance": 50.20339223857295, 
+                        "exit_local_dt": {
+                            "hour": 20, 
+                            "month": 2, 
+                            "second": 55, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 3
+                        }, 
+                        "feature_type": "stop", 
+                        "ending_section": {
+                            "$oid": "57e4e4a1f6858fd4d91ccdbf"
+                        }, 
+                        "starting_section": {
+                            "$oid": "57e4e4a1f6858fd4d91ccdcc"
+                        }, 
+                        "exit_fmt_time": "2016-02-22T20:03:55.000050-08:00", 
+                        "enter_local_dt": {
+                            "hour": 20, 
+                            "month": 2, 
+                            "second": 10, 
+                            "weekday": 0, 
+                            "year": 2016, 
+                            "timezone": "America/Los_Angeles", 
+                            "day": 22, 
+                            "minute": 3
+                        }, 
+                        "exit_loc": {
+                            "type": "Point", 
+                            "coordinates": [
+                                -122.0819336270188, 
+                                37.38988000903036
+                            ]
+                        }, 
+                        "source": "SmoothedHighConfidenceMotion", 
+                        "enter_loc": {
+                            "type": "Point", 
+                            "coordinates": [
+                                -122.0814853628372, 
+                                37.39015749193485
+                            ]
+                        }, 
+                        "enter_ts": 1456200190.003355, 
+                        "duration": 44.996695041656494, 
+                        "trip_id": {
+                            "$oid": "57e4e4a1f6858fd4d91ccdbd"
+                        }, 
+                        "exit_ts": 1456200235.00005
+                    }
+                }, 
+                {
+                    "type": "FeatureCollection", 
+                    "features": [
+                        {
+                            "geometry": {
+                                "type": "LineString", 
+                                "coordinates": [
+                                    [
+                                        -122.079851729909, 
+                                        37.39237743898983
+                                    ], 
+                                    [
+                                        -122.07993136867483, 
+                                        37.39211255244084
+                                    ], 
+                                    [
+                                        -122.08003453075958, 
+                                        37.39184848718848
+                                    ], 
+                                    [
+                                        -122.08018620753931, 
+                                        37.39158611578537
+                                    ], 
+                                    [
+                                        -122.08035800503613, 
+                                        37.39136106755379
+                                    ], 
+                                    [
+                                        -122.08053616084428, 
+                                        37.39114781374997
+                                    ], 
+                                    [
+                                        -122.08071431665243, 
+                                        37.390934559946146
+                                    ], 
+                                    [
+                                        -122.08089247246058, 
+                                        37.39072130614232
+                                    ], 
+                                    [
+                                        -122.08107062826873, 
+                                        37.3905080523385
+                                    ], 
+                                    [
+                                        -122.08124878407688, 
+                                        37.390294798534676
+                                    ], 
+                                    [
+                                        -122.08142865269748, 
+                                        37.39008583996368
+                                    ], 
+                                    [
+                                        -122.0814853628372, 
+                                        37.39015749193485
+                                    ]
+                                ]
+                            }, 
+                            "type": "Feature", 
+                            "id": "57e4e4a1f6858fd4d91ccdbf", 
+                            "properties": {
+                                "distances": [
+                                    0.0, 
+                                    30.28267293938063, 
+                                    30.744596100931574, 
+                                    32.10450513949787, 
+                                    29.26715325273068, 
+                                    28.460793071023964, 
+                                    28.460817832545043, 
+                                    28.460842593264125, 
+                                    28.460867353983566, 
+                                    28.460892113901004, 
+                                    28.149376499418093, 
+                                    9.41169350273362
+                                ], 
+                                "end_ts": 1456200190.003355, 
+                                "feature_type": "section", 
+                                "distance": 302.26421039941016, 
+                                "sensed_mode": "MotionTypes.WALKING", 
+                                "start_ts": 1456199886.7961407, 
+                                "start_fmt_time": "2016-02-22T19:58:06.796141-08:00", 
+                                "source": "SmoothedHighConfidenceMotion", 
+                                "end_fmt_time": "2016-02-22T20:03:10.003355-08:00", 
+                                "end_local_dt": {
+                                    "hour": 20, 
+                                    "month": 2, 
+                                    "second": 10, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 3
+                                }, 
+                                "duration": 303.20721435546875, 
+                                "end_stop": {
+                                    "$oid": "57e4e4a1f6858fd4d91ccdde"
+                                }, 
+                                "trip_id": {
+                                    "$oid": "57e4e4a1f6858fd4d91ccdbd"
+                                }, 
+                                "start_local_dt": {
+                                    "hour": 19, 
+                                    "month": 2, 
+                                    "second": 6, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 58
+                                }, 
+                                "speeds": [
+                                    0.0, 
+                                    1.0094224313126878, 
+                                    1.0248198700310525, 
+                                    1.0701501713165955, 
+                                    0.9755717750910227, 
+                                    0.9486931023674655, 
+                                    0.9486939277515014, 
+                                    0.9486947531088041, 
+                                    0.9486955784661188, 
+                                    0.9486964037967002, 
+                                    0.9383125499806031, 
+                                    2.9345383437453636
+                                ]
+                            }
+                        }
+                    ]
+                }, 
+                {
+                    "type": "FeatureCollection", 
+                    "features": [
+                        {
+                            "geometry": {
+                                "type": "LineString", 
+                                "coordinates": [
+                                    [
+                                        -122.0819336270188, 
+                                        37.38988000903036
+                                    ], 
+                                    [
+                                        -122.0822699941317, 
+                                        37.38964002568686
+                                    ], 
+                                    [
+                                        -122.08266424929494, 
+                                        37.389684987680184
+                                    ], 
+                                    [
+                                        -122.08301158685147, 
+                                        37.38981277176801
+                                    ], 
+                                    [
+                                        -122.08328126356285, 
+                                        37.38991681765771
+                                    ], 
+                                    [
+                                        -122.08351058606978, 
+                                        37.38985453145742
+                                    ], 
+                                    [
+                                        -122.08370905429277, 
+                                        37.3896650699702
+                                    ], 
+                                    [
+                                        -122.08392509889268, 
+                                        37.38956655594276
+                                    ], 
+                                    [
+                                        -122.08414753365177, 
+                                        37.389501107247746
+                                    ], 
+                                    [
+                                        -122.08440377661483, 
+                                        37.389474928162
+                                    ], 
+                                    [
+                                        -122.08472762433168, 
+                                        37.38952727475801
+                                    ], 
+                                    [
+                                        -122.08505352968021, 
+                                        37.38963711808151
+                                    ], 
+                                    [
+                                        -122.08538352549628, 
+                                        37.38978635645828
+                                    ], 
+                                    [
+                                        -122.08575156293686, 
+                                        37.38995056579791
+                                    ], 
+                                    [
+                                        -122.08609191628632, 
+                                        37.390142233108925
+                                    ], 
+                                    [
+                                        -122.08640436698533, 
+                                        37.39040217076821
+                                    ], 
+                                    [
+                                        -122.0866099746172, 
+                                        37.39067566118892
+                                    ]
+                                ]
+                            }, 
+                            "type": "Feature", 
+                            "id": "57e4e4a1f6858fd4d91ccdcc", 
+                            "properties": {
+                                "distances": [
+                                    0.0, 
+                                    39.93977949207265, 
+                                    35.18826253560084, 
+                                    33.816237431636864, 
+                                    26.485559883365106, 
+                                    21.41102815749783, 
+                                    27.409275221305872, 
+                                    22.006958276358553, 
+                                    20.95576299909005, 
+                                    22.82475368041919, 
+                                    29.197135791022507, 
+                                    31.276320102618456, 
+                                    33.546132806700754, 
+                                    37.291032769424, 
+                                    36.85604925226475, 
+                                    39.967495169603716, 
+                                    35.42268864094356
+                                ], 
+                                "feature_type": "section", 
+                                "sensed_mode": "MotionTypes.WALKING", 
+                                "end_ts": 1456200707.000001, 
+                                "start_ts": 1456200235.00005, 
+                                "start_fmt_time": "2016-02-22T20:03:55.000050-08:00", 
+                                "source": "SmoothedHighConfidenceMotion", 
+                                "end_fmt_time": "2016-02-22T20:11:47.000001-08:00", 
+                                "end_local_dt": {
+                                    "hour": 20, 
+                                    "month": 2, 
+                                    "second": 47, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 11
+                                }, 
+                                "duration": 471.9999508857727, 
+                                "start_stop": {
+                                    "$oid": "57e4e4a1f6858fd4d91ccdde"
+                                }, 
+                                "trip_id": {
+                                    "$oid": "57e4e4a1f6858fd4d91ccdbd"
+                                }, 
+                                "start_local_dt": {
+                                    "hour": 20, 
+                                    "month": 2, 
+                                    "second": 55, 
+                                    "weekday": 0, 
+                                    "year": 2016, 
+                                    "timezone": "America/Los_Angeles", 
+                                    "day": 22, 
+                                    "minute": 3
+                                }, 
+                                "speeds": [
+                                    0.0, 
+                                    1.3313259830690884, 
+                                    1.172942084520028, 
+                                    1.1272079143878955, 
+                                    0.8828519961121702, 
+                                    0.713700938583261, 
+                                    0.9136425073768624, 
+                                    0.7335652758786184, 
+                                    0.6985254333030018, 
+                                    0.7608251226806396, 
+                                    0.9732378597007503, 
+                                    1.0425440034206153, 
+                                    1.118204426890025, 
+                                    1.2430344256474666, 
+                                    1.2285349750754915, 
+                                    1.3322498389867905, 
+                                    1.6101258055012886
+                                ], 
+                                "distance": 493.5944722099248
+                            }
+                        }
+                    ]
+                }
+            ], 
+            "type": "FeatureCollection", 
+            "id": "57e4e4a1f6858fd4d91ccdbd", 
+            "properties": {
+                "distance": 846.0620748479079, 
+                "end_place": {
+                    "$oid": "57e4e4a3f6858fd4d91ccde8"
+                }, 
+                "raw_trip": {
+                    "$oid": "57e4e49cf6858fd4d91cccfc"
+                }, 
+                "feature_type": "trip", 
+                "start_loc": {
+                    "type": "Point", 
+                    "coordinates": [
+                        -122.079851729909, 
+                        37.39237743898983
+                    ]
+                }, 
+                "end_ts": 1456200707.000001, 
+                "start_ts": 1456199886.7961407, 
+                "start_fmt_time": "2016-02-22T19:58:06.796141-08:00", 
+                "end_loc": {
+                    "type": "Point", 
+                    "coordinates": [
+                        -122.0866099746172, 
+                        37.39067566118892
+                    ]
+                }, 
+                "source": "DwellSegmentationDistFilter", 
+                "start_place": {
+                    "$oid": "57e4e4a3f6858fd4d91ccde7"
+                }, 
+                "end_fmt_time": "2016-02-22T20:11:47.000001-08:00", 
+                "end_local_dt": {
+                    "hour": 20, 
+                    "month": 2, 
+                    "second": 47, 
+                    "weekday": 0, 
+                    "year": 2016, 
+                    "timezone": "America/Los_Angeles", 
+                    "day": 22, 
+                    "minute": 11
+                }, 
+                "duration": 820.203860282898, 
+                "start_local_dt": {
+                    "hour": 19, 
+                    "month": 2, 
+                    "second": 6, 
+                    "weekday": 0, 
+                    "year": 2016, 
+                    "timezone": "America/Los_Angeles", 
+                    "day": 22, 
+                    "minute": 58
+                }
+            }
+        }
+    ], 
+    "_id": {
+        "$oid": "57e2c3da115514afcd793f18"
+    }, 
+    "user_id": {
+        "$uuid": "7cffc09bec284b77966f9d824775f081"
+    }, 
+    "metadata": {
+        "type": "document", 
+        "key": "diary/trips-2016-02-22", 
+        "write_ts": 1474618532.37175
+    }
+}

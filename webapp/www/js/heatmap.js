@@ -1,11 +1,15 @@
-angular.module('starter.heatmap', ['ui-leaflet'])
+'use strict';
 
-.controller('HeatmapCtrl', function($scope, $ionicActionSheet, $http, $ionicLoading, leafletData) {
+angular.module('starter.heatmap', ['ui-leaflet', 'emission.plugin.logger',
+                                   'emission.incident.posttrip.manual'])
+
+.controller('HeatmapCtrl', function($scope, $ionicLoading, $ionicActionSheet, $http,
+                                    leafletData, PostTripManualMarker, Logger) {
   $scope.mapCtrl = {};
 
   angular.extend($scope.mapCtrl, {
     defaults : {
-      tileLayer: 'http://tile.stamen.com/toner/{z}/{x}/{y}.png',
+      tileLayer: 'http://tile.stamen.com/terrain/{z}/{x}/{y}.png',
       tileLayerOptions: {
         attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
         opacity: 0.9,
@@ -21,53 +25,53 @@ angular.module('starter.heatmap', ['ui-leaflet'])
   });
 
   $scope.getPopRoute = function() {
-    $ionicLoading.show({
-        template: 'Loading...'
-    });
+    $scope.countData.isLoading = true;
     var data = {
       modes: $scope.selectCtrl.modes,
       from_local_date: $scope.selectCtrl.fromDate,
       to_local_date: $scope.selectCtrl.toDate,
       sel_region: null
     };
-    console.log("Sending data "+JSON.stringify(data));
-    $http.post("/result/heatmap/pop.route", data)
+    Logger.log("Sending data "+JSON.stringify(data));
+    return $http.post("/result/heatmap/pop.route/local_date", data)
     .then(function(response) {
-      $ionicLoading.hide();
       if (angular.isDefined(response.data.lnglat)) {
-        console.log("Got points in heatmap "+response.data.lnglat.length);
+        Logger.log("Got points in heatmap "+response.data.lnglat.length);
         $scope.showHeatmap(response.data.lnglat);
       } else {
-        console.log("did not find latlng in response data "+JSON.stringify(response.data));
+        Logger.log("did not find latlng in response data "+JSON.stringify(response.data));
       }
+      $scope.countData.isLoading = false;
     }, function(error) {
-      $ionicLoading.hide();
-      console.log("Got error %s while trying to read heatmap data" +
+      Logger.log("Got error %s while trying to read heatmap data" +
         JSON.stringify(error));
+      $scope.countData.isLoading = false;
     });
   };
 
   $scope.showHeatmap = function(lnglat) {
-    leafletData.getMap('heatmap').then(function(map){
-      var boundsGeojson = L.geoJson();
-      lnglat.forEach(function(cval, i, array) {
-        boundsGeojson.addData({'type': 'Point', 'coordinates': cval});
-      });
-      var bounds = L.featureGroup([boundsGeojson]).getBounds();
-      console.log("geojson bounds="+JSON.stringify(bounds));
-
-      var latlng = lnglat.map(function(cval, i, array){
-        return cval.reverse();
-      });
-      if (angular.isUndefined($scope.heatLayer)) {
-        console.log("no existing heatLayer found, skipping remove...");
-      } else {
-        map.removeLayer($scope.heatLayer);
-      }
-      $scope.heatLayer = L.heatLayer(latlng).addTo(map);
-      map.fitBounds(bounds);
+    var boundsGeojson = L.geoJson();
+    lnglat.forEach(function(cval, i, array) {
+      boundsGeojson.addData({'type': 'Point', 'coordinates': cval});
     });
+    var bounds = L.featureGroup([boundsGeojson]).getBounds();
+    Logger.log("geojson bounds="+JSON.stringify(bounds));
+
+    var latlng = lnglat.map(function(cval, i, array){
+      return cval.reverse();
+    });
+    $scope.countData.layer = L.heatLayer(latlng);
+    $scope.countData.bounds = bounds;
   }
+
+  /*
+   * END: "regular" heatmap with trip "counts".
+   * Hotter for more counts.
+   */
+
+  /*
+   * BEGIN: general controls
+   */
 
   $scope.modeOptions = [
       {text: "ALL", value:null},
@@ -156,6 +160,8 @@ angular.module('starter.heatmap', ['ui-leaflet'])
   var initSelect = function() {
     var now = moment();
     var dayago = moment().subtract(1, 'd');
+    $scope.selectCtrl.showStress = false;
+    $scope.selectCtrl.showCount = true;
     $scope.selectCtrl.modes = null;
     $scope.selectCtrl.modeString = "ALL";
     $scope.selectCtrl.fromDate = moment2Localdate(dayago)
@@ -175,11 +181,147 @@ angular.module('starter.heatmap', ['ui-leaflet'])
     return {
       year: momentObj.year(),
       month: momentObj.month() + 1,
-      day: momentObj.date(),
+      day: momentObj.date() - 1,
       hour: momentObj.hour()
     };
   }
 
   $scope.selectCtrl = {}
   initSelect();
+  $scope.stressData = {};
+  $scope.countData = {};
+
+  /*
+   * END: general controls
+   */
+
+  if ($scope.showCount) {
+      $scope.getIncidents();
+  } else {
+      $scope.getPopRoute();
+  }
+
+  /*
+   * BEGIN: Switching code
+   */
+
+  $scope.countButtonClass = function() {
+    // return $scope.selectCtrl.showCount? "active col" : "col";
+    return $scope.selectCtrl.showCount? "metric-chart-button-active hvcenter" : "metric-chart-button hvcenter";
+  }
+  $scope.stressButtonClass = function() {
+    // return $scope.selectCtrl.showStress? "active col" : "col";
+    return $scope.selectCtrl.showStress? "metric-summary-button-active hvcenter" : "metric-summary-button hvcenter";
+  }
+
+  $scope.showCounts = function() {
+    $scope.selectCtrl.showStress = false;
+    $scope.selectCtrl.showCount = true;
+    $scope.switchSelData();
+  }
+
+  $scope.showStress = function() {
+    $scope.selectCtrl.showCount = false;
+    $scope.selectCtrl.showStress = true;
+    $scope.switchSelData();
+  }
+
+  /*
+   * selected value is of the form:
+   * {
+   *   layer:
+   *   bounds:
+   *   isLoading: // can be changed to progress later
+   * }
+   */
+
+  var setSelData = function(map, selData) {
+    if (selData.isLoading == true) {
+      $ionicLoading.show({
+          template: 'Loading...'
+      });
+      // Don't set any layer - it will be filled in when the load completes
+    } else {
+      $ionicLoading.hide();
+      if (angular.isDefined(selData) && angular.isDefined(selData.layer)) {
+        selData.layer.addTo(map);
+        map.fitBounds(selData.bounds);
+        $scope.selData = selData;
+      }
+    }
+  }
+
+  $scope.switchSelData = function() {
+    leafletData.getMap('heatmap').then(function(map){
+      if (angular.isUndefined($scope.selData)) {
+        Logger.log("no existing data found, skipping remove...");
+      } else {
+        map.removeLayer($scope.selData.layer);
+        $scope.selData = undefined;
+      }
+      if ($scope.selectCtrl.showStress == true) {
+        setSelData(map, $scope.stressData);
+      } else {
+        setSelData(map, $scope.countData);
+      }
+    });
+  };
+
+  $scope.getHeatmaps = function() {
+    $scope.getPopRoute().finally($scope.switchSelData);
+    $scope.getIncidents().finally($scope.switchSelData);
+  }
+
+  /*
+   * END: Switching code
+   */
+
+  /*
+   * BEGIN: Stress map code
+   */
+
+  $scope.getIncidents = function() {
+    $scope.stressData.isLoading = true;
+    var data = {
+      modes: $scope.selectCtrl.modes,
+      from_local_date: $scope.selectCtrl.fromDate,
+      to_local_date: $scope.selectCtrl.toDate,
+      sel_region: null
+    };
+    Logger.log("Sending data "+JSON.stringify(data));
+    return $http.post("/result/heatmap/incidents/local_date", data)
+    .then(function(response) {
+      if (angular.isDefined(response.data.incidents)) {
+        Logger.log("Got incidents"+response.data.incidents.length);
+        $scope.showIncidents(response.data.incidents);
+      } else {
+        Logger.log("did not find incidents in response data "+JSON.stringify(response.data));
+      }
+      $scope.stressData.isLoading = false;
+    }, function(error) {
+      Logger.log("Got error %s while trying to read heatmap data" +
+        JSON.stringify(error));
+      $scope.stressData.isLoading = false;
+    });
+  };
+
+  $scope.showIncidents = function(incidentEntries) {
+    var incidentFeatureList = incidentEntries.map(PostTripManualMarker.toGeoJSONFeature);
+    var incidentsGeojson = L.geoJson(null, {
+      pointToLayer: PostTripManualMarker.incidentMarker,
+      onEachFeature: PostTripManualMarker.displayIncident
+    });
+    incidentFeatureList.forEach(function(ival, i, array) {
+      incidentsGeojson.addData(ival);
+    });
+    var bounds = L.featureGroup([incidentsGeojson]).getBounds();
+    Logger.log("geojson bounds="+JSON.stringify(bounds));
+    $scope.stressData.layer = incidentsGeojson;
+    $scope.stressData.bounds = bounds;
+  }
+
+
+  /*
+   * END: Stress map code
+   */
 });
