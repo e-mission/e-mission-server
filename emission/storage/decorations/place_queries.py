@@ -1,5 +1,6 @@
 import logging
 
+import emission.core.get_database as edb
 import emission.core.wrapper.entry as ecwe
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.analysis_timeseries_queries as esda
@@ -51,9 +52,14 @@ def get_last_place_before(place_key, reset_ts, user_id):
     Note that these correspond to the two use cases in 
     https://github.com/e-mission/e-mission-server/issues/333
     """
-    trip_key = _get_trip_key(place_key)
+    trip_key_query = _get_trip_key_query(place_key)
+    logging.debug("Looking for last place before %s" % reset_ts)
 
     ts = esta.TimeSeries.get_time_series(user_id)
+    all_user_places = list(edb.get_analysis_timeseries_db().find(
+        {"user_id": user_id, "metadata.key": place_key},
+        {"_id": True, "data.enter_fmt_time": True, "data.exit_fmt_time": True}))
+    logging.debug("all places for this user = %s" % all_user_places)
     ret_place_doc = ts.analysis_timeseries_db.find_one({'user_id': user_id,
                                                         'metadata.key': place_key,
                                                         'data.exit_ts' : {'$gt': reset_ts},
@@ -61,7 +67,7 @@ def get_last_place_before(place_key, reset_ts, user_id):
                                                        })
     logging.debug("last place doc = %s" % ret_place_doc)
     ret_trip_doc = ts.analysis_timeseries_db.find_one({'user_id': user_id,
-                                                        'metadata.key': trip_key,
+                                                        'metadata.key': trip_key_query,
                                                         'data.end_ts' : {'$gt': reset_ts},
                                                         'data.start_ts': {'$lt': reset_ts}
                                                        })
@@ -69,16 +75,19 @@ def get_last_place_before(place_key, reset_ts, user_id):
         raise ValueError("No trip or place straddling time %s" % reset_ts)
     if ret_place_doc is None:
         assert ret_trip_doc is not None
-        ret_place_doc = esda.get_entry(esda.CLEANED_PLACE, ret_trip_doc.start_place)
+        logging.info("ret_trip_doc start = %s, end = %s" % 
+            (ret_trip_doc["data"]["start_fmt_time"],
+             ret_trip_doc["data"]["end_fmt_time"]))
+        ret_place_doc = esda.get_entry(place_key, ret_trip_doc["data"]['start_place'])
 
     assert ret_place_doc is not None
     ret_place = ecwe.Entry(ret_place_doc)
     return ret_place
 
-def _get_trip_key(place_key):
+def _get_trip_key_query(place_key):
     if place_key == esda.CLEANED_PLACE_KEY:
-        return esda.CLEANED_TRIP_KEY
+        return {"$in": [esda.CLEANED_TRIP_KEY, esda.CLEANED_UNTRACKED_KEY]}
     elif place_key == esda.RAW_PLACE_KEY:
-        return esda.RAW_TRIP_KEY
+        return {"$in": [esda.RAW_TRIP_KEY, esda.RAW_UNTRACKED_KEY]}
     else:
         raise RuntimeException("Invalid place key %s" % place_key)
