@@ -64,7 +64,10 @@ if __name__ == '__main__':
             epr.reset_all_users_to_start(args.dry_run)
         else:
             user_list = _get_user_list(args)
+            logging.info("received list with %s users" % user_list)
+            logging.info("first few entries are %s" % user_list[0:5])
             for user_id in user_list:
+                logging.info("resetting user %s to start" % user_id)
                 epr.reset_user_to_start(user_id, args.dry_run)
     else:
     # Handle the second row in the table
@@ -73,6 +76,9 @@ if __name__ == '__main__':
         day_ts = day_dt.timestamp
         logging.debug("day_ts is %s" % day_ts)
         user_list = _get_user_list(args)
+        logging.info("received list with %s users" % user_list)
+        logging.info("first few entries are %s" % user_list[0:5])
         for user_id in user_list:
+            logging.info("resetting user %s to ts %s" % (user_id, day_ts))
             epr.reset_user_to_ts(user_id, day_ts, args.dry_run)
 
