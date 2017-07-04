@@ -12,17 +12,28 @@ import copy
 import pymongo
 
 import emission.pipeline.reset as epr
+import emission.core.get_database as edb
 
 def _get_user_list(args):
     if args.all:
         return _find_all_users()
     elif args.platform:
-        return _find_platform_users(platform)
+        return _find_platform_users(args.platform)
     elif args.email_list:
         return _email_2_user_list(args.email_list)
     else:
         assert args.user_list is not None
         return [uuid.UUID(u) for u in args.user_list]
+
+def _find_platform_users(platform):
+   return edb.get_timeseries_db().find({'metadata.platform': platform}).distinct(
+       'user_id')
+
+def _find_all_users():
+   return edb.get_timeseries_db().find().distinct('user_id')
+
+def _email_2_user_list(email_list):
+    return [ecwu.User.fromEmail(e) for e in email_list]
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
@@ -65,12 +76,3 @@ if __name__ == '__main__':
         for user_id in user_list:
             epr.reset_user_to_ts(user_id, day_ts, args.dry_run)
 
-def _find_platform_users(platform):
-   return edb.get_timeseries_db().find({'metadata.platform': platform}).distinct(
-       'user_id')
-
-def _find_all_users():
-   return edb.get_timeseries_db().find().distinct('user_id')
-
-def _email_2_user_list(email_list):
-    return [ecwu.User.fromEmail(e) for e in email_list]
