@@ -49,7 +49,7 @@ class TestPipelineRealData(unittest.TestCase):
 
     def tearDown(self):
         logging.debug("Clearing related databases")
-        # self.clearRelatedDb()
+        self.clearRelatedDb()
 
     def clearRelatedDb(self):
         edb.get_timeseries_db().remove({"user_id": self.testUUID})

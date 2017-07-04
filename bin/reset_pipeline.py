@@ -1,66 +1,76 @@
-# Removes all materialized views and the pipeline state.
-# This will cause us to reprocess the pipeline from scratch
-# As history begins to accumulate, we may want to specify a point to reset the
-# pipeline to instead of deleting everything
+"""
+Script to launch the pipeline reset code.
+Options documented in 
+https://github.com/e-mission/e-mission-server/issues/333#issuecomment-312464984
+"""
 import logging
 
 import argparse
 import uuid
-import datetime as pydt
-import time
+import arrow
 import copy
+import pymongo
 
-import emission.core.get_database as edb
-import emission.core.wrapper.pipelinestate as ecwp
+import emission.pipeline.reset as epr
 
-def del_objects(args):
-    del_query = {}
-    if args.user_id != "all":
-        del_query['user_id'] = uuid.UUID(args.user_id)
-
-    if args.date is None:
-        print("Deleting all analysis information for query %s" % del_query)
-        print edb.get_analysis_timeseries_db().remove(del_query)
-        print edb.get_common_place_db().remove(del_query)
-        print edb.get_common_trip_db().remove(del_query)
-
-def reset_pipeline_for_stage(stage, user_id, day_ts):
-    reset_query = {}
-
-    if user_id is not None:
-        if day_ts is None:
-            print "day_ts is None, deleting stage %s for user %s" % (stage, user_id)
-            print edb.get_pipeline_state_db().remove({'user_id': user_id,
-                    'pipeline_stage': stage.value})
+def _get_user_list(args):
+    if args.all:
+        return _find_all_users()
+    elif args.platform:
+        return _find_platform_users(platform)
+    elif args.email_list:
+        return _email_2_user_list(args.email_list)
     else:
-        if day_ts is None:
-            print "day_ts is None, deleting stage %s for all users" % (stage)
-            print edb.get_pipeline_state_db().remove({'pipeline_stage': stage.value})
-
-def reset_pipeline(args):
-    user_id = None
-    if args.user_id != "all":
-        user_id = uuid.UUID(args.user_id)
-
-    day_ts = None
-    if args.date is not None:
-        day_dt = pydt.datetime.strptime(args.date, "%Y-%m-%d")
-        logging.debug("day_dt is %s" % day_dt)
-        day_ts = time.mktime(day_dt.timetuple())
-        logging.debug("day_ts is %s" % day_ts)
-
-    for stage in ecwp.PipelineStages:
-        reset_pipeline_for_stage(stage, user_id, day_ts)
+        assert args.user_list is not None
+        return [uuid.UUID(u) for u in args.user_list]
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("user_id",
-        help="user to reset the pipeline for. use 'all' for all users")
+    # Options corresponding to
+    # https://github.com/e-mission/e-mission-server/issues/333#issuecomment-312464984
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("-a", "--all", action="store_true", default=False,
+        help="reset the pipeline for all users")
+    group.add_argument("-p", "--platform", choices = ['android', 'ios'],
+                        help="reset the pipeline for all on the specified platform")
+    group.add_argument("-u", "--user_list", nargs='+',
+        help="user ids to reset the pipeline for")
+    group.add_argument("-e", "--email_list", nargs='+',
+        help="email addresses to reset the pipeline for")
+    parser.add_argument("-d", "--date",
+        help="date to reset the pipeline to. Format 'YYYY-mm-dd' e.g. 2016-02-17. Interpreted in UTC, so 2016-02-17 will reset the pipeline to 2016-02-16T16:00:00-08:00 in the pacific time zone")
+    parser.add_argument("-n", "--dry_run", action="store_true", default=False,
+                        help="do everything except actually perform the operations")
 
     args = parser.parse_args()
-    # Hardcoding this for now until we reset the pipeline again
-    args.date = None
-    del_objects(args)
-    reset_pipeline(args)
+    print args
+
+    # Handle the first row in the table
+    if args.date is None:
+        if args.all:
+            epr.reset_all_users_to_start(args.dry_run)
+        else:
+            user_list = _get_user_list(args)
+            for user_id in user_list:
+                epr.reset_user_to_start(user_id, args.dry_run)
+    else:
+    # Handle the second row in the table
+        day_dt = arrow.get(args.date, "YYYY-MM-DD")
+        logging.debug("day_dt is %s" % day_dt)
+        day_ts = day_dt.timestamp
+        logging.debug("day_ts is %s" % day_ts)
+        user_list = _get_user_list(args)
+        for user_id in user_list:
+            epr.reset_user_to_ts(user_id, day_ts, args.dry_run)
+
+def _find_platform_users(platform):
+   return edb.get_timeseries_db().find({'metadata.platform': platform}).distinct(
+       'user_id')
+
+def _find_all_users():
+   return edb.get_timeseries_db().find().distinct('user_id')
+
+def _email_2_user_list(email_list):
+    return [ecwu.User.fromEmail(e) for e in email_list]
