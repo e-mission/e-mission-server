@@ -164,6 +164,9 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         # pipeline were to run again
 
         start_ts = esp.get_complete_ts(self.user_id)
+        if start_ts is None:
+            logging.info("start_ts = %s, last stage not run successfully, skipping output gen" % start_ts)
+            return
         logging.debug("start ts from pipeline = %s, %s" %
            (start_ts, pydt.datetime.utcfromtimestamp(start_ts).isoformat()))
         trip_gj_list = self.get_trip_list_for_seven_days(start_ts)
