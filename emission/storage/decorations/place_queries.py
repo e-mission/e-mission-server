@@ -28,6 +28,24 @@ def get_last_place_entry(key, user_id):
     assert('starting_trip' not in ret_place.data)
     return ret_place
 
+def get_first_place_entry(key, user_id):
+    """
+    Similar to get_last_place_entry, only finding one with only an exit_ts
+    and no enter_ts.
+    """
+    ts = esta.TimeSeries.get_time_series(user_id)
+    ret_place_doc = ts.analysis_timeseries_db.find_one({'user_id': user_id,
+                                                        'metadata.key': key,
+                                                        'data.enter_ts' : {'$exists': False}})
+    logging.debug("first place doc = %s" % ret_place_doc)
+    if ret_place_doc is None:
+        return None
+    ret_place = ecwe.Entry(ret_place_doc)
+    assert('enter_ts' not in ret_place.data)
+    assert('enter_fmt_time' not in ret_place.data)
+    assert('ending_trip' not in ret_place.data)
+    return ret_place
+
 def get_last_place_before(place_key, reset_ts, user_id):
     """
     Unlike `get_last_place_before` which returns the last place in the
