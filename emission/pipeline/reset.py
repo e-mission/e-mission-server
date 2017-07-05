@@ -38,6 +38,10 @@ def reset_user_to_ts(user_id, ts, is_dry_run):
         FYI: this is how we did the query earlier
         edb.get_analysis_timeseries_db().find(first_affected_query).sort('data.exit_ts').limit(1)
     """
+    if user_id is None:
+        logging.info("user_id = None, skipping reset...")
+        return
+
     # Find the place before the time
     last_cleaned_place = esdp.get_last_place_before(esda.CLEANED_PLACE_KEY, ts, user_id)
     logging.debug("last_cleaned_place = %s" % last_cleaned_place)
