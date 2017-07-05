@@ -277,6 +277,49 @@ class TestPipelineReset(unittest.TestCase):
                             ad.AttrDict(ground_truth_2).data)
 
         
+    def testResetToFuture(self):
+        """
+        - Load data for both days
+        - Run pipelines
+        - Verify that all is well
+        - Reset to a date between the two
+        - Verify that analysis data for the first day is unchanged
+        - Verify that analysis data for the second day does not exist
+        - Re-run pipelines
+        - Verify that all is well
+        """
+        # Load all data
+        dataFile_1 = "emission/tests/data/real_examples/shankari_2016-07-22"
+        dataFile_2 = "emission/tests/data/real_examples/shankari_2016-07-25"
+        start_ld_1 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 22})
+        start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
+        cacheKey_1 = "diary/trips-2016-07-22"
+        cacheKey_2 = "diary/trips-2016-07-25"
+        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=bju.object_hook)
+        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=bju.object_hook)
+
+        # Run both pipelines
+        etc.setupRealExample(self, dataFile_1)
+        etc.runIntakePipeline(self.testUUID)
+        self.entries = json.load(open(dataFile_2), object_hook = bju.object_hook)
+        etc.setupRealExampleWithEntries(self)
+        etc.runIntakePipeline(self.testUUID)
+
+        # Reset to a date well after the two days
+        reset_ts = arrow.get("2017-07-24").timestamp
+        epr.reset_user_to_ts(self.testUUID, reset_ts, is_dry_run=False)
+
+        # Data should be untouched because of early return
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_1, start_ld_1)
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth_1).data)
+
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_2, start_ld_2)
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth_2).data)
+
+        # Re-running the pipeline again should not affect anything
+        etc.runIntakePipeline(self.testUUID)
 
 
 if __name__ == '__main__':

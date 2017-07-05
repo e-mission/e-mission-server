@@ -72,7 +72,14 @@ def get_last_place_before(place_key, reset_ts, user_id):
                                                         'data.start_ts': {'$lt': reset_ts}
                                                        })
     if ret_place_doc is None and ret_trip_doc is None:
-        raise ValueError("No trip or place straddling time %s" % reset_ts)
+        # Check to see if the pipeline ended before this
+        last_place = get_last_place_entry(place_key, user_id)
+        if last_place is None:
+            return None
+        elif last_place.data.enter_ts < reset_ts:
+            return last_place
+        else:
+            raise ValueError("No trip or place straddling time %s" % reset_ts)
     if ret_place_doc is None:
         assert ret_trip_doc is not None
         logging.info("ret_trip_doc start = %s, end = %s" % 

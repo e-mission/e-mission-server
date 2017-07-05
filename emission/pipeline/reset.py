@@ -41,6 +41,9 @@ def reset_user_to_ts(user_id, ts, is_dry_run):
     # Find the place before the time
     last_cleaned_place = esdp.get_last_place_before(esda.CLEANED_PLACE_KEY, ts, user_id)
     logging.debug("last_cleaned_place = %s" % last_cleaned_place)
+    if last_cleaned_place is None or last_cleaned_place.data.exit_ts is None:
+        logging.info("Data collection for user %s stopped before reset time, early return" % user_id)
+        return
 
     last_raw_place_id = last_cleaned_place["data"]["raw_places"][-1]
     last_raw_place = esda.get_entry(esda.RAW_PLACE_KEY, last_raw_place_id)
