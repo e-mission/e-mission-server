@@ -28,6 +28,24 @@ def get_last_place_entry(key, user_id):
     assert('starting_trip' not in ret_place.data)
     return ret_place
 
+def get_first_place_entry(key, user_id):
+    """
+    Similar to get_last_place_entry, only finding one with only an exit_ts
+    and no enter_ts.
+    """
+    ts = esta.TimeSeries.get_time_series(user_id)
+    ret_place_doc = ts.analysis_timeseries_db.find_one({'user_id': user_id,
+                                                        'metadata.key': key,
+                                                        'data.enter_ts' : {'$exists': False}})
+    logging.debug("first place doc = %s" % ret_place_doc)
+    if ret_place_doc is None:
+        return None
+    ret_place = ecwe.Entry(ret_place_doc)
+    assert('enter_ts' not in ret_place.data)
+    assert('enter_fmt_time' not in ret_place.data)
+    assert('ending_trip' not in ret_place.data)
+    return ret_place
+
 def get_last_place_before(place_key, reset_ts, user_id):
     """
     Unlike `get_last_place_before` which returns the last place in the
@@ -65,21 +83,25 @@ def get_last_place_before(place_key, reset_ts, user_id):
                                                         'data.exit_ts' : {'$gt': reset_ts},
                                                         'data.enter_ts': {'$lt': reset_ts}
                                                        })
-    logging.debug("last place doc = %s" % ret_place_doc)
+    logging.debug("last place doc for user %s = %s" % (user_id, ret_place_doc))
     ret_trip_doc = ts.analysis_timeseries_db.find_one({'user_id': user_id,
                                                         'metadata.key': trip_key_query,
                                                         'data.end_ts' : {'$gt': reset_ts},
                                                         'data.start_ts': {'$lt': reset_ts}
                                                        })
+    logging.debug("last trip doc for user %s = %s" % (user_id, ret_trip_doc))
     if ret_place_doc is None and ret_trip_doc is None:
         # Check to see if the pipeline ended before this
         last_place = get_last_place_entry(place_key, user_id)
+        logging.debug("last_place = %s, reset_ts = %s" % 
+            (last_place, reset_ts))
         if last_place is None:
             return None
         elif last_place.data.enter_ts < reset_ts:
             return last_place
         else:
-            raise ValueError("No trip or place straddling time %s" % reset_ts)
+            raise ValueError("No trip or place straddling time %s for user %s" % 
+                (reset_ts, user_id))
     if ret_place_doc is None:
         assert ret_trip_doc is not None
         logging.info("ret_trip_doc start = %s, end = %s" % 
