@@ -45,6 +45,47 @@ def give_points_for_task(user_id, task):
                   (map_fn, task.task_id, new_state))
     save_task_state(user_id, task, new_state)
 
+def reset_all_tasks_to_ts(user_id, ts, is_dry_run):
+    # Get the tasks from habitica
+    logging.debug("Entering habitica autocheck for user %s" % user_id)
+    habitica_task_result = get_tasks_from_habitica(user_id)
+    logging.debug("Retrieved %d from habitica for user %s" % (len(habitica_task_result), user_id))
+    reset_tasks_to_ts(user_id, ts, habitica_task_result["data"], is_dry_run)
+
+def reset_tasks_to_ts(user_id, ts, habitica_tasks, is_dry_run):
+    """
+    Split this out into a separate function to make it easier to test
+    We can retrieve habitica tasks, munge them and then pass them through to this
+    :param user_id: user id
+    :param habitica_tasks: list of habitica tasks
+    :return:
+    """
+    # Filter out manual and convert auto to wrapper
+    auto_tasks = get_autocheckable(habitica_tasks)
+    logging.debug("after autocheckable filter %s -> %s" % (len(habitica_tasks),
+                                                           len(auto_tasks)))
+    for task in auto_tasks:
+        logging.debug("About to give points for user %s, task %s" % (user_id,
+                                                                     task.task_id))
+        try:
+            reset_task_to_ts(user_id, ts, is_dry_run, task)
+        except Exception as e:
+            logging.error("While processing task %s, found error %s" %
+                          (task.task_id, e))
+
+def reset_task_to_ts(user_id, ts, is_dry_run, task):
+    curr_state = get_task_state(user_id, task)
+    logging.debug("for task %s, curr_state = %s" % (task.task_id, user_id))
+    reset_fn = get_reset_fn(task.mapper)
+    # TODO: Figure out if we should pass in the args separately
+    new_state = reset_fn(user_id, ts, task, curr_state)
+    logging.debug("after running mapping function %s for task %s, new_state = %s" %
+                  (reset_fn, task.task_id, new_state))
+    if is_dry_run:
+        logging.info("is_dry_run = True, not saving the state")
+    else:
+        save_task_state(user_id, task, new_state)
+
 def get_tasks_from_habitica(user_id):
     tasks_uri = "/api/v3/tasks/user"
     # Get all tasks from the user
@@ -101,6 +142,15 @@ def get_map_fn(fn_name):
     logging.debug("module_name = %s" % module_name)
     module = importlib.import_module(module_name)
     return getattr(module, "give_points")
+
+# Function to map the name to code
+def get_reset_fn(fn_name):
+    import importlib
+
+    module_name = get_module_name(fn_name)
+    logging.debug("module_name = %s" % module_name)
+    module = importlib.import_module(module_name)
+    return getattr(module, "reset_to_ts")
 
 def get_module_name(fn_name):
     return "emission.net.ext_service.habitica.auto_tasks.{key}".format(

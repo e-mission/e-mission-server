@@ -4,6 +4,7 @@ import requests
 import logging
 import arrow
 import attrdict as ad
+import copy
 
 # Our imports
 import emission.core.get_database as edb
@@ -97,5 +98,11 @@ def give_points(user_id, task, curr_state):
     logging.debug("Returning %s" % new_state)
     return new_state
 
-
+def reset_to_ts(user_id, ts, task, curr_state):
+    new_state = copy.copy(curr_state)
+    new_state['last_timestamp'] = ts
+    # We don't know what the leftover walk/bike stuff without re-running from
+    # scratch, so let's leave it untouched. Error can be max 1 point, which is
+    # not too bad.
+    return new_state
 
