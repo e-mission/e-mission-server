@@ -104,16 +104,16 @@ class TestHabiticaAutocheck(unittest.TestCase):
   def testAutomaticRewardActiveTransportation(self):
     # Create a task that we can retrieve later
 
-    new_task_text = randomGen()
-    new_habit = {'type': "habit", 'text': new_task_text,
+    self.new_task_text = randomGen()
+    new_habit = {'type': "habit", 'text': self.new_task_text,
                  'notes': 'AUTOCHECK: {"mapper": "active_distance",'
                           '"args": {"walk_scale": 1000, "bike_scale": 3000}}'}
     habit_id = proxy.create_habit(self.testUUID, new_habit)
 
-    dummy_task = enehat.Task()
-    dummy_task.task_id = habit_id
+    self.dummy_task = enehat.Task()
+    self.dummy_task.task_id = habit_id
     logging.debug("in testAutomaticRewardActiveTransportation,"
-        "the new habit id is = %s and task is %s" % (habit_id, dummy_task))
+        "the new habit id is = %s and task is %s" % (habit_id, self.dummy_task))
 
     #Create test data -- code copied from TestTimeGrouping
     key = (2016, 5, 3)
@@ -142,26 +142,61 @@ class TestHabiticaAutocheck(unittest.TestCase):
     logging.debug("in testAutomaticRewardActiveTransportation, result = %s" % summary_ts)
     
     #Get user data before scoring
-    user_before = autocheck.get_task_state(self.testUUID, dummy_task)
+    user_before = autocheck.get_task_state(self.testUUID, self.dummy_task)
     self.assertIsNone(user_before)
 
     # Needed to work, otherwise sections from may won't show up in the query!
     modification = {"last_timestamp": arrow.Arrow(2016,5,1).timestamp, "bike_count": 0, "walk_count":0}
-    autocheck.save_task_state(self.testUUID, dummy_task, modification)
+    autocheck.save_task_state(self.testUUID, self.dummy_task, modification)
 
-    user_before = autocheck.get_task_state(self.testUUID, dummy_task)
+    user_before = autocheck.get_task_state(self.testUUID, self.dummy_task)
     self.assertEqual(int(user_before['bike_count']), 0)
 
     habits_before = proxy.habiticaProxy(self.testUUID, 'GET', "/api/v3/tasks/user?type=habits", None).json()
-    bike_pts_before = [habit['history'] for habit in habits_before['data'] if habit['text'] == new_task_text]
+    bike_pts_before = [habit['history'] for habit in habits_before['data'] if habit['text'] == self.new_task_text]
     #Score points
     autocheck.give_points_for_all_tasks(self.testUUID)
     #Get user data after scoring and check results
-    user_after = autocheck.get_task_state(self.testUUID, dummy_task)
+    user_after = autocheck.get_task_state(self.testUUID, self.dummy_task)
     self.assertEqual(int(user_after['bike_count']),1500)
     habits_after = proxy.habiticaProxy(self.testUUID, 'GET', "/api/v3/tasks/user?type=habits", None).json()
-    bike_pts_after = [habit['history'] for habit in habits_after['data'] if habit['text'] == new_task_text]
+    bike_pts_after = [habit['history'] for habit in habits_after['data'] if habit['text'] == self.new_task_text]
     self.assertTrue(len(bike_pts_after[0]) - len(bike_pts_before[0]) == 2)
+
+  def testResetActiveTransportation(self):
+    self.testAutomaticRewardActiveTransportation()
+
+    #Get user data before resetting
+    user_before = autocheck.get_task_state(self.testUUID, self.dummy_task)
+    self.assertEqual(int(user_before['bike_count']), 1500)
+
+    habits_before = proxy.habiticaProxy(self.testUUID, 'GET', "/api/v3/tasks/user?type=habits", None).json()
+    bike_pts_before = [habit['history'] for habit in habits_before['data'] if habit['text'] == self.new_task_text]
+
+    #Reset
+    reset_ts = arrow.Arrow(2016,5,3,9).timestamp
+    autocheck.reset_all_tasks_to_ts(self.testUUID, reset_ts, is_dry_run=False)
+
+    # Check timestamp 
+    user_after = autocheck.get_task_state(self.testUUID, self.dummy_task)
+    self.assertEqual(int(user_after['last_timestamp']), reset_ts)
+
+    # Re-score points
+    # This should give points for the second and third sections
+    # So I expect to see an additional distance of 2.5 + 3.5 km = 6km
+    autocheck.give_points_for_all_tasks(self.testUUID)
+
+    #Get user data after scoring and check results
+    # We already had bike_count = 1500, and this is a round number, so it
+    # should continue to be 1500
+    user_after = autocheck.get_task_state(self.testUUID, self.dummy_task)
+    self.assertEqual(int(user_after['bike_count']), 0)
+
+    # and we should have 6 points more?
+    habits_after = proxy.habiticaProxy(self.testUUID, 'GET', "/api/v3/tasks/user?type=habits", None).json()
+    bike_pts_after = [habit['history'] for habit in habits_after['data'] if habit['text'] == self.new_task_text]
+    logging.debug("bike_pts_after = %s" % (len(bike_pts_after[0]) - len(bike_pts_before[0])))
+    self.assertTrue(len(bike_pts_after[0]) - len(bike_pts_before[0]) == 3)
 
 def randomGen():
     alphabet = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
