@@ -60,7 +60,8 @@ class Entry(ecwb.WrapperBase):
             "metrics/daily_user_duration": "modestattimesummary",
             "metrics/daily_mean_duration": "modestattimesummary",
             "metrics/daily_user_median_speed": "modestattimesummary",
-            "metrics/daily_mean_median_speed": "modestattimesummary"
+            "metrics/daily_mean_median_speed": "modestattimesummary",
+            "inference/prediction": "modeprediction"
             }
 
   @staticmethod

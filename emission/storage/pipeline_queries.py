@@ -88,6 +88,21 @@ def mark_smoothing_done(user_id, last_section_done):
 def mark_smoothing_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.JUMP_SMOOTHING)
 
+def get_time_range_for_mode_inference(user_id):
+    tq = get_time_range_for_stage(user_id, ps.PipelineStages.MODE_INFERENCE)
+    tq.timeType = "data.end_ts"
+    return tq
+
+def mark_mode_inference_complete(user_id):
+    if last_section_done is None:
+        mark_stage_done(user_id, ps.PipelineStages.MODE_INFERENCE, None)
+    else:
+        mark_stage_done(user_id, ps.PipelineStages.MODE_INFERENCE,
+                        last_section_done.data.end_ts + END_FUZZ_AVOID_LTE)
+        
+def mark_mode_inference_failed(user_id):
+    mark_stage_failed(user_id, ps.PipelineStages.MODE_INFERENCE)
+
 def get_complete_ts(user_id):
     return get_current_state(user_id, ps.PipelineStages.CLEAN_RESAMPLING).last_processed_ts
 

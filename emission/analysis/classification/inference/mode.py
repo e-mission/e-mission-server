@@ -8,10 +8,17 @@ import numpy as np
 import scipy as sp
 import time
 from datetime import datetime
+import emission.storage.timeseries.abstract_timeseries as esta
+import emission.storage.decorations.analysis_timeseries_queries as esda
+import emission.core.wrapper.entry as ecwe
+import emission.storage.decorations.trip_queries as esdt
 
 # Our imports
 import emission.analysis.section_features as easf
 import emission.core.get_database as edb
+
+
+from uuid import UUID
 
 # We are not going to use the feature matrix for analysis unless we have at
 # least 50 points in the training set. 50 is arbitrary. We could also consider
@@ -28,17 +35,22 @@ class ModeInferencePipeline:
                           "start hour", "end hour", "close to bus stop", "close to train stop",
                           "close to airport"]
     self.Sections = edb.get_section_db()
-    self.PredictionDB = edb.get_prediction_db()
+    self.last_timestamp = 0
 
-  def runPipelineModelStage(self):
+  def getLastTimestamp(self):
+    return self.last_timestamp
+  def runModelBuildingStage(self, uuid=None, algorithm_id=1):
 
-    allConfirmedTripsQuery = ModeInferencePipeline.getSectionQueryWithGroundTruth({'$ne': ''})
-
-
+    #This needs to be changed to query the timeseries instead. Would we have to loop through all the users? Or can we query without a specific one?
+    if uuid == None:
+      allConfirmedTripsQuery = ModeInferencePipeline.getSectionQueryWithGroundTruth({'$ne': ''})
+    else:
+       allConfirmedTripsQuery = {'$and': [{'user_id': uuid}, ModeInferencePipeline.getSectionQueryWithGroundTruth({'$ne': ''})]}
 
     (self.modeList, self.confirmedSections) = self.loadTrainingDataStep(allConfirmedTripsQuery)
     logging.debug("confirmedSections.count() = %s" % (self.confirmedSections.count()))
-    
+  
+
     if (self.confirmedSections.count() < minTrainingSetSize):
       logging.info("initial loadTrainingDataStep DONE")
       logging.debug("current training set too small, reloading from backup!")
@@ -50,36 +62,21 @@ class ModeInferencePipeline:
     (self.featureMatrix, self.resultVector) = self.generateFeatureMatrixAndResultVectorStep()
     logging.info("generateFeatureMatrixAndResultVectorStep DONE")
     (self.cleanedFeatureMatrix, self.cleanedResultVector) = self.cleanDataStep()
-    print "Cleaned feature matrix"
-    print self.cleanedFeatureMatrix
     logging.info("cleanDataStep DONE")
     self.selFeatureIndices = self.selectFeatureIndicesStep()
     logging.info("selectFeatureIndicesStep DONE")
     self.selFeatureMatrix = self.cleanedFeatureMatrix[:,self.selFeatureIndices]
-    self.model = self.buildModelStep()
-    logging.info("buildModelStep DONE")
-    # toPredictTripsQuery = {"$and": [{'type': 'move'},
-    #                                ModeInferencePipeline.getModeQuery(''),
-     #                               {'predicted_mode': None}]]}
-    Algorithm_to_be_used_to_predict = 0
+    self.model = self.buildSpecificModelStep(algorithm_id) #This builds whichever model we pass it. Right now, we only have the default random forest.
 
-    #If we want to predict the things who haven't been predicted with the current prediction method, we can
-    #   set that here. If it is zero, that means predict everything that doesn't have a prediction already in the database
-    if Algorithm_to_be_used_to_predict:
-      IDsWithThisAlgorithm = PredictionDB.find().distinct("section_id", { 'algorithm_id': Algorithm_to_be_used_to_predict})
-      toPredictIDsQuery = {'_id': {'$nin' : IDsWithThisAlgorithm}}
 
-    else:
-      AllIDsInPredictionDB = PredictionDB.find().distinct("section_id")
-      toPredictIDsQuery = {'_id' : {'$nin': AllIDsInPredictionDB}}
+  def runModeInferenceStage(self, uuid, timerange,  model=None):
+    #uuid is a UUID, timerange is a time_query
+    if model is not None:
+      self.model = model
+    ts = esta.TimeSeries.get_time_series(uuid)
+    toPredictTrips_it = ts.find_entries(['analysis/cleaned_section'], time_query=timerange)
 
-    #toPredictTripsQuery = {"$and": [ModeInferencePipeline.getModeQuery(''), {'$or': ['predicted_mode': None}]}
-    
-    #This returns all the section ids that are not currently in the predictiondb
-    #We're going to need to either query the section database to see which section does not have a prediction in the
-    #   prediction database, or we need to grab all the ids of the predictions whose algorithm_id is zero.
-
-    (self.toPredictFeatureMatrix, self.sectionIds, self.sectionUserIds) = self.generateFeatureMatrixAndIDsStep(toPredictTripsQuery)
+    (self.toPredictFeatureMatrix, self.sectionIds, self.sectionUserIds) = self.generateFeatureMatrixAndIDsStep(toPredictTrips_it)
     logging.info("generateFeatureMatrixAndIDsStep DONE")
     self.predictedProb = self.predictModesStep()
     #This is a matrix of the entries and their corresponding probabilities for each classification
@@ -88,12 +85,9 @@ class ModeInferencePipeline:
     self.savePredictionsStep()
     logging.info("savePredictionsStep DONE")
 
+  def runPipelineModelStage(self, uuid, timerange):
 
-  def runPipeline(self):
     allConfirmedTripsQuery = ModeInferencePipeline.getSectionQueryWithGroundTruth({'$ne': ''})
-    print "\n\nConfirmed Trips Query\n\n"
-    print allConfirmedTripsQuery
-
 
     (self.modeList, self.confirmedSections) = self.loadTrainingDataStep(allConfirmedTripsQuery)
     logging.debug("confirmedSections.count() = %s" % (self.confirmedSections.count()))
@@ -109,8 +103,49 @@ class ModeInferencePipeline:
     (self.featureMatrix, self.resultVector) = self.generateFeatureMatrixAndResultVectorStep()
     logging.info("generateFeatureMatrixAndResultVectorStep DONE")
     (self.cleanedFeatureMatrix, self.cleanedResultVector) = self.cleanDataStep()
-    print "Cleaned feature matrix"
-    print self.cleanedFeatureMatrix
+   
+    logging.info("cleanDataStep DONE")
+    self.selFeatureIndices = self.selectFeatureIndicesStep()
+    logging.info("selectFeatureIndicesStep DONE")
+    self.selFeatureMatrix = self.cleanedFeatureMatrix[:,self.selFeatureIndices]
+    self.model = self.buildModelStep()
+    logging.info("buildModelStep DONE")
+
+    ts = esta.TimeSeries.get_time_series(user_id)
+    toPredictTrips_it = ts.find_entries(['analysis/cleaned_section'], time_query=timerange)
+
+    (self.toPredictFeatureMatrix, self.sectionIds, self.sectionUserIds) = self.generateFeatureMatrixAndIDsStep(toPredictTrips_it)
+    logging.info("generateFeatureMatrixAndIDsStep DONE")
+    self.predictedProb = self.predictModesStep()
+    #This is a matrix of the entries and their corresponding probabilities for each classification
+
+    logging.info("predictModesStep DONE")
+    self.savePredictionsStep()
+    logging.info("savePredictionsStep DONE")
+
+  def getModel(self):
+
+    return self.model
+
+
+  def runPipeline(self):
+    allConfirmedTripsQuery = ModeInferencePipeline.getSectionQueryWithGroundTruth({'$ne': ''})
+    
+    (self.modeList, self.confirmedSections) = self.loadTrainingDataStep(allConfirmedTripsQuery)
+    logging.debug("confirmedSections.count() = %s" % (self.confirmedSections.count()))
+    
+    if (self.confirmedSections.count() < minTrainingSetSize):
+      logging.info("initial loadTrainingDataStep DONE")
+      logging.debug("current training set too small, reloading from backup!")
+      backupSections = MongoClient('localhost').Backup_database.Stage_Sections
+      (self.modeList, self.confirmedSections) = self.loadTrainingDataStep(allConfirmedTripsQuery, backupSections)
+    logging.info("loadTrainingDataStep DONE")
+    (self.bus_cluster, self.train_cluster) = self.generateBusAndTrainStopStep() 
+    logging.info("generateBusAndTrainStopStep DONE")
+    (self.featureMatrix, self.resultVector) = self.generateFeatureMatrixAndResultVectorStep()
+    logging.info("generateFeatureMatrixAndResultVectorStep DONE")
+    (self.cleanedFeatureMatrix, self.cleanedResultVector) = self.cleanDataStep()
+ 
     logging.info("cleanDataStep DONE")
     self.selFeatureIndices = self.selectFeatureIndicesStep()
     logging.info("selectFeatureIndicesStep DONE")
@@ -123,11 +158,7 @@ class ModeInferencePipeline:
     
     toPredictTripsQuery = {"$and": [ModeInferencePipeline.getModeQuery(''), {'predicted_mode': None}]}
     #We're going to need to either query the section database to see which section does not have a prediction in the
-    #   prediction database, or we need to grab all the ids of the predictions whose algorithm_id is zero.
-
-    #    toPredictTripsQuery = {"$and": [ModeInferencePipeline.getModeQuery(''), {'predicted_mode': None}]}
-
-
+    #   prediction database, or we need to grab all the ids of the predictions whose algorithm_id is zero
 
     (self.toPredictFeatureMatrix, self.sectionIds, self.sectionUserIds) = self.generateFeatureMatrixAndIDsStep(toPredictTripsQuery)
     logging.info("generateFeatureMatrixAndIDsStep DONE")
@@ -152,13 +183,11 @@ class ModeInferencePipeline:
   @staticmethod
   def getSectionQueryWithGroundTruth(groundTruthMode):
     # return {"$and": [{'type': 'move'},
-    return {"$and": [{"$or": [{'type': { '$exists' : False }}, {'type' : 'move'}]},        
-                     ModeInferencePipeline.getModeQuery(groundTruthMode)]}
+    return {ModeInferencePipeline.getModeQuery(groundTruthMode)}
 
   @staticmethod
   def getSectionQueryWithGroundTruthUser(groundTruthMode, uuid):
-     return {"$and": [{"$or": [{'type': { '$exists' : False }}, {'type' : 'move'}]},        
-                     ModeInferencePipeline.getModeQuery(groundTruthMode)]}
+     return {ModeInferencePipeline.getModeQuery(groundTruthMode)}
 
   # TODO: Refactor into generic steps and results
   def loadTrainingDataStep(self, sectionQuery, sectionDb = None):
@@ -200,7 +229,7 @@ class ModeInferencePipeline:
         sectionDb.find(ModeInferencePipeline.getSectionQueryWithGroundTruth(mode['mode_id']))))
     duration = time.time() - begin
     logging.debug("Getting section query with ground truth took %s" % (duration))
-    #print list(confirmedSections)
+ 
 
     duration = time.time() - begin
     return (modeList, confirmedSections)
@@ -228,33 +257,31 @@ class ModeInferencePipeline:
 
       # This will crash the script because we will try to access a record that
       # doesn't exist.
-      # print "COUNT: " 
-      # print self.confirmedSections.count()
+
       # So we limit the records to the size of the matrix that we have created
       for (i, section) in enumerate(self.confirmedSections.limit(featureMatrix.shape[0]).batch_size(300)):
-       # try:
-        self.updateFeatureMatrixRowWithSection(featureMatrix, i, section)
-        resultVector[i] = self.getGroundTruthMode(section)
-        # print "SECTION"
-        # print section
+        try:
+          self.updateFeatureMatrixRowWithSection(featureMatrix, i, section)
+          resultVector[i] = self.getGroundTruthMode(section)
+    
 
-        if i % 100 == 0:
+          if i % 100 == 0:
             logging.debug("Processing record %s " % i)
-      # except Exception, e:
-      #     print "skipping section %s due to error %s " % (section, e)
-      #     logging.debug("skipping section %s due to error %s " % (section, e))
-      # print "GENERATE"
-      # print featureMatrix
-      # print resultVector
+        except Exception, e:
+          logging.debug("skipping section %s due to error %s " % (section, e))
+     
+    
       return (featureMatrix, resultVector)
 
   def getGroundTruthMode(self, section):
       # logging.debug("getting ground truth for section %s" % section)
       if 'corrected_mode' in section:
-          # logging.debug("Returning corrected mode %s" % section['corrected_mode'])
+         
+          logging.debug("Returning corrected mode %s" % section['corrected_mode'])
           return section['corrected_mode']
       else:
-          # logging.debug("Returning confirmed mode %s" % section['confirmed_mode'])
+     
+          logging.debug("Returning confirmed mode %s" % section['confirmed_mode'])
           return section['confirmed_mode']
 
 # Features are:
@@ -280,44 +307,37 @@ class ModeInferencePipeline:
 # 19. both start and end close to bus stop
 # 20. both start and end close to train station
 # 21. both start and end close to airport
-  def updateFeatureMatrixRowWithSection(self, featureMatrix, i, section):
-    if 'distance' in section.keys():
-      featureMatrix[i,0] = section['distance']
-    else:
-      featureMatrix[i, 0] = easf.calDistance(section['start_loc']['coordinates'], section['end_loc']['coordinates'])  #####would need to calculate this
-    # print "HERE\n\n"
-    # print section.keys()
-    # print "\n\n"
-    featureMatrix[i, 1] = (section['end_ts'] - section['start_ts'])
-
+  def updateFeatureMatrixRowWithSection(self, featureMatrix, i, section): 
+    
+    featureMatrix[i,0] = section.distance
+    featureMatrix[i, 1] = section.duration
+  
     # Deal with unknown modes like "airplane"
-    try:
-      featureMatrix[i, 2] = section['sensed_mode']
+    try: featureMatrix[i, 2] = section['sensed_mode']
     except ValueError:
       featureMatrix[i, 2] = 0
 
-    featureMatrix[i, 3] = section['section_id']   ####
-    #featureMatrix[i, 4] = easf.calAvgSpeed(section)
-    #AAAspeeds = easf.calSpeeds(section)
-    speeds = easf.calSpeed(section)
-    #print speeds
-    if speeds != None: #and len(speeds) > 0:
+    #featureMatrix[i, 3] = section['_id']   ####
+    featureMatrix[i, 4] = easf.calAvgSpeed(section)
+    speeds = easf.calSpeeds(section)
+ 
+    if speeds != None and len(speeds) > 0:
         featureMatrix[i, 5] = np.mean(speeds)
         featureMatrix[i, 6] = np.std(speeds)
         featureMatrix[i, 7] = np.max(speeds)
     else:
         # They will remain zero
         pass
-    # accels = easf.calAccels(section)
-    # if accels != None and len(accels) > 0:
-    #     featureMatrix[i, 8] = np.max(accels)
-    # else:
-    #     # They will remain zero
-    #     pass
+    accels = easf.calAccels(section)
+    if accels != None and len(accels) > 0:
+      featureMatrix[i, 8] = np.max(accels)
+    else:
+        # They will remain zero
+        pass
     featureMatrix[i, 9] = ('commute' in section) and (section['commute'] == 'to' or section['commute'] == 'from')
-    # featureMatrix[i, 10] = easf.calHCR(section)
-    # featureMatrix[i, 11] = easf.calSR(section)
-    # featureMatrix[i, 12] = easf.calVCR(section)
+    featureMatrix[i, 10] = easf.calHCR(section)
+    featureMatrix[i, 11] = easf.calSR(section)
+    featureMatrix[i, 12] = easf.calVCR(section)
     if 'start_loc' in section and section['end_loc'] != None:
         startCoords = section['start_loc']['coordinates']
         featureMatrix[i, 13] = startCoords[0]
@@ -338,12 +358,13 @@ class ModeInferencePipeline:
     if (hasattr(self, "air_cluster")): 
         featureMatrix[i, 21] = easf.mode_start_end_coverage(section, self.air_cluster,600)
 
+    if self.last_timestamp < section.data.end_ts:
+      self.last_timestamp = section.data.end_ts
     # Replace NaN and inf by zeros so that it doesn't crash later
     featureMatrix[i] = np.nan_to_num(featureMatrix[i])
 
   def cleanDataStep(self):
-    # print "Result Vector"
-    # print self.resultVector
+ 
     runIndices = self.resultVector == 2
     transportIndices = self.resultVector == 4
     mixedIndices = self.resultVector == 8
@@ -355,21 +376,15 @@ class ModeInferencePipeline:
       np.count_nonzero(mixedIndices), np.count_nonzero(unknownIndices),
       np.count_nonzero(strippedIndices)))
 
-    # print "Feature Matrix:"
-    # print self.featureMatrix
     strippedFeatureMatrix = self.featureMatrix[strippedIndices]
     strippedResultVector = self.resultVector[strippedIndices]
 
-    # print strippedIndices
-    # print "stripped:"
-    # print strippedFeatureMatrix
+    
     # In spite of stripping out the values, we see that there are clear
     # outliers. This is almost certainly a mis-classified trip, because the
     # distance and speed are both really large, but the mode is walking. Let's
     # manually filter out this outlier.
-    print "FEATURE MATRIX"
-    print strippedFeatureMatrix
-
+ 
     distanceOutliers = strippedFeatureMatrix[:,0] > 500000
     speedOutliers = strippedFeatureMatrix[:,4] > 100
     speedMeanOutliers = strippedFeatureMatrix[:,5] > 80
@@ -381,8 +396,7 @@ class ModeInferencePipeline:
             np.nonzero(maxSpeedOutliers)))
     nonOutlierIndices = np.logical_not(distanceOutliers | speedOutliers | speedMeanOutliers | speedVarianceOutliers | maxSpeedOutliers)
     logging.debug("nonOutlierIndices.shape = %s" % nonOutlierIndices.shape)
-    print "nonOutlierIndices"
-    print nonOutlierIndices
+
     return (strippedFeatureMatrix[nonOutlierIndices],
             strippedResultVector[nonOutlierIndices])
 
@@ -414,11 +428,15 @@ class ModeInferencePipeline:
     return model
 
   def generateFeatureMatrixAndIDsStep(self, sectionQuery):
-    toPredictSections = self.Sections.find(sectionQuery)
-    print "TO PREDICT"
-    print toPredictSections.distinct("_id")
-    logging.debug("Predicting values for %d sections" % toPredictSections.count())
-    featureMatrix = np.zeros([toPredictSections.count(), len(self.featureLabels)])
+    if isinstance(sectionQuery, basestring):
+      toPredictSections = self.Sections.find(sectionQuery)
+      numsections = toPredictSections.count()
+    else:
+      toPredictSections = list(sectionQuery)
+      numsections = len(toPredictSections)
+
+    logging.debug("Predicting values for %d sections" % numsections)
+    featureMatrix = np.zeros([numsections, len(self.featureLabels)])
     sectionIds = []
     sectionUserIds = []
     for (i, section) in enumerate(toPredictSections.limit(featureMatrix.shape[0]).batch_size(300)):
@@ -427,10 +445,7 @@ class ModeInferencePipeline:
       self.updateFeatureMatrixRowWithSection(featureMatrix, i, section)
       sectionIds.append(section['_id'])
       sectionUserIds.append(section['user_id'])
-    # print "Hey now\n\n\n"
-    # print featureMatrix
-    print self.selFeatureIndices
-    print featureMatrix[:,self.selFeatureIndices]
+
     return (featureMatrix[:,self.selFeatureIndices], sectionIds, sectionUserIds)
 
   def predictModesStep(self):

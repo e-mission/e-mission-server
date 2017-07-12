@@ -1,0 +1,477 @@
+
+[
+{ "data" : 
+{"group": 4, 
+"end_fmt_time": "20140401T100549-0700",
+"end_local_dt":
+{
+  "hour": 10,
+  "minute": 5,
+  "second": 49,
+  "weekday": 1,
+  "year": 2014, 
+  "month": 4,
+  "day": 1,
+  "timezone": "America/Los_Angeles"
+},
+"end_ts": 1396371949,    
+"section_id": 0, 
+"source": "Shankari", 
+"sensed_mode": 4, 
+"distance": 2162.668467546699,
+"user_id": "fest@example.com", 
+"start_fmt_time": "20140401T095738-0700",
+"start_local_dt":
+{
+  "hour": 9,
+  "minute": 57,
+  "second": 38,
+  "weekday": 1,
+  "year": 2014, 
+  "month": 4,
+  "day": 1,
+  "timezone": "America/Los_Angeles"
+},
+"start_ts": 1396371458, 
+"start_stop": null,
+"end_stop": "nest@example.com_20140401T100549-0700",
+"start_loc": {
+                "type": "Point", 
+                "coordinates": [0, 0]
+            },
+"end_loc":   {
+                "type": "Point", 
+                "coordinates": [0, 0]
+
+            }, 
+"duration": 491,
+"_id": "fest@example.com_20140401T095738-0700", 
+"trip_id": "20140401T095738-0700", 
+"confirmed_mode": 5}, "metadata" : { "write_fmt_time": "2017-06-29T20:23:01.107991-07:00", "write_ts": 1498792981.107991, "time_zone": "America/Los_Angeles", "platform": "server", "write_local_dt": {"hour": 20, "month": 6, "second": 1, "weekday": 3, "year": 2017, "timezone": "America/Los_Angeles", "day": 29, "minute": 23}, "key": "segmentation/cleaned_section"}}, 
+{"data": {"group": 1, 
+"end_fmt_time": "20140401T101918-0700",
+"end_local_dt":
+{
+  "hour": 10,
+  "minute": 19,
+  "second": 18,
+  "weekday": 1,
+  "year": 2014, 
+  "month": 4,
+  "day": 1,
+  "timezone": "America/Los_Angeles"
+},
+
+"end_ts": 1396372758,    
+"section_id": 1, 
+"source": "Shankari", 
+"sensed_mode": 1,
+"distance": 1057.2524056424411,
+"user_id": "fest@example.com", 
+"start_fmt_time": "20140401T100549-0700",
+"start_local_dt":
+{
+  "hour": 10,
+  "minute": 5,
+  "second": 49,
+  "weekday": 1,
+  "year": 2014, 
+  "month": 4,
+  "day": 1,
+  "timezone": "America/Los_Angeles"
+},
+
+"start_ts": 1396371949, 
+"start_stop": "fest@example.com_20140401T095738-0700",
+"end_stop": null,
+"start_loc":  {
+                "type": "Point", 
+                "coordinates": [0, 0]
+            },
+"end_loc": {
+                "type": "Point", 
+                "coordinates": [0,0]
+                
+            },
+"duration": 809,
+"_id": "fest@example.com_20140401T100549-0700", 
+"trip_id": "20140401T095738-0700", 
+"confirmed_mode": 1}, "metadata" : { "write_fmt_time": "2017-06-29T20:23:01.107991-07:00", "write_ts": 1498792981.107991, "time_zone": "America/Los_Angeles", "platform": "server", "write_local_dt": {"hour": 20, "month": 6, "second": 1, "weekday": 3, "year": 2017, "timezone": "America/Los_Angeles", "day": 29, "minute": 23}, "key": "segmentation/cleaned_section"}},
+{"data": {"group": 4, 
+"end_fmt_time": "20140401T100549-0700",
+"end_local_dt":
+{
+  "hour": 10,
+  "minute": 5,
+  "second": 49,
+  "weekday": 1,
+  "year": 2014, 
+  "month": 4,
+  "day": 1,
+  "timezone": "America/Los_Angeles"
+},
+
+"end_ts": 1396371949,    
+"section_id": 0, 
+"source": "Shankari", 
+"sensed_mode": 4, 
+"distance": 2162.668467546699,
+"user_id": "rest@example.com", 
+"start_fmt_time": "20140401T095738-0700",
+"start_local_dt":
+{
+  "hour": 9,
+  "minute": 57,
+  "second": 38,
+  "weekday": 1,
+  "year": 2014, 
+  "month": 4,
+  "day": 1,
+  "timezone": "America/Los_Angeles"
+},
+"start_ts": 1396371458 , 
+"start_stop": null,
+"end_stop": "nest@example.com_20140401T100549-0700",
+"start_loc": {
+                "type": "Point", 
+                "coordinates": [0, 0]
+            },
+"end_loc":   {
+                "type": "Point", 
+                "coordinates": [0, 0]
+            }, 
+"duration": 491,
+"_id": "rest@example.com_20140401T095738-0700", 
+"trip_id": "20140401T095738-0700", 
+"confirmed_mode": 5}, "metadata" : { "write_fmt_time": "2017-06-29T20:23:01.107991-07:00", "write_ts": 1498792981.107991, "time_zone": "America/Los_Angeles", "platform": "server", "write_local_dt": {"hour": 20, "month": 6, "second": 1, "weekday": 3, "year": 2017, "timezone": "America/Los_Angeles", "day": 29, "minute": 23}, "key": "segmentation/cleaned_section"}}, 
+{"data": {"group": 1, 
+"end_fmt_time": "20140401T101918-0700",
+"end_local_dt":
+{
+  "hour": 10,
+  "minute": 19,
+  "second": 18,
+  "weekday": 1,
+  "year": 2014, 
+  "month": 4,
+  "day": 1,
+  "timezone": "America/Los_Angeles"
+},
+"end_ts": 1396372758,    
+"section_id": 1, 
+"source": "Shankari", 
+"sensed_mode": 1, 
+"distance": 1057.2524056424411,
+"user_id": "rest@example.com", 
+"start_fmt_time": "20140401T100549-0700",
+"start_local_dt":
+{
+  "hour": 10,
+  "minute": 5,
+  "second": 49,
+  "weekday": 1,
+  "year": 2014, 
+  "month": 4,
+  "day": 1,
+  "timezone": "America/Los_Angeles"
+},
+"start_ts": 1396371949, 
+"start_stop": "fest@example.com_20140401T095738-0700",
+"end_stop": null,
+"start_loc":  {
+                "type": "Point", 
+                "coordinates": [0, 0]
+            }, 
+"end_loc": {
+                "type": "Point", 
+                "coordinates": [0, 0]
+            }, 
+"duration": 809,
+"_id": "rest@example.com_20140401T100549-0700", 
+"trip_id": "20140401T095738-0700", 
+"confirmed_mode": 1}, "metadata" : { "write_fmt_time": "2017-06-29T20:23:01.107991-07:00", "write_ts": 1498792981.107991, "time_zone": "America/Los_Angeles", "platform": "server", "write_local_dt": {"hour": 20, "month": 6, "second": 1, "weekday": 3, "year": 2017, "timezone": "America/Los_Angeles", "day": 29, "minute": 23}, "key": "segmentation/cleaned_section"}}, 
+{"data": {"group": 4, 
+"end_fmt_time": "20140401T100549-0700",
+"end_local_dt":
+{
+  "hour": 10,
+  "minute": 5,
+  "second": 49,
+  "weekday": 1,
+  "year": 2014, 
+  "month": 4,
+  "day": 1,
+  "timezone": "America/Los_Angeles"
+},
+"end_ts": 1396371949,    
+"section_id": 0, 
+"source": "Shankari", 
+"sensed_mode": 4, 
+"distance": 2162.668467546699,
+"user_id": "nest@example.com", 
+"start_fmt_time": "20140401T095738-0700",
+"start_local_dt":
+{
+  "hour": 9,
+  "minute": 57,
+  "second": 38,
+  "weekday": 1,
+  "year": 2014, 
+  "month": 4,
+  "day": 1,
+  "timezone": "America/Los_Angeles"
+},
+"start_ts": 1396371458 , 
+"start_stop": null,
+"end_stop": "nest@example.com_20140401T100549-0700",
+"start_loc": {
+                "type": "Point", 
+                "coordinates": [0, 0]
+            },
+"end_loc":   {
+                "type": "Point", 
+                "coordinates": [0, 0]
+            }, 
+"duration": 491,
+"_id": "nest@example.com_20140401T095738-0700", 
+"trip_id": "20140401T095738-0700", 
+"confirmed_mode": 5}, "metadata" : { "write_fmt_time": "2017-06-29T20:23:01.107991-07:00", "write_ts": 1498792981.107991, "time_zone": "America/Los_Angeles", "platform": "server", "write_local_dt": {"hour": 20, "month": 6, "second": 1, "weekday": 3, "year": 2017, "timezone": "America/Los_Angeles", "day": 29, "minute": 23}, "key": "segmentation/cleaned_section"}}, 
+{"data": {"group": 1, 
+"end_fmt_time": "20140401T101918-0700",
+"end_local_dt":
+{
+  "hour": 10,
+  "minute": 19,
+  "second": 18,
+  "weekday": 1,
+  "year": 2014, 
+  "month": 4,
+  "day": 1,
+  "timezone": "America/Los_Angeles"
+},
+"end_ts": 1396372758,    
+"section_id": 1, 
+"source": "Shankari", 
+"sensed_mode": 1, 
+"distance": 1057.2524056424411,
+"user_id": "nest@example.com", 
+"start_fmt_time": "20140401T100549-0700",
+"start_local_dt":
+{
+  "hour": 10,
+  "minute": 5,
+  "second": 49,
+  "weekday": 1,
+  "year": 2014, 
+  "month": 4,
+  "day": 1,
+  "timezone": "America/Los_Angeles"
+},
+"start_ts": 1396371949 , 
+"start_stop": "fest@example.com_20140401T095738-0700",
+"end_stop": null,
+"start_loc": {
+                "type": "Point", 
+                "coordinates": [0, 0]
+            }, 
+"end_loc": {
+                "type": "Point", 
+                "coordinates": [0, 0]
+            }, 
+"duration": 809,
+"_id": "nest@example.com_20140401T100549-0700", 
+"trip_id": "20140401T095738-0700", 
+"confirmed_mode": 1}, "metadata" : { "write_fmt_time": "2017-06-29T20:23:01.107991-07:00", "write_ts": 1498792981.107991, "time_zone": "America/Los_Angeles", "platform": "server", "write_local_dt": {"hour": 20, "month": 6, "second": 1, "weekday": 3, "year": 2017, "timezone": "America/Los_Angeles", "day": 29, "minute": 23}, "key": "segmentation/cleaned_section"}},
+{"data" : {"group": 4, 
+"end_fmt_time": "20140401T100549-0700",
+"end_local_dt":
+{
+  "hour": 10,
+  "minute": 5,
+  "second": 49,
+  "weekday": 1,
+  "year": 2014, 
+  "month": 4,
+  "day": 1,
+  "timezone": "America/Los_Angeles"
+},
+
+"end_ts": 1396371949,    
+"section_id": 0, 
+"source": "Shankari", 
+"sensed_mode": 4, 
+"distance": 2162.668467546699,
+"user_id": "test@example.com", 
+"start_fmt_time": "20140401T095738-0700",
+"start_local_dt":
+{
+  "hour": 9,
+  "minute": 57,
+  "second": 38,
+  "weekday": 1,
+  "year": 2014, 
+  "month": 4,
+  "day": 1,
+  "timezone": "America/Los_Angeles"
+},
+
+"start_ts": 1396371458 , 
+"start_stop": null,
+"end_stop": "nest@example.com_20140401T100549-0700",
+"start_loc": {
+                "type": "Point", 
+                "coordinates": [0, 0]
+            },
+"end_loc":   {
+                "type": "Point", 
+                "coordinates": [0, 0]
+            }, 
+"duration": 491,
+"_id": "test@example.com_20140401T095738-0700", 
+"trip_id": "20140401T095738-0700", 
+"confirmed_mode": 5}, "metadata" : { "write_fmt_time": "2017-06-29T20:23:01.107991-07:00", "write_ts": 1498792981.107991, "time_zone": "America/Los_Angeles", "platform": "server", "write_local_dt": {"hour": 20, "month": 6, "second": 1, "weekday": 3, "year": 2017, "timezone": "America/Los_Angeles", "day": 29, "minute": 23}, "key": "segmentation/cleaned_section"}}, 
+{"data": {"group": 1, 
+"end_fmt_time": "20140401T101918-0700",
+"end_local_dt":
+{
+  "hour": 10,
+  "minute": 19,
+  "second": 18,
+  "weekday": 1,
+  "year": 2014, 
+  "month": 4,
+  "day": 1,
+  "timezone": "America/Los_Angeles"
+},
+
+"end_ts": 1396372758,    
+"section_id": 1, 
+"source": "Shankari", 
+"sensed_mode": 1, 
+"distance": 1057.2524056424411,
+"user_id": "test@example.com", 
+"start_fmt_time": "20140401T100549-0700",
+"start_local_dt":
+{
+  "hour": 10,
+  "minute": 5,
+  "second": 49,
+  "weekday": 1,
+  "year": 2014, 
+  "month": 4,
+  "day": 1,
+  "timezone": "America/Los_Angeles"
+},
+
+"start_ts": 1396371949, 
+"start_stop": "fest@example.com_20140401T095738-0700",
+"end_stop": null,
+"start_loc":  {
+                "type": "Point", 
+                "coordinates": [0, 0]
+            }, 
+"end_loc": {
+                "type": "Point", 
+                "coordinates": [0, 0]
+            }, 
+"duration": 809,
+"_id": "test@example.com_20140401T100549-0700", 
+"trip_id": "20140401T095738-0700", 
+"confirmed_mode": 1}, "metadata" : { "write_fmt_time": "2017-06-29T20:23:01.107991-07:00", "write_ts": 1498792981.107991, "time_zone": "America/Los_Angeles", "platform": "server", "write_local_dt": {"hour": 20, "month": 6, "second": 1, "weekday": 3, "year": 2017, "timezone": "America/Los_Angeles", "day": 29, "minute": 23}, "key": "segmentation/cleaned_section"}}, 
+{"data": {"group": 4, 
+"end_fmt_time": "20140401T100549-0700",
+"end_local_dt":
+{
+  "hour": 10,
+  "minute": 5,
+  "second": 49,
+  "weekday": 1,
+  "year": 2014, 
+  "month": 4,
+  "day": 1,
+  "timezone": "America/Los_Angeles"
+},
+
+"end_ts": 1396371949,    
+"section_id": 0, 
+"source": "Shankari", 
+"sensed_mode": 4, 
+"distance": 2162.668467546699,
+"user_id": "best@example.com", 
+"start_fmt_time": "20140401T095738-0700",
+"start_local_dt":
+{
+  "hour": 9,
+  "minute": 57,
+  "second": 38,
+  "weekday": 1,
+  "year": 2014, 
+  "month": 4,
+  "day": 1,
+  "timezone": "America/Los_Angeles"
+},
+
+"start_ts": 1396371458 , 
+"start_stop": null,
+"end_stop": "nest@example.com_20140401T100549-0700",
+"start_loc": {
+                "type": "Point", 
+                "coordinates": [0, 0]          
+                  },
+"end_loc":   {
+                "type": "Point", 
+                "coordinates": [0, 0]
+            }, 
+"duration": 491,
+"_id": "best@example.com_20140401T095738-0700", 
+"trip_id": "20140401T095738-0700", 
+"confirmed_mode": 4,
+"corrected_mode": 5}, "metadata" : { "write_fmt_time": "2017-06-29T20:23:01.107991-07:00", "write_ts": 1498792981.107991, "time_zone": "America/Los_Angeles", "platform": "server", "write_local_dt": {"hour": 20, "month": 6, "second": 1, "weekday": 3, "year": 2017, "timezone": "America/Los_Angeles", "day": 29, "minute": 23}, "key": "segmentation/cleaned_section"}}, 
+{"data" : {"group": 1, 
+"end_fmt_time": "20140401T101918-0700",
+"end_local_dt":
+{
+  "hour": 10,
+  "minute": 19,
+  "second": 18,
+  "weekday": 1,
+  "year": 2014, 
+  "month": 4,
+  "day": 1,
+  "timezone": "America/Los_Angeles"
+},
+
+"end_ts": 1396372758,    
+"section_id": 1, 
+"source": "Shankari", 
+"sensed_mode": 1, 
+"distance": 1057.2524056424411,
+"user_id": "best@example.com", 
+"start_fmt_time": "20140401T100549-0700",
+"start_local_dt":
+{
+  "hour": 10,
+  "minute": 5,
+  "second": 49,
+  "weekday": 1,
+  "year": 2014, 
+  "month": 4,
+  "day": 1,
+  "timezone": "America/Los_Angeles"
+},
+
+"start_ts": 1396371949, 
+"start_stop": "fest@example.com_20140401T095738-0700",
+"end_stop": null,
+"start_loc": {
+                "type": "Point", 
+                "coordinates": [0, 0]
+            }, 
+"end_loc": {
+                "type": "Point", 
+                "coordinates": [0, 0]
+            }, 
+"duration": 809,
+"_id": "best@example.com_20140401T100549-0700", 
+"trip_id": "20140401T095738-0700", 
+"confirmed_mode": 1}, "metadata" : { "write_fmt_time": "2017-06-29T20:23:01.107991-07:00", "write_ts": 1498792981.107991, "time_zone": "America/Los_Angeles", "platform": "server", "write_local_dt": {"hour": 20, "month": 6, "second": 1, "weekday": 3, "year": 2017, "timezone": "America/Los_Angeles", "day": 29, "minute": 23}, "key": "segmentation/cleaned_section"}}]

@@ -9,17 +9,36 @@ from sklearn.cluster import DBSCAN
 from emission.core.get_database import get_section_db, get_mode_db, get_routeCluster_db,get_transit_db
 from emission.core.common import calDistance, Include_place_2
 from emission.analysis.modelling.tour_model.trajectory_matching.route_matching import getRoute,fullMatchDistance,matchTransitRoutes,matchTransitStops
+import emission.storage.timeseries.abstract_timeseries as esta
+import emission.storage.decorations.analysis_timeseries_queries as esda
+import emission.core.wrapper.entry as ecwe
+import emission.storage.decorations.trip_queries as esdt
+
+from uuid import UUID 
 
 Sections = get_section_db()
 Modes = get_mode_db()
 
 
 # The speed is in m/s
-def calSpeed(trackpoint1, trackpoint2):
+def calSegmentSpeed(section):
   from dateutil import parser
-  distanceDelta = calDistance(trackpoint1['track_location']['coordinates'],
-                              trackpoint2['track_location']['coordinates'])
-  timeDelta = parser.parse(trackpoint2['time']) - parser.parse(trackpoint1['time'])
+
+  distanceDelta = section.distance
+
+  timeDelta = section.duration
+  # logging.debug("while calculating speed form %s -> %s, distanceDelta = %s, timeDelta = %s" %
+  #               (trackpoint1, trackpoint2, distanceDelta, timeDelta))
+  if timeDelta != 0:
+    return distanceDelta / timeDelta
+  else:
+    return None
+
+def calSpeed(point1, point2):
+  from dateutil import parser
+  distanceDelta = calDistance(point1['data']['loc']['coordinates'],
+                              point2['data']['loc']['coordinates'])
+  timeDelta = point2['data']['ts'] - point1['data']['ts']
   # logging.debug("while calculating speed form %s -> %s, distanceDelta = %s, timeDelta = %s" %
   #               (trackpoint1, trackpoint2, distanceDelta, timeDelta))
   if timeDelta.total_seconds() != 0:
@@ -48,20 +67,26 @@ def calHC(point1, point2, point3):
 	return HC
 
 def calHCR(segment):
-    trackpoints = segment['track_points']
-    if len(trackpoints) < 3:
+    try:
+        ts = esta.TimeSeries.get_time_series(segment.user_id)
+        locations = list(ts.find_entries(['background/filtered_location'], time_query=None))
+    except:
+        return 0
+  
+    if not locations:
 		return 0
     else:
         HCNum = 0
-        for (i, point) in enumerate(trackpoints[:-2]):
+        for (i, point) in locations:
             currPoint = point
-            nextPoint = trackpoints[i+1]
-            nexNextPt = trackpoints[i+2]
-            HC = calHC(currPoint['track_location']['coordinates'], nextPoint['track_location']['coordinates'], \
-                       nexNextPt['track_location']['coordinates'])
+            nextPoint = locations[i+1]
+            nexNextPt = locations[i+2]
+            
+            HC = calHC(currPoint['data']['loc']['coordinates'], nextPoint['data']['loc']['coordinates'], \
+                       nexNextPt['data']['loc']['coordinates'])
             if HC >= 15:
                 HCNum += 1
-        segmentDist = segment['distance']
+        segmentDist = segment.distance
         if segmentDist!= None and segmentDist != 0:
             HCR = HCNum/segmentDist
             return HCR
@@ -70,35 +95,90 @@ def calHCR(segment):
 
 
 def calSR(segment):
-    trackpoints = segment['track_points']
-    if len(trackpoints) < 2:
+    if 'speeds' not in segment:
+        return 0
+    speeds = segment.speeds
+    if len(speeds) < 2:
 		return 0
     else:
         stopNum = 0
-        for (i, point) in enumerate(trackpoints[:-1]):
-            currPoint = point
-            nextPoint = trackpoints[i+1]
-
-            currVelocity = calSpeed(currPoint, nextPoint)
+        for (i, speed) in enumerate(speeds[:-1]):
+            currVelocity = speed
             if currVelocity != None and currVelocity <= 0.75:
                 stopNum += 1
 
-        segmentDist = segment['distance']
+        segmentDist = segment.distance
         if segmentDist != None and segmentDist != 0:
             return stopNum/segmentDist
         else:
             return 0
 
+# def calSR(segment):
+#     #trackpoints = segment['track_points']
+#     if len(trackpoints) < 2:
+#         return 0
+#     else:
+#         stopNum = 0
+#         for (i, point) in enumerate(trackpoints[:-1]):
+#             currPoint = point
+#             nextPoint = trackpoints[i+1]
+
+#             currVelocity = calSpeed(currPoint, nextPoint)
+#             if currVelocity != None and currVelocity <= 0.75:
+#                 stopNum += 1
+
+#         segmentDist = segment['distance']
+#         if segmentDist != None and segmentDist != 0:
+#             return stopNum/segmentDist
+#         else:
+#             return 0
+
+# def calVCR(segment):
+#     if 'speeds' not in segment: return 0
+#     trackpoints = segment['speeds']
+#     if len(trackpoints) < 3:
+# 		return 0
+#     else:
+#         Pv = 0
+#         for (i, speed) in enumerate(trackpoints[:-2]):
+#             currPoint = point
+#             nextPoint = trackpoints[i+1]
+#             nexNextPt = trackpoints[i+2]
+#             velocity1 = float(nextPoint +currPoint)/2.0
+#             velocity2 = float((nextPoint +  nexNextPt)/2.0)
+#             if velocity1 != None and velocity2 != None:
+#                 if velocity1 != 0:
+#                     VC = abs(velocity2 - velocity1)/velocity1
+#                 else:
+#                     VC = 0
+#             else:
+#                 VC = 0
+
+#             if VC > 0.7:
+#                 Pv += 1
+
+#         segmentDist = segment['distance']
+#         if segmentDist != None and segmentDist != 0:
+#             return Pv/segmentDist
+#         else:
+#             return 0
+
+
 def calVCR(segment):
-    trackpoints = segment['track_points']
-    if len(trackpoints) < 3:
-		return 0
+    try:
+        ts = esta.TimeSeries.get_time_series(segment.user_id)
+        locations = list(ts.find_entries(['background/filtered_location'], time_query=None))
+    except:
+        return 0
+    speeds = segment.speeds
+    if len(speeds) < 3:
+        return 0
     else:
         Pv = 0
-        for (i, point) in enumerate(trackpoints[:-2]):
+        for (i, point) in enumerate(locations[:-2]):
             currPoint = point
-            nextPoint = trackpoints[i+1]
-            nexNextPt = trackpoints[i+2]
+            nextPoint = locations[i+1]
+            nexNextPt = locations[i+2]
             velocity1 = calSpeed(currPoint, nextPoint)
             velocity2 = calSpeed(nextPoint, nexNextPt)
             if velocity1 != None and velocity2 != None:
@@ -112,20 +192,26 @@ def calVCR(segment):
             if VC > 0.7:
                 Pv += 1
 
-        segmentDist = segment['distance']
+        segmentDist = segment.distance
         if segmentDist != None and segmentDist != 0:
             return Pv/segmentDist
         else:
             return 0
-
 def calSegmentDistance(segment):
-  return segment['distance']
+  return segment.distance
+
+# def calSpeeds(segment):
+#   trackpoints = (segment['speeds'], segment['distances'])
+#   distances = segment['distances']
+#   if len(trackpoints) == 0:
+#     return None
+#   return calSpeedsForList(trackpoints)
 
 def calSpeeds(segment):
-  trackpoints = segment['track_points']
-  if len(trackpoints) == 0:
-    return None
-  return calSpeedsForList(trackpoints)
+    try:
+        return segment['speeds']
+    except KeyError:
+        return []
 
 def calSpeedsForList(trackpoints):
   speeds = np.zeros(len(trackpoints) - 1)
@@ -138,13 +224,17 @@ def calSpeedsForList(trackpoints):
     # logging.debug("Returning vector of length %s while calculating speeds for trackpoints of length %s " % (speeds.shape, len(trackpoints)))
   return speeds
 
-def calAvgSpeed(segment):
-  timeDelta = segment['section_end_datetime'] - segment['section_start_datetime']
-  if timeDelta.total_seconds() != 0:
-    return segment['distance'] / timeDelta.total_seconds()
-  else:
-    return None
+# def calAvgSpeed(segment):
+#   timeDelta = segment['section_end_datetime'] - segment['section_start_datetime']
+#   if timeDelta.total_seconds() != 0:
+#     return segment['distance'] / timeDelta.total_seconds()
+#   else:
+#     return None
 
+def calAvgSpeed(segment):
+    if (('speeds' not in segment) or (len(segment['speeds']) == 0)): return 0
+
+    return float(sum(segment['speeds'])/len(segment['speeds']))
 # In order to calculate the acceleration, we do the following.
 # point0: (loc0, t0), point1: (loc1, t1), point2: (loc2, t2), point3: (loc3, t3)
 # becomes
@@ -156,10 +246,14 @@ def calAvgSpeed(segment):
 
 def calAccels(segment):
   from dateutil import parser
+  try:
+    ts = esta.TimeSeries.get_time_series(segment['user_id'])
+    entries = list(ts.find_entries(['background/filtered_location'], time_query=None))
+  except:
+    return []
 
   speeds = calSpeeds(segment)
-  trackpoints = segment['track_points']
-
+ 
   if speeds is None or len(speeds) == 0:
     return None
 
@@ -168,8 +262,10 @@ def calAccels(segment):
   for (i, speed) in enumerate(speeds[0:-1]):
     currSpeed = speed # speed0
     speedDelta = currSpeed - prevSpeed # (speed0 - 0)
+    accel[i] = speedDelta
     # t1 - t0
-    timeDelta = parser.parse(trackpoints[i+1]['time']) - parser.parse(trackpoints[i]['time'])
+
+    timeDelta = entries[i+1]['data']['ts'] - entries[i]['data']['ts']
     # logging.debug("while calculating accels from %s -> %s, speedDelta = %s, timeDelta = %s" %
     #   (trackpoints[i+1], trackpoints[i], speedDelta, timeDelta))
     if timeDelta.total_seconds() != 0:
@@ -177,6 +273,30 @@ def calAccels(segment):
       # logging.debug("resulting acceleration is %s" % accel[i])
     prevSpeed = currSpeed
   return accel
+
+# def calAccels(segment):
+#   from dateutil import parser
+
+#   speed = calSpeed(segment)
+  
+
+#   if speeds is None:
+#     return None
+
+#   accel = np.zeros(len(speeds) - 1)
+#   prevSpeed = 0
+#   for (i, speed) in enumerate(speeds[0:-1]):
+#     currSpeed = speed # speed0
+#     speedDelta = currSpeed - prevSpeed # (speed0 - 0)
+#     # t1 - t0
+#     timeDelta = parser.parse(trackpoints[i+1]['time']) - parser.parse(trackpoints[i]['time'])
+#     # logging.debug("while calculating accels from %s -> %s, speedDelta = %s, timeDelta = %s" %
+#     #   (trackpoints[i+1], trackpoints[i], speedDelta, timeDelta))
+#     if timeDelta.total_seconds() != 0:
+#       accel[i] = speedDelta/(timeDelta.total_seconds())
+#       # logging.debug("resulting acceleration is %s" % accel[i])
+#     prevSpeed = currSpeed
+#   return accel
 
 def getIthMaxSpeed(segment, i):
   # python does not appear to have a built-in mechanism for returning the top
@@ -247,10 +367,7 @@ def calSpeedDistParams(speeds):
 
 def mode_cluster(mode,eps,sam):
     mode_change_pnts=[]
-    # print(tran_mat)
-    query = {"$and": [{'type': 'move'},\
-                      {'confirmed_mode':mode}]}
-    # print(Sections.find(query).count())
+    query = {'confirmed_mode':mode}
     logging.debug("Trying to find cluster locations for %s trips" % (Sections.find(query).count()))
     for section in Sections.find(query).sort("section_start_datetime",1):
         try:
@@ -259,8 +376,7 @@ def mode_cluster(mode,eps,sam):
         except:
             logging.warn("Found trip %s with missing start and/or end points" % (section['_id']))
             pass
-    # print(user_change_pnts)
-    # print(len(mode_change_pnts))
+    
     if len(mode_change_pnts) == 0:
       logging.debug("No points found in cluster input, nothing to fit..")
       return np.zeros(0)

@@ -13,6 +13,8 @@ import emission.analysis.intake.cleaning.location_smoothing as eaicl
 import emission.analysis.intake.cleaning.clean_and_resample as eaicr
 import emission.analysis.classification.inference.mode as md
 import emission.net.ext_service.habitica.executor as autocheck
+import emission.analysis.classification.inference.mode as pipeline
+
 from uuid import UUID
 
 
@@ -67,7 +69,37 @@ def run_mode_inference_pipeline_for_user(uuid):
 	MIP.runPipeline()
 
 
+def update_model_for_user(uuid, algorithm_id=1):
 
+	MIP = pipeline.ModelInferencePipeline()
+	MIP.runModelBuildingStage(uuid = uuid, algorithm_id= algorithm_id)
+	#user.model = MIP.getModel
+
+def predict_for_user(uuid, timerange, model=None):
+
+	if model is None:
+		pass
+		#model = user.model
+	MIP = pipeline.ModelInferencePipeline()
+	MIP.runModeInferenceStage(uuid, timerange, model=model)
+
+
+def run_mode_pipeline(process_number, uuid_list):
+
+	MIP = pipeline.ModelInferencePipeline()
+	for user_id in uuid_list:
+		try:
+			run_mode_pipeline_for_user(MIP, user_id)
+		except e:
+			logging.debug("Skipping user %s because of error" % user_id)
+			logging.debug("error %s" % e)
+			mark_mode_failed_for_user(user_id)
+
+def run_mode_pipeline_for_user(MIP, uuid):
+
+	timerange = get_time_range_for_mode_inference(uuid)
+	MIP.runPipelineModelStage(uuid, timerange)
+	mark_mode_inference_done_for_user(uuid, MIP.getLastTimestamp})
 
 
 if __name__ == '__main__':
