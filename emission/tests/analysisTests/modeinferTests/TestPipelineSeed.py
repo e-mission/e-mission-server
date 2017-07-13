@@ -5,6 +5,7 @@ import logging
 import numpy as np
 from datetime import datetime, timedelta
 import os
+from pymongo import MongoClient
 
 # Our imports
 from emission.core.get_database import get_db, get_mode_db, get_section_db
@@ -14,7 +15,7 @@ from emission.core.wrapper.user import User
 from emission.core.wrapper.client import Client
 import emission.tests.common as etc
 
-class TestPipeline(unittest.TestCase):
+class TestPipelineSeed(unittest.TestCase):
   def setUp(self):
     self.testUsers = ["test@example.com", "best@example.com", "fest@example.com",
                       "rest@example.com", "nest@example.com"]
@@ -29,6 +30,8 @@ class TestPipeline(unittest.TestCase):
 
     self.SectionsColl = get_section_db()
     self.assertEquals(self.SectionsColl.find().count(), 0)
+
+    MongoClient('localhost').drop_database("Backup_database")
 
     etc.loadTable(self.serverName, "Stage_Modes", "emission/tests/data/modes.json")
     etc.loadTable(self.serverName, "Stage_Sections", "emission/tests/data/testModeInferSeedFile")
@@ -59,6 +62,7 @@ class TestPipeline(unittest.TestCase):
     self.testLoadTrainingData()
 
   def tearDown(self):
+    MongoClient('localhost').drop_database("Backup_database")
     for testUser in self.testUsers:
       etc.purgeSectionData(self.SectionsColl, testUser)
     logging.debug("Number of sections after purge is %d" % self.SectionsColl.find().count())
@@ -69,9 +73,14 @@ class TestPipeline(unittest.TestCase):
         self.assertFalse(os.path.exists(pipeline.SAVED_MODEL_FILENAME))
 
   def testLoadTrainingData(self):
+    from pymongo import MongoClient
+
     allConfirmedTripsQuery = pipeline.ModeInferencePipelineMovesFormat.getSectionQueryWithGroundTruth({'$ne': ''})
     self.pipeline.confirmedSections = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery)
+    backupSections = MongoClient('localhost').Backup_database.Stage_Sections
+    self.pipeline.backupConfirmedSections = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery, backupSections)
     self.assertEquals(self.pipeline.confirmedSections.count(), len(self.testUsers) * 2)
+    self.assertEquals(self.pipeline.backupConfirmedSections.count(), 0)
     
 
   def testGenerateBusAndTrainStops(self):
@@ -139,7 +148,7 @@ class TestPipeline(unittest.TestCase):
     (self.pipeline.featureMatrix, self.pipeline.resultVector) = self.pipeline.generateFeatureMatrixAndResultVectorStep()
 
     (self.pipeline.cleanedFeatureMatrix, self.pipeline.cleanedResultVector) = self.pipeline.cleanDataStep()
-    self.assertEquals(self.pipeline.cleanedFeatureMatrix.shape[0], self.pipeline.confirmedSections.count() - 2)
+    self.assertEquals(self.pipeline.cleanedFeatureMatrix.shape[0], self.pipeline.confirmedSections.count() + self.pipeline.backupConfirmedSections.count() - 2)
 
   def testSelectFeatureIndicesStep(self):
     self.testCleanDataStep()
@@ -191,8 +200,6 @@ class TestPipeline(unittest.TestCase):
     # Here, we only have 5 trips, so the pipeline looks for the backup training
     # set instead, which fails because there is no backup. So let's copy data from
     # the main DB to the backup DB to make this test pass
-    from pymongo import MongoClient
-    MongoClient('localhost').drop_database("Backup_database")
     MongoClient('localhost').copy_database("Stage_database","Backup_database","localhost")
     self.pipeline.runPipeline()
 

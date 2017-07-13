@@ -39,14 +39,13 @@ class ModeInferencePipelineMovesFormat:
     allConfirmedTripsQuery = ModeInferencePipelineMovesFormat.getSectionQueryWithGroundTruth({'$ne': ''})
     self.confirmedSections = self.loadTrainingDataStep(allConfirmedTripsQuery)
     logging.debug("confirmedSections.count() = %s" % (self.confirmedSections.count()))
-    
-    if (self.confirmedSections.count() < minTrainingSetSize):
+    logging.info("initial loadTrainingDataStep DONE")
 
-      logging.info("initial loadTrainingDataStep DONE")
-      logging.debug("current training set too small, reloading from backup!")
-      backupSections = MongoClient('localhost').Backup_database.Stage_Sections
-      self.confirmedSections = self.loadTrainingDataStep(allConfirmedTripsQuery, backupSections)
+    logging.debug("finished loading current training set, now loading from backup!")
+    backupSections = MongoClient('localhost').Backup_database.Stage_Sections
+    self.backupConfirmedSections = self.loadTrainingDataStep(allConfirmedTripsQuery, backupSections)
     logging.info("loadTrainingDataStep DONE")
+
     (self.bus_cluster, self.train_cluster) = self.generateBusAndTrainStopStep() 
     logging.info("generateBusAndTrainStopStep DONE")
     (self.featureMatrix, self.resultVector) = self.generateFeatureMatrixAndResultVectorStep()
@@ -137,9 +136,9 @@ class ModeInferencePipelineMovesFormat:
 
 # Feature matrix construction
   def generateFeatureMatrixAndResultVectorStep(self):
-      featureMatrix = np.zeros([self.confirmedSections.count(), len(self.featureLabels)])
-      resultVector = np.zeros(self.confirmedSections.count())
-      logging.debug("created data structures of size %s" % self.confirmedSections.count())
+      featureMatrix = np.zeros([self.confirmedSections.count() + self.backupConfirmedSections.count(), len(self.featureLabels)])
+      resultVector = np.zeros(self.confirmedSections.count() + self.backupConfirmedSections.count())
+      logging.debug("created data structures of size %s" % (self.confirmedSections.count() + self.backupConfirmedSections.count()))
       # There are a couple of additions to the standard confirmedSections cursor here.
       # First, we read it in batches of 300 in order to avoid the 10 minute timeout
       # Our logging shows that we can process roughly 500 entries in 10 minutes
@@ -161,6 +160,16 @@ class ModeInferencePipelineMovesFormat:
                 logging.debug("Processing record %s " % i)
         except Exception, e:
             logging.debug("skipping section %s due to error %s " % (section, e))
+
+      for (i, section) in enumerate(self.backupConfirmedSections.limit(featureMatrix.shape[0]).batch_size(300)):
+        try:
+            self.updateFeatureMatrixRowWithSection(featureMatrix, i, section)
+            resultVector[i] = self.getGroundTruthMode(section)
+            if i % 100 == 0:
+                logging.debug("Processing backup record %s " % i)
+        except Exception, e:
+            logging.debug("skipping section %s due to error %s " % (section, e))
+
       return (featureMatrix, resultVector)
 
   def getGroundTruthMode(self, section):

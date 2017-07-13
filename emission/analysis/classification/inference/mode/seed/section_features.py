@@ -11,6 +11,8 @@ from emission.core.common import calDistance, Include_place_2
 from emission.analysis.modelling.tour_model.trajectory_matching.route_matching import getRoute,fullMatchDistance,matchTransitRoutes,matchTransitStops
 
 Sections = get_section_db()
+from pymongo import MongoClient
+BackupSections = MongoClient("localhost").Backup_database.Stage_Sections
 Modes = get_mode_db()
 
 
@@ -259,6 +261,14 @@ def mode_cluster(mode,eps,sam):
         except:
             logging.warn("Found trip %s with missing start and/or end points" % (section['_id']))
             pass
+
+    for section in BackupSections.find(query).sort("section_start_datetime",1):
+        try:
+            mode_change_pnts.append(section['section_start_point']['coordinates'])
+            mode_change_pnts.append(section['section_end_point']['coordinates'])
+        except:
+            logging.warn("Found trip %s with missing start and/or end points" % (section['_id']))
+            pass
     # print(user_change_pnts)
     # print(len(mode_change_pnts))
     if len(mode_change_pnts) == 0:
@@ -352,6 +362,8 @@ def get_mode_share_by_count(list_idx):
         MODE[mode['mode_id']]=0
     for _id in list_idx:
         section=Sections.find_one({'_id': _id})
+        if section is None:
+            section=BackupSections.find_one({'id': _id})
         mode_id = section['confirmed_mode']
         try:
             MODE[mode_id] += 1
