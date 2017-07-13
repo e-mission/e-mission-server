@@ -37,7 +37,7 @@ class ModeInferencePipelineMovesFormat:
 
   def runPipeline(self):
     allConfirmedTripsQuery = ModeInferencePipelineMovesFormat.getSectionQueryWithGroundTruth({'$ne': ''})
-    (self.modeList, self.confirmedSections) = self.loadTrainingDataStep(allConfirmedTripsQuery)
+    self.confirmedSections = self.loadTrainingDataStep(allConfirmedTripsQuery)
     logging.debug("confirmedSections.count() = %s" % (self.confirmedSections.count()))
     
     if (self.confirmedSections.count() < minTrainingSetSize):
@@ -45,7 +45,7 @@ class ModeInferencePipelineMovesFormat:
       logging.info("initial loadTrainingDataStep DONE")
       logging.debug("current training set too small, reloading from backup!")
       backupSections = MongoClient('localhost').Backup_database.Stage_Sections
-      (self.modeList, self.confirmedSections) = self.loadTrainingDataStep(allConfirmedTripsQuery, backupSections)
+      self.confirmedSections = self.loadTrainingDataStep(allConfirmedTripsQuery, backupSections)
     logging.info("loadTrainingDataStep DONE")
     (self.bus_cluster, self.train_cluster) = self.generateBusAndTrainStopStep() 
     logging.info("generateBusAndTrainStopStep DONE")
@@ -126,7 +126,7 @@ class ModeInferencePipelineMovesFormat:
     
 
     duration = time.time() - begin
-    return (modeList, confirmedSections)
+    return confirmedSections
 
   # TODO: Should mode_cluster be in featurecalc or here?
   def generateBusAndTrainStopStep(self):

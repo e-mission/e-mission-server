@@ -70,7 +70,7 @@ class TestPipeline(unittest.TestCase):
 
   def testLoadTrainingData(self):
     allConfirmedTripsQuery = pipeline.ModeInferencePipelineMovesFormat.getSectionQueryWithGroundTruth({'$ne': ''})
-    (self.pipeline.modeList, self.pipeline.confirmedSections) = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery)
+    self.pipeline.confirmedSections = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery)
     self.assertEquals(self.pipeline.confirmedSections.count(), len(self.testUsers) * 2)
     
 
@@ -134,7 +134,7 @@ class TestPipeline(unittest.TestCase):
     self.SectionsColl.insert(unknownTripSec)
     
     allConfirmedTripsQuery = {"$and": [{'type': 'move'}, {'confirmed_mode': {'$ne': ''}}]}
-    (self.pipeline.modeList, self.pipeline.confirmedSections) = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery)
+    self.pipeline.confirmedSections = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery)
     self.testGenerateBusAndTrainStops()
     (self.pipeline.featureMatrix, self.pipeline.resultVector) = self.pipeline.generateFeatureMatrixAndResultVectorStep()
 
