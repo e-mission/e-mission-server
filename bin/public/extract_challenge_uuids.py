@@ -19,6 +19,15 @@ if __name__ == '__main__':
         uuid_filename = sys.argv[2]
 
         emails = open(user_email_filename).readlines()
-        uuids = [ecwu.User.fromEmail(e.strip()).uuid for e in emails]
+        uuids = []
+        for e in emails:
+            user = ecwu.User.fromEmail(e.strip())
+            if user is None:
+                logging.warning("Found no mapping for email %s" % e)
+            else:
+                uuid = user.uuid
+                logging.debug("Mapped email %s to uuid %s" % (e, uuid))
+                uuids.append(uuid)
+                
         uuid_strs = [str(u) for u in uuids]
         json.dump(uuid_strs, open(uuid_filename, "w"))
