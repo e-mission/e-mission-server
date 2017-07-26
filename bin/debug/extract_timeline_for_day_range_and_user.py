@@ -10,6 +10,7 @@ import datetime as pydt
 import json
 import bson.json_util as bju
 import arrow
+import argparse
 
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.timequery as estt
@@ -58,17 +59,24 @@ def validate_truncation(loc_entry_list, trip_entry_list, place_entry_list):
     if len(place_entry_list) == MAX_LIMIT:
         logging.warning("place_entry_list length = %d, probably truncated" % len(place_entry_list))
 
+def export_timeline_for_users(user_id_list, args):
+    for curr_uuid in user_id_list:
+        if curr_uuid != '':
+            logging.info("=" * 50)
+            export_timeline(user_id=curr_uuid, start_day_str=sys.argv[2], end_day_str=sys.argv[3], file_name=sys.argv[4])
+
 
 if __name__ == '__main__':
     if len(sys.argv) != 5:
-        print "Usage: %s <user> <start_day> <end_day> <file_prefix>" % (sys.argv[0])
+        print "Usage: %s [<user>|'all'|'file_XXX'] <start_day> <end_day> <file_prefix>" % (sys.argv[0])
     else:
         user_id_str = sys.argv[1]
         if user_id_str == "all":
             all_uuids = esdu.get_all_uuids()
-            for curr_uuid in all_uuids:
-                if curr_uuid != '':
-                    logging.info("=" * 50)
-                    export_timeline(user_id=curr_uuid, start_day_str=sys.argv[2], end_day_str=sys.argv[3], file_name=sys.argv[4])
+            export_timeline_for_users(all_uuids, sys.argv)
+        elif user_id_str.startswith("file_"):
+            uuid_strs = json.load(open(user_id_str))
+            uuids = [uuid.UUID(ustr) for ustr in uuid_strs]
+            export_timeline_for_users(uuids, sys.argv)
         else:
             export_timeline(user_id=uuid.UUID(sys.argv[1]), start_day_str=sys.argv[2], end_day_str=sys.argv[3], file_name=sys.argv[4])
