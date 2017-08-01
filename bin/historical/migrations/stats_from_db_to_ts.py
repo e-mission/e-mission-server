@@ -62,8 +62,8 @@ def convertServerStats(collection):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     # No arguments - muahahahaha. Just going to convert everything.
-    # logging.info("About to convert client stats")
-    # convertClientStats(edb.get_client_stats_db_backup())
+    logging.info("About to convert client stats")
+    convertClientStats(edb.get_client_stats_db_backup())
 
     logging.info("About to convert server stats")
     convertServerStats(edb.get_server_stats_db_backup())
