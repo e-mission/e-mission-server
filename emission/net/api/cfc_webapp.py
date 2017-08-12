@@ -6,7 +6,7 @@ import bottle as bt
 # To support dynamic loading of client-specific libraries
 import sys
 import os
-import logging
+import logging.config
 
 from datetime import datetime
 import time
