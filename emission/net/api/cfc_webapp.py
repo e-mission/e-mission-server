@@ -653,7 +653,7 @@ def habiticaRegister():
   # regenerating the password if we already have the user
   autogen_id = requests.get("http://www.dinopass.com/password/simple").text
   logging.debug("generated id %s through dinopass" % autogen_id)
-  autogen_email = "%s@save.world" % autogen_id
+  autogen_email = "%s@save.world" % autogen_idf
   autogen_password = autogen_id
   return habitproxy.habiticaRegister(username, autogen_email,
                               autogen_password, user_uuid)
@@ -669,6 +669,17 @@ def habiticaProxy():
     return habitproxy.habiticaProxy(user_uuid, method, method_url,
                                     method_args)
 # Data source integration END
+
+# Survey integration START
+@get('/survey')
+def saveSurvey():
+    logging.debug("Survey saving request %s" % (request))
+    # user_uuid = getUUID(request)
+    # assert (user_uuid is not None)
+
+    return {'status': 'ok', 'test': 'Hello World!'}
+# Survey integration END
+
 
 @app.hook('before_request')
 def before_request():
