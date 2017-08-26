@@ -2,6 +2,9 @@
 Script to launch the pipeline reset code.
 Options documented in 
 https://github.com/e-mission/e-mission-server/issues/333#issuecomment-312464984
+
+Can be made a little less general but a lot more performant by using the trick
+below.
 """
 import logging
 
@@ -26,6 +29,14 @@ def _get_user_list(args):
         return [uuid.UUID(u) for u in args.user_list]
 
 def _find_platform_users(platform):
+    # Since all new clients register a profile with the server, we don't have
+    # to run a 'distinct' query over the entire contents of the timeseries.
+    # Instead, we can simply query from the profile users, which is
+    # significantly faster
+    # Use the commented out line instead for better performance.
+    # Soon, we can move to the more performant option, because there will be
+    # no users that don't have a profile
+    # return edb.get_profile_db().find({"curr_platform": platform}).distinct("user_id")
    return edb.get_timeseries_db().find({'metadata.platform': platform}).distinct(
        'user_id')
 

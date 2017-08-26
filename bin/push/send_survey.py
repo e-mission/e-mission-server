@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
     if args.show_emails:
         logging.info("About to push to email list = %s" %
-            [ecwu.User.fromUUID(uuid).__email for uuid in uuid_list])
+            [ecwu.User.fromUUID(uuid)._User__email for uuid in uuid_list if uuid is not None])
 
     if args.dry_run:
         logging.info("dry run, skipping actual push")
