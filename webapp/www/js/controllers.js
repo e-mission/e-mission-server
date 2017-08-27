@@ -90,3 +90,9 @@ angular.module('starter.controllers', ['starter.heatmap', 'starter.metrics'])
     console.log("in setup, hasGroup = "+$scope.hasGroup);
 })
 
+.controller('ClientSetupCtrl', function($scope, $stateParams) {
+    console.log("in client setup, routeParams = "+JSON.stringify($stateParams));
+    $scope.client_label = $stateParams.new_client;
+    $scope.clear_local_storage_flag = $stateParams.clear_local_storage;
+    $scope.clear_usercache_flag = $stateParams.clear_usercache;
+})
