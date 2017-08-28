@@ -48,6 +48,8 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "stats/client_nav_event": self.timeseries_db,
                 "stats/client_error": self.timeseries_db,
                 "manual/incident": self.timeseries_db,
+                "manual/mode_confirm": self.timeseries_db,
+                "manual/purpose_confirm": self.timeseries_db,
                 "segmentation/raw_trip": self.analysis_timeseries_db,
                 "segmentation/raw_place": self.analysis_timeseries_db,
                 "segmentation/raw_section": self.analysis_timeseries_db,

@@ -41,6 +41,8 @@ class Entry(ecwb.WrapperBase):
             "stats/client_nav_event": "statsevent",
             "stats/client_error": "statsevent",
             "manual/incident": "incident",
+            "manual/mode_confirm": "userlabel",
+            "manual/purpose_confirm": "userlabel",
             "segmentation/raw_trip": "rawtrip",
             "segmentation/raw_place": "rawplace",
             "segmentation/raw_section": "section",

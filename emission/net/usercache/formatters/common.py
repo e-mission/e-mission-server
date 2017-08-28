@@ -19,3 +19,9 @@ def expand_metadata_times(m):
 def expand_data_times(d,m):
     d.local_dt = ecsdlq.get_local_date(d.ts, m.time_zone)
     d.fmt_time = arrow.get(d.ts).to(m.time_zone).isoformat()
+
+def expand_start_end_data_times(d,m):
+    d.start_local_dt = ecsdlq.get_local_date(d.start_ts, m.time_zone)
+    d.start_fmt_time = arrow.get(d.start_ts).to(m.time_zone).isoformat()
+    d.end_local_dt = ecsdlq.get_local_date(d.end_ts, m.time_zone)
+    d.end_fmt_time = arrow.get(d.end_ts).to(m.time_zone).isoformat()
