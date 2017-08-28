@@ -19,10 +19,10 @@ def format(entry):
 
     data = entry.data
     fc.expand_data_times(data, metadata)
-    data.local_dt = ecsdlq.get_local_date(data.ts, metadata.time_zone)
-    data.fmt_time = arrow.get(data.ts).to(metadata.time_zone).isoformat()
+    data.local_dt = ecsdlq.get_local_date(metadata.write_ts, metadata.time_zone)
+    data.fmt_time = arrow.get(metadata.write_ts).to(metadata.time_zone).isoformat()
     formatted_entry.data = data
 
-    logging.debug("RECEIVED iOS survey response: %s" % formatted_entry.ts)
+    logging.debug("RECEIVED iOS survey response: %s" % metadata.write_ts)
 
     return formatted_entry
