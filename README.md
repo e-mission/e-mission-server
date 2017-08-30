@@ -275,62 +275,8 @@ bower.
 
 ## Deployment: ##
 ----------
-If you want to use this for anything other than deployment, you should really run it over SSL. In order to make the development flow smoother, *if the server is running over HTTP as opposed to HTTPS, it has no security*. The JWT basically consists of the user email *in plain text*. This means that anybody who knows a users' email access can download their detailed timeline. This is very bad.
-
-<font color="red">If you are using this to store real, non-test data, use SSL right now</font> 
-
-If you are running this in production, you should really run it over SSL. We
-use cherrypy to provide SSL support. The default version of cherrypy in the
-anaconda distribution had some issues, so I've checked in a working version
-of the wsgiserver file.
-
-TODO: clean up later
-
-    $ cp api/wsgiserver2.py <dist-packages>/cherrypy/wsgiserver/wsgiserver2.py
-
-Also, now that we decode the JWTs locally, we need to use the oauth2client,
-which requires the PyOpenSSL library. This can be installed on ubuntu using the
-python-openssl package, but then it is not accessible using the anaconda
-distribution. In order to enable it for the conda distribution as well, use
-
-    $ conda install pyopenssl
-
-Also, installing via `requirements.txt` does not appear to install all of the
-requirements for the google-api-client. If you get mysterious "Invalid token"
-errors for tokens that are correctly validated by the backup URL method, try to
-uninstall and reinstall with the --update option.
-
-    $ pip uninstall google-api-python-client
-    $ pip install --upgrade google-api-python-client
-
-If you are running the server on shared, cloud infrastructure such as AWS, then
-note that the data is accessible by AWS admins by directly looking at the disk.
-In order to avoid this, you want to encrypt the disk. You can do this by:
-- using an encrypted EBS store, but this doesn't appear to allow you to specify
-  your own encryption key
-- using a normal drive that is encrypted using cryptfs (http://sleepyhead.de/howto/?href=cryptpart, https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_a_non-root_file_system). The standard AWS ubuntu AMI appears to have LUKS enabled, so you can follow the instructions with LUKS.
-
-```
-ubuntu@ip-10-203-173-119:/home/e-mission$ cryptsetup --help | grep luks
-                                      for luksFormat
-  -M, --type=STRING                   Type of device metadata: luks, plain,
-...
-```
-
-In either of these cases, you need to reconfigure mongod.conf to point to data
-and log directories in the encrypted volume.
-
-### Getting keys ###
-
-If you are associated with the e-mission project and will be integrating with
-our server, then you can get the key files from:
-https://repo.eecs.berkeley.edu/git/users/shankari/e-mission-keys.git
-
-If not, please get your own copies of the following keys:
-
-* Google Developer Console (stored in conf/net/keys.json)
-  - iOS key (`ios_client_key`)
-  - webApp key (`client_key`)
-* Parse  (coming soon)
+This is fairly complex and is under active change as we have more projects deploy their own servers with various configurations.
+So I have moved it to its own wiki page:
+https://github.com/e-mission/e-mission-server/wiki/Deploying-your-own-server-to-production
 
 [Python_Structure]: https://raw.github.com/amplab/e-mission-server/master/figs/e-mission-server-module-structure.png
