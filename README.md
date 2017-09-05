@@ -15,6 +15,8 @@ The webapp supports a REST API, and accesses data from the database to fulfill
 the queries.  A set of background scripts pull the data from external sources, and
 preprocessing results ensures reasonable performance.
 
+The installation instructions below are generally targeted towards OSX and \*nix shells such as bash. If you want to use Windows, we recomend using PowerShell (https://technet.microsoft.com/en-us/scriptcenter/dd742419), which provides similarly rich commands. If you really want to use the Command Prompt, most commands should work, but you may need to convert `/` -> `\` to make the commands work.
+
 ## Dependencies: ##
 -------------------
 
