@@ -20,6 +20,8 @@ The installation instructions below are generally targeted towards OSX and \*nix
 ## Dependencies: ##
 -------------------
 
+[![Join the chat at https://gitter.im/e-mission/e-mission-server](https://badges.gitter.im/e-mission/e-mission-server.svg)](https://gitter.im/e-mission/e-mission-server?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ### Database: ###
 1. Install [Mongodb](http://www.mongodb.org/)
   2. *Windows*: mongodb appears to be installed as a service on Windows devices and it starts automatically on reboot
