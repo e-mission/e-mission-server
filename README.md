@@ -9,6 +9,8 @@ repo](https://github.com/amplab/e-mission-phone)
 The current build status is:
 [![Build Status](https://amplab.cs.berkeley.edu/jenkins/buildStatus/icon?job=e-mission-server)](https://amplab.cs.berkeley.edu/jenkins/view/E-Mission/job/e-mission-server/)
 
+[![Join the chat at https://gitter.im/e-mission/e-mission-server](https://badges.gitter.im/e-mission/e-mission-server.svg)](https://gitter.im/e-mission/e-mission-server?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 The backend in turn consists of two parts - a summary of their code structure is shown below.
 -![][Python_Structure]
 The webapp supports a REST API, and accesses data from the database to fulfill
