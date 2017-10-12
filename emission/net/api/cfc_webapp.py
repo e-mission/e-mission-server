@@ -7,6 +7,7 @@ import bottle as bt
 import sys
 import os
 import logging
+import logging.config
 
 from datetime import datetime
 import time

@@ -85,7 +85,7 @@ Here are the steps for doing this:
         # Store entries to the stats database. Currently required, dependency should be removed soon
         $ cp conf/net/int_service/giles_conf.json.sample conf/net/int_service/giles_conf.json
         # Game integration.
-        $ cp conf/net/ext_service/habitica.json.sample conf/net/int_service/habitica.json
+        $ cp conf/net/ext_service/habitica.json.sample conf/net/ext_service/habitica.json
 
 1. Start the server
 
