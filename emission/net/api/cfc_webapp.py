@@ -380,13 +380,17 @@ def getTrips(day):
 
 @post('/profile/create')
 def createUserProfile():
-  logging.debug("Called createUserProfile")
-  userEmail = enaa.__getEmail(request, skipAuth, auth_method)
-  logging.debug("userEmail = %s" % userEmail)
-  user = User.register(userEmail)
-  logging.debug("Looked up user = %s" % user)
-  logging.debug("Returning result %s" % {'uuid': str(user.uuid)})
-  return {'uuid': str(user.uuid)}
+  try:
+      logging.debug("Called createUserProfile")
+      userEmail = enaa.__getEmail(request, skipAuth, auth_method)
+      logging.debug("userEmail = %s" % userEmail)
+      user = User.register(userEmail)
+      logging.debug("Looked up user = %s" % user)
+      logging.debug("Returning result %s" % {'uuid': str(user.uuid)})
+      return {'uuid': str(user.uuid)}
+  except ValueError, e:
+      traceback.print_exc()
+      abort(403, e.message)
 
 @post('/profile/update')
 def updateUserProfile():
