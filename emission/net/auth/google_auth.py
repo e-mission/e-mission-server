@@ -45,8 +45,11 @@ class GoogleAuthMethod:
                         r = requests.get(constructedURL)
                         tokenFields = json.loads(r.content)
                         logging.debug("tokenFields = %s" % tokenFields)
+                        if 'audience' not in tokenFields:
+                            raise ValueError("Invalid token %s" % tokenFields)
                         in_client_key = tokenFields['audience']
-                        if (in_client_key != self.client_key):
+                        if (in_client_key != self.client_key and
+                            in_client_key != self.client_key_old):
                             if (in_client_key != self.ios_client_key and 
                                 in_client_key != self.ios_client_key_new):
                                 raise ValueError("Invalid client key %s" % in_client_key)
