@@ -7,6 +7,9 @@ class AuthMethodFactory:
         if methodName == "google_auth":
             import emission.net.auth.google_auth as enag
             return enag.GoogleAuthMethod()
+        elif methodName == "token_list":
+            import emission.net.auth.token_list as enat
+            return enat.TokenListMethod()
 
 class AuthMethod:
     def verifyUserToken(self, token):
