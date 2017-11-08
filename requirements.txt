@@ -15,3 +15,7 @@ python-crontab
 attrdict
 enum34
 arrow
+numpy
+sklearn
+scipy
+pandas
