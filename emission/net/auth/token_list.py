@@ -18,8 +18,8 @@ class TokenListMethod:
 
     def verifyUserToken(self, token):
         # attempt to validate token on the client-side
-        logging.debug("Using the TokenListMethod to verify id token of length %d " % 
-            len(token))
+        logging.debug("Using the TokenListMethod to verify id token %s of length %d against list %s..." % 
+            (token, len(token), self.token_list[0:10]))
         # matching_list = [token == curr_token for curr_token in self.token_list]
         # print matching_list
         # stripped_matching_list = [token == curr_token.strip() for curr_token in self.token_list]
