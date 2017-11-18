@@ -20,10 +20,10 @@ class TokenListMethod:
         # attempt to validate token on the client-side
         logging.debug("Using the TokenListMethod to verify id token of length %d " % 
             len(token))
-        matching_list = [token == curr_token for curr_token in self.token_list]
-        print matching_list
-        stripped_matching_list = [token == curr_token.strip() for curr_token in self.token_list]
-        print stripped_matching_list
+        # matching_list = [token == curr_token for curr_token in self.token_list]
+        # print matching_list
+        # stripped_matching_list = [token == curr_token.strip() for curr_token in self.token_list]
+        # print stripped_matching_list
         if token in self.token_list:
             logging.debug("Found match for token %s of length %d" % (token, len(token)))
             # In this case, the token is the email, since we don't actually
