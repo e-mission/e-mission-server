@@ -3,10 +3,6 @@ import json
 import traceback
 import requests
 
-# For decoding JWTs on the client side
-import oauth2client.client
-from oauth2client.crypt import AppIdentityError
-
 class TokenListMethod:
     def __init__(self):
         key_file = open('conf/net/keys.json')
