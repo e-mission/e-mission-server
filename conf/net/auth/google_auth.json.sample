@@ -1,0 +1,7 @@
+{
+  "client_key_old" : "Get from https://console.developers.google.com",
+  "client_key" : "Get from https://console.developers.google.com",
+  "__comment": "iOS client key to handle the fact that the google iOS API does not work. The open source API does not take the webclient app, so we have the iOS client ID here.",
+  "ios_client_key" : "Get from https://console.developers.google.com",
+  "ios_client_key_new" : "Get from https://console.developers.google.com"
+}

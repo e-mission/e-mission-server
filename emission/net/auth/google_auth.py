@@ -9,7 +9,7 @@ from oauth2client.crypt import AppIdentityError
 
 class GoogleAuthMethod:
     def __init__(self):
-        key_file = open('conf/net/keys.json')
+        key_file = open('conf/net/auth/google_auth.json')
         key_data = json.load(key_file)
         self.client_key = key_data["client_key"]
         self.client_key_old = key_data["client_key_old"]
