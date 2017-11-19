@@ -8,6 +8,10 @@ class AuthMethodFactory:
             import emission.net.auth.skip as enas
             logging.debug("methodName = skip, returning %s" % enas.SkipMethod)
             return enas.SkipMethod()
+        elif methodName == "openid_auth":
+            import emission.net.auth.openid_auth as enao
+            logging.debug("methodName = openid_auth, returning %s" % enao.OpenIDAuthMethod)
+            return enao.OpenIDAuthMethod()
         elif methodName == "google_auth":
             import emission.net.auth.google_auth as enag
             logging.debug("methodName = google_auth, returning %s" % enag.GoogleAuthMethod)
