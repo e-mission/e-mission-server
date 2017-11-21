@@ -2,6 +2,7 @@ import json
 import logging
 import argparse
 import numpy as np
+import logging.config
 
 import emission.pipeline.scheduler as eps
 
