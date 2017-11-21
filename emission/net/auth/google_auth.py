@@ -4,8 +4,8 @@ import traceback
 import requests
 
 # For decoding JWTs on the client side
-from google.oauth2 import id_token
-from google.auth.transport import requests
+import google.oauth2.id_token as goi
+import google.auth.transport.requests as gatr
 
 class GoogleAuthMethod:
     def __init__(self):
@@ -20,7 +20,7 @@ class GoogleAuthMethod:
 
     # Code snippet from 
     # https://developers.google.com/identity/sign-in/android/backend-auth
-    def __verifyTokenFields(tokenFields, audienceKey, issKey):
+    def __verifyTokenFields(self, tokenFields, audienceKey, issKey):
         if audienceKey not in tokenFields:
             raise ValueError("Invalid token %s, does not contain %s" % 
                 (tokenFields, audienceKey))
@@ -29,10 +29,10 @@ class GoogleAuthMethod:
                 raise ValueError("Incoming client key %s not in valid list %s" % 
                     (in_client_key, self.valid_keys))
 
-        if 'iss' not in tokenFields:
+        if issKey not in tokenFields:
             raise ValueError("Invalid token %s" % tokenFields)
 
-        in_issuer = idinfo['iss'] 
+        in_issuer = tokenFields[issKey] 
         issuer_valid_list = ['accounts.google.com', 'https://accounts.google.com']
         if in_issuer not in issuer_valid_list:
             raise ValueError('Wrong issuer %s, expected %s' % (in_issuer, issuer_valid_list))
@@ -44,19 +44,19 @@ class GoogleAuthMethod:
         try:
             # attempt to validate token on the client-side
             logging.debug("Using the google auth library to verify id token of length %d from android phones" % len(token))
-            tokenFields = id_token.verify_oauth2_token(token, requests.Request())
+            tokenFields = goi.verify_oauth2_token(token, gatr.Request())
             logging.debug("tokenFields from library = %s" % tokenFields)
-            verifiedEmail = _verifyTokenFields(tokenFields, "aud", "iss")
+            verifiedEmail = self.__verifyTokenFields(tokenFields, "aud", "iss")
             logging.debug("Found user email %s" % tokenFields['email'])
             return verifiedEmail
-        except ValueError:
+        except:
             logging.debug("OAuth failed to verify id token, falling back to constructedURL")
             #fallback to verifying using Google API
             constructedURL = ("https://www.googleapis.com/oauth2/v1/tokeninfo?id_token=%s" % token)
             r = requests.get(constructedURL)
             tokenFields = json.loads(r.content)
             logging.debug("tokenFields from constructedURL= %s" % tokenFields)
-            verifiedEmail = _verifyTokenFields(tokenFields, "audience", "iss")
+            verifiedEmail = self.__verifyTokenFields(tokenFields, "audience", "issuer")
             logging.debug("Found user email %s" % tokenFields['email'])
             return verifiedEmail
 
