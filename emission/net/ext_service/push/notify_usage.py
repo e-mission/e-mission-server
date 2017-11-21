@@ -35,9 +35,14 @@ def display_response(response):
         logging.debug("did not send push to ionic")
         return
     try:
-        response_json = response.json()
-        rjd = response_json["data"]
-        logging.debug("ionic push result: created %s state %s status %s" % (rjd["created"],
-            rjd["state"], rjd["status"]))
+        if type(response) == requests.models.Response:
+	    response_json = response.json()
+            rjd = response_json["data"]
+            logging.debug("ionic push result: created %s state %s status %s" % (rjd["created"],
+                rjd["state"], rjd["status"]))
+        else:
+            response_json = response
+            logging.debug("ionic push result: success %s failure %s results %s" % 
+		(response_json["success"], response_json["failure"], response_json["results"]))
     except ValueError, e:
         logging.error("Unable to deserialize reponse %s", response.text())

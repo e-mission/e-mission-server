@@ -9,6 +9,7 @@ import time
 
 # Our imports
 import emission.core.get_database as edb
+from pyfcm import FCMNotification
 
 # Note that the URL is hardcoded because the API endpoints are not standardized.
 # If we change a push provider, we will need to modify to match their endpoints.
@@ -51,24 +52,34 @@ def send_visible_notification(token_list, title, message, json_data, dev=False):
     profile_to_use = "devpush" if dev == True else "prodpush";
     logging.debug("dev = %s, using profile = %s" % (dev, profile_to_use))
 
-    message_dict = {
-        "tokens": token_list,
-        "profile": profile_to_use,
-        "notification": {
-            "title": title,
-            "message": message,
-            "android": {
-                "data": json_data,
-                "payload": json_data,
-            },
-            "ios": {
-                "data": json_data,
-                "payload": json_data
-            }
-        }
+    push_service = FCMNotification(api_key=server_auth_token)
+
+#    message_dict = {
+#        "tokens": token_list,
+#        "profile": profile_to_use,
+#        "notification": {
+#            "title": title,
+#            "message": message,
+#            "android": {
+#                "data": json_data,
+#                "payload": json_data,
+#            },
+#            "ios": {
+#                "data": json_data,
+#                "payload": json_data
+#            }
+#        }
+#    }
+#    send_push_url = "https://api.ionic.io/push/notifications"
+#    response = send_msg_to_service("POST", send_push_url, message_dict)
+    data_message = {
+       "data": json_data,
+       "payload": json_data
     }
-    send_push_url = "https://api.ionic.io/push/notifications"
-    response = send_msg_to_service("POST", send_push_url, message_dict)
+    response = push_service.notify_multiple_devices(registration_ids=token_list,
+                                           message_body=message,
+                                           message_title=title,
+                                           data_message=data_message)
     logging.debug(response)
     return response
     
@@ -82,28 +93,34 @@ def send_silent_notification(token_list, json_data, dev=False):
     # being not a float. Have to see if that is too big.
     # Hopefully we will never send a push notification a millisecond to a single phone
     ios_raw_data.update({"notId": int(time.time() * 10**6)})
+    ios_raw_data.update({"payload": ios_raw_data["notId"]})
 
     profile_to_use = "devpush" if dev == True else "prodpush";
     logging.debug("dev = %s, using profile = %s" % (dev, profile_to_use))
 
-    message_dict = {
-        "tokens": token_list,
-        "profile": profile_to_use,
-        "notification": {
-            "android": {
-                "content_available": 1,
-                "data": json_data,
-                "payload": json_data
-            },
-            "ios": {
-                "content_available": 1,
-                "priority": 10,
-                "data": ios_raw_data,
-                "payload": ios_raw_data
-            }
-        }
-    }
-    send_push_url = "https://api.ionic.io/push/notifications"
-    response = send_msg_to_service("POST", send_push_url, message_dict)
+    push_service = FCMNotification(api_key=server_auth_token)
+
+#    message_dict = {
+#        "tokens": token_list,
+#        "profile": profile_to_use,
+#        "notification": {
+#            "android": {
+#                "content_available": 1,
+#                "data": json_data,
+#                "payload": json_data
+#            },
+#            "ios": {
+#                "content_available": 1,
+#                "priority": 10,
+#                "data": ios_raw_data,
+#                "payload": ios_raw_data
+#            }
+#        }
+#    }
+#    send_push_url = "https://api.ionic.io/push/notifications"
+#    response = send_msg_to_service("POST", send_push_url, message_dict)
+    response = push_service.notify_multiple_devices(registration_ids=token_list,
+                                               data_message=ios_raw_data,
+                                               content_available=True)
     logging.debug(response)
     return response
