@@ -28,7 +28,7 @@ import modeshare, zipcode, distance, tripManager, \
                  Berkeley, visualize, stats, usercache, timeline, \
                  metrics, pipeline
 import emission.net.auth.auth as enaa
-import emission.net.ext_service.moves.register as auth
+# import emission.net.ext_service.moves.register as auth
 import emission.net.ext_service.habitica.proxy as habitproxy
 import emission.analysis.result.carbon as carbon
 import emission.analysis.classification.inference.commute as commute
@@ -60,11 +60,6 @@ server_port = config_data["server"]["port"]
 socket_timeout = config_data["server"]["timeout"]
 log_base_dir = config_data["paths"]["log_base_dir"]
 auth_method = config_data["server"]["auth"]
-
-key_file = open('conf/net/keys.json')
-key_data = json.load(key_file)
-ssl_cert = key_data["ssl_certificate"]
-private_key = key_data["private_key"]
 
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes
@@ -739,6 +734,11 @@ if __name__ == '__main__':
     # port number
     if server_port == "443":
       # We support SSL and want to use it
+      key_file = open('conf/net/keys.json')
+      key_data = json.load(key_file)
+      ssl_cert = key_data["ssl_certificate"]
+      private_key = key_data["private_key"]
+
       run(host=server_host, port=server_port, server='cherrypy', debug=True,
           certfile=ssl_cert, keyfile=private_key, ssl_module='builtin')
     else:
