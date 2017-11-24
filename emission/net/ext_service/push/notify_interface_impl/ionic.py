@@ -5,9 +5,12 @@ import copy
 # Our imports
 import emission.core.get_database as edb
 
+def get_interface(push_config):
+    return IonicPush(pushConfig)
+
 class IonicPush(NotifyInterface):
-    def __init__(self, key_data):
-        self.server_auth_token = key_data["server_auth_token"]
+    def __init__(self, push_config):
+        self.server_auth_token = push_config["server_auth_token"]
 
     def get_auth_header(self):
         logging.debug("Found server_auth_token starting with %s" % self.server_auth_token[0:10])
@@ -95,3 +98,9 @@ class IonicPush(NotifyInterface):
         response = send_msg_to_service("POST", send_push_url, message_dict)
         logging.debug(response)
         return response
+
+    def display_response(response):
+	    response_json = response.json()
+        rjd = response_json["data"]
+        logging.debug("ionic push result: created %s state %s status %s" % (rjd["created"],
+                rjd["state"], rjd["status"]))

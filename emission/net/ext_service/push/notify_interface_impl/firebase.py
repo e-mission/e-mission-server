@@ -6,9 +6,12 @@ import copy
 import emission.core.get_database as edb
 from pyfcm import FCMNotification
 
+def get_interface(push_config):
+    return FirebasePush(push_config)
+
 class FirebasePush(NotifyInterface):
-    def __init__(self, key_data):
-        self.server_auth_token = key_data["server_auth_token"]
+    def __init__(self, push_config):
+        self.server_auth_token = push_config["server_auth_token"]
 
     def get_and_invalidate_entries(self):
         # Need to figure out how to do this on firebase
@@ -97,3 +100,8 @@ class FirebasePush(NotifyInterface):
                                                    content_available=True)
         logging.debug(response)
         return response
+
+    def display_response(response):
+        response_json = response
+        logging.debug("firebase push result: success %s failure %s results %s" %
+            (response_json["success"], response_json["failure"], response_json["results"]))

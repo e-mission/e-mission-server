@@ -7,12 +7,15 @@ import json
 # We can revisit this if push providers eventually decide to standardize...
 
 try:
-    key_file = open('conf/net/ext_service/push.json')
-    key_data = json.load(key_file)
+    push_config_file = open('conf/net/ext_service/push.json')
+    push_config = json.load(push_config_file)
 except:
     logging.warning("push service not configured, push notifications not supported")
 
 class NotifyInterfaceFactory(self):
+    def getDefaultNotifyInterface():
+        return getNotifyInterface(push_config["provider"])
+
     def getNotifyInterface(pushProvider):
         module_name = "emission.net.ext_service.push.notify_interface_impl.%s" % pushProvider
         logging.debug("module_name = %s" % module_name)
@@ -32,5 +35,8 @@ class NotifyInterface:
         pass
 
     def send_silent_notification(self, token_list, title, message, json_data, dev=False):
+        pass
+
+    def display_response(self, response):
         pass
 
