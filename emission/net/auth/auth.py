@@ -58,7 +58,7 @@ def getUUID(request, authMethod, inHeader=False):
 
 # Should only be used by the profile creation code, since we may not have a
 # UUID yet. All others should only use the UUID.
-def __getEmail__(request, authMethod, inHeader=False):
+def _getEmail(request, authMethod, inHeader=False):
   userToken = request.json['user']
   # This is the only place we should use the email, since we may not have a
   # UUID yet. All others should only use the UUID.

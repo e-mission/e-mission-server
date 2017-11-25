@@ -115,11 +115,8 @@ class TestAuthSelection(unittest.TestCase):
         request = enab.LocalRequest(environ=test_environ)
         logging.debug("Found request body = %s" % request.body.getvalue())
         logging.debug("Found request headers = %s" % request.headers.keys())
-        self.assertEqual(enaa.__getEmail__(request, "skip", inHeader=False), test_email)
-        self.assertEqual(enaa.__getEmail__(request, "token_list", inHeader=False), test_email)
-        with self.assertRaises(ValueError):
-            self.assertEqual(enaa.__getEmail__(request, "google_auth", inHeader=False), test_email)
-
+        self.assertEqual(enaa._getEmail(request, "skip", inHeader=False), test_email)
+        self.assertEqual(enaa._getEmail(request, "token_list", inHeader=False), test_email)
     def testGetUUIDSkipAuth(self):
         import emission.net.api.bottle as enab
         import emission.core.wrapper.user as ecwu

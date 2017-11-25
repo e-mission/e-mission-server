@@ -385,7 +385,7 @@ def getTrips(day):
 def createUserProfile():
   try:
       logging.debug("Called createUserProfile")
-      userEmail = enaa.__getEmail__(request, auth_method)
+      userEmail = enaa._getEmail(request, auth_method)
       logging.debug("userEmail = %s" % userEmail)
       user = User.register(userEmail)
       logging.debug("Looked up user = %s" % user)
