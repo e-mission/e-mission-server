@@ -43,7 +43,7 @@ class TestAuthSelection(unittest.TestCase):
 
     def testGetAuthMethod(self):
 #        import emission.net.auth.openid_auth as enao
-        import emission.net.auth.google_auth as enag
+#        import emission.net.auth.google_auth as enag
 
         self.assertEqual(enaa.AuthMethodFactory.getAuthMethod("skip").__class__,
             enas.SkipMethod)
@@ -53,8 +53,8 @@ class TestAuthSelection(unittest.TestCase):
 # likely to be reliable
 #         self.assertEqual(enaa.AuthMethodFactory.getAuthMethod("openid_auth").__class__,
 #             enao.OpenIDAuthMethod)
-        self.assertEqual(enaa.AuthMethodFactory.getAuthMethod("google_auth").__class__,
-            enag.GoogleAuthMethod)
+#         self.assertEqual(enaa.AuthMethodFactory.getAuthMethod("google_auth").__class__,
+#             enag.GoogleAuthMethod)
 
     def testGetTokenInJSON(self):
         import emission.net.api.bottle as enab
@@ -71,6 +71,22 @@ class TestAuthSelection(unittest.TestCase):
         with self.assertRaises(AttributeError):
             self.assertEqual(enaa.__getToken__(request, inHeader=True), "test_token")
         
+    def testGetTokenInHeader(self):
+        import emission.net.api.bottle as enab
+        import StringIO
+
+        user_data = StringIO.StringIO() 
+
+        addl_headers = {'HTTP_USER': 'test_header_token'}
+
+        test_environ = etc.createDummyRequestEnviron(self, addl_headers=addl_headers, request_body=user_data)
+        request = enab.LocalRequest(environ=test_environ)
+        logging.debug("Found request body = %s" % request.body.getvalue())
+        logging.debug("Found request headers = %s" % request.headers.keys())
+        self.assertEqual(enaa.__getToken__(request, inHeader=True), "test_header_token")
+        with self.assertRaises(ValueError):
+            self.assertEqual(enaa.__getToken__(request, inHeader=False), "test_header_token")
+
     def testGetTokenInHeader(self):
         import emission.net.api.bottle as enab
         import StringIO
