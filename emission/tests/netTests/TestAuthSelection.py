@@ -42,7 +42,7 @@ class TestAuthSelection(unittest.TestCase):
         os.remove(self.google_auth_conf_path)
 
     def testGetAuthMethod(self):
-        import emission.net.auth.openid_auth as enao
+#        import emission.net.auth.openid_auth as enao
         import emission.net.auth.google_auth as enag
 
         self.assertEqual(enaa.AuthMethodFactory.getAuthMethod("skip").__class__,
