@@ -224,6 +224,10 @@ def getPopRouteLegacy():
 
 @post("/result/heatmap/pop.route/<time_type>")
 def getPopRoute(time_type):
+  print request
+  print request.environ
+  print request.body.getvalue()
+  print request.headers.keys()
   if 'user' in request.json:
      user_uuid = getUUID(request)
   else:

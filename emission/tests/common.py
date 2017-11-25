@@ -136,3 +136,42 @@ def configLogging():
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(thread)d:%(message)s',
                     level=logging.DEBUG)
 
+def setupTokenListAuth(self):
+    token_list_conf_file = open(self.token_list_conf_path, "w")
+    token_list_conf_json = {
+        "token_list": self.token_list_path
+    }
+
+    token_list_conf_file.write(json.dumps(token_list_conf_json))
+    token_list_file = open(self.token_list_path, "w")
+    token_list_file.write("correct_horse_battery_staple\n")
+    token_list_file.write("collar_highly_asset_ovoid_sultan\n")
+    token_list_file.write("caper_hangup_addle_oboist_scroll\n")
+    token_list_file.write("couple_honcho_abbot_obtain_simple\n")
+
+def tearDownTokenListAuth(self):
+    import os
+
+    os.remove(self.token_list_conf_path)
+    os.remove(self.token_list_path)
+
+def createDummyRequestEnviron(self, addl_headers, request_body):
+    # request_body is a StringIO object
+    test_environ = {'HTTP_REFERER': 'http://localhost:8080/',
+        'SERVER_SOFTWARE': 'CherryPy/3.6.0 Server',
+        'SCRIPT_NAME': '',
+        'ACTUAL_SERVER_PROTOCOL': 'HTTP/1.1',
+        'REQUEST_METHOD': 'POST',
+        'PATH_INFO': '/result/heatmap/pop.route/local_date',
+        'SERVER_PROTOCOL': 'HTTP/1.1',
+        'QUERY_STRING': '',
+        'bottle.request.body': request_body,
+        'CONTENT_TYPE': 'application/json;charset=utf-8',
+        'wsgi.input': request_body,
+        'wsgi.multithread': True,
+        'HTTP_ACCEPT_LANGUAGE': 'en-US,en;q=0.5',
+        'HTTP_ACCEPT_ENCODING': 'gzip, deflate'
+    }
+    if addl_headers is not None:
+        test_environ.update(addl_headers)
+    return test_environ
