@@ -12,7 +12,7 @@ import emission.tests.common as etc
 
 import emission.net.ext_service.push.notify_interface as pni
 import emission.net.ext_service.push.notify_usage as pnu
-import emission.net.ext_service.push.notify_query as pnq
+import emission.net.ext_service.push.notify_queries as pnq
 
 # It is really hard to test push code, because the tools to emulate pushes are
 # kind of sucky. For example, the iOS emulator does not support pushes. And
@@ -64,7 +64,7 @@ class TestPush(unittest.TestCase):
         import emission.net.ext_service.push.notify_interface_impl.ionic as pnii
 
         self.assertEqual(pni.NotifyInterfaceFactory.getDefaultNotifyInterface().__class__,
-                         pnif.IonicPush)
+                         pnii.IonicPush)
 
         self.assertEqual(pnu.__get_default_interface__().__class__,
                          pnii.IonicPush)
@@ -83,10 +83,10 @@ class TestPush(unittest.TestCase):
                 "device_token": "android_device_token"})
 
             uuid_token_list = pnq.get_matching_tokens(pnq.get_user_query([user_1.uuid, user_2.uuid]))
-            self.assertEqual(token_list, ["ios_device_token", "android_device_token"])
+            self.assertEqual(uuid_token_list, ["ios_device_token", "android_device_token"])
             
             platform_token_list = pnq.get_matching_tokens(pnq.get_platform_query("ios"))
-            self.assertEqual(token_list, ["ios_device_token"])
+            self.assertEqual(platform_token_list, ["ios_device_token"])
         finally:
             ecwu.User.unregister(self.test_email_1)
             ecwu.User.unregister(self.test_email_2)
