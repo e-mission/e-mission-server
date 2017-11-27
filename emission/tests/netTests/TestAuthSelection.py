@@ -142,7 +142,8 @@ class TestAuthSelection(unittest.TestCase):
         self.test_email = "correct_horse_battery_staple"
         user_data = StringIO.StringIO() 
         user_data.write(json.dumps({'user': self.test_email}))
-        test_environ = etc.createDummyRequestEnviron(self, addl_headers=None, request_body=user_data)
+        test_environ = etc.createDummyRequestEnviron(self, addl_headers=None,
+                                                     request_body=user_data)
 
         request = enab.LocalRequest(environ=test_environ)
         logging.debug("Found request body = %s" % request.body.getvalue())
