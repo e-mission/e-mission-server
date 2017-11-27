@@ -4,12 +4,14 @@ import copy
 
 # Our imports
 import emission.core.get_database as edb
+import emission.net.ext_service.push.notify_interface as pni
 from pyfcm import FCMNotification
+
 
 def get_interface(push_config):
     return FirebasePush(push_config)
 
-class FirebasePush(NotifyInterface):
+class FirebasePush(pni.NotifyInterface):
     def __init__(self, push_config):
         self.server_auth_token = push_config["server_auth_token"]
 
@@ -22,6 +24,22 @@ class FirebasePush(NotifyInterface):
         logging.warning("dev flag is ignored for firebase, since the API does not distinguish between production and dev")
         logging.warning("https://stackoverflow.com/questions/38581241/ios-firebase-push-notification-for-sandbox-only")
         logging.warning("https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages")
+
+    def map_existing_fcm_tokens(self, token_list):
+        mapped_token_list = []
+        unmapped_token_list = []
+
+        for token in token_list:
+            existing_mapping = edb.get_push_token_mapping_db().find_one({"native_token": token})
+            if existing_mapping is not None:
+                assert(existing_mapping["native_token"] == token)
+                mapped_token = existing_mapping["mapped_token"]
+                logging.debug("mapped %s -> %s" % (token, mapped_token))
+                mapped_token_list.append(mapped_token)
+            else:
+                logging.debug("No mapping found for token %s, need to query from database" % token)
+                unmapped_token_list.append(token)
+        return (mapped_token_list, unmapped_token_list)
 
     def retrieve_fcm_tokens(self, token_list):
         importHeaders = {"Authorization": "key=%s" % self.server_auth_token,
@@ -45,15 +63,21 @@ class FirebasePush(NotifyInterface):
                 if result["status"] == "OK" and "registration_token" in result:
                     ret_list.append(result["registration_token"])
                     logging.debug("Found firebase mapping from %s -> %s at index %d"%
-                (result["apns_token"], result["registration_token"], i));
+                        (result["apns_token"], result["registration_token"], i));
+                    edb.get_push_token_mapping_db().insert({"native_token": result["apns_token"],
+                                                            "mapped_token": result["registration_token"]})
                 else:
                     logging.debug("Must already be android token, leave it unchanged");
+                    # TODO: Determine whether to store a mapping here or not depending on what the result
+                    # for an android token is
                     ret_list.append(token_list[i])
         return ret_list
 
     def convert_to_fcm_if_necessary(self, token_list):
-        importedResultJSON = self.retrieve_fcm_tokens(token_list)
-        return self.process_fcm_token_list(token_list, importedResultJSON)
+        (mapped_token_list, unmapped_token_list) = self.map_existing_fcm_tokens(token_list)
+        importedResultJSON = self.retrieve_fcm_tokens(unmapped_token_list)
+        newly_mapped_token_list = self.process_fcm_token_list(token_list, importedResultJSON)
+        return mapped_token_list + newly_mapped_token_list
 
     def send_visible_notification(self, token_list, title, message, json_data, dev=False):
         if len(token_list) == 0:
