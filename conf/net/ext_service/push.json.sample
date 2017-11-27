@@ -1,3 +1,4 @@
 {
+    "provider": "firebase/ionic",
     "server_auth_token": "Get from https://ionic.io"
 }
