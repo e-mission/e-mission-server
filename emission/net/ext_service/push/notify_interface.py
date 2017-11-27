@@ -1,5 +1,7 @@
 # Standard imports
 import json
+import logging
+import importlib
 
 # Note that the URL is hardcoded because the API endpoints are not standardized.
 # If we change a push provider, we will need to modify to match their endpoints.
@@ -12,10 +14,12 @@ try:
 except:
     logging.warning("push service not configured, push notifications not supported")
 
-class NotifyInterfaceFactory(self):
+class NotifyInterfaceFactory:
+    @staticmethod
     def getDefaultNotifyInterface():
-        return getNotifyInterface(push_config["provider"])
+        return NotifyInterfaceFactory.getNotifyInterface(push_config["provider"])
 
+    @staticmethod
     def getNotifyInterface(pushProvider):
         module_name = "emission.net.ext_service.push.notify_interface_impl.%s" % pushProvider
         logging.debug("module_name = %s" % module_name)
@@ -23,7 +27,7 @@ class NotifyInterfaceFactory(self):
         logging.debug("module = %s" % module)
         interface_obj_fn = getattr(module, "get_interface")
         logging.debug("interface_obj_fn = %s" % interface_obj_fn)
-        interface_obj = interface_obj_fn()
+        interface_obj = interface_obj_fn(push_config)
         logging.debug("interface_obj = %s" % interface_obj)
         return interface_obj
 

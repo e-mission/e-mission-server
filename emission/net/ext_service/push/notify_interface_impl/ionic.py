@@ -4,11 +4,12 @@ import copy
 
 # Our imports
 import emission.core.get_database as edb
+import emission.net.ext_service.push.notify_interface as pni
 
 def get_interface(push_config):
-    return IonicPush(pushConfig)
+    return IonicPush(push_config)
 
-class IonicPush(NotifyInterface):
+class IonicPush(pni.NotifyInterface):
     def __init__(self, push_config):
         self.server_auth_token = push_config["server_auth_token"]
 
@@ -100,7 +101,7 @@ class IonicPush(NotifyInterface):
         return response
 
     def display_response(response):
-	    response_json = response.json()
+        response_json = response.json()
         rjd = response_json["data"]
         logging.debug("ionic push result: created %s state %s status %s" % (rjd["created"],
                 rjd["state"], rjd["status"]))
