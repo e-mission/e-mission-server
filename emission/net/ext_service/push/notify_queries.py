@@ -7,13 +7,6 @@ import requests
 # Our imports
 import emission.core.get_database as edb
 
-try:
-    key_file = open('conf/net/ext_service/push.json')
-    key_data = json.load(key_file)
-    server_auth_token = key_data["server_auth_token"]
-except:
-    logging.exception("push service not configured, push notifications not supported")
-
 def get_platform_query(platform):
     return {"curr_platform": platform}
 
