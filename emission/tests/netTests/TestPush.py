@@ -43,8 +43,8 @@ class TestPush(unittest.TestCase):
             "provider": "ionic",
             "server_auth_token": "firebase_api_key"
         }))
-        logging.warning("Finished setting up %s" % self.push_conf_path)
-        logging.warning("Current values are %s" % json.load(open(self.push_conf_path)))
+        logging.debug("Finished setting up %s" % self.push_conf_path)
+        logging.debug("Current values are %s" % json.load(open(self.push_conf_path)))
 
     def tearDown(self):
         # os.remove(self.push_conf_path)
@@ -99,7 +99,7 @@ class TestPush(unittest.TestCase):
 #         import emission.core.get_database as edb
 # 
 #         self.test_token_list = ["device_token_%s" % i for i in range(10)]
-#         logging.warning("test token list = %s" % self.test_token_list)
+#         logging.debug("test token list = %s" % self.test_token_list)
 # 
 #         try:
 #             fcm_instance = pnif.get_interface({"server_auth_token": "firebase_api_key"})
@@ -113,7 +113,7 @@ class TestPush(unittest.TestCase):
 #             pretend_android_tokens = self.test_token_list[6::2] + self.test_token_list[1::2]
 #             fake_result = generate_fake_result(pretend_ios_tokens, pretend_android_tokens)
 #             newly_mapped_token_list = fcm_instance.process_fcm_token_result(self.test_token_list, fake_result)
-#             logging.warning("pretend_ios_tokens = %s, pretend_android_tokens = %s, newly_mapped_token_list = %s" % (pretend_ios_tokens, pretend_android_tokens, newly_mapped_token_list))
+#             logging.debug("pretend_ios_tokens = %s, pretend_android_tokens = %s, newly_mapped_token_list = %s" % (pretend_ios_tokens, pretend_android_tokens, newly_mapped_token_list))
 #             self.assertEqual(len(newly_mapped_token_list), len(self.test_token_list))
 # 
 #             # Now try to map again - this time, all the ios entries should be mapped, and
@@ -127,7 +127,7 @@ class TestPush(unittest.TestCase):
 #             fake_result = generate_fake_result(pretend_ios_tokens, pretend_android_tokens)
 #             # Fake the mapped result again
 #             newly_mapped_token_list = fcm_instance.process_fcm_token_result(self.test_token_list, fake_result)
-#             logging.warning("pretend_ios_tokens = %s, pretend_android_tokens = %s, newly_mapped_token_list = %s" % (pretend_ios_tokens, pretend_android_tokens, newly_mapped_token_list))
+#             logging.debug("pretend_ios_tokens = %s, pretend_android_tokens = %s, newly_mapped_token_list = %s" % (pretend_ios_tokens, pretend_android_tokens, newly_mapped_token_list))
 #             self.assertEqual(len(newly_mapped_token_list), len(self.test_token_list))
 # 
 #             # Now try to map again - again, all the ios entries should be mapped, and
