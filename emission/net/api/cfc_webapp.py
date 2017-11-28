@@ -28,7 +28,7 @@ import modeshare, zipcode, distance, tripManager, \
                  Berkeley, visualize, stats, usercache, timeline, \
                  metrics, pipeline
 import emission.net.auth.auth as enaa
-import emission.net.ext_service.moves.register as auth
+# import emission.net.ext_service.moves.register as auth
 import emission.net.ext_service.habitica.proxy as habitproxy
 import emission.analysis.result.carbon as carbon
 import emission.analysis.classification.inference.commute as commute
@@ -46,7 +46,12 @@ import emission.storage.timeseries.cache_series as esdc
 import emission.core.timer as ect
 import emission.core.get_database as edb
 
-config_file = open('conf/net/api/webserver.conf')
+try:
+    config_file = open('conf/net/api/webserver.conf')
+except:
+    logging.debug("webserver not configured, falling back to sample, default configuration")
+    config_file = open('conf/net/api/webserver.conf.sample')
+
 config_data = json.load(config_file)
 static_path = config_data["paths"]["static_path"]
 python_path = config_data["paths"]["python_path"]
@@ -56,15 +61,9 @@ socket_timeout = config_data["server"]["timeout"]
 log_base_dir = config_data["paths"]["log_base_dir"]
 auth_method = config_data["server"]["auth"]
 
-key_file = open('conf/net/keys.json')
-key_data = json.load(key_file)
-ssl_cert = key_data["ssl_certificate"]
-private_key = key_data["private_key"]
-
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes
 
-skipAuth = False
 print "Finished configuring logging for %s" % logging.getLogger()
 app = app()
 
@@ -382,7 +381,7 @@ def getTrips(day):
 def createUserProfile():
   try:
       logging.debug("Called createUserProfile")
-      userEmail = enaa.__getEmail(request, skipAuth, auth_method)
+      userEmail = enaa._getEmail(request, auth_method)
       logging.debug("userEmail = %s" % userEmail)
       user = User.register(userEmail)
       logging.debug("Looked up user = %s" % user)
@@ -433,12 +432,12 @@ def postCarbonCompare():
   from clients.data import data
   from clients.choice import choice
 
-  if not skipAuth:
-      if request.json == None:
-        return "Waiting for user data to become available..."
-      if 'user' not in request.json:
-        return "Waiting for user data to be become available.."
-
+#   if not skipAuth:
+#       if request.json == None:
+#         return "Waiting for user data to become available..."
+#       if 'user' not in request.json:
+#         return "Waiting for user data to be become available.."
+# 
   user_uuid = getUUID(request)
 
   clientResult = userclient.getClientSpecificResult(user_uuid)
@@ -456,10 +455,10 @@ def getCarbonCompare():
 
   from clients.data import data
 
-  if not skipAuth:
-    if 'User' not in request.headers or request.headers.get('User') == '':
-        return "Waiting for user data to become available..."
-
+#   if not skipAuth:
+#     if 'User' not in request.headers or request.headers.get('User') == '':
+#         return "Waiting for user data to become available..."
+# 
   from clients.choice import choice
 
   user_uuid = getUUID(request, inHeader=True)
@@ -698,7 +697,7 @@ def after_request():
 
 def getUUID(request, inHeader=False):
     try:
-        retUUID = enaa.getUUID(request, skipAuth, auth_method, inHeader)
+        retUUID = enaa.getUUID(request, auth_method, inHeader)
         logging.debug("retUUID = %s" % retUUID)
         if retUUID is None:
            raise HTTPError(403, "token is valid, but no account found for user")
@@ -735,18 +734,16 @@ if __name__ == '__main__':
     # port number
     if server_port == "443":
       # We support SSL and want to use it
+      key_file = open('conf/net/keys.json')
+      key_data = json.load(key_file)
+      ssl_cert = key_data["ssl_certificate"]
+      private_key = key_data["private_key"]
+
       run(host=server_host, port=server_port, server='cherrypy', debug=True,
           certfile=ssl_cert, keyfile=private_key, ssl_module='builtin')
     else:
       # Non SSL option for testing on localhost
-      # We can theoretically use a separate skipAuth flag specified in the config file,
-      # but then we have to define the behavior if SSL is true and we are not
-      # running on localhost but still want to run without authentication. That is
-      # not really an important use case now, and it makes people have to change
-      # two values and increases the chance of bugs. So let's key the auth skipping from this as well.
-      skipAuth = True
-      print "Running with HTTPS turned OFF, skipAuth = True"
-
+      print "Running with HTTPS turned OFF - use a reverse proxy on production"
       run(host=server_host, port=server_port, server='cherrypy', debug=True)
 
     # run(host="0.0.0.0", port=server_port, server='cherrypy', debug=True)

@@ -9,9 +9,11 @@ geojson==1.0.9
 six==1.9.0
 utm==0.3.1
 wsgiref==0.1.2
-google-api-python-client
+google-auth
 xmltodict
 python-crontab
 attrdict
 enum34
 arrow
+jwcrypto
+pyfcm

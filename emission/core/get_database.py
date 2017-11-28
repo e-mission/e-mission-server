@@ -217,6 +217,10 @@ def get_pipeline_state_db():
     PipelineState = _get_current_db().Stage_pipeline_state
     return PipelineState
 
+def get_push_token_mapping_db():
+    PushTokenMapping = _get_current_db().Stage_push_token_mapping
+    return PushTokenMapping
+
 def get_common_place_db():
     #current_db = MongoClient().Stage_database
     CommonPlaces = _get_current_db().Stage_common_place
