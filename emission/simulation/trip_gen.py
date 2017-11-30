@@ -10,7 +10,7 @@ import sys
 from emission.net.ext_service.otp.otp import OTP, PathNotFoundException
 from emission.core.wrapper.trip_old import Coordinate 
 import emission.simulation.markov_model_counter as esmmc
-from emission.core.our_geocoder import Geocoder
+import emission.net.ext_service.geocoder.nominatim as enn
 import emission.core.get_database as edb
 import emission.core.wrapper.trip as ecwt
 import emission.core.wrapper.section as ecws
@@ -124,7 +124,7 @@ def save_section_to_db(section):
 
 def geocode_address(address):
     if address.cord is None:
-        business_geocoder = Geocoder()
+        business_geocoder = enn.Geocoder()
         results = business_geocoder.geocode(address.text)
         address.cord = results
     else:

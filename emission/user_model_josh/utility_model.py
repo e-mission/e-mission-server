@@ -1,6 +1,6 @@
 import emission.simulation.markov_model_counter as emmc
 import emission.net.ext_service.otp.otp as otp
-import emission.core.our_geocoder as geo
+import emission.net.ext_service.geocoder.nominatim as geo
 import emission.core.wrapper.trip_old as to
 import emission.net.ext_service.gmaps.googlemaps as gmaps
 import emission.net.ext_service.gmaps.common as gmcommon

@@ -9,7 +9,7 @@ import arrow
 
 # Our imports
 from emission.core.wrapper.trip_old import Coordinate, Alternative_Trip, Section, Fake_Trip, Trip
-import emission.core.our_geocoder as our_geo
+import emission.net.ext_service.geocoder.nominatim as our_geo
 import emission.storage.decorations.trip_queries as ecsdtq
 import emission.storage.decorations.section_queries as ecsdsq
 import emission.storage.decorations.place_queries as ecsdpq
