@@ -29,7 +29,6 @@ import emission.core.common as ecc
 import emission.storage.decorations.useful_queries as taug
 import emission.storage.decorations.location_queries as lq
 import emission.core.get_database as edb
-import emission.core.common as ec
 
 np.set_printoptions(suppress=True)
 

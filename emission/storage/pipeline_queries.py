@@ -4,7 +4,6 @@ import datetime as pydt
 import emission.core.get_database as edb
 import emission.core.wrapper.pipelinestate as ps
 import emission.storage.timeseries.timequery as estt
-import emission.core.common
 
 import time
 

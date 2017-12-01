@@ -13,7 +13,6 @@ import emission.core.wrapper.localdate as ecwl
 import emission.net.usercache.abstract_usercache_handler as enuah
 import emission.net.ext_service.push.query.point_count as pointcount
 import emission.storage.timeseries.tcquery as estt
-import emission.core.common as ecc
 
 # Test imports
 import emission.tests.common as etc

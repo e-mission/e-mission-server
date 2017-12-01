@@ -75,8 +75,6 @@ class TestGeoJSON(unittest.TestCase):
     sec1 = {'track_location': pnt}
     self.Sections.insert(sec1)
 
-    print common.Inside_polygon(pnt, common.berkeley_area())
-
     retVal = []
     for a in self.Sections.find({ "track_location" : { "$geoWithin" : { "$polygon" : self.getTestPolygon2() } } }):
         retVal.append(a)

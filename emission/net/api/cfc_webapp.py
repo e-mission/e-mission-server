@@ -29,9 +29,7 @@ import emission.net.auth.auth as enaa
 # import emission.net.ext_service.moves.register as auth
 import emission.net.ext_service.habitica.proxy as habitproxy
 import emission.analysis.result.carbon as carbon
-import emission.analysis.classification.inference.commute as commute
 import emission.analysis.result.userclient as userclient
-import emission.core.common as common
 from emission.core.wrapper.client import Client
 from emission.core.wrapper.user import User
 from emission.core.get_database import get_uuid_db, get_mode_db
@@ -178,8 +176,6 @@ def getStressMap(time_type):
     }
     viz_fn = time_type_map[time_type]
     retVal = viz_fn(user_uuid, modes, start_time, end_time, region)
-    # retVal = common.generateRandomResult(['00-04', '04-08', '08-10'])
-    # logging.debug("In getCalPopRoute, retVal is %s" % retVal)
     return retVal
 
 @post("/pipeline/get_complete_ts")
