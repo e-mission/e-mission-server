@@ -98,6 +98,9 @@ class User:
     newTs = self.getUpdateTS() + timedelta
     get_profile_db().update({'user_id': self.uuid}, {'$set': {'update_ts': newTs}})
 
+  def getFirstStudy(self):
+    return None
+
   @staticmethod
   def mergeDicts(dict1, dict2):
     retDict = dict1.copy()
@@ -110,21 +113,19 @@ class User:
     # Combine profile settings and study settings.
     # We currently don't have any profile settings
     retSettings = self.defaultSettings;
-    studyList = self.getStudy()
-    if len(studyList) > 0:
-      logging.debug("To return user settings, combining %s data from %s" % (Client(studyList[0]).getSettings(), studyList[0]))
-      retSettings = User.mergeDicts(retSettings, Client(studyList[0]).getSettings())
-      logging.debug("After merge retSettings = %s" % retSettings)
-    else:
-      logging.debug("To return user settings, using defaults")
+    logging.debug("To return user settings, using defaults")
     return retSettings
 
   @staticmethod
-  def createProfile(uuid, ts, studyList):
+  def createProfile(uuid, ts):
     initProfileObj = {'user_id': uuid,
                       'source':'Shankari',
                       'update_ts': ts,
                       'mpg_array': [defaultMpg]}
+    writeResultProfile = get_profile_db().update(
+        {'user_id': uuid},
+        {'$set': initProfileObj},
+        upsert=True)
     return writeResultProfile
 
   # Create assumes that we will definitely create a new one every time.

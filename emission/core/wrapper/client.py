@@ -1,3 +1,14 @@
+#
+# In the current iteration, there is a client object that can be loaded from
+# the filesystem into the database and its settings loaded from the database.
+# There are no special settings (e.g. active/inactive).
+#
+# I have no idea how this will be used, but it is nice^H^H^H^H, unit tested code,
+# so let us keep it around a bit longer
+#
+# Ah but this assumes that the settings file is in `emission/clients/` and we
+# just deleted that entire directory. Changing this to conf for now...
+
 import json
 import logging
 import dateutil.parser
@@ -11,20 +22,19 @@ class Client:
     # TODO: write background process to ensure that there is only one client with each name
     # Maybe clean up unused clients?
     self.clientName = clientName
-    self.settings_filename = "emission/clients/%s/settings.json" % self.clientName
+    self.settings_filename = "conf/clients/%s.settings.json" % self.clientName
     self.__reload()
 
   # Smart settings call, which returns the override settings if the client is
   # active, and 
   def getSettings(self):
-    if (self.isActive(datetime.now())):
       logging.debug("For client %s, returning settings %s" % (self.clientName, self.clientJSON['client_settings']))
       return self.clientJSON['client_settings']
-    else:
-      # Returning empty dict instead of None to make the client code, which
-      # will want to merge this, easier
-      logging.debug("For client %s, active = false, returning {}" % (self.clientName))
-      return {}
+
+  def __reload(self):
+    self.clientJSON = None
+    if self.clientName is not None:
+      self.clientJSON = get_client_db().find_one({'name': self.clientName})
 
   # Figure out if the JSON object here should always be passed in
   # Having it be passed in is a lot more flexible
@@ -43,19 +53,6 @@ class Client:
     self.__update(newEntry)
     return newEntry['key']
 
-  def __loadModule(self):
-    import importlib
-    clientModule = importlib.import_module("emission.clients.%s.%s" % (self.clientName, self.clientName))
-    return clientModule
-
-  def callMethod(self, methodName, request):
-    clientModule = self.__loadModule()
-    logging.debug("called client with %s %s" % (self.clientName, methodName))
-    # import clients.carshare.carshare as clientModule
-    method = getattr(clientModule, methodName)
-    logging.debug("Invoking %s on module %s" % (method, clientModule))
-    return method(request)
-
   def getClientKey(self):
     if self.clientJSON is None:
         return None
@@ -63,8 +60,4 @@ class Client:
     return self.clientJSON['key']
 
   def clientSpecificSetters(self, uuid, sectionId, predictedModeMap):
-    if self.isActive(datetime.now()):
-      return self.__loadModule().clientSpecificSetters(uuid, sectionId, predictedModeMap)
-    else:
       return None
-
