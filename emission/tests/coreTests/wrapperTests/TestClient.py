@@ -18,14 +18,24 @@ class TestClient(unittest.TestCase):
     # Make sure we start with a clean slate every time
     self.serverName = 'localhost'
     common.dropAllCollections(get_db())
+
+    import shutil
+    self.config_path = "conf/clients/testclient.settings.json"
+    shutil.copyfile("%s.sample" % self.config_path,
+                    self.config_path)
+
     logging.info("After setup, client count = %d, profile count = %d, uuid count = %d" % 
       (get_client_db().find().count(), get_profile_db().count(), get_uuid_db().count()))
     common.loadTable(self.serverName, "Stage_Modes", "emission/tests/data/modes.json")
+
+  def tearDown(self):
+    import os
+    os.remove(self.config_path)
     
   def testInitClient(self):
     emptyClient = Client("testclient")
     self.assertEqual(emptyClient.clientName, "testclient")
-    self.assertEqual(emptyClient.settings_filename, "conf/clients/testclient.settings.json")
+    self.assertEqual(emptyClient.settings_filename, self.config_path)
     self.assertEqual(emptyClient.clientJSON, None)
 
   def updateWithTestSettings(self, client, fileName):
