@@ -1,3 +1,4 @@
+from __future__ import print_function
 from pymongo import MongoClient
 import json
 import sys
@@ -10,7 +11,7 @@ def purgeAllData():
 
 if __name__ == '__main__':
   if len(sys.argv) != 1:
-    print "USAGE: %s" % sys.argv[0]
+    print("USAGE: %s" % sys.argv[0])
     exit(1)
 
   purgeAllData()

@@ -3,6 +3,7 @@ Script to launch the pipeline reset code.
 Options documented in 
 https://github.com/e-mission/e-mission-server/issues/333#issuecomment-312464984
 """
+from __future__ import print_function
 import logging
 
 import argparse
@@ -64,7 +65,7 @@ if __name__ == '__main__':
                         help="do everything except actually perform the operations")
 
     args = parser.parse_args()
-    print args
+    print(args)
 
     # Handle the first row in the table
     if args.date is None:
