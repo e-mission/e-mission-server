@@ -1,3 +1,4 @@
+from __future__ import print_function
 #Standard imports
 import unittest
 import json
@@ -101,8 +102,8 @@ class TestPipeline(unittest.TestCase):
     self.testGenerateBusAndTrainStops()
 
     (self.pipeline.featureMatrix, self.pipeline.resultVector) = self.pipeline.generateFeatureMatrixAndResultVectorStep()
-    print "Number of sections = %s" % self.pipeline.confirmedSections.count()
-    print "Feature Matrix shape = %s" % str(self.pipeline.featureMatrix.shape)
+    print("Number of sections = %s" % self.pipeline.confirmedSections.count())
+    print("Feature Matrix shape = %s" % str(self.pipeline.featureMatrix.shape))
     self.assertEquals(self.pipeline.featureMatrix.shape[0], self.pipeline.confirmedSections.count())
     self.assertEquals(self.pipeline.featureMatrix.shape[1], len(self.pipeline.featureLabels))
 

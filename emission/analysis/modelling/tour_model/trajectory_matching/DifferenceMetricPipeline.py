@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Standard imports
 from pymongo import MongoClient
 import pygmaps
@@ -101,12 +102,12 @@ if __name__ == '__main__':
                         ]
 
     K_value_option = 'manual'
-    print '######'
+    print('######')
     for user in usercluster.find():
-        print 'USER ID: ' + str(user['user_id'])
-        print 'NUMBER OF CLUSTERS: '+ str(len(user['clusters']))
-        print 'NUMBER OF SECTIONS: '+ str(user['size'])
-        print '' 
+        print('USER ID: ' + str(user['user_id']))
+        print('NUMBER OF CLUSTERS: '+ str(len(user['clusters'])))
+        print('NUMBER OF SECTIONS: '+ str(user['size']))
+        print('') 
         if user == 'artificialRoutes':
             #ccr = pipeline(groundTruth, routeType, K_medoid.find_centers, diff_metric = difference_metric, K_option = K_value_option)
             ccr = 0
@@ -115,11 +116,11 @@ if __name__ == '__main__':
                 start = time.time()
                 ccr = pipeline(user['clusters'], eamt.kmedoid.find_centers, metric, K_value_option)
                 end = time.time()
-                print '...DIFFERENCE METRIC: ' + metric
-                print '...CLUSTER CORRECTNESS RATE: ' + str(round(ccr,2))
-                print '...PIPELINE TIME ElAPSED: ' + str(round((end - start)*100, 2)) + 'ms'
-                print ''
-        print '######'
+                print('...DIFFERENCE METRIC: ' + metric)
+                print('...CLUSTER CORRECTNESS RATE: ' + str(round(ccr,2)))
+                print('...PIPELINE TIME ElAPSED: ' + str(round((end - start)*100, 2)) + 'ms')
+                print('')
+        print('######')
     
     
 

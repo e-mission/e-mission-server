@@ -201,7 +201,7 @@ class TestMovesCollect(unittest.TestCase):
     self.assertEquals(newSec['manual'], True)
     self.assertEquals(newSec['section_start_time'], "20140407T183039-0700")
     self.assertEquals(newSec['section_end_time'], "20140407T191539-0700")
-    self.assertEquals(newSec['section_start_datetime'].month, 04)
+    self.assertEquals(newSec['section_start_datetime'].month, 0o4)
     self.assertEquals(newSec['section_end_datetime'].hour, 19)
     self.assertEquals(newSec['duration'], 45)
     self.assertEquals(newSec['distance'], 10)
@@ -246,7 +246,7 @@ class TestMovesCollect(unittest.TestCase):
     self.assertEquals(newSec['type'], 'move')
     self.assertEquals(newSec['trip_start_time'], "20140407T183039-0700")
     self.assertEquals(newSec['trip_end_time'], "20140407T191539-0700")
-    self.assertEquals(newSec['trip_start_datetime'].month, 04)
+    self.assertEquals(newSec['trip_start_datetime'].month, 0o4)
     self.assertEquals(newSec['trip_end_datetime'].hour, 19)
     self.assertEquals(newSec['place']['place_location']['coordinates'][0], -122)
 

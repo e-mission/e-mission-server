@@ -155,7 +155,7 @@ class ModeInferencePipeline:
             resultVector[i] = self.getGroundTruthMode(section)
             if i % 100 == 0:
                 logging.debug("Processing record %s " % i)
-        except Exception, e:
+        except Exception as e:
             logging.debug("skipping section %s due to error %s " % (section, e))
       return (featureMatrix, resultVector)
 

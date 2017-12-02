@@ -1,3 +1,4 @@
+from __future__ import print_function
 import logging
 import emission.core.get_database as edb
 import emission.storage.timeseries.abstract_timeseries as esta
@@ -53,16 +54,16 @@ def find_inactive_users():
                     else:
                         inactive_users_after_september+=str(user['user_email'])+', '
     inactive_users_table = pd.DataFrame(inactive_users, columns=['Email', 'Last Sign Up Date', 'Last Usercache Call'])
-    print "\nList of inactive users emails and date they signed up:"
-    print inactive_users_table
-    print "\nEmails of inactive users who consented to the new IRB protocol:"
-    print inactive_users_new_consent[:-2]
-    print "\nEmails of inactive users who did not consent to the new IRB protocol:"
-    print inactive_users_old_consent[:-2]
-    print "\nEmails of inactive users who signed up before September 1st:"
-    print inactive_users_before_september[:-2]
-    print "\nEmails of inactive users who signed up after September 1st:"
-    print inactive_users_after_september[:-2]   
+    print("\nList of inactive users emails and date they signed up:")
+    print(inactive_users_table)
+    print("\nEmails of inactive users who consented to the new IRB protocol:")
+    print(inactive_users_new_consent[:-2])
+    print("\nEmails of inactive users who did not consent to the new IRB protocol:")
+    print(inactive_users_old_consent[:-2])
+    print("\nEmails of inactive users who signed up before September 1st:")
+    print(inactive_users_before_september[:-2])
+    print("\nEmails of inactive users who signed up after September 1st:")
+    print(inactive_users_after_september[:-2])   
     return
 
 

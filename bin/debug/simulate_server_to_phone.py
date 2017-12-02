@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Exports all data for the particular user for the particular day
 # Used for debugging issues with trip and section generation 
 import sys
@@ -21,6 +22,6 @@ def save_server_to_phone(user_id_str, file_name):
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
-        print "Usage: %s <user> <file>" % (sys.argv[0])
+        print("Usage: %s <user> <file>" % (sys.argv[0]))
     else:
         save_server_to_phone(user_id_str=sys.argv[1], file_name=sys.argv[2])

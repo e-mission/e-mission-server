@@ -1,3 +1,4 @@
+from __future__ import print_function
 # This script allows us to correct misclassified user confirmed trips.
 # We suspect that the user misclassified them because they were inaccurately
 # classified high confidence trips.
@@ -15,9 +16,9 @@ class CommentedFile:
         self.commentstring = commentstring
 
     def next(self):
-        line = self.f.next()
+        line = next(self.f)
         while line.startswith(self.commentstring):
-            line = self.f.next()
+            line = next(self.f)
         return line
 
     def __iter__(self):
@@ -41,7 +42,7 @@ def correctTrips(correctionFileName):
     with open(correctionFileName, 'rb') as correctionFile:
         correctionReader = csv.reader(CommentedFile(correctionFile))
         for correction in correctionReader:
-            print correction
+            print(correction)
             # We need to format the fields correctly
             tripId = correction[0]
             sectionId = int(correction[1])
@@ -56,7 +57,7 @@ if __name__ == '__main__':
     import sys
 
     if len(sys.argv) != 2:
-        print "usage: correct_modes <correction file>"
+        print("usage: correct_modes <correction file>")
         exit(1)
 
     correctTrips(sys.argv[1])

@@ -1,3 +1,4 @@
+from __future__ import print_function
 ## Library to make calls to our Open Trip Planner server
 ## Hopefully similiar to googlemaps.py
 
@@ -40,7 +41,7 @@ class OTP:
         self.start_point = start_point
         self.end_point = end_point
         if mode not in self.accepted_modes:
-            print "mode is %s" % mode
+            print("mode is %s" % mode)
             raise Exception("You are using a mode that doesnt exist")
         if mode == "TRANSIT" and bike:
             mode = "BICYCLE,TRANSIT"
@@ -72,7 +73,7 @@ class OTP:
         query_url = "%s/otp/routers/default/plan?" % address
         encoded_params = urllib.urlencode(params)
         url = query_url + encoded_params
-        print url
+        print(url)
         return url
 
     def get_json(self):
@@ -89,7 +90,7 @@ class OTP:
         return trps
 
     def turn_into_new_trip(self, user_id):
-        print "new trip"
+        print("new trip")
         ts = esta.TimeSeries.get_time_series(user_id)
         trip = ecwrt.Rawtrip()
         sections = []
@@ -166,7 +167,7 @@ class OTP:
                 car_start_coordinates = Coordinate(float(leg["from"]["lat"]), float(leg["from"]["lon"]))    
                 car_end_coordinates = Coordinate(float(leg["to"]["lat"]), float(leg["to"]["lon"]))
         
-        print "len(sections) = %s" % len(sections)
+        print("len(sections) = %s" % len(sections))
         final_start_loc = Coordinate(float(our_json["plan"]["from"]["lat"]), float(our_json["plan"]["from"]["lon"]))         
         final_end_loc = Coordinate(float(our_json["plan"]["to"]["lat"]), float(our_json["plan"]["to"]["lon"]))
         final_start_time = otp_time_to_ours(our_json['plan']['itineraries'][0]["startTime"])

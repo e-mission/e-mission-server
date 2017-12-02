@@ -5,7 +5,7 @@ import logging
 import time
 import pandas as pd
 
-to_ts = lambda(dt): time.mktime(dt.timetuple())
+to_ts = lambda dt: time.mktime(dt.timetuple())
 
 def convert_track_point(tp):
     point = ad.AttrDict()

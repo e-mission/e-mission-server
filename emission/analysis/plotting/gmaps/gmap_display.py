@@ -19,6 +19,8 @@ car - grey
 mixed - olive
 air - skyBlue
 """
+from __future__ import print_function
+from __future__ import absolute_import
 # Standard imports
 import json
 from datetime import tzinfo, datetime, timedelta
@@ -37,7 +39,7 @@ from uuid import UUID
 from emission.analysis.modelling.home import detect_home, detect_home_from_db
 from emission.analysis.modelling.work_place import  detect_work_office, detect_daily_work_office,detect_work_office_from_db,detect_daily_work_office_from_db
 from emission.core.get_database import get_section_db, get_trip_db, get_test_db
-import pygmaps_modified as pygmaps
+from . import pygmaps_modified as pygmaps
 from emission.core.common import calDistance
 import emission.storage.decorations.useful_queries as tauq
 
@@ -178,12 +180,12 @@ def drawTrip(trip_id, db, gmap):
     trip_cursor = db.Stage_Trips.find({'trip_id': trip_id})
 
     if trip_cursor.count() == 0:
-        print "No trip database found, using section database instead"
+        print("No trip database found, using section database instead")
     else:
         if trip_cursor.count() == 1:
             unused = trip_cursor[0]
         else:
-            print "Duplicated trip_id: " + trip_id
+            print("Duplicated trip_id: " + trip_id)
             exit()
     sections = db.Stage_Sections.find({'trip_id': trip_id})
     drawSections(sections, ALL, gmap)
@@ -211,7 +213,7 @@ def drawSectionsSeparatelyFromId(sectionIdList, outPath):
 def drawSectionsSeparately(sectionJSONList, outPath):
     try:
         os.mkdir(outPath)
-    except OSError, e:
+    except OSError as e:
         logging.warn("Error %s while creating result directory" % e)
         pass
 

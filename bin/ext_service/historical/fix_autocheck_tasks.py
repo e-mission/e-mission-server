@@ -1,3 +1,4 @@
+from __future__ import print_function
 import logging
 import argparse
 import uuid
@@ -24,7 +25,7 @@ def find_existing_auto_tasks(uuid):
     habits = result.json()
     auto_tasks = []
     for habit in habits['data']:
-        print habit['text'], habit["notes"], habit["id"]
+        print(habit['text'], habit["notes"], habit["id"])
         if "automatically" in habit['notes']:
             logging.debug("Found auto task %s, %s, %s" %
                           (habit['text'], habit['notes'], habit['id']))

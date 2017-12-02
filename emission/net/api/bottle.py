@@ -14,6 +14,7 @@ License: MIT (see LICENSE for details)
 """
 
 from __future__ import with_statement
+from __future__ import print_function
 
 __author__ = 'Marcel Hellkamp'
 __version__ = '0.13-dev'
@@ -108,7 +109,7 @@ else: # 2.x
         msg  = "Python 2.5 support may be dropped in future versions of Bottle."
         warnings.warn(msg, DeprecationWarning)
         from UserDict import DictMixin
-        def next(it): return it.next()
+        def next(it): return next(it)
         bytes = str
     else: # 2.6, 2.7
         from collections import MutableMapping as DictMixin

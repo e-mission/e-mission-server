@@ -23,6 +23,7 @@ An easy-to-use Python wrapper for the Google Maps and Local Search APIs.
 
 
 """
+from __future__ import print_function
 
 
 import urllib
@@ -54,7 +55,7 @@ def fetch_json(query_url, params={}, headers={}):       # pylint: disable-msg=W0
     """
     encoded_params = urllib.urlencode(params)    
     url = query_url + encoded_params
-    print url
+    print(url)
     request = urllib2.Request(url, headers=headers)
     response = urllib2.urlopen(request)
     return (url, json.load(response))
@@ -482,7 +483,7 @@ if __name__ == "__main__":
         """
 
         if len(argv) < 2 or len(argv) > 4:
-            print main.__doc__
+            print(main.__doc__)
             sys.exit(1)
             
         query = argv[1]
@@ -494,7 +495,7 @@ if __name__ == "__main__":
         gmap = GoogleMaps(api_key)
         try:
             result = gmap.geocode(query)
-        except GoogleMapsError, err:
+        except GoogleMapsError as err:
             sys.stderr.write('%s\n%s\nResponse:\n' % (err.url, err))
             json.dump(err.response, sys.stderr, indent=4)
             sys.exit(1)

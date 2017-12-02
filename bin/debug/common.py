@@ -26,7 +26,7 @@ def analyse_timeline(entries):
 
     return unique_user_list_list, needs_rerun
 
-split_user_id = lambda(fn): fn.split("_")[-1].split(".")[0]
+split_user_id = lambda fn: fn.split("_")[-1].split(".")[0]
 
 def read_files_with_prefix(prefix):
     matching_files = glob.glob(prefix+"*")

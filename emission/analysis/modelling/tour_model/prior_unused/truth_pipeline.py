@@ -43,6 +43,7 @@ For each of the representative trips, open them in MyMaps, and then adjust, add,
 * Maps will then be created of for each of these modified sections that compare the original section with its ground truth. If any issues are observed, then they can be modified and this importing process can be repeated.
 
 """
+from __future__ import print_function
 # Standard imports
 import os, sys, random
 
@@ -53,7 +54,7 @@ import emission.analysis.modelling.tour_model.prior_unused.cluster_groundtruth a
 
 def update_route_clusters(user):
     from Profile import generate_route_clusters
-    print "generating clusters for user %s" % user
+    print("generating clusters for user %s" % user)
     generate_route_clusters(user, 20)
 
 def cluster_to_kml(user, cluster, cluster_id):
@@ -103,7 +104,7 @@ def __read_user_clusters_kml(user):
     success, message = eacg.check_named_clusters(path)
     if not success:
         exit(message)
-    print message
+    print(message)
     for kml in os.listdir(path):
         infile_path = os.path.join(path, kml)
         eacg.update_db_with_clusters(user, infile_path)

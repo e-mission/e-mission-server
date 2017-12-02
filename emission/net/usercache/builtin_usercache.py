@@ -53,9 +53,9 @@ https://github.com/e-mission/e-mission-data-collection/wiki/User-cache-data-form
 class BuiltinUserCache(ucauc.UserCache):
     def __init__(self, user_id):
         super(BuiltinUserCache, self).__init__(user_id)
-        self.key_query = lambda(key): {"metadata.key": key};
-        self.ts_query = lambda(tq): BuiltinUserCache._get_ts_query(tq)
-        self.type_query = lambda(entry_type): {"metadata.type": entry_type}
+        self.key_query = lambda key: {"metadata.key": key};
+        self.ts_query = lambda tq: BuiltinUserCache._get_ts_query(tq)
+        self.type_query = lambda entry_type: {"metadata.type": entry_type}
         self.db = get_usercache_db()
 
     @staticmethod

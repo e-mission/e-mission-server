@@ -1,8 +1,10 @@
+from __future__ import print_function
+from __future__ import absolute_import
 # Standard imports
 import json
 from random import randrange
-from bottle import route, post, get, run, template, static_file, request, app, HTTPError, abort, BaseRequest, JSONPlugin, response
-import bottle as bt
+from .bottle import route, post, get, run, template, static_file, request, app, HTTPError, abort, BaseRequest, JSONPlugin, response
+from . import bottle as bt
 # To support dynamic loading of client-specific libraries
 import sys
 import os
@@ -24,7 +26,7 @@ import urllib2
 import bson.json_util
 
 # Our imports
-import visualize, stats, usercache, timeline, metrics, pipeline
+from . import visualize, stats, usercache, timeline, metrics, pipeline
 import emission.net.auth.auth as enaa
 # import emission.net.ext_service.moves.register as auth
 import emission.net.ext_service.habitica.proxy as habitproxy
@@ -59,7 +61,7 @@ auth_method = config_data["server"]["auth"]
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes
 
-print "Finished configuring logging for %s" % logging.getLogger()
+print("Finished configuring logging for %s" % logging.getLogger())
 app = app()
 
 # On MacOS, the current working directory is always in the python path However,
@@ -249,7 +251,7 @@ def createUserProfile():
       logging.debug("Looked up user = %s" % user)
       logging.debug("Returning result %s" % {'uuid': str(user.uuid)})
       return {'uuid': str(user.uuid)}
-  except ValueError, e:
+  except ValueError as e:
       traceback.print_exc()
       abort(403, e.message)
 
@@ -361,8 +363,8 @@ def getPublicData():
 # Redirect to custom URL. $%$%$$ gmail
 @get('/redirect/<route>')
 def getCustomURL(route):
-  print route
-  print urllib.urlencode(request.query)
+  print(route)
+  print(urllib.urlencode(request.query))
   logging.debug("route = %s, query params = %s" % (route, request.query))
   if route == "join":
     redirected_url = "/#/setup?%s" % (urllib.urlencode(request.query))
@@ -453,7 +455,7 @@ def getUUID(request, inHeader=False):
         if retUUID is None:
            raise HTTPError(403, "token is valid, but no account found for user")
         return retUUID
-    except ValueError, e:
+    except ValueError as e:
         traceback.print_exc()
         abort(401, e.message)
 
@@ -494,7 +496,7 @@ if __name__ == '__main__':
           certfile=ssl_cert, keyfile=private_key, ssl_module='builtin')
     else:
       # Non SSL option for testing on localhost
-      print "Running with HTTPS turned OFF - use a reverse proxy on production"
+      print("Running with HTTPS turned OFF - use a reverse proxy on production")
       run(host=server_host, port=server_port, server='cherrypy', debug=True)
 
     # run(host="0.0.0.0", port=server_port, server='cherrypy', debug=True)

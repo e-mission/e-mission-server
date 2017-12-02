@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import json
 import numpy as np
@@ -15,9 +16,9 @@ for path, direc, filenames in os.walk(path):
         for segment in data:
             temp_list = []
             if segment["type"] == "move":
-                print "Num. Activities: " + str(len(segment['activities']))
+                print("Num. Activities: " + str(len(segment['activities'])))
                 for act in segment['activities']:
-                    print "Num. Points: " +str(len(act['trackPoints']))
+                    print("Num. Points: " +str(len(act['trackPoints'])))
                     points = [[point["loc_utc_ts"], (point["lon"], point["lat"])]  for point in act["trackPoints"]]
                     #points = [[point["loc_elapsed_ts"], (point["lon"], point["lat"])]  for point in act["trackPoints"]]
                     points_test_ascending = sorted(points, key=lambda point: point[0])
@@ -26,6 +27,6 @@ for path, direc, filenames in os.walk(path):
                     temp_list.append(points)
 dataDict = {}
 dataDict["points"] =  processed_data
-print len(dataDict["points"])
-print np.shape(dataDict["points"])
-print dataDict["points"][0]
+print(len(dataDict["points"]))
+print(np.shape(dataDict["points"]))
+print(dataDict["points"][0])

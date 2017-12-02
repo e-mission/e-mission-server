@@ -1,3 +1,4 @@
+from __future__ import print_function
 #maps team provided get_cost function
 
 # Standard imports
@@ -285,7 +286,7 @@ class E_Mission_Trip(Trip):
             "trip_end_location": alternative.trip_end_location.coordinate_list(),
             "mode_list": alternative.mode_list,
             "track_points": alternative.track_points}
-        print "recommending"
+        print("recommending")
         result = db.update({"trip_id": self.trip_id, "user_id": self.user_id},
                       {"$set": {"recommended_alternative" : alternative_json}},
                        upsert=False,multi=False)
@@ -295,7 +296,7 @@ class E_Mission_Trip(Trip):
         result = db.update({"_id": self._id},
                       {"$set": {"mode" : self.mode_list, "confirmed_mode" : self.confirmed_mode_list}},
                        upsert=False,multi=False)
-        print result
+        print(result)
         if not result["updatedExisting"]:
             self._create_new(db)
         self._save_alternatives(self.alternatives)
@@ -413,7 +414,7 @@ class Canonical_E_Mission_Trip(E_Mission_Trip):
                 {"$set": {"start_point_distr" : self.start_point_distr, "end_point_distr" : self.end_point_distr, "start_time_distr": self.start_time_distr,
                     "end_time_distr": self.end_time_distr}},
                        upsert=False,multi=False)
-        print result
+        print(result)
         if not result["updatedExisting"]:
             self._create_new(db)
         self._save_alternatives(self.alternatives)
@@ -462,7 +463,7 @@ class Alternative_Trip(Trip):
             mode_set.add(section.mode)
         if len(mode_set) == 1:
             return mode_set.pop()
-        print mode_list
+        print(mode_list)
         return mode_list
 
     '''

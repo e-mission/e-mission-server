@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Techniques to smooth jumps in location tracking. Each of these returns a
 # boolean mask of inliers and outliers. We assume that the incoming dataframe
 # has a column called "speed" that represents the speed at each point. The
@@ -313,8 +314,8 @@ class SmoothPosdap(object):
                 logging.info("len(last_segment) = %d, len(curr_segment) = %d, skipping" %
                     (len(last_segment), len(curr_segment)))
                 continue
-            get_coords = lambda(i): [with_speeds_df.iloc[i]["mLongitude"], with_speeds_df.iloc[i]["mLatitude"]]
-            get_ts = lambda(i): with_speeds_df.iloc[i]["mTime"]
+            get_coords = lambda i: [with_speeds_df.iloc[i]["mLongitude"], with_speeds_df.iloc[i]["mLatitude"]]
+            get_ts = lambda i: with_speeds_df.iloc[i]["mTime"]
             # I don't know why they would use time instead of distance, but
             # this is what the existing POSDAP code does.
             print("About to compare curr_segment duration %s with last segment duration %s" %

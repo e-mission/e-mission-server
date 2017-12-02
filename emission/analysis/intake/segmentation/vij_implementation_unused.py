@@ -1,3 +1,4 @@
+from __future__ import print_function
 import urllib2
 import csv
 import math
@@ -7,7 +8,7 @@ from os import remove
 from pymongo import MongoClient
 import sys
 
-print "old pythonpath = %s" % sys.path
+print("old pythonpath = %s" % sys.path)
 sys.path.extend(['', '/home/ubuntu/anaconda/lib/python27.zip',
   '/home/ubuntu/anaconda/lib/python2.7',
   '/home/ubuntu/anaconda/lib/python2.7/plat-linux2',
@@ -17,7 +18,7 @@ sys.path.extend(['', '/home/ubuntu/anaconda/lib/python27.zip',
   '/home/ubuntu/anaconda/lib/python2.7/site-packages',
   '/home/ubuntu/anaconda/lib/python2.7/site-packages/PIL',
   '/home/ubuntu/anaconda/lib/python2.7/site-packages/setuptools-2.2-py2.7.egg'])
-print "new pythonpath = %s" % sys.path
+print("new pythonpath = %s" % sys.path)
 
 import numpy
 

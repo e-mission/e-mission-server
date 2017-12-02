@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Standard imports
 import numpy as np
 import urllib,json,csv
@@ -242,7 +243,7 @@ def storeTransitStop(type,route):
             print(row[0])
             for i in range(len(root[1])):
                 if row[0].replace(' / ','/').replace('Street','St.').replace('International',"Int'l")==root[1][i].find('name').text:
-                    print(float(root[1][i].find('gtfs_longitude').text),float(root[1][i].find('gtfs_latitude').text))
+                    print((float(root[1][i].find('gtfs_longitude').text),float(root[1][i].find('gtfs_latitude').text)))
                     stops.append([float(root[1][i].find('gtfs_longitude').text),float(root[1][i].find('gtfs_latitude').text)])
                     break
 
@@ -429,7 +430,7 @@ def update_user_routeDistanceMatrix(user_id,data_feature,step1=100000,step2=1000
     # print(len(ids))
     for _id in ids:
         if a % 100 == 0:
-            print "In update_user_routeDistanceMatrix, a = %d" % a
+            print("In update_user_routeDistanceMatrix, a = %d" % a)
         a+=1
         for key in ids:
             try:

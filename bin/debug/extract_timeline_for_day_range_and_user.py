@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Exports all data for the particular user for the particular day
 # Used for debugging issues with trip and section generation 
 import sys
@@ -68,7 +69,7 @@ def export_timeline_for_users(user_id_list, args):
 
 if __name__ == '__main__':
     if len(sys.argv) != 5:
-        print "Usage: %s [<user>|'all'|'file_XXX'] <start_day> <end_day> <file_prefix>" % (sys.argv[0])
+        print("Usage: %s [<user>|'all'|'file_XXX'] <start_day> <end_day> <file_prefix>" % (sys.argv[0]))
     else:
         user_id_str = sys.argv[1]
         if user_id_str == "all":

@@ -21,4 +21,5 @@ def updateExistence():
     if 'retained' not in tempSec.keys() or tempSec['retained'] is None:
 		label_filtered_section(tempSec)
     else:
-      #don't update
+        #don't update
+        pass

@@ -30,7 +30,7 @@ def find_consecutive_runs(array):
     cons_runs.append(curr_run)
     return cons_runs
 
-get_numerator = lambda(arr) : np.sum(arr[np.nonzero(arr > 1)])
+get_numerator = lambda arr : np.sum(arr[np.nonzero(arr > 1)])
 
 def convert_to_run_lengths(removed_pt_dict):
     removed_runs_dict = {}

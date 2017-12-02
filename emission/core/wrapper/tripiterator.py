@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 # Standard imports
 import os, sys
 import logging
@@ -5,8 +7,8 @@ import traceback
 
 # Our imports
 from emission.core.get_database import get_section_db
-import filter_modules
-import trip_old as trip
+from . import filter_modules
+from . import trip_old as trip
 
 class TripIterator(object):
     """
@@ -42,8 +44,8 @@ class TripIterator(object):
                 self.storedIter = query_function(user_uuid)
             # print "storedIter = %s" % self.storedIter
         except TypeError as e:
-            print e
-            print "something went wrong, here is some info:"
+            print(e)
+            print("something went wrong, here is some info:")
             traceback.print_exc()
             #logging.warn("Found no query function for filter_queries: ", filter_queries);
             self.storedIter = []
@@ -57,7 +59,7 @@ class TripIterator(object):
         return self
 
     def next(self):
-        trip = self.storedIter.next()
+        trip = next(self.storedIter)
         return self.trip_class.trip_from_json(trip) if trip else []
 
     def close(self):

@@ -1,5 +1,6 @@
 # Standard import
 from __future__ import division
+from __future__ import print_function
 import urllib2
 from datetime import datetime, timedelta
 import json
@@ -33,7 +34,7 @@ def google_maps_to_our_trip_list(google_maps_json, _id, user_id, trip_id, mode, 
     routes = []
     for i in xrange(len(google_maps_json['routes'])):
         routes.append(google_maps_to_our_trip(google_maps_json, _id, user_id, trip_id, mode, org_start_time, i))
-    print "routes = %s" % routes
+    print("routes = %s" % routes)
     return routes
 
 def google_maps_to_our_trip(google_maps_json, _id, user_id, trip_id, mode, org_start_time, itinerary=0):

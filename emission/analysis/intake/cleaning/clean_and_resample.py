@@ -111,13 +111,13 @@ def save_cleaned_segments_for_timeline(user_id, tl):
                           (id_or_none(trip), id_or_none(filtered_trip)))
             if filtered_trip is not None:
                 trip_map[trip.get_id()] = filtered_trip
-        except KeyError, e:
+        except KeyError as e:
             # We ran into key errors while dealing with mixed filter trip_entries.
             # I think those should be resolved for now, so we can raise the error again
             # But if this is preventing us from making progress, we can comment out the raise
             logging.exception("Found key error %s while processing trip %s" % (e, trip))
             # raise e
-        except Exception, e:
+        except Exception as e:
             logging.exception("Found error %s while processing trip %s" % (e, trip))
             raise e
 
@@ -1087,7 +1087,7 @@ def _is_squished_untracked(raw_trip, raw_trip_list, trip_map):
     squished_list = [idx in trip_map for idx in index_list]
     try:
         next_unsquished_index = squished_list.index(True, curr_index+1)
-    except ValueError, e:
+    except ValueError as e:
         logging.debug("no unsquished trips found after %s in %s, returning True" %
                       (squished_list, curr_index))
         return True

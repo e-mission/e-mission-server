@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Standard imports
 import unittest
 import sys
@@ -52,7 +53,7 @@ class TestClient(unittest.TestCase):
     self.assertNotEqual(client.getSettings(), None)
     self.assertNotEqual(client.getSettings(), {})
 
-    print client.getSettings()
+    print(client.getSettings())
     self.assertNotEqual(client.getSettings()['result_url'], None)
 
   def testUpdateClient(self):

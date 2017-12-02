@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Read data from a temporary set of "dump" files that were stored on the
 # mission server in the first half of 2015. These files were identical to the
 # inputs from moves, except that they also had accuracy values for the points.
@@ -18,7 +19,7 @@ from dateutil import parser
 import time
 import emission.core.get_database as edb
 
-to_ts = lambda(dt): time.mktime(dt.timetuple()) * 1000
+to_ts = lambda dt: time.mktime(dt.timetuple()) * 1000
 logging.basicConfig(level=logging.DEBUG)
 
 reconstructedTimeSeriesDb = edb.get_usercache_db()
@@ -73,7 +74,7 @@ def load_file(curr_list):
                 reconstructedTripsDb.insert(section)
                 for i, tp in enumerate(activity.trackPoints):
                     if "accuracy" not in tp:
-                        print "Skipping point %d of section %s because it has no accuracy" % (i, section.id)
+                        print("Skipping point %d of section %s because it has no accuracy" % (i, section.id))
                         continue
                     point = AttrDict()
                     point.user_id = section.id

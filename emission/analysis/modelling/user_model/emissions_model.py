@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 # simple user utility model taking cost, time, and mode into account
 # Standard imports
 import numpy as np
@@ -8,8 +10,8 @@ import logging
 # Our imports
 import emission.core.get_database as edb
 import emission.core.common as cm
-import alternative_trips_module as atm
-import user_utility_model as utm
+from . import alternative_trips_module as atm
+from . import user_utility_model as utm
 
 class EmissionsModel(utm.UserUtilityModel):
   def __init__(self, cost, time, mode, trips):
@@ -114,7 +116,7 @@ class EmissionsModel(utm.UserUtilityModel):
     emissions = 0
     mode_list = trip.mode_list
     if isinstance(mode_list, int):
-        print "WARNING! mode_list = %s, converting to a list with one element" % mode_list
+        print("WARNING! mode_list = %s, converting to a list with one element" % mode_list)
         mode_list = [mode_list]
     mode = mode_list[0] if mode_list else "driving"
     logging.debug("Mode: %s " % mode)

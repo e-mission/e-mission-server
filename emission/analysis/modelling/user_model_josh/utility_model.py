@@ -1,3 +1,4 @@
+from __future__ import print_function
 import emission.simulation.markov_model_counter as emmc
 import emission.net.ext_service.otp.otp as otp
 import emission.net.ext_service.geocoder.nominatim as geo
@@ -50,12 +51,12 @@ class UserBase:
     def geocode_with_cache(self, place):
         coder = geo.Geocoder()
         if place in self.geocode_cache:
-            print self.geocode_cache[place]
+            print(self.geocode_cache[place])
             return self.geocode_cache[place]
         else:
             coded = coder.geocode(place)
             self.geocode_cache[place] = coded
-            print coded
+            print(coded)
             return coded
 
 
@@ -187,7 +188,7 @@ class UserModel:
         final_crowd = (self.utilities['social']*crowd_score)
 
         final_score_tuple = (final_time, final_sweat, final_beauty, final_crowd)
-        print "final_score_tuple : %s" % str(final_score_tuple)
+        print("final_score_tuple : %s" % str(final_score_tuple))
         return CampusTrip(final_score_tuple, get_time_of_trip(trip), lst_of_points, "source")
         
 
@@ -247,7 +248,7 @@ def get_normalized_times(lst_of_trips):
 
 def get_sweat_factor(trip, testing=False):
     chng = get_elevation_change(trip, testing)
-    print "chng : %s" % str(chng)
+    print("chng : %s" % str(chng))
     return 71.112*chng[0] + 148.09
 
 def get_normalized_sweat(lst_of_trips, testing=False):
@@ -255,7 +256,7 @@ def get_normalized_sweat(lst_of_trips, testing=False):
     i = 0
     for trip in lst_of_trips:
         factor = get_sweat_factor(trip, testing)
-        print "sweat_factor : %s" % factor
+        print("sweat_factor : %s" % factor)
         counter[i] = factor
         i += 1
     counter.normalize()
@@ -269,7 +270,7 @@ def get_normalized_beauty(lst_of_trips):
     i = 0
     for trip in lst_of_trips:
         factor = get_beauty_score_of_trip(trip)
-        print "beauty_factor : %s" % factor
+        print("beauty_factor : %s" % factor)
         counter[i] = factor
         i += 1
     counter.normalize()
@@ -465,19 +466,19 @@ def make_user_from_jsn(jsn, base):
     end = base.geocode_with_cache(end)
     
     time_info = {}
-    print value_line
+    print(value_line)
     if value_line[2] == "leaveNow":
         time_info["leave"] = True
         time_info["when"] = datetime.datetime.now()
-        print "leaveNow"
+        print("leaveNow")
     elif value_line[2] == "leaveAt":
         time_info["leave"] = True
         time_info["when"] = str_time_to_datetme(value_line[3])
-        print "leaveAt"
+        print("leaveAt")
     elif value_line[2] == "thereBy":
         time_info["leave"] = False
         time_info["when"] = str_time_to_datetme(value_line[3])
-        print "arriveAt"
+        print("arriveAt")
 
     bike = get_bike_info(value_line[4])
     user = UserModel(bike)
@@ -487,7 +488,7 @@ def make_user_from_jsn(jsn, base):
     user.increase_utility_by_n("social", int(value_line[8]))
 
     user.utilities.normalize()
-    print "utilities : %s" % user.utilities
+    print("utilities : %s" % user.utilities)
 
     return {"user" : user, "start" : start, "end" : end, "time_info" : time_info}
 
@@ -505,7 +506,7 @@ def get_elevation_change(trip, testing=False):
         return (up, down)
     time.sleep(1) # so we dont run out calls
     c = gmaps.client.Client(GOOGLE_MAPS_KEY)
-    print get_route(trip)
+    print(get_route(trip))
     jsn = gmaps.elevation.elevation_along_path(c, get_route(trip), 200)
     up, down = 0, 0
     prev = None

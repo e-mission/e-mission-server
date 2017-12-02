@@ -1,3 +1,4 @@
+from __future__ import print_function
 import logging
 import datetime as pydt
 import pandas as pd
@@ -57,11 +58,11 @@ def get_transitions_df(user_id, loc_filter, start_dt, end_dt):
     return entries_df
 
 def get_points_for_transitions(user_id, transitions_df):
-    get_section = lambda(transition): ad.AttrDict({'user_id': user_id,
+    get_section = lambda transition: ad.AttrDict({'user_id': user_id,
                                     'loc_filter': transition["filter"],
                                     'start_ts': transition["write_ts"] - 10 * 60 * 1000,
                                     'end_ts': transition["write_ts"] + 10})
-    get_last_point = lambda(transition): get_points_for_section(get_section(transition)).iloc[-1] 
+    get_last_point = lambda transition: get_points_for_section(get_section(transition)).iloc[-1] 
     return transitions_df.apply(get_last_point, axis=1)
 
 def get_points_for_section(section):
@@ -75,7 +76,7 @@ def get_points_for_section(section):
     except AttributeError:
         logging.debug("Start and end times not defined, no time query")
 
-    print "final query = %s " % query
+    print("final query = %s " % query)
     # full_entries = list(edb.get_usercache_db().find(query).sort("data.mTime", pymongo.ASCENDING))
     full_entries = list(edb.get_usercache_db().find(query))
     merged_entries = [dict(entry["metadata"].items() + entry["data"].items()) for entry in full_entries]

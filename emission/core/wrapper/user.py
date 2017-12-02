@@ -1,3 +1,4 @@
+from __future__ import print_function
 import json
 import logging
 
@@ -57,7 +58,7 @@ class User:
     for mpg in mpg_array:
       total += mpg
     avg = total/len(mpg_array)
-    print "Returning total = %s, len = %s, avg = %s" % (total, len(mpg_array), avg)
+    print("Returning total = %s, len = %s, avg = %s" % (total, len(mpg_array), avg))
     return avg
 
   # Stores Array of MPGs of all the cars the user drives.

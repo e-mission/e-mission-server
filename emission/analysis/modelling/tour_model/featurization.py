@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # Standard imports
 import logging
 import matplotlib.pyplot as plt
@@ -7,7 +8,7 @@ from sklearn import metrics
 import sys
 
 # our imports
-from kmedoid import kmedoids
+from .kmedoid import kmedoids
 
 
 """

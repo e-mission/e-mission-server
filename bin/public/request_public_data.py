@@ -1,3 +1,4 @@
+from __future__ import print_function
 import argparse
 import logging
 import arrow 
@@ -40,7 +41,7 @@ logging.debug("from_ts = " + str(from_ts))
 logging.debug("to_ts = " + str(to_ts))
 
 # Pulling public data in batches 
-print "Pulling data from " + from_date + " to " + to_date + " (local time)"
-print "..."
+print("Pulling data from " + from_date + " to " + to_date + " (local time)")
+print("...")
 
 plpd.request_batched_data(server_url, from_ts, to_ts, phone_ids)

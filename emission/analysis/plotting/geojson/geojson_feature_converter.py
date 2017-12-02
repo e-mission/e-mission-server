@@ -1,3 +1,4 @@
+from __future__ import print_function
 import logging
 import geojson as gj
 import copy
@@ -47,7 +48,7 @@ def location_to_geojson(location):
         ret_feature.properties["feature_type"] = "location"
         _del_non_derializable(ret_feature.properties, ["loc"])
         return ret_feature
-    except Exception, e:
+    except Exception as e:
         logging.exception(("Error while converting object %s" % location))
         raise e
 
@@ -260,7 +261,7 @@ def get_geojson_for_timeline(user_id, tl):
             trip_geojson = trip_to_geojson(trip, tl)
             if trip_geojson is not None:
                 geojson_list.append(trip_geojson)
-        except Exception, e:
+        except Exception as e:
             logging.exception("Found error %s while processing trip %s" % (e, trip))
             raise e
     logging.debug("trip count = %d, geojson count = %d" %

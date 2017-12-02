@@ -78,7 +78,7 @@ def totalCost(size, mat, medoids_idx):
 
     for i in range(size):
         choice = -1
-        min_cost = sys.maxint
+        min_cost = sys.maxsize
 
         for m in medoids_idx:
             tmp = mat[m,i]

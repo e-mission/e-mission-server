@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Standard imports
 import logging
 
@@ -34,7 +35,7 @@ def generate_cluster_comparison(sID_list, outPath):
     try:
         import os
         os.mkdir("%s/smoothing_compare" % outPath)
-    except OSError, e:
+    except OSError as e:
         logging.warn("Error %s while creating result directory " % e)
 
 
@@ -46,8 +47,8 @@ def generate_cluster_comparison(sID_list, outPath):
         before_point_count = len(s["track_points"])
         if "original_points" in s:
             after_point_count = len(s["original_points"]) 
-            totuple = lambda(ca) : (ca[0], ca[1])
-            tocoordtuple = lambda(pt): totuple(pt["track_location"]["coordinates"])
+            totuple = lambda ca : (ca[0], ca[1])
+            tocoordtuple = lambda pt: totuple(pt["track_location"]["coordinates"])
             tplist = [tocoordtuple(pt) for pt in s["track_points"]]
             oplist = [tocoordtuple(pt) for pt in s["original_points"]]
             deleted_points = get_deleted_points(oplist, tplist)
@@ -69,9 +70,9 @@ def generate_cluster_comparison(sID_list, outPath):
 
 clusterDict = tp.__read_user_clusters_text("shankari", "/Users/shankari/cluster_ground_truth/ground_truthed_clusters/manual_ground_truths")
 caltrainSID = clusterDict["shankari_mtn_view_to_millbrae"]
-print "Found %d sections in ground truth" % len(caltrainSID)
+print("Found %d sections in ground truth" % len(caltrainSID))
 caltrainSIDInDb = [s for s in caltrainSID if edb.get_section_db().find({'_id': s}).count() == 1]
-print "Found %d ground truthed sections in DB" % len(caltrainSIDInDb)
+print("Found %d ground truthed sections in DB" % len(caltrainSIDInDb))
 
 caltrainSectionsInDb = [edb.get_section_db().find_one({"_id": sid}) for sid in caltrainSIDInDb]
 generate_cluster_comparison(caltrainSectionsInDb, "/tmp")

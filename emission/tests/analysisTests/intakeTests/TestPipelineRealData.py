@@ -323,7 +323,7 @@ class TestPipelineRealData(unittest.TestCase):
 
     def testAirTripFromHawaii(self):
         dataFile = "emission/tests/data/real_examples/shankari_2016-08-05"
-        start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 05})
+        start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 0o5})
         cacheKey = "diary/trips-2016-07-05"
         ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
 
@@ -649,8 +649,8 @@ class TestPipelineRealData(unittest.TestCase):
         # This tests the effect of online versus offline analysis and segmentation with potentially partial data
 
         dataFile = "emission/tests/data/real_examples/issue_436_assertion_error"
-        start_ld = ecwl.LocalDate({'year': 2016, 'month': 10, 'day': 07})
-        end_ld = ecwl.LocalDate({'year': 2016, 'month': 10, 'day': 07})
+        start_ld = ecwl.LocalDate({'year': 2016, 'month': 10, 'day': 0o7})
+        end_ld = ecwl.LocalDate({'year': 2016, 'month': 10, 'day': 0o7})
         cacheKey = "diary/trips-2016-10-07"
         ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
 

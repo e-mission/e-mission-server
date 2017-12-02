@@ -6,6 +6,7 @@ https://github.com/e-mission/e-mission-server/issues/333#issuecomment-312464984
 Can be made a little less general but a lot more performant by using the trick
 below.
 """
+from __future__ import print_function
 import logging
 
 import argparse
@@ -67,10 +68,10 @@ if __name__ == '__main__':
                         help="do everything except actually perform the operations")
 
     args = parser.parse_args()
-    print args
+    print(args)
 
-    print "Resetting timestamps to %s" % args.date
-    print "WARNING! Any points awarded after that date will be double counted!"
+    print("Resetting timestamps to %s" % args.date)
+    print("WARNING! Any points awarded after that date will be double counted!")
     # Handle the first row in the table
     day_dt = arrow.get(args.date, "YYYY-MM-DD")
     logging.debug("day_dt is %s" % day_dt)

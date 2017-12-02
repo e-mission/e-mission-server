@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 # simple user utility model taking cost, time, and mode into account
 
 # Standard imports
@@ -8,8 +9,8 @@ from datetime import datetime
 # Our imports
 import emission.core.get_database as edb
 import emission.core.common as cm
-import alternative_trips_module as atm
-import user_utility_model as utm
+from . import alternative_trips_module as atm
+from . import user_utility_model as utm
 
 class SimpleCostTimeModeModel(utm.UserUtilityModel):
   def __init__(self, trips=None):

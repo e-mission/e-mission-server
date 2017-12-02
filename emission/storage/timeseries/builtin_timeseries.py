@@ -16,8 +16,8 @@ ts_enum_map = {
 class BuiltinTimeSeries(esta.TimeSeries):
     def __init__(self, user_id):
         super(BuiltinTimeSeries, self).__init__(user_id)
-        self.key_query = lambda(key): {"metadata.key": key}
-        self.type_query = lambda(entry_type): {"metadata.type": entry_type}
+        self.key_query = lambda key: {"metadata.key": key}
+        self.type_query = lambda entry_type: {"metadata.type": entry_type}
         self.user_query = {"user_id": self.user_id} # UUID is mandatory for this version
         self.timeseries_db = ts_enum_map[esta.EntryType.DATA_TYPE]
         self.analysis_timeseries_db = ts_enum_map[esta.EntryType.ANALYSIS_TYPE]

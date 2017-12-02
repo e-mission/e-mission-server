@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Standard imports
 __author__ = 'Yin'
 import logging
@@ -26,7 +27,7 @@ def update_profiles(dummy_users=False):
         generate_route_clusters(user)
 
 def generate_route_clusters(user):
-    print "In profile, generating route clusters for %s" % user
+    print("In profile, generating route clusters for %s" % user)
     data = cp.read_data(uuid=user)
     data, bins = cp.remove_noise(data, 300)
     num_clusters, labels, data = cp.cluster(data, len(bins))

@@ -104,8 +104,8 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             # We are going to use the last 8 points for now.
             # TODO: Change this back to last 10 points once we normalize phone and this
             last10Points_df = filtered_points_df.iloc[max(idx-self.point_threshold, curr_trip_start_point.idx):idx+1]
-            distanceToLast = lambda(row): pf.calDistance(ad.AttrDict(row), currPoint)
-            timeToLast = lambda(row): currPoint.ts - ad.AttrDict(row).ts
+            distanceToLast = lambda row: pf.calDistance(ad.AttrDict(row), currPoint)
+            timeToLast = lambda row: currPoint.ts - ad.AttrDict(row).ts
             last5MinsDistances = last5MinsPoints_df.apply(distanceToLast, axis=1)
             logging.debug("last5MinsDistances = %s with length %d" % (last5MinsDistances.as_matrix(), len(last5MinsDistances)))
             last10PointsDistances = last10Points_df.apply(distanceToLast, axis=1)

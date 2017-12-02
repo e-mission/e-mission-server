@@ -1,3 +1,4 @@
+from __future__ import print_function
 import emission.user_model_josh.utility_model as eum
 import emission.core.get_database as edb
 import datetime
@@ -15,15 +16,15 @@ def do_utility_analysis(info):
     if value_line[2] == "leaveNow":
         time_info["leave"] = True
         time_info["when"] = datetime.datetime.now()
-        print "leaveNow"
+        print("leaveNow")
     elif value_line[2] == "leaveAt":
         time_info["leave"] = True
         time_info["when"] = str_time_to_datetme(value_line[3])
-        print "leaveAt"
+        print("leaveAt")
     elif value_line[2] == "thereBy":
         time_info["leave"] = False
         time_info["when"] = str_time_to_datetme(value_line[3])
-        print "arriveAt"
+        print("arriveAt")
 
     bike = get_bike_info(value_line[4])
 
