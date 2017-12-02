@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Standard imports
 import unittest
 import logging
@@ -14,7 +15,7 @@ import emission.core.get_database as edb
 
 class TestHabiticaRegister(unittest.TestCase):
   def setUp(self):
-    print "Test setup called"
+    print("Test setup called")
     self.testUserUUID = uuid.uuid4()
     autogen_string = randomGen()
     autogen_email = autogen_string + '@save.world'

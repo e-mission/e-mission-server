@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Test the base class enhancements over AttrDict
 # Since the base class should not really contain any properties, we create a
 # dummy subclass here and use it for testing.

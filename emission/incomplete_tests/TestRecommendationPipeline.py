@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Standard imports
 import unittest
 import json
@@ -33,7 +34,7 @@ class TestRecommendationPipeline(unittest.TestCase):
     get_section_db().remove({"user_id": self.testUUID})
     result = self.loadTestJSON("emission/tests/data/missing_trip")
     collect.processResult(self.testUUID, result)
-    print get_section_db().find().count()
+    print(get_section_db().find().count())
     self.pipeline = RecommendationPipeline()
 
   def tearDown(self):

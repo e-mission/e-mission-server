@@ -1,3 +1,4 @@
+from __future__ import print_function
 import unittest
 import time
 import uuid
@@ -20,7 +21,7 @@ class FeaturizationTests(unittest.TestCase):
         self.data = cp.read_data()
         self.testUUID = uuid.uuid4()
         self.ts = esta.TimeSeries.get_time_series(self.testUUID)
-        print 'there are ' + str(len(self.data))
+        print('there are ' + str(len(self.data)))
 
     def tearDown(self):
         edb.get_timeseries_db().remove({'user_id': self.testUUID})
@@ -88,7 +89,7 @@ class FeaturizationTests(unittest.TestCase):
         feat.cluster(min_clusters=2, max_clusters=10)
         try:
             feat.check_clusters()
-        except Exception, e:
+        except Exception as e:
             logging.exception(e.message)
             self.assertTrue(False)
 

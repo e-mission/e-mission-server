@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Standard imports
 import unittest
 import json
@@ -65,7 +66,7 @@ class TestUtilityModelPipeline(unittest.TestCase):
     #get a users trips, there should be 21
     trip_list = self.pipeline.get_training_trips(self.testUUID)
     model = self.pipeline.build_user_model(self.testUUID, trip_list)
-    print "model is a %s" % (type(model))
+    print("model is a %s" % (type(model)))
     self.assertTrue(isinstance(model, UserUtilityModel)), 
 
   '''

@@ -235,8 +235,9 @@ class TestPipeline(unittest.TestCase):
     # set instead, which fails because there is no backup. So let's copy data from
     # the main DB to the backup DB to make this test pass
     from pymongo import MongoClient
-    MongoClient('localhost').drop_database("Backup_database")
-    MongoClient('localhost').copy_database("Stage_database","Backup_database","localhost")
+    client = MongoClient('localhost')
+    client.drop_database("Backup_database")
+    client.admin.command("copydb", fromdb="Stage_database", todb="Backup_database")
     self.pipeline.runPipeline()
 
     # Checks are largely the same as above

@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Standard imports
 import unittest
 import json
@@ -56,7 +57,7 @@ class TestVisualize(unittest.TestCase):
                                           ["BICYCLING"],
                                           self.day_start_dt,
                                           self.day_end_dt, None)
-        print user_points['lnglat']
+        print(user_points['lnglat'])
         self.assertTrue(len(user_points['lnglat']) > 0)
 
     def testAggCommutePopRouteLocalDate(self):

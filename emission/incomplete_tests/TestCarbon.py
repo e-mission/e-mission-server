@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Standard imports
 import unittest
 import json
@@ -65,13 +66,13 @@ class TestCarbon(unittest.TestCase):
   def testGetModes(self):
     modes = carbon.getAllModes()
     for mode in modes:
-      print mode['mode_id'], mode['mode_name']
+      print(mode['mode_id'], mode['mode_name'])
     self.assertEquals(len(modes), 9)
 
   def testGetDisplayModes(self):
     modes = carbon.getDisplayModes()
     for mode in modes:
-      print mode['mode_id'], mode['mode_name']
+      print(mode['mode_id'], mode['mode_name'])
     # skipping transport, underground and not a trip
     self.assertEquals(len(modes), 8)
 
@@ -103,7 +104,7 @@ class TestCarbon(unittest.TestCase):
 
   def testMyModeShare(self):
     modeshare = carbon.getModeShare('fest@example.com', self.weekago, self.now)
-    print modeshare
+    print(modeshare)
     self.assertEqual(modeshare['walking'], 1)
     self.assertEqual(modeshare['bus'], 1)
     self.assertEqual(modeshare['cycling'], 0)
@@ -220,7 +221,7 @@ class TestCarbon(unittest.TestCase):
       # print("Section start = %s, section end = %s" %
       #   (section['section_start_datetime'], section['section_end_datetime']))
       self.SectionsColl.save(section)
-    print "About to check for distinct users from a week ago"
+    print("About to check for distinct users from a week ago")
     self.assertEqual(carbon.getDistinctUserCount(carbon.getQuerySpec(None, None,
                                                  self.weekago, self.now)), 0)
     self.assertEqual(carbon.getDistinctUserCount(carbon.getQuerySpec(None, None,

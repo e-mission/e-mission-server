@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Standard imports
 import random 
 import math 
@@ -83,39 +84,39 @@ class Creator:
             mode = esmmc.sampleFromCounter(self.mode_counter) ## Unsophisticated mode choice, Alexi would throw up
             try:
                 self.prog_bar += "."
-                print self.prog_bar
+                print(self.prog_bar)
                 rand_trip_id = random.random()
                 rand_user_id = user_id if user_id else random.random()
                 otp_trip = OTP(t[0], t[1], mode, write_day(curr_month, curr_day, curr_year), write_time(curr_hour, curr_minute), True)
                 if self.new:
-                    print "here"
+                    print("here")
                     otp_trip.turn_into_new_trip(user_id)
                 else:
                     alt_trip = otp_trip.turn_into_trip("%s%s" % (rand_user_id, rand_trip_id), rand_user_id, rand_trip_id, True)   ## ids
                     save_trip_to_db(alt_trip)
             except PathNotFoundException:
-                print "path not found"
+                print("path not found")
                 self.amount_missed += 1
             except urllib2.HTTPError:
-                print "server error"
+                print("server error")
                 pass   
 
 def save_trip_to_db(trip):
-    print "saving trip to db"
-    print trip.user_id
+    print("saving trip to db")
+    print(trip.user_id)
     db = edb.get_trip_db()
-    print "RHRHRH"
-    print "start loc = %s" % trip.trip_start_location.coordinate_list()
-    print "end loc = %s" % trip.trip_end_location.coordinate_list()
+    print("RHRHRH")
+    print("start loc = %s" % trip.trip_start_location.coordinate_list())
+    print("end loc = %s" % trip.trip_end_location.coordinate_list())
     db.insert({"_id": trip._id, "user_id": trip.user_id, "trip_id": trip.trip_id, "type" : "move", "sections": range(len(trip.sections)), "trip_start_datetime": trip.start_time.datetime,
             "trip_end_datetime": trip.end_time.datetime, "trip_start_location": trip.trip_start_location.coordinate_list(), 
             "trip_end_location": trip.trip_end_location.coordinate_list(), "mode_list": trip.mode_list})
-    print "len(trip.sections) in trip gen is %s" % len(trip.sections)
+    print("len(trip.sections) in trip gen is %s" % len(trip.sections))
     for section in trip.sections:   
         save_section_to_db(section)
 
 def save_section_to_db(section):
-    print "saving section to db"
+    print("saving section to db")
     db = edb.get_section_db()
     db.insert({"user_id" : section.user_id, "trip_id" : section.trip_id, "distance" : section.distance, "type" : section.section_type,
            "section_start_datetime" : section.start_time.datetime, "section_end_datetime" : section.end_time.datetime, 

@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Standard imports
 import unittest
 import json
@@ -8,14 +9,14 @@ import emission.net.ext_service.moves.register as auth
 
 class TestMovesRegister(unittest.TestCase):
   def setUp(self):
-    print "Test setup called"
+    print("Test setup called")
     self.testUserUUID = uuid.uuid4()
     self.sampleAuthMessage1 = {'user_id': 99999999999999999, 'access_token': 'Initial_token', 'expires_in': 15551999, 'token_type': 'bearer', 'refresh_token': 'Initial_refresh_token'}
     self.sampleAuthMessage2 = {'user_id': 99999999999999999, 'access_token': 'Updated_token', 'expires_in': 15551999, 'token_type': 'bearer', 'refresh_token': 'Updated_refresh_token'}
     self.sampleAuthMessage3 = {'user_id': 11111111111111111, 'access_token': 'Updated_token', 'expires_in': 15551999, 'token_type': 'bearer', 'refresh_token': 'Updated_refresh_token'}
 
   def tearDown(self):
-    print "Test teardown called"
+    print("Test teardown called")
     auth.deleteAllTokens(self.testUserUUID)
 
   # One part of this is the communication with moves. That is an integration test, not a unit test,
@@ -43,7 +44,7 @@ class TestMovesRegister(unittest.TestCase):
     self.assertEqual(len(savedTokens), 1)
 
     # You can print out the current state for further reference
-    print savedTokens[0]
+    print(savedTokens[0])
 
     # These identify the user and should not be changed
     self.assertEqual(savedTokens[0]["our_uuid"], self.testUserUUID)

@@ -49,7 +49,7 @@ def reset_user_to_ts(user_id, ts, is_dry_run):
         if last_cleaned_place is None or last_cleaned_place.data.exit_ts is None:
             logging.info("Data collection for user %s stopped before reset time, early return" % user_id)
             return
-    except ValueError, e:
+    except ValueError as e:
         first_cleaned_place = esdp.get_first_place_entry(esda.CLEANED_PLACE_KEY, user_id)
         if first_cleaned_place is not None and first_cleaned_place.data.exit_ts > ts:
             logging.info("first_cleaned_place.exit = %s (%s), resetting to start" % 

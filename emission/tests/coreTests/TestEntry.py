@@ -21,7 +21,7 @@ class TestEntry(unittest.TestCase):
          'data': {'accuracy': 52.5,
           'altitude': 0,
           'bearing': 0,
-          'elapsedRealtimeNanos': 100623898000000L,
+          'elapsedRealtimeNanos': 100623898000000,
           'latitude': 37.3885529,
           'longitude': -122.0879696,
           'loc': {"coordinates": [-122.0879696, 37.3885529], "type": "Point"},

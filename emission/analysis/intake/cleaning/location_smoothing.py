@@ -261,7 +261,7 @@ def _ios_fill_fake_data(locs_df):
              "loc": loc_fill})
         filled_df = pd.concat([filled_df, fill_df])
 
-    sorted_filled_df = filled_df.sort("ts").reset_index()
+    sorted_filled_df = filled_df.sort_values(by="ts").reset_index()
     logging.debug("after filling, returning head = %s, tail = %s" %
                   (sorted_filled_df[["fmt_time", "ts", "latitude", "longitude", "metadata_write_ts"]].head(),
                    sorted_filled_df[["fmt_time", "ts", "latitude", "longitude", "metadata_write_ts"]].tail()))

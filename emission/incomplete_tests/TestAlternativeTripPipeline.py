@@ -152,7 +152,7 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     
   def testAlternativeTripStore(self):
     trip_list = self.pipeline.get_trips_for_alternatives(self.testUUID) 
-    first_trip = trip_list.next()
+    first_trip = next(trip_list)
     self.assertEquals(type(first_trip), ecwt.E_Mission_Trip)
     # alternative_list = pipeline_module.get_alternative_trips(trip_list)
     # for alt in alternative_list:

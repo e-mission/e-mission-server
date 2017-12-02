@@ -1,3 +1,4 @@
+from __future__ import print_function
 import unittest
 import emission.user_model_josh.utility_model as eum
 import emission.net.ext_service.otp.otp as otp
@@ -101,9 +102,9 @@ class UserModelTests(unittest.TestCase):
         normal_sweat = eum.get_normalized_sweat(choices, True)
         normal_beauty = eum.get_normalized_beauty(choices)
 
-        print "normal times = %s" % normal_times
-        print "normal sweat = %s" % normal_sweat
-        print "normal beauty = %s" % normal_beauty
+        print("normal times = %s" % normal_times)
+        print("normal sweat = %s" % normal_sweat)
+        print("normal beauty = %s" % normal_beauty)
 
         self.assertAlmostEqual(sum(normal_times), 1)
         self.assertAlmostEqual(sum(normal_sweat), 1)

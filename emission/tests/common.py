@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Standard imports
 import logging
 from datetime import datetime, timedelta
@@ -37,12 +38,12 @@ def updateUserCreateTime(uuid):
 
 def dropAllCollections(db):
   collections = db.collection_names()
-  print "collections = %s" % collections
+  print("collections = %s" % collections)
   for coll in collections:
     if coll.startswith('system'):
-      print "Skipping system collection %s" % coll
+      print("Skipping system collection %s" % coll)
     else: 
-      print "Dropping collection %s" % coll
+      print("Dropping collection %s" % coll)
       db.drop_collection(coll)
 
 def purgeSectionData(Sections, userName):

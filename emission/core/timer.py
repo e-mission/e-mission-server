@@ -1,3 +1,4 @@
+from __future__ import print_function
 from timeit import default_timer
 
 class Timer(object):
@@ -14,4 +15,4 @@ class Timer(object):
         self.elapsed = end - self.start
         self.elapsed_ms = self.elapsed * 1000  # millisecs
         if self.verbose:
-            print 'elapsed time: %f ms' % self.elapsed_ms
+            print('elapsed time: %f ms' % self.elapsed_ms)
