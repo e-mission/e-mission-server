@@ -82,11 +82,6 @@ class TestVisualize(unittest.TestCase):
         self.assertTrue(len(agg_points['lnglat']) > 0)
         # I have to add test data with modes, I will do that tomorrow.
 
-    def testBerkeleyPopRoute(self):
-        points = visualize.Berkeley_pop_route(self.day_start_ts,
-                                          self.day_end_ts)
-        self.assertTrue(len(['latlng']) > 0)
-
 
 if __name__ == '__main__':
     import emission.tests.common as etc

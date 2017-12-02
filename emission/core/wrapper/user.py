@@ -45,23 +45,6 @@ class User:
   def getProfile(self):
     return get_profile_db().find_one({'user_id': self.uuid})
 
-  # In the real system, we should always have a profile for the user. But
-  # during unit tests, and durig analysis, that it not always true. Let us fail
-  # more gracefully if no profile is present
-  def getStudy(self):
-    if self.getProfile() != None:
-        return self.getProfile()['study_list']
-    else:
-        return []
-
-  def getFirstStudy(self):
-    studyList = self.getStudy()
-    if studyList == None or len(studyList) == 0:
-      return None
-    else:
-      assert(len(studyList) == 1)
-      return studyList[0]
-
   # Returns Average of MPG of all cars the user drives
   def getAvgMpg(self):
     mpg_array = [defaultMpg]
@@ -115,9 +98,8 @@ class User:
     newTs = self.getUpdateTS() + timedelta
     get_profile_db().update({'user_id': self.uuid}, {'$set': {'update_ts': newTs}})
 
-  def setClientSpecificProfileFields(self, setQuery):
-    logging.debug("Changing profile for user %s to %s" % (self.uuid, setQuery))
-    get_profile_db().update({'user_id': self.uuid}, {'$set': setQuery})
+  def getFirstStudy(self):
+    return None
 
   @staticmethod
   def mergeDicts(dict1, dict2):
@@ -131,49 +113,18 @@ class User:
     # Combine profile settings and study settings.
     # We currently don't have any profile settings
     retSettings = self.defaultSettings;
-    studyList = self.getStudy()
-    if len(studyList) > 0:
-      logging.debug("To return user settings, combining %s data from %s" % (Client(studyList[0]).getSettings(), studyList[0]))
-      retSettings = User.mergeDicts(retSettings, Client(studyList[0]).getSettings())
-      logging.debug("After merge retSettings = %s" % retSettings)
-    else:
-      logging.debug("To return user settings, using defaults")
+    logging.debug("To return user settings, using defaults")
     return retSettings
 
-  def setStudy(self, study):
-    # Here's what we want to do:
-    # - if there is no profile entry, insert one with this uuid and the study in the study_list
-    # - if there is a profile entry and the study_list does not contain this study, add it
-    # - if there is a profile entry and the study_list contains the entry, keep it
-    # The following mongodb statement is supposed to handle all of those cases correctly :)
-    writeResult = get_profile_db().update({'user_id': self.uuid},
-      {'$set': {'study_list': [study]}}, upsert=True)
-    if 'err' in writeResult and writeResult['err'] is not None:
-      logging.error("In setStudy, err = %s" % writeResult['err'])
-      raise Exception()
-
-  def unsetStudy(self, study):
-    # Here's what we want to do:
-    # - if there is no profile entry, ignore
-    # - if there is a profile entry and the study_list does not contain this study, ignore
-    # - if there is a profile entry and the study_list contains the entry, remove it
-    # The following mongodb statement is supposed to handle all of those cases correctly :)
-    writeResult = get_profile_db().update({'user_id': self.uuid},
-      {'$pullAll': {'study_list': [study]}})
-    if 'err' in writeResult and writeResult['err'] is not None:
-      logging.error("In setStudy, err = %s" % writeResult['err'])
-      raise Exception()
-
   @staticmethod
-  def createProfile(uuid, ts, studyList):
+  def createProfile(uuid, ts):
     initProfileObj = {'user_id': uuid,
                       'source':'Shankari',
                       'update_ts': ts,
                       'mpg_array': [defaultMpg]}
     writeResultProfile = get_profile_db().update(
         {'user_id': uuid},
-        {'$set': initProfileObj,
-         '$addToSet': {'study_list': {'$each': studyList}}},
+        {'$set': initProfileObj},
         upsert=True)
     return writeResultProfile
 
@@ -255,17 +206,7 @@ class User:
     # database.
     # TODO: Write a script that periodically goes through and identifies maps
     # that don't have an associated profile and fix them
-    study_list = Client.getPendingClientRegs(userEmail)
-    writeResultProfile = User.createProfile(anonUUID, datetime.now(), study_list)
-     
-    if 'err' not in writeResultProfile:
-      # update was successful!
-      # Either upserted or updatedExisting will be true
-      # We can now cleanup the entry from the pending database
-      # Note that we could also move this to a separate cleanup script because
-      # eventual consistency is good enough for us
-      # If there is a profile entry for a particular signup, then delete it
-      Client.deletePendingClientRegs(userEmail)
+    writeResultProfile = User.createProfile(anonUUID, datetime.now())
     return User.fromUUID(anonUUID)
 
   @staticmethod

@@ -41,7 +41,7 @@ import emission.core.wrapper.motionactivity as ecwm
 
 import emission.core.common as ecc
 
-import emission.core.our_geocoder as eco
+import emission.net.ext_service.geocoder.nominatim as eco
 
 import attrdict as ad
 

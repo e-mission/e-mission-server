@@ -14,7 +14,6 @@ import emission.core.wrapper.user as ecwu
 
 import emission.net.usercache.abstract_usercache_handler as enuah
 import emission.storage.timeseries.tcquery as estt
-import emission.core.common as ecc
 
 import emission.net.ext_service.push.query.trip_metrics as tripmetrics
 

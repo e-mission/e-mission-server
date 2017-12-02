@@ -1,7 +1,7 @@
 # Our imports
 import logging
 import emission.simulation.markov_model_counter as esmmc
-from emission.core.our_geocoder import Geocoder
+import emission.net.ext_service.geocoder.nominatim as eco
 
 # Standard imports
 import numpy as np
@@ -87,7 +87,7 @@ class Location(object):
         if self.rep_coords is None:
             raise Exception("You need to input representative coordinates first!")
         if self.address is None:
-            geo = Geocoder()
+            geo = eco.Geocoder()
             self.address = geo.reverse_geocode(self.rep_coords.get_lat(), self.rep_coords.get_lon())
         return self.address
 

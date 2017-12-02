@@ -3,8 +3,6 @@ import logging
 from datetime import datetime, timedelta
 from uuid import UUID
 
-# Our imports
-import emission.net.api.distance as distance
 # from get_database import get_user_db
 from emission.core.wrapper.user import User
 from emission.core.common import getDistinctUserCount, getAllModes, getDisplayModes, getQuerySpec, addFilterToSpec, getTripCountForMode, getModeShare, getDistanceForMode,\

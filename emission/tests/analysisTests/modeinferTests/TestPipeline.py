@@ -229,40 +229,6 @@ class TestPipeline(unittest.TestCase):
     self.assertIsNotNone(test_id_1_sec['distance'])
     self.assertIsNotNone(test_id_2_sec['trip_id'])
 
-  def testSavePredictionsStepWithClient(self):
-    from emission.core.wrapper.user import User
-
-    fakeEmail = "fest@example.com"
-
-    client = Client("testclient")
-    client.update(createKey = False)
-    etc.makeValid(client)
-
-    (resultPre, resultReg) = client.preRegister("this_is_the_super_secret_id", fakeEmail)
-    self.assertEqual(resultPre, 0)
-    self.assertEqual(resultReg, 1)
-
-    user = User.fromEmail(fakeEmail)
-    self.assertEqual(user.getFirstStudy(), 'testclient')
-
-    self.testPredictedProb()
-    self.pipeline.savePredictionsStep()
-    # Confirm that the predictions are saved correctly
-
-    test_id_1_sec = self.SectionsColl.find_one({'_id': 'test_id_1'})
-    self.assertIsNotNone(test_id_1_sec['predicted_mode'])
-    self.assertEquals(test_id_1_sec['predicted_mode'], {'walking': 1})
-    self.assertEquals(test_id_1_sec['test_auto_confirmed'], {'mode': 1, 'prob': 1.0})
-
-    test_id_2_sec = self.SectionsColl.find_one({'_id': 'test_id_2'})
-    self.assertIsNotNone(test_id_2_sec['predicted_mode'])
-    self.assertEquals(test_id_2_sec['predicted_mode'], {'bus': 1})
-    self.assertEquals(test_id_2_sec['test_auto_confirmed'], {'mode': 5, 'prob': 1.0})
-
-    # Let's make sure that we didn't accidentally mess up other fields
-    self.assertIsNotNone(test_id_1_sec['distance'])
-    self.assertIsNotNone(test_id_2_sec['trip_id'])
-
   def testEntirePipeline(self):
     self.setupTestTrips()
     # Here, we only have 5 trips, so the pipeline looks for the backup training
