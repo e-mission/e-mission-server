@@ -1,5 +1,11 @@
 from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import json
 import logging
 import numpy as np
@@ -87,7 +93,7 @@ def plot_instances_for_gps_error_model():
     needsSmoothing = []
     fineWithoutSmoothing = []
 
-    for (sid, rp_list) in smoothing_ground_truth_map.iteritems():
+    for (sid, rp_list) in smoothing_ground_truth_map.items():
         sectionJSON = get_section_db().find_one({"_id": sid})
         if sectionJSON is None:
             print("Unable to find section %s in the database" % sid)

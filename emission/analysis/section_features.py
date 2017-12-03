@@ -1,4 +1,12 @@
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from past.utils import old_div
 import math
 import logging
 import numpy as np
@@ -23,7 +31,7 @@ def calSpeed(trackpoint1, trackpoint2):
   # logging.debug("while calculating speed form %s -> %s, distanceDelta = %s, timeDelta = %s" %
   #               (trackpoint1, trackpoint2, distanceDelta, timeDelta))
   if timeDelta.total_seconds() != 0:
-    return distanceDelta / timeDelta.total_seconds()
+    return old_div(distanceDelta, timeDelta.total_seconds())
   else:
     return None
 
@@ -63,7 +71,7 @@ def calHCR(segment):
                 HCNum += 1
         segmentDist = segment['distance']
         if segmentDist!= None and segmentDist != 0:
-            HCR = HCNum/segmentDist
+            HCR = old_div(HCNum,segmentDist)
             return HCR
         else:
             return 0
@@ -85,7 +93,7 @@ def calSR(segment):
 
         segmentDist = segment['distance']
         if segmentDist != None and segmentDist != 0:
-            return stopNum/segmentDist
+            return old_div(stopNum,segmentDist)
         else:
             return 0
 
@@ -103,7 +111,7 @@ def calVCR(segment):
             velocity2 = calSpeed(nextPoint, nexNextPt)
             if velocity1 != None and velocity2 != None:
                 if velocity1 != 0:
-                    VC = abs(velocity2 - velocity1)/velocity1
+                    VC = old_div(abs(velocity2 - velocity1),velocity1)
                 else:
                     VC = 0
             else:
@@ -114,7 +122,7 @@ def calVCR(segment):
 
         segmentDist = segment['distance']
         if segmentDist != None and segmentDist != 0:
-            return Pv/segmentDist
+            return old_div(Pv,segmentDist)
         else:
             return 0
 
@@ -141,7 +149,7 @@ def calSpeedsForList(trackpoints):
 def calAvgSpeed(segment):
   timeDelta = segment['section_end_datetime'] - segment['section_start_datetime']
   if timeDelta.total_seconds() != 0:
-    return segment['distance'] / timeDelta.total_seconds()
+    return old_div(segment['distance'], timeDelta.total_seconds())
   else:
     return None
 
@@ -173,7 +181,7 @@ def calAccels(segment):
     # logging.debug("while calculating accels from %s -> %s, speedDelta = %s, timeDelta = %s" %
     #   (trackpoints[i+1], trackpoints[i], speedDelta, timeDelta))
     if timeDelta.total_seconds() != 0:
-      accel[i] = speedDelta/(timeDelta.total_seconds())
+      accel[i] = old_div(speedDelta,(timeDelta.total_seconds()))
       # logging.debug("resulting acceleration is %s" % accel[i])
     prevSpeed = currSpeed
   return accel
@@ -364,7 +372,7 @@ def get_mode_share_by_count(list_idx):
         # print(MODE2)
     else:
         for mode in AllModeList:
-            MODE2[mode['mode_id']]=MODE[mode['mode_id']]/sum(MODE.values())
+            MODE2[mode['mode_id']]=old_div(MODE[mode['mode_id']],sum(MODE.values()))
     return MODE2
 
 def cluster_route_match_score(segment,step1=100000,step2=100000,method='lcs',radius1=2000,threshold=0.5):
@@ -372,10 +380,10 @@ def cluster_route_match_score(segment,step1=100000,step2=100000,method='lcs',rad
     route_seg = getRoute(segment['_id'])
 
     dis=999999
-    medoid_ids=userRouteClusters.keys()
+    medoid_ids=list(userRouteClusters.keys())
     if len(medoid_ids)!=0:
         choice=medoid_ids[0]
-        for idx in userRouteClusters.keys():
+        for idx in list(userRouteClusters.keys()):
             route_idx=getRoute(idx)
             try:
                 dis_new=fullMatchDistance(route_seg,route_idx,step1,step2,method,radius1)

@@ -1,7 +1,15 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from builtins import object
 import logging
 import emission.core.wrapper.user as ecwu
 
-class AuthMethodFactory:
+class AuthMethodFactory(object):
     @staticmethod
     def getAuthMethod(methodName):
         if methodName == "skip":
@@ -21,7 +29,7 @@ class AuthMethodFactory:
             logging.debug("methodName = token_list, returning %s" % enat.TokenListMethod)
             return enat.TokenListMethod()
 
-class AuthMethod:
+class AuthMethod(object):
     def verifyUserToken(self, token):
         raise NotImplementedError('call to abstract method verifyUserToken')
 

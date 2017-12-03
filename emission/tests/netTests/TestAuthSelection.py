@@ -1,4 +1,11 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import unittest
 import json
 import sys
@@ -58,78 +65,78 @@ class TestAuthSelection(unittest.TestCase):
 
     def testGetTokenInJSON(self):
         import emission.net.api.bottle as enab
-        import StringIO
+        import io
 
-        user_data = StringIO.StringIO() 
+        user_data = io.StringIO() 
         user_data.write(json.dumps({'user': "test_token"}))
         test_environ = etc.createDummyRequestEnviron(self, addl_headers=None, request_body=user_data)
 
         request = enab.LocalRequest(environ=test_environ)
         logging.debug("Found request body = %s" % request.body.getvalue())
-        logging.debug("Found request headers = %s" % request.headers.keys())
+        logging.debug("Found request headers = %s" % list(request.headers.keys()))
         self.assertEqual(enaa.__getToken__(request, inHeader=False), "test_token")
         with self.assertRaises(AttributeError):
             self.assertEqual(enaa.__getToken__(request, inHeader=True), "test_token")
         
     def testGetTokenInHeader(self):
         import emission.net.api.bottle as enab
-        import StringIO
+        import io
 
-        user_data = StringIO.StringIO() 
+        user_data = io.StringIO() 
 
         addl_headers = {'HTTP_USER': 'test_header_token'}
 
         test_environ = etc.createDummyRequestEnviron(self, addl_headers=addl_headers, request_body=user_data)
         request = enab.LocalRequest(environ=test_environ)
         logging.debug("Found request body = %s" % request.body.getvalue())
-        logging.debug("Found request headers = %s" % request.headers.keys())
+        logging.debug("Found request headers = %s" % list(request.headers.keys()))
         self.assertEqual(enaa.__getToken__(request, inHeader=True), "test_header_token")
         with self.assertRaises(ValueError):
             self.assertEqual(enaa.__getToken__(request, inHeader=False), "test_header_token")
 
     def testGetTokenInHeader(self):
         import emission.net.api.bottle as enab
-        import StringIO
+        import io
 
-        user_data = StringIO.StringIO() 
+        user_data = io.StringIO() 
 
         addl_headers = {'HTTP_USER': 'test_header_token'}
 
         test_environ = etc.createDummyRequestEnviron(self, addl_headers=addl_headers, request_body=user_data)
         request = enab.LocalRequest(environ=test_environ)
         logging.debug("Found request body = %s" % request.body.getvalue())
-        logging.debug("Found request headers = %s" % request.headers.keys())
+        logging.debug("Found request headers = %s" % list(request.headers.keys()))
         self.assertEqual(enaa.__getToken__(request, inHeader=True), "test_header_token")
         with self.assertRaises(ValueError):
             self.assertEqual(enaa.__getToken__(request, inHeader=False), "test_header_token")
 
     def testGetEmail(self):
         import emission.net.api.bottle as enab
-        import StringIO
+        import io
 
-        user_data = StringIO.StringIO() 
+        user_data = io.StringIO() 
         test_email = "correct_horse_battery_staple"
         user_data.write(json.dumps({'user': test_email}))
         test_environ = etc.createDummyRequestEnviron(self, addl_headers=None, request_body=user_data)
 
         request = enab.LocalRequest(environ=test_environ)
         logging.debug("Found request body = %s" % request.body.getvalue())
-        logging.debug("Found request headers = %s" % request.headers.keys())
+        logging.debug("Found request headers = %s" % list(request.headers.keys()))
         self.assertEqual(enaa._getEmail(request, "skip", inHeader=False), test_email)
         self.assertEqual(enaa._getEmail(request, "token_list", inHeader=False), test_email)
     def testGetUUIDSkipAuth(self):
         import emission.net.api.bottle as enab
         import emission.core.wrapper.user as ecwu
-        import StringIO
+        import io
 
         self.test_email = "test_email"
-        user_data = StringIO.StringIO() 
+        user_data = io.StringIO() 
         user_data.write(json.dumps({'user': self.test_email}))
         test_environ = etc.createDummyRequestEnviron(self, addl_headers=None, request_body=user_data)
 
         request = enab.LocalRequest(environ=test_environ)
         logging.debug("Found request body = %s" % request.body.getvalue())
-        logging.debug("Found request headers = %s" % request.headers.keys())
+        logging.debug("Found request headers = %s" % list(request.headers.keys()))
         user = ecwu.User.register(self.test_email)
         self.assertEqual(enaa.getUUID(request, "skip", inHeader=False), user.uuid)
         ecwu.User.unregister(self.test_email)
@@ -137,17 +144,17 @@ class TestAuthSelection(unittest.TestCase):
     def testGetUUIDTokenAuthSuccess(self):
         import emission.net.api.bottle as enab
         import emission.core.wrapper.user as ecwu
-        import StringIO
+        import io
 
         self.test_email = "correct_horse_battery_staple"
-        user_data = StringIO.StringIO() 
+        user_data = io.StringIO() 
         user_data.write(json.dumps({'user': self.test_email}))
         test_environ = etc.createDummyRequestEnviron(self, addl_headers=None,
                                                      request_body=user_data)
 
         request = enab.LocalRequest(environ=test_environ)
         logging.debug("Found request body = %s" % request.body.getvalue())
-        logging.debug("Found request headers = %s" % request.headers.keys())
+        logging.debug("Found request headers = %s" % list(request.headers.keys()))
         user = ecwu.User.register(self.test_email)
         self.assertEqual(enaa.getUUID(request, "token_list", inHeader=False), user.uuid)
         ecwu.User.unregister(self.test_email)
@@ -155,16 +162,16 @@ class TestAuthSelection(unittest.TestCase):
     def testGetUUIDTokenAuthFailure(self):
         import emission.net.api.bottle as enab
         import emission.core.wrapper.user as ecwu
-        import StringIO
+        import io
 
         self.test_email = "correct_horse_battery_staple"
-        user_data = StringIO.StringIO() 
+        user_data = io.StringIO() 
         user_data.write(json.dumps({'user': "incorrect_token"}))
         test_environ = etc.createDummyRequestEnviron(self, addl_headers=None, request_body=user_data)
 
         request = enab.LocalRequest(environ=test_environ)
         logging.debug("Found request body = %s" % request.body.getvalue())
-        logging.debug("Found request headers = %s" % request.headers.keys())
+        logging.debug("Found request headers = %s" % list(request.headers.keys()))
         user = ecwu.User.register(self.test_email)
         ecwu.User.unregister(self.test_email)
         with self.assertRaises(ValueError):

@@ -1,4 +1,14 @@
 from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import *
+from past.utils import old_div
+from builtins import object
 import emission.simulation.markov_model_counter as emmc
 import emission.net.ext_service.otp.otp as otp
 import emission.net.ext_service.geocoder.nominatim as geo
@@ -10,7 +20,7 @@ import emission.core.get_database as edb
 import datetime
 import random
 import math
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import json
 import heapq
 import time
@@ -25,7 +35,7 @@ key_file = open("conf/net/ext_service/googlemaps.json")
 GOOGLE_MAPS_KEY = json.load(key_file)["api_key"]
 
 
-class UserBase:
+class UserBase(object):
 
     """ 
     Stores all the users and stores the population of areas  
@@ -63,7 +73,7 @@ class UserBase:
 the_base = UserBase()
 
 
-class CampusTrip:
+class CampusTrip(object):
 
     def __init__(self, score_list, time_duration, points, source):
         self.time = score_list[0] 
@@ -71,7 +81,7 @@ class CampusTrip:
         self.beauty = score_list[2]
         self.social = score_list[3]
         self.tot_score = sum(score_list)
-        self.time_duration = time_duration / float(60)
+        self.time_duration = old_div(time_duration, float(60))
         self.points = points
         self.source = source
 
@@ -101,7 +111,7 @@ class CampusTrip:
         return self.make_points() == other.make_points()
 
 
-class UserModel:
+class UserModel(object):
 
     """ 
     User Model class  
@@ -178,7 +188,7 @@ class UserModel:
         crowd_score = 0
         lst_of_points = get_route(trip)
 
-        for crowd in self.user_base.crowd_areas.itervalues():
+        for crowd in self.user_base.crowd_areas.values():
             crowd.update_times(trip.start_time)
             crowd_score += crowd.get_crowd()
 
@@ -280,7 +290,7 @@ def get_normalized_beauty(lst_of_trips):
     return to_return
 
 
-class Area:
+class Area(object):
 
     """ Area class """ 
 
@@ -310,7 +320,7 @@ class Area:
 
     def normalize_sounds(self):
         counter = emmc.Counter()
-        for k,v in self.time_to_noise.iteritems():
+        for k,v in self.time_to_noise.items():
             counter[k] = v
         counter.normalize()
         self.time_to_noise = counter
@@ -368,7 +378,7 @@ def get_noise_score(lat, lng, noises, time):
     return .5 ## if point isnt in any mapped area return the average
 
 def get_closest(time, area):
-    for k, v in area.time_to_noise.iteritems():
+    for k, v in area.time_to_noise.items():
         if time - k < datetime.timedelta(minutes=10):
             return v
     return 0
@@ -380,7 +390,7 @@ def get_beauty_score(lat, lng, beauties):
         tot += beauty_area.beauty
         if beauty_area.point_in_area(lat, lng):
             return beauty_area.beauty
-    return float(tot) / float(len(beauties)) ## if point isnt in any mapped area return the average
+    return old_div(float(tot), float(len(beauties))) ## if point isnt in any mapped area return the average
 
 
 def get_beauty_score_of_trip(trip):
@@ -391,7 +401,7 @@ def get_beauty_score_of_trip(trip):
         for point in section.points:
             tot_points += 1
             beauty_score += get_beauty_score(point.get_lat(), point.get_lon(), beauties)
-    return float(beauty_score) / float(tot_points) 
+    return old_div(float(beauty_score), float(tot_points)) 
 
 
 def get_noise_score_of_trip(trip):
@@ -401,7 +411,7 @@ def get_noise_score_of_trip(trip):
         for point in section.points:
             tot_points += 1
             noise_score += get_noise_score(point.get_lat(), point.get_lon(), noises)
-    return float(beauty_score) / float(tot_points) 
+    return old_div(float(beauty_score), float(tot_points)) 
 
 
 
@@ -442,13 +452,13 @@ def get_one_random_point_in_radius(crd, radius):
     t = 2 * math.pi * v
     x = w * math.cos(t)
     y = w * math.sin(t)
-    x = float(x) / float(math.cos(y_0)) # To account for Earth curvature stuff
+    x = old_div(float(x), float(math.cos(y_0))) # To account for Earth curvature stuff
     to_return = to.Coordinate(y + y_0, x + x_0)
     return to_return
 
 def kilometers_to_degrees(km):
     ## From stackexchnage mentioned above 
-    return (float(km)/float(40000)) * 360
+    return (old_div(float(km),float(40000))) * 360
 
 
 def str_time_to_datetme(str_time):

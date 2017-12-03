@@ -1,3 +1,7 @@
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
 # We need to decide whether the functions will return the cleaned entries or
 # just save them directly. Returning makes it easier to test, saving makes it
 # easier to code because you can work locally and just save the results.
@@ -9,6 +13,11 @@
 # TODO: We can revisit once we see what the structures look like.
 
 # General imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import *
+from past.utils import old_div
 import logging
 import numpy as np
 import scipy.interpolate as spi
@@ -197,8 +206,8 @@ def get_filtered_trip(ts, trip):
     # as we copy over values from the underlying section. Since the trip
     # distance includes the stop distance, we need to compute the trip distance
     # after computing the stop distance.
-    trip_distance = sum([section.data.distance for section in section_map.values()]) + \
-                    sum([stop.data.distance for stop in stop_map.values()])
+    trip_distance = sum([section.data.distance for section in list(section_map.values())]) + \
+                    sum([stop.data.distance for stop in list(stop_map.values())])
     filtered_trip_data.distance = trip_distance
     filtered_trip_entry["data"] = filtered_trip_data
     if filtered_trip_data.distance < 100:
@@ -211,7 +220,7 @@ def get_filtered_trip(ts, trip):
     # or not, and to not store any of the sections or stops if it is not. So the validity
     # check should be before the insert
 
-    for section_id, points in point_map.items():
+    for section_id, points in list(point_map.items()):
         # We should have filtered out zero point sections already
         logging.debug("About to store %s points for section %s" %
                       (len(points), section_id))
@@ -467,9 +476,9 @@ def get_overriden_mode(raw_section_data, filtered_section_data, with_speeds_df):
 
     end_to_end_distance = filtered_section_data.distance
     end_to_end_time = filtered_section_data.duration
-    overall_speed = end_to_end_distance / end_to_end_time
-    TEN_KMPH = float(10 * 1000) / (60 * 60) # m/s
-    TWENTY_KMPH = float(20 * 1000) / (60 * 60) # m/s
+    overall_speed = old_div(end_to_end_distance, end_to_end_time)
+    TEN_KMPH = old_div(float(10 * 1000), (60 * 60)) # m/s
+    TWENTY_KMPH = old_div(float(20 * 1000), (60 * 60)) # m/s
     logging.debug("end_to_end_distance = %s, end_to_end_time = %s, overall_speed = %s" %
                   (end_to_end_distance, end_to_end_time, overall_speed))
 
@@ -486,11 +495,11 @@ def get_overriden_mode(raw_section_data, filtered_section_data, with_speeds_df):
     return None
 
 def is_air_section(filtered_section_data,with_speeds_df):
-    HUNDRED_KMPH = float(100 * 1000) / (60 * 60) # m/s
-    ONE_FIFTY_KMPH = float(100 * 1000) / (60 * 60) # m/s
+    HUNDRED_KMPH = old_div(float(100 * 1000), (60 * 60)) # m/s
+    ONE_FIFTY_KMPH = old_div(float(100 * 1000), (60 * 60)) # m/s
     end_to_end_distance = filtered_section_data.distance
     end_to_end_time = filtered_section_data.duration
-    end_to_end_speed = end_to_end_distance / end_to_end_time
+    end_to_end_speed = old_div(end_to_end_distance, end_to_end_time)
     logging.debug("air check: end_to_end_distance = %s, end_to_end_time = %s, so end_to_end_speed = %s" %
                   (end_to_end_distance, end_to_end_time, end_to_end_speed))
     if end_to_end_speed > ONE_FIFTY_KMPH:
@@ -529,7 +538,7 @@ def _add_start_point(filtered_loc_df, raw_start_place, ts):
     # speed is in m/s. We want to compute secs for covering ad meters
     # speed m = 1 sec, ad m = ? ad/speed secs
     if with_speeds_df.speed.median() > 0:
-        del_time = add_dist / with_speeds_df.speed.median()
+        del_time = old_div(add_dist, with_speeds_df.speed.median())
     else:
         logging.info("speeds for this section are %s, median is %s, trying median nonzero instead" %
                      (with_speeds_df.speed, with_speeds_df.speed.median()))
@@ -537,7 +546,7 @@ def _add_start_point(filtered_loc_df, raw_start_place, ts):
         if not np.isnan(speed_nonzero.median()):
             logging.info("nonzero speeds = %s, median is %s" %
                          (speed_nonzero, speed_nonzero.median()))
-            del_time = add_dist / speed_nonzero.median()
+            del_time = old_div(add_dist, speed_nonzero.median())
         else:
             logging.info("non_zero speeds = %s, median is %s, unsure what this even means, skipping" %
                          (speed_nonzero, speed_nonzero.median()))
@@ -571,7 +580,7 @@ def _add_start_point(filtered_loc_df, raw_start_place, ts):
                              (raw_start_place.get_id(), ending_trip_entry.get_id()))
             new_start_ts = raw_start_place.data.enter_ts
         else:
-            new_start_ts = min(raw_start_place.data.enter_ts + raw_start_place.data.duration / 2,
+            new_start_ts = min(raw_start_place.data.enter_ts + old_div(raw_start_place.data.duration, 2),
                                   raw_start_place.data.enter_ts + 3 * 60)
 
         logging.debug("changed new_start_ts to %s" % (new_start_ts))
@@ -906,7 +915,7 @@ def create_and_link_timeline(tl, user_id, trip_map):
             link_squished_place(curr_cleaned_start_place,
                                 tl.get_object(raw_trip.data.start_place))
 
-    logging.debug("Finished creating and linking timeline, returning %d places and %d trips" % (len(cleaned_places), len(trip_map.values())))
+    logging.debug("Finished creating and linking timeline, returning %d places and %d trips" % (len(cleaned_places), len(list(trip_map.values()))))
     return (last_cleaned_place, esdtl.Timeline(esda.CLEANED_PLACE_KEY,
                                                esda.CLEANED_TRIP_KEY,
                                                cleaned_places,
@@ -1014,7 +1023,7 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
     # and the speed array (insert an entry for this first 30 secs)
     # [0.0, 0.45757476285455007, 0.4575750402006284, -> [0.0, distance_delta/30, 0.45757476285455007, 0.4575750402006284,
     speed_list = first_section_data["speeds"]
-    speed_list.insert(1, float(distance_delta)/30)
+    speed_list.insert(1, old_div(float(distance_delta),30))
     first_section_data["distances"] = distances_list
     first_section_data["speeds"] = speed_list
 
@@ -1049,7 +1058,7 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
     curr_first_loc = ecwe.Entry(curr_first_loc_doc)
     curr_first_loc_data = curr_first_loc.data
     curr_first_loc_data["distance"] = distance_delta
-    curr_first_loc_data["speed"] = float(distance_delta) / 30
+    curr_first_loc_data["speed"] = old_div(float(distance_delta), 30)
     curr_first_loc["data"] = curr_first_loc_data
     ts.update(curr_first_loc)
 

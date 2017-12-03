@@ -1,9 +1,19 @@
 from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import absolute_import
 ## Library to make calls to our Open Trip Planner server
 ## Hopefully similiar to googlemaps.py
 
 # Standard imports
-import urllib, urllib2, datetime, time, random
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import *
+from builtins import object
+from past.utils import old_div
+import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse, datetime, time, random
 import geojson as gj
 import arrow
 # from traffic import get_travel_time
@@ -32,7 +42,7 @@ class PathNotFoundException(Exception):
     def __str__(self):
         return json.dumps(self.message)
 
-class OTP:
+class OTP(object):
 
     """ A class that exists to create an alternative trip object out of a call to our OTP server"""
 
@@ -71,14 +81,14 @@ class OTP:
         add_file_1 = json.loads(add_file.read())
         address = add_file_1["open_trip_planner_instance_address"]
         query_url = "%s/otp/routers/default/plan?" % address
-        encoded_params = urllib.urlencode(params)
+        encoded_params = urllib.parse.urlencode(params)
         url = query_url + encoded_params
         print(url)
         return url
 
     def get_json(self):
-        request = urllib2.Request(self.make_url())
-        response = urllib2.urlopen(request)
+        request = urllib.request.Request(self.make_url())
+        response = urllib.request.urlopen(request)
         return json.loads(response.read())
 
     def get_all_trips(self, _id, user_id, trip_id):
@@ -175,7 +185,7 @@ class OTP:
         cost = 0
         if "RAIL" in mode_list or "SUBWAY" in mode_list:
             try:
-                cost = float(our_json['plan']['itineraries'][0]['fare']['fare']['regular']['cents']) / 100.0   #gives fare in cents 
+                cost = old_div(float(our_json['plan']['itineraries'][0]['fare']['fare']['regular']['cents']), 100.0)   #gives fare in cents 
             except:
                 cost = 0
         elif "CAR" in mode_list:
@@ -187,5 +197,5 @@ class OTP:
         return Alternative_Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc, 0, cost, mode_list)
 
 def otp_time_to_ours(otp_str):
-    return arrow.get(int(otp_str)/1000)
+    return arrow.get(old_div(int(otp_str),1000))
 

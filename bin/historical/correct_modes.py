@@ -1,4 +1,7 @@
 from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 # This script allows us to correct misclassified user confirmed trips.
 # We suspect that the user misclassified them because they were inaccurately
 # classified high confidence trips.
@@ -6,16 +9,21 @@ from __future__ import print_function
 # this script.  All corrections should happen through the script, and the
 # associated correction file should be checked in for further reference
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import next
+from builtins import *
+from builtins import object
 from get_database import get_section_db
 
 # Handle comments as per:
 # http://bugs.python.org/issue1225769
-class CommentedFile:
+class CommentedFile(object):
     def __init__(self, f, commentstring="#"):
         self.f = f
         self.commentstring = commentstring
 
-    def next(self):
+    def __next__(self):
         line = next(self.f)
         while line.startswith(self.commentstring):
             line = next(self.f)

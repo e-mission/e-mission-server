@@ -1,9 +1,16 @@
 from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 # Test the base class enhancements over AttrDict
 # Since the base class should not really contain any properties, we create a
 # dummy subclass here and use it for testing.
 
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
 import unittest
 import enum
 

@@ -1,9 +1,17 @@
 from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import *
+from past.utils import old_div
 import numpy as np
-import urllib,json,csv
+import urllib.request, urllib.parse, urllib.error,json,csv
 import xml.etree.cElementTree as ET
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import time
 
 # Our imports
@@ -47,7 +55,7 @@ def cal_matching_score(lst1,lst2,radius):
         # print(lst2[int(i/max_len*len2)])
         if ec.Is_place_2(lst1[int(i/max_len*len1)],lst2[int(i/max_len*len2)],radius):
             count+=1
-    score=count/max_len
+    score=old_div(count,max_len)
     return score
 
 def route_matching(lst1,lst2,step,radius,len_match,min_score):
@@ -63,7 +71,7 @@ def route_matching(lst1,lst2,step,radius,len_match,min_score):
     lst1_extended=[]
     for i in range(len(lst1)-1):
         dis=ec.calDistance(lst1[i]['track_location']['coordinates'],lst1[i+1]['track_location']['coordinates'])
-        num_inter=int(round(dis/step))
+        num_inter=int(round(old_div(dis,step)))
         if num_inter==0:
             lst1_extended.append(lst1[i]['track_location']['coordinates'])
         else:
@@ -75,7 +83,7 @@ def route_matching(lst1,lst2,step,radius,len_match,min_score):
     lst2_extended=[]
     for i in range(len(lst2)-1):
         dis=ec.calDistance(lst2[i]['track_location']['coordinates'],lst2[i+1]['track_location']['coordinates'])
-        num_inter=int(round(dis/step))
+        num_inter=int(round(old_div(dis,step)))
         if num_inter==0:
             lst2_extended.append(lst2[i]['track_location']['coordinates'])
         else:
@@ -103,7 +111,7 @@ def route_matching(lst1,lst2,step,radius,len_match,min_score):
         print("start of case 1")
         for near_s in near_start2:
             for near_e in near_end2:
-                if min(abs(near_e-near_s)+1,len(lst2_extended))/max(abs(near_e-near_s)+1,len(lst2_extended))>=len_match:
+                if old_div(min(abs(near_e-near_s)+1,len(lst2_extended)),max(abs(near_e-near_s)+1,len(lst2_extended)))>=len_match:
                     print("possible near_s is %s" % near_s)
                     print("possible near_e is %s" % near_e)
 
@@ -128,7 +136,7 @@ def route_matching(lst1,lst2,step,radius,len_match,min_score):
         print("start of case 2")
         for near_s in near_start1:
             for near_e in near_end1:
-                if min(abs(near_e-near_s)+1,len(lst1_extended))/max(abs(near_e-near_s)+1,len(lst1_extended))>=len_match:
+                if old_div(min(abs(near_e-near_s)+1,len(lst1_extended)),max(abs(near_e-near_s)+1,len(lst1_extended)))>=len_match:
                     if near_e>near_s:
                         print("start index is %d" % near_s)
                         print("end index is %d" % near_e)
@@ -159,7 +167,7 @@ def route_matching_2(lst1,lst2,step,radius,min_score):
     lst1_extended=[]
     for i in range(len(lst1)-1):
         dis=ec.calDistance(lst1[i]['track_location']['coordinates'],lst1[i+1]['track_location']['coordinates'])
-        num_inter=int(round(dis/step))
+        num_inter=int(round(old_div(dis,step)))
         if num_inter==0:
             lst1_extended.append(lst1[i]['track_location']['coordinates'])
         else:
@@ -171,7 +179,7 @@ def route_matching_2(lst1,lst2,step,radius,min_score):
     lst2_extended=[]
     for i in range(len(lst2)-1):
         dis=ec.calDistance(lst2[i]['track_location']['coordinates'],lst2[i+1]['track_location']['coordinates'])
-        num_inter=int(round(dis/step))
+        num_inter=int(round(old_div(dis,step)))
         if num_inter==0:
             lst2_extended.append(lst2[i]['track_location']['coordinates'])
         else:
@@ -188,12 +196,12 @@ def route_matching_2(lst1,lst2,step,radius,min_score):
     for point2 in lst2:
         if ec.Include_place_2(lst1_extended,point2['track_location']['coordinates'],radius):
             score_2_in_1+=1
-    best_score.append(score_2_in_1/len(lst2))
+    best_score.append(old_div(score_2_in_1,len(lst2)))
     score_1_in_2=0
     for point1 in lst1:
         if ec.Include_place_2(lst2_extended,point1['track_location']['coordinates'],radius):
             score_1_in_2+=1
-    best_score.append(score_1_in_2/len(lst1))
+    best_score.append(old_div(score_1_in_2,len(lst1)))
     print(best_score)
     if max(best_score)>min_score:
         return True
@@ -216,7 +224,7 @@ def refineRoute(lst1,step):
     lst1_extended=[]
     for i in range(len(lst1)-1):
         dis=ec.calDistance(lst1[i],lst1[i+1])
-        num_inter=int(round(dis/step))
+        num_inter=int(round(old_div(dis,step)))
         if num_inter==0:
             lst1_extended.append(lst1[i])
         else:
@@ -233,7 +241,7 @@ def storeTransitStop(type,route):
     Transit=edb.get_transit_db()
     todo={}
     stops=[]
-    tree = ET.ElementTree(file=urllib2.urlopen('http://api.bart.gov/api/stn.aspx?cmd=stns&key=MW9S-E7SL-26DU-VV8V'))
+    tree = ET.ElementTree(file=urllib.request.urlopen('http://api.bart.gov/api/stn.aspx?cmd=stns&key=MW9S-E7SL-26DU-VV8V'))
     root = tree.getroot()
     # print(root[1][0].find('name').text)
     file_name='/Users/Mogeng/Berkeley/Semester2/E-Mission/Transit_routes/'+type+'_'+route+'.csv'
@@ -267,9 +275,9 @@ def storeCalTrainStop():
             time.sleep(1)
             print(row[0])
             # print(add)
-            url='https://maps.googleapis.com/maps/api/geocode/json?address='+urllib.quote_plus(row[0]+' caltrain station')
+            url='https://maps.googleapis.com/maps/api/geocode/json?address='+urllib.parse.quote_plus(row[0]+' caltrain station')
             print(url)
-            geo= json.load(urllib.urlopen(url))
+            geo= json.load(urllib.request.urlopen(url))
             result=geo['results'][0]
             print(result['geometry']['location'])
             stops.append([result['geometry']['location']['lng'],result['geometry']['location']['lat']])
@@ -412,7 +420,7 @@ def matchTwoRoutes(route1,route2,step1=100000,step2=100000,method='lcs',radius1=
         return 0
 
 def update_user_routeDistanceMatrix(user_id,data_feature,step1=100000,step2=100000,method='lcs',radius1=1000):
-    ids = data_feature.keys()
+    ids = list(data_feature.keys())
     """
     user_query=edb.get_routeDistanceMatrix_db().find_one({'$and':[{'user':user_id},{'method':method}]})
     if user_query==None:
@@ -466,7 +474,7 @@ def get_common_routes_for_user(user_id,method='lcs'):
     common_idxs = []
     Sections = edb.get_section_db()
     user_route_clusters = edb.get_routeCluster_db().find_one({'$and':[{'user':user_id},{'method':method}]})['clusters']
-    for idx in user_route_clusters.keys():
+    for idx in list(user_route_clusters.keys()):
         # print(idx)
         if len(user_route_clusters[idx]) >= 3:
             section=Sections.find_one({'_id': idx})

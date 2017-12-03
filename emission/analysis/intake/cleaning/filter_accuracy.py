@@ -13,8 +13,15 @@ The high level algorithm is to:
         is idempotent. That ensures that we can simply reset the pipeline state
         and re-run everything if we have any changes that we need to make.
 """ 
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import logging
 
 # Our imports

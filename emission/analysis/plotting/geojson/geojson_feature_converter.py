@@ -1,4 +1,12 @@
 from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import map
+from builtins import str
+from builtins import *
 import logging
 import geojson as gj
 import copy
@@ -168,7 +176,7 @@ def geojson_incidents_in_range(user_id, start_ts, end_ts):
     incident_entry_docs = list(ts.find_entries([MANUAL_INCIDENT_KEY], time_query=tq)) \
         + list(uc.getMessage([MANUAL_INCIDENT_KEY], tq))
     incidents = [ecwe.Entry(doc) for doc in incident_entry_docs]
-    return map(incident_to_geojson, incidents)
+    return list(map(incident_to_geojson, incidents))
 
 def point_array_to_line(point_array):
     points_line_string = gj.LineString()

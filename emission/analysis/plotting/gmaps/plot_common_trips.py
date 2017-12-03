@@ -1,6 +1,12 @@
 from __future__ import print_function
 from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import division
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
 from get_database import get_section_db, get_routeCluster_db
 from uuid import UUID
 import random
@@ -15,7 +21,7 @@ def plot_each_route_cluster_for_user(user_id,method='lcs'):
     Sections = get_section_db()
     user_route_clusters = get_routeCluster_db().find_one({'$and':[{'user':user_id},{'method':method}]})
     # plot each cluster as a file.
-    for idx in user_route_clusters['clusters'].keys():
+    for idx in list(user_route_clusters['clusters'].keys()):
         print(idx)
         gmap = pygmaps.maps(37.8717, -122.2728, 14)
         # gmap = pygmaps.maps(getRoute(idx)[0][0], getRoute(idx)[0][1], 14)

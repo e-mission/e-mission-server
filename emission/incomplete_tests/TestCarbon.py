@@ -1,5 +1,12 @@
 from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from past.utils import old_div
 import unittest
 import json
 import logging
@@ -32,10 +39,10 @@ class TestCarbon(unittest.TestCase):
 
     self.walkExpect = 1057.2524056424411
     self.busExpect = 2162.668467546699
-    self.busCarbon = 267.0/1609
-    self.airCarbon = 217.0/1609
-    self.driveCarbon = 278.0/1609
-    self.busOptimalCarbon = 92.0/1609
+    self.busCarbon = old_div(267.0,1609)
+    self.airCarbon = old_div(217.0,1609)
+    self.driveCarbon = old_div(278.0,1609)
+    self.busOptimalCarbon = old_div(92.0,1609)
 
     self.now = datetime.now()
     self.dayago = self.now - timedelta(days=1)
@@ -157,8 +164,8 @@ class TestCarbon(unittest.TestCase):
     self.assertEqual(totalModeDistance['walking'], 0)
     self.assertEqual(totalModeDistance['cycling'], 0)
     # We divide by 1000 to make it comprehensible in getModeCarbonFootprint
-    self.assertEqual(totalModeDistance['bus_short'], (self.busCarbon * len(self.testUsers) * self.busExpect)/1000)
-    self.assertEqual(totalModeDistance['air_short'], (self.airCarbon * len(self.testUsers) * self.busExpect)/1000)
+    self.assertEqual(totalModeDistance['bus_short'], old_div((self.busCarbon * len(self.testUsers) * self.busExpect),1000))
+    self.assertEqual(totalModeDistance['air_short'], old_div((self.airCarbon * len(self.testUsers) * self.busExpect),1000))
     self.assertEqual(totalModeDistance['train_short'], 0)
 
   def testMySummary(self):
@@ -188,12 +195,12 @@ class TestCarbon(unittest.TestCase):
                          'air': self.busExpect})
       logging.debug(filterZero(myModeShareDistance))
       self.assertEqual(filterZero(myModeCarbonFootprint),
-            {'bus_short': (self.busExpect * self.busCarbon)/1000,
-             'air_short': (self.busExpect * self.airCarbon)/1000})
+            {'bus_short': old_div((self.busExpect * self.busCarbon),1000),
+             'air_short': old_div((self.busExpect * self.airCarbon),1000)})
       self.assertEqual(filterZero(myModeCarbonFootprintNoLongMotorized),
-            {'bus_short': (self.busExpect * self.busCarbon)/1000})
+            {'bus_short': old_div((self.busExpect * self.busCarbon),1000)})
       self.assertEqual(filterZero(myOptimalCarbonFootprint),
-            {'air_short': (self.busExpect * self.busOptimalCarbon)/1000})
+            {'air_short': old_div((self.busExpect * self.busOptimalCarbon),1000)})
       self.assertEqual(filterZero(myOptimalCarbonFootprintNoLongMotorized),
             {})
 
@@ -201,13 +208,13 @@ class TestCarbon(unittest.TestCase):
     summary = carbon.getSummaryAllTrips(self.weekago, self.now)
     # *2 because the walking trips don't count, but we have doubled the bus
     # trips to count as air trips
-    self.assertEqual(summary['current'], (self.busCarbon * self.busExpect + self.airCarbon * self.busExpect)/1000)
+    self.assertEqual(summary['current'], old_div((self.busCarbon * self.busExpect + self.airCarbon * self.busExpect),1000))
     # No * 2 because the optimal value for short bus trips is to actually move to bikes :)
-    self.assertEqual(summary['optimal'], (self.busOptimalCarbon * self.busExpect)/1000)
+    self.assertEqual(summary['optimal'], old_div((self.busOptimalCarbon * self.busExpect),1000))
     # These are are without air, so will only count the bus trips
-    self.assertEqual(summary['current no air'], (self.busCarbon * self.busExpect)/1000)
+    self.assertEqual(summary['current no air'], old_div((self.busCarbon * self.busExpect),1000))
     self.assertEqual(summary['optimal no air'], 0)
-    self.assertAlmostEqual(summary['all drive'], (self.driveCarbon * (self.busExpect * 2 + self.walkExpect))/1000, places = 4)
+    self.assertAlmostEqual(summary['all drive'], old_div((self.driveCarbon * (self.busExpect * 2 + self.walkExpect)),1000), places = 4)
 
   def testDistinctUserCount(self):
     self.assertEqual(carbon.getDistinctUserCount({}), len(self.testUsers))

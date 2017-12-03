@@ -1,4 +1,13 @@
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import *
+from past.utils import old_div
 import numpy as np
 import json
 import logging
@@ -44,7 +53,7 @@ def recalc_speed(points_df):
     """
     stripped_df = points_df.drop("speed", axis=1).drop("distance", axis=1)
     point_list = [ad.AttrDict(row) for row in points_df.to_dict('records')]
-    zipped_points_list = zip(point_list, point_list[1:])
+    zipped_points_list = list(zip(point_list, point_list[1:]))
     distances = [pf.calDistance(p1, p2) for (p1, p2) in zipped_points_list]
     distances.insert(0, 0)
     with_speeds_df = pd.concat([stripped_df, pd.Series(distances, index=points_df.index, name="distance")], axis=1)
@@ -61,7 +70,7 @@ def add_dist_heading_speed(points_df):
     The first row has a speed of zero.
     """
     point_list = [ad.AttrDict(row) for row in points_df.to_dict('records')]
-    zipped_points_list = zip(point_list, point_list[1:])
+    zipped_points_list = list(zip(point_list, point_list[1:]))
 
     distances = [pf.calDistance(p1, p2) for (p1, p2) in zipped_points_list]
     distances.insert(0, 0)
@@ -82,7 +91,7 @@ def add_heading_change(points_df):
     two points preceding it. The first two rows have a speed of zero.
     """
     point_list = [ad.AttrDict(row) for row in points_df.to_dict('records')]
-    zipped_points_list = zip(point_list, point_list[1:], point_list[2:])
+    zipped_points_list = list(zip(point_list, point_list[1:], point_list[2:]))
     hcs = [pf.calHC(p1, p2, p3) for (p1, p2, p3) in zipped_points_list]
     hcs.insert(0, 0)
     hcs.insert(1, 0)
@@ -246,8 +255,8 @@ def _ios_fill_fake_data(locs_df):
         dist_fill = np.random.uniform(low=0, high=100, size=len(ts_fill))
         angle_fill = np.random.uniform(low=0, high=2 * np.pi, size=len(ts_fill))
         # Formula from http://gis.stackexchange.com/questions/5821/calculating-latitude-longitude-x-miles-from-point
-        lat_fill = locs_df.latitude[end] + np.multiply(dist_fill, np.sin(
-            angle_fill) / 111111)
+        lat_fill = locs_df.latitude[end] + np.multiply(dist_fill, old_div(np.sin(
+            angle_fill), 111111))
         cl = np.cos(locs_df.latitude[end])
         lng_fill = locs_df.longitude[end] + np.multiply(dist_fill, np.cos(
             angle_fill) / cl / 111111)

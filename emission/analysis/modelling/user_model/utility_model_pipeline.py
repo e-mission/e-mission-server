@@ -3,7 +3,15 @@ Construct user utility model or retrieve from database and update with
 augmented trips. Store in database and return the model.
 """
 from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import *
+from builtins import object
 import json
 import logging
 from pymongo.errors import ConnectionFailure
@@ -16,7 +24,7 @@ import emission.net.ext_service.gmaps.common as egcm
 from . import simple_cost_time_mode_model as sctm
 import emission.core.wrapper.trip_old as ecwt
 
-class UtilityModelPipeline:
+class UtilityModelPipeline(object):
     def __init__(self):
         pass
 
@@ -59,7 +67,7 @@ class UtilityModelPipeline:
             return None
 
     def prepare_feature_vectors(self, trips, alternatives):
-        vector = zip(trips, alternatives)
+        vector = list(zip(trips, alternatives))
         vector = [(trip,alts) for trip, alts in vector if alts]
         return vector
 

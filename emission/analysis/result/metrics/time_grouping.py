@@ -1,3 +1,11 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import *
 import enum
 import pandas as pd
 import arrow as arrow
@@ -106,7 +114,7 @@ def grouped_to_summary(time_grouped_df, key_to_fill_fn, summary_fn):
         curr_msts.nUsers = len(section_group_df.user_id.unique())
         mode_grouped_df = section_group_df.groupby('sensed_mode')
         mode_results = summary_fn(mode_grouped_df)
-        for mode, result in mode_results.iteritems():
+        for mode, result in mode_results.items():
             curr_msts[ecwm.MotionTypes(mode).name] = result
         ret_list.append(curr_msts)
     return ret_list

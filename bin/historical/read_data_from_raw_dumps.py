@@ -1,4 +1,7 @@
 from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 # Read data from a temporary set of "dump" files that were stored on the
 # mission server in the first half of 2015. These files were identical to the
 # inputs from moves, except that they also had accuracy values for the points.
@@ -11,6 +14,10 @@ from __future__ import print_function
 # smoothing algorithms. This script is not useful otherwise.
 
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
 import json
 from attrdict import AttrDict
 from pymongo import MongoClient

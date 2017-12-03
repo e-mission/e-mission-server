@@ -1,7 +1,14 @@
 from __future__ import print_function
 from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
 # simple user utility model taking cost, time, and mode into account
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import *
+from past.utils import old_div
 import numpy as np
 import math
 from datetime import datetime
@@ -27,7 +34,7 @@ class EmissionsModel(utm.UserUtilityModel):
     self.mode = mode
     # Let's make the emissions coef be the average of the other two to make sure that
     # is scaled in the same range
-    self.emissions = -100000 * ((self.cost + self.time) / 2)
+    self.emissions = -100000 * (old_div((self.cost + self.time), 2))
     self.coefficients = [self.cost, self.time, self.mode, self.emissions]
     logging.debug("emissions weight: %s" % self.emissions)
 
@@ -107,7 +114,7 @@ class EmissionsModel(utm.UserUtilityModel):
     total = 0
     for mpg in mpg_array:
       total += mpg
-    avg = total/len(mpg_array)
+    avg = old_div(total,len(mpg_array))
     logging.debug("Returning total = %s, len = %s, avg = %s" % (total, len(mpg_array), avg))
     return avg
 
@@ -124,14 +131,14 @@ class EmissionsModel(utm.UserUtilityModel):
     footprint = 0
     if mode == 'driving':
         avgMetersPerGallon = self.getAvgMpg()*1.6093
-        footprint = (1/avgMetersPerGallon)*8.91
+        footprint = (old_div(1,avgMetersPerGallon))*8.91
     elif mode == 'bus':
-        footprint = 267.0/1609
+        footprint = old_div(267.0,1609)
     elif mode == 'train':
-        footprint = 92.0/1609
+        footprint = old_div(92.0,1609)
     elif mode == 'transit':
         # assume bus
-        footprint = 92.0/1609
-    totalDistance = distance / 1000
+        footprint = old_div(92.0,1609)
+    totalDistance = old_div(distance, 1000)
     emissions = totalDistance * footprint
     return emissions

@@ -1,3 +1,11 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from builtins import object
 import logging
 import json
 import traceback
@@ -7,7 +15,7 @@ import requests
 import google.oauth2.id_token as goi
 import google.auth.transport.requests as gatr
 
-class GoogleAuthMethod:
+class GoogleAuthMethod(object):
     def __init__(self):
         key_file = open('conf/net/auth/google_auth.json')
         key_data = json.load(key_file)

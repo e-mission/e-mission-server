@@ -1,8 +1,15 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import json
 import requests
 import logging
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import uuid
 import random
 
@@ -30,7 +37,7 @@ def habiticaRegister(username, email, password, our_uuid):
 
     #if it fails, then user is in db but not in Habitica, so needs to create new account
     #FIX! Still need to test if this will throw an error correctly
-    except urllib2.HTTPError:
+    except urllib.error.HTTPError:
       user_dict = newHabiticaUser(username, email, password, our_uuid)
       edb.get_habitica_db().update({"user_id": our_uuid},{"$set":
         initUserDoc(our_uuid, username, password, user_dict)
@@ -103,7 +110,7 @@ def newHabiticaUser(username, email, password, our_uuid):
   # Bail out if we get an error
   u.raise_for_status()
   user_dict = json.loads(u.text)
-  logging.debug("parsed json from habitica has keys = %s" % user_dict.keys())
+  logging.debug("parsed json from habitica has keys = %s" % list(user_dict.keys()))
   return user_dict
 
 

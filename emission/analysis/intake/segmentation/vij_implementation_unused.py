@@ -1,5 +1,13 @@
 from __future__ import print_function
-import urllib2
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import *
+from past.utils import old_div
+import urllib.request, urllib.error, urllib.parse
 import csv
 import math
 import numpy
@@ -29,7 +37,7 @@ import numpy
 def getNewGPSData(testerName, phoneNum, lastUpdate, gpsFilePath):
 
     url = 'http://' + phoneNum + 'gp.appspot.com/gaeandroid?query=1'
-    data = urllib2.urlopen(url)
+    data = urllib.request.urlopen(url)
     
     localFile = open(gpsFilePath, 'w')
     localFile.write(data.read())
@@ -74,7 +82,7 @@ def calDistance(point1, point2):
     lat1 = math.radians(point1[0])
     lat2 = math.radians(point2[0])
     
-    a = (math.sin(dLat/2) ** 2) + ((math.sin(dLon/2) ** 2) * math.cos(lat1) * math.cos(lat2))
+    a = (math.sin(old_div(dLat,2)) ** 2) + ((math.sin(old_div(dLon,2)) ** 2) * math.cos(lat1) * math.cos(lat2))
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
     d = earthRadius * c 
     
@@ -231,13 +239,13 @@ def lengthPoint(gpsTraces, j):
    return calDistance(gpsTraces[j][2:4], gpsTraces[j+1][2:4])
 
 def timePoint(gpsTraces, j):
-   return (gpsTraces[j+1][1] - gpsTraces[j][1]) / 1000.0
+   return old_div((gpsTraces[j+1][1] - gpsTraces[j][1]), 1000.0)
 
 def speedPoint(gpsTraces, j):
-  return 2.23694 * (float(lengthPoint(gpsTraces, j)) / timePoint(gpsTraces, j))
+  return 2.23694 * (old_div(float(lengthPoint(gpsTraces, j)), timePoint(gpsTraces, j)))
 
 def accelerationPoint(gpsTraces, j):
-  return abs(speedPoint(gpsTraces, j + 1) - speedPoint(gpsTraces, j)) / (timePoint(gpsTraces,j) / 3600.0)
+  return old_div(abs(speedPoint(gpsTraces, j + 1) - speedPoint(gpsTraces, j)), (old_div(timePoint(gpsTraces,j), 3600.0)))
 
 
 # Method that that takes as input the list containing GPS data, called gpsTraces, and a tuple containing the 
@@ -265,8 +273,8 @@ def inferModeChain(gpsTraces, trip, maxWalkSpeed, maxWalkAcceleration,
             i += 1
         else:
             distance = calDistance(gpsTraces[start][2:4], gpsTraces[end][2:4])
-            time = (gpsTraces[end][1] - gpsTraces[start][1]) / 1000.0
-            speed = 2.23694 * (float(distance) / time)
+            time = old_div((gpsTraces[end][1] - gpsTraces[start][1]), 1000.0)
+            speed = 2.23694 * (old_div(float(distance), time))
             dummy = int(speed < maxWalkSpeed)
             while i < end:
                 walkDummy[i] = dummy
@@ -315,8 +323,8 @@ def inferModeChain(gpsTraces, trip, maxWalkSpeed, maxWalkAcceleration,
     if i > 1:
         newModeChains[0][1] = modeChains[i-1][1]
         distance = calDistance(gpsTraces[newModeChains[0][0]][2:4], gpsTraces[newModeChains[0][1]][2:4])
-        time = (gpsTraces[newModeChains[0][1]][1] - gpsTraces[newModeChains[0][0]][1]) / 1000.0
-        speed = 2.23694 * (float(distance) / time)
+        time = old_div((gpsTraces[newModeChains[0][1]][1] - gpsTraces[newModeChains[0][0]][1]), 1000.0)
+        speed = 2.23694 * (old_div(float(distance), time))
         newModeChains[0][-1] = int(speed < maxWalkSpeed)
     if i < len(modeChains) and modeChains[0][-1] == 0:
         time = (gpsTraces[newModeChains[0][1]][1] - gpsTraces[newModeChains[0][0]][1])
@@ -373,7 +381,7 @@ def collect_vij():
             while (trips and activities) or (activities and holes) or (holes and trips):
                 event = {}
                 user_id=tester['name']
-                trip_id=datetime.datetime.fromtimestamp(int(gpsTraces[trips[0][0]][1]/1000)).strftime('%Y%m%dT%H%M%S') + gmtConversion
+                trip_id=datetime.datetime.fromtimestamp(int(old_div(gpsTraces[trips[0][0]][1],1000))).strftime('%Y%m%dT%H%M%S') + gmtConversion
                 eventID = user_id + trip_id
                 if ((trips and activities and holes and trips[0][0] < activities[0][0] and trips[0][0] < holes[0][0]) 
                         or (trips and not activities and holes and trips[0][0] < holes[0][0])
@@ -389,7 +397,7 @@ def collect_vij():
                         for i in range(mode[0], mode[1]):
                             trackPoint = {'Location': {'type': 'Point',
                                                        'coordinates': [gpsTraces[i][3], gpsTraces[i][2]]},
-                                          'Time': (datetime.datetime.fromtimestamp(int(gpsTraces[i][1]/1000)).strftime('%Y%m%dT%H%M%S')
+                                          'Time': (datetime.datetime.fromtimestamp(int(old_div(gpsTraces[i][1],1000))).strftime('%Y%m%dT%H%M%S')
                                                         + gmtConversion)}
                             trackPoints.append(trackPoint)
 
@@ -397,7 +405,7 @@ def collect_vij():
                             sections_todo = {'source':'ITS Berkeley',
                                             'trip_id':trip_id,
                                             'user_id':user_id,
-                                            '_id':user_id + datetime.datetime.fromtimestamp(int(gpsTraces[mode[0]][1]/1000)).strftime('%Y%m%dT%H%M%S')
+                                            '_id':user_id + datetime.datetime.fromtimestamp(int(old_div(gpsTraces[mode[0]][1],1000))).strftime('%Y%m%dT%H%M%S')
                                                 + gmtConversion,
                                             'section_id': segmentID,
                                             'type':'move',
@@ -405,9 +413,9 @@ def collect_vij():
                                             'confirmed Mode': '',
                                             'group':'',
                                             'manual':False,
-                                            'section_start_time': (datetime.datetime.fromtimestamp(int(gpsTraces[mode[0]][1]/1000)).strftime('%Y%m%dT%H%M%S')
+                                            'section_start_time': (datetime.datetime.fromtimestamp(int(old_div(gpsTraces[mode[0]][1],1000))).strftime('%Y%m%dT%H%M%S')
                                                 + gmtConversion),
-                                            'section_end_time': (datetime.datetime.fromtimestamp(int(gpsTraces[mode[1]][1]/1000)).strftime('%Y%m%dT%H%M%S')
+                                            'section_end_time': (datetime.datetime.fromtimestamp(int(old_div(gpsTraces[mode[1]][1],1000))).strftime('%Y%m%dT%H%M%S')
                                                 + gmtConversion),
                                             'track_points':trackPoints}
 
@@ -420,9 +428,9 @@ def collect_vij():
                                       'trip_id':trip_id,
                                       '_id': eventID,
                                       'type': 'move',
-                                      'trip_start_time': (datetime.datetime.fromtimestamp(int(gpsTraces[trips[0][0]][1]/1000)).strftime('%Y%m%dT%H%M%S')
+                                      'trip_start_time': (datetime.datetime.fromtimestamp(int(old_div(gpsTraces[trips[0][0]][1],1000))).strftime('%Y%m%dT%H%M%S')
                                                     + gmtConversion),
-                                      'trip_end_Time': (datetime.datetime.fromtimestamp(int(gpsTraces[trips[0][1]][1]/1000)).strftime('%Y%m%dT%H%M%S')
+                                      'trip_end_Time': (datetime.datetime.fromtimestamp(int(old_div(gpsTraces[trips[0][1]][1],1000))).strftime('%Y%m%dT%H%M%S')
                                                     + gmtConversion),
                                       'sections': [sections['section_id'] for sections in Test_Sections.find({"$and":[{"user_id":user_id}, {"trip_id":trip_id}]})],
                                       'last_update_time': lastUpdate}
@@ -439,7 +447,7 @@ def collect_vij():
                     for i in range(activities[0][0], activities[0][1]):
                         trackPoint = {'Location': {'type': 'Point',
                                                    'coordinates': [gpsTraces[i][3], gpsTraces[i][2]]},
-                                      'Time': (datetime.datetime.fromtimestamp(int(gpsTraces[i][1]/1000)).strftime('%Y%m%dT%H%M%S') 
+                                      'Time': (datetime.datetime.fromtimestamp(int(old_div(gpsTraces[i][1],1000))).strftime('%Y%m%dT%H%M%S') 
                                                         + gmtConversion)}
                         trackPoints.append(trackPoint)
                     if Test_Sections.find({"$and":[ {"user_id":user_id},{"trip_id": trip_id}]}).count()==0:
@@ -449,9 +457,9 @@ def collect_vij():
                                          '_id':eventID,
                                          'section_id': 0,
                                          'type':'place',
-                                         'section_start_time': (datetime.datetime.fromtimestamp(int(gpsTraces[activities[0][0]][1]/1000)).strftime('%Y%m%dT%H%M%S')
+                                         'section_start_time': (datetime.datetime.fromtimestamp(int(old_div(gpsTraces[activities[0][0]][1],1000))).strftime('%Y%m%dT%H%M%S')
                                                     + gmtConversion),
-                                         'section_end_time': (datetime.datetime.fromtimestamp(int(gpsTraces[activities[0][1]][1]/1000)).strftime('%Y%m%dT%H%M%S')
+                                         'section_end_time': (datetime.datetime.fromtimestamp(int(old_div(gpsTraces[activities[0][1]][1],1000))).strftime('%Y%m%dT%H%M%S')
                                                     + gmtConversion),
                                          'track_points' : trackPoints}
                     Test_Sections.insert(sections_todo)
@@ -461,9 +469,9 @@ def collect_vij():
                                       'trip_id': trip_id,
                                       '_id': eventID,
                                       'type':'place',
-                                      'trip_start_time': (datetime.datetime.fromtimestamp(int(gpsTraces[activities[0][0]][1]/1000)).strftime('%Y%m%dT%H%M%S')
+                                      'trip_start_time': (datetime.datetime.fromtimestamp(int(old_div(gpsTraces[activities[0][0]][1],1000))).strftime('%Y%m%dT%H%M%S')
                                                     + gmtConversion),
-                                      'trip_end_time': (datetime.datetime.fromtimestamp(int(gpsTraces[activities[0][1]][1]/1000)).strftime('%Y%m%dT%H%M%S')
+                                      'trip_end_time': (datetime.datetime.fromtimestamp(int(old_div(gpsTraces[activities[0][1]][1],1000))).strftime('%Y%m%dT%H%M%S')
                                                     + gmtConversion),
                                       'sections': [sections['section_id'] for sections in Test_Sections.find({"$and":[{"user_id":user_id}, {"trip_id":trip_id}]})],
                                       'last_update_time': lastUpdate}
@@ -478,9 +486,9 @@ def collect_vij():
                                       'trip_id': trip_id,
                                       '_id':eventID,
                                       'type': 'hole',
-                                      'trip_start_time': (datetime.datetime.fromtimestamp(int(gpsTraces[holes[0][0]][1]/1000)).strftime('%Y%m%dT%H%M%S')
+                                      'trip_start_time': (datetime.datetime.fromtimestamp(int(old_div(gpsTraces[holes[0][0]][1],1000))).strftime('%Y%m%dT%H%M%S')
                                                     + gmtConversion),
-                                      'trip_end_time': (datetime.datetime.fromtimestamp(int(gpsTraces[holes[0][1]][1]/1000)).strftime('%Y%m%dT%H%M%S')
+                                      'trip_end_time': (datetime.datetime.fromtimestamp(int(old_div(gpsTraces[holes[0][1]][1],1000))).strftime('%Y%m%dT%H%M%S')
                                                     + gmtConversion),
                                       'last_update_time': lastUpdate}
                         Test_Trips.insert(trips_todo)

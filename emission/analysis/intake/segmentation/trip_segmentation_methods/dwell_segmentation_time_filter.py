@@ -1,4 +1,13 @@
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
+from past.utils import old_div
 import logging
 import attrdict as ad
 import numpy as np
@@ -200,10 +209,10 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             timeDelta = curr_point.ts - prev_point.ts
             distDelta = pf.calDistance(prev_point, curr_point)
             if timeDelta > 0:
-                speedDelta = distDelta / timeDelta
+                speedDelta = old_div(distDelta, timeDelta)
             else:
                 speedDelta = np.nan
-            speedThreshold = float(self.distance_threshold) / self.time_threshold
+            speedThreshold = old_div(float(self.distance_threshold), self.time_threshold)
 
             if eaisr.is_tracking_restarted_in_range(prev_point.ts, curr_point.ts, timeseries):
                 logging.debug("tracking was restarted, ending trip")

@@ -1,9 +1,17 @@
-import urllib, json
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from builtins import object
+import urllib.request, urllib.parse, urllib.error, json
 import json
 from jwcrypto import jwt, jwk
 
 
-class OpenIDAuthMethod:
+class OpenIDAuthMethod(object):
     def __init__(self):
         """
         Retrieve auth server config and set up the validator
@@ -27,7 +35,7 @@ class OpenIDAuthMethod:
 
     @staticmethod
     def __fetch_content__(url):
-        response = urllib.urlopen(url)
+        response = urllib.request.urlopen(url)
         return response.read()
 
     def __verify_claim__(self, decoded_token_json):

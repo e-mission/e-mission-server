@@ -1,4 +1,12 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import *
 import unittest
 import datetime as pydt
 import logging
@@ -114,7 +122,7 @@ class TestBuiltinUserCacheHandlerOutput(unittest.TestCase):
         uc.putDocument("2015-12-28", {"a": 1})
         uc.putDocument("2015-12-27", {"a": 1})
         uc.putDocument("2015-12-26", {"a": 1})
-        uch.delete_obsolete_entries(uc, list(valid_bins.iterkeys()))
+        uch.delete_obsolete_entries(uc, list(valid_bins.keys()))
         # the result should include entries that are in the past (28,27,26), but should 
         # NOT include newly added entries
         self.assertEqual(uc.getDocumentKeyList(), ["2015-12-30", "2015-12-29"])
@@ -131,7 +139,7 @@ class TestBuiltinUserCacheHandlerOutput(unittest.TestCase):
         uc.putDocument("2015-12-27", {"a": 1})
         uc.putDocument("2015-12-26", {"a": 1})
         uc.putDocument("config/sensor_config", {"a": 1})
-        uch.delete_obsolete_entries(uc, list(valid_bins.iterkeys()))
+        uch.delete_obsolete_entries(uc, list(valid_bins.keys()))
         # the result should include entries that are in the past (28,27,26), but should 
         # NOT include newly added entries
         self.assertEqual(uc.getDocumentKeyList(), ["2015-12-30", "2015-12-29",

@@ -1,3 +1,11 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from builtins import object
 import emission.net.usercache.abstract_usercache as enua
 import emission.storage.decorations.local_date_queries as esdl
 

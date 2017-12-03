@@ -1,3 +1,13 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import str
+from builtins import range
+from builtins import *
 import logging
 
 import json
@@ -30,8 +40,8 @@ def register_fake_users(prefix, unique_user_list):
         user = ecwu.User.registerWithUUID(username, uuid)
 
 def get_load_ranges(entries):
-    start_indices = range(0, len(entries), args.batch_size)
-    ranges = zip(start_indices, start_indices[1:])
+    start_indices = list(range(0, len(entries), args.batch_size))
+    ranges = list(zip(start_indices, start_indices[1:]))
     ranges.append((start_indices[-1], len(entries)))
     return ranges
 

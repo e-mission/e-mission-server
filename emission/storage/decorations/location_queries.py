@@ -1,4 +1,11 @@
 from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from past.utils import old_div
 import logging
 import datetime as pydt
 import pandas as pd
@@ -21,7 +28,7 @@ def get_plottable_df(user_id, loc_filter, start_dt, end_dt):
         tempSection.end_ts = time.mktime(end_dt.timetuple()) * 1000
     return get_points_for_section(tempSection)
 
-from_micros = lambda x: pydt.datetime.fromtimestamp(x/1000)
+from_micros = lambda x: pydt.datetime.fromtimestamp(old_div(x,1000))
 
 def get_activities_for_section(section):
     query = {"user_id": section.user_id,
@@ -34,7 +41,7 @@ def get_activities_for_section(section):
                            {'metadata.write_ts': {'$lt': end_ts}}]})
 
     full_entries = list(edb.get_usercache_db().find(query))
-    merged_entries = [dict(entry["metadata"].items() + entry["data"].items()) for entry in full_entries]
+    merged_entries = [dict(list(entry["metadata"].items()) + list(entry["data"].items())) for entry in full_entries]
     entries_df = pd.DataFrame(merged_entries)
     entries_df['formatted_time'] = entries_df.write_ts.apply(from_micros)
     entries_df['activity'] = entries_df.agb.apply(to_activity_enum)
@@ -52,7 +59,7 @@ def get_transitions_df(user_id, loc_filter, start_dt, end_dt):
                                {'metadata.write_ts': {'$lt': end_ts}}]})
 
     full_entries = list(edb.get_usercache_db().find(query))
-    merged_entries = [dict(entry["metadata"].items() + entry["data"].items()) for entry in full_entries]
+    merged_entries = [dict(list(entry["metadata"].items()) + list(entry["data"].items())) for entry in full_entries]
     entries_df = pd.DataFrame(merged_entries)
     entries_df['formatted_time'] = entries_df.write_ts.apply(from_micros)
     return entries_df
@@ -79,7 +86,7 @@ def get_points_for_section(section):
     print("final query = %s " % query)
     # full_entries = list(edb.get_usercache_db().find(query).sort("data.mTime", pymongo.ASCENDING))
     full_entries = list(edb.get_usercache_db().find(query))
-    merged_entries = [dict(entry["metadata"].items() + entry["data"].items()) for entry in full_entries]
+    merged_entries = [dict(list(entry["metadata"].items()) + list(entry["data"].items())) for entry in full_entries]
     entries_df = pd.DataFrame(merged_entries)
     entries_df['formatted_time'] = entries_df.mTime.apply(from_micros)
     return entries_df

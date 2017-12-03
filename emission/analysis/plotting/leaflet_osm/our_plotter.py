@@ -1,4 +1,13 @@
 from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import str
+from builtins import *
+from past.utils import old_div
 import pandas as pd
 import folium.folium as folium
 import itertools
@@ -67,8 +76,8 @@ def get_maps_for_geojson_list(trip_geojson_list):
         # logging.debug(trip_doc)
         trip_geojson = ad.AttrDict(trip_doc)
         logging.debug("centering based on start = %s, end = %s " % (trip_geojson.features[0], trip_geojson.features[1]))
-        flipped_midpoint = lambda p1_p2: [(p1_p2[0].coordinates[1] + p1_p2[1].coordinates[1])/2,
-                                            (p1_p2[0].coordinates[0] + p1_p2[1].coordinates[0])/2]
+        flipped_midpoint = lambda p1_p2: [old_div((p1_p2[0].coordinates[1] + p1_p2[1].coordinates[1]),2),
+                                            old_div((p1_p2[0].coordinates[0] + p1_p2[1].coordinates[0]),2)]
 
         curr_map = folium.Map(flipped_midpoint((trip_geojson.features[0].geometry,
                                                 trip_geojson.features[1].geometry)))
@@ -82,8 +91,8 @@ def flipped(coord):
     
 def get_center_for_map(coords):
     # logging.debug(trip_geojson)
-    midpoint = lambda p1_p21: [(p1_p21[0][0] + p1_p21[1][0])/2,
-                                (p1_p21[0][1] + p1_p21[1][1])/2]
+    midpoint = lambda p1_p21: [old_div((p1_p21[0][0] + p1_p21[1][0]),2),
+                                old_div((p1_p21[0][1] + p1_p21[1][1]),2)]
     if len(coords) == 0:
         return None
     if len(coords) == 1:
@@ -126,8 +135,8 @@ def get_maps_for_range_old(user_id, start_ts, end_ts):
     place_list = place_list + (esdp.get_places(user_id, estt.TimeQuery("data.enter_ts", start_ts, end_ts)))
     place_map = dict([(p.get_id(), p) for p in place_list])
     map_list = []
-    flipped_midpoint = lambda p1_p22: [(p1_p22[0].coordinates[1] + p1_p22[1].coordinates[1])/2,
-                                        (p1_p22[0].coordinates[0] + p1_p22[1].coordinates[0])/2]
+    flipped_midpoint = lambda p1_p22: [old_div((p1_p22[0].coordinates[1] + p1_p22[1].coordinates[1]),2),
+                                        old_div((p1_p22[0].coordinates[0] + p1_p22[1].coordinates[0]),2)]
     for i, trip in enumerate(trip_list):
         logging.debug("-" * 20 + trip.start_fmt_time + "=>" + trip.end_fmt_time
                       + "(" + str(trip.end_ts - trip.start_ts) + ")")

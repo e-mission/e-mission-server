@@ -1,4 +1,11 @@
 from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from past.utils import old_div
 from main import gmap_display
 from pymongo import MongoClient
 from main import pygmaps_modified as pygmaps
@@ -31,7 +38,7 @@ if __name__ == '__main__':
             print("start_point missing corodinates")
         else:
             startCoord = startpoint['coordinates']
-            gmap = pygmaps.maps(startCoord[1], startCoord[0], min(15, 165000.0/distance))
+            gmap = pygmaps.maps(startCoord[1], startCoord[0], min(15, old_div(165000.0,distance)))
             gmap_display.drawTrip(trip_id, db, gmap)
             if not os.path.exists('plots'):
                 os.makedirs('plots')

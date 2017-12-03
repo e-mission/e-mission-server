@@ -1,5 +1,13 @@
 from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
+from past.utils import old_div
 from pymongo import MongoClient
 import pygmaps
 from uuid import UUID
@@ -26,7 +34,7 @@ def getRouteDict(routeDB):
 
 def getDifferenceDict(routeDict, diff_metric = 'DTW'):
     #print 'calculating difference matrix ... '
-    ids = routeDict.keys()
+    ids = list(routeDict.keys())
     differences = {}
     for _id in ids:
         differences[_id] = {}
@@ -88,7 +96,7 @@ def CCR(testClusters, medoids, groundTruthClusters):
             if currCount > maxcount:
                 maxcount = currCount
         count+= maxcount
-    return float(count)/float(N)
+    return old_div(float(count),float(N))
 
 
 if __name__ == '__main__':

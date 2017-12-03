@@ -1,4 +1,12 @@
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from past.utils import old_div
 import unittest
 import json
 import sys
@@ -38,7 +46,7 @@ class TestBuiltinUserCache(unittest.TestCase):
     logging.debug("retrievedData = %s" % retrievedData)
     self.assertTrue(retrievedData is not None) # if it doesn't exist, the method returns None
     self.assertEquals(len(retrievedData),1)
-    self.assertEquals(retrievedData[0].keys(), ["data", "metadata"])
+    self.assertEquals(list(retrievedData[0].keys()), ["data", "metadata"])
     self.assertEquals(retrievedData[0]["data"]["mine"], 30)
 
   def testPutTwoSetsOfUserDataForPhone(self):
@@ -55,8 +63,8 @@ class TestBuiltinUserCache(unittest.TestCase):
     self.assertTrue(retrievedData is not None) # if it doesn't exist, the method returns None
 
     self.assertEqual(len(retrievedData), 2)
-    self.assertTrue(retrievedData[0].keys(), ["data", "metadata"])
-    self.assertTrue(retrievedData[1].keys(), ["data", "metadata"])
+    self.assertTrue(list(retrievedData[0].keys()), ["data", "metadata"])
+    self.assertTrue(list(retrievedData[1].keys()), ["data", "metadata"])
 
     for data in retrievedData:
         if data["metadata"]["key"] == "data/game":
@@ -253,7 +261,7 @@ class TestBuiltinUserCache(unittest.TestCase):
     ]
 
     # sleep() expects an argument in seconds. We want to sleep for 5 ms.
-    time.sleep(float(5)/1000)
+    time.sleep(old_div(float(5),1000))
 
     background_data_from_phone_2 = [
       {
@@ -291,7 +299,7 @@ class TestBuiltinUserCache(unittest.TestCase):
 
     end_ts = time.time()
 
-    time.sleep(float(5) / 1000)
+    time.sleep(old_div(float(5), 1000))
 
     background_data_from_phone_3 = [
       {

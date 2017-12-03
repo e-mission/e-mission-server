@@ -5,7 +5,14 @@ module_name { query_string: function_for_query }
 
 """
 from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import *
 import sys
 import os
 import math
@@ -29,7 +36,7 @@ def get_clusters_info(uid):
         if clusterJson is None:
             return []
         c_info = []
-        clusterSectionLists= clusterJson["clusters"].values() 
+        clusterSectionLists= list(clusterJson["clusters"].values()) 
 	logging.debug( "Number of section lists for user %s is %s" % (uid, len(clusterSectionLists)))
         for sectionList in clusterSectionLists:
                 first = True

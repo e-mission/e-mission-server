@@ -1,6 +1,13 @@
 from __future__ import print_function
 from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import division
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import next
+from builtins import *
+from builtins import object
 import os, sys
 import logging
 import traceback
@@ -58,7 +65,7 @@ class TripIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         trip = next(self.storedIter)
         return self.trip_class.trip_from_json(trip) if trip else []
 

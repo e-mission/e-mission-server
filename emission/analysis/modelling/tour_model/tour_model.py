@@ -1,4 +1,12 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Our imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from builtins import object
 import emission.simulation.markov_model_counter as esmmc
 
 
@@ -50,7 +58,7 @@ class Location(object):
         self.counter = esmmc.Counter( ) ## Reps successors and probabilities of each one
 
     def add_successors(self, suc_dict):
-        for loc, weight in suc_dict.iteritems():
+        for loc, weight in suc_dict.items():
             if (loc.hour < self.hour) or (loc.day < self.day):
                 raise Exception("You can not go backwards in time!")
             self.counter[loc] = weight

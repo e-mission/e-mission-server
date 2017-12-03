@@ -1,3 +1,7 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # The server side implementation of the user cache
 
 # This is an abstract superclass that can be implemented with couchbase, azure,
@@ -13,6 +17,10 @@
 # rest of the code (ha!) allows us to separate those concerns as well
 
 # Let's switch to new-style classes finally!!
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from builtins import object
 class UserCache(object):
     @staticmethod
     def getUserCache(uuid):

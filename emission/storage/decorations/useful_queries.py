@@ -1,4 +1,12 @@
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from past.utils import old_div
 from datetime import datetime, timedelta
 import logging
 
@@ -78,7 +86,7 @@ def get_center_for_section(sectionJSON):
         Returns a tuple (lat, lon) that can be passsed in to pygmaps to create a map
         centered at the correct location
     """
-    return ((sectionJSON["section_start_point"]["coordinates"][1] +
-             sectionJSON["section_end_point"]["coordinates"][1])/2,
-             (sectionJSON["section_start_point"]["coordinates"][0] +
-             sectionJSON["section_end_point"]["coordinates"][0])/2)
+    return (old_div((sectionJSON["section_start_point"]["coordinates"][1] +
+             sectionJSON["section_end_point"]["coordinates"][1]),2),
+             old_div((sectionJSON["section_start_point"]["coordinates"][0] +
+             sectionJSON["section_end_point"]["coordinates"][0]),2))

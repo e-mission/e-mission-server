@@ -1,3 +1,14 @@
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import *
+from builtins import object
+from past.utils import old_div
 import math
 import re
 ###########################################################
@@ -7,7 +18,7 @@ import re
 ## 
 ############################################################
 
-class maps:
+class maps(object):
 
 	def __init__(self, centerLat, centerLng, zoom ):
 		self.center = (float(centerLat),float(centerLng))
@@ -78,13 +89,13 @@ class maps:
 		lngin = self.gridsetting[5]
 		self.grids = []
 
-		r = [slat+float(x)*latin for x in range(0, int((elat-slat)/latin))]
+		r = [slat+float(x)*latin for x in range(0, int(old_div((elat-slat),latin)))]
 		for lat in r:
-			self.grids.append([(lat+latin/2.0,slng+lngin/2.0),(lat+latin/2.0,elng+lngin/2.0)])
+			self.grids.append([(lat+old_div(latin,2.0),slng+old_div(lngin,2.0)),(lat+old_div(latin,2.0),elng+old_div(lngin,2.0))])
 
-		r = [slng+float(x)*lngin for x in range(0, int((elng-slng)/lngin))]
+		r = [slng+float(x)*lngin for x in range(0, int(old_div((elng-slng),lngin)))]
 		for lng in r:
-			self.grids.append([(slat+latin/2.0,lng+lngin/2.0),(elat+latin/2.0,lng+lngin/2.0)])
+			self.grids.append([(slat+old_div(latin,2.0),lng+old_div(lngin,2.0)),(elat+old_div(latin,2.0),lng+old_div(lngin,2.0))])
 		
 		for line in self.grids:
 			self.drawPolyline(f,line,strokeColor = "#000000")
@@ -102,17 +113,17 @@ class maps:
 		lat = rpoint[0]
 		lng = rpoint[1]
 		rad = rpoint[2] #unit: meter
-		d = (rad/1000.0)/6378.8;
-		lat1 = (math.pi/180.0)* lat
-		lng1 = (math.pi/180.0)* lng
+		d = old_div((old_div(rad,1000.0)),6378.8);
+		lat1 = (old_div(math.pi,180.0))* lat
+		lng1 = (old_div(math.pi,180.0))* lng
 
 		r = [x*30 for x in range(12)]
 		for a in r:
-			tc = (math.pi/180.0)*a;
+			tc = (old_div(math.pi,180.0))*a;
 			y = math.asin(math.sin(lat1)*math.cos(d)+math.cos(lat1)*math.sin(d)*math.cos(tc))
 			dlng = math.atan2(math.sin(tc)*math.sin(d)*math.cos(lat1),math.cos(d)-math.sin(lat1)*math.sin(y))
 			x = ((lng1-dlng+math.pi) % (2.0*math.pi)) - math.pi 
-			cycle.append( ( float(y*(180.0/math.pi)),float(x*(180.0/math.pi)) ) )
+			cycle.append( ( float(y*(old_div(180.0,math.pi))),float(x*(old_div(180.0,math.pi))) ) )
 		return cycle
 
 	def drawpaths(self, f, paths):

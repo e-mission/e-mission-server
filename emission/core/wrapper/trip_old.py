@@ -1,7 +1,16 @@
 from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 #maps team provided get_cost function
 
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import *
+from builtins import object
 import datetime
 import sys
 import os
@@ -350,7 +359,7 @@ class Fake_Trip(Trip):
 
     def save_to_db(self):
         db = edb.get_fake_trips_db()
-        db.insert({"_id": self._id, "user_id": self.user_id, "trip_id": self.trip_id, "sections": range(len(self.sections)), "trip_start_datetime": self.start_time,
+        db.insert({"_id": self._id, "user_id": self.user_id, "trip_id": self.trip_id, "sections": list(range(len(self.sections))), "trip_start_datetime": self.start_time,
                 "trip_end_datetime": self.end_time, "trip_start_location": self.trip_start_location.coordinate_list(), 
                 "trip_end_location": self.trip_end_location.coordinate_list(), "mode_list": self.mode_list})
 

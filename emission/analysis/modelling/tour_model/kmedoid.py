@@ -1,4 +1,13 @@
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
 # standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import *
+from past.utils import old_div
 import random
 import sys
 import numpy
@@ -33,7 +42,7 @@ def kmedoids(data, k):
 
 
     #indices of beginning medoids
-    medoids_idx = random.sample(xrange(size), k)
+    medoids_idx = random.sample(range(size), k)
     
     #initial cost and list of items in each initial cluster
     pre_cost, medoids = totalCost(size, mat, medoids_idx)
@@ -110,6 +119,6 @@ def dist(a,b, data):
     sum = 0
     for i in range(len(dim_a)):
         sum += abs(dim_a[i] - dim_b[i])**4
-    return sum**(1/4.0)
+    return sum**(old_div(1,4.0))
 
 

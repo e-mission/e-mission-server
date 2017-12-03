@@ -1,3 +1,12 @@
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from past.utils import old_div
+from builtins import object
 import logging
 
 import emission.storage.timeseries.abstract_timeseries as esta
@@ -126,7 +135,7 @@ def get_combined_segmentation_points(ts, loc_df, time_query, filters_in_df, filt
         logging.debug("for filter %s, startTs = %d and endTs = %d" %
             (curr_filter, time_query.startTs, time_query.endTs))
         segmentation_map[time_query.startTs] = filter_methods[curr_filter].segment_into_trips(ts, time_query)
-    logging.debug("After filtering, segmentation_map has keys %s" % segmentation_map.keys())
+    logging.debug("After filtering, segmentation_map has keys %s" % list(segmentation_map.keys()))
     sortedStartTsList = sorted(segmentation_map.keys())
     segmentation_points = []
     for startTs in sortedStartTsList:
@@ -135,7 +144,7 @@ def get_combined_segmentation_points(ts, loc_df, time_query, filters_in_df, filt
 
 def get_last_ts_processed(filter_methods):
     last_ts_processed = None
-    for method in filter_methods.itervalues():
+    for method in filter_methods.values():
         try:
             if last_ts_processed is None or method.last_ts_processed > last_ts_processed:
                 last_ts_processed = method.last_ts_processed
@@ -256,12 +265,12 @@ def found_untracked_period(timeseries, last_place, start_loc):
         return False
 
     time_delta = start_loc.ts - last_place.enter_ts
-    transition_speed = transition_distance / time_delta
+    transition_speed = old_div(transition_distance, time_delta)
     logging.debug("while determining new_start_place, time_delta = %s, transition_speed = %s"
                   % (time_delta, transition_speed))
 
     # Let's use a little less than walking speed 3km/hr < 3mph (4.83 kmph)
-    speed_threshold = float(3000) / (60*60)
+    speed_threshold = old_div(float(3000), (60*60))
 
     if transition_speed > speed_threshold:
         logging.debug("transition_speed %s > %s, returning False" %

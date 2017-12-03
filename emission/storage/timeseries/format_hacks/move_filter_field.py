@@ -1,3 +1,7 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # For some reason, probably because we were trying to serialize the default
 # object, we put the "filter" field into the metadata. But the filter doesn't
 # make sense for data other than location, so it doesn't seem like it should be
@@ -8,6 +12,9 @@
 # So this simple script moves the filter from the metadata into the data for
 # location entries and removes it for all other entries
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import logging
 
 import emission.core.get_database as edb
