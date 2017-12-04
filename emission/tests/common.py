@@ -106,9 +106,10 @@ def updateSections(testCase):
 
 def setupRealExample(testObj, dump_file):
     logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
-    testObj.entries = json.load(open(dump_file), object_hook = bju.object_hook)
-    testObj.testUUID = uuid.uuid4()
-    setupRealExampleWithEntries(testObj)
+    with open(dump_file) as dfp:
+        testObj.entries = json.load(dfp, object_hook = bju.object_hook)
+        testObj.testUUID = uuid.uuid4()
+        setupRealExampleWithEntries(testObj)
 
 def setupRealExampleWithEntries(testObj):
     tsdb = edb.get_timeseries_db()
@@ -116,7 +117,7 @@ def setupRealExampleWithEntries(testObj):
         entry["user_id"] = testObj.testUUID
         # print "Saving entry with write_ts = %s and ts = %s" % (entry["metadata"]["write_fmt_time"],
         #                                                        entry["data"]["fmt_time"])
-        tsdb.save(entry)
+        tsdb.replace_one({'_id': entry['_id']}, entry, upsert=True)
         
     logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
     logging.debug("First few entries = %s" % 

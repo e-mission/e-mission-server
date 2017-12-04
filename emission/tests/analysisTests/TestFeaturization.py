@@ -32,8 +32,8 @@ class FeaturizationTests(unittest.TestCase):
         print('there are ' + str(len(self.data)))
 
     def tearDown(self):
-        edb.get_timeseries_db().remove({'user_id': self.testUUID})
-        edb.get_analysis_timeseries_db().remove({'user_id': self.testUUID})
+        edb.get_timeseries_db().delete_many({'user_id': self.testUUID})
+        edb.get_analysis_timeseries_db().delete_many({'user_id': self.testUUID})
 
     def testCalculatePoints(self):
         feat = featurization.featurization([])

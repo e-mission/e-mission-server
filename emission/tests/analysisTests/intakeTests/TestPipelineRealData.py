@@ -60,9 +60,9 @@ class TestPipelineRealData(unittest.TestCase):
         self.clearRelatedDb()
 
     def clearRelatedDb(self):
-        edb.get_timeseries_db().remove({"user_id": self.testUUID})
-        edb.get_analysis_timeseries_db().remove({"user_id": self.testUUID})
-        edb.get_usercache_db().remove({"user_id": self.testUUID})
+        edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID})
+        edb.get_usercache_db().delete_many({"user_id": self.testUUID})
 
     def compare_result(self, result, expect):
         # This is basically a bunch of asserts to ensure that the timeline is as
@@ -178,7 +178,8 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-06-20"
         ld = ecwl.LocalDate({'year': 2016, 'month': 6, 'day': 20})
         cacheKey = "diary/trips-2016-06-20"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile+".ground_truth") as gfp:
+            ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
@@ -203,7 +204,8 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-06-21"
         ld = ecwl.LocalDate({'year': 2016, 'month': 6, 'day': 21})
         cacheKey = "diary/trips-2016-06-21"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile+".ground_truth") as gfp:
+            ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
@@ -228,7 +230,8 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-08-10"
         ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 10})
         cacheKey = "diary/trips-2016-08-10"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile+".ground_truth") as gfp:
+            ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
@@ -255,7 +258,8 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-08-11"
         ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 11})
         cacheKey = "diary/trips-2016-08-11"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile+".ground_truth") as gfp:
+            ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
@@ -277,7 +281,8 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 2, 'day': 22})
         end_ld = ecwl.LocalDate({'year': 2016, 'month': 2, 'day': 22})
         cacheKey = "diary/trips-2016-02-22"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile+".ground_truth") as gfp:
+            ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
@@ -292,7 +297,8 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld = ecwl.LocalDate({'year': 2015, 'month': 8, 'day': 27})
         end_ld = ecwl.LocalDate({'year': 2015, 'month': 8, 'day': 27})
         cacheKey = "diary/trips-2015-08-27"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile+".ground_truth") as gfp:
+            ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
@@ -306,7 +312,8 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-07-27"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 27})
         cacheKey = "diary/trips-2016-07-27"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile+".ground_truth") as gfp:
+            ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
@@ -320,7 +327,8 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-08-04"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 4})
         cacheKey = "diary/trips-2016-07-27"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile+".ground_truth") as gfp:
+            ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
@@ -484,7 +492,9 @@ class TestPipelineRealData(unittest.TestCase):
                                  object_hook=bju.object_hook)
 
         logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
-        all_entries = json.load(open(dataFile), object_hook = bju.object_hook)
+        all_entries = None
+        with open(dataFile) as secondfp:
+            all_entries = json.load(secondfp, object_hook = bju.object_hook)
         ts_1030 = arrow.get("2016-08-10T10:30:00-07:00").timestamp
         logging.debug("ts_1030 = %s, converted back = %s" % (ts_1030, arrow.get(ts_1030).to("America/Los_Angeles")))
         before_1030_entries = [e for e in all_entries if ad.AttrDict(e).metadata.write_ts <= ts_1030]

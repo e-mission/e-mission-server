@@ -31,18 +31,19 @@ class TestFilterAccuracy(unittest.TestCase):
         import uuid
 
         self.testUUID = UUID('079e0f1a-c440-3d7c-b0e7-de160f748e35')
-        self.entries = json.load(open("emission/tests/data/smoothing_data/tablet_2015-11-03"),
+        with open("emission/tests/data/smoothing_data/tablet_2015-11-03") as fp:
+            self.entries = json.load(fp,
                                  object_hook=bju.object_hook)
         tsdb = edb.get_timeseries_db()
         for entry in self.entries:
             entry["user_id"] = self.testUUID
-            tsdb.save(entry)
+            tsdb.insert_one(entry)
         self.ts = esta.TimeSeries.get_time_series(self.testUUID)
 
     def tearDown(self):
         import emission.core.get_database as edb
-        edb.get_timeseries_db().remove({"user_id": self.testUUID})
-        edb.get_pipeline_state_db().remove({"user_id": self.testUUID})
+        edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
+        edb.get_pipeline_state_db().delete_many({"user_id": self.testUUID})
         
     def testEmptyCallToPriorDuplicate(self):
         time_query = epq.get_time_range_for_accuracy_filtering(self.testUUID)
@@ -92,6 +93,8 @@ class TestFilterAccuracy(unittest.TestCase):
         self.assertEqual(len(unfiltered_points_df), 205)
 
         entry_from_df = unfiltered_points_df.iloc[5]
+        logging.debug("entry_from_df: data.ts = %s, metadata.ts = %s" % 
+            (entry_from_df.ts, entry_from_df.metadata_write_ts))
         self.assertEqual(eaicf.check_existing_filtered_location(self.ts, entry_from_df), False)
 
         entry_copy = self.ts.get_entry_at_ts("background/location", "metadata.write_ts",

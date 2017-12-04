@@ -38,12 +38,12 @@ class TestSaveAllConfigs(unittest.TestCase):
         logging.debug("androidUUID = %s, iosUUID = %s" % (self.androidUUID, self.iosUUID))
 
     def tearDown(self):
-        edb.get_timeseries_db().remove({"user_id": self.androidUUID}) 
-        edb.get_timeseries_db().remove({"user_id": self.iosUUID}) 
-        edb.get_usercache_db().remove({"user_id": self.androidUUID}) 
-        edb.get_usercache_db().remove({"user_id": self.iosUUID}) 
-        edb.get_analysis_timeseries_db().remove({"user_id": self.androidUUID})
-        edb.get_analysis_timeseries_db().remove({"user_id": self.iosUUID})
+        edb.get_timeseries_db().delete_many({"user_id": self.androidUUID}) 
+        edb.get_timeseries_db().delete_many({"user_id": self.iosUUID}) 
+        edb.get_usercache_db().delete_many({"user_id": self.androidUUID}) 
+        edb.get_usercache_db().delete_many({"user_id": self.iosUUID}) 
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.androidUUID})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.iosUUID})
 
     def testNoOverrides(self):
         tq = estt.TimeQuery("metadata.write_ts", 1440658800, 1440745200)
