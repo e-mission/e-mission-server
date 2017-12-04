@@ -10,8 +10,8 @@ from builtins import *
 from past.utils import old_div
 import json
 from random import randrange
-from .bottle import route, post, get, run, template, static_file, request, app, HTTPError, abort, BaseRequest, JSONPlugin, response
-from . import bottle as bt
+from emission.net.api.bottle import route, post, get, run, template, static_file, request, app, HTTPError, abort, BaseRequest, JSONPlugin, response
+import emission.net.api.bottle as bt
 # To support dynamic loading of client-specific libraries
 import sys
 import os
@@ -33,12 +33,16 @@ import urllib.request, urllib.error, urllib.parse
 import bson.json_util
 
 # Our imports
-from . import visualize, stats, usercache, timeline, metrics, pipeline
+import emission.net.api.visualize as visualize
+import emission.net.api.stats as stats
+import emission.net.api.usercache as usercache
+import emission.net.api.timeline as timeline
+import emission.net.api.metrics as metrics
+import emission.net.api.pipeline as pipeline
+
 import emission.net.auth.auth as enaa
 # import emission.net.ext_service.moves.register as auth
 import emission.net.ext_service.habitica.proxy as habitproxy
-import emission.analysis.result.carbon as carbon
-import emission.analysis.result.userclient as userclient
 from emission.core.wrapper.client import Client
 from emission.core.wrapper.user import User
 from emission.core.get_database import get_uuid_db, get_mode_db
@@ -499,11 +503,11 @@ if __name__ == '__main__':
       ssl_cert = key_data["ssl_certificate"]
       private_key = key_data["private_key"]
 
-      run(host=server_host, port=server_port, server='cherrypy', debug=True,
+      run(host=server_host, port=server_port, server='cheroot', debug=True,
           certfile=ssl_cert, keyfile=private_key, ssl_module='builtin')
     else:
       # Non SSL option for testing on localhost
       print("Running with HTTPS turned OFF - use a reverse proxy on production")
-      run(host=server_host, port=server_port, server='cherrypy', debug=True)
+      run(host=server_host, port=server_port, server='cheroot', debug=True)
 
     # run(host="0.0.0.0", port=server_port, server='cherrypy', debug=True)
