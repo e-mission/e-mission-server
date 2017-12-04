@@ -188,7 +188,7 @@ class Section(object):
                 coord_json = json_segment[coord_key]["coordinates"]
                 return Coordinate(coord_json[1], coord_json[0])
             else:
-                logging.warn("Unable to get coordinates from key %s in segment %s " % (coord_key, json_segment))
+                logging.warning("Unable to get coordinates from key %s in segment %s " % (coord_key, json_segment))
                 return None
         else:
             return None

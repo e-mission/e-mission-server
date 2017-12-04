@@ -82,7 +82,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
                 time_query.endTs = last_ts_processed
             except Exception as e:
                 # logging.exception("Error while saving entry %s" % entry)
-                logging.warn("Got error %s while saving entry %s -> %s"% (e, entry, unified_entry))
+                logging.warning("Got error %s while saving entry %s -> %s"% (e, entry, unified_entry))
                 try:
                     ts.insert_error(entry_doc)
                 except pymongo.errors.DuplicateKeyError as e:

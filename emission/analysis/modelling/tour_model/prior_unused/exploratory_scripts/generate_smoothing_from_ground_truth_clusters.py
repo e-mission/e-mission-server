@@ -43,7 +43,7 @@ def generate_cluster_comparison(sID_list, outPath):
         import os
         os.mkdir("%s/smoothing_compare" % outPath)
     except OSError as e:
-        logging.warn("Error %s while creating result directory " % e)
+        logging.warning("Error %s while creating result directory " % e)
 
 
     for s in sID_list:

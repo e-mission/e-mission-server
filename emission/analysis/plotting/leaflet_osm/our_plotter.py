@@ -177,7 +177,7 @@ def get_maps_for_range_old(user_id, start_ts, end_ts):
                                 popup="%s (%s -> %s)" % (trip_element.sensed_mode, trip_element.start_fmt_time,
                                                          trip_element.end_fmt_time))
                 else:
-                    logging.warn("found no points for section %s" % trip_element)
+                    logging.warning("found no points for section %s" % trip_element)
     return map_list
 
 
@@ -193,7 +193,7 @@ def update_place(curr_map, place_id, place_map, marker_color='blue'):
         else:
             logging.debug("starting place has no location, skipping")
     else:
-        logging.warn("place not mapped because place_id = %s and place_id in place_map = %s" % (place_id, place_id in place_map))
+        logging.warning("place not mapped because place_id = %s and place_id in place_map = %s" % (place_id, place_id in place_map))
 
 def update_line(currMap, line_points, line_color = None, popup=None):
     currMap.div_markers(line_points[['latitude', 'longitude']].as_matrix().tolist(),

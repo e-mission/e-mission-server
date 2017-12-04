@@ -52,13 +52,13 @@ def calHeading(point1, point2):
     return brng
 
 def calHC(point1, point2, point3):
-	HC = calHeading(point2, point3) - calHeading(point1, point2)
-	return HC
+    HC = calHeading(point2, point3) - calHeading(point1, point2)
+    return HC
 
 def calHCR(segment):
     trackpoints = segment['track_points']
     if len(trackpoints) < 3:
-		return 0
+        return 0
     else:
         HCNum = 0
         for (i, point) in enumerate(trackpoints[:-2]):
@@ -80,7 +80,7 @@ def calHCR(segment):
 def calSR(segment):
     trackpoints = segment['track_points']
     if len(trackpoints) < 2:
-		return 0
+        return 0
     else:
         stopNum = 0
         for (i, point) in enumerate(trackpoints[:-1]):
@@ -100,7 +100,7 @@ def calSR(segment):
 def calVCR(segment):
     trackpoints = segment['track_points']
     if len(trackpoints) < 3:
-		return 0
+        return 0
     else:
         Pv = 0
         for (i, point) in enumerate(trackpoints[:-2]):
@@ -265,7 +265,7 @@ def mode_cluster(mode,eps,sam):
             mode_change_pnts.append(section['section_start_point']['coordinates'])
             mode_change_pnts.append(section['section_end_point']['coordinates'])
         except:
-            logging.warn("Found trip %s with missing start and/or end points" % (section['_id']))
+            logging.warning("Found trip %s with missing start and/or end points" % (section['_id']))
             pass
     # print(user_change_pnts)
     # print(len(mode_change_pnts))

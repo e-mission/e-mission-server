@@ -75,7 +75,7 @@ class TestFormatters(unittest.TestCase):
         data["cycling"] = True
         with self.assertRaisesRegexp(RuntimeError, ".*two modes.*"):
             enum = ioma.type_flags_to_enum(data)
-            logging.warn("Got result num = %s instead of raising exception" % enum)
+            logging.warning("Got result num = %s instead of raising exception" % enum)
     
     def testFlagsToEnumNoEntries(self):
         import emission.net.usercache.formatters.ios.motion_activity as ioma

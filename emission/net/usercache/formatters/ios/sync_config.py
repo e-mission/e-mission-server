@@ -22,7 +22,7 @@ def format(entry):
     try:
         valid_tz = pytz.timezone(entry.metadata.time_zone)
     except pytz.UnknownTimeZoneError as e:
-        logging.warn("Got error %s while checking format validity" % e)
+        logging.warning("Got error %s while checking format validity" % e)
         # Default timezone in for the Bay Area, which is probably a fairly safe
         # assumption for now
         metadata.time_zone = "America/Los_Angeles"

@@ -221,7 +221,7 @@ def drawSectionsSeparately(sectionJSONList, outPath):
     try:
         os.mkdir(outPath)
     except OSError as e:
-        logging.warn("Error %s while creating result directory" % e)
+        logging.warning("Error %s while creating result directory" % e)
         pass
 
     for sectionJSON in sectionJSONList:

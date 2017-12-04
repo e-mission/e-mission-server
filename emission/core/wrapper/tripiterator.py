@@ -54,7 +54,7 @@ class TripIterator(object):
             print(e)
             print("something went wrong, here is some info:")
             traceback.print_exc()
-            #logging.warn("Found no query function for filter_queries: ", filter_queries);
+            #logging.warning("Found no query function for filter_queries: ", filter_queries);
             self.storedIter = []
 	'''
         clientSpecificQuery = getClientSpecificQueryFilter(user_uuid)
