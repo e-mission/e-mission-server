@@ -139,7 +139,7 @@ def save_cleaned_segments_for_timeline(user_id, tl):
             last_cleaned_place)
         ts.update(last_cleaned_place)
     if filtered_tl is not None and not filtered_tl.is_empty():
-        ts.bulk_insert(filtered_tl, esta.EntryType.ANALYSIS_TYPE)
+        ts.bulk_insert(list(filtered_tl), esta.EntryType.ANALYSIS_TYPE)
     return tl.last_place()
 
 def get_filtered_untracked(ts, untracked):
@@ -228,7 +228,7 @@ def get_filtered_trip(ts, trip):
             ts.bulk_insert(points, esta.EntryType.ANALYSIS_TYPE)
 
     if not linked_tl.is_empty():
-        ts.bulk_insert(linked_tl, esta.EntryType.ANALYSIS_TYPE)
+        ts.bulk_insert(list(linked_tl), esta.EntryType.ANALYSIS_TYPE)
     return filtered_trip_entry
 
 def get_filtered_place(raw_place):
@@ -287,9 +287,9 @@ def get_filtered_section(new_trip_entry, section):
     with_speeds_df = get_filtered_points(section, filtered_section_data)
     speeds = list(with_speeds_df.speed)
     distances = list(with_speeds_df.distance)
-    filtered_section_data.speeds = speeds
-    filtered_section_data.distances = distances
-    filtered_section_data.distance = sum(distances)
+    filtered_section_data.speeds = [float(s) for s in speeds]
+    filtered_section_data.distances = [float(d) for d in distances]
+    filtered_section_data.distance = float(sum(distances))
 
     overridden_mode = get_overriden_mode(section.data, filtered_section_data, with_speeds_df)
     if overridden_mode is not None:
@@ -471,11 +471,17 @@ def _copy_non_excluded(old_data, new_data, excluded_list):
             new_data[key] = old_data[key]
 
 def get_overriden_mode(raw_section_data, filtered_section_data, with_speeds_df):
+    end_to_end_distance = filtered_section_data.distance
+    end_to_end_time = filtered_section_data.duration
+
+    if (end_to_end_distance == 0) or (end_to_end_time == 0):
+        logging.info("distance = time = 0 for section in trip (raw: %s, cleaned %s), returning None" % 
+        (raw_section_data.trip_id, filtered_section_data.trip_id))
+        return None
+
     if is_air_section(filtered_section_data, with_speeds_df):
         return ecwm.MotionTypes.AIR_OR_HSR
 
-    end_to_end_distance = filtered_section_data.distance
-    end_to_end_time = filtered_section_data.duration
     overall_speed = old_div(end_to_end_distance, end_to_end_time)
     TEN_KMPH = old_div(float(10 * 1000), (60 * 60)) # m/s
     TWENTY_KMPH = old_div(float(20 * 1000), (60 * 60)) # m/s
@@ -486,10 +492,14 @@ def get_overriden_mode(raw_section_data, filtered_section_data, with_speeds_df):
     # https://github.com/e-mission/e-mission-server/issues/407#issuecomment-248524098
     if raw_section_data.sensed_mode == ecwm.MotionTypes.ON_FOOT:
         if end_to_end_distance > 10 * 1000 and overall_speed > TEN_KMPH:
+            logging.info("Sanity checking failed for ON_FOOT section from trip (raw: %s, cleaned %s), returning UNKNOWN" % 
+                (raw_section_data.trip_id, cleaned_section_data.trip_id))
             return ecwm.MotionTypes.UNKNOWN
 
     if raw_section_data.sensed_mode == ecwm.MotionTypes.BICYCLING:
         if end_to_end_distance > 100 * 1000 and overall_speed > TWENTY_KMPH:
+            logging.info("Sanity checking failed for BICYCLING section from trip (raw: %s, cleaned %s), returning UNKNOWN" % 
+                (raw_section_data.trip_id, cleaned_section_data.trip_id))
             return ecwm.MotionTypes.UNKNOWN
 
     return None
@@ -699,7 +709,7 @@ def _overwrite_from_loc_row(filtered_section_data, fixed_loc, prefix):
                               fixed_loc["loc"])
 
 def _overwrite_from_timestamp(filtered_trip_like, prefix, ts, tz, loc):
-    filtered_trip_like[prefix+"_ts"] = ts
+    filtered_trip_like[prefix+"_ts"] = float(ts)
     filtered_trip_like[prefix+"_local_dt"] = esdl.get_local_date(ts, tz)
     filtered_trip_like[prefix+"_fmt_time"] = arrow.get(ts).to(tz).isoformat()
     filtered_trip_like[prefix+"_loc"] = loc
@@ -784,9 +794,12 @@ def resample(filtered_loc_df, interval):
     return loc_df_new
 
 def _get_timezone(ts, tz_ranges_df):
-    # TODO: change this to a dataframe query instead
-    sel_entry = tz_ranges_df[(tz_ranges_df.start_ts <= ts) &
-                        (tz_ranges_df.end_ts >= ts)]
+    if len(tz_ranges_df) == 1:
+        sel_entry = tz_ranges_df
+    else:
+        # TODO: change this to a dataframe query instead
+        sel_entry = tz_ranges_df[(tz_ranges_df.start_ts <= ts) &
+                            (tz_ranges_df.end_ts >= ts)]
     if len(sel_entry) != 1:
         logging.warning("len(sel_entry) = %d, using the one with the bigger duration" % len(sel_entry))
         sel_entry["duration"] = sel_entry.end_ts - sel_entry.start_ts
@@ -796,6 +809,7 @@ def _get_timezone(ts, tz_ranges_df):
 def _get_tz_ranges(loc_df):
     tz_ranges = []
     if len(loc_df) == 0:
+        logging.debug("Called with loc_df of length 0, returning empty" % len(loc_df))
         return tz_ranges
 
     # We know that there is at least one entry, so we can access it with impunity
@@ -988,6 +1002,9 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
         logging.debug("distance_delta = %s > 100, abandoning squish" %
                       (distance_delta))
         return
+    else:
+        logging.debug("distance_delta = %s < 100, continuing with squish " %
+                      (distance_delta))
 
     # In order to make everything line up, we need to:
     # 1) compute the new trip start ~ 50m at 5km/hr = 36 secs
@@ -999,7 +1016,9 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
                               cleaned_start_place_data.location)
     # 3) Fix other trip stats
     cleaned_trip_data["distance"] = cleaned_trip_data.distance + distance_delta
-    cleaned_trip_data["duration"] = cleaned_trip_data.distance + 30
+    cleaned_trip_data["duration"] = cleaned_trip_data.duration + 30
+
+    logging.debug("fix_squished_place: Fixed trip object = %s" % cleaned_trip_data)
 
     # 4) Reset section
     section_entries = esdtq.get_cleaned_sections_for_trip(user_id, trip_id)
@@ -1012,10 +1031,11 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
     _overwrite_from_timestamp(first_section_data, "start",
                               new_ts, cleaned_trip_data.start_local_dt.timezone,
                               cleaned_start_place_data.location)
+    logging.debug("fix_squished_place: Fixed section object = %s" % first_section_data)
 
     # 5) Fix other section stats
     first_section_data["distance"] = first_section_data.distance + distance_delta
-    first_section_data["duration"] = first_section_data.distance + 30
+    first_section_data["duration"] = first_section_data.duration + 30
     # including the distances array (move everything by the delta and add a 0 entry at the beginning)
     # [0.0, 13.727242885636501, 13.727251206018853, -> [0.0, distance_delta, 13.727242885636501, 13.727251206018853,
     distances_list = first_section_data["distances"]
@@ -1023,7 +1043,9 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
     # and the speed array (insert an entry for this first 30 secs)
     # [0.0, 0.45757476285455007, 0.4575750402006284, -> [0.0, distance_delta/30, 0.45757476285455007, 0.4575750402006284,
     speed_list = first_section_data["speeds"]
+    logging.debug("fix_squished_place: before inserting, speeds = %s" % speed_list[:10])
     speed_list.insert(1, old_div(float(distance_delta),30))
+    logging.debug("fix_squished_place: after inserting, speeds = %s" % speed_list[:10])
     first_section_data["distances"] = distances_list
     first_section_data["speeds"] = speed_list
 
@@ -1048,6 +1070,7 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
     loc_row = ecwrl.Recreatedlocation(orig_location_data)
     loc_row.mode = first_section_data.sensed_mode
     loc_row.section = first_section.get_id()
+    logging.debug("fix_squished_place: added new reconstructed location %s to match new start point" % loc_row)
     ts.insert_data(user_id, esda.CLEANED_LOCATION_KEY, loc_row)
 
     # 5) Update previous first location data to have the correct speed and distance
@@ -1057,16 +1080,22 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
         return
     curr_first_loc = ecwe.Entry(curr_first_loc_doc)
     curr_first_loc_data = curr_first_loc.data
+    logging.debug("fix_squished_place: before updating, old first location data = %s" % loc_row)
     curr_first_loc_data["distance"] = distance_delta
     curr_first_loc_data["speed"] = old_div(float(distance_delta), 30)
     curr_first_loc["data"] = curr_first_loc_data
+    logging.debug("fix_squished_place: after updating, old first location data = %s" % curr_first_loc)
     ts.update(curr_first_loc)
 
     # Validate the distance and speed calculations. Can remove this after validation
     loc_df = esda.get_data_df(esda.CLEANED_LOCATION_KEY, user_id,
                               esda.get_time_query_for_trip_like(esda.CLEANED_SECTION_KEY, first_section.get_id()))
+    logging.debug("fix_squished_place: before recomputing for validation, loc_df = %s" % 
+        (loc_df[["_id", "ts", "fmt_time", "latitude", "longitude", "distance", "speed"]]).head())
     loc_df.rename(columns={"speed": "from_points_speed", "distance": "from_points_distance"}, inplace=True)
     with_speeds_df = eaicl.add_dist_heading_speed(loc_df)
+    logging.debug("fix_squished_place: after recomputing for validation, with_speeds_df = %s" % 
+        (with_speeds_df[["_id", "ts", "fmt_time", "latitude", "longitude", "distance", "speed"]]).head())
     if not ecc.compare_rounded_arrays(with_speeds_df.speed.tolist(), first_section_data["speeds"], 10):
         logging.error("%s != %s" % (with_speeds_df.speed.tolist()[:10], first_section_data["speeds"][:10]))
         assert False
