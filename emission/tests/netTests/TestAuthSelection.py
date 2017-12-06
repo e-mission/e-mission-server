@@ -91,7 +91,7 @@ class TestAuthSelection(unittest.TestCase):
         logging.debug("Found request body = %s" % request.body.getvalue())
         logging.debug("Found request headers = %s" % list(request.headers.keys()))
         self.assertEqual(enaa.__getToken__(request, inHeader=True), "test_header_token")
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             self.assertEqual(enaa.__getToken__(request, inHeader=False), "test_header_token")
 
     def testGetTokenInHeader(self):
@@ -107,7 +107,7 @@ class TestAuthSelection(unittest.TestCase):
         logging.debug("Found request body = %s" % request.body.getvalue())
         logging.debug("Found request headers = %s" % list(request.headers.keys()))
         self.assertEqual(enaa.__getToken__(request, inHeader=True), "test_header_token")
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             self.assertEqual(enaa.__getToken__(request, inHeader=False), "test_header_token")
 
     def testGetEmail(self):

@@ -99,7 +99,7 @@ def give_points(user_id, task, curr_state):
         logging.debug("Request to score bike points %s" % res2)
 
       #update the timestamp and bike/walk counts in db
-      new_state = {'last_timestamp': summary_ts["last_ts_processed"] + esp.END_FUZZ_AVOID_LTE,
+      new_state = {'last_timestamp': float(summary_ts["last_ts_processed"] + esp.END_FUZZ_AVOID_LTE),
               'bike_count': bike_distance%bike_scale,
               'walk_count': walk_distance%walk_scale}
 
