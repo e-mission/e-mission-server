@@ -75,7 +75,7 @@ class TestLocationSmoothing(unittest.TestCase):
         tsdb = edb.get_timeseries_db()
         for entry in entries:
             entry["user_id"] = self.testUUID
-            tsdb.save(entry)
+            edb.save(tsdb, entry)
 
     def testPointFilteringShanghaiJump(self):
         classicJumpTrip1 = self.trip_entries[0]

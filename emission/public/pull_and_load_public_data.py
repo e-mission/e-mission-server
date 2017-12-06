@@ -45,7 +45,7 @@ def request_data(server_url, from_ts, to_ts, phone_ids, debug):
                 logging.debug("saving %d entries" % len(entry_list))
 
             for entry in entry_list:
-                tsdb.save(entry)
+                edb.save(tsdb, entry)
 
 
 # Request data in 5hr-long chunks

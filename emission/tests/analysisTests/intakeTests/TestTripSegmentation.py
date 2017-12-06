@@ -183,7 +183,7 @@ class TestTripSegmentation(unittest.TestCase):
         for entry in esta.TimeSeries.get_time_series(
                 self.iosUUID).find_entries():
             entry["user_id"] = self.androidUUID
-            tsdb.save(entry)
+            edb.save(tsdb, entry)
         
         # Now, segment the data for the combined UUID, which will include both
         # android and ios

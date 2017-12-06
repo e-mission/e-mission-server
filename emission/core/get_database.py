@@ -247,3 +247,14 @@ def get_fake_sections_db():
     #current_db = MongoClient().Stage_database
     FakeSections = _get_current_db().Stage_fake_sections
     return FakeSections
+
+# Static utility method to save entries to a mongodb collection.  Single
+# drop-in replacement for collection.save() now that it is deprecated in 
+# pymongo 3.0. 
+# https://github.com/e-mission/e-mission-server/issues/533#issuecomment-349430623
+def save(db, entry):
+#     if '_id' in entry:
+#         db.replace_one({'_id': entry['_id']}, entry, upsert=True)
+#     else:
+#         db.replace_one({}, entry, upsert=True)
+    db.save(entry)

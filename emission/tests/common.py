@@ -117,7 +117,7 @@ def setupRealExampleWithEntries(testObj):
         entry["user_id"] = testObj.testUUID
         # print "Saving entry with write_ts = %s and ts = %s" % (entry["metadata"]["write_fmt_time"],
         #                                                        entry["data"]["fmt_time"])
-        tsdb.replace_one({'_id': entry['_id']}, entry, upsert=True)
+        edb.save(tsdb, entry)
         
     logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
     logging.debug("First few entries = %s" % 
@@ -151,7 +151,7 @@ def setupTokenListAuth(self):
         "token_list": self.token_list_path
     }
 
-    token_list_conf_file.write(json.dumps(token_list_conf_json))
+    token_list_conf_file.write(str(json.dumps(token_list_conf_json)))
     token_list_file = open(self.token_list_path, "w")
     token_list_file.write("correct_horse_battery_staple\n")
     token_list_file.write("collar_highly_asset_ovoid_sultan\n")

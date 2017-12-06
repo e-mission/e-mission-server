@@ -38,7 +38,7 @@ def move_all_filters_to_data():
 
             # For all cases, including the location one, we want to delete the filter from metadata
             del entry["metadata"]["filter"]
-            tsdb.save(entry)
+            edb.save(tsdb, entry)
             logging.debug("for entry %s, for key %s, deleted filter %s from metadata" % 
                             (entry["_id"], get_curr_key(entry), curr_filter))
         else:
@@ -51,4 +51,4 @@ def move_all_filters_to_data():
             # so set it to time in this case
             entry["data"]["filter"] = "time"
             logging.debug("No entry found in either data or metadata, for key %s setting to 'time'" % entry["metadata"]["key"])
-            tsdb.save(entry)
+            edb.save(tsdb, entry)

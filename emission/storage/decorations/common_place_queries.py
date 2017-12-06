@@ -21,8 +21,7 @@ import emission.storage.decorations.common_trip_queries as esdctp
 #################################################################################
 
 def save_common_place(common_place):
-    db = edb.get_common_place_db()
-    db.save(common_place)
+    edb.save(edb.get_common_place_db(), common_place)
 
 def get_common_place_from_db(common_place_id):
     db = edb.get_common_place_db()

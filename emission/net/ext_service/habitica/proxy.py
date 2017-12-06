@@ -131,7 +131,7 @@ def habiticaProxy(user_uuid, method, method_url, method_args):
   temp = result.json()
   temp['auth'] = {'apiId': stored_cfg['habitica_id'],
                   'apiToken': stored_cfg['habitica_token']}
-  result.encoding, result._content = 'utf8', json.dumps(temp)
+  result.encoding, result._content = 'utf8', json.dumps(temp).encode()
   return result
 
 
@@ -194,4 +194,4 @@ def get_user_entry(user_id):
 
 def save_user_entry(user_id, user_entry):
   assert(user_entry["user_id"] == user_id)
-  return edb.get_habitica_db().save(user_entry)
+  return edb.save(edb.get_habitica_db(), user_entry)
