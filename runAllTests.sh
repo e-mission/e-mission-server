@@ -6,4 +6,5 @@ set -e
 # + ./runAllTests.sh
 # rm: missing operand
 # Try `rm --help' for more information.
+source activate emission
 PYTHONPATH=. python -m unittest discover -s emission/tests -p Test*;
