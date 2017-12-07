@@ -2,8 +2,8 @@ name: py36
 dependencies:
 - _license=1.1=py36_1
 - alabaster=0.7.10=py36_0
+- anaconda=4.4.0=np112py36_0
 - anaconda-client=1.6.3=py36_0
-- anaconda=custom=py36_0
 - anaconda-navigator=1.6.2=py36_0
 - anaconda-project=0.6.0=py36_0
 - appnope=0.1.0=py36_0
@@ -131,7 +131,7 @@ dependencies:
 - pyqt=5.6.0=py36_1
 - pytables=3.3.0=np112py36_0
 - pytest=3.0.7=py36_0
-- python=3.6.2=0
+- python=3.6.1=2
 - python-dateutil=2.6.0=py36_0
 - python.app=1.2=py36_4
 - pytz=2017.2=py36_0
@@ -147,9 +147,9 @@ dependencies:
 - rope=0.9.4=py36_1
 - ruamel_yaml=0.11.14=py36_1
 - scikit-image=0.13.0=np112py36_0
-- scikit-learn=0.19.0=np112py36_0
-- scipy=0.19.1=np112py36_0
-- seaborn=0.8=py36_0
+- scikit-learn=0.18.1=np112py36_1
+- scipy=0.19.0=np112py36_0
+- seaborn=0.7.1=py36_0
 - setuptools=27.2.0=py36_0
 - simplegeneric=0.8.1=py36_1
 - singledispatch=3.4.0.3=py36_0
@@ -221,3 +221,4 @@ dependencies:
   - urllib3==1.22
   - utm==0.4.2
   - xmltodict==0.11.0
+
