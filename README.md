@@ -19,6 +19,39 @@ preprocessing results ensures reasonable performance.
 
 The installation instructions below are generally targeted towards OSX and \*nix shells such as bash. If you want to use Windows, we recomend using PowerShell (https://technet.microsoft.com/en-us/scriptcenter/dd742419), which provides similarly rich commands. If you really want to use the Command Prompt, most commands should work, but you may need to convert `/` -> `\` to make the commands work.
 
+## Install/update: ##
+-------------------
+
+### Installation ###
+is as simple as cloning the github repository.
+
+- If you do not plan to make changes to the code, clone the master repository.
+
+  ```
+  $ git clone https://github.com/e-mission/e-mission-server.git
+  ```
+
+- If you might make changes or develop new features, fork (https://help.github.com/articles/fork-a-repo/) and clone your fork.
+
+  ```
+  $ git clone https://github.com/<username>/e-mission-server.git
+  ```
+
+### Update ###
+is as simple as pulling new changes.
+
+- If you are working off the master repository
+
+  ```
+  $ git pull origin master
+  ```
+
+- If you are working off your fork, you will need to sync your fork with the main repository (https://help.github.com/articles/syncing-a-fork/) and then pull from your fork.
+
+  ```
+  $ git pull origin master
+  ```
+
 ## Dependencies: ##
 -------------------
 
@@ -40,25 +73,57 @@ python scientific computing libraries (numpy/scipy/scikit-learn) along with
 native implementations for performance. Using the distribution avoids native
 library inconsistencies between versions.
 
-The distribution also includes its own version of pip, and a separate package
+The distribution also includes its own version of pip, and a separate environment
 management tool called 'conda'.
 
-Make sure you install Python 2.7 because some libraries used in this code 
-repository do not support Python 3.5 yet.
+The distribution also includes an environment management tool called 'conda'. We will set up a separate `emission`
+environment within anaconda to avoid conflicts with other applications.
 
-After you install the anaconda distribution, please ensure that it is in your
-path, and you are using the anaconda versions of common python tools such as
-`python` and `pip`, e.g.
+- Install the anaconda distribution (https://www.anaconda.com/download). Any
+  installer should be fine - setting up the `emission` environment will
+  automatically choose the correct version of python. Since all required
+  packages will be installed using the environment, if you are comfortable with
+  the command line, you can also download the minimalist `miniconda` installer
+  https://conda.io/miniconda.html
 
-    $ which python
-    /Users/shankari/OSS/anaconda/bin/python
+- Setup the `emission` environment.
 
-    $ which pip
-    /Users/shankari/OSS/anaconda/bin/pip
+  ```
+  $ source setup/setup.sh
+  ```
+
+- Verify that you are in the right environment - your prompt should start with
+  `(emission)` and the `emission` environment should be starred.
+
+  ```
+  (emission) ...$ conda env list
+  # conda environments:
+  #
+  aws                      /..../anaconda/envs/aws
+  emission              *  /..../anaconda/envs/emission
+  firebase                 /..../anaconda/envs/firebase
+  py27                     /..../anaconda/envs/py27
+  py36                     /..../anaconda/envs/py36
+  xbos                     /..../anaconda/envs/xbos
+  root                     /..../anaconda
+  ```
+
+- Remember to re-run the setup script every time you pull from the main repository because the dependencies may have changed.
+
+  ```
+  $ source setup/setup.sh
+  ```
+
+- When you are done working with e-mission, you can cleanup the environment and then just delete the entire directory.
+
+  ```
+  $ source setup/teardown.sh
+  $ cd ..
+  $ rm -rf e-mission-server
+  ```
 
 ### Python dependencies: ###
 
-    $ pip install -r requirements.txt 
     # If you are running this in production over SSL, copy over the cherrypy-wsgiserver
     $ cp api/wsgiserver2.py <dist-packages>/cherrypy/wsgiserver/wsgiserver2.py
 
@@ -78,14 +143,11 @@ Here are the steps for doing this:
 
         $ mongod
 
-1. Copy the following sample files. You should also configure the servers and keys in them if you wish to test the associated features, but can leave them filled with dummy values if you don't.
+1. **Optional** Copy configuration files. The files in `conf` can be used to customize the app with custom authentication options or enable external features such as place lookup and the game integration. Look at the samples in `conf/*`, copy them over and modify as necessary - e.g.
 
+        $ find conf -name \*.sample
         # For the location -> name reverse lookup. Client will lookup if not populated.
         $ cp conf/net/ext_service/nominatim.json.sample conf/net/ext_service/nominatim.json
-        # Store entries to the stats database. Currently required, dependency should be removed soon
-        $ cp conf/net/int_service/giles_conf.json.sample conf/net/int_service/giles_conf.json
-        # Game integration.
-        $ cp conf/net/ext_service/habitica.json.sample conf/net/ext_service/habitica.json
 
 1. Start the server
 
@@ -136,9 +198,8 @@ $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py -n /tmp/data-c
   1. The script loads the data into your mongodb instance using the test phone UUIDs. If you want to play with the raw data, you are good.
   2. If you want to run the existing pipeline, you need to either enable the pipeline for test phones, OR re-load the data as a normal user.
 
-    1. To enable the pipeline for test phones, edit `emission/pipeline/scheduler.py` to add the test phones to the `TEMP_HANDLED_PUBLIC_PHONES` array.
-    2. To reload the data as a normal user, save the data as a timeline file using `bin/debug/extract_timeline_for_day_and_user.py` with one of the test phone UUIDs and the time range that you downloaded the data for. This saves the data into a json file. You can then load the data using the `bin/debug/load_timeline_for_day_and_user.py` script. It requires a timeline file and a user that the timeline is being loaded as. If you wish to view this timeline in the UI after processing it, you need to
-login with this email.
+      1. To enable the pipeline for test phones, edit `emission/pipeline/scheduler.py` to add the test phones to the `TEMP_HANDLED_PUBLIC_PHONES` array.
+      2. To reload the data as a normal user, save the data as a timeline file using `bin/debug/extract_timeline_for_day_and_user.py` with one of the test phone UUIDs and the time range that you downloaded the data for. This saves the data into a json file. You can then load the data using the `bin/debug/load_timeline_for_day_and_user.py` script. It requires a timeline file and a user that the timeline is being loaded as. If you wish to view this timeline in the UI after processing it, you need to login with this email.
 
 ```
             $ cd ..../e-mission-server
@@ -204,7 +265,7 @@ directory to PYTHONPATH.
 
 ## Analysis ##
 Several exploratory analysis scripts are checked in as ipython notebooks into
-`emission/analysis/notebooks`. All data in the notebooks is from members of the
+https://github.com/e-mission/e-mission-explore/. All data in the notebooks is from members of the
 research team who have provided permission to use it. The results in the
 notebooks cannot be replicated in the absence of the raw data, but they can be
 run on data collected from your own instance as well.
@@ -259,7 +320,7 @@ or
 
 ## Design decisions: ##
 ----------
-This site is currently designed to support commute mode tracking and
+This site is currently designed to support travel behavior tracking and
 aggregation. There is a fair amount of backend work that is more complex than
 just reading and writing data from a database. So we are not using any of the
 specialized web frameworks such as django or rails.
