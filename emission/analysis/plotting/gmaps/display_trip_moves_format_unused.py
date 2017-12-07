@@ -1,3 +1,10 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 __author__ = 'Yin'
 from ast import literal_eval
 import pygmaps
@@ -46,7 +53,7 @@ def display_trip(file_name):
     sections = literal_eval(data[0])
     gmap = pygmaps.maps(37.8717, -122.2728, 14)
     for section in sections:
-        print(section.keys())
+        print(list(section.keys()))
         if section['type'] == 'move':
             drawSection(section, gmap)
             gmap.draw(file_name + '.html')

@@ -1,4 +1,12 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
 import logging
 from datetime import datetime, timedelta
 import json
@@ -37,12 +45,12 @@ def updateUserCreateTime(uuid):
 
 def dropAllCollections(db):
   collections = db.collection_names()
-  print "collections = %s" % collections
+  print("collections = %s" % collections)
   for coll in collections:
     if coll.startswith('system'):
-      print "Skipping system collection %s" % coll
+      print("Skipping system collection %s" % coll)
     else: 
-      print "Dropping collection %s" % coll
+      print("Dropping collection %s" % coll)
       db.drop_collection(coll)
 
 def purgeSectionData(Sections, userName):
@@ -98,9 +106,10 @@ def updateSections(testCase):
 
 def setupRealExample(testObj, dump_file):
     logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
-    testObj.entries = json.load(open(dump_file), object_hook = bju.object_hook)
-    testObj.testUUID = uuid.uuid4()
-    setupRealExampleWithEntries(testObj)
+    with open(dump_file) as dfp:
+        testObj.entries = json.load(dfp, object_hook = bju.object_hook)
+        testObj.testUUID = uuid.uuid4()
+        setupRealExampleWithEntries(testObj)
 
 def setupRealExampleWithEntries(testObj):
     tsdb = edb.get_timeseries_db()
@@ -108,7 +117,7 @@ def setupRealExampleWithEntries(testObj):
         entry["user_id"] = testObj.testUUID
         # print "Saving entry with write_ts = %s and ts = %s" % (entry["metadata"]["write_fmt_time"],
         #                                                        entry["data"]["fmt_time"])
-        tsdb.save(entry)
+        edb.save(tsdb, entry)
         
     logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
     logging.debug("First few entries = %s" % 
@@ -142,7 +151,7 @@ def setupTokenListAuth(self):
         "token_list": self.token_list_path
     }
 
-    token_list_conf_file.write(json.dumps(token_list_conf_json))
+    token_list_conf_file.write(str(json.dumps(token_list_conf_json)))
     token_list_file = open(self.token_list_path, "w")
     token_list_file.write("correct_horse_battery_staple\n")
     token_list_file.write("collar_highly_asset_ovoid_sultan\n")

@@ -1,4 +1,12 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from builtins import object
 import json
 import logging
 import importlib
@@ -14,7 +22,7 @@ try:
 except:
     logging.warning("push service not configured, push notifications not supported")
 
-class NotifyInterfaceFactory:
+class NotifyInterfaceFactory(object):
     @staticmethod
     def getDefaultNotifyInterface():
         return NotifyInterfaceFactory.getNotifyInterface(push_config["provider"])
@@ -31,7 +39,7 @@ class NotifyInterfaceFactory:
         logging.debug("interface_obj = %s" % interface_obj)
         return interface_obj
 
-class NotifyInterface:
+class NotifyInterface(object):
     def get_and_invalidate_entries(self):
         pass
 

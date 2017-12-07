@@ -1,8 +1,17 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
+from past.utils import old_div
 import json
 from random import randrange
-from bottle import route, post, get, run, template, static_file, request, app, HTTPError, abort, BaseRequest, JSONPlugin, response
-import bottle as bt
+from emission.net.api.bottle import route, post, get, run, template, static_file, request, app, HTTPError, abort, BaseRequest, JSONPlugin, response
+import emission.net.api.bottle as bt
 # To support dynamic loading of client-specific libraries
 import sys
 import os
@@ -16,20 +25,24 @@ from uuid import UUID
 # So that we can set the socket timeout
 import socket
 # For decoding JWTs using the google decode URL
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import requests
 import traceback
 import xmltodict
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import bson.json_util
 
 # Our imports
-import visualize, stats, usercache, timeline, metrics, pipeline
+import emission.net.api.visualize as visualize
+import emission.net.api.stats as stats
+import emission.net.api.usercache as usercache
+import emission.net.api.timeline as timeline
+import emission.net.api.metrics as metrics
+import emission.net.api.pipeline as pipeline
+
 import emission.net.auth.auth as enaa
 # import emission.net.ext_service.moves.register as auth
 import emission.net.ext_service.habitica.proxy as habitproxy
-import emission.analysis.result.carbon as carbon
-import emission.analysis.result.userclient as userclient
 from emission.core.wrapper.client import Client
 from emission.core.wrapper.user import User
 from emission.core.get_database import get_uuid_db, get_mode_db
@@ -59,7 +72,7 @@ auth_method = config_data["server"]["auth"]
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes
 
-print "Finished configuring logging for %s" % logging.getLogger()
+print("Finished configuring logging for %s" % logging.getLogger())
 app = app()
 
 # On MacOS, the current working directory is always in the python path However,
@@ -249,7 +262,7 @@ def createUserProfile():
       logging.debug("Looked up user = %s" % user)
       logging.debug("Returning result %s" % {'uuid': str(user.uuid)})
       return {'uuid': str(user.uuid)}
-  except ValueError, e:
+  except ValueError as e:
       traceback.print_exc()
       abort(403, e.message)
 
@@ -329,7 +342,7 @@ def habiticaJoinGroup(group_id):
 @get('/eval/publicData/timeseries')
 def getPublicData():
   ids = request.json['phone_ids']
-  all_uuids = map(lambda id: UUID(id), ids)
+  all_uuids = [UUID(id) for id in ids]
   uuids = [uuid for uuid in all_uuids if uuid in estag.TEST_PHONE_IDS]
 
   from_ts = request.query.from_ts
@@ -338,13 +351,13 @@ def getPublicData():
   time_range = estt.TimeQuery("metadata.write_ts", float(from_ts), float(to_ts))
   time_query = time_range.get_query()
 
-  user_queries = map(lambda id: {'user_id': id}, uuids)
+  user_queries = [{'user_id': id} for id in uuids]
 
   for q in user_queries:
     q.update(time_query)
 
-  num_entries_ts = map(lambda q: edb.get_timeseries_db().find(q).count(), user_queries)
-  num_entries_uc = map(lambda q: edb.get_usercache_db().find(q).count(), user_queries)
+  num_entries_ts = [edb.get_timeseries_db().find(q).count() for q in user_queries]
+  num_entries_uc = [edb.get_usercache_db().find(q).count() for q in user_queries]
   total_entries = sum(num_entries_ts + num_entries_uc)
   logging.debug("Total entries requested: %d" % total_entries)
 
@@ -352,7 +365,7 @@ def getPublicData():
   if total_entries > threshold:
     data_list = None
   else:
-    data_list = map(lambda u: esdc.find_entries(u, None, time_range), all_uuids)
+    data_list = [esdc.find_entries(u, None, time_range) for u in all_uuids]
 
   return {'phone_data': data_list}
 
@@ -361,13 +374,13 @@ def getPublicData():
 # Redirect to custom URL. $%$%$$ gmail
 @get('/redirect/<route>')
 def getCustomURL(route):
-  print route
-  print urllib.urlencode(request.query)
+  print(route)
+  print(urllib.parse.urlencode(request.query))
   logging.debug("route = %s, query params = %s" % (route, request.query))
   if route == "join":
-    redirected_url = "/#/setup?%s" % (urllib.urlencode(request.query))
+    redirected_url = "/#/setup?%s" % (urllib.parse.urlencode(request.query))
   else:
-    redirected_url = 'emission://%s?%s' % (route, urllib.urlencode(request.query))
+    redirected_url = 'emission://%s?%s' % (route, urllib.parse.urlencode(request.query))
   response.status = 303
   response.set_header('Location', redirected_url)
   # response.set_header('Location', 'mailto://%s@%s' % (route, urllib.urlencode(request.query)))
@@ -379,8 +392,8 @@ def getCustomURL(route):
 # original URL should be encoded in UTF-8
 @get("/asJSON/<originalXMLWebserviceURL>")
 def xmlProxy(originalXMLWebserviceURL):
-  decodedURL = urllib2.unquote(originalXMLWebserviceURL)
-  f = urllib2.urlopen(decodedURL)
+  decodedURL = urllib.parse.unquote(originalXMLWebserviceURL)
+  f = urllib.request.urlopen(decodedURL)
   xml = f.read()
   parsedXML = xmltodict.parse(xml)
   return json.dumps(parsedXML)
@@ -429,7 +442,7 @@ def after_request():
   request.params.timer.__exit__()
   duration = msTimeNow - request.params.start_ts
   new_duration = request.params.timer.elapsed
-  if round((duration - new_duration) / new_duration > 100) > 0:
+  if round(old_div((duration - new_duration), new_duration) > 100) > 0:
     logging.error("old style duration %s != timer based duration %s" % (duration, new_duration))
     stats.store_server_api_error(request.params.user_uuid, "MISMATCH_%s_%s" %
                                  (request.method, request.path), msTimeNow, duration - new_duration)
@@ -453,7 +466,7 @@ def getUUID(request, inHeader=False):
         if retUUID is None:
            raise HTTPError(403, "token is valid, but no account found for user")
         return retUUID
-    except ValueError, e:
+    except ValueError as e:
         traceback.print_exc()
         abort(401, e.message)
 
@@ -490,11 +503,11 @@ if __name__ == '__main__':
       ssl_cert = key_data["ssl_certificate"]
       private_key = key_data["private_key"]
 
-      run(host=server_host, port=server_port, server='cherrypy', debug=True,
+      run(host=server_host, port=server_port, server='cheroot', debug=True,
           certfile=ssl_cert, keyfile=private_key, ssl_module='builtin')
     else:
       # Non SSL option for testing on localhost
-      print "Running with HTTPS turned OFF - use a reverse proxy on production"
-      run(host=server_host, port=server_port, server='cherrypy', debug=True)
+      print("Running with HTTPS turned OFF - use a reverse proxy on production")
+      run(host=server_host, port=server_port, server='cheroot', debug=True)
 
     # run(host="0.0.0.0", port=server_port, server='cherrypy', debug=True)

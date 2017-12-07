@@ -1,5 +1,12 @@
 # Standard imports
 from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import map
+from builtins import *
 from random import randrange
 import logging
 import copy
@@ -58,5 +65,5 @@ def calDistance(point1, point2, coordinates=False):
 
 def compare_rounded_arrays(arr1, arr2, digits):
     round2n = lambda x: round(x, digits)
-    return map(round2n, arr1) == map(round2n, arr2)
+    return list(map(round2n, arr1)) == list(map(round2n, arr2))
 

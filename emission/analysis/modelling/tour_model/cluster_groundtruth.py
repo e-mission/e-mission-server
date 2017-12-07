@@ -1,4 +1,14 @@
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
 # standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import *
+from past.utils import old_div
 import logging
 from sklearn.metrics.cluster import homogeneity_score, completeness_score
 import numpy 
@@ -59,11 +69,11 @@ def map_clusters_by_groundtruth(data, labels, colors, map_individuals=False):
     from matplotlib import colors as matcol
     colormap = plt.cm.get_cmap()
     import random 
-    r = random.sample(range(len(set(labels))), len(set(labels)))
+    r = random.sample(list(range(len(set(labels)))), len(set(labels)))
     rand = []
     clusters = len(set(labels))
     for i in range(len(labels)):
-        rand.append(r[labels[i]]/float(clusters))
+        rand.append(old_div(r[labels[i]],float(clusters)))
     if map_individuals:
         for color in set(colors):
             first = True
@@ -89,7 +99,7 @@ def map_clusters_by_groundtruth(data, labels, colors, map_individuals=False):
         end_lat = data[i].trip_end_location.lat
         end_lon = data[i].trip_end_location.lon
         path = [(start_lat, start_lon), (end_lat, end_lon)]
-        mymap.addpath(path, matcol.rgb2hex(colormap(float(colors[i])/len(set(colors)))))
+        mymap.addpath(path, matcol.rgb2hex(colormap(old_div(float(colors[i]),len(set(colors))))))
     mymap.draw('./mymap.html')
 
 def main(colors):

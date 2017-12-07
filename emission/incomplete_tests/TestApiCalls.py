@@ -1,7 +1,14 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # This tests REST API directly, and exercises code in the API wrapper layer
 # It runs the test against a running webserver. The webserver host and port are
 # read from the config.json file
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import unittest
 import json
 import logging

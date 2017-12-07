@@ -1,4 +1,12 @@
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from past.utils import old_div
 import unittest
 import sys
 import os
@@ -39,14 +47,14 @@ class TestUser(unittest.TestCase):
                           'running' : 0,
                           'cycling' : 0,
                             'mixed' : 0,
-                        'bus_short' : 267.0/1609,
-                         'bus_long' : 267.0/1609,
-                      'train_short' : 92.0/1609,
-                       'train_long' : 92.0/1609,
-                        'car_short' : (1/(42*1.6093))*8.91,
-                         'car_long' : (1/(42*1.6093))*8.91,
-                        'air_short' : 217.0/1609,
-                         'air_long' : 217.0/1609
+                        'bus_short' : old_div(267.0,1609),
+                         'bus_long' : old_div(267.0,1609),
+                      'train_short' : old_div(92.0,1609),
+                       'train_long' : old_div(92.0,1609),
+                        'car_short' : (old_div(1,(42*1.6093)))*8.91,
+                         'car_long' : (old_div(1,(42*1.6093)))*8.91,
+                        'air_short' : old_div(217.0,1609),
+                         'air_long' : old_div(217.0,1609)
                       }
     self.assertEquals(user.getCarbonFootprintForMode(), correctCarbonFootprintForMode)
 

@@ -1,3 +1,11 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import *
 import geojson as gj
 import logging
 
@@ -13,8 +21,7 @@ import emission.storage.decorations.common_trip_queries as esdctp
 #################################################################################
 
 def save_common_place(common_place):
-    db = edb.get_common_place_db()
-    db.save(common_place)
+    edb.save(edb.get_common_place_db(), common_place)
 
 def get_common_place_from_db(common_place_id):
     db = edb.get_common_place_db()
@@ -71,15 +78,15 @@ def create_places(list_of_cluster_data, user_id):
 
     clear_existing_places(user_id)
     logging.debug("After creating map, number of places is %d" % len(places_to_successors))
-    for loc_str in places_to_successors.iterkeys():
+    for loc_str in places_to_successors.keys():
         start = make_new_common_place(user_id, gj.loads(loc_str))
         logging.debug("Adding %d places for this place" % len(places_dct[loc_str]))
         start.places = places_dct[loc_str]
         save_common_place(start)
 
-    for loc_str, successors in places_to_successors.iteritems():
+    for loc_str, successors in places_to_successors.items():
         start = get_common_place_at_location(gj.loads(loc_str))
-        successor_places = map(lambda loc:get_common_place_at_location(loc), successors)
+        successor_places = [get_common_place_at_location(loc) for loc in successors]
         start.successors = successor_places
 
         save_common_place(start)
@@ -92,7 +99,7 @@ def get_succesor(user_id, place_id, time):
     place = get_common_place_from_db(place_id)
     for suc in place["successors"]:
         trip = esdctp.get_common_trip_from_db(user_id, place_id, suc)
-        for temp_hour in xrange(time.hour, esdctp.HOURS_IN_DAY):
+        for temp_hour in range(time.hour, esdctp.HOURS_IN_DAY):
             counter_key = ("%s" % suc, temp_hour)
             temp[counter_key] = trip.probabilites[day, temp_hour]
     return boi.ObjectId(esmmc.sampleFromCounter(temp)[0])
@@ -102,7 +109,7 @@ def has_succesor(user_id, place_id, time):
     place = get_common_place_from_db(place_id)
     for suc in place["successors"]:
         trip = esdctp.get_common_trip_from_db(user_id, place_id, suc)
-        for temp_hour in xrange(time.hour, esdctp.HOURS_IN_DAY):
+        for temp_hour in range(time.hour, esdctp.HOURS_IN_DAY):
             if trip.probabilites[day, temp_hour] > 0:
                 return True
     return False

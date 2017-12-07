@@ -1,5 +1,12 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 # Exports all data for the particular user for the particular day
 # Used for debugging issues with trip and section generation 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import sys
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -41,7 +48,7 @@ def export_timeline(user_id, start_day_str, end_day_str, file_name):
 
     validate_truncation(loc_entry_list, trip_entry_list, place_entry_list)
 
-    unique_key_list = set(map(lambda e: e["metadata"]["key"], combined_list))
+    unique_key_list = set([e["metadata"]["key"] for e in combined_list])
     logging.info("timeline has unique keys = %s" % unique_key_list)
     if len(combined_list) == 0 or unique_key_list == set(['stats/pipeline_time']):
         logging.info("No entries found in range for user %s, skipping save" % user_id)
@@ -68,7 +75,7 @@ def export_timeline_for_users(user_id_list, args):
 
 if __name__ == '__main__':
     if len(sys.argv) != 5:
-        print "Usage: %s [<user>|'all'|'file_XXX'] <start_day> <end_day> <file_prefix>" % (sys.argv[0])
+        print("Usage: %s [<user>|'all'|'file_XXX'] <start_day> <end_day> <file_prefix>" % (sys.argv[0]))
     else:
         user_id_str = sys.argv[1]
         if user_id_str == "all":

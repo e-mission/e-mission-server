@@ -1,4 +1,15 @@
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
 # Our imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import *
+from builtins import object
+from past.utils import old_div
 import logging
 import emission.simulation.markov_model_counter as esmmc
 import emission.net.ext_service.geocoder.nominatim as eco
@@ -54,9 +65,9 @@ class Commute(object):
         ## Based on a 40 mph guess
         dist = self.starting_point.rep_coords.distance(self.ending_point.rep_coords)
         miles = dist * 0.000621371192
-        time = miles/float(40)
-        if time < 1.0/2.0:
-            time = 1.0/2.0   ## Pushes the random walk forward
+        time = old_div(miles,float(40))
+        if time < old_div(1.0,2.0):
+            time = old_div(1.0,2.0)   ## Pushes the random walk forward
         return datetime.timedelta(hours=time)
 
     def get_distance(self):
@@ -106,7 +117,7 @@ class Location(object):
         for suc in self.successors:
             suc_obj = self.tm.get_location(suc)
             edge = self.tm.get_edge(self, suc_obj)
-            for temp_hour in xrange(time.hour, HOURS_IN_DAY):
+            for temp_hour in range(time.hour, HOURS_IN_DAY):
                 counter_key = (suc_obj, temp_hour, edge.get_rough_time_duration())
                 temp_counter[counter_key] = edge.probabilities[day, temp_hour]
         return esmmc.sampleFromCounter(temp_counter)
@@ -117,14 +128,14 @@ class Location(object):
         for suc in self.successors:
             suc_obj = self.tm.get_location(suc)
             edge = self.tm.get_edge(self, suc_obj)
-            for temp_hour in xrange(time.hour, HOURS_IN_DAY):
+            for temp_hour in range(time.hour, HOURS_IN_DAY):
                 if edge.probabilities[day, temp_hour] > 0:
                     return True
         return False
 
     def get_in_degree(self):
         count = 0
-        for loc in self.tm.locs.values():
+        for loc in list(self.tm.locs.values()):
             if loc in self.successors:
                 logging.debug("count inceasing")
                 count += 1
@@ -172,7 +183,7 @@ class TourModel(object):
         return heapq.nlargest(n, edges_list, key=lambda v: v.weight())
 
     def define_locations(self):
-        for loc in self.locs.itervalues():
+        for loc in self.locs.values():
             logging.debug("%s : %s" % (loc.name, loc.get_address()))
 
     def get_prob_of_place_x_at_time_y_on_date_z(x, y, z):
@@ -219,7 +230,7 @@ class TourModel(object):
  
     def build_tour_model(self):
         tour_model = [ ]
-        for day in xrange(DAYS_IN_WEEK):
+        for day in range(DAYS_IN_WEEK):
             tour_model.append(self.get_tour_model_for_day(day))
         return tour_model 
 
@@ -238,11 +249,11 @@ class TourModel(object):
         plt.clf()
         G = nx.MultiDiGraph()
         labels = { }
-        for v in self.locs.values():
+        for v in list(self.locs.values()):
             G.add_node(v)
             pos[v] = (v.rep_coords.lon, v.rep_coords.lat)
             labels[v] = v.get_address()
-        for e in self.edges.values():
+        for e in list(self.edges.values()):
             start = e.starting_point
             end = e.ending_point
             G.add_edge(start,end)

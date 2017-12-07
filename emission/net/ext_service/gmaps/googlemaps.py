@@ -23,10 +23,20 @@ An easy-to-use Python wrapper for the Google Maps and Local Search APIs.
 
 
 """
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 
 
-import urllib
-import urllib2
+from future import standard_library
+standard_library.install_aliases()
+from builtins import input
+from builtins import str
+from builtins import *
+from builtins import object
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 try:
     import json
 except ImportError:
@@ -52,11 +62,11 @@ def fetch_json(query_url, params={}, headers={}):       # pylint: disable-msg=W0
     :rtype: (string, dict or array)
     
     """
-    encoded_params = urllib.urlencode(params)    
+    encoded_params = urllib.parse.urlencode(params)    
     url = query_url + encoded_params
-    print url
-    request = urllib2.Request(url, headers=headers)
-    response = urllib2.urlopen(request)
+    print(url)
+    request = urllib.request.Request(url, headers=headers)
+    response = urllib.request.urlopen(request)
     return (url, json.load(response))
         
 
@@ -116,7 +126,7 @@ class GoogleMapsError(Exception):
     
     def __unicode__(self):
         """Return a unicode representation of this :exc:`GoogleMapsError`."""
-        return unicode(self.__str__())
+        return str(self.__str__())
 
 
 STATUS_OK = GoogleMapsError.G_GEO_SUCCESS
@@ -482,19 +492,19 @@ if __name__ == "__main__":
         """
 
         if len(argv) < 2 or len(argv) > 4:
-            print main.__doc__
+            print(main.__doc__)
             sys.exit(1)
             
         query = argv[1]
         if len(argv) == 3:
             api_key = argv[2]
         else:
-            api_key = raw_input("Google Maps API key: ")
+            api_key = input("Google Maps API key: ")
             
         gmap = GoogleMaps(api_key)
         try:
             result = gmap.geocode(query)
-        except GoogleMapsError, err:
+        except GoogleMapsError as err:
             sys.stderr.write('%s\n%s\nResponse:\n' % (err.url, err))
             json.dump(err.response, sys.stderr, indent=4)
             sys.exit(1)

@@ -1,4 +1,11 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import unittest
 import json
 import logging
@@ -56,7 +63,7 @@ class TestVisualize(unittest.TestCase):
                                           ["BICYCLING"],
                                           self.day_start_dt,
                                           self.day_end_dt, None)
-        print user_points['lnglat']
+        print(user_points['lnglat'])
         self.assertTrue(len(user_points['lnglat']) > 0)
 
     def testAggCommutePopRouteLocalDate(self):

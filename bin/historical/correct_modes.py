@@ -1,3 +1,7 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 # This script allows us to correct misclassified user confirmed trips.
 # We suspect that the user misclassified them because they were inaccurately
 # classified high confidence trips.
@@ -5,19 +9,24 @@
 # this script.  All corrections should happen through the script, and the
 # associated correction file should be checked in for further reference
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import next
+from builtins import *
+from builtins import object
 from get_database import get_section_db
 
 # Handle comments as per:
 # http://bugs.python.org/issue1225769
-class CommentedFile:
+class CommentedFile(object):
     def __init__(self, f, commentstring="#"):
         self.f = f
         self.commentstring = commentstring
 
-    def next(self):
-        line = self.f.next()
+    def __next__(self):
+        line = next(self.f)
         while line.startswith(self.commentstring):
-            line = self.f.next()
+            line = next(self.f)
         return line
 
     def __iter__(self):
@@ -41,7 +50,7 @@ def correctTrips(correctionFileName):
     with open(correctionFileName, 'rb') as correctionFile:
         correctionReader = csv.reader(CommentedFile(correctionFile))
         for correction in correctionReader:
-            print correction
+            print(correction)
             # We need to format the fields correctly
             tripId = correction[0]
             sectionId = int(correction[1])
@@ -56,7 +65,7 @@ if __name__ == '__main__':
     import sys
 
     if len(sys.argv) != 2:
-        print "usage: correct_modes <correction file>"
+        print("usage: correct_modes <correction file>")
         exit(1)
 
     correctTrips(sys.argv[1])

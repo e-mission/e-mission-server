@@ -1,4 +1,12 @@
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from past.utils import old_div
 import logging
 from datetime import datetime, timedelta
 from uuid import UUID
@@ -18,14 +26,14 @@ carbonFootprintForMode = {'walking' : 0,
                           'running' : 0,
                           'cycling' : 0,
                             'mixed' : 0,
-                        'bus_short' : 267.0/1609,
-                         'bus_long' : 267.0/1609,
-                      'train_short' : 92.0/1609,
-                       'train_long' : 92.0/1609,
-                        'car_short' : 278.0/1609,
-                         'car_long' : 278.0/1609,
-                        'air_short' : 217.0/1609,
-                         'air_long' : 217.0/1609
+                        'bus_short' : old_div(267.0,1609),
+                         'bus_long' : old_div(267.0,1609),
+                      'train_short' : old_div(92.0,1609),
+                       'train_long' : old_div(92.0,1609),
+                        'car_short' : old_div(278.0,1609),
+                         'car_long' : old_div(278.0,1609),
+                        'air_short' : old_div(217.0,1609),
+                         'air_long' : old_div(217.0,1609)
                       }
 
 # TODO: What should the optimal carbon footprint for air travel be?  One option
@@ -38,13 +46,13 @@ optimalCarbonFootprintForMode = {'walking' : 0,
                                  'cycling' : 0,
                                    'mixed' : 0,
                                'bus_short' : 0,
-                                'bus_long' : 92.0/1609,
+                                'bus_long' : old_div(92.0,1609),
                              'train_short' : 0,
-                              'train_long' : 92.0/1609,
+                              'train_long' : old_div(92.0,1609),
                                'car_short' : 0,
-                                'car_long' : 92.0/1609,
-                               'air_short' : 92.0/1609,
-                                'air_long' : 217.0/1609
+                                'car_long' : old_div(92.0,1609),
+                               'air_short' : old_div(92.0,1609),
+                                'air_long' : old_div(217.0,1609)
                             }
 
 # TODO: We need to figure out whether to pass in mode or modeID
@@ -59,7 +67,7 @@ def getCarbonFootprintsForMap(modeDistanceMap, carbonFootprintMap):
   modeFootprintMap = {}
   for modeName in modeDistanceMap:
     # logging.debug("Consider mode with name %s" % modeName)
-    carbonForMode = float(carbonFootprintMap[modeName] * modeDistanceMap[modeName])/1000
+    carbonForMode = old_div(float(carbonFootprintMap[modeName] * modeDistanceMap[modeName]),1000)
     # logging.debug("carbonForMode %s = %s from %s * %s" % 
     #     (modeName, carbonForMode, carbonFootprintMap[modeName], modeDistanceMap[modeName]))
     modeFootprintMap[modeName] = carbonForMode
@@ -206,7 +214,7 @@ def getSummaryAllTrips(start,end):
     nUsers = 1
   sumModeCarbonFootprint = sum(totalModeCarbonFootprint.values())
   sumOptimalCarbonFootprint = sum(totalOptimalCarbonFootprint.values())
-  sumModeShareDistance = sum(totalShortLongModeShareDistance.values())/1000
+  sumModeShareDistance = old_div(sum(totalShortLongModeShareDistance.values()),1000)
 
   # We need to calculate the sums before we delete certain modes from the mode share dict
   delLongMotorizedModes(totalShortLongModeShareDistance)
@@ -219,11 +227,11 @@ def getSummaryAllTrips(start,end):
         totalShortLongModeShareDistance,
         optimalCarbonFootprintForMode)
   return {
-          "current": float(sumModeCarbonFootprint)/nUsers,
-          "optimal": float(sumOptimalCarbonFootprint)/nUsers,
-          "current no air": float(sum(totalModeCarbonFootprintNoLongMotorized.values()))/nUsers,
-          "optimal no air": float(sum(totalOptimalCarbonFootprintNoLongMotorized.values()))/nUsers,
-          "all drive": float((sumModeShareDistance * carbonFootprintForMode['car_short']))/nUsers,
+          "current": old_div(float(sumModeCarbonFootprint),nUsers),
+          "optimal": old_div(float(sumOptimalCarbonFootprint),nUsers),
+          "current no air": old_div(float(sum(totalModeCarbonFootprintNoLongMotorized.values())),nUsers),
+          "optimal no air": old_div(float(sum(totalOptimalCarbonFootprintNoLongMotorized.values())),nUsers),
+          "all drive": old_div(float((sumModeShareDistance * carbonFootprintForMode['car_short'])),nUsers),
           "SB375 mandate for 2035": 40.142892,
           "EO 2050 goal (80% below 1990)": 8.28565
          }
@@ -232,5 +240,5 @@ def getAllDrive(user_uuid, modeDistanceMap):
   assert(not isinstance(user_uuid, User))
   user = User.fromUUID(user_uuid)
   myCarbonFootprintForMode = user.getCarbonFootprintForMode()
-  totalDistance = sum(modeDistanceMap.values()) / 1000
+  totalDistance = old_div(sum(modeDistanceMap.values()), 1000)
   return totalDistance * myCarbonFootprintForMode['car_short']

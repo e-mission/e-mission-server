@@ -1,4 +1,12 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 #Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
 import unittest
 import json
 import logging
@@ -101,8 +109,8 @@ class TestPipeline(unittest.TestCase):
     self.testGenerateBusAndTrainStops()
 
     (self.pipeline.featureMatrix, self.pipeline.resultVector) = self.pipeline.generateFeatureMatrixAndResultVectorStep()
-    print "Number of sections = %s" % self.pipeline.confirmedSections.count()
-    print "Feature Matrix shape = %s" % str(self.pipeline.featureMatrix.shape)
+    print("Number of sections = %s" % self.pipeline.confirmedSections.count())
+    print("Feature Matrix shape = %s" % str(self.pipeline.featureMatrix.shape))
     self.assertEquals(self.pipeline.featureMatrix.shape[0], self.pipeline.confirmedSections.count())
     self.assertEquals(self.pipeline.featureMatrix.shape[1], len(self.pipeline.featureLabels))
 
@@ -235,8 +243,9 @@ class TestPipeline(unittest.TestCase):
     # set instead, which fails because there is no backup. So let's copy data from
     # the main DB to the backup DB to make this test pass
     from pymongo import MongoClient
-    MongoClient('localhost').drop_database("Backup_database")
-    MongoClient('localhost').copy_database("Stage_database","Backup_database","localhost")
+    client = MongoClient('localhost')
+    client.drop_database("Backup_database")
+    client.admin.command("copydb", fromdb="Stage_database", todb="Backup_database")
     self.pipeline.runPipeline()
 
     # Checks are largely the same as above

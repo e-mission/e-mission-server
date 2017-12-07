@@ -1,5 +1,12 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 # Exports all data for the particular user for the particular day
 # Used for debugging issues with trip and section generation 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import sys
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -21,13 +28,13 @@ def export_timeline(user_id_str, start_day_str, end_day_str, file_name):
     # TODO: Convert to call to get_timeseries once we get that working
     # Or should we even do that?
     query = {'user_id': uuid.UUID(user_id_str), 'start_local_dt': {'$gt': start_day_dt, "$lt": end_day_dt}}
-    print "query = %s" % query
+    print("query = %s" % query)
     entry_list = list(edb.get_analysis_timeseries_db().find(query))
     logging.info("Found %d entries" % len(entry_list))
     json.dump(entry_list, open(file_name, "w"), default=bju.default, allow_nan=False, indent=4)
 
 if __name__ == '__main__':
     if len(sys.argv) != 5:
-        print "Usage: %s <user> <start_day> <end_day> <file>" % (sys.argv[0])
+        print("Usage: %s <user> <start_day> <end_day> <file>" % (sys.argv[0]))
     else:
         export_timeline(user_id_str=sys.argv[1], start_day_str=sys.argv[2], end_day_str=sys.argv[3], file_name=sys.argv[4])

@@ -1,3 +1,14 @@
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import *
+from past.utils import old_div
+from builtins import object
 import emission.simulation.markov_model_counter as emmc
 import emission.net.ext_service.otp.otp as otp
 import emission.net.ext_service.geocoder.nominatim as geo
@@ -9,7 +20,7 @@ import emission.core.get_database as edb
 import datetime
 import random
 import math
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import json
 import heapq
 import time
@@ -24,7 +35,7 @@ key_file = open("conf/net/ext_service/googlemaps.json")
 GOOGLE_MAPS_KEY = json.load(key_file)["api_key"]
 
 
-class UserBase:
+class UserBase(object):
 
     """ 
     Stores all the users and stores the population of areas  
@@ -50,19 +61,19 @@ class UserBase:
     def geocode_with_cache(self, place):
         coder = geo.Geocoder()
         if place in self.geocode_cache:
-            print self.geocode_cache[place]
+            print(self.geocode_cache[place])
             return self.geocode_cache[place]
         else:
             coded = coder.geocode(place)
             self.geocode_cache[place] = coded
-            print coded
+            print(coded)
             return coded
 
 
 the_base = UserBase()
 
 
-class CampusTrip:
+class CampusTrip(object):
 
     def __init__(self, score_list, time_duration, points, source):
         self.time = score_list[0] 
@@ -70,7 +81,7 @@ class CampusTrip:
         self.beauty = score_list[2]
         self.social = score_list[3]
         self.tot_score = sum(score_list)
-        self.time_duration = time_duration / float(60)
+        self.time_duration = old_div(time_duration, float(60))
         self.points = points
         self.source = source
 
@@ -100,7 +111,7 @@ class CampusTrip:
         return self.make_points() == other.make_points()
 
 
-class UserModel:
+class UserModel(object):
 
     """ 
     User Model class  
@@ -177,7 +188,7 @@ class UserModel:
         crowd_score = 0
         lst_of_points = get_route(trip)
 
-        for crowd in self.user_base.crowd_areas.itervalues():
+        for crowd in self.user_base.crowd_areas.values():
             crowd.update_times(trip.start_time)
             crowd_score += crowd.get_crowd()
 
@@ -187,7 +198,7 @@ class UserModel:
         final_crowd = (self.utilities['social']*crowd_score)
 
         final_score_tuple = (final_time, final_sweat, final_beauty, final_crowd)
-        print "final_score_tuple : %s" % str(final_score_tuple)
+        print("final_score_tuple : %s" % str(final_score_tuple))
         return CampusTrip(final_score_tuple, get_time_of_trip(trip), lst_of_points, "source")
         
 
@@ -247,7 +258,7 @@ def get_normalized_times(lst_of_trips):
 
 def get_sweat_factor(trip, testing=False):
     chng = get_elevation_change(trip, testing)
-    print "chng : %s" % str(chng)
+    print("chng : %s" % str(chng))
     return 71.112*chng[0] + 148.09
 
 def get_normalized_sweat(lst_of_trips, testing=False):
@@ -255,7 +266,7 @@ def get_normalized_sweat(lst_of_trips, testing=False):
     i = 0
     for trip in lst_of_trips:
         factor = get_sweat_factor(trip, testing)
-        print "sweat_factor : %s" % factor
+        print("sweat_factor : %s" % factor)
         counter[i] = factor
         i += 1
     counter.normalize()
@@ -269,7 +280,7 @@ def get_normalized_beauty(lst_of_trips):
     i = 0
     for trip in lst_of_trips:
         factor = get_beauty_score_of_trip(trip)
-        print "beauty_factor : %s" % factor
+        print("beauty_factor : %s" % factor)
         counter[i] = factor
         i += 1
     counter.normalize()
@@ -279,7 +290,7 @@ def get_normalized_beauty(lst_of_trips):
     return to_return
 
 
-class Area:
+class Area(object):
 
     """ Area class """ 
 
@@ -309,7 +320,7 @@ class Area:
 
     def normalize_sounds(self):
         counter = emmc.Counter()
-        for k,v in self.time_to_noise.iteritems():
+        for k,v in self.time_to_noise.items():
             counter[k] = v
         counter.normalize()
         self.time_to_noise = counter
@@ -367,7 +378,7 @@ def get_noise_score(lat, lng, noises, time):
     return .5 ## if point isnt in any mapped area return the average
 
 def get_closest(time, area):
-    for k, v in area.time_to_noise.iteritems():
+    for k, v in area.time_to_noise.items():
         if time - k < datetime.timedelta(minutes=10):
             return v
     return 0
@@ -379,7 +390,7 @@ def get_beauty_score(lat, lng, beauties):
         tot += beauty_area.beauty
         if beauty_area.point_in_area(lat, lng):
             return beauty_area.beauty
-    return float(tot) / float(len(beauties)) ## if point isnt in any mapped area return the average
+    return old_div(float(tot), float(len(beauties))) ## if point isnt in any mapped area return the average
 
 
 def get_beauty_score_of_trip(trip):
@@ -390,7 +401,7 @@ def get_beauty_score_of_trip(trip):
         for point in section.points:
             tot_points += 1
             beauty_score += get_beauty_score(point.get_lat(), point.get_lon(), beauties)
-    return float(beauty_score) / float(tot_points) 
+    return old_div(float(beauty_score), float(tot_points)) 
 
 
 def get_noise_score_of_trip(trip):
@@ -400,7 +411,7 @@ def get_noise_score_of_trip(trip):
         for point in section.points:
             tot_points += 1
             noise_score += get_noise_score(point.get_lat(), point.get_lon(), noises)
-    return float(beauty_score) / float(tot_points) 
+    return old_div(float(beauty_score), float(tot_points)) 
 
 
 
@@ -441,13 +452,13 @@ def get_one_random_point_in_radius(crd, radius):
     t = 2 * math.pi * v
     x = w * math.cos(t)
     y = w * math.sin(t)
-    x = float(x) / float(math.cos(y_0)) # To account for Earth curvature stuff
+    x = old_div(float(x), float(math.cos(y_0))) # To account for Earth curvature stuff
     to_return = to.Coordinate(y + y_0, x + x_0)
     return to_return
 
 def kilometers_to_degrees(km):
     ## From stackexchnage mentioned above 
-    return (float(km)/float(40000)) * 360
+    return (old_div(float(km),float(40000))) * 360
 
 
 def str_time_to_datetme(str_time):
@@ -465,19 +476,19 @@ def make_user_from_jsn(jsn, base):
     end = base.geocode_with_cache(end)
     
     time_info = {}
-    print value_line
+    print(value_line)
     if value_line[2] == "leaveNow":
         time_info["leave"] = True
         time_info["when"] = datetime.datetime.now()
-        print "leaveNow"
+        print("leaveNow")
     elif value_line[2] == "leaveAt":
         time_info["leave"] = True
         time_info["when"] = str_time_to_datetme(value_line[3])
-        print "leaveAt"
+        print("leaveAt")
     elif value_line[2] == "thereBy":
         time_info["leave"] = False
         time_info["when"] = str_time_to_datetme(value_line[3])
-        print "arriveAt"
+        print("arriveAt")
 
     bike = get_bike_info(value_line[4])
     user = UserModel(bike)
@@ -487,7 +498,7 @@ def make_user_from_jsn(jsn, base):
     user.increase_utility_by_n("social", int(value_line[8]))
 
     user.utilities.normalize()
-    print "utilities : %s" % user.utilities
+    print("utilities : %s" % user.utilities)
 
     return {"user" : user, "start" : start, "end" : end, "time_info" : time_info}
 
@@ -505,7 +516,7 @@ def get_elevation_change(trip, testing=False):
         return (up, down)
     time.sleep(1) # so we dont run out calls
     c = gmaps.client.Client(GOOGLE_MAPS_KEY)
-    print get_route(trip)
+    print(get_route(trip))
     jsn = gmaps.elevation.elevation_along_path(c, get_route(trip), 200)
     up, down = 0, 0
     prev = None

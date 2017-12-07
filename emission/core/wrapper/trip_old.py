@@ -1,6 +1,16 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 #maps team provided get_cost function
 
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import *
+from builtins import object
 import datetime
 import sys
 import os
@@ -178,7 +188,7 @@ class Section(object):
                 coord_json = json_segment[coord_key]["coordinates"]
                 return Coordinate(coord_json[1], coord_json[0])
             else:
-                logging.warn("Unable to get coordinates from key %s in segment %s " % (coord_key, json_segment))
+                logging.warning("Unable to get coordinates from key %s in segment %s " % (coord_key, json_segment))
                 return None
         else:
             return None
@@ -285,7 +295,7 @@ class E_Mission_Trip(Trip):
             "trip_end_location": alternative.trip_end_location.coordinate_list(),
             "mode_list": alternative.mode_list,
             "track_points": alternative.track_points}
-        print "recommending"
+        print("recommending")
         result = db.update({"trip_id": self.trip_id, "user_id": self.user_id},
                       {"$set": {"recommended_alternative" : alternative_json}},
                        upsert=False,multi=False)
@@ -295,7 +305,7 @@ class E_Mission_Trip(Trip):
         result = db.update({"_id": self._id},
                       {"$set": {"mode" : self.mode_list, "confirmed_mode" : self.confirmed_mode_list}},
                        upsert=False,multi=False)
-        print result
+        print(result)
         if not result["updatedExisting"]:
             self._create_new(db)
         self._save_alternatives(self.alternatives)
@@ -349,7 +359,7 @@ class Fake_Trip(Trip):
 
     def save_to_db(self):
         db = edb.get_fake_trips_db()
-        db.insert({"_id": self._id, "user_id": self.user_id, "trip_id": self.trip_id, "sections": range(len(self.sections)), "trip_start_datetime": self.start_time,
+        db.insert({"_id": self._id, "user_id": self.user_id, "trip_id": self.trip_id, "sections": list(range(len(self.sections))), "trip_start_datetime": self.start_time,
                 "trip_end_datetime": self.end_time, "trip_start_location": self.trip_start_location.coordinate_list(), 
                 "trip_end_location": self.trip_end_location.coordinate_list(), "mode_list": self.mode_list})
 
@@ -413,7 +423,7 @@ class Canonical_E_Mission_Trip(E_Mission_Trip):
                 {"$set": {"start_point_distr" : self.start_point_distr, "end_point_distr" : self.end_point_distr, "start_time_distr": self.start_time_distr,
                     "end_time_distr": self.end_time_distr}},
                        upsert=False,multi=False)
-        print result
+        print(result)
         if not result["updatedExisting"]:
             self._create_new(db)
         self._save_alternatives(self.alternatives)
@@ -462,7 +472,7 @@ class Alternative_Trip(Trip):
             mode_set.add(section.mode)
         if len(mode_set) == 1:
             return mode_set.pop()
-        print mode_list
+        print(mode_list)
         return mode_list
 
     '''

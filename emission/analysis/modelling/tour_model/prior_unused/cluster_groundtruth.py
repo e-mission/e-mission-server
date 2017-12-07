@@ -2,7 +2,14 @@
 Portions of the pipeline related to defining 
 ground truth for clusters
 """
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import os, re
 
 # Our imports
@@ -84,7 +91,7 @@ def update_db_with_clusters(user, infile_path):
     if(gc_db.count() == 0):
         gc_db.insert({"clusters":{}})
     x = gc_db.find_one({"clusters":{"$exists":True}})["clusters"]
-    if(cluster_name in x.keys()):
+    if(cluster_name in list(x.keys())):
         x[cluster_name] += cluster_sids
     else:
         x[cluster_name] = cluster_sids
@@ -105,7 +112,7 @@ def update_db_with_clusters_dict(user, clusters):
     if(gc_db.count() == 0):
         gc_db.insert({"clusters":{}})
     x = gc_db.find_one({"clusters":{"$exists":True}})["clusters"]
-    for name, sections in clusters.items():         
+    for name, sections in list(clusters.items()):         
         x[name] = sections # There is likely better way to merge dictionaries
     gc_db.remove({"clusters":{"$exists":True}})
     gc_db.insert({"clusters":x})

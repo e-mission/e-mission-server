@@ -1,3 +1,11 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
 import logging
 import attrdict as ad
 # This is only to allow us to catch the DuplicateKeyError
@@ -74,7 +82,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
                 time_query.endTs = last_ts_processed
             except Exception as e:
                 # logging.exception("Error while saving entry %s" % entry)
-                logging.warn("Got error %s while saving entry %s -> %s"% (e, entry, unified_entry))
+                logging.warning("Got error %s while saving entry %s -> %s"% (e, entry, unified_entry))
                 try:
                     ts.insert_error(entry_doc)
                 except pymongo.errors.DuplicateKeyError as e:
@@ -186,11 +194,11 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         day_list_bins = self.bin_into_days_by_local_time(trip_gj_list)
         uc = enua.UserCache.getUserCache(self.user_id)
 
-        for day, day_gj_list in day_list_bins.iteritems():
+        for day, day_gj_list in day_list_bins.items():
             logging.debug("Adding %s trips for day %s" % (len(day_gj_list), day))
             uc.putDocument("diary/trips-%s"%day, day_gj_list)
 
-        valid_key_list = ["diary/trips-%s"%day for day in day_list_bins.iterkeys()]
+        valid_key_list = ["diary/trips-%s"%day for day in day_list_bins.keys()]
         self.delete_obsolete_entries(uc, valid_key_list)
 
     def storeCommonTripsToCache(self, time_query):
@@ -303,5 +311,5 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
                 list_for_curr_day.append(trip_gj)
 
         logging.debug("After binning, we have %s bins, of which %s are empty" %
-                      (len(ret_val), len([ds for ds,dl in ret_val.iteritems() if len(dl) == 0])))
+                      (len(ret_val), len([ds for ds,dl in ret_val.items() if len(dl) == 0])))
         return ret_val

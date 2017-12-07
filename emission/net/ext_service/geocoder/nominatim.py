@@ -1,4 +1,12 @@
-import urllib, urllib2
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from builtins import object
+import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
 import logging
 import json
 
@@ -17,7 +25,7 @@ try:
 except:
     logging.exception("nominatim not configured either, place decoding must happen on the client")
 
-class Geocoder:
+class Geocoder(object):
 
     def __init__(self):
         pass
@@ -30,14 +38,14 @@ class Geocoder:
         }
 
         query_url = NOMINATIM_QUERY_URL + "/search?"
-        encoded_params = urllib.urlencode(params)
+        encoded_params = urllib.parse.urlencode(params)
         url = query_url + encoded_params
         return url
 
     @classmethod
     def get_json_geo(cls, address):
-        request = urllib2.Request(cls.make_url_geo(address))
-        response = urllib2.urlopen(request)
+        request = urllib.request.Request(cls.make_url_geo(address))
+        response = urllib.request.urlopen(request)
         jsn = json.loads(response.read())
         return jsn
 
@@ -62,14 +70,14 @@ class Geocoder:
         }
 
         query_url = NOMINATIM_QUERY_URL + "/reverse?"
-        encoded_params = urllib.urlencode(params)
+        encoded_params = urllib.parse.urlencode(params)
         url = query_url + encoded_params
         return url
 
     @classmethod
     def get_json_reverse(cls, lat, lng):
-        request = urllib2.Request(cls.make_url_reverse(lat, lng))
-        response = urllib2.urlopen(request)
+        request = urllib.request.Request(cls.make_url_reverse(lat, lng))
+        response = urllib.request.urlopen(request)
         parsed_response = json.loads(response.read())
         logging.debug("parsed_response = %s" % parsed_response)
         return parsed_response

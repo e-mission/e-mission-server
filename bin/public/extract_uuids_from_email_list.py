@@ -1,5 +1,13 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 # Exports all data for the particular user for the particular day
 # Used for debugging issues with trip and section generation 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
 import sys
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -13,7 +21,7 @@ import emission.core.wrapper.user as ecwu
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
-        print "Usage: %s user_email_file user_id_file"
+        print("Usage: %s user_email_file user_id_file")
     else:
         user_email_filename = sys.argv[1]
         uuid_filename = sys.argv[2]

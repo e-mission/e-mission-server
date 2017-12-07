@@ -1,3 +1,11 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
 import emission.core.get_database as edb
 import bson.json_util as bju
 import requests
@@ -18,7 +26,7 @@ def request_data(server_url, from_ts, to_ts, phone_ids, debug):
     phone_list = dic['phone_data']
 
     if phone_list == None:
-        print "Requested amount of data exceeds the threshold value."
+        print("Requested amount of data exceeds the threshold value.")
     else:
         # Load data to the local server
         tsdb = edb.get_timeseries_db()
@@ -37,7 +45,7 @@ def request_data(server_url, from_ts, to_ts, phone_ids, debug):
                 logging.debug("saving %d entries" % len(entry_list))
 
             for entry in entry_list:
-                tsdb.save(entry)
+                edb.save(tsdb, entry)
 
 
 # Request data in 5hr-long chunks
@@ -49,4 +57,4 @@ def request_batched_data(server_url, from_ts, to_ts, phone_ids):
         request_data(server_url, t1, t2, phone_ids, debug)
         t1 = t2
         debug = False
-    print "Data loaded to local server!"
+    print("Data loaded to local server!")

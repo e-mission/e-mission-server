@@ -1,4 +1,11 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import json
 import logging
 import numpy as np
@@ -30,7 +37,7 @@ def find_consecutive_runs(array):
     cons_runs.append(curr_run)
     return cons_runs
 
-get_numerator = lambda(arr) : np.sum(arr[np.nonzero(arr > 1)])
+get_numerator = lambda arr : np.sum(arr[np.nonzero(arr > 1)])
 
 def convert_to_run_lengths(removed_pt_dict):
     removed_runs_dict = {}
@@ -40,7 +47,7 @@ def convert_to_run_lengths(removed_pt_dict):
     max_run_length_list = []
     pct_removed_in_long_runs = []
 
-    for (sid, removed_pt_list) in removed_pt_dict.iteritems():
+    for (sid, removed_pt_list) in removed_pt_dict.items():
         curr_run_list = find_consecutive_runs(removed_pt_list)
         removed_runs_dict[sid] = curr_run_list
         sid_list.append(sid)

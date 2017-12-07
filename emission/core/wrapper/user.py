@@ -1,13 +1,22 @@
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from builtins import object
+from past.utils import old_div
 import json
 import logging
 
 # Our imports
 from emission.core.get_database import get_profile_db, get_pending_signup_db, get_uuid_db
 
-defaultCarFootprint = 278.0/1609
-defaultMpg = 8.91/(1.6093 * defaultCarFootprint) # Should be roughly 32
+defaultCarFootprint = old_div(278.0,1609)
+defaultMpg = old_div(8.91,(1.6093 * defaultCarFootprint)) # Should be roughly 32
 
-class User:
+class User(object):
   def __init__(self, uuid):
     self.uuid = uuid
     # TODO: Read this from a file instead
@@ -56,8 +65,8 @@ class User:
     total = 0
     for mpg in mpg_array:
       total += mpg
-    avg = total/len(mpg_array)
-    print "Returning total = %s, len = %s, avg = %s" % (total, len(mpg_array), avg)
+    avg = old_div(total,len(mpg_array))
+    print("Returning total = %s, len = %s, avg = %s" % (total, len(mpg_array), avg))
     return avg
 
   # Stores Array of MPGs of all the cars the user drives.
@@ -75,19 +84,19 @@ class User:
     #using conversion: 8.91 kg CO2 for one gallon
     #must convert Mpg -> Km, factor of 1000 in denom for g -> kg conversion
     avgMetersPerGallon = self.getAvgMpg()*1.6093
-    car_footprint = (1/avgMetersPerGallon)*8.91
+    car_footprint = (old_div(1,avgMetersPerGallon))*8.91
     modeMap = {'walking' : 0,
                           'running' : 0,
                           'cycling' : 0,
                             'mixed' : 0,
-                        'bus_short' : 267.0/1609,
-                         'bus_long' : 267.0/1609,
-                      'train_short' : 92.0/1609,
-                       'train_long' : 92.0/1609,
+                        'bus_short' : old_div(267.0,1609),
+                         'bus_long' : old_div(267.0,1609),
+                      'train_short' : old_div(92.0,1609),
+                       'train_long' : old_div(92.0,1609),
                         'car_short' : car_footprint,
                          'car_long' : car_footprint,
-                        'air_short' : 217.0/1609,
-                         'air_long' : 217.0/1609
+                        'air_short' : old_div(217.0,1609),
+                         'air_long' : old_div(217.0,1609)
                       }
     return modeMap
 

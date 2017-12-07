@@ -1,4 +1,12 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import next
+from builtins import *
 import unittest
 import traceback
 import json
@@ -152,7 +160,7 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     
   def testAlternativeTripStore(self):
     trip_list = self.pipeline.get_trips_for_alternatives(self.testUUID) 
-    first_trip = trip_list.next()
+    first_trip = next(trip_list)
     self.assertEquals(type(first_trip), ecwt.E_Mission_Trip)
     # alternative_list = pipeline_module.get_alternative_trips(trip_list)
     # for alt in alternative_list:

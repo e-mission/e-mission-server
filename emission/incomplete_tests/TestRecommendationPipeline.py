@@ -1,4 +1,11 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import unittest
 import json
 #from main import tripManager
@@ -33,7 +40,7 @@ class TestRecommendationPipeline(unittest.TestCase):
     get_section_db().remove({"user_id": self.testUUID})
     result = self.loadTestJSON("emission/tests/data/missing_trip")
     collect.processResult(self.testUUID, result)
-    print get_section_db().find().count()
+    print(get_section_db().find().count())
     self.pipeline = RecommendationPipeline()
 
   def tearDown(self):

@@ -67,7 +67,22 @@ number of requests and their responses, so we run a nested loop::
                 if req.close_connection:
                     return
 """
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
 
+from past.builtins import cmp
+from future import standard_library
+standard_library.install_aliases()
+from builtins import next
+from builtins import hex
+from builtins import str
+from builtins import range
+from past.builtins import basestring
+from builtins import *
+from past.utils import old_div
+from builtins import object
 __all__ = ['HTTPRequest', 'HTTPConnection', 'HTTPServer',
            'SizeCheckWrapper', 'KnownLengthRFile', 'ChunkedRFile',
            'CP_fileobject',
@@ -78,10 +93,11 @@ __all__ = ['HTTPRequest', 'HTTPConnection', 'HTTPServer',
            'WSGIPathInfoDispatcher', 'get_ssl_adapter_class']
 
 import os
+from functools import reduce
 try:
     import queue
 except:
-    import Queue as queue
+    import queue as queue
 import re
 import rfc822
 import socket
@@ -89,9 +105,9 @@ import sys
 if 'win' in sys.platform and not hasattr(socket, 'IPPROTO_IPV6'):
     socket.IPPROTO_IPV6 = 41
 try:
-    import cStringIO as StringIO
+    import io as StringIO
 except ImportError:
-    import StringIO
+    import io
 DEFAULT_BUFFER_SIZE = -1
 
 _fileobject_uses_str_type = isinstance(socket._fileobject(None)._rbuf, basestring)
@@ -109,7 +125,7 @@ def format_exc(limit=None):
 
 import operator
 
-from urllib import unquote
+from urllib.parse import unquote
 import warnings
 
 if sys.version_info >= (3, 0):
@@ -122,7 +138,7 @@ if sys.version_info >= (3, 0):
         return n.encode(encoding)
 else:
     bytestr = str
-    unicodestr = unicode
+    unicodestr = str
     basestring = basestring
     def ntob(n, encoding='ISO-8859-1'):
         """Return the given native string as a byte string in the given encoding."""
@@ -304,8 +320,8 @@ class SizeCheckWrapper(object):
         self._check_length()
         return data
 
-    def next(self):
-        data = self.rfile.next()
+    def __next__(self):
+        data = next(self.rfile)
         self.bytes_read += len(data)
         self._check_length()
         return data
@@ -969,7 +985,7 @@ class CP_fileobject(socket._fileobject):
             try:
                 bytes_sent = self.send(data)
                 data = data[bytes_sent:]
-            except socket.error, e:
+            except socket.error as e:
                 if e.args[0] not in socket_errors_nonblocking:
                     raise
 
@@ -990,7 +1006,7 @@ class CP_fileobject(socket._fileobject):
                 data = self._sock.recv(size)
                 self.bytes_read += len(data)
                 return data
-            except socket.error, e:
+            except socket.error as e:
                 if (e.args[0] not in socket_errors_nonblocking
                     and e.args[0] not in socket_error_eintr):
                     raise
@@ -1008,7 +1024,7 @@ class CP_fileobject(socket._fileobject):
             buf.seek(0, 2)  # seek end
             if size < 0:
                 # Read until EOF
-                self._rbuf = StringIO.StringIO()  # reset _rbuf.  we consume it via buf.
+                self._rbuf = io.StringIO()  # reset _rbuf.  we consume it via buf.
                 while True:
                     data = self.recv(rbufsize)
                     if not data:
@@ -1022,11 +1038,11 @@ class CP_fileobject(socket._fileobject):
                     # Already have size bytes in our buffer?  Extract and return.
                     buf.seek(0)
                     rv = buf.read(size)
-                    self._rbuf = StringIO.StringIO()
+                    self._rbuf = io.StringIO()
                     self._rbuf.write(buf.read())
                     return rv
 
-                self._rbuf = StringIO.StringIO()  # reset _rbuf.  we consume it via buf.
+                self._rbuf = io.StringIO()  # reset _rbuf.  we consume it via buf.
                 while True:
                     left = size - buf_len
                     # recv() will malloc the amount of memory given as its
@@ -1064,7 +1080,7 @@ class CP_fileobject(socket._fileobject):
                 buf.seek(0)
                 bline = buf.readline(size)
                 if bline.endswith('\n') or len(bline) == size:
-                    self._rbuf = StringIO.StringIO()
+                    self._rbuf = io.StringIO()
                     self._rbuf.write(buf.read())
                     return bline
                 del bline
@@ -1074,7 +1090,7 @@ class CP_fileobject(socket._fileobject):
                     # Speed up unbuffered case
                     buf.seek(0)
                     buffers = [buf.read()]
-                    self._rbuf = StringIO.StringIO()  # reset _rbuf.  we consume it via buf.
+                    self._rbuf = io.StringIO()  # reset _rbuf.  we consume it via buf.
                     data = None
                     recv = self.recv
                     while data != "\n":
@@ -1085,7 +1101,7 @@ class CP_fileobject(socket._fileobject):
                     return "".join(buffers)
 
                 buf.seek(0, 2)  # seek end
-                self._rbuf = StringIO.StringIO()  # reset _rbuf.  we consume it via buf.
+                self._rbuf = io.StringIO()  # reset _rbuf.  we consume it via buf.
                 while True:
                     data = self.recv(self._rbufsize)
                     if not data:
@@ -1106,10 +1122,10 @@ class CP_fileobject(socket._fileobject):
                 if buf_len >= size:
                     buf.seek(0)
                     rv = buf.read(size)
-                    self._rbuf = StringIO.StringIO()
+                    self._rbuf = io.StringIO()
                     self._rbuf.write(buf.read())
                     return rv
-                self._rbuf = StringIO.StringIO()  # reset _rbuf.  we consume it via buf.
+                self._rbuf = io.StringIO()  # reset _rbuf.  we consume it via buf.
                 while True:
                     data = self.recv(self._rbufsize)
                     if not data:
@@ -1424,8 +1440,8 @@ class WorkerThread(threading.Thread):
             'Bytes Read': lambda s: self.bytes_read + ((self.start_time is None) and trueyzero or self.conn.rfile.bytes_read),
             'Bytes Written': lambda s: self.bytes_written + ((self.start_time is None) and trueyzero or self.conn.wfile.bytes_written),
             'Work Time': lambda s: self.work_time + ((self.start_time is None) and trueyzero or time.time() - self.start_time),
-            'Read Throughput': lambda s: s['Bytes Read'](s) / (s['Work Time'](s) or 1e-6),
-            'Write Throughput': lambda s: s['Bytes Written'](s) / (s['Work Time'](s) or 1e-6),
+            'Read Throughput': lambda s: old_div(s['Bytes Read'](s), (s['Work Time'](s) or 1e-6)),
+            'Write Throughput': lambda s: old_div(s['Bytes Written'](s), (s['Work Time'](s) or 1e-6)),
         }
         threading.Thread.__init__(self)
 
@@ -1707,25 +1723,25 @@ class HTTPServer(object):
             'Bind Address': lambda s: repr(self.bind_addr),
             'Run time': lambda s: (not s['Enabled']) and -1 or self.runtime(),
             'Accepts': 0,
-            'Accepts/sec': lambda s: s['Accepts'] / self.runtime(),
+            'Accepts/sec': lambda s: old_div(s['Accepts'], self.runtime()),
             'Queue': lambda s: getattr(self.requests, "qsize", None),
             'Threads': lambda s: len(getattr(self.requests, "_threads", [])),
             'Threads Idle': lambda s: getattr(self.requests, "idle", None),
             'Socket Errors': 0,
             'Requests': lambda s: (not s['Enabled']) and -1 or sum([w['Requests'](w) for w
-                                       in s['Worker Threads'].values()], 0),
+                                       in list(s['Worker Threads'].values())], 0),
             'Bytes Read': lambda s: (not s['Enabled']) and -1 or sum([w['Bytes Read'](w) for w
-                                         in s['Worker Threads'].values()], 0),
+                                         in list(s['Worker Threads'].values())], 0),
             'Bytes Written': lambda s: (not s['Enabled']) and -1 or sum([w['Bytes Written'](w) for w
-                                            in s['Worker Threads'].values()], 0),
+                                            in list(s['Worker Threads'].values())], 0),
             'Work Time': lambda s: (not s['Enabled']) and -1 or sum([w['Work Time'](w) for w
-                                         in s['Worker Threads'].values()], 0),
+                                         in list(s['Worker Threads'].values())], 0),
             'Read Throughput': lambda s: (not s['Enabled']) and -1 or sum(
-                [w['Bytes Read'](w) / (w['Work Time'](w) or 1e-6)
-                 for w in s['Worker Threads'].values()], 0),
+                [old_div(w['Bytes Read'](w), (w['Work Time'](w) or 1e-6))
+                 for w in list(s['Worker Threads'].values())], 0),
             'Write Throughput': lambda s: (not s['Enabled']) and -1 or sum(
-                [w['Bytes Written'](w) / (w['Work Time'](w) or 1e-6)
-                 for w in s['Worker Threads'].values()], 0),
+                [old_div(w['Bytes Written'](w), (w['Work Time'](w) or 1e-6))
+                 for w in list(s['Worker Threads'].values())], 0),
             'Worker Threads': {},
             }
         logging.statistics["CherryPy HTTPServer %d" % id(self)] = self.stats
@@ -2253,7 +2269,7 @@ class WSGIGateway_10(WSGIGateway):
             env["SERVER_PORT"] = str(req.server.bind_addr[1])
 
         # Request headers
-        for k, v in req.inheaders.iteritems():
+        for k, v in req.inheaders.items():
             env["HTTP_" + k.upper().replace("-", "_")] = v
 
         # CONTENT_TYPE/CONTENT_LENGTH
@@ -2281,7 +2297,7 @@ class WSGIGateway_u0(WSGIGateway_10):
         """Return a new environ dict targeting the given wsgi.version"""
         req = self.req
         env_10 = WSGIGateway_10.get_environ(self)
-        env = dict([(k.decode('ISO-8859-1'), v) for k, v in env_10.iteritems()])
+        env = dict([(k.decode('ISO-8859-1'), v) for k, v in env_10.items()])
         env[u'wsgi.version'] = ('u', 0)
 
         # Request-URI

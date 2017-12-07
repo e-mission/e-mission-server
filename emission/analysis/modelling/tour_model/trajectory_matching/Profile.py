@@ -1,4 +1,12 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import *
 __author__ = 'Yin'
 import logging
 from pygeocoder import Geocoder
@@ -26,7 +34,7 @@ def update_profiles(dummy_users=False):
         generate_route_clusters(user)
 
 def generate_route_clusters(user):
-    print "In profile, generating route clusters for %s" % user
+    print("In profile, generating route clusters for %s" % user)
     data = cp.read_data(uuid=user)
     data, bins = cp.remove_noise(data, 300)
     num_clusters, labels, data = cp.cluster(data, len(bins))

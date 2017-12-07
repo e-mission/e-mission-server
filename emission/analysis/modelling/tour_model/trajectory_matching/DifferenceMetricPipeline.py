@@ -1,4 +1,13 @@
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
+from past.utils import old_div
 from pymongo import MongoClient
 import pygmaps
 from uuid import UUID
@@ -25,7 +34,7 @@ def getRouteDict(routeDB):
 
 def getDifferenceDict(routeDict, diff_metric = 'DTW'):
     #print 'calculating difference matrix ... '
-    ids = routeDict.keys()
+    ids = list(routeDict.keys())
     differences = {}
     for _id in ids:
         differences[_id] = {}
@@ -87,7 +96,7 @@ def CCR(testClusters, medoids, groundTruthClusters):
             if currCount > maxcount:
                 maxcount = currCount
         count+= maxcount
-    return float(count)/float(N)
+    return old_div(float(count),float(N))
 
 
 if __name__ == '__main__':
@@ -101,12 +110,12 @@ if __name__ == '__main__':
                         ]
 
     K_value_option = 'manual'
-    print '######'
+    print('######')
     for user in usercluster.find():
-        print 'USER ID: ' + str(user['user_id'])
-        print 'NUMBER OF CLUSTERS: '+ str(len(user['clusters']))
-        print 'NUMBER OF SECTIONS: '+ str(user['size'])
-        print '' 
+        print('USER ID: ' + str(user['user_id']))
+        print('NUMBER OF CLUSTERS: '+ str(len(user['clusters'])))
+        print('NUMBER OF SECTIONS: '+ str(user['size']))
+        print('') 
         if user == 'artificialRoutes':
             #ccr = pipeline(groundTruth, routeType, K_medoid.find_centers, diff_metric = difference_metric, K_option = K_value_option)
             ccr = 0
@@ -115,11 +124,11 @@ if __name__ == '__main__':
                 start = time.time()
                 ccr = pipeline(user['clusters'], eamt.kmedoid.find_centers, metric, K_value_option)
                 end = time.time()
-                print '...DIFFERENCE METRIC: ' + metric
-                print '...CLUSTER CORRECTNESS RATE: ' + str(round(ccr,2))
-                print '...PIPELINE TIME ElAPSED: ' + str(round((end - start)*100, 2)) + 'ms'
-                print ''
-        print '######'
+                print('...DIFFERENCE METRIC: ' + metric)
+                print('...CLUSTER CORRECTNESS RATE: ' + str(round(ccr,2)))
+                print('...PIPELINE TIME ElAPSED: ' + str(round((end - start)*100, 2)) + 'ms')
+                print('')
+        print('######')
     
     
 

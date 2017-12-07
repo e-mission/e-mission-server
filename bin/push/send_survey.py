@@ -1,3 +1,10 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import json
 import logging
 import argparse
@@ -35,9 +42,9 @@ if __name__ == '__main__':
     assert (survey_spec["alert_type"] == "survey" or survey_spec["alert_type"] == "notify"), "alert_type = %s, expected 'survey' or 'notify'" % survey_spec["alert_type"]
 
     if args.user_uuid:
-        uuid_list = map(lambda uuid_str: uuid.UUID(uuid_str), args.user_uuid)
+        uuid_list = [uuid.UUID(uuid_str) for uuid_str in args.user_uuid]
     elif args.user_email:
-        uuid_list = map(lambda uuid_str: ecwu.User.fromEmail(uuid_str).uuid, args.user_email)
+        uuid_list = [ecwu.User.fromEmail(uuid_str).uuid for uuid_str in args.user_email]
     else:
         assert args.query_spec is not None
         uuid_list = get_uuid_list_from_spec(args.query_spec)

@@ -1,4 +1,13 @@
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
+from past.utils import old_div
 import logging
 import os, sys
 import math
@@ -95,7 +104,7 @@ def get_user_clusters(user, method, nClusters, is_ground_truth=False):
         routes_user = user_route_data(user,edb.get_section_db())
 
     if nClusters == -1:
-        nClusters = int(math.ceil(len(routes_user)/8) + 1)
+        nClusters = int(math.ceil(old_div(len(routes_user),8)) + 1)
     clusters_user = emkm.kmedoids(routes_user,nClusters,user,method=method)
     #update_user_routeClusters(user,clusters_user[2],method=method)
     return clusters_user
@@ -133,14 +142,14 @@ def plot_cluster_trajectories():
 def plot_mds(clusters, user_disMat, method, user_id, is_ground_truth=False):
     routes_dict = {}
     c = 0
-    for key in user_disMat.keys():
+    for key in list(user_disMat.keys()):
         routes_dict[key] = c
         c += 1
-    num_routes = len(routes_dict.keys())
+    num_routes = len(list(routes_dict.keys()))
     matrix_shape = (num_routes, num_routes) 
 
     similarity_matrix = np.zeros(matrix_shape)
-    for route1 in user_disMat.keys():
+    for route1 in list(user_disMat.keys()):
         for route2 in user_disMat[route1]:
             route1_index = routes_dict[route1]
             route2_index = routes_dict[route2]
@@ -305,7 +314,7 @@ def get_ground_truth_sections(username, section_collection):
     clusters = ground_cluster_collection.find_one({"clusters":{"$exists":True}})["clusters"]
     ground_truth_sections = []
     get_username = lambda x: x[0].split("_")[0]
-    clusters = filter(lambda x: username == get_username(x), clusters.items())
+    clusters = [x for x in list(clusters.items()) if username == get_username(x)]
     for key, section_ids in clusters:
         ground_truth_sections.extend(section_ids)
  

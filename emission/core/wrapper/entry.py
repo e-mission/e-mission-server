@@ -1,3 +1,10 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import logging
 import bson.objectid as boi
 
@@ -79,7 +86,7 @@ class Entry(ecwb.WrapperBase):
   @staticmethod
   def get_dedup_list(key):
       key_class = ecwb.WrapperBase._get_class(Entry._getData2Wrapper()[key])
-      all_keys = key_class.props.keys()
+      all_keys = list(key_class.props.keys())
       valid_keys = [item for item in all_keys if item not in key_class.geojson
                     and item not in key_class.local_dates]
       return valid_keys

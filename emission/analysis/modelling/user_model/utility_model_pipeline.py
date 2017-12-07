@@ -2,20 +2,29 @@
 Construct user utility model or retrieve from database and update with
 augmented trips. Store in database and return the model.
 """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import *
+from builtins import object
 import json
 import logging
 from pymongo.errors import ConnectionFailure
 
 # Our imports
-import user_utility_model
+from . import user_utility_model
 import emission.core.wrapper.tripiterator as ti
-import alternative_trips_module as atm
+from . import alternative_trips_module as atm
 import emission.net.ext_service.gmaps.common as egcm
-import simple_cost_time_mode_model as sctm
+from . import simple_cost_time_mode_model as sctm
 import emission.core.wrapper.trip_old as ecwt
 
-class UtilityModelPipeline:
+class UtilityModelPipeline(object):
     def __init__(self):
         pass
 
@@ -47,7 +56,7 @@ class UtilityModelPipeline:
                 model.store_in_db(user_id)
                 #model2.store_in_db(user_id)
                 return model
-            except Exception, e:
+            except Exception as e:
                 logging.info("Exception %s while building model", e)
                 model = sctm.SimpleCostTimeModeModel()
                 return model
@@ -58,7 +67,7 @@ class UtilityModelPipeline:
             return None
 
     def prepare_feature_vectors(self, trips, alternatives):
-        vector = zip(trips, alternatives)
+        vector = list(zip(trips, alternatives))
         vector = [(trip,alts) for trip, alts in vector if alts]
         return vector
 
@@ -78,7 +87,7 @@ class UtilityModelPipeline:
             try:
                 training_real_trips = self.get_training_trips(user_uuid)
                 userModel = self.build_user_model(user_uuid, training_real_trips)
-            except ConnectionFailure, e:
+            except ConnectionFailure as e:
                 logging.error("Found error %s!, skipping user %s" % (e, user_uuid))
 
 if __name__ == "__main__":
