@@ -1,4 +1,6 @@
-name: py36
+name: emission
+channels:
+- defaults
 dependencies:
 - _license=1.1=py36_1
 - alabaster=0.7.10=py36_0
@@ -221,4 +223,4 @@ dependencies:
   - urllib3==1.22
   - utm==0.4.2
   - xmltodict==0.11.0
-
+prefix: /Users/shankari/OSS/anaconda/envs/emission
