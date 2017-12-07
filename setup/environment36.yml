@@ -8,8 +8,6 @@ dependencies:
 - anaconda-client=1.6.3=py36_0
 - anaconda-navigator=1.6.2=py36_0
 - anaconda-project=0.6.0=py36_0
-- appnope=0.1.0=py36_0
-- appscript=1.0.1=py36_0
 - asn1crypto=0.22.0=py36_0
 - astroid=1.4.9=py36_0
 - astropy=1.3.2=np112py36_0
@@ -130,17 +128,16 @@ dependencies:
 - pyodbc=4.0.16=py36_0
 - pyopenssl=17.0.0=py36_0
 - pyparsing=2.1.4=py36_0
-- pyqt=5.6.0=py36_1
+- pyqt=5.6.0
 - pytables=3.3.0=np112py36_0
 - pytest=3.0.7=py36_0
 - python=3.6.1=2
 - python-dateutil=2.6.0=py36_0
-- python.app=1.2=py36_4
 - pytz=2017.2=py36_0
 - pywavelets=0.5.2=np112py36_0
 - pyyaml=3.12=py36_0
 - pyzmq=16.0.2=py36_0
-- qt=5.6.2=2
+- qt=5.6.2
 - qtawesome=0.4.4=py36_0
 - qtconsole=4.3.0=py36_0
 - qtpy=1.2.1=py36_0
@@ -182,7 +179,6 @@ dependencies:
 - wrapt=1.10.10=py36_0
 - xlrd=1.0.0=py36_0
 - xlsxwriter=0.9.6=py36_0
-- xlwings=0.10.4=py36_0
 - xlwt=1.2.0=py36_0
 - xz=5.2.2=1
 - yaml=0.1.6=0
