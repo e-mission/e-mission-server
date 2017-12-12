@@ -33,7 +33,7 @@ import emission.core.wrapper.trip as ecwt
 
 class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
     def setUp(self):
-        emission.tests.common.dropAllCollections(edb.get_db())
+        emission.tests.common.dropAllCollections(edb._get_current_db())
         self.testUserUUID1 = uuid.uuid4()
         self.testUserUUID2 = uuid.uuid4()
         self.testUserUUIDios = uuid.uuid4()

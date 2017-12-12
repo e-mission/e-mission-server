@@ -25,7 +25,7 @@ import emission.tests.common as etc
 
 class TestUser(unittest.TestCase):
   def setUp(self):
-    etc.dropAllCollections(edb.get_db())
+    etc.dropAllCollections(edb._get_current_db())
 
   def testIsNotRegistered(self):
     self.assertFalse(User.isRegistered('fake@fake.com'))

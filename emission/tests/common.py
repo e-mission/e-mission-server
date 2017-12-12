@@ -15,7 +15,8 @@ import uuid
 import pymongo
 
 # Our imports
-from emission.core.get_database import get_client_db, get_db, get_section_db
+import emission.core.get_database as edb
+from emission.core.get_database import get_client_db, get_section_db
 import emission.core.get_database as edb
 
 import emission.analysis.intake.cleaning.filter_accuracy as eaicf
@@ -61,7 +62,7 @@ def purgeSectionData(Sections, userName):
     Sections.remove({'user_id' : userName})
 
 def loadTable(serverName, tableName, fileName):
-  tableColl = get_db()[tableName]
+  tableColl = edb._get_current_db()[tableName]
   dataJSON = json.load(open(fileName))
   for row in dataJSON:
     tableColl.insert(row)

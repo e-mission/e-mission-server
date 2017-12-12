@@ -16,7 +16,8 @@ import re
 
 # Our imports
 from emission.net.api import Profile
-from emission.core.get_database import get_db, get_mode_db, get_section_db, get_trip_db, get_profile_db
+import emission.core.get_database as edb
+from emission.core.get_database import get_mode_db, get_section_db, get_trip_db, get_profile_db
 from emission.core.wrapper.user import User
 from emission.core.wrapper.client import Client
 import emission.tests.common
@@ -29,7 +30,7 @@ class TestProfile(unittest.TestCase):
 
     # Sometimes, we may have entries left behind in the database if one of the tests failed
     # or threw an exception, so let us start by cleaning up all entries
-    emission.tests.common.dropAllCollections(get_db())
+    emission.tests.common.dropAllCollections(edb._get_current_db())
     self.Profiles = get_profile_db()
     self.assertEquals(self.Profiles.find().count(), 0)
     emission.tests.common.loadTable(self.serverName, "Stage_Profiles", "emission/tests/data/profiles.json")

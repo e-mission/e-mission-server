@@ -30,11 +30,6 @@ def get_mode_db():
     Modes= _get_current_db().Stage_Modes
     return Modes
 
-def get_moves_db():
-    # #current_db = MongoClient('localhost').Stage_database
-    MovesAuth= _get_current_db().Stage_user_moves_access
-    return MovesAuth
-
 def get_habitica_db():
     # #current_db = MongoClient('localhost').Stage_database
     HabiticaAuth= _get_current_db().Stage_user_habitica_access
@@ -98,16 +93,6 @@ def get_groundClusters_db():
     groundClusters= _get_current_db().Stage_groundClusters
     return groundClusters
 
-def get_pending_signup_db():
-    # current_db=MongoClient().Stage_database
-    Pending_signups = _get_current_db().Stage_pending_signups
-    return Pending_signups
-
-def get_worktime_db():
-    # current_db=MongoClient().Stage_database
-    Worktimes= _get_current_db().Stage_Worktime
-    return Worktimes
-
 def get_uuid_db():
     # current_db=MongoClient().Stage_database
     UUIDs = _get_current_db().Stage_uuids
@@ -127,10 +112,6 @@ def get_result_stats_db_backup():
     # current_db=MongoClient().Stage_database
     ResultStats = _get_current_db().Stage_result_stats
     return ResultStats
-
-def get_db():
-    current_db=MongoClient(host).Stage_database
-    return current_db
 
 def get_test_db():
     current_db=MongoClient().Test2

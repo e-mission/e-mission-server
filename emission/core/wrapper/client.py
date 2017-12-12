@@ -24,7 +24,7 @@ import dateutil.parser
 from datetime import datetime
 
 # Our imports
-from emission.core.get_database import get_profile_db, get_client_db, get_pending_signup_db
+from emission.core.get_database import get_profile_db, get_client_db
 
 class Client(object):
   def __init__(self, clientName):

@@ -14,7 +14,8 @@ import numpy as np
 from datetime import datetime, timedelta
 
 # Our imports
-from emission.core.get_database import get_db, get_mode_db, get_section_db
+import emission.core.get_database as edb
+from emission.core.get_database import _get_current_db, get_mode_db, get_section_db
 import emission.analysis.classification.inference.mode as pipeline
 from emission.core.wrapper.user import User
 from emission.core.wrapper.client import Client
@@ -28,7 +29,7 @@ class TestPipeline(unittest.TestCase):
 
     # Sometimes, we may have entries left behind in the database if one of the tests failed
     # or threw an exception, so let us start by cleaning up all entries
-    etc.dropAllCollections(get_db())
+    etc.dropAllCollections(edb._get_current_db())
 
     self.ModesColl = get_mode_db()
     self.assertEquals(self.ModesColl.find().count(), 0)
