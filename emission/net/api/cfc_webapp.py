@@ -338,37 +338,6 @@ def habiticaJoinGroup(group_id):
         logging.info("Aborting call with message %s" % e.message)
         abort(400, e.message)
 
-# Pulling public data from the server
-@get('/eval/publicData/timeseries')
-def getPublicData():
-  ids = request.json['phone_ids']
-  all_uuids = [UUID(id) for id in ids]
-  uuids = [uuid for uuid in all_uuids if uuid in estag.TEST_PHONE_IDS]
-
-  from_ts = request.query.from_ts
-  to_ts = request.query.to_ts
-
-  time_range = estt.TimeQuery("metadata.write_ts", float(from_ts), float(to_ts))
-  time_query = time_range.get_query()
-
-  user_queries = [{'user_id': id} for id in uuids]
-
-  for q in user_queries:
-    q.update(time_query)
-
-  num_entries_ts = [edb.get_timeseries_db().find(q).count() for q in user_queries]
-  num_entries_uc = [edb.get_usercache_db().find(q).count() for q in user_queries]
-  total_entries = sum(num_entries_ts + num_entries_uc)
-  logging.debug("Total entries requested: %d" % total_entries)
-
-  threshold = 200000
-  if total_entries > threshold:
-    data_list = None
-  else:
-    data_list = [esdc.find_entries(u, None, time_range) for u in all_uuids]
-
-  return {'phone_data': data_list}
-
 # Small utilities to make client software easier START
 
 # Redirect to custom URL. $%$%$$ gmail
