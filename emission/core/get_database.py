@@ -9,8 +9,18 @@ from pymongo import MongoClient
 import pymongo
 import os
 import json
+import logging
 
-_current_db = MongoClient('localhost').Stage_database
+try:
+    config_file = open('conf/storage/db.conf')
+except:
+    logging.warning("storage not configured, falling back to sample, default configuration")
+    config_file = open('conf/storage/db.conf.sample')
+
+config_data = json.load(config_file)
+host = config_data["timeseries"]["host"]
+
+_current_db = MongoClient(host).Stage_database
 
 def _get_current_db():
     return _current_db
@@ -119,7 +129,7 @@ def get_result_stats_db_backup():
     return ResultStats
 
 def get_db():
-    current_db=MongoClient('localhost').Stage_database
+    current_db=MongoClient(host).Stage_database
     return current_db
 
 def get_test_db():

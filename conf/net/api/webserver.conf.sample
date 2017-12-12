@@ -12,8 +12,5 @@
     "__comment": "1 hour = 60 min = 60 * 60 sec",
     "timeout" : "3600",
     "auth": "skip"
-  },
-  "database" : {
-    "host" : "localhost"
   }
 }
