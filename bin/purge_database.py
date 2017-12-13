@@ -8,11 +8,11 @@ from builtins import *
 from pymongo import MongoClient
 import json
 import sys
-from emission.core.get_database import get_db, get_section_db
+import emission.core.get_database as edb
 import emission.tests.common as etc
 
 def purgeAllData():
-  db = get_db()
+  db = edb._get_current_db()
   etc.dropAllCollections(db)
 
 if __name__ == '__main__':

@@ -27,15 +27,15 @@ import emission.net.usercache.abstract_usercache as ucauc # ucauc = usercache.ab
 import emission.storage.pipeline_queries as esp
 import emission.storage.timeseries.timequery as estt
 import emission.net.api.usercache as mauc
-from emission.core.get_database import get_db, get_usercache_db
+import emission.core.get_database as edb
 
 class TestBuiltinUserCache(unittest.TestCase):
   def setUp(self):
     self.testUserUUID = uuid.uuid4()
-    emission.tests.common.dropAllCollections(get_db())
+    emission.tests.common.dropAllCollections(edb._get_current_db())
 
   def tearDown(self):
-    emission.tests.common.dropAllCollections(get_db())
+    emission.tests.common.dropAllCollections(edb._get_current_db())
 
   def testPutUserDataForPhone(self):
     uc = ucauc.UserCache.getUserCache(self.testUserUUID)

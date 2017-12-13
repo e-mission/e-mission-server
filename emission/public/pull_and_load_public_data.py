@@ -6,55 +6,65 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import str
 from builtins import *
-import emission.core.get_database as edb
+
 import bson.json_util as bju
 import requests
 import json
 import logging
-
+import arrow
 
 # Request data for the specified phones and time range
-def request_data(server_url, from_ts, to_ts, phone_ids, debug):
-    url = server_url + "/eval/publicData/timeseries?from_ts=" + str(
-        from_ts) + "&to_ts=" + str(to_ts)
-    ids = {'phone_ids': phone_ids}
+def request_data(server_url, from_ts, to_ts, phone_id, key_list, debug):
+    url = server_url + "/datastreams/find_entries/time_type"
+    request_body = {
+        "user": phone_id,
+        "key_list": key_list,
+        "start_time": from_ts,
+        "end_time": to_ts
+    }
     headers = {'Content-Type': 'application/json'}
 
-    r = requests.get(url, data=json.dumps(ids), headers=headers)
+    r = requests.post(url, data=json.dumps(request_body), headers=headers)
+
+    r.raise_for_status()
 
     dic = json.loads(r.text, object_hook=bju.object_hook)
-    phone_list = dic['phone_data']
+    entry_list = dic['phone_data']
 
-    if phone_list == None:
-        print("Requested amount of data exceeds the threshold value.")
-    else:
-        # Load data to the local server
-        tsdb = edb.get_timeseries_db()
+    if debug:
+        logging.debug("first entry (in local time):")
 
-        for index, entry_list in enumerate(phone_list):
-            if debug:
-                logging.debug("phone" + str(
-                    index + 1) + " first entry (in Pacific Time):")
+        if len(entry_list) == 0:
+            logging.debug("...has no data...")
+        else:
+            logging.debug(str(
+                entry_list[0].get('metadata').get('write_fmt_time')))
 
-                if len(entry_list) == 0:
-                    logging.debug("...has no data...")
-                else:
-                    logging.debug(str(
-                        entry_list[0].get('metadata').get('write_fmt_time')))
+    logging.debug("returning %d entries for batch %s (%s) -> %s (%s)" % 
+        (len(entry_list),
+        arrow.get(from_ts).to('local'), from_ts,
+        arrow.get(to_ts).to('local'), to_ts))
 
-                logging.debug("saving %d entries" % len(entry_list))
-
-            for entry in entry_list:
-                edb.save(tsdb, entry)
-
+    return entry_list
 
 # Request data in 5hr-long chunks
-def request_batched_data(server_url, from_ts, to_ts, phone_ids):
+def request_batched_data(server_url, from_ts, to_ts, phone_id, key_list):
+    logging.info("Pulling batched data from %s (%s) -> %s (%s) for phone %s, key_list %s" %
+        (arrow.get(from_ts).to('local'), from_ts,
+         arrow.get(to_ts).to('local'), to_ts,
+         phone_id, key_list))
     t1 = from_ts
     debug = True  # only set to True for the first loop iteration
+    all_entries = []
     while t1 < to_ts:
         t2 = min(t1 + 5 * 60 * 60, to_ts)
-        request_data(server_url, t1, t2, phone_ids, debug)
+        logging.info("Processing batch from %s (%s) -> %s (%s)" %
+            (arrow.get(t1).to('local'), t1,
+             arrow.get(t2).to('local'), t2))
+        curr_batch = request_data(server_url, t1, t2, phone_id, key_list, debug)
+        all_entries.extend(curr_batch)
         t1 = t2
         debug = False
-    print("Data loaded to local server!")
+    logging.info("Returning combined data of size = %s, first entries = %s" %
+        (len(all_entries), all_entries[:3]))
+    return all_entries

@@ -13,7 +13,8 @@ from datetime import datetime, timedelta
 import logging
 
 # Our imports
-from emission.core.get_database import get_db, get_client_db, get_profile_db, get_uuid_db, get_pending_signup_db, get_section_db
+import emission.core.get_database as edb
+from emission.core.get_database import get_client_db, get_profile_db, get_uuid_db, get_section_db
 from emission.core.wrapper.client import Client
 from emission.tests import common
 from emission.core.wrapper.user import User
@@ -24,7 +25,7 @@ class TestClient(unittest.TestCase):
   def setUp(self):
     # Make sure we start with a clean slate every time
     self.serverName = 'localhost'
-    common.dropAllCollections(get_db())
+    common.dropAllCollections(edb._get_current_db())
 
     import shutil
     self.config_path = "conf/clients/testclient.settings.json"

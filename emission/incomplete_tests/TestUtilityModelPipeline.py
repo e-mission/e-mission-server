@@ -14,7 +14,7 @@ import logging
 from datetime import datetime, timedelta
 
 # Our imports
-from emission.core.get_database import get_db, get_mode_db, get_section_db, get_trip_db
+from emission.core.get_database import get_mode_db, get_section_db, get_trip_db
 from emission.analysis.modelling.user_model.utility_model_pipeline import UtilityModelPipeline
 from emission.analysis.modelling.user_model.user_utility_model import UserUtilityModel
 from emission.core.wrapper.user import User

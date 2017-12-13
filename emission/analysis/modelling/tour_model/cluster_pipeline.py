@@ -41,7 +41,6 @@ read from the database.
 
 #read the data from the database. 
 def read_data(uuid=None):
-    db = edb.get_trip_db()
     trips = esda.get_entries(esda.CLEANED_TRIP_KEY, uuid,
                              time_query=None, geo_query=None)
     logging.info("After reading data, returning %s trips" % len(trips))

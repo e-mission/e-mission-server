@@ -10,7 +10,6 @@ import logging
 from uuid import UUID
 
 # Our imports
-from emission.core.get_database import get_section_db,get_profile_db
 import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.decorations.timeline as esdt
