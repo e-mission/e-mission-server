@@ -1,5 +1,5 @@
 {
     "timeseries": {
-        "host": "localhost"
+        "url": "localhost"
     }
 }

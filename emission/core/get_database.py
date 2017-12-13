@@ -18,9 +18,10 @@ except:
     config_file = open('conf/storage/db.conf.sample')
 
 config_data = json.load(config_file)
-host = config_data["timeseries"]["host"]
+url = config_data["timeseries"]["url"]
 
-_current_db = MongoClient(host).Stage_database
+logging.debug("Connecting to database URL "+url)
+_current_db = MongoClient(url).Stage_database
 
 def _get_current_db():
     return _current_db

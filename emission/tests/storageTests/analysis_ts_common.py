@@ -7,7 +7,6 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import *
 import unittest
-import datetime as pydt
 import logging
 import uuid
 import json
