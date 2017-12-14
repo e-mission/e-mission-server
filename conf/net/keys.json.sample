@@ -1,10 +1,4 @@
 {
   "ssl_certificate" : "xxxxx-signed-cert.pem",
   "private_key" : "xxxxx_privkey.key",
-  "moves" : {
-    "client_id": "Get from https://dev.moves-app.com",
-    "client_secret": "Get from https://dev.moves-app.com",
-    "https_redirect_url": "Value registered at https://dev.moves-app.com",
-    "ios_redirect_url": "Value registered at https://dev.moves-app.com"
-  }
 }
