@@ -9,18 +9,17 @@ from pymongo import MongoClient
 import pymongo
 import os
 import json
-import logging
 
 try:
     config_file = open('conf/storage/db.conf')
 except:
-    logging.warning("storage not configured, falling back to sample, default configuration")
+    print("storage not configured, falling back to sample, default configuration")
     config_file = open('conf/storage/db.conf.sample')
 
 config_data = json.load(config_file)
 url = config_data["timeseries"]["url"]
 
-logging.debug("Connecting to database URL "+url)
+print("Connecting to database URL "+url)
 _current_db = MongoClient(url).Stage_database
 
 def _get_current_db():
