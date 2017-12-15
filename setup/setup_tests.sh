@@ -8,6 +8,5 @@ echo "Upgrade with 'conda update conda' from the *root* environment"
 conda env create --prefix ${CONDA_TEMP_PREFIX} --file setup/environment36.yml
 source activate ${CONDA_TEMP_PREFIX}
 pip install six --upgrade
-python bin/deploy/giles_conf.py
 python bin/deploy/habitica_conf.py
 python bin/deploy/push_conf.py
