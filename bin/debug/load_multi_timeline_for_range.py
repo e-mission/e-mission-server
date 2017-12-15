@@ -80,7 +80,7 @@ if __name__ == '__main__':
     parser.add_argument("-i", "--info-only", default=False, action='store_true',
         help="only print entry analysis")
 
-    parser.add_argument("-s", "--batch-size", default=10000,
+    parser.add_argument("-s", "--batch-size", default=10000, type=int,
         help="batch size to use for the entries")
 
     parser.add_argument("-p", "--prefix", default="user",
