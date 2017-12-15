@@ -102,7 +102,8 @@ class SetupDBAuth(object):
           {
             "createUser": RO_USERNAME,
             "pwd": RO_PASSWORD,
-            "roles": [ { "role": "readWrite", "db": "Stage_database" } ]
+            "roles": [ { "role": "read", "db": "Stage_database" },
+                       { "role": "createIndex", "db": "Stage_database"} ]
           }
         )
         print("Created RO user, result = %s" % create_result)
