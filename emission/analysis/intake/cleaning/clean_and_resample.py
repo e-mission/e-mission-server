@@ -1096,6 +1096,11 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
     with_speeds_df = eaicl.add_dist_heading_speed(loc_df)
     logging.debug("fix_squished_place: after recomputing for validation, with_speeds_df = %s" % 
         (with_speeds_df[["_id", "ts", "fmt_time", "latitude", "longitude", "distance", "speed"]]).head())
+    if with_speeds_df.iloc[-1].speed == 0 and with_speeds_df.iloc[-1].distance == 0:
+        logging.debug("with_speeds_df.iloc[-1].speed = %s, distance = %s" %
+            (with_speeds_df.iloc[-1].speed, with_speeds_df.iloc[1].distance))
+        with_speeds_df.drop(with_speeds_df.index[-1], inplace=True)
+
     if not ecc.compare_rounded_arrays(with_speeds_df.speed.tolist(), first_section_data["speeds"], 10):
         logging.error("%s != %s" % (with_speeds_df.speed.tolist()[:10], first_section_data["speeds"][:10]))
         assert False

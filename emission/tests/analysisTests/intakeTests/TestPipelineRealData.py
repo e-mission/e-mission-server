@@ -781,6 +781,20 @@ class TestPipelineRealData(unittest.TestCase):
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth).data)
 
+    def testJan16SpeedAssert(self):
+        # Test for https://github.com/e-mission/e-mission-server/issues/457
+        dataFile = "emission/tests/data/real_examples/another_speed_assertion_failure.jan-16"
+        start_ld = ecwl.LocalDate({'year': 2016, 'month': 1, 'day': 16})
+        cacheKey = "diary/trips-2016-01-16"
+        ground_truth = json.load(open("emission/tests/data/real_examples/another_speed_assertion_failure.jan-16.ground_truth"), object_hook=bju.object_hook)
+
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth).data)
+
 if __name__ == '__main__':
     etc.configLogging()
     unittest.main()
