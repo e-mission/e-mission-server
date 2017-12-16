@@ -45,7 +45,7 @@ def get_split_uuid_lists(n_splits):
     logging.debug("sel_uuids = %s, sel_jobs = %s, non_zero_jobs = %s" %
                   (len(sel_uuids), len(sel_jobs), len(non_zero_jobs)))
 
-    non_zero_jobs_df = pd.DataFrame(non_zero_jobs, columns=['user_id', 'count']).sort("count")
+    non_zero_jobs_df = pd.DataFrame(non_zero_jobs, columns=['user_id', 'count']).sort_values(by="count")
     ret_splits = []
     for i in range(0, n_splits):
         ret_splits.append([])
