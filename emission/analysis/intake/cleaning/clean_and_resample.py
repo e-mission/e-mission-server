@@ -492,14 +492,14 @@ def get_overriden_mode(raw_section_data, filtered_section_data, with_speeds_df):
     # https://github.com/e-mission/e-mission-server/issues/407#issuecomment-248524098
     if raw_section_data.sensed_mode == ecwm.MotionTypes.ON_FOOT:
         if end_to_end_distance > 10 * 1000 and overall_speed > TEN_KMPH:
-            logging.info("Sanity checking failed for ON_FOOT section from trip (raw: %s, cleaned %s), returning UNKNOWN" % 
-                (raw_section_data.trip_id, cleaned_section_data.trip_id))
+            logging.info("Sanity checking failed for ON_FOOT section from trip (raw: %s, filtered %s), returning UNKNOWN" % 
+                (raw_section_data.trip_id, filtered_section_data.trip_id))
             return ecwm.MotionTypes.UNKNOWN
 
     if raw_section_data.sensed_mode == ecwm.MotionTypes.BICYCLING:
         if end_to_end_distance > 100 * 1000 and overall_speed > TWENTY_KMPH:
-            logging.info("Sanity checking failed for BICYCLING section from trip (raw: %s, cleaned %s), returning UNKNOWN" % 
-                (raw_section_data.trip_id, cleaned_section_data.trip_id))
+            logging.info("Sanity checking failed for BICYCLING section from trip (raw: %s, filtered %s), returning UNKNOWN" % 
+                (raw_section_data.trip_id, filtered_section_data.trip_id))
             return ecwm.MotionTypes.UNKNOWN
 
     return None

@@ -767,6 +767,20 @@ class TestPipelineRealData(unittest.TestCase):
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth).data)
 
+    def testOverriddenModeHack(self):
+        # Test for https://github.com/e-mission/e-mission-server/issues/457
+        dataFile = "emission/tests/data/real_examples/test_overriden_mode_hack.jul-31"
+        start_ld = ecwl.LocalDate({'year': 2017, 'month': 7, 'day': 31})
+        cacheKey = "diary/trips-2017-07-31"
+        ground_truth = json.load(open("emission/tests/data/real_examples/test_overriden_mode_hack.jul-31.ground_truth"), object_hook=bju.object_hook)
+
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth).data)
+
 if __name__ == '__main__':
     etc.configLogging()
     unittest.main()
