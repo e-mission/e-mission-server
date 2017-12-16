@@ -24,6 +24,7 @@ import scipy.interpolate as spi
 import pandas as pd
 import arrow
 import geojson as gj
+import json
 
 # Our imports
 import emission.storage.decorations.timeline as esdtl
@@ -60,6 +61,7 @@ except:
     print("debug not configured, falling back to sample, default configuration")
     config_file = open('conf/analysis/debug.conf.json.sample')
 
+config_data = json.load(config_file)
 filtered_trip_excluded = ["start_place", "end_place",
                           "start_ts", "start_fmt_time", "start_local_dt", "start_loc",
                           "duration", "distance", "_id"]
@@ -1102,28 +1104,30 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
     logging.debug("fix_squished_place: after recomputing for validation, with_speeds_df = %s" % 
         (with_speeds_df[["_id", "ts", "fmt_time", "latitude", "longitude", "distance", "speed"]]).head())
     if with_speeds_df.iloc[-1].speed == 0 and with_speeds_df.iloc[-1].distance == 0:
-        logging.debug("with_speeds_df.iloc[-1].speed = %s, distance = %s" %
-            (with_speeds_df.iloc[-1].speed, with_speeds_df.iloc[1].distance))
+        logging.debug("with_speeds_df.iloc[-1].speed = %s, distance = %s, dropping %s" %
+            (with_speeds_df.iloc[-1].speed, with_speeds_df.iloc[-1].distance, with_speeds_df.iloc[-1]))
+        logging.debug("with_speeds_df.tail = %s" %
+            (with_speeds_df[["_id", "ts", "fmt_time", "latitude", "longitude", "distance", "speed"]]).tail())
         with_speeds_df.drop(with_speeds_df.index[-1], inplace=True)
 
     if not ecc.compare_rounded_arrays(with_speeds_df.speed.tolist(), first_section_data["speeds"], 10):
         logging.error("%s != %s" % (with_speeds_df.speed.tolist()[:10], first_section_data["speeds"][:10]))
-        if config_file["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
+        if config_data["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
             assert False
 
     if not ecc.compare_rounded_arrays(with_speeds_df.distance.tolist(), first_section_data["distances"], 10):
         logging.error("%s != %s" % (with_speeds_df.distance.tolist()[:10], first_section_data["distances"][:10]))
-        if config_file["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
+        if config_data["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
             assert False
 
     if not ecc.compare_rounded_arrays(with_speeds_df.speed.tolist(), with_speeds_df.from_points_speed.tolist(), 10):
         logging.error("%s != %s" % (with_speeds_df.speed.tolist()[:10], with_speeds_df.from_points_speed.tolist()[:10]))
-        if config_file["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
+        if config_data["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
             assert False
 
     if not ecc.compare_rounded_arrays(with_speeds_df.distance.tolist(), with_speeds_df.from_points_distance.tolist(), 10):
         logging.error("%s != %s" % (with_speeds_df.distance.tolist()[:10], with_speeds_df.from_points_distance.tolist()[:10]))
-        if config_file["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
+        if config_data["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
             assert False
 
 def _is_squished_untracked(raw_trip, raw_trip_list, trip_map):
