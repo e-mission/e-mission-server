@@ -100,7 +100,7 @@ def filter_accuracy(user_id):
                                                     entry.metadata_write_ts))
                 timeseries.insert(entry_copy)
             last_entry_processed = unfiltered_points_df.iloc[-1].metadata_write_ts
-            epq.mark_accuracy_filtering_done(user_id, last_entry_processed) 
+            epq.mark_accuracy_filtering_done(user_id, float(last_entry_processed))
     except:
         logging.exception("Marking accuracy filtering as failed")
         epq.mark_accuracy_filtering_failed(user_id)

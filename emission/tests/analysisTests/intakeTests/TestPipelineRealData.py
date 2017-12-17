@@ -6,7 +6,10 @@ from __future__ import absolute_import
 # with known ground truth output.
 # The way to add a new test is:
 # - load the test timeline
-# $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py emission/tests/data/real_examples/iphone_2016-02-22
+# $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py emission/tests/data/real_examples/iphone_2016-02-22 test-iphone-feb-22
+# ...
+# Loading file emission/tests/data/real_examples/iphone_2016-02-22
+# After registration, test-iphone-feb-22 -> 349b4f21-7cd2-4ac6-8786-ea69142c2238
 #
 # Note that there is some randomness in the tests, due to
 # a56adddc5dc8c94cbe98964aafb17df3bc3f724c, so we need to use a random seed
@@ -15,15 +18,11 @@ from __future__ import absolute_import
 # needs to be re-instituted.
 
 # - run the intake pipeline
-# $ ./e-mission-py.bash bin/intake_stage.py
+# $ ./e-mission-py.bash bin/debug/intake_single_user.py -e test-iphone-feb-22
 # - log in via the phone and check that all is well
-# - generate ground truth
-# >>> tj = edb.get_usercache_db().find_one({'metadata.key': 'diary/trips-2016-02-22'})
-# >>> import attrdict as ad
-# >>> import json
-# >>> import bson.json_util as bju
-# >>> json.dump(tj, open("/tmp/iphone_2016-02-22.ground_truth", "w"), indent=4, default=bju.default)
-# - move the ground truth back
+# - save the ground truth
+# $ ./e-mission-py.bash bin/debug/save_ground_truth.py -e test-iphone-feb-22 2016-02-22 /tmp/iphone_2016-02-22.ground_truth
+# Copy it back and add the test to this file
 # $ mv /tmp/iphone_2016-02-22.ground_truth emission/tests/data/real_examples
 
 from future import standard_library
@@ -773,6 +772,20 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld = ecwl.LocalDate({'year': 2017, 'month': 7, 'day': 31})
         cacheKey = "diary/trips-2017-07-31"
         ground_truth = json.load(open("emission/tests/data/real_examples/test_overriden_mode_hack.jul-31.ground_truth"), object_hook=bju.object_hook)
+
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth).data)
+
+    def testJan16SpeedAssert(self):
+        # Test for https://github.com/e-mission/e-mission-server/issues/457
+        dataFile = "emission/tests/data/real_examples/another_speed_assertion_failure.jan-16"
+        start_ld = ecwl.LocalDate({'year': 2016, 'month': 1, 'day': 16})
+        cacheKey = "diary/trips-2016-01-16"
+        ground_truth = json.load(open("emission/tests/data/real_examples/another_speed_assertion_failure.jan-16.ground_truth"), object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
