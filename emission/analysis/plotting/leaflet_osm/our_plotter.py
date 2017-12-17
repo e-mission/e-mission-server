@@ -32,7 +32,7 @@ import emission.core.wrapper.stop as ecws
 import emission.core.wrapper.section as ecwsc
 
 import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
-import emission.analysis.plotting.leaflet_osm.folium_geojson_plugin as fgjp
+import folium
 
 import emission.storage.timeseries.timequery as estt
 import emission.net.api.usercache as enau
@@ -70,7 +70,9 @@ def get_maps_for_usercache(user_id):
         maps_for_day.append(get_maps_for_geojson_list(day))
     return maps_for_day
 
+# TODO: Needs to convert this to the new folium format
 def get_maps_for_geojson_list(trip_geojson_list):
+    raise NotImplementedError()
     map_list = []
     for trip_doc in trip_geojson_list:
         # logging.debug(trip_doc)
@@ -101,17 +103,34 @@ def get_center_for_map(coords):
         logging.debug("Getting midpoint of %s and %s" % (coords[0], coords[-1]))
         return flipped(midpoint((coords[0], coords[-1])))
     
-def get_maps_for_geojson_unsectioned(feature_list):
+def get_maps_for_geojson_unsectioned(geojson_list):
     map_list = []
-    for feature in feature_list:
-        # logging.debug("Getting map for feature %s" % bju.dumps(feature))
-        feature_coords = list(get_coords(feature))
-        # feature_coords = list(gj.utils.coords(feature))
-        curr_map = folium.Map(get_center_for_map(feature_coords))
-        curr_plugin = fgjp.FoliumGeojsonPlugin(dict(feature))
-        curr_map.add_plugin(curr_plugin)
-        map_list.append(curr_map)
+    for geojson in geojson_list:
+        map_list.append(get_map_for_geojson_unsectioned(geojson))
     return map_list
+
+def get_map_for_geojson_unsectioned(geojson):
+    div_icon = folium.DivIcon()
+    all_div_markers = [folium.CircleMarker(p["geometry"]["coordinates"][::-1],
+                                           popup=bju.dumps(p["properties"]),
+                                           radius=5)
+                       for p in geojson["features"][0]["features"]]
+    # all_div_markers = [folium.Marker(p["geometry"]["coordinates"][::-1],
+    #                                  popup=json.dumps(p["properties"]),
+    #                                  icon=div_icon)
+    #                   for p in all_geojson["features"][0]["features"]]
+    print("Points are ", [m.location for m in all_div_markers[:5]], "...")
+    geojson_line_string = geojson["features"][1]["geometry"]
+    polyline_coords = [c[::-1] for c in geojson_line_string["coordinates"]]
+    print("Linestring is", polyline_coords[:5], "...")
+    polyline = folium.PolyLine(polyline_coords)
+    bounds = polyline.get_bounds()
+    m = folium.Map(tiles='Stamen Terrain')
+    m.fit_bounds(bounds)
+    for marker in all_div_markers:
+        marker.add_to(m)
+    polyline.add_to(m)
+    return m
 
 def get_coords(feature):
     # logging.debug("Getting coordinates for feature %s" % bju.dumps(feature))
