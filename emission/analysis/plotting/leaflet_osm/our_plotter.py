@@ -70,24 +70,60 @@ def get_maps_for_usercache(user_id):
         maps_for_day.append(get_maps_for_geojson_list(day))
     return maps_for_day
 
-# TODO: Needs to convert this to the new folium format
-def get_maps_for_geojson_list(trip_geojson_list):
-    raise NotImplementedError()
+def get_maps_for_geojson_trip_list(trip_geojson_list):
     map_list = []
     for trip_doc in trip_geojson_list:
-        # logging.debug(trip_doc)
-        trip_geojson = ad.AttrDict(trip_doc)
-        logging.debug("centering based on start = %s, end = %s " % (trip_geojson.features[0], trip_geojson.features[1]))
-        flipped_midpoint = lambda p1_p2: [old_div((p1_p2[0].coordinates[1] + p1_p2[1].coordinates[1]),2),
-                                            old_div((p1_p2[0].coordinates[0] + p1_p2[1].coordinates[0]),2)]
-
-        curr_map = folium.Map(flipped_midpoint((trip_geojson.features[0].geometry,
-                                                trip_geojson.features[1].geometry)))
-        curr_plugin = fgjp.FoliumGeojsonPlugin(dict(trip_geojson))
-        curr_map.add_plugin(curr_plugin)
+        curr_map = get_map_for_geojson_trip(trip_doc)
         map_list.append(curr_map)
     return map_list
-    
+
+def get_map_for_geojson_trip(geojson_trip):
+    m = folium.Map()
+
+    location_points=[]
+    for f in geojson_trip["features"]:
+        if f["type"] == "Feature":
+            print(f["properties"]["feature_type"], f["id"])
+            if f["properties"]["feature_type"] == 'start_place':
+                place_marker = get_place_ui(f)
+                ic = folium.features.Icon(color='green', icon="flag")
+                place_marker.add_child(ic)
+                place_marker.add_to(m)
+            if f["properties"]["feature_type"] == 'end_place':
+                place_marker = get_place_ui(f)
+                ic = folium.features.Icon(color='red', icon="flag")
+                place_marker.add_child(ic)
+                place_marker.add_to(m)
+            if f["properties"]["feature_type"] == 'stop':
+                (start_marker, end_marker) = get_stop_ui(f)
+                start_marker.add_to(m)
+                end_marker.add_to(m)
+        if f["type"] == "FeatureCollection":
+            for section in f["features"]:
+                print(section["properties"]["feature_type"], section["id"])
+                if (section["properties"]["feature_type"] == "section"):
+                    section_line = get_section_ui(section)
+                    location_points.extend(section_line.location)
+                    section_line.add_to(m)
+                else:
+                    raise NotImplementedException()
+    temp_polyline = folium.PolyLine(location_points)
+    m.fit_bounds(temp_polyline.get_bounds())
+    return m
+
+def get_place_ui(place):
+    return folium.Marker(place["geometry"]["coordinates"][::-1], popup=bju.dumps(place["properties"]))
+
+def get_section_ui(section):
+    lat_lng_points = list((p[::-1] for p in section["geometry"]["coordinates"]))
+    return folium.PolyLine(lat_lng_points, popup=bju.dumps(section["properties"]))
+
+def get_stop_ui(stop):
+    lat_lng_points = list((p[::-1] for p in stop["geometry"]["coordinates"]))
+    return (folium.CircleMarker(lat_lng_points[0], popup=bju.dumps(stop["properties"]), color="green", fill_color="green", fill=True),
+            folium.CircleMarker(lat_lng_points[1], popup=bju.dumps(stop["properties"]), color="red", fill_color="red", fill=True))
+
+        
 def flipped(coord):
     return (coord[1], coord[0])
     
