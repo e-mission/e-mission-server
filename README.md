@@ -2,6 +2,10 @@ e-mission is a project to gather data about user travel patterns using phone
 apps, and use them to provide an personalized carbon footprint, and aggregate
 them to make data available to urban planners and transportation engineers.
 
+If you are here to use ***Zephyr***, which uses the e-mission platform to
+evaluate power/accuracy tradeoffs for background sensed data, please see the
+[zephyr-specific README and examples](https://github.com/e-mission/e-mission-server/tree/master/webapp).
+
 It has two components, the backend server and the phone apps. This is the
 backend server - the phone apps are available in the [e-mission-phone
 repo](https://github.com/amplab/e-mission-phone)
