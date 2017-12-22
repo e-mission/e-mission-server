@@ -9,7 +9,11 @@
 - Change the sampling rate if needed. Default is every hour. (Profile -> Developer Zone -> Sync)
 
 ## Analysing data ##
-Re-run the reference notebooks to match your experiment.
+The data from your phone goes directly to a server for open data.
+The password for the server is concatenation of the first names of the maintainer's advisors and associated labs (R....D....R...B...). All information can be found in the third sentence of her home page https://people.eecs.berkeley.edu/~shankari/.
+
+The server contains several reference notebooks to help you evaluate the power drain of your sensing regime.
+Re-run them to match your experiment.
 http://34.239.42.177:8888/tree/zephyr/reference
 Make sure to change the `label`, `start_ts` and `end_ts` to match your experiment.
 
