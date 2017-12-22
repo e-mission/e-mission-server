@@ -87,6 +87,15 @@ class User:
     logging.debug("Updating user %s with fields %s" % (self.uuid, update_doc))
     get_profile_db().update({'user_id': self.uuid}, {'$set': update_doc})
 
+  #CO2 Consumption
+
+  #def getCarbonWeek(self, n) : gets this weeks average carbon emission, where n is the nth week in the past
+  #def getCarbonWeekly(self, n) : gets delta carbon emission for the nth week in the past. = getCarbonWeek(n) - getCarbonWeek(n+1)
+
+  #def getFavTransport(self) : gets mode of transportation that is highest used... or let client handle this?
+  #def getTotalDistance(self) : gets total distance travelled by user
+  #def getTier(self)
+
   def getCarbonFootprintForMode(self):
     logging.debug("Setting Carbon Footprint map for user %s to" % (self.uuid))
     #using conversion: 8.91 kg CO2 for one gallon
@@ -243,7 +252,7 @@ class User:
 
     # Second decision: what do we do if the user is not part of a study? Create a
     # profile anyway with an empty list, or defer the creation of the profile?
-    # 
+    #
     # Decision: create profile with empty list for two reasons:
     # a) for most of the functions, we want to use the profile data. We should
     # only use the email -> uuid map in the API layer to get the UUID, and use
@@ -257,7 +266,7 @@ class User:
     # that don't have an associated profile and fix them
     study_list = Client.getPendingClientRegs(userEmail)
     writeResultProfile = User.createProfile(anonUUID, datetime.now(), study_list)
-     
+
     if 'err' not in writeResultProfile:
       # update was successful!
       # Either upserted or updatedExisting will be true
