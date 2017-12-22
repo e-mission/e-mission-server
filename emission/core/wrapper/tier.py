@@ -1,8 +1,10 @@
 class Tier:
-  def __init__(self, rank):
+  def __init__(self, tid, users = []):
     self.tid = tid
-    self.uuids = []
-    self.rank = rank
+    self.users = users
 
   def getUsers(self):
     return self.uuids
+
+  def setUsers(self, users):
+    self.uuids = users

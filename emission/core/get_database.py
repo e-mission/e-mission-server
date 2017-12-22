@@ -5,6 +5,7 @@ import json
 
 _current_db = MongoClient('localhost').Stage_database
 
+
 def _get_current_db():
     return _current_db
 
