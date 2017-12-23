@@ -7,6 +7,11 @@
 - Switch to the zephyr-specific UI (https://e-mission.eecs.berkeley.edu/#/client_setup?new_client=zephyr&clear_usercache=true&clear_local_storage=true)
 - Turn off tracking (Profile -> Tracking)
 - Change the sampling rate if needed. Default is every hour. (Profile -> Developer Zone -> Sync)
+- Run your experiment
+- At the end, perform the following steps to ensure that the data is pushed. The app currently only pushes data for completed trips.
+  - Start a trip (Developer Zone -> tracking stopped -> start trip)
+  - End a trip (Developer Zone -> tracking stopped -> end trip)
+  - Force sync
 
 ## Analysing data ##
 The data from your phone goes directly to a server for open data.
