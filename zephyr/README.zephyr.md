@@ -4,11 +4,9 @@
 - Install the e-mission app for your platform
     - android: https://play.google.com/store/apps/details?id=edu.berkeley.eecs.emission
     - iOS: https://itunes.apple.com/us/app/emission/id1084198445?&mt=8
-- Switch to the zephyr-specific UI
+- Switch to the zephyr-specific UI (https://e-mission.eecs.berkeley.edu/#/client_setup?new_client=zephyr&clear_usercache=true&clear_local_storage=true)
 - Turn off tracking (Profile -> Tracking)
-- Set the sampling rate (Profile -> Developer Zone -> Sync)
-- Send shankari@eecs.berkeley.edu email from address you used to log in stating
-  that you want the data collected for that email address to be public
+- Change the sampling rate if needed. Default is every hour. (Profile -> Developer Zone -> Sync)
 
 ## Analysing data ##
 Re-run the reference notebooks to match your experiment.
