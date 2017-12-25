@@ -107,9 +107,9 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         time_query = esp.get_time_range_for_output_gen(self.user_id)
         try:
             self.storeTimelineToCache(time_query)
-            self.storeCommonTripsToCache(time_query)
-            last_processed_ts = self.storeConfigsToCache(time_query)
-            esp.mark_output_gen_done(self.user_id, last_processed_ts)
+            # self.storeCommonTripsToCache(time_query)
+            # last_processed_ts = self.storeConfigsToCache(time_query)
+            # esp.mark_output_gen_done(self.user_id, last_processed_ts)
         except:
             logging.exception("Storing views to cache failed for user %s" % self.user_id)
             esp.mark_output_gen_failed(self.user_id)
