@@ -55,7 +55,7 @@ def run_intake_pipeline(process_number, uuid_list):
         intake_log_config["handlers"]["errors"]["filename"].replace("intake", "intake_%s" % process_number)
 
     logging.config.dictConfig(intake_log_config)
-    # np.random.seed(61297777)
+    np.random.seed(61297777)
 
     logging.info("processing UUID list = %s" % uuid_list)
 
