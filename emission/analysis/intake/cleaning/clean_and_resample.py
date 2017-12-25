@@ -1099,35 +1099,71 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
                               esda.get_time_query_for_trip_like(esda.CLEANED_SECTION_KEY, first_section.get_id()))
     logging.debug("fix_squished_place: before recomputing for validation, loc_df = %s" % 
         (loc_df[["_id", "ts", "fmt_time", "latitude", "longitude", "distance", "speed"]]).head())
+    related_sections = loc_df.section.unique().tolist()
+    if len(related_sections) > 1:
+        logging.debug("Found %d sections, need to remove the uncommon ones..." % 
+            len(related_sections))
+        
+        section_counts = [np.count_nonzero(loc_df.section == s) for s in related_sections]
+        logging.debug("section counts = %s" % list(zip(related_sections, section_counts)))
+        # This code should work even if this assert is removed
+        # but this is the expectation we have based on the use cases we have seen so far
+        assert(min(section_counts) == 1)
+       
+        # the most common section is the one at the same index as the max
+        # count. This is the valid section
+        valid_section = related_sections[np.argmax(section_counts)]
+        logging.debug("valid_section = %s" % valid_section)
+
+        index_for_invalid_sections = loc_df[loc_df.section != valid_section].index
+        logging.debug("index_for_invalid_sections = %s" % index_for_invalid_sections)
+
+        logging.debug("Before dropping, with_speeds_df.tail = %s" % 
+            (loc_df[["_id", "section", "ts", "fmt_time", "latitude", "longitude", "speed"]]).tail())
+
+        loc_df.drop(index_for_invalid_sections, inplace=True)
+        # If we don't this, the dropped entry is still present with all
+        # entries = NaN, the result after recomputing is 
+        # 30  5a40a632f6858f5e3b27307b  1.452972e+09  2016-01-16T11:17:28.072312-08:00
+        loc_df.reset_index(drop=True, inplace=True)
+        logging.debug("After dropping, with_speeds_df.tail = %s" % 
+            (loc_df[["_id", "section", "ts", "fmt_time", "latitude", "longitude", "speed"]]).tail())
+
+        # validate that we only have valid sections now
+        logging.debug("About to validate that we have only one valid section %s" % 
+            loc_df.section.unique())
+        assert(len(loc_df.section.unique().tolist()) == 1)
+
     loc_df.rename(columns={"speed": "from_points_speed", "distance": "from_points_distance"}, inplace=True)
     with_speeds_df = eaicl.add_dist_heading_speed(loc_df)
-    logging.debug("fix_squished_place: after recomputing for validation, with_speeds_df = %s" % 
-        (with_speeds_df[["_id", "ts", "fmt_time", "latitude", "longitude", "distance", "speed"]]).head())
-    if with_speeds_df.iloc[-1].speed == 0 and with_speeds_df.iloc[-1].distance == 0:
-        logging.debug("Found zero-speed, distance entries may need to drop last entry %s" %
-            (with_speeds_df[["_id", "ts", "fmt_time", "latitude", "longitude", "distance", "speed"]]).tail())
-        delta_ts = with_speeds_df.iloc[-1].ts - with_speeds_df.iloc[-2].ts
-        if delta_ts == 0:
-            logging.debug("delta_ts = %s, dropping last entry" % delta_ts)
-            with_speeds_df.drop(with_speeds_df.index[-1], inplace=True)
+    logging.debug("fix_squished_place: after recomputing for validation, with_speeds_df.head = %s" % 
+        (with_speeds_df[["_id", "ts", "fmt_time", "latitude", "longitude", "distance", "speed", "from_points_speed"]]).head())
+
+    logging.debug("fix_squished_place: after recomputing for validation, with_speeds_df.tail = %s" % 
+        (with_speeds_df[["_id", "ts", "fmt_time", "latitude", "longitude", "distance", "speed", "from_points_speed"]]).tail())
+
 
     if not ecc.compare_rounded_arrays(with_speeds_df.speed.tolist(), first_section_data["speeds"], 10):
-        logging.error("%s != %s" % (with_speeds_df.speed.tolist()[:10], first_section_data["speeds"][:10]))
+        logging.error("check start: %s != %s" % (with_speeds_df.speed.tolist()[:10], first_section_data["speeds"][:10]))
+        logging.error("check end: %s != %s" % (with_speeds_df.speed.tolist()[-10:], first_section_data["speeds"][-10:]))
         if config_data["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
             assert False
 
     if not ecc.compare_rounded_arrays(with_speeds_df.distance.tolist(), first_section_data["distances"], 10):
-        logging.error("%s != %s" % (with_speeds_df.distance.tolist()[:10], first_section_data["distances"][:10]))
+        logging.error("check start: %s != %s" % (with_speeds_df.distance.tolist()[:10], first_section_data["distances"][:10]))
+        logging.error("check end: %s != %s" % (with_speeds_df.speed.tolist()[-10:], first_section_data["speeds"][-10:]))
         if config_data["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
             assert False
 
     if not ecc.compare_rounded_arrays(with_speeds_df.speed.tolist(), with_speeds_df.from_points_speed.tolist(), 10):
-        logging.error("%s != %s" % (with_speeds_df.speed.tolist()[:10], with_speeds_df.from_points_speed.tolist()[:10]))
+        logging.error("check start: %s != %s" % (with_speeds_df.speed.tolist()[:10], with_speeds_df.from_points_speed.tolist()[:10]))
+        logging.error("check end: %s != %s" % (with_speeds_df.speed.tolist()[-10:], with_speeds_df.from_points_speed.tolist()[-10:]))
         if config_data["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
             assert False
 
     if not ecc.compare_rounded_arrays(with_speeds_df.distance.tolist(), with_speeds_df.from_points_distance.tolist(), 10):
-        logging.error("%s != %s" % (with_speeds_df.distance.tolist()[:10], with_speeds_df.from_points_distance.tolist()[:10]))
+        logging.error("check start: %s != %s" % (with_speeds_df.distance.tolist()[:10], with_speeds_df.from_points_distance.tolist()[:10]))
+        logging.error("check end: %s != %s" % (with_speeds_df.speed.tolist()[-10:], with_speeds_df.from_points_speed.tolist()[-10:]))
         if config_data["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
             assert False
 
