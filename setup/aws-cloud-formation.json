@@ -90,7 +90,7 @@
         "SubnetId" : { "Ref" : "publicsubnet1"},
         "Tags" : [ {"Key" : "Name",
                     "Value": { "Fn::Join" : ["", [
-                          { "Ref" : "Prefix" }, "-publicsubnet1"
+                          { "Ref" : "Prefix" }, "-nat-gw"
                         ]]}
                     },
                     {
@@ -804,6 +804,17 @@
         }
       },
       "DependsOn": "gw1"
+    },
+    "subnetroute2": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "rtbf15ab38c"
+        },
+        "SubnetId": {
+          "Ref": "subnete6dd73bb"
+        }
+      }
     },
     "route2": {
       "Type": "AWS::EC2::Route",
