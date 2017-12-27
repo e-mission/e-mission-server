@@ -12,7 +12,7 @@
     }
   },
   "Resources": {
-    "vpcc9dca6b1": {
+    "OneVpcToRuleThemAll": {
       "Type": "AWS::EC2::VPC",
       "Properties": {
         "CidrBlock": "192.168.0.0/16",
@@ -39,13 +39,13 @@
         "CidrBlock": "192.168.0.0/24",
         "AvailabilityZone": "us-east-1d",
         "VpcId": {
-          "Ref": "vpcc9dca6b1"
+          "Ref": "OneVpcToRuleThemAll"
         },
         "Tags": [
           {
             "Key": "Name",
             "Value": { "Fn::Join" : ["", [
-                  { "Ref" : "Prefix" }, "-publicsubnet1"
+                  { "Ref" : "Prefix" }, "-public-subnet"
                 ]]}
           },
           {
@@ -55,13 +55,13 @@
         ]
       }
     },
-    "subnete6dd73bb": {
+    "privatesubnet1": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "CidrBlock": "192.168.1.0/24",
         "AvailabilityZone": "us-east-1d",
         "VpcId": {
-          "Ref": "vpcc9dca6b1"
+          "Ref": "OneVpcToRuleThemAll"
         },
         "Tags": [
           {
@@ -90,7 +90,7 @@
         "SubnetId" : { "Ref" : "publicsubnet1"},
         "Tags" : [ {"Key" : "Name",
                     "Value": { "Fn::Join" : ["", [
-                          { "Ref" : "Prefix" }, "-publicsubnet1"
+                          { "Ref" : "Prefix" }, "-nat-gw"
                         ]]}
                     },
                     {
@@ -104,7 +104,7 @@
         "Type": "AWS::EC2::EgressOnlyInternetGateway",
         "Properties": {
             "VpcId": {
-                "Ref": "vpcc9dca6b1"
+                "Ref": "OneVpcToRuleThemAll"
             }
         }
     },
@@ -121,7 +121,7 @@
       "Type": "AWS::EC2::NetworkAcl",
       "Properties": {
         "VpcId": {
-          "Ref": "vpcc9dca6b1"
+          "Ref": "OneVpcToRuleThemAll"
         }
       }
     },
@@ -129,7 +129,7 @@
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
         "VpcId": {
-          "Ref": "vpcc9dca6b1"
+          "Ref": "OneVpcToRuleThemAll"
         },
         "Tags": [
           {
@@ -150,7 +150,7 @@
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
         "VpcId": {
-          "Ref": "vpcc9dca6b1"
+          "Ref": "OneVpcToRuleThemAll"
         },
         "Tags": [
           {
@@ -406,7 +406,7 @@
             "Description": "Primary network interface",
             "DeviceIndex": 0,
             "SubnetId": {
-              "Ref": "subnete6dd73bb"
+              "Ref": "privatesubnet1"
             },
             "PrivateIpAddresses": [
               {
@@ -631,7 +631,7 @@
       "Properties": {
         "GroupDescription": "open data collection database",
         "VpcId": {
-          "Ref": "vpcc9dca6b1"
+          "Ref": "OneVpcToRuleThemAll"
         },
         "Tags": [
           {
@@ -652,7 +652,7 @@
       "Properties": {
         "GroupDescription": "security group for the webserver for open data collectio",
         "VpcId": {
-          "Ref": "vpcc9dca6b1"
+          "Ref": "OneVpcToRuleThemAll"
         },
         "Tags": [
           {
@@ -673,7 +673,7 @@
       "Properties": {
         "GroupDescription": "security group for the analysis server for open data collection",
         "VpcId": {
-          "Ref": "vpcc9dca6b1"
+          "Ref": "OneVpcToRuleThemAll"
         },
         "Tags": [
           {
@@ -694,7 +694,7 @@
       "Properties": {
         "GroupDescription": "security group for the public server for open data collection",
         "VpcId": {
-          "Ref": "vpcc9dca6b1"
+          "Ref": "OneVpcToRuleThemAll"
         },
         "Tags": [
           {
@@ -753,7 +753,7 @@
           "Ref": "acl86bf7efd"
         },
         "SubnetId": {
-          "Ref": "subnete6dd73bb"
+          "Ref": "privatesubnet1"
         }
       }
     },
@@ -761,7 +761,7 @@
       "Type": "AWS::EC2::VPCGatewayAttachment",
       "Properties": {
         "VpcId": {
-          "Ref": "vpcc9dca6b1"
+          "Ref": "OneVpcToRuleThemAll"
         },
         "InternetGatewayId": {
           "Ref": "igw362a534f"
@@ -805,6 +805,17 @@
       },
       "DependsOn": "gw1"
     },
+    "subnetroute2": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "rtbf15ab38c"
+        },
+        "SubnetId": {
+          "Ref": "privatesubnet1"
+        }
+      }
+    },
     "route2": {
       "Type": "AWS::EC2::Route",
       "Properties": {
@@ -835,7 +846,7 @@
       "Type": "AWS::EC2::VPCDHCPOptionsAssociation",
       "Properties": {
         "VpcId": {
-          "Ref": "vpcc9dca6b1"
+          "Ref": "OneVpcToRuleThemAll"
         },
         "DhcpOptionsId": {
           "Ref": "dopt170af572"
@@ -974,6 +985,18 @@
         "CidrIp": "0.0.0.0/0"
       }
     },
+    "ingress10ipv6": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenpublicsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "8888",
+        "ToPort": "9999",
+        "CidrIpv6": "::/0"
+      }
+    },
     "ingress11": {
       "Type": "AWS::EC2::SecurityGroupIngress",
       "Properties": {
@@ -998,14 +1021,26 @@
         "CidrIp": "0.0.0.0/0"
       }
     },
-    "egress2": {
+    "egress1ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopendatabasesg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIpv6": "::/0"
+      }
+    },
+    "egress2ipv6": {
       "Type": "AWS::EC2::SecurityGroupEgress",
       "Properties": {
         "GroupId": {
           "Ref": "sgopendatabasesg"
         },
         "IpProtocol": "icmpv6",
-        "CidrIp": "0.0.0.0/0"
+        "CidrIpv6": "::/0"
       }
     },
     "egress3": {
@@ -1020,6 +1055,18 @@
         "CidrIp": "0.0.0.0/0"
       }
     },
+    "egress3ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopendatabasesg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIpv6": "::/0"
+      }
+    },
     "egress4": {
       "Type": "AWS::EC2::SecurityGroupEgress",
       "Properties": {
@@ -1029,7 +1076,7 @@
         "IpProtocol": "icmp",
         "FromPort": "-1",
         "ToPort": "-1",
-        "CidrIp": "192.168.0.0/24"
+        "CidrIp": "0.0.0.0/0"
       }
     },
     "egress5": {
@@ -1042,6 +1089,18 @@
         "FromPort": "80",
         "ToPort": "80",
         "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress5ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenwebappsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIpv6": "::/0"
       }
     },
     "egress6": {
@@ -1084,6 +1143,18 @@
         "CidrIp": "0.0.0.0/0"
       }
     },
+    "egress8ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenwebappsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIpv6": "::/0"
+      }
+    },
     "egress9": {
       "Type": "AWS::EC2::SecurityGroupEgress",
       "Properties": {
@@ -1108,6 +1179,18 @@
         "CidrIp": "0.0.0.0/0"
       }
     },
+    "egress10ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenwebappsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "9418",
+        "ToPort": "9418",
+        "CidrIpv6": "::/0"
+      }
+    },
     "egress11": {
       "Type": "AWS::EC2::SecurityGroupEgress",
       "Properties": {
@@ -1118,6 +1201,18 @@
         "FromPort": "80",
         "ToPort": "80",
         "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress11ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenanalysissg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIpv6": "::/0"
       }
     },
     "egress12": {
@@ -1146,6 +1241,18 @@
         "CidrIp": "0.0.0.0/0"
       }
     },
+    "egress13ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenanalysissg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIpv6": "::/0"
+      }
+    },
     "egress14": {
       "Type": "AWS::EC2::SecurityGroupEgress",
       "Properties": {
@@ -1168,6 +1275,18 @@
         "FromPort": "80",
         "ToPort": "80",
         "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress15ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenpublicsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIpv6": "::/0"
       }
     },
     "egress16": {
@@ -1194,6 +1313,18 @@
         "FromPort": "443",
         "ToPort": "443",
         "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress17ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenpublicsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIpv6": "::/0"
       }
     },
     "egress18": {
