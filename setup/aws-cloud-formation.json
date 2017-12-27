@@ -985,6 +985,18 @@
         "CidrIp": "0.0.0.0/0"
       }
     },
+    "ingress10ipv6": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenpublicsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "8888",
+        "ToPort": "9999",
+        "CidrIpv6": "::/0"
+      }
+    },
     "ingress11": {
       "Type": "AWS::EC2::SecurityGroupIngress",
       "Properties": {
@@ -1009,14 +1021,26 @@
         "CidrIp": "0.0.0.0/0"
       }
     },
-    "egress2": {
+    "egress1ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopendatabasesg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIpv6": "::/0"
+      }
+    },
+    "egress2ipv6": {
       "Type": "AWS::EC2::SecurityGroupEgress",
       "Properties": {
         "GroupId": {
           "Ref": "sgopendatabasesg"
         },
         "IpProtocol": "icmpv6",
-        "CidrIp": "0.0.0.0/0"
+        "CidrIpv6": "::/0"
       }
     },
     "egress3": {
@@ -1029,6 +1053,18 @@
         "FromPort": "443",
         "ToPort": "443",
         "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress3ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopendatabasesg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIpv6": "::/0"
       }
     },
     "egress4": {
@@ -1053,6 +1089,18 @@
         "FromPort": "80",
         "ToPort": "80",
         "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress5ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenwebappsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIpv6": "::/0"
       }
     },
     "egress6": {
@@ -1095,6 +1143,18 @@
         "CidrIp": "0.0.0.0/0"
       }
     },
+    "egress8ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenwebappsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIpv6": "::/0"
+      }
+    },
     "egress9": {
       "Type": "AWS::EC2::SecurityGroupEgress",
       "Properties": {
@@ -1119,6 +1179,18 @@
         "CidrIp": "0.0.0.0/0"
       }
     },
+    "egress10ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenwebappsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "9418",
+        "ToPort": "9418",
+        "CidrIpv6": "::/0"
+      }
+    },
     "egress11": {
       "Type": "AWS::EC2::SecurityGroupEgress",
       "Properties": {
@@ -1129,6 +1201,18 @@
         "FromPort": "80",
         "ToPort": "80",
         "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress11ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenanalysissg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIpv6": "::/0"
       }
     },
     "egress12": {
@@ -1157,6 +1241,18 @@
         "CidrIp": "0.0.0.0/0"
       }
     },
+    "egress13ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenanalysissg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIpv6": "::/0"
+      }
+    },
     "egress14": {
       "Type": "AWS::EC2::SecurityGroupEgress",
       "Properties": {
@@ -1179,6 +1275,18 @@
         "FromPort": "80",
         "ToPort": "80",
         "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress15ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenpublicsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIpv6": "::/0"
       }
     },
     "egress16": {
@@ -1205,6 +1313,18 @@
         "FromPort": "443",
         "ToPort": "443",
         "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress17ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenpublicsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIpv6": "::/0"
       }
     },
     "egress18": {
