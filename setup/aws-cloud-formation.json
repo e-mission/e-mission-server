@@ -12,7 +12,7 @@
     }
   },
   "Resources": {
-    "vpcc9dca6b1": {
+    "OneVpcToRuleThemAll": {
       "Type": "AWS::EC2::VPC",
       "Properties": {
         "CidrBlock": "192.168.0.0/16",
@@ -39,13 +39,13 @@
         "CidrBlock": "192.168.0.0/24",
         "AvailabilityZone": "us-east-1d",
         "VpcId": {
-          "Ref": "vpcc9dca6b1"
+          "Ref": "OneVpcToRuleThemAll"
         },
         "Tags": [
           {
             "Key": "Name",
             "Value": { "Fn::Join" : ["", [
-                  { "Ref" : "Prefix" }, "-publicsubnet1"
+                  { "Ref" : "Prefix" }, "-public-subnet"
                 ]]}
           },
           {
@@ -55,13 +55,13 @@
         ]
       }
     },
-    "subnete6dd73bb": {
+    "privatesubnet1": {
       "Type": "AWS::EC2::Subnet",
       "Properties": {
         "CidrBlock": "192.168.1.0/24",
         "AvailabilityZone": "us-east-1d",
         "VpcId": {
-          "Ref": "vpcc9dca6b1"
+          "Ref": "OneVpcToRuleThemAll"
         },
         "Tags": [
           {
@@ -104,7 +104,7 @@
         "Type": "AWS::EC2::EgressOnlyInternetGateway",
         "Properties": {
             "VpcId": {
-                "Ref": "vpcc9dca6b1"
+                "Ref": "OneVpcToRuleThemAll"
             }
         }
     },
@@ -121,7 +121,7 @@
       "Type": "AWS::EC2::NetworkAcl",
       "Properties": {
         "VpcId": {
-          "Ref": "vpcc9dca6b1"
+          "Ref": "OneVpcToRuleThemAll"
         }
       }
     },
@@ -129,7 +129,7 @@
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
         "VpcId": {
-          "Ref": "vpcc9dca6b1"
+          "Ref": "OneVpcToRuleThemAll"
         },
         "Tags": [
           {
@@ -150,7 +150,7 @@
       "Type": "AWS::EC2::RouteTable",
       "Properties": {
         "VpcId": {
-          "Ref": "vpcc9dca6b1"
+          "Ref": "OneVpcToRuleThemAll"
         },
         "Tags": [
           {
@@ -406,7 +406,7 @@
             "Description": "Primary network interface",
             "DeviceIndex": 0,
             "SubnetId": {
-              "Ref": "subnete6dd73bb"
+              "Ref": "privatesubnet1"
             },
             "PrivateIpAddresses": [
               {
@@ -631,7 +631,7 @@
       "Properties": {
         "GroupDescription": "open data collection database",
         "VpcId": {
-          "Ref": "vpcc9dca6b1"
+          "Ref": "OneVpcToRuleThemAll"
         },
         "Tags": [
           {
@@ -652,7 +652,7 @@
       "Properties": {
         "GroupDescription": "security group for the webserver for open data collectio",
         "VpcId": {
-          "Ref": "vpcc9dca6b1"
+          "Ref": "OneVpcToRuleThemAll"
         },
         "Tags": [
           {
@@ -673,7 +673,7 @@
       "Properties": {
         "GroupDescription": "security group for the analysis server for open data collection",
         "VpcId": {
-          "Ref": "vpcc9dca6b1"
+          "Ref": "OneVpcToRuleThemAll"
         },
         "Tags": [
           {
@@ -694,7 +694,7 @@
       "Properties": {
         "GroupDescription": "security group for the public server for open data collection",
         "VpcId": {
-          "Ref": "vpcc9dca6b1"
+          "Ref": "OneVpcToRuleThemAll"
         },
         "Tags": [
           {
@@ -753,7 +753,7 @@
           "Ref": "acl86bf7efd"
         },
         "SubnetId": {
-          "Ref": "subnete6dd73bb"
+          "Ref": "privatesubnet1"
         }
       }
     },
@@ -761,7 +761,7 @@
       "Type": "AWS::EC2::VPCGatewayAttachment",
       "Properties": {
         "VpcId": {
-          "Ref": "vpcc9dca6b1"
+          "Ref": "OneVpcToRuleThemAll"
         },
         "InternetGatewayId": {
           "Ref": "igw362a534f"
@@ -812,7 +812,7 @@
           "Ref": "rtbf15ab38c"
         },
         "SubnetId": {
-          "Ref": "subnete6dd73bb"
+          "Ref": "privatesubnet1"
         }
       }
     },
@@ -846,7 +846,7 @@
       "Type": "AWS::EC2::VPCDHCPOptionsAssociation",
       "Properties": {
         "VpcId": {
-          "Ref": "vpcc9dca6b1"
+          "Ref": "OneVpcToRuleThemAll"
         },
         "DhcpOptionsId": {
           "Ref": "dopt170af572"
