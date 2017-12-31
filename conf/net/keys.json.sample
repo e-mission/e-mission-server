@@ -1,4 +1,5 @@
 {
-  "ssl_certificate" : "xxxxx-signed-cert.pem",
+  "host_certificate" : "xxxxx-cert.cer",
+  "chain_certificate" : "xxxxx-interm.cer",
   "private_key" : "xxxxx_privkey.key",
 }

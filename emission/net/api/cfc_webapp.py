@@ -469,11 +469,12 @@ if __name__ == '__main__':
       # We support SSL and want to use it
       key_file = open('conf/net/keys.json')
       key_data = json.load(key_file)
-      ssl_cert = key_data["ssl_certificate"]
+      host_cert = key_data["host_certificate"]
+      chain_cert = key_data["chain_certificate"]
       private_key = key_data["private_key"]
 
       run(host=server_host, port=server_port, server='cheroot', debug=True,
-          certfile=ssl_cert, keyfile=private_key, ssl_module='builtin')
+          certfile=host_cert, chainfile=chain_cert, keyfile=private_key)
     else:
       # Non SSL option for testing on localhost
       print("Running with HTTPS turned OFF - use a reverse proxy on production")
