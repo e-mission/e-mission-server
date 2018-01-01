@@ -126,11 +126,6 @@ environment within anaconda to avoid conflicts with other applications.
   $ rm -rf e-mission-server
   ```
 
-### Python dependencies: ###
-
-    # If you are running this in production over SSL, copy over the cherrypy-wsgiserver
-    $ cp api/wsgiserver2.py <dist-packages>/cherrypy/wsgiserver/wsgiserver2.py
-
 ### Javascript dependencies ###
 Run "bower install" instead if you are prompted password for 'https://github.com' after running "bower update".
 
