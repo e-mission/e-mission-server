@@ -17,13 +17,13 @@ try:
     googlemaps_key_file = open("conf/net/ext_service/googlemaps.json")
     GOOGLE_MAPS_KEY = json.load(googlemaps_key_file)["api_key"]
 except:
-    logging.exception("google maps key not configured, falling back to nominatim")
+    logging.warning("google maps key not configured, falling back to nominatim")
 
 try:
     nominatim_file = open("conf/net/ext_service/nominatim.json")
     NOMINATIM_QUERY_URL = json.load(nominatim_file)["query_url"]
 except:
-    logging.exception("nominatim not configured either, place decoding must happen on the client")
+    logging.warning("nominatim not configured either, place decoding must happen on the client")
 
 class Geocoder(object):
 
