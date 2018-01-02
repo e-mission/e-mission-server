@@ -56,19 +56,20 @@ def old2new(old_style_data):
 
     none2None = lambda s: None if s == 'none' else s
     float_with_none = lambda s: float(s) if s is not None else None
+    ms_to_sec_with_none = lambda s: (float(s))/1000 if s is not None else None
 
     user_id = old_style_data["user"]
     del old_style_data["user"]
     if old_style_data["stat"] == "battery_level":
         new_style_data = ecwb.Battery({
             "battery_level_pct" : float_with_none(none2None(old_style_data["reading"])),
-            "ts": old_style_data["ts"]
+            "ts": ms_to_sec_with_none(old_style_data["ts"])
         })
         new_key = "background/battery"
     else:
         new_style_data = ecws.Statsevent()
         new_style_data.name = old_style_data["stat"]
-        new_style_data.ts = old_style_data["ts"]
+        new_style_data.ts = ms_to_sec_with_none(old_style_data["ts"])
         new_style_data.reading = float_with_none(none2None(old_style_data["reading"]))
         new_style_data.client_app_version = old_style_data["client_app_version"]
         new_style_data.client_os_version = old_style_data["client_os_version"]
@@ -77,7 +78,7 @@ def old2new(old_style_data):
     new_entry = ecwe.Entry.create_entry(user_id, new_key, new_style_data)
     # For legacy entries, make sure that the write_ts doesn't become the conversion
     # time or the server arrival time
-    new_entry["metadata"]["write_ts"] = new_style_data.ts
+    new_entry["metadata"]["write_ts"] = float_with_none(old_style_data["reported_ts"])
     del new_entry["metadata"]["write_local_dt"]
     del new_entry["metadata"]["write_fmt_time"]
     # We are not going to fill in the local_date and fmt_time entries because
