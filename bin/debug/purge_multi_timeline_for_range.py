@@ -71,5 +71,5 @@ if __name__ == '__main__':
 
             if args.pipeline_purge:
                 logging.info("For uuid %s, deleting entries from the pipeline_state_db" % curr_uuid)
-                psdb_del_result = psdb.remove({"uuid": curr_uuid})
+                psdb_del_result = psdb.remove({"user_id": curr_uuid})
                 logging.info("result = %s" % psdb_del_result)
