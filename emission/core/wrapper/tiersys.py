@@ -2,6 +2,8 @@ import emission.core.get_database as edb
 import pandas as pd
 from uuid import UUID
 import emission.storage.timeseries.abstract_timeseries as esta
+import emission.storage.timeseries.timequery as estt
+import arrow
 
 class TierSys:
   def __init__(self, tsid):
@@ -38,19 +40,22 @@ class TierSys:
         list_of_tiers[i] = user_carbon_sorted[i*boundary:(i+1)*boundary]
       return list_of_tiers
 
-  def computeCarbon(self, uuid, last_ts):
+  def computeCarbon(self, user_id, last_ts):
       """
       Computers carbon metric for specified user.
       Formula is (Actual CO2 + penalty) / distance travelled
       """
       ts = esta.TimeSeries.get_time_series(user_id)
 
-      # Get all cleaned trips for the user.
-      entry_it = ts.find_entries(["analysis/cleaned_trip"], time_query=None)
+      # Get cleaned trips for the two users that started on 1st Aug UTC
+      last_period_tq = estt.TimeQuery("data.start_ts",
+                          last_ts, # start of range
+                          arrow.utcnow())  # end of range
+      ct_df = ts.get_data_df("analysis/cleaned_trip", time_query=last_period_tq)
 
       carbon_val = 
-      penalty_val = self.computePenalty(t_mode)
-      dist_travelled = 
+      penalty_val = self.computePenalty(t_mode) # Mappings in emission/core/wrapper/motionactivity.py
+      dist_travelled = ct_df[["distance"]].sum()
       return (carbon_val + penalty_val) / dist_travelled
 
   def computePenalty(self, t_mode):
@@ -60,12 +65,8 @@ class TierSys:
       car: 50 mile threshold
       bus: 25 mile threshold
       cycling: 5 mile threshold
-      idea: we need to go through all trips
-      sinc 5 days ago and
-      compute each carbon metric for 
-      each trip, aggregate carbon metric
-      values to get their total penalty
       """
+      return
 
   def updateTiers(self, last_ts):
       updated_user_tiers = self.computeRanks(last_ts, 5)
