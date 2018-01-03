@@ -8,10 +8,10 @@ import emission.core.wrapper.motionactivity as ecwm
 import arrow
 
 class TierSys:
-    def __init__(self, tsid):
+    def __init__(self, tsid, num_tiers=5):
         self.tsid = tsid
         self.tiers = {}
-        for i in range(1, 6):
+        for i in range(1, num_tiers+1):
            self.addTier(i)
 
     def addTier(self, rank):
@@ -56,10 +56,40 @@ class TierSys:
                             arrow.utcnow())  # end of range
         cs_df = ts.get_data_df("analysis/cleaned_section", time_query=last_period_tq)
 
-        #carbon_val = #TODO: Get carbon values from phone, check Gitter chat
+        carbon_val = self.computeFootprint(cs_df[["sensed_mode", "distance"]])
         penalty_val = self.computePenalty(cs_df[["sensed_mode", "distance"]]) # Mappings in emission/core/wrapper/motionactivity.py
         dist_travelled = cs_df[["distance"]].sum()
-        return (carbon_val + penalty_val) / dist_travelled
+
+        if dist_travelled > 0:
+            return (carbon_val + penalty_val) / dist_travelled
+        # Do not include no distance traveled users in the tier system.
+        return None
+
+    def computeFootprint(self, footprint_df):
+        """
+        Inspired by e-mission-phone/www/js/metrics-factory.js
+
+        train: 92/1609,
+        car: 287/1609,
+        ON_FOOT/BICYCLING: 0
+
+        Computes range and for now calculates the average since we 
+        don't distinguish between train and car.
+
+        If unknown (sensed mode = 4), don't compute anything for now.
+
+        footprint_df: [[trip1mode, distance], [trip2mode, distance], ...]
+
+        """
+        fp_train = 92.0/1609.0
+        fp_car = 287.0/1609.0
+        total_footprint = 0
+        for index, row in footprint_df.iterrows():
+            motiontype = int(row['sensed_mode'])
+            if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:
+                # TODO: Replace this avg with public transportation/car value when we can distinguish.
+                total_footprint += (fp_train * m_to_km(distance) + fp_car * m_to_km(distance)) / 2;
+        return total_footprint   
 
     def computePenalty(self, penalty_df):
         """
@@ -69,29 +99,33 @@ class TierSys:
         bus: 25 mile threshold, penalty = 25 - distance
         cycling: 5 mile threshold, penalty = 5 - distance
 
-        if unknown (sensed mode = 4), don't compute anything for now
-
+        If unknown (sensed mode = 4), don't compute anything for now.
 
         penalty_df: [[trip1mode, distance], [trip2mode, distance], ...]
 
         """
         #TODO: Differentiate between car and bus, check ML & try to add to ecwm.MotionTypes...
-        penalties = [0, 0]
+        total_penalty = 0
         for index, row in penalty_df.iterrows():
             motiontype = int(row['sensed_mode'])
             if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:
-                #Vehicle
-                if (37.5 - row['distance'] > 0):
-                    penalties[0] += 37.5 - row['distance']
+                total_penalty += max(0, 37.5 - row['distance'])
             elif motiontype == ecwm.MotionTypes.BICYCLING.value:
-                #Bike
-                if (5 - row['distance'] > 0):
-                    penalties[1] += 5 - row['distance']
-        return sum(penalties)
+                total_penalty += max(0, 5 - row['distance'])
+        return total_penalty
 
     def updateTiers(self, last_ts):
+        """
+        Resets user tiers for the last timestep to the present.
+        Also updates users tier attributes in the database.
+        "Best" tiers have lower rank values.
+        """
         updated_user_tiers = self.computeRanks(last_ts, 5)
         for rank in range(1, len(updated_user_tiers) + 1):
             self.addTier(rank)
             tier_users = updated_user_tiers[rank-1]
             self.tiers[rank].setUsers(tier_users)
+
+def m_to_km(distance):
+    return max(0, distance / 1000)
+
