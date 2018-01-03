@@ -1,8 +1,10 @@
+import emission.core.wrapper.tier as st
 import emission.core.get_database as edb
 import pandas as pd
 from uuid import UUID
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.timequery as estt
+import emission.core.wrapper.motionactivity as ecwm
 import arrow
 
 class TierSys:
@@ -11,9 +13,9 @@ class TierSys:
         self.tiers = {}
         for i in range(1, 6):
            self.addTier(i)
-        
+
     def addTier(self, rank):
-        self.tiers[rank] = Tier(rank)
+        self.tiers[rank] = st.Tier(rank)
 
     def computeRanks(self, last_ts, n):
         #TODO: FINISH
@@ -22,8 +24,9 @@ class TierSys:
         sort them by carbon metric
         compute percentiles
         set boundaries
-        return list of n lists for n ranks, 
-        with the tiers sorted in descending order."""
+        return list of n lists for n ranks,
+        with the tiers sorted in descending order.
+        """
         user_carbon_map = {} # Map from user_id to carbon val.
         num_users = len(all_users.iloc)
         all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"user_email":1, "uuid": 1, "_id": 0})))
@@ -31,7 +34,7 @@ class TierSys:
             user_id = all_users.iloc[i].UUID
             user_carbon_map[user_id] = self.computeCarbon(user_id, last_ts)
 
-        # Sort and partition users by carbon metric.    
+        # Sort and partition users by carbon metric.
         user_carbon_tuples_sorted = sorted(user_carbon_map.iteritems(), key=lambda (k,v): (v,k)) # Sorted list by value of dict tuples.
         user_carbon_sorted = [i[0] for i in user_carbon_tuples_sorted] # Extract only the user ids.
         boundary = int(round(num_users / n)) # Floors to nearest boundary, make first tier have all extra remainder.
@@ -53,7 +56,7 @@ class TierSys:
                             arrow.utcnow())  # end of range
         cs_df = ts.get_data_df("analysis/cleaned_section", time_query=last_period_tq)
 
-        carbon_val = #TODO: Get carbon values from phone, check Gitter chat
+        #carbon_val = #TODO: Get carbon values from phone, check Gitter chat
         penalty_val = self.computePenalty(cs_df[["sensed_mode", "distance"]]) # Mappings in emission/core/wrapper/motionactivity.py
         dist_travelled = cs_df[["distance"]].sum()
         return (carbon_val + penalty_val) / dist_travelled
@@ -70,18 +73,20 @@ class TierSys:
 
 
         penalty_df: [[trip1mode, distance], [trip2mode, distance], ...]
-        
+
         """
-        #TODO: Differentiate between bus and car, check for False
+        #TODO: Differentiate between car and bus, check ML & try to add to ecwm.MotionTypes...
         penalties = [0, 0]
-        for row in penalty_df.rows:
-            if 
-            elif row['sensed_mode'] == 0:
+        for index, row in penalty_df.iterrows():
+            motiontype = int(row['sensed_mode'])
+            if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:
                 #Vehicle
-                penalties[0] += 37.5 - row['distance']
-            elif row['sensed_mode'] == 1:
+                if (37.5 - row['distance'] > 0):
+                    penalties[0] += 37.5 - row['distance']
+            elif motiontype == ecwm.MotionTypes.BICYCLING.value:
                 #Bike
-                penalties[1] += 5 - row['distance']
+                if (5 - row['distance'] > 0):
+                    penalties[1] += 5 - row['distance']
         return sum(penalties)
 
     def updateTiers(self, last_ts):
@@ -90,4 +95,3 @@ class TierSys:
             self.addTier(rank)
             tier_users = updated_user_tiers[rank-1]
             self.tiers[rank].setUsers(tier_users)
-    

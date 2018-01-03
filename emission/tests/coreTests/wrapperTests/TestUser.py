@@ -91,7 +91,7 @@ class TestUser(unittest.TestCase):
     dict1 = {'a': 'a1', 'b': 'b1', 'c': 'c1'}
     dict2 = {'d': 'd2', 'b': 'b2', 'c': 'c2'}
     mergedDict = User.mergeDicts(dict1, dict2)
-    
+
     self.assertEqual(len(mergedDict), 4)
     self.assertEqual(mergedDict['a'], 'a1')
     self.assertEqual(mergedDict, {'a': 'a1', 'b': 'b2', 'c': 'c2', 'd': 'd2'})
@@ -129,7 +129,7 @@ class TestUser(unittest.TestCase):
   def testRegisterExistingUser(self):
     user = User.register('fake@fake.com')
     self.assertEquals(user.getStudy(), [])
-    
+
     client = Client("testclient")
     client.update(createKey = False)
     common.makeValid(client)
@@ -178,7 +178,7 @@ class TestUser(unittest.TestCase):
     user = User.register('fake@fake.com')
     self.assertTrue(User.isRegistered('fake@fake.com'))
 
-    # Check that the field doesn't exist initially    
+    # Check that the field doesn't exist initially
     self.assertTrue(user.getProfile().get('test_field', 'blank'), 'blank')
 
     # Check that a simple value update works
@@ -188,7 +188,7 @@ class TestUser(unittest.TestCase):
     # Check that a data structure update works
     user.setClientSpecificProfileFields({'test_field': {'something': 'beautiful'}})
     self.assertTrue(user.getProfile().get('test_field', 'blank'), {'something': 'beautiful'})
-    
+
 if __name__ == '__main__':
     etc.configLogging()
     unittest.main()
