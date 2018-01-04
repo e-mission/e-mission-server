@@ -39,6 +39,10 @@ def get_profile_db():
     Profiles=_get_current_db().Stage_Profiles
     return Profiles
 
+def get_tiersys_db():
+    TierSys=_get_current_db().Tier_Sys
+    return TierSys
+
 """
 def get_routeDistanceMatrix_db():
     current_db=MongoClient().Stage_database
@@ -49,7 +53,7 @@ def get_routeDistanceMatrix_db():
 def get_routeDistanceMatrix_db(user_id, method):
     if not os.path.exists('routeDistanceMatrices'):
         os.makedirs('routeDistanceMatrices')
-    
+
     routeDistanceMatrix = {}
     if not os.path.exists('routeDistanceMatrices/' + user_id + '_' + method + '_routeDistanceMatrix.json'):
         data = {}
@@ -64,7 +68,7 @@ def get_routeDistanceMatrix_db(user_id, method):
 def update_routeDistanceMatrix_db(user_id, method, updatedMatrix):
     f = open('routeDistanceMatrices/' + user_id + '_' + method + '_routeDistanceMatrix.json', 'w+')
     f.write(json.dumps(updatedMatrix))
-    f.close()   
+    f.close()
 
 
 def get_client_db():

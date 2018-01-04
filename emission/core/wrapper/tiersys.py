@@ -6,6 +6,7 @@ import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.timequery as estt
 import emission.core.wrapper.motionactivity as ecwm
 import arrow
+from emission.core.get_database import get_tiersys_db
 
 class TierSys:
     def __init__(self, tsid, num_tiers=5):
@@ -16,6 +17,9 @@ class TierSys:
 
     def addTier(self, rank):
         self.tiers[rank] = st.Tier(rank)
+
+    def deleteTier(self, rank):
+        self.tiers.pop(rank)
 
     def computeRanks(self, last_ts, n):
         #TODO: FINISH
@@ -73,7 +77,7 @@ class TierSys:
         car: 287/1609,
         ON_FOOT/BICYCLING: 0
 
-        Computes range and for now calculates the average since we 
+        Computes range and for now calculates the average since we
         don't distinguish between train and car.
 
         If unknown (sensed mode = 4), don't compute anything for now.
@@ -86,10 +90,11 @@ class TierSys:
         total_footprint = 0
         for index, row in footprint_df.iterrows():
             motiontype = int(row['sensed_mode'])
+            distance = row['distance']
             if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:
                 # TODO: Replace this avg with public transportation/car value when we can distinguish.
                 total_footprint += (fp_train * m_to_km(distance) + fp_car * m_to_km(distance)) / 2;
-        return total_footprint   
+        return total_footprint
 
     def computePenalty(self, penalty_df):
         """
@@ -126,6 +131,27 @@ class TierSys:
             tier_users = updated_user_tiers[rank-1]
             self.tiers[rank].setUsers(tier_users)
 
+    def saveTiers(self):
+        """
+        Saves the current tiers into the tiersys.
+        Adds/Replaces array of tiers into tiersys object
+        Gets current array of uuids and puts them into tier objects
+        {{
+            _id : 0,
+            tiers : [{
+                rank : [],
+                uuids : []
+            }, {
+                rank : [],
+                uuids : []
+            }]
+        }}
+        """
+        ts = []
+        for rank, users in self.tiers.iteritems():
+            ts.push({'rank': rank, 'uuids': users})
+
+        get_tiersys_db().update({'_id': self.tsid}, {'tiers': ts}, { upsert: true })
+
 def m_to_km(distance):
     return max(0, distance / 1000)
-

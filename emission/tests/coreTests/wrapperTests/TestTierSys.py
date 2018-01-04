@@ -33,6 +33,22 @@ class TestTierSys(unittest.TestCase):
       self.assertEquals(ts.computePenalty(penalty_df), 0, "No inputs penalty is not 0")
       return
 
+  def testComputeFootprint(self):
+      ts = TierSys(0)
+      d = {'sensed_mode': [0, 1, 2], 'distance': [100.1, 2000.1, 80.1]}
+      footprint_df = pd.DataFrame(data=d)
+      ans = (float(92)/1609 + float(287)/1609)/(2 * 1000) * 100.1
+      self.assertEquals(ts.computeFootprint(footprint_df), ans, "Many inputs footprint is not 1178.927")
+
+      d = {'sensed_mode': [1, 2], 'distance': [100.1, 2000.1]}
+      footprint_df = pd.DataFrame(data=d)
+      self.assertEquals(ts.computeFootprint(footprint_df), 0, "Expected non vehicle input to have no footprint")
+
+      d = {'sensed_mode': [], 'distance': []}
+      footprint_df = pd.DataFrame(data=d)
+      self.assertEquals(ts.computeFootprint(footprint_df), 0, "Expected no inputs to yield 0")
+      return
+
   def testComputeCarbon(self):
       return
 
