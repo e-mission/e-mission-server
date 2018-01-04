@@ -129,7 +129,7 @@ class TierSys:
         for rank in range(1, len(updated_user_tiers) + 1):
             self.addTier(rank)
             tier_users = updated_user_tiers[rank-1]
-            self.tiers[rank].setUsers(tier_users)
+            self.tiers[rank] = tier_users
 
     def saveTiers(self):
         """
