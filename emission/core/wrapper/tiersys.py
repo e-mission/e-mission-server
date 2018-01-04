@@ -132,6 +132,7 @@ class TierSys:
             self.tiers[rank] = tier_users
 
     def saveTiers(self):
+        from datetime import datetime
         """
         Saves the current tiers into the tiersys.
         Adds/Replaces array of tiers into tiersys object
@@ -151,7 +152,7 @@ class TierSys:
         for rank, users in self.tiers.iteritems():
             ts.push({'rank': rank, 'uuids': users})
 
-        get_tiersys_db().update({'_id': self.tsid}, {'tiers': ts}, { upsert: true })
+        get_tiersys_db().insert({'id': self.tsid, 'tiers': ts, 'created_at': datetime.now()})
 
 def m_to_km(distance):
     return max(0, distance / 1000)
