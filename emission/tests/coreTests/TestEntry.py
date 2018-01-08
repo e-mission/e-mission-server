@@ -1,7 +1,14 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Test the class that supports usercache entries
 # The main change here is that 
 
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import logging
 import unittest
 from uuid import UUID
@@ -21,7 +28,7 @@ class TestEntry(unittest.TestCase):
          'data': {'accuracy': 52.5,
           'altitude': 0,
           'bearing': 0,
-          'elapsedRealtimeNanos': 100623898000000L,
+          'elapsedRealtimeNanos': 100623898000000,
           'latitude': 37.3885529,
           'longitude': -122.0879696,
           'loc': {"coordinates": [-122.0879696, 37.3885529], "type": "Point"},

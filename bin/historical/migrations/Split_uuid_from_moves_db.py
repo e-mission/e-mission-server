@@ -1,9 +1,16 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 from pymongo import MongoClient
 from get_database import get_uuid_db, get_moves_db, get_profile_db
 from datetime import datetime
 
 for entry in get_moves_db().find():
-  print "%s -> %s" % (entry['user'], entry['uuid'])
+  print("%s -> %s" % (entry['user'], entry['uuid']))
   userEmail = entry['user']
   userUUID = entry['uuid']
   userUUIDEntry = \

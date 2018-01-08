@@ -1,4 +1,11 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import logging
 import time
 import pymongo
@@ -53,9 +60,9 @@ https://github.com/e-mission/e-mission-data-collection/wiki/User-cache-data-form
 class BuiltinUserCache(ucauc.UserCache):
     def __init__(self, user_id):
         super(BuiltinUserCache, self).__init__(user_id)
-        self.key_query = lambda(key): {"metadata.key": key};
-        self.ts_query = lambda(tq): BuiltinUserCache._get_ts_query(tq)
-        self.type_query = lambda(entry_type): {"metadata.type": entry_type}
+        self.key_query = lambda key: {"metadata.key": key};
+        self.ts_query = lambda tq: BuiltinUserCache._get_ts_query(tq)
+        self.type_query = lambda entry_type: {"metadata.type": entry_type}
         self.db = get_usercache_db()
 
     @staticmethod
@@ -121,16 +128,6 @@ class BuiltinUserCache(ucauc.UserCache):
         read_ts = time.time()
         combo_query = self._get_msg_query(key_list, timeQuery)
         
-        # We first update the read timestamp and then actually read the messages
-        # This ensures that the values that we return have the read_ts set
-        # Is this important/useful? Dunno
-        update_read = {
-            '$set': {
-                'metadata.read_ts': read_ts
-            }
-        }
-        update_result = self.db.update(combo_query, update_read)
-        logging.debug("result = %s after updating read timestamp", update_result)
         # In the handler, we assume that the messages are processed in order of
         # the write timestamp, because we use the last_ts_processed to mark the
         # beginning of the entry for the next query. So let's sort by the

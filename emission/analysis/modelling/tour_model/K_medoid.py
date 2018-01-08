@@ -1,5 +1,11 @@
 # Standard imports
 from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import random
 
 # Our imports
@@ -32,7 +38,7 @@ def totalCost(data_feature,disMat2,medoids_idx):
     #print(medoids)
     # Compute the distance and do the clustering
  
-    for i in data_feature.keys():
+    for i in list(data_feature.keys()):
         choice = -1
     	# Make a big number
         min_cost = float('inf')
@@ -76,7 +82,7 @@ def kmedoids(data_feature, k, user_id,method='lcs'):
     #disMat_user=get_routeDistanceMatrix_db().find_one({'$and':[{'user':user_id},{'method':method}]})['disMat']
     disMat_user = get_routeDistanceMatrix_db(user_id, method)
     #print(len(disMat_user))
-    medoids_idx = random.sample([i for i in data_feature.keys()], k)
+    medoids_idx = random.sample([i for i in list(data_feature.keys())], k)
 
     pre_cost, medoids = totalCost(data_feature,disMat_user,medoids_idx)
 

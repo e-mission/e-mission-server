@@ -1,3 +1,11 @@
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from past.utils import old_div
 import json
 import logging
 
@@ -26,7 +34,7 @@ if __name__ == '__main__':
 
     # TEST_PHONE_IDS are not critical - we can run a pipeline for them once a day
     filtered_long_term_uuid_list = [u for u in all_long_term_uuid_list if u not in estag.TEST_PHONE_IDS]
-    half = len(filtered_long_term_uuid_list)/2
+    half = old_div(len(filtered_long_term_uuid_list),2)
     long_term_uuid_list = filtered_long_term_uuid_list[half:]
 
     logging.info("*" * 10 + "long term UUID list = %s" % long_term_uuid_list)

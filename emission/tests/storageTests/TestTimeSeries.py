@@ -1,4 +1,11 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import unittest
 import datetime as pydt
 import logging
@@ -63,7 +70,7 @@ class TestTimeSeries(unittest.TestCase):
         ts = esta.TimeSeries.get_time_series(self.testUUID)
         # Query for all of Aug
         tq = estt.TimeQuery("metadata.write_ts", 1438387200, 1441065600)
-        ignored_phones = estag._get_ignore_test_phone_extra_query()
+        ignored_phones = {"user_id": {"$nin": [self.testUUID]}}
         # user_id is in both the extra query and the base query
         with self.assertRaises(AttributeError):
             list(ts.find_entries(time_query=tq, extra_query_list=[ignored_phones]))

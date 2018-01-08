@@ -1,4 +1,12 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import *
 import unittest
 import logging
 import json
@@ -14,7 +22,7 @@ import emission.core.get_database as edb
 
 class TestHabiticaRegister(unittest.TestCase):
   def setUp(self):
-    print "Test setup called"
+    print("Test setup called")
     self.testUserUUID = uuid.uuid4()
     autogen_string = randomGen()
     autogen_email = autogen_string + '@save.world'
@@ -50,8 +58,8 @@ class TestHabiticaRegister(unittest.TestCase):
       ret_profile = proxy.habiticaProxy(self.testUserUUID, "GET",
                                         "/api/v3/user", None)
       ret_json = ret_profile.json()
-      logging.debug("Retrieved profile with keys %s" % ret_json.keys())
-      logging.debug("profile data keys = %s" % ret_json['data'].keys())
+      logging.debug("Retrieved profile with keys %s" % list(ret_json.keys()))
+      logging.debug("profile data keys = %s" % list(ret_json['data'].keys()))
       # User has just been created, so has no gear
       self.assertEqual(ret_json['data']['achievements']['ultimateGearSets'],
                        {'warrior': False, 'rogue': False, 'wizard': False,

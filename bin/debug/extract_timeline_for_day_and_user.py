@@ -1,5 +1,12 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 # Exports all data for the particular user for the particular day
 # Used for debugging issues with trip and section generation 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import sys
 import logging
 logging.basicConfig(level=logging.DEBUG)
@@ -12,7 +19,7 @@ import emission.core.get_database as edb
 
 def export_timeline(user_id_str, day_str, file_name):
     logging.info("Extracting timeline for user %s day %s and saving to file %s" %
-                 (user_id_str, day_str, file))
+                 (user_id_str, day_str, file_name))
 
     # day_dt = pydt.datetime.strptime(day_str, "%Y-%m-%d").date()
     day_dt = pydt.datetime.strptime(day_str, "%Y-%m-%d")
@@ -31,6 +38,6 @@ def export_timeline(user_id_str, day_str, file_name):
 
 if __name__ == '__main__':
     if len(sys.argv) != 4:
-        print "Usage: %s <user> <day> <file>" % (sys.argv[0])
+        print("Usage: %s <user> <day> <file>" % (sys.argv[0]))
     else:
         export_timeline(user_id_str=sys.argv[1], day_str=sys.argv[2], file_name=sys.argv[3])

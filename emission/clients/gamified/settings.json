@@ -1,9 +1,0 @@
-{
-  "name": "gamified",
-  "start_date": "2014/10/13",
-  "end_date": "2016/06/01",
-  "key": "this_is_the_super_secret_id",
-  "client_settings": {
-    "result_url": "https://e-mission.eecs.berkeley.edu/compare"
-  }
-}

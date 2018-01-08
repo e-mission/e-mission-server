@@ -1,3 +1,7 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Fixes usercache processing
 # If there are any errors in the usercache processing, fix them and reload the data
 # Basic flow
@@ -6,6 +10,9 @@
 # - Find errors
 # - Fix errors
 # - Repeat until no errors are found
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import sys
 import logging
 logging.basicConfig(level=logging.DEBUG)

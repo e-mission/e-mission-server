@@ -1,3 +1,13 @@
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import *
+from builtins import object
+from past.utils import old_div
 __author__ = 'Mogeng'
 # Standard imports
 import numpy as np
@@ -19,7 +29,7 @@ class Dtw(object):
         # print(size)
             self._seq1 = seq1
         else:
-            indexes=np.arange(0,size1,int(math.ceil(size1/100)))
+            indexes=np.arange(0,size1,int(math.ceil(old_div(size1,100))))
             # print(len(indexes))
             self._seq1 = []
             for i in indexes:
@@ -31,7 +41,7 @@ class Dtw(object):
         # print(size)
             self._seq2 = seq2
         else:
-            indexes=np.arange(0,size2,int(math.ceil(size2/100)))
+            indexes=np.arange(0,size2,int(math.ceil(old_div(size2,100))))
             # print(len(indexes))
             self._seq2 = []
             for i in indexes:
@@ -88,7 +98,7 @@ class Dtw(object):
                                        len(self._seq2) - 1)
 
     def calculate_distance(self):
-        return self.calculate()/len(self.get_path())
+        return old_div(self.calculate(),len(self.get_path()))
 
 import math
 
@@ -99,15 +109,15 @@ def dynamicTimeWarp(seqA, seqB, d = ec.calDistance):
 
     # initialize the first row and column
     cost[0][0] = d(seqA[0], seqB[0])
-    for i in xrange(1, numRows):
+    for i in range(1, numRows):
         cost[i][0] = cost[i-1][0] + d(seqA[i], seqB[0])
 
-    for j in xrange(1, numCols):
+    for j in range(1, numCols):
         cost[0][j] = cost[0][j-1] + d(seqA[0], seqB[j])
 
     # fill in the rest of the matrix
-    for i in xrange(1, numRows):
-        for j in xrange(1, numCols):
+    for i in range(1, numRows):
+        for j in range(1, numCols):
             choices = cost[i-1][j], cost[i][j-1], cost[i-1][j-1]
             cost[i][j] = min(choices) + d(seqA[i], seqB[j])
 
@@ -115,7 +125,7 @@ def dynamicTimeWarp(seqA, seqB, d = ec.calDistance):
     #    for entry in row:
     #       print "%03d" % entry,
     #    print ""
-    return cost[-1][-1] / (len(seqA) + len(seqB))
+    return old_div(cost[-1][-1], (len(seqA) + len(seqB)))
 
 class DtwSym(object):
     def __init__(self, seq1, seq2, distance_func=None):
@@ -176,7 +186,7 @@ class DtwSym(object):
                                        len(self._seq2) - 1)
 
     def calculate_distance(self):
-        return self.calculate()/(len(self._seq1)+len(self._seq2))
+        return old_div(self.calculate(),(len(self._seq1)+len(self._seq2)))
 
 class DtwAsym(object):
     def __init__(self, seq1, seq2, distance_func=None):
@@ -235,4 +245,4 @@ class DtwAsym(object):
                                        len(self._seq2) - 1)
 
     def calculate_distance(self):
-        return self.calculate()/len(self._seq1)
+        return old_div(self.calculate(),len(self._seq1))

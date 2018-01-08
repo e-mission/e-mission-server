@@ -1,8 +1,17 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
+from past.utils import old_div
 import json
 from random import randrange
-from bottle import route, post, get, run, template, static_file, request, app, HTTPError, abort, BaseRequest, JSONPlugin, response
-import bottle as bt
+from emission.net.api.bottle import route, post, get, run, template, static_file, request, app, HTTPError, abort, BaseRequest, JSONPlugin, response
+import emission.net.api.bottle as bt
 # To support dynamic loading of client-specific libraries
 import sys
 import os
@@ -16,27 +25,24 @@ from uuid import UUID
 # So that we can set the socket timeout
 import socket
 # For decoding JWTs using the google decode URL
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import requests
-# For decoding JWTs on the client side
-import oauth2client.client
-from oauth2client.crypt import AppIdentityError
 import traceback
 import xmltodict
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import bson.json_util
 
 # Our imports
-import modeshare, zipcode, distance, tripManager, \
-                 Berkeley, visualize, stats, usercache, timeline, \
-                 metrics, pipeline
-import emission.net.ext_service.moves.register as auth
+import emission.net.api.visualize as visualize
+import emission.net.api.stats as stats
+import emission.net.api.usercache as usercache
+import emission.net.api.timeline as timeline
+import emission.net.api.metrics as metrics
+import emission.net.api.pipeline as pipeline
+
+import emission.net.auth.auth as enaa
+# import emission.net.ext_service.moves.register as auth
 import emission.net.ext_service.habitica.proxy as habitproxy
-import emission.analysis.result.carbon as carbon
-import emission.analysis.classification.inference.commute as commute
-import emission.analysis.modelling.work_time as work_time
-import emission.analysis.result.userclient as userclient
-import emission.core.common as common
 from emission.core.wrapper.client import Client
 from emission.core.wrapper.user import User
 from emission.core.get_database import get_uuid_db, get_mode_db
@@ -48,7 +54,12 @@ import emission.storage.timeseries.cache_series as esdc
 import emission.core.timer as ect
 import emission.core.get_database as edb
 
-config_file = open('conf/net/api/webserver.conf')
+try:
+    config_file = open('conf/net/api/webserver.conf')
+except:
+    logging.debug("webserver not configured, falling back to sample, default configuration")
+    config_file = open('conf/net/api/webserver.conf.sample')
+
 config_data = json.load(config_file)
 static_path = config_data["paths"]["static_path"]
 python_path = config_data["paths"]["python_path"]
@@ -56,21 +67,12 @@ server_host = config_data["server"]["host"]
 server_port = config_data["server"]["port"]
 socket_timeout = config_data["server"]["timeout"]
 log_base_dir = config_data["paths"]["log_base_dir"]
-
-key_file = open('conf/net/keys.json')
-key_data = json.load(key_file)
-ssl_cert = key_data["ssl_certificate"]
-private_key = key_data["private_key"]
-client_key = key_data["client_key"]
-client_key_old = key_data["client_key_old"]
-ios_client_key = key_data["ios_client_key"]
-ios_client_key_new = key_data["ios_client_key_new"]
+auth_method = config_data["server"]["auth"]
 
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes
 
-skipAuth = False
-print "Finished configuring logging for %s" % logging.getLogger()
+print("Finished configuring logging for %s" % logging.getLogger())
 app = app()
 
 # On MacOS, the current working directory is always in the python path However,
@@ -91,6 +93,7 @@ def index():
 @route("/docs/<filename>")
 def docs(filename):
   if filename != "privacy.html" and filename != "support.html" and filename != "about.html" and filename != "consent.html" and filename != "approval_letter.pdf":
+    logging.error("Request for unknown filename "% filename)
     logging.error("Request for unknown filename "% filename)
     return HTTPError(404, "Don't try to hack me, you evil spammer")
   else:
@@ -129,103 +132,6 @@ def server_lib(filepath):
 def server_templates(filepath):
   logging.debug("static filepath = %s" % filepath)
   return static_file(filepath, "%s/%s" % (static_path, "templates"))
-
-@route('/clients/<clientname>/front/<filename>')
-def server_static(clientname, filename):
-  logging.debug("returning file %s from client %s " % (filename, clientname))
-  return static_file(filename, "clients/%s/%s" % (clientname, static_path))
-
-# Returns the proportion of survey takers who use each mode
-@route('/result/commute.modeshare.distance')
-def getCommuteModeShare():
-  fromTs = request.query.from_ts
-  toTs = request.query.to_ts
-  logging.debug("Filtering values for range %s -> %s" % (fromTs, toTs))
-  return modeshare.get_Alluser_mode_share_by_distance("commute",
-    datetime.fromtimestamp(float(fromTs)/1000), datetime.fromtimestamp(float(toTs)/1000))
-  # return modeshare.getModeShare()
-
-@route('/result/internal.modeshare.distance')
-def getBerkeleyModeShare():
-  fromTs = request.query.from_ts
-  toTs = request.query.to_ts
-  logging.debug("Filtering values for range %s -> %s" % (fromTs, toTs))
-  return Berkeley.get_berkeley_mode_share_by_distance(
-    datetime.fromtimestamp(float(fromTs)/1000), datetime.fromtimestamp(float(toTs)/1000))
-  # return modeshare.getModeShare()
-
-# Returns the modeshare by zipcode
-@route('/result/commute.modeshare/zipcode/<zc>')
-def getCommuteModeShare(zc):
-  fromTs = request.query.from_ts
-  toTs = request.query.to_ts
-  logging.debug("Filtering values for range %s -> %s" % (fromTs, toTs))
-  return zipcode.get_mode_share_by_Zipcode(zc, "commute",
-    datetime.fromtimestamp(float(fromTs)/1000), datetime.fromtimestamp(float(toTs)/1000))
-
-# Returns the proportion of survey takers from different zip codes
-@route('/result/home.zipcode')
-def getZipcode():
-  return zipcode.getZipcode()
-
-# Returns the proportion of commute distances
-@route('/result/commute.distance.to')
-def getDistance():
-  fromTs = request.query.from_ts
-  toTs = request.query.to_ts
-  logging.debug("Filtering values for range %s -> %s" % (fromTs, toTs))
-  distances = distance.get_morning_commute_distance_pie(
-    datetime.fromtimestamp(float(fromTs)/1000), datetime.fromtimestamp(float(toTs)/1000))
-  # logging.debug("Returning distances = %s" % distances)
-  return distances
-
-@route('/result/commute.distance.from')
-def getDistance():
-  fromTs = request.query.from_ts
-  toTs = request.query.to_ts
-  logging.debug("Filtering values for range %s -> %s" % (fromTs, toTs))
-  distances = distance.get_evening_commute_distance_pie(
-    datetime.fromtimestamp(float(fromTs)/1000), datetime.fromtimestamp(float(toTs)/1000))
-  # logging.debug("Returning distances = %s" % distances)
-  return distances
-
-# Returns the distribution of commute arrival and departure times
-@route('/result/commute.arrivalTime')
-def getArrivalTime():
-  fromTs = request.query.from_ts
-  toTs = request.query.to_ts
-  logging.debug("Filtering values for range %s -> %s" % (fromTs, toTs))
-  retVal = work_time.get_Alluser_work_start_time_pie(
-    datetime.fromtimestamp(float(fromTs)/1000), datetime.fromtimestamp(float(toTs)/1000))
-  # retVal = common.generateRandomResult(['00-04', '04-08', '08-10'])
-  # logging.debug("In getArrivalTime, retVal is %s" % retVal)
-  return retVal
-
-@route('/result/commute.departureTime')
-def getDepartureTime():
-  fromTs = request.query.from_ts
-  toTs = request.query.to_ts
-  logging.debug("Filtering values for range %s -> %s" % (fromTs, toTs))
-  retVal = work_time.get_Alluser_work_end_time_pie(
-    datetime.fromtimestamp(float(fromTs)/1000), datetime.fromtimestamp(float(toTs)/1000))
-  # retVal = common.generateRandomResult(['00-04', '04-08', '08-10'])
-  # logging.debug("In getDepartureTime, retVal is %s" % retVal)
-  return retVal
-
-@route("/result/heatmap/carbon")
-def getCarbonHeatmap():
-  fromTs = request.query.from_ts
-  toTs = request.query.to_ts
-  logging.debug("Filtering values for range %s -> %s" % (fromTs, toTs))
-  retVal = visualize.carbon_by_zip(
-    datetime.fromtimestamp(float(fromTs)/1000), datetime.fromtimestamp(float(toTs)/1000))
-  # retVal = common.generateRandomResult(['00-04', '04-08', '08-10'])
-  # logging.debug("In getCarbonHeatmap, retVal is %s" % retVal)
-  return retVal
-
-@post("/result/heatmap/pop.route")
-def getPopRouteLegacy():
-  return getPopRoute("local_date")
 
 @post("/result/heatmap/pop.route/<time_type>")
 def getPopRoute(time_type):
@@ -283,8 +189,6 @@ def getStressMap(time_type):
     }
     viz_fn = time_type_map[time_type]
     retVal = viz_fn(user_uuid, modes, start_time, end_time, region)
-    # retVal = common.generateRandomResult(['00-04', '04-08', '08-10'])
-    # logging.debug("In getCalPopRoute, retVal is %s" % retVal)
     return retVal
 
 @post("/pipeline/get_complete_ts")
@@ -320,38 +224,6 @@ def getTimeseriesEntries(time_type):
     data_list = esdc.find_entries(user_uuid, key_list, time_query)
     return {'phone_data': data_list}
 
-@get('/result/carbon/all/summary')
-def carbonSummaryAllTrips():
-  fromTs = request.query.from_ts
-  toTs = request.query.to_ts
-  logging.debug("Filtering values for range %s -> %s" % (fromTs, toTs))
-  return carbon.getSummaryAllTrips(
-      datetime.fromtimestamp(float(fromTs)/1000), datetime.fromtimestamp(float(toTs)/1000))
-
-@get('/tripManager/getModeOptions')
-def getModeOptions():
-  return tripManager.getModeOptions()
-
-@post('/tripManager/getUnclassifiedSections')
-def getUnclassifiedSections():
-  user_uuid=getUUID(request)
-  return tripManager.getUnclassifiedSections(user_uuid)
-
-@post('/tripManager/setSectionClassification')
-def setSectionClassification():
-  user_uuid=getUUID(request)
-  updates = request.json['updates']
-  return tripManager.setSectionClassification(user_uuid, updates)
-
-@post('/tripManager/storeSensedTrips')
-def storeSensedTrips():
-  logging.debug("Called storeSensedTrips")
-  user_uuid=getUUID(request)
-  print "user_uuid %s" % user_uuid
-  logging.debug("user_uuid %s" % user_uuid)
-  sections = request.json['sections']
-  return tripManager.storeSensedTrips(user_uuid, sections)
-
 @post('/usercache/get')
 def getFromCache():
   logging.debug("Called userCache.get")
@@ -380,23 +252,19 @@ def getTrips(day):
   logging.debug("type(ret_dict) = %s" % type(ret_dict))
   return ret_dict
 
-@post('/incidents/')
-
 @post('/profile/create')
 def createUserProfile():
-  logging.debug("Called createUserProfile")
-  userToken = request.json['user']
-  # This is the only place we should use the email, since we may not have a
-  # UUID yet. All others should only use the UUID.
-  if skipAuth:
-    userEmail = userToken
-  else:
-    userEmail = verifyUserToken(userToken)
-  logging.debug("userEmail = %s" % userEmail)
-  user = User.register(userEmail)
-  logging.debug("Looked up user = %s" % user)
-  logging.debug("Returning result %s" % {'uuid': str(user.uuid)})
-  return {'uuid': str(user.uuid)}
+  try:
+      logging.debug("Called createUserProfile")
+      userEmail = enaa._getEmail(request, auth_method)
+      logging.debug("userEmail = %s" % userEmail)
+      user = User.register(userEmail)
+      logging.debug("Looked up user = %s" % user)
+      logging.debug("Returning result %s" % {'uuid': str(user.uuid)})
+      return {'uuid': str(user.uuid)}
+  except ValueError as e:
+      traceback.print_exc()
+      abort(403, e.message)
 
 @post('/profile/update')
 def updateUserProfile():
@@ -412,72 +280,6 @@ def getUserProfile():
   user_uuid = getUUID(request)
   user = User.fromUUID(user_uuid)
   return user.getProfile()
-
-@post('/profile/consent')
-def setConsentInProfile():
-  user_uuid = getUUID(request)
-  version = request.json['version']
-  print "Setting accepted version to %s for user %s" % (version, user_uuid)
-  logging.debug("Setting accepted version to %s for user %s" % (version, user_uuid))
-  return None
-
-@post('/profile/settings')
-def getCustomizationForProfile():
-  user_uuid = getUUID(request)
-  user = User.fromUUID(user_uuid)
-  logging.debug("Returning settings for user %s" % user_uuid)
-  return user.getSettings()
-
-@post('/stats/set')
-def setStats():
-  user_uuid=getUUID(request)
-  inStats = request.json['stats']
-  stats.setClientMeasurements(user_uuid, inStats)
-
-@post('/compare')
-def postCarbonCompare():
-  from clients.data import data
-  from clients.choice import choice
-
-  if not skipAuth:
-      if request.json == None:
-        return "Waiting for user data to become available..."
-      if 'user' not in request.json:
-        return "Waiting for user data to be become available.."
-
-  user_uuid = getUUID(request)
-
-  clientResult = userclient.getClientSpecificResult(user_uuid)
-  if clientResult != None:
-    logging.debug("Found overriding client result for user %s, returning it" % user_uuid)
-    return clientResult
-  else:
-    logging.debug("No overriding client result for user %s, returning choice " % user_uuid)
-  return choice.getResult(user_uuid)
-
-@get('/compare')
-def getCarbonCompare():
-  for key, val in request.headers.items():
-    print("  %s: %s" % (key, val))
-
-  from clients.data import data
-
-  if not skipAuth:
-    if 'User' not in request.headers or request.headers.get('User') == '':
-        return "Waiting for user data to become available..."
-
-  from clients.choice import choice
-
-  user_uuid = getUUID(request, inHeader=True)
-  print ('UUID', user_uuid)
-
-  clientResult = userclient.getClientSpecificResult(user_uuid)
-  if clientResult != None:
-    logging.debug("Found overriding client result for user %s, returning it" % user_uuid)
-    return clientResult
-  else:
-    logging.debug("No overriding client result for user %s, returning choice" % user_uuid)
-  return choice.getResult(user_uuid)
 
 @post('/result/metrics/<time_type>')
 def summarize_metrics(time_type):
@@ -536,47 +338,18 @@ def habiticaJoinGroup(group_id):
         logging.info("Aborting call with message %s" % e.message)
         abort(400, e.message)
 
-# Pulling public data from the server
-@get('/eval/publicData/timeseries')
-def getPublicData():
-  ids = request.json['phone_ids']
-  all_uuids = map(lambda id: UUID(id), ids)
-  uuids = [uuid for uuid in all_uuids if uuid in estag.TEST_PHONE_IDS]
-
-  from_ts = request.query.from_ts
-  to_ts = request.query.to_ts
-
-  time_range = estt.TimeQuery("metadata.write_ts", float(from_ts), float(to_ts))
-  time_query = time_range.get_query()
-
-  user_queries = map(lambda id: {'user_id': id}, uuids)
-
-  for q in user_queries:
-    q.update(time_query)
-
-  num_entries_ts = map(lambda q: edb.get_timeseries_db().find(q).count(), user_queries)
-  num_entries_uc = map(lambda q: edb.get_usercache_db().find(q).count(), user_queries)
-  total_entries = sum(num_entries_ts + num_entries_uc)
-  logging.debug("Total entries requested: %d" % total_entries)
-
-  threshold = 200000
-  if total_entries > threshold:
-    data_list = None
-  else:
-    data_list = map(lambda u: esdc.find_entries(u, None, time_range), all_uuids)
-
-  return {'phone_data': data_list}
+# Small utilities to make client software easier START
 
 # Redirect to custom URL. $%$%$$ gmail
 @get('/redirect/<route>')
 def getCustomURL(route):
-  print route
-  print urllib.urlencode(request.query)
+  print(route)
+  print(urllib.parse.urlencode(request.query))
   logging.debug("route = %s, query params = %s" % (route, request.query))
   if route == "join":
-    redirected_url = "/#/setup?%s" % (urllib.urlencode(request.query))
+    redirected_url = "/#/setup?%s" % (urllib.parse.urlencode(request.query))
   else:
-    redirected_url = 'emission://%s?%s' % (route, urllib.urlencode(request.query))
+    redirected_url = 'emission://%s?%s' % (route, urllib.parse.urlencode(request.query))
   response.status = 303
   response.set_header('Location', redirected_url)
   # response.set_header('Location', 'mailto://%s@%s' % (route, urllib.urlencode(request.query)))
@@ -584,64 +357,17 @@ def getCustomURL(route):
   print("Redirecting to URL %s" % redirected_url)
   return {'redirect': 'success'}
 
-
-# Client related code START
-@post("/client/<clientname>/<method>")
-def callStudy(clientname, method):
-  user_uuid = getUUID(request)
-  request['user'] = user_uuid
-  return Client(clientname).callMethod(method, request)
-
-@get('/client/pre-register')
-def registeredForStudy():
-  userEmail = request.query.email
-  client = request.query.client
-  client_key = request.query.client_key
-
-  logging.debug("request = %s" % (request))
-  logging.debug("userEmail = %s, client = %s, client_key = %s" % (userEmail, client, client_key))
-  # try:
-  newSignupCount = Client(client).preRegister(client_key, userEmail)
-  # except Exception as e:
-  #   abort(e.code, e.msg)
-  return {'email': userEmail, 'client': client, 'signup_count': newSignupCount }
-
-@get('/client/<clientName>/<method>')
-def javascriptCallback(clientName, method):
-  from clients.choice import choice
-
-  client = Client(clientName)
-  client_key = request.query.client_key
-  client.callJavascriptCallback(client_key, method, request.params)
-  return {'status': 'ok'}
-
 # proxy used to request and process XML from an external API, then convert it to JSON
 # original URL should be encoded in UTF-8
 @get("/asJSON/<originalXMLWebserviceURL>")
 def xmlProxy(originalXMLWebserviceURL):
-  decodedURL = urllib2.unquote(originalXMLWebserviceURL)
-  f = urllib2.urlopen(decodedURL)
+  decodedURL = urllib.parse.unquote(originalXMLWebserviceURL)
+  f = urllib.request.urlopen(decodedURL)
   xml = f.read()
   parsedXML = xmltodict.parse(xml)
   return json.dumps(parsedXML)
 
-# Client related code END
-
-# Data source integration START
-@post('/movesCallback')
-def movesCallback():
-  logging.debug("Request from user = %s" % request)
-  logging.debug("Request.json from user = %s" % request.json)
-  user_uuid = getUUID(request)
-  if user_uuid is None:
-    # Hack to support older clients that don't call register before calling movesCallback
-    # Remove by Dec 31, 2014
-    createUserProfile()
-    user_uuid = getUUID(request)
-  assert(user_uuid is not None)
-  code = request.json['code']
-  state = request.json['state']
-  return auth.movesCallback(code, state, user_uuid)
+# Small utilities to make client software easier END
 
 @post('/habiticaRegister')
 def habiticaRegister():
@@ -685,7 +411,7 @@ def after_request():
   request.params.timer.__exit__()
   duration = msTimeNow - request.params.start_ts
   new_duration = request.params.timer.elapsed
-  if round((duration - new_duration) / new_duration > 100) > 0:
+  if round(old_div((duration - new_duration), new_duration) > 100) > 0:
     logging.error("old style duration %s != timer based duration %s" % (duration, new_duration))
     stats.store_server_api_error(request.params.user_uuid, "MISMATCH_%s_%s" %
                                  (request.method, request.path), msTimeNow, duration - new_duration)
@@ -701,86 +427,18 @@ def after_request():
 # Auth helpers BEGIN
 # This should only be used by createUserProfile since we may not have a UUID
 # yet. All others should use the UUID.
-def verifyUserToken(token):
-    try:
-        # attempt to validate token on the client-side
-        logging.debug("Using OAuth2Client to verify id token of length %d from android phones" % len(token))
-        tokenFields = oauth2client.client.verify_id_token(token,client_key)
-        logging.debug(tokenFields)
-    except AppIdentityError as androidExp:
-        try:
-            logging.debug("Using OAuth2Client to verify id token of length %d from android phones using old token" % len(token))
-            tokenFields = oauth2client.client.verify_id_token(token,client_key_old)
-            logging.debug(tokenFields)
-        except AppIdentityError as androidExpOld:
-            try:
-                logging.debug("Using OAuth2Client to verify id token from iOS phones")
-                tokenFields = oauth2client.client.verify_id_token(token, ios_client_key)
-                logging.debug(tokenFields)
-            except AppIdentityError as iOSExp:
-                try:
-                    logging.debug("Using OAuth2Client to verify id token from newer iOS phones")
-                    tokenFields = oauth2client.client.verify_id_token(token, ios_client_key_new)
-                    logging.debug(tokenFields)
-                except AppIdentityError as iOSExp:
-                    traceback.print_exc()
-                    logging.debug("OAuth failed to verify id token, falling back to constructedURL")
-                    #fallback to verifying using Google API
-                    constructedURL = ("https://www.googleapis.com/oauth2/v1/tokeninfo?id_token=%s" % token)
-                    r = requests.get(constructedURL)
-                    tokenFields = json.loads(r.content)
-                    in_client_key = tokenFields['audience']
-                    if (in_client_key != client_key):
-                        if (in_client_key != ios_client_key and 
-                            in_client_key != ios_client_key_new):
-                            abort(401, "Invalid client key %s" % in_client_key)
-    logging.debug("Found user email %s" % tokenFields['email'])
-    return tokenFields['email']
-
-def getUUIDFromToken(token):
-    userEmail = verifyUserToken(token)
-    return __getUUIDFromEmail__(userEmail)
-
-# This should not be used for general API calls
-def __getUUIDFromEmail__(userEmail):
-    user=User.fromEmail(userEmail)
-    if user is None:
-        return None
-    user_uuid=user.uuid
-    return user_uuid
-
-def __getToken__(request, inHeader):
-    if inHeader:
-      userHeaderSplitList = request.headers.get('User').split()
-      if len(userHeaderSplitList) == 1:
-          userToken = userHeaderSplitList[0]
-      else:
-          userToken = userHeaderSplitList[1]
-    else:
-      userToken = request.json['user']
-
-    return userToken
 
 def getUUID(request, inHeader=False):
-  retUUID = None
-  if skipAuth:
-    if 'User' in request.headers or 'user' in request.json:
-        # skipAuth = true, so the email will be sent in plaintext
-        userEmail = __getToken__(request, inHeader)
-        retUUID = __getUUIDFromEmail__(userEmail)
-        logging.debug("skipAuth = %s, returning UUID directly from email %s" % (skipAuth, retUUID))
-    else:
-        logging.debug("skipAuth = %s, returning None")
-        return None
-    if Client("choice").getClientKey() is None:
-        Client("choice").update(createKey = True)
-  else:
-    userToken = __getToken__(request, inHeader)
-    retUUID = getUUIDFromToken(userToken)
-  if retUUID is None:
-     raise HTTPError(403, "token is valid, but no account found for user")
-  request.params.user_uuid = retUUID
-  return retUUID
+    try:
+        retUUID = enaa.getUUID(request, auth_method, inHeader)
+        logging.debug("retUUID = %s" % retUUID)
+        if retUUID is None:
+           raise HTTPError(403, "token is valid, but no account found for user")
+        return retUUID
+    except ValueError as e:
+        traceback.print_exc()
+        abort(401, e.message)
+
 # Auth helpers END
 
 if __name__ == '__main__':
@@ -809,18 +467,17 @@ if __name__ == '__main__':
     # port number
     if server_port == "443":
       # We support SSL and want to use it
-      run(host=server_host, port=server_port, server='cherrypy', debug=True,
-          certfile=ssl_cert, keyfile=private_key, ssl_module='builtin')
+      key_file = open('conf/net/keys.json')
+      key_data = json.load(key_file)
+      host_cert = key_data["host_certificate"]
+      chain_cert = key_data["chain_certificate"]
+      private_key = key_data["private_key"]
+
+      run(host=server_host, port=server_port, server='cheroot', debug=True,
+          certfile=host_cert, chainfile=chain_cert, keyfile=private_key)
     else:
       # Non SSL option for testing on localhost
-      # We can theoretically use a separate skipAuth flag specified in the config file,
-      # but then we have to define the behavior if SSL is true and we are not
-      # running on localhost but still want to run without authentication. That is
-      # not really an important use case now, and it makes people have to change
-      # two values and increases the chance of bugs. So let's key the auth skipping from this as well.
-      skipAuth = True
-      print "Running with HTTPS turned OFF, skipAuth = True"
-
-      run(host=server_host, port=server_port, server='cherrypy', debug=True)
+      print("Running with HTTPS turned OFF - use a reverse proxy on production")
+      run(host=server_host, port=server_port, server='cheroot', debug=True)
 
     # run(host="0.0.0.0", port=server_port, server='cherrypy', debug=True)

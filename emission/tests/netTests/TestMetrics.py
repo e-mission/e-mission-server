@@ -1,3 +1,10 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import unittest
 import logging
 import arrow
@@ -47,7 +54,7 @@ class TestMetrics(unittest.TestCase):
                                        'd', ['count'], True)
         logging.debug(met_result)
 
-        self.assertEqual(met_result.keys(), ['aggregate_metrics', 'user_metrics'])
+        self.assertEqual(list(met_result.keys()), ['aggregate_metrics', 'user_metrics'])
         user_met_result = met_result['user_metrics'][0]
         agg_met_result = met_result['aggregate_metrics'][0]
 
@@ -82,7 +89,7 @@ class TestMetrics(unittest.TestCase):
                                                      ecwl.LocalDate({'year': 2015, 'month': 8}),
                                                      ecwl.LocalDate({'year': 2015, 'month': 9}),
                                                      'MONTHLY', ['count'], True)
-        self.assertEqual(met_result.keys(), ['aggregate_metrics', 'user_metrics'])
+        self.assertEqual(list(met_result.keys()), ['aggregate_metrics', 'user_metrics'])
         user_met_result = met_result['user_metrics'][0]
         agg_met_result = met_result['aggregate_metrics'][0]
 
@@ -114,7 +121,7 @@ class TestMetrics(unittest.TestCase):
                                                      ecwl.LocalDate({'year': 2000}),
                                                      ecwl.LocalDate({'year': 2001}),
                                                      'MONTHLY', ['count'], True)
-        self.assertEqual(met_result_ld.keys(), ['aggregate_metrics', 'user_metrics'])
+        self.assertEqual(list(met_result_ld.keys()), ['aggregate_metrics', 'user_metrics'])
         self.assertEqual(met_result_ld['aggregate_metrics'][0], [])
         self.assertEqual(met_result_ld['user_metrics'][0], [])
 
@@ -122,7 +129,7 @@ class TestMetrics(unittest.TestCase):
                                                        arrow.get(2000,1,1).timestamp,
                                                        arrow.get(2001,1,1).timestamp,
                                                         'm', ['count'], True)
-        self.assertEqual(met_result_ts.keys(), ['aggregate_metrics', 'user_metrics'])
+        self.assertEqual(list(met_result_ts.keys()), ['aggregate_metrics', 'user_metrics'])
         self.assertEqual(met_result_ts['aggregate_metrics'][0], [])
         self.assertEqual(met_result_ts['user_metrics'][0], [])
 

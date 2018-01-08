@@ -1,3 +1,10 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import logging
 import emission.storage.decorations.stats_queries as esds
 
@@ -49,19 +56,20 @@ def old2new(old_style_data):
 
     none2None = lambda s: None if s == 'none' else s
     float_with_none = lambda s: float(s) if s is not None else None
+    ms_to_sec_with_none = lambda s: (float(s))/1000 if s is not None else None
 
     user_id = old_style_data["user"]
     del old_style_data["user"]
     if old_style_data["stat"] == "battery_level":
         new_style_data = ecwb.Battery({
             "battery_level_pct" : float_with_none(none2None(old_style_data["reading"])),
-            "ts": old_style_data["ts"]
+            "ts": ms_to_sec_with_none(old_style_data["ts"])
         })
         new_key = "background/battery"
     else:
         new_style_data = ecws.Statsevent()
         new_style_data.name = old_style_data["stat"]
-        new_style_data.ts = old_style_data["ts"]
+        new_style_data.ts = ms_to_sec_with_none(old_style_data["ts"])
         new_style_data.reading = float_with_none(none2None(old_style_data["reading"]))
         new_style_data.client_app_version = old_style_data["client_app_version"]
         new_style_data.client_os_version = old_style_data["client_os_version"]
@@ -70,7 +78,7 @@ def old2new(old_style_data):
     new_entry = ecwe.Entry.create_entry(user_id, new_key, new_style_data)
     # For legacy entries, make sure that the write_ts doesn't become the conversion
     # time or the server arrival time
-    new_entry["metadata"]["write_ts"] = new_style_data.ts
+    new_entry["metadata"]["write_ts"] = float_with_none(old_style_data["reported_ts"])
     del new_entry["metadata"]["write_local_dt"]
     del new_entry["metadata"]["write_fmt_time"]
     # We are not going to fill in the local_date and fmt_time entries because
@@ -112,30 +120,3 @@ def createEntry(user, stat, ts, reading):
            'ts': float(ts),
            'reading': reading}
 
-# Dummy functions to keep the old, obsolete code happy.
-# Will do a big purge over winter break
-
-STAT_TRIP_MGR_PCT_SHOWN = "tripManager.pctShown"
-STAT_TRIP_MGR_TRIPS_FOR_DAY = "tripManager.tripsForDay"
-
-STAT_MY_CARBON_FOOTPRINT = "footprint.my_carbon"
-STAT_MY_CARBON_FOOTPRINT_NO_AIR = "footprint.my_carbon.no_air"
-STAT_MY_OPTIMAL_FOOTPRINT = "footprint.optimal"
-STAT_MY_OPTIMAL_FOOTPRINT_NO_AIR = "footprint.optimal.no_air"
-STAT_MY_ALLDRIVE_FOOTPRINT = "footprint.alldrive"
-
-STAT_PCT_CLASSIFIED = "game.score.pct_classified"
-STAT_MINE_MINUS_OPTIMAL = "game.score.mine_minus_optimal"
-STAT_ALL_DRIVE_MINUS_MINE = "game.score.all_drive_minus_mine"
-STAT_SB375_DAILY_GOAL = "game.score.sb375_daily_goal"
-
-STAT_MEAN_FOOTPRINT = "footprint.mean"
-STAT_MEAN_FOOTPRINT_NO_AIR = "footprint.mean.no_air"
-STAT_GAME_SCORE = "game.score"
-STAT_VIEW_CHOICE = "view.choice"
-
-def storeServerEntry(user, stat, ts, reading):
-    pass
-
-def storeResultEntry(user, stat, ts, reading):
-    pass

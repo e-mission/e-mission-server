@@ -1,13 +1,22 @@
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from builtins import object
+from past.utils import old_div
 import json
 import logging
 
 # Our imports
-from emission.core.get_database import get_profile_db, get_pending_signup_db, get_uuid_db
+from emission.core.get_database import get_profile_db, get_uuid_db
 
-defaultCarFootprint = 278.0/1609
-defaultMpg = 8.91/(1.6093 * defaultCarFootprint) # Should be roughly 32
+defaultCarFootprint = old_div(278.0,1609)
+defaultMpg = old_div(8.91,(1.6093 * defaultCarFootprint)) # Should be roughly 32
 
-class User:
+class User(object):
   def __init__(self, uuid):
     self.uuid = uuid
     # TODO: Read this from a file instead
@@ -45,23 +54,6 @@ class User:
   def getProfile(self):
     return get_profile_db().find_one({'user_id': self.uuid})
 
-  # In the real system, we should always have a profile for the user. But
-  # during unit tests, and durig analysis, that it not always true. Let us fail
-  # more gracefully if no profile is present
-  def getStudy(self):
-    if self.getProfile() != None:
-        return self.getProfile()['study_list']
-    else:
-        return []
-
-  def getFirstStudy(self):
-    studyList = self.getStudy()
-    if studyList == None or len(studyList) == 0:
-      return None
-    else:
-      assert(len(studyList) == 1)
-      return studyList[0]
-
   # Returns Average of MPG of all cars the user drives
   def getAvgMpg(self):
     mpg_array = [defaultMpg]
@@ -73,8 +65,8 @@ class User:
     total = 0
     for mpg in mpg_array:
       total += mpg
-    avg = total/len(mpg_array)
-    print "Returning total = %s, len = %s, avg = %s" % (total, len(mpg_array), avg)
+    avg = old_div(total,len(mpg_array))
+    print("Returning total = %s, len = %s, avg = %s" % (total, len(mpg_array), avg))
     return avg
 
   # Stores Array of MPGs of all the cars the user drives.
@@ -101,19 +93,19 @@ class User:
     #using conversion: 8.91 kg CO2 for one gallon
     #must convert Mpg -> Km, factor of 1000 in denom for g -> kg conversion
     avgMetersPerGallon = self.getAvgMpg()*1.6093
-    car_footprint = (1/avgMetersPerGallon)*8.91
+    car_footprint = (old_div(1,avgMetersPerGallon))*8.91
     modeMap = {'walking' : 0,
                           'running' : 0,
                           'cycling' : 0,
                             'mixed' : 0,
-                        'bus_short' : 267.0/1609,
-                         'bus_long' : 267.0/1609,
-                      'train_short' : 92.0/1609,
-                       'train_long' : 92.0/1609,
+                        'bus_short' : old_div(267.0,1609),
+                         'bus_long' : old_div(267.0,1609),
+                      'train_short' : old_div(92.0,1609),
+                       'train_long' : old_div(92.0,1609),
                         'car_short' : car_footprint,
                          'car_long' : car_footprint,
-                        'air_short' : 217.0/1609,
-                         'air_long' : 217.0/1609
+                        'air_short' : old_div(217.0,1609),
+                         'air_long' : old_div(217.0,1609)
                       }
     return modeMap
 
@@ -124,9 +116,8 @@ class User:
     newTs = self.getUpdateTS() + timedelta
     get_profile_db().update({'user_id': self.uuid}, {'$set': {'update_ts': newTs}})
 
-  def setClientSpecificProfileFields(self, setQuery):
-    logging.debug("Changing profile for user %s to %s" % (self.uuid, setQuery))
-    get_profile_db().update({'user_id': self.uuid}, {'$set': setQuery})
+  def getFirstStudy(self):
+    return None
 
   @staticmethod
   def mergeDicts(dict1, dict2):
@@ -140,49 +131,18 @@ class User:
     # Combine profile settings and study settings.
     # We currently don't have any profile settings
     retSettings = self.defaultSettings;
-    studyList = self.getStudy()
-    if len(studyList) > 0:
-      logging.debug("To return user settings, combining %s data from %s" % (Client(studyList[0]).getSettings(), studyList[0]))
-      retSettings = User.mergeDicts(retSettings, Client(studyList[0]).getSettings())
-      logging.debug("After merge retSettings = %s" % retSettings)
-    else:
-      logging.debug("To return user settings, using defaults")
+    logging.debug("To return user settings, using defaults")
     return retSettings
 
-  def setStudy(self, study):
-    # Here's what we want to do:
-    # - if there is no profile entry, insert one with this uuid and the study in the study_list
-    # - if there is a profile entry and the study_list does not contain this study, add it
-    # - if there is a profile entry and the study_list contains the entry, keep it
-    # The following mongodb statement is supposed to handle all of those cases correctly :)
-    writeResult = get_profile_db().update({'user_id': self.uuid},
-      {'$set': {'study_list': [study]}}, upsert=True)
-    if 'err' in writeResult and writeResult['err'] is not None:
-      logging.error("In setStudy, err = %s" % writeResult['err'])
-      raise Exception()
-
-  def unsetStudy(self, study):
-    # Here's what we want to do:
-    # - if there is no profile entry, ignore
-    # - if there is a profile entry and the study_list does not contain this study, ignore
-    # - if there is a profile entry and the study_list contains the entry, remove it
-    # The following mongodb statement is supposed to handle all of those cases correctly :)
-    writeResult = get_profile_db().update({'user_id': self.uuid},
-      {'$pullAll': {'study_list': [study]}})
-    if 'err' in writeResult and writeResult['err'] is not None:
-      logging.error("In setStudy, err = %s" % writeResult['err'])
-      raise Exception()
-
   @staticmethod
-  def createProfile(uuid, ts, studyList):
+  def createProfile(uuid, ts):
     initProfileObj = {'user_id': uuid,
                       'source':'Shankari',
                       'update_ts': ts,
                       'mpg_array': [defaultMpg]}
     writeResultProfile = get_profile_db().update(
         {'user_id': uuid},
-        {'$set': initProfileObj,
-         '$addToSet': {'study_list': {'$each': studyList}}},
+        {'$set': initProfileObj},
         upsert=True)
     return writeResultProfile
 
@@ -264,6 +224,7 @@ class User:
     # database.
     # TODO: Write a script that periodically goes through and identifies maps
     # that don't have an associated profile and fix them
+<<<<<<< HEAD
     study_list = Client.getPendingClientRegs(userEmail)
     writeResultProfile = User.createProfile(anonUUID, datetime.now(), study_list)
 
@@ -275,6 +236,9 @@ class User:
       # eventual consistency is good enough for us
       # If there is a profile entry for a particular signup, then delete it
       Client.deletePendingClientRegs(userEmail)
+=======
+    writeResultProfile = User.createProfile(anonUUID, datetime.now())
+>>>>>>> 869a43d37f2362697da252ab03f3c416a880ae6a
     return User.fromUUID(anonUUID)
 
   @staticmethod

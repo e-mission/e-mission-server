@@ -1,3 +1,7 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Input spec sample at
 # emission/net/ext_service/push/sample.specs/trip_metrics.query.sample sample
 # finds all users who have at least one day in Feb 2017 with no more than 10
@@ -7,6 +11,9 @@
 # Input: query spec
 # Output: list of uuids
 # 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import logging
 import numpy as np
 

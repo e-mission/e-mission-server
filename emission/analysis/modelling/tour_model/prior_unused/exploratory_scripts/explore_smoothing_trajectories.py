@@ -1,4 +1,11 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import json
 import logging
 import numpy as np
@@ -13,7 +20,7 @@ import emission.analysis.modelling.tour_model.prior_unused.exploratory_scripts.g
 
 query = {'type': 'move',
          'confirmed_mode': {'$ne': 9},
-         'section_start_datetime' : {'$gt': pydt.datetime(2015, 02, 14)},
+         'section_start_datetime' : {'$gt': pydt.datetime(2015, 0o2, 14)},
          '$where': 'this.track_points.length>1'}
 
 # Now find other sections that meet this criterion
@@ -86,32 +93,32 @@ def plot_instances_for_gps_error_model():
     needsSmoothing = []
     fineWithoutSmoothing = []
 
-    for (sid, rp_list) in smoothing_ground_truth_map.iteritems():
+    for (sid, rp_list) in smoothing_ground_truth_map.items():
         sectionJSON = get_section_db().find_one({"_id": sid})
         if sectionJSON is None:
-            print "Unable to find section %s in the database" % sid
+            print("Unable to find section %s in the database" % sid)
         else:
             if len(rp_list) > 0:
                 needsSmoothing.append(sectionJSON)
             else:
                 fineWithoutSmoothing.append(sectionJSON)
 
-    print "-" * 20, "Needs smoothing", '-' * 20
+    print("-" * 20, "Needs smoothing", '-' * 20)
 
     for section in needsSmoothing:
         if section is not None:
-            print section["_id"], fc.calAvgSpeed(section), fc.getIthMaxSpeed(section, 1), np.percentile(fc.calSpeeds(section), [90, 95, 99])
+            print(section["_id"], fc.calAvgSpeed(section), fc.getIthMaxSpeed(section, 1), np.percentile(fc.calSpeeds(section), [90, 95, 99]))
 
-    print "-" * 20, "Fine without smoothing", '-' * 20
+    print("-" * 20, "Fine without smoothing", '-' * 20)
 
     for section in fineWithoutSmoothing:
         if section is not None:
-            print section["_id"], fc.calAvgSpeed(section), fc.getIthMaxSpeed(section, 1), np.percentile(fc.calSpeeds(section), [90, 95, 99])
+            print(section["_id"], fc.calAvgSpeed(section), fc.getIthMaxSpeed(section, 1), np.percentile(fc.calSpeeds(section), [90, 95, 99]))
 
     other_manual_candidates = find_other_sections_manual(needsSmoothing, fineWithoutSmoothing)
     other_auto_candidates = find_other_sections_auto(needsSmoothing, fineWithoutSmoothing)
 
-    print other_auto_candidates
+    print(other_auto_candidates)
 
     gsfgtc.generate_cluster_comparison(other_manual_candidates, "/tmp/other_manual")
     gsfgtc.generate_cluster_comparison(other_auto_candidates, "/tmp/other_auto")

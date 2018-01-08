@@ -1,10 +1,16 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import logging
 import datetime as pydt
 
 import emission.core.get_database as edb
 import emission.core.wrapper.pipelinestate as ps
 import emission.storage.timeseries.timequery as estt
-import emission.core.common
 
 import time
 
@@ -147,7 +153,10 @@ def mark_stage_done(user_id, stage, last_processed_ts):
     else:
         logging.info("For stage %s, last_ts_processed is unchanged" % stage)
     curr_state.curr_run_ts = None
-    edb.get_pipeline_state_db().save(curr_state)
+    logging.debug("About to save object %s" % curr_state)
+    edb.save(edb.get_pipeline_state_db(), curr_state)
+    logging.debug("After saving state %s, list is %s" % (curr_state,
+        list(edb.get_pipeline_state_db().find({"user_id": user_id}))))
 
 def mark_stage_failed(user_id, stage):
     curr_state = get_current_state(user_id, stage)
@@ -157,7 +166,10 @@ def mark_stage_failed(user_id, stage):
     # the next query will start from the start_ts of this run
     # we also reset the curr_run_ts to indicate that we are not currently running
     curr_state.curr_run_ts = None
-    edb.get_pipeline_state_db().save(curr_state)
+    logging.debug("About to save object %s" % curr_state)
+    edb.save(edb.get_pipeline_state_db(), curr_state)
+    logging.debug("After saving state %s, list is %s" % (curr_state,
+        list(edb.get_pipeline_state_db().find({"user_id": user_id}))))
 
 def get_time_range_for_stage(user_id, stage):
     """
@@ -193,7 +205,10 @@ def get_time_range_for_stage(user_id, stage):
     ret_query = estt.TimeQuery("metadata.write_ts", start_ts, end_ts)
 
     curr_state.curr_run_ts = end_ts
-    edb.get_pipeline_state_db().save(curr_state)
+    logging.debug("About to save object %s" % curr_state)
+    edb.save(edb.get_pipeline_state_db(), curr_state)
+    logging.debug("After saving state %s, list is %s" % (curr_state,
+        list(edb.get_pipeline_state_db().find({"user_id": user_id}))))
     return ret_query
 
 def get_current_state(user_id, stage):

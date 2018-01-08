@@ -1,8 +1,0 @@
-geofence_100m_plus_fused_balanced_power_30sec_1445896243_to_1445918025_checkin:5,0,t,dc,13,14,0,14
-geofence_100m_plus_fused_balanced_power_30sec_1445896243_to_1445918025_checkin:5,0,u,dc,14,14,0,14
-geofence_100m_plus_fused_balanced_power_30sec_1445957053_to_1445979189_checkin:5,0,t,dc,12,13,0,13
-geofence_100m_plus_fused_balanced_power_30sec_1445957053_to_1445979189_checkin:5,0,u,dc,13,13,0,13
-geofence_100m_plus_fused_balanced_power_30sec_1448031600_to_1448053200_checkin:5,0,t,dc,10,11,2,9
-geofence_100m_plus_fused_balanced_power_30sec_1448031600_to_1448053200_checkin:5,0,u,dc,11,11,2,9
-geofence_100m_plus_fused_balanced_power_30sec_1448556300_to_1445896011_checkin:5,0,t,dc,16,17,0,17
-geofence_100m_plus_fused_balanced_power_30sec_1448556300_to_1445896011_checkin:5,0,u,dc,17,17,0,17

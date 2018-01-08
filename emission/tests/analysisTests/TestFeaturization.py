@@ -1,3 +1,12 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import *
 import unittest
 import time
 import uuid
@@ -20,11 +29,11 @@ class FeaturizationTests(unittest.TestCase):
         self.data = cp.read_data()
         self.testUUID = uuid.uuid4()
         self.ts = esta.TimeSeries.get_time_series(self.testUUID)
-        print 'there are ' + str(len(self.data))
+        print('there are ' + str(len(self.data)))
 
     def tearDown(self):
-        edb.get_timeseries_db().remove({'user_id': self.testUUID})
-        edb.get_analysis_timeseries_db().remove({'user_id': self.testUUID})
+        edb.get_timeseries_db().delete_many({'user_id': self.testUUID})
+        edb.get_analysis_timeseries_db().delete_many({'user_id': self.testUUID})
 
     def testCalculatePoints(self):
         feat = featurization.featurization([])
@@ -88,7 +97,7 @@ class FeaturizationTests(unittest.TestCase):
         feat.cluster(min_clusters=2, max_clusters=10)
         try:
             feat.check_clusters()
-        except Exception, e:
+        except Exception as e:
             logging.exception(e.message)
             self.assertTrue(False)
 

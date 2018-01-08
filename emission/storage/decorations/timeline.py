@@ -1,3 +1,11 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from builtins import object
 import logging
 import emission.storage.timeseries.timequery as estt
 import emission.storage.timeseries.tcquery as esttc
@@ -200,7 +208,7 @@ class Timeline(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         ret_val = self.state.element
         # logging.debug("ret_val = %s" % ret_val)
         if ret_val is None:

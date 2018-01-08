@@ -1,13 +1,15 @@
-__author__ = 'Yin'
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import logging
 from uuid import UUID
 
 # Our imports
-from emission.analysis.result.carbon import getModeCarbonFootprint, carbonFootprintForMode
-from emission.core.common import Inside_polygon,berkeley_area,getConfirmationModeQuery
-from emission.core.get_database import get_section_db,get_profile_db
-import geojson as gj
 import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.decorations.timeline as esdt
@@ -28,45 +30,14 @@ import emission.storage.timeseries.cache_series as estc
 
 MANUAL_INCIDENT_KEY = "manual/incident"
 
-# Note that all the points here are returned in (lng, lat) format, which is the
-# GeoJSON format.
-
-def carbon_by_zip(start,end):
-    Profiles=get_profile_db()
-    carbon_list=[]
-    for zip in Profiles.distinct('zip'):
-        # print(zip)
-        if zip!='N/A':
-            tempdict={}
-            tempdict['weight']=Profiles.find({'zip':zip}).count()
-            # print(Profiles.find({'zip':zip}).count())
-            tempdict['carbon']=0
-            for profile in Profiles.find({'zip':zip}):
-                tempdict['loc']=profile['zip_centroid']
-                user=profile['user_id']
-                user_carbon=getModeCarbonFootprint(user,carbonFootprintForMode,start,end)
-                tempdict['carbon']+=sum(list(user_carbon.values()))
-            tempdict['carbon']=tempdict['carbon']/tempdict['weight']
-            carbon_list.append(tempdict)
-    return {"weightedLoc": carbon_list}
-
-def Berkeley_pop_route(start_ts, end_ts):
-    berkeley_json  = {"geometry": {
-      "type": "Polygon",
-      "coordinates": [[
-        [-122.267443, 37.864693], [-122.267443, 37.880687], [-122.250985, 37.880687], [-122.250985, 37.864693], [-122.267443, 37.864693]
-        ]]
-      }
-    }
-    # box = [ [-122.267443, 37.864693], [-122.250985, 37.880687] ]
-    start_dt = esdl.get_local_date(start_ts, "UTC")
-    end_dt = esdl.get_local_date(end_ts, "UTC")
-    time_query = esttc.TimeComponentQuery("data.ts", start_dt, end_dt)
-    geo_query = estg.GeoQuery(["data.loc"], berkeley_json)
-    loc_entry_list = esda.get_entries(esda.CLEANED_LOCATION_KEY, user_id=None,
-                                      time_query=time_query,
-                                      geo_query=geo_query)
-    return {"lnglat": [e.data.loc.coordinates for e in loc_entry_list]}
+# Example of region that can be used in the queries below
+#     berkeley_json  = {"geometry": {
+#       "type": "Polygon",
+#       "coordinates": [[
+#         [-122.267443, 37.864693], [-122.267443, 37.880687], [-122.250985, 37.880687], [-122.250985, 37.864693], [-122.267443, 37.864693]
+#         ]]
+#       }
+#     }
 
 def range_mode_heatmap_local_date(user_uuid, modes, from_ld, to_ld, region):
     time_query = esttc.TimeComponentQuery("data.local_dt", from_ld, to_ld)

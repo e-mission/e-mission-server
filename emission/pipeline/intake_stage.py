@@ -1,3 +1,11 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
 import json
 import logging
 import numpy as np
@@ -47,7 +55,7 @@ def run_intake_pipeline(process_number, uuid_list):
         intake_log_config["handlers"]["errors"]["filename"].replace("intake", "intake_%s" % process_number)
 
     logging.config.dictConfig(intake_log_config)
-    # np.random.seed(61297777)
+    np.random.seed(61297777)
 
     logging.info("processing UUID list = %s" % uuid_list)
 

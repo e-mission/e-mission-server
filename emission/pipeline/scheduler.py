@@ -1,3 +1,11 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import *
 import logging
 import multiprocessing as mp
 import pandas as pd
@@ -9,7 +17,7 @@ import emission.storage.timeseries.aggregate_timeseries as estag
 import emission.storage.decorations.user_queries as esdu
 import emission.pipeline.intake_stage as epi
 
-def get_split_uuid_lists(n_splits, is_public_pipeline):
+def get_split_uuid_lists(n_splits):
     get_count = lambda u: enua.UserCache.getUserCache(u).getMessageCount()
 
     """
@@ -29,11 +37,7 @@ def get_split_uuid_lists(n_splits, is_public_pipeline):
     users based on that.
     """
 
-    if is_public_pipeline:
-        sel_uuids = esdu.get_test_phone_uuids()
-    else:
-        sel_uuids = esdu.get_non_test_phone_uuids()
-
+    sel_uuids = esdu.get_all_uuids()
     sel_jobs = [(u, get_count(u)) for u in sel_uuids]
     # non_zero_jobs = [j for j in sel_jobs if j[1] !=0 ]
     # Not filtering for now
@@ -41,7 +45,7 @@ def get_split_uuid_lists(n_splits, is_public_pipeline):
     logging.debug("sel_uuids = %s, sel_jobs = %s, non_zero_jobs = %s" %
                   (len(sel_uuids), len(sel_jobs), len(non_zero_jobs)))
 
-    non_zero_jobs_df = pd.DataFrame(non_zero_jobs, columns=['user_id', 'count']).sort("count")
+    non_zero_jobs_df = pd.DataFrame(non_zero_jobs, columns=['user_id', 'count']).sort_values(by="count")
     ret_splits = []
     for i in range(0, n_splits):
         ret_splits.append([])
@@ -56,12 +60,13 @@ def get_split_uuid_lists(n_splits, is_public_pipeline):
     logging.debug("Split values are %s" % ret_splits)
     return ret_splits
 
-def dispatch(split_lists, is_public_pipeline):
+def dispatch(split_lists):
+    ctx = mp.get_context('spawn')
     process_list = []
     for i, uuid_list in enumerate(split_lists):
         logging.debug("Dispatching list %s" % uuid_list)
-        pid = "public_%s" % i if is_public_pipeline else i
-        p = mp.Process(target=epi.run_intake_pipeline, args=(pid, uuid_list))
+        pid = i
+        p = ctx.Process(target=epi.run_intake_pipeline, args=(pid, uuid_list))
         logging.info("Created process %s to process %s list of size %s" %
                      (p, i, len(uuid_list)))
         p.start()

@@ -1,4 +1,13 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import *
 from pykml import parser
 from pykml.parser import Schema
 from pykml.factory import KML_ElementMaker as KML
@@ -22,7 +31,7 @@ def kml_multiple_to_geojson(infile_path, outdir_path, geojson_properties={}):
         coord_dict = __get_all_coords(data)
         if not os.path.exists(outdir_path):
                 os.makedirs(outdir_path)        
-        for section_id, coords in coord_dict.items():
+        for section_id, coords in list(coord_dict.items()):
                 filename = "%s.json" % section_id
                 path = os.path.join(outdir_path, filename)
                 outfile = file(path,'w')
@@ -36,7 +45,7 @@ def get_kml_section_ids(infile_path):
     """
     data = __read_file(infile_path)
     coord_dict = __get_all_coords(data)
-    return coord_dict.keys()
+    return list(coord_dict.keys())
 
 
 def kml_to_geojson(infile_path, outfile_path, geojson_properties={}):
@@ -117,10 +126,8 @@ def section_to_kml(section, color, outfile_path="", write=True):
         green = "00B80C"
         start_icon_style_id = "icon-%s" % color
         end_icon_style_id = "icon-%s" % color        
-        make_coord = lambda p: (",".join(map(lambda x: str(x), 
-                         p["track_location"]["coordinates"]) + ["0.0"]))
-        make_coord_point = lambda p: (",".join(map(lambda x: str(x), 
-                         p["coordinates"]) + ["0.0"]))
+        make_coord = lambda p: (",".join([str(x) for x in p["track_location"]["coordinates"]] + ["0.0"]))
+        make_coord_point = lambda p: (",".join([str(x) for x in p["coordinates"]] + ["0.0"]))
 	style_id = "style-%s" % section['section_start_time']
         pm = KML.Placemark(
                 KML.styleUrl("#%s" % line_style_id),
@@ -129,8 +136,7 @@ def section_to_kml(section, color, outfile_path="", write=True):
                 KML.LineString(
                         KML.tessellate(1),                        
                         KML.coordinates(" ".join(
-                                map(lambda track_point: make_coord(track_point)
-                                    ,section['track_points'])))
+                                [make_coord(track_point) for track_point in section['track_points']]))
                 )
         )
         start_point = section['section_start_point']
@@ -193,7 +199,7 @@ def section_to_kml(section, color, outfile_path="", write=True):
 
 def sections_to_kml(filename, sections, outfile_path=""):
         r = lambda: random.randint(0,255)
-        l_tuples = map(lambda section: section_to_kml(section, '%02X%02X%02X' % (r(),r(),r()),  write=False) if len(section['track_points']) > 1 else None ,sections)
+        l_tuples = [section_to_kml(section, '%02X%02X%02X' % (r(),r(),r()),  write=False) if len(section['track_points']) > 1 else None for section in sections]
         flat = []
         assert (l_tuples is not None), "No sections for user!"
         for f,s,i_s,i_e in l_tuples:
@@ -210,7 +216,7 @@ def chunks(l,n):
         """
         Generates evenly sized chunks of a list
         """
-        for i in xrange(0, len(l), n):
+        for i in range(0, len(l), n):
                 yield l[i:i+n]
 
 def mongodate_to_datetime(date):
@@ -229,7 +235,7 @@ def read_uuids():
     f = open("user_uuid.secret","r")
     user_uuid = {}
     for line in f:
-        user, uuid = map(lambda c: c.strip(), line.split(":"))
+        user, uuid = [c.strip() for c in line.split(":")]
         user_uuid[user] = UUID(uuid)
     return user_uuid
 
