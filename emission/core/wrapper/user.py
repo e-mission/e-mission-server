@@ -224,21 +224,7 @@ class User(object):
     # database.
     # TODO: Write a script that periodically goes through and identifies maps
     # that don't have an associated profile and fix them
-<<<<<<< HEAD
-    study_list = Client.getPendingClientRegs(userEmail)
-    writeResultProfile = User.createProfile(anonUUID, datetime.now(), study_list)
-
-    if 'err' not in writeResultProfile:
-      # update was successful!
-      # Either upserted or updatedExisting will be true
-      # We can now cleanup the entry from the pending database
-      # Note that we could also move this to a separate cleanup script because
-      # eventual consistency is good enough for us
-      # If there is a profile entry for a particular signup, then delete it
-      Client.deletePendingClientRegs(userEmail)
-=======
     writeResultProfile = User.createProfile(anonUUID, datetime.now())
->>>>>>> 869a43d37f2362697da252ab03f3c416a880ae6a
     return User.fromUUID(anonUUID)
 
   @staticmethod
