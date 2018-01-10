@@ -1,0 +1,16 @@
+{
+  "paths" : {
+    "static_path" : "webapp/www/",
+    "python_path" : "main",
+    "log_base_dir" : ".",
+    "log_file" : "debug.log"
+  },
+  "__comment" : "Fill this in for the production server. port will almost certainly be 80 or 443. For iOS, using localhost allows you to test without an internet connection. For AWS and android, make sure that the host 0.0.0.0, localhost does not seem to work",
+  "server" : {
+    "host" : "localhost",
+    "port" : "8080",
+    "__comment": "1 hour = 60 min = 60 * 60 sec",
+    "timeout" : "3600",
+    "auth": "skip"
+  }
+}

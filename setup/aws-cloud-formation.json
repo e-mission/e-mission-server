@@ -1,0 +1,1372 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Allows you to setup a multi-tier architecture for e-mission. Does not currently setup software - that needs to be done manually, after I experiment with docker and see which is better",
+  "Parameters": {
+    "Prefix": {
+        "Description": "Prefix for the user names, to distinguish them from each other",
+        "Type": "String"
+    },
+    "MyIP": {
+        "Description": "IP address to restrict ssh access from",
+        "Type": "String"
+    }
+  },
+  "Resources": {
+    "OneVpcToRuleThemAll": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "192.168.0.0/16",
+        "InstanceTenancy": "default",
+        "EnableDnsSupport": "true",
+        "EnableDnsHostnames": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-vpc"
+                ]]}
+          },
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ]
+      }
+    },
+    "publicsubnet1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "192.168.0.0/24",
+        "AvailabilityZone": "us-east-1d",
+        "VpcId": {
+          "Ref": "OneVpcToRuleThemAll"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-public-subnet"
+                ]]}
+          },
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ]
+      }
+    },
+    "privatesubnet1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "192.168.1.0/24",
+        "AvailabilityZone": "us-east-1d",
+        "VpcId": {
+          "Ref": "OneVpcToRuleThemAll"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-private-subnet"
+                ]]}
+          },
+
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ]
+      }
+    },
+    "igw362a534f": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+      }
+    },
+    "natgw" : {
+      "Type" : "AWS::EC2::NatGateway",
+      "Properties" : {
+        "AllocationId" : { "Fn::GetAtt" : ["eip342362291", "AllocationId"]},
+        "SubnetId" : { "Ref" : "publicsubnet1"},
+        "Tags" : [ {"Key" : "Name",
+                    "Value": { "Fn::Join" : ["", [
+                          { "Ref" : "Prefix" }, "-nat-gw"
+                        ]]}
+                    },
+                    {
+                      "Key": "em-instance",
+                      "Value": { "Ref" : "Prefix" }
+                    }
+                  ]
+      }
+    },
+    "eigwipv6": {
+        "Type": "AWS::EC2::EgressOnlyInternetGateway",
+        "Properties": {
+            "VpcId": {
+                "Ref": "OneVpcToRuleThemAll"
+            }
+        }
+    },
+    "dopt170af572": {
+      "Type": "AWS::EC2::DHCPOptions",
+      "Properties": {
+        "DomainName": "ec2.internal",
+        "DomainNameServers": [
+          "AmazonProvidedDNS"
+        ]
+      }
+    },
+    "acl86bf7efd": {
+      "Type": "AWS::EC2::NetworkAcl",
+      "Properties": {
+        "VpcId": {
+          "Ref": "OneVpcToRuleThemAll"
+        }
+      }
+    },
+    "rtb2050b95d": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "OneVpcToRuleThemAll"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-public-route"
+                ]]}
+          },
+
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ]
+      }
+    },
+    "rtbf15ab38c": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "OneVpcToRuleThemAll"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-default-route"
+                ]]}
+          },
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ]
+      }
+    },
+    "eip342362291": {
+      "Type": "AWS::EC2::EIP",
+      "Properties": {
+        "Domain": "vpc"
+      }
+    },
+    "instancei0416c2d5116b19579": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "EbsOptimized": "true",
+        "ImageId": "ami-aa2ea6d0",
+        "InstanceType": "m5.xlarge",
+        "KeyName": "amplab-us-east",
+        "Monitoring": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-analysis"
+                ]]}
+          },
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ],
+        "Volumes": [
+          {
+            "Device": "/dev/sdf",
+            "VolumeId": {
+              "Ref": "volumevol055802f1415a7bf5d"
+            }
+          },
+          {
+            "Device": "/dev/sdg",
+            "VolumeId": {
+              "Ref": "volumevol0720812ac1bee71e1"
+            }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "Description": "Primary network interface",
+            "DeviceIndex": 0,
+            "SubnetId": {
+              "Ref": "publicsubnet1"
+            },
+            "PrivateIpAddresses": [
+              {
+                "PrivateIpAddress": "192.168.0.237",
+                "Primary": "true"
+              }
+            ],
+            "GroupSet": [
+              {
+                "Ref": "sgopenanalysissg"
+              }
+            ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "instancei01c51055663b28332": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "EbsOptimized": "true",
+        "ImageId": "ami-aa2ea6d0",
+        "InstanceType": "m5.xlarge",
+        "KeyName": "amplab-us-east",
+        "Monitoring": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-webapp"
+                ]]}
+          },
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ],
+        "Volumes": [
+          {
+            "Device": "/dev/sdf",
+            "VolumeId": {
+              "Ref": "volumevol0f4b89d8bf2c6551a"
+            }
+          },
+          {
+            "Device": "/dev/sdg",
+            "VolumeId": {
+              "Ref": "volumevol057d04d450ad420b6"
+            }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "Description": "Primary network interface",
+            "DeviceIndex": 0,
+            "SubnetId": {
+              "Ref": "publicsubnet1"
+            },
+            "PrivateIpAddresses": [
+              {
+                "PrivateIpAddress": "192.168.0.80",
+                "Primary": "true"
+              }
+            ],
+            "GroupSet": [
+              {
+                "Ref": "sgopenwebappsg"
+              }
+            ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "instancei0f1c5de20a60e571a": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "EbsOptimized": "true",
+        "ImageId": "ami-aa2ea6d0",
+        "InstanceType": "m5.xlarge",
+        "KeyName": "amplab-us-east",
+        "Monitoring": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-notebooks"
+                ]]}
+          },
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ],
+        "Volumes": [
+          {
+            "Device": "/dev/sdf",
+            "VolumeId": {
+              "Ref": "volumevol0f93e44b5e5f16f9c"
+            }
+          },
+          {
+            "Device": "/dev/sdg",
+            "VolumeId": {
+              "Ref": "volumevol032078927f2124d92"
+            }
+          },
+          {
+            "Device": "/dev/sdh",
+            "VolumeId": {
+              "Ref": "volumevol03c79b3be0b9a13d7"
+            }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "Description": "Primary network interface",
+            "DeviceIndex": 0,
+            "SubnetId": {
+              "Ref": "publicsubnet1"
+            },
+            "PrivateIpAddresses": [
+              {
+                "PrivateIpAddress": "192.168.0.120",
+                "Primary": "true"
+              }
+            ],
+            "GroupSet": [
+              {
+                "Ref": "sgopenpublicsg"
+              }
+            ],
+            "AssociatePublicIpAddress": "true"
+          }
+        ]
+      }
+    },
+    "instancei01065ae059dcaf1c4": {
+      "Type": "AWS::EC2::Instance",
+      "Properties": {
+        "DisableApiTermination": "false",
+        "InstanceInitiatedShutdownBehavior": "stop",
+        "EbsOptimized": "true",
+        "ImageId": "ami-55ef662f",
+        "InstanceType": "r4.2xlarge",
+        "KeyName": "amplab-us-east",
+        "Monitoring": "false",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-database"
+                ]]}
+          },
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ],
+        "Volumes": [
+          {
+            "Device": "/dev/sdf",
+            "VolumeId": {
+              "Ref": "volumevol090606d27a60c682e"
+            }
+          },
+          {
+            "Device": "/dev/sdg",
+            "VolumeId": {
+              "Ref": "volumevol01d8b71d38b47f909"
+            }
+          },
+          {
+            "Device": "/dev/sdh",
+            "VolumeId": {
+              "Ref": "volumevol02e56c23e28147a69"
+            }
+          }
+        ],
+        "NetworkInterfaces": [
+          {
+            "DeleteOnTermination": "true",
+            "Description": "Primary network interface",
+            "DeviceIndex": 0,
+            "SubnetId": {
+              "Ref": "privatesubnet1"
+            },
+            "PrivateIpAddresses": [
+              {
+                "PrivateIpAddress": "192.168.1.100",
+                "Primary": "true"
+              }
+            ],
+            "GroupSet": [
+              {
+                "Ref": "sgopendatabasesg"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "volumevol090606d27a60c682e": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": "us-east-1d",
+        "Iops": "1000",
+        "Size": "3072",
+        "VolumeType": "io1",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-db-data"
+                ]]}
+          },
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ]
+      }
+    },
+    "volumevol01d8b71d38b47f909": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": "us-east-1d",
+        "Iops": "250",
+        "Size": "25",
+        "VolumeType": "io1",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-db-journal"
+                ]]}
+          },
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ]
+      }
+    },
+    "volumevol02e56c23e28147a69": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": "us-east-1d",
+        "Iops": "100",
+        "Size": "10",
+        "VolumeType": "io1",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-db-log"
+                ]]}
+          },
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ]
+      }
+    },
+    "volumevol0f4b89d8bf2c6551a": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": "us-east-1d",
+        "Size": "10",
+        "VolumeType": "gp2",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-webapp-code"
+                ]]}
+          },
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ]
+      }
+    },
+    "volumevol057d04d450ad420b6": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": "us-east-1d",
+        "Size": "10",
+        "VolumeType": "gp2",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-webapp-log"
+                ]]}
+          },
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ]
+      }
+    },
+    "volumevol055802f1415a7bf5d": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": "us-east-1d",
+        "Size": "10",
+        "VolumeType": "gp2",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-analysis-code"
+                ]]}
+          },
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ]
+      }
+    },
+    "volumevol0720812ac1bee71e1": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": "us-east-1d",
+        "Size": "10",
+        "VolumeType": "gp2",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-analysis-log"
+                ]]}
+          },
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ]
+      }
+    },
+    "volumevol0f93e44b5e5f16f9c": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": "us-east-1d",
+        "Size": "10",
+        "VolumeType": "gp2",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-notebook-code"
+                ]]}
+          },
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ]
+      }
+    },
+    "volumevol032078927f2124d92": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": "us-east-1d",
+        "Size": "10",
+        "VolumeType": "gp2",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-notebook-notebooks"
+                ]]}
+          },
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ]
+      }
+    },
+    "volumevol03c79b3be0b9a13d7": {
+      "Type": "AWS::EC2::Volume",
+      "Properties": {
+        "AvailabilityZone": "us-east-1d",
+        "Size": "10",
+        "VolumeType": "gp2",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-notebook-log"
+                ]]}
+          },
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ]
+      }
+    },
+    "sgopendatabasesg": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "open data collection database",
+        "VpcId": {
+          "Ref": "OneVpcToRuleThemAll"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-database-sg"
+                ]]}
+          },
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ]
+      }
+    },
+    "sgopenwebappsg": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "security group for the webserver for open data collectio",
+        "VpcId": {
+          "Ref": "OneVpcToRuleThemAll"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-webapp-sg"
+                ]]}
+          },
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ]
+      }
+    },
+    "sgopenanalysissg": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "security group for the analysis server for open data collection",
+        "VpcId": {
+          "Ref": "OneVpcToRuleThemAll"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-analysis-sg"
+                ]]}
+          },
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ]
+      }
+    },
+    "sgopenpublicsg": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "security group for the public server for open data collection",
+        "VpcId": {
+          "Ref": "OneVpcToRuleThemAll"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": { "Fn::Join" : ["", [
+                  { "Ref" : "Prefix" }, "-notebook-sg"
+                ]]}
+          },
+          {
+            "Key": "em-instance",
+            "Value": { "Ref" : "Prefix" }
+          }
+        ]
+      }
+    },
+    "acl1": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "acl86bf7efd"
+        }
+      }
+    },
+    "acl2": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "acl86bf7efd"
+        }
+      }
+    },
+    "subnetacl1": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "acl86bf7efd"
+        },
+        "SubnetId": {
+          "Ref": "publicsubnet1"
+        }
+      }
+    },
+    "subnetacl2": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "acl86bf7efd"
+        },
+        "SubnetId": {
+          "Ref": "privatesubnet1"
+        }
+      }
+    },
+    "gw1": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "OneVpcToRuleThemAll"
+        },
+        "InternetGatewayId": {
+          "Ref": "igw362a534f"
+        }
+      }
+    },
+    "subnetroute1": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "rtb2050b95d"
+        },
+        "SubnetId": {
+          "Ref": "publicsubnet1"
+        }
+      }
+    },
+    "route1": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "rtb2050b95d"
+        },
+        "GatewayId": {
+          "Ref": "igw362a534f"
+        }
+      },
+      "DependsOn": "gw1"
+    },
+    "route1Ipv6": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationIpv6CidrBlock": "::/0",
+        "RouteTableId": {
+          "Ref": "rtb2050b95d"
+        },
+        "GatewayId": {
+          "Ref": "igw362a534f"
+        }
+      },
+      "DependsOn": "gw1"
+    },
+    "subnetroute2": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "rtbf15ab38c"
+        },
+        "SubnetId": {
+          "Ref": "privatesubnet1"
+        }
+      }
+    },
+    "route2": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+            "Ref": "natgw"
+        },
+        "RouteTableId": {
+          "Ref": "rtbf15ab38c"
+        }
+      },
+      "DependsOn": "natgw"
+    },
+    "route2Ipv6": {
+        "Type": "AWS::EC2::Route",
+        "Properties": {
+            "DestinationIpv6CidrBlock": "::/0",
+            "EgressOnlyInternetGatewayId": {
+                "Ref": "eigwipv6"
+            },
+            "RouteTableId": {
+                "Ref": "rtbf15ab38c"
+            }
+        },
+        "DependsOn": "eigwipv6"
+    },
+    "dchpassoc1": {
+      "Type": "AWS::EC2::VPCDHCPOptionsAssociation",
+      "Properties": {
+        "VpcId": {
+          "Ref": "OneVpcToRuleThemAll"
+        },
+        "DhcpOptionsId": {
+          "Ref": "dopt170af572"
+        }
+      }
+    },
+    "ingress1": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopendatabasesg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "SourceSecurityGroupId": {
+          "Ref": "sgopenwebappsg"
+        },
+        "SourceSecurityGroupOwnerId": "618485968641"
+      }
+    },
+    "ingress2": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopendatabasesg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "27017",
+        "ToPort": "27017",
+        "SourceSecurityGroupId": {
+          "Ref": "sgopenwebappsg"
+        },
+        "SourceSecurityGroupOwnerId": "618485968641"
+      }
+    },
+    "ingress3": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopendatabasesg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "27017",
+        "ToPort": "27017",
+        "SourceSecurityGroupId": {
+          "Ref": "sgopenanalysissg"
+        },
+        "SourceSecurityGroupOwnerId": "618485968641"
+      }
+    },
+    "ingress4": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopendatabasesg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "27017",
+        "ToPort": "27017",
+        "SourceSecurityGroupId": {
+          "Ref": "sgopenpublicsg"
+        },
+        "SourceSecurityGroupOwnerId": "618485968641"
+      }
+    },
+    "ingress5": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopendatabasesg"
+        },
+        "IpProtocol": "icmp",
+        "FromPort": "-1",
+        "ToPort": "-1",
+        "CidrIp": "192.168.0.0/16"
+      }
+    },
+    "ingress6": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenwebappsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIp": "128.32.37.248/32"
+      }
+    },
+    "ingress7": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenwebappsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIp": { "Ref" : "MyIP" }
+      }
+    },
+    "ingress8": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenwebappsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "CidrIp": { "Ref" : "MyIP" }
+      }
+    },
+    "ingress9": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenanalysissg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "CidrIp": { "Ref" : "MyIP" }
+      }
+    },
+    "ingress10": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenpublicsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "8888",
+        "ToPort": "9999",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "ingress10ipv6": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenpublicsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "8888",
+        "ToPort": "9999",
+        "CidrIpv6": "::/0"
+      }
+    },
+    "ingress11": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenpublicsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "CidrIp": { "Ref" : "MyIP" }
+      }
+    },
+    "egress1": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopendatabasesg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress1ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopendatabasesg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIpv6": "::/0"
+      }
+    },
+    "egress2ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopendatabasesg"
+        },
+        "IpProtocol": "icmpv6",
+        "CidrIpv6": "::/0"
+      }
+    },
+    "egress3": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopendatabasesg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress3ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopendatabasesg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIpv6": "::/0"
+      }
+    },
+    "egress4": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopendatabasesg"
+        },
+        "IpProtocol": "icmp",
+        "FromPort": "-1",
+        "ToPort": "-1",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress5": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenwebappsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress5ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenwebappsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIpv6": "::/0"
+      }
+    },
+    "egress6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenwebappsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "DestinationSecurityGroupId": {
+          "Ref": "sgopendatabasesg"
+        }
+      }
+    },
+    "egress7": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenwebappsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "27017",
+        "ToPort": "27017",
+        "DestinationSecurityGroupId": {
+          "Ref": "sgopendatabasesg"
+        }
+      }
+    },
+    "egress8": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenwebappsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress8ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenwebappsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIpv6": "::/0"
+      }
+    },
+    "egress9": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenwebappsg"
+        },
+        "IpProtocol": "icmp",
+        "FromPort": "-1",
+        "ToPort": "-1",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress10": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenwebappsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "9418",
+        "ToPort": "9418",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress10ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenwebappsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "9418",
+        "ToPort": "9418",
+        "CidrIpv6": "::/0"
+      }
+    },
+    "egress11": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenanalysissg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress11ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenanalysissg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIpv6": "::/0"
+      }
+    },
+    "egress12": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenanalysissg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "27017",
+        "ToPort": "27017",
+        "DestinationSecurityGroupId": {
+          "Ref": "sgopendatabasesg"
+        }
+      }
+    },
+    "egress13": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenanalysissg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress13ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenanalysissg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIpv6": "::/0"
+      }
+    },
+    "egress14": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenanalysissg"
+        },
+        "IpProtocol": "icmp",
+        "FromPort": "-1",
+        "ToPort": "-1",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress15": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenpublicsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress15ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenpublicsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIpv6": "::/0"
+      }
+    },
+    "egress16": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenpublicsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "27017",
+        "ToPort": "27017",
+        "DestinationSecurityGroupId": {
+          "Ref": "sgopendatabasesg"
+        }
+      }
+    },
+    "egress17": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenpublicsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress17ipv6": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenpublicsg"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIpv6": "::/0"
+      }
+    },
+    "egress18": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgopenpublicsg"
+        },
+        "IpProtocol": "icmp",
+        "FromPort": "-1",
+        "ToPort": "-1",
+        "CidrIp": "0.0.0.0/0"
+      }
+    }
+  },
+  "Description": "Multi-tier stack for e-mission (webapp, analysis app, jupyter server, database server)",
+  "Outputs": {
+    "instancei0416c2d5116b19579IP": {
+      "Value": {
+        "Fn::GetAtt": [
+          "instancei0416c2d5116b19579",
+          "PublicIp"
+        ]
+      }
+    },
+    "instancei01c51055663b28332IP": {
+      "Value": {
+        "Fn::GetAtt": [
+          "instancei01c51055663b28332",
+          "PublicIp"
+        ]
+      }
+    },
+    "instancei0f1c5de20a60e571aIP": {
+      "Value": {
+        "Fn::GetAtt": [
+          "instancei0f1c5de20a60e571a",
+          "PublicIp"
+        ]
+      }
+    }
+  }
+}
+
+

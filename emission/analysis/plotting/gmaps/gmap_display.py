@@ -19,7 +19,16 @@ car - grey
 mixed - olive
 air - skyBlue
 """
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
+from past.utils import old_div
 import json
 from datetime import tzinfo, datetime, timedelta
 import pytz
@@ -37,7 +46,7 @@ from uuid import UUID
 from emission.analysis.modelling.home import detect_home, detect_home_from_db
 from emission.analysis.modelling.work_place import  detect_work_office, detect_daily_work_office,detect_work_office_from_db,detect_daily_work_office_from_db
 from emission.core.get_database import get_section_db, get_trip_db, get_test_db
-import pygmaps_modified as pygmaps
+from . import pygmaps_modified as pygmaps
 from emission.core.common import calDistance
 import emission.storage.decorations.useful_queries as tauq
 
@@ -178,12 +187,12 @@ def drawTrip(trip_id, db, gmap):
     trip_cursor = db.Stage_Trips.find({'trip_id': trip_id})
 
     if trip_cursor.count() == 0:
-        print "No trip database found, using section database instead"
+        print("No trip database found, using section database instead")
     else:
         if trip_cursor.count() == 1:
             unused = trip_cursor[0]
         else:
-            print "Duplicated trip_id: " + trip_id
+            print("Duplicated trip_id: " + trip_id)
             exit()
     sections = db.Stage_Sections.find({'trip_id': trip_id})
     drawSections(sections, ALL, gmap)
@@ -200,7 +209,7 @@ def drawSectionsFromList(sectionIdList, outPath):
     sectionJsonList = [get_section_db().find_one({"_id": sid}) for sid in sectionIdList]
 
     bounds = tauq.get_bounds(sectionJsonList)
-    gmap = pygmaps.maps((bounds[0].lat + bounds[1].lat)/2, (bounds[0].lon + bounds[1].lon)/2, 10)
+    gmap = pygmaps.maps(old_div((bounds[0].lat + bounds[1].lat),2), old_div((bounds[0].lon + bounds[1].lon),2), 10)
 
     drawSections(sectionJsonList, ALL, gmap, "random")
     gmap.draw(outPath)
@@ -211,8 +220,8 @@ def drawSectionsSeparatelyFromId(sectionIdList, outPath):
 def drawSectionsSeparately(sectionJSONList, outPath):
     try:
         os.mkdir(outPath)
-    except OSError, e:
-        logging.warn("Error %s while creating result directory" % e)
+    except OSError as e:
+        logging.warning("Error %s while creating result directory" % e)
         pass
 
     for sectionJSON in sectionJSONList:

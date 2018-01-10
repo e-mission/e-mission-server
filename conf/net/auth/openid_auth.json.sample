@@ -1,0 +1,4 @@
+{
+  "discoveryURI" : "<config_url>, similar to https://accounts.open-to-all.com/auth/realms/OpenToAll/.well-known/openid-configuration",
+  "clientID": "<audience>, similar to emission-mobile-dev"
+}

@@ -1,3 +1,10 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import logging
 import argparse
 import json
@@ -22,11 +29,8 @@ if __name__ == '__main__':
     parser.add_argument("-i", "--info-only", default=False, action='store_true',
         help="only print entry analysis")
 
-    parser.add_argument("-s", "--batch-size", default=10000,
-        help="batch size to use for the entries")
-
-    parser.add_argument("-p", "--prefix", default="user",
-        help="prefix for the automatically generated usernames. usernames will be <prefix>-001, <prefix>-002...")
+    parser.add_argument("-p", "--pipeline-purge", default=False, action='store_true',
+        help="purge the pipeline state as well")
 
     args = parser.parse_args()
     fn = args.timeline_filename
@@ -36,6 +40,7 @@ if __name__ == '__main__':
     ts_db = edb.get_timeseries_db()
     ats_db = edb.get_analysis_timeseries_db()
     udb = edb.get_uuid_db()
+    psdb = edb.get_pipeline_state_db()
 
     for i, filename in enumerate(sel_file_list):
         logging.info("=" * 50)
@@ -63,3 +68,8 @@ if __name__ == '__main__':
             logging.info("For uuid %s, deleting entries from the user_db" % curr_uuid)
             user_db_del_result = udb.remove({"uuid": curr_uuid})
             logging.info("result = %s" % user_db_del_result)
+
+            if args.pipeline_purge:
+                logging.info("For uuid %s, deleting entries from the pipeline_state_db" % curr_uuid)
+                psdb_del_result = psdb.remove({"user_id": curr_uuid})
+                logging.info("result = %s" % psdb_del_result)

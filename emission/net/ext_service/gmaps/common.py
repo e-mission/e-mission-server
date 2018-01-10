@@ -1,6 +1,14 @@
 # Standard import
 from __future__ import division
-import urllib2
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import *
+import urllib.request, urllib.error, urllib.parse
 from datetime import datetime, timedelta
 import json
 import copy
@@ -31,9 +39,9 @@ def coerce_gmaps_time(time):
 
 def google_maps_to_our_trip_list(google_maps_json, _id, user_id, trip_id, mode, org_start_time):
     routes = []
-    for i in xrange(len(google_maps_json['routes'])):
+    for i in range(len(google_maps_json['routes'])):
         routes.append(google_maps_to_our_trip(google_maps_json, _id, user_id, trip_id, mode, org_start_time, i))
-    print "routes = %s" % routes
+    print("routes = %s" % routes)
     return routes
 
 def google_maps_to_our_trip(google_maps_json, _id, user_id, trip_id, mode, org_start_time, itinerary=0):
@@ -66,7 +74,7 @@ def meters_to_miles(meters):
 def calc_car_cost(distance):
     ave_mpg = 25
     gallons =  meters_to_miles(distance) / ave_mpg
-    price = urllib2.urlopen('http://www.fueleconomy.gov/ws/rest/fuelprices')
+    price = urllib.request.urlopen('http://www.fueleconomy.gov/ws/rest/fuelprices')
     xml = price.read()
     p = ET.fromstring(xml)[-1]
     return float(p.text)*gallons

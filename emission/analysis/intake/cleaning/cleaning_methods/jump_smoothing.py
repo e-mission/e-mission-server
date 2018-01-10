@@ -1,3 +1,7 @@
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import absolute_import
 # Techniques to smooth jumps in location tracking. Each of these returns a
 # boolean mask of inliers and outliers. We assume that the incoming dataframe
 # has a column called "speed" that represents the speed at each point. The
@@ -5,6 +9,12 @@
 # The result is in the inlier_mask field of the appropriate object
 
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import *
+from past.utils import old_div
+from builtins import object
 import logging
 import math
 import pandas as pd
@@ -313,8 +323,8 @@ class SmoothPosdap(object):
                 logging.info("len(last_segment) = %d, len(curr_segment) = %d, skipping" %
                     (len(last_segment), len(curr_segment)))
                 continue
-            get_coords = lambda(i): [with_speeds_df.iloc[i]["mLongitude"], with_speeds_df.iloc[i]["mLatitude"]]
-            get_ts = lambda(i): with_speeds_df.iloc[i]["mTime"]
+            get_coords = lambda i: [with_speeds_df.iloc[i]["mLongitude"], with_speeds_df.iloc[i]["mLatitude"]]
+            get_ts = lambda i: with_speeds_df.iloc[i]["mTime"]
             # I don't know why they would use time instead of distance, but
             # this is what the existing POSDAP code does.
             print("About to compare curr_segment duration %s with last segment duration %s" %
@@ -327,7 +337,7 @@ class SmoothPosdap(object):
                 for curr_idx in curr_segment:
                     print("Comparing distance %s with speed %s * time %s = %s" %
                         (math.fabs(ec.calDistance(get_coords(ref_idx), get_coords(curr_idx))),
-                         self.maxSpeed / 100, abs(get_ts(ref_idx) - get_ts(curr_idx)),
+                         old_div(self.maxSpeed, 100), abs(get_ts(ref_idx) - get_ts(curr_idx)),
                          self.maxSpeed / 100 * abs(get_ts(ref_idx) - get_ts(curr_idx))))
 
                     if (math.fabs(ec.calDistance(get_coords(ref_idx), get_coords(curr_idx))) >
@@ -340,7 +350,7 @@ class SmoothPosdap(object):
                 for curr_idx in reversed(last_segment):
                     print("Comparing distance %s with speed %s * time %s = %s" %
                         (math.fabs(ec.calDistance(get_coords(ref_idx), get_coords(curr_idx))),
-                         self.maxSpeed / 1000 , abs(get_ts(ref_idx) - get_ts(curr_idx)),
+                         old_div(self.maxSpeed, 1000) , abs(get_ts(ref_idx) - get_ts(curr_idx)),
                          self.maxSpeed / 1000 * abs(get_ts(ref_idx) - get_ts(curr_idx))))
                     if (abs(ec.calDistance(get_coords(ref_idx), get_coords(curr_idx))) >
                         (self.maxSpeed / 1000 *  abs(get_ts(ref_idx) - get_ts(curr_idx)))):

@@ -1,10 +1,26 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 from pymongo import MongoClient
 import pymongo
 import os
 import json
 
-_current_db = MongoClient('localhost').Stage_database
+try:
+    config_file = open('conf/storage/db.conf')
+except:
+    print("storage not configured, falling back to sample, default configuration")
+    config_file = open('conf/storage/db.conf.sample')
 
+config_data = json.load(config_file)
+url = config_data["timeseries"]["url"]
+
+print("Connecting to database URL "+url)
+_current_db = MongoClient(url).Stage_database
 
 def _get_current_db():
     return _current_db
@@ -13,11 +29,6 @@ def get_mode_db():
     # #current_db = MongoClient().Stage_database
     Modes= _get_current_db().Stage_Modes
     return Modes
-
-def get_moves_db():
-    # #current_db = MongoClient('localhost').Stage_database
-    MovesAuth= _get_current_db().Stage_user_moves_access
-    return MovesAuth
 
 def get_habitica_db():
     # #current_db = MongoClient('localhost').Stage_database
@@ -38,10 +49,6 @@ def get_profile_db():
     # current_db=MongoClient().Stage_database
     Profiles=_get_current_db().Stage_Profiles
     return Profiles
-
-def get_tiersys_db():
-    TierSys=_get_current_db().Tier_Sys
-    return TierSys
 
 """
 def get_routeDistanceMatrix_db():
@@ -86,16 +93,6 @@ def get_groundClusters_db():
     groundClusters= _get_current_db().Stage_groundClusters
     return groundClusters
 
-def get_pending_signup_db():
-    # current_db=MongoClient().Stage_database
-    Pending_signups = _get_current_db().Stage_pending_signups
-    return Pending_signups
-
-def get_worktime_db():
-    # current_db=MongoClient().Stage_database
-    Worktimes= _get_current_db().Stage_Worktime
-    return Worktimes
-
 def get_uuid_db():
     # current_db=MongoClient().Stage_database
     UUIDs = _get_current_db().Stage_uuids
@@ -115,10 +112,6 @@ def get_result_stats_db_backup():
     # current_db=MongoClient().Stage_database
     ResultStats = _get_current_db().Stage_result_stats
     return ResultStats
-
-def get_db():
-    current_db=MongoClient('localhost').Stage_database
-    return current_db
 
 def get_test_db():
     current_db=MongoClient().Test2
@@ -222,6 +215,10 @@ def get_pipeline_state_db():
     PipelineState = _get_current_db().Stage_pipeline_state
     return PipelineState
 
+def get_push_token_mapping_db():
+    PushTokenMapping = _get_current_db().Stage_push_token_mapping
+    return PushTokenMapping
+
 def get_common_place_db():
     #current_db = MongoClient().Stage_database
     CommonPlaces = _get_current_db().Stage_common_place
@@ -241,3 +238,18 @@ def get_fake_sections_db():
     #current_db = MongoClient().Stage_database
     FakeSections = _get_current_db().Stage_fake_sections
     return FakeSections
+
+def get_tiersys_db():
+    TierSys=_get_current_db().Tier_Sys
+    return TierSys
+
+# Static utility method to save entries to a mongodb collection.  Single
+# drop-in replacement for collection.save() now that it is deprecated in
+# pymongo 3.0.
+# https://github.com/e-mission/e-mission-server/issues/533#issuecomment-349430623
+def save(db, entry):
+#     if '_id' in entry:
+#         db.replace_one({'_id': entry['_id']}, entry, upsert=True)
+#     else:
+#         db.replace_one({}, entry, upsert=True)
+    db.save(entry)

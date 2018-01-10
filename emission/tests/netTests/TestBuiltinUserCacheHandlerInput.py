@@ -1,4 +1,12 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import *
 import unittest
 import datetime as pydt
 import logging
@@ -25,7 +33,7 @@ import emission.core.wrapper.trip as ecwt
 
 class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
     def setUp(self):
-        emission.tests.common.dropAllCollections(edb.get_db())
+        emission.tests.common.dropAllCollections(edb._get_current_db())
         self.testUserUUID1 = uuid.uuid4()
         self.testUserUUID2 = uuid.uuid4()
         self.testUserUUIDios = uuid.uuid4()

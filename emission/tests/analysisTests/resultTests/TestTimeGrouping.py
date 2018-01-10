@@ -1,4 +1,11 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import unittest
 import logging
 import pandas as pd
@@ -76,7 +83,7 @@ class TestTimeGrouping(unittest.TestCase):
         object["%slocal_dt" % prefix] = esdl.get_local_date(ardt.timestamp,
                                                      timezone)
         object["%sfmt_time" % prefix] = ardt.to(timezone).isoformat()
-        logging.debug("After filling entries, keys are %s" % object.keys())
+        logging.debug("After filling entries, keys are %s" % list(object.keys()))
         return object
 
     def testLocalDtFillTimesDailyOneTz(self):

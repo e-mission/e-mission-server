@@ -1,6 +1,13 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Functions that manipulate both user and client information. It seemed better
 # to call that out into a separate module, rather than decide whether to stick
 # it into User or into Client.
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 from emission.core.wrapper.user import User
 from emission.core.wrapper.client import Client
 from emission.core.get_database import get_profile_db

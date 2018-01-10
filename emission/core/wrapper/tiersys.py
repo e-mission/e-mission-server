@@ -15,6 +15,9 @@ class TierSys:
         for i in range(1, num_tiers+1):
            self.addTier(i)
 
+    def fromID(id):
+        #TODO: Get form mongodb collection, return tiersys
+
     def addTier(self, rank):
         self.tiers[rank] = st.Tier(rank)
 

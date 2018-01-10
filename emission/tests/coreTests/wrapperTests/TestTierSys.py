@@ -10,12 +10,15 @@ from emission.core.wrapper.tiersys import TierSys
 from emission.tests import common
 import emission.tests.common as etc
 import emission.core.get_database as edb
+import emission.storage.timeseries.abstract_timeseries as esta
 import pandas as pd
+import arrow
 
 import emission.tests.common as etc
 
 class TestTierSys(unittest.TestCase):
   def setUp(self):
+      #etc.dropAllCollections(edb.get_db())
       return
 
   def testComputePenalty(self):
@@ -50,6 +53,27 @@ class TestTierSys(unittest.TestCase):
       return
 
   def testComputeCarbon(self):
+      #TODO: setupRealExample does not work as expected
+      import uuid
+      etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-07-22")
+      print(self.testUUID)
+      self.ts = esta.TimeSeries.get_time_series(self.testUUID)
+      print(self.ts.get_uuid_list());
+      entry_it = self.ts.find_entries(["analysis/cleaned_trip"])
+      #cs_df = self.ts.get_data_df("analysis/cleaned_section")
+      for ct in entry_it:
+        cte = ecwe.Entry(ct)
+        print("found something")
+        print "=== Trip:", cte.data.start_loc, "->", cte.data.end_loc
+        section_it = esdt.get_sections_for_trip("analysis/cleaned_section", test_user_id, cte.get_id())
+        for sec in section_it:
+          print "  --- Section:", sec.data.start_loc, "->", sec.data.end_loc, " on ", sec.data.sensed_mode
+      #now = arrow.utcnow()
+      #yesterday = now.shift(days=-1)
+      #ts = TierSys(0)
+      #ts.computeCarbon(0, yesterday)
+      #analysis/cleaned_section
+      #edb.get_timeseries_db
       return
 
 if __name__ == '__main__':

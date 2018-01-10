@@ -1,3 +1,11 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
 import logging
 import geojson as gj
 import uuid
@@ -44,7 +52,7 @@ def _setup(self):
     #if len(self.data) == 0:
     #    tg.create_fake_trips()
     #    self.data = cp.read_data(size=100)
-    print 'there are ' + str(len(self.data))
+    print('there are ' + str(len(self.data)))
     self.testUUID = uuid.uuid4()
     self.ts = esta.TimeSeries.get_time_series(self.testUUID)
 

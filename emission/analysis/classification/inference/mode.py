@@ -1,4 +1,13 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import *
+from builtins import object
 from pymongo import MongoClient
 import logging
 from datetime import datetime
@@ -19,7 +28,7 @@ import emission.core.get_database as edb
 # problem, so we don't need to solve it right now.
 minTrainingSetSize = 1000
 
-class ModeInferencePipeline:
+class ModeInferencePipeline(object):
   def __init__(self):
     self.featureLabels = ["distance", "duration", "first filter mode", "sectionId", "avg speed",
                           "speed EV", "speed variance", "max speed", "max accel", "isCommute",
@@ -155,7 +164,7 @@ class ModeInferencePipeline:
             resultVector[i] = self.getGroundTruthMode(section)
             if i % 100 == 0:
                 logging.debug("Processing record %s " % i)
-        except Exception, e:
+        except Exception as e:
             logging.debug("skipping section %s due to error %s " % (section, e))
       return (featureMatrix, resultVector)
 
@@ -281,11 +290,11 @@ class ModeInferencePipeline:
 
 # Feature Indices
   def selectFeatureIndicesStep(self):
-    genericFeatureIndices = list(xrange(0,10))
-    AdvancedFeatureIndices = list(xrange(10,13))
-    LocationFeatureIndices = list(xrange(13,17))
-    TimeFeatureIndices = list(xrange(17,19))
-    BusTrainFeatureIndices = list(xrange(19,22))
+    genericFeatureIndices = list(range(0,10))
+    AdvancedFeatureIndices = list(range(10,13))
+    LocationFeatureIndices = list(range(13,17))
+    TimeFeatureIndices = list(range(17,19))
+    BusTrainFeatureIndices = list(range(19,22))
     logging.debug("generic features = %s" % genericFeatureIndices)
     logging.debug("advanced features = %s" % AdvancedFeatureIndices)
     logging.debug("location features = %s" % LocationFeatureIndices)

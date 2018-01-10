@@ -1,3 +1,7 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # When I initially started tracking scores, I was lazy and stored the
 # carbonFootprint in the same field as the gamification score, instead of
 # having client specific fields. This made sense if you thought that there was
@@ -10,6 +14,9 @@
 # carbon footprint from the currentScore field to the carbon_footprint field,
 # and delete the currentScore and previousScore fields
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 from get_database import get_uuid_db, get_profile_db
 from dao.user import User
 from clients.default import default

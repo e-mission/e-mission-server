@@ -13,8 +13,15 @@ The high level algorithm is to:
         is idempotent. That ensures that we can simply reset the pipeline state
         and re-run everything if we have any changes that we need to make.
 """ 
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import logging
 
 # Our imports
@@ -63,17 +70,9 @@ def convert_to_filtered(entry):
     entry["metadata"]["key"] = "background/filtered_location"
     return entry
 
-def continuous_collection_in_range(timeseries):
-    return timeseries.user_id in estag.TEST_PHONE_IDS and \
-           timeseries.user_id not in esdu.TEMP_HANDLED_PUBLIC_PHONES
-
 def filter_accuracy(user_id):
     time_query = epq.get_time_range_for_accuracy_filtering(user_id)
     timeseries = esta.TimeSeries.get_time_series(user_id)
-    if not continuous_collection_in_range(timeseries):
-        logging.debug("Not a public phone, must already have filtered data, early return")
-        epq.mark_accuracy_filtering_done(user_id, None)
-        return
 
     try:
         unfiltered_points_df = timeseries.get_data_df("background/location", time_query)
@@ -101,7 +100,7 @@ def filter_accuracy(user_id):
                                                     entry.metadata_write_ts))
                 timeseries.insert(entry_copy)
             last_entry_processed = unfiltered_points_df.iloc[-1].metadata_write_ts
-            epq.mark_accuracy_filtering_done(user_id, last_entry_processed) 
+            epq.mark_accuracy_filtering_done(user_id, float(last_entry_processed))
     except:
         logging.exception("Marking accuracy filtering as failed")
         epq.mark_accuracy_filtering_failed(user_id)

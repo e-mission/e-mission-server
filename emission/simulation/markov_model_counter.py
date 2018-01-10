@@ -1,3 +1,7 @@
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
 # Licensing Information:  You are free to use or extend these projects for 
 # educational purposes provided that (1) you do not distribute or publish 
 # solutions, (2) you retain this notice, and (3) you provide clear 
@@ -12,6 +16,11 @@
 
 ## Because this code is copied from the CS188 project
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import *
+from past.utils import old_div
 import random
 
 class Counter(dict):
@@ -76,8 +85,8 @@ class Counter(dict):
         """
         Returns the key with the highest value.
         """
-        if len(self.keys()) == 0: return None
-        all = self.items()
+        if len(list(self.keys())) == 0: return None
+        all = list(self.items())
         values = [x[1] for x in all]
         maxIndex = values.index(max(values))
         return all[maxIndex][0]
@@ -94,7 +103,7 @@ class Counter(dict):
         >>> a.sortedKeys()
         ['second', 'third', 'first']
         """
-        sortedItems = self.items()
+        sortedItems = list(self.items())
         compare = lambda x, y:  sign(y[1] - x[1])
         sortedItems.sort(cmp=compare)
         return [x[0] for x in sortedItems]
@@ -114,8 +123,8 @@ class Counter(dict):
         """
         total = float(self.totalCount())
         if total == 0: return
-        for key in self.keys():
-            self[key] = self[key] / total
+        for key in list(self.keys()):
+            self[key] = old_div(self[key], total)
 
     def divideAll(self, divisor):
         """
@@ -172,7 +181,7 @@ class Counter(dict):
         >>> a['first']
         1
         """
-        for key, value in y.items():
+        for key, value in list(y.items()):
             self[key] += value
 
     def __add__( self, y ):
@@ -237,15 +246,15 @@ def normalize(vectorOrCounter):
         counter = vectorOrCounter
         total = float(counter.totalCount())
         if total == 0: return counter
-        for key in counter.keys():
+        for key in list(counter.keys()):
             value = counter[key]
-            normalizedCounter[key] = value / total
+            normalizedCounter[key] = old_div(value, total)
         return normalizedCounter
     else:
         vector = vectorOrCounter
         s = float(sum(vector))
         if s == 0: return vector
-        return [el / s for el in vector]
+        return [old_div(el, s) for el in vector]
 
 def nSample(distribution, values, n):
     if sum(distribution) != 1:

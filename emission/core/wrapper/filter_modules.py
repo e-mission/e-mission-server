@@ -4,7 +4,15 @@ structured:
 module_name { query_string: function_for_query }
 
 """
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import *
 import sys
 import os
 import math
@@ -16,7 +24,7 @@ from uuid import UUID
 
 # Our imports
 from emission.core.get_database import get_section_db, get_trip_db, get_routeCluster_db, get_alternatives_db
-import trip_old as trip
+from . import trip_old as trip
 
 # 0763de67-f61e-3f5d-90e7-518e69793954
 # 0763de67-f61e-3f5d-90e7-518e69793954_20150421T230304-0700_0
@@ -28,7 +36,7 @@ def get_clusters_info(uid):
         if clusterJson is None:
             return []
         c_info = []
-        clusterSectionLists= clusterJson["clusters"].values() 
+        clusterSectionLists= list(clusterJson["clusters"].values()) 
 	logging.debug( "Number of section lists for user %s is %s" % (uid, len(clusterSectionLists)))
         for sectionList in clusterSectionLists:
                 first = True
@@ -144,10 +152,10 @@ def getAlternativeTrips(trip_id):
     raise AlternativesNotFound("No Alternatives Found")
 
 def getRecentTrips(uid):
-    raise "Not Implemented Error"
+    raise NotImplementedError()
 
 def getTripsThroughMode(uid):
-    raise "Not Implemented Error"
+    raise NotImplementedError()
 
 modules = {
    # Trip Module

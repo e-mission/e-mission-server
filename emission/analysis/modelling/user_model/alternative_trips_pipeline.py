@@ -1,4 +1,12 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from builtins import object
 import optparse
 import sys
 import json
@@ -10,7 +18,7 @@ import emission.core.wrapper.tripiterator as ti
 import emission.net.ext_service.gmaps.common as ec
 from emission.core.wrapper.trip_old import E_Mission_Trip
 
-class AlternativeTripsPipeline:
+class AlternativeTripsPipeline(object):
     def __init__(self):
         pass
 
