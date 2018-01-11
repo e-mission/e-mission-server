@@ -19,7 +19,10 @@ class TierSys:
         return get_tiersys_db().find().sort('created_at',-1).limit(1)
 
     def addTier(self, rank):
-        self.tiers[rank] = st.Tier(rank)
+        if rank not in self.tiers:
+            self.tiers[rank] = st.Tier(rank)
+        else:
+            raise Exception('Inputted rank already exits in the tiersys.')
 
     def deleteTier(self, rank):
         self.tiers.pop(rank)
@@ -105,7 +108,6 @@ class TierSys:
         transportation mode:
         car: 50 mile threshold, penalty = 50 - distance
         bus: 25 mile threshold, penalty = 25 - distance
-        cycling: 5 mile threshold, penalty = 5 - distance
 
         If unknown (sensed mode = 4), don't compute anything for now.
 
@@ -118,8 +120,6 @@ class TierSys:
             motiontype = int(row['sensed_mode'])
             if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:
                 total_penalty += max(0, 37.5 - row['distance'])
-            elif motiontype == ecwm.MotionTypes.BICYCLING.value:
-                total_penalty += max(0, 5 - row['distance'])
         return total_penalty
 
     def updateTiers(self, last_ts):
