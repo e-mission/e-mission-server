@@ -60,12 +60,12 @@ class TierSys:
         # Get cleaned trips for the two users that started on 1st Aug UTC
         last_period_tq = estt.TimeQuery("data.start_ts",
                             last_ts, # start of range
-                            arrow.utcnow())  # end of range
+                            arrow.utcnow().timestamp)  # end of range
         cs_df = ts.get_data_df("analysis/cleaned_section", time_query=last_period_tq)
 
         carbon_val = self.computeFootprint(cs_df[["sensed_mode", "distance"]])
         penalty_val = self.computePenalty(cs_df[["sensed_mode", "distance"]]) # Mappings in emission/core/wrapper/motionactivity.py
-        dist_travelled = cs_df[["distance"]].sum()
+        dist_travelled = cs_df["distance"].sum()
 
         if dist_travelled > 0:
             return (carbon_val + penalty_val) / dist_travelled
@@ -105,7 +105,6 @@ class TierSys:
         transportation mode:
         car: 50 mile threshold, penalty = 50 - distance
         bus: 25 mile threshold, penalty = 25 - distance
-        cycling: 5 mile threshold, penalty = 5 - distance
 
         If unknown (sensed mode = 4), don't compute anything for now.
 
@@ -117,9 +116,7 @@ class TierSys:
         for index, row in penalty_df.iterrows():
             motiontype = int(row['sensed_mode'])
             if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:
-                total_penalty += max(0, 37.5 - row['distance'])
-            elif motiontype == ecwm.MotionTypes.BICYCLING.value:
-                total_penalty += max(0, 5 - row['distance'])
+                total_penalty += max(0, mil_to_km(37.5) - m_to_km(row['distance']))
         return total_penalty
 
     def updateTiers(self, last_ts):
@@ -159,4 +156,7 @@ class TierSys:
         get_tiersys_db().insert_one({'tiers': ts, 'created_at': datetime.now()})
 
 def m_to_km(distance):
-    return max(0, distance / 1000)
+    return max(0, float(distance) / float(1000))
+
+def mil_to_km(miles):
+    return float(miles) * 1609.344/float(1000)
