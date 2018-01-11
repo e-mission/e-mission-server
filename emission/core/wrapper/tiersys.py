@@ -9,14 +9,14 @@ import arrow
 from emission.core.get_database import get_tiersys_db
 
 class TierSys:
-    def __init__(self, tsid, num_tiers=5):
-        self.tsid = tsid
+    def __init__(self, num_tiers=5):
         self.tiers = {}
         for i in range(1, num_tiers+1):
            self.addTier(i)
 
-    def fromID(id):
-        #TODO: Get form mongodb collection, return tiersys
+    @staticmethod
+    def getLatest():
+        return get_tiersys_db().find().sort('created_at',-1).limit(1)
 
     def addTier(self, rank):
         self.tiers[rank] = st.Tier(rank)
@@ -42,7 +42,7 @@ class TierSys:
             user_carbon_map[user_id] = self.computeCarbon(user_id, last_ts)
 
         # Sort and partition users by carbon metric.
-        user_carbon_tuples_sorted = sorted(user_carbon_map.iteritems(), key=lambda (k,v): (v,k)) # Sorted list by value of dict tuples.
+        user_carbon_tuples_sorted = sorted(user_carbon_map.iteritems(), key=(lambda kv: (kv[1],kv[0]))) # Sorted list by value of dict tuples.
         user_carbon_sorted = [i[0] for i in user_carbon_tuples_sorted] # Extract only the user ids.
         boundary = int(round(num_users / n)) # Floors to nearest boundary, make first tier have all extra remainder.
         list_of_tiers = []
@@ -141,7 +141,8 @@ class TierSys:
         Adds/Replaces array of tiers into tiersys object
         Gets current array of uuids and puts them into tier objects
         {{
-            _id : 0,
+            _id : DEFINED BY MONGO,
+            created_at: datetime,
             tiers : [{
                 rank : [],
                 uuids : []
@@ -153,9 +154,9 @@ class TierSys:
         """
         ts = []
         for rank, users in self.tiers.iteritems():
-            ts.push({'rank': rank, 'uuids': users})
+            ts.append({'rank': rank, 'uuids': users})
 
-        get_tiersys_db().insert({'id': self.tsid, 'tiers': ts, 'created_at': datetime.now()})
+        get_tiersys_db().insert_one({'tiers': ts, 'created_at': datetime.now()})
 
 def m_to_km(distance):
     return max(0, distance / 1000)
