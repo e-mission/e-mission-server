@@ -37,6 +37,21 @@ class TestTierSys(unittest.TestCase):
           ts.addTier(1)
       return
 
+  def testDeleteTier(self):
+      ts = TierSys(5)
+      num_tiers = len(ts.tiers)
+      self.assertEquals(num_tiers, 5, "Did not correctly initialize number of tiers.")
+
+      # Basic test, adds a dictionary key value pair.
+      ts.deleteTier(2)
+      num_tiers = len(ts.tiers)
+      self.assertEquals(num_tiers, 4, "Did not correctly delete a tier.")
+
+      # Test that exception raised when attempting to add a rank that already exists.
+      with self.assertRaises(Exception) as context:
+          ts.deleteTier(2)
+      return
+
   def testComputePenalty(self):
       """
       IN_VEHICLE = 0, BICYCLING = 1, ON_FOOT = 2, STILL = 3, UNKNOWN = 4, TILTING = 5, WALKING = 7, RUNNING = 8

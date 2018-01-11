@@ -22,10 +22,13 @@ class TierSys:
         if rank not in self.tiers:
             self.tiers[rank] = st.Tier(rank)
         else:
-            raise Exception('Inputted rank already exits in the tiersys.')
+            raise Exception('Inputted rank already exist in the tiersys.')
 
     def deleteTier(self, rank):
-        self.tiers.pop(rank)
+        if rank in self.tiers:
+            self.tiers.pop(rank)
+        else:
+            raise Exception('Inputted rank does not exist in the tiersys.')
 
     def computeRanks(self, last_ts, n):
         #TODO: FINISH
