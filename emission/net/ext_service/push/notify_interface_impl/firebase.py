@@ -83,7 +83,7 @@ class FirebasePush(pni.NotifyInterface):
     def convert_to_fcm_if_necessary(self, token_list):
         (mapped_token_list, unmapped_token_list) = self.map_existing_fcm_tokens(token_list)
         importedResultJSON = self.retrieve_fcm_tokens(unmapped_token_list)
-        newly_mapped_token_list = self.process_fcm_token_list(token_list, importedResultJSON)
+        newly_mapped_token_list = self.process_fcm_token_result(token_list, importedResultJSON)
         return mapped_token_list + newly_mapped_token_list
 
     def send_visible_notification(self, token_list, title, message, json_data, dev=False):
@@ -96,14 +96,12 @@ class FirebasePush(pni.NotifyInterface):
         # convert tokens if necessary
         fcm_token_list = self.convert_to_fcm_if_necessary(token_list)
 
-        push_service = FCMNotification(api_key=server_auth_token)
+        push_service = FCMNotification(api_key=self.server_auth_token)
         data_message = {
            "data": json_data,
            "payload": json_data
         }
         response = push_service.notify_multiple_devices(registration_ids=fcm_token_list,
-                                               message_body=message,
-                                               message_title=title,
                                                data_message=data_message)
         logging.debug(response)
         return response
@@ -120,7 +118,7 @@ class FirebasePush(pni.NotifyInterface):
         ios_raw_data.update({"notId": int(time.time() * 10**6)})
         ios_raw_data.update({"payload": ios_raw_data["notId"]})
 
-        push_service = FCMNotification(api_key=server_auth_token)
+        push_service = FCMNotification(api_key=self.server_auth_token)
 
         FirebasePush.print_dev_flag_warning()
         # convert tokens if necessary
@@ -132,7 +130,7 @@ class FirebasePush(pni.NotifyInterface):
         logging.debug(response)
         return response
 
-    def display_response(response):
+    def display_response(self, response):
         response_json = response
         logging.debug("firebase push result: success %s failure %s results %s" %
             (response_json["success"], response_json["failure"], response_json["results"]))
