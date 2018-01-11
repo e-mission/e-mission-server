@@ -18,9 +18,38 @@ from emission.core.get_database import get_tiersys_db
 import emission.tests.common as etc
 
 class TestTierSys(unittest.TestCase):
-
   def setUp(self):
-      etc.dropAllCollections(edb._get_current_db())
+      #etc.dropAllCollections(edb.get_db())
+      return
+
+  def testAddTier(self):
+      ts = TierSys(0)
+      num_tiers = len(ts.tiers)
+      self.assertEquals(num_tiers, 0, "Did not correctly initialize number of tiers.")
+
+      # Basic test, adds a dictionary key value pair.
+      ts.addTier(1)
+      num_tiers = len(ts.tiers)
+      self.assertEquals(num_tiers, 1, "Did not correctly add a tier.")
+
+      # Test that exception raised when attempting to add a rank that already exists.
+      with self.assertRaises(Exception) as context:
+          ts.addTier(1)
+      return
+
+  def testDeleteTier(self):
+      ts = TierSys(5)
+      num_tiers = len(ts.tiers)
+      self.assertEquals(num_tiers, 5, "Did not correctly initialize number of tiers.")
+
+      # Basic test, adds a dictionary key value pair.
+      ts.deleteTier(2)
+      num_tiers = len(ts.tiers)
+      self.assertEquals(num_tiers, 4, "Did not correctly delete a tier.")
+
+      # Test that exception raised when attempting to add a rank that already exists.
+      with self.assertRaises(Exception) as context:
+          ts.deleteTier(2)
       return
 
   def testComputePenalty(self):

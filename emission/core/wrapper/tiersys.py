@@ -19,10 +19,16 @@ class TierSys:
         return get_tiersys_db().find().sort('created_at',-1).limit(1)
 
     def addTier(self, rank):
-        self.tiers[rank] = st.Tier(rank)
+        if rank not in self.tiers:
+            self.tiers[rank] = st.Tier(rank)
+        else:
+            raise Exception('Inputted rank already exist in the tiersys.')
 
     def deleteTier(self, rank):
-        self.tiers.pop(rank)
+        if rank in self.tiers:
+            self.tiers.pop(rank)
+        else:
+            raise Exception('Inputted rank does not exist in the tiersys.')
 
     def computeRanks(self, last_ts, n):
         #TODO: FINISH
