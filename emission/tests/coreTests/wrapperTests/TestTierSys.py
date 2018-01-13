@@ -7,6 +7,7 @@ import logging
 
 # Our imports
 from emission.core.wrapper.tiersys import TierSys
+from emission.core.wrapper.user import User
 from emission.tests import common
 import emission.tests.common as etc
 import emission.core.get_database as edb
@@ -14,23 +15,24 @@ import emission.storage.timeseries.abstract_timeseries as esta
 import pandas as pd
 import arrow
 from emission.core.get_database import get_tiersys_db
+import uuid
 
 import emission.tests.common as etc
 
 class TestTierSys(unittest.TestCase):
   def setUp(self):
-      #etc.dropAllCollections(edb.get_db())
+      etc.dropAllCollections(edb._get_current_db())
       return
 
   def testAddTier(self):
       ts = TierSys(0)
       num_tiers = len(ts.tiers)
-      self.assertEquals(num_tiers, 0, "Did not correctly initialize number of tiers.")
+      self.assertEqual(num_tiers, 0, "Did not correctly initialize number of tiers.")
 
       # Basic test, adds a dictionary key value pair.
       ts.addTier(1)
       num_tiers = len(ts.tiers)
-      self.assertEquals(num_tiers, 1, "Did not correctly add a tier.")
+      self.assertEqual(num_tiers, 1, "Did not correctly add a tier.")
 
       # Test that exception raised when attempting to add a rank that already exists.
       with self.assertRaises(Exception) as context:
@@ -40,12 +42,12 @@ class TestTierSys(unittest.TestCase):
   def testDeleteTier(self):
       ts = TierSys(5)
       num_tiers = len(ts.tiers)
-      self.assertEquals(num_tiers, 5, "Did not correctly initialize number of tiers.")
+      self.assertEqual(num_tiers, 5, "Did not correctly initialize number of tiers.")
 
       # Basic test, adds a dictionary key value pair.
       ts.deleteTier(2)
       num_tiers = len(ts.tiers)
-      self.assertEquals(num_tiers, 4, "Did not correctly delete a tier.")
+      self.assertEqual(num_tiers, 4, "Did not correctly delete a tier.")
 
       # Test that exception raised when attempting to add a rank that already exists.
       with self.assertRaises(Exception) as context:
@@ -145,11 +147,93 @@ class TestTierSys(unittest.TestCase):
       get_tiersys_db().insert_one({'tiers': ts, 'created_at': datetime.now() - timedelta(hours = 3)})
       get_tiersys_db().insert_one({'tiers': correctTs, 'created_at': datetime.now()})
 
-      latest = TierSys.getLatest()
       for a in TierSys.getLatest():
           self.assertEqual(a['tiers'][0], {'rank': 1, 'uuids': [4, 5, 6]}, "Did not get latest Tier")
           self.assertEqual(a['tiers'][1], {'rank': 2, 'uuids': [1, 2, 3]}, "Did not get latest Tier")
       return
+
+  def testDivideIntoBuckets(self):
+      items = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+      with self.assertRaises(Exception) as context:
+          TierSys.divideIntoBuckets(items, 0)
+      self.assertEqual(TierSys.divideIntoBuckets(items, 1), [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]])
+      self.assertEqual(TierSys.divideIntoBuckets(items, 2), [[0, 1, 2, 3, 4], [5, 6, 7, 8, 9]])
+      self.assertEqual(TierSys.divideIntoBuckets(items, 3), [[0, 1, 2, 3], [4, 5, 6], [7, 8, 9]])
+      self.assertEqual(TierSys.divideIntoBuckets(items, 4), [[0, 1, 2], [3, 4, 5], [6, 7], [8, 9]])
+      self.assertEqual(TierSys.divideIntoBuckets(items, 5), [[0, 1], [2, 3], [4, 5], [6, 7], [8, 9]])
+      self.assertEqual(TierSys.divideIntoBuckets(items, 6), [[0, 1], [2, 3], [4, 5], [6, 7], [8], [9]])
+      self.assertEqual(TierSys.divideIntoBuckets(items, 7), [[0, 1], [2, 3], [4, 5], [6], [7], [8], [9]])
+      self.assertEqual(TierSys.divideIntoBuckets(items, 8), [[0, 1], [2, 3], [4], [5], [6], [7], [8], [9]])
+      self.assertEqual(TierSys.divideIntoBuckets(items, 9), [[0, 1], [2], [3], [4], [5], [6], [7], [8], [9]])
+      self.assertEqual(TierSys.divideIntoBuckets(items, 10), [[0], [1], [2], [3], [4], [5], [6], [7], [8], [9]])
+      with self.assertRaises(Exception) as context:
+          TierSys.divideIntoBuckets(items, 11)
+      return
+
+  def testComputeRanks(self):
+      time = arrow.Arrow(2010,5,1).timestamp
+      tiersys = TierSys(0)
+
+      etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-08-23")
+      shankari8_id = self.testUUID
+      etc.runIntakePipeline(self.testUUID)
+      shankari8_carbon = tiersys.computeCarbon(shankari8_id, time)
+      User.registerWithUUID("shankari8@gmail.com", shankari8_id)
+      etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-07-22")
+      shankari7_id = self.testUUID
+      etc.runIntakePipeline(self.testUUID)
+      shankari7_carbon = tiersys.computeCarbon(shankari7_id, time)
+      User.registerWithUUID("shankari7@gmail.com", shankari7_id)
+      user_tiers = tiersys.computeRanks(time, 2)
+      self.assertEqual(user_tiers, [[shankari7_id], [shankari8_id]])
+      return
+
+  def testUpdateAndSaveTiers(self):
+      time = arrow.Arrow(2010,5,1).timestamp
+      tiersys = TierSys(0)
+
+      etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2016-06-20")
+      etc.runIntakePipeline(self.testUUID)
+      shankari0620 = self.testUUID
+      User.registerWithUUID("shankari06-20@gmail.com", self.testUUID)
+
+      etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2016-06-21")
+      etc.runIntakePipeline(self.testUUID)
+      shankari0621 = self.testUUID
+      User.registerWithUUID("shankari06-21gmail.com", self.testUUID)
+
+      etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2016-07-22")
+      etc.runIntakePipeline(self.testUUID)
+      shankari0722 = self.testUUID
+      User.registerWithUUID("shankari07-22@gmail.com", self.testUUID)
+
+      etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2016-07-25")
+      etc.runIntakePipeline(self.testUUID)
+      shankari0725 = self.testUUID
+      User.registerWithUUID("shankari07-25@gmail.com", self.testUUID)
+
+      etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2016-07-27")
+      etc.runIntakePipeline(self.testUUID)
+      shankari0727 = self.testUUID
+      User.registerWithUUID("shankari07-27@gmail.com", self.testUUID)
+
+      tiersys.updateTiers(time)
+      tiers = tiersys.tiers
+      print(tiers)
+      self.assertEqual(True, shankari0621 in tiers[1] or hankari0725 in tiers[1])
+      self.assertEqual(True, shankari0621 in tiers[2] or shankari0725 in tiers[2])
+      self.assertEqual(True, shankari0727 in tiers[3])
+      self.assertEqual(True, shankari0722 in tiers[4])
+      self.assertEqual(True, shankari0620 in tiers[5])
+
+      tiersys.saveTiers()
+
+      for a in TierSys.getLatest():
+          self.assertEqual(a['tiers'][2], {'rank': 3, 'uuids': [shankari0727]}, "Save failed")
+          self.assertEqual(a['tiers'][3], {'rank': 4, 'uuids': [shankari0722]}, "Save failed")
+          self.assertEqual(a['tiers'][4], {'rank': 5, 'uuids': [shankari0620]}, "Save failed")
+      return
+
 
 if __name__ == '__main__':
     etc.configLogging()

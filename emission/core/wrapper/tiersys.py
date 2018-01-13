@@ -30,6 +30,29 @@ class TierSys:
         else:
             raise Exception('Inputted rank does not exist in the tiersys.')
 
+    @staticmethod
+    def divideIntoBuckets(objs, n_buckets):
+        """
+        Divides objects into n buckets.
+        Used in compute ranks to divide users into n tiers
+        """
+        if n_buckets <= 0:
+            raise Exception('Number of buckets cannot be less than 1')
+        elif n_buckets > len(objs):
+            raise Exception('Number of buckets can not be creater than num of objs')
+        perBucket = len(objs) // n_buckets
+        remaining = len(objs) % n_buckets
+        buckets = []
+        i = 0
+        for b in range(0, n_buckets):
+            extra = 1 if b < remaining else 0
+            bucket = []
+            for o in range(0, extra + perBucket):
+                bucket.append(objs[i])
+                i += 1
+            buckets.append(bucket)
+        return buckets
+
     def computeRanks(self, last_ts, n):
         #TODO: FINISH
         """
@@ -38,23 +61,21 @@ class TierSys:
         compute percentiles
         set boundaries
         return list of n lists for n ranks,
-        with the tiers sorted in descending order.
+        with the tiers sorted in ascending order.
+        (lower carbon val comes first)
         """
         user_carbon_map = {} # Map from user_id to carbon val.
-        num_users = len(all_users.iloc)
-        all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"user_email":1, "uuid": 1, "_id": 0})))
-        for i in range(1, num_users+1):
-            user_id = all_users.iloc[i].UUID
+        all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
+        print(all_users.shape)
+        num_users = all_users.shape[0]
+        for index, row in all_users.iterrows():
+            user_id = row['uuid']
             user_carbon_map[user_id] = self.computeCarbon(user_id, last_ts)
 
         # Sort and partition users by carbon metric.
-        user_carbon_tuples_sorted = sorted(user_carbon_map.iteritems(), key=(lambda kv: (kv[1],kv[0]))) # Sorted list by value of dict tuples.
+        user_carbon_tuples_sorted = sorted(user_carbon_map.items(), key=(lambda kv: kv[1])) # Sorted list by value of dict tuples.
         user_carbon_sorted = [i[0] for i in user_carbon_tuples_sorted] # Extract only the user ids.
-        boundary = int(round(num_users / n)) # Floors to nearest boundary, make first tier have all extra remainder.
-        list_of_tiers = []
-        for i in range(0, n):
-            list_of_tiers[i] = user_carbon_sorted[i*boundary:(i+1)*boundary]
-        return list_of_tiers
+        return self.divideIntoBuckets(user_carbon_sorted, n)
 
     def computeCarbon(self, user_id, last_ts):
         """
@@ -131,6 +152,7 @@ class TierSys:
         Also updates users tier attributes in the database.
         "Best" tiers have lower rank values.
         """
+        self.tiers = {}
         updated_user_tiers = self.computeRanks(last_ts, 5)
         for rank in range(1, len(updated_user_tiers) + 1):
             self.addTier(rank)
@@ -156,7 +178,7 @@ class TierSys:
         }}
         """
         ts = []
-        for rank, users in self.tiers.iteritems():
+        for rank, users in self.tiers.items():
             ts.append({'rank': rank, 'uuids': users})
 
         get_tiersys_db().insert_one({'tiers': ts, 'created_at': datetime.now()})
