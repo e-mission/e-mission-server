@@ -20,6 +20,7 @@ import pymongo
 
 import emission.pipeline.reset as epr
 import emission.core.get_database as edb
+import emission.storage.decorations.user_queries as esdu
 
 def _get_user_list(args):
     if args.all:
@@ -40,12 +41,12 @@ def _find_platform_users(platform):
     # Use the commented out line instead for better performance.
     # Soon, we can move to the more performant option, because there will be
     # no users that don't have a profile
-    # return edb.get_profile_db().find({"curr_platform": platform}).distinct("user_id")
-   return edb.get_timeseries_db().find({'metadata.platform': platform}).distinct(
-       'user_id')
+    # return edb.get_timeseries_db().find({'metadata.platform': platform}).distinct(
+    #    'user_id')
+   return edb.get_profile_db().find({"curr_platform": platform}).distinct("user_id")
 
 def _find_all_users():
-   return edb.get_timeseries_db().find().distinct('user_id')
+   return esdu.get_all_uuids()
 
 def _email_2_user_list(email_list):
     return [ecwu.User.fromEmail(e) for e in email_list]

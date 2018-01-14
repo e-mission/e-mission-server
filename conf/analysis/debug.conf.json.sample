@@ -1,3 +1,4 @@
 {
-    "intake.cleaning.clean_and_resample.speedDistanceAssertions": true
+    "intake.cleaning.clean_and_resample.speedDistanceAssertions": true,
+    "intake.cleaning.filter_accuracy.enable": false
 }
