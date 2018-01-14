@@ -60,6 +60,11 @@ def format(entry):
     # data.transition_raw = entry.data.transition
     
     data.transition = transition_map[entry.data.transition].value
+    if entry.data.transition is not None:
+        data.transition = transition_map[entry.data.transition].value
+    else:
+        data.transition = None
+
     logging.debug("Mapped %s -> %s" % (entry.data.transition, data.transition))
     
     if "ts" not in data:

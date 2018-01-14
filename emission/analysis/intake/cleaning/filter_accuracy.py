@@ -25,6 +25,7 @@ from builtins import *
 import logging
 
 # Our imports
+import emission.analysis.config as eac
 import emission.storage.pipeline_queries as epq
 import emission.storage.decorations.user_queries as esdu
 import emission.storage.timeseries.abstract_timeseries as esta
@@ -73,6 +74,11 @@ def convert_to_filtered(entry):
 def filter_accuracy(user_id):
     time_query = epq.get_time_range_for_accuracy_filtering(user_id)
     timeseries = esta.TimeSeries.get_time_series(user_id)
+
+    if not eac.get_config()["intake.cleaning.filter_accuracy.enable"]:
+        logging.debug("filter_accuracy disabled, early return")
+        epq.mark_accuracy_filtering_done(user_id, None)
+        return
 
     try:
         unfiltered_points_df = timeseries.get_data_df("background/location", time_query)
