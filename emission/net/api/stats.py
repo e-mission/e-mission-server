@@ -7,6 +7,7 @@ standard_library.install_aliases()
 from builtins import *
 import logging
 import emission.storage.decorations.stats_queries as esds
+import emission.net.usercache.formatters.common as enufc
 
 def store_server_api_time(user_id, call, ts, reading):
     esds.store_server_api_time(user_id, call, ts, reading)
@@ -56,7 +57,7 @@ def old2new(old_style_data):
 
     none2None = lambda s: None if s == 'none' else s
     float_with_none = lambda s: float(s) if s is not None else None
-    ms_to_sec_with_none = lambda s: (float(s))/1000 if s is not None else None
+    ms_to_sec_with_none = lambda s: (float(s))/1000 if type(s) == str or type(s) == unicode else float(s)
 
     user_id = old_style_data["user"]
     del old_style_data["user"]
@@ -81,11 +82,7 @@ def old2new(old_style_data):
     new_entry["metadata"]["write_ts"] = float_with_none(old_style_data["reported_ts"])
     del new_entry["metadata"]["write_local_dt"]
     del new_entry["metadata"]["write_fmt_time"]
-    # We are not going to fill in the local_date and fmt_time entries because
-    # a) we don't know what they are for legacy entries
-    # b) we don't even know whether we need to use them
-    # c) even if we do, we don't know if we need to use them for older entries
-    # So let's leave the hacky reconstruction algorithm until we know that we really need it
+    enufc.expand_metadata_times(new_entry["metadata"])
     return new_entry
 
 def stat2key(stat_name):
