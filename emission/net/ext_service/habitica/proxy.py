@@ -1,3 +1,5 @@
+"""
+
 from __future__ import unicode_literals
 from __future__ import print_function
 from __future__ import division
@@ -195,3 +197,4 @@ def get_user_entry(user_id):
 def save_user_entry(user_id, user_entry):
   assert(user_entry["user_id"] == user_id)
   return edb.save(edb.get_habitica_db(), user_entry)
+"""
