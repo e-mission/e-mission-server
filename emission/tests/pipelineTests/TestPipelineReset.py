@@ -385,6 +385,8 @@ class TestPipelineReset(unittest.TestCase):
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth_2).data)
 
+    # TODO: Add tests for no place and one place
+
 
 if __name__ == '__main__':
     etc.configLogging()

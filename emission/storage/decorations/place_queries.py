@@ -104,6 +104,8 @@ def get_last_place_before(place_key, reset_ts, user_id):
             (last_place, reset_ts))
         if last_place is None:
             return None
+        elif last_place.data.enter_ts is None:
+            return None
         elif last_place.data.enter_ts < reset_ts:
             return last_place
         else:

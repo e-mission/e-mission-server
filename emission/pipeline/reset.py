@@ -157,6 +157,10 @@ def reset_pipeline_state(user_id, reset_ts, is_dry_run):
     # Fuzz the TRIP_SEGMENTATION stage 5 mins because of
     # https://github.com/e-mission/e-mission-server/issues/333#issuecomment-312730217
     FUZZ_FACTOR = 5 * 60
+    if reset_ts is None:
+        logging.info("reset_ts = %s, returning from reset_pipeline_state without modifying anything" % None)
+        return
+        
     trip_seg_reset_pipeline_query = {'user_id': user_id,
                                      'last_processed_ts': {'$ne': None},
     # only reset entries that are after the reset_ts
