@@ -42,8 +42,14 @@ def export_timeline(user_id, start_day_str, end_day_str, file_name):
     trip_entry_list = list(ts.find_entries(key_list=None, time_query=trip_time_query))
     place_time_query = estt.TimeQuery("data.enter_ts", start_day_ts, end_day_ts)
     place_entry_list = list(ts.find_entries(key_list=None, time_query=place_time_query))
+    # Handle the case of the first place, which has no enter_ts and won't be
+    # matched by the default query
+    first_place_extra_query = {'$and': [{'data.enter_ts': {'$exists': False}},
+                                        {'data.exit_ts': {'$exists': True}}]}
+    first_place_entry_list = list(ts.find_entries(key_list=None, time_query=None, extra_query_list=[first_place_extra_query]))
+    logging.info("First place entry list = %s" % first_place_entry_list)
 
-    combined_list = loc_entry_list + trip_entry_list + place_entry_list
+    combined_list = loc_entry_list + trip_entry_list + place_entry_list + first_place_entry_list
     logging.info("Found %d loc entries, %d trip-like entries, %d place-like entries = %d total entries" % 
         (len(loc_entry_list), len(trip_entry_list), len(place_entry_list), len(combined_list)))
 
