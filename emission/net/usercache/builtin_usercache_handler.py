@@ -109,7 +109,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
             self.storeTimelineToCache(time_query)
             # self.storeCommonTripsToCache(time_query)
             # last_processed_ts = self.storeConfigsToCache(time_query)
-            # esp.mark_output_gen_done(self.user_id, last_processed_ts)
+            esp.mark_output_gen_done(self.user_id, last_processed_ts = None)
         except:
             logging.exception("Storing views to cache failed for user %s" % self.user_id)
             esp.mark_output_gen_failed(self.user_id)
