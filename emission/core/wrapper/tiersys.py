@@ -9,7 +9,7 @@ import arrow
 from emission.core.get_database import get_tiersys_db
 
 class TierSys:
-    def __init__(self, num_tiers=5):
+    def __init__(self, num_tiers=3):
         self.tiers = {}
         for i in range(1, num_tiers+1):
            self.addTier(i)
@@ -153,7 +153,7 @@ class TierSys:
         "Best" tiers have lower rank values.
         """
         self.tiers = {}
-        updated_user_tiers = self.computeRanks(last_ts, 5)
+        updated_user_tiers = self.computeRanks(last_ts, 3)
         for rank in range(1, len(updated_user_tiers) + 1):
             self.addTier(rank)
             tier_users = updated_user_tiers[rank-1]
