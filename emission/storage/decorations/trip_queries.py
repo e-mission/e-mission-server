@@ -69,3 +69,24 @@ def get_stops_for_trip(key, user_id, trip_id):
         "data.enter_ts", pymongo.ASCENDING)
     return [ecwe.Entry(doc) for doc in stop_doc_cursor]
 
+def get_user_input_for_trip(trip_key, user_id, trip_id, user_input_key):
+    ts = esta.TimeSeries.get_time_series(user_id)
+    trip_obj = ts.get_entry_from_id(trip_key, trip_id)
+    return get_user_input_for_trip_object(ts, trip_obj, user_input_key)
+
+def get_user_input_for_trip_object(ts, trip_obj, user_input_key):
+    tq = estt.TimeQuery("data.start_ts", trip_obj.data.start_ts, trip_obj.data.end_ts)
+    # In general, all candiates will have the same start_ts, so no point in
+    # sorting by it. Only exception to general rule is when user first provides
+    # input before the pipeline is run, and then overwrites after pipeline is
+    # run
+    potential_candidates = ts.get_data_df(user_input_key, tq)
+    if len(potential_candidates) == 0:
+        return None
+
+    sorted_pc = potential_candidates.sort_values(by="metadata_write_ts")
+    most_recent_entry_id = potential_candidates._id.iloc[-1]
+    logging.debug("most recent entry has id %s" % most_recent_entry_id)
+    ret_val = ts.get_entry_from_id(user_input_key, most_recent_entry_id)
+    logging.debug("and is mapped to entry %s" % ret_val)
+    return ret_val

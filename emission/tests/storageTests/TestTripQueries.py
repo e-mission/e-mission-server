@@ -20,6 +20,7 @@ import emission.storage.timeseries.timequery as estt
 import emission.storage.timeseries.abstract_timeseries as esta
 
 import emission.core.get_database as edb
+import emission.core.wrapper.userlabel as ecul
 import emission.core.wrapper.rawtrip as ecwrt
 import emission.core.wrapper.section as ecwc
 import emission.core.wrapper.stop as ecws
@@ -29,7 +30,10 @@ import emission.tests.storageTests.analysis_ts_common as etsa
 class TestTripQueries(unittest.TestCase):
     def setUp(self):
         self.testUserId = uuid.uuid3(uuid.NAMESPACE_URL, "mailto:test@test.me")
-        edb.get_analysis_timeseries_db().remove({'user_id': self.testUserId})
+        edb.get_analysis_timeseries_db().delete_many({'user_id': self.testUserId})
+    
+    def tearDown(self):
+        edb.get_analysis_timeseries_db().delete_many({'user_id': self.testUserId})
 
     def create_fake_trip(self):
         return etsa.createNewTripLike(self, esda.RAW_TRIP_KEY, ecwrt.Rawtrip)
@@ -62,6 +66,81 @@ class TestTripQueries(unittest.TestCase):
         ts.insert_data(self.testUserId, esda.RAW_STOP_KEY, new_stop) 
         ret_entries = esdt.get_raw_stops_for_trip(self.testUserId, new_trip.get_id())
         self.assertEqual([entry.data for entry in ret_entries], [new_stop])
+
+    def testUserInputForTripNoInputs(self):
+        """
+        Test the case in which the user has not provided any inputs
+        """
+        new_trip = self.create_fake_trip()
+        user_input = esdt.get_user_input_for_trip(esda.RAW_TRIP_KEY, self.testUserId, new_trip.get_id(), "manual/mode_confirm")
+        self.assertIsNone(user_input)
+
+    def testUserInputForTripOneInput(self):
+        """
+        Test the case in which the user has not provided any inputs
+        """
+        MODE_CONFIRM_KEY = "manual/mode_confirm"
+
+        new_trip = self.create_fake_trip()
+        new_mc = ecul.Userlabel()
+        new_mc["start_ts"] = new_trip.data.start_ts + 1
+        new_mc["end_ts"] = new_trip.data.end_ts + 1
+        ts = esta.TimeSeries.get_time_series(self.testUserId)
+        ts.insert_data(self.testUserId, MODE_CONFIRM_KEY, new_mc) 
+        
+        user_input = esdt.get_user_input_for_trip(esda.RAW_TRIP_KEY, self.testUserId,
+            new_trip.get_id(), MODE_CONFIRM_KEY)
+
+        self.assertEqual(new_mc, user_input.data)
+
+    def testUserInputForTripOneInput(self):
+        """
+        Test the case in which the user has provided exactly one input
+        """
+        MODE_CONFIRM_KEY = "manual/mode_confirm"
+
+        new_trip = self.create_fake_trip()
+        new_mc = ecul.Userlabel()
+        new_mc["start_ts"] = new_trip.data.start_ts + 1
+        new_mc["end_ts"] = new_trip.data.end_ts + 1
+        ts = esta.TimeSeries.get_time_series(self.testUserId)
+        ts.insert_data(self.testUserId, MODE_CONFIRM_KEY, new_mc) 
+        
+        user_input = esdt.get_user_input_for_trip(esda.RAW_TRIP_KEY, self.testUserId,
+            new_trip.get_id(), MODE_CONFIRM_KEY)
+
+        self.assertEqual(new_mc, user_input.data)
+
+    def testUserInputForTripTwoInput(self):
+        """
+        Test the case in which the user has provided two inputs
+        """
+        MODE_CONFIRM_KEY = "manual/mode_confirm"
+
+        ts = esta.TimeSeries.get_time_series(self.testUserId)
+
+        new_trip = self.create_fake_trip()
+        new_mc = ecul.Userlabel()
+        new_mc["start_ts"] = new_trip.data.start_ts + 1
+        new_mc["end_ts"] = new_trip.data.end_ts + 1
+        new_mc["label"] = "car"
+        ts.insert_data(self.testUserId, MODE_CONFIRM_KEY, new_mc) 
+        user_input = esdt.get_user_input_for_trip(esda.RAW_TRIP_KEY, self.testUserId,
+            new_trip.get_id(), MODE_CONFIRM_KEY)
+
+        # WHen there is only one input, it is a car
+        self.assertEqual(new_mc, user_input.data)
+        self.assertEqual(user_input.data.label, "car")
+
+        new_mc["label"] = "bike"
+        ts.insert_data(self.testUserId, MODE_CONFIRM_KEY, new_mc) 
+        
+        user_input = esdt.get_user_input_for_trip(esda.RAW_TRIP_KEY, self.testUserId,
+            new_trip.get_id(), MODE_CONFIRM_KEY)
+
+        # When it is overridden, it is a bike
+        self.assertEqual(new_mc, user_input.data)
+        self.assertEqual(user_input.data.label, "bike")
 
 if __name__ == '__main__':
     import emission.tests.common as etc
