@@ -84,7 +84,6 @@ class TierSys:
         """
         ts = esta.TimeSeries.get_time_series(user_id)
 
-        # Get cleaned trips for the two users that started on 1st Aug UTC
         last_period_tq = estt.TimeQuery("data.start_ts",
                             last_ts, # start of range
                             arrow.utcnow().timestamp)  # end of range
