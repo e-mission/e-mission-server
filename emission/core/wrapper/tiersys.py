@@ -71,7 +71,9 @@ class TierSys:
             raise Exception("No users in DB")
         for index, row in all_users.iterrows():
             user_id = row['uuid']
-            user_carbon_map[user_id] = self.computeCarbon(user_id, last_ts)
+            val = self.computeCarbon(user_id, last_ts)
+            if val != None:
+                user_carbon_map[user_id] = val
 
         # Sort and partition users by carbon metric.
         user_carbon_tuples_sorted = sorted(user_carbon_map.items(), key=(lambda kv: kv[1])) # Sorted list by value of dict tuples.
@@ -90,7 +92,7 @@ class TierSys:
                             arrow.utcnow().timestamp)  # end of range
         cs_df = ts.get_data_df("analysis/cleaned_section", time_query=last_period_tq)
         if cs_df.shape[0] <= 0:
-            raise Exception("No data in analysis since time query")
+            return None
         carbon_val = self.computeFootprint(cs_df[["sensed_mode", "distance"]])
         penalty_val = self.computePenalty(cs_df[["sensed_mode", "distance"]]) # Mappings in emission/core/wrapper/motionactivity.py
         dist_travelled = cs_df["distance"].sum()
