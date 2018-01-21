@@ -92,7 +92,7 @@ def check_against_business_location(location='0, 0', address = ''):
 def calculate_single_suggestion(uuid):
     #Given a single UUID, create a suggestion for them
     return_obj = { 'message': "Good job walking and biking! No suggestion to show.",
-    'savings': "You could save: 0 kg CO2", 'start_lat' = '0.0', 'start_lon' = '0.0',
+    'savings': "0", 'start_lat' = '0.0', 'start_lon' = '0.0',
     'end_lat' = '0.0', 'end_lon' = '0.0'}
     all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
     user_id = row['uuid']
@@ -113,33 +113,42 @@ def calculate_single_suggestion(uuid):
         end_loc = cleaned_sections.iloc[i]["end_loc"]["coordinates"]
         end_lat = str(end_loc[0])
         end_lon = str(end_loc[1])
+        #TODO: Add elif's for bus
         if mode == 0 and distance => 5 and distance <= 15:
             #Suggest bus if it is car and distance between 5 and 15
-            #TODO: Change ret_obj and figure out how to change lat and lon to places
             default_message = return_obj['message']
             try:
                 message = "Try public transportation from " + return_address_from_location(start_lat + ", " + start_lon) +
                 "to " + return_address_from_location(end_lat + ", " + end_lon)
+                #savings per month, .465 kg co2/mile for car, 0.14323126 kg co2/mile for bus
+                savings = str(int(distance * 30 * .465 - 0.14323126 * distance * 30))
+                return {'message' : message, 'savings' : savings, 'start_lat' : start_lat,
+                'start_lon' : start_lon, 'end_lat' : end_lat, 'end_lon' : end_lon}
                 break
             except:
                 return_obj['message'] = default_message
                 continue
-        #TODO: Make mode correspond to bus too
         elif mode == 0 and distance < 5 and distance >= 1:
             #Suggest bike if it is car/bus and distance between 5 and 1
             #TODO: Change ret_boj and figure out how to change lat and lon to places
             try:
                 message = "Try biking from " + return_address_from_location(start_lat + ", " + start_lon) +
                 "to " + return_address_from_location(end_lat + ", " + end_lon)
+                savings = str(int(distance * 30 * .465))  #savings per month, .465 kg co2/mile
+                return {'message' : message, 'savings' : savings, 'start_lat' : start_lat,
+                'start_lon' : start_lon, 'end_lat' : end_lat, 'end_lon' : end_lon}
                 break
             except:
                 continue
-        #TODO: Make mode correspond to bus too
         elif mode == 0 and distance < 1:
             #Suggest walking if it is car/bus and distance less than 1
             try:
-                message = "Try walking from " + return_address_from_location(start_lat + ", " + start_lon) +
+                message = "Try walking/biking from " + return_address_from_location(start_lat + ", " + start_lon) +
                 "to " + return_address_from_location(end_lat + ", " + end_lon)
+                savings = str(int(distance * 30 * .465)) #savings per month, .465 kg co2/mile
                 return {'message' : message, 'savings' : savings, 'start_lat' : start_lat,
                 'start_lon' : start_lon, 'end_lat' : end_lat, 'end_lon' : end_lon}
+                break
+            except:
+                continue
     return return_obj
