@@ -1,8 +1,11 @@
 import emission.storage.timeseries.abstract_timeseries as esta
 import pandas as pd
+import requests
+import json
+import re
 from uuid import UUID
-import urllib
 ACCESS_TOKEN = 'AIzaSyAbnpsty2SAzEX9s1VVIdh5pTHUPMjn3lQ' #GOOGLE MAPS ACCESS TOKEN
+JACK_TOKEN = 'AIzaSyAXG_8bZvAAACChc26JC6SFzhuWysRqQPo'
 """
 def calculate_suggestions():
     #For each person, create their most recent suggestion
@@ -14,45 +17,129 @@ def calculate_suggestions():
         user_carbon_map[user_id] = self.computeCarbon(user_id, TierSys.getLatest()['created_at'])
 """
 
-def build_URL(search_text='',types_text=''):
+def return_address_from_location(location='0, 0'):
     """
-    Builds the url for a Google Maps business request from latitude and longitude
+    Creates a Google Maps API call that returns the addresss given a lat, lon
     """
-    base_url = 'https://maps.googleapis.com/maps/api/place/textsearch/json'
-    key_string = '?key=' + ACCESS_TOKEN
-    query_string = '&query=' + urllib.parse.quote(search_text)
-    type_string = ''
-    if types_text != '':
-        type_string = '&types='+urllib.parse.quote(types_text)
-    url = base_url+key_string+query_string+type_string
-    return url
+    if not re.compile('^(\-?\d+(\.\d+)?),\s*(\-?\d+(\.\d+)?)$').match(location):
+        raise ValueError('Location Invalid')
+    base_url = 'https://maps.googleapis.com/maps/api/geocode/json?'
+    latlng = 'latlng=' + location
+    try:
+        #This try block is for our first 150,000 requests. If we exceed this, use Jack's Token.
+        key_string = '&key=' + ACCESS_TOKEN
+        url = base_url + latlng + key_string #Builds the url
+        result = requests.get(url).json() #Gets google maps json file
+        cleaned = result['results'][0]['address_components']
+        #Address to check against value of check_against_business_location
+        chk = cleaned[0]['long_name'] + ' ' + cleaned[1]['long_name'] + ', ' + cleaned[3]['long_name']
+        business_tuple = check_against_business_location(location, chk)
+        if business_tuple[0]: #If true, the lat, lon matches a business location and we return business name
+            return business_tuple[1]
+        else: #otherwise, we just return the address
+            return cleaned[0]['long_name'] + ' ' + cleaned[1]['short_name'] + ', ' + cleaned[3]['short_name']
+    except:
+        try:
+            #Use Jack's Token in case of some invalid request problem with other API Token
+            key_string = '&key=' + JACK_TOKEN
+            url = base_url + latlng + key_string #Builds the url
+            result = requests.get(url).json() #Gets google maps json file
+            cleaned = result['results'][0]['address_components']
+            #Address to check against value of check_against_business_location
+            chk = cleaned[0]['long_name'] + ' ' + cleaned[1]['long_name'] + ', ' + cleaned[3]['long_name']
+            business_tuple = check_against_business_location(location, chk)
+            if business_tuple[0]: #If true, the lat, lon matches a business location and we return business name
+                return business_tuple[1]
+            else: #otherwise, we just return the address
+                return cleaned[0]['long_name'] + ' ' + cleaned[1]['short_name'] + ', ' + cleaned[3]['short_name']
+        except:
+            raise ValueError("Something went wrong")
+
+def check_against_business_location(location='0, 0', address = ''):
+    if not re.compile('^(\-?\d+(\.\d+)?),\s*(\-?\d+(\.\d+)?)$').match(location):
+        raise ValueError('Location Invalid')
+    base_url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?'
+    location = 'location=' + location
+    try:
+        key_string = '&key=' + ACCESS_TOKEN
+        radius = '&radius=10'
+        url = base_url + location + radius + key_string
+        result = requests.get(url).json()
+        cleaned = result['results']
+        for i in cleaned:
+            #If the street address matches the street address of this business, we return a tuple
+            #signifying success and the business name
+            if address == i['vicinity']:
+                return (True, i['name'])
+        else:
+            return (False, '')
+    except:
+        try:
+            key_string = '&key=' + JACK_TOKEN
+            radius = '&radius=10'
+            url = base_url + location + radius + key_string
+            result = requests.get(url).json()
+            cleaned = result['results']
+            for i in cleaned:
+                if address == i['vicinity']:
+                    return (True, i['name'])
+            else:
+                return (False, '')
+        except:
+            raise ValueError("Something went wrong")
+
 
 def calculate_single_suggestion(uuid):
     #Given a single UUID, create a suggestion for them
-    return_obj = {message: "Good job walking and biking! No suggestion to show.",
-    savings: "You could save: 0 kg CO2", start_lat = 0.0, start_lon = 0.0,
-    end_lat = 0.0, end_lon = 0.0}
+    return_obj = { 'message': "Good job walking and biking! No suggestion to show.",
+    'savings': "You could save: 0 kg CO2", 'start_lat' = '0.0', 'start_lon' = '0.0',
+    'end_lat' = '0.0', 'end_lon' = '0.0'}
     all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
     user_id = row['uuid']
     time_series = esta.TimeSeries.get_time_series(user_id)
     cleaned_sections = time_series.get_data_df("analysis/cleaned_section", time_query = None)
     #Go in reverse order because we check by most recent trip
+    counter = 20
     for i in range(len(cleaned_sections), -1, -1):
+        counter -= 1
+        if counter < 0:
+            #Iterate 20 trips back
+            return return_obj
         distance_in_miles = cleaned_sections.iloc[i]["distance"] * 0.000621371
         mode = cleaned_sections.iloc[i]["sensed_mode"]
         start_loc = cleaned_sections.iloc[i]["start_loc"]["coordinates"]
-        start_lat = start_loc[0]
-        start_lon = start_loc[1]
+        start_lat = str(start_loc[0])
+        start_lon = str(start_loc[1])
         end_loc = cleaned_sections.iloc[i]["end_loc"]["coordinates"]
-        end_lat = end_loc[0]
-        end_lon = end_loc[1]
+        end_lat = str(end_loc[0])
+        end_lon = str(end_loc[1])
         if mode == 0 and distance => 5 and distance <= 15:
             #Suggest bus if it is car and distance between 5 and 15
             #TODO: Change ret_obj and figure out how to change lat and lon to places
-            break
+            default_message = return_obj['message']
+            try:
+                message = "Try public transportation from " + return_address_from_location(start_lat + ", " + start_lon) +
+                "to " + return_address_from_location(end_lat + ", " + end_lon)
+                break
+            except:
+                return_obj['message'] = default_message
+                continue
         #TODO: Make mode correspond to bus too
-        elif mode == 0 and distance < 5:
-            #Suggest bike if it is car/bus and distance less than 5
+        elif mode == 0 and distance < 5 and distance >= 1:
+            #Suggest bike if it is car/bus and distance between 5 and 1
             #TODO: Change ret_boj and figure out how to change lat and lon to places
-            break
+            try:
+                message = "Try biking from " + return_address_from_location(start_lat + ", " + start_lon) +
+                "to " + return_address_from_location(end_lat + ", " + end_lon)
+                break
+            except:
+                continue
+        #TODO: Make mode correspond to bus too
+        elif mode == 0 and distance < 1:
+            #Suggest walking if it is car/bus and distance less than 1
+            try:
+                message = "Try walking from " + return_address_from_location(start_lat + ", " + start_lon) +
+                "to " + return_address_from_location(end_lat + ", " + end_lon)
+                return {'message' : message, 'savings' : savings, 'start_lat' : start_lat,
+                'start_lon' : start_lon, 'end_lat' : end_lat, 'end_lon' : end_lon}
     return return_obj
