@@ -66,11 +66,14 @@ class TierSys:
         """
         user_carbon_map = {} # Map from user_id to carbon val.
         all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
-        print(all_users.shape)
         num_users = all_users.shape[0]
+        if num_users <= 0:
+            raise Exception("No users in DB")
         for index, row in all_users.iterrows():
             user_id = row['uuid']
-            user_carbon_map[user_id] = self.computeCarbon(user_id, last_ts)
+            val = self.computeCarbon(user_id, last_ts)
+            if val != None:
+                user_carbon_map[user_id] = val
 
         # Sort and partition users by carbon metric.
         user_carbon_tuples_sorted = sorted(user_carbon_map.items(), key=(lambda kv: kv[1])) # Sorted list by value of dict tuples.
@@ -88,7 +91,8 @@ class TierSys:
                             last_ts, # start of range
                             arrow.utcnow().timestamp)  # end of range
         cs_df = ts.get_data_df("analysis/cleaned_section", time_query=last_period_tq)
-
+        if cs_df.shape[0] <= 0:
+            return None
         carbon_val = self.computeFootprint(cs_df[["sensed_mode", "distance"]])
         penalty_val = self.computePenalty(cs_df[["sensed_mode", "distance"]]) # Mappings in emission/core/wrapper/motionactivity.py
         dist_travelled = cs_df["distance"].sum()
@@ -181,6 +185,7 @@ class TierSys:
             ts.append({'rank': rank, 'uuids': users})
 
         get_tiersys_db().insert_one({'tiers': ts, 'created_at': datetime.now()})
+        return ts
 
 def m_to_km(distance):
     return max(0, float(distance) / float(1000))
