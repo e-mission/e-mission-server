@@ -27,6 +27,7 @@ import geojson as gj
 import json
 
 # Our imports
+import emission.analysis.config as eac
 import emission.storage.decorations.timeline as esdtl
 import emission.storage.decorations.trip_queries as esdtq
 import emission.storage.decorations.analysis_timeseries_queries as esda
@@ -55,13 +56,6 @@ import emission.net.ext_service.geocoder.nominatim as eco
 
 import attrdict as ad
 
-try:
-    config_file = open('conf/analysis/debug.conf.json')
-except:
-    print("debug not configured, falling back to sample, default configuration")
-    config_file = open('conf/analysis/debug.conf.json.sample')
-
-config_data = json.load(config_file)
 filtered_trip_excluded = ["start_place", "end_place",
                           "start_ts", "start_fmt_time", "start_local_dt", "start_loc",
                           "duration", "distance", "_id"]
@@ -1146,25 +1140,25 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
     if not ecc.compare_rounded_arrays(with_speeds_df.speed.tolist(), first_section_data["speeds"], 10):
         logging.error("check start: %s != %s" % (with_speeds_df.speed.tolist()[:10], first_section_data["speeds"][:10]))
         logging.error("check end: %s != %s" % (with_speeds_df.speed.tolist()[-10:], first_section_data["speeds"][-10:]))
-        if config_data["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
+        if eac.get_config()["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
             assert False
 
     if not ecc.compare_rounded_arrays(with_speeds_df.distance.tolist(), first_section_data["distances"], 10):
         logging.error("check start: %s != %s" % (with_speeds_df.distance.tolist()[:10], first_section_data["distances"][:10]))
         logging.error("check end: %s != %s" % (with_speeds_df.speed.tolist()[-10:], first_section_data["speeds"][-10:]))
-        if config_data["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
+        if eac.get_config()["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
             assert False
 
     if not ecc.compare_rounded_arrays(with_speeds_df.speed.tolist(), with_speeds_df.from_points_speed.tolist(), 10):
         logging.error("check start: %s != %s" % (with_speeds_df.speed.tolist()[:10], with_speeds_df.from_points_speed.tolist()[:10]))
         logging.error("check end: %s != %s" % (with_speeds_df.speed.tolist()[-10:], with_speeds_df.from_points_speed.tolist()[-10:]))
-        if config_data["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
+        if eac.get_config()["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
             assert False
 
     if not ecc.compare_rounded_arrays(with_speeds_df.distance.tolist(), with_speeds_df.from_points_distance.tolist(), 10):
         logging.error("check start: %s != %s" % (with_speeds_df.distance.tolist()[:10], with_speeds_df.from_points_distance.tolist()[:10]))
         logging.error("check end: %s != %s" % (with_speeds_df.speed.tolist()[-10:], with_speeds_df.from_points_speed.tolist()[-10:]))
-        if config_data["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
+        if eac.get_config()["intake.cleaning.clean_and_resample.speedDistanceAssertions"]:
             assert False
 
 def _is_squished_untracked(raw_trip, raw_trip_list, trip_map):
