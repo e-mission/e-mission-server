@@ -92,8 +92,8 @@ def check_against_business_location(location='0, 0', address = ''):
 def calculate_single_suggestion(uuid):
     #Given a single UUID, create a suggestion for them
     return_obj = { 'message': "Good job walking and biking! No suggestion to show.",
-    'savings': "0", 'start_lat' = '0.0', 'start_lon' = '0.0',
-    'end_lat' = '0.0', 'end_lon' = '0.0'}
+    'savings': "0", 'start_lat' : '0.0', 'start_lon' : '0.0',
+    'end_lat' : '0.0', 'end_lon' : '0.0'}
     all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
     user_id = row['uuid']
     time_series = esta.TimeSeries.get_time_series(user_id)
