@@ -292,14 +292,9 @@ def getUserProfile():
   user = User.fromUUID(user_uuid)
   return user.getProfile()
 
-#TODO: Return tiersys in json format
-@get('/tiersys')
+@post('/tiersys')
 def getTierSys():
   return TierSys.getLatest()
-
-@get('/')
-def lastWeekCarbonForUser(uuid):
-    #TODO: add this function
 
 @post('/result/metrics/<time_type>')
 def summarize_metrics(time_type):
