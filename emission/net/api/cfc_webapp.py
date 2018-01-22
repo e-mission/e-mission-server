@@ -45,6 +45,7 @@ import emission.net.auth.auth as enaa
 import emission.net.ext_service.habitica.proxy as habitproxy
 from emission.core.wrapper.client import Client
 from emission.core.wrapper.user import User
+from emission.core.wrapper.tiersys import TierSys
 from emission.core.get_database import get_uuid_db, get_mode_db
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.timeseries.timequery as estt
@@ -280,6 +281,15 @@ def getUserProfile():
   user_uuid = getUUID(request)
   user = User.fromUUID(user_uuid)
   return user.getProfile()
+
+#TODO: Return tiersys in json format
+@get('/tiersys')
+def getTierSys():
+  return TierSys.getLatest()
+
+@get('/')
+def lastWeekCarbonForUser(uuid):
+    #TODO: add this function
 
 @post('/result/metrics/<time_type>')
 def summarize_metrics(time_type):
