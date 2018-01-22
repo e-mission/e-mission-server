@@ -114,7 +114,7 @@ def calculate_single_suggestion(uuid):
         end_lat = str(end_loc[0])
         end_lon = str(end_loc[1])
         #TODO: Add elif's for bus
-        if mode == 0 and distance >= 5 and distance =< 15:
+        if mode == 0 and distance >= 5 and distance <= 15:
             #Suggest bus if it is car and distance between 5 and 15
             default_message = return_obj['message']
             try:
