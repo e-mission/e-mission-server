@@ -118,7 +118,7 @@ def calculate_single_suggestion(uuid):
             #Suggest bus if it is car and distance between 5 and 15
             default_message = return_obj['message']
             try:
-                message = "Try public transportation from " + return_address_from_location(start_lat + ", " + start_lon) +
+                message = "Try public transportation from " + return_address_from_location(start_lat + ", " + start_lon) + \
                 "to " + return_address_from_location(end_lat + ", " + end_lon)
                 #savings per month, .465 kg co2/mile for car, 0.14323126 kg co2/mile for bus
                 savings = str(int(distance * 30 * .465 - 0.14323126 * distance * 30))
@@ -132,7 +132,7 @@ def calculate_single_suggestion(uuid):
             #Suggest bike if it is car/bus and distance between 5 and 1
             #TODO: Change ret_boj and figure out how to change lat and lon to places
             try:
-                message = "Try biking from " + return_address_from_location(start_lat + ", " + start_lon) +
+                message = "Try biking from " + return_address_from_location(start_lat + ", " + start_lon) + \
                 "to " + return_address_from_location(end_lat + ", " + end_lon)
                 savings = str(int(distance * 30 * .465))  #savings per month, .465 kg co2/mile
                 return {'message' : message, 'savings' : savings, 'start_lat' : start_lat,
@@ -143,7 +143,7 @@ def calculate_single_suggestion(uuid):
         elif mode == 0 and distance < 1:
             #Suggest walking if it is car/bus and distance less than 1
             try:
-                message = "Try walking/biking from " + return_address_from_location(start_lat + ", " + start_lon) +
+                message = "Try walking/biking from " + return_address_from_location(start_lat + ", " + start_lon) + \
                 "to " + return_address_from_location(end_lat + ", " + end_lon)
                 savings = str(int(distance * 30 * .465)) #savings per month, .465 kg co2/mile
                 return {'message' : message, 'savings' : savings, 'start_lat' : start_lat,
