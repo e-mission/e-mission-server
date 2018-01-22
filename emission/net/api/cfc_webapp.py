@@ -253,6 +253,16 @@ def getTrips(day):
   logging.debug("type(ret_dict) = %s" % type(ret_dict))
   return ret_dict
 
+@post('/suggestion')
+def getSuggestion():
+  logging.debug("Called suggestion")
+  user_uuid=getUUID(request)
+  logging.debug("user_uuid %s" % user_uuid)
+  ret_dir = suggsys.calculate_single_suggestion(user_uuid)
+  logging.debug("type(ret_dict) = %s" % type(ret_dict))
+  logging.debug("Output of ret_dir = %s" % ret_dict)
+  return ret_dir
+
 @post('/profile/create')
 def createUserProfile():
   try:
