@@ -45,6 +45,7 @@ import emission.net.auth.auth as enaa
 import emission.net.ext_service.habitica.proxy as habitproxy
 from emission.core.wrapper.client import Client
 from emission.core.wrapper.user import User
+from emission.core.wrapper.tiersys import TierSys
 from emission.core.get_database import get_uuid_db, get_mode_db
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.timeseries.timequery as estt
@@ -159,6 +160,10 @@ def getPopRoute(time_type):
   retVal = viz_fn(user_uuid, modes, start_time, end_time, region)
   return retVal
 
+def getYesterdayCarbon():
+  user_id = getUUID(request)
+  return User.carbonYesterday(user_id)
+
 @post("/result/heatmap/incidents/<time_type>")
 def getStressMap(time_type):
     if 'user' in request.json:
@@ -253,6 +258,16 @@ def getTrips(day):
   logging.debug("type(ret_dict) = %s" % type(ret_dict))
   return ret_dict
 
+@post('/suggestion')
+def getSuggestion():
+  logging.debug("Called suggestion")
+  user_uuid=getUUID(request)
+  logging.debug("user_uuid %s" % user_uuid)
+  ret_dir = suggsys.calculate_single_suggestion(user_uuid)
+  logging.debug("type(ret_dict) = %s" % type(ret_dict))
+  logging.debug("Output of ret_dir = %s" % ret_dict)
+  return ret_dir
+
 @post('/profile/create')
 def createUserProfile():
   try:
@@ -281,6 +296,10 @@ def getUserProfile():
   user_uuid = getUUID(request)
   user = User.fromUUID(user_uuid)
   return user.getProfile()
+
+@post('/tiersys')
+def getTierSys():
+  return TierSys.getLatest()
 
 @post('/result/metrics/<time_type>')
 def summarize_metrics(time_type):

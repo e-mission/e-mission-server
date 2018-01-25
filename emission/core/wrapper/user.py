@@ -9,6 +9,10 @@ from builtins import object
 from past.utils import old_div
 import json
 import logging
+import emission.storage.timeseries.abstract_timeseries as esta
+import emission.storage.timeseries.timequery as estt
+import emission.core.wrapper.motionactivity as ecwm
+import arrow
 
 # Our imports
 from emission.core.get_database import get_profile_db, get_uuid_db
@@ -224,21 +228,7 @@ class User(object):
     # database.
     # TODO: Write a script that periodically goes through and identifies maps
     # that don't have an associated profile and fix them
-<<<<<<< HEAD
-    study_list = Client.getPendingClientRegs(userEmail)
-    writeResultProfile = User.createProfile(anonUUID, datetime.now(), study_list)
-
-    if 'err' not in writeResultProfile:
-      # update was successful!
-      # Either upserted or updatedExisting will be true
-      # We can now cleanup the entry from the pending database
-      # Note that we could also move this to a separate cleanup script because
-      # eventual consistency is good enough for us
-      # If there is a profile entry for a particular signup, then delete it
-      Client.deletePendingClientRegs(userEmail)
-=======
     writeResultProfile = User.createProfile(anonUUID, datetime.now())
->>>>>>> 869a43d37f2362697da252ab03f3c416a880ae6a
     return User.fromUUID(anonUUID)
 
   @staticmethod
@@ -248,3 +238,110 @@ class User(object):
     get_uuid_db().remove({'user_email': userEmail})
     get_profile_db().remove({'user_id': uuid})
     return uuid
+
+  @staticmethod
+  def carbonYesterday(user_id):
+    """ Returns the previous day's carbon usage
+          Calculates the sum of the footprint and penalty values
+    """
+    ts = esta.TimeSeries.get_time_series(user_id)
+    last_period_tq = estt.TimeQuery("data.start_ts",
+                            arrow.utcnow().shift(days = -1), # start of range
+                            arrow.utcnow().timestamp)
+    cs_df = ts.get_data_df("analysis/cleaned_section", time_query=last_period_tq)
+    fp_train = 92.0/1609.0
+    fp_car = 287.0/1609.0
+    total_carbon = 0
+    carbon_df = cs_df[["sensed_mode", "distance"]]
+    for index, row in carbon_df.iterrows():
+      motiontype = int(row['sensed_mode'])
+      if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:
+        total_carbon += (fp_train * m_to_km(distance) + fp_car * m_to_km(distance)) / 2;
+    for index, row in penalty_df.iterrows():
+      motiontype = int(row['sensed_mode'])
+      if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:
+        total_carbon += max(0, mil_to_km(37.5) - m_to_km(row['distance']))
+    dist_travelled = cs_df["distance"].sum()
+    return total_carbon / dist_travelled
+
+  @staticmethod
+  def computeCarbon(user_id, last_ts):
+    """
+    Computers carbon metric for specified user.
+    Formula is (Actual CO2 + penalty) / distance travelled
+    """
+    ts = esta.TimeSeries.get_time_series(user_id)
+
+    last_period_tq = estt.TimeQuery("data.start_ts",
+                        last_ts, # start of range
+                        arrow.utcnow().timestamp)  # end of range
+    cs_df = ts.get_data_df("analysis/cleaned_section", time_query=last_period_tq)
+    if cs_df.shape[0] <= 0:
+      return None
+    carbon_val = computeFootprint(cs_df[["sensed_mode", "distance"]])
+    penalty_val = computePenalty(cs_df[["sensed_mode", "distance"]]) # Mappings in emission/core/wrapper/motionactivity.py
+    dist_travelled = cs_df["distance"].sum()
+
+    if dist_travelled > 0:
+      return (carbon_val + penalty_val) / dist_travelled
+    # Do not include no distance traveled users in the tier system.
+    return None
+
+  @staticmethod
+  def computeFootprint(footprint_df):
+        """
+        Inspired by e-mission-phone/www/js/metrics-factory.js
+
+        train: 92/1609,
+        car: 287/1609,
+        ON_FOOT/BICYCLING: 0
+
+        Computes range and for now calculates the average since we
+        don't distinguish between train and car.
+
+        If unknown (sensed mode = 4), don't compute anything for now.
+
+        footprint_df: [[trip1mode, distance], [trip2mode, distance], ...]
+
+        """
+    fp_train = 92.0/1609.0
+    fp_car = 287.0/1609.0
+    total_footprint = 0
+    for index, row in footprint_df.iterrows():
+      motiontype = int(row['sensed_mode'])
+      distance = row['distance']
+      if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:
+        # TODO: Replace this avg with public transportation/car value when we can distinguish.
+        total_footprint += (fp_train * m_to_km(distance) + fp_car * m_to_km(distance)) / 2;
+    return total_footprint
+
+  @staticmethod
+  def computePenalty(penalty_df):
+        """
+        Linear penalty functions are created depending on
+        transportation mode:
+        car: 50 mile threshold, penalty = 50 - distance
+        bus: 25 mile threshold, penalty = 25 - distance
+
+        If unknown (sensed mode = 4), don't compute anything for now.
+
+        penalty_df: [[trip1mode, distance], [trip2mode, distance], ...]
+
+        """
+        #TODO: Differentiate between car and bus, check ML & try to add to ecwm.MotionTypes...
+    total_penalty = 0
+    for index, row in penalty_df.iterrows():
+      motiontype = int(row['sensed_mode'])
+      if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:
+        total_penalty += max(0, mil_to_km(37.5) - m_to_km(row['distance']))
+    return total_penalty
+
+
+
+
+
+def m_to_km(distance):
+    return max(0, float(distance) / float(1000))
+
+def mil_to_km(miles):
+    return float(miles) * 1609.344/float(1000)

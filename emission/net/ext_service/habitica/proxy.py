@@ -1,3 +1,4 @@
+"""
 from __future__ import unicode_literals
 from __future__ import print_function
 from __future__ import division
@@ -77,10 +78,10 @@ def habiticaRegister(username, email, password, our_uuid):
     #If if fails to login AND to create new user, throw exception
     except:
       logging.exception("Exception while trying to login/signup!")
-    
-    logging.debug("habitica user to be created in our db = %s" % user_dict['data'])  
+
+    logging.debug("habitica user to be created in our db = %s" % user_dict['data'])
     #Now save new user (user_dict) to our db
-    #Since we are randomly generating the password, we store it in case users 
+    #Since we are randomly generating the password, we store it in case users
     #want to access their Habitica account from the browser
     #Need to create a way from them to retrieve username/password
     #metrics_data is used to calculate points based on km biked/walked
@@ -195,3 +196,4 @@ def get_user_entry(user_id):
 def save_user_entry(user_id, user_entry):
   assert(user_entry["user_id"] == user_id)
   return edb.save(edb.get_habitica_db(), user_entry)
+"""

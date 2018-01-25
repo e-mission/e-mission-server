@@ -73,22 +73,6 @@ class TestUser(unittest.TestCase):
 
   def testRegisterExistingUser(self):
     user = User.register('fake@fake.com')
-<<<<<<< HEAD
-    self.assertEquals(user.getStudy(), [])
-
-    client = Client("testclient")
-    client.update(createKey = False)
-    common.makeValid(client)
-
-    (resultPre, resultReg) = client.preRegister("this_is_the_super_secret_id", "fake@fake.com")
-    self.assertEqual(resultPre, 0)
-    self.assertEqual(resultReg, 1)
-
-    user = User.fromEmail("fake@fake.com")
-    self.assertEquals(user.getStudy(), ['testclient'])
-
-=======
->>>>>>> 869a43d37f2362697da252ab03f3c416a880ae6a
     # Here's the key difference, now register again
     user = User.register('fake@fake.com')
     self.assertTrue(User.isRegistered("fake@fake.com"))
@@ -106,41 +90,7 @@ class TestUser(unittest.TestCase):
     self.assertTrue(User.isRegistered('fake@fake.com'))
     user.changeUpdateTs(timedelta(days = -20))
     self.assertEqual((datetime.now() - user.getUpdateTS()).days, 20)
-<<<<<<< HEAD
 
-  def testGetFirstStudy(self):
-    user = User.register('fake@fake.com')
-    self.assertTrue(User.isRegistered('fake@fake.com'))
-
-    client = Client("testclient")
-    client.update(createKey = False)
-    common.makeValid(client)
-
-    (resultPre, resultReg) = client.preRegister("this_is_the_super_secret_id", "fake@fake.com")
-    self.assertEqual(resultPre, 0)
-    self.assertEqual(resultReg, 1)
-
-    user = User.fromEmail('fake@fake.com')
-    self.assertEqual(user.getFirstStudy(), 'testclient')
-
-  def testSetClientSpecificFields(self):
-    user = User.register('fake@fake.com')
-    self.assertTrue(User.isRegistered('fake@fake.com'))
-
-    # Check that the field doesn't exist initially
-    self.assertTrue(user.getProfile().get('test_field', 'blank'), 'blank')
-
-    # Check that a simple value update works
-    user.setClientSpecificProfileFields({'test_field': 'something beautiful'})
-    self.assertTrue(user.getProfile().get('test_field', 'blank'), 'something beautiful')
-
-    # Check that a data structure update works
-    user.setClientSpecificProfileFields({'test_field': {'something': 'beautiful'}})
-    self.assertTrue(user.getProfile().get('test_field', 'blank'), {'something': 'beautiful'})
-
-=======
-    
->>>>>>> 869a43d37f2362697da252ab03f3c416a880ae6a
 if __name__ == '__main__':
     etc.configLogging()
     unittest.main()
