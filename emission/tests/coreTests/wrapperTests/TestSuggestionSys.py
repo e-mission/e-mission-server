@@ -33,7 +33,7 @@ class TestSuggestionSys(unittest.TestCase):
   def printSuggestions(self):
       all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"user_email":1, "uuid": 1, "_id": 0})))
       for uuid in all_users["uuid"]:
-          print(sugg_sys.calculate_single_suggestion(uuid)))
+          print(sugg_sys.calculate_single_suggestion(uuid))
       return
 
 
