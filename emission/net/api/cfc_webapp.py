@@ -160,6 +160,10 @@ def getPopRoute(time_type):
   retVal = viz_fn(user_uuid, modes, start_time, end_time, region)
   return retVal
 
+def getYesterdayCarbon():
+  user_id = getUUID(request)
+  return User.carbonYesterday(user_id)
+
 @post("/result/heatmap/incidents/<time_type>")
 def getStressMap(time_type):
     if 'user' in request.json:
