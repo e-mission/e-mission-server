@@ -7,9 +7,6 @@ import logging
 
 # Our imports
 import emission.core.wrapper.suggestion_sys as sugg_sys
-from emission.core.wrapper.user import User
-from emission.tests import common
-import emission.tests.common as etc
 import emission.core.get_database as edb
 import emission.storage.timeseries.abstract_timeseries as esta
 import pandas as pd
@@ -28,12 +25,13 @@ class TestSuggestionSys(unittest.TestCase):
       all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"user_email":1, "uuid": 1, "_id": 0})))
       for uuid in all_users["uuid"]:
           print(uuid)
+
       return
 
   def printSuggestions(self):
       all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"user_email":1, "uuid": 1, "_id": 0})))
       for uuid in all_users["uuid"]:
-          print(sugg_sys.calculate_single_suggestion(uuid)))
+          print(sugg_sys.calculate_single_suggestion(uuid))
       return
 
 
