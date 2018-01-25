@@ -6,18 +6,9 @@ import re
 from uuid import UUID
 ACCESS_TOKEN = 'AIzaSyAbnpsty2SAzEX9s1VVIdh5pTHUPMjn3lQ' #GOOGLE MAPS ACCESS TOKEN
 JACK_TOKEN = 'AIzaSyAXG_8bZvAAACChc26JC6SFzhuWysRqQPo'
-"""
-def calculate_suggestions():
-    #For each person, create their most recent suggestion
-    user_carbon_map = {}
-    all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
-    #unfinished, not sure if right direction yet
-    for index, row in all_users.iterrows():
-        user_id = row['uuid']
-        user_carbon_map[user_id] = self.computeCarbon(user_id, TierSys.getLatest()['created_at'])
-"""
 
-def return_address_from_location(location='0, 0'):
+
+def return_address_from_location(location='0,0'):
     """
     Creates a Google Maps API call that returns the addresss given a lat, lon
     """
@@ -95,57 +86,61 @@ def calculate_single_suggestion(uuid):
     'savings': "0", 'start_lat' : '0.0', 'start_lon' : '0.0',
     'end_lat' : '0.0', 'end_lon' : '0.0'}
     all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
-    user_id = row['uuid']
+    user_id = all_users.iloc[all_users[all_users.uuid == uuid].index.tolist()[0]].uuid
     time_series = esta.TimeSeries.get_time_series(user_id)
     cleaned_sections = time_series.get_data_df("analysis/cleaned_section", time_query = None)
     #Go in reverse order because we check by most recent trip
-    counter = 20
-    for i in range(len(cleaned_sections), -1, -1):
+    counter = 40
+    for i in range(len(cleaned_sections) - 1, -1, -1):
         counter -= 1
         if counter < 0:
             #Iterate 20 trips back
             return return_obj
+        if cleaned_sections.iloc[i]["end_ts"] - cleaned_sections.iloc[i]["start_ts"] < 5 * 60:
+            continue
         distance_in_miles = cleaned_sections.iloc[i]["distance"] * 0.000621371
         mode = cleaned_sections.iloc[i]["sensed_mode"]
         start_loc = cleaned_sections.iloc[i]["start_loc"]["coordinates"]
         start_lat = str(start_loc[0])
         start_lon = str(start_loc[1])
+        print(cleaned_sections.iloc[i]["trip_id"])
+        print(cleaned_sections.iloc[i]["start_fmt_time"])
         end_loc = cleaned_sections.iloc[i]["end_loc"]["coordinates"]
         end_lat = str(end_loc[0])
         end_lon = str(end_loc[1])
         #TODO: Add elif's for bus
-        if mode == 0 and distance >= 5 and distance <= 15:
+        if mode == 0 and distance_in_miles >= 5 and distance_in_miles <= 15:
             #Suggest bus if it is car and distance between 5 and 15
             default_message = return_obj['message']
             try:
-                message = "Try public transportation from " + return_address_from_location(start_lat + ", " + start_lon) + \
-                "to " + return_address_from_location(end_lat + ", " + end_lon)
+                message = "Try public transportation from " + return_address_from_location(start_lon + "," + start_lat) + \
+                " to " + return_address_from_location(end_lon + "," + end_lat)
                 #savings per month, .465 kg co2/mile for car, 0.14323126 kg co2/mile for bus
-                savings = str(int(distance * 30 * .465 - 0.14323126 * distance * 30))
+                savings = str(int(distance_in_miles * 30 * .465 - 0.14323126 * distance_in_miles * 30))
                 return {'message' : message, 'savings' : savings, 'start_lat' : start_lat,
                 'start_lon' : start_lon, 'end_lat' : end_lat, 'end_lon' : end_lon}
                 break
-            except:
+            except ValueError as e:
                 return_obj['message'] = default_message
                 continue
-        elif mode == 0 and distance < 5 and distance >= 1:
+        elif mode == 0 and distance_in_miles < 5 and distance_in_miles >= 1:
             #Suggest bike if it is car/bus and distance between 5 and 1
             #TODO: Change ret_boj and figure out how to change lat and lon to places
             try:
-                message = "Try biking from " + return_address_from_location(start_lat + ", " + start_lon) + \
-                "to " + return_address_from_location(end_lat + ", " + end_lon)
-                savings = str(int(distance * 30 * .465))  #savings per month, .465 kg co2/mile
+                message = "Try biking from " + return_address_from_location(start_lon + "," + start_lat) + \
+                " to " + return_address_from_location(end_lon + "," + end_lat)
+                savings = str(int(distance_in_miles * 30 * .465))  #savings per month, .465 kg co2/mile
                 return {'message' : message, 'savings' : savings, 'start_lat' : start_lat,
                 'start_lon' : start_lon, 'end_lat' : end_lat, 'end_lon' : end_lon}
                 break
             except:
                 continue
-        elif mode == 0 and distance < 1:
+        elif mode == 0 and distance_in_miles < 1:
             #Suggest walking if it is car/bus and distance less than 1
             try:
-                message = "Try walking/biking from " + return_address_from_location(start_lat + ", " + start_lon) + \
-                "to " + return_address_from_location(end_lat + ", " + end_lon)
-                savings = str(int(distance * 30 * .465)) #savings per month, .465 kg co2/mile
+                message = "Try walking/biking from " + return_address_from_location(start_lon + "," + start_lat) + \
+                " to " + return_address_from_location(end_lon + "," + end_lat)
+                savings = str(int(distance_in_miles * 30 * .465)) #savings per month, .465 kg co2/mile
                 return {'message' : message, 'savings' : savings, 'start_lat' : start_lat,
                 'start_lon' : start_lon, 'end_lat' : end_lat, 'end_lon' : end_lon}
                 break
