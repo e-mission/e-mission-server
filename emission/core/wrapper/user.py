@@ -244,28 +244,22 @@ class User(object):
     """ Returns the previous day's carbon usage
           Calculates the sum of the footprint and penalty values
     """
-    ts = esta.TimeSeries.get_time_series(user_id)
-    last_period_tq = estt.TimeQuery("data.start_ts",
-                            arrow.utcnow().shift(days = -1), # start of range
-                            arrow.utcnow().timestamp)
-    cs_df = ts.get_data_df("analysis/cleaned_section", time_query=last_period_tq)
-    fp_train = 92.0/1609.0
-    fp_car = 287.0/1609.0
-    total_carbon = 0
-    carbon_df = cs_df[["sensed_mode", "distance"]]
-    for index, row in carbon_df.iterrows():
-      motiontype = int(row['sensed_mode'])
-      if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:
-        total_carbon += (fp_train * m_to_km(distance) + fp_car * m_to_km(distance)) / 2;
-    for index, row in penalty_df.iterrows():
-      motiontype = int(row['sensed_mode'])
-      if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:
-        total_carbon += max(0, mil_to_km(37.5) - m_to_km(row['distance']))
-    dist_travelled = cs_df["distance"].sum()
-    return total_carbon / dist_travelled
-
+    curr_ts = arrow.utcnow().timestamp
+    last_ts = arrow.utcnow().shift(days = -1).timestamp
+    return computeCarbon(user_id, last_ts, curr_ts)
+    
   @staticmethod
-  def computeCarbon(user_id, last_ts):
+  def carbonLastWeek(user_id):
+    """
+    Returns the daily average carbon of last week
+    """
+    dayOfWeek = arrow.utcnow().weekday()
+    curr_ts = arrow.utcnow().shift(days = -(dayOfWeek + 7)).timestamp
+    last_ts = arrow.utcnow().shift(days = -(dayOfWeek)).timestamp
+    return computeCarbon(user_id, last_ts, curr_ts) / 7
+    
+  @staticmethod
+  def computeCarbon(user_id, last_ts, curr_ts):
     """
     Computers carbon metric for specified user.
     Formula is (Actual CO2 + penalty) / distance travelled
@@ -274,7 +268,7 @@ class User(object):
 
     last_period_tq = estt.TimeQuery("data.start_ts",
                         last_ts, # start of range
-                        arrow.utcnow().timestamp)  # end of range
+                        curr_ts)  # end of range
     cs_df = ts.get_data_df("analysis/cleaned_section", time_query=last_period_tq)
     if cs_df.shape[0] <= 0:
       return None

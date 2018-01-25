@@ -86,7 +86,8 @@ class TierSys:
         Computers carbon metric for specified user.
         Formula is (Actual CO2 + penalty) / distance travelled
         """
-        return User.computeCarbon(user_id, last_ts)
+        curr_ts = arrow.utcnow().timestamp
+        return User.computeCarbon(user_id, last_ts, curr_ts)
 
     def updateTiers(self, last_ts):
         """
