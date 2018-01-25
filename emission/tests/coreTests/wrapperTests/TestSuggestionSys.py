@@ -28,6 +28,7 @@ class TestSuggestionSys(unittest.TestCase):
       all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"user_email":1, "uuid": 1, "_id": 0})))
       for uuid in all_users["uuid"]:
           print(uuid)
+          
       return
 
   def printSuggestions(self):
