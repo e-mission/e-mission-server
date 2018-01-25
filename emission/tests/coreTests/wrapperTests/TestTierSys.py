@@ -54,37 +54,6 @@ class TestTierSys(unittest.TestCase):
           ts.deleteTier(2)
       return
 
-  def testComputePenalty(self):
-      """
-      IN_VEHICLE = 0, BICYCLING = 1, ON_FOOT = 2, STILL = 3, UNKNOWN = 4, TILTING = 5, WALKING = 7, RUNNING = 8
-      """
-      ts = TierSys(0)
-      d = {'sensed_mode': [0, 1, 0, 2, 3, 4, 5, 6, 7, 8, 1], 'distance': [3320, 4450, 630, 12140, 5430, 0, 1300, 65200, 32200, 31300, 8310]}
-      penalty_df = pd.DataFrame(data=d)
-      penalty = (37.5 * 1609.344/1000) - 3.320 + (37.5 * 1609.344/1000) - 0.630
-      self.assertEqual(ts.computePenalty(penalty_df), penalty, "Many inputs penalty is not correct")
-
-      d = {'sensed_mode': [], 'distance': []}
-      penalty_df = pd.DataFrame(data=d)
-      self.assertEqual(ts.computePenalty(penalty_df), 0, "No inputs penalty is not 0")
-      return
-
-  def testComputeFootprint(self):
-      ts = TierSys(0)
-      d = {'sensed_mode': [0, 1, 2], 'distance': [100.1, 2000.1, 80.1]}
-      footprint_df = pd.DataFrame(data=d)
-      ans = (float(92)/1609 + float(287)/1609)/(2 * 1000) * 100.1
-      self.assertEqual(ts.computeFootprint(footprint_df), ans, "Many inputs footprint is not 1178.927")
-
-      d = {'sensed_mode': [1, 2], 'distance': [100.1, 2000.1]}
-      footprint_df = pd.DataFrame(data=d)
-      self.assertEqual(ts.computeFootprint(footprint_df), 0, "Expected non vehicle input to have no footprint")
-
-      d = {'sensed_mode': [], 'distance': []}
-      footprint_df = pd.DataFrame(data=d)
-      self.assertEqual(ts.computeFootprint(footprint_df), 0, "Expected no inputs to yield 0")
-      return
-
   def testComputeCarbon(self):
       etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-07-22")
       etc.runIntakePipeline(self.testUUID)
@@ -106,8 +75,8 @@ class TestTierSys(unittest.TestCase):
       ts = esta.TimeSeries.get_time_series(self.testUUID)
       cs_df = ts.get_data_df("analysis/cleaned_section")
 
-      self.assertEqual(int(tiersys.computeFootprint(cs_df) * 10000), int(footprint * 10000), "footprint value is not correct")
-      self.assertEqual(int(tiersys.computePenalty(cs_df) * 10000), int(penalty * 10000), "penalty value is not correct")
+      self.assertEqual(int(User.computeFootprint(cs_df) * 10000), int(footprint * 10000), "footprint value is not correct")
+      self.assertEqual(int(User.computePenalty(cs_df) * 10000), int(penalty * 10000), "penalty value is not correct")
 
       val = float(footprint + penalty)/float(totalDist)
       self.assertEqual(int(tiersys.computeCarbon(self.testUUID, time) * 10000), int(val * 10000), "computeCarbon Fails")
@@ -220,18 +189,14 @@ class TestTierSys(unittest.TestCase):
       tiersys.updateTiers(time)
       tiers = tiersys.tiers
       print(tiers)
-      self.assertEqual(True, shankari0621 in tiers[1] or hankari0725 in tiers[1])
-      self.assertEqual(True, shankari0621 in tiers[2] or shankari0725 in tiers[2])
-      self.assertEqual(True, shankari0727 in tiers[3])
-      self.assertEqual(True, shankari0722 in tiers[4])
-      self.assertEqual(True, shankari0620 in tiers[5])
+      self.assertEqual(True, shankari0621 in tiers[1] and shankari0725 in tiers[1])
+      self.assertEqual(True, shankari0722 in tiers[2] and shankari0727 in tiers[2])
+      self.assertEqual(True, shankari0620 in tiers[3])
 
       tiersys.saveTiers()
 
       for a in TierSys.getLatest():
-          self.assertEqual(a['tiers'][2], {'rank': 3, 'uuids': [shankari0727]}, "Save failed")
-          self.assertEqual(a['tiers'][3], {'rank': 4, 'uuids': [shankari0722]}, "Save failed")
-          self.assertEqual(a['tiers'][4], {'rank': 5, 'uuids': [shankari0620]}, "Save failed")
+          self.assertEqual(a['tiers'][2], {'rank': 3, 'uuids': [shankari0620]}, "Save failed")
       return
 
 
