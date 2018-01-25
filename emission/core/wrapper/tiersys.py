@@ -85,69 +85,7 @@ class TierSys:
         Computers carbon metric for specified user.
         Formula is (Actual CO2 + penalty) / distance travelled
         """
-        ts = esta.TimeSeries.get_time_series(user_id)
-
-        last_period_tq = estt.TimeQuery("data.start_ts",
-                            last_ts, # start of range
-                            arrow.utcnow().timestamp)  # end of range
-        cs_df = ts.get_data_df("analysis/cleaned_section", time_query=last_period_tq)
-        if cs_df.shape[0] <= 0:
-            return None
-        carbon_val = self.computeFootprint(cs_df[["sensed_mode", "distance"]])
-        penalty_val = self.computePenalty(cs_df[["sensed_mode", "distance"]]) # Mappings in emission/core/wrapper/motionactivity.py
-        dist_travelled = cs_df["distance"].sum()
-
-        if dist_travelled > 0:
-            return (carbon_val + penalty_val) / dist_travelled
-        # Do not include no distance traveled users in the tier system.
-        return None
-
-    def computeFootprint(self, footprint_df):
-        """
-        Inspired by e-mission-phone/www/js/metrics-factory.js
-
-        train: 92/1609,
-        car: 287/1609,
-        ON_FOOT/BICYCLING: 0
-
-        Computes range and for now calculates the average since we
-        don't distinguish between train and car.
-
-        If unknown (sensed mode = 4), don't compute anything for now.
-
-        footprint_df: [[trip1mode, distance], [trip2mode, distance], ...]
-
-        """
-        fp_train = 92.0/1609.0
-        fp_car = 287.0/1609.0
-        total_footprint = 0
-        for index, row in footprint_df.iterrows():
-            motiontype = int(row['sensed_mode'])
-            distance = row['distance']
-            if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:
-                # TODO: Replace this avg with public transportation/car value when we can distinguish.
-                total_footprint += (fp_train * m_to_km(distance) + fp_car * m_to_km(distance)) / 2;
-        return total_footprint
-
-    def computePenalty(self, penalty_df):
-        """
-        Linear penalty functions are created depending on
-        transportation mode:
-        car: 50 mile threshold, penalty = 50 - distance
-        bus: 25 mile threshold, penalty = 25 - distance
-
-        If unknown (sensed mode = 4), don't compute anything for now.
-
-        penalty_df: [[trip1mode, distance], [trip2mode, distance], ...]
-
-        """
-        #TODO: Differentiate between car and bus, check ML & try to add to ecwm.MotionTypes...
-        total_penalty = 0
-        for index, row in penalty_df.iterrows():
-            motiontype = int(row['sensed_mode'])
-            if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:
-                total_penalty += max(0, mil_to_km(37.5) - m_to_km(row['distance']))
-        return total_penalty
+        return user.computeCarbon(user_id)
 
     def updateTiers(self, last_ts):
         """
