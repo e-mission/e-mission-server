@@ -254,8 +254,8 @@ class User(object):
     Returns the daily average carbon of last week
     """
     dayOfWeek = arrow.utcnow().weekday()
-    curr_ts = arrow.utcnow().shift(days = -(dayOfWeek + 7)).timestamp
-    last_ts = arrow.utcnow().shift(days = -(dayOfWeek)).timestamp
+    curr_ts = arrow.utcnow().shift(days = -(dayOfWeek)).timestamp
+    last_ts = arrow.utcnow().shift(days = -(dayOfWeek + 7)).timestamp
     carbonMetric = computeCarbon(user_id, last_ts, curr_ts)
     if carbonMetric == None:
       return 0
