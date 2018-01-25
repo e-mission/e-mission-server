@@ -172,10 +172,10 @@ class TierSys:
             _id : DEFINED BY MONGO,
             created_at: datetime,
             tiers : [{
-                rank : [],
+                rank : 0,
                 uuids : []
             }, {
-                rank : [],
+                rank : 1,
                 uuids : []
             }]
         }}
