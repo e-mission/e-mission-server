@@ -256,6 +256,9 @@ class User(object):
     dayOfWeek = arrow.utcnow().weekday()
     curr_ts = arrow.utcnow().shift(days = -(dayOfWeek + 7)).timestamp
     last_ts = arrow.utcnow().shift(days = -(dayOfWeek)).timestamp
+    carbonMetric = computeCarbon(user_id, last_ts, curr_ts)
+    if carbonMetric == None:
+      return 0
     return computeCarbon(user_id, last_ts, curr_ts) / 7
     
   @staticmethod
