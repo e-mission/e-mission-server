@@ -3,6 +3,9 @@ class Tier:
     self.tid = tid
     self.users = users
 
+  def getTierUsers(self):
+  	return self.users
+
   def getUsers(self):
     return self.uuids
 

@@ -240,6 +240,32 @@ class User(object):
     return uuid
 
   @staticmethod
+  def getUserTier(user_id):
+    tierSys = TierSys.getLatest()
+    allTiers = tierSys.getAllTiers()
+    for tier in allTiers:
+      currTier = allTiers[tier]
+      if user_id in currTier.getTierUsers():
+        return tier
+    return -1
+
+  @staticmethod
+  def computeHappiness(user_id):
+    """
+    Computes the happiness of the Polar Bear
+    Happiness is based on change from last week's to yesterday's
+      Carbon metric.
+    Ranges for moods are, on a 0-1 scale:
+      Happy: > 0.6
+      Neutral: 0.4 - 0.6
+      Sad: < 0.0
+    """
+    carbonY = carbonYesterday(user_id)
+    carbonLW = carbonLastWeek(user_id)
+    deltaCarbon = (carbonY - carbonLW) / carbonLW
+    return deltaCarbon + 0.5
+
+  @staticmethod
   def carbonYesterday(user_id):
     """ Returns the previous day's carbon usage
           Calculates the sum of the footprint and penalty values

@@ -19,6 +19,9 @@ class TierSys:
     def getLatest():
         return get_tiersys_db().find().sort('created_at',-1).limit(1)
 
+    def getAllTiers(self):
+        return self.tiers
+
     def addTier(self, rank):
         if rank not in self.tiers:
             self.tiers[rank] = st.Tier(rank)
