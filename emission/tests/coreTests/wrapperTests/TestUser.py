@@ -22,6 +22,7 @@ import emission.tests.common as etc
 import emission.core.get_database as edb
 
 import emission.tests.common as etc
+import pandas as pd
 
 class TestUser(unittest.TestCase):
   def setUp(self):
@@ -90,6 +91,35 @@ class TestUser(unittest.TestCase):
     self.assertTrue(User.isRegistered('fake@fake.com'))
     user.changeUpdateTs(timedelta(days = -20))
     self.assertEqual((datetime.now() - user.getUpdateTS()).days, 20)
+
+  def testComputePenalty(self):
+    """
+    IN_VEHICLE = 0, BICYCLING = 1, ON_FOOT = 2, STILL = 3, UNKNOWN = 4, TILTING = 5, WALKING = 7, RUNNING = 8
+    """
+    d = {'sensed_mode': [0, 1, 0, 2, 3, 4, 5, 6, 7, 8, 1], 'distance': [3320, 4450, 630, 12140, 5430, 0, 1300, 65200, 32200, 31300, 8310]}
+    penalty_df = pd.DataFrame(data=d)
+    penalty = (37.5 * 1609.344/1000) - 3.320 + (37.5 * 1609.344/1000) - 0.630
+    self.assertEqual(User.computePenalty(penalty_df), penalty, "Many inputs penalty is not correct")
+
+    d = {'sensed_mode': [], 'distance': []}
+    penalty_df = pd.DataFrame(data=d)
+    self.assertEqual(User.computePenalty(penalty_df), 0, "No inputs penalty is not 0")
+    return
+
+  def testComputeFootprint(self):
+    d = {'sensed_mode': [0, 1, 2], 'distance': [100.1, 2000.1, 80.1]}
+    footprint_df = pd.DataFrame(data=d)
+    ans = (float(92)/1609 + float(287)/1609)/(2 * 1000) * 100.1
+    self.assertEqual(User.computeFootprint(footprint_df), ans, "Many inputs footprint is not 1178.927")
+
+    d = {'sensed_mode': [1, 2], 'distance': [100.1, 2000.1]}
+    footprint_df = pd.DataFrame(data=d)
+    self.assertEqual(User.computeFootprint(footprint_df), 0, "Expected non vehicle input to have no footprint")
+
+    d = {'sensed_mode': [], 'distance': []}
+    footprint_df = pd.DataFrame(data=d)
+    self.assertEqual(User.computeFootprint(footprint_df), 0, "Expected no inputs to yield 0")
+    return
 
 if __name__ == '__main__':
     etc.configLogging()

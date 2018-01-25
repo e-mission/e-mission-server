@@ -207,6 +207,7 @@ def getTimeseriesEntries(time_type):
         abort(401, "only a user can read his/her data")
 
     user_uuid = getUUID(request)
+    logging.debug("called with request.json = %s" % request.json)
 
     key_list = request.json['key_list']
     if 'from_local_date' in request.json and 'to_local_date' in request.json:
