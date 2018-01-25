@@ -5,6 +5,7 @@ from uuid import UUID
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.timequery as estt
 import emission.core.wrapper.motionactivity as ecwm
+from emission.core.wrapper.user import User
 import arrow
 from emission.core.get_database import get_tiersys_db
 
@@ -85,7 +86,7 @@ class TierSys:
         Computers carbon metric for specified user.
         Formula is (Actual CO2 + penalty) / distance travelled
         """
-        return user.computeCarbon(user_id)
+        return User.computeCarbon(user_id, last_ts)
 
     def updateTiers(self, last_ts):
         """
