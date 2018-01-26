@@ -240,13 +240,29 @@ class User(object):
     return uuid
 
   @staticmethod
+  def computeTierRank(user_id):
+    tierSys = TierSys.getLatest()
+    allTiers = tierSys.getAllTiers()
+    userTier = allTiers[getUserTier(user_id)]
+    userCarbon, userRank = {}, {}
+    # userCarbon- dict HappinessMetric : UUID
+    # userRank- dict UUID : Position
+    for user in userTier:
+      userCarbon[computeHappiness(user)] = user
+    sortedCarbonVals = list(userCarbon.keys())
+    sortedCarbonVals.sort()
+    for carbon, pos in zip(sortedCarbonVals, range(len(userCarbon))):
+      userRank[userCarbon[carbon]] = range(len(userCarbon)) - pos 
+    return userRank[user_id]
+
+  @staticmethod
   def getUserTier(user_id):
     tierSys = TierSys.getLatest()
     allTiers = tierSys.getAllTiers()
-    for tier in allTiers:
-      currTier = allTiers[tier]
+    for tierNum in allTiers:
+      currTier = allTiers[tierNum]
       if user_id in currTier.getTierUsers():
-        return tier
+        return tierNum
     return -1
 
   @staticmethod
