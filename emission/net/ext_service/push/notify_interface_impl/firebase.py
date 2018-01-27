@@ -48,12 +48,12 @@ class FirebasePush(pni.NotifyInterface):
                 unmapped_token_list.append(token)
         return (mapped_token_list, unmapped_token_list)
 
-    def retrieve_fcm_tokens(self, token_list):
+    def retrieve_fcm_tokens(self, token_list, dev):
         importHeaders = {"Authorization": "key=%s" % self.server_auth_token,
                          "Content-Type": "application/json"}
         importMessage = {
             "application": "edu.berkeley.eecs.emission",
-            "sandbox": False,
+            "sandbox": dev,
             "apns_tokens":token_list
         }
         logging.debug("About to send message %s" % importMessage)
@@ -80,9 +80,9 @@ class FirebasePush(pni.NotifyInterface):
                     ret_list.append(token_list[i])
         return ret_list
 
-    def convert_to_fcm_if_necessary(self, token_list):
+    def convert_to_fcm_if_necessary(self, token_list, dev):
         (mapped_token_list, unmapped_token_list) = self.map_existing_fcm_tokens(token_list)
-        importedResultJSON = self.retrieve_fcm_tokens(unmapped_token_list)
+        importedResultJSON = self.retrieve_fcm_tokens(unmapped_token_list, dev)
         newly_mapped_token_list = self.process_fcm_token_result(token_list, importedResultJSON)
         return mapped_token_list + newly_mapped_token_list
 
@@ -91,10 +91,8 @@ class FirebasePush(pni.NotifyInterface):
             logging.info("len(token_list) == 0, early return to save api calls")
             return
 
-        FirebasePush.print_dev_flag_warning()
-
         # convert tokens if necessary
-        fcm_token_list = self.convert_to_fcm_if_necessary(token_list)
+        fcm_token_list = self.convert_to_fcm_if_necessary(token_list, dev)
 
         push_service = FCMNotification(api_key=self.server_auth_token)
         data_message = {
@@ -120,9 +118,8 @@ class FirebasePush(pni.NotifyInterface):
 
         push_service = FCMNotification(api_key=self.server_auth_token)
 
-        FirebasePush.print_dev_flag_warning()
         # convert tokens if necessary
-        fcm_token_list = self.convert_to_fcm_if_necessary(token_list)
+        fcm_token_list = self.convert_to_fcm_if_necessary(token_list, dev)
 
         response = push_service.notify_multiple_devices(registration_ids=fcm_token_list,
                                                    data_message=ios_raw_data,
