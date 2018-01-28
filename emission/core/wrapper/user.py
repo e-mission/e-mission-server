@@ -265,6 +265,7 @@ class User(object):
       currTier = allTiers[tierNum]
       if user_id in currTier.getTierUsers():
         return tierNum
+    #Should I keep this -1? Hmm will think about it
     return -1
 
   @staticmethod
