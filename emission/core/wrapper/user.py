@@ -243,7 +243,9 @@ class User(object):
   def computeTierRank(user_id):
     tierSys = TierSys.getLatest()
     allTiers = tierSys.getAllTiers()
+    #allTiers- dict rankNum : tierObject
     userTier = allTiers[getUserTier(user_id)]
+    #userTier- list of UUIDs of users within tier
     userCarbon, userRank = {}, {}
     # userCarbon- dict HappinessMetric : UUID
     # userRank- dict UUID : Position
@@ -252,7 +254,7 @@ class User(object):
     sortedCarbonVals = list(userCarbon.keys())
     sortedCarbonVals.sort()
     for carbon, pos in zip(sortedCarbonVals, range(len(userCarbon))):
-      userRank[userCarbon[carbon]] = range(len(userCarbon)) - pos 
+      userRank[userCarbon[carbon]] = len(userCarbon) - pos 
     return userRank[user_id]
 
   @staticmethod

@@ -268,6 +268,16 @@ def getSuggestion():
   logging.debug("Output of ret_dir = %s" % ret_dict)
   return ret_dir
 
+@post('/happiness')
+def getHappiness():
+  user_id = getUUID(request)
+  return User.computeHappiness(user_id)
+
+@post('/tierRank')
+def getTierRank():
+  user_id = getUUID(request)
+  return User.getUserTier(user_id)
+
 @post('/profile/create')
 def createUserProfile():
   try:
