@@ -276,7 +276,7 @@ def getHappiness():
 @post('/tierRank')
 def getTierRank():
   user_id = getUUID(request)
-  return User.getUserTier(user_id)
+  return User.computeTierRank(user_id)
 
 @post('/profile/create')
 def createUserProfile():
