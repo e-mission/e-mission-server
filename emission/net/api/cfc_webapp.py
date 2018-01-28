@@ -278,7 +278,7 @@ def getTierRank():
   user_id = getUUID(request)
   return User.computeTierRank(user_id)
 
-@post('tier')
+@post('/tier')
 def getUserTier():
   user_id = getUUID(request)
   return User.getUserTier(user_id)
