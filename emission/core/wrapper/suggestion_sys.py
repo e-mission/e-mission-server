@@ -85,7 +85,7 @@ def calculate_single_suggestion(uuid):
     #Given a single UUID, create a suggestion for them
     return_obj = { 'message': "Good job walking and biking! No suggestion to show.",
     'savings': "0", 'start_lat' : '0.0', 'start_lon' : '0.0',
-    'end_lat' : '0.0', 'end_lon' : '0.0'}
+    'end_lat' : '0.0', 'end_lon' : '0.0', 'method' : 'bike'}
     all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
     user_id = all_users.iloc[all_users[all_users.uuid == uuid].index.tolist()[0]].uuid
     time_series = esta.TimeSeries.get_time_series(user_id)
@@ -119,7 +119,7 @@ def calculate_single_suggestion(uuid):
                 #savings per month, .465 kg co2/mile for car, 0.14323126 kg co2/mile for bus
                 savings = str(int(distance_in_miles * 30 * .465 - 0.14323126 * distance_in_miles * 30))
                 return {'message' : message, 'savings' : savings, 'start_lat' : start_lat,
-                'start_lon' : start_lon, 'end_lat' : end_lat, 'end_lon' : end_lon}
+                'start_lon' : start_lon, 'end_lat' : end_lat, 'end_lon' : end_lon, 'method': 'public'}
                 break
             except ValueError as e:
                 return_obj['message'] = default_message
@@ -132,7 +132,7 @@ def calculate_single_suggestion(uuid):
                 " to " + return_address_from_location(end_lon + "," + end_lat)
                 savings = str(int(distance_in_miles * 30 * .465))  #savings per month, .465 kg co2/mile
                 return {'message' : message, 'savings' : savings, 'start_lat' : start_lat,
-                'start_lon' : start_lon, 'end_lat' : end_lat, 'end_lon' : end_lon}
+                'start_lon' : start_lon, 'end_lat' : end_lat, 'end_lon' : end_lon, 'method': 'bike'}
                 break
             except:
                 continue
@@ -143,7 +143,7 @@ def calculate_single_suggestion(uuid):
                 " to " + return_address_from_location(end_lon + "," + end_lat)
                 savings = str(int(distance_in_miles * 30 * .465)) #savings per month, .465 kg co2/mile
                 return {'message' : message, 'savings' : savings, 'start_lat' : start_lat,
-                'start_lon' : start_lon, 'end_lat' : end_lat, 'end_lon' : end_lon}
+                'start_lon' : start_lon, 'end_lat' : end_lat, 'end_lon' : end_lon, 'method': 'walk'}
                 break
             except:
                 continue
