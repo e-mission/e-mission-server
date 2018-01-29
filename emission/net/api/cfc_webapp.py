@@ -47,6 +47,7 @@ from emission.core.wrapper.client import Client
 from emission.core.wrapper.user import User
 from emission.core.wrapper.tiersys import TierSys
 from emission.core.get_database import get_uuid_db, get_mode_db
+import emission.core.wrapper.suggestion_sys as suggsys
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.timeseries.timequery as estt
 import emission.storage.timeseries.tcquery as esttc
