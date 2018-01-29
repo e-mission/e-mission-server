@@ -130,7 +130,7 @@ class User(object):
     userDict = userCollection.find_one({'user_id' : user_id})
     if not userDict:
       return None
-    return userCollection.find_one({'user_id' : user_id})['username']
+    return userDict['username']
 
   def getUpdateTS(self):
     return self.getProfile()['update_ts']
