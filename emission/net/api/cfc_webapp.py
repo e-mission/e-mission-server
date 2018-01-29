@@ -230,7 +230,7 @@ def getTimeseriesEntries(time_type):
 @post("/getUsername")
 def getUsername():
   user_id = getUUID(request)
-  return User.get(user_id)
+  return User.getUsername(user_id)
 
 @post("/setUsername/<username>")
 def setUsername(username):
