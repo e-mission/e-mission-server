@@ -127,6 +127,9 @@ class User(object):
   @staticmethod
   def getUsername(user_id):
     userCollection = db.get_username_db()
+    userDict = userCollection.find_one({'user_id' : user_id})
+    if not userDict:
+      return None
     return userCollection.find_one({'user_id' : user_id})['username']
 
   def getUpdateTS(self):
