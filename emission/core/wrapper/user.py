@@ -123,11 +123,11 @@ class User(object):
     userCollection = db.get_username_db()
     userDict = userCollection.find_one({'user_id' : user_id})
     if userDict == None:
-      userCollection.insertOne({'user_id' : user_id, 'username' : username})
+      userCollection.insert_one({'user_id' : user_id, 'username' : username})
       logging.debug('userDict  did not exist when trying to enter username')
     else:
       logging.debug('updated username to: %s' %username)
-      userCollection.updateOne(
+      userCollection.update_one(
         {"user_id" : user_id},
         {'$set' : {"username" : username}}
       )  
