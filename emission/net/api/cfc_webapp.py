@@ -265,8 +265,8 @@ def getSuggestion():
   user_uuid=getUUID(request)
   logging.debug("user_uuid %s" % user_uuid)
   ret_dir = suggsys.calculate_single_suggestion(user_uuid)
-  logging.debug("type(ret_dict) = %s" % type(ret_dict))
-  logging.debug("Output of ret_dir = %s" % ret_dict)
+  logging.debug("type(ret_dir) = %s" % type(ret_dir))
+  logging.debug("Output of ret_dir = %s" % ret_dir)
   return ret_dir
 
 @post('/happiness')
