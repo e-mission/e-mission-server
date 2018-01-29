@@ -273,6 +273,7 @@ def getUsername():
 @post("/setUsername/<username>")
 def setUsername(username):
   user_id = getUUID(request)
+  logging.debug("called setUsername: %s" %username)
   return User.setUsername(user_id, username)
 
 @post('/happiness')

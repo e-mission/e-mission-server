@@ -117,7 +117,7 @@ class User(object):
 
   @staticmethod
   def setUsername(user_id, username):
-    """ 
+    """
     Sets this user's username to the inputted value
     """
     userCollection = db.get_username_db()
@@ -129,7 +129,7 @@ class User(object):
     userDict = userCollection.find_one({'user_id' : user_id})
     if not userDict:
       return None
-    return userDict['username']
+    return {'username': userDict['username']}
 
   def getUpdateTS(self):
     return self.getProfile()['update_ts']
@@ -272,7 +272,7 @@ class User(object):
     sortedCarbonVals = list(userCarbon.keys())
     sortedCarbonVals.sort()
     for carbon, pos in zip(sortedCarbonVals, range(len(userCarbon))):
-      userRank[userCarbon[carbon]] = len(userCarbon) - pos 
+      userRank[userCarbon[carbon]] = len(userCarbon) - pos
     return userRank[user_id]
 
   @staticmethod
@@ -310,7 +310,7 @@ class User(object):
     curr_ts = arrow.utcnow().timestamp
     last_ts = arrow.utcnow().shift(days = -1).timestamp
     return computeCarbon(user_id, last_ts, curr_ts)
-    
+
   @staticmethod
   def carbonLastWeek(user_id):
     """
@@ -323,7 +323,7 @@ class User(object):
     if carbonMetric == None:
       return 0
     return computeCarbon(user_id, last_ts, curr_ts) / 7
-    
+
   @staticmethod
   def computeCarbon(user_id, last_ts, curr_ts):
     """
