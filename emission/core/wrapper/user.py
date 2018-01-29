@@ -122,8 +122,7 @@ class User(object):
     """
     userCollection = db.get_username_db()
     userDict = userCollection.find_one({'user_id' : user_id})
-    userVal = {'username': userDict['username']}
-    if not userVal['username']:
+    if userDict == None:
       userCollection.insertOne({'user_id' : user_id, 'username' : username})
     else:
       userCollection.updateOne(
