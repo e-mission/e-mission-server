@@ -268,6 +268,7 @@ def getSuggestion():
 @post("/getUsername")
 def getUsername():
   user_id = getUUID(request)
+  logging.debug("Starting getUsername")
   username = User.getUsername(user_id)
   logging.debug("Output of getUsername: %s" %username)
   return User.getUsername(user_id)
