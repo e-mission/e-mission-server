@@ -13,6 +13,7 @@ import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.timequery as estt
 import emission.core.wrapper.motionactivity as ecwm
 import arrow
+import emission.core.get_database as db
 
 # Our imports
 from emission.core.get_database import get_profile_db, get_uuid_db
@@ -114,11 +115,19 @@ class User(object):
                       }
     return modeMap
 
-  def setUsername(self, username):
+  @staticmethod
+  def setUsername(user_id, username):
     """ 
     Sets this user's username to the inputted value
     """
     self.username = username
+    userCollection = db.get_username_db()
+    userCollection.insertOne({'user_id' : user_id, 'username' : username})
+
+  @staticmethod
+  def getUsername(user_id):
+    userCollection = db.get_username_db()
+    return userCollection.find_one({'user_id' : user_id})['username']
 
   def getUpdateTS(self):
     return self.getProfile()['update_ts']

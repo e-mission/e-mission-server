@@ -227,12 +227,16 @@ def getTimeseriesEntries(time_type):
     data_list = esdc.find_entries(user_uuid, key_list, time_query)
     return {'phone_data': data_list}
 
-"""@post("/username")
+@post("/getUsername")
 def getUsername():
   user_id = getUUID(request)
-  return User.
-  """
+  return User.get(user_id)
 
+@post("/setUsername/<username>")
+def setUsername(username):
+  user_id = getUUID(request)
+  return User.setUsername(user_id, username)
+  
 @post('/usercache/get')
 def getFromCache():
   logging.debug("Called userCache.get")
