@@ -121,7 +121,15 @@ class User(object):
     Sets this user's username to the inputted value
     """
     userCollection = db.get_username_db()
-    userCollection.insertOne({'user_id' : user_id, 'username' : username})
+    userDict = userCollection.find_one({'user_id' : user_id})
+    userVal = {'username': userDict['username']}
+    if not userVal['username']:
+      userCollection.insertOne({'user_id' : user_id, 'username' : username})
+    else:
+      userCollection.updateOne(
+        {"user_id" : user_id},
+        {$set : {"username" : username}}
+      );  
 
   @staticmethod
   def getUsername(user_id):

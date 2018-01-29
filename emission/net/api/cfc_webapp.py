@@ -282,17 +282,17 @@ def setUsername(username):
 @post('/happiness')
 def getHappiness():
   user_id = getUUID(request)
-  return User.computeHappiness(user_id)
+  return {'happiness' : User.computeHappiness(user_id)}
 
 @post('/tierRank')
 def getTierRank():
   user_id = getUUID(request)
-  return User.computeTierRank(user_id)
+  return {'tierRank' : User.computeTierRank(user_id)}
 
 @post('/tier')
 def getUserTier():
   user_id = getUUID(request)
-  return User.getUserTier(user_id)
+  return {'tier' : User.getUserTier(user_id)}
 
 @post('/listOfUsers')
 def getListOfUsers():
@@ -303,7 +303,7 @@ def getListOfUsers():
   tierUsernames = []
   for uuid in userTierUsers:
     tierUsernames.append(User.getUsername(uuid))
-  return tierUsernames
+  return {'allUsers' : tierUsernames}
 
 @post('/profile/create')
 def createUserProfile():
