@@ -129,7 +129,7 @@ class User(object):
       userCollection.updateOne(
         {"user_id" : user_id},
         {$set : {"username" : username}}
-      );  
+      )  
 
   @staticmethod
   def getUsername(user_id):
