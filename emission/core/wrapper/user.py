@@ -128,7 +128,7 @@ class User(object):
     else:
       userCollection.updateOne(
         {"user_id" : user_id},
-        {$set : {"username" : username}}
+        {'$set' : {"username" : username}}
       )  
 
   @staticmethod
