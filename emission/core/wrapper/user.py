@@ -23,6 +23,7 @@ defaultMpg = old_div(8.91,(1.6093 * defaultCarFootprint)) # Should be roughly 32
 class User(object):
   def __init__(self, uuid):
     self.uuid = uuid
+    self.username = None
     # TODO: Read this from a file instead
     self.defaultSettings = {
       'result_url': 'https://e-mission.eecs.berkeley.edu/compare'
@@ -112,6 +113,12 @@ class User(object):
                          'air_long' : old_div(217.0,1609)
                       }
     return modeMap
+
+  def setUsername(self, username):
+    """ 
+    Sets this user's username to the inputted value
+    """
+    self.username = username
 
   def getUpdateTS(self):
     return self.getProfile()['update_ts']
@@ -274,10 +281,10 @@ class User(object):
     Computes the happiness of the Polar Bear
     Happiness is based on change from last week's to yesterday's
       Carbon metric.
-    Ranges for moods are, on a 0-1 scale:
+    Ranges for moods are, on a (<) 0-1 (<) scale:
       Happy: > 0.6
       Neutral: 0.4 - 0.6
-      Sad: < 0.0
+      Sad: < 0.4
     """
     carbonY = carbonYesterday(user_id)
     carbonLW = carbonLastWeek(user_id)

@@ -160,10 +160,6 @@ def getPopRoute(time_type):
   retVal = viz_fn(user_uuid, modes, start_time, end_time, region)
   return retVal
 
-def getYesterdayCarbon():
-  user_id = getUUID(request)
-  return User.carbonYesterday(user_id)
-
 @post("/result/heatmap/incidents/<time_type>")
 def getStressMap(time_type):
     if 'user' in request.json:
@@ -230,6 +226,12 @@ def getTimeseriesEntries(time_type):
     data_list = esdc.find_entries(user_uuid, key_list, time_query)
     return {'phone_data': data_list}
 
+"""@post("/username")
+def getUsername():
+  user_id = getUUID(request)
+  return User.
+  """
+
 @post('/usercache/get')
 def getFromCache():
   logging.debug("Called userCache.get")
@@ -282,6 +284,11 @@ def getTierRank():
 def getUserTier():
   user_id = getUUID(request)
   return User.getUserTier(user_id)
+
+@post('/listOfUsers')
+def getListOfUsers();
+  user_id = getUUID(request)
+  return [1,2,3,4,5,6,7,8]
 
 @post('/profile/create')
 def createUserProfile():
