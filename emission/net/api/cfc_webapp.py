@@ -293,7 +293,13 @@ def getUserTier():
 @post('/listOfUsers')
 def getListOfUsers();
   user_id = getUUID(request)
-  return [1,2,3,4,5,6,7,8]
+  userTierNum = User.getUserTier(user_id)
+  userTier = TierSys.getLatest().getAllTiers()[userTierNum]
+  userTierUsers = userTier.getUsers()
+  tierUsernames = []
+  for uuid in userTierUsers:
+    tierUsernames.append(User.getUsername(uuid))
+  return tierUsernames
 
 @post('/profile/create')
 def createUserProfile():
