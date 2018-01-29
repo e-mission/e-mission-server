@@ -226,16 +226,6 @@ def getTimeseriesEntries(time_type):
     # the API
     data_list = esdc.find_entries(user_uuid, key_list, time_query)
     return {'phone_data': data_list}
-
-@post("/getUsername")
-def getUsername():
-  user_id = getUUID(request)
-  return User.getUsername(user_id)
-
-@post("/setUsername/<username>")
-def setUsername(username):
-  user_id = getUUID(request)
-  return User.setUsername(user_id, username)
   
 @post('/usercache/get')
 def getFromCache():
@@ -275,6 +265,16 @@ def getSuggestion():
   logging.debug("Output of ret_dir = %s" % ret_dir)
   return ret_dir
 
+@post("/getUsername")
+def getUsername():
+  user_id = getUUID(request)
+  return User.getUsername(user_id)
+
+@post("/setUsername/<username>")
+def setUsername(username):
+  user_id = getUUID(request)
+  return User.setUsername(user_id, username)
+
 @post('/happiness')
 def getHappiness():
   user_id = getUUID(request)
@@ -289,11 +289,6 @@ def getTierRank():
 def getUserTier():
   user_id = getUUID(request)
   return User.getUserTier(user_id)
-
-@post('/username')
-def getUsername():
-  user_id = getUUID(request)
-  return User.getUsername(user_id)
 
 @post('/listOfUsers')
 def getListOfUsers();
