@@ -226,7 +226,7 @@ def getTimeseriesEntries(time_type):
     # the API
     data_list = esdc.find_entries(user_uuid, key_list, time_query)
     return {'phone_data': data_list}
-  
+
 @post('/usercache/get')
 def getFromCache():
   logging.debug("Called userCache.get")
@@ -291,7 +291,7 @@ def getUserTier():
   return User.getUserTier(user_id)
 
 @post('/listOfUsers')
-def getListOfUsers();
+def getListOfUsers():
   user_id = getUUID(request)
   userTierNum = User.getUserTier(user_id)
   userTier = TierSys.getLatest().getAllTiers()[userTierNum]
