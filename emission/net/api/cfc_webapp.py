@@ -290,6 +290,11 @@ def getUserTier():
   user_id = getUUID(request)
   return User.getUserTier(user_id)
 
+@post('/username')
+def getUsername():
+  user_id = getUUID(request)
+  return User.getUsername(uuid)
+
 @post('/listOfUsers')
 def getListOfUsers();
   user_id = getUUID(request)
