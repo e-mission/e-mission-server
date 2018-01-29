@@ -120,7 +120,6 @@ class User(object):
     """ 
     Sets this user's username to the inputted value
     """
-    self.username = username
     userCollection = db.get_username_db()
     userCollection.insertOne({'user_id' : user_id, 'username' : username})
 
