@@ -3,7 +3,6 @@ from __future__ import division
 from __future__ import unicode_literals
 from __future__ import absolute_import
 from future import standard_library
-from emission.core.wrapper.tiersys import TierSys
 standard_library.install_aliases()
 from builtins import *
 from builtins import object
@@ -266,35 +265,6 @@ class User:
     get_uuid_db().remove({'user_email': userEmail})
     get_profile_db().remove({'user_id': uuid})
     return uuid
-
-  @staticmethod
-  def computeTierRank(user_id):
-    tierSys = TierSys.getLatest()
-    allTiers = tierSys.getAllTiers()
-    #allTiers- dict rankNum : tierObject
-    userTier = allTiers[getUserTier(user_id)]
-    #userTier- list of UUIDs of users within tier
-    userCarbon, userRank = {}, {}
-    # userCarbon- dict HappinessMetric : UUID
-    # userRank- dict UUID : Position
-    for user in userTier:
-      userCarbon[computeHappiness(user)] = user
-    sortedCarbonVals = list(userCarbon.keys())
-    sortedCarbonVals.sort()
-    for carbon, pos in zip(sortedCarbonVals, range(len(userCarbon))):
-      userRank[userCarbon[carbon]] = len(userCarbon) - pos
-    return userRank[user_id]
-
-  @staticmethod
-  def getUserTier(user_id):
-    tierSys = TierSys.getLatest()
-    allTiers = tierSys.getAllTiers()
-    for tierNum in allTiers:
-      currTier = allTiers[tierNum]
-      if user_id in currTier.getTierUsers():
-        return tierNum
-    #Should I keep this -1? Hmm will think about it
-    return -1
 
   @staticmethod
   def computeHappiness(user_id):
