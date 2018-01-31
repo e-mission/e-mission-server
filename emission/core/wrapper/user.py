@@ -273,7 +273,7 @@ class User(object):
     """
     curr_ts = arrow.utcnow().timestamp
     last_ts = arrow.utcnow().shift(days = -1).timestamp
-    return computeCarbon(user_id, last_ts, curr_ts)
+    return User.computeCarbon(user_id, last_ts, curr_ts)
 
   @staticmethod
   def carbonLastWeek(user_id):
@@ -286,7 +286,7 @@ class User(object):
     carbonMetric = computeCarbon(user_id, last_ts, curr_ts)
     if carbonMetric == None:
       return 0
-    return computeCarbon(user_id, last_ts, curr_ts) / 7
+    return User.computeCarbon(user_id, last_ts, curr_ts) / 7
 
   @staticmethod
   def computeHappiness(user_id):
