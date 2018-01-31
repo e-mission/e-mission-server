@@ -297,7 +297,19 @@ def getUserTier():
 @post('/listOfUsers')
 def getListOfUsers():
   user_id = getUUID(request)
-  logging.debug("Getting list of users")
+  userTierNum = TierSys.getUserTier(user_id)
+  userTier = TierSys.getLatest()[0]['tiers']
+  tierUsernames = [[]]
+  index = 0
+  for tier in userTiers:
+    for uuid in tier['uuids']:
+        tierUsernames[index].append(User.getUsername(uuid))
+    index += 1
+  return {'tiers' : tierUsernames}
+
+@post('/getListOfUsersInUsersTier')
+def getListOfUsersInUsersTier():
+  user_id = getUUID(request)
   userTierNum = TierSys.getUserTier(user_id)
   userTierUsers = TierSys.getLatest()[0]['tiers'][userTierNum - 1]['uuids']
   logging.debug("User Tier is: %s" %str(userTierNum))
