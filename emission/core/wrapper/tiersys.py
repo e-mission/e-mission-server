@@ -21,7 +21,7 @@ class TierSys:
 
     @staticmethod
     def getUserTier(user_id):
-        allTiers = getLatest().getAllTiers()
+        allTiers = TierSys.getLatest().getAllTiers()
         for tierNum in allTiers:
           currTier = allTiers[tierNum]
           if user_id in currTier.getTierUsers():
@@ -30,7 +30,7 @@ class TierSys:
         return -1
     @staticmethod
     def computeTierRank(user_id):
-        allTiers = getLatest().getAllTiers()
+        allTiers = TierSys.getLatest().getAllTiers()
         #allTiers- dict rankNum : tierObject
         userTier = allTiers[getUserTier(user_id)]
         #userTier- list of UUIDs of users within tier

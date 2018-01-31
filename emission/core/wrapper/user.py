@@ -21,7 +21,7 @@ from emission.core.get_database import get_profile_db, get_uuid_db
 defaultCarFootprint = old_div(278.0,1609)
 defaultMpg = old_div(8.91,(1.6093 * defaultCarFootprint)) # Should be roughly 32
 
-class User:
+class User(object):
   def __init__(self, uuid):
     self.uuid = uuid
     self.username = None
