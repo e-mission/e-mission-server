@@ -3,6 +3,7 @@ from __future__ import division
 from __future__ import unicode_literals
 from __future__ import absolute_import
 from future import standard_library
+from emission.core.wrapper.tiersys import TierSys
 standard_library.install_aliases()
 from builtins import *
 from builtins import object
@@ -130,7 +131,7 @@ class User(object):
       userCollection.update_one(
         {"user_id" : user_id},
         {'$set' : {"username" : username}}
-      )  
+      )
 
   @staticmethod
   def getUsername(user_id):
