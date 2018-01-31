@@ -267,22 +267,6 @@ class User(object):
     return uuid
 
   @staticmethod
-  def computeHappiness(user_id):
-    """
-    Computes the happiness of the Polar Bear
-    Happiness is based on change from last week's to yesterday's
-      Carbon metric.
-    Ranges for moods are, on a (<) 0-1 (<) scale:
-      Happy: > 0.6
-      Neutral: 0.4 - 0.6
-      Sad: < 0.4
-    """
-    carbonY = User.carbonYesterday(user_id)
-    carbonLW = User.carbonLastWeek(user_id)
-    deltaCarbon = (carbonY - carbonLW) / carbonLW
-    return deltaCarbon + 0.5
-
-  @staticmethod
   def carbonYesterday(user_id):
     """ Returns the previous day's carbon usage
           Calculates the sum of the footprint and penalty values
@@ -303,6 +287,22 @@ class User(object):
     if carbonMetric == None:
       return 0
     return computeCarbon(user_id, last_ts, curr_ts) / 7
+
+  @staticmethod
+  def computeHappiness(user_id):
+    """
+    Computes the happiness of the Polar Bear
+    Happiness is based on change from last week's to yesterday's
+      Carbon metric.
+    Ranges for moods are, on a (<) 0-1 (<) scale:
+      Happy: > 0.6
+      Neutral: 0.4 - 0.6
+      Sad: < 0.4
+    """
+    carbonY = User.carbonYesterday(user_id)
+    carbonLW = User.carbonLastWeek(user_id)
+    deltaCarbon = (carbonY - carbonLW) / carbonLW
+    return deltaCarbon + 0.5
 
   @staticmethod
   def computeCarbon(user_id, last_ts, curr_ts):
