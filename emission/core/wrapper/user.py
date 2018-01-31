@@ -21,7 +21,7 @@ from emission.core.get_database import get_profile_db, get_uuid_db
 defaultCarFootprint = old_div(278.0,1609)
 defaultMpg = old_div(8.91,(1.6093 * defaultCarFootprint)) # Should be roughly 32
 
-class User(object):
+class User:
   def __init__(self, uuid):
     self.uuid = uuid
     self.username = None
@@ -130,7 +130,7 @@ class User(object):
       userCollection.update_one(
         {"user_id" : user_id},
         {'$set' : {"username" : username}}
-      )  
+      )
 
   @staticmethod
   def getUsername(user_id):
@@ -265,35 +265,6 @@ class User(object):
     get_uuid_db().remove({'user_email': userEmail})
     get_profile_db().remove({'user_id': uuid})
     return uuid
-
-  @staticmethod
-  def computeTierRank(user_id):
-    tierSys = TierSys.getLatest()
-    allTiers = tierSys.getAllTiers()
-    #allTiers- dict rankNum : tierObject
-    userTier = allTiers[getUserTier(user_id)]
-    #userTier- list of UUIDs of users within tier
-    userCarbon, userRank = {}, {}
-    # userCarbon- dict HappinessMetric : UUID
-    # userRank- dict UUID : Position
-    for user in userTier:
-      userCarbon[computeHappiness(user)] = user
-    sortedCarbonVals = list(userCarbon.keys())
-    sortedCarbonVals.sort()
-    for carbon, pos in zip(sortedCarbonVals, range(len(userCarbon))):
-      userRank[userCarbon[carbon]] = len(userCarbon) - pos
-    return userRank[user_id]
-
-  @staticmethod
-  def getUserTier(user_id):
-    tierSys = TierSys.getLatest()
-    allTiers = tierSys.getAllTiers()
-    for tierNum in allTiers:
-      currTier = allTiers[tierNum]
-      if user_id in currTier.getTierUsers():
-        return tierNum
-    #Should I keep this -1? Hmm will think about it
-    return -1
 
   @staticmethod
   def computeHappiness(user_id):

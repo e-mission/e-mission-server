@@ -19,6 +19,33 @@ class TierSys:
     def getLatest():
         return get_tiersys_db().find().sort('created_at',-1).limit(1)
 
+    @staticmethod
+    def getUserTier(user_id):
+        allTiers = getLatest().getAllTiers()
+        for tierNum in allTiers:
+          currTier = allTiers[tierNum]
+          if user_id in currTier.getTierUsers():
+            return tierNum
+        #Should I keep this -1? Hmm will think about it
+        return -1
+    @staticmethod
+    def computeTierRank(user_id):
+        allTiers = getLatest().getAllTiers()
+        #allTiers- dict rankNum : tierObject
+        userTier = allTiers[getUserTier(user_id)]
+        #userTier- list of UUIDs of users within tier
+        userCarbon, userRank = {}, {}
+        # userCarbon- dict HappinessMetric : UUID
+        # userRank- dict UUID : Position
+        for user in userTier:
+            userCarbon[computeHappiness(user)] = user
+        sortedCarbonVals = list(userCarbon.keys())
+        sortedCarbonVals.sort()
+        for carbon, pos in zip(sortedCarbonVals, range(len(userCarbon))):
+            userRank[userCarbon[carbon]] = len(userCarbon) - pos
+        return userRank[user_id]
+
+
     def getAllTiers(self):
         return self.tiers
 
