@@ -298,7 +298,7 @@ def getUserTier():
 def getListOfUsers():
   user_id = getUUID(request)
   userTierNum = TierSys.getUserTier(user_id)
-  userTier = TierSys.getLatest()[0]['tiers']
+  userTiers = TierSys.getLatest()[0]['tiers']
   tierUsernames = [[]]
   index = 0
   for tier in userTiers:
