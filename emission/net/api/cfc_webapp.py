@@ -297,12 +297,16 @@ def getUserTier():
 @post('/listOfUsers')
 def getListOfUsers():
   user_id = getUUID(request)
+  logging.debug("Getting list of users")
   userTierNum = User.getUserTier(user_id)
   userTier = TierSys.getLatest().getAllTiers()[userTierNum]
+  logging.debug("User Tier is: %s" %str(userTier))
   userTierUsers = userTier.getUsers()
+  logging.debug("Getting users")
   tierUsernames = []
   for uuid in userTierUsers:
     tierUsernames.append(User.getUsername(uuid))
+  logging.debug("returning usernames to client")
   return {'allUsers' : tierUsernames}
 
 @post('/profile/create')
