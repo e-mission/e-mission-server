@@ -299,9 +299,8 @@ def getListOfUsers():
   user_id = getUUID(request)
   logging.debug("Getting list of users")
   userTierNum = TierSys.getUserTier(user_id)
-  userTier = TierSys.getLatest().getAllTiers()[userTierNum]
+  userTierUsers = TierSys.getLatest()[0]['tiers'][userTierNum - 1]['uuids']
   logging.debug("User Tier is: %s" %str(userTier))
-  userTierUsers = userTier.getUsers()
   logging.debug("Getting users")
   tierUsernames = []
   for uuid in userTierUsers:
