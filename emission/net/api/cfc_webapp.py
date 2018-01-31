@@ -299,11 +299,13 @@ def getListOfUsers():
   user_id = getUUID(request)
   userTierNum = TierSys.getUserTier(user_id)
   userTiers = TierSys.getLatest()[0]['tiers']
-  tierUsernames = [[]]
+  tierUsernames = []
   index = 0
   for tier in userTiers:
+    tierUsernames.append([])
+    curr_tier = tierUsernames[index]
     for uuid in tier['uuids']:
-        tierUsernames[index].append(User.getUsername(uuid))
+        curr_tier.append(User.getUsername(uuid))
     index += 1
   return {'tiers' : tierUsernames}
 
