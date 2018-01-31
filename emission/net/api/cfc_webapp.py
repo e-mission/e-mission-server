@@ -305,7 +305,11 @@ def getListOfUsers():
     tierUsernames.append([])
     curr_tier = tierUsernames[index]
     for uuid in tier['uuids']:
-        curr_tier.append(User.getUsername(uuid))
+        username = User.getUsername(uuid)
+        if username == None:
+            curr_tier.append(uuid)
+        else:
+            curr_tier.append(username)
     index += 1
   return {'tiers' : tierUsernames}
 
