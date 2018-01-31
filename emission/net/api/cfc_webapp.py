@@ -287,18 +287,18 @@ def getHappiness():
 @post('/tierRank')
 def getTierRank():
   user_id = getUUID(request)
-  return {'tierRank' : User.computeTierRank(user_id)}
+  return {'tierRank' : TierSys.computeTierRank(user_id)}
 
 @post('/tier')
 def getUserTier():
   user_id = getUUID(request)
-  return {'tier' : User.getUserTier(user_id)}
+  return {'tier' : TierSys.getUserTier(user_id)}
 
 @post('/listOfUsers')
 def getListOfUsers():
   user_id = getUUID(request)
   logging.debug("Getting list of users")
-  userTierNum = User.getUserTier(user_id)
+  userTierNum = TierSys.getUserTier(user_id)
   userTier = TierSys.getLatest().getAllTiers()[userTierNum]
   logging.debug("User Tier is: %s" %str(userTier))
   userTierUsers = userTier.getUsers()
