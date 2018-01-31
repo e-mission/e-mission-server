@@ -21,24 +21,26 @@ class TierSys:
 
     @staticmethod
     def getUserTier(user_id):
-        allTiers = TierSys.getLatest().getAllTiers()
-        for tierNum in allTiers:
-          currTier = allTiers[tierNum]
-          if user_id in currTier.getTierUsers():
-            return tierNum
-        #Should I keep this -1? Hmm will think about it
-        return -1
+        allTiers = TierSys.getLatest()
+        index = 1
+        for tier in allTiers['tiers']:
+            if user_id in tier['uuids']:
+                return index
+            else:
+                index += 1
+        #Should I keep this -1?No
+        return index
     @staticmethod
     def computeTierRank(user_id):
-        allTiers = TierSys.getLatest().getAllTiers()
+        tierSys = TierSys.getLatest()
         #allTiers- dict rankNum : tierObject
-        userTier = allTiers[getUserTier(user_id)]
+        userTier = tierSys['tiers'][TierSys.getUserTier(user_id) - 1]['uuids']
         #userTier- list of UUIDs of users within tier
         userCarbon, userRank = {}, {}
         # userCarbon- dict HappinessMetric : UUID
         # userRank- dict UUID : Position
         for user in userTier:
-            userCarbon[computeHappiness(user)] = user
+            userCarbon[User.computeHappiness(user)] = user
         sortedCarbonVals = list(userCarbon.keys())
         sortedCarbonVals.sort()
         for carbon, pos in zip(sortedCarbonVals, range(len(userCarbon))):
