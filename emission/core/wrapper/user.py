@@ -277,8 +277,8 @@ class User(object):
       Neutral: 0.4 - 0.6
       Sad: < 0.4
     """
-    carbonY = carbonYesterday(user_id)
-    carbonLW = carbonLastWeek(user_id)
+    carbonY = User.carbonYesterday(user_id)
+    carbonLW = User.carbonLastWeek(user_id)
     deltaCarbon = (carbonY - carbonLW) / carbonLW
     return deltaCarbon + 0.5
 
