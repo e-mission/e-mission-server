@@ -301,6 +301,8 @@ class User(object):
     """
     carbonY = User.carbonYesterday(user_id)
     carbonLW = User.carbonLastWeek(user_id)
+    if (carbonY == None or carbonLW == None):
+        return 0.5
     deltaCarbon = (carbonY - carbonLW) / carbonLW
     return deltaCarbon + 0.5
 
