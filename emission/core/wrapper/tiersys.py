@@ -145,16 +145,27 @@ class TierSys:
             created_at: datetime,
             tiers : [{
                 rank : 0,
-                uuids : []
+                users : [
+                    {
+                    uuid: 1234,
+                    lastWeekCarbon: 1.2 g/mile
+                    } , ...
+                ]
             }, {
                 rank : 1,
-                uuids : []
+                users : [
+                    {
+                    uuid: 1234,
+                    lastWeekCarbon: 1.2 g/mile
+                    } , ...
+                ]
             }]
         }}
         """
         ts = []
-        for rank, users in self.tiers.items():
-            ts.append({'rank': rank, 'uuids': users})
+        for rank, uuids in self.tiers.items():
+            users = [{'uuid': uuid, 'lastWeekCarbon': User.carbonLastWeek(uuid)} for uuid in uuids]
+            ts.append({'rank': rank, 'users': users})
 
         get_tiersys_db().insert_one({'tiers': ts, 'created_at': datetime.now()})
         return ts
