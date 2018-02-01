@@ -306,10 +306,13 @@ def getListOfUsers():
     curr_tier = tierUsernames[index]
     for uuid in tier['uuids']:
         username = User.getUsername(uuid)
+        carbon = User.carbonLastWeek(uuid)
         if username == None:
-            curr_tier.append(uuid)
+            result = {'uuid': uuid, 'carbonLastWeek': carbon}
+            curr_tier.append(result)
         else:
-            curr_tier.append(username)
+            result = {'username': username, 'carbonLastWeek': carbon}
+            curr_tier.append(result)
     index += 1
   return {'tiers' : tierUsernames}
 
