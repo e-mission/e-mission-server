@@ -302,9 +302,10 @@ def getListOfUsers():
   tierUsernames = []
   index = 0
   for tier in userTiers:
+    logging.debug('TIER: %s' %tier)
     tierUsernames.append([])
     curr_tier = tierUsernames[index]
-    for user in tier['rank']:
+    for user in tier['users']:
         uuid = user['uuid']
         username = User.getUsername(uuid)
         carbon = user['lastWeekCarbon'] * 1000
