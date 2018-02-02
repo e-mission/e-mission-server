@@ -35,7 +35,7 @@ class TierSys:
     def computeTierRank(user_id):
 
         #TODO: Change for new tier format
-        
+
         tierSys = TierSys.getLatest()[0]
         #allTiers- dict rankNum : tierObject
         userTier = tierSys['tiers'][TierSys.getUserTier(user_id) - 1]['uuids']
@@ -168,7 +168,7 @@ class TierSys:
         """
         ts = []
         for rank, uuids in self.tiers.items():
-            users = [{'uuid': uuid, 'lastWeekCarbon': User.carbonLastWeek(uuid)} for uuid in uuids]
+            users = [{'uuid': uuid, 'lastWeekCarbon': round(User.carbonLastWeek(uuid), -3)} for uuid in uuids]
             ts.append({'rank': rank, 'users': users})
 
         print(ts)
