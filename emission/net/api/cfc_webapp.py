@@ -47,6 +47,7 @@ from emission.core.wrapper.client import Client
 from emission.core.wrapper.user import User
 from emission.core.wrapper.tiersys import TierSys
 from emission.core.get_database import get_uuid_db, get_mode_db
+import emission.core.wrapper.polarbear as pb
 import emission.core.wrapper.suggestion_sys as suggsys
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.timeseries.timequery as estt
@@ -283,6 +284,11 @@ def setUsername(username):
 def getHappiness():
   user_id = getUUID(request)
   return {'happiness' : User.computeHappiness(user_id)}
+
+@post('/polarbear')
+def getTierPolarBears():
+  user_id = getUUID(request)
+  return pb.getAllBearsInTier(user_id)
 
 @post('/tierRank')
 def getTierRank():
