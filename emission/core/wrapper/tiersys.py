@@ -167,6 +167,8 @@ class TierSys:
             users = [{'uuid': uuid, 'lastWeekCarbon': User.carbonLastWeek(uuid)} for uuid in uuids]
             ts.append({'rank': rank, 'users': users})
 
+        print(ts)
+
         get_tiersys_db().insert_one({'tiers': ts, 'created_at': datetime.now()})
         return ts
 
