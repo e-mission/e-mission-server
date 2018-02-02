@@ -24,7 +24,8 @@ class TierSys:
         allTiers = TierSys.getLatest()[0]
         index = 1
         for tier in allTiers['tiers']:
-            if user_id in tier['uuids']:
+            uuids = [user['uuid'] for user in tier['users']]
+            if user_id in uuids:
                 return index
             else:
                 index += 1
@@ -166,6 +167,8 @@ class TierSys:
         for rank, uuids in self.tiers.items():
             users = [{'uuid': uuid, 'lastWeekCarbon': User.carbonLastWeek(uuid)} for uuid in uuids]
             ts.append({'rank': rank, 'users': users})
+
+        print(ts)
 
         get_tiersys_db().insert_one({'tiers': ts, 'created_at': datetime.now()})
         return ts
