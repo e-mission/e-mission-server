@@ -25,7 +25,7 @@ class TierSys:
         index = 1
         for tier in allTiers['tiers']:
             uuids = [user['uuid'] for user in tier['users']]
-            if user_id in tier['uuids']:
+            if user_id in uuids:
                 return index
             else:
                 index += 1
