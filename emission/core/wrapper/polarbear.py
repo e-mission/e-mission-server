@@ -1,4 +1,4 @@
-from emission.core.wrapper.tiersys import Tiersys
+from emission.core.wrapper.tiersys import TierSys
 from emission.core.wrapper.user import User
 import emission.core.get_database as db
 
