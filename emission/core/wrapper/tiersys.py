@@ -24,6 +24,7 @@ class TierSys:
         allTiers = TierSys.getLatest()[0]
         index = 1
         for tier in allTiers['tiers']:
+            uuids = [user['uuid'] for user in tier['users']]
             if user_id in tier['uuids']:
                 return index
             else:
