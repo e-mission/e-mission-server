@@ -3,7 +3,7 @@ from emission.core.wrapper.user import User
 import emission.core.get_database as db
 
 
-def setPolarBearattr(dict):
+def setPolarBearattr(attrs):
 	"""
 	Sets a Polar Bear's attributes based on input dict:
 		{user_id: num, username: string, happiness:int, size: int}
@@ -11,13 +11,13 @@ def setPolarBearattr(dict):
 	polarBearCollection = db.get_polarbear_db()
 	userDict = polarBearCollection.find_one({'user_id' : 'user_id'})
 	if userDict == None:
-		polarBearCollection.insert_one(dict)
+		polarBearCollection.insert_one(attrs)
 	else:
 		polarBearCollection.update_one(
-			{'user_id': dict['user_id']},
-			{'$set' : {'username' : dict['username'],
-			'happiness' : dict['happiness'],
-			'size' : dict['size']
+			{'user_id': attrs['user_id']},
+			{'$set' : {'username' : attrs['username'],
+			'happiness' : attrs['happiness'],
+			'size' : attrs['size']
 			}}
 		)
 
@@ -48,7 +48,7 @@ def updatePolarBear(user_id):
 		currattr['username'] = User.getUsername(user_id)
 		#Have to user new username if user has changed it
 		if newHappiness > 0.4:
-			currattr['size'] += Tiersys.getUserTier(user_id)
+			currattr['size'] += (4 - Tiersys.getUserTier(user_id))
 		else:
 			currattr['size'] = 0
 		setPolarBearattr(currattr)
