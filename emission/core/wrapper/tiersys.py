@@ -38,13 +38,14 @@ class TierSys:
 
         tierSys = TierSys.getLatest()[0]
         #allTiers- dict rankNum : tierObject
-        userTier = tierSys['tiers'][TierSys.getUserTier(user_id) - 1]['uuids']
-        #userTier- list of UUIDs of users within tier
+        userTier = tierSys['tiers'][TierSys.getUserTier(user_id) - 1]['users']
+        uuids = [user['uuid'] for user in userTier]
+        #uuids - list of UUIDs of users within tier
         userCarbon, userRank = {}, {}
         # userCarbon- dict HappinessMetric : UUID
         # userRank- dict UUID : Position
-        for user in userTier:
-            userCarbon[User.computeHappiness(user)] = user
+        for uuid in uuids:
+            userCarbon[User.computeHappiness(user)] = uuid
         sortedCarbonVals = list(userCarbon.keys())
         sortedCarbonVals.sort()
         for carbon, pos in zip(sortedCarbonVals, range(len(userCarbon))):
