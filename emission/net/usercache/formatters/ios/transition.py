@@ -1,3 +1,10 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import logging
 
 import emission.core.wrapper.transition as et
@@ -53,6 +60,11 @@ def format(entry):
     # data.transition_raw = entry.data.transition
     
     data.transition = transition_map[entry.data.transition].value
+    if entry.data.transition is not None:
+        data.transition = transition_map[entry.data.transition].value
+    else:
+        data.transition = None
+
     logging.debug("Mapped %s -> %s" % (entry.data.transition, data.transition))
     
     if "ts" not in data:

@@ -11,6 +11,13 @@ Roads API
 
 See more on how to enable these here: https://github.com/googlemaps/google-maps-services-python
 """
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import emission.net.ext_service.gmaps.googlemaps as googlemaps
 import datetime
 import sys

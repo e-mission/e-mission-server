@@ -1,3 +1,7 @@
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from __future__ import division
 # Phase 1: Build a model for User Utility Function (per Vij, Shankari)
 # First, for each trip, we must obtain alternatives through some method
 # (currently Google Maps API), alongside the actual trips which were taken.
@@ -15,13 +19,18 @@
 # set of alternative routes. In Phase 2, this learning is time-dependent (think traffic).
 
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import *
+from builtins import object
 from sklearn import linear_model as lm
 import numpy as np
 import logging
 
 # Our imports
 import emission.core.get_database as edb
-import alternative_trips_module as atm
+from . import alternative_trips_module as atm
 
 
 class UserUtilityModel(object):
@@ -54,7 +63,7 @@ class UserUtilityModel(object):
        self.regression.fit(trip_features, labels)
        self.coefficients = self.regression.coef_
        self.save_coefficients()
-    except ValueError, e:
+    except ValueError as e:
        logging.warning("While fitting the regression, got error %s" % e)
        if ("%s" % e) == "The number of classes has to be greater than one":
           logging.warning("Training set has no alternatives!")
@@ -121,7 +130,7 @@ class UserUtilityModel(object):
   # calculate the utility of trip using the model
   def predict_utility(self, trip):
     utility = sum(f * c for f, c in zip(trip, self.coefficients[0]))
-    print trip, " Utility: ", utility 
+    print(trip, " Utility: ", utility) 
     return utility
 
   # find model params from DB and construct a model using these params

@@ -1,4 +1,14 @@
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import *
+from builtins import object
+from past.utils import old_div
 import logging
 import math
 import matplotlib
@@ -24,7 +34,7 @@ trips have to be for the trips to be put in the same bin
 
 This is called by cluster_pipeline.py.
 """
-class similarity:
+class similarity(object):
     
     def __init__(self, data, radius):
         self.data = data
@@ -112,7 +122,7 @@ class similarity:
         for i in range(len(self.bins)):
             y[i] = len(self.bins[i])
         N = len(y)
-        x = range(N)
+        x = list(range(N))
         max = 0
         index = -1
         a = numpy.array([x[0], y[0]])
@@ -121,7 +131,7 @@ class similarity:
         new_y = []
         for i in range(0, N):
             p = numpy.array([x[i], y[i]])
-            dist = norm(numpy.cross(p-a,p-b))/n
+            dist = old_div(norm(numpy.cross(p-a,p-b)),n)
             new_y.append(dist)
             if dist > max:
                 max = dist
@@ -210,7 +220,7 @@ class similarity:
         rlat2 = math.radians(lat2)
         lon = math.radians(lon2 - lon1);
         lat = math.radians(lat2-lat1);
-        a = math.sin(lat/2.0)**2 + math.cos(rlat1)*math.cos(rlat2) * math.sin(lon/2.0)**2
+        a = math.sin(old_div(lat,2.0))**2 + math.cos(rlat1)*math.cos(rlat2) * math.sin(old_div(lon,2.0))**2
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
         d = R * c
         if d <= self.radius:

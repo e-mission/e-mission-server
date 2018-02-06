@@ -1,4 +1,12 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from builtins import object
 import logging
 
 # Our imports
@@ -141,8 +149,8 @@ def fill_section(section, start_loc, end_loc, sensed_mode):
     section.end_ts = end_loc.ts
     try:
         section.end_local_dt = end_loc.local_dt
-    except AttributeError, e:
-        print end_loc
+    except AttributeError as e:
+        print(end_loc)
     section.end_fmt_time = end_loc.fmt_time
 
     section.start_loc = start_loc.loc

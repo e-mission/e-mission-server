@@ -1,4 +1,13 @@
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
+from past.utils import old_div
 import logging
 import attrdict as ad
 import numpy as np
@@ -104,8 +113,8 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             # We are going to use the last 8 points for now.
             # TODO: Change this back to last 10 points once we normalize phone and this
             last10Points_df = filtered_points_df.iloc[max(idx-self.point_threshold, curr_trip_start_point.idx):idx+1]
-            distanceToLast = lambda(row): pf.calDistance(ad.AttrDict(row), currPoint)
-            timeToLast = lambda(row): currPoint.ts - ad.AttrDict(row).ts
+            distanceToLast = lambda row: pf.calDistance(ad.AttrDict(row), currPoint)
+            timeToLast = lambda row: currPoint.ts - ad.AttrDict(row).ts
             last5MinsDistances = last5MinsPoints_df.apply(distanceToLast, axis=1)
             logging.debug("last5MinsDistances = %s with length %d" % (last5MinsDistances.as_matrix(), len(last5MinsDistances)))
             last10PointsDistances = last10Points_df.apply(distanceToLast, axis=1)
@@ -200,10 +209,10 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             timeDelta = curr_point.ts - prev_point.ts
             distDelta = pf.calDistance(prev_point, curr_point)
             if timeDelta > 0:
-                speedDelta = distDelta / timeDelta
+                speedDelta = old_div(distDelta, timeDelta)
             else:
                 speedDelta = np.nan
-            speedThreshold = float(self.distance_threshold) / self.time_threshold
+            speedThreshold = old_div(float(self.distance_threshold), self.time_threshold)
 
             if eaisr.is_tracking_restarted_in_range(prev_point.ts, curr_point.ts, timeseries):
                 logging.debug("tracking was restarted, ending trip")

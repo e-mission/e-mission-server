@@ -1,3 +1,10 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import logging
 import importlib
 
@@ -16,6 +23,7 @@ def save_all_configs(user_id, time_query):
     # Let's test it out and see if it works!
     last_processed_ts_list = [save_config(user_id, uc, time_query, config_name) 
         for config_name in config_list]
+    logging.debug("last_processed_ts_list = %s" % last_processed_ts_list)
     return max(last_processed_ts_list)
 
 def save_config(user_id, uc, time_query, module_name):
@@ -27,7 +35,7 @@ def save_config(user_id, uc, time_query, module_name):
         uc.putDocument("config/%s" % module_name, config)
         return last_processed_ts
     else:
-        return None
+        return 0
 
 def get_configurator(module_name):
     module = importlib.import_module(module_name)

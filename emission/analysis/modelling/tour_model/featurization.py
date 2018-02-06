@@ -1,4 +1,15 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import range
+from builtins import *
+from builtins import object
+from past.utils import old_div
 import logging
 import matplotlib.pyplot as plt
 import numpy
@@ -7,7 +18,7 @@ from sklearn import metrics
 import sys
 
 # our imports
-from kmedoid import kmedoids
+from .kmedoid import kmedoids
 
 
 """
@@ -18,7 +29,7 @@ The input parameters of an instance of this class are:
 
 This class is run by cluster_pipeline.py
 """
-class featurization:
+class featurization(object):
 
     def __init__(self, data):
         self.data = data
@@ -143,5 +154,5 @@ class featurization:
                 end_lat = self.points[i][3]
                 end_lon = self.points[i][2]
                 path = [(start_lat, start_lon), (end_lat, end_lon)]
-                mymap2.addpath(path, matcol.rgb2hex(colormap(float(self.labels[i])/self.clusters)))
+                mymap2.addpath(path, matcol.rgb2hex(colormap(old_div(float(self.labels[i]),self.clusters))))
             mymap2.draw('./mylabels.html')

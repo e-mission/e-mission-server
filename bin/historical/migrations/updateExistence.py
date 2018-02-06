@@ -1,3 +1,10 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 from moves import Moves
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
@@ -18,7 +25,8 @@ logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
 def updateExistence():
   Sections = get_section_db()
   for tempSec in Sections:
-    if 'retained' not in tempSec.keys() or tempSec['retained'] is None:
+    if 'retained' not in list(tempSec.keys()) or tempSec['retained'] is None:
 		label_filtered_section(tempSec)
     else:
-      #don't update
+        #don't update
+        pass

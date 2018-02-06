@@ -2,6 +2,10 @@ e-mission is a project to gather data about user travel patterns using phone
 apps, and use them to provide an personalized carbon footprint, and aggregate
 them to make data available to urban planners and transportation engineers.
 
+If you are here to use ***Zephyr***, which uses the e-mission platform to
+evaluate power/accuracy tradeoffs for background sensed data, please see the
+[zephyr-specific README and examples](https://github.com/e-mission/e-mission-server/tree/master/zephyr).
+
 It has two components, the backend server and the phone apps. This is the
 backend server - the phone apps are available in the [e-mission-phone
 repo](https://github.com/amplab/e-mission-phone)
@@ -9,11 +13,48 @@ repo](https://github.com/amplab/e-mission-phone)
 The current build status is:
 [![Build Status](https://amplab.cs.berkeley.edu/jenkins/buildStatus/icon?job=e-mission-server)](https://amplab.cs.berkeley.edu/jenkins/view/E-Mission/job/e-mission-server/)
 
+[![Join the chat at https://gitter.im/e-mission/e-mission-server](https://badges.gitter.im/e-mission/e-mission-server.svg)](https://gitter.im/e-mission/e-mission-server?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 The backend in turn consists of two parts - a summary of their code structure is shown below.
 -![][Python_Structure]
 The webapp supports a REST API, and accesses data from the database to fulfill
 the queries.  A set of background scripts pull the data from external sources, and
 preprocessing results ensures reasonable performance.
+
+The installation instructions below are generally targeted towards OSX and \*nix shells such as bash. If you want to use Windows, we recomend using PowerShell (https://technet.microsoft.com/en-us/scriptcenter/dd742419), which provides similarly rich commands. If you really want to use the Command Prompt, most commands should work, but you may need to convert `/` -> `\` to make the commands work.
+
+## Install/update: ##
+-------------------
+
+### Installation ###
+is as simple as cloning the github repository.
+
+- If you do not plan to make changes to the code, clone the master repository.
+
+  ```
+  $ git clone https://github.com/e-mission/e-mission-server.git
+  ```
+
+- If you might make changes or develop new features, fork (https://help.github.com/articles/fork-a-repo/) and clone your fork.
+
+  ```
+  $ git clone https://github.com/<username>/e-mission-server.git
+  ```
+
+### Update ###
+is as simple as pulling new changes.
+
+- If you are working off the master repository
+
+  ```
+  $ git pull origin master
+  ```
+
+- If you are working off your fork, you will need to sync your fork with the main repository (https://help.github.com/articles/syncing-a-fork/) and then pull from your fork.
+
+  ```
+  $ git pull origin master
+  ```
 
 ## Dependencies: ##
 -------------------
@@ -36,27 +77,54 @@ python scientific computing libraries (numpy/scipy/scikit-learn) along with
 native implementations for performance. Using the distribution avoids native
 library inconsistencies between versions.
 
-The distribution also includes its own version of pip, and a separate package
+The distribution also includes its own version of pip, and a separate environment
 management tool called 'conda'.
 
-Make sure you install Python 2.7 because some libraries used in this code 
-repository do not support Python 3.5 yet.
+The distribution also includes an environment management tool called 'conda'. We will set up a separate `emission`
+environment within anaconda to avoid conflicts with other applications.
 
-After you install the anaconda distribution, please ensure that it is in your
-path, and you are using the anaconda versions of common python tools such as
-`python` and `pip`, e.g.
+- Install the anaconda distribution (https://www.anaconda.com/download). Any
+  installer should be fine - setting up the `emission` environment will
+  automatically choose the correct version of python. Since all required
+  packages will be installed using the environment, if you are comfortable with
+  the command line, you can also download the minimalist `miniconda` installer
+  https://conda.io/miniconda.html
 
-    $ which python
-    /Users/shankari/OSS/anaconda/bin/python
+- Setup the `emission` environment.
 
-    $ which pip
-    /Users/shankari/OSS/anaconda/bin/pip
+  ```
+  $ source setup/setup.sh
+  ```
 
-### Python dependencies: ###
+- Verify that you are in the right environment - your prompt should start with
+  `(emission)` and the `emission` environment should be starred.
 
-    $ pip install -r requirements.txt 
-    # If you are running this in production over SSL, copy over the cherrypy-wsgiserver
-    $ cp api/wsgiserver2.py <dist-packages>/cherrypy/wsgiserver/wsgiserver2.py
+  ```
+  (emission) ...$ conda env list
+  # conda environments:
+  #
+  aws                      /..../anaconda/envs/aws
+  emission              *  /..../anaconda/envs/emission
+  firebase                 /..../anaconda/envs/firebase
+  py27                     /..../anaconda/envs/py27
+  py36                     /..../anaconda/envs/py36
+  xbos                     /..../anaconda/envs/xbos
+  root                     /..../anaconda
+  ```
+
+- Remember to re-run the setup script every time you pull from the main repository because the dependencies may have changed.
+
+  ```
+  $ source setup/setup.sh
+  ```
+
+- When you are done working with e-mission, you can cleanup the environment and then just delete the entire directory.
+
+  ```
+  $ source setup/teardown.sh
+  $ cd ..
+  $ rm -rf e-mission-server
+  ```
 
 ### Javascript dependencies ###
 Run "bower install" instead if you are prompted password for 'https://github.com' after running "bower update".
@@ -74,14 +142,11 @@ Here are the steps for doing this:
 
         $ mongod
 
-1. Copy the following sample files. You should also configure the servers and keys in them if you wish to test the associated features, but can leave them filled with dummy values if you don't.
+1. **Optional** Copy configuration files. The files in `conf` can be used to customize the app with custom authentication options or enable external features such as place lookup and the game integration. Look at the samples in `conf/*`, copy them over and modify as necessary - e.g.
 
+        $ find conf -name \*.sample
         # For the location -> name reverse lookup. Client will lookup if not populated.
         $ cp conf/net/ext_service/nominatim.json.sample conf/net/ext_service/nominatim.json
-        # Store entries to the stats database. Currently required, dependency should be removed soon
-        $ cp conf/net/int_service/giles_conf.json.sample conf/net/int_service/giles_conf.json
-        # Game integration.
-        $ cp conf/net/ext_service/habitica.json.sample conf/net/int_service/habitica.json
 
 1. Start the server
 
@@ -132,9 +197,8 @@ $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py -n /tmp/data-c
   1. The script loads the data into your mongodb instance using the test phone UUIDs. If you want to play with the raw data, you are good.
   2. If you want to run the existing pipeline, you need to either enable the pipeline for test phones, OR re-load the data as a normal user.
 
-    1. To enable the pipeline for test phones, edit `emission/pipeline/scheduler.py` to add the test phones to the `TEMP_HANDLED_PUBLIC_PHONES` array.
-    2. To reload the data as a normal user, save the data as a timeline file using `bin/debug/extract_timeline_for_day_and_user.py` with one of the test phone UUIDs and the time range that you downloaded the data for. This saves the data into a json file. You can then load the data using the `bin/debug/load_timeline_for_day_and_user.py` script. It requires a timeline file and a user that the timeline is being loaded as. If you wish to view this timeline in the UI after processing it, you need to
-login with this email.
+      1. To enable the pipeline for test phones, edit `emission/pipeline/scheduler.py` to add the test phones to the `TEMP_HANDLED_PUBLIC_PHONES` array.
+      2. To reload the data as a normal user, save the data as a timeline file using `bin/debug/extract_timeline_for_day_and_user.py` with one of the test phone UUIDs and the time range that you downloaded the data for. This saves the data into a json file. You can then load the data using the `bin/debug/load_timeline_for_day_and_user.py` script. It requires a timeline file and a user that the timeline is being loaded as. If you wish to view this timeline in the UI after processing it, you need to login with this email.
 
 ```
             $ cd ..../e-mission-server
@@ -200,7 +264,7 @@ directory to PYTHONPATH.
 
 ## Analysis ##
 Several exploratory analysis scripts are checked in as ipython notebooks into
-`emission/analysis/notebooks`. All data in the notebooks is from members of the
+https://github.com/e-mission/e-mission-explore/. All data in the notebooks is from members of the
 research team who have provided permission to use it. The results in the
 notebooks cannot be replicated in the absence of the raw data, but they can be
 run on data collected from your own instance as well.
@@ -255,7 +319,7 @@ or
 
 ## Design decisions: ##
 ----------
-This site is currently designed to support commute mode tracking and
+This site is currently designed to support travel behavior tracking and
 aggregation. There is a fair amount of backend work that is more complex than
 just reading and writing data from a database. So we are not using any of the
 specialized web frameworks such as django or rails.
@@ -275,62 +339,8 @@ bower.
 
 ## Deployment: ##
 ----------
-If you want to use this for anything other than deployment, you should really run it over SSL. In order to make the development flow smoother, *if the server is running over HTTP as opposed to HTTPS, it has no security*. The JWT basically consists of the user email *in plain text*. This means that anybody who knows a users' email access can download their detailed timeline. This is very bad.
-
-<font color="red">If you are using this to store real, non-test data, use SSL right now</font> 
-
-If you are running this in production, you should really run it over SSL. We
-use cherrypy to provide SSL support. The default version of cherrypy in the
-anaconda distribution had some issues, so I've checked in a working version
-of the wsgiserver file.
-
-TODO: clean up later
-
-    $ cp api/wsgiserver2.py <dist-packages>/cherrypy/wsgiserver/wsgiserver2.py
-
-Also, now that we decode the JWTs locally, we need to use the oauth2client,
-which requires the PyOpenSSL library. This can be installed on ubuntu using the
-python-openssl package, but then it is not accessible using the anaconda
-distribution. In order to enable it for the conda distribution as well, use
-
-    $ conda install pyopenssl
-
-Also, installing via `requirements.txt` does not appear to install all of the
-requirements for the google-api-client. If you get mysterious "Invalid token"
-errors for tokens that are correctly validated by the backup URL method, try to
-uninstall and reinstall with the --update option.
-
-    $ pip uninstall google-api-python-client
-    $ pip install --upgrade google-api-python-client
-
-If you are running the server on shared, cloud infrastructure such as AWS, then
-note that the data is accessible by AWS admins by directly looking at the disk.
-In order to avoid this, you want to encrypt the disk. You can do this by:
-- using an encrypted EBS store, but this doesn't appear to allow you to specify
-  your own encryption key
-- using a normal drive that is encrypted using cryptfs (http://sleepyhead.de/howto/?href=cryptpart, https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_a_non-root_file_system). The standard AWS ubuntu AMI appears to have LUKS enabled, so you can follow the instructions with LUKS.
-
-```
-ubuntu@ip-10-203-173-119:/home/e-mission$ cryptsetup --help | grep luks
-                                      for luksFormat
-  -M, --type=STRING                   Type of device metadata: luks, plain,
-...
-```
-
-In either of these cases, you need to reconfigure mongod.conf to point to data
-and log directories in the encrypted volume.
-
-### Getting keys ###
-
-If you are associated with the e-mission project and will be integrating with
-our server, then you can get the key files from:
-https://repo.eecs.berkeley.edu/git/users/shankari/e-mission-keys.git
-
-If not, please get your own copies of the following keys:
-
-* Google Developer Console (stored in conf/net/keys.json)
-  - iOS key (`ios_client_key`)
-  - webApp key (`client_key`)
-* Parse  (coming soon)
+This is fairly complex and is under active change as we have more projects deploy their own servers with various configurations.
+So I have moved it to its own wiki page:
+https://github.com/e-mission/e-mission-server/wiki/Deploying-your-own-server-to-production
 
 [Python_Structure]: https://raw.github.com/amplab/e-mission-server/master/figs/e-mission-server-module-structure.png

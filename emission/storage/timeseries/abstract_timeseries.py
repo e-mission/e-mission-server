@@ -1,3 +1,11 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+from builtins import object
 import logging
 import enum as enum
 
@@ -39,6 +47,9 @@ class TimeSeries(object):
         pass
 
     def get_entry_at_ts(self, key, ts_key, ts):
+        pass
+
+    def get_entry_from_id(self, key, entry_id):
         pass
 
     def get_data_df(self, key, time_query = None, geo_query=None, extra_query_list=None):

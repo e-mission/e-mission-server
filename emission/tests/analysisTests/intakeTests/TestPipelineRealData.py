@@ -1,8 +1,15 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # This test compares the output of the intake pipeline
 # with known ground truth output.
 # The way to add a new test is:
 # - load the test timeline
-# $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py emission/tests/data/real_examples/iphone_2016-02-22
+# $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py emission/tests/data/real_examples/iphone_2016-02-22 test-iphone-feb-22
+# ...
+# Loading file emission/tests/data/real_examples/iphone_2016-02-22
+# After registration, test-iphone-feb-22 -> 349b4f21-7cd2-4ac6-8786-ea69142c2238
 #
 # Note that there is some randomness in the tests, due to
 # a56adddc5dc8c94cbe98964aafb17df3bc3f724c, so we need to use a random seed
@@ -11,17 +18,17 @@
 # needs to be re-instituted.
 
 # - run the intake pipeline
-# $ ./e-mission-py.bash bin/intake_stage.py
+# $ ./e-mission-py.bash bin/debug/intake_single_user.py -e test-iphone-feb-22
 # - log in via the phone and check that all is well
-# - generate ground truth
-# >>> tj = edb.get_usercache_db().find_one({'metadata.key': 'diary/trips-2016-02-22'})
-# >>> import attrdict as ad
-# >>> import json
-# >>> import bson.json_util as bju
-# >>> json.dump(tj, open("/tmp/iphone_2016-02-22.ground_truth", "w"), indent=4, default=bju.default)
-# - move the ground truth back
+# - save the ground truth
+# $ ./e-mission-py.bash bin/debug/save_ground_truth.py -e test-iphone-feb-22 2016-02-22 /tmp/iphone_2016-02-22.ground_truth
+# Copy it back and add the test to this file
 # $ mv /tmp/iphone_2016-02-22.ground_truth emission/tests/data/real_examples
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import *
 import unittest
 import logging
 import json
@@ -52,9 +59,9 @@ class TestPipelineRealData(unittest.TestCase):
         self.clearRelatedDb()
 
     def clearRelatedDb(self):
-        edb.get_timeseries_db().remove({"user_id": self.testUUID})
-        edb.get_analysis_timeseries_db().remove({"user_id": self.testUUID})
-        edb.get_usercache_db().remove({"user_id": self.testUUID})
+        edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID})
+        edb.get_usercache_db().delete_many({"user_id": self.testUUID})
 
     def compare_result(self, result, expect):
         # This is basically a bunch of asserts to ensure that the timeline is as
@@ -170,7 +177,8 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-06-20"
         ld = ecwl.LocalDate({'year': 2016, 'month': 6, 'day': 20})
         cacheKey = "diary/trips-2016-06-20"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile+".ground_truth") as gfp:
+            ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
@@ -195,7 +203,8 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-06-21"
         ld = ecwl.LocalDate({'year': 2016, 'month': 6, 'day': 21})
         cacheKey = "diary/trips-2016-06-21"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile+".ground_truth") as gfp:
+            ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
@@ -220,7 +229,8 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-08-10"
         ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 10})
         cacheKey = "diary/trips-2016-08-10"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile+".ground_truth") as gfp:
+            ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
@@ -247,7 +257,8 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-08-11"
         ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 11})
         cacheKey = "diary/trips-2016-08-11"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile+".ground_truth") as gfp:
+            ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
@@ -269,7 +280,8 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 2, 'day': 22})
         end_ld = ecwl.LocalDate({'year': 2016, 'month': 2, 'day': 22})
         cacheKey = "diary/trips-2016-02-22"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile+".ground_truth") as gfp:
+            ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
@@ -284,7 +296,8 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld = ecwl.LocalDate({'year': 2015, 'month': 8, 'day': 27})
         end_ld = ecwl.LocalDate({'year': 2015, 'month': 8, 'day': 27})
         cacheKey = "diary/trips-2015-08-27"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile+".ground_truth") as gfp:
+            ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
@@ -298,7 +311,8 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-07-27"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 27})
         cacheKey = "diary/trips-2016-07-27"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile+".ground_truth") as gfp:
+            ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
@@ -312,7 +326,8 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-08-04"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 4})
         cacheKey = "diary/trips-2016-07-27"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile+".ground_truth") as gfp:
+            ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
@@ -323,7 +338,7 @@ class TestPipelineRealData(unittest.TestCase):
 
     def testAirTripFromHawaii(self):
         dataFile = "emission/tests/data/real_examples/shankari_2016-08-05"
-        start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 05})
+        start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 0o5})
         cacheKey = "diary/trips-2016-07-05"
         ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
 
@@ -476,7 +491,9 @@ class TestPipelineRealData(unittest.TestCase):
                                  object_hook=bju.object_hook)
 
         logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
-        all_entries = json.load(open(dataFile), object_hook = bju.object_hook)
+        all_entries = None
+        with open(dataFile) as secondfp:
+            all_entries = json.load(secondfp, object_hook = bju.object_hook)
         ts_1030 = arrow.get("2016-08-10T10:30:00-07:00").timestamp
         logging.debug("ts_1030 = %s, converted back = %s" % (ts_1030, arrow.get(ts_1030).to("America/Los_Angeles")))
         before_1030_entries = [e for e in all_entries if ad.AttrDict(e).metadata.write_ts <= ts_1030]
@@ -649,8 +666,8 @@ class TestPipelineRealData(unittest.TestCase):
         # This tests the effect of online versus offline analysis and segmentation with potentially partial data
 
         dataFile = "emission/tests/data/real_examples/issue_436_assertion_error"
-        start_ld = ecwl.LocalDate({'year': 2016, 'month': 10, 'day': 07})
-        end_ld = ecwl.LocalDate({'year': 2016, 'month': 10, 'day': 07})
+        start_ld = ecwl.LocalDate({'year': 2016, 'month': 10, 'day': 0o7})
+        end_ld = ecwl.LocalDate({'year': 2016, 'month': 10, 'day': 0o7})
         cacheKey = "diary/trips-2016-10-07"
         ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
 
@@ -741,6 +758,34 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 12, 'day': 12})
         cacheKey = "diary/trips-2016-12-12"
         ground_truth = json.load(open("emission/tests/data/real_examples/shankari_single_positional_indexer.dec-12.ground_truth"), object_hook=bju.object_hook)
+
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth).data)
+
+    def testOverriddenModeHack(self):
+        # Test for https://github.com/e-mission/e-mission-server/issues/457
+        dataFile = "emission/tests/data/real_examples/test_overriden_mode_hack.jul-31"
+        start_ld = ecwl.LocalDate({'year': 2017, 'month': 7, 'day': 31})
+        cacheKey = "diary/trips-2017-07-31"
+        ground_truth = json.load(open("emission/tests/data/real_examples/test_overriden_mode_hack.jul-31.ground_truth"), object_hook=bju.object_hook)
+
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth).data)
+
+    def testJan16SpeedAssert(self):
+        # Test for https://github.com/e-mission/e-mission-server/issues/457
+        dataFile = "emission/tests/data/real_examples/another_speed_assertion_failure.jan-16"
+        start_ld = ecwl.LocalDate({'year': 2016, 'month': 1, 'day': 16})
+        cacheKey = "diary/trips-2016-01-16"
+        ground_truth = json.load(open("emission/tests/data/real_examples/another_speed_assertion_failure.jan-16.ground_truth"), object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)

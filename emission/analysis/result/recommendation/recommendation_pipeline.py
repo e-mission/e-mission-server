@@ -1,4 +1,13 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import *
+from builtins import object
 import json
 import uuid
 import logging
@@ -13,7 +22,7 @@ import emission.core.wrapper.trip_old as t
 from emission.net.ext_service.gmaps.common import get_uuid_list, get_recommender_uuid_list
 import emission.analysis.modelling.user_model.alternative_trips_module as atm
 
-class RecommendationPipeline:
+class RecommendationPipeline(object):
     def get_trips_to_improve(self, user_uuid):
         # pick trips which we would like to improve
         # will make usage of canonical trip class
@@ -79,7 +88,7 @@ class RecommendationPipeline:
 
     def prepare_feature_vectors(self, trips, alternatives):
 	logging.debug("Before zipping, trips, alternatives lengths are %d, %d " % (len(list(trips)), len(alternatives)))
-        vector = zip(trips, alternatives)
+        vector = list(zip(trips, alternatives))
 	logging.debug("After zipping, vector length is %d " % len(vector))
         vector = [(trip,list(alts)) for trip, alts in vector if alts] 
 	logging.debug("After preparing feature vectors, vector length is %d " % len(vector))

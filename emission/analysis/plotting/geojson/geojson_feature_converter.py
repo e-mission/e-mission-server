@@ -1,3 +1,12 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import map
+from builtins import str
+from builtins import *
 import logging
 import geojson as gj
 import copy
@@ -47,7 +56,7 @@ def location_to_geojson(location):
         ret_feature.properties["feature_type"] = "location"
         _del_non_derializable(ret_feature.properties, ["loc"])
         return ret_feature
-    except Exception, e:
+    except Exception as e:
         logging.exception(("Error while converting object %s" % location))
         raise e
 
@@ -167,7 +176,7 @@ def geojson_incidents_in_range(user_id, start_ts, end_ts):
     incident_entry_docs = list(ts.find_entries([MANUAL_INCIDENT_KEY], time_query=tq)) \
         + list(uc.getMessage([MANUAL_INCIDENT_KEY], tq))
     incidents = [ecwe.Entry(doc) for doc in incident_entry_docs]
-    return map(incident_to_geojson, incidents)
+    return list(map(incident_to_geojson, incidents))
 
 def point_array_to_line(point_array):
     points_line_string = gj.LineString()
@@ -260,7 +269,7 @@ def get_geojson_for_timeline(user_id, tl):
             trip_geojson = trip_to_geojson(trip, tl)
             if trip_geojson is not None:
                 geojson_list.append(trip_geojson)
-        except Exception, e:
+        except Exception as e:
             logging.exception("Found error %s while processing trip %s" % (e, trip))
             raise e
     logging.debug("trip count = %d, geojson count = %d" %

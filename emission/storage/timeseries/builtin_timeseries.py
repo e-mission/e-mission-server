@@ -1,3 +1,10 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import logging
 import pandas as pd
 import pymongo
@@ -16,8 +23,8 @@ ts_enum_map = {
 class BuiltinTimeSeries(esta.TimeSeries):
     def __init__(self, user_id):
         super(BuiltinTimeSeries, self).__init__(user_id)
-        self.key_query = lambda(key): {"metadata.key": key}
-        self.type_query = lambda(entry_type): {"metadata.type": entry_type}
+        self.key_query = lambda key: {"metadata.key": key}
+        self.type_query = lambda entry_type: {"metadata.type": entry_type}
         self.user_query = {"user_id": self.user_id} # UUID is mandatory for this version
         self.timeseries_db = ts_enum_map[esta.EntryType.DATA_TYPE]
         self.analysis_timeseries_db = ts_enum_map[esta.EntryType.ANALYSIS_TYPE]
@@ -48,6 +55,8 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "stats/client_nav_event": self.timeseries_db,
                 "stats/client_error": self.timeseries_db,
                 "manual/incident": self.timeseries_db,
+                "manual/mode_confirm": self.timeseries_db,
+                "manual/purpose_confirm": self.timeseries_db,
                 "segmentation/raw_trip": self.analysis_timeseries_db,
                 "segmentation/raw_place": self.analysis_timeseries_db,
                 "segmentation/raw_section": self.analysis_timeseries_db,
@@ -219,9 +228,14 @@ class BuiltinTimeSeries(esta.TimeSeries):
         return ts_db_result
 
     def get_entry_at_ts(self, key, ts_key, ts):
-        query = {"user_id": self.user_id, "metadata.key": key, ts_key: ts}
+        import numpy as np
+
+        query_ts = float(ts) if type(ts) == np.int64 or type(ts) == np.float64 else ts
+        query = {"user_id": self.user_id, "metadata.key": key, ts_key: query_ts}
         logging.debug("get_entry_at_ts query = %s" % query)
-        return self.get_timeseries_db(key).find_one(query)
+        retValue = self.get_timeseries_db(key).find_one(query)
+        logging.debug("get_entry_at_ts result = %s" % retValue)
+        return retValue
 
     def get_data_df(self, key, time_query = None, geo_query = None,
                     extra_query_list=None,
@@ -293,17 +307,29 @@ class BuiltinTimeSeries(esta.TimeSeries):
             keyfunc = lambda e: e.metadata.key
             sorted_data = sorted(entries, key=keyfunc)
             for k, g in itertools.groupby(sorted_data, keyfunc):
-                glist = list(g)
-                logging.debug("Inserting %s entries for key %s" % (len(glist), k))
-                self.get_timeseries_db(k).insert(glist, continue_on_error=False)
+                try:
+                    glist = list(g)
+                    logging.debug("Inserting %s entries for key %s" % (len(glist), k))
+                    self.get_timeseries_db(k).insert_many(glist, ordered=True)
+                except pymongo.errors.BulkWriteError as e:
+                    logging.info("Got errors %s while saving %d entries for key %s" % 
+                        (e.details['writeErrors'], len(glist), k))
         else:
-            return ts_enum_map[data_type].insert(entries, continue_on_error=True)
+            multi_result = None
+            try:
+                multi_result = ts_enum_map[data_type].insert_many(entries, ordered=False)
+                logging.debug("Returning multi_result.inserted_ids = %s... of length %d" % 
+                    (multi_result.inserted_ids[:10], len(multi_result.inserted_ids)))
+                return multi_result
+            except pymongo.errors.BulkWriteError as e:
+                logging.info("Got errors %s while saving %d entries" % 
+                    (e.details['writeErrors'], len(entries)))
 
     def insert(self, entry):
         """
         Inserts the specified entry and returns the object ID 
         """
-        logging.debug("insert called")
+        logging.debug("insert called with entry of type %s" % type(entry))
         if type(entry) == dict:
             entry = ecwe.Entry(entry)
         if "user_id" not in entry or entry["user_id"] is None:
@@ -315,7 +341,8 @@ class BuiltinTimeSeries(esta.TimeSeries):
             logging.debug("entry was fine, no need to fix it")
 
         logging.debug("Inserting entry %s into timeseries" % entry)
-        return self.get_timeseries_db(entry.metadata.key).insert(entry)
+        ins_result = self.get_timeseries_db(entry.metadata.key).insert_one(entry)
+        return ins_result.inserted_id
 
     def insert_data(self, user_id, key, data):
         """
@@ -351,7 +378,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
         logging.debug("update called")
         ts = esta.TimeSeries.get_time_series(entry.user_id)
         logging.debug("Saving entry %s into timeseries" % entry)
-        ts.get_timeseries_db(entry.metadata.key).save(entry)
+        edb.save(ts.get_timeseries_db(entry.metadata.key), entry)
 
     @staticmethod
     def update_data(user_id, key, obj_id, data):
@@ -367,5 +394,5 @@ class BuiltinTimeSeries(esta.TimeSeries):
         # Make sure that we update the existing entry instead of creating a new one
         new_entry['_id'] = obj_id
         logging.debug("updating entry %s into timeseries" % new_entry)
-        ts.get_timeseries_db(key).save(new_entry)
+        edb.save(ts.get_timeseries_db(key), new_entry)
 

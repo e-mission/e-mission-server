@@ -1,3 +1,10 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import logging
 import pytz
 import attrdict as ad
@@ -15,8 +22,8 @@ def format(entry):
     metadata = entry.metadata
     try:
         valid_tz = pytz.timezone(entry.metadata.time_zone)
-    except pytz.UnknownTimeZoneError, e:
-        logging.warn("Got error %s while checking format validity" % e)
+    except pytz.UnknownTimeZoneError as e:
+        logging.warning("Got error %s while checking format validity" % e)
         # Default timezone in for the Bay Area, which is probably a fairly safe
         # assumption for now
         metadata.time_zone = "America/Los_Angeles"

@@ -1,3 +1,10 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import logging
 import arrow
 
@@ -18,7 +25,7 @@ def convert_collection(collection, key):
         if entry.get_id() != wrapper["_id"]:
             logging.warn("entry.id = %s, wrapper.id = %s" % (entry.get_id(), wrapper["_id"]))
         if i % 10000 == 0:
-            print "converted %s -> %s" % (wrapper, entry)
+            print("converted %s -> %s" % (wrapper, entry))
         edb.get_timeseries_db().insert(entry)
         # collection.remove(wrapper)
 
@@ -32,7 +39,7 @@ def move_ts_entries(key):
     for i, entry_doc in enumerate(result_cursor):
       try:
         if i % 10000 == 0:
-            print "moved %s from one ts to the other" % (entry_doc)
+            print("moved %s from one ts to the other" % (entry_doc))
         atdb.insert(entry_doc)
         # tdb.remove(entry_doc)
       except:

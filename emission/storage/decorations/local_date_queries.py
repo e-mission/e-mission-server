@@ -1,3 +1,10 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import logging
 import pymongo
 import arrow
@@ -11,9 +18,9 @@ def get_local_date(ts, timezone):
     'weekday': adt.weekday(), 'timezone': timezone})
 
 def get_range_query(field_name, start_local_dt, end_local_dt):
-    if start_local_dt.keys() != end_local_dt.keys():
+    if list(start_local_dt.keys()) != list(end_local_dt.keys()):
         raise RuntimeError("start_local_dt.keys() = %s does not match end_local_dt.keys() = %s" %
-            (start_local_dt.keys(), end_local_dt.keys()))
+            (list(start_local_dt.keys()), list(end_local_dt.keys())))
     query_result = {}
     for key in start_local_dt:
         curr_field = "%s.%s" % (field_name, key)

@@ -1,4 +1,13 @@
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
+from past.utils import old_div
 import logging
 import attrdict as ad
 import numpy as np
@@ -154,13 +163,13 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
             # _time filter_ points, or because we didn't get points for
             # that duration, (e.g. because we were underground)
             if timeDelta > 0:
-                speedDelta = distDelta / timeDelta
+                speedDelta = old_div(distDelta, timeDelta)
             else:
                 speedDelta = np.nan
             # this is way too slow. On ios, we use 5meters in 10 minutes.
             # On android, we use 10 meters in 5 mins, which seems to work better
             # for this kind of test
-            speedThreshold = float(self.distance_threshold * 2) / (self.time_threshold / 2)
+            speedThreshold = old_div(float(self.distance_threshold * 2), (old_div(self.time_threshold, 2)))
 
             if eaisr.is_tracking_restarted_in_range(lastPoint.ts, currPoint.ts, timeseries):
                 logging.debug("tracking was restarted, ending trip")

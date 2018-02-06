@@ -1,3 +1,10 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import logging
 
 import emission.core.get_database as edb
@@ -96,6 +103,8 @@ def get_last_place_before(place_key, reset_ts, user_id):
         logging.debug("last_place = %s, reset_ts = %s" % 
             (last_place, reset_ts))
         if last_place is None:
+            return None
+        elif last_place.data.enter_ts is None:
             return None
         elif last_place.data.enter_ts < reset_ts:
             return last_place

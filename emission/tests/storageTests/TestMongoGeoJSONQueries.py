@@ -1,4 +1,11 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import unittest
 
 # Our imports
@@ -74,8 +81,6 @@ class TestGeoJSON(unittest.TestCase):
     pnt = {'type':'Point', 'coordinates': [90.5, 35.5]} # works
     sec1 = {'track_location': pnt}
     self.Sections.insert(sec1)
-
-    print common.Inside_polygon(pnt, common.berkeley_area())
 
     retVal = []
     for a in self.Sections.find({ "track_location" : { "$geoWithin" : { "$polygon" : self.getTestPolygon2() } } }):

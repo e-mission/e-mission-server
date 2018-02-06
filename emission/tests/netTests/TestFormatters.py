@@ -1,4 +1,11 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import unittest
 import datetime as pydt
 import logging
@@ -19,7 +26,7 @@ import emission.core.wrapper.transition as et
 class TestFormatters(unittest.TestCase):
     def testConvertMotionActivity(self):
         entry = json.load(open("emission/tests/data/netTests/android.activity.txt"))
-        logging.debug("entry.keys() = %s" % entry.keys())
+        logging.debug("entry.keys() = %s" % list(entry.keys()))
         formatted_entry = enuf.convert_to_common_format(ad.AttrDict(entry))
         self.assertEquals(formatted_entry.data.confidence, 100)
         self.assertEquals(formatted_entry.data.type, ema.MotionTypes.TILTING.value)
@@ -68,7 +75,7 @@ class TestFormatters(unittest.TestCase):
         data["cycling"] = True
         with self.assertRaisesRegexp(RuntimeError, ".*two modes.*"):
             enum = ioma.type_flags_to_enum(data)
-            logging.warn("Got result num = %s instead of raising exception" % enum)
+            logging.warning("Got result num = %s instead of raising exception" % enum)
     
     def testFlagsToEnumNoEntries(self):
         import emission.net.usercache.formatters.ios.motion_activity as ioma

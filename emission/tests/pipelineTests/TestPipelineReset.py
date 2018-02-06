@@ -1,5 +1,13 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # This test is for the pipeline reset code
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import *
 import unittest
 import logging
 import json
@@ -376,6 +384,8 @@ class TestPipelineReset(unittest.TestCase):
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_2, start_ld_2)
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth_2).data)
+
+    # TODO: Add tests for no place and one place
 
 
 if __name__ == '__main__':

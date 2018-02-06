@@ -1,4 +1,11 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import unittest
 import datetime as pydt
 import logging
@@ -31,12 +38,12 @@ class TestSaveAllConfigs(unittest.TestCase):
         logging.debug("androidUUID = %s, iosUUID = %s" % (self.androidUUID, self.iosUUID))
 
     def tearDown(self):
-        edb.get_timeseries_db().remove({"user_id": self.androidUUID}) 
-        edb.get_timeseries_db().remove({"user_id": self.iosUUID}) 
-        edb.get_usercache_db().remove({"user_id": self.androidUUID}) 
-        edb.get_usercache_db().remove({"user_id": self.iosUUID}) 
-        edb.get_analysis_timeseries_db().remove({"user_id": self.androidUUID})
-        edb.get_analysis_timeseries_db().remove({"user_id": self.iosUUID})
+        edb.get_timeseries_db().delete_many({"user_id": self.androidUUID}) 
+        edb.get_timeseries_db().delete_many({"user_id": self.iosUUID}) 
+        edb.get_usercache_db().delete_many({"user_id": self.androidUUID}) 
+        edb.get_usercache_db().delete_many({"user_id": self.iosUUID}) 
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.androidUUID})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.iosUUID})
 
     def testNoOverrides(self):
         tq = estt.TimeQuery("metadata.write_ts", 1440658800, 1440745200)

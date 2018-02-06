@@ -1,3 +1,10 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import logging
 
 import emission.core.get_database as edb
@@ -49,7 +56,7 @@ def reset_user_to_ts(user_id, ts, is_dry_run):
         if last_cleaned_place is None or last_cleaned_place.data.exit_ts is None:
             logging.info("Data collection for user %s stopped before reset time, early return" % user_id)
             return
-    except ValueError, e:
+    except ValueError as e:
         first_cleaned_place = esdp.get_first_place_entry(esda.CLEANED_PLACE_KEY, user_id)
         if first_cleaned_place is not None and first_cleaned_place.data.exit_ts > ts:
             logging.info("first_cleaned_place.exit = %s (%s), resetting to start" % 
@@ -150,6 +157,10 @@ def reset_pipeline_state(user_id, reset_ts, is_dry_run):
     # Fuzz the TRIP_SEGMENTATION stage 5 mins because of
     # https://github.com/e-mission/e-mission-server/issues/333#issuecomment-312730217
     FUZZ_FACTOR = 5 * 60
+    if reset_ts is None:
+        logging.info("reset_ts = %s, returning from reset_pipeline_state without modifying anything" % None)
+        return
+        
     trip_seg_reset_pipeline_query = {'user_id': user_id,
                                      'last_processed_ts': {'$ne': None},
     # only reset entries that are after the reset_ts

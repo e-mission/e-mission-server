@@ -1,3 +1,13 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import zip
+from builtins import str
+from builtins import range
+from builtins import *
 import logging
 
 import json
@@ -30,19 +40,30 @@ def register_fake_users(prefix, unique_user_list):
         user = ecwu.User.registerWithUUID(username, uuid)
 
 def get_load_ranges(entries):
-    start_indices = range(0, len(entries), args.batch_size)
-    ranges = zip(start_indices, start_indices[1:])
+    start_indices = list(range(0, len(entries), args.batch_size))
+    ranges = list(zip(start_indices, start_indices[1:]))
     ranges.append((start_indices[-1], len(entries)))
     return ranges
+
+def load_pipeline_states(file_prefix, all_uuid_list):
+    import emission.core.get_database as edb
+    for curr_uuid in all_uuid_list:
+        pipeline_filename = "%s_pipelinestate_%s.gz" % (file_prefix, curr_uuid)
+        print("Loading pipeline state for %s from %s" % 
+            (curr_uuid, pipeline_filename))
+        with gzip.open(filename) as gfd:
+            states = json.load(gfd, object_hook = bju.object_hook)
+            edb.get_pipeline_state_db().insert_many(states)
 
 def post_check(unique_user_list, all_rerun_list):
     import emission.core.get_database as edb
     import numpy as np
 
-    logging.info("For %s users, loaded %s raw entries and %s processed entries" %
+    logging.info("For %s users, loaded %s raw entries, %s processed entries and %s pipeline states" %
         (len(unique_user_list),
          edb.get_timeseries_db().find({"user_id": {"$in": list(unique_user_list)}}).count(),
-         edb.get_analysis_timeseries_db().find({"user_id": {"$in": list(unique_user_list)}}).count()))
+         edb.get_analysis_timeseries_db().find({"user_id": {"$in": list(unique_user_list)}}).count(),
+         edb.get_pipeline_state_db().find({"user_id": {"$in": list(unique_user_list)}}).count()))
 
     all_rerun_arr = np.array(all_rerun_list)
    
@@ -58,7 +79,7 @@ def post_check(unique_user_list, all_rerun_list):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("timeline_filename",
+    parser.add_argument("file_prefix",
         help="the name of the file or file prefix that contains the json representation of the timeline")
 
     parser.add_argument("-d", "--debug", type=int,
@@ -70,7 +91,7 @@ if __name__ == '__main__':
     parser.add_argument("-i", "--info-only", default=False, action='store_true',
         help="only print entry analysis")
 
-    parser.add_argument("-s", "--batch-size", default=10000,
+    parser.add_argument("-s", "--batch-size", default=10000, type=int,
         help="batch size to use for the entries")
 
     parser.add_argument("-p", "--prefix", default="user",
@@ -82,7 +103,7 @@ if __name__ == '__main__':
     else:
         logging.basicConfig(level=logging.INFO)
 
-    fn = args.timeline_filename
+    fn = args.file_prefix
     logging.info("Loading file or prefix %s" % fn)
     sel_file_list = common.read_files_with_prefix(fn)
 
@@ -90,6 +111,8 @@ if __name__ == '__main__':
     all_rerun_list = []
 
     for i, filename in enumerate(sel_file_list):
+        if "pipelinestate" in filename:
+            continue
         logging.info("=" * 50)
         logging.info("Loading data from file %s" % filename)
         
@@ -118,6 +141,7 @@ if __name__ == '__main__':
 
     unique_user_list = set(all_user_list)
     if not args.info_only:
+        load_pipeline_states(args.file_prefix, unique_user_list)
         register_fake_users(args.prefix, unique_user_list)
        
     post_check(unique_user_list, all_rerun_list) 

@@ -1,6 +1,13 @@
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
 # Our imports
-import emission.core.common as ec
-
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import *
+from past.utils import old_div
 def lcs(a, b,radiusBound):
     lengths = [[0 for j in range(len(b)+1)] for i in range(len(a)+1)]
     # row 0 and column 0 are initialized to 0 already
@@ -29,4 +36,4 @@ def lcs(a, b,radiusBound):
     return lengths[-1][-1]
 
 def lcsScore(route1, route2,radiusBound):
-    return 1-lcs(route1, route2,radiusBound)/min(len(route1),len(route2))
+    return 1-old_div(lcs(route1, route2,radiusBound),min(len(route1),len(route2)))

@@ -1,4 +1,12 @@
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 #Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import *
 import unittest
 import json
 import logging
@@ -6,7 +14,8 @@ import numpy as np
 from datetime import datetime, timedelta
 
 # Our imports
-from emission.core.get_database import get_db, get_mode_db, get_section_db
+import emission.core.get_database as edb
+from emission.core.get_database import _get_current_db, get_mode_db, get_section_db
 import emission.analysis.classification.inference.mode as pipeline
 from emission.core.wrapper.user import User
 from emission.core.wrapper.client import Client
@@ -26,7 +35,7 @@ class TestPipeline(unittest.TestCase):
 
     # Sometimes, we may have entries left behind in the database if one of the tests failed
     # or threw an exception, so let us start by cleaning up all entries
-    etc.dropAllCollections(get_db())
+    etc.dropAllCollections(edb._get_current_db())
 
     self.ModesColl = get_mode_db()
     self.assertEquals(self.ModesColl.find().count(), 0)
@@ -132,6 +141,8 @@ class TestPipeline(unittest.TestCase):
     self.testGenerateBusAndTrainStops()
 
     (self.pipeline.featureMatrix, self.pipeline.resultVector) = self.pipeline.generateFeatureMatrixAndResultVectorStep()
+    print("Number of sections = %s" % self.pipeline.confirmedSections.count())
+    print("Feature Matrix shape = %s" % str(self.pipeline.featureMatrix.shape))
     self.assertEquals(self.pipeline.featureMatrix.shape[0], self.pipeline.confirmedSections.count())
     self.assertEquals(self.pipeline.featureMatrix.shape[1], len(self.pipeline.featureLabels))
 
@@ -271,48 +282,15 @@ class TestPipeline(unittest.TestCase):
     self.assertIsNotNone(test_id_1_sec['distance'])
     self.assertIsNotNone(test_id_2_sec['trip_id'])
 
-  def testSavePredictionsStepWithClient(self):
-    from emission.core.wrapper.user import User
-
-    fakeEmail = "fest@example.com"
-
-    client = Client("testclient")
-    client.update(createKey = False)
-    etc.makeValid(client)
-
-    (resultPre, resultReg) = client.preRegister("this_is_the_super_secret_id", fakeEmail)
-    self.assertEqual(resultPre, 0)
-    self.assertEqual(resultReg, 1)
-
-    user = User.fromEmail(fakeEmail)
-    self.assertEqual(user.getFirstStudy(), 'testclient')
-
-    self.testPredictedProb()
-    self.pipeline.savePredictionsStep()
-    # Confirm that the predictions are saved correctly
-
-    test_id_1_sec = self.SectionsColl.find_one({'_id': 'test_id_1'})
-    self.assertIsNotNone(test_id_1_sec['predicted_mode'])
-    self.assertEquals(test_id_1_sec['predicted_mode'], {'walking': 1})
-    self.assertEquals(test_id_1_sec['test_auto_confirmed'], {'mode': 1, 'prob': 1.0})
-
-    test_id_2_sec = self.SectionsColl.find_one({'_id': 'test_id_2'})
-    self.assertIsNotNone(test_id_2_sec['predicted_mode'])
-    self.assertEquals(test_id_2_sec['predicted_mode'], {'bus': 1})
-    self.assertEquals(test_id_2_sec['test_auto_confirmed'], {'mode': 5, 'prob': 1.0})
-
-    # Let's make sure that we didn't accidentally mess up other fields
-    self.assertIsNotNone(test_id_1_sec['distance'])
-    self.assertIsNotNone(test_id_2_sec['trip_id'])
-
   def testEntirePipeline(self):
     self.setupTestTrips()
     # Here, we only have 5 trips, so the pipeline looks for the backup training
     # set instead, which fails because there is no backup. So let's copy data from
     # the main DB to the backup DB to make this test pass
     from pymongo import MongoClient
-    MongoClient('localhost').drop_database("Backup_database")
-    MongoClient('localhost').copy_database("Stage_database","Backup_database","localhost")
+    client = MongoClient('localhost')
+    client.drop_database("Backup_database")
+    client.admin.command("copydb", fromdb="Stage_database", todb="Backup_database")
     self.pipeline.runPipeline()
 
     # Checks are largely the same as above

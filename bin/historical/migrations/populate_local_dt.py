@@ -1,8 +1,15 @@
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 # Note that this script is only retained for historical purposes,
 # to document how we expanded the local date entries. It will not run
 # any more, since we have removed the trip, place, section and stop
 # collections and merged them into the analysis database
 
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
 import logging
 # logging.basicConfig(level=logging.DEBUG)
 

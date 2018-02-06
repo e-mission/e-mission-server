@@ -43,7 +43,16 @@ For each of the representative trips, open them in MyMaps, and then adjust, add,
 * Maps will then be created of for each of these modified sections that compare the original section with its ground truth. If any issues are observed, then they can be modified and this importing process can be repeated.
 
 """
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
 # Standard imports
+from future import standard_library
+standard_library.install_aliases()
+from builtins import input
+from builtins import str
+from builtins import *
 import os, sys, random
 
 # Our imports
@@ -53,7 +62,7 @@ import emission.analysis.modelling.tour_model.prior_unused.cluster_groundtruth a
 
 def update_route_clusters(user):
     from Profile import generate_route_clusters
-    print "generating clusters for user %s" % user
+    print("generating clusters for user %s" % user)
     generate_route_clusters(user, 20)
 
 def cluster_to_kml(user, cluster, cluster_id):
@@ -66,7 +75,7 @@ def cluster_to_kml(user, cluster, cluster_id):
     """ 
     Sections = edb.get_section_db()
     for i,chunk in enumerate(eaut.chunks(cluster,10)):    
-        sections = map(lambda section_id: Sections.find_one({'_id':section_id}), chunk)
+        sections = [Sections.find_one({'_id':section_id}) for section_id in chunk]
         eaut.sections_to_kml("%s_cluster_data_kml/CLUSTER_%s_%i" % (user, str(cluster_id), i), sections)
         
 def all_user_clusters_to_kml(user, user_id):
@@ -74,10 +83,10 @@ def all_user_clusters_to_kml(user, user_id):
     Creates KML files for all of a given user's clusters
     """
     user_clusters = edb.get_routeCluster_db().find_one({'$and':[{'user':user_id},{'method':"dtw"}]})
-    num_clusters = len(user_clusters['clusters'].items())
+    num_clusters = len(list(user_clusters['clusters'].items()))
 
     print("Writing " + str(num_clusters) + " clusters to disk for " + user + ".")
-    for idc, cluster in user_clusters['clusters'].items():
+    for idc, cluster in list(user_clusters['clusters'].items()):
         cluster_to_kml(user, cluster, idc)
 
 def __collect(user, user_id):
@@ -103,7 +112,7 @@ def __read_user_clusters_kml(user):
     success, message = eacg.check_named_clusters(path)
     if not success:
         exit(message)
-    print message
+    print(message)
     for kml in os.listdir(path):
         infile_path = os.path.join(path, kml)
         eacg.update_db_with_clusters(user, infile_path)
@@ -164,7 +173,7 @@ if __name__ == "__main__":
     from uuid import UUID
     user_uuid = eaut.read_uuids()
     parser = argparse.ArgumentParser(description='Ground truth')
-    parser.add_argument('user', metavar='U', type=str, choices=user_uuid.keys(), 
+    parser.add_argument('user', metavar='U', type=str, choices=list(user_uuid.keys()), 
                         help='Type a user you want to ground truth')
     parser.add_argument('-u', '--update', dest='update', action='store_const',
                         const=True, default=False,
@@ -194,7 +203,7 @@ if __name__ == "__main__":
         os.makedirs(directory)
     elif dir_exists and not args.force:
         abort = True
-        put = raw_input("Are you sure you want to overwrite %s_cluster_data_kml? [Y/n]" % user)
+        put = input("Are you sure you want to overwrite %s_cluster_data_kml? [Y/n]" % user)
         if put.strip().lower() in ("yes", "y"):
             abort = False
     if abort:
