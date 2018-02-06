@@ -8,7 +8,7 @@ import os
 from pymongo import MongoClient
 
 # Our imports
-from emission.core.get_database import get_db, get_mode_db, get_section_db
+from emission.core.get_database import get_mode_db, get_section_db
 # This is the old "seed" pipeline
 import emission.analysis.classification.inference.mode.seed.pipeline as pipeline
 from emission.core.wrapper.user import User
@@ -21,24 +21,27 @@ class TestPipelineSeed(unittest.TestCase):
                       "rest@example.com", "nest@example.com"]
     self.serverName = 'localhost'
 
+    self.ModesColl = get_mode_db()
+    self.SectionsColl = get_section_db()
+
+    # Let's make sure that the users are registered so that they have profiles
+    user_objects = []
+    for userEmail in self.testUsers:
+      user_objects.append(User.register(userEmail))
+
     # Sometimes, we may have entries left behind in the database if one of the tests failed
     # or threw an exception, so let us start by cleaning up all entries
-    etc.dropAllCollections(get_db())
+    for testUser in user_objects:
+        etc.purgeSectionData(self.SectionsColl, testUser.uuid)
 
-    self.ModesColl = get_mode_db()
     self.assertEquals(self.ModesColl.find().count(), 0)
 
-    self.SectionsColl = get_section_db()
     self.assertEquals(self.SectionsColl.find().count(), 0)
 
     MongoClient('localhost').drop_database("Backup_database")
 
     etc.loadTable(self.serverName, "Stage_Modes", "emission/tests/data/modes.json")
     etc.loadTable(self.serverName, "Stage_Sections", "emission/tests/data/testModeInferSeedFile")
-
-    # Let's make sure that the users are registered so that they have profiles
-    for userEmail in self.testUsers:
-      User.register(userEmail)
 
     self.now = datetime.now()
     self.dayago = self.now - timedelta(days=1)
@@ -116,8 +119,8 @@ class TestPipelineSeed(unittest.TestCase):
     self.testGenerateBusAndTrainStops()
 
     (self.pipeline.featureMatrix, self.pipeline.resultVector) = self.pipeline.generateFeatureMatrixAndResultVectorStep()
-    print "Number of sections = %s" % self.pipeline.confirmedSections.count()
-    print "Feature Matrix shape = %s" % str(self.pipeline.featureMatrix.shape)
+    logging.debug("Number of sections = %s" % self.pipeline.confirmedSections.count())
+    logging.debug("Feature Matrix shape = %s" % str(self.pipeline.featureMatrix.shape))
     self.assertEquals(self.pipeline.featureMatrix.shape[0], self.pipeline.confirmedSections.count())
     self.assertEquals(self.pipeline.featureMatrix.shape[1], len(self.pipeline.featureLabels))
 
@@ -200,7 +203,10 @@ class TestPipelineSeed(unittest.TestCase):
     # Here, we only have 5 trips, so the pipeline looks for the backup training
     # set instead, which fails because there is no backup. So let's copy data from
     # the main DB to the backup DB to make this test pass
-    MongoClient('localhost').copy_database("Stage_database","Backup_database","localhost")
+    MongoClient('localhost').admin.command("copydb",
+        fromdb="Stage_database",
+        todb="Backup_database",
+        fromhost="localhost")
     self.pipeline.runPipeline()
 
     # Checks are largely the same as above

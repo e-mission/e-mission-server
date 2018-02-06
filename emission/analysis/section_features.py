@@ -82,7 +82,7 @@ def calHCR(segment):
         return 0
   
     if not locations:
-		return 0
+        return 0
     else:
         HCNum = 0
         for (i, point) in locations:
@@ -107,7 +107,7 @@ def calSR(segment):
         return 0
     speeds = segment.speeds
     if len(speeds) < 2:
-		return 0
+        return 0
     else:
         stopNum = 0
         for (i, speed) in enumerate(speeds[:-1]):

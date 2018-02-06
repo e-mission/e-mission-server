@@ -180,9 +180,9 @@ def get_analysis_timeseries_db():
     return AnalysisTimeSeries
 
 def get_non_user_timeseries_db():
-    """^M
+    """
     " Stores the data that is not associated with a particular user
-    """^M
+    """
     NonUserTimeSeries = _get_current_db().Stage_analysis_timeseries
     NonUserTimeSeries.create_index([("user_id", pymongo.HASHED)])
     _create_analysis_result_indices(NonUserTimeSeries)
@@ -266,4 +266,3 @@ def save(db, entry):
 #     else:
 #         db.replace_one({}, entry, upsert=True)
     db.save(entry)
->>>>>>> fa7052e26cd300b719c48faa048ebd6876d51fdc

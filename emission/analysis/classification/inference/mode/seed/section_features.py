@@ -52,7 +52,7 @@ def calHC(point1, point2, point3):
 def calHCR(segment):
     trackpoints = segment['track_points']
     if len(trackpoints) < 3:
-		return 0
+        return 0
     else:
         HCNum = 0
         for (i, point) in enumerate(trackpoints[:-2]):
@@ -74,7 +74,7 @@ def calHCR(segment):
 def calSR(segment):
     trackpoints = segment['track_points']
     if len(trackpoints) < 2:
-		return 0
+	    return 0
     else:
         stopNum = 0
         for (i, point) in enumerate(trackpoints[:-1]):
@@ -94,7 +94,7 @@ def calSR(segment):
 def calVCR(segment):
     trackpoints = segment['track_points']
     if len(trackpoints) < 3:
-		return 0
+	    return 0
     else:
         Pv = 0
         for (i, point) in enumerate(trackpoints[:-2]):
