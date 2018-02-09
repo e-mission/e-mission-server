@@ -42,7 +42,7 @@ def calculate_single_suggestion(uuid):
 def handle_insert(tripDict, tripID, collection, uuid):
     if tripDict == None:
         collection.insert_one({'uuid': uuid, 'trip_id': tripID})
-        return False
+        return True
     else:
         if tripDict['trip_id'] != tripID:
             return True
