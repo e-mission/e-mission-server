@@ -80,7 +80,6 @@ def check_against_business_location(location='0, 0', address = ''):
         except:
             raise ValueError("Something went wrong")
 
-
 def calculate_single_suggestion(uuid):
     #Given a single UUID, create a suggestion for them
     return_obj = { 'message': "Good job walking and biking! No suggestion to show.",
