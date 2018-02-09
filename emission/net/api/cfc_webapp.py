@@ -315,7 +315,7 @@ def getListOfUsers():
     for user in tier['users']:
         uuid = user['uuid']
         username = User.getUsername(uuid)
-        carbon = user['lastWeekCarbon'] * 1000
+        carbon = round(user['lastWeekCarbon'] * 1000 , -3)
         if username == None:
             result = {'uuid': uuid, 'carbonLastWeek': carbon}
             curr_tier.append(result)
