@@ -79,7 +79,7 @@ def updateAll():
 	"""
 	Updates all Polar Bears' attributes
 	"""
-	tiersys = Tiersys.getLatest()[0]['tiers']
+	tiersys = TierSys.getLatest()[0]['tiers']
 	for tier in tiersys:
 		for user in tier['users']:
 			updatePolarBear(user['uuid'])
