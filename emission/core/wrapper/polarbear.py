@@ -9,7 +9,7 @@ def setPolarBearattr(attrs):
 		{user_id: num, username: string, happiness:int, size: int}
 	"""
 	polarBearCollection = db.get_polarbear_db()
-	userDict = polarBearCollection.find_one({'user_id' : 'user_id'})
+	userDict = polarBearCollection.find_one({'user_id' : attrs['user_id']})
 	if userDict == None:
 		polarBearCollection.insert_one(attrs)
 	else:
@@ -22,7 +22,7 @@ def setPolarBearattr(attrs):
 		)
 
 def getPolarBearattr(user_id):
-	""" 
+	"""
 	Return a dictionary containing all Polar Bear attributes
 	 {user_id: num, username: string, happiness:int, size: int}
 	"""
@@ -41,7 +41,7 @@ def getAllBearsInTier(user_id):
 	for uuid in userTier:
 		userattrs = getPolarBearattr(uuid)
 		currUsername = userattrs['username']
-		allUsers[currUsername] = [userattrs['happiness'], userattrs['size']]			
+		allUsers[currUsername] = [userattrs['happiness'], userattrs['size']]
 	return allUsers
 
 

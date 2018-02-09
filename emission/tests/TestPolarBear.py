@@ -24,9 +24,10 @@ class TestTierSys(unittest.TestCase):
       etc.dropAllCollections(edb._get_current_db())
       return
 
-  def testUpdatePolarBear(self):
+  def testUpdatePolarBear1(self):
   	""" 
-	Creates a tier 
+	Creates a tiersys and tests updating polar attributes.
+	In this test, 
   	"""
 
 
