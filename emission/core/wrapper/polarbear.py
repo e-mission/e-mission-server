@@ -81,5 +81,6 @@ def updateAll():
 	"""
 	tiersys = Tiersys.getLatest()[0]['tiers']
 	for tier in tiersys:
-		for user_id in tier['uuids']:
-			updatePolarBear(user_id)
+		for user in tier['users']:
+			updatePolarBear(user['uuid'])
+updateAll()
