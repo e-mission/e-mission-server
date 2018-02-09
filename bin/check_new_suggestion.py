@@ -24,17 +24,7 @@ def calculate_single_suggestion(uuid):
             return False
         if cleaned_sections.iloc[i]["end_ts"] - cleaned_sections.iloc[i]["start_ts"] < 5 * 60:
             continue
-        distance_in_miles = cleaned_sections.iloc[i]["distance"] * 0.000621371
-        mode = cleaned_sections.iloc[i]["sensed_mode"]
-        start_loc = cleaned_sections.iloc[i]["start_loc"]["coordinates"]
         trip_id = cleaned_sections.iloc[i]['trip_id']
-        start_lat = str(start_loc[0])
-        start_lon = str(start_loc[1])
-        print(cleaned_sections.iloc[i]["trip_id"])
-        print(cleaned_sections.iloc[i]["start_fmt_time"])
-        end_loc = cleaned_sections.iloc[i]["end_loc"]["coordinates"]
-        end_lat = str(end_loc[0])
-        end_lon = str(end_loc[1])
         tripDict = suggestion_trips.find_one({'uuid': uuid})
 
         #TODO: Add elif's for bus
