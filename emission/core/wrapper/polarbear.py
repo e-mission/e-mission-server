@@ -6,7 +6,7 @@ import emission.core.get_database as db
 def setPolarBearattr(attrs):
 	"""
 	Sets a Polar Bear's attributes based on input dict:
-		{user_id: num, username: string, happiness:int, size: int}
+		{user_id: num, username: string, happiness: int, oldHappiness: int, size: int}
 	"""
 	polarBearCollection = db.get_polarbear_db()
 	userDict = polarBearCollection.find_one({'user_id' : attrs['user_id']})
@@ -17,6 +17,7 @@ def setPolarBearattr(attrs):
 			{'user_id': attrs['user_id']},
 			{'$set' : {'username' : attrs['username'],
 			'happiness' : attrs['happiness'],
+			'oldHappiness': attrs['oldHappiness'],
 			'size' : attrs['size']
 			}}
 		)
@@ -24,7 +25,7 @@ def setPolarBearattr(attrs):
 def getPolarBearattr(user_id):
 	"""
 	Return a dictionary containing all Polar Bear attributes
-	 {user_id: num, username: string, happiness:int, size: int}
+	 {user_id: num, username: string, happiness: int, oldHappiness: int, size: int}
 	"""
 	polarBearCollection = db.get_polarbear_db()
 	return polarBearCollection.find_one({'user_id' : user_id})
@@ -59,11 +60,13 @@ def updatePolarBear(user_id):
 		setPolarBearattr({'user_id': user_id,
 						'username': currUsername,
 						'happiness': User.computeHappiness(user_id),
+						'oldHappiness' : None
 						'size' : 0
 						})
 	else:
 		#Update the user's Polar Bear with newer stats
 		newHappiness = User.computeHappiness(user_id)
+		currattr['oldHappiness'] = currattr['happiness']
 		currattr['happiness'] = newHappiness
 		currattr['username'] = User.getUsername(user_id)
 		if currattr['username'] == None:
