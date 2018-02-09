@@ -35,10 +35,11 @@ def getAllBearsInTier(user_id):
 		{'username1':[happiness1, size1], 'username2':[happiness2, size2]...}
 	"""
 	tiersys = Tiersys.getLatest()[0]
-	userTier = tierSys['tiers'][TierSys.getUserTier(user_id) - 1]['uuids']
-	#List of uuids of users within a tier
+	userTier = tierSys['tiers'][TierSys.getUserTier(user_id) - 1]['users']
+	#List of of users within a tier
 	allUsers = {}
-	for uuid in userTier:
+	for user in userTier:
+		uuid = user['uuid']
 		userattrs = getPolarBearattr(uuid)
 		currUsername = userattrs['username']
 		allUsers[currUsername] = [userattrs['happiness'], userattrs['size']]
@@ -79,7 +80,8 @@ def updateAll():
 	"""
 	Updates all Polar Bears' attributes
 	"""
-	tiersys = Tiersys.getLatest()[0]['tiers']
+	tiersys = TierSys.getLatest()[0]['tiers']
 	for tier in tiersys:
-		for user_id in tier['uuids']:
-			updatePolarBear(user_id)
+		for user in tier['users']:
+			updatePolarBear(user['uuid'])
+updateAll()

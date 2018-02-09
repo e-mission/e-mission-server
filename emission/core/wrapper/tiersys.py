@@ -31,11 +31,9 @@ class TierSys:
                 index += 1
         #Should I keep this -1?No
         return index
+        
     @staticmethod
     def computeTierRank(user_id):
-
-        #TODO: Change for new tier format
-
         tierSys = TierSys.getLatest()[0]
         #allTiers- dict rankNum : tierObject
         userTier = tierSys['tiers'][TierSys.getUserTier(user_id) - 1]['users']
