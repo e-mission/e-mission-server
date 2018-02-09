@@ -1,0 +1,387 @@
+[
+    {
+        "_id": {
+            "$oid": "5a5d7005c442d44402e67a23"
+        },
+        "user_id": {
+            "$uuid": "881137a35f07417a9c12530d2ceb23ea"
+        },
+        "metadata": {
+            "time_zone": "America/Los_Angeles",
+            "plugin": "none",
+            "write_ts": 1516072714.47254,
+            "platform": "ios",
+            "read_ts": 0,
+            "key": "manual/purpose_confirm",
+            "type": "message",
+            "write_local_dt": {
+                "year": 2018,
+                "month": 1,
+                "day": 15,
+                "hour": 19,
+                "minute": 18,
+                "second": 34,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2018-01-15T19:18:34.472540-08:00"
+        },
+        "data": {
+            "end_ts": 1481563931.135,
+            "label": "school",
+            "start_ts": 1481563177.681,
+            "start_local_dt": {
+                "year": 2016,
+                "month": 12,
+                "day": 12,
+                "hour": 9,
+                "minute": 19,
+                "second": 37,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-12-12T09:19:37.681000-08:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 12,
+                "day": 12,
+                "hour": 9,
+                "minute": 32,
+                "second": 11,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-12-12T09:32:11.135000-08:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5a5d7005c442d44402e67a27"
+        },
+        "user_id": {
+            "$uuid": "881137a35f07417a9c12530d2ceb23ea"
+        },
+        "metadata": {
+            "time_zone": "America/Los_Angeles",
+            "plugin": "none",
+            "write_ts": 1516072725.328583,
+            "platform": "ios",
+            "read_ts": 0,
+            "key": "manual/purpose_confirm",
+            "type": "message",
+            "write_local_dt": {
+                "year": 2018,
+                "month": 1,
+                "day": 15,
+                "hour": 19,
+                "minute": 18,
+                "second": 45,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2018-01-15T19:18:45.328583-08:00"
+        },
+        "data": {
+            "end_ts": 1481565307.256,
+            "label": "school",
+            "start_ts": 1481564056.911,
+            "start_local_dt": {
+                "year": 2016,
+                "month": 12,
+                "day": 12,
+                "hour": 9,
+                "minute": 34,
+                "second": 16,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-12-12T09:34:16.911000-08:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 12,
+                "day": 12,
+                "hour": 9,
+                "minute": 55,
+                "second": 7,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-12-12T09:55:07.256000-08:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5a5d7005c442d44402e67a2b"
+        },
+        "user_id": {
+            "$uuid": "881137a35f07417a9c12530d2ceb23ea"
+        },
+        "metadata": {
+            "time_zone": "America/Los_Angeles",
+            "plugin": "none",
+            "write_ts": 1516072736.493696,
+            "platform": "ios",
+            "read_ts": 0,
+            "key": "manual/purpose_confirm",
+            "type": "message",
+            "write_local_dt": {
+                "year": 2018,
+                "month": 1,
+                "day": 15,
+                "hour": 19,
+                "minute": 18,
+                "second": 56,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2018-01-15T19:18:56.493696-08:00"
+        },
+        "data": {
+            "end_ts": 1481593788.738,
+            "label": "pick_drop",
+            "start_ts": 1481592524.076,
+            "start_local_dt": {
+                "year": 2016,
+                "month": 12,
+                "day": 12,
+                "hour": 17,
+                "minute": 28,
+                "second": 44,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-12-12T17:28:44.076000-08:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 12,
+                "day": 12,
+                "hour": 17,
+                "minute": 49,
+                "second": 48,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-12-12T17:49:48.738000-08:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5a5d7005c442d44402e67a2d"
+        },
+        "user_id": {
+            "$uuid": "881137a35f07417a9c12530d2ceb23ea"
+        },
+        "metadata": {
+            "time_zone": "America/Los_Angeles",
+            "plugin": "none",
+            "write_ts": 1516072741.888691,
+            "platform": "ios",
+            "read_ts": 0,
+            "key": "manual/purpose_confirm",
+            "type": "message",
+            "write_local_dt": {
+                "year": 2018,
+                "month": 1,
+                "day": 15,
+                "hour": 19,
+                "minute": 19,
+                "second": 1,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2018-01-15T19:19:01.888691-08:00"
+        },
+        "data": {
+            "end_ts": 1481565307.256,
+            "label": "pick_drop",
+            "start_ts": 1481564056.911,
+            "start_local_dt": {
+                "year": 2016,
+                "month": 12,
+                "day": 12,
+                "hour": 9,
+                "minute": 34,
+                "second": 16,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-12-12T09:34:16.911000-08:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 12,
+                "day": 12,
+                "hour": 9,
+                "minute": 55,
+                "second": 7,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-12-12T09:55:07.256000-08:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5a5d7005c442d44402e67a2f"
+        },
+        "user_id": {
+            "$uuid": "881137a35f07417a9c12530d2ceb23ea"
+        },
+        "metadata": {
+            "time_zone": "America/Los_Angeles",
+            "plugin": "none",
+            "write_ts": 1516072746.459487,
+            "platform": "ios",
+            "read_ts": 0,
+            "key": "manual/purpose_confirm",
+            "type": "message",
+            "write_local_dt": {
+                "year": 2018,
+                "month": 1,
+                "day": 15,
+                "hour": 19,
+                "minute": 19,
+                "second": 6,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2018-01-15T19:19:06.459487-08:00"
+        },
+        "data": {
+            "end_ts": 1481563931.135,
+            "label": "pick_drop",
+            "start_ts": 1481563177.681,
+            "start_local_dt": {
+                "year": 2016,
+                "month": 12,
+                "day": 12,
+                "hour": 9,
+                "minute": 19,
+                "second": 37,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-12-12T09:19:37.681000-08:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 12,
+                "day": 12,
+                "hour": 9,
+                "minute": 32,
+                "second": 11,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-12-12T09:32:11.135000-08:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5a5d7005c442d44402e67a33"
+        },
+        "user_id": {
+            "$uuid": "881137a35f07417a9c12530d2ceb23ea"
+        },
+        "metadata": {
+            "time_zone": "America/Los_Angeles",
+            "plugin": "none",
+            "write_ts": 1516072769.4334102,
+            "platform": "ios",
+            "read_ts": 0,
+            "key": "manual/purpose_confirm",
+            "type": "message",
+            "write_local_dt": {
+                "year": 2018,
+                "month": 1,
+                "day": 15,
+                "hour": 19,
+                "minute": 19,
+                "second": 29,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2018-01-15T19:19:29.433410-08:00"
+        },
+        "data": {
+            "end_ts": 1481597197.113,
+            "label": "Not a trip",
+            "start_ts": 1481594091.492,
+            "start_local_dt": {
+                "year": 2016,
+                "month": 12,
+                "day": 12,
+                "hour": 17,
+                "minute": 54,
+                "second": 51,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-12-12T17:54:51.492000-08:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 12,
+                "day": 12,
+                "hour": 18,
+                "minute": 46,
+                "second": 37,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-12-12T18:46:37.113000-08:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5a5d7005c442d44402e67a37"
+        },
+        "user_id": {
+            "$uuid": "881137a35f07417a9c12530d2ceb23ea"
+        },
+        "metadata": {
+            "time_zone": "America/Los_Angeles",
+            "plugin": "none",
+            "write_ts": 1516072777.245432,
+            "platform": "ios",
+            "read_ts": 0,
+            "key": "manual/purpose_confirm",
+            "type": "message",
+            "write_local_dt": {
+                "year": 2018,
+                "month": 1,
+                "day": 15,
+                "hour": 19,
+                "minute": 19,
+                "second": 37,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2018-01-15T19:19:37.245432-08:00"
+        },
+        "data": {
+            "end_ts": 1481601004.01,
+            "label": "pick_drop",
+            "start_ts": 1481598124.35,
+            "start_local_dt": {
+                "year": 2016,
+                "month": 12,
+                "day": 12,
+                "hour": 19,
+                "minute": 2,
+                "second": 4,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-12-12T19:02:04.350000-08:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 12,
+                "day": 12,
+                "hour": 19,
+                "minute": 50,
+                "second": 4,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-12-12T19:50:04.010000-08:00"
+        }
+    }
+]
