@@ -90,6 +90,7 @@ def calculate_single_suggestion(uuid):
     user_id = all_users.iloc[all_users[all_users.uuid == uuid].index.tolist()[0]].uuid
     time_series = esta.TimeSeries.get_time_series(user_id)
     cleaned_sections = time_series.get_data_df("analysis/cleaned_section", time_query = None)
+    suggestion_trips = edb.get_suggestion_trips_db()
     #Go in reverse order because we check by most recent trip
     counter = 40
     for i in range(len(cleaned_sections) - 1, -1, -1):
@@ -104,6 +105,8 @@ def calculate_single_suggestion(uuid):
         start_loc = cleaned_sections.iloc[i]["start_loc"]["coordinates"]
         start_lat = str(start_loc[0])
         start_lon = str(start_loc[1])
+        trip_id = cleaned_sections.iloc[i]['trip_id']
+        tripDict = suggestion_trips.find_one({'uuid': uuid})
         print(cleaned_sections.iloc[i]["trip_id"])
         print(cleaned_sections.iloc[i]["start_fmt_time"])
         end_loc = cleaned_sections.iloc[i]["end_loc"]["coordinates"]
@@ -120,6 +123,7 @@ def calculate_single_suggestion(uuid):
                 savings = str(int(distance_in_miles * 30 * .465 - 0.14323126 * distance_in_miles * 30))
                 return {'message' : message, 'savings' : savings, 'start_lat' : start_lat,
                 'start_lon' : start_lon, 'end_lat' : end_lat, 'end_lon' : end_lon, 'method': 'public'}
+                insert_into_db(tripDict, trip_id, suggestion_trips, uuid)
                 break
             except ValueError as e:
                 return_obj['message'] = default_message
@@ -131,6 +135,7 @@ def calculate_single_suggestion(uuid):
                 message = "Try biking from " + return_address_from_location(start_lon + "," + start_lat) + \
                 " to " + return_address_from_location(end_lon + "," + end_lat)
                 savings = str(int(distance_in_miles * 30 * .465))  #savings per month, .465 kg co2/mile
+                insert_into_db(tripDict, trip_id, suggestion_trips, uuid)
                 return {'message' : message, 'savings' : savings, 'start_lat' : start_lat,
                 'start_lon' : start_lon, 'end_lat' : end_lat, 'end_lon' : end_lon, 'method': 'bike'}
                 break
@@ -142,9 +147,17 @@ def calculate_single_suggestion(uuid):
                 message = "Try walking/biking from " + return_address_from_location(start_lon + "," + start_lat) + \
                 " to " + return_address_from_location(end_lon + "," + end_lat)
                 savings = str(int(distance_in_miles * 30 * .465)) #savings per month, .465 kg co2/mile
+                insert_into_db(tripDict, trip_id, suggestion_trips, uuid)
                 return {'message' : message, 'savings' : savings, 'start_lat' : start_lat,
                 'start_lon' : start_lon, 'end_lat' : end_lat, 'end_lon' : end_lon, 'method': 'walk'}
                 break
             except:
                 continue
     return return_obj
+def insert_into_db(tripDict, tripID, collection, uuid):
+    if tripDict == None:
+        collection.insert_one({'uuid': uuid, 'trip_id': tripID})
+    else:
+        if tripDict['trip_id'] != tripID:
+            collection.update_one({'uuid': uuid, 'trip_id' : tripID})
+            
