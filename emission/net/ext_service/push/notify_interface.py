@@ -43,10 +43,10 @@ class NotifyInterface(object):
     def get_and_invalidate_entries(self):
         pass
 
-    def send_visible_notification(self, token_list, title, message, json_data, dev=False):
+    def send_visible_notification(self, token_map, title, message, json_data, dev=False):
         pass
 
-    def send_silent_notification(self, token_list, title, message, json_data, dev=False):
+    def send_silent_notification(self, token_map, title, message, json_data, dev=False):
         pass
 
     def display_response(self, response):

@@ -32,18 +32,21 @@ class FirebasePush(pni.NotifyInterface):
         logging.warning("https://stackoverflow.com/questions/38581241/ios-firebase-push-notification-for-sandbox-only")
         logging.warning("https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages")
 
-    def map_existing_fcm_tokens(self, token_list):
+    def map_existing_fcm_tokens(self, token_map):
+        # android tokens never need to be mapped, so let's just not even check them
         mapped_token_map = {"ios": [],
-                            "android": []}
+                            "android": token_map["android"]}
         unmapped_token_list = []
 
-        for token in token_list:
+        for token in token_map["ios"]:
             existing_mapping = edb.get_push_token_mapping_db().find_one({"native_token": token})
             if existing_mapping is not None:
                 assert(existing_mapping["native_token"] == token)
                 mapped_token = existing_mapping["mapped_token"]
                 mapped_platform = existing_mapping["platform"]
+                # we are only iterating over ios mappings anyway
                 logging.debug("%s: mapped %s -> %s" % (mapped_platform, token, mapped_token))
+                assert(mapped_platform == "ios")
                 mapped_token_map[mapped_platform].append(mapped_token)
             else:
                 logging.debug("No mapping found for token %s, need to query from database" % token)
@@ -51,6 +54,9 @@ class FirebasePush(pni.NotifyInterface):
         return (mapped_token_map, unmapped_token_list)
 
     def retrieve_fcm_tokens(self, token_list, dev):
+        if len(token_list) == 0:
+            logging.debug("len(token_list) == 0, skipping fcm token mapping to save API call")
+            return None
         importHeaders = {"Authorization": "key=%s" % self.server_auth_token,
                          "Content-Type": "application/json"}
         importMessage = {
@@ -64,43 +70,40 @@ class FirebasePush(pni.NotifyInterface):
         importedResultJSON = importResponse.json()
         return importedResultJSON
 
-    def process_fcm_token_result(self, token_list, importedResultJSON):
-        ret_map = {"ios": [],
-                   "android": []}
-        if "results" in importedResultJSON:
+    def process_fcm_token_result(self, importedResultJSON):
+        ret_list = []
+        if importedResultJSON is not None and "results" in importedResultJSON:
             importedResult = importedResultJSON["results"]
             for i, result in enumerate(importedResult):
                 if result["status"] == "OK" and "registration_token" in result:
-                    ret_map["ios"].append(result["registration_token"])
+                    ret_list.append(result["registration_token"])
                     logging.debug("Found firebase mapping from %s -> %s at index %d"%
                         (result["apns_token"], result["registration_token"], i));
                     edb.get_push_token_mapping_db().insert({"native_token": result["apns_token"],
                                                             "platform": "ios",
                                                             "mapped_token": result["registration_token"]})
                 else:
-                    logging.debug("Must already be android token, leave it unchanged");
-                    # TODO: Determine whether to store a mapping here or not depending on what the result
-                    # for an android token is
-                    ret_map["android"].append(token_list[i])
-        return ret_map
+                    logging.warning("Got error %s while mapping iOS token at index %d" %
+                        (result, i));
+        return ret_list
 
-    def convert_to_fcm_if_necessary(self, token_list, dev):
-        (mapped_token_map, unmapped_token_list) = self.map_existing_fcm_tokens(token_list)
+    def convert_to_fcm_if_necessary(self, token_map, dev):
+        (mapped_token_map, unmapped_token_list) = self.map_existing_fcm_tokens(token_map)
         importedResultJSON = self.retrieve_fcm_tokens(unmapped_token_list, dev)
-        newly_mapped_token_map = self.process_fcm_token_result(token_list, importedResultJSON)
+        newly_mapped_token_list = self.process_fcm_token_result(importedResultJSON)
         combo_token_map = {"ios": [],
                            "android": []}
-        combo_token_map["ios"] = mapped_token_map["ios"] + newly_mapped_token_map["ios"]
-        combo_token_map["android"] = mapped_token_map["android"] + newly_mapped_token_map["android"]
+        combo_token_map["ios"] = mapped_token_map["ios"] + newly_mapped_token_list
+        combo_token_map["android"] = mapped_token_map["android"]
         return combo_token_map
 
-    def send_visible_notification(self, token_list, title, message, json_data, dev=False):
-        if len(token_list) == 0:
-            logging.info("len(token_list) == 0, early return to save api calls")
+    def send_visible_notification(self, token_map, title, message, json_data, dev=False):
+        if len(token_map) == 0:
+            logging.info("len(token_map) == 0, early return to save api calls")
             return
 
         # convert tokens if necessary
-        fcm_token_map = self.convert_to_fcm_if_necessary(token_list, dev)
+        fcm_token_map = self.convert_to_fcm_if_necessary(token_map, dev)
 
         push_service = FCMNotification(api_key=self.server_auth_token)
         data_message = {
@@ -120,9 +123,9 @@ class FirebasePush(pni.NotifyInterface):
         logging.debug(combo_response)
         return combo_response
 
-    def send_silent_notification(self, token_list, json_data, dev=False):
-        if len(token_list) == 0:
-            logging.info("len(token_list) == 0, early return to save api calls")
+    def send_silent_notification(self, token_map, json_data, dev=False):
+        if len(token_map) == 0:
+            logging.info("len(token_map) == 0, early return to save api calls")
             return
 
         ios_raw_data = copy.copy(json_data)
@@ -135,7 +138,7 @@ class FirebasePush(pni.NotifyInterface):
         push_service = FCMNotification(api_key=self.server_auth_token)
 
         # convert tokens if necessary
-        fcm_token_list = self.convert_to_fcm_if_necessary(token_list, dev)
+        fcm_token_map = self.convert_to_fcm_if_necessary(token_map, dev)
 
         response = push_service.notify_multiple_devices(registration_ids=fcm_token_list,
                                                    data_message=ios_raw_data,
