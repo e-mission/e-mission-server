@@ -34,9 +34,9 @@ class TestPipelineSeed(unittest.TestCase):
     for testUser in user_objects:
         etc.purgeSectionData(self.SectionsColl, testUser.uuid)
 
-    self.assertEquals(self.ModesColl.find().count(), 0)
+    self.assertEqual(self.ModesColl.find().count(), 0)
 
-    self.assertEquals(self.SectionsColl.find().count(), 0)
+    self.assertEqual(self.SectionsColl.find().count(), 0)
 
     MongoClient('localhost').drop_database("Backup_database")
 
@@ -69,8 +69,8 @@ class TestPipelineSeed(unittest.TestCase):
     for testUser in self.testUsers:
       etc.purgeSectionData(self.SectionsColl, testUser)
     logging.debug("Number of sections after purge is %d" % self.SectionsColl.find().count())
-    self.ModesColl.remove()
-    self.assertEquals(self.ModesColl.find().count(), 0)
+    self.ModesColl.delete_many({})
+    self.assertEqual(self.ModesColl.find().count(), 0)
     if os.path.exists(pipeline.SAVED_MODEL_FILENAME):
         os.remove(pipeline.SAVED_MODEL_FILENAME)
         self.assertFalse(os.path.exists(pipeline.SAVED_MODEL_FILENAME))
@@ -82,8 +82,8 @@ class TestPipelineSeed(unittest.TestCase):
     self.pipeline.confirmedSections = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery)
     backupSections = MongoClient('localhost').Backup_database.Stage_Sections
     self.pipeline.backupConfirmedSections = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery, backupSections)
-    self.assertEquals(self.pipeline.confirmedSections.count(), len(self.testUsers) * 2)
-    self.assertEquals(self.pipeline.backupConfirmedSections.count(), 0)
+    self.assertEqual(self.pipeline.confirmedSections.count(), len(self.testUsers) * 2)
+    self.assertEqual(self.pipeline.backupConfirmedSections.count(), 0)
     
 
   def testGenerateBusAndTrainStops(self):
@@ -91,8 +91,8 @@ class TestPipelineSeed(unittest.TestCase):
     # Half our trips are bus, and are copies of the identical bus trip.
     # So they should all cluster into one set of start and stop points.
     # So we expect to have to cluster points - one for start and one for end
-    self.assertEquals(len(self.pipeline.train_cluster), 0)
-    self.assertEquals(len(self.pipeline.bus_cluster), 2)
+    self.assertEqual(len(self.pipeline.train_cluster), 0)
+    self.assertEqual(len(self.pipeline.bus_cluster), 2)
 
   def testFeatureGenWithOnePoint(self):
     trackpoint1 = {"track_location": {"coordinates": [-122.0861645, 37.3910201]},
@@ -121,8 +121,8 @@ class TestPipelineSeed(unittest.TestCase):
     (self.pipeline.featureMatrix, self.pipeline.resultVector) = self.pipeline.generateFeatureMatrixAndResultVectorStep()
     logging.debug("Number of sections = %s" % self.pipeline.confirmedSections.count())
     logging.debug("Feature Matrix shape = %s" % str(self.pipeline.featureMatrix.shape))
-    self.assertEquals(self.pipeline.featureMatrix.shape[0], self.pipeline.confirmedSections.count())
-    self.assertEquals(self.pipeline.featureMatrix.shape[1], len(self.pipeline.featureLabels))
+    self.assertEqual(self.pipeline.featureMatrix.shape[0], self.pipeline.confirmedSections.count())
+    self.assertEqual(self.pipeline.featureMatrix.shape[1], len(self.pipeline.featureLabels))
 
   def testCleanDataStep(self):
     # Add in some entries that should be cleaned by duplicating existing sections
@@ -151,7 +151,7 @@ class TestPipelineSeed(unittest.TestCase):
     (self.pipeline.featureMatrix, self.pipeline.resultVector) = self.pipeline.generateFeatureMatrixAndResultVectorStep()
 
     (self.pipeline.cleanedFeatureMatrix, self.pipeline.cleanedResultVector) = self.pipeline.cleanDataStep()
-    self.assertEquals(self.pipeline.cleanedFeatureMatrix.shape[0], self.pipeline.confirmedSections.count() + self.pipeline.backupConfirmedSections.count() - 2)
+    self.assertEqual(self.pipeline.cleanedFeatureMatrix.shape[0], self.pipeline.confirmedSections.count() + self.pipeline.backupConfirmedSections.count() - 2)
 
   def testSelectFeatureIndicesStep(self):
     self.testCleanDataStep()
@@ -165,23 +165,23 @@ class TestPipelineSeed(unittest.TestCase):
     self.testSelectFeatureIndicesStep()
 
     self.pipeline.model = self.pipeline.buildModelStep()
-    from sklearn import cross_validation
-    scores = cross_validation.cross_val_score(self.pipeline.model, self.pipeline.cleanedFeatureMatrix, self.pipeline.cleanedResultVector, cv=3)
+    from sklearn import model_selection
+    scores = model_selection.cross_val_score(self.pipeline.model, self.pipeline.cleanedFeatureMatrix, self.pipeline.cleanedResultVector, cv=3)
     self.assertGreater(scores.mean(), 0.90)
 
   def testSaveModelStep(self):
     self.testBuildModelStep()
     self.pipeline.saveModelStep()
 
-    fd = open(pipeline.SAVED_MODEL_FILENAME, "r")
-    self.assertIsNotNone(fd)
+    with open(pipeline.SAVED_MODEL_FILENAME, "r") as fd:
+        self.assertIsNotNone(fd)
 
   def testLoadModelStep(self):
     self.testSaveModelStep()
 
     self.pipeline.model = pipeline.ModeInferencePipelineMovesFormat.loadModel()
-    from sklearn import cross_validation
-    scores = cross_validation.cross_val_score(self.pipeline.model, self.pipeline.cleanedFeatureMatrix, self.pipeline.cleanedResultVector, cv=3)
+    from sklearn import model_selection
+    scores = model_selection.cross_val_score(self.pipeline.model, self.pipeline.cleanedFeatureMatrix, self.pipeline.cleanedResultVector, cv=3)
     self.assertGreater(scores.mean(), 0.90)
 
   def setupTestTrips(self):
@@ -211,8 +211,8 @@ class TestPipelineSeed(unittest.TestCase):
 
     # Checks are largely the same as above
     self.pipeline.model = pipeline.ModeInferencePipelineMovesFormat.loadModel()
-    from sklearn import cross_validation
-    scores = cross_validation.cross_val_score(self.pipeline.model, self.pipeline.cleanedFeatureMatrix, self.pipeline.cleanedResultVector, cv=3)
+    from sklearn import model_selection
+    scores = model_selection.cross_val_score(self.pipeline.model, self.pipeline.cleanedFeatureMatrix, self.pipeline.cleanedResultVector, cv=3)
     self.assertGreater(scores.mean(), 0.90)
 
 if __name__ == '__main__':

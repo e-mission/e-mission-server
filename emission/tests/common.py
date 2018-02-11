@@ -59,7 +59,7 @@ def purgeSectionData(Sections, userName):
     Deletes all sections for this user.
     TODO: Need to extend it to delete entries across all collections
     """
-    Sections.remove({'user_id' : userName})
+    Sections.delete_many({'user_id' : userName})
 
 def loadTable(serverName, tableName, fileName):
   tableColl = edb._get_current_db()[tableName]

@@ -14,7 +14,6 @@ from datetime import datetime
 import sys
 import os
 import numpy as np
-import scipy as sp
 import time
 from datetime import datetime
 
@@ -328,8 +327,8 @@ class ModeInferencePipelineMovesFormat:
     # The assumption is that people will run the script first to generate the model 
     # Need to figure out how others will get seed data
     model_rep = jpickle.dumps(self.model)
-    fd = open(SAVED_MODEL_FILENAME, "w")
-    fd.write(model_rep)
+    with open(SAVED_MODEL_FILENAME, "w") as fd:
+        fd.write(model_rep)
 
 if __name__ == "__main__":
   import json
