@@ -31,6 +31,9 @@ def get_username_db():
 def get_polarbear_db():
     return _get_current_db().PolarBear
 
+def get_suggestion_trips_db():
+    return _get_current_db().SuggestionSys
+
 def get_mode_db():
     # #current_db = MongoClient().Stage_database
     Modes= _get_current_db().Stage_Modes
