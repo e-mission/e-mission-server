@@ -35,7 +35,7 @@ def getAllBearsInTier(user_id):
 	Return a dictionary containing all Polar bear attrs in a given tier
 		{'username1':[happiness1, size1], 'username2':[happiness2, size2]...}
 	"""
-	tiersys = Tiersys.getLatest()[0]
+	tierSys = TierSys.getLatest()[0]
 	userTier = tierSys['tiers'][TierSys.getUserTier(user_id) - 1]['users']
 	#List of of users within a tier
 	allUsers = {}
@@ -60,7 +60,7 @@ def updatePolarBear(user_id):
 		setPolarBearattr({'user_id': user_id,
 						'username': currUsername,
 						'happiness': User.computeHappiness(user_id),
-						'oldHappiness' : None
+						'oldHappiness' : None,
 						'size' : 0
 						})
 	else:
