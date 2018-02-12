@@ -306,11 +306,10 @@ def getListOfUsers():
   userTierNum = TierSys.getUserTier(user_id)
   userTiers = TierSys.getLatest()[0]['tiers']
   logging.debug('TierSys: %s' %TierSys.getLatest()[0])
-  tierUsernames = []
-  index = 0
+  tierUsernames = [[], [], []]
   for tier in userTiers:
     logging.debug('TIER: %s' %tier)
-    tierUsernames.append([])
+    index = tier['rank']
     curr_tier = tierUsernames[index]
     for user in tier['users']:
         uuid = user['uuid']
@@ -322,7 +321,6 @@ def getListOfUsers():
         else:
             result = {'username': username, 'carbonLastWeek': carbon}
             curr_tier.append(result)
-    index += 1
   return {'tiers' : tierUsernames}
 
 @post('/getListOfUsersInUsersTier')

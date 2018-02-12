@@ -31,7 +31,7 @@ class TierSys:
                 index += 1
         #Should I keep this -1?No
         return index
-        
+
     @staticmethod
     def computeTierRank(user_id):
         tierSys = TierSys.getLatest()[0]
