@@ -40,9 +40,13 @@ if __name__ == '__main__':
     if (args.silent):
         response = pnu.send_silent_notification_to_users(uuid_list, {}, dev=args.dev)
     else:
+        json_data = {
+            "title": args.title_message[0],
+            "message": args.title_message[1]
+        }
         response = pnu.send_visible_notification_to_users(uuid_list,
-                                                            args.title_message[0],
-                                                            args.title_message[1],
-                                                            {},
+                                                            json_data["title"],
+                                                            json_data["message"],
+                                                            json_data,
                                                             dev = args.dev)
     pnu.display_response(response)
