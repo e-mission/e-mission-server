@@ -309,7 +309,7 @@ def getListOfUsers():
   tierUsernames = [[], [], []]
   for tier in userTiers:
     logging.debug('TIER: %s' %tier)
-    index = tier['rank']
+    index = tier['rank'] - 1
     curr_tier = tierUsernames[index]
     for user in tier['users']:
         uuid = user['uuid']
