@@ -60,7 +60,7 @@ def updatePolarBear(user_id):
 		setPolarBearattr({'user_id': user_id,
 						'username': currUsername,
 						'happiness': User.computeHappiness(user_id),
-						'oldHappiness' : None
+						'oldHappiness' : None,
 						'size' : 0
 						})
 	else:
