@@ -44,6 +44,9 @@ class TimeSeries(object):
     def get_entry_at_ts(self, key, ts_key, ts):
         pass
 
+    def get_entry_from_id(self, key, entry_id):
+        pass
+
     def get_data_df(self, key, time_query = None, geo_query=None, extra_query_list=None):
         """
         Returns a dataframe of the specified entries. A single key is required,
