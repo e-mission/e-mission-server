@@ -73,7 +73,7 @@ def updatePolarBear(user_id):
 			currattr['username'] = 'Anon'
 		#Have to user new username if user has changed it
 		if newHappiness > 0.4:
-			currattr['size'] += (4 - Tiersys.getUserTier(user_id))
+			currattr['size'] += (4 - TierSys.getUserTier(user_id))
 		else:
 			currattr['size'] = 0
 		setPolarBearattr(currattr)
