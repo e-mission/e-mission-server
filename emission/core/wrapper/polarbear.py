@@ -1,6 +1,7 @@
 from emission.core.wrapper.tiersys import TierSys
 from emission.core.wrapper.user import User
 import emission.core.get_database as db
+from uuid import UUID
 
 
 def setPolarBearattr(attrs):
@@ -27,6 +28,8 @@ def getPolarBearattr(user_id):
 	Return a dictionary containing all Polar Bear attributes
 	 {user_id: num, username: string, happiness: int, oldHappiness: int, size: int}
 	"""
+	if type(user_id) == str:
+		user_id = UUID(user_id)
 	polarBearCollection = db.get_polarbear_db()
 	return polarBearCollection.find_one({'user_id' : user_id})
 
