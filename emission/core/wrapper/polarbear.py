@@ -54,7 +54,7 @@ def updatePolarBear(user_id):
 	currattr = getPolarBearattr(user_id)
 	if currattr == None:
 		#Create a new Polar Bear for the given user
-		currUsername = User.getUsername(user_id)
+		currUsername = User.getUsername(user_id)['username']
 		if currUsername == None:
 			currUsername = 'Anon'
 		setPolarBearattr({'user_id': user_id,
@@ -68,7 +68,7 @@ def updatePolarBear(user_id):
 		newHappiness = User.computeHappiness(user_id)
 		currattr['oldHappiness'] = currattr['happiness']
 		currattr['happiness'] = newHappiness
-		currattr['username'] = User.getUsername(user_id)
+		currattr['username'] = User.getUsername(user_id)['username']
 		if currattr['username'] == None:
 			currattr['username'] = 'Anon'
 		#Have to user new username if user has changed it
