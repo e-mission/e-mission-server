@@ -21,6 +21,8 @@ class TierSys:
 
     @staticmethod
     def getUserTier(user_id):
+        if type(user_id) == str:
+            user_id = UUID(user_id)
         allTiers = TierSys.getLatest()[0]
         index = 1
         for tier in allTiers['tiers']:
