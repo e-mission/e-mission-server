@@ -3,7 +3,6 @@ from emission.core.wrapper.user import User
 import emission.core.get_database as db
 from uuid import UUID
 
-
 def setPolarBearattr(attrs):
 	"""
 	Sets a Polar Bear's attributes based on input dict:
@@ -90,4 +89,3 @@ def updateAll():
 	for tier in tiersys:
 		for user in tier['users']:
 			updatePolarBear(user['uuid'])
-updateAll()
