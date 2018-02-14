@@ -32,7 +32,7 @@ class TierSys:
             else:
                 index += 1
         #Should I keep this -1?No
-        return index
+        return None
 
     @staticmethod
     def computeTierRank(user_id):
