@@ -69,27 +69,18 @@ class TierSys:
             raise Exception('Inputted rank does not exist in the tiersys.')
 
     @staticmethod
-    def divideIntoBuckets(objs, n_buckets):
+    def divideIntoBuckets(seq, num):
         """
         Divides objects into n buckets.
         Used in compute ranks to divide users into n tiers
         """
-        if n_buckets <= 0:
-            raise Exception('Number of buckets cannot be less than 1')
-        elif n_buckets > len(objs):
-            raise Exception('Number of buckets can not be creater than num of objs')
-        perBucket = len(objs) // n_buckets
-        remaining = len(objs) % n_buckets
-        buckets = []
-        i = 0
-        for b in range(0, n_buckets):
-            extra = 1 if b < remaining else 0
-            bucket = []
-            for o in range(0, extra + perBucket):
-                bucket.append(objs[i])
-                i += 1
-            buckets.append(bucket)
-        return buckets
+        avg = len(seq) / float(num)
+        out = []
+        last = 0.0
+        while last < len(seq):
+            out.append(seq[int(last):int(last + avg)])
+            last += avg
+        return out
 
     def computeRanks(self, last_ts, n):
         #TODO: FINISH
@@ -115,7 +106,7 @@ class TierSys:
         logging.debug('USER CARBON MAP')
         logging.debug(user_carbon_map)
         # Sort and partition users by carbon metric.
-        user_carbon_tuples_sorted = sorted(user_carbon_map.items(), key=(lambda kv: kv[1])) # Sorted list by value of dict tuples.
+        user_carbon_tuples_sorted = sorted(user_carbon_map.items(), key=lambda kv: kv[1]) # Sorted list by value of dict tuples.
         logging.debug('USER CARBON TUPLES SORTED')
         logging.debug(user_carbon_tuples_sorted)
         user_carbon_sorted = [i[0] for i in user_carbon_tuples_sorted] # Extract only the user ids.
