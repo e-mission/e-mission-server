@@ -112,9 +112,11 @@ class TierSys:
             val = self.computeCarbon(user_id, last_ts)
             if val != None:
                 user_carbon_map[user_id] = val
-
+        logging.debug('USER CARBON MAP')
+        logging.debug(user_carbon_map)
         # Sort and partition users by carbon metric.
         user_carbon_tuples_sorted = sorted(user_carbon_map.items(), key=(lambda kv: kv[1])) # Sorted list by value of dict tuples.
+        logging.debug('USER CARBON TUPLES SORTED')
         logging.debug(user_carbon_tuples_sorted)
         user_carbon_sorted = [i[0] for i in user_carbon_tuples_sorted] # Extract only the user ids.
         return self.divideIntoBuckets(user_carbon_sorted, n)
