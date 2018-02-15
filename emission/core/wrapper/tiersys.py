@@ -13,7 +13,7 @@ import logging.config
 
 class TierSys:
     def __init__(self, num_tiers=3):
-        self.tiers = {}
+        self.tiers = []
         for i in range(1, num_tiers+1):
            self.addTier(i)
 
@@ -59,16 +59,13 @@ class TierSys:
         return self.tiers
 
     def addTier(self, rank):
-        if rank not in self.tiers:
-            self.tiers[rank] = st.Tier(rank)
-        else:
-            raise Exception('Inputted rank already exist in the tiersys.')
+        self.tiers.append([])
 
-    def deleteTier(self, rank):
+    """def deleteTier(self, rank):
         if rank in self.tiers:
             self.tiers.pop(rank)
         else:
-            raise Exception('Inputted rank does not exist in the tiersys.')
+            raise Exception('Inputted rank does not exist in the tiersys.')"""
 
     @staticmethod
     def divideIntoBuckets(seq, num):
@@ -128,13 +125,13 @@ class TierSys:
         Also updates users tier attributes in the database.
         "Best" tiers have lower rank values.
         """
-        self.tiers = {}
+        self.tiers = []
         updated_user_tiers = self.computeRanks(last_ts, 3)
 
         for rank in range(1, len(updated_user_tiers) + 1):
             self.addTier(rank)
             tier_users = updated_user_tiers[rank-1]
-            self.tiers[rank] = tier_users
+            self.tiers[rank - 1] = tier_users
 
     def saveTiers(self):
         from datetime import datetime
@@ -165,9 +162,9 @@ class TierSys:
         }}
         """
         ts = []
-        for rank, uuids in self.tiers.items():
-            users = [{'uuid': uuid, 'lastWeekCarbon': User.carbonLastWeek(uuid)} for uuid in uuids]
-            ts.append({'rank': rank, 'users': users})
+        for i in range(len(self.tiers)):
+            users = [{'uuid': uuid, 'lastWeekCarbon': User.carbonLastWeek(uuid)} for uuid in tiers[i]]
+            ts.append({'rank': i + 1, 'users': users})
 
         print(ts)
         logging.debug(ts)
