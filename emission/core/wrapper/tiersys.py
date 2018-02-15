@@ -8,6 +8,8 @@ import emission.core.wrapper.motionactivity as ecwm
 from emission.core.wrapper.user import User
 import arrow
 from emission.core.get_database import get_tiersys_db
+import logging
+import logging.config
 
 class TierSys:
     def __init__(self, num_tiers=3):
