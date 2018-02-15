@@ -117,7 +117,7 @@ class TierSys:
         Formula is (Actual CO2 + penalty) / distance travelled
         """
         curr_ts = arrow.utcnow().timestamp
-        return User.computeCarbon(user_id, last_ts, curr_ts)
+        return User.carbonLastWeek(user_id)
 
     def updateTiers(self, last_ts):
         """
