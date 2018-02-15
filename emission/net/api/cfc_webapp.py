@@ -307,6 +307,7 @@ def getListOfUsers():
   userTiers = TierSys.getLatest()[0]['tiers']
   logging.debug('TierSys: %s' %TierSys.getLatest()[0])
   tierUsernames = [[], [], []]
+  logging.debug(userTiers)
   for tier in userTiers:
     logging.debug('TIER: %s' %tier)
     index = tier['rank'] - 1

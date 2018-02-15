@@ -173,6 +173,7 @@ class TierSys:
             ts.append({'rank': rank, 'users': users})
 
         print(ts)
+        logging.debug(ts)
 
         get_tiersys_db().insert_one({'tiers': ts, 'created_at': datetime.now()})
         return ts
