@@ -115,6 +115,7 @@ class TierSys:
 
         # Sort and partition users by carbon metric.
         user_carbon_tuples_sorted = sorted(user_carbon_map.items(), key=(lambda kv: kv[1])) # Sorted list by value of dict tuples.
+        logging.debug(user_carbon_tuples_sorted)
         user_carbon_sorted = [i[0] for i in user_carbon_tuples_sorted] # Extract only the user ids.
         return self.divideIntoBuckets(user_carbon_sorted, n)
 
@@ -134,6 +135,7 @@ class TierSys:
         """
         self.tiers = {}
         updated_user_tiers = self.computeRanks(last_ts, 3)
+
         for rank in range(1, len(updated_user_tiers) + 1):
             self.addTier(rank)
             tier_users = updated_user_tiers[rank-1]
