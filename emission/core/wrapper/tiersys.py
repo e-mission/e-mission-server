@@ -163,7 +163,7 @@ class TierSys:
         """
         ts = []
         for i in range(len(self.tiers)):
-            users = [{'uuid': uuid, 'lastWeekCarbon': User.carbonLastWeek(uuid)} for uuid in tiers[i]]
+            users = [{'uuid': uuid, 'lastWeekCarbon': User.carbonLastWeek(uuid)} for uuid in self.tiers[i]]
             ts.append({'rank': i + 1, 'users': users})
 
         print(ts)
