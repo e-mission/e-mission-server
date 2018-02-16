@@ -33,7 +33,7 @@ def getMoodChange(user_id):
 	def checkMood(val):
 		if val >= 0.6:
 			return 'happy'
-		else if val < 0.6 and val >= 0.4:
+		elif val < 0.6 and val >= 0.4:
 			return 'neutral'
 		else:
 			return 'sad'
