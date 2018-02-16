@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <script type="text/javascript" >
-    window.onload = init;
+    //window.onload = init;
     function init(){
       var image = document.getElementById("clickme")
       image.addEventListener("click", function(){
@@ -19,22 +19,53 @@
     </script>
     <style type="text/css">
       body {
-        background-color: black;
+        font-family: "AvenirNext-Regular";
+        color: #4A4A4A;
       }
+
       #clickme {
         display: block;
         margin-left: auto;
         margin-right: auto;
-        width: 100%;
-        max-width: 800px;
-      }
-      #clickme:hover {
-        cursor: pointer;
+        width: 50%;
+        max-width: 300px;
       }
     </style>
     <title>Tripaware</title>
   </head>
-  <body>
+
+  <body style="text-align: center;">
     <img src="img/tripaware.png" id="clickme">
+    <div class="redirect">
+      <div>
+        <h2>Thank you for participating - only two steps left!</h2>
+        <p>
+          Please open the links below <b>on your phone</b>, or read the QR codes from a laptop display using a QR code reader <b>on your phone.</b>
+        </p>
+      </div>
+      <div>
+        <h4>1. Install the e-mission app</h4>
+      </div>
+      <div class="row responsive-sm">
+        <a class="col" href='https://play.google.com/store/apps/details?id=edu.berkeley.eecs.emission'><img style="height:75px;" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
+        <qrcode class="col" data="https://play.google.com/store/apps/details?id=edu.berkeley.eecs.emission" size="200"></qrcode>
+      </div>
+      <div class="row responsive-sm">
+        <a class="col" href="https://itunes.apple.com/us/app/emission/id1084198445?&mt=8"><img src="img/apple-badge.svg"></a>
+        <qrcode class="col" data="https://itunes.apple.com/us/app/emission/id1084198445?&mt=8" size="200"></qrcode>
+      </div>
+      <div>
+        <h4>2. Join the study</h4>
+      </div>
+      <div id="downloadRow">
+        <a id="groupLink" href="emission://change_client?new_client={{client_label}}&clear_local_storage={{clear_local_storage_flag}}&clear_usercache={{clear_usercache_flag}}">
+          <p style="color: #417505;">Open this link on your phone to launch the app and join the study</p>
+          <!--<p style="color: black;">emission://change_client?new_client={{client_label}}&clear_local_storage={{clear_local_storage_flag}}&clear_usercache={{clear_usercache_flag}}</p>-->
+        </a>
+      </div>
+      <div>
+        <qrcode class="col" data="emission://change_client?new_client={{client_label}}&clear_local_storage={{clear_local_storage_flag}}&clear_usercache={{clear_usercache_flag}}" size="200"></qrcode>
+      </div>
+    </div>
   </body>
 </html>
