@@ -1,10 +1,31 @@
 import emission.storage.timeseries.abstract_timeseries as esta
+import emission.net.ext_service.push.notify_usage as pnu
+import emission.core.wrapper.user as ecwu
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import *
+import logging
+import argparse
 import pandas as pd
 import requests
 import json
 import re
 import emission.core.get_database as edb
 from uuid import UUID
+import emission.core.wrapper.polarbear as pb
+def handle_insert(tripDict, tripID, collection, uuid):
+    if tripDict == None:
+        return False
+    else:
+        if tripDict['trip_id'] != tripID:
+            return True
+        else:
+            return False
+
 def calculate_single_suggestion(uuid):
     #Given a single UUID, create a suggestion for them
     suggestion_trips = edb.get_suggestion_trips_db()
@@ -39,12 +60,34 @@ def calculate_single_suggestion(uuid):
             #Suggest walking if it is car/bus and distance less than 1
             return handle_insert(tripDict, trip_id, suggestion_trips, uuid)
     return False
-def handle_insert(tripDict, tripID, collection, uuid):
-    if tripDict == None:
-        collection.insert_one({'uuid': uuid, 'trip_id': tripID})
-        return True
-    else:
-        if tripDict['trip_id'] != tripID:
-            return True
-        else:
-            return False
+
+def push_to_user(uuid_list, message):
+    json_data = {
+        "title": "TripAware Notification",
+        "message": message
+    }
+    response = pnu.send_visible_notification_to_users(uuid_list,
+                                                        json_data["title"],
+                                                        json_data["message"],
+                                                        json_data,
+                                                        dev = False)
+    pnu.display_response(response)
+
+def check_all_suggestions():
+    suggestion_uuids = []
+    happiness_uuids = []
+    all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"user_email":1, "uuid": 1, "_id": 0})))
+    for i in range(len(all_users)):
+        try:
+            uuid = all_users[i].uuid
+            client = all_users[i].client
+            if client == "urap-2017-emotion":
+                if pb.getMoodChange(uuid):
+                    happiness_uuids.append(uuid)
+            elif client == "urap-2017-information":
+                if calculate_single_suggestion(uuid):
+                    suggestion_uuids.append(uuid)
+        except:
+            continue
+    push_to_user(suggestion_uuids, "You have a new suggestion! Tap me to see it.")
+    push_to_user(happiness_uuids, "Your polar bear's mood has changed since yesterday! Tap me to see it.")
