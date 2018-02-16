@@ -5,12 +5,13 @@
     <script type="text/javascript">
       window.onload = init;
       function init(){
-        var image = document.getElementById("groupLink");
+        var link = document.getElementById("groupLink");
         var myrandom=Math.round(Math.random());
-        if myrandom < 0.5
-          image.href = "emission://change_client?new_client=urap2017information&clear_local_storage=true&clear_usercache=true"
+        if (myrandom < 0.5) {
+          link.href = "emission://change_client?new_client=urap2017information&clear_local_storage=true&clear_usercache=true"
+        }
         else {
-          image.href = "emission://change_client?new_client=urap2017emotion&clear_local_storage=true&clear_usercache=true"
+          link.href = "emission://change_client?new_client=urap2017emotion&clear_local_storage=true&clear_usercache=true"
         }
       }
     </script>
