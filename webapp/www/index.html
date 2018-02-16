@@ -6,12 +6,12 @@
       window.onload = init;
       function init(){
         var link = document.getElementById("groupLink");
-        var myrandom=Math.round(Math.random());
+        var myrandom = Math.random();
         if (myrandom < 0.5) {
           link.href = "emission://change_client?new_client=urap2017information&clear_local_storage=true&clear_usercache=true"
         }
         else {
-          link.href = "emission://change_client?new_client=urap2017emotion&clear_local_storage=true&clear_usercache=true"
+          link.href = "emission://change_client?new_client=urap2017control&clear_local_storage=true&clear_usercache=true"
         }
       }
     </script>
