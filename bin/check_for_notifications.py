@@ -9,6 +9,7 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import *
 import logging
+import logging.config
 import argparse
 import pandas as pd
 import requests
@@ -67,7 +68,7 @@ def push_to_user(uuid_list, message):
         "title": "TripAware Notification",
         "message": message
     }
-    print(uuid_list)
+    logging.debug(uuid_list)
     response = pnu.send_visible_notification_to_users(uuid_list,
                                                         json_data["title"],
                                                         json_data["message"],
