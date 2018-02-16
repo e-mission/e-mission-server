@@ -2,20 +2,17 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <script type="text/javascript" >
-    //window.onload = init;
-    function init(){
-      var image = document.getElementById("clickme")
-      image.addEventListener("click", function(){
-        var myrandom=Math.round(Math.random())
-        var link1="https://www.stanford.edu"
-        var link2="https://www.berkeley.edu"
-        if (myrandom==0)
-            window.location=link1
-        else
-            window.location=link2
-      });
-    }
+    <script type="text/javascript">
+      window.onload = init;
+      function init(){
+        var image = document.getElementById("groupLink");
+        var myrandom=Math.round(Math.random());
+        if myrandom < 0.5
+          image.href = "emission://change_client?new_client=urap2017information&clear_local_storage=true&clear_usercache=true"
+        else {
+          image.href = "emission://change_client?new_client=urap2017emotion&clear_local_storage=true&clear_usercache=true"
+        }
+      }
     </script>
     <style type="text/css">
       body {
@@ -27,7 +24,7 @@
         display: block;
         margin-left: auto;
         margin-right: auto;
-        width: 50%;
+        width: 80%;
         max-width: 300px;
       }
     </style>
@@ -58,7 +55,7 @@
         <h4>2. Join the study</h4>
       </div>
       <div id="downloadRow">
-        <a id="groupLink" href="emission://change_client?new_client={{client_label}}&clear_local_storage={{clear_local_storage_flag}}&clear_usercache={{clear_usercache_flag}}">
+        <a id="groupLink" href="tripaware.eecs.berkeley.edu">
           <p style="color: #417505;">Open this link on your phone to launch the app and join the study</p>
           <!--<p style="color: black;">emission://change_client?new_client={{client_label}}&clear_local_storage={{clear_local_storage_flag}}&clear_usercache={{clear_usercache_flag}}</p>-->
         </a>
