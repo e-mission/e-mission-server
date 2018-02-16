@@ -22,6 +22,25 @@ def setPolarBearattr(attrs):
 			}}
 		)
 
+def getMoodChange(user_id):
+	"""
+	Returns T/F, checking if PolarBear's mood has changed
+	 	relative to yesterday.
+	"""
+	attr = getPolarBearattr(user_id)
+	happiness = attr['happiness']
+	oldHappiness = attr['oldHappiness']
+	def checkMood(val):
+		if val >= 0.6:
+			return 'happy'
+		else if val < 0.6 and val >= 0.4:
+			return 'neutral'
+		else:
+			return 'sad'
+	if (checkMood(happiness) == checkMood(oldHappiness)):
+		return False
+	return True
+
 def getPolarBearattr(user_id):
 	"""
 	Return a dictionary containing all Polar Bear attributes
