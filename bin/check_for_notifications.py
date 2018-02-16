@@ -19,7 +19,8 @@ from uuid import UUID
 import emission.core.wrapper.polarbear as pb
 def handle_insert(tripDict, tripID, collection, uuid):
     if tripDict == None:
-        return False
+        collection.insert_one({'uuid': uuid, 'trip_id': tripID})
+        return True
     else:
         if tripDict['trip_id'] != tripID:
             return True
@@ -66,6 +67,7 @@ def push_to_user(uuid_list, message):
         "title": "TripAware Notification",
         "message": message
     }
+    print(uuid_list)
     response = pnu.send_visible_notification_to_users(uuid_list,
                                                         json_data["title"],
                                                         json_data["message"],
