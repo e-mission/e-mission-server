@@ -8,10 +8,12 @@ import emission.core.wrapper.motionactivity as ecwm
 from emission.core.wrapper.user import User
 import arrow
 from emission.core.get_database import get_tiersys_db
+import logging
+import logging.config
 
 class TierSys:
     def __init__(self, num_tiers=3):
-        self.tiers = {}
+        self.tiers = []
         for i in range(1, num_tiers+1):
            self.addTier(i)
 
@@ -57,39 +59,27 @@ class TierSys:
         return self.tiers
 
     def addTier(self, rank):
-        if rank not in self.tiers:
-            self.tiers[rank] = st.Tier(rank)
-        else:
-            raise Exception('Inputted rank already exist in the tiersys.')
+        self.tiers.append([])
 
-    def deleteTier(self, rank):
+    """def deleteTier(self, rank):
         if rank in self.tiers:
             self.tiers.pop(rank)
         else:
-            raise Exception('Inputted rank does not exist in the tiersys.')
+            raise Exception('Inputted rank does not exist in the tiersys.')"""
 
     @staticmethod
-    def divideIntoBuckets(objs, n_buckets):
+    def divideIntoBuckets(seq, num):
         """
         Divides objects into n buckets.
         Used in compute ranks to divide users into n tiers
         """
-        if n_buckets <= 0:
-            raise Exception('Number of buckets cannot be less than 1')
-        elif n_buckets > len(objs):
-            raise Exception('Number of buckets can not be creater than num of objs')
-        perBucket = len(objs) // n_buckets
-        remaining = len(objs) % n_buckets
-        buckets = []
-        i = 0
-        for b in range(0, n_buckets):
-            extra = 1 if b < remaining else 0
-            bucket = []
-            for o in range(0, extra + perBucket):
-                bucket.append(objs[i])
-                i += 1
-            buckets.append(bucket)
-        return buckets
+        avg = len(seq) / float(num)
+        out = []
+        last = 0.0
+        while last < len(seq):
+            out.append(seq[int(last):int(last + avg)])
+            last += avg
+        return out
 
     def computeRanks(self, last_ts, n):
         #TODO: FINISH
@@ -112,9 +102,12 @@ class TierSys:
             val = self.computeCarbon(user_id, last_ts)
             if val != None:
                 user_carbon_map[user_id] = val
-
+        logging.debug('USER CARBON MAP')
+        logging.debug(user_carbon_map)
         # Sort and partition users by carbon metric.
-        user_carbon_tuples_sorted = sorted(user_carbon_map.items(), key=(lambda kv: kv[1])) # Sorted list by value of dict tuples.
+        user_carbon_tuples_sorted = sorted(user_carbon_map.items(), key=lambda kv: kv[1]) # Sorted list by value of dict tuples.
+        logging.debug('USER CARBON TUPLES SORTED')
+        logging.debug(user_carbon_tuples_sorted)
         user_carbon_sorted = [i[0] for i in user_carbon_tuples_sorted] # Extract only the user ids.
         return self.divideIntoBuckets(user_carbon_sorted, n)
 
@@ -124,7 +117,7 @@ class TierSys:
         Formula is (Actual CO2 + penalty) / distance travelled
         """
         curr_ts = arrow.utcnow().timestamp
-        return User.computeCarbon(user_id, last_ts, curr_ts)
+        return User.carbonLastWeek(user_id)
 
     def updateTiers(self, last_ts):
         """
@@ -132,12 +125,13 @@ class TierSys:
         Also updates users tier attributes in the database.
         "Best" tiers have lower rank values.
         """
-        self.tiers = {}
+        self.tiers = []
         updated_user_tiers = self.computeRanks(last_ts, 3)
+
         for rank in range(1, len(updated_user_tiers) + 1):
             self.addTier(rank)
             tier_users = updated_user_tiers[rank-1]
-            self.tiers[rank] = tier_users
+            self.tiers[rank - 1] = tier_users
 
     def saveTiers(self):
         from datetime import datetime
@@ -168,11 +162,12 @@ class TierSys:
         }}
         """
         ts = []
-        for rank, uuids in self.tiers.items():
-            users = [{'uuid': uuid, 'lastWeekCarbon': User.carbonLastWeek(uuid)} for uuid in uuids]
-            ts.append({'rank': rank, 'users': users})
+        for i in range(len(self.tiers)):
+            users = [{'uuid': uuid, 'lastWeekCarbon': User.carbonLastWeek(uuid)} for uuid in self.tiers[i]]
+            ts.append({'rank': i + 1, 'users': users})
 
         print(ts)
+        logging.debug(ts)
 
         get_tiersys_db().insert_one({'tiers': ts, 'created_at': datetime.now()})
         return ts
