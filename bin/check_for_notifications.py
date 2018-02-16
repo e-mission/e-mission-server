@@ -1,10 +1,10 @@
-import emission.storage.timeseries.abstract_timeseries as esta
-import emission.net.ext_service.push.notify_usage as pnu
-import emission.core.wrapper.user as ecwu
 from __future__ import unicode_literals
 from __future__ import print_function
 from __future__ import division
 from __future__ import absolute_import
+import emission.storage.timeseries.abstract_timeseries as esta
+import emission.net.ext_service.push.notify_usage as pnu
+import emission.core.wrapper.user as ecwu
 from future import standard_library
 standard_library.install_aliases()
 from builtins import *
@@ -91,3 +91,5 @@ def check_all_suggestions():
             continue
     push_to_user(suggestion_uuids, "You have a new suggestion! Tap me to see it.")
     push_to_user(happiness_uuids, "Your polar bear's mood has changed since yesterday! Tap me to see it.")
+if __name__ == "main":
+    check_all_suggestions()
