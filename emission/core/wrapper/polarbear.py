@@ -54,17 +54,24 @@ def getPolarBearattr(user_id):
 def getAllBearsInTier(user_id):
 	"""
 	Return a dictionary containing all Polar bear attrs in a given tier
-		{'username1':[happiness1, size1], 'username2':[happiness2, size2]...}
+		{'myBear':{'happiness': int, 'size': int }, 'otherBears':{username1: {happiness: int, size: int},
+			username2: {'happiness: int, 'size': int}...}
 	"""
+	if type(user_id) == str:
+		user_id = UUID(user_id)
 	tierSys = TierSys.getLatest()[0]
 	userTier = tierSys['tiers'][TierSys.getUserTier(user_id) - 1]['users']
+	myBear = getPolarBearattr(user_id)
 	#List of of users within a tier
-	allUsers = {}
+	allUsers = {'myBear': {'happiness': myBear['happiness'], 'size': myBear['size']}, 'otherBears':{}}
 	for user in userTier:
 		uuid = user['uuid']
-		userattrs = getPolarBearattr(uuid)
-		currUsername = userattrs['username']
-		allUsers[currUsername] = [userattrs['happiness'], userattrs['size']]
+		if uuid != user_id:
+			userattrs = getPolarBearattr(uuid)
+			currUsername = userattrs['username']
+			allUsers['otherBears'][currUsername] = {}
+			allUsers['otherBears'][currUsername]['happiness'] = userattrs['happiness']
+			allUsers['otherBears'][currUsername]['size'] = userattrs['size']
 	return allUsers
 
 
