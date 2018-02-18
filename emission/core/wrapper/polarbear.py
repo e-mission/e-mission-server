@@ -70,6 +70,7 @@ def getAllBearsInTier(user_id):
 			userattrs = getPolarBearattr(uuid)
 			currUsername = userattrs['username']
 			allUsers['otherBears'][currUsername] = {}
+            allUsers['otherBears'][currUsername]['username'] = currUsername
 			allUsers['otherBears'][currUsername]['happiness'] = userattrs['happiness']
 			allUsers['otherBears'][currUsername]['size'] = userattrs['size']
 	return allUsers
@@ -89,7 +90,7 @@ def updatePolarBear(user_id):
 						'username': currUsername,
 						'happiness': User.computeHappiness(user_id),
 						'oldHappiness' : None,
-						'size' : 0
+						'size' : 1
 						})
 	else:
 		#Update the user's Polar Bear with newer stats
@@ -101,9 +102,7 @@ def updatePolarBear(user_id):
 			currattr['username'] = 'Anon'
 		#Have to user new username if user has changed it
 		if newHappiness > 0.4:
-			currattr['size'] += (4 - TierSys.getUserTier(user_id))
-		else:
-			currattr['size'] = 0
+			currattr['size'] += (4-(TierSys.getUserTier(user_id)))*0.03
 		setPolarBearattr(currattr)
 
 
