@@ -15,6 +15,7 @@
         }
       }
     </script>
+	  
     <style type="text/css">
       body {
         font-family: "AvenirNext-Regular";
@@ -28,36 +29,56 @@
         width: 80%;
         max-width: 300px;
       }
+		
+	  .direction {
+	  	width:95vw;
+	  	margin:auto;
+	  	background-color: #FFA726;
+		color: white;
+	  	border-radius: 10px;
+	  }
+		
+		h2 {
+			margin: 5px;
+		}
     </style>
     <title>Tripaware</title>
   </head>
 
   <body style="text-align: center;">
-    <img src="img/tripaware.png" id="clickme">
+    <img src="img/tripaware.png" alt="flyer" id="clickme">
     <div class="redirect">
       <div>
-        <h2>Thank you for participating - only two steps left!</h2>
+		<h2>Thank you for participating - only two steps left!</h2>
         <p>
-          Please open the links below <b>on your phone</b>, or read the QR codes from a laptop display using a QR code reader <b>on your phone.</b>
+          Please open the links below <b>on your phone</b>.
         </p>
       </div>
-      <div>
-        <h4>1. Install the e-mission app</h4>
+      <div class="direction">
+        <h2>1. Install the e-mission app</h2>
+		<p style="margin:3px;">After installing the app, remember to do step two!</p>
       </div>
-      <div class="row responsive-sm">
-        <a class="col" href='https://play.google.com/store/apps/details?id=edu.berkeley.eecs.emission'><img style="height:75px;" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
-        <qrcode class="col" data="https://play.google.com/store/apps/details?id=edu.berkeley.eecs.emission" size="200"></qrcode>
+      <div class="row responsive-sm" style="display:flex; justify-content:center">
+		<div>
+		  <img id="logo" alt="e-mission logo" src="img/favicon-96x96.png" style="margin-top:28px;">
+		</div>
+		<div>
+        	<a href="https://play.google.com/store/apps/details?id=edu.berkeley.eecs.emission">
+				<img style="height:75px;" alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png">
+			</a>
+			<br>
+			<a href="https://itunes.apple.com/us/app/emission/id1084198445?&mt=8">
+				<img style="height:65px;" alt="Get it on the iTunes App Store" src="img/apple-badge.svg">
+			</a>
+		</div>
       </div>
-      <div class="row responsive-sm">
-        <a class="col" href="https://itunes.apple.com/us/app/emission/id1084198445?&mt=8"><img src="img/apple-badge.svg"></a>
-        <qrcode class="col" data="https://itunes.apple.com/us/app/emission/id1084198445?&mt=8" size="200"></qrcode>
-      </div>
-      <div>
-        <h4>2. Join the study</h4>
+      <div class="direction">
+        <h2>2. Join the study</h2>
+		<p style="margin:3px;">You <b>must</b> click on this link <b>after</b> downloading the app in order to be considered for the study.</p>
       </div>
       <div id="downloadRow">
         <a id="groupLink" href="tripaware.eecs.berkeley.edu">
-          <p style="color: #417505;">Open this link on your phone to launch the app and join the study</p>
+          <p style="font-size: 20px;">Open this link on your phone to launch the app and join the study</p>
           <!--<p style="color: black;">emission://change_client?new_client={{client_label}}&clear_local_storage={{clear_local_storage_flag}}&clear_usercache={{clear_usercache_flag}}</p>-->
         </a>
       </div>
