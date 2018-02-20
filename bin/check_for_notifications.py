@@ -89,14 +89,14 @@ def check_all_suggestions():
     logging.debug("About to iterate over %s users" % len(all_users))
     for i in range(len(all_users)):
         try:
-            uuid = all_users.iloc[i].uuid
-            client = all_users.iloc[i].client
+            curr_uuid = all_users.iloc[i].uuid
+            client = edb.get_profile_db().find_one({"user_id": curr_uuid})['client']
             if client == "urap-2017-emotion":
-                if pb.getMoodChange(uuid):
-                    happiness_uuids.append(uuid)
+                if pb.getMoodChange(curr_uuid):
+                    happiness_uuids.append(curr_uuid)
             elif client == "urap-2017-information":
-                if calculate_single_suggestion(uuid):
-                    suggestion_uuids.append(uuid)
+                if calculate_single_suggestion(curr_uuid):
+                    suggestion_uuids.append(curr_uuid)
         except:
             logging.debug("error on %s" % all_users.iloc[i].user_email)
             continue
