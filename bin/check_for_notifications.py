@@ -25,6 +25,7 @@ def handle_insert(tripDict, tripID, collection, uuid):
         return True
     else:
         if tripDict['trip_id'] != tripID:
+            collection.update_one({'uuid': uuid}, {'$set': {'trip_id' : tripID}})
             return True
         else:
             return False
@@ -70,7 +71,7 @@ def calculate_single_suggestion(uuid):
             #Suggest walking if it is car/bus and distance less than 1
             return handle_insert(tripDict, trip_id, suggestion_trips, uuid)
     return False
-    
+
 def push_to_user(uuid_list, message):
     logging.debug("About to send notifications to: %s users" % len(uuid_list))
     json_data = {
