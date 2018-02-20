@@ -117,7 +117,7 @@ class TierSys:
         Formula is (Actual CO2 + penalty) / distance travelled
         """
         curr_ts = arrow.utcnow().timestamp
-        return User.carbonLastWeek(user_id)
+        return User.computeCarbon(user_id, last_ts, curr_ts)
 
     def updateTiers(self, last_ts):
         """
@@ -133,7 +133,7 @@ class TierSys:
             tier_users = updated_user_tiers[rank-1]
             self.tiers[rank - 1] = tier_users
 
-    def saveTiers(self):
+    def saveTiers(self, last_ts):
         from datetime import datetime
         """
         Saves the current tiers into the tiersys.
@@ -161,9 +161,10 @@ class TierSys:
             }]
         }}
         """
+        curr_ts = arrow.utcnow().timestamp
         ts = []
         for i in range(len(self.tiers)):
-            users = [{'uuid': uuid, 'lastWeekCarbon': User.carbonLastWeek(uuid)} for uuid in self.tiers[i]]
+            users = [{'uuid': uuid, 'lastWeekCarbon': User.computeCarbon(uuid, last_ts, curr_ts)} for uuid in self.tiers[i]]
             ts.append({'rank': i + 1, 'users': users})
 
         print(ts)

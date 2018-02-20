@@ -106,8 +106,7 @@ def calculate_single_suggestion(uuid):
         start_lon = str(start_loc[1])
         trip_id = cleaned_sections.iloc[i]['trip_id']
         tripDict = suggestion_trips.find_one({'uuid': uuid})
-        print(cleaned_sections.iloc[i]["trip_id"])
-        print(cleaned_sections.iloc[i]["start_fmt_time"])
+        print(tripDict)
         end_loc = cleaned_sections.iloc[i]["end_loc"]["coordinates"]
         end_lat = str(end_loc[0])
         end_lon = str(end_loc[1])
@@ -129,7 +128,6 @@ def calculate_single_suggestion(uuid):
                 continue
         elif mode == 0 and distance_in_miles < 5 and distance_in_miles >= 1:
             #Suggest bike if it is car/bus and distance between 5 and 1
-            #TODO: Change ret_boj and figure out how to change lat and lon to places
             try:
                 message = "Try biking from " + return_address_from_location(start_lon + "," + start_lat) + \
                 " to " + return_address_from_location(end_lon + "," + end_lat)
@@ -154,9 +152,9 @@ def calculate_single_suggestion(uuid):
                 continue
     return return_obj
 def insert_into_db(tripDict, tripID, collection, uuid):
+    print(tripDict)
     if tripDict == None:
         collection.insert_one({'uuid': uuid, 'trip_id': tripID})
     else:
         if tripDict['trip_id'] != tripID:
-            collection.update_one({'uuid': uuid, 'trip_id' : tripID})
-            
+            collection.update_one({'uuid': uuid}, {'$set':{'trip_id' : tripID}})

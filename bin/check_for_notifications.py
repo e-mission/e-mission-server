@@ -18,25 +18,29 @@ import re
 import emission.core.get_database as edb
 from uuid import UUID
 import emission.core.wrapper.polarbear as pb
+
 def handle_insert(tripDict, tripID, collection, uuid):
     if tripDict == None:
         collection.insert_one({'uuid': uuid, 'trip_id': tripID})
         return True
     else:
         if tripDict['trip_id'] != tripID:
+            collection.update_one({'uuid': uuid}, {'$set': {'trip_id' : tripID}})
             return True
         else:
             return False
 
 def calculate_single_suggestion(uuid):
+    logging.debug("About to calculate single suggestion for %s" % uuid)
+    all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
     #Given a single UUID, create a suggestion for them
     suggestion_trips = edb.get_suggestion_trips_db()
     return_obj = { 'message': "Good job walking and biking! No suggestion to show.",
     'savings': "0", 'start_lat' : '0.0', 'start_lon' : '0.0',
     'end_lat' : '0.0', 'end_lon' : '0.0', 'method' : 'bike'}
-    all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
     user_id = all_users.iloc[all_users[all_users.uuid == uuid].index.tolist()[0]].uuid
     time_series = esta.TimeSeries.get_time_series(user_id)
+    cleaned_sections = time_series.get_data_df("analysis/cleaned_section", time_query = None)
     cleaned_sections = time_series.get_data_df("analysis/cleaned_section", time_query = None)
     #Go in reverse order because we check by most recent trip
     counter = 40
@@ -45,11 +49,16 @@ def calculate_single_suggestion(uuid):
         if counter < 0:
             #Iterate 20 trips back
             return False
+        logging.debug("Considering section from %s -> %s" %
+            (cleaned_sections.iloc[i]["start_fmt_time"],
+             cleaned_sections.iloc[i]["end_fmt_time"]))
         if cleaned_sections.iloc[i]["end_ts"] - cleaned_sections.iloc[i]["start_ts"] < 5 * 60:
             continue
+        distance_in_miles = cleaned_sections.iloc[i]["distance"] * 0.000621371
         trip_id = cleaned_sections.iloc[i]['trip_id']
         tripDict = suggestion_trips.find_one({'uuid': uuid})
-
+        logging.debug("%s" % tripDict)
+        mode = cleaned_sections.iloc[i]["sensed_mode"]
         #TODO: Add elif's for bus
         if mode == 0 and distance_in_miles >= 5 and distance_in_miles <= 15:
             #Suggest bus if it is car and distance between 5 and 15
@@ -64,6 +73,7 @@ def calculate_single_suggestion(uuid):
     return False
 
 def push_to_user(uuid_list, message):
+    logging.debug("About to send notifications to: %s users" % len(uuid_list))
     json_data = {
         "title": "TripAware Notification",
         "message": message
@@ -80,19 +90,24 @@ def check_all_suggestions():
     suggestion_uuids = []
     happiness_uuids = []
     all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"user_email":1, "uuid": 1, "_id": 0})))
+    logging.debug("About to iterate over %s users" % len(all_users))
     for i in range(len(all_users)):
         try:
-            uuid = all_users[i].uuid
-            client = all_users[i].client
+            curr_uuid = all_users.iloc[i].uuid
+            client = edb.get_profile_db().find_one({"user_id": curr_uuid})['client']
             if client == "urap-2017-emotion":
-                if pb.getMoodChange(uuid):
-                    happiness_uuids.append(uuid)
+                if pb.getMoodChange(curr_uuid):
+                    happiness_uuids.append(curr_uuid)
             elif client == "urap-2017-information":
-                if calculate_single_suggestion(uuid):
-                    suggestion_uuids.append(uuid)
+                if calculate_single_suggestion(curr_uuid):
+                    suggestion_uuids.append(curr_uuid)
         except:
+            logging.debug("error on %s" % all_users.iloc[i].user_email)
             continue
     push_to_user(suggestion_uuids, "You have a new suggestion! Tap me to see it.")
     push_to_user(happiness_uuids, "Your polar bear's mood has changed since yesterday! Tap me to see it.")
-if __name__ == "main":
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
+    print("Set log leve to DEBUG")
     check_all_suggestions()

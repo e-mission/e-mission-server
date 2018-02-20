@@ -68,11 +68,14 @@ def getAllBearsInTier(user_id):
 		uuid = user['uuid']
 		if uuid != user_id:
 			userattrs = getPolarBearattr(uuid)
-			currUsername = userattrs['username']
-			allUsers['otherBears'][currUsername] = {}
-            allUsers['otherBears'][currUsername]['username'] = currUsername
-			allUsers['otherBears'][currUsername]['happiness'] = userattrs['happiness']
-			allUsers['otherBears'][currUsername]['size'] = userattrs['size']
+            if userattrs != None:
+    			currUsername = userattrs['username']
+    			allUsers['otherBears'][currUsername] = {}
+                allUsers['otherBears'][currUsername]['username'] = currUsername
+    			allUsers['otherBears'][currUsername]['happiness'] = userattrs['happiness']
+    			allUsers['otherBears'][currUsername]['size'] = userattrs['size']
+            else:
+                print("user polar bear not found!: " + uuid)
 	return allUsers
 
 
@@ -98,11 +101,14 @@ def updatePolarBear(user_id):
 		currattr['oldHappiness'] = currattr['happiness']
 		currattr['happiness'] = newHappiness
 		currattr['username'] = User.getUsername(user_id)['username']
+		rate_map = {1 : 1.05, 2: 1.03, 3: 1.012}
 		if currattr['username'] == None:
 			currattr['username'] = 'Anon'
 		#Have to user new username if user has changed it
 		if newHappiness > 0.4:
-			currattr['size'] += (4-(TierSys.getUserTier(user_id)))*0.03
+			currattr['size'] = max(currattr['size'] * rate_map[TierSys.getUserTier(user_id)], 1)
+		else:
+			currattr['size'] = 1
 		setPolarBearattr(currattr)
 
 
