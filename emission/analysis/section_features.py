@@ -72,14 +72,16 @@ def calHC(point1, point2, point3):
     HC = calHeading(point2, point3) - calHeading(point1, point2)
     return HC
 
-def calHCR(section):
-    ts = esta.TimeSeries.get_time_series(section.user_id)
+def calHCR(section_entry):
+    section = section_entry.data
+
+    ts = esta.TimeSeries.get_time_series(section_entry.user_id)
     tq = esda.get_time_query_for_trip_like_object(section)
     locations = list(ts.find_entries(["analysis/recreated_location"], tq))
 
     if len(locations) < 3:
         return 0
-  
+
     HCNum = 0
     for (i, point) in locations:
         currPoint = point
@@ -117,8 +119,9 @@ def calSR(section):
         else:
             return 0
 
-def calVCR(section):
-    speeds = section.speeds
+def calVCR(section_entry):
+    section = section_entry.data
+    speeds = section['speeds']
     if len(speeds) < 3:
         return 0
     else:

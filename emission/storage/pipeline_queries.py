@@ -109,7 +109,7 @@ def mark_mode_inference_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.MODE_INFERENCE)
 
 def get_complete_ts(user_id):
-    return get_current_state(user_id, ps.PipelineStages.CLEAN_RESAMPLING).last_processed_ts
+    return get_current_state(user_id, ps.PipelineStages.MODE_INFERENCE).last_processed_ts
 
 def get_time_range_for_clean_resampling(user_id):
     # type: (uuid.UUID) -> emission.storage.timeseries.timequery.TimeQuery
