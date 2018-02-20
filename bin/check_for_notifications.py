@@ -54,7 +54,7 @@ def calculate_single_suggestion(uuid):
             continue
         trip_id = cleaned_sections.iloc[i]['trip_id']
         tripDict = suggestion_trips.find_one({'uuid': uuid})
-
+        logging.debug("%s" % tripDict)
         #TODO: Add elif's for bus
         if mode == 0 and distance_in_miles >= 5 and distance_in_miles <= 15:
             #Suggest bus if it is car and distance between 5 and 15
@@ -98,6 +98,7 @@ def check_all_suggestions():
                 if calculate_single_suggestion(uuid):
                     suggestion_uuids.append(uuid)
         except:
+            logging.debug("error on %s" % all_users[i].username)
             continue
     push_to_user(suggestion_uuids, "You have a new suggestion! Tap me to see it.")
     push_to_user(happiness_uuids, "Your polar bear's mood has changed since yesterday! Tap me to see it.")
