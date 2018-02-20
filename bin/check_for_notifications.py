@@ -18,6 +18,7 @@ import re
 import emission.core.get_database as edb
 from uuid import UUID
 import emission.core.wrapper.polarbear as pb
+
 def handle_insert(tripDict, tripID, collection, uuid):
     if tripDict == None:
         collection.insert_one({'uuid': uuid, 'trip_id': tripID})
@@ -29,6 +30,7 @@ def handle_insert(tripDict, tripID, collection, uuid):
             return False
 
 def calculate_single_suggestion(uuid):
+    logging.debug("About to calculate single suggestion for %s" % uuid)
     #Given a single UUID, create a suggestion for them
     suggestion_trips = edb.get_suggestion_trips_db()
     return_obj = { 'message': "Good job walking and biking! No suggestion to show.",
@@ -45,6 +47,9 @@ def calculate_single_suggestion(uuid):
         if counter < 0:
             #Iterate 20 trips back
             return False
+        logging.debug("Considering section from %s -> %s" %
+            (cleaned_sections.iloc[i]["start_fmt_time"],
+             cleaned_sections.iloc[i]["end_fmt_time"]))
         if cleaned_sections.iloc[i]["end_ts"] - cleaned_sections.iloc[i]["start_ts"] < 5 * 60:
             continue
         trip_id = cleaned_sections.iloc[i]['trip_id']
@@ -64,6 +69,7 @@ def calculate_single_suggestion(uuid):
     return False
 
 def push_to_user(uuid_list, message):
+    logging.debug("About to send notifications to: %s users" % len(uuid_list))
     json_data = {
         "title": "TripAware Notification",
         "message": message
@@ -80,6 +86,7 @@ def check_all_suggestions():
     suggestion_uuids = []
     happiness_uuids = []
     all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"user_email":1, "uuid": 1, "_id": 0})))
+    logging.debug("About to iterate over %s users" % len(all_users))
     for i in range(len(all_users)):
         try:
             uuid = all_users[i].uuid
@@ -94,5 +101,8 @@ def check_all_suggestions():
             continue
     push_to_user(suggestion_uuids, "You have a new suggestion! Tap me to see it.")
     push_to_user(happiness_uuids, "Your polar bear's mood has changed since yesterday! Tap me to see it.")
-if __name__ == "main":
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
+    print("Set log leve to DEBUG")
     check_all_suggestions()
