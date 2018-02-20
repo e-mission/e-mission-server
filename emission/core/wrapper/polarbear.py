@@ -75,7 +75,7 @@ def getAllBearsInTier(user_id):
 			allUsers['otherBears'][currUsername]['happiness'] = userattrs['happiness']
 			allUsers['otherBears'][currUsername]['size'] = userattrs['size']
 		else:
-			print("user polar bear not found!: " + uuid)
+			print("user polar bear not found!: " + str(uuid))
 	return allUsers
 
 
