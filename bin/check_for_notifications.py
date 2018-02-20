@@ -31,14 +31,15 @@ def handle_insert(tripDict, tripID, collection, uuid):
 
 def calculate_single_suggestion(uuid):
     logging.debug("About to calculate single suggestion for %s" % uuid)
+    all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
     #Given a single UUID, create a suggestion for them
     suggestion_trips = edb.get_suggestion_trips_db()
     return_obj = { 'message': "Good job walking and biking! No suggestion to show.",
     'savings': "0", 'start_lat' : '0.0', 'start_lon' : '0.0',
     'end_lat' : '0.0', 'end_lon' : '0.0', 'method' : 'bike'}
-    all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
     user_id = all_users.iloc[all_users[all_users.uuid == uuid].index.tolist()[0]].uuid
     time_series = esta.TimeSeries.get_time_series(user_id)
+    cleaned_sections = time_series.get_data_df("analysis/cleaned_section", time_query = None)
     cleaned_sections = time_series.get_data_df("analysis/cleaned_section", time_query = None)
     #Go in reverse order because we check by most recent trip
     counter = 40
@@ -52,9 +53,11 @@ def calculate_single_suggestion(uuid):
              cleaned_sections.iloc[i]["end_fmt_time"]))
         if cleaned_sections.iloc[i]["end_ts"] - cleaned_sections.iloc[i]["start_ts"] < 5 * 60:
             continue
+        distance_in_miles = cleaned_sections.iloc[i]["distance"] * 0.000621371
         trip_id = cleaned_sections.iloc[i]['trip_id']
         tripDict = suggestion_trips.find_one({'uuid': uuid})
         logging.debug("%s" % tripDict)
+        mode = cleaned_sections.iloc[i]["sensed_mode"]
         #TODO: Add elif's for bus
         if mode == 0 and distance_in_miles >= 5 and distance_in_miles <= 15:
             #Suggest bus if it is car and distance between 5 and 15
@@ -67,7 +70,7 @@ def calculate_single_suggestion(uuid):
             #Suggest walking if it is car/bus and distance less than 1
             return handle_insert(tripDict, trip_id, suggestion_trips, uuid)
     return False
-
+    
 def push_to_user(uuid_list, message):
     logging.debug("About to send notifications to: %s users" % len(uuid_list))
     json_data = {
