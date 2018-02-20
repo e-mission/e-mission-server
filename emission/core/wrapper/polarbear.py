@@ -69,11 +69,11 @@ def getAllBearsInTier(user_id):
 		if uuid != user_id:
 			userattrs = getPolarBearattr(uuid)
             if userattrs != None:
-    			currUsername = userattrs['username']
-    			allUsers['otherBears'][currUsername] = {}
+                currUsername = userattrs['username']
+                allUsers['otherBears'][currUsername] = {}
                 allUsers['otherBears'][currUsername]['username'] = currUsername
-    			allUsers['otherBears'][currUsername]['happiness'] = userattrs['happiness']
-    			allUsers['otherBears'][currUsername]['size'] = userattrs['size']
+                allUsers['otherBears'][currUsername]['happiness'] = userattrs['happiness']
+                allUsers['otherBears'][currUsername]['size'] = userattrs['size']
             else:
                 print("user polar bear not found!: " + uuid)
 	return allUsers
