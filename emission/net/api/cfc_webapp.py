@@ -45,7 +45,10 @@ import emission.net.auth.auth as enaa
 import emission.net.ext_service.habitica.proxy as habitproxy
 from emission.core.wrapper.client import Client
 from emission.core.wrapper.user import User
+from emission.core.wrapper.tiersys import TierSys
 from emission.core.get_database import get_uuid_db, get_mode_db
+import emission.core.wrapper.polarbear as pb
+import emission.core.wrapper.suggestion_sys as suggsys
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.timeseries.timequery as estt
 import emission.storage.timeseries.tcquery as esttc
@@ -202,6 +205,7 @@ def getTimeseriesEntries(time_type):
         abort(401, "only a user can read his/her data")
 
     user_uuid = getUUID(request)
+    logging.debug("called with request.json = %s" % request.json)
 
     key_list = request.json['key_list']
     if 'from_local_date' in request.json and 'to_local_date' in request.json:
@@ -252,6 +256,87 @@ def getTrips(day):
   logging.debug("type(ret_dict) = %s" % type(ret_dict))
   return ret_dict
 
+@post('/suggestion')
+def getSuggestion():
+  logging.debug("Called suggestion")
+  user_uuid=getUUID(request)
+  logging.debug("user_uuid %s" % user_uuid)
+  ret_dir = suggsys.calculate_single_suggestion(user_uuid)
+  logging.debug("type(ret_dir) = %s" % type(ret_dir))
+  logging.debug("Output of ret_dir = %s" % ret_dir)
+  return ret_dir
+
+@post("/getUsername")
+def getUsername():
+  user_id = getUUID(request)
+  logging.debug("Starting getUsername")
+  username = User.getUsername(user_id)
+  logging.debug("Output of getUsername: %s" %username)
+  return User.getUsername(user_id)
+
+@post("/setUsername/<username>")
+def setUsername(username):
+  user_id = getUUID(request)
+  logging.debug("called setUsername: %s" %username)
+  return User.setUsername(user_id, username)
+
+@post('/happiness')
+def getHappiness():
+  user_id = getUUID(request)
+  return {'happiness' : User.computeHappiness(user_id)}
+
+@post('/polarbear')
+def getTierPolarBears():
+  user_id = getUUID(request)
+  return pb.getAllBearsInTier(user_id)
+
+@post('/tierRank')
+def getTierRank():
+  user_id = getUUID(request)
+  return {'tierRank' : TierSys.computeTierRank(user_id)}
+
+@post('/tier')
+def getUserTier():
+  user_id = getUUID(request)
+  return {'tier' : TierSys.getUserTier(user_id)}
+
+@post('/listOfUsers')
+def getListOfUsers():
+  user_id = getUUID(request)
+  userTierNum = TierSys.getUserTier(user_id)
+  userTiers = TierSys.getLatest()[0]['tiers']
+  logging.debug('TierSys: %s' %TierSys.getLatest()[0])
+  tierUsernames = [[], [], []]
+  logging.debug(userTiers)
+  for tier in userTiers:
+    logging.debug('TIER: %s' %tier)
+    index = tier['rank'] - 1
+    curr_tier = tierUsernames[index]
+    for user in tier['users']:
+        uuid = user['uuid']
+        username = User.getUsername(uuid)
+        carbon = user['lastWeekCarbon'] * 1000
+        if username == None:
+            result = {'uuid': uuid, 'carbonLastWeek': carbon}
+            curr_tier.append(result)
+        else:
+            result = {'username': username, 'carbonLastWeek': carbon}
+            curr_tier.append(result)
+  return {'tiers' : tierUsernames}
+
+@post('/getListOfUsersInUsersTier')
+def getListOfUsersInUsersTier():
+  user_id = getUUID(request)
+  userTierNum = TierSys.getUserTier(user_id)
+  userTierUsers = TierSys.getLatest()[0]['tiers'][userTierNum - 1]['uuids']
+  logging.debug("User Tier is: %s" %str(userTierNum))
+  logging.debug("Getting users")
+  tierUsernames = []
+  for uuid in userTierUsers:
+    tierUsernames.append(User.getUsername(uuid))
+  logging.debug("returning usernames to client")
+  return {'allUsers' : tierUsernames}
+
 @post('/profile/create')
 def createUserProfile():
   try:
@@ -280,6 +365,10 @@ def getUserProfile():
   user_uuid = getUUID(request)
   user = User.fromUUID(user_uuid)
   return user.getProfile()
+
+@post('/tiersys')
+def getTierSys():
+  return TierSys.getLatest()
 
 @post('/result/metrics/<time_type>')
 def summarize_metrics(time_type):

@@ -2,82 +2,89 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
-    <title></title>
-    
-    <link rel="shortcut icon" type="image/x-icon" href="img/favicon-96x96.png">
-    <link href="lib/ionic/css/ionic.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
-    <link href="css/redirect.css" rel="stylesheet">
-    <link href="css/home.css" rel="stylesheet">
-    <link href="lib/leaflet/dist/leaflet.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-    <link href='https://fonts.googleapis.com/css?family=Roboto:400,700,500,300' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="lib/nvd3/build/nv.d3.css">
-    <!-- IF using Sass (run gulp sass first), then uncomment below and remove the CSS includes above
-    <link href="css/ionic.app.css" rel="stylesheet">
-    -->
+    <script type="text/javascript">
+      window.onload = init;
+      function init(){
+        var link = document.getElementById("groupLink");
+        var myrandom = Math.random();
+        if (myrandom < 0.5) {
+          link.href = "emission://change_client?new_client=urap2017information&clear_local_storage=true&clear_usercache=true"
+        }
+        else {
+          link.href = "emission://change_client?new_client=urap2017control&clear_local_storage=true&clear_usercache=true"
+        }
+      }
+    </script>
+	  
+    <style type="text/css">
+      body {
+        font-family: "AvenirNext-Regular";
+        color: #4A4A4A;
+      }
 
-    <!-- ionic/angularjs js -->
-    <script src="lib/ionic/js/ionic.bundle.js"></script>
-
-    <!-- other javascript libraries -->
-    <script src="lib/moment/min/moment.min.js"></script>
-    <script src="lib/angular-simple-logger/dist/angular-simple-logger.js"></script>
-    <script src="lib/leaflet/dist/leaflet.js"></script>
-    <script src="lib/ui-leaflet/dist/ui-leaflet.min.js"></script>
-    <script src="lib/simple-leaflet-plugins/leaflet-heat.js"></script>
-    <script src="lib/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
-    <script src="lib/d3/d3.js"></script>
-    <script src="lib/nvd3/build/nv.d3.js"></script> <!-- or use another assembly -->
-    <script src="lib/angular-nvd3/dist/angular-nvd3.js"></script>
-    <script src="lib/qrcode-generator/js/qrcode.js"></script>
-    <script src="lib/qrcode-generator/js/qrcode_UTF8.js"></script>
-    <script src="lib/angular-qrcode/angular-qrcode.js"></script>
-
-    <!-- cordova script (this will be a 404 during development) -->
-    <script src="cordova.js"></script>
-
-    <!-- your app's js -->
-    <script src="js/logger.js"></script>
-    <script src="js/incident/post-trip-manual.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/controllers.js"></script>
-    <script src="js/services.js"></script>
-    <script src="js/directives.js"></script>
-    <script src="js/heatmap.js"></script>
-    <script src="js/metrics.js"></script>
+      #clickme {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        width: 80%;
+        max-width: 300px;
+      }
+		
+	  .direction {
+	  	width:95vw;
+	  	margin:auto;
+	  	background-color: #FFA726;
+		color: white;
+	  	border-radius: 10px;
+	  }
+		
+		h2 {
+			margin: 5px;
+		}
+    </style>
+    <title>Tripaware</title>
   </head>
-  <body ng-app="starter">
-    <!--
-      The nav bar that will be updated as we navigate between views.
-    -->
-    <ion-nav-bar class="bar-position">
-      <ion-nav-buttons side="left">
-        <button class="button button-icon" ui-sref="home">
-        <i class="icon-left ion-home"></i> Home
-        </button>
-        <button class="button button-icon" ui-sref="heatmap">
-            <i class="icon-left ion-fireball"></i> Analysis
-        </button>
-        <button class="button button-icon" ui-sref="metrics">
-            <i class="icon-left ion-ios-analytics"></i> Metrics
-        </button>
-        <button class="button button-icon" ui-sref="trip-planning">
-            <i class="icon-left ion-android-compass"></i> Trip Planning
-        </button>
-        <button class="button button-icon" ui-sref="game">
-            <i class="icon-left ion-checkmark"></i> Game
-        </button>
-      </ion-nav-buttons-->
-    </ion-nav-bar>
-      <!--ion-nav-back-button>
-      </ion-nav-back-button-->
-    <!--
-      The views will be rendered in the <ion-nav-view> directive below
-      Templates are in the /templates folder (but you could also
-      have templates inline in this html file if you'd like).
-    -->
-    <ion-nav-view></ion-nav-view>
+
+  <body style="text-align: center;">
+    <img src="img/tripaware.png" alt="flyer" id="clickme">
+    <div class="redirect">
+      <div>
+		<h2>Thank you for participating - only two steps left!</h2>
+        <p>
+          Please open the links below <b>on your phone</b>.
+        </p>
+      </div>
+      <div class="direction">
+        <h2>1. Install the e-mission app</h2>
+		<p style="margin:3px;">After installing the app, remember to do step two!</p>
+      </div>
+      <div class="row responsive-sm" style="display:flex; justify-content:center">
+		<div>
+		  <img id="logo" alt="e-mission logo" src="img/favicon-96x96.png" style="margin-top:28px;">
+		</div>
+		<div>
+        	<a href="https://play.google.com/store/apps/details?id=edu.berkeley.eecs.emission">
+				<img style="height:75px;" alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png">
+			</a>
+			<br>
+			<a href="https://itunes.apple.com/us/app/emission/id1084198445?&mt=8">
+				<img style="height:65px;" alt="Get it on the iTunes App Store" src="img/apple-badge.svg">
+			</a>
+		</div>
+      </div>
+      <div class="direction">
+        <h2>2. Join the study</h2>
+		<p style="margin:3px;">You <b>must</b> click on this link <b>after</b> downloading the app in order to be considered for the study.</p>
+      </div>
+      <div id="downloadRow">
+        <a id="groupLink" href="tripaware.eecs.berkeley.edu">
+          <p style="font-size: 20px;">Open this link on your phone to launch the app and join the study</p>
+          <!--<p style="color: black;">emission://change_client?new_client={{client_label}}&clear_local_storage={{clear_local_storage_flag}}&clear_usercache={{clear_usercache_flag}}</p>-->
+        </a>
+      </div>
+      <div>
+        <qrcode class="col" data="emission://change_client?new_client={{client_label}}&clear_local_storage={{clear_local_storage_flag}}&clear_usercache={{clear_usercache_flag}}" size="200"></qrcode>
+      </div>
+    </div>
   </body>
 </html>
