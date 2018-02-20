@@ -89,8 +89,8 @@ def check_all_suggestions():
     logging.debug("About to iterate over %s users" % len(all_users))
     for i in range(len(all_users)):
         try:
-            uuid = all_users[i].uuid
-            client = all_users[i].client
+            uuid = all_users.iloc[i].uuid
+            client = all_users.iloc[i].client
             if client == "urap-2017-emotion":
                 if pb.getMoodChange(uuid):
                     happiness_uuids.append(uuid)
@@ -98,7 +98,7 @@ def check_all_suggestions():
                 if calculate_single_suggestion(uuid):
                     suggestion_uuids.append(uuid)
         except:
-            logging.debug("error on %s" % all_users[i].username)
+            logging.debug("error on %s" % all_users.iloc[i].user_email)
             continue
     push_to_user(suggestion_uuids, "You have a new suggestion! Tap me to see it.")
     push_to_user(happiness_uuids, "Your polar bear's mood has changed since yesterday! Tap me to see it.")
