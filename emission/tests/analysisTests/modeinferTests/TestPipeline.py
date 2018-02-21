@@ -51,7 +51,7 @@ class TestPipeline(unittest.TestCase):
 
   def tearDown(self):
         logging.debug("Clearing related databases")
-        # self.clearRelatedDb()
+        self.clearRelatedDb()
 
   def clearRelatedDb(self):
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
@@ -121,9 +121,9 @@ class TestPipeline(unittest.TestCase):
 
     # I know this from looking at the output for this small dataset
     # self.assertAlmostEqual(self.pipeline.predictedProb[0,0], 0.9, places=3)
-    self.assertEqual(self.pipeline.predictedProb[0,0], 0.4)
-    self.assertTrue(round(self.pipeline.predictedProb[0,1],2) == 0.6 or 
-        round(self.pipeline.predictedProb[0,1],2) == 0.6,
+    self.assertEqual(self.pipeline.predictedProb[0,0], 0.7)
+    self.assertTrue(round(self.pipeline.predictedProb[0,1],2) == 0.3 or 
+        round(self.pipeline.predictedProb[0,1],2) == 0.3,
         "predictedProb[0,1] = %s, with rounding = %s" % (self.pipeline.predictedProb[0,1],
             round(self.pipeline.predictedProb[0,1])))
     self.assertTrue(round(self.pipeline.predictedProb[2,0],2) == 0.2 or
@@ -142,9 +142,9 @@ class TestPipeline(unittest.TestCase):
     self.assertEquals(uniqueModes.tolist(), [1,5])
 
     currProb = self.pipeline.convertPredictedProbToMap(uniqueModes,
-        self.pipeline.predictedProb[1])
+        self.pipeline.predictedProb[2])
 
-    self.assertEquals(currProb, {'WALKING': 0.4, 'BUS': 0.6})
+    self.assertEquals(currProb, {'WALKING': 0.2, 'BUS': 0.8})
 
   def testSavePredictionsStep(self):
     self.testPredictedProb()
@@ -156,7 +156,7 @@ class TestPipeline(unittest.TestCase):
         self.assertIsNotNone(predicted_mode)
         if i == 0:
             self.assertEquals(predicted_mode.data["predicted_mode_map"],
-                {'WALKING': 0.4, 'BUS': 0.6})
+                {'WALKING': 0.7, 'BUS': 0.3})
 
         if i == 2:
             self.assertEquals(predicted_mode.data["predicted_mode_map"],
@@ -171,7 +171,7 @@ class TestPipeline(unittest.TestCase):
         self.assertIsNotNone(predicted_mode)
         if i == 0:
             self.assertEquals(predicted_mode.data["predicted_mode_map"],
-                {'WALKING': 0.4, 'BUS': 0.6})
+                {'WALKING': 0.7, 'BUS': 0.3})
 
         if i == 2:
             self.assertEquals(predicted_mode.data["predicted_mode_map"],

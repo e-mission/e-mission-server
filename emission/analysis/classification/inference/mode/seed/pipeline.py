@@ -302,7 +302,7 @@ class ModeInferencePipelineMovesFormat:
 
 # Feature Indices
   def selectFeatureIndicesStep(self):
-    genericFeatureIndices = list(range(0,10))
+    genericFeatureIndices = list(range(0,2)) + list(range(4,9))
     AdvancedFeatureIndices = list(range(10,13))
     LocationFeatureIndices = list(range(13,17))
     TimeFeatureIndices = list(range(17,19))
@@ -312,7 +312,7 @@ class ModeInferencePipelineMovesFormat:
     logging.debug("location features = %s" % LocationFeatureIndices)
     logging.debug("time features = %s" % TimeFeatureIndices)
     logging.debug("bus train features = %s" % BusTrainFeatureIndices)
-    return genericFeatureIndices + BusTrainFeatureIndices
+    return genericFeatureIndices + AdvancedFeatureIndices + BusTrainFeatureIndices
 
   def buildModelStep(self):
     from sklearn import ensemble
