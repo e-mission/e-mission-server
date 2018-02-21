@@ -7,6 +7,7 @@ import numpy as np
 import scipy as sp
 import time
 import json
+import copy
 
 # Our imports
 import emission.storage.timeseries.abstract_timeseries as esta
@@ -31,6 +32,7 @@ def predictMode(user_id):
     time_query = epq.get_time_range_for_segmentation(user_id)
     try:
         mip = ModeInferencePipeline()
+        mip.user_id = user_id
         mip.runPredictionPipeline(user_id, time_query)
         if mip.getLastTimestamp() == 0:
             logging.debug("after, run, last_timestamp == 0, must be early return")
@@ -63,17 +65,21 @@ class ModeInferencePipeline:
   # created from the small store of data that we do have ground truth for, and
   # we documented to have ~ 70% accuracy in the 2014 e-mission paper.
 
-  def runPredictionPipeline(self, uuid, timerange):
-    ts = esta.TimeSeries.get_time_series(user_id)
-    toPredictTrips_it = ts.find_entries(['analysis/cleaned_section'], time_query=timerange)
-    if (toPredictTrips_it.count() == 0):
-        logging.debug("toPredictTrips_it.count() == 0, early return")
+  def runPredictionPipeline(self, user_id, timerange):
+    self.ts = esta.TimeSeries.get_time_series(user_id)
+    self.toPredictSections = esda.get_entries(esda.CLEANED_SECTION_KEY, user_id, 
+        time_query=None)
+    if (len(self.toPredictSections) == 0):
+        logging.debug("len(toPredictSections) == 0, early return")
+        assert(self.last_timestamp == 0)
         return None
 
     self.loadModelStage()
     logging.info("loadModelStage DONE")
+    self.selFeatureIndices = self.selectFeatureIndicesStep()
+    logging.info("selectFeatureIndicesStep DONE")
     (self.toPredictFeatureMatrix, self.tripIds, self.sectionIds) = \
-        self.generateFeatureMatrixAndIDsStep(toPredictTrips_it)
+        self.generateFeatureMatrixAndIDsStep(self.toPredictSections)
     logging.info("generateFeatureMatrixAndIDsStep DONE")
     self.predictedProb = self.predictModesStep()
     #This is a matrix of the entries and their corresponding probabilities for each classification
@@ -116,7 +122,8 @@ class ModeInferencePipeline:
     featureMatrix[i, 1] = section.duration
   
     featureMatrix[i, 2] = section.sensed_mode.value
-    featureMatrix[i, 3] = section['_id']
+    # TODO: Figure out if I can get the section id from the new style sections
+    # featureMatrix[i, 3] = section['_id']
     featureMatrix[i, 4] = easf.calOverallSectionSpeed(section)
 
     speeds = section['speeds']
@@ -166,49 +173,13 @@ class ModeInferencePipeline:
     # Replace NaN and inf by zeros so that it doesn't crash later
     featureMatrix[i] = np.nan_to_num(featureMatrix[i])
 
-  def cleanDataStep(self):
-    runIndices = self.resultVector == 2
-    transportIndices = self.resultVector == 4
-    mixedIndices = self.resultVector == 8
-    airIndices = self.resultVector == 9
-    unknownIndices = self.resultVector == 0
-    strippedIndices = np.logical_not(runIndices | transportIndices | mixedIndices | unknownIndices)
-    logging.debug("Stripped trips with mode: run %s, transport %s, mixed %s, unknown %s unstripped %s" %
-      (np.count_nonzero(runIndices), np.count_nonzero(transportIndices),
-      np.count_nonzero(mixedIndices), np.count_nonzero(unknownIndices),
-      np.count_nonzero(strippedIndices)))
-
-    strippedFeatureMatrix = self.featureMatrix[strippedIndices]
-    strippedResultVector = self.resultVector[strippedIndices]
-
-    
-    # In spite of stripping out the values, we see that there are clear
-    # outliers. This is almost certainly a mis-classified trip, because the
-    # distance and speed are both really large, but the mode is walking. Let's
-    # manually filter out this outlier.
- 
-    distanceOutliers = strippedFeatureMatrix[:,0] > 500000
-    speedOutliers = strippedFeatureMatrix[:,4] > 100
-    speedMeanOutliers = strippedFeatureMatrix[:,5] > 80
-    speedVarianceOutliers = strippedFeatureMatrix[:,6] > 70
-    maxSpeedOutliers = strippedFeatureMatrix[:,7] > 160
-    logging.debug("Stripping out distanceOutliers %s, speedOutliers %s, speedMeanOutliers %s, speedVarianceOutliers %s, maxSpeedOutliers %s" % 
-            (np.nonzero(distanceOutliers), np.nonzero(speedOutliers),
-            np.nonzero(speedMeanOutliers), np.nonzero(speedVarianceOutliers),
-            np.nonzero(maxSpeedOutliers)))
-    nonOutlierIndices = np.logical_not(distanceOutliers | speedOutliers | speedMeanOutliers | speedVarianceOutliers | maxSpeedOutliers)
-    logging.debug("nonOutlierIndices.shape = %s" % nonOutlierIndices.shape)
-
-    return (strippedFeatureMatrix[nonOutlierIndices],
-            strippedResultVector[nonOutlierIndices])
-
 # Feature Indices
   def selectFeatureIndicesStep(self):
-    genericFeatureIndices = list(xrange(0,10))
-    AdvancedFeatureIndices = list(xrange(10,13))
-    LocationFeatureIndices = list(xrange(13,17))
-    TimeFeatureIndices = list(xrange(17,19))
-    BusTrainFeatureIndices = list(xrange(19,22))
+    genericFeatureIndices = list(range(0,10))
+    AdvancedFeatureIndices = list(range(10,13))
+    LocationFeatureIndices = list(range(13,17))
+    TimeFeatureIndices = list(range(17,19))
+    BusTrainFeatureIndices = list(range(19,22))
     logging.debug("generic features = %s" % genericFeatureIndices)
     logging.debug("advanced features = %s" % AdvancedFeatureIndices)
     logging.debug("location features = %s" % LocationFeatureIndices)
@@ -216,24 +187,20 @@ class ModeInferencePipeline:
     logging.debug("bus train features = %s" % BusTrainFeatureIndices)
     return genericFeatureIndices + BusTrainFeatureIndices
 
-  def generateFeatureMatrixAndIDsStep(self, sectionQuery):
-    if isinstance(sectionQuery, basestring):
-      toPredictSections = self.Sections.find(sectionQuery)
-      numsections = toPredictSections.count()
-    else:
-      toPredictSections = list(sectionQuery)
-      numsections = len(toPredictSections)
+  def generateFeatureMatrixAndIDsStep(self, toPredictSections_it):
+    toPredictSections = list(toPredictSections_it)
+    numsections = len(toPredictSections)
 
     logging.debug("Predicting values for %d sections" % numsections)
     featureMatrix = np.zeros([numsections, len(self.featureLabels)])
     sectionIds = []
     tripIds = []
-    for (i, section) in enumerate(toPredictSections.limit(featureMatrix.shape[0]).batch_size(300)):
+    for (i, section) in enumerate(toPredictSections):
       if i % 50 == 0:
         logging.debug("Processing test record %s " % i)
       self.updateFeatureMatrixRowWithSection(featureMatrix, i, section)
       sectionIds.append(section['_id'])
-      tripIds.append(section['trip_id'])
+      tripIds.append(section.data.trip_id)
 
     return (featureMatrix[:,self.selFeatureIndices], tripIds, sectionIds)
 
@@ -257,6 +224,7 @@ class ModeInferencePipeline:
       uniqueModesInt = [int(um) for um in uniqueModes]
       logging.debug("predictedProbArr has %s non-zero elements" % np.count_nonzero(predictedProbArr))
       logging.debug("uniqueModes are %s " % uniqueModesInt)
+      logging.debug("predictedProbArr = %s" % predictedProbArr)
       for (j, oldMode) in enumerate(uniqueModesInt):
         if predictedProbArr[j] != 0:
           uniqueMode = self.seed_modes_mapping[str(oldMode)]
@@ -264,24 +232,42 @@ class ModeInferencePipeline:
           logging.debug("Setting probability of mode %s (%s) to %s" %
             (uniqueMode, modeName, predictedProbArr[j]))
           currProbMap[modeName] = predictedProbArr[j]
+          # logging.debug("after setting value = %s" % currProbMap[modeName])
+          # logging.debug("after setting map = %s" % currProbMap)
+      # logging.debug("Returning map %s" % currProbMap)
       return currProbMap
 
   def savePredictionsStep(self):
     from emission.core.wrapper.user import User
     from emission.core.wrapper.client import Client
 
-    uniqueModes = sorted(set(self.cleanedResultVector))
+    uniqueModes = self.model.classes_
 
     for i in range(self.predictedProb.shape[0]):
-        currTripId = self.tripIds[i]
-        currSectionId = self.sectionIds[i]
+        currSectionEntry = self.toPredictSections[i]
+        currSection = currSectionEntry.data
         currProb = self.convertPredictedProbToMap(uniqueModes, self.predictedProb[i])
-        logging.debug("Updating probability for section with id = %s" % currSectionId)
+
+        # Insert the prediction
         mp = ecwm.Modeprediction()
-        mp.trip_id = currTripId
-        mp.section_id = currSectionId
+        mp.trip_id = currSection.trip_id
+        mp.section_id = currSectionEntry.get_id()
         mp.algorithm_id = ecwm.AlgorithmTypes.SEED_RANDOM_FOREST
-        mp.predicted_mode = currProb
+        mp.predicted_mode_map = currProb
+        mp.start_ts = currSection.start_ts
+        mp.end_ts = currSection.end_ts
+        self.ts.insert_data(self.user_id, "inference/prediction", mp)
+
+        # Since there is currently only one prediction, create the inferred
+        # section object right here
+        is_dict = copy.copy(currSectionEntry)
+        del is_dict["_id"]
+        is_dict["metadata"]["key"] = "analysis/inferred_section"
+        is_dict["data"]["sensed_mode"] = ecwm.PredictedModeTypes[easf.select_inferred_mode([mp])].value
+        ise = ecwe.Entry(is_dict)
+        logging.debug("Updating sensed mode for section = %s to %s" % 
+            (currSectionEntry.get_id(), ise.data.sensed_mode))
+        self.ts.insert(ise)
 
 if __name__ == "__main__":
   import json

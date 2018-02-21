@@ -13,7 +13,11 @@ import emission.analysis.section_features as fc
 
 import emission.core.wrapper.cleanedsection as ecwcs
 import emission.core.wrapper.entry as ecwe
+import emission.core.wrapper.modeprediction as ecwm
+import emission.core.wrapper.motionactivity as ecwma
 import emission.storage.decorations.analysis_timeseries_queries as esda
+
+import emission.tests.common as etc
 
 class TestFeatureCalc(unittest.TestCase):
   def setUp(self):
@@ -84,5 +88,33 @@ class TestFeatureCalc(unittest.TestCase):
     print(fc.calAccels(testSec))
     self.assertEqual(fc.calAccels(testSec).tolist(), [3/30, 3/30])
 
+  def testSelectInferredModeImbalanced(self):
+    # dummy_inferred_mode = dim
+    dim = ecwm.Modeprediction()
+    dim.trip_id = "test_trip_id"
+    dim.section_id = "test_section_id"
+    dim.algorithm_id = ecwm.AlgorithmTypes.SEED_RANDOM_FOREST
+    dim.sensed_mode = ecwma.MotionTypes.WALKING
+    dim.predicted_mode_map = {"WALKING": 0.9, "BUS": 0.1}
+    dim.start_ts = 0
+    dim.end_ts = 0
+
+    self.assertEqual(fc.select_inferred_mode([dim]), 'WALKING')
+
+  def testSelectInferredModeEqual(self):
+    # dummy_inferred_mode = dim
+    # select the lower value mode, typically = lower carbon intensity mode
+    dim = ecwm.Modeprediction()
+    dim.trip_id = "test_trip_id"
+    dim.section_id = "test_section_id"
+    dim.algorithm_id = ecwm.AlgorithmTypes.SEED_RANDOM_FOREST
+    dim.sensed_mode = ecwma.MotionTypes.WALKING
+    dim.predicted_mode_map = {"WALKING": 0.5, "BUS": 0.5}
+    dim.start_ts = 0
+    dim.end_ts = 0
+
+    self.assertEqual(fc.select_inferred_mode([dim]), 'WALKING')
+
 if __name__ == '__main__':
+    etc.configLogging()
     unittest.main()

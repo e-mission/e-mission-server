@@ -20,6 +20,7 @@ from emission.analysis.modelling.tour_model.trajectory_matching.route_matching i
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.core.wrapper.entry as ecwe
+import emission.core.wrapper.modeprediction as ecwm
 import emission.storage.decorations.trip_queries as esdt
 
 from uuid import UUID 
@@ -83,7 +84,7 @@ def calHCR(section_entry):
         return 0
 
     HCNum = 0
-    for (i, point) in locations:
+    for (i, point) in enumerate(locations[:-2]):
         currPoint = point
         nextPoint = locations[i+1]
         nexNextPt = locations[i+2]
@@ -128,7 +129,7 @@ def calVCR(section_entry):
         Pv = 0
         for (i, speed) in enumerate(speeds[:-1]):
             velocity1 = speed
-            velocity2 = speed[i+1]
+            velocity2 = speeds[i+1]
             if velocity1 != None and velocity2 != None:
                 if velocity1 != 0:
                     VC = abs(velocity2 - velocity1)/velocity1
@@ -422,3 +423,23 @@ def transit_stop_match_score(section,radius1=300):
             if transitMatch[entry['type']]==1:
                 break
     return transitMatch
+
+def select_inferred_mode(prediction_list):
+    # We currently only support a single prediction
+    assert(len(prediction_list) == 1)
+    curr_prediction = prediction_list[0]
+    assert(curr_prediction.algorithm_id == ecwm.AlgorithmTypes.SEED_RANDOM_FOREST)
+   
+    prediction_map = curr_prediction["predicted_mode_map"]
+    max_value = max(prediction_map.values())
+    logging.debug("max confidence in prediction map = %s" % max_value)
+    keys_for_max_value = [k for (k, v) in prediction_map.items() if v == max_value]
+    logging.debug("max keys in prediction map = %s" % keys_for_max_value)
+    if len(keys_for_max_value) == 1:
+        return keys_for_max_value[0]
+    else:
+        classes_for_max_value = [ecwm.PredictedModeTypes[key].value for key in keys_for_max_value]
+        logging.debug("classes for max_value = %s" % classes_for_max_value)
+        min_class = min(classes_for_max_value)
+        logging.debug("min_class = %s" % min_class)
+        return ecwm.PredictedModeTypes(min_class).name
