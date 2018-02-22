@@ -6,13 +6,14 @@ import utm
 from sklearn.cluster import DBSCAN
 
 # Our imports
+import emission.core.get_database as edb
 from emission.core.get_database import get_section_db, get_mode_db, get_routeCluster_db,get_transit_db
 from emission.core.common import calDistance, Include_place_2
 from emission.analysis.modelling.tour_model.trajectory_matching.route_matching import getRoute,fullMatchDistance,matchTransitRoutes,matchTransitStops
 
 Sections = get_section_db()
 from pymongo import MongoClient
-BackupSections = MongoClient("localhost").Backup_database.Stage_Sections
+BackupSections = MongoClient(edb.url).Backup_database.Stage_Sections
 Modes = get_mode_db()
 
 
@@ -288,9 +289,16 @@ def mode_cluster(mode,eps,sam):
     utm_y = []
     for row in mode_change_pnts:
         # GEOJSON order is lng, lat
-        utm_loc = utm.from_latlon(row[1],row[0])
-        utm_x = np.append(utm_x,utm_loc[0])
-        utm_y = np.append(utm_y,utm_loc[1])
+        try:
+            utm_loc = utm.from_latlon(row[1],row[0])
+            utm_x = np.append(utm_x,utm_loc[0])
+            utm_y = np.append(utm_y,utm_loc[1])
+        except utm.error.OutOfRangeError as oore:
+            logging.warning("Found OutOfRangeError while converting=%s, swapping" % row)
+            utm_loc = utm.from_latlon(row[0],row[1])
+            utm_x = np.append(utm_x,utm_loc[1])
+            utm_y = np.append(utm_y,utm_loc[0])
+            
     utm_location = np.column_stack((utm_x,utm_y))
     db = DBSCAN(eps=eps,min_samples=sam)
     db_fit = db.fit(utm_location)

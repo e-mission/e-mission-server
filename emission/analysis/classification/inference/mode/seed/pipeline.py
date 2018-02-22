@@ -51,7 +51,7 @@ class ModeInferencePipelineMovesFormat:
     logging.info("initial loadTrainingDataStep DONE")
 
     logging.debug("finished loading current training set, now loading from backup!")
-    backupSections = MongoClient('localhost').Backup_database.Stage_Sections
+    backupSections = MongoClient(edb.url).Backup_database.Stage_Sections
     self.backupConfirmedSections = self.loadTrainingDataStep(allConfirmedTripsQuery, backupSections)
     logging.info("loadTrainingDataStep DONE")
 
