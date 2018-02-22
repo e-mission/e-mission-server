@@ -38,7 +38,7 @@
                                 "$oid": "57e1933df6858f0a02a4a315"
                             }
                         ], 
-                        "exit_ts": 1440688739.672
+                        "exit_ts": 1440688707.867
                     }
                 }, 
                 {
@@ -279,7 +279,7 @@
                                 "feature_type": "section", 
                                 "distance": 1573.988648884902, 
                                 "sensed_mode": "MotionTypes.BICYCLING", 
-                                "start_ts": 1440688739.672, 
+                                "start_ts": 1440688707.867, 
                                 "start_fmt_time": "2015-08-27T08:18:59.672000-07:00", 
                                 "source": "SmoothedHighConfidenceMotion", 
                                 "end_fmt_time": "2015-08-27T08:27:45.092000-07:00", 
@@ -440,7 +440,7 @@
                     ]
                 }, 
                 "end_ts": 1440689408.302, 
-                "start_ts": 1440688739.672, 
+                "start_ts": 1440688707.867, 
                 "start_fmt_time": "2015-08-27T08:18:59.672000-07:00", 
                 "end_loc": {
                     "type": "Point", 
