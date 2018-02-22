@@ -19,13 +19,6 @@ import emission.core.get_database as edb
 from emission.core.get_database import get_client_db, get_section_db
 import emission.core.get_database as edb
 
-import emission.analysis.intake.cleaning.filter_accuracy as eaicf
-import emission.storage.timeseries.format_hacks.move_filter_field as estfm
-import emission.analysis.intake.segmentation.trip_segmentation as eaist
-import emission.analysis.intake.segmentation.section_segmentation as eaiss
-import emission.analysis.intake.cleaning.location_smoothing as eaicl
-import emission.analysis.intake.cleaning.clean_and_resample as eaicr
-
 def makeValid(client):
   client.clientJSON['start_date'] = str(datetime.now() + timedelta(days=-2))
   client.clientJSON['end_date'] = str(datetime.now() + timedelta(days=+2))
@@ -127,6 +120,15 @@ def setupRealExampleWithEntries(testObj):
                         list(edb.get_timeseries_db().find({"user_id": testObj.testUUID}).sort("data.write_ts",
                                                                                        pymongo.ASCENDING).limit(10))])
 def runIntakePipeline(uuid):
+    # Move these imports here so that we don't inadvertently load the modules,
+    # and any related config modules, before we want to
+    import emission.analysis.intake.cleaning.filter_accuracy as eaicf
+    import emission.storage.timeseries.format_hacks.move_filter_field as estfm
+    import emission.analysis.intake.segmentation.trip_segmentation as eaist
+    import emission.analysis.intake.segmentation.section_segmentation as eaiss
+    import emission.analysis.intake.cleaning.location_smoothing as eaicl
+    import emission.analysis.intake.cleaning.clean_and_resample as eaicr
+
     eaicf.filter_accuracy(uuid)
     eaist.segment_current_trips(uuid)
     eaiss.segment_current_sections(uuid)
@@ -186,3 +188,25 @@ def createDummyRequestEnviron(self, addl_headers, request_body):
     if addl_headers is not None:
         test_environ.update(addl_headers)
     return test_environ
+
+def set_analysis_config(key, value):
+    import emission.analysis.config as eac
+    import shutil
+
+    analysis_conf_path = "conf/analysis/debug.conf.json"
+    shutil.copyfile("%s.sample" % analysis_conf_path,
+                    analysis_conf_path)
+    with open(analysis_conf_path) as fd:
+        curr_config = json.load(fd)
+    curr_config[key] = value
+    with open(analysis_conf_path, "w") as fd:
+        json.dump(curr_config, fd, indent=4)
+    logging.debug("Finished setting up %s" % analysis_conf_path)
+    with open(analysis_conf_path) as fd:
+        logging.debug("Current values are %s" % json.load(fd))
+
+    eac.reload_config()
+    
+    # Return this so that we can delete it in the teardown
+    return analysis_conf_path
+

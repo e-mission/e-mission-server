@@ -41,21 +41,8 @@ import emission.tests.common as etc
 
 class TestSectionSegmentation(unittest.TestCase):
     def setUp(self):
-        import emission.analysis.config as eac
-        import shutil
-        self.analysis_conf_path = "conf/analysis/debug.conf.json"
-        shutil.copyfile("%s.sample" % self.analysis_conf_path,
-                        self.analysis_conf_path)
-        with open(self.analysis_conf_path) as fd:
-            curr_config = json.load(fd)
-        curr_config["intake.cleaning.filter_accuracy.enable"] = True
-        with open(self.analysis_conf_path, "w") as fd:
-            json.dump(curr_config, fd, indent=4)
-        logging.debug("Finished setting up %s" % self.analysis_conf_path)
-        with open(self.analysis_conf_path) as fd:
-            logging.debug("Current values are %s" % json.load(fd))
-
-        eac.reload_config()
+        self.analysis_conf_path = \
+            etc.set_analysis_config("intake.cleaning.filter_accuracy.enable", True)
 
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
         self.androidUUID = self.testUUID

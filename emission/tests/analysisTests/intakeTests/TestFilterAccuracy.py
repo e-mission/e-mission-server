@@ -29,24 +29,10 @@ class TestFilterAccuracy(unittest.TestCase):
         # forcibly insert entries for the tests to pass. But we put the import
         # in here to reduce the temptation to use the database directly elsewhere.
         import emission.core.get_database as edb
-        import emission.analysis.config as eac
-
         import uuid
-        import shutil
-        self.analysis_conf_path = "conf/analysis/debug.conf.json"
-        shutil.copyfile("%s.sample" % self.analysis_conf_path,
-                        self.analysis_conf_path)
-        with open(self.analysis_conf_path) as fd:
-            curr_config = json.load(fd)
-        curr_config["intake.cleaning.filter_accuracy.enable"] = True
-        with open(self.analysis_conf_path, "w") as fd:
-            json.dump(curr_config, fd, indent=4)
-        logging.debug("Finished setting up %s" % self.analysis_conf_path)
-        with open(self.analysis_conf_path) as fd:
-            logging.debug("Current values are %s" % json.load(fd))
 
-        eac.reload_config()
-
+        self.analysis_conf_path = \
+            etc.set_analysis_config("intake.cleaning.filter_accuracy.enable", True)
         self.testUUID = UUID('079e0f1a-c440-3d7c-b0e7-de160f748e35')
         with open("emission/tests/data/smoothing_data/tablet_2015-11-03") as fp:
             self.entries = json.load(fp,
