@@ -9,6 +9,9 @@ import time
 import json
 import copy
 
+# Get the configuration for the classifier
+import emission.analysis.config as eac
+
 # Our imports
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.analysis_timeseries_queries as esda
@@ -186,7 +189,10 @@ class ModeInferencePipeline:
     logging.debug("location features = %s" % LocationFeatureIndices)
     logging.debug("time features = %s" % TimeFeatureIndices)
     logging.debug("bus train features = %s" % BusTrainFeatureIndices)
-    return genericFeatureIndices + AdvancedFeatureIndices + BusTrainFeatureIndices
+    if eac.get_config()["classification.inference.mode.useAdvancedFeatureIndices"]:
+        return genericFeatureIndices + AdvancedFeatureIndices + BusTrainFeatureIndices
+    else:
+        return genericFeatureIndices + BusTrainFeatureIndices
 
   def generateFeatureMatrixAndIDsStep(self, toPredictSections):
     toPredictSections = toPredictSections

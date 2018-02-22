@@ -25,6 +25,7 @@ jsonpickle_numpy.register_handlers()
 # Our imports
 import emission.analysis.classification.inference.mode.seed.section_features as easf
 import emission.core.get_database as edb
+import emission.analysis.config as eac
 
 # We are not going to use the feature matrix for analysis unless we have at
 # least 50 points in the training set. 50 is arbitrary. We could also consider
@@ -312,7 +313,10 @@ class ModeInferencePipelineMovesFormat:
     logging.debug("location features = %s" % LocationFeatureIndices)
     logging.debug("time features = %s" % TimeFeatureIndices)
     logging.debug("bus train features = %s" % BusTrainFeatureIndices)
-    return genericFeatureIndices + AdvancedFeatureIndices + BusTrainFeatureIndices
+    if eac.get_config()["classification.inference.mode.useAdvancedFeatureIndices"]:
+        return genericFeatureIndices + AdvancedFeatureIndices + BusTrainFeatureIndices
+    else:
+        return genericFeatureIndices + BusTrainFeatureIndices
 
   def buildModelStep(self):
     from sklearn import ensemble
