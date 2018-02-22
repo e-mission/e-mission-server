@@ -12,6 +12,7 @@ import logging
 import json
 import uuid
 import bson.json_util as bju
+import os
 
 # Our imports
 import emission.core.get_database as edb
@@ -35,6 +36,21 @@ import emission.tests.common as etc
 
 class TestTripSegmentation(unittest.TestCase):
     def setUp(self):
+        import emission.analysis.config as eac
+        import shutil
+        self.analysis_conf_path = "conf/analysis/debug.conf.json"
+        shutil.copyfile("%s.sample" % self.analysis_conf_path,
+                        self.analysis_conf_path)
+        with open(self.analysis_conf_path) as fd:
+            curr_config = json.load(fd)
+        curr_config["intake.cleaning.filter_accuracy.enable"] = True
+        with open(self.analysis_conf_path, "w") as fd:
+            json.dump(curr_config, fd, indent=4)
+        logging.debug("Finished setting up %s" % self.analysis_conf_path)
+        with open(self.analysis_conf_path) as fd:
+            logging.debug("Current values are %s" % json.load(fd))
+
+        eac.reload_config()
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
         self.androidUUID = self.testUUID
 
@@ -46,6 +62,7 @@ class TestTripSegmentation(unittest.TestCase):
         logging.debug("androidUUID = %s, iosUUID = %s" % (self.androidUUID, self.iosUUID))
 
     def tearDown(self):
+        os.remove(self.analysis_conf_path)
         edb.get_timeseries_db().remove({"user_id": self.androidUUID}) 
         edb.get_timeseries_db().remove({"user_id": self.iosUUID})
         edb.get_pipeline_state_db().remove({"user_id": self.androidUUID})
