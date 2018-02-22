@@ -35,8 +35,19 @@ def _get_sections_for_query(section_query, sort_field):
     return [ecwe.Entry(doc) for doc in section_doc_cursor]
 
 def get_inferred_mode_entry(user_id, section_id):
-    prediction_key_query = {"metadata.key": "inference/prediction"}
-    inference_query = {"user_id": user_id, "data.section_id": section_id}
+    curr_prediction = _get_inference_entry_for_section(user_id, section_id, "inference/prediction", "data.section_id")
+    assert curr_prediction.data.algorithm_id == ecwm.AlgorithmTypes.SEED_RANDOM_FOREST, \
+        "Found algorithm_id = %s, expected %s" % (curr_prediction.data.algorithm_id,
+            ecwm.AlgorithmTypes.SEED_RANDOM_FOREST)
+    return curr_prediction
+
+def cleaned2inferred_section(user_id, section_id):
+    curr_predicted_entry = _get_inference_entry_for_section(user_id, section_id, "analysis/inferred_section", "data.cleaned_section")
+    return curr_predicted_entry
+
+def _get_inference_entry_for_section(user_id, section_id, entry_key, section_id_key):
+    prediction_key_query = {"metadata.key": entry_key}
+    inference_query = {"user_id": user_id, section_id_key: section_id}
     combo_query = copy.copy(prediction_key_query)
     combo_query.update(inference_query)
     logging.debug("About to query %s" % combo_query)
@@ -49,7 +60,5 @@ def get_inferred_mode_entry(user_id, section_id):
     
     assert len(ret_list) == 1, "Found ret_list of length %d, expected 1" % len(ret_list)
     curr_prediction = ecwe.Entry(ret_list[0])
-    assert curr_prediction.data.algorithm_id == ecwm.AlgorithmTypes.SEED_RANDOM_FOREST, \
-        "Found algorithm_id = %s, expected %s" % (curr_prediction.data.algorithm_id,
-            ecwm.AlgorithmTypes.SEED_RANDOM_FOREST)
     return curr_prediction
+

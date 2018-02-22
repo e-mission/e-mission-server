@@ -22,6 +22,8 @@ import emission.core.wrapper.localdate as ecwl
 import emission.core.wrapper.location as ecwlo
 import emission.core.wrapper.section as ecws
 import emission.core.wrapper.entry as ecwe
+import emission.core.wrapper.modeprediction as ecwm
+import emission.core.wrapper.motionactivity as ecwma
 
 import emission.tests.common as etc
 import emission.net.usercache.formatters.common as enufc
@@ -51,7 +53,7 @@ class TestPipeline(unittest.TestCase):
 
   def tearDown(self):
         logging.debug("Clearing related databases")
-        self.clearRelatedDb()
+        # self.clearRelatedDb()
 
   def clearRelatedDb(self):
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
@@ -139,12 +141,12 @@ class TestPipeline(unittest.TestCase):
     self.testPredictedProb()
 
     uniqueModes = self.pipeline.model.classes_
-    self.assertEquals(uniqueModes.tolist(), [1,5])
+    self.assertEqual(uniqueModes.tolist(), [1,5])
 
     currProb = self.pipeline.convertPredictedProbToMap(uniqueModes,
         self.pipeline.predictedProb[2])
 
-    self.assertEquals(currProb, {'WALKING': 0.2, 'BUS': 0.8})
+    self.assertEqual(currProb, {'WALKING': 0.2, 'BUS': 0.8})
 
   def testSavePredictionsStep(self):
     self.testPredictedProb()
@@ -155,11 +157,11 @@ class TestPipeline(unittest.TestCase):
         predicted_mode = esds.get_inferred_mode_entry(self.testUUID, section.get_id())
         self.assertIsNotNone(predicted_mode)
         if i == 0:
-            self.assertEquals(predicted_mode.data["predicted_mode_map"],
+            self.assertEqual(predicted_mode.data["predicted_mode_map"],
                 {'WALKING': 0.7, 'BUS': 0.3})
 
         if i == 2:
-            self.assertEquals(predicted_mode.data["predicted_mode_map"],
+            self.assertEqual(predicted_mode.data["predicted_mode_map"],
                 {'WALKING': 0.2, 'BUS': 0.8})
 
   def testEntirePipeline(self):
@@ -170,12 +172,45 @@ class TestPipeline(unittest.TestCase):
         predicted_mode = esds.get_inferred_mode_entry(self.testUUID, section.get_id())
         self.assertIsNotNone(predicted_mode)
         if i == 0:
-            self.assertEquals(predicted_mode.data["predicted_mode_map"],
+            self.assertEqual(predicted_mode.data["predicted_mode_map"],
                 {'WALKING': 0.7, 'BUS': 0.3})
 
         if i == 2:
-            self.assertEquals(predicted_mode.data["predicted_mode_map"],
+            self.assertEqual(predicted_mode.data["predicted_mode_map"],
                 {'WALKING': 0.2, 'BUS': 0.8})
+
+  def testAirOverrideHack(self):
+    self.testPredictedProb()
+    self.pipeline.toPredictSections[1]["data"]["sensed_mode"] = ecwma.MotionTypes.AIR_OR_HSR.value
+    self.pipeline.toPredictSections[3]["data"]["sensed_mode"] = ecwma.MotionTypes.AIR_OR_HSR.value
+    self.pipeline.savePredictionsStep()
+
+    for i, section in enumerate(self.pipeline.toPredictSections):
+        predicted_mode = esds.get_inferred_mode_entry(self.testUUID, section.get_id())
+        self.assertIsNotNone(predicted_mode)
+
+        ise = esds.cleaned2inferred_section(self.testUUID, section.get_id())
+        self.assertIsNotNone(ise)
+
+        if i == 0:
+            self.assertEqual(predicted_mode.data["predicted_mode_map"],
+                {'WALKING': 0.7, 'BUS': 0.3})
+            self.assertEqual(ise.data.sensed_mode, ecwm.PredictedModeTypes.WALKING)
+
+        if i == 1:
+            self.assertEqual(predicted_mode.data["predicted_mode_map"],
+                {'AIR_OR_HSR': 1.0})
+            self.assertEqual(ise.data.sensed_mode, ecwm.PredictedModeTypes.AIR_OR_HSR)
+
+        if i == 2:
+            self.assertEqual(predicted_mode.data["predicted_mode_map"],
+                {'WALKING': 0.2, 'BUS': 0.8})
+            self.assertEqual(ise.data.sensed_mode, ecwm.PredictedModeTypes.BUS)
+
+        if i == 3:
+            self.assertEqual(predicted_mode.data["predicted_mode_map"],
+                {'AIR_OR_HSR': 1.0})
+            self.assertEqual(ise.data.sensed_mode, ecwm.PredictedModeTypes.AIR_OR_HSR)
 
 if __name__ == '__main__':
     etc.configLogging()

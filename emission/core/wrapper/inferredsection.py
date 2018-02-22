@@ -11,6 +11,8 @@ import emission.core.wrapper.modeprediction as ecwm
 
 class Inferredsection(ecwc.Cleanedsection):
     props = ecwc.Cleanedsection.props
+    props.update({"cleaned_section": ecwb.WrapperBase.Access.WORM
+                  })
 
     enums = {"sensed_mode": ecwm.PredictedModeTypes}
 

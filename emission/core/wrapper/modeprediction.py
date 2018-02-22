@@ -20,7 +20,7 @@ class PredictedModeTypes(enum.Enum):
     BUS = 3
     TRAIN = 4
     CAR = 5
-    AIR = 6
+    AIR_OR_HSR = 6
 
 class Modeprediction(ecwb.WrapperBase):
     props = {"trip_id":     ecwb.WrapperBase.Access.WORM,     # the trip that this is part of

@@ -19,6 +19,7 @@ import emission.analysis.section_features as easf
 import emission.core.get_database as edb
 import emission.core.wrapper.entry as ecwe
 import emission.core.wrapper.modeprediction as ecwm
+import emission.core.wrapper.motionactivity as ecwma
 
 from uuid import UUID
 
@@ -187,8 +188,8 @@ class ModeInferencePipeline:
     logging.debug("bus train features = %s" % BusTrainFeatureIndices)
     return genericFeatureIndices + AdvancedFeatureIndices + BusTrainFeatureIndices
 
-  def generateFeatureMatrixAndIDsStep(self, toPredictSections_it):
-    toPredictSections = list(toPredictSections_it)
+  def generateFeatureMatrixAndIDsStep(self, toPredictSections):
+    toPredictSections = toPredictSections
     numsections = len(toPredictSections)
 
     logging.debug("Predicting values for %d sections" % numsections)
@@ -248,6 +249,17 @@ class ModeInferencePipeline:
         currSection = currSectionEntry.data
         currProb = self.convertPredictedProbToMap(uniqueModes, self.predictedProb[i])
 
+        # Special handling for the AIR mode
+        # AIR is not a mode that is sensed from the phone, but it is inferred
+        # through some heuristics in cleanAndResample instead of through the
+        # decision tree. Ideally those heurstics should be replaced by the
+        # inference through the decision tree, or through a separate heuristic
+        # step. But we are out of time for a bigger refactor here.
+        # so we say that if the sensed mode == AIR, we are going to use it
+        # directly and ignore the inferred mode
+        if currSection.sensed_mode == ecwma.MotionTypes.AIR_OR_HSR:
+            currProb = {'AIR_OR_HSR': 1.0}
+
         # Insert the prediction
         mp = ecwm.Modeprediction()
         mp.trip_id = currSection.trip_id
@@ -264,6 +276,7 @@ class ModeInferencePipeline:
         del is_dict["_id"]
         is_dict["metadata"]["key"] = "analysis/inferred_section"
         is_dict["data"]["sensed_mode"] = ecwm.PredictedModeTypes[easf.select_inferred_mode([mp])].value
+        is_dict["data"]["cleaned_section"] = currSectionEntry.get_id()
         ise = ecwe.Entry(is_dict)
         logging.debug("Updating sensed mode for section = %s to %s" % 
             (currSectionEntry.get_id(), ise.data.sensed_mode))
