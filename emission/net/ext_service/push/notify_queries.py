@@ -31,10 +31,19 @@ def combine_queries(query_list):
 
 def get_matching_tokens(query):
     logging.debug("Getting tokens matching query %s" % query)
-    ret_cursor = edb.get_profile_db().find(query, {"_id": False, "device_token": True})
-    mapped_list = [e.get("device_token") for e in ret_cursor]
-    non_null_list = [item for item in mapped_list if item is not None]
-    return non_null_list
+    ret_map = {"ios": [],
+               "android": []}
+    ret_cursor = edb.get_profile_db().find(query, {"_id": False, "device_token": True, "curr_platform": True})
+    for i, entry in enumerate(ret_cursor):
+        curr_platform = entry["curr_platform"]
+        device_token = entry["device_token"]
+        if curr_platform is None or device_token is None:
+            logging.warning("ignoring entry %s due to None values" % entry)
+        else:
+            logging.debug("adding token %s to list for platform %s" % (device_token, curr_platform))
+            ret_map[curr_platform].append(device_token)
+
+    return ret_map
 
 def get_matching_user_ids(query):
     logging.debug("Getting tokens matching query %s" % query)

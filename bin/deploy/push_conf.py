@@ -13,7 +13,7 @@ data = json.loads(f.read())
 f.close()
 
 real_path = "conf/net/ext_service/push.json"
-data['provider'] = 'ionic'
+data['provider'] = 'firebase'
 data['server_auth_token'] = 'firebase_api_key'
 f = open(real_path, "w")
 f.write(json.dumps(data))
