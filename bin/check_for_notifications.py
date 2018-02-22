@@ -49,9 +49,6 @@ def calculate_single_suggestion(uuid):
         if counter < 0:
             #Iterate 20 trips back
             return False
-        logging.debug("Considering section from %s -> %s" %
-            (cleaned_sections.iloc[i]["start_fmt_time"],
-             cleaned_sections.iloc[i]["end_fmt_time"]))
         if cleaned_sections.iloc[i]["end_ts"] - cleaned_sections.iloc[i]["start_ts"] < 5 * 60:
             continue
         distance_in_miles = cleaned_sections.iloc[i]["distance"] * 0.000621371
@@ -61,13 +58,25 @@ def calculate_single_suggestion(uuid):
         mode = cleaned_sections.iloc[i]["sensed_mode"]
         #TODO: Add elif's for bus
         if mode == 0 and distance_in_miles >= 5 and distance_in_miles <= 15:
+            logging.debug("Considering section from %s -> %s" %
+                (cleaned_sections.iloc[i]["start_fmt_time"],
+                 cleaned_sections.iloc[i]["end_fmt_time"]))
             #Suggest bus if it is car and distance between 5 and 15
             return handle_insert(tripDict, trip_id, suggestion_trips, uuid)
         elif mode == 0 and distance_in_miles < 5 and distance_in_miles >= 1:
+            logging.debug("Considering section from %s -> %s" %
+                (cleaned_sections.iloc[i]["start_fmt_time"],
+                 cleaned_sections.iloc[i]["end_fmt_time"]))
             #Suggest bike if it is car/bus and distance between 5 and 1
             #TODO: Change ret_boj and figure out how to change lat and lon to places
             return handle_insert(tripDict, trip_id, suggestion_trips, uuid)
+            logging.debug("Considering section from %s -> %s" %
+                (cleaned_sections.iloc[i]["start_fmt_time"],
+                 cleaned_sections.iloc[i]["end_fmt_time"]))
         elif mode == 0 and distance_in_miles < 1:
+            logging.debug("Considering section from %s -> %s" %
+                (cleaned_sections.iloc[i]["start_fmt_time"],
+                 cleaned_sections.iloc[i]["end_fmt_time"]))
             #Suggest walking if it is car/bus and distance less than 1
             return handle_insert(tripDict, trip_id, suggestion_trips, uuid)
     return False
@@ -109,5 +118,5 @@ def check_all_suggestions():
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    print("Set log leve to DEBUG")
+    print("Set log level to DEBUG")
     check_all_suggestions()
