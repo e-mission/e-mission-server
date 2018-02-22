@@ -50,6 +50,10 @@ def get_profile_db():
     Profiles=_get_current_db().Stage_Profiles
     return Profiles
 
+def get_prediction_db():
+    Predictions=_get_current_db().Stage_Predictions
+    return Predictions
+
 """
 def get_routeDistanceMatrix_db():
     current_db=MongoClient().Stage_database
@@ -172,31 +176,44 @@ def get_analysis_timeseries_db():
     #current_db = MongoClient().Stage_database
     AnalysisTimeSeries = _get_current_db().Stage_analysis_timeseries
     AnalysisTimeSeries.create_index([("user_id", pymongo.HASHED)])
-    AnalysisTimeSeries.create_index([("metadata.key", pymongo.HASHED)])
+    _create_analysis_result_indices(AnalysisTimeSeries)
+    return AnalysisTimeSeries
+
+def get_non_user_timeseries_db():
+    """
+    " Stores the data that is not associated with a particular user
+    """
+    NonUserTimeSeries = _get_current_db().Stage_analysis_timeseries
+    NonUserTimeSeries.create_index([("user_id", pymongo.HASHED)])
+    _create_analysis_result_indices(NonUserTimeSeries)
+    return NonUserTimeSeries
+
+def _create_analysis_result_indices(tscoll):
+    tscoll.create_index([("metadata.key", pymongo.HASHED)])
 
     # trips and sections
-    AnalysisTimeSeries.create_index([("data.start_ts", pymongo.DESCENDING)], sparse=True)
-    AnalysisTimeSeries.create_index([("data.end_ts", pymongo.DESCENDING)], sparse=True)
-    AnalysisTimeSeries.create_index([("data.start_loc", pymongo.GEOSPHERE)], sparse=True)
-    AnalysisTimeSeries.create_index([("data.end_loc", pymongo.GEOSPHERE)], sparse=True)
-    _create_local_dt_indices(AnalysisTimeSeries, "data.start_local_dt")
-    _create_local_dt_indices(AnalysisTimeSeries, "data.end_local_dt")
+    tscoll.create_index([("data.start_ts", pymongo.DESCENDING)], sparse=True)
+    tscoll.create_index([("data.end_ts", pymongo.DESCENDING)], sparse=True)
+    tscoll.create_index([("data.start_loc", pymongo.GEOSPHERE)], sparse=True)
+    tscoll.create_index([("data.end_loc", pymongo.GEOSPHERE)], sparse=True)
+    _create_local_dt_indices(tscoll, "data.start_local_dt")
+    _create_local_dt_indices(tscoll, "data.end_local_dt")
 
     # places and stops
-    AnalysisTimeSeries.create_index([("data.enter_ts", pymongo.DESCENDING)], sparse=True)
-    AnalysisTimeSeries.create_index([("data.exit_ts", pymongo.DESCENDING)], sparse=True)
-    _create_local_dt_indices(AnalysisTimeSeries, "data.enter_local_dt")
-    _create_local_dt_indices(AnalysisTimeSeries, "data.exit_local_dt")
-    AnalysisTimeSeries.create_index([("data.location", pymongo.GEOSPHERE)], sparse=True)
-    AnalysisTimeSeries.create_index([("data.duration", pymongo.DESCENDING)], sparse=True)
-    AnalysisTimeSeries.create_index([("data.mode", pymongo.HASHED)], sparse=True)
-    AnalysisTimeSeries.create_index([("data.section", pymongo.HASHED)], sparse=True)
+    tscoll.create_index([("data.enter_ts", pymongo.DESCENDING)], sparse=True)
+    tscoll.create_index([("data.exit_ts", pymongo.DESCENDING)], sparse=True)
+    _create_local_dt_indices(tscoll, "data.enter_local_dt")
+    _create_local_dt_indices(tscoll, "data.exit_local_dt")
+    tscoll.create_index([("data.location", pymongo.GEOSPHERE)], sparse=True)
+    tscoll.create_index([("data.duration", pymongo.DESCENDING)], sparse=True)
+    tscoll.create_index([("data.mode", pymongo.HASHED)], sparse=True)
+    tscoll.create_index([("data.section", pymongo.HASHED)], sparse=True)
 
     # recreated location
-    AnalysisTimeSeries.create_index([("data.ts", pymongo.DESCENDING)], sparse=True)
-    AnalysisTimeSeries.create_index([("data.loc", pymongo.GEOSPHERE)], sparse=True)
-    _create_local_dt_indices(AnalysisTimeSeries, "data.local_dt") # recreated location
-    return AnalysisTimeSeries
+    tscoll.create_index([("data.ts", pymongo.DESCENDING)], sparse=True)
+    tscoll.create_index([("data.loc", pymongo.GEOSPHERE)], sparse=True)
+    _create_local_dt_indices(tscoll, "data.local_dt") # recreated location
+    return tscoll
 
 def _create_local_dt_indices(time_series, key_prefix):
     """

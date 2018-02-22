@@ -24,6 +24,11 @@ class TimeSeries(object):
         import emission.storage.timeseries.aggregate_timeseries as bita
         return bita.AggregateTimeSeries()
 
+    @staticmethod
+    def get_non_user_time_series():
+        import emission.storage.timeseries.non_user_timeseries as nuts
+        return nuts.NonUserTimeSeries()
+
     def __init__(self, user_id):
         self.user_id = user_id
 
