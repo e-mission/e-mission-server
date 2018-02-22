@@ -47,15 +47,14 @@ class TestPush(unittest.TestCase):
         shutil.copyfile("%s.sample" % self.push_conf_path,
                         self.push_conf_path)
         open(self.push_conf_path, "w").write(json.dumps({
-            "provider": "ionic",
+            "provider": "firebase",
             "server_auth_token": "firebase_api_key"
         }))
         logging.debug("Finished setting up %s" % self.push_conf_path)
         logging.debug("Current values are %s" % json.load(open(self.push_conf_path)))
 
     def tearDown(self):
-        # os.remove(self.push_conf_path)
-        pass
+        os.remove(self.push_conf_path)
 
     def testGetInterface(self):
         #import emission.net.ext_service.push.notify_interface_impl.firebase as pnif
