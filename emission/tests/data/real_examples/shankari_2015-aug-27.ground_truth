@@ -424,7 +424,7 @@
             "type": "FeatureCollection", 
             "id": "57e19340f6858f0a02a4a352", 
             "properties": {
-                "distance": 1713.21374176403, 
+                "distance": 1772.479712753613, 
                 "end_place": {
                     "$oid": "57e19345f6858f0a02a4a5ca"
                 }, 
