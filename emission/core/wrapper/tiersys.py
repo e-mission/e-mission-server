@@ -99,7 +99,7 @@ class TierSys:
         newUser = {'uuid': user_id, "lastWeekCarbon": 0.0}
         if tierSys == None:
             newTiers = [newUser]
-            get_tiersys_db().update_one({'newUserTier': 4}, {'$set': {'users': newTiers}}))
+            get_tiersys_db().update_one({'newUserTier': 4}, {'$set': {'users': newTiers}})
         else:
             tierSys['users'].append(newUser)
             newTiers = tierSys['tiers']
