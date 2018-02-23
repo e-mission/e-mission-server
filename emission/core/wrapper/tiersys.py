@@ -8,6 +8,7 @@ import emission.core.wrapper.motionactivity as ecwm
 from emission.core.wrapper.user import User
 import arrow
 from emission.core.get_database import get_tiersys_db
+from emission.core.get_database import get_new_tier_db
 import logging
 import logging.config
 
@@ -23,7 +24,8 @@ class TierSys:
 
     @staticmethod
     def getNewUserTier():
-        return get_tiersys_db().find_one({'newUserTier' : 4})
+        return get_new_tier_db().find_one({'newUserTier' : 4})
+
     @staticmethod
     def getUserTier(user_id):
         if type(user_id) == str:
@@ -36,7 +38,7 @@ class TierSys:
                 return index
             else:
                 index += 1
-        newUserTier = TierSys.getNewUserTier()[0]
+        newUserTier = TierSys.getNewUserTier()
         uuids = [user['uuid'] for user in newUserTier['users']]
         if user_id in uuids:
             return 4
@@ -95,17 +97,18 @@ class TierSys:
         '''
         if type(user_id) == str:
             user_id = UUID(user_id)
-        tierSys = TierSys.getNewUserTier()
+        newTierCollection = get_new_tier_db()
         newUser = {'uuid': user_id, "lastWeekCarbon": 0.0}
-        if tierSys == None:
-            newTiers = [newUser]
-            get_tiersys_db().insert_one({'newUserTier': 4, 'users' : newTiers})
+        newTier = newTierCollection.find_one({'newUserTier': 4})
+        if newTier == None:
+            newTier = {'newUserTier': 4, 'users': [newUser]}
+            newTierCollection.insert_one(newTier)
         else:
-            tierSys['users'].append(newUser)
-            newTiers = tierSys['tiers']
-            get_tiersys_db().update_one({'newUserTier': 4},
-                {'$set': {'users': newTiers}
-                }
+            allUsers = newTier['users']
+            updatedUsers = allUsers.append(newUser)
+            newTierCollection.update_one(
+                {'newUserTier': 4},
+                {'$set': {'users': updatedUsers}}
             )
 
     def computeRanks(self, last_ts, n):
@@ -197,7 +200,7 @@ class TierSys:
         logging.debug(ts)
 
         get_tiersys_db().insert_one({'tiers': ts, 'created_at': datetime.now()})
-        get_tiersys_db().update_one({'newUserTier' : 4}, {'$set': {'users': []}})
+        get_new_tier_db().update_one({'newUserTier' : 4}, {'$set' {'users': []}})
         return ts
 
 def m_to_km(distance):
