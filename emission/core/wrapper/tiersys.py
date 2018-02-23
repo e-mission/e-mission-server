@@ -23,7 +23,7 @@ class TierSys:
 
     @staticmethod
     def getNewUserTier():
-        return get_tiersys_db.find_one({'newUserTier' : 4})
+        return get_tiersys_db().find_one({'newUserTier' : 4})
     @staticmethod
     def getUserTier(user_id):
         if type(user_id) == str:
