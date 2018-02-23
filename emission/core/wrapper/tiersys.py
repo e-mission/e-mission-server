@@ -109,10 +109,11 @@ class TierSys:
             )
         else:
             allUsers = newTier['users']
-            updatedUsers = allUsers.append(newUser)
-            if updatedUsers == None:
+            if allUsers == None:
                 updatedUsers = []
                 updatedUsers.append(newUser)
+            else:
+                updatedUsers = allUsers.append(newUser)
             newTierCollection.update_one(
                 {'newUserTier': 4},
                 {'$set': {'users': updatedUsers}}
