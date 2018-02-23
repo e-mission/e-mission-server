@@ -70,6 +70,7 @@ def getAllBearsInTier(user_id):
 	allUsers = {'myBear': {'happiness': myBear['happiness'], 'size': myBear['size']}, 'otherBears':{}}
 	for user in userTier:
 		uuid = user['uuid']
+		userattrs = None
 		if uuid != user_id:
 			userattrs = getPolarBearattr(uuid)
 		if userattrs != None:
