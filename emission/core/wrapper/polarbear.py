@@ -32,6 +32,8 @@ def getMoodChange(user_id):
 	attr = getPolarBearattr(user_id)
 	happiness = attr['happiness']
 	oldHappiness = attr['oldHappiness']
+	attr['oldHappiness'] = happiness
+	setPolarBearattr(attr)
 	def checkMood(val):
 		if val >= 0.6:
 			return 'happy'
@@ -61,13 +63,21 @@ def getAllBearsInTier(user_id):
 	"""
 	if type(user_id) == str:
 		user_id = UUID(user_id)
-	tierSys = TierSys.getLatest()[0]
-	userTier = tierSys['tiers'][TierSys.getUserTier(user_id) - 1]['users']
+	tierNum = TierSys.getUserTier(user_id)
+	if tierNum != 4:
+		tierSys = TierSys.getLatest()[0]
+		userTier = tierSys['tiers'][tierNum - 1]['users']
+	else:
+		tierSys = TierSys.getNewUserTier()[0]
+		userTier = tierSys['users']
 	myBear = getPolarBearattr(user_id)
+	if myBear == None:
+		return None
 	#List of of users within a tier
 	allUsers = {'myBear': {'happiness': myBear['happiness'], 'size': myBear['size']}, 'otherBears':{}}
 	for user in userTier:
 		uuid = user['uuid']
+		userattrs = None
 		if uuid != user_id:
 			userattrs = getPolarBearattr(uuid)
 		if userattrs != None:
@@ -88,9 +98,11 @@ def updatePolarBear(user_id):
 	currattr = getPolarBearattr(user_id)
 	if currattr == None:
 		#Create a new Polar Bear for the given user
-		currUsername = User.getUsername(user_id)['username']
+		currUsername = User.getUsername(user_id)
 		if currUsername == None:
 			currUsername = 'Anon'
+		else:
+			currUsername = currUsername['username']
 		setPolarBearattr({'user_id': user_id,
 						'username': currUsername,
 						'happiness': User.computeHappiness(user_id),
@@ -103,7 +115,7 @@ def updatePolarBear(user_id):
 		currattr['oldHappiness'] = currattr['happiness']
 		currattr['happiness'] = newHappiness
 		currattr['username'] = User.getUsername(user_id)['username']
-		rate_map = {1 : 1.05, 2: 1.03, 3: 1.012}
+		rate_map = {1 : 1.05, 2: 1.03, 3: 1.012, 4: 1.1}
 		if currattr['username'] == None:
 			currattr['username'] = 'Anon'
 		#Have to user new username if user has changed it
@@ -122,3 +134,6 @@ def updateAll():
 	for tier in tiersys:
 		for user in tier['users']:
 			updatePolarBear(user['uuid'])
+	newUsers = TierSys.getNewUserTier()[0]['users']
+	for user in newUsers:
+		updatePolarBear(user['uuid'])

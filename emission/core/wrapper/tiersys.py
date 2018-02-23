@@ -22,6 +22,9 @@ class TierSys:
         return get_tiersys_db().find().sort('created_at',-1).limit(1)
 
     @staticmethod
+    def getNewUserTier():
+        return get_tiersys_db.find_one({'newUserTier' : 4})
+    @staticmethod
     def getUserTier(user_id):
         if type(user_id) == str:
             user_id = UUID(user_id)
@@ -33,7 +36,10 @@ class TierSys:
                 return index
             else:
                 index += 1
-        #Should I keep this -1?No
+        newUserTier = TierSys.getNewUserTier()[0]
+        uuids = [user['uuid'] for user in newUserTier['users']]
+        if user_id in uuids:
+            return 4
         return None
 
     @staticmethod
@@ -80,6 +86,23 @@ class TierSys:
             out.append(seq[int(last):int(last + avg)])
             last += avg
         return out
+
+    @staticmethod
+    def addUser(user_id):
+        '''
+        Adds a user to the new people tier.
+            Used upon study start.
+        '''
+        if type(user_id) == str:
+            user_id = UUID(user_id)
+        tierSys = TierSys.getNewUserTier[0]
+        newUser = {'uuid': user_id, "lastWeekCarbon": 0.0}
+        tierSys['users'].append(newUser)
+        newTiers = tierSys['tiers']
+        get_tiersys_db().update_one({'newUserTier': 4},
+            {'$set': {'users': newTiers}
+            }
+        )
 
     def computeRanks(self, last_ts, n):
         #TODO: FINISH
@@ -167,10 +190,10 @@ class TierSys:
             users = [{'uuid': uuid, 'lastWeekCarbon': User.computeCarbon(uuid, last_ts, curr_ts)} for uuid in self.tiers[i]]
             ts.append({'rank': i + 1, 'users': users})
 
-        print(ts)
         logging.debug(ts)
 
         get_tiersys_db().insert_one({'tiers': ts, 'created_at': datetime.now()})
+        get_tiersys_db().update_one({'newUserTier' : 4, 'users': []})
         return ts
 
 def m_to_km(distance):

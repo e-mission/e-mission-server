@@ -92,6 +92,9 @@ def calculate_single_suggestion(uuid):
     suggestion_trips = edb.get_suggestion_trips_db()
     #Go in reverse order because we check by most recent trip
     counter = 40
+    if len(cleaned_sections) == 0:
+        return_obj['message'] = 'Suggestions will appear once you start taking trips!'
+    return return_obj
     for i in range(len(cleaned_sections) - 1, -1, -1):
         counter -= 1
         if counter < 0:
