@@ -64,7 +64,7 @@ def getAllBearsInTier(user_id):
 	if type(user_id) == str:
 		user_id = UUID(user_id)
 	tierNum = TierSys.getUserTier(user_id)
-	if tierNum != 4:
+	if tierNum != 4 and tierNum != None:
 		tierSys = TierSys.getLatest()[0]
 		userTier = tierSys['tiers'][tierNum - 1]['users']
 	else:
