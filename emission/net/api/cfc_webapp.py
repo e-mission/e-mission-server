@@ -136,6 +136,15 @@ def server_templates(filepath):
   logging.debug("static filepath = %s" % filepath)
   return static_file(filepath, "%s/%s" % (static_path, "templates"))
 
+@route('/vendor/<filepath:path>')
+def server_vendors(filepath):
+  logging.debug("static filepath = %s" % filepath)
+  return static_file(filepath, "%s/%s" % (static_path, "vendor"))
+@route('/device-mockups/<filepath:path>')
+def server_mockups(filepath):
+  logging.debug("static filepath = %s" % filepath)
+  return static_file(filepath, "%s/%s" % (static_path, "device-mockups"))
+
 @post("/result/heatmap/pop.route/<time_type>")
 def getPopRoute(time_type):
   if 'user' in request.json:
