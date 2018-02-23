@@ -39,6 +39,8 @@ class TierSys:
             else:
                 index += 1
         newUserTier = TierSys.getNewUserTier()
+        if newUserTier == None:
+            return 4
         uuids = [user['uuid'] for user in newUserTier['users']]
         if user_id in uuids:
             return 4
