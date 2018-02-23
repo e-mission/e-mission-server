@@ -110,7 +110,7 @@ def updatePolarBear(user_id):
 		currattr['oldHappiness'] = currattr['happiness']
 		currattr['happiness'] = newHappiness
 		currattr['username'] = User.getUsername(user_id)['username']
-		rate_map = {1 : 1.05, 2: 1.03, 3: 1.012}
+		rate_map = {1 : 1.05, 2: 1.03, 3: 1.012, 4: 1.1}
 		if currattr['username'] == None:
 			currattr['username'] = 'Anon'
 		#Have to user new username if user has changed it
@@ -129,3 +129,6 @@ def updateAll():
 	for tier in tiersys:
 		for user in tier['users']:
 			updatePolarBear(user['uuid'])
+	newUsers = TierSys.getNewUserTier()[0]['users']
+	for user in newUsers:
+		updatePolarBear(user['uuid'])
