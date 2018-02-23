@@ -95,14 +95,18 @@ class TierSys:
         '''
         if type(user_id) == str:
             user_id = UUID(user_id)
-        tierSys = TierSys.getNewUserTier[0]
+        tierSys = TierSys.getNewUserTier()
         newUser = {'uuid': user_id, "lastWeekCarbon": 0.0}
-        tierSys['users'].append(newUser)
-        newTiers = tierSys['tiers']
-        get_tiersys_db().update_one({'newUserTier': 4},
-            {'$set': {'users': newTiers}
-            }
-        )
+        if tierSys == None:
+            newTiers = [newUser]
+            get_tiersys_db().update_one({'newUserTier': 4}, {'$set': {'users': newTiers}}))
+        else:
+            tierSys['users'].append(newUser)
+            newTiers = tierSys['tiers']
+            get_tiersys_db().update_one({'newUserTier': 4},
+                {'$set': {'users': newTiers}
+                }
+            )
 
     def computeRanks(self, last_ts, n):
         #TODO: FINISH
