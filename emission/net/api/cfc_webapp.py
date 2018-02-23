@@ -345,6 +345,8 @@ def createUserProfile():
       logging.debug("userEmail = %s" % userEmail)
       user = User.register(userEmail)
       logging.debug("Looked up user = %s" % user)
+      pb.updatePolarBear(user.uuid)
+      logging.debug("Created user's Polar Bear = %s" % user)
       logging.debug("Returning result %s" % {'uuid': str(user.uuid)})
       return {'uuid': str(user.uuid)}
   except ValueError as e:
