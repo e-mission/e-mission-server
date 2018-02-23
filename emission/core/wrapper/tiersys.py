@@ -81,6 +81,24 @@ class TierSys:
             last += avg
         return out
 
+    @staticmethod
+    def addUser(user_id):
+        '''
+        Adds a user to the bottom tier.
+            Used upon study start.
+        '''
+        if type(user_id) == str:
+            user_id = UUID(user_id)
+        tierSys = TierSys.getLatest()[0]
+        newUser = {'uuid': user_id, "lastWeekCarbon": 0.0}
+        tierSys['tiers'][2]['users'].append(newUser)
+        newTiers = tierSys['tiers']
+        currTime = tierSys['created_at']
+        get_tiersys_db().update_one({'created_at': currTime},
+            {'$set': {'tiers': newTiers}
+            }
+        )
+
     def computeRanks(self, last_ts, n):
         #TODO: FINISH
         """
