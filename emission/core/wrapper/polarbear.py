@@ -91,9 +91,11 @@ def updatePolarBear(user_id):
 	currattr = getPolarBearattr(user_id)
 	if currattr == None:
 		#Create a new Polar Bear for the given user
-		currUsername = User.getUsername(user_id)['username']
+		currUsername = User.getUsername(user_id)
 		if currUsername == None:
 			currUsername = 'Anon'
+		else:
+			currUsername = currUsername['username']
 		setPolarBearattr({'user_id': user_id,
 						'username': currUsername,
 						'happiness': User.computeHappiness(user_id),
