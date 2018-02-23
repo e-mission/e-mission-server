@@ -252,6 +252,10 @@ def get_tiersys_db():
     TierSys=_get_current_db().Tier_Sys
     return TierSys
 
+def get_new_tier_db():
+    newTier =_get_current_db().new_tier
+    return newTier
+
 # Static utility method to save entries to a mongodb collection.  Single
 # drop-in replacement for collection.save() now that it is deprecated in
 # pymongo 3.0.
