@@ -102,7 +102,10 @@ class TierSys:
         newTier = newTierCollection.find_one({'newUserTier': 4})
         if newTier == None:
             newTier = {'newUserTier': 4, 'users': [newUser]}
-            newTierCollection.insert_one(newTier)
+            newTierCollection.update_one(
+                {'newUserTier': 4},
+                {'$set': {'users': updatedUsers}}
+            )
         else:
             allUsers = newTier['users']
             updatedUsers = allUsers.append(newUser)
