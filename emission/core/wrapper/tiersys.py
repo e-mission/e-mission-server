@@ -101,7 +101,8 @@ class TierSys:
         newUser = {'uuid': user_id, "lastWeekCarbon": 0.0}
         newTier = newTierCollection.find_one({'newUserTier': 4})
         if newTier == None:
-            newTier = {'newUserTier': 4, 'users': [newUser]}
+            updatedUsers = []
+            updatedUsers.append(newUser)
             newTierCollection.update_one(
                 {'newUserTier': 4},
                 {'$set': {'users': updatedUsers}}
