@@ -66,6 +66,8 @@ def getAllBearsInTier(user_id):
 	tierSys = TierSys.getLatest()[0]
 	userTier = tierSys['tiers'][TierSys.getUserTier(user_id) - 1]['users']
 	myBear = getPolarBearattr(user_id)
+	if myBear == None:
+		return None
 	#List of of users within a tier
 	allUsers = {'myBear': {'happiness': myBear['happiness'], 'size': myBear['size']}, 'otherBears':{}}
 	for user in userTier:
