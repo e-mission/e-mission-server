@@ -87,7 +87,7 @@ class TestHabiticaAutocheck(unittest.TestCase):
     # from the test case
     self._fillDates(section, "end_", start_ardt, start_timezone)
     #logging.debug("created section %s" % (section.start_fmt_time))
-    entry = ecwe.Entry.create_entry(self.testUUID, esda.CLEANED_SECTION_KEY,
+    entry = ecwe.Entry.create_entry(self.testUUID, esda.INFERRED_SECTION_KEY,
                                     section, create_id=True)
     self.ts.insert(entry)
     return entry
