@@ -135,7 +135,9 @@ def mark_clean_resampling_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.CLEAN_RESAMPLING)
 
 def get_time_range_for_mode_inference(user_id):
-    return get_time_range_for_stage(user_id, ps.PipelineStages.MODE_INFERENCE)
+    tq = get_time_range_for_stage(user_id, ps.PipelineStages.MODE_INFERENCE)
+    tq.timeType = "data.end_ts"
+    return tq
 
 def mark_mode_inference_done(user_id, last_section_done):
     if last_section_done is None:
