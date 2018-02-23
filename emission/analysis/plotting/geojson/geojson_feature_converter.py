@@ -28,6 +28,7 @@ import emission.core.common as ecc
 
 # TODO: Move this to the section_features class instead
 import emission.analysis.intake.cleaning.location_smoothing as eaicl
+import emission.analysis.config as eac
 
 def _del_non_derializable(prop_dict, extra_keys):
     for key in extra_keys:
@@ -113,7 +114,7 @@ def section_to_geojson(section, tl):
     ts = esta.TimeSeries.get_time_series(section.user_id)
     entry_it = ts.find_entries(["analysis/recreated_location"],
                                esda.get_time_query_for_trip_like(
-                                   "analysis/cleaned_section",
+                                   eac.get_section_key_for_analysis_results(),
                                    section.get_id()))
 
     # TODO: Decide whether we want to use Rewrite to use dataframes throughout instead of python arrays.

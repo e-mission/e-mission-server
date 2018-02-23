@@ -1,5 +1,6 @@
 {
     "intake.cleaning.clean_and_resample.speedDistanceAssertions": true,
     "intake.cleaning.filter_accuracy.enable": false,
-    "classification.inference.mode.useAdvancedFeatureIndices": true
+    "classification.inference.mode.useAdvancedFeatureIndices": true,
+    "analysis.result.section.key": "analysis/inferred_section"
 }

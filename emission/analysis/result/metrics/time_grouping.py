@@ -22,6 +22,8 @@ import emission.core.wrapper.motionactivity as ecwm
 import emission.core.wrapper.modestattimesummary as ecwms
 import emission.core.wrapper.localdate as ecwl
 
+import emission.analysis.config as eac
+
 def group_by_timestamp(user_id, start_ts, end_ts, freq, summary_fn_list):
     """
     Get grouped dataframes for the specific time range and at the specified frequency
@@ -40,7 +42,7 @@ def group_by_timestamp(user_id, start_ts, end_ts, freq, summary_fn_list):
         and the list is empty.
     """
     time_query = estt.TimeQuery("data.start_ts", start_ts, end_ts)
-    section_df = esda.get_data_df(esda.CLEANED_SECTION_KEY,
+    section_df = esda.get_data_df(eac.get_section_key_for_analysis_results(),
                                   user_id=user_id, time_query=time_query,
                                   geo_query=None)
     if len(section_df) == 0:
@@ -87,7 +89,7 @@ def group_by_local_date(user_id, from_dt, to_dt, freq, summary_fn_list):
         and the list is empty.
     """
     time_query = esttc.TimeComponentQuery("data.start_local_dt", from_dt, to_dt)
-    section_df = esda.get_data_df(esda.CLEANED_SECTION_KEY,
+    section_df = esda.get_data_df(eac.get_section_key_for_analysis_results(),
                                   user_id=user_id, time_query=time_query,
                                   geo_query=None)
     if len(section_df) == 0:
