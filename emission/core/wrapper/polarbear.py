@@ -32,6 +32,8 @@ def getMoodChange(user_id):
 	attr = getPolarBearattr(user_id)
 	happiness = attr['happiness']
 	oldHappiness = attr['oldHappiness']
+	attr['oldHappiness'] = happiness
+	setPolarBearattr(attr)
 	def checkMood(val):
 		if val >= 0.6:
 			return 'happy'
