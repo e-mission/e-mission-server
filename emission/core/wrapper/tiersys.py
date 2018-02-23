@@ -38,7 +38,7 @@ class TierSys:
                 return index
             else:
                 index += 1
-        newUserTier = TierSys.getNewUserTier()[0]
+        newUserTier = TierSys.getNewUserTier()
         uuids = [user['uuid'] for user in newUserTier['users']]
         if user_id in uuids:
             return 4
@@ -99,7 +99,7 @@ class TierSys:
             user_id = UUID(user_id)
         newTierCollection = get_new_tier_db()
         newUser = {'uuid': user_id, "lastWeekCarbon": 0.0}
-        newTier = newTierCollection.find_one({'newUserTier': 4})
+        newTier = TierSys.getNewUserTier()
         if newTier == None:
             updatedUsers = []
             updatedUsers.append(newUser)
@@ -114,10 +114,9 @@ class TierSys:
                 updatedUsers.append(newUser)
             else:
                 updatedUsers = allUsers.append(newUser)
-            newTierCollection.update_one(
+                newTierCollection.update_one(
                 {'newUserTier': 4},
-                {'$set': {'users': updatedUsers}}
-            )
+                {'$set': {'users': updatedUsers}})
 
     def computeRanks(self, last_ts, n):
         #TODO: FINISH
