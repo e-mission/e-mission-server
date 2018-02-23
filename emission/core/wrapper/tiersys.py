@@ -193,7 +193,7 @@ class TierSys:
         logging.debug(ts)
 
         get_tiersys_db().insert_one({'tiers': ts, 'created_at': datetime.now()})
-        get_tiersys_db().update_one({'newUserTier' : 4, 'users': []})
+        get_tiersys_db().update_one({'newUserTier' : 4}, {'$set': {'users': []}})
         return ts
 
 def m_to_km(distance):
