@@ -18,7 +18,6 @@ from datetime import datetime, timedelta
 # Our imports
 import emission.core.get_database as edb
 from emission.core.wrapper.user import User
-from emission.core.wrapper.client import Client
 import emission.core.wrapper.localdate as ecwl
 import emission.core.wrapper.location as ecwlo
 import emission.core.wrapper.section as ecws
@@ -26,13 +25,6 @@ import emission.core.wrapper.entry as ecwe
 import emission.core.wrapper.modeprediction as ecwm
 import emission.core.wrapper.motionactivity as ecwma
 
-import emission.tests.common as etc
-import emission.net.usercache.formatters.common as enufc
-
-import emission.analysis.classification.inference.mode.pipeline as pipeline
-import emission.storage.timeseries.abstract_timeseries as esta
-import emission.storage.decorations.analysis_timeseries_queries as esda
-import emission.storage.decorations.section_queries as esds
 
 '''
 TODO:
@@ -41,6 +33,14 @@ TODO:
 '''
 class TestPipeline(unittest.TestCase):
   def setUp(self):
+      import emission.tests.common as etc
+      import emission.net.usercache.formatters.common as enufc
+  
+      import emission.analysis.classification.inference.mode.pipeline as pipeline
+      import emission.storage.timeseries.abstract_timeseries as esta
+      import emission.storage.decorations.analysis_timeseries_queries as esda
+      import emission.storage.decorations.section_queries as esds
+
         # Thanks to M&J for the number!
       np.random.seed(61297777)
       self.copied_model_path = etc.copy_dummy_seed_for_inference()
@@ -70,6 +70,13 @@ class TestPipeline(unittest.TestCase):
         edb.get_usercache_db().delete_many({"user_id": self.testUUID})
 
   def testFeatureGenWithOnePoint(self):
+    import emission.tests.common as etc
+    import emission.net.usercache.formatters.common as enufc
+ 
+    import emission.analysis.classification.inference.mode.pipeline as pipeline
+    import emission.storage.timeseries.abstract_timeseries as esta
+    import emission.storage.decorations.analysis_timeseries_queries as esda
+    import emission.storage.decorations.section_queries as esds
     # ensure that the start and end datetimes are the same, since the average calculation uses
     # the total distance and the total duration
     ts = esta.TimeSeries.get_time_series(self.testUUID)
@@ -99,6 +106,10 @@ class TestPipeline(unittest.TestCase):
     logging.debug("featureMatrix = %s" % featureMatrix)
     self.assertEqual(np.count_nonzero(featureMatrix[0][5:16]), 0)
     self.assertEqual(np.count_nonzero(featureMatrix[0][19:21]), 0)
+
+  def testEntirePipeline(self):
+    self.pipeline.user_id = self.testUUID
+    self.pipeline.runPredictionPipeline(self.testUUID, None)
 
 if __name__ == '__main__':
     etc.configLogging()
