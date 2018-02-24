@@ -20,12 +20,12 @@ import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.pipeline_queries as epq
 import emission.core.wrapper.motionactivity as ecwm
 
-import emission.analysis.plotting.geojson.geojson_feature_converter as gjfc
+import emission.analysis.intake.segmentation.trip_segmentation as eaist
 import emission.analysis.intake.segmentation.section_segmentation as eaiss
 import emission.analysis.intake.cleaning.location_smoothing as eaicl
 import emission.analysis.intake.cleaning.clean_and_resample as eaicr
-
-import emission.analysis.intake.segmentation.trip_segmentation as eaist
+import emission.analysis.classification.inference.mode.pipeline as eacimp
+import emission.analysis.plotting.geojson.geojson_feature_converter as gjfc
 
 import emission.storage.decorations.trip_queries as esdt
 import emission.storage.decorations.stop_queries as esdst
@@ -56,6 +56,7 @@ class TestGeojsonFeatureConverter(unittest.TestCase):
         self.assertEquals(len(tl.trips), 9)
 
         eaicr.clean_and_resample(self.testUUID)
+        eacimp.predict_mode(self.testUUID)
 
         tl = esdtl.get_cleaned_timeline(self.testUUID, 1440658800, 1440745200)
         tl.fill_start_end_places()
