@@ -8,6 +8,7 @@ from builtins import *
 import unittest
 import logging
 import arrow
+import os
 
 import emission.core.get_database as edb
 import emission.core.wrapper.localdate as ecwl
@@ -23,6 +24,8 @@ from emission.net.api import metrics
 
 class TestMetrics(unittest.TestCase):
     def setUp(self):
+        self.analysis_conf_path = \
+            etc.set_analysis_config("analysis.result.section.key", "analysis/cleaned_section")
         etc.setupRealExample(self,
                              "emission/tests/data/real_examples/shankari_2015-aug-21")
         self.testUUID1 = self.testUUID
@@ -39,14 +42,15 @@ class TestMetrics(unittest.TestCase):
 
     def tearDown(self):
         self.clearRelatedDb()
+        os.remove(self.analysis_conf_path)
 
     def clearRelatedDb(self):
-        edb.get_timeseries_db().remove({"user_id": self.testUUID})
-        edb.get_analysis_timeseries_db().remove({"user_id": self.testUUID})
-        edb.get_pipeline_state_db().remove({"user_id": self.testUUID})
-        edb.get_timeseries_db().remove({"user_id": self.testUUID1})
-        edb.get_analysis_timeseries_db().remove({"user_id": self.testUUID1})
-        edb.get_pipeline_state_db().remove({"user_id": self.testUUID1})
+        edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID})
+        edb.get_pipeline_state_db().delete_many({"user_id": self.testUUID})
+        edb.get_timeseries_db().delete_many({"user_id": self.testUUID1})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID1})
+        edb.get_pipeline_state_db().delete_many({"user_id": self.testUUID1})
 
     def testCountTimestampMetrics(self):
         met_result = metrics.summarize_by_timestamp(self.testUUID,

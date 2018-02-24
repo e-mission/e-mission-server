@@ -128,12 +128,14 @@ def runIntakePipeline(uuid):
     import emission.analysis.intake.segmentation.section_segmentation as eaiss
     import emission.analysis.intake.cleaning.location_smoothing as eaicl
     import emission.analysis.intake.cleaning.clean_and_resample as eaicr
+    import emission.analysis.classification.inference.mode.pipeline as eacimp
 
     eaicf.filter_accuracy(uuid)
     eaist.segment_current_trips(uuid)
     eaiss.segment_current_sections(uuid)
     eaicl.filter_current_sections(uuid)
     eaicr.clean_and_resample(uuid)
+    eacimp.predict_mode(uuid)
 
 def configLogging():
     """

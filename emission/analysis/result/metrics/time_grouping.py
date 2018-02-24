@@ -20,6 +20,7 @@ import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.aggregate_timeseries as estag
 import emission.core.wrapper.motionactivity as ecwm
 import emission.core.wrapper.modestattimesummary as ecwms
+import emission.core.wrapper.modeprediction as ecwmp
 import emission.core.wrapper.localdate as ecwl
 
 import emission.analysis.config as eac
@@ -117,7 +118,10 @@ def grouped_to_summary(time_grouped_df, key_to_fill_fn, summary_fn):
         mode_grouped_df = section_group_df.groupby('sensed_mode')
         mode_results = summary_fn(mode_grouped_df)
         for mode, result in mode_results.items():
-            curr_msts[ecwm.MotionTypes(mode).name] = result
+            if eac.get_section_key_for_analysis_results() == "analysis/inferred_section":
+                curr_msts[ecwmp.PredictedModeTypes(mode).name] = result
+            else:
+                curr_msts[ecwm.MotionTypes(mode).name] = result
         ret_list.append(curr_msts)
     return ret_list
 
