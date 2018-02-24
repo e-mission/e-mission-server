@@ -212,3 +212,10 @@ def set_analysis_config(key, value):
     # Return this so that we can delete it in the teardown
     return analysis_conf_path
 
+def copy_dummy_seed_for_inference():
+    import shutil
+
+    seed_json_source = "emission/tests/data/seed_model_from_test_data.json"
+    seed_json_dest = "seed_model.json"
+    shutil.copyfile(seed_json_source, seed_json_dest)
+    return seed_json_dest

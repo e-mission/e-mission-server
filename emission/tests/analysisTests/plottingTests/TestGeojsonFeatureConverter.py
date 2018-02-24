@@ -12,6 +12,7 @@ import logging
 import json
 import geojson as gj
 import bson.json_util as bju
+import os
 
 # Our imports
 import emission.core.get_database as edb
@@ -38,15 +39,18 @@ import emission.tests.common as etc
 
 class TestGeojsonFeatureConverter(unittest.TestCase):
     def setUp(self):
+        self.copied_model_path = etc.copy_dummy_seed_for_inference()
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
         eaicf.filter_accuracy(self.testUUID)
 
     def tearDown(self):
         self.clearRelatedDb()
+        os.remove(self.copied_model_path)
 
     def clearRelatedDb(self):
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
         edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID})
+        os.remove(self.copied_model_path)
 
     def testTripGeojson(self):
         eaist.segment_current_trips(self.testUUID)
