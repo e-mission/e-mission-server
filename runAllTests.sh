@@ -6,4 +6,4 @@ set -e
 # + ./runAllTests.sh
 # rm: missing operand
 # Try `rm --help' for more information.
-PYTHONPATH=. python -m unittest discover -s emission/tests -p Test*;
+PYTHONPATH=. python -m unittest discover -s emission/individual_tests -p Test*;
