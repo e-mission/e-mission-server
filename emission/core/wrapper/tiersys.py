@@ -117,10 +117,10 @@ class TierSys:
                 {'newUserTier': 4},
                 {'$set': {'users': updatedUsers}})
             else:
-                updatedUsers = allUsers.append(newUser)
+                allUsers.append(newUser)
                 newTierCollection.update_one(
                 {'newUserTier': 4},
-                {'$set': {'users': updatedUsers}})
+                {'$set': {'users': allUsers}})
 
     def computeRanks(self, last_ts, n):
         #TODO: FINISH
