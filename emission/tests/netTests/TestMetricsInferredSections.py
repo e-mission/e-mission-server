@@ -8,6 +8,7 @@ from builtins import *
 import unittest
 import logging
 import arrow
+import os
 
 import emission.core.get_database as edb
 import emission.core.wrapper.localdate as ecwl
@@ -23,6 +24,7 @@ from emission.net.api import metrics
 
 class TestMetricsInferredSections(unittest.TestCase):
     def setUp(self):
+        self.seed_mode_path = etc.copy_dummy_seed_for_inference()
         etc.setupRealExample(self,
                              "emission/tests/data/real_examples/shankari_2015-aug-21")
         self.testUUID1 = self.testUUID
@@ -39,6 +41,7 @@ class TestMetricsInferredSections(unittest.TestCase):
 
     def tearDown(self):
         self.clearRelatedDb()
+        os.remove(self.seed_mode_path)
 
     def clearRelatedDb(self):
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
@@ -66,12 +69,11 @@ class TestMetricsInferredSections(unittest.TestCase):
         self.assertEqual([m.nUsers for m in user_met_result], [1,1])
         self.assertEqual(user_met_result[0].local_dt.day, 27)
         self.assertEqual(user_met_result[1].local_dt.day, 28)
-        self.assertEqual(user_met_result[0].WALKING, 5)
-        self.assertEqual(user_met_result[0].BICYCLING, 2)
+        self.assertEqual(user_met_result[0].WALKING, 7)
+        self.assertNotIn("BICYCLING", user_met_result[0])
         # Changed from 3 to 4 - investigation at
         # https://github.com/e-mission/e-mission-server/issues/288#issuecomment-242531798
-        self.assertEqual(user_met_result[0].CAR, 2)
-        self.assertEqual(user_met_result[0].TRAIN, 2)
+        self.assertEqual(user_met_result[0].BUS, 4)
         # We are not going to make absolute value assertions about
         # the aggregate values since they are affected by other
         # entries in the database. However, because we have at least
@@ -103,21 +105,18 @@ class TestMetricsInferredSections(unittest.TestCase):
         # local timezone means that we only have one entry
         self.assertEqual(len(user_met_result), 1)
         self.assertEqual(user_met_result[0].nUsers, 1)
-        self.assertEqual(user_met_result[0].WALKING, 7)
-        self.assertEqual(user_met_result[0].BICYCLING, 5)
-        self.assertEqual(user_met_result[0].TRAIN, 2)
-        self.assertEqual(user_met_result[0].CAR, 2)
+        self.assertEqual(user_met_result[0].WALKING, 12)
+        self.assertNotIn('BICYCLING', user_met_result[0])
+        self.assertEqual(user_met_result[0].BUS, 4)
         # We are not going to make assertions about the aggregate values since
         # they are affected by other entries in the database but we expect them
         # to be at least as much as the user values
         self.assertEqual(len(agg_met_result), 1)
         self.assertEqual(agg_met_result[0].nUsers, 2)
-        self.assertGreaterEqual(agg_met_result[0].BICYCLING,
-                                user_met_result[0].BICYCLING + 2) # 21s has one bike trip
         self.assertGreaterEqual(agg_met_result[0].WALKING,
-                                user_met_result[0].WALKING + 4) # 21s has three bike trips
-        self.assertGreaterEqual(agg_met_result[0].TRAIN,
-                                user_met_result[0].TRAIN) # 21s has three motorized trips
+                                user_met_result[0].WALKING + 5) # 21s has three bike trips
+        self.assertGreaterEqual(agg_met_result[0].BUS,
+                                user_met_result[0].BUS + 2) # 21s has three motorized trips
 
     def testCountNoEntries(self):
         # Ensure that we don't crash if we don't find any entries

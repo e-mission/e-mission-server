@@ -50,7 +50,6 @@ class TestGeojsonFeatureConverter(unittest.TestCase):
     def clearRelatedDb(self):
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
         edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID})
-        os.remove(self.copied_model_path)
 
     def testTripGeojson(self):
         eaist.segment_current_trips(self.testUUID)
