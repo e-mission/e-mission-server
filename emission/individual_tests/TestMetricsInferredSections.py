@@ -51,6 +51,73 @@ class TestMetricsInferredSections(unittest.TestCase):
         edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID1})
         edb.get_pipeline_state_db().delete_many({"user_id": self.testUUID1})
 
+    def testCountTimestampMetrics(self):
+        met_result = metrics.summarize_by_timestamp(self.testUUID,
+                                                    self.aug_start_ts, self.aug_end_ts,
+                                       'd', ['count'], True)
+
+        import json
+        import bson.json_util as bju
+        
+        logging.debug(json.dumps(met_result, default=bju.default))
+
+        self.assertEqual(list(met_result.keys()), ['aggregate_metrics', 'user_metrics'])
+        user_met_result = met_result['user_metrics'][0]
+        agg_met_result = met_result['aggregate_metrics'][0]
+
+        self.assertEqual(len(user_met_result), 2)
+        self.assertEqual([m.nUsers for m in user_met_result], [1,1])
+        self.assertEqual(user_met_result[0].local_dt.day, 27)
+        self.assertEqual(user_met_result[1].local_dt.day, 28)
+        self.assertEqual(user_met_result[0].WALKING, 7)
+        self.assertNotIn("BICYCLING", user_met_result[0])
+        # Changed from 3 to 4 - investigation at
+        # https://github.com/e-mission/e-mission-server/issues/288#issuecomment-242531798
+        self.assertEqual(user_met_result[0].BUS, 4)
+        # We are not going to make absolute value assertions about
+        # the aggregate values since they are affected by other
+        # entries in the database. However, because we have at least
+        # data for two days in the database, the aggregate data
+        # must be at least that much larger than the original data.
+        self.assertEqual(len(agg_met_result), 8)
+        # no overlap between users at the daily level
+        # bunch of intermediate entries with no users since this binning works
+        # by range
+        self.assertEqual([m.nUsers for m in agg_met_result], [1,1,0,0,0,0,1,1])
+        # If there are no users, there are no values for any of the fields
+        # since these are never negative, it implies that their sum is zero
+        self.assertTrue('WALKING' not in agg_met_result[2] and
+                         'BICYCLING' not in agg_met_result[2] and
+                         'IN_VEHICLE' not in agg_met_result[2])
+
+
+    def testCountLocalDateMetrics(self):
+        met_result = metrics.summarize_by_local_date(self.testUUID,
+                                                     ecwl.LocalDate({'year': 2015, 'month': 8}),
+                                                     ecwl.LocalDate({'year': 2015, 'month': 9}),
+                                                     'MONTHLY', ['count'], True)
+        self.assertEqual(list(met_result.keys()), ['aggregate_metrics', 'user_metrics'])
+        user_met_result = met_result['user_metrics'][0]
+        agg_met_result = met_result['aggregate_metrics'][0]
+
+        logging.debug(met_result)
+
+        # local timezone means that we only have one entry
+        self.assertEqual(len(user_met_result), 1)
+        self.assertEqual(user_met_result[0].nUsers, 1)
+        self.assertEqual(user_met_result[0].WALKING, 12)
+        self.assertNotIn('BICYCLING', user_met_result[0])
+        self.assertEqual(user_met_result[0].BUS, 4)
+        # We are not going to make assertions about the aggregate values since
+        # they are affected by other entries in the database but we expect them
+        # to be at least as much as the user values
+        self.assertEqual(len(agg_met_result), 1)
+        self.assertEqual(agg_met_result[0].nUsers, 2)
+        self.assertGreaterEqual(agg_met_result[0].WALKING,
+                                user_met_result[0].WALKING + 5) # 21s has three bike trips
+        self.assertGreaterEqual(agg_met_result[0].BUS,
+                                user_met_result[0].BUS + 2) # 21s has three motorized trips
+
     def testCountNoEntries(self):
         # Ensure that we don't crash if we don't find any entries
         # Should return empty array instead
