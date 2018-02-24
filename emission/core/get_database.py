@@ -253,7 +253,7 @@ def get_tiersys_db():
     return TierSys
 
 def get_new_tier_db():
-    newTier =_get_current_db().new_tier
+    newTier =_get_current_db().New_tier
     return newTier
 
 # Static utility method to save entries to a mongodb collection.  Single
