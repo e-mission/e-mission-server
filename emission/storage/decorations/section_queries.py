@@ -53,7 +53,7 @@ def _get_inference_entry_for_section(user_id, section_id, entry_key, section_id_
     logging.debug("About to query %s" % combo_query)
     ret_list = list(edb.get_analysis_timeseries_db().find(combo_query))
     # We currently have only one algorithm
-    assert(len(ret_list) <= 1)
+    assert len(ret_list) <= 1, "Found len(ret_list) = %d, expected <=1" % len(ret_list)
     if len(ret_list) == 0:
         logging.debug("Found no inferred prediction, returning None")
         return None
