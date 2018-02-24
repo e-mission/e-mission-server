@@ -75,6 +75,7 @@ def getAllBearsInTier(user_id):
 		return None
 	#List of of users within a tier
 	allUsers = {'myBear': {'happiness': myBear['happiness'], 'size': myBear['size']}, 'otherBears':{}}
+	logging.debug("User tier contains: %s" %userTier)
 	if userTier is None:
 		return allUsers
 	for user in userTier:
