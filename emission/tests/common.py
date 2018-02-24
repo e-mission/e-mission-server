@@ -222,10 +222,4 @@ def copy_dummy_seed_for_inference():
     logging.debug("Copied file %s -> %s with result %s" % (seed_json_source, seed_json_dest, result))
 
     assert os.path.exists(seed_json_dest), "File %s not found after copy" % seed_json_dest
-
-    # Validation
-    import emission.analysis.classification.inference.mode.pipeline as eacimp
-    mip = eacimp.ModeInferencePipeline()
-    mip.loadModelStage()
-
     return seed_json_dest
