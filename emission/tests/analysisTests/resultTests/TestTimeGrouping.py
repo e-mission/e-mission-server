@@ -24,7 +24,7 @@ import emission.analysis.config as eac
 import emission.core.wrapper.entry as ecwe
 import emission.core.wrapper.section as ecws
 import emission.core.wrapper.modestattimesummary as ecwms
-import emission.core.wrapper.motionactivity as ecwm
+import emission.core.wrapper.modeprediction as ecwm
 import emission.core.wrapper.localdate as ecwl
 
 import emission.storage.timeseries.abstract_timeseries as esta
@@ -265,7 +265,7 @@ class TestTimeGrouping(unittest.TestCase):
     def _fillModeDistanceDuration(self, section_list):
         for i, s in enumerate(section_list):
             dw = s.data
-            dw.sensed_mode = ecwm.MotionTypes.BICYCLING
+            dw.sensed_mode = ecwm.PredictedModeTypes.BICYCLING
             dw.duration = (i + 1) * 100
             dw.distance = (i + 1) * 1000
             s['data'] = dw
