@@ -3,6 +3,8 @@ from emission.core.wrapper.user import User
 import emission.core.get_database as db
 from uuid import UUID
 import arrow
+import logging
+import logging.config
 
 
 def setPolarBearattr(attrs):
