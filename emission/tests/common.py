@@ -214,8 +214,18 @@ def set_analysis_config(key, value):
 
 def copy_dummy_seed_for_inference():
     import shutil
+    import os
 
     seed_json_source = "emission/tests/data/seed_model_from_test_data.json"
     seed_json_dest = "seed_model.json"
-    shutil.copyfile(seed_json_source, seed_json_dest)
+    result = shutil.copyfile(seed_json_source, seed_json_dest)
+    logging.debug("Copied file %s -> %s with result %s" % (seed_json_source, seed_json_dest, result))
+
+    assert os.path.exists(seed_json_dest), "File %s not found after copy" % seed_json_dest
+
+    # Validation
+    import emission.analysis.classification.inference.mode.pipeline as eacimp
+    mip = eacimp.ModeInferencePipeline()
+    mip.loadModelStage()
+
     return seed_json_dest
