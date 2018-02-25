@@ -153,11 +153,14 @@ def section_to_geojson(section, tl):
 
     if eac.get_section_key_for_analysis_results() == esda.INFERRED_SECTION_KEY:
         ise = esds.cleaned2inferred_section(section.user_id, section.get_id())
-        logging.debug("mapped cleaned section %s -> inferred section %s" % 
-            (section.get_id(), ise.get_id()))
-        logging.debug("changing mode from %s -> %s" % 
-            (points_line_feature.properties.sensed_mode, ise.data.sensed_mode))
-        points_line_feature.properties["sensed_mode"] = str(ise.data.sensed_mode)
+        if ise is not None:
+            logging.debug("mapped cleaned section %s -> inferred section %s" % 
+                (section.get_id(), ise.get_id()))
+            logging.debug("changing mode from %s -> %s" % 
+                (points_line_feature.properties.sensed_mode, ise.data.sensed_mode))
+            points_line_feature.properties["sensed_mode"] = str(ise.data.sensed_mode)
+        else:
+            points_line_feature.properties["sensed_mode"] = str(points_line_feature.properties.sensed_mode)
     else:
         points_line_feature.properties["sensed_mode"] = str(points_line_feature.properties.sensed_mode)
     
