@@ -36,6 +36,7 @@ import bson.json_util as bju
 import attrdict as ad
 import arrow
 import numpy as np
+import os
 
 # Our imports
 import emission.core.get_database as edb
@@ -53,10 +54,13 @@ class TestPipelineRealData(unittest.TestCase):
     def setUp(self):
         # Thanks to M&J for the number!
         np.random.seed(61297777)
+        self.analysis_conf_path = \
+            etc.set_analysis_config("analysis.result.section.key", "analysis/cleaned_section")
 
     def tearDown(self):
         logging.debug("Clearing related databases")
         self.clearRelatedDb()
+        os.remove(self.analysis_conf_path)
 
     def clearRelatedDb(self):
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})

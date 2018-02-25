@@ -12,6 +12,7 @@ import json
 import arrow
 import logging
 import numpy as np
+import os
 from datetime import datetime, timedelta
 
 # Our imports
@@ -42,18 +43,26 @@ class TestPipeline(unittest.TestCase):
   def setUp(self):
         # Thanks to M&J for the number!
       np.random.seed(61297777)
+      self.copied_model_path = etc.copy_dummy_seed_for_inference()
       dataFile = "emission/tests/data/real_examples/shankari_2016-08-10"
       start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 9})
       end_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 10})
       cacheKey = "diary/trips-2016-08-10"
       etc.setupRealExample(self, dataFile)
       etc.runIntakePipeline(self.testUUID)
+      # Default intake pipeline now includes mode inference
+      # this is correct in general, but causes errors while testing the mode inference
+      # because then that step is effectively run twice. This code
+      # rolls back the results of running the mode inference as part of the
+      # pipeline and allows us to correctly test the mode inference pipeline again.
+      pipeline.del_objects_after(self.testUUID, 0, is_dry_run=False)
       self.pipeline = pipeline.ModeInferencePipeline()
       self.pipeline.loadModelStage()
 
   def tearDown(self):
         logging.debug("Clearing related databases")
-        # self.clearRelatedDb()
+        self.clearRelatedDb()
+        os.remove(self.copied_model_path)
 
   def clearRelatedDb(self):
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})

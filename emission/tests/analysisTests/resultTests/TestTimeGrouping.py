@@ -19,11 +19,12 @@ import emission.tests.common as etc
 
 import emission.analysis.result.metrics.time_grouping as earmt
 import emission.analysis.result.metrics.simple_metrics as earmts
+import emission.analysis.config as eac
 
 import emission.core.wrapper.entry as ecwe
 import emission.core.wrapper.section as ecws
 import emission.core.wrapper.modestattimesummary as ecwms
-import emission.core.wrapper.motionactivity as ecwm
+import emission.core.wrapper.modeprediction as ecwm
 import emission.core.wrapper.localdate as ecwl
 
 import emission.storage.timeseries.abstract_timeseries as esta
@@ -73,7 +74,8 @@ class TestTimeGrouping(unittest.TestCase):
         self._fillDates(section, "end_", start_ardt, start_timezone)
         logging.debug("created section %s" % (section.start_fmt_time))
 
-        entry = ecwe.Entry.create_entry(self.testUUID, esda.CLEANED_SECTION_KEY,
+        entry = ecwe.Entry.create_entry(self.testUUID,
+                                        eac.get_section_key_for_analysis_results(),
                                         section, create_id=True)
         self.ts.insert(entry)
         return entry
@@ -99,7 +101,7 @@ class TestTimeGrouping(unittest.TestCase):
             self._createTestSection(arrow.Arrow(2016,5,3,23, tzinfo=tz.gettz(PST)),
                                     PST))
 
-        section_group_df = self.ts.to_data_df(esda.CLEANED_SECTION_KEY,
+        section_group_df = self.ts.to_data_df(eac.get_section_key_for_analysis_results(),
                                               test_section_list)
         logging.debug("First row of section_group_df = %s" % section_group_df.iloc[0])
         self.assertEqual(earmt._get_tz(section_group_df), PST)
@@ -143,7 +145,7 @@ class TestTimeGrouping(unittest.TestCase):
             arrow.Arrow(2016,5,4,0, tzinfo=tz.gettz(PST)),
                                     PST)
 
-        section_group_df = self.ts.to_data_df(esda.CLEANED_SECTION_KEY,
+        section_group_df = self.ts.to_data_df(eac.get_section_key_for_analysis_results(),
                                               test_section_list)
 
         # Timestamps are monotonically increasing
@@ -234,7 +236,8 @@ class TestTimeGrouping(unittest.TestCase):
             arrow.Arrow(2016,5,4,3, tzinfo=tz.gettz(BST)),
             BST)
 
-        section_group_df = self.ts.to_data_df(esda.CLEANED_SECTION_KEY, test_section_list)
+        section_group_df = self.ts.to_data_df(eac.get_section_key_for_analysis_results(),
+            test_section_list)
         logging.debug("first row is %s" % section_group_df.loc[0])
 
         # Timestamps are monotonically increasing
@@ -262,7 +265,7 @@ class TestTimeGrouping(unittest.TestCase):
     def _fillModeDistanceDuration(self, section_list):
         for i, s in enumerate(section_list):
             dw = s.data
-            dw.sensed_mode = ecwm.MotionTypes.BICYCLING
+            dw.sensed_mode = ecwm.PredictedModeTypes.BICYCLING
             dw.duration = (i + 1) * 100
             dw.distance = (i + 1) * 1000
             s['data'] = dw

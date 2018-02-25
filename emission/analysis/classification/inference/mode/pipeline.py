@@ -32,20 +32,43 @@ from uuid import UUID
 # problem, so we don't need to solve it right now.
 minTrainingSetSize = 1000
 
-def predictMode(user_id):
-    time_query = epq.get_time_range_for_segmentation(user_id)
+def predict_mode(user_id):
+    time_query = epq.get_time_range_for_mode_inference(user_id)
     try:
         mip = ModeInferencePipeline()
         mip.user_id = user_id
         mip.runPredictionPipeline(user_id, time_query)
-        if mip.getLastTimestamp() == 0:
-            logging.debug("after, run, last_timestamp == 0, must be early return")
+        if mip.getLastSectionDone() is None:
+            logging.debug("after, run, last_section_done == None, must be early return")
             epq.mark_mode_inference_done(user_id, None)
             return
         else:
-            epq.mark_mode_inference_done(user_id, mip.getLastTimestamp())
+            epq.mark_mode_inference_done(user_id, mip.getLastSectionDone())
     except:
+        logging.exception("Error while inferring modes, timestamp is unchanged")
         epq.mark_mode_inference_failed(user_id)
+
+# Delete the objects created by this pipeline step
+def del_objects_after(user_id, reset_ts, is_dry_run):
+    del_query = {}
+    # handle the user
+    del_query.update({"user_id": user_id})
+
+    del_query.update({"metadata.key": {"$in": ["inference/prediction", "analysis/inferred_section"]}})
+    # all objects inserted here have start_ts and end_ts and are trip-like
+    del_query.update({"data.start_ts": {"$gt": reset_ts}})
+    logging.debug("After all updates, del_query = %s" % del_query)
+
+    logging.info("About to delete %d entries" 
+        % edb.get_analysis_timeseries_db().find(del_query).count())
+    logging.info("About to delete entries with keys %s" 
+        % edb.get_analysis_timeseries_db().find(del_query).distinct("metadata.key"))
+    
+    if is_dry_run:
+        logging.info("this is a dry-run, returning from del_objects_after without modifying anything")
+    else:
+        result = edb.get_analysis_timeseries_db().remove(del_query)
+        logging.info("this is not a dry-run, result of deleting analysis entries is %s" % result)
 
 class ModeInferencePipeline:
   def __init__(self):
@@ -55,13 +78,13 @@ class ModeInferencePipeline:
                           "start lat", "start lng", "stop lat", "stop lng",
                           "start hour", "end hour", "close to bus stop", "close to train stop",
                           "close to airport"]
-    self.last_timestamp = 0
+    self.last_section_done = None
     with open("emission/analysis/classification/inference/mode/mode_id_old2new.txt") as fp:
         self.seed_modes_mapping = json.load(fp)
     logging.debug("Loaded modes %s" % self.seed_modes_mapping)
 
-  def getLastTimestamp(self):
-    return self.last_timestamp
+  def getLastSectionDone(self):
+    return self.last_section_done
 
   # At this point, none of the clients except for CCI are supporting ground
   # truth, and even cci is only supporting trip-level ground truth. So this
@@ -75,7 +98,8 @@ class ModeInferencePipeline:
         time_query=None)
     if (len(self.toPredictSections) == 0):
         logging.debug("len(toPredictSections) == 0, early return")
-        assert(self.last_timestamp == 0)
+        assert self.last_section_done is None, ("self.last_section_done == %s, expecting None" % \
+            self.last_section_done)
         return None
 
     self.loadModelStage()
@@ -132,7 +156,7 @@ class ModeInferencePipeline:
 
     speeds = section['speeds']
  
-    if speeds != None and len(speeds) > 0:
+    if speeds is not None and len(speeds) > 0:
         featureMatrix[i, 5] = np.mean(speeds)
         featureMatrix[i, 6] = np.std(speeds)
         featureMatrix[i, 7] = np.max(speeds)
@@ -141,7 +165,7 @@ class ModeInferencePipeline:
         pass
 
     accels = easf.calAccels(section)
-    if accels != None and len(accels) > 0:
+    if accels is not None and len(accels) > 0:
       featureMatrix[i, 8] = np.max(accels)
     else:
         # They will remain zero
@@ -171,8 +195,8 @@ class ModeInferencePipeline:
     if (hasattr(self, "air_cluster")): 
         featureMatrix[i, 21] = easf.mode_start_end_coverage(section, self.air_cluster,600)
 
-    if self.last_timestamp < section.end_ts:
-      self.last_timestamp = section.end_ts
+    if self.last_section_done is None or self.last_section_done.data.end_ts < section_entry.data.end_ts:
+      self.last_section_done = section_entry
 
     # Replace NaN and inf by zeros so that it doesn't crash later
     featureMatrix[i] = np.nan_to_num(featureMatrix[i])

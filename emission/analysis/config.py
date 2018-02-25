@@ -16,3 +16,6 @@ def get_config():
 def reload_config():
     global config_data
     config_data = get_config_data()
+
+def get_section_key_for_analysis_results():
+    return config_data["analysis.result.section.key"]

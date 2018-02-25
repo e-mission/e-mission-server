@@ -128,12 +128,14 @@ def runIntakePipeline(uuid):
     import emission.analysis.intake.segmentation.section_segmentation as eaiss
     import emission.analysis.intake.cleaning.location_smoothing as eaicl
     import emission.analysis.intake.cleaning.clean_and_resample as eaicr
+    import emission.analysis.classification.inference.mode.pipeline as eacimp
 
     eaicf.filter_accuracy(uuid)
     eaist.segment_current_trips(uuid)
     eaiss.segment_current_sections(uuid)
     eaicl.filter_current_sections(uuid)
     eaicr.clean_and_resample(uuid)
+    eacimp.predict_mode(uuid)
 
 def configLogging():
     """
@@ -210,3 +212,14 @@ def set_analysis_config(key, value):
     # Return this so that we can delete it in the teardown
     return analysis_conf_path
 
+def copy_dummy_seed_for_inference():
+    import shutil
+    import os
+
+    seed_json_source = "emission/tests/data/seed_model_from_test_data.json"
+    seed_json_dest = "seed_model.json"
+    result = shutil.copyfile(seed_json_source, seed_json_dest)
+    logging.debug("Copied file %s -> %s with result %s" % (seed_json_source, seed_json_dest, result))
+
+    assert os.path.exists(seed_json_dest), "File %s not found after copy" % seed_json_dest
+    return seed_json_dest
