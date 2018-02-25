@@ -241,10 +241,12 @@ class ModeInferencePipeline:
     logging.debug("location features = %s" % LocationFeatureIndices)
     logging.debug("time features = %s" % TimeFeatureIndices)
     logging.debug("bus train features = %s" % BusTrainFeatureIndices)
+    retIndices = genericFeatureIndices
     if eac.get_config()["classification.inference.mode.useAdvancedFeatureIndices"]:
-        return genericFeatureIndices + AdvancedFeatureIndices + BusTrainFeatureIndices
-    else:
-        return genericFeatureIndices + BusTrainFeatureIndices
+        retIndices = retIndices + AdvancedFeatureIndices
+    if eac.get_config()["classification.inference.mode.useBusTrainFeatureIndices"]:
+        retIndices = retIndices + BusTrainFeatureIndices
+    return retIndices
 
   def generateFeatureMatrixAndIDsStep(self, toPredictSections):
     toPredictSections = toPredictSections
