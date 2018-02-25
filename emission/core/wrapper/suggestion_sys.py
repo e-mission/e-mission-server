@@ -119,7 +119,7 @@ def calculate_single_suggestion(uuid):
             default_message = return_obj['message']
             try:
                 message = "Try public transportation from " + return_address_from_location(start_lon + "," + start_lat) + \
-                " to " + return_address_from_location(end_lon + "," + end_lat)
+                " to " + return_address_from_location(end_lon + "," + end_lat) + " (tap me to view)"
                 #savings per month, .465 kg co2/mile for car, 0.14323126 kg co2/mile for bus
                 savings = str(int(distance_in_miles * 30 * .465 - 0.14323126 * distance_in_miles * 30))
                 return {'message' : message, 'savings' : savings, 'start_lat' : start_lat,
@@ -133,7 +133,7 @@ def calculate_single_suggestion(uuid):
             #Suggest bike if it is car/bus and distance between 5 and 1
             try:
                 message = "Try biking from " + return_address_from_location(start_lon + "," + start_lat) + \
-                " to " + return_address_from_location(end_lon + "," + end_lat)
+                " to " + return_address_from_location(end_lon + "," + end_lat) + " (tap me to view)"
                 savings = str(int(distance_in_miles * 30 * .465))  #savings per month, .465 kg co2/mile
                 insert_into_db(tripDict, trip_id, suggestion_trips, uuid)
                 return {'message' : message, 'savings' : savings, 'start_lat' : start_lat,
@@ -145,7 +145,7 @@ def calculate_single_suggestion(uuid):
             #Suggest walking if it is car/bus and distance less than 1
             try:
                 message = "Try walking/biking from " + return_address_from_location(start_lon + "," + start_lat) + \
-                " to " + return_address_from_location(end_lon + "," + end_lat)
+                " to " + return_address_from_location(end_lon + "," + end_lat) + " (tap me to view)"
                 savings = str(int(distance_in_miles * 30 * .465)) #savings per month, .465 kg co2/mile
                 insert_into_db(tripDict, trip_id, suggestion_trips, uuid)
                 return {'message' : message, 'savings' : savings, 'start_lat' : start_lat,
