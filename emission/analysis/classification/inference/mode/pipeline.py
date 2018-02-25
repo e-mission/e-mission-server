@@ -82,6 +82,9 @@ def del_objects_after(user_id, reset_ts, is_dry_run):
     logging.debug("After all updates, del_query = %s" % del_query)
 
     reset_pipeline_query = {"pipeline_stage": ecwp.PipelineStages.MODE_INFERENCE.value}
+    # Fuzz the TRIP_SEGMENTATION stage 5 mins because of
+    # https://github.com/e-mission/e-mission-server/issues/333#issuecomment-312730217
+    FUZZ_FACTOR = 5 * 60
     reset_pipeline_update = {'$set': {'last_processed_ts': reset_ts + FUZZ_FACTOR}}
     logging.info("About to reset stage %s to %s" 
         % (ecwp.PipelineStages.MODE_INFERENCE, reset_ts))
