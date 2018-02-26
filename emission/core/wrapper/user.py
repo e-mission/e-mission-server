@@ -350,13 +350,20 @@ class User(object):
     """
     fp_train = 92.0/1609.0
     fp_car = 287.0/1609.0
+    fp_bus = 3/4 * fp_car
     total_footprint = 0
     for index, row in footprint_df.iterrows():
         motiontype = int(row['sensed_mode'])
         distance = row['distance']
+        """
         if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:
-            # TODO: Replace this avg with public transportation/car value when we can distinguish.
-            total_footprint += (fp_train * m_to_km(distance) + fp_car * m_to_km(distance)) / 2;
+            """
+        if motiontype == 5: #car
+            total_footprint += fp_car * m_to_km(distance)
+        elif motiontype == 4: #train
+            total_footprint += fp_train * m_to_km(distance)
+        elif motiontype == 3: #bus
+            total_footprint += fp_bus * m_to_km(distance)
     return total_footprint
 
   @staticmethod
@@ -374,10 +381,17 @@ class User(object):
     """
     #TODO: Differentiate between car and bus, check ML & try to add to ecwm.MotionTypes...
     total_penalty = 0
+
     for index, row in penalty_df.iterrows():
       motiontype = int(row['sensed_mode'])
-      if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:
+      """
+      if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:"""
+      if motiontype == 5: #car
         total_penalty += max(0, mil_to_km(37.5) - m_to_km(row['distance']))
+      elif motiontype == 3: #bus
+        total_penalty += max(0, mil_to_km(10) - m_to_km(row['distance']))
+      elif motiontype == 4: #train
+        total_penalty += max(0, mil_to_km(15) - m_to_km(row['distance']))
     return total_penalty
 
 

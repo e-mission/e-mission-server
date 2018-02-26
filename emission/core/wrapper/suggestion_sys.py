@@ -79,7 +79,12 @@ def check_against_business_location(location='0, 0', address = ''):
                 return (False, '')
         except:
             raise ValueError("Something went wrong")
-
+def insert_into_db(tripDict, tripID, collection, uuid):
+    if tripDict == None:
+        collection.insert_one({'uuid': uuid, 'trip_id': tripID})
+    else:
+        if tripDict['trip_id'] != tripID:
+            collection.update_one({'uuid': uuid}, {'$set': {'trip_id' : tripID}})
 def calculate_single_suggestion(uuid):
     #Given a single UUID, create a suggestion for them
     return_obj = { 'message': "Good job walking and biking! No suggestion to show.",
@@ -113,8 +118,7 @@ def calculate_single_suggestion(uuid):
         end_loc = cleaned_sections.iloc[i]["end_loc"]["coordinates"]
         end_lat = str(end_loc[0])
         end_lon = str(end_loc[1])
-        #TODO: Add elif's for bus
-        if mode == 0 and distance_in_miles >= 5 and distance_in_miles <= 15:
+        if mode == 5 and distance_in_miles >= 5 and distance_in_miles <= 15:
             #Suggest bus if it is car and distance between 5 and 15
             default_message = return_obj['message']
             try:
@@ -129,8 +133,8 @@ def calculate_single_suggestion(uuid):
             except ValueError as e:
                 return_obj['message'] = default_message
                 continue
-        elif mode == 0 and distance_in_miles < 5 and distance_in_miles >= 1:
-            #Suggest bike if it is car/bus and distance between 5 and 1
+        elif mode == 5 or mode == 3 or mode == 4 and distance_in_miles < 5 and distance_in_miles >= 1:
+            #Suggest bike if it is car/bus/train and distance between 5 and 1
             try:
                 message = "Try biking from " + return_address_from_location(start_lon + "," + start_lat) + \
                 " to " + return_address_from_location(end_lon + "," + end_lat) + " (tap me to view)"
@@ -141,8 +145,8 @@ def calculate_single_suggestion(uuid):
                 break
             except:
                 continue
-        elif mode == 0 and distance_in_miles < 1:
-            #Suggest walking if it is car/bus and distance less than 1
+        elif mode == 5 or mode == 3 or mode == 4 distance_in_miles < 1:
+            #Suggest walking if it is car/bus/train and distance less than 1
             try:
                 message = "Try walking/biking from " + return_address_from_location(start_lon + "," + start_lat) + \
                 " to " + return_address_from_location(end_lon + "," + end_lat) + " (tap me to view)"
@@ -154,10 +158,3 @@ def calculate_single_suggestion(uuid):
             except:
                 continue
     return return_obj
-def insert_into_db(tripDict, tripID, collection, uuid):
-    print(tripDict)
-    if tripDict == None:
-        collection.insert_one({'uuid': uuid, 'trip_id': tripID})
-    else:
-        if tripDict['trip_id'] != tripID:
-            collection.update_one({'uuid': uuid}, {'$set':{'trip_id' : tripID}})
