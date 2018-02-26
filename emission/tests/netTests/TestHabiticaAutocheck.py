@@ -20,7 +20,7 @@ import emission.analysis.result.metrics.simple_metrics as earmts
 import emission.analysis.result.metrics.time_grouping as earmt
 import emission.core.get_database as edb
 import emission.core.wrapper.entry as ecwe
-import emission.core.wrapper.motionactivity as ecwm
+import emission.core.wrapper.modeprediction as ecwm
 import emission.core.wrapper.section as ecws
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.decorations.local_date_queries as esdl
@@ -87,7 +87,7 @@ class TestHabiticaAutocheck(unittest.TestCase):
     # from the test case
     self._fillDates(section, "end_", start_ardt, start_timezone)
     #logging.debug("created section %s" % (section.start_fmt_time))
-    entry = ecwe.Entry.create_entry(self.testUUID, esda.CLEANED_SECTION_KEY,
+    entry = ecwe.Entry.create_entry(self.testUUID, esda.INFERRED_SECTION_KEY,
                                     section, create_id=True)
     self.ts.insert(entry)
     return entry
@@ -102,7 +102,7 @@ class TestHabiticaAutocheck(unittest.TestCase):
   def _fillModeDistanceDuration(self, section_list):
     for i, s in enumerate(section_list):
       dw = s.data
-      dw.sensed_mode = ecwm.MotionTypes.BICYCLING
+      dw.sensed_mode = ecwm.PredictedModeTypes.BICYCLING
       dw.duration = (i + 1) * 100
       dw.distance = (i + 1.5) * 1000
       s['data'] = dw

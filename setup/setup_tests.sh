@@ -10,3 +10,4 @@ source activate ${CONDA_TEMP_PREFIX}
 pip install six --upgrade
 python bin/deploy/habitica_conf.py
 python bin/deploy/push_conf.py
+python bin/deploy/model_copy.py

@@ -9,251 +9,217 @@ from builtins import str
 from builtins import *
 import unittest
 import json
+import arrow
 import logging
 import numpy as np
+import os
 from datetime import datetime, timedelta
 
 # Our imports
 import emission.core.get_database as edb
-from emission.core.get_database import _get_current_db, get_mode_db, get_section_db
-import emission.analysis.classification.inference.mode as pipeline
 from emission.core.wrapper.user import User
 from emission.core.wrapper.client import Client
-import emission.tests.common as etc
+import emission.core.wrapper.localdate as ecwl
+import emission.core.wrapper.location as ecwlo
+import emission.core.wrapper.section as ecws
+import emission.core.wrapper.entry as ecwe
+import emission.core.wrapper.modeprediction as ecwm
+import emission.core.wrapper.motionactivity as ecwma
 
+import emission.tests.common as etc
+import emission.net.usercache.formatters.common as enufc
+
+import emission.analysis.classification.inference.mode.pipeline as pipeline
+import emission.storage.timeseries.abstract_timeseries as esta
+import emission.storage.decorations.analysis_timeseries_queries as esda
+import emission.storage.decorations.section_queries as esds
+
+'''
+TODO:
+    Create some outliers and make sure they're stripped out
+
+'''
 class TestPipeline(unittest.TestCase):
   def setUp(self):
-    self.testUsers = ["test@example.com", "best@example.com", "fest@example.com",
-                      "rest@example.com", "nest@example.com"]
-    self.serverName = 'localhost'
-
-    # Sometimes, we may have entries left behind in the database if one of the tests failed
-    # or threw an exception, so let us start by cleaning up all entries
-    etc.dropAllCollections(edb._get_current_db())
-
-    self.ModesColl = get_mode_db()
-    self.assertEquals(self.ModesColl.find().count(), 0)
-
-    self.SectionsColl = get_section_db()
-    self.assertEquals(self.SectionsColl.find().count(), 0)
-
-    etc.loadTable(self.serverName, "Stage_Modes", "emission/tests/data/modes.json")
-    etc.loadTable(self.serverName, "Stage_Sections", "emission/tests/data/testModeInferFile")
-
-    # Let's make sure that the users are registered so that they have profiles
-    for userEmail in self.testUsers:
-      User.register(userEmail)
-
-    self.now = datetime.now()
-    self.dayago = self.now - timedelta(days=1)
-    self.weekago = self.now - timedelta(weeks = 1)
-
-    for section in self.SectionsColl.find():
-      section['section_start_datetime'] = self.dayago
-      section['section_end_datetime'] = self.dayago + timedelta(hours = 1)
-      if (section['confirmed_mode'] == 5):
-        # We only cluster bus and train trips
-        # And our test data only has bus trips
-        section['section_start_point'] = {u'type': u'Point', u'coordinates': [-122.270039042, 37.8800285728]}
-        section['section_end_point'] = {u'type': u'Point', u'coordinates': [-122.2690412952, 37.8739578595]}
-      # print("Section start = %s, section end = %s" %
-      #   (section['section_start_datetime'], section['section_end_datetime']))
-      # Replace the user email with the UUID
-      section['user_id'] = User.fromEmail(section['user_id']).uuid
-      self.SectionsColl.save(section)
-
-    self.pipeline = pipeline.ModeInferencePipeline()
-    self.testLoadTrainingData()
+        # Thanks to M&J for the number!
+      np.random.seed(61297777)
+      self.copied_model_path = etc.copy_dummy_seed_for_inference()
+      dataFile = "emission/tests/data/real_examples/shankari_2016-08-10"
+      start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 9})
+      end_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 10})
+      cacheKey = "diary/trips-2016-08-10"
+      etc.setupRealExample(self, dataFile)
+      etc.runIntakePipeline(self.testUUID)
+      # Default intake pipeline now includes mode inference
+      # this is correct in general, but causes errors while testing the mode inference
+      # because then that step is effectively run twice. This code
+      # rolls back the results of running the mode inference as part of the
+      # pipeline and allows us to correctly test the mode inference pipeline again.
+      pipeline.del_objects_after(self.testUUID, 0, is_dry_run=False)
+      self.pipeline = pipeline.ModeInferencePipeline()
+      self.pipeline.loadModelStage()
 
   def tearDown(self):
-    for testUser in self.testUsers:
-      etc.purgeSectionData(self.SectionsColl, testUser)
-    logging.debug("Number of sections after purge is %d" % self.SectionsColl.find().count())
-    self.ModesColl.remove()
-    self.assertEquals(self.ModesColl.find().count(), 0)
+        logging.debug("Clearing related databases")
+        self.clearRelatedDb()
+        os.remove(self.copied_model_path)
 
-  def testLoadTrainingData(self):
-    allConfirmedTripsQuery = pipeline.ModeInferencePipeline.getSectionQueryWithGroundTruth({'$ne': ''})
-    (self.pipeline.modeList, self.pipeline.confirmedSections) = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery)
-    self.assertEquals(self.pipeline.confirmedSections.count(), len(self.testUsers) * 2)
-
-  def testGenerateBusAndTrainStops(self):
-    (self.pipeline.bus_cluster, self.pipeline.train_cluster) = self.pipeline.generateBusAndTrainStopStep()
-    # Half our trips are bus, and are copies of the identical bus trip.
-    # So they should all cluster into one set of start and stop points.
-    # So we expect to have to cluster points - one for start and one for end
-    self.assertEquals(len(self.pipeline.train_cluster), 0)
-    self.assertEquals(len(self.pipeline.bus_cluster), 2)
+  def clearRelatedDb(self):
+        edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID})
+        edb.get_usercache_db().delete_many({"user_id": self.testUUID})
 
   def testFeatureGenWithOnePoint(self):
-    trackpoint1 = {"track_location": {"coordinates": [-122.0861645, 37.3910201]},
-                   "time" : "20150127T203305-0800"}
-    now = datetime.now()
-
     # ensure that the start and end datetimes are the same, since the average calculation uses
     # the total distance and the total duration
-    testSeg = {"track_points": [trackpoint1],
-               "distance": 500,
-               "section_start_datetime": now,
-               "section_end_datetime": now,
-               "mode": 1,
-               "section_id": 2}
-
+    ts = esta.TimeSeries.get_time_series(self.testUUID)
+    trackpoint1 = ecwlo.Location({u'coordinates': [0,0], 'type': 'Point'})
+    ts.insert_data(self.testUUID, "analysis/recreated_location", trackpoint1)
+    testSeg = ecws.Section({"start_loc": trackpoint1,
+                "end_loc": trackpoint1,
+                "distance": 500,
+                "sensed_mode": 1,
+                "duration": 150,
+                "start_ts": arrow.now().timestamp,
+                "end_ts": arrow.now().timestamp,
+                "_id": 2,
+                "speeds":[],
+                "distances":[],
+                })
+    testSegEntry = ecwe.Entry.create_entry(self.testUUID, "analysis/cleaned_section", testSeg)
+    d = testSegEntry.data
+    m = testSegEntry.metadata
+    enufc.expand_start_end_data_times(d, m)
+    testSegEntry["data"] = d
+    testSegEntry["metadata"] = m
+    inserted_id = ts.insert(testSegEntry)
     featureMatrix = np.zeros([1, len(self.pipeline.featureLabels)])
     resultVector = np.zeros(1)
-    self.pipeline.updateFeatureMatrixRowWithSection(featureMatrix, 0, testSeg)
-    self.assertEqual(np.count_nonzero(featureMatrix[0][4:16]), 0)
+    self.pipeline.updateFeatureMatrixRowWithSection(featureMatrix, 0, testSegEntry) 
+    logging.debug("featureMatrix = %s" % featureMatrix)
+    self.assertEqual(np.count_nonzero(featureMatrix[0][5:16]), 0)
     self.assertEqual(np.count_nonzero(featureMatrix[0][19:21]), 0)
 
-  def testGenerateTrainingSet(self):
-    self.testLoadTrainingData()
-    self.testGenerateBusAndTrainStops()
-
-    (self.pipeline.featureMatrix, self.pipeline.resultVector) = self.pipeline.generateFeatureMatrixAndResultVectorStep()
-    print("Number of sections = %s" % self.pipeline.confirmedSections.count())
-    print("Feature Matrix shape = %s" % str(self.pipeline.featureMatrix.shape))
-    self.assertEquals(self.pipeline.featureMatrix.shape[0], self.pipeline.confirmedSections.count())
-    self.assertEquals(self.pipeline.featureMatrix.shape[1], len(self.pipeline.featureLabels))
-
-  def testCleanDataStep(self):
-    # Add in some entries that should be cleaned by duplicating existing sections
-    runSec = self.SectionsColl.find_one({'type':'move'})
-    runSec['_id'] = 'clean_me_1'
-    runSec['confirmed_mode'] = 2
-    logging.debug("Inserting runSec %s" % runSec)
-    self.SectionsColl.insert(runSec)
-
-    # Outlier trip
-    longTripSec = self.SectionsColl.find_one({'type':'move'})
-    longTripSec['_id'] = 'clean_me_2'
-    longTripSec['distance'] = 5000000
-    logging.debug("Inserting longTripSec %s" % longTripSec)
-    self.SectionsColl.insert(longTripSec)
-
-    unknownTripSec = self.SectionsColl.find_one({'type':'move'})
-    unknownTripSec['_id'] = 'clean_me_3'
-    unknownTripSec['mode'] = 'airplane'
-    logging.debug("Inserting unknownTripSec %s" % unknownTripSec)
-    self.SectionsColl.insert(unknownTripSec)
-    
-    allConfirmedTripsQuery = {"$and": [{'type': 'move'}, {'confirmed_mode': {'$ne': ''}}]}
-    (self.pipeline.modeList, self.pipeline.confirmedSections) = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery)
-    self.testGenerateBusAndTrainStops()
-    (self.pipeline.featureMatrix, self.pipeline.resultVector) = self.pipeline.generateFeatureMatrixAndResultVectorStep()
-
-    (self.pipeline.cleanedFeatureMatrix, self.pipeline.cleanedResultVector) = self.pipeline.cleanDataStep()
-    self.assertEquals(self.pipeline.cleanedFeatureMatrix.shape[0], self.pipeline.confirmedSections.count() - 2)
-
   def testSelectFeatureIndicesStep(self):
-    self.testCleanDataStep()
-
     self.pipeline.selFeatureIndices = self.pipeline.selectFeatureIndicesStep()
     self.assertEqual(len(self.pipeline.selFeatureIndices), 13)
-    self.pipeline.selFeatureMatrix = self.pipeline.cleanedFeatureMatrix[:,self.pipeline.selFeatureIndices]
-    self.assertEqual(self.pipeline.selFeatureMatrix.shape[1], len(self.pipeline.selFeatureIndices))
-
-  def testBuildModelStep(self):
-    self.testSelectFeatureIndicesStep()
-
-    self.pipeline.model = self.pipeline.buildModelStep()
-    from sklearn import cross_validation
-    scores = cross_validation.cross_val_score(self.pipeline.model, self.pipeline.cleanedFeatureMatrix, self.pipeline.cleanedResultVector, cv=3)
-    self.assertGreater(scores.mean(), 0.90)
-
-  def setupTestTrips(self):
-    # Generate some test data by taking existing training data and stripping out the labels
-    test_id_1 = self.SectionsColl.find_one({'confirmed_mode':1})
-    test_id_1['_id'] = 'test_id_1'
-    test_id_1['confirmed_mode'] = ''
-    logging.debug("Inserting test_id_1 %s" % test_id_1)
-    self.SectionsColl.insert(test_id_1)
-
-    test_id_2 = self.SectionsColl.find_one({'confirmed_mode':5})
-    test_id_2['_id'] = 'test_id_2'
-    test_id_2['confirmed_mode'] = ''
-    logging.debug("Inserting test_id_2 %s" % test_id_2)
-    self.SectionsColl.insert(test_id_2)
 
   def testGenerateFeatureMatrixAndIds(self):
-    self.setupTestTrips()
-    self.testBuildModelStep()
-    toPredictTripsQuery = {"$and": [{'type': 'move'}, {'confirmed_mode': ''},
-    # TODO: Change to does not exist
-      {'predicted_mode': None}]}
-    (self.pipeline.toPredictFeatureMatrix, self.pipeline.sectionIds, self.pipeline.sectionUserIds) = self.pipeline.generateFeatureMatrixAndIDsStep(toPredictTripsQuery)
+    self.testSelectFeatureIndicesStep()
+
+    self.pipeline.user_id = self.testUUID
+    self.pipeline.ts = esta.TimeSeries.get_time_series(self.testUUID)
+    self.pipeline.toPredictSections = esda.get_entries(esda.CLEANED_SECTION_KEY, self.testUUID, 
+        time_query=None)
+    (self.pipeline.toPredictFeatureMatrix,
+        self.pipeline.tripIds,
+        self.pipeline.sectionIds) = \
+        self.pipeline.generateFeatureMatrixAndIDsStep(self.pipeline.toPredictSections)
     self.assertEqual(self.pipeline.toPredictFeatureMatrix.shape[0], len(self.pipeline.sectionIds))
-    self.assertEqual(self.pipeline.toPredictFeatureMatrix.shape[0], len(self.pipeline.sectionUserIds))
+    self.assertEqual(self.pipeline.toPredictFeatureMatrix.shape[0], len(self.pipeline.tripIds))
     self.assertEqual(self.pipeline.toPredictFeatureMatrix.shape[1], len(self.pipeline.selFeatureIndices))
-    self.assertEqual(self.pipeline.toPredictFeatureMatrix.shape[0], 2)
+    self.assertEqual(self.pipeline.toPredictFeatureMatrix.shape[0], len(self.pipeline.toPredictSections))
 
   def testPredictedProb(self):
     self.testGenerateFeatureMatrixAndIds()
 
     self.pipeline.predictedProb = self.pipeline.predictModesStep()
-    self.assertEqual(self.pipeline.predictedProb.shape[0], 2)
-    self.assertEqual(self.pipeline.predictedProb.shape[1], len(set(self.pipeline.cleanedResultVector)))
+    logging.debug("self.pipeline.predictedProb = %s" % 
+        self.pipeline.predictedProb)
+    self.assertEqual(self.pipeline.predictedProb.shape[0], len(self.pipeline.toPredictSections))
+    # our simple static model has two results
+    self.assertEqual(self.pipeline.predictedProb.shape[1], 2)
 
     # I know this from looking at the output for this small dataset
     # self.assertAlmostEqual(self.pipeline.predictedProb[0,0], 0.9, places=3)
-    self.assertEqual(self.pipeline.predictedProb[0,0], 1)
-    logging.debug("predicted prob = %s" % self.pipeline.predictedProb)
-    self.assertTrue(round(self.pipeline.predictedProb[0,1],2) == 0 or 
-        round(self.pipeline.predictedProb[0,1],2) == 0.1,
+    self.assertEqual(self.pipeline.predictedProb[0,0], 0.7)
+    self.assertTrue(round(self.pipeline.predictedProb[0,1],2) == 0.3 or 
+        round(self.pipeline.predictedProb[0,1],2) == 0.3,
         "predictedProb[0,1] = %s, with rounding = %s" % (self.pipeline.predictedProb[0,1],
             round(self.pipeline.predictedProb[0,1])))
-    self.assertTrue(round(self.pipeline.predictedProb[1,0],2) == 0 or
-        round(self.pipeline.predictedProb[1,0],2) == 0.1,
-        "predictedProb[1,0] = %s, with rounding = %s" % (self.pipeline.predictedProb[1,0],
-            round(self.pipeline.predictedProb[1,0])))
-    self.assertTrue(round(self.pipeline.predictedProb[1,1],2) == 1 or
-        round(self.pipeline.predictedProb[1,1],2) == 0.9,
-        "predictedProb[1,1] = %s, with rounding = %s" % (self.pipeline.predictedProb[1,1],
-            round(self.pipeline.predictedProb[1,1])))
+    self.assertTrue(round(self.pipeline.predictedProb[2,0],2) == 0.2 or
+        round(self.pipeline.predictedProb[2,0],2) == 0.2,
+        "predictedProb[2,0] = %s, with rounding = %s" % (self.pipeline.predictedProb[2,0],
+            round(self.pipeline.predictedProb[2,0])))
+    self.assertTrue(round(self.pipeline.predictedProb[2,1],2) == 0.8 or
+        round(self.pipeline.predictedProb[2,1],2) == 0.8,
+        "predictedProb[2,1] = %s, with rounding = %s" % (self.pipeline.predictedProb[2,1],
+            round(self.pipeline.predictedProb[2,1])))
 
   def testConvertPredictedProbToMap(self):
     self.testPredictedProb()
 
-    uniqueModes = sorted(set(self.pipeline.cleanedResultVector))
-    self.assertEquals(uniqueModes, [1,5])
+    uniqueModes = self.pipeline.model.classes_
+    self.assertEqual(uniqueModes.tolist(), [1,5])
 
-    currProb = self.pipeline.convertPredictedProbToMap(self.pipeline.modeList,
-      uniqueModes, self.pipeline.predictedProb[1])
+    currProb = self.pipeline.convertPredictedProbToMap(uniqueModes,
+        self.pipeline.predictedProb[2])
 
-    self.assertEquals(currProb, {'bus': 1})
+    self.assertEqual(currProb, {'WALKING': 0.2, 'BUS': 0.8})
 
   def testSavePredictionsStep(self):
     self.testPredictedProb()
     self.pipeline.savePredictionsStep()
     # Confirm that the predictions are saved correctly
 
-    test_id_1_sec = self.SectionsColl.find_one({'_id': 'test_id_1'})
-    self.assertIsNotNone(test_id_1_sec['predicted_mode'])
-    self.assertEquals(test_id_1_sec['predicted_mode'], {'walking': 1})
+    for i, section in enumerate(self.pipeline.toPredictSections):
+        predicted_mode = esds.get_inferred_mode_entry(self.testUUID, section.get_id())
+        self.assertIsNotNone(predicted_mode)
+        if i == 0:
+            self.assertEqual(predicted_mode.data["predicted_mode_map"],
+                {'WALKING': 0.7, 'BUS': 0.3})
 
-    test_id_2_sec = self.SectionsColl.find_one({'_id': 'test_id_2'})
-    self.assertIsNotNone(test_id_2_sec['predicted_mode'])
-    self.assertEquals(test_id_2_sec['predicted_mode'], {'bus': 1})
-
-    # Let's make sure that we didn't accidentally mess up other fields
-    self.assertIsNotNone(test_id_1_sec['distance'])
-    self.assertIsNotNone(test_id_2_sec['trip_id'])
+        if i == 2:
+            self.assertEqual(predicted_mode.data["predicted_mode_map"],
+                {'WALKING': 0.2, 'BUS': 0.8})
 
   def testEntirePipeline(self):
-    self.setupTestTrips()
-    # Here, we only have 5 trips, so the pipeline looks for the backup training
-    # set instead, which fails because there is no backup. So let's copy data from
-    # the main DB to the backup DB to make this test pass
-    from pymongo import MongoClient
-    client = MongoClient('localhost')
-    client.drop_database("Backup_database")
-    client.admin.command("copydb", fromdb="Stage_database", todb="Backup_database")
-    self.pipeline.runPipeline()
+    self.pipeline.user_id = self.testUUID
+    self.pipeline.runPredictionPipeline(self.testUUID, None)
 
-    # Checks are largely the same as above
-    test_id_1_sec = self.SectionsColl.find_one({'_id': 'test_id_1'})
-    self.assertIsNotNone(test_id_1_sec['predicted_mode'])
-    self.assertEquals(test_id_1_sec['predicted_mode'], {'walking': 1})
-    self.assertIsNotNone(test_id_1_sec['distance'])
+    for i, section in enumerate(self.pipeline.toPredictSections):
+        predicted_mode = esds.get_inferred_mode_entry(self.testUUID, section.get_id())
+        self.assertIsNotNone(predicted_mode)
+        if i == 0:
+            self.assertEqual(predicted_mode.data["predicted_mode_map"],
+                {'WALKING': 0.7, 'BUS': 0.3})
+
+        if i == 2:
+            self.assertEqual(predicted_mode.data["predicted_mode_map"],
+                {'WALKING': 0.2, 'BUS': 0.8})
+
+  def testAirOverrideHack(self):
+    self.testPredictedProb()
+    self.pipeline.toPredictSections[1]["data"]["sensed_mode"] = ecwma.MotionTypes.AIR_OR_HSR.value
+    self.pipeline.toPredictSections[3]["data"]["sensed_mode"] = ecwma.MotionTypes.AIR_OR_HSR.value
+    self.pipeline.savePredictionsStep()
+
+    for i, section in enumerate(self.pipeline.toPredictSections):
+        predicted_mode = esds.get_inferred_mode_entry(self.testUUID, section.get_id())
+        self.assertIsNotNone(predicted_mode)
+
+        ise = esds.cleaned2inferred_section(self.testUUID, section.get_id())
+        self.assertIsNotNone(ise)
+
+        if i == 0:
+            self.assertEqual(predicted_mode.data["predicted_mode_map"],
+                {'WALKING': 0.7, 'BUS': 0.3})
+            self.assertEqual(ise.data.sensed_mode, ecwm.PredictedModeTypes.WALKING)
+
+        if i == 1:
+            self.assertEqual(predicted_mode.data["predicted_mode_map"],
+                {'AIR_OR_HSR': 1.0})
+            self.assertEqual(ise.data.sensed_mode, ecwm.PredictedModeTypes.AIR_OR_HSR)
+
+        if i == 2:
+            self.assertEqual(predicted_mode.data["predicted_mode_map"],
+                {'WALKING': 0.2, 'BUS': 0.8})
+            self.assertEqual(ise.data.sensed_mode, ecwm.PredictedModeTypes.BUS)
+
+        if i == 3:
+            self.assertEqual(predicted_mode.data["predicted_mode_map"],
+                {'AIR_OR_HSR': 1.0})
+            self.assertEqual(ise.data.sensed_mode, ecwm.PredictedModeTypes.AIR_OR_HSR)
 
 if __name__ == '__main__':
     etc.configLogging()
