@@ -56,14 +56,13 @@ def calculate_single_suggestion(uuid):
         tripDict = suggestion_trips.find_one({'uuid': uuid})
         logging.debug("%s" % tripDict)
         mode = cleaned_sections.iloc[i]["sensed_mode"]
-        #TODO: Add elif's for bus
-        if mode == 0 and distance_in_miles >= 5 and distance_in_miles <= 15:
+        if mode == 5 and distance_in_miles >= 5 and distance_in_miles <= 15:
             logging.debug("Considering section from %s -> %s" %
                 (cleaned_sections.iloc[i]["start_fmt_time"],
                  cleaned_sections.iloc[i]["end_fmt_time"]))
             #Suggest bus if it is car and distance between 5 and 15
             return handle_insert(tripDict, trip_id, suggestion_trips, uuid)
-        elif mode == 0 and distance_in_miles < 5 and distance_in_miles >= 1:
+        elif mode == 5 or mode == 3 or mode == 4 and distance_in_miles < 5 and distance_in_miles >= 1:
             logging.debug("Considering section from %s -> %s" %
                 (cleaned_sections.iloc[i]["start_fmt_time"],
                  cleaned_sections.iloc[i]["end_fmt_time"]))
@@ -73,7 +72,7 @@ def calculate_single_suggestion(uuid):
             logging.debug("Considering section from %s -> %s" %
                 (cleaned_sections.iloc[i]["start_fmt_time"],
                  cleaned_sections.iloc[i]["end_fmt_time"]))
-        elif mode == 0 and distance_in_miles < 1:
+        elif mode == 5 or mode == 3 or mode == 4 distance_in_miles < 1:
             logging.debug("Considering section from %s -> %s" %
                 (cleaned_sections.iloc[i]["start_fmt_time"],
                  cleaned_sections.iloc[i]["end_fmt_time"]))
