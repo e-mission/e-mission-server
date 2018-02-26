@@ -126,7 +126,7 @@ class ModeInferencePipeline:
   def runPredictionPipeline(self, user_id, timerange):
     self.ts = esta.TimeSeries.get_time_series(user_id)
     self.toPredictSections = esda.get_entries(esda.CLEANED_SECTION_KEY, user_id, 
-        time_query=None)
+        time_query=timerange)
     if (len(self.toPredictSections) == 0):
         logging.debug("len(toPredictSections) == 0, early return")
         assert self.last_section_done is None, ("self.last_section_done == %s, expecting None" % \
