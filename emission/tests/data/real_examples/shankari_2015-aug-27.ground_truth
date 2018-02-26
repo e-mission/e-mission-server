@@ -6,8 +6,8 @@
                     "geometry": {
                         "type": "Point", 
                         "coordinates": [
-                            -122.0846749, 
-                            37.393415
+                            -122.084979, 
+                            37.3929098
                         ]
                     }, 
                     "type": "Feature", 
@@ -25,7 +25,7 @@
                         }, 
                         "display_name": "South Shoreline Boulevard, Mountain View", 
                         "feature_type": "start_place", 
-                        "exit_fmt_time": "2015-08-27T08:18:59.672000-07:00", 
+                        "exit_fmt_time": "2015-08-27T08:18:27.867000-07:00", 
                         "starting_trip": {
                             "$oid": "57e19340f6858f0a02a4a352"
                         }, 
@@ -38,7 +38,7 @@
                                 "$oid": "57e1933df6858f0a02a4a315"
                             }
                         ], 
-                        "exit_ts": 1440688739.672
+                        "exit_ts": 1440688707.867
                     }
                 }, 
                 {
@@ -174,8 +174,8 @@
                                 "type": "LineString", 
                                 "coordinates": [
                                     [
-                                        -122.0846749, 
-                                        37.393415
+                                        -122.084979, 
+                                        37.3929098
                                     ], 
                                     [
                                         -122.08367716219298, 
@@ -279,8 +279,8 @@
                                 "feature_type": "section", 
                                 "distance": 1573.988648884902, 
                                 "sensed_mode": "MotionTypes.BICYCLING", 
-                                "start_ts": 1440688739.672, 
-                                "start_fmt_time": "2015-08-27T08:18:59.672000-07:00", 
+                                "start_ts": 1440688707.867, 
+                                "start_fmt_time": "2015-08-27T08:18:27.867000-07:00", 
                                 "source": "SmoothedHighConfidenceMotion", 
                                 "end_fmt_time": "2015-08-27T08:27:45.092000-07:00", 
                                 "end_local_dt": {
@@ -424,7 +424,7 @@
             "type": "FeatureCollection", 
             "id": "57e19340f6858f0a02a4a352", 
             "properties": {
-                "distance": 1713.21374176403, 
+                "distance": 1772.479712753613, 
                 "end_place": {
                     "$oid": "57e19345f6858f0a02a4a5ca"
                 }, 
@@ -435,13 +435,13 @@
                 "start_loc": {
                     "type": "Point", 
                     "coordinates": [
-                        -122.0846749, 
-                        37.393415
+                        -122.084979, 
+                        37.3929098
                     ]
                 }, 
                 "end_ts": 1440689408.302, 
-                "start_ts": 1440688739.672, 
-                "start_fmt_time": "2015-08-27T08:18:59.672000-07:00", 
+                "start_ts": 1440688707.867, 
+                "start_fmt_time": "2015-08-27T08:18:27.867000-07:00", 
                 "end_loc": {
                     "type": "Point", 
                     "coordinates": [

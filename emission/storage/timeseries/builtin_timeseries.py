@@ -76,7 +76,9 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "metrics/daily_user_duration": self.analysis_timeseries_db,
                 "metrics/daily_mean_duration": self.analysis_timeseries_db,
                 "metrics/daily_user_median_speed": self.analysis_timeseries_db,
-                "metrics/daily_mean_median_speed": self.analysis_timeseries_db
+                "metrics/daily_mean_median_speed": self.analysis_timeseries_db,
+                "inference/prediction": self.analysis_timeseries_db,
+                "analysis/inferred_section": self.analysis_timeseries_db
             }
 
 

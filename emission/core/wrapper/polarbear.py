@@ -3,6 +3,8 @@ from emission.core.wrapper.user import User
 import emission.core.get_database as db
 from uuid import UUID
 import arrow
+import logging
+import logging.config
 
 
 def setPolarBearattr(attrs):
@@ -64,17 +66,20 @@ def getAllBearsInTier(user_id):
 	if type(user_id) == str:
 		user_id = UUID(user_id)
 	tierNum = TierSys.getUserTier(user_id)
-	if tierNum != 4:
+	if tierNum != 4 and tierNum != None:
 		tierSys = TierSys.getLatest()[0]
 		userTier = tierSys['tiers'][tierNum - 1]['users']
 	else:
-		tierSys = TierSys.getNewUserTier()[0]
+		tierSys = TierSys.getNewUserTier()
 		userTier = tierSys['users']
 	myBear = getPolarBearattr(user_id)
 	if myBear == None:
 		return None
 	#List of of users within a tier
 	allUsers = {'myBear': {'happiness': myBear['happiness'], 'size': myBear['size']}, 'otherBears':{}}
+	logging.debug("User tier contains: %s" %userTier)
+	if userTier is None:
+		return allUsers
 	for user in userTier:
 		uuid = user['uuid']
 		userattrs = None
@@ -134,6 +139,6 @@ def updateAll():
 	for tier in tiersys:
 		for user in tier['users']:
 			updatePolarBear(user['uuid'])
-	newUsers = TierSys.getNewUserTier()[0]['users']
+	newUsers = TierSys.getNewUserTier()['users']
 	for user in newUsers:
 		updatePolarBear(user['uuid'])
