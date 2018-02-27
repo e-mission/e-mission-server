@@ -145,7 +145,7 @@ def calculate_single_suggestion(uuid):
                 break
             except:
                 continue
-        elif mode == 5 or mode == 3 or mode == 4 distance_in_miles < 1:
+        elif mode == 5 or mode == 3 or mode == 4 and distance_in_miles < 1:
             #Suggest walking if it is car/bus/train and distance less than 1
             try:
                 message = "Try walking/biking from " + return_address_from_location(start_lon + "," + start_lat) + \
