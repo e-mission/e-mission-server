@@ -119,13 +119,14 @@ def updatePolarBear(user_id):
 		newHappiness = User.computeHappiness(user_id)
 		currattr['oldHappiness'] = currattr['happiness']
 		currattr['happiness'] = newHappiness
-        uname = User.getUsername(user_id)
-        if uname == None:
-            currattr['username'] = 'Anon'
-        else:
-            currattr['username'] = User.getUsername(user_id)['username']
-    		if currattr['username'] == None:
-    			currattr['username'] = 'Anon'
+
+	uname = User.getUsername(user_id)
+	if uname == None:
+		currattr['username'] = 'Anon'
+	else:
+		currattr['username'] = uname['username']
+		if currattr['username'] == None:
+			currattr['username'] = 'Anon'
 
 		rate_map = {1 : 1.05, 2: 1.03, 3: 1.012, 4: 1.1}
 		#Have to user new username if user has changed it
