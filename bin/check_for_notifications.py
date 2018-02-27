@@ -72,7 +72,7 @@ def calculate_single_suggestion(uuid):
             logging.debug("Considering section from %s -> %s" %
                 (cleaned_sections.iloc[i]["start_fmt_time"],
                  cleaned_sections.iloc[i]["end_fmt_time"]))
-        elif mode == 5 or mode == 3 or mode == 4 distance_in_miles < 1:
+        elif mode == 5 or mode == 3 or mode == 4 and distance_in_miles < 1:
             logging.debug("Considering section from %s -> %s" %
                 (cleaned_sections.iloc[i]["start_fmt_time"],
                  cleaned_sections.iloc[i]["end_fmt_time"]))
