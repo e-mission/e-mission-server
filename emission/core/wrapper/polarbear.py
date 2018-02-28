@@ -143,9 +143,9 @@ def updatePolarBear(user_id):
 		currattr['happiness'] = newHappiness
 
 	uname = User.getUsername(user_id)
-	if uname == None:
+	if currattr != None and uname == None:
 		currattr['username'] = assignName(user_id)
-	else:
+	elif currattr != None:
 		currattr['username'] = uname['username']
 		if currattr['username'] == None:
 			currattr['username'] = assignName(user_id)
