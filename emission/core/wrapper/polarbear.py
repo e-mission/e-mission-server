@@ -109,7 +109,8 @@ def assignName(user_id):
 	for user in userTier:
 		currID = user['uuid']
 		currPolarAttr = getPolarBearattr(currID)
-		allPolarUsernames.append(currPolarAttr['username'])
+		if currPolarAttr != None:
+			allPolarUsernames.append(currPolarAttr['username'])
 	newUsername = "Anon"
 	count = 1
 	while newUsername in allPolarUsernames:
