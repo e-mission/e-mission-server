@@ -136,6 +136,11 @@ def server_templates(filepath):
   logging.debug("static filepath = %s" % filepath)
   return static_file(filepath, "%s/%s" % (static_path, "templates"))
 
+@route('/scss/<filepath:path>')
+def server_scss(filepath):
+  logging.debug("static filepath = %s" % filepath)
+  return static_file(filepath, "%s/%s" % (static_path, "scss"))
+
 @post("/result/heatmap/pop.route/<time_type>")
 def getPopRoute(time_type):
   if 'user' in request.json:
