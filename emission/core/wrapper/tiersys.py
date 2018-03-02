@@ -9,6 +9,7 @@ from emission.core.wrapper.user import User
 import arrow
 from emission.core.get_database import get_tiersys_db
 from emission.core.get_database import get_new_tier_db
+from emission.core.get_database import get_carbon_usage_db
 import logging
 import logging.config
 
@@ -204,12 +205,38 @@ class TierSys:
         """
         curr_ts = arrow.utcnow().timestamp
         ts = []
+        carbonDB = {'timestamp': curr_ts, 'users': []}
         for i in range(len(self.tiers)):
-            users = [{'uuid': uuid, 'lastWeekCarbon': User.computeCarbon(uuid, last_ts, curr_ts)} for uuid in self.tiers[i]]
+            users = []
+            for uuid in self.tiers[i]:
+                client = edb.get_profile_db().find_one({"user_id": uuid})['client']
+                ''' 
+                carbonLWU -> Carbon Last Week Unpenalized (normalized with distance), 
+                carbonLWUR -> Carbon Last Week Unpenalized Raw (not normalized with distance), 
+                carbonLWP -> Carbon Last Week Penalized
+                '''
+                userCarbonRaw = User.computeCarbonRaw(uuid, last_ts, curr_ts)
+                carbonLWP = User.computeCarbon(uuid, last_ts, curr_ts)
+                carbonLWU = None
+                carbonLWUR = None
+
+                if userCarbonRaw != None:
+                    carbonLWU = userCarbonRaw[0]
+                    carbonLWUR = userCarbonRaw[1]
+
+                userStats = {'user_id': uuid, 'tier': i + 1, 'client': client, "carbonLWU": carbonLWU, 
+                                'carbonLWP': carbonLWP, 'carbonLWUR': carbonLWUR}
+
+                carbonDB['users'].append(userStats)
+                users.append({'uuid': uuid, 'lastWeekCarbon': carbonLWP})
             ts.append({'rank': i + 1, 'users': users})
+
+            #users = [{'uuid': uuid, 'lastWeekCarbon': User.computeCarbon(uuid, last_ts, curr_ts)} for uuid in self.tiers[i]]
+            #ts.append({'rank': i + 1, 'users': users})
 
         logging.debug(ts)
 
+        get_carbon_usage_db().insert_one(carbonDB)
         get_tiersys_db().insert_one({'tiers': ts, 'created_at': datetime.now()})
         get_new_tier_db().update_one({'newUserTier' : 4}, {'$set' : {'users': []}})
         return ts
