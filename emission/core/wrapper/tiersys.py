@@ -209,7 +209,12 @@ class TierSys:
         for i in range(len(self.tiers)):
             users = []
             for uuid in self.tiers[i]:
-                client = edb.get_profile_db().find_one({"user_id": uuid})['client']
+                client = None
+                try:
+                    client = edb.get_profile_db().find_one({"user_id": uuid})['client']
+                except:
+                    logging.debug("Failed to get client in TierSys")
+                    continue
                 ''' 
                 carbonLWU -> Carbon Last Week Unpenalized (normalized with distance), 
                 carbonLWUR -> Carbon Last Week Unpenalized Raw (not normalized with distance), 
