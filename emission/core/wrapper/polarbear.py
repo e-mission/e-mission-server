@@ -127,10 +127,10 @@ def updatePolarBear(user_id):
     		if currattr['username'] == None:
     			currattr['username'] = 'Anon'
 
-		rate_map = {1 : 1.05, 2: 1.03, 3: 1.012, 4: 1.1}
+		rate_map = {1 : 0.15, 2: 0.1, 3: 0.05, 4: 0}
 		#Have to user new username if user has changed it
 		if newHappiness > 0.4:
-			currattr['size'] = max(currattr['size'] * rate_map[TierSys.getUserTier(user_id)], 1)
+			currattr['size'] = currattr['size'] + (rate_map[TierSys.getUserTier(user_id)] + currattr['size'])
 		else:
 			currattr['size'] = 1
 		setPolarBearattr(currattr)
