@@ -51,21 +51,27 @@ class TierSys:
 
     @staticmethod
     def computeTierRank(user_id):
+        if type(user_id) == str:
+                    user_id = UUID(user_id)
         tierSys = TierSys.getLatest()[0]
         #allTiers- dict rankNum : tierObject
-        userTier = tierSys['tiers'][TierSys.getUserTier(user_id) - 1]['users']
+        tierNum = TierSys.getUserTier(user_id)
+        if tierNum == 4:
+            return 1
+        userTier = tierSys['tiers'][tierNum - 1]['users']
         uuids = [user['uuid'] for user in userTier]
         #uuids - list of UUIDs of users within tier
         userCarbon, userRank = {}, {}
+        userCarbon = []
         # userCarbon- dict HappinessMetric : UUID
         # userRank- dict UUID : Position
         for uuid in uuids:
-            userCarbon[User.computeHappiness(user)] = uuid
-        sortedCarbonVals = list(userCarbon.keys())
-        sortedCarbonVals.sort()
-        for carbon, pos in zip(sortedCarbonVals, range(len(userCarbon))):
-            userRank[userCarbon[carbon]] = len(userCarbon) - pos
-        return userRank[user_id]
+            currHappiness = User.computeHappiness(uuid)
+            userCarbon.append((currHappiness, uuid))
+        sorted(userCarbon, key = lambda x: x[0])
+        for currUser, pos in zip(userCarbon, range(1, len(userCarbon) + 1)):
+            if currUser[1] == user_id:
+                return pos
 
 
     def getAllTiers(self):
