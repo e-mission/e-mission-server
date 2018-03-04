@@ -99,7 +99,7 @@ def calculate_single_suggestion(uuid):
     counter = 40
     if len(cleaned_sections) == 0:
         return_obj['message'] = 'Suggestions will appear once you start taking trips!'
-    return return_obj
+        return return_obj
     for i in range(len(cleaned_sections) - 1, -1, -1):
         counter -= 1
         if counter < 0:
