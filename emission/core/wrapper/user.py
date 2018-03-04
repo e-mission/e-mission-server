@@ -332,6 +332,30 @@ class User(object):
     return None
 
   @staticmethod
+  def computeCarbonRaw(user_id, last_ts, curr_ts):
+      """
+      Computers raw carbon metric for specified user.
+      Returns a tuple with noramlized and actual carbon without
+      taking into account the penalty metric at all
+      """
+      ts = esta.TimeSeries.get_time_series(user_id)
+
+      last_period_tq = estt.TimeQuery("data.start_ts",
+                          last_ts, # start of range
+                          curr_ts)  # end of range
+      cs_df = ts.get_data_df("analysis/cleaned_section", time_query=last_period_tq)
+      if cs_df.shape[0] <= 0:
+        return None
+      carbon_val = User.computeFootprint(cs_df[["sensed_mode", "distance"]])
+      dist_travelled = cs_df["distance"].sum()
+
+      if dist_travelled > 0:
+        carbon_normalized = carbon_val / dist_travelled
+        return [carbon_normalized, carbon_val]
+      # Do not include no distance traveled users in the tier system.
+      return None
+
+  @staticmethod
   def computeFootprint(footprint_df):
     """
     Inspired by e-mission-phone/www/js/metrics-factory.js

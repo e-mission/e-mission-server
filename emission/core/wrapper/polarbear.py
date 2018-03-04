@@ -95,6 +95,28 @@ def getAllBearsInTier(user_id):
 			print("user polar bear not found!: " + str(uuid))
 	return allUsers
 
+def assignName(user_id):
+	if type(user_id) == str:
+		user_id = UUID(user_id)
+	tierNum = TierSys.getUserTier(user_id)
+	if tierNum != 4 and tierNum != None:
+		tierSys = TierSys.getLatest()[0]
+		userTier = tierSys['tiers'][tierNum - 1]['users']
+	else:
+		tierSys = TierSys.getNewUserTier()
+		userTier = tierSys['users']
+	allPolarUsernames = []
+	for user in userTier:
+		currID = user['uuid']
+		currPolarAttr = getPolarBearattr(currID)
+		if currPolarAttr != None:
+			allPolarUsernames.append(currPolarAttr['username'])
+	newUsername = "Anon"
+	count = 1
+	while newUsername in allPolarUsernames:
+		newUsername = "Anon" + str(count)
+		count += 1
+	return newUsername
 
 def updatePolarBear(user_id):
 	"""
@@ -105,7 +127,7 @@ def updatePolarBear(user_id):
 		#Create a new Polar Bear for the given user
 		currUsername = User.getUsername(user_id)
 		if currUsername == None:
-			currUsername = 'Anon'
+			currUsername = assignName(user_id)
 		else:
 			currUsername = currUsername['username']
 		setPolarBearattr({'user_id': user_id,
@@ -119,13 +141,14 @@ def updatePolarBear(user_id):
 		newHappiness = User.computeHappiness(user_id)
 		currattr['oldHappiness'] = currattr['happiness']
 		currattr['happiness'] = newHappiness
-        uname = User.getUsername(user_id)
-        if uname == None:
-            currattr['username'] = 'Anon'
-        else:
-            currattr['username'] = User.getUsername(user_id)['username']
-    		if currattr['username'] == None:
-    			currattr['username'] = 'Anon'
+
+	uname = User.getUsername(user_id)
+	if currattr != None and uname == None:
+		currattr['username'] = assignName(user_id)
+	elif currattr != None:
+		currattr['username'] = uname['username']
+		if currattr['username'] == None:
+			currattr['username'] = assignName(user_id)
 
 		rate_map = {1 : 0.15, 2: 0.1, 3: 0.05, 4: 0}
 		#Have to user new username if user has changed it
