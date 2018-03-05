@@ -55,14 +55,14 @@ def getPolarBearattr(user_id):
 	if type(user_id) == str:
 		user_id = UUID(user_id)
 	polarBearCollection = db.get_polarbear_db()
-	attr = polarBearCollection.find_one({'user_id' : user_id})
-	if "Anon" in attr['username']:
+	attrs = polarBearCollection.find_one({'user_id' : user_id})
+	if "Anon" in attrs['username']:
 		polarBearCollection.update_one({'user_id': attrs['user_id']},{'$set' : {'username' : User.getUsername(user_id)['username'],
                                                                         'happiness' : attrs['happiness'],
                                                                         'oldHappiness': attrs['oldHappiness'],
                                                                         'size' : attrs['size']}})
-		attr = polarBearCollection.find_one({'user_id' : user_id})
-	return attr
+		attrs = polarBearCollection.find_one({'user_id' : user_id})
+	return attrs
 
 def getAllBearsInTier(user_id):
 	"""
