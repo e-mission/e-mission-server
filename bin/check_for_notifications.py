@@ -40,8 +40,7 @@ def calculate_single_suggestion(uuid):
     'end_lat' : '0.0', 'end_lon' : '0.0', 'method' : 'bike'}
     user_id = all_users.iloc[all_users[all_users.uuid == uuid].index.tolist()[0]].uuid
     time_series = esta.TimeSeries.get_time_series(user_id)
-    cleaned_sections = time_series.get_data_df("analysis/cleaned_section", time_query = None)
-    cleaned_sections = time_series.get_data_df("analysis/cleaned_section", time_query = None)
+    cleaned_sections = time_series.get_data_df("analysis/inferred_section", time_query = None)
     #Go in reverse order because we check by most recent trip
     counter = 40
     for i in range(len(cleaned_sections) - 1, -1, -1):
