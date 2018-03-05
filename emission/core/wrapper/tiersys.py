@@ -39,7 +39,7 @@ class TierSys:
                 return index
             else:
                 index += 1
-        newUserTier = TierSys.getNewUserTier()
+        newUserTier = TierSys.getNewUserTier()[0]
         if newUserTier is None:
             return 4
         elif newUserTier['users'] is None:
@@ -110,7 +110,7 @@ class TierSys:
             user_id = UUID(user_id)
         newTierCollection = get_new_tier_db()
         newUser = {'uuid': user_id, "lastWeekCarbon": 0.0}
-        newTier = TierSys.getNewUserTier()
+        newTier = TierSys.getNewUserTier()[0]
         if newTier is None:
             updatedUsers = []
             updatedUsers.append(newUser)
