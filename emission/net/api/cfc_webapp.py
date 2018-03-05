@@ -303,7 +303,9 @@ def getHappiness():
 @post('/polarbear')
 def getTierPolarBears():
   user_id = getUUID(request)
-  return pb.getAllBearsInTier(user_id)
+  result = pb.getAllBearsInTier(user_id)
+  logging.debug("called getTierPolarBears: %s" result)
+  return result
 
 @post('/tierRank')
 def getTierRank():
