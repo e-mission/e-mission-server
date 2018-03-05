@@ -174,6 +174,7 @@ class TierSys:
             self.addTier(rank)
             tier_users = updated_user_tiers[rank-1]
             self.tiers[rank - 1] = tier_users
+        return self.tiers
 
     def saveTiers(self, last_ts):
         from datetime import datetime
