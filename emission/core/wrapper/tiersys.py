@@ -25,7 +25,7 @@ class TierSys:
 
     @staticmethod
     def getNewUserTier():
-        return get_new_tier_db().find_one({'newUserTier' : 4})
+        return get_new_tier_db().find().sort('created_at', -1).limit(1)
 
     @staticmethod
     def getUserTier(user_id):
@@ -39,7 +39,7 @@ class TierSys:
                 return index
             else:
                 index += 1
-        newUserTier = TierSys.getNewUserTier()
+        newUserTier = TierSys.getNewUserTier()[0]
         if newUserTier is None:
             return 4
         elif newUserTier['users'] is None:
@@ -51,21 +51,27 @@ class TierSys:
 
     @staticmethod
     def computeTierRank(user_id):
+        if type(user_id) == str:
+                    user_id = UUID(user_id)
         tierSys = TierSys.getLatest()[0]
         #allTiers- dict rankNum : tierObject
-        userTier = tierSys['tiers'][TierSys.getUserTier(user_id) - 1]['users']
+        tierNum = TierSys.getUserTier(user_id)
+        if tierNum == 4:
+            return 1
+        userTier = tierSys['tiers'][tierNum - 1]['users']
         uuids = [user['uuid'] for user in userTier]
         #uuids - list of UUIDs of users within tier
         userCarbon, userRank = {}, {}
+        userCarbon = []
         # userCarbon- dict HappinessMetric : UUID
         # userRank- dict UUID : Position
         for uuid in uuids:
-            userCarbon[User.computeHappiness(user)] = uuid
-        sortedCarbonVals = list(userCarbon.keys())
-        sortedCarbonVals.sort()
-        for carbon, pos in zip(sortedCarbonVals, range(len(userCarbon))):
-            userRank[userCarbon[carbon]] = len(userCarbon) - pos
-        return userRank[user_id]
+            currHappiness = User.computeHappiness(uuid)
+            userCarbon.append((currHappiness, uuid))
+        sorted(userCarbon, key = lambda x: x[0])
+        for currUser, pos in zip(userCarbon, range(1, len(userCarbon) + 1)):
+            if currUser[1] == user_id:
+                return pos
 
 
     def getAllTiers(self):
@@ -96,6 +102,7 @@ class TierSys:
 
     @staticmethod
     def addUser(user_id):
+        from datetime import datetime
         '''
         Adds a user to the new people tier.
             Used upon study start.
@@ -104,24 +111,22 @@ class TierSys:
             user_id = UUID(user_id)
         newTierCollection = get_new_tier_db()
         newUser = {'uuid': user_id, "lastWeekCarbon": 0.0}
-        newTier = TierSys.getNewUserTier()
+        newTier = TierSys.getNewUserTier()[0]
         if newTier is None:
             updatedUsers = []
             updatedUsers.append(newUser)
-            newTierCollection.insert_one({'newUserTier': 4,  'users': updatedUsers})
+            newTierCollection.insert_one({'users': updatedUsers, 'created_at': datetime.now()})
         else:
             allUsers = newTier['users']
             if allUsers is None:
                 updatedUsers = []
                 updatedUsers.append(newUser)
-                newTierCollection.update_one(
-                {'newUserTier': 4},
-                {'$set': {'users': updatedUsers}})
+                newTierCollection.insert_one(
+                {'users': updatedUsers, 'created_at': datetime.now()})
             else:
                 allUsers.append(newUser)
-                newTierCollection.update_one(
-                {'newUserTier': 4},
-                {'$set': {'users': allUsers}})
+                newTierCollection.insert_one(
+                {'users': allUsers, 'created_at': datetime.now()})
 
     def computeRanks(self, last_ts, n):
         #TODO: FINISH
@@ -215,9 +220,9 @@ class TierSys:
                 except:
                     logging.debug("Failed to get client in TierSys")
                     continue
-                ''' 
-                carbonLWU -> Carbon Last Week Unpenalized (normalized with distance), 
-                carbonLWUR -> Carbon Last Week Unpenalized Raw (not normalized with distance), 
+                '''
+                carbonLWU -> Carbon Last Week Unpenalized (normalized with distance),
+                carbonLWUR -> Carbon Last Week Unpenalized Raw (not normalized with distance),
                 carbonLWP -> Carbon Last Week Penalized
                 '''
                 userCarbonRaw = User.computeCarbonRaw(uuid, last_ts, curr_ts)
@@ -229,7 +234,7 @@ class TierSys:
                     carbonLWU = userCarbonRaw[0]
                     carbonLWUR = userCarbonRaw[1]
 
-                userStats = {'user_id': uuid, 'tier': i + 1, 'client': client, "carbonLWU": carbonLWU, 
+                userStats = {'user_id': uuid, 'tier': i + 1, 'client': client, "carbonLWU": carbonLWU,
                                 'carbonLWP': carbonLWP, 'carbonLWUR': carbonLWUR}
 
                 carbonDB['users'].append(userStats)
@@ -240,10 +245,9 @@ class TierSys:
             #ts.append({'rank': i + 1, 'users': users})
 
         logging.debug(ts)
-
         get_carbon_usage_db().insert_one(carbonDB)
         get_tiersys_db().insert_one({'tiers': ts, 'created_at': datetime.now()})
-        get_new_tier_db().update_one({'newUserTier' : 4}, {'$set' : {'users': []}})
+        get_new_tier_db().insert_one({'users': [], 'created_at': datetime.now()})
         return ts
 
 def m_to_km(distance):
