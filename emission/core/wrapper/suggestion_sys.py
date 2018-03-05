@@ -93,7 +93,7 @@ def calculate_single_suggestion(uuid):
     all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
     user_id = all_users.iloc[all_users[all_users.uuid == uuid].index.tolist()[0]].uuid
     time_series = esta.TimeSeries.get_time_series(user_id)
-    cleaned_sections = time_series.get_data_df("analysis/cleaned_section", time_query = None)
+    cleaned_sections = time_series.get_data_df("analysis/inferred_section", time_query = None)
     suggestion_trips = edb.get_suggestion_trips_db()
     #Go in reverse order because we check by most recent trip
     counter = 40
