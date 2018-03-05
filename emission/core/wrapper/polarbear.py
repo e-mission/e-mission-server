@@ -70,7 +70,7 @@ def getAllBearsInTier(user_id):
 		tierSys = TierSys.getLatest()[0]
 		userTier = tierSys['tiers'][tierNum - 1]['users']
 	else:
-		tierSys = TierSys.getNewUserTier()
+		tierSys = TierSys.getNewUserTier()[0]
 		userTier = tierSys['users']
 	myBear = getPolarBearattr(user_id)
 	if myBear == None:
@@ -103,7 +103,7 @@ def assignName(user_id):
 		tierSys = TierSys.getLatest()[0]
 		userTier = tierSys['tiers'][tierNum - 1]['users']
 	else:
-		tierSys = TierSys.getNewUserTier()
+		tierSys = TierSys.getNewUserTier()[0]
 		userTier = tierSys['users']
 	allPolarUsernames = []
 	for user in userTier:
@@ -167,6 +167,6 @@ def updateAll():
 	for tier in tiersys:
 		for user in tier['users']:
 			updatePolarBear(user['uuid'])
-	newUsers = TierSys.getNewUserTier()['users']
+	newUsers = TierSys.getNewUserTier()[0]['users']
 	for user in newUsers:
 		updatePolarBear(user['uuid'])
