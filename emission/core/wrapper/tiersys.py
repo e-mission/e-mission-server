@@ -102,6 +102,7 @@ class TierSys:
 
     @staticmethod
     def addUser(user_id):
+        from datetime import datetime
         '''
         Adds a user to the new people tier.
             Used upon study start.
