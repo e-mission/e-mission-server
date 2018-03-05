@@ -144,7 +144,7 @@ class TierSys:
             val = self.computeCarbon(user_id, last_ts)
             if val != None:
                 try:
-                    client = edb.get_profile_db().find_one({"user_id": uuid})['client']
+                    client = edb.get_profile_db().find_one({"user_id": user_id})['client']
                     user_carbon_map[user_id] = val
                 except:
                     logging.debug("Failed to get client in TierSys")
