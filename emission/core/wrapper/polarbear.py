@@ -56,12 +56,13 @@ def getPolarBearattr(user_id):
 		user_id = UUID(user_id)
 	polarBearCollection = db.get_polarbear_db()
 	attrs = polarBearCollection.find_one({'user_id' : user_id})
-	if "Anon" in attrs['username']:
-		polarBearCollection.update_one({'user_id': attrs['user_id']},{'$set' : {'username' : User.getUsername(user_id)['username'],
-                                                                        'happiness' : attrs['happiness'],
-                                                                        'oldHappiness': attrs['oldHappiness'],
-                                                                        'size' : attrs['size']}})
-		attrs = polarBearCollection.find_one({'user_id' : user_id})
+	if attrs is not None:
+		if "Anon" in attrs['username']:
+			polarBearCollection.update_one({'user_id': attrs['user_id']},{'$set' : {'username' : User.getUsername(user_id)['username'],
+	                                                                        'happiness' : attrs['happiness'],
+	                                                                        'oldHappiness': attrs['oldHappiness'],
+	                                                                        'size' : attrs['size']}})
+			attrs = polarBearCollection.find_one({'user_id' : user_id})
 	return attrs
 
 def getAllBearsInTier(user_id):
