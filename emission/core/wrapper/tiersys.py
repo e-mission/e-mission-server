@@ -92,8 +92,8 @@ class TierSys:
         Divides objects into n buckets.
         Used in compute ranks to divide users into n tiers
         """
-        k, m = divmod(len(seq), num)
-        return (seq[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(num))
+        n, k = len(seq), num
+        return [seq[i * (n // k) + min(i, n % k):(i+1) * (n // k) + min(i+1, n % k)] for i in range(k)]
 
     @staticmethod
     def addUser(user_id):
