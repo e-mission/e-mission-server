@@ -143,7 +143,12 @@ class TierSys:
             user_id = row['uuid']
             val = self.computeCarbon(user_id, last_ts)
             if val != None:
-                user_carbon_map[user_id] = val
+                try:
+                    client = edb.get_profile_db().find_one({"user_id": uuid})['client']
+                    user_carbon_map[user_id] = val
+                except:
+                    logging.debug("Failed to get client in TierSys")
+                    continue
         logging.debug('USER CARBON MAP')
         logging.debug(user_carbon_map)
         # Sort and partition users by carbon metric.
