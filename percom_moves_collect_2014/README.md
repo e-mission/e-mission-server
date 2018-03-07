@@ -15,24 +15,26 @@ The notebook *must* be run from the current directory because it uses some files
 
 1. Set the home environment variable
 
-```
-$ export EMISSION_SERVER_HOME=<path_to_emission_server_repo>
-```
+   ```
+   $ export EMISSION_SERVER_HOME=<path_to_emission_server_repo>
+   ```
 
 1. Set up this analysis
 
-```
-$ source setup.sh
-```
+    ```
+    $ source setup.sh
+    ```
 
 1. Start the notebook server
 
-```
-$ ../bin/em-jupyter-notebook.sh
-```
+    ```
+    $ ../bin/em-jupyter-notebook.sh
+    ```
+
+### Cleaning up
 
 After completing analysis, tear down
 
-```
-$ source teardown.sh
-```
+    ```
+    $ source teardown.sh
+    ```
