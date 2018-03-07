@@ -5,6 +5,8 @@ from uuid import UUID
 import arrow
 import logging
 import logging.config
+from random import shuffle
+
 
 
 def setPolarBearattr(attrs):
@@ -70,6 +72,7 @@ def getAllBearsInTier(user_id):
 	Return a dictionary containing all Polar bear attrs in a given tier
 		{'myBear':{'happiness': int, 'size': int }, 'otherBears':{username1: {happiness: int, size: int},
 			username2: {'happiness: int, 'size': int}...}
+	Limited to 4 random polar bears
 	"""
 	if type(user_id) == str:
 		user_id = UUID(user_id)
@@ -88,7 +91,12 @@ def getAllBearsInTier(user_id):
 	logging.debug("User tier contains: %s" %userTier)
 	if userTier is None:
 		return allUsers
+	counter = 5
+	shuffle(userTier)
 	for user in userTier:
+		if counter == 0:
+			break
+		counter -= 1
 		uuid = user['uuid']
 		userattrs = None
 		if uuid != user_id:
