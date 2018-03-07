@@ -5,4 +5,4 @@
 
 # Make sure that the python here is the anaconda python if that is not the one in the path
 
-PYTHONPATH=$HOME/e-mission/e-mission-server jupyter notebook $*
+PYTHONPATH=$EMISSION_SERVER_HOME jupyter notebook $*
