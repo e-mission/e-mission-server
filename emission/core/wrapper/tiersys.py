@@ -18,6 +18,8 @@ class TierSys:
         self.tiers = []
         for i in range(1, num_tiers+1):
            self.addTier(i)
+        logging.basicConfig(level=logging.DEBUG)
+        print("Set log level to DEBUG")
 
     @staticmethod
     def getLatest():
