@@ -89,7 +89,7 @@ app = app()
 @route('/')
 def index(filename):
     if filename == "faq.html" or filename =="index.html":
-        return static_file(filename), static_path)
+        return static_file(filename, static_path)
 
 # Bunch of static pages that constitute our website
 # Should we have gone for something like django instead after all?
