@@ -60,6 +60,8 @@ class TierSys:
         tierNum = TierSys.getUserTier(user_id)
         if tierNum == 4:
             return 1
+        if tierNum == None:
+            return None
         userTier = tierSys['tiers'][tierNum - 1]['users']
         uuids = [user['uuid'] for user in userTier]
         #uuids - list of UUIDs of users within tier
