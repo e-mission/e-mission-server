@@ -90,6 +90,11 @@ app = app()
 def index():
     return static_file("index.html", static_path)
 
+@route('/<filename>')
+def index2(filename):
+    if filename == "index.html":
+        return static_file("index.html", static_path)
+
 @route('/faq/<filename>')
 def faq(filename):
     return static_file(filename,  "%s/%s" % (static_path, "faq"))
