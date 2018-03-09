@@ -18,6 +18,8 @@ class TierSys:
         self.tiers = []
         for i in range(1, num_tiers+1):
            self.addTier(i)
+        logging.basicConfig(level=logging.DEBUG)
+        print("Set log level to DEBUG")
 
     @staticmethod
     def getLatest():
@@ -58,6 +60,8 @@ class TierSys:
         tierNum = TierSys.getUserTier(user_id)
         if tierNum == 4:
             return 1
+        if tierNum == None:
+            return None
         userTier = tierSys['tiers'][tierNum - 1]['users']
         uuids = [user['uuid'] for user in userTier]
         #uuids - list of UUIDs of users within tier

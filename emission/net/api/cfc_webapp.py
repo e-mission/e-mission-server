@@ -389,6 +389,7 @@ def getUserProfile():
 
 @post('/tiersys')
 def getTierSys():
+  user_id = getUUID(request)
   return TierSys.getLatest()
 
 @post('/result/metrics/<time_type>')
