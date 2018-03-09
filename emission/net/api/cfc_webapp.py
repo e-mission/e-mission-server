@@ -86,12 +86,13 @@ app = app()
 # the webapp layer
 
 #Simple path that serves up a static landing page with javascript in it
-@route('/<filename>')
-def index(filename):
-    if filename == "index.html" or filename == "faq.html":
-        return static_file(filename, static_path)
-    else:
-        return HTTPError(404, "Don't try to hack me, you evil spammer")
+@route('/')
+def index():
+    return static_file("index.html", static_path)
+
+@route('/faq/<filename>')
+def faq(filename):
+    return static_file(filename,  "%s/%s" % (static_path, "faq"))
 
 # Bunch of static pages that constitute our website
 # Should we have gone for something like django instead after all?
