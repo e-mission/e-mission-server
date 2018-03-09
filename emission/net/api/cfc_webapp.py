@@ -86,11 +86,12 @@ app = app()
 # the webapp layer
 
 #Simple path that serves up a static landing page with javascript in it
-@route('/')
+@route('/<filename>')
 def index(filename):
-    if filename == "faq.html" or filename =="index.html":
+    if filename == "index.html" or filename == "faq.html":
         return static_file(filename, static_path)
-    return HTTPError(404, "Don't try to hack me, you evil spammer")
+    else:
+        return HTTPError(404, "Don't try to hack me, you evil spammer")
 
 # Bunch of static pages that constitute our website
 # Should we have gone for something like django instead after all?
@@ -391,7 +392,7 @@ def getUserProfile():
 
 @post('/tiersys')
 def getTierSys():
-  user_id = getUUID(request)
+  user_uuid = getUUID(request)
   return TierSys.getLatest()
 
 @post('/result/metrics/<time_type>')
