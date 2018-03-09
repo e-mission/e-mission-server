@@ -5,6 +5,8 @@ from uuid import UUID
 import arrow
 import logging
 import logging.config
+from random import shuffle
+
 
 
 def setPolarBearattr(attrs):
@@ -58,10 +60,11 @@ def getPolarBearattr(user_id):
 	attrs = polarBearCollection.find_one({'user_id' : user_id})
 	if attrs is not None:
 		if "Anon" in attrs['username']:
-			polarBearCollection.update_one({'user_id': attrs['user_id']},{'$set' : {'username' : User.getUsername(user_id)['username'],
-	                                                                        'happiness' : attrs['happiness'],
-	                                                                        'oldHappiness': attrs['oldHappiness'],
-	                                                                        'size' : attrs['size']}})
+			if User.getUsername(user_id) is not None:
+				polarBearCollection.update_one({'user_id': attrs['user_id']},{'$set' : {'username' : User.getUsername(user_id),
+		                                                                        'happiness' : attrs['happiness'],
+		                                                                        'oldHappiness': attrs['oldHappiness'],
+		                                                                        'size' : attrs['size']}})
 			attrs = polarBearCollection.find_one({'user_id' : user_id})
 	return attrs
 
@@ -70,6 +73,7 @@ def getAllBearsInTier(user_id):
 	Return a dictionary containing all Polar bear attrs in a given tier
 		{'myBear':{'happiness': int, 'size': int }, 'otherBears':{username1: {happiness: int, size: int},
 			username2: {'happiness: int, 'size': int}...}
+	Limited to 4 random polar bears
 	"""
 	if type(user_id) == str:
 		user_id = UUID(user_id)
@@ -88,7 +92,12 @@ def getAllBearsInTier(user_id):
 	logging.debug("User tier contains: %s" %userTier)
 	if userTier is None:
 		return allUsers
+	counter = 5
+	shuffle(userTier)
 	for user in userTier:
+		if counter == 0:
+			break
+		counter -= 1
 		uuid = user['uuid']
 		userattrs = None
 		if uuid != user_id:
