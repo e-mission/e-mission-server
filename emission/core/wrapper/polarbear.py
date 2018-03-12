@@ -60,8 +60,9 @@ def getPolarBearattr(user_id):
 	attrs = polarBearCollection.find_one({'user_id' : user_id})
 	if attrs is not None:
 		if "Anon" in attrs['username']:
+			username = User.getUsername(user_id)
 			if User.getUsername(user_id) is not None:
-				polarBearCollection.update_one({'user_id': attrs['user_id']},{'$set' : {'username' : User.getUsername(user_id),
+				polarBearCollection.update_one({'user_id': attrs['user_id']},{'$set' : {'username' : username['username'],
 		                                                                        'happiness' : attrs['happiness'],
 		                                                                        'oldHappiness': attrs['oldHappiness'],
 		                                                                        'size' : attrs['size']}})
@@ -104,6 +105,8 @@ def getAllBearsInTier(user_id):
 			userattrs = getPolarBearattr(uuid)
 		if userattrs != None:
 			currUsername = userattrs['username']
+			if type(currUsername) is dict:
+				currUsername = currUsername['username']
 			allUsers['otherBears'][currUsername] = {}
 			allUsers['otherBears'][currUsername]['username'] = currUsername
 			allUsers['otherBears'][currUsername]['happiness'] = userattrs['happiness']

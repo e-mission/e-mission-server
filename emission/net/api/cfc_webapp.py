@@ -88,7 +88,16 @@ app = app()
 #Simple path that serves up a static landing page with javascript in it
 @route('/')
 def index():
-  return static_file("index.html", static_path)
+    return static_file("index.html", static_path)
+
+@route('/<filename>')
+def index2(filename):
+    if filename == "index.html":
+        return static_file("index.html", static_path)
+
+@route('/faq/<filename>')
+def faq(filename):
+    return static_file(filename,  "%s/%s" % (static_path, "faq"))
 
 # Bunch of static pages that constitute our website
 # Should we have gone for something like django instead after all?
@@ -389,7 +398,7 @@ def getUserProfile():
 
 @post('/tiersys')
 def getTierSys():
-  user_id = getUUID(request)
+  user_uuid = getUUID(request)
   return TierSys.getLatest()
 
 @post('/result/metrics/<time_type>')
