@@ -405,17 +405,22 @@ class User(object):
     """
     #TODO: Differentiate between car and bus, check ML & try to add to ecwm.MotionTypes...
     total_penalty = 0
-
+    fp_train = 92.0/1609.0
+    fp_car = 287.0/1609.0
+    fp_bus = 3/4 * fp_car
     for index, row in penalty_df.iterrows():
       motiontype = int(row['sensed_mode'])
       """
       if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:"""
       if motiontype == 5: #car
         total_penalty += max(0, mil_to_km(37.5) - m_to_km(row['distance']))
+        total_penalty -= m_to_km(row['distance']) * fp_car
       elif motiontype == 3: #bus
         total_penalty += max(0, mil_to_km(10) - m_to_km(row['distance']))
+        total_penalty -= m_to_km(row['distance']) * fp_bus
       elif motiontype == 4: #train
         total_penalty += max(0, mil_to_km(15) - m_to_km(row['distance']))
+        total_penalty -= m_to_km(row['distance']) * fp_train
     return total_penalty
 
 
