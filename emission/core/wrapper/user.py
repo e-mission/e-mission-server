@@ -302,10 +302,13 @@ class User(object):
     carbonY = User.carbonYesterday(user_id)
     #Something is wrong with carbonLastWeek rn
     carbonLW = User.computeCarbon(user_id, arrow.utcnow().shift(weeks=-1).timestamp, arrow.utcnow().timestamp)
-    carbonLW = carbonLW if carbonLW != 0 else None
+    if carbonLW == 0:
+        if carbonY > 0.03:
+            return -100
+
     if (carbonY == None or carbonLW == None):
         return 0.5
-    deltaCarbon = (carbonY - carbonLW) / (carbonLW)
+    deltaCarbon = (carbonLW - carbonY) / (carbonLW)
     return deltaCarbon + 0.5
 
   @staticmethod
