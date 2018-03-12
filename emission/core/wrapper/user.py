@@ -304,8 +304,8 @@ class User(object):
     carbonLW = User.computeCarbon(user_id, arrow.utcnow().shift(weeks=-1).timestamp, arrow.utcnow().timestamp)
     carbonLW = carbonLW if carbonLW != 0 else None
     if (carbonY == None or carbonLW == None):
-        return 100
-    deltaCarbon = (carbonY - carbonLW / 7) / (carbonLW / 7)
+        return 0.5
+    deltaCarbon = (carbonY - carbonLW) / (carbonLW)
     return deltaCarbon + 0.5
 
   @staticmethod
@@ -403,7 +403,6 @@ class User(object):
     penalty_df: [[trip1mode, distance], [trip2mode, distance], ...]
 
     """
-    #TODO: Differentiate between car and bus, check ML & try to add to ecwm.MotionTypes...
     total_penalty = 0
     fp_train = 92.0/1609.0
     fp_car = 287.0/1609.0
@@ -413,13 +412,13 @@ class User(object):
       """
       if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:"""
       if motiontype == 5: #car
-        total_penalty += max(0, mil_to_km(37.5) - m_to_km(row['distance']))
+        total_penalty += fp_car * max(0, mil_to_km(50) - m_to_km(row['distance']))
         total_penalty -= m_to_km(row['distance']) * fp_car
       elif motiontype == 3: #bus
-        total_penalty += max(0, mil_to_km(10) - m_to_km(row['distance']))
+        total_penalty += fp_bus * max(0, mil_to_km(25) - m_to_km(row['distance']))
         total_penalty -= m_to_km(row['distance']) * fp_bus
       elif motiontype == 4: #train
-        total_penalty += max(0, mil_to_km(15) - m_to_km(row['distance']))
+        total_penalty += fp_train * max(0, mil_to_km(37.5) - m_to_km(row['distance']))
         total_penalty -= m_to_km(row['distance']) * fp_train
     return total_penalty
 
