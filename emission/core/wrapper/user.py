@@ -280,9 +280,8 @@ class User(object):
     """
     Returns the daily average carbon of last week
     """
-    dayOfWeek = arrow.utcnow().weekday()
-    curr_ts = arrow.utcnow().shift(days = -(dayOfWeek)).timestamp
-    last_ts = arrow.utcnow().shift(days = -(dayOfWeek + 7)).timestamp
+    curr_ts = arrow.utcnow().timestamp
+    last_ts = arrow.utcnow().shift(weeks=-1).timestamp
     carbonMetric = User.computeCarbon(user_id, last_ts, curr_ts)
     if carbonMetric == None:
       return None
@@ -302,10 +301,13 @@ class User(object):
     carbonY = User.carbonYesterday(user_id)
     #Something is wrong with carbonLastWeek rn
     carbonLW = User.computeCarbon(user_id, arrow.utcnow().shift(weeks=-1).timestamp, arrow.utcnow().timestamp)
-    carbonLW = carbonLW if carbonLW != 0 else None
+    if carbonLW == 0:
+        if carbonY > 0.03:
+            return -100
+
     if (carbonY == None or carbonLW == None):
         return 0.5
-    deltaCarbon = (carbonY - carbonLW) / (carbonLW)
+    deltaCarbon = (carbonLW - carbonY) / (carbonLW)
     return deltaCarbon + 0.5
 
   @staticmethod
