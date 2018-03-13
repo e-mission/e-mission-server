@@ -302,7 +302,9 @@ class User(object):
     #Something is wrong with carbonLastWeek rn
     carbonLW = User.computeCarbon(user_id, arrow.utcnow().shift(weeks=-1).timestamp, arrow.utcnow().timestamp)
     if carbonLW == 0:
-        if carbonY > 0.03:
+        if carbonY == None or carbonY <= 0.03:
+            return 0.5
+        else:
             return -100
 
     if (carbonY == None or carbonLW == None):
