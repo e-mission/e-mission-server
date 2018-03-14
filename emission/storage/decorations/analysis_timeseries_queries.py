@@ -83,7 +83,7 @@ def get_timeseries_for_user(user_id):
 def get_time_query_for_trip_like(key, trip_like_id):
     """
     Returns the query that returns all the points associated with this
-    trip-like (raw trip, cleaned trip, raw section) 
+    trip-like (examples of trip-like objects are: raw trip, cleaned trip, raw section) 
     """
     trip = get_object(key, trip_like_id)
     return get_time_query_for_trip_like_object(trip)
