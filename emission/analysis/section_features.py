@@ -102,9 +102,9 @@ def calHCR(section_entry):
         return 0
 
 def calSR(section):
-    if 'speeds' not in section:
+    if 'speeds' not in section.data:
         return 0
-    speeds = section.speeds
+    speeds = section.data["speeds"]
     if len(speeds) < 2:
         return 0
     else:
@@ -114,7 +114,7 @@ def calSR(section):
             if currVelocity != None and currVelocity <= 0.75:
                 stopNum += 1
 
-        sectionDist = section.distance
+        sectionDist = section.data.distance
         if sectionDist != None and sectionDist != 0:
             return stopNum/sectionDist
         else:
