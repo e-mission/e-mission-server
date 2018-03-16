@@ -280,9 +280,8 @@ class User(object):
     """
     Returns the daily average carbon of last week
     """
-    dayOfWeek = arrow.utcnow().weekday()
-    curr_ts = arrow.utcnow().shift(days = -(dayOfWeek)).timestamp
-    last_ts = arrow.utcnow().shift(days = -(dayOfWeek + 7)).timestamp
+    curr_ts = arrow.utcnow().timestamp
+    last_ts = arrow.utcnow().shift(weeks=-1).timestamp
     carbonMetric = User.computeCarbon(user_id, last_ts, curr_ts)
     if carbonMetric == None:
       return None
@@ -302,10 +301,15 @@ class User(object):
     carbonY = User.carbonYesterday(user_id)
     #Something is wrong with carbonLastWeek rn
     carbonLW = User.computeCarbon(user_id, arrow.utcnow().shift(weeks=-1).timestamp, arrow.utcnow().timestamp)
-    carbonLW = carbonLW if carbonLW != 0 else None
+    if carbonLW == 0:
+        if carbonY == None or carbonY <= 0.03:
+            return 0.5
+        else:
+            return -100
+
     if (carbonY == None or carbonLW == None):
-        return 100
-    deltaCarbon = (carbonY - carbonLW / 7) / (carbonLW / 7)
+        return 0.5
+    deltaCarbon = (carbonLW - carbonY) / (carbonLW)
     return deltaCarbon + 0.5
 
   @staticmethod
@@ -403,19 +407,23 @@ class User(object):
     penalty_df: [[trip1mode, distance], [trip2mode, distance], ...]
 
     """
-    #TODO: Differentiate between car and bus, check ML & try to add to ecwm.MotionTypes...
     total_penalty = 0
-
+    fp_train = 92.0/1609.0
+    fp_car = 287.0/1609.0
+    fp_bus = 3/4 * fp_car
     for index, row in penalty_df.iterrows():
       motiontype = int(row['sensed_mode'])
       """
       if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:"""
       if motiontype == 5: #car
-        total_penalty += max(0, mil_to_km(37.5) - m_to_km(row['distance']))
+        total_penalty += fp_car * max(0, mil_to_km(50) - m_to_km(row['distance']))
+        total_penalty -= m_to_km(row['distance']) * fp_car
       elif motiontype == 3: #bus
-        total_penalty += max(0, mil_to_km(10) - m_to_km(row['distance']))
+        total_penalty += fp_bus * max(0, mil_to_km(25) - m_to_km(row['distance']))
+        total_penalty -= m_to_km(row['distance']) * fp_bus
       elif motiontype == 4: #train
-        total_penalty += max(0, mil_to_km(15) - m_to_km(row['distance']))
+        total_penalty += fp_train * max(0, mil_to_km(37.5) - m_to_km(row['distance']))
+        total_penalty -= m_to_km(row['distance']) * fp_train
     return total_penalty
 
 

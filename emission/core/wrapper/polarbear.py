@@ -19,6 +19,12 @@ def setPolarBearattr(attrs):
 	if userDict == None:
 		polarBearCollection.insert_one(attrs)
 	else:
+		print("updated " + str(attrs['user_id']))
+		print({'username' : attrs['username'],
+                        'happiness' : attrs['happiness'],
+                        'oldHappiness': attrs['oldHappiness'],
+                        'size' : attrs['size']
+                        })
 		polarBearCollection.update_one(
 			{'user_id': attrs['user_id']},
 			{'$set' : {'username' : attrs['username'],
