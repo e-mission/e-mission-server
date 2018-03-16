@@ -99,6 +99,10 @@ def index2(filename):
 def faq(filename):
     return static_file(filename,  "%s/%s" % (static_path, "faq"))
 
+@route('/shared/<filename>')
+def shared(filename):
+    return static_file(filename,  "%s/%s" % (static_path, "shared"))
+
 # Bunch of static pages that constitute our website
 # Should we have gone for something like django instead after all?
 # If this gets to be too much, we should definitely consider that
