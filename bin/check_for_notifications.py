@@ -111,7 +111,6 @@ def check_all_suggestions():
         except (KeyError, Exception) as e:
             logging.debug("error: " + str(e) + " on %s" % all_users.iloc[i].user_email)
             continue
-        except e
     push_to_user(suggestion_uuids, "You have a new suggestion! Tap me to see it.")
     push_to_user(happiness_uuids, "Your polar bear's mood has changed since yesterday! Tap me to see it.")
 
