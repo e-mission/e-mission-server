@@ -129,9 +129,25 @@ def get_combined_segmentation_points(ts, loc_df, time_query, filters_in_df, filt
     That might be the easier option after all
     """
     segmentation_map = {}
+    initEndTs = time_query.endTs
+   
+    # This assumes that there is only one transition in the time range that we
+    # are considering 
+    # dist -> time -> dist won't work because `loc_df[loc_df["filter"] ==
+    # curr_filter]` will span multiple ranges 
+    # also, since we use transitions in the segmentation now, it is not
+    # sufficient to stop at the end of the location df. We need to end the
+    # query at the next point if one exists, or at now if it doesn't
     for curr_filter in filters_in_df:
-        time_query.startTs = loc_df[loc_df["filter"] == curr_filter].head(1).iloc[0].ts
-        time_query.endTs = loc_df[loc_df["filter"] == curr_filter].tail(1).iloc[0].ts
+        startRow = loc_df[loc_df["filter"] == curr_filter].head(1).iloc[0]
+        time_query.startTs = startRow.ts
+        endRow = loc_df[loc_df["filter"] == curr_filter].tail(1).iloc[0]
+        if endRow.index == len(loc_df):
+            logging.debug("filter %s ends at index = %s when len = %s, using initEndTs %s ..." % (curr_filter, endRow.index, len(loc_df), initEndTs))
+            time_query.endTs = initEndTs
+        else:
+            logging.debug("filter %s ends at index = %s when len = %s, using index %s ..." % (curr_filter, endRow.index, len(loc_df), initEndTs))
+            time_query.endTs = loc_df.iloc[endRow.index+1].ts
         logging.debug("for filter %s, startTs = %d and endTs = %d" %
             (curr_filter, time_query.startTs, time_query.endTs))
         segmentation_map[time_query.startTs] = filter_methods[curr_filter].segment_into_trips(ts, time_query)
