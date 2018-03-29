@@ -166,6 +166,9 @@ def get_matched_location(motion, raw_section_df, resampled_sec_df, index, timese
         # we look it up later
         # TODO: Set this to the right version
         matched_point = matched_point.append(pd.Series({"filter": "distance"}))
+        # Mark newly inserted location points as special so that we can move them
+        # later if we need to
+        matched_point = matched_point.append(pd.Series({"inserted": True}))
         new_id = timeseries.insert_data(user_id, "background/filtered_location", ecwl.Location(matched_point))
         matched_point = matched_point.append(pd.Series({"_id": new_id}))
 
