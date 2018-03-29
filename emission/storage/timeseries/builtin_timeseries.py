@@ -107,7 +107,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
         :param extra_query_list: additional queries for mode, etc
         :return:
         """
-        ret_query = {}
+        ret_query = {"invalid": {"$exists": False}}
         ret_query.update(self.user_query)
         if key_list is not None and len(key_list) > 0:
             key_query_list = []
@@ -397,3 +397,5 @@ class BuiltinTimeSeries(esta.TimeSeries):
         logging.debug("updating entry %s into timeseries" % new_entry)
         edb.save(ts.get_timeseries_db(key), new_entry)
 
+    def invalidate_raw_entry(self, obj_id):
+        self.timeseries_db.update_one({"_id": obj_id, "user_id": self.user_id}, {"$set": {"invalid": True}})

@@ -78,13 +78,12 @@ def segment_current_trips(user_id):
         logging.info("%s" % out_of_order_points)
         # drop from the table
         loc_df = loc_df.drop(out_of_order_points.index.tolist())
-        # delete from the database. Should be generally discouraged, so we
-        # are kindof putting it in here secretively
-        import emission.core.get_database as edb
-
+        loc_df.reset_index(inplace=True)
+        # invalidate in the database.
         out_of_order_id_list = out_of_order_points["_id"].tolist()
         logging.debug("out_of_order_id_list = %s" % out_of_order_id_list)
-        edb.get_timeseries_db().remove({"_id": {"$in": out_of_order_id_list}})
+        for ooid in out_of_order_id_list:
+            ts.invalidate_raw_data(ooid)
 
     filters_in_df = loc_df["filter"].dropna().unique()
     logging.debug("Filters in the dataframe = %s" % filters_in_df)

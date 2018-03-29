@@ -204,19 +204,16 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
                 # https://github.com/e-mission/e-mission-server/issues/577#issuecomment-376379460
                 if eaistc.is_huge_invalid_ts_offset(self, lastPoint, currPoint,
                     timeseries, ongoing_motion_in_range):
-                    # delete from memory and the database. Should be generally
-                    # discouraged, so we are kindof putting it in here
-                    # secretively
+                    # invalidate from memory and the database.
                     logging.debug("About to set valid column for index = %s" % 
                         (currPoint.idx))
                     self.filtered_points_df.valid.iloc[currPoint.idx] = False
                     logging.debug("After dropping %d, filtered points = %s" % 
                         (currPoint.idx, self.filtered_points_df.iloc[currPoint.idx - 5:currPoint.idx + 5][["valid", "fmt_time"]]))
-                    import emission.core.get_database as edb
                     logging.debug("remove huge invalid ts offset point = %s" % currPoint)
-                    edb.get_timeseries_db().remove({"_id": currPoint["_id"]})
+                    timeseries.invalidate_raw_entry(currPoint["_id"])
                     # We currently re-retrieve the last point every time, so
-                    # the reindexing above is good enough but if we use
+                    # searching upwards is good enough but if we use
                     # lastPoint = currPoint, we should update currPoint here
                     return False
                 else:
