@@ -3,7 +3,14 @@ body {
   width: 100%;
   height: 100%;
 }
-
+canvas {
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    padding-bottom: 50px;
+    display: block;
+}
 body {
   font-family: 'Muli', 'Helvetica', 'Arial', 'sans-serif';
 }
@@ -285,7 +292,8 @@ section.features .feature-item i {
 section.cta {
   position: relative;
   padding: 250px 0;
-  background-image: url("../img/bg-cta.jpg");
+  /*background-image: url("../img/bg-cta.jpg");*/
+  background-color: red;
   background-position: center;
   -webkit-background-size: cover;
   -moz-background-size: cover;
