@@ -64,6 +64,4 @@ function init(){
   qr0 = QRC.encodeText(link.href, QRC.Ecc.MEDIUM);
   qr0.drawCanvas(4, 1, canvas);
   canvas.style.removeProperty("display");
-
-
 }
