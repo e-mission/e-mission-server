@@ -7,6 +7,7 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import *
 import logging
+import copy
 
 import numpy as np
 
@@ -84,10 +85,13 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
                 assert (idx > 0)
                 logging.debug("At %s, found new activity %s compared to current %s - creating new section with start_time %s" %
                       (curr_motion.fmt_time, curr_motion.type, curr_start_motion.type,
-                       curr_motion.fmt_time))
+                       prev_motion.fmt_time))
                 # complete this section
-                motion_change_list.append((curr_start_motion, curr_motion))
-                curr_start_motion = curr_motion
+                curr_end_motion = copy.copy(prev_motion)
+                curr_end_motion["type"] = curr_motion.type
+                curr_end_motion["confidence"] = curr_motion.confidence
+                motion_change_list.append((curr_start_motion, curr_end_motion))
+                curr_start_motion = curr_end_motion
             else:
                 logging.debug("At %s, retained existing activity %s because of no change" %
                       (curr_motion.fmt_time, curr_motion.type))
