@@ -39,8 +39,11 @@ class FlipFlopDetection():
             logging.info("Found single flip-flop %s -> %s -> %s" % 
                 (streak_start - 1, streak_start, streak_start+1))
             ctv = self.check_transition_validity(streak_start, streak_end)
+            cnlw = self.check_no_location_walk(streak_start, streak_end)
             if ctv != 0:
                 return ctv
+            if cnlw != 0:
+                return cnlw
             return 0
 
         ics = self.is_constant_speed(streak_start, streak_end)
@@ -62,12 +65,29 @@ class FlipFlopDetection():
         the travel will be long enough that we will get at least a couple of
         activity points. It's not worth it otherwise
         """
+        assert streak_start == streak_end, \
+            "1 flip check called with streak %d -> %d" % (streak_start, streak_end)
         start_change = self.motion_changes[streak_start]
         if start_change[0].type != ecwm.MotionTypes.WALKING:
             logging.debug("single transition %s, not WALKING, merging" % start_change[0].type)
             return self.get_merge_direction(streak_start, streak_end)
         else:
             logging.debug("single transition %s, WALKING, not merging yet" % start_change[0].type)
+        return 0
+
+    def check_no_location_walk(self, streak_start, streak_end):
+        assert streak_start == streak_end, \
+            "1 flip check called with streak %d -> %d" % (streak_start, streak_end)
+        ssm, sem = self.motion_changes[streak_start]
+        streak_locs = self.seg_method.filter_points_for_range(
+            self.seg_method.location_points, ssm, sem)
+        streak_unfiltered_locs = self.seg_method.filter_points_for_range(
+            self.seg_method.unfiltered_loc_df, ssm, sem)
+
+        if len(streak_locs) <= 1 and len(streak_unfiltered_locs) <= 1:
+            # we have no points, not even unfiltered. This must be bogus 
+            return self.get_merge_direction(streak_start, streak_end)
+
         return 0
 
     def is_constant_speed(self, streak_start, streak_end):
