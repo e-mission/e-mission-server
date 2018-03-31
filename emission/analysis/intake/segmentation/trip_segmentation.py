@@ -83,7 +83,7 @@ def segment_current_trips(user_id):
         out_of_order_id_list = out_of_order_points["_id"].tolist()
         logging.debug("out_of_order_id_list = %s" % out_of_order_id_list)
         for ooid in out_of_order_id_list:
-            ts.invalidate_raw_data(ooid)
+            ts.invalidate_raw_entry(ooid)
 
     filters_in_df = loc_df["filter"].dropna().unique()
     logging.debug("Filters in the dataframe = %s" % filters_in_df)
