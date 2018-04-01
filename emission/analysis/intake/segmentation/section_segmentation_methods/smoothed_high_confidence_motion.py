@@ -91,13 +91,11 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
                 # motion.  So when idx == 0, the activities will be equal and
                 # this is guaranteed to not be invoked
                 assert (idx > 0)
-                logging.debug("At idx %d, time %s, found new activity %s compared to current %s - creating new section with start_time %s" %
-                      (idx, curr_motion.fmt_time, curr_motion.type, curr_start_motion.type,
-                       prev_motion.fmt_time))
+                logging.debug("At idx %d, time %s, found new activity %s compared to current %s" %
+                      (idx, curr_motion.fmt_time, curr_motion.type, curr_start_motion.type))
+                curr_end_motion = get_curr_end_motion(prev_motion, curr_motion)
+                logging.debug("creating new section for %s with start_time %s" % (curr_end_motion.type, curr_end_motion.fmt_time))
                 # complete this section
-                curr_end_motion = copy.copy(prev_motion)
-                curr_end_motion["type"] = curr_motion.type
-                curr_end_motion["confidence"] = curr_motion.confidence
                 motion_change_list.append((curr_start_motion, curr_end_motion))
                 curr_start_motion = curr_end_motion
             else:
@@ -185,3 +183,38 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
         """
         return df[(df.ts >= start_motion.ts) &
                   (df.ts <= end_motion.ts)]
+
+def get_curr_end_motion(prev_motion, curr_motion):
+    """
+    Get the end motion based on the transition.
+    In general, while starting, we want to end at the prev_motion
+                while ending, we want to end at the curr_motion
+    https://github.com/e-mission/e-mission-server/issues/577#issuecomment-377742975
+
+    There are 4 cases:
+    non-motorized -> motorized: prev_motion
+    motorized -> non-motorized: curr_motion
+    non-motorized -> non-motorized: prev_motion (worked well for the flip-flopping at the end)
+    motorized -> motorized: unsure if this ever happens, return curr_motion for now
+    """
+
+    prev_motorized = is_motorized(prev_motion)
+    curr_motorized = is_motorized(curr_motion)
+
+    if not prev_motorized and curr_motorized:
+        return prev2end(prev_motion, curr_motion)
+    elif prev_motorized and not curr_motorized:
+        return curr_motion
+    elif not prev_motorized and not curr_motorized:
+        return prev2end(prev_motion, curr_motion)
+    else:
+        return curr_motion
+
+def is_motorized(motion):
+    return motion.type == ecwm.MotionTypes.IN_VEHICLE
+
+def prev2end(prev_motion, curr_motion):
+    curr_end_motion = copy.copy(prev_motion)
+    curr_end_motion["type"] = curr_motion.type
+    curr_end_motion["confidence"] = curr_motion.confidence
+    return curr_end_motion
