@@ -27,6 +27,9 @@ def resample(filtered_loc_df, interval):
                   (loc_df[["fmt_time", "ts", "longitude", "latitude"]].head(), len(filtered_loc_df)))
     start_ts = loc_df.ts.iloc[0]
     end_ts = loc_df.ts.iloc[-1]
+    return resample_for_range(loc_df, start_ts, end_ts, interval)
+
+def resample_for_range(loc_df, start_ts, end_ts, interval):
     tz_ranges_df = _get_tz_ranges(loc_df)
     logging.debug("tz_ranges_df = %s" % tz_ranges_df)
 

@@ -121,16 +121,17 @@ class SmoothedHighConfidenceMotionWithVisitTransitions(eaisms.SmoothedHighConfid
             resampled_sec_df = self.filter_points_for_range(self.resampled_loc_df,
                                         start_motion, end_motion)
 
-            if len(raw_section_df) <=1 and len(unfiltered_section_df) <= 1:
+            if len(raw_section_df) <=1:
                 logging.info("Found %d filtered points and %d unfiltered points between %s and %s for type %s, skipping..." % (len(raw_section_df), len(unfiltered_section_df),
                                       start_motion.fmt_time, end_motion.fmt_time,
                                       start_motion.type))
             else:
-                section_start_loc = eaissr.get_matched_location(start_motion, raw_section_df, resampled_sec_df, 0, timeseries)
-                section_end_loc = eaissr.get_matched_location(end_motion, raw_section_df, resampled_sec_df, -1, timeseries)
+                section_start_loc = eaissr.get_matched_location(start_motion, raw_section_df, unfiltered_section_df, 0, timeseries)
+                section_end_loc = eaissr.get_matched_location(end_motion, raw_section_df, unfiltered_section_df, -1, timeseries)
                 logging.debug("section start point = %s, section end point = %s" %
                               (ecwl.Location(section_start_loc), ecwl.Location(section_end_loc)))
                 section_list.append((section_start_loc, section_end_loc, start_motion.type))
+
             # if this lack of overlap is part of an existing set of sections,
             # then it is fine, because in the section segmentation code, we
             # will mark it as a transition

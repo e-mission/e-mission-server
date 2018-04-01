@@ -21,7 +21,13 @@ class FlipFlopDetection():
         if end_motion["idx"] - start_motion["idx"] == 1:
             return True
         else:
-            return False
+            streak_locs = self.seg_method.filter_points_for_range(
+                self.seg_method.location_points, start_motion, end_motion)
+            logging.debug("in is_flip_flop: len(streak_locs) = %d" % len(streak_locs))
+            if len(streak_locs) == 0:
+                return True
+
+        return False
 
     def should_merge(self, streak_start, streak_end):
         """
@@ -84,7 +90,7 @@ class FlipFlopDetection():
         streak_unfiltered_locs = self.seg_method.filter_points_for_range(
             self.seg_method.unfiltered_loc_df, ssm, sem)
 
-        if len(streak_locs) <= 1 and len(streak_unfiltered_locs) <= 1:
+        if len(streak_locs) <= 1:
             # we have no points, not even unfiltered. This must be bogus 
             return self.get_merge_direction(streak_start, streak_end)
 
@@ -151,6 +157,11 @@ class FlipFlopDetection():
         end_change = self.motion_changes[streak_end]
         ssm, sem = start_change
         esm, eem = end_change
+
+        if streak_start == 0:
+            # There is no before section - only one way to merge!
+            logging.debug("get_merge_direction: at beginning of changes, can only merge backward")
+            return -1
 
         before_motion = self.motion_changes[streak_start - 1]
         bsm, bem = before_motion
@@ -379,13 +390,15 @@ class FlipFlopDetection():
         logging.debug("After merging, list = %s" %
             ([(mc[0]["type"], mc[1]["type"]) for mc in merged_list]))
         return merged_list
-            
+
     def is_curr_change_in_merge(self, i, merged_list):
         is_change_list = [(s < i) and (i < e) for s, e in merged_list]
         logging.debug("is_change_list = %s" % is_change_list)
         return reduce(lambda x,y: x and y, is_change_list)
 
     def merge_flip_flop_sections(self):
+        logging.debug("while starting flip_flop detection, changes are %s" %
+            ([(mc[0]["idx"], mc[1]["idx"]) for mc in self.motion_changes]))
         self.flip_flop_list = []
         for i, (sm, em) in enumerate(self.motion_changes):
             logging.debug("comparing %s, %s to see if there is a flipflop" %
