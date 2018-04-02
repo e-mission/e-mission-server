@@ -76,7 +76,7 @@ class FlipFlopDetection():
         assert streak_start == streak_end, \
             "1 flip check called with streak %d -> %d" % (streak_start, streak_end)
         start_change = self.motion_changes[streak_start]
-        if start_change[0].type != ecwm.MotionTypes.WALKING:
+        if not eaid.is_walking_type(start_change[0].type):
             logging.debug("single transition %s, not WALKING, merging" % start_change[0].type)
             return self.get_merge_direction(streak_start, streak_end)
         else:
@@ -165,11 +165,11 @@ class FlipFlopDetection():
 
         # check for walking speed, which is the one constant is a cruel,
         # shifting world where there is no truth
-        if (asm.type == ecwm.MotionTypes.WALKING and 
+        if (eaid.is_walking_type(asm.type) and 
             (not eaid.is_walking_speed(curr_median_speed))):
             logging.debug("after is walking, but speed is %d, merge forward, returning 1" % curr_median_speed)
             return 1
-        elif (bsm.type == ecwm.MotionTypes.WALKING and 
+        elif (eaid.is_walking_type(bsm.type) and 
             (not eaid.is_walking_speed(curr_median_speed))):
             logging.debug("before is walking, but speed is %d, merge backward, returning -1")
             return -1
@@ -212,6 +212,8 @@ class FlipFlopDetection():
         mcs, mce = motion_change
         validity_check_map = {
             ecwm.MotionTypes.WALKING: self.validate_walking,
+            ecwm.MotionTypes.ON_FOOT: self.validate_walking,
+            ecwm.MotionTypes.RUNNING: self.validate_walking,
             ecwm.MotionTypes.BICYCLING: self.validate_bicycling,
             ecwm.MotionTypes.IN_VEHICLE: self.validate_motorized
         }

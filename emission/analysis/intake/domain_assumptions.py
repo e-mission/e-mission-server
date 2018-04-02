@@ -4,6 +4,10 @@ import emission.core.wrapper.motionactivity as ecwm
 def is_motorized(motion):
     return motion.type == ecwm.MotionTypes.IN_VEHICLE
 
+def is_walking_type(motion_type):
+    return motion_type == ecwm.MotionTypes.WALKING or \
+           motion_type == ecwm.MotionTypes.ON_FOOT
+
 def is_walking_speed(speed):
     """
     https://en.wikipedia.org/wiki/Preferred_walking_speed

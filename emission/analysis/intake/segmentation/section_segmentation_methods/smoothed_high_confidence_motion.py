@@ -122,15 +122,15 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
         :return: a list of tuples [(start1, end1), (start2, end2), ...] that represent the start and end of sections
         in this time range. end[n] and start[n+1] are typically assumed to be adjacent.
         """
-        self.get_location_changes_for_trip(timeseries, time_query)
+        self.get_location_streams_for_trip(timeseries, time_query)
         motion_changes = self.segment_into_motion_changes(timeseries, time_query)
 
-        if len(location_points) == 0:
+        if len(self.location_points) == 0:
             logging.debug("No location points found for query %s, returning []" % time_query)
             return []
 
-        fp = location_points.iloc[0]
-        lp = location_points.iloc[-1]
+        fp = self.location_points.iloc[0]
+        lp = self.location_points.iloc[-1]
 
         # Create sections for each motion. At this point, we need to decide a policy on how to deal with the gaps.
         # Let's pick a reasonable default for now.
@@ -140,8 +140,8 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
             logging.debug("Considering %s from %s -> %s" %
                           (start_motion.type, start_motion.fmt_time, end_motion.fmt_time))
             # Find points that correspond to this section
-            raw_section_df = location_points[(location_points.ts >= start_motion.ts) &
-                                             (location_points.ts <= end_motion.ts)]
+            raw_section_df = self.location_points[(self.location_points.ts >= start_motion.ts) &
+                                             (self.location_points.ts <= end_motion.ts)]
             if len(raw_section_df) == 0:
                 logging.info("Found no location points between %s and %s" % (start_motion, end_motion))
             else:
