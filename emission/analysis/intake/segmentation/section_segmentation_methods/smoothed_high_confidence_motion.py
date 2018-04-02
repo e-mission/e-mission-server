@@ -17,6 +17,7 @@ import emission.analysis.intake.segmentation.section_segmentation_methods.flip_f
 import emission.core.wrapper.motionactivity as ecwm
 import emission.core.wrapper.location as ecwl
 import emission.analysis.intake.location_utils as eail
+import emission.analysis.intake.domain_assumptions as eaid
 
 class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
     """
@@ -94,7 +95,9 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
                 logging.debug("At idx %d, time %s, found new activity %s compared to current %s" %
                       (idx, curr_motion.fmt_time, curr_motion.type, curr_start_motion.type))
                 curr_end_motion = get_curr_end_motion(prev_motion, curr_motion)
-                logging.debug("creating new section for %s with start_time %s" % (curr_end_motion.type, curr_end_motion.fmt_time))
+                logging.debug("creating new section for %s at %s -> %s with start_time %s -> %s" % (curr_start_motion.type,
+                    curr_start_motion["idx"], curr_end_motion["idx"],
+                    curr_start_motion.fmt_time, curr_end_motion.fmt_time))
                 # complete this section
                 motion_change_list.append((curr_start_motion, curr_end_motion))
                 curr_start_motion = curr_end_motion
@@ -198,8 +201,8 @@ def get_curr_end_motion(prev_motion, curr_motion):
     motorized -> motorized: unsure if this ever happens, return curr_motion for now
     """
 
-    prev_motorized = is_motorized(prev_motion)
-    curr_motorized = is_motorized(curr_motion)
+    prev_motorized = eaid.is_motorized(prev_motion)
+    curr_motorized = eaid.is_motorized(curr_motion)
 
     if not prev_motorized and curr_motorized:
         return prev2end(prev_motion, curr_motion)
@@ -209,9 +212,6 @@ def get_curr_end_motion(prev_motion, curr_motion):
         return prev2end(prev_motion, curr_motion)
     else:
         return curr_motion
-
-def is_motorized(motion):
-    return motion.type == ecwm.MotionTypes.IN_VEHICLE
 
 def prev2end(prev_motion, curr_motion):
     curr_end_motion = copy.copy(prev_motion)

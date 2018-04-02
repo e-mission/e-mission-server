@@ -6,6 +6,7 @@ import emission.core.wrapper.location as ecwl
 import emission.core.common as ecc
 
 import emission.analysis.intake.cleaning.location_smoothing as eaicl
+import emission.analysis.intake.domain_assumptions as eaid
 
 class FlipFlopDetection():
     def __init__(self, motion_changes, seg_method):
@@ -18,7 +19,12 @@ class FlipFlopDetection():
         Current definition for when there is a potential flip flop
         - if the transition was based on 1 motion activity 
         """
-        if end_motion["idx"] - start_motion["idx"] == 1:
+        idx_diff = end_motion["idx"] - start_motion["idx"]
+        if idx_diff <= 1:
+            logging.debug("in is_flip_flop: idx_diff = %d" % idx_diff)
+            return True
+        elif not self.is_valid_for_type((start_motion, end_motion)):
+            logging.debug("in is_flip_flop: is_valid_for_type is false")
             return True
         else:
             streak_locs = self.seg_method.filter_points_for_range(
@@ -52,11 +58,7 @@ class FlipFlopDetection():
                 return cnlw
             return 0
 
-        ics = self.is_constant_speed(streak_start, streak_end)
         cvft = self.check_valid_for_type(streak_start, streak_end)
-
-        if ics != 0:
-            return ics
         if cvft != 0:
             return cvft
         
@@ -94,42 +96,6 @@ class FlipFlopDetection():
             # we have no points, not even unfiltered. This must be bogus 
             return self.get_merge_direction(streak_start, streak_end)
 
-        return 0
-
-    def is_constant_speed(self, streak_start, streak_end):
-        """
-        if we have a flip + flop in the middle of the sequence
-        e.g. (3,4), can we erase the 3 and merge 4 with 2?
-        """
-        # streak is of length 2 - e.g. (3,4) and
-        # in the middle, otherwise we can't compare with what came before this streak
-        start_change = self.motion_changes[streak_start]
-        end_change = self.motion_changes[streak_end]
-        ssm, sem = start_change
-        sem, eem = end_change
-
-        if streak_end - streak_start == 1 and \
-            streak_start != 0 and \
-            streak_end < len(self.motion_changes):
-            before_motion = self.motion_changes[streak_start - 1]
-            logging.debug("in can_erase_flip, checking merge of %s -> %s with %s -> %s" % 
-                (before_motion[0].fmt_time, before_motion[1].fmt_time,
-                 ssm.fmt_time, eem.fmt_time))
-            streak_locs = self.seg_method.filter_points_for_range(
-                self.seg_method.location_points, ssm, eem)
-            if len(streak_locs) != 0:
-                streak_locs.reset_index(inplace=True)
-                logging.debug("in can_erase_flip, streak_locs are %s" % 
-                    (streak_locs[["fmt_time", "ts"]]))
-                with_speed_df = eaicl.add_dist_heading_speed(streak_locs)
-                logging.debug("in can_erase_flip, speeds are %s" % 
-                    (with_speed_df[["fmt_time", "speed"]]))
-                with_speed_df.loc[:,"speed_pct_change"] = with_speed_df.speed.pct_change() * 100
-                logging.debug("in can_erase_flip, changes are %s" % 
-                    (with_speed_df[["fmt_time", "speed", "speed_pct_change"]]))
-                if with_speed_df.speed_pct_change.max() < 10:
-                    # TODO: Fix when we have an example
-                    return self.get_merge_direction(streak_start, streak_end)
         return 0
 
     def check_valid_for_type(self, streak_start, streak_end):
@@ -200,11 +166,11 @@ class FlipFlopDetection():
         # check for walking speed, which is the one constant is a cruel,
         # shifting world where there is no truth
         if (asm.type == ecwm.MotionTypes.WALKING and 
-            curr_median_speed > 1.4 + 0.2 * 1.4):
+            (not eaid.is_walking_speed(curr_median_speed))):
             logging.debug("after is walking, but speed is %d, merge forward, returning 1" % curr_median_speed)
             return 1
         elif (bsm.type == ecwm.MotionTypes.WALKING and 
-            curr_median_speed > 1.4 + 0.2 * 1.4):
+            (not eaid.is_walking_speed(curr_median_speed))):
             logging.debug("before is walking, but speed is %d, merge backward, returning -1")
             return -1
             
@@ -256,24 +222,39 @@ class FlipFlopDetection():
         return ret_val
 
     def validate_walking(self, mcs, mce):
+        median_speed = self.get_median_speed(mcs, mce)
+        if median_speed is not None and not eaid.is_walking_speed(median_speed):
+            return False
+        return True
+
+    def validate_bicycling(self, mcs, mce):
+        # time shortness check. unlikely to ride a bike for less than a minute
+        # and then switch to another mode
+        if eaid.is_too_short_bicycle_ride(mce.ts - mcs.ts):
+            return False
+        
+        # speed check
+        median_speed = self.get_median_speed(mcs, mce)
+        if median_speed is not None and not eaid.is_bicycling_speed(median_speed):
+            return False
+        return True
+
+    def validate_motorized(self, mcs, mce):
+        # time shortness check. unlikely to use a motorized mode for less than 5 minutes
+        # and then switch to another mode
+        if eaid.is_too_short_motorized_ride(mce.ts - mcs.ts):
+            return False
+        return True
+
+    def get_median_speed(self, mcs, mce):
         loc_df = self.seg_method.filter_points_for_range(
                 self.seg_method.location_points, mcs, mce)
         if len(loc_df) > 0:
             loc_df.reset_index(inplace=True)
             with_speed_df = eaicl.add_dist_heading_speed(loc_df)
-            if with_speed_df.speed.median() > 1.4: # preferred walking speedA
-                return False
-        return True
-
-    def validate_bicycling(self, mcs, mce):
-        if mce.ts - mcs.ts > 30 * 60: # thirty minutes
-            return False
-        return True
-
-    def validate_motorized(self, mcs, mce):
-        if mce.ts - mcs.ts < 5 * 60:
-            return False
-        return True
+            return with_speed_df.speed.median()
+        else:
+            return None
 
     def get_streaks(self, flip_flop_list):
         """
@@ -343,6 +324,11 @@ class FlipFlopDetection():
         for mss, mse in backward_merged_streaks:
             # extend the post-merge section to start with the merged section
             # by setting the start motion
+            # in this case, because the start motion determines the section type
+            # and we are changing the start section, we should ensure that the 
+            # after section's type is the one that is retained
+            # https://github.com/e-mission/e-mission-server/issues/577#issuecomment-377863642
+            modifiable_changes[mss][0]["type"] = modifiable_changes[mse+1][0]["type"]
             modifiable_changes[mse+1][0] = modifiable_changes[mss][0]
             for i in range(mss, mse+1):
                 modifiable_changes[i] = modifiable_changes[mse+1]
@@ -398,7 +384,7 @@ class FlipFlopDetection():
 
     def merge_flip_flop_sections(self):
         logging.debug("while starting flip_flop detection, changes are %s" %
-            ([(mc[0]["idx"], mc[1]["idx"]) for mc in self.motion_changes]))
+            ([(mc[0]["idx"], mc[1]["idx"], mc[0]["type"]) for mc in self.motion_changes]))
         self.flip_flop_list = []
         for i, (sm, em) in enumerate(self.motion_changes):
             logging.debug("comparing %s, %s to see if there is a flipflop" %
@@ -425,7 +411,7 @@ class FlipFlopDetection():
         # use a separate to_remove list to avoid modifying the list and changing indices
         # while iterating
         logging.debug("before merging entries, changes were %s" %
-            ([(mc[0]["idx"], mc[1]["idx"]) for mc in self.motion_changes]))
+            ([(mc[0]["idx"], mc[1]["idx"], mc[0]["type"]) for mc in self.motion_changes]))
 
         merged_list_p1 = self.merge_streaks_pass_1(self.motion_changes,
             forward_merged_streaks,
@@ -434,7 +420,7 @@ class FlipFlopDetection():
         merged_list_p2 = self.merge_streaks_pass_2(merged_list_p1)
 
         logging.debug("after merging entries, changes are %s" %
-            ([(mc[0]["idx"], mc[1]["idx"]) for mc in merged_list_p2]))
+            ([(mc[0]["idx"], mc[1]["idx"], mc[0]["type"]) for mc in merged_list_p2]))
 
         return merged_list_p2
 
