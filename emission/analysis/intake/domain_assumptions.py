@@ -35,3 +35,8 @@ def is_too_short_motorized_ride(duration):
     else:
         return False
 
+def is_too_short_bike_vehicle_transition(duration):
+    if duration < 60:
+        return True
+    else:
+        return False

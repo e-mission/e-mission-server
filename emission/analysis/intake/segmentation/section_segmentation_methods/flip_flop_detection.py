@@ -1,5 +1,6 @@
 import logging
 import itertools
+import enum
 
 import emission.core.wrapper.motionactivity as ecwm
 import emission.core.wrapper.location as ecwl
@@ -8,17 +9,55 @@ import emission.core.common as ecc
 import emission.analysis.intake.cleaning.location_smoothing as eaicl
 import emission.analysis.intake.domain_assumptions as eaid
 
+@enum.unique
+class Direction(enum.Enum):
+    FORWARD = 1
+    BACKWARD = -1
+    NONE = 0
+
+@enum.unique
+class FinalMode(enum.Enum):
+    NA = 0
+    UNMERGED = 1
+    MERGED = -1
+
+class MergeResult:
+    def __init__(self, direction, final_mode):
+        self.direction = direction
+        self.final_mode = final_mode
+
+    @staticmethod
+    def NONE():
+        return MergeResult(Direction.NONE, FinalMode.NA)
+
+class MergeAction:
+    def __init__(self, start, end, final_mode):
+        self.start = start
+        self.end = end
+        self.final_mode = final_mode
+
 class FlipFlopDetection():
     def __init__(self, motion_changes, seg_method):
         # List of motion activity objects representing the start and end of sections
         self.motion_changes = motion_changes
         self.seg_method = seg_method
+        self.add_trip_percentages()
+
+    def add_trip_percentages(self):
+        total_trip_time = self.motion_changes[-1][1].ts - self.motion_changes[0][0].ts
+
+        for sm, em in self.motion_changes:
+            curr_section_time = em.ts - sm.ts
+            sm.update({"trip_pct": (curr_section_time * 100)/total_trip_time})
 
     def is_flip_flop(self, start_motion, end_motion):
         """
         Current definition for when there is a potential flip flop
         - if the transition was based on 1 motion activity 
         """
+        if start_motion["trip_pct"] > 25:
+            logging.debug("trip_pct = %d, > 25, returning False" % start_motion["trip_pct"])
+            return False
         idx_diff = end_motion["idx"] - start_motion["idx"]
         if idx_diff <= 1:
             logging.debug("in is_flip_flop: idx_diff = %d" % idx_diff)
@@ -32,7 +71,6 @@ class FlipFlopDetection():
             logging.debug("in is_flip_flop: len(streak_locs) = %d" % len(streak_locs))
             if len(streak_locs) == 0:
                 return True
-
         return False
 
     def should_merge(self, streak_start, streak_end):
@@ -40,29 +78,87 @@ class FlipFlopDetection():
         Current checks for whether we should merge or not:
         - can we erase the flip
         
-        returns: +1 to merge forwards (e.g. expand the existing
-                previous section forwards)
-                -1 to merge backwards (e.g. expand the existing next section
-                backwards)
-                0 to not merge
+        returns: {"merge": , "mode": }
+               valid merge values:
+               +1 to merge forwards (e.g. expand the existing previous section forwards)
+               -1 to merge backwards (e.g. expand the existing next section backwards)
+                 0 to not merge
+
+                valid set_mode_to values
+                - unmerged: final mode of (merged + unmerged) = unmerged (most
+                  common)
+                - merged: final mode of (merged + unmerged) = merged (for
+                  special cases like the bike check)
         """
 
         if streak_start == streak_end:
             logging.info("Found single flip-flop %s -> %s -> %s" % 
                 (streak_start - 1, streak_start, streak_start+1))
+            cfbs  = self.check_fast_biker_special(streak_start, streak_end)
             ctv = self.check_transition_validity(streak_start, streak_end)
             cnlw = self.check_no_location_walk(streak_start, streak_end)
-            if ctv != 0:
+            if cfbs.direction != Direction.NONE:
+                return cfbs
+            if ctv.direction != Direction.NONE:
                 return ctv
-            if cnlw != 0:
+            if cnlw.direction != Direction.NONE:
                 return cnlw
-            return 0
+            return MergeResult.NONE()
 
         cvft = self.check_valid_for_type(streak_start, streak_end)
-        if cvft != 0:
+        if cvft.direction != Direction.NONE:
             return cvft
         
-        return 0
+        return MergeResult.NONE()
+
+    def check_fast_biker_special(self, streak_start, streak_end):
+        """
+        Check a special transition that happens for very fast bikers
+        https://github.com/e-mission/e-mission-server/issues/577#issuecomment-378126571
+        https://github.com/e-mission/e-mission-server/issues/577#issuecomment-378129015
+        """
+        start_change = self.motion_changes[streak_start]
+        end_change = self.motion_changes[streak_end]
+        ssm, sem = start_change
+        esm, eem = end_change
+
+        if streak_end + 1 == len(self.motion_changes):
+            # There is no after section - cannot be IN_VEHICLE!
+            return MergeResult.NONE()
+
+        after_motion = self.motion_changes[streak_end + 1]
+        asm, aem = after_motion
+
+        # the idx checks ensure that this was indeed the luck of the draw.
+        # if we had chosen the flip the other way then the `IN_VEHICLE` would
+        # have been deleted instead of the bicycling
+        bike_idx_diff = esm["idx"] - ssm["idx"]
+        vehicle_idx_diff = aem["idx"] - asm["idx"]
+
+        transition_interval = esm.ts - sem.ts
+        is_short_transition_interval = eaid.is_too_short_bike_vehicle_transition(transition_interval)
+
+        # since we are potentially deleting a section that is NOT a flip flop,
+        # add the equivalent of the trip_pct check
+        section_ratio = (esm.ts - ssm.ts) / (aem.ts - asm.ts)
+
+        rule_checks_log = (("check_fast_biker_special: "+
+            "curr_type = %s, next_type = %s, curr_idx_diff = %d, "+
+                "next_idx_diff = %d, short_transition_interval = %s, " +
+                "section_ratio = %s") % (ssm.type, asm.type, bike_idx_diff,
+            vehicle_idx_diff, is_short_transition_interval, section_ratio))
+
+        if (ssm.type == ecwm.MotionTypes.BICYCLING and 
+            asm.type == ecwm.MotionTypes.IN_VEHICLE and
+            bike_idx_diff <= 1 and 
+            vehicle_idx_diff <=2 and
+            is_short_transition_interval and
+            (bike_idx_diff == 0 or section_ratio > 0.75)):
+                logging.debug(rule_checks_log + ", merged")
+                return MergeResult(Direction.BACKWARD, FinalMode.MERGED)
+
+        logging.debug(rule_checks_log + ", unmerged")
+        return MergeResult.NONE()
 
     def check_transition_validity(self, streak_start, streak_end):
         """
@@ -81,7 +177,7 @@ class FlipFlopDetection():
             return self.get_merge_direction(streak_start, streak_end)
         else:
             logging.debug("single transition %s, WALKING, not merging yet" % start_change[0].type)
-        return 0
+        return MergeResult.NONE()
 
     def check_no_location_walk(self, streak_start, streak_end):
         assert streak_start == streak_end, \
@@ -96,7 +192,7 @@ class FlipFlopDetection():
             # we have no points, not even unfiltered. This must be bogus 
             return self.get_merge_direction(streak_start, streak_end)
 
-        return 0
+        return MergeResult.NONE()
 
     def check_valid_for_type(self, streak_start, streak_end):
         valid_for_type = True
@@ -109,7 +205,7 @@ class FlipFlopDetection():
             # the section to the speed profiles of the two sides
             # TODO: generalize to longer sequence of flip-flops later
             return self.get_merge_direction(streak_start, streak_end)
-        return 0
+        return MergeResult.NONE()
 
 
     def get_merge_direction(self, streak_start, streak_end):
@@ -127,7 +223,7 @@ class FlipFlopDetection():
         if streak_start == 0:
             # There is no before section - only one way to merge!
             logging.debug("get_merge_direction: at beginning of changes, can only merge backward")
-            return -1
+            return MergeResult(Direction.BACKWARD, FinalMode.UNMERGED)
 
         before_motion = self.motion_changes[streak_start - 1]
         bsm, bem = before_motion
@@ -135,7 +231,7 @@ class FlipFlopDetection():
         if streak_end + 1 == len(self.motion_changes):
             # There is no after section - only one way to merge!
             logging.debug("get_merge_direction: at end of changes, can only merge forward")
-            return 1
+            return MergeResult(Direction.FORWARD, FinalMode.UNMERGED)
 
         after_motion = self.motion_changes[streak_end + 1]
         asm, aem = after_motion
@@ -143,7 +239,7 @@ class FlipFlopDetection():
         if bsm.type == asm.type:
             logging.debug("before type = %s, after type = %s, merge direction is don't care, returning forward"  % 
             (bsm.type, asm.type))
-            return 1
+            return MergeResult(Direction.FORWARD, FinalMode.UNMERGED)
 
         loc_points = self.seg_method.filter_points_for_range(
                 self.seg_method.location_points, ssm, eem)
@@ -168,11 +264,11 @@ class FlipFlopDetection():
         if (eaid.is_walking_type(asm.type) and 
             (not eaid.is_walking_speed(curr_median_speed))):
             logging.debug("after is walking, but speed is %d, merge forward, returning 1" % curr_median_speed)
-            return 1
+            return MergeResult(Direction.FORWARD, FinalMode.UNMERGED)
         elif (eaid.is_walking_type(bsm.type) and 
             (not eaid.is_walking_speed(curr_median_speed))):
             logging.debug("before is walking, but speed is %d, merge backward, returning -1")
-            return -1
+            return MergeResult(Direction.BACKWARD, FinalMode.UNMERGED)
             
         logging.debug("while merging, comparing curr speed %s with before %s and after %s" % 
             (curr_median_speed, with_speed_points_before.speed.median(),
@@ -181,10 +277,10 @@ class FlipFlopDetection():
             abs(curr_median_speed - with_speed_points_after.speed.median())):
             # speed is closer to before than after, merge with before, merge forward
             logging.debug("before is closer, merge forward, returning 1")
-            return 1
+            return MergeResult(Direction.FORWARD, FinalMode.UNMERGED)
         else:
             logging.debug("after is closer, merge backward, returning -1")
-            return -1
+            return MergeResult(Direction.BACKWARD, FinalMode.UNMERGED)
 
     def get_section_speed(self, loc_points, with_speed_loc_points, points_before, points_after):
         if len(loc_points) >1:
@@ -315,25 +411,35 @@ class FlipFlopDetection():
         logging.debug("before merging entries, changes were %s" %
             ([(mc[0]["idx"], mc[1]["idx"]) for mc in modifiable_changes]))
 
-        for mss, mse in forward_merged_streaks:
+        for ms in forward_merged_streaks:
             # extend the pre-merge section to end with the merged section
             # by setting the end motion
-            modifiable_changes[mss-1][1] = modifiable_changes[mse][1]
+            modifiable_changes[ms.start-1][1] = modifiable_changes[ms.end][1]
+            # by default, final mode will the mode of (ms.start-1) which is the
+            # unmerged mode
+            if ms.final_mode == FinalMode.MERGED:
+                modifiable_changes[ms.start-1][0]["type"] = \
+                    modifiable_changes[ms.start][0]["type"]
             # change all the merged entries to point to the retained entry
-            for i in range(mss, mse+1):
-                modifiable_changes[i] = modifiable_changes[mss-1]
+            for i in range(ms.start, ms.end+1):
+                modifiable_changes[i] = modifiable_changes[ms.start-1]
 
-        for mss, mse in backward_merged_streaks:
+        for ms in backward_merged_streaks:
             # extend the post-merge section to start with the merged section
             # by setting the start motion
             # in this case, because the start motion determines the section type
             # and we are changing the start section, we should ensure that the 
             # after section's type is the one that is retained
             # https://github.com/e-mission/e-mission-server/issues/577#issuecomment-377863642
-            modifiable_changes[mss][0]["type"] = modifiable_changes[mse+1][0]["type"]
-            modifiable_changes[mse+1][0] = modifiable_changes[mss][0]
-            for i in range(mss, mse+1):
-                modifiable_changes[i] = modifiable_changes[mse+1]
+
+            # By default, final mode will be the mode of ms.start, which is the
+            # merged mode
+            if ms.final_mode == FinalMode.UNMERGED:
+                modifiable_changes[ms.start][0]["type"] = \
+                    modifiable_changes[ms.end+1][0]["type"]
+            modifiable_changes[ms.end+1][0] = modifiable_changes[ms.start][0]
+            for i in range(ms.start, ms.end+1):
+                modifiable_changes[i] = modifiable_changes[ms.end+1]
 
         logging.debug("before merging entries, changes were %s" %
             ([(mc[0]["idx"], mc[1]["idx"]) for mc in modifiable_changes]))
@@ -384,6 +490,7 @@ class FlipFlopDetection():
         logging.debug("is_change_list = %s" % is_change_list)
         return reduce(lambda x,y: x and y, is_change_list)
 
+
     def merge_flip_flop_sections(self):
         logging.debug("while starting flip_flop detection, changes are %s" %
             ([(mc[0]["idx"], mc[1]["idx"], mc[0]["type"]) for mc in self.motion_changes]))
@@ -402,10 +509,10 @@ class FlipFlopDetection():
         for streak in self.flip_flop_streaks:
             ss, se = streak
             sm = self.should_merge(ss, se)
-            if sm == 1:
-                forward_merged_streaks.append(streak)
-            elif sm == -1:
-                backward_merged_streaks.append(streak)
+            if sm.direction == Direction.FORWARD:
+                forward_merged_streaks.append(MergeAction(ss, se, sm.final_mode))
+            elif sm.direction == Direction.BACKWARD:
+                backward_merged_streaks.append(MergeAction(ss, se, sm.final_mode))
 
         logging.debug("forward merged_streaks = %s" % forward_merged_streaks)
         logging.debug("backward merged_streaks = %s" % backward_merged_streaks)
