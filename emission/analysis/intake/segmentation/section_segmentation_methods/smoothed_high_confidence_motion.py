@@ -201,8 +201,8 @@ def get_curr_end_motion(prev_motion, curr_motion):
     motorized -> motorized: unsure if this ever happens, return curr_motion for now
     """
 
-    prev_motorized = eaid.is_motorized(prev_motion)
-    curr_motorized = eaid.is_motorized(curr_motion)
+    prev_motorized = eaid.is_motorized(prev_motion.type)
+    curr_motorized = eaid.is_motorized(curr_motion.type)
 
     if not prev_motorized and curr_motorized:
         return prev2end(prev_motion, curr_motion)
