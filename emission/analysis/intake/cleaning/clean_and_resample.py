@@ -790,7 +790,8 @@ def _fill_stop(old_stop, new_stop, section_map):
                                          stop_data.enter_loc.coordinates)
 
     # squish stop if necessary
-    STOP_DISTANCE_THRESHOLD = 1000
+    STOP_DISTANCE_THRESHOLD = max(eac.get_config()["section.startStopRadius"],
+        eac.get_config()["section.endStopRadius"])
     if stop_data.distance > STOP_DISTANCE_THRESHOLD:
         logging.debug("stop distance = %d > %d, squishing it between %s -> %s and %s -> %s" % 
             (stop_data.distance, STOP_DISTANCE_THRESHOLD,
