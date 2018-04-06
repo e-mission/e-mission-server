@@ -825,11 +825,11 @@ def squish_stop(filtered_stop_data, new_ending_section, new_starting_section):
                                    esda.get_time_query_for_trip_like_object(
                                    new_starting_section.data))
 
-    prev_section_space_density = len(prev_section_points_df)/new_ending_section.data.distance
-    next_section_space_density = len(next_section_points_df)/new_starting_section.data.distance
+    prev_section_space_density = len(prev_section_points_df)/(new_ending_section.data.distance + 1)
+    next_section_space_density = len(next_section_points_df)/(new_starting_section.data.distance + 1)
 
-    prev_section_time_density = len(prev_section_points_df)/new_ending_section.data.duration
-    next_section_time_density = len(next_section_points_df)/new_starting_section.data.duration
+    prev_section_time_density = len(prev_section_points_df)/(new_ending_section.data.duration + 1)
+    next_section_time_density = len(next_section_points_df)/(new_starting_section.data.duration + 1)
 
     # Get the deltas before overwriting so that we can adjust section dist and time
     # accordingly.
