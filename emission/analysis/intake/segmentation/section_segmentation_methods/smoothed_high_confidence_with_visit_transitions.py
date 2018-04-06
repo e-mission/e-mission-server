@@ -12,7 +12,6 @@ import logging
 import emission.analysis.intake.segmentation.section_segmentation_methods.smoothed_high_confidence_motion as eaisms
 import emission.core.wrapper.motionactivity as ecwm
 import emission.core.wrapper.location as ecwl
-import emission.analysis.intake.segmentation.section_segmentation_methods.reconstruct_locations as eaissr
 
 class SmoothedHighConfidenceMotionWithVisitTransitions(eaisms.SmoothedHighConfidenceMotion):
     def create_unknown_section(self, location_points_df):
@@ -126,8 +125,8 @@ class SmoothedHighConfidenceMotionWithVisitTransitions(eaisms.SmoothedHighConfid
                                       start_motion.fmt_time, end_motion.fmt_time,
                                       start_motion.type))
             else:
-                section_start_loc = eaissr.get_matched_location(start_motion, raw_section_df, unfiltered_section_df, 0, timeseries)
-                section_end_loc = eaissr.get_matched_location(end_motion, raw_section_df, unfiltered_section_df, -1, timeseries)
+                section_start_loc = raw_section_df.iloc[0]
+                section_end_loc = raw_section_df.iloc[-1]
                 logging.debug("section start point = %s, section end point = %s" %
                               (ecwl.Location(section_start_loc), ecwl.Location(section_end_loc)))
                 section_list.append((section_start_loc, section_end_loc, start_motion.type))
