@@ -585,11 +585,11 @@ def _add_start_point(filtered_loc_df, raw_start_place, ts, sensed_mode):
             logging.debug("motorized? %s, speed unchanged %s, speed reduced %s" %
                         (eaid.is_motorized(sensed_mode),
                         speed_fn(computed_median),
-                        speed_fn(0.8 * computed_median)))
-            if not speed_fn(computed_median) and speed_fn(0.8 * computed_median):
-                del_time = add_dist / speed_fn(0.8 * computed_median)
+                        speed_fn(0.9 * computed_median)))
+            if not speed_fn(computed_median) and speed_fn(0.9 * computed_median):
+                del_time = add_dist / speed_fn(0.9 * computed_median)
                 logging.info("median speeds for %s section is %s, resetting to %s instead" %
-                    (sensed_mode, computed_median, 0.8 * computed_median))
+                    (sensed_mode, computed_median, 0.9 * computed_median))
         else:
             del_time = add_dist / with_speeds_df.speed.median()
     else:
