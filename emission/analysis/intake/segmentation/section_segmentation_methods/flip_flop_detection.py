@@ -140,7 +140,7 @@ class FlipFlopDetection():
 
         # since we are potentially deleting a section that is NOT a flip flop,
         # add the equivalent of the trip_pct check
-        section_ratio = (esm.ts - ssm.ts) / (aem.ts - asm.ts)
+        section_ratio = (esm.ts - ssm.ts) / (aem.ts - asm.ts + 1)
 
         rule_checks_log = (("check_fast_biker_special: "+
             "curr_type = %s, next_type = %s, curr_idx_diff = %d, "+
