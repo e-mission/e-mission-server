@@ -65,6 +65,10 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
             logging.info("Found filter_mask with shape (0,0), returning blank")
             return []
 
+        # Replace RUNNING with WALKING so that we don't get extra, incorrect sections 
+        # https://github.com/e-mission/e-mission-server/issues/577#issuecomment-379496118
+        motion_df["type"].replace([8], 7, inplace=True)
+
         logging.debug("filtered points %s" % np.nonzero(filter_mask))
         logging.debug("motion_df = %s" % motion_df.head())
         filtered_df = motion_df[filter_mask]
