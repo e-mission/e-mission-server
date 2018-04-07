@@ -28,6 +28,7 @@ import json
 # Our imports
 import emission.analysis.config as eac
 import emission.analysis.intake.location_utils as eail
+import emission.analysis.intake.domain_assumptions as eaid
 
 import emission.storage.decorations.timeline as esdtl
 import emission.storage.decorations.trip_queries as esdtq
@@ -387,7 +388,7 @@ def get_filtered_points(section, filtered_section_data):
         raw_trip = ts.get_entry_from_id(esda.RAW_TRIP_KEY, section.data.trip_id)
         raw_start_place = ts.get_entry_from_id(esda.RAW_PLACE_KEY, raw_trip.data.start_place)
         if not is_place_bogus(loc_entry_list, 0, filtered_point_id_list, raw_start_place):
-            filtered_loc_df = _add_start_point(filtered_loc_df, raw_start_place, ts)
+            filtered_loc_df = _add_start_point(filtered_loc_df, raw_start_place, ts, section.data.sensed_mode)
             if _is_unknown_mark_needed(filtered_section_data, section, filtered_loc_df):
                 # UGLY! UGLY! Fix when we fix
                 # https://github.com/e-mission/e-mission-server/issues/388
@@ -557,7 +558,7 @@ def is_air_section(filtered_section_data,with_speeds_df):
                    with_speeds_df.speed.quantile(0.9), ONE_FIFTY_KMPH))
     return False
 
-def _add_start_point(filtered_loc_df, raw_start_place, ts):
+def _add_start_point(filtered_loc_df, raw_start_place, ts, sensed_mode):
     raw_start_place_enter_loc_entry = _get_raw_place_enter_loc_entry(ts, raw_start_place)
 
     curr_first_point = filtered_loc_df.iloc[0]
@@ -572,7 +573,25 @@ def _add_start_point(filtered_loc_df, raw_start_place, ts):
     # speed is in m/s. We want to compute secs for covering ad meters
     # speed m = 1 sec, ad m = ? ad/speed secs
     if with_speeds_df.speed.median() > 0:
-        del_time = old_div(add_dist, with_speeds_df.speed.median())
+        if add_dist > 2 * with_speeds_df.distance.sum() \
+            and not eaid.is_motorized(sensed_mode):
+            # Better handling of iOS small non-motorized trips
+            # https://github.com/e-mission/e-mission-server/issues/577#issuecomment-379496118
+            computed_median = with_speeds_df.speed.median()
+            if (eaid.is_walking_type(sensed_mode)):
+                speed_fn = eaid.is_walking_speed
+            else:
+                speed_fn = eaid.is_biking_speed
+            logging.debug("motorized? %s, speed unchanged %s, speed reduced %s" %
+                        (eaid.is_motorized(sensed_mode),
+                        speed_fn(computed_median),
+                        speed_fn(0.8 * computed_median)))
+            if not speed_fn(computed_median) and speed_fn(0.8 * computed_median):
+                del_time = add_dist / speed_fn(0.8 * computed_median)
+                logging.info("median speeds for %s section is %s, resetting to %s instead" %
+                    (sensed_mode, computed_median, 0.8 * computed_median))
+        else:
+            del_time = add_dist / with_speeds_df.speed.median()
     else:
         logging.info("speeds for this section are %s, median is %s, trying median nonzero instead" %
                      (with_speeds_df.speed, with_speeds_df.speed.median()))
@@ -580,7 +599,7 @@ def _add_start_point(filtered_loc_df, raw_start_place, ts):
         if not np.isnan(speed_nonzero.median()):
             logging.info("nonzero speeds = %s, median is %s" %
                          (speed_nonzero, speed_nonzero.median()))
-            del_time = old_div(add_dist, speed_nonzero.median())
+            del_time = add_dist / speed_nonzero.median()
         else:
             logging.info("non_zero speeds = %s, median is %s, unsure what this even means, skipping" %
                          (speed_nonzero, speed_nonzero.median()))
