@@ -34,11 +34,13 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
 
     def is_filtered(self, curr_activity_doc):
         curr_activity = ecwm.Motionactivity(curr_activity_doc)
-        logging.debug("curr activity = %s" % curr_activity)
+        activity_dump = ("curr activity = %s" % curr_activity)
         if (curr_activity.confidence > self.confidence_threshold and
                     curr_activity.type not in self.ignore_modes_list):
+            logging.debug("%s, returning True" % activity_dump)
             return True
         else:
+            logging.debug("%s, returning False" % activity_dump)
             return False
 
     def segment_into_motion_changes(self, timeseries, time_query):
@@ -209,7 +211,16 @@ def get_curr_end_motion(prev_motion, curr_motion):
     elif prev_motorized and not curr_motorized:
         return curr_motion
     elif not prev_motorized and not curr_motorized:
-        return prev2end(prev_motion, curr_motion)
+        if eaid.is_walking_type(prev_motion.type) and \
+            curr_motion.type == ecwm.MotionTypes.BICYCLING:
+            # WALK -> BIKE transition, merge backwards
+            return prev2end(prev_motion, curr_motion)
+        elif prev_motion.type == ecwm.MotionTypes.BICYCLING and \
+            eaid.is_walking_type(curr_motion.type):
+            return curr_motion
+        else:
+            # both modes are walking or bicycling, let's just merge forward
+            return curr_motion
     else:
         return curr_motion
 

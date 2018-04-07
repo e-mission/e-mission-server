@@ -6,7 +6,8 @@ def is_motorized(motion_type):
 
 def is_walking_type(motion_type):
     return motion_type == ecwm.MotionTypes.WALKING or \
-           motion_type == ecwm.MotionTypes.ON_FOOT
+           motion_type == ecwm.MotionTypes.ON_FOOT or \
+           motion_type == ecwm.MotionTypes.RUNNING
 
 def is_walking_speed(speed):
     """
