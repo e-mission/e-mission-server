@@ -62,6 +62,11 @@ class FlipFlopDetection():
         if idx_diff <= 1:
             logging.debug("in is_flip_flop: idx_diff = %d" % idx_diff)
             return True
+        if not eaid.is_walking_type(start_motion.type) and idx_diff <= 2:
+            # for bicycling and transport, we want idx = 2
+            # https://github.com/e-mission/e-mission-server/issues/577#issuecomment-379527711
+            logging.debug("in is_flip_flop: idx_diff = %d" % idx_diff)
+            return True
         elif not self.is_valid_for_type((start_motion, end_motion)):
             logging.debug("in is_flip_flop: is_valid_for_type is false")
             return True
@@ -286,7 +291,7 @@ class FlipFlopDetection():
         if len(loc_points) >1:
             curr_median_speed = with_speed_loc_points.speed.median()
             logging.debug("Median calculation from speeds = %s" % curr_median_speed)
-        else:
+        elif (len(points_before) > 0) and (len(points_after) > 0):
             # We don't have any points of our own. Let's use the last point
             # from before and the first point from after
             last_prev_point = points_before.iloc[-1]
@@ -298,6 +303,8 @@ class FlipFlopDetection():
                 (last_prev_point.fmt_time, first_next_point.fmt_time,
                  dist, time, dist/time))
             curr_median_speed = dist/time
+        else:
+            curr_median_speed = 0
         return curr_median_speed
 
     def is_valid_for_type(self, motion_change):
