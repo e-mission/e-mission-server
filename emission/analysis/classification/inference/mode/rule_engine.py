@@ -177,7 +177,8 @@ def collapse_modes(section_entry, modes):
     start and end points. This method merges the list of entries returned by
     the GIS into one, potentially using speed information 
     """
-    train_mode_list = ['railway', 'light_rail', 'subway']
+    train_mode_list = ['funicular', 'miniature', 'rail', 'railway',
+        'light_rail', 'subway', 'monorail', 'tram', ]
 
     if modes is None or len(modes) == 0:
         return None
