@@ -836,21 +836,10 @@ def squish_stop(filtered_stop_data, new_ending_section, new_starting_section):
     # How do we determine which side is better quality?
     # - non-motorized side is generally better quality
     # - side with high density of points is better quality
-    # let's start with the second check
-
-    ts = esta.TimeSeries.get_time_series(new_ending_section.user_id)
-    prev_section_points_df = ts.get_data_df("background/filtered_location",
-                                   esda.get_time_query_for_trip_like_object(
-                                   new_ending_section.data))
-    next_section_points_df = ts.get_data_df("background/filtered_location",
-                                   esda.get_time_query_for_trip_like_object(
-                                   new_starting_section.data))
-
-    prev_section_space_density = len(prev_section_points_df)/(new_ending_section.data.distance + 1)
-    next_section_space_density = len(next_section_points_df)/(new_starting_section.data.distance + 1)
-
-    prev_section_time_density = len(prev_section_points_df)/(new_ending_section.data.duration + 1)
-    next_section_time_density = len(next_section_points_df)/(new_starting_section.data.duration + 1)
+    # let's start with the second check.
+    # second check failed in https://github.com/e-mission/e-mission-server/issues/577#issuecomment-379520895
+    # let's go with the first check, which is also consistent with merging when
+    # we create the sections
 
     # Get the deltas before overwriting so that we can adjust section dist and time
     # accordingly.
@@ -860,41 +849,75 @@ def squish_stop(filtered_stop_data, new_ending_section, new_starting_section):
                                 filtered_stop_data.exit_loc.coordinates)
     ts_diff = filtered_stop_data.enter_ts - filtered_stop_data.exit_ts
 
-    if prev_section_space_density > next_section_space_density:
-        if prev_section_time_density <= next_section_time_density:
-                logging.warning("%s -> %s v/s %s -> %s, space density is (%4f, %4f) but time density is (%4f, %4f)" %
-                    (new_ending_section.data.start_fmt_time, new_ending_section.data.end_fmt_time,
-                     new_starting_section.data.start_fmt_time, new_starting_section.data.end_fmt_time,
-                     prev_section_space_density, next_section_space_density,
-                     prev_section_time_density, next_section_time_density))
+    ts = esta.TimeSeries.get_time_series(new_ending_section.user_id)
+    prev_section_mode = new_ending_section.data.sensed_mode
+    next_section_mode = new_starting_section.data.sensed_mode
 
-        logging.debug("prev_section %s is more dense than next_section %s, merging backwards" % 
-            (new_ending_section.data.end_fmt_time, new_starting_section.data.start_fmt_time))
-        # NOTE: copy_prefixed_fields(a, b) is the equivalent of a = b. a is changed!!
-
-        # merge backward. next section takes over the stop (e.g. walking ->
-        # transit). So the exit should be overwritten with the enter
-        _copy_prefixed_fields(filtered_stop_data, "exit", filtered_stop_data, "enter")
-
-        # Then, the next section's start should be overwritten with this stop's
-        # information (since enter now = exit, which set of fields is a don't care) 
-        _copy_prefixed_fields(new_starting_section["data"], "start", filtered_stop_data, "enter")
-        _extend_section_by_point(new_starting_section, dist_diff, ts_diff)
-        logging.debug("after merge, next section is %s" % new_starting_section.data.start_fmt_time)
+    if not eaid.is_motorized(prev_section_mode) and eaid.is_motorized(next_section_mode):
+        _merge_backward(filtered_stop_data, new_ending_section, new_starting_section,
+            dist_diff, ts_diff)
+    elif eaid.is_motorized(prev_section_mode) and not eaid.is_motorized(next_section_mode):
+        _merge_forward(filtered_stop_data, new_ending_section, new_starting_section,
+            dist_diff, ts_diff)
     else:
-        logging.debug("next_section %s is more dense than prev_section %s, merging forwards" % 
-            (new_ending_section.data.end_fmt_time, new_starting_section.data.start_fmt_time))
-        # merge forward. previous section takes over the stop (e.g. transit -> walking).
-        # So the enter should be overwritten with the exit
-        _copy_prefixed_fields(filtered_stop_data, "enter", filtered_stop_data, "exit")
-        # Then, the previous section's end should be overwritten with this stop's
-        # information (since enter now = exit, which set of fields is a don't care) 
-        _copy_prefixed_fields(new_ending_section["data"], "end", filtered_stop_data, "exit")
-        _extend_section_by_point(new_starting_section, dist_diff, ts_diff)
-        logging.debug("after merge, prev section is %s" % new_ending_section.data.end_fmt_time)
+        prev_section_points_df = ts.get_data_df("background/filtered_location",
+                                       esda.get_time_query_for_trip_like_object(
+                                       new_ending_section.data))
+        next_section_points_df = ts.get_data_df("background/filtered_location",
+                                       esda.get_time_query_for_trip_like_object(
+                                       new_starting_section.data))
+
+        prev_section_space_density = len(prev_section_points_df)/(new_ending_section.data.distance + 1)
+        next_section_space_density = len(next_section_points_df)/(new_starting_section.data.distance + 1)
+
+        prev_section_time_density = len(prev_section_points_df)/(new_ending_section.data.duration + 1)
+        next_section_time_density = len(next_section_points_df)/(new_starting_section.data.duration + 1)
+
+        if prev_section_space_density > next_section_space_density:
+            if prev_section_time_density <= next_section_time_density:
+                    logging.warning("%s -> %s v/s %s -> %s, space density is (%4f, %4f) but time density is (%4f, %4f)" %
+                        (new_ending_section.data.start_fmt_time, new_ending_section.data.end_fmt_time,
+                         new_starting_section.data.start_fmt_time, new_starting_section.data.end_fmt_time,
+                         prev_section_space_density, next_section_space_density,
+                         prev_section_time_density, next_section_time_density))
+
+            logging.debug("prev_section %s is more dense than next_section %s, merging backwards" % 
+                (new_ending_section.data.end_fmt_time, new_starting_section.data.start_fmt_time))
+            _merge_backward(filtered_stop_data, new_ending_section, new_starting_section,
+                dist_diff, ts_diff)
+        else:
+            logging.debug("next_section %s is more dense than prev_section %s, merging forwards" % 
+                (new_ending_section.data.end_fmt_time, new_starting_section.data.start_fmt_time))
+            _merge_forward(filtered_stop_data, new_ending_section, new_starting_section,
+                dist_diff, ts_diff)
 
     filtered_stop_data["distance"] = 0
     filtered_stop_data["duration"] = 0
+
+def _merge_backward(filtered_stop_data, new_ending_section, new_starting_section,
+                     dist_diff, ts_diff):
+    # NOTE: copy_prefixed_fields(a, b) is the equivalent of a = b. a is changed!!
+
+    # merge backward. next section takes over the stop (e.g. walking ->
+    # transit). So the exit should be overwritten with the enter
+    _copy_prefixed_fields(filtered_stop_data, "exit", filtered_stop_data, "enter")
+
+    # Then, the next section's start should be overwritten with this stop's
+    # information (since enter now = exit, which set of fields is a don't care) 
+    _copy_prefixed_fields(new_starting_section["data"], "start", filtered_stop_data, "enter")
+    _extend_section_by_point(new_starting_section, dist_diff, ts_diff)
+    logging.debug("after backward merge, next section is %s" % new_starting_section.data.start_fmt_time)
+
+def _merge_forward(filtered_stop_data, new_ending_section, new_starting_section,
+                     dist_diff, ts_diff):
+    # merge forward. previous section takes over the stop (e.g. transit -> walking).
+    # So the enter should be overwritten with the exit
+    _copy_prefixed_fields(filtered_stop_data, "enter", filtered_stop_data, "exit")
+    # Then, the previous section's end should be overwritten with this stop's
+    # information (since enter now = exit, which set of fields is a don't care) 
+    _copy_prefixed_fields(new_ending_section["data"], "end", filtered_stop_data, "exit")
+    _extend_section_by_point(new_starting_section, dist_diff, ts_diff)
+    logging.debug("after forward merge, prev section is %s" % new_ending_section.data.end_fmt_time)
 
 def _extend_section_by_point(section, dist_diff, ts_diff):
     section["data"]["distance"] += dist_diff
