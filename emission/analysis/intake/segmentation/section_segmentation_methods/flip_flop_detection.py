@@ -65,7 +65,7 @@ class FlipFlopDetection():
         if not eaid.is_walking_type(start_motion.type) and idx_diff <= 2:
             # for bicycling and transport, we want idx = 2
             # https://github.com/e-mission/e-mission-server/issues/577#issuecomment-379527711
-            logging.debug("in is_flip_flop: idx_diff = %d" % idx_diff)
+            logging.debug("in non-walking is_flip_flop: idx_diff = %d" % idx_diff)
             return True
         elif not self.is_valid_for_type((start_motion, end_motion)):
             logging.debug("in is_flip_flop: is_valid_for_type is false")
@@ -96,7 +96,8 @@ class FlipFlopDetection():
                   special cases like the bike check)
         """
 
-        if streak_start == streak_end:
+        if (streak_start) == streak_end or \
+            (streak_start + 1) == streak_end:
             logging.info("Found single flip-flop %s -> %s -> %s" % 
                 (streak_start - 1, streak_start, streak_start+1))
             cfbs  = self.check_fast_biker_special(streak_start, streak_end)
@@ -174,7 +175,7 @@ class FlipFlopDetection():
         the travel will be long enough that we will get at least a couple of
         activity points. It's not worth it otherwise
         """
-        assert streak_start == streak_end, \
+        assert (streak_start == streak_end) or (streak_start + 1 == streak_end), \
             "1 flip check called with streak %d -> %d" % (streak_start, streak_end)
         start_change = self.motion_changes[streak_start]
         if not eaid.is_walking_type(start_change[0].type):
@@ -185,7 +186,7 @@ class FlipFlopDetection():
         return MergeResult.NONE()
 
     def check_no_location_walk(self, streak_start, streak_end):
-        assert streak_start == streak_end, \
+        assert (streak_start == streak_end) or (streak_start + 1 == streak_end), \
             "1 flip check called with streak %d -> %d" % (streak_start, streak_end)
         ssm, sem = self.motion_changes[streak_start]
         streak_locs = self.seg_method.filter_points_for_range(
