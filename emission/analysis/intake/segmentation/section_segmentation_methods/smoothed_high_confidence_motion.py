@@ -16,6 +16,9 @@ import emission.analysis.intake.segmentation.section_segmentation as eaiss
 import emission.analysis.intake.segmentation.section_segmentation_methods.flip_flop_detection as ffd
 import emission.core.wrapper.motionactivity as ecwm
 import emission.core.wrapper.location as ecwl
+import emission.core.common as ecc
+
+import emission.analysis.config as eac
 import emission.analysis.intake.location_utils as eail
 import emission.analysis.intake.domain_assumptions as eaid
 
@@ -142,7 +145,7 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
         # Let's pick a reasonable default for now.
         # TODO: Restructure into policy that can be passed in.
         section_list = []
-        for (start_motion, end_motion) in motion_changes:
+        for i, (start_motion, end_motion) in enumerate(motion_changes):
             logging.debug("Considering %s from %s -> %s" %
                           (start_motion.type, start_motion.fmt_time, end_motion.fmt_time))
             # Find points that correspond to this section
@@ -163,6 +166,8 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
                 if start_motion.type == end_motion.type:
                     logging.debug("No section because start_motion == end_motion, creating one dummy section")
                     section_list.append((fp, lp, start_motion.type))
+
+            self.squish_stops(motion_changes, section_list)
 
             if len(motion_changes) == 0:
             # there are no high confidence motions useful motions, so we add a section of type NONE
@@ -192,6 +197,51 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
         """
         return df[(df.ts >= start_motion.ts) &
                   (df.ts <= end_motion.ts)]
+
+    def squish_stops(self, motion_changes, section_list):
+        STOP_DISTANCE_THRESHOLD = max(eac.get_config()["section.startStopRadius"],
+            eac.get_config()["section.endStopRadius"])
+
+        for i, x in enumerate(zip(section_list, section_list[1:])):
+            try:
+                ((ss1, se1, st1), (ss2, se2, st2)) = x
+            except ValueError as e:
+                print(len(x), [len(xm) for xm in x])
+                print(x[0])
+            # i is the index of s1, i+1 is the index of s2
+            stop_duration = ss2.ts - se1.ts
+            stop_distance = ecc.calDistance(ss2.loc["loc"]["coordinates"],
+                                            se1.loc["loc"]["coordinates"])
+            logging.debug("while squishing stop, %s (%d) -> %s (%d), duration = %d, dist = %d" % 
+                        (se1.fmt_time, i, ss2.fmt_time, i+1, stop_duration, stop_distance))
+            if stop_distance > STOP_DISTANCE_THRESHOLD:
+                mcs1, mce1 = motion_changes[i]
+                mcs2, mce2 = motion_changes[i+1]
+                assert mce1.ts == mcs2.ts, \
+                    "curr motion change ends at %s, next motion change ends at %s" % \
+                        (mce1.fmt_time, mce2.fmt_time)
+
+                # e.g. if the motion changed at 11:33, mce1.ts = mcs2.ts = 11:33
+                # if the first section's last point (se1) was at 11:31 and the
+                # second section's first point (ss2) was at 11:51, then we
+                # should set the second section's first point to be the first
+                # section's last point (e.g. ss2 = se1)
+
+                stop_start_gap = mce1.ts - se1.ts
+                stop_end_gap = ss2.ts - mcs2.ts
+                gap_ratio = max(stop_start_gap, stop_end_gap)/min(stop_start_gap, stop_end_gap)
+
+                log_msg = ("need to squish, comparing start_gap = %d, end_gap = %d, ratio = %4f" % 
+                    (stop_start_gap, stop_end_gap, gap_ratio))
+                if gap_ratio >= 1.5:
+                    if stop_start_gap < stop_end_gap:
+                        logging.debug(log_msg + ", setting ss2 <- se1")
+                        section_list[i+1] = (se1, se2, st2)
+                    else:
+                        logging.debug(log_msg + ", setting se1 <- ss2")
+                        section_list[i] = (ss1, ss2, st1)
+                else:
+                    logging.debug(log_msg + ", no change, fixed in clean_and_resample")
 
 def get_curr_end_motion(prev_motion, curr_motion):
     """
