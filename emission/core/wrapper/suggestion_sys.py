@@ -2,6 +2,7 @@ import emission.storage.timeseries.abstract_timeseries as esta
 import pandas as pd
 import requests
 import json
+import logging
 import re
 import emission.core.get_database as edb
 from datetime import datetime
@@ -120,6 +121,7 @@ def calculate_single_suggestion(uuid):
         end_lat = str(end_loc[0])
         end_lon = str(end_loc[1])
         if mode == 5 and distance_in_miles >= 5 and distance_in_miles <= 15:
+            logging.debug("15 >= distance >= 5 so I'm considering distance: " + str(distance_in_miles))
             #Suggest bus if it is car and distance between 5 and 15
             default_message = return_obj['message']
             try:
@@ -134,7 +136,8 @@ def calculate_single_suggestion(uuid):
             except ValueError as e:
                 return_obj['message'] = default_message
                 continue
-        elif mode == 5 or mode == 3 or mode == 4 and distance_in_miles < 5 and distance_in_miles >= 1:
+        elif (mode == 5 or mode == 3 or mode == 4) and (distance_in_miles < 5 and distance_in_miles >= 1):
+            logging.debug("5 > distance >= 1 so I'm considering distance: " + str(distance_in_miles))
             #Suggest bike if it is car/bus/train and distance between 5 and 1
             try:
                 message = "Try biking from " + return_address_from_location(start_lon + "," + start_lat) + \
@@ -146,7 +149,8 @@ def calculate_single_suggestion(uuid):
                 break
             except:
                 continue
-        elif mode == 5 or mode == 3 or mode == 4 and distance_in_miles < 1:
+        elif (mode == 5 or mode == 3 or mode == 4) and (distance_in_miles < 1):
+            logging.debug("1 > distance so I'm considering distance: " + str(distance_in_miles))
             #Suggest walking if it is car/bus/train and distance less than 1
             try:
                 message = "Try walking/biking from " + return_address_from_location(start_lon + "," + start_lat) + \

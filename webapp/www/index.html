@@ -90,13 +90,12 @@
           <div class="col-md-8 mx-auto">
             <h2 class="section-heading"><strong>TWO STEP PROCESS</strong></h2>
             <h3><strong>Step 1: Download the app.</strong></h3>
-            <h4><strong><font color="red">COME BACK TO THIS PAGE IMMEDIATELY AFTER INSTALLATION</font><strong></h4>
             <div class="badges">
-              <a class="badge-link" href="https://play.google.com/store/apps/details?id=edu.berkeley.eecs.emission"><img src="img/google-play-badge.svg" alt=""></a>
-              <a class="badge-link" href="https://itunes.apple.com/us/app/emission/id1084198445?&mt=8"><img src="img/app-store-badge.svg" alt=""></a>
+              <a class="badge-link" target="_blank" href="https://play.google.com/store/apps/details?id=edu.berkeley.eecs.embase"><img src="img/google-play-badge.svg" alt=""></a>
+              <a class="badge-link" target="_blank" href="https://itunes.apple.com/us/app/emtriplog/id1362434685?mt=8"><img src="img/app-store-badge.svg" alt=""></a>
             </div>
             <p> </p>
-            <p>Welcome back! ... and scroll down!</p>
+            <img src="img/downarrow.png" height="80" width="110">
           </div>
         </div>
       </div>
@@ -107,7 +106,9 @@
         <div class="container">
           <h2>STEP 2: <br><font size="6.5">CLICK AFTER DOWNLOADING</font></br></h2>
           <a href="#download" id="groupLink" class="btn btn-outline btn-xxl js-scroll-trigger">CLICK to join the study!</a>
-          <h4><br><font color="white">Note that this button will only work on your mobile device!</font></br></h4>
+          <h4><br><font color="white">Note: the button will only work on your mobile device!</font></br></h4>
+          <h3><br><font color="white">OR: Scan QR Code here from EmTripLog App:</br></h3>
+          <canvas xmlns="http://www.w3.org/1999/xhtml" id="qrcode-canvas" style="" width="232" height="232" ></canvas>
           <div style="display:flex; flex-direction: row; flex-wrap: wrap; justify-content: center">
             <img src="img/motion.png" height="125" width="145">
             <img src="img/notification.png" height="125" width="145">
@@ -135,10 +136,10 @@
       <section id="footer">
         <div style="display: flex; flex-direction: row; justify-content: center; width: 100%;">
           <a href="https://www.facebook.com/CalTripAware/" target="_top">
-            <img style="height: 64px; width:64px; margin: 0px 10px;" src="/img/facebook-logo.png">
+            <img style="height: 64px; width:64px; margin: 0px 10px;" src="img/facebook-logo.png">
           </a>
           <a href="https://twitter.com/TripAware" target="_top">
-            <img style="height: 64px; width:64px; margin: 0px 10px;" src="/img/twitter-logo.png">
+            <img style="height: 64px; width:64px; margin: 0px 10px;" src="img/twitter-logo.png">
           </a>
         </div>
       </section>
@@ -153,6 +154,8 @@
 
     <!-- Custom scripts for this template -->
     <script src="js/new-age.js"></script>
+    <script src="js/qrcodegen.js"></script>
+
 
   </body>
 

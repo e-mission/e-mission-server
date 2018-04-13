@@ -45,11 +45,14 @@ window.onload = init;
 function init(){
   var link = document.getElementById("groupLink");
   var image = document.getElementById("phone");
+  var QRC = qrcodegen.QrCode;
+  var qr0 = QRC.encodeText("Hello, world!", QRC.Ecc.MEDIUM);
+  var canvas = document.getElementById("qrcode-canvas");
+  canvas.style.display = "none";
   var myrandom = Math.floor(Math.random() * 3) + 1;
   if (myrandom == 1) {
     link.href = "emission://change_client?new_client=urap2017information&clear_local_storage=true&clear_usercache=true"
     image.src = "img/information.jpg"
-
   }
   else if (myrandom == 2) {
     link.href = "emission://change_client?new_client=urap2017emotion&clear_local_storage=true&clear_usercache=true"
@@ -58,4 +61,7 @@ function init(){
     link.href = "emission://change_client?new_client=urap2017control&clear_local_storage=true&clear_usercache=true"
     image.src = "img/control.jpg"
   }
+  qr0 = QRC.encodeText(link.href, QRC.Ecc.MEDIUM);
+  qr0.drawCanvas(4, 1, canvas);
+  canvas.style.removeProperty("display");
 }
