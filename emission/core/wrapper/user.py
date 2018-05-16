@@ -327,7 +327,6 @@ class User(object):
     if cs_df.shape[0] <= 0:
       return None
     carbon_val = User.computeFootprint(cs_df[["sensed_mode", "distance"]])
-    penalty_val = User.computePenalty(cs_df[["sensed_mode", "distance"]]) # Mappings in emission/core/wrapper/motionactivity.py
     dist_travelled = cs_df["distance"].sum()
 
     if dist_travelled > 0:
@@ -387,44 +386,31 @@ class User(object):
         if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:
             """
         if motiontype == 5: #car
-            total_footprint += fp_car * m_to_km(distance)
+            total_footprint += fp_car * computePenalty(motiontype, m_to_km(distance))
         elif motiontype == 4: #train
-            total_footprint += fp_train * m_to_km(distance)
+            total_footprint += fp_train * computePenalty(motiontype, m_to_km(distance))
         elif motiontype == 3: #bus
-            total_footprint += fp_bus * m_to_km(distance)
+            total_footprint += fp_bus * computePenalty(motiontype, m_to_km(distance))
     return total_footprint
 
   @staticmethod
-  def computePenalty(penalty_df):
+  def computePenalty(motiontype, distance):
     """
     Linear penalty functions are created depending on
-    transportation mode:
-    car: 50 mile threshold, penalty = 50 - distance
-    bus: 25 mile threshold, penalty = 25 - distance
-
-    If unknown (sensed mode = 4), don't compute anything for now.
-
-    penalty_df: [[trip1mode, distance], [trip2mode, distance], ...]
-
+    transportation mode
     """
-    total_penalty = 0
-    fp_train = 92.0/1609.0
-    fp_car = 287.0/1609.0
-    fp_bus = 3/4 * fp_car
-    for index, row in penalty_df.iterrows():
-      motiontype = int(row['sensed_mode'])
-      """
-      if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:"""
-      if motiontype == 5: #car
-        total_penalty += fp_car * max(0, mil_to_km(50) - m_to_km(row['distance']))
-        total_penalty -= m_to_km(row['distance']) * fp_car
-      elif motiontype == 3: #bus
-        total_penalty += fp_bus * max(0, mil_to_km(25) - m_to_km(row['distance']))
-        total_penalty -= m_to_km(row['distance']) * fp_bus
-      elif motiontype == 4: #train
-        total_penalty += fp_train * max(0, mil_to_km(37.5) - m_to_km(row['distance']))
-        total_penalty -= m_to_km(row['distance']) * fp_train
-    return total_penalty
+    if motiontype == 5: #car
+        if distance < 50:
+            return distance
+        return max(50/distance, 0.5*distance)
+    elif motiontype == 3: #bus
+        if distance < 25:
+            return distance
+        return max(25/distance, 0.5*distance)
+    elif motiontype == 4: #train
+        if distance < 37.5
+            return distance
+        return max(37.5/distance, 0.5*distance)
 
 
 
