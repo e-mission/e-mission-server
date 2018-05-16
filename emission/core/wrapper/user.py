@@ -402,15 +402,15 @@ class User(object):
     if motiontype == 5: #car
         if distance < 50:
             return distance
-        return max(50/distance, 0.5) * distance
+        return max(-(1/(2*50))*distance + 3/2, 0.5) * distance
     elif motiontype == 3: #bus
         if distance < 25:
             return distance
-        return max(25/distance, 0.5) * distance
+        return max(-(1/(2*25))*distance + 3/2, 0.5) * distance
     elif motiontype == 4: #train
         if distance < 37.5
             return distance
-        return max(37.5/distance, 0.5) * distance
+        return max(-(1/(2*37.5))*distance + 3/2, 0.5) * distance
 
 
 
