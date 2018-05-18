@@ -386,11 +386,11 @@ class User(object):
         if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:
             """
         if motiontype == 5: #car
-            total_footprint += fp_car * computePenalty(motiontype, m_to_km(distance))
+            total_footprint += fp_car * User.computePenalty(motiontype, m_to_km(distance))
         elif motiontype == 4: #train
-            total_footprint += fp_train * computePenalty(motiontype, m_to_km(distance))
+            total_footprint += fp_train * User.computePenalty(motiontype, m_to_km(distance))
         elif motiontype == 3: #bus
-            total_footprint += fp_bus * computePenalty(motiontype, m_to_km(distance))
+            total_footprint += fp_bus * User.computePenalty(motiontype, m_to_km(distance))
     return total_footprint
 
   @staticmethod
