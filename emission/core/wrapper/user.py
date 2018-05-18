@@ -330,7 +330,7 @@ class User(object):
     dist_travelled = cs_df["distance"].sum()
 
     if dist_travelled > 0:
-      return (carbon_val + penalty_val) / dist_travelled
+      return carbon_val / dist_travelled
     # Do not include no distance traveled users in the tier system.
     return None
 
