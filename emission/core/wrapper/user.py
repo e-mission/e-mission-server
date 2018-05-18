@@ -408,7 +408,7 @@ class User(object):
             return distance
         return max(-(1/(2*25))*distance + 3/2, 0.5) * distance
     elif motiontype == 4: #train
-        if distance < 37.5
+        if distance < 37.5:
             return distance
         return max(-(1/(2*37.5))*distance + 3/2, 0.5) * distance
 
