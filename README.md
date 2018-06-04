@@ -57,7 +57,7 @@ is as simple as pulling new changes.
   ```
 
 ## Dependencies: ##
--------------------
+			-------------------
 
 ### Database: ###
 1. Install [Mongodb](http://www.mongodb.org/)

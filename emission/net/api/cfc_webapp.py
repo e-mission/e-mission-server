@@ -17,6 +17,7 @@ import sys
 import os
 import logging
 import logging.config
+import platform
 
 from datetime import datetime
 import time
@@ -442,6 +443,9 @@ def getUUID(request, inHeader=False):
 # Auth helpers END
 
 if __name__ == '__main__':
+    if platform.system == 'Windows':
+        webserver_log_config = json.load(open("conf/log/webserver.conf.sample.windows", "r"))
+
     try:
         webserver_log_config = json.load(open("conf/log/webserver.conf", "r"))
     except:
