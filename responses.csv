@@ -1,43 +1,42 @@
-Timestamp,"Your Unique User Identifier (Automatically Filled, please don't edit)",What is your age? (Not eligible if under 18),How long are you willing to walk every day?,How long are you willing to bike every day?,Please select your household income bracket before taxes: (per year),Rate your level of fluency in English,Rate how rushed/stressed you feel before traveling,Do you feel that public transportation is easily accessible for your commutes?,Do you feel that walking/biking or other alternative transportation methods are easily accessible for your commutes?,How did you hear about this study?,How sustainable do you think your current transportation methods are?,How much of a concern is transportation sustainability to you?
-3/8/2018 19:58:00,6e1e8adce7854e578cc2962f8bc02fc3,50+,31-60 minutes,<10 minutes,"$100,001 - $200,000",3,4,No,Yes,Recruiting Talk,4,5
-3/8/2018 20:03:31,420d4587e6b540a0bfd5b5ac2901aa77,50+,31-60 minutes,31-60 minutes,"$100,001 - $200,000",3,2,No,Yes,Recruiting Talk,4,5
-3/9/2018 9:41:03,8962422171504c6d99d46adc436cd93c,31-50,10-30 minutes,61+ minutes,"$200,001 +",3,1,Yes,Yes,Recruiting Talk,5,5
-3/9/2018 11:41:10,28e0571a19be4989a33e6b6a9d75fcfe,50+,61+ minutes,Decline to State,"$100,001 - $200,000",3,3,No,Yes,Recruiting Talk,4,5
-3/9/2018 13:11:22,9b6ea38737644e4b8216b0b46a52e520,18-30,31-60 minutes,31-60 minutes,"< $50,000",3,4,No,Yes,Recruiting Talk,5,4
-3/12/2018 13:24:47,035633ef0ba64da88f70102f15332e53,18-30,31-60 minutes,I don't have a bike,"$50,001 - $100,000",3,4,Yes,Yes,Friend/Family Member,5,3
-3/12/2018 13:25:23,f1e0716b5d514a4685717225ea4b3f3e,18-30,61+ minutes,I don't have a bike,"$200,001 +",3,3,Yes,Yes,Friend/Family Member,3,4
-3/12/2018 13:25:26,e379fe208b7c47f6a7f3eee98e89861c,18-30,31-60 minutes,<10 minutes,Decline to State,3,4,Yes,Yes,Decline to State,4,4
-3/12/2018 13:26:03,d554a772f144476ead864a470a36b48a,18-30,61+ minutes,I don't have a bike,Decline to State,3,3,Yes,Yes,Recruiting Talk,4,4
-3/12/2018 13:26:08,53c65322d6494de2ba5292e075dc30c7,18-30,31-60 minutes,I don't have a bike,"< $50,000",3,4,Yes,Yes,Recruiting Talk,4,4
-3/12/2018 16:06:53,a8df5775396e4af2928b2e3056978afa,18-30,31-60 minutes,10-30 minutes,"< $50,000",3,3,Yes,Yes,Recruiting Talk,5,4
-3/12/2018 16:08:40,132f89561b864e178930b5ae1142eb5e,31-50,10-30 minutes,31-60 minutes,"< $50,000",3,5,Yes,Yes,Recruiting Talk,5,5
-3/12/2018 19:36:49,405879cad11447b190cfdc0ba5cddcd7,18-30,31-60 minutes,<10 minutes,"< $50,000",3,3,Yes,Yes,Recruiting Talk,5,4
-3/12/2018 20:18:01,be8a01120f9b4747abbf6cc91f76dd77,31-50,10-30 minutes,10-30 minutes,"< $50,000",3,2,Yes,Yes,Recruiting Talk,5,4
-3/12/2018 20:35:16,39a4c030980445209e2e46e99f558f47,18-30,61+ minutes,<10 minutes,"< $50,000",3,2,Decline to State,Yes,Friend/Family Member,4,5
-3/15/2018 13:00:30,c1c5c858341f4d4a9bc5e9fd061ee92c,18-30,61+ minutes,31-60 minutes,"< $50,000",3,3,Yes,Yes,Recruiting Talk,5,5
-3/15/2018 18:53:25,422e97caa3f14133bcd5afb3c86fd617,18-30,31-60 minutes,<10 minutes,"< $50,000",2,2,No,No,Recruiting Talk,5,4
-3/18/2018 17:33:16,e5da7ded2be14f9993a1c91af8607687,18-30,61+ minutes,31-60 minutes,"< $50,000",3,4,Yes,No,Friend/Family Member,4,3
-3/19/2018 13:41:57,b4a26ca075644125a238b88ca26253a5,18-30,10-30 minutes,I don't have a bike,"$200,001 +",3,1,Yes,Yes,Recruiting Talk,3,3
-3/19/2018 13:43:55,1ba7287a2cae4e4ea1f4a7a626985c3a,18-30,31-60 minutes,<10 minutes,"$50,001 - $100,000",3,3,Yes,No,Recruiting Talk,4,4
-3/19/2018 13:45:56,72506ba2f78f4d80a8f4afd6423adcaf,18-30,31-60 minutes,31-60 minutes,"$100,001 - $200,000",3,3,Yes,Yes,Decline to State,5,2
-3/20/2018 21:52:55,f8ac6263e14541bea12cabe6639cd333,18-30,10-30 minutes,10-30 minutes,"< $50,000",3,3,No,No,Friend/Family Member,3,4
-3/22/2018 0:36:04,e5da7ded2be14f9993a1c91af8607687,31-50,10-30 minutes,31-60 minutes,"$100,001 - $200,000",3,4,No,Yes,Recruiting Talk,4,3
-3/22/2018 17:00:45,ae1df73cb79a4e9b9c9dbb4e07fc320c,18-30,61+ minutes,I don't have a bike,"< $50,000",3,2,Yes,Yes,Decline to State,5,4
-4/2/2018 20:23:56,b7b83baecf4e4f14b29236065681ff47,18-30,31-60 minutes,31-60 minutes,"$200,001 +",3,3,No,Yes,Friend/Family Member,4,5
-4/6/2018 15:51:16,97af58e3816f4c11acb123f60581fded,50+,31-60 minutes,<10 minutes,"$200,001 +",3,3,Yes,Yes,Friend/Family Member,4,3
-4/7/2018 22:12:42,6d2294873feb41b393cedeb798a90129,18-30,<10 minutes,I don't have a bike,"< $50,000",3,3,No,No,Facebook Post,3,4
-4/9/2018 10:47:45,0db72877da7f4241a930eac15beb1b0f,31-50,31-60 minutes,10-30 minutes,"$100,001 - $200,000",3,3,Yes,Yes,Friend/Family Member,5,5
-4/17/2018 4:35:16,744615d2a3854ef5ba8eb599dda59c40,31-50,10-30 minutes,I don't have a bike,"$50,001 - $100,000",2,3,No,No,Friend/Family Member,2,4
-4/17/2018 19:47:00,e379fe208b7c47f6a7f3eee98e89861c,18-30,31-60 minutes,I don't have a bike,Decline to State,3,4,Yes,Yes,Decline to State,4,4
-4/18/2018 20:27:42,97881c69aee5411c923f4d553c90c932,31-50,61+ minutes,I don't have a bike,"$100,001 - $200,000",3,3,Yes,No,Friend/Family Member,3,4
-4/19/2018 9:15:56,030720d48cb84bdc97569bb14532ae05,31-50,31-60 minutes,10-30 minutes,"$200,001 +",3,5,No,No,Friend/Family Member,4,4
-4/20/2018 0:24:31,055243d732714081994985a548c7eb8c,18-30,10-30 minutes,10-30 minutes,Decline to State,3,2,Yes,Yes,Friend/Family Member,5,4
-4/20/2018 1:18:08,51d3f24be7064fc4915661da49170610,18-30,61+ minutes,I don't have a bike,"$200,001 +",3,1,Yes,Yes,Friend/Family Member,5,3
-4/20/2018 3:04:42,8e1e30797f174357a0049de2b2f18b9f,18-30,61+ minutes,31-60 minutes,"$100,001 - $200,000",3,2,No,Yes,Friend/Family Member,3,3
-4/20/2018 13:24:17,797cb89bef9f41caaad63fa77c80ca44,50+,61+ minutes,10-30 minutes,"$100,001 - $200,000",3,3,No,No,Friend/Family Member,4,5
-4/20/2018 15:24:35,b67371bb75ab454899b73acc1b4a1c60,Decline to State,Decline to State,Decline to State,Decline to State,,,Decline to State,Decline to State,Decline to State,,
-4/24/2018 9:36:57,030720d48cb84bdc97569bb14532ae05,31-50,31-60 minutes,10-30 minutes,"$200,001 +",3,5,No,No,Friend/Family Member,4,4
-4/26/2018 9:54:30,797cb89bef9f41caaad63fa77c80ca44,50+,31-60 minutes,10-30 minutes,"$100,001 - $200,000",3,3,No,No,Friend/Family Member,3,5
-4/27/2018 15:17:24,c3335c9628424f569e290d26479d25ea,18-30,31-60 minutes,10-30 minutes,"$50,001 - $100,000",2,3,No,Yes,Friend/Family Member,4,4
-4/28/2018 11:17:02,27a1a18343c14e08b2e6e7bb082cc69b,18-30,31-60 minutes,61+ minutes,"< $50,000",3,4,Yes,Yes,Friend/Family Member,4,4
-4/30/2018 19:03:28,4be6c93a41f749b1b4a95d8e7f8e474c,31-50,<10 minutes,<10 minutes,"$200,001 +",3,2,Yes,Yes,Friend/Family Member,3,5
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
+,
