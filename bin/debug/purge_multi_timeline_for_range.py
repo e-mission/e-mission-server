@@ -43,6 +43,9 @@ if __name__ == '__main__':
     psdb = edb.get_pipeline_state_db()
 
     for i, filename in enumerate(sel_file_list):
+        if "pipelinestate" in filename:
+            continue
+
         logging.info("=" * 50)
         logging.info("Deleting data from file %s" % filename)
 

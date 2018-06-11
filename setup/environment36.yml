@@ -196,6 +196,7 @@ dependencies:
   - google-auth==1.2.1
   - ipython-genutils==0.2.0
   - jaraco.classes==1.4.3
+  - jsonpickle==0.9.5
   - jupyter-client==5.0.1
   - jupyter-console==5.1.0
   - jupyter-core==4.3.0

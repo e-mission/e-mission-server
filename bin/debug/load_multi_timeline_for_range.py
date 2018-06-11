@@ -51,8 +51,10 @@ def load_pipeline_states(file_prefix, all_uuid_list):
         pipeline_filename = "%s_pipelinestate_%s.gz" % (file_prefix, curr_uuid)
         print("Loading pipeline state for %s from %s" % 
             (curr_uuid, pipeline_filename))
-        with gzip.open(filename) as gfd:
+        with gzip.open(pipeline_filename) as gfd:
             states = json.load(gfd, object_hook = bju.object_hook)
+            if args.verbose:
+                logging.debug("Loading states of length %s" % len(states))
             edb.get_pipeline_state_db().insert_many(states)
 
 def post_check(unique_user_list, all_rerun_list):

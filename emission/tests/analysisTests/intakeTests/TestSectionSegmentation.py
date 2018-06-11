@@ -12,6 +12,7 @@ import logging
 import json
 import bson.json_util as bju
 import uuid
+import os
 
 # Our imports
 import emission.core.get_database as edb
@@ -40,6 +41,9 @@ import emission.tests.common as etc
 
 class TestSectionSegmentation(unittest.TestCase):
     def setUp(self):
+        self.analysis_conf_path = \
+            etc.set_analysis_config("intake.cleaning.filter_accuracy.enable", True)
+
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
         self.androidUUID = self.testUUID
         eaicf.filter_accuracy(self.androidUUID)
@@ -52,6 +56,7 @@ class TestSectionSegmentation(unittest.TestCase):
 
     def tearDown(self):
         self.clearRelatedDb()
+        os.remove(self.analysis_conf_path)
 
     def clearRelatedDb(self):
         edb.get_timeseries_db().remove({"user_id": self.androidUUID})
