@@ -38,3 +38,19 @@ After completing analysis, tear down
 ```
 $ source teardown.sh
 ```
+
+### Checking in notebooks
+
+Note that all notebooks checked in here are completely public. All results included in them can be viewed by anybody, even malicious users. 
+Therefore, you need to split your analysis into two groups:
+- *aggregate only*: results are not specific for a single user. The scripts in such notebooks should not include uuids, and should use the aggregate timeseries instead of the default timeseries.
+   - example: number of walking and biking trips over all users in the control group
+- *individual analyses*: results are specific for a single user. The scripts in such notebooks can include uuids, and potentially even user emails or tokens.
+   - example: varation in walking and biking trips over time for user `uuid1`
+
+Notebooks that include aggregate analyses can be checked in with outputs included. This is because it is hard to tease out the contributions by individuals to the aggregate statistics, and so the chances of leaking information are low. However, notebooks that include individual analyses should be checked in after deleting all outputs (Kernel -> Restart and clear output).
+
+|              | Aggregate results | Individual results |
+|--------------|--------------|--------------|
+| with outputs |     Y        |     **N**    |
+| after clearing outputs | Y  |     Y        | 
