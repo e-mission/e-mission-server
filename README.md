@@ -60,9 +60,9 @@ is as simple as pulling new changes.
 -------------------
 
 ### Database: ###
-1. Install [Mongodb](http://www.mongodb.org/)
+1. Install [Mongodb](http://www.mongodb.org/), version 3.4
   2. *Windows*: mongodb appears to be installed as a service on Windows devices and it starts automatically on reboot
-  3. *OSX*: You want to install homebrew and then use homebrew to install mongodb. Follow these instruction on how to do so ---> (http://docs.mongodb.org/manual/tutorial/install-mongodb-on-os-x/)
+  3. *OSX*: You want to install homebrew and then use homebrew to install mongodb. Follow these instruction on how to do so ---> (https://docs.mongodb.com/v3.4/tutorial/install-mongodb-on-ubuntu/)
   4. *Ubuntu*: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
 
 2. Start it at the default port
@@ -127,7 +127,7 @@ environment within anaconda to avoid conflicts with other applications.
   ```
 
 ### Javascript dependencies ###
-Run "bower install" instead if you are prompted password for 'https://github.com' after running "bower update".
+Tip: Run "bower install" instead if you are prompted password for 'https://github.com' after running "bower update".
 
     $ cd webapp
     $ bower update
