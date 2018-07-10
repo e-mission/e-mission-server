@@ -127,6 +127,9 @@ environment within anaconda to avoid conflicts with other applications.
   ```
 
 ### Javascript dependencies ###
+
+Note: It is required only if the user needs a  web interface for the server. Otherwise one can do without it as well.
+
 Tip: Run "bower install" instead if you are prompted password for 'https://github.com' after running "bower update".
 
     $ cd webapp
