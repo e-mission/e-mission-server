@@ -132,6 +132,8 @@ Tip: Run "bower install" instead if you are prompted password for 'https://githu
     $ cd webapp
     $ bower update
 
+Note: It is required only if the user needs a  web interface for the server. Otherwise one can do without it as well.
+
 ## Development: ##
 -------------------
 In order to test out changes to the webapp, you should make the changes locally, test them and then push. Then, deployment is as simple as pulling from the repo to the real server and changing the config files slightly.
