@@ -23,6 +23,12 @@ preprocessing results ensures reasonable performance.
 
 The installation instructions below are generally targeted towards OSX and \*nix shells such as bash. If you want to use Windows, we recomend using PowerShell (https://technet.microsoft.com/en-us/scriptcenter/dd742419), which provides similarly rich commands. If you really want to use the Command Prompt, most commands should work, but you may need to convert `/` -> `\` to make the commands work.
 
+## Additional Documentation: ##
+----------
+Additional documentation has been moved to their own repository [e-mission-docs](https://github.com/e-mission/e-mission-docs). E-mission server specific additional documentation can be found here:
+https://github.com/e-mission/e-mission-docs/tree/master/docs/e-mission-server
+
+
 ## Install/update: ##
 -------------------
 
@@ -381,8 +387,3 @@ So I have moved it to the e-mission-server section in the e-mission-docs repo:
 https://github.com/e-mission/e-mission-docs/blob/master/docs/e-mission-server/deploying_your_own_server_to_production.md
 
 [Python_Structure]: https://raw.github.com/amplab/e-mission-server/master/figs/e-mission-server-module-structure.png
-
-## Wiki: ##
-----------
-All wikis have been moved to their own repository [e-mission-docs](https://github.com/e-mission/e-mission-docs). E-mission server specific wikis can be found here:
-https://github.com/e-mission/e-mission-docs/tree/master/docs/e-mission-server
