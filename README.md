@@ -25,7 +25,7 @@ The installation instructions below are generally targeted towards OSX and \*nix
 
 ## Additional Documentation: ##
 ----------
-Additional documentation has been moved to their own repository [e-mission-docs](https://github.com/e-mission/e-mission-docs). E-mission server specific additional documentation can be found here:
+Additional documentation has been moved to its own repository [e-mission-docs](https://github.com/e-mission/e-mission-docs). Specific e-mission-server additional documentation can be found here:
 https://github.com/e-mission/e-mission-docs/tree/master/docs/e-mission-server
 
 
