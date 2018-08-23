@@ -23,6 +23,12 @@ preprocessing results ensures reasonable performance.
 
 The installation instructions below are generally targeted towards OSX and \*nix shells such as bash. If you want to use Windows, we recomend using PowerShell (https://technet.microsoft.com/en-us/scriptcenter/dd742419), which provides similarly rich commands. If you really want to use the Command Prompt, most commands should work, but you may need to convert `/` -> `\` to make the commands work.
 
+## Additional Documentation: ##
+----------
+Additional documentation has been moved to its own repository [e-mission-docs](https://github.com/e-mission/e-mission-docs). Specific e-mission-server additional documentation can be found here:
+https://github.com/e-mission/e-mission-docs/tree/master/docs/e-mission-server
+
+
 ## Install/update: ##
 -------------------
 
@@ -225,7 +231,7 @@ $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py -n /tmp/data-c
 #### Other data sources ####
 1. Get your own data. You can export your timeline for a particular day via email (Profile -> Download json dump) and then load and view it as above.
 
-1. Request access to anonymized data for research purposes by sending email to @shankari. You will be asked to consent to data retention and usage policies and will get an encrypted timeline with data from multiple users, one file per user. More information is at https://github.com/e-mission/e-mission-server/wiki/Requesting-data-as-a-collaborator
+1. Request access to anonymized data for research purposes by sending email to @shankari. You will be asked to consent to data retention and usage policies and will get an encrypted timeline with data from multiple users, one file per user. More information is at https://github.com/e-mission/e-mission-docs/blob/master/docs/e-mission-server/requesting_data_as_a_collaborator.md
    
 1. Sample timeline data from the test phones can be retrieved using the `bin/public/request_public_data.py` script. You can see the inputs to pass to the script by using
    ```
@@ -377,7 +383,7 @@ bower.
 ## Deployment: ##
 ----------
 This is fairly complex and is under active change as we have more projects deploy their own servers with various configurations.
-So I have moved it to its own wiki page:
-https://github.com/e-mission/e-mission-server/wiki/Deploying-your-own-server-to-production
+So I have moved it to the e-mission-server section in the e-mission-docs repo:
+https://github.com/e-mission/e-mission-docs/blob/master/docs/e-mission-server/deploying_your_own_server_to_production.md
 
 [Python_Structure]: https://raw.github.com/amplab/e-mission-server/master/figs/e-mission-server-module-structure.png
