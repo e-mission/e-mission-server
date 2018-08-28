@@ -120,6 +120,6 @@ if __name__ == '__main__':
         uuid_list = esdu.get_all_uuids()
     elif args.file:
         with open(args.file) as fd:
-            uuid_strs = json.load(fd)
-            uuid_list = [uuid.UUID(ustr) for ustr in uuid_strs]
+            uuid_entries = json.load(fd, object_hook=bju.object_hook)
+            uuid_list = [ue["uuid"] for ue in uuid_entries]
     export_timeline_for_users(uuid_list, args)

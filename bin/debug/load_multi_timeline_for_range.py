@@ -35,8 +35,22 @@ def register_fake_users(prefix, unique_user_list):
         username = (format_string % i)
         if args.verbose is not None and i % args.verbose == 0:
             logging.info("About to insert mapping %s -> %s" % (username, uuid))
-        # Let's register and then update instead of manipulating the database directly
-        # Alternatively, we can refactor register to pass in the uuid as well
+        user = ecwu.User.registerWithUUID(username, uuid)
+
+def register_mapped_users(mapfile, unique_user_list):
+    uuid_entries = json.load(open(mapfile), object_hook=bju.object_hook)
+    logging.info("Creating user entries for %d users from map of length %d" % (len(unique_user_list), len(mapfile)))
+
+    lookup_map = dict([(eu["uuid"], eu) for eu in uuid_entries])
+
+    for i, uuid in enumerate(unique_user_list):
+        username = lookup_map[uuid]["user_email"]
+        # TODO: Figure out whether we should insert the entry directly or
+        # register this way
+        # Pro: will do everything that register does, including creating the profile
+        # Con: will insert only username and uuid - id and update_ts will be different
+        if args.verbose is not None and i % args.verbose == 0:
+            logging.info("About to insert mapping %s -> %s" % (username, uuid))
         user = ecwu.User.registerWithUUID(username, uuid)
 
 def get_load_ranges(entries):
@@ -55,7 +69,10 @@ def load_pipeline_states(file_prefix, all_uuid_list):
             states = json.load(gfd, object_hook = bju.object_hook)
             if args.verbose:
                 logging.debug("Loading states of length %s" % len(states))
-            edb.get_pipeline_state_db().insert_many(states)
+            if len(states) > 0:
+                edb.get_pipeline_state_db().insert_many(states)
+            else:
+                logging.info("No pipeline states found, skipping load")
 
 def post_check(unique_user_list, all_rerun_list):
     import emission.core.get_database as edb
@@ -96,8 +113,11 @@ if __name__ == '__main__':
     parser.add_argument("-s", "--batch-size", default=10000, type=int,
         help="batch size to use for the entries")
 
-    parser.add_argument("-p", "--prefix", default="user",
+    group = parser.add_mutually_exclusive_group(required=False)
+    group.add_argument("-p", "--prefix", default="user",
         help="prefix for the automatically generated usernames. usernames will be <prefix>-001, <prefix>-002...")
+    group.add_argument("-m", "--mapfile",
+        help="file containing email <-> uuid mapping for the uuids in the dump")
 
     args = parser.parse_args()
     if args.debug:
@@ -144,6 +164,10 @@ if __name__ == '__main__':
     unique_user_list = set(all_user_list)
     if not args.info_only:
         load_pipeline_states(args.file_prefix, unique_user_list)
-        register_fake_users(args.prefix, unique_user_list)
+        print("args.prefix = %s, args.mapfile = %s" % (args.prefix, args.mapfile))
+        if args.mapfile is not None:
+            register_mapped_users(args.mapfile, unique_user_list)
+        elif args.prefix is not None:
+            register_fake_users(args.prefix, unique_user_list)
        
     post_check(unique_user_list, all_rerun_list) 
