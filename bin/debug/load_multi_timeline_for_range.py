@@ -164,7 +164,6 @@ if __name__ == '__main__':
     unique_user_list = set(all_user_list)
     if not args.info_only:
         load_pipeline_states(args.file_prefix, unique_user_list)
-        print("args.prefix = %s, args.mapfile = %s" % (args.prefix, args.mapfile))
         if args.mapfile is not None:
             register_mapped_users(args.mapfile, unique_user_list)
         elif args.prefix is not None:
