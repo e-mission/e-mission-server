@@ -20,6 +20,8 @@ ts_enum_map = {
     esta.EntryType.ANALYSIS_TYPE: edb.get_analysis_timeseries_db()
 }
 
+INVALID_QUERY = {'1': '2'}
+
 class BuiltinTimeSeries(esta.TimeSeries):
     def __init__(self, user_id):
         super(BuiltinTimeSeries, self).__init__(user_id)
@@ -198,6 +200,8 @@ class BuiltinTimeSeries(esta.TimeSeries):
                                                                  geo_query,
                                                                  extra_query_list,
                                                                  sort_key)
+        logging.debug("orig_ts_db_matches = %s, analysis_ts_db_matches = %s" %
+            (orig_ts_db_result.count(), analysis_ts_db_result.count()))
         return itertools.chain(orig_ts_db_result, analysis_ts_db_result)
 
     def _get_entries_for_timeseries(self, tsdb, key_list, time_query, geo_query,
@@ -223,9 +227,9 @@ class BuiltinTimeSeries(esta.TimeSeries):
             # Out[593]: 449869
             ts_db_result.limit(25 * 10000)
         else:
-            ts_db_result = [].__iter__()
+            ts_db_result = tsdb.find(INVALID_QUERY)
 
-        logging.debug("finished querying values for %s" % key_list)
+        logging.debug("finished querying values for %s, count = %d" % (key_list, ts_db_result.count()))
         return ts_db_result
 
     def get_entry_at_ts(self, key, ts_key, ts):
