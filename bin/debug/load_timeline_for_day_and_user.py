@@ -7,7 +7,7 @@ standard_library.install_aliases()
 from builtins import *
 import json
 import bson.json_util as bju
-import emission.core.get_database as edb
+import emission.storage.timeseries.cache_series as estcs
 import argparse
 import emission.core.wrapper.user as ecwu
 
@@ -28,28 +28,19 @@ if __name__ == '__main__':
     fn = args.timeline_filename
     print(fn)
     print("Loading file " + fn)
-    tsdb = edb.get_timeseries_db()
-    ucdb = edb.get_usercache_db()
     user = ecwu.User.register(args.user_email)
     override_uuid = user.uuid
     print("After registration, %s -> %s" % (args.user_email, override_uuid))
     entries = json.load(open(fn), object_hook = bju.object_hook)
-    tsdb_count = 0
-    ucdb_count = 0
+    munged_entries = []
     for i, entry in enumerate(entries):
         entry["user_id"] = override_uuid
         if not args.retain:
             del entry["_id"]
         if args.verbose is not None and i % args.verbose == 0:
             print("About to save %s" % entry)
-        if "write_fmt_time" in entry["metadata"]:
-            # write_fmt_time is filled in only during the formatting process
-            # so if write_fmt_time exists, it must be in the timeseries already
-            tsdb.save(entry)
-            tsdb_count = tsdb_count + 1
-        else:
-            ucdb.save(entry)
-            ucdb_count = ucdb_count + 1
+        munged_entries.append(entry)
 
+    (tsdb_count, ucdb_count) = estcs.insert_entries(munged_entries)
     print("Finished loading %d entries into the usercache and %d entries into the timeseries" %
         (ucdb_count, tsdb_count))
