@@ -22,6 +22,7 @@ import gzip
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.core.wrapper.user as ecwu
 import emission.core.wrapper.entry as ecwe
+import emission.storage.timeseries.cache_series as estcs
 
 args = None
 
@@ -153,13 +154,12 @@ if __name__ == '__main__':
 
         load_ranges = get_load_ranges(entries)
         if not args.info_only:
-            ts = esta.TimeSeries.get_time_series(curr_uuid)
             for j, curr_range in enumerate(load_ranges):
                 if args.verbose is not None and j % args.verbose == 0:
                     logging.info("About to load range %s -> %s" % (curr_range[0], curr_range[1]))
                 wrapped_entries = [ecwe.Entry(e) for e in entries[curr_range[0]:curr_range[1]]]
-                for entry in wrapped_entries:
-                    insert_result = ts.insert(entry)
+                (tsdb_count, ucdb_count) = estcs.insert_entries(curr_uuid, wrapped_entries)
+        print("For uuid %s, finished loading %d entries into the usercache and %d entries into the timeseries" % (curr_uuid, ucdb_count, tsdb_count))
 
     unique_user_list = set(all_user_list)
     if not args.info_only:

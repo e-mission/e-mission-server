@@ -23,6 +23,7 @@ import emission.core.wrapper.user as ecwu
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.timequery as estt
 import emission.storage.decorations.user_queries as esdu
+import emission.storage.timeseries.cache_series as estcs
 
 def export_timeline(user_id, start_day_str, end_day_str, file_name):
     logging.info("Extracting timeline for user %s day %s -> %s and saving to file %s" %
@@ -37,7 +38,9 @@ def export_timeline(user_id, start_day_str, end_day_str, file_name):
 
     ts = esta.TimeSeries.get_time_series(user_id)
     loc_time_query = estt.TimeQuery("data.ts", start_day_ts, end_day_ts)
-    loc_entry_list = list(ts.find_entries(key_list=None, time_query=loc_time_query))
+    loc_entry_list = list(estcs.find_entries(user_id, key_list=None, time_query=loc_time_query))
+    ma_time_query = estt.TimeQuery("metadata.write_ts", start_day_ts, end_day_ts)
+    ma_entry_list = list(estcs.find_entries(user_id, key_list=["background/motion_activity"], time_query=ma_time_query))
     trip_time_query = estt.TimeQuery("data.start_ts", start_day_ts, end_day_ts)
     trip_entry_list = list(ts.find_entries(key_list=None, time_query=trip_time_query))
     place_time_query = estt.TimeQuery("data.enter_ts", start_day_ts, end_day_ts)
@@ -49,9 +52,9 @@ def export_timeline(user_id, start_day_str, end_day_str, file_name):
     first_place_entry_list = list(ts.find_entries(key_list=None, time_query=None, extra_query_list=[first_place_extra_query]))
     logging.info("First place entry list = %s" % first_place_entry_list)
 
-    combined_list = loc_entry_list + trip_entry_list + place_entry_list + first_place_entry_list
-    logging.info("Found %d loc entries, %d trip-like entries, %d place-like entries = %d total entries" % 
-        (len(loc_entry_list), len(trip_entry_list), len(place_entry_list), len(combined_list)))
+    combined_list = loc_entry_list + ma_entry_list + trip_entry_list + place_entry_list + first_place_entry_list
+    logging.info("Found %d loc entries, %d motion entries, %d trip-like entries, %d place-like entries = %d total entries" %
+        (len(loc_entry_list), len(ma_entry_list), len(trip_entry_list), len(place_entry_list), len(combined_list)))
 
     validate_truncation(loc_entry_list, trip_entry_list, place_entry_list)
 
