@@ -30,5 +30,7 @@ class Trip(ecwb.WrapperBase):
     nullable = []
     local_dates = ['start_local_dt', 'end_local_dt']
 
+    #TODO: Add getSimilarTrips. how do you even get trips
+
     def _populateDependencies(self):
         pass
