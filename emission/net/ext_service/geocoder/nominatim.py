@@ -4,6 +4,7 @@ from __future__ import division
 from __future__ import absolute_import
 from future import standard_library
 standard_library.install_aliases()
+import os
 from builtins import *
 from builtins import object
 import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
@@ -14,13 +15,20 @@ from emission.core.wrapper.trip_old import Coordinate
 from pygeocoder import Geocoder as pyGeo  ## We fall back on this if we have to
 
 try:
-    googlemaps_key_file = open("conf/net/ext_service/googlemaps.json")
+    script_dir = os.path.dirname(__file__)
+    rel_path = "../gmaps/googlemaps.json"
+    abs_file_path = os.path.join(script_dir, rel_path)
+    googlemaps_key_file = open(abs_file_path, 'r')
+    print('got here')
     GOOGLE_MAPS_KEY = json.load(googlemaps_key_file)["api_key"]
-except:
+except Exception as e:
     print("google maps key not configured, falling back to nominatim")
 
 try:
-    nominatim_file = open("conf/net/ext_service/nominatim.json")
+    script_dir = os.path.dirname(__file__)
+    rel_path = "nominatim.json"
+    abs_file_path = os.path.join(script_dir, rel_path)
+    nominatim_file = open(abs_file_path, 'r')
     NOMINATIM_QUERY_URL = json.load(nominatim_file)["query_url"]
 except:
     print("nominatim not configured either, place decoding must happen on the client")
@@ -51,14 +59,14 @@ class Geocoder(object):
 
     @classmethod
     def geocode(cls, address):
-        # try:
-        #     jsn = cls.get_json_geo(address)
-        #     lat = float(jsn[0]["lat"])
-        #     lon = float(jsn[0]["lon"])
-        #     return Coordinate(lat, lon)
-        # except:
-        #     print "defaulting"
-        return _do_google_geo(address) # If we fail ask the gods
+        try:
+            jsn = cls.get_json_geo(address)
+            lat = float(jsn[0]["lat"])
+            lon = float(jsn[0]["lon"])
+            return Coordinate(lat, lon)
+        except:
+            print("defaulting")
+            return _do_google_geo(address) # If we fail ask the gods
 
 
     @classmethod
