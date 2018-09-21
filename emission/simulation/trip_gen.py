@@ -37,6 +37,15 @@ class Address(object):
     def __str__(self):
         return self.text
 
+    def __eq__(self, other):
+        return (self.text.lower(), self.cord) == (other.text.lower(), self.cord)
+
+    def __lt__(self, other):
+        return (self.text.lower(), self.cord) < (other.text.lower(), other.cord)
+    
+    def __hash__(self):
+        return hash((self.text, self.cord))
+
 class Creator(object): 
 
     def __init__(self, new=False):
@@ -47,9 +56,9 @@ class Creator(object):
         self.num_trips = None
         self.radius = None
         self.amount_missed = 0
-        self.starting_counter = esmmc.Counter( )
-        self.ending_counter = esmmc.Counter( )
-        self.mode_counter = esmmc.Counter( )
+        self.starting_counter = esmmc.Counter()
+        self.ending_counter = esmmc.Counter()
+        self.mode_counter = esmmc.Counter()
         self.prog_bar = ""
 
     def set_up(self):
