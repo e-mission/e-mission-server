@@ -2,6 +2,7 @@ from __future__ import print_function
 from __future__ import division
 from __future__ import unicode_literals
 from __future__ import absolute_import
+
 ## Library to make calls to our Open Trip Planner server
 ## Hopefully similiar to googlemaps.py
 
@@ -29,6 +30,16 @@ import emission.storage.timeseries.abstract_timeseries as esta
 import emission.core.wrapper.rawtrip as ecwrt
 import emission.core.wrapper.entry as ecwe
 import emission.core.wrapper.section as ecws
+# new imports
+import emission.core.wrapper.transition as ecwt
+import emission.core.wrapper.location as ecwl
+import emission.core.wrapper.rawplace as ecwrp
+import emission.core.wrapper.stop as ecwrs
+import emission.core.wrapper.motionactivity as ecwm
+
+import emission.analysis.intake.segmentation.trip_segmentation as eaist 
+import emission.analysis.intake.segmentation.section_segmentation as eaiss
+import emission.storage.decorations.analysis_timeseries_queries as esda
 
 try:
     import json
@@ -100,39 +111,92 @@ class OTP(object):
         return trps
 
     def turn_into_new_trip(self, user_id):
-        print("new trip")
-        ts = esta.TimeSeries.get_time_series(user_id)
-        trip = ecwrt.Rawtrip()
-        sections = []
+        #TODO: This function does not work with the new data format. 
+        # The way sections are created is wrong. Look at intake pielpline to figure out 
+        # how to properly build sections
         our_json = self.get_json()
-        mode_list = set ( )
-
-
+        print("new trip")
         if "plan" not in our_json:
             print("While querying alternatives from %s to %s" % (self.start_point, self.end_point))
             print("query URL is %s" % self.make_url())
             print("Response %s does not have a plan " % our_json)
             raise PathNotFoundException(our_json['debugOutput'])
 
-        trip.start_loc = gj.Point( (float(our_json["plan"]["from"]["lat"]), float(our_json["plan"]["from"]["lon"])) ) 
-        trip.end_loc = gj.Point( (float(our_json["plan"]["to"]["lat"]), float(our_json["plan"]["to"]["lon"])) ) 
-        trip.start_local_dt = ecsdlq.get_local_date(otp_time_to_ours(
-            our_json['plan']['itineraries'][0]["startTime"]).timestamp, "UTC")
-        trip.end_local_dt = ecsdlq.get_local_date(otp_time_to_ours(
-            our_json['plan']['itineraries'][0]["endTime"]).timestamp, "UTC")
-        trip_id = ts.insert(ecwe.Entry.create_entry(user_id, "segmentation/raw_trip", trip))
+        #Initialize some values.
+        ts = esta.TimeSeries.get_time_series(user_id)
+        #Create start place entry 
+        start_place = eaist.start_new_chain(user_id)
+        start_place.source = 'Fake'
+        start_place_entry = ecwe.Entry.create_entry(user_id,
+                                "segmentation/raw_place", start_place, create_id = True)
+        #Set the start location TODO: should we save this to longterm storage.
+        trip_start_loc = create_start_location_from_trip_plan(our_json['plan'])
+        #set end location 
+        trip_end_loc = create_end_location_from_trip_plan(our_json['plan']) 
+        #Create a curr trip object
+        trip = ecwrt.Rawtrip()
+        trip.source = 'Fake'  
+        trip_entry = ecwe.Entry.create_entry(user_id,
+                            "segmentation/raw_trip", trip, create_id = True)
+        #Create end_place
+        end_place = ecwrp.Rawplace()
+        end_place.source = 'Fake' 
+        end_place_entry = ecwe.Entry.create_entry(user_id,
+                            "segmentation/raw_place", end_place, create_id = True)
+                            
+        ## Link together the start place entry, the trip entry and endplace entry 
+        eaist._link_and_save(ts, start_place_entry, trip_entry, end_place_entry, trip_start_loc, trip_end_loc)
+       # trip.start_loc = gj.Point( (float(our_json["plan"]["from"]["lon"]), float(our_json["plan"]["from"]["lat"])) ) 
+       # trip.end_loc = gj.Point( (float(our_json["plan"]["to"]["lon"]), float(our_json["plan"]["to"]["lat"]) ) ) 
+       # trip.start_local_dt = ecsdlq.get_local_date(otp_time_to_ours(
+       #     our_json['plan']['itineraries'][0]["startTime"]).timestamp, "UTC")
+       # trip.end_local_dt = ecsdlq.get_local_date(otp_time_to_ours(
+       #     our_json['plan']['itineraries'][0]["endTime"]).timestamp, "UTC")
+       # trip_id = ts.insert(ecwe.Entry.create_entry(user_id, "segmentation/raw_trip", trip))
+        prev_section_entry = None
+        for i, leg in enumerate(our_json["plan"]["itineraries"][0]['legs']):
+            #Fill section entry. TODO: break this into its own function
+            section_start_loc = create_start_location_from_leg(leg)
+            section_end_loc  = create_end_location_from_leg(leg)
 
-        for leg in our_json["plan"]["itineraries"][0]['legs']:
             section = ecws.Section()
-            section.trip_id = trip_id
-            section.start_local_dt = ecsdlq.get_local_date(otp_time_to_ours(
-                leg["startTime"]).timestamp, "UTC")
-            section.end_local_dt = ecsdlq.get_local_date(otp_time_to_ours(
-                leg["endTime"]).timestamp, "UTC")
-            section.distance = float(leg["distance"])
-            section.start_loc = gj.Point( (float(leg["from"]["lat"]), float(leg["from"]["lon"])) )
-            section.end_loc = gj.Point( (float(leg["to"]["lat"]), float(leg["to"]["lon"])) )
-            ts.insert_data(user_id, "segmentation/raw_section", section)
+            section.trip_id = trip_entry.get_id()
+            if prev_section_entry is None:
+            # This is the first point, so we want to start from the start of the trip, not the start of this segment
+                section_start_loc = trip_start_loc
+            if i == len(our_json["plan"]["itineraries"][0]['legs']) - 1:
+                # This is the last point, so we want to end at the end of the trip, not at the end of this segment
+                # Particularly in this case, if we don't do this, then the trip end may overshoot the section end
+                section_end_loc = trip_end_loc
+
+            eaiss.fill_section(section, section_start_loc, section_end_loc, opt_mode_to_motiontype(leg["mode"]) )
+            ## TODO: We need to create a secion entry first. Create section entry here
+            section_entry = ecwe.Entry.create_entry(user_id, esda.RAW_SECTION_KEY,
+                                                section, create_id=True)
+            if prev_section_entry is not None:
+            # If this is not the first section, create a stop to link the two sections together
+            # The expectation is prev_section -> stop -> curr_section
+                stop = ecwrs.Stop()
+                stop.trip_id = trip_entry.get_id()
+                stop_entry = ecwe.Entry.create_entry(user_id,
+                                                    esda.RAW_STOP_KEY,
+                                                    stop, create_id=True)
+                eaiss.stitch_together(prev_section_entry, stop_entry, section_entry)
+                ts.insert(stop_entry)
+                ts.update(prev_section_entry)
+
+            # After we go through the loop, we will be left with the last section,
+            # which does not have an ending stop. We insert that too.
+            ts.insert(section_entry)
+            prev_section_entry = section_entry
+            #section.trip_id = trip_entry.get_id()
+            #section.start_local_dt = ecsdlq.get_local_date(otp_time_to_ours(
+            #    leg["startTime"]).timestamp, "UTC")
+            #section.end_local_dt = ecsdlq.get_local_date(otp_time_to_ours(
+            #    leg["endTime"]).timestamp, "UTC")
+            #section.distance = float(leg["distance"])
+            #section.start_loc = gj.Point( (float(leg["from"]["lat"]), float(leg["from"]["lon"])) )
+            #section.end_loc = gj.Point( (float(leg["to"]["lat"]), float(leg["to"]["lon"])) )
  
     def turn_into_trip(self, _id, user_id, trip_id, is_fake=False, itinerary=0):
         sections = [ ]
@@ -198,4 +262,73 @@ class OTP(object):
 
 def otp_time_to_ours(otp_str):
     return arrow.get(old_div(int(otp_str),1000))
+
+
+def create_start_location_from_trip_plan(plan):
+    converted_time = otp_time_to_ours(plan['itineraries'][0]["startTime"])
+    time_stamp = converted_time.timestamp
+    local_dt = ecsdlq.get_local_date(time_stamp, 'UTC')
+    fmt_time = converted_time.to("UTC").format()
+    loc = gj.Point( (float(plan["from"]["lon"]), float(plan["from"]["lat"])) )
+    start_loc = ecwl.Location(
+        ts =time_stamp, 
+        local_dt =local_dt,
+        fmt_time= fmt_time,
+        loc = loc
+    )
+    return start_loc
+
+def create_end_location_from_trip_plan(plan):
+    converted_time = otp_time_to_ours(plan['itineraries'][0]["endTime"])
+    time_stamp = converted_time.timestamp
+    local_dt = ecsdlq.get_local_date(time_stamp, 'UTC')
+    fmt_time = converted_time.to("UTC").format()
+    loc = gj.Point( (float(plan["to"]["lon"]), float(plan["to"]["lat"])) )
+    end_loc = ecwl.Location(
+        ts =time_stamp, 
+        local_dt =local_dt,
+        fmt_time= fmt_time,
+        loc = loc
+    )
+    return end_loc
+
+
+def create_start_location_from_leg(leg):
+    converted_time = otp_time_to_ours(leg['startTime'])
+    time_stamp = converted_time.timestamp
+    local_dt = ecsdlq.get_local_date(time_stamp, 'UTC')
+    fmt_time = converted_time.to("UTC").format()
+    loc = gj.Point( (float(leg["from"]["lon"]), float(leg["from"]["lat"])) )
+    start_loc = ecwl.Location(
+        ts =time_stamp, 
+        local_dt =local_dt,
+        fmt_time= fmt_time,
+        loc = loc
+    )
+    return start_loc
+
+def create_end_location_from_leg(leg):
+    converted_time = otp_time_to_ours(leg['endTime'])
+    time_stamp = converted_time.timestamp
+    local_dt = ecsdlq.get_local_date(time_stamp, 'UTC')
+    fmt_time = converted_time.to("UTC").format()
+    loc = gj.Point( (float(leg["to"]["lon"]), float(leg["to"]["lat"])) )
+    end_loc = ecwl.Location(
+        ts =time_stamp, 
+        local_dt =local_dt,
+        fmt_time= fmt_time,
+        loc = loc
+    )
+    return end_loc
+
+def opt_mode_to_motiontype(opt_mode):
+    mapping = {
+        'CAR': ecwm.MotionTypes.IN_VEHICLE,
+        'RAIL': ecwm.MotionTypes.IN_VEHICLE,
+        'WALK': ecwm.MotionTypes.WALKING
+    }
+    if opt_mode in mapping.keys():
+        return mapping[opt_mode]
+    else:
+        return ecwm.MotionTypes.UNKNOWN
 
