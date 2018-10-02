@@ -144,6 +144,7 @@ def save_section_to_db(section):
 def geocode_address(address):
     if address.cord is None:
         business_geocoder = enn.Geocoder()
+        # TODO: if the geocoder fails then what?
         results = business_geocoder.geocode(address.text)
         address.cord = results
     else:
@@ -188,6 +189,7 @@ def create_fake_trips(user_name=None, new=False):
     ### This is the main function, its the only thing you need to run
     my_creator = Creator(new)
     my_creator.set_up()
+    #TODO: If we cant find coordintates for one of the addresses, tell the user. We must decide how the user shoudl enter the addresses in a meaningfull format. 
     my_creator.get_starting_ending_points()
     my_creator.make_a_to_b()
     my_creator.get_trips_from_a_to_b(user_name)
