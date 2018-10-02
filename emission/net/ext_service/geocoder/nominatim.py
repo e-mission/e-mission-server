@@ -19,7 +19,6 @@ try:
     rel_path = "../gmaps/googlemaps.json"
     abs_file_path = os.path.join(script_dir, rel_path)
     googlemaps_key_file = open(abs_file_path, 'r')
-    print('got here')
     GOOGLE_MAPS_KEY = json.load(googlemaps_key_file)["api_key"]
 except Exception as e:
     print("google maps key not configured, falling back to nominatim")
@@ -29,7 +28,8 @@ try:
     rel_path = "nominatim.json"
     abs_file_path = os.path.join(script_dir, rel_path)
     nominatim_file = open(abs_file_path, 'r')
-    NOMINATIM_QUERY_URL = json.load(nominatim_file)["query_url"]
+    nominatim_config_object = json.load(nominatim_file)
+    NOMINATIM_QUERY_URL = nominatim_config_object["query_url"]
 except:
     print("nominatim not configured either, place decoding must happen on the client")
 
@@ -45,7 +45,7 @@ class Geocoder(object):
             "format" : "json"
         }
 
-        query_url = NOMINATIM_QUERY_URL + "/search?"
+        query_url = NOMINATIM_QUERY_URL + "/search.php?"
         encoded_params = urllib.parse.urlencode(params)
         url = query_url + encoded_params
         return url
@@ -64,8 +64,10 @@ class Geocoder(object):
             lat = float(jsn[0]["lat"])
             lon = float(jsn[0]["lon"])
             return Coordinate(lat, lon)
-        except:
+        except Exception as e:
+            print(e)
             print("defaulting")
+            #TODO: Right now there is no default gecoder. Discuss if we should create a google account for this.
             return _do_google_geo(address) # If we fail ask the gods
 
 
