@@ -17,6 +17,8 @@ from past.utils import old_div
 import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse, datetime, time, random
 import geojson as gj
 import arrow
+from polyline.codec import PolylineCodec
+from geopy.distance import great_circle
 # from traffic import get_travel_time
 
 # Our imports
@@ -36,7 +38,6 @@ import emission.core.wrapper.location as ecwl
 import emission.core.wrapper.rawplace as ecwrp
 import emission.core.wrapper.stop as ecwrs
 import emission.core.wrapper.motionactivity as ecwm
-
 import emission.analysis.intake.segmentation.trip_segmentation as eaist 
 import emission.analysis.intake.segmentation.section_segmentation as eaiss
 import emission.storage.decorations.analysis_timeseries_queries as esda
@@ -109,6 +110,35 @@ class OTP(object):
         for itin in range(num_its):
             trps.append(self.turn_into_trip(_id, user_id, trip_id, False, itin))
         return trps
+    
+    def get_locations_along_route(self):
+        locations = []
+        otp_json = self.get_json()
+        self._raise_exception_if_no_plan(otp_json)
+        for i, leg in enumerate(otp_json["plan"]["itineraries"][0]['legs']):
+            #If there are points along this path 
+            if leg['legGeometry']['length'] > 0:
+                coordinates = PolylineCodec().decode(leg['legGeometry']['points'])
+                prev_coord = coordinates[0]
+                time_at_prev_coord = otp_time_to_ours(leg['startTime'])
+                velocity = get_average_velocity(int(leg['startTime']), int(leg['endTime']), float(leg['distance']))
+
+                for j, curr_coordinate in enumerate(coordinates):
+                    if j == 0:
+                        curr_timestamp = otp_time_to_ours(leg['startTime'])
+                    else:
+                        #get time stamp
+                        curr_timestamp = get_time_at_next_location(curr_coordinate, prev_coord, time_at_prev_coord, velocity)
+
+                    locations.append(create_measurement(curr_coordinate, curr_timestamp, 123))
+        return locations
+
+    def _raise_exception_if_no_plan(self, otp_json):
+        if "plan" not in otp_json:
+            print("While querying alternatives from %s to %s" % (self.start_point, self.end_point))
+            print("query URL is %s" % self.make_url())
+            print("Response %s does not have a plan " % otp_json)
+            raise PathNotFoundException(otp_json['debugOutput'])
 
     def turn_into_new_trip(self, user_id):
         #TODO: This function does not work with the new data format. 
@@ -240,6 +270,45 @@ class OTP(object):
         if is_fake:
             return Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc)
         return Alternative_Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc, 0, cost, mode_list)
+
+#####Helpers######
+def get_time_at_next_location(next_loc, prev_loc, time_at_prev, velocity):
+    """
+    Velocity should be given meters/second
+    """
+    time_at_prev_arrow = arrow.get(time_at_prev)
+    distance = great_circle(prev_loc, next_loc).meters
+    print(distance)
+    time_delta_seconds = distance/velocity
+    time_at_next = time_at_prev_arrow.shift(seconds=+time_delta_seconds)
+    return time_at_next.timestamp
+
+def create_measurement(coordinate, timestamp, user_id):
+    new_measurement = {}
+    data = {}
+    metadata = {}
+    metadata['key'] = "background/location"
+    metadata['time_zone'] = "America/Los_Angeles"
+    metadata['type'] = "fake-data" 
+    data['latitude'] = coordinate[0]
+    data['longitude'] = coordinate[1]
+    data['ts'] = timestamp
+    new_measurement['metadata'] = metadata
+    new_measurement['data'] = data
+    return new_measurement
+
+def get_average_velocity(start_time, end_time, distance):
+    """
+    Return average velocity in meters per second
+    """
+    start_time_arrow = arrow.get(start_time)
+    end_time_arrow = arrow.get(end_time)
+    time_delta = end_time_arrow - start_time_arrow
+    print("Difference in seconds",time_delta.total_seconds())
+    velocity = distance/time_delta.total_seconds()
+    return velocity
+    
+
 
 def otp_time_to_ours(otp_str):
     return arrow.get(old_div(int(otp_str),1000))

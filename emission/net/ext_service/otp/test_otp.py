@@ -6,6 +6,7 @@ import emission.core.wrapper.location as ecwl
 import emission.storage.decorations.local_date_queries as ecsdlq
 import emission.core.wrapper.user as ecwu
 from past.utils import old_div
+import arrow
 
 
 class TestOTPMethods(unittest.TestCase):
@@ -39,7 +40,8 @@ class TestOTPMethods(unittest.TestCase):
         pass
 
     def test_legs_json(self):
-       legs = self.opt_trip.get_json()["plan"]["itineraries"][0]['legs'] 
+       #legs = self.opt_trip.get_json()["plan"]["itineraries"][0]['legs']
+       pass 
     
     def test_turn_into_new_trip(self):
         fake_user_email = 'test_otp_insert'
@@ -49,6 +51,34 @@ class TestOTPMethods(unittest.TestCase):
     
     def test_make_url(self):
         print(self.opt_trip.make_url())
+    
+    def test_get_locations_along_route(self):
+        #locations = self.opt_trip.get_locations_along_route()
+        #print(locations)
+        #self.assertNotEqual(len(locations), 0)
+        pass
+
+    def test_get_average_velocity(self):
+        start_time = arrow.utcnow().timestamp 
+        end_time  = arrow.utcnow().shift(seconds=+200).timestamp
+        distance = 500
+        velocity = otp.get_average_velocity(start_time, end_time, distance)
+        self.assertAlmostEquals(velocity, 2.5)
+
+
+    def test_get_time_at_next_location(self):
+        prev_loc, next_loc, time_at_prev, velocity = (37.77264255,-122.399714854263), (37.42870635,-122.140926605802), arrow.utcnow().timestamp, 10 
+        time_at_next_loc = otp.get_time_at_next_location(prev_loc, next_loc, time_at_prev, velocity)
+        #print(arrow.get(time_at_prev).humanize())
+        #print(arrow.get(time_at_next_loc).humanize())
+        self.assertGreater(time_at_next_loc, time_at_prev)
+
+    def test_create_measurement_obj(self):
+        coorindate = (37.77264255,-122.399714854263)
+        time_stamp = arrow.utcnow().timestamp
+        user_id = 123
+        new_measurement = otp.create_measurement(coorindate, time_stamp, user_id)
+        print(new_measurement)
 
 if __name__ == '__main__':
     unittest.main()
