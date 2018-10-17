@@ -1,6 +1,9 @@
 import unittest
 from fake_user import FakeUser
 from error import AddressNotFoundError
+import datascience 
+import prob140
+import numpy as np
 
 class TestFakeUserMethods(unittest.TestCase):
     def setUp(self):
@@ -12,7 +15,13 @@ class TestFakeUserMethods(unittest.TestCase):
                 "AT&T Park", 
                 "Skyline Wilderness Park", 
                 "UC Berkeley",
-
+            ],
+            "transition_probabilities":
+            [
+                np.random.dirichlet(np.ones(4), size=1)[0],
+                np.random.dirichlet(np.ones(4), size=1)[0],
+                np.random.dirichlet(np.ones(4), size=1)[0],
+                np.random.dirichlet(np.ones(4), size=1)[0],
             ],
             "modes" : 
             {
@@ -30,9 +39,16 @@ class TestFakeUserMethods(unittest.TestCase):
         self.assertEqual(self.fake_user._email, 'test_fake_user')
 
     def test_take_trip(self):
-        self.assertEqual(self.fake_user._current_state, self.config['inital_state'])
+        self.assertEqual(self.fake_user._current_state, self.config['initial_state'])
         measurements = self.fake_user.take_trip()
-        print(self.fake_user._current_state)
+        #print(self.fake_user._current_state)
+    
+    def test_take_many_trips(self):
+        for _ in range(100):
+            self.fake_user.take_trip()
+            print(self.fake_user._current_state)
+
+        print(self.fake_user._path)
 
 if __name__ == '__main__':
     unittest.main()
