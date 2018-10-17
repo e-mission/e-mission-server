@@ -19,6 +19,7 @@ import geojson as gj
 import arrow
 from polyline.codec import PolylineCodec
 from geopy.distance import great_circle
+from uuid import UUID
 # from traffic import get_travel_time
 
 # Our imports
@@ -111,26 +112,33 @@ class OTP(object):
             trps.append(self.turn_into_trip(_id, user_id, trip_id, False, itin))
         return trps
     
-    def get_locations_along_route(self):
+    def get_locations_along_route(self, user_id):
         locations = []
         otp_json = self.get_json()
         self._raise_exception_if_no_plan(otp_json)
         for i, leg in enumerate(otp_json["plan"]["itineraries"][0]['legs']):
             #If there are points along this path 
             if leg['legGeometry']['length'] > 0:
+                leg_start_time = otp_time_to_ours(leg['startTime']).timestamp
+                leg_end_time = otp_time_to_ours(leg['endTime']).timestamp
                 coordinates = PolylineCodec().decode(leg['legGeometry']['points'])
+                print("actual points",leg['legGeometry']['length'], "extracted", len(coordinates))
                 prev_coord = coordinates[0]
-                time_at_prev_coord = otp_time_to_ours(leg['startTime'])
-                velocity = get_average_velocity(int(leg['startTime']), int(leg['endTime']), float(leg['distance']))
+                velocity = get_average_velocity(leg_start_time, leg_end_time, float(leg['distance']))
+                time_at_prev_coord = leg_start_time
+                print('Speed along leg(m/s)', velocity)
 
                 for j, curr_coordinate in enumerate(coordinates):
                     if j == 0:
-                        curr_timestamp = otp_time_to_ours(leg['startTime'])
+                        curr_timestamp = leg_start_time
                     else:
-                        #get time stamp
+                        #Estimate the time at the current location
                         curr_timestamp = get_time_at_next_location(curr_coordinate, prev_coord, time_at_prev_coord, velocity)
 
-                    locations.append(create_measurement(curr_coordinate, curr_timestamp, 123))
+                    locations.append(create_measurement(curr_coordinate, curr_timestamp, velocity, user_id))
+                    prev_coord = curr_coordinate
+                    time_at_prev_coord = curr_timestamp
+                    
         return locations
 
     def _raise_exception_if_no_plan(self, otp_json):
@@ -278,12 +286,11 @@ def get_time_at_next_location(next_loc, prev_loc, time_at_prev, velocity):
     """
     time_at_prev_arrow = arrow.get(time_at_prev)
     distance = great_circle(prev_loc, next_loc).meters
-    print(distance)
     time_delta_seconds = distance/velocity
     time_at_next = time_at_prev_arrow.shift(seconds=+time_delta_seconds)
     return time_at_next.timestamp
 
-def create_measurement(coordinate, timestamp, user_id):
+def create_measurement(coordinate, timestamp, velocity, user_id):
     new_measurement = {}
     data = {}
     metadata = {}
@@ -291,10 +298,12 @@ def create_measurement(coordinate, timestamp, user_id):
     metadata['time_zone'] = "America/Los_Angeles"
     metadata['type'] = "fake-data" 
     data['latitude'] = coordinate[0]
+    data['sensed_speed'] = velocity
     data['longitude'] = coordinate[1]
     data['ts'] = timestamp
     new_measurement['metadata'] = metadata
     new_measurement['data'] = data
+    new_measurement['user_id'] = user_id
     return new_measurement
 
 def get_average_velocity(start_time, end_time, distance):
@@ -304,7 +313,6 @@ def get_average_velocity(start_time, end_time, distance):
     start_time_arrow = arrow.get(start_time)
     end_time_arrow = arrow.get(end_time)
     time_delta = end_time_arrow - start_time_arrow
-    print("Difference in seconds",time_delta.total_seconds())
     velocity = distance/time_delta.total_seconds()
     return velocity
     
