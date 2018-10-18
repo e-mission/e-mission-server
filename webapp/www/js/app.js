@@ -65,7 +65,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services',
     controller: 'SetupCtrl'
   })
   .state('client_setup', {
-    url: '/client_setup?new_client&clear_local_storage&clear_usercache',
+    url: '/client_setup?base_app&new_client&clear_local_storage&clear_usercache',
     templateUrl: 'templates/client_setup.html',
     controller: 'ClientSetupCtrl'
   });
