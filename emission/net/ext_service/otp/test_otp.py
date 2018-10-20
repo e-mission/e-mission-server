@@ -6,8 +6,11 @@ import emission.core.wrapper.location as ecwl
 import emission.storage.decorations.local_date_queries as ecsdlq
 import emission.core.wrapper.user as ecwu
 import emission.storage.timeseries.cache_series as estcs
+import emission.storage.timeseries.abstract_timeseries as esta
 from past.utils import old_div
 import arrow
+import geocoder
+import requests
 
 
 class TestOTPMethods(unittest.TestCase):
@@ -19,8 +22,8 @@ class TestOTPMethods(unittest.TestCase):
         curr_month = curr_time.month
         curr_year = curr_time.year
         curr_minute = curr_time.minute
-        curr_day = random.randint(1, 28)
-        curr_hour = random.randint(0, 23)
+        curr_day = random.randint(1, 9)
+        curr_hour = random.randint(0, 10)
         date = "%s-%s-%s" % (curr_month, curr_day, curr_year)
         time = "%s:%s" % (curr_hour, curr_minute) 
         self.opt_trip = otp.OTP(start_point, end_point, mode, date, time, bike=True)
@@ -37,30 +40,26 @@ class TestOTPMethods(unittest.TestCase):
         trip_plan = self.opt_trip.get_json()["plan"]
         start_loc = otp.create_start_location_from_trip_plan(trip_plan)
 
-    def test_get_json(self):
-        pass
-
     def test_legs_json(self):
        #legs = self.opt_trip.get_json()["plan"]["itineraries"][0]['legs']
        pass 
     
     def test_turn_into_new_trip(self):
-        fake_user_email = 'test_otp_insert'
-        user = ecwu.User.register(fake_user_email)
-        override_uuid = user.uuid
+        #fake_user_email = 'test_otp_insert'
+        #user = ecwu.User.register(fake_user_email)
+        #override_uuid = user.uuid
         #self.opt_trip.turn_into_new_trip(override_uuid)
+        pass 
     
-    def test_make_url(self):
-        pass
-       #print(self.opt_trip.make_url())
-    
-    def test_get_locations_along_route(self):
-        pass
-        #locations = self.opt_trip.get_locations_along_route()
-        #print(locations)
-        #self.assertNotEqual(len(locations), 0)
-        #pass
-
+    def test_get_measurements_along_route(self):
+        ##Test that the last 
+        #fake_user_email = 'test_time_delta'
+        #user = ecwu.User.register(fake_user_email)
+        #locations = self.opt_trip.get_locations_along_route(user.uuid)
+        #print(locations[-1], locations[-2])
+        #time_delta = arrow.get(locations[-1].data.ts) - arrow.get(locations[-2].data.ts)
+        #self.assertGreater(time_delta.total_seconds(), 300)
+        pass 
     def test_get_average_velocity(self):
         start_time = arrow.utcnow().timestamp 
         end_time  = arrow.utcnow().shift(seconds=+200).timestamp
@@ -80,16 +79,39 @@ class TestOTPMethods(unittest.TestCase):
         time_stamp = arrow.utcnow().timestamp
         user_id = 123
         velocity = 5
-        new_measurement = otp.create_measurement(coorindate, time_stamp, velocity, user_id)
+        altitude = 0.1
+        new_measurement = otp.create_measurement(coorindate, time_stamp, velocity, altitude, user_id)
+        #print(new_measurement)
 
     def test_save_entries_to_db(self):
-        fake_user_email = 'test_insert_fake_data'
+        fake_user_email = 'test_insert_fake_data_66'
         user = ecwu.User.register(fake_user_email)
         override_uuid = user.uuid
-        location_entries = self.opt_trip.get_locations_along_route(override_uuid)
-        (tsdb_count, ucdb_count) = estcs.insert_entries(override_uuid, location_entries)
-        print("Finished loading %d entries into the usercache and %d entries into the timeseries" %
-        (ucdb_count, tsdb_count))
+        location_entries = self.opt_trip.get_measurements_along_route(override_uuid)
+        ts = esta.TimeSeries.get_time_series(override_uuid)
+        result = ts.bulk_insert(location_entries)
+        #print(type(location_entries[-1].data.ts))
+        #(tsdb_count, ucdb_count) = estcs.insert_entries(override_uuid, location_entries)
+        #print("Finished loading %d entries into the usercache and %d entries into the timeseries" %
+        #(ucdb_count, tsdb_count))
+
+    def test_create_motion_entry(self):
+        time_stamp = arrow.utcnow().timestamp
+        user_id = 123
+        start_time = arrow.utcnow().timestamp
+        leg = {
+            'mode': "BICYCLE",
+            'startTime' : start_time,
+            'endTime':arrow.utcnow().shift(minutes=+60).timestamp 
+        }
+        new_motion_entry = otp.create_motion_entry_from_leg(leg, user_id)
+        #print(new_motion_entry)
+        #self.assertEqual(start_time, new_motion_entry.data.ts)
+
+    def test_get_elevation(self):
+        coordinate = (37.77264255,-122.399714854263)
+        #print('Elevation',otp.get_elevation(coordinate))
+
 
 if __name__ == '__main__':
     unittest.main()
