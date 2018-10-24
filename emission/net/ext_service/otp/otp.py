@@ -120,29 +120,19 @@ class OTP(object):
         measurements = []
         otp_json = self.get_json()
         self._raise_exception_if_no_plan(otp_json)
+        time_stamps_seen = set()
 
-        #TODO: We might not need this anymore.
-        prev_leg_end = arrow.get(0)
         for i, leg in enumerate(otp_json["plan"]["itineraries"][0]['legs']):
             #If there are points along this leg 
             if leg['legGeometry']['length'] > 0:
-                #Add a new motion measurement based on the leg mode
+                #Add a new motion measurement based on the leg mode. This is nescearry for the 
+                #piplen to detect that the trip has ended
                 measurements.append(create_motion_entry_from_leg(leg, user_id))
-                
-                #Add a little bit of buffer time between legs. TODO: put this in a seperate function
+        
                 leg_start = otp_time_to_ours(leg['startTime'])
                 leg_end = otp_time_to_ours(leg['endTime'])
-                #delta_seconds = (leg_start - prev_leg_end).total_seconds()
-                #if delta_seconds > 0 and delta_seconds < 60:
-                #    leg_start_time = leg_start.shift(seconds=+180).timestamp
-                #    leg_end_time = leg_end.shift(seconds=+180).timestamp
-                #elif delta_seconds < 0:
-                #    leg_start_time = leg_start.shift(seconds=+abs(delta_seconds)+180).timestamp
-                #    leg_end_time = leg_end.shift(seconds=+abs(delta_seconds)+180).timestamp
-                #else:
-                #    leg_start_time = leg_start.timestamp 
-                #    leg_end_time = leg_end.timestamp
                 leg_start_time = leg_start.timestamp + leg_start.microsecond/1e6
+                ##if leg start time is already seen increment by 1?
                 leg_end_time = leg_end.timestamp + leg_end.microsecond/1e6
 
                 coordinates = PolylineCodec().decode(leg['legGeometry']['points'])
@@ -157,25 +147,31 @@ class OTP(object):
                     if j == 0:
                         curr_timestamp = leg_start_time
                     elif j == len(coordinates) - 1:
-                        #We store the last coordinate so we can duplicate it at a later timepoint. This is nescessary for the piepline to detect that our trip has ended. 
-                        # TODO: shoudl we also set the last time stamp to be the leg_end timestamp?  
+                        #We store the last coordinate so we can duplicate it at a later timepoint. This is nescessary for the piepline to detect that the trip has ended. 
+                        # TODO: should we set the last timestamp to be leg_end timestamp?  
                         last_coordinate = curr_coordinate
+                        curr_timestamp = get_time_at_next_location(curr_coordinate, prev_coord, time_at_prev_coord, velocity)
                     else:
                         #Estimate the time at the current location
                         curr_timestamp = get_time_at_next_location(curr_coordinate, prev_coord, time_at_prev_coord, velocity)
-                        #TODO: we dont know if this works yet. Check if two time stamps are equal, add another second if yes. 
-                        if curr_timestamp == time_at_prev_coord:
-                            curr_timestamp += random.random() + 0.1
+                        #TODO: Check if two time stamps are equal, add lil extra time to make the timestamp unique
+                        #Hack to make the timestamps unique. it shoudl be enough to only keep track of previous timestamp.
+                        while int(curr_timestamp) in time_stamps_seen:
+                            #print(curr_timestamp)
+                            curr_timestamp += 1 #curr_timestamp + random.random() + 1
+
+                    time_stamps_seen.add(int(curr_timestamp))
+                    ##TODO: remove this debugg informatio
+                    print(arrow.get(curr_timestamp).format(), curr_coordinate)
 
                     measurements.append(create_measurement(curr_coordinate, float(curr_timestamp), velocity, altitude, user_id))
                     prev_coord = curr_coordinate
                     time_at_prev_coord = curr_timestamp
-
-                #save the prev leg end time. Not sure if this is correct yet. 
-                prev_leg_end = arrow.get(time_at_prev_coord) 
+    
         # we need to add one more measurement to indicate to the piepline that the trip has ended. This value is hardcoded
         # based on the dwell segmentation dist filter time delta threshold
         idle_time_stamp = arrow.get(curr_timestamp).shift(seconds=+ 1000).timestamp
+        print(arrow.get(idle_time_stamp), last_coordinate) 
         measurements.append(create_measurement(last_coordinate, float(idle_time_stamp), 0, altitude, user_id))            
         return measurements
 
@@ -327,7 +323,7 @@ def get_time_at_next_location(next_loc, prev_loc, time_at_prev, velocity):
     time_delta_seconds = distance/velocity
     time_at_next = time_at_prev_arrow.shift(seconds=+time_delta_seconds)
     new_time = time_at_next.timestamp + time_at_next.microsecond/1e6
-    print('time at next loc', new_time)
+    #print('time at next loc', new_time)
     return new_time
 
 def create_measurement(coordinate, timestamp, velocity, altitude, user_id):
