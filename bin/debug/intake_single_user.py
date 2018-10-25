@@ -17,7 +17,7 @@ import emission.core.wrapper.user as ecwu
 
 if __name__ == '__main__':
     np.random.seed(61297777)
-
+    
     parser = argparse.ArgumentParser(prog="intake_single_user")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-e", "--user_email")

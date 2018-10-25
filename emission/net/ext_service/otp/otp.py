@@ -117,29 +117,36 @@ class OTP(object):
         return trps
     
     def get_measurements_along_route(self, user_id):
+        """
+        Returns a list of measurements along trip based on OTP data. Measurements inlcude
+        location entries and motion entries. Motion entries are included so the pipeline can
+        determine the mode of transportation for each section of the trip. 
+        """
         measurements = []
         otp_json = self.get_json()
         self._raise_exception_if_no_plan(otp_json)
         time_stamps_seen = set()
 
+        #We iterate over the legs and create loation entries for based on the leg geometry.
+        #the leg geometry is just a long list of coordinates along the leg.
         for i, leg in enumerate(otp_json["plan"]["itineraries"][0]['legs']):
             #If there are points along this leg 
             if leg['legGeometry']['length'] > 0:
-                #Add a new motion measurement based on the leg mode. This is nescearry for the 
-                #piplen to detect that the trip has ended
+                #Add a new motion measurement based on the leg mode. This is necessary for the
+                #pipeline to detect the mode of transportation and to differentiate sections.
                 measurements.append(create_motion_entry_from_leg(leg, user_id))
-        
+                
+                #TODO: maybe we shoudl check if the leg start time is less than the last timestamp to ensure
+                #that we are allways moving forward in time
                 leg_start = otp_time_to_ours(leg['startTime'])
                 leg_end = otp_time_to_ours(leg['endTime'])
                 leg_start_time = leg_start.timestamp + leg_start.microsecond/1e6
-                ##if leg start time is already seen increment by 1?
                 leg_end_time = leg_end.timestamp + leg_end.microsecond/1e6
 
                 coordinates = PolylineCodec().decode(leg['legGeometry']['points'])
                 prev_coord = coordinates[0]
                 velocity = get_average_velocity(leg_start_time, leg_end_time, float(leg['distance']))
-                #TODO: consider sampling again half way through the leg. rn : only get altitude at the beginning of leg
-                altitude = 0 #get_elevation(coordinates[0])
+                altitude = 0 
                 time_at_prev_coord = leg_start_time
                 #print('Speed along leg(m/s)', velocity)
 
@@ -147,31 +154,33 @@ class OTP(object):
                     if j == 0:
                         curr_timestamp = leg_start_time
                     elif j == len(coordinates) - 1:
-                        #We store the last coordinate so we can duplicate it at a later timepoint. This is nescessary for the piepline to detect that the trip has ended. 
-                        # TODO: should we set the last timestamp to be leg_end timestamp?  
+                        #We store the last coordinate so we can duplicate it at a later point in time.
+                        # This is necessary for the piepline to detect that the trip has ended. 
+                        # TODO: should we make sure the last timestamp is the same as leg['endTime']?  
                         last_coordinate = curr_coordinate
                         curr_timestamp = get_time_at_next_location(curr_coordinate, prev_coord, time_at_prev_coord, velocity)
                     else:
                         #Estimate the time at the current location
                         curr_timestamp = get_time_at_next_location(curr_coordinate, prev_coord, time_at_prev_coord, velocity)
-                        #TODO: Check if two time stamps are equal, add lil extra time to make the timestamp unique
-                        #Hack to make the timestamps unique. it shoudl be enough to only keep track of previous timestamp.
+                        #TODO: Check if two time stamps are equal, add a lil extra time to make sure all timestamps are unique
+                        #Hack to make the timestamps unique. 
+                        # Also, we only need to keep track of previous timestamp.
                         while int(curr_timestamp) in time_stamps_seen:
                             #print(curr_timestamp)
-                            curr_timestamp += 1 #curr_timestamp + random.random() + 1
+                            curr_timestamp += 1 
 
                     time_stamps_seen.add(int(curr_timestamp))
-                    ##TODO: remove this debugg informatio
-                    print(arrow.get(curr_timestamp).format(), curr_coordinate)
+                    ##TODO: remove this debug print statement
+                    #print(arrow.get(curr_timestamp).format(), curr_coordinate)
 
                     measurements.append(create_measurement(curr_coordinate, float(curr_timestamp), velocity, altitude, user_id))
                     prev_coord = curr_coordinate
                     time_at_prev_coord = curr_timestamp
     
-        # we need to add one more measurement to indicate to the piepline that the trip has ended. This value is hardcoded
-        # based on the dwell segmentation dist filter time delta threshold
+        # We need to add one more measurement to indicate to the pipeline that the trip has ended. This value is hardcoded
+        # based on the dwell segmentation dist filter time delta threshold.
         idle_time_stamp = arrow.get(curr_timestamp).shift(seconds=+ 1000).timestamp
-        print(arrow.get(idle_time_stamp), last_coordinate) 
+        #print(arrow.get(idle_time_stamp), last_coordinate) 
         measurements.append(create_measurement(last_coordinate, float(idle_time_stamp), 0, altitude, user_id))            
         return measurements
 
@@ -183,6 +192,7 @@ class OTP(object):
             raise PathNotFoundException(otp_json['debugOutput'])
 
     def turn_into_new_trip(self, user_id):
+        #TODO: Old function. Should be removed
         #TODO: This function does not work with the new data format. 
         # The way sections are created is wrong. Look at intake pielpline to figure out 
         # how to properly build sections
@@ -252,6 +262,7 @@ class OTP(object):
             
  
     def turn_into_trip(self, _id, user_id, trip_id, is_fake=False, itinerary=0):
+        #TODO: Old function. Should be removed
         sections = [ ]
         our_json = self.get_json()
         mode_list = set()
@@ -316,7 +327,8 @@ class OTP(object):
 #####Helpers######
 def get_time_at_next_location(next_loc, prev_loc, time_at_prev, velocity):
     """
-    Velocity should be given in meters/second
+    Returns timestamp for next location entry.
+    Note: Velocity must be given in meters/second
     """
     time_at_prev_arrow = arrow.get(time_at_prev)
     distance = great_circle(prev_loc, next_loc).meters
@@ -327,6 +339,10 @@ def get_time_at_next_location(next_loc, prev_loc, time_at_prev, velocity):
     return new_time
 
 def create_measurement(coordinate, timestamp, velocity, altitude, user_id):
+    #TODO: Rename to create_location_measurement
+    """
+    Creates location entry.
+    """
     new_loc = ecwl.Location(
         ts = timestamp, 
         latitude = coordinate[0],
@@ -343,22 +359,9 @@ def create_measurement(coordinate, timestamp, velocity, altitude, user_id):
 
     return ecwe.Entry.create_entry(user_id,"background/filtered_location", new_loc, create_id=True) 
 
-    #metadata['key'] = "background/location"
-    #metadata['time_zone'] = "America/Los_Angeles"
-    #metadata['type'] = "fake-data" 
-    #metadata['write_ts'] = arrow.utcnow().timestamp
-    #data['latitude'] = coordinate[0]
-    #data['sensed_speed'] = velocity
-    #data['longitude'] = coordinate[1]
-    #data['ts'] = timestamp
-    #new_measurement['metadata'] = metadata
-    #new_measurement['data'] = data
-    #new_measurement['user_id'] = user_id
-    #return new_measurement
-
 def get_average_velocity(start_time, end_time, distance):
     """
-    Return average velocity in meters per second
+    Calculates average velocity in meters per second
     """
     start_time_arrow = arrow.get(start_time)
     end_time_arrow = arrow.get(end_time)
@@ -400,6 +403,7 @@ def create_motion_entry_from_leg(leg, user_id):
     return ecwe.Entry.create_entry(user_id, "background/motion_activity", new_motion_activity, create_id=True) 
 
 def create_start_location_from_trip_plan(plan):
+    #TODO: Old function. Should be removed
     converted_time = otp_time_to_ours(plan['itineraries'][0]["startTime"])
     time_stamp = converted_time.timestamp
     local_dt = ecsdlq.get_local_date(time_stamp, 'UTC')
@@ -414,6 +418,7 @@ def create_start_location_from_trip_plan(plan):
     return start_loc
 
 def create_end_location_from_trip_plan(plan):
+    #TODO: Old function. Should be removed
     converted_time = otp_time_to_ours(plan['itineraries'][0]["endTime"])
     time_stamp = converted_time.timestamp
     local_dt = ecsdlq.get_local_date(time_stamp, 'UTC')
@@ -429,6 +434,7 @@ def create_end_location_from_trip_plan(plan):
 
 
 def create_start_location_from_leg(leg):
+    #TODO: Old function. Should be removed
     converted_time = otp_time_to_ours(leg['startTime'])
     time_stamp = converted_time.timestamp
     local_dt = ecsdlq.get_local_date(time_stamp, 'UTC')
@@ -443,6 +449,7 @@ def create_start_location_from_leg(leg):
     return start_loc
 
 def create_end_location_from_leg(leg):
+    #TODO: Old function. Should be removed
     converted_time = otp_time_to_ours(leg['endTime'])
     time_stamp = converted_time.timestamp
     local_dt = ecsdlq.get_local_date(time_stamp, 'UTC')
@@ -457,7 +464,8 @@ def create_end_location_from_leg(leg):
     return end_loc
 
 def opt_mode_to_motiontype(opt_mode):
-    #TODO: this needs to be mad more sophisticated
+    #TODO: this needs to be made more sophisticated. This should include all modes supported by OTP client
+    # and emission server.
     mapping = {
         'CAR': ecwm.MotionTypes.IN_VEHICLE,
         'RAIL': ecwm.MotionTypes.IN_VEHICLE,
