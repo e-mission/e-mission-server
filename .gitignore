@@ -3,6 +3,7 @@
 *.swp
 *debug.log
 .DS_Store
+seed_model.json
 
 CFC_WebApp/config.json
 CFC_WebApp/keys.json
@@ -18,3 +19,4 @@ conf/**/*.json
 *.ipynb_checkpoints*
 
 *.secret
+seed_model.json
