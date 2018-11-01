@@ -3,6 +3,7 @@ import json
 import requests
 import attrdict as ad
 import itertools
+import copy
 
 try:
     config_file = open('conf/net/ext_service/overpass_server.json')
@@ -79,6 +80,8 @@ def get_predicted_transit_mode(start_stops, end_stops):
     p_end_routes = list(itertools.chain.from_iterable([extract_routes(s) for s in end_stops]))
 
     rel_id_matches = get_rel_id_match(p_start_routes, p_end_routes)
+    logging.debug("len(start_routes) = %d, len(end_routes) = %d, len(rel_id_matches) = %d" %
+        (len(p_start_routes), len(p_end_routes), len(rel_id_matches)))
     if len(rel_id_matches) > 0:
         return [rim.tags.route for rim in rel_id_matches]
 
@@ -88,30 +91,53 @@ def get_predicted_transit_mode(start_stops, end_stops):
     p_start_train = ["railway" in s.tags for s in start_stops]
     p_end_train = ["railway" in s.tags for s in end_stops]
 
+    logging.debug("len(start_train) = %s, len(end_train) = %s" % (
+        (len(p_start_train), len(p_end_train))))
     if is_true(p_start_train) and is_true(p_end_train):
+        logging.debug("start and end are both TRAIN, returning TRAIN")
         return ["TRAIN"]
 
     # Did not find matching routes. Let's see if any stops have a "highway" =
     # "bus_stop" tag
     is_bus_stop = lambda s: "highway" in s.tags and \
                                   s.tags.highway == "bus_stop"
+
+    # Older bus stops sometimes have `route_ref`, which is a `;` separated list
+    # of routes. This is now deprecated, but until everything is moved over, we
+    # have to use it :(
+    # https://help.openstreetmap.org/questions/33325/bus-stops-by-line-bus
+    start_bus_stops = [s for s in start_stops if is_bus_stop(s)]
+    end_bus_stops = [s for s in end_stops if is_bus_stop(s)]
+    logging.debug("%d start stops -> %d start bus stops, %d end stops -> %d end bus stops" % (len(start_stops), len(start_bus_stops), len(end_stops), len(end_bus_stops)))
+    start_bus_route_ref = create_routes_from_ref(start_bus_stops)
+    end_bus_route_ref = create_routes_from_ref(end_bus_stops)
+    route_ref_matches = get_rel_id_match(start_bus_route_ref, end_bus_route_ref)
+    logging.debug("len(start_bus_route_ref) = %d, len(end_bus_route_ref) = %d, len(rel_id_matches) = %d" %
+        (len(start_bus_route_ref), len(end_bus_route_ref), len(route_ref_matches)))
+    if len(route_ref_matches) > 0:
+        return [rim.tags.route for rim in route_ref_matches]
+
     p_start_bus = [is_bus_stop(s) for s in start_stops]
     p_end_bus = [is_bus_stop(s) for s in end_stops]
 
-    # Let's be a bit more careful about regular bus stops, since without
+    # If there are no route refs either, let's be a bit careful, since without
     # routes, we could end up with a lot of false positives.
     # In general, in areas with a high density of routes, we expect to have
     # good OSM coverage with route information, so the first checks will match
     # And if we fall through to here, we probably don't have a dense public
     # transit network. So to avoid misclassifying car trips as bus, let's check
     # that the density is low.
+    logging.debug("len(start_bus) = %s, len(end_bus) = %s" % (
+        (len(p_start_bus), len(p_end_bus))))
     if is_true(p_start_bus) and is_true(p_end_bus):
         # Query for bus stops in the surrounding area and compare the density
         # overall versus the density here
         # If the density of bus stops is much higher here, then the chances are
         # that it is a bus trip since otherwise, by random chance, it should
         # have started anywhere in the space
+        logging.debug("Both start and end are bus stops, validating...")
         if validate_simple_bus_stops(start_stops, end_stops):
+            logging.debug("Validation succeeded, returning BUS")
             return ['BUS']
 
     # No public transit matches, return None
@@ -140,6 +166,32 @@ def extract_routes(stop):
 
     return p_modes
 
+def create_routes_from_ref(bus_stop_list):
+    created_routes = []
+    route_ref_bus_stop_list = [s for s in bus_stop_list if "route_ref" in s.tags]
+    for s in route_ref_bus_stop_list:
+        logging.debug("Splitting route ref %s" % s.tags.route_ref)
+        # route_ref is a ; separated list of routes. We want to split them up
+        route_list = s.tags.route_ref.split(';')
+        for route in route_list:
+            # the id of the stop represents the stop, not the route
+            # so we create an id from the route
+            re = {"id": route,
+                   "tags": {"ref": route, "name": route, "route": "bus", "type": "route"}}
+
+            # 'tags': {'bus': 'yes', 'gtfs_id': '0300315', 'gtfs_location_type': '0', 'gtfs_stop_code': '57566', 'highway': 'bus_stop', 'name': 'Addison St:Oxford St', 'network': 'AC Transit', 'public_transport': 'platform', 'ref': '57566', 'route_ref': '65'}
+            # #65 bus stop doesn't have an operator tag, only network
+            if "operator" in s.tags:
+                re["operator"] = s.tags.operator
+            elif "network" in s.tags:
+                re["operator"] = s.tags.network
+            # logging.debug("Converted stop %s + route_ref %s -> route %s" %
+            #    (s, route, re))
+            created_routes.append(ad.AttrDict(re))
+    logging.debug("%d bus stops -> %d bus stops with refs -> %d routes" %
+        (len(bus_stop_list), len(route_ref_bus_stop_list), len(created_routes)))
+    return created_routes
+
 def is_true(bool_array):
     import functools as ft
 
@@ -156,6 +208,8 @@ def validate_simple_bus_stops(p_start_stops, p_end_stops):
 
     # at least one of the sides should be sparse
     if len(start_bus_stops) == 1 or len(end_bus_stops) == 1:
+        logging.debug("One side is sparse, valid bus stop")
         return True
-    
+
+    logging.debug("Both side are dense, invalid bus stop")
     return False
