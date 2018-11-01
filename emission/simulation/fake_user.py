@@ -5,6 +5,7 @@ from prob140 import MarkovChain
 import numpy as np
 import datetime
 import arrow 
+import requests
 #emission imports
 import emission.core.wrapper.user as ecwu
 from emission.net.ext_service.otp.otp import OTP, PathNotFoundException
@@ -15,16 +16,18 @@ class FakeUser:
     """
 #TODO: Make FakeUser an abstract class and create a concrete implementation called EmissionFakeUser
     def __init__(self, config={}):
-        self._email = config['email']
         self._config = config
-        self._uuid = ecwu.User.register(self._email).uuid # TODO: do this using webserver API
-        self._time_object = arrow.utcnow()
+        self._email = config['email']
+        self._uuid = config['uuid'] 
+        # We need to set the time of ther user in the past to that the pipeline can find the entries.
+        self._time_object = arrow.utcnow().shift(years=-1) 
         self._trip_planer_client = OTP
         self._current_state = config['initial_state']
         self._markov_model = self._create_markow_model(config) #MarkovChain(config['addresses'], config['transition_probabilities'])
         self._path = [self._current_state]
-        self._lable_to_coordinate_map = self._create_lable_to_coordinate_map(config)
+        self._label_to_coordinate_map = self._create_label_to_coordinate_map(config)
         self._trip_to_mode_map = self._create_trip_to_mode_map(config)
+        self._measurements_cache = []
 
     def take_trip(self):
         #TODO: If we have already completed a trip, we could potentially cache the location data 
@@ -37,8 +40,8 @@ class FakeUser:
             print('>> Staying at', curr_loc)
             return []
 
-        curr_coordinate = self._lable_to_coordinate_map[curr_loc] 
-        next_coordinate = self._lable_to_coordinate_map[next_loc]
+        curr_coordinate = self._label_to_coordinate_map[curr_loc] 
+        next_coordinate = self._label_to_coordinate_map[next_loc]
 
         trip_planer_client = self._create_new_otp_trip(curr_coordinate, next_coordinate, curr_loc, next_loc)
 
@@ -55,9 +58,30 @@ class FakeUser:
             self._update_time(end_time_last_trip)
             self._current_state = next_loc
             self._path.append(next_loc)
+            #Update measurements cache
+            self._measurements_cache += measurements
+            #TODO: if the user cache has more than 5000 entries notify the user so they can sync the data. 
 
         return measurements
-    
+    def sync_data_to_server(self):
+        #Remove the _id field
+        measurements_no_id = [self._remove_id_field(entry) for entry in self._measurements_cache]
+        #Send data to server
+        data = {
+            'phone_to_server': measurements_no_id,
+            'user': self._email
+        }
+
+        r = requests.post(self._config['upload_url'], json=data)
+
+        #Check if sucessful
+        if r.ok:
+            self._flush_cache()
+            print("%d entries were sucessfully synced to the server" % len(measurements_no_id))
+        else:
+            print('Something went wrong when trying to sync your data. Try again or use save_cache_to_file to save your data.')
+            print(r.content)
+
     def _create_new_otp_trip(self, curr_coordinate, next_coordinate, cur_loc, next_loc):
         try:
             mode = self._trip_to_mode_map[(cur_loc, next_loc)]
@@ -75,15 +99,15 @@ class FakeUser:
         self._time_object = arrow.get(prev_trip_end_time).shift(hours=+3)
     
     def _create_markow_model(self, config):
-        lables = [elem['lable'].lower() for elem in config['locations']]
+        labels = [elem['label'].lower() for elem in config['locations']]
         transitions_probabilities = config['transition_probabilities']
-        return MarkovChain(lables, transitions_probabilities)
+        return MarkovChain(labels, transitions_probabilities)
 
-    def _create_lable_to_coordinate_map(self, config):
+    def _create_label_to_coordinate_map(self, config):
         locations = config['locations']
         new_map = {}
         for loc in locations:
-            new_map[loc['lable']] = tuple(loc['coordinate'])
+            new_map[loc['label']] = tuple(loc['coordinate'])
 
         return new_map
     
@@ -93,5 +117,14 @@ class FakeUser:
             for edge in v:
                 new_map[tuple(edge)] = k
         return new_map
+    
+    @staticmethod
+    def _remove_id_field(entry):
+        copy = entry.copy()
+        del copy['_id']
+        return copy
+    
+    def _flush_cache(self):
+        self._measurements_cache = []
 
         

@@ -9,20 +9,21 @@ class TestFakeUserMethods(unittest.TestCase):
     def setUp(self):
         self.config = {
             "email" : 'my_fake_user',
-
-	        "locations" :
+            "uuid" : '124',
+            "upload_url" : 'http://localhost:8080/usercache/put',
+	        "locations" : 
 	        [
                {
-                    'lable': 'home',
+                    'label': 'home',
                     'coordinate': [37.77264255,-122.399714854263]
                 },
 
                 {
-                    'lable': 'work',
+                    'label': 'work',
                     'coordinate': [37.42870635,-122.140926605802]
                 },
                 {
-                    'lable': 'family',
+                    'label': 'family',
                     'coordinate': [37.87119, -122.27388]
                 }
             ],
@@ -48,11 +49,16 @@ class TestFakeUserMethods(unittest.TestCase):
     def test_init(self):
         self.assertEqual(self.fake_user._email, 'my_fake_user')
 
+    def test_upload_to_server(self):
+        self.fake_user.take_trip()
+        self.fake_user.upload_measurments()
+
     def test_take_trip(self):
         self.assertEqual(self.fake_user._current_state, self.config['initial_state'])
         measurements = self.fake_user.take_trip()
         #print(self.fake_user._current_state)
-    
+
+
     def test_take_many_trips(self):
         for _ in range(10):
             self.fake_user.take_trip()
