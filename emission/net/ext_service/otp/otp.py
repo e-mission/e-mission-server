@@ -349,6 +349,7 @@ def create_measurement(coordinate, timestamp, velocity, altitude, user_id):
         longitude = coordinate[1],
         sensed_speed = velocity,
         accuracy = 0,
+        bearing = 0,
         filter = 'distance',
         fmt_time = arrow.get(timestamp).to('UTC').format(),
         #This should not be neseceary. TODO: Figure out how we can avoind this.
@@ -356,8 +357,14 @@ def create_measurement(coordinate, timestamp, velocity, altitude, user_id):
         local_dt = ecsdlq.get_local_date(timestamp, 'UTC'),
         altitude = altitude 
     )
-
-    return ecwe.Entry.create_entry(user_id,"background/filtered_location", new_loc, create_id=True) 
+    entry = ecwe.Entry.create_entry(user_id,"background/filtered_location", new_loc, create_id=True)
+    #This field ('type') is required by the server when we push the entry to the user cache
+    # so we add it here. Also we just chose an abritrary formater. In the future we might want to 
+    # create a fromater group called fake user. 
+    entry['metadata']['type'] = 'sensor-data'
+    entry['metadata']['platform'] = 'android'
+    #entry['data']['bearing'] = 0
+    return entry
 
 def get_average_velocity(start_time, end_time, distance):
     """
@@ -395,12 +402,19 @@ def create_motion_entry_from_leg(leg, user_id):
     new_motion_activity = ecwm.Motionactivity(
         ts = timestamp,
         type = opt_mode_to_motion_type[leg['mode']],
+        #The following two lines were added to satisfy the formatters/android/motion_activity.py script
+        zzaKM = opt_mode_to_motion_type[leg['mode']],
+        zzaKN = 100.0, 
         fmt_time = arrow.get(timestamp).to('UTC').format(),
         local_dt = ecsdlq.get_local_date(timestamp, 'UTC'),
         confidence = 100.0
     )
-
-    return ecwe.Entry.create_entry(user_id, "background/motion_activity", new_motion_activity, create_id=True) 
+    entry = ecwe.Entry.create_entry(user_id, "background/motion_activity", new_motion_activity, create_id=True) 
+    #This field ('type') is required by the server when we push the entry to the user cache
+    # so we add it here.
+    entry['metadata']['type'] = 'sensor-data'
+    entry['metadata']['platform'] = 'android'
+    return entry
 
 def create_start_location_from_trip_plan(plan):
     #TODO: Old function. Should be removed
