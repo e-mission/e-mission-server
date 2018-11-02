@@ -147,14 +147,22 @@ def get_unknown_prediction(i, section_entry):
     grained speed specific checks. We can do checks on overall speed and GIS
     features. If nothing matches, we should probably leave as UNKNOWN.
     """
+    if len(section_entry.data["speeds"]) > 0 and \
+        eaid.is_walking_speed(pd.Series(section_entry.data["speeds"]).median()):
+        logging.debug("median speed is walking, UNKNOWN -> WALKING")
+        return {'WALKING': 1}
     if eaid.is_walking_speed(easf.calOverallSectionSpeed(section_entry.data)):
+        logging.debug("overall speed is walking, UNKNOWN -> WALKING")
         return {'WALKING': 1}
     else:
         predicted_transit_mode = _get_transit_prediction(i, section_entry)
         if predicted_transit_mode is not None:
+            logging.debug("predicted transit mode is not None, UNKNOWN -> %s" % 
+                predicted_transit_mode)
             return {predicted_transit_mode: 1}
         else:
             # could be either car or bike, dunno which
+            logging.debug("no luck finding a match, stay UNKNOWN")
             return {'UNKNOWN': 1}
 
 def _get_transit_prediction(i, section_entry):
