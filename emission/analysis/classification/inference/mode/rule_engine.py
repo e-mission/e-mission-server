@@ -13,6 +13,7 @@ import emission.analysis.section_features as easf
 import emission.net.ext_service.transit_matching.match_stops as enetm
 
 import emission.core.wrapper.modeprediction as ecwm
+import emission.core.wrapper.motionactivity as ecwma
 import emission.core.wrapper.entry as ecwe
 
 def predict_mode(user_id):
@@ -64,7 +65,7 @@ class RuleEngineModeInferencePipeline:
                 (section_entry.get_id(),
                  section_entry.data.start_fmt_time, section_entry.data.end_fmt_time) +
                 '~' * 10)
-            if section_entry.data.sensed_mode == 'AIR_OR_HSR':
+            if section_entry.data.sensed_mode == ecwma.MotionTypes.AIR_OR_HSR:
                 predictedProb.append({'AIR_OR_HSR': 1})
             else:
                 predictedProb.append(get_prediction(i, section_entry))
@@ -103,7 +104,7 @@ class RuleEngineModeInferencePipeline:
         self.last_section_done = self.toPredictSections[-1]
 
 def get_prediction(i, section_entry):
-    if section_entry.data.sensed_mode == 'UNKNOWN':
+    if section_entry.data.sensed_mode == ecwma.MotionTypes.UNKNOWN:
         return get_unknown_prediction(i, section_entry)
     elif eaid.is_motorized(section_entry.data.sensed_mode):
         return get_motorized_prediction(i, section_entry)
@@ -141,11 +142,12 @@ def get_motorized_prediction(i, section_entry):
 
 def get_unknown_prediction(i, section_entry):
     """
-    For unknown sections, we have no points, so we cannot to fine grained
-    speed specific checks. We can do checks on overall speed and GIS
+    For unknown sections, we sometimes have points and sometimes not. If we
+    have points, use the median speed as always. Otherwise, we cannot to fine
+    grained speed specific checks. We can do checks on overall speed and GIS
     features. If nothing matches, we should probably leave as UNKNOWN.
     """
-    if eaid.is_walking_speed(eaisf.calOverallSectionSpeed(section_entry.data)):
+    if eaid.is_walking_speed(easf.calOverallSectionSpeed(section_entry.data)):
         return {'WALKING': 1}
     else:
         predicted_transit_mode = _get_transit_prediction(i, section_entry)
@@ -201,13 +203,13 @@ def collapse_modes(section_entry, modes):
     if len(unique_modes) == 1:
         return unique_modes[0]
 
-    assert sorted(unique_modes) == ['bus', 'train'],\
-        "unique_modes = %s, but we support only two, [bus, train]"
+    assert sorted(unique_modes) == ['BUS', 'TRAIN'],\
+        "unique_modes = %s, but we support only two, [bus, train]" % unique_modes
    
     # could be either bus or train. Let's use the speed to decide
     # local bus speeds are pretty close to bike, which is why it is hard to
     # distinguish between them
-    if eaid.is_bicycling_speed(section_entry.data["speeds"].median()):
+    if eaid.is_bicycling_speed(pd.Series(section_entry.data["speeds"]).median()):
         return 'BUS'
     else:
         return 'TRAIN'
