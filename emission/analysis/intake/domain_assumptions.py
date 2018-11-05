@@ -41,3 +41,6 @@ def is_too_short_bike_vehicle_transition(duration):
         return True
     else:
         return False
+
+def is_flip_flop_streak_for_new_section(ff_streak_length):
+    return ff_streak_length > 3

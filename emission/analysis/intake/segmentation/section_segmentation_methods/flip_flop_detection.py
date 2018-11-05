@@ -14,17 +14,23 @@ class Direction(enum.Enum):
     FORWARD = 1
     BACKWARD = -1
     NONE = 0
+    NEW = 2
 
 @enum.unique
 class FinalMode(enum.Enum):
     NA = 0
     UNMERGED = 1
     MERGED = -1
+    NEW = 2
 
 class MergeResult:
-    def __init__(self, direction, final_mode):
+    def __init__(self, direction, final_mode, new_mode=None):
         self.direction = direction
         self.final_mode = final_mode
+        self.new_mode = new_mode
+
+    def __str__(self):
+        return "(%s, %s)" % (self.direction, self.final_mode)
 
     @staticmethod
     def NONE():
@@ -88,6 +94,7 @@ class FlipFlopDetection():
                +1 to merge forwards (e.g. expand the existing previous section forwards)
                -1 to merge backwards (e.g. expand the existing next section backwards)
                  0 to not merge
+                2 to merge into a new section
 
                 valid set_mode_to values
                 - unmerged: final mode of (merged + unmerged) = unmerged (most
@@ -96,6 +103,8 @@ class FlipFlopDetection():
                   special cases like the bike check)
         """
 
+        logging.debug("Looking to see whether we should merge streak %s -> %s, length %d" %
+            (streak_start, streak_end, streak_end - streak_start))
         if (streak_start) == streak_end or \
             (streak_start + 1) == streak_end:
             logging.info("Found single flip-flop %s -> %s -> %s" % 
@@ -110,6 +119,13 @@ class FlipFlopDetection():
             if cnlw.direction != Direction.NONE:
                 return cnlw
             return MergeResult.NONE()
+
+        # As an easy fix, let us assume that any long flip-flop streak needs to
+        # be a new section. And most of the time, it is going to be bicycling,
+        # at least according to the data we have seen so far, so let's just set
+        # that anyway
+        if eaid.is_flip_flop_streak_for_new_section(streak_end - streak_start):
+            return MergeResult(Direction.NEW, FinalMode.NEW, ecwm.MotionTypes.BICYCLING)
 
         cvft = self.check_valid_for_type(streak_start, streak_end)
         if cvft.direction != Direction.NONE:
@@ -227,7 +243,8 @@ class FlipFlopDetection():
         esm, eem = end_change
 
         if streak_start == 0:
-            # There is no before section - only one way to merge!
+            # There is no before section - only choices are to merge backward
+            # or make a new section
             logging.debug("get_merge_direction: at beginning of changes, can only merge backward")
             return MergeResult(Direction.BACKWARD, FinalMode.UNMERGED)
 
@@ -313,6 +330,7 @@ class FlipFlopDetection():
         Basic sanity checks for the various types of movement
         Gah this is pathetic, but I am desperate here.
         """
+        logging.debug("is_valid_for_type called")
         mcs, mce = motion_change
         validity_check_map = {
             ecwm.MotionTypes.WALKING: self.validate_walking,
@@ -330,6 +348,7 @@ class FlipFlopDetection():
     def validate_walking(self, mcs, mce):
         median_speed = self.get_median_speed(mcs, mce)
         if median_speed is not None and not eaid.is_walking_speed(median_speed):
+            logging.debug("in validate_walking, median speed = %d, failed" % median_speed)
             return False
         return True
 
@@ -337,11 +356,13 @@ class FlipFlopDetection():
         # time shortness check. unlikely to ride a bike for less than a minute
         # and then switch to another mode
         if eaid.is_too_short_bicycle_ride(mce.ts - mcs.ts):
+            logging.debug("bike ride length = %d, failed" % (mce.ts - mcs.ts))
             return False
         
         # speed check
         median_speed = self.get_median_speed(mcs, mce)
         if median_speed is not None and not eaid.is_bicycling_speed(median_speed):
+            logging.debug("in validate_bicycling, median speed = %d, failed" % median_speed)
             return False
         return True
 
@@ -384,7 +405,7 @@ class FlipFlopDetection():
         return streak_list
 
     def merge_streaks_pass_1(self, unmerged_change_list, forward_merged_streaks,
-                                                  backward_merged_streaks):
+                                   backward_merged_streaks, new_merged_streaks):
         """
         Extends the un-flipflopped sections to cover the flip-flop sections
         that we need to merge. If we have unmerged_change_list = 
@@ -420,7 +441,6 @@ class FlipFlopDetection():
             ([(mc[0]["idx"], mc[1]["idx"]) for mc in modifiable_changes]))
 
         for ms in forward_merged_streaks:
-            # extend the pre-merge section to end with the merged section
             # by setting the end motion
             modifiable_changes[ms.start-1][1] = modifiable_changes[ms.end][1]
             # by default, final mode will the mode of (ms.start-1) which is the
@@ -448,6 +468,12 @@ class FlipFlopDetection():
             modifiable_changes[ms.end+1][0] = modifiable_changes[ms.start][0]
             for i in range(ms.start, ms.end+1):
                 modifiable_changes[i] = modifiable_changes[ms.end+1]
+
+        for ms in new_merged_streaks:
+            new_mc = (modifiable_changes[ms.start][0], modifiable_changes[ms.end][1])
+            new_mc[0]["type"] = ms.final_mode
+            for i in range(ms.start, ms.end+1):
+                modifiable_changes[i] = new_mc
 
         logging.debug("before merging entries, changes were %s" %
             ([(mc[0]["idx"], mc[1]["idx"]) for mc in modifiable_changes]))
@@ -514,6 +540,7 @@ class FlipFlopDetection():
 
         forward_merged_streaks = []
         backward_merged_streaks = []
+        new_merged_streaks = []
         for streak in self.flip_flop_streaks:
             ss, se = streak
             sm = self.should_merge(ss, se)
@@ -521,9 +548,12 @@ class FlipFlopDetection():
                 forward_merged_streaks.append(MergeAction(ss, se, sm.final_mode))
             elif sm.direction == Direction.BACKWARD:
                 backward_merged_streaks.append(MergeAction(ss, se, sm.final_mode))
+            elif sm.direction == Direction.NEW:
+                new_merged_streaks.append(MergeAction(ss, se, sm.new_mode))
 
         logging.debug("forward merged_streaks = %s" % forward_merged_streaks)
         logging.debug("backward merged_streaks = %s" % backward_merged_streaks)
+        logging.debug("new merged_streaks = %s" % new_merged_streaks)
 
         # use a separate to_remove list to avoid modifying the list and changing indices
         # while iterating
@@ -532,7 +562,8 @@ class FlipFlopDetection():
 
         merged_list_p1 = self.merge_streaks_pass_1(self.motion_changes,
             forward_merged_streaks,
-            backward_merged_streaks)
+            backward_merged_streaks,
+            new_merged_streaks)
 
         merged_list_p2 = self.merge_streaks_pass_2(merged_list_p1)
 
