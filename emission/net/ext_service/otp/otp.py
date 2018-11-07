@@ -23,6 +23,7 @@ import requests
 import pandas as pd
 from uuid import UUID
 import random
+import logging
 # from traffic import get_travel_time
 
 # Our imports
@@ -191,139 +192,7 @@ class OTP(object):
             print("Response %s does not have a plan " % otp_json)
             raise PathNotFoundException(otp_json['debugOutput'])
 
-    def turn_into_new_trip(self, user_id):
-        #TODO: Old function. Should be removed
-        #TODO: This function does not work with the new data format. 
-        # The way sections are created is wrong. Look at intake pielpline to figure out 
-        # how to properly build sections
-        our_json = self.get_json()
-        print("new trip")
-        if "plan" not in our_json:
-            print("While querying alternatives from %s to %s" % (self.start_point, self.end_point))
-            print("query URL is %s" % self.make_url())
-            print("Response %s does not have a plan " % our_json)
-            raise PathNotFoundException(our_json['debugOutput'])
-
-        ts = esta.TimeSeries.get_time_series(user_id)
-        #Create start place entry 
-        start_place = eaist.start_new_chain(user_id)
-        start_place.source = 'Fake'
-        start_place_entry = ecwe.Entry.create_entry(user_id,
-                                "segmentation/raw_place", start_place, create_id = True)
-        #Set the start location TODO: should we save locations this to longterm storage?
-        trip_start_loc = create_start_location_from_trip_plan(our_json['plan'])
-        #set end location 
-        trip_end_loc = create_end_location_from_trip_plan(our_json['plan']) 
-        #Create a curr trip object
-        trip = ecwrt.Rawtrip()
-        trip.source = 'Fake'  
-        trip_entry = ecwe.Entry.create_entry(user_id,
-                            "segmentation/raw_trip", trip, create_id = True)
-        #Create end_place
-        end_place = ecwrp.Rawplace()
-        end_place.source = 'Fake' 
-        end_place_entry = ecwe.Entry.create_entry(user_id,
-                            "segmentation/raw_place", end_place, create_id = True)
-                            
-        ## Link together the start place entry, the trip entry and endplace entry 
-        eaist._link_and_save(ts, start_place_entry, trip_entry, end_place_entry, trip_start_loc, trip_end_loc)
-      #Create sections.  
-        prev_section_entry = None
-        for i, leg in enumerate(our_json["plan"]["itineraries"][0]['legs']):
-            #Fill section entry.  
-            section_start_loc = create_start_location_from_leg(leg)
-            section_end_loc  = create_end_location_from_leg(leg)
-            section = ecws.Section()
-            section.trip_id = trip_entry.get_id()
-            if prev_section_entry is None:
-                section_start_loc = trip_start_loc
-            if i == len(our_json["plan"]["itineraries"][0]['legs']) - 1:
-                section_end_loc = trip_end_loc
-
-            eaiss.fill_section(section, section_start_loc, section_end_loc, opt_mode_to_motiontype(leg["mode"]) )
-            section_entry = ecwe.Entry.create_entry(user_id, esda.RAW_SECTION_KEY,
-                                                section, create_id=True)
-            if prev_section_entry is not None:
-            # If this is not the first section, create a stop to link the two sections together
-            # The expectation is prev_section -> stop -> curr_section
-                stop = ecwrs.Stop()
-                stop.trip_id = trip_entry.get_id()
-                stop_entry = ecwe.Entry.create_entry(user_id,
-                                                    esda.RAW_STOP_KEY,
-                                                    stop, create_id=True)
-                eaiss.stitch_together(prev_section_entry, stop_entry, section_entry)
-                ts.insert(stop_entry)
-                ts.update(prev_section_entry)
-
-            # After we go through the loop, we will be left with the last section,
-            # which does not have an ending stop. We insert that too.
-            ts.insert(section_entry)
-            prev_section_entry = section_entry
-            
- 
-    def turn_into_trip(self, _id, user_id, trip_id, is_fake=False, itinerary=0):
-        #TODO: Old function. Should be removed
-        sections = [ ]
-        our_json = self.get_json()
-        mode_list = set()
-        car_dist = 0
-        if "plan" not in our_json:
-            print("While querying alternatives from %s to %s" % (self.start_point, self.end_point))
-            print("query URL is %s" % self.make_url())
-            print("Response %s does not have a plan " % our_json)
-            raise PathNotFoundException(our_json['debugOutput'])
-
-        for leg in our_json["plan"]["itineraries"][itinerary]['legs']:
-            coords = [ ]
-            var = 'steps'
-            if leg['mode'] == 'RAIL' or leg['mode'] == 'SUBWAY':
-                var = 'intermediateStops'
-                for step in leg[var]:
-                    coords.append(Coordinate(step['lat'], step['lon'])) 
-
-            start_time = otp_time_to_ours(leg["startTime"])
-            end_time = otp_time_to_ours(leg["endTime"])
-            distance = float(leg['distance'])
-            start_loc = Coordinate(float(leg["from"]["lat"]), float(leg["from"]["lon"]))
-            end_loc = Coordinate(float(leg["to"]["lat"]), float(leg["to"]["lon"]))
-            coords.insert(0, start_loc)
-            coords.append(end_loc)
-            mode = leg["mode"]
-            mode_list.add(mode)
-            fake_id = random.random()
-            points = [ ]
-            for step in leg['steps']:
-                c = Coordinate(step["lat"], step['lon'])
-                #print c
-                points.append(c)
-            #print "len of points is %s" % len(points)
-            section = Section(str(fake_id), user_id, trip_id, distance, "move", start_time, end_time, start_loc, end_loc, mode, mode, points)
-            #section.points = coords
-            sections.append(section)
-            if mode == 'CAR':
-                car_dist = distance
-                car_start_coordinates = Coordinate(float(leg["from"]["lat"]), float(leg["from"]["lon"]))    
-                car_end_coordinates = Coordinate(float(leg["to"]["lat"]), float(leg["to"]["lon"]))
-        
-        print("len(sections) = %s" % len(sections))
-        final_start_loc = Coordinate(float(our_json["plan"]["from"]["lat"]), float(our_json["plan"]["from"]["lon"]))         
-        final_end_loc = Coordinate(float(our_json["plan"]["to"]["lat"]), float(our_json["plan"]["to"]["lon"]))
-        final_start_time = otp_time_to_ours(our_json['plan']['itineraries'][0]["startTime"])
-        final_end_time = otp_time_to_ours(our_json['plan']['itineraries'][0]["endTime"])
-        cost = 0
-        if "RAIL" in mode_list or "SUBWAY" in mode_list:
-            try:
-                cost = old_div(float(our_json['plan']['itineraries'][0]['fare']['fare']['regular']['cents']), 100.0)   #gives fare in cents 
-            except:
-                cost = 0
-        elif "CAR" in mode_list:
-            # TODO calculate car cost
-            cost = 0
-        mode_list = list(mode_list)
-        if is_fake:
-            return Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc)
-        return Alternative_Trip(_id, user_id, trip_id, sections, final_start_time, final_end_time, final_start_loc, final_end_loc, 0, cost, mode_list)
-
+   
 #####Helpers######
 def get_time_at_next_location(next_loc, prev_loc, time_at_prev, velocity):
     """
@@ -393,6 +262,7 @@ def create_motion_entry_from_leg(leg, user_id):
     #TODO: Update with all possible/supported OTP modes. Also check for leg == None
     #Also, make sure this timestamp is correct 
     timestamp = float(otp_time_to_ours(leg['startTime']).timestamp)
+    print("*** Leg Start Time: %s" % arrow.get(timestamp).format())
     opt_mode_to_motion_type = {
         'BICYCLE': ecwm.MotionTypes.BICYCLING.value,
         'CAR': ecwm.MotionTypes.IN_VEHICLE.value,
@@ -413,6 +283,9 @@ def create_motion_entry_from_leg(leg, user_id):
     #This field ('type') is required by the server when we push the entry to the user cache
     # so we add it here.
     entry['metadata']['type'] = 'sensor-data'
+    #For some reason the android formater overwrites ts with metadata.write_ts. 
+    #so we need to set write_ts to ts to make sure they become the same. 
+    entry['metadata']['write_ts'] = timestamp
     entry['metadata']['platform'] = 'android'
     return entry
 
