@@ -58,7 +58,7 @@ def insert_entries(uuid, entry_it):
             ts.insert(entry)
             tsdb_count = tsdb_count + 1
         else:
-            ucdb.save(entry)
+            ucdb.insert_one(entry)
             ucdb_count = ucdb_count + 1
 
     return (tsdb_count, ucdb_count)
