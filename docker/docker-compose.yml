@@ -1,0 +1,31 @@
+version: "3"
+services:
+  web-server:
+    # replace username/repo:tag with your name and image details
+    image: emission-server:latest
+    depends_on:
+      - db
+    environment:
+      - DB_URL=db
+      - WEB_SERVER_HOST=web-server
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "8080:8080"
+    networks:
+      - emission
+  db:
+    image: mongo:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "27017:27017"
+##Mount data volumes at local node.
+    networks:
+       - emission
+networks:
+  emission:
