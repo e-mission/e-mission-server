@@ -10,7 +10,8 @@ import emission.core.get_database as edb
 import emission.storage.timeseries.abstract_timeseries as esta
 import argparse
 import pprint
-
+import requests
+import os
 
 
 try:
@@ -30,24 +31,48 @@ except ImportError:
 # It now uses private keys to authenticate requests (API Key)
 # You can find it on
 # https://www.yelp.com/developers/v3/manage_app
-API_KEY= 'jBC0box-WQr7jvQvXlI9sJuw17wfN9AYFMnu5ebxsYkgQoKTjjIRD0I_tAePUasbaIbXj28cmj4nUBDHrVxtrfHU2l6TM4E61Kk3EVeSbLZsxStLxkAVlkHK9xJ6W3Yx' 
-ACCESS_TOKEN = 'AIzaSyAbnpsty2SAzEX9s1VVIdh5pTHUPMjn3lQ' #GOOGLE MAPS ACCESS TOKEN
-JACK_TOKEN = 'AIzaSyAXG_8bZvAAACChc26JC6SFzhuWysRqQPo'
 
-MAPQUEST_KEY = 'AuwuGlPC5f3Ru7PGahKAtGcs4WdvARem'
-# API constants, you shouldn't have to change these.
-API_HOST = 'https://api.yelp.com'
-SEARCH_PATH = '/v3/businesses/search'
-BUSINESS_PATH = '/v3/businesses/'  # Business ID will come after slash.
+google_maps_path = 'conf/net/ext_service/googlemaps.json'
+yelp_json_path = 'conf/net/ext_service/yelpfusion.json'
+nominatim_path = 'conf/net/ext_service/nominatim.json'
+"""
+Checks if conf files exists or not. The conf files will be given to the user through request.
+"""
+assert os.path.exists(google_maps_path), "File %s not found" % google_maps_path
+assert os.path.exists(yelp_json_path), "File %s not found" % yelp_json_path
+assert os.path.exists(nominatim_path), "File %s not found" % nominatim_path
+
+google_maps_json = open('conf/net/ext_service/googlemaps.json', 'r')
+yelp_json = open('conf/net/ext_service/yelpfusion.json', 'r')
+nominatim = open('conf/net/ext_service/nominatim.json', 'r')
 
 
-# Defaults for our simple example.
-DEFAULT_TERM = 'dinner'
-DEFAULT_LOCATION = 'San Francisco, CA'
-SEARCH_LIMIT = 3
-LOCATION = '37.871942'
+google_maps_auth = json.load(google_maps_json)
+yelp_auth = json.load(yelp_json)
+nominatim_auth = json.load(nominatim)
 
-#Helper function to query into Yelp's API
+YELP_API_KEY = yelp_auth['api_key']
+ACCESS_TOKEN = google_maps_auth['access_token']
+JACK_TOKEN = google_maps_auth['backup_access_token']
+
+MAPQUEST_KEY = google_maps_auth['map_quest_key']
+API_HOST = yelp_auth['api_host']
+SEARCH_PATH = yelp_auth['search_path']
+BUSINESS_PATH = yelp_auth['business_path']
+
+SEARCH_LIMIT = yelp_auth['search_limit']
+
+NEARBY_URL = google_maps_auth['nearby_base_url']
+SEARCH_URL = google_maps_auth['search_base_url']
+NOMINATIM_URL = nominatim_auth['base_url']
+ZOOM = nominatim_auth['zoom']
+LAT_URL = nominatim_auth['lat']
+LON_URL = nominatim_auth['lon']
+
+
+"""
+YELP API: Helper function to query into the API domain. Will change to requests instead of urllib later on.
+"""
 def request(host, path, api_key, url_params=None):
     """Given your API_KEY, send a GET request to the API.
     Args:
@@ -72,6 +97,9 @@ def request(host, path, api_key, url_params=None):
 
     return response.json()
 
+"""
+YELP API: Function to query based on search terms
+"""
 def search(api_key, term, location):
     """Query the Search API by a search term and location.
     Args:
@@ -88,26 +116,38 @@ def search(api_key, term, location):
     }
     return request(API_HOST, SEARCH_PATH, api_key, url_params=url_params)
 
+"""
+YELP API: Function to retrieve all reviews related to the business. 
+"""
 def business_reviews(api_key, business_id):
     business_path = BUSINESS_PATH + business_id
 
     return request(API_HOST, business_path, api_key)
 
-def calculate(json_file):
+"""
+YELP API: Returns the title of the business category in the API call
+"""
+def title_of_category(json_file):
     return json_file["categories"][0]["title"]
 
-#Not as accurate compared to the below functions
+"""
+YELP API: Obtains the business ID through latitude, longitude
+"""
 def get_business_id(api_key, lat, lon):
     url_params = {
         'location': lat + ',' + lon
     }
     return request(API_HOST, SEARCH_PATH, api_key, url_params=url_params)
 
-#Used first semester's code to obtain the business ID and location in order to find address
+"""
+Google API: Gets business name through Google's API query - not very accurate based on location 
+NOTE: Transitioning to Nominatim - will not use this anymore - here in case Nominatim functions 
+go horribly wrong.
+"""
 def check_against_business_location(location='0, 0', address = ''):
     if not re.compile('^(\-?\d+(\.\d+)?),\s*(\-?\d+(\.\d+)?)$').match(location):
         raise ValueError('Location Invalid')
-    base_url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?'
+    base_url = NEARBY_URL
     location = 'location=' + location
     try:
         key_string = '&key=' + ACCESS_TOKEN
@@ -137,20 +177,28 @@ def check_against_business_location(location='0, 0', address = ''):
         except:
             raise ValueError("Something went wrong")
 
+
+
+"""
+NOMINATIM API: Creates a Nominatim API Call, returns address in string form and dictionary form separated by streetname, 
+    road, neighborhood, etc
+"""
 def return_address_from_location_nominatim(lat, lon):
-    
-    base_url = 'https://nominatim.openstreetmap.org/reverse?format=json&'
-    lat_lon = 'lat=' + lat + '&lon=' + lon
-    zoom = '&zoom=18&addressdetails=1'
+    base_url = NOMINATIM_URL
+    lat_lon = LAT_URL + lat + LON_URL + lon
+    zoom = ZOOM
     try: 
         url = base_url + lat_lon + zoom
+        # print(url)
         result = requests.get(url).json()
-        return result["display_name"]
+        return result["display_name"], result["address"]
     except:
         raise ValueError("Something went wrong")
 
-
-def return_address_from_location_yelp(location='0,0'):
+'''
+GOOGLE API: Makes Google Maps API CALL to the domain and returns address given a latitude and longitude
+'''
+def return_address_from_location_google(location='0,0'):
     """
     Creates a Google Maps API call that returns the addresss given a lat, lon
     """
@@ -172,14 +220,8 @@ def return_address_from_location_yelp(location='0,0'):
         
         if business_tuple[0]: #If true, the lat, lon matches a business location and we return business name
             address_comp = cleaned[0]['long_name'] + ' ' + cleaned[1]['short_name']
-            # print(business_tuple[1])
-            # print(cleaned[3]['short_name'])
-            # print(address_comp)
             return business_tuple[1], cleaned[3]['short_name'], address_comp
         else: #otherwise, we just return the address
-            # print(cleaned[0]['long_name'])
-            # print(cleaned[1]['short_name'])
-            # print(cleaned[3]['short_name'])
             return cleaned[0]['long_name'] + ' ' + cleaned[1]['short_name'] + ', ' + cleaned[3]['short_name']
     except:
         try:
@@ -193,65 +235,90 @@ def return_address_from_location_yelp(location='0,0'):
             business_tuple = check_against_business_location(location, chk)
             if business_tuple[0]: #If true, the lat, lon matches a business location and we return business name
                 address_comp = cleaned[0]['long_name'] + ' ' + cleaned[1]['short_name'] 
-                # print(address_comp)
-                # print(business_tuple[1])
-                # print(cleaned[3]['short_name'])
                 return business_tuple[1], cleaned[3]['short_name'], address_comp
             else: #otherwise, we just return the address
-                # print(cleaned[0]['long_name'])
-                # print(cleaned[1]['short_name'])
-                # print(cleaned[3]['short_name'])
                 return cleaned[0]['long_name'] + ' ' + cleaned[1]['short_name'] + ', ' + cleaned[3]['short_name']
         except:
             raise ValueError("Something went wrong")
 
+'''
+YELP API: Function to find the business matching the address
+'''
 def match_business_address(address):
     business_path = SEARCH_PATH
     url_params = {
         'location': address.replace(' ', '+')
     }
-    return request(API_HOST, business_path, API_KEY, url_params)
+    return request(API_HOST, business_path, YELP_API_KEY, url_params)
+
 '''
-Function to find the review of the original location of the end point of a trip
+YELP API: Function to find the review of the original location of the end point of a trip
 '''
 def review_start_loc(location = '0,0'):
     try:
         #Off at times if the latlons are of a location that takes up a small spot, especially boba shops
 
         #IF RETURN_ADDRESS_FROM_LOCATION HAS A BUSINESS LOCATION ATTACHED TO THE ADDRESS
-        if (len(return_address_from_location_yelp(location)) == 3):
-            business_name, city, address = return_address_from_location_yelp(location)
+        if (len(return_address_from_location_google(location)) == 3):
+            business_name, city, address = return_address_from_location_google(location)
         #print(business_reviews(API_KEY, business_name.replace(' ', '-') + '-' + city))
-            return business_reviews(API_KEY, business_name.replace(' ', '-') + '-' + city)['rating']
+            return business_reviews(YELP_API_KEY, business_name.replace(' ', '-') + '-' + city)['rating']
     except:
         try:
             #This EXCEPT part may error, because it grabs a list of businesses instead of matching the address to a business
-            address = return_address_from_location_yelp(location)
+            address = return_address_from_location_google(location)
             return match_business_address(address)
         except:
             raise ValueError("Something went wrong")
     
 '''
-Function that RETURNS a list of categories that the business falls into
+YELP API: Function that RETURNS a list of categories that the business falls into
 '''
 def category_of_business(location = '0,0'):
     try:
         #Off at times if the latlons are of a location that takes up a small spot, especially boba shops
-        # print(return_address_from_location_yelp(location))
-        # print(len(return_address_from_location_yelp(location)))
+        # print(return_address_from_location_google(location))
+        # print(len(return_address_from_location_google(location)))
         #IF RETURN_ADDRESS_FROM_LOCATION HAS A BUSINESS LOCATION ATTACHED TO THE ADDRESS
-        if (len(return_address_from_location_yelp(location)) == 3):
-            business_name, city, address = return_address_from_location_yelp(location)
+        if (len(return_address_from_location_google(location)) == 3):
+            business_name, city, address = return_address_from_location_google(location)
             categories = []
-            for c in business_reviews(API_KEY, business_name.replace(' ', '-') + '-' + city)['categories']:
+            for c in business_reviews(YELP_API_KEY, business_name.replace(' ', '-') + '-' + city)['categories']:
                 categories.append(c['alias'])
             return categories
         else:
-            # print(search(API_KEY, '', return_address_from_location_yelp(location)))
+            # print(search(API_KEY, '', return_address_from_location_google(location)))
             return None
     except:
         try:
-            address = return_address_from_location_yelp(location)
+            address = return_address_from_location_google(location)
+            return match_business_address(address)
+        except:
+            raise ValueError("Something went wrong")
+
+'''
+NOMINATIM VERS: Function that RETURNS a list of categories that the business falls into 
+'''
+def category_of_business_nominatim(lat, lon):
+    try:
+        #Off at times if the latlons are of a location that takes up a small spot, especially boba shops
+        # print(return_address_from_location_google(location))
+        # print(len(return_address_from_location_google(location)))
+        #IF RETURN_ADDRESS_FROM_LOCATION HAS A BUSINESS LOCATION ATTACHED TO THE ADDRESS
+        string_address, address_dict = return_address_from_location_nominatim(lat, lon)   
+        business_key = list(address_dict.keys())[0]
+        business_name = address_dict[business_key]
+        city = address_dict['city']
+        categories = []
+        for c in business_reviews(YELP_API_KEY, business_name.replace(' ', '-') + '-' + city)['categories']:
+            categories.append(c['alias'])
+        return categories
+        
+    except:
+        #USE GOOGLE API JUST IN CASE if nominatim doesn't work
+        location = lat + ',' + lon
+        try:
+            address = return_address_from_location_google(location)
             return match_business_address(address)
         except:
             raise ValueError("Something went wrong")
@@ -281,9 +348,7 @@ def distance(address1, address2):
 Two functions that RETURN latitude and longitude coordinates from GEOJSON file
 '''
 def geojson_to_latlon(geojson):
-    coordinates = geojson["coordinates"]
-    lon = str(coordinates[0])
-    lat = str(coordinates[1])
+    lat, lon = geojson_to_lat_lon_separated(geojson)
     lat_lon = lat + ',' + lon
     return lat_lon
 
@@ -292,71 +357,18 @@ def geojson_to_lat_lon_separated(geojson):
     lon = str(coordinates[0])
     lat = str(coordinates[1])
     return lat, lon
-'''
-Determines the motion type in words from sensed mode.
-'''
-def sensed_to_motion_type(value):
-    if value == 0:
-        return "IN_VEHICLE"
-    elif value == 1:
-        return "BIKING"
-    elif value == 2:
-        return "ON_FOOT"
-    elif value == 3:
-        return "STILL"
-    elif value == 4:
-        return "UNKNOWN"
-    elif value == 5:
-        return "TILTING"
-    elif value == 7:
-        return "WALKING"
-    elif value == 8:
-        return "RUNNING"
-    elif value == 9:
-        return "NONE"
-    elif value == 10:
-        return "STOPPED_WHILE_IN_VEHICLE"
-    elif value == 11:
-        return "AIR_ON_HSR"
 
 '''
-Determines the mode that was mostly used through out the trip. 
-'''
-def most_used_mode_from_trip(cleaned_trip, cleaned_sections, section_counter, trip_counter):
-    end_location = cleaned_trip.iloc[trip_counter]["end_loc"]
-    end_loc_lat, end_loc_lon = geojson_to_lat_lon_separated(end_location)
-    modes_from_section = []
-    endsec_location = cleaned_sections.iloc[section_counter]["end_loc"]
-    endsec_loc_lat, endsec_loc_lon = geojson_to_lat_lon_separated(endsec_location)
-    #If a trip is a whole section to start off with 
-    mode_word = ''
-    if (endsec_loc_lat == end_loc_lat and endsec_loc_lon == end_loc_lon):
-        return sensed_to_motion_type(cleaned_sections.iloc[section_counter]["sensed_mode"]), section_counter + 1
-
-    while endsec_loc_lat!= end_loc_lat and endsec_loc_lon!=end_loc_lon and section_counter < len(cleaned_sections) :
-        modes_from_section.append(sensed_to_motion_type(cleaned_sections.iloc[section_counter]["sensed_mode"]))
-        endsec_location = cleaned_sections.iloc[section_counter]["end_loc"]
-        endsec_loc_lat, endsec_loc_lon = geojson_to_lat_lon_separated(endsec_location)
-        section_counter +=1
-
-    return most_common_mode(modes_from_section), section_counter
-
-'''
-Given a list of modes, should RETURN the most used mode.
+REWRITE def check_mode_from_trip(cleaned_trip, cleaned_sections, section_counter, trip_counter): 
 '''
 
-def most_common_mode(list_modes):
-    return max(set(list_modes), key = list_modes.count)
-
-# Should return the section counter, so you know which index to start off with 
 '''
-New and cleaned up version of yelp-suggestion that detects if there is a better-reviewed place of the same 
-category near the user based on the trip point. 
+DUMMY HELPER FUNCTION TO TEST if server and phone side are connected
 '''
 
 def dummy_starter_suggestion(uuid):
     all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
-    user_id = all_users.iloc[all_users[all_users.uuid == uuid].index.tolist()[0]].uuid
+    user_id = uuid
     time_series = esta.TimeSeries.get_time_series(user_id)
     cleaned_sections = time_series.get_data_df("analysis/cleaned_trip", time_query = None)
     real_cleaned_sections = time_series.get_data_df("analysis/inferred_section", time_query = None)
@@ -366,6 +378,123 @@ def dummy_starter_suggestion(uuid):
         modes_from_trips[i], section_counter = most_used_mode_from_trip(cleaned_sections, real_cleaned_sections, section_counter, i)
     return modes_from_trips
 
+'''
+NOMINATIM VERSION: Function to find the review of the original location of the end point of a trip 
+'''
+def review_start_loc_nominatim(location = '0,0'):
+    try:
+        #Off at times if the latlons are of a location that takes up a small spot, especially boba shops
+
+        #IF RETURN_ADDRESS_FROM_LOCATION HAS A BUSINESS LOCATION ATTACHED TO THE ADDRESS
+        if (len(return_address_from_location_nominatim(location)) == 3):
+            address, address_dict = return_address_from_location_nominatim(location)
+            business_name = address_dict[list(address_dict.keys())[0]]
+            city = address_dict['city']
+        #print(business_reviews(API_KEY, business_name.replace(' ', '-') + '-' + city))
+            return business_reviews(YELP_API_KEY, business_name.replace(' ', '-') + '-' + city)['rating']
+    except:
+        try:
+            #This EXCEPT part may error, because it grabs a list of businesses instead of matching the address to a business
+            address, address_dict = return_address_from_location_nominatim(location)
+            return match_business_address(address)
+        except:
+            raise ValueError("Something went wrong")
+'''
+NOMINATIM
+In progress-nominatim yelp server suggestion function, first just trying to make end-to-end work before robustifying this function.
+
+Mode number correspondence: 
+0: "IN_VEHICLE"
+1: "BIKING"
+2: "ON_FOOT"
+3: "STILL"
+4: "UNKNOWN"
+5: "TILTING"
+7: "WALKING"
+8: "RUNNING"
+9: "NONE"
+10: "STOPPED_WHILE_IN_VEHICLE"
+11: "AIR_ON_HSR"
+'''
+def calculate_yelp_server_suggestion_nominatim(uuid):
+    return_obj = { 'message': "Good job walking and biking! No suggestion to show.",
+    'savings': "0", 'start_lat' : '0.0', 'start_lon' : '0.0',
+    'end_lat' : '0.0', 'end_lon' : '0.0', 'method' : 'bike'}
+    all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
+    user_id = all_users.iloc[all_users[all_users.uuid == uuid].index.tolist()[0]].uuid
+    time_series = esta.TimeSeries.get_time_series(user_id)
+    cleaned_trips = time_series.get_data_df("analysis/cleaned_trip", time_query = None)
+    real_cleaned_sections = time_series.get_data_df("analysis/inferred_section", time_query = None)
+    # modes_from_trips = {}
+    section_counter = 0
+    # for i in range(len(cleaned_trips)):
+    #     modes_from_trips[i], section_counter = check_mode_from_trip(cleaned_trips, cleaned_sections, section_counter, i)
+    if len(cleaned_trips) == 0:
+        return_obj['message'] = 'Suggestions will appear once you start taking trips!'
+        return return_obj
+    for i in range(len(cleaned_trips) - 1, -1, -1):
+        distance_in_miles = cleaned_trips.iloc[i]["distance"] * 0.000621371
+        # mode = modes_from_trips[i]
+        start_lat, start_lon = geojson_to_lat_lon_separated(cleaned_trips.iloc[i]["start_loc"])
+        end_lat, end_lon = geojson_to_lat_lon_separated(cleaned_trips.iloc[i]["end_loc"])
+        endpoint_categories = category_of_business_nominatim(end_lat, end_lon)
+        business_locations = {}
+        begin_string_address, begin_address_dict = return_address_from_location_nominatim(start_lat, start_lon)
+        end_string_address, end_address_dict = return_address_from_location_nominatim(end_lat, end_lon)
+        city = end_address_dict["city"]
+        address = end_string_address
+        end_lat_lon = end_lat + "," + end_lon
+        location_review = review_start_loc(end_lat_lon)
+        ratings_bus = {}
+        error_message = 'Sorry, unable to retrieve datapoint'
+        error_message_categor = 'Sorry, unable to retrieve datapoint because datapoint is a house or datapoint does not belong in service categories'
+        try:
+            if (endpoint_categories):
+                for categor in endpoint_categories:
+                    queried_bus = search(YELP_API_KEY, categor, city)['businesses']
+                    for q in queried_bus:
+                            if q['rating'] >= location_review:
+                                #'Coordinates' come out as two elements, latitude and longitude
+                                ratings_bus[q['name']] = q['rating']
+                                obtained = q['location']['display_address'][0] + q['location']['display_address'][1] 
+                                obtained.replace(' ', '+')
+                                business_locations[q['name']] = obtained
+        except: 
+            return {'message' : error_message_categor, 'method': 'bike'}
+
+        #THIS PART WILL BE FIXED ACCODRING TO NOMINATIM AND GET RID OF MAPQUEST (find some other way to calculate distance)
+        for a in business_locations:
+            calculate_distance = distance(start_lat_lon, business_locations[a])
+            #Will check which mode the trip was taking for the integrated calculate yelp suggestion
+            if calculate_distance < distance_in_miles and calculate_distance < 5 and calculate_distance >= 1:
+                try:
+                    message = "Why didn't you bike from " + begin_address + " to " + a + " (tap me to view) " + a + \
+                    " has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a])
+                    #Not sure to include the amount of carbon saved
+                    #Still looking to see what to return with this message, because currently my latitude and longitudes are stacked together in one string
+                    # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
+                    return {'message' : message, 'method': 'bike'}
+                except ValueError as e:
+                    continue
+            elif calculate_distance < distance_in_miles and calculate_distance < 1:
+                try: 
+                    message = "Why didn't you walk from " + begin_address + " to " + a + " (tap me to view) " + a + \
+                    " has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a])
+                    # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
+                    return {'message' : message, 'method': 'walk'}
+                except ValueError as e:
+                    continue
+            elif calculate_distance < distance_in_miles and calculate_distance >= 5 and calculate_distance <= 15:
+                try: 
+                    message = "Why didn't you check out public transportation from " + begin_address + " to " + a + " (tap me to view) " + a + \
+                    " has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a])
+                    # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
+                    return {'message' : message, 'method': 'public'}
+                except ValueError as e:
+                    continue
+
+
+#ORIGINAL YELP_SERVER_SUGGESTION FUNCTION USED TO TEST THE NOTIFICATIONS WILL BE MOVING TO NOMINATIM FUNCTION ON THE TOP
 def calculate_yelp_server_suggestion(uuid):
     #Given a single UUID, create a suggestion for them
     return_obj = { 'message': "Good job walking and biking! No suggestion to show.",
@@ -376,36 +505,31 @@ def calculate_yelp_server_suggestion(uuid):
     time_series = esta.TimeSeries.get_time_series(user_id)
     cleaned_sections = time_series.get_data_df("analysis/cleaned_trip", time_query = None)
     real_cleaned_sections = time_series.get_data_df("analysis/inferred_section", time_query = None)
-    yelp_suggestion_trips = edb.get_yelp_db()
     modes_from_trips = {}
     section_counter = 0
-    for i in range(len(cleaned_sections)):
-        modes_from_trips[i], section_counter = most_used_mode_from_trip(cleaned_sections, real_cleaned_sections, section_counter, i)
     
     if len(cleaned_sections) == 0:
         return_obj['message'] = 'Suggestions will appear once you start taking trips!'
         return return_obj
     for i in range(len(cleaned_sections) - 1, -1, -1):
         distance_in_miles = cleaned_sections.iloc[i]["distance"] * 0.000621371
-        mode = modes_from_trips[i]
         start_lat_lon = geojson_to_latlon(cleaned_sections.iloc[i]["start_loc"])
         end_lat_lon = geojson_to_latlon(cleaned_sections.iloc[i]["end_loc"])
-        # tripDict = yelp_suggestion_trips.find_one({'uuid': uuid})
         endpoint_categories = category_of_business(end_lat_lon)
-        # print(endpoint_categories)
         business_locations = {}
-        if len(return_address_from_location_yelp(start_lat_lon))==1:
-            begin_address = return_address_from_location_yelp(start_lat_lon)
+        if len(return_address_from_location_google(start_lat_lon))==1:
+            begin_address = return_address_from_location_google(start_lat_lon)
         else:
-            begin_address = return_address_from_location_yelp(start_lat_lon)[2]
-        if len(return_address_from_location_yelp(end_lat_lon)) == 1:
+            begin_address = return_address_from_location_google(start_lat_lon)[2]
+        if len(return_address_from_location_google(end_lat_lon)) == 1:
             continue
-        city = return_address_from_location_yelp(end_lat_lon)[1]
-        address = return_address_from_location_yelp(end_lat_lon)[2]
+        city = return_address_from_location_google(end_lat_lon)[1]
+        address = return_address_from_location_google(end_lat_lon)[2]
         location_review = review_start_loc(end_lat_lon)
         ratings_bus = {}
         error_message = 'Sorry, unable to retrieve datapoint'
         error_message_categor = 'Sorry, unable to retrieve datapoint because datapoint is a house or datapoint does not belong in service categories'
+        #ROBUSTIFY: What happens if you lost connection? 
         if (endpoint_categories):
             for categor in endpoint_categories:
                 queried_bus = search(API_KEY, categor, city)['businesses']
