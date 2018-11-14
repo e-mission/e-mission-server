@@ -30,6 +30,7 @@ try:
     nominatim_file = open(abs_file_path, 'r')
     nominatim_config_object = json.load(nominatim_file)
     NOMINATIM_QUERY_URL = nominatim_config_object["query_url"]
+    #nominatim_file.close()
 except:
     print("nominatim not configured either, place decoding must happen on the client")
 
