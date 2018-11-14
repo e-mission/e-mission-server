@@ -3,15 +3,25 @@ FROM continuumio/anaconda3
 
 MAINTAINER Alvin Ghouas
 
+ENV DB_URL=''
+ENV WEB_SERVER_HOST=''
 # set working directory
 WORKDIR /usr/src/app
 
 # clone from repo
-RUN git clone https://github.com/alvinalexander/e-mission-server.git .
-
+#RUN git clone https://github.com/alvinalexander/e-mission-server.git .
+COPY . /usr/src/app
 # setup python environment. TODO: set this to the correct environment. Using alvin_env for testing purposes
-RUN conda env update --name emission --file setup/alvin_environment.yml
+RUN conda env update --name emission --file setup/environment36.yml
 RUN /bin/bash -c "source activate emission; pip install six --upgrade"
+
+RUN export $DB_URL
+RUN export $WEB_SERVER_HOST
+#Configure Database
+#RUN sed "s_localhost_${DB_URL}_" conf/storage/db.conf.sample > conf/storage/db.conf
+
+#RUN cat conf/storage/db.conf
+#RUN cat conf/storage/db.conf.sample
 
 RUN apt-get -y install nano
 
