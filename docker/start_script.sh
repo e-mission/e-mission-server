@@ -14,9 +14,9 @@ cat conf/storage/db.conf
 echo ${WEB_SERVER_HOST}
 if [ -z ${WEB_SERVER_HOST}} ] ; then
     local_host=`hostname -i`
-    sed "s_host_${local_host}_" conf/net/api/webserver.conf.sample > conf/net/api/webserver.conf
+    sed "s_localhost_${local_host}_" conf/net/api/webserver.conf.sample > conf/net/api/webserver.conf
 else
-    sed "s_host_${WEB_SERVER_HOST}_" conf/net/api/webserver.conf.sample > conf/net/api/webserver.conf
+    sed "s_localhost_${WEB_SERVER_HOST}_" conf/net/api/webserver.conf.sample > conf/net/api/webserver.conf
 fi
 cat conf/net/api/webserver.conf
 # change python environment
