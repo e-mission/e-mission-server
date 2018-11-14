@@ -23,7 +23,8 @@ def calculate_single_yelp_suggestion(UUID):
 	logging.debug("About to calculate single suggestion for %s" % UUID)
 	yelp_suggestion_trips = edb.get_yelp_db()
     all_users = pd.DataFrame()
-    user_id = all_users.iloc[all_users[all_users.uuid == uuid].index.tolist()[0]].uuid
+    user_id = UUID
+    #TO ADDRESS PREVIOUS PULL REQUEST COMMENTS, have not yet hooked up the database with the suggestion trips
     time_series = esta.TimeSeries.get_time_series(user_id)
     cleaned_trips = time_series.get_data_df("analysis/cleaned_trip", time_query = None)
     num_cleaned_trips = len(cleaned_trips)
