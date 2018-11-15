@@ -1,13 +1,12 @@
 version: "3"
 services:
   web-server:
-    # replace username/repo:tag with your name and image details
-    image: emission-server:latest
+    image: emission-server
     depends_on:
       - db
     environment:
-      - DB_URL=db
-      - WEB_SERVER_HOST=web-server
+      - DB_HOST=db
+      - WEB_SERVER_HOST=0.0.0.0
     deploy:
       replicas: 1
       restart_policy:
