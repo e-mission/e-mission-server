@@ -59,6 +59,5 @@
      --restart=always \
      --mount type=bind,source="$(pwd)"/conf/storage/db.conf.docker.sample,target=/usr/src/app/conf/storage/db.conf,readonly \
      --mount type=bind,source="$(pwd)"/conf/net/api/webserver.conf.docker.sample,target=/usr/src/app/conf/net/api/webserver.conf,readonly \
-     --mount type=bind,source="$(pwd)"/docker/config/google_auth.json,target=/usr/src/app/conf/net/auth/google_auth.json,readonly \
      e-mission-server:latest
    ```
