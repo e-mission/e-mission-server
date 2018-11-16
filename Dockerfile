@@ -24,7 +24,7 @@ RUN bower update --allow-root
 WORKDIR /usr/src/app
 
 # install nano for editing
-RUN apt-get -y install nano
+RUN apt-get -y install nano vim
 
 # start the server
 ADD docker/start_script.sh /usr/src/app/start_script.sh
