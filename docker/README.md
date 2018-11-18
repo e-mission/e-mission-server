@@ -37,19 +37,7 @@
    
    and access it like MongoDB is running on your host machine.
    
-4. Configure `db.conf`
-
-   ```
-   {
-     "timeseries": {
-       "url": "e-mission-mongo-1"
-     }
-   }
-   ```
-   
-5. Run the server
-
-   Assuming `config` files are located at `docker/config` folder
+4. Run the server
 
    ```
    docker run -d \
