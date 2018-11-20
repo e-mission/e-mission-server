@@ -272,7 +272,9 @@ def updateUserProfile():
   user_uuid = getUUID(request)
   user = User.fromUUID(user_uuid)
   new_fields = request.json['update_doc']
-  return user.update(new_fields)
+  to_return = user.update(new_fields)
+  logging.debug("Successfully updated profile for user %s" % user_uuid)
+  return {"update": True}
 
 @post('/profile/get')
 def getUserProfile():

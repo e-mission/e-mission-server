@@ -23,6 +23,12 @@ preprocessing results ensures reasonable performance.
 
 The installation instructions below are generally targeted towards OSX and \*nix shells such as bash. If you want to use Windows, we recomend using PowerShell (https://technet.microsoft.com/en-us/scriptcenter/dd742419), which provides similarly rich commands. If you really want to use the Command Prompt, most commands should work, but you may need to convert `/` -> `\` to make the commands work.
 
+## Additional Documentation: ##
+----------
+Additional documentation has been moved to its own repository [e-mission-docs](https://github.com/e-mission/e-mission-docs). Specific e-mission-server additional documentation can be found here:
+https://github.com/e-mission/e-mission-docs/tree/master/docs/e-mission-server
+
+
 ## Install/update: ##
 -------------------
 
@@ -60,9 +66,9 @@ is as simple as pulling new changes.
 -------------------
 
 ### Database: ###
-1. Install [Mongodb](http://www.mongodb.org/)
+1. Install [Mongodb](http://www.mongodb.org/), version 3.4
   2. *Windows*: mongodb appears to be installed as a service on Windows devices and it starts automatically on reboot
-  3. *OSX*: You want to install homebrew and then use homebrew to install mongodb. Follow these instruction on how to do so ---> (http://docs.mongodb.org/manual/tutorial/install-mongodb-on-os-x/)
+  3. *OSX*: You want to install homebrew and then use homebrew to install mongodb. Follow these instruction on how to do so ---> (https://docs.mongodb.com/v3.4/tutorial/install-mongodb-on-ubuntu/)
   4. *Ubuntu*: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
 
 2. Start it at the default port
@@ -127,7 +133,10 @@ environment within anaconda to avoid conflicts with other applications.
   ```
 
 ### Javascript dependencies ###
-Run "bower install" instead if you are prompted password for 'https://github.com' after running "bower update".
+
+Note: It is required only if the user needs a  web interface for the server. Otherwise one can do without it as well.
+
+Tip: Run "bower install" instead if you are prompted password for 'https://github.com' after running "bower update".
 
     $ cd webapp
     $ bower update
@@ -141,6 +150,10 @@ Here are the steps for doing this:
 1. On OSX, start the database  (Note: mongodb appears to be installed as a service on Windows devices and it starts automatically on reboot). 
 
         $ mongod
+        2018-05-23T11:06:07.576-0700 I CONTROL  [initandlisten] MongoDB starting : pid=60899 port=27017 dbpath=/data/db 64-bit ...
+        2018-05-23T11:06:07.576-0700 I CONTROL  [initandlisten] db version v3.6.2
+        ...
+        2018-05-23T11:06:08.420-0700 I FTDC     [initandlisten] Initializing full-time diagnostic data capture with directory '/data/db/diagnostic.data'
 
 1. **Optional** Copy configuration files. The files in `conf` can be used to customize the app with custom authentication options or enable external features such as place lookup and the game integration. Look at the samples in `conf/*`, copy them over and modify as necessary - e.g.
 
@@ -151,6 +164,16 @@ Here are the steps for doing this:
 1. Start the server
 
         $ ./e-mission-py.bash emission/net/api/cfc_webapp.py
+        storage not configured, falling back to sample, default configuration
+        Connecting to database URL localhost
+        analysis.debug.conf.json not configured, falling back to sample, default configuration
+        Finished configuring logging for <RootLogger root (WARNING)>
+        Replaced json_dumps in plugin with the one from bson
+        Changing bt.json_loads from <function <lambda> at 0x10f5fdb70> to <function loads at 0x1104b6ae8>
+        Running with HTTPS turned OFF - use a reverse proxy on production
+        Bottle v0.13-dev server starting up (using CherootServer())...
+        Listening on http://0.0.0.0:8080/
+        Hit Ctrl-C to quit.
 
 1. Test your connection to the server
   * Using a web browser, go to [http://localhost:8080](http://localhost:8080)
@@ -169,12 +192,32 @@ You may also want to load some test data.
 
    ```
    $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py emission/tests/data/real_examples/shankari_2015-07-22 test_july_22
+    storage not configured, falling back to sample, default configuration
+    Connecting to database URL localhost
+    emission/tests/data/real_examples/shankari_2015-07-22
+    Loading file emission/tests/data/real_examples/shankari_2015-07-22
+    After registration, test_july_22 -> 908eb622-be3f-4cf4-bf04-1b7e610bea1c
    ```
    
    This will load the data as a new user with email `test_july_22` and a newly created uuid. You can run the intake pipeline for this user like so
    
    ```
    $ ./e-mission-py.bash bin/debug/intake_single_user.py -e test_july_22
+    storage not configured, falling back to sample, default configuration
+    Connecting to database URL localhost
+    analysis.debug.conf.json not configured, falling back to sample, default configuration
+    google maps key not configured, falling back to nominatim
+    nominatim not configured either, place decoding must happen on the client
+    transit stops query not configured, falling back to default
+    2018-05-22T19:56:36.262694-07:00**********UUID 908eb622-be3f-4cf4-bf04-1b7e610bea1c: moving to long term**********
+    2018-05-22T19:56:36.281071-07:00**********UUID 908eb622-be3f-4cf4-bf04-1b7e610bea1c: filter accuracy if needed**********
+    2018-05-22T19:56:36.293284-07:00**********UUID 908eb622-be3f-4cf4-bf04-1b7e610bea1c: segmenting into trips**********
+    2018-05-22T19:56:45.741950-07:00**********UUID 908eb622-be3f-4cf4-bf04-1b7e610bea1c: segmenting into sections**********
+    2018-05-22T19:56:45.777937-07:00**********UUID 908eb622-be3f-4cf4-bf04-1b7e610bea1c: smoothing sections**********
+    2018-05-22T19:56:45.784900-07:00**********UUID 908eb622-be3f-4cf4-bf04-1b7e610bea1c: cleaning and resampling timeline**********
+    2018-05-22T19:56:46.055701-07:00**********UUID 908eb622-be3f-4cf4-bf04-1b7e610bea1c: inferring transportation mode**********
+    2018-05-22T19:56:46.063397-07:00**********UUID 908eb622-be3f-4cf4-bf04-1b7e610bea1c: checking active mode trips to autocheck habits**********
+    2018-05-22T19:56:46.067243-07:00**********UUID 908eb622-be3f-4cf4-bf04-1b7e610bea1c: storing views to cache**********
    ```
    
    If you have the phone app installed, you can log in using `test_july_22` as the email, and select July 22 *2015* to see the data for that date.
@@ -188,7 +231,7 @@ $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py -n /tmp/data-c
 #### Other data sources ####
 1. Get your own data. You can export your timeline for a particular day via email (Profile -> Download json dump) and then load and view it as above.
 
-1. Request access to anonymized data for research purposes by sending email to @shankari. You will be asked to consent to data retention and usage policies and will get an encrypted timeline with data from multiple users, one file per user. More information is at https://github.com/e-mission/e-mission-server/wiki/Requesting-data-as-a-collaborator
+1. Request access to anonymized data for research purposes by sending email to @shankari. You will be asked to consent to data retention and usage policies and will get an encrypted timeline with data from multiple users, one file per user. More information is at https://github.com/e-mission/e-mission-docs/blob/master/docs/e-mission-server/requesting_data_as_a_collaborator.md
    
 1. Sample timeline data from the test phones can be retrieved using the `bin/public/request_public_data.py` script. You can see the inputs to pass to the script by using
    ```
@@ -340,7 +383,7 @@ bower.
 ## Deployment: ##
 ----------
 This is fairly complex and is under active change as we have more projects deploy their own servers with various configurations.
-So I have moved it to its own wiki page:
-https://github.com/e-mission/e-mission-server/wiki/Deploying-your-own-server-to-production
+So I have moved it to the e-mission-server section in the e-mission-docs repo:
+https://github.com/e-mission/e-mission-docs/blob/master/docs/e-mission-server/deploying_your_own_server_to_production.md
 
 [Python_Structure]: https://raw.github.com/amplab/e-mission-server/master/figs/e-mission-server-module-structure.png
