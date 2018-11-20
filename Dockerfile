@@ -15,7 +15,7 @@ RUN /bin/bash -c "source activate emission; pip install six --upgrade"
 
 # install nodejs, npm and bower
 RUN apt-get update
-RUN apt-get install build-essential
+RUN apt-get install -y build-essential
 RUN curl -sL https://deb.nodesource.com/setup_8.x | bash -
 RUN apt-get -y install nodejs
 RUN npm install -g bower
