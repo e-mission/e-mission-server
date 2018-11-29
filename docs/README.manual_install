@@ -150,8 +150,8 @@ Tip: Run "bower install" instead if you are prompted password for 'https://githu
 
 1. Test your connection to the server
   * Using a web browser, go to [http://localhost:8080](http://localhost:8080)
-  * Using the iOS emulator, connect to [http://localhost:8080](http://localhost:8080)
-  * Using the android emulator:
+  * Using safari in the iOS emulator, go to [http://localhost:8080](http://localhost:8080)
+  * Using chrome in the android emulator:
     * change `server.host` in `conf/net/api/webserver.conf` to 0.0.0.0, and 
-    * connect the app to the special IP for the current host in the android emulator - [10.0.2.2](https://developer.android.com/tools/devices/emulator.html#networkaddresses)
+    * go to the special IP for the current host in the android emulator - [10.0.2.2](https://developer.android.com/tools/devices/emulator.html#networkaddresses)
 

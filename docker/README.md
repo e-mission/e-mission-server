@@ -50,6 +50,12 @@ Instructions on re-building the image are at [in the build instructions](#Docker
      emission/e-mission-server:latest
    ```
 
+1. Test your connection to the server
+  * Using a web browser, go to [http://localhost:8080](http://localhost:8080)
+  * Using safari in the iOS emulator, go to [http://localhost:8080](http://localhost:8080)
+  * Using chrome in the android emulator, go to [http://10.0.2.2:8080](http://10.0.2.2:8080) 
+    This is the [special IP for the current host in the android emulator](https://developer.android.com/tools/devices/emulator.html#networkaddresses)
+
 ### Docker Build Instructions
 
 1. Build local docker image
