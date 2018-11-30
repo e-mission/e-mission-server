@@ -1,5 +1,6 @@
 # python 3
 FROM continuumio/anaconda3
+
 MAINTAINER Alvin Ghouas
 # set working directory
 WORKDIR /usr/src/app
@@ -13,5 +14,4 @@ RUN conda env update --name emission --file setup/environment36.yml
 RUN /bin/bash -c "source activate emission; pip install six --upgrade"
 
 RUN apt-get -y install nano
-
 
