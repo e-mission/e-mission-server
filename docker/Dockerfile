@@ -1,12 +1,12 @@
 # python 3
-#FROM continuumio/anaconda3
 FROM emission-server-base
+
 MAINTAINER Alvin Ghouas
 
 ENV DB_HOST=''
 ENV WEB_SERVER_HOST=''
 
-ADD docker/start_script.sh /usr/src/app/start_script.sh
+ADD start_script.sh /usr/src/app/start_script.sh
 RUN chmod u+x /usr/src/app/start_script.sh
 
 EXPOSE 8080
