@@ -12,6 +12,7 @@ services:
       restart_policy:
         condition: on-failure
     ports:
+      #This is a default port mapping. In production you might want to use 80:8080,
       - "8080:8080"
     networks:
       - emission
@@ -23,7 +24,8 @@ services:
         condition: on-failure
     ports:
       - "27017:27017"
-##Mount data volumes at local node.
+#If you want to persist the data in the DB you need to mount a volume.
+    #Instructions can be found here: https://docs.docker.com/compose/compose-file/#volume-configuration-reference
     networks:
        - emission
 networks:
