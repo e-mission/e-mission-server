@@ -10,6 +10,7 @@ else
     sed "s_localhost_${DB_HOST}_" conf/storage/db.conf.sample > conf/storage/db.conf
 fi
 cat conf/storage/db.conf
+
 #set Web Server host using environment variable
 echo ${WEB_SERVER_HOST}
 if [ -z ${WEB_SERVER_HOST}} ] ; then
@@ -20,7 +21,7 @@ else
 fi
 cat conf/net/api/webserver.conf
 
-# start cron jobs
+#TODO: start cron jobs
 
 # change python environment
 source activate emission
