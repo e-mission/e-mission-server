@@ -29,35 +29,12 @@ Instructions on re-building the image are [in the build instructions](#Docker_Bu
     This is the [special IP for the current host in the android emulator](https://developer.android.com/tools/devices/emulator.html#networkaddresses)
 
 ### Docker Build Instructions
-#### emission-server base image
-
-1. Build local docker image
-
-   ```
-   docker build -f docker/Dockerfile-base -t emission/e-mission-server-base:latest .
-   ```
-
-1. Tag the release (make sure you are in the owners group for emission, or
-    replace emission by your own namespace)
-
-   ```
-   docker tag emission/e-mission-server-base:latest emission/e-mission-server-base:<version>
-   ```
-   
-1. Push the release 
-
-   ```
-   docker login
-   docker push emission/e-mission-server-base:<version>
-   docker push emission/e-mission-server-base:latest
-   ```
-
 #### emission-server image
 
 1. Build local docker image
 
    ```
-   docker build -f docker/Dockerfile -t emission/e-mission-server:latest .
+   docker build -f docker/Dockerfile -t emission/e-mission-server:latest ./docker
    ```
 
 1. Tag the release (make sure you are in the owners group for emission, or
