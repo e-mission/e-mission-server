@@ -21,7 +21,7 @@ except:
 
 try:
     nominatim_file = open("conf/net/ext_service/nominatim.json")
-    NOMINATIM_QUERY_URL = json.load(nominatim_file)["base_url"]
+    NOMINATIM_QUERY_URL = json.load(nominatim_file)["query_url"]
 except:
     print("nominatim not configured either, place decoding must happen on the client")
 
@@ -84,14 +84,14 @@ class Geocoder(object):
 
     @classmethod
     def reverse_geocode(cls, lat, lng):
-        # try:
-        #     jsn = cls.get_json_reverse(lat, lng)
-        #     address = jsn["display_name"]
-        #     return address
-
-        # except:
-        #     print "defaulting"
-        return _do_google_reverse(lat, lng) # Just in case
+        try:
+            jsn = cls.get_json_reverse(lat, lng)
+            business_name = jsn["display_name"]
+            address = jsn["address"]
+            return business_name, address
+        except:
+            print("defaulting")
+            return _do_google_reverse(lat, lng) # Just in case
 
 ## Failsafe section
 def _do_google_geo(address):
