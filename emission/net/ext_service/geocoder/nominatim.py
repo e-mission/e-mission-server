@@ -91,7 +91,7 @@ class Geocoder(object):
             return business_name, address
         except:
             print("defaulting")
-        return _do_google_reverse(lat, lng) # Just in case
+            return _do_google_reverse(lat, lng) # Just in case
 
 ## Failsafe section
 def _do_google_geo(address):

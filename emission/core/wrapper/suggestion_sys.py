@@ -46,12 +46,6 @@ except:
     print("google maps key not configured, falling back to nominatim")
 
 try:
-    nominatim = open('conf/net/ext_service/nominatim.json', 'r')
-    nominatim_auth = json.load(nominatim)
-except:
-    print("nominatim not configured either, place decoding must happen on the client")
-
-try:
     yelp_json = open('conf/net/ext_service/yelpfusion.json', 'r')
     yelp_auth = json.load(yelp_json)
 except:
@@ -71,14 +65,10 @@ SEARCH_LIMIT = yelp_auth['search_limit']
 
 NEARBY_URL = google_maps_auth['nearby_base_url']
 SEARCH_URL = google_maps_auth['search_base_url']
-NOMINATIM_URL = nominatim_auth['query_url']
-ZOOM = nominatim_auth['zoom']
-LAT_URL = nominatim_auth['lat']
-LON_URL = nominatim_auth['lon']
 
 
 """
-YELP API: Helper function to query into the API domain. Will change to requests instead of urllib later on.
+YELP API: Helper function to query into the API domain.
 """
 def request(host, path, api_key, url_params=None):
     """Given your API_KEY, send a GET request to the API.
