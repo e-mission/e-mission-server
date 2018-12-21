@@ -1,15 +1,14 @@
 # python 3
 FROM continuumio/miniconda3
 
-MAINTAINER Attawit Kittikrairit
-
+MAINTAINER K. Shankari (shankari@eecs.berkeley.edu)
 # set working directory
 WORKDIR /usr/src/app
 
 # clone from repo
 RUN git clone https://github.com/e-mission/e-mission-server.git .
 
-# setup python environment
+# setup python environment.
 RUN conda env update --name emission --file setup/environment36.yml
 RUN /bin/bash -c "source activate emission; pip install six --upgrade"
 
@@ -23,15 +22,20 @@ WORKDIR /usr/src/app/webapp
 RUN bower update --allow-root
 WORKDIR /usr/src/app
 
-# install nano for editing
+# install nano and vim for editing
 RUN apt-get -y install nano vim
 
 # cleanup
 RUN apt-get -y remove --purge build-essential
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# start the server
-ADD docker/start_script.sh /usr/src/app/start_script.sh
+#declare environment variables
+ENV DB_HOST=''
+ENV WEB_SERVER_HOST=''
+
+#add start script.
+WORKDIR /usr/src/app
+ADD start_script.sh /usr/src/app/start_script.sh
 RUN chmod u+x /usr/src/app/start_script.sh
 
 EXPOSE 8080
