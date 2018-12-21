@@ -1,6 +1,7 @@
 # python 3
 FROM continuumio/miniconda3
 
+MAINTAINER K. Shankari (shankari@eecs.berkeley.edu)
 # set working directory
 WORKDIR /usr/src/app
 
