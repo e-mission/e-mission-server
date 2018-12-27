@@ -438,6 +438,7 @@ Mode number correspondence:
 11: "AIR_ON_HSR"
 '''
 
+
 def calculate_yelp_server_suggestion_singletrip_nominatim(tripid, uuid):
     all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
     user_id = all_users.iloc[all_users[all_users.uuid == uuid].index.tolist()[0]].uuid
