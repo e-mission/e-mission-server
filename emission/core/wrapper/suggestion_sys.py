@@ -248,7 +248,6 @@ DUMMY HELPER FUNCTION TO TEST if server and phone side are connected
 '''
 
 def dummy_starter_suggestion(uuid):
-    all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
     user_id = uuid
     time_series = esta.TimeSeries.get_time_series(user_id)
     cleaned_sections = time_series.get_data_df("analysis/cleaned_trip", time_query = None)
@@ -301,7 +300,6 @@ Mode number correspondence:
 '''
 
 def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripid):
-    all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
     user_id = uuid
     timeseries = esta.TimeSeries.get_time_series(user_id)
     cleaned_trips = timeseries.get_data_df("analysis/cleaned_trip", time_query = None)
@@ -373,7 +371,6 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
     return_obj = { 'message': "Good job walking and biking! No suggestion to show.",
     'savings': "0", 'start_lat' : '0.0', 'start_lon' : '0.0',
     'end_lat' : '0.0', 'end_lon' : '0.0', 'method' : 'bike'}
-    all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
     user_id = uuid
     time_series = esta.TimeSeries.get_time_series(user_id)
     cleaned_trips = time_series.get_data_df("analysis/cleaned_trip", time_query = None)
