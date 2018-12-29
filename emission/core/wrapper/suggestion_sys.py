@@ -6,7 +6,6 @@ import requests
 import json
 import logging
 import re
-import emission.core.get_database as edb
 import emission.storage.timeseries.abstract_timeseries as esta
 import argparse
 import pprint
