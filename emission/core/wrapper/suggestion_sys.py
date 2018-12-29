@@ -49,13 +49,11 @@ except:
 
 
 YELP_API_KEY = yelp_auth['api_key']
-
 MAPQUEST_KEY = yelp_auth['map_quest_key']
 API_HOST = yelp_auth['api_host']
 SEARCH_PATH = yelp_auth['search_path']
 BUSINESS_PATH = yelp_auth['business_path']
 SEARCH_LIMIT = yelp_auth['search_limit']
-
 
 
 """
@@ -302,10 +300,9 @@ Mode number correspondence:
 11: "AIR_ON_HSR"
 '''
 
-
-def calculate_yelp_server_suggestion_singletrip_nominatim(tripid, uuid):
+def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripid):
     all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
-    user_id = all_users.iloc[all_users[all_users.uuid == uuid].index.tolist()[0]].uuid
+    user_id = uuid
     timeseries = esta.TimeSeries.get_time_series(user_id)
     cleaned_trips = timeseries.get_data_df("analysis/cleaned_trip", time_query = None)
     spec_trip = cleaned_trips.iloc[cleaned_trips[cleaned_trips._id == tripid].index.tolist()[0]]
@@ -377,7 +374,7 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
     'savings': "0", 'start_lat' : '0.0', 'start_lon' : '0.0',
     'end_lat' : '0.0', 'end_lon' : '0.0', 'method' : 'bike'}
     all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
-    user_id = all_users.iloc[all_users[all_users.uuid == uuid].index.tolist()[0]].uuid
+    user_id = uuid
     time_series = esta.TimeSeries.get_time_series(user_id)
     cleaned_trips = time_series.get_data_df("analysis/cleaned_trip", time_query = None)
     real_cleaned_sections = time_series.get_data_df("analysis/inferred_section", time_query = None)
