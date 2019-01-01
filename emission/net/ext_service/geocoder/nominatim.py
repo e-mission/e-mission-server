@@ -99,6 +99,26 @@ class Geocoder(object):
             return _do_google_reverse(lat, lng) # Just in case
 
 ## Failsafe section
+
+'''
+GOOGLE LOOKUP VERS: Function that RETURNS a list of business locations near or at the latitude 
+and longitude point given. 
+
+Uses the helper function check_against_business_location. 
+
+The lat, lon are converted into a string, so that it is easier to have it all in one variable 
+in querying for the results through the API call. 
+
+Moved these functions from suggestion_sys.py to nominatim.py because wanted to reduce the 
+number of times of opening the same json file and nominatim.py was already calling 
+the google maps and nominatim json files, so that's why these lookup functions are now 
+in nominatim.py
+
+Attempted to replace the google reverse lookup function with the nominatim.py version of the 
+function, but it encountered an error in the pygeocoder file that is in anaconda.
+Thus, decided to move the original google reverse functions from suggestion_sys.py 
+to nominatim.py
+'''
 def check_against_business_location(location='0, 0', address = ''):
     if not re.compile('^(\-?\d+(\.\d+)?),\s*(\-?\d+(\.\d+)?)$').match(location):
         raise ValueError('Location Invalid')
