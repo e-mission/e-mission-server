@@ -119,11 +119,12 @@ function, but it encountered an error in the pygeocoder file that is in anaconda
 Thus, decided to move the original google reverse functions from suggestion_sys.py 
 to nominatim.py
 '''
-def check_against_business_location(location='0, 0', address = ''):
-    if not re.compile('^(\-?\d+(\.\d+)?),\s*(\-?\d+(\.\d+)?)$').match(location):
+def check_against_business_location(lat, lon, address = ''):
+    location_first = lat + ',' + lon
+    if not re.compile('^(\-?\d+(\.\d+)?),\s*(\-?\d+(\.\d+)?)$').match(location_first):
         raise ValueError('Location Invalid')
     base_url = NEARBY_URL
-    location = 'location=' + location
+    location = 'location=' + location_first
     try:
         key_string = '&key=' + GOOGLE_MAPS_KEY
         radius = '&radius=10'
@@ -152,10 +153,11 @@ def check_against_business_location(location='0, 0', address = ''):
         except:
             raise ValueError("Something went wrong")
 
-def return_address_from_location_google(location='0,0'):
+def return_address_from_location_google(lat, lon):
     """
     Creates a Google Maps API call that returns the addresss given a lat, lon
     """
+    location = lat + ',' + lon
     if not re.compile('^(\-?\d+(\.\d+)?),\s*(\-?\d+(\.\d+)?)$').match(location):
         raise ValueError('Location Invalid')
     base_url = 'https://maps.googleapis.com/maps/api/geocode/json?'
@@ -170,7 +172,7 @@ def return_address_from_location_google(location='0,0'):
 
         #Address to check against value of check_against_business_location
         chk = cleaned[0]['long_name'] + ' ' + cleaned[1]['long_name'] + ', ' + cleaned[3]['long_name']
-        business_tuple = check_against_business_location(location, chk)
+        business_tuple = check_against_business_location(lat, lon, chk)
         
         if business_tuple[0]: #If true, the lat, lon matches a business location and we return business name
             address_comp = cleaned[0]['long_name'] + ' ' + cleaned[1]['short_name']
@@ -186,7 +188,7 @@ def return_address_from_location_google(location='0,0'):
             cleaned = result['results'][0]['address_components']
             #Address to check against value of check_against_business_location
             chk = cleaned[0]['long_name'] + ' ' + cleaned[1]['long_name'] + ', ' + cleaned[3]['long_name']
-            business_tuple = check_against_business_location(location, chk)
+            business_tuple = check_against_business_location(lat, lon, chk)
             if business_tuple[0]: #If true, the lat, lon matches a business location and we return business name
                 address_comp = cleaned[0]['long_name'] + ' ' + cleaned[1]['short_name'] 
                 return business_tuple[1], cleaned[3]['short_name'], address_comp

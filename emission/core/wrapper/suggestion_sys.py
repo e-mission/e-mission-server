@@ -13,6 +13,7 @@ import requests
 import os
 import emission.net.ext_service.geocoder.nominatim as geo
 from emission.net.ext_service.geocoder.nominatim import Geocoder
+import emission.storage.decorations.trip_queries as tripqu
 
 
 try:
@@ -135,8 +136,8 @@ def return_address_from_location_nominatim(lat, lon):
 GOOGLE API: Makes Google Maps API CALL to the domain and returns address given a latitude and longitude
 '''
 
-def return_address_from_google_nomfile(location):
-    return geo.return_address_from_location_google(location)
+def return_address_from_google_nomfile(lat, lon):
+    return geo.return_address_from_location_google(lat, lon)
 
 
 '''
@@ -177,9 +178,8 @@ def category_of_business_nominatim(lat, lon):
         
     except:
         #USE GOOGLE API JUST IN CASE if nominatim doesn't work
-        location = lat + ',' + lon
         try:
-            address = return_address_from_google_nomfile(location)
+            address = return_address_from_google_nomfile(lat, lon)
             categories = []
             possible_bus = match_business_address(address)["businesses"][0]
             possible_categ = possible_bus["categories"]
@@ -309,22 +309,24 @@ Mode number correspondence:
 def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripid):
     user_id = uuid
     timeseries = esta.TimeSeries.get_time_series(user_id)
-    cleaned_trips = timeseries.get_data_df("analysis/cleaned_trip", time_query = None)
+    cleaned_trips = timeseries.get_entry_from_id("analysis/cleaned_trip", tripid)
+    # timeseries.get_data_df("analysis/cleaned_trip", time_query = None)
     '''
-    I changed this to be directly indexing the cleaned trips, wanted to ask 
-    to make sure that it wasn't reading everything to memory
+    Used the abstract time series method, wanted to make sure this was what you were asking for
     '''
     
     # spec_trip = cleaned_trips.iloc[cleaned_trips[cleaned_trips._id == tripid].index.tolist()[0]]
-    spec_trip = cleaned_trips[cleaned_trips._id == tripid]
-    start_location = spec_trip.start_loc.tolist()[0]
-    end_location = spec_trip.end_loc.tolist()[0]
+    # cleaned_trips[cleaned_trips._id == tripid]
+    # spec_trip.end_loc.tolist()[0]
+    spec_trip = cleaned_trips.get("data")
+    start_location = spec_trip["start_loc"]
+    end_location = spec_trip["end_loc"]
     '''
     Distance in miles because the current calculated distances is through MapQuest which uses miles, 
     still working on changing those functions, because haven't found any functions through nominatim
     that calculates distance between points.
     '''
-    distance_in_miles = spec_trip.distance.tolist()[0] * 0.000621371
+    distance_in_miles = spec_trip["distance"] * 0.000621371
     start_lat, start_lon = geojson_to_lat_lon_separated(start_location)
     end_lat, end_lon = geojson_to_lat_lon_separated(end_location)
     start_lat_lon = start_lat + "," + start_lon
