@@ -12,8 +12,6 @@ import pprint
 import requests
 import os
 import emission.net.ext_service.geocoder.nominatim as geo
-from emission.net.ext_service.geocoder.nominatim import Geocoder
-import emission.storage.decorations.trip_queries as tripqu
 
 
 try:
@@ -129,7 +127,7 @@ NOMINATIM API: Creates a Nominatim API Call, returns address in string form and 
     road, neighborhood, etc
 """
 def return_address_from_location_nominatim(lat, lon):
-    geocode_obj = Geocoder()
+    geocode_obj = geo.Geocoder()
     return geocode_obj.reverse_geocode(lat, lon)
 
 '''
@@ -310,23 +308,17 @@ def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripid):
     user_id = uuid
     timeseries = esta.TimeSeries.get_time_series(user_id)
     cleaned_trips = timeseries.get_entry_from_id("analysis/cleaned_trip", tripid)
-    # timeseries.get_data_df("analysis/cleaned_trip", time_query = None)
     '''
     Used the abstract time series method, wanted to make sure this was what you were asking for
     '''
-    
-    # spec_trip = cleaned_trips.iloc[cleaned_trips[cleaned_trips._id == tripid].index.tolist()[0]]
-    # cleaned_trips[cleaned_trips._id == tripid]
-    # spec_trip.end_loc.tolist()[0]
-    spec_trip = cleaned_trips.get("data")
-    start_location = spec_trip["start_loc"]
-    end_location = spec_trip["end_loc"]
+    start_location = cleaned_trips.data.start_loc
+    end_location = cleaned_trips.data.end_loc
     '''
     Distance in miles because the current calculated distances is through MapQuest which uses miles, 
     still working on changing those functions, because haven't found any functions through nominatim
     that calculates distance between points.
     '''
-    distance_in_miles = spec_trip["distance"] * 0.000621371
+    distance_in_miles = cleaned_trips.data.distance * 0.000621371
     start_lat, start_lon = geojson_to_lat_lon_separated(start_location)
     end_lat, end_lon = geojson_to_lat_lon_separated(end_location)
     start_lat_lon = start_lat + "," + start_lon
