@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 #Configure web server
-
 #set database URL using environment variable
 echo ${DB_HOST}
 if [ -z ${DB_HOST} ] ; then
@@ -22,7 +21,6 @@ fi
 cat conf/net/api/webserver.conf
 
 #TODO: start cron jobs
-
 # change python environment
 source activate emission
 

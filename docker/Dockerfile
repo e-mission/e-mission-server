@@ -1,6 +1,7 @@
 # python 3
 FROM continuumio/miniconda3
 
+MAINTAINER K. Shankari (shankari@eecs.berkeley.edu)
 # set working directory
 WORKDIR /usr/src/app
 
@@ -21,8 +22,8 @@ WORKDIR /usr/src/app/webapp
 RUN bower update --allow-root
 WORKDIR /usr/src/app
 
-# install nano for editing
-RUN apt-get -y install nano
+# install nano and vim for editing
+RUN apt-get -y install nano vim
 
 # cleanup
 RUN apt-get -y remove --purge build-essential
