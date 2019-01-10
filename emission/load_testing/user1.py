@@ -68,8 +68,8 @@ class UserBehavior(TaskSet):
         r = self.client.post(url, json=data)
         r.raise_for_status()
         uuid = r.json()['uuid']
-        #TODO: This is a hack to make all the genereated entries JSON encodeable.
-        #Might be a bad Idead to stringify the uuid. For instance,
+        #TODO: This is a hack to make the generated entries JSON encodeable.
+        #Might be a bad idead to stringify the uuid. For instance,
         # the create_entry function expects uuid of type UUID
         return str(uuid)
 
