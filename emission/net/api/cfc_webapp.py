@@ -263,6 +263,16 @@ def getSuggestion():
   logging.debug("Output of ret_dir = %s" % ret_dir)
   return ret_dir
 
+@post('/suggestion_sys')
+def getSingleTripSuggestion(tripid):
+  logging.debug("Called suggestion")
+  user_uuid=getUUID(request)
+  logging.debug("user_uuid %s" % user_uuid)
+  ret_dir = suggsys.calculate_yelp_server_suggestion_singletrip_nominatim(user_uuid, tripid)
+  logging.debug("type(ret_dir) = %s" % type(ret_dir))
+  logging.debug("Output of ret_dir = %s" % ret_dir)
+  return ret_dir
+
 @post('/profile/create')
 def createUserProfile():
   try:

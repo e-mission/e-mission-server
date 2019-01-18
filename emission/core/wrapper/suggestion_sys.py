@@ -53,6 +53,12 @@ SEARCH_PATH = yelp_auth['search_path']
 BUSINESS_PATH = yelp_auth['business_path']
 SEARCH_LIMIT = yelp_auth['search_limit']
 
+ZIPCODE_API_KEY = yelp_auth['zip_code_key']
+ZIP_HOST_URL = yelp_auth['zip_code_host']
+ZIP_FORMAT = yelp_auth['zip_code_format']
+ZIP_DEGREE = yelp_auth['zip_code_degree']
+BACKUP_ZIP_KEY = yelp_auth['backup_zip_code_key']
+
 
 """
 YELP API: Helper function to query into the API domain.
@@ -287,6 +293,31 @@ def review_start_loc_nominatim(lat, lon):
         except:
             raise ValueError("Something went wrong")
 '''
+ZIPCODEAPI
+
+As nominatim sometimes is unable to provide a specific location with the city and instead returns
+a postcode (zipcode) and the country name. For the suggestions that we built, the suggestions
+require which city (city name) it is in order to look for other similar categoried services 
+in the area. Thus, this function takes in the INPUT of a zipcode, and RETURNS the name of the city. 
+
+'''
+def zipcode_retrieval(zipcode):
+    try:
+        # Use this API key first. 
+        url = ZIP_HOST_URL + ZIPCODE_API_KEY + ZIP_FORMAT + zipcode + ZIP_DEGREE
+        response = requests.request('GET', url=url)
+        return response.json()
+
+    except:
+        # In case the first API key runs out of requests per hour. 
+        url = ZIP_HOST_URL + BACKUP_ZIP_KEY + ZIP_FORMAT + zipcode + ZIP_DEGREE
+        response = requests.request('GET', url=url)
+        return response.json()
+        
+def zipcode_to_city(zipcode):
+    response = zipcode_retrieval(zipcode)
+    return response['city']
+'''
 NOMINATIM
 In progress-nominatim yelp server suggestion function, first just trying to make end-to-end work before robustifying this function.
 
@@ -327,7 +358,19 @@ def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripid):
     business_locations = {}
     begin_string_address, begin_address_dict = return_address_from_location_nominatim(start_lat, start_lon)
     end_string_address, end_address_dict = return_address_from_location_nominatim(end_lat, end_lon)
-    city = end_address_dict["city"]
+    try: 
+        city = end_address_dict["city"]
+    except:
+        try:
+            # To classify cities as towns, as some locations only appear as "TOWN" to nominatim
+            city = end_address_dict["town"]
+        except:
+            try:
+                # To classify cities through zipcode, as some locations only appear as "POSTCODE", so convert postcode to city
+                zipcode = end_address_dict["postcode"]
+                city = zipcode_to_city(zipcode)
+            except:
+                return {'message' : 'Sorry, the most recent trip was unable to be detected as to which city.', 'method': 'bike'}
     address = end_string_address
     location_review = review_start_loc_nominatim(end_lat, end_lon)
     ratings_bus = {}
@@ -403,7 +446,19 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
         business_locations = {}
         begin_string_address, begin_address_dict = return_address_from_location_nominatim(start_lat, start_lon)
         end_string_address, end_address_dict = return_address_from_location_nominatim(end_lat, end_lon)
-        city = end_address_dict["city"]
+        try: 
+            city = end_address_dict["city"]
+        except:
+            try:
+                # To classify cities as towns, as some locations only appear as "TOWN" to nominatim
+                city = end_address_dict["town"]
+            except:
+                try:
+                    # To classify cities through zipcode, as some locations only appear as "POSTCODE", so convert postcode to city
+                    zipcode = end_address_dict["postcode"]
+                    city = zipcode_to_city(zipcode)
+                except:
+                    return {'message' : 'Sorry, the most recent trip was unable to be detected as to which city.', 'method': 'bike'}
         address = end_string_address
         start_lat_lon = start_lat + "," + start_lon
         end_lat_lon = end_lat + "," + end_lon
@@ -413,6 +468,7 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
         error_message_categor = 'Sorry, unable to retrieve datapoint because datapoint is a house or datapoint does not belong in service categories'
         try:
             if (endpoint_categories):
+                print(endpoint_categories)
                 for categor in endpoint_categories:
                     queried_bus = search(YELP_API_KEY, categor, city)['businesses']
                     for q in queried_bus:
