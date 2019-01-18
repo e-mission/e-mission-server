@@ -1,0 +1,6 @@
+{
+	"api_key" : "Get from https://www.yelp.com/developers/documentation/v3",
+	"zip_code_key" : "Get from https://www.zipcodeapi.com/Register", 
+	"backup_zip_code_key" : "Also get from https://www.zipcodeapi.com/Register"
+
+}
