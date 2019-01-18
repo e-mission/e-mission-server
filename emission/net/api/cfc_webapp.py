@@ -263,6 +263,7 @@ def getSuggestion():
   logging.debug("Output of ret_dir = %s" % ret_dir)
   return ret_dir
 
+
 @post('/suggestion_sys')
 def getSingleTripSuggestion(tripid):
   logging.debug("Called suggestion")
@@ -272,6 +273,7 @@ def getSingleTripSuggestion(tripid):
   logging.debug("type(ret_dir) = %s" % type(ret_dir))
   logging.debug("Output of ret_dir = %s" % ret_dir)
   return ret_dir
+
 
 @post('/profile/create')
 def createUserProfile():
