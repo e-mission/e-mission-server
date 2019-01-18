@@ -53,11 +53,13 @@ SEARCH_PATH = yelp_auth['search_path']
 BUSINESS_PATH = yelp_auth['business_path']
 SEARCH_LIMIT = yelp_auth['search_limit']
 
+
 ZIPCODE_API_KEY = yelp_auth['zip_code_key']
 ZIP_HOST_URL = yelp_auth['zip_code_host']
 ZIP_FORMAT = yelp_auth['zip_code_format']
 ZIP_DEGREE = yelp_auth['zip_code_degree']
 BACKUP_ZIP_KEY = yelp_auth['backup_zip_code_key']
+
 
 
 """
