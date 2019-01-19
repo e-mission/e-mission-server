@@ -6,7 +6,7 @@ MAINTAINER K. Shankari (shankari@eecs.berkeley.edu)
 WORKDIR /usr/src/app
 
 # clone from repo
-RUN git clone https://github.com/alvinalexander/e-mission-server.git .
+RUN git clone https://github.com/e-mission/e-mission-server.git .
 
 # setup python environment.
 RUN conda env update --name emission --file setup/environment36.yml
