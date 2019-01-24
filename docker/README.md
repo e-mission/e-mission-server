@@ -1,11 +1,12 @@
 # Docker usage instructions
 This project is now published on dockerhub!
 https://hub.docker.com/r/emission/e-mission-server/
-and https://hub.docker.com/r/emission/e-mission-server-base/
+
+Both the standard Dockerfile and the docker-compose.yml are in this directory (docker) and should be specified using `-f`. Once we split out the docker stuff into a separate repository, this should become simpler.
 
 Instructions on re-building the image are [in the build instructions](#Docker_Build_Instructions)
 
-1. Initialize Swarm
+1. (optional) If you want to use `swarm` for container management, initialize Swarm
     ```
    docker swarm init 
    ``` 
@@ -16,8 +17,15 @@ Instructions on re-building the image are [in the build instructions](#Docker_Bu
     * Update the port mappings and environment variables if necessary. 
     For more details on how to configure compose files please see the official documentation: https://docs.docker.com/compose/compose-file/#service-configuration-reference 
 
-3. Deploy to swarm
-    ```
+3. Deploy directly
+
+   ```
+    docker-compose -f docker/docker-compose.yml up -d
+   ```
+
+    or to swarm if you initalized it in step 1
+
+   ```
     docker stack deploy -c docker-compose.yml emission
    ```
    There are many ways you can manage your deployment. Again, please see the official documentation for more details: https://docs.docker.com/get-started/part4/
