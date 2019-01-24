@@ -273,6 +273,7 @@ def getSingleTripSuggestion(tripid):
   logging.debug("Output of ret_dir = %s" % ret_dir)
   return ret_dir
 
+
 @post('/profile/create')
 def createUserProfile():
   try:
