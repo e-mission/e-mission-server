@@ -531,6 +531,7 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
                     return {'message' : message, 'method': 'public', 'rating': str(ratings_bus[a]), 'businessid': a}
                 except ValueError as e:
                     continue
+    print("is it done")
     return {'message': "Your endpoint has either been a non-serviceable category or a closeby option.",'method': 'public transportation', 'rating': None, 'businessid': None}
 
 

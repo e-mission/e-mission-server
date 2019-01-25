@@ -253,7 +253,7 @@ def getTrips(day):
   logging.debug("type(ret_dict) = %s" % type(ret_dict))
   return ret_dict
 
-@post('/suggestion_sys/overall')
+@post('/suggestion_sys/recent')
 def getSuggestion():
   logging.debug("Called suggestion")
   user_uuid=getUUID(request)
