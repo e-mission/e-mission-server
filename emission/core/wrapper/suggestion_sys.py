@@ -12,7 +12,7 @@ import pprint
 import requests
 import os
 import emission.net.ext_service.geocoder.nominatim as geo
-
+import bson
 
 try:
     # For Python 3.0 and later
@@ -53,13 +53,11 @@ SEARCH_PATH = yelp_auth['search_path']
 BUSINESS_PATH = yelp_auth['business_path']
 SEARCH_LIMIT = yelp_auth['search_limit']
 
-
 ZIPCODE_API_KEY = yelp_auth['zip_code_key']
 ZIP_HOST_URL = yelp_auth['zip_code_host']
 ZIP_FORMAT = yelp_auth['zip_code_format']
 ZIP_DEGREE = yelp_auth['zip_code_degree']
 BACKUP_ZIP_KEY = yelp_auth['backup_zip_code_key']
-
 
 
 """
@@ -302,7 +300,6 @@ def review_start_loc_nominatim(lat, lon):
         except:
             raise ValueError("Something went wrong")
 '''
-
 ZIPCODEAPI
 
 As nominatim sometimes is unable to provide a specific location with the city and instead returns
@@ -328,7 +325,6 @@ def zipcode_to_city(zipcode):
     response = zipcode_retrieval(zipcode)
     return response['city']
 '''
-
 NOMINATIM
 In progress-nominatim yelp server suggestion function, first just trying to make end-to-end work before robustifying this function.
 
@@ -348,8 +344,9 @@ Mode number correspondence:
 
 def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripid):
     user_id = uuid
+    trip_id = bson.objectid.ObjectId(tripid)
     timeseries = esta.TimeSeries.get_time_series(user_id)
-    cleaned_trips = timeseries.get_entry_from_id("analysis/cleaned_trip", tripid)
+    cleaned_trips = timeseries.get_entry_from_id("analysis/cleaned_trip", trip_id)
     '''
     Used the abstract time series method, wanted to make sure this was what you were asking for
     '''
@@ -360,9 +357,7 @@ def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripid):
     still working on changing those functions, because haven't found any functions through nominatim
     that calculates distance between points.
     '''
-    print(start_location)
-    print(end_location)
-    print(tripid)
+
     distance_in_miles = cleaned_trips.data.distance * 0.000621371
     start_lat, start_lon = geojson_to_lat_lon_separated(start_location)
     end_lat, end_lon = geojson_to_lat_lon_separated(end_location)
@@ -372,21 +367,14 @@ def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripid):
     business_locations = {}
     begin_string_address, begin_address_dict = return_address_from_location_nominatim(start_lat, start_lon)
     end_string_address, end_address_dict = return_address_from_location_nominatim(end_lat, end_lon)
-
     try: 
         city = end_address_dict["city"]
     except:
         try:
-            # To classify cities as towns, as some locations only appear as "TOWN" to nominatim
             city = end_address_dict["town"]
         except:
-            try:
-                # To classify cities through zipcode, as some locations only appear as "POSTCODE", so convert postcode to city
-                zipcode = end_address_dict["postcode"]
-                city = zipcode_to_city(zipcode)
-            except:
-                return {'message' : 'Sorry, the most recent trip was unable to be detected as to which city.', 'method': 'bike'}
-
+            zipcode = end_address_dict["postcode"]
+            city = zipcode_to_city(zipcode)
     address = end_string_address
     location_review = review_start_loc_nominatim(end_lat, end_lon)
     ratings_bus = {}
@@ -462,7 +450,7 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
         business_locations = {}
         begin_string_address, begin_address_dict = return_address_from_location_nominatim(start_lat, start_lon)
         end_string_address, end_address_dict = return_address_from_location_nominatim(end_lat, end_lon)
-
+        print(end_string_address)
         try: 
             city = end_address_dict["city"]
         except:
@@ -476,7 +464,6 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
                     city = zipcode_to_city(zipcode)
                 except:
                     return {'message' : 'Sorry, the most recent trip was unable to be detected as to which city.', 'method': 'bike'}
-
         address = end_string_address
         start_lat_lon = start_lat + "," + start_lon
         end_lat_lon = end_lat + "," + end_lon
@@ -531,7 +518,6 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
                     return {'message' : message, 'method': 'public', 'rating': str(ratings_bus[a]), 'businessid': a}
                 except ValueError as e:
                     continue
-    print("is it done")
     return {'message': "Your endpoint has either been a non-serviceable category or a closeby option.",'method': 'public transportation', 'rating': None, 'businessid': None}
 
 
