@@ -344,9 +344,9 @@ Mode number correspondence:
 
 def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripid):
     user_id = uuid
-    trip_id = bson.objectid.ObjectId(tripid)
+    tripidstr = bson.objectid.ObjectId(tripid)
     timeseries = esta.TimeSeries.get_time_series(user_id)
-    cleaned_trips = timeseries.get_entry_from_id("analysis/cleaned_trip", trip_id)
+    cleaned_trips = timeseries.get_entry_from_id("analysis/cleaned_trip", tripidstr)
     '''
     Used the abstract time series method, wanted to make sure this was what you were asking for
     '''
