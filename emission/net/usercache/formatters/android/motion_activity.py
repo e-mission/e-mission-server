@@ -21,8 +21,6 @@ def format(entry):
         metadata.time_zone = "America/Los_Angeles" 
     fc.expand_metadata_times(metadata)
     formatted_entry.metadata = metadata
-
-    logging.info('*** Motion Data write_ts: %d' % metadata.write_ts)
     
     data = ad.AttrDict()
     if 'agb' in entry.data:
