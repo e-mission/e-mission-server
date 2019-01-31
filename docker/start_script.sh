@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 #Configure web server
-
 #set database URL using environment variable
 echo ${DB_HOST}
 if [ -z ${DB_HOST} ] ; then
@@ -27,3 +26,4 @@ source activate emission
 
 # launch the webapp
 ./e-mission-py.bash emission/net/api/cfc_webapp.py
+
