@@ -87,6 +87,18 @@ class Entry(ecwb.WrapperBase):
       return result_entry
 
   @staticmethod
+  def create_fake_entry(user_id, key, data, write_ts, create_id=False):
+      """Method used to create Synthetic entries"""
+      
+      result_entry = Entry()
+      result_entry['_id'] = boi.ObjectId()
+      result_entry.user_id = user_id
+      result_entry.metadata = ecwm.Metadata.create_metadata_for_fake_result(key, write_ts)
+      result_entry.data = data
+      result_entry._populateDependencies()
+      return result_entry
+
+  @staticmethod
   def get_dedup_list(key):
       key_class = ecwb.WrapperBase._get_class(Entry._getData2Wrapper()[key])
       all_keys = list(key_class.props.keys())

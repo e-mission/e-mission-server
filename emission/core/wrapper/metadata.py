@@ -43,7 +43,20 @@ class Metadata(ecwb.WrapperBase):
       m.write_local_dt = esdl.get_local_date(m.write_ts, m.time_zone)
       m.write_fmt_time = arrow.get(m.write_ts).to(m.time_zone).isoformat()
       return m
+  @staticmethod
+  def create_metadata_for_fake_result(key, write_ts):
+      import emission.storage.decorations.local_date_queries as esdl
+      import arrow
 
+      m = Metadata()
+      m.key = key
+      m.platform = "server"
+      m.write_ts = write_ts
+      m.time_zone = "America/Los_Angeles"
+      m.write_local_dt = esdl.get_local_date(m.write_ts, m.time_zone)
+      m.write_fmt_time = arrow.get(m.write_ts).to(m.time_zone).isoformat()
+      return m
+      
   def isAndroid(self):
     return self.platform == "android"
 
