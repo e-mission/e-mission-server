@@ -342,11 +342,11 @@ Mode number correspondence:
 11: "AIR_ON_HSR"
 '''
 
-def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripid):
+def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripidstr):
     user_id = uuid
-    tripidstr = bson.objectid.ObjectId(tripid)
+    tripid = bson.objectid.ObjectId(tripidstr)
     timeseries = esta.TimeSeries.get_time_series(user_id)
-    cleaned_trips = timeseries.get_entry_from_id("analysis/cleaned_trip", tripidstr)
+    cleaned_trips = timeseries.get_entry_from_id("analysis/cleaned_trip", tripid)
     '''
     Used the abstract time series method, wanted to make sure this was what you were asking for
     '''
