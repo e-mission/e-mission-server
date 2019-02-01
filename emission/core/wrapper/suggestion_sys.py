@@ -12,7 +12,7 @@ import pprint
 import requests
 import os
 import emission.net.ext_service.geocoder.nominatim as geo
-
+import bson
 
 try:
     # For Python 3.0 and later
@@ -52,6 +52,12 @@ API_HOST = yelp_auth['api_host']
 SEARCH_PATH = yelp_auth['search_path']
 BUSINESS_PATH = yelp_auth['business_path']
 SEARCH_LIMIT = yelp_auth['search_limit']
+
+ZIPCODE_API_KEY = yelp_auth['zip_code_key']
+ZIP_HOST_URL = yelp_auth['zip_code_host']
+ZIP_FORMAT = yelp_auth['zip_code_format']
+ZIP_DEGREE = yelp_auth['zip_code_degree']
+BACKUP_ZIP_KEY = yelp_auth['backup_zip_code_key']
 
 
 """
@@ -194,9 +200,16 @@ def distance(address1, address2):
     address1 = address1.replace(' ', '+')
     address2 = address2.replace(' ', '+')
 
+
     url = 'http://www.mapquestapi.com/directions/v2/route?key=' + MAPQUEST_KEY + '&from=' + address1 + '&to=' + address2
     response = requests.get(url)
     return response.json()['route']['distance']
+    # except:
+    #     url = 'http://www.mapquestapi.com/directions/v2/route?key=' + BACKUP_MAPQUEST_KEY + '&from=' + address1 + '&to=' + address2
+    #     response = requests.get(url)
+    #     print(response.json())
+    #     return response.json()['route']['distance']
+
 
 '''
 Two functions that RETURN latitude and longitude coordinates from GEOJSON file
@@ -287,6 +300,31 @@ def review_start_loc_nominatim(lat, lon):
         except:
             raise ValueError("Something went wrong")
 '''
+ZIPCODEAPI
+
+As nominatim sometimes is unable to provide a specific location with the city and instead returns
+a postcode (zipcode) and the country name. For the suggestions that we built, the suggestions
+require which city (city name) it is in order to look for other similar categoried services 
+in the area. Thus, this function takes in the INPUT of a zipcode, and RETURNS the name of the city. 
+
+'''
+def zipcode_retrieval(zipcode):
+    try:
+        # Use this API key first. 
+        url = ZIP_HOST_URL + ZIPCODE_API_KEY + ZIP_FORMAT + zipcode + ZIP_DEGREE
+        response = requests.request('GET', url=url)
+        return response.json()
+
+    except:
+        # In case the first API key runs out of requests per hour. 
+        url = ZIP_HOST_URL + BACKUP_ZIP_KEY + ZIP_FORMAT + zipcode + ZIP_DEGREE
+        response = requests.request('GET', url=url)
+        return response.json()
+        
+def zipcode_to_city(zipcode):
+    response = zipcode_retrieval(zipcode)
+    return response['city']
+'''
 NOMINATIM
 In progress-nominatim yelp server suggestion function, first just trying to make end-to-end work before robustifying this function.
 
@@ -304,8 +342,9 @@ Mode number correspondence:
 11: "AIR_ON_HSR"
 '''
 
-def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripid):
+def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripidstr):
     user_id = uuid
+    tripid = bson.objectid.ObjectId(tripidstr)
     timeseries = esta.TimeSeries.get_time_series(user_id)
     cleaned_trips = timeseries.get_entry_from_id("analysis/cleaned_trip", tripid)
     '''
@@ -318,6 +357,7 @@ def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripid):
     still working on changing those functions, because haven't found any functions through nominatim
     that calculates distance between points.
     '''
+
     distance_in_miles = cleaned_trips.data.distance * 0.000621371
     start_lat, start_lon = geojson_to_lat_lon_separated(start_location)
     end_lat, end_lon = geojson_to_lat_lon_separated(end_location)
@@ -327,7 +367,14 @@ def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripid):
     business_locations = {}
     begin_string_address, begin_address_dict = return_address_from_location_nominatim(start_lat, start_lon)
     end_string_address, end_address_dict = return_address_from_location_nominatim(end_lat, end_lon)
-    city = end_address_dict["city"]
+    try: 
+        city = end_address_dict["city"]
+    except:
+        try:
+            city = end_address_dict["town"]
+        except:
+            zipcode = end_address_dict["postcode"]
+            city = zipcode_to_city(zipcode)
     address = end_string_address
     location_review = review_start_loc_nominatim(end_lat, end_lon)
     ratings_bus = {}
@@ -345,10 +392,13 @@ def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripid):
                         obtained.replace(' ', '+')
                         business_locations[q['name']] = obtained
     except: 
-        return {'message' : error_message_categor, 'method': 'bike'}
+        return {'message' : error_message_categor, 'method': 'bike', 'rating': None, 'businessid': None}
     
     for a in business_locations:
-        calculate_distance = distance(start_lat_lon, business_locations[a])
+        try:
+            calculate_distance = distance(start_lat_lon, business_locations[a])
+        except:
+            continue
         #Will check which mode the trip was taking for the integrated calculate yelp suggestion
         if calculate_distance < distance_in_miles and calculate_distance < 5 and calculate_distance >= 1:
             try:
@@ -357,7 +407,7 @@ def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripid):
                 #Not sure to include the amount of carbon saved
                 #Still looking to see what to return with this message, because currently my latitude and longitudes are stacked together in one string
                 # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
-                return {'message' : message, 'method': 'bike'}
+                return {'message' : message, 'method': 'bike', 'rating': str(ratings_bus[a]), 'businessid': a}
             except ValueError as e:
                 continue
         elif calculate_distance < distance_in_miles and calculate_distance < 1:
@@ -365,7 +415,7 @@ def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripid):
                 message = "Why didn't you walk from " + begin_string_address+ " to " + a + " (tap me to view) " + a + \
                 " has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a])
                 # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
-                return {'message' : message, 'method': 'walk'}
+                return {'message' : message, 'method': 'walk', 'rating': str(ratings_bus[a]), 'businessid': a}
             except ValueError as e:
                 continue
         elif calculate_distance < distance_in_miles and calculate_distance >= 5 and calculate_distance <= 15:
@@ -373,16 +423,13 @@ def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripid):
                 message = "Why didn't you check out public transportation from " + begin_string_address + " to " + a + " (tap me to view) " + a + \
                 " has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a])
                 # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
-                return {'message' : message, 'method': 'public'}
+                return {'message' : message, 'method': 'public', 'rating': str(ratings_bus[a]), 'businessid': a}
             except ValueError as e:
                 continue
    
-    return {'message': "Your endpoint has either been a non-serviceable category or a closeby option.",'method': 'public transportation'}
+    return {'message': "Your endpoint has either been a non-serviceable category or a closeby option.",'method': 'public transportation', 'rating': None, 'businessid': None}
 
 def calculate_yelp_server_suggestion_nominatim(uuid):
-    return_obj = { 'message': "Good job walking and biking! No suggestion to show.",
-    'savings': "0", 'start_lat' : '0.0', 'start_lon' : '0.0',
-    'end_lat' : '0.0', 'end_lon' : '0.0', 'method' : 'bike'}
     user_id = uuid
     time_series = esta.TimeSeries.get_time_series(user_id)
     cleaned_trips = time_series.get_data_df("analysis/cleaned_trip", time_query = None)
@@ -403,7 +450,20 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
         business_locations = {}
         begin_string_address, begin_address_dict = return_address_from_location_nominatim(start_lat, start_lon)
         end_string_address, end_address_dict = return_address_from_location_nominatim(end_lat, end_lon)
-        city = end_address_dict["city"]
+        print(end_string_address)
+        try: 
+            city = end_address_dict["city"]
+        except:
+            try:
+                # To classify cities as towns, as some locations only appear as "TOWN" to nominatim
+                city = end_address_dict["town"]
+            except:
+                try:
+                    # To classify cities through zipcode, as some locations only appear as "POSTCODE", so convert postcode to city
+                    zipcode = end_address_dict["postcode"]
+                    city = zipcode_to_city(zipcode)
+                except:
+                    return {'message' : 'Sorry, the most recent trip was unable to be detected as to which city.', 'method': 'bike'}
         address = end_string_address
         start_lat_lon = start_lat + "," + start_lon
         end_lat_lon = end_lat + "," + end_lon
@@ -423,11 +483,14 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
                                 obtained.replace(' ', '+')
                                 business_locations[q['name']] = obtained
         except: 
-            return {'message' : error_message_categor, 'method': 'bike'}
+            return {'message' : error_message_categor, 'method': 'bike', 'rating': None, 'businessid': None}
 
         #THIS PART WILL BE FIXED ACCODRING TO NOMINATIM AND GET RID OF MAPQUEST (find some other way to calculate distance)
         for a in business_locations:
-            calculate_distance = distance(start_lat_lon, business_locations[a])
+            try:
+                calculate_distance = distance(start_lat_lon, business_locations[a])
+            except:
+                continue
             #Will check which mode the trip was taking for the integrated calculate yelp suggestion
             if calculate_distance < distance_in_miles and calculate_distance < 5 and calculate_distance >= 1:
                 try:
@@ -436,7 +499,7 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
                     #Not sure to include the amount of carbon saved
                     #Still looking to see what to return with this message, because currently my latitude and longitudes are stacked together in one string
                     # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
-                    return {'message' : message, 'method': 'bike'}
+                    return {'message' : message, 'method': 'bike', 'rating': str(ratings_bus[a]), 'businessid': a}
                 except ValueError as e:
                     continue
             elif calculate_distance < distance_in_miles and calculate_distance < 1:
@@ -444,7 +507,7 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
                     message = "Why didn't you walk from " + begin_string_address+ " to " + a + " (tap me to view) " + a + \
                     " has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a])
                     # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
-                    return {'message' : message, 'method': 'walk'}
+                    return {'message' : message, 'method': 'walk', 'rating': str(ratings_bus[a]), 'businessid': a}
                 except ValueError as e:
                     continue
             elif calculate_distance < distance_in_miles and calculate_distance >= 5 and calculate_distance <= 15:
@@ -452,9 +515,9 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
                     message = "Why didn't you check out public transportation from " + begin_string_address + " to " + a + " (tap me to view) " + a + \
                     " has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a])
                     # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
-                    return {'message' : message, 'method': 'public'}
+                    return {'message' : message, 'method': 'public', 'rating': str(ratings_bus[a]), 'businessid': a}
                 except ValueError as e:
                     continue
-    return return_obj
+    return {'message': "Your endpoint has either been a non-serviceable category or a closeby option.",'method': 'public transportation', 'rating': None, 'businessid': None}
 
 
