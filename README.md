@@ -23,8 +23,8 @@ preprocessing results ensures reasonable performance.
 
 ## Installation: ##
 ----------
-- The [docker installation](docker/README.md) is probably the easiest way to get started.
-- If you are planning to make changes to the install and are on OSX or \*nix shells, the [manual install](docs/README.manual_install) may make it easier to edit files directly on your local filesystem.
+- For **deployers** (i.e. if you want to primarily *use* the system as opposed to modify/develop it, the [docker installation](https://github.com/e-mission/e-mission-docker) is probably the easiest way to get started.
+- For **builders** (i.e. if you want to write new scripts or modify existing scripts) the [manual install](https://github.com/e-mission/e-mission-docs/blob/master/docs/e-mission-server/manual_install.md) will make it easier to edit files directly on your local filesystem. Make sure to use a POSIX-compliant CLI; you may want to look into [gitbash](https://openhatch.org/missions/windows-setup/install-git-bash) or similar on Windows.
 
 ## Additional Documentation: ##
 ----------
@@ -33,24 +33,15 @@ https://github.com/e-mission/e-mission-docs/tree/master/docs/e-mission-server
 
 ## Deployment: ##
 -------------------
-- If you just want to run the server, you can use [our docker image](docker/README.md).
-- Alternatively, you can follow the [manual installation instructions](docs/README.manual_install) and just not change any code.
+- If you just want to run the server, you can use [our docker image](https://github.com/e-mission/e-mission-docker).
+- Alternatively, you can follow the [manual installation instructions](https://github.com/e-mission/e-mission-docs/blob/master/docs/e-mission-server/manual_install.md) to pull from the repo to the server, change the config files slightly and just not change any code.
 
 ## Development: ##
 -------------------
-In order to test out changes to the webapp, you should make the changes locally, test them and then push. Then, deployment is as simple as pulling from the repo to the real server and changing the config files slightly. Note that if the changes are to the server code, you need to restart the server after making changes.
-
-### Making changes using docker ###
--------------------
-- Option 1: The docker image has vim installed, so you can just [edit the files directly in the docker container](https://stackoverflow.com/questions/30853247/how-do-i-edit-a-file-after-i-shell-to-a-docker-container)
-- Option 2: You can mount the source code (using `--mount`) and edit the files on the host drive. Note that this is tricky because the image already has the files, and mounting on top of an existing directory does not work. So you may want to mount to a different location, [open a shell](https://stackoverflow.com/a/26496875) and then restart the server manually.
-- Option 3: Using `scp`, editing via `ssh` url, or [any of the other known options](https://stackoverflow.com/a/43548695)
-
-### Making changes on a manual install ### 
-Use the [manual install](docs/README.manual_install) instructions and edit files on your computer directly.
+In order to test out changes to the webapp, you should make the changes locally, test them and then push the tested changes to a repository. Note that if the changes are to the server code, you need to restart the server after making changes.
 
 ### Loading test data ###
-
+-------------------
 You may also want to load some test data. Note that for the docker install, you will need to run these scripts from the docker image after [opening a shell](https://stackoverflow.com/a/26496875)
 
 #### Quick start ####
