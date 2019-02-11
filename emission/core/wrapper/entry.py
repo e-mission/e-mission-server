@@ -32,36 +32,77 @@ class Entry(ecwb.WrapperBase):
 
   @staticmethod
   def _getData2Wrapper():
-    return {"background/location": "location",
+    return {
+            ### BEGIN: incoming data types ###
+            # all location points from the phone
+            "background/location": "location",
+            # "valid" location points from the phone, after removing low-accuracy points
             "background/filtered_location": "location",
+            # "motionactivity" results from the phone, indicating walk/bike or "motorized"
             "background/motion_activity": "motionactivity",
+            # battery readings, to determine power drain empirically
             "background/battery": "battery",
+            # transition events for the tracking finite state machine on the phone
             "statemachine/transition": "transition",
+            # phone sensing configuration (e.g. sensing frequency, geofencing,...)
             "config/sensor_config": "sensorconfig",
+            # phone sync configuration (sync interval,...)
             "config/sync_config": "syncconfig",
+            # user consent time + protocol version
             "config/consent": "consentconfig",
+            # webapp API call time, measured on the server
             "stats/server_api_time": "statsevent",
+            # intended to log the occurrence of errors in the webapp
             "stats/server_api_error": "statsevent",
+            # pipeline stage time, measured on the server
             "stats/pipeline_time": "statsevent",
+            # intended to log the occurrence of errors in the pipeline
             "stats/pipeline_error": "statsevent",
+            # time for various client operations, measured on the client
+            # comparison with the server_api_time can help debug networking issues
             "stats/client_time": "statsevent",
+            # events, such as button presses, on the client
             "stats/client_nav_event": "statsevent",
+            # errors detected on the client. Again, can be correlated with
+            # server calls to debug networking issues
             "stats/client_error": "statsevent",
+            # incidents (smiley/frownie) reported by the user from the phone
             "manual/incident": "incident",
+            # user confirmation of the travel mode, potentially selected from a
+            # rich set of travel modes that cannot be detected using sensors
             "manual/mode_confirm": "userlabel",
+            # user confirmation of the travel purpose
             "manual/purpose_confirm": "userlabel",
+            ### END: incoming data types ###
+            ### BEGIN: analysis result data types ###
+            ### ** BEGIN: objects generated after the initial segmentation step **
+            # trips from one place to another
             "segmentation/raw_trip": "rawtrip",
+            # places between trips
             "segmentation/raw_place": "rawplace",
+            # sections within a trip (e.g. walk -> bus -> walk has 3 sections)
             "segmentation/raw_section": "section",
+            # stops between sections
             "segmentation/raw_stop": "stop",
+            # untracked time (e.g. when phone was out of battery)
             "segmentation/raw_untracked": "untrackedtime",
+            ### ** END: objects generated after the initial segmentation step **
+            # object indicating which points need to be removed from the trajectory
+            # because they represent zig-zags
             "analysis/smoothing": "smoothresults",
+            ### ** BEGIN: objects generated after the second cleaned segmentation step
+            ### same explanations as the corresponding segmentation/* objects
             "analysis/cleaned_trip": "cleanedtrip",
             "analysis/cleaned_place": "cleanedplace",
             "analysis/cleaned_section": "cleanedsection",
             "analysis/cleaned_stop": "stop",
             "analysis/cleaned_untracked": "untrackedtime",
+            # Resampled locations to ensure that the point density is
+            # consistent across operating systems and sampling frequencies
             "analysis/recreated_location": "recreatedlocation",
+            ### ** END: objects generated after the second cleaned segmentation step
+            ### ** BEGIN: metric outputs. These are not currently stored
+            ### they are generated on demand instead
             "metrics/daily_user_count": "modestattimesummary",
             "metrics/daily_mean_count": "modestattimesummary",
             "metrics/daily_user_distance": "modestattimesummary",
@@ -70,9 +111,19 @@ class Entry(ecwb.WrapperBase):
             "metrics/daily_mean_duration": "modestattimesummary",
             "metrics/daily_user_median_speed": "modestattimesummary",
             "metrics/daily_mean_median_speed": "modestattimesummary",
+            ### ** END: metric outputs.
+            ### ** BEGIN: prediction objects
+            # the generated model for the random forest based mode inference
+            # saved so that it can be used for prediction without retraining
             "mode_inference/model": "modeinfermodel",
+            # the predicted mode for a particular section
             "inference/prediction": "modeprediction",
+            # equivalent of cleaned_section, but with the mode set to the 
+            # inferred mode instead of just walk/bike/motorized
+            # used for consistency and to make the client work whether or not we were
+            # running the inference step
             "analysis/inferred_section": "inferredsection",
+            ### ** END: prediction objects
             }
 
   @staticmethod
