@@ -3,11 +3,8 @@ channels:
 - conda-forge
 - defaults
 dependencies:
-- altair=1.2.1=py_0
 - branca=0.2.0=py_1
 - folium=0.5.0=py_0
-- vega=0.4.4=py36_1
-- vincent=0.4.4=py36_0
 - ipython=5.3.0=py36_0
 - jupyter=1.0.0=py36_3
 - arrow=0.12.1
