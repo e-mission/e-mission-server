@@ -531,7 +531,7 @@ def get_overriden_mode(raw_section_data, filtered_section_data, with_speeds_df):
 
 def is_air_section(filtered_section_data,with_speeds_df):
     HUNDRED_KMPH = old_div(float(100 * 1000), (60 * 60)) # m/s
-    ONE_FIFTY_KMPH = old_div(float(100 * 1000), (60 * 60)) # m/s
+    ONE_FIFTY_KMPH = old_div(float(150 * 1000), (60 * 60)) # m/s
     end_to_end_distance = filtered_section_data.distance
     end_to_end_time = filtered_section_data.duration
     end_to_end_speed = old_div(end_to_end_distance, end_to_end_time)
