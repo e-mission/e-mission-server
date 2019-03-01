@@ -200,11 +200,13 @@ def is_true(bool_array):
     return ret_val
 
 def validate_simple_bus_stops(p_start_stops, p_end_stops):
-    is_bus_stop = lambda s: "highway" in s.tags and \
-                            s.tags.highway == "bus_stop"
+    is_no_route_bus_stop = lambda s: "highway" in s.tags and \
+                                     s.tags.highway == "bus_stop" and \
+                                     "route_ref" not in s.tags and \
+                                     "routes" not in s
 
-    start_bus_stops = [s for s in p_start_stops if is_bus_stop(s)]
-    end_bus_stops = [s for s in p_end_stops if is_bus_stop(s)]
+    start_bus_stops = [s for s in p_start_stops if is_no_route_bus_stop(s)]
+    end_bus_stops = [s for s in p_end_stops if is_no_route_bus_stop(s)]
 
     # at least one of the sides should be sparse
     if len(start_bus_stops) == 1 or len(end_bus_stops) == 1:
