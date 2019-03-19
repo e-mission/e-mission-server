@@ -153,6 +153,7 @@ def match_business_address(address):
         'location': address.replace(' ', '+')
     }
     return request(API_HOST, business_path, YELP_API_KEY, url_params)
+
 """
 NOMINATIM API: Checks if location given by nominatim call is a residential location
 
@@ -163,6 +164,7 @@ def is_service_nominatim(business):
     if "Road" in business:
         return False
     return True
+
 '''
 NOMINATIM VERS: Function that RETURNS a list of categories that the business falls into 
 
@@ -212,6 +214,8 @@ def category_of_business_nominatim(lat, lon):
             return categories
         except:
             raise ValueError("Something went wrong")
+
+
 
 
 '''
