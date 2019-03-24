@@ -1,7 +1,7 @@
 version: "3"
 services:
   web-server:
-    image: emission-server
+    image: emission/e-mission-server:latest
     depends_on:
       - db
     environment:

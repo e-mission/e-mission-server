@@ -34,6 +34,8 @@ ENV DB_HOST=''
 ENV WEB_SERVER_HOST=''
 
 #add start script.
+# this is a redundant workdir setting, but it doesn't harm anything and might
+# be useful if the other one is removed for some reason
 WORKDIR /usr/src/app
 ADD start_script.sh /usr/src/app/start_script.sh
 RUN chmod u+x /usr/src/app/start_script.sh

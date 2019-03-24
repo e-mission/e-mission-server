@@ -20,7 +20,7 @@ ts_enum_map = {
     esta.EntryType.ANALYSIS_TYPE: edb.get_analysis_timeseries_db()
 }
 
-INVALID_QUERY = {'1': '2'}
+INVALID_QUERY = {'metadata.key': 'invalid'}
 
 class BuiltinTimeSeries(esta.TimeSeries):
     def __init__(self, user_id):

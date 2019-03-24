@@ -4,5 +4,5 @@
 # - on linux: /home/<user>/miniconda3/bin/conda
 # - on OSX: /Users/<user>/miniconda3/bin/conda
 # - on Windows: C:/Users/<user>/Miniconda3/Scripts/conda
-conda env update --name emission --file setup/environment36.yml
+conda env update --name emission --file setup/environment36.nomkl.yml
 source activate emission
