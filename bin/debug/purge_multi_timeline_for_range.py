@@ -41,6 +41,7 @@ if __name__ == '__main__':
     ats_db = edb.get_analysis_timeseries_db()
     udb = edb.get_uuid_db()
     psdb = edb.get_pipeline_state_db()
+    db_array = [ts_db, ats_db, udb, psdb]
 
     for i, filename in enumerate(sel_file_list):
         if "pipelinestate" in filename:
@@ -60,19 +61,4 @@ if __name__ == '__main__':
                 (len(curr_uuid_list), curr_uuid_list, common.split_user_id(filename)))
         curr_uuid = curr_uuid_list[0]
         if not args.info_only:
-            logging.info("For uuid = %s, deleting entries from the timeseries" % curr_uuid)
-            timeseries_del_result = ts_db.remove({"user_id": curr_uuid})
-            logging.info("result = %s" % timeseries_del_result)
-
-            logging.info("For uuid = %s, deleting entries from the analysis_timeseries" % curr_uuid)
-            analysis_timeseries_del_result = ats_db.remove({"user_id": curr_uuid})
-            logging.info("result = %s" % analysis_timeseries_del_result)
-
-            logging.info("For uuid %s, deleting entries from the user_db" % curr_uuid)
-            user_db_del_result = udb.remove({"uuid": curr_uuid})
-            logging.info("result = %s" % user_db_del_result)
-
-            if args.pipeline_purge:
-                logging.info("For uuid %s, deleting entries from the pipeline_state_db" % curr_uuid)
-                psdb_del_result = psdb.remove({"user_id": curr_uuid})
-                logging.info("result = %s" % psdb_del_result)
+            common.purge_entries_for_user(curr_uuid, args.pipeline_purge, db_array)
