@@ -252,7 +252,7 @@ def get_time_range_for_stage(user_id, stage):
 def get_current_state(user_id, stage):
     curr_state_doc = edb.get_pipeline_state_db().find_one({"user_id": user_id,
                                                             "pipeline_stage": stage.value})
-    logging.debug("returning curr_state_doc  %s for stage %s " % (curr_state_doc, stage))
+    #logging.debug("returning curr_state_doc  %s for stage %s " % (curr_state_doc, stage))
     if curr_state_doc is not None:
         return ps.PipelineState(curr_state_doc)
     else:

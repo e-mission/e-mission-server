@@ -22,7 +22,7 @@ def format(entry):
     fc.expand_metadata_times(metadata)
     formatted_entry.metadata = metadata
 
-    logging.info('*** Motion Data write_ts: %d' % metadata.write_ts)
+    #logging.info('*** Motion Data write_ts: %d' % metadata.write_ts)
     
     data = ad.AttrDict()
     if 'agb' in entry.data:
