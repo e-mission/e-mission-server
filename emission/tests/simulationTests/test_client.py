@@ -1,6 +1,6 @@
 import unittest
-from client import EmissionFakeDataGenerator
-from error import AddressNotFoundError
+from emission.simulation.client import EmissionFakeDataGenerator
+from emission.simulation.error import AddressNotFoundError
 
 class TestClientMethods(unittest.TestCase):
     def setUp(self):

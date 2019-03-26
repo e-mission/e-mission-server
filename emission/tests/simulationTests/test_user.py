@@ -1,6 +1,6 @@
 import unittest
-from fake_user import FakeUser
-from error import AddressNotFoundError
+from emission.simulation.fake_user import FakeUser
+from emission.simulation.error import AddressNotFoundError
 import datascience 
 import prob140
 import numpy as np
@@ -51,7 +51,7 @@ class TestFakeUserMethods(unittest.TestCase):
 
     def test_upload_to_server(self):
         self.fake_user.take_trip()
-        self.fake_user.upload_measurments()
+        self.fake_user.sync_data_to_server()
 
     def test_take_trip(self):
         self.assertEqual(self.fake_user._current_state, self.config['initial_state'])
@@ -79,7 +79,7 @@ class TestFakeUserMethods(unittest.TestCase):
     def test_create_otp_trip(self):
         home = (37.77264255,-122.399714854263)
         work = (37.42870635,-122.140926605802)
-        otp = self.fake_user._create_new_otp_trip(home, work)
+        otp = self.fake_user._create_new_otp_trip(home, work, home, work)
         measurements = otp.get_measurements_along_route(self.fake_user._uuid)
         print(len(measurements))
 

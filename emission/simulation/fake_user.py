@@ -92,7 +92,7 @@ class FakeUser:
         date = "%s-%s-%s" % (self._time_object.month, self._time_object.day, self._time_object.year)
         time = "%s:%s" % (self._time_object.hour, self._time_object.minute)
         
-        #TODO: Figure out ho we should set bike
+        #TODO: Figure out how we should set bike
         return self._trip_planer_client(curr_coordinate, next_coordinate, mode, date, time, bike=True)
     
     def _update_time(self, prev_trip_end_time):
