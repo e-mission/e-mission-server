@@ -4,7 +4,6 @@ from __future__ import division
 from __future__ import absolute_import
 from future import standard_library
 standard_library.install_aliases()
-import os
 from builtins import *
 from builtins import object
 import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
@@ -15,22 +14,14 @@ from emission.core.wrapper.trip_old import Coordinate
 from pygeocoder import Geocoder as pyGeo  ## We fall back on this if we have to
 
 try:
-    script_dir = os.path.dirname(__file__)
-    rel_path = "../gmaps/googlemaps.json"
-    abs_file_path = os.path.join(script_dir, rel_path)
-    googlemaps_key_file = open(abs_file_path, 'r')
+    googlemaps_key_file = open("conf/net/ext_service/googlemaps.json")
     GOOGLE_MAPS_KEY = json.load(googlemaps_key_file)["api_key"]
-except Exception as e:
+except:
     print("google maps key not configured, falling back to nominatim")
 
 try:
-    script_dir = os.path.dirname(__file__)
-    rel_path = "nominatim.json"
-    abs_file_path = os.path.join(script_dir, rel_path)
-    nominatim_file = open(abs_file_path, 'r')
-    nominatim_config_object = json.load(nominatim_file)
-    NOMINATIM_QUERY_URL = nominatim_config_object["query_url"]
-    #nominatim_file.close()
+    nominatim_file = open("conf/net/ext_service/nominatim.json")
+    NOMINATIM_QUERY_URL = json.load(nominatim_file)["query_url"]
 except:
     print("nominatim not configured either, place decoding must happen on the client")
 
@@ -46,7 +37,7 @@ class Geocoder(object):
             "format" : "json"
         }
 
-        query_url = NOMINATIM_QUERY_URL + "/search.php?"
+        query_url = NOMINATIM_QUERY_URL + "/search?"
         encoded_params = urllib.parse.urlencode(params)
         url = query_url + encoded_params
         return url
@@ -60,16 +51,14 @@ class Geocoder(object):
 
     @classmethod
     def geocode(cls, address):
-        try:
-            jsn = cls.get_json_geo(address)
-            lat = float(jsn[0]["lat"])
-            lon = float(jsn[0]["lon"])
-            return Coordinate(lat, lon)
-        except Exception as e:
-            print(e)
-            print("defaulting")
-            #TODO: Right now there is no default gecoder. Discuss if we should create a google account for this.
-            return _do_google_geo(address) # If we fail ask the gods
+        # try:
+        #     jsn = cls.get_json_geo(address)
+        #     lat = float(jsn[0]["lat"])
+        #     lon = float(jsn[0]["lon"])
+        #     return Coordinate(lat, lon)
+        # except:
+        #     print "defaulting"
+        return _do_google_geo(address) # If we fail ask the gods
 
 
     @classmethod
