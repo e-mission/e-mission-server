@@ -1,6 +1,5 @@
 
 from abc import ABC, abstractmethod
-import datascience 
 from prob140 import MarkovChain 
 import numpy as np
 import datetime
