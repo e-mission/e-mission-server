@@ -40,3 +40,33 @@ def read_files_with_prefix(prefix):
     logging.info("Found %d matching files for prefix %s" % (len(matching_files), prefix))
     logging.info("files are %s ... %s" % (matching_files[0:5], matching_files[-5:-1]))
     return matching_files
+
+def purge_entries_for_user(curr_uuid, is_purge_state, db_array=None):
+    logging.info("For uuid = %s, deleting entries from the timeseries" % curr_uuid)
+    if db_array is not None:
+        [ts_db, ats_db, udb, psdb] = db_array
+        logging.debug("db_array passed in with databases %s" % db_array)
+    else:
+        import emission.core.get_database as edb
+
+        ts_db = edb.get_timeseries_db()
+        ats_db = edb.get_analysis_timeseries_db()
+        udb = edb.get_uuid_db()
+        psdb = edb.get_pipeline_state_db()
+        logging.debug("db_array not passed in, looking up databases")
+
+    timeseries_del_result = ts_db.remove({"user_id": curr_uuid})
+    logging.info("result = %s" % timeseries_del_result)
+
+    logging.info("For uuid = %s, deleting entries from the analysis_timeseries" % curr_uuid)
+    analysis_timeseries_del_result = ats_db.remove({"user_id": curr_uuid})
+    logging.info("result = %s" % analysis_timeseries_del_result)
+
+    logging.info("For uuid %s, deleting entries from the user_db" % curr_uuid)
+    user_db_del_result = udb.remove({"uuid": curr_uuid})
+    logging.info("result = %s" % user_db_del_result)
+
+    if is_purge_state:
+        logging.info("For uuid %s, deleting entries from the pipeline_state_db" % curr_uuid)
+        psdb_del_result = psdb.remove({"user_id": curr_uuid})
+        logging.info("result = %s" % psdb_del_result)

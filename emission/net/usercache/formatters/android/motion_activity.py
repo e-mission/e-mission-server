@@ -33,8 +33,10 @@ def format(entry):
         data.type = ecwa.MotionTypes(entry.data.zzbjA).value
     elif 'ajO' in entry.data:
         data.type = ecwa.MotionTypes(entry.data.ajO).value
-    else:
+    elif 'zzaKM' in entry.data:
         data.type = ecwa.MotionTypes(entry.data.zzaKM).value
+    else:
+        data.type = ecwa.MotionTypes(entry.data.zzbhB).value
 
 
     if 'agc' in entry.data:
@@ -45,8 +47,10 @@ def format(entry):
         data.confidence = entry.data.zzbjB
     elif 'ajP' in entry.data:
         data.confidence = entry.data.ajP
-    else:
+    elif 'zzaKN' in entry.data:
         data.confidence = entry.data.zzaKN
+    else:
+        data.confidence = entry.data.zzbhC
 
     data.ts = formatted_entry.metadata.write_ts
     data.local_dt = formatted_entry.metadata.write_local_dt
