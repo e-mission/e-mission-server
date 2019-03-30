@@ -154,6 +154,17 @@ def match_business_address(address):
     }
     return request(API_HOST, business_path, YELP_API_KEY, url_params)
 
+"""
+NOMINATIM API: Checks if location given by nominatim call is a residential location
+
+"""
+def is_service_nominatim(business):
+    if "Hall" in business:
+        return False
+    if "Road" in business:
+        return False
+    return True
+
 '''
 NOMINATIM VERS: Function that RETURNS a list of categories that the business falls into 
 
@@ -174,6 +185,8 @@ def category_of_business_nominatim(lat, lon):
         string_address, address_dict = return_address_from_location_nominatim(lat, lon)   
         business_key = list(address_dict.keys())[0]
         business_name = address_dict[business_key]
+        if (not is_service_nominatim(business_name)):
+            return []
         city = address_dict['city']
         categories = []
         for c in business_reviews(YELP_API_KEY, business_name.replace(' ', '-') + '-' + city)['categories']:
@@ -183,7 +196,12 @@ def category_of_business_nominatim(lat, lon):
     except:
         #USE GOOGLE API JUST IN CASE if nominatim doesn't work
         try:
-            address = return_address_from_google_nomfile(lat, lon)
+            try:
+                bus_name, short_addr, address, location_is_service = return_address_from_google_nomfile(lat, lon)
+            except:
+                address, location_is_service = return_address_from_google_nomfile(lat, lon)
+            if (location_is_service == False):
+                return []
             categories = []
             possible_bus = match_business_address(address)["businesses"][0]
             possible_categ = possible_bus["categories"]
@@ -192,6 +210,9 @@ def category_of_business_nominatim(lat, lon):
             return categories
         except:
             raise ValueError("Something went wrong")
+
+
+
 
 '''
 Function that RETURNS distance between addresses
@@ -450,7 +471,6 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
         business_locations = {}
         begin_string_address, begin_address_dict = return_address_from_location_nominatim(start_lat, start_lon)
         end_string_address, end_address_dict = return_address_from_location_nominatim(end_lat, end_lon)
-        print(end_string_address)
         try: 
             city = end_address_dict["city"]
         except:
@@ -482,8 +502,10 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
                                 obtained = q['location']['display_address'][0] + q['location']['display_address'][1] 
                                 obtained.replace(' ', '+')
                                 business_locations[q['name']] = obtained
+            else:
+                return {'message' : error_message_categor, 'method': 'bike', 'rating': None, 'businessid': None, 'tripid': cleaned_trips.iloc[i]["_id"]}
         except: 
-            return {'message' : error_message_categor, 'method': 'bike', 'rating': None, 'businessid': None}
+            return {'message' : error_message_categor, 'method': 'bike', 'rating': None, 'businessid': None, 'tripid': None}
 
         #THIS PART WILL BE FIXED ACCODRING TO NOMINATIM AND GET RID OF MAPQUEST (find some other way to calculate distance)
         for a in business_locations:
@@ -499,7 +521,7 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
                     #Not sure to include the amount of carbon saved
                     #Still looking to see what to return with this message, because currently my latitude and longitudes are stacked together in one string
                     # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
-                    return {'message' : message, 'method': 'bike', 'rating': str(ratings_bus[a]), 'businessid': a}
+                    return {'message' : message, 'method': 'bike', 'rating': str(ratings_bus[a]), 'businessid': a, 'tripid': cleaned_trips.iloc[i]["_id"]}
                 except ValueError as e:
                     continue
             elif calculate_distance < distance_in_miles and calculate_distance < 1:
@@ -507,7 +529,7 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
                     message = "Why didn't you walk from " + begin_string_address+ " to " + a + " (tap me to view) " + a + \
                     " has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a])
                     # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
-                    return {'message' : message, 'method': 'walk', 'rating': str(ratings_bus[a]), 'businessid': a}
+                    return {'message' : message, 'method': 'walk', 'rating': str(ratings_bus[a]), 'businessid': a, 'tripid': cleaned_trips.iloc[i]["_id"]}
                 except ValueError as e:
                     continue
             elif calculate_distance < distance_in_miles and calculate_distance >= 5 and calculate_distance <= 15:
@@ -515,9 +537,9 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
                     message = "Why didn't you check out public transportation from " + begin_string_address + " to " + a + " (tap me to view) " + a + \
                     " has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a])
                     # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
-                    return {'message' : message, 'method': 'public', 'rating': str(ratings_bus[a]), 'businessid': a}
+                    return {'message' : message, 'method': 'public', 'rating': str(ratings_bus[a]), 'businessid': a, 'tripid': cleaned_trips.iloc[i]["_id"]}
                 except ValueError as e:
                     continue
-    return {'message': "Your endpoint has either been a non-serviceable category or a closeby option.",'method': 'public transportation', 'rating': None, 'businessid': None}
+    return {'message': "Your endpoint has either been a non-serviceable category or a closeby option.",'method': 'public transportation', 'rating': None, 'businessid': None, 'tripid': cleaned_trips.iloc[i]["_id"]}
 
 

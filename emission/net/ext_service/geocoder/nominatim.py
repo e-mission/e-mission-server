@@ -168,17 +168,16 @@ def return_address_from_location_google(lat, lon):
         url = base_url + latlng + key_string #Builds the url
         result = requests.get(url).json() #Gets google maps json file
         cleaned = result['results'][0]['address_components']
-
-
         #Address to check against value of check_against_business_location
         chk = cleaned[0]['long_name'] + ' ' + cleaned[1]['long_name'] + ', ' + cleaned[3]['long_name']
         business_tuple = check_against_business_location(lat, lon, chk)
-        
+        location_is_service = isLocationService(cleaned)
         if business_tuple[0]: #If true, the lat, lon matches a business location and we return business name
             address_comp = cleaned[0]['long_name'] + ' ' + cleaned[1]['short_name']
-            return business_tuple[1], cleaned[3]['short_name'], address_comp
+            #, cleaned[3]['short_name'], address_comp
+            return business_tuple[1], cleaned[3]['short_name'], address_comp, location_is_service
         else: #otherwise, we just return the address
-            return cleaned[0]['long_name'] + ' ' + cleaned[1]['short_name'] + ', ' + cleaned[3]['short_name']
+            return cleaned[0]['long_name'] + ' ' + cleaned[1]['short_name'] + ', ' + cleaned[3]['short_name'], location_is_service
     except:
         try:
             #Use Jack's Token in case of some invalid request problem with other API Token
@@ -186,16 +185,30 @@ def return_address_from_location_google(lat, lon):
             url = base_url + latlng + key_string #Builds the url
             result = requests.get(url).json() #Gets google maps json file
             cleaned = result['results'][0]['address_components']
+            location_is_service = isLocationService(cleaned)
             #Address to check against value of check_against_business_location
             chk = cleaned[0]['long_name'] + ' ' + cleaned[1]['long_name'] + ', ' + cleaned[3]['long_name']
             business_tuple = check_against_business_location(lat, lon, chk)
             if business_tuple[0]: #If true, the lat, lon matches a business location and we return business name
                 address_comp = cleaned[0]['long_name'] + ' ' + cleaned[1]['short_name'] 
-                return business_tuple[1], cleaned[3]['short_name'], address_comp
+                return business_tuple[1], cleaned[3]['short_name'], address_comp, location_is_service
             else: #otherwise, we just return the address
-                return cleaned[0]['long_name'] + ' ' + cleaned[1]['short_name'] + ', ' + cleaned[3]['short_name']
+                return cleaned[0]['long_name'] + ' ' + cleaned[1]['short_name'] + ', ' + cleaned[3]['short_name'], location_is_service
         except:
             raise ValueError("Something went wrong")
+
+'''
+Function that checks if location was a place of service or a residential area. RETURNS TRUE 
+if it is a location of service, FALSE otherwise
+'''
+def isLocationService(address_components):
+    for a in address_components:
+        types_of_service = a["types"]
+        longname = a["long_name"]
+        for t in types_of_service:
+            if t == "premise" or t == "neighborhood" and "Downtown" not in longname:
+                return False
+    return True
 
 def _do_google_geo(address):
     geo = pyGeo(GOOGLE_MAPS_KEY)
