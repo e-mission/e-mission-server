@@ -175,7 +175,7 @@ def return_address_from_location_google(lat, lon):
         if business_tuple[0]: #If true, the lat, lon matches a business location and we return business name
             address_comp = cleaned[0]['long_name'] + ' ' + cleaned[1]['short_name']
             #, cleaned[3]['short_name'], address_comp
-            return business_tuple[1], location_is_service
+            return business_tuple[1], cleaned[3]['short_name'], address_comp, location_is_service
         else: #otherwise, we just return the address
             return cleaned[0]['long_name'] + ' ' + cleaned[1]['short_name'] + ', ' + cleaned[3]['short_name'], location_is_service
     except:
@@ -191,7 +191,7 @@ def return_address_from_location_google(lat, lon):
             business_tuple = check_against_business_location(lat, lon, chk)
             if business_tuple[0]: #If true, the lat, lon matches a business location and we return business name
                 address_comp = cleaned[0]['long_name'] + ' ' + cleaned[1]['short_name'] 
-                return business_tuple[1], location_is_service
+                return business_tuple[1], cleaned[3]['short_name'], address_comp, location_is_service
             else: #otherwise, we just return the address
                 return cleaned[0]['long_name'] + ' ' + cleaned[1]['short_name'] + ', ' + cleaned[3]['short_name'], location_is_service
         except:

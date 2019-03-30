@@ -196,7 +196,10 @@ def category_of_business_nominatim(lat, lon):
     except:
         #USE GOOGLE API JUST IN CASE if nominatim doesn't work
         try:
-            address, location_is_service = return_address_from_google_nomfile(lat, lon)
+            try:
+                bus_name, short_addr, address, location_is_service = return_address_from_google_nomfile(lat, lon)
+            except:
+                address, location_is_service = return_address_from_google_nomfile(lat, lon)
             if (location_is_service == False):
                 return []
             categories = []
@@ -500,7 +503,7 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
                                 obtained.replace(' ', '+')
                                 business_locations[q['name']] = obtained
             else:
-                return {'message' : error_message_categor, 'method': 'bike', 'rating': None, 'businessid': None, 'tripid': str(cleaned_trips.iloc[i]["_id"])}
+                return {'message' : error_message_categor, 'method': 'bike', 'rating': None, 'businessid': None, 'tripid': cleaned_trips.iloc[i]["_id"]}
         except: 
             return {'message' : error_message_categor, 'method': 'bike', 'rating': None, 'businessid': None, 'tripid': None}
 
@@ -518,7 +521,7 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
                     #Not sure to include the amount of carbon saved
                     #Still looking to see what to return with this message, because currently my latitude and longitudes are stacked together in one string
                     # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
-                    return {'message' : message, 'method': 'bike', 'rating': str(ratings_bus[a]), 'businessid': a, 'tripid': str(cleaned_trips.iloc[i]["_id"])}
+                    return {'message' : message, 'method': 'bike', 'rating': str(ratings_bus[a]), 'businessid': a, 'tripid': cleaned_trips.iloc[i]["_id"]}
                 except ValueError as e:
                     continue
             elif calculate_distance < distance_in_miles and calculate_distance < 1:
@@ -526,7 +529,7 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
                     message = "Why didn't you walk from " + begin_string_address+ " to " + a + " (tap me to view) " + a + \
                     " has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a])
                     # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
-                    return {'message' : message, 'method': 'walk', 'rating': str(ratings_bus[a]), 'businessid': a, 'tripid': str(cleaned_trips.iloc[i]["_id"])}
+                    return {'message' : message, 'method': 'walk', 'rating': str(ratings_bus[a]), 'businessid': a, 'tripid': cleaned_trips.iloc[i]["_id"]}
                 except ValueError as e:
                     continue
             elif calculate_distance < distance_in_miles and calculate_distance >= 5 and calculate_distance <= 15:
@@ -534,9 +537,9 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
                     message = "Why didn't you check out public transportation from " + begin_string_address + " to " + a + " (tap me to view) " + a + \
                     " has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a])
                     # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
-                    return {'message' : message, 'method': 'public', 'rating': str(ratings_bus[a]), 'businessid': a, 'tripid': str(cleaned_trips.iloc[i]["_id"])}
+                    return {'message' : message, 'method': 'public', 'rating': str(ratings_bus[a]), 'businessid': a, 'tripid': cleaned_trips.iloc[i]["_id"]}
                 except ValueError as e:
                     continue
-    return {'message': "Your endpoint has either been a non-serviceable category or a closeby option.",'method': 'public transportation', 'rating': None, 'businessid': None, 'tripid': str(cleaned_trips.iloc[i]["_id"])}
+    return {'message': "Your endpoint has either been a non-serviceable category or a closeby option.",'method': 'public transportation', 'rating': None, 'businessid': None, 'tripid': cleaned_trips.iloc[i]["_id"]}
 
 
