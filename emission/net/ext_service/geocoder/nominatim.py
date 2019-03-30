@@ -166,14 +166,12 @@ def return_address_from_location_google(lat, lon):
         #This try block is for our first 150,000 requests. If we exceed this, use Jack's Token.
         key_string = '&key=' + GOOGLE_MAPS_KEY
         url = base_url + latlng + key_string #Builds the url
-        print(url)
         result = requests.get(url).json() #Gets google maps json file
         cleaned = result['results'][0]['address_components']
         #Address to check against value of check_against_business_location
         chk = cleaned[0]['long_name'] + ' ' + cleaned[1]['long_name'] + ', ' + cleaned[3]['long_name']
         business_tuple = check_against_business_location(lat, lon, chk)
         location_is_service = isLocationService(cleaned)
-
         if business_tuple[0]: #If true, the lat, lon matches a business location and we return business name
             address_comp = cleaned[0]['long_name'] + ' ' + cleaned[1]['short_name']
             #, cleaned[3]['short_name'], address_comp
@@ -206,8 +204,9 @@ if it is a location of service, FALSE otherwise
 def isLocationService(address_components):
     for a in address_components:
         types_of_service = a["types"]
+        longname = a["long_name"]
         for t in types_of_service:
-            if t == "premise" or t == "neighborhood":
+            if t == "premise" or t == "neighborhood" and "Downtown" not in longname:
                 return False
     return True
 

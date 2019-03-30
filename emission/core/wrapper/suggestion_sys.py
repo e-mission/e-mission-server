@@ -189,9 +189,6 @@ def category_of_business_nominatim(lat, lon):
             return []
         city = address_dict['city']
         categories = []
-        print("tried worked")
-        print("Address")
-        print(business_name)
         for c in business_reviews(YELP_API_KEY, business_name.replace(' ', '-') + '-' + city)['categories']:
             categories.append(c['alias'])
         return categories
@@ -202,13 +199,9 @@ def category_of_business_nominatim(lat, lon):
             address, location_is_service = return_address_from_google_nomfile(lat, lon)
             if (location_is_service == False):
                 return []
-            print("Address")
-            print(address)
             categories = []
             possible_bus = match_business_address(address)["businesses"][0]
             possible_categ = possible_bus["categories"]
-            print("Categories")
-            print(possible_categ)
             for p in possible_categ:
                 categories.append(p["alias"])
             return categories
@@ -466,7 +459,6 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
     if len(cleaned_trips) == 0:
         return_obj['message'] = 'Suggestions will appear once you start taking trips!'
         return return_obj
-    print(len(cleaned_trips))
     for i in range(len(cleaned_trips) - 1, -1, -1):
         distance_in_miles = cleaned_trips.iloc[i]["distance"] * 0.000621371
         # mode = modes_from_trips[i]
@@ -476,7 +468,6 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
         business_locations = {}
         begin_string_address, begin_address_dict = return_address_from_location_nominatim(start_lat, start_lon)
         end_string_address, end_address_dict = return_address_from_location_nominatim(end_lat, end_lon)
-        # print(end_string_address)
         try: 
             city = end_address_dict["city"]
         except:
