@@ -1,0 +1,175 @@
+body {
+	background: #eff2f2;
+}
+
+h1 { font-family: "EB Garamond"; font-size: 24px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 26.4px; } h3 { font-family: "EB Garamond"; font-size: 14px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 15.4px; } p { font-family: "EB Garamond"; font-size: 14px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 20px; } blockquote { font-family: "EB Garamond"; font-size: 21px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 30px; } pre { font-family: "EB Garamond"; font-size: 13px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 18.5714px; }
+
+.top_bar {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.item {
+	font-family: "EB Garamond"; 
+	font-size: 20px; 
+	font-style: normal; 
+	font-variant: normal; 
+	color: #204f2f;
+	margin-top: 30px;
+	font-weight: bold;
+}
+
+#logo {
+	margin-top: -10px;
+}
+
+.button {
+	width: 175px;
+	height: 30px;
+	border-width: .5px;
+	border: solid;
+	border-color: #204f2f;
+	font-family: "EB Garamond";
+	color: #204f2f;
+	font-size: 24px; 
+	text-align: center; 
+	justify-content: center;
+	margin-top: 15px;
+	display: inline-block;
+	padding: 5px;
+	/*font-weight: bold; */
+}
+
+.big_box {
+	background-color: #FFEDC2;
+	position: absolute; /* or absolute */
+  	width: 900px;
+  	height: 400px;
+  	text-align: center; 
+  	opacity: .7;
+  	left: 10%;
+
+}
+
+.large_text {
+	font-family: "EB Garamond";
+	font-size: 80px;
+	font-weight: .1;
+	margin-top: 75px;
+	opacity: 1;
+}
+
+.smaller_text {
+	font-family: "EB Garamond";
+	font-size: 20px;
+	margin-top: 30px;
+	opacity: 1;
+}
+
+#learn {
+	width: 300px;
+	margin-top: 30px;
+	color: black;
+	border-color: black;
+	font-weight: bold;
+	opacity: 1;
+}
+
+.background_image {
+	margin-top: 100px;
+	margin-left: 60px;
+}
+
+#contact {
+	left: 40%;
+	position: absolute;
+}
+
+#second_page {
+	background-color: #278e29;
+	opacity: .8;
+	height: 500px;
+}
+
+#learn_image {
+	margin-top: 150px;
+}
+
+#large_text_1 {
+	margin-top: 30px;
+}
+
+#incentive_box {
+	height: 500px;
+	background-color: rgba(82, 41, 165, 0.6);
+}
+
+#incentive_image {
+	margin-top: 175px;
+}
+
+#large_text_2 {
+	margin-top: 20px;
+}
+
+a {
+	text-decoration: none;
+	color: #204f2f;
+}
+
+div.button a {
+	color: black;
+}
+
+div.smaller_text a {
+	text-decoration: none;
+	color: black;
+}
+
+.student_info {
+	display: flex;
+	margin: 20px;
+	background-color: #FFEDC2;
+}
+
+.text {
+	display: flex;
+	flex-direction: column;
+}
+
+#large_text_3 {
+	margin-top: 10px;
+	margin-left: 30%;
+}
+
+.name {
+	font-family: "EB Garamond";
+	font-size: 40px;
+	margin-left: 30px;
+}
+
+.background {
+	font-family: "EB Garamond";
+	margin-left: 30px;
+	font-size: 20px;
+}
+
+#large_text_4 {
+	margin-top: 20px;
+}
+
+#support_box {
+	height: 450px;
+	background-color: rgb(96, 207, 247);
+}
+
+#related_work {
+	background-color: rgb(98, 135, 52);
+
+}
+
+a:visited { text-decoration: none; color: #204f2f;}
+a:hover { text-decoration: none; color: #204f2f;}
+a:focus { text-decoration: none; color: #204f2f;}
+a:hover, a:active { text-decoration: none; color: #204f2f;}
