@@ -161,8 +161,6 @@ NOMINATIM API: Checks if location given by nominatim call is a residential locat
 def is_service_nominatim(business):
     if "Hall" in business:
         return False
-    if "Road" in business:
-        return False
     return True
 
 '''
@@ -330,17 +328,21 @@ in the area. Thus, this function takes in the INPUT of a zipcode, and RETURNS th
 
 '''
 def zipcode_retrieval(zipcode):
-    try:
-        # Use this API key first. 
-        url = ZIP_HOST_URL + ZIPCODE_API_KEY + ZIP_FORMAT + zipcode + ZIP_DEGREE
-        response = requests.request('GET', url=url)
-        return response.json()
+    
+    # Use this API key first. 
+    url = ZIP_HOST_URL + ZIPCODE_API_KEY + ZIP_FORMAT + zipcode + ZIP_DEGREE
+    response = requests.request('GET', url=url)
+    results = response.json()
 
-    except:
+    if "error_code" in results:
         # In case the first API key runs out of requests per hour. 
         url = ZIP_HOST_URL + BACKUP_ZIP_KEY + ZIP_FORMAT + zipcode + ZIP_DEGREE
         response = requests.request('GET', url=url)
         return response.json()
+    else:
+        return results
+
+    
         
 def zipcode_to_city(zipcode):
     response = zipcode_retrieval(zipcode)
