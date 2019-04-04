@@ -19,6 +19,7 @@ import emission.storage.timeseries.timequery as estt
 
 import emission.storage.decorations.trip_queries as esdt
 import emission.storage.decorations.analysis_timeseries_queries as esda
+import emission.storage.decorations.section_queries as esds
 import emission.storage.decorations.timeline as esdtl
 
 import emission.core.wrapper.location as ecwl
@@ -28,6 +29,7 @@ import emission.core.common as ecc
 
 # TODO: Move this to the section_features class instead
 import emission.analysis.intake.cleaning.location_smoothing as eaicl
+import emission.analysis.config as eac
 
 def _del_non_derializable(prop_dict, extra_keys):
     for key in extra_keys:
@@ -146,9 +148,22 @@ def section_to_geojson(section, tl):
     # Update works on dicts, convert back to a section object to make the modes
     # work properly
     points_line_feature.properties = ecwcs.Cleanedsection(points_line_feature.properties)
-    points_line_feature.properties["feature_type"] = "section"
-    points_line_feature.properties["sensed_mode"] = str(points_line_feature.properties.sensed_mode)
 
+    points_line_feature.properties["feature_type"] = "section"
+
+    if eac.get_section_key_for_analysis_results() == esda.INFERRED_SECTION_KEY:
+        ise = esds.cleaned2inferred_section(section.user_id, section.get_id())
+        if ise is not None:
+            logging.debug("mapped cleaned section %s -> inferred section %s" % 
+                (section.get_id(), ise.get_id()))
+            logging.debug("changing mode from %s -> %s" % 
+                (points_line_feature.properties.sensed_mode, ise.data.sensed_mode))
+            points_line_feature.properties["sensed_mode"] = str(ise.data.sensed_mode)
+        else:
+            points_line_feature.properties["sensed_mode"] = str(points_line_feature.properties.sensed_mode)
+    else:
+        points_line_feature.properties["sensed_mode"] = str(points_line_feature.properties.sensed_mode)
+    
     _del_non_derializable(points_line_feature.properties, ["start_loc", "end_loc"])
 
     # feature_array.append(gj.FeatureCollection(points_feature_array))

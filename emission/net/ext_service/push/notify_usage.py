@@ -22,23 +22,23 @@ def __get_default_interface__():
     return interface_obj
 
 def send_visible_notification_to_users(user_id_list, title, message, json_data, dev=False):
-    token_list = pnq.get_matching_tokens(pnq.get_user_query(user_id_list))
+    token_map = pnq.get_matching_tokens(pnq.get_user_query(user_id_list))
     logging.debug("user_id_list of length %d -> token list of length %d" % 
-        (len(user_id_list), len(token_list)))
-    return __get_default_interface__().send_visible_notification(token_list, title, message, json_data, dev)
+        (len(user_id_list), len(token_map["ios"]) + len(token_map["android"])))
+    return __get_default_interface__().send_visible_notification(token_map, title, message, json_data, dev)
 
 def send_silent_notification_to_users(user_id_list, json_data, dev=False):
-    token_list = pnq.get_matching_tokens(pnq.get_user_query(user_id_list))
+    token_map = pnq.get_matching_tokens(pnq.get_user_query(user_id_list))
     logging.debug("user_id_list of length %d -> token list of length %d" % 
-        (len(user_id_list), len(token_list)))
-    return __get_default_interface__().send_silent_notification(token_list, json_data, dev)
+        (len(user_id_list), len(token_map)))
+    return __get_default_interface__().send_silent_notification(token_map, json_data, dev)
 
 def send_silent_notification_to_ios_with_interval(interval, dev=False):
     query = pnq.combine_queries([pnq.get_platform_query("ios"),
                                  pnq.get_sync_interval_query(interval)])
-    token_list = pnq.get_matching_tokens(query)
-    logging.debug("found %d tokens for ios with interval %d" % (len(token_list), interval))
-    return __get_default_interface__().send_silent_notification(token_list, {}, dev)
+    token_map = pnq.get_matching_tokens(query)
+    logging.debug("found %d tokens for ios with interval %d" % (len(token_map), interval))
+    return __get_default_interface__().send_silent_notification(token_map, {}, dev)
 
 def display_response(response):
     if response is None:

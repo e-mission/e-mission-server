@@ -1,4 +1,4 @@
 {
-    "provider": "firebase/ionic",
-    "server_auth_token": "Get from https://ionic.io"
+    "provider": "firebase",
+    "server_auth_token": "Get from firebase console"
 }

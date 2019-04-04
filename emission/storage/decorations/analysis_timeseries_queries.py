@@ -21,6 +21,7 @@ RAW_UNTRACKED_KEY = "segmentation/raw_untracked"
 CLEANED_TRIP_KEY = "analysis/cleaned_trip"
 CLEANED_PLACE_KEY = "analysis/cleaned_place"
 CLEANED_SECTION_KEY = "analysis/cleaned_section"
+INFERRED_SECTION_KEY = "analysis/inferred_section"
 CLEANED_STOP_KEY = "analysis/cleaned_stop"
 CLEANED_UNTRACKED_KEY = "analysis/cleaned_untracked"
 CLEANED_LOCATION_KEY = "analysis/recreated_location"
@@ -82,8 +83,14 @@ def get_timeseries_for_user(user_id):
 def get_time_query_for_trip_like(key, trip_like_id):
     """
     Returns the query that returns all the points associated with this
-    trip-like (raw trip, cleaned trip, raw section) 
+    trip-like (examples of trip-like objects are: raw trip, cleaned trip, raw section) 
     """
     trip = get_object(key, trip_like_id)
-    return estt.TimeQuery("data.ts", trip.start_ts, trip.end_ts)
+    return get_time_query_for_trip_like_object(trip)
 
+def get_time_query_for_trip_like_object(trip_like):
+    """
+    Returns the query that returns all the points associated with this
+    trip-like (raw trip, cleaned trip, raw section) 
+    """
+    return estt.TimeQuery("data.ts", trip_like.start_ts, trip_like.end_ts)

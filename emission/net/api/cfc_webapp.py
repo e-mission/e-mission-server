@@ -45,6 +45,7 @@ import emission.net.auth.auth as enaa
 import emission.net.ext_service.habitica.proxy as habitproxy
 from emission.core.wrapper.client import Client
 from emission.core.wrapper.user import User
+import emission.core.wrapper.suggestion_sys as suggsys
 from emission.core.get_database import get_uuid_db, get_mode_db
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.timeseries.timequery as estt
@@ -252,6 +253,26 @@ def getTrips(day):
   logging.debug("type(ret_dict) = %s" % type(ret_dict))
   return ret_dict
 
+@post('/suggestion_sys/getSug')
+def getSuggestion():
+  logging.debug("Called suggestion")
+  user_uuid=getUUID(request)
+  logging.debug("user_uuid %s" % user_uuid)
+  ret_dir = suggsys.calculate_yelp_server_suggestion_nominatim(user_uuid)
+  logging.debug("type(ret_dir) = %s" % type(ret_dir))
+  logging.debug("Output of ret_dir = %s" % ret_dir)
+  return ret_dir
+
+@post('/suggestion_sys/getSing/<tripid>')
+def getSingleTripSuggestion(tripid):
+  logging.debug("Called suggestion.getSingleTrip")
+  user_uuid=getUUID(request)
+  logging.debug("user_uuid %s" % user_uuid)
+  ret_dir = suggsys.calculate_yelp_server_suggestion_singletrip_nominatim(user_uuid, tripid)
+  logging.debug("type(ret_dir) = %s" % type(ret_dir))
+  logging.debug("Output of ret_dir = %s" % ret_dir)
+  return ret_dir
+
 @post('/profile/create')
 def createUserProfile():
   try:
@@ -272,7 +293,9 @@ def updateUserProfile():
   user_uuid = getUUID(request)
   user = User.fromUUID(user_uuid)
   new_fields = request.json['update_doc']
-  return user.update(new_fields)
+  to_return = user.update(new_fields)
+  logging.debug("Successfully updated profile for user %s" % user_uuid)
+  return {"update": True}
 
 @post('/profile/get')
 def getUserProfile():

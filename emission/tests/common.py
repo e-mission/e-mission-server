@@ -19,13 +19,6 @@ import emission.core.get_database as edb
 from emission.core.get_database import get_client_db, get_section_db
 import emission.core.get_database as edb
 
-import emission.analysis.intake.cleaning.filter_accuracy as eaicf
-import emission.storage.timeseries.format_hacks.move_filter_field as estfm
-import emission.analysis.intake.segmentation.trip_segmentation as eaist
-import emission.analysis.intake.segmentation.section_segmentation as eaiss
-import emission.analysis.intake.cleaning.location_smoothing as eaicl
-import emission.analysis.intake.cleaning.clean_and_resample as eaicr
-
 def makeValid(client):
   client.clientJSON['start_date'] = str(datetime.now() + timedelta(days=-2))
   client.clientJSON['end_date'] = str(datetime.now() + timedelta(days=+2))
@@ -59,7 +52,7 @@ def purgeSectionData(Sections, userName):
     Deletes all sections for this user.
     TODO: Need to extend it to delete entries across all collections
     """
-    Sections.remove({'user_id' : userName})
+    Sections.delete_many({'user_id' : userName})
 
 def loadTable(serverName, tableName, fileName):
   tableColl = edb._get_current_db()[tableName]
@@ -110,6 +103,7 @@ def setupRealExample(testObj, dump_file):
     with open(dump_file) as dfp:
         testObj.entries = json.load(dfp, object_hook = bju.object_hook)
         testObj.testUUID = uuid.uuid4()
+        print("Setting up real example for %s" % testObj.testUUID)
         setupRealExampleWithEntries(testObj)
 
 def setupRealExampleWithEntries(testObj):
@@ -126,11 +120,22 @@ def setupRealExampleWithEntries(testObj):
                         list(edb.get_timeseries_db().find({"user_id": testObj.testUUID}).sort("data.write_ts",
                                                                                        pymongo.ASCENDING).limit(10))])
 def runIntakePipeline(uuid):
+    # Move these imports here so that we don't inadvertently load the modules,
+    # and any related config modules, before we want to
+    import emission.analysis.intake.cleaning.filter_accuracy as eaicf
+    import emission.storage.timeseries.format_hacks.move_filter_field as estfm
+    import emission.analysis.intake.segmentation.trip_segmentation as eaist
+    import emission.analysis.intake.segmentation.section_segmentation as eaiss
+    import emission.analysis.intake.cleaning.location_smoothing as eaicl
+    import emission.analysis.intake.cleaning.clean_and_resample as eaicr
+    import emission.analysis.classification.inference.mode.pipeline as eacimp
+
     eaicf.filter_accuracy(uuid)
     eaist.segment_current_trips(uuid)
     eaiss.segment_current_sections(uuid)
     eaicl.filter_current_sections(uuid)
     eaicr.clean_and_resample(uuid)
+    eacimp.predict_mode(uuid)
 
 def configLogging():
     """
@@ -185,3 +190,36 @@ def createDummyRequestEnviron(self, addl_headers, request_body):
     if addl_headers is not None:
         test_environ.update(addl_headers)
     return test_environ
+
+def set_analysis_config(key, value):
+    import emission.analysis.config as eac
+    import shutil
+
+    analysis_conf_path = "conf/analysis/debug.conf.json"
+    shutil.copyfile("%s.sample" % analysis_conf_path,
+                    analysis_conf_path)
+    with open(analysis_conf_path) as fd:
+        curr_config = json.load(fd)
+    curr_config[key] = value
+    with open(analysis_conf_path, "w") as fd:
+        json.dump(curr_config, fd, indent=4)
+    logging.debug("Finished setting up %s" % analysis_conf_path)
+    with open(analysis_conf_path) as fd:
+        logging.debug("Current values are %s" % json.load(fd))
+
+    eac.reload_config()
+    
+    # Return this so that we can delete it in the teardown
+    return analysis_conf_path
+
+def copy_dummy_seed_for_inference():
+    import shutil
+    import os
+
+    seed_json_source = "emission/tests/data/seed_model_from_test_data.json"
+    seed_json_dest = "seed_model.json"
+    result = shutil.copyfile(seed_json_source, seed_json_dest)
+    logging.debug("Copied file %s -> %s with result %s" % (seed_json_source, seed_json_dest, result))
+
+    assert os.path.exists(seed_json_dest), "File %s not found after copy" % seed_json_dest
+    return seed_json_dest
