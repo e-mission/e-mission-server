@@ -14,6 +14,7 @@ import json
 import bson.json_util as bju
 import pandas as pd
 from uuid import UUID
+import os
 
 # Our imports
 import emission.analysis.intake.cleaning.filter_accuracy as eaicf
@@ -30,6 +31,8 @@ class TestFilterAccuracy(unittest.TestCase):
         import emission.core.get_database as edb
         import uuid
 
+        self.analysis_conf_path = \
+            etc.set_analysis_config("intake.cleaning.filter_accuracy.enable", True)
         self.testUUID = UUID('079e0f1a-c440-3d7c-b0e7-de160f748e35')
         with open("emission/tests/data/smoothing_data/tablet_2015-11-03") as fp:
             self.entries = json.load(fp,
@@ -44,6 +47,7 @@ class TestFilterAccuracy(unittest.TestCase):
         import emission.core.get_database as edb
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
         edb.get_pipeline_state_db().delete_many({"user_id": self.testUUID})
+        os.remove(self.analysis_conf_path)
         
     def testEmptyCallToPriorDuplicate(self):
         time_query = epq.get_time_range_for_accuracy_filtering(self.testUUID)

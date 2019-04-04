@@ -73,11 +73,11 @@ class User(object):
   # At this point, guaranteed that user has a profile.
   def setMpgArray(self, mpg_array):
     logging.debug("Setting MPG array for user %s to : %s" % (self.uuid, mpg_array))
-    get_profile_db().update({'user_id': self.uuid}, {'$set': {'mpg_array': mpg_array}})
+    get_profile_db().update_one({'user_id': self.uuid}, {'$set': {'mpg_array': mpg_array}})
 
   def update(self, update_doc):
     logging.debug("Updating user %s with fields %s" % (self.uuid, update_doc))
-    get_profile_db().update({'user_id': self.uuid}, {'$set': update_doc})
+    get_profile_db().update_one({'user_id': self.uuid}, {'$set': update_doc})
 
   def getCarbonFootprintForMode(self):
     logging.debug("Setting Carbon Footprint map for user %s to" % (self.uuid))
@@ -131,7 +131,7 @@ class User(object):
                       'source':'Shankari',
                       'update_ts': ts,
                       'mpg_array': [defaultMpg]}
-    writeResultProfile = get_profile_db().update(
+    writeResultProfile = get_profile_db().update_one(
         {'user_id': uuid},
         {'$set': initProfileObj},
         upsert=True)
@@ -184,7 +184,7 @@ class User(object):
 
 
     emailUUIDObject = {'user_email': userEmail, 'uuid': anonUUID, 'update_ts': datetime.now()}
-    writeResultMap = get_uuid_db().update(userEmailQuery, emailUUIDObject, upsert=True)
+    writeResultMap = get_uuid_db().replace_one(userEmailQuery, emailUUIDObject, upsert=True)
     # Note, if we did want the create_ts to not be overwritten, we can use the
     # writeResult to decide how to deal with the values
 
@@ -222,6 +222,6 @@ class User(object):
   def unregister(userEmail):
     user = User.fromEmail(userEmail)
     uuid = user.uuid
-    get_uuid_db().remove({'user_email': userEmail})
-    get_profile_db().remove({'user_id': uuid})
+    get_uuid_db().delete_one({'user_email': userEmail})
+    get_profile_db().delete_one({'user_id': uuid})
     return uuid

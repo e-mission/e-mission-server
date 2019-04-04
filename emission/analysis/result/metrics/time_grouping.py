@@ -20,7 +20,10 @@ import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.aggregate_timeseries as estag
 import emission.core.wrapper.motionactivity as ecwm
 import emission.core.wrapper.modestattimesummary as ecwms
+import emission.core.wrapper.modeprediction as ecwmp
 import emission.core.wrapper.localdate as ecwl
+
+import emission.analysis.config as eac
 
 def group_by_timestamp(user_id, start_ts, end_ts, freq, summary_fn_list):
     """
@@ -40,7 +43,7 @@ def group_by_timestamp(user_id, start_ts, end_ts, freq, summary_fn_list):
         and the list is empty.
     """
     time_query = estt.TimeQuery("data.start_ts", start_ts, end_ts)
-    section_df = esda.get_data_df(esda.CLEANED_SECTION_KEY,
+    section_df = esda.get_data_df(eac.get_section_key_for_analysis_results(),
                                   user_id=user_id, time_query=time_query,
                                   geo_query=None)
     if len(section_df) == 0:
@@ -87,7 +90,7 @@ def group_by_local_date(user_id, from_dt, to_dt, freq, summary_fn_list):
         and the list is empty.
     """
     time_query = esttc.TimeComponentQuery("data.start_local_dt", from_dt, to_dt)
-    section_df = esda.get_data_df(esda.CLEANED_SECTION_KEY,
+    section_df = esda.get_data_df(eac.get_section_key_for_analysis_results(),
                                   user_id=user_id, time_query=time_query,
                                   geo_query=None)
     if len(section_df) == 0:
@@ -115,7 +118,10 @@ def grouped_to_summary(time_grouped_df, key_to_fill_fn, summary_fn):
         mode_grouped_df = section_group_df.groupby('sensed_mode')
         mode_results = summary_fn(mode_grouped_df)
         for mode, result in mode_results.items():
-            curr_msts[ecwm.MotionTypes(mode).name] = result
+            if eac.get_section_key_for_analysis_results() == "analysis/inferred_section":
+                curr_msts[ecwmp.PredictedModeTypes(mode).name] = result
+            else:
+                curr_msts[ecwm.MotionTypes(mode).name] = result
         ret_list.append(curr_msts)
     return ret_list
 

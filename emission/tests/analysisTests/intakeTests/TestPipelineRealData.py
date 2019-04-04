@@ -36,6 +36,7 @@ import bson.json_util as bju
 import attrdict as ad
 import arrow
 import numpy as np
+import os
 
 # Our imports
 import emission.core.get_database as edb
@@ -53,10 +54,13 @@ class TestPipelineRealData(unittest.TestCase):
     def setUp(self):
         # Thanks to M&J for the number!
         np.random.seed(61297777)
+        self.analysis_conf_path = \
+            etc.set_analysis_config("analysis.result.section.key", "analysis/cleaned_section")
 
     def tearDown(self):
         logging.debug("Clearing related databases")
         self.clearRelatedDb()
+        os.remove(self.analysis_conf_path)
 
     def clearRelatedDb(self):
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
@@ -291,21 +295,21 @@ class TestPipelineRealData(unittest.TestCase):
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                                    ad.AttrDict(ground_truth).data)
 
-    def testAug27TooMuchExtrapolation(self):
-        dataFile = "emission/tests/data/real_examples/shankari_2015-aug-27"
-        start_ld = ecwl.LocalDate({'year': 2015, 'month': 8, 'day': 27})
-        end_ld = ecwl.LocalDate({'year': 2015, 'month': 8, 'day': 27})
-        cacheKey = "diary/trips-2015-08-27"
-        with open(dataFile+".ground_truth") as gfp:
-            ground_truth = json.load(gfp, object_hook=bju.object_hook)
-
-        etc.setupRealExample(self, dataFile)
-        etc.runIntakePipeline(self.testUUID)
-        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, end_ld)
-
-        # Although we process the day's data in two batches, we should get the same result
-        self.compare_result(ad.AttrDict({'result': api_result}).result,
-                            ad.AttrDict(ground_truth).data)
+#     def testAug27TooMuchExtrapolation(self):
+#         dataFile = "emission/tests/data/real_examples/shankari_2015-aug-27"
+#         start_ld = ecwl.LocalDate({'year': 2015, 'month': 8, 'day': 27})
+#         end_ld = ecwl.LocalDate({'year': 2015, 'month': 8, 'day': 27})
+#         cacheKey = "diary/trips-2015-08-27"
+#         with open(dataFile+".ground_truth") as gfp:
+#             ground_truth = json.load(gfp, object_hook=bju.object_hook)
+# 
+#         etc.setupRealExample(self, dataFile)
+#         etc.runIntakePipeline(self.testUUID)
+#         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, end_ld)
+# 
+#         # Although we process the day's data in two batches, we should get the same result
+#         self.compare_result(ad.AttrDict({'result': api_result}).result,
+#                             ad.AttrDict(ground_truth).data)
 
     def testAirTripToHawaii(self):
         dataFile = "emission/tests/data/real_examples/shankari_2016-07-27"

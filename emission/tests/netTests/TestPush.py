@@ -17,10 +17,6 @@ import time
 # Our imports
 import emission.tests.common as etc
 
-import emission.net.ext_service.push.notify_interface as pni
-import emission.net.ext_service.push.notify_usage as pnu
-import emission.net.ext_service.push.notify_queries as pnq
-
 # It is really hard to test push code, because the tools to emulate pushes are
 # kind of sucky. For example, the iOS emulator does not support pushes. And
 # even if we use physical devices, are we going to use the same physical
@@ -28,6 +24,8 @@ import emission.net.ext_service.push.notify_queries as pnq
 # Therefore, the tests here are primarily about the query and local mapping
 # functionality.
 # We can add other tests that mock this functionality later
+# firebase now maps all tokens, both android and iOS, so we only pass in iOS tokens
+# but let's pretend that some of them fail anyway
 
 def generate_fake_result(successful_tokens, failed_tokens):
     fake_result = {
@@ -46,39 +44,35 @@ class TestPush(unittest.TestCase):
         self.push_conf_path = "conf/net/ext_service/push.json"
         shutil.copyfile("%s.sample" % self.push_conf_path,
                         self.push_conf_path)
-        open(self.push_conf_path, "w").write(json.dumps({
-            "provider": "ionic",
-            "server_auth_token": "firebase_api_key"
-        }))
+        with open(self.push_conf_path, "w") as fd:
+            fd.write(json.dumps({
+                "provider": "firebase",
+                "server_auth_token": "firebase_api_key"
+            }))
         logging.debug("Finished setting up %s" % self.push_conf_path)
-        logging.debug("Current values are %s" % json.load(open(self.push_conf_path)))
+        with open(self.push_conf_path) as fd:
+            logging.debug("Current values are %s" % json.load(fd))
 
     def tearDown(self):
-        # os.remove(self.push_conf_path)
-        pass
+        os.remove(self.push_conf_path)
 
     def testGetInterface(self):
-        #import emission.net.ext_service.push.notify_interface_impl.firebase as pnif
+        import emission.net.ext_service.push.notify_interface as pni
+        import emission.net.ext_service.push.notify_interface_impl.firebase as pnif
 
-        #self.assertEqual(pni.NotifyInterfaceFactory.getNotifyInterface("firebase").__class__,
-        #                 pnif.FirebasePush)
+        self.assertEqual(pni.NotifyInterfaceFactory.getNotifyInterface("firebase").__class__,
+                         pnif.FirebasePush)
 
-        import emission.net.ext_service.push.notify_interface_impl.ionic as pnii
-
-        self.assertEqual(pni.NotifyInterfaceFactory.getNotifyInterface("ionic").__class__,
-                         pnii.IonicPush)
 
     def testGetDefaultInterface(self):
-        #import emission.net.ext_service.push.notify_interface_impl.firebase as pnif
-        import emission.net.ext_service.push.notify_interface_impl.ionic as pnii
+        import emission.net.ext_service.push.notify_interface as pni
+        import emission.net.ext_service.push.notify_interface_impl.firebase as pnif
 
         self.assertEqual(pni.NotifyInterfaceFactory.getDefaultNotifyInterface().__class__,
-                         pnii.IonicPush)
-
-        self.assertEqual(pnu.__get_default_interface__().__class__,
-                         pnii.IonicPush)
+                         pnif.FirebasePush)
 
     def testMappingQueries(self):
+        import emission.net.ext_service.push.notify_queries as pnq
         import emission.core.wrapper.user as ecwu
 
         self.test_email_1 = "test_push_1"
@@ -92,58 +86,72 @@ class TestPush(unittest.TestCase):
                 "device_token": "android_device_token"})
 
             uuid_token_list = pnq.get_matching_tokens(pnq.get_user_query([user_1.uuid, user_2.uuid]))
-            self.assertEqual(uuid_token_list, ["ios_device_token", "android_device_token"])
+            self.assertEqual(uuid_token_list, {"ios": ["ios_device_token"],
+                "android": ["android_device_token"]})
             
             platform_token_list = pnq.get_matching_tokens(pnq.get_platform_query("ios"))
-            self.assertEqual(platform_token_list, ["ios_device_token"])
+            self.assertEqual(platform_token_list, {"ios": ["ios_device_token"],
+                "android": []})
         finally:
             ecwu.User.unregister(self.test_email_1)
             ecwu.User.unregister(self.test_email_2)
 
 # Currently firebase only!
-#     def testFcmMapping(self):
-#         import emission.net.ext_service.push.notify_interface_impl.firebase as pnif
-#         import emission.core.get_database as edb
-# 
-#         self.test_token_list = ["device_token_%s" % i for i in range(10)]
-#         logging.debug("test token list = %s" % self.test_token_list)
-# 
-#         try:
-#             fcm_instance = pnif.get_interface({"server_auth_token": "firebase_api_key"})
-#             (mapped_list, unmapped_list) = fcm_instance.map_existing_fcm_tokens(self.test_token_list)
-#             # At this point, there is nothing in the database, so nothing will be mapped
-#             self.assertEqual(len(mapped_list), 0)
-#             self.assertEqual(len(unmapped_list), 10)
-# 
-#             # Now, pretend to get back some mappings
-#             pretend_ios_tokens = self.test_token_list[:5:2]
-#             pretend_android_tokens = self.test_token_list[6::2] + self.test_token_list[1::2]
-#             fake_result = generate_fake_result(pretend_ios_tokens, pretend_android_tokens)
-#             newly_mapped_token_list = fcm_instance.process_fcm_token_result(self.test_token_list, fake_result)
-#             logging.debug("pretend_ios_tokens = %s, pretend_android_tokens = %s, newly_mapped_token_list = %s" % (pretend_ios_tokens, pretend_android_tokens, newly_mapped_token_list))
-#             self.assertEqual(len(newly_mapped_token_list), len(self.test_token_list))
-# 
-#             # Now try to map again - this time, all the ios entries should be mapped, and
-#             # the android ones not
-#             (mapped_list, unmapped_list) = fcm_instance.map_existing_fcm_tokens(self.test_token_list)
-#             self.assertEqual(len(mapped_list), len(pretend_ios_tokens))
-#             self.assertEqual(len(unmapped_list), len(pretend_android_tokens))
-# 
-#             pretend_ios_tokens = self.test_token_list[::2]
-#             pretend_android_tokens = self.test_token_list[1::2]
-#             fake_result = generate_fake_result(pretend_ios_tokens, pretend_android_tokens)
-#             # Fake the mapped result again
-#             newly_mapped_token_list = fcm_instance.process_fcm_token_result(self.test_token_list, fake_result)
-#             logging.debug("pretend_ios_tokens = %s, pretend_android_tokens = %s, newly_mapped_token_list = %s" % (pretend_ios_tokens, pretend_android_tokens, newly_mapped_token_list))
-#             self.assertEqual(len(newly_mapped_token_list), len(self.test_token_list))
-# 
-#             # Now try to map again - again, all the ios entries should be mapped, and
-#             # the android ones not
-#             (mapped_list, unmapped_list) = fcm_instance.map_existing_fcm_tokens(self.test_token_list)
-# 
-#         finally:
-#             # Delete everything from the database
-#             edb.get_push_token_mapping_db().remove()
+    def testFcmMapping(self):
+        import emission.net.ext_service.push.notify_interface_impl.firebase as pnif
+        import emission.core.get_database as edb
+
+        self.test_token_list_ios = ["device_token_ios_%s" % i for i in range(10)]
+        self.test_token_list_android = ["device_token_android_%s" % i for i in range(10)]
+        self.test_token_map = {"ios": self.test_token_list_ios,
+            "android": self.test_token_list_android}
+        logging.debug("test token map = %s" % self.test_token_map)
+
+        try:
+            fcm_instance = pnif.get_interface({"server_auth_token": "firebase_api_key"})
+            (mapped_token_map, unmapped_token_list) = fcm_instance.map_existing_fcm_tokens(self.test_token_map)
+            # At this point, there is nothing in the database, so no iOS tokens will be mapped
+            self.assertEqual(len(mapped_token_map["ios"]), 0)
+            # android tokens should not be mapped, so they will be returned as-is
+            self.assertEqual(len(mapped_token_map["android"]), 10)
+
+            # and all iOS tokens will be returned as needing a mapping
+            self.assertEqual(len(unmapped_token_list), 10)
+
+            # Now, pretend to get back some mappings
+            to_succeed_ios_tokens = self.test_token_list_ios[::2]
+            to_fail_ios_tokens = self.test_token_list_ios[1::2]
+            fake_result = generate_fake_result(to_succeed_ios_tokens, to_fail_ios_tokens)
+            newly_mapped_token_list = fcm_instance.process_fcm_token_result(fake_result)
+            logging.debug("to_succeed_ios_tokens = %s, to_fail_ios_tokens = %s, newly_mapped_token_list = %s" % (to_succeed_ios_tokens, to_fail_ios_tokens, newly_mapped_token_list))
+            self.assertEqual(len(newly_mapped_token_list), len(to_succeed_ios_tokens))
+
+            # Now try to map again - this time, all the successful ios entries should be mapped, and
+            # the android ones not
+            (mapped_token_map, unmapped_list) = fcm_instance.map_existing_fcm_tokens(self.test_token_map)
+            self.assertEqual(len(mapped_token_map["ios"]), len(to_succeed_ios_tokens))
+            self.assertEqual(len(mapped_token_map["android"]), 10)
+            self.assertEqual(len(unmapped_list), len(to_fail_ios_tokens))
+
+            to_succeed_ios_tokens_call_2 = to_fail_ios_tokens[::2]
+            to_fail_ios_tokens_call_2 = to_fail_ios_tokens[1::2]
+            fake_result = generate_fake_result(to_succeed_ios_tokens_call_2, to_fail_ios_tokens_call_2)
+            # Fake the mapped result again
+            newly_mapped_token_list = fcm_instance.process_fcm_token_result(fake_result)
+            logging.debug("to_succeed_ios_tokens_call_2 = %s, to_fail_ios_tokens_call_2 = %s, newly_mapped_token_list = %s" % (to_succeed_ios_tokens_call_2, to_fail_ios_tokens_call_2, newly_mapped_token_list))
+            self.assertEqual(len(newly_mapped_token_list), len(to_succeed_ios_tokens_call_2))
+
+            # Now try to map again - again, all the ios entries that succeeded
+            # in the past two calls should be mapped, and the failed ones not
+            (mapped_token_map, unmapped_list) = fcm_instance.map_existing_fcm_tokens(self.test_token_map)
+            self.assertEqual(len(mapped_token_map["ios"]),
+                len(to_succeed_ios_tokens) + len(to_succeed_ios_tokens_call_2))
+            self.assertEqual(len(mapped_token_map["android"]), 10)
+            self.assertEqual(len(unmapped_list), len(to_fail_ios_tokens_call_2))
+
+        finally:
+            # Delete everything from the database
+            edb.get_push_token_mapping_db().delete_many({})
     
 if __name__ == '__main__':
     import emission.tests.common as etc

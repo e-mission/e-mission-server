@@ -22,7 +22,7 @@ import emission.analysis.configs.config as eacc
 
 import emission.net.usercache.formatters.formatter as enuf
 import emission.storage.pipeline_queries as esp
-import emission.storage.decorations.tour_model_queries as esdtmpq
+# import emission.storage.decorations.tour_model_queries as esdtmpq
 
 import emission.core.wrapper.trip as ecwt
 import emission.core.wrapper.entry as ecwe

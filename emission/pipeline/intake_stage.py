@@ -28,6 +28,7 @@ import emission.analysis.intake.segmentation.trip_segmentation as eaist
 import emission.analysis.intake.segmentation.section_segmentation as eaiss
 import emission.analysis.intake.cleaning.location_smoothing as eaicl
 import emission.analysis.intake.cleaning.clean_and_resample as eaicr
+import emission.analysis.classification.inference.mode.pipeline as eacimp
 import emission.net.ext_service.habitica.executor as autocheck
 
 import emission.storage.decorations.stats_queries as esds
@@ -137,6 +138,14 @@ def run_intake_pipeline_for_user(uuid):
             eaicr.clean_and_resample(uuid)
 
         esds.store_pipeline_time(uuid, ecwp.PipelineStages.CLEAN_RESAMPLING.name,
+                                 time.time(), crt.elapsed)
+
+        with ect.Timer() as crt:
+            logging.info("*" * 10 + "UUID %s: inferring transportation mode" % uuid + "*" * 10)
+            print(str(arrow.now()) + "*" * 10 + "UUID %s: inferring transportation mode" % uuid + "*" * 10)
+            eacimp.predict_mode(uuid)
+
+        esds.store_pipeline_time(uuid, ecwp.PipelineStages.MODE_INFERENCE.name,
                                  time.time(), crt.elapsed)
 
         with ect.Timer() as act:
