@@ -524,7 +524,7 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
             if calculate_distance < distance_in_miles and calculate_distance < 5 and calculate_distance >= 1:
                 try:
                     new_message = "We saw that you took a vehicle from" + begin_string_address + "to" + address  + \
-                    ". Instead, there is a place " + a + "has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a][0]) + \
+                    ". Instead, there is a place " + a + "which has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a][0]) + \
                     " that you could have potentially biked to."
                     #Not sure to include the amount of carbon saved
                     #Still looking to see what to return with this message, because currently my latitude and longitudes are stacked together in one string
@@ -535,7 +535,7 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
             elif calculate_distance < distance_in_miles and calculate_distance < 1:
                 try: 
                     new_message = "We saw that you took a vehicle from" + begin_string_address + "to" + address  + \
-                    ". Instead, there is a place " + a + "has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a][0]) + \
+                    ". Instead, there is a place " + a + "which has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a][0]) + \
                     " that you could have potentially walked to."
                     # message = "Why didn't you walk from " + begin_string_address+ " to " + a + " (tap me to view) " + a + \
                     # " has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a])
@@ -546,7 +546,7 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
             elif calculate_distance < distance_in_miles and calculate_distance >= 5 and calculate_distance <= 15:
                 try: 
                     new_message = "We saw that you took a vehicle from" + begin_string_address + "to" + address  + \
-                    ". Instead, there is a place " + a + "has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a][0]) + \
+                    ". Instead, there is a place " + a + "which has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a][0]) + \
                     " that you could have potentially used public transportation to get there."
                     # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
                     return {'message' : new_message, 'method': 'public', 'rating': str(ratings_bus[a][0]), 'businessid': ratings_bus[a][1], 'tripid': cleaned_trips.iloc[i]["_id"]}
