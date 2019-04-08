@@ -7,9 +7,11 @@ $(document).ready(function(){
 
 	if (group == 1) {
 		// Then experimental group
-		document.getElementById("join_link").innerHTML = "emission://change_client?new_client=greentrip&clear_local_storage=true&clear_usercache=true"
+		document.getElementById("join_link").innerHTML = "emission://change_client?new_client=greentrip&clear_local_storage=true&clear_usercache=true";
+		$("#customize").attr("src", "../img/join_study.png");
 	} else {
-		document.getElementById("join_link").innerHTML = "emission://change_client?new_client=urap2017control&clear_local_storage=true&clear_usercache=true"
+		document.getElementById("join_link").innerHTML = "emission://change_client?new_client=urap2017control&clear_local_storage=true&clear_usercache=true";
+		$("#customize").attr("src", "../img/join_study_control.png");
 	};
 
 });
