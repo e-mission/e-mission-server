@@ -60,16 +60,18 @@
         <div id="downloadRow">
           <a id="groupLink" href="emission://change_client?new_client={{urap2017control}}&clear_local_storage={{clear_local_storage_flag}}&clear_usercache={{clear_usercache_flag}}">
             <p style="color: #417505;">Open this link on your phone to launch the app and join the study</p>
-            <p style="color: black;">emission://change_client?new_client={{urap2017control}}&clear_local_storage={{clear_local_storage_flag}}&clear_usercache={{clear_usercache_flag}}</p>
+            <div id = "join_link"> <p style="color: black;">emission://change_client?new_client={{urap2017control}}&clear_local_storage={{clear_local_storage_flag}}&clear_usercache={{clear_usercache_flag}}</p> </div>
           </a>
         </div>
         <div>
           <qrcode class="col" data="emission://change_client?new_client={{greentrip}}&clear_local_storage={{clear_local_storage_flag}}&clear_usercache={{clear_usercache_flag}}" size="200"></qrcode>
-          <img src = "../img/join_study.png">
+          <!-- <img src = "../img/join_study.png"> -->
         </div>
       </div>
       <!-- https://youtu.be/CV1rGkRn9xM video displaying qr code testing --> 
 
   </ion-content>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+  <script src="../js/client_setup.js"></script>
 </ion-view>
 
