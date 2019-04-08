@@ -6,3 +6,4 @@
 # - on Windows: C:/Users/<user>/Miniconda3/Scripts/conda
 conda env update --name emission --file setup/environment36.yml
 source activate emission
+pip install six --upgrade

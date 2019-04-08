@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-# coding: utf-8
-
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from __future__ import print_function
 from __future__ import division
@@ -43,7 +42,7 @@ class Geocoder(object):
         query_url = NOMINATIM_QUERY_URL + "/search?"
         encoded_params = urllib.parse.urlencode(params)
         url = query_url + encoded_params
-        logging.debug("For geocoding, using URL %s" % url)
+
         return url
 
     @classmethod
@@ -76,7 +75,6 @@ class Geocoder(object):
         query_url = NOMINATIM_QUERY_URL + "/reverse?"
         encoded_params = urllib.parse.urlencode(params)
         url = query_url + encoded_params
-        logging.debug("For reverse geocoding, using URL %s" % url)
         return url
 
     @classmethod
@@ -84,6 +82,9 @@ class Geocoder(object):
         request = urllib.request.Request(cls.make_url_reverse(lat, lng))
         response = urllib.request.urlopen(request)
         parsed_response = json.loads(response.read())
+        print('=' * 50)
+        print(parsed_response)
+        print('*' * 50)
         logging.debug("parsed_response = %s" % parsed_response)
         return parsed_response
 

@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# coding: utf-8
+
 import logging
 import json
 import requests
@@ -28,6 +31,8 @@ def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
     overpass_public_transit_query_template = query_string
     overpass_query = overpass_public_transit_query_template.format(bbox=bbox_string)
     response = requests.post("http://overpass-api.de/api/interpreter", data=overpass_query)
+    if response == None or response.json() == None:
+        return []
     all_results = response.json()["elements"]
     relations = [ad.AttrDict(r) for r in all_results if r["type"] == "relation" and r["tags"]["type"] == "route"]
     logging.debug("Found %d relations with ids %s" % (len(relations), [r["id"] for r in relations]))
@@ -36,7 +41,7 @@ def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
     rel_map = {}
     for relation in relations:
         rel_nodes_ids = [rm.ref for rm in relation.members if (rm.type == "node")]
-        rel_stop_node_ids = [rm.ref for rm in relation.members if (rm.type == "node") 
+        rel_stop_node_ids = [rm.ref for rm in relation.members if (rm.type == "node")
             and (rm.type == "stop")]
         # logging.debug("for relation number of nodes = %d, number of stop nodes = %d" % (len(rel_nodes_ids),
         #                                                            len(rel_stop_node_ids)))
@@ -86,7 +91,7 @@ def get_predicted_transit_mode(start_stops, end_stops):
         return [rim.tags.route for rim in rel_id_matches]
 
     # Did not find matching routes. Let's see if stops are both "railway",
-    # if so, we can mark as TRAIN 
+    # if so, we can mark as TRAIN
     # TODO: return more complex kinds of railways?
     p_start_train = ["railway" in s.tags for s in start_stops]
     p_end_train = ["railway" in s.tags for s in end_stops]
@@ -144,8 +149,8 @@ def get_predicted_transit_mode(start_stops, end_stops):
     return None
 
 def get_rel_id_match(p_start_routes, p_end_routes):
-    logging.debug("About to find matches in lists: %s \n %s" % 
-        ([p.id for p in p_start_routes], 
+    logging.debug("About to find matches in lists: %s \n %s" %
+        ([p.id for p in p_start_routes],
          [p.id for p in p_end_routes]))
     matching_routes = []
     for sr in p_start_routes:
@@ -161,7 +166,7 @@ def extract_routes(stop):
         for route in stop.routes:
             p_modes.append(route)
 
-    logging.debug("After iterating through routes, potential modes = %s" % 
+    logging.debug("After iterating through routes, potential modes = %s" %
         [(p.id, p.tags.route) for p in p_modes])
 
     return p_modes

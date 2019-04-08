@@ -1,39 +1,39 @@
 {
     "handlers": {
         "errors": {
-            "backupCount": 2, 
-            "mode": "a", 
-            "level": "ERROR", 
-            "formatter": "detailed", 
-            "class": "logging.handlers.RotatingFileHandler", 
-            "maxBytes": 1073741824, 
+            "backupCount": 20,
+            "mode": "a",
+            "level": "ERROR",
+            "formatter": "detailed",
+            "class": "logging.handlers.RotatingFileHandler",
+            "maxBytes": 10485760,
             "filename": "/var/tmp/intake-errors.log"
-        }, 
+        },
         "console": {
-            "class": "logging.StreamHandler", 
+            "class": "logging.StreamHandler",
             "level": "WARNING"
-        }, 
+        },
         "file": {
-            "backupCount": 8, 
-            "filename": "/var/tmp/intake.log", 
-            "maxBytes": 1073741824, 
-            "mode": "a", 
-            "formatter": "detailed", 
+            "backupCount": 20,
+            "filename": "/var/tmp/intake.log",
+            "maxBytes": 10485760,
+            "mode": "a",
+            "formatter": "detailed",
             "class": "logging.handlers.RotatingFileHandler"
         }
-    }, 
-    "version": 1, 
+    },
+    "version": 1,
     "root": {
         "handlers": [
-            "console", 
-            "file", 
+            "console",
+            "file",
             "errors"
-        ], 
+        ],
         "level": "DEBUG"
-    }, 
+    },
     "formatters": {
         "detailed": {
-            "class": "logging.Formatter", 
+            "class": "logging.Formatter",
             "format": "%(asctime)s:%(levelname)s:%(thread)d:%(message)s"
         }
     }

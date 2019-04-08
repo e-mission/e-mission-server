@@ -2,7 +2,7 @@
   "name": "ui-leaflet",
   "author": "https://github.com/angular-ui/ui-leaflet/graphs/contributors",
   "description": "ui-leaflet - An AngularJS directive to easily interact with Leaflet maps",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "homepage": "http://angular-ui.github.io/ui-leaflet/",
   "keywords": [
     "angularjs",
@@ -34,14 +34,14 @@
     "Leaflet.utfgrid": "danzel/Leaflet.utfgrid",
     "Leaflet.awesome-markers": "*",
     "leaflet-providers": "~1.1.5",
-    "leaflet.vector-markers": "~0.0.3",
+    "leaflet.vector-markers": "0.0.4",
     "webgl-heatmap-leaflet": "*",
-    "leaflet-plugins": "*",
-    "esri-leaflet": "*",
-    "proj4": "*",
+    "leaflet-plugins": "1.X",
+    "esri-leaflet": "1.X",
+    "proj4": "2.X",
     "font-awesome": "~4.3.x",
-    "proj4leaflet": "*",
-    "Leaflet.MakiMarkers": "*",
+    "proj4leaflet": "0.X",
+    "Leaflet.MakiMarkers": "2.X",
     "Leaflet.heat": "https://github.com/Leaflet/Leaflet.heat/archive/gh-pages.tar.gz",
     "Leaflet.ExtraMarkers": "https://github.com/coryasilva/Leaflet.ExtraMarkers/archive/v1.0.1.tar.gz",
     "Leaflet.fullscreen": "http://github.com/Leaflet/Leaflet.fullscreen/archive/v0.0.4.tar.gz",
@@ -50,9 +50,12 @@
     "leaflet-minimap": "~2.2.0",
     "esri-leaflet-clustered-feature-layer": "~1.0.x",
     "esri-leaflet-heatmap-feature-layer": "~1.0.x",
-    "leaflet-search": "~1.5.8"
+    "leaflet-search": "~1.5.8",
+    "highlightjs": "~8.8.0",
+    "angular-highlightjs": "~0.4.3"
   },
   "ignore": [
+    "website/",
     "**/.*",
     "src",
     "doc",
@@ -61,16 +64,16 @@
     "*.md",
     "Gruntfile.js",
     "package.json",
-    "bower.json"
+    "bower.json",
+    "dist/coverage/"
   ],
-  "_release": "1.0.0",
+  "_release": "1.0.3",
   "_resolution": {
     "type": "version",
-    "tag": "v1.0.0",
-    "commit": "56931fbfb8d08528770c058312c07f5bf38a0178"
+    "tag": "v1.0.3",
+    "commit": "639462672e2c8391d9de7da39ca72f4d5409c7fe"
   },
   "_source": "https://github.com/angular-ui/ui-leaflet.git",
   "_target": "^1.0.0",
-  "_originalSource": "ui-leaflet",
-  "_direct": true
+  "_originalSource": "ui-leaflet"
 }

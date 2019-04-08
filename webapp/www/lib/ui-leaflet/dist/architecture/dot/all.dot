@@ -568,6 +568,9 @@ digraph dependencies {
         
       
         
+          "leafletHelpers"[label="leafletHelpers"]
+          "leafletHelpers" -> "leafletLegendHelpers"
+        
       
         
           "leafletHelpers"[label="leafletHelpers"]
