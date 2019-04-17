@@ -1,0 +1,5 @@
+{
+    "emission_server_base_url": "http://localhost:8080",
+    "register_user_endpoint": "/profile/create",
+    "user_cache_endpoint": "/usercache/put"
+}

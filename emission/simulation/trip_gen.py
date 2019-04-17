@@ -37,6 +37,15 @@ class Address(object):
     def __str__(self):
         return self.text
 
+    def __eq__(self, other):
+        return (self.text.lower(), self.cord) == (other.text.lower(), self.cord)
+
+    def __lt__(self, other):
+        return (self.text.lower(), self.cord) < (other.text.lower(), other.cord)
+    
+    def __hash__(self):
+        return hash((self.text, self.cord))
+
 class Creator(object): 
 
     def __init__(self, new=False):
@@ -47,9 +56,9 @@ class Creator(object):
         self.num_trips = None
         self.radius = None
         self.amount_missed = 0
-        self.starting_counter = esmmc.Counter( )
-        self.ending_counter = esmmc.Counter( )
-        self.mode_counter = esmmc.Counter( )
+        self.starting_counter = esmmc.Counter()
+        self.ending_counter = esmmc.Counter()
+        self.mode_counter = esmmc.Counter()
         self.prog_bar = ""
 
     def set_up(self):
@@ -135,6 +144,7 @@ def save_section_to_db(section):
 def geocode_address(address):
     if address.cord is None:
         business_geocoder = enn.Geocoder()
+        # TODO: if the geocoder fails then what?
         results = business_geocoder.geocode(address.text)
         address.cord = results
     else:
@@ -179,6 +189,7 @@ def create_fake_trips(user_name=None, new=False):
     ### This is the main function, its the only thing you need to run
     my_creator = Creator(new)
     my_creator.set_up()
+    #TODO: If we cant find coordintates for one of the addresses, tell the user. We must decide how the user shoudl enter the addresses in a meaningfull format. 
     my_creator.get_starting_ending_points()
     my_creator.make_a_to_b()
     my_creator.get_trips_from_a_to_b(user_name)
