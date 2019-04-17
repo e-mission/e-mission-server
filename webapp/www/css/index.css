@@ -169,6 +169,10 @@ div.smaller_text a {
 
 }
 
+#bears {
+	margin-top: 20px;
+}
+
 a:visited { text-decoration: none; color: #204f2f;}
 a:hover { text-decoration: none; color: #204f2f;}
 a:focus { text-decoration: none; color: #204f2f;}

@@ -1,11 +1,22 @@
 <ion-view view-title="Setup">
   <ion-content>
+  <link rel="stylesheet" type="text/css" href="../css/index.css">
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=EB+Garamond" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+  <div class = "top_bar">
+      <div class = "item" id = "logo"> <a href = "index_copy.html"> <img src = "../img/greentrip_logo.png" style = "width:150px; height:100px;"> </a> </div>
+      <div class = "item"> <a href = "incentive.html"> Incentivization </a> </div>
+      <div class = "item"> <a href = "who_we_are.html"> Who We Are </a> </div>
+      <div class = "item"> <a href = "supporters.html"> Supporters </a> </div>
+      <div class = "item"> <a href = "related_work.html"> Related Works </a> </div>
+      <div class = "button"> <a href = "client_setup.html"> JOIN STUDY </a> </div>
+    </div>
       <div class="redirect">
         <div>
           <img id="logo" ng-src="img/favicon-96x96.png">
         </div>
         <div>
-          <h2>Thank you for participating - only two steps left!</h2>
+          <h2> <div class = "large_text" id = "large_text_2"> Thank you for participating - only two steps left! </div> </h2>
           <p>
             Please open the links below <b>on your phone</b>, or read the QR codes from a laptop display using a QR code reader <b>on your phone.</b>
           </p>
@@ -28,7 +39,7 @@
           </svg>
         <h4>Install the emTripLog app</h4>
         </div>
-        <div class="row responsive-sm">
+        <div class="row responsive-sm" style="margin-bottom: 50px;">
           <a class="col" href='https://play.google.com/store/apps/details?id=edu.berkeley.eecs.embase'><img style="height:75px;" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
           <img src = "../img/greentrip_qr_code_gp.png">
             <!-- <br style="clear:both;"/> -->
@@ -60,7 +71,7 @@
         <div id="downloadRow">
           <a id="groupLink" href="emission://change_client?new_client={{urap2017control}}&clear_local_storage={{clear_local_storage_flag}}&clear_usercache={{clear_usercache_flag}}">
             <p style="color: #417505;">Open this link on your phone to launch the app and join the study</p>
-            <div id = "join_link"> <p style="color: black;">emission://change_client?new_client={{urap2017control}}&clear_local_storage={{clear_local_storage_flag}&clear_usercache={{clear_usercache_flag}}</p> </div>
+            <div id = "join_link"> <p style="color: black;">emission://change_client?new_client={{greentripcontrol}}&clear_local_storage={{clear_local_storage_flag}&clear_usercache={{clear_usercache_flag}}</p> </div>
           </a>
         </div>
         <div>
