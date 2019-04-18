@@ -13,7 +13,7 @@ repo](https://github.com/amplab/e-mission-phone)
 The current build status is:
 [![Build Status](https://amplab.cs.berkeley.edu/jenkins/buildStatus/icon?job=e-mission-server)](https://amplab.cs.berkeley.edu/jenkins/view/E-Mission/job/e-mission-server/)
 
-[![Join the chat at https://gitter.im/e-mission/e-mission-server](https://badges.gitter.im/e-mission/e-mission-server.svg)](https://gitter.im/e-mission/e-mission-server?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+**Issues:** Since this repository is part of a larger project, all issues are tracked [in the central docs repository](https://github.com/e-mission/e-mission-docs/issues). If you have a question, [as suggested by the open source guide](https://opensource.guide/how-to-contribute/#communicating-effectively), please file an issue instead of sending an email. Since issues are public, other contributors can try to answer the question and benefit from the answer.
 
 The backend in turn consists of two parts - a summary of their code structure is shown below.
 -![][Python_Structure]
@@ -21,170 +21,28 @@ The webapp supports a REST API, and accesses data from the database to fulfill
 the queries.  A set of background scripts pull the data from external sources, and
 preprocessing results ensures reasonable performance.
 
-The installation instructions below are generally targeted towards OSX and \*nix shells such as bash. If you want to use Windows, we recomend using PowerShell (https://technet.microsoft.com/en-us/scriptcenter/dd742419), which provides similarly rich commands. If you really want to use the Command Prompt, most commands should work, but you may need to convert `/` -> `\` to make the commands work.
+## Installation: ##
+----------
+- For **deployers** (i.e. if you want to primarily *use* the system as opposed to modify/develop it, the [docker installation](https://github.com/e-mission/e-mission-docker) is probably the easiest way to get started.
+- For **builders** (i.e. if you want to write new scripts or modify existing scripts) the [manual install](https://github.com/e-mission/e-mission-docs/blob/master/docs/e-mission-server/manual_install.md) will make it easier to edit files directly on your local filesystem. Make sure to use a POSIX-compliant CLI; you may want to look into [gitbash](https://openhatch.org/missions/windows-setup/install-git-bash) or similar on Windows.
 
 ## Additional Documentation: ##
 ----------
 Additional documentation has been moved to its own repository [e-mission-docs](https://github.com/e-mission/e-mission-docs). Specific e-mission-server additional documentation can be found here:
 https://github.com/e-mission/e-mission-docs/tree/master/docs/e-mission-server
 
-
-## Install/update: ##
+## Deployment: ##
 -------------------
-
-### Installation ###
-is as simple as cloning the github repository.
-
-- If you do not plan to make changes to the code, clone the master repository.
-
-  ```
-  $ git clone https://github.com/e-mission/e-mission-server.git
-  ```
-
-- If you might make changes or develop new features, fork (https://help.github.com/articles/fork-a-repo/) and clone your fork.
-
-  ```
-  $ git clone https://github.com/<username>/e-mission-server.git
-  ```
-
-### Update ###
-is as simple as pulling new changes.
-
-- If you are working off the master repository
-
-  ```
-  $ git pull origin master
-  ```
-
-- If you are working off your fork, you will need to sync your fork with the main repository (https://help.github.com/articles/syncing-a-fork/) and then pull from your fork.
-
-  ```
-  $ git pull origin master
-  ```
-
-## Dependencies: ##
--------------------
-
-### Database: ###
-1. Install [Mongodb](http://www.mongodb.org/), version 3.4
-  2. *Windows*: mongodb appears to be installed as a service on Windows devices and it starts automatically on reboot
-  3. *OSX*: You want to install homebrew and then use homebrew to install mongodb. Follow these instruction on how to do so ---> (https://docs.mongodb.com/v3.4/tutorial/install-mongodb-on-ubuntu/)
-  4. *Ubuntu*: http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
-
-2. Start it at the default port
-
-     `$ mongod`
-
-### Python distribution ###
-We will use a distribution of python that is optimized for scientific
-computing. The [anaconda](https://store.continuum.io/cshop/anaconda/)
-distribution is available for a wide variety of platforms and includes the
-python scientific computing libraries (numpy/scipy/scikit-learn) along with
-native implementations for performance. Using the distribution avoids native
-library inconsistencies between versions.
-
-The distribution also includes its own version of pip, and a separate environment
-management tool called 'conda'.
-
-The distribution also includes an environment management tool called 'conda'. We will set up a separate `emission`
-environment within anaconda to avoid conflicts with other applications.
-
-- Install the anaconda distribution (https://www.anaconda.com/download). Any
-  installer should be fine - setting up the `emission` environment will
-  automatically choose the correct version of python. Since all required
-  packages will be installed using the environment, if you are comfortable with
-  the command line, you can also download the minimalist `miniconda` installer
-  https://conda.io/miniconda.html
-
-- Setup the `emission` environment.
-
-  ```
-  $ source setup/setup.sh
-  ```
-
-- Verify that you are in the right environment - your prompt should start with
-  `(emission)` and the `emission` environment should be starred.
-
-  ```
-  (emission) ...$ conda env list
-  # conda environments:
-  #
-  aws                      /..../anaconda/envs/aws
-  emission              *  /..../anaconda/envs/emission
-  firebase                 /..../anaconda/envs/firebase
-  py27                     /..../anaconda/envs/py27
-  py36                     /..../anaconda/envs/py36
-  xbos                     /..../anaconda/envs/xbos
-  root                     /..../anaconda
-  ```
-
-- Remember to re-run the setup script every time you pull from the main repository because the dependencies may have changed.
-
-  ```
-  $ source setup/setup.sh
-  ```
-
-- When you are done working with e-mission, you can cleanup the environment and then just delete the entire directory.
-
-  ```
-  $ source setup/teardown.sh
-  $ cd ..
-  $ rm -rf e-mission-server
-  ```
-
-### Javascript dependencies ###
-
-Note: It is required only if the user needs a  web interface for the server. Otherwise one can do without it as well.
-
-Tip: Run "bower install" instead if you are prompted password for 'https://github.com' after running "bower update".
-
-    $ cd webapp
-    $ bower update
+- If you just want to run the server, you can use [our docker image](https://github.com/e-mission/e-mission-docker).
+- Alternatively, you can follow the [manual installation instructions](https://github.com/e-mission/e-mission-docs/blob/master/docs/e-mission-server/manual_install.md) to pull from the repo to the server, change the config files slightly and just not change any code.
 
 ## Development: ##
 -------------------
-In order to test out changes to the webapp, you should make the changes locally, test them and then push. Then, deployment is as simple as pulling from the repo to the real server and changing the config files slightly.
-
-Here are the steps for doing this:
-
-1. On OSX, start the database  (Note: mongodb appears to be installed as a service on Windows devices and it starts automatically on reboot). 
-
-        $ mongod
-        2018-05-23T11:06:07.576-0700 I CONTROL  [initandlisten] MongoDB starting : pid=60899 port=27017 dbpath=/data/db 64-bit ...
-        2018-05-23T11:06:07.576-0700 I CONTROL  [initandlisten] db version v3.6.2
-        ...
-        2018-05-23T11:06:08.420-0700 I FTDC     [initandlisten] Initializing full-time diagnostic data capture with directory '/data/db/diagnostic.data'
-
-1. **Optional** Copy configuration files. The files in `conf` can be used to customize the app with custom authentication options or enable external features such as place lookup and the game integration. Look at the samples in `conf/*`, copy them over and modify as necessary - e.g.
-
-        $ find conf -name \*.sample
-        # For the location -> name reverse lookup. Client will lookup if not populated.
-        $ cp conf/net/ext_service/nominatim.json.sample conf/net/ext_service/nominatim.json
-
-1. Start the server
-
-        $ ./e-mission-py.bash emission/net/api/cfc_webapp.py
-        storage not configured, falling back to sample, default configuration
-        Connecting to database URL localhost
-        analysis.debug.conf.json not configured, falling back to sample, default configuration
-        Finished configuring logging for <RootLogger root (WARNING)>
-        Replaced json_dumps in plugin with the one from bson
-        Changing bt.json_loads from <function <lambda> at 0x10f5fdb70> to <function loads at 0x1104b6ae8>
-        Running with HTTPS turned OFF - use a reverse proxy on production
-        Bottle v0.13-dev server starting up (using CherootServer())...
-        Listening on http://0.0.0.0:8080/
-        Hit Ctrl-C to quit.
-
-1. Test your connection to the server
-  * Using a web browser, go to [http://localhost:8080](http://localhost:8080)
-  * Using the iOS emulator, connect to [http://localhost:8080](http://localhost:8080)
-  * Using the android emulator:
-    * change `server.host` in `conf/net/api/webserver.conf` to 0.0.0.0, and 
-    * connect the app to the special IP for the current host in the android emulator - [10.0.2.2](https://developer.android.com/tools/devices/emulator.html#networkaddresses)
+In order to test out changes to the webapp, you should make the changes locally, test them and then push the tested changes to a repository. Note that if the changes are to the server code, you need to restart the server after making changes.
 
 ### Loading test data ###
-
-You may also want to load some test data.
+-------------------
+You may also want to load some test data. Note that for the docker install, you will need to run these scripts from the docker image after [opening a shell](https://stackoverflow.com/a/26496875)
 
 #### Quick start ####
 
@@ -247,9 +105,6 @@ $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py -n /tmp/data-c
             $ cd ..../e-mission-server
             $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py /tmp/data-collection-eval/results_dec_2015/ucb.sdb.android.1/timeseries/active_day_2.2015-11-27 shankari@eecs.berkeley.edu
 ```        
-
-
-
 
 ### Creating fake user data ###
 
