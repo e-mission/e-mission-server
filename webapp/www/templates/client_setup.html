@@ -10,18 +10,29 @@
       <div class = "item"> <a href = "supporters.html"> Supporters </a> </div>
       <div class = "item"> <a href = "related_work.html"> Related Works </a> </div>
       <div class = "button"> <a href = "client_setup.html"> JOIN STUDY </a> </div>
-    </div>
+  </div>
+
       <div class="redirect">
         <div>
           <img id="logo" ng-src="img/favicon-96x96.png">
         </div>
-        <div>
-          <h2> <div class = "large_text" id = "large_text_2"> Thank you for participating - only two steps left! </div> </h2>
+        <div class = "background_image"> <img src = "../img/client-setup-background.jpg" style = "width: 95%; height: 400px;"> </div>
+        
+        <div style="padding: 5%">
+          <h2> 
+            <div class = "large_text" id = "large_text_2"> 
+              Thank you for participating - only two steps left! 
+            </div> 
+          </h2>
+
           <p>
-            Please open the links below <b>on your phone</b>, or read the QR codes from a laptop display using a QR code reader <b>on your phone.</b>
+            <div style="font-family: EB Garamond; font-size: 50">
+              In order to join the study, you must first download our app [step 1] and then you can click our link [in step 2].</h3>
+            </div>
           </p>
         </div>
-        <div>
+
+        <div style="padding-left: 5%; padding-bottom: 2%">
           <svg width="58px" height="49px" viewBox="0 0 58 49" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
               <!-- Generator: Sketch 43.1 (39012) - http://www.bohemiancoding.com/sketch -->
               <desc>Created with Sketch.</desc>
@@ -37,20 +48,61 @@
                   </g>
               </g>
           </svg>
-        <h4>Install the emTripLog app</h4>
+
+        <h4>
+          <div style="font-family: EB Garamond; font-size: 40px;"> 
+            Install the emTripLog app
+          </div>
+        </h4>
+
+        <div style="font-family: EB Garamond; font-size: 30px;"> 
+          Click on the AppStore or Google Play logos to download the app.
         </div>
-        <div class="row responsive-sm" style="margin-bottom: 50px;">
-          <a class="col" href='https://play.google.com/store/apps/details?id=edu.berkeley.eecs.embase'><img style="height:75px;" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
-          <img src = "../img/greentrip_qr_code_gp.png">
-            <!-- <br style="clear:both;"/> -->
-        </div>
-        <div class="row responsive-sm">
-          <a class="col" href="https://itunes.apple.com/us/app/emtriplog/id1362434685"><img style="height:75px;" alt='Get in on the iOS app store' ng-src = "../img/apple_badge.svg" src='../img/apple-badge.svg'/></a>
-          <qrcode class="col" data="https://itunes.apple.com/us/app/emtriplog/id1362434685" size="200"></qrcode>
-            <!-- <br style="clear:both;"/> -->
-            <img src = "../img/greentrip_qr_code_as.png">
-        </div>
-        <div>
+      </div>
+      
+      <div style="padding-left: 5%">
+        <table style="width:50%">
+        <tr>
+          <th>
+            <h4 style="font-family: EB Garamond; font-size: 30px">
+              Android Devices
+            </h4> 
+          </th>
+          
+          <th>
+            <h4 style="font-family: EB Garamond; font-size: 30px">
+              Apple Devices
+            </h4>
+          </th>
+        </tr>
+        
+        <tr>
+          <td>
+            <center>
+              <div class="row responsive-sm" style="margin-bottom: 20px;">
+                <a class="col" href='https://play.google.com/store/apps/details?id=edu.berkeley.eecs.embase'><img style="height:75px;" alt='Get it on Google Play'  src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
+                <p><img src = "../img/greentrip_qr_code_gp.png"></p>
+                <!-- <br style="clear:both;"/> -->
+              </div>
+            </center>
+          </td>
+            
+          <td>
+            <center>
+              <div class="row responsive-sm" style="margin-bottom: 20px">
+                <a class="col" href="https://itunes.apple.com/us/app/emtriplog/id1362434685"><img style="height:75px;" alt='Get in on the iOS app store' ng-src = "../img/apple_badge.svg" src='../img/apple-badge.svg'/></a>
+                <qrcode class="col" data="https://itunes.apple.com/us/app/emtriplog/id1362434685" size="200"></qrcode>
+                <!-- <br style="clear:both;"/> -->
+                <p><img src = "../img/greentrip_qr_code_as.png"></p>
+              </div>
+            </center>
+          </td>
+
+        </tr>
+        </table>
+      </div>
+
+        <div style="padding-left: 5%; padding-top: 3%">
           <svg width="58px" height="49px" viewBox="0 0 58 49" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
               <!-- Generator: Sketch 43.1 (39012) - http://www.bohemiancoding.com/sketch -->
               <desc>Created with Sketch.</desc>
@@ -66,20 +118,42 @@
                   </g>
               </g>
           </svg>
-          <h4>Join this study</h4>
+            <h4>
+              <div style="font-size: 40">
+                Join this study
+              </div>
+            </h4>
         </div>
-        <div id="downloadRow">
+
+
+        <div id="downloadRow" style="padding-left: 5%">
+          <div style="font-size: 30">
+            When you have the app installed, press the "click to join" button below. This will take you to the app to consent to and begin the study.  
+          </div>
           <a id="groupLink" href="emission://change_client?new_client={{urap2017control}}&clear_local_storage={{clear_local_storage_flag}}&clear_usercache={{clear_usercache_flag}}">
-            <p style="color: #417505;">Open this link on your phone to launch the app and join the study</p>
-            <div id = "join_link"> <p style="color: black;">emission://change_client?new_client={{greentripcontrol}}&clear_local_storage={{clear_local_storage_flag}&clear_usercache={{clear_usercache_flag}}</p> </div>
+            <div id = "join_link"> <p style="color: black;">    
+              emission://change_client?new_client={{greentripcontrol}}&clear_local_storage={{clear_local_storage_flag}&clear_usercache={{clear_usercache_flag}}</p> 
+            </div>
           </a>
+
+          <p> <div class = "button"> 
+            <a href = "emission://change_client?new_client={{urap2017control}}&clear_local_storage={{clear_local_storage_flag}}&clear_usercache={{clear_usercache_flag}}">  
+              Click to join 
+            </a> 
+          </div> </p>
+
         </div>
-        <div>
+
+        <div style ="padding-left: 5%">
           <qrcode class="col" data="emission://change_client?new_client={{greentrip}}&clear_local_storage={{clear_local_storage_flag}}&clear_usercache={{clear_usercache_flag}}" size="200"></qrcode>
           <img id = "customize" src = "../img/join_study.png">
         </div>
       </div>
       <!-- https://youtu.be/CV1rGkRn9xM video displaying qr code testing --> 
+      <div class = "button" id = "contact"> <a href = "contact.html"> CONTACT US </a> </div>
+
+      <div style="padding-bottom: 5%">
+      </div>
 
   </ion-content>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
