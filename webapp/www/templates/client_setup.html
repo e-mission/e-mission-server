@@ -2,7 +2,7 @@
   <ion-content>
       <div class="redirect">
         <div>
-          <img id="logo" ng-src="img/favicon-96x96.png">
+          <img id="logo" alt="{{base_app}} logo" ng-src="img/{{base_app}}-icon-96x96.png">
         </div>
         <div>
           <h2>Thank you for participating - only two steps left!</h2>
@@ -11,7 +11,7 @@
           </p>
         </div>
         <div>
-          <svg width="58px" height="49px" viewBox="0 0 58 49" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+          <svg aria-label="Step 1" width="58px" height="49px" viewBox="0 0 58 49" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
               <!-- Generator: Sketch 43.1 (39012) - http://www.bohemiancoding.com/sketch -->
               <desc>Created with Sketch.</desc>
               <defs></defs>
@@ -26,20 +26,20 @@
                   </g>
               </g>
           </svg>
-        <h4>Install the e-mission app</h4>
+        <h4>Install the {{base_app}} app</h4>
         </div>
         <div class="row responsive-sm">
-          <a class="col" href='https://play.google.com/store/apps/details?id=edu.berkeley.eecs.emission'><img style="height:75px;" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
-          <qrcode class="col" data="https://play.google.com/store/apps/details?id=edu.berkeley.eecs.emission" size="200"></qrcode>
+          <a class="col" href='{{android_base_app}}'><img style="height:75px;" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
+          <qrcode class="col" aria-label="qrcode for google play installation" data="{{android_base_app}}" size="200"></qrcode>
             <!-- <br style="clear:both;"/> -->
         </div>
         <div class="row responsive-sm">
-          <a class="col" href="https://itunes.apple.com/us/app/emission/id1084198445?&mt=8"><img ng-src="img/apple-badge.svg"></a>
-          <qrcode class="col" data="https://itunes.apple.com/us/app/emission/id1084198445?&mt=8" size="200"></qrcode>
+          <a class="col" href="{{ios_base_app}}"><img alt='Get it on the iOS app store' ng-src="img/apple-badge.svg"></a>
+          <qrcode class="col" aria-label="qrcode for iOS app store installation" data="{{ios_base_app}}" size="200"></qrcode>
             <!-- <br style="clear:both;"/> -->
         </div>
         <div>
-          <svg width="58px" height="49px" viewBox="0 0 58 49" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+          <svg aria-label="Step 2" width="58px" height="49px" viewBox="0 0 58 49" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
               <!-- Generator: Sketch 43.1 (39012) - http://www.bohemiancoding.com/sketch -->
               <desc>Created with Sketch.</desc>
               <defs></defs>
@@ -63,7 +63,7 @@
           </a>
         </div>
         <div>
-          <qrcode class="col" data="emission://change_client?new_client={{client_label}}&clear_local_storage={{clear_local_storage_flag}}&clear_usercache={{clear_usercache_flag}}" size="200"></qrcode>
+          <qrcode class="col" aria-label="qrcode to join the study" data="emission://change_client?new_client={{client_label}}&clear_local_storage={{clear_local_storage_flag}}&clear_usercache={{clear_usercache_flag}}" size="200"></qrcode>
         </div>
       </div>
   </ion-content>

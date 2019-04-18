@@ -92,6 +92,32 @@ angular.module('starter.controllers', ['starter.heatmap', 'starter.metrics'])
 
 .controller('ClientSetupCtrl', function($scope, $stateParams) {
     console.log("in client setup, routeParams = "+JSON.stringify($stateParams));
+    var BASE_APP_URL = {
+        "emTripLog": {
+            "android": "https://play.google.com/store/apps/details?id=edu.berkeley.eecs.embase",
+            "ios": "https://itunes.apple.com/us/app/emtriplog/id1362434685"
+        },
+        "emission": {
+            "android": "https://play.google.com/store/apps/details?id=edu.berkeley.eecs.emission",
+            "ios": "https://itunes.apple.com/us/app/emission/id1084198445"
+        }
+    }
+    if (angular.isDefined($stateParams.base_app)) {
+        if (angular.isDefined(BASE_APP_URL[$stateParams.base_app])) {
+            $scope.base_app = $stateParams.base_app;
+            console.log("base_app defined in paramters, setting to "+$scope.base_app);
+        } else {
+            // emTripLog is the default
+            $scope.base_app = "emTripLog"
+            console.log("invalid base_app "+$stateParams.base_app+" defined, defaulting to emTripLog");
+        }
+    } else {
+        // emTripLog is the default
+        $scope.base_app = "emTripLog"
+        console.log("base_app not defined in paramters, defaulting to emTripLog");
+    }
+    $scope.android_base_app = BASE_APP_URL[$scope.base_app]["android"]
+    $scope.ios_base_app = BASE_APP_URL[$scope.base_app]["ios"]
     $scope.client_label = $stateParams.new_client;
     $scope.clear_local_storage_flag = $stateParams.clear_local_storage;
     $scope.clear_usercache_flag = $stateParams.clear_usercache;
