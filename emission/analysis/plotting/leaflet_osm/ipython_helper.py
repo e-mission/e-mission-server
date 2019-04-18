@@ -10,18 +10,19 @@ standard_library.install_aliases()
 from builtins import str
 from builtins import range
 from builtins import *
-import IPython.display as idisp
-import html as hgen
+
+import branca.element as bre
  
-def inline_map(map):
+def inline_map(m):
     """
     Embeds the HTML source of the map directly into the IPython notebook.
     
     This method will not work if the map depends on any files (json data). Also this uses
     the HTML5 srcdoc attribute, which may not be supported in all browsers.
     """
-    map._build_map()
-    return idisp.HTML('<iframe srcdoc="{srcdoc}" style="width: 100%; height: 510px; border: none"></iframe>'.format(srcdoc=map.HTML.replace('"', '&quot;')))
+    fig = bre.Figure()
+    fig.add_subplot(1,1,1).add_child(m)
+    return fig
 
 def inline_maps(map_list):
     """
@@ -34,24 +35,9 @@ def inline_maps(map_list):
     nRows: Number of rows
     nCols: Number of columns
     """
-    nRows = len(map_list)
-    # nCols = max([len(row) for row in map_list])
-    hb = hgen.HTML()
-    t = hb.table(width="100%")
-    for r in range(nRows):
-        row = t.tr
-        for c in range(len(map_list[r])):
-            currMap = map_list[r][c]
-            currMap._build_map()
-            row.td('<iframe srcdoc="{srcdoc}" style="width: 100%; height: 510px; border: none"></iframe>'.format(srcdoc=currMap.HTML.replace('"', '&quot;')))
-    return idisp.HTML('<iframe srcdoc="{srcdoc}" style="width: 100%; height: {ht}px; border: none"></iframe>'.format(srcdoc=str(t).replace('"', '&quot;'), ht=510*nRows))
- 
-def embed_map(map, path="map.html"):
-    """
-    Embeds a linked iframe to the map into the IPython notebook.
-    
-    Note: this method will not capture the source of the map into the notebook.
-    This method should work for all maps (as long as they use relative urls).
-    """
-    map.create_map(path=path)
-    return idisp.IFrame(src="files/{path}".format(path=path), width="100%", height="510")
+    ncols = 2
+    nrows = (len(map_list)/ncols) + 1
+    fig = bre.Figure()
+    for i, m in enumerate(map_list):
+        fig.add_subplot(nrows,ncols,i+1).add_child(m)
+    return fig

@@ -21,6 +21,7 @@ url = config_data["timeseries"]["url"]
 
 print("Connecting to database URL "+url)
 _current_db = MongoClient(url).Stage_database
+#config_file.close()
 
 def _get_current_db():
     return _current_db
