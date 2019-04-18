@@ -415,7 +415,7 @@ def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripidstr):
                         obtained.replace(' ', '+')
                         business_locations[q['name']] = obtained
     except: 
-        return {'message' : error_message_categor, 'method': 'bike', 'rating': None, 'businessid': None}
+        return {'message' : error_message_categor, 'question': None, 'suggested_loc': None, 'method': 'bike', 'rating': None, 'businessid': None}
     
     for a in business_locations:
         try:
@@ -425,33 +425,36 @@ def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripidstr):
         #Will check which mode the trip was taking for the integrated calculate yelp suggestion
         if calculate_distance < distance_in_miles and calculate_distance < 5 and calculate_distance >= 1:
             try:
-                new_message = "We saw that you took a vehicle from" + begin_string_address + "to" + address  + \
-                    ". Instead, there is a place " + a + "has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a][0]) + \
-                    " that you could have potentially biked to."
+                question = "How about this location?"
+                new_message = "We saw that you took a vehicle from" + begin_string_address + "to" + address  
+                suggested_loc =  "Instead, there is " + a + "which has better reviews and closer to your original starting point" 
+                rating_mess = "Rating of " + str(ratings_bus[a][0])
                 # message = "Why didn't you bike from " + begin_string_address + " to " + a + " (tap me to view) " + a + \
                 # " has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a][0])
                 #Not sure to include the amount of carbon saved
                 #Still looking to see what to return with this message, because currently my latitude and longitudes are stacked together in one string
                 # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
-                return {'message' : new_message, 'method': 'bike', 'rating': str(ratings_bus[a][0]), 'businessid': ratings_bus[a][1]}
+                return {'message' : new_message, 'question': question, 'suggested_loc': suggested_loc, 'method': 'bike', 'rating': str(ratings_bus[a][0]), 'businessid': ratings_bus[a][1]}
             except ValueError as e:
                 continue
         elif calculate_distance < distance_in_miles and calculate_distance < 1:
             try: 
-                new_message = "We saw that you took a vehicle from" + begin_string_address + "to" + address  + \
-                    ". Instead, there is a place " + a + "has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a][0]) + \
-                    " that you could have potentially walked to."
+                question = "How about this location?"
+                new_message = "We saw that you took a vehicle from" + begin_string_address + "to" + address  
+                suggested_loc =  "Instead, there is " + a + "which has better reviews and closer to your original starting point" 
+                rating_mess = "Rating of " + str(ratings_bus[a][0])
                 # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
-                return {'message' : message, 'method': 'walk', 'rating': str(ratings_bus[a][0]), 'businessid': ratings_bus[a][1]}
+                return {'message' : new_message,  'question': question, 'suggested_loc': suggested_loc, 'method': 'walk', 'rating': str(ratings_bus[a][0]), 'businessid': ratings_bus[a][1]}
             except ValueError as e:
                 continue
         elif calculate_distance < distance_in_miles and calculate_distance >= 5 and calculate_distance <= 15:
             try: 
-                new_message = "We saw that you took a vehicle from" + begin_string_address + "to" + address  + \
-                    ". Instead, there is a place " + a + "has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a][0]) + \
-                    " that you could have potentially used public transportation to get there."
+                question = "How about this location?"
+                new_message = "We saw that you took a vehicle from" + begin_string_address + "to" + address  
+                suggested_loc =  "Instead, there is " + a + "which has better reviews and closer to your original starting point" 
+                rating_mess = "Rating of " + str(ratings_bus[a][0])
                 # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
-                return {'message' : message, 'method': 'public', 'rating': str(ratings_bus[a][0]), 'businessid': ratings_bus[a][1]}
+                return {'message' : new_message,  'question': question, 'suggested_loc': suggested_loc, 'method': 'public', 'rating': str(ratings_bus[a][0]), 'businessid': ratings_bus[a][1]}
             except ValueError as e:
                 continue
    
@@ -510,9 +513,9 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
                                 obtained.replace(' ', '+')
                                 business_locations[q['name']] = obtained
             else:
-                return {'message' : error_message_categor, 'method': 'bike', 'rating': None, 'businessid': None, 'tripid': cleaned_trips.iloc[i]["_id"]}
+                return {'message' : error_message_categor, 'question': None, 'suggested_loc': None, 'method': 'bike', 'rating': None, 'businessid': None, 'tripid': cleaned_trips.iloc[i]["_id"]}
         except: 
-            return {'message' : error_message_categor, 'method': 'bike', 'rating': None, 'businessid': None, 'tripid': None}
+            return {'message' : error_message_categor, 'question': None, 'suggested_loc': None, 'method': 'bike', 'rating': None, 'businessid': None, 'tripid': None}
 
         #THIS PART WILL BE FIXED ACCODRING TO NOMINATIM AND GET RID OF MAPQUEST (find some other way to calculate distance)
         for a in business_locations:
@@ -523,33 +526,36 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
             #Will check which mode the trip was taking for the integrated calculate yelp suggestion
             if calculate_distance < distance_in_miles and calculate_distance < 5 and calculate_distance >= 1:
                 try:
-                    new_message = "We saw that you took a vehicle from" + begin_string_address + "to" + address  + \
-                    ". Instead, there is a place " + a + "which has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a][0]) + \
-                    " that you could have potentially biked to."
+                    question = "How about this location?"
+                    new_message = "We saw that you took a vehicle from" + begin_string_address + "to" + address  
+                    suggested_loc =  "Instead, there is " + a + "which has better reviews and closer to your original starting point" 
+                    rating_mess = "Rating of " + str(ratings_bus[a][0])
                     #Not sure to include the amount of carbon saved
                     #Still looking to see what to return with this message, because currently my latitude and longitudes are stacked together in one string
                     # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
-                    return {'message' : new_message, 'method': 'bike', 'rating': str(ratings_bus[a][0]), 'businessid': ratings_bus[a][1], 'tripid': cleaned_trips.iloc[i]["_id"]}
+                    return {'message' : new_message, 'question': question, 'suggested_loc': suggested_loc, 'method': 'bike', 'rating': str(ratings_bus[a][0]), 'businessid': ratings_bus[a][1], 'tripid': cleaned_trips.iloc[i]["_id"]}
                 except ValueError as e:
                     continue
             elif calculate_distance < distance_in_miles and calculate_distance < 1:
                 try: 
-                    new_message = "We saw that you took a vehicle from" + begin_string_address + "to" + address  + \
-                    ". Instead, there is a place " + a + "which has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a][0]) + \
-                    " that you could have potentially walked to."
+                    question = "How about this location?"
+                    new_message = "We saw that you took a vehicle from" + begin_string_address + "to" + address  
+                    suggested_loc =  "Instead, there is " + a + "which has better reviews and closer to your original starting point" 
+                    rating_mess = "Rating of " + str(ratings_bus[a][0])
                     # message = "Why didn't you walk from " + begin_string_address+ " to " + a + " (tap me to view) " + a + \
                     # " has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a])
                     # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
-                    return {'message' : new_message, 'method': 'walk', 'rating': str(ratings_bus[a][0]), 'businessid': ratings_bus[a][1], 'tripid': cleaned_trips.iloc[i]["_id"]}
+                    return {'message' : new_message, 'question': question, 'suggested_loc': suggested_loc, 'method': 'walk', 'rating': str(ratings_bus[a][0]), 'businessid': ratings_bus[a][1], 'tripid': cleaned_trips.iloc[i]["_id"]}
                 except ValueError as e:
                     continue
             elif calculate_distance < distance_in_miles and calculate_distance >= 5 and calculate_distance <= 15:
                 try: 
-                    new_message = "We saw that you took a vehicle from" + begin_string_address + "to" + address  + \
-                    ". Instead, there is a place " + a + "which has better reviews, closer to your original starting point, and has a rating of " + str(ratings_bus[a][0]) + \
-                    " that you could have potentially used public transportation to get there."
+                    question = "How about this location?"
+                    new_message = "We saw that you took a vehicle from" + begin_string_address + "to" + address  
+                    suggested_loc =  "Instead, there is " + a + "which has better reviews and closer to your original starting point" 
+                    rating_mess = "Rating of " + str(ratings_bus[a][0])
                     # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
-                    return {'message' : new_message, 'method': 'public', 'rating': str(ratings_bus[a][0]), 'businessid': ratings_bus[a][1], 'tripid': cleaned_trips.iloc[i]["_id"]}
+                    return {'message' : new_message, 'question': question, 'suggested_loc': suggested_loc, 'method': 'public', 'rating': str(ratings_bus[a][0]), 'businessid': ratings_bus[a][1], 'tripid': cleaned_trips.iloc[i]["_id"]}
                 except ValueError as e:
                     continue
     return {'message': "Your endpoint has either been a non-serviceable category or a closeby option.",'method': 'public transportation', 'rating': None, 'businessid': None, 'tripid': cleaned_trips.iloc[i]["_id"]}
