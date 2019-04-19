@@ -132,6 +132,8 @@ def check_against_business_location(lat, lon, address = ''):
         result = requests.get(url).json()
         cleaned = result['results']
         for i in cleaned:
+            logging.debug("For amenity %s, comparing address %s with nearby business %s" %
+                (i['name'], address, i['vicinity']))
             #If the street address matches the street address of this business, we return a tuple
             #signifying success and the business name
             if address == i['vicinity']:
@@ -166,18 +168,23 @@ def return_address_from_location_google(lat, lon):
         #This try block is for our first 150,000 requests. If we exceed this, use Jack's Token.
         key_string = '&key=' + GOOGLE_MAPS_KEY
         url = base_url + latlng + key_string #Builds the url
+        # logging.debug("About to query google with URL %s" % url)
         result = requests.get(url).json() #Gets google maps json file
         cleaned = result['results'][0]['address_components']
+        logging.debug("Components from address lookup = %s" % cleaned)
         #Address to check against value of check_against_business_location
         chk = cleaned[0]['long_name'] + ' ' + cleaned[1]['long_name'] + ', ' + cleaned[3]['long_name']
         business_tuple = check_against_business_location(lat, lon, chk)
+        logging.debug("After checking = %s, got business tuple %s " % (chk, business_tuple))
         location_is_service = isLocationService(cleaned)
+        address_comp = cleaned[0]['long_name'] + ' ' + cleaned[1]['short_name']
         if business_tuple[0]: #If true, the lat, lon matches a business location and we return business name
-            address_comp = cleaned[0]['long_name'] + ' ' + cleaned[1]['short_name']
             #, cleaned[3]['short_name'], address_comp
-            return business_tuple[1], cleaned[3]['short_name'], address_comp, location_is_service
-        else: #otherwise, we just return the address
-            return cleaned[0]['long_name'] + ' ' + cleaned[1]['short_name'] + ', ' + cleaned[3]['short_name'], location_is_service
+            business_name = business_tuple[1]
+        else:
+            business_name = None
+
+        return business_name, address_comp, cleaned[3]['short_name'], location_is_service
     except:
         try:
             #Use Jack's Token in case of some invalid request problem with other API Token
