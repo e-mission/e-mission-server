@@ -127,7 +127,7 @@ def check_against_business_location(lat, lon, address = ''):
     location = 'location=' + location_first
     try:
         key_string = '&key=' + GOOGLE_MAPS_KEY
-        radius = '&radius=10'
+        radius = '&radius=100'
         url = base_url + location + radius + key_string
         result = requests.get(url).json()
         cleaned = result['results']
@@ -141,7 +141,7 @@ def check_against_business_location(lat, lon, address = ''):
     except:
         try:
             key_string = '&key=' + BACKUP_GOOGLE_MAPS_KEY
-            radius = '&radius=10'
+            radius = '&radius=100'
             url = base_url + location + radius + key_string
             result = requests.get(url).json()
             cleaned = result['results']
