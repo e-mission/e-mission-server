@@ -174,7 +174,8 @@ Such as Piedmont Ave, Berkeley, CA
 Then the function will enter the Google reverse lookup and choose a business that is closest to 
 latitude and longitude given
 '''
-def category_of_business_nominatim(lat, lon):
+
+def find_destination_business(lat, lon):
     try:
         #Off at times if the latlons are of a location that takes up a small spot, especially boba shops
         # print(return_address_from_location_google(location))
@@ -183,33 +184,37 @@ def category_of_business_nominatim(lat, lon):
         string_address, address_dict = return_address_from_location_nominatim(lat, lon)   
         business_key = list(address_dict.keys())[0]
         business_name = address_dict[business_key]
-        if (not is_service_nominatim(business_name)):
-            return []
         city = address_dict['city']
-        categories = []
-        for c in business_reviews(YELP_API_KEY, business_name.replace(' ', '-') + '-' + city)['categories']:
-            categories.append(c['alias'])
-        return categories
-        
+        return_tuple = (business_name, string_address, city,
+            (not is_service_nominatim(business_name)))
+        logging.debug("Nominatim found destination business %s " % str(return_tuple))
+        return return_tuple
     except:
         #USE GOOGLE API JUST IN CASE if nominatim doesn't work
-        try:
-            try:
-                bus_name, short_addr, address, location_is_service = return_address_from_google_nomfile(lat, lon)
-            except:
-                address, location_is_service = return_address_from_google_nomfile(lat, lon)
-            if (location_is_service == False):
-                return []
-            categories = []
+        return_tuple = return_address_from_google_nomfile(lat, lon)
+        logging.debug("Nominatim failed, Google found destination business %s "
+            % str(return_tuple))
+        return return_tuple
+
+def category_of_business_nominatim(lat, lon):
+    try:
+        business_name, address, city, location_is_service = find_destination_business(lat, lon)
+        if not location_is_service:
+            return []
+
+        categories = []
+        if business_name is not None:
+            for c in business_reviews(YELP_API_KEY, business_name.replace(' ', '-') + '-' + city)['categories']:
+                categories.append(c['alias'])
+            return categories
+        else:
             possible_bus = match_business_address(address)["businesses"][0]
             possible_categ = possible_bus["categories"]
             for p in possible_categ:
                 categories.append(p["alias"])
             return categories
-        except:
-            raise ValueError("Something went wrong")
-
-
+    except:
+        raise ValueError("Something went wrong")
 
 
 '''
