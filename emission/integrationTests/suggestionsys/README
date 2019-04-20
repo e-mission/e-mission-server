@@ -1,0 +1,53 @@
+The suggestion system requires several different components to come together to work
+- we have to correctly figure out what the trip destination and its category were
+- we have to then come up with a set of potential alternatives
+- we have to pick the best alternative
+All of these involve mini-algorithms that are likely to change the results as
+we tweak them
+
+We will use these python tests to effectively create ad-hoc mini datasets that
+can track how the algorithms work across a fairly broad set of use cases, not
+just one
+
+These are not unit tests since they depend on external results which may change
+over time. We can convert them into unit tests through mocking, but kind of
+running out of time for that here
+
+NOTE: We may want to remove/edit the "find_destination_business" if we choose
+depending on the API we choose for the lookup.
+
+NOTE #2: If you comment out the line 
+"import emission.storage.timeseries.abstract_timeseries as esta"
+in suggestion_sys, you don't need to have the database running. Please make
+sure not to commit this change
+
+INSTRUCTIONS
+-----------
+- Pick an _interesting_ use case, hopefully one that is not already covered -
+  suburban big box store in mall, suburban big box store standalone, strip
+  mall, downtown restaurant,....
+- Look up the related latlng using https://www.openstreetmap.org, zoom in as
+  much as you can go, click on the right toolbar -> Layers -> Map Data.  For
+  bigger buildings, you may need to click on the associated nodes You can also
+  get the yelp business id by searching yelp for the business and looking at the
+  id in the URL (e.g. in
+  https://www.yelp.com/biz/kohls-mountain-view-mountain-view-2?osq=kohl%27s+mountain+view,
+  the business id is kohls-mountain-view-mountain-view-2)
+- Use the OSM map data or suggestion system methods - e.g.
+  `return_address_from_location_nominatim` or
+  `business_reviews` or maybe even yelp - e.g.
+    ```
+    sugg.request(sugg.API_HOST, sugg.SEARCH_PATH, sugg.YELP_API_KEY,
+        url_params={'latitude': 37.701995, 'longitude': -122.4706021,
+        'radius': 100, 'limit': 50})
+    ```
+    to find your options
+    - especially for the address, this may be inconsistent across potential
+      APIs, which is why I have the note above.
+    - you may want to use the yelp bid to directly get the categories, for example
+- find the output of the correct answer
+- put it into the dataset
+- run the harness to make sure that the json is in the right format
+- rinse, repeat
+
+Let me know if anything in here is unclear
