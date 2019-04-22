@@ -1,0 +1,13 @@
+[
+    {
+        "test_name": "Mountain View Kohls",
+        "test_type": "Suburban big box store in local anchor shopping center ",
+        "input": {
+            "loc": {
+                "coordinates": [-122.1078300, 37.4035500],
+                "type": "Point"
+            }
+        },
+        "output": ["Kohl's", "Showers Drive", "Mountain View", true]
+    }
+]

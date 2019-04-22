@@ -1,0 +1,17 @@
+[
+    {
+        "test_name": "Sunnyvale -> Mountain View Kohls",
+        "test_type": "From suburban residential area (between Wolfe and Braly School) to suburban big box store",
+        "input": {
+            "start_loc": {
+                "coordinates": [-122.0154871, 37.3635335],
+                "type": "Point"
+            },
+            "end_loc": {
+                "coordinates": [-122.1078300, 37.4035500],
+                "type": "Point"
+            }
+        },
+        "output": "target-sunnyvale-2"
+    }
+]
