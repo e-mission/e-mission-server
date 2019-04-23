@@ -10,4 +10,40 @@
         },
         "output": ["deptstores", "menscloth", "womenscloth"]
     }
+
+    {
+        "test_name": "Italian Homemade",
+        "test_type": "Main Street type commercial district italian restaurant",
+        "input": {
+            "loc": {
+                "coordinates": [-122.252844, 37.858179],
+                "type": "Point"
+            }
+        },
+        "output": ["restaurant", "italian"]
+    }
+
+    {
+        "test_name": "Jong Ga House",
+        "test_type": "Midtown type commercial district korean barbecue",
+        "input": {
+            "loc": {
+                "coordinates": [-122.1078300, 37.4035500],
+                "type": "Point"
+            }
+        },
+        "output": ["restaurant", "korean"]
+    }
+
+    {
+        "test_name": "T Pumps",
+        "test_type": "Midtown type main street boba tea shop",
+        "input": {
+            "loc": {
+                "coordinates": [-122.478639, 37.763643],
+                "type": "Point"
+            }
+        },
+        "output": ["fast_food", "smoothies"]
+    }
 ]
