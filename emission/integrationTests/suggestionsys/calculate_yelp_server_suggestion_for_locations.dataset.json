@@ -14,4 +14,52 @@
         },
         "output": "target-sunnyvale-2"
     }
+
+    {
+        "test_name": "Martinez -> Italian Homemade",
+        "test_type": "From urban residential area (Channing and Telegraph) to Main Street type commercial district italian restaurant",
+        "input": {
+            "start_loc": {
+                "coordinates": [-122.258042, 37.866615],
+                "type": "Point"
+            },
+            "end_loc": {
+                "coordinates": [-122.252844, 37.858179],
+                "type": "Point"
+            }
+        },
+        "output": "gypsys-trattoria-italiano-berkeley"
+    }
+
+    {
+        "test_name": "Martinez -> Jong Ga",
+        "test_type": "From urban residential area (Channing and Telegraph) to Midtown type commercial district korean barbecue",
+        "input": {
+            "start_loc": {
+                "coordinates": [-122.258042, 37.866615],
+                "type": "Point"
+            },
+            "end_loc": {
+                "coordinates": [-122.1078300, 37.4035500],
+                "type": "Point"
+            }
+        },
+        "output": "koja-kitchen-berkeley-2"
+    }
+
+    {
+        "test_name": "Martinez -> T Pumps",
+        "test_type": "From urban residential area (Channing and Telegraph) to Midtown type Main Street boba tea shop",
+        "input": {
+            "start_loc": {
+                "coordinates": [-122.258042, 37.866615],
+                "type": "Point"
+            },
+            "end_loc": {
+                "coordinates": [-122.478639, 37.763643],
+                "type": "Point"
+            }
+        },
+        "output": "yifang-taiwan-fruit-tea-berkeley-4"
+    }
 ]
