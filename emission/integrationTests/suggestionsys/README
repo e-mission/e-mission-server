@@ -21,6 +21,13 @@ NOTE #2: If you comment out the line
 in suggestion_sys, you don't need to have the database running. Please make
 sure not to commit this change
 
+NOTE #3: To invoke the sugg functions in here interactively, open an emission
+environment loaded ipython terminal (i.e. ./e-mission-ipy.bash) or jupyter
+notebook (i.e.  ./e-mission-juypter.bash notebook) and `import
+emission.core.wrapper.suggestion_sys as sugg`.  You can look for examples of
+other interactive code from the `sugg` module in
+https://github.com/e-mission/e-mission-docs/issues/382
+
 INSTRUCTIONS
 -----------
 - Pick an _interesting_ use case, hopefully one that is not already covered -
@@ -45,6 +52,16 @@ INSTRUCTIONS
     - especially for the address, this may be inconsistent across potential
       APIs, which is why I have the note above.
     - you may want to use the yelp bid to directly get the categories, for example
+        ```
+        In [2]: sugg.business_reviews(sugg.YELP_API_KEY, "kohls-mountain-view-mountain-view-2")
+        Out[2]:
+        {'alias': 'kohls-mountain-view-mountain-view-2',
+         'categories': [{'alias': 'deptstores', 'title': 'Department Stores'},
+          {'alias': 'menscloth', 'title': "Men's Clothing"},
+          {'alias': 'womenscloth', 'title': "Women's Clothing"}],
+         'coordinates': {'latitude': 37.4028391, 'longitude': -122.1082734},
+          ...
+        ```
 - find the output of the correct answer
 - put it into the dataset
 - run the harness to make sure that the json is in the right format
