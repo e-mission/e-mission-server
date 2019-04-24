@@ -1,4 +1,4 @@
-e-mission phone app [FABMOB]
+*-mission phone app [FABMOB]
 
 This is the README for e-mission-phone FabMob
 
