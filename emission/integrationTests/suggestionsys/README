@@ -30,6 +30,8 @@ https://github.com/e-mission/e-mission-docs/issues/382
 
 INSTRUCTIONS
 -----------
+- Configure nominatim, google and yelp in the `conf/net` directory. You can use
+  the values on the server to start with.
 - Pick an _interesting_ use case, hopefully one that is not already covered -
   suburban big box store in mall, suburban big box store standalone, strip
   mall, downtown restaurant,....
