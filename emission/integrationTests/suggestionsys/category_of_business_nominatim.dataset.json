@@ -10,127 +10,6 @@
         },
         "output": ["deptstores", "menscloth", "womenscloth"]
     },
-
-    {
-        "test_name": "Trattoria Oliverii",
-        "test_type": "Italian food inn downtown area in North suburb of Chicago ",
-        "input": {
-            "loc": {
-                "coordinates": [-87.8280804, 42.1282360],
-                "type": "Point"
-            }
-        },
-        "output": ["pizza", "italian"]
-    },
-
-    {
-        "test_name": "Landmark Inn",
-        "test_type": "The single bar that older people and recent college grads find in downtown area in North suburb of Chicago ",
-        "input": {
-            "loc": {
-                "coordinates": [-87.8278122,  42.1284190],
-                "type": "Point"
-            }
-        },
-        "output": ["bars", "newamerican"]
-    },
-
-    {
-        "test_name": "Northbrook Public Library",
-        "test_type": "Where I spent a lot of my childhood, reading, studying and crying in North suburb of Chicago ",
-        "input": {
-            "loc": {
-                "coordinates": [-87.8310260,  42.1305753],
-                "type": "Point"
-            }
-        },
-        "output": ["libraries"]
-    },
-
-    {
-        "test_name": "Sunset Foods",
-        "test_type": "A pretty good grocery joint in North suburb of Chicago ",
-        "input": {
-            "loc": {
-                "coordinates": [-87.8262419, 42.1320020],
-                "type": "Point"
-            }
-        },
-        "output": ["grocery", "delis"]
-    },
-
-    {
-        "test_name": "Chase Bank",
-        "test_type": "A Chase Bank in a North suburb of Chicago ",
-        "input": {
-            "loc": {
-                "coordinates": [-87.8264886, 42.1307608],
-                "type": "Point"
-            }
-        },
-        "output": ["banks"]
-    },
-
-    {
-        "test_name": "Northbrook Police Department",
-        "test_type": "A police department in a North suburb of Chicago ... never been ",
-        "input": {
-            "loc": {
-                "coordinates": [-87.8575364, 42.1269540],
-                "type": "Point"
-            }
-        },
-        "output": ["policedepartments"]
-    },
-
-    {
-        "test_name": "CineBistro at Solaris",
-        "test_type": "A movie theater in Vail, CO ",
-        "input": {
-            "loc": {
-                "coordinates": [-106.3762184, 39.6422828],
-                "type": "Point"
-            }
-        },
-        "output": ["movietheaters", "lounges", "burgers"]
-    },
-
-    {
-        "test_name": "10th Mountain Whiskey and Spirit Co",
-        "test_type": "A whiskey and spirit company in Vail, CO ",
-        "input": {
-            "loc": {
-                "coordinates": [-106.3778327, 39.6430009],
-                "type": "Point"
-            }
-        },
-        "output": ["whiskeybars"]
-    },
-
-    {
-        "test_name": "Mountain Standard",
-        "test_type": "Restaurant in Vail, CO with pretty good seasonal salads ",
-        "input": {
-            "loc": {
-                "coordinates": [-106.3747021, 39.6409689],
-                "type": "Point"
-            }
-        },
-        "output": ["newamerican", "burgers", "bars"]
-    },
-
-    {
-        "test_name": "Building",
-        "test_type": "Buidling in Vail, CO ",
-        "input": {
-            "loc": {
-                "coordinates": [-106.3832471, 39.6430976],
-                "type": "Point"
-            }
-        },
-        "output": []
-    },
-    
     {
         "test_name": "Manhattan Beach Kettle",
         "test_type": "Non-chain restaurant in suburban downtown area",
@@ -359,6 +238,343 @@
             }
         },
         "output": ["hotdogs", "tex-mex", "mexican"]
-    }
+    },
 
+    {
+        "test_name": "Trattoria Oliverii",
+        "test_type": "Italian food inn downtown area in North suburb of Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.8280804, 42.1282360],
+                "type": "Point"
+            }
+        },
+        "output": ["pizza", "italian"]
+    },
+
+    {
+        "test_name": "Landmark Inn",
+        "test_type": "The single bar that older people and recent college grads find in downtown area in North suburb of Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.8278122,  42.1284190],
+                "type": "Point"
+            }
+        },
+        "output": ["bars", "newamerican"]
+    },
+
+    {
+        "test_name": "Northbrook Public Library",
+        "test_type": "Where I spent a lot of my childhood, reading, studying and crying in North suburb of Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.8310260,  42.1305753],
+                "type": "Point"
+            }
+        },
+        "output": ["libraries"]
+    },
+
+    {
+        "test_name": "Sunset Foods",
+        "test_type": "A pretty good grocery joint in North suburb of Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.8262419, 42.1320020],
+                "type": "Point"
+            }
+        },
+        "output": ["grocery", "delis"]
+    },
+
+    {
+        "test_name": "Chase Bank",
+        "test_type": "A Chase Bank in a North suburb of Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.8264886, 42.1307608],
+                "type": "Point"
+            }
+        },
+        "output": ["banks"]
+    },
+
+    {
+        "test_name": "Northbrook Police Department",
+        "test_type": "A police department in a North suburb of Chicago ... never been ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.8575364, 42.1269540],
+                "type": "Point"
+            }
+        },
+        "output": ["policedepartments"]
+    },
+
+    {
+        "test_name": "CineBistro at Solaris",
+        "test_type": "A movie theater in Vail, CO ",
+        "input": {
+            "loc": {
+                "coordinates": [-106.3762184, 39.6422828],
+                "type": "Point"
+            }
+        },
+        "output": ["movietheaters", "lounges", "burgers"]
+    },
+
+    {
+        "test_name": "10th Mountain Whiskey and Spirit Co",
+        "test_type": "A whiskey and spirit company in Vail, CO ",
+        "input": {
+            "loc": {
+                "coordinates": [-106.3778327, 39.6430009],
+                "type": "Point"
+            }
+        },
+        "output": ["whiskeybars"]
+    },
+
+    {
+        "test_name": "Mountain Standard",
+        "test_type": "Restaurant in Vail, CO with pretty good seasonal salads ",
+        "input": {
+            "loc": {
+                "coordinates": [-106.3747021, 39.6409689],
+                "type": "Point"
+            }
+        },
+        "output": ["newamerican", "burgers", "bars"]
+    },
+
+    {
+        "test_name": "Building",
+        "test_type": "Buidling in Vail, CO ",
+        "input": {
+            "loc": {
+                "coordinates": [-106.3832471, 39.6430976],
+                "type": "Point"
+            }
+        },
+        "output": []
+    },
+    {
+        "test_name": "Pekoe San Jose",
+        "test_type": "Tea shop along major road in strip mall",
+        "input": {
+            "loc": {
+                "coordinates": [-121.7897235, 37.3146154],
+                "type": "Point"
+            }
+        },
+        "output": ["coffee", "bubbletea", "tea"]
+    },
+    {
+        "test_name": "99 Ranch Market Fremont",
+        "test_type": "Asian Supermarket in strip mall",
+        "input": {
+            "loc": {
+                "coordinates": [-121.9309053, 37.4881864],
+                "type": "Point"
+            }
+        },
+        "output": ["grocery", "seafoodmarkets"]
+    },
+    {
+        "test_name": "Mission San Jose High School Fremont",
+        "test_type": "Suburban high school in residential area",
+        "input": {
+            "loc": {
+                "coordinates": [-121.935992, 37.5443018],
+                "type": "Point"
+            }
+        },
+        "output": ["highschools"] 
+    },
+    {
+        "test_name": "Giraffe Learning Center",
+        "test_type": "after school tutoring place in strip mall",
+        "input": {
+            "loc": {
+                "coordinates": [-121.9485068, 37.5417558],
+                "type": "Point"
+            }
+        },
+        "output": ["tutoring"]
+    },
+    {
+        "test_name": "Costco",
+        "test_type": "large wholesale store w/ food court in suburban strip mall",
+        "input": {
+            "loc": {
+                "coordinates": [-121.9752093, 37.5016114],
+                "type": "Point"
+            }
+        },
+        "output": ["wholesale_stores"]
+    },
+    {
+        "test_name": "Ohlone College",
+        "test_type": "large community college in suburban area",
+        "input": {
+            "loc": {
+                "coordinates": [-121.9168524, 37.5298962],
+                "type": "Point"
+            }
+        },
+        "output": ["collegeuniv"]
+    },
+    {
+        "test_name": "Holiday Inn San Jose - Silicon Valley",
+        "test_type": "large hotel in urban area",
+        "input": {
+            "loc": {
+                "coordinates": [-121.9099833, 37.361147],
+                "type": "Point"
+            }
+        },
+        "output": ["hotels", "venues"]
+    },
+    {
+        "test_name": "Annie Hair & Beauty",
+        "test_type": "barber shop in strip mall",
+        "input": {
+            "loc": {
+                "coordinates": [-121.9318015, 37.4891932],
+                "type": "Point"
+            }
+        },
+        "output": ["hair", "cosmetics"]
+    },
+    {
+        "test_name": "Quik Stop",
+        "test_type": "gas station near highway onramp",
+        "input": {
+            "loc": {
+                "coordinates": [-121.9392133, 37.5307587],
+                "type": "Point"
+            }
+        },
+        "output": ["servicestations", "convenience"]
+    },
+    {
+        "test_name": "Department of Motor Vehicles",
+        "test_type": "DMV office in central area of town",
+        "input": {
+            "loc": {
+                "coordinates": [-122.0093908, 37.5533451],
+                "type": "Point"
+            }
+        },
+        "output": ["departmentsofmotorvehicles"]
+    }
+,
+    {
+        "test_name": "Italian Homemade",
+        "test_type": "Main Street type commercial district italian restaurant",
+        "input": {
+            "loc": {
+                "coordinates": [-122.252844, 37.858179],
+                "type": "Point"
+            }
+        },
+        "output": ["gelato", "delis", "italian"]
+    }
+,
+    {
+        "test_name": "Jong Ga House",
+        "test_type": "Midtown type commercial district korean barbecue",
+        "input": {
+            "loc": {
+                "coordinates": [-122.254948, 37.809082],
+                "type": "Point"
+            }
+        },
+        "output": ["korean"]
+    }
+,
+    {
+        "test_name": "T Pumps",
+        "test_type": "Midtown type main street boba tea shop",
+        "input": {
+            "loc": {
+                "coordinates": [-122.478639, 37.763643],
+                "type": "Point"
+            }
+        },
+        "output": ["bubbletea", "juicebars", "coffee"]
+    }
+,
+    {
+        "test_name": "Martinez Commons",
+        "test_type": "Urban apartment building",
+        "input": {
+            "loc": {
+                "coordinates": [-122.258042, 37.866615],
+                "type": "Point"
+            }
+        },
+        "output": []
+    }
+,
+    {
+        "test_name": "Richmond District House",
+        "test_type": "Flats in medium/low density SF richmond district",
+        "input": {
+            "loc": {
+                "coordinates": [-122.469817, 37.779966],
+                "type": "Point"
+            }
+        },
+        "output": []
+    }
+,
+    {
+        "test_name": "Novato Unified School District",
+        "test_type": "Suburban office for school district",
+        "input": {
+            "loc": {
+                "coordinates": [-122.578671, 38.109495],
+                "type": "Point"
+            }
+        },
+        "output": ["elementaryschools", "highschools"]
+    }
+,
+    {
+        "test_name": "Tamalpais Pediatrics",
+        "test_type": "Pediatrician's office in suburban medical complex",
+        "input": {
+            "loc": {
+                "coordinates": [-122.540262, 37.944070],
+                "type": "Point"
+            }
+        },
+        "output": ["pediatricians"]
+    }
+,
+    {
+        "test_name": "Novato Library",
+        "test_type": "Library in suburban setting",
+        "input": {
+            "loc": {
+                "coordinates": [-122.580147, 38.107132],
+                "type": "Point"
+            }
+        },
+        "output": ["libraries"]
+    }
+,
+    {
+        "test_name": "O'hair Park",
+        "test_type": "Large park adjacent to open lands",
+        "input": {
+            "loc": {
+                "coordinates": [-122.619220, 38.116237],
+                "type": "Point"
+            }
+        },
+        "output": ["parks"]
+    }
 ]

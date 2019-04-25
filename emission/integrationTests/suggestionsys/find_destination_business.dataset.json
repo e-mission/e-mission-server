@@ -357,6 +357,115 @@
             }
         },
         "output": ["Bitcoin of America", "East Monroe Street", "Chicago", true]
+    },
+    {
+        "test_name": "Pekoe San Jose",
+        "test_type": "Tea shop along major road in strip mall",
+        "input": {
+            "loc": {
+                "coordinates": [-121.7897235, 37.3146154],
+                "type": "Point"
+            }
+        },
+        "output": ["Pekoe", "South White Road", "San Jose", true]
+    },
+    {
+        "test_name": "99 Ranch Market Fremont",
+        "test_type": "Asian Supermarket in strip mall",
+        "input": {
+            "loc": {
+                "coordinates": [-121.9309053, 37.4881864],
+                "type": "Point"
+            }
+        },
+        "output": ["99 Ranch Market", "Warm Springs Boulevard", "Fremont", true]
+    },
+    {
+        "test_name": "Mission San Jose High School Fremont",
+        "test_type": "Suburban high school in residential area",
+        "input": {
+            "loc": {
+                "coordinates": [-121.935992, 37.5443018],
+                "type": "Point"
+            }
+        },
+        "output": ["Mission San Jose High School", "Palm Avenue", "Fremont", true]
+    },
+    {
+        "test_name": "Giraffe Learning Center",
+        "test_type": "after school tutoring place in strip mall",
+        "input": {
+            "loc": {
+                "coordinates": [-121.9485068, 37.5417558],
+                "type": "Point"
+            }
+        },
+        "output": ["Giraffe Learning Center", "Driscoll Road", "Fremont", true]
+    },
+    {
+        "test_name": "Costco",
+        "test_type": "large wholesale store w/ food court in suburban strip mall",
+        "input": {
+            "loc": {
+                "coordinates": [-121.9752093, 37.5016114],
+                "type": "Point"
+            }
+        },
+        "output": ["Costco", "Pacific Commons Boulevard", "Fremont", true]
+    },
+    {
+        "test_name": "Ohlone College",
+        "test_type": "large community college in suburban area",
+        "input": {
+            "loc": {
+                "coordinates": [-121.9168524, 37.5298962],
+                "type": "Point"
+            }
+        },
+        "output": ["Ohlone College", "Mission Boulevard", "Fremont", true]
+    },
+    {
+        "test_name": "Holiday Inn San Jose - Silicon Valley",
+        "test_type": "large hotel in urban area",
+        "input": {
+            "loc": {
+                "coordinates": [-121.9099833, 37.361147],
+                "type": "Point"
+            }
+        },
+        "output": ["Holiday Inn San Jose - Silicon Valley", "North 1st Street", "San Jose", true]
+    },
+    {
+        "test_name": "Annie Hair & Beauty",
+        "test_type": "barber shop in strip mall",
+        "input": {
+            "loc": {
+                "coordinates": [-121.9318015, 37.4891932],
+                "type": "Point"
+            }
+        },
+        "output": ["Annie Hair & Beauty", "Warm Springs Boulevard", "Fremont", true]
+    },
+    {
+        "test_name": "Quik Stop",
+        "test_type": "gas station near highway onramp",
+        "input": {
+            "loc": {
+                "coordinates": [-121.9392133, 37.5307587],
+                "type": "Point"
+            }
+        },
+        "output": ["Quik Stop", "Washington Boulevard", "Fremont", true]
+    },
+    {
+        "test_name": "Department of Motor Vehicles",
+        "test_type": "DMV office in central area of town",
+        "input": {
+            "loc": {
+                "coordinates": [-122.0093908, 37.5533451],
+                "type": "Point"
+            }
+        },
+        "output": ["Department of Motor Vehicles", "Central Avenue", "Fremont", true]
     }
-
 ]
