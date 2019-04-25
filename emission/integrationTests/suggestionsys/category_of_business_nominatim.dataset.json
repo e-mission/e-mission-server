@@ -9,5 +9,115 @@
             }
         },
         "output": ["deptstores", "menscloth", "womenscloth"]
+    }, 
+    {
+        "test_name": "Walmart Supercenter",
+        "test_type": "Suburban big box store by itself in a plaza",
+        "input": {
+            "loc": {
+                "coordinates": [-121.9218589, 37.4310221],
+                "type": "Point"
+            }
+        },
+        "output": ["deptstores", "grocery"]
+    }, 
+    {   
+        "test_name": "Loving Hut",
+        "test_type": "Restaurant in a large plaza with other restaurants",
+        "input": {
+            "loc": {
+                "coordinates": [-121.9163240, 37.4208679],
+                "type": "Point"
+            }
+        },
+        "output": ["vegetarian", "vegan", "asianfusion"]
+    }, 
+    {
+        "test_name": "San Francisco Premium Outlets",
+        "test_type": "A large outlet with a lot of stores inside",
+        "input": {
+            "loc": {
+                "coordinates": [-121.8479784, 37.6997385],
+                "type": "Point"
+            }
+        },
+        "output": ["outlet_stores", "shoppingcenters"]
+    },
+    {
+        "test_name": "San Ramon Valley High School",
+        "test_type": "A highschool in a suburban community",
+        "input": {
+            "loc": {
+                "coordinates": [-122.0062950, 37.8273458],
+                "type": "Point"
+            }
+        },
+        "output": ["highschools"]
+    },
+    {
+        "test_name": "Bank of America",
+        "test_type": "A bank that is on the side of a large road",
+        "input": {
+            "loc": {
+                "coordinates": [-121.8937688, 37.4332083],
+                "type": "Point"
+            }
+        },
+        "output": ["banks"]
+    },
+    {
+        "test_name": "Chevron Milpitas",
+        "test_type": "A gas station next to a highway and neighborhood",
+        "input": {
+            "loc": {
+                "coordinates": [-121.9208686, 37.4520320],
+                "type": "Point"
+            }
+        },
+        "output": ["servicestations", "convenience", "carwash"]
+    },
+    {
+        "test_name": "Costco",
+        "test_type": "Suburban big box store in a large plaza",
+        "input": {
+            "loc": {
+                "coordinates": [-122.3210599, 37.8989026],
+                "type": "Point"
+            }
+        },
+        "output": ["hotdog", "pizza", "hotdogs"]
+    }, 
+    {
+        "test_name": "Layang Layang",
+        "test_type": "A restaurant in a plaza with Save Marts",
+        "input": {
+            "loc": {
+                "coordinates": [-121.9110908, 37.4289207],
+                "type": "Point"
+            }
+        },
+        "output": ["malaysian"]
+    }, 
+    {
+        "test_name": "Kaiser Permanente Pediatrics Building",
+        "test_type": "Clinic next to a road",
+        "input": {
+            "loc": {
+                "coordinates": [-121.8938994, 37.4320244],
+                "type": "Point"
+            }
+        },
+        "output": ["medcenters"]
+    }, 
+    {
+        "test_name": "Taco Bell",
+        "test_type": "Chain fast-food restaurant",
+        "input": {
+            "loc": {
+                "coordinates": [-121.8758283, 37.4171766],
+                "type": "Point"
+            }
+        },
+        "output": ["hotdogs", "tex-mex", "mexican"]
     }
 ]
