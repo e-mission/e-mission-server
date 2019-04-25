@@ -27,13 +27,13 @@ def get_count(mode_section_grouped_df):
 def get_distance(mode_section_grouped_df):
     ret_dict = {}
     for (mode, mode_section_df) in mode_section_grouped_df:
-        ret_dict[mode] = mode_section_df.distance.sum()
+        ret_dict[mode] = float(mode_section_df.distance.sum())
     return ret_dict
 
 def get_duration(mode_section_grouped_df):
     ret_dict = {}
     for (mode, mode_section_df) in mode_section_grouped_df:
-        ret_dict[mode] = mode_section_df.duration.sum()
+        ret_dict[mode] = float(mode_section_df.duration.sum())
     return ret_dict
 
 def get_median_speed(mode_section_grouped_df):
@@ -45,5 +45,5 @@ def get_median_speed(mode_section_grouped_df):
         if np.isnan(mode_median):
             logging.debug("still found nan for mode %s, skipping")
         else:
-            ret_dict[mode] = mode_median
+            ret_dict[mode] = float(mode_median)
     return ret_dict
