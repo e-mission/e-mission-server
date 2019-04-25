@@ -10,7 +10,6 @@
         },
         "output": ["deptstores", "menscloth", "womenscloth"]
     },
-    
     {
         "test_name": "Manhattan Beach Kettle",
         "test_type": "Non-chain restaurant in suburban downtown area",
@@ -239,6 +238,126 @@
             }
         },
         "output": ["hotdogs", "tex-mex", "mexican"]
+    },
+
+    {
+        "test_name": "Trattoria Oliverii",
+        "test_type": "Italian food inn downtown area in North suburb of Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.8280804, 42.1282360],
+                "type": "Point"
+            }
+        },
+        "output": ["pizza", "italian"]
+    },
+
+    {
+        "test_name": "Landmark Inn",
+        "test_type": "The single bar that older people and recent college grads find in downtown area in North suburb of Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.8278122,  42.1284190],
+                "type": "Point"
+            }
+        },
+        "output": ["bars", "newamerican"]
+    },
+
+    {
+        "test_name": "Northbrook Public Library",
+        "test_type": "Where I spent a lot of my childhood, reading, studying and crying in North suburb of Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.8310260,  42.1305753],
+                "type": "Point"
+            }
+        },
+        "output": ["libraries"]
+    },
+
+    {
+        "test_name": "Sunset Foods",
+        "test_type": "A pretty good grocery joint in North suburb of Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.8262419, 42.1320020],
+                "type": "Point"
+            }
+        },
+        "output": ["grocery", "delis"]
+    },
+
+    {
+        "test_name": "Chase Bank",
+        "test_type": "A Chase Bank in a North suburb of Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.8264886, 42.1307608],
+                "type": "Point"
+            }
+        },
+        "output": ["banks"]
+    },
+
+    {
+        "test_name": "Northbrook Police Department",
+        "test_type": "A police department in a North suburb of Chicago ... never been ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.8575364, 42.1269540],
+                "type": "Point"
+            }
+        },
+        "output": ["policedepartments"]
+    },
+
+    {
+        "test_name": "CineBistro at Solaris",
+        "test_type": "A movie theater in Vail, CO ",
+        "input": {
+            "loc": {
+                "coordinates": [-106.3762184, 39.6422828],
+                "type": "Point"
+            }
+        },
+        "output": ["movietheaters", "lounges", "burgers"]
+    },
+
+    {
+        "test_name": "10th Mountain Whiskey and Spirit Co",
+        "test_type": "A whiskey and spirit company in Vail, CO ",
+        "input": {
+            "loc": {
+                "coordinates": [-106.3778327, 39.6430009],
+                "type": "Point"
+            }
+        },
+        "output": ["whiskeybars"]
+    },
+
+    {
+        "test_name": "Mountain Standard",
+        "test_type": "Restaurant in Vail, CO with pretty good seasonal salads ",
+        "input": {
+            "loc": {
+                "coordinates": [-106.3747021, 39.6409689],
+                "type": "Point"
+            }
+        },
+        "output": ["newamerican", "burgers", "bars"]
+    },
+
+    {
+        "test_name": "Building",
+        "test_type": "Buidling in Vail, CO ",
+        "input": {
+            "loc": {
+                "coordinates": [-106.3832471, 39.6430976],
+                "type": "Point"
+            }
+        },
+        "output": []
     }
 
 ]
