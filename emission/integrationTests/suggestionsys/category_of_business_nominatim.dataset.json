@@ -80,7 +80,7 @@
                 "type": "Point"
             }
         },
-        "output": []
+        "output": ["highschools"]
     },
 
     {
@@ -92,7 +92,7 @@
                 "type": "Point"
             }
         },
-        "output": []
+        "output": ["highschools"]
     },
 
     {
