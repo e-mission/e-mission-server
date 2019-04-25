@@ -127,7 +127,6 @@
             }
         },
         "output": ["Torrance Memorial Medical Center", "Lomita Boulevard", "Torrance", true]
-=======
     }, 
     {
         "test_name": "Walmart Supercenter",
