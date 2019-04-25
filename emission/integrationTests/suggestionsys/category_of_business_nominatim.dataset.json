@@ -128,7 +128,7 @@
                 "type": "Point"
             }
         },
-        "output": []
+        "output": ["medcenters"]
     }, 
     {
         "test_name": "Walmart Supercenter",
