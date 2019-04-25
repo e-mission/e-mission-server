@@ -1,0 +1,13 @@
+{
+    "api_key" : "Get from https://www.yelp.com/developers/documentation/v3",
+    "api_host" : "https://api.yelp.com",
+    "search_path" : "/v3/businesses/search",
+    "business_path" : "/v3/businesses/",
+    "search_limit": 3,
+    "map_quest_key": "Get from https://developer.mapquest.com/",
+    "zip_code_key" : "Get from https://www.zipcodeapi.com/Register",
+    "backup_zip_code_key" : "Also get from https://www.zipcodeapi.com/Register",
+    "zip_code_host": "Get from https://www.zipcodeapi.com/",
+    "zip_code_format": "Get from https://www.zipcodeapi.com/",
+    "zip_code_degree": "Get from https://www.zipcodeapi.com/"
+}
