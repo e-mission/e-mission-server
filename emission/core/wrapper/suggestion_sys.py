@@ -186,7 +186,15 @@ def find_destination_business_nominatim(lat, lon):
     string_address, address_dict = return_address_from_location_nominatim(lat, lon)
     business_key = list(address_dict.keys())[0]
     business_name = address_dict[business_key]
-    city = address_dict['city']
+    try:
+        city = address_dict['city']
+    except: 
+        try:
+            city = address_dict["town"]
+        except:
+            zipcode = address_dict["postcode"]
+            city = zipcode_to_city(zipcode)  
+
     return (business_name, string_address, city,
         (not is_service_nominatim(business_name)))
 ### END: Pulled out candidate functions so that we can evaluate individual accuracies
@@ -200,16 +208,16 @@ def find_destination_business(lat, lon):
     # print(return_address_from_location_google(location))
     # print(len(return_address_from_location_google(location)))
     #IF RETURN_ADDRESS_FROM_LOCATION HAS A BUSINESS LOCATION ATTACHED TO THE ADDRESS
-    try:
+    # try:
         return_tuple = find_destination_business_nominatim(lat, lon)
         logging.debug("Nominatim found destination business %s " % str(return_tuple))
         return return_tuple
-    except:
-        #USE GOOGLE API JUST IN CASE if nominatim doesn't work
-        return_tuple = return_address_from_google_nomfile(lat, lon)
-        logging.debug("Nominatim failed, Google found destination business %s "
-            % str(return_tuple))
-        return return_tuple
+    # except:
+    #     #USE GOOGLE API JUST IN CASE if nominatim doesn't work
+    #     return_tuple = return_address_from_google_nomfile(lat, lon)
+    #     logging.debug("Nominatim failed, Google found destination business %s "
+    #         % str(return_tuple))
+    #     return return_tuple
 
 ### BEGIN: Pulled out candidate functions so that we can evaluate individual accuracies
 def category_of_business_awesome(lat, lon):
