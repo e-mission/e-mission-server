@@ -13,8 +13,12 @@ def test_find_destination_business(cfn, params, exp_output):
     name = result[0]
     # exp_output is a list of valid names
     if name in exp_output:
+        logging.debug("found match! name = %s, comparing with %s" %
+            (name, exp_output))
         return True
     else:
+        logging.debug("no match! name = %s, comparing with %s" %
+            (name, exp_output))
         return False
 
 def test_category_of_business_nominatim(cfn, params, exp_output):
@@ -82,6 +86,8 @@ if __name__ == '__main__':
         help="the candidate implementations of the algorithm; see suggestion_sys for details")
     parser.add_argument("-f", "--infile",
         help="the file that has the inputs and expected outputs. default is emission/integrationTests/suggestionsys/{algorithm}.dataset.json")
+    parser.add_argument("-t", "--test", nargs="+",
+        help="run only the test with the specific name, to make it easier to debug individual instances")
 
     args = parser.parse_args()
 #     if args.debug:
@@ -112,6 +118,15 @@ if __name__ == '__main__':
     logging.info("Comparing candidate functions %s" % candidate_fns)
 
     dataset = json.load(open(args.infile))
+
+    if args.test is not None:
+        logging.info("Running single test %s" % args.test)
+        test_instance = [i for i in dataset if i["test_name"] == " ".join(args.test)][0]
+        logging.debug("Found test instance %s" % test_instance)
+        for cfn in candidate_fns:
+            test_single_instance(test_fn, cfn, test_instance)
+        exit(0)
+
     cfn2resultlist= []
     for cfn in candidate_fns:
         successfulTests = 0
