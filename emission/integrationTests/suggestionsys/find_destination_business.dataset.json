@@ -8,7 +8,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Kohl's", "Showers Drive", "Mountain View", true]
+        "output": ["Kohl's", "Kohl's Mountain View"]
     },
     {
         "test_name": "Manhattan Beach Kettle",
