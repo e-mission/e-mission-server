@@ -238,6 +238,126 @@
         },
         "output": ["Taco Bell", "South Park Victoria Drive", "Milpitas", true]
     },
+
+    {
+        "test_name": "Northbrook Village Hall",
+        "test_type": "Village hall in downtown area in North suburb of Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.8311015, 42.1296436],
+                "type": "Point"
+            }
+        },
+        "output": ["Northbrook Village Hall", "Cedar Lane", "Northbrook", true]
+    },
+
+    {
+        "test_name": "Patisserie Coralie",
+        "test_type": "A local patisserie in downtown area in North suburb of Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.6799562,  42.0461498],
+                "type": "Point"
+            }
+        },
+        "output": ["Patisserie Coralie", "Davis Street", "Evanston", true]
+    },
+
+    {
+        "test_name": "Northbrook Public Library",
+        "test_type": "Where I spent a lot of my childhood, reading, studying and crying in North suburb of Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.8310260,  42.1305753],
+                "type": "Point"
+            }
+        },
+        "output": ["Northbrook Public Library", "Cedar Lane", "Northbrook", true]
+    },
+
+    {
+        "test_name": "Music Institute of Chicago",
+        "test_type": "A music institute of study in North suburb of Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.6807234, 42.0449701],
+                "type": "Point"
+            }
+        },
+        "output": ["Music Institute of Chicago", "Chicago Avenue", "Evanston", true]
+    },
+
+    {
+        "test_name": "Town Cleaners",
+        "test_type": "A local dry cleaners in a North suburb of Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.6803244,  42.0454404],
+                "type": "Point"
+            }
+        },
+        "output": ["Town Cleaners", "Chicago Avenue", "Evanston", true]
+    },
+
+    {
+        "test_name": "RadioShack Evanston",
+        "test_type": "A RadioShack for music-related tech products in a North suburb of Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.6815733, 42.0483088],
+                "type": "Point"
+            }
+        },
+        "output": ["RadioShack", "Church Street", "Evanston", true]
+    },
+
+    {
+        "test_name": "Squash Blossom",
+        "test_type": "A local jewlery store in Vail, CO ",
+        "input": {
+            "loc": {
+                "coordinates": [-106.3744452, 39.6405737],
+                "type": "Point"
+            }
+        },
+        "output": ["Squash Blossom", "Gore Creek Drive", "Vail", true]
+    },
+
+    {
+        "test_name": "Garfinkel's",
+        "test_type": "A locally owned restaurant in Vail, CO (Lionshead Village) ",
+        "input": {
+            "loc": {
+                "coordinates": [-106.3878760, 39.6432528],
+                "type": "Point"
+            }
+        },
+        "output": ["Garfinkel's", "East Lionshead Circle", "Vail", true]
+    },
+
+    {
+        "test_name": "Art Institute of Chicago Garden",
+        "test_type": "World-Renowned museum of art in Chicago, garden ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.6236237, 41.8795675],
+                "type": "Point"
+            }
+        },
+        "output": ["Art Institute's Gardens", "South Michigan Avenue", "Chicago", true]
+    },
+
+    {
+        "test_name": "Bitcoin of America",
+        "test_type": "A bitcoin front-facing company in Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.6256760, 41.8805215],
+                "type": "Point"
+            }
+        },
+        "output": ["Bitcoin of America", "East Monroe Street", "Chicago", true]
+    },
     {
         "test_name": "Pekoe San Jose",
         "test_type": "Tea shop along major road in strip mall",
