@@ -7,17 +7,22 @@ import json
 
 import emission.core.wrapper.suggestion_sys as sugg
 
-def test_find_destination_business(cfn, params):
+def test_find_destination_business(cfn, params, exp_output):
     lat, lon = sugg.geojson_to_lat_lon_separated(params["loc"])
     result = cfn(lat, lon)
-    return list(result)
+    name = result[0]
+    # exp_output is a list of valid names
+    if name in exp_output:
+        return True
+    else:
+        return False
 
-def test_category_of_business_nominatim(cfn, params):
+def test_category_of_business_nominatim(cfn, params, exp_output):
     lat, lon = sugg.geojson_to_lat_lon_separated(params["loc"])
     result = cfn(lat, lon)
-    return result
+    return exp_output == result
 
-def test_calculate_yelp_server_suggestion_for_locations(cfn, params):
+def test_calculate_yelp_server_suggestion_for_locations(cfn, params, exp_output):
     start_loc = params["start_loc"]
     end_loc = params["end_loc"]
     distance_in_miles = sugg.distance(sugg.geojson_to_latlon(start_loc), sugg.geojson_to_latlon(end_loc))
@@ -25,19 +30,17 @@ def test_calculate_yelp_server_suggestion_for_locations(cfn, params):
     logging.debug("distance in meters = %s" % distance_in_meters)
     # calculation function expects distance in meters
     result = cfn(start_loc, end_loc, distance_in_meters)
-    return result.get('businessid', None)
+    return result.get('businessid', None) == exp_output
 
 def test_single_instance(test_fn, cfn, instance):
     logging.debug("-----" + instance["test_name"] + "------")
     param = instance["input"]
-    result = test_fn(cfn, param)
     exp_output = instance["output"]
-    if exp_output == result:
-        return True
-    else:
+    result = test_fn(cfn, param, exp_output)
+    if not result:
         logging.debug("Test %s failed, output = %s, expected %s "
             % (instance["test_name"], result, exp_output))
-        return False
+    return result
 
 # Note: this has to be here because it needs to be after the
 # wrapper function is defined but before we use the keys as valid choices while
@@ -53,7 +56,8 @@ CANDIDATE_ALGORITHMS = {
     "find_destination_business": [
         sugg.find_destination_business_google,
         sugg.find_destination_business_yelp,
-        sugg.find_destination_business_nominatim
+        sugg.find_destination_business_nominatim,
+        sugg.find_destination_business
     ],
     "category_of_business_nominatim": [
         sugg.category_of_business_nominatim,
