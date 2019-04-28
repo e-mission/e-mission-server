@@ -100,10 +100,7 @@ CANDIDATE_ALGORITHMS = {
         sugg.find_destination_business
     ],
     "category_of_business_nominatim": [
-        sugg.category_of_business_nominatim,
-        sugg.category_from_name_wrapper,
-        sugg.category_from_address_wrapper,
-        sugg.category_of_business_awesome
+        sugg.category_from_name_wrapper_new
     ],
     "calculate_yelp_server_suggestion_for_locations": [
         sugg.calculate_yelp_server_suggestion_for_locations

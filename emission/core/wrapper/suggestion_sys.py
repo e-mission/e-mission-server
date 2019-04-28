@@ -105,6 +105,15 @@ def search(api_key, term, location):
     }
     return request(API_HOST, SEARCH_PATH, api_key, url_params=url_params)
 
+def newsearch(api_key, lat, lon, radius):
+    url_params = {
+        'latitude': lat,
+        'longitude': lon,
+        'radius' : radius,
+        'limit': SEARCH_LIMIT
+    }
+    return request(API_HOST, SEARCH_PATH, api_key, url_params=url_params)
+
 """
 YELP API: Function to retrieve all reviews related to the business.
 """
@@ -181,7 +190,17 @@ def find_destination_business_google(lat, lon):
     return return_address_from_google_nomfile(lat, lon)
 
 def find_destination_business_yelp(lat, lon):
-    return (None, None, None, None)
+    yelp_from_lat_lon = newsearch(YELP_API_KEY, lat, lon, 50)
+    print(yelp_from_lat_lon)
+    if yelp_from_lat_lon == {}:
+        return None, None
+    businesses = yelp_from_lat_lon['businesses']
+    if businesses == []:
+        return None, None
+    alias = businesses[0]['alias']
+    name = businesses[0]['name']
+    categories = businesses[0]['categories']
+    return alias, categories
 
 def find_destination_business_nominatim(lat, lon):
     string_address, address_dict = return_address_from_location_nominatim(lat, lon)
@@ -217,9 +236,11 @@ def find_destination_business(lat, lon):
 def category_of_business_awesome(lat, lon):
     return []
 
-def category_from_name(business_name):
+def category_from_name_new(business_id, business_cat_json):
     categories = []
-    for c in business_reviews(YELP_API_KEY, business_name.replace(' ', '-') + '-' + city)['categories']:
+    if business_id is None:
+        return []
+    for c in business_cat_json:
         categories.append(c['alias'])
     return categories
 
@@ -235,15 +256,9 @@ def category_from_address(address):
 ### BEGIN: Wrappers for the candidate functions to make them callable from the harness
 ### We do not want to use them in the combination function directly because that will
 ### result in two separate calls to `find_destination_business`
-def category_from_name_wrapper(lat, lon):
-    business_name, address, city, location_is_service = find_destination_business(lat, lon)
-    if not location_is_service:
-        return []
-
-    if business_name is None:
-        return []
-
-    return category_from_name(business_name)
+def category_from_name_wrapper_new(lat, lon):
+    business_id, business_cat_json = find_destination_business_yelp(lat, lon)
+    return category_from_name_new(business_id, business_cat_json)
 
 def category_from_address_wrapper(lat, lon):
     business_name, address, city, location_is_service = find_destination_business(lat, lon)
