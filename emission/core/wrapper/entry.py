@@ -73,8 +73,6 @@ class Entry(ecwb.WrapperBase):
             "manual/mode_confirm": "userlabel",
             # user confirmation of the travel purpose
             "manual/purpose_confirm": "userlabel",
-            # user survey results. The survey results are a JSON blob
-            "manual/survey": "survey",
             ### END: incoming data types ###
             ### BEGIN: analysis result data types ###
             ### ** BEGIN: objects generated after the initial segmentation step **
@@ -135,6 +133,18 @@ class Entry(ecwb.WrapperBase):
       result_entry['_id'] = boi.ObjectId()
       result_entry.user_id = user_id
       result_entry.metadata = ecwm.Metadata.create_metadata_for_result(key)
+      result_entry.data = data
+      result_entry._populateDependencies()
+      return result_entry
+
+  @staticmethod
+  def create_fake_entry(user_id, key, data, write_ts, create_id=False):
+      """Method used to create Synthetic entries"""
+      
+      result_entry = Entry()
+      result_entry['_id'] = boi.ObjectId()
+      result_entry.user_id = user_id
+      result_entry.metadata = ecwm.Metadata.create_metadata_for_fake_result(key, write_ts)
       result_entry.data = data
       result_entry._populateDependencies()
       return result_entry

@@ -1,0 +1,193 @@
+[
+    {
+        "test_name": "Sunnyvale -> Mountain View Kohls",
+        "test_type": "From suburban residential area (between Wolfe and Braly School) to suburban big box store",
+        "input": {
+            "start_loc": {
+                "coordinates": [-122.0154871, 37.3635335],
+                "type": "Point"
+            },
+            "end_loc": {
+                "coordinates": [-122.1078300, 37.4035500],
+                "type": "Point"
+            }
+        },
+        "output": "target-sunnyvale-2"
+    }
+,
+    {
+        "test_name": "Martinez -> Italian Homemade",
+        "test_type": "From urban residential area (Channing and Telegraph) to Main Street type commercial district italian restaurant",
+        "input": {
+            "start_loc": {
+                "coordinates": [-122.258042, 37.866615],
+                "type": "Point"
+            },
+            "end_loc": {
+                "coordinates": [-122.252844, 37.858179],
+                "type": "Point"
+            }
+        },
+        "output": "gypsys-trattoria-italiano-berkeley"
+    }
+,
+    {
+        "test_name": "Martinez -> Jong Ga",
+        "test_type": "From urban residential area (Channing and Telegraph) to Midtown type commercial district korean barbecue",
+        "input": {
+            "start_loc": {
+                "coordinates": [-122.258042, 37.866615],
+                "type": "Point"
+            },
+            "end_loc": {
+                "coordinates": [-122.1078300, 37.4035500],
+                "type": "Point"
+            }
+        },  
+        "output": "koja-kitchen-berkeley-2"
+    }
+,
+    {
+        "test_name": "Martinez -> T Pumps",
+        "test_type": "From urban residential area (Channing and Telegraph) to Midtown type Main Street boba tea shop",
+        "input": {
+            "start_loc": {
+                "coordinates": [-122.258042, 37.866615],
+                "type": "Point"
+            },
+            "end_loc": {
+                "coordinates": [-122.478639, 37.763643],
+                "type": "Point"
+            }
+        },
+        "output": "yifang-taiwan-fruit-tea-berkeley-4"
+    }
+,
+    {
+        "test_name": "Martinez -> Berkeley Bowl West",
+        "test_type": "From urban residential area (Channing and Telegraph) to industrial area grocery store",
+        "input": {
+            "start_loc": {
+                "coordinates": [-122.258042, 37.866615],
+                "type": "Point"
+            },
+            "end_loc": {
+                "coordinates": [-122.290105, 37.853365],
+                "type": "Point"
+            }
+        },
+        "output": "whole-foods-market-berkeley-7"
+    }
+,
+    {
+        "test_name": "Martinez -> SFO",
+        "test_type": "From urban residential area (Channing and Telegraph) to large international airport",
+        "input": {
+            "start_loc": {
+                "coordinates": [-122.258042, 37.866615],
+                "type": "Point"
+            },
+            "end_loc": {
+                "coordinates": [-122.391835, 37.618168],
+                "type": "Point"
+            }
+        },
+        "output": "oakland-international-airport-oakland-8"
+    }
+,
+    {
+        "test_name": "Martinez -> SF House",
+        "test_type": "From urban residential area (Channing and Telegraph) to medium density house in Richmond District SF",
+        "input": {
+            "start_loc": {
+                "coordinates": [-122.258042, 37.866615],
+                "type": "Point"
+            },
+            "end_loc": {
+                "coordinates": [-122.469817, 37.779966],
+                "type": "Point"
+            }
+        },
+        "output": ""
+    }
+,
+    {
+        "test_name": "SF House -> Pho K&K",
+        "test_type": "From medium density house in Richmond District SF to urban Pho restaurant in Berkeley",
+        "input": {
+            "start_loc": {
+                "coordinates": [-122.469817, 37.779966],
+                "type": "Point"
+            },
+            "end_loc": {
+                "coordinates": [-122.258322, 37.864413],
+                "type": "Point"
+            }
+        },
+        "output": "cafe-bunn-mi-san-francisco"
+    }
+,
+    {
+        "test_name": "SF House -> Home Cafe",
+        "test_type": "From medium density house in Richmond District to lower medium density cafe in Sunset District",
+        "input": {
+            "start_loc": {
+                "coordinates": [-122.469817, 37.779966],
+                "type": "Point"
+            },
+            "end_loc": {
+                "coordinates": [-122.477261, 37.754091],
+                "type": "Point"
+            }
+        },
+        "output": "schuberts-bakery-san-francisco"
+    }
+,
+    {
+        "test_name": "Martinez -> China Village",
+        "test_type": "From urban residential area (Channing and Telegraph) to Main Street type commercial district restaurant",
+        "input": {
+            "start_loc": {
+                "coordinates": [-122.258042, 37.866615],
+                "type": "Point"
+            },
+            "end_loc": {
+                "coordinates": [-122.291228, 37.890835],
+                "type": "Point"
+            }
+        },
+        "output": "chengdu-style-restaurant-berkeley"
+    }
+,
+    {
+        "test_name": "Martinez -> O'hair Park",
+        "test_type": "From urban residential area (Channing and Telegraph) to suburban large park surrounded by open space",
+        "input": {
+            "start_loc": {
+                "coordinates": [-122.258042, 37.866615],
+                "type": "Point"
+            },
+            "end_loc": {
+                "coordinates": [-122.619220, 38.116237],
+                "type": "Point"
+            }
+        },
+        "output": "willard-park-berkeley"
+    }
+,
+    {
+        "test_name": "Martinez -> NUSD",
+        "test_type": "From urban residential area (Channing and Telegraph) to suburban office for school district",
+        "input": {
+            "start_loc": {
+                "coordinates": [-122.258042, 37.866615],
+                "type": "Point"
+            },
+            "end_loc": {
+                "coordinates": [-122.578671, 38.109495],
+                "type": "Point"
+            }
+        },
+        "output": "willard-middle-school-berkeley"
+    }
+]

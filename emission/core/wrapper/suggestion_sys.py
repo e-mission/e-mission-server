@@ -215,6 +215,8 @@ def find_destination_business_yelp(lat, lon):
 
 def find_destination_business_nominatim(lat, lon):
     string_address, address_dict = return_address_from_location_nominatim(lat, lon)
+    if address_dict == {}:
+        return (None, None, None, False)
     business_key = list(address_dict.keys())[0]
     business_name = address_dict[business_key]
     city = address_dict['city']
