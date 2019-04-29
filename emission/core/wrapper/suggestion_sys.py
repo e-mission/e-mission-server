@@ -192,8 +192,11 @@ def find_destination_business_nominatim(lat, lon):
         try:
             city = address_dict["town"]
         except:
-            zipcode = address_dict["postcode"]
-            city = zipcode_to_city(zipcode)  
+            try:
+                zipcode = address_dict["postcode"]
+                city = zipcode_to_city(zipcode)  
+            except:
+                city = ''
 
     return (business_name, string_address, city,
         (not is_service_nominatim(business_name)))
