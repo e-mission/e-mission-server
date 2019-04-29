@@ -211,16 +211,16 @@ def find_destination_business(lat, lon):
     # print(return_address_from_location_google(location))
     # print(len(return_address_from_location_google(location)))
     #IF RETURN_ADDRESS_FROM_LOCATION HAS A BUSINESS LOCATION ATTACHED TO THE ADDRESS
-    # try:
+    try:
         return_tuple = find_destination_business_nominatim(lat, lon)
         logging.debug("Nominatim found destination business %s " % str(return_tuple))
         return return_tuple
-    # except:
-    #     #USE GOOGLE API JUST IN CASE if nominatim doesn't work
-    #     return_tuple = return_address_from_google_nomfile(lat, lon)
-    #     logging.debug("Nominatim failed, Google found destination business %s "
-    #         % str(return_tuple))
-    #     return return_tuple
+    except:
+        #USE GOOGLE API JUST IN CASE if nominatim doesn't work
+        return_tuple = return_address_from_google_nomfile(lat, lon)
+        logging.debug("Nominatim failed, Google found destination business %s "
+            % str(return_tuple))
+        return return_tuple
 
 ### BEGIN: Pulled out candidate functions so that we can evaluate individual accuracies
 def category_of_business_awesome(lat, lon):
