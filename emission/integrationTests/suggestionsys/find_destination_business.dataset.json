@@ -19,7 +19,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Kettle", "Kettle Manhattan Beach"]
+        "output": ["Kettle", "The Kettle Manhattan Beach"]
     },
     {
         "test_name": "Manhattan Beach Beckers",
@@ -30,7 +30,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Becker's Bakery and Deli", "Becker's Bakery and Deli Manhattan Beach"]
+        "output": ["Becker's Bakery and Deli", "Becker's Bakery Manhattan Beach"]
     },
 
     {
@@ -42,7 +42,7 @@
                 "type": "Point"
             }
         },
-        "output": ["FISHBAR", "FISHBAR Manhattan Beach"]
+        "output": ["FISHBAR", "Fishbar Manhattan Beach 2"]
     },
 
     {
@@ -54,7 +54,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Umi", "Umi Los Angeles"]
+        "output": ["Umi", "Umi by Hamasuku El Segundo"]
     },
 
     {
@@ -66,7 +66,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Captain Kidd’s Fish Market", "Captain Kidd’s Fish Market Redondo Beach"]
+        "output": ["Captain Kidd’s Fish Market", "Captain Kidd’s Redondo Beach 4"]
     },
 
      {
@@ -148,7 +148,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Loving Hut", "Loving Hut Milpitas"]
+        "output": ["Loving Hut", "Loving Hut Milpitas Milpitas"]
     }, 
     {
         "test_name": "San Francisco Premium Outlets",
@@ -159,7 +159,7 @@
                 "type": "Point"
             }
         },
-        "output": ["San Francisco Premium Outlets", "San Francisco Premium Outlets Livermore"]
+        "output": ["San Francisco Premium Outlets", "San Francisco Premium Outlets Livermore 3"]
     },
     {
         "test_name": "San Ramon Valley High School",
@@ -170,7 +170,7 @@
                 "type": "Point"
             }
         },
-        "output": ["San Ramon Valley High School", "San Ramon Valley High School San Ramon"]
+        "output": ["San Ramon Valley High School", "San Ramon Valley High School Danville"]
     },
     {
         "test_name": "Bank of America",
@@ -192,7 +192,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Chevron Milpitas", "Chevron Milpitas"]
+        "output": ["Chevron Milpitas", "Chevron Milpitas 3"]
     },
     {
         "test_name": "Costco",
@@ -225,7 +225,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Kaiser Permanente Pediatrics Building", "Kaiser Permanente Pediatrics Building Milpitas"]
+        "output": ["Kaiser Permanente Pediatrics Building", "Kaiser Permanente Pediatrics Building Milpitas 2"]
     }, 
     {
         "test_name": "Taco Bell",
@@ -248,7 +248,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Northbrook Village Hall", "Northbrook Village Hall Northbrook"]
+        "output": ["Northbrook Village Hall", "Village Hall Northbrook"]
     },
 
     {
@@ -320,7 +320,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Squash Blossom", "Squash Blossom Vail"]
+        "output": ["Squash Blossom", "Squash Blossom Vail 2"]
     },
 
     {
@@ -344,7 +344,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Art Institute's Gardens", "Art Institute's Gardens Chicago"]
+        "output": ["Art Institute's Gardens", "Art Institute of Chicago Chicago 3"]
     },
 
     {
@@ -356,7 +356,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Bitcoin of America", "Bitcoin of America Chicago"]
+        "output": ["Bitcoin of America", ""]
     },
     {
         "test_name": "Pekoe San Jose",
@@ -433,7 +433,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Holiday Inn San Jose - Silicon Valley", "Holiday Inn San Jose - Silicon Valley San Jose"]
+        "output": ["Holiday Inn San Jose - Silicon Valley", "Holiday Inn San Jose Silicon Valley San Jose"]
     },
     {
         "test_name": "Annie Hair & Beauty",
@@ -466,6 +466,6 @@
                 "type": "Point"
             }
         },
-        "output": ["Department of Motor Vehicles", "Department of Motor Vehicles Fremont"]
+        "output": ["Department of Motor Vehicles", "Department of Motor Vehicles Fremont 4"]
     }
 ]
