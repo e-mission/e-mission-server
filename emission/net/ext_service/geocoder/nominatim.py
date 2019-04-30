@@ -14,6 +14,7 @@ import requests
 
 from emission.core.wrapper.trip_old import Coordinate
 from pygeocoder import Geocoder as pyGeo  ## We fall back on this if we have to
+from math import sin, cos, sqrt, atan2, radians
 
 try:
     googlemaps_key_file = open("conf/net/ext_service/googlemaps.json")
@@ -235,13 +236,68 @@ def places_nearby_google(lat, lon):
     url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + lat + "," + lon + "&radius=6" + "&type=" + trial_type + "&key=" + GOOGLE_MAPS_KEY
     result = requests.get(url).json()
     i = 0
-    types = ["art_gallery", "bank", "bakery", "beauty_salon", "cafe", "city_hall", "clothing_store", "convenience_store", "department_store", "dentist", "gas_station", "hospital", "jewelry_store", "local_government_office", "lodging", "library", "school", "shopping_center", "spa", "store", "supermarket"]
+    types = ["art_gallery", "bank", "bakery", "beauty_salon", "cafe", "city_hall", "clothing_store", "convenience_store", "department_store", "dentist", "gas_station", "hospital", "jewelry_store", "local_government_office", "lodging", "library", "school", "spa", "store", "supermarket"]
     while len(result.get("results")) == 0 and i < len(types) - 1:
         i += 1
         trial_type = types[i]
+        print(trial_type)
         url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + lat + "," + lon + "&radius=6" + "&type=" + trial_type + "&key=" + GOOGLE_MAPS_KEY
         result = requests.get(url).json()
     if i == len(types) - 1:
         return "No result found for this location"
     return result.get("results")[0].get("name")
+
+def places_nearby_google_using_address(lat, lon):
+    address = return_address_from_location_google(lat, lon)
+    street_and_number = address[1]
+    street_and_number = street_and_number.split(" ")
+    city = address[2]
+    city = city.split(" ")
+    url = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input="
+    for i in range(0, len(street_and_number)):
+        url += "%20" + street_and_number[i]
+    url += "%2C"
+    for i in range(len(city)):
+        url += "%20" + city[i]
+    url += "&inputtype=textquery&key=" + GOOGLE_MAPS_KEY + "&fields=formatted_address,name,place_id,opening_hours,rating,types" + "&locationbias=circle:100@" + lat + "," + lon
+    return requests.get(url).json()
+
+def businesses_nearby_google(lat, lon):
+    address = return_address_from_location_google(lat, lon)
+    start_url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=businesses+near"
+    street_and_number = address[1]
+    street_and_number = street_and_number.split(" ")
+    city = address[2]
+    city = city.split(" ")
+    for i in range(0, len(street_and_number)):
+        start_url += "+" + street_and_number[i]
+    for i in range(0, len(city)):
+        start_url += "+" + city[i]
+    start_url += "&radius=1" + "&key=" + GOOGLE_MAPS_KEY
+    businesses = {}
+    types = ["restaurant", "art_gallery", "bank", "bakery", "beauty_salon", "cafe", "city_hall", "clothing_store", "convenience_store", "department_store", "dentist", "gas_station", "hospital", "jewelry_store", "local_government_office", "lodging", "library", "school", "shopping_center", "spa", "store", "supermarket"]
+    i = 0
+    while i < len(types) - 1:
+        url = start_url + "&type=" + types[i]
+        result = requests.get(url).json()
+        for j in range(len(result.get("results"))):
+            businesses[result.get("results")[j].get("name")] = distance_latitude_longitude(float(lat), float(lon), 
+                float(result.get("results")[j].get("geometry").get("location").get("lat")),
+                float(result.get("results")[j].get("geometry").get("location").get("lng")))
+        i += 1
+    print(sorted(businesses, key=businesses.get, reverse = False))
+    return sorted(businesses, key=businesses.get, reverse = False)[0]
+
+def distance_latitude_longitude(lat1, lon1, lat2, lon2):
+    R = 6373.0
+    lat1 = radians(lat1)
+    lon1 = radians(lon1)
+    lat2 = radians(lat2)
+    lon2 = radians(lon2)
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    distance = R * c
+    return distance 
 
