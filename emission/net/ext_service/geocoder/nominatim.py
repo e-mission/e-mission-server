@@ -228,3 +228,20 @@ def _do_google_reverse(lat, lng):
     geo = pyGeo(GOOGLE_MAPS_KEY)
     address = geo.reverse_geocode(lat, lng)
     return address[0]
+
+#google API call to find nearby places
+def places_nearby_google(lat, lon):
+    trial_type = "restaurant"
+    url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + lat + "," + lon + "&radius=6" + "&type=" + trial_type + "&key=" + GOOGLE_MAPS_KEY
+    result = requests.get(url).json()
+    i = 0
+    types = ["art_gallery", "bank", "bakery", "beauty_salon", "cafe", "city_hall", "clothing_store", "convenience_store", "department_store", "dentist", "gas_station", "hospital", "jewelry_store", "local_government_office", "lodging", "library", "school", "shopping_center", "spa", "store", "supermarket"]
+    while len(result.get("results")) == 0 and i < len(types) - 1:
+        i += 1
+        trial_type = types[i]
+        url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + lat + "," + lon + "&radius=6" + "&type=" + trial_type + "&key=" + GOOGLE_MAPS_KEY
+        result = requests.get(url).json()
+    if i == len(types) - 1:
+        return "No result found for this location"
+    return result.get("results")[0].get("name")
+
