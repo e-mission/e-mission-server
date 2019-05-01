@@ -54,6 +54,21 @@ def test_find_destination_business(cfn, params, exp_output, noise_in_meters):
             (name, exp_output))
         return False
 
+def test_find_destination_restaurant(cfn, params, exp_output, noise_in_meters):
+    noisy_loc = add_noise(params["loc"], noise_in_meters)
+    lat, lon = sugg.geojson_to_lat_lon_separated(noisy_loc)
+    result = cfn(lat, lon)
+    name = result[0]
+    # exp_output is a list of valid names
+    if name in exp_output:
+        logging.debug("found match! name = %s, comparing with %s" %
+            (name, exp_output))
+        return True
+    else:
+        logging.debug("no match! name = %s, comparing with %s" %
+            (name, exp_output))
+        return False
+
 def test_category_of_business_nominatim(cfn, params, exp_output, noise_in_meters):
     noisy_loc = add_noise(params["loc"], noise_in_meters)
     lat, lon = sugg.geojson_to_lat_lon_separated(noisy_loc)
@@ -89,7 +104,8 @@ def test_single_instance(test_fn, cfn, instance, noise_in_meters):
 TEST_WRAPPER_MAP = {
     "find_destination_business": test_find_destination_business,
     "category_of_business_nominatim": test_category_of_business_nominatim,
-    "calculate_yelp_server_suggestion_for_locations": test_calculate_yelp_server_suggestion_for_locations
+    "calculate_yelp_server_suggestion_for_locations": test_calculate_yelp_server_suggestion_for_locations,
+    "find_destination_restaurant" : test_find_destination_restaurant
 }
 
 CANDIDATE_ALGORITHMS = {
@@ -107,6 +123,11 @@ CANDIDATE_ALGORITHMS = {
     ],
     "calculate_yelp_server_suggestion_for_locations": [
         sugg.calculate_yelp_server_suggestion_for_locations
+    ],
+    "find_destination_restaurant": [
+        sugg.find_destination_business_yelp,
+        sugg.find_destination_business_google,
+        sugg.find_destination_business
     ]
 }
 
