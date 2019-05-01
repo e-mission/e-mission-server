@@ -66,7 +66,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Captain Kidd’s Fish Market", "Captain Kidd’s Redondo Beach 4"]
+        "output": ["Captain Kidd’s Fish Market", "Captain Kidd’s Redondo Beach 4", "Captain Kidd's Fish Market & Restaurant"]
     },
 
      {
@@ -102,7 +102,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Black Bear Diner", "Black Bear Diner Torrance"]
+        "output": ["Black Bear Diner", "Black Bear Diner Torrance", "Torrance Black Bear Diner"]
     },
 
      {
@@ -126,7 +126,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Torrance Memorial Medical Center", "Torrance Memorial Medical Center Torrance"]
+        "output": ["Torrance Memorial Medical Center", "Torrance Memorial Medical Center Torrance", "Surgery Center of South Bay"]
     }, 
     {
         "test_name": "Walmart Supercenter",
@@ -137,7 +137,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Walmart Supercenter", "Walmart Supercenter Milpitas"]
+        "output": ["Walmart Supercenter", "Walmart Supercenter Milpitas", "Walmart Photo Center"]
     }, 
     {   
         "test_name": "Loving Hut",
@@ -181,7 +181,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Bank of America", "Bank of America Milpitas"]
+        "output": ["Bank of America", "Bank of America Milpitas", "Bank of America Financial Center"]
     },
     {
         "test_name": "Chevron Milpitas",
@@ -203,7 +203,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Costco", "Costco Richmond"]
+        "output": ["Costco", "Costco Richmond", "Costco Bakery"]
     }, 
     {
         "test_name": "Layang Layang",
@@ -214,7 +214,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Layang Layang", "Layang Layang Milpitas"]
+        "output": ["Layang Layang", "Layang Layang Milpitas", "Layang Layang Malaysian Cuisine"]
     }, 
     {
         "test_name": "Kaiser Permanente Pediatrics Building",
@@ -248,7 +248,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Northbrook Village Hall", "Village Hall Northbrook"]
+        "output": ["Northbrook Village Hall", "Village Hall Northbrook", "Northbrook Village Hall", "northbrook Village hall", ]
     },
 
     {
@@ -344,7 +344,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Art Institute's Gardens", "Art Institute of Chicago Chicago 3"]
+        "output": ["Art Institute's Gardens", "Art Institute of Chicago Chicago 3", "The Art Institute of Chicago"]
     },
 
     {
