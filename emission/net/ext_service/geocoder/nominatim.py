@@ -45,6 +45,7 @@ class Geocoder(object):
         query_url = NOMINATIM_QUERY_URL + "/search?"
         encoded_params = urllib.parse.urlencode(params)
         url = query_url + encoded_params
+        logging.debug("For geocoding, using URL %s" % url)
         return url
 
     @classmethod
@@ -77,6 +78,7 @@ class Geocoder(object):
         query_url = NOMINATIM_QUERY_URL + "/reverse?"
         encoded_params = urllib.parse.urlencode(params)
         url = query_url + encoded_params
+        logging.debug("For reverse geocoding, using URL %s" % url)
         return url
 
     @classmethod
