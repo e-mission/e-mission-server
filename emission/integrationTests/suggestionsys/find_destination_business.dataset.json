@@ -66,7 +66,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Captain Kidd’s Fish Market", "North Harbor Drive", "Redondo Beach", true]
+        "output": ["Captain Kidd's Fish Market & Restaurant", "North Harbor Drive", "Redondo Beach", true]
     },
 
      {
@@ -102,7 +102,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Black Bear Diner", "Hawthorne Boulevard", "Torrance", true]
+        "output": ["Black Bear Diner", "Torrance Black Bear Diner", "Hawthorne Boulevard", "Torrance", true]
     },
 
      {
@@ -126,7 +126,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Torrance Memorial Medical Center", "Lomita Boulevard", "Torrance", true]
+        "output": ["Surgery Center of South Bay", "Lomita Boulevard", "Torrance", true]
     }, 
     {
         "test_name": "Walmart Supercenter",
@@ -137,7 +137,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Walmart Supercenter", "Ranch Drive", "Milpitas", true]
+        "output": ["Walmart Photo Center", "Ranch Drive", "Milpitas", true]
     }, 
     {   
         "test_name": "Loving Hut",
@@ -181,7 +181,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Bank of America", "East Calaveras Boulevard", "Milpitas", true]
+        "output": ["Bank of America Financial Center", "East Calaveras Boulevard", "Milpitas", true]
     },
     {
         "test_name": "Chevron Milpitas",
@@ -203,7 +203,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Costco", "Central Avenue", "Richmond", true]
+        "output": ["Costco Bakery", "Central Avenue", "Richmond", true]
     }, 
     {
         "test_name": "Layang Layang",
@@ -214,7 +214,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Layang Layang", "West Calaveras Boulevard", "Milpitas", true]
+        "output": ["Layang Layang Malaysian Cuisine", "West Calaveras Boulevard", "Milpitas", true]
     }, 
     {
         "test_name": "Kaiser Permanente Pediatrics Building",
@@ -248,7 +248,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Northbrook Village Hall", "Cedar Lane", "Northbrook", true]
+        "output": ["Northbrook Village Hall", "northbrook Village hall", "Cedar Lane", "Northbrook", true]
     },
 
     {
@@ -344,7 +344,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Art Institute's Gardens", "South Michigan Avenue", "Chicago", true]
+        "output": ["Art Institute's Gardens", "The Art Institute of Chicago", "South Michigan Avenue", "Chicago", true]
     },
 
     {
