@@ -19,7 +19,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Kettle", "North Highland Avenue", true]
+        "output": ["Kettle", "The Kettle Manhattan Beach"]
     },
     {
         "test_name": "Manhattan Beach Beckers",
@@ -30,7 +30,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Becker's Bakery and Deli", "Manhattan Beach Ave", "Manhattan Beach", true]
+        "output": ["Becker's Bakery and Deli", "Becker's Bakery Manhattan Beach"]
     },
 
     {
@@ -42,7 +42,7 @@
                 "type": "Point"
             }
         },
-        "output": ["FISHBAR", "Highland Ave", "Manhattan Beach", true]
+        "output": ["FISHBAR", "Fishbar Manhattan Beach 2"]
     },
 
     {
@@ -54,7 +54,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Umi", "Sepulveda Boulevard", "Los Angeles", true]
+        "output": ["Umi", "Umi by Hamasuku El Segundo"]
     },
 
     {
@@ -66,7 +66,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Captain Kidd’s Fish Market", "North Harbor Drive", "Redondo Beach", true]
+        "output": ["Captain Kidd’s Fish Market", "Captain Kidd’s Redondo Beach 4"]
     },
 
      {
@@ -78,7 +78,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Mira Costa High School", "Artesia Boulevard", "Manhattan Beach", true]
+        "output": ["Mira Costa High School", "Mira Costa High School Manhattan Beach"]
     },
 
     {
@@ -90,7 +90,7 @@
                 "type": "Point"
             }
         },
-        "output": ["El Segundo High School", "Main Street", "El Segundo", true]
+        "output": ["El Segundo High School", "El Segundo High School El Segundo"]
     },
 
      {
@@ -102,7 +102,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Black Bear Diner", "Hawthorne Boulevard", "Torrance", true]
+        "output": ["Black Bear Diner", "Black Bear Diner Torrance"]
     },
 
      {
@@ -114,7 +114,7 @@
                 "type": "Point"
             }
         },
-        "output": ["In-N-Out Burger", "West Century Boulevard", "Inglewood", true]
+        "output": ["In-N-Out Burger", "In-N-Out Burger Inglewood"]
     },
 
     {
@@ -126,7 +126,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Torrance Memorial Medical Center", "Lomita Boulevard", "Torrance", true]
+        "output": ["Torrance Memorial Medical Center", "Torrance Memorial Medical Center Torrance"]
     }, 
     {
         "test_name": "Walmart Supercenter",
@@ -137,7 +137,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Walmart Supercenter", "Ranch Drive", "Milpitas", true]
+        "output": ["Walmart Supercenter", "Walmart Supercenter Milpitas"]
     }, 
     {   
         "test_name": "Loving Hut",
@@ -148,7 +148,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Loving Hut", "Barber Lane", "Milpitas", true]
+        "output": ["Loving Hut", "Loving Hut Milpitas Milpitas"]
     }, 
     {
         "test_name": "San Francisco Premium Outlets",
@@ -159,7 +159,7 @@
                 "type": "Point"
             }
         },
-        "output": ["San Francisco Premium Outlets", "Livermore Outlets Drive", "Livermore", true]
+        "output": ["San Francisco Premium Outlets", "San Francisco Premium Outlets Livermore 3"]
     },
     {
         "test_name": "San Ramon Valley High School",
@@ -170,7 +170,7 @@
                 "type": "Point"
             }
         },
-        "output": ["San Ramon Valley High School", "Danville Boulevard", "San Ramon", true]
+        "output": ["San Ramon Valley High School", "San Ramon Valley High School Danville"]
     },
     {
         "test_name": "Bank of America",
@@ -181,7 +181,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Bank of America", "East Calaveras Boulevard", "Milpitas", true]
+        "output": ["Bank of America", "Bank of America Milpitas"]
     },
     {
         "test_name": "Chevron Milpitas",
@@ -192,7 +192,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Chevron Milpitas", "California Circle", "Milpitas", true]
+        "output": ["Chevron Milpitas", "Chevron Milpitas 3"]
     },
     {
         "test_name": "Costco",
@@ -203,7 +203,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Costco", "Central Avenue", "Richmond", true]
+        "output": ["Costco", "Costco Richmond"]
     }, 
     {
         "test_name": "Layang Layang",
@@ -214,7 +214,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Layang Layang", "West Calaveras Boulevard", "Milpitas", true]
+        "output": ["Layang Layang", "Layang Layang Milpitas"]
     }, 
     {
         "test_name": "Kaiser Permanente Pediatrics Building",
@@ -225,7 +225,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Kaiser Permanente Pediatrics Building", "Los Coches Street", "Milpitas", true]
+        "output": ["Kaiser Permanente Pediatrics Building", "Kaiser Permanente Pediatrics Building Milpitas 2"]
     }, 
     {
         "test_name": "Taco Bell",
@@ -236,7 +236,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Taco Bell", "South Park Victoria Drive", "Milpitas", true]
+        "output": ["Taco Bell", "Taco Bell Milpitas"]
     },
 
     {
@@ -248,7 +248,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Northbrook Village Hall", "Cedar Lane", "Northbrook", true]
+        "output": ["Northbrook Village Hall", "Village Hall Northbrook"]
     },
 
     {
@@ -260,7 +260,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Patisserie Coralie", "Davis Street", "Evanston", true]
+        "output": ["Patisserie Coralie", "Patisserie Coralie Evanston"]
     },
 
     {
@@ -272,7 +272,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Northbrook Public Library", "Cedar Lane", "Northbrook", true]
+        "output": ["Northbrook Public Library", "Northbrook Public Library Northbrook"]
     },
 
     {
@@ -284,7 +284,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Music Institute of Chicago", "Chicago Avenue", "Evanston", true]
+        "output": ["Music Institute of Chicago", "Music Institute of Chicago Evanston"]
     },
 
     {
@@ -296,7 +296,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Town Cleaners", "Chicago Avenue", "Evanston", true]
+        "output": ["Town Cleaners", "Town Cleaners Evanston"]
     },
 
     {
@@ -308,7 +308,7 @@
                 "type": "Point"
             }
         },
-        "output": ["RadioShack", "Church Street", "Evanston", true]
+        "output": ["RadioShack", "RadioShack Evanston"]
     },
 
     {
@@ -320,7 +320,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Squash Blossom", "Gore Creek Drive", "Vail", true]
+        "output": ["Squash Blossom", "Squash Blossom Vail 2"]
     },
 
     {
@@ -332,7 +332,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Garfinkel's", "East Lionshead Circle", "Vail", true]
+        "output": ["Garfinkel's", "Garfinkel's Vail"]
     },
 
     {
@@ -344,7 +344,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Art Institute's Gardens", "South Michigan Avenue", "Chicago", true]
+        "output": ["Art Institute's Gardens", "Art Institute of Chicago Chicago 3"]
     },
 
     {
@@ -356,7 +356,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Bitcoin of America", "East Monroe Street", "Chicago", true]
+        "output": ["Bitcoin of America", ""]
     },
     {
         "test_name": "Pekoe San Jose",
@@ -367,7 +367,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Pekoe", "South White Road", "San Jose", true]
+        "output": ["Pekoe", "Pekoe San Jose"]
     },
     {
         "test_name": "99 Ranch Market Fremont",
@@ -378,7 +378,7 @@
                 "type": "Point"
             }
         },
-        "output": ["99 Ranch Market", "Warm Springs Boulevard", "Fremont", true]
+        "output": ["99 Ranch Market", "99 Ranch Market Fremont"]
     },
     {
         "test_name": "Mission San Jose High School Fremont",
@@ -389,7 +389,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Mission San Jose High School", "Palm Avenue", "Fremont", true]
+        "output": ["Mission San Jose High School", "Mission San Jose High School Fremont"]
     },
     {
         "test_name": "Giraffe Learning Center",
@@ -400,7 +400,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Giraffe Learning Center", "Driscoll Road", "Fremont", true]
+        "output": ["Giraffe Learning Center", "Giraffe Learning Center Fremont"]
     },
     {
         "test_name": "Costco",
@@ -411,7 +411,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Costco", "Pacific Commons Boulevard", "Fremont", true]
+        "output": ["Costco", "Costco Fremont"]
     },
     {
         "test_name": "Ohlone College",
@@ -422,7 +422,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Ohlone College", "Mission Boulevard", "Fremont", true]
+        "output": ["Ohlone College", "Ohlone College Fremont"]
     },
     {
         "test_name": "Holiday Inn San Jose - Silicon Valley",
@@ -433,7 +433,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Holiday Inn San Jose - Silicon Valley", "North 1st Street", "San Jose", true]
+        "output": ["Holiday Inn San Jose - Silicon Valley", "Holiday Inn San Jose Silicon Valley San Jose"]
     },
     {
         "test_name": "Annie Hair & Beauty",
@@ -444,7 +444,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Annie Hair & Beauty", "Warm Springs Boulevard", "Fremont", true]
+        "output": ["Annie Hair & Beauty", "Annie Hair & Beauty Fremont"]
     },
     {
         "test_name": "Quik Stop",
@@ -455,7 +455,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Quik Stop", "Washington Boulevard", "Fremont", true]
+        "output": ["Quik Stop", "Quik Stop Fremont"]
     },
     {
         "test_name": "Department of Motor Vehicles",
@@ -466,6 +466,6 @@
                 "type": "Point"
             }
         },
-        "output": ["Department of Motor Vehicles", "Central Avenue", "Fremont", true]
+        "output": ["Department of Motor Vehicles", "Department of Motor Vehicles Fremont 4"]
     }
 ]
