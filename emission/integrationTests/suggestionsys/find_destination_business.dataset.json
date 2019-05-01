@@ -468,4 +468,125 @@
         },
         "output": ["Department of Motor Vehicles", "Central Avenue", "Fremont", true]
     }
+    ,
+    {
+        "test_name": "Manhattan Beach Kettle",
+        "test_type": "Non-chain restaurant in suburban downtown area",
+        "input": {
+            "loc": {
+                "coordinates": [-118.4097008, 33.8853681],
+                "type": "Point"
+            }
+        },
+        "output": ["Kettle", "North Highland Avenue", true]
+    },
+
+    {
+        "test_name": "Italian Homemade",
+        "test_type": "Main Street type commercial district italian restaurant",
+        "input": {
+            "loc": {
+                "coordinates": [-122.252844, 37.858179],
+                "type": "Point"
+            }
+        },
+        "output": ["Italian Homemade", "College Avenue", "Berkeley", true]
+    }
+,
+    {
+        "test_name": "Jong Ga House",
+        "test_type": "Midtown type commercial district korean barbecue",
+        "input": {
+            "loc": {
+                "coordinates": [-122.254948, 37.809082],
+                "type": "Point"
+            }
+        },
+        "output": ["Jong Ga House", "Grand Avenue", "Oakland", true]
+    }
+,
+    {
+        "test_name": "T Pumps",
+        "test_type": "Midtown type main street boba tea shop",
+        "input": {
+            "loc": {
+                "coordinates": [-122.478639, 37.763643],
+                "type": "Point"
+            }
+        },
+        "output": ["Tpumps", "Irving Street", "San Francisco", true]
+    }
+,
+    {
+        "test_name": "Martinez Commons",
+        "test_type": "Urban apartment building",
+        "input": {
+            "loc": {
+                "coordinates": [-122.258042, 37.866615],
+                "type": "Point"
+            }
+        },
+        "output": ["Maximo Martinez Commons", "Channing Way", "Berkeley", false]
+    }
+,
+    {
+        "test_name": "Richmond District House",
+        "test_type": "Flats in medium/low density SF richmond district",
+        "input": {
+            "loc": {
+                "coordinates": [-122.469817, 37.779966],
+                "type": "Point"
+            }
+        },
+        "output": ["11th Avenue", "San Francisco", false]
+    }
+,
+    {
+        "test_name": "Novato Unified School District",
+        "test_type": "Suburban office for school district",
+        "input": {
+            "loc": {
+                "coordinates": [-122.578671, 38.109495],
+                "type": "Point"
+            }
+        },
+        "output": ["Novato Unified School District", "7th Street", "Novato", true]
+    }
+,
+    {
+        "test_name": "Tamalpais Pediatrics",
+        "test_type": "Pediatrician's office in suburban medical complex",
+        "input": {
+            "loc": {
+                "coordinates": [-122.540262, 37.944070],
+                "type": "Point"
+            }
+        },
+        "output": ["Tamalpais Pediatrics", "Bon Air Road", "Larkspur", true]
+    }
+,
+    {
+        "test_name": "Novato Library",
+        "test_type": "Library in suburban setting",
+        "input": {
+            "loc": {
+                "coordinates": [-122.580147, 38.107132],
+                "type": "Point"
+            }
+        },
+        "output": ["Novato Library", "Novato Boulevard", "Novato", "True"]
+    }
+,
+    {
+        "test_name": "O'hair Park",
+        "test_type": "Large park adjacent to open lands",
+        "input": {
+            "loc": {
+                "coordinates": [-122.619220, 38.116237],
+                "type": "Point"
+            }
+        },
+        "output": ["O'Hair Park", "Sutro Avenue", "Novato", true]
+    }   
 ]
+
