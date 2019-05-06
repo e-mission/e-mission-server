@@ -490,7 +490,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Italian Homemade", "College Avenue", "Berkeley", true]
+        "output": ["Italian Homemade", "the-italian-homemade-company-berkeley-3"]
     }
 ,
     {
@@ -502,7 +502,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Jong Ga House", "Grand Avenue", "Oakland", true]
+        "output": ["Jong Ga House", "jong-ga-house-oakland"]
     }
 ,
     {
@@ -514,7 +514,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Tpumps", "Irving Street", "San Francisco", true]
+        "output": ["Tpumps", "tpumps-san-francisco"]
     }
 ,
     {
@@ -526,7 +526,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Maximo Martinez Commons", "Channing Way", "Berkeley", false]
+        "output": ["Maximo Martinez Commons"]
     }
 ,
     {
@@ -538,7 +538,7 @@
                 "type": "Point"
             }
         },
-        "output": ["11th Avenue", "San Francisco", false]
+        "output": []
     }
 ,
     {
@@ -550,7 +550,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Novato Unified School District", "7th Street", "Novato", true]
+        "output": ["Novato Unified School District"]
     }
 ,
     {
@@ -562,7 +562,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Tamalpais Pediatrics", "Bon Air Road", "Larkspur", true]
+        "output": ["Tamalpais Pediatrics", "tamalpais-pediatrics-larkspur"]
     }
 ,
     {
@@ -574,7 +574,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Novato Library", "Novato Boulevard", "Novato", "True"]
+        "output": ["Novato Library", "novato-library-novato"]
     }
 ,
     {
@@ -586,6 +586,6 @@
                 "type": "Point"
             }
         },
-        "output": ["O'Hair Park", "Sutro Avenue", "Novato", true]
+        "output": ["O'Hair Park", "o-hair-park-novato"]
     }   
 ]
