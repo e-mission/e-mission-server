@@ -577,4 +577,112 @@
         },
         "output": ["parks"]
     }
+,
+    {
+        "test_name": "Italian Homemade",
+        "test_type": "Main Street type commercial district italian restaurant",
+        "input": {
+            "loc": {
+                "coordinates": [-122.252844, 37.858179],
+                "type": "Point"
+            }
+        },
+        "output": ["gelato", "delis", "italian"]
+    }
+,
+    {
+        "test_name": "Jong Ga House",
+        "test_type": "Midtown type commercial district korean barbecue",
+        "input": {
+            "loc": {
+                "coordinates": [-122.254948, 37.809082],
+                "type": "Point"
+            }
+        },
+        "output": ["korean"]
+    }
+,
+    {
+        "test_name": "T Pumps",
+        "test_type": "Midtown type main street boba tea shop",
+        "input": {
+            "loc": {
+                "coordinates": [-122.478607, 37.763630],
+                "type": "Point"
+            }
+        },
+        "output": ["bubbletea", "juicebars", "coffee"]
+    }
+,
+    {
+        "test_name": "Martinez Commons",
+        "test_type": "Urban apartment building",
+        "input": {
+            "loc": {
+                "coordinates": [-122.258042, 37.866615],
+                "type": "Point"
+            }
+        },
+        "output": []
+    }
+,
+    {
+        "test_name": "Richmond District House",
+        "test_type": "Flats in medium/low density SF richmond district",
+        "input": {
+            "loc": {
+                "coordinates": [-122.469817, 37.779966],
+                "type": "Point"
+            }
+        },
+        "output": []
+    }
+,
+    {
+        "test_name": "Novato Unified School District",
+        "test_type": "Suburban office for school district",
+        "input": {
+            "loc": {
+                "coordinates": [-122.578671, 38.109495],
+                "type": "Point"
+            }
+        },
+        "output": ["elementaryschools", "highschools"]
+    }
+,
+    {
+        "test_name": "Tamalpais Pediatrics",
+        "test_type": "Pediatrician's office in suburban medical complex",
+        "input": {
+            "loc": {
+                "coordinates": [-122.540262, 37.944070],
+                "type": "Point"
+            }
+        },
+        "output": ["pediatricians"]
+    }
+,
+    {
+        "test_name": "Novato Library",
+        "test_type": "Library in suburban setting",
+        "input": {
+            "loc": {
+                "coordinates": [-122.580147, 38.107132],
+                "type": "Point"
+            }
+        },
+        "output": ["libraries"]
+    }
+,
+    {
+        "test_name": "O'hair Park",
+        "test_type": "Large park adjacent to open lands",
+        "input": {
+            "loc": {
+                "coordinates": [-122.619220, 38.116237],
+                "type": "Point"
+            }
+        },
+        "output": ["parks"]
+    }
 ]
