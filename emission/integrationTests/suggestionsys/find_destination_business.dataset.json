@@ -469,17 +469,6 @@
         "output": ["Department of Motor Vehicles", "Department of Motor Vehicles Fremont 4"]
     }
     ,
-    {
-        "test_name": "Manhattan Beach Kettle",
-        "test_type": "Non-chain restaurant in suburban downtown area",
-        "input": {
-            "loc": {
-                "coordinates": [-118.4097008, 33.8853681],
-                "type": "Point"
-            }
-        },
-        "output": ["Kettle", "North Highland Avenue", true]
-    },
 
     {
         "test_name": "Italian Homemade",
