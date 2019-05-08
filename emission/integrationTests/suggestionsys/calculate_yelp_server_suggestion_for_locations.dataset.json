@@ -7,10 +7,7 @@
                 "coordinates": [-122.0154871, 37.3635335],
                 "type": "Point"
             },
-            "end_loc": {
-                "coordinates": [-122.1078300, 37.4035500],
-                "type": "Point"
-            }
+            "end_business_id": "kohls-mountain-view-mountain-view-2"
         },
         "output": "target-sunnyvale-2"
     }
@@ -23,10 +20,7 @@
                 "coordinates": [-122.258042, 37.866615],
                 "type": "Point"
             },
-            "end_loc": {
-                "coordinates": [-122.252844, 37.858179],
-                "type": "Point"
-            }
+            "end_business_id": "the-italian-homemade-company-berkeley-3"
         },
         "output": "gypsys-trattoria-italiano-berkeley"
     }
@@ -39,10 +33,7 @@
                 "coordinates": [-122.258042, 37.866615],
                 "type": "Point"
             },
-            "end_loc": {
-                "coordinates": [-122.1078300, 37.4035500],
-                "type": "Point"
-            }
+            "end_business_id": "jong-ga-house-oakland"
         },  
         "output": "koja-kitchen-berkeley-2"
     }
@@ -55,10 +46,7 @@
                 "coordinates": [-122.258042, 37.866615],
                 "type": "Point"
             },
-            "end_loc": {
-                "coordinates": [-122.478639, 37.763643],
-                "type": "Point"
-            }
+            "end_business_id": "tpumps-san-francisco"
         },
         "output": "yifang-taiwan-fruit-tea-berkeley-4"
     }
@@ -71,10 +59,7 @@
                 "coordinates": [-122.258042, 37.866615],
                 "type": "Point"
             },
-            "end_loc": {
-                "coordinates": [-122.290105, 37.853365],
-                "type": "Point"
-            }
+            "end_business_id": "berkeley-bowl-west-berkeley-2"
         },
         "output": "whole-foods-market-berkeley-7"
     }
@@ -87,10 +72,7 @@
                 "coordinates": [-122.258042, 37.866615],
                 "type": "Point"
             },
-            "end_loc": {
-                "coordinates": [-122.391835, 37.618168],
-                "type": "Point"
-            }
+            "end_business_id": "san-francisco-international-airport-sfo-san-francisco-3"
         },
         "output": "oakland-international-airport-oakland-8"
     }
@@ -103,10 +85,7 @@
                 "coordinates": [-122.258042, 37.866615],
                 "type": "Point"
             },
-            "end_loc": {
-                "coordinates": [-122.469817, 37.779966],
-                "type": "Point"
-            }
+            "end_business_id": "the-house-san-francisco"
         },
         "output": ""
     }
@@ -119,10 +98,7 @@
                 "coordinates": [-122.469817, 37.779966],
                 "type": "Point"
             },
-            "end_loc": {
-                "coordinates": [-122.258322, 37.864413],
-                "type": "Point"
-            }
+            "end_business_id": "pho-k-and-k-berkeley"
         },
         "output": "cafe-bunn-mi-san-francisco"
     }
@@ -135,10 +111,7 @@
                 "coordinates": [-122.469817, 37.779966],
                 "type": "Point"
             },
-            "end_loc": {
-                "coordinates": [-122.477261, 37.754091],
-                "type": "Point"
-            }
+            "end_business_id": "home-san-francisco-28"   
         },
         "output": "schuberts-bakery-san-francisco"
     }
@@ -151,10 +124,7 @@
                 "coordinates": [-122.258042, 37.866615],
                 "type": "Point"
             },
-            "end_loc": {
-                "coordinates": [-122.291228, 37.890835],
-                "type": "Point"
-            }
+            "end_business_id": "china-village-albany-3"     
         },
         "output": "chengdu-style-restaurant-berkeley"
     }
@@ -167,10 +137,7 @@
                 "coordinates": [-122.258042, 37.866615],
                 "type": "Point"
             },
-            "end_loc": {
-                "coordinates": [-122.619220, 38.116237],
-                "type": "Point"
-            }
+            "end_business_id": "o-hair-park-novato"
         },
         "output": "willard-park-berkeley"
     }
@@ -183,10 +150,7 @@
                 "coordinates": [-122.258042, 37.866615],
                 "type": "Point"
             },
-            "end_loc": {
-                "coordinates": [-122.578671, 38.109495],
-                "type": "Point"
-            }
+            "end_business_id": "novato-unified-school-district-novato"
         },
         "output": "willard-middle-school-berkeley"
     }

@@ -145,6 +145,13 @@ def return_address_from_google_nomfile(lat, lon):
 
 
 '''
+GOOGLE API: Makes Google Maps API CALL to the domain and returns a list of candidate addresses given a latitude and longitude
+'''
+
+def return_address_from_google_candidates_nomfile(lat, lon):
+    return geo.return_list_of_addresses_from_location_google(lat, lon)
+
+'''
 YELP API: Function to find the business matching the address
 '''
 def match_business_address(address):
@@ -179,6 +186,9 @@ latitude and longitude given
 def find_destination_business_google(lat, lon):
     return return_address_from_google_nomfile(lat, lon)
 
+def find_candidates_business_google(lat, lon):
+    return return_address_from_google_candidates_nomfile(lat, lon)
+
 def find_destination_business_yelp(lat, lon):
     return (None, None, None, None)
 
@@ -186,7 +196,18 @@ def find_destination_business_nominatim(lat, lon):
     string_address, address_dict = return_address_from_location_nominatim(lat, lon)
     business_key = list(address_dict.keys())[0]
     business_name = address_dict[business_key]
-    city = address_dict['city']
+    try:
+        city = address_dict['city']
+    except: 
+        try:
+            city = address_dict["town"]
+        except:
+            try:
+                zipcode = address_dict["postcode"]
+                city = zipcode_to_city(zipcode)  
+            except:
+                city = ''
+
     return (business_name, string_address, city,
         (not is_service_nominatim(business_name)))
 ### END: Pulled out candidate functions so that we can evaluate individual accuracies
@@ -210,6 +231,9 @@ def find_destination_business(lat, lon):
         logging.debug("Nominatim failed, Google found destination business %s "
             % str(return_tuple))
         return return_tuple
+
+# def find_candidates_business(lat, lon):
+#     return_tupe = 
 
 ### BEGIN: Pulled out candidate functions so that we can evaluate individual accuracies
 def category_of_business_awesome(lat, lon):
