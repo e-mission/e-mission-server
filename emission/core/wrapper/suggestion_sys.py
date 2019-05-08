@@ -187,7 +187,18 @@ def find_destination_business_nominatim(lat, lon):
     string_address, address_dict = return_address_from_location_nominatim(lat, lon)
     business_key = list(address_dict.keys())[0]
     business_name = address_dict[business_key]
-    city = address_dict['city']
+    try:
+        city = address_dict['city']
+    except: 
+        try:
+            city = address_dict["town"]
+        except:
+            try:
+                zipcode = address_dict["postcode"]
+                city = zipcode_to_city(zipcode)  
+            except:
+                city = ''
+
     return (business_name, string_address, city,
         (not is_service_nominatim(business_name)))
 ### END: Pulled out candidate functions so that we can evaluate individual accuracies
