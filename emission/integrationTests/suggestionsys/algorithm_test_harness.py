@@ -62,13 +62,13 @@ def test_find_candidates_business(cfn, params, exp_output, noise_in_meters):
     name = result
     # exp_output is a list of valid names
     for n in name:
-        if n[0] in exp_output:
+        if n in exp_output:
             logging.debug("found match! name = %s, comparing with %s" %
-                (n[0], exp_output))
+                (n, exp_output))
             return True
         else:
             logging.debug("no match! name = %s, comparing with %s" %
-                (n[0], exp_output))
+                (n, exp_output))
             continue
     return False
 

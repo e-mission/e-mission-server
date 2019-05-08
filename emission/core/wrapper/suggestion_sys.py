@@ -152,6 +152,14 @@ def return_address_from_google_candidates_nomfile(lat, lon):
     return geo.return_list_of_addresses_from_location_google(lat, lon)
 
 '''
+GOOGLE API: (SAM) Makes Google Maps API CALL to the domain and returns a list of candidate addresses given a latitude and longitude
+'''
+
+def return_address_from_google_candidates_nomfile_sam(lat, lon):
+    return geo.businesses_nearby_google(lat, lon)
+
+
+'''
 YELP API: Function to find the business matching the address
 '''
 def match_business_address(address):
@@ -187,7 +195,7 @@ def find_destination_business_google(lat, lon):
     return return_address_from_google_nomfile(lat, lon)
 
 def find_candidates_business_google(lat, lon):
-    return return_address_from_google_candidates_nomfile(lat, lon)
+    return return_address_from_google_candidates_nomfile_sam(lat, lon)
 
 def find_destination_business_yelp(lat, lon):
     return (None, None, None, None)
