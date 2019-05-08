@@ -221,13 +221,13 @@ def find_destination_business_nominatim(lat, lon):
     business_name = address_dict[business_key]
     try:
         city = address_dict['city']
-    except: 
+    except:
         try:
             city = address_dict["town"]
         except:
             try:
                 zipcode = address_dict["postcode"]
-                city = zipcode_to_city(zipcode)  
+                city = zipcode_to_city(zipcode)
             except:
                 city = ''
 
