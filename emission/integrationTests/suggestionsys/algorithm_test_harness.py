@@ -189,4 +189,3 @@ if __name__ == '__main__':
     logging.info("Test complete, comparison results = ")
     for cfn_name, successfulTests, failedTests in cfn2resultlist:
         logging.info("candidate: %s, accuracy = %s" % (cfn_name, (successfulTests * 100) / (successfulTests + failedTests)))
-

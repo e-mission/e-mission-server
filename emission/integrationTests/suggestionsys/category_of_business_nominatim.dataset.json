@@ -35,11 +35,11 @@
     },
 
     {
-        "test_name": "Manhattan Beach FISHBAR", 
+        "test_name": "Manhattan Beach FISHBAR",
         "test_type": "Suburban local bar/restaurant, non-chain",
         "input": {
             "loc": {
-                "coordinates": [-118.4182952, 33.9017119], 
+                "coordinates": [-118.4182952, 33.9017119],
                 "type": "Point"
             }
         },
@@ -128,7 +128,7 @@
             }
         },
         "output": ["medcenters"]
-    }, 
+    },
     {
         "test_name": "Walmart Supercenter",
         "test_type": "Suburban big box store by itself in a plaza",
@@ -139,8 +139,8 @@
             }
         },
         "output": ["deptstores", "grocery"]
-    }, 
-    {   
+    },
+    {
         "test_name": "Loving Hut",
         "test_type": "Restaurant in a large plaza with other restaurants",
         "input": {
@@ -150,7 +150,7 @@
             }
         },
         "output": ["vegetarian", "vegan", "asianfusion"]
-    }, 
+    },
     {
         "test_name": "San Francisco Premium Outlets",
         "test_type": "A large outlet with a lot of stores inside",
@@ -205,7 +205,7 @@
             }
         },
         "output": ["hotdog", "pizza", "hotdogs"]
-    }, 
+    },
     {
         "test_name": "Layang Layang",
         "test_type": "A restaurant in a plaza with Save Marts",
@@ -216,7 +216,7 @@
             }
         },
         "output": ["malaysian"]
-    }, 
+    },
     {
         "test_name": "Kaiser Permanente Pediatrics Building",
         "test_type": "Clinic next to a road",
@@ -227,7 +227,7 @@
             }
         },
         "output": ["medcenters"]
-    }, 
+    },
     {
         "test_name": "Taco Bell",
         "test_type": "Chain fast-food restaurant",
@@ -390,7 +390,7 @@
                 "type": "Point"
             }
         },
-        "output": ["highschools"] 
+        "output": ["highschools"]
     },
     {
         "test_name": "Giraffe Learning Center",
