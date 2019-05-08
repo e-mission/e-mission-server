@@ -119,7 +119,8 @@ def lat_lon_search(api_key, lat, lon, radius):
         'longitude': lon,
         'radius' : radius,
         'limit': SEARCH_LIMIT,
-        'sort_by': 'distance'
+        'sort_by': 'distance',
+        'categories' : 'food,restaurants,shopping,hotels,beautysvc,auto,education,collegeuniv,financialservices,publicservicesgovt'
     }
     return request(API_HOST, SEARCH_PATH, api_key, url_params=url_params)
 
@@ -199,8 +200,7 @@ def find_destination_business_google(lat, lon):
     return return_address_from_google_nomfile(lat, lon)
 
 def find_destination_business_yelp(lat, lon):
-    yelp_from_lat_lon = lat_lon_search(YELP_API_KEY, lat, lon, 100)
-    print(yelp_from_lat_lon)
+    yelp_from_lat_lon = lat_lon_search(YELP_API_KEY, lat, lon, 250)
     if yelp_from_lat_lon == {}:
         return (None, None, None, False)
     businesses = yelp_from_lat_lon['businesses']

@@ -248,7 +248,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Northbrook Village Hall", "Village Hall Northbrook", "Northbrook Village Hall", "northbrook Village hall", ]
+        "output": ["Northbrook Village Hall", "Village Hall Northbrook", "Northbrook Village Hall", "northbrook Village hall"]
     },
 
     {
@@ -344,7 +344,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Art Institute's Gardens", "Art Institute of Chicago Chicago 3", "The Art Institute of Chicago"]
+        "output": ["Art Institute's Gardens", "Art Institute of Chicago Chicago 3", "The Art Institute of Chicago", "Art Institute of Chicago"]
     },
 
     {
@@ -363,7 +363,7 @@
         "test_type": "Tea shop along major road in strip mall",
         "input": {
             "loc": {
-                "coordinates": [-121.7897235, 37.3146154],
+                "coordinates": [-121.790188997984, 37.3145584994999],
                 "type": "Point"
             }
         },
@@ -374,7 +374,7 @@
         "test_type": "Asian Supermarket in strip mall",
         "input": {
             "loc": {
-                "coordinates": [-121.9309053, 37.4881864],
+                "coordinates": [-121.03944, 37.57507],
                 "type": "Point"
             }
         },
@@ -385,7 +385,7 @@
         "test_type": "Suburban high school in residential area",
         "input": {
             "loc": {
-                "coordinates": [-121.935992, 37.5443018],
+                "coordinates": [-121.93371753373, 37.5441242756684],
                 "type": "Point"
             }
         },
@@ -396,7 +396,7 @@
         "test_type": "after school tutoring place in strip mall",
         "input": {
             "loc": {
-                "coordinates": [-121.9485068, 37.5417558],
+                "coordinates": [-121.946624755859, 37.5413246154785],
                 "type": "Point"
             }
         },
@@ -407,7 +407,7 @@
         "test_type": "large wholesale store w/ food court in suburban strip mall",
         "input": {
             "loc": {
-                "coordinates": [-121.9752093, 37.5016114],
+                "coordinates": [-121.973287, 37.501845],
                 "type": "Point"
             }
         },
@@ -418,7 +418,7 @@
         "test_type": "large community college in suburban area",
         "input": {
             "loc": {
-                "coordinates": [-121.9168524, 37.5298962],
+                "coordinates": [-121.914514, 37.530557],
                 "type": "Point"
             }
         },
@@ -429,18 +429,18 @@
         "test_type": "large hotel in urban area",
         "input": {
             "loc": {
-                "coordinates": [-121.9099833, 37.361147],
+                "coordinates": [-121.908210754395, 37.3615913391113],
                 "type": "Point"
             }
         },
-        "output": ["Holiday Inn San Jose - Silicon Valley", "Holiday Inn San Jose Silicon Valley San Jose"]
+        "output": ["Holiday Inn San Jose - Silicon Valley", "Holiday Inn San Jose Silicon Valley San Jose", "Holiday Inn"]
     },
     {
         "test_name": "Annie Hair & Beauty",
         "test_type": "barber shop in strip mall",
         "input": {
             "loc": {
-                "coordinates": [-121.9318015, 37.4891932],
+                "coordinates": [-121.9293976, 37.4890594],
                 "type": "Point"
             }
         },
@@ -451,7 +451,7 @@
         "test_type": "gas station near highway onramp",
         "input": {
             "loc": {
-                "coordinates": [-121.9392133, 37.5307587],
+                "coordinates": [-121.99445, 37.5580042422888],
                 "type": "Point"
             }
         },
@@ -462,7 +462,7 @@
         "test_type": "DMV office in central area of town",
         "input": {
             "loc": {
-                "coordinates": [-122.0093908, 37.5533451],
+                "coordinates": [-122.00728, 37.55314],
                 "type": "Point"
             }
         },
