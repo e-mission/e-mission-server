@@ -191,13 +191,8 @@
                 "type": "Point"
             }
         },
-<<<<<<< HEAD
         "output": ["Costco", "Costco Richmond"]
     }, 
-=======
-        "output": ["Costco", "Costco Richmond", "Costco Bakery"]
-    },
->>>>>>> 6424fd7018d2b9f1647d414e311bb7bacbc7351a
     {
         "test_name": "Layang Layang",
         "test_type": "A restaurant in a plaza with Save Marts",
@@ -207,13 +202,8 @@
                 "type": "Point"
             }
         },
-<<<<<<< HEAD
         "output": ["Layang Layang", "Layang Layang Milpitas"]
     }, 
-=======
-        "output": ["Layang Layang", "Layang Layang Milpitas", "Layang Layang Malaysian Cuisine"]
-    },
->>>>>>> 6424fd7018d2b9f1647d414e311bb7bacbc7351a
     {
         "test_name": "Kaiser Permanente Pediatrics Building",
         "test_type": "Clinic next to a road",
