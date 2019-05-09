@@ -73,6 +73,9 @@ class Entry(ecwb.WrapperBase):
             "manual/mode_confirm": "userlabel",
             # user confirmation of the travel purpose
             "manual/purpose_confirm": "userlabel",
+            # user confirmation of the destination (unsure how this will
+            # interact with purpose
+            "manual/destination_confirm": "userlabel",
             ### END: incoming data types ###
             ### BEGIN: analysis result data types ###
             ### ** BEGIN: objects generated after the initial segmentation step **
