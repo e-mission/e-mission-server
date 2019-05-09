@@ -34,11 +34,11 @@
     },
 
     {
-        "test_name": "Manhattan Beach FISHBAR", 
+        "test_name": "Manhattan Beach FISHBAR",
         "test_type": "Suburban local bar/restaurant, non-chain",
         "input": {
             "loc": {
-                "coordinates": [-118.4182952, 33.9017119], 
+                "coordinates": [-118.4182952, 33.9017119],
                 "type": "Point"
             }
         },
@@ -79,18 +79,6 @@
             }
         },
         "output": ["Mira Costa High School", "Mira Costa High School Manhattan Beach"]
-    },
-
-    {
-        "test_name": "El Segundo High School",
-        "test_type": "Local public school in Los Angeles County",
-        "input": {
-            "loc": {
-                "coordinates": [-118.4141835, 33.9245280],
-                "type": "Point"
-            }
-        },
-        "output": ["El Segundo High School", "El Segundo High School El Segundo"]
     },
 
      {
@@ -149,7 +137,7 @@
             }
         },
         "output": ["Loving Hut", "Loving Hut Milpitas Milpitas"]
-    }, 
+    },
     {
         "test_name": "San Francisco Premium Outlets",
         "test_type": "A large outlet with a lot of stores inside",
@@ -203,8 +191,13 @@
                 "type": "Point"
             }
         },
+<<<<<<< HEAD
         "output": ["Costco", "Costco Richmond"]
     }, 
+=======
+        "output": ["Costco", "Costco Richmond", "Costco Bakery"]
+    },
+>>>>>>> 6424fd7018d2b9f1647d414e311bb7bacbc7351a
     {
         "test_name": "Layang Layang",
         "test_type": "A restaurant in a plaza with Save Marts",
@@ -214,8 +207,13 @@
                 "type": "Point"
             }
         },
+<<<<<<< HEAD
         "output": ["Layang Layang", "Layang Layang Milpitas"]
     }, 
+=======
+        "output": ["Layang Layang", "Layang Layang Milpitas", "Layang Layang Malaysian Cuisine"]
+    },
+>>>>>>> 6424fd7018d2b9f1647d414e311bb7bacbc7351a
     {
         "test_name": "Kaiser Permanente Pediatrics Building",
         "test_type": "Clinic next to a road",
@@ -226,7 +224,7 @@
             }
         },
         "output": ["Kaiser Permanente Pediatrics Building", "Kaiser Permanente Pediatrics Building Milpitas 2"]
-    }, 
+    },
     {
         "test_name": "Taco Bell",
         "test_type": "Chain fast-food restaurant",
@@ -363,7 +361,7 @@
         "test_type": "Tea shop along major road in strip mall",
         "input": {
             "loc": {
-                "coordinates": [-121.7897235, 37.3146154],
+                "coordinates": [-121.790188997984, 37.3145584994999],
                 "type": "Point"
             }
         },
@@ -374,7 +372,7 @@
         "test_type": "Asian Supermarket in strip mall",
         "input": {
             "loc": {
-                "coordinates": [-121.9309053, 37.4881864],
+                "coordinates": [-121.03944, 37.57507],
                 "type": "Point"
             }
         },
@@ -385,7 +383,7 @@
         "test_type": "Suburban high school in residential area",
         "input": {
             "loc": {
-                "coordinates": [-121.935992, 37.5443018],
+                "coordinates": [-121.93371753373, 37.5441242756684],
                 "type": "Point"
             }
         },
@@ -396,7 +394,7 @@
         "test_type": "after school tutoring place in strip mall",
         "input": {
             "loc": {
-                "coordinates": [-121.9485068, 37.5417558],
+                "coordinates": [-121.946624755859, 37.5413246154785],
                 "type": "Point"
             }
         },
@@ -407,7 +405,7 @@
         "test_type": "large wholesale store w/ food court in suburban strip mall",
         "input": {
             "loc": {
-                "coordinates": [-121.9752093, 37.5016114],
+                "coordinates": [-121.973287, 37.501845],
                 "type": "Point"
             }
         },
@@ -418,7 +416,7 @@
         "test_type": "large community college in suburban area",
         "input": {
             "loc": {
-                "coordinates": [-121.9168524, 37.5298962],
+                "coordinates": [-121.914514, 37.530557],
                 "type": "Point"
             }
         },
@@ -429,18 +427,18 @@
         "test_type": "large hotel in urban area",
         "input": {
             "loc": {
-                "coordinates": [-121.9099833, 37.361147],
+                "coordinates": [-121.908210754395, 37.3615913391113],
                 "type": "Point"
             }
         },
-        "output": ["Holiday Inn San Jose - Silicon Valley", "Holiday Inn San Jose Silicon Valley San Jose"]
+        "output": ["Holiday Inn San Jose - Silicon Valley", "Holiday Inn San Jose Silicon Valley San Jose", "Holiday Inn"]
     },
     {
         "test_name": "Annie Hair & Beauty",
         "test_type": "barber shop in strip mall",
         "input": {
             "loc": {
-                "coordinates": [-121.9318015, 37.4891932],
+                "coordinates": [-121.9293976, 37.4890594],
                 "type": "Point"
             }
         },
@@ -451,7 +449,7 @@
         "test_type": "gas station near highway onramp",
         "input": {
             "loc": {
-                "coordinates": [-121.9392133, 37.5307587],
+                "coordinates": [-121.99445, 37.5580042422888],
                 "type": "Point"
             }
         },
@@ -462,10 +460,119 @@
         "test_type": "DMV office in central area of town",
         "input": {
             "loc": {
-                "coordinates": [-122.0093908, 37.5533451],
+                "coordinates": [-122.00728, 37.55314],
                 "type": "Point"
             }
         },
         "output": ["Department of Motor Vehicles", "Department of Motor Vehicles Fremont 4"]
     }
+    ,
+
+    {
+        "test_name": "Italian Homemade",
+        "test_type": "Main Street type commercial district italian restaurant",
+        "input": {
+            "loc": {
+                "coordinates": [-122.252844, 37.858179],
+                "type": "Point"
+            }
+        },
+        "output": ["Italian Homemade", "the-italian-homemade-company-berkeley-3"]
+    }
+,
+    {
+        "test_name": "Jong Ga House",
+        "test_type": "Midtown type commercial district korean barbecue",
+        "input": {
+            "loc": {
+                "coordinates": [-122.254948, 37.809082],
+                "type": "Point"
+            }
+        },
+        "output": ["Jong Ga House", "jong-ga-house-oakland"]
+    }
+,
+    {
+        "test_name": "T Pumps",
+        "test_type": "Midtown type main street boba tea shop",
+        "input": {
+            "loc": {
+                "coordinates": [-122.478639, 37.763643],
+                "type": "Point"
+            }
+        },
+        "output": ["Tpumps", "tpumps-san-francisco"]
+    }
+,
+    {
+        "test_name": "Martinez Commons",
+        "test_type": "Urban apartment building",
+        "input": {
+            "loc": {
+                "coordinates": [-122.258042, 37.866615],
+                "type": "Point"
+            }
+        },
+        "output": ["Maximo Martinez Commons"]
+    }
+,
+    {
+        "test_name": "Richmond District House",
+        "test_type": "Flats in medium/low density SF richmond district",
+        "input": {
+            "loc": {
+                "coordinates": [-122.469817, 37.779966],
+                "type": "Point"
+            }
+        },
+        "output": []
+    }
+,
+    {
+        "test_name": "Novato Unified School District",
+        "test_type": "Suburban office for school district",
+        "input": {
+            "loc": {
+                "coordinates": [-122.578671, 38.109495],
+                "type": "Point"
+            }
+        },
+        "output": ["Novato Unified School District"]
+    }
+,
+    {
+        "test_name": "Tamalpais Pediatrics",
+        "test_type": "Pediatrician's office in suburban medical complex",
+        "input": {
+            "loc": {
+                "coordinates": [-122.540262, 37.944070],
+                "type": "Point"
+            }
+        },
+        "output": ["Tamalpais Pediatrics", "tamalpais-pediatrics-larkspur"]
+    }
+,
+    {
+        "test_name": "Novato Library",
+        "test_type": "Library in suburban setting",
+        "input": {
+            "loc": {
+                "coordinates": [-122.580147, 38.107132],
+                "type": "Point"
+            }
+        },
+        "output": ["Novato Library", "novato-library-novato"]
+    }
+,
+    {
+        "test_name": "O'hair Park",
+        "test_type": "Large park adjacent to open lands",
+        "input": {
+            "loc": {
+                "coordinates": [-122.619220, 38.116237],
+                "type": "Point"
+            }
+        },
+        "output": ["O'Hair Park", "o-hair-park-novato"]
+    }   
 ]

@@ -8,7 +8,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Kohl's", "Showers Drive", "Mountain View", true]
+        "output": ["Kohl's Mountain View", "350 Showers Drive", "Mountain View", true]
     },
     {
         "test_name": "Manhattan Beach Kettle",
@@ -19,7 +19,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Kettle", "North Highland Avenue", true]
+        "output": ["The Kettle", "1138 Highland Ave", "Manhattan Beach", true]
     },
     {
         "test_name": "Manhattan Beach Beckers",
@@ -30,7 +30,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Becker's Bakery and Deli", "Manhattan Beach Ave", "Manhattan Beach", true]
+        "output": ["Becker's Bakery", "Manhattan Beach Ave", "Manhattan Beach", true]
     },
 
     {
@@ -42,7 +42,7 @@
                 "type": "Point"
             }
         },
-        "output": ["FISHBAR", "Highland Ave", "Manhattan Beach", true]
+        "output": ["FishBar", "3801 Highland Ave", "Manhattan Beach", true]
     },
 
     {
@@ -54,7 +54,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Umi", "Sepulveda Boulevard", "Los Angeles", true]
+        "output": ["Umi by Hamasaku", "860 S Sepulveda Blvd", "El Segundo", true]
     },
 
     {
@@ -66,7 +66,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Captain Kidd’s Fish Market", "North Harbor Drive", "Redondo Beach", true]
+        "output": ["Captain Kidd's", "209 N Harbor Dr", "Redondo Beach", true]
     },
 
      {
@@ -78,20 +78,9 @@
                 "type": "Point"
             }
         },
-        "output": ["Mira Costa High School", "Artesia Boulevard", "Manhattan Beach", true]
+        "output": ["Mira Costa High School", "1401 Artesia Blvd", "Manhattan Beach", true]
     },
 
-    {
-        "test_name": "El Segundo High School",
-        "test_type": "Local public school in Los Angeles County",
-        "input": {
-            "loc": {
-                "coordinates": [-118.4141835, 33.9245280],
-                "type": "Point"
-            }
-        },
-        "output": ["El Segundo High School", "Main Street", "El Segundo", true]
-    },
 
      {
         "test_name": "Torrance Black Bear Diner",
@@ -102,7 +91,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Black Bear Diner", "Hawthorne Boulevard", "Torrance", true]
+        "output": ["Black Bear Diner", "24021 Hawthorne Blvd", "Torrance", true]
     },
 
      {
@@ -114,7 +103,7 @@
                 "type": "Point"
             }
         },
-        "output": ["In-N-Out Burger", "West Century Boulevard", "Inglewood", true]
+        "output": ["In-N-Out Burger", "3411 W Century Blvd", "Inglewood", true]
     },
 
     {
@@ -137,7 +126,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Walmart Supercenter", "Ranch Drive", "Milpitas", true]
+        "output": ["Walmart Supercenter", "301 Ranch Dr", "Milpitas", true]
     }, 
     {   
         "test_name": "Loving Hut",
@@ -148,7 +137,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Loving Hut", "Barber Lane", "Milpitas", true]
+        "output": ["Loving Hut - Milpitas", "516 Barber Ln", "Milpitas", true]
     }, 
     {
         "test_name": "San Francisco Premium Outlets",
@@ -159,7 +148,7 @@
                 "type": "Point"
             }
         },
-        "output": ["San Francisco Premium Outlets", "Livermore Outlets Drive", "Livermore", true]
+        "output": ["Etro Outlet", "2774 Livermore Outlets Dr", "Livermore", true]
     },
     {
         "test_name": "San Ramon Valley High School",
@@ -170,7 +159,7 @@
                 "type": "Point"
             }
         },
-        "output": ["San Ramon Valley High School", "Danville Boulevard", "San Ramon", true]
+        "output": ["San Ramon Valley High School", "501 Danville Blvd", "Danville", true]
     },
     {
         "test_name": "Bank of America",
@@ -181,7 +170,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Bank of America", "East Calaveras Boulevard", "Milpitas", true]
+        "output": ["Bank of America", "740 E Calaveras Blvd", "Milpitas", true]
     },
     {
         "test_name": "Chevron Milpitas",
@@ -192,7 +181,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Chevron Milpitas", "California Circle", "Milpitas", true]
+        "output": ["Chevron", "1551 California Cir", "Milpitas", true]
     },
     {
         "test_name": "Costco",
@@ -203,7 +192,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Costco", "Central Avenue", "Richmond", true]
+        "output": ["Costco", "4801 Central Ave", "Richmond", true]
     }, 
     {
         "test_name": "Layang Layang",
@@ -214,7 +203,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Layang Layang", "West Calaveras Boulevard", "Milpitas", true]
+        "output": ["Layang Layang", "181 W Calaveras Blvd", "Milpitas", true]
     }, 
     {
         "test_name": "Kaiser Permanente Pediatrics Building",
@@ -236,7 +225,211 @@
                 "type": "Point"
             }
         },
-        "output": ["Taco Bell", "South Park Victoria Drive", "Milpitas", true]
+        "output": ["Taco Bell", "1365 S Park Victoria", "Milpitas", true]
+    },
+    {
+        "test_name": "Northbrook Village Hall",
+        "test_type": "Village hall in downtown area in North suburb of Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.8311015, 42.1296436],
+                "type": "Point"
+            }
+        },
+        "output": ["Northbrook Village Hall", "Village Hall Northbrook", "Northbrook Village Hall", true]
+    },
+
+    {
+        "test_name": "Patisserie Coralie",
+        "test_type": "A local patisserie in downtown area in North suburb of Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.6799562,  42.0461498],
+                "type": "Point"
+            }
+        },
+        "output": ["Patisserie Coralie", "Patisserie Coralie Evanston"]
+    },
+
+    {
+        "test_name": "Northbrook Public Library",
+        "test_type": "Where I spent a lot of my childhood, reading, studying and crying in North suburb of Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.8310260,  42.1305753],
+                "type": "Point"
+            }
+        },
+        "output": ["Northbrook Public Library", "Northbrook Public Library Northbrook"]
+    },
+    {
+        "test_name": "Town Cleaners",
+        "test_type": "A local dry cleaners in a North suburb of Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.6803244,  42.0454404],
+                "type": "Point"
+            }
+        },
+        "output": ["Town Cleaners", "Town Cleaners Evanston"]
+    },
+
+    {
+        "test_name": "RadioShack Evanston",
+        "test_type": "A RadioShack for music-related tech products in a North suburb of Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.6815733, 42.0483088],
+                "type": "Point"
+            }
+        },
+        "output": ["RadioShack", "RadioShack Evanston"]
+    },
+
+    {
+        "test_name": "Music Institute of Chicago",
+        "test_type": "A music institute of study in North suburb of Chicago ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.6807234, 42.0449701],
+                "type": "Point"
+            }
+        },
+        "output": ["Music Institute of Chicago", "Music Institute of Chicago Evanston"]
+    },
+    {
+        "test_name": "Squash Blossom",
+        "test_type": "A local jewlery store in Vail, CO ",
+        "input": {
+            "loc": {
+                "coordinates": [-106.3744452, 39.6405737],
+                "type": "Point"
+            }
+        },
+        "output": ["Squash Blossom", "Squash Blossom Vail 2"]
+    },
+
+    {
+        "test_name": "Garfinkel's",
+        "test_type": "A locally owned restaurant in Vail, CO (Lionshead Village) ",
+        "input": {
+            "loc": {
+                "coordinates": [-106.3878760, 39.6432528],
+                "type": "Point"
+            }
+        },
+        "output": ["Garfinkel's", "Garfinkel's Vail"]
+    },
+
+    {
+        "test_name": "Art Institute of Chicago Garden",
+        "test_type": "World-Renowned museum of art in Chicago, garden ",
+        "input": {
+            "loc": {
+                "coordinates": [-87.6236237, 41.8795675],
+                "type": "Point"
+            }
+        },
+        "output": ["Art Institute of Chicago", "Art Institute of Chicago Chicago 3", "The Art Institute of Chicago", "Art Institute of Chicago"]
+    },
+    {
+        "test_name": "Pekoe San Jose",
+        "test_type": "Tea shop along major road in strip mall",
+        "input": {
+            "loc": {
+                "coordinates": [-121.790188997984, 37.3145584994999],
+                "type": "Point"
+            }
+        },
+        "output": ["Pekoe", "Pekoe San Jose"]
+    },
+    {
+        "test_name": "Mission San Jose High School Fremont",
+        "test_type": "Suburban high school in residential area",
+        "input": {
+            "loc": {
+                "coordinates": [-121.93371753373, 37.5441242756684],
+                "type": "Point"
+            }
+        },
+        "output": ["Mission San Jose High School", "Mission San Jose High School Fremont"]
+    },
+    {
+        "test_name": "Giraffe Learning Center",
+        "test_type": "after school tutoring place in strip mall",
+        "input": {
+            "loc": {
+                "coordinates": [-121.946624755859, 37.5413246154785],
+                "type": "Point"
+            }
+        },
+        "output": ["Giraffe Learning Center", "Giraffe Learning Center Fremont"]
+    },
+    {
+        "test_name": "Costco",
+        "test_type": "large wholesale store w/ food court in suburban strip mall",
+        "input": {
+            "loc": {
+                "coordinates": [-121.973287, 37.501845],
+                "type": "Point"
+            }
+        },
+        "output": ["Costco", "Costco Fremont"]
+    },
+    {
+        "test_name": "Ohlone College",
+        "test_type": "large community college in suburban area",
+        "input": {
+            "loc": {
+                "coordinates": [-121.914514, 37.530557],
+                "type": "Point"
+            }
+        },
+        "output": ["Ohlone College", "Ohlone College Fremont"]
+    },
+    {
+        "test_name": "Holiday Inn San Jose - Silicon Valley",
+        "test_type": "large hotel in urban area",
+        "input": {
+            "loc": {
+                "coordinates": [-121.908210754395, 37.3615913391113],
+                "type": "Point"
+            }
+        },
+        "output": ["Holiday Inn San Jose - Silicon Valley", "Holiday Inn San Jose Silicon Valley San Jose", "Holiday Inn"]
+    },
+    {
+        "test_name": "Annie Hair & Beauty",
+        "test_type": "barber shop in strip mall",
+        "input": {
+            "loc": {
+                "coordinates": [-121.9293976, 37.4890594],
+                "type": "Point"
+            }
+        },
+        "output": ["Annie Hair & Beauty", "Annie Hair & Beauty Fremont"]
+    },
+    {
+        "test_name": "Quik Stop",
+        "test_type": "gas station near highway onramp",
+        "input": {
+            "loc": {
+                "coordinates": [-121.99445, 37.5580042422888],
+                "type": "Point"
+            }
+        },
+        "output": ["Quik Stop", "Quik Stop Fremont"]
+    },
+    {
+        "test_name": "Department of Motor Vehicles",
+        "test_type": "DMV office in central area of town",
+        "input": {
+            "loc": {
+                "coordinates": [-122.00728, 37.55314],
+                "type": "Point"
+            }
+        },
+        "output": ["Department of Motor Vehicles", "Department of Motor Vehicles Fremont 4"]
     }
 
 ]

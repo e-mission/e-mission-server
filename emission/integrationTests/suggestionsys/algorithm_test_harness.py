@@ -62,7 +62,7 @@ def test_find_candidates_business(cfn, params, exp_output, noise_in_meters):
     name = result
     # exp_output is a list of valid names
     for n in name:
-        if n in exp_output:
+        if n[0] == exp_output[0]:
             logging.debug("found match! name = %s, comparing with %s" %
                 (n, exp_output))
             return True
@@ -80,17 +80,32 @@ def test_category_of_business_nominatim(cfn, params, exp_output, noise_in_meters
 
 def test_calculate_yelp_server_suggestion_for_locations(cfn, params, exp_output, noise_in_meters):
     noisy_start_loc = add_noise(params["start_loc"], noise_in_meters)
-    # noisy_end_loc = add_noise(params["end_loc"], noise_in_meters)
-    noisy_end_business = add_noise(params["end_business"], noise_in_meters)
+    # # noisy_end_loc = add_noise(params["end_loc"], noise_in_meters)
+    # noisy_end_business = add_noise(params["end_business"], noise_in_meters)
+    noisy_end_business = params["end_business_id"]
     # input_end_business = params["end_business"]
+    end_loc_coord = sugg.business_reviews(sugg.YELP_API_KEY, noisy_end_business)['coordinates']
+    end_loc_lat = end_loc_coord['latitude']
+    end_loc_lon = end_loc_coord['longitude']
+
+    noisy_end_loc = {'coordinates': [end_loc_lon, end_loc_lat]}
+
     distance_in_miles = sugg.distance(
         sugg.geojson_to_latlon(noisy_start_loc),
         sugg.geojson_to_latlon(noisy_end_loc))
     distance_in_meters = distance_in_miles / 0.000621371
     logging.debug("distance in meters = %s" % distance_in_meters)
     # calculation function expects distance in meters
-    result = cfn(start_loc, end_loc, distance_in_meters)
-    return result.get('businessid', None) == exp_output
+    result = cfn(noisy_start_loc, noisy_end_business, distance_in_meters)
+    if result == exp_output:
+        logging.debug("found match! name = %s, comparing with %s" %
+                (result, exp_output))
+        return True
+    else:
+        logging.debug("no match! name = %s, comparing with %s" %
+                (result, exp_output))
+        return False
+    
 
 def test_single_instance(test_fn, cfn, instance, noise_in_meters):
     logging.debug("-----" + instance["test_name"] + "------")
@@ -127,10 +142,10 @@ CANDIDATE_ALGORITHMS = {
         sugg.category_of_business_awesome
     ],
     "calculate_yelp_server_suggestion_for_locations": [
-        sugg.calculate_yelp_server_suggestion_for_locations
+        sugg.calculate_yelp_server_suggestion_for_locations_business_id
     ], 
     "find_candidate_business": [
-        sugg.find_candidates_business_google
+        sugg.find_candidates_business_yelp
     ]
 }
 
@@ -213,4 +228,3 @@ if __name__ == '__main__':
     logging.info("Test complete, comparison results = ")
     for cfn_name, successfulTests, failedTests in cfn2resultlist:
         logging.info("candidate: %s, accuracy = %s" % (cfn_name, (successfulTests * 100) / (successfulTests + failedTests)))
-

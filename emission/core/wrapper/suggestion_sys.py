@@ -6,6 +6,7 @@ import requests
 import json
 import logging
 import re
+
 import emission.storage.timeseries.abstract_timeseries as esta
 import argparse
 import pprint
@@ -105,8 +106,27 @@ def search(api_key, term, location):
     }
     return request(API_HOST, SEARCH_PATH, api_key, url_params=url_params)
 
+def lat_lon_search(api_key, lat, lon, radius):
+    """Query Search API using latitude and longitude.
+    Args:
+        lat (float) : latitude
+        lon (float) : longitude
+        radius (int) : radius of search in meters
+    Returns:
+        dict: The JSON response form the request.
+    """
+    url_params = {
+        'latitude': lat,
+        'longitude': lon,
+        'radius' : radius,
+        'limit': SEARCH_LIMIT,
+        'sort_by': 'distance',
+        'categories' : 'food,restaurants,shopping,hotels,beautysvc,auto,education,collegeuniv,financialservices,publicservicesgovt'
+    }
+    return request(API_HOST, SEARCH_PATH, api_key, url_params=url_params)
+
 """
-YELP API: Function to retrieve all reviews related to the business. 
+YELP API: Function to retrieve all reviews related to the business.
 """
 def business_reviews(api_key, business_id):
     business_path = BUSINESS_PATH + business_id
@@ -129,7 +149,7 @@ def get_business_id(api_key, lat, lon):
     return request(API_HOST, SEARCH_PATH, api_key, url_params=url_params)
 
 """
-NOMINATIM API: Creates a Nominatim API Call, returns address in string form and dictionary form separated by streetname, 
+NOMINATIM API: Creates a Nominatim API Call, returns address in string form and dictionary form separated by streetname,
     road, neighborhood, etc
 """
 def return_address_from_location_nominatim(lat, lon):
@@ -179,16 +199,17 @@ def is_service_nominatim(business):
     return True
 
 '''
-NOMINATIM VERS: Function that RETURNS a list of categories that the business falls into 
+NOMINATIM VERS: Function that RETURNS a list of categories that the business falls into
 
-Using the Google reverse lookup in the except clause, in case Nominatim's results are too vague. 
-Will first try Nominatim's reverse lookup, but if Nominatim returns a broad "address" 
-of the street and the city, without a full address with a specific location 
+Using the Google reverse lookup in the except clause, in case Nominatim's results are too vague.
+Will first try Nominatim's reverse lookup, but if Nominatim returns a broad "address"
+of the street and the city, without a full address with a specific location
 Such as Piedmont Ave, Berkeley, CA
 
-Then the function will enter the Google reverse lookup and choose a business that is closest to 
+Then the function will enter the Google reverse lookup and choose a business that is closest to
 latitude and longitude given
 '''
+
 
 ### BEGIN: Pulled out candidate functions so that we can evaluate individual accuracies
 def find_destination_business_google(lat, lon):
@@ -198,7 +219,39 @@ def find_candidates_business_google(lat, lon):
     return return_address_from_google_candidates_nomfile_sam(lat, lon)
 
 def find_destination_business_yelp(lat, lon):
-    return (None, None, None, None)
+    yelp_from_lat_lon = lat_lon_search(YELP_API_KEY, lat, lon, 350)
+    if yelp_from_lat_lon == {}:
+        return (None, None, None, False)
+    businesses = yelp_from_lat_lon['businesses']
+    if businesses == []:
+        return find_destination_business(lat, lon)
+    business_name = businesses[0]['name']
+    address = businesses[0]['location']['address1']
+    city = businesses[0]['location']['city']
+    #If there is no commercial establishment in a 50 meter (1/2 block) radius of coordinate
+    #It is safe to assume the area is not a commercial establishment
+    location_is_service = True
+    print((business_name, address, city, location_is_service))
+    return (business_name, address, city, location_is_service)
+
+def find_candidates_business_yelp(lat, lon):
+    yelp_from_lat_lon = lat_lon_search(YELP_API_KEY, lat, lon, 125)
+    if yelp_from_lat_lon == {}:
+        return (None, None, None, False)
+    businesses = yelp_from_lat_lon['businesses']
+    # if businesses == []:
+    #     return find_destination_business(lat, lon)
+    results = []
+    for b in businesses:
+        business_name = b['name']
+        address = b['location']['address1']
+        city = b['location']['city']
+        location_is_service = True
+        results.append([business_name, address, city, location_is_service])
+    return results
+
+
+
 
 def find_destination_business_nominatim(lat, lon):
     string_address, address_dict = return_address_from_location_nominatim(lat, lon)
@@ -206,13 +259,13 @@ def find_destination_business_nominatim(lat, lon):
     business_name = address_dict[business_key]
     try:
         city = address_dict['city']
-    except: 
+    except:
         try:
             city = address_dict["town"]
         except:
             try:
                 zipcode = address_dict["postcode"]
-                city = zipcode_to_city(zipcode)  
+                city = zipcode_to_city(zipcode)
             except:
                 city = ''
 
@@ -240,8 +293,6 @@ def find_destination_business(lat, lon):
             % str(return_tuple))
         return return_tuple
 
-# def find_candidates_business(lat, lon):
-#     return_tupe = 
 
 ### BEGIN: Pulled out candidate functions so that we can evaluate individual accuracies
 def category_of_business_awesome(lat, lon):
@@ -281,6 +332,7 @@ def category_from_address_wrapper(lat, lon):
         return []
 
     return category_from_address(address)
+
 ### END: Wrappers for the candidate functions to make them callable from the harness
 
 ## Current combination of candidate functions;
@@ -299,6 +351,7 @@ def category_of_business_nominatim(lat, lon):
             return category_from_address(address)
     except:
         raise ValueError("Something went wrong")
+
 
 
 '''
@@ -334,8 +387,8 @@ def geojson_to_lat_lon_separated(geojson):
     return lat, lon
 
 '''
-REWRITE def check_mode_from_trip(cleaned_trip, cleaned_sections, section_counter, trip_counter): 
-Mode number correspondence: 
+REWRITE def check_mode_from_trip(cleaned_trip, cleaned_sections, section_counter, trip_counter):
+Mode number correspondence:
 0: "IN_VEHICLE"
 1: "BIKING"
 2: "ON_FOOT"
@@ -385,7 +438,7 @@ def dummy_starter_suggestion(uuid):
     return modes_from_trips
 
 '''
-NOMINATIM VERSION: Function to find the review of the original location of the end point of a trip 
+NOMINATIM VERSION: Function to find the review of the original location of the end point of a trip
 '''
 def review_start_loc_nominatim(lat, lon):
     try:
@@ -412,27 +465,27 @@ ZIPCODEAPI
 
 As nominatim sometimes is unable to provide a specific location with the city and instead returns
 a postcode (zipcode) and the country name. For the suggestions that we built, the suggestions
-require which city (city name) it is in order to look for other similar categoried services 
-in the area. Thus, this function takes in the INPUT of a zipcode, and RETURNS the name of the city. 
+require which city (city name) it is in order to look for other similar categoried services
+in the area. Thus, this function takes in the INPUT of a zipcode, and RETURNS the name of the city.
 
 '''
 def zipcode_retrieval(zipcode):
-    
-    # Use this API key first. 
+
+    # Use this API key first.
     url = ZIP_HOST_URL + ZIPCODE_API_KEY + ZIP_FORMAT + zipcode + ZIP_DEGREE
     response = requests.request('GET', url=url)
     results = response.json()
 
     if "error_code" in results:
-        # In case the first API key runs out of requests per hour. 
+        # In case the first API key runs out of requests per hour.
         url = ZIP_HOST_URL + BACKUP_ZIP_KEY + ZIP_FORMAT + zipcode + ZIP_DEGREE
         response = requests.request('GET', url=url)
         return response.json()
     else:
         return results
 
-    
-        
+
+
 def zipcode_to_city(zipcode):
     response = zipcode_retrieval(zipcode)
     return response['city']
@@ -440,7 +493,7 @@ def zipcode_to_city(zipcode):
 NOMINATIM
 In progress-nominatim yelp server suggestion function, first just trying to make end-to-end work before robustifying this function.
 
-Mode number correspondence: 
+Mode number correspondence:
 0: "IN_VEHICLE"
 1: "BIKING"
 2: "ON_FOOT"
@@ -465,7 +518,7 @@ def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripidstr):
     start_location = cleaned_trips.data.start_loc
     end_location = cleaned_trips.data.end_loc
     '''
-    Distance in miles because the current calculated distances is through MapQuest which uses miles, 
+    Distance in miles because the current calculated distances is through MapQuest which uses miles,
     still working on changing those functions, because haven't found any functions through nominatim
     that calculates distance between points.
     '''
@@ -473,6 +526,62 @@ def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripidstr):
     # we could fill in the tripid here as well since we know it, but we weren't doing it before,
     # so let's not mess it up
     return suggestion_result
+
+
+def calculate_yelp_server_suggestion_for_locations_business_id(start_loc, end_id, distance):
+    distance_in_miles = distance * 0.000621371
+    start_lat, start_lon = geojson_to_lat_lon_separated(start_loc)
+    endpoint_categories = []
+    business_locations = {}
+    yelp_call = business_reviews(YELP_API_KEY, end_id)
+    categories_dict = yelp_call['categories']
+    for c in categories_dict:
+        endpoint_categories.append(c['alias'])
+    city = yelp_call['location']['city']
+    location_review = yelp_call['rating']
+    ratings_bus = {}
+    error_message = 'Sorry, unable to retrieve datapoint'
+    error_message_categor = 'Sorry, unable to retrieve datapoint because datapoint is a house or datapoint does not belong in service categories'
+    try:
+        if (endpoint_categories):
+            for categor in endpoint_categories:
+                queried_bus = search(YELP_API_KEY, categor, city)['businesses']
+                for q in queried_bus:
+                    if q['rating'] >= location_review:
+                        #'Coordinates' come out as two elements, latitude and longitude
+                        ratings_bus[q['name']] = (q['rating'], q['alias'])
+                        obtained = q['location']['display_address'][0] + q['location']['display_address'][1]
+                        obtained.replace(' ', '+')
+                        business_locations[q['name']] = obtained
+        else:
+            return ''
+    except:
+        return ''
+    for a in business_locations:
+        print(a)
+        try:
+            calculate_distance = distance(start_lat_lon, business_locations[a])
+        except:
+            continue
+        if calculate_distance < distance_in_miles and calculate_distance < 5 and calculate_distance >= 1:
+            try:
+                return a
+            except ValueError as e:
+                continue
+        elif calculate_distance < distance_in_miles and calculate_distance < 1:
+            try:
+                return a
+            except ValueError as e:
+                continue
+        elif calculate_distance < distance_in_miles and calculate_distance >= 5 and calculate_distance <= 15:
+            try:
+                return a
+            except ValueError as e:
+                continue
+
+    return ''
+
+
 
 def calculate_yelp_server_suggestion_for_locations(start_location, end_location, distance):
     distance_in_miles = distance * 0.000621371
@@ -484,7 +593,7 @@ def calculate_yelp_server_suggestion_for_locations(start_location, end_location,
 
     begin_string_address, begin_address_dict = return_address_from_location_nominatim(start_lat, start_lon)
     end_string_address, end_address_dict = return_address_from_location_nominatim(end_lat, end_lon)
-    try: 
+    try:
         city = end_address_dict["city"]
     except:
         try:
@@ -512,12 +621,12 @@ def calculate_yelp_server_suggestion_for_locations(start_location, end_location,
                     if q['rating'] >= location_review:
                         #'Coordinates' come out as two elements, latitude and longitude
                         ratings_bus[q['name']] = (q['rating'], q['alias'])
-                        obtained = q['location']['display_address'][0] + q['location']['display_address'][1] 
+                        obtained = q['location']['display_address'][0] + q['location']['display_address'][1]
                         obtained.replace(' ', '+')
                         business_locations[q['name']] = obtained
         else:
             return {'message' : error_message_categor, 'question': None, 'suggested_loc': None, 'method': 'bike', 'rating': None, 'businessid': None}
-    except: 
+    except:
         return {'message' : error_message_categor, 'question': None, 'suggested_loc': None, 'method': 'bike', 'rating': None, 'businessid': None}
 
     #THIS PART WILL BE FIXED ACCODRING TO NOMINATIM AND GET RID OF MAPQUEST (find some other way to calculate distance)
@@ -530,8 +639,8 @@ def calculate_yelp_server_suggestion_for_locations(start_location, end_location,
         if calculate_distance < distance_in_miles and calculate_distance < 5 and calculate_distance >= 1:
             try:
                 question = "How about this location?"
-                new_message = "We saw that you took a vehicle from" + begin_string_address + "to" + address  
-                suggested_loc =  "Instead, there is " + a + "which has better reviews and closer to your original starting point" 
+                new_message = "We saw that you took a vehicle from" + begin_string_address + "to" + address
+                suggested_loc =  "Instead, there is " + a + "which has better reviews and closer to your original starting point"
                 rating_mess = "Rating of " + str(ratings_bus[a][0])
                 #Not sure to include the amount of carbon saved
                 #Still looking to see what to return with this message, because currently my latitude and longitudes are stacked together in one string
@@ -540,20 +649,20 @@ def calculate_yelp_server_suggestion_for_locations(start_location, end_location,
             except ValueError as e:
                 continue
         elif calculate_distance < distance_in_miles and calculate_distance < 1:
-            try: 
+            try:
                 question = "How about this location?"
-                new_message = "We saw that you took a vehicle from" + begin_string_address + "to" + address  
-                suggested_loc =  "Instead, there is " + a + "which has better reviews and closer to your original starting point" 
+                new_message = "We saw that you took a vehicle from" + begin_string_address + "to" + address
+                suggested_loc =  "Instead, there is " + a + "which has better reviews and closer to your original starting point"
                 rating_mess = "Rating of " + str(ratings_bus[a][0])
                 # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
                 return {'message' : new_message, 'question': question, 'suggested_loc': suggested_loc, 'method': 'walk', 'rating': str(ratings_bus[a][0]), 'businessid': ratings_bus[a][1]}
             except ValueError as e:
                 continue
         elif calculate_distance < distance_in_miles and calculate_distance >= 5 and calculate_distance <= 15:
-            try: 
+            try:
                 question = "How about this location?"
-                new_message = "We saw that you took a vehicle from" + begin_string_address + "to" + address  
-                suggested_loc =  "Instead, there is " + a + "which has better reviews and closer to your original starting point" 
+                new_message = "We saw that you took a vehicle from" + begin_string_address + "to" + address
+                suggested_loc =  "Instead, there is " + a + "which has better reviews and closer to your original starting point"
                 rating_mess = "Rating of " + str(ratings_bus[a][0])
                 # insert_into_db(tripDict, i, yelp_suggestion_trips, uuid)
                 return {'message' : new_message, 'question': question, 'suggested_loc': suggested_loc, 'method': 'public', 'rating': str(ratings_bus[a][0]), 'businessid': ratings_bus[a][1]}
