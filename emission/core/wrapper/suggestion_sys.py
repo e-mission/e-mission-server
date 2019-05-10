@@ -23,7 +23,7 @@ import bson
 
 #RESTRUCTURE CODE FOR GOOGLE MAPS SO CAN GET RID OF IT AND JUST USE NOMINATIM.PY
 yelp_json_path = 'conf/net/ext_service/yelpfusion.json'
-nominatim_path = 'conf/net/ext_service/nominatim.json'
+
 """
 Checks if conf files exists or not. The conf files will be given to the user through request.
 """
@@ -32,7 +32,7 @@ try:
     yelp_json = open('conf/net/ext_service/yelpfusion.json', 'r')
     yelp_auth = json.load(yelp_json)
 except:
-    print("nominatim not configured either, place decoding must happen on the client")
+    print("yelp not configured, cannot generate suggestions")
 
 
 YELP_API_KEY = yelp_auth['api_key']
