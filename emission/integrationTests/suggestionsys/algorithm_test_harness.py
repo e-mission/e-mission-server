@@ -57,9 +57,10 @@ def test_find_destination_business(cfn, params, exp_output, noise_in_meters):
 def test_calculate_yelp_server_suggestion_for_locations(cfn, params, exp_output, noise_in_meters):
     noisy_start_loc = add_noise(params["start_loc"], noise_in_meters)
     noisy_end_loc = add_noise(params["end_loc"], noise_in_meters)
-    distance_in_miles = sugg.distance(
-        sugg.geojson_to_latlon(noisy_start_loc),
-        sugg.geojson_to_latlon(noisy_end_loc))
+    noisy_start_lat, noisy_start_lng = sugg.geojson_to_lat_lon_separated(noisy_start_loc)
+    noisy_end_lat, noisy_end_lng = sugg.geojson_to_lat_lon_separated(noisy_end_loc)
+    distance_in_miles = sugg.distance(noisy_start_lat, noisy_start_lng,
+        noisy_end_lat, noisy_end_lng)
     distance_in_meters = distance_in_miles / 0.000621371
     logging.debug("distance in meters = %s" % distance_in_meters)
     # calculation function expects distance in meters
