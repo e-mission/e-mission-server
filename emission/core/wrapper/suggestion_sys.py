@@ -15,18 +15,6 @@ import os
 import emission.net.ext_service.geocoder.nominatim as geo
 import bson
 
-try:
-    # For Python 3.0 and later
-    from urllib.error import HTTPError
-    from urllib.parse import quote
-    from urllib.parse import urlencode
-except ImportError:
-    # Fall back to Python 2's urllib2 and urllib
-    from urllib2 import HTTPError
-    from urllib import quote
-    from urllib import urlencode
-
-
 # Yelp Fusion no longer uses OAuth as of December 7, 2017.
 # You no longer need to provide Client ID to fetch Data
 # It now uses private keys to authenticate requests (API Key)
