@@ -179,7 +179,7 @@ def find_destination_business_yelp(lat, lon):
         return (None, None, None, False)
     businesses = yelp_from_lat_lon['businesses']
     if businesses == []:
-        return find_destination_business(lat, lon)
+        return (None, None, None, False)
     business_name = businesses[0]['name']
     address = businesses[0]['location']['address1']
     city = businesses[0]['location']['city']
@@ -225,12 +225,17 @@ def find_destination_business(lat, lon):
 Function that RETURNS distance between lat,lng pairs
 '''
 def distance(start_lat, start_lon, end_lat, end_lon):
+#     logging.debug("Calculating distance between %s %s %s %s of types %s %s %s %s" %
+#         (start_lat, start_lon, end_lat, end_lon,
+#          type(start_lat), type(start_lon), type(end_lat), type(end_lon)))
     start_lat_lon = start_lat + "," + start_lon
     end_lat_lon = end_lat + "," + end_lon
 
     url = 'http://www.mapquestapi.com/directions/v2/route?key=' + MAPQUEST_KEY + '&from=' + start_lat_lon + '&to=' + end_lat_lon
     response = requests.get(url)
-    return response.json()['route']['distance']
+    response_json = response.json()
+#     logging.debug("mapquest response = %s " % response_json)
+    return response_json['route']['distance']
     # except:
     #     url = 'http://www.mapquestapi.com/directions/v2/route?key=' + BACKUP_MAPQUEST_KEY + '&from=' + address1 + '&to=' + address2
     #     response = requests.get(url)
@@ -382,22 +387,36 @@ def calculate_yelp_server_suggestion_for_locations(start_location, end_location,
     start_lat, start_lon = geojson_to_lat_lon_separated(start_location)
     end_lat, end_lon = geojson_to_lat_lon_separated(end_location)
 
-    orig_end_business_details = find_destination_business(end_lat, end_lon)
+    orig_end_business_details = find_destination_business_yelp(end_lat, end_lon)
     logging.debug("orig_end_business_details = %s " % str(orig_end_business_details))
     if not orig_end_business_details[-1]:
         # This is not a service, so we bail right now
         return format_suggestion(start_lat, start_lon, None, None, 'bike')
-    business_name = orig_end_business_details[0]
-    city = orig_end_business_details[2]
-    orig_end_bid_hack = business_name.replace(' ', '-') + '-' + city
+    business_name = orig_end_business_details[0].lower()
+    city = orig_end_business_details[2].lower()
+    orig_end_bid_hack = business_name.replace(' ', '-') + '-' + city.replace(' ', '-')
     orig_bus_details = business_details(YELP_API_KEY, orig_end_bid_hack)
+    if orig_bus_details is None or 'error' in orig_bus_details:
+        # the hack doesn't work
+        # this is a corner case anyway since we should be able to return the bid
+        # from the query too
+        logging.info("hack for %s did not work, skipping suggestion" % orig_end_bid_hack)
+        return format_suggestion(start_lat, start_lon, None, None, 'bike')
+    else:
+        logging.info("hack worked, found bid %s" % orig_bus_details["alias"])
 
     alt_sugg_list = get_potential_suggestions(orig_bus_details)
     fill_distances(start_lat, start_lon, alt_sugg_list)
-    final_bdetails, final_mode = get_selected_suggestion_and_mode(alt_sugg_list)
+    final_sugg, final_mode = get_selected_suggestion_and_mode(alt_sugg_list,
+        distance_in_miles)
+
+    logging.info("For %s, found suggestion %s with mode %s" %
+        (orig_bus_details["alias"],
+            final_sugg["bdetails"]["alias"] if final_sugg is not None else None,
+            final_mode))
 
     return format_suggestion(start_lat, start_lon, orig_bus_details,
-                             final_bdetails, final_mode)
+                             final_sugg, final_mode)
 
 #
 # Returns a list of potential suggestions. Each entry is a {"bdetails":
@@ -415,7 +434,7 @@ def get_potential_suggestions(orig_bus_details):
     suggestion_list = []
     try:
         for categor in endpoint_categories:
-            queried_bus = search(YELP_API_KEY, categor, city)['businesses']
+            queried_bus = search(YELP_API_KEY, categor, orig_city)['businesses']
             for q in queried_bus:
                 if q['rating'] >= orig_end_rating:
                     suggestion_list.append({"bdetails": q})
@@ -432,10 +451,16 @@ def fill_distances(start_lat, start_lon, sugg_list):
     for sugg_obj in sugg_list:
         curr_sugg_details = sugg_obj["bdetails"]
         try:
+            curr_sugg_coords = curr_sugg_details["coordinates"]
+            logging.debug("calculating distance for %s at location %s" %
+                (curr_sugg_details['alias'], curr_sugg_coords))
+            # The inputs to distance have to be strings; otherwise
+            # str + float fails
+            # Error unsupported operand type(s) for +: 'float' and 'str'
             alt_distance = distance(start_lat, start_lon,
-                curr_sugg_details["coordinates"][0], curr_sugg_details["coordinates"][1])
+                str(curr_sugg_coords["latitude"]), str(curr_sugg_coords["longitude"]))
             logging.debug("While considering %s, calculated new distance %s" %
-                (sugg_obj["alias"], alt_distance))
+                (curr_sugg_details["alias"], alt_distance))
         except Exception as e:
             logging.info("Error %s while calculating distance for %s,returning inf" %
                 (e, curr_sugg_details["alias"]))
@@ -466,8 +491,8 @@ def get_selected_suggestion_and_mode(sugg_list, distance_in_miles):
     return (None, 'public')
 
 def format_suggestion(start_lat, start_lon, orig_bus_details,
-                      alt_bus_details, alt_mode):
-    if alt_bus_details is None:
+                      alt_sugg, alt_mode):
+    if alt_sugg is None:
         return {
             'message': 'Sorry, unable to retrieve datapoint because datapoint is a house or datapoint does not belong in service categories',
             'question': None,
@@ -480,7 +505,8 @@ def format_suggestion(start_lat, start_lon, orig_bus_details,
         begin_string_address, begin_address_dict = return_address_from_location_nominatim(start_lat, start_lon)
         # TODO: Can't we just use the business name here directly instead of an
         # address. Seems like that will be a lot more meaningful to people
-        end_string_address, end_address_dict = return_address_from_location_nominatim(end_lat, end_lon)
+        end_string_address = " ".join(orig_bus_details["location"]["display_address"])
+        alt_bus_details = alt_sugg["bdetails"]
         return {
             'message': 'We saw that you took a vehicle from '+begin_string_address
                 + ' to '+ end_string_address,
