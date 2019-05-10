@@ -391,7 +391,7 @@ def calculate_yelp_server_suggestion_for_locations(start_location, end_location,
     logging.debug("orig_end_business_details = %s " % str(orig_end_business_details))
     if not orig_end_business_details[-1]:
         # This is not a service, so we bail right now
-        return format_suggestion(start_lat, start_lon, None, None, 'bike')
+        return format_suggestion(start_lat, start_lon, None, None)
     business_name = orig_end_business_details[0].lower()
     city = orig_end_business_details[2].lower()
     orig_end_bid_hack = business_name.replace(' ', '-') + '-' + city.replace(' ', '-')
@@ -401,22 +401,15 @@ def calculate_yelp_server_suggestion_for_locations(start_location, end_location,
         # this is a corner case anyway since we should be able to return the bid
         # from the query too
         logging.info("hack for %s did not work, skipping suggestion" % orig_end_bid_hack)
-        return format_suggestion(start_lat, start_lon, None, None, 'bike')
+        return format_suggestion(start_lat, start_lon, None, None)
     else:
         logging.info("hack worked, found bid %s" % orig_bus_details["alias"])
 
     alt_sugg_list = get_potential_suggestions(orig_bus_details)
     fill_distances(start_lat, start_lon, alt_sugg_list)
-    final_sugg, final_mode = get_selected_suggestion_and_mode(alt_sugg_list,
-        distance_in_miles)
+    final_sugg = get_selected_suggestion(alt_sugg_list, distance_in_miles)
 
-    logging.info("For %s, found suggestion %s with mode %s" %
-        (orig_bus_details["alias"],
-            final_sugg["bdetails"]["alias"] if final_sugg is not None else None,
-            final_mode))
-
-    return format_suggestion(start_lat, start_lon, orig_bus_details,
-                             final_sugg, final_mode)
+    return format_suggestion(start_lat, start_lon, orig_bus_details, final_sugg)
 
 #
 # Returns a list of potential suggestions. Each entry is a {"bdetails":
@@ -474,25 +467,32 @@ def fill_distances(start_lat, start_lon, sugg_list):
 # Every single check in here currently checks for calculate_distance <
 # distance_in_miles so theoretically, we could introduce a separate filter step
 # before this and simplify this function even further. But since
-# `get_selected_suggestion_and_mode` is under active development, I will leave
+# `get_selected_suggestion` is under active development, I will leave
 # it unchanged
 # Don't need any try/catch blocks here because we have them in the preceding functions
 
-def get_selected_suggestion_and_mode(sugg_list, distance_in_miles):
+def get_selected_suggestion(sugg_list, distance_in_miles):
     for sugg_obj in sugg_list:
         calculate_distance = sugg_obj["alt_distance"]
         #Will check which mode the trip was taking for the integrated calculate yelp suggestion
         if calculate_distance < distance_in_miles and calculate_distance < 5 and calculate_distance >= 1:
-            return (sugg_obj, 'bike')
+            sugg_obj['mode'] = 'bike'
+            return sugg_obj
         elif calculate_distance < distance_in_miles and calculate_distance < 1:
-            return (sugg_obj, 'walk')
+            sugg_obj['mode'] = 'walk'
+            return sugg_obj
         elif calculate_distance < distance_in_miles and calculate_distance >= 5 and calculate_distance <= 15:
-            return (sugg_obj, 'public')
-    return (None, 'public')
+            sugg_obj['mode'] = 'public'
+            return sugg_obj
+    return None
 
 def format_suggestion(start_lat, start_lon, orig_bus_details,
-                      alt_sugg, alt_mode):
+                      alt_sugg):
     if alt_sugg is None:
+        if orig_bus_details is None:
+            logging.info("No dest business -> no suggestion")
+        else:
+            logging.info("For %s, found no suggestion" % (orig_bus_details["alias"]))
         return {
             'message': 'Sorry, unable to retrieve datapoint because datapoint is a house or datapoint does not belong in service categories',
             'question': None,
@@ -502,6 +502,8 @@ def format_suggestion(start_lat, start_lon, orig_bus_details,
             'businessid': None
         }
     else:
+        logging.info("For %s, found suggestion %s with mode %s" %
+            (orig_bus_details["alias"], alt_sugg["bdetails"]["alias"], alt_sugg["mode"]))
         begin_string_address, begin_address_dict = return_address_from_location_nominatim(start_lat, start_lon)
         # TODO: Can't we just use the business name here directly instead of an
         # address. Seems like that will be a lot more meaningful to people
@@ -511,7 +513,7 @@ def format_suggestion(start_lat, start_lon, orig_bus_details,
             'message': 'We saw that you took a vehicle from '+begin_string_address
                 + ' to '+ end_string_address,
             'suggested_loc': 'Instead, there is '+ alt_bus_details['name']+' which has better reviews and is closer to your starting point',
-            'method': alt_mode,
+            'method': alt_sugg["mode"],
             'rating': alt_bus_details['rating'],
             'businessid': alt_bus_details['alias']
         }
