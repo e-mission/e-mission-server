@@ -221,64 +221,6 @@ def find_destination_business(lat, lon):
         return return_tuple
 
 
-### BEGIN: Pulled out candidate functions so that we can evaluate individual accuracies
-def category_of_business_awesome(lat, lon):
-    return []
-
-def category_from_name(business_name):
-    categories = []
-    for c in business_reviews(YELP_API_KEY, business_name.replace(' ', '-') + '-' + city)['categories']:
-        categories.append(c['alias'])
-    return categories
-
-def category_from_address(address):
-    categories = []
-    possible_bus = match_business_address(address)["businesses"][0]
-    possible_categ = possible_bus["categories"]
-    for p in possible_categ:
-        categories.append(p["alias"])
-    return categories
-### END: Pulled out candidate functions so that we can evaluate individual accuracies
-
-### BEGIN: Wrappers for the candidate functions to make them callable from the harness
-### We do not want to use them in the combination function directly because that will
-### result in two separate calls to `find_destination_business`
-def category_from_name_wrapper(lat, lon):
-    business_name, address, city, location_is_service = find_destination_business(lat, lon)
-    if not location_is_service:
-        return []
-
-    if business_name is None:
-        return []
-
-    return category_from_name(business_name)
-
-def category_from_address_wrapper(lat, lon):
-    business_name, address, city, location_is_service = find_destination_business(lat, lon)
-    if not location_is_service:
-        return []
-
-    return category_from_address(address)
-### END: Wrappers for the candidate functions to make them callable from the harness
-
-## Current combination of candidate functions;
-## First try name, and if it fails, fall back to address
-## Is that the right approach?
-def category_of_business_nominatim(lat, lon):
-    try:
-        business_name, address, city, location_is_service = find_destination_business(lat, lon)
-        if not location_is_service:
-            return []
-
-        categories = []
-        if business_name is not None:
-            return category_from_name(business_name)
-        else:
-            return category_from_address(address)
-    except:
-        raise ValueError("Something went wrong")
-
-
 '''
 Function that RETURNS distance between addresses
 '''
