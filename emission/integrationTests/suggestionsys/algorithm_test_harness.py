@@ -69,7 +69,7 @@ def test_calculate_yelp_server_suggestion_for_locations(cfn, params, exp_output,
     distance_in_meters = distance_in_miles / 0.000621371
     logging.debug("distance in meters = %s" % distance_in_meters)
     # calculation function expects distance in meters
-    result = cfn(start_loc, end_loc, distance_in_meters)
+    result = cfn(noisy_start_loc, noisy_end_loc, distance_in_meters)
     return result.get('businessid', None) == exp_output
 
 def test_single_instance(test_fn, cfn, instance, noise_in_meters):
