@@ -31,9 +31,11 @@ def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
     overpass_public_transit_query_template = query_string
     overpass_query = overpass_public_transit_query_template.format(bbox=bbox_string)
     response = requests.post("http://overpass-api.de/api/interpreter", data=overpass_query)
-    # the next 2 lines don't prevent the pipeline to crash when response is none
-    # the problem should be solved. Cf. https://github.com/e-mission/e-mission-docs/issues/398
-    if response == None or response.json() == None:
+    # the next 2 lines prevent the pipeline to crash when response is none
+    # Cf. https://github.com/e-mission/e-mission-docs/issues/398
+    if response == None:
+        return []
+    if response.json() == None:
         return []
     all_results = response.json()["elements"]
     relations = [ad.AttrDict(r) for r in all_results if r["type"] == "relation" and r["tags"]["type"] == "route"]
