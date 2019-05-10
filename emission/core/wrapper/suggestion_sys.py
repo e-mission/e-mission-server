@@ -65,12 +65,12 @@ def request(host, path, api_key, url_params=None):
         HTTPError: An error occurs from the HTTP request.
     """
     url_params = url_params or {}
-    url = '{0}{1}'.format(host, quote(path.encode('utf8')))
+    url = '{0}{1}'.format(host, path)
     headers = {
         'Authorization': 'Bearer %s' % api_key,
     }
 
-    # print(u'Querying {0} ...'.format(url))
+    # print('Querying {0} ...'.format(url))
 
     response = requests.request('GET', url, headers=headers, params=url_params)
     return response.json()
@@ -120,21 +120,6 @@ def business_reviews(api_key, business_id):
     business_path = BUSINESS_PATH + business_id
 
     return request(API_HOST, business_path, api_key)
-
-"""
-YELP API: Returns the title of the business category in the API call
-"""
-def title_of_category(json_file):
-    return json_file["categories"][0]["title"]
-
-"""
-YELP API: Obtains the business ID through latitude, longitude
-"""
-def get_business_id(api_key, lat, lon):
-    url_params = {
-        'location': lat + ',' + lon
-    }
-    return request(API_HOST, SEARCH_PATH, api_key, url_params=url_params)
 
 """
 NOMINATIM API: Creates a Nominatim API Call, returns address in string form and dictionary form separated by streetname,
@@ -208,18 +193,9 @@ def find_destination_business_nominatim(lat, lon):
     string_address, address_dict = return_address_from_location_nominatim(lat, lon)
     business_key = list(address_dict.keys())[0]
     business_name = address_dict[business_key]
-    try:
-        city = address_dict['city']
-    except:
-        try:
-            city = address_dict["town"]
-        except:
-            try:
-                zipcode = address_dict["postcode"]
-                city = zipcode_to_city(zipcode)
-            except:
-                city = ''
-
+    city = get_city_from_address(address_dict)
+    if city is None:
+        city = ''
     return (business_name, string_address, city,
         (not is_service_nominatim(business_name)))
 ### END: Pulled out candidate functions so that we can evaluate individual accuracies
@@ -418,8 +394,7 @@ require which city (city name) it is in order to look for other similar categori
 in the area. Thus, this function takes in the INPUT of a zipcode, and RETURNS the name of the city.
 
 '''
-def zipcode_retrieval(zipcode):
-
+def zipcode_to_city(zipcode):
     # Use this API key first.
     url = ZIP_HOST_URL + ZIPCODE_API_KEY + ZIP_FORMAT + zipcode + ZIP_DEGREE
     response = requests.request('GET', url=url)
@@ -429,15 +404,23 @@ def zipcode_retrieval(zipcode):
         # In case the first API key runs out of requests per hour.
         url = ZIP_HOST_URL + BACKUP_ZIP_KEY + ZIP_FORMAT + zipcode + ZIP_DEGREE
         response = requests.request('GET', url=url)
-        return response.json()
+        response_json = response.json()
+        return response_json["city"]
     else:
-        return results
+        return None
 
+def get_city_from_address(address_dict):
+    if "city" in address_dict:
+        return address_dict["city"]
+    if "town" in address_dict:
+        return address_dict["town"]
 
+    # Falling back to zipcode
+    zipcode = address_dict["postcode"]
+    city = zipcode_to_city(zipcode)
+    # Note that `zipcode_to_city` returns None if the result is not json
+    return city
 
-def zipcode_to_city(zipcode):
-    response = zipcode_retrieval(zipcode)
-    return response['city']
 '''
 NOMINATIM
 In progress-nominatim yelp server suggestion function, first just trying to make end-to-end work before robustifying this function.
@@ -480,25 +463,15 @@ def calculate_yelp_server_suggestion_for_locations(start_location, end_location,
     distance_in_miles = distance * 0.000621371
     start_lat, start_lon = geojson_to_lat_lon_separated(start_location)
     end_lat, end_lon = geojson_to_lat_lon_separated(end_location)
+
     endpoint_categories = category_of_business_nominatim(end_lat, end_lon)
     business_locations = {}
 
-
     begin_string_address, begin_address_dict = return_address_from_location_nominatim(start_lat, start_lon)
     end_string_address, end_address_dict = return_address_from_location_nominatim(end_lat, end_lon)
-    try:
-        city = end_address_dict["city"]
-    except:
-        try:
-            # To classify cities as towns, as some locations only appear as "TOWN" to nominatim
-            city = end_address_dict["town"]
-        except:
-            try:
-                # To classify cities through zipcode, as some locations only appear as "POSTCODE", so convert postcode to city
-                zipcode = end_address_dict["postcode"]
-                city = zipcode_to_city(zipcode)
-            except:
-                return {'message' : 'Sorry, the most recent trip was unable to be detected as to which city.', 'method': 'bike'}
+    city = get_city_from_address(end_address_dict)
+    if city is None:
+        return {'message' : 'Sorry, the most recent trip was unable to be detected as to which city.', 'method': 'bike'}
     address = end_string_address
     start_lat_lon = start_lat + "," + start_lon
     end_lat_lon = end_lat + "," + end_lon
