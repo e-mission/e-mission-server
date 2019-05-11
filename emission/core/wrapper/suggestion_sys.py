@@ -383,15 +383,12 @@ def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripidstr):
     return suggestion_result
 
 def calculate_yelp_server_suggestion_for_locations(start_location, end_location, distance):
-    distance_in_miles = distance * 0.000621371
-    start_lat, start_lon = geojson_to_lat_lon_separated(start_location)
     end_lat, end_lon = geojson_to_lat_lon_separated(end_location)
-
     orig_end_business_details = find_destination_business_yelp(end_lat, end_lon)
     logging.debug("orig_end_business_details = %s " % str(orig_end_business_details))
     if not orig_end_business_details[-1]:
         # This is not a service, so we bail right now
-        return format_suggestion(start_lat, start_lon, None, None)
+        return format_suggestion(0, 0, None, None)
     business_name = orig_end_business_details[0].lower()
     city = orig_end_business_details[2].lower()
     orig_end_bid_hack = business_name.replace(' ', '-') + '-' + city.replace(' ', '-')
@@ -401,9 +398,18 @@ def calculate_yelp_server_suggestion_for_locations(start_location, end_location,
         # this is a corner case anyway since we should be able to return the bid
         # from the query too
         logging.info("hack for %s did not work, skipping suggestion" % orig_end_bid_hack)
-        return format_suggestion(start_lat, start_lon, None, None)
+        return format_suggestion(0, 0, None, None)
     else:
         logging.info("hack worked, found bid %s" % orig_bus_details["alias"])
+    return calculate_yelp_server_suggestion_for_business(start_location, orig_bus_details, distance)
+
+def calculate_yelp_server_suggestion_for_bid(start_location, orig_bid, distance):
+    orig_bus_details = business_details(YELP_API_KEY, orig_bid)
+    return calculate_yelp_server_suggestion_for_business(start_location, orig_bus_details, distance)
+
+def calculate_yelp_server_suggestion_for_business(start_location, orig_bus_details, distance):
+    distance_in_miles = distance * 0.000621371
+    start_lat, start_lon = geojson_to_lat_lon_separated(start_location)
 
     alt_sugg_list = get_potential_suggestions(orig_bus_details)
     fill_distances(start_lat, start_lon, alt_sugg_list)
