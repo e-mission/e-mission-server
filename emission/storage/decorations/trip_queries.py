@@ -106,4 +106,4 @@ def get_user_input_from_cache_series(user_id, trip_obj, user_input_key):
     most_recent_entry = potential_candidates[-1]
     logging.debug("most recent entry has id %s" % most_recent_entry["_id"])
     logging.debug("and is mapped to entry %s" % most_recent_entry)
-    return most_recent_entry
+    return ecwe.Entry(most_recent_entry)
