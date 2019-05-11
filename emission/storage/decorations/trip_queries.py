@@ -15,6 +15,7 @@ import emission.core.wrapper.rawtrip as ecwrt
 import emission.core.wrapper.entry as ecwe
 
 import emission.storage.timeseries.abstract_timeseries as esta
+import emission.storage.timeseries.cache_series as estsc
 import emission.storage.decorations.timeline as esdt
 import emission.storage.decorations.analysis_timeseries_queries as esda
 
@@ -90,3 +91,19 @@ def get_user_input_for_trip_object(ts, trip_obj, user_input_key):
     ret_val = ts.get_entry_from_id(user_input_key, most_recent_entry_id)
     logging.debug("and is mapped to entry %s" % ret_val)
     return ret_val
+
+# This is almost an exact copy of get_user_input_for_trip_object, but it
+# retrieves an interable instead of a dataframe. So almost everything is
+# different and it is hard to unify the implementations. Switching the existing
+# function from get_data_df to find_entries may help us unify in the future
+
+def get_user_input_from_cache_series(user_id, trip_obj, user_input_key):
+    tq = estt.TimeQuery("data.start_ts", trip_obj.data.start_ts, trip_obj.data.end_ts)
+    potential_candidates = estsc.find_entries(user_id, [user_input_key], tq)
+    if len(potential_candidates) == 0:
+        return None
+    sorted_pc = sorted(potential_candidates, key=lambda c:c["metadata"]["write_ts"])
+    most_recent_entry = potential_candidates[-1]
+    logging.debug("most recent entry has id %s" % most_recent_entry["_id"])
+    logging.debug("and is mapped to entry %s" % most_recent_entry)
+    return most_recent_entry
