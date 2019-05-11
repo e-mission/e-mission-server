@@ -140,7 +140,7 @@ class TestTripQueries(unittest.TestCase):
 
         # WHen there is only one input, it is roller_blading
         self.assertEqual(new_mce, user_input)
-        self.assertEqual(ecwe.Entry(user_input).data.label, 'roller_blading')
+        self.assertEqual(user_input.data.label, 'roller_blading')
 
         new_mc["label"] = 'pogo_sticking'
 
@@ -153,7 +153,7 @@ class TestTripQueries(unittest.TestCase):
 
         # When it is overridden, it is pogo sticking
         self.assertEqual(new_mce, user_input)
-        self.assertEqual(ecwe.Entry(user_input).data.label, 'pogo_sticking')
+        self.assertEqual(user_input.data.label, 'pogo_sticking')
 
 
     def testUserInputForTripTwoInput(self):
