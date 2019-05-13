@@ -8,11 +8,13 @@ import logging
 import re
 
 import emission.storage.timeseries.abstract_timeseries as esta
+import emission.storage.decorations.trip_queries as esdt
 import argparse
 import pprint
 import requests
 import os
 import emission.net.ext_service.geocoder.nominatim as geo
+import emission.core.wrapper.entry as ecwe
 import bson
 
 # Yelp Fusion no longer uses OAuth as of December 7, 2017.
@@ -366,18 +368,25 @@ def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripidstr):
     user_id = uuid
     tripid = bson.objectid.ObjectId(tripidstr)
     timeseries = esta.TimeSeries.get_time_series(user_id)
-    cleaned_trips = timeseries.get_entry_from_id("analysis/cleaned_trip", tripid)
+    cleaned_trip = timeseries.get_entry_from_id("analysis/cleaned_trip", tripid)
     '''
     Used the abstract time series method, wanted to make sure this was what you were asking for
     '''
-    start_location = cleaned_trips.data.start_loc
-    end_location = cleaned_trips.data.end_loc
+    start_location = cleaned_trip.data.start_loc
+    end_location = cleaned_trip.data.end_loc
     '''
     Distance in miles because the current calculated distances is through MapQuest which uses miles,
     still working on changing those functions, because haven't found any functions through nominatim
     that calculates distance between points.
     '''
-    suggestion_result = calculate_yelp_server_suggestion_for_locations(start_location, end_location, cleaned_trips.data.distance)
+    dest_confirmed_object = esdt.get_user_input_from_cache_series(user_id,
+        cleaned_trip, "manual/destination_confirm")
+    if dest_confirmed_object is None:
+        logging.info("Trip destination is not confirmed, suggestion cannot be generated")
+        return format_suggestion(0, 0, None, None)
+    logging.info("Trip destination confirmed, bid = %s" % dest_confirmed_object.data.label)
+    suggestion_result = calculate_yelp_server_suggestion_for_bid(start_location,
+        dest_confirmed_object.data.label, cleaned_trip.data.distance)
     # we could fill in the tripid here as well since we know it, but we weren't doing it before,
     # so let's not mess it up
     return suggestion_result
@@ -527,8 +536,7 @@ def format_suggestion(start_lat, start_lon, orig_bus_details,
 def calculate_yelp_server_suggestion_nominatim(uuid):
     user_id = uuid
     time_series = esta.TimeSeries.get_time_series(user_id)
-    cleaned_trips = time_series.get_data_df("analysis/cleaned_trip", time_query = None)
-    real_cleaned_sections = time_series.get_data_df("analysis/inferred_section", time_query = None)
+    cleaned_trips = [ecwe.Entry(e) for e in time_series.find_entries(["analysis/cleaned_trip"], time_query = None)]
     # modes_from_trips = {}
     section_counter = 0
     # for i in range(len(cleaned_trips)):
@@ -537,10 +545,22 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
         return_obj['message'] = 'Suggestions will appear once you start taking trips!'
         return return_obj
     for i in range(len(cleaned_trips) - 1, -1, -1):
-        distance_in_miles = cleaned_trips.iloc[i]["distance"] * 0.000621371
+        curr_eval_trip = cleaned_trips[i]
+        distance_in_miles = curr_eval_trip.data.distance * 0.000621371
         # mode = modes_from_trips[i]
-        start_lat, start_lon = geojson_to_lat_lon_separated(cleaned_trips.iloc[i]["start_loc"])
-        end_lat, end_lon = geojson_to_lat_lon_separated(cleaned_trips.iloc[i]["end_loc"])
-        suggestion_result = calculate_yelp_server_suggestion_for_locations(cleaned_trips.iloc[i]["start_loc"], cleaned_trips.iloc[i]["end_loc"], cleaned_trips.iloc[i]["distance"])
-        suggestion_result['tripid'] = cleaned_trips.iloc[i]["_id"]
+        dest_confirmed_object = esdt.get_user_input_from_cache_series(user_id,
+            curr_eval_trip, "manual/destination_confirm")
+        if dest_confirmed_object is None:
+            logging.info("Trip destination is not confirmed, suggestion cannot be generated")
+            continue
+        logging.info("Trip destination confirmed, bid = %s" % dest_confirmed_object.data.label)
+        suggestion_result = calculate_yelp_server_suggestion_for_bid(curr_eval_trip.data.start_loc, dest_confirmed_object.data.label, curr_eval_trip.data.distance)
+        logging.debug("suggestion_result = %s" % suggestion_result)
+        if suggestion_result["businessid"] is None:
+            logging.info("No suggestion generated for bid = %s, continuing" % dest_confirmed_object.data.label)
+            continue
+
+        logging.info("Found valid suggestion %s for %s, returning" %
+            (suggestion_result["businessid"], dest_confirmed_object.data.label))
+        suggestion_result['tripid'] = curr_eval_trip.get_id()
         return suggestion_result
