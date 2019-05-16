@@ -33,6 +33,12 @@ def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
     overpass_query = overpass_public_transit_query_template.format(bbox=bbox_string)
     response = requests.post("http://overpass-api.de/api/interpreter", data=overpass_query)
 
+    # if response == None:
+    #     return []
+    # if response.json() == None:
+    #     return []
+    # all_results = response.json()["elements"]
+
     try:
         all_results = response.json()["elements"]
     except json.decoder.JSONDecodeError as e:
