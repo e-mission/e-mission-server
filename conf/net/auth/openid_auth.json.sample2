@@ -1,0 +1,4 @@
+{
+  "discoveryURI" : "https://id.indie.host/auth/realms/fabmob-io/",
+  "clientID": "traceur"
+}
