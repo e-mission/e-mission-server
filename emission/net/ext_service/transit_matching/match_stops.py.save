@@ -31,10 +31,7 @@ def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
     overpass_public_transit_query_template = query_string
     overpass_query = overpass_public_transit_query_template.format(bbox=bbox_string)
     response = requests.post("http://overpass-api.de/api/interpreter", data=overpass_query)
-    # 2 lines above : a way to solve e-mission-docs/issue/398 ?
-    if response == None:
-        return []
-    if response.json() == None:
+    if response == None or response.json() == None:
         return []
     all_results = response.json()["elements"]
     relations = [ad.AttrDict(r) for r in all_results if r["type"] == "relation" and r["tags"]["type"] == "route"]
@@ -94,7 +91,7 @@ def get_predicted_transit_mode(start_stops, end_stops):
         return [rim.tags.route for rim in rel_id_matches]
 
     # Did not find matching routes. Let's see if stops are both "railway",
-    # if so, we can mark as TRAIN
+   # if so, we can mark as TRAIN
     # TODO: return more complex kinds of railways?
     p_start_train = ["railway" in s.tags for s in start_stops]
     p_end_train = ["railway" in s.tags for s in end_stops]

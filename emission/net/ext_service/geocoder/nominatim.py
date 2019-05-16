@@ -51,6 +51,7 @@ class Geocoder(object):
         request = urllib.request.Request(cls.make_url_geo(address))
         response = urllib.request.urlopen(request)
         jsn = json.loads(response.read())
+        logging.debug("For geocoding, parsed_response = %s" % jsn)
         return jsn
 
     @classmethod
@@ -84,7 +85,7 @@ class Geocoder(object):
         request = urllib.request.Request(cls.make_url_reverse(lat, lng))
         response = urllib.request.urlopen(request)
         parsed_response = json.loads(response.read())
-        logging.debug("parsed_response = %s" % parsed_response)
+        logging.debug("For reverse geocoding, parsed_response = %s" % parsed_response)
         return parsed_response
 
     @classmethod
