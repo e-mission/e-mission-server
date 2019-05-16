@@ -188,7 +188,7 @@ def collapse_modes(section_entry, modes):
     the GIS into one, potentially using speed information 
     """
     train_mode_list = ['funicular', 'miniature', 'rail', 'railway',
-        'light_rail', 'subway', 'monorail', 'tram', ]
+        'light_rail', 'subway', 'monorail', 'tram', 'aerialway', ]
 
     if modes is None or len(modes) == 0:
         return None
@@ -212,7 +212,7 @@ def collapse_modes(section_entry, modes):
         return unique_modes[0]
 
     assert sorted(unique_modes) == ['BUS', 'TRAIN'],\
-        "unique_modes = %s, but we support only two, [bus, train]" % unique_modes
+        "unique_modes = %s, but we support only two, [BUS, TRAIN]" % sorted(unique_modes)
    
     # could be either bus or train. Let's use the speed to decide
     # local bus speeds are pretty close to bike, which is why it is hard to

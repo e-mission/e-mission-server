@@ -7,6 +7,7 @@ import requests
 import attrdict as ad
 import itertools
 import copy
+import time
 
 try:
     config_file = open('conf/net/ext_service/overpass_server.json')
@@ -31,12 +32,17 @@ def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
     overpass_public_transit_query_template = query_string
     overpass_query = overpass_public_transit_query_template.format(bbox=bbox_string)
     response = requests.post("http://overpass-api.de/api/interpreter", data=overpass_query)
-    # 2 lines above : a way to solve e-mission-docs/issue/398 ?
-    if response == None:
-        return []
-    if response.json() == None:
-        return []
-    all_results = response.json()["elements"]
+
+    try:
+        all_results = response.json()["elements"]
+    except json.decoder.JSONDecodeError as e:
+        logging.info("Unable to decode response with status_code %s, text %s" %
+            (response.status_code, response.text))
+        time.sleep(5)
+        logging.info("Retrying after 5 second sleep")
+        response = requests.post("http://overpass-api.de/api/interpreter", data=overpass_query)
+        all_results = response.json()["elements"]
+
     relations = [ad.AttrDict(r) for r in all_results if r["type"] == "relation" and r["tags"]["type"] == "route"]
     logging.debug("Found %d relations with ids %s" % (len(relations), [r["id"] for r in relations]))
     stops = [ad.AttrDict(r) for r in all_results if r["type"] != "relation"]
@@ -160,7 +166,8 @@ def get_rel_id_match(p_start_routes, p_end_routes):
         for er in p_end_routes:
             if sr.id == er.id:
                 matching_routes.append(sr)
-    logging.debug("matching routes = %s" % [(r.id, r.tags.ref) for r in matching_routes])
+    logging.debug("matching routes = %s" % [(r.id,
+        r.tags.ref if "ref" in r.tags else r.tags.name) for r in matching_routes])
     return matching_routes
 
 def extract_routes(stop):
