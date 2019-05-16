@@ -75,6 +75,9 @@ class Entry(ecwb.WrapperBase):
             "manual/purpose_confirm": "userlabel",
             # user survey results. The survey results are a JSON blob
             "manual/survey": "survey",
+            # user confirmation of the destination (unsure how this will
+            # interact with purpose
+            "manual/destination_confirm": "userlabel",
             ### END: incoming data types ###
             ### BEGIN: analysis result data types ###
             ### ** BEGIN: objects generated after the initial segmentation step **
@@ -120,7 +123,7 @@ class Entry(ecwb.WrapperBase):
             "mode_inference/model": "modeinfermodel",
             # the predicted mode for a particular section
             "inference/prediction": "modeprediction",
-            # equivalent of cleaned_section, but with the mode set to the 
+            # equivalent of cleaned_section, but with the mode set to the
             # inferred mode instead of just walk/bike/motorized
             # used for consistency and to make the client work whether or not we were
             # running the inference step
@@ -142,7 +145,7 @@ class Entry(ecwb.WrapperBase):
   @staticmethod
   def create_fake_entry(user_id, key, data, write_ts, create_id=False):
       """Method used to create Synthetic entries"""
-      
+
       result_entry = Entry()
       result_entry['_id'] = boi.ObjectId()
       result_entry.user_id = user_id
