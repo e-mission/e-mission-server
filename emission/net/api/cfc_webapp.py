@@ -477,7 +477,8 @@ if __name__ == '__main__':
     # The selection of SSL versus non-SSL should really be done through a config
     # option and not through editing source code, so let's make this keyed off the
     # port number
-    if server_port == "443":
+    force_ssl = config_data["server"]['force_ssl'] == 'true' if 'force_ssl' in config_data["server"] else False
+    if server_port == "443" or force_ssl == True:
       # We support SSL and want to use it
       key_file = open('conf/net/keys.json')
       key_data = json.load(key_file)
