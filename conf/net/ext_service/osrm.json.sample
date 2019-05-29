@@ -1,0 +1,8 @@
+{
+    "routing_host": "Run your own server (following the instructions at http://project-osrm.org/) or use the limited use public server",
+    "paths": {
+        "CAR": "path that returns driving directions - e.g. routed-car/route/v1/driving",
+        "WALKING": "path that returns walking directions - e.g. routed-foot/route/v1/driving",
+        "BICYCLING": "path that returns biking directions - e.g. routed-bike/route/v1/driving"
+    }
+}
