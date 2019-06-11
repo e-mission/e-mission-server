@@ -23,7 +23,13 @@ def get_route(mode, waypoints, params):
     logging.debug("waypoints = %s..." % waypoints[0:3])
     route_coords_string = ";".join([",".join([str(lon), str(lat)]) for [lon, lat] in waypoints])
     logging.debug("route_coords_string = %s" % route_coords_string[0:30])
-    url_to_query = OSRM_HOST + "/" + OSRM_ROUTES[mode.name] + "/" + route_coords_string
+    # Now that we want to re-use this module outside of the e-mission server code
+    # the mode parameter can either be a PredictedModeTypes object or a string
+    # maybe eventually we can standardize on only a string, after we split apart
+    # the monolithic e-mission server into multiple modules
+    # but let us support both for now
+    mode_name = mode.name if "name" in mode else mode
+    url_to_query = OSRM_HOST + "/" + OSRM_ROUTES[mode_name] + "/" + route_coords_string
     response = requests.get(url_to_query, params=params)
     logging.debug("Call to URL %s returns %s" % (response.url, response))
     return response.json()
