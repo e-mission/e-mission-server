@@ -76,6 +76,10 @@ class Entry(ecwb.WrapperBase):
             # user confirmation of the destination (unsure how this will
             # interact with purpose
             "manual/destination_confirm": "userlabel",
+            # Evaluation configuration
+            "config/evaluation_spec": "userlabel",
+            # Evaluation start/stop times
+            "manual/evaluation_transition": "evaltransition",
             ### END: incoming data types ###
             ### BEGIN: analysis result data types ###
             ### ** BEGIN: objects generated after the initial segmentation step **
