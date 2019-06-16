@@ -380,7 +380,7 @@ def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripidstr):
     that calculates distance between points.
     '''
     dest_confirmed_object = esdt.get_user_input_from_cache_series(user_id,
-        cleaned_trip, "manual/destination_confirm")
+        cleaned_trip, "manual/mode_confirm")
     if dest_confirmed_object is None:
         logging.info("Trip destination is not confirmed, suggestion cannot be generated")
         return format_suggestion(0, 0, None, None)
