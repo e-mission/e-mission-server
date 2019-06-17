@@ -243,15 +243,13 @@ def putIntoCache():
 
 @post('/usercache/putone')
 def putIntoOneEntry():
-  logging.debug("Called userCache.putone with request %s" % request)
+  logging.debug("Called userCache.putone with request " % request)
   user_uuid=getUUID(request)
   logging.debug("user_uuid %s" % user_uuid)
   the_entry = request.json['the_entry']
-  logging.debug("About to save entry %s" % the_entry)
   # sync_phone_to_server requires a list, so we wrap our one entry in the list
   from_phone = [the_entry]
-  usercache.sync_phone_to_server(user_uuid, from_phone)
-  return {"putone": True}
+  return usercache.sync_phone_to_server(user_uuid, from_phone)
 
 @post('/timeline/getTrips/<day>')
 def getTrips(day):

@@ -8,13 +8,11 @@ import logging
 import re
 
 import emission.storage.timeseries.abstract_timeseries as esta
-import emission.storage.decorations.trip_queries as esdt
 import argparse
 import pprint
 import requests
 import os
 import emission.net.ext_service.geocoder.nominatim as geo
-import emission.core.wrapper.entry as ecwe
 import bson
 
 # Yelp Fusion no longer uses OAuth as of December 7, 2017.
@@ -140,6 +138,21 @@ def return_address_from_google_nomfile(lat, lon):
 
 
 '''
+GOOGLE API: Makes Google Maps API CALL to the domain and returns a list of candidate addresses given a latitude and longitude
+'''
+
+def return_address_from_google_candidates_nomfile(lat, lon):
+    return geo.return_list_of_addresses_from_location_google(lat, lon)
+
+'''
+GOOGLE API: (SAM) Makes Google Maps API CALL to the domain and returns a list of candidate addresses given a latitude and longitude
+'''
+
+def return_address_from_google_candidates_nomfile_sam(lat, lon):
+    return geo.businesses_nearby_google(lat, lon)
+
+
+'''
 YELP API: Function to find the business matching the address
 '''
 def match_business_address(address):
@@ -175,8 +188,11 @@ latitude and longitude given
 def find_destination_business_google(lat, lon):
     return return_address_from_google_nomfile(lat, lon)
 
+def find_candidates_business_google(lat, lon):
+    return return_address_from_google_candidates_nomfile_sam(lat, lon)
+
 def find_destination_business_yelp(lat, lon):
-    yelp_from_lat_lon = lat_lon_search(YELP_API_KEY, lat, lon, 250)
+    yelp_from_lat_lon = lat_lon_search(YELP_API_KEY, lat, lon, 350)
     if yelp_from_lat_lon == {}:
         return (None, None, None, False)
     businesses = yelp_from_lat_lon['businesses']
@@ -190,6 +206,25 @@ def find_destination_business_yelp(lat, lon):
     location_is_service = True
     print((business_name, address, city, location_is_service))
     return (business_name, address, city, location_is_service)
+
+def find_candidates_business_yelp(lat, lon):
+    yelp_from_lat_lon = lat_lon_search(YELP_API_KEY, lat, lon, 125)
+    if yelp_from_lat_lon == {}:
+        return (None, None, None, False)
+    businesses = yelp_from_lat_lon['businesses']
+    # if businesses == []:
+    #     return find_destination_business(lat, lon)
+    results = []
+    for b in businesses:
+        business_name = b['name']
+        address = b['location']['address1']
+        city = b['location']['city']
+        location_is_service = True
+        results.append([business_name, address, city, location_is_service])
+    return results
+
+
+
 
 def find_destination_business_nominatim(lat, lon):
     string_address, address_dict = return_address_from_location_nominatim(lat, lon)
@@ -226,6 +261,7 @@ def find_destination_business(lat, lon):
 '''
 Function that RETURNS distance between lat,lng pairs
 '''
+
 def distance(start_lat, start_lon, end_lat, end_lon):
 #     logging.debug("Calculating distance between %s %s %s %s of types %s %s %s %s" %
 #         (start_lat, start_lon, end_lat, end_lon,
@@ -237,6 +273,8 @@ def distance(start_lat, start_lon, end_lat, end_lon):
     response = requests.get(url)
     response_json = response.json()
 #     logging.debug("mapquest response = %s " % response_json)
+    print("distance")
+    print(response_json['route']['distance'])
     return response_json['route']['distance']
     # except:
     #     url = 'http://www.mapquestapi.com/directions/v2/route?key=' + BACKUP_MAPQUEST_KEY + '&from=' + address1 + '&to=' + address2
@@ -368,28 +406,80 @@ def calculate_yelp_server_suggestion_singletrip_nominatim(uuid, tripidstr):
     user_id = uuid
     tripid = bson.objectid.ObjectId(tripidstr)
     timeseries = esta.TimeSeries.get_time_series(user_id)
-    cleaned_trip = timeseries.get_entry_from_id("analysis/cleaned_trip", tripid)
+    cleaned_trips = timeseries.get_entry_from_id("analysis/cleaned_trip", tripid)
     '''
     Used the abstract time series method, wanted to make sure this was what you were asking for
     '''
-    start_location = cleaned_trip.data.start_loc
-    end_location = cleaned_trip.data.end_loc
+    start_location = cleaned_trips.data.start_loc
+    end_location = cleaned_trips.data.end_loc
     '''
     Distance in miles because the current calculated distances is through MapQuest which uses miles,
     still working on changing those functions, because haven't found any functions through nominatim
     that calculates distance between points.
     '''
-    dest_confirmed_object = esdt.get_user_input_from_cache_series(user_id,
-        cleaned_trip, "manual/destination_confirm")
-    if dest_confirmed_object is None:
-        logging.info("Trip destination is not confirmed, suggestion cannot be generated")
-        return format_suggestion(0, 0, None, None)
-    logging.info("Trip destination confirmed, bid = %s" % dest_confirmed_object.data.label)
-    suggestion_result = calculate_yelp_server_suggestion_for_bid(start_location,
-        dest_confirmed_object.data.label, cleaned_trip.data.distance)
+    suggestion_result = calculate_yelp_server_suggestion_for_locations(start_location, end_location, cleaned_trips.data.distance)
     # we could fill in the tripid here as well since we know it, but we weren't doing it before,
     # so let's not mess it up
     return suggestion_result
+
+
+def calculate_yelp_server_suggestion_for_locations_business_id(start_loc, end_id, given_distance):
+    distance_in_miles = given_distance * 0.000621371
+    start_lat, start_lon = geojson_to_lat_lon_separated(start_loc)
+    endpoint_categories = []
+    business_locations = {}
+    yelp_call = business_details(YELP_API_KEY, end_id)
+    categories_dict = yelp_call['categories']
+    for c in categories_dict:
+        endpoint_categories.append(c['alias'])
+    city = yelp_call['location']['city']
+    location_review = yelp_call['rating']
+    ratings_bus = {}
+    error_message = 'Sorry, unable to retrieve datapoint'
+    error_message_categor = 'Sorry, unable to retrieve datapoint because datapoint is a house or datapoint does not belong in service categories'
+
+    start_lat_lon = start_lat + "," + start_lon
+    try:
+        if (endpoint_categories):
+            for categor in endpoint_categories:
+                queried_bus = search(YELP_API_KEY, categor, city)['businesses']
+                for q in queried_bus:
+                    if q['rating'] >= location_review:
+                        #'Coordinates' come out as two elements, latitude and longitude
+                        ratings_bus[q['name']] = (q['rating'], q['alias'])
+                        obtained_lat = q['coordinates']['latitude'] 
+                        obtained_lon = q['coordinates']['longitude']
+                        obtained = str(obtained_lat) + ',' + str(obtained_lon)
+                        # obtained.replace(' ', '+')
+                        business_locations[q['alias']] = (obtained_lat, obtained_lon)
+        else:
+            return ''
+    except:
+        return ''
+    for a in business_locations:
+        try:     
+            calculate_distance = distance(str(start_lat), str(start_lon), str(business_locations[a][0]), str(business_locations[a][1]))
+        except:
+            continue
+        if calculate_distance < distance_in_miles and calculate_distance < 5 and calculate_distance >= 1:
+            try:
+                return a
+            except ValueError as e:
+                continue
+        elif calculate_distance < distance_in_miles and calculate_distance < 1:
+            try:
+                return a
+            except ValueError as e:
+                continue
+        elif calculate_distance < distance_in_miles and calculate_distance >= 5 and calculate_distance <= 15:
+            try:
+                return a
+            except ValueError as e:
+                continue
+
+    return ''
+
+
 
 def calculate_yelp_server_suggestion_for_locations(start_location, end_location, distance):
     end_lat, end_lon = geojson_to_lat_lon_separated(end_location)
@@ -536,7 +626,8 @@ def format_suggestion(start_lat, start_lon, orig_bus_details,
 def calculate_yelp_server_suggestion_nominatim(uuid):
     user_id = uuid
     time_series = esta.TimeSeries.get_time_series(user_id)
-    cleaned_trips = [ecwe.Entry(e) for e in time_series.find_entries(["analysis/cleaned_trip"], time_query = None)]
+    cleaned_trips = time_series.get_data_df("analysis/cleaned_trip", time_query = None)
+    real_cleaned_sections = time_series.get_data_df("analysis/inferred_section", time_query = None)
     # modes_from_trips = {}
     section_counter = 0
     # for i in range(len(cleaned_trips)):
@@ -545,22 +636,10 @@ def calculate_yelp_server_suggestion_nominatim(uuid):
         return_obj['message'] = 'Suggestions will appear once you start taking trips!'
         return return_obj
     for i in range(len(cleaned_trips) - 1, -1, -1):
-        curr_eval_trip = cleaned_trips[i]
-        distance_in_miles = curr_eval_trip.data.distance * 0.000621371
+        distance_in_miles = cleaned_trips.iloc[i]["distance"] * 0.000621371
         # mode = modes_from_trips[i]
-        dest_confirmed_object = esdt.get_user_input_from_cache_series(user_id,
-            curr_eval_trip, "manual/destination_confirm")
-        if dest_confirmed_object is None:
-            logging.info("Trip destination is not confirmed, suggestion cannot be generated")
-            continue
-        logging.info("Trip destination confirmed, bid = %s" % dest_confirmed_object.data.label)
-        suggestion_result = calculate_yelp_server_suggestion_for_bid(curr_eval_trip.data.start_loc, dest_confirmed_object.data.label, curr_eval_trip.data.distance)
-        logging.debug("suggestion_result = %s" % suggestion_result)
-        if suggestion_result["businessid"] is None:
-            logging.info("No suggestion generated for bid = %s, continuing" % dest_confirmed_object.data.label)
-            continue
-
-        logging.info("Found valid suggestion %s for %s, returning" %
-            (suggestion_result["businessid"], dest_confirmed_object.data.label))
-        suggestion_result['tripid'] = curr_eval_trip.get_id()
+        start_lat, start_lon = geojson_to_lat_lon_separated(cleaned_trips.iloc[i]["start_loc"])
+        end_lat, end_lon = geojson_to_lat_lon_separated(cleaned_trips.iloc[i]["end_loc"])
+        suggestion_result = calculate_yelp_server_suggestion_for_locations(cleaned_trips.iloc[i]["start_loc"], cleaned_trips.iloc[i]["end_loc"], cleaned_trips.iloc[i]["distance"])
+        suggestion_result['tripid'] = cleaned_trips.iloc[i]["_id"]
         return suggestion_result

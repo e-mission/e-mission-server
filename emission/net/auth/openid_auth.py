@@ -8,7 +8,6 @@ from builtins import *
 from builtins import object
 import urllib.request, urllib.parse, urllib.error, json
 import json
-import logging
 from jwcrypto import jwt, jwk
 
 
@@ -57,5 +56,5 @@ class OpenIDAuthMethod(object):
         logging.debug("decoded_json = %s" % decoded_json)
         self.__verify_claim__(decoded_json)
         email = decoded_json['email']
-        logging.debug("After verifying claim, returning valid email = %s" % email)
+        logging.debug("After verifying claim, returning valid email = " % email)
         return email
