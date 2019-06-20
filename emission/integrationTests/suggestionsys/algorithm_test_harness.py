@@ -56,16 +56,31 @@ def test_find_destination_business(cfn, params, exp_output, noise_in_meters):
 
 def test_calculate_yelp_server_suggestion_for_locations(cfn, params, exp_output, noise_in_meters):
     noisy_start_loc = add_noise(params["start_loc"], noise_in_meters)
-    noisy_end_loc = add_noise(params["end_loc"], noise_in_meters)
-    noisy_start_lat, noisy_start_lng = sugg.geojson_to_lat_lon_separated(noisy_start_loc)
-    noisy_end_lat, noisy_end_lng = sugg.geojson_to_lat_lon_separated(noisy_end_loc)
-    distance_in_miles = sugg.distance(noisy_start_lat, noisy_start_lng,
-        noisy_end_lat, noisy_end_lng)
+    # # noisy_end_loc = add_noise(params["end_loc"], noise_in_meters)
+    # noisy_end_business = add_noise(params["end_business"], noise_in_meters)
+    noisy_end_business = params["end_business_id"]
+    # input_end_business = params["end_business"]
+    end_loc_coord = sugg.business_details(sugg.YELP_API_KEY, noisy_end_business)['coordinates']
+    end_loc_lat = end_loc_coord['latitude']
+    end_loc_lon = end_loc_coord['longitude']
+
+    noisy_end_loc = {'coordinates': [end_loc_lon, end_loc_lat]}
+    start_lat, start_lon = sugg.geojson_to_lat_lon_separated(noisy_start_loc)
+    end_lat, end_lon = sugg.geojson_to_lat_lon_separated(noisy_end_loc)
+
+    distance_in_miles = sugg.distance(start_lat, start_lon, end_lat, end_lon)
     distance_in_meters = distance_in_miles / 0.000621371
     logging.debug("distance in meters = %s" % distance_in_meters)
-    # calculation function expects distance in meters
-    result = cfn(noisy_start_loc, noisy_end_loc, distance_in_meters)
-    return result.get('businessid', None) == exp_output
+    # calculation function expects distance in meters  
+    result = cfn(noisy_start_loc, noisy_end_business, distance_in_meters)
+    if result == exp_output:
+        logging.debug("found match! name = %s, comparing with %s" %
+                (result, exp_output))
+        return True
+    else:
+        logging.debug("no match! name = %s, comparing with %s" %
+                (result, exp_output))
+        return False
 
 def test_single_instance(test_fn, cfn, instance, noise_in_meters):
     logging.debug("-----" + instance["test_name"] + "------")
@@ -94,7 +109,7 @@ CANDIDATE_ALGORITHMS = {
         sugg.find_destination_business
     ],
     "calculate_yelp_server_suggestion_for_locations": [
-        sugg.calculate_yelp_server_suggestion_for_locations
+        sugg.calculate_yelp_server_suggestion_for_bid
     ]
 }
 
