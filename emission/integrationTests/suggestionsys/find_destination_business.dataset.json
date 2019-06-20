@@ -66,7 +66,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Captain Kidd’s Fish Market", "Captain Kidd’s Redondo Beach 4", "Captain Kidd's Fish Market & Restaurant"]
+        "output": ["Captain Kidd’s Fish Market", "Captain Kidd’s Redondo Beach 4"]
     },
 
      {
@@ -81,18 +81,6 @@
         "output": ["Mira Costa High School", "Mira Costa High School Manhattan Beach"]
     },
 
-    {
-        "test_name": "El Segundo High School",
-        "test_type": "Local public school in Los Angeles County",
-        "input": {
-            "loc": {
-                "coordinates": [-118.4141835, 33.9245280],
-                "type": "Point"
-            }
-        },
-        "output": ["El Segundo High School", "El Segundo High School El Segundo"]
-    },
-
      {
         "test_name": "Torrance Black Bear Diner",
         "test_type": "Small diner in LA County",
@@ -102,7 +90,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Black Bear Diner", "Black Bear Diner Torrance", "Torrance Black Bear Diner"]
+        "output": ["Black Bear Diner", "Black Bear Diner Torrance"]
     },
 
      {
@@ -126,8 +114,8 @@
                 "type": "Point"
             }
         },
-        "output": ["Torrance Memorial Medical Center", "Torrance Memorial Medical Center Torrance", "Surgery Center of South Bay"]
-    },
+        "output": ["Torrance Memorial Medical Center", "Torrance Memorial Medical Center Torrance"]
+    }, 
     {
         "test_name": "Walmart Supercenter",
         "test_type": "Suburban big box store by itself in a plaza",
@@ -137,9 +125,9 @@
                 "type": "Point"
             }
         },
-        "output": ["Walmart Supercenter", "Walmart Supercenter Milpitas", "Walmart Photo Center"]
-    },
-    {
+        "output": ["Walmart Supercenter", "Walmart Supercenter Milpitas"]
+    }, 
+    {   
         "test_name": "Loving Hut",
         "test_type": "Restaurant in a large plaza with other restaurants",
         "input": {
@@ -181,7 +169,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Bank of America", "Bank of America Milpitas", "Bank of America Financial Center"]
+        "output": ["Bank of America", "Bank of America Milpitas"]
     },
     {
         "test_name": "Chevron Milpitas",
@@ -203,8 +191,8 @@
                 "type": "Point"
             }
         },
-        "output": ["Costco", "Costco Richmond", "Costco Bakery"]
-    },
+        "output": ["Costco", "Costco Richmond"]
+    }, 
     {
         "test_name": "Layang Layang",
         "test_type": "A restaurant in a plaza with Save Marts",
@@ -214,8 +202,8 @@
                 "type": "Point"
             }
         },
-        "output": ["Layang Layang", "Layang Layang Milpitas", "Layang Layang Malaysian Cuisine"]
-    },
+        "output": ["Layang Layang", "Layang Layang Milpitas"]
+    }, 
     {
         "test_name": "Kaiser Permanente Pediatrics Building",
         "test_type": "Clinic next to a road",
@@ -248,7 +236,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Northbrook Village Hall", "Village Hall Northbrook", "Northbrook Village Hall", "northbrook Village hall"]
+        "output": ["Northbrook Village Hall", "Village Hall Northbrook"]
     },
 
     {
@@ -344,7 +332,7 @@
                 "type": "Point"
             }
         },
-        "output": ["Art Institute's Gardens", "Art Institute of Chicago Chicago 3", "The Art Institute of Chicago", "Art Institute of Chicago"]
+        "output": ["Art Institute's Gardens", "Art Institute of Chicago Chicago 3"]
     },
 
     {
