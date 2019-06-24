@@ -56,10 +56,7 @@ def test_find_destination_business(cfn, params, exp_output, noise_in_meters):
 
 def test_calculate_yelp_server_suggestion_for_locations(cfn, params, exp_output, noise_in_meters):
     noisy_start_loc = add_noise(params["start_loc"], noise_in_meters)
-    # # noisy_end_loc = add_noise(params["end_loc"], noise_in_meters)
-    # noisy_end_business = add_noise(params["end_business"], noise_in_meters)
     noisy_end_business = params["end_business_id"]
-    # input_end_business = params["end_business"]
     end_loc_coord = sugg.business_details(sugg.YELP_API_KEY, noisy_end_business)['coordinates']
     end_loc_lat = end_loc_coord['latitude']
     end_loc_lon = end_loc_coord['longitude']
@@ -73,13 +70,13 @@ def test_calculate_yelp_server_suggestion_for_locations(cfn, params, exp_output,
     logging.debug("distance in meters = %s" % distance_in_meters)
     # calculation function expects distance in meters  
     result = cfn(noisy_start_loc, noisy_end_business, distance_in_meters)
-    if result == exp_output:
+    if result['businessid'] == exp_output:
         logging.debug("found match! name = %s, comparing with %s" %
-                (result, exp_output))
+                (result['businessid'], exp_output))
         return True
     else:
         logging.debug("no match! name = %s, comparing with %s" %
-                (result, exp_output))
+                (result['businessid'], exp_output))
         return False
 
 def test_single_instance(test_fn, cfn, instance, noise_in_meters):

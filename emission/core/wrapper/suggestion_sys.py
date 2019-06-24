@@ -129,7 +129,7 @@ NOMINATIM API: Creates a Nominatim API Call, returns address in string form and 
 """
 def return_address_from_location_nominatim(lat, lon):
     geocode_obj = geo.Geocoder()
-    return geocode_obj.reverse_geocode(lat, lon)
+    return geocode_obj.reverse_geocode(float(lat), float(lon))
 
 '''
 GOOGLE API: Makes Google Maps API CALL to the domain and returns address given a latitude and longitude
@@ -519,14 +519,19 @@ def format_suggestion(start_lat, start_lon, orig_bus_details,
     else:
         logging.info("For %s, found suggestion %s with mode %s" %
             (orig_bus_details["alias"], alt_sugg["bdetails"]["alias"], alt_sugg["mode"]))
-        begin_string_address, begin_address_dict = return_address_from_location_nominatim(start_lat, start_lon)
+        try:
+            print(return_address_from_location_nominatim(start_lat, start_lon))
+            begin_string_address, begin_address_dict = return_address_from_location_nominatim(start_lat, start_lon)
+        except: 
+            begin_string_address = return_address_from_location_nominatim(start_lat, start_lon)
         # TODO: Can't we just use the business name here directly instead of an
         # address. Seems like that will be a lot more meaningful to people
         end_string_address = " ".join(orig_bus_details["location"]["display_address"])
+        print(end_string_address)
         alt_bus_details = alt_sugg["bdetails"]
         return {
-            'message': 'We saw that you took a vehicle from '+begin_string_address
-                + ' to '+ end_string_address,
+            'message': 'We saw that you took a vehicle from '+ str(begin_string_address)
+                + ' to '+ str(end_string_address),
             'suggested_loc': 'Instead, there is '+ alt_bus_details['name']+' which has better reviews and is closer to your starting point',
             'method': alt_sugg["mode"],
             'rating': alt_bus_details['rating'],

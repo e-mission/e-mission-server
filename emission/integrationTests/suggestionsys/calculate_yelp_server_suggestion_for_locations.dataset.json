@@ -22,7 +22,7 @@
             },
             "end_business_id": "the-italian-homemade-company-berkeley-3"
         },
-        "output": "gypsys-trattoria-italiano-berkeley-2"
+        "output": "gypsys-trattoria-italiana-berkeley-2"
     }
 ,
     {
@@ -74,7 +74,7 @@
             },
             "end_business_id": "san-francisco-international-airport-sfo-san-francisco-3"
         },
-        "output": ""
+        "output": "None"
     }
 ,
     {
@@ -87,7 +87,7 @@
             },
             "end_business_id": "the-house-san-francisco"
         },
-        "output": ""
+        "output": "None"
     }
 ,
     {
@@ -139,7 +139,7 @@
             },
             "end_business_id": "o-hair-park-novato"
         },
-        "output": "willard-park-berkeley"
+        "output": "None"
     }
 ,
     {
@@ -152,7 +152,7 @@
             },
             "end_business_id": "novato-unified-school-district-novato"
         },
-        "output": ""
+        "output": "None"
     }
 ,
    {
@@ -230,7 +230,7 @@
             },
             "end_business_id": "play-and-learn-pre-school-petaluma"
         },
-        "output": ""
+        "output": "None"
     }
 ,
     {
@@ -269,7 +269,7 @@
             },
             "end_business_id": "petaluma-community-acupuncture-petaluma"
         },
-        "output": ""
+        "output": "None"
     }
 ,
     {
@@ -482,7 +482,7 @@
             },
             "end_business_id" : "chase-bank-northbrook-2"
         },
-        "output": ""
+        "output": "None"
     }
 ,
     {
