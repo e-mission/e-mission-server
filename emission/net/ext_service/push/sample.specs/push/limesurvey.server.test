@@ -1,0 +1,14 @@
+{
+    "alert_type": "survey",
+    "title": "Avez-vous covoituré?",
+    "message": "2 questions - Approx. 1 min",
+    "image": "icon",
+    "force-start": 1,
+    "spec": {
+      "url": "https://loicmayol.limequery.com/886519",
+      "uuidElementId": "answer886519X3X3",
+      "type": "limesurvey",
+      "sid": "886519"
+    }
+}
+
