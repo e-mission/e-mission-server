@@ -17,9 +17,9 @@ angular.module('starter.heatmap', ['ui-leaflet', 'emission.plugin.logger',
         reuseTiles: true,
       },
       center: {
-        lat: 37.87269,
-        lng: -122.25921,
-        zoom: 15
+        lat: 48.8566969,
+        lng: 2.3514616,
+        zoom: 5
       }
     }
   });

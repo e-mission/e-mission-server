@@ -41,10 +41,13 @@ class Limesurvey(object):
 
     def add_participants_by_mail(self, survey_id, email_list):
         participant_list = []
+
         for email in email_list:
+            # Retrieve uuid and convert it in hex to use it as a LimeSurvey invitation token
             token = ecwu.User.fromEmail(email).uuid.hex
             participant_list.append({"email": email, "token": token})
         
+        # create_token_key = False to disable the automatic generation
         response = self.api.token.add_participants(survey_id=survey_id, 
                                                 participant_data=participant_list,
                                                 create_token_key=False)
@@ -56,6 +59,7 @@ class Limesurvey(object):
     
     def add_participants_by_uuid(self, survey_id, uuid_list):
         participant_list = []
+
         for uuid in uuid_list:
             token = uuid.hex
             email = ecwu.User.fromUUID(uuid)._User__email
@@ -85,3 +89,27 @@ class Limesurvey(object):
             else:
                 logging.warning("No participants found in %d" % survey_id)
             return []
+
+    def get_surveys_user(self, uuid):
+        uuid = uuid.hex
+        logging.debug("User token is %s" % uuid)
+        surveys = self.get_all_surveys()
+        user_surveys = []
+        survey_count = 0
+
+        for survey in surveys:
+            try:
+                result = self.api.token.list_participants(survey_id=survey["sid"], 
+                                                            attributes=["completed"], 
+                                                            conditions={"token":uuid})
+                user_surveys.append({"sid": survey["sid"], 
+                                        "title": survey["surveyls_title"], 
+                                        "expires": survey["expires"],
+                                        "active": survey["active"], 
+                                        "completed": result[0]["completed"]})
+                survey_count = survey_count + 1
+            except:
+                logging.warning("No %s in survey %s" % (uuid, survey['sid']))
+
+        logging.debug("User surveys are %s" % user_surveys)
+        return {"survey_count": survey_count, "surveys": user_surveys}
