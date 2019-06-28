@@ -87,9 +87,9 @@ class Limesurvey(object):
         except:
             response = self.api.token.get_summary(survey_id=survey_id)
             if response["token_count"] == response["token_completed"]:
-                logging.warning("Every participants as answered to %d" % survey_id)
+                logging.warning("Every participants has answered to %s" % survey_id)
             else:
-                logging.warning("No participants found in %d" % survey_id)
+                logging.warning("No participants found in %s" % survey_id)
             return []
 
     def get_surveys_user(self, uuid):
