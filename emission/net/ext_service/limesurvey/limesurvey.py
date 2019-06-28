@@ -8,6 +8,7 @@ from builtins import *
 import json
 import logging
 import importlib
+import time
 
 # Our imports
 from limesurveyrc2api.limesurvey import LimeSurvey
@@ -27,6 +28,7 @@ class Limesurvey(object):
         self.url = limesurvey_config["url"]
         self.username =  limesurvey_config["username"]
         self.password =  limesurvey_config["password"]
+        self.url_surveys = limesurvey_config["url_surveys"]
 
     def open_api(self):
         self.api = LimeSurvey(url=self.url, username=self.username)
@@ -45,7 +47,7 @@ class Limesurvey(object):
         for email in email_list:
             # Retrieve uuid and convert it in hex to use it as a LimeSurvey invitation token
             token = ecwu.User.fromEmail(email).uuid.hex
-            participant_list.append({"email": email, "token": token})
+            participant_list.append({"email": email, "token": token,"validfrom": time.strftime("%Y-%m-%d %H:%M",time.gmtime())})
         
         # create_token_key = False to disable the automatic generation
         response = self.api.token.add_participants(survey_id=survey_id, 
@@ -100,13 +102,18 @@ class Limesurvey(object):
         for survey in surveys:
             try:
                 result = self.api.token.list_participants(survey_id=survey["sid"], 
-                                                            attributes=["completed"], 
+                                                            attributes=["completed","validfrom"], 
                                                             conditions={"token":uuid})
+                
+                # URL to launch the survey when on the Surveys screen
+                url = self.url_surveys + survey["sid"] + "?token=" + uuid
                 user_surveys.append({"sid": survey["sid"], 
                                         "title": survey["surveyls_title"], 
                                         "expires": survey["expires"],
                                         "active": survey["active"], 
-                                        "completed": result[0]["completed"]})
+                                        "completed": result[0]["completed"],
+                                        "received": result[0]["validfrom"],
+                                        "url": url})
                 survey_count = survey_count + 1
             except:
                 logging.warning("No %s in survey %s" % (uuid, survey['sid']))
