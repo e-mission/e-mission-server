@@ -70,13 +70,13 @@ def test_calculate_yelp_server_suggestion_for_locations(cfn, params, exp_output,
     logging.debug("distance in meters = %s" % distance_in_meters)
     # calculation function expects distance in meters  
     result = cfn(noisy_start_loc, noisy_end_business, distance_in_meters)
-    if result['businessid'] == exp_output:
+    if str(result['businessid']) == exp_output:
         logging.debug("found match! name = %s, comparing with %s" %
-                (result['businessid'], exp_output))
+                (str(result['businessid']), exp_output))
         return True
     else:
         logging.debug("no match! name = %s, comparing with %s" %
-                (result['businessid'], exp_output))
+                (str(result['businessid']), exp_output))
         return False
 
 def test_single_instance(test_fn, cfn, instance, noise_in_meters):
