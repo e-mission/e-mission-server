@@ -7,7 +7,10 @@
                 "coordinates": [-122.0154871, 37.3635335],
                 "type": "Point"
             },
-            "end_business_id": "kohls-mountain-view-mountain-view-2"
+            "end_loc": {
+                "coordinates": [-122.1078300, 37.4035500],
+                "type": "Point"
+            }
         },
         "output": "target-sunnyvale-2"
     }
@@ -20,9 +23,12 @@
                 "coordinates": [-122.258042, 37.866615],
                 "type": "Point"
             },
-            "end_business_id": "the-italian-homemade-company-berkeley-3"
+            "end_loc": {
+                "coordinates": [-122.252844, 37.858179],
+                "type": "Point"
+            }
         },
-        "output": "gypsys-trattoria-italiana-berkeley-2"
+        "output": "gypsys-trattoria-italiano-berkeley"
     }
 ,
     {
@@ -33,9 +39,12 @@
                 "coordinates": [-122.258042, 37.866615],
                 "type": "Point"
             },
-            "end_business_id": "jong-ga-house-oakland"
+            "end_loc": {
+                "coordinates": [-122.1078300, 37.4035500],
+                "type": "Point"
+            }
         },  
-        "output": "ohgane-korean-restaurant-oakland"
+        "output": "koja-kitchen-berkeley-2"
     }
 ,
     {
@@ -46,9 +55,12 @@
                 "coordinates": [-122.258042, 37.866615],
                 "type": "Point"
             },
-            "end_business_id": "tpumps-san-francisco"
+            "end_loc": {
+                "coordinates": [-122.478639, 37.763643],
+                "type": "Point"
+            }
         },
-        "output": "four-barrel-coffee-san-francisco"
+        "output": "yifang-taiwan-fruit-tea-berkeley-4"
     }
 ,
     {
@@ -59,7 +71,10 @@
                 "coordinates": [-122.258042, 37.866615],
                 "type": "Point"
             },
-            "end_business_id": "berkeley-bowl-west-berkeley-2"
+            "end_loc": {
+                "coordinates": [-122.290105, 37.853365],
+                "type": "Point"
+            }
         },
         "output": "whole-foods-market-berkeley-7"
     }
@@ -72,9 +87,12 @@
                 "coordinates": [-122.258042, 37.866615],
                 "type": "Point"
             },
-            "end_business_id": "san-francisco-international-airport-sfo-san-francisco-3"
+            "end_loc": {
+                "coordinates": [-122.391835, 37.618168],
+                "type": "Point"
+            }
         },
-        "output": "None"
+        "output": "oakland-international-airport-oakland-8"
     }
 ,
     {
@@ -85,9 +103,12 @@
                 "coordinates": [-122.258042, 37.866615],
                 "type": "Point"
             },
-            "end_business_id": "the-house-san-francisco"
+            "end_loc": {
+                "coordinates": [-122.469817, 37.779966],
+                "type": "Point"
+            }
         },
-        "output": "None"
+        "output": ""
     }
 ,
     {
@@ -98,9 +119,12 @@
                 "coordinates": [-122.469817, 37.779966],
                 "type": "Point"
             },
-            "end_business_id": "pho-k-and-k-berkeley"
+            "end_loc": {
+                "coordinates": [-122.258322, 37.864413],
+                "type": "Point"
+            }
         },
-        "output": "le-pho-berkeley-6"
+        "output": "cafe-bunn-mi-san-francisco"
     }
 ,
     {
@@ -111,9 +135,12 @@
                 "coordinates": [-122.469817, 37.779966],
                 "type": "Point"
             },
-            "end_business_id": "home-san-francisco-28"   
+            "end_loc": {
+                "coordinates": [-122.477261, 37.754091],
+                "type": "Point"
+            }
         },
-        "output": "rise-and-grind-coffee-and-tea-san-francisco"
+        "output": "schuberts-bakery-san-francisco"
     }
 ,
     {
@@ -124,7 +151,10 @@
                 "coordinates": [-122.258042, 37.866615],
                 "type": "Point"
             },
-            "end_business_id": "china-village-albany-3"     
+            "end_loc": {
+                "coordinates": [-122.291228, 37.890835],
+                "type": "Point"
+            }
         },
         "output": "chengdu-style-restaurant-berkeley"
     }
@@ -137,9 +167,12 @@
                 "coordinates": [-122.258042, 37.866615],
                 "type": "Point"
             },
-            "end_business_id": "o-hair-park-novato"
+            "end_loc": {
+                "coordinates": [-122.619220, 38.116237],
+                "type": "Point"
+            }
         },
-        "output": "None"
+        "output": "willard-park-berkeley"
     }
 ,
     {
@@ -150,352 +183,12 @@
                 "coordinates": [-122.258042, 37.866615],
                 "type": "Point"
             },
-            "end_business_id": "novato-unified-school-district-novato"
-        },
-        "output": "None"
-    }
-,
-   {
-        "test_name": "Martinez -> Ohana Family BBQ",
-        "test_type": "From urban residential area (Channing and Telegraph) to suburban Hawaiian Restaurant in strip mall",
-        "input": {
-            "start_loc": {
-                "coordinates": [-122.258042, 37.866615],
+            "end_loc": {
+                "coordinates": [-122.578671, 38.109495],
                 "type": "Point"
-            },
-            "end_business_id": "ohana-hawaiian-bbq-petaluma"
+            }
         },
-        "output": "matiki-island-bbq-and-brew-berkeley-4"
+        "output": "willard-middle-school-berkeley"
     }
-,
-    {
-        "test_name": "Martinez -> Michaels Petaluma",
-        "test_type": "From urban residential area (Channing and Telegraph) to suburban arts supplies in strip mall",
-        "input": {
-            "start_loc": {
-                "coordinates": [-122.258042, 37.866615],
-                "type": "Point"
-            },
-            "end_business_id": "michaels-petaluma-2"
-        },
-        "output": "the-ink-stone-berkeley"
-    }
-,
-    {
-        "test_name": "Martinez -> FedEX Print",
-        "test_type": "From urban residential area (Channing and Telegraph) to suburban print and sign shop in strip mall",
-        "input": {
-            "start_loc": {
-                "coordinates": [-122.258042, 37.866615],
-                "type": "Point"
-            },
-            "end_business_id": "fedex-office-print-and-ship-center-petaluma-2"
-        },
-        "output": "zee-zee-copy-berkeley"
-    }
-,
-    {
-        "test_name": "Martinez -> Planet Fitness Rohnert Park",
-        "test_type": "From urban residential area (Channing and Telegraph) to suburban gym in strip mall",
-        "input": {
-            "start_loc": {
-                "coordinates": [-122.258042, 37.866615],
-                "type": "Point"
-            },
-            "end_business_id": "planet-fitness-rohnert-park-rohnert-park"
-        },
-        "output": "equinox-berkeley-berkeley-2"
-    }
-,
-    {
-        "test_name": "Martinez -> Cottage Gardens",
-        "test_type": "From urban residential area (Channing and Telegraph) to rural garden store",
-        "input": {
-            "start_loc": {
-                "coordinates": [-122.258042, 37.866615],
-                "type": "Point"
-            },
-            "end_business_id": "cottage-gardens-of-petaluma-petaluma"
-        },
-        "output": "east-bay-nursery-berkeley"
-    }
-,   
-    {
-        "test_name": "Martinez -> Play n Learn Petaluma",
-        "test_type": "From urban residential area (Channing and Telegraph) to suburban child care center next to park",
-        "input": {
-            "start_loc": {
-                "coordinates": [-122.258042, 37.866615],
-                "type": "Point"
-            },
-            "end_business_id": "play-and-learn-pre-school-petaluma"
-        },
-        "output": "None"
-    }
-,
-    {
-        "test_name": "Martinez -> Dick's SPorting",
-        "test_type": "From urban residential area (Channing and Telegraph) to suburban sports good store in strip mall",
-        "input": {
-            "start_loc": {
-                "coordinates": [-122.258042, 37.866615],
-                "type": "Point"
-            },
-            "end_business_id": "dicks-sporting-goods-petaluma"
-        },
-        "output": "berkeley-sports-berkeley"
-    }
-,
-    {
-        "test_name": "Martinez -> Tea Room Petaluma",
-        "test_type": "From urban residential area (Channing and Telegraph) to suburban downtown tea room",
-        "input": {
-            "start_loc": {
-                "coordinates": [-122.258042, 37.866615],
-                "type": "Point"
-            },
-            "end_business_id": "tea-room-cafe-petaluma-4"
-        },
-        "output": "sodoi-coffee-tasting-house-berkeley-2"
-    }
-,   
-    {
-        "test_name": "Martinez -> Petaluma Accupuncture",
-        "test_type": "From urban residential area (Channing and Telegraph) to suburban downtown accupuncture clinic",
-        "input": {
-            "start_loc": {
-                "coordinates": [-122.258042, 37.866615],
-                "type": "Point"
-            },
-            "end_business_id": "petaluma-community-acupuncture-petaluma"
-        },
-        "output": "None"
-    }
-,
-    {
-        "test_name": "Martinez -> Main Street Computer Repair",
-        "test_type": "From urban residential area (Channing and Telegraph) to suburban downtown computer repair shop",
-        "input": {
-            "start_loc": {
-                "coordinates": [-122.258042, 37.866615],
-                "type": "Point"
-            },
-            "end_business_id": "main-street-computer-store-petaluma"
-        },
-        "output": "computerland-of-berkeley-berkeley-4"
-    }
-,
-    {
-        "test_name": "99 Ranch Market -> Jang Su Jang",
-        "test_type": "From super market to another plaza with a Korean BBQ restaurant",
-        "input": {
-            "start_loc": {
-                "coordinates": [-121.9168968, 37.4227499],
-                "type": "Point"
-            },
-            "end_business_id": "jang-su-jang-milpitas-3"
-        },
-        "output": "pinoy-bbq-atbp-milpitas"
-    }
-,
-    {
-        "test_name": "99 Ranch Market -> Layang Layang",
-        "test_type": "From super market to a Malaysian cuisine restaurant",
-        "input": {
-            "start_loc": {
-                "coordinates": [-121.9168968, 37.4227499],
-                "type": "Point"
-            },
-            "end_business_id": "layang-layang-milpitas"
-        },
-        "output": "banana-leaf-restaurant-milpitas"
-    }
-, 
-    {
-        "test_name": "Bank of America -> Lucky",
-        "test_type": "From a bank in a suburban area to a grocery store",
-        "input": {
-            "start_loc": {
-                "coordinates": [-121.893570078292, 37.4330339],
-                "type": "Point"
-            },
-            "end_business_id": "lucky-milpitas-3"
-        },
-        "output": "safeway-milpitas"
-    }
-,
-    {
-        "test_name": "Bank of America -> T4",
-        "test_type": "From a bank in a suburban area to a boba shop in another plaza",
-        "input": {
-            "start_loc": {
-                "coordinates": [-121.893570078292, 37.4330339],
-                "type": "Point"
-            },
-            "end_business_id": "t4-milpitas"
-        },
-        "output": "kokoro-ramen-milpitas"
-    }
-, 
-    {
-        "test_name": "Bank of America -> Black Angus",
-        "test_type": "From a bank in a suburban area to a traditional American restaurant in Union city",
-        "input": {
-            "start_loc": {
-                "coordinates": [-121.893570078292, 37.4330339],
-                "type": "Point"
-            },
-            "end_business_id": "black-angus-steakhouse-milpitas"
-        },
-        "output": "red-lobster-milpitas"
-    }
-,
-    {
-        "test_name": "Milpitas High School -> Sally's Beauty Salon",
-        "test_type": "From a high school in the suburbs to a hair salon",
-        "input": {
-            "start_loc": {
-                "coordinates": [-121.902181662713, 37.4505958],
-                "type": "Point"
-            },
-            "end_business_id": "sally-beauty-salon-milpitas"
-        },
-        "output": "simple-hair-milpitas"
-    }
-,
-    {
-        "test_name": "Milpitas High School -> ShengKee Bakery",
-        "test_type": "From a high school in the suburbs to a bakery in a plaza",
-        "input": {
-            "start_loc": {
-                "coordinates": [-121.902181662713, 37.4505958],
-                "type": "Point"
-            },
-            "end_business_id": "sheng-kee-bakery-milpitas-2"
-        },
-        "output": "meka-bakery-milpitas-2"
-    }
-,
-    {
-        "test_name": "Illinois Institute of Art -> Goddess and the Baker",
-        "test_type": "From Chicago-based Illinois Institute of Art to a Cafe",
-        "input": {
-            "start_loc": {
-                "coordinates": [-87.6266294, 41.8854453],
-                "type": "Point"
-            },
-            "end_business_id": "goddess-and-the-baker-chicago"
-            
-        },
-        "output": "argo-tea-chicago-28"
-    }
-,
-    {
-        "test_name": "Wood Oaks Junior High School -> California Pizza Kitchen",
-        "test_type": "From a middle school to California Pizza Kitchen in a Shopping Mall",
-        "input": {
-            "start_loc": {
-                "coordinates": [-87.8807004, 42.1289512],
-                "type": "Point"
-            },
-            "end_business_id": "california-pizza-kitchen-at-northbrook-court-northbrook-3"
-            
-        
-        },
-        "output": "lou-malnatis-pizzeria-northbrook-2"
-    }
-,
-    {
-        "test_name": "Davis CTA Station -> Lou Malnati's",
-        "test_type": "From a CTA Station to the best deep dish restaurant in the Chicagoland area",
-        "input": {
-            "start_loc": {
-                "coordinates": [-87.6834458, 42.0478385],
-                "type": "Point"
-            },
-            "end_business_id": "lou-malnatis-pizzeria-evanston-2"
-            
-        
-        },
-        "output": "papa-johns-pizza-evanston-2"
-    }
-,
-    {
-        "test_name": "CVS Pharmacy -> Bangers and Lace",
-        "test_type": "From CVS Pharmacy to a bar",
-        "input": {
-            "start_loc": {
-                "coordinates": [-87.6815653, 42.0489605],
-                "type": "Point"
-            },
-            "end_business_id": "bangers-and-lace-evanston-evanston-3"
-        },
-        "output": "celtic-knot-public-house-evanston"
-    }
-,
-    {
-        "test_name": "Gioradano's -> Jimmy John's",
-        "test_type": "From a pizza place to a bus stop in Evanston near Northwestern's campus",
-        "input": {
-            "start_loc": {
-                "coordinates": [-87.6795324, 42.0460200],
-                "type": "Point"
-            },
-            "end_business_id": "jimmy-johns-evanston"
-        },
-        "output": "soulwich-evanston"
-    }
-,
-    {
-        "test_name": "Apartment Building -> LA Fitness",
-        "test_type": "From a randomly chosen apartment to an LA Fitness in downtown Evanston",
-        "input": {
-            "start_loc": {
-                "coordinates": [-87.6823290, 42.0498415],
-                "type": "Point"
-            },
-            "end_business_id" : "la-fitness-evanston"
-        },
-        "output": "evanston-athletic-club-evanston"
-    }
-,
-    {
-        "test_name": "Walgreens -> Potbelly's Sandwich Shop",
-        "test_type": "From a pharmacy to one of the best fast food sandwich shops out there",
-        "input": {
-            "start_loc": {
-                "coordinates": [-87.6247427, 41.8830264],
-                "type": "Point"
-            },
-            "end_business_id": "potbelly-sandwich-shop-chicago-3"
-        },
-        "output": "subway-chicago"
-    }
-,
-    {
-        "test_name": "Chicago Architecture Foundation -> Chase Bank Northbrook",
-        "test_type": "From an architecture foundation in downtown Chicago to a Chase in the north suburbs",
-        "input": {
-            "start_loc": {
-                "coordinates": [-87.6247942, 41.8784582],
-                "type": "Point"
-            },
-            "end_business_id" : "chase-bank-northbrook-2"
-        },
-        "output": "None"
-    }
-,
-    {
-        "test_name": "Chase Bank Northbrook -> Trader Joe's in Lincoln Park",
-        "test_type": "From a Chase Bank in the North Suburbs to a grocery store in Chicago",
-        "input": {
-            "start_loc": {
-                "coordinates": [-87.8264886, 42.1307608],
-                "type": "Point"
-            },
-            "end_business_id": "trader-joes-chicago-5"
-        },
-        "output": "sunset-foods-northbrook"
-    }
-
 ]
+
