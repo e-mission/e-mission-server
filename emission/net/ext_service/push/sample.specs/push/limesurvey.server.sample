@@ -1,0 +1,14 @@
+{
+    "alert_type": "survey",
+    "title": "Avez-vous covoituré ?",
+    "message": "3 questions - Approx. 1 min",
+    "image": "icon",
+    "force-start": 1,
+    "spec": {
+      "url": "https://fabmob.grfmap.com/limesurvey/index.php/964722",
+      "uuidElementId": "answer886519X3X3",
+      "type": "limesurvey",
+      "sid": "964722"
+    }
+}
+
