@@ -2,18 +2,18 @@
 	"radius" : ".1",
 	"starting centroids" :
 	{
-		"2703 Hallmark Dr Belmont Ca" : 100,
-		"ATT Park" : 20, 
-		"Skyline County Park Napa, CA" : 10, 
+		"2703 Hallmark Dr Belmont" : 100,
+		"AT&T Park" : 20, 
+		"Skyline Wilderness Park" : 10, 
 		"UC Berkeley" : 50
 
 	},
 	"ending centroids" :
 	{
-		"Skyline County Park Napa, CA" : 10,
-		"ATT Park" : 100, 
+		"Skyline Wilderness Park" : 10,
+		"AT&T Park" : 100, 
 		"UC Berkeley" : 75,
-		"2703 Hallmark Dr Belmont Ca" : 100
+		"2703 Hallmark Dr Belmont" : 100
 
 	},
 	"modes" : 

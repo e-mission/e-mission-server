@@ -1,0 +1,36 @@
+{
+            "email" : "fake_user_129",
+
+            "locations" :
+            [
+               {
+                    "label": "home",
+                    "coordinate": [37.77264255,-122.399714854263]
+                },
+
+                {
+                    "label": "work",
+                    "coordinate": [37.42870635,-122.140926605802]
+                },
+                {
+                    "label": "family",
+                    "coordinate": [37.87119, -122.27388]
+                }
+            ],
+            "transition_probabilities":
+            [
+                [0.32833882, 0.06245342, 0.60920776],
+                [0.57634164, 0.20089474, 0.22276363],
+                [0.85068322, 0.07665405, 0.07266273]
+            ],
+
+            "modes" :
+            {
+                "CAR" : [["home", "family"]],
+                "TRANSIT" : [["home", "work"], ["work", "home"]]
+            },
+
+            "default_mode": "CAR",
+            "initial_state" : "home",
+            "radius" : ".1"
+}
