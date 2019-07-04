@@ -78,13 +78,12 @@ def segment_current_trips(user_id):
         logging.info("%s" % out_of_order_points)
         # drop from the table
         loc_df = loc_df.drop(out_of_order_points.index.tolist())
-        # delete from the database. Should be generally discouraged, so we
-        # are kindof putting it in here secretively
-        import emission.core.get_database as edb
-
+        loc_df.reset_index(inplace=True)
+        # invalidate in the database.
         out_of_order_id_list = out_of_order_points["_id"].tolist()
         logging.debug("out_of_order_id_list = %s" % out_of_order_id_list)
-        edb.get_timeseries_db().remove({"_id": {"$in": out_of_order_id_list}})
+        for ooid in out_of_order_id_list:
+            ts.invalidate_raw_entry(ooid)
 
     filters_in_df = loc_df["filter"].dropna().unique()
     logging.debug("Filters in the dataframe = %s" % filters_in_df)
@@ -129,9 +128,26 @@ def get_combined_segmentation_points(ts, loc_df, time_query, filters_in_df, filt
     That might be the easier option after all
     """
     segmentation_map = {}
+    initEndTs = time_query.endTs
+   
+    # This assumes that there is only one transition in the time range that we
+    # are considering 
+    # dist -> time -> dist won't work because `loc_df[loc_df["filter"] ==
+    # curr_filter]` will span multiple ranges 
+    # also, since we use transitions in the segmentation now, it is not
+    # sufficient to stop at the end of the location df. We need to end the
+    # query at the next point if one exists, or at now if it doesn't
     for curr_filter in filters_in_df:
-        time_query.startTs = loc_df[loc_df["filter"] == curr_filter].head(1).iloc[0].ts
-        time_query.endTs = loc_df[loc_df["filter"] == curr_filter].tail(1).iloc[0].ts
+        curr_filter_loc_index = loc_df[loc_df["filter"] == curr_filter].index
+        startIndex = curr_filter_loc_index[0]
+        time_query.startTs = loc_df.iloc[startIndex].ts
+        endIndex = curr_filter_loc_index[-1]
+        if endIndex == len(loc_df) - 1:
+            logging.debug("filter %s ends at index = %s when len = %s, using initEndTs %s ..." % (curr_filter, endIndex, len(loc_df), initEndTs))
+            time_query.endTs = initEndTs
+        else:
+            logging.debug("filter %s ends at index = %s when len = %s, using index %s ..." % (curr_filter, endIndex, len(loc_df), initEndTs))
+            time_query.endTs = loc_df.iloc[endIndex+1].ts
         logging.debug("for filter %s, startTs = %d and endTs = %d" %
             (curr_filter, time_query.startTs, time_query.endTs))
         segmentation_map[time_query.startTs] = filter_methods[curr_filter].segment_into_trips(ts, time_query)

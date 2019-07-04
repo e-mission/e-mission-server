@@ -17,9 +17,39 @@ import argparse
 import uuid
 import arrow
 
-import emission.analysis.classification.inference.mode.pipeline as eacimp
+import emission.analysis.classification.inference.mode.reset as eacimr
 import emission.core.get_database as edb
 import emission.storage.decorations.user_queries as esdu
+import emission.core.wrapper.user as ecwu
+
+def _get_user_list(args):
+    if args.all:
+        return _find_all_users()
+    elif args.platform:
+        return _find_platform_users(args.platform)
+    elif args.email_list:
+        return _email_2_user_list(args.email_list)
+    else:
+        assert args.user_list is not None
+        return [uuid.UUID(u) for u in args.user_list]
+
+def _find_platform_users(platform):
+    # Since all new clients register a profile with the server, we don't have
+    # to run a 'distinct' query over the entire contents of the timeseries.
+    # Instead, we can simply query from the profile users, which is
+    # significantly faster
+    # Use the commented out line instead for better performance.
+    # Soon, we can move to the more performant option, because there will be
+    # no users that don't have a profile
+    # return edb.get_timeseries_db().find({'metadata.platform': platform}).distinct(
+    #    'user_id')
+   return edb.get_profile_db().find({"curr_platform": platform}).distinct("user_id")
+
+def _find_all_users():
+   return esdu.get_all_uuids()
+
+def _email_2_user_list(email_list):
+    return [ecwu.User.fromEmail(e).uuid for e in email_list]
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
@@ -47,14 +77,14 @@ if __name__ == '__main__':
     # Handle the first row in the table
     if args.date is None:
         if args.all:
-            eacimp.del_all_objects(args.dry_run)
+            eacimr.del_all_objects(args.dry_run)
         else:
             user_list = _get_user_list(args)
             logging.info("received list with %s users" % user_list)
             logging.info("first few entries are %s" % user_list[0:5])
             for user_id in user_list:
                 logging.info("resetting user %s to start" % user_id)
-                eacimp.del_objects_after(user_id, 0, args.dry_run)
+                eacimr.del_objects_after(user_id, 0, args.dry_run)
     else:
     # Handle the second row in the table
         day_dt = arrow.get(args.date, "YYYY-MM-DD")
@@ -66,5 +96,5 @@ if __name__ == '__main__':
         logging.info("first few entries are %s" % user_list[0:5])
         for user_id in user_list:
             logging.info("resetting user %s to ts %s" % (user_id, day_ts))
-            eacimp.del_objects_after(user_id, day_ts, args.dry_run)
+            eacimr.del_objects_after(user_id, day_ts, args.dry_run)
 

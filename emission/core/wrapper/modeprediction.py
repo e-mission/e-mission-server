@@ -12,6 +12,7 @@ class AlgorithmTypes(enum.Enum):
 
     '''
     SEED_RANDOM_FOREST = 1
+    SIMPLE_RULE_ENGINE = 2
 
 class PredictedModeTypes(enum.Enum):
     UNKNOWN = 0

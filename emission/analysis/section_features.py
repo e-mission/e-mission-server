@@ -428,7 +428,8 @@ def select_inferred_mode(prediction_list):
     # We currently only support a single prediction
     assert(len(prediction_list) == 1)
     curr_prediction = prediction_list[0]
-    assert(curr_prediction.algorithm_id == ecwm.AlgorithmTypes.SEED_RANDOM_FOREST)
+    assert curr_prediction.algorithm_id == ecwm.AlgorithmTypes.SEED_RANDOM_FOREST or \
+            curr_prediction.algorithm_id == ecwm.AlgorithmTypes.SIMPLE_RULE_ENGINE
    
     prediction_map = curr_prediction["predicted_mode_map"]
     max_value = max(prediction_map.values())
