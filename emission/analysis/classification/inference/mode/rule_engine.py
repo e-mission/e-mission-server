@@ -188,7 +188,7 @@ def collapse_modes(section_entry, modes):
     the GIS into one, potentially using speed information 
     """
     train_mode_list = ['funicular', 'miniature', 'rail', 'railway',
-        'light_rail', 'subway', 'monorail', 'tram', 'aerialway', ]
+        'light_rail', 'subway', 'monorail', 'tram', 'aerialway', 'tracks',]
 
     if modes is None or len(modes) == 0:
         return None
