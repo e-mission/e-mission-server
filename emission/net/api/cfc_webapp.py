@@ -53,6 +53,7 @@ import emission.storage.timeseries.aggregate_timeseries as estag
 import emission.storage.timeseries.cache_series as esdc
 import emission.core.timer as ect
 import emission.core.get_database as edb
+import emission.net.ext_service.limesurvey.limesurvey as LimeSurvey
 
 try:
     config_file = open('conf/net/api/webserver.conf')
@@ -294,6 +295,17 @@ def getUserProfile():
   user_uuid = getUUID(request)
   user = User.fromUUID(user_uuid)
   return user.getProfile()
+
+@post('/survey/get')
+def getUserSurveys():
+  logging.debug("Called getUserSurveys")
+  limesurvey = LimeSurvey.get_instance()
+  limesurvey.open_api()
+  user_uuid = getUUID(request)
+  logging.debug(user_uuid)
+  response = limesurvey.get_surveys_user(User.fromUUID(user_uuid).uuid)
+  limesurvey.close_api()
+  return response
 
 @post('/result/metrics/<time_type>')
 def summarize_metrics(time_type):

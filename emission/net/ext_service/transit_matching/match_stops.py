@@ -47,7 +47,18 @@ def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
         time.sleep(5)
         logging.info("Retrying after 5 second sleep")
         response = requests.post("http://overpass-api.de/api/interpreter", data=overpass_query)
+    try:
         all_results = response.json()["elements"]
+    except json.decoder.JSONDecodeError as e:
+        logging.info("Unable to decode response with status_code %s, text %s" %
+            (response.status_code, response.text))
+        time.sleep(25)
+        logging.info("Retrying after 25 second sleep")
+        response = requests.post("http://overpass-api.de/api/interpreter", data=overpass_query)
+        if response.status_code == 429:
+            all_results = []
+        else:
+            all_results = response.json()["elements"]
 
     relations = [ad.AttrDict(r) for r in all_results if r["type"] == "relation" and r["tags"]["type"] == "route"]
     logging.debug("Found %d relations with ids %s" % (len(relations), [r["id"] for r in relations]))

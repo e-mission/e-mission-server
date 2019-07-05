@@ -1,0 +1,6 @@
+{
+    "url": "RemoteControl API URL", 
+    "username": "Admin account of limesurvey",
+    "password": "password",
+    "url_surveys": "URL of the surveys"
+}
