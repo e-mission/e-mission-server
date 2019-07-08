@@ -65,7 +65,7 @@ class Limesurvey(object):
         for uuid in uuid_list:
             token = uuid.hex
             email = ecwu.User.fromUUID(uuid)._User__email
-            participant_list.append({"email": email, "token": token})
+            participant_list.append({"email": email, "token": token,"validfrom": time.strftime("%Y-%m-%d %H:%M",time.gmtime())}) 
         
         response = self.api.token.add_participants(survey_id=survey_id, 
                                                 participant_data=participant_list,
