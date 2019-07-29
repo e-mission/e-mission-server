@@ -5,6 +5,7 @@ import attrdict as ad
 import itertools
 import copy
 import time
+from collections import Counter
 
 try:
     config_file = open('conf/net/ext_service/overpass_server.json')
@@ -96,17 +97,28 @@ def get_predicted_transit_mode(start_stops, end_stops):
         return [rim.tags.route for rim in rel_id_matches]
 
     # Did not find matching routes. Let's see if stops are both "railway",
-    # if so, we can mark as TRAIN 
+    # if so, we can mark as TRAIN
     # TODO: return more complex kinds of railways?
-    p_start_train = ["railway" in s.tags for s in start_stops]
-    p_end_train = ["railway" in s.tags for s in end_stops]
-
-    logging.debug("len(start_train) = %s, len(end_train) = %s" % (
-        (len(p_start_train), len(p_end_train))))
-    if is_true(p_start_train) and is_true(p_end_train):
-        logging.debug("start and end are both TRAIN, returning TRAIN")
-        return ["TRAIN"]
-
+    p_start_train = [extract_railway_modes(s.tags) for s in start_stops]
+    p_start_train = Counter(itertools.chain.from_iterable(set(i) for i in p_start_train))
+    p_end_train = [extract_railway_modes(s.tags) for s in end_stops]
+    p_end_train = Counter(itertools.chain.from_iterable(set(i) for i in p_end_train))
+    logging.debug("len(start_train) = %d, len(end_train) = %d" %
+        (len(p_start_train), len(p_end_train)))
+    if len(p_start_train) > 0 and len(p_end_train) > 0:
+        p_start_max = p_start_train.most_common(1)[0][0]
+        p_end_max = p_end_train.most_common(1)[0][0]
+        if p_start_max is not None and p_start_max == p_end_max:
+            logging.debug("Start and end are both " + p_start_max + ", returning " + p_start_max)
+            return [p_start_max]
+    # p_start_train = ["railway" in s.tags for s in start_stops]
+    # p_end_train = ["railway" in s.tags for s in end_stops]
+    # print("len(start_train) = %s, len(end_train) = %s" % (
+    #     (len(p_start_train), len(p_end_train))))
+    # if is_true(p_start_train) and is_true(p_end_train):
+    #     logging.debug("start and end are both TRAIN, returning TRAIN")
+    #     return ["TRAIN"]
+    
     # Did not find matching routes. Let's see if any stops have a "highway" =
     # "bus_stop" tag
     is_bus_stop = lambda s: "highway" in s.tags and \
@@ -226,3 +238,18 @@ def validate_simple_bus_stops(p_start_stops, p_end_stops):
 
     logging.debug("Both side are dense, invalid bus stop")
     return False
+
+def extract_railway_modes(stop):
+    p_modes = []
+    if "railway" in stop:
+        if "subway" in stop:
+            p_modes.append("SUBWAY")
+        if "train" in stop:
+            p_modes.append("TRAIN")
+        if "tram" in stop:
+            p_modes.append("TRAM")
+
+    logging.debug("After extracting data from tags, potential modes = %s" %
+        [p for p in p_modes])
+
+    return p_modes

@@ -187,8 +187,10 @@ def collapse_modes(section_entry, modes):
     start and end points. This method merges the list of entries returned by
     the GIS into one, potentially using speed information 
     """
-    train_mode_list = ['funicular', 'miniature', 'rail', 'railway',
-        'light_rail', 'subway', 'monorail', 'tram', 'aerialway', ]
+    # train_mode_list = ['funicular', 'miniature', 'rail', 'railway',
+    #     'light_rail', 'subway', 'monorail', 'tram', 'aerialway', ]
+    train_mode_list = ['funicular', 'miniature', 'rail', 'railway', 'light_rail', 'monorail', 
+                'aerialway', ]
 
     if modes is None or len(modes) == 0:
         return None
@@ -211,8 +213,8 @@ def collapse_modes(section_entry, modes):
     if len(unique_modes) == 1:
         return unique_modes[0]
 
-    assert sorted(unique_modes) == ['BUS', 'TRAIN'],\
-        "unique_modes = %s, but we support only two, [BUS, TRAIN]" % sorted(unique_modes)
+    # assert sorted(unique_modes) == ['BUS', 'TRAIN'],\
+    #     "unique_modes = %s, but we support only two, [BUS, TRAIN]" % sorted(unique_modes)
    
     # could be either bus or train. Let's use the speed to decide
     # local bus speeds are pretty close to bike, which is why it is hard to
@@ -220,4 +222,9 @@ def collapse_modes(section_entry, modes):
     if eaid.is_bicycling_speed(pd.Series(section_entry.data["speeds"]).median()):
         return 'BUS'
     else:
-        return 'TRAIN'
+        return 'TRAIN'	        
+        # We only want to return a train modes there, so let's remove bus from the list
+        if 'BUS' in train_mapped_modes:
+            train_mapped_modes.remove("BUS")
+        logging.debug("Returning %s but could also be another train modes" % train_mapped_modes[0])
+        return train_mapped_modes[0]
