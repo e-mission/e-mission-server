@@ -131,7 +131,8 @@ def section_to_geojson(section, tl):
                                       digits=4):
             logging.info("section_location_array[-1].data.loc %s != section.data.end_loc %s even after df.ts fix, filling gap" % \
                     (section_location_entries[-1].data.loc, section.data.end_loc))
-            assert(False)
+            if eac.get_config()["output.conversion.validityAssertions"]:
+                assert(False)
             last_loc_doc = ts.get_entry_at_ts("background/filtered_location", "data.ts", section.data.end_ts)
             if last_loc_doc is None:
                 logging.warning("can't find entry to patch gap, leaving gap")
