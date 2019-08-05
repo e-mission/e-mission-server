@@ -8,6 +8,7 @@ import emission.core.common as ecc
 
 import emission.analysis.intake.cleaning.location_smoothing as eaicl
 import emission.analysis.intake.domain_assumptions as eaid
+import emission.analysis.config as eac
 
 @enum.unique
 class Direction(enum.Enum):
@@ -191,8 +192,11 @@ class FlipFlopDetection():
         the travel will be long enough that we will get at least a couple of
         activity points. It's not worth it otherwise
         """
-        assert (streak_start == streak_end) or (streak_start + 1 == streak_end), \
-            "1 flip check called with streak %d -> %d" % (streak_start, streak_end)
+        if not ((streak_start == streak_end) or (streak_start + 1 == streak_end)):
+            logging.error("1 flip check called with streak %d -> %d" % (streak_start, streak_end))
+            if eac.get_config()["intake.segmentation.section_segmentation.sectionValidityAssertions"]:
+                assert False
+
         start_change = self.motion_changes[streak_start]
         if not eaid.is_walking_type(start_change[0].type):
             logging.debug("single transition %s, not WALKING, merging" % start_change[0].type)
@@ -202,8 +206,11 @@ class FlipFlopDetection():
         return MergeResult.NONE()
 
     def check_no_location_walk(self, streak_start, streak_end):
-        assert (streak_start == streak_end) or (streak_start + 1 == streak_end), \
-            "1 flip check called with streak %d -> %d" % (streak_start, streak_end)
+        if not ((streak_start == streak_end) or (streak_start + 1 == streak_end)):
+            logging.error("1 flip check called with streak %d -> %d" % (streak_start, streak_end))
+            if eac.get_config()["intake.segmentation.section_segmentation.sectionValidityAssertions"]:
+                assert False
+
         ssm, sem = self.motion_changes[streak_start]
         streak_locs = self.seg_method.filter_points_for_range(
             self.seg_method.location_points, ssm, sem)
