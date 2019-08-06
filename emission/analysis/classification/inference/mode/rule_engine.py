@@ -190,7 +190,7 @@ def collapse_modes(section_entry, modes):
     # train_mode_list = ['funicular', 'miniature', 'rail', 'railway',
     #     'light_rail', 'subway', 'monorail', 'tram', 'aerialway', ]
     train_mode_list = ['funicular', 'miniature', 'rail', 'railway', 'light_rail', 'monorail', 
-                'aerialway', ]
+                'aerialway', 'tracks']
 
     if modes is None or len(modes) == 0:
         return None
