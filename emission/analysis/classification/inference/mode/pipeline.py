@@ -129,8 +129,11 @@ class ModeInferencePipeline:
         time_query=timerange)
     if (len(self.toPredictSections) == 0):
         logging.debug("len(toPredictSections) == 0, early return")
-        assert self.last_section_done is None, ("self.last_section_done == %s, expecting None" % \
-            self.last_section_done)
+        if self.last_section_done is not None:
+            logging.error("self.last_section_done == %s, expecting None" %
+                self.last_section_done)
+            if eac.get_config()["classification.validityAssertions"]:
+                assert False
         return None
 
     self.loadModelStage()
