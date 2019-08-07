@@ -1,6 +1,7 @@
 import logging
 import common
 import argparse
+import uuid
 import emission.core.wrapper.user as ecwu
 
 if __name__ == '__main__':
