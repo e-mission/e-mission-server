@@ -29,7 +29,7 @@ def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
     logging.debug("bbox_string = %s" % bbox_string)
     overpass_public_transit_query_template = query_string
     overpass_query = overpass_public_transit_query_template.format(bbox=bbox_string)
-    response = requests.post("http://overpass-api.de/api/interpreter", data=overpass_query)
+    response = requests.post(url + "api/interpreter", data=overpass_query)
     try:
         all_results = response.json()["elements"]
     except json.decoder.JSONDecodeError as e:
@@ -37,8 +37,42 @@ def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
             (response.status_code, response.text))
         time.sleep(5)
         logging.info("Retrying after 5 second sleep")
-        response = requests.post("http://overpass-api.de/api/interpreter", data=overpass_query)
+        response = requests.post(url + "api/interpreter", data=overpass_query)
+    try:
         all_results = response.json()["elements"]
+    except json.decoder.JSONDecodeError as e:
+        logging.info("Unable to decode response with status_code %s, text %s" %
+            (response.status_code, response.text))
+        if response.status_code == 429:
+            logging.info("Checking when a slot is available")
+            response = requests.get(url + "api/status")
+            status_string = response.text.split("\n")
+            try:
+                available_slots = int(status_string[3].split(" ")[0])
+                if available_slots > 0:
+                    logging.info("No need to wait")
+                    response = requests.post(url + "api/interpreter", data=overpass_query)
+                    all_results = response.json()["elements"]
+                # Some api/status returns 0 slots available and then when they will be available
+                elif available_slots == 0:
+                    min_waiting_time = min(int(status_string[4].split(" ")[5]), int(status_string[5].split(" ")[5]))
+                    time.sleep(min_waiting_time)
+                    logging.info("Retrying after " + str(min_waiting_time) +  " second sleep")
+                    response = requests.post(url + "api/interpreter", data=overpass_query)
+                    all_results = response.json()["elements"]
+            except ValueError as e:
+                # And some api/status directly returns when the slots will be available
+                try:
+                    min_waiting_time = min(int(status_string[3].split(" ")[5]), int(status_string[4].split(" ")[5]))
+                    time.sleep(min_waiting_time)
+                    logging.info("Retrying after " + str(min_waiting_time) +  " second sleep")
+                    response = requests.post(url + "api/interpreter", data=overpass_query)
+                    all_results = response.json()["elements"]
+                except ValueError as e:
+                    logging.info("Unable to find availables slots")
+                    all_results = []
+        else:
+            all_results = []
 
     relations = [ad.AttrDict(r) for r in all_results if r["type"] == "relation" and r["tags"]["type"] == "route"]
     logging.debug("Found %d relations with ids %s" % (len(relations), [r["id"] for r in relations]))
