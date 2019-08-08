@@ -41,8 +41,8 @@ def calSpeed(point1, point2):
             # Distance between points ... 59.8499494256
             # happens fairly frequently actually
             # https://github.com/e-mission/e-mission-server/issues/407#issuecomment-248974661
-            # logging.debug("Distance between points %s, %s is %s, although the time delta = 0" %
-            #     (point1, point2, distanceDelta))
+            logging.warning("Distance between points %s, %s is %s, although the time delta = 0" %
+                (point1, point2, distanceDelta))
             pass
             # assert(distanceDelta < 0.01)
         return 0

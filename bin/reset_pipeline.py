@@ -20,6 +20,7 @@ import pymongo
 
 import emission.pipeline.reset as epr
 import emission.core.get_database as edb
+import emission.core.wrapper.user as ecwu
 import emission.storage.decorations.user_queries as esdu
 import emission.core.wrapper.user as ecwu
 
