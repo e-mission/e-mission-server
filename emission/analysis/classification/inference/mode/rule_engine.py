@@ -45,8 +45,11 @@ class RuleEngineModeInferencePipeline:
             time_query=timerange)
         if (len(self.toPredictSections) == 0):
             logging.debug("len(toPredictSections) == 0, early return")
-            assert self.last_section_done is None, ("self.last_section_done == %s, expecting None" % \
-                self.last_section_done)
+            if self.last_section_done is not None:
+                logging.error("self.last_section_done == %s, expecting None" %
+                    self.last_section_done)
+                if eac.get_config()["classification.validityAssertions"]:
+                    assert False
             return None
     
         self.predictedProb = self.predictModesStep()
@@ -213,8 +216,10 @@ def collapse_modes(section_entry, modes):
     if len(unique_modes) == 1:
         return unique_modes[0]
 
-    # assert sorted(unique_modes) == ['BUS', 'TRAIN'],\
-    #     "unique_modes = %s, but we support only two, [BUS, TRAIN]" % sorted(unique_modes)
+    if sorted(unique_modes) != ['BUS', 'TRAIN']:
+        logging.error("unique_modes = %s, but we support only two, [BUS, TRAIN]" % sorted(unique_modes))
+        if eac.get_config()["classification.validityAssertions"]:
+            assert False
    
     # could be either bus or train. Let's use the speed to decide
     # local bus speeds are pretty close to bike, which is why it is hard to
