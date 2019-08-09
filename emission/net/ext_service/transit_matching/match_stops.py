@@ -200,6 +200,8 @@ def get_predicted_transit_mode(start_stops, end_stops):
     return None
 
 def get_rel_id_match(p_start_routes, p_end_routes):
+    train_mode_list = ['funicular', 'miniature', 'rail', 'railway',
+    'light_rail', 'subway', 'monorail', 'tram', 'aerialway', 'tracks']
     logging.debug("About to find matches in lists: %s \n %s" % 
         ([p.id for p in p_start_routes], 
          [p.id for p in p_end_routes]))
@@ -208,6 +210,11 @@ def get_rel_id_match(p_start_routes, p_end_routes):
         for er in p_end_routes:
             if sr.id == er.id:
                 matching_routes.append(sr)
+            elif sr.tags.route in train_mode_list and er.tags.route in train_mode_list and sr.tags.route == er.tags.route:
+                if "network" in sr.tags and "network" in er.tags:
+                    if sr.tags.network == er.tags.network:
+                        logging.debug("network matches between %d and  %d", sr.id,er.id)
+                        matching_routes.append(sr)
     logging.debug("matching routes = %s" % [(r.id,
         r.tags.ref if "ref" in r.tags else r.tags.name) for r in matching_routes])
     return matching_routes
