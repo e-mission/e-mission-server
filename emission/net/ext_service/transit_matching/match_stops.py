@@ -130,7 +130,7 @@ def get_predicted_transit_mode(start_stops, end_stops):
         return [rim.tags.route for rim in rel_id_matches]
 
     # Did not find matching routes. Let's see if stops are both "railway",
-    # if so, we can mark as TRAIN, TRAM or SUBWAY
+    # if so, we can mark as LIGHT_RAIL, TRAIN, TRAM or SUBWAY
     p_start_train = [extract_railway_modes(s.tags) for s in start_stops]
     p_start_train = set(itertools.chain.from_iterable(set(i) for i in p_start_train))
     p_end_train = [extract_railway_modes(s.tags) for s in end_stops]
@@ -279,6 +279,8 @@ def extract_railway_modes(stop):
             p_modes.append("TRAIN")
         if "tram" in stop:
             p_modes.append("TRAM")
+        if "light_rail" in stop:
+            p_modes.append("LIGHT_RAIL")
 
     logging.debug("After extracting data from tags, potential modes = %s" %
         [p for p in p_modes])
