@@ -190,8 +190,10 @@ def collapse_modes(section_entry, modes):
     start and end points. This method merges the list of entries returned by
     the GIS into one, potentially using speed information 
     """
-    train_mode_list = ['funicular', 'miniature', 'rail', 'railway',
-        'light_rail', 'subway', 'monorail', 'tram', 'aerialway', ]
+    # train_mode_list = ['funicular', 'miniature', 'rail', 'railway',
+    #     'light_rail', 'subway', 'monorail', 'tram', 'aerialway', ]
+    train_mode_list = ['funicular', 'miniature', 'rail', 'railway', 'monorail', 
+                'aerialway', 'tracks']
 
     if modes is None or len(modes) == 0:
         return None
@@ -225,4 +227,9 @@ def collapse_modes(section_entry, modes):
     if eaid.is_bicycling_speed(pd.Series(section_entry.data["speeds"]).median()):
         return 'BUS'
     else:
-        return 'TRAIN'
+        return 'TRAIN'	        
+        # We only want to return a train modes there, so let's remove bus from the list
+        if 'BUS' in train_mapped_modes:
+            train_mapped_modes.remove("BUS")
+        logging.debug("Returning %s but could also be another train modes" % train_mapped_modes[0])
+        return train_mapped_modes[0]

@@ -28,7 +28,7 @@ def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
     logging.debug("bbox_string = %s" % bbox_string)
     overpass_public_transit_query_template = query_string
     overpass_query = overpass_public_transit_query_template.format(bbox=bbox_string)
-    response = requests.post("http://overpass-api.de/api/interpreter", data=overpass_query)
+    response = requests.post(url + "api/interpreter", data=overpass_query)
     try:
         all_results = response.json()["elements"]
     except json.decoder.JSONDecodeError as e:
@@ -36,8 +36,42 @@ def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
             (response.status_code, response.text))
         time.sleep(5)
         logging.info("Retrying after 5 second sleep")
-        response = requests.post("http://overpass-api.de/api/interpreter", data=overpass_query)
+        response = requests.post(url + "api/interpreter", data=overpass_query)
+    try:
         all_results = response.json()["elements"]
+    except json.decoder.JSONDecodeError as e:
+        logging.info("Unable to decode response with status_code %s, text %s" %
+            (response.status_code, response.text))
+        if response.status_code == 429:
+            logging.info("Checking when a slot is available")
+            response = requests.get(url + "api/status")
+            status_string = response.text.split("\n")
+            try:
+                available_slots = int(status_string[3].split(" ")[0])
+                if available_slots > 0:
+                    logging.info("No need to wait")
+                    response = requests.post(url + "api/interpreter", data=overpass_query)
+                    all_results = response.json()["elements"]
+                # Some api/status returns 0 slots available and then when they will be available
+                elif available_slots == 0:
+                    min_waiting_time = min(int(status_string[4].split(" ")[5]), int(status_string[5].split(" ")[5]))
+                    time.sleep(min_waiting_time)
+                    logging.info("Retrying after " + str(min_waiting_time) +  " second sleep")
+                    response = requests.post(url + "api/interpreter", data=overpass_query)
+                    all_results = response.json()["elements"]
+            except ValueError as e:
+                # And some api/status directly returns when the slots will be available
+                try:
+                    min_waiting_time = min(int(status_string[3].split(" ")[5]), int(status_string[4].split(" ")[5]))
+                    time.sleep(min_waiting_time)
+                    logging.info("Retrying after " + str(min_waiting_time) +  " second sleep")
+                    response = requests.post(url + "api/interpreter", data=overpass_query)
+                    all_results = response.json()["elements"]
+                except ValueError as e:
+                    logging.info("Unable to find availables slots")
+                    all_results = []
+        else:
+            all_results = []
 
     relations = [ad.AttrDict(r) for r in all_results if r["type"] == "relation" and r["tags"]["type"] == "route"]
     logging.debug("Found %d relations with ids %s" % (len(relations), [r["id"] for r in relations]))
@@ -96,17 +130,19 @@ def get_predicted_transit_mode(start_stops, end_stops):
         return [rim.tags.route for rim in rel_id_matches]
 
     # Did not find matching routes. Let's see if stops are both "railway",
-    # if so, we can mark as TRAIN 
-    # TODO: return more complex kinds of railways?
-    p_start_train = ["railway" in s.tags for s in start_stops]
-    p_end_train = ["railway" in s.tags for s in end_stops]
-
-    logging.debug("len(start_train) = %s, len(end_train) = %s" % (
-        (len(p_start_train), len(p_end_train))))
-    if is_true(p_start_train) and is_true(p_end_train):
-        logging.debug("start and end are both TRAIN, returning TRAIN")
-        return ["TRAIN"]
-
+    # if so, we can mark as LIGHT_RAIL, TRAIN, TRAM or SUBWAY
+    p_start_train = [extract_railway_modes(s.tags) for s in start_stops]
+    p_start_train = set(itertools.chain.from_iterable(set(i) for i in p_start_train))
+    p_end_train = [extract_railway_modes(s.tags) for s in end_stops]
+    p_end_train = set(itertools.chain.from_iterable(set(i) for i in p_end_train))
+    logging.debug("len(start_train) = %d, len(end_train) = %d" %
+        (len(p_start_train), len(p_end_train)))
+    if len(p_start_train) > 0 and len(p_end_train) > 0:
+        p_intersection_train = p_start_train & p_end_train
+        p_intersection_train = list(p_intersection_train)
+        logging.debug("Start and end have both " + str(p_intersection_train) + ", returning " + str(p_intersection_train))
+        return p_intersection_train
+    
     # Did not find matching routes. Let's see if any stops have a "highway" =
     # "bus_stop" tag
     is_bus_stop = lambda s: "highway" in s.tags and \
@@ -154,6 +190,8 @@ def get_predicted_transit_mode(start_stops, end_stops):
     return None
 
 def get_rel_id_match(p_start_routes, p_end_routes):
+    train_mode_list = ['funicular', 'miniature', 'rail', 'railway',
+    'light_rail', 'subway', 'monorail', 'tram', 'aerialway', 'tracks']
     logging.debug("About to find matches in lists: %s \n %s" % 
         ([p.id for p in p_start_routes], 
          [p.id for p in p_end_routes]))
@@ -162,6 +200,11 @@ def get_rel_id_match(p_start_routes, p_end_routes):
         for er in p_end_routes:
             if sr.id == er.id:
                 matching_routes.append(sr)
+            elif sr.tags.route in train_mode_list and er.tags.route in train_mode_list and sr.tags.route == er.tags.route:
+                if "network" in sr.tags and "network" in er.tags:
+                    if sr.tags.network == er.tags.network:
+                        logging.debug("network matches between %d and  %d", sr.id,er.id)
+                        matching_routes.append(sr)
     logging.debug("matching routes = %s" % [(r.id,
         r.tags.ref if "ref" in r.tags else r.tags.name) for r in matching_routes])
     return matching_routes
@@ -226,3 +269,20 @@ def validate_simple_bus_stops(p_start_stops, p_end_stops):
 
     logging.debug("Both side are dense, invalid bus stop")
     return False
+
+def extract_railway_modes(stop):
+    p_modes = []
+    if "railway" in stop:
+        if "subway" in stop:
+            p_modes.append("SUBWAY")
+        if "train" in stop:
+            p_modes.append("TRAIN")
+        if "tram" in stop:
+            p_modes.append("TRAM")
+        if "light_rail" in stop:
+            p_modes.append("LIGHT_RAIL")
+
+    logging.debug("After extracting data from tags, potential modes = %s" %
+        [p for p in p_modes])
+
+    return p_modes
