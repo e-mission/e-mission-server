@@ -24,23 +24,27 @@ import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.timequery as estt
 import emission.storage.decorations.user_queries as esdu
 import emission.storage.timeseries.cache_series as estcs
+# only needed to read the motion_activity
+# https://github.com/e-mission/e-mission-docs/issues/356#issuecomment-520630934
+import emission.net.usercache.abstract_usercache as enua
 
-def export_timeline(user_id, start_day_str, end_day_str, file_name):
+def export_timeline(user_id, start_day_str, end_day_str, timezone, file_name):
     logging.info("Extracting timeline for user %s day %s -> %s and saving to file %s" %
                  (user_id, start_day_str, end_day_str, file_name))
 
     # day_dt = pydt.datetime.strptime(day_str, "%Y-%m-%d").date()
-    start_day_ts = arrow.get(start_day_str).timestamp
-    end_day_ts = arrow.get(end_day_str).timestamp
+    start_day_ts = arrow.get(start_day_str).replace(tzinfo=timezone).timestamp
+    end_day_ts = arrow.get(end_day_str).replace(tzinfo=timezone).timestamp
     logging.debug("start_day_ts = %s (%s), end_day_ts = %s (%s)" % 
-        (start_day_ts, arrow.get(start_day_ts),
-         end_day_ts, arrow.get(end_day_ts)))
+        (start_day_ts, arrow.get(start_day_ts).to(timezone),
+         end_day_ts, arrow.get(end_day_ts).to(timezone)))
 
     ts = esta.TimeSeries.get_time_series(user_id)
     loc_time_query = estt.TimeQuery("data.ts", start_day_ts, end_day_ts)
     loc_entry_list = list(estcs.find_entries(user_id, key_list=None, time_query=loc_time_query))
     ma_time_query = estt.TimeQuery("metadata.write_ts", start_day_ts, end_day_ts)
-    ma_entry_list = list(estcs.find_entries(user_id, key_list=["background/motion_activity"], time_query=ma_time_query))
+    uc = enua.UserCache.getUserCache(user_id)
+    ma_entry_list = uc.getMessage(["background/motion_activity"], ma_time_query)
     trip_time_query = estt.TimeQuery("data.start_ts", start_day_ts, end_day_ts)
     trip_entry_list = list(ts.find_entries(key_list=None, time_query=trip_time_query))
     place_time_query = estt.TimeQuery("data.enter_ts", start_day_ts, end_day_ts)
@@ -97,7 +101,8 @@ def export_timeline_for_users(user_id_list, args):
         if curr_uuid != '':
             logging.info("=" * 50)
             export_timeline(user_id=curr_uuid, start_day_str=args.start_day,
-                end_day_str= args.end_day, file_name=args.file_prefix)
+                end_day_str= args.end_day, timezone=args.timezone,
+                file_name=args.file_prefix)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
@@ -109,6 +114,7 @@ if __name__ == '__main__':
     group.add_argument("-a", "--all", action="store_true")
     group.add_argument("-f", "--file")
 
+    parser.add_argument("--timezone", default="UTC")
     parser.add_argument("start_day", help="start day in utc - e.g. 'YYYY-MM-DD'" )
     parser.add_argument("end_day", help="start day in utc - e.g. 'YYYY-MM-DD'" )
     parser.add_argument("file_prefix", help="prefix for the filenames generated - e.g /tmp/dump_ will generate files /tmp/dump_<uuid1>.gz, /tmp/dump_<uuid2>.gz..." )
