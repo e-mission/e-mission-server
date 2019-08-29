@@ -12,7 +12,7 @@
         }, 
         "console": {
             "class": "logging.StreamHandler", 
-            "level": "WARNING"
+            "level": "WARNING",
             "encoding": "UTF-8"
         }, 
         "file": {
@@ -21,7 +21,7 @@
             "maxBytes": 1073741824, 
             "mode": "a", 
             "formatter": "detailed", 
-            "class": "logging.handlers.RotatingFileHandler"
+            "class": "logging.handlers.RotatingFileHandler",
             "encoding": "UTF-8"
         }
     }, 
