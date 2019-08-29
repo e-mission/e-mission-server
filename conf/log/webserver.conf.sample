@@ -7,11 +7,13 @@
             "formatter": "detailed", 
             "class": "logging.handlers.RotatingFileHandler", 
             "maxBytes": 1073741824, 
-            "filename": "/var/tmp/webserver-errors.log"
+            "filename": "/var/tmp/webserver-errors.log",
+            "encoding": "UTF-8"
         }, 
         "console": {
             "class": "logging.StreamHandler", 
             "level": "WARNING"
+            "encoding": "UTF-8"
         }, 
         "file": {
             "backupCount": 3, 
@@ -20,6 +22,7 @@
             "mode": "a", 
             "formatter": "detailed", 
             "class": "logging.handlers.RotatingFileHandler"
+            "encoding": "UTF-8"
         }
     }, 
     "version": 1, 
