@@ -46,6 +46,6 @@ six==1.11.0
 statsmodels==0.8.0
 subprocess32==3.2.7
 tempora==1.9
-urllib3==1.22
+urllib3==1.24.2
 utm==0.4.2
 xmltodict==0.11.0
