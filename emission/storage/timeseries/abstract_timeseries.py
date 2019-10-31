@@ -105,3 +105,6 @@ class TimeSeries(object):
     @staticmethod
     def update_data(user_id, key, obj_id, data):
         pass
+
+    def invalidate_raw_entry(self, obj_id):
+        pass

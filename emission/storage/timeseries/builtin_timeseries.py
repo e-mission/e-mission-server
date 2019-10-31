@@ -20,6 +20,8 @@ ts_enum_map = {
     esta.EntryType.ANALYSIS_TYPE: edb.get_analysis_timeseries_db()
 }
 
+INVALID_QUERY = {'metadata.key': 'invalid'}
+
 class BuiltinTimeSeries(esta.TimeSeries):
     def __init__(self, user_id):
         super(BuiltinTimeSeries, self).__init__(user_id)
@@ -57,6 +59,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "manual/incident": self.timeseries_db,
                 "manual/mode_confirm": self.timeseries_db,
                 "manual/purpose_confirm": self.timeseries_db,
+                "manual/destination_confirm": self.timeseries_db,
                 "segmentation/raw_trip": self.analysis_timeseries_db,
                 "segmentation/raw_place": self.analysis_timeseries_db,
                 "segmentation/raw_section": self.analysis_timeseries_db,
@@ -107,7 +110,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
         :param extra_query_list: additional queries for mode, etc
         :return:
         """
-        ret_query = {}
+        ret_query = {"invalid": {"$exists": False}}
         ret_query.update(self.user_query)
         if key_list is not None and len(key_list) > 0:
             key_query_list = []
@@ -198,6 +201,8 @@ class BuiltinTimeSeries(esta.TimeSeries):
                                                                  geo_query,
                                                                  extra_query_list,
                                                                  sort_key)
+        logging.debug("orig_ts_db_matches = %s, analysis_ts_db_matches = %s" %
+            (orig_ts_db_result.count(), analysis_ts_db_result.count()))
         return itertools.chain(orig_ts_db_result, analysis_ts_db_result)
 
     def _get_entries_for_timeseries(self, tsdb, key_list, time_query, geo_query,
@@ -223,9 +228,9 @@ class BuiltinTimeSeries(esta.TimeSeries):
             # Out[593]: 449869
             ts_db_result.limit(25 * 10000)
         else:
-            ts_db_result = [].__iter__()
+            ts_db_result = tsdb.find(INVALID_QUERY)
 
-        logging.debug("finished querying values for %s" % key_list)
+        logging.debug("finished querying values for %s, count = %d" % (key_list, ts_db_result.count()))
         return ts_db_result
 
     def get_entry_at_ts(self, key, ts_key, ts):
@@ -397,3 +402,5 @@ class BuiltinTimeSeries(esta.TimeSeries):
         logging.debug("updating entry %s into timeseries" % new_entry)
         edb.save(ts.get_timeseries_db(key), new_entry)
 
+    def invalidate_raw_entry(self, obj_id):
+        self.timeseries_db.update_one({"_id": obj_id, "user_id": self.user_id}, {"$set": {"invalid": True}})

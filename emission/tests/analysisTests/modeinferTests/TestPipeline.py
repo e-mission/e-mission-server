@@ -30,6 +30,7 @@ import emission.tests.common as etc
 import emission.net.usercache.formatters.common as enufc
 
 import emission.analysis.classification.inference.mode.pipeline as pipeline
+import emission.analysis.classification.inference.mode.reset as modereset
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.decorations.section_queries as esds
@@ -55,7 +56,7 @@ class TestPipeline(unittest.TestCase):
       # because then that step is effectively run twice. This code
       # rolls back the results of running the mode inference as part of the
       # pipeline and allows us to correctly test the mode inference pipeline again.
-      pipeline.del_objects_after(self.testUUID, 0, is_dry_run=False)
+      modereset.del_objects_after(self.testUUID, 0, is_dry_run=False)
       self.pipeline = pipeline.ModeInferencePipeline()
       self.pipeline.loadModelStage()
 

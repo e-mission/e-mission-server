@@ -1,0 +1,4 @@
+{
+    "__comment": "server running the overpass API to query OSM (e.g. https://wiki.openstreetmap.org/wiki/Overpass_API) without the /api/interpreter",
+    "url": "https://lz4.overpass-api.de/"
+}

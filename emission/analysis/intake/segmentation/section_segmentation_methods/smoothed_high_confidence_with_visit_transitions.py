@@ -36,7 +36,7 @@ class SmoothedHighConfidenceMotionWithVisitTransitions(eaisms.SmoothedHighConfid
         if distance_from_start > self.distance_threshold:
             logging.debug("found distance %s > threshold %s, returning dummy section" %
                           (distance_from_start, self.distance_threshold))
-            return self.create_unknown_section(location_points)
+            return self.create_unknown_section(self.location_points)
 
         visit_ended_transition_df = transition_df[transition_df.transition == 14]
         if len(visit_ended_transition_df) == 0:
@@ -46,7 +46,7 @@ class SmoothedHighConfidenceMotionWithVisitTransitions(eaisms.SmoothedHighConfid
         # We have a visit transition, so we have a pretty good idea that
         # this is a real section. So let's create a dummy section for it and return
         logging.debug("found visit transition %s, returning dummy section" % visit_ended_transition_df[["transition", "fmt_time"]])
-        return self.create_unknown_section(location_points)
+        return self.create_unknown_section(self.location_points)
 
     def extend_activity_to_location(self, motion_change, location_point):
         new_mc = ecwm.Motionactivity({
@@ -66,20 +66,24 @@ class SmoothedHighConfidenceMotionWithVisitTransitions(eaisms.SmoothedHighConfid
         :return: a list of tuples [(start1, end1), (start2, end2), ...] that represent the start and end of sections
         in this time range. end[n] and start[n+1] are typically assumed to be adjacent.
         """
+
+        # Since we are going to use a hybrid model, let's just read all kinds
+        # of locations upfront
+        self.get_location_streams_for_trip(timeseries, time_query)
         motion_changes = self.segment_into_motion_changes(timeseries, time_query)
-        location_points = timeseries.get_data_df("background/filtered_location", time_query)
-        if len(location_points) == 0:
+
+        if len(self.location_points) == 0:
             logging.debug("There are no points in the trip. How the heck did we segment it?")
             return []
 
         if len(motion_changes) == 0:
             dummy_sec = self.get_section_if_applicable(timeseries, distance_from_place,
-                                                       time_query, location_points)
+                                                       time_query, self.location_points)
             if dummy_sec is not None:
                 return [dummy_sec]
             else:
                 return []
-        
+
         # Now, we know that we have location points and we have motion_changes.
         section_list = []
         # Sometimes, on iOS, we have no overlap between motion detection
@@ -98,27 +102,35 @@ class SmoothedHighConfidenceMotionWithVisitTransitions(eaisms.SmoothedHighConfid
         # trip, and the last motion change to the end of the trip
         motion_changes[0] = (self.extend_activity_to_location(motion_changes[0][0],
                 timeseries.df_row_to_entry("background/filtered_location",
-                                           location_points.iloc[0])),
+                                           self.location_points.iloc[0])),
                              motion_changes[0][1])
         motion_changes[-1] = (motion_changes[-1][0],
             self.extend_activity_to_location(motion_changes[-1][1],
                 timeseries.df_row_to_entry("background/filtered_location",
-                                           location_points.iloc[-1])))
+                                           self.location_points.iloc[-1])))
 
         for (start_motion, end_motion) in motion_changes:
             logging.debug("Considering %s from %s -> %s" %
                           (start_motion.type, start_motion.fmt_time, end_motion.fmt_time))
             # Find points that correspond to this section
-            raw_section_df = location_points[(location_points.ts >= start_motion.ts) &
-                                             (location_points.ts <= end_motion.ts)]
-            if len(raw_section_df) == 0:
-                logging.info("Found no location points between %s and %s" % (start_motion, end_motion))
+            raw_section_df = self.filter_points_for_range(self.location_points,
+                                        start_motion, end_motion)
+
+            if len(raw_section_df) <=1:
+                logging.info("Found %d filtered points %s and %s for type %s, skipping..." % 
+                                      (len(raw_section_df),
+                                      start_motion.fmt_time, end_motion.fmt_time,
+                                      start_motion.type))
             else:
-                logging.debug("with iloc, section start point = %s, section end point = %s" %
-                              (ecwl.Location(raw_section_df.iloc[0]), ecwl.Location(raw_section_df.iloc[-1])))
-                section_list.append((raw_section_df.iloc[0], raw_section_df.iloc[-1], start_motion.type))
+                section_start_loc = raw_section_df.iloc[0]
+                section_end_loc = raw_section_df.iloc[-1]
+                logging.debug("section start point = %s, section end point = %s" %
+                              (ecwl.Location(section_start_loc), ecwl.Location(section_end_loc)))
+                section_list.append((section_start_loc, section_end_loc, start_motion.type))
+
             # if this lack of overlap is part of an existing set of sections,
             # then it is fine, because in the section segmentation code, we
             # will mark it as a transition
+        self.squish_stops(motion_changes, section_list)
         return section_list
 

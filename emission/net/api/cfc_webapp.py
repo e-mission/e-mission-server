@@ -240,6 +240,18 @@ def putIntoCache():
   from_phone = request.json['phone_to_server']
   return usercache.sync_phone_to_server(user_uuid, from_phone)
 
+@post('/usercache/putone')
+def putIntoOneEntry():
+  logging.debug("Called userCache.putone with request %s" % request)
+  user_uuid=getUUID(request)
+  logging.debug("user_uuid %s" % user_uuid)
+  the_entry = request.json['the_entry']
+  logging.debug("About to save entry %s" % the_entry)
+  # sync_phone_to_server requires a list, so we wrap our one entry in the list
+  from_phone = [the_entry]
+  usercache.sync_phone_to_server(user_uuid, from_phone)
+  return {"putone": True}
+
 @post('/timeline/getTrips/<day>')
 def getTrips(day):
   logging.debug("Called timeline.getTrips/%s" % day)
@@ -272,7 +284,9 @@ def updateUserProfile():
   user_uuid = getUUID(request)
   user = User.fromUUID(user_uuid)
   new_fields = request.json['update_doc']
-  return user.update(new_fields)
+  to_return = user.update(new_fields)
+  logging.debug("Successfully updated profile for user %s" % user_uuid)
+  return {"update": True}
 
 @post('/profile/get')
 def getUserProfile():

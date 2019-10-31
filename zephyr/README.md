@@ -19,10 +19,10 @@ The password for the server is concatenation of the first names of the maintaine
 
 The server contains several reference notebooks to help you evaluate the power drain of your sensing regime.
 Copy them to a new directory and re-run them to match your experiment.
-http://34.239.42.177:8888/tree/zephyr/reference
+http://cardshark.cs.berkeley.edu:8888/tree/zephyr/reference
 Make sure to change the `label`, `start_ts` and `end_ts` to match your experiment.
 
 In particular, the steps are:
-- Calibrate your approach (http://34.239.42.177:8888/tree/zephyr/reference/Calibration.ipynb)
+- Calibrate your approach (http://cardshark.cs.berkeley.edu:8888/tree/zephyr/reference/Calibration.ipynb)
 - Run your experiment
 - Report the difference in slope as your performance evaluation

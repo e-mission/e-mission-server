@@ -69,7 +69,9 @@ def segment_trip_into_sections(user_id, trip_entry, trip_source):
         import emission.analysis.intake.segmentation.section_segmentation_methods.smoothed_high_confidence_motion as shcm
         shcmsm = shcm.SmoothedHighConfidenceMotion(60, 100, [ecwm.MotionTypes.TILTING,
                                                         ecwm.MotionTypes.UNKNOWN,
-                                                        ecwm.MotionTypes.STILL])
+                                                        ecwm.MotionTypes.STILL,
+                                                        ecwm.MotionTypes.NONE,
+                                                        ecwm.MotionTypes.STOPPED_WHILE_IN_VEHICLE])
     else:
         assert(trip_source == "DwellSegmentationDistFilter")
         import emission.analysis.intake.segmentation.section_segmentation_methods.smoothed_high_confidence_with_visit_transitions as shcmvt

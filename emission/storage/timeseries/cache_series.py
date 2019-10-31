@@ -13,6 +13,8 @@ from __future__ import absolute_import
 from future import standard_library
 standard_library.install_aliases()
 from builtins import *
+
+import emission.core.get_database as edb
 import emission.net.usercache.abstract_usercache as enua
 import emission.storage.timeseries.abstract_timeseries as esta
 
@@ -32,3 +34,31 @@ def find_entries(uuid, key_list=None, time_query=None):
                                  extra_query_list = None)
     uc_entries = uc.getMessage(key_list, time_query)
     return list(ts_entries) + uc_entries
+
+def insert_entries(uuid, entry_it):
+    # We want to get the references to the databases upfront, because
+    # otherwise, we will get a new connection for each reference, which
+    # will slow things down a lot
+    # See
+    # https://github.com/e-mission/e-mission-server/commit/aed451bc41ee09a9ff11f350881c320557fea71b
+    # for details
+    # This is also the reason why we pass in an iterator of entries instead of
+    # one entry at a time. We don't want the interface to contain references to
+    # the databases, since they are an implementation detail, and opening a
+    # connection to the database for every call
+    ts = esta.TimeSeries.get_time_series(uuid)
+    ucdb = edb.get_usercache_db()
+    tsdb_count = 0
+    ucdb_count = 0
+    for entry in entry_it:
+        assert entry["user_id"] is not None, "user_id for entry %s is None, cannot insert" % entry
+        if "write_fmt_time" in entry["metadata"]:
+            # write_fmt_time is filled in only during the formatting process
+            # so if write_fmt_time exists, it must be in the timeseries already
+            ts.insert(entry)
+            tsdb_count = tsdb_count + 1
+        else:
+            ucdb.save(entry)
+            ucdb_count = ucdb_count + 1
+
+    return (tsdb_count, ucdb_count)

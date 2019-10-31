@@ -5,4 +5,4 @@
 
 # Make sure that the python here is the anaconda python if that is not the one in the path
 
-PYTHONPATH=. python $*
+PYTHONPATH=. python "$@"
