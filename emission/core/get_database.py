@@ -26,6 +26,18 @@ _current_db = MongoClient(url).Stage_database
 def _get_current_db():
     return _current_db
 
+def get_carbon_usage_db():
+    return _get_current_db().CarbonUsage
+
+def get_username_db():
+    return _get_current_db().Usernames
+
+def get_polarbear_db():
+    return _get_current_db().PolarBear
+
+def get_suggestion_trips_db():
+    return _get_current_db().SuggestionSys
+
 def get_mode_db():
     # #current_db = MongoClient().Stage_database
     Modes= _get_current_db().Stage_Modes
@@ -65,7 +77,7 @@ def get_routeDistanceMatrix_db():
 def get_routeDistanceMatrix_db(user_id, method):
     if not os.path.exists('routeDistanceMatrices'):
         os.makedirs('routeDistanceMatrices')
-    
+
     routeDistanceMatrix = {}
     if not os.path.exists('routeDistanceMatrices/' + user_id + '_' + method + '_routeDistanceMatrix.json'):
         data = {}
@@ -80,7 +92,7 @@ def get_routeDistanceMatrix_db(user_id, method):
 def update_routeDistanceMatrix_db(user_id, method, updatedMatrix):
     f = open('routeDistanceMatrices/' + user_id + '_' + method + '_routeDistanceMatrix.json', 'w+')
     f.write(json.dumps(updatedMatrix))
-    f.close()   
+    f.close()
 
 
 def get_client_db():
@@ -257,9 +269,17 @@ def get_fake_sections_db():
     FakeSections = _get_current_db().Stage_fake_sections
     return FakeSections
 
+def get_tiersys_db():
+    TierSys=_get_current_db().Tier_Sys
+    return TierSys
+
+def get_new_tier_db():
+    newTier =_get_current_db().New_tier
+    return newTier
+
 # Static utility method to save entries to a mongodb collection.  Single
-# drop-in replacement for collection.save() now that it is deprecated in 
-# pymongo 3.0. 
+# drop-in replacement for collection.save() now that it is deprecated in
+# pymongo 3.0.
 # https://github.com/e-mission/e-mission-server/issues/533#issuecomment-349430623
 def save(db, entry):
 #     if '_id' in entry:

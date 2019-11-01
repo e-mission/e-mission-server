@@ -153,8 +153,8 @@ def run_intake_pipeline_for_user(uuid):
             print(str(arrow.now()) + "*" * 10 + "UUID %s: checking active mode trips to autocheck habits" % uuid + "*" * 10)
             autocheck.give_points_for_all_tasks(uuid)
 
-        esds.store_pipeline_time(uuid, "AUTOCHECK_POINTS",
-                                 time.time(), act.elapsed)
+        #esds.store_pipeline_time(uuid, "AUTOCHECK_POINTS",
+        #                         time.time(), act.elapsed)
 
         with ect.Timer() as ogt:
             logging.info("*" * 10 + "UUID %s: storing views to cache" % uuid + "*" * 10)

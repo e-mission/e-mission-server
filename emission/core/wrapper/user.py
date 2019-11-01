@@ -9,6 +9,11 @@ from builtins import object
 from past.utils import old_div
 import json
 import logging
+import emission.storage.timeseries.abstract_timeseries as esta
+import emission.storage.timeseries.timequery as estt
+import emission.core.wrapper.motionactivity as ecwm
+import arrow
+import emission.core.get_database as db
 
 # Our imports
 from emission.core.get_database import get_profile_db, get_uuid_db
@@ -19,6 +24,7 @@ defaultMpg = old_div(8.91,(1.6093 * defaultCarFootprint)) # Should be roughly 32
 class User(object):
   def __init__(self, uuid):
     self.uuid = uuid
+    self.username = None
     # TODO: Read this from a file instead
     self.defaultSettings = {
       'result_url': 'https://e-mission.eecs.berkeley.edu/compare'
@@ -79,6 +85,15 @@ class User(object):
     logging.debug("Updating user %s with fields %s" % (self.uuid, update_doc))
     get_profile_db().update_one({'user_id': self.uuid}, {'$set': update_doc})
 
+  #CO2 Consumption
+
+  #def getCarbonWeek(self, n) : gets this weeks average carbon emission, where n is the nth week in the past
+  #def getCarbonWeekly(self, n) : gets delta carbon emission for the nth week in the past. = getCarbonWeek(n) - getCarbonWeek(n+1)
+
+  #def getFavTransport(self) : gets mode of transportation that is highest used... or let client handle this?
+  #def getTotalDistance(self) : gets total distance travelled by user
+  #def getTier(self)
+
   def getCarbonFootprintForMode(self):
     logging.debug("Setting Carbon Footprint map for user %s to" % (self.uuid))
     #using conversion: 8.91 kg CO2 for one gallon
@@ -99,6 +114,31 @@ class User(object):
                          'air_long' : old_div(217.0,1609)
                       }
     return modeMap
+
+  @staticmethod
+  def setUsername(user_id, username):
+    """
+    Sets this user's username to the inputted value
+    """
+    userCollection = db.get_username_db()
+    userDict = userCollection.find_one({'user_id' : user_id})
+    if userDict == None:
+      userCollection.insert_one({'user_id' : user_id, 'username' : username})
+      logging.debug('userDict  did not exist when trying to enter username')
+    else:
+      logging.debug('updated username to: %s' %username)
+      userCollection.update_one(
+        {"user_id" : user_id},
+        {'$set' : {"username" : username}}
+      )
+
+  @staticmethod
+  def getUsername(user_id):
+    userCollection = db.get_username_db()
+    userDict = userCollection.find_one({'user_id' : user_id})
+    if not userDict:
+      return None
+    return {'username': userDict['username']}
 
   def getUpdateTS(self):
     return self.getProfile()['update_ts']
@@ -203,7 +243,7 @@ class User(object):
 
     # Second decision: what do we do if the user is not part of a study? Create a
     # profile anyway with an empty list, or defer the creation of the profile?
-    # 
+    #
     # Decision: create profile with empty list for two reasons:
     # a) for most of the functions, we want to use the profile data. We should
     # only use the email -> uuid map in the API layer to get the UUID, and use
@@ -225,3 +265,159 @@ class User(object):
     get_uuid_db().delete_one({'user_email': userEmail})
     get_profile_db().delete_one({'user_id': uuid})
     return uuid
+
+  @staticmethod
+  def carbonYesterday(user_id):
+    """ Returns the previous day's carbon usage
+          Calculates the sum of the footprint and penalty values
+    """
+    curr_ts = arrow.utcnow().timestamp
+    last_ts = arrow.utcnow().shift(days = -1).timestamp
+    return User.computeCarbon(user_id, last_ts, curr_ts)
+
+  @staticmethod
+  def carbonLastWeek(user_id):
+    """
+    Returns the daily average carbon of last week
+    """
+    curr_ts = arrow.utcnow().timestamp
+    last_ts = arrow.utcnow().shift(weeks=-1).timestamp
+    carbonMetric = User.computeCarbon(user_id, last_ts, curr_ts)
+    if carbonMetric == None:
+      return None
+    return User.computeCarbon(user_id, last_ts, curr_ts) / 7
+
+  @staticmethod
+  def computeHappiness(user_id):
+    """
+    Computes the happiness of the Polar Bear
+    Happiness is based on change from last week's to yesterday's
+      Carbon metric.
+    Ranges for moods are, on a (<) 0-1 (<) scale:
+      Happy: > 0.6
+      Neutral: 0.4 - 0.6
+      Sad: < 0.4
+    """
+    carbonY = User.carbonYesterday(user_id)
+    #Something is wrong with carbonLastWeek rn
+    carbonLW = User.computeCarbon(user_id, arrow.utcnow().shift(weeks=-1).timestamp, arrow.utcnow().timestamp)
+    if carbonLW == 0:
+        if carbonY == None or carbonY <= 0.03:
+            return 0.5
+        else:
+            return -100
+
+    if (carbonY == None or carbonLW == None):
+        return 0.5
+    deltaCarbon = (carbonLW - carbonY) / (carbonLW)
+    return deltaCarbon + 0.5
+
+  @staticmethod
+  def computeCarbon(user_id, last_ts, curr_ts):
+    """
+    Computers carbon metric for specified user.
+    Formula is (Actual CO2 + penalty) / distance travelled
+    """
+    ts = esta.TimeSeries.get_time_series(user_id)
+
+    last_period_tq = estt.TimeQuery("data.start_ts",
+                        last_ts, # start of range
+                        curr_ts)  # end of range
+    cs_df = ts.get_data_df("analysis/inferred_section", time_query=last_period_tq)
+    if cs_df.shape[0] <= 0:
+      return None
+    carbon_val = User.computeFootprint(cs_df[["sensed_mode", "distance"]])
+    dist_travelled = cs_df["distance"].sum()
+
+    if dist_travelled > 0:
+      return carbon_val / dist_travelled
+    # Do not include no distance traveled users in the tier system.
+    return None
+
+  @staticmethod
+  def computeCarbonRaw(user_id, last_ts, curr_ts):
+      """
+      Computers raw carbon metric for specified user.
+      Returns a tuple with noramlized and actual carbon without
+      taking into account the penalty metric at all
+      """
+      ts = esta.TimeSeries.get_time_series(user_id)
+
+      last_period_tq = estt.TimeQuery("data.start_ts",
+                          last_ts, # start of range
+                          curr_ts)  # end of range
+      cs_df = ts.get_data_df("analysis/cleaned_section", time_query=last_period_tq)
+      if cs_df.shape[0] <= 0:
+        return None
+      carbon_val = User.computeFootprint(cs_df[["sensed_mode", "distance"]])
+      dist_travelled = cs_df["distance"].sum()
+
+      if dist_travelled > 0:
+        carbon_normalized = carbon_val / dist_travelled
+        return [carbon_normalized, carbon_val]
+      # Do not include no distance traveled users in the tier system.
+      return None
+
+  @staticmethod
+  def computeFootprint(footprint_df):
+    """
+    Inspired by e-mission-phone/www/js/metrics-factory.js
+
+    train: 92/1609,
+    car: 287/1609,
+    ON_FOOT/BICYCLING: 0
+
+    Computes range and for now calculates the average since we
+    don't distinguish between train and car.
+
+    If unknown (sensed mode = 4), don't compute anything for now.
+
+    footprint_df: [[trip1mode, distance], [trip2mode, distance], ...]
+
+    """
+    fp_train = 92.0/1609.0
+    fp_car = 287.0/1609.0
+    fp_bus = 3/4 * fp_car
+    total_footprint = 0
+    for index, row in footprint_df.iterrows():
+        motiontype = int(row['sensed_mode'])
+        distance = row['distance']
+        """
+        if motiontype == ecwm.MotionTypes.IN_VEHICLE.value:
+            """
+        if motiontype == 5: #car
+            total_footprint += fp_car * User.computePenalty(motiontype, m_to_km(distance))
+        elif motiontype == 4: #train
+            total_footprint += fp_train * User.computePenalty(motiontype, m_to_km(distance))
+        elif motiontype == 3: #bus
+            total_footprint += fp_bus * User.computePenalty(motiontype, m_to_km(distance))
+    return total_footprint
+
+  @staticmethod
+  def computePenalty(motiontype, distance):
+    """
+    Linear penalty functions are created depending on
+    transportation mode
+    """
+    if motiontype == 5: #car
+        if distance < 50:
+            return distance
+        return max(-(1/(2*50))*distance + 3/2, 0.5) * distance
+    elif motiontype == 3: #bus
+        if distance < 25:
+            return distance
+        return max(-(1/(2*25))*distance + 3/2, 0.5) * distance
+    elif motiontype == 4: #train
+        if distance < 37.5:
+            return distance
+        return max(-(1/(2*37.5))*distance + 3/2, 0.5) * distance
+
+
+
+
+
+def m_to_km(distance):
+    return max(0, float(distance) / float(1000))
+
+def mil_to_km(miles):
+    return float(miles) * 1609.344/float(1000)
