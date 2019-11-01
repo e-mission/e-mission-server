@@ -45,7 +45,10 @@ import emission.net.auth.auth as enaa
 import emission.net.ext_service.habitica.proxy as habitproxy
 from emission.core.wrapper.client import Client
 from emission.core.wrapper.user import User
+from emission.core.wrapper.tiersys import TierSys
 from emission.core.get_database import get_uuid_db, get_mode_db
+import emission.core.wrapper.polarbear as pb
+import emission.core.wrapper.suggestion_sys as suggsys
 import emission.core.wrapper.motionactivity as ecwm
 import emission.storage.timeseries.timequery as estt
 import emission.storage.timeseries.tcquery as esttc
@@ -85,7 +88,20 @@ app = app()
 #Simple path that serves up a static landing page with javascript in it
 @route('/')
 def index():
-  return static_file("index.html", static_path)
+    return static_file("index.html", static_path)
+
+@route('/<filename>')
+def index2(filename):
+    if filename == "index.html":
+        return static_file("index.html", static_path)
+
+@route('/faq/<filename>')
+def faq(filename):
+    return static_file(filename,  "%s/%s" % (static_path, "faq"))
+
+@route('/shared/<filename>')
+def shared(filename):
+    return static_file(filename,  "%s/%s" % (static_path, "shared"))
 
 # Bunch of static pages that constitute our website
 # Should we have gone for something like django instead after all?
@@ -132,6 +148,21 @@ def server_lib(filepath):
 def server_templates(filepath):
   logging.debug("static filepath = %s" % filepath)
   return static_file(filepath, "%s/%s" % (static_path, "templates"))
+
+@route('/vendor/<filepath:path>')
+def server_vendors(filepath):
+  logging.debug("static filepath = %s" % filepath)
+  return static_file(filepath, "%s/%s" % (static_path, "vendor"))
+
+@route('/device-mockups/<filepath:path>')
+def server_mockups(filepath):
+  logging.debug("static filepath = %s" % filepath)
+  return static_file(filepath, "%s/%s" % (static_path, "device-mockups"))
+
+@route('/scss/<filepath:path>')
+def server_scss(filepath):
+  logging.debug("static filepath = %s" % filepath)
+  return static_file(filepath, "%s/%s" % (static_path, "scss"))
 
 @post("/result/heatmap/pop.route/<time_type>")
 def getPopRoute(time_type):
@@ -202,6 +233,7 @@ def getTimeseriesEntries(time_type):
         abort(401, "only a user can read his/her data")
 
     user_uuid = getUUID(request)
+    logging.debug("called with request.json = %s" % request.json)
 
     key_list = request.json['key_list']
     if 'from_local_date' in request.json and 'to_local_date' in request.json:
@@ -264,6 +296,89 @@ def getTrips(day):
   logging.debug("type(ret_dict) = %s" % type(ret_dict))
   return ret_dict
 
+@post('/suggestion')
+def getSuggestion():
+  logging.debug("Called suggestion")
+  user_uuid=getUUID(request)
+  logging.debug("user_uuid %s" % user_uuid)
+  ret_dir = suggsys.calculate_single_suggestion(user_uuid)
+  logging.debug("type(ret_dir) = %s" % type(ret_dir))
+  logging.debug("Output of ret_dir = %s" % ret_dir)
+  return ret_dir
+
+@post("/getUsername")
+def getUsername():
+  user_id = getUUID(request)
+  logging.debug("Starting getUsername")
+  username = User.getUsername(user_id)
+  logging.debug("Output of getUsername: %s" %username)
+  return User.getUsername(user_id)
+
+@post("/setUsername/<username>")
+def setUsername(username):
+  user_id = getUUID(request)
+  logging.debug("called setUsername: %s" %username)
+  return User.setUsername(user_id, username)
+
+@post('/happiness')
+def getHappiness():
+  user_id = getUUID(request)
+  return {'happiness' : User.computeHappiness(user_id)}
+
+@post('/polarbear')
+def getTierPolarBears():
+  user_id = getUUID(request)
+  result = pb.getAllBearsInTier(user_id)
+  logging.debug("called getTierPolarBears: %s" %result)
+  return result
+
+@post('/tierRank')
+def getTierRank():
+  user_id = getUUID(request)
+  return {'tierRank' : TierSys.computeTierRank(user_id)}
+
+@post('/tier')
+def getUserTier():
+  user_id = getUUID(request)
+  return {'tier' : TierSys.getUserTier(user_id)}
+
+@post('/listOfUsers')
+def getListOfUsers():
+  user_id = getUUID(request)
+  userTierNum = TierSys.getUserTier(user_id)
+  userTiers = TierSys.getLatest()[0]['tiers']
+  logging.debug('TierSys: %s' %TierSys.getLatest()[0])
+  tierUsernames = [[], [], []]
+  logging.debug(userTiers)
+  for tier in userTiers:
+    logging.debug('TIER: %s' %tier)
+    index = tier['rank'] - 1
+    curr_tier = tierUsernames[index]
+    for user in tier['users']:
+        uuid = user['uuid']
+        username = User.getUsername(uuid)
+        carbon = user['lastWeekCarbon'] * 1000
+        if username == None:
+            result = {'uuid': uuid, 'carbonLastWeek': carbon}
+            curr_tier.append(result)
+        else:
+            result = {'username': username, 'carbonLastWeek': carbon}
+            curr_tier.append(result)
+  return {'tiers' : tierUsernames}
+
+@post('/getListOfUsersInUsersTier')
+def getListOfUsersInUsersTier():
+  user_id = getUUID(request)
+  userTierNum = TierSys.getUserTier(user_id)
+  userTierUsers = TierSys.getLatest()[0]['tiers'][userTierNum - 1]['uuids']
+  logging.debug("User Tier is: %s" %str(userTierNum))
+  logging.debug("Getting users")
+  tierUsernames = []
+  for uuid in userTierUsers:
+    tierUsernames.append(User.getUsername(uuid))
+  logging.debug("returning usernames to client")
+  return {'allUsers' : tierUsernames}
+
 @post('/profile/create')
 def createUserProfile():
   try:
@@ -272,6 +387,10 @@ def createUserProfile():
       logging.debug("userEmail = %s" % userEmail)
       user = User.register(userEmail)
       logging.debug("Looked up user = %s" % user)
+      TierSys.addUser(user.uuid)
+      logging.debug("Added user to TierSys = %s" % user)
+      pb.updatePolarBear(user.uuid)
+      logging.debug("Created user's Polar Bear = %s" % user)
       logging.debug("Returning result %s" % {'uuid': str(user.uuid)})
       return {'uuid': str(user.uuid)}
   except ValueError as e:
@@ -294,6 +413,11 @@ def getUserProfile():
   user_uuid = getUUID(request)
   user = User.fromUUID(user_uuid)
   return user.getProfile()
+
+@post('/tiersys')
+def getTierSys():
+  user_uuid = getUUID(request)
+  return TierSys.getLatest()
 
 @post('/result/metrics/<time_type>')
 def summarize_metrics(time_type):
