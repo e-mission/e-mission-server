@@ -80,17 +80,18 @@ You may also want to load some test data. Note that for the docker install, you 
    
    If you have the phone app installed, you can log in using `test_july_22` as the email, and select July 22 *2015* to see the data for that date.
    
+
 Note that loading the data retains the object IDs. This means that if you load the same data twice with different user IDs, then only the second one will stick. In other words, if you load the file as `user1@foo.edu` and then load the same file as `user2@foo.edu`, you will only have data for `user2@foo.edu` in the database. This can be overwritten using the `--make-new` flag - e.g.
 
 ```
 $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py -n /tmp/data-collection-eval/results_dec_2015/ucb.sdb.android.1/timeseries/active_day_2.2015-11-27 shankari@eecs.berkeley.edu
 ```
-   
+
 #### Other data sources ####
 1. Get your own data. You can export your timeline for a particular day via email (Profile -> Download json dump) and then load and view it as above.
 
-1. Request access to anonymized data for research purposes by sending email to @shankari. You will be asked to consent to data retention and usage policies and will get an encrypted timeline with data from multiple users, one file per user. More information is at https://github.com/e-mission/e-mission-docs/blob/master/docs/e-mission-server/requesting_data_as_a_collaborator.md
-   
+1. Request access to anonymized data for research purposes by sending email to @shankari. You will be asked to consent to data retention and usage policies and will get an encrypted timeline with data from multiple users, one file per user. More information is at https://github.com/e-mission/e-mission-docs/blob/master/docs/manage/requesting_data_as_a_collaborator.md
+  
 1. Sample timeline data from the test phones can be retrieved using the `bin/public/request_public_data.py` script. You can see the inputs to pass to the script by using
    ```
    $ bin/public/request_public_data.py --help
@@ -104,7 +105,7 @@ $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py -n /tmp/data-c
 ```
             $ cd ..../e-mission-server
             $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py /tmp/data-collection-eval/results_dec_2015/ucb.sdb.android.1/timeseries/active_day_2.2015-11-27 shankari@eecs.berkeley.edu
-```        
+```
 
 ### Creating fake user data ###
 
@@ -133,13 +134,13 @@ Because this user data is specifically designed to test our tour model creation,
 Once you have loaded the timeline, you probably want to segment it into trips and sections, smooth the sections, generate a timeline, etc. We have a unified script to do all of those, called the intake pipeline. You can run it like this.
 
     $ ./e-mission-py.bash bin/debug/intake_single_user.py -u <uuid>
-    
+
 You can also use the user's email id with the `-e` option. See the help message for details. Once the script is done running, places, trips, sections and stops would have been generated and stored in their respective mongodb tables, and the timelines for the last 7 days have been stored in the usercache.
 
 We also do some modelling on the generated data. This is much more time-intensive than the intake, but also does not need to run at the same frequency as the intake pipeline. So it is pulled out to its own pipeline. If you want to work on the modelling, you need to run this pipeline as well.
 
     $ ./e-mission-py.bash emission/pipeline/model_stage.py
-    
+
 ### Experimenting with loaded data ###
 
 Some examples of how to retrieve and experiment with loaded/analysed data are in the `Timeseries_Sample.ipynb`
@@ -187,12 +188,12 @@ If you're interested in having karma in your path and globally set, run
 To run tests if you have karma globally set, run 
 
     $ karma start my.conf.js 
-    
+
 in the webapp directory. If you didn't run the -g command, you can run
 tests with 
 
     $ ./node_modules/karma/bin/karma start
-    
+
 in the webapp directory
 
 
@@ -239,6 +240,6 @@ bower.
 ----------
 This is fairly complex and is under active change as we have more projects deploy their own servers with various configurations.
 So I have moved it to the e-mission-server section in the e-mission-docs repo:
-https://github.com/e-mission/e-mission-docs/blob/master/docs/e-mission-server/deploying_your_own_server_to_production.md
+https://github.com/e-mission/e-mission-docs/blob/master/docs/install/deploying_your_own_server_to_production.md
 
 [Python_Structure]: https://raw.github.com/amplab/e-mission-server/master/figs/e-mission-server-module-structure.png
