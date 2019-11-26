@@ -24,12 +24,11 @@ preprocessing results ensures reasonable performance.
 ## Installation: ##
 ----------
 - For **deployers** (i.e. if you want to primarily *use* the system as opposed to modify/develop it, the [docker installation](https://github.com/e-mission/e-mission-docker) is probably the easiest way to get started.
-- For **builders** (i.e. if you want to write new scripts or modify existing scripts) the [manual install](https://github.com/e-mission/e-mission-docs/blob/master/docs/e-mission-server/manual_install.md) will make it easier to edit files directly on your local filesystem. Make sure to use a POSIX-compliant CLI; you may want to look into [gitbash](https://openhatch.org/missions/windows-setup/install-git-bash) or similar on Windows.
+- For **builders** (i.e. if you want to write new scripts or modify existing scripts) the [manual install](https://github.com/e-mission/e-mission-docs/blob/master/docs/install/manual_install.md) will make it easier to edit files directly on your local filesystem. Make sure to use a POSIX-compliant CLI; you may want to look into [gitbash](https://openhatch.org/missions/windows-setup/install-git-bash) or similar on Windows.
 
 ## Additional Documentation: ##
 ----------
-Additional documentation has been moved to its own repository [e-mission-docs](https://github.com/e-mission/e-mission-docs). Specific e-mission-server additional documentation can be found here:
-https://github.com/e-mission/e-mission-docs/tree/master/docs/e-mission-server
+Additional documentation has been moved to its own repository [e-mission-docs](https://github.com/e-mission/e-mission-docs). 
 
 ## Deployment: ##
 -------------------
