@@ -15,10 +15,16 @@ import emission.storage.timeseries.abstract_timeseries as esta
 
 import emission.core.wrapper.entry as ecwe
 
-ts_enum_map = {
-    esta.EntryType.DATA_TYPE: edb.get_timeseries_db(),
-    esta.EntryType.ANALYSIS_TYPE: edb.get_analysis_timeseries_db()
-}
+ts_enum_map = None
+
+def get_ts_enum_map():
+    global ts_enum_map
+    if (ts_enum_map is None):
+        ts_enum_map = {
+            esta.EntryType.DATA_TYPE: edb.get_timeseries_db(),
+            esta.EntryType.ANALYSIS_TYPE: edb.get_analysis_timeseries_db()
+        }
+    return ts_enum_map
 
 INVALID_QUERY = {'metadata.key': 'invalid'}
 
@@ -28,8 +34,8 @@ class BuiltinTimeSeries(esta.TimeSeries):
         self.key_query = lambda key: {"metadata.key": key}
         self.type_query = lambda entry_type: {"metadata.type": entry_type}
         self.user_query = {"user_id": self.user_id} # UUID is mandatory for this version
-        self.timeseries_db = ts_enum_map[esta.EntryType.DATA_TYPE]
-        self.analysis_timeseries_db = ts_enum_map[esta.EntryType.ANALYSIS_TYPE]
+        self.timeseries_db = get_ts_enum_map()[esta.EntryType.DATA_TYPE]
+        self.analysis_timeseries_db = get_ts_enum_map()[esta.EntryType.ANALYSIS_TYPE]
         # Design question: Should the stats be a separate database, or should it be part
         # of the timeseries database? Technically, it should be part of the timeseries
         # database. However, I am concerned about the performance of the database
@@ -323,7 +329,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
         else:
             multi_result = None
             try:
-                multi_result = ts_enum_map[data_type].insert_many(entries, ordered=False)
+                multi_result = get_ts_enum_map()[data_type].insert_many(entries, ordered=False)
                 logging.debug("Returning multi_result.inserted_ids = %s... of length %d" % 
                     (multi_result.inserted_ids[:10], len(multi_result.inserted_ids)))
                 return multi_result
