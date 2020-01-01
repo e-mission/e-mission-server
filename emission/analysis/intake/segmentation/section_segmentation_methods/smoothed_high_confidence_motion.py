@@ -278,6 +278,8 @@ def get_curr_end_motion(prev_motion, curr_motion):
     else:
         return curr_motion
 
+# Transition at the previous motion by retaining the timestamp but setting the
+# end to the type
 def prev2end(prev_motion, curr_motion):
     curr_end_motion = copy.copy(prev_motion)
     curr_end_motion["type"] = curr_motion.type
