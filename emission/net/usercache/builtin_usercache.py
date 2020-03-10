@@ -101,7 +101,7 @@ class BuiltinUserCache(ucauc.UserCache):
                     'metadata.type': 'document',
                     'metadata.key': key}
         # logging.debug("Updating %s spec to %s" % (self.user_id, document))
-        result = self.db.update(queryDoc,
+        result = self.db.update_one(queryDoc,
                                 document,
                                 upsert=True)
         logging.debug("Result = %s after updating document %s" % (result, key))

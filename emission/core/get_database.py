@@ -18,6 +18,7 @@ except:
 
 config_data = json.load(config_file)
 url = config_data["timeseries"]["url"]
+config_file.close()
 
 print("Connecting to database URL "+url)
 _current_db = MongoClient(url).Stage_database
