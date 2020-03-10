@@ -263,8 +263,4 @@ def get_fake_sections_db():
 # pymongo 3.0. 
 # https://github.com/e-mission/e-mission-server/issues/533#issuecomment-349430623
 def save(db, entry):
-#     if '_id' in entry:
-#         db.replace_one({'_id': entry['_id']}, entry, upsert=True)
-#     else:
-#         db.replace_one({}, entry, upsert=True)
-    db.save(entry)
+    db.replace_one({}, entry, upsert=True)
