@@ -264,6 +264,8 @@ def get_fake_sections_db():
 # https://github.com/e-mission/e-mission-server/issues/533#issuecomment-349430623
 def save(db, entry):
     if '_id' in entry:
-        db.replace_one({'_id': entry['_id']}, entry, upsert=True)
+        result = db.replace_one({'_id': entry['_id']}, entry, upsert=True)
+        # logging.debug("entry has id, calling with match, result = %s" % result.raw_result)
     else:
-        db.replace_one({}, entry, upsert=True)
+        result = db.insert_one(entry)
+        # logging.debug("entry has id, calling without match, result = %s" % result.inserted_id)
