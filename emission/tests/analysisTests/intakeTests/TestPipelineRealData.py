@@ -364,7 +364,8 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 9})
         end_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 10})
         cacheKey = "diary/trips-2016-08-10"
-        ground_truth = json.load(open("emission/tests/data/real_examples/shankari_2016-08-910.ground_truth"),
+        with open("emission/tests/data/real_examples/shankari_2016-08-910.ground_truth") as gtf:
+            ground_truth = json.load(gtf,
                                  object_hook=bju.object_hook)
 
         logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
@@ -405,10 +406,12 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 2, 'day': 22})
         end_ld = ecwl.LocalDate({'year': 2016, 'month': 2, 'day': 22})
         cacheKey = "diary/trips-2016-02-22"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile+".ground_truth") as gtf:
+            ground_truth = json.load(gtf, object_hook=bju.object_hook)
 
         logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
-        all_entries = json.load(open(dataFile), object_hook = bju.object_hook)
+        with open(dataFile) as df:
+            all_entries = json.load(df, object_hook = bju.object_hook)
         # 18:01 because the transition was at 2016-02-22T18:00:09.623404-08:00, so right after
         # 18:00
         ts_1800 = arrow.get("2016-02-22T18:00:30-08:00").timestamp
@@ -442,11 +445,13 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 9})
         end_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 10})
         cacheKey = "diary/trips-2016-08-10"
-        ground_truth = json.load(open("emission/tests/data/real_examples/shankari_2016-08-910.ground_truth"),
+        with open("emission/tests/data/real_examples/shankari_2016-08-910.ground_truth") as gtf:
+            ground_truth = json.load(gtf,
                                  object_hook=bju.object_hook)
 
         logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
-        all_entries = json.load(open(dataFile), object_hook = bju.object_hook)
+        with open(dataFile) as df:
+            all_entries = json.load(df, object_hook = bju.object_hook)
         ts_1030 = arrow.get("2016-08-10T10:30:00-07:00").timestamp
         logging.debug("ts_1030 = %s, converted back = %s" % (ts_1030, arrow.get(ts_1030).to("America/Los_Angeles")))
         before_1030_entries = [e for e in all_entries if ad.AttrDict(e).metadata.write_ts <= ts_1030]
@@ -481,12 +486,15 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=bju.object_hook)
-        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile_1+".ground_truth") as gtf1:
+            ground_truth_1 = json.load(gtf1, object_hook=bju.object_hook)
+        with open(dataFile_2+".ground_truth") as gtf2:
+            ground_truth_2 = json.load(gtf2, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = json.load(open(dataFile_2), object_hook = bju.object_hook)
+        with open(dataFile_2) as df2:
+            self.entries = json.load(df2, object_hook = bju.object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -508,10 +516,12 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 2, 'day': 22})
         end_ld = ecwl.LocalDate({'year': 2016, 'month': 2, 'day': 22})
         cacheKey = "diary/trips-2016-02-22"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile+".ground_truth") as gtf:
+            ground_truth = json.load(gtf, object_hook=bju.object_hook)
 
         logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
-        all_entries = json.load(open(dataFile), object_hook = bju.object_hook)
+        with open(dataFile) as df:
+            all_entries = json.load(df, object_hook = bju.object_hook)
         # 18:01 because the transition was at 2016-02-22T18:00:09.623404-08:00, so right after
         # 18:00
         ts_1800 = arrow.get("2016-02-22T18:00:30-08:00").timestamp
@@ -546,10 +556,12 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 10, 'day': 0o7})
         end_ld = ecwl.LocalDate({'year': 2016, 'month': 10, 'day': 0o7})
         cacheKey = "diary/trips-2016-10-07"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile+".ground_truth") as gtf:
+            ground_truth = json.load(gtf, object_hook=bju.object_hook)
 
         logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
-        all_entries = json.load(open(dataFile), object_hook = bju.object_hook)
+        with open(dataFile) as df:
+            all_entries = json.load(df, object_hook = bju.object_hook)
         # 18:01 because the transition was at 2016-02-22T18:00:09.623404-08:00, so right after
         # 18:00
         ts_1800 = arrow.get("2016-10-07T18:33:11-07:00").timestamp
@@ -584,11 +596,14 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 1, 'day': 13})
         cacheKey_1 = "diary/trips-2016-01-12"
         cacheKey_2 = "diary/trips-2016-01-13"
-        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=bju.object_hook)
-        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile_1+".ground_truth") as gtf1:
+            ground_truth_1 = json.load(gtf1, object_hook=bju.object_hook)
+        with open(dataFile_2+".ground_truth") as gtf2:
+            ground_truth_2 = json.load(gtf2, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile_1)
-        self.entries = json.load(open(dataFile_2), object_hook = bju.object_hook)
+        with open(dataFile_2) as df2:
+            self.entries = json.load(df2, object_hook = bju.object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -610,12 +625,15 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 1, 'day': 13})
         cacheKey_1 = "diary/trips-2016-01-12"
         cacheKey_2 = "diary/trips-2016-01-13"
-        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=bju.object_hook)
-        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile_1+".ground_truth") as gtf1:
+            ground_truth_1 = json.load(gtf1, object_hook=bju.object_hook)
+        with open(dataFile_2+".ground_truth") as gtf2:
+            ground_truth_2 = json.load(gtf2, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = json.load(open(dataFile_2), object_hook = bju.object_hook)
+        with open(dataFile_2) as df2:
+            self.entries = json.load(df2, object_hook = bju.object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -634,14 +652,7 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_single_positional_indexer.dec-12"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 12, 'day': 12})
         cacheKey = "diary/trips-2016-12-12"
-        ground_truth = json.load(open("emission/tests/data/real_examples/shankari_single_positional_indexer.dec-12.ground_truth"), object_hook=bju.object_hook)
-
-        etc.setupRealExample(self, dataFile)
-        etc.runIntakePipeline(self.testUUID)
-
-        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
-        self.compare_result(ad.AttrDict({'result': api_result}).result,
-                            ad.AttrDict(ground_truth).data)
+        self.standardMatchDataGroundTruth(dataFile, start_ld, cacheKey)
 
     def testOverriddenModeHack(self):
         # Test for https://github.com/e-mission/e-mission-server/issues/457
