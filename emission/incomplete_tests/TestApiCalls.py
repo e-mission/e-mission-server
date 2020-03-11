@@ -20,6 +20,7 @@ class TestCarbon(unittest.TestCase):
     def setUp(self):
         config_file = open('config.json')
         config_data = json.load(config_file)
+        config_file.close()
         self.server_host = config_data["server"]["host"]
         self.server_port = config_data["server"]["port"]
         self.log_base_dir = config_data["paths"]["log_base_dir"]

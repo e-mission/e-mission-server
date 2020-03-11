@@ -15,6 +15,7 @@ class TokenListMethod(object):
     def __init__(self):
         key_file = open('conf/net/auth/token_list.json')
         key_data = json.load(key_file)
+        key_file.close()
         self.token_list_file = key_data["token_list"]
         raw_token_list = open(self.token_list_file).readlines()
         self.token_list = [t.strip() for t in raw_token_list]
