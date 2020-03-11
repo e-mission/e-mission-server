@@ -18,7 +18,7 @@ import geojson as gj
 import bson.objectid as boi
 
 # Our imports
-import emission.tests.common
+import emission.tests.common as etc
 
 import emission.core.get_database as edb
 import emission.net.usercache.abstract_usercache as enua
