@@ -43,7 +43,8 @@ class TestTripSegmentation(unittest.TestCase):
         self.androidUUID = self.testUUID
 
         self.testUUID = uuid.UUID("c76a0487-7e5a-3b17-a449-47be666b36f6")
-        self.entries = json.load(open("emission/tests/data/real_examples/iphone_2015-11-06"), object_hook = bju.object_hook)
+        with open("emission/tests/data/real_examples/iphone_2015-11-06") as fp:
+            self.entries = json.load(fp, object_hook = bju.object_hook)
         etc.setupRealExampleWithEntries(self)
         self.iosUUID = self.testUUID
         eaicf.filter_accuracy(self.iosUUID)

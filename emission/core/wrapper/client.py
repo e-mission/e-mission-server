@@ -55,7 +55,8 @@ class Client(object):
 
   def update(self, createKey = True):
     import uuid 
-    newEntry = json.load(open(self.settings_filename))
+    with open(self.settings_filename) as fp:
+        newEntry = json.load(fp)
     if createKey:
       newEntry['key'] = str(uuid.uuid4())
     # logging.info("Updating with new entry %s" % newEntry)

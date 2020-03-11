@@ -17,7 +17,8 @@ class TokenListMethod(object):
         key_data = json.load(key_file)
         key_file.close()
         self.token_list_file = key_data["token_list"]
-        raw_token_list = open(self.token_list_file).readlines()
+        with open(self.token_list_file) as tlf:
+            raw_token_list = tlf.readlines()
         self.token_list = [t.strip() for t in raw_token_list]
         raw_token_list = None
 

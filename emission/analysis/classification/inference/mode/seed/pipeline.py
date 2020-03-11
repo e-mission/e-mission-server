@@ -92,6 +92,7 @@ class ModeInferencePipelineMovesFormat:
   def loadModel():
     fd = open(SAVED_MODEL_FILENAME, "r")
     model_rep = fd.read()
+    fd.close()
     return jpickle.loads(model_rep)
 
   # TODO: Refactor into generic steps and results

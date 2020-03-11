@@ -14,6 +14,8 @@ from uuid import UUID
 import attrdict as ad
 import geojson
 
+import emission.tests.common as etc
+
 # Our imports
 import emission.net.usercache.formatters.formatter as enuf
 import emission.core.wrapper.motionactivity as ema
@@ -25,7 +27,8 @@ import emission.core.wrapper.transition as et
 
 class TestFormatters(unittest.TestCase):
     def testConvertMotionActivity(self):
-        entry = json.load(open("emission/tests/data/netTests/android.activity.txt"))
+        with open("emission/tests/data/netTests/android.activity.txt") as fp:
+            entry = json.load(fp)
         logging.debug("entry.keys() = %s" % list(entry.keys()))
         formatted_entry = enuf.convert_to_common_format(ad.AttrDict(entry))
         self.assertEquals(formatted_entry.data.confidence, 100)
@@ -34,7 +37,8 @@ class TestFormatters(unittest.TestCase):
         self.assertTrue(formatted_entry.data.fmt_time.startswith("2015-07-13T15:26:00.493"))
 
     def testConvertLocation(self):
-        entry = json.load(open("emission/tests/data/netTests/android.location.raw.txt"))
+        with open("emission/tests/data/netTests/android.location.raw.txt") as fp:
+            entry = json.load(fp)
         formatted_entry = enuf.convert_to_common_format(ad.AttrDict(entry))
         self.assertEquals(formatted_entry.data.accuracy, 52.5)
         self.assertEquals(formatted_entry.data.latitude, 37.3885529)
@@ -46,7 +50,8 @@ class TestFormatters(unittest.TestCase):
         self.assertTrue(formatted_entry.metadata.write_fmt_time.startswith("2015-07-13T15:25:57.115"))
 
     def testConvertTransition(self):
-        entry = json.load(open("emission/tests/data/netTests/android.transition.txt"))
+        with open("emission/tests/data/netTests/android.transition.txt") as fp:
+            entry = json.load(fp)
         formatted_entry = enuf.convert_to_common_format(ad.AttrDict(entry))
         self.assertEquals(formatted_entry.data.curr_state, et.State.WAITING_FOR_TRIP_START.value)
         self.assertEquals(formatted_entry.data.transition, et.TransitionType.INITIALIZE.value)
@@ -55,14 +60,16 @@ class TestFormatters(unittest.TestCase):
 
     def testFlagsToEnumOneEntry(self):
         import emission.net.usercache.formatters.ios.motion_activity as ioma
-        entry = json.load(open("emission/tests/data/netTests/ios.activity.txt"))
+        with open("emission/tests/data/netTests/ios.activity.txt") as fp:
+            entry = json.load(fp)
         data = entry["data"]
         enum = ioma.type_flags_to_enum(data)
         self.assertEqual(enum, ema.MotionTypes.STILL)
         
     def testFlagsToEnumStoppedInVehicle(self):
         import emission.net.usercache.formatters.ios.motion_activity as ioma
-        entry = json.load(open("emission/tests/data/netTests/ios.activity.txt"))
+        with open("emission/tests/data/netTests/ios.activity.txt") as fp:
+            entry = json.load(fp)
         data = entry["data"]
         data["automotive"] = True
         enum = ioma.type_flags_to_enum(data)
@@ -70,7 +77,8 @@ class TestFormatters(unittest.TestCase):
         
     def testFlagsToEnumTwoEntries(self):
         import emission.net.usercache.formatters.ios.motion_activity as ioma
-        entry = json.load(open("emission/tests/data/netTests/ios.activity.txt"))
+        with open("emission/tests/data/netTests/ios.activity.txt") as fp:
+            entry = json.load(fp)
         data = entry["data"]
         data["cycling"] = True
         with self.assertRaisesRegexp(RuntimeError, ".*two modes.*"):
@@ -79,13 +87,15 @@ class TestFormatters(unittest.TestCase):
     
     def testFlagsToEnumNoEntries(self):
         import emission.net.usercache.formatters.ios.motion_activity as ioma
-        entry = json.load(open("emission/tests/data/netTests/ios.activity.none.txt"))
+        with open("emission/tests/data/netTests/ios.activity.none.txt") as fp:
+            entry = json.load(fp)
         data = entry["data"]
         enum = ioma.type_flags_to_enum(data)
         self.assertEqual(enum, ema.MotionTypes.NONE)
             
     def testConvertMotionActivity_ios(self):
-        entry = json.load(open("emission/tests/data/netTests/ios.activity.txt"))
+        with open("emission/tests/data/netTests/ios.activity.txt") as fp:
+            entry = json.load(fp)
         formatted_entry = enuf.convert_to_common_format(ad.AttrDict(entry))
         self.assertEquals(formatted_entry.data.confidence, 100)
         self.assertEquals(formatted_entry.data.type, ema.MotionTypes.STILL.value)
@@ -93,7 +103,8 @@ class TestFormatters(unittest.TestCase):
         self.assertTrue(formatted_entry.data.fmt_time.startswith("2015-11-02T17:23:47"))
         
     def testConvertLocation_ios(self):
-        entry = json.load(open("emission/tests/data/netTests/ios.location.txt"))
+        with open("emission/tests/data/netTests/ios.location.txt") as fp:
+            entry = json.load(fp)
         formatted_entry = enuf.convert_to_common_format(ad.AttrDict(entry))
         self.assertEquals(formatted_entry.data.accuracy, 65)
         self.assertEquals(formatted_entry.data.latitude, 37.39974810579324)
@@ -105,7 +116,8 @@ class TestFormatters(unittest.TestCase):
         self.assertTrue(formatted_entry.metadata.write_fmt_time.startswith("2015-11-02T14:39:25.760"))
         
     def testConvertTransition_ios(self):
-        entry = json.load(open("emission/tests/data/netTests/ios.transition.txt"))
+        with open("emission/tests/data/netTests/ios.transition.txt") as fp:
+            entry = json.load(fp)
         formatted_entry = enuf.convert_to_common_format(ad.AttrDict(entry))
         self.assertEquals(formatted_entry.data.curr_state, et.State.WAITING_FOR_TRIP_START.value)
         self.assertEquals(formatted_entry.data.transition, et.TransitionType.STOPPED_MOVING.value)
