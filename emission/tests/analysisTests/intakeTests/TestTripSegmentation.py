@@ -52,12 +52,12 @@ class TestTripSegmentation(unittest.TestCase):
 
     def tearDown(self):
         os.remove(self.analysis_conf_path)
-        edb.get_timeseries_db().remove({"user_id": self.androidUUID}) 
-        edb.get_timeseries_db().remove({"user_id": self.iosUUID})
-        edb.get_pipeline_state_db().remove({"user_id": self.androidUUID})
-        edb.get_pipeline_state_db().remove({"user_id": self.iosUUID})
-        edb.get_analysis_timeseries_db().remove({"user_id": self.androidUUID})
-        edb.get_analysis_timeseries_db().remove({"user_id": self.iosUUID}) 
+        edb.get_timeseries_db().delete_many({"user_id": self.androidUUID}) 
+        edb.get_timeseries_db().delete_many({"user_id": self.iosUUID})
+        edb.get_pipeline_state_db().delete_many({"user_id": self.androidUUID})
+        edb.get_pipeline_state_db().delete_many({"user_id": self.iosUUID})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.androidUUID})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.iosUUID}) 
 
     def testEmptyCall(self):
         import uuid

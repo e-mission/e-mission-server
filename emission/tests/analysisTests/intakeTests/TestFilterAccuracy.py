@@ -40,7 +40,7 @@ class TestFilterAccuracy(unittest.TestCase):
         tsdb = edb.get_timeseries_db()
         for entry in self.entries:
             entry["user_id"] = self.testUUID
-            tsdb.insert_one(entry)
+            tsdb.insert(entry)
         self.ts = esta.TimeSeries.get_time_series(self.testUUID)
 
     def tearDown(self):
@@ -61,7 +61,7 @@ class TestFilterAccuracy(unittest.TestCase):
     def testEmptyCall(self):
         # Check call to the entire filter accuracy with a zero length timeseries
         import emission.core.get_database as edb
-        edb.get_timeseries_db().remove({"user_id": self.testUUID})
+        edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
         # We expect that this should not throw
         eaicf.filter_accuracy(self.testUUID)
         self.assertEqual(len(self.ts.get_data_df("background/location")), 0)

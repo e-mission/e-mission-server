@@ -18,8 +18,6 @@ import geojson as gj
 import bson.objectid as boi
 
 # Our imports
-import emission.tests.common as etc
-
 import emission.core.get_database as edb
 import emission.net.usercache.abstract_usercache as enua
 import emission.storage.timeseries.abstract_timeseries as esta
@@ -33,7 +31,9 @@ import emission.core.wrapper.trip as ecwt
 
 class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
     def setUp(self):
-        emission.tests.common.dropAllCollections(edb._get_current_db())
+        import emission.tests.common as etc
+
+        etc.dropAllCollections(edb._get_current_db())
         self.testUserUUID1 = uuid.uuid4()
         self.testUserUUID2 = uuid.uuid4()
         self.testUserUUIDios = uuid.uuid4()
@@ -75,9 +75,9 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
             mauc.sync_phone_to_server(self.testUserUUIDios, self.ios_entry_list)
 
     def tearDown(self):
-        edb.get_usercache_db().remove({"user_id": self.testUserUUID1})
-        edb.get_usercache_db().remove({"user_id": self.testUserUUID2})
-        edb.get_usercache_db().remove({"user_id": self.testUserUUIDios})
+        edb.get_usercache_db().delete_many({"user_id": self.testUserUUID1})
+        edb.get_usercache_db().delete_many({"user_id": self.testUserUUID2})
+        edb.get_usercache_db().delete_many({"user_id": self.testUserUUIDios})
 
     def testMoveToLongTerm(self):
         # 5 mins of data, every 30 secs = 10 entries per entry type. There are
@@ -131,7 +131,7 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
         self.assertEqual(len(list(self.ts1.find_entries())), 30)
 
         # Add an invalid type
-        edb.get_usercache_db().insert({
+        edb.get_usercache_db().insert_one({
             'user_id': self.testUserUUID1,
             '_id': boi.ObjectId('572d3621d282b8f30def7e85'),
             'data': {u'transition': None,
@@ -172,7 +172,7 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
         self.assertEqual(len(list(self.ts1.find_entries())), 30)
 
         # Put the same entries (with the same object IDs into the cache again)
-        edb.get_usercache_db().insert(entries_before_move)
+        edb.get_usercache_db().insert_many(entries_before_move)
         self.assertEqual(len(self.uc1.getMessage()), 30)
 
         self.assertEqual(len(self.uc2.getMessage()), 30)
@@ -186,7 +186,7 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
         self.assertEqual(len(self.uc1.getMessage()), 60)
         self.assertEqual(len(list(self.ts1.find_entries())), 30)
 
-        edb.get_pipeline_state_db().remove({"user_id": self.testUserUUID1})
+        edb.get_pipeline_state_db().delete_many({"user_id": self.testUserUUID1})
 
         # Then we move entries for user1 into longterm again
         enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUID1).moveToLongTerm()

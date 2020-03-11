@@ -60,12 +60,12 @@ class TestSectionSegmentation(unittest.TestCase):
         os.remove(self.analysis_conf_path)
 
     def clearRelatedDb(self):
-        edb.get_timeseries_db().remove({"user_id": self.androidUUID})
-        edb.get_analysis_timeseries_db().remove({"user_id": self.androidUUID})
-        edb.get_pipeline_state_db().remove({"user_id": self.androidUUID})
-        edb.get_timeseries_db().remove({"user_id": self.iosUUID})
-        edb.get_analysis_timeseries_db().remove({"user_id": self.iosUUID})
-        edb.get_pipeline_state_db().remove({"user_id": self.iosUUID})
+        edb.get_timeseries_db().delete_many({"user_id": self.androidUUID})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.androidUUID})
+        edb.get_pipeline_state_db().delete_many({"user_id": self.androidUUID})
+        edb.get_timeseries_db().delete_many({"user_id": self.iosUUID})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.iosUUID})
+        edb.get_pipeline_state_db().delete_many({"user_id": self.iosUUID})
 
     def testSegmentationPointsSmoothedHighConfidenceMotion(self):
         ts = esta.TimeSeries.get_time_series(self.androidUUID)

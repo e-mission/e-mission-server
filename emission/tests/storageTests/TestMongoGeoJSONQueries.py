@@ -24,12 +24,12 @@ class TestGeoJSON(unittest.TestCase):
            "text": "My first blog post!",
            "tags": ["mongodb", "python", "pymongo"],
            'loc':{'type':'Point', 'coordinates':[100,32]}}
-    self.Sections.insert(post1)
+    self.Sections.insert_one(post1)
     post2 = {"author": "hh",
            "text": "My 2 blog post!",
            "tags": ["mongodb", "python", "pymongo"],
            "loc":{'type':'Point', 'coordinates':[200,30]}}
-    self.Sections.insert(post2)
+    self.Sections.insert_one(post2)
 
     retVal = []
     for a in self.Sections.find({ "loc" : { "$geoWithin" : { "$polygon" :[ [ 90,31 ],[90,40] ,[ 110,40 ],[110,31]] } } }):
@@ -44,7 +44,7 @@ class TestGeoJSON(unittest.TestCase):
 
   def testGeoWithOurStructureAndTestPolyFunction(self):
     sec1 = {'track_location':{'type':'Point', 'coordinates':[100,-40]}}
-    self.Sections.insert(sec1)
+    self.Sections.insert_one(sec1)
 
     retVal = []
     for a in self.Sections.find({ "track_location" : { "$geoWithin" : { "$polygon" : self.getTestPolygon() } } }):
@@ -80,7 +80,7 @@ class TestGeoJSON(unittest.TestCase):
     # pnt = {'type':'Point', 'coordinates': [89.5, 35.5]} # works
     pnt = {'type':'Point', 'coordinates': [90.5, 35.5]} # works
     sec1 = {'track_location': pnt}
-    self.Sections.insert(sec1)
+    self.Sections.insert_one(sec1)
 
     retVal = []
     for a in self.Sections.find({ "track_location" : { "$geoWithin" : { "$polygon" : self.getTestPolygon2() } } }):
@@ -96,7 +96,7 @@ class TestGeoJSON(unittest.TestCase):
 
   def testGeoWithNegativeValues(self):
     test = {'track_location': {'type':'Point', 'coordinates': [-90.5,35.5]} }
-    self.Sections.insert(test)
+    self.Sections.insert_one(test)
 
     retVal = []
     for a in self.Sections.find({ "track_location" : { "$geoWithin" : { "$polygon" : self.getTestNegPolygon() } } }):
@@ -113,7 +113,7 @@ class TestGeoJSON(unittest.TestCase):
 
   def testGeoWithNegativeValues(self):
     test = {'track_location': {'type':'Point', 'coordinates': [-122.5,37.5]} }
-    self.Sections.insert(test)
+    self.Sections.insert_one(test)
 
     retVal = []
     for a in self.Sections.find({ "track_location" : { "$geoWithin" : { "$polygon" : self.getTestNegPolygon() } } }):
@@ -128,19 +128,19 @@ class TestGeoJSON(unittest.TestCase):
 
   def testGeoWithOurStructureAndRealPolyFunction(self):
     test = {'track_location': {'type':'Point', 'coordinates': [-122.5, 37.5]} }
-    self.Sections.insert(test)
+    self.Sections.insert_one(test)
 
     library = {'track_location': {'type':'Point', 'coordinates': [-122.259475, 37.872370]} }
-    self.Sections.insert(library)
+    self.Sections.insert_one(library)
 
     mclaughlin = {'track_location': {'type':'Point', 'coordinates': [-122.259169, 37.873873]} }
-    self.Sections.insert(mclaughlin)
+    self.Sections.insert_one(mclaughlin)
 
     soda = {'track_location': {'type':'Point', 'coordinates': [-122.258740, 37.875711]} }
-    self.Sections.insert(soda)
+    self.Sections.insert_one(soda)
 
     wurster = {'track_location': {'type':'Point', 'coordinates': [-122.254577, 37.870352]} }
-    self.Sections.insert(wurster)
+    self.Sections.insert_one(wurster)
 
     retVal = []
     for a in self.Sections.find({ "track_location" : { "$geoWithin" : { "$polygon" : self.getTestNegPolygon() } } }):

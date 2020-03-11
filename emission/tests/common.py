@@ -59,7 +59,7 @@ def loadTable(serverName, tableName, fileName):
   with open(fileName) as fp:
       dataJSON = json.load(fp)
   for row in dataJSON:
-    tableColl.insert(row)
+    tableColl.insert_one(row)
 
 # Create a dummy section with the main stuff that we use in our code
 def createDummySection(startTime, endTime, startLoc, endLoc, predictedMode = None, confirmedMode = None):
@@ -77,7 +77,7 @@ def createDummySection(startTime, endTime, startLoc, endLoc, predictedMode = Non
   if confirmedMode != None:
     section['confirmed_mode'] = confirmedMode
 
-  get_section_db().insert(section)
+  get_section_db().insert_one(section)
   return section
 
 def updateSections(testCase):
