@@ -98,7 +98,7 @@ def del_objects_after(user_id, reset_ts, is_dry_run):
     if is_dry_run:
         logging.info("this is a dry-run, returning from del_objects_after without modifying anything")
     else:
-        result = edb.get_analysis_timeseries_db().remove(del_query)
+        result = edb.get_analysis_timeseries_db().delete_many(del_query)
         logging.info("this is not a dry-run, result of deleting analysis entries is %s" % result)
 
 class ModeInferencePipeline:

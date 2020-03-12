@@ -227,7 +227,7 @@ class ModeInferencePipelineMovesFormat:
     featureMatrix[i, 3] = section['section_id']
     featureMatrix[i, 4] = easf.calAvgSpeed(section)
     speeds = easf.calSpeeds(section)
-    if speeds != None and len(speeds) > 0:
+    if (not speeds is None) and len(speeds) > 0:
         featureMatrix[i, 5] = np.mean(speeds)
         featureMatrix[i, 6] = np.std(speeds)
         featureMatrix[i, 7] = np.max(speeds)

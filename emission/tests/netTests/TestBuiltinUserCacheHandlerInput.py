@@ -177,9 +177,8 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
 
         self.assertEqual(len(self.uc2.getMessage()), 30)
         # Also reset the user2 cache to be user1 so that we have a fresh supply of entries
-        update_result = edb.get_usercache_db().update({"user_id": self.testUserUUID2},
-                                      {"$set": {"user_id": self.testUserUUID1}},
-                                      multi=True)
+        update_result = edb.get_usercache_db().update_many({"user_id": self.testUserUUID2},
+                                      {"$set": {"user_id": self.testUserUUID1}})
         logging.debug("update_result = %s" % update_result)
 
         # Now, we should have 60 entries in the usercache (30 duplicates + 30 from user2)

@@ -40,7 +40,7 @@ class TestFilterAccuracy(unittest.TestCase):
         tsdb = edb.get_timeseries_db()
         for entry in self.entries:
             entry["user_id"] = self.testUUID
-            tsdb.insert(entry)
+            tsdb.insert_one(entry)
         self.ts = esta.TimeSeries.get_time_series(self.testUUID)
 
     def tearDown(self):
@@ -89,7 +89,7 @@ class TestFilterAccuracy(unittest.TestCase):
                                         "metadata.write_ts",
                                         entry_from_df.metadata_write_ts))
         self.assertNotIn("_id", entry_copy)
-        self.assertEquals(entry_copy["metadata"]["key"], "background/filtered_location")
+        self.assertEqual(entry_copy["metadata"]["key"], "background/filtered_location")
 
     def testExistingFilteredLocation(self):
         time_query = epq.get_time_range_for_accuracy_filtering(self.testUUID)

@@ -37,7 +37,7 @@ class TestUser(unittest.TestCase):
   def testGetAvgMpg(self):
     user = User.register('fake@fake.com')
     user.setMpgArray([45, 50, 31])
-    self.assertEquals(user.getAvgMpg(), 42)
+    self.assertEqual(user.getAvgMpg(), 42)
 
   def testGetCarbonFootprintForMode(self):
     user = User.register('fake@fake.com')
@@ -56,7 +56,7 @@ class TestUser(unittest.TestCase):
                         'air_short' : old_div(217.0,1609),
                          'air_long' : old_div(217.0,1609)
                       }
-    self.assertEquals(user.getCarbonFootprintForMode(), correctCarbonFootprintForMode)
+    self.assertEqual(user.getCarbonFootprintForMode(), correctCarbonFootprintForMode)
 
   def testMergeDict(self):
     dict1 = {'a': 'a1', 'b': 'b1', 'c': 'c1'}
@@ -69,7 +69,7 @@ class TestUser(unittest.TestCase):
 
   def testGetSettingsDefaultUser(self):
     user = User.register('fake@fake.com')
-    self.assertRegexpMatches(user.getSettings()['result_url'], ".*/compare")
+    self.assertRegex(user.getSettings()['result_url'], ".*/compare")
 
   def testRegisterExistingUser(self):
     user = User.register('fake@fake.com')
