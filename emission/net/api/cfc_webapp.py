@@ -61,6 +61,7 @@ except:
     config_file = open('conf/net/api/webserver.conf.sample')
 
 config_data = json.load(config_file)
+config_file.close()
 static_path = config_data["paths"]["static_path"]
 python_path = config_data["paths"]["python_path"]
 server_host = config_data["server"]["host"]

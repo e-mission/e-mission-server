@@ -98,7 +98,7 @@ def del_objects_after(user_id, reset_ts, is_dry_run):
     if is_dry_run:
         logging.info("this is a dry-run, returning from del_objects_after without modifying anything")
     else:
-        result = edb.get_analysis_timeseries_db().remove(del_query)
+        result = edb.get_analysis_timeseries_db().delete_many(del_query)
         logging.info("this is not a dry-run, result of deleting analysis entries is %s" % result)
 
 class ModeInferencePipeline:
@@ -351,7 +351,8 @@ class ModeInferencePipeline:
 if __name__ == "__main__":
   import json
 
-  config_data = json.load(open('config.json'))
+  with open('config.json') as cf:
+      config_data = json.load(cf)
   log_base_dir = config_data['paths']['log_base_dir']
   logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
                       filename="%s/pipeline.log" % log_base_dir, level=logging.DEBUG)

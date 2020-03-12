@@ -33,6 +33,7 @@ N_TOP_TRIPS = 3 # Number of top trips we return for the user to look at
 
 key_file = open("conf/net/ext_service/googlemaps.json")
 GOOGLE_MAPS_KEY = json.load(key_file)["api_key"]
+key_file.close()
 
 
 class UserBase(object):

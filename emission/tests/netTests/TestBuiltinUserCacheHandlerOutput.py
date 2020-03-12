@@ -18,7 +18,7 @@ import geojson as gj
 import arrow
 
 # Our imports
-import emission.tests.common
+import emission.tests.common as etc
 
 import emission.core.get_database as edb
 import emission.net.usercache.abstract_usercache as enua
@@ -34,15 +34,12 @@ import emission.storage.decorations.local_date_queries as ecsdlq
 
 class TestBuiltinUserCacheHandlerOutput(unittest.TestCase):
     def setUp(self):
-        emission.tests.common.dropAllCollections(edb._get_current_db())
+        etc.dropAllCollections(edb._get_current_db())
         self.testUserUUID1 = uuid.uuid4()
         self.testUserUUID2 = uuid.uuid4()
         self.testUserUUIDios = uuid.uuid4()
-        
-        self.activity_entry = json.load(open("emission/tests/data/netTests/android.activity.txt"))
-        self.location_entry = json.load(open("emission/tests/data/netTests/android.location.raw.txt"))
-        self.transition_entry = json.load(open("emission/tests/data/netTests/android.transition.txt"))
-        self.entry_list = [self.activity_entry, self.location_entry, self.transition_entry]
+
+        (self.entry_list, self.ios_entry_list) = etc.setupIncomingEntries()
 
         self.uc1 = enua.UserCache.getUserCache(self.testUserUUID1)
         self.uc2 = enua.UserCache.getUserCache(self.testUserUUID2)
@@ -67,11 +64,7 @@ class TestBuiltinUserCacheHandlerOutput(unittest.TestCase):
             for entry in self.entry_list:
                 entry["metadata"]["write_ts"] = offset * 1000
             mauc.sync_phone_to_server(self.testUserUUID2, self.entry_list)
-            
-        self.ios_activity_entry = json.load(open("emission/tests/data/netTests/ios.activity.txt"))
-        self.ios_location_entry = json.load(open("emission/tests/data/netTests/ios.location.txt"))
-        self.ios_transition_entry = json.load(open("emission/tests/data/netTests/ios.transition.txt"))
-        self.ios_entry_list = [self.ios_activity_entry, self.ios_location_entry, self.ios_transition_entry]
+
         for entry in self.ios_entry_list:
             # Needed because otherwise we get a DuplicateKeyError while
             # inserting the mutiple copies 

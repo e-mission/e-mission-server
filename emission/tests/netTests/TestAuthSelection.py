@@ -34,10 +34,11 @@ class TestAuthSelection(unittest.TestCase):
         self.openid_auth_conf_path = "conf/net/auth/openid_auth.json"
         shutil.copyfile("%s.sample" % self.openid_auth_conf_path,
                         self.openid_auth_conf_path)
-        open(self.openid_auth_conf_path, "w").write(json.dumps({
-            "discoveryURI": "https://accounts.google.com/.well-known/openid-configuration",
-            "clientID": "123456"
-        }))
+        with open(self.openid_auth_conf_path, "w") as fp:
+            fp.write(json.dumps({
+                "discoveryURI": "https://accounts.google.com/.well-known/openid-configuration",
+                "clientID": "123456"
+            }))
 
         self.google_auth_conf_path = "conf/net/auth/google_auth.json"
         shutil.copyfile("%s.sample" % self.google_auth_conf_path,

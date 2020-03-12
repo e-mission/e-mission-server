@@ -84,7 +84,7 @@ def segment_current_trips(user_id):
 
         out_of_order_id_list = out_of_order_points["_id"].tolist()
         logging.debug("out_of_order_id_list = %s" % out_of_order_id_list)
-        edb.get_timeseries_db().remove({"_id": {"$in": out_of_order_id_list}})
+        edb.get_timeseries_db().delete_many({"_id": {"$in": out_of_order_id_list}})
 
     filters_in_df = loc_df["filter"].dropna().unique()
     logging.debug("Filters in the dataframe = %s" % filters_in_df)
