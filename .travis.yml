@@ -1,6 +1,6 @@
 # Template from 
 # https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/use-conda-with-travis-ci.html
-language: python
+language: generic
 python:
   # We don't actually use the Travis Python, but this keeps it organized.
   - "3.6.1"
