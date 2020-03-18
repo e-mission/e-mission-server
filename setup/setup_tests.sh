@@ -2,7 +2,11 @@
 
 echo "Setting up blank environment"
 conda create --name emissiontest python=3.6
-source activate emissiontest
+if [ ${CI} == "true" ] ; then
+    conda activate emissiontest
+else
+    source activate emissiontest
+fi
 
 echo "Downloading packages"
 curl -o /tmp/cachetools-2.1.0-py_0.tar.bz2 -L https://anaconda.org/conda-forge/cachetools/2.1.0/download/noarch/cachetools-2.1.0-py_0.tar.bz2
