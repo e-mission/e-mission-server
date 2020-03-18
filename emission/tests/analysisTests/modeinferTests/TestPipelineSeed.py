@@ -20,7 +20,7 @@ class TestPipelineSeed(unittest.TestCase):
   def setUp(self):
     self.testUsers = ["test@example.com", "best@example.com", "fest@example.com",
                       "rest@example.com", "nest@example.com"]
-    self.serverName = 'localhost'
+    self.serverName = edb.url
 
     self.ModesColl = get_mode_db()
     self.SectionsColl = get_section_db()
@@ -39,7 +39,7 @@ class TestPipelineSeed(unittest.TestCase):
 
     self.assertEqual(self.SectionsColl.find().count(), 0)
 
-    MongoClient('localhost').drop_database("Backup_database")
+    MongoClient(edb.url).drop_database("Backup_database")
 
     etc.loadTable(self.serverName, "Stage_Modes", "emission/tests/data/modes.json")
     etc.loadTable(self.serverName, "Stage_Sections", "emission/tests/data/testModeInferSeedFile")
@@ -66,7 +66,7 @@ class TestPipelineSeed(unittest.TestCase):
     self.testLoadTrainingData()
 
   def tearDown(self):
-    MongoClient('localhost').drop_database("Backup_database")
+    MongoClient(edb.url).drop_database("Backup_database")
     for testUser in self.testUsers:
       etc.purgeSectionData(self.SectionsColl, testUser)
     logging.debug("Number of sections after purge is %d" % self.SectionsColl.find().count())
@@ -81,7 +81,7 @@ class TestPipelineSeed(unittest.TestCase):
 
     allConfirmedTripsQuery = pipeline.ModeInferencePipelineMovesFormat.getSectionQueryWithGroundTruth({'$ne': ''})
     self.pipeline.confirmedSections = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery)
-    backupSections = MongoClient('localhost').Backup_database.Stage_Sections
+    backupSections = MongoClient(edb.url).Backup_database.Stage_Sections
     self.pipeline.backupConfirmedSections = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery, backupSections)
     self.assertEqual(self.pipeline.confirmedSections.count(), len(self.testUsers) * 2)
     self.assertEqual(self.pipeline.backupConfirmedSections.count(), 0)
@@ -204,10 +204,10 @@ class TestPipelineSeed(unittest.TestCase):
     # Here, we only have 5 trips, so the pipeline looks for the backup training
     # set instead, which fails because there is no backup. So let's copy data from
     # the main DB to the backup DB to make this test pass
-    MongoClient('localhost').admin.command("copydb",
+    MongoClient(edb.url).admin.command("copydb",
         fromdb="Stage_database",
         todb="Backup_database",
-        fromhost="localhost")
+        fromhost=edb.url)
     self.pipeline.runPipeline()
 
     # Checks are largely the same as above
