@@ -105,7 +105,7 @@ class User(object):
 
   def changeUpdateTs(self, timedelta):
     newTs = self.getUpdateTS() + timedelta
-    get_profile_db().update({'user_id': self.uuid}, {'$set': {'update_ts': newTs}})
+    get_profile_db().update_one({'user_id': self.uuid}, {'$set': {'update_ts': newTs}})
 
   def getFirstStudy(self):
     return None

@@ -37,10 +37,10 @@ class TestTripMetricsQuery(unittest.TestCase):
         self.clearRelatedDb()
 
     def clearRelatedDb(self):
-        edb.get_timeseries_db().remove({"user_id": {"$in": self.testUUIDList}})
-        edb.get_analysis_timeseries_db().remove({"user_id": {"$in": self.testUUIDList}})
-        edb.get_usercache_db().remove({"user_id": {"$in": self.testUUIDList}})
-        edb.get_uuid_db().remove({"user_id": {"$in": self.testUUIDList}})
+        edb.get_timeseries_db().delete_many({"user_id": {"$in": self.testUUIDList}})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": {"$in": self.testUUIDList}})
+        edb.get_usercache_db().delete_many({"user_id": {"$in": self.testUUIDList}})
+        edb.get_uuid_db().delete_many({"user_id": {"$in": self.testUUIDList}})
 
     def testGetMetricList(self):
         self.testUUIDList = []
@@ -173,7 +173,7 @@ class TestTripMetricsQuery(unittest.TestCase):
 
         etc.setupRealExample(self, dataFileba)
         testUUIDba = self.testUUID
-        edb.get_uuid_db().insert({"uuid": testUUIDba, "user_email": "sfbay@sfbay.location"})
+        edb.get_uuid_db().insert_one({"uuid": testUUIDba, "user_email": "sfbay@sfbay.location"})
         etc.runIntakePipeline(testUUIDba)
         logging.debug("uuid for the bay area = %s " % testUUIDba)
 
@@ -183,7 +183,7 @@ class TestTripMetricsQuery(unittest.TestCase):
 
         etc.setupRealExample(self, dataFilehi)
         testUUIDhi = self.testUUID
-        edb.get_uuid_db().insert({"uuid": testUUIDhi, "user_email": "hawaii@hawaii.location"})
+        edb.get_uuid_db().insert_one({"uuid": testUUIDhi, "user_email": "hawaii@hawaii.location"})
         etc.runIntakePipeline(testUUIDhi)
 
         logging.debug("uuid for hawaii = %s " % testUUIDhi)

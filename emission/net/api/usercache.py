@@ -51,11 +51,14 @@ def sync_phone_to_server(uuid, data_from_phone):
                         'metadata.type': data["metadata"]["type"],
                         'metadata.write_ts': data["metadata"]["write_ts"],
                         'metadata.key': data["metadata"]["key"]}
-        result = usercache_db.update(update_query,
+        result = usercache_db.update_one(update_query,
                                            document,
                                            upsert=True)
         logging.debug("Updated result for user = %s, key = %s, write_ts = %s = %s" % 
-            (uuid, data["metadata"]["key"], data["metadata"]["write_ts"], result))
-        if 'err' in result and result['err'] is not None:
-            logging.error("In sync_phone_to_server, err = %s" % result['err'])
+            (uuid, data["metadata"]["key"], data["metadata"]["write_ts"], result.raw_result))
+
+        # I am not sure how to trigger a writer error to test this
+        # and whether this is the format expected from the server in the rawResult
+        if 'ok' in result.raw_result and result.raw_result['ok'] != 1.0:
+            logging.error("In sync_phone_to_server, err = %s" % result.raw_result['writeError'])
             raise Exception()

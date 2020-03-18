@@ -18,6 +18,7 @@ except:
 
 config_data = json.load(config_file)
 url = config_data["timeseries"]["url"]
+config_file.close()
 
 print("Connecting to database URL "+url)
 _current_db = MongoClient(url).Stage_database
@@ -262,8 +263,9 @@ def get_fake_sections_db():
 # pymongo 3.0. 
 # https://github.com/e-mission/e-mission-server/issues/533#issuecomment-349430623
 def save(db, entry):
-#     if '_id' in entry:
-#         db.replace_one({'_id': entry['_id']}, entry, upsert=True)
-#     else:
-#         db.replace_one({}, entry, upsert=True)
-    db.save(entry)
+    if '_id' in entry:
+        result = db.replace_one({'_id': entry['_id']}, entry, upsert=True)
+        # logging.debug("entry has id, calling with match, result = %s" % result.raw_result)
+    else:
+        result = db.insert_one(entry)
+        # logging.debug("entry has id, calling without match, result = %s" % result.inserted_id)

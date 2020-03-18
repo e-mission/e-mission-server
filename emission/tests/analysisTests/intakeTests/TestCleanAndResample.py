@@ -41,7 +41,7 @@ class TestCleanAndResample(unittest.TestCase):
 
     def tearDown(self):
         import emission.core.get_database as edb
-        edb.get_timeseries_db().remove({"user_id": self.testUUID})
+        edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
 
     def testRemoveOutliers(self):
         TS_START = 12345

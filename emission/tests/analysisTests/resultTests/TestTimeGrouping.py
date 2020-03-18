@@ -44,7 +44,7 @@ class TestTimeGrouping(unittest.TestCase):
         self.ts = esta.TimeSeries.get_time_series(self.testUUID)
 
     def tearDown(self):
-        edb.get_analysis_timeseries_db().remove({'user_id': self.testUUID})
+        edb.get_analysis_timeseries_db().delete_many({'user_id': self.testUUID})
 
     def testLocalGroupBy(self):
         self.assertEqual(earmt._get_local_group_by(earmt.LocalFreq.DAILY),

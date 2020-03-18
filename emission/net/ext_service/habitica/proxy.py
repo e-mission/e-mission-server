@@ -21,6 +21,7 @@ import emission.core.get_database as edb
 try:
     key_file = open('conf/net/ext_service/habitica.json')
     key_data = json.load(key_file)
+    key_file.close()
     url = key_data["url"]
 except:
     logging.exception("habitica not configured, game functions not supported")

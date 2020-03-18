@@ -34,8 +34,8 @@ class TestLocalDateQueries(unittest.TestCase):
         self.clearRelatedDb()
 
     def clearRelatedDb(self):
-        edb.get_timeseries_db().remove({'user_id': self.testUUID})
-        edb.get_analysis_timeseries_db().remove({'user_id': self.testUUID})
+        edb.get_timeseries_db().delete_many({'user_id': self.testUUID})
+        edb.get_analysis_timeseries_db().delete_many({'user_id': self.testUUID})
 
     def testLocalDateReadWrite(self):
         ts = esta.TimeSeries.get_time_series(self.testUUID)
@@ -73,7 +73,7 @@ class TestLocalDateQueries(unittest.TestCase):
         final_query = {"user_id": self.testUUID}
         final_query.update(esdl.get_range_query("data.local_dt", start_local_dt, end_local_dt))
         entries = edb.get_timeseries_db().find(final_query)
-        self.assertEquals(15, entries.count())
+        self.assertEqual(15, entries.count())
 
     def testLocalRangeRolloverQuery(self):
         """
@@ -84,7 +84,7 @@ class TestLocalDateQueries(unittest.TestCase):
         final_query = {"user_id": self.testUUID}
         final_query.update(esdl.get_range_query("data.local_dt", start_local_dt, end_local_dt))
         entries = edb.get_timeseries_db().find(final_query).sort('data.ts', pymongo.ASCENDING)
-        self.assertEquals(448, entries.count())
+        self.assertEqual(448, entries.count())
 
         entries_list = list(entries)
 
@@ -105,13 +105,13 @@ class TestLocalDateQueries(unittest.TestCase):
         final_query = {"user_id": self.testUUID}
         final_query.update(esdl.get_range_query("data.local_dt", start_local_dt, end_local_dt))
         entries_docs = edb.get_timeseries_db().find(final_query).sort("metadata.write_ts")
-        self.assertEquals(20, entries_docs.count())
+        self.assertEqual(20, entries_docs.count())
         entries = [ecwe.Entry(doc) for doc in entries_docs]
         logging.debug("entries bookends are %s and %s" % (entries[0], entries[-1]))
         first_entry = entries[0]
-        self.assertEquals(first_entry.data.local_dt.hour, 9)
+        self.assertEqual(first_entry.data.local_dt.hour, 9)
         last_entry = entries[19]
-        self.assertEquals(last_entry.data.local_dt.hour, 17)
+        self.assertEqual(last_entry.data.local_dt.hour, 17)
 
 if __name__ == '__main__':
     import emission.tests.common as etc
