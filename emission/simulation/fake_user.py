@@ -63,9 +63,14 @@ class FakeUser:
             #TODO: if the user cache has more than 5000 entries notify the user so they can sync the data. 
 
         return measurements
+
+    def add_measurements(self, entries):
+        self._measurements_cache += entries
+
     def sync_data_to_server(self):
         #Remove the _id field
         measurements_no_id = [self._remove_id_field(entry) for entry in self._measurements_cache]
+        print(measurements_no_id[0])
         #Send data to server
         data = {
             'phone_to_server': measurements_no_id,
@@ -120,9 +125,15 @@ class FakeUser:
     
     @staticmethod
     def _remove_id_field(entry):
-        copy = entry.copy()
-        del copy['_id']
-        return copy
+        munged = entry.copy()
+        del munged['_id']
+        if 'user_id' in munged:
+            del munged['user_id']
+        if 'write_local_dt' in munged['metadata']:
+            del munged['metadata']['write_local_dt']
+        if 'type' not in munged['metadata']:
+            munged['metadata']['type'] = "sensor-data"
+        return munged
     
     def _flush_cache(self):
         self._measurements_cache = []
