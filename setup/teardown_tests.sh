@@ -2,7 +2,7 @@
 
 echo "Removing environment from "${CONDA_TEMP_PREFIX}
 if [ ${CI} == "true" ] ; then
-    conda deactivate emissiontest
+    conda deactivate
 else
     source deactivate emissiontest
 fi
