@@ -14,7 +14,6 @@ import numpy as np
 
 import emission.storage.decorations.common_place_queries as esdcpq
 import emission.analysis.modelling.tour_model.cluster_pipeline as eamtcp
-import emission.simulation.trip_gen as tg
 import emission.core.get_database as edb
 import emission.storage.decorations.common_trip_queries as esdctp
 import emission.tests.common as etc

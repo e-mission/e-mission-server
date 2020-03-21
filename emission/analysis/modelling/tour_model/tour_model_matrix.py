@@ -11,7 +11,6 @@ from builtins import *
 from builtins import object
 from past.utils import old_div
 import logging
-import emission.simulation.markov_model_counter as esmmc
 import emission.net.ext_service.geocoder.nominatim as eco
 
 # Standard imports

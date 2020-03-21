@@ -109,24 +109,8 @@ $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py -n /tmp/data-c
 ### Creating fake user data ###
 
 You may need a larger or more diverse set of data than the given test data supplies.
-To create it you can run the trip generation script included in the project. 
-
-The script works by creating random noise around starting and ending points of trips.
-
-You can fill out options for the new data in emission/simulation/input.json. 
-The different options are as follows
-* radius - the number of kilometers of randomization around starting and ending points (the amount of noise)
-* starting centroids - addresses you want trips to start around, as well as a weight defining the relative probability a trip will start there
-* ending centroids - addresses you want trips to end around, as well as a weight defining the relative probability a trip will end there
-* modes - the relative probability a user will take a trip with the given mode
-* number of trips - the amount of trips the simulation should create
-
-run the script with 
-    
-    $ python emission/simulation/trip_gen.py <user_name>
-
-Because this user data is specifically designed to test our tour model creation, you can create fake tour models easily by running the `make_tour_model_from_fake_data` function in `emission/storage/decorations/tour_model_queries.py`
-
+Please see https://github.com/e-mission/em-dataload for examples of creating
+and loading fake data.
 
 ### Running the analysis pipeline ###
 
