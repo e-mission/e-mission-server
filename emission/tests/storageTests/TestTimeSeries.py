@@ -31,7 +31,7 @@ class TestTimeSeries(unittest.TestCase):
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
 
     def tearDown(self):
-        edb.get_timeseries_db().remove({"user_id": self.testUUID}) 
+        edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
 
     def testGetUUIDList(self):
         uuid_list = esta.TimeSeries.get_uuid_list()

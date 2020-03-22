@@ -24,6 +24,7 @@ class OpenIDAuthMethod(object):
         # including the config_url and the audience
         key_file = open('conf/net/auth/openid_auth.json')
         key_data = json.load(key_file)
+        key_file.close()
         discoveryURI = key_data["discoveryURI"]
         audience = key_data["clientID"]
         # Now, use them to retrieve the configuration

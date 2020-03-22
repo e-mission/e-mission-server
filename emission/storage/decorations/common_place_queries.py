@@ -13,7 +13,7 @@ import bson.objectid as boi
 
 import emission.core.wrapper.common_place as ecwcp
 import emission.core.get_database as edb
-import emission.simulation.markov_model_counter as esmmc
+import pykov as pk
 import emission.storage.decorations.common_trip_queries as esdctp
 
 #################################################################################
@@ -94,7 +94,7 @@ def create_places(list_of_cluster_data, user_id):
 ### Graph queries
 
 def get_succesor(user_id, place_id, time):
-    temp = esmmc.Counter()
+    temp = pk.Vector()
     day = time.weekday()
     place = get_common_place_from_db(place_id)
     for suc in place["successors"]:
@@ -102,7 +102,7 @@ def get_succesor(user_id, place_id, time):
         for temp_hour in range(time.hour, esdctp.HOURS_IN_DAY):
             counter_key = ("%s" % suc, temp_hour)
             temp[counter_key] = trip.probabilites[day, temp_hour]
-    return boi.ObjectId(esmmc.sampleFromCounter(temp)[0])
+    return boi.ObjectId(temp.choose())
 
 def has_succesor(user_id, place_id, time):
     day = time.weekday()

@@ -9,7 +9,7 @@ from builtins import range
 from builtins import *
 from past.utils import old_div
 from builtins import object
-import emission.simulation.markov_model_counter as emmc
+import pykov as pk
 import emission.net.ext_service.otp.otp as otp
 import emission.net.ext_service.geocoder.nominatim as geo
 import emission.core.wrapper.trip_old as to
@@ -33,6 +33,7 @@ N_TOP_TRIPS = 3 # Number of top trips we return for the user to look at
 
 key_file = open("conf/net/ext_service/googlemaps.json")
 GOOGLE_MAPS_KEY = json.load(key_file)["api_key"]
+key_file.close()
 
 
 class UserBase(object):
@@ -119,7 +120,7 @@ class UserModel(object):
     """ 
 
     def __init__(self, has_bike=False):
-        self.utilities = emmc.Counter()
+        self.utilities = pk.Chain()
         self.has_bike = has_bike
         self.user_base = the_base
 
@@ -245,7 +246,7 @@ def get_time_of_trip(trip):
     return (trip.end_time - trip.start_time).seconds
 
 def get_normalized_times(lst_of_trips):
-    counter = emmc.Counter()
+    counter = pk.Vector()
     i = 0
     for trip in lst_of_trips:
         counter[i] = get_time_of_trip(trip)
@@ -262,7 +263,7 @@ def get_sweat_factor(trip, testing=False):
     return 71.112*chng[0] + 148.09
 
 def get_normalized_sweat(lst_of_trips, testing=False):
-    counter = emmc.Counter()
+    counter = pk.Vector()
     i = 0
     for trip in lst_of_trips:
         factor = get_sweat_factor(trip, testing)
@@ -276,7 +277,7 @@ def get_normalized_sweat(lst_of_trips, testing=False):
     return to_return
 
 def get_normalized_beauty(lst_of_trips):
-    counter = emmc.Counter()
+    counter = pk.Vector()
     i = 0
     for trip in lst_of_trips:
         factor = get_beauty_score_of_trip(trip)
@@ -319,7 +320,7 @@ class Area(object):
         self.update_times(datetime.datetime.now())
 
     def normalize_sounds(self):
-        counter = emmc.Counter()
+        counter = pk.Vector()
         for k,v in self.time_to_noise.items():
             counter[k] = v
         counter.normalize()

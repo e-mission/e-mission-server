@@ -35,9 +35,9 @@ class TestPipelineReset(unittest.TestCase):
         self.clearRelatedDb()
 
     def clearRelatedDb(self):
-        edb.get_timeseries_db().remove({"user_id": self.testUUID})
-        edb.get_analysis_timeseries_db().remove({"user_id": self.testUUID})
-        edb.get_usercache_db().remove({"user_id": self.testUUID})
+        edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID})
+        edb.get_usercache_db().delete_one({"user_id": self.testUUID})
 
     def compare_result(self, result, expect):
         # This is basically a bunch of asserts to ensure that the timeline is as

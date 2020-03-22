@@ -97,7 +97,8 @@ class RecommendationPipeline(object):
 
 if __name__ == "__main__":
 
-  config_data = json.load(open('config.json'))
+  with open('config.json') as cf:
+      config_data = json.load(cf)
   log_base_dir = config_data['paths']['log_base_dir']
   logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
                       filename="%s/pipeline.log" % log_base_dir, level=logging.DEBUG)

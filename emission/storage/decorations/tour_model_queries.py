@@ -12,7 +12,6 @@ import emission.core.get_database as edb
 import emission.storage.decorations.common_place_queries as esdcpq
 import emission.storage.decorations.common_trip_queries as esdctq
 import emission.analysis.modelling.tour_model.cluster_pipeline as eamtmcp
-import emission.simulation.trip_gen as estg
 
 #################################################################################
 ############################ database functions #################################
@@ -59,8 +58,4 @@ def make_tour_model_from_raw_user_data(user_id):
         esdctq.set_up_trips(list_of_cluster_data, user_id)
     except ValueError as e:
        logging.debug("Got ValueError %s while creating tour model, skipping it..." % e)
-
-def make_tour_model_from_fake_data(fake_user_id):
-    estg.create_fake_trips(fake_user_id, True)
-    make_tour_model_from_raw_user_data(fake_user_id)
 

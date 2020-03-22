@@ -46,9 +46,11 @@ def run_intake_pipeline(process_number, uuid_list):
     :return:
     """
     try:
-        intake_log_config = json.load(open("conf/log/intake.conf", "r"))
+        with open("conf/log/intake.conf", "r") as cf:
+            intake_log_config = json.load(cf)
     except:
-        intake_log_config = json.load(open("conf/log/intake.conf.sample", "r"))
+        with open("conf/log/intake.conf.sample", "r") as cf:
+            intake_log_config = json.load(cf)
 
     intake_log_config["handlers"]["file"]["filename"] = \
         intake_log_config["handlers"]["file"]["filename"].replace("intake", "intake_%s" % process_number)

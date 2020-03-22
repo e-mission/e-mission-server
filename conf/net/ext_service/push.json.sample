@@ -1,5 +1,5 @@
 {
     "provider": "firebase",
-    "server_auth_token": "Get from firebase console"
+    "server_auth_token": "Get from firebase console",
     "app_package_name": "full package name from config.xml. e.g. edu.berkeley.eecs.emission or edu.berkeley.eecs.embase. Defaults to edu.berkeley.eecs.embase"
 }

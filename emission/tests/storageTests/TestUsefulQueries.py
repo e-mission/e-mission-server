@@ -16,40 +16,40 @@ import emission.storage.decorations.useful_queries as tauq
 
 class UsefulQueriesTests(unittest.TestCase):
     def setUp(self):
-        get_section_db().remove({"_id": "foo_1"})
-        get_section_db().remove({"_id": "foo_2"})
-        get_section_db().remove({"_id": "foo_3"})
+        get_section_db().delete_one({"_id": "foo_1"})
+        get_section_db().delete_one({"_id": "foo_2"})
+        get_section_db().delete_one({"_id": "foo_3"})
 
     def tearDown(self):
-        get_section_db().remove({"_id": "foo_1"})
-        get_section_db().remove({"_id": "foo_2"})
-        get_section_db().remove({"_id": "foo_3"})
+        get_section_db().delete_one({"_id": "foo_1"})
+        get_section_db().delete_one({"_id": "foo_2"})
+        get_section_db().delete_one({"_id": "foo_3"})
         self.assertEqual(get_section_db().find({'_id': 'foo_1'}).count(), 0)
         self.assertEqual(get_section_db().find({'_id': 'foo_2'}).count(), 0)
         self.assertEqual(get_section_db().find({'_id': 'foo_3'}).count(), 0)
 
     def testGetAllSections(self):
-        get_section_db().insert({"_id": "foo_1", "trip_id": "bar"})
-        get_section_db().insert({"_id": "foo_2", "trip_id": "bar"})
-        get_section_db().insert({"_id": "foo_3", "trip_id": "baz"})
+        get_section_db().insert_one({"_id": "foo_1", "trip_id": "bar"})
+        get_section_db().insert_one({"_id": "foo_2", "trip_id": "bar"})
+        get_section_db().insert_one({"_id": "foo_3", "trip_id": "baz"})
         self.assertEqual(len(tauq.get_all_sections("foo_1")), 2)
 
     def testGetAllSectionsForUserDay(self):
         dt1 = datetime(2015, 1, 1, 1, 1, 1)
         dt2 = datetime(2015, 1, 1, 2, 1, 1)
         dt3 = datetime(2015, 1, 1, 3, 1, 1)
-        get_section_db().insert({"_id": "foo_1",
+        get_section_db().insert_one({"_id": "foo_1",
             "type":"move",
             "trip_id": "trip_1",
             "section_id": 3,
             "section_start_datetime": dt1,
             "section_end_datetime": dt2})
-        get_section_db().insert({"_id": "foo_2",
+        get_section_db().insert_one({"_id": "foo_2",
             "type":"place",
             "trip_id": "trip_2",
             "section_start_datetime": dt2,
             "section_end_datetime": dt3})
-        get_section_db().insert({"_id": "foo_3",
+        get_section_db().insert_one({"_id": "foo_3",
             "type": "move",
             "trip_id": "trip_3",
             "section_id": 0,
@@ -60,18 +60,18 @@ class UsefulQueriesTests(unittest.TestCase):
         dt1 = datetime(2015, 1, 1, 1, 1, 1)
         dt2 = datetime(2015, 1, 1, 2, 1, 1)
         dt3 = datetime(2015, 1, 2, 3, 1, 1)
-        get_section_db().insert({"_id": "foo_1",
+        get_section_db().insert_one({"_id": "foo_1",
             "user_id": "test_user",
             "type":"move",
             "section_id": 3,
             "section_start_datetime": dt1,
             "section_end_datetime": dt2})
-        get_section_db().insert({"_id": "foo_2",
+        get_section_db().insert_one({"_id": "foo_2",
             "user_id": "test_user",
             "type":"place",
             "section_start_datetime": dt2,
             "section_end_datetime": dt3})
-        get_section_db().insert({"_id": "foo_3",
+        get_section_db().insert_one({"_id": "foo_3",
             "user_id": "test_user",
             "type": "move",
             "section_id": 0,
