@@ -12,8 +12,7 @@
         }, 
         "console": {
             "class": "logging.StreamHandler", 
-            "level": "WARNING",
-            "encoding": "UTF-8"
+            "level": "WARNING"
         }, 
         "file": {
             "backupCount": 3, 
