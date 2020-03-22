@@ -18,7 +18,6 @@ import emission.storage.decorations.common_trip_queries as esdctp
 import emission.analysis.modelling.tour_model.cluster_pipeline as eamtcp
 import emission.storage.decorations.common_place_queries as esdcpq
 import emission.storage.decorations.trip_queries as esdtq
-import emission.simulation.trip_gen as tg
 import emission.core.get_database as edb
 import emission.core.wrapper.trip as ecwt
 import emission.tests.common as etc
@@ -97,14 +96,6 @@ class TestCommonTripQueries(unittest.TestCase):
             self.assertEqual(type(esdtq.get_trip(rand_id)), ecwt.Trip) 
             self.assertTrue(trip.probabilites.sum() > 0)
             self.assertEqual(str(trip.user_id), "test2")
-
-
-
-def get_fake_data(user_name):
-    # Call with a username unique to your database
-    tg.create_fake_trips(user_name, True)
-    return eamtcp.main(user_name)
-
 
 if __name__ == "__main__":
     import emission.tests.common as etc
