@@ -45,8 +45,8 @@ class TestLocationSmoothing(unittest.TestCase):
 
         self.testUUID = uuid.uuid4()
         self.ts = esta.TimeSeries.get_time_series(self.testUUID)
-
-        self.trip_entries = json.load(open("emission/tests/data/smoothing_data/trip_list.txt"),
+        with open("emission/tests/data/smoothing_data/trip_list.txt") as tfp:
+            self.trip_entries = json.load(tfp,
                                       object_hook=bju.object_hook)
         for trip_entry in self.trip_entries:
             trip_entry["user_id"] = self.testUUID
@@ -54,7 +54,8 @@ class TestLocationSmoothing(unittest.TestCase):
 
         self.trip_entries = [ecwe.Entry(t) for t in self.trip_entries]
 
-        self.section_entries = json.load(open("emission/tests/data/smoothing_data/section_list.txt"),
+        with open("emission/tests/data/smoothing_data/section_list.txt") as sfp:
+            self.section_entries = json.load(sfp,
                                          object_hook=bju.object_hook)
         for section_entry in self.section_entries:
             section_entry["user_id"] = self.testUUID
@@ -64,13 +65,14 @@ class TestLocationSmoothing(unittest.TestCase):
 
     def tearDown(self):
         import emission.core.get_database as edb
-        edb.get_timeseries_db().remove({"user_id": self.testUUID})
-        edb.get_analysis_timeseries_db().remove({"user_id": self.testUUID})
+        edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID})
 
     def loadPointsForTrip(self, trip_id):
         import emission.core.get_database as edb
 
-        entries = json.load(open("emission/tests/data/smoothing_data/%s" % trip_id),
+        with open("emission/tests/data/smoothing_data/%s" % trip_id) as pfp:
+            entries = json.load(pfp,
                                  object_hook=bju.object_hook)
         tsdb = edb.get_timeseries_db()
         for entry in entries:

@@ -50,12 +50,13 @@ class Client(object):
   # Let's compromise for now by passing it in and seeing how much of a hassle it is
   # That will also ensure that the update_client script is not a complete NOP
   def __update(self, newEntry):
-    get_client_db().update({'name': self.clientName}, newEntry, upsert = True)
+    get_client_db().replace_one({'name': self.clientName}, newEntry, upsert = True)
     self.__reload()
 
   def update(self, createKey = True):
     import uuid 
-    newEntry = json.load(open(self.settings_filename))
+    with open(self.settings_filename) as fp:
+        newEntry = json.load(fp)
     if createKey:
       newEntry['key'] = str(uuid.uuid4())
     # logging.info("Updating with new entry %s" % newEntry)

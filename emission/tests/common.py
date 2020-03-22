@@ -56,9 +56,10 @@ def purgeSectionData(Sections, userName):
 
 def loadTable(serverName, tableName, fileName):
   tableColl = edb._get_current_db()[tableName]
-  dataJSON = json.load(open(fileName))
+  with open(fileName) as fp:
+      dataJSON = json.load(fp)
   for row in dataJSON:
-    tableColl.insert(row)
+    tableColl.insert_one(row)
 
 # Create a dummy section with the main stuff that we use in our code
 def createDummySection(startTime, endTime, startLoc, endLoc, predictedMode = None, confirmedMode = None):
@@ -76,7 +77,7 @@ def createDummySection(startTime, endTime, startLoc, endLoc, predictedMode = Non
   if confirmedMode != None:
     section['confirmed_mode'] = confirmedMode
 
-  get_section_db().insert(section)
+  get_section_db().insert_one(section)
   return section
 
 def updateSections(testCase):
@@ -119,6 +120,27 @@ def setupRealExampleWithEntries(testObj):
                     [e["data"]["fmt_time"] if "fmt_time" in e["data"] else e["metadata"]["write_fmt_time"] for e in 
                         list(edb.get_timeseries_db().find({"user_id": testObj.testUUID}).sort("data.write_ts",
                                                                                        pymongo.ASCENDING).limit(10))])
+
+def setupIncomingEntries():
+    with open("emission/tests/data/netTests/android.activity.txt") as aaef:
+        activity_entry = json.load(aaef)
+    with open("emission/tests/data/netTests/android.location.raw.txt") as alef:
+        location_entry = json.load(alef)
+    with open("emission/tests/data/netTests/android.transition.txt") as atef:
+        transition_entry = json.load(atef)
+    entry_list = [activity_entry, location_entry, transition_entry]
+
+    with open("emission/tests/data/netTests/ios.activity.txt") as iaef:
+        ios_activity_entry = json.load(iaef)
+    with open("emission/tests/data/netTests/ios.location.txt") as ilef:
+        ios_location_entry = json.load(ilef)
+    with open("emission/tests/data/netTests/ios.transition.txt") as itef:
+        ios_transition_entry = json.load(itef)
+
+    ios_entry_list = [ios_activity_entry, ios_location_entry, ios_transition_entry]
+
+    return (entry_list, ios_entry_list)
+
 def runIntakePipeline(uuid):
     # Move these imports here so that we don't inadvertently load the modules,
     # and any related config modules, before we want to
@@ -158,11 +180,13 @@ def setupTokenListAuth(self):
     }
 
     token_list_conf_file.write(str(json.dumps(token_list_conf_json)))
+    token_list_conf_file.close()
     token_list_file = open(self.token_list_path, "w")
     token_list_file.write("correct_horse_battery_staple\n")
     token_list_file.write("collar_highly_asset_ovoid_sultan\n")
     token_list_file.write("caper_hangup_addle_oboist_scroll\n")
     token_list_file.write("couple_honcho_abbot_obtain_simple\n")
+    token_list_file.close()
 
 def tearDownTokenListAuth(self):
     import os
