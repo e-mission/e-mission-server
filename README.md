@@ -11,7 +11,7 @@ backend server - the phone apps are available in the [e-mission-phone
 repo](https://github.com/amplab/e-mission-phone)
 
 The current build status is:
-[![Build Status](https://amplab.cs.berkeley.edu/jenkins/buildStatus/icon?job=e-mission-server)](https://amplab.cs.berkeley.edu/jenkins/view/E-Mission/job/e-mission-server/)
+[![Build Status](https://travis-ci.org/shankari/e-mission-server.svg?branch=master)](https://travis-ci.org/shankari/e-mission-server)
 
 **Issues:** Since this repository is part of a larger project, all issues are tracked [in the central docs repository](https://github.com/e-mission/e-mission-docs/issues). If you have a question, [as suggested by the open source guide](https://opensource.guide/how-to-contribute/#communicating-effectively), please file an issue instead of sending an email. Since issues are public, other contributors can try to answer the question and benefit from the answer.
 
@@ -24,12 +24,11 @@ preprocessing results ensures reasonable performance.
 ## Installation: ##
 ----------
 - For **deployers** (i.e. if you want to primarily *use* the system as opposed to modify/develop it, the [docker installation](https://github.com/e-mission/e-mission-docker) is probably the easiest way to get started.
-- For **builders** (i.e. if you want to write new scripts or modify existing scripts) the [manual install](https://github.com/e-mission/e-mission-docs/blob/master/docs/e-mission-server/manual_install.md) will make it easier to edit files directly on your local filesystem. Make sure to use a POSIX-compliant CLI; you may want to look into [gitbash](https://openhatch.org/missions/windows-setup/install-git-bash) or similar on Windows.
+- For **builders** (i.e. if you want to write new scripts or modify existing scripts) the [manual install](https://github.com/e-mission/e-mission-docs/blob/master/docs/install/manual_install.md) will make it easier to edit files directly on your local filesystem. Make sure to use a POSIX-compliant CLI; you may want to look into [gitbash](https://openhatch.org/missions/windows-setup/install-git-bash) or similar on Windows.
 
 ## Additional Documentation: ##
 ----------
-Additional documentation has been moved to its own repository [e-mission-docs](https://github.com/e-mission/e-mission-docs). Specific e-mission-server additional documentation can be found here:
-https://github.com/e-mission/e-mission-docs/tree/master/docs/e-mission-server
+Additional documentation has been moved to its own repository [e-mission-docs](https://github.com/e-mission/e-mission-docs). 
 
 ## Deployment: ##
 -------------------
@@ -80,17 +79,18 @@ You may also want to load some test data. Note that for the docker install, you 
    
    If you have the phone app installed, you can log in using `test_july_22` as the email, and select July 22 *2015* to see the data for that date.
    
+
 Note that loading the data retains the object IDs. This means that if you load the same data twice with different user IDs, then only the second one will stick. In other words, if you load the file as `user1@foo.edu` and then load the same file as `user2@foo.edu`, you will only have data for `user2@foo.edu` in the database. This can be overwritten using the `--make-new` flag - e.g.
 
 ```
 $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py -n /tmp/data-collection-eval/results_dec_2015/ucb.sdb.android.1/timeseries/active_day_2.2015-11-27 shankari@eecs.berkeley.edu
 ```
-   
+
 #### Other data sources ####
 1. Get your own data. You can export your timeline for a particular day via email (Profile -> Download json dump) and then load and view it as above.
 
-1. Request access to anonymized data for research purposes by sending email to @shankari. You will be asked to consent to data retention and usage policies and will get an encrypted timeline with data from multiple users, one file per user. More information is at https://github.com/e-mission/e-mission-docs/blob/master/docs/e-mission-server/requesting_data_as_a_collaborator.md
-   
+1. Request access to anonymized data for research purposes by sending email to @shankari. You will be asked to consent to data retention and usage policies and will get an encrypted timeline with data from multiple users, one file per user. More information is at https://github.com/e-mission/e-mission-docs/blob/master/docs/manage/requesting_data_as_a_collaborator.md
+  
 1. Sample timeline data from the test phones can be retrieved using the `bin/public/request_public_data.py` script. You can see the inputs to pass to the script by using
    ```
    $ bin/public/request_public_data.py --help
@@ -104,42 +104,26 @@ $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py -n /tmp/data-c
 ```
             $ cd ..../e-mission-server
             $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py /tmp/data-collection-eval/results_dec_2015/ucb.sdb.android.1/timeseries/active_day_2.2015-11-27 shankari@eecs.berkeley.edu
-```        
+```
 
 ### Creating fake user data ###
 
 You may need a larger or more diverse set of data than the given test data supplies.
-To create it you can run the trip generation script included in the project. 
-
-The script works by creating random noise around starting and ending points of trips.
-
-You can fill out options for the new data in emission/simulation/input.json. 
-The different options are as follows
-* radius - the number of kilometers of randomization around starting and ending points (the amount of noise)
-* starting centroids - addresses you want trips to start around, as well as a weight defining the relative probability a trip will start there
-* ending centroids - addresses you want trips to end around, as well as a weight defining the relative probability a trip will end there
-* modes - the relative probability a user will take a trip with the given mode
-* number of trips - the amount of trips the simulation should create
-
-run the script with 
-    
-    $ python emission/simulation/trip_gen.py <user_name>
-
-Because this user data is specifically designed to test our tour model creation, you can create fake tour models easily by running the `make_tour_model_from_fake_data` function in `emission/storage/decorations/tour_model_queries.py`
-
+Please see https://github.com/e-mission/em-dataload for examples of creating
+and loading fake data.
 
 ### Running the analysis pipeline ###
 
 Once you have loaded the timeline, you probably want to segment it into trips and sections, smooth the sections, generate a timeline, etc. We have a unified script to do all of those, called the intake pipeline. You can run it like this.
 
     $ ./e-mission-py.bash bin/debug/intake_single_user.py -u <uuid>
-    
+
 You can also use the user's email id with the `-e` option. See the help message for details. Once the script is done running, places, trips, sections and stops would have been generated and stored in their respective mongodb tables, and the timelines for the last 7 days have been stored in the usercache.
 
 We also do some modelling on the generated data. This is much more time-intensive than the intake, but also does not need to run at the same frequency as the intake pipeline. So it is pulled out to its own pipeline. If you want to work on the modelling, you need to run this pipeline as well.
 
     $ ./e-mission-py.bash emission/pipeline/model_stage.py
-    
+
 ### Experimenting with loaded data ###
 
 Some examples of how to retrieve and experiment with loaded/analysed data are in the `Timeseries_Sample.ipynb`
@@ -187,12 +171,12 @@ If you're interested in having karma in your path and globally set, run
 To run tests if you have karma globally set, run 
 
     $ karma start my.conf.js 
-    
+
 in the webapp directory. If you didn't run the -g command, you can run
 tests with 
 
     $ ./node_modules/karma/bin/karma start
-    
+
 in the webapp directory
 
 
@@ -239,6 +223,6 @@ bower.
 ----------
 This is fairly complex and is under active change as we have more projects deploy their own servers with various configurations.
 So I have moved it to the e-mission-server section in the e-mission-docs repo:
-https://github.com/e-mission/e-mission-docs/blob/master/docs/e-mission-server/deploying_your_own_server_to_production.md
+https://github.com/e-mission/e-mission-docs/blob/master/docs/install/deploying_your_own_server_to_production.md
 
 [Python_Structure]: https://raw.github.com/amplab/e-mission-server/master/figs/e-mission-server-module-structure.png

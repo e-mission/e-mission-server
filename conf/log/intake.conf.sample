@@ -7,7 +7,8 @@
             "formatter": "detailed", 
             "class": "logging.handlers.RotatingFileHandler", 
             "maxBytes": 1073741824, 
-            "filename": "/var/tmp/intake-errors.log"
+            "filename": "/var/tmp/intake-errors.log",
+            "encoding": "UTF-8"
         }, 
         "console": {
             "class": "logging.StreamHandler", 
@@ -19,7 +20,8 @@
             "maxBytes": 1073741824, 
             "mode": "a", 
             "formatter": "detailed", 
-            "class": "logging.handlers.RotatingFileHandler"
+            "class": "logging.handlers.RotatingFileHandler",
+            "encoding": "UTF-8"
         }
     }, 
     "version": 1, 
