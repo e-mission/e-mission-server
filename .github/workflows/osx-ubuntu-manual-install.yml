@@ -35,10 +35,6 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
-    - name: Check existing version of miniconda
-      shell: bash -l {0}
-      run: conda info -a
-
     - name: Install miniconda
       shell: bash -l {0}
       run: |
