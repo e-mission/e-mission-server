@@ -1,6 +1,4 @@
-# This is a basic workflow to help you get started with Actions
-
-name: ubuntu-only-test-with-manual-install
+name: osx-ubuntu-manual-install
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
@@ -21,27 +19,34 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-16.04, ubuntu-18.04, ubuntu-latest]
+        os: [ubuntu-16.04, ubuntu-18.04, ubuntu-latest, macos-latest]
+        include:
+        - os: macos-latest
+          PLATFORM: MacOSX-x86_64
+        - os: ubuntu-16.04
+          PLATFORM: Linux-x86_64
+        - os: ubuntu-18.04
+          PLATFORM: Linux-x86_64
+        - os: ubuntu-latest
+          PLATFORM: Linux-x86_64
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
-    - name: Install and start MongoDB
-      uses: supercharge/mongodb-github-action@1.3.0
-      with:
-        mongodb-version: 3.4
-
-    - name: Check existing version of miniconda
-      shell: bash -l {0}
-      run: conda info -a
-
     - name: Install miniconda
       shell: bash -l {0}
       run: |
-        source setup/setup_conda.sh Linux-x86_64
-        which conda
+        source setup/setup_conda.sh ${{ matrix.PLATFORM }}
+        if [ ${{ matrix.PLATFORM }} == "Linux-x86_64" ]; then
+            echo "Linux install, going to check conda path"
+            which conda
+        else
+            echo "OSX install, skipping conda path check"
+            echo "    since 'which conda' inexplicably returns with status code 1"
+            echo "    only in the CI environment"
+        fi
 
     - name: Check whether the CI environment variable is set
       shell: bash -l {0}
@@ -49,23 +54,20 @@ jobs:
         source "$HOME/miniconda/etc/profile.d/conda.sh"
         echo $CI
 
-    - name: Setup the emission environment for testing
+    - name: Setup the emission environment
       shell: bash -l {0}
       run: |
         conda --version
         which conda
         source "$HOME/miniconda/etc/profile.d/conda.sh"
         conda --version
-        source setup/setup_tests.sh
+        source setup/setup.sh
+        echo "About to activate environment"
+        conda activate emission
+        conda env list
 
-    - name: Switch to emission and run the tests
+    - name: Teardown the emission environment
       shell: bash -l {0}
       run: |
         source "$HOME/miniconda/etc/profile.d/conda.sh"
-        conda --version
-        conda activate emissiontest
-        ./runAllTests.sh
-
-    - name: Teardown the test environment
-      shell: bash -l {0}
-      run: source setup/teardown_tests.sh
+        source setup/teardown.sh
