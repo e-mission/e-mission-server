@@ -5,15 +5,7 @@
 # - on OSX: /Users/<user>/miniconda3/bin/conda
 # - on Windows: C:/Users/<user>/Miniconda3/Scripts/conda
 
-CURR_CONDA_VER=`conda --version | cut -d " " -f 2`
-EXP_CONDA_VER=4.5.12
-
-if [ $CURR_CONDA_VER == $EXP_CONDA_VER ]; then
-    echo "For conda, found $CURR_CONDA_VER, expected $EXP_CONDA_VER, all is good!"
-else
-    echo "For conda, found $CURR_CONDA_VER, expected $EXP_CONDA_VER, run setup/setup_conda.sh to get the correct version"
-    exit 1
-fi
+source setup/checks/check_for_conda.sh
 
 echo "Setting up blank environment"
 conda create --name emission python=3.6
