@@ -43,6 +43,12 @@ jobs:
         source setup/setup_conda.sh
         which conda
 
+    - name: Check whether the CI environment variable is set
+      shell: bash -l {0}
+      run: |
+        source "$HOME/miniconda/etc/profile.d/conda.sh"
+        echo $CI
+
     - name: Setup the emission environment for testing
       shell: bash -l {0}
       run: |
@@ -50,7 +56,7 @@ jobs:
         which conda
         source "$HOME/miniconda/etc/profile.d/conda.sh"
         conda --version
-        source setup/setup.sh
+        source setup/setup_tests.sh
 
     - name: Switch to emission and run the tests
       shell: bash -l {0}
