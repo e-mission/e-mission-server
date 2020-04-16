@@ -1,5 +1,7 @@
 #!/bin/bash 
 
+source setup/checks/check_for_conda.sh
+
 echo "Setting up blank environment"
 conda create --name emissiontest python=3.6
 if [ ${CI} == "true" ] ; then
