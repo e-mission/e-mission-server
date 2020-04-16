@@ -39,10 +39,14 @@ jobs:
       shell: bash -l {0}
       run: |
         source setup/setup_conda.sh ${{ matrix.PLATFORM }}
-        echo "About to see where conda is"
-        which conda
-        echo "Finished conda location check, forcing success code"
-        exit 0
+        if [ ${{ matrix.PLATFORM }} == "Linux-x86_64" ]; then
+            echo "Linux install, going to check conda path"
+            which conda
+        else
+            echo "OSX install, skipping conda path check"
+            echo "    since 'which conda' inexplicably returns with status code 1"
+            echo "    only in the CI environment"
+        fi
 
     - name: Check whether the CI environment variable is set
       shell: bash -l {0}
