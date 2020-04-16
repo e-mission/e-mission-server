@@ -1,11 +1,7 @@
 #!/bin/bash
 
 echo "Removing environment from "${CONDA_TEMP_PREFIX}
-if [ ${CI} == "true" ] ; then
-    conda deactivate
-else
-    source deactivate emissiontest
-fi
+conda deactivate
 
 conda env remove --yes --name emissiontest
 # rm conf/net/ext_service/habitica.json

@@ -62,6 +62,7 @@ jobs:
         source "$HOME/miniconda/etc/profile.d/conda.sh"
         conda --version
         source setup/setup.sh
+        conda activate emission
 
     - name: Teardown the emission environment
       shell: bash -l {0}
