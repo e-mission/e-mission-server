@@ -121,6 +121,8 @@ def fix_int64_key_if_needed(key):
         mod_keys = tuple([int(k) for k in key])
         # print("after conversion, types = %s" % str(tuple([type(k) for k in key])))
         return mod_keys
+    else:
+        return key
 
 def grouped_to_summary(time_grouped_df, key_to_fill_fn, summary_fn):
     ret_list = []
