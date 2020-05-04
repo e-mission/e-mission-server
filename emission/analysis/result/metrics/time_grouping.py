@@ -99,6 +99,7 @@ def group_by_local_date(user_id, from_dt, to_dt, freq, summary_fn_list):
             "last_ts_processed": None,
             "result": [[] for i in range(len(summary_fn_list))]
         }
+
     groupby_arr = _get_local_group_by(freq)
     time_grouped_df = section_df.groupby(groupby_arr)
     local_dt_fill_fn = _get_local_key_to_fill_fn(freq)
@@ -108,11 +109,27 @@ def group_by_local_date(user_id, from_dt, to_dt, freq, summary_fn_list):
                         for summary_fn in summary_fn_list]
     }
 
+# by default, the incoming values for the keys are `numpy.int64` for reasons
+# that I don't understand. This breaks serialization
+# (https://github.com/e-mission/e-mission-docs/issues/530)
+# converting to regular ints to avoid this issue
+
+def fix_int64_key_if_needed(key):
+    if isinstance(key, tuple):
+        logging.debug("Converting %d fields from int64 to regular integer" % len(key))
+        # print("before conversion, types = %s" % str(tuple([type(k) for k in key])))
+        mod_keys = tuple([int(k) for k in key])
+        # print("after conversion, types = %s" % str(tuple([type(k) for k in key])))
+        return mod_keys
+    else:
+        return key
+
 def grouped_to_summary(time_grouped_df, key_to_fill_fn, summary_fn):
     ret_list = []
     # When we group by a time range, the key is the end of the range
     for key, section_group_df in time_grouped_df:
         curr_msts = ecwms.ModeStatTimeSummary()
+        key = fix_int64_key_if_needed(key)
         key_to_fill_fn(key, section_group_df, curr_msts)
         curr_msts.nUsers = len(section_group_df.user_id.unique())
         mode_grouped_df = section_group_df.groupby('sensed_mode')
@@ -123,6 +140,12 @@ def grouped_to_summary(time_grouped_df, key_to_fill_fn, summary_fn):
             else:
                 curr_msts[ecwm.MotionTypes(mode).name] = result
         ret_list.append(curr_msts)
+#         import bson.json_util as bju
+#         logging.debug("After appending %s, ret_list = %s" % (curr_msts, ret_list))
+#         for k in curr_msts.keys():
+#             print("Serializing key = %s" % k)
+#             logging.debug("Serializing key %s = %s" %
+#                 (k, bju.dumps(curr_msts[k])))
     return ret_list
 
 def _get_local_group_by(local_freq):
