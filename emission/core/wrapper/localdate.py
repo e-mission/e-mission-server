@@ -39,7 +39,7 @@ class LocalDate(ecwb.WrapperBase):
     @staticmethod
     def get_local_date(ts, timezone):
         adt = arrow.get(ts).to(timezone)
-        return ecwl.LocalDate({'year': adt.year, 'month': adt.month, 'day': adt.day,
+        return LocalDate({'year': adt.year, 'month': adt.month, 'day': adt.day,
         'hour': adt.hour, 'minute': adt.minute, 'second': adt.second,
         'weekday': adt.weekday(), 'timezone': timezone})
 
