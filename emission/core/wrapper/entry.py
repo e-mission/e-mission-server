@@ -6,7 +6,6 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import *
 import logging
-import bson.objectid as boi
 
 import emission.core.wrapper.wrapperbase as ecwb
 import emission.core.wrapper.metadata as ecwm
