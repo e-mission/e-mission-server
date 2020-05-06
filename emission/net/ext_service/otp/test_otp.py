@@ -3,7 +3,7 @@ import random
 import datetime 
 import emission.net.ext_service.otp.otp as otp
 import emission.core.wrapper.location as ecwl
-import emission.storage.decorations.local_date_queries as ecsdlq
+import emission.core.wrapper.localdate as ecwld
 import emission.core.wrapper.user as ecwu
 import emission.storage.timeseries.cache_series as estcs
 import emission.storage.timeseries.abstract_timeseries as esta
@@ -46,7 +46,7 @@ class TestOTPMethods(unittest.TestCase):
         first_leg = legs[0]
         start_loc = otp.create_start_location_from_leg(first_leg)
         self.assertEqual(start_loc.ts,otp.otp_time_to_ours(first_leg['startTime']).timestamp )
-        self.assertEqual(start_loc.local_dt, ecsdlq.get_local_date(start_loc.ts, 'UTC'))
+        self.assertEqual(start_loc.local_dt, ecwld.LocalDate.get_local_date(start_loc.ts, 'UTC'))
         #print(start_loc)
 
     def test_create_start_location_form_trip_plan(self):
