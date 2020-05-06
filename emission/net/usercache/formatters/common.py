@@ -9,7 +9,7 @@ import pytz
 import logging
 import arrow
 
-import emission.storage.decorations.local_date_queries as ecsdlq
+import emission.core.wrapper.localdate as ecwl
 
 def expand_metadata_times(m):
     logging.debug("write_ts = %s" % m.write_ts)
@@ -20,15 +20,15 @@ def expand_metadata_times(m):
     # The timestamp is in UTC and doesn't know the local time.
     # The fmt_time is in local time, but is a string, so query ranges are hard
     # to search for
-    m.write_local_dt = ecsdlq.get_local_date(m.write_ts, m.time_zone)
+    m.write_local_dt = ecwl.LocalDate.get_local_date(m.write_ts, m.time_zone)
     m.write_fmt_time = arrow.get(m.write_ts).to(m.time_zone).isoformat()
 
 def expand_data_times(d,m):
-    d.local_dt = ecsdlq.get_local_date(d.ts, m.time_zone)
+    d.local_dt = ecwl.LocalDate.get_local_date(d.ts, m.time_zone)
     d.fmt_time = arrow.get(d.ts).to(m.time_zone).isoformat()
 
 def expand_start_end_data_times(d,m):
-    d.start_local_dt = ecsdlq.get_local_date(d.start_ts, m.time_zone)
+    d.start_local_dt = ecwl.LocalDate.get_local_date(d.start_ts, m.time_zone)
     d.start_fmt_time = arrow.get(d.start_ts).to(m.time_zone).isoformat()
-    d.end_local_dt = ecsdlq.get_local_date(d.end_ts, m.time_zone)
+    d.end_local_dt = ecwl.LocalDate.get_local_date(d.end_ts, m.time_zone)
     d.end_fmt_time = arrow.get(d.end_ts).to(m.time_zone).isoformat()
