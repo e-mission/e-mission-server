@@ -22,8 +22,8 @@ import emission.core.get_database as edb
 import emission.core.wrapper.entry as ecwe
 import emission.core.wrapper.modeprediction as ecwm
 import emission.core.wrapper.section as ecws
+import emission.core.wrapper.localdate as ecwl
 import emission.storage.decorations.analysis_timeseries_queries as esda
-import emission.storage.decorations.local_date_queries as esdl
 import emission.storage.timeseries.abstract_timeseries as esta
 
 import emission.net.ext_service.habitica.proxy as proxy
@@ -94,7 +94,7 @@ class TestHabiticaAutocheck(unittest.TestCase):
 
   def _fillDates(self, object, prefix, ardt, timezone):
     object["%sts" % prefix] = ardt.timestamp
-    object["%slocal_dt" % prefix] = esdl.get_local_date(ardt.timestamp, timezone)
+    object["%slocal_dt" % prefix] = ecwl.LocalDate.get_local_date(ardt.timestamp, timezone)
     object["%sfmt_time" % prefix] = ardt.to(timezone).isoformat()
     #logging.debug("After filling entries, keys are %s" % object.keys())
     return object
