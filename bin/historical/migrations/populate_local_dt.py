@@ -18,7 +18,7 @@ import argparse
 import json
 
 import emission.core.get_database as edb
-import emission.storage.decorations.local_date_queries as ecsdlq
+import emission.core.wrapper.localdate as ecwld
 
 # For entries in the timeseries, this is simple because all of them follow the "ts" -> "local_dt" -> "fmt_time" pattern.
 # We can just parse the fmt_time to get an arrow object and then get all the components
@@ -36,7 +36,7 @@ def get_local_date(fmt_time, timezone):
     """
     adt = arrow.get(fmt_time)
     logging.debug("after parsing, adt = %s" % adt)
-    return ecsdlq.get_local_date(adt.timestamp, timezone)
+    return ecwld.LocalDate.get_local_date(adt.timestamp, timezone)
         
 def fix_timeseries(key):
     tsdb = edb.get_timeseries_db()

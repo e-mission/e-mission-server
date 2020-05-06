@@ -65,7 +65,7 @@ def group_by_timestamp(user_id, start_ts, end_ts, freq, summary_fn_list):
 def timestamp_fill_times(key, ignored, metric_summary):
     dt = arrow.get(key)
     metric_summary.ts = dt.timestamp
-    metric_summary.local_dt = esdl.get_local_date(dt.timestamp, 'UTC')
+    metric_summary.local_dt = ecwl.LocalDate.get_local_date(dt.timestamp, 'UTC')
     metric_summary.fmt_time = dt.isoformat()
 
 class LocalFreq(enum.Enum):

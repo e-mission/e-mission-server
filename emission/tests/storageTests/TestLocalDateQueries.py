@@ -41,7 +41,7 @@ class TestLocalDateQueries(unittest.TestCase):
         ts = esta.TimeSeries.get_time_series(self.testUUID)
         start_ts = arrow.now().timestamp
         ma_ts = 1460586729
-        local_dt = esdl.get_local_date(ma_ts, "America/Los_Angeles")
+        local_dt = ecwl.LocalDate.get_local_date(ma_ts, "America/Los_Angeles")
         fmt_time = arrow.get(ma_ts).to("America/Los_Angeles").isoformat()
         ma = ecwm.Motionactivity({
             "ts": 1460586729,
