@@ -27,13 +27,7 @@ import logging
 # from traffic import get_travel_time
 
 # Our imports
-from emission.core.wrapper.trip_old import Coordinate, Alternative_Trip, Section, Fake_Trip, Trip
-import emission.net.ext_service.geocoder.nominatim as our_geo
-import emission.storage.decorations.trip_queries as ecsdtq
-import emission.storage.decorations.section_queries as ecsdsq
-import emission.storage.decorations.place_queries as ecsdpq
-import emission.storage.decorations.local_date_queries as ecsdlq
-import emission.storage.timeseries.abstract_timeseries as esta
+import emission.core.wrapper.localdate as ecwld
 import emission.core.wrapper.rawtrip as ecwrt
 import emission.core.wrapper.entry as ecwe
 import emission.core.wrapper.section as ecws
@@ -43,9 +37,6 @@ import emission.core.wrapper.location as ecwl
 import emission.core.wrapper.rawplace as ecwrp
 import emission.core.wrapper.stop as ecwrs
 import emission.core.wrapper.motionactivity as ecwm
-import emission.analysis.intake.segmentation.trip_segmentation as eaist 
-import emission.analysis.intake.segmentation.section_segmentation as eaiss
-import emission.storage.decorations.analysis_timeseries_queries as esda
 
 try:
     import json
@@ -223,7 +214,7 @@ def create_measurement(coordinate, timestamp, velocity, altitude, user_id):
         fmt_time = arrow.get(timestamp).to('UTC').format(),
         #This should not be neseceary. TODO: Figure out how we can avoind this.
         loc = gj.Point( (coordinate[1], coordinate[0]) ),
-        local_dt = ecsdlq.get_local_date(timestamp, 'UTC'),
+        local_dt = ecwld.LocalDate.get_local_date(timestamp, 'UTC'),
         altitude = altitude 
     )
     entry = ecwe.Entry.create_entry(user_id,"background/filtered_location", new_loc, create_id=True)
@@ -276,7 +267,7 @@ def create_motion_entry_from_leg(leg, user_id):
         zzaKM = opt_mode_to_motion_type[leg['mode']],
         zzaKN = 100.0, 
         fmt_time = arrow.get(timestamp).to('UTC').format(),
-        local_dt = ecsdlq.get_local_date(timestamp, 'UTC'),
+        local_dt = ecwld.LocalDate.get_local_date(timestamp, 'UTC'),
         confidence = 100.0
     )
     entry = ecwe.Entry.create_entry(user_id, "background/motion_activity", new_motion_activity, create_id=True) 
@@ -293,7 +284,7 @@ def create_start_location_from_trip_plan(plan):
     #TODO: Old function. Should be removed
     converted_time = otp_time_to_ours(plan['itineraries'][0]["startTime"])
     time_stamp = converted_time.timestamp
-    local_dt = ecsdlq.get_local_date(time_stamp, 'UTC')
+    local_dt = ecwld.LocalDate.get_local_date(time_stamp, 'UTC')
     fmt_time = converted_time.to("UTC").format()
     loc = gj.Point( (float(plan["from"]["lon"]), float(plan["from"]["lat"])) )
     start_loc = ecwl.Location(
@@ -308,7 +299,7 @@ def create_end_location_from_trip_plan(plan):
     #TODO: Old function. Should be removed
     converted_time = otp_time_to_ours(plan['itineraries'][0]["endTime"])
     time_stamp = converted_time.timestamp
-    local_dt = ecsdlq.get_local_date(time_stamp, 'UTC')
+    local_dt = ecwld.LocalDate.get_local_date(time_stamp, 'UTC')
     fmt_time = converted_time.to("UTC").format()
     loc = gj.Point( (float(plan["to"]["lon"]), float(plan["to"]["lat"])) )
     end_loc = ecwl.Location(
@@ -324,7 +315,7 @@ def create_start_location_from_leg(leg):
     #TODO: Old function. Should be removed
     converted_time = otp_time_to_ours(leg['startTime'])
     time_stamp = converted_time.timestamp
-    local_dt = ecsdlq.get_local_date(time_stamp, 'UTC')
+    local_dt = ecwld.LocalDate.get_local_date(time_stamp, 'UTC')
     fmt_time = converted_time.to("UTC").format()
     loc = gj.Point( (float(leg["from"]["lon"]), float(leg["from"]["lat"])) )
     start_loc = ecwl.Location(
@@ -339,7 +330,7 @@ def create_end_location_from_leg(leg):
     #TODO: Old function. Should be removed
     converted_time = otp_time_to_ours(leg['endTime'])
     time_stamp = converted_time.timestamp
-    local_dt = ecsdlq.get_local_date(time_stamp, 'UTC')
+    local_dt = ecwld.LocalDate.get_local_date(time_stamp, 'UTC')
     fmt_time = converted_time.to("UTC").format()
     loc = gj.Point( (float(leg["to"]["lon"]), float(leg["to"]["lat"])) )
     end_loc = ecwl.Location(
