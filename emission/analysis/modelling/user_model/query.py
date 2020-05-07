@@ -12,6 +12,7 @@ import uuid
 import logging
 import crontab
 import optparse
+import os
 
 # Our imports
 import emission.core.get_database as edb
@@ -39,7 +40,7 @@ def obtain_alternatives(trip_id, user_id):
 	
         for mode in otp_modes:
                 try:
-                    otp_trip = otp.OTP(start_coord, end_coord, mode, write_day(curr_month, curr_day, curr_year), write_time(curr_hour, curr_minute), False)
+                    otp_trip = otp.OTP(os.environ("OTP_SERVER")).route(start_coord, end_coord, mode, write_day(curr_month, curr_day, curr_year), write_time(curr_hour, curr_minute), False)
                     otp_trip = otp_trip.turn_into_trip(None, user_id, trip_id) 
                     otp_trip.save_to_db()
                 except otp.PathNotFoundException as e:

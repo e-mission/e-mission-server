@@ -54,7 +54,10 @@ class OTP(object):
 
     """ A class that exists to create an alternative trip object out of a call to our OTP server"""
 
-    def __init__(self, start_point, end_point, mode, date, time, bike, max_walk_distance=10000000000000000000000000000000000):
+    def __init__(self, url):
+        self.base_url = url
+
+    def route(start_point, end_point, mode, date, time, bike, max_walk_distance=10000000000000000000000000000000000):
         self.accepted_modes = {"CAR", "WALK", "BICYCLE", "TRANSIT", "BICYCLE_RENT"}
         self.start_point = start_point
         self.end_point = end_point
@@ -69,11 +72,11 @@ class OTP(object):
         self.date = date
         self.time = time
         self.max_walk_distance = max_walk_distance
+        return self
 
     def make_url(self):
         """Returns the url for request """
         params = {
-
             "fromPlace" : self.start_point,
             "toPlace" : self.end_point,
             "time" : self.time,
@@ -85,10 +88,7 @@ class OTP(object):
             "arriveBy" : "false"
         }
 
-        add_file = open("emission/net/ext_service/otp/planner.json")
-        add_file_1 = json.loads(add_file.read())
-        address = add_file_1["open_trip_planner_instance_address"]
-        query_url = "%s/otp/routers/default/plan?" % address
+        query_url = "%s/otp/routers/default/plan?" % self.base_url
         encoded_params = urllib.parse.urlencode(params)
         url = query_url + encoded_params
         #print(url)

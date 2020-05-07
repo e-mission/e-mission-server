@@ -11,6 +11,7 @@ from past.utils import old_div
 import arrow
 import geocoder
 import requests
+import os
 
 
 class TestOTPMethods(unittest.TestCase):
@@ -37,9 +38,10 @@ class TestOTPMethods(unittest.TestCase):
         time_2 = "%s:%s" % (hour_2, curr_minute) 
         time_3 = "%s:%s" % (hour_3, curr_minute) 
 
-        self.opt_trip_1 = otp.OTP(start_point_1, end_point_1, mode_1, date, time_1, bike=True)
-        self.opt_trip_2 = otp.OTP(start_point_2, end_point_2, mode_2, date, time_2, bike=False)
-        self.opt_trip_3 = otp.OTP(start_point_2, end_point_2, mode_2, date, time_3, bike=False)
+        self.base_url = os.environ("OTP_SERVER")
+        self.opt_trip_1 = otp.OTP(self.base_url).route(start_point_1, end_point_1, mode_1, date, time_1, bike=True)
+        self.opt_trip_2 = otp.OTP(self.base_url).route(start_point_2, end_point_2, mode_2, date, time_2, bike=False)
+        self.opt_trip_3 = otp.OTP(self.base_url).route(start_point_2, end_point_2, mode_2, date, time_3, bike=False)
 
     def test_create_start_location_form_leg(self):
         legs = self.opt_trip_1.get_json()["plan"]["itineraries"][0]['legs']
