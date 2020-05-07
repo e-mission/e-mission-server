@@ -57,7 +57,7 @@ class OTP(object):
     def __init__(self, url):
         self.base_url = url
 
-    def route(start_point, end_point, mode, date, time, bike, max_walk_distance=10000000000000000000000000000000000):
+    def route(self, start_point, end_point, mode, date, time, bike, max_walk_distance=10000000000000000000000000000000000):
         self.accepted_modes = {"CAR", "WALK", "BICYCLE", "TRANSIT", "BICYCLE_RENT"}
         self.start_point = start_point
         self.end_point = end_point
@@ -92,7 +92,6 @@ class OTP(object):
         encoded_params = urllib.parse.urlencode(params)
         url = query_url + encoded_params
         #print(url)
-        add_file.close()
         return url
 
     def get_json(self):
