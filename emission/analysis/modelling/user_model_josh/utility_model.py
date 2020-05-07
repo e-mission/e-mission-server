@@ -26,6 +26,7 @@ import heapq
 import time
 import requests
 import random
+import os
 
 CENTER_OF_CAMPUS = to.Coordinate(37.871790, -122.260005)
 RANDOM_RADIUS = .3  # 300 meters around center of campus; for randomization
@@ -150,7 +151,7 @@ class UserModel(object):
         if self.has_bike:
             mode = "BICYCLE"
 
-        walk_otp = otp.OTP(start, end, "WALK", write_day(curr_month, curr_day, curr_year), write_time(curr_hour, curr_minute), False)
+        walk_otp = otp.OTP(os.environ("OTP_SERVER")).route(start, end, "WALK", write_day(curr_month, curr_day, curr_year), write_time(curr_hour, curr_minute), False)
         lst_of_trips = walk_otp.get_all_trips(0, 0, 0)
 
         our_gmaps = gmaps.GoogleMaps(GOOGLE_MAPS_KEY) 
