@@ -107,7 +107,7 @@ class OTP(object):
             trps.append(self.turn_into_trip(_id, user_id, trip_id, False, itin))
         return trps
     
-    def get_measurements_along_route(self, user_id):
+    def get_measurements_along_route(self):
         """
         Returns a list of measurements along trip based on OTP data. Measurements inlcude
         location entries and motion entries. Motion entries are included so the pipeline can
@@ -116,6 +116,7 @@ class OTP(object):
         measurements = []
         otp_json = self.get_json()
         self._raise_exception_if_no_plan(otp_json)
+
         time_stamps_seen = set()
 
         #We iterate over the legs and create loation entries for based on the leg geometry.
@@ -125,7 +126,7 @@ class OTP(object):
             if leg['legGeometry']['length'] > 0:
                 #Add a new motion measurement based on the leg mode. This is necessary for the
                 #pipeline to detect the mode of transportation and to differentiate sections.
-                measurements.append(create_motion_entry_from_leg(leg, user_id))
+                measurements.append(create_motion_entry_from_leg(leg))
                 
                 #TODO: maybe we shoudl check if the leg start time is less than the last timestamp to ensure
                 #that we are allways moving forward in time
@@ -164,7 +165,7 @@ class OTP(object):
                     ##TODO: remove this debug print statement
                     #print(arrow.get(curr_timestamp).format(), curr_coordinate)
 
-                    measurements.append(create_measurement(curr_coordinate, float(curr_timestamp), velocity, altitude, user_id))
+                    measurements.append(create_measurement(curr_coordinate, float(curr_timestamp), velocity, altitude))
                     prev_coord = curr_coordinate
                     time_at_prev_coord = curr_timestamp
     
@@ -172,7 +173,7 @@ class OTP(object):
         # based on the dwell segmentation dist filter time delta threshold.
         idle_time_stamp = arrow.get(curr_timestamp).shift(seconds=+ 1000).timestamp
         #print(arrow.get(idle_time_stamp), last_coordinate) 
-        measurements.append(create_measurement(last_coordinate, float(idle_time_stamp), 0, altitude, user_id))            
+        measurements.append(create_measurement(last_coordinate, float(idle_time_stamp), 0, altitude))
         return measurements
 
     def _raise_exception_if_no_plan(self, otp_json):
@@ -180,7 +181,7 @@ class OTP(object):
             print("While querying alternatives from %s to %s" % (self.start_point, self.end_point))
             print("query URL is %s" % self.make_url())
             print("Response %s does not have a plan " % otp_json)
-            raise PathNotFoundException(otp_json['debugOutput'])
+            raise PathNotFoundException(otp_json)
 
    
 #####Helpers######
@@ -197,7 +198,7 @@ def get_time_at_next_location(next_loc, prev_loc, time_at_prev, velocity):
     #print('time at next loc', new_time)
     return new_time
 
-def create_measurement(coordinate, timestamp, velocity, altitude, user_id):
+def create_measurement(coordinate, timestamp, velocity, altitude):
     #TODO: Rename to create_location_measurement
     """
     Creates location entry.
@@ -216,7 +217,7 @@ def create_measurement(coordinate, timestamp, velocity, altitude, user_id):
         local_dt = ecwld.LocalDate.get_local_date(timestamp, 'UTC'),
         altitude = altitude 
     )
-    entry = ecwe.Entry.create_entry(user_id,"background/filtered_location", new_loc, create_id=True)
+    entry = ecwe.Entry.create_entry("dummy_uuid","background/filtered_location", new_loc, create_id=True)
     #This field ('type') is required by the server when we push the entry to the user cache
     # so we add it here. Also we just chose an abritrary formater. In the future we might want to 
     # create a fromater group called fake user. 
@@ -248,7 +249,7 @@ def otp_time_to_ours(otp_str):
     return arrow.get(old_div(int(otp_str),1000))
 
 
-def create_motion_entry_from_leg(leg, user_id):
+def create_motion_entry_from_leg(leg):
     #TODO: Update with all possible/supported OTP modes. Also check for leg == None
     #Also, make sure this timestamp is correct 
     timestamp = float(otp_time_to_ours(leg['startTime']).timestamp)
@@ -269,7 +270,7 @@ def create_motion_entry_from_leg(leg, user_id):
         local_dt = ecwld.LocalDate.get_local_date(timestamp, 'UTC'),
         confidence = 100.0
     )
-    entry = ecwe.Entry.create_entry(user_id, "background/motion_activity", new_motion_activity, create_id=True) 
+    entry = ecwe.Entry.create_entry("dummy_uuid", "background/motion_activity", new_motion_activity, create_id=True)
     #This field ('type') is required by the server when we push the entry to the user cache
     # so we add it here.
     entry['metadata']['type'] = 'sensor-data'
