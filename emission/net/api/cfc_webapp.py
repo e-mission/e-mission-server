@@ -41,7 +41,6 @@ import emission.net.api.metrics as metrics
 import emission.net.api.pipeline as pipeline
 
 import emission.net.auth.auth as enaa
-# import emission.net.ext_service.moves.register as auth
 import emission.net.ext_service.habitica.proxy as habitproxy
 from emission.core.wrapper.client import Client
 from emission.core.wrapper.user import User
