@@ -15,7 +15,6 @@ license by including their license information.
 | Module | License | Repository |
 |--------|---------|------------|
 | Bottle | MIT     | http://bottlepy.org |
-| 
 
 ### Python unmodified modules installed from `environment.yml`
 
@@ -49,6 +48,8 @@ The commit
 does not have any details of why I checked them in instead of using bower. Just
 listing them for now. TODO: this should be cleaned up later 🚧
 
+| Module | License |
+|--------|---------|
 | `webapp/www/lib/angular-animate` | MIT |
 | `webapp/www/lib/angular-sanitize` | MIT |
 | `webapp/www/lib/angular-simple-logger` | MIT (from `bower.json`) |
@@ -61,6 +62,8 @@ listing them for now. TODO: this should be cleaned up later 🚧
 
 ### Unmodified Javascript dependencies installed using bower
 
+| Module | License |
+|--------|---------|
 | `webapp/www/lib/moment` | MIT |
 | `webapp/www/lib/angular-bootstrap` | MIT |
 | `webapp/www/lib/angular-nvd3` | MIT |
