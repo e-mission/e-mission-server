@@ -9,7 +9,6 @@ from builtins import str
 from builtins import *
 from past.utils import old_div
 from pymongo import MongoClient
-import pygmaps
 from uuid import UUID
 import time
 
