@@ -65,7 +65,6 @@ def evaluate(colors, labels):
 #creates a map for each groundtruthed cluster and 
 #a map showing all the clusters. 
 def map_clusters_by_groundtruth(data, labels, colors, map_individuals=False):
-    import pygmaps
     from matplotlib import colors as matcol
     colormap = plt.cm.get_cmap()
     import random 
@@ -86,13 +85,13 @@ def map_clusters_by_groundtruth(data, labels, colors, map_individuals=False):
                     end_lat = data[i].trip_end_location.lat
                     end_lon = data[i].trip_end_location.lon
                     if first:
-                        mymap = pygmaps.maps(start_lat, start_lon, 10)
+                        # mymap = pygmaps.maps(start_lat, start_lon, 10)
                         first = False
                     path = [(start_lat, start_lon), (end_lat, end_lon)]
                     mymap.addpath(path, matcol.rgb2hex(colormap(rand[i])))
             mymap.draw('./mycluster' + str(color) + '.html')
 
-    mymap = pygmaps.maps(37.5, -122.32, 10)
+    # mymap = pygmaps.maps(37.5, -122.32, 10)
     for i in range(len(data)):
         start_lat = data[i].trip_start_location.lat
         start_lon = data[i].trip_start_location.lon

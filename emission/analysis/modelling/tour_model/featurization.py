@@ -142,12 +142,11 @@ class featurization(object):
     #map the clusters
     #TODO - move this to a file in emission.analysis.plotting to map clusters from the database
     def map_clusters(self):
-        import pygmaps
         from matplotlib import colors as matcol
         colormap = plt.cm.get_cmap()
 
         if self.labels:
-            mymap2 = pygmaps.maps(37.5, -122.32, 10)
+            # mymap2 = pygmaps.maps(37.5, -122.32, 10)
             for i in range(len(self.points)):
                 start_lat = self.points[i][1]
                 start_lon = self.points[i][0]
