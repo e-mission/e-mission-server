@@ -28,7 +28,6 @@ import socket
 import urllib.request, urllib.parse, urllib.error
 import requests
 import traceback
-import xmltodict
 import urllib.request, urllib.error, urllib.parse
 import bson.json_util
 
@@ -370,16 +369,6 @@ def getCustomURL(route):
   logging.debug("Redirecting to URL %s" % redirected_url)
   print("Redirecting to URL %s" % redirected_url)
   return {'redirect': 'success'}
-
-# proxy used to request and process XML from an external API, then convert it to JSON
-# original URL should be encoded in UTF-8
-@get("/asJSON/<originalXMLWebserviceURL>")
-def xmlProxy(originalXMLWebserviceURL):
-  decodedURL = urllib.parse.unquote(originalXMLWebserviceURL)
-  f = urllib.request.urlopen(decodedURL)
-  xml = f.read()
-  parsedXML = xmltodict.parse(xml)
-  return json.dumps(parsedXML)
 
 # Small utilities to make client software easier END
 
