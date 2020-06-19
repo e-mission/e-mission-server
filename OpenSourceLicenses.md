@@ -15,6 +15,7 @@ license by including their license information.
 | Module | License | Repository |
 |--------|---------|------------|
 | Bottle | MIT     | http://bottlepy.org |
+| Google Maps integration | LGPL | `emission//net/ext_service/gmaps/googlemaps.py` |
 
 ### Python unmodified modules installed from `environment.yml`
 
