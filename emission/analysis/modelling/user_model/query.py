@@ -17,7 +17,6 @@ import os
 # Our imports
 import emission.core.get_database as edb
 import emission.core.wrapper.trip_old as ecwt
-import emission.net.ext_service.gmaps as gmaps_lib
 import emission.net.ext_service.otp.otp as otp
 
 def obtain_alternatives(trip_id, user_id):
@@ -44,17 +43,7 @@ def obtain_alternatives(trip_id, user_id):
                     otp_trip = otp_trip.turn_into_trip(None, user_id, trip_id) 
                     otp_trip.save_to_db()
                 except otp.PathNotFoundException as e:
-                    #modes = ['driving', 'walking', 'bicycling', 'transit']
-                    logging.debug("Got error %s from OTP, defaulting to Google Maps" % e)
-                    otp_to_google_mode = {"CAR":"driving", "WALK":"walking", "BICYCLE":"bicycling", "TRANSIT":"transit"}
-                    mode = otp_to_google_mode[mode]
-                    gmaps = gmaps_lib.googlemaps.GoogleMaps('AIzaSyBEkw4PXVv_bsAdUmrFwatEyS6xLw3Bd9c')
-                    try:
-                        result = gmaps.directions(origin=start_coord, destination=end_coord, mode=mode)
-                        gmaps_trip = gmaps_lib.common.google_maps_to_our_trip(result, None, user_id, trip_id, mode, curr_time)
-                        gmaps_trip.save_to_db()
-                    except gmaps_lib.googlemaps.GoogleMapsError as ge:
-                        logging.info("No alternatives found in either OTP or google maps, saving nothing")
+                    logging.info("No alternatives found in OTP, saving nothing")
                         
         '''
 

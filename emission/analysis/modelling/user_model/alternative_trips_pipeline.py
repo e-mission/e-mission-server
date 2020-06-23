@@ -14,19 +14,17 @@ import logging
 
 # Our imports
 import emission.analysis.modelling.user_model.alternative_trips_module as eatm
-import emission.core.wrapper.tripiterator as ti
-import emission.net.ext_service.gmaps.common as ec
-from emission.core.wrapper.trip_old import E_Mission_Trip
+import emission.storage.timeseries.abstract_timeseries as esta
 
 class AlternativeTripsPipeline(object):
     def __init__(self):
         pass
 
     def get_trips_for_alternatives(self, user_uuid):
-        return ti.TripIterator(user_uuid, ["trips", "get_no_alternatives_past_month"])
+        pass
 
     def runPipeline(self, immediate=False):
-        for user_uuid in ec.get_uuid_list():
+        for user_uuid in esta.TimeSeries.get_uuid_list():
             logging.debug("Finding Trips for User: %s" % user_uuid)
             trips_with_no_alternatives = self.get_trips_for_alternatives(user_uuid)
             eatm.calc_alternative_trips(trips_with_no_alternatives, immediate)
