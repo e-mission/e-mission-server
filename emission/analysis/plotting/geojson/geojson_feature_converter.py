@@ -203,12 +203,12 @@ def point_array_to_line(point_array):
     for l in point_array:
         # logging.debug("About to add %s to line_string " % l)
         points_line_string.coordinates.append(l.data.loc.coordinates)
-        points_times.append(l.data.ts)
+        points_times.append(int(round(l.data.ts * 1000)))
     
     points_line_feature = gj.Feature()
     points_line_feature.geometry = points_line_string
     points_line_feature.properties = {}
-    points_line_feature.properties["times"] = points_times
+    points_line_feature.properties["timestamps"] = points_times
     return points_line_feature    
 
 def trip_to_geojson(trip, tl):
