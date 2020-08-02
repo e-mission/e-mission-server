@@ -41,12 +41,11 @@ jobs:
       shell: bash -l {0}
       run: |
         source setup/setup_conda.sh Linux-x86_64
-        which conda
 
     - name: Check whether the CI environment variable is set
       shell: bash -l {0}
       run: |
-        source "$HOME/miniconda/etc/profile.d/conda.sh"
+        source setup/activate_conda.sh
         echo $CI
 
     - name: Setup the emission environment for testing
@@ -54,16 +53,15 @@ jobs:
       run: |
         conda --version
         which conda
-        source "$HOME/miniconda/etc/profile.d/conda.sh"
+        source setup/activate_conda.sh
         conda --version
         source setup/setup_tests.sh
 
     - name: Switch to emission and run the tests
       shell: bash -l {0}
       run: |
-        source "$HOME/miniconda/etc/profile.d/conda.sh"
+        source setup/activate_tests.sh
         conda --version
-        conda activate emissiontest
         ./runAllTests.sh
 
     - name: Teardown the test environment
