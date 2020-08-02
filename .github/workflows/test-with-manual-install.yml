@@ -41,16 +41,20 @@ jobs:
       shell: bash -l {0}
       run: |
         source setup/setup_conda.sh Linux-x86_64
-        which conda
 
     - name: Check whether the CI environment variable is set
       shell: bash -l {0}
       run: |
+        source setup/activate_conda.sh
         echo $CI
 
     - name: Setup the emission environment for testing
       shell: bash -l {0}
       run: |
+        conda --version
+        which conda
+        source setup/activate_conda.sh
+        conda --version
         source setup/setup_tests.sh
 
     - name: Switch to emission and run the tests

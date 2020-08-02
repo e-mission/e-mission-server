@@ -39,6 +39,11 @@ jobs:
       shell: bash -l {0}
       run: |
         source setup/setup_conda.sh ${{ matrix.PLATFORM }}
+
+    - name: Check whether the environment is setup properly
+      shell: bash -l {0}
+      run: |
+        source setup/activate_conda.sh
         if [ ${{ matrix.PLATFORM }} == "Linux-x86_64" ]; then
             echo "Linux install, going to check conda path"
             which conda
@@ -47,11 +52,6 @@ jobs:
             echo "    since 'which conda' inexplicably returns with status code 1"
             echo "    only in the CI environment"
         fi
-
-    - name: Check whether the CI environment variable is set
-      shell: bash -l {0}
-      run: |
-        source "$HOME/miniconda/etc/profile.d/conda.sh"
         echo $CI
 
     - name: Setup the emission environment
@@ -59,7 +59,7 @@ jobs:
       run: |
         conda --version
         which conda
-        source "$HOME/miniconda/etc/profile.d/conda.sh"
+        source setup/activate_conda.sh
         conda --version
         source setup/setup.sh
         echo "About to activate environment"
@@ -69,5 +69,5 @@ jobs:
     - name: Teardown the emission environment
       shell: bash -l {0}
       run: |
-        source "$HOME/miniconda/etc/profile.d/conda.sh"
+        source setup/activate_conda.sh
         source setup/teardown.sh

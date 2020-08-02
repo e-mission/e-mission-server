@@ -1,9 +1,11 @@
-EXP_CONDA_VER=$1
-PLATFORM=$2
+source setup/export_versions.sh
+
+PLATFORM=$1
 echo "Installing for version $EXP_CONDA_VER and platform $PLATFORM"
 
 if [[ -z $EXP_CONDA_VER || -z $PLATFORM ]]; then
-    echo "Usage: setup_conda.sh <version> <platform>"
+    echo "Usage: setup_conda.sh <platform>"
+    echo "   Assumes that the EXP_CONDA_VER variable is set"
     echo "   Platform options are Linux-x86_64, MacOSX-x86_64"
     echo "   For Windows, manually download and install https://repo.anaconda.com/miniconda/Miniconda3-$EXP_CONDA_VER-Windows-x86_64.exe"
 else
@@ -17,5 +19,5 @@ else
     conda config --set always_yes yes
     # Useful for debugging any issues with conda
     conda info -a
-    echo "Successfully installed at $INSTALL_PREFIX. Please run 'source $SOURCE_SCRIPT' in every terminal where you want to use conda" 
+    echo "Successfully installed at $INSTALL_PREFIX. Please activate with 'source setup/activateXXX.sh' in every terminal where you want to use conda" 
 fi
