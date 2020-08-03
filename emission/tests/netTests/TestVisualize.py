@@ -22,7 +22,7 @@ import emission.analysis.intake.segmentation.section_segmentation as eaiss
 import emission.analysis.intake.cleaning.filter_accuracy as eaicf
 import emission.storage.timeseries.format_hacks.move_filter_field as estfm
 import emission.core.wrapper.motionactivity as ecwm
-import emission.storage.decorations.local_date_queries as esdldq
+import emission.core.wrapper.localdate as ecwl
 
 
 class TestVisualize(unittest.TestCase):
@@ -36,8 +36,8 @@ class TestVisualize(unittest.TestCase):
             "After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
         self.day_start_ts = 1440658800
         self.day_end_ts = 1440745200
-        self.day_start_dt = esdldq.get_local_date(self.day_start_ts, "America/Los_Angeles")
-        self.day_end_dt = esdldq.get_local_date(self.day_end_ts, "America/Los_Angeles")
+        self.day_start_dt = ecwl.LocalDate.get_local_date(self.day_start_ts, "America/Los_Angeles")
+        self.day_end_dt = ecwl.LocalDate.get_local_date(self.day_end_ts, "America/Los_Angeles")
 
         # If we don't delete the time components, we end up with the upper and
         # lower bounds = 0, which basically matches nothing.

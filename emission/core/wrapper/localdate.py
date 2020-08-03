@@ -6,6 +6,7 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import *
 import logging
+import arrow
 import emission.core.wrapper.wrapperbase as ecwb
 
 class LocalDate(ecwb.WrapperBase):
@@ -34,4 +35,11 @@ class LocalDate(ecwb.WrapperBase):
 
     def _populateDependencies(self):
         pass
+
+    @staticmethod
+    def get_local_date(ts, timezone):
+        adt = arrow.get(ts).to(timezone)
+        return LocalDate({'year': adt.year, 'month': adt.month, 'day': adt.day,
+        'hour': adt.hour, 'minute': adt.minute, 'second': adt.second,
+        'weekday': adt.weekday(), 'timezone': timezone})
 

@@ -10,8 +10,7 @@ It has two components, the backend server and the phone apps. This is the
 backend server - the phone apps are available in the [e-mission-phone
 repo](https://github.com/amplab/e-mission-phone)
 
-The current build status is:
-[![Build Status](https://travis-ci.org/shankari/e-mission-server.svg?branch=master)](https://travis-ci.org/shankari/e-mission-server)
+[![Build Status](https://travis-ci.org/shankari/e-mission-server.svg?branch=master)](https://travis-ci.org/shankari/e-mission-server) ![test-with-docker](https://github.com/e-mission/e-mission-server/workflows/test-with-docker/badge.svg) ![ubuntu-only-test-with-manual-install](https://github.com/e-mission/e-mission-server/workflows/ubuntu-only-test-with-manual-install/badge.svg) ![osx-ubuntu-manual-install](https://github.com/e-mission/e-mission-server/workflows/osx-ubuntu-manual-install/badge.svg)
 
 **Issues:** Since this repository is part of a larger project, all issues are tracked [in the central docs repository](https://github.com/e-mission/e-mission-docs/issues). If you have a question, [as suggested by the open source guide](https://opensource.guide/how-to-contribute/#communicating-effectively), please file an issue instead of sending an email. Since issues are public, other contributors can try to answer the question and benefit from the answer.
 

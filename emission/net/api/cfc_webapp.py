@@ -28,7 +28,6 @@ import socket
 import urllib.request, urllib.parse, urllib.error
 import requests
 import traceback
-import xmltodict
 import urllib.request, urllib.error, urllib.parse
 import bson.json_util
 
@@ -41,7 +40,6 @@ import emission.net.api.metrics as metrics
 import emission.net.api.pipeline as pipeline
 
 import emission.net.auth.auth as enaa
-# import emission.net.ext_service.moves.register as auth
 import emission.net.ext_service.habitica.proxy as habitproxy
 from emission.core.wrapper.client import Client
 from emission.core.wrapper.user import User
@@ -371,16 +369,6 @@ def getCustomURL(route):
   logging.debug("Redirecting to URL %s" % redirected_url)
   print("Redirecting to URL %s" % redirected_url)
   return {'redirect': 'success'}
-
-# proxy used to request and process XML from an external API, then convert it to JSON
-# original URL should be encoded in UTF-8
-@get("/asJSON/<originalXMLWebserviceURL>")
-def xmlProxy(originalXMLWebserviceURL):
-  decodedURL = urllib.parse.unquote(originalXMLWebserviceURL)
-  f = urllib.request.urlopen(decodedURL)
-  xml = f.read()
-  parsedXML = xmltodict.parse(xml)
-  return json.dumps(parsedXML)
 
 # Small utilities to make client software easier END
 

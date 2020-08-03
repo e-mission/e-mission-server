@@ -17,18 +17,12 @@ from emission.core.get_database import get_utility_model_db
 from emission.analysis.modelling.user_model.user_utility_model import UserUtilityModel
 from emission.analysis.modelling.user_model.emissions_model import EmissionsModel
 from emission.analysis.modelling.user_model.simple_cost_time_mode_model import SimpleCostTimeModeModel
-import emission.core.wrapper.tripiterator as ti
-import emission.core.wrapper.trip_old as t
-from emission.net.ext_service.gmaps.common import get_uuid_list, get_recommender_uuid_list
 import emission.analysis.modelling.user_model.alternative_trips_module as atm
 
 class RecommendationPipeline(object):
     def get_trips_to_improve(self, user_uuid):
         # pick trips which we would like to improve
-        # will make usage of canonical trip class
-        # returns a list of trips implementing Trip interface, could be basic E_Mission_Trips or canonical
-        # TODO: Stubbed out returning all move trips in order to allow tests to pass
-        return ti.TripIterator(user_uuid, ["recommender", "get_improve"], t.Canonical_E_Mission_Trip)
+        pass
 
     def retrieve_alternative_trips(self, trip_list):
         return []

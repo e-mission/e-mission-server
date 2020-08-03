@@ -9,6 +9,7 @@ import unittest
 import emission.user_model_josh.utility_model as eum
 import emission.net.ext_service.otp.otp as otp
 import datetime
+import os
 
 
 class UserModelTests(unittest.TestCase):
@@ -60,8 +61,9 @@ class UserModelTests(unittest.TestCase):
         curr_day = curr_time.day
         curr_hour = curr_time.hour
 
-        walk_otp = otp.OTP(start, end, "WALK", eum.write_day(curr_month, curr_day, curr_year), eum.write_time(curr_hour, curr_minute), False)
-        bike_otp = otp.OTP(start, end, "BICYCLE", eum.write_day(curr_month, curr_day, curr_year), eum.write_time(curr_hour, curr_minute), True)
+        self.base_url = os.environ("OTP_SERVER")
+        walk_otp = otp.OTP(self.base_url).route(start, end, "WALK", eum.write_day(curr_month, curr_day, curr_year), eum.write_time(curr_hour, curr_minute), False)
+        bike_otp = otp.OTP(self.base_url).route(start, end, "BICYCLE", eum.write_day(curr_month, curr_day, curr_year), eum.write_time(curr_hour, curr_minute), True)
 
         
         choices = walk_otp.get_all_trips(0,0,0) + bike_otp.get_all_trips(0,0,0)
@@ -97,8 +99,9 @@ class UserModelTests(unittest.TestCase):
         curr_day = curr_time.day
         curr_hour = curr_time.hour
 
-        walk_otp = otp.OTP(start, end, "WALK", eum.write_day(curr_month, curr_day, curr_year), eum.write_time(curr_hour, curr_minute), False)
-        bike_otp = otp.OTP(start, end, "BICYCLE", eum.write_day(curr_month, curr_day, curr_year), eum.write_time(curr_hour, curr_minute), False)
+        self.base_url = os.environ("OTP_SERVER")
+        walk_otp = otp.OTP(self.base_url).route(start, end, "WALK", eum.write_day(curr_month, curr_day, curr_year), eum.write_time(curr_hour, curr_minute), False)
+        bike_otp = otp.OTP(self.base_url).route(start, end, "BICYCLE", eum.write_day(curr_month, curr_day, curr_year), eum.write_time(curr_hour, curr_minute), False)
 
         choices = walk_otp.get_all_trips(0,0,0) + bike_otp.get_all_trips(0,0,0)
 

@@ -5,6 +5,8 @@
 # - on OSX: /Users/<user>/miniconda3/bin/conda
 # - on Windows: C:/Users/<user>/Miniconda3/Scripts/conda
 
+source setup/checks/check_for_conda.sh
+
 echo "Setting up blank environment"
 conda create --name emission python=3.6
 conda activate emission
