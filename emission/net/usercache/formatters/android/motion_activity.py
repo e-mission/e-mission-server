@@ -25,6 +25,7 @@ def format(entry):
     #logging.info('*** Motion Data write_ts: %d' % metadata.write_ts)
     
     data = ad.AttrDict()
+
     if 'agb' in entry.data:
         data.type = ecwa.MotionTypes(entry.data.agb).value
     elif 'zzaEg' in entry.data:
@@ -35,7 +36,7 @@ def format(entry):
         data.type = ecwa.MotionTypes(entry.data.ajO).value
     elif 'zzaKM' in entry.data:
         data.type = ecwa.MotionTypes(entry.data.zzaKM).value
-    else:
+    elif 'zzbhB' in entry.data:
         data.type = ecwa.MotionTypes(entry.data.zzbhB).value
 
 
@@ -49,10 +50,12 @@ def format(entry):
         data.confidence = entry.data.ajP
     elif 'zzaKN' in entry.data:
         data.confidence = entry.data.zzaKN
-    else:
+    elif 'zzbhC' in entry.data:
         data.confidence = entry.data.zzbhC
 
-    data.ts = formatted_entry.metadata.write_ts
+    if 'ts' not in entry.data:
+        data.ts = formatted_entry.metadata.write_ts
+
     data.local_dt = formatted_entry.metadata.write_local_dt
     data.fmt_time = formatted_entry.metadata.write_fmt_time
     formatted_entry.data = data

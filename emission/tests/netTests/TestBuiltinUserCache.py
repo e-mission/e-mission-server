@@ -45,9 +45,9 @@ class TestBuiltinUserCache(unittest.TestCase):
     retrievedData = mauc.sync_server_to_phone(self.testUserUUID)
     logging.debug("retrievedData = %s" % retrievedData)
     self.assertTrue(retrievedData is not None) # if it doesn't exist, the method returns None
-    self.assertEquals(len(retrievedData),1)
-    self.assertEquals(sorted(list(retrievedData[0].keys())), ["data", "metadata"])
-    self.assertEquals(retrievedData[0]["data"]["mine"], 30)
+    self.assertEqual(len(retrievedData),1)
+    self.assertEqual(sorted(list(retrievedData[0].keys())), ["data", "metadata"])
+    self.assertEqual(retrievedData[0]["data"]["mine"], 30)
 
   def testPutTwoSetsOfUserDataForPhone(self):
     uc = ucauc.UserCache.getUserCache(self.testUserUUID)
@@ -371,7 +371,7 @@ class TestBuiltinUserCache(unittest.TestCase):
   def testGetUUIDList(self):
     self.testGetTwoSetsOfUserDataFromPhone()
     uuid_list = ucauc.UserCache.get_uuid_list()
-    self.assertEquals(uuid_list, [self.testUserUUID])
+    self.assertEqual(uuid_list, [self.testUserUUID])
 
 if __name__ == '__main__':
     import emission.tests.common as etc

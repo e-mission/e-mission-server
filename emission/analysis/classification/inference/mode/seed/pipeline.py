@@ -92,6 +92,7 @@ class ModeInferencePipelineMovesFormat:
   def loadModel():
     fd = open(SAVED_MODEL_FILENAME, "r")
     model_rep = fd.read()
+    fd.close()
     return jpickle.loads(model_rep)
 
   # TODO: Refactor into generic steps and results
@@ -226,7 +227,7 @@ class ModeInferencePipelineMovesFormat:
     featureMatrix[i, 3] = section['section_id']
     featureMatrix[i, 4] = easf.calAvgSpeed(section)
     speeds = easf.calSpeeds(section)
-    if speeds != None and len(speeds) > 0:
+    if (not speeds is None) and len(speeds) > 0:
         featureMatrix[i, 5] = np.mean(speeds)
         featureMatrix[i, 6] = np.std(speeds)
         featureMatrix[i, 7] = np.max(speeds)
@@ -339,7 +340,8 @@ class ModeInferencePipelineMovesFormat:
 if __name__ == "__main__":
   import json
 
-  config_data = json.load(open('config.json'))
+  with open('config.json') as cf:
+      config_data = json.load(cf)
   log_base_dir = config_data['paths']['log_base_dir']
   logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
                       filename="%s/pipeline.log" % log_base_dir, level=logging.DEBUG)

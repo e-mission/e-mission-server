@@ -85,7 +85,7 @@ class FirebasePush(pni.NotifyInterface):
                     ret_list.append(result["registration_token"])
                     logging.debug("Found firebase mapping from %s -> %s at index %d"%
                         (result["apns_token"], result["registration_token"], i));
-                    edb.get_push_token_mapping_db().insert({"native_token": result["apns_token"],
+                    edb.get_push_token_mapping_db().insert_one({"native_token": result["apns_token"],
                                                             "platform": "ios",
                                                             "mapped_token": result["registration_token"]})
                 else:

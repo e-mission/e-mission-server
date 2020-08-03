@@ -1,0 +1,73 @@
+name: osx-ubuntu-manual-install
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '5 4 * * 0'
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-16.04, ubuntu-18.04, ubuntu-latest, macos-latest]
+        include:
+        - os: macos-latest
+          PLATFORM: MacOSX-x86_64
+        - os: ubuntu-16.04
+          PLATFORM: Linux-x86_64
+        - os: ubuntu-18.04
+          PLATFORM: Linux-x86_64
+        - os: ubuntu-latest
+          PLATFORM: Linux-x86_64
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    - name: Install miniconda
+      shell: bash -l {0}
+      run: |
+        source setup/setup_conda.sh ${{ matrix.PLATFORM }}
+
+    - name: Check whether the environment is setup properly
+      shell: bash -l {0}
+      run: |
+        source setup/activate_conda.sh
+        if [ ${{ matrix.PLATFORM }} == "Linux-x86_64" ]; then
+            echo "Linux install, going to check conda path"
+            which conda
+        else
+            echo "OSX install, skipping conda path check"
+            echo "    since 'which conda' inexplicably returns with status code 1"
+            echo "    only in the CI environment"
+        fi
+        echo $CI
+
+    - name: Setup the emission environment
+      shell: bash -l {0}
+      run: |
+        conda --version
+        which conda
+        source setup/activate_conda.sh
+        conda --version
+        source setup/setup.sh
+        echo "About to activate environment"
+        conda activate emission
+        conda env list
+
+    - name: Teardown the emission environment
+      shell: bash -l {0}
+      run: |
+        source setup/activate_conda.sh
+        source setup/teardown.sh

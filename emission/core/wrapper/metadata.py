@@ -32,7 +32,7 @@ class Metadata(ecwb.WrapperBase):
 
   @staticmethod
   def create_metadata_for_result(key):
-      import emission.storage.decorations.local_date_queries as esdl
+      import emission.core.wrapper.localdate as ecwld
       import arrow
 
       m = Metadata()
@@ -40,12 +40,13 @@ class Metadata(ecwb.WrapperBase):
       m.platform = "server"
       m.write_ts = time.time()
       m.time_zone = "America/Los_Angeles"
-      m.write_local_dt = esdl.get_local_date(m.write_ts, m.time_zone)
+      m.write_local_dt = ecwld.LocalDate.get_local_date(m.write_ts, m.time_zone)
       m.write_fmt_time = arrow.get(m.write_ts).to(m.time_zone).isoformat()
       return m
+
   @staticmethod
   def create_metadata_for_fake_result(key, write_ts):
-      import emission.storage.decorations.local_date_queries as esdl
+      import emission.core.wrapper.localdate as ecwld
       import arrow
 
       m = Metadata()
@@ -53,7 +54,7 @@ class Metadata(ecwb.WrapperBase):
       m.platform = "server"
       m.write_ts = write_ts
       m.time_zone = "America/Los_Angeles"
-      m.write_local_dt = esdl.get_local_date(m.write_ts, m.time_zone)
+      m.write_local_dt = ecwld.LocalDate.get_local_date(m.write_ts, m.time_zone)
       m.write_fmt_time = arrow.get(m.write_ts).to(m.time_zone).isoformat()
       return m
       

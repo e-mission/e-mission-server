@@ -50,7 +50,8 @@ class TestSectionSegmentation(unittest.TestCase):
         eaicf.filter_accuracy(self.androidUUID)
 
         self.testUUID = uuid.UUID("c76a0487-7e5a-3b17-a449-47be666b36f6")
-        self.entries = json.load(open("emission/tests/data/real_examples/iphone_2015-11-06"), object_hook = bju.object_hook)
+        with open("emission/tests/data/real_examples/iphone_2015-11-06") as fp:
+            self.entries = json.load(fp, object_hook = bju.object_hook)
         etc.setupRealExampleWithEntries(self)
         self.iosUUID = self.testUUID
         eaicf.filter_accuracy(self.iosUUID)
@@ -60,12 +61,12 @@ class TestSectionSegmentation(unittest.TestCase):
         os.remove(self.analysis_conf_path)
 
     def clearRelatedDb(self):
-        edb.get_timeseries_db().remove({"user_id": self.androidUUID})
-        edb.get_analysis_timeseries_db().remove({"user_id": self.androidUUID})
-        edb.get_pipeline_state_db().remove({"user_id": self.androidUUID})
-        edb.get_timeseries_db().remove({"user_id": self.iosUUID})
-        edb.get_analysis_timeseries_db().remove({"user_id": self.iosUUID})
-        edb.get_pipeline_state_db().remove({"user_id": self.iosUUID})
+        edb.get_timeseries_db().delete_many({"user_id": self.androidUUID})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.androidUUID})
+        edb.get_pipeline_state_db().delete_many({"user_id": self.androidUUID})
+        edb.get_timeseries_db().delete_many({"user_id": self.iosUUID})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.iosUUID})
+        edb.get_pipeline_state_db().delete_many({"user_id": self.iosUUID})
 
     def testSegmentationPointsSmoothedHighConfidenceMotion(self):
         ts = esta.TimeSeries.get_time_series(self.androidUUID)

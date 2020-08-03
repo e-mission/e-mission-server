@@ -8,7 +8,6 @@ standard_library.install_aliases()
 from builtins import *
 import unittest
 import json
-#from main import tripManager
 from pymongo import MongoClient
 import logging
 from datetime import datetime, timedelta

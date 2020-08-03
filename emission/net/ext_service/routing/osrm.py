@@ -6,6 +6,7 @@ import polyline.codec as pc
 try:
     osrm_file = open("conf/net/ext_service/osrm.json")
     osrm_config = json.load(osrm_file)
+    osrm_file.close()
     OSRM_HOST = osrm_config["routing_host"]
     OSRM_ROUTES = osrm_config["paths"]
 except Exception as e:

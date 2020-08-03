@@ -18,18 +18,13 @@ from pymongo.errors import ConnectionFailure
 
 # Our imports
 from . import user_utility_model
-import emission.core.wrapper.tripiterator as ti
 from . import alternative_trips_module as atm
-import emission.net.ext_service.gmaps.common as egcm
 from . import simple_cost_time_mode_model as sctm
-import emission.core.wrapper.trip_old as ecwt
+import emission.storage.timeseries.abstract_timeseries as esta
 
 class UtilityModelPipeline(object):
     def __init__(self):
         pass
-
-    def get_training_trips(self, user_id):
-        return ti.TripIterator(user_id, ["utility", "get_training"], ecwt.E_Mission_Trip)
 
     def build_user_model(self, user_id, trips):
         model = user_utility_model.UserUtilityModel.find_from_db(user_id, False)
@@ -83,10 +78,10 @@ class UtilityModelPipeline(object):
     '''
 
     def runPipeline(self):
-        for user_uuid in egcm.get_training_uuid_list():
+        for user_uuid in esta.TimeSeries.get_uuid_list():
             try:
-                training_real_trips = self.get_training_trips(user_uuid)
-                userModel = self.build_user_model(user_uuid, training_real_trips)
+                # training_real_trips = self.get_training_trips(user_uuid)
+                # userModel = self.build_user_model(user_uuid, training_real_trips)
             except ConnectionFailure as e:
                 logging.error("Found error %s!, skipping user %s" % (e, user_uuid))
 

@@ -38,6 +38,7 @@ How to know if the section has never been predicted?
 
 '''
 def setup(self):
+	pass
 
 
 def run_model_pipeline(process_number, uuid_list):

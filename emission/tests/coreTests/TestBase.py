@@ -55,55 +55,55 @@ class TestWrapper(ecwb.WrapperBase):
 class TestBase(unittest.TestCase):
     def testCreationABC(self):
         test_tw = TestWrapper({'a': 1, 'b': 2, 'c': 3})
-        self.assertEquals(test_tw.valid, TestEnum.B)
-        self.assertEquals(test_tw.invalid, TestEnum.C)
+        self.assertEqual(test_tw.valid, TestEnum.B)
+        self.assertEqual(test_tw.invalid, TestEnum.C)
         self.assertTrue(str(test_tw).startswith("TestWrapper"))
 
     def testCreationAB(self):
         test_tw = TestWrapper({'a': 1, 'c': 3})
-        self.assertEquals(test_tw.valid, TestEnum.B)
+        self.assertEqual(test_tw.valid, TestEnum.B)
         with self.assertRaises(AttributeError):
             print ("test_tw.invalid = %s" % test_tw.invalid)
         self.assertTrue(str(test_tw).startswith("TestWrapper"))
 
     def testSetReadOnly(self):
         test_tw = TestWrapper({'a': 1, 'c': 3})
-        self.assertEquals(test_tw.valid, TestEnum.B)
+        self.assertEqual(test_tw.valid, TestEnum.B)
         with self.assertRaisesRegexp(AttributeError, ".*read-only.*"):
             test_tw.invalid = 2
 
     def testGetSetReadWrite(self):
         test_tw = TestWrapper({'a': 1, 'c': 3})
-        self.assertEquals(test_tw.valid, TestEnum.B)
+        self.assertEqual(test_tw.valid, TestEnum.B)
         test_tw.valid = 2
-        self.assertEquals(test_tw.valid, 2)
+        self.assertEqual(test_tw.valid, 2)
 
     def testSetEnumPositive(self):
         test_tw = TestWrapper({'a': 1, 'c': 3})
-        self.assertEquals(test_tw.valid, TestEnum.B)
+        self.assertEqual(test_tw.valid, TestEnum.B)
         test_tw.write_a = TestEnum.C
-        self.assertEquals(test_tw.write_a, TestEnum.C)
-        self.assertEquals(test_tw["write_a"], 2)
+        self.assertEqual(test_tw.write_a, TestEnum.C)
+        self.assertEqual(test_tw["write_a"], 2)
 
     def testSetEnumNegative(self):
         test_tw = TestWrapper({'a': 1, 'c': 3})
-        self.assertEquals(test_tw.valid, TestEnum.B)
+        self.assertEqual(test_tw.valid, TestEnum.B)
         with self.assertRaisesRegexp(AttributeError, ".*enum.*"):
             test_tw.write_a = 2
 
     def testSetInvalid(self):
         test_tw = TestWrapper({'a': 1, 'c': 3})
         with self.assertRaisesRegexp(AttributeError, ".*not defined.*"):
-            self.assertEquals(test_tw.z, 1)
+            self.assertEqual(test_tw.z, 1)
 
     def testGetReadOnly(self):
         test_tw = TestWrapper({'a': 1, 'c': 3})
-        self.assertEquals(test_tw.a, TestEnum.B)
+        self.assertEqual(test_tw.a, TestEnum.B)
 
     def testGetInvalid(self):
         test_tw = TestWrapper({'a': 1, 'c': 3})
         with self.assertRaisesRegexp(AttributeError, ".*not defined.*"):
-            self.assertEquals(test_tw.z, 1)
+            self.assertEqual(test_tw.z, 1)
 
     def testIPythonAutoComplete(self):
         test_tw = TestWrapper({'a': 1, 'c': 3})
@@ -121,7 +121,7 @@ class TestBase(unittest.TestCase):
         test_tw.unset = 4
         # Now that it is set, it cannot be changed since it is read-only, so an
         # attempt to change it causes an exception
-        with self.assertRaisesRegexp(AttributeError, ".*read-only.*"):
+        with self.assertRaisesRegex(AttributeError, ".*read-only.*"):
             test_tw.unset = 5
 
     def testNullable(self):

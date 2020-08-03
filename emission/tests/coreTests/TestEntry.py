@@ -44,11 +44,11 @@ class TestEntry(unittest.TestCase):
         'user_id': UUID('0763de67-f61e-3f5d-90e7-518e69793954')}
 
         entry = ecwe.Entry(testEntryJSON)
-        self.assertEquals(entry.metadata.key, 'background/location')
-        self.assertEquals(entry.metadata.type, 'message')
-        self.assertEquals(entry.data.latitude, 37.3885529)
-        self.assertEquals(entry.data.longitude, -122.0879696)
-        # self.assertEquals(entry.data.loc, gj.Point((-122.0879696, 37.3885529)))
+        self.assertEqual(entry.metadata.key, 'background/location')
+        self.assertEqual(entry.metadata.type, 'message')
+        self.assertEqual(entry.data.latitude, 37.3885529)
+        self.assertEqual(entry.data.longitude, -122.0879696)
+        # self.assertEqual(entry.data.loc, gj.Point((-122.0879696, 37.3885529)))
         self.assertTrue(isinstance(entry.data.loc, gj.Point))
         logging.debug("location time = %s, written at %s (%s)" % 
             (entry.data.ts, entry.metadata.write_ts, entry.metadata.write_fmt_time))
@@ -71,10 +71,10 @@ class TestEntry(unittest.TestCase):
             'user_id': UUID('0763de67-f61e-3f5d-90e7-518e69793954')
         }
         entry = ecwe.Entry(testEntryJSON)
-        self.assertEquals(entry.metadata.key, 'background/motion_activity')
-        self.assertEquals(entry.metadata.type, 'message')
-        self.assertEquals(entry.data.type, ecwm.MotionTypes.TILTING)
-        self.assertEquals(entry.data.confidence, 100)
+        self.assertEqual(entry.metadata.key, 'background/motion_activity')
+        self.assertEqual(entry.metadata.type, 'message')
+        self.assertEqual(entry.data.type, ecwm.MotionTypes.TILTING)
+        self.assertEqual(entry.data.confidence, 100)
         logging.debug("activity time = %s, written at %s (%s)" % 
             (entry.data.ts, entry.metadata.write_ts, entry.metadata.write_fmt_time))
 
@@ -91,9 +91,9 @@ class TestEntry(unittest.TestCase):
             'user_id': UUID('0763de67-f61e-3f5d-90e7-518e69793954')
         }
         trip = ecwt.Trip(testTripJSON)
-        self.assertEquals(trip.get_id(), bo.ObjectId("55d8c47b7d65cb39ee983c2d"))
-        self.assertEquals(trip.start_place, bo.ObjectId("55d8c47b7d65cb39ee983c2d"))
-        self.assertEquals(trip.end_place, bo.ObjectId("55d8c47b7d65cb39ee983c2d"))
+        self.assertEqual(trip.get_id(), bo.ObjectId("55d8c47b7d65cb39ee983c2d"))
+        self.assertEqual(trip.start_place, bo.ObjectId("55d8c47b7d65cb39ee983c2d"))
+        self.assertEqual(trip.end_place, bo.ObjectId("55d8c47b7d65cb39ee983c2d"))
         self.assertTrue(isinstance(trip.start_loc, gj.Point))
 
     def testDedupList(self):

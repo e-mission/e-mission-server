@@ -202,12 +202,12 @@ class TestTripQueries(unittest.TestCase):
         self.assertEqual(len(ct_df), 4)
 
         # Now, let's load the mode_confirm and purpose_confirm objects
-        mode_confirm_list = json.load(open("emission/tests/data/real_examples/shankari_single_positional_indexer.dec-12.mode_confirm"),
-            object_hook=bju.object_hook)
+        with open("emission/tests/data/real_examples/shankari_single_positional_indexer.dec-12.mode_confirm") as mcfp:
+            mode_confirm_list = json.load(mcfp, object_hook=bju.object_hook)
         self.assertEqual(len(mode_confirm_list), 5)
 
-        purpose_confirm_list = json.load(open("emission/tests/data/real_examples/shankari_single_positional_indexer.dec-12.purpose_confirm"),
-            object_hook=bju.object_hook)
+        with open("emission/tests/data/real_examples/shankari_single_positional_indexer.dec-12.purpose_confirm") as pcfp:
+            purpose_confirm_list = json.load(pcfp, object_hook=bju.object_hook)
         self.assertEqual(len(purpose_confirm_list), 7)
 
         for mc in mode_confirm_list:

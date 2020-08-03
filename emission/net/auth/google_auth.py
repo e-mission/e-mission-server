@@ -19,6 +19,7 @@ class GoogleAuthMethod(object):
     def __init__(self):
         key_file = open('conf/net/auth/google_auth.json')
         key_data = json.load(key_file)
+        key_file.close()
         self.client_key = key_data["client_key"]
         self.client_key_old = key_data["client_key_old"]
         self.ios_client_key = key_data["ios_client_key"]

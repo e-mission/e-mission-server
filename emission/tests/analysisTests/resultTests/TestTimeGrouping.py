@@ -29,7 +29,6 @@ import emission.core.wrapper.localdate as ecwl
 
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.analysis_timeseries_queries as esda
-import emission.storage.decorations.local_date_queries as esdl
 
 import emission.tests.common as etc
 
@@ -44,7 +43,7 @@ class TestTimeGrouping(unittest.TestCase):
         self.ts = esta.TimeSeries.get_time_series(self.testUUID)
 
     def tearDown(self):
-        edb.get_analysis_timeseries_db().remove({'user_id': self.testUUID})
+        edb.get_analysis_timeseries_db().delete_many({'user_id': self.testUUID})
 
     def testLocalGroupBy(self):
         self.assertEqual(earmt._get_local_group_by(earmt.LocalFreq.DAILY),
@@ -82,7 +81,7 @@ class TestTimeGrouping(unittest.TestCase):
 
     def _fillDates(self, object, prefix, ardt, timezone):
         object["%sts" % prefix] = ardt.timestamp
-        object["%slocal_dt" % prefix] = esdl.get_local_date(ardt.timestamp,
+        object["%slocal_dt" % prefix] = ecwl.LocalDate.get_local_date(ardt.timestamp,
                                                      timezone)
         object["%sfmt_time" % prefix] = ardt.to(timezone).isoformat()
         logging.debug("After filling entries, keys are %s" % list(object.keys()))

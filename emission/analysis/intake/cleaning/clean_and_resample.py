@@ -33,7 +33,7 @@ import emission.analysis.intake.domain_assumptions as eaid
 import emission.storage.decorations.timeline as esdtl
 import emission.storage.decorations.trip_queries as esdtq
 import emission.storage.decorations.analysis_timeseries_queries as esda
-import emission.storage.decorations.local_date_queries as esdl
+import emission.core.wrapper.localdate as ecwld
 import emission.storage.decorations.place_queries as esdp
 
 import emission.storage.timeseries.abstract_timeseries as esta
@@ -653,7 +653,7 @@ def _add_start_point(filtered_loc_df, raw_start_place, ts, sensed_mode):
     logging.debug("After copy, new data = %s" % new_first_point_data)
     new_first_point_data["ts"] = new_start_ts
     tz = raw_start_place_enter_loc_entry.data.local_dt.timezone
-    new_first_point_data["local_dt"] = esdl.get_local_date(new_start_ts, tz)
+    new_first_point_data["local_dt"] = ecwld.LocalDate.get_local_date(new_start_ts, tz)
     new_first_point_data["fmt_time"] = arrow.get(new_start_ts).to(tz).isoformat()
     new_first_point = ecwe.Entry.create_entry(curr_first_point.user_id,
                             "background/filtered_location",
@@ -760,7 +760,7 @@ def _overwrite_from_loc_row(filtered_section_data, fixed_loc, prefix):
 
 def _overwrite_from_timestamp(filtered_trip_like, prefix, ts, tz, loc):
     filtered_trip_like[prefix+"_ts"] = float(ts)
-    filtered_trip_like[prefix+"_local_dt"] = esdl.get_local_date(ts, tz)
+    filtered_trip_like[prefix+"_local_dt"] = ecwld.LocalDate.get_local_date(ts, tz)
     filtered_trip_like[prefix+"_fmt_time"] = arrow.get(ts).to(tz).isoformat()
     filtered_trip_like[prefix+"_loc"] = loc
 

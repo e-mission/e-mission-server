@@ -1,0 +1,14 @@
+# Template from 
+# https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/use-conda-with-travis-ci.html
+language: generic
+install:
+  # We do this conditionally because it saves us some downloading if the
+  # version is the same.
+
+  - source setup/setup_conda.sh Linux-x86_64
+services:
+  - mongodb
+script:
+  - source setup/setup_tests.sh
+  - ./runAllTests.sh
+  - source setup/teardown_tests.sh
