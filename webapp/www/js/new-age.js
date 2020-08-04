@@ -15,6 +15,10 @@
     }
   });
 
+  $('a.badge-link').click(function() {
+    alert("The apps are currently under development. Please contact the CEO for an invite to the beta");
+  });
+
   // Closes responsive menu when a scroll trigger link is clicked
   $('.js-scroll-trigger').click(function() {
     $('.navbar-collapse').collapse('hide');
@@ -50,6 +54,7 @@ function init(){
   var canvas = document.getElementById("qrcode-canvas");
   canvas.style.display = "none";
   var myrandom = Math.floor(Math.random() * 3) + 1;
+  /*
   if (myrandom == 1) {
     link.href = "emission://change_client?new_client=urap2017information&clear_local_storage=true&clear_usercache=true"
     image.src = "img/information.jpg"
@@ -64,4 +69,5 @@ function init(){
   qr0 = QRC.encodeText(link.href, QRC.Ecc.MEDIUM);
   qr0.drawCanvas(4, 1, canvas);
   canvas.style.removeProperty("display");
+  */
 }
