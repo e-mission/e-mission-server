@@ -141,8 +141,8 @@ class TierSys:
         user_carbon_map = {} # Map from user_id to carbon val.
         all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
         num_users = all_users.shape[0]
-        if num_users <= 0:
-            raise Exception("No users in DB")
+        # if num_users <= 0:
+        #     raise Exception("No users in DB")
         for index, row in all_users.iterrows():
             user_id = row['uuid']
             val = self.computeCarbon(user_id, last_ts)
