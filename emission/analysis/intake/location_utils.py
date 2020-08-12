@@ -49,7 +49,7 @@ def resample_for_range(loc_df, start_ts, end_ts, interval):
     lng_new = lng_fn(ts_new)
     alt_new = altitude_fn(ts_new)
     tz_new = [_get_timezone(ts, tz_ranges_df) for ts in ts_new]
-    ld_new = [ecwld.LocalDate..get_local_date(ts, tz) for (ts, tz) in zip(ts_new, tz_new)]
+    ld_new = [ecwld.LocalDate.get_local_date(ts, tz) for (ts, tz) in zip(ts_new, tz_new)]
     loc_new = [gj.Point((lng, lat)) for (lng, lat) in zip(lng_new, lat_new)]
     fmt_time_new = [arrow.get(ts).to(tz).isoformat() for
                         (ts, tz) in zip(ts_new, tz_new)]
