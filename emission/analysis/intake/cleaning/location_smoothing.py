@@ -52,6 +52,7 @@ def recalc_speed(points_df):
     The first row has a speed of zero.
     """
     stripped_df = points_df.drop("speed", axis=1).drop("distance", axis=1)
+    logging.debug("columns in points_df = %s" % points_df.columns)
     point_list = [ad.AttrDict(row) for row in points_df.to_dict('records')]
     zipped_points_list = list(zip(point_list, point_list[1:]))
     distances = [pf.calDistance(p1, p2) for (p1, p2) in zipped_points_list]
@@ -81,7 +82,7 @@ def add_dist_heading_speed(points_df):
 
     with_distances_df = pd.concat([points_df, pd.Series(distances, name="distance")], axis=1)
     with_speeds_df = pd.concat([with_distances_df, pd.Series(speeds, name="speed")], axis=1)
-    with_headings_df = pd.concat([with_speeds_df, pd.Series(headings, name="heading")], axis=1)
+    with_headings_df = pd.concat([with_speeds_df.drop("heading", axis=1), pd.Series(headings, name="heading")], axis=1)
     return with_headings_df
 
 def add_heading_change(points_df):
