@@ -102,7 +102,7 @@ class TestBase(unittest.TestCase):
 
     def testGetInvalid(self):
         test_tw = TestWrapper({'a': 1, 'c': 3})
-        with self.assertRaisesRegexp(AttributeError, ".*not defined.*"):
+        with self.assertRaisesRegex(AttributeError, ".*not defined.*"):
             self.assertEqual(test_tw.z, 1)
 
     def testIPythonAutoComplete(self):
