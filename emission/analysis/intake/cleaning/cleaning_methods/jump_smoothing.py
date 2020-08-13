@@ -366,8 +366,8 @@ class SmoothPiecewiseRansac(object):
     def filter_area_using_ransac(self, area_df):
         from sklearn import linear_model
         import numpy as np
-        latArr = [[lat] for lat in area_df.mLatitude.as_matrix()]
-        lngArr = area_df.mLongitude.as_matrix()
+        latArr = [[lat] for lat in area_df.mLatitude.to_numpy()]
+        lngArr = area_df.mLongitude.to_numpy()
         model_ransac = linear_model.RANSACRegressor(linear_model.LinearRegression())
         model_ransac.fit(latArr, lngArr)
         inlier_mask = model_ransac.inlier_mask_
@@ -408,4 +408,4 @@ class SmoothPiecewiseRansac(object):
             ransac_mask[area.index] = retain_mask
         logging.debug("with speed df shape is %s, ransac_mask size = %s" % (with_speeds_df.shape, len(ransac_mask)))
         logging.debug("filtering done, ransac deleted points = %s" % np.nonzero(ransac_mask == False))
-        self.inlier_mask_ = ransac_mask.as_matrix().tolist()
+        self.inlier_mask_ = ransac_mask.to_numpy().tolist()
