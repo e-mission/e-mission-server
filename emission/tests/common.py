@@ -38,7 +38,7 @@ def updateUserCreateTime(uuid):
   user.changeUpdateTs(timedelta(days = -20))
 
 def dropAllCollections(db):
-  collections = db.collection_names()
+  collections = db.list_collection_names()
   print("collections = %s" % collections)
   for coll in collections:
     if coll.startswith('system'):
