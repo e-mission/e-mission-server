@@ -82,7 +82,9 @@ def add_dist_heading_speed(points_df):
 
     with_distances_df = pd.concat([points_df, pd.Series(distances, name="distance")], axis=1)
     with_speeds_df = pd.concat([with_distances_df, pd.Series(speeds, name="speed")], axis=1)
-    with_headings_df = pd.concat([with_speeds_df.drop("heading", axis=1), pd.Series(headings, name="heading")], axis=1)
+    if "heading" in with_speeds_df.columns:
+        with_speeds_df.drop("heading", axis=1, inplace=True)
+    with_headings_df = pd.concat([with_speeds_df, pd.Series(headings, name="heading")], axis=1)
     return with_headings_df
 
 def add_heading_change(points_df):
