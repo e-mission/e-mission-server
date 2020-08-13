@@ -47,7 +47,7 @@ def generate_route_clusters(user):
             if labels[j] == i:
                 clusters[tripid].append(data[j].trip_id)
     update_user_routeClusters(user, clusters)
-# print(Profiles.find().count())
+# print(Profiles.count_documents())
 # for profile in Profiles.find():
 #     print(profile)
 

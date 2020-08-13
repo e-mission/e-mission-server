@@ -42,13 +42,13 @@ class TestDatabaseUtils(unittest.TestCase):
     Sections=Testdb.Test_Sections
 
     purge_database_json.purgeData('localhost', self.testUser)
-    self.assertEqual(Sections.find({'user_id' : self.testUser}).count(), 0)
+    self.assertEqual(Sections.count_documents({'user_id' : self.testUser}), 0)
 
     load_database_json.loadData(self.serverName, 'CFC_WebApp/tests/data/testLoadFile')
-    self.assertEqual(Sections.find({'user_id': self.testUser}).count(), 3)
+    self.assertEqual(Sections.count_documents({'user_id': self.testUser}), 3)
 
     purge_database_json.purgeData('localhost', self.testUser)
-    self.assertEqual(Sections.find({'user_id' : self.testUser}).count(), 0)
+    self.assertEqual(Sections.count_documents({'user_id' : self.testUser}), 0)
 
   def testUserRecordPresent(self):
     userRecord = dump_database_json.getSingleUserRecord(self.testUser)
@@ -74,9 +74,9 @@ class TestDatabaseUtils(unittest.TestCase):
     load_database_json.loadTable(self.serverName, "Test_Groups", "CFC_DataCollector/tests/data/groups.json")
     Testdb = MongoClient(self.serverName).Test_database
     GroupsColl=Testdb.Test_Groups
-    self.assertEqual(GroupsColl.find().count(), 5)
+    self.assertEqual(GroupsColl.estimated_document_count(), 5)
     GroupsColl.remove()
-    self.assertEqual(GroupsColl.find().count(), 0)
+    self.assertEqual(GroupsColl.estimated_document_count(), 0)
 
   def testDumpTable(self):
     rawFile = "CFC_DataCollector/tests/data/groups.json"

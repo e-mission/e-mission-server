@@ -30,7 +30,7 @@ class TestRecommendationPipeline(unittest.TestCase):
     # or threw an exception, so let us start by cleaning up all entries
     self.ModesColl = get_mode_db()
     self.ModesColl.remove()
-    self.assertEquals(self.ModesColl.find().count(), 0)
+    self.assertEquals(self.ModesColl.estimated_document_count(), 0)
 
     dataJSON = json.load(open("emission/tests/data/modes.json"))
     for row in dataJSON:
@@ -39,14 +39,14 @@ class TestRecommendationPipeline(unittest.TestCase):
     get_section_db().remove({"user_id": self.testUUID})
     result = self.loadTestJSON("emission/tests/data/missing_trip")
     collect.processResult(self.testUUID, result)
-    print(get_section_db().find().count())
+    print(get_section_db().estimated_document_count())
     self.pipeline = RecommendationPipeline()
 
   def tearDown(self):
     get_section_db().remove({"user_id": self.testUUID})
     self.ModesColl.remove()
     get_routeCluster_db().remove()
-    self.assertEquals(self.ModesColl.find().count(), 0)
+    self.assertEquals(self.ModesColl.estimated_document_count(), 0)
 
   def loadTestJSON(self, fileName):
     fileHandle = open(fileName)

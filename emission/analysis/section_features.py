@@ -215,11 +215,11 @@ def calSpeedDistParams(speeds):
 #     query = {"$and": [{'type': 'move'},{'user_id':user},\
 #                       {'$or': [{'confirmed_mode':1}, {'confirmed_mode':3},\
 #                                {'confirmed_mode':5},{'confirmed_mode':6},{'confirmed_mode':7}]}]}
-#     # print(Sections.find(query).count())
+#     # print(Sections.count_documents(query))
 #     for section in Sections.find(query).sort("section_start_datetime",1):
 #         user_sections.append(section)
-#     if Sections.find(query).count()>=2:
-#         tran_mat=np.zeros([Modes.find().count(), Modes.find().count()])
+#     if Sections.count_documents(query)>=2:
+#         tran_mat=np.zeros([Modes.estimated_document_count(), Modes.estimated_document_count()])
 #         for i in range(len(user_sections)-1):
 #             if (user_sections[i+1]['section_start_datetime']-user_sections[i]['section_end_datetime']).seconds<=60:
 #                 # print(user_sections[i+1]['section_start_datetime'],user_sections[i]['section_end_datetime'])
@@ -234,17 +234,17 @@ def calSpeedDistParams(speeds):
 #
 # # all model
 # def all_tran_mat():
-#     tran_mat=np.zeros([Modes.find().count(), Modes.find().count()])
+#     tran_mat=np.zeros([Modes.estimated_document_count(), Modes.estimated_document_count()])
 #     for user in Sections.distinct("user_id"):
 #         user_sections=[]
 #         # print(tran_mat)
 #         query = {"$and": [{'type': 'move'},{'user_id':user},\
 #                           {'$or': [{'confirmed_mode':1}, {'confirmed_mode':3},\
 #                                    {'confirmed_mode':5},{'confirmed_mode':6},{'confirmed_mode':7}]}]}
-#         # print(Sections.find(query).count())
+#         # print(Sections.count_documents(query))
 #         for section in Sections.find(query).sort("section_start_datetime",1):
 #             user_sections.append(section)
-#         if Sections.find(query).count()>=2:
+#         if Sections.count_documents(query)>=2:
 #             for i in range(len(user_sections)-1):
 #                 if (user_sections[i+1]['section_start_datetime']-user_sections[i]['section_end_datetime']).seconds<=60:
 #                     # print(user_sections[i+1]['section_start_datetime'],user_sections[i]['section_end_datetime'])
@@ -258,7 +258,7 @@ def calSpeedDistParams(speeds):
 def mode_cluster(mode,eps,sam):
     mode_change_pnts=[]
     query = {'confirmed_mode':mode}
-    logging.debug("Trying to find cluster locations for %s trips" % (Sections.find(query).count()))
+    logging.debug("Trying to find cluster locations for %s trips" % (Sections.count_documents(query)))
     for section in Sections.find(query).sort("section_start_datetime",1):
         try:
             mode_change_pnts.append(section['section_start_point']['coordinates'])

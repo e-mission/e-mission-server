@@ -72,8 +72,8 @@ class TestLocalDateQueries(unittest.TestCase):
         end_local_dt = ecwl.LocalDate({'year': 2015, 'month': 8, 'hour': 8, 'minute': 20})
         final_query = {"user_id": self.testUUID}
         final_query.update(esdl.get_range_query("data.local_dt", start_local_dt, end_local_dt))
-        entries = edb.get_timeseries_db().find(final_query)
-        self.assertEqual(15, entries.count())
+        entriesCnt = edb.get_timeseries_db().count_documents(final_query)
+        self.assertEqual(15, entriesCnt)
 
     def testLocalRangeRolloverQuery(self):
         """
@@ -84,7 +84,7 @@ class TestLocalDateQueries(unittest.TestCase):
         final_query = {"user_id": self.testUUID}
         final_query.update(esdl.get_range_query("data.local_dt", start_local_dt, end_local_dt))
         entries = edb.get_timeseries_db().find(final_query).sort('data.ts', pymongo.ASCENDING)
-        self.assertEqual(448, entries.count())
+        self.assertEqual(448, edb.get_timeseries_db().count_documents(final_query))
 
         entries_list = list(entries)
 
@@ -105,7 +105,7 @@ class TestLocalDateQueries(unittest.TestCase):
         final_query = {"user_id": self.testUUID}
         final_query.update(esdl.get_range_query("data.local_dt", start_local_dt, end_local_dt))
         entries_docs = edb.get_timeseries_db().find(final_query).sort("metadata.write_ts")
-        self.assertEqual(20, entries_docs.count())
+        self.assertEqual(20, edb.get_timeseries_db().count_documents(final_query))
         entries = [ecwe.Entry(doc) for doc in entries_docs]
         logging.debug("entries bookends are %s and %s" % (entries[0], entries[-1]))
         first_entry = entries[0]

@@ -368,7 +368,7 @@ class TestPipelineRealData(unittest.TestCase):
             ground_truth = json.load(gtf,
                                  object_hook=bju.object_hook)
 
-        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
+        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
         all_entries = None
         with open(dataFile) as secondfp:
             all_entries = json.load(secondfp, object_hook = bju.object_hook)
@@ -409,7 +409,7 @@ class TestPipelineRealData(unittest.TestCase):
         with open(dataFile+".ground_truth") as gtf:
             ground_truth = json.load(gtf, object_hook=bju.object_hook)
 
-        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
+        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
         with open(dataFile) as df:
             all_entries = json.load(df, object_hook = bju.object_hook)
         # 18:01 because the transition was at 2016-02-22T18:00:09.623404-08:00, so right after
@@ -449,7 +449,7 @@ class TestPipelineRealData(unittest.TestCase):
             ground_truth = json.load(gtf,
                                  object_hook=bju.object_hook)
 
-        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
+        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
         with open(dataFile) as df:
             all_entries = json.load(df, object_hook = bju.object_hook)
         ts_1030 = arrow.get("2016-08-10T10:30:00-07:00").timestamp
@@ -519,7 +519,7 @@ class TestPipelineRealData(unittest.TestCase):
         with open(dataFile+".ground_truth") as gtf:
             ground_truth = json.load(gtf, object_hook=bju.object_hook)
 
-        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
+        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
         with open(dataFile) as df:
             all_entries = json.load(df, object_hook = bju.object_hook)
         # 18:01 because the transition was at 2016-02-22T18:00:09.623404-08:00, so right after
@@ -559,7 +559,7 @@ class TestPipelineRealData(unittest.TestCase):
         with open(dataFile+".ground_truth") as gtf:
             ground_truth = json.load(gtf, object_hook=bju.object_hook)
 
-        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
+        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
         with open(dataFile) as df:
             all_entries = json.load(df, object_hook = bju.object_hook)
         # 18:01 because the transition was at 2016-02-22T18:00:09.623404-08:00, so right after

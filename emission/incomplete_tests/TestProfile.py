@@ -32,9 +32,9 @@ class TestProfile(unittest.TestCase):
     # or threw an exception, so let us start by cleaning up all entries
     emission.tests.common.dropAllCollections(edb._get_current_db())
     self.Profiles = get_profile_db()
-    self.assertEquals(self.Profiles.find().count(), 0)
+    self.assertEquals(self.Profiles.estimated_document_count(), 0)
     emission.tests.common.loadTable(self.serverName, "Stage_Profiles", "emission/tests/data/profiles.json")
-    self.assertEquals(self.Profiles.find().count(), 1)
+    self.assertEquals(self.Profiles.estimated_document_count(), 1)
     # Let's make sure that the users are registered so that they have profiles
     for userEmail in self.testUsers:
       User.register(userEmail)
@@ -51,7 +51,7 @@ class TestProfile(unittest.TestCase):
     for testUser in self.testUsers:
       emission.tests.common.purgeSectionData(get_section_db(), testUser)
     self.Profiles.remove()
-    self.assertEquals(self.Profiles.find().count(), 0)
+    self.assertEquals(self.Profiles.estimated_document_count(), 0)
 
   def testZipCreation(self):
     # Make sure that zipcodes are updated in the database, correctly and when needed

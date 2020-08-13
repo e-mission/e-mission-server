@@ -45,8 +45,8 @@ def createNewPlaceLike(utest, key, wrapper):
 
 def saveTripLike(utest, key, wrapper):
     new_trip = createNewTripLike(utest, key, wrapper)
-    utest.assertEqual(edb.get_analysis_timeseries_db().find(
-        {"metadata.key": key, "data.end_ts": 6}).count(), 1)
+    utest.assertEqual(edb.get_analysis_timeseries_db().count_documents(
+        {"metadata.key": key, "data.end_ts": 6}), 1)
     utest.assertEqual(edb.get_analysis_timeseries_db().find_one(
         {"metadata.key": key, "data.end_ts": 6})["_id"], new_trip.get_id())
     utest.assertEqual(edb.get_analysis_timeseries_db().find_one(
@@ -56,7 +56,7 @@ def saveTripLike(utest, key, wrapper):
 def savePlaceLike(utest, key, wrapper):
     new_place = createNewPlaceLike(utest, key, wrapper)
     utest.assertEqual(edb.get_analysis_timeseries_db().find(
-        {"metadata.key": key, "data.exit_ts": 6}).count(), 1)
+        {"metadata.key": key, "data.exit_ts": 6}).estimated_document_count(), 1)
     utest.assertEqual(edb.get_analysis_timeseries_db().find_one(
         {"metadata.key": key, "data.exit_ts": 6})["_id"], new_place.get_id())
     utest.assertEqual(edb.get_analysis_timeseries_db().find_one(

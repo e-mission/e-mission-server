@@ -143,7 +143,7 @@ class BuiltinUserCache(ucauc.UserCache):
         """
         read_ts = time.time()
         combo_query = self._get_msg_query(None, None)
-        count = self.db.find(combo_query).count()
+        count = self.db.count_documents(combo_query)
         logging.debug("For %s, found %s messages in usercache" %
                       (self.user_id, count))
         return count
