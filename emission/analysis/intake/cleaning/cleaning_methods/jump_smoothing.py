@@ -255,7 +255,7 @@ class SmoothZigzag(object):
         for segment in bad_segments:
             self.inlier_mask_[segment.start:segment.end] = False
 
-        logging.debug("after setting values, outlier_mask = %s" % np.nonzero(self.inlier_mask_ == False))
+        logging.debug("after setting values, outlier_mask = %s" % np.nonzero((self.inlier_mask_ == False).to_numpy()))
         # logging.debug("point details are %s" % with_speeds_df[np.logical_not(self.inlier_mask_)])
 
         # TODO: This is not the right place for this - adds too many dependencies
