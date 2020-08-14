@@ -1,5 +1,5 @@
 # python 3
-FROM emission/e-mission-server.dev.server-only:latest
+FROM ubuntu:latest
 
 # CHANGEME: Create the files that correspond to your configuration in the conf directory
 # COPY conf/net/auth/google_auth.json /usr/src/app/conf/net/auth/google_auth.json
