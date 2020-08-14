@@ -35,7 +35,7 @@ def copy_to_usercache():
     error_it = edb.get_timeseries_error_db().find()
     uc = edb.get_usercache_db()
     te = edb.get_timeseries_error_db()
-    logging.info("Found %d errors in this round" % error_it.count())
+    logging.info("Found %d errors in this round" % edb.get_timeseries_error_db.estimate_document_count())
     for error in error_it:
         logging.debug("Copying entry %s" % error["metadata"])
         save_result = uc.save(error)
