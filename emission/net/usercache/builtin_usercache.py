@@ -164,7 +164,7 @@ class BuiltinUserCache(ucauc.UserCache):
         return self.getKeyListForType("message")
 
     def getKeyListForType(self, message_type):
-        return self.db.find({"user_id": self.user_id, "metadata.type": message_type}).distinct("metadata.key")
+        return sorted(self.db.find({"user_id": self.user_id, "metadata.type": message_type}).distinct("metadata.key"))
 
     def clearObsoleteDocument(self, key):
         """
