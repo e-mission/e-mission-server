@@ -111,7 +111,6 @@ def fillExistingUUID(testObj):
 def setupRealExample(testObj, dump_file):
     logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
     with open(dump_file) as dfp:
-        print(testObj.__dict__)
         testObj.entries = json.load(dfp, object_hook = bju.object_hook)
         if hasattr(testObj, "evaluation") and testObj.evaluation:
             reg_email = getRealExampleEmail(testObj)

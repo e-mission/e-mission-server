@@ -317,9 +317,6 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/gabe_2016-06-15"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 6, 'day': 15})
         cacheKey = "diary/trips-2016-06-15"
-        print("self = %s" % type(self))
-        print("self.evaluation = %s" % self.evaluation)
-        print("self.methodname = %s" % self._testMethodName)
         self.standardMatchDataGroundTruth(dataFile, start_ld, cacheKey)
 
     def testJumpSmoothingSectionEnd(self):
