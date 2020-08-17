@@ -58,8 +58,10 @@ class TestSectionSegmentation(unittest.TestCase):
         eaicf.filter_accuracy(self.iosUUID)
 
     def tearDown(self):
-        self.clearRelatedDb()
-        os.remove(self.analysis_conf_path)
+        if not hasattr(self, "evaluation") or not self.evaluation:
+            self.clearRelatedDb()
+        if hasattr(self, "analysis_conf_path"):
+            os.remove(self.analysis_conf_path)
 
     def clearRelatedDb(self):
         edb.get_timeseries_db().delete_many({"user_id": self.androidUUID})
@@ -231,7 +233,7 @@ class TestSectionSegmentation(unittest.TestCase):
         self.assertEqual(len(sections_stops), len(created_trips))
         # The expected value was copy-pasted from the debug statement above
         self.assertEqual(sections_stops,
-                         [(0, 0), (11, 10)])
+                         [(0, 0), (8, 7)])
 
     def test_GetStreakOne(self):
         ffd = eaissf.FlipFlopDetection([], None)
