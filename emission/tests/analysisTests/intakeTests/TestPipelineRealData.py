@@ -37,6 +37,8 @@ import attrdict as ad
 import arrow
 import numpy as np
 import os
+import os.path
+import argparse
 
 # Our imports
 import emission.core.get_database as edb
@@ -56,16 +58,24 @@ class TestPipelineRealData(unittest.TestCase):
         np.random.seed(61297777)
         self.analysis_conf_path = \
             etc.set_analysis_config("analysis.result.section.key", "analysis/cleaned_section")
+        logging.info("setUp complete")
 
     def tearDown(self):
-        logging.debug("Clearing related databases")
-        self.clearRelatedDb()
-        os.remove(self.analysis_conf_path)
+        logging.debug("Clearing related databases for %s" % self.testUUID)
+        # Clear the database only if it is not an evaluation run
+        # A testing run validates that nothing has changed
+        # An evaluation run compares to different algorithm implementations
+        # to determine whether to switch to a new implementation
+        if not hasattr(self, "evaluation") or not self.evaluation:
+            self.clearRelatedDb()
+        if hasattr(self, "analysis_conf_path"):
+            os.remove(self.analysis_conf_path)
+        logging.info("tearDown complete")
 
     def clearRelatedDb(self):
-        edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
-        edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID})
-        edb.get_usercache_db().delete_many({"user_id": self.testUUID})
+        logging.info("Timeseries delete result %s" % edb.get_timeseries_db().delete_many({"user_id": self.testUUID}).raw_result)
+        logging.info("Analysis delete result %s" % edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID}).raw_result)
+        logging.info("Usercache delete result %s" % edb.get_usercache_db().delete_many({"user_id": self.testUUID}).raw_result)
 
     def compare_result(self, result, expect):
         # This is basically a bunch of asserts to ensure that the timeline is as
@@ -173,6 +183,21 @@ class TestPipelineRealData(unittest.TestCase):
                 logging.debug(20 * "-")
             logging.debug(20 * "=")
 
+    def persistGroundTruthIfNeeded(self, api_result, dataFile, ld, cacheKey):
+        if hasattr(self, "persistence") and self.persistence:
+            savedFn = "/tmp/"+os.path.basename(dataFile)+".ground_truth"
+            logging.info("Persisting ground truth to "+savedFn)
+            with open(savedFn, "w") as gofp:
+                wrapped_gt = {
+                    "data": api_result,
+                    "metadata": {
+                        "key": cacheKey,
+                        "type": "document",
+                        "write_ts": arrow.now().timestamp
+                    }
+                }
+                json.dump(wrapped_gt, gofp, indent=4, default=bju.default)
+
     def standardMatchDataGroundTruth(self, dataFile, ld, cacheKey):
         with open(dataFile+".ground_truth") as gfp:
             ground_truth = json.load(gfp, object_hook=bju.object_hook)
@@ -187,6 +212,7 @@ class TestPipelineRealData(unittest.TestCase):
         # cached_result = edb.get_usercache_db().find_one({'user_id': self.testUUID,
         #                                                  "metadata.key": cacheKey})
         api_result = gfc.get_geojson_for_dt(self.testUUID, ld, ld)
+        self.persistGroundTruthIfNeeded(api_result, dataFile, ld, cacheKey)
 
         # self.compare_result(cached_result, ground_truth)
         self.compare_result(ad.AttrDict({'result': api_result}).result,
@@ -283,6 +309,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID)
 
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
+        self.persistGroundTruthIfNeeded(api_result, dataFile, start_ld, cacheKey)
         # Although we process the day's data in two batches, we should get the same result
         self.assertEqual(api_result, [])
 
@@ -309,6 +336,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID)
 
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
+        self.persistGroundTruthIfNeeded(api_result, dataFile, start_ld, cacheKey)
         # Although we process the day's data in two batches, we should get the same result
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth).data)
@@ -324,6 +352,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID)
 
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
+        self.persistGroundTruthIfNeeded(api_result, dataFile, start_ld, cacheKey)
         # Although we process the day's data in two batches, we should get the same result
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth).data)
@@ -393,6 +422,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, end_ld)
+        self.persistGroundTruthIfNeeded(api_result, dataFile, start_ld, cacheKey)
 
         # Although we process the day's data in two batches, we should get the same result
         self.compare_approx_result(ad.AttrDict({'result': api_result}).result,
@@ -432,6 +462,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, end_ld)
+        self.persistGroundTruthIfNeeded(api_result, dataFile, start_ld, cacheKey)
 
         # Although we process the day's data in two batches, we should get the same result
         self.compare_approx_result(ad.AttrDict({'result': api_result}).result,
@@ -474,6 +505,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, end_ld)
+        self.persistGroundTruthIfNeeded(api_result, dataFile, start_ld, cacheKey)
 
         # Although we process the day's data in two batches, we should get the same result
         self.compare_approx_result(ad.AttrDict({'result': api_result}).result,
@@ -499,11 +531,13 @@ class TestPipelineRealData(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID)
 
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_1, start_ld_1)
+        self.persistGroundTruthIfNeeded(api_result, dataFile_1, start_ld_1, cacheKey_1)
         # Although we process the day's data in two batches, we should get the same result
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth_1).data)
 
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_2, start_ld_2)
+        self.persistGroundTruthIfNeeded(api_result, dataFile_2, start_ld_2, cacheKey_2)
         # Although we process the day's data in two batches, we should get the same result
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth_2).data)
@@ -543,6 +577,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, end_ld)
+        self.persistGroundTruthIfNeeded(api_result, dataFile, start_ld, cacheKey)
 
         # Although we process the day's data in two batches, we should get the same result
         self.compare_approx_result(ad.AttrDict({'result': api_result}).result,
@@ -583,6 +618,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, end_ld)
+        self.persistGroundTruthIfNeeded(api_result, dataFile, start_ld, cacheKey)
 
         # Although we process the day's data in two batches, we should get the same result
         self.compare_approx_result(ad.AttrDict({'result': api_result}).result,
@@ -609,11 +645,14 @@ class TestPipelineRealData(unittest.TestCase):
 
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_1, start_ld_1)
         # Although we process the day's data in two batches, we should get the same result
+        self.persistGroundTruthIfNeeded(api_result, dataFile_1, start_ld_1, cacheKey_1)
+
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth_1).data)
 
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_2, start_ld_2)
         # Although we process the day's data in two batches, we should get the same result
+        self.persistGroundTruthIfNeeded(api_result, dataFile_2, start_ld_2, cacheKey_2)
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth_2).data)
 
@@ -639,11 +678,13 @@ class TestPipelineRealData(unittest.TestCase):
 
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_1, start_ld_1)
         # Although we process the day's data in two batches, we should get the same result
+        self.persistGroundTruthIfNeeded(api_result, dataFile_1, start_ld_1, cacheKey_1)
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth_1).data)
 
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_2, start_ld_2)
         # Although we process the day's data in two batches, we should get the same result
+        self.persistGroundTruthIfNeeded(api_result, dataFile_2, start_ld_2, cacheKey_2)
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth_2).data)
 
@@ -670,4 +711,8 @@ class TestPipelineRealData(unittest.TestCase):
 
 if __name__ == '__main__':
     etc.configLogging()
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--algo_change",
+        help="modifications to the algorithm", action="store_true")
     unittest.main()
