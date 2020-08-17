@@ -18,6 +18,7 @@ import pymongo
 import emission.core.get_database as edb
 from emission.core.get_database import get_client_db, get_section_db
 import emission.core.get_database as edb
+import emission.core.wrapper.user as ecwu
 
 def makeValid(client):
   client.clientJSON['start_date'] = str(datetime.now() + timedelta(days=-2))
@@ -99,11 +100,26 @@ def updateSections(testCase):
       testCase.uuid_list.append(curr_uuid)
       testCase.SectionsColl.save(section)
 
+def getRealExampleEmail(testObj):
+    return testObj.branch + "_" + testObj._testMethodName
+
+def fillExistingUUID(testObj):
+    userObj = ecwu.User.fromEmail(getRealExampleEmail(testObj))
+    print("Setting testUUID to %s" % userObj.uuid)
+    testObj.testUUID = userObj.uuid
+
 def setupRealExample(testObj, dump_file):
     logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
     with open(dump_file) as dfp:
         testObj.entries = json.load(dfp, object_hook = bju.object_hook)
-        testObj.testUUID = uuid.uuid4()
+        if hasattr(testObj, "evaluation") and testObj.evaluation:
+            reg_email = getRealExampleEmail(testObj)
+            logging.info("registering email = %s" % reg_email)
+            user = ecwu.User.register(reg_email)
+            testObj.testUUID = user.uuid
+        else:
+            testObj.testUUID = uuid.uuid4()
+
         print("Setting up real example for %s" % testObj.testUUID)
         setupRealExampleWithEntries(testObj)
 
