@@ -51,11 +51,14 @@ class FlipFlopDetection():
         self.add_trip_percentages()
 
     def add_trip_percentages(self):
-        total_trip_time = self.motion_changes[-1][1].ts - self.motion_changes[0][0].ts
+        if len(self.motion_changes) > 0:
+            total_trip_time = self.motion_changes[-1][1].ts - self.motion_changes[0][0].ts
 
-        for sm, em in self.motion_changes:
-            curr_section_time = em.ts - sm.ts
-            sm.update({"trip_pct": (curr_section_time * 100)/total_trip_time})
+            for sm, em in self.motion_changes:
+                curr_section_time = em.ts - sm.ts
+                sm.update({"trip_pct": (curr_section_time * 100)/total_trip_time})
+        else:
+            logging.info("No motion changes, skipping trip percentages...")
 
     def is_flip_flop(self, start_motion, end_motion):
         """
