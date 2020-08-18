@@ -108,18 +108,21 @@ def fillExistingUUID(testObj):
     print("Setting testUUID to %s" % userObj.uuid)
     testObj.testUUID = userObj.uuid
 
+def createAndFillUUID(testObj):
+    if hasattr(testObj, "evaluation") and testObj.evaluation:
+        reg_email = getRealExampleEmail(testObj)
+        logging.info("registering email = %s" % reg_email)
+        user = ecwu.User.register(reg_email)
+        testObj.testUUID = user.uuid
+    else:
+        logging.info("No evaluation flag found, not registering email")
+        testObj.testUUID = uuid.uuid4()
+
 def setupRealExample(testObj, dump_file):
     logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
     with open(dump_file) as dfp:
         testObj.entries = json.load(dfp, object_hook = bju.object_hook)
-        if hasattr(testObj, "evaluation") and testObj.evaluation:
-            reg_email = getRealExampleEmail(testObj)
-            logging.info("registering email = %s" % reg_email)
-            user = ecwu.User.register(reg_email)
-            testObj.testUUID = user.uuid
-        else:
-            testObj.testUUID = uuid.uuid4()
-
+        createAndFillUUID(testObj)
         print("Setting up real example for %s" % testObj.testUUID)
         setupRealExampleWithEntries(testObj)
 
