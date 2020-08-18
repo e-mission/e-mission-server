@@ -65,13 +65,15 @@ class FlipFlopDetection():
         Current definition for when there is a potential flip flop
         - if the transition was based on 1 motion activity 
         """
-        if start_motion["trip_pct"] > 25:
+        if eaid.is_big_pct_of_trip(start_motion["trip_pct"]):
             logging.debug("trip_pct = %d, > 25, returning False" % start_motion["trip_pct"])
             return False
         idx_diff = end_motion["idx"] - start_motion["idx"]
         if idx_diff <= 1:
             logging.debug("in is_flip_flop: idx_diff = %d" % idx_diff)
-            return True
+            if not eaid.is_transit_transfer(start_motion.type, end_motion.type):
+                logging.debug("in is_flip_flip: is_transit_transfer = False => FF = true ")
+                return True
         if not eaid.is_walking_type(start_motion.type) and idx_diff <= 2:
             # for bicycling and transport, we want idx = 2
             # https://github.com/e-mission/e-mission-server/issues/577#issuecomment-379527711
