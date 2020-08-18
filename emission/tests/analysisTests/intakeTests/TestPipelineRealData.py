@@ -450,8 +450,7 @@ class TestPipelineRealData(unittest.TestCase):
         after_1800_entries = [e for e in all_entries if ad.AttrDict(e).metadata.write_ts > ts_1800]
 
         # Sync at 18:00 to capture all the points on the trip *to* the optometrist
-        import uuid
-        self.testUUID = uuid.uuid4()
+        etc.createAndFillUUID(self)
         self.entries = before_1800_entries
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
@@ -565,8 +564,7 @@ class TestPipelineRealData(unittest.TestCase):
 
         # Sync at 18:00 to capture all the points on the trip *to* the optometrist
         # Skip the last few points to ensure that the trip end is skipped
-        import uuid
-        self.testUUID = uuid.uuid4()
+        etc.createAndFillUUID(self)
         self.entries = before_1800_entries[0:-2]
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
@@ -606,8 +604,7 @@ class TestPipelineRealData(unittest.TestCase):
 
         # Sync at 18:00 to capture all the points on the trip *to* the optometrist
         # Skip the last few points to ensure that the trip end is skipped
-        import uuid
-        self.testUUID = uuid.uuid4()
+        etc.createAndFillUUID(self)
         self.entries = before_1800_entries
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
