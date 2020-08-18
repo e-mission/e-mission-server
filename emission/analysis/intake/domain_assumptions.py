@@ -45,8 +45,10 @@ def is_too_short_bike_vehicle_transition(duration):
     else:
         return False
 
-def is_transit_transfer(start_mode, end_mode):
-    return is_walking_type(start_mode) and is_motorized(end_mode)
+def is_transit_transfer(before_mode, curr_mode, after_mode):
+    return is_motorized(before_mode) and \
+        is_walking_type(curr_mode) and \
+        is_motorized(after_mode)
 
 def is_flip_flop_streak_for_new_section(ff_streak_length):
     return ff_streak_length > 3

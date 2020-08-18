@@ -71,9 +71,7 @@ class FlipFlopDetection():
         idx_diff = end_motion["idx"] - start_motion["idx"]
         if idx_diff <= 1:
             logging.debug("in is_flip_flop: idx_diff = %d" % idx_diff)
-            if not eaid.is_transit_transfer(start_motion.type, end_motion.type):
-                logging.debug("in is_flip_flip: is_transit_transfer = False => FF = true ")
-                return True
+            return True
         if not eaid.is_walking_type(start_motion.type) and idx_diff <= 2:
             # for bicycling and transport, we want idx = 2
             # https://github.com/e-mission/e-mission-server/issues/577#issuecomment-379527711
@@ -248,6 +246,7 @@ class FlipFlopDetection():
         - if either direction is WALKING and speed is greater than 1.4 + slosh then 
             must be the other direction
         - pick direction that is closer to the median speed
+        - if transit transfer, don't merge
         """
         start_change = self.motion_changes[streak_start]
         end_change = self.motion_changes[streak_end]
@@ -270,6 +269,16 @@ class FlipFlopDetection():
 
         after_motion = self.motion_changes[streak_end + 1]
         asm, aem = after_motion
+
+        logging.info("ssm == %s, sem = %s, esm = %s, eem = %s" %
+            (ssm.type, sem.type, esm.type, eem.type))
+        curr_mode = ssm.type
+
+        if eaid.is_transit_transfer(bsm.type, ssm.type, asm.type):
+            logging.debug("Found transit transfer in range (%s, %s), skipping merge"
+                % (streak_start, streak_end))
+            return MergeResult.NONE()
+            
 
         if bsm.type == asm.type:
             logging.debug("before type = %s, after type = %s, merge direction is don't care, returning forward"  % 
