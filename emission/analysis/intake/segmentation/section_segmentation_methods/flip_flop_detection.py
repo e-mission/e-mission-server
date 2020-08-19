@@ -420,7 +420,9 @@ class FlipFlopDetection():
                     streak_list.append((curr_streak_start, i-1))
                 curr_streak_start = i+1
 
-        if i != (curr_streak_start - 1):
+        if (i == 0 or i == 1) and flip_flop_list[i]:
+            streak_list.append((i,i))
+        elif i != (curr_streak_start - 1):
             # There is a streak ending at the end of the list
             streak_list.append((curr_streak_start, len(flip_flop_list) - 2))
         return streak_list
