@@ -51,6 +51,12 @@ class TestFlipFlopDetection(unittest.TestCase):
         sss_list = ffd.get_streaks(flip_flop_list)
         self.assertEqual(sss_list, [(0,0), (2,2)])
 
+    def test_ShouldMerge(self):
+        ffd = eaissf.FlipFlopDetection([(ad.AttrDict({'idx': 'a', 'ts': 100}),
+            ad.AttrDict({'idx': 'b', 'ts': 200}))], None)
+        sm = ffd.should_merge(0, 0)
+        self.assertEqual(sm.direction, eaissf.Direction.NONE)
+
     def test_MergeStreaksPass1(self):
         ffd = eaissf.FlipFlopDetection([], None)
         unmerged_change_list = [({'idx': 'a'}, {'idx': 'b'}),

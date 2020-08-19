@@ -109,6 +109,11 @@ class FlipFlopDetection():
 
         logging.debug("Looking to see whether we should merge streak %s -> %s, length %d" %
             (streak_start, streak_end, streak_end - streak_start))
+
+        if streak_start == 0 and (streak_end + 1) == len(self.motion_changes):
+            logging.info("The flip-flop (%s, %s) = all changes of length %s, can't merge with anything" %
+                (streak_start, streak_end, len(self.motion_changes)))
+            return MergeResult.NONE()
         if (streak_start) == streak_end or \
             (streak_start + 1) == streak_end:
             logging.info("Found single flip-flop %s -> %s -> %s" % 
