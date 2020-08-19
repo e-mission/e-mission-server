@@ -201,7 +201,7 @@ class TestSectionSegmentation(unittest.TestCase):
         self.assertEqual(len(sections_stops), len(created_trips))
         # The expected value was copy-pasted from the debug statement above
         self.assertEqual(sections_stops,
-                         [(2, 1), (1, 0), (2, 1), (2, 1), (1, 0), (2, 1),
+                         [(2, 1), (1, 0), (1, 0), (2, 1), (1, 0), (2, 1),
                           (4, 3), (2, 1)])
 
         # tq_stop = estt.TimeQuery("data.enter_ts", 1440658800, 1440745200)
