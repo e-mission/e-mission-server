@@ -66,8 +66,14 @@ class FlipFlopDetection():
         - if the transition was based on 1 motion activity 
         """
         if eaid.is_big_pct_of_trip(start_motion["trip_pct"]):
-            logging.debug("trip_pct = %d, > 25, returning False" % start_motion["trip_pct"])
-            return False
+            logging.debug("trip_pct = %d, > 25, checking mode and length" % start_motion["trip_pct"])
+            duration = end_motion["ts"] - start_motion["ts"]
+            if (eaid.is_motorized(start_motion["type"]) and
+                eaid.is_too_short_motorized_ride(duration)):
+                logging.debug("motorized mode= %s, duration = %s, continuing to other checks" % (start_motion["type"], duration))
+            else:
+                logging.debug("motorized mode= %s, duration = %s, not a flip flop already" % (start_motion["type"], duration))
+                return False
         idx_diff = end_motion["idx"] - start_motion["idx"]
         if idx_diff <= 1:
             logging.debug("in is_flip_flop: idx_diff = %d" % idx_diff)
