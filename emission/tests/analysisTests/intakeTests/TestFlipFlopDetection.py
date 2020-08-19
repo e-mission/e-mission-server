@@ -1,5 +1,6 @@
 import unittest
 import attrdict as ad
+import pandas as pd
 
 # our imports
 import emission.core.wrapper.motionactivity as ecwm
@@ -45,6 +46,10 @@ class TestFlipFlopDetection(unittest.TestCase):
         flip_flop_list = [False, True]
         sss_list = ffd.get_streaks(flip_flop_list)
         self.assertEqual(sss_list, [(1,1)])
+
+        flip_flop_list = [True, False, True, True]
+        sss_list = ffd.get_streaks(flip_flop_list)
+        self.assertEqual(sss_list, [(0,0), (2,2)])
 
     def test_MergeStreaksPass1(self):
         ffd = eaissf.FlipFlopDetection([], None)
@@ -99,6 +104,24 @@ class TestFlipFlopDetection(unittest.TestCase):
                                     ({'idx': 'e'}, {'idx': 'h'}),
                                     ({'idx': 'h'}, {'idx': 'i'}),
                                     ({'idx': 'k', 'type': ecwm.MotionTypes.BICYCLING}, {'idx': 'p'})])
+
+    def test_GetSectionSpeed(self):
+        ffd = eaissf.FlipFlopDetection([], None)
+        loc_points = pd.DataFrame()
+        with_speed_loc_points = pd.DataFrame()
+        points_before = pd.DataFrame()
+        points_after = pd.DataFrame()
+
+        curr_speed = ffd.get_section_speed(loc_points, with_speed_loc_points,
+                        points_before, points_after)
+        self.assertEqual(curr_speed, 0)
+
+        loc_points = pd.DataFrame({"speed": [0]})
+        self.assertEqual(loc_points.speed.median(), 0)
+
+        curr_speed = ffd.get_section_speed(loc_points, with_speed_loc_points,
+                        points_before, points_after)
+        self.assertEqual(curr_speed, 0)
 
     def test_MergeStreaksPass2(self):
         ffd = eaissf.FlipFlopDetection([], None)
