@@ -6,9 +6,13 @@ name: ubuntu-only-test-with-manual-install
 # events but only for the master branch
 on:
   push:
-    branches: [ master gis-based-mode-detection ]
+    branches: 
+        - master
+        - gis-based-mode-detection
   pull_request:
-    branches: [ master gis-based-mode-detection ]
+    branches: 
+        - master
+        - gis-based-mode-detection
   schedule:
     # * is a special character in YAML so you have to quote this string
     - cron:  '5 4 * * 0'
