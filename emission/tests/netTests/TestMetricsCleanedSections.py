@@ -65,7 +65,7 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual([m.nUsers for m in user_met_result], [1,1])
         self.assertEqual(user_met_result[0].local_dt.day, 27)
         self.assertEqual(user_met_result[1].local_dt.day, 28)
-        self.assertEqual(user_met_result[0].ON_FOOT, 4)
+        self.assertEqual(user_met_result[0].ON_FOOT, 3)
         self.assertEqual(user_met_result[0].BICYCLING, 2)
         # Changed from 3 to 4 - investigation at
         # https://github.com/e-mission/e-mission-server/issues/288#issuecomment-242531798
@@ -101,7 +101,7 @@ class TestMetrics(unittest.TestCase):
         # local timezone means that we only have one entry
         self.assertEqual(len(user_met_result), 1)
         self.assertEqual(user_met_result[0].nUsers, 1)
-        self.assertEqual(user_met_result[0].ON_FOOT, 6)
+        self.assertEqual(user_met_result[0].ON_FOOT, 5)
         self.assertEqual(user_met_result[0].BICYCLING, 4)
         self.assertEqual(user_met_result[0].IN_VEHICLE, 5)
         # We are not going to make assertions about the aggregate values since
