@@ -320,7 +320,7 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-independence_day_jump_straddle"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 15})
         cacheKey = "diary/trips-2016-08-15"
-        with open("emission/tests/data/real_examples/shankari_2016-independence_day.ground_truth") as gfp:
+        with open("emission/tests/data/real_examples/shankari_2016-independence_day.alt.ground_truth") as gfp:
             ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
@@ -336,7 +336,7 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-independence_day_jump_bus_start"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 15})
         cacheKey = "diary/trips-2016-08-15"
-        with open("emission/tests/data/real_examples/shankari_2016-independence_day.ground_truth") as gfp:
+        with open("emission/tests/data/real_examples/shankari_2016-independence_day.alt.ground_truth") as gfp:
             ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
