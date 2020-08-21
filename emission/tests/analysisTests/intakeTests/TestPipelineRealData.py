@@ -267,21 +267,12 @@ class TestPipelineRealData(unittest.TestCase):
         cacheKey = "diary/trips-2016-02-22"
         self.standardMatchDataGroundTruth(dataFile, start_ld, cacheKey)
 
-#     def testAug27TooMuchExtrapolation(self):
-#         dataFile = "emission/tests/data/real_examples/shankari_2015-aug-27"
-#         start_ld = ecwl.LocalDate({'year': 2015, 'month': 8, 'day': 27})
-#         end_ld = ecwl.LocalDate({'year': 2015, 'month': 8, 'day': 27})
-#         cacheKey = "diary/trips-2015-08-27"
-#         with open(dataFile+".ground_truth") as gfp:
-#             ground_truth = json.load(gfp, object_hook=bju.object_hook)
-# 
-#         etc.setupRealExample(self, dataFile)
-#         etc.runIntakePipeline(self.testUUID)
-#         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, end_ld)
-# 
-#         # Although we process the day's data in two batches, we should get the same result
-#         self.compare_result(ad.AttrDict({'result': api_result}).result,
-#                             ad.AttrDict(ground_truth).data)
+    def testAug27TooMuchExtrapolation(self):
+        dataFile = "emission/tests/data/real_examples/shankari_2015-aug-27"
+        start_ld = ecwl.LocalDate({'year': 2015, 'month': 8, 'day': 27})
+        end_ld = ecwl.LocalDate({'year': 2015, 'month': 8, 'day': 27})
+        cacheKey = "diary/trips-2015-08-27"
+        self.standardMatchDataGroundTruth(dataFile, start_ld, cacheKey)
 
     def testAirTripToHawaii(self):
         dataFile = "emission/tests/data/real_examples/shankari_2016-07-27"
@@ -329,7 +320,7 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-independence_day_jump_straddle"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 15})
         cacheKey = "diary/trips-2016-08-15"
-        with open("emission/tests/data/real_examples/shankari_2016-independence_day.ground_truth") as gfp:
+        with open("emission/tests/data/real_examples/shankari_2016-independence_day.alt.ground_truth") as gfp:
             ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
@@ -345,7 +336,7 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-independence_day_jump_bus_start"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 15})
         cacheKey = "diary/trips-2016-08-15"
-        with open("emission/tests/data/real_examples/shankari_2016-independence_day.ground_truth") as gfp:
+        with open("emission/tests/data/real_examples/shankari_2016-independence_day.alt.ground_truth") as gfp:
             ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
@@ -450,8 +441,7 @@ class TestPipelineRealData(unittest.TestCase):
         after_1800_entries = [e for e in all_entries if ad.AttrDict(e).metadata.write_ts > ts_1800]
 
         # Sync at 18:00 to capture all the points on the trip *to* the optometrist
-        import uuid
-        self.testUUID = uuid.uuid4()
+        etc.createAndFillUUID(self)
         self.entries = before_1800_entries
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
@@ -565,8 +555,7 @@ class TestPipelineRealData(unittest.TestCase):
 
         # Sync at 18:00 to capture all the points on the trip *to* the optometrist
         # Skip the last few points to ensure that the trip end is skipped
-        import uuid
-        self.testUUID = uuid.uuid4()
+        etc.createAndFillUUID(self)
         self.entries = before_1800_entries[0:-2]
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
@@ -606,8 +595,7 @@ class TestPipelineRealData(unittest.TestCase):
 
         # Sync at 18:00 to capture all the points on the trip *to* the optometrist
         # Skip the last few points to ensure that the trip end is skipped
-        import uuid
-        self.testUUID = uuid.uuid4()
+        etc.createAndFillUUID(self)
         self.entries = before_1800_entries
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
