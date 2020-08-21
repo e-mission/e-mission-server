@@ -118,7 +118,7 @@ class TestBuiltinUserCacheHandlerOutput(unittest.TestCase):
         uch.delete_obsolete_entries(uc, list(valid_bins.keys()))
         # the result should include entries that are in the past (28,27,26), but should 
         # NOT include newly added entries
-        self.assertEqual(uc.getDocumentKeyList(), ["2015-12-30", "2015-12-29"])
+        self.assertEqual(uc.getDocumentKeyList(), ["2015-12-29", "2015-12-30"])
 
     def testRetainSetConfig(self):
         valid_bins = {"2015-12-30":[{"b": 2}],
@@ -135,7 +135,7 @@ class TestBuiltinUserCacheHandlerOutput(unittest.TestCase):
         uch.delete_obsolete_entries(uc, list(valid_bins.keys()))
         # the result should include entries that are in the past (28,27,26), but should 
         # NOT include newly added entries
-        self.assertEqual(uc.getDocumentKeyList(), ["2015-12-30", "2015-12-29",
+        self.assertEqual(uc.getDocumentKeyList(), ["2015-12-29", "2015-12-30",
             "config/sensor_config"])
 
 if __name__ == '__main__':

@@ -59,7 +59,7 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
             logging.info("Found filter_mask with shape (0,0), returning blank")
             return []
 
-        logging.debug("filtered points %s" % np.nonzero(filter_mask))
+        logging.debug("filtered points %s" % np.nonzero(filter_mask.to_numpy()))
         logging.debug("motion_df = %s" % motion_df.head())
         filtered_df = motion_df[filter_mask]
 

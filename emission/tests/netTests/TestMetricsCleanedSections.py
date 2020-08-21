@@ -33,7 +33,7 @@ class TestMetrics(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID1)
         etc.runIntakePipeline(self.testUUID)
         logging.info(
-            "After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
+            "After loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
         self.aug_start_ts = 1438387200
         self.aug_end_ts = 1441065600
         self.day_start_dt = ecwl.LocalDate.get_local_date(self.aug_start_ts, "America/Los_Angeles")

@@ -109,7 +109,7 @@ def del_objects_after(user_id, reset_ts, is_dry_run):
     del_query.update({"$or": date_query_list})
     logging.debug("After all updates, del_query = %s" % del_query)
     logging.info("About to delete %d entries" 
-        % edb.get_analysis_timeseries_db().find(del_query).count())
+        % edb.get_analysis_timeseries_db().count_documents(del_query))
     logging.info("About to delete entries with keys %s" 
         % edb.get_analysis_timeseries_db().find(del_query).distinct("metadata.key"))
 
@@ -171,7 +171,7 @@ def reset_pipeline_state(user_id, reset_ts, is_dry_run):
     logging.debug("trip_seg_reset_pipeline_query = %s" % trip_seg_reset_pipeline_query)
     logging.debug("trip_seg_update_pipeline_query = %s" % trip_seg_update_pipeline_query)
     logging.info("resetting %s trip_seg_pipeline states for user %s to %s" % 
-            (edb.get_pipeline_state_db().find(trip_seg_reset_pipeline_query).count(),
+            (edb.get_pipeline_state_db().count_documents(trip_seg_reset_pipeline_query),
             user_id, reset_ts + FUZZ_FACTOR))
 
     # Don't fuzz the others because of 
@@ -186,8 +186,8 @@ def reset_pipeline_state(user_id, reset_ts, is_dry_run):
     logging.debug("reset_pipeline_query = %s" % reset_pipeline_query)
     logging.debug("update_pipeline_query = %s" % update_pipeline_query)
     logging.info("out of %s total, resetting %s pipeline states for user %s to %s" % 
-            (edb.get_pipeline_state_db().find({'user_id': user_id}).count(),
-            edb.get_pipeline_state_db().find(reset_pipeline_query).count(),
+            (edb.get_pipeline_state_db().count_documents({'user_id': user_id}),
+            edb.get_pipeline_state_db().count_documents(reset_pipeline_query),
             user_id, reset_ts))
 
     if is_dry_run:
@@ -223,11 +223,11 @@ def _del_entries_for_query(del_query, is_dry_run):
         - delete all pipeline states for this user
     """
     logging.info("About to delete %s analysis results" %
-                    edb.get_analysis_timeseries_db().find(del_query).count())
+                    edb.get_analysis_timeseries_db().count_documents(del_query))
     logging.info("About to delete entries with keys %s" 
         % edb.get_analysis_timeseries_db().find(del_query).distinct("metadata.key"))
     logging.info("About to delete %s pipeline states" % 
-            (edb.get_pipeline_state_db().find(del_query).count()))
+            (edb.get_pipeline_state_db().count_documents(del_query)))
 
     if is_dry_run:
         logging.info("this is a dry run, returning from reset_user_to-start without modifying anything")

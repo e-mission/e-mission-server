@@ -33,7 +33,7 @@ class TestClient(unittest.TestCase):
                     self.config_path)
 
     logging.info("After setup, client count = %d, profile count = %d, uuid count = %d" % 
-      (get_client_db().find().count(), get_profile_db().count(), get_uuid_db().count()))
+      (get_client_db().estimated_document_count(), get_profile_db().estimated_document_count(), get_uuid_db().estimated_document_count()))
     common.loadTable(self.serverName, "Stage_Modes", "emission/tests/data/modes.json")
 
   def tearDown(self):

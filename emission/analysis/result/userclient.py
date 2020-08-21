@@ -52,7 +52,7 @@ def getClientQuery(clientName):
         return {'study_list': {'$in': [clientName]}}
 
 def countForStudy(study):
-  return get_profile_db().find(getClientQuery(study)).count()
+  return get_profile_db().count_documents(getClientQuery(study))
 
 def getUsersForClient(clientName):
   # Find all users for this client

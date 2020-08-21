@@ -41,7 +41,7 @@ def get_local_date(fmt_time, timezone):
 def fix_timeseries(key):
     tsdb = edb.get_timeseries_db()
     tsdb_cursor = tsdb.find({'metadata.key': key})
-    logging.debug("Fixing %s entries for key %s" % (tsdb_cursor.count(), key))
+    logging.debug("Fixing %s entries for key %s" % (tsdb.count_documents({'metadata.key': key}), key))
     data_local_dt = False
     for entry in tsdb.find({'metadata.key': key}):
         entry["metadata"]["write_local_dt"] = get_local_date(entry['metadata']['write_fmt_time'],

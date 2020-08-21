@@ -108,8 +108,8 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
         self.assertEqual(len(list(self.tsios.find_entries())), 30)
         
         # 30 entries from android + 30 entries from ios = 60
-        self.assertEqual(edb.get_timeseries_db().find().count(), 60)
-        self.assertEqual(edb.get_timeseries_error_db().find().count(), 0)
+        self.assertEqual(edb.get_timeseries_db().estimated_document_count(), 60)
+        self.assertEqual(edb.get_timeseries_error_db().estimated_document_count(), 0)
 
         # But all existing entries still in usercache for the second user
         self.assertEqual(len(self.uc2.getMessage()), 30)
@@ -149,7 +149,7 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
         enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUID1).moveToLongTerm()
 
         # That was stored in error_db, no errors in main body
-        self.assertEqual(edb.get_timeseries_error_db().find({"user_id": self.testUserUUID1}).count(), 1)
+        self.assertEqual(edb.get_timeseries_error_db().count_documents({"user_id": self.testUserUUID1}), 1)
         self.assertEqual(len(self.uc1.getMessage()), 0)
         self.assertEqual(len(list(self.ts1.find_entries())), 30)
 
@@ -220,8 +220,8 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
         self.assertEqual(len(list(self.tsios.find_entries())), 30)
         
         # 30 entries from android + 30 entries from ios = 60
-        self.assertEqual(edb.get_timeseries_db().find().count(), 60)
-        self.assertEqual(edb.get_timeseries_error_db().find().count(), 0)
+        self.assertEqual(edb.get_timeseries_db().estimated_document_count(), 60)
+        self.assertEqual(edb.get_timeseries_error_db().estimated_document_count(), 0)
 
         logging.debug("old curr_ts = %d" % self.curr_ts)
         time.sleep(20)
@@ -266,8 +266,8 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
         self.assertEqual(len(list(self.tsios.find_entries())), 60)
         
         # 60 entries from android + 60 entries from ios = 120
-        self.assertEqual(edb.get_timeseries_db().find().count(), 120)
-        self.assertEqual(edb.get_timeseries_error_db().find().count(), 0)
+        self.assertEqual(edb.get_timeseries_db().estimated_document_count(), 120)
+        self.assertEqual(edb.get_timeseries_error_db().estimated_document_count(), 0)
 
 if __name__ == '__main__':
     import emission.tests.common as etc
