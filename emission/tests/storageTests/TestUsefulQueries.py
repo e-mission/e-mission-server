@@ -24,9 +24,9 @@ class UsefulQueriesTests(unittest.TestCase):
         get_section_db().delete_one({"_id": "foo_1"})
         get_section_db().delete_one({"_id": "foo_2"})
         get_section_db().delete_one({"_id": "foo_3"})
-        self.assertEqual(get_section_db().find({'_id': 'foo_1'}).count(), 0)
-        self.assertEqual(get_section_db().find({'_id': 'foo_2'}).count(), 0)
-        self.assertEqual(get_section_db().find({'_id': 'foo_3'}).count(), 0)
+        self.assertEqual(get_section_db().count_documents({'_id': 'foo_1'}), 0)
+        self.assertEqual(get_section_db().count_documents({'_id': 'foo_2'}), 0)
+        self.assertEqual(get_section_db().count_documents({'_id': 'foo_3'}), 0)
 
     def testGetAllSections(self):
         get_section_db().insert_one({"_id": "foo_1", "trip_id": "bar"})

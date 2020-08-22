@@ -35,9 +35,12 @@ class TestPipelineSeed(unittest.TestCase):
     for testUser in user_objects:
         etc.purgeSectionData(self.SectionsColl, testUser.uuid)
 
-    self.assertEqual(self.ModesColl.find().count(), 0)
+    if self.ModesColl.estimated_document_count() > 0:
+        self.ModesColl.delete_many({})
 
-    self.assertEqual(self.SectionsColl.find().count(), 0)
+    self.assertEqual(self.ModesColl.estimated_document_count(), 0)
+
+    self.assertEqual(self.SectionsColl.estimated_document_count(), 0)
 
     MongoClient(edb.url).drop_database("Backup_database")
 
@@ -69,9 +72,9 @@ class TestPipelineSeed(unittest.TestCase):
     MongoClient(edb.url).drop_database("Backup_database")
     for testUser in self.testUsers:
       etc.purgeSectionData(self.SectionsColl, testUser)
-    logging.debug("Number of sections after purge is %d" % self.SectionsColl.find().count())
+    logging.debug("Number of sections after purge is %d" % self.SectionsColl.estimated_document_count())
     self.ModesColl.delete_many({})
-    self.assertEqual(self.ModesColl.find().count(), 0)
+    self.assertEqual(self.ModesColl.estimated_document_count(), 0)
     if os.path.exists(pipeline.SAVED_MODEL_FILENAME):
         os.remove(pipeline.SAVED_MODEL_FILENAME)
         self.assertFalse(os.path.exists(pipeline.SAVED_MODEL_FILENAME))
@@ -80,11 +83,11 @@ class TestPipelineSeed(unittest.TestCase):
     from pymongo import MongoClient
 
     allConfirmedTripsQuery = pipeline.ModeInferencePipelineMovesFormat.getSectionQueryWithGroundTruth({'$ne': ''})
-    self.pipeline.confirmedSections = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery)
+    (self.pipeline.confirmedSectionCount, self.pipeline.confirmedSections) = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery)
     backupSections = MongoClient(edb.url).Backup_database.Stage_Sections
-    self.pipeline.backupConfirmedSections = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery, backupSections)
-    self.assertEqual(self.pipeline.confirmedSections.count(), len(self.testUsers) * 2)
-    self.assertEqual(self.pipeline.backupConfirmedSections.count(), 0)
+    (self.pipeline.backupSectionCount, self.pipeline.backupConfirmedSections) = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery, backupSections)
+    self.assertEqual(self.pipeline.confirmedSectionCount, len(self.testUsers) * 2)
+    self.assertEqual(self.pipeline.backupSectionCount, 0)
     
 
   def testGenerateBusAndTrainStops(self):
@@ -120,9 +123,9 @@ class TestPipelineSeed(unittest.TestCase):
     self.testGenerateBusAndTrainStops()
 
     (self.pipeline.featureMatrix, self.pipeline.resultVector) = self.pipeline.generateFeatureMatrixAndResultVectorStep()
-    logging.debug("Number of sections = %s" % self.pipeline.confirmedSections.count())
+    logging.debug("Number of sections = %s" % self.pipeline.confirmedSectionCount)
     logging.debug("Feature Matrix shape = %s" % str(self.pipeline.featureMatrix.shape))
-    self.assertEqual(self.pipeline.featureMatrix.shape[0], self.pipeline.confirmedSections.count())
+    self.assertEqual(self.pipeline.featureMatrix.shape[0], self.pipeline.confirmedSectionCount)
     self.assertEqual(self.pipeline.featureMatrix.shape[1], len(self.pipeline.featureLabels))
 
   def testCleanDataStep(self):
@@ -147,12 +150,12 @@ class TestPipelineSeed(unittest.TestCase):
     self.SectionsColl.insert_one(unknownTripSec)
     
     allConfirmedTripsQuery = {"$and": [{'type': 'move'}, {'confirmed_mode': {'$ne': ''}}]}
-    self.pipeline.confirmedSections = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery)
+    (self.pipeline.confirmedSectionCount, self.pipeline.confirmedSections) = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery)
     self.testGenerateBusAndTrainStops()
     (self.pipeline.featureMatrix, self.pipeline.resultVector) = self.pipeline.generateFeatureMatrixAndResultVectorStep()
 
     (self.pipeline.cleanedFeatureMatrix, self.pipeline.cleanedResultVector) = self.pipeline.cleanDataStep()
-    self.assertEqual(self.pipeline.cleanedFeatureMatrix.shape[0], self.pipeline.confirmedSections.count() + self.pipeline.backupConfirmedSections.count() - 2)
+    self.assertEqual(self.pipeline.cleanedFeatureMatrix.shape[0], self.pipeline.confirmedSectionCount + self.pipeline.backupSectionCount - 2)
 
   def testSelectFeatureIndicesStep(self):
     self.testCleanDataStep()
@@ -185,29 +188,26 @@ class TestPipelineSeed(unittest.TestCase):
     scores = model_selection.cross_val_score(self.pipeline.model, self.pipeline.cleanedFeatureMatrix, self.pipeline.cleanedResultVector, cv=3)
     self.assertGreater(scores.mean(), 0.90)
 
-  def setupTestTrips(self):
+  def setupTestTrips(self, sectionsColl):
     # Generate some test data by taking existing training data and stripping out the labels
     test_id_1 = self.SectionsColl.find_one({'confirmed_mode':1})
     test_id_1['_id'] = 'test_id_1'
     test_id_1['confirmed_mode'] = ''
     logging.debug("Inserting test_id_1 %s" % test_id_1)
-    self.SectionsColl.insert_one(test_id_1)
+    sectionsColl.insert_one(test_id_1)
 
     test_id_2 = self.SectionsColl.find_one({'confirmed_mode':5})
     test_id_2['_id'] = 'test_id_2'
     test_id_2['confirmed_mode'] = ''
     logging.debug("Inserting test_id_2 %s" % test_id_2)
-    self.SectionsColl.insert_one(test_id_2)
+    sectionsColl.insert_one(test_id_2)
 
   def testEntirePipeline(self):
-    self.setupTestTrips()
+    self.setupTestTrips(self.SectionsColl)
+    self.setupTestTrips(MongoClient(edb.url).Backup_database.Stage_Sections)
     # Here, we only have 5 trips, so the pipeline looks for the backup training
     # set instead, which fails because there is no backup. So let's copy data from
     # the main DB to the backup DB to make this test pass
-    MongoClient(edb.url).admin.command("copydb",
-        fromdb="Stage_database",
-        todb="Backup_database",
-        fromhost=edb.url)
     self.pipeline.runPipeline()
 
     # Checks are largely the same as above

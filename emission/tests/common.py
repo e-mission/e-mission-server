@@ -39,7 +39,7 @@ def updateUserCreateTime(uuid):
   user.changeUpdateTs(timedelta(days = -20))
 
 def dropAllCollections(db):
-  collections = db.collection_names()
+  collections = db.list_collection_names()
   print("collections = %s" % collections)
   for coll in collections:
     if coll.startswith('system'):
@@ -119,7 +119,7 @@ def createAndFillUUID(testObj):
         testObj.testUUID = uuid.uuid4()
 
 def setupRealExample(testObj, dump_file):
-    logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
+    logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
     with open(dump_file) as dfp:
         testObj.entries = json.load(dfp, object_hook = bju.object_hook)
         createAndFillUUID(testObj)
@@ -134,7 +134,7 @@ def setupRealExampleWithEntries(testObj):
         #                                                        entry["data"]["fmt_time"])
         edb.save(tsdb, entry)
         
-    logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
+    logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
     logging.debug("First few entries = %s" % 
                     [e["data"]["fmt_time"] if "fmt_time" in e["data"] else e["metadata"]["write_fmt_time"] for e in 
                         list(edb.get_timeseries_db().find({"user_id": testObj.testUUID}).sort("data.write_ts",
