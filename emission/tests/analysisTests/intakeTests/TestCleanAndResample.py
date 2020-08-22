@@ -89,18 +89,22 @@ class TestCleanAndResample(unittest.TestCase):
         # because the stop length is non zero!!
         # So there is only one cleaned trip left
         cleaned_trips_df = self.ts.get_data_df(esda.CLEANED_TRIP_KEY, time_query=None)
-        self.assertEqual(len(cleaned_trips_df), 1)
+        logging.debug("non-zero length trips = %s" % cleaned_trips_df[["start_fmt_time", "end_fmt_time"]])
+        self.assertEqual(len(cleaned_trips_df), 2)
 
         # We don't support squishing sections, but we only store stops and sections
         # for non-squished trips. And this non-squished trip happens to have
         # two sections and one stop
         cleaned_sections_df = self.ts.get_data_df(esda.CLEANED_SECTION_KEY, time_query=None)
-        self.assertEqual(len(cleaned_sections_df), 2)
-        self.assertEqual(cleaned_sections_df.distance.tolist(), [0,0])
+        self.assertEqual(len(cleaned_sections_df), 4)
+        # The first section is 3252.023643502053 
+        self.assertAlmostEqual(cleaned_sections_df.distance.tolist()[0], 3252, 0)
+        self.assertEqual(cleaned_sections_df.distance.tolist()[1:], [0,0,0])
 
         cleaned_stops_df = self.ts.get_data_df(esda.CLEANED_STOP_KEY, time_query=None)
-        self.assertEqual(len(cleaned_stops_df), 1)
-        self.assertAlmostEqual(cleaned_stops_df.distance[0], 3252, places=0)
+        self.assertEqual(len(cleaned_stops_df), 2)
+        self.assertAlmostEqual(cleaned_stops_df.distance[0], 0, places=0)
+        self.assertAlmostEqual(cleaned_stops_df.distance[1], 150, places=0)
 
 
 if __name__ == '__main__':

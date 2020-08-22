@@ -46,13 +46,13 @@ class ModeInferencePipelineMovesFormat:
 
   def runPipeline(self):
     allConfirmedTripsQuery = ModeInferencePipelineMovesFormat.getSectionQueryWithGroundTruth({'$ne': ''})
-    self.confirmedSections = self.loadTrainingDataStep(allConfirmedTripsQuery)
-    logging.debug("confirmedSections.count() = %s" % (self.confirmedSections.count()))
+    (self.confirmedSectionCount, self.confirmedSections) = self.loadTrainingDataStep(allConfirmedTripsQuery)
+    logging.debug("confirmedSectionCount = %s" % (self.confirmedSectionCount))
     logging.info("initial loadTrainingDataStep DONE")
 
     logging.debug("finished loading current training set, now loading from backup!")
     backupSections = MongoClient(edb.url).Backup_database.Stage_Sections
-    self.backupConfirmedSections = self.loadTrainingDataStep(allConfirmedTripsQuery, backupSections)
+    (self.backupSectionCount, self.backupConfirmedSections) = self.loadTrainingDataStep(allConfirmedTripsQuery, backupSections)
     logging.info("loadTrainingDataStep DONE")
 
     (self.bus_cluster, self.train_cluster) = self.generateBusAndTrainStopStep() 
@@ -102,13 +102,14 @@ class ModeInferencePipelineMovesFormat:
       sectionDb = self.Sections
 
     begin = time.time()
-    logging.debug("Section data set size = %s" % sectionDb.find({'type': 'move'}).count())
+    logging.debug("Section data set size = %s" % sectionDb.count_documents({'type': 'move'}))
     duration = time.time() - begin
     logging.debug("Getting dataset size took %s" % (duration))
         
     logging.debug("Querying confirmedSections %s" % (datetime.now()))
     begin = time.time()
     confirmedSections = sectionDb.find(sectionQuery).sort('_id', 1)
+    confirmedSectionCount = sectionDb.count_documents(sectionQuery)
 
     duration = time.time() - begin
     logging.debug("Querying confirmedSection took %s" % (duration))
@@ -125,7 +126,7 @@ class ModeInferencePipelineMovesFormat:
     logging.debug("Section query with ground truth %s" % (datetime.now()))
     begin = time.time()
     logging.debug("Training set total size = %s" %
-      sectionDb.find(ModeInferencePipelineMovesFormat.getSectionQueryWithGroundTruth({'$ne': ''})).count())
+      sectionDb.count_documents(ModeInferencePipelineMovesFormat.getSectionQueryWithGroundTruth({'$ne': ''})))
 
     for mode in modeList:
       logging.debug("%s: %s" % (mode['mode_name'],
@@ -135,7 +136,7 @@ class ModeInferencePipelineMovesFormat:
     
 
     duration = time.time() - begin
-    return confirmedSections
+    return (confirmedSectionCount, confirmedSections)
 
   # TODO: Should mode_cluster be in featurecalc or here?
   def generateBusAndTrainStopStep(self):
@@ -146,9 +147,9 @@ class ModeInferencePipelineMovesFormat:
 
 # Feature matrix construction
   def generateFeatureMatrixAndResultVectorStep(self):
-      featureMatrix = np.zeros([self.confirmedSections.count() + self.backupConfirmedSections.count(), len(self.featureLabels)])
-      resultVector = np.zeros(self.confirmedSections.count() + self.backupConfirmedSections.count())
-      logging.debug("created data structures of size %s" % (self.confirmedSections.count() + self.backupConfirmedSections.count()))
+      featureMatrix = np.zeros([self.confirmedSectionCount + self.backupSectionCount, len(self.featureLabels)])
+      resultVector = np.zeros(self.confirmedSectionCount + self.backupSectionCount)
+      logging.debug("created data structures of size %s" % (self.confirmedSectionCount + self.backupSectionCount))
       # There are a couple of additions to the standard confirmedSections cursor here.
       # First, we read it in batches of 300 in order to avoid the 10 minute timeout
       # Our logging shows that we can process roughly 500 entries in 10 minutes

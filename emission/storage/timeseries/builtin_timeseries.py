@@ -188,21 +188,21 @@ class BuiltinTimeSeries(esta.TimeSeries):
         logging.debug("orig_ts_db_keys = %s, analysis_ts_db_keys = %s" % 
             (orig_ts_db_keys, analysis_ts_db_keys))
 
-        orig_ts_db_result = self._get_entries_for_timeseries(self.timeseries_db,
+        (orig_ts_db_count, orig_ts_db_result) = self._get_entries_for_timeseries(self.timeseries_db,
                                                              orig_ts_db_keys,
                                                              time_query,
                                                              geo_query,
                                                              extra_query_list,
                                                              sort_key)
 
-        analysis_ts_db_result = self._get_entries_for_timeseries(self.analysis_timeseries_db,
+        (analysis_ts_db_count, analysis_ts_db_result) = self._get_entries_for_timeseries(self.analysis_timeseries_db,
                                                                  analysis_ts_db_keys,
                                                                  time_query,
                                                                  geo_query,
                                                                  extra_query_list,
                                                                  sort_key)
         logging.debug("orig_ts_db_matches = %s, analysis_ts_db_matches = %s" %
-            (orig_ts_db_result.count(), analysis_ts_db_result.count()))
+            (orig_ts_db_count, analysis_ts_db_count))
         return itertools.chain(orig_ts_db_result, analysis_ts_db_result)
 
     def _get_entries_for_timeseries(self, tsdb, key_list, time_query, geo_query,
@@ -210,9 +210,10 @@ class BuiltinTimeSeries(esta.TimeSeries):
         # workaround for https://github.com/e-mission/e-mission-server/issues/271
         # during the migration
         if key_list is None or len(key_list) > 0:
-            ts_db_cursor = tsdb.find(
-                self._get_query(key_list, time_query, geo_query,
-                                extra_query_list))
+            ts_query = self._get_query(key_list, time_query, geo_query,
+                                extra_query_list)
+            ts_db_cursor = tsdb.find(ts_query)
+            ts_db_count = tsdb.count_documents(ts_query)
             if sort_key is None:
                 ts_db_result = ts_db_cursor
             else:
@@ -229,9 +230,10 @@ class BuiltinTimeSeries(esta.TimeSeries):
             ts_db_result.limit(25 * 10000)
         else:
             ts_db_result = tsdb.find(INVALID_QUERY)
+            ts_db_count = 0
 
-        logging.debug("finished querying values for %s, count = %d" % (key_list, ts_db_result.count()))
-        return ts_db_result
+        logging.debug("finished querying values for %s, count = %d" % (key_list, ts_db_count))
+        return (ts_db_count, ts_db_result)
 
     def get_entry_at_ts(self, key, ts_key, ts):
         import numpy as np
@@ -299,10 +301,11 @@ class BuiltinTimeSeries(esta.TimeSeries):
         """
         result_it = self.get_timeseries_db(key).find(self._get_query([key], time_query),
                                                  {"_id": False, field: True}).sort(field, pymongo.DESCENDING).limit(1)
-        if result_it.count() == 0:
+        result_list = list(result_it)
+        if len(result_list) == 0:
             return -1
 
-        retVal = list(result_it)[0]
+        retVal = result_list[0]
         field_parts = field.split(".")
         for part in field_parts:
             retVal = retVal[part]

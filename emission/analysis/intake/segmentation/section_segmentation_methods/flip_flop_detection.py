@@ -51,20 +51,29 @@ class FlipFlopDetection():
         self.add_trip_percentages()
 
     def add_trip_percentages(self):
-        total_trip_time = self.motion_changes[-1][1].ts - self.motion_changes[0][0].ts
+        if len(self.motion_changes) > 0:
+            total_trip_time = self.motion_changes[-1][1].ts - self.motion_changes[0][0].ts
 
-        for sm, em in self.motion_changes:
-            curr_section_time = em.ts - sm.ts
-            sm.update({"trip_pct": (curr_section_time * 100)/total_trip_time})
+            for sm, em in self.motion_changes:
+                curr_section_time = em.ts - sm.ts
+                sm.update({"trip_pct": (curr_section_time * 100)/total_trip_time})
+        else:
+            logging.info("No motion changes, skipping trip percentages...")
 
     def is_flip_flop(self, start_motion, end_motion):
         """
         Current definition for when there is a potential flip flop
         - if the transition was based on 1 motion activity 
         """
-        if start_motion["trip_pct"] > 25:
-            logging.debug("trip_pct = %d, > 25, returning False" % start_motion["trip_pct"])
-            return False
+        if eaid.is_big_pct_of_trip(start_motion["trip_pct"]):
+            logging.debug("trip_pct = %d, > 25, checking mode and length" % start_motion["trip_pct"])
+            duration = end_motion["ts"] - start_motion["ts"]
+            if (eaid.is_motorized(start_motion["type"]) and
+                eaid.is_too_short_motorized_ride(duration)):
+                logging.debug("motorized mode= %s, duration = %s, continuing to other checks" % (start_motion["type"], duration))
+            else:
+                logging.debug("motorized mode= %s, duration = %s, not a flip flop already" % (start_motion["type"], duration))
+                return False
         idx_diff = end_motion["idx"] - start_motion["idx"]
         if idx_diff <= 1:
             logging.debug("in is_flip_flop: idx_diff = %d" % idx_diff)
@@ -106,6 +115,11 @@ class FlipFlopDetection():
 
         logging.debug("Looking to see whether we should merge streak %s -> %s, length %d" %
             (streak_start, streak_end, streak_end - streak_start))
+
+        if streak_start == 0 and (streak_end + 1) == len(self.motion_changes):
+            logging.info("The flip-flop (%s, %s) = all changes of length %s, can't merge with anything" %
+                (streak_start, streak_end, len(self.motion_changes)))
+            return MergeResult.NONE()
         if (streak_start) == streak_end or \
             (streak_start + 1) == streak_end:
             logging.info("Found single flip-flop %s -> %s -> %s" % 
@@ -243,6 +257,7 @@ class FlipFlopDetection():
         - if either direction is WALKING and speed is greater than 1.4 + slosh then 
             must be the other direction
         - pick direction that is closer to the median speed
+        - if transit transfer, don't merge
         """
         start_change = self.motion_changes[streak_start]
         end_change = self.motion_changes[streak_end]
@@ -265,6 +280,16 @@ class FlipFlopDetection():
 
         after_motion = self.motion_changes[streak_end + 1]
         asm, aem = after_motion
+
+        logging.info("ssm == %s, sem = %s, esm = %s, eem = %s" %
+            (ssm.type, sem.type, esm.type, eem.type))
+        curr_mode = ssm.type
+
+        if eaid.is_transit_transfer(bsm.type, ssm.type, asm.type):
+            logging.debug("Found transit transfer in range (%s, %s), skipping merge"
+                % (streak_start, streak_end))
+            return MergeResult.NONE()
+            
 
         if bsm.type == asm.type:
             logging.debug("before type = %s, after type = %s, merge direction is don't care, returning forward"  % 
@@ -406,7 +431,9 @@ class FlipFlopDetection():
                     streak_list.append((curr_streak_start, i-1))
                 curr_streak_start = i+1
 
-        if i != (curr_streak_start - 1):
+        if (i == 0 or i == 1) and flip_flop_list[i]:
+            streak_list.append((i,i))
+        elif i != (curr_streak_start - 1):
             # There is a streak ending at the end of the list
             streak_list.append((curr_streak_start, len(flip_flop_list) - 2))
         return streak_list

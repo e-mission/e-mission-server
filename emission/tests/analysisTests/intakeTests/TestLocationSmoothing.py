@@ -99,10 +99,10 @@ class TestLocationSmoothing(unittest.TestCase):
             logging.debug("Max speed for section %s = %s" % (i, maxSpeed))
 
             jump_algo.filter(with_speeds_df)
-            logging.debug("Retaining points %s" % np.nonzero(jump_algo.inlier_mask_))
+            logging.debug("Retaining points %s" % np.nonzero(jump_algo.inlier_mask_.to_numpy()))
 
             to_delete_mask = np.logical_not(jump_algo.inlier_mask_)
-            logging.debug("Deleting points %s" % np.nonzero(to_delete_mask))
+            logging.debug("Deleting points %s" % np.nonzero(to_delete_mask.to_numpy()))
 
             delete_ids = list(with_speeds_df[to_delete_mask]._id)
             logging.debug("Deleting ids %s" % delete_ids)
@@ -137,10 +137,10 @@ class TestLocationSmoothing(unittest.TestCase):
             logging.debug("Max speed for section %s = %s" % (i, maxSpeed))
 
             jump_algo.filter(with_speeds_df)
-            logging.debug("Retaining points %s" % np.nonzero(jump_algo.inlier_mask_))
+            logging.debug("Retaining points %s" % np.nonzero(jump_algo.inlier_mask_.to_numpy()))
 
             to_delete_mask = np.logical_not(jump_algo.inlier_mask_)
-            logging.debug("Deleting points %s" % np.nonzero(to_delete_mask))
+            logging.debug("Deleting points %s" % np.nonzero(to_delete_mask.to_numpy()))
 
             delete_ids = list(with_speeds_df[to_delete_mask]._id)
             logging.debug("Deleting ids %s" % delete_ids)
@@ -171,17 +171,17 @@ class TestLocationSmoothing(unittest.TestCase):
             logging.debug("Max speed for section %s = %s" % (i, maxSpeed))
 
             jump_algo.filter(with_speeds_df)
-            logging.debug("Retaining points %s" % np.nonzero(jump_algo.inlier_mask_))
+            logging.debug("Retaining points %s" % np.nonzero(jump_algo.inlier_mask_.to_numpy()))
 
             to_delete_mask = np.logical_not(jump_algo.inlier_mask_)
-            logging.debug("Deleting points %s" % np.nonzero(to_delete_mask))
+            logging.debug("Deleting points %s" % np.nonzero(to_delete_mask.to_numpy()))
 
             delete_ids = list(with_speeds_df[to_delete_mask]._id)
             logging.debug("Deleting ids %s" % delete_ids)
 
             if i == 0:
                 # this is the zigzag section
-                self.assertEqual(np.nonzero(to_delete_mask)[0].tolist(),
+                self.assertEqual(np.nonzero(to_delete_mask.to_numpy())[0].tolist(),
                                  [25, 64, 114, 115, 116, 117, 118, 119, 120, 123, 126])
                 self.assertEqual(delete_ids,
                                  [boi.ObjectId('55edafe77d65cb39ee9882ff'),
@@ -196,7 +196,7 @@ class TestLocationSmoothing(unittest.TestCase):
                                   boi.ObjectId('55edcc217d65cb39ee98841f'),
                                   boi.ObjectId('55edcc217d65cb39ee988429')])
             else:
-                self.assertEqual(len(np.nonzero(to_delete_mask)[0]), 0)
+                self.assertEqual(len(np.nonzero(to_delete_mask.to_numpy())[0]), 0)
                 self.assertEqual(len(delete_ids), 0)
 
     def testFilterSection(self):

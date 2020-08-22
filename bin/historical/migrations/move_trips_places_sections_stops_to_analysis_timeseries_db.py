@@ -19,7 +19,7 @@ def convert_wrapper_to_entry(key, wrapper):
 
 def convert_collection(collection, key):
     result_cursor = collection.find()
-    logging.info("About to convert %s entries" % result_cursor.count())
+    logging.info("About to convert %s entries" % collection.estimated_document_count())
     for i, wrapper in enumerate(result_cursor):
         entry = convert_wrapper_to_entry(key, wrapper)
         if entry.get_id() != wrapper["_id"]:
@@ -34,7 +34,7 @@ def move_ts_entries(key):
     atdb = edb.get_analysis_timeseries_db()
 
     result_cursor = tdb.find({'metadata.key': key})
-    logging.info("About to convert %s entries" % result_cursor.count())
+    logging.info("About to convert %s entries" % tdb.count_documents({'metadata.key': key}))
 
     for i, entry_doc in enumerate(result_cursor):
       try:

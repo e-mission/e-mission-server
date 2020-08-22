@@ -1,6 +1,9 @@
 import logging
 import emission.core.wrapper.motionactivity as ecwm
 
+def is_big_pct_of_trip(trip_pct):
+    return trip_pct > 25
+
 def is_motorized(motion_type):
     return motion_type == ecwm.MotionTypes.IN_VEHICLE
 
@@ -41,6 +44,11 @@ def is_too_short_bike_vehicle_transition(duration):
         return True
     else:
         return False
+
+def is_transit_transfer(before_mode, curr_mode, after_mode):
+    return is_motorized(before_mode) and \
+        is_walking_type(curr_mode) and \
+        is_motorized(after_mode)
 
 def is_flip_flop_streak_for_new_section(ff_streak_length):
     return ff_streak_length > 3

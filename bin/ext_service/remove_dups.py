@@ -27,9 +27,9 @@ if __name__ == '__main__':
             logging.debug("Each Duplicate %s" % dup)
             bike += list(edb.get_habitica_db().find({'user_id': dup}))[0]['metrics_data']['bike_count']
             walk += list(edb.get_habitica_db().find({'user_id': dup}))[0]['metrics_data']['walk_count']
-            if edb.get_habitica_db().find({'user_id': dup}).count() > 1:            
+            if edb.get_habitica_db().count_documents({'user_id': dup}) > 1:            
                 edb.get_habitica_db().remove({'user_id': dup}, multi=False)
-            elif edb.get_habitica_db().find({'user_id': dup}).count() == 1:
+            elif edb.get_habitica_db().count_documents({'user_id': dup}) == 1:
                 edb.get_habitica_db().update({"user_id": dup},{"$set": {'metrics_data.bike_count': bike, 'metrics_data.walk_count': walk}},upsert=True)
         
 

@@ -10,7 +10,7 @@ def del_all_objects(is_dry_run):
     del_query = {}
     del_query.update({"metadata.key": {"$in": ["inference/prediction", "analysis/inferred_section"]}})
     logging.info("About to delete %d entries" 
-        % edb.get_analysis_timeseries_db().find(del_query).count())
+        % edb.get_analysis_timeseries_db().count_documents(del_query))
     logging.info("About to delete entries with keys %s" 
         % edb.get_analysis_timeseries_db().find(del_query).distinct("metadata.key"))
 
@@ -47,7 +47,7 @@ def del_objects_after(user_id, reset_ts, is_dry_run):
     
 
     logging.info("About to delete %d entries" 
-        % edb.get_analysis_timeseries_db().find(del_query).count())
+        % edb.get_analysis_timeseries_db().count_documents(del_query))
     logging.info("About to delete entries with keys %s" 
         % edb.get_analysis_timeseries_db().find(del_query).distinct("metadata.key"))
     

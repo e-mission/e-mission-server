@@ -18,6 +18,7 @@ import pymongo
 import emission.core.get_database as edb
 from emission.core.get_database import get_client_db, get_section_db
 import emission.core.get_database as edb
+import emission.core.wrapper.user as ecwu
 
 def makeValid(client):
   client.clientJSON['start_date'] = str(datetime.now() + timedelta(days=-2))
@@ -38,7 +39,7 @@ def updateUserCreateTime(uuid):
   user.changeUpdateTs(timedelta(days = -20))
 
 def dropAllCollections(db):
-  collections = db.collection_names()
+  collections = db.list_collection_names()
   print("collections = %s" % collections)
   for coll in collections:
     if coll.startswith('system'):
@@ -99,11 +100,29 @@ def updateSections(testCase):
       testCase.uuid_list.append(curr_uuid)
       testCase.SectionsColl.save(section)
 
+def getRealExampleEmail(testObj):
+    return testObj.branch + "_" + testObj._testMethodName
+
+def fillExistingUUID(testObj):
+    userObj = ecwu.User.fromEmail(getRealExampleEmail(testObj))
+    print("Setting testUUID to %s" % userObj.uuid)
+    testObj.testUUID = userObj.uuid
+
+def createAndFillUUID(testObj):
+    if hasattr(testObj, "evaluation") and testObj.evaluation:
+        reg_email = getRealExampleEmail(testObj)
+        logging.info("registering email = %s" % reg_email)
+        user = ecwu.User.register(reg_email)
+        testObj.testUUID = user.uuid
+    else:
+        logging.info("No evaluation flag found, not registering email")
+        testObj.testUUID = uuid.uuid4()
+
 def setupRealExample(testObj, dump_file):
-    logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
+    logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
     with open(dump_file) as dfp:
         testObj.entries = json.load(dfp, object_hook = bju.object_hook)
-        testObj.testUUID = uuid.uuid4()
+        createAndFillUUID(testObj)
         print("Setting up real example for %s" % testObj.testUUID)
         setupRealExampleWithEntries(testObj)
 
@@ -115,7 +134,7 @@ def setupRealExampleWithEntries(testObj):
         #                                                        entry["data"]["fmt_time"])
         edb.save(tsdb, entry)
         
-    logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
+    logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
     logging.debug("First few entries = %s" % 
                     [e["data"]["fmt_time"] if "fmt_time" in e["data"] else e["metadata"]["write_fmt_time"] for e in 
                         list(edb.get_timeseries_db().find({"user_id": testObj.testUUID}).sort("data.write_ts",
