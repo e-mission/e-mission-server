@@ -43,7 +43,7 @@ class TestHabiticaRegister(unittest.TestCase):
                            sampleAuthMessage1Ad.password, sampleAuthMessage1Ad.our_uuid)
 
     find_it = edb.get_habitica_db().find({"user_id": self.testUserUUID})
-    self.assertEqual(find_it.count(), 1)
+    self.assertEqual(edb.get_habitica_db().count_documents({"user_id": self.testUserUUID}), 1)
     
     user_val = list(find_it)[0]
     self.assertIsNotNone(user_val['habitica_id'])

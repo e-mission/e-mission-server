@@ -33,7 +33,7 @@ class TestVisualize(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID)
         # estfm.move_all_filters_to_data()
         logging.info(
-            "After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
+            "After loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
         self.day_start_ts = 1440658800
         self.day_end_ts = 1440745200
         self.day_start_dt = ecwl.LocalDate.get_local_date(self.day_start_ts, "America/Los_Angeles")

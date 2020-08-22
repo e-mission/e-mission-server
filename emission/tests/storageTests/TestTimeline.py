@@ -37,7 +37,7 @@ class TestTimeline(unittest.TestCase):
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
         eaicf.filter_accuracy(self.testUUID)
         estfm.move_all_filters_to_data()        
-        logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
+        logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
         self.day_start_ts = 1440658800
         self.day_end_ts = 1440745200
         self.day_start_dt = ecwl.LocalDate({'year': 2015, 'month': 8, 'day': 27})

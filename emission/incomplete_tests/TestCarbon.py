@@ -32,7 +32,7 @@ class TestCarbon(unittest.TestCase):
     # or threw an exception, so let us start by cleaning up all entries
     etc.dropAllCollections(edb._get_current_db())
     self.ModesColl = get_mode_db()
-    self.assertEquals(self.ModesColl.find().count(), 0)
+    self.assertEquals(self.ModesColl.estimated_document_count(), 0)
 
     etc.loadTable(self.serverName, "Stage_Modes", "emission/tests/data/modes.json")
     etc.loadTable(self.serverName, "Stage_Sections", "emission/tests/data/testCarbonFile")
@@ -66,7 +66,7 @@ class TestCarbon(unittest.TestCase):
     for testUser in self.testUsers:
       etc.purgeSectionData(self.SectionsColl, testUser)
     self.ModesColl.remove()
-    self.assertEquals(self.ModesColl.find().count(), 0)
+    self.assertEquals(self.ModesColl.estimated_document_count(), 0)
 
   def getMyQuerySpec(self, user, modeId):
     return common.getQuerySpec(user, modeId, self.weekago, self.now)

@@ -72,7 +72,7 @@ class SmoothedHighConfidenceMotion(eaiss.SectionSegmentationMethod):
         # https://github.com/e-mission/e-mission-server/issues/577#issuecomment-379496118
         motion_df["type"].replace([8], 7, inplace=True)
 
-        logging.debug("filtered points %s" % np.nonzero(filter_mask))
+        logging.debug("filtered points %s" % np.nonzero(filter_mask.to_numpy()))
         logging.debug("motion_df = %s" % motion_df.head())
         filtered_df = motion_df[filter_mask]
         filtered_df.reset_index(inplace=True)

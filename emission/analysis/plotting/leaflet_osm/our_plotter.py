@@ -251,9 +251,9 @@ def update_place(curr_map, place_id, place_map, marker_color='blue'):
         logging.warning("place not mapped because place_id = %s and place_id in place_map = %s" % (place_id, place_id in place_map))
 
 def update_line(currMap, line_points, line_color = None, popup=None):
-    currMap.div_markers(line_points[['latitude', 'longitude']].as_matrix().tolist(),
+    currMap.div_markers(line_points[['latitude', 'longitude']].to_numpy().tolist(),
         df_to_string_list(line_points), marker_size=5)
-    currMap.line(line_points[['latitude', 'longitude']].as_matrix().tolist(),
+    currMap.line(line_points[['latitude', 'longitude']].to_numpy().tolist(),
         line_color = line_color,
         popup = popup)
 
@@ -316,9 +316,9 @@ def get_map(section_points, line_color = None, popup=None):
     return currMap
 
 def update_map(currMap, section_points, line_color = None, popup=None):
-    currMap.div_markers(section_points[['mLatitude', 'mLongitude']].as_matrix().tolist(),
+    currMap.div_markers(section_points[['mLatitude', 'mLongitude']].to_numpy().tolist(),
         df_to_string_list(section_points), marker_size=5)
-    currMap.line(section_points[['mLatitude', 'mLongitude']].as_matrix().tolist(),
+    currMap.line(section_points[['mLatitude', 'mLongitude']].to_numpy().tolist(),
         line_color = line_color,
         popup = popup)
 

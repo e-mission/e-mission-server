@@ -21,7 +21,7 @@ import emission.analysis.modelling.tour_model.prior_unused.exploratory_scripts.g
 query = {'type': 'move',
          'confirmed_mode': {'$ne': 9},
          'section_start_datetime' : {'$gt': pydt.datetime(2015, 0o2, 14)},
-         '$where': 'this.track_points.length>1'}
+         '$expr': 'this.track_points.length>1'}
 
 # Now find other sections that meet this criterion
 # Manually, we pick the sections with the top 20 average speeds that are not air
@@ -67,7 +67,7 @@ def find_other_sections_auto(needsSmoothing, fineWithoutSmoothing):
         training_feature_set[nPos + i] = get_feature_row(section)
         result_vector[nPos + i] = -1
 
-    nTestSetRows = get_section_db().find(query).count()
+    nTestSetRows = get_section_db().count_documents(query)
     test_feature_set = np.zeros((nTestSetRows, nCols))
 
     testSection_list = []
