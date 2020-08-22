@@ -921,7 +921,7 @@ def _merge_forward(filtered_stop_data, new_ending_section, new_starting_section,
     # Then, the previous section's end should be overwritten with this stop's
     # information (since enter now = exit, which set of fields is a don't care) 
     _copy_prefixed_fields(new_ending_section["data"], "end", filtered_stop_data, "exit")
-    _extend_section_by_point(new_starting_section, dist_diff, ts_diff)
+    _extend_section_by_point(new_ending_section, dist_diff, ts_diff)
     logging.debug("after forward merge, prev section is %s" % new_ending_section.data.end_fmt_time)
 
 def _extend_section_by_point(section, dist_diff, ts_diff):

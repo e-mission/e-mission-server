@@ -69,7 +69,7 @@ class TestCommonPlaceQueries(unittest.TestCase):
             self.assertIsNotNone(place["successors"])
 
     def testGetSuccessor(self):
-        logging.debug("size of db is %s" % edb.get_common_place_db().find().count())
+        logging.debug("size of db is %s" % edb.get_common_place_db().estimated_document_count())
         self.assertIsNotNone(edb.get_common_place_db().find_one({"_id": self.testEnd.get_id()}))
         probs = np.zeros( (7, 24) )
         probs[self.time0.weekday(), 3] = 10

@@ -96,12 +96,13 @@ class SmoothZigzag(object):
         segment_distance_list = [[segment.distance, segment.is_cluster] for segment in segment_list]
         segment_distance_df = pd.DataFrame(segment_distance_list, columns = ["distance", "is_cluster"])
         non_cluster_segments = segment_distance_df[segment_distance_df.is_cluster == False]
+        logging.debug("non_cluster_segments %s" % non_cluster_segments)
         if len(non_cluster_segments) == 0:
             # If every segment is a cluster, then it is very hard to
             # distinguish between them for zigzags. Let us see if there is any
             # one point cluster - i.e. where the distance is zero. If so, that is likely
             # to be a bad cluster, so we return the one to the right or left of it
-            minDistanceCluster = segment_distance_df.distance.argmin()
+            minDistanceCluster = segment_distance_df.distance.idxmin()
             if minDistanceCluster == 0:
                 goodCluster = minDistanceCluster + 1
                 assert(goodCluster < len(segment_list))
@@ -110,7 +111,7 @@ class SmoothZigzag(object):
                 goodCluster = minDistanceCluster - 1
                 assert(goodCluster >= 0)
                 return goodCluster
-        retVal = non_cluster_segments.distance.argmin()
+        retVal = non_cluster_segments.distance.idxmin()
         logging.debug("shortest_non_cluster_segment = %s" % retVal)
         return retVal
 
@@ -255,7 +256,7 @@ class SmoothZigzag(object):
         for segment in bad_segments:
             self.inlier_mask_[segment.start:segment.end] = False
 
-        logging.debug("after setting values, outlier_mask = %s" % np.nonzero(self.inlier_mask_ == False))
+        logging.debug("after setting values, outlier_mask = %s" % np.nonzero((self.inlier_mask_ == False).to_numpy()))
         # logging.debug("point details are %s" % with_speeds_df[np.logical_not(self.inlier_mask_)])
 
         # TODO: This is not the right place for this - adds too many dependencies
@@ -366,8 +367,8 @@ class SmoothPiecewiseRansac(object):
     def filter_area_using_ransac(self, area_df):
         from sklearn import linear_model
         import numpy as np
-        latArr = [[lat] for lat in area_df.mLatitude.as_matrix()]
-        lngArr = area_df.mLongitude.as_matrix()
+        latArr = [[lat] for lat in area_df.mLatitude.to_numpy()]
+        lngArr = area_df.mLongitude.to_numpy()
         model_ransac = linear_model.RANSACRegressor(linear_model.LinearRegression())
         model_ransac.fit(latArr, lngArr)
         inlier_mask = model_ransac.inlier_mask_
@@ -408,4 +409,4 @@ class SmoothPiecewiseRansac(object):
             ransac_mask[area.index] = retain_mask
         logging.debug("with speed df shape is %s, ransac_mask size = %s" % (with_speeds_df.shape, len(ransac_mask)))
         logging.debug("filtering done, ransac deleted points = %s" % np.nonzero(ransac_mask == False))
-        self.inlier_mask_ = ransac_mask.as_matrix().tolist()
+        self.inlier_mask_ = ransac_mask.to_numpy().tolist()

@@ -26,7 +26,6 @@ import emission.core.wrapper.rawplace as ecwrp
 import emission.core.wrapper.pipelinestate as ecwp
 
 import emission.analysis.intake.segmentation.section_segmentation_methods.smoothed_high_confidence_motion as shcm
-import emission.analysis.intake.segmentation.section_segmentation_methods.flip_flop_detection as eaissf
 import emission.analysis.intake.segmentation.section_segmentation as eaiss
 
 import emission.analysis.intake.segmentation.trip_segmentation as eaist
@@ -57,8 +56,10 @@ class TestSectionSegmentation(unittest.TestCase):
         eaicf.filter_accuracy(self.iosUUID)
 
     def tearDown(self):
-        self.clearRelatedDb()
-        os.remove(self.analysis_conf_path)
+        if not hasattr(self, "evaluation") or not self.evaluation:
+            self.clearRelatedDb()
+        if hasattr(self, "analysis_conf_path"):
+            os.remove(self.analysis_conf_path)
 
     def clearRelatedDb(self):
         edb.get_timeseries_db().delete_many({"user_id": self.androidUUID})
@@ -200,7 +201,7 @@ class TestSectionSegmentation(unittest.TestCase):
         self.assertEqual(len(sections_stops), len(created_trips))
         # The expected value was copy-pasted from the debug statement above
         self.assertEqual(sections_stops,
-                         [(2, 1), (1, 0), (2, 1), (2, 1), (1, 0), (2, 1),
+                         [(2, 1), (1, 0), (1, 0), (2, 1), (1, 0), (2, 1),
                           (4, 3), (2, 1)])
 
         # tq_stop = estt.TimeQuery("data.enter_ts", 1440658800, 1440745200)
@@ -230,69 +231,7 @@ class TestSectionSegmentation(unittest.TestCase):
         self.assertEqual(len(sections_stops), len(created_trips))
         # The expected value was copy-pasted from the debug statement above
         self.assertEqual(sections_stops,
-                         [(0, 0), (11, 10)])
-
-    def test_GetStreakOne(self):
-        ffd = eaissf.FlipFlopDetection([], None)
-        flip_flop_list = [False, False, False, True, True, False, False, False]
-        sss_list = ffd.get_streaks(flip_flop_list)
-        self.assertEqual(sss_list, [(3, 4)])
-
-    def test_GetStreakMixed(self):
-        ffd = eaissf.FlipFlopDetection([], None)
-        flip_flop_list = [False, False, True, False, False, False, False, True, False, True, False, True, True, False, False]
-        sss_list = ffd.get_streaks(flip_flop_list)
-        self.assertEqual(sss_list, [(2,2), (7,7), (9,9), (11, 12)])
-
-    def test_GetStreakLast(self):
-        ffd = eaissf.FlipFlopDetection([], None)
-        flip_flop_list = [False, False, True, False, False, False, False, True, False, True, False, True, True]
-        sss_list = ffd.get_streaks(flip_flop_list)
-        self.assertEqual(sss_list, [(2,2), (7,7), (9,9), (11,11)])
-
-    def test_MergeStreaksPass1(self):
-        ffd = eaissf.FlipFlopDetection([], None)
-        unmerged_change_list = [({'idx': 'a'}, {'idx': 'b'}),
-                                ({'idx': 'b'}, {'idx': 'c'}),
-                                ({'idx': 'c'}, {'idx': 'd'}),
-                                ({'idx': 'd'}, {'idx': 'e'}),
-                                ({'idx': 'e'}, {'idx': 'f'}),
-                                ({'idx': 'f'}, {'idx': 'g'}),
-                                ({'idx': 'g'}, {'idx': 'h'}),
-                                ({'idx': 'h'}, {'idx': 'i'})]
-        forward_merged_list = [(1,2), (6,6)]
-        backward_merged_list = [(4, 4)]
-        ret_list = ffd.merge_streaks_pass_1(unmerged_change_list, forward_merged_list,
-                                 backward_merged_list)
-        self.assertEqual(ret_list, [({'idx': 'a'}, {'idx': 'd'}),
-                                    ({'idx': 'd'}, {'idx': 'e'}),
-                                    ({'idx': 'e'}, {'idx': 'h'}),
-                                    ({'idx': 'h'}, {'idx': 'i'})])
-
-    def test_MergeStreaksPass2(self):
-        import attrdict as ad
-
-        ffd = eaissf.FlipFlopDetection([], None)
-        unmerged_change_list = [
-            (ad.AttrDict({'type': ecwm.MotionTypes.WALKING}),
-                ad.AttrDict({'type': ecwm.MotionTypes.IN_VEHICLE})),
-            (ad.AttrDict({'type': ecwm.MotionTypes.IN_VEHICLE}),
-                ad.AttrDict({'type': ecwm.MotionTypes.WALKING})),
-            (ad.AttrDict({'type': ecwm.MotionTypes.WALKING}),
-                ad.AttrDict({'type': ecwm.MotionTypes.WALKING})),
-            (ad.AttrDict({'type': ecwm.MotionTypes.WALKING}),
-                ad.AttrDict({'type': ecwm.MotionTypes.WALKING})),
-            (ad.AttrDict({'type': ecwm.MotionTypes.WALKING}),
-                ad.AttrDict({'type': ecwm.MotionTypes.WALKING}))]
-
-        ret_list = ffd.merge_streaks_pass_2(unmerged_change_list)
-        self.assertEqual(ret_list, [
-            (ad.AttrDict({'type': ecwm.MotionTypes.WALKING}),
-                ad.AttrDict({'type': ecwm.MotionTypes.IN_VEHICLE})),
-            (ad.AttrDict({'type': ecwm.MotionTypes.IN_VEHICLE}),
-                ad.AttrDict({'type': ecwm.MotionTypes.WALKING})),
-            (ad.AttrDict({'type': ecwm.MotionTypes.WALKING}),
-                ad.AttrDict({'type': ecwm.MotionTypes.WALKING}))])
+                         [(0, 0), (8, 7)])
 
 if __name__ == '__main__':
     etc.configLogging()

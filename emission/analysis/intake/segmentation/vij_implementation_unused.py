@@ -401,7 +401,7 @@ def collect_vij():
                                                         + gmtConversion)}
                             trackPoints.append(trackPoint)
 
-                        if Test_Sections.find({"$and":[ {"user_id":user_id},{"trip_id": trip_id},{"section_id": segmentID}]}).count()==0:
+                        if Test_Sections.count_documents({"$and":[ {"user_id":user_id},{"trip_id": trip_id},{"section_id": segmentID}]})==0:
                             sections_todo = {'source':'ITS Berkeley',
                                             'trip_id':trip_id,
                                             'user_id':user_id,
@@ -422,7 +422,7 @@ def collect_vij():
                             Test_Sections.insert(sections_todo)
                             segments.append(sections_todo)
                             segmentID += 1
-                    if Test_Trips.find({"$and":[ {"user_id":user_id},{"trip_id": trip_id}]}).count()==0:
+                    if Test_Trips.count_documents({"$and":[ {"user_id":user_id},{"trip_id": trip_id}]})==0:
                         trips_todo = {'source': 'ITS Berkeley',
                                       'user_id': user_id,
                                       'trip_id':trip_id,
@@ -450,7 +450,7 @@ def collect_vij():
                                       'Time': (datetime.datetime.fromtimestamp(int(old_div(gpsTraces[i][1],1000))).strftime('%Y%m%dT%H%M%S') 
                                                         + gmtConversion)}
                         trackPoints.append(trackPoint)
-                    if Test_Sections.find({"$and":[ {"user_id":user_id},{"trip_id": trip_id}]}).count()==0:
+                    if Test_Sections.count_documents({"$and":[ {"user_id":user_id},{"trip_id": trip_id}]})==0:
                         sections_todo = {'source':'ITS Berkeley',
                                          'trip_id':trip_id,
                                          'user_id':user_id,
@@ -463,7 +463,7 @@ def collect_vij():
                                                     + gmtConversion),
                                          'track_points' : trackPoints}
                     Test_Sections.insert(sections_todo)
-                    if Test_Trips.find({"$and":[ {"user_id":user_id},{"trip_id": trip_id}]}).count()==0:
+                    if Test_Trips.count_documents({"$and":[ {"user_id":user_id},{"trip_id": trip_id}]})==0:
                         trips_todo = {'source': 'ITS Berkeley',
                                       'user_id': user_id,
                                       'trip_id': trip_id,
@@ -480,7 +480,7 @@ def collect_vij():
                         activities = activities[1:]
     
                 elif holes:
-                    if Test_Trips.find({"$and":[ {"user_id":user_id},{"trip_id": trip_id}]}).count()==0:
+                    if Test_Trips.count_documents({"$and":[ {"user_id":user_id},{"trip_id": trip_id}]})==0:
                         trips_todo = {'source': 'ITS Berkeley',
                                       'user_id': user_id,
                                       'trip_id': trip_id,
