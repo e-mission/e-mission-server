@@ -23,8 +23,12 @@ def format(entry):
     formatted_entry.metadata = metadata
 
     #logging.info('*** Motion Data write_ts: %d' % metadata.write_ts)
-    
-    data = ad.AttrDict()
+   
+    if 'ts' not in entry.data:
+        # old style entries
+        data = ad.AttrDict()
+    else:
+        data = entry.data
 
     if 'agb' in entry.data:
         data.type = ecwa.MotionTypes(entry.data.agb).value
