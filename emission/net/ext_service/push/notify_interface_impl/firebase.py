@@ -27,6 +27,7 @@ class FirebasePush(pni.NotifyInterface):
         else:
             logging.warning("No package name specified, defaulting to embase")
             self.app_package_name = "edu.berkeley.eecs.embase"
+        self.is_fcm_format = push_config["ios_token_format"] == "fcm"
 
     def get_and_invalidate_entries(self):
         # Need to figure out how to do this on firebase
@@ -39,6 +40,10 @@ class FirebasePush(pni.NotifyInterface):
         logging.warning("https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages")
 
     def map_existing_fcm_tokens(self, token_map):
+        if self.is_fcm_format:
+            logging.info("iOS tokens are already in the FCM format, no mapping required")
+            return ({"ios": token_map["ios"],
+                    "android": token_map["android"]}, [])
         # android tokens never need to be mapped, so let's just not even check them
         mapped_token_map = {"ios": [],
                             "android": token_map["android"]}
