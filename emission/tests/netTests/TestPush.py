@@ -47,7 +47,8 @@ class TestPush(unittest.TestCase):
         with open(self.push_conf_path, "w") as fd:
             fd.write(json.dumps({
                 "provider": "firebase",
-                "server_auth_token": "firebase_api_key"
+                "server_auth_token": "firebase_api_key",
+                "ios_token_format": "apns"
             }))
         logging.debug("Finished setting up %s" % self.push_conf_path)
         with open(self.push_conf_path) as fd:
