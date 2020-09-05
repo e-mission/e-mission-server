@@ -47,7 +47,8 @@ class TestPush(unittest.TestCase):
         with open(self.push_conf_path, "w") as fd:
             fd.write(json.dumps({
                 "provider": "firebase",
-                "server_auth_token": "firebase_api_key"
+                "server_auth_token": "firebase_api_key",
+                "ios_token_format": "apns"
             }))
         logging.debug("Finished setting up %s" % self.push_conf_path)
         with open(self.push_conf_path) as fd:
@@ -74,6 +75,7 @@ class TestPush(unittest.TestCase):
     def testMappingQueries(self):
         import emission.net.ext_service.push.notify_queries as pnq
         import emission.core.wrapper.user as ecwu
+        import emission.core.get_database as edb
 
         self.test_email_1 = "test_push_1"
         self.test_email_2 = "test_push_2"
@@ -108,7 +110,7 @@ class TestPush(unittest.TestCase):
         logging.debug("test token map = %s" % self.test_token_map)
 
         try:
-            fcm_instance = pnif.get_interface({"server_auth_token": "firebase_api_key"})
+            fcm_instance = pnif.get_interface({"server_auth_token": "firebase_api_key", "ios_token_format": "apns"})
             (mapped_token_map, unmapped_token_list) = fcm_instance.map_existing_fcm_tokens(self.test_token_map)
             # At this point, there is nothing in the database, so no iOS tokens will be mapped
             self.assertEqual(len(mapped_token_map["ios"]), 0)
@@ -152,6 +154,29 @@ class TestPush(unittest.TestCase):
         finally:
             # Delete everything from the database
             edb.get_push_token_mapping_db().delete_many({})
+
+    def testFcmNoMapping(self):
+        import emission.net.ext_service.push.notify_interface_impl.firebase as pnif
+        import emission.core.get_database as edb
+
+        self.test_token_list_ios = ["device_token_ios_%s" % i for i in range(10)]
+        self.test_token_list_android = ["device_token_android_%s" % i for i in range(10)]
+        self.test_token_map = {"ios": self.test_token_list_ios,
+            "android": self.test_token_list_android}
+        logging.debug("test token map = %s" % self.test_token_map)
+
+        fcm_instance = pnif.get_interface({"server_auth_token": "firebase_api_key", "ios_token_format": "fcm"})
+        (mapped_token_map, unmapped_token_list) = fcm_instance.map_existing_fcm_tokens(self.test_token_map)
+        # These are assumed to be FCM tokens directly, so no mapping required
+        self.assertEqual(len(mapped_token_map["ios"]), 10)
+        # android tokens should not be mapped, so they will be returned as-is
+        self.assertEqual(len(mapped_token_map["android"]), 10)
+
+        # no tokens will be returned as needing a mapping
+        self.assertEqual(len(unmapped_token_list), 0)
+        
+        # and there will be no entries in the token mapping database
+        self.assertEqual(edb.get_push_token_mapping_db().count_documents({}), 0)
     
 if __name__ == '__main__':
     import emission.tests.common as etc
