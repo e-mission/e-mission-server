@@ -15,9 +15,11 @@
     }
   });
 
+/*
   $('a.badge-link').click(function() {
     alert("The apps are currently under development. Please contact the CEO for an invite to the beta");
   });
+*/
 
   // Closes responsive menu when a scroll trigger link is clicked
   $('.js-scroll-trigger').click(function() {
