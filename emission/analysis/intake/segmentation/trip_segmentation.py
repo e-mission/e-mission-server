@@ -165,6 +165,8 @@ def get_last_ts_processed(filter_methods):
             if last_ts_processed is None or method.last_ts_processed > last_ts_processed:
                 last_ts_processed = method.last_ts_processed
                 logging.debug("Set last_ts_processed = %s from method %s" % (last_ts_processed, method))
+        except TypeError as e:
+            logging.debug("Processing method %s got error %s, skipping" % (method, e))
         except AttributeError as e:
             logging.debug("Processing method %s got error %s, skipping" % (method, e))
     logging.info("Returning last_ts_processed = %s" % last_ts_processed)
