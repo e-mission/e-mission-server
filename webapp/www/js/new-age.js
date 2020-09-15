@@ -47,6 +47,7 @@
 
 window.onload = init;
 function init(){
+  /*
   var link = document.getElementById("groupLink");
   var image = document.getElementById("phone");
   var QRC = qrcodegen.QrCode;
@@ -54,7 +55,6 @@ function init(){
   var canvas = document.getElementById("qrcode-canvas");
   canvas.style.display = "none";
   var myrandom = Math.floor(Math.random() * 3) + 1;
-  /*
   if (myrandom == 1) {
     link.href = "emission://change_client?new_client=urap2017information&clear_local_storage=true&clear_usercache=true"
     image.src = "img/information.jpg"
