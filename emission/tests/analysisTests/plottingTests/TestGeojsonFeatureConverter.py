@@ -56,7 +56,7 @@ class TestGeojsonFeatureConverter(unittest.TestCase):
         eaiss.segment_current_sections(self.testUUID)
         eaicl.filter_current_sections(self.testUUID)
         tl = esdtl.get_raw_timeline(self.testUUID, 1440658800, 1440745200)
-        self.assertEquals(len(tl.trips), 9)
+        self.assertEqual(len(tl.trips), 9)
 
         eaicr.clean_and_resample(self.testUUID)
         eacimp.predict_mode(self.testUUID)
@@ -65,20 +65,20 @@ class TestGeojsonFeatureConverter(unittest.TestCase):
         tl.fill_start_end_places()
 
         created_trips = tl.trips
-        self.assertEquals(len(created_trips), 9)
+        self.assertEqual(len(created_trips), 9)
 
         trip_geojson = gjfc.trip_to_geojson(created_trips[0], tl)
         logging.debug("first trip_geojson = %s" % bju.dumps(trip_geojson, indent=4))
 
-        self.assertEquals(trip_geojson.type, "FeatureCollection")
-        self.assertEquals(trip_geojson.properties["feature_type"], "trip")
-        self.assertEquals(len(trip_geojson.features), 5)
+        self.assertEqual(trip_geojson.type, "FeatureCollection")
+        self.assertEqual(trip_geojson.properties["feature_type"], "trip")
+        self.assertEqual(len(trip_geojson.features), 5)
 
         day_geojson = gjfc.get_geojson_for_timeline(self.testUUID, tl)
-        self.assertEquals(len(day_geojson), 8)
-        self.assertEquals(day_geojson[-1].type, "FeatureCollection")
-        self.assertEquals(day_geojson[-1].properties["feature_type"], "trip")
-        self.assertEquals(len(day_geojson[-1].features), 5)
+        self.assertEqual(len(day_geojson), 8)
+        self.assertEqual(day_geojson[-1].type, "FeatureCollection")
+        self.assertEqual(day_geojson[-1].properties["feature_type"], "trip")
+        self.assertEqual(len(day_geojson[-1].features), 5)
 
 
 if __name__ == '__main__':

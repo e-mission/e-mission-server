@@ -14,7 +14,6 @@ import numpy as np
 
 import emission.storage.decorations.common_place_queries as esdcpq
 import emission.analysis.modelling.tour_model.cluster_pipeline as eamtcp
-import emission.simulation.trip_gen as tg
 import emission.core.get_database as edb
 import emission.storage.decorations.common_trip_queries as esdctp
 import emission.tests.common as etc
@@ -70,7 +69,7 @@ class TestCommonPlaceQueries(unittest.TestCase):
             self.assertIsNotNone(place["successors"])
 
     def testGetSuccessor(self):
-        logging.debug("size of db is %s" % edb.get_common_place_db().find().count())
+        logging.debug("size of db is %s" % edb.get_common_place_db().estimated_document_count())
         self.assertIsNotNone(edb.get_common_place_db().find_one({"_id": self.testEnd.get_id()}))
         probs = np.zeros( (7, 24) )
         probs[self.time0.weekday(), 3] = 10

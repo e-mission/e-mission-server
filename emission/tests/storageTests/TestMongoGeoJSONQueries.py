@@ -24,32 +24,32 @@ class TestGeoJSON(unittest.TestCase):
            "text": "My first blog post!",
            "tags": ["mongodb", "python", "pymongo"],
            'loc':{'type':'Point', 'coordinates':[100,32]}}
-    self.Sections.insert(post1)
+    self.Sections.insert_one(post1)
     post2 = {"author": "hh",
            "text": "My 2 blog post!",
            "tags": ["mongodb", "python", "pymongo"],
            "loc":{'type':'Point', 'coordinates':[200,30]}}
-    self.Sections.insert(post2)
+    self.Sections.insert_one(post2)
 
     retVal = []
     for a in self.Sections.find({ "loc" : { "$geoWithin" : { "$polygon" :[ [ 90,31 ],[90,40] ,[ 110,40 ],[110,31]] } } }):
         retVal.append(a)
 
-    self.assertEquals(len(retVal), 1)
-    self.assertEquals(retVal[0]['text'], "My first blog post!")
-    self.assertEquals(retVal[0]['loc']['coordinates'], [100,32])
+    self.assertEqual(len(retVal), 1)
+    self.assertEqual(retVal[0]['text'], "My first blog post!")
+    self.assertEqual(retVal[0]['loc']['coordinates'], [100,32])
 
   def getTestPolygon(self):
     return [ [ 90.234,-31.0323 ],[95.0343,-45.03453] ,[ 110.02322,-43.3435 ],[100.343423,-33.33423]]
 
   def testGeoWithOurStructureAndTestPolyFunction(self):
     sec1 = {'track_location':{'type':'Point', 'coordinates':[100,-40]}}
-    self.Sections.insert(sec1)
+    self.Sections.insert_one(sec1)
 
     retVal = []
     for a in self.Sections.find({ "track_location" : { "$geoWithin" : { "$polygon" : self.getTestPolygon() } } }):
         retVal.append(a)
-    self.assertEquals(len(retVal), 1)
+    self.assertEqual(len(retVal), 1)
 
   def getTestPolygon2(self):
     # return [ [30,+50],[30,+100], [60,+100],[60,+50]] # works1
@@ -80,13 +80,13 @@ class TestGeoJSON(unittest.TestCase):
     # pnt = {'type':'Point', 'coordinates': [89.5, 35.5]} # works
     pnt = {'type':'Point', 'coordinates': [90.5, 35.5]} # works
     sec1 = {'track_location': pnt}
-    self.Sections.insert(sec1)
+    self.Sections.insert_one(sec1)
 
     retVal = []
     for a in self.Sections.find({ "track_location" : { "$geoWithin" : { "$polygon" : self.getTestPolygon2() } } }):
         retVal.append(a)
 
-    self.assertEquals(len(retVal), 1)
+    self.assertEqual(len(retVal), 1)
 
   def getTestNegPolygon(self):
     return [ [-90,35],[-90,36],
@@ -96,14 +96,14 @@ class TestGeoJSON(unittest.TestCase):
 
   def testGeoWithNegativeValues(self):
     test = {'track_location': {'type':'Point', 'coordinates': [-90.5,35.5]} }
-    self.Sections.insert(test)
+    self.Sections.insert_one(test)
 
     retVal = []
     for a in self.Sections.find({ "track_location" : { "$geoWithin" : { "$polygon" : self.getTestNegPolygon() } } }):
         retVal.append(a)
         print("Found match for %s" % a)
 
-    self.assertEquals(len(retVal), 1)
+    self.assertEqual(len(retVal), 1)
 
   def getTestNegPolygon(self):
 #     return [[-122,36],[-122,38], # FAILS
@@ -113,14 +113,14 @@ class TestGeoJSON(unittest.TestCase):
 
   def testGeoWithNegativeValues(self):
     test = {'track_location': {'type':'Point', 'coordinates': [-122.5,37.5]} }
-    self.Sections.insert(test)
+    self.Sections.insert_one(test)
 
     retVal = []
     for a in self.Sections.find({ "track_location" : { "$geoWithin" : { "$polygon" : self.getTestNegPolygon() } } }):
         retVal.append(a)
         print("Found match for %s" % a)
 
-    self.assertEquals(len(retVal), 1)
+    self.assertEqual(len(retVal), 1)
 
   def getRealBerkeleyPolygon(self):
     return [[-122,37],[-122,38],
@@ -128,33 +128,33 @@ class TestGeoJSON(unittest.TestCase):
 
   def testGeoWithOurStructureAndRealPolyFunction(self):
     test = {'track_location': {'type':'Point', 'coordinates': [-122.5, 37.5]} }
-    self.Sections.insert(test)
+    self.Sections.insert_one(test)
 
     library = {'track_location': {'type':'Point', 'coordinates': [-122.259475, 37.872370]} }
-    self.Sections.insert(library)
+    self.Sections.insert_one(library)
 
     mclaughlin = {'track_location': {'type':'Point', 'coordinates': [-122.259169, 37.873873]} }
-    self.Sections.insert(mclaughlin)
+    self.Sections.insert_one(mclaughlin)
 
     soda = {'track_location': {'type':'Point', 'coordinates': [-122.258740, 37.875711]} }
-    self.Sections.insert(soda)
+    self.Sections.insert_one(soda)
 
     wurster = {'track_location': {'type':'Point', 'coordinates': [-122.254577, 37.870352]} }
-    self.Sections.insert(wurster)
+    self.Sections.insert_one(wurster)
 
     retVal = []
     for a in self.Sections.find({ "track_location" : { "$geoWithin" : { "$polygon" : self.getTestNegPolygon() } } }):
         retVal.append(a)
         print("Found match for %s" % a)
 
-    self.assertEquals(len(retVal), 5)
+    self.assertEqual(len(retVal), 5)
 
     retVal = []
     for a in self.Sections.find({ "track_location" : { "$geoWithin" : { "$polygon" : self.getRealBerkeleyPolygon() } } }):
         retVal.append(a)
         print("Found match for %s" % a)
 
-    self.assertEquals(len(retVal), 5)
+    self.assertEqual(len(retVal), 5)
 
 if __name__ == '__main__':
     unittest.main()

@@ -81,9 +81,9 @@ def post_check(unique_user_list, all_rerun_list):
 
     logging.info("For %s users, loaded %s raw entries, %s processed entries and %s pipeline states" %
         (len(unique_user_list),
-         edb.get_timeseries_db().find({"user_id": {"$in": list(unique_user_list)}}).count(),
-         edb.get_analysis_timeseries_db().find({"user_id": {"$in": list(unique_user_list)}}).count(),
-         edb.get_pipeline_state_db().find({"user_id": {"$in": list(unique_user_list)}}).count()))
+         edb.get_timeseries_db().count_documents({"user_id": {"$in": list(unique_user_list)}}),
+         edb.get_analysis_timeseries_db().count_documents({"user_id": {"$in": list(unique_user_list)}}),
+         edb.get_pipeline_state_db().count_documents({"user_id": {"$in": list(unique_user_list)}})))
 
     all_rerun_arr = np.array(all_rerun_list)
    

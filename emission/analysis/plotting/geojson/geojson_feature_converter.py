@@ -131,7 +131,8 @@ def section_to_geojson(section, tl):
                                       digits=4):
             logging.info("section_location_array[-1].data.loc %s != section.data.end_loc %s even after df.ts fix, filling gap" % \
                     (section_location_entries[-1].data.loc, section.data.end_loc))
-            assert(False)
+            if eac.get_config()["output.conversion.validityAssertions"]:
+                assert(False)
             last_loc_doc = ts.get_entry_at_ts("background/filtered_location", "data.ts", section.data.end_ts)
             if last_loc_doc is None:
                 logging.warning("can't find entry to patch gap, leaving gap")
@@ -198,16 +199,19 @@ def point_array_to_line(point_array):
     # points_line_string.coordinates = [l.loc.coordinates for l in filtered_section_location_array]
     points_line_string.coordinates = []
     points_times = []
+    points_timestamps = []
 
     for l in point_array:
         # logging.debug("About to add %s to line_string " % l)
         points_line_string.coordinates.append(l.data.loc.coordinates)
         points_times.append(l.data.ts)
+        points_timestamps.append(int(round(l.data.ts * 1000)))
     
     points_line_feature = gj.Feature()
     points_line_feature.geometry = points_line_string
     points_line_feature.properties = {}
     points_line_feature.properties["times"] = points_times
+    points_line_feature.properties["timestamps"] = points_timestamps
     return points_line_feature    
 
 def trip_to_geojson(trip, tl):

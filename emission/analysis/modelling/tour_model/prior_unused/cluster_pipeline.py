@@ -14,7 +14,6 @@ import math
 import numpy as np
 import matplotlib
 # matplotlib.use('Agg')
-import pygmaps 
 from sklearn.cluster import KMeans
 from sklearn import manifold
 import matplotlib.pyplot as plt
@@ -115,29 +114,6 @@ def get_user_list():
 
     user_list = edb.get_section_db().distinct('user_id')
     return user_list
-
-def plot_cluster_trajectories():
-
-    for cluster_label in clusters:
-
-        sections = clusters[cluster_label]
-        section = sections[0]
-
-        start_point = section['track_points'][0]['track_location']['coordinates']
-        mymap = pygmaps.maps(start_point[1], start_point[0], 16)
-        #mymap = pygmaps.maps(37.428, -122.145, 16)
-
-        for section in sections:
-            path = []
-            for track_point in section['track_points']:
-                coordinates = track_point['track_location']['coordinates']
-                #path.append(coordinates)
-                path.append((coordinates[1], coordinates[0]))
-            #path = [(37.429, -122.145),(37.428, -122.145),(37.427, -122.145),(37.427, -122.146),(37.427, -122.146)]
-            mymap.addpath(path,"#00FF00")
-
-
-        mymap.draw(str(cluster_label) + '_cluster.html')
 
 def plot_mds(clusters, user_disMat, method, user_id, is_ground_truth=False):
     routes_dict = {}

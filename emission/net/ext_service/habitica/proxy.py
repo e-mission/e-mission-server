@@ -21,6 +21,7 @@ import emission.core.get_database as edb
 try:
     key_file = open('conf/net/ext_service/habitica.json')
     key_data = json.load(key_file)
+    key_file.close()
     url = key_data["url"]
 except:
     logging.exception("habitica not configured, game functions not supported")
@@ -29,7 +30,7 @@ except:
 def habiticaRegister(username, email, password, our_uuid):
   user_dict = {}
   #if user is already in e-mission db, try to load user data
-  if edb.get_habitica_db().find({'user_id': our_uuid}).count() == 1:
+  if edb.get_habitica_db().count_documents({'user_id': our_uuid}) == 1:
     try:
       result = habiticaProxy(our_uuid, 'GET', '/api/v3/user', None)
       user_dict = result.json()
@@ -188,7 +189,7 @@ def create_habit(user_id, new_habit):
 def get_user_entry(user_id):
   user_query = {'user_id': user_id}
   # TODO: Raise a real, descriptive exception here instead of asserting
-  assert(edb.get_habitica_db().find(user_query).count() == 1)
+  assert(edb.get_habitica_db().count_documents(user_query) == 1)
   stored_cfg = edb.get_habitica_db().find_one(user_query)
   return stored_cfg
 

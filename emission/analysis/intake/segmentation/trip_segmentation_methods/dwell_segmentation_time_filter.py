@@ -116,9 +116,9 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             distanceToLast = lambda row: pf.calDistance(ad.AttrDict(row), currPoint)
             timeToLast = lambda row: currPoint.ts - ad.AttrDict(row).ts
             last5MinsDistances = last5MinsPoints_df.apply(distanceToLast, axis=1)
-            logging.debug("last5MinsDistances = %s with length %d" % (last5MinsDistances.as_matrix(), len(last5MinsDistances)))
+            logging.debug("last5MinsDistances = %s with length %d" % (last5MinsDistances.to_numpy(), len(last5MinsDistances)))
             last10PointsDistances = last10Points_df.apply(distanceToLast, axis=1)
-            logging.debug("last10PointsDistances = %s with length %d, shape %s" % (last10PointsDistances.as_matrix(),
+            logging.debug("last10PointsDistances = %s with length %d, shape %s" % (last10PointsDistances.to_numpy(),
                                                                            len(last10PointsDistances),
                                                                            last10PointsDistances.shape))
 

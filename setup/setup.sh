@@ -4,5 +4,8 @@
 # - on linux: /home/<user>/miniconda3/bin/conda
 # - on OSX: /Users/<user>/miniconda3/bin/conda
 # - on Windows: C:/Users/<user>/Miniconda3/Scripts/conda
+
+source setup/checks/check_for_conda.sh
+
+echo "Installing using conda now"
 conda env update --name emission --file setup/environment36.yml
-source activate emission

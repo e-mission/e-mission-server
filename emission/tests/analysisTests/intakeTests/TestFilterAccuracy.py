@@ -61,7 +61,7 @@ class TestFilterAccuracy(unittest.TestCase):
     def testEmptyCall(self):
         # Check call to the entire filter accuracy with a zero length timeseries
         import emission.core.get_database as edb
-        edb.get_timeseries_db().remove({"user_id": self.testUUID})
+        edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
         # We expect that this should not throw
         eaicf.filter_accuracy(self.testUUID)
         self.assertEqual(len(self.ts.get_data_df("background/location")), 0)
@@ -89,7 +89,7 @@ class TestFilterAccuracy(unittest.TestCase):
                                         "metadata.write_ts",
                                         entry_from_df.metadata_write_ts))
         self.assertNotIn("_id", entry_copy)
-        self.assertEquals(entry_copy["metadata"]["key"], "background/filtered_location")
+        self.assertEqual(entry_copy["metadata"]["key"], "background/filtered_location")
 
     def testExistingFilteredLocation(self):
         time_query = epq.get_time_range_for_accuracy_filtering(self.testUUID)

@@ -9,12 +9,10 @@ from builtins import range
 from builtins import *
 from past.utils import old_div
 from builtins import object
-import emission.simulation.markov_model_counter as emmc
+import pykov as pk
 import emission.net.ext_service.otp.otp as otp
 import emission.net.ext_service.geocoder.nominatim as geo
 import emission.core.wrapper.trip_old as to
-import emission.net.ext_service.gmaps.googlemaps as gmaps
-import emission.net.ext_service.gmaps.common as gmcommon
 import emission.core.get_database as edb
 
 import datetime
@@ -26,14 +24,11 @@ import heapq
 import time
 import requests
 import random
+import os
 
 CENTER_OF_CAMPUS = to.Coordinate(37.871790, -122.260005)
 RANDOM_RADIUS = .3  # 300 meters around center of campus; for randomization
 N_TOP_TRIPS = 3 # Number of top trips we return for the user to look at
-
-key_file = open("conf/net/ext_service/googlemaps.json")
-GOOGLE_MAPS_KEY = json.load(key_file)["api_key"]
-
 
 class UserBase(object):
 
@@ -119,7 +114,7 @@ class UserModel(object):
     """ 
 
     def __init__(self, has_bike=False):
-        self.utilities = emmc.Counter()
+        self.utilities = pk.Chain()
         self.has_bike = has_bike
         self.user_base = the_base
 
@@ -137,7 +132,6 @@ class UserModel(object):
         return self.get_top_choices_lat_lng(start, end)
 
     def get_all_trips(self, start, end, curr_time=None):
-        c = gmaps.client.Client(GOOGLE_MAPS_KEY)
         if curr_time is None:
             curr_time = datetime.datetime.now()
         curr_month = curr_time.month
@@ -149,22 +143,9 @@ class UserModel(object):
         if self.has_bike:
             mode = "BICYCLE"
 
-        walk_otp = otp.OTP(start, end, "WALK", write_day(curr_month, curr_day, curr_year), write_time(curr_hour, curr_minute), False)
+        walk_otp = otp.OTP(os.environ("OTP_SERVER")).route(start, end, "WALK", write_day(curr_month, curr_day, curr_year), write_time(curr_hour, curr_minute), False)
         lst_of_trips = walk_otp.get_all_trips(0, 0, 0)
-
-        our_gmaps = gmaps.GoogleMaps(GOOGLE_MAPS_KEY) 
-        mode = "walking"
-        if self.has_bike:
-            mode = "bicycling"
-
-        jsn = our_gmaps.directions(start, end, mode)
-        gmaps_options = gmcommon.google_maps_to_our_trip_list(jsn, 0, 0, 0, mode, curr_time)
-
-        ## Throw in a random waypoint to make things more interesting
-        waypoint = get_one_random_point_in_radius(CENTER_OF_CAMPUS, RANDOM_RADIUS)
-        gmaps_way_points_jsn = our_gmaps.directions(start, end, mode, waypoints=waypoint)
-        way_points_options = gmcommon.google_maps_to_our_trip_list(gmaps_way_points_jsn, 0, 0, 0, mode, curr_time)
-        tot_trips = lst_of_trips + gmaps_options + way_points_options
+        tot_trips = lst_of_trips
 
         return tot_trips
 
@@ -245,7 +226,7 @@ def get_time_of_trip(trip):
     return (trip.end_time - trip.start_time).seconds
 
 def get_normalized_times(lst_of_trips):
-    counter = emmc.Counter()
+    counter = pk.Vector()
     i = 0
     for trip in lst_of_trips:
         counter[i] = get_time_of_trip(trip)
@@ -262,7 +243,7 @@ def get_sweat_factor(trip, testing=False):
     return 71.112*chng[0] + 148.09
 
 def get_normalized_sweat(lst_of_trips, testing=False):
-    counter = emmc.Counter()
+    counter = pk.Vector()
     i = 0
     for trip in lst_of_trips:
         factor = get_sweat_factor(trip, testing)
@@ -276,7 +257,7 @@ def get_normalized_sweat(lst_of_trips, testing=False):
     return to_return
 
 def get_normalized_beauty(lst_of_trips):
-    counter = emmc.Counter()
+    counter = pk.Vector()
     i = 0
     for trip in lst_of_trips:
         factor = get_beauty_score_of_trip(trip)
@@ -319,7 +300,7 @@ class Area(object):
         self.update_times(datetime.datetime.now())
 
     def normalize_sounds(self):
-        counter = emmc.Counter()
+        counter = pk.Vector()
         for k,v in self.time_to_noise.items():
             counter[k] = v
         counter.normalize()
@@ -510,26 +491,8 @@ def get_bike_info(bike_str):
     return True
 
 def get_elevation_change(trip, testing=False):
-    if testing:
-        up = random.randint(1, 100)
-        down = random.randint(1, 100)
-        return (up, down)
-    time.sleep(1) # so we dont run out calls
-    c = gmaps.client.Client(GOOGLE_MAPS_KEY)
-    print(get_route(trip))
-    jsn = gmaps.elevation.elevation_along_path(c, get_route(trip), 200)
-    up, down = 0, 0
-    prev = None
-    for item in jsn:
-        if item["location"]["lat"] == 0:
-            return (0, 0)
-        if prev and item["elevation"] > prev:
-            up += item["elevation"] - prev
-        elif prev and item["elevation"] < prev:
-            down += prev - item["elevation"]
-        prev = item['elevation']
-    return (up, down)
-
+    # TODO: re-implement using the open elevation API
+    pass
 
 if __name__ == "__main__":
     main()

@@ -7,7 +7,6 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import *
 from builtins import object
-import emission.simulation.markov_model_counter as esmmc
 
 
 ## A File meant to represent tour models for individual users 

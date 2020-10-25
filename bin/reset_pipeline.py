@@ -20,6 +20,7 @@ import pymongo
 
 import emission.pipeline.reset as epr
 import emission.core.get_database as edb
+import emission.core.wrapper.user as ecwu
 import emission.storage.decorations.user_queries as esdu
 
 def _get_user_list(args):
@@ -49,7 +50,7 @@ def _find_all_users():
    return esdu.get_all_uuids()
 
 def _email_2_user_list(email_list):
-    return [ecwu.User.fromEmail(e) for e in email_list]
+    return [ecwu.User.fromEmail(e).uuid for e in email_list]
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)

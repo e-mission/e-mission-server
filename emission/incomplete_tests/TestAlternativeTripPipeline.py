@@ -48,7 +48,7 @@ class TestAlternativeTripPipeline(unittest.TestCase):
     edb.get_section_db().remove()
     edb.get_alternatives_db().remove()
 
-    self.assertEquals(self.ModesColl.find().count(), 0)
+    self.assertEquals(self.ModesColl.estimated_document_count(), 0)
 
     dataJSON = json.load(open("emission/tests/data/modes.json"))
     for row in dataJSON:
@@ -72,7 +72,7 @@ class TestAlternativeTripPipeline(unittest.TestCase):
   def tearDown(self):
     edb.get_section_db().remove({"user_id": self.testUUID})
     self.ModesColl.remove()
-    self.assertEquals(self.ModesColl.find().count(), 0)
+    self.assertEquals(self.ModesColl.estimated_document_count(), 0)
 
   def loadTestJSON(self, fileName):
     fileHandle = open(fileName)

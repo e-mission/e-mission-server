@@ -8,7 +8,7 @@ cffi==1.11.2
 chardet==3.0.4
 cheroot==5.10.0
 CherryPy==12.0.1
-cryptography==2.1.4
+cryptography==2.3
 cycler==0.10.0
 enum34==1.1.6
 functools32==3.2.3.post2
@@ -36,7 +36,7 @@ pyparsing==2.2.0
 python-crontab==2.2.7
 python-dateutil==2.6.1
 pytz==2017.3
-requests==2.18.4
+requests==2.20.0
 requests-toolbelt==0.8.0
 rsa==3.4.2
 scikit-learn==0.19.0
@@ -46,6 +46,6 @@ six==1.11.0
 statsmodels==0.8.0
 subprocess32==3.2.7
 tempora==1.9
-urllib3==1.22
+urllib3==1.24.2
 utm==0.4.2
 xmltodict==0.11.0

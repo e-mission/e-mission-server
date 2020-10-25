@@ -31,7 +31,7 @@ def _get_sections_for_query(section_query, sort_field):
     logging.debug("Returning sections for query %s" % section_query)
     section_doc_cursor = edb.get_analysis_timeseries_db().find(
         section_query).sort(sort_field, pymongo.ASCENDING)
-    logging.debug("result cursor length = %d" % section_doc_cursor.count())
+    logging.debug("result length = %d" % edb.get_analysis_timeseries_db().count_documents(section_query))
     return [ecwe.Entry(doc) for doc in section_doc_cursor]
 
 def get_inferred_mode_entry(user_id, section_id):

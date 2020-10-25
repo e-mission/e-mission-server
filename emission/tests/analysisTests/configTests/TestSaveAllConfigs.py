@@ -54,7 +54,7 @@ class TestSaveAllConfigs(unittest.TestCase):
     def testOneOverride(self):
         cfg_1 = copy.copy(self.dummy_config)
         cfg_1['metadata']['write_ts'] = 1440700000
-        edb.get_timeseries_db().insert(cfg_1)
+        edb.get_timeseries_db().insert_one(cfg_1)
 
         tq = estt.TimeQuery("metadata.write_ts", 1440658800, 1440745200)
         eacc.save_all_configs(self.androidUUID, tq)
@@ -66,12 +66,12 @@ class TestSaveAllConfigs(unittest.TestCase):
     def testTwoOverride(self):
         cfg_1 = copy.copy(self.dummy_config)
         cfg_1['metadata']['write_ts'] = 1440700000
-        edb.get_timeseries_db().insert(cfg_1)
+        edb.get_timeseries_db().insert_one(cfg_1)
 
         cfg_2 = copy.copy(self.dummy_config)
         cfg_2['metadata']['write_ts'] = 1440710000
         cfg_2['data']['is_duty_cycling'] = False
-        edb.get_timeseries_db().insert(cfg_2)
+        edb.get_timeseries_db().insert_one(cfg_2)
 
         tq = estt.TimeQuery("metadata.write_ts", 1440658800, 1440745200)
         eacc.save_all_configs(self.androidUUID, tq)
@@ -83,11 +83,11 @@ class TestSaveAllConfigs(unittest.TestCase):
     def testOldOverride(self):
         cfg_1 = copy.copy(self.dummy_config)
         cfg_1['metadata']['write_ts'] = 1440500000
-        edb.get_timeseries_db().insert(cfg_1)
+        edb.get_timeseries_db().insert_one(cfg_1)
 
         cfg_2 = copy.copy(self.dummy_config)
         cfg_2['metadata']['write_ts'] = 1440610000
-        edb.get_timeseries_db().insert(cfg_2)
+        edb.get_timeseries_db().insert_one(cfg_2)
 
         tq = estt.TimeQuery("metadata.write_ts", 1440658800, 1440745200)
         eacc.save_all_configs(self.androidUUID, tq)

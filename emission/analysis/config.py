@@ -6,7 +6,9 @@ def get_config_data():
     except:
         print("analysis.debug.conf.json not configured, falling back to sample, default configuration")
         config_file = open('conf/analysis/debug.conf.json.sample')
-    return json.load(config_file)
+    ret_val = json.load(config_file)
+    config_file.close()
+    return ret_val
 
 config_data = get_config_data()
 

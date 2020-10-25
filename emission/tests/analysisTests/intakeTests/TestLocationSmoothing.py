@@ -45,8 +45,8 @@ class TestLocationSmoothing(unittest.TestCase):
 
         self.testUUID = uuid.uuid4()
         self.ts = esta.TimeSeries.get_time_series(self.testUUID)
-
-        self.trip_entries = json.load(open("emission/tests/data/smoothing_data/trip_list.txt"),
+        with open("emission/tests/data/smoothing_data/trip_list.txt") as tfp:
+            self.trip_entries = json.load(tfp,
                                       object_hook=bju.object_hook)
         for trip_entry in self.trip_entries:
             trip_entry["user_id"] = self.testUUID
@@ -54,7 +54,8 @@ class TestLocationSmoothing(unittest.TestCase):
 
         self.trip_entries = [ecwe.Entry(t) for t in self.trip_entries]
 
-        self.section_entries = json.load(open("emission/tests/data/smoothing_data/section_list.txt"),
+        with open("emission/tests/data/smoothing_data/section_list.txt") as sfp:
+            self.section_entries = json.load(sfp,
                                          object_hook=bju.object_hook)
         for section_entry in self.section_entries:
             section_entry["user_id"] = self.testUUID
@@ -64,13 +65,14 @@ class TestLocationSmoothing(unittest.TestCase):
 
     def tearDown(self):
         import emission.core.get_database as edb
-        edb.get_timeseries_db().remove({"user_id": self.testUUID})
-        edb.get_analysis_timeseries_db().remove({"user_id": self.testUUID})
+        edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID})
 
     def loadPointsForTrip(self, trip_id):
         import emission.core.get_database as edb
 
-        entries = json.load(open("emission/tests/data/smoothing_data/%s" % trip_id),
+        with open("emission/tests/data/smoothing_data/%s" % trip_id) as pfp:
+            entries = json.load(pfp,
                                  object_hook=bju.object_hook)
         tsdb = edb.get_timeseries_db()
         for entry in entries:
@@ -97,10 +99,10 @@ class TestLocationSmoothing(unittest.TestCase):
             logging.debug("Max speed for section %s = %s" % (i, maxSpeed))
 
             jump_algo.filter(with_speeds_df)
-            logging.debug("Retaining points %s" % np.nonzero(jump_algo.inlier_mask_))
+            logging.debug("Retaining points %s" % np.nonzero(jump_algo.inlier_mask_.to_numpy()))
 
             to_delete_mask = np.logical_not(jump_algo.inlier_mask_)
-            logging.debug("Deleting points %s" % np.nonzero(to_delete_mask))
+            logging.debug("Deleting points %s" % np.nonzero(to_delete_mask.to_numpy()))
 
             delete_ids = list(with_speeds_df[to_delete_mask]._id)
             logging.debug("Deleting ids %s" % delete_ids)
@@ -135,10 +137,10 @@ class TestLocationSmoothing(unittest.TestCase):
             logging.debug("Max speed for section %s = %s" % (i, maxSpeed))
 
             jump_algo.filter(with_speeds_df)
-            logging.debug("Retaining points %s" % np.nonzero(jump_algo.inlier_mask_))
+            logging.debug("Retaining points %s" % np.nonzero(jump_algo.inlier_mask_.to_numpy()))
 
             to_delete_mask = np.logical_not(jump_algo.inlier_mask_)
-            logging.debug("Deleting points %s" % np.nonzero(to_delete_mask))
+            logging.debug("Deleting points %s" % np.nonzero(to_delete_mask.to_numpy()))
 
             delete_ids = list(with_speeds_df[to_delete_mask]._id)
             logging.debug("Deleting ids %s" % delete_ids)
@@ -169,17 +171,17 @@ class TestLocationSmoothing(unittest.TestCase):
             logging.debug("Max speed for section %s = %s" % (i, maxSpeed))
 
             jump_algo.filter(with_speeds_df)
-            logging.debug("Retaining points %s" % np.nonzero(jump_algo.inlier_mask_))
+            logging.debug("Retaining points %s" % np.nonzero(jump_algo.inlier_mask_.to_numpy()))
 
             to_delete_mask = np.logical_not(jump_algo.inlier_mask_)
-            logging.debug("Deleting points %s" % np.nonzero(to_delete_mask))
+            logging.debug("Deleting points %s" % np.nonzero(to_delete_mask.to_numpy()))
 
             delete_ids = list(with_speeds_df[to_delete_mask]._id)
             logging.debug("Deleting ids %s" % delete_ids)
 
             if i == 0:
                 # this is the zigzag section
-                self.assertEqual(np.nonzero(to_delete_mask)[0].tolist(),
+                self.assertEqual(np.nonzero(to_delete_mask.to_numpy())[0].tolist(),
                                  [25, 64, 114, 115, 116, 117, 118, 119, 120, 123, 126])
                 self.assertEqual(delete_ids,
                                  [boi.ObjectId('55edafe77d65cb39ee9882ff'),
@@ -194,7 +196,7 @@ class TestLocationSmoothing(unittest.TestCase):
                                   boi.ObjectId('55edcc217d65cb39ee98841f'),
                                   boi.ObjectId('55edcc217d65cb39ee988429')])
             else:
-                self.assertEqual(len(np.nonzero(to_delete_mask)[0]), 0)
+                self.assertEqual(len(np.nonzero(to_delete_mask.to_numpy())[0]), 0)
                 self.assertEqual(len(delete_ids), 0)
 
     def testFilterSection(self):

@@ -84,7 +84,7 @@ def segment_current_trips(user_id):
 
         out_of_order_id_list = out_of_order_points["_id"].tolist()
         logging.debug("out_of_order_id_list = %s" % out_of_order_id_list)
-        edb.get_timeseries_db().remove({"_id": {"$in": out_of_order_id_list}})
+        edb.get_timeseries_db().delete_many({"_id": {"$in": out_of_order_id_list}})
 
     filters_in_df = loc_df["filter"].dropna().unique()
     logging.debug("Filters in the dataframe = %s" % filters_in_df)
@@ -149,6 +149,8 @@ def get_last_ts_processed(filter_methods):
             if last_ts_processed is None or method.last_ts_processed > last_ts_processed:
                 last_ts_processed = method.last_ts_processed
                 logging.debug("Set last_ts_processed = %s from method %s" % (last_ts_processed, method))
+        except TypeError as e:
+            logging.debug("Processing method %s got error %s, skipping" % (method, e))
         except AttributeError as e:
             logging.debug("Processing method %s got error %s, skipping" % (method, e))
     logging.info("Returning last_ts_processed = %s" % last_ts_processed)

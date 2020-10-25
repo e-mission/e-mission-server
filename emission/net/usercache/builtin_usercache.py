@@ -101,7 +101,7 @@ class BuiltinUserCache(ucauc.UserCache):
                     'metadata.type': 'document',
                     'metadata.key': key}
         # logging.debug("Updating %s spec to %s" % (self.user_id, document))
-        result = self.db.update(queryDoc,
+        result = self.db.update_one(queryDoc,
                                 document,
                                 upsert=True)
         logging.debug("Result = %s after updating document %s" % (result, key))
@@ -143,7 +143,7 @@ class BuiltinUserCache(ucauc.UserCache):
         """
         read_ts = time.time()
         combo_query = self._get_msg_query(None, None)
-        count = self.db.find(combo_query).count()
+        count = self.db.count_documents(combo_query)
         logging.debug("For %s, found %s messages in usercache" %
                       (self.user_id, count))
         return count
@@ -151,7 +151,7 @@ class BuiltinUserCache(ucauc.UserCache):
     def clearProcessedMessages(self, timeQuery, key_list=None):
         del_query = self._get_msg_query(key_list, timeQuery)
         logging.debug("About to delete messages matching query %s" % del_query)
-        del_result = self.db.remove(del_query)
+        del_result = self.db.delete_many(del_query)
         logging.debug("Delete result = %s" % del_result)
 
     def getDocumentKeyList(self):
@@ -164,7 +164,7 @@ class BuiltinUserCache(ucauc.UserCache):
         return self.getKeyListForType("message")
 
     def getKeyListForType(self, message_type):
-        return self.db.find({"user_id": self.user_id, "metadata.type": message_type}).distinct("metadata.key")
+        return sorted(self.db.find({"user_id": self.user_id, "metadata.type": message_type}).distinct("metadata.key"))
 
     def clearObsoleteDocument(self, key):
         """
@@ -177,5 +177,5 @@ class BuiltinUserCache(ucauc.UserCache):
                     'metadata.type': 'document',
                     'metadata.key': key}
         
-        result = self.db.remove(queryDoc)
+        result = self.db.delete_many(queryDoc)
         logging.debug("Result of removing document with key %s is %s" % (key, result))

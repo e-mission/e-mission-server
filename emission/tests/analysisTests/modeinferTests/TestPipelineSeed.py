@@ -14,12 +14,13 @@ import emission.analysis.classification.inference.mode.seed.pipeline as pipeline
 from emission.core.wrapper.user import User
 from emission.core.wrapper.client import Client
 import emission.tests.common as etc
+import emission.core.get_database as edb
 
 class TestPipelineSeed(unittest.TestCase):
   def setUp(self):
     self.testUsers = ["test@example.com", "best@example.com", "fest@example.com",
                       "rest@example.com", "nest@example.com"]
-    self.serverName = 'localhost'
+    self.serverName = edb.url
 
     self.ModesColl = get_mode_db()
     self.SectionsColl = get_section_db()
@@ -34,11 +35,14 @@ class TestPipelineSeed(unittest.TestCase):
     for testUser in user_objects:
         etc.purgeSectionData(self.SectionsColl, testUser.uuid)
 
-    self.assertEqual(self.ModesColl.find().count(), 0)
+    if self.ModesColl.estimated_document_count() > 0:
+        self.ModesColl.delete_many({})
 
-    self.assertEqual(self.SectionsColl.find().count(), 0)
+    self.assertEqual(self.ModesColl.estimated_document_count(), 0)
 
-    MongoClient('localhost').drop_database("Backup_database")
+    self.assertEqual(self.SectionsColl.estimated_document_count(), 0)
+
+    MongoClient(edb.url).drop_database("Backup_database")
 
     etc.loadTable(self.serverName, "Stage_Modes", "emission/tests/data/modes.json")
     etc.loadTable(self.serverName, "Stage_Sections", "emission/tests/data/testModeInferSeedFile")
@@ -59,18 +63,18 @@ class TestPipelineSeed(unittest.TestCase):
       #   (section['section_start_datetime'], section['section_end_datetime']))
       # Replace the user email with the UUID
       section['user_id'] = User.fromEmail(section['user_id']).uuid
-      self.SectionsColl.save(section)
+      edb.save(self.SectionsColl, section)
 
     self.pipeline = pipeline.ModeInferencePipelineMovesFormat()
     self.testLoadTrainingData()
 
   def tearDown(self):
-    MongoClient('localhost').drop_database("Backup_database")
+    MongoClient(edb.url).drop_database("Backup_database")
     for testUser in self.testUsers:
       etc.purgeSectionData(self.SectionsColl, testUser)
-    logging.debug("Number of sections after purge is %d" % self.SectionsColl.find().count())
+    logging.debug("Number of sections after purge is %d" % self.SectionsColl.estimated_document_count())
     self.ModesColl.delete_many({})
-    self.assertEqual(self.ModesColl.find().count(), 0)
+    self.assertEqual(self.ModesColl.estimated_document_count(), 0)
     if os.path.exists(pipeline.SAVED_MODEL_FILENAME):
         os.remove(pipeline.SAVED_MODEL_FILENAME)
         self.assertFalse(os.path.exists(pipeline.SAVED_MODEL_FILENAME))
@@ -79,11 +83,11 @@ class TestPipelineSeed(unittest.TestCase):
     from pymongo import MongoClient
 
     allConfirmedTripsQuery = pipeline.ModeInferencePipelineMovesFormat.getSectionQueryWithGroundTruth({'$ne': ''})
-    self.pipeline.confirmedSections = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery)
-    backupSections = MongoClient('localhost').Backup_database.Stage_Sections
-    self.pipeline.backupConfirmedSections = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery, backupSections)
-    self.assertEqual(self.pipeline.confirmedSections.count(), len(self.testUsers) * 2)
-    self.assertEqual(self.pipeline.backupConfirmedSections.count(), 0)
+    (self.pipeline.confirmedSectionCount, self.pipeline.confirmedSections) = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery)
+    backupSections = MongoClient(edb.url).Backup_database.Stage_Sections
+    (self.pipeline.backupSectionCount, self.pipeline.backupConfirmedSections) = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery, backupSections)
+    self.assertEqual(self.pipeline.confirmedSectionCount, len(self.testUsers) * 2)
+    self.assertEqual(self.pipeline.backupSectionCount, 0)
     
 
   def testGenerateBusAndTrainStops(self):
@@ -119,9 +123,9 @@ class TestPipelineSeed(unittest.TestCase):
     self.testGenerateBusAndTrainStops()
 
     (self.pipeline.featureMatrix, self.pipeline.resultVector) = self.pipeline.generateFeatureMatrixAndResultVectorStep()
-    logging.debug("Number of sections = %s" % self.pipeline.confirmedSections.count())
+    logging.debug("Number of sections = %s" % self.pipeline.confirmedSectionCount)
     logging.debug("Feature Matrix shape = %s" % str(self.pipeline.featureMatrix.shape))
-    self.assertEqual(self.pipeline.featureMatrix.shape[0], self.pipeline.confirmedSections.count())
+    self.assertEqual(self.pipeline.featureMatrix.shape[0], self.pipeline.confirmedSectionCount)
     self.assertEqual(self.pipeline.featureMatrix.shape[1], len(self.pipeline.featureLabels))
 
   def testCleanDataStep(self):
@@ -130,28 +134,28 @@ class TestPipelineSeed(unittest.TestCase):
     runSec['_id'] = 'clean_me_1'
     runSec['confirmed_mode'] = 2
     logging.debug("Inserting runSec %s" % runSec)
-    self.SectionsColl.insert(runSec)
+    self.SectionsColl.insert_one(runSec)
 
     # Outlier trip
     longTripSec = self.SectionsColl.find_one({'type':'move'})
     longTripSec['_id'] = 'clean_me_2'
     longTripSec['distance'] = 5000000
     logging.debug("Inserting longTripSec %s" % longTripSec)
-    self.SectionsColl.insert(longTripSec)
+    self.SectionsColl.insert_one(longTripSec)
 
     unknownTripSec = self.SectionsColl.find_one({'type':'move'})
     unknownTripSec['_id'] = 'clean_me_3'
     unknownTripSec['mode'] = 'airplane'
     logging.debug("Inserting unknownTripSec %s" % unknownTripSec)
-    self.SectionsColl.insert(unknownTripSec)
+    self.SectionsColl.insert_one(unknownTripSec)
     
     allConfirmedTripsQuery = {"$and": [{'type': 'move'}, {'confirmed_mode': {'$ne': ''}}]}
-    self.pipeline.confirmedSections = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery)
+    (self.pipeline.confirmedSectionCount, self.pipeline.confirmedSections) = self.pipeline.loadTrainingDataStep(allConfirmedTripsQuery)
     self.testGenerateBusAndTrainStops()
     (self.pipeline.featureMatrix, self.pipeline.resultVector) = self.pipeline.generateFeatureMatrixAndResultVectorStep()
 
     (self.pipeline.cleanedFeatureMatrix, self.pipeline.cleanedResultVector) = self.pipeline.cleanDataStep()
-    self.assertEqual(self.pipeline.cleanedFeatureMatrix.shape[0], self.pipeline.confirmedSections.count() + self.pipeline.backupConfirmedSections.count() - 2)
+    self.assertEqual(self.pipeline.cleanedFeatureMatrix.shape[0], self.pipeline.confirmedSectionCount + self.pipeline.backupSectionCount - 2)
 
   def testSelectFeatureIndicesStep(self):
     self.testCleanDataStep()
@@ -184,29 +188,26 @@ class TestPipelineSeed(unittest.TestCase):
     scores = model_selection.cross_val_score(self.pipeline.model, self.pipeline.cleanedFeatureMatrix, self.pipeline.cleanedResultVector, cv=3)
     self.assertGreater(scores.mean(), 0.90)
 
-  def setupTestTrips(self):
+  def setupTestTrips(self, sectionsColl):
     # Generate some test data by taking existing training data and stripping out the labels
     test_id_1 = self.SectionsColl.find_one({'confirmed_mode':1})
     test_id_1['_id'] = 'test_id_1'
     test_id_1['confirmed_mode'] = ''
     logging.debug("Inserting test_id_1 %s" % test_id_1)
-    self.SectionsColl.insert(test_id_1)
+    sectionsColl.insert_one(test_id_1)
 
     test_id_2 = self.SectionsColl.find_one({'confirmed_mode':5})
     test_id_2['_id'] = 'test_id_2'
     test_id_2['confirmed_mode'] = ''
     logging.debug("Inserting test_id_2 %s" % test_id_2)
-    self.SectionsColl.insert(test_id_2)
+    sectionsColl.insert_one(test_id_2)
 
   def testEntirePipeline(self):
-    self.setupTestTrips()
+    self.setupTestTrips(self.SectionsColl)
+    self.setupTestTrips(MongoClient(edb.url).Backup_database.Stage_Sections)
     # Here, we only have 5 trips, so the pipeline looks for the backup training
     # set instead, which fails because there is no backup. So let's copy data from
     # the main DB to the backup DB to make this test pass
-    MongoClient('localhost').admin.command("copydb",
-        fromdb="Stage_database",
-        todb="Backup_database",
-        fromhost="localhost")
     self.pipeline.runPipeline()
 
     # Checks are largely the same as above

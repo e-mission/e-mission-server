@@ -29,5 +29,5 @@ def _get_stops_for_query(stop_query, sort_key):
     logging.debug("updated query = %s" % stop_query)
     stop_doc_cursor = edb.get_analysis_timeseries_db().find(stop_query).sort(
         sort_key, pymongo.ASCENDING)
-    logging.debug("result count = %d" % stop_doc_cursor.count())
+    logging.debug("result count = %d" % edb.get_analysis_timeseries_db().count_documents(stop_query))
     return [ecwe.Entry(doc) for doc in stop_doc_cursor]

@@ -46,9 +46,11 @@ def run_intake_pipeline(process_number, uuid_list):
     :return:
     """
     try:
-        intake_log_config = json.load(open("conf/log/intake.conf", "r"))
+        with open("conf/log/intake.conf", "r") as cf:
+            intake_log_config = json.load(cf)
     except:
-        intake_log_config = json.load(open("conf/log/intake.conf.sample", "r"))
+        with open("conf/log/intake.conf.sample", "r") as cf:
+            intake_log_config = json.load(cf)
 
     intake_log_config["handlers"]["file"]["filename"] = \
         intake_log_config["handlers"]["file"]["filename"].replace("intake", "intake_%s" % process_number)
@@ -147,14 +149,6 @@ def run_intake_pipeline_for_user(uuid):
 
         esds.store_pipeline_time(uuid, ecwp.PipelineStages.MODE_INFERENCE.name,
                                  time.time(), crt.elapsed)
-
-        with ect.Timer() as act:
-            logging.info("*" * 10 + "UUID %s: checking active mode trips to autocheck habits" % uuid + "*" * 10)
-            print(str(arrow.now()) + "*" * 10 + "UUID %s: checking active mode trips to autocheck habits" % uuid + "*" * 10)
-            autocheck.give_points_for_all_tasks(uuid)
-
-        esds.store_pipeline_time(uuid, "AUTOCHECK_POINTS",
-                                 time.time(), act.elapsed)
 
         with ect.Timer() as ogt:
             logging.info("*" * 10 + "UUID %s: storing views to cache" % uuid + "*" * 10)
