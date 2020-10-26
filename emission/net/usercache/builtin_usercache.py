@@ -12,7 +12,7 @@ import pymongo
 
 # Our imports
 import emission.net.usercache.abstract_usercache as ucauc # ucauc = usercache.abstract_usercache
-from emission.core.get_database import get_usercache_db
+import emission.core.get_database as edb
 
 """
 Format of the usercache_db.
@@ -63,7 +63,7 @@ class BuiltinUserCache(ucauc.UserCache):
         self.key_query = lambda key: {"metadata.key": key};
         self.ts_query = lambda tq: BuiltinUserCache._get_ts_query(tq)
         self.type_query = lambda entry_type: {"metadata.type": entry_type}
-        self.db = get_usercache_db()
+        self.db = edb.get_usercache_db()
 
     @staticmethod
     def _get_ts_query(tq):
@@ -71,7 +71,7 @@ class BuiltinUserCache(ucauc.UserCache):
 
     @staticmethod
     def get_uuid_list():
-        return get_usercache_db().distinct("user_id")
+        return edb.get_usercache_db().distinct("user_id")
 
     def putDocument(self, key, value):
         """
