@@ -132,7 +132,7 @@ class BuiltinUserCache(ucauc.UserCache):
         # the write timestamp, because we use the last_ts_processed to mark the
         # beginning of the entry for the next query. So let's sort by the
         # write_ts before returning.
-        retrievedMsgs = list(self.db.find(combo_query).sort("metadata.write_ts", pymongo.ASCENDING).limit(100000))
+        retrievedMsgs = list(self.db.find(combo_query).sort("metadata.write_ts", pymongo.ASCENDING).limit(edb.result_limit))
         logging.debug("Found %d messages in response to query %s" % (len(retrievedMsgs), combo_query))
         return retrievedMsgs
 
