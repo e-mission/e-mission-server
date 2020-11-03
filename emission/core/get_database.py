@@ -18,6 +18,7 @@ except:
 
 config_data = json.load(config_file)
 url = config_data["timeseries"]["url"]
+result_limit = config_data["timeseries"]["result_limit"]
 config_file.close()
 
 print("Connecting to database URL "+url)
