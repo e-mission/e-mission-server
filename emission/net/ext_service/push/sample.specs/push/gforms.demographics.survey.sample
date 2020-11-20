@@ -5,6 +5,6 @@
     "image": "icon",
     "spec": {
       "url": "https://docs.google.com/forms/d/e/1FAIpQLSd_7VICYb8AfLQPIt8pg9AYsXW_rrHQBfsv-NSviO7Dgk7fyg/viewform",
-      "uuidXPath": "/html/body/div/div[2]/form/div[2]/div/div[2]/div[1]/div/div/div[2]/div/div[1]/div/div[1]/input"
+      "uuidSearchParam": "entry.488417190"
     }
 }
