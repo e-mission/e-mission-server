@@ -209,18 +209,18 @@ def collapse_modes(section_entry, modes):
 
     # now uniquify them. If there is only one possible mode (e.g. train), there
     # should be only one entry here
-    unique_modes = list(set(train_mapped_modes))
+    unique_modes = set(train_mapped_modes)
 
     logging.debug("unique_modes = %s" % unique_modes)
 
     if len(unique_modes) == 1:
-        return unique_modes[0]
+        return list(unique_modes)[0]
 
-    supported_modes = ['BUS', 'TRAIN', 'LIGHT_RAIL', 'SUBWAY', 'TRAM']
+    supported_modes = set(['BUS', 'TRAIN', 'LIGHT_RAIL', 'SUBWAY', 'TRAM'])
 
-    if sorted(unique_modes) != supported_modes:
+    if not unique_modes.issubset(supported_modes):
         logging.error("unique_modes = %s, but we support only %s" %
-            (sorted(unique_modes), supported_modes))
+            (unique_modes, supported_modes))
         if eac.get_config()["classification.validityAssertions"]:
             assert False
    
