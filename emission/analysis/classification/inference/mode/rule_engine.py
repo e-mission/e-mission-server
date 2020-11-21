@@ -193,7 +193,7 @@ def collapse_modes(section_entry, modes):
     # train_mode_list = ['funicular', 'miniature', 'rail', 'railway',
     #     'light_rail', 'subway', 'monorail', 'tram', 'aerialway', ]
     train_mode_list = ['funicular', 'miniature', 'rail', 'railway', 'monorail', 
-                'aerialway', 'tracks']
+                'monorail', 'aerialway', 'tracks']
 
     if modes is None or len(modes) == 0:
         return None
@@ -216,8 +216,11 @@ def collapse_modes(section_entry, modes):
     if len(unique_modes) == 1:
         return unique_modes[0]
 
-    if sorted(unique_modes) != ['BUS', 'TRAIN']:
-        logging.error("unique_modes = %s, but we support only two, [BUS, TRAIN]" % sorted(unique_modes))
+    supported_modes = ['BUS', 'TRAIN', 'LIGHT_RAIL', 'SUBWAY', 'TRAM']
+
+    if sorted(unique_modes) != supported_modes:
+        logging.error("unique_modes = %s, but we support only %s" %
+            (sorted(unique_modes), supported_modes))
         if eac.get_config()["classification.validityAssertions"]:
             assert False
    
@@ -227,7 +230,6 @@ def collapse_modes(section_entry, modes):
     if eaid.is_bicycling_speed(pd.Series(section_entry.data["speeds"]).median()):
         return 'BUS'
     else:
-        return 'TRAIN'	        
         # We only want to return a train modes there, so let's remove bus from the list
         if 'BUS' in train_mapped_modes:
             train_mapped_modes.remove("BUS")
