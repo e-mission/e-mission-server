@@ -11,6 +11,7 @@ import argparse
 import uuid
 import emission.storage.decorations.user_queries as esdu
 import emission.net.ext_service.push.notify_usage as pnu
+import emission.net.ext_service.push.notify_queries as pnq
 import emission.core.wrapper.user as ecwu
 
 if __name__ == '__main__':
@@ -25,6 +26,7 @@ if __name__ == '__main__':
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-e", "--user_email", nargs="+")
     group.add_argument("-u", "--user_uuid", nargs="+")
+    group.add_argument("-p", "--platform")
     group.add_argument("-a", "--all", action="store_true") 
     parser.add_argument("-d", "--dev", action="store_true", default=False)
 
@@ -32,7 +34,9 @@ if __name__ == '__main__':
 
     if args.user_uuid:
         uuid_list = [uuid.UUID(uuid_str) for uuid_str in args.user_uuid]
-    if args.all:
+    elif args.platform:
+        uuid_list = pnq.get_matching_user_ids(pnq.get_platform_query(args.platform))
+    elif args.all:
         uuid_list = esdu.get_all_uuids() 
     else:
         uuid_list = [ecwu.User.fromEmail(uuid_str).uuid for uuid_str in args.user_email]

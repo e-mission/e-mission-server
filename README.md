@@ -10,7 +10,11 @@ It has two components, the backend server and the phone apps. This is the
 backend server - the phone apps are available in the [e-mission-phone
 repo](https://github.com/amplab/e-mission-phone)
 
-[![Build Status](https://travis-ci.org/shankari/e-mission-server.svg?branch=master)](https://travis-ci.org/shankari/e-mission-server) ![test-with-docker](https://github.com/e-mission/e-mission-server/workflows/test-with-docker/badge.svg) ![ubuntu-only-test-with-manual-install](https://github.com/e-mission/e-mission-server/workflows/ubuntu-only-test-with-manual-install/badge.svg) ![osx-ubuntu-manual-install](https://github.com/e-mission/e-mission-server/workflows/osx-ubuntu-manual-install/badge.svg)
+
+- **Master** [![master:test-with-docker](https://github.com/e-mission/e-mission-server/workflows/test-with-docker/badge.svg)](https://github.com/e-mission/e-mission-server/actions?query=branch%3Amaster+workflow%3Atest-with-docker) [![master:ubuntu-only-test-with-manual-install](https://github.com/e-mission/e-mission-server/workflows/ubuntu-only-test-with-manual-install/badge.svg)](https://github.com/e-mission/e-mission-server/actions?query=branch%3Amaster+workflow%3Aubuntu-only-test-with-manual-install) [![master:osx-ubuntu-manual-install](https://github.com/e-mission/e-mission-server/workflows/osx-ubuntu-manual-install/badge.svg)](https://github.com/e-mission/e-mission-server/actions?query=branch%3Amaster+workflow%3Aosx-ubuntu-manual-install)
+
+- **GIS branch:** [![master:ubuntu-only-test-with-manual-install](https://github.com/e-mission/e-mission-server/workflows/ubuntu-only-test-with-manual-install/badge.svg?branch=gis-based-mode-detection)](https://github.com/e-mission/e-mission-server/actions?query=branch%3Agis-based-mode-detection+workflow%3Aubuntu-only-test-with-manual-install) [![osx-ubuntu-manual-install](https://github.com/e-mission/e-mission-server/workflows/osx-ubuntu-manual-install/badge.svg?branch=gis-based-mode-detection)](https://github.com/e-mission/e-mission-server/actions?query=branch%3Agis-based-mode-detection+workflow%3Aosx-ubuntu-manual-install)
+
 
 **Issues:** Since this repository is part of a larger project, all issues are tracked [in the central docs repository](https://github.com/e-mission/e-mission-docs/issues). If you have a question, [as suggested by the open source guide](https://opensource.guide/how-to-contribute/#communicating-effectively), please file an issue instead of sending an email. Since issues are public, other contributors can try to answer the question and benefit from the answer.
 

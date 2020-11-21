@@ -227,7 +227,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
             #
             # In [593]: edb.get_timeseries_db().find({"user_id": UUID('ea59084e-11d4-4076-9252-3b9a29ce35e0')}).count()
             # Out[593]: 449869
-            ts_db_result.limit(25 * 10000)
+            ts_db_result.limit(edb.result_limit)
         else:
             ts_db_result = tsdb.find(INVALID_QUERY)
             ts_db_count = 0
