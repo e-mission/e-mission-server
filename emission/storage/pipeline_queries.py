@@ -38,6 +38,19 @@ def mark_accuracy_filtering_done(user_id, last_processed_ts):
 def mark_accuracy_filtering_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.ACCURACY_FILTERING)
 
+def get_time_range_for_incoming_userinput_match(user_id):
+    return get_time_range_for_stage(user_id, ps.PipelineStages.USER_INPUT_MATCH_INCOMING)
+
+def mark_incoming_userinput_match_done(user_id, last_processed_ts):
+    if last_processed_ts is None:
+        mark_stage_done(user_id, ps.PipelineStages.USER_INPUT_MATCH_INCOMING, None)
+    else:
+        mark_stage_done(user_id, ps.PipelineStages.USER_INPUT_MATCH_INCOMING,
+                        last_processed_ts + END_FUZZ_AVOID_LTE)
+
+def mark_incoming_userinput_match_failed(user_id):
+    mark_stage_failed(user_id, ps.PipelineStages.USER_INPUT_MATCH_INCOMING)
+
 def get_time_range_for_segmentation(user_id):
     return get_time_range_for_stage(user_id, ps.PipelineStages.TRIP_SEGMENTATION)
 
@@ -108,10 +121,25 @@ def mark_mode_inference_complete(user_id):
 def mark_mode_inference_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.MODE_INFERENCE)
 
+def get_time_range_for_confirmed_object_creation(user_id):
+    tq = get_time_range_for_stage(user_id, ps.PipelineStages.CREATE_CONFIRMED_OBJECTS)
+    tq.timeType = "data.end_ts"
+    return tq
+
+def mark_confirmed_object_creation_done(user_id, last_processed_ts):
+    if last_processed_ts is None:
+        mark_stage_done(user_id, ps.PipelineStages.CREATE_CONFIRMED_OBJECTS, None)
+    else:
+        mark_stage_done(user_id, ps.PipelineStages.CREATE_CONFIRMED_OBJECTS,
+                        last_processed_ts + END_FUZZ_AVOID_LTE)
+        
+def mark_confirmed_object_creation_failed(user_id):
+    mark_stage_failed(user_id, ps.PipelineStages.CREATE_CONFIRMED_OBJECTS)
+
 def get_complete_ts(user_id):
-    mode_infer_state = get_current_state(user_id, ps.PipelineStages.MODE_INFERENCE)
-    if mode_infer_state is not None:
-        return mode_infer_state.last_processed_ts
+    create_confirmed_state = get_current_state(user_id, ps.PipelineStages.CREATE_CONFIRMED_OBJECTS)
+    if create_confirmed_state is not None:
+        return create_confirmed_state.last_processed_ts
     else:
         cleaned_state = get_current_state(user_id, ps.PipelineStages.CLEAN_RESAMPLING)
         if cleaned_state is not None:

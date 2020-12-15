@@ -85,7 +85,8 @@ def valid_user_input(trip_obj):
         # we know that the trip is cleaned so we can use the fmt_time
         # but the confirm objects are not necessarily filled out
         fmt_ts = lambda ts, tz: arrow.get(ts).to(tz)
-        logging.debug("Comparing user input %s -> %s, trip %s -> %s, checks are (%s) && (%s) || (%s)" % (
+        logging.debug("Comparing user input %s: %s -> %s, trip %s -> %s, checks are (%s) && (%s) || (%s)" % (
+            user_input.data.label,
             fmt_ts(user_input.data.start_ts, user_input.metadata.time_zone),
             fmt_ts(user_input.data.end_ts, user_input.metadata.time_zone),
             trip_obj.data.start_fmt_time, trip_obj.data.end_fmt_time,
@@ -104,18 +105,19 @@ def final_candidate(trip_obj, potential_candidates):
     if len(extra_filtered_potential_candidates) == 0:
         return None
 
-    sorted_pc = sorted(extra_filtered_potential_candidates, key=lambda c:c["metadata"]["write_ts"])
-    most_recent_entry = extra_filtered_potential_candidates[-1]
-    logging.debug("most recent entry has id %s" % most_recent_entry)
-    logging.debug("and is mapped to entry %s" % most_recent_entry)
-    return most_recent_entry
-
-def get_user_input_for_trip_object(ts, trip_obj, user_input_key):
-    tq = estt.TimeQuery("data.start_ts", trip_obj.data.start_ts, trip_obj.data.end_ts)
     # In general, all candiates will have the same start_ts, so no point in
     # sorting by it. Only exception to general rule is when user first provides
     # input before the pipeline is run, and then overwrites after pipeline is
     # run
+    sorted_pc = sorted(extra_filtered_potential_candidates, key=lambda c:c["metadata"]["write_ts"])
+    logging.debug("sorted candidates are %s" % [(c.metadata.write_fmt_time, c.data.label) for c in sorted_pc])
+    most_recent_entry = sorted_pc[-1]
+    logging.debug("most recent entry is %s, %s" % 
+        (most_recent_entry.metadata.write_fmt_time, most_recent_entry.data.label))
+    return most_recent_entry
+
+def get_user_input_for_trip_object(ts, trip_obj, user_input_key):
+    tq = estt.TimeQuery("data.start_ts", trip_obj.data.start_ts, trip_obj.data.end_ts)
     potential_candidates = ts.find_entries([user_input_key], tq)
     return final_candidate(trip_obj, potential_candidates)
 
