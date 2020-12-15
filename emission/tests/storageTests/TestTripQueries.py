@@ -40,6 +40,7 @@ class TestTripQueries(unittest.TestCase):
     
     def tearDown(self):
         edb.get_analysis_timeseries_db().delete_many({'user_id': self.testUserId})
+        edb.get_timeseries_db().delete_many({'user_id': self.testUserId})
         edb.get_usercache_db().delete_many({'user_id': self.testUserId})
 
     def create_fake_trip(self):

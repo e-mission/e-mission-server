@@ -7,6 +7,7 @@ standard_library.install_aliases()
 from builtins import *
 import logging
 import pymongo
+import arrow
 
 import emission.storage.timeseries.timequery as estt
 
@@ -75,22 +76,48 @@ def get_user_input_for_trip(trip_key, user_id, trip_id, user_input_key):
     trip_obj = ts.get_entry_from_id(trip_key, trip_id)
     return get_user_input_for_trip_object(ts, trip_obj, user_input_key)
 
+# Additional checks to be consistent with the phone code
+# www/js/diary/services.js
+# Since that has been tested the most
+# If we no longer need these checks (maybe with trip editing), we can remove them
+def valid_user_input(trip_obj):
+    def curried(user_input):
+        # we know that the trip is cleaned so we can use the fmt_time
+        # but the confirm objects are not necessarily filled out
+        fmt_ts = lambda ts, tz: arrow.get(ts).to(tz)
+        logging.debug("Comparing user input %s -> %s, trip %s -> %s, checks are (%s) && (%s) || (%s)" % (
+            fmt_ts(user_input.data.start_ts, user_input.metadata.time_zone),
+            fmt_ts(user_input.data.end_ts, user_input.metadata.time_zone),
+            trip_obj.data.start_fmt_time, trip_obj.data.end_fmt_time,
+            (user_input.data.start_ts >= trip_obj.data.start_ts),
+            (user_input.data.end_ts <= trip_obj.data.end_ts),
+            ((user_input.data.end_ts - trip_obj.data.end_ts) <= 5 * 60)
+        ))
+        return (user_input.data.start_ts >= trip_obj.data.start_ts and
+            (user_input.data.end_ts <= trip_obj.data.end_ts or
+            ((user_input.data.end_ts - trip_obj.data.end_ts) <= 5 * 60)))
+    return curried
+
+def final_candidate(trip_obj, potential_candidates):
+    potential_candidate_objects = [ecwe.Entry(c) for c in potential_candidates]
+    extra_filtered_potential_candidates = list(filter(valid_user_input(trip_obj), potential_candidate_objects))
+    if len(extra_filtered_potential_candidates) == 0:
+        return None
+
+    sorted_pc = sorted(extra_filtered_potential_candidates, key=lambda c:c["metadata"]["write_ts"])
+    most_recent_entry = extra_filtered_potential_candidates[-1]
+    logging.debug("most recent entry has id %s" % most_recent_entry)
+    logging.debug("and is mapped to entry %s" % most_recent_entry)
+    return most_recent_entry
+
 def get_user_input_for_trip_object(ts, trip_obj, user_input_key):
     tq = estt.TimeQuery("data.start_ts", trip_obj.data.start_ts, trip_obj.data.end_ts)
     # In general, all candiates will have the same start_ts, so no point in
     # sorting by it. Only exception to general rule is when user first provides
     # input before the pipeline is run, and then overwrites after pipeline is
     # run
-    potential_candidates = ts.get_data_df(user_input_key, tq)
-    if len(potential_candidates) == 0:
-        return None
-
-    sorted_pc = potential_candidates.sort_values(by="metadata_write_ts")
-    most_recent_entry_id = potential_candidates._id.iloc[-1]
-    logging.debug("most recent entry has id %s" % most_recent_entry_id)
-    ret_val = ts.get_entry_from_id(user_input_key, most_recent_entry_id)
-    logging.debug("and is mapped to entry %s" % ret_val)
-    return ret_val
+    potential_candidates = ts.find_entries([user_input_key], tq)
+    return final_candidate(trip_obj, potential_candidates)
 
 # This is almost an exact copy of get_user_input_for_trip_object, but it
 # retrieves an interable instead of a dataframe. So almost everything is
@@ -100,10 +127,4 @@ def get_user_input_for_trip_object(ts, trip_obj, user_input_key):
 def get_user_input_from_cache_series(user_id, trip_obj, user_input_key):
     tq = estt.TimeQuery("data.start_ts", trip_obj.data.start_ts, trip_obj.data.end_ts)
     potential_candidates = estsc.find_entries(user_id, [user_input_key], tq)
-    if len(potential_candidates) == 0:
-        return None
-    sorted_pc = sorted(potential_candidates, key=lambda c:c["metadata"]["write_ts"])
-    most_recent_entry = potential_candidates[-1]
-    logging.debug("most recent entry has id %s" % most_recent_entry["_id"])
-    logging.debug("and is mapped to entry %s" % most_recent_entry)
-    return ecwe.Entry(most_recent_entry)
+    return final_candidate(trip_obj, potential_candidates)
