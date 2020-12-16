@@ -113,6 +113,7 @@ class TestTripQueries(unittest.TestCase):
         new_mc = ecul.Userlabel()
         new_mc["start_ts"] = new_trip.data.start_ts + 1
         new_mc["end_ts"] = new_trip.data.end_ts + 1
+        new_mc["label"] = "pogo_sticking"
         ts = esta.TimeSeries.get_time_series(self.testUserId)
         ts.insert_data(self.testUserId, MODE_CONFIRM_KEY, new_mc) 
         
