@@ -119,7 +119,8 @@ def createAndFillUUID(testObj):
         testObj.testUUID = uuid.uuid4()
 
 def setupRealExample(testObj, dump_file):
-    logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
+    logging.info("Before loading from %s, timeseries db size = %s" %
+        (dump_file, edb.get_timeseries_db().estimated_document_count()))
     with open(dump_file) as dfp:
         testObj.entries = json.load(dfp, object_hook = bju.object_hook)
         createAndFillUUID(testObj)
@@ -163,6 +164,7 @@ def setupIncomingEntries():
 def runIntakePipeline(uuid):
     # Move these imports here so that we don't inadvertently load the modules,
     # and any related config modules, before we want to
+    import emission.analysis.userinput.matcher as eaum
     import emission.analysis.intake.cleaning.filter_accuracy as eaicf
     import emission.storage.timeseries.format_hacks.move_filter_field as estfm
     import emission.analysis.intake.segmentation.trip_segmentation as eaist
@@ -171,12 +173,14 @@ def runIntakePipeline(uuid):
     import emission.analysis.intake.cleaning.clean_and_resample as eaicr
     import emission.analysis.classification.inference.mode.pipeline as eacimp
 
+    eaum.match_incoming_user_inputs(uuid)
     eaicf.filter_accuracy(uuid)
     eaist.segment_current_trips(uuid)
     eaiss.segment_current_sections(uuid)
     eaicl.filter_current_sections(uuid)
     eaicr.clean_and_resample(uuid)
     eacimp.predict_mode(uuid)
+    eaum.create_confirmed_objects(uuid)
 
 def configLogging():
     """

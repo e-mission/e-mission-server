@@ -1,0 +1,920 @@
+[
+    {
+        "_id": {
+            "$oid": "5fd7b7bdf181cd8feb045f29"
+        },
+        "user_id": {
+            "$uuid": "1114befce2774cf89b9506dcbff3a52d"
+        },
+        "metadata": {
+            "key": "manual/mode_confirm",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1607970514.069,
+            "write_local_dt": {
+                "year": 2020,
+                "month": 12,
+                "day": 14,
+                "hour": 10,
+                "minute": 28,
+                "second": 34,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2020-12-14T10:28:34.069000-08:00"
+        },
+        "data": {
+            "start_ts": 1466436506.53,
+            "end_ts": 1466437492.486,
+            "label": "walk",
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 8,
+                "minute": 28,
+                "second": 26,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T08:28:26.530000-07:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 8,
+                "minute": 44,
+                "second": 52,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T08:44:52.486000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5fd7b7bdf181cd8feb045f2d"
+        },
+        "user_id": {
+            "$uuid": "1114befce2774cf89b9506dcbff3a52d"
+        },
+        "metadata": {
+            "key": "manual/mode_confirm",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1607970712.122,
+            "write_local_dt": {
+                "year": 2020,
+                "month": 12,
+                "day": 14,
+                "hour": 10,
+                "minute": 31,
+                "second": 52,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2020-12-14T10:31:52.122000-08:00"
+        },
+        "data": {
+            "start_ts": 1466466680.964,
+            "end_ts": 1466468087.626,
+            "label": "shared_ride",
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 16,
+                "minute": 51,
+                "second": 20,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T16:51:20.964000-07:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 17,
+                "minute": 14,
+                "second": 47,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T17:14:47.626000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5fd7b7bdf181cd8feb045f35"
+        },
+        "user_id": {
+            "$uuid": "1114befce2774cf89b9506dcbff3a52d"
+        },
+        "metadata": {
+            "key": "manual/mode_confirm",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1607970727.311,
+            "write_local_dt": {
+                "year": 2020,
+                "month": 12,
+                "day": 14,
+                "hour": 10,
+                "minute": 32,
+                "second": 7,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2020-12-14T10:32:07.311000-08:00"
+        },
+        "data": {
+            "start_ts": 1466466680.964,
+            "end_ts": 1466468087.626,
+            "label": "drove_alone",
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 16,
+                "minute": 51,
+                "second": 20,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T16:51:20.964000-07:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 17,
+                "minute": 14,
+                "second": 47,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T17:14:47.626000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5fd7b7bdf181cd8feb045f37"
+        },
+        "user_id": {
+            "$uuid": "1114befce2774cf89b9506dcbff3a52d"
+        },
+        "metadata": {
+            "key": "manual/mode_confirm",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1607970729.493,
+            "write_local_dt": {
+                "year": 2020,
+                "month": 12,
+                "day": 14,
+                "hour": 10,
+                "minute": 32,
+                "second": 9,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2020-12-14T10:32:09.493000-08:00"
+        },
+        "data": {
+            "start_ts": 1466466680.964,
+            "end_ts": 1466468087.626,
+            "label": "shared_ride",
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 16,
+                "minute": 51,
+                "second": 20,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T16:51:20.964000-07:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 17,
+                "minute": 14,
+                "second": 47,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T17:14:47.626000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5fd7b7bdf181cd8feb045f39"
+        },
+        "user_id": {
+            "$uuid": "1114befce2774cf89b9506dcbff3a52d"
+        },
+        "metadata": {
+            "key": "manual/mode_confirm",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1607972439.757,
+            "write_local_dt": {
+                "year": 2020,
+                "month": 12,
+                "day": 14,
+                "hour": 11,
+                "minute": 0,
+                "second": 39,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2020-12-14T11:00:39.757000-08:00"
+        },
+        "data": {
+            "start_ts": 1466462052.158904,
+            "end_ts": 1466462452.708,
+            "label": "free_shuttle",
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 15,
+                "minute": 34,
+                "second": 12,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T15:34:12.158904-07:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 15,
+                "minute": 40,
+                "second": 52,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T15:40:52.708000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5fd7b7bdf181cd8feb045f3f"
+        },
+        "user_id": {
+            "$uuid": "1114befce2774cf89b9506dcbff3a52d"
+        },
+        "metadata": {
+            "key": "manual/mode_confirm",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1607972461.225,
+            "write_local_dt": {
+                "year": 2020,
+                "month": 12,
+                "day": 14,
+                "hour": 11,
+                "minute": 1,
+                "second": 1,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2020-12-14T11:01:01.225000-08:00"
+        },
+        "data": {
+            "start_ts": 1466462052.158904,
+            "end_ts": 1466462452.708,
+            "label": "bus",
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 15,
+                "minute": 34,
+                "second": 12,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T15:34:12.158904-07:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 15,
+                "minute": 40,
+                "second": 52,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T15:40:52.708000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5fd7b7bdf181cd8feb045f41"
+        },
+        "user_id": {
+            "$uuid": "1114befce2774cf89b9506dcbff3a52d"
+        },
+        "metadata": {
+            "key": "manual/mode_confirm",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1607972464.372,
+            "write_local_dt": {
+                "year": 2020,
+                "month": 12,
+                "day": 14,
+                "hour": 11,
+                "minute": 1,
+                "second": 4,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2020-12-14T11:01:04.372000-08:00"
+        },
+        "data": {
+            "start_ts": 1466462052.158904,
+            "end_ts": 1466462452.708,
+            "label": "walk",
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 15,
+                "minute": 34,
+                "second": 12,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T15:34:12.158904-07:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 15,
+                "minute": 40,
+                "second": 52,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T15:40:52.708000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5fd7b7bdf181cd8feb045f43"
+        },
+        "user_id": {
+            "$uuid": "1114befce2774cf89b9506dcbff3a52d"
+        },
+        "metadata": {
+            "key": "manual/mode_confirm",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1607972631.351,
+            "write_local_dt": {
+                "year": 2020,
+                "month": 12,
+                "day": 14,
+                "hour": 11,
+                "minute": 3,
+                "second": 51,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2020-12-14T11:03:51.351000-08:00"
+        },
+        "data": {
+            "start_ts": 1466463028.216,
+            "end_ts": 1466464013.985,
+            "label": "taxi",
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 15,
+                "minute": 50,
+                "second": 28,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T15:50:28.216000-07:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 16,
+                "minute": 6,
+                "second": 53,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T16:06:53.985000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5fd7b7bdf181cd8feb045f47"
+        },
+        "user_id": {
+            "$uuid": "1114befce2774cf89b9506dcbff3a52d"
+        },
+        "metadata": {
+            "key": "manual/mode_confirm",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1607972700.068,
+            "write_local_dt": {
+                "year": 2020,
+                "month": 12,
+                "day": 14,
+                "hour": 11,
+                "minute": 5,
+                "second": 0,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2020-12-14T11:05:00.068000-08:00"
+        },
+        "data": {
+            "start_ts": 1466462970.2807262,
+            "end_ts": 1466463835.713,
+            "label": "shared_ride",
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 15,
+                "minute": 49,
+                "second": 30,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T15:49:30.280726-07:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 16,
+                "minute": 3,
+                "second": 55,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T16:03:55.713000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5fd7b7bdf181cd8feb045f2b"
+        },
+        "user_id": {
+            "$uuid": "1114befce2774cf89b9506dcbff3a52d"
+        },
+        "metadata": {
+            "key": "manual/purpose_confirm",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1607970529.123,
+            "write_local_dt": {
+                "year": 2020,
+                "month": 12,
+                "day": 14,
+                "hour": 10,
+                "minute": 28,
+                "second": 49,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2020-12-14T10:28:49.123000-08:00"
+        },
+        "data": {
+            "start_ts": 1466436506.53,
+            "end_ts": 1466437492.486,
+            "label": "library",
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 8,
+                "minute": 28,
+                "second": 26,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T08:28:26.530000-07:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 8,
+                "minute": 44,
+                "second": 52,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T08:44:52.486000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5fd7b7bdf181cd8feb045f2f"
+        },
+        "user_id": {
+            "$uuid": "1114befce2774cf89b9506dcbff3a52d"
+        },
+        "metadata": {
+            "key": "manual/purpose_confirm",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1607970716.731,
+            "write_local_dt": {
+                "year": 2020,
+                "month": 12,
+                "day": 14,
+                "hour": 10,
+                "minute": 31,
+                "second": 56,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2020-12-14T10:31:56.731000-08:00"
+        },
+        "data": {
+            "start_ts": 1466466680.964,
+            "end_ts": 1466468087.626,
+            "label": "home",
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 16,
+                "minute": 51,
+                "second": 20,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T16:51:20.964000-07:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 17,
+                "minute": 14,
+                "second": 47,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T17:14:47.626000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5fd7b7bdf181cd8feb045f31"
+        },
+        "user_id": {
+            "$uuid": "1114befce2774cf89b9506dcbff3a52d"
+        },
+        "metadata": {
+            "key": "manual/purpose_confirm",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1607970720.79,
+            "write_local_dt": {
+                "year": 2020,
+                "month": 12,
+                "day": 14,
+                "hour": 10,
+                "minute": 32,
+                "second": 0,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2020-12-14T10:32:00.790000-08:00"
+        },
+        "data": {
+            "start_ts": 1466466680.964,
+            "end_ts": 1466468087.626,
+            "label": "shopping",
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 16,
+                "minute": 51,
+                "second": 20,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T16:51:20.964000-07:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 17,
+                "minute": 14,
+                "second": 47,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T17:14:47.626000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5fd7b7bdf181cd8feb045f33"
+        },
+        "user_id": {
+            "$uuid": "1114befce2774cf89b9506dcbff3a52d"
+        },
+        "metadata": {
+            "key": "manual/purpose_confirm",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1607970724.14,
+            "write_local_dt": {
+                "year": 2020,
+                "month": 12,
+                "day": 14,
+                "hour": 10,
+                "minute": 32,
+                "second": 4,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2020-12-14T10:32:04.140000-08:00"
+        },
+        "data": {
+            "start_ts": 1466466680.964,
+            "end_ts": 1466468087.626,
+            "label": "home",
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 16,
+                "minute": 51,
+                "second": 20,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T16:51:20.964000-07:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 17,
+                "minute": 14,
+                "second": 47,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T17:14:47.626000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5fd7b7bdf181cd8feb045f3b"
+        },
+        "user_id": {
+            "$uuid": "1114befce2774cf89b9506dcbff3a52d"
+        },
+        "metadata": {
+            "key": "manual/purpose_confirm",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1607972445.489,
+            "write_local_dt": {
+                "year": 2020,
+                "month": 12,
+                "day": 14,
+                "hour": 11,
+                "minute": 0,
+                "second": 45,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2020-12-14T11:00:45.489000-08:00"
+        },
+        "data": {
+            "start_ts": 1466462052.158904,
+            "end_ts": 1466462452.708,
+            "label": "transit_transfer",
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 15,
+                "minute": 34,
+                "second": 12,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T15:34:12.158904-07:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 15,
+                "minute": 40,
+                "second": 52,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T15:40:52.708000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5fd7b7bdf181cd8feb045f3d"
+        },
+        "user_id": {
+            "$uuid": "1114befce2774cf89b9506dcbff3a52d"
+        },
+        "metadata": {
+            "key": "manual/purpose_confirm",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1607972448.716,
+            "write_local_dt": {
+                "year": 2020,
+                "month": 12,
+                "day": 14,
+                "hour": 11,
+                "minute": 0,
+                "second": 48,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2020-12-14T11:00:48.716000-08:00"
+        },
+        "data": {
+            "start_ts": 1466462052.158904,
+            "end_ts": 1466462452.708,
+            "label": "home",
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 15,
+                "minute": 34,
+                "second": 12,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T15:34:12.158904-07:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 15,
+                "minute": 40,
+                "second": 52,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T15:40:52.708000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5fd7b7bdf181cd8feb045f45"
+        },
+        "user_id": {
+            "$uuid": "1114befce2774cf89b9506dcbff3a52d"
+        },
+        "metadata": {
+            "key": "manual/purpose_confirm",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1607972639.249,
+            "write_local_dt": {
+                "year": 2020,
+                "month": 12,
+                "day": 14,
+                "hour": 11,
+                "minute": 3,
+                "second": 59,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2020-12-14T11:03:59.249000-08:00"
+        },
+        "data": {
+            "start_ts": 1466463028.216,
+            "end_ts": 1466464013.985,
+            "label": "religious",
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 15,
+                "minute": 50,
+                "second": 28,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T15:50:28.216000-07:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 16,
+                "minute": 6,
+                "second": 53,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T16:06:53.985000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "5fd7b7bdf181cd8feb045f49"
+        },
+        "user_id": {
+            "$uuid": "1114befce2774cf89b9506dcbff3a52d"
+        },
+        "metadata": {
+            "key": "manual/purpose_confirm",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1607972709.426,
+            "write_local_dt": {
+                "year": 2020,
+                "month": 12,
+                "day": 14,
+                "hour": 11,
+                "minute": 5,
+                "second": 9,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2020-12-14T11:05:09.426000-08:00"
+        },
+        "data": {
+            "start_ts": 1466462970.2807262,
+            "end_ts": 1466463835.713,
+            "label": "karate",
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 15,
+                "minute": 49,
+                "second": 30,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T15:49:30.280726-07:00",
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 16,
+                "minute": 3,
+                "second": 55,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T16:03:55.713000-07:00"
+        }
+    }
+]

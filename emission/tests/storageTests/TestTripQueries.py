@@ -13,6 +13,7 @@ import uuid
 import json
 import bson.json_util as bju
 import numpy as np
+import copy
 
 # Our imports
 import emission.storage.decorations.trip_queries as esdt
@@ -40,6 +41,7 @@ class TestTripQueries(unittest.TestCase):
     
     def tearDown(self):
         edb.get_analysis_timeseries_db().delete_many({'user_id': self.testUserId})
+        edb.get_timeseries_db().delete_many({'user_id': self.testUserId})
         edb.get_usercache_db().delete_many({'user_id': self.testUserId})
 
     def create_fake_trip(self):
@@ -112,6 +114,7 @@ class TestTripQueries(unittest.TestCase):
         new_mc = ecul.Userlabel()
         new_mc["start_ts"] = new_trip.data.start_ts + 1
         new_mc["end_ts"] = new_trip.data.end_ts + 1
+        new_mc["label"] = "pogo_sticking"
         ts = esta.TimeSeries.get_time_series(self.testUserId)
         ts.insert_data(self.testUserId, MODE_CONFIRM_KEY, new_mc) 
         
@@ -222,15 +225,64 @@ class TestTripQueries(unittest.TestCase):
         pc_label_list = []
         for trip_id in ct_df._id:
             mc = esdt.get_user_input_for_trip(esda.CLEANED_TRIP_KEY,
-                        self.testUserId, ct_df._id[0], "manual/mode_confirm")
+                        self.testUserId, trip_id, "manual/mode_confirm")
             mc_label_list.append(mc.data.label)
 
             pc = esdt.get_user_input_for_trip(esda.CLEANED_TRIP_KEY,
-                        self.testUserId, ct_df._id[0], "manual/purpose_confirm")
+                        self.testUserId, trip_id, "manual/purpose_confirm")
             pc_label_list.append(pc.data.label)
 
         self.assertEqual(mc_label_list, 4 * ['bike'])
         self.assertEqual(pc_label_list, 4 * ['pick_drop'])
+
+    def testUserInputRealDataPostArrival(self):
+        np.random.seed(61297777)
+        dataFile = "emission/tests/data/real_examples/shankari_single_positional_indexer.dec-12"
+        etc.setupRealExample(self, dataFile)
+        self.testUserId = self.testUUID
+        # At this point, we have only raw data, no trips
+        etc.runIntakePipeline(self.testUUID)
+        # At this point, we have trips
+
+        # Let's retrieve them
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        ct_df = ts.get_data_df("analysis/confirmed_trip", time_query=None)
+        self.assertEqual(len(ct_df), 4)
+        mode_fmt_times = list(ct_df.start_fmt_time)
+        # corresponds to the walk not a trip
+        # https://github.com/e-mission/e-mission-docs/issues/476#issuecomment-747115640)
+        mode_fmt_times.insert(3, None)
+        purpose_fmt_times = copy.copy(mode_fmt_times)
+        # corresponds to overrides for the same trip
+        # they are correctly matched to the same trip
+        # in the final pipeline step, will override the same entry multiple times
+        purpose_fmt_times.insert(3, purpose_fmt_times[1])
+        purpose_fmt_times.insert(4, purpose_fmt_times[0])
+        print("expected_fmt_times: mode = %s" % mode_fmt_times)
+        print("expected_fmt_times: purpose = %s" % purpose_fmt_times)
+
+        # Now, let's load the mode_confirm and purpose_confirm objects
+        with open("emission/tests/data/real_examples/shankari_single_positional_indexer.dec-12.mode_confirm") as mcfp:
+            mode_confirm_list = [ecwe.Entry(mc) for mc in json.load(mcfp, object_hook=bju.object_hook)]
+        self.assertEqual(len(mode_confirm_list), 5)
+
+        with open("emission/tests/data/real_examples/shankari_single_positional_indexer.dec-12.purpose_confirm") as pcfp:
+            purpose_confirm_list = [ecwe.Entry(pc) for pc in json.load(pcfp, object_hook=bju.object_hook)]
+        self.assertEqual(len(purpose_confirm_list), 7)
+
+        mc_trip_start_fmt_time_list = []
+        pc_trip_start_fmt_time_list = []
+        for mode in mode_confirm_list:
+            mc_trip = esdt.get_trip_for_user_input_obj(ts, mode)
+            mc_trip_start_fmt_time_list.append(mc_trip.data.start_fmt_time if mc_trip is not None else None)
+
+        for purpose in purpose_confirm_list:
+            pc_trip = esdt.get_trip_for_user_input_obj(ts, purpose)
+            print("Found pc_trip %s" % pc_trip.data.start_fmt_time if pc_trip is not None else None)
+            pc_trip_start_fmt_time_list.append(pc_trip.data.start_fmt_time if pc_trip is not None else None)
+
+        self.assertEqual(mc_trip_start_fmt_time_list, mode_fmt_times)
+        self.assertEqual(pc_trip_start_fmt_time_list, purpose_fmt_times)
 
 if __name__ == '__main__':
     import emission.tests.common as etc
