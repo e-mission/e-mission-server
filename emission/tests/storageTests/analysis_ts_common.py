@@ -21,7 +21,9 @@ import emission.core.get_database as edb
 def createNewTripLike(utest, key, wrapper):
     new_trip = wrapper()
     new_trip.start_ts = 5
+    new_trip.start_fmt_time = "5 secs"
     new_trip.end_ts = 6
+    new_trip.end_fmt_time = "6 secs"
     new_trip_id = esta.TimeSeries.get_time_series(utest.testUserId).insert_data(
         utest.testUserId, key, new_trip)
     new_trip_entry = esta.TimeSeries.get_time_series(utest.testUserId).get_entry_from_id(
