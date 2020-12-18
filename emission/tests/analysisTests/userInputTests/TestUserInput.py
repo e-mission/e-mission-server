@@ -132,13 +132,13 @@ class TestUserInput(unittest.TestCase):
         ld = ecwl.LocalDate({'year': 2016, 'month': 6, 'day': 20})
         self.checkConfirmedTripsAndSections(dataFile, ld, preload=True)
 
-#     def testJun20Postload(self):
-#         # Same as testJun20Preload, except that the user input arrives after the
-#         # pipeline is run for the first time, and the matching happens on the
-#         # next pipeline run
-#         dataFile = "emission/tests/data/real_examples/shankari_2016-06-20"
-#         ld = ecwl.LocalDate({'year': 2016, 'month': 6, 'day': 20})
-#         self.checkConfirmedTripsAndSections(dataFile, ld, preload=False)
+    def testJun20Postload(self):
+        # Same as testJun20Preload, except that the user input arrives after the
+        # pipeline is run for the first time, and the matching happens on the
+        # next pipeline run
+        dataFile = "emission/tests/data/real_examples/shankari_2016-06-20"
+        ld = ecwl.LocalDate({'year': 2016, 'month': 6, 'day': 20})
+        self.checkConfirmedTripsAndSections(dataFile, ld, preload=False)
 
 if __name__ == '__main__':
     etc.configLogging()

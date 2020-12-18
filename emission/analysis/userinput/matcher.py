@@ -10,10 +10,43 @@ import emission.storage.decorations.trip_queries as esdt
 import emission.storage.pipeline_queries as epq
 import emission.core.wrapper.entry as ecwe
 
+obj_to_dict_key = lambda key: key.split("/")[1]
+
 def match_incoming_user_inputs(user_id):
     time_query = epq.get_time_range_for_incoming_userinput_match(user_id)
-    print("this is currently a no-op")
-    epq.mark_incoming_userinput_match_done(user_id, None)
+    try:
+        last_user_input_done = match_incoming_inputs(user_id, time_query)
+        if last_user_input_done is None:
+            logging.debug("after run, last_user_input_done == None, must be early return")
+            epq.mark_incoming_userinput_match_done(user_id, None)
+        else:
+            epq.mark_incoming_userinput_match_done(user_id, last_user_input_done.metadata.write_ts)
+    except:
+        logging.exception("Error while matching incoming user inputs, timestamp is unchanged")
+        epq.mark_incoming_userinput_match_failed(user_id)
+
+def match_incoming_inputs(user_id, timerange):
+    ts = esta.TimeSeries.get_time_series(user_id)
+    input_key_list = eac.get_config()["userinput.keylist"]
+    toMatchInputs = [ecwe.Entry(e) for e in ts.find_entries(input_key_list, time_query=timerange)]
+    logging.debug("Matching %d inputs to trips" % len(toMatchInputs))
+    lastInputProcessed = None
+    if len(toMatchInputs) == 0:
+        logging.debug("len(toMatchInputs) == 0, early return")
+        return None
+    for ui in toMatchInputs:
+        confirmed_trip = esdt.get_trip_for_user_input_obj(ts, ui)
+        if confirmed_trip is not None:
+            input_name = obj_to_dict_key(ui.metadata.key)
+            confirmed_trip["data"]["user_input"][input_name] = ui.data.label
+            import emission.storage.timeseries.builtin_timeseries as estbt
+            estbt.BuiltinTimeSeries.update(confirmed_trip)
+        else:
+            logging.warn("No match found for user input %s, moving forward anyway" % ui)
+        lastInputProcessed = ui
+
+    return lastInputProcessed
+
 
 def create_confirmed_objects(user_id):
     time_query = epq.get_time_range_for_confirmed_object_creation(user_id)
@@ -59,7 +92,7 @@ def get_user_input_dict(ts, tct, input_key_list):
     for ikey in input_key_list:
         matched_userinput = esdt.get_user_input_for_trip_object(ts, tct, ikey)
         if matched_userinput is not None:
-            ikey_name = ikey.split("/")[1]
+            ikey_name = obj_to_dict_key(ikey)
             tct_userinput[ikey_name] = matched_userinput.data.label
     logging.debug("for trip %s, returning user input dict %s" % (tct.get_id(), tct_userinput))
     return tct_userinput

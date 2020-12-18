@@ -146,7 +146,7 @@ def final_candidate(filter_fn, potential_candidates):
     sorted_pc = sorted(extra_filtered_potential_candidates, key=lambda c:c["metadata"]["write_ts"])
     entry_detail = lambda c: c.data.label if "label" in c.data else c.data.start_fmt_time
     logging.debug("sorted candidates are %s" %
-        [(c.metadata.write_fmt_time, entry_detail(c)) for c in sorted_pc])
+        [{"write_fmt_time": c.metadata.write_fmt_time, "detail": entry_detail(c)} for c in sorted_pc])
     most_recent_entry = sorted_pc[-1]
     logging.debug("most recent entry is %s, %s" %
         (most_recent_entry.metadata.write_fmt_time, entry_detail(most_recent_entry)))
