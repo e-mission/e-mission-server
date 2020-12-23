@@ -2,3 +2,18 @@
 	padding-bottom: 50px;
 }
 
+.video_box{
+    position: relative;
+    float:left;
+}
+.video_overlays {
+    position:absolute;
+    float:left;
+    background-color: rgba(255, 153, 0, 0.5);
+    text-align: center;
+    top: 300px;
+    color: #FFF; 
+    width:350px;
+    min-height:10x;
+    z-index:300000;
+}
