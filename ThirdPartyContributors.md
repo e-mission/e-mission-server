@@ -12,5 +12,5 @@ Corporation (SRC) program sponsored by DARPA.
 
 Contributions owned by their respective contributors.
 
-This project would not be possible without [contributors](graphs/contributors)
-(code, documentation, issues, ideas) from across the world. Thank you!
+This project would not be possible without contributors (code, documentation,
+issues, ideas) from across the world. Thank you!
