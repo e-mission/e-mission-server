@@ -145,7 +145,7 @@ class TierSys:
         #     raise Exception("No users in DB")
         for index, row in all_users.iterrows():
             user_id = row['uuid']
-            val = self.computeCarbon(user_id, last_ts)
+            val = User.computeConfirmed(user_id)[0]
             if val != None:
                 try:
                     user_carbon_map[user_id] = val
@@ -155,7 +155,7 @@ class TierSys:
         logging.debug('USER CARBON MAP')
         logging.debug(user_carbon_map)
         # Sort and partition users by carbon metric.
-        user_carbon_tuples_sorted = sorted(user_carbon_map.items(), key=lambda kv: kv[1]) # Sorted list by value of dict tuples.
+        user_carbon_tuples_sorted = sorted(user_carbon_map.items(), key=lambda kv: kv[1], reverse=True) # Sorted list by value of dict tuples.
         logging.debug('USER CARBON TUPLES SORTED')
         logging.debug(user_carbon_tuples_sorted)
         user_carbon_sorted = [i[0] for i in user_carbon_tuples_sorted] # Extract only the user ids.
@@ -231,6 +231,7 @@ class TierSys:
                 carbonLWP = User.computeCarbon(uuid, last_ts, curr_ts)
                 carbonLWU = None
                 carbonLWUR = None
+                (confirmedPct, invalid_replacement_pct) = User.computeConfirmed(uuid)
 
                 if userCarbonRaw != None:
                     carbonLWU = userCarbonRaw[0]
@@ -240,7 +241,8 @@ class TierSys:
                                 'carbonLWP': carbonLWP, 'carbonLWUR': carbonLWUR}
 
                 carbonDB['users'].append(userStats)
-                users.append({'uuid': uuid, 'lastWeekCarbon': carbonLWP})
+                users.append({'uuid': uuid, 'lastWeekCarbon': carbonLWP,
+                    'confirmedPct': confirmedPct, 'invalidReplacePct': invalid_replacement_pct})
             ts.append({'rank': i + 1, 'users': users})
 
             #users = [{'uuid': uuid, 'lastWeekCarbon': User.computeCarbon(uuid, last_ts, curr_ts)} for uuid in self.tiers[i]]

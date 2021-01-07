@@ -354,16 +354,22 @@ def getListOfUsers():
     index = tier['rank'] - 1
     curr_tier = tierUsernames[index]
     for user in tier['users']:
+        print(user)
         uuid = user['uuid']
         username = User.getUsername(uuid)
-        carbon = user['lastWeekCarbon'] * 1000
+        carbonLWP = user['lastWeekCarbon']
+        carbon = carbonLWP * 1000 if carbonLWP is not None else "Unknown"
         if username == None:
-            result = {'uuid': uuid, 'carbonLastWeek': carbon}
+            result = {'uuid': uuid, 'carbonLastWeek': carbon,
+                'confirmedPct': user['confirmedPct'],
+                'invalidReplacePct': user['invalidReplacePct']}
             curr_tier.append(result)
         else:
-            result = {'username': username, 'carbonLastWeek': carbon}
+            result = {'uuid': uuid, 'username': username, 'carbonLastWeek': carbon,
+                'confirmedPct': user['confirmedPct'],
+                'invalidReplacePct': user['invalidReplacePct']}
             curr_tier.append(result)
-  return {'tiers' : tierUsernames}
+  return {'me': user_id, 'tiers' : tierUsernames}
 
 @post('/getListOfUsersInUsersTier')
 def getListOfUsersInUsersTier():

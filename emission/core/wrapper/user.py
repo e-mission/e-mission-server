@@ -313,6 +313,35 @@ class User(object):
     return deltaCarbon + 0.5
 
   @staticmethod
+  def computeConfirmed(user_id):
+    """
+    Computers carbon metric for specified user.
+    Formula is (Actual CO2 + penalty) / distance travelled
+    """
+    ts = esta.TimeSeries.get_time_series(user_id)
+
+    ct_df = ts.get_data_df("analysis/confirmed_trip", time_query=None)
+    if ct_df.shape[0] <= 0:
+      return 0
+    ct_df_confirmed = ct_df[ct_df.user_input != {}]
+    confirmed_pct = (ct_df_confirmed.shape[0] * 100)/ ct_df.shape[0]
+    if ct_df_confirmed.shape[0] <= 0:
+        invalid_replacement_pct = None
+    else:
+        invalid_replacement = ct_df_confirmed.user_input.apply(lambda ui: ui["mode_confirm"] == "pilot_ebike" and (ui["replaced_mode"] == "pilot_ebike" or ui["replaced_mode"] == "same_mode")).value_counts()
+        invalid_replacement_freq = invalid_replacement.value_counts()
+        print(invalid_replacement_freq.count())
+        if invalid_replacement_freq.count() == 1:
+            # all true or all false
+            if True in invalid_replacement_freq:
+                invalid_replacement_pct = 100
+            else:
+                invalid_replacement_pct = 0
+        else:
+            invalid_replacement_pct = invalid_replacement_freq[True] / invalid_replacement.count()
+    return (confirmed_pct, invalid_replacement_pct)
+
+  @staticmethod
   def computeCarbon(user_id, last_ts, curr_ts):
     """
     Computers carbon metric for specified user.
