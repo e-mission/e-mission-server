@@ -322,15 +322,15 @@ class User(object):
 
     ct_df = ts.get_data_df("analysis/confirmed_trip", time_query=None)
     if ct_df.shape[0] <= 0:
-      return 0
+      return (0, None)
     ct_df_confirmed = ct_df[ct_df.user_input != {}]
     confirmed_pct = (ct_df_confirmed.shape[0] * 100)/ ct_df.shape[0]
     if ct_df_confirmed.shape[0] <= 0:
         invalid_replacement_pct = None
     else:
-        invalid_replacement = ct_df_confirmed.user_input.apply(lambda ui: ui["mode_confirm"] == "pilot_ebike" and (ui["replaced_mode"] == "pilot_ebike" or ui["replaced_mode"] == "same_mode")).value_counts()
+        invalid_replacement = ct_df_confirmed.user_input.apply(lambda ui: ui["mode_confirm"] == "pilot_ebike" and ("replaced_mode" not in ui or ui["replaced_mode"] == "pilot_ebike" or ui["replaced_mode"] == "same_mode"))
         invalid_replacement_freq = invalid_replacement.value_counts()
-        print(invalid_replacement_freq.count())
+        print(invalid_replacement_freq)
         if invalid_replacement_freq.count() == 1:
             # all true or all false
             if True in invalid_replacement_freq:
