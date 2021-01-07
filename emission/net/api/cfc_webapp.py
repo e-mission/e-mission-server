@@ -348,13 +348,11 @@ def getListOfUsers():
   userTiers = TierSys.getLatest()[0]['tiers']
   logging.debug('TierSys: %s' %TierSys.getLatest()[0])
   tierUsernames = [[], [], []]
-  logging.debug(userTiers)
   for tier in userTiers:
     logging.debug('TIER: %s' %tier)
     index = tier['rank'] - 1
     curr_tier = tierUsernames[index]
     for user in tier['users']:
-        print(user)
         uuid = user['uuid']
         username = User.getUsername(uuid)
         carbonLWP = user['lastWeekCarbon']
