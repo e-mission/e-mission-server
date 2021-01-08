@@ -338,7 +338,7 @@ class User(object):
             else:
                 invalid_replacement_pct = 0
         else:
-            invalid_replacement_pct = invalid_replacement_freq[True] / invalid_replacement.count()
+            invalid_replacement_pct = (invalid_replacement_freq[True] * 100)/ invalid_replacement.count()
     return (confirmed_pct, invalid_replacement_pct)
 
   @staticmethod
