@@ -150,6 +150,7 @@ class TierSys:
         user_carbon_map = {} # Map from user_id to carbon val.
         all_users = pd.DataFrame(list(edb.get_uuid_db().find({}, {"uuid": 1, "_id": 0})))
         num_users = all_users.shape[0]
+        logging.debug("Processing %d users " % (num_users))
         # if num_users <= 0:
         #     raise Exception("No users in DB")
         for index, row in all_users.iterrows():
@@ -161,16 +162,19 @@ class TierSys:
                 except:
                     logging.debug("Failed to get client in TierSys")
                     continue
+            else:
+                logging.debug("No value found, skipping")
         logging.debug('USER CARBON MAP')
         logging.debug(user_carbon_map)
         # Sort and partition users by carbon metric.
         user_carbon_tuples_sorted = sorted(user_carbon_map.items(), key=lambda kv: kv[1], reverse=True) # Sorted list by value of dict tuples.
         logging.debug('USER CARBON TUPLES SORTED')
         logging.debug(user_carbon_tuples_sorted)
-        # user_carbon_sorted = [i[0] for i in user_carbon_tuples_sorted] # Extract only the user ids.
-        split_tier_tuples = self.divideIntoEligibleOrNot(user_carbon_tuples_sorted, n)
-        return [[i[0] for i in split_tier_tuples[0]],
-                [i[0] for i in split_tier_tuples[1]]]
+        user_carbon_sorted = [i[0] for i in user_carbon_tuples_sorted] # Extract only the user ids.
+        return self.divideIntoBuckets(user_carbon_sorted, n)
+        # split_tier_tuples = self.divideIntoEligibleOrNot(user_carbon_tuples_sorted, n)
+        # return [[i[0] for i in split_tier_tuples[0]],
+        #         [i[0] for i in split_tier_tuples[1]]]
 
     def computeCarbon(self, user_id, last_ts):
         """
