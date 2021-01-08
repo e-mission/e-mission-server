@@ -343,7 +343,7 @@ class User(object):
         # multiply the two pcts to get an overall "probability"
         # but since they are percents instead of ratios, need to divide by 100
         score = (confirmed_pct * valid_replacement_pct) / 100
-    return (confirmed_pct, valid_replacement_pct)
+    return (confirmed_pct, valid_replacement_pct, score)
 
   @staticmethod
   def computeCarbon(user_id, last_ts, curr_ts):
