@@ -326,7 +326,7 @@ class User(object):
     ct_df_confirmed = ct_df[ct_df.user_input != {}]
     confirmed_pct = (ct_df_confirmed.shape[0] * 100)/ ct_df.shape[0]
     if ct_df_confirmed.shape[0] <= 0:
-        invalid_replacement_pct = None
+        valid_replacement_pct = None
     else:
         invalid_replacement = ct_df_confirmed.user_input.apply(lambda ui: ui["mode_confirm"] == "pilot_ebike" and ("replaced_mode" not in ui or ui["replaced_mode"] == "pilot_ebike" or ui["replaced_mode"] == "same_mode"))
         invalid_replacement_freq = invalid_replacement.value_counts()
@@ -334,12 +334,12 @@ class User(object):
         if invalid_replacement_freq.count() == 1:
             # all true or all false
             if True in invalid_replacement_freq:
-                invalid_replacement_pct = 100
+                valid_replacement_pct = 0
             else:
-                invalid_replacement_pct = 0
+                valid_replacement_pct = 100
         else:
-            invalid_replacement_pct = (invalid_replacement_freq[True] * 100)/ invalid_replacement.count()
-    return (confirmed_pct, invalid_replacement_pct)
+            valid_replacement_pct = (invalid_replacement_freq[False] * 100)/ invalid_replacement.count()
+    return (confirmed_pct, valid_replacement_pct)
 
   @staticmethod
   def computeCarbon(user_id, last_ts, curr_ts):

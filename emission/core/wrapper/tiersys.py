@@ -231,7 +231,7 @@ class TierSys:
                 carbonLWP = User.computeCarbon(uuid, last_ts, curr_ts)
                 carbonLWU = None
                 carbonLWUR = None
-                (confirmedPct, invalid_replacement_pct) = User.computeConfirmed(uuid)
+                (confirmedPct, valid_replacement_pct) = User.computeConfirmed(uuid)
 
                 if userCarbonRaw != None:
                     carbonLWU = userCarbonRaw[0]
@@ -242,7 +242,7 @@ class TierSys:
 
                 carbonDB['users'].append(userStats)
                 users.append({'uuid': uuid, 'lastWeekCarbon': carbonLWP,
-                    'confirmedPct': confirmedPct, 'invalidReplacePct': invalid_replacement_pct})
+                    'confirmedPct': confirmedPct, 'validReplacePct': valid_replacement_pct})
             ts.append({'rank': i + 1, 'users': users})
 
             #users = [{'uuid': uuid, 'lastWeekCarbon': User.computeCarbon(uuid, last_ts, curr_ts)} for uuid in self.tiers[i]]

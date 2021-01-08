@@ -360,12 +360,12 @@ def getListOfUsers():
         if username == None:
             result = {'uuid': uuid, 'carbonLastWeek': carbon,
                 'confirmedPct': user['confirmedPct'],
-                'invalidReplacePct': user['invalidReplacePct']}
+                'validReplacePct': user['validReplacePct']}
             curr_tier.append(result)
         else:
             result = {'uuid': uuid, 'username': username, 'carbonLastWeek': carbon,
                 'confirmedPct': user['confirmedPct'],
-                'invalidReplacePct': user['invalidReplacePct']}
+                'validReplacePct': user['validReplacePct']}
             curr_tier.append(result)
   return {'me': user_id, 'tiers' : tierUsernames}
 
