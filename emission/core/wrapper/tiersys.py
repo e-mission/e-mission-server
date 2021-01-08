@@ -100,6 +100,15 @@ class TierSys:
         return [seq[i * (n // k) + min(i, n % k):(i+1) * (n // k) + min(i+1, n % k)] for i in range(k)]
 
     @staticmethod
+    def divideIntoEligibleOrNot(seq, num):
+        """
+        Divides objects into n buckets.
+        Used in compute ranks to divide users into n tiers
+        """
+        n, k = len(seq), num
+        return [filter(lambda s: s[1] >= 50, seq), filter(lambda s: s[1] < 50, seq)]
+
+    @staticmethod
     def addUser(user_id):
         from datetime import datetime
         '''
@@ -145,7 +154,7 @@ class TierSys:
         #     raise Exception("No users in DB")
         for index, row in all_users.iterrows():
             user_id = row['uuid']
-            val = User.computeConfirmed(user_id)[0]
+            val = User.computeConfirmed(user_id)[2]
             if val != None:
                 try:
                     user_carbon_map[user_id] = val
@@ -158,8 +167,10 @@ class TierSys:
         user_carbon_tuples_sorted = sorted(user_carbon_map.items(), key=lambda kv: kv[1], reverse=True) # Sorted list by value of dict tuples.
         logging.debug('USER CARBON TUPLES SORTED')
         logging.debug(user_carbon_tuples_sorted)
-        user_carbon_sorted = [i[0] for i in user_carbon_tuples_sorted] # Extract only the user ids.
-        return self.divideIntoBuckets(user_carbon_sorted, n)
+        # user_carbon_sorted = [i[0] for i in user_carbon_tuples_sorted] # Extract only the user ids.
+        split_tier_tuples = self.divideIntoEligibleOrNot(user_carbon_tuples_sorted, n)
+        return [[i[0] for i in split_tier_tuples[0]],
+                [i[0] for i in split_tier_tuples[1]]]
 
     def computeCarbon(self, user_id, last_ts):
         """
@@ -231,7 +242,7 @@ class TierSys:
                 carbonLWP = User.computeCarbon(uuid, last_ts, curr_ts)
                 carbonLWU = None
                 carbonLWUR = None
-                (confirmedPct, valid_replacement_pct) = User.computeConfirmed(uuid)
+                (confirmedPct, valid_replacement_pct, score) = User.computeConfirmed(uuid)
 
                 if userCarbonRaw != None:
                     carbonLWU = userCarbonRaw[0]
@@ -242,7 +253,7 @@ class TierSys:
 
                 carbonDB['users'].append(userStats)
                 users.append({'uuid': uuid, 'lastWeekCarbon': carbonLWP,
-                    'confirmedPct': confirmedPct, 'validReplacePct': valid_replacement_pct})
+                    'confirmedPct': confirmedPct, 'validReplacePct': valid_replacement_pct, 'overallScore': score})
             ts.append({'rank': i + 1, 'users': users})
 
             #users = [{'uuid': uuid, 'lastWeekCarbon': User.computeCarbon(uuid, last_ts, curr_ts)} for uuid in self.tiers[i]]

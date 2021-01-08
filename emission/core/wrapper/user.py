@@ -322,11 +322,12 @@ class User(object):
 
     ct_df = ts.get_data_df("analysis/confirmed_trip", time_query=None)
     if ct_df.shape[0] <= 0:
-      return (0, None)
+      return (0, None, None)
     ct_df_confirmed = ct_df[ct_df.user_input != {}]
     confirmed_pct = (ct_df_confirmed.shape[0] * 100)/ ct_df.shape[0]
     if ct_df_confirmed.shape[0] <= 0:
         valid_replacement_pct = None
+        score = None
     else:
         invalid_replacement = ct_df_confirmed.user_input.apply(lambda ui: ui["mode_confirm"] == "pilot_ebike" and ("replaced_mode" not in ui or ui["replaced_mode"] == "pilot_ebike" or ui["replaced_mode"] == "same_mode"))
         invalid_replacement_freq = invalid_replacement.value_counts()
@@ -339,6 +340,9 @@ class User(object):
                 valid_replacement_pct = 100
         else:
             valid_replacement_pct = (invalid_replacement_freq[False] * 100)/ invalid_replacement.count()
+        # multiply the two pcts to get an overall "probability"
+        # but since they are percents instead of ratios, need to divide by 100
+        score = (confirmed_pct * valid_replacement_pct) / 100
     return (confirmed_pct, valid_replacement_pct)
 
   @staticmethod
