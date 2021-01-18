@@ -290,7 +290,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
         return deduped_df.reset_index(drop=True)
 
 
-    def get_max_value_for_field(self, key, field, time_query=None):
+    def get_first_value_for_field(self, key, field, sort_order, time_query=None):
         """
         Currently used to get the max value of the location values so that we can send data
         that actually exists into the usercache. Is that too corner of a use case? Do we want to do
@@ -298,11 +298,12 @@ class BuiltinTimeSeries(esta.TimeSeries):
         :param key: the metadata key for the entries, used to identify the stream
         :param field: the field in the stream whose max value we want.
         :param time_query: the time range in which to search the stream
+        :param sort_order: pymongo.ASCENDING or pymongon.DESCENDING
         It is assumed that the values for the field are sortable.
         :return: the max value for the field in the stream identified by key. -1 if there are no entries for the key.
         """
         result_it = self.get_timeseries_db(key).find(self._get_query([key], time_query),
-                                                 {"_id": False, field: True}).sort(field, pymongo.DESCENDING).limit(1)
+                                                 {"_id": False, field: True}).sort(field, sort_order).limit(1)
         result_list = list(result_it)
         if len(result_list) == 0:
             return -1

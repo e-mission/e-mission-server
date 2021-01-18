@@ -61,13 +61,15 @@ class TimeSeries(object):
         """
         pass
 
-    def get_max_value_for_field(self, key, field):
+    def get_first_value_for_field(self, key, sort_order, field):
         """
         Currently used to get the max value of the location values so that we can send data
         that actually exists into the usercache. Is that too corner of a use case? Do we want to do
         this in some other way?
         :param key: the metadata key for the entries, used to identify the stream
         :param field: the field in the stream whose max value we want.
+        :param time_query: the time range in which to search the stream
+        :param sort_order: pymongo.ASCENDING or pymongon.DESCENDING
         It is assumed that the values for the field are sortable.
         :return: the max value for the field in the stream identified by key.  -1 if there are no entries for the key.
         """
