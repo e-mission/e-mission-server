@@ -59,7 +59,7 @@ You may also want to load some test data. Note that for the docker install, you 
     After registration, test_july_22 -> 908eb622-be3f-4cf4-bf04-1b7e610bea1c
    ```
    
-   This will load the data as a new user with email `test_july_22` and a newly created uuid. You can run the intake pipeline for this user like so
+   This will load the data as a new user with email `test_july_22` and a newly created uuid `908eb622-be3f-4cf4-bf04-1b7e610bea1c`. You can run the intake pipeline for this user like so
    
    ```
    $ ./e-mission-py.bash bin/debug/intake_single_user.py -e test_july_22
@@ -129,7 +129,7 @@ We also do some modelling on the generated data. This is much more time-intensiv
 
 ### Experimenting with loaded data ###
 
-Some examples of how to retrieve and experiment with loaded/analysed data are in the `Timeseries_Sample.ipynb`
+Some examples of how to retrieve and experiment with loaded/analysed data are in the `Timeseries_Sample.ipynb` (Note: to avoid raising `IndexError`, you should load at least three real examples.)
 
 ### Running unit tests ###
 
@@ -146,6 +146,8 @@ Some examples of how to retrieve and experiment with loaded/analysed data are in
 directory to PYTHONPATH.
 
         $ PYTHONPATH=. ./runAllTests.sh
+        
+(Note: you don't need to run the tests if you haven't changed the data.)
 
 ## Analysis ##
 Several exploratory analysis scripts are checked in as ipython notebooks into
