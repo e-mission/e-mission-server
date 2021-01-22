@@ -11,10 +11,10 @@ import os
 import json
 
 try:
-    config_file = open('conf/storage/db.conf')
+    config_file = open('conf/storage/db.conf.sample')
 except:
     print("storage not configured, falling back to sample, default configuration")
-    config_file = open('conf/storage/db.conf.sample')
+    config_file = open('/Users/chuang/Desktop/e-mission-server/conf/storage/db.conf.sample')
 
 config_data = json.load(config_file)
 url = config_data["timeseries"]["url"]

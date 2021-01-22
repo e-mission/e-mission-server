@@ -103,7 +103,7 @@ def get_map_for_geojson_trip(geojson_trip):
                 print(section["properties"]["feature_type"], section["id"])
                 if (section["properties"]["feature_type"] == "section"):
                     section_line = get_section_ui(section)
-                    location_points.extend(section_line.location)
+                    location_points.extend(section_line.locations)
                     section_line.add_to(m)
                 else:
                     raise NotImplementedException()

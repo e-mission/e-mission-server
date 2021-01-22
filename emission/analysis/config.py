@@ -2,10 +2,10 @@ import json
 
 def get_config_data():
     try:
-        config_file = open('conf/analysis/debug.conf.json')
+        config_file = open('conf/analysis/debug.conf.json.sample')
     except:
         print("analysis.debug.conf.json not configured, falling back to sample, default configuration")
-        config_file = open('conf/analysis/debug.conf.json.sample')
+        config_file = open('/Users/chuang/Desktop/e-mission-server/conf/analysis/debug.conf.json.sample')
     ret_val = json.load(config_file)
     config_file.close()
     return ret_val

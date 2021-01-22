@@ -19,7 +19,7 @@ import emission.core.get_database as edb
 
 
 try:
-    key_file = open('conf/net/ext_service/habitica.json')
+    key_file = open('/Users/chuang/Desktop/e-mission-server/conf/net/ext_service/habitica.json.sample')
     key_data = json.load(key_file)
     key_file.close()
     url = key_data["url"]
