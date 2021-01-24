@@ -1,6 +1,7 @@
 *.pyc
 *.pdf
 *.swp
+.idea/*
 *debug.log
 .DS_Store
 
