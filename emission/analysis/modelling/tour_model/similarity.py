@@ -11,9 +11,6 @@ from builtins import object
 from past.utils import old_div
 import logging
 import math
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 import numpy
 from sklearn import metrics
 from numpy.linalg import norm
@@ -147,6 +144,9 @@ class similarity(object):
 
     #create the histogram
     def graph(self):
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
         bars = [0] * len(self.bins)
         for i in range(len(self.bins)):
             bars[i] = len(self.bins[i])
