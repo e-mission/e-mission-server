@@ -13,10 +13,16 @@ it needs to be included while running them.
     $ export EMISSION_SERVER_HOME=<path_to_emission_server_repo>
     ```
 
-1. Set up the evaluation system
+1. If you haven't setup before, set up the evaluation system
 
     ```
     $ source setup.sh
+    ```
+
+1. If you have, activate
+
+    ```
+    $ source activate.sh
     ```
 
 1. Start the notebook server
