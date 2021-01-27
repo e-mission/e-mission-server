@@ -1,3 +1,7 @@
+# Our excludes
+# conf directories are copied over from the server, so no need to check them in here
+conf
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

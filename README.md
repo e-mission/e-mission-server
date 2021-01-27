@@ -25,6 +25,13 @@ it needs to be included while running them.
     $ source activate.sh
     ```
 
+1. Access the visualizations of interest and copy the config over
+
+```
+$ cd <eval_folder>
+$ cp -r ../conf
+```
+
 1. Start the notebook server
 
 ```
