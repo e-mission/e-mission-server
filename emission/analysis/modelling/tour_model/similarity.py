@@ -77,8 +77,7 @@ class similarity(object):
                 self.bins.append([a])
         self.bins.sort(key=lambda bin: len(bin), reverse=True)
 
-    #delete lower portion of bins
-    def delete_bins(self):
+    def calc_cutoff_bins(self):
         if len(self.bins) <= 1:
             self.newdata = self.data
             return
@@ -93,7 +92,10 @@ class similarity(object):
         logging.debug('the new number of trips is %d' % sum)
         logging.debug('the cutoff point is %d' % num)
         self.num = num
-        #self.graph()
+
+    #delete lower portion of bins
+    def delete_bins(self):
+        self.calc_cutoff_bins()
         for i in range(len(self.bins) - num):
             self.bins.pop()
         newdata = []
@@ -141,27 +143,6 @@ class similarity(object):
             if not self.distance_helper(a, b):
                 return False
         return True
-
-    #create the histogram
-    def graph(self):
-        import matplotlib
-        matplotlib.use('Agg')
-        import matplotlib.pyplot as plt
-        bars = [0] * len(self.bins)
-        for i in range(len(self.bins)):
-            bars[i] = len(self.bins[i])
-        N = len(bars)
-        index = numpy.arange(N)
-        width = .2
-        plt.bar(index+width, bars, color='k')
-        try:
-            plt.bar(self.num+width, bars[self.num], color='g')
-        except Exception:
-            pass
-        plt.xlim([0, N])
-        plt.xlabel('Bins')
-        plt.ylabel('Number of elements')
-        plt.savefig('histogram.png')
 
     #evaluate the bins as if they were a clustering on the data
     def evaluate_bins(self):
