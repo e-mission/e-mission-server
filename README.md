@@ -29,7 +29,7 @@ it needs to be included while running them.
 
 ```
 $ cd <eval_folder>
-$ cp -r ../conf
+$ cp -r ../conf .
 ```
 
 1. Start the notebook server
