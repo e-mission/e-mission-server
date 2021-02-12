@@ -67,7 +67,7 @@ def cluster(data, nBins):
     max = int(math.ceil(1.5 * nBins))
     feat.cluster(min_clusters=min, max_clusters=max)
     logging.debug('number of clusters: %d' % feat.clusters)
-    return feat.clusters, feat.labels, feat.data
+    return feat.clusters, feat.labels, feat.data, feat.points
 
 #prepare the data for the tour model
 def cluster_to_tour_model(data, labels):
