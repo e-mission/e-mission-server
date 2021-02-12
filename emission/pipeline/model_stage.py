@@ -11,7 +11,6 @@ import emission.net.usercache.abstract_usercache_handler as euah
 import emission.net.usercache.abstract_usercache as enua
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.tour_model_queries as esdtmq
-from emission.core.get_database import get_db, get_mode_db, get_section_db
 
 import emission.analysis.intake.cleaning.filter_accuracy as eaicf
 import emission.analysis.intake.segmentation.trip_segmentation as eaist
@@ -59,7 +58,7 @@ def run_model_pipeline(process_number, uuid_list):
 		try: 
 			run_model_pipeline_for_user(uuid)
 		except Exception as e:
-			print "dang flabbit failed on error %s" % e
+			print("dang flabbit failed on error %s" % e)
 
 
 def run_mode_inference_pipeline_for_user(uuid):
@@ -107,7 +106,7 @@ def run_mode_pipeline_for_user(MIP, uuid):
 
 	timerange = get_time_range_for_mode_inference(uuid)
 	MIP.runPipelineModelStage(uuid, timerange)
-	mark_mode_inference_done_for_user(uuid, MIP.getLastTimestamp})
+	mark_mode_inference_done_for_user(uuid, MIP.getLastTimestamp)
 
 
 if __name__ == '__main__':
