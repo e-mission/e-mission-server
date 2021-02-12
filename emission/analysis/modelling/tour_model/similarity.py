@@ -96,7 +96,7 @@ class similarity(object):
     #delete lower portion of bins
     def delete_bins(self):
         self.calc_cutoff_bins()
-        for i in range(len(self.bins) - num):
+        for i in range(len(self.bins) - self.num):
             self.bins.pop()
         newdata = []
         for bin in self.bins:
