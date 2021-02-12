@@ -58,12 +58,13 @@ def remove_noise(data, radius):
     return sim.newdata, sim.bins
 
 #cluster the data using k-means
-def cluster(data, bins):
+def cluster(data, nBins):
+    logging.debug("Calling cluster(%s, %d)" % (data, nBins))
     if not data:
         return 0, [], []
     feat = featurization.featurization(data)
-    min = bins
-    max = int(math.ceil(1.5 * bins))
+    min = nBins
+    max = int(math.ceil(1.5 * nBins))
     feat.cluster(min_clusters=min, max_clusters=max)
     logging.debug('number of clusters: %d' % feat.clusters)
     return feat.clusters, feat.labels, feat.data
@@ -89,6 +90,8 @@ def main(uuid=None):
     return tour_dict
 
 if __name__=='__main__':
+    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
+        level=logging.DEBUG)
     uuid = None
     if len(sys.argv) == 2:
         uuid = sys.argv[1]
