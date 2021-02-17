@@ -6,4 +6,6 @@ dependencies:
 - branca=0.4.1
 - folium=0.11.0
 - ipython=7.17.0
+- jedi=0.17.2
 - jupyter=1.0.0
+- matplotlib=3.2.2
