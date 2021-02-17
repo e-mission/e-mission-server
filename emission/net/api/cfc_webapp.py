@@ -195,6 +195,15 @@ def getPipelineState():
     user_uuid = getUUID(request)
     return {"complete_ts": pipeline.get_complete_ts(user_uuid)}
 
+@post("/pipeline/get_range_ts")
+def getPipelineState():
+    user_uuid = getUUID(request)
+    (start_ts, end_ts) = pipeline.get_range(user_uuid)
+    return {
+        "start_ts": start_ts,
+        "end_ts": end_ts
+    }
+
 @post("/datastreams/find_entries/<time_type>")
 def getTimeseriesEntries(time_type):
     if 'user' not in request.json:
@@ -206,21 +215,46 @@ def getTimeseriesEntries(time_type):
     if 'from_local_date' in request.json and 'to_local_date' in request.json:
         start_time = request.json['from_local_date']
         end_time = request.json['to_local_date']
-        time_query = esttc.TimeComponentQuery("metadata.write_ts",
+        time_key = request.json.get('key_local_date', 'metadata.write_ts')
+        time_query = esttc.TimeComponentQuery(time_key,
                                               start_time,
                                               end_time)
     else:
         start_time = request.json['start_time']
         end_time = request.json['end_time']
-        time_query = estt.TimeQuery("metadata.write_ts",
-                                              start_time,
-                                              end_time)
+        time_key = request.json.get('key_time', 'metadata.write_ts')
+        time_query = estt.TimeQuery(time_key,
+                                    start_time,
+                                    end_time)
     # Note that queries from usercache are limited to 100,000 entries
     # and entries from timeseries are limited to 250,000, so we will
     # return at most 350,000 entries. So this means that we don't need
     # additional filtering, but this should be documented in
     # the API
     data_list = esdc.find_entries(user_uuid, key_list, time_query)
+    if 'max_entries' in request.json:
+        me = request.json['max_entries']
+        if (type(me) != int):
+            logging.error("aborting: max entry count is %s, type %s, expected int" % (me, type(me)))
+            abort(500, "Invalid max_entries %s" % me)
+
+        if len(data_list) > me:
+            if request.json['trunc_method'] == 'first':
+                logging.debug("first n entries is %s" % me)
+                data_list = data_list[:me]
+            if request.json['trunc_method'] == 'last':
+                logging.debug("first n entries is %s" % me)
+                data_list = data_list[-me:]
+            elif request.json["trunc_method"] == "sample":
+                sample_rate = len(data_list)//me + 1
+                logging.debug("sampling rate is %s" % sample_rate)
+                data_list = data_list[::sample_rate]
+            else:
+                logging.error("aborting: unexpected sampling method %s" % request.json["trunc_method"])
+                abort(500, "sampling method not specified while retriving limited data")
+        else:
+            logging.debug("Found %d entries < %s, no truncation" % (len(data_list), me))
+    logging.debug("successfully returning list of size %s" % len(data_list))
     return {'phone_data': data_list}
 
 @post('/usercache/get')
