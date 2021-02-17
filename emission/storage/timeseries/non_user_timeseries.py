@@ -43,7 +43,7 @@ class NonUserTimeSeries(bits.BuiltinTimeSeries):
     # get_entry_at_ts is unchanged
     # get_data_df is unchanged
     # to_data_df is unchanged
-    # get_max_value_for_field is unchanged
+    # get_first_value_for_field is unchanged
     # bulk_insert is unchanged
 
     def insert(self, entry):
