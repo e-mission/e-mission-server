@@ -40,9 +40,14 @@ read from the database.
 """
 
 #read the data from the database. 
-def read_data(uuid=None):
-    trips = esda.get_entries(esda.CLEANED_TRIP_KEY, uuid,
-                             time_query=None, geo_query=None)
+def read_data(uuid=None,key='cleaned_trip'):
+    trips = None
+    if key == 'confirmed_trip':
+        trips = esda.get_entries(esda.CONFIRMED_TRIP_KEY, uuid,
+                                 time_query=None, geo_query=None)
+    elif key == 'cleaned_trip':
+        trips = esda.get_entries(esda.CLEANED_TRIP_KEY, uuid,
+                                 time_query=None, geo_query=None)
     logging.info("After reading data, returning %s trips" % len(trips))
     return trips
 
