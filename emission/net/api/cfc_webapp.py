@@ -195,8 +195,11 @@ def getPipelineState():
     user_uuid = getUUID(request)
     return {"complete_ts": pipeline.get_complete_ts(user_uuid)}
 
-@post("/datastreams/find_entries/<time_type>")
+@post("/datastreams/find_entries/<time_type>", method=['OPTIONS', 'POST'])
 def getTimeseriesEntries(time_type):
+    print("method is ", request.method)
+    if request.method == "OPTIONS":
+        return
     if 'user' not in request.json:
         abort(401, "only a user can read his/her data")
 
@@ -410,6 +413,10 @@ def before_request():
 
 @app.hook('after_request')
 def after_request():
+  response.set_header('Access-Control-Allow-Origin', '*')
+  response.add_header('Access-Control-Allow-Methods', 'GET, POST, PUT, OPTIONS')
+  response.add_header('Access-Control-Allow-Headers', 'Origin, Accept, Content-Type, X-Requested-With')
+
   msTimeNow = time.time()
   request.params.timer.__exit__()
   duration = msTimeNow - request.params.start_ts
