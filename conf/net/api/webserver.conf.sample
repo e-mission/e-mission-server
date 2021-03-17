@@ -11,6 +11,8 @@
     "port" : "8080",
     "__comment": "1 hour = 60 min = 60 * 60 sec",
     "timeout" : "3600",
-    "auth": "skip"
+    "auth": "skip",
+    "__comment": "Options are no_auth, user_only, never",
+    "aggregate_call_auth": "no_auth"
   }
 }
