@@ -505,7 +505,7 @@ def getUUID(request, inHeader=False):
         return retUUID
     except ValueError as e:
         traceback.print_exc()
-        abort(401, e.message)
+        abort(403, e)
 
 # Auth helpers END
 
@@ -514,6 +514,8 @@ if __name__ == '__main__':
         webserver_log_config = json.load(open("conf/log/webserver.conf", "r"))
     except:
         webserver_log_config = json.load(open("conf/log/webserver.conf.sample", "r"))
+
+    print(f"Using auth method {auth_method}")
 
     logging.config.dictConfig(webserver_log_config)
     logging.debug("This should go to the log file")
