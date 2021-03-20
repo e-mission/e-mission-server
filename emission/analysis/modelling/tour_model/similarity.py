@@ -95,15 +95,19 @@ class similarity(object):
 
     #delete lower portion of bins
     def delete_bins(self):
+        below_cutoff =[]
         self.calc_cutoff_bins()
         for i in range(len(self.bins) - self.num):
-            self.bins.pop()
+            below_cutoff.append(self.bins.pop())
         newdata = []
         for bin in self.bins:
             for b in bin:
                 d = self.data[b]
                 newdata.append(self.data[b])
         self.newdata = newdata if len(newdata) > 1 else self.data
+        self.below_cutoff = below_cutoff
+        self.below_cutoff.sort(key=lambda bin: len(bin), reverse=True)
+
 
 
     #calculate the cut-off point in the histogram
