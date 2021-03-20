@@ -67,6 +67,7 @@ server_port = config_data["server"]["port"]
 socket_timeout = config_data["server"]["timeout"]
 log_base_dir = config_data["paths"]["log_base_dir"]
 auth_method = config_data["server"]["auth"]
+aggregate_call_auth = config_data["server"]["aggregate_call_auth"]
 
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes
@@ -132,12 +133,21 @@ def server_templates(filepath):
   logging.debug("static filepath = %s" % filepath)
   return static_file(filepath, "%s/%s" % (static_path, "templates"))
 
+# Backward compat to handle older clients
+# Remove in 2023 after everybody has upgraded
+# We used to use the presence or absence of the "user" field
+# to determine whether this was an aggregate call or not
+# now we expect the client to fill it in
+def _fill_aggregate_backward_compat(request):
+  if 'aggregate' not in request.json:
+    # Aggregate if there is no user
+    # no aggregate if there is a user
+    request.json["aggregate"] = ('user' not in request.json)
+
 @post("/result/heatmap/pop.route/<time_type>")
 def getPopRoute(time_type):
-  if 'user' in request.json:
-     user_uuid = getUUID(request)
-  else:
-     user_uuid = None
+  _fill_aggregate_backward_compat(request)
+  user_uuid = get_user_or_aggregate_auth(request)
 
   if 'from_local_date' in request.json and 'to_local_date' in request.json:
       start_time = request.json['from_local_date']
@@ -160,10 +170,8 @@ def getPopRoute(time_type):
 
 @post("/result/heatmap/incidents/<time_type>")
 def getStressMap(time_type):
-    if 'user' in request.json:
-        user_uuid = getUUID(request)
-    else:
-        user_uuid = None
+    _fill_aggregate_backward_compat(request)
+    user_uuid = get_user_or_aggregate_auth(request)
 
     # modes = request.json['modes']
     # hardcode modes to None because we currently don't store
@@ -330,10 +338,9 @@ def getUserProfile():
 
 @post('/result/metrics/<time_type>')
 def summarize_metrics(time_type):
-    if 'user' in request.json:
-        user_uuid = getUUID(request)
-    else:
-        user_uuid = None
+    _fill_aggregate_backward_compat(request)
+    user_uuid = get_user_or_aggregate_auth(request)
+
     start_time = request.json['start_time']
     end_time = request.json['end_time']
     freq_name = request.json['freq']
@@ -465,6 +472,30 @@ def after_request():
 # This should only be used by createUserProfile since we may not have a UUID
 # yet. All others should use the UUID.
 
+def _get_uuid_bool_wrapper(request):
+  try:
+    getUUID(request)
+    return True
+  except:
+    return False
+
+def get_user_or_aggregate_auth(request):
+  # If this is not an aggregate call, returns the uuid
+  # If this is an aggregate call, returns None if the call is valid, otherwise aborts
+  # we only support aggregates on a subset of calls, so we don't need the
+  # `inHeader` parameter to `getUUID`
+  aggregate_call_map = {
+    "no_auth": lambda r: None,
+    "user_only": lambda r: None if _get_uuid_bool_wrapper(request) else abort(403, "aggregations only available to users"),
+    "never": lambda r: abort(404, "Aggregate calls not supported")
+  }
+  if request.json["aggregate"] == False:
+    logging.debug("User specific call, returning UUID")
+    return getUUID(request)
+  else:
+    logging.debug(f"Aggregate call, checking {aggregate_call_auth} policy")
+    return aggregate_call_map[aggregate_call_auth](request)
+
 def getUUID(request, inHeader=False):
     try:
         retUUID = enaa.getUUID(request, auth_method, inHeader)
@@ -474,7 +505,7 @@ def getUUID(request, inHeader=False):
         return retUUID
     except ValueError as e:
         traceback.print_exc()
-        abort(401, e.message)
+        abort(403, e)
 
 # Auth helpers END
 
@@ -483,6 +514,8 @@ if __name__ == '__main__':
         webserver_log_config = json.load(open("conf/log/webserver.conf", "r"))
     except:
         webserver_log_config = json.load(open("conf/log/webserver.conf.sample", "r"))
+
+    print(f"Using auth method {auth_method}")
 
     logging.config.dictConfig(webserver_log_config)
     logging.debug("This should go to the log file")
