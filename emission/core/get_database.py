@@ -148,10 +148,9 @@ def get_perturbed_trips_db():
 def get_usercache_db():
     #current_db = MongoClient().Stage_database
     UserCache = _get_current_db().Stage_usercache
-    UserCache.create_index([("user_id", pymongo.ASCENDING),
-                            ("metadata.type", pymongo.ASCENDING),
-                            ("metadata.write_ts", pymongo.ASCENDING),
-                            ("metadata.key", pymongo.ASCENDING)])
+    UserCache.create_index([("user_id", pymongo.ASCENDING)])
+    UserCache.create_index([("metadata.type", pymongo.ASCENDING)])
+    UserCache.create_index([("metadata.key", pymongo.ASCENDING)])
     UserCache.create_index([("metadata.write_ts", pymongo.DESCENDING)])
     UserCache.create_index([("data.ts", pymongo.DESCENDING)], sparse=True)
     return UserCache
