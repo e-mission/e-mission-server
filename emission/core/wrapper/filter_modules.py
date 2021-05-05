@@ -137,7 +137,7 @@ def getTrainingTrips_Date(uid, dys):
     d = datetime.datetime.now() - datetime.timedelta(days=dys)
     query = {'user_id':uid, 'type':'move','trip_start_datetime':{"$gt":d}, "pipelineFlags":{"$exists":True}}
     #query = {'user_id':uid, 'type':'move','trip_start_datetime':{"$gt":d}}
-    #print get_trip_db().find(query).count()
+    #print get_trip_db().count_documents(query)
     return get_trip_db().find(query)
 
 def getAlternativeTrips(trip_id):
@@ -146,8 +146,8 @@ def getAlternativeTrips(trip_id):
     #query = {'trip_id':trip_id, 'trip_start_datetime':{"$gt":d}}
     query = {'trip_id':trip_id}
     alternatives = get_alternatives_db().find(query)
-    if alternatives.count() > 0:
-        logging.debug("Number of alternatives for trip %s is %d" % (trip_id, alternatives.count()))
+    if alternatives.estimated_document_count() > 0:
+        logging.debug("Number of alternatives for trip %s is %d" % (trip_id, alternatives.estimated_document_count()))
         return alternatives
     raise AlternativesNotFound("No Alternatives Found")
 

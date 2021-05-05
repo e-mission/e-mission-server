@@ -73,6 +73,9 @@ class Entry(ecwb.WrapperBase):
             "manual/mode_confirm": "userlabel",
             # user confirmation of the travel purpose
             "manual/purpose_confirm": "userlabel",
+            # user confirmation of the destination (unsure how this will
+            # interact with purpose
+            "manual/destination_confirm": "userlabel",
             ### END: incoming data types ###
             ### BEGIN: analysis result data types ###
             ### ** BEGIN: objects generated after the initial segmentation step **
@@ -124,6 +127,10 @@ class Entry(ecwb.WrapperBase):
             # running the inference step
             "analysis/inferred_section": "inferredsection",
             ### ** END: prediction objects
+            ### ** BEGIN: confirmed objects which combine inferred and user input values
+            "analysis/confirmed_trip": "confirmedtrip",
+            "analysis/confirmed_section": "confirmedsection"
+            ### ** END: confirmed objects which combine inferred and user input values
             }
 
   @staticmethod

@@ -130,20 +130,20 @@ class TestPipelineQueries(unittest.TestCase):
         new_state = epq.get_current_state(self.testUUID, ewps.PipelineStages.USERCACHE)
         self.assertIsNotNone(new_state)
         self.assertIsNone(new_state.curr_run_ts)
-        self.assertEquals(new_state.last_ts_run, uc_ts)
-        self.assertEquals(new_state.last_processed_ts, TEST_DONE_TS_BASE + 10)
+        self.assertEqual(new_state.last_ts_run, uc_ts)
+        self.assertEqual(new_state.last_processed_ts, TEST_DONE_TS_BASE + 10)
 
         new_state = epq.get_current_state(self.testUUID, ewps.PipelineStages.TRIP_SEGMENTATION)
         self.assertIsNotNone(new_state)
         self.assertIsNone(new_state.curr_run_ts)
-        self.assertEquals(new_state.last_ts_run, ts_ts)
-        self.assertEquals(new_state.last_processed_ts, TEST_DONE_TS_BASE + 11)
+        self.assertEqual(new_state.last_ts_run, ts_ts)
+        self.assertEqual(new_state.last_processed_ts, TEST_DONE_TS_BASE + 11)
 
         new_state = epq.get_current_state(self.testUUID, ewps.PipelineStages.SECTION_SEGMENTATION)
         self.assertIsNotNone(new_state)
         self.assertIsNone(new_state.curr_run_ts)
-        self.assertEquals(new_state.last_ts_run, ss_ts)
-        self.assertEquals(new_state.last_processed_ts, TEST_DONE_TS_BASE + 12)
+        self.assertEqual(new_state.last_ts_run, ss_ts)
+        self.assertEqual(new_state.last_processed_ts, TEST_DONE_TS_BASE + 12)
 
 
 if __name__ == '__main__':

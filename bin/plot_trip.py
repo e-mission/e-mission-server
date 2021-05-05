@@ -27,7 +27,7 @@ if __name__ == '__main__':
     else:
         trip_id = sys.argv[1]
         sections =db.Stage_Sections.find({'trip_id': trip_id})
-        if sections.count() == 0:
+        if db.Stage_Sections.count_documents({'trip_id': trip_id}) == 0:
             print("\nTRIP NOT FOUND\n")
             exit(1)
         startpoint = sections[0]['section_start_point']

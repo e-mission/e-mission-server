@@ -105,22 +105,6 @@ class representatives(object):
             a = ecwe.Entry.create_entry(c.user_id, "analysis/cleaned_trip", t)
             self.reps.append(a)
 
-    #map the representatives
-    def map(self):
-        import pygmaps
-        mymap = pygmaps.maps(37.5, -122.32, 10)
-        for t in self.reps:
-            start_lat = t.trip_start_location.lat
-            start_lon = t.trip_start_location.lon
-            end_lat = t.trip_end_location.lat
-            end_lon = t.trip_end_location.lon
-            path = [(start_lat, start_lon), (end_lat, end_lon)]
-            mymap.addpath(path)
-        for l in self.locs:
-            mymap.addpoint(l.lat, l.lon, '#0000FF')
-        mymap.draw('./myreps.html')
-
-
     #define the set of locations for the data
     def locations(self):
         self.bins = []

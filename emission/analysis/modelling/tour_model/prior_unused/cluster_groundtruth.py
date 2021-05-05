@@ -88,7 +88,7 @@ def update_db_with_clusters(user, infile_path):
     cluster_name = infile_path.split("/")[-1].split(".")[0][:-2]
     cluster_name = "%s_%s" % (user, cluster_name)
     cluster_sids = etmu.get_kml_section_ids(infile_path)
-    if(gc_db.count() == 0):
+    if(gc_db.estimated_document_count() == 0):
         gc_db.insert({"clusters":{}})
     x = gc_db.find_one({"clusters":{"$exists":True}})["clusters"]
     if(cluster_name in list(x.keys())):
@@ -109,7 +109,7 @@ def update_db_with_clusters_dict(user, clusters):
     """
     gc_db = edb.get_groundClusters_db();
     assert (clusters != {}), "clusters must be nonempty"
-    if(gc_db.count() == 0):
+    if(gc_db.estimated_document_count() == 0):
         gc_db.insert({"clusters":{}})
     x = gc_db.find_one({"clusters":{"$exists":True}})["clusters"]
     for name, sections in list(clusters.items()):         

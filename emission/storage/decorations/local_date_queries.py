@@ -11,12 +11,6 @@ import arrow
 
 import emission.core.wrapper.localdate as ecwl
 
-def get_local_date(ts, timezone):
-    adt = arrow.get(ts).to(timezone)
-    return ecwl.LocalDate({'year': adt.year, 'month': adt.month, 'day': adt.day,
-    'hour': adt.hour, 'minute': adt.minute, 'second': adt.second,
-    'weekday': adt.weekday(), 'timezone': timezone})
-
 def get_range_query(field_name, start_local_dt, end_local_dt):
     if list(start_local_dt.keys()) != list(end_local_dt.keys()):
         raise RuntimeError("start_local_dt.keys() = %s does not match end_local_dt.keys() = %s" %

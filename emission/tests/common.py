@@ -18,6 +18,7 @@ import pymongo
 import emission.core.get_database as edb
 from emission.core.get_database import get_client_db, get_section_db
 import emission.core.get_database as edb
+import emission.core.wrapper.user as ecwu
 
 def makeValid(client):
   client.clientJSON['start_date'] = str(datetime.now() + timedelta(days=-2))
@@ -38,7 +39,7 @@ def updateUserCreateTime(uuid):
   user.changeUpdateTs(timedelta(days = -20))
 
 def dropAllCollections(db):
-  collections = db.collection_names()
+  collections = db.list_collection_names()
   print("collections = %s" % collections)
   for coll in collections:
     if coll.startswith('system'):
@@ -56,9 +57,10 @@ def purgeSectionData(Sections, userName):
 
 def loadTable(serverName, tableName, fileName):
   tableColl = edb._get_current_db()[tableName]
-  dataJSON = json.load(open(fileName))
+  with open(fileName) as fp:
+      dataJSON = json.load(fp)
   for row in dataJSON:
-    tableColl.insert(row)
+    tableColl.insert_one(row)
 
 # Create a dummy section with the main stuff that we use in our code
 def createDummySection(startTime, endTime, startLoc, endLoc, predictedMode = None, confirmedMode = None):
@@ -76,7 +78,7 @@ def createDummySection(startTime, endTime, startLoc, endLoc, predictedMode = Non
   if confirmedMode != None:
     section['confirmed_mode'] = confirmedMode
 
-  get_section_db().insert(section)
+  get_section_db().insert_one(section)
   return section
 
 def updateSections(testCase):
@@ -98,11 +100,30 @@ def updateSections(testCase):
       testCase.uuid_list.append(curr_uuid)
       testCase.SectionsColl.save(section)
 
+def getRealExampleEmail(testObj):
+    return testObj.branch + "_" + testObj._testMethodName
+
+def fillExistingUUID(testObj):
+    userObj = ecwu.User.fromEmail(getRealExampleEmail(testObj))
+    print("Setting testUUID to %s" % userObj.uuid)
+    testObj.testUUID = userObj.uuid
+
+def createAndFillUUID(testObj):
+    if hasattr(testObj, "evaluation") and testObj.evaluation:
+        reg_email = getRealExampleEmail(testObj)
+        logging.info("registering email = %s" % reg_email)
+        user = ecwu.User.register(reg_email)
+        testObj.testUUID = user.uuid
+    else:
+        logging.info("No evaluation flag found, not registering email")
+        testObj.testUUID = uuid.uuid4()
+
 def setupRealExample(testObj, dump_file):
-    logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
+    logging.info("Before loading from %s, timeseries db size = %s" %
+        (dump_file, edb.get_timeseries_db().estimated_document_count()))
     with open(dump_file) as dfp:
         testObj.entries = json.load(dfp, object_hook = bju.object_hook)
-        testObj.testUUID = uuid.uuid4()
+        createAndFillUUID(testObj)
         print("Setting up real example for %s" % testObj.testUUID)
         setupRealExampleWithEntries(testObj)
 
@@ -114,14 +135,36 @@ def setupRealExampleWithEntries(testObj):
         #                                                        entry["data"]["fmt_time"])
         edb.save(tsdb, entry)
         
-    logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
+    logging.info("After loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
     logging.debug("First few entries = %s" % 
                     [e["data"]["fmt_time"] if "fmt_time" in e["data"] else e["metadata"]["write_fmt_time"] for e in 
                         list(edb.get_timeseries_db().find({"user_id": testObj.testUUID}).sort("data.write_ts",
                                                                                        pymongo.ASCENDING).limit(10))])
+
+def setupIncomingEntries():
+    with open("emission/tests/data/netTests/android.activity.txt") as aaef:
+        activity_entry = json.load(aaef)
+    with open("emission/tests/data/netTests/android.location.raw.txt") as alef:
+        location_entry = json.load(alef)
+    with open("emission/tests/data/netTests/android.transition.txt") as atef:
+        transition_entry = json.load(atef)
+    entry_list = [activity_entry, location_entry, transition_entry]
+
+    with open("emission/tests/data/netTests/ios.activity.txt") as iaef:
+        ios_activity_entry = json.load(iaef)
+    with open("emission/tests/data/netTests/ios.location.txt") as ilef:
+        ios_location_entry = json.load(ilef)
+    with open("emission/tests/data/netTests/ios.transition.txt") as itef:
+        ios_transition_entry = json.load(itef)
+
+    ios_entry_list = [ios_activity_entry, ios_location_entry, ios_transition_entry]
+
+    return (entry_list, ios_entry_list)
+
 def runIntakePipeline(uuid):
     # Move these imports here so that we don't inadvertently load the modules,
     # and any related config modules, before we want to
+    import emission.analysis.userinput.matcher as eaum
     import emission.analysis.intake.cleaning.filter_accuracy as eaicf
     import emission.storage.timeseries.format_hacks.move_filter_field as estfm
     import emission.analysis.intake.segmentation.trip_segmentation as eaist
@@ -130,12 +173,14 @@ def runIntakePipeline(uuid):
     import emission.analysis.intake.cleaning.clean_and_resample as eaicr
     import emission.analysis.classification.inference.mode.pipeline as eacimp
 
+    eaum.match_incoming_user_inputs(uuid)
     eaicf.filter_accuracy(uuid)
     eaist.segment_current_trips(uuid)
     eaiss.segment_current_sections(uuid)
     eaicl.filter_current_sections(uuid)
     eaicr.clean_and_resample(uuid)
     eacimp.predict_mode(uuid)
+    eaum.create_confirmed_objects(uuid)
 
 def configLogging():
     """
@@ -158,11 +203,13 @@ def setupTokenListAuth(self):
     }
 
     token_list_conf_file.write(str(json.dumps(token_list_conf_json)))
+    token_list_conf_file.close()
     token_list_file = open(self.token_list_path, "w")
     token_list_file.write("correct_horse_battery_staple\n")
     token_list_file.write("collar_highly_asset_ovoid_sultan\n")
     token_list_file.write("caper_hangup_addle_oboist_scroll\n")
     token_list_file.write("couple_honcho_abbot_obtain_simple\n")
+    token_list_file.close()
 
 def tearDownTokenListAuth(self):
     import os

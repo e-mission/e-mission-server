@@ -31,7 +31,7 @@ import emission.analysis.config as eac
 import emission.storage.decorations.timeline as esdtl
 import emission.storage.decorations.trip_queries as esdtq
 import emission.storage.decorations.analysis_timeseries_queries as esda
-import emission.storage.decorations.local_date_queries as esdl
+import emission.core.wrapper.localdate as ecwld
 import emission.storage.decorations.place_queries as esdp
 
 import emission.storage.timeseries.abstract_timeseries as esta
@@ -583,9 +583,10 @@ def _add_start_point(filtered_loc_df, raw_start_place, ts):
                 ts.get_entry_from_id(esda.RAW_TRIP_KEY,
                                      raw_start_place.data.ending_trip))
             if ending_trip_entry is None or ending_trip_entry.metadata.key != "segmentation/raw_untracked":
-                logging.debug("place %s has zero duration but is after %s!" % 
+                logging.error("place %s has zero duration but is after %s!" %
                              (raw_start_place.get_id(), ending_trip_entry))
-                assert False
+                if eac.get_config()["intake.segmentation.section_segmentation.sectionValidityAssertions"]:
+                    assert False
             else:
                 logging.debug("place %s is after untracked_time %s, has zero duration!" %
                              (raw_start_place.get_id(), ending_trip_entry.get_id()))
@@ -608,7 +609,7 @@ def _add_start_point(filtered_loc_df, raw_start_place, ts):
     logging.debug("After copy, new data = %s" % new_first_point_data)
     new_first_point_data["ts"] = new_start_ts
     tz = raw_start_place_enter_loc_entry.data.local_dt.timezone
-    new_first_point_data["local_dt"] = esdl.get_local_date(new_start_ts, tz)
+    new_first_point_data["local_dt"] = ecwld.LocalDate.get_local_date(new_start_ts, tz)
     new_first_point_data["fmt_time"] = arrow.get(new_start_ts).to(tz).isoformat()
     new_first_point = ecwe.Entry.create_entry(curr_first_point.user_id,
                             "background/filtered_location",
@@ -633,7 +634,11 @@ def _add_end_point(filtered_loc_df, raw_end_place, ts):
     # to extrapolate to the place
 
     # because the enter_ts is None
-    assert(raw_end_place.data.enter_ts is not None)
+    if raw_end_place.data.enter_ts is None:
+        logging.error("raw_end_place.data.enter_ts == None, should not have to extrapolate")
+        if eac.get_config()["intake.cleaning.clean_and_resample.sectionValidityAssertions"]:
+            assert False
+
     logging.debug("Found mismatch of %s in last section %s -> %s, "
                    "appending location %s, %s, %s to fill the gap" %
                   (add_dist, curr_last_loc.coordinates, raw_end_place_enter_loc_entry.data.loc.coordinates,
@@ -711,7 +716,7 @@ def _overwrite_from_loc_row(filtered_section_data, fixed_loc, prefix):
 
 def _overwrite_from_timestamp(filtered_trip_like, prefix, ts, tz, loc):
     filtered_trip_like[prefix+"_ts"] = float(ts)
-    filtered_trip_like[prefix+"_local_dt"] = esdl.get_local_date(ts, tz)
+    filtered_trip_like[prefix+"_local_dt"] = ecwld.LocalDate.get_local_date(ts, tz)
     filtered_trip_like[prefix+"_fmt_time"] = arrow.get(ts).to(tz).isoformat()
     filtered_trip_like[prefix+"_loc"] = loc
 
@@ -785,7 +790,7 @@ def resample(filtered_loc_df, interval):
     lng_new = lng_fn(ts_new)
     alt_new = altitude_fn(ts_new)
     tz_new = [_get_timezone(ts, tz_ranges_df) for ts in ts_new]
-    ld_new = [esdl.get_local_date(ts, tz) for (ts, tz) in zip(ts_new, tz_new)]
+    ld_new = [ecwld.LocalDate.get_local_date(ts, tz) for (ts, tz) in zip(ts_new, tz_new)]
     loc_new = [gj.Point((lng, lat)) for (lng, lat) in zip(lng_new, lat_new)]
     fmt_time_new = [arrow.get(ts).to(tz).isoformat() for
                         (ts, tz) in zip(ts_new, tz_new)]
@@ -1102,7 +1107,10 @@ def _fix_squished_place_mismatch(user_id, trip_id, ts, cleaned_trip_data, cleane
         logging.debug("section counts = %s" % list(zip(related_sections, section_counts)))
         # This code should work even if this assert is removed
         # but this is the expectation we have based on the use cases we have seen so far
-        assert(min(section_counts) == 1)
+        if min(section_counts) != 1:
+            logging.error("Section counts = %s, expecting 1" % section_counts)
+            if eac.get_config()["intake.cleaning.clean_and_resample.sectionValidityAssertions"]:
+                assert False
        
         # the most common section is the one at the same index as the max
         # count. This is the valid section

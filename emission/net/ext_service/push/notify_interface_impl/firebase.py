@@ -8,6 +8,7 @@ from builtins import *
 import logging
 import requests
 import copy
+import time
 
 # Our imports
 import emission.core.get_database as edb
@@ -21,6 +22,12 @@ def get_interface(push_config):
 class FirebasePush(pni.NotifyInterface):
     def __init__(self, push_config):
         self.server_auth_token = push_config["server_auth_token"]
+        if "app_package_name" in push_config:
+            self.app_package_name = push_config["app_package_name"]
+        else:
+            logging.warning("No package name specified, defaulting to embase")
+            self.app_package_name = "edu.berkeley.eecs.embase"
+        self.is_fcm_format = push_config["ios_token_format"] == "fcm"
 
     def get_and_invalidate_entries(self):
         # Need to figure out how to do this on firebase
@@ -33,6 +40,10 @@ class FirebasePush(pni.NotifyInterface):
         logging.warning("https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages")
 
     def map_existing_fcm_tokens(self, token_map):
+        if self.is_fcm_format:
+            logging.info("iOS tokens are already in the FCM format, no mapping required")
+            return ({"ios": token_map["ios"],
+                    "android": token_map["android"]}, [])
         # android tokens never need to be mapped, so let's just not even check them
         mapped_token_map = {"ios": [],
                             "android": token_map["android"]}
@@ -60,7 +71,7 @@ class FirebasePush(pni.NotifyInterface):
         importHeaders = {"Authorization": "key=%s" % self.server_auth_token,
                          "Content-Type": "application/json"}
         importMessage = {
-            "application": "edu.berkeley.eecs.emission",
+            "application": self.app_package_name,
             "sandbox": dev,
             "apns_tokens":token_list
         }
@@ -79,7 +90,7 @@ class FirebasePush(pni.NotifyInterface):
                     ret_list.append(result["registration_token"])
                     logging.debug("Found firebase mapping from %s -> %s at index %d"%
                         (result["apns_token"], result["registration_token"], i));
-                    edb.get_push_token_mapping_db().insert({"native_token": result["apns_token"],
+                    edb.get_push_token_mapping_db().insert_one({"native_token": result["apns_token"],
                                                             "platform": "ios",
                                                             "mapped_token": result["registration_token"]})
                 else:
@@ -140,9 +151,12 @@ class FirebasePush(pni.NotifyInterface):
         # convert tokens if necessary
         fcm_token_map = self.convert_to_fcm_if_necessary(token_map, dev)
 
-        response = push_service.notify_multiple_devices(registration_ids=fcm_token_list,
+        response = {}
+        response["ios"] = push_service.notify_multiple_devices(registration_ids=fcm_token_map["ios"],
                                                    data_message=ios_raw_data,
                                                    content_available=True)
+        response["android"] = {"success": "skipped", "failure": "skipped",
+                               "results": "skipped"}
         logging.debug(response)
         return response
 

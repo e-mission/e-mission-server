@@ -18,7 +18,6 @@ import emission.tests.common as etc
 import emission.analysis.intake.cleaning.filter_accuracy as eaicf
 
 import emission.storage.timeseries.format_hacks.move_filter_field as estfm
-import emission.storage.decorations.local_date_queries as esdldq
 
 from emission.net.api import metrics
 
@@ -34,11 +33,11 @@ class TestMetrics(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID1)
         etc.runIntakePipeline(self.testUUID)
         logging.info(
-            "After loading, timeseries db size = %s" % edb.get_timeseries_db().count())
+            "After loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
         self.aug_start_ts = 1438387200
         self.aug_end_ts = 1441065600
-        self.day_start_dt = esdldq.get_local_date(self.aug_start_ts, "America/Los_Angeles")
-        self.day_end_dt = esdldq.get_local_date(self.aug_end_ts, "America/Los_Angeles")
+        self.day_start_dt = ecwl.LocalDate.get_local_date(self.aug_start_ts, "America/Los_Angeles")
+        self.day_end_dt = ecwl.LocalDate.get_local_date(self.aug_end_ts, "America/Los_Angeles")
 
     def tearDown(self):
         self.clearRelatedDb()

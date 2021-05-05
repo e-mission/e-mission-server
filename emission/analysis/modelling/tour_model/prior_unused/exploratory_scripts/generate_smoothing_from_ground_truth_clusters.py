@@ -78,7 +78,7 @@ def generate_cluster_comparison(sID_list, outPath):
 clusterDict = tp.__read_user_clusters_text("shankari", "/Users/shankari/cluster_ground_truth/ground_truthed_clusters/manual_ground_truths")
 caltrainSID = clusterDict["shankari_mtn_view_to_millbrae"]
 print("Found %d sections in ground truth" % len(caltrainSID))
-caltrainSIDInDb = [s for s in caltrainSID if edb.get_section_db().find({'_id': s}).count() == 1]
+caltrainSIDInDb = [s for s in caltrainSID if edb.get_section_db().count_documents({'_id': s}) == 1]
 print("Found %d ground truthed sections in DB" % len(caltrainSIDInDb))
 
 caltrainSectionsInDb = [edb.get_section_db().find_one({"_id": sid}) for sid in caltrainSIDInDb]

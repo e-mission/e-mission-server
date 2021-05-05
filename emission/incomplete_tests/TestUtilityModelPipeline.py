@@ -8,7 +8,6 @@ standard_library.install_aliases()
 from builtins import *
 import unittest
 import json
-#from main import tripManager
 from pymongo import MongoClient
 import logging
 from datetime import datetime, timedelta
@@ -41,7 +40,7 @@ class TestUtilityModelPipeline(unittest.TestCase):
     self.ModesColl = get_mode_db()
     self.ModesColl.remove()
 
-    self.assertEquals(self.ModesColl.find().count(), 0)
+    self.assertEquals(self.ModesColl.estimated_document_count(), 0)
 
     dataJSON = json.load(open("emission/tests/data/modes.json"))
     for row in dataJSON:
@@ -57,7 +56,7 @@ class TestUtilityModelPipeline(unittest.TestCase):
   def tearDown(self):
     get_section_db().remove({"user_id": self.testUUID})
     self.ModesColl.remove()
-    self.assertEquals(self.ModesColl.find().count(), 0)
+    self.assertEquals(self.ModesColl.estimated_document_count(), 0)
 
   def loadTestJSON(self, fileName):
     fileHandle = open(fileName)

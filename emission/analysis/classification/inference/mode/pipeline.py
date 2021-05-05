@@ -54,7 +54,7 @@ def del_all_objects(is_dry_run):
     del_query = {}
     del_query.update({"metadata.key": {"$in": ["inference/prediction", "analysis/inferred_section"]}})
     logging.info("About to delete %d entries" 
-        % edb.get_analysis_timeseries_db().find(del_query).count())
+        % edb.get_analysis_timeseries_db().count_documents(del_query))
     logging.info("About to delete entries with keys %s" 
         % edb.get_analysis_timeseries_db().find(del_query).distinct("metadata.key"))
 
@@ -91,14 +91,14 @@ def del_objects_after(user_id, reset_ts, is_dry_run):
     
 
     logging.info("About to delete %d entries" 
-        % edb.get_analysis_timeseries_db().find(del_query).count())
+        % edb.get_analysis_timeseries_db().count_documents(del_query))
     logging.info("About to delete entries with keys %s" 
         % edb.get_analysis_timeseries_db().find(del_query).distinct("metadata.key"))
     
     if is_dry_run:
         logging.info("this is a dry-run, returning from del_objects_after without modifying anything")
     else:
-        result = edb.get_analysis_timeseries_db().remove(del_query)
+        result = edb.get_analysis_timeseries_db().delete_many(del_query)
         logging.info("this is not a dry-run, result of deleting analysis entries is %s" % result)
 
 class ModeInferencePipeline:
@@ -129,8 +129,11 @@ class ModeInferencePipeline:
         time_query=timerange)
     if (len(self.toPredictSections) == 0):
         logging.debug("len(toPredictSections) == 0, early return")
-        assert self.last_section_done is None, ("self.last_section_done == %s, expecting None" % \
-            self.last_section_done)
+        if self.last_section_done is not None:
+            logging.error("self.last_section_done == %s, expecting None" %
+                self.last_section_done)
+            if eac.get_config()["classification.validityAssertions"]:
+                assert False
         return None
 
     self.loadModelStage()
@@ -348,7 +351,8 @@ class ModeInferencePipeline:
 if __name__ == "__main__":
   import json
 
-  config_data = json.load(open('config.json'))
+  with open('config.json') as cf:
+      config_data = json.load(cf)
   log_base_dir = config_data['paths']['log_base_dir']
   logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
                       filename="%s/pipeline.log" % log_base_dir, level=logging.DEBUG)

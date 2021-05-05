@@ -1,7 +1,12 @@
 {
+    "intake.segmentation.section_segmentation.sectionValidityAssertions": true,
     "intake.cleaning.clean_and_resample.speedDistanceAssertions": true,
+    "intake.cleaning.clean_and_resample.sectionValidityAssertions": true,
     "intake.cleaning.filter_accuracy.enable": false,
     "classification.inference.mode.useAdvancedFeatureIndices": true,
     "classification.inference.mode.useBusTrainFeatureIndices": true,
-    "analysis.result.section.key": "analysis/inferred_section"
+    "classification.validityAssertions": true,
+    "output.conversion.validityAssertions": true,
+    "analysis.result.section.key": "analysis/inferred_section",
+    "userinput.keylist": ["manual/mode_confirm", "manual/purpose_confirm"]
 }

@@ -1,0 +1,10 @@
+{
+    "alert_type": "survey",
+    "title": "Tell us about yourself",
+    "message": "3 question survey - approx 20 secs",
+    "image": "icon",
+    "spec": {
+      "url": "https://docs.google.com/forms/d/e/1FAIpQLSd_7VICYb8AfLQPIt8pg9AYsXW_rrHQBfsv-NSviO7Dgk7fyg/viewform",
+      "uuidSearchParam": "entry.488417190"
+    }
+}

@@ -34,9 +34,9 @@ class TestPointCountQuery(unittest.TestCase):
         self.clearRelatedDb()
 
     def clearRelatedDb(self):
-        edb.get_timeseries_db().remove({"user_id": {"$in": self.testUUIDList}})
-        edb.get_analysis_timeseries_db().remove({"user_id": {"$in": self.testUUIDList}})
-        edb.get_usercache_db().remove({"user_id": {"$in": self.testUUIDList}})
+        edb.get_timeseries_db().delete_many({"user_id": {"$in": self.testUUIDList}})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": {"$in": self.testUUIDList}})
+        edb.get_usercache_db().delete_many({"user_id": {"$in": self.testUUIDList}})
 
     def testAllQuery(self): 
         dataFile = "emission/tests/data/real_examples/shankari_2016-06-20"

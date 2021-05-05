@@ -28,7 +28,6 @@ import socket
 import urllib.request, urllib.parse, urllib.error
 import requests
 import traceback
-import xmltodict
 import urllib.request, urllib.error, urllib.parse
 import bson.json_util
 
@@ -41,7 +40,6 @@ import emission.net.api.metrics as metrics
 import emission.net.api.pipeline as pipeline
 
 import emission.net.auth.auth as enaa
-# import emission.net.ext_service.moves.register as auth
 import emission.net.ext_service.habitica.proxy as habitproxy
 from emission.core.wrapper.client import Client
 from emission.core.wrapper.user import User
@@ -61,6 +59,7 @@ except:
     config_file = open('conf/net/api/webserver.conf.sample')
 
 config_data = json.load(config_file)
+config_file.close()
 static_path = config_data["paths"]["static_path"]
 python_path = config_data["paths"]["python_path"]
 server_host = config_data["server"]["host"]
@@ -240,6 +239,18 @@ def putIntoCache():
   from_phone = request.json['phone_to_server']
   return usercache.sync_phone_to_server(user_uuid, from_phone)
 
+@post('/usercache/putone')
+def putIntoOneEntry():
+  logging.debug("Called userCache.putone with request %s" % request)
+  user_uuid=getUUID(request)
+  logging.debug("user_uuid %s" % user_uuid)
+  the_entry = request.json['the_entry']
+  logging.debug("About to save entry %s" % the_entry)
+  # sync_phone_to_server requires a list, so we wrap our one entry in the list
+  from_phone = [the_entry]
+  usercache.sync_phone_to_server(user_uuid, from_phone)
+  return {"putone": True}
+
 @post('/timeline/getTrips/<day>')
 def getTrips(day):
   logging.debug("Called timeline.getTrips/%s" % day)
@@ -358,16 +369,6 @@ def getCustomURL(route):
   logging.debug("Redirecting to URL %s" % redirected_url)
   print("Redirecting to URL %s" % redirected_url)
   return {'redirect': 'success'}
-
-# proxy used to request and process XML from an external API, then convert it to JSON
-# original URL should be encoded in UTF-8
-@get("/asJSON/<originalXMLWebserviceURL>")
-def xmlProxy(originalXMLWebserviceURL):
-  decodedURL = urllib.parse.unquote(originalXMLWebserviceURL)
-  f = urllib.request.urlopen(decodedURL)
-  xml = f.read()
-  parsedXML = xmltodict.parse(xml)
-  return json.dumps(parsedXML)
 
 # Small utilities to make client software easier END
 

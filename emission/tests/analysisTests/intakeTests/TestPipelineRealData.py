@@ -37,6 +37,8 @@ import attrdict as ad
 import arrow
 import numpy as np
 import os
+import os.path
+import argparse
 
 # Our imports
 import emission.core.get_database as edb
@@ -56,16 +58,24 @@ class TestPipelineRealData(unittest.TestCase):
         np.random.seed(61297777)
         self.analysis_conf_path = \
             etc.set_analysis_config("analysis.result.section.key", "analysis/cleaned_section")
+        logging.info("setUp complete")
 
     def tearDown(self):
-        logging.debug("Clearing related databases")
-        self.clearRelatedDb()
-        os.remove(self.analysis_conf_path)
+        logging.debug("Clearing related databases for %s" % self.testUUID)
+        # Clear the database only if it is not an evaluation run
+        # A testing run validates that nothing has changed
+        # An evaluation run compares to different algorithm implementations
+        # to determine whether to switch to a new implementation
+        if not hasattr(self, "evaluation") or not self.evaluation:
+            self.clearRelatedDb()
+        if hasattr(self, "analysis_conf_path"):
+            os.remove(self.analysis_conf_path)
+        logging.info("tearDown complete")
 
     def clearRelatedDb(self):
-        edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
-        edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID})
-        edb.get_usercache_db().delete_many({"user_id": self.testUUID})
+        logging.info("Timeseries delete result %s" % edb.get_timeseries_db().delete_many({"user_id": self.testUUID}).raw_result)
+        logging.info("Analysis delete result %s" % edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID}).raw_result)
+        logging.info("Usercache delete result %s" % edb.get_usercache_db().delete_many({"user_id": self.testUUID}).raw_result)
 
     def compare_result(self, result, expect):
         # This is basically a bunch of asserts to ensure that the timeline is as
@@ -173,14 +183,22 @@ class TestPipelineRealData(unittest.TestCase):
                 logging.debug(20 * "-")
             logging.debug(20 * "=")
 
-    def testJun20(self):
-        # This is a fairly straightforward day. Tests mainly:
-        # - ordering of trips
-        # - handling repeated location entries with different write timestamps
-        # We have two identical location points with ts = 1466436483.395 and write_ts = 1466436496.4, 1466436497.047
-        dataFile = "emission/tests/data/real_examples/shankari_2016-06-20"
-        ld = ecwl.LocalDate({'year': 2016, 'month': 6, 'day': 20})
-        cacheKey = "diary/trips-2016-06-20"
+    def persistGroundTruthIfNeeded(self, api_result, dataFile, ld, cacheKey):
+        if hasattr(self, "persistence") and self.persistence:
+            savedFn = "/tmp/"+os.path.basename(dataFile)+".ground_truth"
+            logging.info("Persisting ground truth to "+savedFn)
+            with open(savedFn, "w") as gofp:
+                wrapped_gt = {
+                    "data": api_result,
+                    "metadata": {
+                        "key": cacheKey,
+                        "type": "document",
+                        "write_ts": arrow.now().timestamp
+                    }
+                }
+                json.dump(wrapped_gt, gofp, indent=4, default=bju.default)
+
+    def standardMatchDataGroundTruth(self, dataFile, ld, cacheKey):
         with open(dataFile+".ground_truth") as gfp:
             ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
@@ -194,10 +212,21 @@ class TestPipelineRealData(unittest.TestCase):
         # cached_result = edb.get_usercache_db().find_one({'user_id': self.testUUID,
         #                                                  "metadata.key": cacheKey})
         api_result = gfc.get_geojson_for_dt(self.testUUID, ld, ld)
+        self.persistGroundTruthIfNeeded(api_result, dataFile, ld, cacheKey)
 
         # self.compare_result(cached_result, ground_truth)
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth).data)
+
+    def testJun20(self):
+        # This is a fairly straightforward day. Tests mainly:
+        # - ordering of trips
+        # - handling repeated location entries with different write timestamps
+        # We have two identical location points with ts = 1466436483.395 and write_ts = 1466436496.4, 1466436497.047
+        dataFile = "emission/tests/data/real_examples/shankari_2016-06-20"
+        ld = ecwl.LocalDate({'year': 2016, 'month': 6, 'day': 20})
+        cacheKey = "diary/trips-2016-06-20"
+        self.standardMatchDataGroundTruth(dataFile, ld, cacheKey)
 
     def testJun21(self):
         # This is a more complex day. Tests:
@@ -207,23 +236,7 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-06-21"
         ld = ecwl.LocalDate({'year': 2016, 'month': 6, 'day': 21})
         cacheKey = "diary/trips-2016-06-21"
-        with open(dataFile+".ground_truth") as gfp:
-            ground_truth = json.load(gfp, object_hook=bju.object_hook)
-
-        etc.setupRealExample(self, dataFile)
-        etc.runIntakePipeline(self.testUUID)
-        # runIntakePipeline does not run the common trips, habitica or store views to cache
-        # So let's manually store to the cache
-        # tc_query = estt.TimeComponentQuery("data.star_local_dt", ld, ld)
-        # enuah.UserCacheHandler.getUserCacheHandler(self.testUUID).storeTimelineToCache(tc_query)
-
-        # cached_result = edb.get_usercache_db().find_one({'user_id': self.testUUID,
-        #                                                  "metadata.key": cacheKey})
-        api_result = gfc.get_geojson_for_dt(self.testUUID, ld, ld)
-
-        # self.compare_result(cached_result, ground_truth)
-        self.compare_result(ad.AttrDict({'result': api_result}).result,
-                            ad.AttrDict(ground_truth).data)
+        self.standardMatchDataGroundTruth(dataFile, ld, cacheKey)
 
     def testAug10(self):
         # This is a more complex day. Tests:
@@ -233,23 +246,7 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-08-10"
         ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 10})
         cacheKey = "diary/trips-2016-08-10"
-        with open(dataFile+".ground_truth") as gfp:
-            ground_truth = json.load(gfp, object_hook=bju.object_hook)
-
-        etc.setupRealExample(self, dataFile)
-        etc.runIntakePipeline(self.testUUID)
-        # runIntakePipeline does not run the common trips, habitica or store views to cache
-        # So let's manually store to the cache
-        # tc_query = estt.TimeComponentQuery("data.star_local_dt", ld, ld)
-        # enuah.UserCacheHandler.getUserCacheHandler(self.testUUID).storeTimelineToCache(tc_query)
-
-        # cached_result = edb.get_usercache_db().find_one({'user_id': self.testUUID,
-        #                                                  "metadata.key": cacheKey})
-        api_result = gfc.get_geojson_for_dt(self.testUUID, ld, ld)
-
-        # self.compare_result(cached_result, ground_truth)
-        self.compare_result(ad.AttrDict({'result': api_result}).result,
-                            ad.AttrDict(ground_truth).data)
+        self.standardMatchDataGroundTruth(dataFile, ld, cacheKey)
 
     def testAug11(self):
         # This is a more complex day. Tests:
@@ -261,109 +258,49 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-08-11"
         ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 11})
         cacheKey = "diary/trips-2016-08-11"
-        with open(dataFile+".ground_truth") as gfp:
-            ground_truth = json.load(gfp, object_hook=bju.object_hook)
-
-        etc.setupRealExample(self, dataFile)
-        etc.runIntakePipeline(self.testUUID)
-        # runIntakePipeline does not run the common trips, habitica or store views to cache
-        # So let's manually store to the cache
-        # tc_query = estt.TimeComponentQuery("data.star_local_dt", ld, ld)
-        # enuah.UserCacheHandler.getUserCacheHandler(self.testUUID).storeTimelineToCache(tc_query)
-
-        # cached_result = edb.get_usercache_db().find_one({'user_id': self.testUUID,
-        #                                                  "metadata.key": cacheKey})
-        api_result = gfc.get_geojson_for_dt(self.testUUID, ld, ld)
-
-        # self.compare_result(cached_result, ground_truth)
-        self.compare_result(ad.AttrDict({'result': api_result}).result,
-                            ad.AttrDict(ground_truth).data)
+        self.standardMatchDataGroundTruth(dataFile, ld, cacheKey)
 
     def testFeb22ShortTripsDistance(self):
         dataFile = "emission/tests/data/real_examples/iphone_3_2016-02-22"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 2, 'day': 22})
         end_ld = ecwl.LocalDate({'year': 2016, 'month': 2, 'day': 22})
         cacheKey = "diary/trips-2016-02-22"
-        with open(dataFile+".ground_truth") as gfp:
-            ground_truth = json.load(gfp, object_hook=bju.object_hook)
+        self.standardMatchDataGroundTruth(dataFile, start_ld, cacheKey)
 
-        etc.setupRealExample(self, dataFile)
-        etc.runIntakePipeline(self.testUUID)
-        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, end_ld)
-
-        # Although we process the day's data in two batches, we should get the same result
-        self.compare_result(ad.AttrDict({'result': api_result}).result,
-                                   ad.AttrDict(ground_truth).data)
-
-#     def testAug27TooMuchExtrapolation(self):
-#         dataFile = "emission/tests/data/real_examples/shankari_2015-aug-27"
-#         start_ld = ecwl.LocalDate({'year': 2015, 'month': 8, 'day': 27})
-#         end_ld = ecwl.LocalDate({'year': 2015, 'month': 8, 'day': 27})
-#         cacheKey = "diary/trips-2015-08-27"
-#         with open(dataFile+".ground_truth") as gfp:
-#             ground_truth = json.load(gfp, object_hook=bju.object_hook)
-# 
-#         etc.setupRealExample(self, dataFile)
-#         etc.runIntakePipeline(self.testUUID)
-#         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, end_ld)
-# 
-#         # Although we process the day's data in two batches, we should get the same result
-#         self.compare_result(ad.AttrDict({'result': api_result}).result,
-#                             ad.AttrDict(ground_truth).data)
+    def testAug27TooMuchExtrapolation(self):
+        dataFile = "emission/tests/data/real_examples/shankari_2015-aug-27"
+        start_ld = ecwl.LocalDate({'year': 2015, 'month': 8, 'day': 27})
+        end_ld = ecwl.LocalDate({'year': 2015, 'month': 8, 'day': 27})
+        cacheKey = "diary/trips-2015-08-27"
+        self.standardMatchDataGroundTruth(dataFile, start_ld, cacheKey)
 
     def testAirTripToHawaii(self):
         dataFile = "emission/tests/data/real_examples/shankari_2016-07-27"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 27})
         cacheKey = "diary/trips-2016-07-27"
-        with open(dataFile+".ground_truth") as gfp:
-            ground_truth = json.load(gfp, object_hook=bju.object_hook)
-
-        etc.setupRealExample(self, dataFile)
-        etc.runIntakePipeline(self.testUUID)
-        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
-        # Although we process the day's data in two batches, we should get the same result
-        self.compare_result(ad.AttrDict({'result': api_result}).result,
-                            ad.AttrDict(ground_truth).data)
-
+        self.standardMatchDataGroundTruth(dataFile, start_ld, cacheKey)
 
     def testAirTripHawaiiEnd(self):
         dataFile = "emission/tests/data/real_examples/shankari_2016-08-04"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 4})
         cacheKey = "diary/trips-2016-07-27"
-        with open(dataFile+".ground_truth") as gfp:
-            ground_truth = json.load(gfp, object_hook=bju.object_hook)
-
-        etc.setupRealExample(self, dataFile)
-        etc.runIntakePipeline(self.testUUID)
-        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
-        # Although we process the day's data in two batches, we should get the same result
-        self.compare_result(ad.AttrDict({'result': api_result}).result,
-                            ad.AttrDict(ground_truth).data)
+        self.standardMatchDataGroundTruth(dataFile, start_ld, cacheKey)
 
     def testAirTripFromHawaii(self):
         dataFile = "emission/tests/data/real_examples/shankari_2016-08-05"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 0o5})
         cacheKey = "diary/trips-2016-07-05"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
-
-        etc.setupRealExample(self, dataFile)
-        etc.runIntakePipeline(self.testUUID)
-
-        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
-        # Although we process the day's data in two batches, we should get the same result
-        self.compare_result(ad.AttrDict({'result': api_result}).result,
-                            ad.AttrDict(ground_truth).data)
+        self.standardMatchDataGroundTruth(dataFile, start_ld, cacheKey)
 
     def testSunilShortTrips(self):
         dataFile = "emission/tests/data/real_examples/sunil_2016-07-27"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 27})
         cacheKey = "diary/trips-2016-07-27"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
-
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
 
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
+        self.persistGroundTruthIfNeeded(api_result, dataFile, start_ld, cacheKey)
         # Although we process the day's data in two batches, we should get the same result
         self.assertEqual(api_result, [])
 
@@ -371,40 +308,26 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/gabe_2016-06-15"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 6, 'day': 15})
         cacheKey = "diary/trips-2016-06-15"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
-
-        etc.setupRealExample(self, dataFile)
-        etc.runIntakePipeline(self.testUUID)
-
-        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
-        # Although we process the day's data in two batches, we should get the same result
-        self.compare_result(ad.AttrDict({'result': api_result}).result,
-                            ad.AttrDict(ground_truth).data)
+        self.standardMatchDataGroundTruth(dataFile, start_ld, cacheKey)
 
     def testJumpSmoothingSectionEnd(self):
         dataFile = "emission/tests/data/real_examples/shankari_2016-independence_day"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 15})
         cacheKey = "diary/trips-2016-08-15"
-        ground_truth = json.load(open("emission/tests/data/real_examples/shankari_2016-independence_day.ground_truth"), object_hook=bju.object_hook)
-
-        etc.setupRealExample(self, dataFile)
-        etc.runIntakePipeline(self.testUUID)
-
-        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
-        # Although we process the day's data in two batches, we should get the same result
-        self.compare_result(ad.AttrDict({'result': api_result}).result,
-                            ad.AttrDict(ground_truth).data)
+        self.standardMatchDataGroundTruth(dataFile, start_ld, cacheKey)
 
     def testJumpSmoothingSectionsStraddle(self):
         dataFile = "emission/tests/data/real_examples/shankari_2016-independence_day_jump_straddle"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 15})
         cacheKey = "diary/trips-2016-08-15"
-        ground_truth = json.load(open("emission/tests/data/real_examples/shankari_2016-independence_day.ground_truth"), object_hook=bju.object_hook)
+        with open("emission/tests/data/real_examples/shankari_2016-independence_day.ground_truth") as gfp:
+            ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
 
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
+        self.persistGroundTruthIfNeeded(api_result, dataFile, start_ld, cacheKey)
         # Although we process the day's data in two batches, we should get the same result
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth).data)
@@ -413,12 +336,14 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-independence_day_jump_bus_start"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 15})
         cacheKey = "diary/trips-2016-08-15"
-        ground_truth = json.load(open("emission/tests/data/real_examples/shankari_2016-independence_day.ground_truth"), object_hook=bju.object_hook)
+        with open("emission/tests/data/real_examples/shankari_2016-independence_day.ground_truth") as gfp:
+            ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
 
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
+        self.persistGroundTruthIfNeeded(api_result, dataFile, start_ld, cacheKey)
         # Although we process the day's data in two batches, we should get the same result
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth).data)
@@ -428,60 +353,28 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2015-08-23"
         start_ld = ecwl.LocalDate({'year': 2015, 'month': 8, 'day': 23})
         cacheKey = "diary/trips-2015-08-23"
-        ground_truth = json.load(open("emission/tests/data/real_examples/shankari_2015-08-23.ground_truth"), object_hook=bju.object_hook)
-
-        etc.setupRealExample(self, dataFile)
-        etc.runIntakePipeline(self.testUUID)
-
-        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
-        # Although we process the day's data in two batches, we should get the same result
-        self.compare_result(ad.AttrDict({'result': api_result}).result,
-                            ad.AttrDict(ground_truth).data)
+        self.standardMatchDataGroundTruth(dataFile, start_ld, cacheKey)
 
     def testSquishedMismatchForUntrackedTime(self):
         # Test for a2c0ee4e3ceafa822425ceef299dcdb01c9b32c9
         dataFile = "emission/tests/data/real_examples/shankari_2015-07-22"
         start_ld = ecwl.LocalDate({'year': 2015, 'month': 7, 'day': 22})
         cacheKey = "diary/trips-2015-07-22"
-        ground_truth = json.load(open("emission/tests/data/real_examples/shankari_2015-07-22.ground_truth"), object_hook=bju.object_hook)
-
-        etc.setupRealExample(self, dataFile)
-        etc.runIntakePipeline(self.testUUID)
-
-        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
-        # Although we process the day's data in two batches, we should get the same result
-        self.compare_result(ad.AttrDict({'result': api_result}).result,
-                            ad.AttrDict(ground_truth).data)
+        self.standardMatchDataGroundTruth(dataFile, start_ld, cacheKey)
 
     def testUnknownTrips(self):
         # Test for a2c0ee4e3ceafa822425ceef299dcdb01c9b32c9
         dataFile = "emission/tests/data/real_examples/shankari_2016-09-03"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 9, 'day': 3})
         cacheKey = "diary/trips-2016-09-03"
-        ground_truth = json.load(open("emission/tests/data/real_examples/shankari_2016-09-03.ground_truth"), object_hook=bju.object_hook)
-
-        etc.setupRealExample(self, dataFile)
-        etc.runIntakePipeline(self.testUUID)
-
-        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
-        # Although we process the day's data in two batches, we should get the same result
-        self.compare_result(ad.AttrDict({'result': api_result}).result,
-                            ad.AttrDict(ground_truth).data)
+        self.standardMatchDataGroundTruth(dataFile, start_ld, cacheKey)
 
     def testIosJumpsAndUntrackedSquishing(self):
         # Test for a2c0ee4e3ceafa822425ceef299dcdb01c9b32c9
         dataFile = "emission/tests/data/real_examples/sunil_2016-07-20"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 20})
         cacheKey = "diary/trips-2016-07-20"
-        ground_truth = json.load(open("emission/tests/data/real_examples/sunil_2016-07-20.ground_truth"), object_hook=bju.object_hook)
-
-        etc.setupRealExample(self, dataFile)
-        etc.runIntakePipeline(self.testUUID)
-
-        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
-        # Although we process the day's data in two batches, we should get the same result
-        self.compare_result(ad.AttrDict({'result': api_result}).result,
-                            ad.AttrDict(ground_truth).data)
+        self.standardMatchDataGroundTruth(dataFile, start_ld, cacheKey)
 
     def testAug10MultiSyncEndDetected(self):
         # Re-run, but with multiple calls to sync data
@@ -491,10 +384,11 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 9})
         end_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 10})
         cacheKey = "diary/trips-2016-08-10"
-        ground_truth = json.load(open("emission/tests/data/real_examples/shankari_2016-08-910.ground_truth"),
+        with open("emission/tests/data/real_examples/shankari_2016-08-910.ground_truth") as gtf:
+            ground_truth = json.load(gtf,
                                  object_hook=bju.object_hook)
 
-        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
+        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
         all_entries = None
         with open(dataFile) as secondfp:
             all_entries = json.load(secondfp, object_hook = bju.object_hook)
@@ -519,6 +413,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, end_ld)
+        self.persistGroundTruthIfNeeded(api_result, dataFile, start_ld, cacheKey)
 
         # Although we process the day's data in two batches, we should get the same result
         self.compare_approx_result(ad.AttrDict({'result': api_result}).result,
@@ -532,10 +427,12 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 2, 'day': 22})
         end_ld = ecwl.LocalDate({'year': 2016, 'month': 2, 'day': 22})
         cacheKey = "diary/trips-2016-02-22"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile+".ground_truth") as gtf:
+            ground_truth = json.load(gtf, object_hook=bju.object_hook)
 
-        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
-        all_entries = json.load(open(dataFile), object_hook = bju.object_hook)
+        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
+        with open(dataFile) as df:
+            all_entries = json.load(df, object_hook = bju.object_hook)
         # 18:01 because the transition was at 2016-02-22T18:00:09.623404-08:00, so right after
         # 18:00
         ts_1800 = arrow.get("2016-02-22T18:00:30-08:00").timestamp
@@ -544,8 +441,7 @@ class TestPipelineRealData(unittest.TestCase):
         after_1800_entries = [e for e in all_entries if ad.AttrDict(e).metadata.write_ts > ts_1800]
 
         # Sync at 18:00 to capture all the points on the trip *to* the optometrist
-        import uuid
-        self.testUUID = uuid.uuid4()
+        etc.createAndFillUUID(self)
         self.entries = before_1800_entries
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
@@ -556,6 +452,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, end_ld)
+        self.persistGroundTruthIfNeeded(api_result, dataFile, start_ld, cacheKey)
 
         # Although we process the day's data in two batches, we should get the same result
         self.compare_approx_result(ad.AttrDict({'result': api_result}).result,
@@ -569,11 +466,13 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 9})
         end_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 10})
         cacheKey = "diary/trips-2016-08-10"
-        ground_truth = json.load(open("emission/tests/data/real_examples/shankari_2016-08-910.ground_truth"),
+        with open("emission/tests/data/real_examples/shankari_2016-08-910.ground_truth") as gtf:
+            ground_truth = json.load(gtf,
                                  object_hook=bju.object_hook)
 
-        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
-        all_entries = json.load(open(dataFile), object_hook = bju.object_hook)
+        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
+        with open(dataFile) as df:
+            all_entries = json.load(df, object_hook = bju.object_hook)
         ts_1030 = arrow.get("2016-08-10T10:30:00-07:00").timestamp
         logging.debug("ts_1030 = %s, converted back = %s" % (ts_1030, arrow.get(ts_1030).to("America/Los_Angeles")))
         before_1030_entries = [e for e in all_entries if ad.AttrDict(e).metadata.write_ts <= ts_1030]
@@ -596,6 +495,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, end_ld)
+        self.persistGroundTruthIfNeeded(api_result, dataFile, start_ld, cacheKey)
 
         # Although we process the day's data in two batches, we should get the same result
         self.compare_approx_result(ad.AttrDict({'result': api_result}).result,
@@ -608,21 +508,26 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=bju.object_hook)
-        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile_1+".ground_truth") as gtf1:
+            ground_truth_1 = json.load(gtf1, object_hook=bju.object_hook)
+        with open(dataFile_2+".ground_truth") as gtf2:
+            ground_truth_2 = json.load(gtf2, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = json.load(open(dataFile_2), object_hook = bju.object_hook)
+        with open(dataFile_2) as df2:
+            self.entries = json.load(df2, object_hook = bju.object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_1, start_ld_1)
+        self.persistGroundTruthIfNeeded(api_result, dataFile_1, start_ld_1, cacheKey_1)
         # Although we process the day's data in two batches, we should get the same result
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth_1).data)
 
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_2, start_ld_2)
+        self.persistGroundTruthIfNeeded(api_result, dataFile_2, start_ld_2, cacheKey_2)
         # Although we process the day's data in two batches, we should get the same result
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth_2).data)
@@ -635,10 +540,12 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 2, 'day': 22})
         end_ld = ecwl.LocalDate({'year': 2016, 'month': 2, 'day': 22})
         cacheKey = "diary/trips-2016-02-22"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile+".ground_truth") as gtf:
+            ground_truth = json.load(gtf, object_hook=bju.object_hook)
 
-        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
-        all_entries = json.load(open(dataFile), object_hook = bju.object_hook)
+        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
+        with open(dataFile) as df:
+            all_entries = json.load(df, object_hook = bju.object_hook)
         # 18:01 because the transition was at 2016-02-22T18:00:09.623404-08:00, so right after
         # 18:00
         ts_1800 = arrow.get("2016-02-22T18:00:30-08:00").timestamp
@@ -648,8 +555,7 @@ class TestPipelineRealData(unittest.TestCase):
 
         # Sync at 18:00 to capture all the points on the trip *to* the optometrist
         # Skip the last few points to ensure that the trip end is skipped
-        import uuid
-        self.testUUID = uuid.uuid4()
+        etc.createAndFillUUID(self)
         self.entries = before_1800_entries[0:-2]
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
@@ -660,6 +566,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, end_ld)
+        self.persistGroundTruthIfNeeded(api_result, dataFile, start_ld, cacheKey)
 
         # Although we process the day's data in two batches, we should get the same result
         self.compare_approx_result(ad.AttrDict({'result': api_result}).result,
@@ -673,10 +580,12 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 10, 'day': 0o7})
         end_ld = ecwl.LocalDate({'year': 2016, 'month': 10, 'day': 0o7})
         cacheKey = "diary/trips-2016-10-07"
-        ground_truth = json.load(open(dataFile+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile+".ground_truth") as gtf:
+            ground_truth = json.load(gtf, object_hook=bju.object_hook)
 
-        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().count())
-        all_entries = json.load(open(dataFile), object_hook = bju.object_hook)
+        logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
+        with open(dataFile) as df:
+            all_entries = json.load(df, object_hook = bju.object_hook)
         # 18:01 because the transition was at 2016-02-22T18:00:09.623404-08:00, so right after
         # 18:00
         ts_1800 = arrow.get("2016-10-07T18:33:11-07:00").timestamp
@@ -686,8 +595,7 @@ class TestPipelineRealData(unittest.TestCase):
 
         # Sync at 18:00 to capture all the points on the trip *to* the optometrist
         # Skip the last few points to ensure that the trip end is skipped
-        import uuid
-        self.testUUID = uuid.uuid4()
+        etc.createAndFillUUID(self)
         self.entries = before_1800_entries
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
@@ -698,6 +606,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, end_ld)
+        self.persistGroundTruthIfNeeded(api_result, dataFile, start_ld, cacheKey)
 
         # Although we process the day's data in two batches, we should get the same result
         self.compare_approx_result(ad.AttrDict({'result': api_result}).result,
@@ -711,21 +620,27 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 1, 'day': 13})
         cacheKey_1 = "diary/trips-2016-01-12"
         cacheKey_2 = "diary/trips-2016-01-13"
-        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=bju.object_hook)
-        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile_1+".ground_truth") as gtf1:
+            ground_truth_1 = json.load(gtf1, object_hook=bju.object_hook)
+        with open(dataFile_2+".ground_truth") as gtf2:
+            ground_truth_2 = json.load(gtf2, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile_1)
-        self.entries = json.load(open(dataFile_2), object_hook = bju.object_hook)
+        with open(dataFile_2) as df2:
+            self.entries = json.load(df2, object_hook = bju.object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_1, start_ld_1)
         # Although we process the day's data in two batches, we should get the same result
+        self.persistGroundTruthIfNeeded(api_result, dataFile_1, start_ld_1, cacheKey_1)
+
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth_1).data)
 
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_2, start_ld_2)
         # Although we process the day's data in two batches, we should get the same result
+        self.persistGroundTruthIfNeeded(api_result, dataFile_2, start_ld_2, cacheKey_2)
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth_2).data)
 
@@ -737,22 +652,27 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 1, 'day': 13})
         cacheKey_1 = "diary/trips-2016-01-12"
         cacheKey_2 = "diary/trips-2016-01-13"
-        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=bju.object_hook)
-        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=bju.object_hook)
+        with open(dataFile_1+".ground_truth") as gtf1:
+            ground_truth_1 = json.load(gtf1, object_hook=bju.object_hook)
+        with open(dataFile_2+".ground_truth") as gtf2:
+            ground_truth_2 = json.load(gtf2, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = json.load(open(dataFile_2), object_hook = bju.object_hook)
+        with open(dataFile_2) as df2:
+            self.entries = json.load(df2, object_hook = bju.object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_1, start_ld_1)
         # Although we process the day's data in two batches, we should get the same result
+        self.persistGroundTruthIfNeeded(api_result, dataFile_1, start_ld_1, cacheKey_1)
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth_1).data)
 
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_2, start_ld_2)
         # Although we process the day's data in two batches, we should get the same result
+        self.persistGroundTruthIfNeeded(api_result, dataFile_2, start_ld_2, cacheKey_2)
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth_2).data)
 
@@ -761,43 +681,26 @@ class TestPipelineRealData(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_single_positional_indexer.dec-12"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 12, 'day': 12})
         cacheKey = "diary/trips-2016-12-12"
-        ground_truth = json.load(open("emission/tests/data/real_examples/shankari_single_positional_indexer.dec-12.ground_truth"), object_hook=bju.object_hook)
-
-        etc.setupRealExample(self, dataFile)
-        etc.runIntakePipeline(self.testUUID)
-
-        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
-        self.compare_result(ad.AttrDict({'result': api_result}).result,
-                            ad.AttrDict(ground_truth).data)
+        self.standardMatchDataGroundTruth(dataFile, start_ld, cacheKey)
 
     def testOverriddenModeHack(self):
         # Test for https://github.com/e-mission/e-mission-server/issues/457
         dataFile = "emission/tests/data/real_examples/test_overriden_mode_hack.jul-31"
         start_ld = ecwl.LocalDate({'year': 2017, 'month': 7, 'day': 31})
         cacheKey = "diary/trips-2017-07-31"
-        ground_truth = json.load(open("emission/tests/data/real_examples/test_overriden_mode_hack.jul-31.ground_truth"), object_hook=bju.object_hook)
-
-        etc.setupRealExample(self, dataFile)
-        etc.runIntakePipeline(self.testUUID)
-
-        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
-        self.compare_result(ad.AttrDict({'result': api_result}).result,
-                            ad.AttrDict(ground_truth).data)
+        self.standardMatchDataGroundTruth(dataFile, start_ld, cacheKey)
 
     def testJan16SpeedAssert(self):
         # Test for https://github.com/e-mission/e-mission-server/issues/457
         dataFile = "emission/tests/data/real_examples/another_speed_assertion_failure.jan-16"
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 1, 'day': 16})
         cacheKey = "diary/trips-2016-01-16"
-        ground_truth = json.load(open("emission/tests/data/real_examples/another_speed_assertion_failure.jan-16.ground_truth"), object_hook=bju.object_hook)
-
-        etc.setupRealExample(self, dataFile)
-        etc.runIntakePipeline(self.testUUID)
-
-        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld, start_ld)
-        self.compare_result(ad.AttrDict({'result': api_result}).result,
-                            ad.AttrDict(ground_truth).data)
+        self.standardMatchDataGroundTruth(dataFile, start_ld, cacheKey)
 
 if __name__ == '__main__':
     etc.configLogging()
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--algo_change",
+        help="modifications to the algorithm", action="store_true")
     unittest.main()

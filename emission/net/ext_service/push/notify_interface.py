@@ -19,6 +19,7 @@ import importlib
 try:
     push_config_file = open('conf/net/ext_service/push.json')
     push_config = json.load(push_config_file)
+    push_config_file.close()
 except:
     logging.warning("push service not configured, push notifications not supported")
 
