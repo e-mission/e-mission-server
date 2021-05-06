@@ -275,6 +275,12 @@ def get_tiersys_db():
     TierSys=_get_current_db().Tier_Sys
     return TierSys
 
+def get_checkinout_db():
+    Checkinout =_get_current_db().Checkinout
+    Checkinout.create_index([("bikeLabel",  pymongo.ASCENDING)], unique=True)
+    Checkinout.create_index([("user_id",  pymongo.ASCENDING)], unique=True)
+    return Checkinout
+
 def get_new_tier_db():
     newTier =_get_current_db().New_tier
     return newTier
