@@ -38,6 +38,7 @@ import emission.net.api.usercache as usercache
 import emission.net.api.timeline as timeline
 import emission.net.api.metrics as metrics
 import emission.net.api.pipeline as pipeline
+import emission.net.api.checkinout as checkinout
 
 import emission.net.auth.auth as enaa
 import emission.net.ext_service.habitica.proxy as habitproxy
@@ -425,6 +426,38 @@ def getListOfUsersInUsersTier():
     tierUsernames.append(User.getUsername(uuid))
   logging.debug("returning usernames to client")
   return {'allUsers' : tierUsernames}
+
+@post('/checkinout/new')
+def checkinoutmod():
+  user_id = getUUID(request)
+  checkinoutop = request.json["operation"]
+  co_details = request.json["details"]
+  co_details["user_id"] = user_id
+  if checkinoutop == "CHECKIN":
+    checkinout.checkin(co_details)
+  elif checkinoutop == "CHECKOUT":
+    checkinout.checkout(co_details)
+  else:
+    abort(400, "Invalid operation type %s" % checkinout["type"])
+  return {'operation': checkinoutop,
+        'details' : co_details}
+
+@post('/checkinout/list')
+def checkinoutlist():
+  user_uuid = get_user_or_aggregate_auth(request)
+  return {'ts_secs': arrow.get().timestamp,
+          'current_list': checkinout.checkedoutlist()}
+
+@post('/checkinout/get')
+def checkinoutlist():
+  user_id = getUUID(request)
+  return {'ts_secs': arrow.get().timestamp,
+          'current_checkout': checkinout.checkedoutget(user_id)}
+
+@post('/tier')
+def getUserTier():
+  user_id = getUUID(request)
+  return {'tier' : TierSys.getUserTier(user_id)}
 
 @post('/profile/create')
 def createUserProfile():
