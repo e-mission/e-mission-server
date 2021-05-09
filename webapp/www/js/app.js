@@ -37,6 +37,11 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services',
     templateUrl: 'templates/home.html',
     controller: 'HomeCtrl'
   })
+  .state('migrate', {
+    url: '/migrate',
+    templateUrl: 'templates/migrate.html',
+    controller: 'HomeCtrl'
+  })
   .state('heatmap', {
     url: '/heatmap',
     templateUrl: 'templates/heatmap.html',
