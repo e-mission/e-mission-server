@@ -67,45 +67,57 @@ class FirebasePush(pni.NotifyInterface):
     def retrieve_fcm_tokens(self, token_list, dev):
         if len(token_list) == 0:
             logging.debug("len(token_list) == 0, skipping fcm token mapping to save API call")
-            return None
+            return []
+        importedResultList = []
         importHeaders = {"Authorization": "key=%s" % self.server_auth_token,
                          "Content-Type": "application/json"}
-        importMessage = {
-            "application": self.app_package_name,
-            "sandbox": dev,
-            "apns_tokens":token_list
-        }
-        logging.debug("About to send message %s" % importMessage)
-        importResponse = requests.post("https://iid.googleapis.com/iid/v1:batchImport", headers=importHeaders, json=importMessage)
-        logging.debug("Response = %s" % importResponse)
-        importedResultJSON = importResponse.json()
-        return importedResultJSON
+        for curr_first in range(0, len(token_list), 100):
+            curr_batch = token_list[curr_first:curr_first + 100]
+            importMessage = {
+                "application": self.app_package_name,
+                "sandbox": dev,
+                "apns_tokens":curr_batch
+            }
+            logging.debug("About to send message %s" % importMessage)
+            importResponse = requests.post("https://iid.googleapis.com/iid/v1:batchImport", headers=importHeaders, json=importMessage)
+            logging.debug("Response = %s" % importResponse)
+            importedResultJSON = importResponse.json()
+            if importedResultJSON is not None and "results" in importedResultJSON:
+                importedResult = importedResultJSON["results"]
+                importedResultList.extend(importedResult)
+                print("After appending result of size %s, total size = %s" %
+                        (len(importedResult), len(importedResultList)))
+            else:
+                print(f"Received invalid result for batch starting at = {curr_first}")
+        return importedResultList
 
-    def process_fcm_token_result(self, importedResultJSON):
+    def process_fcm_token_result(self, importedResultList):
         ret_list = []
-        if importedResultJSON is not None and "results" in importedResultJSON:
-            importedResult = importedResultJSON["results"]
-            for i, result in enumerate(importedResult):
-                if result["status"] == "OK" and "registration_token" in result:
-                    ret_list.append(result["registration_token"])
-                    logging.debug("Found firebase mapping from %s -> %s at index %d"%
-                        (result["apns_token"], result["registration_token"], i));
-                    edb.get_push_token_mapping_db().insert_one({"native_token": result["apns_token"],
-                                                            "platform": "ios",
-                                                            "mapped_token": result["registration_token"]})
-                else:
-                    logging.warning("Got error %s while mapping iOS token at index %d" %
-                        (result, i));
+        for i, result in enumerate(importedResultList):
+            if result["status"] == "OK" and "registration_token" in result:
+                ret_list.append(result["registration_token"])
+                logging.debug("Found firebase mapping from %s -> %s at index %d"%
+                    (result["apns_token"], result["registration_token"], i));
+                edb.get_push_token_mapping_db().insert_one({"native_token": result["apns_token"],
+                                                        "platform": "ios",
+                                                        "mapped_token": result["registration_token"]})
+            else:
+                logging.warning("Got error %s while mapping iOS token at index %d" %
+                    (result, i));
         return ret_list
 
     def convert_to_fcm_if_necessary(self, token_map, dev):
         (mapped_token_map, unmapped_token_list) = self.map_existing_fcm_tokens(token_map)
-        importedResultJSON = self.retrieve_fcm_tokens(unmapped_token_list, dev)
-        newly_mapped_token_list = self.process_fcm_token_result(importedResultJSON)
+        importedResultList = self.retrieve_fcm_tokens(unmapped_token_list, dev)
+        newly_mapped_token_list = self.process_fcm_token_result(importedResultList)
+        print("after mapping iOS tokens, imported %s -> processed %s" %
+            (len(importedResultList), len(newly_mapped_token_list)))
         combo_token_map = {"ios": [],
                            "android": []}
         combo_token_map["ios"] = mapped_token_map["ios"] + newly_mapped_token_list
         combo_token_map["android"] = mapped_token_map["android"]
+        print("combo token map has %d ios entries and %d android entries" %
+            (len(combo_token_map["ios"]), len(combo_token_map["android"])))
         return combo_token_map
 
     def send_visible_notification(self, token_map, title, message, json_data, dev=False):
