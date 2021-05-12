@@ -35,7 +35,7 @@ def generate_fake_result(successful_tokens, failed_tokens):
     }
     fake_result["results"] = fake_result["results"] + [{"status": "no_matching_token",
                     "apns_token": token} for token in failed_tokens]
-    return fake_result
+    return fake_result["results"]
 
 
 class TestPush(unittest.TestCase):
