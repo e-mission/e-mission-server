@@ -80,7 +80,7 @@ def filter_accuracy(user_id):
         epq.mark_accuracy_filtering_done(user_id, None)
         return
 
-    SEL_FIELDS_FOR_DUP = ["latitude", "longitude", "ts", "accuracy", "metadata_write_ts"]
+    SEL_FIELDS_FOR_DUP = ["latitude", "longitude", "ts", "accuracy"]
 
     try:
         unfiltered_points_list = list(timeseries.find_entries(["background/location"], time_query))
@@ -89,6 +89,7 @@ def filter_accuracy(user_id):
             epq.mark_accuracy_filtering_done(user_id, None) 
         else:        
             unfiltered_points_df = unfiltered_points_df[SEL_FIELDS_FOR_DUP]
+            unfiltered_points_df["msts"] = unfiltered_points_df.ts.apply(lambda x: int(x * 10**3))
             filtered_from_unfiltered_df = unfiltered_points_df[unfiltered_points_df.accuracy < 200].drop_duplicates()
             logging.info("filtered %d of %d points" % (len(filtered_from_unfiltered_df), len(unfiltered_points_df)))
             filtered_points_df = timeseries.get_data_df("background/filtered_location", time_query)
@@ -98,14 +99,15 @@ def filter_accuracy(user_id):
             else:
                 logging.debug("Partial filtered points %d found" % len(filtered_points_df))
                 filtered_points_df = filtered_points_df[SEL_FIELDS_FOR_DUP]
-                matched_points_df = filtered_from_unfiltered.merge(filtered_points_df, on="ts", left_index=True)
+                filtered_points_df["msts"] = filtered_points_df.ts.apply(lambda x: int(x * 10**3))
+                matched_points_df = filtered_from_unfiltered_df.merge(filtered_points_df, on="msts", right_index=True)
                 to_insert_df = filtered_from_unfiltered_df.drop(index=matched_points_df.index)
             for idx, entry in to_insert_df.iterrows():
                 unfiltered_entry = unfiltered_points_list[idx]
                 # logging.debug("Inserting %s filtered entry %s into timeseries" % (idx, entry))
                 entry_copy = convert_to_filtered(unfiltered_entry)
                 timeseries.insert(entry_copy)
-            last_entry_processed = unfiltered_points_df.iloc[-1].metadata_write_ts
+            last_entry_processed = unfiltered_points_list[-1]["metadata"]["write_ts"]
             epq.mark_accuracy_filtering_done(user_id, float(last_entry_processed))
     except:
         logging.exception("Marking accuracy filtering as failed")
