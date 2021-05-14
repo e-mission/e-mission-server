@@ -17,6 +17,9 @@ from uuid import UUID
 import os
 
 # Our imports
+import emission.core.get_database as edb
+import emission.core.wrapper.pipelinestate as ecwp
+
 import emission.analysis.intake.cleaning.filter_accuracy as eaicf
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.pipeline_queries as epq
@@ -48,6 +51,11 @@ class TestFilterAccuracy(unittest.TestCase):
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
         edb.get_pipeline_state_db().delete_many({"user_id": self.testUUID})
         os.remove(self.analysis_conf_path)
+
+    def checkSuccessfulRun(self):
+        pipelineState = edb.get_pipeline_state_db().find_one({"user_id": self.testUUID,
+            "pipeline_stage": ecwp.PipelineStages.ACCURACY_FILTERING.value})
+        self.assertIsNotNone(pipelineState["last_ts_run"])
         
     def testEmptyCallToPriorDuplicate(self):
         time_query = epq.get_time_range_for_accuracy_filtering(self.testUUID)
@@ -65,6 +73,7 @@ class TestFilterAccuracy(unittest.TestCase):
         # We expect that this should not throw
         eaicf.filter_accuracy(self.testUUID)
         self.assertEqual(len(self.ts.get_data_df("background/location")), 0)
+        self.checkSuccessfulRun()
 
     def testCheckPriorDuplicate(self):
         time_query = epq.get_time_range_for_accuracy_filtering(self.testUUID)
@@ -115,6 +124,7 @@ class TestFilterAccuracy(unittest.TestCase):
         eaicf.filter_accuracy(self.testUUID)
         filtered_points_df = self.ts.get_data_df("background/filtered_location", None)
         self.assertEqual(len(filtered_points_df), 124)
+        self.checkSuccessfulRun()
 
 if __name__ == '__main__':
     etc.configLogging()
