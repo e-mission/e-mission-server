@@ -17,6 +17,9 @@ from uuid import UUID
 import os
 
 # Our imports
+import emission.core.get_database as edb
+import emission.core.wrapper.pipelinestate as ecwp
+
 import emission.analysis.intake.cleaning.filter_accuracy as eaicf
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.pipeline_queries as epq
@@ -33,23 +36,23 @@ class TestFilterAccuracy(unittest.TestCase):
 
         self.analysis_conf_path = \
             etc.set_analysis_config("intake.cleaning.filter_accuracy.enable", True)
-        self.testUUID = UUID('079e0f1a-c440-3d7c-b0e7-de160f748e35')
-        with open("emission/tests/data/smoothing_data/tablet_2015-11-03") as fp:
-            self.entries = json.load(fp,
-                                 object_hook=bju.object_hook)
-        tsdb = edb.get_timeseries_db()
-        for entry in self.entries:
-            entry["user_id"] = self.testUUID
-            tsdb.insert_one(entry)
-        self.ts = esta.TimeSeries.get_time_series(self.testUUID)
+        self.testUUID = None
 
     def tearDown(self):
         import emission.core.get_database as edb
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
         edb.get_pipeline_state_db().delete_many({"user_id": self.testUUID})
         os.remove(self.analysis_conf_path)
+
+    def checkSuccessfulRun(self):
+        pipelineState = edb.get_pipeline_state_db().find_one({"user_id": self.testUUID,
+            "pipeline_stage": ecwp.PipelineStages.ACCURACY_FILTERING.value})
+        self.assertIsNotNone(pipelineState["last_ts_run"])
         
     def testEmptyCallToPriorDuplicate(self):
+        dataFile = "emission/tests/data/smoothing_data/tablet_2015-11-03"
+        etc.setupRealExample(self, dataFile)
+        self.ts = esta.TimeSeries.get_time_series(self.testUUID)
         time_query = epq.get_time_range_for_accuracy_filtering(self.testUUID)
         unfiltered_points_df = self.ts.get_data_df("background/location", time_query)
         self.assertEqual(len(unfiltered_points_df), 205)
@@ -59,14 +62,21 @@ class TestFilterAccuracy(unittest.TestCase):
         self.assertEqual(eaicf.check_prior_duplicate(pd.DataFrame(), 0, entry), False)
 
     def testEmptyCall(self):
+        dataFile = "emission/tests/data/smoothing_data/tablet_2015-11-03"
+        etc.setupRealExample(self, dataFile)
+        self.ts = esta.TimeSeries.get_time_series(self.testUUID)
         # Check call to the entire filter accuracy with a zero length timeseries
         import emission.core.get_database as edb
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
         # We expect that this should not throw
         eaicf.filter_accuracy(self.testUUID)
         self.assertEqual(len(self.ts.get_data_df("background/location")), 0)
+        self.checkSuccessfulRun()
 
     def testCheckPriorDuplicate(self):
+        dataFile = "emission/tests/data/smoothing_data/tablet_2015-11-03"
+        etc.setupRealExample(self, dataFile)
+        self.ts = esta.TimeSeries.get_time_series(self.testUUID)
         time_query = epq.get_time_range_for_accuracy_filtering(self.testUUID)
         unfiltered_points_df = self.ts.get_data_df("background/location", time_query)
         self.assertEqual(len(unfiltered_points_df), 205)
@@ -80,6 +90,9 @@ class TestFilterAccuracy(unittest.TestCase):
         self.assertEqual(eaicf.check_prior_duplicate(unfiltered_points_df, 5, entry), False)
         
     def testConvertToFiltered(self):
+        dataFile = "emission/tests/data/smoothing_data/tablet_2015-11-03"
+        etc.setupRealExample(self, dataFile)
+        self.ts = esta.TimeSeries.get_time_series(self.testUUID)
         time_query = epq.get_time_range_for_accuracy_filtering(self.testUUID)
         unfiltered_points_df = self.ts.get_data_df("background/location", time_query)
         self.assertEqual(len(unfiltered_points_df), 205)
@@ -92,6 +105,9 @@ class TestFilterAccuracy(unittest.TestCase):
         self.assertEqual(entry_copy["metadata"]["key"], "background/filtered_location")
 
     def testExistingFilteredLocation(self):
+        dataFile = "emission/tests/data/smoothing_data/tablet_2015-11-03"
+        etc.setupRealExample(self, dataFile)
+        self.ts = esta.TimeSeries.get_time_series(self.testUUID)
         time_query = epq.get_time_range_for_accuracy_filtering(self.testUUID)
         unfiltered_points_df = self.ts.get_data_df("background/location", time_query)
         self.assertEqual(len(unfiltered_points_df), 205)
@@ -107,6 +123,9 @@ class TestFilterAccuracy(unittest.TestCase):
         self.assertEqual(eaicf.check_existing_filtered_location(self.ts, entry_from_df), True)
 
     def testFilterAccuracy(self):
+        dataFile = "emission/tests/data/smoothing_data/tablet_2015-11-03"
+        etc.setupRealExample(self, dataFile)
+        self.ts = esta.TimeSeries.get_time_series(self.testUUID)
         unfiltered_points_df = self.ts.get_data_df("background/location", None)
         self.assertEqual(len(unfiltered_points_df), 205)
         pre_filtered_points_df = self.ts.get_data_df("background/filtered_location", None)
@@ -115,6 +134,41 @@ class TestFilterAccuracy(unittest.TestCase):
         eaicf.filter_accuracy(self.testUUID)
         filtered_points_df = self.ts.get_data_df("background/filtered_location", None)
         self.assertEqual(len(filtered_points_df), 124)
+        self.checkSuccessfulRun()
+
+    def testFilterAccuracyWithPartialFiltered(self):
+        dataFile = "emission/tests/data/real_examples/shankari_2016-independence_day"
+        etc.setupRealExample(self, dataFile)
+        self.ts = esta.TimeSeries.get_time_series(self.testUUID)
+        unfiltered_points_df = self.ts.get_data_df("background/location", None)
+        self.assertEqual(len(unfiltered_points_df), 801)
+        pre_filtered_points_df = self.ts.get_data_df("background/filtered_location", None)
+        self.assertEqual(len(pre_filtered_points_df), 703)
+
+        cutoff_ts = pre_filtered_points_df.iloc[200].ts
+        del_result = edb.get_timeseries_db().delete_many({
+                "user_id": self.testUUID,
+                "metadata.key": "background/filtered_location",
+                "data.ts": {"$gte": cutoff_ts}
+            })
+        self.assertEqual(del_result.raw_result["n"], 503)
+
+        post_cutoff_points_df = self.ts.get_data_df("background/filtered_location", None)
+        self.assertEqual(len(post_cutoff_points_df), 200)
+
+        eaicf.filter_accuracy(self.testUUID)
+        filtered_points_df = self.ts.get_data_df("background/filtered_location", None)
+        self.assertEqual(len(filtered_points_df), 703)
+        self.checkSuccessfulRun()
+
+    def testPandasMergeBehavior(self):
+        import pandas as pd
+        df_a = pd.DataFrame({"ts": [1,2,3,4]})
+        df_b = pd.DataFrame({"ts": [1,3]})
+        merged_left_idx = df_a.merge(df_b, on="ts", how="inner", left_index=True)
+        merged_right_idx = df_a.merge(df_b, on="ts", how="inner", right_index=True)
+        self.assertEqual(merged_left_idx.index.to_list(), [0,1])
+        self.assertEqual(merged_right_idx.index.to_list(), [0,2])
 
 if __name__ == '__main__':
     etc.configLogging()
