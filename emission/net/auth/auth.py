@@ -16,6 +16,10 @@ class AuthMethodFactory(object):
             import emission.net.auth.skip as enas
             logging.debug("methodName = skip, returning %s" % enas.SkipMethod)
             return enas.SkipMethod()
+        if methodName == "secret":
+            import emission.net.auth.secret as enar
+            logging.debug("methodName = secret, returning %s" % enar.SecretMethod)
+            return enar.SecretMethod()
         elif methodName == "openid_auth":
             import emission.net.auth.openid_auth as enao
             logging.debug("methodName = openid_auth, returning %s" % enao.OpenIDAuthMethod)
