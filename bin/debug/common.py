@@ -49,6 +49,9 @@ def purge_entries_for_user(curr_uuid, is_purge_state, db_array=None):
     else:
         import emission.core.get_database as edb
 
+        pr_db = edb.get_profile_db()
+        tse_db = edb.get_timeseries_error_db()
+        uc_db = edb.get_usercache_db()
         ts_db = edb.get_timeseries_db()
         ats_db = edb.get_analysis_timeseries_db()
         udb = edb.get_uuid_db()
@@ -57,6 +60,18 @@ def purge_entries_for_user(curr_uuid, is_purge_state, db_array=None):
 
     timeseries_del_result = ts_db.remove({"user_id": curr_uuid})
     logging.info("result = %s" % timeseries_del_result)
+
+    logging.info("For uuid = %s, deleting entries from the profiles" % curr_uuid)
+    profiles_del_result = pr_db.remove({"user_id": curr_uuid})
+    logging.info("result = %s" % profiles_del_result)
+
+    logging.info("For uuid = %s, deleting entries from the usercache" % curr_uuid)
+    usercache_del_result = uc_db.remove({"user_id": curr_uuid})
+    logging.info("result = %s" % usercache_del_result)
+
+    logging.info("For uuid = %s, deleting entries from the timeseries_error" % curr_uuid)
+    timeseries_error_del_result = tse_db.remove({"user_id": curr_uuid})
+    logging.info("result = %s" % timeseries_error_del_result)
 
     logging.info("For uuid = %s, deleting entries from the analysis_timeseries" % curr_uuid)
     analysis_timeseries_del_result = ats_db.remove({"user_id": curr_uuid})
@@ -70,3 +85,4 @@ def purge_entries_for_user(curr_uuid, is_purge_state, db_array=None):
         logging.info("For uuid %s, deleting entries from the pipeline_state_db" % curr_uuid)
         psdb_del_result = psdb.remove({"user_id": curr_uuid})
         logging.info("result = %s" % psdb_del_result)
+ 
