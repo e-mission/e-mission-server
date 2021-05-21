@@ -5,8 +5,11 @@ angular.module('starter.controllers', ['starter.heatmap', 'starter.metrics'])
 .controller('HomeCtrl', function($scope) {
     $scope.active = 0;
     $scope.aggregateSlides = [];
+    $scope.RIPSlides = [];
     $scope.personalSlides = [];
     $scope.introSlides = [];
+    $scope.android_base_app = "https://play.google.com/store/apps/details?id=edu.berkeley.eecs.embase";
+    $scope.ios_base_app = "https://itunes.apple.com/us/app/emtriplog/id1362434685";
 
     var addIntroSlides = function() {
         $scope.introSlides.push({
@@ -20,36 +23,44 @@ angular.module('starter.controllers', ['starter.heatmap', 'starter.metrics'])
             id: 1
         });
         $scope.introSlides.push({
-            image: 'img/intro/game_explain.png',
-            text: 'habitica integration automatically gives points for every km walked and biked',
-            id: 2
-        });
-        $scope.introSlides.push({
             image: 'img/intro/incident_report_explain.png',
-            text: 'users are prompted at the end of every trip to report incidents',
-            id: 3
+            text: 'users can be prompted at the end of every trip to report incidents',
+            id: 2
         });
         $scope.introSlides.push({
             image: 'img/intro/targeted_survey_explain.png',
             text: 'targeted surveys can be sent to regular users to capture public input',
-            id: 4
+            id: 3
         });
         $scope.introSlides.push({
             image: 'img/intro/extension_explain.png',
             text: 'customizing the UI while retaining native functionality is simple',
-            id: 5
+            id: 4
         });
     };
 
     var addAggregateSlides = function() {
         $scope.aggregateSlides.push({
-            image: 'img/aggregate/bike_march_2016.png',
-            text: 'Bicycling trips in March 2016',
+            image: 'img/aggregate/canbikeco_nov_dashboard.png',
+            text: 'Multiple metrics for November',
             id: 0
         });
         $scope.aggregateSlides.push({
-            image: 'img/aggregate/bike_apr_2016.png',
-            text: 'Bicycling trips in Apr 2016',
+            image: 'img/aggregate/canbikeco_variation_over_time.png',
+            text: 'Variation of one metric over time',
+            id: 1
+        });
+    };
+
+    var addRIPSlides = function() {
+        $scope.RIPSlides.push({
+            image: 'img/rip_emission/rip_play_store.png',
+            text: 'RIP: e-mission on the play store',
+            id: 0
+        });
+        $scope.RIPSlides.push({
+            image: 'img/rip_emission/rip_app_store.png',
+            text: 'RIP: e-mission on the app store',
             id: 1
         });
     };
@@ -65,19 +76,10 @@ angular.module('starter.controllers', ['starter.heatmap', 'starter.metrics'])
             text: 'Detail for a particular trip',
             id: 1
         });
-        $scope.personalSlides.push({
-            image: 'img/personal/common_trips.png',
-            text: 'Tour model',
-            id: 2
-        });
-        $scope.personalSlides.push({
-            image: 'img/personal/compare_with_common.png',
-            text: 'Changes from normal',
-            id: 3
-        });
     };
 
     addAggregateSlides();
+    addRIPSlides();
     addPersonalSlides();
     addIntroSlides();
 })

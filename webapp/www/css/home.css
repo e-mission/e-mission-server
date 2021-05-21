@@ -35,12 +35,12 @@
             padding: 0px 0px;
             height: 100%;
             color: #cdbfe3;
-            background-color: #54DCC1;
-            background-image: -webkit-gradient(linear,left top,left bottom,from(#54DCC1),to(#01D0A7));
-            background-image: -webkit-linear-gradient(top,#54DCC1 0,#01D0A7 100%);
-            background-image: -o-linear-gradient(top,#54DCC1 0,#01D0A7 100%);
-            background-image: linear-gradient(to bottom,#54DCC1 0,#01D0A7 100%);
-            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#54DCC1', endColorstr='#01D0A7', GradientType=0);
+            background-color: #ffffff;
+            background-image: -webkit-gradient(linear,left top,left bottom,from(#ffffff),to(#ffffff));
+            background-image: -webkit-linear-gradient(top,#ffffff 0,#ffffff 100%);
+            background-image: -o-linear-gradient(top,#ffffff 0,#ffffff 100%);
+            background-image: linear-gradient(to bottom,#ffffff 0,#ffffff 100%);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#ffffff', GradientType=0);
         }
 
 .carousel-caption {
