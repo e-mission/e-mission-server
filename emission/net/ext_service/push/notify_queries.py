@@ -35,8 +35,8 @@ def get_matching_tokens(query):
                "android": []}
     ret_cursor = edb.get_profile_db().find(query, {"_id": False, "device_token": True, "curr_platform": True})
     for i, entry in enumerate(ret_cursor):
-        curr_platform = entry["curr_platform"]
-        device_token = entry["device_token"]
+        curr_platform = entry.get("curr_platform", None)
+        device_token = entry.get("device_token", None)
         if curr_platform is None or device_token is None:
             logging.warning("ignoring entry %s due to None values" % entry)
         else:

@@ -1,0 +1,74 @@
+<ion-view view-title="Migration">
+  <ion-content class="has-header padding">
+    <!--
+    <section id="summary" class="emission-docs-masthead" role="main">
+        <h3 style="color: white">Migrating from the Berkeley e-mission server</h3>
+        <uib-carousel 
+            active="active"
+            interval=10000
+            no-wrap="false">
+
+            <uib-slide ng-repeat="slide in migrateSlides track by slide.id" index="slide.id" class="intro-slide">
+                <img ng-src="{{slide.image}}" class="intro-img" style="height:90vh">
+                <div class="carousel-caption">
+                    <p class="caption-text">{{slide.text}}</p>
+                </div>
+            </uib-slide>
+        </uib-carousel>
+    </section>
+    -->
+    <section class="page" id="summary">
+            <section class="container card" style="padding:1%">
+                <h1 class="introH">Migration</h1>
+                <p class="intro"> 💣 Due to AWS constraints, the REST API hosted at
+                    EECS Berkeley is likely to be unavailable after 11 May 2021.
+                </p>
+                <p class="intro"> ✏️  I have unpublished the base e-mission app from
+                    the stores as of 9 May 2021.
+                </p>
+                <p class="intro"> ✨ Current users are encouraged to try out
+                    different skins through the emTripLog app.
+                </p>
+                <p class="intro"> ❌ If you have the app already installed, it will
+                    continue to work, and trips will visible in the diary, but
+                    they will never go out of draft mode. The dashboard and
+                    other summary statistics will also not be updated.
+                </p>
+                <p class="intro"> 🗄️ If you want access to the data collected so
+                    far, either as a data dump, or by migrating it to the server that
+                    the emTripLog skins connect to, please email me
+                    (shankari@eecs.berkeley.edu).
+                </p>
+        </section>
+    </section>
+    <section class="page" id="emTripLog">
+            <section class="container card" style="padding:1%">
+                <h1 class="introH">emTripLog</h1>
+                <p class="intro">As the e-mission platform is deployed to
+                address many different use cases, we want to move away from a
+                single "app" to highlight the various potential solutions that
+                it can be used to address.  </p>
+
+                <p class="intro">The emTripLog app requires scanning a QR code
+                to work. The QR code controls the app <i>skin</i> and the
+                results and interactivity with the user. Check out the two
+                skins below!  </p>
+
+                <p class="intro">To use emTripLog, install the app</p>
+                <a class="col" href='{{android_base_app}}'><img style="height:75px;" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
+                <a class="col" href="{{ios_base_app}}"><img alt='Get it on the iOS app store' ng-src="img/apple-badge.svg"></a>
+            <p class="intro">with either of these QR codes</p>
+            <div class="row">
+            <div class="col-50">Polar bears</div>
+            <div class="col-50">Dashboard</div>
+            </div>
+            <div class="row">
+            <div class="col-50"><img src="img/urap2017emotion.png"></img></div>
+            <div class="col-50"><img src="img/NRELlh.png"></img></div>
+            </div>
+            </p>
+
+            </section>
+    </section>
+  </ion-content>
+</ion-view>
