@@ -35,11 +35,20 @@ class similarity(object):
     
     def __init__(self, data, radius):
         self.data = data
-        if not data:
-            self.data = []
         self.bins = []
-        self.radius = float(radius)
-        for t in self.data:
+        self.radius = radius
+        self.size = len(self.data)
+
+    # this function can filter out trips that are points
+    # for trips that are points - the distance between start and end point doesn't exceed radius
+    @staticmethod
+    def filter_distance(data, radius):
+        # data = data
+        if not data:
+            data = []
+        # self.bins = []
+        radius = float(radius)
+        for t in data:
             logging.debug("Considering trip %s" % t)
             try:
                 start_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
@@ -52,14 +61,16 @@ class similarity(object):
                 end_lat = end_place.data.location["coordinates"][1]
                 logging.debug("endpoints are = (%s, %s) and (%s, %s)" %
                               (start_lon, start_lat, end_lon, end_lat))
-                if self.distance(start_lat, start_lon, end_lat, end_lon):
-                    self.data.remove(t)
+                if similarity(data, radius).distance(start_lat, start_lon, end_lat, end_lon):
+                    data.remove(t)
             except:
                 logging.exception("exception while getting start and end places for %s" % t)
-                self.data.remove(t)
+                data.remove(t)
 
-        logging.debug('After removing trips that are points, there are %s data points' % len(self.data))
-        self.size = len(self.data)
+        logging.debug('After removing trips that are points, there are %s data points' % len(data))
+        size = len(data)
+        return data, size
+
 
     #create bins
     def bin_data(self):
