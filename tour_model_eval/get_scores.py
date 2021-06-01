@@ -19,6 +19,7 @@ def compare_trip_orders(bins,bin_trips,filter_trips):
 # in bins above cutoff
 # More info about bin_trips is in similarity.py (delete_bins)
 # The homogeneity score reflects the degree to which a cluster consists only of trips with similar ground truthed labels.
+# In the following examples, "A","B","C" are user labels.
 # The labels can be drawn from different sets as long as the mapping is unique (e.g. ["A", "A", "C"] matches perfectly
 # with [0,0,1]). 
 # Ideally, there would be 1:1 mapping between labels and clusters - e.g. ["A", "A", "A"] maps to [1,1,1]

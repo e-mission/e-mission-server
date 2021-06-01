@@ -35,8 +35,10 @@ def extract_features(filter_trips):
         distance = trip.data.distance
         duration = trip.data.duration
         X.append([start[0], start[1], end[0], end[1], distance, duration])
+    return X
 
-def split_data(X):
+def split_data(filter_trips):
+    X = extract_features(filter_trips)
     kf = KFold(n_splits=5, shuffle=True, random_state=3)
     train_idx = []
     test_idx = []
