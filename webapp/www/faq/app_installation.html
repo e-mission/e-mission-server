@@ -71,29 +71,27 @@
 
  <h3>Instructions</h3>
  <p>Click on the button to open the dropdown menu. Select the video based on your phone type and follow the video guidelines.</p>
- <p>1. Read and accept the privacy policy by clicking on the "I accept" button.</p>
- <p>2. Please use the token given by your program administrator when "Login via token" window is prompted.</p>
- <p>3. Select a username.</p>
- <p>4. Complete the onboarding survey.</p>
-   <nav>
+ <p> 1. Read and accept the privacy policy by clicking on the "I accept" button.</p>
+ <p> 2. Allow access to Location, Motion & Fitness activity,  and physical activity.</p>
+ <p> 3. Please use the token given by your program administrator when "Login via token" window is prompted.</p>
+ <p> 4. Select a username.</p>
+ <p> 5. Complete the onboarding survey.</p>
+  <nav>
 
-     <div class="dropdown">
-       <button onclick="myFunction()" class="dropbtn">Dropdown</button>
-       <div id="myDropdown" class="dropdown-content">
-         <a href="#iOS 11-12">iOS 11-12</a>
-               <div id="videoDiv">
-                    <video id="video"
-                            width="480" height="360"
-                            controls>
-                        <source src="https://github.com/e-mission/e-mission-docs/raw/master/docs/assets/editediOS11_12.mov">
-                    </video>
-                </div>
+    <a href="#iOS 11-12">iOS 11-12</a>
+        <div id="videoDiv">
+          <video id="video"
+               width="480" height="360"
+               controls>
+            <source src="https://github.com/e-mission/e-mission-docs/raw/master/docs/assets/editediOS_11_12.mp4">
+          </video>
+          </div>
      <a href="#iOS 14 and later">iOS 14 and later</a>
        <div id="videoDiv">
             <video id="video"
                     width="480" height="360"
                     controls>
-                <source src="https://github.com/e-mission/e-mission-docs/raw/master/docs/assets/editediOS_14.mov">
+                <source src="https://github.com/e-mission/e-mission-docs/raw/master/docs/assets/editediOS_14.mp4">
             </video>
         </div>
       <a href="#Android 6-9">Android 6-9</a>
@@ -101,7 +99,7 @@
              <video id="video"
                      width="480" height="360"
                      controls>
-                 <source src="https://github.com/e-mission/e-mission-docs/raw/master/docs/assets/editedAndroid_6_9.mov">
+                 <source src="https://github.com/e-mission/e-mission-docs/raw/master/docs/assets/editedAndroid_6_9.mp4">
              </video>
          </div>
      <a href="#Android 10">Andorid 10</a>
@@ -110,7 +108,7 @@
             <video id="video"
                     width="480" height="360"
                     controls>
-                <source src="https://github.com/e-mission/e-mission-docs/raw/master/docs/assets/editedAndroid_10.mov">
+                <source src="https://github.com/e-mission/e-mission-docs/raw/master/docs/assets/editedAndroid_10.mp4">
             </video>
         </div>
 
@@ -119,37 +117,13 @@
               <video id="video"
                       width="480" height="360"
                       controls>
-                  <source src="https://github.com/e-mission/e-mission-docs/raw/master/docs/assets/editedAndroid_11.mov">
+                  <source src="https://github.com/e-mission/e-mission-docs/raw/master/docs/assets/editedAndroid_11.mp4">
               </video>
           </div>
          </div>
    </div>
 
-   <script>
-   /* When the user clicks on the button,
-   toggle between hiding and showing the dropdown content */
-   function myFunction() {
-     document.getElementById("myDropdown").classList.toggle("show");
-   }
+      </nav>
 
-   function filterFunction() {
-     var input, filter, ul, li, a, i;
-     input = document.getElementById("myInput");
-     filter = input.value.toUpperCase();
-     div = document.getElementById("myDropdown");
-     a = div.getElementsByTagName("a");
-     for (i = 0; i < a.length; i++) {
-       txtValue = a[i].textContent || a[i].innerText;
-       if (txtValue.toUpperCase().indexOf(filter) > -1) {
-         a[i].style.display = "";
-       } else {
-         a[i].style.display = "none";
-       }
-     }
-   }
-
-
-
-
-
-</script>
+    </body>
+</html>
