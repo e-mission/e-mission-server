@@ -437,7 +437,7 @@ def createUserProfile():
       return {'uuid': str(user.uuid)}
   except ValueError as e:
       traceback.print_exc()
-      abort(403, e.message)
+      abort(403, str(e.args))
 
 @post('/profile/update')
 def updateUserProfile():
