@@ -12,9 +12,12 @@ from past.utils import old_div
 import logging
 import math
 import numpy
+import copy
 from sklearn import metrics
 from numpy.linalg import norm
 import emission.storage.decorations.analysis_timeseries_queries as esda
+import emission.core.common as ecc
+
 
 """
 This class organizes data into bins by similarity. It then orders the bins 
@@ -31,34 +34,47 @@ trips have to be for the trips to be put in the same bin
 
 This is called by cluster_pipeline.py.
 """
+
+#Determine whether two points are within a cutoff distance threshold
+def within_radius(lat1, lon1, lat2, lon2, radius):
+    dist = ecc.calDistance([lon1, lat1], [lon2, lat2])
+    return dist <= radius
+
+def filter_too_short(all_trips, radius):
+    # Since this is a pure function, we should append valid trips
+    # instead of removing invalid trips
+    # But let's go from working to working
+    valid_trips = copy.copy(all_trips)
+    for t in all_trips:
+        logging.debug("Considering trip %s" % t)
+        try:
+            start_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
+                                         t.data.start_place)
+            end_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
+                                         t.data.end_place)
+            start_lon = start_place.data.location["coordinates"][0]
+            start_lat = start_place.data.location["coordinates"][1]
+            end_lon = end_place.data.location["coordinates"][0]
+            end_lat = end_place.data.location["coordinates"][1]
+            logging.debug("endpoints are = (%s, %s) and (%s, %s)" %
+                          (start_lon, start_lat, end_lon, end_lat))
+            if within_radius(start_lat, start_lon, end_lat, end_lon, radius):
+                valid_trips.remove(t)
+        except:
+            logging.exception("exception while getting start and end places for %s" % t)
+            valid_trips.remove(t)
+
+    logging.debug('After removing trips that are points, there are %s data points' % len(valid_trips))
+    return valid_trips
+
 class similarity(object):
-    
     def __init__(self, data, radius):
-        self.data = data
+        inData = data
         if not data:
-            self.data = []
+            inData = []
         self.bins = []
         self.radius = float(radius)
-        for t in self.data:
-            logging.debug("Considering trip %s" % t)
-            try:
-                start_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
-                                             t.data.start_place)
-                end_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
-                                             t.data.end_place)
-                start_lon = start_place.data.location["coordinates"][0]
-                start_lat = start_place.data.location["coordinates"][1]
-                end_lon = end_place.data.location["coordinates"][0]
-                end_lat = end_place.data.location["coordinates"][1]
-                logging.debug("endpoints are = (%s, %s) and (%s, %s)" %
-                              (start_lon, start_lat, end_lon, end_lat))
-                if self.distance(start_lat, start_lon, end_lat, end_lon):
-                    self.data.remove(t)
-            except:
-                logging.exception("exception while getting start and end places for %s" % t)
-                self.data.remove(t)
-
-        logging.debug('After removing trips that are points, there are %s data points' % len(self.data))
+        self.data = filter_too_short(inData, self.radius)
         self.size = len(self.data)
 
     #create bins
@@ -192,22 +208,9 @@ class similarity(object):
         endb = tripb.end_loc["coordinates"]
 
         # Flip indices because points are in geojson (i.e. lon, lat)
-        start = self.distance(starta[1], starta[0], startb[1], startb[0])
-        end = self.distance(enda[1], enda[0], endb[1], endb[0])
+        start = within_radius(starta[1], starta[0], startb[1], startb[0], self.radius)
+        end = within_radius(enda[1], enda[0], endb[1], endb[0], self.radius)
 
         return True if start and end else False
 
 
-    #calculate the meter distance between two trips
-    def distance(self, lat1, lon1, lat2, lon2):
-        R = 6371000
-        rlat1 = math.radians(lat1)
-        rlat2 = math.radians(lat2)
-        lon = math.radians(lon2 - lon1);
-        lat = math.radians(lat2-lat1);
-        a = math.sin(old_div(lat,2.0))**2 + math.cos(rlat1)*math.cos(rlat2) * math.sin(old_div(lon,2.0))**2
-        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-        d = R * c
-        if d <= self.radius:
-            return True
-        return False

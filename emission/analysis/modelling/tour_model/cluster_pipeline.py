@@ -85,7 +85,7 @@ def main(uuid=None):
     data = read_data(uuid)
     logging.debug("len(data) is %d" % len(data))
     data, bins = remove_noise(data, 300)
-    n, labels, data = cluster(data, len(bins))
+    n, labels, data, points = cluster(data, len(bins))
     tour_dict = cluster_to_tour_model(data, labels)
     return tour_dict
 
