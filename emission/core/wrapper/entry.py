@@ -129,8 +129,9 @@ class Entry(ecwb.WrapperBase):
             ### ** END: prediction objects
             ### ** BEGIN: confirmed objects which combine inferred and user input values
             "analysis/confirmed_trip": "confirmedtrip",
-            "analysis/confirmed_section": "confirmedsection"
+            "analysis/confirmed_section": "confirmedsection",
             ### ** END: confirmed objects which combine inferred and user input values
+            "itinerum": "itinerum_boolean"
             }
 
   @staticmethod

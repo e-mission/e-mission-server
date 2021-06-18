@@ -19,6 +19,7 @@ class Confirmedtrip(ecwt.Trip):
 # the user input will have all `manual/*` entries
 # let's make that be somewhat flexible instead of hardcoding into the data model
                   "user_input": ecwb.WrapperBase.Access.WORM
+                  "itinerum_boolean": ecwb.WrapperBase.Access.WORM
                   })
 
     def _populateDependencies(self):
