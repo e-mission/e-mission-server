@@ -1,2 +1,2 @@
-source setup/activate_conda.sh
+# source setup/activate_conda.sh
 conda activate emission
