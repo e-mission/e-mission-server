@@ -52,17 +52,70 @@ class LabelInferencePipeline:
 def predict_trip(trip):
     return placeholder_prediction(trip)
 
+# For testing only!
+trip_n = 0
+import random
+
 # A placeholder predictor to allow pipeline development without a real inference algorithm
-def placeholder_prediction(trip):
+def placeholder_prediction(trip, scenario=2):
     # For the moment, the system is configured to work with two labels, "mode_confirm" and
-    # "purpose_confirm", so I'll do that. This placeholder situation represent a case where it is
-    # hard to distinguish between biking and walking (e.g., because the user is a very slow biker)
-    # and hard to distinguish between work and shopping at the grocery store (e.g., because the
-    # user works at the grocery store), but whenever the user bikes to the location it is to work
-    # and whenever the user walks to the location it is to shop (e.g., because they don't have a
-    # basket on their bike), and the user bikes to the location four times more than they walk
-    # there. Obviously, it is a simplification.
+    # "purpose_confirm", so I'll do that.
+
+    # For testing only!
+    global trip_n
+    trip_n %= 6
+    trip_n += 1
+
     return [
-        {"labels": {"mode_confirm": "bike", "purpose_confirm": "work"}, "p": 0.8},
-        {"labels": {"mode_confirm": "walk", "purpose_confirm": "shopping"}, "p": 0.2}
-    ]
+        # The first placeholder scenario represents a case where it is hard to distinguish between
+        # biking and walking (e.g., because the user is a very slow biker) and hard to distinguish
+        # between work and shopping at the grocery store (e.g., because the user works at the
+        # grocery store), but whenever the user bikes to the location it is to work and whenever
+        # the user walks to the location it is to shop (e.g., because they don't have a basket on
+        # their bike), and the user bikes to the location four times more than they walk there.
+        # Obviously, it is a simplification.
+        [
+            {"labels": {"mode_confirm": "bike", "purpose_confirm": "work"}, "p": 0.8},
+            {"labels": {"mode_confirm": "walk", "purpose_confirm": "shopping"}, "p": 0.2}
+        ],
+
+        # The next placeholder scenario provides that same set of labels in 75% of cases and no
+        # labels in the rest.
+        [
+            {"labels": {"mode_confirm": "bike", "purpose_confirm": "work"}, "p": 0.8},
+            {"labels": {"mode_confirm": "walk", "purpose_confirm": "shopping"}, "p": 0.2}
+        ]
+        if random.random() > 0.25 else [],
+
+        # This third scenario provides labels designed to test the soundness and resilience of
+        # the client-side inference processing algorithms.
+        [
+            [
+
+            ],
+            [
+                {"labels": {"mode_confirm": "bike", "purpose_confirm": "work"}, "p": 0.8},
+                {"labels": {"mode_confirm": "walk", "purpose_confirm": "shopping"}, "p": 0.2}
+            ],
+            [
+                {"labels": {"mode_confirm": "drove_alone"}, "p": 0.8},
+            ],
+            [
+                {"labels": {"mode_confirm": "bike", "purpose_confirm": "work"}, "p": 0.8},
+                {"labels": {"mode_confirm": "walk", "purpose_confirm": "shopping"}, "p": 0.2}
+            ],
+            [
+                {"labels": {"mode_confirm": "walk", "purpose_confirm": "shopping"}, "p": 0.45},
+                {"labels": {"mode_confirm": "walk", "purpose_confirm": "entertainment"}, "p": 0.35},
+                {"labels": {"mode_confirm": "drove_alone", "purpose_confirm": "work"}, "p": 0.15},
+                {"labels": {"mode_confirm": "shared_ride", "purpose_confirm": "work"}, "p": 0.05}
+            ],
+            [
+                {"labels": {"mode_confirm": "walk", "purpose_confirm": "shopping"}, "p": 0.45},
+                {"labels": {"mode_confirm": "walk", "purpose_confirm": "entertainment"}, "p": 0.35},
+                {"labels": {"mode_confirm": "drove_alone", "purpose_confirm": "work"}, "p": 0.15},
+                {"labels": {"mode_confirm": "shared_ride", "purpose_confirm": "work"}, "p": 0.05}
+            ]
+        ][6-trip_n]
+    ][scenario]
+    
