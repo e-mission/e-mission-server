@@ -178,5 +178,5 @@ def run_intake_pipeline_for_user(uuid):
             print(str(arrow.now()) + "*" * 10 + "UUID %s: exporting data" % uuid + "*" * 10)
             eeded.set_export_data(uuid)
 
-            esds.store_pipeline_time(uuid, ecwp.PipelineStages.EXPORT_DATA.name,
+        esds.store_pipeline_time(uuid, ecwp.PipelineStages.EXPORT_DATA.name,
                                  time.time(), edt.elapsed)
