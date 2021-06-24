@@ -83,8 +83,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "inference/prediction": self.analysis_timeseries_db,
                 "analysis/inferred_section": self.analysis_timeseries_db,
                 "analysis/confirmed_trip": self.analysis_timeseries_db,
-                "analysis/confirmed_section": self.analysis_timeseries_db,
-                "itinerum": self.analysis_timeseries_db
+                "analysis/confirmed_section": self.analysis_timeseries_db
             }
 
 
