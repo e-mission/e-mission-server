@@ -38,7 +38,7 @@ def export(loc_time_query, trip_time_query, place_time_query, ma_entry_list, use
                                         {'data.exit_ts': {'$exists': True}}]}
     	first_place_entry_list = list(ts.find_entries(key_list=None, time_query=None, extra_query_list=[first_place_extra_query]))
     	logging.info("First place entry list = %s" % first_place_entry_list)
-	combined_list += loc_entry_list + trip_entry_list + place_entry_list + first_place_entry_list
+	combined_list = ma_entry_list + loc_entry_list + trip_entry_list + place_entry_list + first_place_entry_list
 	
 	logging.info("Found %d loc entries, %d motion entries, %d trip-like entries, %d place-like entries = %d total entries" %
         (len(loc_entry_list), len(ma_entry_list), len(trip_entry_list), len(place_entry_list), len(combined_list)))
