@@ -24,7 +24,6 @@ import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.user_queries as esdu
 # only needed to read the motion_activity
 # https://github.com/e-mission/e-mission-docs/issues/356#issuecomment-520630934
-import emission.net.usercache.abstract_usercache as enua
 import emission.export.export as eee
 
 def export_timeline(user_id, start_day_str, end_day_str, timezone, file_name):
@@ -37,10 +36,7 @@ def export_timeline(user_id, start_day_str, end_day_str, timezone, file_name):
         (start_day_ts, arrow.get(start_day_ts).to(timezone),
          end_day_ts, arrow.get(end_day_ts).to(timezone)))
     ts = esta.TimeSeries.get_time_series(user_id)
-    ma_time_query = estt.TimeQuery("metadata.write_ts", start_day_ts, end_day_ts)
-    uc = enua.UserCache.getUserCache(user_id)
-    ma_entry_list = uc.getMessage(["background/motion_activity"], ma_time_query)
-    eee.export(ma_entry_list, user_id, ts, start_day_ts, end_day_ts)
+    eee.export(user_id, ts, start_day_ts, end_day_ts, "%s_%s" % (file_name, user_id), True)
  
     import emission.core.get_database as edb
     pipeline_state_list = list(edb.get_pipeline_state_db().find({"user_id": user_id}))

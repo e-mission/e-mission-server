@@ -32,7 +32,7 @@ class ExportDataPipeline:
 
     def run_export_data_pipeline(self, user_id):
         ts = esta.TimeSeries.get_time_series(user_id)
-        ma_entry_list = []
         time_query = espq.get_time_range_for_export_data(user_id)
-        eee.export(ma_entry_list, user_id, ts, time_query.startTs, time_query.endTs)
+        file_name = "archive_%s_%s_%s" % (user_id, time_query.startTs, time_query.endTs)
+        eee.export(user_id, ts, time_query.startTs, time_query.endTs, file_name, False)
 	        
