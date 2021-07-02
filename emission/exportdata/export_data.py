@@ -10,7 +10,7 @@ import gzip
 import json
 import bson.json_util as bju
 
-def set_export_data(user_id):
+def export_data(user_id):
     try:
         edp = ExportDataPipeline()
         edp.user_id = user_id

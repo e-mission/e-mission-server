@@ -18,9 +18,8 @@ import json
 import bson.json_util as bju
 import arrow
 import argparse
-
-import emission.storage.timeseries.timequery as estt
 import emission.storage.timeseries.abstract_timeseries as esta
+import emission.storage.timeseries.timequery as estt
 import emission.storage.decorations.user_queries as esdu
 # only needed to read the motion_activity
 # https://github.com/e-mission/e-mission-docs/issues/356#issuecomment-520630934
@@ -30,11 +29,13 @@ def export_timeline(user_id, start_day_str, end_day_str, timezone, file_name):
     logging.info("Extracting timeline for user %s day %s -> %s and saving to file %s" %
                  (user_id, start_day_str, end_day_str, file_name))
 
+    # day_dt = pydt.datetime.strptime(day_str, "%Y-%m-%d").date()
     start_day_ts = arrow.get(start_day_str).replace(tzinfo=timezone).timestamp
     end_day_ts = arrow.get(end_day_str).replace(tzinfo=timezone).timestamp
     logging.debug("start_day_ts = %s (%s), end_day_ts = %s (%s)" % 
         (start_day_ts, arrow.get(start_day_ts).to(timezone),
          end_day_ts, arrow.get(end_day_ts).to(timezone)))
+    
     ts = esta.TimeSeries.get_time_series(user_id)
     eee.export(user_id, ts, start_day_ts, end_day_ts, "%s_%s" % (file_name, user_id), True)
  

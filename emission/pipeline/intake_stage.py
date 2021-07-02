@@ -33,7 +33,6 @@ import emission.analysis.classification.inference.mode.rule_engine as eacimr
 import emission.net.ext_service.habitica.executor as autocheck
 
 import emission.storage.decorations.stats_queries as esds
-import emission.exportdata.export_data as eeded
 
 def run_intake_pipeline(process_number, uuid_list):
     """
@@ -173,10 +172,3 @@ def run_intake_pipeline_for_user(uuid):
 
         esds.store_pipeline_time(uuid, ecwp.PipelineStages.OUTPUT_GEN.name,
                                  time.time(), ogt.elapsed)
-        with ect.Timer() as edt:
-            logging.info("*" * 10 + "UUID %s: exporting data" % uuid + "*" * 10)
-            print(str(arrow.now()) + "*" * 10 + "UUID %s: exporting data" % uuid + "*" * 10)
-            eeded.set_export_data(uuid)
-
-        esds.store_pipeline_time(uuid, ecwp.PipelineStages.EXPORT_DATA.name,
-                                 time.time(), edt.elapsed)
