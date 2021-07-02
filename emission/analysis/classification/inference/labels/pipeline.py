@@ -9,6 +9,7 @@ import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.core.wrapper.labelprediction as ecwl
 
+# Does all the work necessary for a given user
 def infer_labels(user_id):
     time_query = epq.get_time_range_for_label_inference(user_id)
     try:
@@ -87,10 +88,10 @@ def placeholder_predictor_2(trip):
 
 # For each algorithm in ecwl.AlgorithmTypes that runs on a trip (e.g., not the ensemble, which
 # runs on the results of other algorithms), primary_algorithms specifies a corresponding
-# function to run
+# function to run. This makes it easy to plug in additional algorithms later.
 primary_algorithms = {
     # This can be edited to select a different placeholder predictor
-    ecwl.AlgorithmTypes.PLACEHOLDER: placeholder_predictor_1
+    ecwl.AlgorithmTypes.PLACEHOLDER: placeholder_predictor_2
 }
 
 # Code structure based on emission.analysis.classification.inference.mode.pipeline
@@ -103,13 +104,19 @@ class LabelInferencePipeline:
     def last_trip_done(self):
         return self._last_trip_done
 
+    # For a given user and time range, runs all the primary algorithms and ensemble, saves results
+    # to the database, and records progress
     def run_prediction_pipeline(self, user_id, time_range):
         self.ts = esta.TimeSeries.get_time_series(user_id)
         self.toPredictTrips = esda.get_entries(
-            esda.CLEANED_TRIP_KEY, user_id, time_query=time_range)
+            esda.CONFIRMED_TRIP_KEY, user_id, time_query=time_range)
         for trip in self.toPredictTrips:
             results = self.compute_and_save_algorithms(trip)
-            self.compute_and_save_ensemble(trip, results)
+            ensemble = self.compute_and_save_ensemble(trip, results)
+
+            # Add final prediction to the confirmed trip entry in the database
+            trip["data"]["inferred_labels"] = ensemble["prediction"]
+            self.ts.update(trip)
             if self._last_trip_done is None or self._last_trip_done.data.end_ts < trip.data.end_ts:
                 self._last_trip_done = trip
     
@@ -131,15 +138,18 @@ class LabelInferencePipeline:
         return predictions
 
     # Combine all our predictions into a single ensemble prediction.
+    # As a placeholder, we just take the first prediction.
+    # TODO: implement a real combination algorithm.
     def compute_and_save_ensemble(self, trip, predictions):
         il = ecwl.Labelprediction()
         il.trip_id = trip.get_id()
-        il.algorithm_id = ecwl.AlgorithmTypes.ENSEMBLE
+        # Since this is not a real ensemble yet, we will not mark it as such
+        # il.algorithm_id = ecwl.AlgorithmTypes.ENSEMBLE
+        il.algorithm_id = ecwl.AlgorithmTypes(predictions[0]["algorithm_id"])
         il.start_ts = trip.data.start_ts
         il.end_ts = trip.data.end_ts
 
-        # As a placeholder, we just take the first prediction.
-        # TODO: implement a real combination algorithm.
         il.prediction = copy.copy(predictions[0]["prediction"])
         
         self.ts.insert_data(self.user_id, "analysis/inferred_labels", il)
+        return il

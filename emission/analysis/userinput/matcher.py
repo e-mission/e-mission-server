@@ -79,7 +79,6 @@ def create_confirmed_trips(user_id, timerange):
         confirmed_trip_dict["data"]["cleaned_trip"] = tct.get_id()
         confirmed_trip_dict["data"]["user_input"] = \
             get_user_input_dict(ts, tct, input_key_list)
-        confirmed_trip_dict["data"]["inferred_labels"] = get_inferred_labels_list(tct)
         confirmed_trip_entry = ecwe.Entry(confirmed_trip_dict)
         # save the entry
         ts.insert(confirmed_trip_entry)
@@ -97,12 +96,3 @@ def get_user_input_dict(ts, tct, input_key_list):
             tct_userinput[ikey_name] = matched_userinput.data.label
     logging.debug("for trip %s, returning user input dict %s" % (tct.get_id(), tct_userinput))
     return tct_userinput
-
-# For a given trip, find the corresponding list of label inferences if it has been generated
-def get_inferred_labels_list(trip):
-    candidates = esdt.get_sections_for_trip(esda.INFERRED_LABELS_KEY, trip.user_id, trip.get_id())
-    if len(candidates) == 0: return {}  # Perhaps we have not run the inference step for this trip
-    assert len(candidates) == 1, \
-        "Multiple label inference list objects for trip "+str(trip.get_id())
-    return candidates[0]["data"]["prediction"]
-
