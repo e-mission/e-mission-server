@@ -18,6 +18,7 @@ import json
 import bson.json_util as bju
 import arrow
 import argparse
+
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.timequery as estt
 import emission.storage.decorations.user_queries as esdu
@@ -35,7 +36,7 @@ def export_timeline(user_id, start_day_str, end_day_str, timezone, file_name):
     logging.debug("start_day_ts = %s (%s), end_day_ts = %s (%s)" % 
         (start_day_ts, arrow.get(start_day_ts).to(timezone),
          end_day_ts, arrow.get(end_day_ts).to(timezone)))
-    
+
     ts = esta.TimeSeries.get_time_series(user_id)
     eee.export(user_id, ts, start_day_ts, end_day_ts, "%s_%s" % (file_name, user_id), True)
  

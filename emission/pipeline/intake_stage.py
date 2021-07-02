@@ -34,6 +34,7 @@ import emission.net.ext_service.habitica.executor as autocheck
 
 import emission.storage.decorations.stats_queries as esds
 
+
 def run_intake_pipeline(process_number, uuid_list):
     """
     Run the intake pipeline with the specified process number and uuid list.
