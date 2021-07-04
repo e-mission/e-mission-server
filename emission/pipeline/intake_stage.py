@@ -67,10 +67,6 @@ def run_intake_pipeline(process_number, uuid_list):
         if uuid is None:
             continue
 
-        # Skip entry with mixed time and distance filters
-        if uuid == UUID("2c3996d1-49b1-4dce-82f8-d0cda85d3475"):
-            continue
-
         try:
             run_intake_pipeline_for_user(uuid)
         except Exception as e:

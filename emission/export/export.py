@@ -36,9 +36,6 @@ def export(user_id, ts, start_ts, end_ts, file_name, ma_bool):
     if len(combined_list) == 0 or unique_key_list == set(['stats/pipeline_time']):
         logging.info("No entries found in range for user %s, skipping save" % user_id)
     else:
-        # Also dump the pipeline state, since that's where we have analysis results upto
-	# This allows us to copy data to a different *live system*, not just
-	# duplicate for analysis
         combined_filename = "%s.gz" % (file_name)
         with gzip.open(combined_filename, "wt") as gcfd:
             json.dump(combined_list,gcfd, default=bju.default, allow_nan=False, indent=4)

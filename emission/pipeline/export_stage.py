@@ -42,10 +42,6 @@ def run_export_pipeline(process_number, uuid_list):
         if uuid is None:
             continue
 
-        # Skip entry with mixed time and distance filters
-        if uuid == UUID("2c3996d1-49b1-4dce-82f8-d0cda85d3475"):
-            continue
-
         try:
             run_export_pipeline_for_user(uuid)
         except Exception as e:
@@ -55,7 +51,6 @@ def run_export_pipeline(process_number, uuid_list):
 
 
 def run_export_pipeline_for_user(uuid):
-    #run the intake stage?
     with ect.Timer() as edt:
         logging.info("*" * 10 + "UUID %s: exporting data" % uuid + "*" * 10)
         print(str(arrow.now()) + "*" * 10 + "UUID %s: exporting data" % uuid + "*" * 10)
