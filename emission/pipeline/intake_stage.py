@@ -160,19 +160,19 @@ def run_intake_pipeline_for_user(uuid):
                                  time.time(), crt.elapsed)
 
         with ect.Timer() as crt:
-            logging.info("*" * 10 + "UUID %s: creating confirmed objects " % uuid + "*" * 10)
-            print(str(arrow.now()) + "*" * 10 + "UUID %s: creating confirmed objects " % uuid + "*" * 10)
-            eaum.create_confirmed_objects(uuid)
-
-        esds.store_pipeline_time(uuid, ecwp.PipelineStages.CREATE_CONFIRMED_OBJECTS.name,
-                                 time.time(), crt.elapsed)
-
-        with ect.Timer() as crt:
             logging.info("*" * 10 + "UUID %s: inferring labels" % uuid + "*" * 10)
             print(str(arrow.now()) + "*" * 10 + "UUID %s: inferring labels" % uuid + "*" * 10)
             eacilp.infer_labels(uuid)
 
         esds.store_pipeline_time(uuid, ecwp.PipelineStages.LABEL_INFERENCE.name,
+                                 time.time(), crt.elapsed)
+
+        with ect.Timer() as crt:
+            logging.info("*" * 10 + "UUID %s: creating confirmed objects " % uuid + "*" * 10)
+            print(str(arrow.now()) + "*" * 10 + "UUID %s: creating confirmed objects " % uuid + "*" * 10)
+            eaum.create_confirmed_objects(uuid)
+
+        esds.store_pipeline_time(uuid, ecwp.PipelineStages.CREATE_CONFIRMED_OBJECTS.name,
                                  time.time(), crt.elapsed)
 
         with ect.Timer() as ogt:

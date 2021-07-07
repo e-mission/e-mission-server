@@ -8,6 +8,7 @@ import emission.storage.pipeline_queries as epq
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.core.wrapper.labelprediction as ecwl
+import emission.core.wrapper.entry as ecwe
 
 # Does all the work necessary for a given user
 def infer_labels(user_id):
@@ -109,16 +110,22 @@ class LabelInferencePipeline:
     def run_prediction_pipeline(self, user_id, time_range):
         self.ts = esta.TimeSeries.get_time_series(user_id)
         self.toPredictTrips = esda.get_entries(
-            esda.CONFIRMED_TRIP_KEY, user_id, time_query=time_range)
-        for trip in self.toPredictTrips:
-            results = self.compute_and_save_algorithms(trip)
-            ensemble = self.compute_and_save_ensemble(trip, results)
+            esda.CLEANED_TRIP_KEY, user_id, time_query=time_range)
+        for cleaned_trip in self.toPredictTrips:
+            results = self.compute_and_save_algorithms(cleaned_trip)
+            ensemble = self.compute_and_save_ensemble(cleaned_trip, results)
 
-            # Add final prediction to the confirmed trip entry in the database
-            trip["data"]["inferred_labels"] = ensemble["prediction"]
-            self.ts.update(trip)
-            if self._last_trip_done is None or self._last_trip_done.data.end_ts < trip.data.end_ts:
-                self._last_trip_done = trip
+            # Create an inferred trip entry in the database
+            inferred_trip = copy.copy(cleaned_trip);
+            del inferred_trip["_id"];
+            inferred_trip["metadata"]["key"] = "analysis/inferred_trip"
+            inferred_trip["data"]["cleaned_trip"] = cleaned_trip.get_id()
+            inferred_trip["data"]["inferred_labels"] = ensemble["prediction"]
+            self.ts.insert(ecwe.Entry(inferred_trip))
+
+
+            if self._last_trip_done is None or self._last_trip_done.data.end_ts < cleaned_trip.data.end_ts:
+                self._last_trip_done = cleaned_trip
     
     # This is where the labels for a given trip are actually predicted.
     # Though the only information passed in is the trip object, the trip object can provide the

@@ -132,6 +132,7 @@ class Entry(ecwb.WrapperBase):
             "analysis/inferred_labels": "labelprediction",
             ### ** END: prediction objects
             ### ** BEGIN: confirmed objects which combine inferred and user input values
+            "analysis/inferred_trip": "inferredtrip",
             "analysis/confirmed_trip": "confirmedtrip",
             "analysis/confirmed_section": "confirmedsection"
             ### ** END: confirmed objects which combine inferred and user input values
