@@ -12,7 +12,9 @@ import enum
 
 class AlgorithmTypes(enum.Enum):
     ENSEMBLE = 0
-    PLACEHOLDER = 1
+    PLACEHOLDER_0 = 1
+    PLACEHOLDER_1 = 2
+    PLACEHOLDER_2 = 3
 
 
 class Labelprediction(ecwb.WrapperBase):

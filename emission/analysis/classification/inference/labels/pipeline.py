@@ -53,11 +53,11 @@ def placeholder_predictor_1(trip):
 
 # This third scenario provides labels designed to test the soundness and resilience of
 # the client-side inference processing algorithms.
-trip_n = 0  # ugly use of globals for testing only
 def placeholder_predictor_2(trip):
-    global trip_n  # ugly use of globals for testing only
-    trip_n %= 6
-    trip_n += 1
+    # Hardcoded to match "test_july_22" -- clearly, this is just for testing
+    timestamp2index = {494: 5, 565: 4, 795: 3, 805: 2, 880: 1, 960: 0}
+    timestamp = trip["data"]["start_local_dt"]["hour"]*60+trip["data"]["start_local_dt"]["minute"]
+    index = timestamp2index[timestamp] if timestamp in timestamp2index else 0
     return [
         [
 
@@ -85,14 +85,13 @@ def placeholder_predictor_2(trip):
             {"labels": {"mode_confirm": "drove_alone", "purpose_confirm": "work"}, "p": 0.15},
             {"labels": {"mode_confirm": "shared_ride", "purpose_confirm": "work"}, "p": 0.05}
         ]
-    ][6-trip_n]
+    ][index]
 
 # For each algorithm in ecwl.AlgorithmTypes that runs on a trip (e.g., not the ensemble, which
 # runs on the results of other algorithms), primary_algorithms specifies a corresponding
 # function to run. This makes it easy to plug in additional algorithms later.
 primary_algorithms = {
-    # This can be edited to select a different placeholder predictor
-    ecwl.AlgorithmTypes.PLACEHOLDER: placeholder_predictor_2
+    ecwl.AlgorithmTypes.PLACEHOLDER_2: placeholder_predictor_2
 }
 
 # Code structure based on emission.analysis.classification.inference.mode.pipeline
@@ -112,19 +111,20 @@ class LabelInferencePipeline:
         self.toPredictTrips = esda.get_entries(
             esda.CLEANED_TRIP_KEY, user_id, time_query=time_range)
         for cleaned_trip in self.toPredictTrips:
-            results = self.compute_and_save_algorithms(cleaned_trip)
-            ensemble = self.compute_and_save_ensemble(cleaned_trip, results)
+            # Create an inferred trip
+            cleaned_trip_dict = copy.copy(cleaned_trip)["data"]
+            inferred_trip = ecwe.Entry.create_entry(user_id, "analysis/inferred_trip", cleaned_trip_dict)
+            
+            # Run the algorithms and the ensemble, store results
+            results = self.compute_and_save_algorithms(inferred_trip)
+            ensemble = self.compute_and_save_ensemble(inferred_trip, results)
 
-            # Create an inferred trip entry in the database
-            inferred_trip = copy.copy(cleaned_trip);
-            del inferred_trip["_id"];
-            inferred_trip["metadata"]["key"] = "analysis/inferred_trip"
+            # Put final results into the inferred trip and store it
             inferred_trip["data"]["cleaned_trip"] = cleaned_trip.get_id()
             inferred_trip["data"]["inferred_labels"] = ensemble["prediction"]
-            self.ts.insert(ecwe.Entry(inferred_trip))
+            self.ts.insert(inferred_trip)
 
-
-            if self._last_trip_done is None or self._last_trip_done.data.end_ts < cleaned_trip.data.end_ts:
+            if self._last_trip_done is None or self._last_trip_done["data"]["end_ts"] < cleaned_trip["data"]["end_ts"]:
                 self._last_trip_done = cleaned_trip
     
     # This is where the labels for a given trip are actually predicted.
@@ -138,8 +138,8 @@ class LabelInferencePipeline:
             lp.trip_id = trip.get_id()
             lp.algorithm_id = algorithm_id
             lp.prediction = prediction
-            lp.start_ts = trip.data.start_ts
-            lp.end_ts = trip.data.end_ts
+            lp.start_ts = trip["data"]["start_ts"]
+            lp.end_ts = trip["data"]["end_ts"]
             self.ts.insert_data(self.user_id, "inference/labels", lp)
             predictions.append(lp)
         return predictions
@@ -153,8 +153,8 @@ class LabelInferencePipeline:
         # Since this is not a real ensemble yet, we will not mark it as such
         # il.algorithm_id = ecwl.AlgorithmTypes.ENSEMBLE
         il.algorithm_id = ecwl.AlgorithmTypes(predictions[0]["algorithm_id"])
-        il.start_ts = trip.data.start_ts
-        il.end_ts = trip.data.end_ts
+        il.start_ts = trip["data"]["start_ts"]
+        il.end_ts = trip["data"]["end_ts"]
 
         il.prediction = copy.copy(predictions[0]["prediction"])
         
