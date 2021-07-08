@@ -51,21 +51,21 @@ def match_incoming_inputs(user_id, timerange):
 def create_confirmed_objects(user_id):
     time_query = epq.get_time_range_for_confirmed_object_creation(user_id)
     try:
-        last_inferred_trip_done = create_confirmed_trips(user_id, time_query)
-        if last_inferred_trip_done is None:
-            logging.debug("after run, last_inferred_trip_done == None, must be early return")
+        last_expected_trip_done = create_confirmed_trips(user_id, time_query)
+        if last_expected_trip_done is None:
+            logging.debug("after run, last_expected_trip_done == None, must be early return")
             epq.mark_confirmed_object_creation_done(user_id, None)
         else:
-            epq.mark_confirmed_object_creation_done(user_id, last_inferred_trip_done.data.end_ts)
+            epq.mark_confirmed_object_creation_done(user_id, last_expected_trip_done.data.end_ts)
     except:
         logging.exception("Error while creating confirmed objects, timestamp is unchanged")
         epq.mark_confirmed_object_creation_failed(user_id)
    
 def create_confirmed_trips(user_id, timerange):
     ts = esta.TimeSeries.get_time_series(user_id)
-    toConfirmTrips = esda.get_entries(esda.INFERRED_TRIP_KEY, user_id,
+    toConfirmTrips = esda.get_entries(esda.EXPECTED_TRIP_KEY, user_id,
         time_query=timerange)
-    logging.debug("Converting %d inferred trips to confirmed ones" % len(toConfirmTrips))
+    logging.debug("Converting %d expected trips to confirmed ones" % len(toConfirmTrips))
     lastTripProcessed = None
     if len(toConfirmTrips) == 0:
         logging.debug("len(toConfirmTrips) == 0, early return")
@@ -76,7 +76,7 @@ def create_confirmed_trips(user_id, timerange):
         confirmed_trip_dict = copy.copy(tct)
         del confirmed_trip_dict["_id"]
         confirmed_trip_dict["metadata"]["key"] = "analysis/confirmed_trip"
-        confirmed_trip_dict["data"]["inferred_trip"] = tct.get_id()
+        confirmed_trip_dict["data"]["expected_trip"] = tct.get_id()
         confirmed_trip_dict["data"]["user_input"] = \
             get_user_input_dict(ts, tct, input_key_list)
         confirmed_trip_entry = ecwe.Entry(confirmed_trip_dict)
