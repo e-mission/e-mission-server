@@ -12,6 +12,8 @@ class Confirmedtrip(ecwt.Trip):
     props = ecwt.Trip.props
     props.update({"raw_trip": ecwb.WrapperBase.Access.WORM,
                   "cleaned_trip": ecwb.WrapperBase.Access.WORM,
+                  "inferred_labels": ecwb.WrapperBase.Access.WORM,
+                  "inferred_trip": ecwb.WrapperBase.Access.WORM,
 # the confirmed section that is the "primary"
 # https://github.com/e-mission/e-mission-docs/issues/476#issuecomment-738120752
                   "primary_section": ecwb.WrapperBase.Access.WORM,

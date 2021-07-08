@@ -185,6 +185,22 @@ def mark_mode_inference_done(user_id, last_section_done):
 def mark_mode_inference_failed(user_id):    
     mark_stage_failed(user_id, ps.PipelineStages.MODE_INFERENCE)
 
+def get_time_range_for_label_inference(user_id):
+    tq = get_time_range_for_stage(user_id, ps.PipelineStages.LABEL_INFERENCE)
+    tq.timeType = "data.end_ts"
+    return tq
+
+# This stage operates on trips, not sections
+def mark_label_inference_done(user_id, last_trip_done):
+    if last_trip_done is None:
+        mark_stage_done(user_id, ps.PipelineStages.LABEL_INFERENCE, None)
+    else:
+        mark_stage_done(user_id, ps.PipelineStages.LABEL_INFERENCE,
+                        last_trip_done.data.end_ts + END_FUZZ_AVOID_LTE)
+
+def mark_label_inference_failed(user_id):    
+    mark_stage_failed(user_id, ps.PipelineStages.LABEL_INFERENCE)
+
 def get_time_range_for_output_gen(user_id):
     return get_time_range_for_stage(user_id, ps.PipelineStages.OUTPUT_GEN)
 

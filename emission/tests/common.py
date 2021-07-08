@@ -172,6 +172,7 @@ def runIntakePipeline(uuid):
     import emission.analysis.intake.cleaning.location_smoothing as eaicl
     import emission.analysis.intake.cleaning.clean_and_resample as eaicr
     import emission.analysis.classification.inference.mode.pipeline as eacimp
+    import emission.analysis.classification.inference.labels.pipeline as eacilp
 
     eaum.match_incoming_user_inputs(uuid)
     eaicf.filter_accuracy(uuid)
@@ -180,6 +181,7 @@ def runIntakePipeline(uuid):
     eaicl.filter_current_sections(uuid)
     eaicr.clean_and_resample(uuid)
     eacimp.predict_mode(uuid)
+    eacilp.infer_labels(uuid)
     eaum.create_confirmed_objects(uuid)
 
 def configLogging():

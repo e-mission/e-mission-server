@@ -30,6 +30,7 @@ import emission.analysis.intake.segmentation.section_segmentation as eaiss
 import emission.analysis.intake.cleaning.location_smoothing as eaicl
 import emission.analysis.intake.cleaning.clean_and_resample as eaicr
 import emission.analysis.classification.inference.mode.pipeline as eacimp
+import emission.analysis.classification.inference.labels.pipeline as eacilp
 import emission.net.ext_service.habitica.executor as autocheck
 
 import emission.storage.decorations.stats_queries as esds
@@ -156,6 +157,14 @@ def run_intake_pipeline_for_user(uuid):
             eacimp.predict_mode(uuid)
 
         esds.store_pipeline_time(uuid, ecwp.PipelineStages.MODE_INFERENCE.name,
+                                 time.time(), crt.elapsed)
+
+        with ect.Timer() as crt:
+            logging.info("*" * 10 + "UUID %s: inferring labels" % uuid + "*" * 10)
+            print(str(arrow.now()) + "*" * 10 + "UUID %s: inferring labels" % uuid + "*" * 10)
+            eacilp.infer_labels(uuid)
+
+        esds.store_pipeline_time(uuid, ecwp.PipelineStages.LABEL_INFERENCE.name,
                                  time.time(), crt.elapsed)
 
         with ect.Timer() as crt:
