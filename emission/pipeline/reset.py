@@ -54,7 +54,8 @@ def reset_user_to_ts(user_id, ts, is_dry_run):
         last_cleaned_place = esdp.get_last_place_before(esda.CLEANED_PLACE_KEY, ts, user_id)
         logging.debug("last_cleaned_place = %s" % last_cleaned_place)
         if last_cleaned_place is None or last_cleaned_place.data.exit_ts is None:
-            logging.info("Data collection for user %s stopped before reset time, early return" % user_id)
+            logging.info("Data collection for user %s stopped before reset time, resetting curr_run_state and then early return" % user_id)
+            reset_curr_run_state(user_id, is_dry_run)
             return
     except ValueError as e:
         first_cleaned_place = esdp.get_first_place_entry(esda.CLEANED_PLACE_KEY, user_id)
@@ -92,6 +93,10 @@ def reset_user_to_ts(user_id, ts, is_dry_run):
 
     # reset pipeline states to its enter_ts
     reset_pipeline_state(user_id, reset_ts, is_dry_run)
+
+    # reset any curr_run_ts
+    reset_curr_run_state(user_id, is_dry_run)
+
 
 def del_objects_after(user_id, reset_ts, is_dry_run):
     del_query = {}
@@ -202,6 +207,19 @@ def reset_pipeline_state(user_id, reset_ts, is_dry_run):
                     reset_pipeline_query, update_pipeline_query,
                     upsert=False, multi=True)
         logging.debug("this is not a dry run, result of updating all other stages in reset_pipeline_state = %s" % result)
+
+
+def reset_curr_run_state(user_id, is_dry_run):
+    reset_curr_run_ts_query = {"user_id": user_id, "curr_run_ts": {"$ne": None}}
+    reset_curr_run_ts_update = {"$set": {"curr_run_ts": None}}
+    logging.debug("reset_curr_run_ts_query = %s" % reset_curr_run_ts_query)
+    logging.debug("reset_curr_run_ts_update = %s" % reset_curr_run_ts_update)
+    if is_dry_run:
+        logging.info("this is a dry run, returning from reset_curr_run_state without modifying anything")
+    else:
+        result = edb.get_pipeline_state_db().update_many(
+                    reset_curr_run_ts_query, reset_curr_run_ts_update)
+        logging.debug("this is not a dry run, result of removing any curr_run_ts entries = %s" % result)
 # 
 # END: reset_user_to_ts
 # 
