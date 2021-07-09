@@ -9,6 +9,7 @@ import emission.export.export as eee
 import gzip
 import json
 import bson.json_util as bju
+import os
 
 def export_data(user_id):
     try:
@@ -33,6 +34,6 @@ class ExportDataPipeline:
     def run_export_data_pipeline(self, user_id):
         ts = esta.TimeSeries.get_time_series(user_id)
         time_query = espq.get_time_range_for_export_data(user_id)
-        file_name = os.environ.get('DATA_DIR', 'emission/archived/')+ "archive_%s_%s_%s" % (user_id, time_query.startTs, time_query.endTs)
+        file_name = os.environ.get('DATA_DIR', 'emission/archived') + "/archive_%s_%s_%s" % (user_id, time_query.startTs, time_query.endTs)
         eee.export(user_id, ts, time_query.startTs, time_query.endTs, file_name, False)
 	        
