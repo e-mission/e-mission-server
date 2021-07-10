@@ -38,8 +38,9 @@ def export(user_id, ts, start_ts, end_ts, file_name, ma_bool):
         logging.info("No entries found in range for user %s, skipping save" % user_id)
     else:
         combined_filename = "%s.gz" % (file_name)
-        if os.path.isdir(os.environ['DATA_DIR']) == False:
-            os.mkdir(os.environ['DATA_DIR']) 
+        if "DATA_DIR" in os.environ:
+            if os.path.isdir(os.environ['DATA_DIR']) == False:
+                os.mkdir(os.environ['DATA_DIR']) 
         with gzip.open(combined_filename, "wt") as gcfd:
             json.dump(combined_list,gcfd, default=bju.default, allow_nan=False, indent=4)
 

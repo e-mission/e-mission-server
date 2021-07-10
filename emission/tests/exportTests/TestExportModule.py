@@ -2,6 +2,8 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import *
 import os
+from os import path
+import tempfile
 import unittest
 import json
 import bson.json_util as bju
@@ -17,12 +19,12 @@ import emission.export.export as eee
 class TestExportModule(unittest.TestCase):
     def testExportModule(self):
         #Setup
-        etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-07-22") #is this needed? thinking yes
+        etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-07-22")
         etc.runIntakePipeline(self.testUUID)
 
         ts = esta.TimeSeries.get_time_series(self.testUUID)
         time_query = espq.get_time_range_for_export_data(self.testUUID)
-        file_name = os.environ.get('DATA_DIR', 'emission/archived/') + "archive_%s_%s_%s" % (self.testUUID, time_query.startTs, time_query.endTs)
+        file_name = os.environ.get('DATA_DIR', 'emission/archived') + "/archive_%s_%s_%s" % (self.testUUID, time_query.startTs, time_query.endTs)
 
         eee.export(self.testUUID, ts, time_query.startTs, time_query.endTs, file_name, False)
         file_name += ".gz"
@@ -67,7 +69,12 @@ class TestExportModule(unittest.TestCase):
         self.assertEqual(len(background_location_exported), len(background_location_raw))
         self.assertEqual(len(background_location_exported), len(background_location_db))
 
+    def testExportPipelineFull(self):
         #Testing functionality of the export pipeline entirely, first with tempdir usage
+        #Setup
+        etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-07-22")
+        etc.runIntakePipeline(self.testUUID)
+
         #Create a temporary directory within the emission folder
         with tempfile.TemporaryDirectory(dir='/tmp') as tmpdirname:
             self.assertTrue(path.isdir(tmpdirname))
@@ -88,7 +95,12 @@ class TestExportModule(unittest.TestCase):
             file_name = directory[0]
             self.assertTrue(uuid in file_name)
 
+    def testExportPipelineCreateDirectory(self):
         #Testing for the creation of non existent directories (creation in export pipeline)
+        #Setup
+        etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-07-22")
+        etc.runIntakePipeline(self.testUUID)
+
         #Set the os.environ['DATA_DIR'] to a directory path that does not yet exist
         os.environ['DATA_DIR'] = '/tmp/nonexistent'
         self.assertTrue(os.environ['DATA_DIR'], '/tmp/nonexistent')
