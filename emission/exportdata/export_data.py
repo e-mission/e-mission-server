@@ -34,6 +34,9 @@ class ExportDataPipeline:
     def run_export_data_pipeline(self, user_id):
         ts = esta.TimeSeries.get_time_series(user_id)
         time_query = espq.get_time_range_for_export_data(user_id)
+        if "DATA_DIR" in os.environ:
+            if os.path.isdir(os.environ['DATA_DIR']) == False:
+                os.mkdir(os.environ['DATA_DIR']) 
         file_name = os.environ.get('DATA_DIR', 'emission/archived') + "/archive_%s_%s_%s" % (user_id, time_query.startTs, time_query.endTs)
         eee.export(user_id, ts, time_query.startTs, time_query.endTs, file_name, False)
 	        
