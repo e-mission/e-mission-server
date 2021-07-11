@@ -4,13 +4,12 @@
         {
             "label": "intensive",
             "schedule": {
-                "startDate": "2021-06-01T20:00:00.000-00:00",
+                "startDate": "2021-06-01T20:00:00.000",
                 "recurrenceUnit": "months",
                 "recurrenceValue": 1,
                 "duration": 7
             },
             "confidenceThreshold": 0.65,
-            "draftDelay": 1.5,
             "rules": [
                 {
                     "trigger": -1,
@@ -45,7 +44,6 @@
         {
             "label": "relaxed",
             "confidenceThreshold": 0.55,
-            "draftDelay": 1.5,
             "rules": [
                 {
                     "trigger": -1,

@@ -36,11 +36,6 @@
                     "minimum": 0,
                     "maximum": 1
                 },
-                "draftDelay": {
-                    "description": "Avoid processing new draft trips for this number of hours, then, if they still have not been confirmed, treat them as if they have all red labels",
-                    "type": "number",
-                    "minimum": 0
-                },
                 "schedule": {
                     "$ref": "#/definitions/scheduleType"
                 },
@@ -66,14 +61,15 @@
                     ]
                 }
             },
-            "required": ["label", "confidenceThreshold", "draftDelay", "rules"]
+            "required": ["label", "confidenceThreshold", "rules"]
         },
         "scheduleType": {
             "description": "Describes when the mode is active; omit to make always active",
             "type": "object",
             "properties": {
                 "startDate": {
-                    "description": "The base date from which to measure time",
+                    "description": "The base date from which to measure time; omit time zone to signify user's local time",
+                    "$comment": "Officially, the \"date-time\" format is supposed to be RFC 3339. It breaks RFC 3339 (but not ISO 8601) to omit a time zone. My current design decision is to accept this rather than add a whole other field.",
                     "type": "string",
                     "format": "date-time"
                 },
