@@ -1,0 +1,43 @@
+{
+    "handlers": {
+        "errors": {
+            "backupCount": 2,
+            "mode": "a",
+            "level": "ERROR",
+            "formatter": "detailed",
+            "class": "logging.handlers.RotatingFileHandler",
+            "maxBytes": 1073741824,
+            "filename": "/var/tmp/export-errors.log",
+            "encoding": "UTF-8"
+        },
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": "WARNING"
+        },
+        "file": {
+            "backupCount": 8,
+            "filename": "/var/tmp/export.log",
+            "maxBytes": 1073741824,
+            "mode": "a",
+            "formatter": "detailed",
+            "class": "logging.handlers.RotatingFileHandler",
+            "encoding": "UTF-8"
+        }
+    },
+    "version": 1,
+    "root": {
+        "handlers": [
+            "console",
+            "file",
+            "errors"
+        ],
+        "level": "DEBUG"
+    },
+    "formatters": {
+        "detailed": {
+            "class": "logging.Formatter",
+            "format": "%(asctime)s:%(levelname)s:%(thread)d:%(message)s"
+        }
+    }
+}
+

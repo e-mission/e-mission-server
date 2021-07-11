@@ -185,6 +185,21 @@ def mark_mode_inference_done(user_id, last_section_done):
 def mark_mode_inference_failed(user_id):    
     mark_stage_failed(user_id, ps.PipelineStages.MODE_INFERENCE)
 
+def get_time_range_for_export_data(user_id):
+    tq = get_time_range_for_stage(user_id, ps.PipelineStages.EXPORT_DATA)
+    tq.timeType = "data.end_ts"
+    return tq
+
+def mark_export_data_done(user_id, last_trip_done):
+    if last_trip_done is None:
+        mark_stage_done(user_id, ps.PipelineStages.EXPORT_DATA, None)
+    else:
+        mark_stage_done(user_id, ps.PipelineStages.EXPORT_DATA,
+                        last_trip_done.data.end_ts + END_FUZZ_AVOID_LTE)
+
+def mark_export_data_failed(user_id):    
+    mark_stage_failed(user_id, ps.PipelineStages.EXPORT_DATA)
+
 def get_time_range_for_output_gen(user_id):
     return get_time_range_for_stage(user_id, ps.PipelineStages.OUTPUT_GEN)
 
