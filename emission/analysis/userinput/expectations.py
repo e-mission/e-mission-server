@@ -5,6 +5,12 @@ import emission.storage.pipeline_queries as epq
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.core.wrapper.entry as ecwe
 import emission.storage.timeseries.abstract_timeseries as esta
+import emission.analysis.configs.expectation_notification_config as eace
+
+# These may be altered to run tests
+_test_options = {
+    "preprocess_trip": None  # Runs on each trip before we process it, to do things like add fake end dates
+}
 
 # For a given user, determines which trips the user is expected to label (regardless of whether they have already done so) and marks them as such
 def populate_expectations(user_id):
@@ -29,6 +35,7 @@ def populate_expectations(user_id):
 def _process_and_save_trip(user_id, inferred_trip, ts):
     inferred_trip_dict = copy.copy(inferred_trip)["data"]
     expected_trip = ecwe.Entry.create_entry(user_id, "analysis/expected_trip", inferred_trip_dict)
+    if _test_options["preprocess_trip"] is not None: _test_options["preprocess_trip"](expected_trip)
 
     expectation = _get_expectation_for_trip(expected_trip)
     # For now, I don't think it's necessary to save each expectation as its own database entry
@@ -37,6 +44,9 @@ def _process_and_save_trip(user_id, inferred_trip, ts):
     expected_trip["data"]["expectation"] = expectation
     ts.insert(expected_trip)
 
-# This is a placeholder. TODO: implement the real configuration file-based algorithm
+# This is a placeholder. TODO: implement the real algorithm
 def _get_expectation_for_trip(trip):
-    return {"toLabel": False}
+    raw_expectation = eace.get_expectation(trip)
+    # For now, expect always labeling unless the config file specifies no labeling at all
+    processed_expectation = not raw_expectation["type"] == "none"
+    return {"to_label": processed_expectation}

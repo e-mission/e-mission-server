@@ -3,6 +3,7 @@ import arrow
 import copy
 
 import emission.analysis.configs.expectation_notification_config as eace
+import emission.tests.common as etc
 
 
 # Exhaustive (and exhausting) tests of expectation_notification_config, including the behind-the-scenes rules algorithms and timey-wimey stuff
@@ -196,3 +197,10 @@ class TestExpectationNotificationConfig(unittest.TestCase):
         self.assertEqual(eace.get_confidence_threshold(trip), 0.55)
         self.assertEqual(eace.get_expectation(trip), {"type": "randomFraction", "value": 0.05})
         self.assertEqual(eace.get_notification(trip), {"type": "dayEnd"})
+
+def main():
+    etc.configLogging()
+    unittest.main()
+
+if __name__ == "__main__":
+    main()

@@ -30,6 +30,7 @@ def _get_keylist():
     if _test_options["override_keylist"] is not None: return _test_options["override_keylist"]
     keylist = eac.get_config()["userinput.keylist"]
     assert len(keylist) > 0
+    keylist = [s.split("/")[1] for s in keylist]  # Turns e.g. "manual/mode_confirm" into "mode_confirm"
     return keylist
 
 _config = _get_expectation_config()
@@ -84,6 +85,8 @@ def _get_collection_mode_by_schedule(trip):
 def _rule_matches_label(mode, rule, trip, label):
     # If we were doing this on the phone, we would use finalInference.
     # Here, we just take the most likely prediction.
+    if len(trip["data"]["inferred_labels"]) == 0:
+        return rule["trigger"] == -1
     prediction = max(trip["data"]["inferred_labels"], key = lambda d: d["p"])
     confidence = prediction["p"]
     if confidence <= mode["confidenceThreshold"] or label not in prediction["labels"]:
