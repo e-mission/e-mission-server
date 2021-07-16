@@ -1,5 +1,6 @@
 import logging
 import scipy.cluster.hierarchy as sch
+import sklearn.cluster as sc
 
 # to map the user labels
 # - user_input_df: pass in original user input dataframe, return changed user input dataframe
@@ -61,7 +62,7 @@ def map_labels(user_input_df):
 # - dist_pct: the percentage of the last distance in the dendrogram
 # - sch.fcluster: form clusters from the hierarchical clustering defined by the given linkage matrix
 # e.g., if last_d = 10000, dist_pct = 0.4, max_d = 400, clusters will be assigned at the distance of 400
-# - clusters: the labels from the second round clustering
+# by default, using scipy hierarchical clustering
 def get_second_labels(x,method,low,dist_pct):
     z = sch.linkage(x, method=method, metric='euclidean')
     last_d = z[-1][2]
@@ -73,6 +74,13 @@ def get_second_labels(x,method,low,dist_pct):
         max_d = last_d * dist_pct
         clusters = sch.fcluster(z, max_d, criterion='distance')
     return clusters
+
+# using kmeans to build the model
+def kmeans_clusters(clusters,x):
+    n_clusters = len(set(clusters))
+    kmeans = sc.KMeans(n_clusters=n_clusters, random_state=0).fit(x)
+    k_clusters = kmeans.labels_
+    return k_clusters
 
 
 # this function includes hierarchical clustering and changing labels from the first round to get appropriate labels for
