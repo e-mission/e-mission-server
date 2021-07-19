@@ -2,8 +2,8 @@ import emission.core.get_database as edb
 import emission.analysis.modelling.tour_model.get_scores as gs
 import emission.analysis.modelling.tour_model.get_users as gu
 import emission.analysis.modelling.tour_model.label_processing as lp
-import evaluation_pipeline as ep
-import load_predict as load
+import emission.analysis.modelling.tour_model.evaluation_pipeline as ep
+import emission.analysis.modelling.tour_model.load_predict as load
 import emission.analysis.modelling.tour_model.data_preprocessing as preprocess
 import copy
 import pandas as pd
