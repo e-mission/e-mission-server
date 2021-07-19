@@ -22,7 +22,8 @@ class TestLabelInferencePipeline(unittest.TestCase):
     def setUp(self):
         np.random.seed(61297777)
         self.reset_all()
-        etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-jul-22")
+        # Note that shankari_2015-07-22 is different from shankari_2015-jul-22 and that if you use shankari_2015-jul-22 things will fail silently!!! Took me a lot of time to find that bug.
+        etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-07-22")
         self.run_pipeline(self.test_algorithms)
         time_range = estt.TimeQuery("metadata.write_ts", None, time.time())
         self.cleaned_trips = esda.get_entries(esda.CLEANED_TRIP_KEY, self.testUUID, time_query=time_range)
@@ -43,6 +44,7 @@ class TestLabelInferencePipeline(unittest.TestCase):
 
     # Tests that the fields from the cleaned trip are carried over into the inferred trip correctly
     def testPipelineIntegrity(self):
+        self.assertGreaterEqual(len(self.inferred_trips), 1)  # Make sure we've actually loaded trips
         self.assertEqual(len(self.inferred_trips), len(self.cleaned_trips))
         for inferred_trip in self.inferred_trips:
             cleaned_id = inferred_trip["data"]["cleaned_trip"]

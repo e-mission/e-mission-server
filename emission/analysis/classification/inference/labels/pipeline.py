@@ -54,6 +54,7 @@ def placeholder_predictor_1(trip):
 # This third scenario provides labels designed to test the soundness and resilience of
 # the client-side inference processing algorithms.
 def placeholder_predictor_2(trip):
+    # Timestamp2index gives us a deterministic way to match test trips with labels
     # Hardcoded to match "test_july_22" -- clearly, this is just for testing
     timestamp2index = {494: 5, 565: 4, 795: 3, 805: 2, 880: 1, 960: 0}
     timestamp = trip["data"]["start_local_dt"]["hour"]*60+trip["data"]["start_local_dt"]["minute"]
@@ -86,6 +87,43 @@ def placeholder_predictor_2(trip):
             {"labels": {"mode_confirm": "shared_ride", "purpose_confirm": "work"}, "p": 0.05}
         ]
     ][index]
+
+
+# This fourth scenario provides labels designed to test the expectation and notification system.
+def placeholder_predictor_3(trip):
+    timestamp2index = {494: 5, 565: 4, 795: 3, 805: 2, 880: 1, 960: 0}
+    timestamp = trip["data"]["start_local_dt"]["hour"]*60+trip["data"]["start_local_dt"]["minute"]
+    index = timestamp2index[timestamp] if timestamp in timestamp2index else 0
+    return [
+        [
+            {"labels": {"mode_confirm": "bike", "purpose_confirm": "work"}, "p": 0.80},
+            {"labels": {"mode_confirm": "walk", "purpose_confirm": "shopping"}, "p": 0.20}
+        ],
+        [
+            {"labels": {"mode_confirm": "bike", "purpose_confirm": "work"}, "p": 0.80},
+            {"labels": {"mode_confirm": "walk", "purpose_confirm": "shopping"}, "p": 0.20}
+        ],
+        [
+            {"labels": {"mode_confirm": "drove_alone", "purpose_confirm": "entertainment"}, "p": 0.70},
+        ],
+        [
+            {"labels": {"mode_confirm": "bike", "purpose_confirm": "work"}, "p": 0.96},
+            {"labels": {"mode_confirm": "walk", "purpose_confirm": "shopping"}, "p": 0.04}
+        ],
+        [
+            {"labels": {"mode_confirm": "walk", "purpose_confirm": "shopping"}, "p": 0.45},
+            {"labels": {"mode_confirm": "walk", "purpose_confirm": "entertainment"}, "p": 0.35},
+            {"labels": {"mode_confirm": "drove_alone", "purpose_confirm": "work"}, "p": 0.15},
+            {"labels": {"mode_confirm": "shared_ride", "purpose_confirm": "work"}, "p": 0.05}
+        ],
+        [
+            {"labels": {"mode_confirm": "walk", "purpose_confirm": "shopping"}, "p": 0.60},
+            {"labels": {"mode_confirm": "walk", "purpose_confirm": "entertainment"}, "p": 0.25},
+            {"labels": {"mode_confirm": "drove_alone", "purpose_confirm": "work"}, "p": 0.11},
+            {"labels": {"mode_confirm": "shared_ride", "purpose_confirm": "work"}, "p": 0.04}
+        ]
+    ][index]
+
 
 # For each algorithm in ecwl.AlgorithmTypes that runs on a trip (e.g., not the ensemble, which
 # runs on the results of other algorithms), primary_algorithms specifies a corresponding
