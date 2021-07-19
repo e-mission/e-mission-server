@@ -16,7 +16,7 @@ def get_scatter(valid_users,all_filename,first_round,second_round):
         df = pd.read_csv(all_filename[i], index_col='split')
         color = cmp.colors[i]
         plot_scatter(df, sc, color, first_round, second_round)
-    plt.legend(sc, valid_users, markerscale=0.8, scatterpoints=1, bbox_to_anchor=(1.21, 1))
+    plt.legend(sc, valid_users, markerscale=0.8, scatterpoints=1, bbox_to_anchor=(1.23, 1))
     plt.xlabel('user input request percentage',fontsize=16)
     plt.ylabel('homogeneity score',fontsize=16)
     plt.xticks(np.arange(0.4,1.1,step=0.1),fontsize=14)
