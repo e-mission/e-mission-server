@@ -199,5 +199,5 @@ def main(all_users):
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
         level=logging.DEBUG)
-    all_users = [esta.TimeSeries.get_uuid_list()[0]]
+    all_users = esta.TimeSeries.get_uuid_list()
     main(all_users)

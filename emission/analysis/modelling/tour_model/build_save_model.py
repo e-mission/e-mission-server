@@ -45,7 +45,7 @@ def save_models(obj_name,obj,user):
 
 
 def main():
-    all_users = [esta.TimeSeries.get_uuid_list()[0]]
+    all_users = esta.TimeSeries.get_uuid_list()
     radius = 100
     for a in range(len(all_users)):
         user = all_users[a]
