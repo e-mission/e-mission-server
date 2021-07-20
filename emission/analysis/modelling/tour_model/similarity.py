@@ -46,7 +46,7 @@ def filter_too_short(all_trips, radius):
     # But let's go from working to working
     valid_trips = copy.copy(all_trips)
     for t in all_trips:
-        logging.debug("Considering trip %s" % t)
+        logging.debug(f"Considering trip {t['_id']}: {t.data.start_fmt_time} -> {t.data.end_fmt_time}, {t.data.start_loc} -> {t.data.end_loc}")
         try:
             start_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
                                          t.data.start_place)
@@ -98,10 +98,13 @@ class similarity(object):
             self.newdata = self.data
             return
         num = self.elbow_distance()
+        logging.debug("bins = %s, elbow distance = %s" % (self.bins, num))
         sum = 0
         for i in range(len(self.bins)):
             sum += len(self.bins[i])
             if len(self.bins[i]) <= len(self.bins[num]):
+                logging.debug("found weird condition, self.bins[i] = %s, self.bins[num] = %s" %
+                    (self.bins[i], self.bins[num]))
                 sum -= len(self.bins[i])
                 num = i
                 break
