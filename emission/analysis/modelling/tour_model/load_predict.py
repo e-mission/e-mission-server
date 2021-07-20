@@ -1,5 +1,6 @@
 # Standard imports
 import jsonpickle as jpickle
+import logging
 
 # Our imports
 import emission.storage.timeseries.abstract_timeseries as esta
@@ -113,6 +114,8 @@ def predict_labels(trip):
 
 
 if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
+        level=logging.DEBUG)
     all_users = [esta.TimeSeries.get_uuid_list()[0]]
 
     # case 1: the new trip matches a bin from the 1st round and a cluster from the 2nd round
@@ -129,11 +132,11 @@ if __name__ == '__main__':
     # case 2: no existing files for the user who has the new trip:
     # 1. the user is invalid(< 10 existing fully labeled trips, or < 50% of trips that fully labeled)
     # 2. the user doesn't have common trips
-    user = all_users[1]
-    trips = preprocess.read_data(user)
-    new_trip = [trips[0]]
-    # result is []
-    print(predict_labels(new_trip))
+#     user = all_users[1]
+#     trips = preprocess.read_data(user)
+#     new_trip = [trips[0]]
+#     # result is []
+#     print(predict_labels(new_trip))
 
     # case3: the new trip is novel trip(doesn't fall in any 1st round bins)
     user = all_users[0]
