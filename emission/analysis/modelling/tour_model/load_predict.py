@@ -1,7 +1,11 @@
-import emission.core.get_database as edb
+# Standard imports
+import jsonpickle as jpickle
+
+# Our imports
+import emission.storage.timeseries.abstract_timeseries as esta
+import emission.analysis.modelling.tour_model.similarity as similarity
 import emission.analysis.modelling.tour_model.similarity as similarity
 import emission.analysis.modelling.tour_model.data_preprocessing as preprocess
-import jsonpickle as jpickle
 
 
 def loadModelStage(filename):
@@ -109,8 +113,7 @@ def predict_labels(trip):
 
 
 if __name__ == '__main__':
-    participant_uuid_obj = list(edb.get_profile_db().find({"install_group": "participant"}, {"user_id": 1, "_id": 0}))
-    all_users = [u["user_id"] for u in participant_uuid_obj]
+    all_users = [esta.TimeSeries.get_uuid_list()[0]]
 
     # case 1: the new trip matches a bin from the 1st round and a cluster from the 2nd round
     user = all_users[0]

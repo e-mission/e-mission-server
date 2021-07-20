@@ -1,14 +1,18 @@
-import emission.analysis.modelling.tour_model.similarity as similarity
+# Standard imports
 import numpy as np
-import emission.core.get_database as edb
+import pandas as pd
+import jsonpickle as jpickle
+
+# Our imports
+import emission.storage.timeseries.abstract_timeseries as esta
+
+import emission.analysis.modelling.tour_model.similarity as similarity
 import emission.analysis.modelling.tour_model.get_request_percentage as grp
 import emission.analysis.modelling.tour_model.get_scores as gs
 import emission.analysis.modelling.tour_model.label_processing as lp
 import emission.analysis.modelling.tour_model.data_preprocessing as preprocess
 import emission.analysis.modelling.tour_model.second_round_of_clustering as sr
 import emission.analysis.modelling.tour_model.get_users as gu
-import pandas as pd
-import jsonpickle as jpickle
 
 def second_round(bin_trips,filter_trips,first_labels,track,low,dist_pct,sim,kmeans):
     sec = sr.SecondRoundOfClustering(bin_trips,first_labels)
@@ -187,6 +191,5 @@ def main(all_users):
 
 
 if __name__ == '__main__':
-    participant_uuid_obj = list(edb.get_profile_db().find({"install_group": "participant"}, {"user_id": 1, "_id": 0}))
-    all_users = [u["user_id"] for u in participant_uuid_obj]
+    all_users = [esta.TimeSeries.get_uuid_list()[0]]
     main(all_users)
