@@ -1,0 +1,87 @@
+{
+    "$schema": "./expectations.conf.schema.json",
+    "modes": [
+        {
+            "label": "intensive",
+            "schedule": {
+                "startDate": "2021-06-01T20:00:00.000",
+                "recurrenceUnit": "months",
+                "recurrenceValue": 1,
+                "duration": 7
+            },
+            "confidenceThreshold": 0.65,
+            "rules": [
+                {
+                    "trigger": -1,
+                    "expect": {
+                        "type": "all"
+                    },
+                    "notify": {
+                        "type": "dayEnd"
+                    }
+                },
+                {
+                    "trigger": 1,
+                    "expect": {
+                        "type": "all"
+                    },
+                    "notify": {
+                        "type": "weekDay",
+                        "value": 5
+                    }
+                },
+                {
+                    "trigger": 0.75,
+                    "expect": {
+                        "type": "all"
+                    },
+                    "notify": {
+                        "type": "dayEnd"
+                    }
+                }
+            ]
+        },
+        {
+            "label": "relaxed",
+            "confidenceThreshold": 0.55,
+            "rules": [
+                {
+                    "trigger": -1,
+                    "expect": {
+                        "type": "randomDays",
+                        "value": 2
+                    },
+                    "notify": {
+                        "type": "dayEnd"
+                    }
+                },
+                {
+                    "trigger": 1,
+                    "expect": {
+                        "type": "none"
+                    }
+                },
+                {
+                    "trigger": 0.95,
+                    "expect": {
+                        "type": "randomFraction",
+                        "value": 0.05
+                    },
+                    "notify": {
+                        "type": "dayEnd"
+                    }
+                },
+                {
+                    "trigger": 0.75,
+                    "expect": {
+                        "type": "randomDays",
+                        "value": 2
+                    },
+                    "notify": {
+                        "type": "dayEnd"
+                    }
+                }
+            ]
+        }
+    ]
+}
