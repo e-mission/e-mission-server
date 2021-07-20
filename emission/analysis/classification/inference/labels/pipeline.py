@@ -10,6 +10,8 @@ import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.core.wrapper.labelprediction as ecwl
 import emission.core.wrapper.entry as ecwe
 
+import emission.analysis.modelling.tour_model.load_predict as lp
+
 # Does all the work necessary for a given user
 def infer_labels(user_id):
     time_query = epq.get_time_range_for_label_inference(user_id)
@@ -124,12 +126,18 @@ def placeholder_predictor_3(trip):
         ]
     ][index]
 
+# Non-placeholder implementation. First bins the trips, and then clusters every bin
+# See emission.analysis.modelling.tour_model for more details
+# Assumes that pre-built models are stored in working directory
+# Models are built using evaluation_pipeline.py and build_save_model.py
+def predict_two_stage_bin_cluster(trip):
+    return lp.predict_labels(trip)
 
 # For each algorithm in ecwl.AlgorithmTypes that runs on a trip (e.g., not the ensemble, which
 # runs on the results of other algorithms), primary_algorithms specifies a corresponding
 # function to run. This makes it easy to plug in additional algorithms later.
 primary_algorithms = {
-    ecwl.AlgorithmTypes.PLACEHOLDER_2: placeholder_predictor_2
+    ecwl.AlgorithmTypes.TWO_STAGE_BIN_CLUSTER: predict_two_stage_bin_cluster
 }
 
 # Code structure based on emission.analysis.classification.inference.mode.pipeline
