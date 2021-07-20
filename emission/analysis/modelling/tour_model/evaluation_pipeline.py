@@ -131,8 +131,6 @@ def test(data,radius,low,dist_pct,kmeans):
 
 def main(all_users):
     radius = 100
-    # get all/valid user list
-    user_ls, valid_users = gu.get_user_ls(all_users, radius)
     all_filename = []
     for a in range(len(all_users)):
         user = all_users[a]
