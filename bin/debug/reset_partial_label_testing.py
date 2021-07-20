@@ -16,13 +16,14 @@ group.add_argument("-c", "--confirmed", action='store_true')
 args = parser.parse_args()
 
 if args.inferred:
-    edb.get_analysis_timeseries_db().delete_many({"metadata.key": esda.INFERRED_TRIP_KEY})
-    edb.get_analysis_timeseries_db().delete_many({"metadata.key": esda.EXPECTED_TRIP_KEY})
-    edb.get_analysis_timeseries_db().delete_many({"metadata.key": "inference/labels"})
-    edb.get_analysis_timeseries_db().delete_many({"metadata.key": "analysis/inferred_labels"})
-    edb.get_pipeline_state_db().delete_many({"pipeline_stage": {"$in": [14,15]}})
+    print(edb.get_analysis_timeseries_db().delete_many({"metadata.key": esda.INFERRED_TRIP_KEY}).raw_result)
+    print(edb.get_analysis_timeseries_db().delete_many({"metadata.key": esda.EXPECTED_TRIP_KEY}).raw_result)
+    print(edb.get_analysis_timeseries_db().delete_many({"metadata.key": "inference/labels"}).raw_result)
+    print(edb.get_analysis_timeseries_db().delete_many({"metadata.key": "analysis/inferred_labels"}).raw_result)
+    print(edb.get_pipeline_state_db().delete_many({"pipeline_stage": {"$in": [14,15]}}).raw_result)
 
 if args.confirmed:
-    edb.get_analysis_timeseries_db().delete_many({"metadata.key": esda.CONFIRMED_TRIP_KEY})
-    edb.get_pipeline_state_db().delete_many({"pipeline_stage": {"$in": [13]}})
+    print(edb.get_analysis_timeseries_db().delete_many({"metadata.key": esda.EXPECTED_TRIP_KEY}).raw_result)
+    print(edb.get_analysis_timeseries_db().delete_many({"metadata.key": esda.CONFIRMED_TRIP_KEY}).raw_result)
+    print(edb.get_pipeline_state_db().delete_many({"pipeline_stage": {"$in": [13]}}).raw_result)
 
