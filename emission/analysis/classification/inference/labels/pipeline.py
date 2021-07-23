@@ -154,6 +154,34 @@ primary_algorithms = {
     ecwl.AlgorithmTypes.PLACEHOLDER_PREDICTOR_DEMO: placeholder_predictor_demo
 }
 
+# This placeholder ensemble simply returns the first prediction run
+def ensemble_first_prediction(trip, predictions):
+    # Since this is not a real ensemble yet, we will not mark it as such
+    # algorithm_id = ecwl.AlgorithmTypes.ENSEMBLE
+    algorithm_id = ecwl.AlgorithmTypes(predictions[0]["algorithm_id"]);
+    prediction = copy.copy(predictions[0]["prediction"])
+    return algorithm_id, prediction
+
+# If we get a real prediction, use it, otherwise fallback to the placeholder
+def ensemble_real_and_placeholder(trip, predictions):
+        if predictions[0]["prediction"] != []:
+            sel_prediction = predictions[0]
+            logging.debug(f"Found real prediction {sel_prediction}, using that preferentially")
+            # assert sel_prediction.algorithm_id == ecwl.AlgorithmTypes.TWO_STAGE_BIN_CLUSTER
+        else:
+            sel_prediction = predictions[1]
+            logging.debug(f"No real prediction found, using placeholder prediction {sel_prediction}")
+            # Use a not equal assert since we may want to change the placeholder
+            assert sel_prediction.algorithm_id != ecwl.AlgorithmTypes.TWO_STAGE_BIN_CLUSTER
+
+        algorithm_id = ecwl.AlgorithmTypes(sel_prediction["algorithm_id"])
+        prediction = copy.copy(sel_prediction["prediction"])
+        return algorithm_id, prediction
+
+# ensemble specifies which algorithm of the several above to run.
+# This makes it easy to test various ways of combining various algorithms.
+ensemble = ensemble_first_prediction
+
 # Code structure based on emission.analysis.classification.inference.mode.pipeline
 # and emission.analysis.classification.inference.mode.rule_engine
 class LabelInferencePipeline:
@@ -210,24 +238,8 @@ class LabelInferencePipeline:
     def compute_and_save_ensemble(self, trip, predictions):
         il = ecwl.Labelprediction()
         il.trip_id = trip.get_id()
-        # if we get a real prediction, use it, otherwise fallback to the placeholder
-        # Since this is not a real ensemble yet, we will not mark it as such
-        # il.algorithm_id = ecwl.AlgorithmTypes.ENSEMBLE
-        if predictions[0]["prediction"] != []:
-            sel_prediction = predictions[0]
-            logging.debug(f"Found real prediction {sel_prediction}, using that preferentially")
-            assert sel_prediction.algorithm_id == ecwl.AlgorithmTypes.TWO_STAGE_BIN_CLUSTER
-        else:
-            sel_prediction = predictions[1]
-            logging.debug(f"No real prediction found, using placeholder prediction {sel_prediction}")
-            # Use a not equal assert since we may want to change the placeholder
-            assert sel_prediction.algorithm_id != ecwl.AlgorithmTypes.TWO_STAGE_BIN_CLUSTER
-
-        il.algorithm_id = ecwl.AlgorithmTypes(sel_prediction["algorithm_id"])
         il.start_ts = trip["data"]["start_ts"]
         il.end_ts = trip["data"]["end_ts"]
-
-        il.prediction = copy.copy(sel_prediction["prediction"])
-        
+        (il.algorithm_id, il.prediction) = ensemble(trip, predictions)
         self.ts.insert_data(self.user_id, "analysis/inferred_labels", il)
         return il
