@@ -23,7 +23,7 @@ primary_algorithms = {
 
 # ensemble specifies which algorithm in eacile to run.
 # This makes it easy to test various ways of combining various algorithms.
-ensemble = eacile.ensemble_first_prediction
+ensemble = eacile.ensemble_real_and_placeholder
 
 
 # Does all the work necessary for a given user
