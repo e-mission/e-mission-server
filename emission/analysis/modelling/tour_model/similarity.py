@@ -48,14 +48,10 @@ def filter_too_short(all_trips, radius):
     for t in all_trips:
         logging.debug(f"Considering trip {t['_id']}: {t.data.start_fmt_time} -> {t.data.end_fmt_time}, {t.data.start_loc} -> {t.data.end_loc}")
         try:
-            start_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
-                                         t.data.start_place)
-            end_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
-                                         t.data.end_place)
-            start_lon = start_place.data.location["coordinates"][0]
-            start_lat = start_place.data.location["coordinates"][1]
-            end_lon = end_place.data.location["coordinates"][0]
-            end_lat = end_place.data.location["coordinates"][1]
+            start_lon = t.data.start_loc["coordinates"][0]
+            start_lat = t.data.start_loc["coordinates"][1]
+            end_lon = t.data.end_loc["coordinates"][0]
+            end_lat = t.data.end_loc["coordinates"][1]
             logging.debug("endpoints are = (%s, %s) and (%s, %s)" %
                           (start_lon, start_lat, end_lon, end_lat))
             if within_radius(start_lat, start_lon, end_lat, end_lon, radius):
@@ -183,14 +179,10 @@ class similarity(object):
         for bin in self.bins:
             for b in bin:
                 tb = self.data[b]
-                start_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
-                                             tb.data.start_place)
-                end_place = esda.get_entry(esda.CLEANED_PLACE_KEY,
-                                           tb.data.end_place)
-                start_lon = start_place.data.location["coordinates"][0]
-                start_lat = start_place.data.location["coordinates"][1]
-                end_lon = end_place.data.location["coordinates"][0]
-                end_lat = end_place.data.location["coordinates"][1]
+                start_lon = tb.data.start_loc["coordinates"][0]
+                start_lat = tb.data.start_loc["coordinates"][1]
+                end_lon = tb.data.end_loc["coordinates"][0]
+                end_lat = tb.data.end_loc["coordinates"][1]
                 path = [start_lat, start_lon, end_lat, end_lon]
                 points.append(path)
         logging.debug("number of labels are %d, number of points are = %d" %
