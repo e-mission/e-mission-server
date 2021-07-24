@@ -12,6 +12,7 @@ from past.utils import old_div
 import logging
 import math
 import numpy
+import pandas as pd
 import copy
 from sklearn import metrics
 from numpy.linalg import norm
@@ -65,13 +66,43 @@ def filter_too_short(all_trips, radius):
 
 class similarity(object):
     def __init__(self, data, radius):
-        inData = data
         if not data:
-            inData = []
+            self.all_data = []
+        # In order to retrofit multiple invocation options without undertaking
+        # a full restructuring, we will use the following structure for the
+        # data
+        # self.data will always represent the current state of the trips
+        # self.bins will always represent the current state of the bins
+        # In addition, self.all_data will represent all input trips
+        # In addition, self.filtered_data will represent the output of "filter_too_short"
+        # In addition, self.data_above_cutoff will represent the output of "delete_bins"
+        # so even after finishing all three steps, we will have access to the
+        # original input data
+        # since we are only copying the lists (copy), not the objects in the
+        # lists (deepcopy), this should not involve an undue user burden
+        # I really don't see why we need to work with indices here, but in the absence of unit tests,
+        # I am not comfortable with restructuring further
+        self.all_data = data
+        self.set_state(self.all_data)
         self.bins = []
         self.radius = float(radius)
-        self.data = filter_too_short(inData, self.radius)
+
+    def set_state(self, in_data):
+        """
+        Encapsulates all the state related to this object
+        so that we don't forget to update everything
+        """
+        self.data = copy.copy(in_data)
         self.size = len(self.data)
+        
+
+    # Pull out the trip filtration code so that we can invoke the code in
+    # multiple ways (with and without filteration) depending on whether we want
+    # to focus on common trips or auto-labeling
+    def filter_trips(self):
+        self.filtered_data = filter_too_short(self.all_data, self.radius)
+        self.set_state(self.filtered_data)
+        
 
     #create bins
     def bin_data(self):
@@ -84,6 +115,7 @@ class similarity(object):
                         added = True
                         break
                 except:
+                    print(f"Got exception while matching trip {a}, creating new bin")
                     added = False
             if not added:
                 self.bins.append([a])
@@ -92,6 +124,8 @@ class similarity(object):
     def calc_cutoff_bins(self):
         if len(self.bins) <= 1:
             self.newdata = self.data
+            self.data_above_cutoff = self.newdata
+            self.set_state(self.newdata)
             return
         num = self.elbow_distance()
         logging.debug("bins = %s, elbow distance = %s" % (self.bins, num))
@@ -119,11 +153,83 @@ class similarity(object):
             for b in bin:
                 d = self.data[b]
                 newdata.append(self.data[b])
-        self.newdata = newdata if len(newdata) > 1 else self.data
+        self.newdata = newdata if len(newdata) > 1 else copy.copy(self.data)
+        self.data_above_cutoff = self.newdata
+        self.set_state(self.newdata)
         self.below_cutoff = below_cutoff
         self.below_cutoff.sort(key=lambda bin: len(bin), reverse=True)
 
+    def get_result_labels(self):
+        """
+        Return "labels" for the trips, to be consistent with sklearn
+        implementations.  This is not otherwise compatible with sklearn, but
+        would be great to submit it as an example of an absolute radius, even
+        if it is computationally expensive.
 
+        It would certainly help with:
+        https://stackoverflow.com/questions/48217127/distance-based-classification
+        and
+        https://stackoverflow.com/questions/35971441/how-to-adjust-this-dbscan-algorithm-python
+
+        This function sets labels based on the various states for the trips.
+        Pulling this out
+        as a separate function to write unit tests. This would be normally be
+        trivial - we would just index the all_trip_df on the trips in each bin and
+        set a unique number. However, if we have filtered before binning, then the
+        trip indices in the bin are the filtered trip indices, which are different
+        from all_trips indices. So we need to remap from one set of indices to
+        another before we can assign the labels.
+        param: all_trip_df: dataframe of all trips
+        param: filtered_trip_df: dataframe of trips that were removed as "too short"
+        param: bins (either all, or above cutoff only)
+        
+        Returns: pandas Series with labels:
+        >=0 for trips in bins. the label is a unique bin id
+        =-1 for long trips not in bins
+        =-2 for trips that were too short
+        """
+        # This is a bit tricky wrt indexing, since the indices of the trips in the bin are after filtering,
+        # so don't match up 1:1 with the indices in the trip dataframe
+        # since we create a new dataframe for the filtered trips, they should match up with the filtered dataframe
+        # but the index of the filtered dataframe is a new RangeIndex, so it doesn't work for indexing into the result series
+        # so we need to follow a two-step process as below
+
+        all_trip_df = pd.DataFrame(self.all_data)
+        if hasattr(self, "filtered_data"):
+            filtered_trip_df = pd.DataFrame([e for e in self.filtered_data])
+            # print(filtered_trip_df)
+        else:
+            filtered_trip_df = None
+        self.before_cutoff_bins = [[t for t in ob if t not in self.too_short_indices] for ob in self.all_bins]
+
+        # assume that everything is noise to start with
+        result_labels = pd.Series([-1] * len(all_trip_df))
+
+        # self.bins contains the bins in the current state (either before or
+        # after cutoff). Loop will not run if binning is not complete, so all
+        # trips will be noise
+        for i, curr_bin in enumerate(self.bins):
+            if filtered_trip_df is not None:
+
+                # get the trip ids of matching filtered trips for the current bin
+                matching_filtered_trip_ids = filtered_trip_df.loc[curr_bin]._id
+                # then, match by tripid to find the corresponding entries in the all_trips dataframe
+                matching_all_trip_ids = all_trip_df[all_trip_df._id.isin(matching_filtered_trip_ids)].index
+                # then set all those indices to the bin index
+                result_labels.loc[matching_all_trip_ids] = i
+            else:
+                # No filteration, trip indices in the bins are from all trips
+                # so we can index directly
+                result_labels.loc[curr_bin] = i
+
+        # For now, we also mark the "too short" labels with -2 to help with
+        # our understanding. Consider removing this code later. This will override
+        # noisy labels
+        if filtered_trip_df is not None:        
+            removed_trips = all_trip_df[~all_trip_df._id.isin(filtered_trip_df._id)]
+            logging.debug("Detected removed trips %s" % removed_trips.index)
+            result_labels.loc[removed_trips.index] = -2
+        return result_labels    
 
     #calculate the cut-off point in the histogram
     #This is motivated by the need to calculate the cut-off point 
