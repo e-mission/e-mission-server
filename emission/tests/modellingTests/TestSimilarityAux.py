@@ -45,6 +45,15 @@ class TestSimilarityAux(unittest.TestCase):
     def tearDown(self):
         pass
 
+    def testEmptyDataFrame(self):
+        self.curr_sim = eamts.similarity([], 0)
+        self.assertEqual(self.curr_sim.get_result_labels().to_list(), [])
+
+    def testEmptyTooShortDataFrame(self):
+        self.curr_sim = eamts.similarity([{"_id": boi.ObjectId()}], 0)
+        self.curr_sim.filtered_data = []
+        self.assertEqual(self.curr_sim.get_result_labels().to_list(), [-1])
+
     def testBeforeFiltering(self):
         # before filtering, everything should be noise
         result = self.curr_sim.get_result_labels()

@@ -65,7 +65,7 @@ def filter_too_short(all_trips, radius):
     return valid_trips
 
 class similarity(object):
-    def __init__(self, data, radius):
+    def __init__(self, data, radius, shouldFilter=True, cutoff=True):
         if not data:
             self.all_data = []
         # In order to retrofit multiple invocation options without undertaking
@@ -86,6 +86,8 @@ class similarity(object):
         self.set_state(self.all_data)
         self.bins = []
         self.radius = float(radius)
+        self.shouldFilter = shouldFilter
+        self.cutoff = cutoff
 
     def set_state(self, in_data):
         """
@@ -94,6 +96,14 @@ class similarity(object):
         """
         self.data = copy.copy(in_data)
         self.size = len(self.data)
+
+    def fit(self):
+        if self.shouldFilter:
+            self.filter_trips()
+        self.bin_data()
+        if self.cutoff:
+            self.delete_bins()
+        self.labels_ = self.get_result_labels()
         
 
     # Pull out the trip filtration code so that we can invoke the code in
@@ -123,9 +133,11 @@ class similarity(object):
 
     def calc_cutoff_bins(self):
         if len(self.bins) <= 1:
+            print(f"{len(self.bins)}, no cutoff")
             self.newdata = self.data
             self.data_above_cutoff = self.newdata
             self.set_state(self.newdata)
+            self.num = len(self.bins)
             return
         num = self.elbow_distance()
         logging.debug("bins = %s, elbow distance = %s" % (self.bins, num))
@@ -200,17 +212,17 @@ class similarity(object):
             # print(filtered_trip_df)
         else:
             filtered_trip_df = None
-        self.before_cutoff_bins = [[t for t in ob if t not in self.too_short_indices] for ob in self.all_bins]
+
+        # logging.debug(f"lengths: {len(all_trip_df)}, {len(filtered_trip_df) if filtered_trip_df is not None else None}")
 
         # assume that everything is noise to start with
-        result_labels = pd.Series([-1] * len(all_trip_df))
+        result_labels = pd.Series([-1] * len(all_trip_df), dtype="int")
 
         # self.bins contains the bins in the current state (either before or
         # after cutoff). Loop will not run if binning is not complete, so all
         # trips will be noise
         for i, curr_bin in enumerate(self.bins):
-            if filtered_trip_df is not None:
-
+            if filtered_trip_df is not None and len(filtered_trip_df) > 0:
                 # get the trip ids of matching filtered trips for the current bin
                 matching_filtered_trip_ids = filtered_trip_df.loc[curr_bin]._id
                 # then, match by tripid to find the corresponding entries in the all_trips dataframe
@@ -225,11 +237,11 @@ class similarity(object):
         # For now, we also mark the "too short" labels with -2 to help with
         # our understanding. Consider removing this code later. This will override
         # noisy labels
-        if filtered_trip_df is not None:        
+        if filtered_trip_df is not None and len(filtered_trip_df) > 0:
             removed_trips = all_trip_df[~all_trip_df._id.isin(filtered_trip_df._id)]
             logging.debug("Detected removed trips %s" % removed_trips.index)
             result_labels.loc[removed_trips.index] = -2
-        return result_labels    
+        return result_labels
 
     #calculate the cut-off point in the histogram
     #This is motivated by the need to calculate the cut-off point 
