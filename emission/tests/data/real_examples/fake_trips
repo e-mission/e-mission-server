@@ -691,10 +691,10 @@
         },
         "data": {
             "source": "DwellSegmentationTimeFilter",
-            "end_ts": 1466809435.0,
+            "end_ts": 1469401435.0,
             "end_local_dt": {
                 "year": 2016,
-                "month": 6,
+                "month": 7,
                 "day": 24,
                 "hour": 16,
                 "minute": 3,
@@ -713,10 +713,10 @@
             "raw_trip": {
                 "$oid": "5fd8e662baff4ef23d349791"
             },
-            "start_ts": 1466808570.0,
+            "start_ts": 1469400570.0,
             "start_local_dt": {
                 "year": 2016,
-                "month": 6,
+                "month": 7,
                 "day": 24,
                 "hour": 15,
                 "minute": 49,
@@ -775,9 +775,9 @@
         },
         "data": {
             "source": "DwellSegmentationTimeFilter",
-            "end_ts": 1466550235.0,
+            "end_ts": 1498086235.0,
             "end_local_dt": {
-                "year": 2016,
+                "year": 2017,
                 "month": 6,
                 "day": 21,
                 "hour": 16,
@@ -797,9 +797,9 @@
             "raw_trip": {
                 "$oid": "5fd8e662baff4ef23d349791"
             },
-            "start_ts": 1466549370.0,
+            "start_ts": 1498085370.0,
             "start_local_dt": {
-                "year": 2016,
+                "year": 2017,
                 "month": 6,
                 "day": 21,
                 "hour": 15,
