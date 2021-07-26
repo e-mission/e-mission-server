@@ -8,6 +8,7 @@ from builtins import *
 import logging
 import pymongo
 import arrow
+import pandas as pd
 
 import emission.storage.timeseries.timequery as estt
 
@@ -191,3 +192,43 @@ def get_trip_for_user_input_obj(ts, ui_obj):
         ui_obj.data.start_ts + ONE_DAY)
     potential_candidates = ts.find_entries(["analysis/confirmed_trip"], tq)
     return final_candidate(valid_trip(ts, ui_obj), potential_candidates)
+
+def filter_labeled_trips(mixed_trip_df):
+    """
+    mixed_trip_df: a dataframe with mixed labeled and unlabeled entries
+    Returns only the labeled entries
+    """
+    if len(mixed_trip_df) == 0:
+        return mixed_trip_df
+    labeled_ct = mixed_trip_df[mixed_trip_df.user_input != {}]
+    logging.debug("After filtering, found %s labeled trips" % len(labeled_ct))
+    logging.debug(labeled_ct.head())
+    return labeled_ct
+
+def expand_userinputs(labeled_ct):
+    """
+    labeled_ct: a dataframe that contains only labeled trips
+    Returns a dataframe with the labels expanded into the main dataframe
+    If the labels are simple, single level kv pairs (e.g. {mode_confirm:
+    bike}), the expanded columns can be indexed very simply, like the other
+    columns in the dataframe.
+
+    TODO: Replace by pandas.io.json.json_normalize?
+    TODO: Currently duplicated from 
+    https://github.com/e-mission/em-public-dashboard/blob/main/viz_scripts/scaffolding.py
+
+    Should remove it from there
+    """
+    if len(labeled_ct) == 0:
+        return labeled_ct
+    label_only = pd.DataFrame(labeled_ct.user_input.to_list(), index=labeled_ct.index)
+    logging.debug(label_only.head())
+    expanded_ct = pd.concat([labeled_ct, label_only], axis=1)
+    assert len(expanded_ct) == len(labeled_ct), \
+        ("Mismatch after expanding labels, expanded_ct.rows = %s != labeled_ct.columns %s" %
+            (len(expanded_ct), len(labeled_ct)))
+    logging.debug("After expanding, columns went from %s -> %s" %
+        (len(labeled_ct.columns), len(expanded_ct.columns)))
+    logging.debug(expanded_ct.head())
+    return expanded_ct
+

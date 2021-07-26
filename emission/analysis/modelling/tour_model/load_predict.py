@@ -1,7 +1,12 @@
-import emission.core.get_database as edb
+# Standard imports
+import jsonpickle as jpickle
+import logging
+
+# Our imports
+import emission.storage.timeseries.abstract_timeseries as esta
+import emission.analysis.modelling.tour_model.similarity as similarity
 import emission.analysis.modelling.tour_model.similarity as similarity
 import emission.analysis.modelling.tour_model.data_preprocessing as preprocess
-import jsonpickle as jpickle
 
 
 def loadModelStage(filename):
@@ -40,9 +45,11 @@ def in_bin(bin_location_features,new_trip_location_feat,radius):
 
 def predict_labels(trip):
     radius = 100
-    user = trip[0]['user_id']
-    trip_feat = preprocess.extract_features(trip)[0]
+    user = trip['user_id']
+    logging.debug(f"At stage: extracting features")
+    trip_feat = preprocess.extract_features([trip])[0]
     trip_loc_feat = trip_feat[0:4]
+    logging.debug(f"At stage: loading model")
     try:
         # load locations of bins(1st round of clustering)
         # e.g.{'0': [[start lon1, start lat1, end lon1, end lat1],[start lon, start lat, end lon, end lat]]}
@@ -66,9 +73,11 @@ def predict_labels(trip):
         # e.g. {'0': [{'1': [{'labels': {'mode_confirm': 'shared_ride', 'purpose_confirm': 'home', 'replaced_mode': 'drove_alone'}}]}]}
         user_labels = loadModelStage('user_labels_' + str(user))[0]
 
-    except IOError:
+    except IOError as e:
+        logging.exception(e)
         return []
 
+    logging.debug(f"At stage: first round labeling")
     first_round_label_set = list(bin_locations.keys())
     sel_fl = None
     for fl in first_round_label_set:
@@ -81,7 +90,9 @@ def predict_labels(trip):
             sel_fl = fl
             break
     if not sel_fl:
+        logging.debug(f"sel_fl = {sel_fl}, early return")
         return []
+    logging.debug(f"At stage: second round labeling")
     # choose selected model
     sel_model = models[sel_fl]
     # predict 2nd label for the new trip
@@ -103,43 +114,48 @@ def predict_labels(trip):
         return []
     # values of the selected 2nd round label, wrapped in a list
     sel_2nd_round_val = seccond_round_result[sel_sl]
+    logging.debug(f"Found prediction {sel_2nd_round_val}")
 
     return sel_2nd_round_val
 
 
 
 if __name__ == '__main__':
-    participant_uuid_obj = list(edb.get_profile_db().find({"install_group": "participant"}, {"user_id": 1, "_id": 0}))
-    all_users = [u["user_id"] for u in participant_uuid_obj]
+    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
+        level=logging.DEBUG)
+    all_users = esta.TimeSeries.get_uuid_list()
 
     # case 1: the new trip matches a bin from the 1st round and a cluster from the 2nd round
     user = all_users[0]
     radius = 100
     trips = preprocess.read_data(user)
     filter_trips = preprocess.filter_data(trips, radius)
-    new_trip = [filter_trips[4]]
+    new_trip = filter_trips[4]
     # result is [{'labels': {'mode_confirm': 'shared_ride', 'purpose_confirm': 'church', 'replaced_mode': 'drove_alone'},
     # 'p': 0.9333333333333333}, {'labels': {'mode_confirm': 'shared_ride', 'purpose_confirm': 'entertainment',
     # 'replaced_mode': 'drove_alone'}, 'p': 0.06666666666666667}]
-    print(predict_labels(new_trip))
+    pl = predict_labels(new_trip)
+    assert len(pl) > 0, f"Invalid prediction {pl}"
 
     # case 2: no existing files for the user who has the new trip:
     # 1. the user is invalid(< 10 existing fully labeled trips, or < 50% of trips that fully labeled)
     # 2. the user doesn't have common trips
     user = all_users[1]
     trips = preprocess.read_data(user)
-    new_trip = [trips[0]]
+    new_trip = trips[0]
     # result is []
-    print(predict_labels(new_trip))
+    pl = predict_labels(new_trip)
+    assert len(pl) == 0, f"Invalid prediction {pl}"
 
     # case3: the new trip is novel trip(doesn't fall in any 1st round bins)
     user = all_users[0]
     radius = 100
     trips = preprocess.read_data(user)
     filter_trips = preprocess.filter_data(trips, radius)
-    new_trip = [filter_trips[0]]
+    new_trip = filter_trips[0]
     # result is []
-    print(predict_labels(new_trip))
+    pl = predict_labels(new_trip)
+    assert len(pl) == 0, f"Invalid prediction {pl}"
 
     # case 4: the new trip falls in a 1st round bin, but predict to be a new cluster in the 2nd round
     # result is []

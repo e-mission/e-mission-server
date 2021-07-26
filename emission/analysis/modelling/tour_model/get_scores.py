@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 import pandas.testing as pdt
 import label_processing as label_pro
@@ -43,6 +44,7 @@ def compare_trip_orders(bins,bin_trips,filter_trips):
 # For example, in the second round, user labels are [("home", "ebike", "bus"),("home", "walk", "bus"),
 # ("home", "ebike", "bus")], the labels_pred can be [0,1,0], or [1,0,1] or represented by other numeric labels.
 def score(bin_trips, labels_pred):
+    logging.debug(f"Calculating score for {len(bin_trips)} and {len(labels_pred)}")
     bin_trips_user_input_df = pd.DataFrame(data=[trip["data"]["user_input"] for trip in bin_trips])
     bin_trips_user_input_df = label_pro.map_labels(bin_trips_user_input_df)
 

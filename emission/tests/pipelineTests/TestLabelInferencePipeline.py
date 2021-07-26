@@ -5,6 +5,7 @@ import numpy as np
 import time
 
 import emission.analysis.classification.inference.labels.pipeline as eacilp
+import emission.analysis.classification.inference.labels.inferrers as eacili
 import emission.core.wrapper.labelprediction as ecwl
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.timeseries.timequery as estt
@@ -15,8 +16,8 @@ import emission.tests.common as etc
 class TestLabelInferencePipeline(unittest.TestCase):
     # It is important that these functions be deterministic
     test_algorithms = {
-            ecwl.AlgorithmTypes.PLACEHOLDER_0: eacilp.placeholder_predictor_0,
-            ecwl.AlgorithmTypes.PLACEHOLDER_2: eacilp.placeholder_predictor_2
+            ecwl.AlgorithmTypes.PLACEHOLDER_0: eacili.placeholder_predictor_0,
+            ecwl.AlgorithmTypes.PLACEHOLDER_2: eacili.placeholder_predictor_2
     }
 
     def setUp(self):

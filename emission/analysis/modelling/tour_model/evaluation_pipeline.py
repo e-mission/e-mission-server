@@ -1,14 +1,19 @@
-import emission.analysis.modelling.tour_model.similarity as similarity
+# Standard imports
 import numpy as np
-import emission.core.get_database as edb
+import pandas as pd
+import jsonpickle as jpickle
+import logging
+
+# Our imports
+import emission.storage.timeseries.abstract_timeseries as esta
+
+import emission.analysis.modelling.tour_model.similarity as similarity
 import emission.analysis.modelling.tour_model.get_request_percentage as grp
 import emission.analysis.modelling.tour_model.get_scores as gs
 import emission.analysis.modelling.tour_model.label_processing as lp
 import emission.analysis.modelling.tour_model.data_preprocessing as preprocess
 import emission.analysis.modelling.tour_model.second_round_of_clustering as sr
 import emission.analysis.modelling.tour_model.get_users as gu
-import pandas as pd
-import jsonpickle as jpickle
 
 def second_round(bin_trips,filter_trips,first_labels,track,low,dist_pct,sim,kmeans):
     sec = sr.SecondRoundOfClustering(bin_trips,first_labels)
@@ -128,16 +133,20 @@ def test(data,radius,low,dist_pct,kmeans):
 def main(all_users):
     radius = 100
     all_filename = []
-    for a in range(len(all_users)):
-        user = all_users[a]
+    for a, user in enumerate(all_users):
+        logging.info(f"Starting evaluation for {user}")
         df = pd.DataFrame(columns=['user','user_id','percentage of 1st round','homogeneity socre of 1st round',
                                    'percentage of 2nd round','homogeneity socre of 2nd roun','scores','lower boundary',
                                    'distance percentage'])
+        logging.info(f"At stage: Reading data")
         trips = preprocess.read_data(user)
+        logging.info(f"At stage: Filtering data")
         filter_trips = preprocess.filter_data(trips, radius)
         # filter out users that don't have enough valid labeled trips
         if not gu.valid_user(filter_trips, trips):
+            logging.warn(f"User {user} is invalid, early return")
             continue
+        logging.info(f"At stage: Splitting data")
         tune_idx, test_idx = preprocess.split_data(filter_trips)
         # choose tuning/test set to run the model
         # this step will use KFold (5 splits) to split the data into different subsets
@@ -148,32 +157,35 @@ def main(all_users):
         test_data = preprocess.get_subdata(filter_trips, tune_idx)
 
         # tune data
-        for j in range(len(tune_data)):
+        for i, curr_tune in enumerate(tune_data):
+            logging.info(f"At stage: starting tuning for stage {i}")
             # for tuning, we don't add kmeans for re-clustering. We just need to get tuning parameters
             # - low: the lower boundary of the dendrogram. If the final distance of the dendrogram is lower than "low",
             # this bin no need to be re-clutered.
             # - dist_pct: the higher boundary of the dendrogram. If the final distance is higher than "low",
             # the cutoff of the dendrogram is (the final distance of the dendrogram * dist_pct)
-            low, dist_pct = tune(tune_data[j], radius, kmeans=False)
-            df.loc[j,'lower boundary']=low
-            df.loc[j,'distance percentage']=dist_pct
+            low, dist_pct = tune(curr_tune, radius, kmeans=False)
+            df.loc[i,'lower boundary']=low
+            df.loc[i,'distance percentage']=dist_pct
 
         # testing
-        for k in range(len(test_data)):
-            low = df.loc[k,'lower boundary']
-            dist_pct = df.loc[k,'distance percentage']
+        for i, curr_test in enumerate(test_data):
+            logging.info(f"At stage: starting testing for stage {i}")
+            low = df.loc[i,'lower boundary']
+            dist_pct = df.loc[i,'distance percentage']
 
             # for testing, we add kmeans to re-build the model
-            homo_first, percentage_first, homo_second, percentage_second, scores = test(test_data[k],radius,low,
+            homo_first, percentage_first, homo_second, percentage_second, scores = test(curr_test,radius,low,
                                                                                         dist_pct,kmeans=True)
-            df.loc[k, 'percentage of 1st round'] = percentage_first
-            df.loc[k, 'homogeneity socre of 1st round'] = homo_first
-            df.loc[k, 'percentage of 2nd round'] = percentage_second
-            df.loc[k, 'homogeneity socre of 2nd round'] = homo_second
-            df.loc[k, 'scores'] = scores
+            df.loc[i, 'percentage of 1st round'] = percentage_first
+            df.loc[i, 'homogeneity socre of 1st round'] = homo_first
+            df.loc[i, 'percentage of 2nd round'] = percentage_second
+            df.loc[i, 'homogeneity socre of 2nd round'] = homo_second
+            df.loc[i, 'scores'] = scores
             df['user_id'] = user
             df['user']='user'+str(a+1)
 
+        logging.info(f"At stage: parameter selection outputs complete")
         filename = "user_" + str(user) + ".csv"
         all_filename.append(filename)
         df.to_csv(filename, index=True, index_label='split')
@@ -185,6 +197,7 @@ def main(all_users):
 
 
 if __name__ == '__main__':
-    participant_uuid_obj = list(edb.get_profile_db().find({"install_group": "participant"}, {"user_id": 1, "_id": 0}))
-    all_users = [u["user_id"] for u in participant_uuid_obj]
+    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
+        level=logging.DEBUG)
+    all_users = esta.TimeSeries.get_uuid_list()
     main(all_users)

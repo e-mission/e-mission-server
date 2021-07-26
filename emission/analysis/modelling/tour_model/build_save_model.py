@@ -1,15 +1,19 @@
-import emission.core.get_database as edb
+# Standard imports
+import copy
+import pandas as pd
+import logging
+import jsonpickle as jpickle
+import sklearn.cluster as sc
+
+# Our imports
+import emission.storage.timeseries.abstract_timeseries as esta
+
 import emission.analysis.modelling.tour_model.get_scores as gs
 import emission.analysis.modelling.tour_model.get_users as gu
 import emission.analysis.modelling.tour_model.label_processing as lp
 import emission.analysis.modelling.tour_model.evaluation_pipeline as ep
 import emission.analysis.modelling.tour_model.load_predict as load
 import emission.analysis.modelling.tour_model.data_preprocessing as preprocess
-import copy
-import pandas as pd
-import logging
-import jsonpickle as jpickle
-import sklearn.cluster as sc
 
 
 def find_best_split_and_parameters(user,test_data):
@@ -41,8 +45,7 @@ def save_models(obj_name,obj,user):
 
 
 def main():
-    participant_uuid_obj = list(edb.get_profile_db().find({"install_group": "participant"}, {"user_id": 1, "_id": 0}))
-    all_users = [u["user_id"] for u in participant_uuid_obj]
+    all_users = esta.TimeSeries.get_uuid_list()
     radius = 100
     for a in range(len(all_users)):
         user = all_users[a]
@@ -109,8 +112,8 @@ def main():
                     sum_trips = len(user_label_df)
                     # compute unique label sets and their probabilities in one cluster
                     # 'p' refers to probability
-                    unique_labels = user_label_df.groupby(user_label_df.columns.tolist()).size().reset_index(name='count')
-                    unique_labels['p'] = unique_labels.count / sum_trips
+                    unique_labels = user_label_df.groupby(user_label_df.columns.tolist()).size().reset_index(name='uniqcount')
+                    unique_labels['p'] = unique_labels.uniqcount / sum_trips
                     labels_columns = user_label_df.columns.to_list()
                     for i in range(len(unique_labels)):
                         one_set_labels = {}
@@ -147,21 +150,6 @@ def main():
 
 
 if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
+        level=logging.DEBUG)
     main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
