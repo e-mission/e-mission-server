@@ -9,7 +9,7 @@ import bson.json_util as bju
 import emission.tests.common as etc
 
 # This test file is to test the functions that are used in the
-class TestDataPreprocessing(unittest.TestCase):
+class TestSimilarity(unittest.TestCase):
     def setUp(self):
         self.readAndStoreTripsFromFile("emission/tests/data/real_examples/fake_trips")
         self.user = self.testUUID

@@ -648,7 +648,7 @@
                     37.3910011
                 ]
             },
-            "duration": 865.4322738647461,
+            "duration": 700,
             "distance": 4521.417177464177,
             "start_place": {
                 "$oid": "5fd8e664baff4ef23d349864"
@@ -732,7 +732,7 @@
                     37.3910011
                 ]
             },
-            "duration": 865.4322738647461,
+            "duration": 700,
             "distance": 4521.417177464177,
             "start_place": {
                 "$oid": "5fd8e664baff4ef23d349864"
@@ -816,7 +816,7 @@
                     37.3910011
                 ]
             },
-            "duration": 865.4322738647461,
+            "duration": 700,
             "distance": 4521.417177464177,
             "start_place": {
                 "$oid": "5fd8e664baff4ef23d349888"
