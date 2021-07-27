@@ -16,13 +16,9 @@ def read_data(user):
 def filter_data(trips,radius):
     non_empty_trips = [t for t in trips if t["data"]["user_input"] != {}]
     non_empty_trips_df = pd.DataFrame(t["data"]["user_input"] for t in non_empty_trips)
-    valid_trips_df = non_empty_trips_df.dropna(axis=0, how='any', thresh=None, subset=None, inplace=False)
-    valid_trips_idx_ls = valid_trips_df.index.tolist()
+    valid_trips_idx_ls = non_empty_trips_df.index.tolist()
     valid_trips = [non_empty_trips[i]for i in valid_trips_idx_ls]
-
-    # similarity codes can filter out trips that are points in valid_trips
-    filter_trips = similarity.filter_too_short(valid_trips, radius)
-    return filter_trips
+    return valid_trips
 
 
 # use KFold (n_splits=5) to split the data into 5 models (5 training sets, 5 test sets)

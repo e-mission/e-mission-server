@@ -5,7 +5,7 @@ import emission.analysis.modelling.tour_model.data_preprocessing as preprocess
 # valid user should have >= 10 trips for further analysis and the proportion of filter_trips is >=50%
 def valid_user(filter_trips,trips):
     valid = False
-    if len(filter_trips) >= 10 and len(filter_trips) / len(trips) >= 0.5:
+    if len(filter_trips) >= 14:
         valid = True
     return valid
 

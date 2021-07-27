@@ -8,8 +8,6 @@ import logging
 import emission.storage.timeseries.abstract_timeseries as esta
 
 import emission.analysis.modelling.tour_model.similarity as similarity
-import emission.analysis.modelling.tour_model.get_request_percentage as grp
-import emission.analysis.modelling.tour_model.get_scores as gs
 import emission.analysis.modelling.tour_model.label_processing as lp
 import emission.analysis.modelling.tour_model.data_preprocessing as preprocess
 import emission.analysis.modelling.tour_model.second_round_of_clustering as sr
@@ -34,16 +32,11 @@ def second_round(bin_trips,filter_trips,first_labels,track,low,dist_pct,sim,kmea
 
 # we use functions in similarity to build the first round of clustering
 def first_round(data,radius):
-    sim = similarity.similarity(data, radius)
+    sim = similarity.similarity(data, radius, shouldFilter=False, cutoff=False)
     filter_trips = sim.data
-    print(f"in ep: after filtering, {len(sim.data)}")
-    sim.bin_data()
-    print(f"in ep: after binning, {len(sim.data)}")
-    sim.delete_bins()
-    print(f"in ep: after deleting, {len(sim.data)}")
+    sim.fit()
     bins = sim.bins
-    bin_trips = sim.newdata
-    print(f"in ep: after assignment, {len(sim.newdata)}")
+    bin_trips = sim.data
     return sim, bins, bin_trips, filter_trips
 
 
