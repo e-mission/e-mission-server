@@ -4,7 +4,7 @@
 import logging
 import random
 
-import emission.analysis.modelling.tour_model.load_predict as lp
+import emission.analysis.modelling.tour_model_first_only.load_predict as lp
 
 # A set of placeholder predictors to allow pipeline development without a real inference algorithm.
 # For the moment, the system is configured to work with two labels, "mode_confirm" and
