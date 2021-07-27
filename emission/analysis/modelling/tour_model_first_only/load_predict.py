@@ -42,6 +42,24 @@ def in_bin(bin_location_features,new_trip_location_feat,radius):
             return False
     return True
 
+def find_bin(trip, bin_locations, radius):
+    trip_feat = preprocess.extract_features([trip])[0]
+    trip_loc_feat = trip_feat[0:4]
+    first_round_label_set = list(bin_locations.keys())
+    sel_fl = None
+    for fl in first_round_label_set:
+        # extract location features of selected bin
+        sel_loc_feat = bin_locations[fl]
+        # Check if start/end locations of the new trip and every start/end locations in this bin are within the range of
+        # radius. If so, the new trip falls in this bin. Then predict the second round label of the new trip
+        # using this bin's model
+        if in_bin(sel_loc_feat, trip_loc_feat, radius):
+            sel_fl = fl
+            break
+    if not sel_fl:
+        logging.debug(f"sel_fl = {sel_fl}, early return")
+        return -1
+    return sel_fl
 
 def predict_labels(trip):
     radius = 100
@@ -56,14 +74,7 @@ def predict_labels(trip):
         # another explanation: -'0': label from the 1st round
         #                      - the value of key '0': all trips that in this bin
         #                      - for every trip: the coordinates of start/end locations
-        bin_locations = loadModelStage('locations_' + str(user))[0]
-
-        # load models from the 2nd round of clustering
-        # we use Kmeans to build the model in the previous model building step
-        # assume that we have 2 clusters from the 1st round(that means 2 bins),
-        # the following is an example of the saved models.
-        # e.g. {'0': KMeans(n_clusters=2, random_state=0), '1': KMeans(n_clusters=5, random_state=0)}
-        models = loadModelStage('models_' + str(user))[0]
+        bin_locations = loadModelStage('locations_first_round' + str(user))[0]
 
         # load user labels in all clusters
         # assume that we have 1 cluster(bin) from the 1st round of clustering, which has label '0',
@@ -71,54 +82,25 @@ def predict_labels(trip):
         # the value of key '0' contains all 2nd round clusters
         # the value of key '1' contains all user labels and probabilities in this cluster
         # e.g. {'0': [{'1': [{'labels': {'mode_confirm': 'shared_ride', 'purpose_confirm': 'home', 'replaced_mode': 'drove_alone'}}]}]}
-        user_labels = loadModelStage('user_labels_' + str(user))[0]
+        user_labels = loadModelStage('user_labels_first_round' + str(user))[0]
 
     except IOError as e:
+        logging.info(f"No models found for {user}, no prediction")
         logging.exception(e)
         return []
 
-    logging.debug(f"At stage: first round labeling")
-    first_round_label_set = list(bin_locations.keys())
-    sel_fl = None
-    for fl in first_round_label_set:
-        # extract location features of selected bin
-        sel_loc_feat = bin_locations[fl]
-        # Check if start/end locations of the new trip and every start/end locations in this bin are within the range of
-        # radius. If so, the new trip falls in this bin. Then predict the second round label of the new trip
-        # using this bin's model
-        if in_bin(sel_loc_feat, trip_loc_feat, radius):
-            sel_fl = fl
-            break
-    if not sel_fl:
-        logging.debug(f"sel_fl = {sel_fl}, early return")
+
+    logging.debug(f"At stage: first round prediction")
+    pred_bin = find_bin(trip, bin_location, radius)
+    logging.debug(f"At stage: matched with bin {pred_bin}")
+
+    if pred_bin == -1:
+        logging.info(f"No match found for {trip['data']['start_fmt_time']} early return")
         return []
-    logging.debug(f"At stage: second round labeling")
-    # choose selected model
-    sel_model = models[sel_fl]
-    # predict 2nd label for the new trip
-    # the value of sel_model.predict([trip_feat]) by default is numpy.ndarray, e.g.[1]
-    # so we need to turn it into '1' so that it can be the same type as dict key in user_labels dicts
-    sel_sl = str(sel_model.predict([trip_feat])[0])
 
-    # - seccond_round_result: values of the key of selected 1st round label
-    # e.g.{'0': [{'labels': {'mode_confirm': 'shared_ride', 'purpose_confirm': 'home', 'replaced_mode': 'drove_alone'},
-    # 'p': 1.0}],
-    # '1': [{'labels': {'mode_confirm': 'shared_ride', 'purpose_confirm': 'church', 'replaced_mode': 'drove_alone'},
-    # 'p': 0.9333333333333333},{'labels': {'mode_confirm': 'shared_ride', 'purpose_confirm': 'entertainment',
-    # 'replaced_mode': 'drove_alone'},'p': 0.06666666666666667}]}
-    # more explanation: '0' and '1' are 2nd round clusters from a bin(1st round cluster)
-    # cluster '0' contains all user label combinations and probabilities in this cluster
-    seccond_round_result = user_labels[sel_fl][0]
-    second_label_ls = list(seccond_round_result.keys())
-    if sel_sl not in second_label_ls:
-        return []
-    # values of the selected 2nd round label, wrapped in a list
-    sel_2nd_round_val = seccond_round_result[sel_sl]
-    logging.debug(f"Found prediction {sel_2nd_round_val}")
-
-    return sel_2nd_round_val
-
-
+    user_input_pred_list = user_labels[pred_bin]
+    logging.debug(f"At stage: looked up user input {user_input_pred_list}")
+    return user_input_pred_list
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
