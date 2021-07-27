@@ -74,7 +74,7 @@ def predict_labels(trip):
         # another explanation: -'0': label from the 1st round
         #                      - the value of key '0': all trips that in this bin
         #                      - for every trip: the coordinates of start/end locations
-        bin_locations = loadModelStage('locations_first_round' + str(user))[0]
+        bin_locations = loadModelStage('locations_first_round_' + str(user))
 
         # load user labels in all clusters
         # assume that we have 1 cluster(bin) from the 1st round of clustering, which has label '0',
@@ -82,7 +82,7 @@ def predict_labels(trip):
         # the value of key '0' contains all 2nd round clusters
         # the value of key '1' contains all user labels and probabilities in this cluster
         # e.g. {'0': [{'1': [{'labels': {'mode_confirm': 'shared_ride', 'purpose_confirm': 'home', 'replaced_mode': 'drove_alone'}}]}]}
-        user_labels = loadModelStage('user_labels_first_round' + str(user))[0]
+        user_labels = loadModelStage('user_labels_first_round_' + str(user))
 
     except IOError as e:
         logging.info(f"No models found for {user}, no prediction")
@@ -91,7 +91,7 @@ def predict_labels(trip):
 
 
     logging.debug(f"At stage: first round prediction")
-    pred_bin = find_bin(trip, bin_location, radius)
+    pred_bin = find_bin(trip, bin_locations, radius)
     logging.debug(f"At stage: matched with bin {pred_bin}")
 
     if pred_bin == -1:
