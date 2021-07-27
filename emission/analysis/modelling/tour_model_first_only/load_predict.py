@@ -86,7 +86,6 @@ def predict_labels(trip):
 
     except IOError as e:
         logging.info(f"No models found for {user}, no prediction")
-        logging.exception(e)
         return []
 
 
