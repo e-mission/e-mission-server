@@ -114,6 +114,8 @@ def placeholder_predictor_demo(trip):
     import emission.core.get_database as edb
     user = trip["user_id"]
     unique_user_inputs = edb.get_analysis_timeseries_db().find({"user_id": user}).distinct("data.user_input")
+    if len(unique_user_inputs) == 0:
+        return []
     random_user_input = random.choice(unique_user_inputs) if random.randrange(0,10) > 0 else []
 
     logging.debug(f"In placeholder_predictor_demo: ound {len(unique_user_inputs)} for user {user}, returning value {random_user_input}")
