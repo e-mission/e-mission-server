@@ -17,13 +17,12 @@ import emission.analysis.classification.inference.labels.ensembles as eacile
 # runs on the results of other algorithms), primary_algorithms specifies a corresponding
 # function in eacili to run. This makes it easy to plug in additional algorithms later.
 primary_algorithms = {
-    ecwl.AlgorithmTypes.TWO_STAGE_BIN_CLUSTER: eacili.predict_two_stage_bin_cluster,
-    ecwl.AlgorithmTypes.PLACEHOLDER_PREDICTOR_DEMO: eacili.placeholder_predictor_demo
+    ecwl.AlgorithmTypes.TWO_STAGE_BIN_CLUSTER: eacili.predict_two_stage_bin_cluster
 }
 
 # ensemble specifies which algorithm in eacile to run.
 # This makes it easy to test various ways of combining various algorithms.
-ensemble = eacile.ensemble_real_and_placeholder
+ensemble = eacile.ensemble_first_prediction
 
 
 # Does all the work necessary for a given user
