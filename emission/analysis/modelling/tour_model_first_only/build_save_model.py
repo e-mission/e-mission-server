@@ -14,6 +14,7 @@ import emission.analysis.modelling.tour_model_first_only.evaluation_pipeline as 
 import emission.analysis.modelling.tour_model.load_predict as load
 import emission.analysis.modelling.tour_model_first_only.data_preprocessing as preprocess
 
+RADIUS=500
 
 def save_models(obj_name,obj,user):
     obj_capsule = jpickle.dumps(obj)
@@ -59,28 +60,19 @@ def create_user_input_map(trip_list, bins):
         user_input_map[str(b)] = bin_label_combo_list
     return user_input_map
 
-def main():
-    all_users = esta.TimeSeries.get_uuid_list()
-    radius = 500
-    for a in range(len(all_users)):
-        user = all_users[a]
-        trips = preprocess.read_data(user)
-        filter_trips = preprocess.filter_data(trips, radius)
-        # filter out users that don't have enough valid labeled trips
-        if not gu.valid_user(filter_trips, trips):
-            logging.debug(f"Total: {len(trips)}, labeled: {len(filter_trips)}, user {user} doesn't have enough valid trips for further analysis.")
-            continue
-        # run the first round of clustering
-        sim, bins, bin_trips, filter_trips = ep.first_round(filter_trips, radius)
+def build_user_model(user):
+    trips = preprocess.read_data(user)
+    filter_trips = preprocess.filter_data(trips, RADIUS)
+    # filter out users that don't have enough valid labeled trips
+    if not gu.valid_user(filter_trips, trips):
+        logging.debug(f"Total: {len(trips)}, labeled: {len(filter_trips)}, user {user} doesn't have enough valid trips for further analysis.")
+        return
+    # run the first round of clustering
+    sim, bins, bin_trips, filter_trips = ep.first_round(filter_trips, RADIUS)
 
-        # save all user labels
-        save_models('user_labels',create_user_input_map(filter_trips, bins),user)
+    # save all user labels
+    save_models('user_labels',create_user_input_map(filter_trips, bins),user)
 
-        # save location features of all bins
-        save_models('locations',create_location_map(filter_trips, bins),user)
+    # save location features of all bins
+    save_models('locations',create_location_map(filter_trips, bins),user)
 
-
-if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
-        level=logging.DEBUG)
-    main()
