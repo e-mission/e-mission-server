@@ -32,15 +32,18 @@ def map_labels_purpose(user_input_df):
 
 def map_labels_mode(user_input_df):
     # convert mode
-    same_mode_df = user_input_df[user_input_df.replaced_mode == "same_mode"]
-    logging.debug("The following rows will be changed %s" %
-        same_mode_df.index)
-    for a in range(len(user_input_df)):
-        if user_input_df.iloc[a]["replaced_mode"] == "same_mode":
-            # to see which row will be converted
-            # logging.debug("The following rows will be changed: %s", user_input_df.iloc[a])
-            user_input_df.iloc[a]["replaced_mode"] = user_input_df.iloc[a]['mode_confirm']
-    logging.debug("Finished changing all rows")
+    if "replaced_mode" in user_input_df.columns:
+        same_mode_df = user_input_df[user_input_df.replaced_mode == "same_mode"]
+        logging.debug("The following rows will be changed %s" %
+            same_mode_df.index)
+        for a in range(len(user_input_df)):
+            if user_input_df.iloc[a]["replaced_mode"] == "same_mode":
+                # to see which row will be converted
+                # logging.debug("The following rows will be changed: %s", user_input_df.iloc[a])
+                user_input_df.iloc[a]["replaced_mode"] = user_input_df.iloc[a]['mode_confirm']
+        logging.debug("Finished changing all rows")
+    else:
+        logging.info("map_labels_mode: no replaced mode column found, early return")
     return user_input_df
 
 
