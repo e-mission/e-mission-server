@@ -8,6 +8,7 @@ import emission.analysis.modelling.tour_model.similarity as similarity
 import emission.analysis.modelling.tour_model.similarity as similarity
 import emission.analysis.modelling.tour_model.data_preprocessing as preprocess
 
+RADIUS=500
 
 def loadModelStage(filename):
     import jsonpickle.ext.numpy as jsonpickle_numpy
@@ -62,7 +63,6 @@ def find_bin(trip, bin_locations, radius):
     return sel_fl
 
 def predict_labels(trip):
-    radius = 100
     user = trip['user_id']
     logging.debug(f"At stage: extracting features")
     trip_feat = preprocess.extract_features([trip])[0]
@@ -90,7 +90,7 @@ def predict_labels(trip):
 
 
     logging.debug(f"At stage: first round prediction")
-    pred_bin = find_bin(trip, bin_locations, radius)
+    pred_bin = find_bin(trip, bin_locations, RADIUS)
     logging.debug(f"At stage: matched with bin {pred_bin}")
 
     if pred_bin == -1:
@@ -108,9 +108,8 @@ if __name__ == '__main__':
 
     # case 1: the new trip matches a bin from the 1st round and a cluster from the 2nd round
     user = all_users[0]
-    radius = 100
     trips = preprocess.read_data(user)
-    filter_trips = preprocess.filter_data(trips, radius)
+    filter_trips = preprocess.filter_data(trips, RADIUS)
     new_trip = filter_trips[4]
     # result is [{'labels': {'mode_confirm': 'shared_ride', 'purpose_confirm': 'church', 'replaced_mode': 'drove_alone'},
     # 'p': 0.9333333333333333}, {'labels': {'mode_confirm': 'shared_ride', 'purpose_confirm': 'entertainment',
@@ -130,7 +129,6 @@ if __name__ == '__main__':
 
     # case3: the new trip is novel trip(doesn't fall in any 1st round bins)
     user = all_users[0]
-    radius = 100
     trips = preprocess.read_data(user)
     filter_trips = preprocess.filter_data(trips, radius)
     new_trip = filter_trips[0]
