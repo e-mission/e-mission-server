@@ -26,7 +26,7 @@ def export(user_id, ts, start_ts, end_ts, file_name, ma_bool):
     first_place_extra_query = {'$and': [{'data.enter_ts': {'$exists': False}},{'data.exit_ts': {'$exists': True}}]}
     first_place_entry_list = list(ts.find_entries(key_list=None, time_query=None, extra_query_list=[first_place_extra_query]))
     logging.info("First place entry list = %s" % first_place_entry_list)
-    combined_list = ma_entry_list + loc_entry_list + trip_entry_list + place_entry_list + first_place_entry_list
+    combined_list = loc_entry_list + ma_entry_list + trip_entry_list + place_entry_list + first_place_entry_list
 	
     logging.info("Found %d loc entries, %d motion entries, %d trip-like entries, %d place-like entries = %d total entries" %
         (len(loc_entry_list), len(ma_entry_list), len(trip_entry_list), len(place_entry_list), len(combined_list)))
@@ -38,9 +38,6 @@ def export(user_id, ts, start_ts, end_ts, file_name, ma_bool):
         logging.info("No entries found in range for user %s, skipping save" % user_id)
     else:
         combined_filename = "%s.gz" % (file_name)
-        if "DATA_DIR" in os.environ:
-            if os.path.isdir(os.environ['DATA_DIR']) == False:
-                os.mkdir(os.environ['DATA_DIR']) 
         with gzip.open(combined_filename, "wt") as gcfd:
             json.dump(combined_list,gcfd, default=bju.default, allow_nan=False, indent=4)
 
