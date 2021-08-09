@@ -80,8 +80,6 @@ class Entry(ecwb.WrapperBase):
             # user confirmation of the destination (unsure how this will
             # interact with purpose
             "manual/destination_confirm": "userlabel",
-            #add key for the syncing of survey responses
-            "manual/survey_response":"userlabel",
             ### END: incoming data types ###
             ### BEGIN: analysis result data types ###
             ### ** BEGIN: objects generated after the initial segmentation step **
