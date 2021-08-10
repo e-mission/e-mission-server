@@ -106,16 +106,26 @@ def getRealExampleEmail(testObj):
 def fillExistingUUID(testObj):
     userObj = ecwu.User.fromEmail(getRealExampleEmail(testObj))
     print("Setting testUUID to %s" % userObj.uuid)
-    testObj.testUUID = userObj.uuid
+    testObj.testUUID = userObj.uuir
+
+def getRegEmailIfPresent(testObj):
+    if hasattr(testObj, "evaluation") and testObj.evaluation:
+        logging.info("evaluation, returning email = %s" % reg_email)
+        reg_email = getRealExampleEmail(testObj)
+        return reg_email
+    elif hasattr(testObj, "testEmail"):
+        return testObj.testEmail
+    else:
+        return None
 
 def createAndFillUUID(testObj):
-    if hasattr(testObj, "evaluation") and testObj.evaluation:
-        reg_email = getRealExampleEmail(testObj)
-        logging.info("registering email = %s" % reg_email)
-        user = ecwu.User.register(reg_email)
+    regEmail = getRegEmailIfPresent(testObj)
+    if regEmail is not None:
+        logging.info("registering email = %s" % regEmail)
+        user = ecwu.User.register(regEmail)
         testObj.testUUID = user.uuid
     else:
-        logging.info("No evaluation flag found, not registering email")
+        logging.info("No reg email found, not registering email")
         testObj.testUUID = uuid.uuid4()
 
 def setupRealExample(testObj, dump_file):

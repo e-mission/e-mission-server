@@ -26,9 +26,12 @@ import emission.tests.common as etc
 
 class TestTimeSeries(unittest.TestCase):
     def setUp(self):
+        self.testEmail = "user1"
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-21")
         self.testUUID1 = self.testUUID
         self.entries1 = self.entries
+
+        self.testEmail = "user1"
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
 
     def tearDown(self):
