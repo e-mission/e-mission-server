@@ -27,6 +27,13 @@ class TestExpectationPipeline(unittest.TestCase):
     }
 
     def setUp(self):
+        self.test_options_stash = eace._test_options
+        eace._test_options = {
+            "use_sample": True,
+            "override_keylist": None
+        }
+        eace.reload_config()
+        
         np.random.seed(61297777)
         self.reset_all()
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-07-22")
@@ -38,6 +45,9 @@ class TestExpectationPipeline(unittest.TestCase):
 
     def tearDown(self):
         self.reset_all()
+        
+        eace._test_options = self.test_options_stash
+        eace.reload_config()
 
     def run_pipeline(self, algorithms):
         primary_algorithms_stash = eacilp.primary_algorithms
@@ -100,12 +110,16 @@ class TestExpectationPipeline(unittest.TestCase):
             self.assertIn("expectation", trip["data"])
             raw_expectation = eace.get_expectation(trip)
             if raw_expectation["type"] == "none":
-                self.assertEqual(trip["data"]["expectation"], {"to_label": False})
+                self.assertEqual(trip["data"]["expectation"]["to_label"], False)
             elif raw_expectation["type"] == "all":
-                self.assertEqual(trip["data"]["expectation"], {"to_label": True})
+                self.assertEqual(trip["data"]["expectation"]["to_label"], True)
             else:
                 print("Expectation behavior for "+str(raw_expectation)+" has not been implemented yet; not testing. Value is "+str(trip["data"]["expectation"]))
             # TODO: implement tests for the other configurable expectation types once they've been implemented
+
+    def testConfidenceThreshold(self):
+        for trip in self.expected_trips:
+            self.assertTrue("confidence_threshold" in trip["data"])
 
 def main():
     etc.configLogging()

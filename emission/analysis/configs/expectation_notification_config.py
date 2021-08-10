@@ -77,7 +77,7 @@ def _mode_matches_date(mode, trip_date):
 
 def _get_collection_mode_by_schedule(trip):
     trip_tz = trip["data"]["end_local_dt"]["timezone"]
-    trip_date = arrow.get(trip["data"]["end_ts"], tz=trip_tz)
+    trip_date = arrow.get(trip["data"]["end_ts"]).to(trip_tz)
     for mode in _config["modes"]:
         if _mode_matches_date(mode, trip_date): return mode
     raise ValueError("Trip date does not match any modes; this means the config file lacks a schedule-less mode")

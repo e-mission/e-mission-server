@@ -14,7 +14,8 @@ class Expectedtrip(ecwt.Trip):
                   "cleaned_trip": ecwb.WrapperBase.Access.WORM,
                   "inferred_labels": ecwb.WrapperBase.Access.WORM,
                   "inferred_trip": ecwb.WrapperBase.Access.WORM,
-                  "expectation": ecwb.WrapperBase.Access.WORM
+                  "expectation": ecwb.WrapperBase.Access.WORM,
+                  "confidence_threshold": ecwb.WrapperBase.Access.WORM,
                   })
 
     def _populateDependencies(self):
