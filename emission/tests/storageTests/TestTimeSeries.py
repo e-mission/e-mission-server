@@ -31,7 +31,7 @@ class TestTimeSeries(unittest.TestCase):
         self.testUUID1 = self.testUUID
         self.entries1 = self.entries
 
-        self.testEmail = "user1"
+        self.testEmail = "user2"
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
 
     def tearDown(self):
