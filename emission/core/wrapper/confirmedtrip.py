@@ -15,6 +15,7 @@ class Confirmedtrip(ecwt.Trip):
                   "inferred_labels": ecwb.WrapperBase.Access.WORM,
                   "inferred_trip": ecwb.WrapperBase.Access.WORM,
                   "expectation": ecwb.WrapperBase.Access.WORM,
+                  "confidence_threshold": ecwb.WrapperBase.Access.WORM,
                   "expected_trip": ecwb.WrapperBase.Access.WORM,
 # the confirmed section that is the "primary"
 # https://github.com/e-mission/e-mission-docs/issues/476#issuecomment-738120752

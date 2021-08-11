@@ -16,7 +16,7 @@ class TestExpectationNotificationConfig(unittest.TestCase):
         }
         eace.reload_config()
 
-        self.tz = "America/Chicago"
+        self.tz = "Etc/GMT-8"
         # Note that these depend on certain values in expectations.conf.json.sample, as will other values later
         self.test_dates = {
             "before_intensive": arrow.get("2021-05-01T20:00:00.000", tzinfo=self.tz),  # Ensures schedules can't apply before their start_date
