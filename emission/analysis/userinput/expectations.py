@@ -38,10 +38,12 @@ def _process_and_save_trip(user_id, inferred_trip, ts):
     if _test_options["preprocess_trip"] is not None: _test_options["preprocess_trip"](expected_trip)
 
     expectation = _get_expectation_for_trip(expected_trip)
+    confidence_threshold = eace.get_confidence_threshold(expected_trip)
     # For now, I don't think it's necessary to save each expectation as its own database entry
 
     expected_trip["data"]["inferred_trip"] = inferred_trip.get_id()
     expected_trip["data"]["expectation"] = expectation
+    expected_trip["data"]["confidence_threshold"] = confidence_threshold
     ts.insert(expected_trip)
 
 # This is a placeholder. TODO: implement the real algorithm

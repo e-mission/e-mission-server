@@ -26,7 +26,19 @@ class TestExpectationPipeline(unittest.TestCase):
         960: arrow.get("2023-02-12T20:00:00.000", tzinfo=tz) 
     }
 
+    @staticmethod
+    def fingerprint(trip):
+        # See eacilp.placeholder_predictor_2 for an explanation of the "fingerprint" technique
+        return trip["data"]["start_local_dt"]["hour"]*60+trip["data"]["start_local_dt"]["minute"]
+
     def setUp(self):
+        self.test_options_stash = eace._test_options
+        eace._test_options = {
+            "use_sample": True,
+            "override_keylist": None
+        }
+        eace.reload_config()
+        
         np.random.seed(61297777)
         self.reset_all()
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-07-22")
@@ -38,6 +50,9 @@ class TestExpectationPipeline(unittest.TestCase):
 
     def tearDown(self):
         self.reset_all()
+        
+        eace._test_options = self.test_options_stash
+        eace.reload_config()
 
     def run_pipeline(self, algorithms):
         primary_algorithms_stash = eacilp.primary_algorithms
@@ -49,9 +64,7 @@ class TestExpectationPipeline(unittest.TestCase):
         eaue._test_options = test_options_stash
     
     def preprocess(self, trip):
-        # See eacilp.placeholder_predictor_2 for an explanation of the "fingerprint" technique
-        fingerprint = trip["data"]["start_local_dt"]["hour"]*60+trip["data"]["start_local_dt"]["minute"]
-        trip["data"]["end_ts"] = self.contrived_dates[fingerprint].float_timestamp
+        trip["data"]["end_ts"] = self.contrived_dates[self.fingerprint(trip)].float_timestamp
         trip["data"]["end_local_dt"]["timezone"] = self.tz
 
     def reset_all(self):
@@ -79,8 +92,7 @@ class TestExpectationPipeline(unittest.TestCase):
             960: {"type": "randomFraction", "value": 0.05}
         }
         for trip in self.expected_trips:
-            fingerprint = trip["data"]["start_local_dt"]["hour"]*60+trip["data"]["start_local_dt"]["minute"]
-            self.assertEqual(eace.get_expectation(trip), answers[fingerprint])
+            self.assertEqual(eace.get_expectation(trip), answers[self.fingerprint(trip)])
 
     def testProcessedAgainstAnswers(self):
         answers = {
@@ -92,20 +104,33 @@ class TestExpectationPipeline(unittest.TestCase):
             960: None
         }
         for trip in self.expected_trips:
-            fingerprint = trip["data"]["start_local_dt"]["hour"]*60+trip["data"]["start_local_dt"]["minute"]
-            if answers[fingerprint] is not None: self.assertEqual(trip["data"]["expectation"]["to_label"], answers[fingerprint])
+            ans = answers[self.fingerprint(trip)]
+            if ans is not None: self.assertEqual(trip["data"]["expectation"]["to_label"], ans)
 
     def testProcessedAgainstRaw(self):
         for trip in self.expected_trips:
             self.assertIn("expectation", trip["data"])
             raw_expectation = eace.get_expectation(trip)
             if raw_expectation["type"] == "none":
-                self.assertEqual(trip["data"]["expectation"], {"to_label": False})
+                self.assertEqual(trip["data"]["expectation"]["to_label"], False)
             elif raw_expectation["type"] == "all":
-                self.assertEqual(trip["data"]["expectation"], {"to_label": True})
+                self.assertEqual(trip["data"]["expectation"]["to_label"], True)
             else:
                 print("Expectation behavior for "+str(raw_expectation)+" has not been implemented yet; not testing. Value is "+str(trip["data"]["expectation"]))
             # TODO: implement tests for the other configurable expectation types once they've been implemented
+
+    def testConfidenceThreshold(self):
+        answers = {
+            494: 0.55,
+            565: 0.65,
+            795: 0.55,
+            805: 0.65,
+            880: 0.65,
+            960: 0.55
+        }
+        for trip in self.expected_trips:
+            self.assertTrue("confidence_threshold" in trip["data"])  # Existence
+            self.assertAlmostEqual(trip["data"]["confidence_threshold"], answers[self.fingerprint(trip)]) # Correctness
 
 def main():
     etc.configLogging()
