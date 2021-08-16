@@ -3,6 +3,7 @@
 
 import logging
 import random
+import copy
 
 import emission.analysis.modelling.tour_model_first_only.load_predict as lp
 
@@ -118,12 +119,35 @@ def placeholder_predictor_demo(trip):
         return []
     random_user_input = random.choice(unique_user_inputs) if random.randrange(0,10) > 0 else []
 
-    logging.debug(f"In placeholder_predictor_demo: ound {len(unique_user_inputs)} for user {user}, returning value {random_user_input}")
+    logging.debug(f"In placeholder_predictor_demo: found {len(unique_user_inputs)} for user {user}, returning value {random_user_input}")
     return [{"labels": random_user_input, "p": random.random()}]
 
 # Non-placeholder implementation. First bins the trips, and then clusters every bin
 # See emission.analysis.modelling.tour_model for more details
 # Assumes that pre-built models are stored in working directory
 # Models are built using evaluation_pipeline.py and build_save_model.py
+# This algorithm is now DEPRECATED in favor of predict_cluster_confidence_discounting (see https://github.com/e-mission/e-mission-docs/issues/663)
 def predict_two_stage_bin_cluster(trip):
     return lp.predict_labels(trip)
+
+# Reduce the confidence of the clustering prediction when the number of trips in the cluster is small
+# See https://github.com/e-mission/e-mission-docs/issues/663
+def n_to_confidence_coeff(n):
+    MAX_CONFIDENCE = 0.99  # Confidence coefficient for n approaching infinity -- in the GitHub issue, this is 1-A
+    FIRST_CONFIDENCE = 0.75  # Confidence coefficient for n = 1 -- in the issue, this is B
+    CONFIDENCE_MULTIPLIER = 0.25  # How much of the remaining removable confidence to remove between n = k and n = k+1 -- in the issue, this is C
+    return MAX_CONFIDENCE-(MAX_CONFIDENCE-FIRST_CONFIDENCE)*(1-CONFIDENCE_MULTIPLIER)**(n-1)  # This is the u = ... formula in the issue
+
+# predict_two_stage_bin_cluster but with the above reduction in confidence
+def predict_cluster_confidence_discounting(trip):
+    labels, n = lp.predict_labels_with_n(trip)
+    if n <= 0:  # No model data or trip didn't match a cluster
+        logging.debug(f"In predict_cluster_confidence_discounting: n={n}; returning as-is")
+        return labels
+
+    confidence_coeff = n_to_confidence_coeff(n)
+    logging.debug(f"In predict_cluster_confidence_discounting: n={n}; discounting with coefficient {confidence_coeff}")
+
+    labels = copy.deepcopy(labels)
+    for l in labels: l["p"] *= confidence_coeff
+    return labels

@@ -62,7 +62,8 @@ def find_bin(trip, bin_locations, radius):
         return -1
     return sel_fl
 
-def predict_labels(trip):
+# Predict labels and also return the number of trips in the matched cluster
+def predict_labels_with_n(trip):
     user = trip['user_id']
     logging.debug(f"At stage: extracting features")
     trip_feat = preprocess.extract_features([trip])[0]
@@ -84,9 +85,13 @@ def predict_labels(trip):
         # e.g. {'0': [{'1': [{'labels': {'mode_confirm': 'shared_ride', 'purpose_confirm': 'home', 'replaced_mode': 'drove_alone'}}]}]}
         user_labels = loadModelStage('user_labels_first_round_' + str(user))
 
+        # Get the number of trips in each cluster from the number of locations in each bin
+        # This is a bit hacky; in the future, we might want the model stage to save a metadata file with this and potentially other information
+        cluster_sizes = {k: len(bin_locations[k]) for k in bin_locations}
+
     except IOError as e:
         logging.info(f"No models found for {user}, no prediction")
-        return []
+        return [], -1
 
 
     logging.debug(f"At stage: first round prediction")
@@ -95,11 +100,16 @@ def predict_labels(trip):
 
     if pred_bin == -1:
         logging.info(f"No match found for {trip['data']['start_fmt_time']} early return")
-        return []
+        return [], 0
 
     user_input_pred_list = user_labels[pred_bin]
+    this_cluster_size = cluster_sizes[pred_bin]
     logging.debug(f"At stage: looked up user input {user_input_pred_list}")
-    return user_input_pred_list
+    return user_input_pred_list, this_cluster_size
+
+# For backwards compatibility
+def predict_labels(trip):
+    return predict_labels_with_n(trip)[0]
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',

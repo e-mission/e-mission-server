@@ -17,7 +17,7 @@ import emission.analysis.classification.inference.labels.ensembles as eacile
 # runs on the results of other algorithms), primary_algorithms specifies a corresponding
 # function in eacili to run. This makes it easy to plug in additional algorithms later.
 primary_algorithms = {
-    ecwl.AlgorithmTypes.TWO_STAGE_BIN_CLUSTER: eacili.predict_two_stage_bin_cluster
+    ecwl.AlgorithmTypes.CONFIDENCE_DISCOUNTED_CLUSTER: eacili.predict_cluster_confidence_discounting
 }
 
 # ensemble specifies which algorithm in eacile to run.
