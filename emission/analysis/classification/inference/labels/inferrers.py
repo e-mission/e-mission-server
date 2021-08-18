@@ -132,20 +132,20 @@ def predict_two_stage_bin_cluster(trip):
 
 # Reduce the confidence of the clustering prediction when the number of trips in the cluster is small
 # See https://github.com/e-mission/e-mission-docs/issues/663
-def n_to_confidence_coeff(n):
-    MAX_CONFIDENCE = 0.99  # Confidence coefficient for n approaching infinity -- in the GitHub issue, this is 1-A
-    FIRST_CONFIDENCE = 0.80  # Confidence coefficient for n = 1 -- in the issue, this is B
-    CONFIDENCE_MULTIPLIER = 0.30  # How much of the remaining removable confidence to remove between n = k and n = k+1 -- in the issue, this is C
-    return MAX_CONFIDENCE-(MAX_CONFIDENCE-FIRST_CONFIDENCE)*(1-CONFIDENCE_MULTIPLIER)**(n-1)  # This is the u = ... formula in the issue
+def n_to_confidence_coeff(n, max_confidence=None, first_confidence=None, confidence_multiplier=None):
+    if max_confidence is None: max_confidence = 0.99  # Confidence coefficient for n approaching infinity -- in the GitHub issue, this is 1-A
+    if first_confidence is None: first_confidence = 0.80  # Confidence coefficient for n = 1 -- in the issue, this is B
+    if confidence_multiplier is None: confidence_multiplier = 0.30  # How much of the remaining removable confidence to remove between n = k and n = k+1 -- in the issue, this is C
+    return max_confidence-(max_confidence-first_confidence)*(1-confidence_multiplier)**(n-1)  # This is the u = ... formula in the issue
 
 # predict_two_stage_bin_cluster but with the above reduction in confidence
-def predict_cluster_confidence_discounting(trip):
+def predict_cluster_confidence_discounting(trip, max_confidence=None, first_confidence=None, confidence_multiplier=None):
     labels, n = lp.predict_labels_with_n(trip)
     if n <= 0:  # No model data or trip didn't match a cluster
         logging.debug(f"In predict_cluster_confidence_discounting: n={n}; returning as-is")
         return labels
 
-    confidence_coeff = n_to_confidence_coeff(n)
+    confidence_coeff = n_to_confidence_coeff(n, max_confidence, first_confidence, confidence_multiplier)
     logging.debug(f"In predict_cluster_confidence_discounting: n={n}; discounting with coefficient {confidence_coeff}")
 
     labels = copy.deepcopy(labels)
