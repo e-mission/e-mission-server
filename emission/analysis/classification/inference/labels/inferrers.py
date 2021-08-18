@@ -134,8 +134,8 @@ def predict_two_stage_bin_cluster(trip):
 # See https://github.com/e-mission/e-mission-docs/issues/663
 def n_to_confidence_coeff(n):
     MAX_CONFIDENCE = 0.99  # Confidence coefficient for n approaching infinity -- in the GitHub issue, this is 1-A
-    FIRST_CONFIDENCE = 0.75  # Confidence coefficient for n = 1 -- in the issue, this is B
-    CONFIDENCE_MULTIPLIER = 0.25  # How much of the remaining removable confidence to remove between n = k and n = k+1 -- in the issue, this is C
+    FIRST_CONFIDENCE = 0.80  # Confidence coefficient for n = 1 -- in the issue, this is B
+    CONFIDENCE_MULTIPLIER = 0.30  # How much of the remaining removable confidence to remove between n = k and n = k+1 -- in the issue, this is C
     return MAX_CONFIDENCE-(MAX_CONFIDENCE-FIRST_CONFIDENCE)*(1-CONFIDENCE_MULTIPLIER)**(n-1)  # This is the u = ... formula in the issue
 
 # predict_two_stage_bin_cluster but with the above reduction in confidence
