@@ -17,3 +17,35 @@
     min-height:10x;
     z-index:300000;
 }
+
+.fig_ref {
+    color: #dc2430;
+    display: inline-block;
+    /* background: rgba(255, 255, 255, 0.75); */
+    background: #fef0cd;
+    border-radius: 1em;
+    border: 2px solid #dc2430;
+    width: 1.2em;
+    height: 1.2em;
+    text-align: center;
+    font-weight: 500;
+    line-height: 1.2em;
+    margin-right: 0.1em;
+}
+
+figure {
+    text-align: center;
+}
+
+figure img {
+    width: 40%;
+}
+
+/* @media print {
+    .fig_ref::before {
+        content: "["
+    }
+    .fig_ref::after {
+        content: "]"
+    }
+} */
