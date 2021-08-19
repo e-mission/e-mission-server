@@ -45,6 +45,7 @@ def _process_and_save_trip(user_id, inferred_trip, ts):
     expected_trip["data"]["expectation"] = expectation
     expected_trip["data"]["confidence_threshold"] = confidence_threshold
     ts.insert(expected_trip)
+    return expected_trip  # Fixes https://github.com/e-mission/e-mission-docs/issues/654
 
 # This is a placeholder. TODO: implement the real algorithm
 def _get_expectation_for_trip(trip):
