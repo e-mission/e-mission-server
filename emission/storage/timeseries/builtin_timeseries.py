@@ -81,7 +81,11 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "metrics/daily_user_median_speed": self.analysis_timeseries_db,
                 "metrics/daily_mean_median_speed": self.analysis_timeseries_db,
                 "inference/prediction": self.analysis_timeseries_db,
+                "inference/labels": self.analysis_timeseries_db,
                 "analysis/inferred_section": self.analysis_timeseries_db,
+                "analysis/inferred_labels": self.analysis_timeseries_db,
+                "analysis/inferred_trip": self.analysis_timeseries_db,
+                "analysis/expected_trip": self.analysis_timeseries_db,
                 "analysis/confirmed_trip": self.analysis_timeseries_db,
                 "analysis/confirmed_section": self.analysis_timeseries_db
             }
@@ -89,7 +93,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
 
     @staticmethod
     def get_uuid_list():
-        return edb.get_timeseries_db().distinct("user_id")
+        return edb.get_uuid_db().distinct("uuid")
 
     def get_timeseries_db(self, key):
         """

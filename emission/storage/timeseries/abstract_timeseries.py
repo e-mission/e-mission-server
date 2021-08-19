@@ -37,6 +37,40 @@ class TimeSeries(object):
         import emission.storage.timeseries.builtin_timeseries as bits
         return bits.BuiltinTimeSeries.get_uuid_list()
 
+    # This is a HACK and is very poor practice.
+    # It imports two other modules and modifies them directly
+    # It encodes details of their internal structure
+    # This is BAD
+    # DO NOT use this as an example for your own code
+    # However, with the current code structure, I don't have much of a choice
+    # both the modules include module variables for greater efficiency, and you
+    # cannot modify a module variable from a function within the module - it will
+    # treat it as a local variable
+    # I remember seeing some examples of how to fix this before, but I can't
+    # find it now. So we import the modules and change the variables here
+    @staticmethod
+    def _reset_url(new_url):
+        """
+        Used for federation, to allow us to connect to multiple databases from a
+        single client instance.
+        """
+
+        from pymongo import MongoClient
+        import emission.core.get_database as edb
+
+        edb.url = new_url
+        print("Connecting to new URL "+edb.url+" resetting _current_db link")
+        edb._current_db = MongoClient(edb.url).Stage_database
+        print("After changing URL, connection is %s" % edb._current_db)
+
+        import emission.storage.timeseries.builtin_timeseries as bits
+        bits.ts_enum_map = {
+            EntryType.DATA_TYPE: edb.get_timeseries_db(),
+            EntryType.ANALYSIS_TYPE: edb.get_analysis_timeseries_db()
+        }
+        print("After resetting the timeseries connections, map is %s" % bits.ts_enum_map)
+
+
     def find_entries(self, key_list=None, time_query=None, geo_query=None,
                      extra_query_list=None):
         """

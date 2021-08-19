@@ -284,6 +284,90 @@ class TestTripQueries(unittest.TestCase):
         self.assertEqual(mc_trip_start_fmt_time_list, mode_fmt_times)
         self.assertEqual(pc_trip_start_fmt_time_list, purpose_fmt_times)
 
+    def testFilterLabelInputs(self):
+        import pandas as pd
+
+        # Test invalid inputs
+        pd.testing.assert_frame_equal(esdt.filter_labeled_trips(pd.DataFrame()),
+            pd.DataFrame())
+        with self.assertRaises(TypeError):
+             esdt.filter_labeled_trips(None)
+
+        # Test valid inputs
+        
+        # no labeled
+        test_unlabeled_df = pd.DataFrame([{"user_input": {}}] * 3)
+        self.assertTrue(esdt.filter_labeled_trips(test_unlabeled_df).empty)
+
+        # all labeled
+        test_labeled_df = pd.DataFrame([{"user_input": {"mode_confirm": "bike", "purpose_confirm": "shopping"}}] * 3)
+        pd.testing.assert_frame_equal(esdt.filter_labeled_trips(test_labeled_df),
+            test_labeled_df)
+
+        # mixed labeled
+        test_mixed_df = pd.DataFrame(([{"user_input": {"mode_confirm": "bike", "purpose_confirm": "shopping"}}] * 3 + [{"user_input": {}}] * 3))
+        result_df = pd.DataFrame([{"user_input": {"mode_confirm": "bike", "purpose_confirm": "shopping"}}] * 3)
+        pd.testing.assert_frame_equal(esdt.filter_labeled_trips(test_mixed_df),
+            result_df)
+
+    def testExpandUserInputs(self):
+        import pandas as pd
+        import numpy as np
+
+        # Test invalid inputs
+        pd.testing.assert_frame_equal(esdt.expand_userinputs(pd.DataFrame()),
+            pd.DataFrame())
+        with self.assertRaises(TypeError):
+             esdt.expand_userinputs(None)
+
+        # Test valid inputs
+        
+        # no labeled trips; no additional columns added
+        logging.debug("About to test unlabeled")
+        test_unlabeled_df = pd.DataFrame([{"user_input": {}}] * 3)
+        pd.testing.assert_frame_equal(esdt.expand_userinputs(test_unlabeled_df),
+            test_unlabeled_df)
+
+        # all labeled; additional columns added with unstructured data
+        test_labeled_df = pd.DataFrame([{"user_input": {"mode_confirm": "bike", "purpose_confirm": "shopping"}}] * 3)
+        test_exp_result = pd.DataFrame([{"user_input": {"mode_confirm": "bike", "purpose_confirm": "shopping"}, "mode_confirm": "bike", "purpose_confirm" : "shopping"}] * 3)
+        logging.debug(test_exp_result)
+        pd.testing.assert_frame_equal(esdt.expand_userinputs(test_labeled_df),
+            test_exp_result)
+
+        # mixed labeled; additional columns added but with some N/A
+        test_mixed_df = pd.DataFrame(([{"user_input": {"mode_confirm": "bike", "purpose_confirm": "shopping"}}] * 3 + [{"user_input": {}}] * 3))
+        result_df = pd.DataFrame(
+        # Three expanded entries
+            [{"user_input": {"mode_confirm": "bike", "purpose_confirm": "shopping"}, "mode_confirm": "bike", "purpose_confirm" : "shopping"}] * 3 + 
+        # Three partial entries
+            [{"user_input": {}}] * 3)
+        actual_result = esdt.expand_userinputs(test_mixed_df)
+        pd.testing.assert_frame_equal(actual_result, result_df)
+        # The last three entries are N/A
+        self.assertTrue(pd.isna(actual_result.loc[3, "mode_confirm"]))
+
+        # mixed labeled with different columns; additional columns added but with some N/A
+        test_mixed_df = pd.DataFrame((
+            [{"user_input": {"mode_confirm": "bike", "purpose_confirm": "shopping"}}] * 3 +
+            [{"user_input": {"mode_confirm": "bike", "purpose_confirm": "shopping", "replaced_mode": "running"}}] * 3 +
+            [{"user_input": {}}] * 3))
+        result_df = pd.DataFrame(
+        # Three partially expanded entries
+            [{"user_input": {"mode_confirm": "bike", "purpose_confirm": "shopping"}, "mode_confirm": "bike", "purpose_confirm" : "shopping"}] * 3 + 
+        # Three fully expanded entries
+            [{"user_input": {"mode_confirm": "bike", "purpose_confirm": "shopping", "replaced_mode": "running"}, "mode_confirm": "bike", "purpose_confirm" : "shopping", "replaced_mode": "running"}] * 3 + 
+        # Three partial entries
+            [{"user_input": {}}] * 3)
+        actual_result = esdt.expand_userinputs(test_mixed_df)
+        pd.testing.assert_frame_equal(actual_result, result_df)
+        # The first three entries have N/A replaced mode
+        logging.debug(pd.isna(actual_result.loc[:2, "replaced_mode"]))
+        self.assertTrue(pd.isna(actual_result.loc[:2, "replaced_mode"]).all())
+        # The last three entries have N/A for all expanded values
+        logging.debug(pd.isna(actual_result.loc[6:,["mode_confirm", "purpose_confirm", "replaced_mode"]]))
+        self.assertTrue(pd.isna(actual_result.loc[6:,["mode_confirm", "purpose_confirm", "replaced_mode"]].to_numpy().flatten()).all())
+
 if __name__ == '__main__':
     import emission.tests.common as etc
     etc.configLogging()
