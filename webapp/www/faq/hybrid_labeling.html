@@ -68,26 +68,32 @@
             </div>
         </div>
     </nav>
-    
     <section class="download bg-primary text-center" id="faq">
         <div class="container">
+            <h2 class="section-heading" style="text-align: center;"><strong>New Labeling Procedure!</strong></h2>
+            <p></p>
             <div class="row">
-                <div class="col-md-10 mx-auto" style="text-align: left;">
-                    <h2 class="section-heading" style="text-align: center;"><strong>New Labeling Procedure!</strong></h2>
-                    <p></p>
+                <div class="col-md-33 mx-auto" style="text-align: left;">
                     <figure>
                         <img src="../img/hybrid_labeling/BeforeBackgroundRemoved.png">
                         <figcaption>The Label screen on iOS before the update</figcaption>
                     </figure>
+                </div>
+                <div class="col-md-33 mx-auto" style="text-align: left;">
                     <figure>
                         <img src="../img/hybrid_labeling/AfterAnnotated.png">
                         <figcaption>The Label screen on iOS after the update; numbers correspond to in-text references</figcaption>
                     </figure>
+                </div>
+                <div class="col-md-33 mx-auto" style="text-align: left;">
                     <figure>
                         <img src="../img/hybrid_labeling/MoreTripsAnnotated.png">
                         <figcaption>The Label screen on Android scrolled up to show the button to load older trips</figcaption>
                     </figure>
-                    <p></p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-10 mx-auto" style="text-align: left;">
                     <h3>
                         <strong>What is the new Label screen interface?</strong>
                     </h3>
@@ -152,6 +158,16 @@
                     <h4>
                         The Diary screen has not changed at all. None of the new features (e.g., the yellow labels, the confirm button, only seeing trips you need to label) work on the Diary screen. So we recommend you do your labeling on the Label screen!
                     </h4>
+                    <p></p>
+                    <h3>
+                        <strong>I love algorithms! Can I have more details?</strong>
+                    </h3>
+                    <h4>
+                        We group all your data so that trips with the same start and end location are in the same group. We then look at the labels for the trips in each group and how often they occur. If a trip has (shared_ride,work,drove_alone) labels 60% of the time, and (drove_alone,work,shared_ride) 40% of the time, we will display the highest probability labels — i.e., (shared_ride,work,drove_alone) — as yellow in "To Label." If the highest probability labels occur closer to 100% of the time, after a while, we don't even need to put them into "To Label" because we are so sure that they are correct.
+                        But what if you used to carpool to work consistently, but now you started riding your spiffy new eBike? To detect such changes, we will periodically go from the usual "relaxed" mode to an "intensive" mode, where all your trips will show up in "To Label" for a week.
+                        To summarize, as your travel patterns change — you switch jobs or modes or take up a new hobby — your trip locations and probabilities will change. But as long as we can get the correct labels periodically, the algorithm will update itself with the new probabilities and continue making your life easier.
+                        We are committed to an open and transparent platform - for more technical details, see the related discussions at https://github.com/e-mission/e-mission-docs/issues
+                        </h4>
                     <p></p>
                     <h3>
                         <strong>What if I have questions or comments on the new labeling interface?</strong>
