@@ -163,11 +163,11 @@
                         <strong>I love algorithms! Can I have more details?</strong>
                     </h3>
                     <h4>
-                        We group all your data so that trips with the same start and end location are in the same bin. We then look at the labels for the trips in each bin and how often they occur. If a trip has (shared_ride,work,drove_alone) labels 60% of the time, and (drove_alone,work,shared_ride) 40% of the time, we will display the highest probability label - e.g. (shared_ride,work,drove_alone) as a "yellow" "To Label". If it occurs 100% of the time, though, after the first few times, we don't even need to put it into "To Label" because we are pretty sure that is right.
+                        We group all your data so that trips with the same start and end location are in the same group. We then look at the labels for the trips in each group and how often they occur. If a trip has (shared_ride,work,drove_alone) labels 60% of the time, and (drove_alone,work,shared_ride) 40% of the time, we will display the highest probability labels — i.e., (shared_ride,work,drove_alone) — as yellow in "To Label." If the highest probability labels occur closer to 100% of the time, after a while, we don't even need to put them into "To Label" because we are so sure that they are correct.
                         <div>&nbsp;</div>
-                        But what if you used to carpool to work consistently, but now you started riding your spiffy new ebike? To detect such changes, we will periodically go from the usual "relaxed" mode to an "intensive" mode, where all your trips will show up in "To Label" for a week.
+                        But what if you used to carpool to work consistently, but now you started riding your spiffy new eBike? To detect such changes, we will periodically go from the usual "relaxed" mode to an "intensive" mode, where all your trips will show up in "To Label" for a week.
                         <div>&nbsp;</div>
-                        To summarize, as your travel patterns change - you switch jobs or modes or take up a new hobby - your trip locations and probabilities will change. But as long as we can get the correct labels periodically, the algorithm will update itself with the new probabilities and continue making your life easier.
+                        To summarize, as your travel patterns change — you switch jobs or modes or take up a new hobby — your trip locations and probabilities will change. But as long as we can get the correct labels periodically, the algorithm will update itself with the new probabilities and continue making your life easier.
                         <div>&nbsp;</div>
                         We are committed to an open and transparent platform - for more technical details, see the related discussions at https://github.com/e-mission/e-mission-docs/issues
                         </h4>
