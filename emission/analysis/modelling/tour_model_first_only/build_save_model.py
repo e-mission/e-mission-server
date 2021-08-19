@@ -40,7 +40,7 @@ def create_user_input_map(trip_list, bins):
     for b, curr_bin in enumerate(bins):
         bin_trips = [trip_list[j] for j in curr_bin]
         user_label_df = pd.DataFrame([trip['data']['user_input'] for trip in bin_trips])
-        user_label_df = lp.map_labels(user_label_df)
+        user_label_df = lp.map_labels(user_label_df).dropna()
         # compute the sum of trips in this cluster
         sum_trips = len(user_label_df)
         # compute unique label sets and their probabilities in one cluster
