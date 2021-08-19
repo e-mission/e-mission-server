@@ -30,6 +30,8 @@ import emission.analysis.intake.segmentation.section_segmentation as eaiss
 import emission.analysis.intake.cleaning.location_smoothing as eaicl
 import emission.analysis.intake.cleaning.clean_and_resample as eaicr
 import emission.analysis.classification.inference.mode.rule_engine as eacimr
+import emission.analysis.classification.inference.labels.pipeline as eacilp
+import emission.analysis.userinput.expectations as eaue
 import emission.net.ext_service.habitica.executor as autocheck
 
 import emission.storage.decorations.stats_queries as esds
@@ -65,10 +67,6 @@ def run_intake_pipeline(process_number, uuid_list):
 
     for uuid in uuid_list:
         if uuid is None:
-            continue
-
-        # Skip entry with mixed time and distance filters
-        if uuid == UUID("2c3996d1-49b1-4dce-82f8-d0cda85d3475"):
             continue
 
         try:
@@ -156,6 +154,22 @@ def run_intake_pipeline_for_user(uuid):
             eacimr.predict_mode(uuid)
 
         esds.store_pipeline_time(uuid, ecwp.PipelineStages.MODE_INFERENCE.name,
+                                 time.time(), crt.elapsed)
+
+        with ect.Timer() as crt:
+            logging.info("*" * 10 + "UUID %s: inferring labels" % uuid + "*" * 10)
+            print(str(arrow.now()) + "*" * 10 + "UUID %s: inferring labels" % uuid + "*" * 10)
+            eacilp.infer_labels(uuid)
+
+        esds.store_pipeline_time(uuid, ecwp.PipelineStages.LABEL_INFERENCE.name,
+                                 time.time(), crt.elapsed)
+
+        with ect.Timer() as crt:
+            logging.info("*" * 10 + "UUID %s: populating expectations" % uuid + "*" * 10)
+            print(str(arrow.now()) + "*" * 10 + "UUID %s: populating expectations" % uuid + "*" * 10)
+            eaue.populate_expectations(uuid)
+
+        esds.store_pipeline_time(uuid, ecwp.PipelineStages.EXPECTATION_POPULATION.name,
                                  time.time(), crt.elapsed)
 
         with ect.Timer() as crt:

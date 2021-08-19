@@ -25,6 +25,8 @@ INFERRED_SECTION_KEY = "analysis/inferred_section"
 CLEANED_STOP_KEY = "analysis/cleaned_stop"
 CLEANED_UNTRACKED_KEY = "analysis/cleaned_untracked"
 CLEANED_LOCATION_KEY = "analysis/recreated_location"
+INFERRED_TRIP_KEY = "analysis/inferred_trip"
+EXPECTED_TRIP_KEY = "analysis/expected_trip"
 CONFIRMED_TRIP_KEY = "analysis/confirmed_trip"
 METRICS_DAILY_USER_COUNT = "metrics/daily_user_count"
 METRICS_DAILY_MEAN_COUNT = "metrics/daily_mean_count"
@@ -34,6 +36,7 @@ METRICS_DAILY_USER_DURATION = "metrics/daily_user_duration"
 METRICS_DAILY_MEAN_DURATION = "metrics/daily_mean_duration"
 METRICS_DAILY_USER_MEDIAN_SPEED = "metrics/daily_user_median_speed"
 METRICS_DAILY_MEAN_MEDIAN_SPEED = "metrics/daily_mean_median_speed"
+INFERRED_LABELS_KEY = "inference/labels"
 
 # General methods
 

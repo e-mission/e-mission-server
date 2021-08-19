@@ -18,12 +18,15 @@ class PipelineStages(enum.Enum):
     JUMP_SMOOTHING = 3
     CLEAN_RESAMPLING = 11
     MODE_INFERENCE = 4
+    LABEL_INFERENCE = 14
+    EXPECTATION_POPULATION = 15
     CREATE_CONFIRMED_OBJECTS = 13
     TOUR_MODEL = 5
     ALTERNATIVES = 10
     USER_MODEL = 7
     RECOMMENDATION = 8
     OUTPUT_GEN = 9
+    EXPORT_DATA = 15
 
 class PipelineState(ecwb.WrapperBase):
     props = {"pipeline_stage": ecwb.WrapperBase.Access.RW,  # the value of the stage from the enum above

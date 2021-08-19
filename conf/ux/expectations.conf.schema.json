@@ -1,0 +1,220 @@
+{
+    "$schema": "http://json-schema.org/draft/2020-12/schema",
+    "title": "Expectations and Notifications",
+    "description": "Specifies which trips users are expected to label and when they should be reminded to do so",
+    "type": "object",
+    "properties": {
+        "modes": {
+            "description": "The various modes we can be in and their specifications. The active mode is the first mode in this list with a schedule matching the current date or with no schedule.",
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/modeType"
+            },
+            "contains": {
+                "$comment": "Must contain a \"default\" element -- one with no schedule",
+                "not": {"required": ["schedule"]}
+            }
+        }
+    },
+    "required": ["modes"],
+    "definitions": {
+        "modeType": {
+            "description": "Specifies a collection mode that defines expectation and notification settings for a given time period",
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "description": "Whether or not to enable this mode; mode is enabled if this property is omitted",
+                    "type": "boolean"
+                },
+                "label": {
+                    "description": "A human-readable label for the mode",
+                    "type": "string"
+                },
+                "confidenceThreshold": {
+                    "description": "Only display yellow labels with confidence greater than this threshold (0 to display all, 1 to display none)",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "schedule": {
+                    "$ref": "#/definitions/scheduleType"
+                },
+                "rules": {
+                    "description": "A list of rules that define the expectation and notification settings for label types",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ruleType"
+                    },
+                    "allOf": [
+                        {
+                            "contains": {
+                                "$comment": "Must contain a rule for red labels",
+                                "properties": {"trigger": {"const": -1}}
+                            }
+                        },
+                        {
+                            "contains": {
+                                "$comment": "Must contain a rule for all yellow labels",
+                                "properties": {"trigger": {"const": 1}}
+                            }
+                        }
+                    ]
+                }
+            },
+            "required": ["label", "confidenceThreshold", "rules"]
+        },
+        "scheduleType": {
+            "description": "Describes when the mode is active; omit to make always active",
+            "type": "object",
+            "properties": {
+                "startDate": {
+                    "description": "The base date from which to measure time; omit time zone to signify user's local time",
+                    "$comment": "Officially, the \"date-time\" format is supposed to be RFC 3339. It breaks RFC 3339 (but not ISO 8601) to omit a time zone. My current design decision is to accept this rather than add a whole other field.",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "recurrenceUnit": {
+                    "description": "The units for recurrenceValue",
+                    "type": "string",
+                    "enum": ["days", "weeks", "months"]
+                },
+                "recurrenceValue": {
+                    "description": "How often the mode recurs",
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "duration": {
+                    "description": "How long the mode lasts in days",
+                    "type": "integer",
+                    "minimum": 1
+                }
+            },
+            "required": ["startDate", "recurrenceUnit", "recurrenceValue", "duration"]
+        },
+        "ruleType": {
+            "description": "Specifies the expectation and notification settings for a given label type trigger",
+            "type": "object",
+            "properties": {
+                "trigger": {
+                    "description": "The type of label that this rule applies to: -1 for red labels, 0.0<=x<=1.0 for all yellow labels with confidence <= x, regardless of whether confidenceThreshold allows us to display them (1 for all yellow labels)",
+                    "type": "number",
+                    "anyOf": [
+                        {"minimum": 0, "maximum": 1},
+                        {"const": -1}
+                    ]
+                },
+                "expect": {
+                    "$ref": "#/definitions/expectType"
+                },
+                "notify": {
+                    "$ref": "#/definitions/notifyType"
+                }
+            },
+            "required": ["trigger", "expect"],
+            "allOf": [
+                {
+                    "$comment": "If no labeling expectation, do not send a notification; should not even configure",
+                    "if": {"properties": {"expect": {"properties": {"type": {"const": "none"}}}}},
+                    "then": {"not": {"required": ["notify"]}}
+                },
+                {
+                    "$comment": "The only way for a \"notify\" field to not exist is if there is no labeling expectation",
+                    "then": {"properties": {"expect": {"properties": {"type": {"const": "none"}}}}},
+                    "if": {"not": {"required": ["notify"]}}
+                }
+            ]
+        },
+        "expectType": {
+            "description": "Specifies whether the user must label all of the trips with the associated trigger, none of them, or somewhere in between",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "description": "\"all\": must label all trips\n\"randomFraction\": must label a certain fraction of trips\n\"randomDays\": must label for a certain number of days per week\n\"none\": not expected to label any trips",
+                    "type": "string",
+                    "enum": ["all", "randomFraction", "randomDays", "none"]
+                },
+                "value": {
+                    "$comment": "If \"type\" is \"randomFraction\": this is the fraction (0.0, 1.0) of trips that must be labeled\nIf \"type\" is \"randomDays\": this is the number of days per week [1, 6] for which trips must be labeled"
+                }
+            },
+            "allOf": [
+                {
+                    "if": {"properties": {"type": {"enum": ["all", "none"]}}},
+                    "then": {"not": {"required": ["value"]}}
+                },
+                {
+                    "if": {"properties": {"type": {"const": "randomFraction"}}},
+                    "then": {
+                        "properties": {
+                            "value": {
+                                "description": "The fraction (0.0, 1.0) of trips that must be labeled",
+                                "type": "number",
+                                "exclusiveMinimum": 0,
+                                "exclusiveMaximum": 1
+                                }
+                            },
+                        "required": ["value"]
+                    }
+                },
+                {
+                    "if": {"properties": {"type": {"const": "randomDays"}}},
+                    "then": {
+                        "properties": {"value": {"description": "The number of days per week [1, 6] for which trips must be labeled", "type": "integer", "minimum": 1, "maximum": 6}},
+                        "required": ["value"]
+                    }
+                }
+            ]
+        },
+        "notifyType": {
+            "description": "Specifies when the user should be notified to complete the expected labeling, if at all",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "description": "\"immediately\": notify as soon as the label data comes in\n\"dayEnd\": notify at the end of each day\n\"nDays\": notify every certain number of days\n\"weekDay\": notify on a certain day of the week\n\"none\": do not notify",
+                    "type": "string",
+                    "enum": ["immediately", "dayEnd", "nDays", "weekDay", "none"]
+                },
+                "value": {
+                    "$comment": "If \"type\" is \"nDays\": this is the number [1, Infinity) of days we wait in between notifications\nIf \"type\" is \"weekDay\": this is the number of the day [1=Monday, 7=Sunday] on which we notify"
+                }
+            },
+            "allOf": [
+                {
+                    "if": {"properties": {"type": {"enum": ["immediately", "dayEnd", "none"]}}},
+                    "then": {"not": {"required": ["value"]}}
+                },
+                {
+                    "if": {"properties": {"type": {"const": "nDays"}}},
+                    "then": {
+                        "properties": {
+                            "value": {
+                                "description": "The number [1, Infinity) of days we wait in between notifications",
+                                "type": "integer",
+                                "minimum": 1
+                                }
+                            },
+                        "required": ["value"]
+                    }
+                },
+                {
+                    "if": {"properties": {"type": {"const": "weekDay"}}},
+                    "then": {
+                        "properties": {
+                            "value": {
+                                "description": "The number of the day [1=Monday, 7=Sunday] on which we notify",
+                                "type": "integer",
+                                "minimum": 1,
+                                "maximum": 7
+                                }
+                            },
+                        "required": ["value"]
+                    }
+                },
+                {
+                    "if": {"properties": {"type": {"const": "none"}}},
+                    "then": {"not": {"required": ["value"]}}
+                }
+            ]
+        }
+    }
+}
