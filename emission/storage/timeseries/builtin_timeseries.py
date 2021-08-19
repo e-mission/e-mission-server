@@ -93,7 +93,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
 
     @staticmethod
     def get_uuid_list():
-        return edb.get_timeseries_db().distinct("user_id")
+        return edb.get_uuid_db().distinct("uuid")
 
     def get_timeseries_db(self, key):
         """
