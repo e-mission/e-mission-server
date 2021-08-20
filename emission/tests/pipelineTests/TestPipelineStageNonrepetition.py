@@ -13,7 +13,7 @@ import emission.analysis.classification.inference.labels.inferrers as eacili
 import emission.analysis.configs.expectation_notification_config as eace
 import emission.analysis.userinput.expectations as eaue
 
-class TestExpectationPipeline(unittest.TestCase):
+class TestPipelineStageNonrepetition(unittest.TestCase):
     # The limitation of this approach is that one must manually add database keys here.
     # So when implementing a new pipeline stage, put the relevant key(s) here!
     # I've tried to go through the various existing pipeline stages and put some of their keys here, but this may already be incomplete.
@@ -63,7 +63,7 @@ class TestExpectationPipeline(unittest.TestCase):
         counts = {}
         db = edb.get_analysis_timeseries_db()
         for key in self.keys_to_track:
-            count = db.find({"metadata.key": key, "user_id": self.testUUID}).count()
+            count = db.count_documents({"metadata.key": key, "user_id": self.testUUID})
             counts[key] = count
         # print(counts)
         return counts
