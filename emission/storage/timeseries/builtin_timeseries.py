@@ -60,6 +60,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "manual/mode_confirm": self.timeseries_db,
                 "manual/purpose_confirm": self.timeseries_db,
                 "manual/survey_response": self.timeseries_db,
+                "manual/survey_response_marker": self.timeseries_db,
                 "manual/destination_confirm": self.timeseries_db,
                 "segmentation/raw_trip": self.analysis_timeseries_db,
                 "segmentation/raw_place": self.analysis_timeseries_db,

@@ -75,6 +75,7 @@ class Entry(ecwb.WrapperBase):
             "manual/purpose_confirm": "userlabel",
             #user response to the survey questions
             "manual/survey_response": "userlabel",
+            "manual/survey_response_marker": "userlabel",
             # user survey results. The survey results are a JSON blob
             "manual/survey": "survey",
             # user confirmation of the destination (unsure how this will
