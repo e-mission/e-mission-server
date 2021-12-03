@@ -41,7 +41,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     survey_spec = json.load(open(args.survey_spec))
-    assert (survey_spec["alert_type"] == "survey" or survey_spec["alert_type"] == "notify"), "alert_type = %s, expected 'survey' or 'notify'" % survey_spec["alert_type"]
+    valid_type_list = ["survey", "notify", "popup", "website"]
+    assert (survey_spec["alert_type"] in valid_type_list, "alert_type = %s, expected one of %s" % (survey_spec["alert_type"], valid_type_list))
 
     if args.user_uuid:
         uuid_list = [uuid.UUID(uuid_str) for uuid_str in args.user_uuid]
