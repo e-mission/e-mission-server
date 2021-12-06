@@ -1,0 +1,10 @@
+{
+    "alert_type": "popup",
+    "title": "Look into your heart and mind",
+    "message": "What kind of day is it?",
+    "image": "icon",
+    "spec": {
+        "title": "What a glorious morning!",
+        "text": "The maddest, merriest day of the year!!"
+    }
+}
