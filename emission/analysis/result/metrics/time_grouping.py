@@ -136,6 +136,11 @@ def grouped_to_summary(time_grouped_df, key_to_fill_fn, summary_fn):
         if result_section_key == "analysis/confirmed_trip":
             import emission.storage.decorations.trip_queries as esdt
             section_group_df = esdt.expand_userinputs(section_group_df)
+            # pandas ignores NaN entries while grouping
+            # (see TestMetricsConfirmed.testPandasNaNHandlingAndWorkaround)
+            # so we convert them to "unknown" first
+            section_group_df.fillna("unknown", inplace=True)
+            logging.debug(section_group_df.mode_confirm)
             grouping_field = "mode_confirm"
         else:
             grouping_field = "sensed_mode"
