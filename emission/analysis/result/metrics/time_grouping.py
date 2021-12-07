@@ -132,10 +132,19 @@ def grouped_to_summary(time_grouped_df, key_to_fill_fn, summary_fn):
         key = fix_int64_key_if_needed(key)
         key_to_fill_fn(key, section_group_df, curr_msts)
         curr_msts.nUsers = len(section_group_df.user_id.unique())
-        mode_grouped_df = section_group_df.groupby('sensed_mode')
+        result_section_key = eac.get_section_key_for_analysis_results()
+        if result_section_key == "analysis/confirmed_trip":
+            import emission.storage.decorations.trip_queries as esdt
+            section_group_df = esdt.expand_userinputs(section_group_df)
+            grouping_field = "mode_confirm"
+        else:
+            grouping_field = "sensed_mode"
+        mode_grouped_df = section_group_df.groupby(grouping_field)
         mode_results = summary_fn(mode_grouped_df)
         for mode, result in mode_results.items():
-            if eac.get_section_key_for_analysis_results() == "analysis/inferred_section":
+            if eac.get_section_key_for_analysis_results() == "analysis/confirmed_trip":
+                curr_msts[mode] = result
+            elif eac.get_section_key_for_analysis_results() == "analysis/inferred_section":
                 curr_msts[ecwmp.PredictedModeTypes(mode).name] = result
             else:
                 curr_msts[ecwm.MotionTypes(mode).name] = result
