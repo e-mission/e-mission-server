@@ -80,25 +80,6 @@ class TestMetrics(unittest.TestCase):
         self.assertTrue('shared_ride' not in agg_met_result[2] and
                          'bike' not in agg_met_result[2])
 
-    def testPandasNaNHandlingAndWorkaround(self):
-        # Pandas currently ignores NaN entries in groupby
-        import pandas as pd
-        import numpy as np
-
-        test_df = pd.DataFrame({"id": [1,2,3,4,5,6],
-            "mode_confirm": ["walk", "bike", "bike", "walk", np.NaN, np.NaN]})
-
-        # Current pandas behavior ignores NaN
-        orig_grouping = test_df.groupby("mode_confirm").groups
-        self.assertEquals(list(orig_grouping.keys()), ["bike", "walk"])
-
-        # workaround replaces NaN with "unknown"
-        new_test_df = test_df.fillna("unknown")
-
-        # Now we should not ignore NaN
-        new_grouping = new_test_df.groupby("mode_confirm").groups
-        self.assertEquals(list(new_grouping.keys()), ["bike", "unknown", "walk"])
-
     def testCountTimestampPartialMissingLabels(self):
         self.entries = json.load(open("emission/tests/data/real_examples/shankari_2016-07-22"), object_hook = bju.object_hook)
         etc.setupRealExampleWithEntries(self)
@@ -133,6 +114,76 @@ class TestMetrics(unittest.TestCase):
         # since these are never negative, it implies that their sum is zero
         self.assertTrue('unknown' in agg_met_result[0])
         self.assertEqual(agg_met_result[0]["unknown"], 5)
+
+    def testCountTimestampFullMissingLabels(self):
+        self.entries = json.load(open("emission/tests/data/real_examples/shankari_2016-07-22"), object_hook = bju.object_hook)
+        etc.setupRealExampleWithEntries(self)
+        etc.runIntakePipeline(self.testUUID2)
+        # We group by day, so the last day will not have any labeled entries
+        met_result = metrics.summarize_by_timestamp(self.testUUID2,
+                                                    self.jun_start_ts, self.jun_end_ts,
+                                       'd', ['count'], True)
+        logging.debug(met_result)
+
+        self.assertEqual(list(met_result.keys()), ['aggregate_metrics', 'user_metrics'])
+        user_met_result = met_result['user_metrics'][0]
+        agg_met_result = met_result['aggregate_metrics'][0]
+
+        self.assertEqual(len(user_met_result), 32)
+        self.assertEqual([m.nUsers for m in user_met_result], [1,1] + [0] * 29 + [1])
+        self.assertEqual(user_met_result[0].local_dt.day, 21)
+        self.assertEqual(user_met_result[0]["bike"], 2)
+        self.assertEqual(user_met_result[1]["walk"], 2)
+        self.assertEqual(user_met_result[31].local_dt.day, 22)
+        self.assertEqual(user_met_result[31]["unknown"], 6)
+        # We are not going to make absolute value assertions about
+        # the aggregate values since they are affected by other
+        # entries in the database. However, because we have at least
+        # data for two days in the database, the aggregate data
+        # must be at least that much larger than the original data.
+        self.assertEqual(len(agg_met_result), 33)
+        # no overlap between users at the daily level
+        # bunch of intermediate entries with no users since this binning works
+        # by range
+        self.assertEqual([m.nUsers for m in agg_met_result], [1,1,1] + [0] * 29 + [1])
+        # If there are no users, there are no values for any of the fields
+        # since these are never negative, it implies that their sum is zero
+        self.assertTrue('unknown' in agg_met_result[32])
+        self.assertEqual(agg_met_result[32]["unknown"], 6)
+
+    def testCountTimestampFullMissingLabelsMonth(self):
+        self.entries = json.load(open("emission/tests/data/real_examples/shankari_2016-07-22"), object_hook = bju.object_hook)
+        etc.setupRealExampleWithEntries(self)
+        etc.runIntakePipeline(self.testUUID2)
+        # We group by day, so the last day will not have any labeled entries
+        met_result = metrics.summarize_by_timestamp(self.testUUID2,
+                                                    self.jun_start_ts, self.jun_end_ts,
+                                       'm', ['count'], True)
+        logging.debug(met_result)
+
+        self.assertEqual(list(met_result.keys()), ['aggregate_metrics', 'user_metrics'])
+        user_met_result = met_result['user_metrics'][0]
+        agg_met_result = met_result['aggregate_metrics'][0]
+
+        self.assertEqual(len(user_met_result), 2)
+        self.assertEqual([m.nUsers for m in user_met_result], [1,1])
+        self.assertEqual(user_met_result[0].local_dt.day, 30)
+        self.assertEqual(user_met_result[0]["bike"], 2)
+        self.assertEqual(user_met_result[0]["walk"], 2)
+        self.assertEqual(user_met_result[1].local_dt.day, 31)
+        self.assertEqual(user_met_result[1]["unknown"], 6)
+        self.assertNotIn("walk", user_met_result[1].keys())
+        self.assertNotIn("bike", user_met_result[1].keys())
+
+        self.assertEqual(len(agg_met_result), 2)
+        # no overlap between users at the daily level
+        # bunch of intermediate entries with no users since this binning works
+        # by range
+        self.assertEqual([m.nUsers for m in agg_met_result], [2,1])
+        # If there are no users, there are no values for any of the fields
+        # since these are never negative, it implies that their sum is zero
+        self.assertTrue('unknown' in agg_met_result[1])
+        self.assertEqual(agg_met_result[1]["unknown"], 6)
 
     def testCountLocalDateMetrics(self):
         met_result = metrics.summarize_by_local_date(self.testUUID,
