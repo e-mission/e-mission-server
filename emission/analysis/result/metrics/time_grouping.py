@@ -8,6 +8,7 @@ from builtins import range
 from builtins import *
 import enum
 import pandas as pd
+import numpy as np
 import arrow as arrow
 import logging
 
@@ -128,14 +129,41 @@ def grouped_to_summary(time_grouped_df, key_to_fill_fn, summary_fn):
     ret_list = []
     # When we group by a time range, the key is the end of the range
     for key, section_group_df in time_grouped_df:
+        logging.debug("For key %s, found %s sections" % (key, len(section_group_df)))
         curr_msts = ecwms.ModeStatTimeSummary()
         key = fix_int64_key_if_needed(key)
         key_to_fill_fn(key, section_group_df, curr_msts)
         curr_msts.nUsers = len(section_group_df.user_id.unique())
-        mode_grouped_df = section_group_df.groupby('sensed_mode')
+        result_section_key = eac.get_section_key_for_analysis_results()
+        if result_section_key == "analysis/confirmed_trip":
+            import emission.storage.decorations.trip_queries as esdt
+            section_group_df = esdt.expand_userinputs(section_group_df)
+            # if none of the trips in the time grouping are labeled,
+            # we add a dummy column
+            # pandas checks in TestMetricsConfirmedTripsPandas.testPandasConcatModeConfirm
+            if "mode_confirm" not in section_group_df.columns:
+                # If we don't reset the index and the index doesn't start from 1,
+                # the concat will end up with additional rows
+                # see TestMetricsConfirmedTripsPandas.testPandasConcatModeConfirm
+                section_group_df.reset_index(inplace=True)
+                dummy_col = pd.Series([np.NaN] * len(section_group_df), name="mode_confirm")
+                section_group_df = pd.concat([section_group_df, dummy_col],
+                    axis = 1, copy=True)
+            # pandas ignores NaN entries while grouping
+            # (see TestMetricsConfirmedTripsPandas.testPandasNaNHandlingAndWorkaround)
+            # so we convert them to "unknown" first
+            section_group_df.fillna("unknown", inplace=True)
+            logging.debug("After replacing unknown, we get %s " % list(section_group_df.mode_confirm))
+            grouping_field = "mode_confirm"
+        else:
+            grouping_field = "sensed_mode"
+
+        mode_grouped_df = section_group_df.groupby(grouping_field)
         mode_results = summary_fn(mode_grouped_df)
         for mode, result in mode_results.items():
-            if eac.get_section_key_for_analysis_results() == "analysis/inferred_section":
+            if eac.get_section_key_for_analysis_results() == "analysis/confirmed_trip":
+                curr_msts[mode] = result
+            elif eac.get_section_key_for_analysis_results() == "analysis/inferred_section":
                 curr_msts[ecwmp.PredictedModeTypes(mode).name] = result
             else:
                 curr_msts[ecwm.MotionTypes(mode).name] = result
