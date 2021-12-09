@@ -49,8 +49,6 @@ if args.inferred:
 
 if args.confirmed:
     print(edb.get_analysis_timeseries_db().delete_many(
-        dict(base_query, **{"metadata.key": esda.EXPECTED_TRIP_KEY})).raw_result)
-    print(edb.get_analysis_timeseries_db().delete_many(
         dict(base_query, **{"metadata.key": esda.CONFIRMED_TRIP_KEY})).raw_result)
     print(edb.get_pipeline_state_db().delete_many(
         dict(base_query, **{"pipeline_stage": {"$in": [13]}})).raw_result)
