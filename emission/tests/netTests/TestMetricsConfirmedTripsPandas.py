@@ -2,8 +2,16 @@ import unittest
 import pandas as pd
 import numpy as np
 import logging
+import uuid
+import statistics
 
 import emission.storage.decorations.trip_queries as esdt
+import emission.storage.timeseries.abstract_timeseries as esta
+
+import emission.core.wrapper.trip as ecwt
+import emission.core.wrapper.entry as ecwe
+
+import emission.analysis.result.metrics.simple_metrics as earms
 
 class TestMetricsConfirmedTripsPandas(unittest.TestCase):
 
@@ -56,6 +64,47 @@ class TestMetricsConfirmedTripsPandas(unittest.TestCase):
 
         self.assertIn("mode_confirm", filled_expanded_test_df.columns)
         self.assertEqual(len(filled_expanded_test_df.mode_confirm), len(dummy_col))
+
+    def testGetSpeedsForTrip(self):
+        self.testUUID = uuid.uuid4()
+        self.ts = esta.TimeSeries.get_time_series(self.testUUID)
+        section1_speeds = list(range(0,10))
+        section2_speeds = list(range(5,15))
+        section3_speeds = list(range(10,20))
+
+        cltrip_entry = ecwe.Entry.create_entry(self.testUUID,
+                                "analysis/cleaned_trip",
+                                {}, create_id=True)
+        cltrip_entry_id = self.ts.insert(cltrip_entry)
+        trip_entry = ecwe.Entry.create_entry(self.testUUID,
+                                "analysis/confirmed_trip",
+                                {"cleaned_trip": cltrip_entry_id}, create_id=True)
+        trip_entry_id = self.ts.insert(trip_entry)
+        section_entry_1 = ecwe.Entry.create_entry(self.testUUID,
+                                "analysis/cleaned_section",
+                                {"trip_id": cltrip_entry_id, "speeds": section1_speeds},
+                                create_id=True)
+        self.ts.insert(section_entry_1)
+        section_entry_2 = ecwe.Entry.create_entry(self.testUUID,
+                                "analysis/cleaned_section",
+                                {"trip_id": cltrip_entry_id, "speeds": section2_speeds},
+                                create_id=True)
+        self.ts.insert(section_entry_2)
+        section_entry_3 = ecwe.Entry.create_entry(self.testUUID,
+                                "analysis/cleaned_section",
+                                {"trip_id": cltrip_entry_id, "speeds": section3_speeds},
+                                create_id=True)
+        self.ts.insert(section_entry_3)
+
+        trip_df = pd.DataFrame([{"_id": trip_entry_id,
+            "cleaned_trip": cltrip_entry_id, "user_id": self.testUUID}])
+        self.assertEqual(len(trip_df), 1)
+        speeds_list = trip_df.apply(earms._get_speeds_for_trip, axis=1)
+        print(speeds_list.iloc[0])
+        self.assertEqual(len(speeds_list), 1)
+        self.assertEqual(len(speeds_list[0]), 3*10)
+        self.assertEqual(pd.Series(speeds_list[0]).dropna().median(),
+            statistics.median(section1_speeds + section2_speeds + section3_speeds))
 
 if __name__ == '__main__':
     import emission.tests.common as etc
