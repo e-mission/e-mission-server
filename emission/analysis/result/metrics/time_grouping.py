@@ -151,9 +151,9 @@ def grouped_to_summary(time_grouped_df, key_to_fill_fn, summary_fn):
                     axis = 1, copy=True)
             # pandas ignores NaN entries while grouping
             # (see TestMetricsConfirmedTripsPandas.testPandasNaNHandlingAndWorkaround)
-            # so we convert them to "unknown" first
-            section_group_df.fillna("unknown", inplace=True)
-            logging.debug("After replacing unknown, we get %s " % list(section_group_df.mode_confirm))
+            # so we convert them to "unlabeled" first
+            section_group_df.fillna("unlabeled", inplace=True)
+            logging.debug("After replacing unlabeled, we get %s " % list(section_group_df.mode_confirm))
             grouping_field = "mode_confirm"
         else:
             grouping_field = "sensed_mode"
@@ -162,7 +162,7 @@ def grouped_to_summary(time_grouped_df, key_to_fill_fn, summary_fn):
         mode_results = summary_fn(mode_grouped_df)
         for mode, result in mode_results.items():
             if eac.get_section_key_for_analysis_results() == "analysis/confirmed_trip":
-                curr_msts[mode] = result
+                curr_msts["label_"+mode] = result
             elif eac.get_section_key_for_analysis_results() == "analysis/inferred_section":
                 curr_msts[ecwmp.PredictedModeTypes(mode).name] = result
             else:
