@@ -39,7 +39,7 @@ def get_duration(mode_section_grouped_df):
 def get_median_speed(mode_section_grouped_df):
     ret_dict = {}
     for (mode, mode_section_df) in mode_section_grouped_df:
-        print("while getting median speed %s, %s" % (mode, mode_section_df.columns))
+        # print("while getting median speed %s, %s" % (mode, mode_section_df.columns))
         if "speeds" in mode_section_df.columns:
             speeds_list = mode_section_df.speeds
         else:

@@ -72,27 +72,32 @@ class TestMetricsConfirmedTripsPandas(unittest.TestCase):
         section2_speeds = list(range(5,15))
         section3_speeds = list(range(10,20))
 
+        cltrip_entry = ecwe.Entry.create_entry(self.testUUID,
+                                "analysis/cleaned_trip",
+                                {}, create_id=True)
+        cltrip_entry_id = self.ts.insert(cltrip_entry)
         trip_entry = ecwe.Entry.create_entry(self.testUUID,
                                 "analysis/confirmed_trip",
-                                {}, create_id=True)
+                                {"cleaned_trip": cltrip_entry_id}, create_id=True)
         trip_entry_id = self.ts.insert(trip_entry)
         section_entry_1 = ecwe.Entry.create_entry(self.testUUID,
                                 "analysis/cleaned_section",
-                                {"trip_id": trip_entry_id, "speeds": section1_speeds},
+                                {"trip_id": cltrip_entry_id, "speeds": section1_speeds},
                                 create_id=True)
         self.ts.insert(section_entry_1)
         section_entry_2 = ecwe.Entry.create_entry(self.testUUID,
                                 "analysis/cleaned_section",
-                                {"trip_id": trip_entry_id, "speeds": section2_speeds},
+                                {"trip_id": cltrip_entry_id, "speeds": section2_speeds},
                                 create_id=True)
         self.ts.insert(section_entry_2)
         section_entry_3 = ecwe.Entry.create_entry(self.testUUID,
                                 "analysis/cleaned_section",
-                                {"trip_id": trip_entry_id, "speeds": section3_speeds},
+                                {"trip_id": cltrip_entry_id, "speeds": section3_speeds},
                                 create_id=True)
         self.ts.insert(section_entry_3)
 
-        trip_df = pd.DataFrame([{"_id": trip_entry_id, "user_id": self.testUUID}])
+        trip_df = pd.DataFrame([{"_id": trip_entry_id,
+            "cleaned_trip": cltrip_entry_id, "user_id": self.testUUID}])
         self.assertEqual(len(trip_df), 1)
         speeds_list = trip_df.apply(earms._get_speeds_for_trip, axis=1)
         print(speeds_list.iloc[0])
