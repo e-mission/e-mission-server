@@ -39,11 +39,31 @@ def get_duration(mode_section_grouped_df):
 def get_median_speed(mode_section_grouped_df):
     ret_dict = {}
     for (mode, mode_section_df) in mode_section_grouped_df:
+        # print("while getting median speed %s, %s" % (mode, mode_section_df.columns))
+        if "speeds" in mode_section_df.columns:
+            speeds_list = mode_section_df.speeds
+        else:
+            # we are using the confirmed trips, which don't have the speed list
+            # let's get it by concatenating from the sections
+            speeds_list = mode_section_df.apply(_get_speeds_for_trip, axis=1)
+
+        # speeds series is a series with one row per section/trip where the
+        # value is the list of speeds in that section/trip
         median_speeds = [pd.Series(sl).dropna().median() for sl
-                            in mode_section_df.speeds]
+                            in speeds_list]
         mode_median = pd.Series(median_speeds).dropna().median()
         if np.isnan(mode_median):
             logging.debug("still found nan for mode %s, skipping")
         else:
             ret_dict[mode] = float(mode_median)
     return ret_dict
+
+def _get_speeds_for_trip(trip_df_row):
+    import itertools
+    import emission.storage.decorations.trip_queries as esdt
+
+    section_list = esdt.get_cleaned_sections_for_trip(trip_df_row.user_id, trip_df_row.cleaned_trip)
+    logging.debug("Found %s matching sections for trip %s" % (len(section_list), trip_df_row._id))
+    speed_list_of_lists = [s["data"]["speeds"] for s in section_list]
+    speed_list = list(itertools.chain(*speed_list_of_lists))
+    return speed_list

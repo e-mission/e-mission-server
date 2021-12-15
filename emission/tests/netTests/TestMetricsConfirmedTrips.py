@@ -62,9 +62,9 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual(len(user_met_result), 2)
         self.assertEqual([m.nUsers for m in user_met_result], [1, 1])
         self.assertEqual(user_met_result[0].local_dt.day, 21)
-        self.assertEqual(user_met_result[0]["bike"], 2)
+        self.assertEqual(user_met_result[0]["label_bike"], 2)
         self.assertEqual(user_met_result[1].local_dt.day, 22)
-        self.assertEqual(user_met_result[1]["walk"], 2)
+        self.assertEqual(user_met_result[1]["label_walk"], 2)
         # We are not going to make absolute value assertions about
         # the aggregate values since they are affected by other
         # entries in the database. However, because we have at least
@@ -77,8 +77,39 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual([m.nUsers for m in agg_met_result], [1,1,1])
         # If there are no users, there are no values for any of the fields
         # since these are never negative, it implies that their sum is zero
-        self.assertTrue('shared_ride' not in agg_met_result[2] and
-                         'bike' not in agg_met_result[2])
+        self.assertTrue('label_shared_ride' not in agg_met_result[2] and
+                         'label_bike' not in agg_met_result[2])
+
+    def testAllTimestampMetrics(self):
+        met_result = metrics.summarize_by_timestamp(self.testUUID2,
+                                                    self.jun_start_ts, self.jun_end_ts,
+                                       'd', ['count', 'distance', 'duration', 'median_speed'], True)
+        logging.debug(met_result)
+
+        self.assertEqual(list(met_result.keys()), ['aggregate_metrics', 'user_metrics'])
+        self.assertEqual(len(met_result["user_metrics"]), 4)
+        self.assertEqual(len(met_result["aggregate_metrics"]), 4)
+
+        user_met_count_result = met_result['user_metrics'][0]
+        agg_met_count_result = met_result['aggregate_metrics'][0]
+
+        user_met_dist_result = met_result['user_metrics'][1]
+        agg_met_dist_result = met_result['aggregate_metrics'][1]
+
+        user_met_dur_result = met_result['user_metrics'][2]
+        agg_met_dur_result = met_result['aggregate_metrics'][2]
+
+        user_met_spd_result = met_result['user_metrics'][3]
+        agg_met_spd_result = met_result['aggregate_metrics'][3]
+
+        self.assertEqual([len(ml) for ml in met_result["user_metrics"]], [2]*4)
+        self.assertEqual([len(ml) for ml in met_result["aggregate_metrics"]], [3]*4)
+        self.assertEqual([[m.nUsers for m in ml] for ml in met_result["user_metrics"]],
+            [[1, 1]]*4)
+        self.assertEqual(user_met_count_result[0]["label_bike"], 2)
+        self.assertAlmostEqual(user_met_dist_result[0]["label_bike"], 4305.02678, places=3)
+        self.assertAlmostEqual(user_met_dur_result[0]["label_bike"], 2388.97132, places=3)
+        self.assertAlmostEqual(user_met_spd_result[0]["label_bike"], 1.98726, places=3)
 
     def testCountTimestampPartialMissingLabels(self):
         self.entries = json.load(open("emission/tests/data/real_examples/shankari_2016-07-22"), object_hook = bju.object_hook)
@@ -97,9 +128,9 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual(len(user_met_result), 1)
         self.assertEqual([m.nUsers for m in user_met_result], [1])
         self.assertEqual(user_met_result[0].local_dt.day, 31)
-        self.assertEqual(user_met_result[0]["bike"], 2)
-        self.assertEqual(user_met_result[0]["walk"], 2)
-        self.assertEqual(user_met_result[0]["unknown"], 3)
+        self.assertEqual(user_met_result[0]["label_bike"], 2)
+        self.assertEqual(user_met_result[0]["label_walk"], 2)
+        self.assertEqual(user_met_result[0]["label_unlabeled"], 3)
         # We are not going to make absolute value assertions about
         # the aggregate values since they are affected by other
         # entries in the database. However, because we have at least
@@ -112,8 +143,8 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual([m.nUsers for m in agg_met_result], [2])
         # If there are no users, there are no values for any of the fields
         # since these are never negative, it implies that their sum is zero
-        self.assertTrue('unknown' in agg_met_result[0])
-        self.assertEqual(agg_met_result[0]["unknown"], 5)
+        self.assertTrue('label_unlabeled' in agg_met_result[0])
+        self.assertEqual(agg_met_result[0]["label_unlabeled"], 5)
 
     def testCountTimestampFullMissingLabels(self):
         self.entries = json.load(open("emission/tests/data/real_examples/shankari_2016-07-22"), object_hook = bju.object_hook)
@@ -132,10 +163,10 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual(len(user_met_result), 32)
         self.assertEqual([m.nUsers for m in user_met_result], [1,1] + [0] * 29 + [1])
         self.assertEqual(user_met_result[0].local_dt.day, 21)
-        self.assertEqual(user_met_result[0]["bike"], 2)
-        self.assertEqual(user_met_result[1]["walk"], 2)
+        self.assertEqual(user_met_result[0]["label_bike"], 2)
+        self.assertEqual(user_met_result[1]["label_walk"], 2)
         self.assertEqual(user_met_result[31].local_dt.day, 22)
-        self.assertEqual(user_met_result[31]["unknown"], 3)
+        self.assertEqual(user_met_result[31]["label_unlabeled"], 3)
         # We are not going to make absolute value assertions about
         # the aggregate values since they are affected by other
         # entries in the database. However, because we have at least
@@ -148,8 +179,8 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual([m.nUsers for m in agg_met_result], [1,1,1] + [0] * 29 + [1])
         # If there are no users, there are no values for any of the fields
         # since these are never negative, it implies that their sum is zero
-        self.assertTrue('unknown' in agg_met_result[32])
-        self.assertEqual(agg_met_result[32]["unknown"], 3)
+        self.assertTrue('label_unlabeled' in agg_met_result[32])
+        self.assertEqual(agg_met_result[32]["label_unlabeled"], 3)
 
     def testCountTimestampFullMissingLabelsMonth(self):
         self.entries = json.load(open("emission/tests/data/real_examples/shankari_2016-07-22"), object_hook = bju.object_hook)
@@ -168,12 +199,12 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual(len(user_met_result), 2)
         self.assertEqual([m.nUsers for m in user_met_result], [1,1])
         self.assertEqual(user_met_result[0].local_dt.day, 30)
-        self.assertEqual(user_met_result[0]["bike"], 2)
-        self.assertEqual(user_met_result[0]["walk"], 2)
+        self.assertEqual(user_met_result[0]["label_bike"], 2)
+        self.assertEqual(user_met_result[0]["label_walk"], 2)
         self.assertEqual(user_met_result[1].local_dt.day, 31)
-        self.assertEqual(user_met_result[1]["unknown"], 3)
-        self.assertNotIn("walk", user_met_result[1].keys())
-        self.assertNotIn("bike", user_met_result[1].keys())
+        self.assertEqual(user_met_result[1]["label_unlabeled"], 3)
+        self.assertNotIn("label_walk", user_met_result[1].keys())
+        self.assertNotIn("label_bike", user_met_result[1].keys())
 
         self.assertEqual(len(agg_met_result), 2)
         # no overlap between users at the daily level
@@ -182,8 +213,8 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual([m.nUsers for m in agg_met_result], [2,1])
         # If there are no users, there are no values for any of the fields
         # since these are never negative, it implies that their sum is zero
-        self.assertTrue('unknown' in agg_met_result[1])
-        self.assertEqual(agg_met_result[1]["unknown"], 3)
+        self.assertTrue('label_unlabeled' in agg_met_result[1])
+        self.assertEqual(agg_met_result[1]["label_unlabeled"], 3)
 
     def testCountLocalDateMetrics(self):
         met_result = metrics.summarize_by_local_date(self.testUUID,
@@ -199,13 +230,13 @@ class TestMetrics(unittest.TestCase):
         # local timezone means that we only have one entry
         self.assertEqual(len(user_met_result), 1)
         self.assertEqual(user_met_result[0].nUsers, 1)
-        self.assertEqual(user_met_result[0]["walk"], 2)
-        self.assertEqual(user_met_result[0]["bike"], 2)
+        self.assertEqual(user_met_result[0]["label_walk"], 2)
+        self.assertEqual(user_met_result[0]["label_bike"], 2)
         self.assertEqual(len(agg_met_result), 1)
         self.assertEqual(agg_met_result[0].nUsers, 2)
-        self.assertGreaterEqual(agg_met_result[0]["shared_ride"], 2)
-        self.assertGreaterEqual(agg_met_result[0]["walk"], 4)
-        self.assertGreaterEqual(agg_met_result[0]["unknown"], 2)
+        self.assertGreaterEqual(agg_met_result[0]["label_shared_ride"], 2)
+        self.assertGreaterEqual(agg_met_result[0]["label_walk"], 4)
+        self.assertGreaterEqual(agg_met_result[0]["label_unlabeled"], 2)
 
     def testCountLocalDateFullMissingLabelsMonth(self):
         self.entries = json.load(open("emission/tests/data/real_examples/shankari_2016-07-22"), object_hook = bju.object_hook)
@@ -225,12 +256,12 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual(len(user_met_result), 2)
         self.assertEqual([m.nUsers for m in user_met_result], [1,1])
         self.assertEqual(user_met_result[0].local_dt.month, 6)
-        self.assertEqual(user_met_result[0]["bike"], 2)
-        self.assertEqual(user_met_result[0]["walk"], 2)
+        self.assertEqual(user_met_result[0]["label_bike"], 2)
+        self.assertEqual(user_met_result[0]["label_walk"], 2)
         self.assertEqual(user_met_result[1].local_dt.month, 7)
-        self.assertEqual(user_met_result[1]["unknown"], 3)
-        self.assertNotIn("walk", user_met_result[1].keys())
-        self.assertNotIn("bike", user_met_result[1].keys())
+        self.assertEqual(user_met_result[1]["label_unlabeled"], 3)
+        self.assertNotIn("label_walk", user_met_result[1].keys())
+        self.assertNotIn("label_bike", user_met_result[1].keys())
 
         self.assertEqual(len(agg_met_result), 2)
         # no overlap between users at the daily level
@@ -239,8 +270,8 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual([m.nUsers for m in agg_met_result], [2,1])
         # If there are no users, there are no values for any of the fields
         # since these are never negative, it implies that their sum is zero
-        self.assertTrue('unknown' in agg_met_result[1])
-        self.assertEqual(agg_met_result[1]["unknown"], 3)
+        self.assertTrue('label_unlabeled' in agg_met_result[1])
+        self.assertEqual(agg_met_result[1]["label_unlabeled"], 3)
 
     def testCountNoEntries(self):
         # Ensure that we don't crash if we don't find any entries
