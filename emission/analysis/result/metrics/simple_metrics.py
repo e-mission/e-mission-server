@@ -47,5 +47,10 @@ def get_mean_speed(mode_section_grouped_df):
     for (mode, mode_section_df) in mode_section_grouped_df:
         # mean_speeds is a series with one row per section/trip where the
         # value is the mean speed (distance/duration) for that section/trip
-        ret_dict[mode] = float(mode_section_df.distance.sum() / mode_section_df.duration.sum())
+        mean_speeds = mode_section_df.distance / mode_section_df.duration
+        mode_mean = mean_speeds.dropna().mean()
+        if np.isnan(mode_mean):
+            logging.debug("still found nan for mode %s, skipping")
+        else:
+            ret_dict[mode] = float(mode_mean)
     return ret_dict
