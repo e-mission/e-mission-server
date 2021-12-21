@@ -83,12 +83,12 @@ class TestMetrics(unittest.TestCase):
     def testAllTimestampMetrics(self):
         met_result = metrics.summarize_by_timestamp(self.testUUID2,
                                                     self.jun_start_ts, self.jun_end_ts,
-                                       'd', ['count', 'distance', 'duration', 'median_speed'], True)
+                                       'd', ['count', 'distance', 'duration', 'median_speed', 'mean_speed'], True)
         logging.debug(met_result)
 
         self.assertEqual(list(met_result.keys()), ['aggregate_metrics', 'user_metrics'])
-        self.assertEqual(len(met_result["user_metrics"]), 4)
-        self.assertEqual(len(met_result["aggregate_metrics"]), 4)
+        self.assertEqual(len(met_result["user_metrics"]), 5)
+        self.assertEqual(len(met_result["aggregate_metrics"]), 5)
 
         user_met_count_result = met_result['user_metrics'][0]
         agg_met_count_result = met_result['aggregate_metrics'][0]
@@ -99,17 +99,21 @@ class TestMetrics(unittest.TestCase):
         user_met_dur_result = met_result['user_metrics'][2]
         agg_met_dur_result = met_result['aggregate_metrics'][2]
 
-        user_met_spd_result = met_result['user_metrics'][3]
-        agg_met_spd_result = met_result['aggregate_metrics'][3]
+        user_met_old_spd_result = met_result['user_metrics'][4]
+        agg_met_old_spd_result = met_result['aggregate_metrics'][4]
 
-        self.assertEqual([len(ml) for ml in met_result["user_metrics"]], [2]*4)
-        self.assertEqual([len(ml) for ml in met_result["aggregate_metrics"]], [3]*4)
+        user_met_spd_result = met_result['user_metrics'][4]
+        agg_met_spd_result = met_result['aggregate_metrics'][4]
+
+        self.assertEqual([len(ml) for ml in met_result["user_metrics"]], [2]*5)
+        self.assertEqual([len(ml) for ml in met_result["aggregate_metrics"]], [3]*5)
         self.assertEqual([[m.nUsers for m in ml] for ml in met_result["user_metrics"]],
-            [[1, 1]]*4)
+            [[1, 1]]*5)
         self.assertEqual(user_met_count_result[0]["label_bike"], 2)
         self.assertAlmostEqual(user_met_dist_result[0]["label_bike"], 4305.02678, places=3)
         self.assertAlmostEqual(user_met_dur_result[0]["label_bike"], 2388.97132, places=3)
-        self.assertAlmostEqual(user_met_spd_result[0]["label_bike"], 1.98726, places=3)
+        self.assertAlmostEqual(user_met_old_spd_result[0]["label_bike"], 2.24535722467578, places=3)
+        self.assertAlmostEqual(user_met_spd_result[0]["label_bike"], 2.24535722467578, places=3)
 
     def testCountTimestampPartialMissingLabels(self):
         self.entries = json.load(open("emission/tests/data/real_examples/shankari_2016-07-22"), object_hook = bju.object_hook)
