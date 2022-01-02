@@ -445,13 +445,19 @@ class TestTripQueries(unittest.TestCase):
         labeled_df = all_df[all_df.mc == 100]
         inferred_df = all_df[all_df.mc == 30]
         naive_concat = pd.concat([labeled_df, inferred_df], axis=0)
-        logging.debug(naive_concat)
-        correct_concat = naive_concat.reindex(all_df.index)
-        logging.debug(correct_concat)
+        # The naive re-index fails with the error
+        # ValueError: cannot reindex from a duplicate axis
+        # since we have N/A entries for the labeled df entries
+        # We need to drop the N/A first as seen below
+        try:
+            correct_concat = naive_concat.reindex(all_df.index)
+        except ValueError as e:
+            logging.info(e)
 
         logging.debug("Testing concat with one dataframe empty and forced index")
         labeled_df = all_df[all_df.mc == 100].reindex(all_df.index)
         inferred_df = all_df[all_df.mc == 30]
+        labeled_df.dropna('index', how="all", inplace=True)
         naive_concat = pd.concat([labeled_df, inferred_df], axis=0)
         logging.debug(naive_concat)
         correct_concat = naive_concat.reindex(all_df.index)
