@@ -103,7 +103,8 @@ def group_by_local_date(user_id, from_dt, to_dt, freq, summary_fn_list):
         }
 
     groupby_arr = _get_local_group_by(freq)
-    time_grouped_df = section_df.groupby(groupby_arr)
+    adjusted_df = adjust_for_user_inputs_if_needed(section_df)
+    time_grouped_df = adjusted_df.groupby(groupby_arr)
     local_dt_fill_fn = _get_local_key_to_fill_fn(freq)
     return {
         "last_ts_processed": section_df.iloc[-1].start_ts,
