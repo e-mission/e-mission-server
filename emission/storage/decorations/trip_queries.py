@@ -301,7 +301,7 @@ def expand_finallabels(labeled_ct):
 
     # see testExpandFinalLabelsPandasFunctions for a step by step walkthrough of this section
     naive_concat = pd.concat([user_input_only, high_confidence_max_p_inferred_labels_only], axis=0)
-    print(naive_concat)
+    # print(naive_concat)
     label_only = naive_concat.reindex(labeled_ct.index)
 
     expanded_ct = pd.concat([labeled_ct, label_only], axis=1)
