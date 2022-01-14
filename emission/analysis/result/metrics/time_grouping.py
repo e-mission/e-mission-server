@@ -137,7 +137,7 @@ def grouped_to_summary(time_grouped_df, key_to_fill_fn, summary_fn):
         result_section_key = eac.get_section_key_for_analysis_results()
         if result_section_key == "analysis/confirmed_trip":
             import emission.storage.decorations.trip_queries as esdt
-            section_group_df = esdt.expand_userinputs(section_group_df)
+            section_group_df = esdt.expand_finallabels(section_group_df)
             # if none of the trips in the time grouping are labeled,
             # we add a dummy column
             # pandas checks in TestMetricsConfirmedTripsPandas.testPandasConcatModeConfirm
