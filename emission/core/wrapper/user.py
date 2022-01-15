@@ -330,7 +330,7 @@ class User(object):
         valid_replacement_pct = None
         score = None
     else:
-        invalid_replacement = ct_df_confirmed.user_input.apply(lambda ui: ui["mode_confirm"] == "pilot_ebike" and ("replaced_mode" not in ui or ui["replaced_mode"] == "pilot_ebike" or ui["replaced_mode"] == "same_mode"))
+        invalid_replacement = ct_df_confirmed.user_input.apply(lambda ui: ("mode_confirm" in ui and ui["mode_confirm"] == "pilot_ebike") and ("replaced_mode" not in ui or ui["replaced_mode"] == "pilot_ebike" or ui["replaced_mode"] == "same_mode"))
         invalid_replacement_freq = invalid_replacement.value_counts()
         print(invalid_replacement_freq)
         if invalid_replacement_freq.count() == 1:
