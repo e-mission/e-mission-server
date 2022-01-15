@@ -399,6 +399,39 @@ class TestTripQueries(unittest.TestCase):
             "expectation": {"to_label": False}
         })))
 
+    def testHasFinalLabelsDataFrame(self):
+        test_mixed_df = pd.DataFrame(
+            [{"user_input": {"mode_confirm": "bike", "purpose_confirm": "shopping"},
+            "expectation": {"to_label": True}}] * 3 +
+            [{"user_input": {}, "expectation": {"to_label": False},
+            "inferred_labels":
+                [{"labels": {"mode_confirm": "bike", "purpose_confirm": "shopping"}, "p": 0.1},
+                {"labels": {"mode_confirm": "walk", "purpose_confirm": "exercise"}, "p": 0.9}]
+            }] * 3 +
+            [{"user_input": {}, "expectation": {"to_label": True},
+            "inferred_labels":
+                [{"labels": {"mode_confirm": "bike", "purpose_confirm": "shopping"}, "p": 0.2},
+                {"labels": {"mode_confirm": "walk", "purpose_confirm": "exercise"}, "p": 0.4},
+                {"labels": {"mode_confirm": "drove_alone", "purpose_confirm": "work"}, "p": 0.4}]
+            }] * 3 +
+            [{"user_input": {}, "expectation": {"to_label": True}}] * 3)
+
+        has_user_labels_df = test_mixed_df[test_mixed_df.user_input != {}]
+        # only the actual user inputs will be counted in the old way
+        self.assertEqual(has_user_labels_df.shape[0], 3)
+
+        # print(test_mixed_df.apply(lambda row: print(row.user_input), axis=1))
+        self.assertEqual(np.count_nonzero(test_mixed_df.apply(
+            lambda row: esdt.has_final_labels(row), axis=1)), 6)
+
+        has_final_labels_df = test_mixed_df[test_mixed_df.apply(
+            lambda row: esdt.has_final_labels(row), axis=1)]
+        # the actual user inputs and to_label = false will be counted in the new way
+        self.assertEqual(has_final_labels_df.shape[0], 6)
+
+        self.assertEqual(esdt.has_final_labels_df(test_mixed_df).shape[0], 6)
+
+
     def testGetMaxProbLabel(self):
         self.assertEqual(esdt.get_max_prob_label([
             {'labels': {'mc': 30, 'pc': 40}, 'p': 0.9}]), {'mc': 30, 'pc': 40})
