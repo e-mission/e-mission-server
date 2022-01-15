@@ -2,6 +2,7 @@ import emission.core.get_database as edb
 import uuid
 import argparse
 
+import emission.core.wrapper.user as ecwu
 
 parser = argparse.ArgumentParser(prog="intake_single_user")
 group = parser.add_mutually_exclusive_group(required=True)

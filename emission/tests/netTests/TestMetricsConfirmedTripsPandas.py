@@ -2,8 +2,16 @@ import unittest
 import pandas as pd
 import numpy as np
 import logging
+import uuid
+import statistics
 
 import emission.storage.decorations.trip_queries as esdt
+import emission.storage.timeseries.abstract_timeseries as esta
+
+import emission.core.wrapper.trip as ecwt
+import emission.core.wrapper.entry as ecwe
+
+import emission.analysis.result.metrics.simple_metrics as earms
 
 class TestMetricsConfirmedTripsPandas(unittest.TestCase):
 

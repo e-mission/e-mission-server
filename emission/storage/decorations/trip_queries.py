@@ -207,11 +207,11 @@ def filter_labeled_trips(mixed_trip_df):
 
 def expand_userinputs(labeled_ct):
     """
-    labeled_ct: a dataframe that contains only labeled trips
+    labeled_ct: a dataframe that contains potentially mixed trips.
     Returns a dataframe with the labels expanded into the main dataframe
     If the labels are simple, single level kv pairs (e.g. {mode_confirm:
     bike}), the expanded columns can be indexed very simply, like the other
-    columns in the dataframe.
+    columns in the dataframe. Trips without labels are represented by N/A
 
     TODO: Replace by pandas.io.json.json_normalize?
     TODO: Currently duplicated from 
@@ -232,3 +232,83 @@ def expand_userinputs(labeled_ct):
     logging.debug(expanded_ct.head())
     return expanded_ct
 
+def has_final_labels(confirmed_trip_data):
+    return (confirmed_trip_data["user_input"] != {}
+            or confirmed_trip_data["expectation"]["to_label"] == False)
+
+def get_max_prob_label(inferred_label_list):
+    # Two columns: "labels" and "p"
+    label_prob_df = pd.DataFrame(inferred_label_list)
+    # logging.debug(label_prob_df)
+    # idxmax returns the index corresponding to the max data value in each column
+    max_p_idx = label_prob_df.p.idxmax()
+    # logging.debug(max_p_idx)
+    # now we look up the labels for that index
+    return label_prob_df.loc[max_p_idx].labels
+
+def expand_finallabels(labeled_ct):
+    """
+    labeled_ct: a dataframe that contains potentially mixed trips.
+    Returns a dataframe with the user input labels and the high confidence
+    inferred labels expanded into the main dataframe.  If the labels are
+    simple, single level kv pairs (e.g. {mode_confirm: bike}), the expanded columns
+    can be indexed very simply, like the other columns in the dataframe. Trips
+    without labels are represented by N/A
+    """
+    if len(labeled_ct) == 0:
+        return labeled_ct
+    user_input_only = pd.DataFrame(labeled_ct.user_input.to_list(), index=labeled_ct.index)
+    # Drop entries that are blank so we don't end up with duplicate entries in the concatenated dataframe.
+    # without this change, concat might involve N/A rows from user entries,
+    # inserted because the index is specified manually
+    # then if they have high confidence entries, we will end up with
+    # duplicated entries for N/A and the yellow labels
+    user_input_only.dropna('index', how="all", inplace=True)
+    logging.debug("user_input_only %s" % user_input_only.head())
+
+    # see testExpandFinalLabelsPandasFunctionsNestedPostFilter for a step by step
+    # walkthrough of how this section works. Note that
+    # testExpandFinalLabelsPandasFunctionsNestedPostFilter has an alternate
+    # implementation that we don't choose because it generates a UserWarning
+
+    # Note that we could have entries that have both user inputs and high
+    # confidence inferred values. This could happen if the user chooses to go
+    # into "All Labels" and label high-confidence values. That's why the
+    # algorithm
+    # https://github.com/e-mission/e-mission-docs/issues/688#issuecomment-1000981037
+    # specifies that we look for inferred values only if the user input does
+    # not exist
+    expectation_expansion = pd.DataFrame(labeled_ct.expectation.to_list(), index=labeled_ct.index)
+    high_confidence_no_userinput_df = labeled_ct[
+        (labeled_ct.user_input == {}) & (expectation_expansion.to_label == False)
+    ]
+    high_confidence_no_userinput_df.dropna('index', how="all", inplace=True)
+    if len(high_confidence_no_userinput_df) > 0:
+        high_confidence_inferred_labels = high_confidence_no_userinput_df.inferred_labels
+        high_confidence_max_p_inferred_labels = high_confidence_inferred_labels.apply(get_max_prob_label)
+        high_confidence_max_p_inferred_labels_only = pd.DataFrame(
+                high_confidence_max_p_inferred_labels.to_list(),
+                index=high_confidence_inferred_labels.index)
+        logging.debug("high confidence inferred %s" % high_confidence_max_p_inferred_labels_only.head())
+
+        assert pd.Series(labeled_ct.loc[
+                high_confidence_max_p_inferred_labels_only.index].user_input == {}).all(), \
+            ("Did not filter out all user inputs before expanding high confidence labels %s" %
+                labeled_ct.loc[high_confidence_max_p_inferred_labels_only.index].user_input)
+    else:
+        high_confidence_max_p_inferred_labels_only = pd.DataFrame()
+
+
+    # see testExpandFinalLabelsPandasFunctions for a step by step walkthrough of this section
+    naive_concat = pd.concat([user_input_only, high_confidence_max_p_inferred_labels_only], axis=0)
+    # print(naive_concat)
+    label_only = naive_concat.reindex(labeled_ct.index)
+
+    expanded_ct = pd.concat([labeled_ct, label_only], axis=1)
+    assert len(expanded_ct) == len(labeled_ct), \
+        ("Mismatch after expanding labels, expanded_ct.rows = %s != labeled_ct.columns %s" %
+            (len(expanded_ct), len(labeled_ct)))
+    logging.debug("After expanding, columns went from %s -> %s" %
+        (len(labeled_ct.columns), len(expanded_ct.columns)))
+    logging.debug(expanded_ct.head())
+    return expanded_ct
