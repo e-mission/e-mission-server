@@ -236,6 +236,15 @@ def has_final_labels(confirmed_trip_data):
     return (confirmed_trip_data["user_input"] != {}
             or confirmed_trip_data["expectation"]["to_label"] == False)
 
+# Create an alternate method to work on the dataframe column-wise
+# instead of iterating over each individual row for improved performance
+def has_final_labels_df(df):
+    # print(df.expectation)
+    # print(pd.DataFrame(df.expectation.to_list(), index=df.index))
+    to_list_series = pd.DataFrame(df.expectation.to_list(), index=df.index).to_label
+    return df[(df.user_input != {})
+            | (to_list_series == False)]
+
 def get_max_prob_label(inferred_label_list):
     # Two columns: "labels" and "p"
     label_prob_df = pd.DataFrame(inferred_label_list)
