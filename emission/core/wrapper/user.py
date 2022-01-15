@@ -10,6 +10,7 @@ from past.utils import old_div
 import json
 import logging
 import emission.storage.timeseries.abstract_timeseries as esta
+import emission.storage.decorations.trip_queries as esdt
 import emission.storage.timeseries.timequery as estt
 import emission.core.wrapper.motionactivity as ecwm
 import arrow
@@ -323,7 +324,7 @@ class User(object):
     ct_df = ts.get_data_df("analysis/confirmed_trip", time_query=None)
     if ct_df.shape[0] <= 0:
       return (0, None, None)
-    ct_df_confirmed = ct_df[ct_df.user_input != {}]
+    ct_df_confirmed = esdt.has_final_labels_df(ct_df)
     confirmed_pct = (ct_df_confirmed.shape[0] * 100)/ ct_df.shape[0]
     if ct_df_confirmed.shape[0] <= 0:
         valid_replacement_pct = None
