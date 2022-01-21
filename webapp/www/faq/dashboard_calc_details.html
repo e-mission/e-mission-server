@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>FAQ | Can Do Colorado eBike Program </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom fonts for this template -->
+    <link rel="stylesheet" href="../vendor/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../vendor/simple-line-icons/css/simple-line-icons.css">
+    <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Catamaran:100,200,300,400,500,600,700,800,900" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Muli" rel="stylesheet">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../device-mockups/device-mockups.min.css">
+
+    <!-- Custom styles for this template -->
+    <link href="../css/new-age.css" rel="stylesheet">
+	<link href="../css/style.css" rel="stylesheet">
+
+  </head>
+  <style>
+    .batteryTable { border-collapse:collapse; }
+    .batteryTable th { background-color: #000; color: white; border:1px solid black; text-align:center}
+    .batteryTable td, .myTable th { border:1px solid #000; text-align:center}
+    a {color:blue;}
+  </style>
+
+  <body id="page-top">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top" id="mainNav">
+      <div class="container">
+        <a class="navbar-brand js-scroll-trigger" href="https://www.canbikeco.org">Can Do Colorado eBike Program</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          Menu
+          <i class="fa fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="https://dashboard.canbikeco.org">Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#page-top">Installation</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="faq.html">FAQ</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="hybrid_labeling.html">New labeling procedure!</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="privacy.html">Privacy</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="mailto:k.shankari@nrel.gov">Contact Us!</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <section class="download bg-primary text-center" id="faq">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-10 mx-auto" style="text-align: left;">
+            <h2 class="section-heading" style="text-align: center;"><strong>Dashboard calculation details</strong></h2>
+			  <p></p>
+
+<h3>Carbon footprint calculation</h3>
+Computing the carbon footprint of transportation is tricky to do in sufficient
+detail. At a high level, the computation involves two components.
+<ol>
+<li> The distance travelled</li>
+<li> The energy consumed per unit distance</li>
+</ol>
+We also provide two comparison metrics to frame this number in a larger
+context. The US outlined <a href="https://www.whitehouse.gov/wp-content/uploads/2021/10/US-Long-Term-Strategy.pdf">ambitious goals for CO<sub><small>2</small></sub> reduction
+of 50% below 2005 levels by 2030 and net-zero by 2050</a>. We use the baseline
+2005 GHG emission estimates and 2050 carbon credits to compute the US-wide
+carbon budget for those years. We then use population growth estimates to
+compute the per-capita GHG emission target for those years, assuming all
+sectors decarbonize equally. 
+</ol>
+<h3>GHG emission table</h3>
+The GHG emission table below uses energy values from the Transportation Energy
+Data Book (TEDB). It converts them to emission values by:
+<ul>
+<li> using the <a href="https://www.eia.gov/environment/emissions/co2_vol_mass.php">EIA carbon dioxide equivalents</a> for fossil fuel vehicles
+<li> using the <a href="https://www.epa.gov/egrid/power-profiler#/RMPA">EPA eGrid dataset for Colorado (retrieved Spring 2021)</a> for electric vehicles
+</ul>
+
+This is the same calculation that is used for the aggregate dashboard metrics,
+with the exception of the per-trip rebalancing cost of shared micromobility.
+Shared micromobility is a small fraction of the mode share in this project, so
+the impact of the omission is small.
+<p>
+<code>
+energy/PMT = e; 1 mile = 1.6 km; energy/PkmT = e/1.6
+lbs/energy = l; energy/PkmT = e/1.6; lbs/PkmT = (e * l)/1.6
+lbs/PkmT = (e * l)/1.6; 1 kg = 2.2 lb; kg/PkmT = (e * l)/(1.6 * 2.2)
+</code>
+
+<p>
+The actual calculations are:
+
+<table class="batteryTable">
+<tr><th>Mode</th><th>energy/PMT</th><th>lbs/energy</th><th>kg/PkmT</th><th>Notes</th></tr>
+<tr><td>walk</td><td>0</td><td>0</td><td>0</td>
+<td>We assume that people don't exhale more or eat more because they walk</td></tr>
+<!-- <tr><td>scoot/rollerblade</td><td>0</td>
+<td>Similar to above</td></tr> -->
+<tr><td>bike</td><td>0</td><td>0</td><td>0</td>
+<td>Since we are looking at ongoing behaviour, we ignore one-time manufacturing costs</td></tr>
+<tr><td>bus</td><td>4560 BTU/PMT</td><td>161.30 per million BTU</td><td>(4560 * (161.30/1000000))/(1.6*2.2) = 0.20727</td>
+<td><i>Transit bus</i> from the TEDB</td></tr>
+<tr><td>free_shuttle_</td><td>4560 BTU/PMT</td><td>161.30 per million BTU</td><td>(4560 * (161.30/1000000))/(1.6*2.2) = 0.20727</td>
+<td>Same as bus</td></tr>
+<tr><td>drive_alone</td><td>5170 BTU/PMT</td><td>157.20 lb per million BTU</td><td>(5170 * (157.20/1000000))/(1.6*2.2) = 0.22031</td>
+<td>Mean per *VMT* of cars and trucks from the TEDB. We don’t consider the load factor since the user traveled alone</td></tr>
+<tr><td>shared_ride</td><td>2585 BTU/PMT</td><td>157.20 lb per million BTU</td> <td>(2585 * (157.20/1000000))/(1.6*2.2) = 0.11015</td>
+<td><i>drive_alone</i> divided by 2. We can use a load factor of 2 instead of the 1.5 in the TEDB since we know this is a shared ride.</td></tr>
+<tr><td>taxi</td><td>7214 BTU/PMT</td><td>157.20 lb per million BTU</td> <td>(7214 * (157.20/1000000))/(1.6*2.2) = 0.30741</td>
+<td><i>car_pmt</i> + <i>car_vmt</i> see note below</i></td></tr>
+<tr><td>air</td><td>2341 BTU/PMT</td><td>159.25 lb per million BTU</td><td>(2341 * (159.25/1000000))/(1.6*2.2) = .09975</td>
+<td>We don't currently use air as a label, but it would be good to have it for the optimal carbon footprint calculations.</td></tr>
+<tr><td>train</td><td>1252 BTU/PMT = 0.37 kWh/PMT</td><td>1166 lb per MWH</td><td>(0.37 * (1166/1000))/(1.6*2.2) = 0.12256</td>
+<td>Denver light rail specific number from Figure 7.03 from the TEDB.</td></tr>
+<tr><td>pilot_ebike</td><td>0.022 kWh/PMT</td><td>1166 lb per MWH</td><td>(0.022 * (1166/1000))/(1.6*2.2) = 0.00728</td>
+<td>TEDB does not have micromobility estimates, so we use a <a href="https://doi.org/10.1016/j.trd.2021.103012">prior NREL publication</a> instead</td></tr>
+<tr><td>pilot_ebike</td><td>0.022 kWh/PMT</td><td>1166 lb per MWH</td><td>(0.022 * (1166/1000))/(1.6*2.2) = 0.00728</td>
+<td>TEDB does not have micromobility estimates, so we use a <a href="https://doi.org/10.1016/j.trd.2021.103012">prior NREL publication</a> instead</td></tr>
+<tr><td>bikeshare</td><td>0 kWh/PMT + 0.09 kWh/trip</td><td>1166 lb per MWH</td><td>(0 * (1166/1000))/(1.6*2.2) = 0</td>
+<td>Manual (human-powered) dock-based shared bicycles. We currently ignore the per-trip impact.</td></tr>
+<tr><td>scootershare</td><td>0.027 kWh/PMT + 0.0041 kWh/trip</td><td>1166 lb per MWH</td><td>(0.027 * (1166/1000))/(1.6*2.2) = 0.00894</td>
+<td>TEDB does not have micromobility estimates, so we use a <a href="https://doi.org/10.1016/j.trd.2021.103012">prior NREL publication</a> instead. Note that we currently ignore the per-trip component.</td></tr>
+</table>
+
+The taxi/uber/lyft value requires some explanation. The TEDB has a value for
+demand response which matches the taxi mobility model, but combines data from
+cars and small vans. So, we use the driving mode, with an additional penalty
+for deadheading. Current estimates indicate that <a
+href="https://www.sciencedirect.com/science/article/pii/S0965856419310985">50%
+of TNC travel is deadheading</a>. We assume the driving EI and load factor for
+the productive travel and add on an equivalent distance with a load factor of 1
+for deadheading. This gives us an overall value of 7214 BTU/PMT = 2840 (driving
+BTU/PMT) + 4374 (driving BTU/VMT).  We use the car VMT, not the mean of car and
+truck as we do for the other automobile modes, since taxis are typically not
+trucks.
+
+<h3>Comparison data</h3>
+Current US goals, per "The Long Term Strategy of the United States" are:
+
+<ol>
+<li> 50% reduction below 2005 levels by 2030. 2005 levels are ~ 2Gt (Figure 4). So the 2030 transportation sector goal is 1 Gt
+<li> 100% net zero by 2050. The net zero goal relies on around 1Gt of negative emissions (page 6, figure ES-2). So the actual emissions target is 1Gt in 2050. The transportation sector accounts for 29% of current emissions (page 30). Assuming that all sectors decarbonize proportionally, the transportation sector emissions should be ~ 0.3 Gt in 2050.
+</ol>
+
+US population estimates and projections are from the International Population Database (https://www.census.gov/programs-surveys/international-programs/about/idb.html). The "Tables" view is particularly useful to obtain the granular estimates that we need.
+
+We estimate the per capita values using:
+<p>
+<code>
+per capita kg CO2e/wk = (1,000,000,000 * 1000 * GTCO2e) / (population * 52)
+</code>
+
+<table class="batteryTable">
+<tr><th>Time</th><th>Yearly GT CO2e</th><th>Population</th><th>Per Capita kgCO2e/wk</th></tr>
+<tr><td>Baseline (2005)</td><td>2</td><td>295,516,599</td><td>(1000000000 * 1000 * 2) / (295516599 * 52) = 130</td></tr>
+<tr><td>Short-term goal (2030)</td><td>1</td><td>355,100,730</td><td>(1000000000 * 1000 * 1) / (355,100,730 * 52) = 54</td></tr>
+<tr><td>Long-term goal (2050)</td><td>0.3</td><td>388,922,201</td><td>(1000000000 * 1000 * 0.3) / (388922201 * 52) = 14</td></tr>
+</table>
+
+
+<h4>Calorie Calulations</h4>
+We use calorie calculations based on Metabolic Equivalents (MET) from the <a href="https://sites.google.com/site/compendiumofphysicalactivities/home">Compendium of Physical Activities</a>. The standard compendium does not include e-bikes, so we use this recent article <a href="https://journals.lww.com/acsm-tj/Fulltext/2021/04150/Metabolic_and_Cardiovascular_Responses_to_a.5.aspx?context=LatestArticles">for e-bikes only</a>.
+</body>
+</html>
