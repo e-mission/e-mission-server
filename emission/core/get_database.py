@@ -21,8 +21,20 @@ url = config_data["timeseries"]["url"]
 result_limit = config_data["timeseries"]["result_limit"]
 config_file.close()
 
+try:
+    parsed=pymongo.uri_parser.parse_uri(url)
+except:
+    print("URL not formatted, defaulting to \"Stage_database\"")
+    db_name = "Stage_database"
+else:
+    if parsed['database']:
+        db_name = parsed['database']
+    else:
+        print("URL does not specify a DB name, defaulting to \"Stage_database\"")
+        db_name = "Stage_database"
+
 print("Connecting to database URL "+url)
-_current_db = MongoClient(url).Stage_database
+_current_db = MongoClient(url)[db_name]
 #config_file.close()
 
 def _get_current_db():
