@@ -22,6 +22,8 @@ import emission.net.usercache.formatters.common as fc
 import attrdict as ad
 import emission.storage.decorations.local_date_queries as ecsdlq
 
+import emission.core.common as ecc
+
 def format(entry):
     assert(entry.metadata.key == "background/location" or 
             entry.metadata.key == "background/filtered_location")
@@ -40,7 +42,11 @@ def format_location_raw(entry):
 
     metadata = entry.metadata
     metadata.time_zone = "America/Los_Angeles"
-    metadata.write_ts = old_div(float(entry.metadata.write_ts), 1000)
+    # Hack to deal with milliseconds until we have moved everything over
+    if ecc.isMillisecs(entry.metadata.write_ts):
+        metadata.write_ts = old_div(float(entry.metadata.write_ts), 1000)
+    else:
+        metadata.write_ts = entry.metadata.write_ts
     fc.expand_metadata_times(metadata)
     formatted_entry.metadata = metadata
 
@@ -48,7 +54,12 @@ def format_location_raw(entry):
     data.latitude = entry.data.mLatitude
     data.longitude = entry.data.mLongitude
     data.loc = geojson.Point((data.longitude, data.latitude))
-    data.ts = old_div(float(entry.data.mTime), 1000) # convert the ms from the phone to secs
+    # Hack to deal with milliseconds until we have moved everything over
+    if ecc.isMillisecs(entry.data.mTime):
+        data.ts = old_div(float(entry.data.mTime), 1000)
+    else:
+        data.ts = entry.data.mTime
+    # data.ts = old_div(float(entry.data.mTime), 1000) # convert the ms from the phone to secs
     fc.expand_data_times(data, metadata)
     data.altitude = entry.data.mAltitude
     data.accuracy = entry.data.mAccuracy
