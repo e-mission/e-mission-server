@@ -9,7 +9,8 @@ import emission.core.common as ecc
 class OriginDestinationSimilarity(SimilarityMetric):
     """
     similarity metric which compares, for two trips, 
-    the distance for origin to origin, and destination to destination
+    the distance for origin to origin, and destination to destination,
+    in meters.
     """
     
     def extract_features(self, trip: Confirmedtrip) -> List[float]:
