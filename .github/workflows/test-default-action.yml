@@ -31,3 +31,6 @@ jobs:
       run: |
         echo Add other actions to build,
         echo test, and deploy your project.
+
+    - name: coverage.py badge
+      uses: tj-actions/coverage-badge-py@v1.8
