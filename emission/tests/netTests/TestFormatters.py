@@ -37,17 +37,19 @@ class TestFormatters(unittest.TestCase):
         self.assertTrue(formatted_entry.data.fmt_time.startswith("2015-07-13T15:26:00.493"))
 
     def testConvertLocation(self):
-        with open("emission/tests/data/netTests/android.location.raw.txt") as fp:
+        with open("emission/tests/data/netTests/android.location.txt") as fp:
             entry = json.load(fp)
         formatted_entry = enuf.convert_to_common_format(ad.AttrDict(entry))
-        self.assertEqual(formatted_entry.data.accuracy, 52.5)
-        self.assertEqual(formatted_entry.data.latitude, 37.3885529)
-        self.assertEqual(formatted_entry.data.longitude, -122.0879696)
-        self.assertEqual(formatted_entry.data.loc, geojson.Point((-122.0879696, 37.3885529)))
-        self.assertEqual(formatted_entry.data.ts, 1436826356.852)
-        self.assertTrue(formatted_entry.data.fmt_time.startswith("2015-07-13T15:25:56.852"))
-        self.assertEqual(formatted_entry.metadata.write_ts, 1436826357.115)
-        self.assertTrue(formatted_entry.metadata.write_fmt_time.startswith("2015-07-13T15:25:57.115"))
+        self.assertEqual(formatted_entry.data.accuracy, 28.944)
+        self.assertEqual(formatted_entry.data.latitude, 39.5974003)
+        self.assertEqual(formatted_entry.data.longitude, -104.9823262)
+        self.assertEqual(formatted_entry.data.loc, geojson.Point((-104.9823262, 39.5974003)))
+        self.assertEqual(formatted_entry.data.ts, 1617913865)
+        self.assertTrue(formatted_entry.data.fmt_time.startswith("2021-04-08T14:31:05"),
+            "Found formatted time %s" % formatted_entry.data.fmt_time)
+        self.assertEqual(formatted_entry.metadata.write_ts, 1617919770.084)
+        self.assertTrue(formatted_entry.metadata.write_fmt_time.startswith("2021-04-08T16:09:30.084"),
+            "Found formatted metadata time %s" % formatted_entry.metadata.write_fmt_time)
 
     def testConvertTransition(self):
         with open("emission/tests/data/netTests/android.transition.txt") as fp:
