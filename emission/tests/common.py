@@ -154,7 +154,7 @@ def setupRealExampleWithEntries(testObj):
 def setupIncomingEntries():
     with open("emission/tests/data/netTests/android.activity.txt") as aaef:
         activity_entry = json.load(aaef)
-    with open("emission/tests/data/netTests/android.location.raw.txt") as alef:
+    with open("emission/tests/data/netTests/android.location.txt") as alef:
         location_entry = json.load(alef)
     with open("emission/tests/data/netTests/android.transition.txt") as atef:
         transition_entry = json.load(atef)
