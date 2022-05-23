@@ -1,0 +1,28 @@
+{
+    "_id": {
+        "$oid": "607f5e4d54cdb2d8bf073d6e"
+    },
+    "metadata": {
+        "key": "background/location",
+        "platform": "android",
+        "read_ts": 0,
+        "time_zone": "America/Denver",
+        "type": "sensor-data",
+        "write_ts": 1617919770.084
+    },
+    "user_id": {
+        "$uuid": "73c7bf7e25524a6db21162190d2322e2"
+    },
+    "data": {
+        "accuracy": 28.944,
+        "altitude": 1649.0229115940374,
+        "bearing": 98,
+        "elapsedRealtimeNanos": 9978889615940,
+        "filter": "time",
+        "fmt_time": "Apr 8, 2021 2:31:05 PM",
+        "latitude": 39.5974003,
+        "longitude": -104.9823262,
+        "sensed_speed": 6.62,
+        "ts": 1617913865
+    }
+}
