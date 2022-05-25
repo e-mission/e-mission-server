@@ -60,6 +60,21 @@ class TestFormatters(unittest.TestCase):
         self.assertEqual(formatted_entry.metadata.write_ts, 1436821510.445)
         self.assertTrue(formatted_entry.data.fmt_time.startswith("2015-07-13T14:05:10.445"))
 
+    # The survey has an XML result embedded in it, so let's test it separately
+    def testConvertSurvey(self):
+        with open("emission/tests/data/netTests/survey.txt") as fp:
+            entry = json.load(fp)
+        formatted_entry = enuf.convert_to_common_format(ad.AttrDict(entry))
+        self.assertEqual(formatted_entry.data.version, 1)
+        self.assertEqual(formatted_entry.data.name, "UserProfileSurvey")
+        self.assertEqual(len(formatted_entry.data.xmlResponse), 1290)
+        self.assertTrue(formatted_entry.data.fmt_time.startswith("2022-05-24"),
+            "fmt_time is %s" % formatted_entry.data.fmt_time)
+        self.assertEqual(formatted_entry.data.jsonDocResponse.data.group_lm5fq00.driver_licence, "no",
+            "group is %s" % formatted_entry.data.jsonDocResponse.data.group_lm5fq00)
+        self.assertEqual(formatted_entry.data.jsonDocResponse.data.group_uy6od86.employment, "not_currently_",
+            "group is %s" % formatted_entry.data.jsonDocResponse.data.group_uy6od86)
+
     def testFlagsToEnumOneEntry(self):
         import emission.net.usercache.formatters.ios.motion_activity as ioma
         with open("emission/tests/data/netTests/ios.activity.txt") as fp:
