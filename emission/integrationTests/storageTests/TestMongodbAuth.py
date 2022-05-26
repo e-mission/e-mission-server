@@ -17,6 +17,9 @@
 # automatically run test anyway
 
 
+# Admin user with username "admin" and password "pass" must be entered via the mongo shell manually
+# Tests can only be run one at a time
+
 from __future__ import unicode_literals
 from __future__ import print_function
 from __future__ import division
@@ -37,7 +40,8 @@ import os
 
 class TestMongodbAuth(unittest.TestCase):
     def setUp(self):
-        self.admin_default = pymongo.MongoClient('localhost').admin
+        self.admin_default = pymongo.MongoClient('localhost', username="admin", 
+                     password="pass",).admin
         self.test_username = "test-admin"
         self.test_password = "test-admin-password"
         self.uuid = uuid.uuid4()
@@ -65,14 +69,15 @@ class TestMongodbAuth(unittest.TestCase):
     def configureDB(self, url):
         config = {
             "timeseries": {
-                "url": url
+                "url": url,
+                "result_limit": 250000
             }
         }
         with open(self.db_conf_file, "w") as fp:
             json.dump(config, fp, indent=4)
 
-    def getURL(self, username, password):
-        return "mongodb://%s:%s@localhost/admin?authMechanism=SCRAM-SHA-1" % (username, password)
+    def getURL(self, username, password, dbname="admin"):
+        return "mongodb://%s:%s@localhost/%s?authSource=admin&authMechanism=SCRAM-SHA-1" % (username, password, dbname)
 
     def testCreateAdmin(self):
         result = self.admin_auth.command({"usersInfo": self.test_username})
@@ -96,7 +101,7 @@ class TestMongodbAuth(unittest.TestCase):
             self.assertEqual(len(result['users']), 1)
             self.assertEqual(result['users'][0]['user'], rw_username)
 
-            self.configureDB(self.getURL(rw_username, rw_password))
+            self.configureDB(self.getURL(rw_username, rw_password, "Stage_database"))
 
             import emission.tests.storageTests.analysis_ts_common as etsa
             import emission.storage.decorations.analysis_timeseries_queries as esda
@@ -151,7 +156,7 @@ class TestMongodbAuth(unittest.TestCase):
             self.assertEqual(len(result['users']), 1)
             self.assertEqual(result['users'][0]['user'], ro_username)
 
-            self.configureDB(self.getURL(ro_username, ro_password))
+            self.configureDB(self.getURL(ro_username, ro_password, "Stage_database"))
 
             import emission.tests.storageTests.analysis_ts_common as etsa
             import emission.storage.decorations.analysis_timeseries_queries as esda
@@ -171,6 +176,100 @@ class TestMongodbAuth(unittest.TestCase):
             with self.assertRaises(pymongo.errors.OperationFailure):
                 edb.get_analysis_timeseries_db().delete_many({'user_id': self.testUserId})
             self.stagedb_auth.command({"dropAllRolesFromDatabase": 1})
+
+    def testReadWriteUser_CustomDB(self):
+        custDB = "test_dbname"
+        try:
+            rw_username = "test-rw-cust"
+            rw_password = "test-rw-password-cust"
+            self.admin_auth.command(
+              {
+                "createUser": rw_username,
+                "pwd": rw_password,
+                "roles": [ { "role": "readWrite", "db": custDB } ]
+              }
+            )
+            result = self.admin_auth.command({"usersInfo": rw_username})
+            self.assertEqual(result['ok'], 1.0)
+            self.assertEqual(len(result['users']), 1)
+            self.assertEqual(result['users'][0]['user'], rw_username)
+
+            self.configureDB(self.getURL(rw_username, rw_password, custDB))
+
+            import emission.tests.storageTests.analysis_ts_common as etsa
+            import emission.storage.decorations.analysis_timeseries_queries as esda
+            import emission.core.wrapper.rawplace as ecwrp
+            import emission.storage.timeseries.abstract_timeseries as esta
+
+            ts = esta.TimeSeries.get_time_series(self.uuid)
+            etsa.createNewPlaceLike(self, esda.RAW_PLACE_KEY, ecwrp.Rawplace)
+     
+            inserted_df = ts.get_data_df(esda.RAW_PLACE_KEY)
+            self.assertEqual(len(inserted_df), 1)
+            self.assertEqual(len(ts.get_data_df(esda.CLEANED_PLACE_KEY)), 0)
+        finally:
+            import emission.core.get_database as edb
+
+            edb.get_analysis_timeseries_db().delete_many({'user_id': self.testUserId})
+
+    def testReadOnlyUser_CustomDB(self):
+        custDB = "test_dbname"
+        try:
+            ro_username = "test-ro-cust"
+            ro_password = "test-ro-password-cust"
+            self.custdb_auth = pymongo.MongoClient(self.getURL(self.test_username, self.test_password))[custDB]
+            # self.custdb_auth.command(
+            #   {
+            #     "createRole": "createIndex",
+            #      "privileges": [
+            #         { "resource": { "db": custDB, "collection": "" },
+            #                         "actions": [ "createIndex"] }
+            #       ],
+            #       "roles": []
+            #   }
+            # )
+            role_result = self.custdb_auth.command({ "rolesInfo": 1, "showBuiltinRoles": False, "showPrivileges": True})
+            logging.debug("role_result = %s" % role_result)
+            self.assertEqual(role_result['ok'], 1.0)
+            self.assertEqual(len(role_result['roles']), 1)
+            self.assertEqual(role_result['roles'][0]['role'], "createIndex")
+            self.assertEqual(role_result['roles'][0]['db'], custDB)
+            self.assertEqual(len(role_result['roles'][0]['privileges']), 1)
+            self.assertEqual(role_result['roles'][0]['privileges'][0]["actions"], ["createIndex"])
+
+            self.admin_auth.command(
+              {
+                "createUser": ro_username,
+                "pwd": ro_password,
+                "roles": [ { "role": "read", "db": custDB },
+                           { "role": "createIndex", "db": custDB} ]
+              }
+            )
+            result = self.admin_auth.command({"usersInfo": ro_username})
+            self.assertEqual(result['ok'], 1.0)
+            self.assertEqual(len(result['users']), 1)
+            self.assertEqual(result['users'][0]['user'], ro_username)
+
+            self.configureDB(self.getURL(ro_username, ro_password, custDB))
+
+            import emission.tests.storageTests.analysis_ts_common as etsa
+            import emission.storage.decorations.analysis_timeseries_queries as esda
+            import emission.core.wrapper.rawplace as ecwrp
+            import emission.storage.timeseries.abstract_timeseries as esta
+
+            ts = esta.TimeSeries.get_time_series(self.uuid)
+            with self.assertRaises(pymongo.errors.OperationFailure):
+                etsa.createNewPlaceLike(self, esda.RAW_PLACE_KEY, ecwrp.Rawplace)
+     
+            inserted_df = ts.get_data_df(esda.RAW_PLACE_KEY)
+            self.assertEqual(len(inserted_df), 0)
+            self.assertEqual(len(ts.get_data_df(esda.CLEANED_PLACE_KEY)), 0)
+        finally:
+            import emission.core.get_database as edb
+
+            with self.assertRaises(pymongo.errors.OperationFailure):
+                edb.get_analysis_timeseries_db().delete_many({'user_id': self.testUserId})
+            self.custdb_auth.command({"dropAllRolesFromDatabase": 1})
 
 if __name__ == '__main__':
     # import emission.tests.common as etc
