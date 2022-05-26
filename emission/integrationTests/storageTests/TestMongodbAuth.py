@@ -218,16 +218,16 @@ class TestMongodbAuth(unittest.TestCase):
             ro_username = "test-ro-cust"
             ro_password = "test-ro-password-cust"
             self.custdb_auth = pymongo.MongoClient(self.getURL(self.test_username, self.test_password))[custDB]
-            # self.custdb_auth.command(
-            #   {
-            #     "createRole": "createIndex",
-            #      "privileges": [
-            #         { "resource": { "db": custDB, "collection": "" },
-            #                         "actions": [ "createIndex"] }
-            #       ],
-            #       "roles": []
-            #   }
-            # )
+            self.custdb_auth.command(
+              {
+                "createRole": "createIndex",
+                 "privileges": [
+                    { "resource": { "db": custDB, "collection": "" },
+                                    "actions": [ "createIndex"] }
+                  ],
+                  "roles": []
+              }
+            )
             role_result = self.custdb_auth.command({ "rolesInfo": 1, "showBuiltinRoles": False, "showPrivileges": True})
             logging.debug("role_result = %s" % role_result)
             self.assertEqual(role_result['ok'], 1.0)
