@@ -10,6 +10,7 @@ import traceback
 
 # Variables to change
 
+DB_NAME="Stage_database"
 DB_HOST="localhost"
 ADMIN_USERNAME="test-admin"
 ADMIN_PASSWORD="test-admin-pw"
@@ -63,7 +64,7 @@ class SetupDBAuth(object):
           {
             "createUser": RW_USERNAME,
             "pwd": RW_PASSWORD,
-            "roles": [ { "role": "readWrite", "db": "Stage_database" } ]
+            "roles": [ { "role": "readWrite", "db": DB_NAME } ]
           }
         )
         print("Created RW user, result = %s" % create_result)
@@ -84,12 +85,12 @@ class SetupDBAuth(object):
 
     def setupROUser(self):
         self.stagedb_auth = pymongo.MongoClient(
-            self.getURL(ADMIN_USERNAME, ADMIN_PASSWORD)).Stage_database
+            self.getURL(ADMIN_USERNAME, ADMIN_PASSWORD))[DB_NAME]
         create_role_result = self.stagedb_auth.command(
           {
             "createRole": "createIndex",
              "privileges": [
-                { "resource": { "db": "Stage_database", "collection": "" },
+                { "resource": { "db": DB_NAME, "collection": "" },
                                 "actions": [ "createIndex"] }
               ],
               "roles": []
@@ -102,8 +103,8 @@ class SetupDBAuth(object):
           {
             "createUser": RO_USERNAME,
             "pwd": RO_PASSWORD,
-            "roles": [ { "role": "read", "db": "Stage_database" },
-                       { "role": "createIndex", "db": "Stage_database"} ]
+            "roles": [ { "role": "read", "db": DB_NAME },
+                       { "role": "createIndex", "db": DB_NAME} ]
           }
         )
         print("Created RO user, result = %s" % create_result)
@@ -112,7 +113,7 @@ class SetupDBAuth(object):
     def teardownROUser(self):
         try:
             self.stagedb_auth = pymongo.MongoClient(
-                self.getURL(ADMIN_USERNAME, ADMIN_PASSWORD)).Stage_database
+                self.getURL(ADMIN_USERNAME, ADMIN_PASSWORD))[DB_NAME]
             drop_role_result = self.stagedb_auth.command(
               {
                 "dropRole": "createIndex"
