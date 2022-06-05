@@ -1,0 +1,68 @@
+{
+    "_id": {
+        "$oid": "628d7f758f39cb68214d76e3"
+    },
+    "metadata": {
+        "key": "manual/demographic_survey",
+        "platform": "android",
+        "read_ts": 0,
+        "time_zone": "America/Los_Angeles",
+        "type": "message",
+        "write_ts": 1653440358.709
+    },
+    "user_id": {
+        "$uuid": "e595f8635c27495e9a578e55f9c3a12c"
+    },
+    "data": {
+        "label": "Answered",
+        "name": "UserProfileSurvey",
+        "version": 1,
+        "xmlResponse": "<data xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:odk=\"http://www.opendatakit.org/xforms\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"snapshot_xml\">\n          <start>2022-05-24T17:57:54.320-07:00</start>\n          <end>2022-05-24T17:57:54.320-07:00</end>\n          <today>2022-05-23</today>\n          <deviceid>deviceid not found</deviceid>\n          <group_uy6od86>\n            <age>5_minus</age>\n            <gender>others</gender>\n            <home_location_001>FiFi</home_location_001>\n            <employment>not_currently_</employment>\n            <work_location>Mimi</work_location>\n            <study>study_full_time</study>\n            <school_location>Preschool</school_location>\n          </group_uy6od86>\n          <group_my6jo52>\n            <hh_size>1</hh_size>\n            <num_workers>0</num_workers>\n            <num_adults>0</num_adults>\n            <num_kids>1</num_kids>\n          </group_my6jo52>\n          <group_lm5fq00>\n            <num_vehicles>0</num_vehicles>\n            <driver_licence>no</driver_licence>\n            <drive/>\n            <Vehicle_year/>\n            <veh_make/>\n            <veh_model/>\n          </group_lm5fq00>\n          <meta>\n            <instanceID>uuid:3a2088fe-b495-4231-af91-c0d71534f1f0</instanceID>\n          </meta>\n        </data>",
+        "jsonDocResponse": {
+            "data": {
+                "attr": {
+                    "xmlns:jr": "http://openrosa.org/javarosa",
+                    "xmlns:odk": "http://www.opendatakit.org/xforms",
+                    "xmlns:orx": "http://openrosa.org/xforms",
+                    "id": "snapshot_xml"
+                },
+                "start": "2022-05-24T17:57:54.320-07:00",
+                "end": "2022-05-24T17:57:54.320-07:00",
+                "today": "2022-05-23",
+                "deviceid": "deviceid not found",
+                "group_uy6od86": {
+                    "attr": {},
+                    "age": "5_minus",
+                    "gender": "others",
+                    "home_location_001": "FiFi",
+                    "employment": "not_currently_",
+                    "work_location": "Mimi",
+                    "study": "study_full_time",
+                    "school_location": "Preschool"
+                },
+                "group_my6jo52": {
+                    "attr": {},
+                    "hh_size": "1",
+                    "num_workers": "0",
+                    "num_adults": "0",
+                    "num_kids": "1"
+                },
+                "group_lm5fq00": {
+                    "attr": {},
+                    "num_vehicles": "0",
+                    "driver_licence": "no",
+                    "drive": "",
+                    "Vehicle_year": "",
+                    "veh_make": "",
+                    "veh_model": ""
+                },
+                "meta": {
+                    "attr": {},
+                    "instanceID": "uuid:3a2088fe-b495-4231-af91-c0d71534f1f0"
+                }
+            }
+        },
+        "ts": 1653440358.707,
+        "fmt_time": "2022-05-25T00:59:18.707Z"
+    }
+}
