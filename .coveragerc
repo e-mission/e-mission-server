@@ -1,5 +1,5 @@
 [run]
 relative_files = True
 omit =
-        *tests*
+	*tests*
 	*bottle.py
