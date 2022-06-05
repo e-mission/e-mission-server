@@ -87,52 +87,6 @@ app = app()
 def index():
   return static_file("index.html", static_path)
 
-# Bunch of static pages that constitute our website
-# Should we have gone for something like django instead after all?
-# If this gets to be too much, we should definitely consider that
-@route("/docs/<filename>")
-def docs(filename):
-  if filename != "privacy.html" and filename != "support.html" and filename != "about.html" and filename != "consent.html" and filename != "approval_letter.pdf":
-    logging.error("Request for unknown filename "% filename)
-    logging.error("Request for unknown filename "% filename)
-    return HTTPError(404, "Don't try to hack me, you evil spammer")
-  else:
-    return static_file(filename, "%s/%s" % (static_path, "docs"))
-
-@route("/<filename>")
-def docs(filename):
-  if filename != "privacy" and filename != "support" and filename != "about" and filename != "consent":
-    return HTTPError(404, "Don't try to hack me, you evil spammer")
-  else:
-    return static_file("%s.html" % filename, "%s/%s" % (static_path, "docs"))
-
-# Serve up the components of the webapp - library files, our javascript and css
-# files, and HTML templates, properly
-@route('/css/<filepath:path>')
-def server_css(filepath):
-    logging.debug("static filepath = %s" % filepath)
-    return static_file(filepath, "%s/%s" % (static_path, "css"))
-
-@route('/img/<filepath:path>')
-def server_img(filepath):
-    logging.debug("static filepath = %s" % filepath)
-    return static_file(filepath, "%s/%s" % (static_path, "img"))
-
-@route('/js/<filepath:path>')
-def server_js(filepath):
-    logging.debug("static filepath = %s" % filepath)
-    return static_file(filepath, "%s/%s" % (static_path, "js"))
-
-@route('/lib/<filepath:path>')
-def server_lib(filepath):
-    logging.debug("static filepath = %s" % filepath)
-    return static_file(filepath, "%s/%s" % (static_path, "lib"))
-
-@route('/templates/<filepath:path>')
-def server_templates(filepath):
-  logging.debug("static filepath = %s" % filepath)
-  return static_file(filepath, "%s/%s" % (static_path, "templates"))
-
 # Backward compat to handle older clients
 # Remove in 2023 after everybody has upgraded
 # We used to use the presence or absence of the "user" field
