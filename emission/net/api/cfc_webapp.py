@@ -10,7 +10,7 @@ from builtins import *
 from past.utils import old_div
 import json
 from random import randrange
-from emission.net.api.bottle import route, post, get, run, template, static_file, request, app, HTTPError, abort, BaseRequest, JSONPlugin, response
+from emission.net.api.bottle import route, post, get, run, template, static_file, request, app, HTTPError, abort, BaseRequest, JSONPlugin, response, error, redirect
 import emission.net.api.bottle as bt
 # To support dynamic loading of client-specific libraries
 import sys
@@ -58,6 +58,8 @@ except:
     logging.debug("webserver not configured, falling back to sample, default configuration")
     config_file = open('conf/net/api/webserver.conf.sample')
 
+OPENPATH_URL="https://www.nrel.gov/transportation/openpath.html"
+
 config_data = json.load(config_file)
 config_file.close()
 static_path = config_data["paths"]["static_path"]
@@ -68,6 +70,8 @@ socket_timeout = config_data["server"]["timeout"]
 log_base_dir = config_data["paths"]["log_base_dir"]
 auth_method = config_data["server"]["auth"]
 aggregate_call_auth = config_data["server"]["aggregate_call_auth"]
+# not_found_redirect = "foo" if len(config_data["paths"]) == 5 else "bar"
+not_found_redirect = config_data["paths"]["404_redirect"] if "404_redirect" in config_data["paths"] else OPENPATH_URL
 
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes
@@ -394,6 +398,11 @@ def habiticaProxy():
     return habitproxy.habiticaProxy(user_uuid, method, method_url,
                                     method_args)
 # Data source integration END
+
+@error(404)
+def error404(error):
+    response.status = 301
+    response.set_header('Location', "https://www.nrel.gov/transportation/openpath.html")
 
 @app.hook('before_request')
 def before_request():
