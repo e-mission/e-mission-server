@@ -20,4 +20,4 @@ conf/**/*.json
 
 *.secret
 
-,coverage
+.coverage
