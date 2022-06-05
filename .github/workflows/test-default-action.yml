@@ -24,6 +24,48 @@ jobs:
       with:
         ref: refs/heads/${{ github.head_ref }}
 
+    - name: Install and start MongoDB
+      uses: supercharge/mongodb-github-action@1.3.0
+      with:
+        mongodb-version: 4.4.0
+
+    - name: Check existing version of miniconda
+      shell: bash -l {0}
+      run: conda info -a
+
+    - name: Install miniconda
+      shell: bash -l {0}
+      run: |
+        source setup/setup_conda.sh Linux-x86_64
+
+    - name: Check whether the CI environment variable is set
+      shell: bash -l {0}
+      run: |
+        source setup/activate_conda.sh
+        echo $CI
+
+    - name: Setup the emission environment for testing
+      shell: bash -l {0}
+      run: |
+        conda --version
+        which conda
+        source setup/activate_conda.sh
+        conda --version
+        source setup/setup.sh
+        conda env list
+        
+    - name: Switch to emission, install/run Coverage
+      shell: bash -l {0}
+      run: |
+        conda env list
+        source setup/activate.sh
+        conda env list
+        pip install coverage
+        coverage --version
+        export PYTHONPATH=.
+        coverage run -m unittest discover -s emission/tests -p Test*;
+        coverage report
+
     - name: Coverage Badge
       uses: tj-actions/coverage-badge-py@v1.8
 
