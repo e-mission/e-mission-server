@@ -238,7 +238,11 @@ def trip_to_geojson(trip, tl):
     end_place_geojson["properties"]["feature_type"] = "end_place"
     feature_array.append(end_place_geojson)
 
-    trip_tl = esdt.get_cleaned_timeline_for_trip(trip.user_id, trip.get_id())
+    if "cleaned_trip" in trip.data:
+        trip_tl = esdt.get_cleaned_timeline_for_trip(trip.user_id, trip.data.cleaned_trip)
+    else:
+        trip_tl = esdt.get_cleaned_timeline_for_trip(trip.user_id, trip.get_id())
+
     stops = trip_tl.places
     for stop in stops:
         feature_array.append(stop_to_geojson(stop))
@@ -267,13 +271,13 @@ def trip_to_geojson(trip, tl):
     return trip_geojson
 
 def get_geojson_for_ts(user_id, start_ts, end_ts):
-    tl = esdtl.get_cleaned_timeline(user_id, start_ts, end_ts)
+    tl = esdtl.get_confirmed_timeline(user_id, start_ts, end_ts)
     tl.fill_start_end_places()
     return get_geojson_for_timeline(user_id, tl)
 
 def get_geojson_for_dt(user_id, start_local_dt, end_local_dt):
     logging.debug("Getting geojson for %s -> %s" % (start_local_dt, end_local_dt))
-    tl = esdtl.get_cleaned_timeline_from_dt(user_id, start_local_dt, end_local_dt)
+    tl = esdtl.get_confirmed_timeline_from_dt(user_id, start_local_dt, end_local_dt)
     tl.fill_start_end_places()
     return get_geojson_for_timeline(user_id, tl)
 
