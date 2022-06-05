@@ -26,6 +26,11 @@ def get_cleaned_timeline_from_dt(user_id, start_local_dt, end_local_dt,
     return get_timeline_from_dt(user_id, esda.CLEANED_PLACE_KEY, esda.CLEANED_TRIP_KEY, esda.CLEANED_UNTRACKED_KEY,
                                 start_local_dt, end_local_dt, geojson, extra_query_list)
 
+def get_confirmed_timeline_from_dt(user_id, start_local_dt, end_local_dt,
+                                 geojson=None, extra_query_list=None):
+    return get_timeline_from_dt(user_id, esda.CLEANED_PLACE_KEY, esda.CONFIRMED_TRIP_KEY, esda.CLEANED_UNTRACKED_KEY,
+                                start_local_dt, end_local_dt, geojson, extra_query_list)
+
 def get_raw_timeline(user_id, start_ts, end_ts,
                      geojson=None, extra_query_list=None):
     return get_timeline(user_id, esda.RAW_PLACE_KEY, esda.RAW_TRIP_KEY, esda.RAW_UNTRACKED_KEY,
@@ -34,6 +39,11 @@ def get_raw_timeline(user_id, start_ts, end_ts,
 def get_cleaned_timeline(user_id, start_ts, end_ts,
                          geojson=None, extra_query_list=None):
     return get_timeline(user_id, esda.CLEANED_PLACE_KEY, esda.CLEANED_TRIP_KEY, esda.CLEANED_UNTRACKED_KEY,
+                        start_ts, end_ts, geojson, extra_query_list)
+
+def get_confirmed_timeline(user_id, start_ts, end_ts,
+                         geojson=None, extra_query_list=None):
+    return get_timeline(user_id, esda.CLEANED_PLACE_KEY, esda.CONFIRMED_TRIP_KEY, esda.CLEANED_UNTRACKED_KEY,
                         start_ts, end_ts, geojson, extra_query_list)
 
 def get_timeline(user_id, place_key, trip_key, untracked_key, start_ts, end_ts,
