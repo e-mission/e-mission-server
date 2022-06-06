@@ -6,9 +6,9 @@ name: Coverage
 # events but only for the master branch
 on:
   push:
-    branches: [ master ]
+    branches: [ master, gis-based-mode-detection ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, gis-based-mode-detection ]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -93,6 +93,7 @@ jobs:
       uses: ewjoachim/python-coverage-comment-action@v2
       with:
         GITHUB_TOKEN: ${{ github.token }}
+        VERBOSE: true
 
     - name: Store Pull Request comment to be posted
       uses: actions/upload-artifact@v2
