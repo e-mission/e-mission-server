@@ -1,7 +1,7 @@
 import logging
 import pandas as pd
 import pandas.testing as pdt
-import label_processing as label_pro
+import emission.analysis.modelling.tour_model.label_processing as label_pro
 import sklearn.metrics as skm
 import itertools
 

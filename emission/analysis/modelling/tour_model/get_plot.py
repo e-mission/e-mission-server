@@ -4,7 +4,7 @@ import pandas as pd
 from matplotlib import cm
 import folium
 import branca.colormap as clm
-import load_predict as predict
+import emission.analysis.modelling.tour_model.load_predict as predict
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)

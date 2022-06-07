@@ -1,4 +1,4 @@
-import label_processing as label_pro
+import emission.analysis.modelling.tour_model.label_processing as label_pro
 import copy
 import itertools
 
