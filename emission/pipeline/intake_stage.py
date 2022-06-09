@@ -23,12 +23,15 @@ import emission.net.usercache.abstract_usercache as enua
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.aggregate_timeseries as estag
 
+import emission.analysis.userinput.matcher as eaum
 import emission.analysis.intake.cleaning.filter_accuracy as eaicf
 import emission.analysis.intake.segmentation.trip_segmentation as eaist
 import emission.analysis.intake.segmentation.section_segmentation as eaiss
 import emission.analysis.intake.cleaning.location_smoothing as eaicl
 import emission.analysis.intake.cleaning.clean_and_resample as eaicr
 import emission.analysis.classification.inference.mode.pipeline as eacimp
+import emission.analysis.classification.inference.labels.pipeline as eacilp
+import emission.analysis.userinput.expectations as eaue
 import emission.net.ext_service.habitica.executor as autocheck
 
 import emission.storage.decorations.stats_queries as esds
@@ -88,6 +91,13 @@ def run_intake_pipeline_for_user(uuid):
         esds.store_pipeline_time(uuid, ecwp.PipelineStages.USERCACHE.name,
                                  time.time(), uct.elapsed)
 
+        with ect.Timer() as uit:
+            logging.info("*" * 10 + "UUID %s: updating incoming user inputs" % uuid + "*" * 10)
+            print(str(arrow.now()) + "*" * 10 + "UUID %s: updating incoming user inputs" % uuid + "*" * 10)
+            eaum.match_incoming_user_inputs(uuid)
+
+        esds.store_pipeline_time(uuid, ecwp.PipelineStages.USER_INPUT_MATCH_INCOMING.name,
+                                 time.time(), uct.elapsed)
 
         # Hack until we delete these spurious entries
         # https://github.com/e-mission/e-mission-server/issues/407#issuecomment-2484868
@@ -148,6 +158,30 @@ def run_intake_pipeline_for_user(uuid):
             eacimp.predict_mode(uuid)
 
         esds.store_pipeline_time(uuid, ecwp.PipelineStages.MODE_INFERENCE.name,
+                                 time.time(), crt.elapsed)
+
+        with ect.Timer() as crt:
+            logging.info("*" * 10 + "UUID %s: inferring labels" % uuid + "*" * 10)
+            print(str(arrow.now()) + "*" * 10 + "UUID %s: inferring labels" % uuid + "*" * 10)
+            eacilp.infer_labels(uuid)
+
+        esds.store_pipeline_time(uuid, ecwp.PipelineStages.LABEL_INFERENCE.name,
+                                 time.time(), crt.elapsed)
+
+        with ect.Timer() as crt:
+            logging.info("*" * 10 + "UUID %s: populating expectations" % uuid + "*" * 10)
+            print(str(arrow.now()) + "*" * 10 + "UUID %s: populating expectations" % uuid + "*" * 10)
+            eaue.populate_expectations(uuid)
+
+        esds.store_pipeline_time(uuid, ecwp.PipelineStages.EXPECTATION_POPULATION.name,
+                                 time.time(), crt.elapsed)
+
+        with ect.Timer() as crt:
+            logging.info("*" * 10 + "UUID %s: creating confirmed objects " % uuid + "*" * 10)
+            print(str(arrow.now()) + "*" * 10 + "UUID %s: creating confirmed objects " % uuid + "*" * 10)
+            eaum.create_confirmed_objects(uuid)
+
+        esds.store_pipeline_time(uuid, ecwp.PipelineStages.CREATE_CONFIRMED_OBJECTS.name,
                                  time.time(), crt.elapsed)
 
         with ect.Timer() as ogt:

@@ -1,0 +1,9 @@
+{
+    "alert_type": "website",
+    "title": "Learn more about the technology behind this app",
+    "message": "The app is a custom version of OpenPATH, an open-source platform to instrument human mobility.",
+    "image": "icon",
+    "spec": {
+        "url": "https://www.nrel.gov/transportation/openpath.html"
+    }
+}

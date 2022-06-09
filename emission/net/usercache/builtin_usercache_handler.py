@@ -180,7 +180,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         trip_gj_list = self.get_trip_list_for_seven_days(start_ts)
         if len(trip_gj_list) == 0:
             ts = etsa.TimeSeries.get_time_series(self.user_id)
-            max_loc_ts = ts.get_max_value_for_field("background/filtered_location", "data.ts")
+            max_loc_ts = ts.get_first_value_for_field("background/filtered_location", "data.ts", pymongo.DESCENDING)
             if max_loc_ts == -1:
                 logging.warning("No entries for user %s, early return " % self.user_id)
                 return

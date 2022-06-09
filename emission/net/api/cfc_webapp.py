@@ -10,7 +10,7 @@ from builtins import *
 from past.utils import old_div
 import json
 from random import randrange
-from emission.net.api.bottle import route, post, get, run, template, static_file, request, app, HTTPError, abort, BaseRequest, JSONPlugin, response
+from emission.net.api.bottle import route, post, get, run, template, static_file, request, app, HTTPError, abort, BaseRequest, JSONPlugin, response, error, redirect
 import emission.net.api.bottle as bt
 # To support dynamic loading of client-specific libraries
 import sys
@@ -58,6 +58,8 @@ except:
     logging.debug("webserver not configured, falling back to sample, default configuration")
     config_file = open('conf/net/api/webserver.conf.sample')
 
+OPENPATH_URL="https://www.nrel.gov/transportation/openpath.html"
+
 config_data = json.load(config_file)
 config_file.close()
 static_path = config_data["paths"]["static_path"]
@@ -67,6 +69,9 @@ server_port = config_data["server"]["port"]
 socket_timeout = config_data["server"]["timeout"]
 log_base_dir = config_data["paths"]["log_base_dir"]
 auth_method = config_data["server"]["auth"]
+aggregate_call_auth = config_data["server"]["aggregate_call_auth"]
+# not_found_redirect = "foo" if len(config_data["paths"]) == 5 else "bar"
+not_found_redirect = config_data["paths"]["404_redirect"] if "404_redirect" in config_data["paths"] else OPENPATH_URL
 
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes
@@ -86,58 +91,21 @@ app = app()
 def index():
   return static_file("index.html", static_path)
 
-# Bunch of static pages that constitute our website
-# Should we have gone for something like django instead after all?
-# If this gets to be too much, we should definitely consider that
-@route("/docs/<filename>")
-def docs(filename):
-  if filename != "privacy.html" and filename != "support.html" and filename != "about.html" and filename != "consent.html" and filename != "approval_letter.pdf":
-    logging.error("Request for unknown filename "% filename)
-    logging.error("Request for unknown filename "% filename)
-    return HTTPError(404, "Don't try to hack me, you evil spammer")
-  else:
-    return static_file(filename, "%s/%s" % (static_path, "docs"))
-
-@route("/<filename>")
-def docs(filename):
-  if filename != "privacy" and filename != "support" and filename != "about" and filename != "consent":
-    return HTTPError(404, "Don't try to hack me, you evil spammer")
-  else:
-    return static_file("%s.html" % filename, "%s/%s" % (static_path, "docs"))
-
-# Serve up the components of the webapp - library files, our javascript and css
-# files, and HTML templates, properly
-@route('/css/<filepath:path>')
-def server_css(filepath):
-    logging.debug("static filepath = %s" % filepath)
-    return static_file(filepath, "%s/%s" % (static_path, "css"))
-
-@route('/img/<filepath:path>')
-def server_img(filepath):
-    logging.debug("static filepath = %s" % filepath)
-    return static_file(filepath, "%s/%s" % (static_path, "img"))
-
-@route('/js/<filepath:path>')
-def server_js(filepath):
-    logging.debug("static filepath = %s" % filepath)
-    return static_file(filepath, "%s/%s" % (static_path, "js"))
-
-@route('/lib/<filepath:path>')
-def server_lib(filepath):
-    logging.debug("static filepath = %s" % filepath)
-    return static_file(filepath, "%s/%s" % (static_path, "lib"))
-
-@route('/templates/<filepath:path>')
-def server_templates(filepath):
-  logging.debug("static filepath = %s" % filepath)
-  return static_file(filepath, "%s/%s" % (static_path, "templates"))
+# Backward compat to handle older clients
+# Remove in 2023 after everybody has upgraded
+# We used to use the presence or absence of the "user" field
+# to determine whether this was an aggregate call or not
+# now we expect the client to fill it in
+def _fill_aggregate_backward_compat(request):
+  if 'aggregate' not in request.json:
+    # Aggregate if there is no user
+    # no aggregate if there is a user
+    request.json["aggregate"] = ('user' not in request.json)
 
 @post("/result/heatmap/pop.route/<time_type>")
 def getPopRoute(time_type):
-  if 'user' in request.json:
-     user_uuid = getUUID(request)
-  else:
-     user_uuid = None
+  _fill_aggregate_backward_compat(request)
+  user_uuid = get_user_or_aggregate_auth(request)
 
   if 'from_local_date' in request.json and 'to_local_date' in request.json:
       start_time = request.json['from_local_date']
@@ -160,10 +128,8 @@ def getPopRoute(time_type):
 
 @post("/result/heatmap/incidents/<time_type>")
 def getStressMap(time_type):
-    if 'user' in request.json:
-        user_uuid = getUUID(request)
-    else:
-        user_uuid = None
+    _fill_aggregate_backward_compat(request)
+    user_uuid = get_user_or_aggregate_auth(request)
 
     # modes = request.json['modes']
     # hardcode modes to None because we currently don't store
@@ -195,7 +161,16 @@ def getPipelineState():
     user_uuid = getUUID(request)
     return {"complete_ts": pipeline.get_complete_ts(user_uuid)}
 
-@post("/datastreams/find_entries/<time_type>", method=['OPTIONS', 'POST'])
+@post("/pipeline/get_range_ts")
+def getPipelineState():
+    user_uuid = getUUID(request)
+    (start_ts, end_ts) = pipeline.get_range(user_uuid)
+    return {
+        "start_ts": start_ts,
+        "end_ts": end_ts
+    }
+
+@post("/datastreams/find_entries/<time_type>")
 def getTimeseriesEntries(time_type):
     print("method is ", request.method)
     if request.method == "OPTIONS":
@@ -209,21 +184,46 @@ def getTimeseriesEntries(time_type):
     if 'from_local_date' in request.json and 'to_local_date' in request.json:
         start_time = request.json['from_local_date']
         end_time = request.json['to_local_date']
-        time_query = esttc.TimeComponentQuery("metadata.write_ts",
+        time_key = request.json.get('key_local_date', 'metadata.write_ts')
+        time_query = esttc.TimeComponentQuery(time_key,
                                               start_time,
                                               end_time)
     else:
         start_time = request.json['start_time']
         end_time = request.json['end_time']
-        time_query = estt.TimeQuery("metadata.write_ts",
-                                              start_time,
-                                              end_time)
+        time_key = request.json.get('key_time', 'metadata.write_ts')
+        time_query = estt.TimeQuery(time_key,
+                                    start_time,
+                                    end_time)
     # Note that queries from usercache are limited to 100,000 entries
     # and entries from timeseries are limited to 250,000, so we will
     # return at most 350,000 entries. So this means that we don't need
     # additional filtering, but this should be documented in
     # the API
     data_list = esdc.find_entries(user_uuid, key_list, time_query)
+    if 'max_entries' in request.json:
+        me = request.json['max_entries']
+        if (type(me) != int):
+            logging.error("aborting: max entry count is %s, type %s, expected int" % (me, type(me)))
+            abort(500, "Invalid max_entries %s" % me)
+
+        if len(data_list) > me:
+            if request.json['trunc_method'] == 'first':
+                logging.debug("first n entries is %s" % me)
+                data_list = data_list[:me]
+            if request.json['trunc_method'] == 'last':
+                logging.debug("first n entries is %s" % me)
+                data_list = data_list[-me:]
+            elif request.json["trunc_method"] == "sample":
+                sample_rate = len(data_list)//me + 1
+                logging.debug("sampling rate is %s" % sample_rate)
+                data_list = data_list[::sample_rate]
+            else:
+                logging.error("aborting: unexpected sampling method %s" % request.json["trunc_method"])
+                abort(500, "sampling method not specified while retriving limited data")
+        else:
+            logging.debug("Found %d entries < %s, no truncation" % (len(data_list), me))
+    logging.debug("successfully returning list of size %s" % len(data_list))
     return {'phone_data': data_list}
 
 @post('/usercache/get')
@@ -278,7 +278,7 @@ def createUserProfile():
       return {'uuid': str(user.uuid)}
   except ValueError as e:
       traceback.print_exc()
-      abort(403, e.message)
+      abort(403, str(e.args))
 
 @post('/profile/update')
 def updateUserProfile():
@@ -299,10 +299,9 @@ def getUserProfile():
 
 @post('/result/metrics/<time_type>')
 def summarize_metrics(time_type):
-    if 'user' in request.json:
-        user_uuid = getUUID(request)
-    else:
-        user_uuid = None
+    _fill_aggregate_backward_compat(request)
+    user_uuid = get_user_or_aggregate_auth(request)
+
     start_time = request.json['start_time']
     end_time = request.json['end_time']
     freq_name = request.json['freq']
@@ -403,6 +402,11 @@ def habiticaProxy():
                                     method_args)
 # Data source integration END
 
+@error(404)
+def error404(error):
+    response.status = 301
+    response.set_header('Location', "https://www.nrel.gov/transportation/openpath.html")
+
 @app.hook('before_request')
 def before_request():
   print("START %s %s %s" % (datetime.now(), request.method, request.path))
@@ -438,6 +442,30 @@ def after_request():
 # This should only be used by createUserProfile since we may not have a UUID
 # yet. All others should use the UUID.
 
+def _get_uuid_bool_wrapper(request):
+  try:
+    getUUID(request)
+    return True
+  except:
+    return False
+
+def get_user_or_aggregate_auth(request):
+  # If this is not an aggregate call, returns the uuid
+  # If this is an aggregate call, returns None if the call is valid, otherwise aborts
+  # we only support aggregates on a subset of calls, so we don't need the
+  # `inHeader` parameter to `getUUID`
+  aggregate_call_map = {
+    "no_auth": lambda r: None,
+    "user_only": lambda r: None if _get_uuid_bool_wrapper(request) else abort(403, "aggregations only available to users"),
+    "never": lambda r: abort(404, "Aggregate calls not supported")
+  }
+  if request.json["aggregate"] == False:
+    logging.debug("User specific call, returning UUID")
+    return getUUID(request)
+  else:
+    logging.debug(f"Aggregate call, checking {aggregate_call_auth} policy")
+    return aggregate_call_map[aggregate_call_auth](request)
+
 def getUUID(request, inHeader=False):
     try:
         retUUID = enaa.getUUID(request, auth_method, inHeader)
@@ -447,7 +475,7 @@ def getUUID(request, inHeader=False):
         return retUUID
     except ValueError as e:
         traceback.print_exc()
-        abort(401, e.message)
+        abort(403, e)
 
 # Auth helpers END
 
@@ -456,6 +484,8 @@ if __name__ == '__main__':
         webserver_log_config = json.load(open("conf/log/webserver.conf", "r"))
     except:
         webserver_log_config = json.load(open("conf/log/webserver.conf.sample", "r"))
+
+    print(f"Using auth method {auth_method}")
 
     logging.config.dictConfig(webserver_log_config)
     logging.debug("This should go to the log file")

@@ -59,10 +59,13 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "manual/incident": self.timeseries_db,
                 "manual/mode_confirm": self.timeseries_db,
                 "manual/purpose_confirm": self.timeseries_db,
+                "manual/replaced_mode": self.timeseries_db,
+                "manual/trip_user_input": self.timeseries_db,
                 "manual/destination_confirm": self.timeseries_db,
                 "config/evaluation_spec": self.timeseries_db,
                 "manual/evaluation_transition": self.timeseries_db,
                 "manual/evaluation_stop": self.timeseries_db,
+                "manual/demographic_survey": self.timeseries_db,
                 "segmentation/raw_trip": self.analysis_timeseries_db,
                 "segmentation/raw_place": self.analysis_timeseries_db,
                 "segmentation/raw_section": self.analysis_timeseries_db,
@@ -84,13 +87,19 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "metrics/daily_user_median_speed": self.analysis_timeseries_db,
                 "metrics/daily_mean_median_speed": self.analysis_timeseries_db,
                 "inference/prediction": self.analysis_timeseries_db,
-                "analysis/inferred_section": self.analysis_timeseries_db
+                "inference/labels": self.analysis_timeseries_db,
+                "analysis/inferred_section": self.analysis_timeseries_db,
+                "analysis/inferred_labels": self.analysis_timeseries_db,
+                "analysis/inferred_trip": self.analysis_timeseries_db,
+                "analysis/expected_trip": self.analysis_timeseries_db,
+                "analysis/confirmed_trip": self.analysis_timeseries_db,
+                "analysis/confirmed_section": self.analysis_timeseries_db
             }
 
 
     @staticmethod
     def get_uuid_list():
-        return edb.get_timeseries_db().distinct("user_id")
+        return edb.get_uuid_db().distinct("uuid")
 
     def get_timeseries_db(self, key):
         """
@@ -291,7 +300,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
         return deduped_df.reset_index(drop=True)
 
 
-    def get_max_value_for_field(self, key, field, time_query=None):
+    def get_first_value_for_field(self, key, field, sort_order, time_query=None):
         """
         Currently used to get the max value of the location values so that we can send data
         that actually exists into the usercache. Is that too corner of a use case? Do we want to do
@@ -299,11 +308,12 @@ class BuiltinTimeSeries(esta.TimeSeries):
         :param key: the metadata key for the entries, used to identify the stream
         :param field: the field in the stream whose max value we want.
         :param time_query: the time range in which to search the stream
+        :param sort_order: pymongo.ASCENDING or pymongon.DESCENDING
         It is assumed that the values for the field are sortable.
         :return: the max value for the field in the stream identified by key. -1 if there are no entries for the key.
         """
         result_it = self.get_timeseries_db(key).find(self._get_query([key], time_query),
-                                                 {"_id": False, field: True}).sort(field, pymongo.DESCENDING).limit(1)
+                                                 {"_id": False, field: True}).sort(field, sort_order).limit(1)
         result_list = list(result_it)
         if len(result_list) == 0:
             return -1

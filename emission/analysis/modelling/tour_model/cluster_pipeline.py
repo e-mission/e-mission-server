@@ -40,8 +40,8 @@ read from the database.
 """
 
 #read the data from the database. 
-def read_data(uuid=None):
-    trips = esda.get_entries(esda.CLEANED_TRIP_KEY, uuid,
+def read_data(uuid=None,key=esda.CLEANED_TRIP_KEY):
+    trips = esda.get_entries(key, uuid,
                              time_query=None, geo_query=None)
     logging.info("After reading data, returning %s trips" % len(trips))
     return trips
@@ -58,15 +58,16 @@ def remove_noise(data, radius):
     return sim.newdata, sim.bins
 
 #cluster the data using k-means
-def cluster(data, bins):
+def cluster(data, nBins):
+    logging.debug("Calling cluster(%s, %d)" % (data, nBins))
     if not data:
         return 0, [], []
     feat = featurization.featurization(data)
-    min = bins
-    max = int(math.ceil(1.5 * bins))
+    min = nBins
+    max = int(math.ceil(1.5 * nBins))
     feat.cluster(min_clusters=min, max_clusters=max)
     logging.debug('number of clusters: %d' % feat.clusters)
-    return feat.clusters, feat.labels, feat.data
+    return feat.clusters, feat.labels, feat.data, feat.points
 
 #prepare the data for the tour model
 def cluster_to_tour_model(data, labels):
@@ -84,11 +85,13 @@ def main(uuid=None):
     data = read_data(uuid)
     logging.debug("len(data) is %d" % len(data))
     data, bins = remove_noise(data, 300)
-    n, labels, data = cluster(data, len(bins))
+    n, labels, data, points = cluster(data, len(bins))
     tour_dict = cluster_to_tour_model(data, labels)
     return tour_dict
 
 if __name__=='__main__':
+    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
+        level=logging.DEBUG)
     uuid = None
     if len(sys.argv) == 2:
         uuid = sys.argv[1]

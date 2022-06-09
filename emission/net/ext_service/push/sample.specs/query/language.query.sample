@@ -1,0 +1,6 @@
+{
+    "query_type": "language",
+    "spec": {
+        "phone_lang": "en"
+    }
+}
