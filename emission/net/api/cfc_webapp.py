@@ -170,7 +170,7 @@ def getPipelineState():
         "end_ts": end_ts
     }
 
-@post("/datastreams/find_entries/<time_type>")
+@post("/datastreams/find_entries/<time_type>", method=['OPTIONS', 'POST'])
 def getTimeseriesEntries(time_type):
     print("method is ", request.method)
     if request.method == "OPTIONS":
