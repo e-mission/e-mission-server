@@ -174,7 +174,12 @@ def get_timeseries_db():
     TimeSeries.create_index([("metadata.key", pymongo.ASCENDING)])
     TimeSeries.create_index([("metadata.write_ts", pymongo.DESCENDING)])
     TimeSeries.create_index([("data.ts", pymongo.DESCENDING)], sparse=True)
-
+    # Hack to migrate from sparse to dense indices to gracefully handle
+    # https://github.com/e-mission/e-mission-server/pull/849/commits/c65a4b209ed00db6aa3ad918fa631f9186ee3266
+    if "sparse" in TimeSeries.index_information()["data.loc_2dsphere"]:
+        print("Before dropping, dropping %s" % (TimeSeries.list_indexes()))
+        TimeSeries.drop_index("data.loc_2dsphere")
+        print("Found sparse geosphere index, dropping %s" % (TimeSeries.list_indexes()))
     TimeSeries.create_index([("data.loc", pymongo.GEOSPHERE)])
 
     return TimeSeries
@@ -209,6 +214,14 @@ def _create_analysis_result_indices(tscoll):
     # trips and sections
     tscoll.create_index([("data.start_ts", pymongo.DESCENDING)], sparse=True)
     tscoll.create_index([("data.end_ts", pymongo.DESCENDING)], sparse=True)
+    if "sparse" in tscoll.index_information()["data.start_loc_2dsphere"]:
+        print("Before dropping, dropping %s" % (tscoll.list_indexes()))
+        tscoll.drop_index("data.start_loc_2dsphere")
+        print("Found sparse geosphere index, dropping %s" % (tscoll.list_indexes()))
+    if "sparse" in tscoll.index_information()["data.end_loc_2dsphere"]:
+        print("Before dropping, dropping %s" % (tscoll.list_indexes()))
+        tscoll.drop_index("data.end_loc_2dsphere")
+        print("Found sparse geosphere index, dropping %s" % (tscoll.list_indexes()))
     tscoll.create_index([("data.start_loc", pymongo.GEOSPHERE)])
     tscoll.create_index([("data.end_loc", pymongo.GEOSPHERE)])
     _create_local_dt_indices(tscoll, "data.start_local_dt")
@@ -219,6 +232,10 @@ def _create_analysis_result_indices(tscoll):
     tscoll.create_index([("data.exit_ts", pymongo.DESCENDING)], sparse=True)
     _create_local_dt_indices(tscoll, "data.enter_local_dt")
     _create_local_dt_indices(tscoll, "data.exit_local_dt")
+    if "sparse" in tscoll.index_information()["data.location_2dsphere"]:
+        print("Before dropping, dropping %s" % (tscoll.list_indexes()))
+        tscoll.drop_index("data.location_2dsphere")
+        print("Found sparse geosphere index, dropping %s" % (tscoll.list_indexes()))
     tscoll.create_index([("data.location", pymongo.GEOSPHERE)])
     tscoll.create_index([("data.duration", pymongo.DESCENDING)], sparse=True)
     tscoll.create_index([("data.mode", pymongo.ASCENDING)], sparse=True)
@@ -226,6 +243,10 @@ def _create_analysis_result_indices(tscoll):
 
     # recreated location
     tscoll.create_index([("data.ts", pymongo.DESCENDING)], sparse=True)
+    if "sparse" in tscoll.index_information()["data.loc_2dsphere"]:
+        print("Before dropping, dropping %s" % (tscoll.list_indexes()))
+        tscoll.drop_index("data.loc_2dsphere")
+        print("Found sparse geosphere index, dropping %s" % (tscoll.list_indexes()))
     tscoll.create_index([("data.loc", pymongo.GEOSPHERE)])
     _create_local_dt_indices(tscoll, "data.local_dt") # recreated location
     return tscoll
