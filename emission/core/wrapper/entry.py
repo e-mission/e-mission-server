@@ -50,6 +50,8 @@ class Entry(ecwb.WrapperBase):
             "config/sync_config": "syncconfig",
             # user consent time + protocol version
             "config/consent": "consentconfig",
+            # phone ui configuration, applied by scanning a QR code
+            "config/app_ui_config": "appuiconfig",
             # webapp API call time, measured on the server
             "stats/server_api_time": "statsevent",
             # intended to log the occurrence of errors in the webapp
