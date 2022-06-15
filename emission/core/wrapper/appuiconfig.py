@@ -14,6 +14,7 @@ class Location(ecwb.WrapperBase):
              "local_dt": ecwb.WrapperBase.Access.RO, # searchable datetime in local time
              "fmt_time": ecwb.WrapperBase.Access.RO, # formatted version of the timestampst changed
              "version": ecwb.WrapperBase.Access.RO,  # the format version of the document
+             "joined": ecwb.WrapperBase.Access.RO,   # the join settings, including label and source
              "server": ecwb.WrapperBase.Access.RO,       # server customizations, notably the URL
              "intro": ecwb.WrapperBase.Access.RO,        # introduction customizations, notably the text in the summary and consent, and the auth method
              "display_config": ecwb.WrapperBase.Access.RO, # customizations for display/UI screens
