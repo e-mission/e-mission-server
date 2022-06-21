@@ -1,45 +1,37 @@
 import logging
-from datetime import datetime
-import arrow
-from tracemalloc import start
 from typing import Optional
 
-import emission.storage.timeseries.abstract_timeseries as esta
-from emission.analysis.modelling.similarity.od_similarity import \
-    OriginDestinationSimilarity
-from emission.analysis.modelling.user_label_model.greedy_similarity_binning import \
-    GreedySimilarityBinning
-from emission.analysis.modelling.user_label_model.model_storage import (
-    ModelStorage, load, save)
-from emission.analysis.modelling.user_label_model.model_type import ModelType
-from emission.analysis.modelling.user_label_model.user_label_prediction_model import \
-    UserLabelPredictionModel
-from emission.core.wrapper.confirmedtrip import Confirmedtrip
-from numpy import isin
-
+import arrow
 import emission.analysis.modelling.tour_model.cluster_pipeline as pipeline
-import emission.storage.pipeline_queries as epq
 import emission.storage.decorations.analysis_timeseries_queries as esda
+import emission.storage.pipeline_queries as epq
+import emission.storage.timeseries.abstract_timeseries as esta
+import emission.analysis.modelling.similarity.od_similarity as eamso
+import emission.analysis.modelling.user_label_model.greedy_similarity_binning as eamug
+import emission.analysis.modelling.user_label_model.model_storage as eamum
+from emission.analysis.modelling.user_label_model.model_storage import ModelStorage
+from emission.analysis.modelling.user_label_model.model_type import ModelType
+import emission.analysis.modelling.user_label_model.user_label_prediction_model as eamuu
+from emission.core.wrapper.confirmedtrip import Confirmedtrip
 from emission.storage.timeseries.timequery import TimeQuery
+from numpy import isin
 
 SIMILARITY_THRESHOLD_METERS = 500
 
 
-def _model_factory(model_type: ModelType):
+def _model_factory(model_type: ModelType) -> eamuu.UserLabelPredictionModel:
     """
     instantiates the requested user model type with the configured
     parameters. if future model types are created, they should be 
     added here.
 
     :param model_type: internally-used model name
-    :type model_type: ModelType
-    :raises KeyError: if the requested model name does not exist
     :return: a user label prediction model
-    :rtype: UserLabelPredictionModel
+    :raises KeyError: if the requested model name does not exist
     """
     MODELS = {
-        ModelType.GREEDY_SIMILARITY_BINNING: GreedySimilarityBinning(
-            metric=OriginDestinationSimilarity(),
+        ModelType.GREEDY_SIMILARITY_BINNING: eamug.GreedySimilarityBinning(
+            metric=eamso.OriginDestinationSimilarity(),
             sim_thresh=SIMILARITY_THRESHOLD_METERS,
             apply_cutoff=False
         )
@@ -79,7 +71,7 @@ def update_user_label_model(
     model = _model_factory(model_type)
 
     # if a previous model exists, deserialize the stored model
-    model_data_prev = load(user_id, model_type, model_storage)
+    model_data_prev = eamum.load(user_id, model_type, model_storage)
     if model_data_prev is not None:
         model.from_dict(model_data_prev)
 
@@ -90,7 +82,7 @@ def update_user_label_model(
     # train and store the model
     model.fit(trips)
     model_data_next = model.to_dict()
-    save(user_id, model_type, model_data_next, timestamp, model_storage)
+    eamum.save(user_id, model_type, model_data_next, timestamp, model_storage)
 
     logging.debug(f"{model_type.name} label prediction model built for user {user_id} with timestamp {timestamp}")
 
@@ -143,7 +135,7 @@ def _get_trips_for_user(user_id, time_query: Optional[TimeQuery]=None, min_trips
 def _load_user_label_model(
     user_id, 
     model_type: ModelType, 
-    model_storage: ModelStorage) -> Optional[UserLabelPredictionModel]:
+    model_storage: ModelStorage) -> Optional[eamuu.UserLabelPredictionModel]:
     """helper to build a user label prediction model class with the 
     contents of a stored model for some user.
 
@@ -152,7 +144,7 @@ def _load_user_label_model(
     :param model_storage: storage type
     :return: model, or None if no model is stored for this user
     """
-    model_dict = load(user_id, model_type, model_storage)
+    model_dict = eamum.load(user_id, model_type, model_storage)
     if model_dict is None:
         return None
     else:    
