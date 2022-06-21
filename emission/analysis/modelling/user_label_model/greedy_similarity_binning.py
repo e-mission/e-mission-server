@@ -50,15 +50,10 @@ class GreedySimilarityBinning(UserLabelPredictionModel):
         the number of predictions is not assumed to be the number of features.
 
         :param dir: the model load/save directory
-        :type dir: Path
         :param user_id: identity (UUID) of the e-mission user
-        :type user_id: str
         :param metric: type of similarity metric to use
-        :type metric: SimilarityMetric
         :param sim_thresh: max distance threshold for similarity (assumed meters)
-        :type sim_thresh: float
         :param apply_cutoff: ignore clusters which are small, based on a "knee point" heuristic (default False)
-        :type apply_cutoff: bool
         """
         super().__init__()
         self.metric = metric
@@ -72,7 +67,6 @@ class GreedySimilarityBinning(UserLabelPredictionModel):
         corresponds to a label at the matching index of the label input
 
         :param trips: 2D array of features to train from
-        :type trips: List[Confirmedtrip]
         """
         self.bins = {}
         self._assign_bins(trips)
@@ -101,6 +95,9 @@ class GreedySimilarityBinning(UserLabelPredictionModel):
             return labels, n_features
 
     def is_incremental(self) -> bool:
+        """
+        greedy similarity binning is not an incremental model
+        """
         return False
 
     def to_dict(self) -> Dict:
