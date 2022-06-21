@@ -10,7 +10,7 @@ from builtins import *
 from past.utils import old_div
 import json
 from random import randrange
-from emission.net.api.bottle import route, post, get, run, template, static_file, request, app, HTTPError, abort, BaseRequest, JSONPlugin, response
+from emission.net.api.bottle import route, post, get, run, template, static_file, request, app, HTTPError, abort, BaseRequest, JSONPlugin, response, error, redirect
 import emission.net.api.bottle as bt
 # To support dynamic loading of client-specific libraries
 import sys
@@ -58,6 +58,8 @@ except:
     logging.debug("webserver not configured, falling back to sample, default configuration")
     config_file = open('conf/net/api/webserver.conf.sample')
 
+OPENPATH_URL="https://www.nrel.gov/transportation/openpath.html"
+
 config_data = json.load(config_file)
 config_file.close()
 static_path = config_data["paths"]["static_path"]
@@ -68,6 +70,8 @@ socket_timeout = config_data["server"]["timeout"]
 log_base_dir = config_data["paths"]["log_base_dir"]
 auth_method = config_data["server"]["auth"]
 aggregate_call_auth = config_data["server"]["aggregate_call_auth"]
+# not_found_redirect = "foo" if len(config_data["paths"]) == 5 else "bar"
+not_found_redirect = config_data["paths"]["404_redirect"] if "404_redirect" in config_data["paths"] else OPENPATH_URL
 
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes
@@ -86,52 +90,6 @@ app = app()
 @route('/')
 def index():
   return static_file("index.html", static_path)
-
-# Bunch of static pages that constitute our website
-# Should we have gone for something like django instead after all?
-# If this gets to be too much, we should definitely consider that
-@route("/docs/<filename>")
-def docs(filename):
-  if filename != "privacy.html" and filename != "support.html" and filename != "about.html" and filename != "consent.html" and filename != "approval_letter.pdf":
-    logging.error("Request for unknown filename "% filename)
-    logging.error("Request for unknown filename "% filename)
-    return HTTPError(404, "Don't try to hack me, you evil spammer")
-  else:
-    return static_file(filename, "%s/%s" % (static_path, "docs"))
-
-@route("/<filename>")
-def docs(filename):
-  if filename != "privacy" and filename != "support" and filename != "about" and filename != "consent":
-    return HTTPError(404, "Don't try to hack me, you evil spammer")
-  else:
-    return static_file("%s.html" % filename, "%s/%s" % (static_path, "docs"))
-
-# Serve up the components of the webapp - library files, our javascript and css
-# files, and HTML templates, properly
-@route('/css/<filepath:path>')
-def server_css(filepath):
-    logging.debug("static filepath = %s" % filepath)
-    return static_file(filepath, "%s/%s" % (static_path, "css"))
-
-@route('/img/<filepath:path>')
-def server_img(filepath):
-    logging.debug("static filepath = %s" % filepath)
-    return static_file(filepath, "%s/%s" % (static_path, "img"))
-
-@route('/js/<filepath:path>')
-def server_js(filepath):
-    logging.debug("static filepath = %s" % filepath)
-    return static_file(filepath, "%s/%s" % (static_path, "js"))
-
-@route('/lib/<filepath:path>')
-def server_lib(filepath):
-    logging.debug("static filepath = %s" % filepath)
-    return static_file(filepath, "%s/%s" % (static_path, "lib"))
-
-@route('/templates/<filepath:path>')
-def server_templates(filepath):
-  logging.debug("static filepath = %s" % filepath)
-  return static_file(filepath, "%s/%s" % (static_path, "templates"))
 
 # Backward compat to handle older clients
 # Remove in 2023 after everybody has upgraded
@@ -440,6 +398,11 @@ def habiticaProxy():
     return habitproxy.habiticaProxy(user_uuid, method, method_url,
                                     method_args)
 # Data source integration END
+
+@error(404)
+def error404(error):
+    response.status = 301
+    response.set_header('Location', "https://www.nrel.gov/transportation/openpath.html")
 
 @app.hook('before_request')
 def before_request():
