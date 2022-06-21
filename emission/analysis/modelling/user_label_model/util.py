@@ -5,8 +5,10 @@ from past.utils import old_div
 import numpy
 from numpy.linalg import norm
 
+import emission.storage.decorations.analysis_timeseries_queries as esda
 
-def load_fs(filename: str, numpy_decode: bool = True) -> dict:
+
+def load_fs(filename: str, numpy_decode: bool = True) -> Optional[dict]:
     """loads model state as a pickled object on the file system.
     if the file is not found, returns an empty dict.
 
@@ -17,13 +19,14 @@ def load_fs(filename: str, numpy_decode: bool = True) -> dict:
     :return: json object parsed, or, an empty list
     :rtype: Dict
     """
+    raise Exception("deprecated, use db instead")
     logging.debug(f"At stage: loading model")
     try:
         with open(filename, "r") as f:
             contents = f.read()
     except FileNotFoundError:
         logging.info(f"No model found at {filename}, no prediction")
-        return {}
+        return None
     
     try:
         if numpy_decode:
@@ -49,6 +52,7 @@ def save_fs(filename: str, obj: object):
     :type obj: object
 
     """
+    raise Exception("deprecated, use db instead")
     try:
         logging.debug("At stage: saving model")
         obj_capsule = jpickle.dumps(obj)
@@ -59,25 +63,21 @@ def save_fs(filename: str, obj: object):
         raise IOError(msg) from e
 
 
-def load_db(user_id: str, table: str, timestamp: Optional[int] = None) -> Dict:
+def load_db(user_id: str, timestamp: Optional[int] = None) -> Dict:
     """
-    loads a user label prediction model from a database table. 
-
-    data is assumed stored in a document database, with the structure:
-
-    { "user_id": user_id, "data": model_data }
+    loads a user label prediction model from the analysis database. 
 
     :param user_id: user id to filter on
     :type user_id: str
-    :param table: the table name
-    :type table: str
     :param timestamp: optional time to 
     :return: 
     :rtype: Dict
     """    
+    esda.get_entry
     # build the time query if a timestamp is provided
-    time_query = lambda confirmed_trip: confirmed_trip['data']['start_ts'] >= timestamp \
-        if timestamp is not None else None
+    # time_query = lambda trip: trip['data']['start_ts'] >= timestamp \
+    #     if timestamp is not None else None
+
     pass
 
 def save_db(user_id, table: str, model_data: Dict):

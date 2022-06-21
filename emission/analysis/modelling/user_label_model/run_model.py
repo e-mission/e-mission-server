@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+import arrow
 from tracemalloc import start
 from typing import Optional
 
@@ -17,6 +18,7 @@ from emission.core.wrapper.confirmedtrip import Confirmedtrip
 from numpy import isin
 
 import emission.analysis.modelling.tour_model.cluster_pipeline as pipeline
+import emission.storage.pipeline_queries as epq
 import emission.storage.decorations.analysis_timeseries_queries as esda
 from emission.storage.timeseries.timequery import TimeQuery
 
@@ -53,7 +55,11 @@ def _model_factory(model_type: ModelType):
     return model
 
 
-def update_user_label_model(user_id, model_type: ModelType, model_storage: ModelStorage, min_trips: int = 14):
+def update_user_label_model(
+    user_id, 
+    model_type: ModelType, 
+    model_storage: ModelStorage = ModelStorage.DATABASE, 
+    min_trips: int = 14):
     """
     create/update a user label model for a user.
 
@@ -62,46 +68,31 @@ def update_user_label_model(user_id, model_type: ModelType, model_storage: Model
     if the model type is "incremental", only the newest trips are used.
 
     :param user_id: id of user
-    :type user_id: _type_
-    :param model_type: type of model to build
-    :type model_type: str
-    :param model_storage: storage destination for built model
-    :type model_storage: ModelStorage
+    :param model_type: type of model to build. this is also stored on the database. if
+                    there is a mismatch, an exception is thrown
+    :param model_storage: storage destination for built model (default DATABASE)
     :param min_trips: minimum number of labeled trips per user to apply prediction (default 14)
-    :type min_trips: int
     """
+
+    # this timestamp is used for recording the state of the updated model
+    timestamp = arrow.now()
     model = _model_factory(model_type)
-    model_name = model_type.model_name
 
-    if model.is_incremental:
-        
-        # read in existing model, if it exists
-        model_data = load(user_id, model_name, model_storage)
-        model.from_dict(model_data)
-        
-        # todo: get timestamp from pipeline, use as filter in query
-        start_ts = -1
-        end_ts = datetime.now()
-        time_query = TimeQuery(
-            timeType="data.start_ts",
-            startTs=start_ts,
-            endTs=end_ts
-        )
-    else:
-        time_query = None
+    # if a previous model exists, deserialize the stored model
+    model_data_prev = load(user_id, model_type, model_storage)
+    if model_data_prev is not None:
+        model.from_dict(model_data_prev)
 
+    # get all relevant trips
+    time_query = epq.get_time_query_for_user_label_model(user_id) if model.is_incremental else None
     trips = _get_trips_for_user(user_id, time_query, min_trips)
 
-    # fit and store the updated model
+    # train and store the model
     model.fit(trips)
-    model_data = model.to_dict()
-    save(user_id, model_data, model_name, model_storage)
+    model_data_next = model.to_dict()
+    save(user_id, model_type, model_data_next, timestamp, model_storage)
 
-    if model.is_incremental:
-        new_timestamp = datetime.now()
-        # todo: update pipeline with new timestamp
-
-    logging.debug(f"{model_name} label prediction model built for user {user_id}")
+    logging.debug(f"{model_type.name} label prediction model built for user {user_id} with timestamp {timestamp}")
 
 
 def predict_labels_with_n(
@@ -112,18 +103,17 @@ def predict_labels_with_n(
     invoke the user label prediction model to predict labels for a trip.
 
     :param trip: the trip to predict labels for
-    :type trip: Confirmedtrip
     :param model_type: type of prediction model to run
-    :type model_type: ModelType
     :param model_storage: location to read/write models
-    :type model_storage: ModelStorage
     :return: a list of predictions
-    :rtype: List[Prediction]
     """
     user_id = trip['user_id']
     model = _load_user_label_model(user_id, model_type, model_storage)
-    predictions, n = model.predict(trip)
-    return predictions, n
+    if model is None:
+        return [], -1
+    else:
+        predictions, n = model.predict(trip)
+        return predictions, n
 
 
 def _get_trips_for_user(user_id, time_query: Optional[TimeQuery]=None, min_trips: int=14):
@@ -150,15 +140,26 @@ def _get_trips_for_user(user_id, time_query: Optional[TimeQuery]=None, min_trips
     return labeled_trips
 
 
-def _load_user_label_model(user_id, model_type: ModelType, model_storage: ModelStorage) -> UserLabelPredictionModel:
-    model = _model_factory(model_type)
-    model_name = model_type.model_name
+def _load_user_label_model(
+    user_id, 
+    model_type: ModelType, 
+    model_storage: ModelStorage) -> Optional[UserLabelPredictionModel]:
+    """helper to build a user label prediction model class with the 
+    contents of a stored model for some user.
 
-    model_data = load(user_id, model_name, model_storage)
-    model.from_dict(model_data)
-
-    return model
-
+    :param user_id: user to retrieve the model for
+    :param model_type: UserLabelPredictionModel type configured for this OpenPATH server
+    :param model_storage: storage type
+    :return: model, or None if no model is stored for this user
+    """
+    model_dict = load(user_id, model_type, model_storage)
+    if model_dict is None:
+        return None
+    else:    
+        model = _model_factory(model_type)
+        model.from_dict(model_dict)
+        return model
+    
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',

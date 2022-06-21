@@ -121,6 +121,14 @@ def mark_mode_inference_complete(user_id):
 def mark_mode_inference_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.MODE_INFERENCE)
 
+def get_time_query_for_user_label_model(user_id):  # TODO: here
+    tq = get_time_range_for_stage(user_id, ps.PipelineStages.USER_LABEL_MODEL)
+    tq.timeType = 'data.model_ts'
+    return tq
+
+def mark_user_label_model_done(user_id, last_ts=None):
+    mark_stage_done(user_id, ps.PipelineStages.USER_LABEL_MODEL, last_ts)
+
 def get_time_range_for_confirmed_object_creation(user_id):
     tq = get_time_range_for_stage(user_id, ps.PipelineStages.CREATE_CONFIRMED_OBJECTS)
     tq.timeType = "data.end_ts"

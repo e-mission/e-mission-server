@@ -86,6 +86,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "metrics/daily_mean_median_speed": self.analysis_timeseries_db,
                 "inference/prediction": self.analysis_timeseries_db,
                 "inference/labels": self.analysis_timeseries_db,
+                "inference/user_label_model": self.analysis_timeseries_db,
                 "analysis/inferred_section": self.analysis_timeseries_db,
                 "analysis/inferred_labels": self.analysis_timeseries_db,
                 "analysis/inferred_trip": self.analysis_timeseries_db,
@@ -298,6 +299,24 @@ class BuiltinTimeSeries(esta.TimeSeries):
         return deduped_df.reset_index(drop=True)
 
 
+    def get_first_entry(self, key, field, sort_order, time_query=None):
+        """gets the first entry with the provided key when sorted by some field
+
+        :param key: the metadata key for the entries, used to identify the stream
+        :param field: the field in the stream whose max value we want.
+        :param sort_order: pymongo.ASCENDING or pymongon.DESCENDING
+        :param time_query: the time range in which to search the stream
+        :return: a database row, or None if no match is found
+        """
+        result_it = self.get_timeseries_db(key).find(self._get_query([key], time_query),
+            {"_id": False, field: True}).sort(field, sort_order).limit(1)
+        result_list = list(result_it)
+        if len(result_list) == 0:
+            return None
+        else:
+            return result_list[0]
+    
+
     def get_first_value_for_field(self, key, field, sort_order, time_query=None):
         """
         Currently used to get the max value of the location values so that we can send data
@@ -310,13 +329,11 @@ class BuiltinTimeSeries(esta.TimeSeries):
         It is assumed that the values for the field are sortable.
         :return: the max value for the field in the stream identified by key. -1 if there are no entries for the key.
         """
-        result_it = self.get_timeseries_db(key).find(self._get_query([key], time_query),
-                                                 {"_id": False, field: True}).sort(field, sort_order).limit(1)
-        result_list = list(result_it)
-        if len(result_list) == 0:
+        retVal = self.get_first_entry(key, field, sort_order, time_query)
+        if retVal is None:
             return -1
 
-        retVal = result_list[0]
+        # extract the specified field from the entry that was found
         field_parts = field.split(".")
         for part in field_parts:
             retVal = retVal[part]
