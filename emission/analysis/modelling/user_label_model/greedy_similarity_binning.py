@@ -142,9 +142,7 @@ class GreedySimilarityBinning(UserLabelPredictionModel):
         none are found, (None, None) is returned.
 
         :param trip: incoming trip features to test with
-        :type trip: Confirmedtrip
         :return: nearest record and bin number, if found
-        :rtype: Optional[Tuple[BinRecord, Int]]
         """
         trip_features = self.extract_features(trip)
         selected_bin = None
