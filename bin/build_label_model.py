@@ -6,12 +6,14 @@ import logging
 import argparse
 import uuid
 import copy
+from emission.analysis.modelling.user_label_model.model_storage import ModelStorage
+from emission.analysis.modelling.user_label_model.model_type import ModelType
 
 import emission.pipeline.reset as epr
 import emission.core.get_database as edb
 import emission.core.wrapper.user as ecwu
 import emission.storage.timeseries.abstract_timeseries as esta
-import emission.analysis.modelling.tour_model_first_only.build_save_model as eamtb
+import emission.analysis.modelling.user_label_model.run_model as eamur
 
 def _get_user_list(args):
     if args.all:
@@ -64,4 +66,7 @@ if __name__ == '__main__':
     logging.info("received list with %s users" % user_list)
     for user_id in user_list:
         logging.info("building model for user %s" % user_id)
-        eamtb.build_user_model(user_id)
+        model_type = ModelType.GREEDY_SIMILARITY_BINNING
+        model_storage = ModelStorage.DATABASE
+        min_trips = 14
+        eamur.update_user_label_model(user_id, model_type, model_storage, min_trips)

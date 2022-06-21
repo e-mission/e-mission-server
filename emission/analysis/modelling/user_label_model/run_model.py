@@ -90,7 +90,7 @@ def update_user_label_model(
 def predict_labels_with_n(
     trip: Confirmedtrip,
     model_type = ModelType.GREEDY_SIMILARITY_BINNING,
-    model_storage = ModelStorage.FILE_SYSTEM):
+    model_storage = ModelStorage.DATABASE):
     """
     invoke the user label prediction model to predict labels for a trip.
 
