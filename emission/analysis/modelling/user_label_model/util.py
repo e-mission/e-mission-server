@@ -61,41 +61,7 @@ def save_fs(filename: str, obj: object):
     except Exception as e:
         msg = f"failed writing clustering model contents to file system"
         raise IOError(msg) from e
-
-
-def load_db(user_id: str, timestamp: Optional[int] = None) -> Dict:
-    """
-    loads a user label prediction model from the analysis database. 
-
-    :param user_id: user id to filter on
-    :type user_id: str
-    :param timestamp: optional time to 
-    :return: 
-    :rtype: Dict
-    """    
-    esda.get_entry
-    # build the time query if a timestamp is provided
-    # time_query = lambda trip: trip['data']['start_ts'] >= timestamp \
-    #     if timestamp is not None else None
-
-    pass
-
-def save_db(user_id, table: str, model_data: Dict):
-    """
-    saves a user label prediction model to the database.
-
-    data is assumed stored in a document database, with the structure:
-
-    { "user_id": user_id, "data": model_data }
-
-    :param user_id: the user to store data for
-    :type user_id: object
-    :param table: the table name
-    :type table: str
-    :param model_data: the data row to store tagged by this user id
-    :type model_data: Dict
-    """
-    pass
+        
 
 def find_knee_point(values: List[float]) -> Tuple[float, int]:
     """for a list of values, find the value which represents the cut-off point
