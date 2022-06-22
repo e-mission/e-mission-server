@@ -91,6 +91,22 @@ app = app()
 def index():
   return static_file("index.html", static_path)
 
+# Redirect to the NREL static study-specific pages
+# Remove after the temporary redirect is done
+# https://github.nrel.gov/nrel-cloud-computing/emissionlhd/issues/27
+@route('/join_redirect_to_static')
+def redirectToNRELStudy():
+  orig_host = request.urlparts.netloc
+  first_domain = orig_host.split(".")[0]
+  openpath_index = first_domain.find("-openpath")
+  if openpath_index == -1:
+      abort(400, "Invalid study format %s, does not end with -openpath" % first_domain)
+  study_name = first_domain[0:openpath_index]
+  new_url = "https://www.nrel.gov/transportation/openpath-%s-study.html" % (study_name)
+  logging.debug("Found study %s, mapped join URL for %s -> %s" % (study_name, orig_host, new_url))
+  response.status = 301
+  response.set_header('Location', new_url)
+
 # Backward compat to handle older clients
 # Remove in 2023 after everybody has upgraded
 # We used to use the presence or absence of the "user" field
