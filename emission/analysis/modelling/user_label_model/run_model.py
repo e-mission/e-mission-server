@@ -19,34 +19,6 @@ from numpy import isin
 SIMILARITY_THRESHOLD_METERS = 500
 
 
-def _model_factory(model_type: ModelType) -> eamuu.UserLabelPredictionModel:
-    """
-    instantiates the requested user model type with the configured
-    parameters. if future model types are created, they should be 
-    added here.
-
-    :param model_type: internally-used model name
-    :return: a user label prediction model
-    :raises KeyError: if the requested model name does not exist
-    """
-    MODELS = {
-        ModelType.GREEDY_SIMILARITY_BINNING: eamug.GreedySimilarityBinning(
-            metric=eamso.OriginDestinationSimilarity(),
-            sim_thresh=SIMILARITY_THRESHOLD_METERS,
-            apply_cutoff=False
-        )
-    }
-    model = MODELS.get(model_type)
-    if model is None:
-        if not isinstance(model_type, ModelType):
-            raise TypeError(f"provided model type {model_type} is not an instance of ModelType")
-        else:
-            model_names = list(lambda e: e.name, MODELS.keys())
-            models = ",".join(model_names)
-            raise KeyError(f"user label model {model_type.name} not found in factory, must be one of {{{models}}}")
-    return model
-
-
 def update_user_label_model(
     user_id, 
     model_type: ModelType, 
@@ -68,10 +40,10 @@ def update_user_label_model(
 
     # this timestamp is used for recording the state of the updated model
     timestamp = arrow.now()
-    model = _model_factory(model_type)
+    model = model_factory(model_type)
 
     # if a previous model exists, deserialize the stored model
-    model_data_prev = eamum.load(user_id, model_type, model_storage)
+    model_data_prev = eamum.load_model(user_id, model_type, model_storage)
     if model_data_prev is not None:
         model.from_dict(model_data_prev)
 
@@ -82,7 +54,7 @@ def update_user_label_model(
     # train and store the model
     model.fit(trips)
     model_data_next = model.to_dict()
-    eamum.save(user_id, model_type, model_data_next, timestamp, model_storage)
+    eamum.save_model(user_id, model_type, model_data_next, timestamp, model_storage)
 
     logging.debug(f"{model_type.name} label prediction model built for user {user_id} with timestamp {timestamp}")
 
@@ -108,17 +80,43 @@ def predict_labels_with_n(
         return predictions, n
 
 
-def _get_trips_for_user(user_id, time_query: Optional[TimeQuery]=None, min_trips: int=14):
+def model_factory(model_type: ModelType) -> eamuu.UserLabelPredictionModel:
+    """
+    instantiates the requested user model type with the configured
+    parameters. 
+    
+    hey YOU! if future model types are created, they should be added here!
+
+    :param model_type: internally-used model name (an enum)
+    :return: a user label prediction model
+    :raises KeyError: if the requested model name does not exist
+    """
+    MODELS = {
+        ModelType.GREEDY_SIMILARITY_BINNING: eamug.GreedySimilarityBinning(
+            metric=eamso.OriginDestinationSimilarity(),
+            sim_thresh=SIMILARITY_THRESHOLD_METERS,
+            apply_cutoff=False
+        )
+    }
+    model = MODELS.get(model_type)
+    if model is None:
+        if not isinstance(model_type, ModelType):
+            raise TypeError(f"provided model type {model_type} is not an instance of ModelType")
+        else:
+            model_names = list(lambda e: e.name, MODELS.keys())
+            models = ",".join(model_names)
+            raise KeyError(f"user label model {model_type.name} not found in factory, must be one of {{{models}}}")
+    return model
+
+
+def _get_trips_for_user(user_id, time_query: Optional[TimeQuery], min_trips: int):
     """
     load the labeled trip data for this user, subject to a time query. if the user
     does not have at least $min_trips trips with labels, then return an empty list.
 
     :param user_id: user to collect trips from
-    :type user_id: _type_
     :param time_query: query to restrict the time (optional)
-    :type time_query: Optional[TimeQuery]
     :param min_trips: minimum number of labeled trips required to train
-    :type min_trips: int
     """
     trips = esda.get_entries(key=esda.CONFIRMED_TRIP_KEY, user_id=user_id, time_query=time_query)
     labeled_trips = [trip for trip in trips if trip['data']['user_input'] != {}]
@@ -144,24 +142,23 @@ def _load_user_label_model(
     :param model_storage: storage type
     :return: model, or None if no model is stored for this user
     """
-    model_dict = eamum.load(user_id, model_type, model_storage)
+    model_dict = eamum.load_model(user_id, model_type, model_storage)
     if model_dict is None:
         return None
     else:    
-        model = _model_factory(model_type)
+        model = model_factory(model_type)
         model.from_dict(model_dict)
         return model
     
 
 if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',
-        level=logging.DEBUG)
+    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s',level=logging.DEBUG)
     all_users = esta.TimeSeries.get_uuid_list()
 
     # case 1: the new trip matches a bin from the 1st round and a cluster from the 2nd round
     user_id = all_users[0]
     update_user_label_model(user_id, ModelType.GREEDY_SIMILARITY_BINNING, ModelStorage.FILE_SYSTEM)
-    filter_trips = _get_trips_for_user(user_id)
+    filter_trips = _get_trips_for_user(user_id, None, 0)
     new_trip = filter_trips[4]
     # result is [{'labels': {'mode_confirm': 'shared_ride', 'purpose_confirm': 'church', 'replaced_mode': 'drove_alone'},
     # 'p': 0.9333333333333333}, {'labels': {'mode_confirm': 'shared_ride', 'purpose_confirm': 'entertainment',
@@ -174,7 +171,7 @@ if __name__ == '__main__':
     # 2. the user doesn't have common trips
     user_id = all_users[1]
     update_user_label_model(user_id, ModelType.GREEDY_SIMILARITY_BINNING, ModelStorage.FILE_SYSTEM)
-    filter_trips = _get_trips_for_user(user_id)
+    filter_trips = _get_trips_for_user(user_id, None, 0)
     new_trip = filter_trips[0]
     # result is []
     pl, _ = predict_labels_with_n(new_trip)
@@ -183,7 +180,7 @@ if __name__ == '__main__':
     # case3: the new trip is novel trip(doesn't fall in any 1st round bins)
     user = all_users[0]
     update_user_label_model(user_id, ModelType.GREEDY_SIMILARITY_BINNING, ModelStorage.FILE_SYSTEM)
-    filter_trips = _get_trips_for_user(user_id)
+    filter_trips = _get_trips_for_user(user_id, None, 0)
     new_trip = filter_trips[0]
     # result is []
     pl = predict_labels_with_n(new_trip)

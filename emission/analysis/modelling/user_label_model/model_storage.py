@@ -23,7 +23,7 @@ def create_filename(user_id, model_type: ModelType) -> str:
     return f"user_label_model_{model_type.name}_{str(user_id)}"
 
 
-def load(user_id, model_type: ModelType, model_storage: ModelStorage) -> Optional[Dict]:
+def load_model(user_id, model_type: ModelType, model_storage: ModelStorage) -> Optional[Dict]:
     """load a user label model from a model storage location
 
     :param user_id: the user to request a model for
@@ -65,7 +65,7 @@ def load(user_id, model_type: ModelType, model_storage: ModelStorage) -> Optiona
         )
         raise TypeError(msg)
 
-def save(
+def save_model(
     user_id, 
     model_type: ModelType, 
     model_data: Dict,
