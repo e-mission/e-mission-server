@@ -1,29 +1,27 @@
 from enum import Enum
 from typing import Dict, Optional
 
-import emission.analysis.modelling.user_label_model.util as util
+import emission.analysis.modelling.user_label_model.model_type as eamum
 import emission.core.wrapper.user_label_prediction_model as ecwu
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.pipeline_queries as epq
 import emission.storage.timeseries.abstract_timeseries as esta
+import emission.storage.timeseries.builtin_timeseries as estb
 import pymongo
-from emission.analysis.modelling.user_label_model.model_type import ModelType
-from emission.storage.timeseries.builtin_timeseries import BuiltinTimeSeries
 
 
 class ModelStorage(Enum):
-    FILE_SYSTEM = 0
-    DATABASE = 1
+    """
+    enumeration of model storage destinations. currently restricted to 
+    DATABASE only.
+    """
+    DATABASE = 0
     @classmethod
     def names(cls):
         return list(map(lambda e: e.name, list(cls)))
 
 
-def create_filename(user_id, model_type: ModelType) -> str:
-    return f"user_label_model_{model_type.name}_{str(user_id)}"
-
-
-def load_model(user_id, model_type: ModelType, model_storage: ModelStorage) -> Optional[Dict]:
+def load_model(user_id, model_type: eamum.ModelType, model_storage: ModelStorage) -> Optional[Dict]:
     """load a user label model from a model storage location
 
     :param user_id: the user to request a model for
@@ -32,16 +30,12 @@ def load_model(user_id, model_type: ModelType, model_storage: ModelStorage) -> O
     :return: the model representation as a Python Dict or None
     :raises: TypeError if loaded model has different type than expected type
     """
-    if model_storage == ModelStorage.FILE_SYSTEM:
-        filename = create_filename(user_id, model_type)
-        model_data = util.load_fs(filename)
-        return model_data
-    elif model_storage == ModelStorage.DATABASE:
+    if model_storage == ModelStorage.DATABASE:
         
         # retrieve stored model with timestamp that matches/exceeds the most
         # recent PipelineState.USER_LABEL_MODEL entry        
         ts = esda.get_timeseries_for_user(user_id)
-        if not isinstance(ts, BuiltinTimeSeries):
+        if not isinstance(ts, estb.BuiltinTimeSeries):
             raise Exception('user model storage requires BuiltInTimeSeries')
         latest_model_entry = ts.get_first_entry(
             key=esda.USER_LABEL_MODEL_STORE_KEY,
@@ -67,7 +61,7 @@ def load_model(user_id, model_type: ModelType, model_storage: ModelStorage) -> O
 
 def save_model(
     user_id, 
-    model_type: ModelType, 
+    model_type: eamum.ModelType, 
     model_data: Dict,
     model_timestamp: int,
     model_storage: ModelStorage = ModelStorage.DATABASE):
@@ -81,18 +75,7 @@ def save_model(
     :raises IOError: failure when writing to storage medium
     """
    
-    if model_storage == ModelStorage.FILE_SYSTEM:
-        try:
-            filename = create_filename(user_id, model_type)
-            util.save_fs(filename, model_data)
-        except IOError as e:
-            msg = (
-                f"failure storing model for user {user_id}, model {model_type.name} "
-                f"to the file system"
-            )
-            raise IOError(msg) from e
-        
-    elif model_storage == ModelStorage.DATABASE:
+    if model_storage == ModelStorage.DATABASE:
         
         row = ecwu.UserLabelPredictionModel()
         row.user_id = user_id

@@ -1,26 +1,27 @@
 import logging
 from typing import Dict, List, Optional, Tuple
 
+import emission.analysis.modelling.similarity.similarity_metric as eamss
 import emission.analysis.modelling.tour_model.label_processing as lp
+import emission.analysis.modelling.user_label_model.user_label_prediction_model as eamuu
 import emission.analysis.modelling.user_label_model.util as util
+import emission.core.wrapper.confirmedtrip as ecwc
 import pandas as pd
-from emission.analysis.modelling.similarity.similarity_metric import \
-    SimilarityMetric
-from emission.analysis.modelling.user_label_model.user_label_prediction_model import \
-    UserLabelPredictionModel
-from emission.core.wrapper.confirmedtrip import Confirmedtrip
 
 
-class GreedySimilarityBinning(UserLabelPredictionModel):
+class GreedySimilarityBinning(eamuu.UserLabelPredictionModel):
 
     def __init__(
         self,
-        metric: SimilarityMetric,
+        metric: eamss.SimilarityMetric,
         sim_thresh: float,
         apply_cutoff: bool = False,
     ) -> None:
         """
         instantiate a clustering model for a user.
+
+        replaces the original similarity class
+        [https://github.com/e-mission/e-mission-server/blob/5b9e608154de15e32df4f70a07a5b95477e7dbf5/emission/analysis/modelling/tour_model/similarity.py#L67]
 
         this technique employs a greedy similarity heuristic to associate
         trips with collections of probabilistic class labels. in pseudocode:
@@ -52,7 +53,7 @@ class GreedySimilarityBinning(UserLabelPredictionModel):
         self.bins: Dict[int, Dict] = {}
         self.loaded = False
 
-    def fit(self, trips: List[Confirmedtrip]):
+    def fit(self, trips: List[ecwc.Confirmedtrip]):
         """train the model by passing data, where each row in the data
         corresponds to a label at the matching index of the label input
 
@@ -65,12 +66,9 @@ class GreedySimilarityBinning(UserLabelPredictionModel):
         self._generate_predictions()
         logging.info(f"model fit to trip data")
 
-    def predict(self, trip: Confirmedtrip) -> Tuple[List[Dict], int]:
+    def predict(self, trip: ecwc.Confirmedtrip) -> Tuple[List[Dict], int]:
         if not self.loaded:
-            msg = (
-                "predict called on unloaded model "
-                f"for user {self.user_id}"
-            )
+            msg = f"predict called on unloaded model for user {self.user_id}"
             raise IOError(msg)
 
         logging.debug(f"running greedy similarity clustering")
@@ -96,13 +94,14 @@ class GreedySimilarityBinning(UserLabelPredictionModel):
     def from_dict(self, model: Dict):
         self.bins = model
 
-    def extract_features(self, trip: Confirmedtrip) -> List[float]:
+    def extract_features(self, trip: ecwc.Confirmedtrip) -> List[float]:
         features = self.metric.extract_features(trip)
         return features
 
-    def _assign_bins(self, trips: List[Confirmedtrip]):
+    def _assign_bins(self, trips: List[ecwc.Confirmedtrip]):
         """
         assigns each trip to a bin by greedy similarity search
+        [see https://github.com/e-mission/e-mission-server/blob/5b9e608154de15e32df4f70a07a5b95477e7dbf5/emission/analysis/modelling/tour_model/similarity.py#L118]
 
         :param data: trips to assign to bins
         :type data: List[Confirmedtrip]
@@ -125,7 +124,7 @@ class GreedySimilarityBinning(UserLabelPredictionModel):
                 }
                 self.bins[new_bin_id] = new_bin_record
 
-    def _nearest_bin(self, trip: Confirmedtrip) -> Tuple[Optional[int], Optional[Dict]]:
+    def _nearest_bin(self, trip: ecwc.Confirmedtrip) -> Tuple[Optional[int], Optional[Dict]]:
         """
         finds a bin which contains at least one matching feature. the 
         first record matching by similarity measure is returned. if
@@ -174,6 +173,7 @@ class GreedySimilarityBinning(UserLabelPredictionModel):
     def _generate_predictions(self):
         """
         helper function to transform binned features and labels into predictions.
+        taken from [https://github.com/e-mission/e-mission-server/blob/10772f892385d44e11e51e796b0780d8f6609a2c/emission/analysis/modelling/tour_model_first_only/build_save_model.py#L40]
 
         for each bin, the unique label combinations are counted. their 
         probability is estimated with label_count / total_labels.

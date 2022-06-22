@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from typing import Dict, List, Tuple
 
-from emission.core.wrapper.confirmedtrip import Confirmedtrip
+import emission.core.wrapper.confirmedtrip as ecwc
 
 
 class UserLabelPredictionModel(metaclass=ABCMeta):
@@ -68,7 +68,7 @@ class UserLabelPredictionModel(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def extract_features(self, trip: Confirmedtrip) -> List[float]:
+    def extract_features(self, trip: ecwc.Confirmedtrip) -> List[float]:
         """
         extract the relevant features for learning from a trip for this model instance
 

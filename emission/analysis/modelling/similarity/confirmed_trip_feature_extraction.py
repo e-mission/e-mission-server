@@ -1,28 +1,48 @@
-from typing import Dict, List
-from emission.core.wrapper.confirmedtrip import Confirmedtrip
+from typing import List
+import emission.core.wrapper.confirmedtrip as ecwc
 import emission.analysis.modelling.tour_model.label_processing as lp
 
 
-def origin_features(trip: Confirmedtrip) -> List[float]:
+def origin_features(trip: ecwc.Confirmedtrip) -> List[float]:
+    """extract the trip origin coordinates.
+
+    :param trip: trip to extract features from
+    :return: origin coordinates
+    """
     origin = trip.data.start_loc["coordinates"]
     return origin
 
-def destination_features(trip: Confirmedtrip) -> List[float]:
+def destination_features(trip: ecwc.Confirmedtrip) -> List[float]:
+    """extract the trip destination coordinates. 
+
+    :param trip: trip to extract features from
+    :return: destination coordinates
+    """
     destination = trip.data.end_loc["coordinates"]
     return destination
 
-def od_features(trip: Confirmedtrip) -> List[float]:
+def od_features(trip: ecwc.Confirmedtrip) -> List[float]:
+    """extract both origin and destination coordinates.
+
+    :param trip: trip to extract features from
+    :return: od coordinates
+    """
     o_lat, o_lon = origin_features(trip)
     d_lat, d_lon = destination_features(trip)
     return [o_lat, o_lon, d_lat, d_lon]
 
-def distance_feature(trip: Confirmedtrip) -> List[float]:
+def distance_feature(trip: ecwc.Confirmedtrip) -> List[float]:
+    """provided for forward compatibility.
+
+    :param trip: trip to extract features from
+    :return: distance feature
+    """
     return [trip.data.distance]
 
-def duration_feature(trip: Confirmedtrip) -> List[float]:
-    return [trip.data.duration]
+def duration_feature(trip: ecwc.Confirmedtrip) -> List[float]:
+    """provided for forward compatibility.
 
-def label_features(trip: Confirmedtrip) -> Dict:
-    labels = trip.data.user_input
-    labels_normalized = lp.map_labels(labels)  # could be replaced by localization logic
-    return labels_normalized
+    :param trip: trip to extract features from
+    :return: duration feature
+    """
+    return [trip.data.duration]

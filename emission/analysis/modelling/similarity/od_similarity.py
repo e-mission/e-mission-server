@@ -1,19 +1,18 @@
 from typing import List
-from emission.analysis.modelling.similarity.similarity_metric import SimilarityMetric
+import emission.analysis.modelling.similarity.similarity_metric as eamss
 import emission.analysis.modelling.similarity.confirmed_trip_feature_extraction as ctfe
-from emission.analysis.modelling.tour_model.similarity import similarity
-from emission.core.wrapper.confirmedtrip import Confirmedtrip
+import emission.core.wrapper.confirmedtrip as ecwc
 import emission.core.common as ecc
 
 
-class OriginDestinationSimilarity(SimilarityMetric):
+class OriginDestinationSimilarity(eamss.SimilarityMetric):
     """
     similarity metric which compares, for two trips, 
     the distance for origin to origin, and destination to destination,
     in meters.
     """
     
-    def extract_features(self, trip: Confirmedtrip) -> List[float]:
+    def extract_features(self, trip: ecwc.Confirmedtrip) -> List[float]:
         return ctfe.od_features(trip)
 
     def similarity(self, a: List[float], b: List[float], thresh: float) -> List[float]:
