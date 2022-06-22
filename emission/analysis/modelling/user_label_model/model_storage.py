@@ -54,7 +54,7 @@ def load_model(user_id, model_type: ModelType, model_storage: ModelStorage) -> O
                 f"but was expected to have model type {model_type}"
             )
             raise TypeError(msg)
-        model = latest_model_entry['data']['model'] if latest_model_entry is not None else None
+        model = latest_model_entry.model if latest_model_entry is not None else None
         return model
 
     else:
