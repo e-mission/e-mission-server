@@ -66,6 +66,7 @@ if __name__ == '__main__':
     logging.info("received list with %s users" % user_list)
     for user_id in user_list:
         logging.info("building model for user %s" % user_id)
+        # these can come from the application config as default values
         model_type = ModelType.GREEDY_SIMILARITY_BINNING
         model_storage = ModelStorage.DATABASE
         min_trips = 14

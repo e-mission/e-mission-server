@@ -11,22 +11,18 @@ class SimilarityMetric(metaclass=ABCMeta):
         """extracts the features we want to compare for similarity
 
         :param trip: a confirmed trip
-        :type trip: Confirmedtrip
         :return: the features to compare
-        :rtype: List[float]
         """
         pass
 
+    @abstractmethod
     def similarity(self, a: List[float], b: List[float]) -> List[float]:
         """compares the features, producing their similarity
         as computed by this similarity metric
 
         :param a: features for a trip
-        :type a: List[float]
         :param b: features for another trip
-        :type b: List[float]
         :return: for each feature, the similarity of these features
-        :rtype: List[float]
         """
         pass
 
@@ -35,12 +31,10 @@ class SimilarityMetric(metaclass=ABCMeta):
         within some threshold
 
         :param a: features for a trip
-        :type a: List[float]
         :param b: features for another trip
-        :type b: List[float]
         :param thresh: threshold for similarity
-        :type thresh: float
         :return: true if the feature similarity is within some threshold
-        :rtype: float
         """
-        pass
+        similarity_values = self.similarity(a, b)
+        is_similar = all(map(lambda sim: sim <= thresh, similarity_values))
+        return is_similar

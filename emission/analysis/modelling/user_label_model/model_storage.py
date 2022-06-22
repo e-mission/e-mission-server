@@ -1,17 +1,15 @@
 from enum import Enum
 from typing import Dict, Optional
-from emission.analysis.modelling.user_label_model.model_type import ModelType
+
+import emission.analysis.modelling.user_label_model.util as util
 import emission.core.wrapper.user_label_prediction_model as ecwu
+import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.pipeline_queries as epq
 import emission.storage.timeseries.abstract_timeseries as esta
-import emission.storage.decorations.analysis_timeseries_queries as esda
-import emission.analysis.modelling.user_label_model.util as util
-import logging
-import arrow
 import pymongo
+from emission.analysis.modelling.user_label_model.model_type import ModelType
 from emission.storage.timeseries.builtin_timeseries import BuiltinTimeSeries
 
-from emission.storage.timeseries.timequery import TimeQuery
 
 class ModelStorage(Enum):
     FILE_SYSTEM = 0

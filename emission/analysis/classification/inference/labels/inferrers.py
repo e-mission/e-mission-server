@@ -143,6 +143,7 @@ def n_to_confidence_coeff(n, max_confidence=None, first_confidence=None, confide
 
 # predict_two_stage_bin_cluster but with the above reduction in confidence
 def predict_cluster_confidence_discounting(trip, max_confidence=None, first_confidence=None, confidence_multiplier=None):
+    # these can come from the application config as default values
     model_type = ModelType.GREEDY_SIMILARITY_BINNING
     model_storage = ModelStorage.DATABASE
     labels, n = eamur.predict_labels_with_n(trip, model_type, model_storage)

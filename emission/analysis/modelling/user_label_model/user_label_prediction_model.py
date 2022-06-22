@@ -1,7 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from typing import Dict, List, Tuple
 
-from emission.analysis.modelling.user_label_model.prediction import Prediction
 from emission.core.wrapper.confirmedtrip import Confirmedtrip
 
 
@@ -18,7 +17,7 @@ class UserLabelPredictionModel(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def predict(self, data: List[float]) -> Tuple[List[Prediction], int]:
+    def predict(self, data: List[float]) -> Tuple[List[Dict], int]:
         """use this model to predict labels for some data
 
         :param data: a single row of features in the model's feature space

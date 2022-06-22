@@ -20,8 +20,3 @@ class OriginDestinationSimilarity(SimilarityMetric):
         o_dist = ecc.calDistance([a[0], a[1]], [b[0], b[1]])
         d_dist = ecc.calDistance([a[2], a[3]], [b[2], b[3]])
         return [o_dist, d_dist]
-
-    def similar(self, a: List[float], b: List[float], thresh: float) -> bool:
-        o_dist, d_dist = self.similarity(a, b)
-        is_similar = o_dist <= thresh and d_dist <= thresh
-        return is_similar

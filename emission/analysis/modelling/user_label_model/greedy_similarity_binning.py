@@ -1,24 +1,14 @@
 import logging
-import pandas as pd
-from pathlib import Path
 from typing import Dict, List, Optional, Tuple
-from emission.analysis.modelling.user_label_model.bin_record import BinRecord
-from emission.analysis.modelling.user_label_model.prediction import (
-    Prediction,
-)
-from emission.analysis.modelling.user_label_model.user_label_prediction_model import (
-    UserLabelPredictionModel,
-)
-from emission.analysis.modelling.similarity.similarity_metric import SimilarityMetric
-from emission.analysis.modelling.tour_model.similarity import similarity
-from emission.analysis.modelling.tour_model_first_only.load_predict import (
-    loadModelStage,
-)
-import emission.analysis.modelling.tour_model.data_preprocessing as preprocess
-from emission.core.wrapper.confirmedtrip import Confirmedtrip
-import emission.analysis.modelling.similarity.confirmed_trip_feature_extraction as ctfe
-import emission.analysis.modelling.user_label_model.util as util
+
 import emission.analysis.modelling.tour_model.label_processing as lp
+import emission.analysis.modelling.user_label_model.util as util
+import pandas as pd
+from emission.analysis.modelling.similarity.similarity_metric import \
+    SimilarityMetric
+from emission.analysis.modelling.user_label_model.user_label_prediction_model import \
+    UserLabelPredictionModel
+from emission.core.wrapper.confirmedtrip import Confirmedtrip
 
 
 class GreedySimilarityBinning(UserLabelPredictionModel):
@@ -59,7 +49,7 @@ class GreedySimilarityBinning(UserLabelPredictionModel):
         self.metric = metric
         self.sim_thresh = sim_thresh
         self.apply_cutoff = apply_cutoff
-        self.bins: Dict[int, BinRecord] = {}
+        self.bins: Dict[int, Dict] = {}
         self.loaded = False
 
     def fit(self, trips: List[Confirmedtrip]):
@@ -75,7 +65,7 @@ class GreedySimilarityBinning(UserLabelPredictionModel):
         self._generate_predictions()
         logging.info(f"model fit to trip data")
 
-    def predict(self, trip: Confirmedtrip) -> Tuple[List[Prediction], int]:
+    def predict(self, trip: Confirmedtrip) -> Tuple[List[Dict], int]:
         if not self.loaded:
             msg = (
                 "predict called on unloaded model "
@@ -135,14 +125,14 @@ class GreedySimilarityBinning(UserLabelPredictionModel):
                 }
                 self.bins[new_bin_id] = new_bin_record
 
-    def _nearest_bin(self, trip: Confirmedtrip) -> Tuple[Optional[int], Optional[BinRecord]]:
+    def _nearest_bin(self, trip: Confirmedtrip) -> Tuple[Optional[int], Optional[Dict]]:
         """
         finds a bin which contains at least one matching feature. the 
         first record matching by similarity measure is returned. if
         none are found, (None, None) is returned.
 
         :param trip: incoming trip features to test with
-        :return: nearest record and bin number, if found
+        :return: nearest bin record, if found
         """
         trip_features = self.extract_features(trip)
         selected_bin = None
