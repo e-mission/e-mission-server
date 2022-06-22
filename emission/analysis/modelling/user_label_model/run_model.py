@@ -46,6 +46,9 @@ def update_user_label_model(
     model_data_prev = eamum.load_model(user_id, model_type, model_storage)
     if model_data_prev is not None:
         model.from_dict(model_data_prev)
+        logging.debug(f"loaded {model_type.name} user label model for user {user_id}")
+    else:
+        logging.debug(f"building first {model_type.name} user label model for user {user_id}")
 
     # get all relevant trips
     time_query = epq.get_time_query_for_user_label_model(user_id) if model.is_incremental else None
