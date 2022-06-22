@@ -10,6 +10,7 @@ import unittest
 import datetime as pydt
 import logging
 import json
+import pymongo
 
 # Our imports
 import emission.core.get_database as edb
@@ -25,9 +26,12 @@ import emission.tests.common as etc
 
 class TestTimeSeries(unittest.TestCase):
     def setUp(self):
+        self.testEmail = "user1"
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-21")
         self.testUUID1 = self.testUUID
         self.entries1 = self.entries
+
+        self.testEmail = "user2"
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
 
     def tearDown(self):
@@ -56,7 +60,7 @@ class TestTimeSeries(unittest.TestCase):
 
     def testGetMaxValueForField(self):
         ts = esta.TimeSeries.get_time_series(self.testUUID)
-        self.assertEqual(ts.get_max_value_for_field("background/filtered_location", "data.ts"), 1440729334.797)
+        self.assertEqual(ts.get_first_value_for_field("background/filtered_location", "data.ts", pymongo.DESCENDING), 1440729334.797)
 
     def testGetDataDf(self):
         ts = esta.TimeSeries.get_time_series(self.testUUID)

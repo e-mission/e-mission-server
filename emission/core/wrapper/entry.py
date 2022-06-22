@@ -73,6 +73,10 @@ class Entry(ecwb.WrapperBase):
             "manual/mode_confirm": "userlabel",
             # user confirmation of the travel purpose
             "manual/purpose_confirm": "userlabel",
+            # user confirmation of the replaced mode
+            "manual/replaced_mode": "userlabel",
+            # user input for the trip; in one entry instead of being split up
+            "manual/trip_user_input": "tripuserinput",
             # user confirmation of the destination (unsure how this will
             # interact with purpose
             "manual/destination_confirm": "userlabel",
@@ -80,6 +84,8 @@ class Entry(ecwb.WrapperBase):
             "config/evaluation_spec": "userlabel",
             # Evaluation start/stop times
             "manual/evaluation_transition": "evaltransition",
+            # demographic survey
+            "manual/demographic_survey": "onetimesurvey",
             ### END: incoming data types ###
             ### BEGIN: analysis result data types ###
             ### ** BEGIN: objects generated after the initial segmentation step **
@@ -123,14 +129,24 @@ class Entry(ecwb.WrapperBase):
             # the generated model for the random forest based mode inference
             # saved so that it can be used for prediction without retraining
             "mode_inference/model": "modeinfermodel",
-            # the predicted mode for a particular section
+            # the predicted mode for a particular section (one entry per algorithm)
             "inference/prediction": "modeprediction",
+            # the predicted labels for a particular trip (one entry per algorithm)
+            "inference/labels": "labelprediction",
             # equivalent of cleaned_section, but with the mode set to the 
             # inferred mode instead of just walk/bike/motorized
             # used for consistency and to make the client work whether or not we were
-            # running the inference step
+            # the final inferred section mode (possibly an ensemble result)
             "analysis/inferred_section": "inferredsection",
+            # the final inferred label data structure (possibly an ensemble result)
+            "analysis/inferred_labels": "labelprediction",
             ### ** END: prediction objects
+            ### ** BEGIN: confirmed objects which combine inferred and user input values
+            "analysis/inferred_trip": "inferredtrip",
+            "analysis/expected_trip": "expectedtrip",
+            "analysis/confirmed_trip": "confirmedtrip",
+            "analysis/confirmed_section": "confirmedsection"
+            ### ** END: confirmed objects which combine inferred and user input values
             }
 
   @staticmethod

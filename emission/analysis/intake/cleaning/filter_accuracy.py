@@ -80,32 +80,34 @@ def filter_accuracy(user_id):
         epq.mark_accuracy_filtering_done(user_id, None)
         return
 
+    SEL_FIELDS_FOR_DUP = ["latitude", "longitude", "ts", "accuracy"]
+
     try:
+        unfiltered_points_list = list(timeseries.find_entries(["background/location"], time_query))
         unfiltered_points_df = timeseries.get_data_df("background/location", time_query)
         if len(unfiltered_points_df) == 0:
             epq.mark_accuracy_filtering_done(user_id, None) 
         else:        
-            filtered_from_unfiltered_df = unfiltered_points_df[unfiltered_points_df.accuracy < 200]
+            unfiltered_points_df = unfiltered_points_df[SEL_FIELDS_FOR_DUP]
+            unfiltered_points_df["msts"] = unfiltered_points_df.ts.apply(lambda x: int(x * 10**3))
+            filtered_from_unfiltered_df = unfiltered_points_df[unfiltered_points_df.accuracy < 200].drop_duplicates()
             logging.info("filtered %d of %d points" % (len(filtered_from_unfiltered_df), len(unfiltered_points_df)))
-            for idx, entry in filtered_from_unfiltered_df.iterrows():
-                # First, we check to see if this is a duplicate of an existing entry.
-                # If so, we will skip it since it is probably generated as a duplicate...
-                if check_prior_duplicate(filtered_from_unfiltered_df, idx, entry):
-                    logging.info("Found duplicate entry at index %s, id = %s, lat = %s, lng = %s, skipping" % 
-                                    (idx, entry._id, entry.latitude, entry.longitude))
-                    continue
-                # Next, we check to see if there is an existing "background/filtered_location" point that corresponds
-                # to this point. If there is, then we don't want to re-insert. This ensures that this step is idempotent
-                if check_existing_filtered_location(timeseries, entry):
-                    logging.info("Found existing filtered location for entry at index = %s, id = %s, ts = %s, fmt_time = %s, skipping" % (idx, entry._id, entry.ts, entry.fmt_time))
-                    continue
+            filtered_points_df = timeseries.get_data_df("background/filtered_location", time_query)
+            if len(filtered_points_df) == 0:
+                logging.debug("No filtered points found, inserting all %d newly filtered points" % len(filtered_from_unfiltered_df))
+                to_insert_df = filtered_from_unfiltered_df
+            else:
+                logging.debug("Partial filtered points %d found" % len(filtered_points_df))
+                filtered_points_df = filtered_points_df[SEL_FIELDS_FOR_DUP]
+                filtered_points_df["msts"] = filtered_points_df.ts.apply(lambda x: int(x * 10**3))
+                matched_points_df = filtered_from_unfiltered_df.merge(filtered_points_df, on="msts", right_index=True)
+                to_insert_df = filtered_from_unfiltered_df.drop(index=matched_points_df.index)
+            for idx, entry in to_insert_df.iterrows():
+                unfiltered_entry = unfiltered_points_list[idx]
                 # logging.debug("Inserting %s filtered entry %s into timeseries" % (idx, entry))
-                entry_copy = convert_to_filtered(timeseries.get_entry_at_ts(
-                                                    "background/location",
-                                                    "metadata.write_ts",
-                                                    entry.metadata_write_ts))
+                entry_copy = convert_to_filtered(unfiltered_entry)
                 timeseries.insert(entry_copy)
-            last_entry_processed = unfiltered_points_df.iloc[-1].metadata_write_ts
+            last_entry_processed = unfiltered_points_list[-1]["metadata"]["write_ts"]
             epq.mark_accuracy_filtering_done(user_id, float(last_entry_processed))
     except:
         logging.exception("Marking accuracy filtering as failed")

@@ -11,7 +11,6 @@ from builtins import *
 from builtins import object
 from past.utils import old_div
 import logging
-import matplotlib.pyplot as plt
 import numpy
 from sklearn.cluster import KMeans
 from sklearn import metrics
@@ -142,6 +141,7 @@ class featurization(object):
     #map the clusters
     #TODO - move this to a file in emission.analysis.plotting to map clusters from the database
     def map_clusters(self):
+        import matplotlib.pyplot as plt
         from matplotlib import colors as matcol
         colormap = plt.cm.get_cmap()
 
