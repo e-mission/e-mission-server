@@ -1,8 +1,8 @@
 from enum import Enum
 from typing import Dict, Optional
 
-import emission.analysis.modelling.user_label_model.model_type as eamum
-import emission.core.wrapper.user_label_prediction_model as ecwu
+import emission.analysis.modelling.trip_model.model_type as eamum
+import emission.core.wrapper.tripmodel as ecwu
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.pipeline_queries as epq
 import emission.storage.timeseries.abstract_timeseries as esta
@@ -33,12 +33,12 @@ def load_model(user_id, model_type: eamum.ModelType, model_storage: ModelStorage
     if model_storage == ModelStorage.DATABASE:
         
         # retrieve stored model with timestamp that matches/exceeds the most
-        # recent PipelineState.USER_LABEL_MODEL entry        
+        # recent PipelineState.TRIP_MODEL entry        
         ts = esda.get_timeseries_for_user(user_id)
         if not isinstance(ts, estb.BuiltinTimeSeries):
             raise Exception('user model storage requires BuiltInTimeSeries')
         latest_model_entry = ts.get_first_entry(
-            key=esda.USER_LABEL_MODEL_STORE_KEY,
+            key=esda.TRIP_MODEL_STORE_KEY,
             field='data.model_ts',
             sort_order=pymongo.DESCENDING
         )
@@ -77,7 +77,7 @@ def save_model(
    
     if model_storage == ModelStorage.DATABASE:
         
-        row = ecwu.UserLabelPredictionModel()
+        row = ecwu.Tripmodel()
         row.user_id = user_id
         row.model_ts = model_timestamp
         row.model_type = model_type
@@ -85,7 +85,7 @@ def save_model(
 
         try:
             ts = esta.TimeSeries.get_time_series(user_id)
-            ts.insert_data(user_id, esda.USER_LABEL_MODEL_STORE_KEY, row)
+            ts.insert_data(user_id, esda.TRIP_MODEL_STORE_KEY, row)
         except Exception as e:
             msg = (
                 f"failure storing model for user {user_id}, model {model_type.name} "
@@ -94,7 +94,7 @@ def save_model(
             raise IOError(msg) from e
 
         try:
-            epq.mark_user_label_model_done(user_id, model_timestamp)
+            epq.mark_trip_model_done(user_id, model_timestamp)
         except Exception as e:
             msg = (
                 f"failure updating user label pipeline state for user {user_id}"

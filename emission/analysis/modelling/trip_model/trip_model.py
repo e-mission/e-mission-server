@@ -4,7 +4,7 @@ from typing import Dict, List, Tuple
 import emission.core.wrapper.confirmedtrip as ecwc
 
 
-class UserLabelPredictionModel(metaclass=ABCMeta):
+class TripModel(metaclass=ABCMeta):
 
     @abstractmethod
     def fit(data: List[List[float]]):

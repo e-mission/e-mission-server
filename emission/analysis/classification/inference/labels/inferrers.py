@@ -6,9 +6,9 @@ import random
 import copy
 
 import emission.analysis.modelling.tour_model_first_only.load_predict as lp
-from emission.analysis.modelling.user_label_model.model_storage import ModelStorage
-import emission.analysis.modelling.user_label_model.run_model as eamur
-from emission.analysis.modelling.user_label_model.model_type import ModelType
+from emission.analysis.modelling.trip_model.model_storage import ModelStorage
+import emission.analysis.modelling.trip_model.run_model as eamur
+from emission.analysis.modelling.trip_model.model_type import ModelType
 
 # A set of placeholder predictors to allow pipeline development without a real inference algorithm.
 # For the moment, the system is configured to work with two labels, "mode_confirm" and

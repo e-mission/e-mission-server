@@ -1,15 +1,16 @@
 import logging
+from tokenize import group
 from typing import Dict, List, Optional, Tuple
 
 import emission.analysis.modelling.similarity.similarity_metric as eamss
 import emission.analysis.modelling.tour_model.label_processing as lp
-import emission.analysis.modelling.user_label_model.user_label_prediction_model as eamuu
-import emission.analysis.modelling.user_label_model.util as util
+import emission.analysis.modelling.trip_model.trip_model as eamuu
+import emission.analysis.modelling.trip_model.util as util
 import emission.core.wrapper.confirmedtrip as ecwc
 import pandas as pd
 
 
-class GreedySimilarityBinning(eamuu.UserLabelPredictionModel):
+class GreedySimilarityBinning(eamuu.TripModel):
 
     def __init__(
         self,
@@ -85,6 +86,10 @@ class GreedySimilarityBinning(eamuu.UserLabelPredictionModel):
 
         :param trips: 2D array of features to train from
         """
+        unlabeled = list(filter(lambda t: len(t['data']['user_input']) == 0, trips))
+        if len(unlabeled) > 0:
+            msg = f'model.fit cannot be called with unlabeled trips, found {len(unlabeled)}'
+            raise Exception(msg)
         self.bins = {}
         self._assign_bins(trips)
         if len(self.bins) > 1 and self.apply_cutoff:
@@ -132,6 +137,7 @@ class GreedySimilarityBinning(eamuu.UserLabelPredictionModel):
         :param data: trips to assign to bins
         :type data: List[Confirmedtrip]
         """
+        logging.debug(f"_assign_bins called with trips {trips}")
         for trip in trips:
             trip_features = self.extract_features(trip)
             trip_labels = trip['data']['user_input']
@@ -159,14 +165,19 @@ class GreedySimilarityBinning(eamuu.UserLabelPredictionModel):
         :param trip: incoming trip features to test with
         :return: nearest bin record, if found
         """
+        logging.debug(f"_nearest_bin called with trip {trip}")
+
         trip_features = self.extract_features(trip)
         selected_bin = None
         selected_record = None
         
         for bin_id, bin_record in self.bins.items():
-            if self.metric.similar(trip_features, bin_record['features'], self.sim_thresh):
-                selected_bin = bin_id
-                selected_record = bin_record
+            for bin_features in bin_record['features']:
+                if self.metric.similar(trip_features, bin_features, self.sim_thresh):
+                    selected_bin = bin_id
+                    selected_record = bin_record
+                    break
+            if selected_bin is not None:
                 break
                 
         return selected_bin, selected_record
@@ -204,14 +215,15 @@ class GreedySimilarityBinning(eamuu.UserLabelPredictionModel):
         for each bin, the unique label combinations are counted. their 
         probability is estimated with label_count / total_labels.
         """
-        for _, bin_record in self.bins:
+        for _, bin_record in self.bins.items():
             user_label_df = pd.DataFrame(bin_record['labels'])
             user_label_df = lp.map_labels(user_label_df).dropna()
             # compute the sum of trips in this cluster
             sum_trips = len(user_label_df)
             # compute unique label sets and their probabilities in one cluster
             # 'p' refers to probability
-            unique_labels = user_label_df.groupby(user_label_df.columns.tolist()).size().reset_index(name='uniqcount')
+            group_cols = user_label_df.columns.tolist()
+            unique_labels = user_label_df.groupby(group_cols).size().reset_index(name='uniqcount')
             unique_labels['p'] = unique_labels.uniqcount / sum_trips
             labels_columns = user_label_df.columns.to_list()
             bin_label_combo_list = []

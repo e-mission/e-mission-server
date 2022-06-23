@@ -1,9 +1,9 @@
 import unittest
 
 
-import emission.analysis.modelling.user_label_model.model_storage as eamums
-import emission.analysis.modelling.user_label_model.model_type as eamumt
-import emission.analysis.modelling.user_label_model.run_model as eamur
+import emission.analysis.modelling.trip_model.model_storage as eamums
+import emission.analysis.modelling.trip_model.model_type as eamumt
+import emission.analysis.modelling.trip_model.run_model as eamur
 import emission.storage.timeseries.abstract_timeseries as esta
 
 
@@ -23,7 +23,7 @@ class TestSimilarityAux(unittest.TestCase):
 
         # case 1: the new trip matches a bin from the 1st round and a cluster from the 2nd round
         user_id = self.all_users[0]
-        eamur.update_user_label_model(user_id, eamumt.ModelType.GREEDY_SIMILARITY_BINNING, eamums.ModelStorage.DATABASE)
+        eamur.update_trip_model(user_id, eamumt.ModelType.GREEDY_SIMILARITY_BINNING, eamums.ModelStorage.DATABASE)
         filter_trips = eamur._get_trips_for_user(user_id, None, 0)
         new_trip = filter_trips[4]
         # result is [{'labels': {'mode_confirm': 'shared_ride', 'purpose_confirm': 'church', 'replaced_mode': 'drove_alone'},
@@ -38,7 +38,7 @@ class TestSimilarityAux(unittest.TestCase):
         # 1. the user is invalid(< 10 existing fully labeled trips, or < 50% of trips that fully labeled)
         # 2. the user doesn't have common trips
         user_id = self.all_users[1]
-        eamur.update_user_label_model(user_id, eamumt.ModelType.GREEDY_SIMILARITY_BINNING, eamums.ModelStorage.DATABASE)
+        eamur.update_trip_model(user_id, eamumt.ModelType.GREEDY_SIMILARITY_BINNING, eamums.ModelStorage.DATABASE)
         filter_trips = eamur._get_trips_for_user(user_id, None, 0)
         new_trip = filter_trips[0]
         # result is []
@@ -49,7 +49,7 @@ class TestSimilarityAux(unittest.TestCase):
 
         # case3: the new trip is novel trip(doesn't fall in any 1st round bins)
         user_id = self.all_users[0]
-        eamur.update_user_label_model(user_id, eamumt.ModelType.GREEDY_SIMILARITY_BINNING, eamums.ModelStorage.DATABASE)
+        eamur.update_trip_model(user_id, eamumt.ModelType.GREEDY_SIMILARITY_BINNING, eamums.ModelStorage.DATABASE)
         filter_trips = eamur._get_trips_for_user(user_id, None, 0)
         new_trip = filter_trips[0]
         # result is []

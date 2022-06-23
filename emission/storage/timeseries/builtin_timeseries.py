@@ -86,7 +86,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "metrics/daily_mean_median_speed": self.analysis_timeseries_db,
                 "inference/prediction": self.analysis_timeseries_db,
                 "inference/labels": self.analysis_timeseries_db,
-                "inference/user_label_model": self.analysis_timeseries_db,
+                "inference/trip_model": self.analysis_timeseries_db,
                 "analysis/inferred_section": self.analysis_timeseries_db,
                 "analysis/inferred_labels": self.analysis_timeseries_db,
                 "analysis/inferred_trip": self.analysis_timeseries_db,

@@ -3,10 +3,10 @@ from typing import Optional
 
 import arrow
 import emission.analysis.modelling.similarity.od_similarity as eamso
-import emission.analysis.modelling.user_label_model.greedy_similarity_binning as eamug
-import emission.analysis.modelling.user_label_model.model_storage as eamums
-import emission.analysis.modelling.user_label_model.model_type as eamumt
-import emission.analysis.modelling.user_label_model.user_label_prediction_model as eamuu
+import emission.analysis.modelling.trip_model.greedy_similarity_binning as eamug
+import emission.analysis.modelling.trip_model.model_storage as eamums
+import emission.analysis.modelling.trip_model.model_type as eamumt
+import emission.analysis.modelling.trip_model.trip_model as eamuu
 import emission.core.wrapper.confirmedtrip as ecwc
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.pipeline_queries as epq
@@ -16,7 +16,7 @@ import emission.storage.timeseries.timequery as estt
 SIMILARITY_THRESHOLD_METERS = 500  # should come from app config
 
 
-def update_user_label_model(
+def update_trip_model(
     user_id, 
     model_type: eamumt.ModelType, 
     model_storage: eamums.ModelStorage = eamums.ModelStorage.DATABASE, 
@@ -48,7 +48,7 @@ def update_user_label_model(
         logging.debug(f"building first {model_type.name} user label model for user {user_id}")
 
     # get all relevant trips
-    time_query = epq.get_time_query_for_user_label_model(user_id) if model.is_incremental else None
+    time_query = epq.get_time_query_for_trip_model(user_id) if model.is_incremental else None
     trips = _get_trips_for_user(user_id, time_query, min_trips)
 
     # train and store the model
@@ -80,7 +80,7 @@ def predict_labels_with_n(
         return predictions, n
 
 
-def model_factory(model_type: eamumt.ModelType) -> eamuu.UserLabelPredictionModel:
+def model_factory(model_type: eamumt.ModelType) -> eamuu.TripModel:
     """
     instantiates the requested user model type with the configured
     parameters. 
@@ -133,12 +133,12 @@ def _get_trips_for_user(user_id, time_query: Optional[estt.TimeQuery], min_trips
 def _load_user_label_model(
     user_id, 
     model_type: eamumt.ModelType, 
-    model_storage: eamums.ModelStorage) -> Optional[eamuu.UserLabelPredictionModel]:
+    model_storage: eamums.ModelStorage) -> Optional[eamuu.TripModel]:
     """helper to build a user label prediction model class with the 
     contents of a stored model for some user.
 
     :param user_id: user to retrieve the model for
-    :param model_type: UserLabelPredictionModel type configured for this OpenPATH server
+    :param model_type: TripModel type configured for this OpenPATH server
     :param model_storage: storage type
     :return: model, or None if no model is stored for this user
     """
