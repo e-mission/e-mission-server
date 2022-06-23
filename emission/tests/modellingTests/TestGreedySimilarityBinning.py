@@ -29,7 +29,6 @@ class TestGreedySimilarityBinning(unittest.TestCase):
             label_data=label_data, 
             within_threshold=should_be_grouped, 
             threshold=0.001,  # ~ 111 meters in degrees WGS84
-            has_label_p=1.0
         )
         model = eamtg.GreedySimilarityBinning(
             metric=eamso.OriginDestinationSimilarity(),
@@ -58,7 +57,6 @@ class TestGreedySimilarityBinning(unittest.TestCase):
             destination=(1, 1), 
             label_data=label_data, 
             threshold=0.001,  # ~ 111 meters in degrees WGS84
-            has_label_p=1.0
         )
         model = eamtg.GreedySimilarityBinning(
             metric=eamso.OriginDestinationSimilarity(),

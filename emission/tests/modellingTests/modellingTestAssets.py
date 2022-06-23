@@ -1,5 +1,6 @@
 import random
 from typing import Tuple, List, Dict
+import emission.core.wrapper.confirmedtrip as ecwc
 
 import emission.core.wrapper.entry as ecwe
 import arrow 
@@ -14,9 +15,7 @@ def generate_trip_coordinates(
     ) -> Tuple[float, float]:
     """generates trip coordinate data to use when mocking a set of trip data.
 
-    :param origin: origin coordinates
-    :param destination: destination coordinates
-    :param trips: number of nearby coordinate pairs to generate
+    :param ref_coords: reference coordinates to use as the center of the sampling circle
     :param within_threshold: how many of these trips are within some distance threshold
     :param threshold: the distance threshold, in WGS84
     :param max: max distance, in WGS84, defaults to 0.1 (approx. 10km)
@@ -42,8 +41,10 @@ def sample_trip_labels(
 
     :param mode_labels: labels for mode_confirm
     :param purpose_labels: labels for purpose_confirm
+    :param replaced_mode_labels: labels for replaced_mode
     :param mode_weights: sample weights, defaults to None, see random.choices "weights"
     :param purpose_weights: sample weights, defaults to None for uniform sampling
+    :param replaced_mode_weights: sample weights, defaults to None
     :return: sampled trip labels
     """
     mw = [1.0 / len(mode_labels) for i in range(len(mode_labels))] \
@@ -63,7 +64,15 @@ def sample_trip_labels(
     return user_input
 
 
-def build_mock_trip(user_id, origin, destination, labels) -> Dict:
+def build_mock_trip(user_id, origin, destination, labels) -> ecwc.Confirmedtrip:
+    """repackages mock data as a Confirmedtrip Entry type
+
+    :param user_id: the user id UUID
+    :param origin: trip origin coordinates
+    :param destination: trip destination coordinates
+    :param labels: user labels for the trip
+    :return: a Confirmedtrip entry
+    """
     key = "analysis/confirmed_trip"
     data = {
         "start_loc": {
@@ -87,8 +96,38 @@ def generate_mock_trips(
     within_threshold = None,
     threshold = 0.01,
     max = 0.1, 
-    has_label_p = 0.7,
+    has_label_p = 1.0,
     seed = 0):
+    """mocking function that generates multiple trips for a user. some are sampled 
+    within a threshold from the provided o/d pair, and some have labels. some other
+    ones can be sampled to appear outside of the threshold of the o/d locations.
+
+    label_data is an optional dictionary with labels and sample weights, for example:
+    {
+        "mode_labels": ['walk', 'bike'],
+        "replaced_mode_labels": ['drive', 'tnc'],
+        "purpose_labels": ['home', 'work'],
+        "mode_weights": [0.8, 0.2],
+        "replaced_mode_weights": [0.4, 0.6],
+        "purpose_weights": [0.1, 0.9]
+    }
+
+    weights entries are optional and result in uniform sampling.
+
+    :param user_id: user UUID
+    :param trips: number of trips
+    :param origin: origin coordinates
+    :param destination: destination coordinates
+    :param label_data: dictionary of label data, see above, defaults to None
+    :param within_threshold: number of trips that should fall within the provided
+           distance threshold in degrees WGS84, defaults to None
+    :param threshold: distance threshold in WGS84 for sampling, defaults to 0.01
+    :param max: maximum distance beyond the threshold for trips sampled that
+                are not within the threshold, defaults to 0.1 degrees WGS84
+    :param has_label_p: probability a trip has labels, defaults to 1.0
+    :param seed: random seed, defaults to 0
+    :return: randomly sampled trips
+    """
     
     random.seed(seed)
     within = within_threshold if within_threshold is not None else trips
