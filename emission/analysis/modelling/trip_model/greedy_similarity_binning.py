@@ -95,11 +95,12 @@ class GreedySimilarityBinning(eamuu.TripModel):
         if len(self.bins) > 1 and self.apply_cutoff:
             self._apply_cutoff()
         self._generate_predictions()
+        self.loaded = True
         logging.info(f"model fit to trip data")
 
     def predict(self, trip: ecwc.Confirmedtrip) -> Tuple[List[Dict], int]:
         if not self.loaded:
-            msg = f"predict called on unloaded model for user {self.user_id}"
+            msg = f"predict called on unloaded model"
             raise IOError(msg)
 
         logging.debug(f"running greedy similarity clustering")
@@ -108,7 +109,7 @@ class GreedySimilarityBinning(eamuu.TripModel):
             logging.debug(f"unable to predict bin for trip {trip}")
             return [], -1
         else:
-            labels = bin_record['prediction']
+            labels = bin_record['predictions']
             n_features = len(bin_record['features'])
             logging.debug(f"found cluster {predicted_bin} with labels {labels}")
             return labels, n_features
@@ -137,7 +138,7 @@ class GreedySimilarityBinning(eamuu.TripModel):
         :param data: trips to assign to bins
         :type data: List[Confirmedtrip]
         """
-        logging.debug(f"_assign_bins called with trips {trips}")
+        logging.debug(f"_assign_bins called with {len(trips)} trips")
         for trip in trips:
             trip_features = self.extract_features(trip)
             trip_labels = trip['data']['user_input']
@@ -165,7 +166,7 @@ class GreedySimilarityBinning(eamuu.TripModel):
         :param trip: incoming trip features to test with
         :return: nearest bin record, if found
         """
-        logging.debug(f"_nearest_bin called with trip {trip}")
+        logging.debug(f"_nearest_bin called")
 
         trip_features = self.extract_features(trip)
         selected_bin = None

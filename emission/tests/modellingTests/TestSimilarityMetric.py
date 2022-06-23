@@ -3,8 +3,6 @@ import emission.tests.modellingTests.modellingTestAssets as etmm
 import emission.analysis.modelling.similarity.od_similarity as eamso
 
 class TestSimilarityMetric(unittest.TestCase):
-    def setUp(self) -> None:
-        pass
 
     def testODsAreSimilar(self):
         generate_points_thresh = 0.001  # approx. 111 meters
