@@ -5,9 +5,8 @@ import logging
 
 import argparse
 import uuid
-import copy
-from emission.analysis.modelling.user_label_model.model_storage import ModelStorage
-from emission.analysis.modelling.user_label_model.model_type import ModelType
+import emission.analysis.modelling.user_label_model.model_storage as eamums
+import emission.analysis.modelling.user_label_model.model_type as eamumt
 
 import emission.pipeline.reset as epr
 import emission.core.get_database as edb
@@ -67,7 +66,7 @@ if __name__ == '__main__':
     for user_id in user_list:
         logging.info("building model for user %s" % user_id)
         # these can come from the application config as default values
-        model_type = ModelType.GREEDY_SIMILARITY_BINNING
-        model_storage = ModelStorage.DATABASE
+        model_type = eamumt.ModelType.GREEDY_SIMILARITY_BINNING
+        model_storage = eamums.ModelStorage.DATABASE
         min_trips = 14
         eamur.update_user_label_model(user_id, model_type, model_storage, min_trips)

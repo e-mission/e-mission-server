@@ -8,6 +8,9 @@ def find_knee_point(values: List[float]) -> Tuple[float, int]:
     """for a list of values, find the value which represents the cut-off point
     or "elbow" in the function when values are sorted.
 
+    copied from original similarity algorithm. permalink:
+    [https://github.com/e-mission/e-mission-server/blob/5b9e608154de15e32df4f70a07a5b95477e7dbf5/emission/analysis/modelling/tour_model/similarity.py#L256]
+
     based on this stack overflow answer: https://stackoverflow.com/a/2022348/4803266
     And summarized by the statement: "A quick way of finding the elbow is to draw a
     line from the first to the last point of the curve and then find the data point
