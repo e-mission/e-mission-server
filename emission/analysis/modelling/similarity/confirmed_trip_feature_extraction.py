@@ -1,6 +1,5 @@
 from typing import List
 import emission.core.wrapper.confirmedtrip as ecwc
-import emission.analysis.modelling.tour_model.label_processing as lp
 
 
 def origin_features(trip: ecwc.Confirmedtrip) -> List[float]:

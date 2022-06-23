@@ -40,6 +40,32 @@ class GreedySimilarityBinning(eamuu.UserLabelPredictionModel):
 
         the number of predictions is not assumed to be the number of features.
 
+        the original similarity class (link above) used a nested List data 
+        structure to capture the notion of binning. this was then copied into
+        a Dict when the model needed to be saved. the same technique can be 
+        written to work directly on nested Dicts with no loss in performance. 
+        the data takes the form:
+        {
+            bin_id: {
+                "features": [
+                    [f1, f2, .., fn],
+                    ...
+                ],
+                "labels": [
+                    { label1: value1, ... }
+                ],
+                "predictions": [
+                    { "labels": { label1: value1, ... }, 'p': p_val }
+                ]
+            }
+        }
+        where
+        - bin_id:  int    index of a bin containing similar trips
+        - f_x:     float  feature value (an ordinate such as origin.x)
+        - label_x: str    OpenPATH user label category such as "mode_confirm"
+        - value_x: str    user-provided label for a category
+        - p_val:   float  probability of a prediction, real number in [0, 1]
+
         :param dir: the model load/save directory
         :param user_id: identity (UUID) of the e-mission user
         :param metric: type of similarity metric to use

@@ -1,13 +1,13 @@
 from abc import ABCMeta, abstractmethod
 from typing import List
 
-from emission.core.wrapper.confirmedtrip import Confirmedtrip
+import emission.core.wrapper.confirmedtrip as ecwc
 
 
 class SimilarityMetric(metaclass=ABCMeta):
 
     @abstractmethod
-    def extract_features(self, trip: Confirmedtrip) -> List[float]:
+    def extract_features(self, trip: ecwc.Confirmedtrip) -> List[float]:
         """extracts the features we want to compare for similarity
 
         :param trip: a confirmed trip
