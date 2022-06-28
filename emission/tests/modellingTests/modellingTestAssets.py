@@ -64,27 +64,29 @@ def sample_trip_labels(
     return user_input
 
 
-def build_mock_trip(user_id, origin, destination, labels) -> ecwc.Confirmedtrip:
+def build_mock_trip(user_id, origin, destination, labels = {}) -> ecwc.Confirmedtrip:
     """repackages mock data as a Confirmedtrip Entry type
 
     :param user_id: the user id UUID
     :param origin: trip origin coordinates
     :param destination: trip destination coordinates
-    :param labels: user labels for the trip
+    :param labels: user labels for the trip, optional, default none
     :return: a Confirmedtrip entry
     """
     key = "analysis/confirmed_trip"
     data = {
         "start_loc": {
+            "type": "Point",
             "coordinates": origin
         },
         "end_loc": {
+            "type": "Point",
             "coordinates": destination
         },
         "user_input": labels
     }
 
-    return ecwe.Entry.create_fake_entry(user_id, key, data, write_ts=arrow.now())
+    return ecwe.Entry.create_fake_entry(user_id, key, data, write_ts=arrow.now().timestamp)
 
 
 def generate_mock_trips(

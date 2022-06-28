@@ -308,13 +308,15 @@ class BuiltinTimeSeries(esta.TimeSeries):
         :param time_query: the time range in which to search the stream
         :return: a database row, or None if no match is found
         """
-        result_it = self.get_timeseries_db(key).find(self._get_query([key], time_query),
-            {"_id": False, field: True}).sort(field, sort_order).limit(1)
+        find_query = self._get_query([key], time_query)
+        result_it = self.get_timeseries_db(key).find(find_query).sort(field, sort_order).limit(1)
         result_list = list(result_it)
         if len(result_list) == 0:
             return None
         else:
-            return result_list[0]
+            first_entry = result_list[0]
+            del first_entry['_id']
+            return first_entry
     
 
     def get_first_value_for_field(self, key, field, sort_order, time_query=None):

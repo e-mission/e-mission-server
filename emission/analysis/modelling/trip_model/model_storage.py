@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import Dict, Optional
+import logging
 
 import emission.analysis.modelling.trip_model.model_type as eamum
 import emission.core.wrapper.tripmodel as ecwu
@@ -13,9 +14,9 @@ import pymongo
 class ModelStorage(Enum):
     """
     enumeration of model storage destinations. currently restricted to 
-    DATABASE only.
+    DOCUMENT_DATABASE only.
     """
-    DATABASE = 0
+    DOCUMENT_DATABASE = 0
     @classmethod
     def names(cls):
         return list(map(lambda e: e.name, list(cls)))
@@ -29,8 +30,9 @@ def load_model(user_id, model_type: eamum.ModelType, model_storage: ModelStorage
     :param model_storage: storage format 
     :return: the model representation as a Python Dict or None
     :raises: TypeError if loaded model has different type than expected type
+             KeyError if the ModelType is not known
     """
-    if model_storage == ModelStorage.DATABASE:
+    if model_storage == ModelStorage.DOCUMENT_DATABASE:
         
         # retrieve stored model with timestamp that matches/exceeds the most
         # recent PipelineState.TRIP_MODEL entry        
@@ -42,14 +44,31 @@ def load_model(user_id, model_type: eamum.ModelType, model_storage: ModelStorage
             field='data.model_ts',
             sort_order=pymongo.DESCENDING
         )
-        if latest_model_entry.model_type != model_type:
+
+        if latest_model_entry is None:
+            logging.debug(f'no {model_type.name} model found for user {user_id}')
+            return None
+
+        write_ts = latest_model_entry['metadata']['write_ts']
+        logging.debug(f'retrieved latest trip model recorded at timestamp {write_ts}')
+        logging.debug(latest_model_entry)
+
+        # parse str to enum for ModelType
+        latest_model_type_str = latest_model_entry.get('data', {}).get('model_type')
+        if latest_model_type_str is None:
+            raise TypeError('stored model does not have a model type')
+        latest_model_type = eamum.ModelType.from_str(latest_model_type_str)
+        
+        if latest_model_entry is None:
+            return None
+        elif latest_model_type != model_type:
             msg = (
-                f"loading model for user {user_id} has model type {latest_model_entry.model_type} " 
-                f"but was expected to have model type {model_type}"
+                f"loading model for user {user_id} has model type '{latest_model_type.name}' " 
+                f"but was expected to have model type {model_type.name}"
             )
             raise TypeError(msg)
-        model = latest_model_entry.model if latest_model_entry is not None else None
-        return model
+        else:
+            return latest_model_entry['data']['model']
 
     else:
         storage_types_str = ",".join(ModelStorage.names())
@@ -64,7 +83,7 @@ def save_model(
     model_type: eamum.ModelType, 
     model_data: Dict,
     model_timestamp: int,
-    model_storage: ModelStorage = ModelStorage.DATABASE):
+    model_storage: ModelStorage = ModelStorage.DOCUMENT_DATABASE):
     """saves a model to storage
 
     :param user_id: user associated with this model
@@ -75,7 +94,7 @@ def save_model(
     :raises IOError: failure when writing to storage medium
     """
    
-    if model_storage == ModelStorage.DATABASE:
+    if model_storage == ModelStorage.DOCUMENT_DATABASE:
         
         row = ecwu.Tripmodel()
         row.user_id = user_id
@@ -90,14 +109,6 @@ def save_model(
             msg = (
                 f"failure storing model for user {user_id}, model {model_type.name} "
                 f"to the database"
-            )
-            raise IOError(msg) from e
-
-        try:
-            epq.mark_trip_model_done(user_id, model_timestamp)
-        except Exception as e:
-            msg = (
-                f"failure updating user label pipeline state for user {user_id}"
             )
             raise IOError(msg) from e
     

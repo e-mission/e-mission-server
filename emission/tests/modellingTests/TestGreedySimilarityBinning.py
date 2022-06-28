@@ -13,6 +13,9 @@ class TestGreedySimilarityBinning(unittest.TestCase):
         level=logging.DEBUG)
 
     def testBinning(self):
+        """
+        when $should_be_grouped trips are the same, they should appear in a bin
+        """
         label_data = {
             "mode_labels": ['walk', 'bike', 'transit'],
             "purpose_labels": ['work', 'home', 'school'],
@@ -38,11 +41,14 @@ class TestGreedySimilarityBinning(unittest.TestCase):
         
         model.fit(trips)
 
-        # 5 trip features should appear together in one bin
+        # $should_be_grouped trip features should appear together in one bin
         at_least_one_large_bin = any(map(lambda b: len(b['features']) >= should_be_grouped, model.bins.values()))
         self.assertTrue(at_least_one_large_bin, "at least one bin should have at least 5 features in it")
 
     def testPrediction(self):
+        """
+        training and testing with similar trips should lead to a positive bin match
+        """
         label_data = {
             "mode_labels": ['skipping'],
             "purpose_labels": ['pizza_party'],
@@ -72,3 +78,43 @@ class TestGreedySimilarityBinning(unittest.TestCase):
 
         self.assertEqual(len(results), 1, "should have found a matching bin")
         self.assertEqual(n, len(train), "that bin should have had the whole train set in it")
+
+    def testNoPrediction(self):
+        """
+        when trained on trips in Colorado, shouldn't have a prediction for a trip in Alaska
+        """
+        label_data = {
+            "mode_labels": ['skipping'],
+            "purpose_labels": ['pizza_party'],
+            "replaced_mode_labels": ['crabwalking']
+        }
+
+        n = 5
+        train = etmm.generate_mock_trips(
+            user_id="joe", 
+            trips=n, 
+            origin=(39.7645187, -104.9951944),       # Denver, CO
+            destination=(39.7435206, -105.2369292),  # Golden, CO
+            label_data=label_data, 
+            threshold=0.001,  # ~ 111 meters in degrees WGS84
+        )
+        test = etmm.generate_mock_trips(
+            user_id="joe", 
+            trips=1, 
+            origin=(61.1042262, -150.5611644),       # Anchorage, AK
+            destination=(62.2721466, -150.3233046),  # Talkeetna, AK
+            label_data=label_data, 
+            threshold=0.001,  # ~ 111 meters in degrees WGS84
+        )
+
+        model = eamtg.GreedySimilarityBinning(
+            metric=eamso.OriginDestinationSimilarity(),
+            sim_thresh=500,      # meters,
+            apply_cutoff=False  # currently unused 
+        )
+
+        model.fit(train)
+        results, n = model.predict(test[0])
+
+        self.assertEqual(len(results), 0, "should have found a matching bin")
+        self.assertEqual(n, -1, "that bin should have had the whole train set in it")

@@ -67,6 +67,6 @@ if __name__ == '__main__':
         logging.info("building model for user %s" % user_id)
         # these can come from the application config as default values
         model_type = eamumt.ModelType.GREEDY_SIMILARITY_BINNING
-        model_storage = eamums.ModelStorage.DATABASE
+        model_storage = eamums.ModelStorage.DOCUMENT_DATABASE
         min_trips = 14
         eamur.update_trip_model(user_id, model_type, model_storage, min_trips)

@@ -12,6 +12,8 @@ import pandas as pd
 
 class GreedySimilarityBinning(eamuu.TripModel):
 
+    is_incremental = False
+
     def __init__(
         self,
         metric: eamss.SimilarityMetric,
@@ -61,7 +63,8 @@ class GreedySimilarityBinning(eamuu.TripModel):
             }
         }
         where
-        - bin_id:  int    index of a bin containing similar trips
+        - bin_id:  str    index of a bin containing similar trips, as a string
+                          (string type for bin_id comes from mongodb object key type requirements)
         - f_x:     float  feature value (an ordinate such as origin.x)
         - label_x: str    OpenPATH user label category such as "mode_confirm"
         - value_x: str    user-provided label for a category
@@ -77,7 +80,7 @@ class GreedySimilarityBinning(eamuu.TripModel):
         self.metric = metric
         self.sim_thresh = sim_thresh
         self.apply_cutoff = apply_cutoff
-        self.bins: Dict[int, Dict] = {}
+        self.bins: Dict[str, Dict] = {}
         self.loaded = False
 
     def fit(self, trips: List[ecwc.Confirmedtrip]):
@@ -96,7 +99,10 @@ class GreedySimilarityBinning(eamuu.TripModel):
             self._apply_cutoff()
         self._generate_predictions()
         self.loaded = True
+        binned_features = sum([len(b['features']) for b in self.bins.values() ])
         logging.info(f"model fit to trip data")
+        logging.info(f'source data: {len(trips)} rows')
+        logging.info(f'stored model: {binned_features} entries')
 
     def predict(self, trip: ecwc.Confirmedtrip) -> Tuple[List[Dict], int]:
         if not self.loaded:
@@ -113,12 +119,6 @@ class GreedySimilarityBinning(eamuu.TripModel):
             n_features = len(bin_record['features'])
             logging.debug(f"found cluster {predicted_bin} with labels {labels}")
             return labels, n_features
-
-    def is_incremental(self) -> bool:
-        """
-        greedy similarity binning is not an incremental model
-        """
-        return False
 
     def to_dict(self) -> Dict:
         return self.bins
@@ -149,12 +149,13 @@ class GreedySimilarityBinning(eamuu.TripModel):
                 bin_record['labels'].append(trip_labels)
             else:
                 # create new bin
-                new_bin_id = len(self.bins)
+                new_bin_id = str(len(self.bins))
                 new_bin_record = {
                     "features": [trip_features],
                     "labels": [trip_labels],
                     "predictions": []
                 }
+                logging.debug(f"creating new bin {new_bin_id} at location {trip_features}")
                 self.bins[new_bin_id] = new_bin_record
 
     def _nearest_bin(self, trip: ecwc.Confirmedtrip) -> Tuple[Optional[int], Optional[Dict]]:
@@ -175,6 +176,8 @@ class GreedySimilarityBinning(eamuu.TripModel):
         for bin_id, bin_record in self.bins.items():
             for bin_features in bin_record['features']:
                 if self.metric.similar(trip_features, bin_features, self.sim_thresh):
+                    logging.debug(f"found nearest bin id {bin_id}")
+                    logging.debug(f"similar: {trip_features}, {bin_features}")
                     selected_bin = bin_id
                     selected_record = bin_record
                     break

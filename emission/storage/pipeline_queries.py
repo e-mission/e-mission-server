@@ -121,13 +121,20 @@ def mark_mode_inference_complete(user_id):
 def mark_mode_inference_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.MODE_INFERENCE)
 
-def get_time_query_for_trip_model(user_id):  # TODO: here
+def get_time_query_for_trip_model(user_id):
     tq = get_time_range_for_stage(user_id, ps.PipelineStages.TRIP_MODEL)
-    tq.timeType = 'data.model_ts'
-    return tq
+    if tq.startTs is None:
+        return None
+    else:    
+        tq.timeType = 'data.model_ts'
+        return tq
 
 def mark_trip_model_done(user_id, last_ts=None):
-    mark_stage_done(user_id, ps.PipelineStages.TRIP_MODEL, last_ts)
+    last_processed_ts = last_ts + END_FUZZ_AVOID_LTE if last_ts is not None else None
+    mark_stage_done(user_id, ps.PipelineStages.TRIP_MODEL, last_processed_ts)
+
+def mark_trip_model_failed(user_id):
+    mark_stage_failed(user_id, ps.PipelineStages.TRIP_MODEL)
 
 def get_time_range_for_confirmed_object_creation(user_id):
     tq = get_time_range_for_stage(user_id, ps.PipelineStages.CREATE_CONFIRMED_OBJECTS)
