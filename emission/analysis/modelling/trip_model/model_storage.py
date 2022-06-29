@@ -108,7 +108,13 @@ def save_model(
     :raises TypeError: unknown ModelType
     :raises IOError: failure when writing to storage medium
     """
-   
+    if len(model_data) == 0:
+        # this wouldn't be good, esp for incremental models, because it can 
+        # wipe out all of a model's history. save_model should be avoided at the
+        # call site when the model is empty.
+        msg = f'trip model for user {user_id} is empty but save_model called'
+        raise Exception(msg)
+
     if model_storage == ModelStorage.DOCUMENT_DATABASE:
         
         row = ecwu.Tripmodel()

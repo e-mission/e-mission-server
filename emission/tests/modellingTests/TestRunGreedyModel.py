@@ -90,6 +90,34 @@ class TestRunGreedyModel(unittest.TestCase):
         eamumt.ModelType.GREEDY_SIMILARITY_BINNING.build()
         # success if it didn't throw
 
+    def testTrainGreedyModelWithZeroTrips(self):
+        """
+        greedy model takes config arguments via the constructor for testing
+        purposes but will load from a file in /conf/analysis/ which is tested here
+        """
+
+        # making an assumption here...
+        unused_user_id = 'asdjfkl;asdfjkl;asd08234ur13fi4jhf2103mkl'
+
+        # pass along debug model configuration
+        greedy_model_config = {
+            "metric": "od_similarity",
+            "similarity_threshold_meters": 500,
+            "apply_cutoff": False,
+            "incremental_evaluation": False
+        }
+
+        logging.debug(f'~~~~ do nothing ~~~~')
+        eamur.update_trip_model(
+            user_id=unused_user_id,
+            model_type=eamumt.ModelType.GREEDY_SIMILARITY_BINNING,
+            model_storage=eamums.ModelStorage.DOCUMENT_DATABASE,
+            min_trips=self.min_trips,
+            model_config=greedy_model_config
+        )
+
+        # todo: check the pipeline for this user to confirm they don't have a current timestamp
+
     def test1RoundTripGreedySimilarityBinning(self):
         """
         train a model, save it, load it, and use it for prediction, using

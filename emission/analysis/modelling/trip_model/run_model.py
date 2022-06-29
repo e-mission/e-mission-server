@@ -50,16 +50,29 @@ def update_trip_model(
 
         logging.debug(f'model type {model_type.name} is incremental? {model.is_incremental}')
         trips = _get_training_data(user_id, min_trips, model.is_incremental)
-        logging.debug(f'found {len(trips)} for trip model')
-
-        # train and store the model
-        model.fit(trips)
-        model_data_next = model.to_dict()
         
-        eamums.save_model(user_id, model_type, model_data_next, timestamp, model_storage)
-        logging.debug(f"{model_type.name} label prediction model built for user {user_id} with timestamp {timestamp}")
+        if not len(trips) >= min_trips:
+            msg = (
+                f"Total: {len(trips)}, labeled: {len(trips)}, user "
+                f"{user_id} doesn't have enough valid trips for further analysis."
+            )
+            logging.debug(msg)
+            epq.mark_trip_model_failed(user_id)
+        else:
+            
+            # train and store the model
+            model.fit(trips)
+            model_data_next = model.to_dict()
 
-        epq.mark_trip_model_done(user_id, timestamp)
+            if len(model_data_next) == 0:
+                epq.mark_trip_model_failed(user_id)
+                msg = f"trip model for user {user_id} is empty"
+                raise Exception(msg)
+            
+            eamums.save_model(user_id, model_type, model_data_next, timestamp, model_storage)
+            logging.debug(f"{model_type.name} label prediction model built for user {user_id} with timestamp {timestamp}")
+
+            epq.mark_trip_model_done(user_id, timestamp)
         
     except Exception as e:
         epq.mark_trip_model_failed(user_id)
@@ -92,14 +105,13 @@ def predict_labels_with_n(
         return predictions, n
 
 
-def _get_training_data(user_id, min_trips: int, incremental: bool):
+def _get_training_data(user_id, int, incremental: bool):
     """
     load the labeled trip data for this user, subject to a time query. if the user
     does not have at least $min_trips trips with labels, then return an empty list.
 
     :param user_id: user to collect trips from
     :param time_query: query to restrict the time (optional)
-    :param min_trips: minimum number of labeled trips required to train
     :param incremental: if true, only collect trips which have arrived since the 
                         last time this model was trained, otherwise, collect all
                         historical data for this user
@@ -113,13 +125,6 @@ def _get_training_data(user_id, min_trips: int, incremental: bool):
     trips = esda.get_entries(key=esda.CONFIRMED_TRIP_KEY, user_id=user_id, time_query=time_query)
     print(f'found {len(trips)} training rows')
     labeled_trips = [trip for trip in trips if trip['data']['user_input'] != {}]
-    if not len(labeled_trips) >= min_trips:
-        msg = (
-            f"Total: {len(trips)}, labeled: {len(labeled_trips)}, user "
-            f"{user_id} doesn't have enough valid trips for further analysis."
-        )
-        logging.debug(msg)
-        return []
 
     logging.debug(f'found {len(labeled_trips)} labeled trips for user {user_id}')
     return labeled_trips
