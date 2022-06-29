@@ -2,24 +2,21 @@ import logging
 from tokenize import group
 from typing import Dict, List, Optional, Tuple
 
+import emission.analysis.modelling.similarity.similarity_metric_type as eamssmt
 import emission.analysis.modelling.similarity.similarity_metric as eamss
 import emission.analysis.modelling.tour_model.label_processing as lp
 import emission.analysis.modelling.trip_model.trip_model as eamuu
 import emission.analysis.modelling.trip_model.util as util
+import emission.analysis.modelling.trip_model.config as eamtc
 import emission.core.wrapper.confirmedtrip as ecwc
 import pandas as pd
 
 
 class GreedySimilarityBinning(eamuu.TripModel):
 
-    is_incremental = False
+    is_incremental: bool = False  # overwritten during __init__
 
-    def __init__(
-        self,
-        metric: eamss.SimilarityMetric,
-        sim_thresh: float,
-        apply_cutoff: bool = False,
-    ) -> None:
+    def __init__(self, config=None):
         """
         instantiate a clustering model for a user.
 
@@ -70,18 +67,35 @@ class GreedySimilarityBinning(eamuu.TripModel):
         - value_x: str    user-provided label for a category
         - p_val:   float  probability of a prediction, real number in [0, 1]
 
-        :param dir: the model load/save directory
-        :param user_id: identity (UUID) of the e-mission user
-        :param metric: type of similarity metric to use
-        :param sim_thresh: max distance threshold for similarity (assumed meters)
-        :param apply_cutoff: ignore clusters which are small, based on a "knee point" heuristic (default False)
+        :param config: if provided, a manual configuration for testing purposes. these
+                       values should be provided by the config file when running OpenPATH.
+                       see config.py for more details.
         """
-        super().__init__()
-        self.metric = metric
-        self.sim_thresh = sim_thresh
-        self.apply_cutoff = apply_cutoff
+
+        if config is None:
+            config = eamtc.get_config_value_or_raise('model_parameters.greedy')
+            logging.debug(f'GreedySimilarityBinning loaded model config from file')
+        else:
+            logging.debug(f'GreedySimilarityBinning using model config argument')
+        
+        expected_keys = [
+            'metric',
+            'similarity_threshold_meters', 
+            'apply_cutoff', 
+            'incremental_evaluation'
+        ]
+        for k in expected_keys:
+            if config.get(k) is None:
+                msg = f"greedy trip model config missing expected key {k}"
+                raise KeyError(msg)
+
+        self.metric = eamssmt.SimilarityMetricType.from_str(config['metric']).build()
+        self.sim_thresh = config['similarity_threshold_meters']
+        self.apply_cutoff = config['apply_cutoff']
+        self.is_incremental = config['incremental_evaluation']
+
         self.bins: Dict[str, Dict] = {}
-        self.loaded = False
+        
 
     def fit(self, trips: List[ecwc.Confirmedtrip]):
         """train the model by passing data, where each row in the data
@@ -98,16 +112,11 @@ class GreedySimilarityBinning(eamuu.TripModel):
         if len(self.bins) > 1 and self.apply_cutoff:
             self._apply_cutoff()
         self._generate_predictions()
-        self.loaded = True
+
         binned_features = sum([len(b['features']) for b in self.bins.values() ])
-        logging.info(f"model fit to trip data")
-        logging.info(f'source data: {len(trips)} rows')
-        logging.info(f'stored model: {binned_features} entries')
+        logging.info(f"greedy binning model fit to {len(trips)} rows of trip data")
 
     def predict(self, trip: ecwc.Confirmedtrip) -> Tuple[List[Dict], int]:
-        if not self.loaded:
-            msg = f"predict called on unloaded model"
-            raise IOError(msg)
 
         logging.debug(f"running greedy similarity clustering")
         predicted_bin, bin_record = self._nearest_bin(trip)
@@ -115,10 +124,10 @@ class GreedySimilarityBinning(eamuu.TripModel):
             logging.debug(f"unable to predict bin for trip {trip}")
             return [], -1
         else:
-            labels = bin_record['predictions']
+            predictions = bin_record['predictions']
             n_features = len(bin_record['features'])
-            logging.debug(f"found cluster {predicted_bin} with labels {labels}")
-            return labels, n_features
+            logging.debug(f"found cluster {predicted_bin} with predictions {predictions}")
+            return predictions, n_features
 
     def to_dict(self) -> Dict:
         return self.bins

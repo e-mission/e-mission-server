@@ -9,10 +9,10 @@ SIMILARITY_THRESHOLD_METERS=500
 
 
 class ModelType(Enum):
-    GREEDY_SIMILARITY_BINNING = 'greedy'
+    # ENUM_NAME_CAPS = 'SHORTHAND_NAME_CAPS'
+    GREEDY_SIMILARITY_BINNING = 'GREEDY'
     
-    @classmethod
-    def build(cls, model_type: ModelType) -> eamuu.TripModel:
+    def build(self, config=None) -> eamuu.TripModel:
         """
         instantiates the requested user model type with the configured
         parameters. 
@@ -24,22 +24,15 @@ class ModelType(Enum):
         :raises KeyError: if the requested model name does not exist
         """
         # Dict[ModelType, TripModel]
-        # inject default values here at construction
         MODELS = {
-                cls.GREEDY_SIMILARITY_BINNING: eamug.GreedySimilarityBinning(
-                metric=eamso.OriginDestinationSimilarity(),
-                sim_thresh=SIMILARITY_THRESHOLD_METERS,
-                apply_cutoff=False
-            )
+                ModelType.GREEDY_SIMILARITY_BINNING: eamug.GreedySimilarityBinning(config)
         }
-        model = MODELS.get(model_type)
+        model = MODELS.get(self)
         if model is None:
-            if not isinstance(model_type, ModelType):
-                raise TypeError(f"provided model type {model_type} is not an instance of ModelType")
-            else:
-                model_names = list(lambda e: e.name, MODELS.keys())
-                models = ",".join(model_names)
-                raise KeyError(f"user label model {model_type.name} not found in factory, must be one of {{{models}}}")
+            model_names = list(lambda e: e.name, MODELS.keys())
+            models = ",".join(model_names)
+            raise KeyError(f"ModelType {self.name} not found in factory, please add to build method")
+                
         return model
 
     @classmethod
@@ -66,15 +59,16 @@ class ModelType(Enum):
         since a short name is 'nicer', we attempt to match on the enum
         value first (for example, 'greedy'). as a fallback, we attempt
         to match on the full ModelType name (for example, 
-        'GREEDY_SIMILARITY_BINNING').
+        'GREEDY_SIMILARITY_BINNING'). not case sensitive.
 
         :param str: a string name of a ModelType
         """
         try:
-            return cls(str)
+            str_caps = str.upper()
+            return cls(str_caps)
         except ValueError:
             try:
-                return cls[str]
+                return cls[str_caps]
             except KeyError:
                 names_list = '{' + ','.join(cls.names) + '}'
                 msg = f'{str} is not a known ModelType, should be one of {names_list}'

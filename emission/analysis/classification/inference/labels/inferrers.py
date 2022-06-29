@@ -6,9 +6,8 @@ import random
 import copy
 
 import emission.analysis.modelling.tour_model_first_only.load_predict as lp
-from emission.analysis.modelling.trip_model.model_storage import ModelStorage
 import emission.analysis.modelling.trip_model.run_model as eamur
-from emission.analysis.modelling.trip_model.model_type import ModelType
+import emission.analysis.modelling.trip_model.config as eamtc
 
 # A set of placeholder predictors to allow pipeline development without a real inference algorithm.
 # For the moment, the system is configured to work with two labels, "mode_confirm" and
@@ -143,9 +142,9 @@ def n_to_confidence_coeff(n, max_confidence=None, first_confidence=None, confide
 
 # predict_two_stage_bin_cluster but with the above reduction in confidence
 def predict_cluster_confidence_discounting(trip, max_confidence=None, first_confidence=None, confidence_multiplier=None):
-    # these can come from the application config as default values
-    model_type = ModelType.GREEDY_SIMILARITY_BINNING
-    model_storage = ModelStorage.DOCUMENT_DATABASE
+    # load application config 
+    model_type = eamtc.get_model_type()
+    model_storage = eamtc.get_model_storage()
     labels, n = eamur.predict_labels_with_n(trip, model_type, model_storage)
     if n <= 0:  # No model data or trip didn't match a cluster
         logging.debug(f"In predict_cluster_confidence_discounting: n={n}; returning as-is")

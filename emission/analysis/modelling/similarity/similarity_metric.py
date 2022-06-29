@@ -38,5 +38,4 @@ class SimilarityMetric(metaclass=ABCMeta):
         """
         similarity_values = self.similarity(a, b)
         is_similar = all(map(lambda sim: sim <= thresh, similarity_values))
-        logging.debug(f"is_similar: {is_similar} | similarity: {similarity_values}")
         return is_similar

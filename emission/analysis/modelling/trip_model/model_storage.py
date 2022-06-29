@@ -21,6 +21,21 @@ class ModelStorage(Enum):
     def names(cls):
         return list(map(lambda e: e.name, list(cls)))
 
+    @classmethod
+    def from_str(cls, str):
+        """
+        attempts to match the provided string to a known ModelStorage type.
+        not case sensitive.
+        
+        :param str: a string name of a ModelType
+        """
+        try:
+            str_caps = str.upper()
+            return cls[str_caps]
+        except KeyError:
+            names = "{" + ",".join(cls.names) + "}"
+            msg = f"{str} is not a known ModelStorage, must be one of {names}"
+            raise KeyError(msg)
 
 def load_model(user_id, model_type: eamum.ModelType, model_storage: ModelStorage) -> Optional[Dict]:
     """load a user label model from a model storage location
