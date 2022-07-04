@@ -49,6 +49,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "config/sensor_config": self.timeseries_db,
                 "config/sync_config": self.timeseries_db,
                 "config/consent": self.timeseries_db,
+                "config/app_ui_config": self.timeseries_db,
                 "stats/server_api_time": self.timeseries_db,
                 "stats/server_api_error": self.timeseries_db,
                 "stats/pipeline_time": self.timeseries_db,

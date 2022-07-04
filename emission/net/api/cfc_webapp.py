@@ -105,7 +105,13 @@ def _fill_aggregate_backward_compat(request):
 @post("/result/heatmap/pop.route/<time_type>")
 def getPopRoute(time_type):
   _fill_aggregate_backward_compat(request)
-  user_uuid = get_user_or_aggregate_auth(request)
+  # Disable aggregate access for the spatio-temporal data temporarily
+  # until we can figure out how to prevent malicious users from signing up for studies,
+  # pulling data using automated scripts, and using repeated queries on a
+  # sparse dataset to reconstruct trajectories
+  # re-enable when we add heatmaps back
+  # https://github.nrel.gov/kshankar/openpath-phone/issues/2#issuecomment-44111
+  user_uuid = getUUID(request)
 
   if 'from_local_date' in request.json and 'to_local_date' in request.json:
       start_time = request.json['from_local_date']
@@ -129,7 +135,13 @@ def getPopRoute(time_type):
 @post("/result/heatmap/incidents/<time_type>")
 def getStressMap(time_type):
     _fill_aggregate_backward_compat(request)
-    user_uuid = get_user_or_aggregate_auth(request)
+    # Disable aggregate access for the spatio-temporal data temporarily
+    # until we can figure out how to prevent malicious users from signing up for studies,
+    # pulling data using automated scripts, and using repeated queries on a
+    # sparse dataset to reconstruct trajectories
+    # re-enable when we add heatmaps back
+    # https://github.nrel.gov/kshankar/openpath-phone/issues/2#issuecomment-44111
+    user_uuid = getUUID(request)
 
     # modes = request.json['modes']
     # hardcode modes to None because we currently don't store
