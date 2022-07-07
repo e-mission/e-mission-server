@@ -8,8 +8,12 @@ def origin_features(trip: ecwc.Confirmedtrip) -> List[float]:
     :param trip: trip to extract features from
     :return: origin coordinates
     """
-    origin = trip.data.start_loc["coordinates"]
-    return origin
+    try:
+        origin = trip['data']['start_loc']["coordinates"]
+        return origin
+    except KeyError as e:
+        msg = 'Confirmedtrip expected to have path data.start_loc.coordinates'
+        raise KeyError(msg) from e
 
 def destination_features(trip: ecwc.Confirmedtrip) -> List[float]:
     """extract the trip destination coordinates. 
@@ -17,8 +21,13 @@ def destination_features(trip: ecwc.Confirmedtrip) -> List[float]:
     :param trip: trip to extract features from
     :return: destination coordinates
     """
-    destination = trip.data.end_loc["coordinates"]
-    return destination
+    try:
+        destination = trip['data']['start_loc']["coordinates"]
+        return destination
+    except KeyError as e:
+        msg = 'Confirmedtrip expected to have path data.start_loc.coordinates'
+        raise KeyError(msg) from e
+    
 
 def od_features(trip: ecwc.Confirmedtrip) -> List[float]:
     """extract both origin and destination coordinates.
@@ -36,7 +45,11 @@ def distance_feature(trip: ecwc.Confirmedtrip) -> List[float]:
     :param trip: trip to extract features from
     :return: distance feature
     """
-    return [trip.data.distance]
+    try:
+        return [trip['data']['distance']]
+    except KeyError as e:
+        msg = 'Confirmedtrip expected to have path data.distance'
+        raise KeyError(msg) from e
 
 def duration_feature(trip: ecwc.Confirmedtrip) -> List[float]:
     """provided for forward compatibility.
@@ -44,4 +57,8 @@ def duration_feature(trip: ecwc.Confirmedtrip) -> List[float]:
     :param trip: trip to extract features from
     :return: duration feature
     """
-    return [trip.data.duration]
+    try:
+        return [trip['data']['duration']]
+    except KeyError as e:
+        msg = 'Confirmedtrip expected to have path data.duration'
+        raise KeyError(msg) from e

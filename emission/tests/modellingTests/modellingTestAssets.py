@@ -30,6 +30,26 @@ def generate_trip_coordinates(
     return (x, y)
 
 
+def extract_trip_labels(trips: List[ecwc.Confirmedtrip]) -> Dict:
+    """
+    helper to build the `label_data` argument for the generate_mock_trips
+    function below. reads all entries from a list of Confirmedtrip entries.
+
+    :param trips: the trips to read from
+    :return: label_data
+    """
+    keys = ['mode_confirm', 'purpose_confirm', 'replaced_mode']
+    result = {k: set() for k in keys}
+    for k in keys:
+        for t in trips:
+            entry = t['data']['user_input'].get(k)
+            if entry is not None:
+                result[k].add(entry) 
+    for k in result.keys():
+        result[k] = list(result[k])
+    return result
+
+
 def sample_trip_labels(
     mode_labels, 
     purpose_labels,
@@ -47,21 +67,21 @@ def sample_trip_labels(
     :param replaced_mode_weights: sample weights, defaults to None
     :return: sampled trip labels
     """
-    mw = [1.0 / len(mode_labels) for i in range(len(mode_labels))] \
-        if mode_weights is not None else mode_weights
-    rw = [1.0 / len(replaced_mode_labels) for i in range(len(replaced_mode_labels))] \
-        if replaced_mode_weights is not None else replaced_mode_weights
-    pw = [1.0 / len(purpose_labels) for i in range(len(purpose_labels))] \
-        if purpose_weights is not None else purpose_weights
-    mode_label_samples = random.choices(population=mode_labels, k=1, weights=mw)
-    replaced_mode_label_samples = random.choices(population=replaced_mode_labels, k=1, weights=rw)
-    purpose_label_samples = random.choices(population=purpose_labels, k=1, weights=pw)
-    user_input = {
-        "mode_confirm": mode_label_samples[0],
-        "replaced_mode": replaced_mode_label_samples[0],
-        "purpose_confirm": purpose_label_samples[0]
-    }
-    return user_input
+    user_inputs = [
+        ('mode_confirm', mode_labels, mode_weights),
+        ('replaced_mode', replaced_mode_labels, replaced_mode_weights),
+        ('purpose_confirm', purpose_labels, purpose_weights)
+    ]
+
+    result = {}
+    for key, labels, weights in user_inputs:
+        if len(labels) > 0:
+            if weights is None:
+                weights = [1.0 / len(labels) for i in range(len(labels))]
+            samples = random.choices(population=labels,k=1,weights=weights)
+            result[key] = samples[0]
+
+    return result
 
 
 def build_mock_trip(user_id, origin, destination, labels = {}) -> ecwc.Confirmedtrip:
@@ -106,9 +126,9 @@ def generate_mock_trips(
 
     label_data is an optional dictionary with labels and sample weights, for example:
     {
-        "mode_labels": ['walk', 'bike'],
-        "replaced_mode_labels": ['drive', 'tnc'],
-        "purpose_labels": ['home', 'work'],
+        "mode_confirm": ['walk', 'bike'],
+        "replaced_mode": ['drive', 'tnc'],
+        "purpose_confirm": ['home', 'work'],
         "mode_weights": [0.8, 0.2],
         "replaced_mode_weights": [0.4, 0.6],
         "purpose_weights": [0.1, 0.9]
@@ -140,9 +160,9 @@ def generate_mock_trips(
         d = generate_trip_coordinates(destination, within, threshold, max)
         labels = {} if label_data is None or random.random() > has_label_p \
             else sample_trip_labels(
-            mode_labels=label_data.get('mode_labels'),
-            replaced_mode_labels=label_data.get('replaced_mode_labels'),
-            purpose_labels=label_data.get('purpose_labels'),
+            mode_labels=label_data.get('mode_confirm'),
+            replaced_mode_labels=label_data.get('replaced_mode'),
+            purpose_labels=label_data.get('purpose_confirm'),
             mode_weights=label_data.get('mode_weights'),
             replaced_mode_weights=label_data.get('replaced_mode_weights'),
             purpose_weights=label_data.get('purpose_weights')
@@ -156,9 +176,9 @@ def generate_mock_trips(
 
 if __name__ == '__main__':
     label_data = {
-        "mode_labels": ['walk', 'bike', 'drive'],
-        "purpose_labels": ['work', 'home', 'school'],
-        "replaced_mode_labels": ['walk', 'bike', 'drive']
+        "mode_confirm": ['walk', 'bike', 'drive'],
+        "purpose_confirm": ['work', 'home', 'school'],
+        "replaced_mode": ['walk', 'bike', 'drive']
     }
     result = generate_mock_trips('joe-bob', 14, [0, 0], [1,1], label_data, 6)
     for r in result:

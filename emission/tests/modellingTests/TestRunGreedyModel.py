@@ -45,9 +45,9 @@ class TestRunGreedyModel(unittest.TestCase):
             
             # generate labels with a known sample weight that we can rely on in the test
             label_data = {
-                "mode_labels": ['ebike', 'bike'],
-                "purpose_labels": ['happy-hour', 'dog-park'],
-                "replaced_mode_labels": ['walk'],
+                "mode_confirm": ['ebike', 'bike'],
+                "purpose_confirm": ['happy-hour', 'dog-park'],
+                "replaced_mode": ['walk'],
                 "mode_weights": [0.9, 0.1],
                 "purpose_weights": [0.1, 0.9]
             }
@@ -161,3 +161,4 @@ class TestRunGreedyModel(unittest.TestCase):
         [logging.debug(p) for p in sorted(prediction, key=lambda r: r['p'], reverse=True)]
 
         self.assertNotEqual(len(prediction), 0, "should have a prediction")
+
