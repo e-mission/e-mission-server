@@ -122,7 +122,8 @@ def _get_training_data(user_id, int, incremental: bool):
     time_query = time_query_from_pipeline if incremental else None
     logging.debug(f'time query for training data collection: {time_query}')
     
-    trips = esda.get_entries(key=esda.CONFIRMED_TRIP_KEY, user_id=user_id, time_query=time_query)
+    ts = esta.TimeSeries.get_time_series(user_id)
+    trips = list(ts.find_entries([esda.CONFIRMED_TRIP_KEY], time_query=time_query))  
     print(f'found {len(trips)} training rows')
     labeled_trips = [trip for trip in trips if trip['data']['user_input'] != {}]
 

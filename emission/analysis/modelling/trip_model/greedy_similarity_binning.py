@@ -103,6 +103,8 @@ class GreedySimilarityBinning(eamuu.TripModel):
 
         :param trips: 2D array of features to train from
         """
+        
+        logging.debug(f'fit called with {len(trips)} trips')
         unlabeled = list(filter(lambda t: len(t['data']['user_input']) == 0, trips))
         if len(unlabeled) > 0:
             msg = f'model.fit cannot be called with unlabeled trips, found {len(unlabeled)}'

@@ -46,6 +46,7 @@ class TestRunGreedyModel(unittest.TestCase):
 
         # test data can be saved between test invocations, check if data exists before generating
         self.initial_data = list(self.ts.find_entries([esdatq.CONFIRMED_TRIP_KEY]))  
+
         if len(self.initial_data) == 0:
 
             # first time running against this database instance:
@@ -66,11 +67,12 @@ class TestRunGreedyModel(unittest.TestCase):
                 logging.debug(f'test setup failed while loading trips from file')
                 self.fail()
 
+            logging.debug('writing initial trip model')
             eamur.update_trip_model(
                 user_id=self.user_id,
                 model_type=self.model_type,
                 model_storage=self.model_storage,
-                min_trips=5,  # there are 5 similar trips in the file
+                min_trips=4,  # there are 4 similar and labelled trips in the file
                 model_config=self.greedy_model_config
             )
 
@@ -93,21 +95,21 @@ class TestRunGreedyModel(unittest.TestCase):
         similar_matrix = [[metric.similar(t1, t2, sim_threshold)
                 for t1 in features]
                 for t2 in features]
-        similar_trips = []
-        similar_features = []
+        self.similar_trips = []
+        self.similar_features = []
         for idx, f in enumerate(self.initial_data):
             sim = [similar_matrix[idx][i] for i in range(len(features)) if i != idx]
             similar = any(sim)
             if similar:
-                similar_trips.append(self.initial_data[idx])
-                similar_features.append(features[idx])
+                self.similar_trips.append(self.initial_data[idx])
+                self.similar_features.append(features[idx])
         
         # after running, how many trips should be stored together in a similar bin?
-        self.initial_similar_trips = len(similar_trips)
+        self.initial_similar_trips = len(self.similar_trips)
         self.expected_trips = self.initial_similar_trips + self.new_trips_per_invocation
 
         # find the centroid of the similar trip data
-        src_x, src_y, dst_x, dst_y = np.mean(similar_features, axis=0)
+        src_x, src_y, dst_x, dst_y = np.mean(self.similar_features, axis=0)
         self.origin = [src_x, src_y]
         self.destination = [dst_x, dst_y]
 
@@ -131,7 +133,7 @@ class TestRunGreedyModel(unittest.TestCase):
             origin=self.origin,
             destination=self.destination,
             label_data=label_data,
-            threshold=0.0005 # ~50m
+            threshold=0.0001 # ~10m
         )
         self.ts.bulk_insert(new_trips)
 
@@ -154,6 +156,7 @@ class TestRunGreedyModel(unittest.TestCase):
             'there should be two bins, one with similar trips, one with an outlier')
 
         trips_in_bin = len(updated_model.bins['0'])
+        print(f'trips in bins: {[len(x) for x in updated_model.bins.values()]}')
         self.assertEqual(trips_in_bin, self.expected_trips,
             'expected number of trips stored in bin')
 
