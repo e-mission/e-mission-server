@@ -7,7 +7,7 @@ import branca.element as bre
 from scipy.spatial import ConvexHull
 
 import data_wrangling
-from clustering import add_loc_clusters
+from clustering import add_loc_clusters, ALG_OPTIONS
 import emission.storage.decorations.trip_queries as esdtq
 
 DENVER_COORD = [39.7392, -104.9903]
@@ -37,8 +37,9 @@ COLORS = [
 
 
 def plot_clusters(user_df,
-                  alg,
                   loc_type,
+                  alg,
+                  SVM=False,
                   radii=[50, 100, 150, 200],
                   cluster_unlabeled=False,
                   plot_unlabeled=False,
@@ -55,10 +56,11 @@ def plot_clusters(user_df,
         Args: 
             user_df (dataframe): must contain the following columns: 
                 'start_loc', 'end_loc', 'user_input'
-            alg (str): the clustering algorithm to be used. must be one of the 
-                following: 'DBSCAN', 'oursim', 'OPTICS', 'SVM', 'fuzzy'
             loc_type (str): 'start' or 'end', the type of points to cluster
-                TODO: allow for trip-wise clustering? 
+            alg (str): the clustering algorithm to be used. must be one of the 
+                following: 'DBSCAN', 'oursim', 'OPTICS', 'SVM', 'fuzzy' or
+                'mean_shift'
+            SVM (bool): whether or not to sub-divide clusters with SVM
             radii (int list): list of radii to pass to the clustering alg
             cluster_unlabeled (bool): whether or not unlabeled points are used 
                 to generate clusters.
@@ -79,8 +81,7 @@ def plot_clusters(user_df,
     assert 'start_loc' in user_df.columns
     assert 'end_loc' in user_df.columns
     assert 'user_input' in user_df.columns
-    alg_options = ['DBSCAN', 'oursim', 'OPTICS', 'SVM', 'fuzzy']
-    assert alg in alg_options
+    assert alg in ALG_OPTIONS
 
     fig = bre.Figure(figsize=(20, 20))
     fig_index = 0
@@ -97,12 +98,18 @@ def plot_clusters(user_df,
 
     labeled_trips_df = all_trips_df.loc[all_trips_df.user_input != {}].dropna(
         subset=['purpose_confirm'])
-    df_for_cluster = all_trips_df if cluster_unlabeled else labeled_trips_df
+
+    if cluster_unlabeled:
+        df_for_cluster = all_trips_df
+    else:
+        df_for_cluster = labeled_trips_df
 
     df_for_cluster = add_loc_clusters(
         df_for_cluster,
         radii=radii,
         alg=alg,
+        SVM=SVM,
+        # cluster_unlabeled=cluster_unlabeled,
         loc_type=loc_type,
         min_samples=2,
         optics_min_samples=optics_min_samples,
@@ -129,6 +136,9 @@ def plot_clusters(user_df,
                 df_for_cluster[f"{loc_type}_{alg}_clusters_{r}_m"] == c]
 
             if np.isnan(c):
+                print(points_in_cluster)
+                print(df_for_cluster[df_for_cluster[
+                    f"{loc_type}_{alg}_clusters_{r}_m"].isnull()])
                 raise Exception(
                     'nan cluster detected; all trips should have a proper cluster index'
                 )
