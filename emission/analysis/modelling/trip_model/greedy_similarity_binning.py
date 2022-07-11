@@ -109,7 +109,6 @@ class GreedySimilarityBinning(eamuu.TripModel):
         if len(unlabeled) > 0:
             msg = f'model.fit cannot be called with unlabeled trips, found {len(unlabeled)}'
             raise Exception(msg)
-        self.bins = {}
         self._assign_bins(trips)
         if len(self.bins) > 1 and self.apply_cutoff:
             self._apply_cutoff()

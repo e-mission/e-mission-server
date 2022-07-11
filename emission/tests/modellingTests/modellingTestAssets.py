@@ -1,10 +1,11 @@
 import random
-from typing import Tuple, List, Dict
+from typing import Optional, Tuple, List, Dict
+from uuid import UUID
 import emission.analysis.modelling.trip_model.trip_model as eamtm
 import emission.core.wrapper.confirmedtrip as ecwc
 
 import emission.core.wrapper.entry as ecwe
-import arrow 
+import time 
 import math
 
 
@@ -85,21 +86,36 @@ def sample_trip_labels(
     return result
 
 
-def build_mock_trip(user_id, origin, destination, labels = {}) -> ecwc.Confirmedtrip:
+def build_mock_trip(
+    user_id: UUID, 
+    origin, 
+    destination, 
+    labels: Optional[Dict] = {}, 
+    start_ts: Optional[float] = None,
+    end_ts: Optional[float] = None) -> ecwc.Confirmedtrip:
     """repackages mock data as a Confirmedtrip Entry type
+
+    NOTE: these mock objects **do not** include all fields. see Trip and Confirmedtrip
+    classes for the complete list and expand if necessary.
 
     :param user_id: the user id UUID
     :param origin: trip origin coordinates
     :param destination: trip destination coordinates
     :param labels: user labels for the trip, optional, default none
-    :return: a Confirmedtrip entry
+    :param start_ts: optional timestamp for trip start, otherwise NOW
+    :param end_ts: optional timestamp for trip end, otherwise NOW
+    :return: a mock Confirmedtrip entry
     """
+    start_ts = start_ts if start_ts is not None else time.time()
+    end_ts = end_ts if end_ts is not None else time.time()
     key = "analysis/confirmed_trip"
     data = {
+        "start_ts": start_ts,
         "start_loc": {
             "type": "Point",
             "coordinates": origin
         },
+        "end_ts": end_ts,
         "end_loc": {
             "type": "Point",
             "coordinates": destination
@@ -107,7 +123,7 @@ def build_mock_trip(user_id, origin, destination, labels = {}) -> ecwc.Confirmed
         "user_input": labels
     }
 
-    return ecwe.Entry.create_fake_entry(user_id, key, data, write_ts=arrow.now().timestamp)
+    return ecwe.Entry.create_fake_entry(user_id, key, data, write_ts=time.time())
 
 
 def generate_mock_trips(
@@ -117,6 +133,8 @@ def generate_mock_trips(
     destination, 
     label_data = None, 
     within_threshold = None,
+    start_ts: None = None,
+    end_ts: None = None,
     threshold = 0.01,
     max = 0.1, 
     has_label_p = 1.0,
@@ -168,7 +186,7 @@ def generate_mock_trips(
             replaced_mode_weights=label_data.get('replaced_mode_weights'),
             purpose_weights=label_data.get('purpose_weights')
         )
-        trip = build_mock_trip(user_id, o, d, labels)
+        trip = build_mock_trip(user_id, o, d, labels, start_ts, end_ts)
         result.append(trip)
         
     random.shuffle(result) 

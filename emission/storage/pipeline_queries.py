@@ -124,14 +124,15 @@ def mark_mode_inference_failed(user_id):
 def get_time_query_for_trip_model(user_id):
     tq = get_time_range_for_stage(user_id, ps.PipelineStages.TRIP_MODEL)
     if tq.startTs is None:
+        # time_query=None, request all confirmed trips for user
         return None
     else:    
-        tq.timeType = 'data.model_ts'
+        # key off of Confirmedtrip end timestamp for the provided time range
+        tq.timeType = 'data.end_ts'
         return tq
 
-def mark_trip_model_done(user_id, last_ts=None):
-    last_processed_ts = last_ts + END_FUZZ_AVOID_LTE if last_ts is not None else None
-    mark_stage_done(user_id, ps.PipelineStages.TRIP_MODEL, last_processed_ts)
+def mark_trip_model_done(user_id, last_ts):
+    mark_stage_done(user_id, ps.PipelineStages.TRIP_MODEL, last_ts + END_FUZZ_AVOID_LTE)
 
 def mark_trip_model_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.TRIP_MODEL)

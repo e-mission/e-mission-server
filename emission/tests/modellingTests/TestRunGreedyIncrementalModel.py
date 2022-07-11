@@ -4,6 +4,7 @@ import logging
 import json
 import numpy as np
 import uuid
+import time
 
 import bson.json_util as bju
 
@@ -92,21 +93,24 @@ class TestRunGreedyModel(unittest.TestCase):
         #   but only 5 are "similar" within 500 meters. here we dynamically dis-
         #   include trip 6. set up like this in case we have to switch datasets 
         #   in the future (as long as the outliers are not similar!)
+        # 2022-07-11 rjf: ooh, let's remove the ones without labels too
         similar_matrix = [[metric.similar(t1, t2, sim_threshold)
                 for t1 in features]
                 for t2 in features]
         self.similar_trips = []
         self.similar_features = []
         for idx, f in enumerate(self.initial_data):
+            has_labels = len(self.initial_data[idx]['data']['user_input']) > 0
             sim = [similar_matrix[idx][i] for i in range(len(features)) if i != idx]
             similar = any(sim)
-            if similar:
+            if has_labels and similar:
                 self.similar_trips.append(self.initial_data[idx])
                 self.similar_features.append(features[idx])
         
         # after running, how many trips should be stored together in a similar bin?
         self.initial_similar_trips = len(self.similar_trips)
         self.expected_trips = self.initial_similar_trips + self.new_trips_per_invocation
+        logging.debug(f"end of test, expecting {self.expected_trips} trips")
 
         # find the centroid of the similar trip data
         src_x, src_y, dst_x, dst_y = np.mean(self.similar_features, axis=0)
@@ -126,6 +130,9 @@ class TestRunGreedyModel(unittest.TestCase):
 
         # create a new trip sampling from the centroid and the existing
         # set of user input data
+        # timestamps for these rows cannot be within the last 5 seconds
+        # based on invariant set in pipeline_queries.py by the
+        # END_FUZZ_AVOID_LTE constant.
         label_data = etmm.extract_trip_labels(self.similar_trips)
         new_trips = etmm.generate_mock_trips(
             user_id=self.user_id,
@@ -133,9 +140,14 @@ class TestRunGreedyModel(unittest.TestCase):
             origin=self.origin,
             destination=self.destination,
             label_data=label_data,
-            threshold=0.0001 # ~10m
+            threshold=0.0001, # ~10m,
+            start_ts=time.time() - 20,
+            end_ts=time.time() - 10
         )
+
         self.ts.bulk_insert(new_trips)
+        all_trips = list(self.ts.find_entries([esdatq.CONFIRMED_TRIP_KEY]))
+        logging.debug(f'total of {len(all_trips)} now stored in database')
 
         # train the new model on the complete collection of trips
         eamur.update_trip_model(
@@ -155,11 +167,11 @@ class TestRunGreedyModel(unittest.TestCase):
         self.assertEqual(len(updated_model.bins), 2, 
             'there should be two bins, one with similar trips, one with an outlier')
 
-        trips_in_bin = len(updated_model.bins['0'])
-        print(f'trips in bins: {[len(x) for x in updated_model.bins.values()]}')
+        trips_in_bin = len(updated_model.bins['0']['features'])
+        print(f'trips in bins: {[len(x["features"]) for x in updated_model.bins.values()]}')
         self.assertEqual(trips_in_bin, self.expected_trips,
             'expected number of trips stored in bin')
 
-        self.assertEqual(len(updated_model.bins['1']), 1,
+        self.assertEqual(len(updated_model.bins['1']['features']), 1,
             'the second bin should have exactly one entry (an outlier)')
         

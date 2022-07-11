@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import Dict, Optional
 import logging
+import json
 
 import emission.analysis.modelling.trip_model.model_type as eamum
 import emission.core.wrapper.tripmodel as ecwu
@@ -56,7 +57,7 @@ def load_model(user_id, model_type: eamum.ModelType, model_storage: ModelStorage
             raise Exception('user model storage requires BuiltInTimeSeries')
         latest_model_entry = ts.get_first_entry(
             key=esda.TRIP_MODEL_STORE_KEY,
-            field='data.model_ts',
+            field='metadata.write_ts',
             sort_order=pymongo.DESCENDING
         )
 
@@ -74,6 +75,7 @@ def load_model(user_id, model_type: eamum.ModelType, model_storage: ModelStorage
             raise TypeError('stored model does not have a model type')
         latest_model_type = eamum.ModelType.from_str(latest_model_type_str)
         
+        # validate and return
         if latest_model_entry is None:
             return None
         elif latest_model_type != model_type:
@@ -104,6 +106,7 @@ def save_model(
     :param user_id: user associated with this model
     :param model_type: type of model stored
     :param model_data: data for this model to store, should be a dict
+    :param model_timestamp: time that model is current to
     :param model_storage: type of storage to load from, defaults to ModelStorage.DATABASE
     :raises TypeError: unknown ModelType
     :raises IOError: failure when writing to storage medium
@@ -118,7 +121,6 @@ def save_model(
     if model_storage == ModelStorage.DOCUMENT_DATABASE:
         
         row = ecwu.Tripmodel()
-        row.user_id = user_id
         row.model_ts = model_timestamp
         row.model_type = model_type
         row.model = model_data

@@ -17,9 +17,9 @@ class TestGreedySimilarityBinning(unittest.TestCase):
         when $should_be_grouped trips are the same, they should appear in a bin
         """
         label_data = {
-            "mode_labels": ['walk', 'bike', 'transit'],
-            "purpose_labels": ['work', 'home', 'school'],
-            "replaced_mode_labels": ['drive']
+            "mode_confirm": ['walk', 'bike', 'transit'],
+            "purpose_confirm": ['work', 'home', 'school'],
+            "replaced_mode": ['drive']
         }
 
         n = 20
@@ -33,11 +33,14 @@ class TestGreedySimilarityBinning(unittest.TestCase):
             within_threshold=should_be_grouped, 
             threshold=0.001,  # ~ 111 meters in degrees WGS84
         )
-        model = eamtg.GreedySimilarityBinning(
-            metric=eamso.OriginDestinationSimilarity(),
-            sim_thresh=500,      # meters,
-            apply_cutoff=False  # currently unused 
-        )
+
+        model_config = {
+            "metric": "od_similarity",
+            "similarity_threshold_meters": 500,      # meters,
+            "apply_cutoff": False,
+            "incremental_evaluation": False
+        }
+        model = eamtg.GreedySimilarityBinning(model_config)
         
         model.fit(trips)
 
@@ -50,9 +53,9 @@ class TestGreedySimilarityBinning(unittest.TestCase):
         training and testing with similar trips should lead to a positive bin match
         """
         label_data = {
-            "mode_labels": ['skipping'],
-            "purpose_labels": ['pizza_party'],
-            "replaced_mode_labels": ['crabwalking']
+            "mode_confirm": ['skipping'],
+            "purpose_confirm": ['pizza_party'],
+            "replaced_mode": ['crabwalking']
         }
 
         n = 6
@@ -64,11 +67,14 @@ class TestGreedySimilarityBinning(unittest.TestCase):
             label_data=label_data, 
             threshold=0.001,  # ~ 111 meters in degrees WGS84
         )
-        model = eamtg.GreedySimilarityBinning(
-            metric=eamso.OriginDestinationSimilarity(),
-            sim_thresh=500,      # meters,
-            apply_cutoff=False  # currently unused 
-        )
+
+        model_config = {
+            "metric": "od_similarity",
+            "similarity_threshold_meters": 500,      # meters,
+            "apply_cutoff": False,
+            "incremental_evaluation": False
+        }
+        model = eamtg.GreedySimilarityBinning(model_config)
         
         train = trips[0:5]
         test = trips[5]
@@ -84,9 +90,9 @@ class TestGreedySimilarityBinning(unittest.TestCase):
         when trained on trips in Colorado, shouldn't have a prediction for a trip in Alaska
         """
         label_data = {
-            "mode_labels": ['skipping'],
-            "purpose_labels": ['pizza_party'],
-            "replaced_mode_labels": ['crabwalking']
+            "mode_confirm": ['skipping'],
+            "purpose_confirm": ['pizza_party'],
+            "replaced_mode": ['crabwalking']
         }
 
         n = 5
@@ -107,11 +113,13 @@ class TestGreedySimilarityBinning(unittest.TestCase):
             threshold=0.001,  # ~ 111 meters in degrees WGS84
         )
 
-        model = eamtg.GreedySimilarityBinning(
-            metric=eamso.OriginDestinationSimilarity(),
-            sim_thresh=500,      # meters,
-            apply_cutoff=False  # currently unused 
-        )
+        model_config = {
+            "metric": "od_similarity",
+            "similarity_threshold_meters": 500,      # meters,
+            "apply_cutoff": False,
+            "incremental_evaluation": False
+        }
+        model = eamtg.GreedySimilarityBinning(model_config)
 
         model.fit(train)
         results, n = model.predict(test[0])
