@@ -94,14 +94,18 @@ def index():
 # Redirect to the NREL static study-specific pages
 # Remove after the temporary redirect is done
 # https://github.nrel.gov/nrel-cloud-computing/emissionlhd/issues/27
-@route('/join_redirect_to_static')
-def redirectToNRELStudy():
+def _get_study_name(request):
   orig_host = request.urlparts.netloc
   first_domain = orig_host.split(".")[0]
   openpath_index = first_domain.find("-openpath")
   if openpath_index == -1:
       abort(400, "Invalid study format %s, does not end with -openpath" % first_domain)
   study_name = first_domain[0:openpath_index]
+  return study_name
+
+@route('/join_redirect_to_static')
+def redirectToNRELStudy():
+  study_name = _get_study_name(request)
   new_url = "https://www.nrel.gov/transportation/openpath-%s-study.html" % (study_name)
   logging.debug("Found study %s, mapped join URL for %s -> %s" % (study_name, orig_host, new_url))
   response.status = 301
@@ -492,7 +496,16 @@ def getUUID(request, inHeader=False):
         retUUID = enaa.getUUID(request, auth_method, inHeader)
         logging.debug("retUUID = %s" % retUUID)
         if retUUID is None:
-           raise HTTPError(403, "token is valid, but no account found for user")
+            logging.debug("token %s is valid, but no account found. stripping out study name and retrying..." % request.json["user"])
+            study_name = _get_study_name(request)
+            study_prefix = "nrelop_"+study_name
+            logging.debug("study prefix is %s" % study_prefix)
+            if request.json["user"].startswith(study_prefix):
+                request.json["user"] = request.json["user"][len(study_prefix)+1:-1]
+                logging.debug("After stripping out %s, token is %s" % request.json["user"])
+                retUUID = enaa.getUUID(request, auth_method, inHeader)
+                if retUUID is None:
+                    raise HTTPError(403, "token is valid, but no account found for user")
         return retUUID
     except ValueError as e:
         traceback.print_exc()
