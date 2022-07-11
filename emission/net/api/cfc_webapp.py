@@ -96,6 +96,8 @@ def index():
 # https://github.nrel.gov/nrel-cloud-computing/emissionlhd/issues/27
 def _get_study_name(request):
   orig_host = request.urlparts.netloc
+  if orig_host == "openpath-stage":
+    return "stage"
   first_domain = orig_host.split(".")[0]
   openpath_index = first_domain.find("-openpath")
   if openpath_index == -1:
