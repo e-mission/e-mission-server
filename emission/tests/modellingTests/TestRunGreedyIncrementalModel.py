@@ -127,7 +127,16 @@ class TestRunGreedyModel(unittest.TestCase):
         pass
 
     def testIncrementalRun(self):
-
+        """
+        incremental trip models train from Confirmedtrip entries at most
+        once. to test this behavior, a model is built based on a small
+        Confirmedtrip dataset stored at a file location (See setUp, above).
+        this happens once and is not repeated when the test is re-run,
+        unless a new database instance is spun up. within the test method,
+        an additional few mock trips are generated with a later timestamp.
+        the training model should 1) only see the new trips, 2) have been
+        trained on the expected number of trips at completion.
+        """
         # create a new trip sampling from the centroid and the existing
         # set of user input data
         # timestamps for these rows cannot be within the last 5 seconds
