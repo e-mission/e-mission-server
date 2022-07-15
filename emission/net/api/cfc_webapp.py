@@ -96,7 +96,7 @@ def index():
 # https://github.nrel.gov/nrel-cloud-computing/emissionlhd/issues/27
 def _get_study_name(request):
   orig_host = request.urlparts.netloc
-  print(orig_host)
+  logging.debug("While getting study name, orig_host = %s" % orig_host)
   if orig_host == "localhost:8080" or "10.0.2.2:8080":
     return "dev"
   if orig_host == "openpath-stage":
@@ -511,6 +511,8 @@ def getUUID(request, inHeader=False):
                 retUUID = enaa.getUUID(request, auth_method, inHeader)
                 if retUUID is None:
                     raise HTTPError(403, "token is valid, but no account found for user")
+            else:
+                    raise HTTPError(403, "no token %s found on server" % request.json["user"])
         return retUUID
     except ValueError as e:
         traceback.print_exc()
