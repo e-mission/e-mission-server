@@ -173,9 +173,9 @@ def _migrate_sparse_to_dense(collection, geo_index):
     # Should be safe to remove after Jun 2024
     index_info = collection.index_information()
     if geo_index in index_info and "sparse" in index_info[geo_index]:
-        print("Found sparse geosphere index, dropping %s, index list before=%s" % (list(collection.list_indexes())))
+        print("Found sparse geosphere index, dropping %s, index list before=%s" % (geo_index, collection.index_information().keys()))
         collection.drop_index(geo_index)
-        print("Found sparse geosphere index, dropping %s, index list after=%s" % (list(collection.list_indexes())))
+        print("Found sparse geosphere index, dropping %s, index list after=%s" % (geo_index, collection.index_information().keys()))
 
 def get_timeseries_db():
     #current_db = MongoClient().Stage_database
@@ -219,7 +219,7 @@ def _create_analysis_result_indices(tscoll):
     tscoll.create_index([("data.start_ts", pymongo.DESCENDING)], sparse=True)
     tscoll.create_index([("data.end_ts", pymongo.DESCENDING)], sparse=True)
     _migrate_sparse_to_dense(tscoll, "data.start_loc_2dsphere")
-    _migrate_sparse_to_dense(tscoll, "data.start_loc_2dsphere")
+    _migrate_sparse_to_dense(tscoll, "data.end_loc_2dsphere")
     tscoll.create_index([("data.start_loc", pymongo.GEOSPHERE)])
     tscoll.create_index([("data.end_loc", pymongo.GEOSPHERE)])
     _create_local_dt_indices(tscoll, "data.start_local_dt")
