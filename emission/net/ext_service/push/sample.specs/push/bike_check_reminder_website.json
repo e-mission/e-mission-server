@@ -1,0 +1,9 @@
+{
+    "alert_type": "website",
+    "title": "[Open Directly] Do you remember...",
+    "message": "how to check your bike before you ride?",
+    "image": "icon",
+    "spec": {
+       "url": "https://youtu.be/fD0JwrzMJlM"
+    }
+}
