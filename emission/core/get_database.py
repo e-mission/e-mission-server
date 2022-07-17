@@ -167,6 +167,16 @@ def get_usercache_db():
     UserCache.create_index([("data.ts", pymongo.DESCENDING)], sparse=True)
     return UserCache
 
+def _migrate_sparse_to_dense(collection, geo_index):
+    # Hack to migrate from sparse to dense indices to gracefully handle
+    # https://github.com/e-mission/e-mission-server/pull/849/commits/c65a4b209ed00db6aa3ad918fa631f9186ee3266
+    # Should be safe to remove after Jun 2024
+    index_info = collection.index_information()
+    if geo_index in index_info and "sparse" in index_info[geo_index]:
+        print("Found sparse geosphere index, dropping %s, index list before=%s" % (geo_index, collection.index_information().keys()))
+        collection.drop_index(geo_index)
+        print("Found sparse geosphere index, dropping %s, index list after=%s" % (geo_index, collection.index_information().keys()))
+
 def get_timeseries_db():
     #current_db = MongoClient().Stage_database
     TimeSeries = _get_current_db().Stage_timeseries
@@ -174,9 +184,8 @@ def get_timeseries_db():
     TimeSeries.create_index([("metadata.key", pymongo.ASCENDING)])
     TimeSeries.create_index([("metadata.write_ts", pymongo.DESCENDING)])
     TimeSeries.create_index([("data.ts", pymongo.DESCENDING)], sparse=True)
-
+    _migrate_sparse_to_dense(TimeSeries, "data.loc_2dsphere")
     TimeSeries.create_index([("data.loc", pymongo.GEOSPHERE)])
-
     return TimeSeries
 
 def get_timeseries_error_db():
@@ -209,6 +218,8 @@ def _create_analysis_result_indices(tscoll):
     # trips and sections
     tscoll.create_index([("data.start_ts", pymongo.DESCENDING)], sparse=True)
     tscoll.create_index([("data.end_ts", pymongo.DESCENDING)], sparse=True)
+    _migrate_sparse_to_dense(tscoll, "data.start_loc_2dsphere")
+    _migrate_sparse_to_dense(tscoll, "data.end_loc_2dsphere")
     tscoll.create_index([("data.start_loc", pymongo.GEOSPHERE)])
     tscoll.create_index([("data.end_loc", pymongo.GEOSPHERE)])
     _create_local_dt_indices(tscoll, "data.start_local_dt")
@@ -219,6 +230,7 @@ def _create_analysis_result_indices(tscoll):
     tscoll.create_index([("data.exit_ts", pymongo.DESCENDING)], sparse=True)
     _create_local_dt_indices(tscoll, "data.enter_local_dt")
     _create_local_dt_indices(tscoll, "data.exit_local_dt")
+    _migrate_sparse_to_dense(tscoll, "data.location_2dsphere")
     tscoll.create_index([("data.location", pymongo.GEOSPHERE)])
     tscoll.create_index([("data.duration", pymongo.DESCENDING)], sparse=True)
     tscoll.create_index([("data.mode", pymongo.ASCENDING)], sparse=True)
@@ -226,6 +238,7 @@ def _create_analysis_result_indices(tscoll):
 
     # recreated location
     tscoll.create_index([("data.ts", pymongo.DESCENDING)], sparse=True)
+    _migrate_sparse_to_dense(tscoll, "data.loc_2dsphere")
     tscoll.create_index([("data.loc", pymongo.GEOSPHERE)])
     _create_local_dt_indices(tscoll, "data.local_dt") # recreated location
     return tscoll
