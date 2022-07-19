@@ -28,6 +28,7 @@ import emission.storage.decorations.trip_queries as esdtq
 import emission.analysis.modelling.tour_model_first_only.build_save_model as bsm
 import emission.analysis.modelling.tour_model_first_only.evaluation_pipeline as ep
 from emission.analysis.classification.inference.labels.inferrers import predict_cluster_confidence_discounting
+import emission.core.wrapper.entry as ecwe
 
 # logging.basicConfig(level=logging.DEBUG)
 
@@ -35,7 +36,7 @@ EARTH_RADIUS = 6371000
 RADIUS = 500
 
 
-class old_clustering():
+class old_clustering_predictor():
     """ temporary class that implements first round clustering so that we don't 
         have to run the whole pipeline. also adds fit and predict methods so 
         that we can use this in our custom cross-validation function. 
@@ -49,10 +50,14 @@ class old_clustering():
         self.radius = radius
 
     def fit(self, train_trips):
-        """ Args:
-                train_trips: list of trips
+        """ copied from bsm.build_user_model()
+        
+            Args:
+                train_trips: list or dataframe of trips
         """
-        # copied from bsm.build_user_model()
+        # convert train_trips to a list, if needed
+        if isinstance(train_trips, pd.DataFrame):
+            train_trips = self._trip_df_to_list(train_trips)
 
         sim, bins, bin_trips, train_trips = ep.first_round(
             train_trips, self.radius)
@@ -78,6 +83,10 @@ class old_clustering():
         purpose_pred = []
         replaced_pred = []
         # confidence = []
+
+        # convert test_trips to a list, if needed
+        if isinstance(test_trips, pd.DataFrame):
+            test_trips = self._trip_df_to_list(test_trips)
 
         for trip in test_trips:
             predictions = predict_cluster_confidence_discounting(trip)
@@ -126,6 +135,40 @@ class old_clustering():
                 # confidence.append(top_conf)
 
         return mode_pred, purpose_pred, replaced_pred  #, confidence
+
+    def _trip_df_to_list(self, trip_df):
+        trips_list = []
+
+        for idx, row in trip_df.iterrows():
+            data = {
+                'source': row['source'],
+                'end_ts': row['end_ts'],
+                # 'end_local_dt':row['end_local_dt'],
+                'end_fmt_time': row['end_fmt_time'],
+                'end_loc': row['end_loc'],
+                'raw_trip': row['raw_trip'],
+                'start_ts': row['start_ts'],
+                # 'start_local_dt':row['start_local_dt'],
+                'start_fmt_time': row['start_fmt_time'],
+                'start_loc': row['start_loc'],
+                'duration': row['duration'],
+                'distance': row['distance'],
+                'start_place': row['start_place'],
+                'end_place': row['end_place'],
+                'cleaned_trip': row['cleaned_trip'],
+                'inferred_labels': row['inferred_labels'],
+                'inferred_trip': row['inferred_trip'],
+                'expectation': row['expectation'],
+                'confidence_threshold': row['confidence_threshold'],
+                'expected_trip': row['expected_trip'],
+                'user_input': row['user_input']
+            }
+            trip = ecwe.Entry.create_entry(user_id=row['user_id'],
+                                           key='analysis/confirmed_trip',
+                                           data=data)
+            trips_list += [trip]
+
+        return trips_list
 
 
 class new_clustering():
@@ -222,8 +265,8 @@ class new_clustering():
                 continue
 
             # only do SVM if purity is below threshold
-            purity = clustering.single_cluster_purity(
-                points_in_cluster, label_col='purpose_true')
+            purity = clustering.single_cluster_purity(points_in_cluster,
+                                                      label_col='purpose_true')
             if purity < self.purity_thresh:
                 X = points_in_cluster[[
                     f"{self.loc_type}_lon", f"{self.loc_type}_lat"
