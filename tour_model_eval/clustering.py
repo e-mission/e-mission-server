@@ -79,9 +79,12 @@ def add_loc_clusters(
         dist_matrix_meters = get_distance_matrix(loc_df, loc_type)
 
         for r in radii:
-            labels = sc.DBSCAN(
-                r, metric="precomputed",
-                min_samples=min_samples).fit(dist_matrix_meters).labels_
+            model = sc.DBSCAN(r, metric="precomputed",
+                              min_samples=min_samples).fit(dist_matrix_meters)
+            labels = model.labels_
+            # print(model.n_features_in_)
+            # print(model.components_.shape)
+            # print(model.components_)
 
             # pd.Categorical converts the type from int to category (so
             # numerical operations aren't possible)
@@ -197,10 +200,19 @@ def add_loc_clusters(
 
     elif alg == 'mean_shift':
         for r in radii:
-            # TODO: calculate bandwidth
+            # seems like the bandwidth is based on the raw lat/lon data (we
+            # never pass in a distance matrix), so we want a conversion factor
+            # from meters to degrees. Since 100-500m corresponds to such a
+            # small degree change, we can rely on the small angle approximation
+            # and just use a linear multiplier. This conversion factor doesn't
+            # have to be *super* accurate, its just so we can get a sense of
+            # what the bandwidth roughly corresponds to in the real world/make
+            # the value a little more interpretable.
+            LATLON_TO_M = 1 / 111139
             labels = sc.MeanShift(
-                bandwidth=0.000005 * r,
-                # min_bin_freq=2,
+                bandwidth=LATLON_TO_M * r,
+                min_bin_freq=min_samples,
+                cluster_all=False,
             ).fit(loc_df[[f"{loc_type}_lon", f"{loc_type}_lat"]]).labels_
 
             # pd.Categorical converts the type from int to category (so
@@ -264,6 +276,7 @@ def add_loc_SVM(loc_df,
             cluster_col = cluster_cols[i]
         assert cluster_col in loc_df.columns
 
+        # c is the count of how many clusters we have iterated over
         c = 0
         # iterate over all clusters and subdivide them with SVM. The while loop
         # is so we can do multiple iterations of subdividing if needed
@@ -353,18 +366,19 @@ def get_distance_matrix(loc_df, loc_type):
     return dist_matrix_meters
 
 
-def single_cluster_purity(points_in_cluster):
+def single_cluster_purity(points_in_cluster, label_col='purpose_confirm'):
     """ Calculates purity of a cluster (i.e. % of trips that have the most 
         common label)
     
         Args:
             points_in_cluster (df): dataframe containing points in the same 
-                cluster. must have a 'purpose_confirm' column
+                cluster
+            label_col (str): column in the dataframe containing labels
     """
-    assert 'purpose_confirm' in points_in_cluster.columns
+    assert label_col in points_in_cluster.columns
 
-    most_freq_label = points_in_cluster.purpose_confirm.mode()[0]
-    purity = len(points_in_cluster[points_in_cluster.purpose_confirm ==
+    most_freq_label = points_in_cluster[label_col].mode()[0]
+    purity = len(points_in_cluster[points_in_cluster[label_col] ==
                                    most_freq_label]) / len(points_in_cluster)
     return purity
 

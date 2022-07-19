@@ -215,7 +215,7 @@ def get_trip_index(trips):
     return trip_indices
 
 
-def expand_coords(exp_df, purpose=None, loc_fields=["start_loc", "end_loc"]):
+def expand_coords(exp_df, purpose=None):
     """
         copied and modifed from get_loc_df_for_purpose() in the 'Radius
         selection' notebook
@@ -225,11 +225,12 @@ def expand_coords(exp_df, purpose=None, loc_fields=["start_loc", "end_loc"]):
         purpose_trips = exp_df[exp_df.purpose_confirm == purpose]
 
     dfs = [purpose_trips]
-    for field in loc_fields:
-        loc_type = field.split('_')[0]
+    for loc_type in ['start', 'end']:
         df = pd.DataFrame(
-            purpose_trips[field].apply(lambda p: p["coordinates"]).to_list(),
+            purpose_trips[loc_type +
+                          "_loc"].apply(lambda p: p["coordinates"]).to_list(),
             columns=[loc_type + "_lon", loc_type + "_lat"])
+        df = df.set_index(purpose_trips.index)
         dfs.append(df)
 
     # display.display(end_loc_df.head())
