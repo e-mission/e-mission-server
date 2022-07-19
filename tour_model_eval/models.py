@@ -223,7 +223,7 @@ class new_clustering():
 
             # only do SVM if purity is below threshold
             purity = clustering.single_cluster_purity(
-                points_in_cluster, purpose_col='purpose_true')
+                points_in_cluster, label_col='purpose_true')
             if purity < self.purity_thresh:
                 X = points_in_cluster[[
                     f"{self.loc_type}_lon", f"{self.loc_type}_lat"
