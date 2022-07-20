@@ -28,6 +28,9 @@ _current_db = MongoClient(url).Stage_database
 def _get_current_db():
     return _current_db
 
+def get_Error_Rates_db():
+    return _get_current_db().Error_Rates
+
 def get_carbon_usage_db():
     return _get_current_db().CarbonUsage
 
