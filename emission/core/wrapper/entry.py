@@ -50,6 +50,8 @@ class Entry(ecwb.WrapperBase):
             "config/sync_config": "syncconfig",
             # user consent time + protocol version
             "config/consent": "consentconfig",
+            # phone ui configuration, applied by scanning a QR code
+            "config/app_ui_config": "appuiconfig",
             # webapp API call time, measured on the server
             "stats/server_api_time": "statsevent",
             # intended to log the occurrence of errors in the webapp
@@ -73,13 +75,15 @@ class Entry(ecwb.WrapperBase):
             "manual/mode_confirm": "userlabel",
             # user confirmation of the travel purpose
             "manual/purpose_confirm": "userlabel",
-            # user confirmation of the travel purpose
+            # user confirmation of the replaced mode
             "manual/replaced_mode": "userlabel",
-            # user survey results. The survey results are a JSON blob
-            "manual/survey": "survey",
+            # user input for the trip; in one entry instead of being split up
+            "manual/trip_user_input": "tripuserinput",
             # user confirmation of the destination (unsure how this will
             # interact with purpose
             "manual/destination_confirm": "userlabel",
+            # demographic survey
+            "manual/demographic_survey": "onetimesurvey",
             ### END: incoming data types ###
             ### BEGIN: analysis result data types ###
             ### ** BEGIN: objects generated after the initial segmentation step **
