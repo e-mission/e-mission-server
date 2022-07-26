@@ -13,6 +13,15 @@ from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.exceptions import NotFittedError
 
+# hack because jupyter notebook doesn't work properly through my vscode for
+# some reason and therefore cant import stuff from emission? remove this before
+# pushing
+###
+import sys
+
+sys.path.append('/Users/hlu2/Documents/GitHub/e-mission-server/')
+###
+
 # our imports
 from clustering import get_distance_matrix, single_cluster_purity
 import data_wrangling
@@ -1362,6 +1371,272 @@ class ClusterAdaBoostPredictor(ClusterForestPredictor):
                       learning_rate)
 
 
+class BasicForestPredictor(ClusterForestPredictor):
+
+    def __init__(
+        self,
+        n_estimators=100,
+        criterion='gini',
+        max_depth=None,
+        min_samples_split=2,
+        min_samples_leaf=1,
+        max_features='sqrt',
+        bootstrap=True,
+        random_state=42,
+    ):
+        # wrapper class to generate one-hot encodings for cluster indices,
+        # purposes, and modes
+        self.purpose_enc = OneHotWrapper(impute_missing=True,
+                                         sparse=False,
+                                         handle_unknown='error')
+        self.mode_enc = OneHotWrapper(impute_missing=True,
+                                      sparse=False,
+                                      handle_unknown='error')
+
+        # ensemble classifiers for each label category
+        self.purpose_predictor = RandomForestClassifier(
+            n_estimators=n_estimators,
+            criterion=criterion,
+            max_depth=max_depth,
+            min_samples_split=min_samples_split,
+            min_samples_leaf=min_samples_leaf,
+            max_features=max_features,
+            bootstrap=bootstrap,
+            random_state=random_state)
+        self.mode_predictor = RandomForestClassifier(
+            n_estimators=n_estimators,
+            criterion=criterion,
+            max_depth=max_depth,
+            min_samples_split=min_samples_split,
+            min_samples_leaf=min_samples_leaf,
+            max_features=max_features,
+            bootstrap=bootstrap,
+            random_state=random_state)
+        self.replaced_predictor = RandomForestClassifier(
+            n_estimators=n_estimators,
+            criterion=criterion,
+            max_depth=max_depth,
+            min_samples_split=min_samples_split,
+            min_samples_leaf=min_samples_leaf,
+            max_features=max_features,
+            bootstrap=bootstrap,
+            random_state=random_state)
+
+        # base features and targets to be used in the ensemble classifiers
+        # (cluster indices will also be added as features once they are one-hot
+        # encoded, along with purpose and mode when applicable)
+        self.base_features = [
+            'duration',
+            'distance',
+            'start_local_dt_year',
+            'start_local_dt_month',
+            'start_local_dt_day',
+            'start_local_dt_hour',
+            # 'start_local_dt_minute',
+            'start_local_dt_weekday',
+            'end_local_dt_year',  # most likely the same as the start year
+            'end_local_dt_month',  # most likely the same as the start month
+            'end_local_dt_day',
+            'end_local_dt_hour',
+            # 'end_local_dt_minute',
+            'end_local_dt_weekday',
+            'start_lon',
+            'start_lat',
+            'end_lon',
+            'end_lat',
+            # 'base_cluster_idx',
+            # 'final_cluster_idx'
+        ]
+        self.targets = ['mode_true', 'purpose_true', 'replaced_true']
+
+    def set_params(self, params):
+        """ hacky code that mimics the set_params of an sklearn Estimator class 
+            so that we can pass params during randomizedsearchCV 
+            
+            Args:
+                params (dict): a dictionary where the keys are the parameter 
+                names and the values are the parameter values
+        """
+        n_estimators = params['n_estimators'] if 'n_estimators' in params.keys(
+        ) else 100
+        criterion = params['criterion'] if 'criterion' in params.keys(
+        ) else 'gini'
+        max_depth = params['max_depth'] if 'max_depth' in params.keys(
+        ) else None
+        min_samples_split = params[
+            'min_samples_split'] if 'min_samples_split' in params.keys() else 2
+        min_samples_leaf = params[
+            'min_samples_leaf'] if 'min_samples_leaf' in params.keys() else 1
+        max_features = params['max_features'] if 'max_features' in params.keys(
+        ) else 'sqrt'
+        bootstrap = params['bootstrap'] if 'bootstrap' in params.keys(
+        ) else True
+        random_state = params['random_state'] if 'random_state' in params.keys(
+        ) else 42
+
+        # calling __init__ again is not good practice...
+        self.__init__(n_estimators, criterion, max_depth, min_samples_split,
+                      min_samples_leaf, max_features, bootstrap, random_state)
+
+    def fit(self, train_df):
+        """ Fit the model. Cluster the trips in the training set and build a 
+            forest of trees. 
+        
+            Args:
+                train_df (dataframe): dataframe containing trips. must contain 
+                    the following columns: 'user_input', 'start_loc', 
+                    'end_loc', 'duration', 'distance', 'start_local_dt_year', 
+                    'start_local_dt_month', 'start_local_dt_day', 
+                    'start_local_dt_hour', 'start_local_dt_weekday', 
+                    'end_local_dt_year', 'end_local_dt_month', 
+                    'end_local_dt_day', 'end_local_dt_hour', 
+                    'end_local_dt_weekday', 'mode_confirm', 'purpose_confirm', 'replaced_mode'
+
+            Returns:
+                self (a fitted classifier)
+        """
+        #################################################
+        ### prepare data for the random forest models ###
+        #################################################
+        # note that we want to use purpose data to aid our mode predictions,
+        # and use both purpose and mode data to aid our replaced-mode
+        # predictions
+        # thus, we want to one-hot encode the purpose and mode as data
+        # features, but also preserve an unencoded copy for the target columns
+
+        # hacky way to reuse code, fix this
+        train_df = DBSCANSVM_Clustering()._clean_data(train_df)
+        if train_df.purpose_true.isna().any():
+            num_nan = train_df.purpose_true.value_counts(
+                dropna=False).loc[np.nan]
+            logging.info(
+                f'dropping {num_nan}/{len(train_df)} trips that are missing purpose labels'
+            )
+            train_df = train_df.dropna(subset=['purpose_true']).reset_index(
+                drop=True)
+        if len(train_df) == 0:
+            # i.e. no valid trips after removing all nans
+            raise Exception('no valid trips; nothing to fit')
+
+        # dataframe holding all features and targets
+        self.Xy_train = pd.concat([
+            train_df[self.base_features + self.targets],
+        ],
+                                  axis=1)
+
+        onehot_purpose_df = self.purpose_enc.fit_transform(
+            self.Xy_train[['purpose_true']], output_col_prefix='purpose')
+        onehot_mode_df = self.mode_enc.fit_transform(
+            self.Xy_train[['mode_true']], output_col_prefix='mode')
+
+        self.Xy_train = pd.concat(
+            [self.Xy_train, onehot_purpose_df, onehot_mode_df], axis=1)
+
+        # for predicting purpose, drop encoded purpose and mode features, as
+        # well as all target labels
+        self.X_purpose = self.Xy_train.dropna(subset=['purpose_true']).drop(
+            labels=self.targets + self.purpose_enc.onehot_encoding_cols +
+            self.mode_enc.onehot_encoding_cols,
+            axis=1)
+
+        # for predicting mode, we want to keep purpose data
+        self.X_mode = self.Xy_train.dropna(subset=['mode_true']).drop(
+            labels=self.targets + self.mode_enc.onehot_encoding_cols, axis=1)
+
+        # for predicting replaced-mode, we want to keep purpose and mode data
+        self.X_replaced = self.Xy_train.dropna(subset=['replaced_true']).drop(
+            labels=self.targets, axis=1)
+
+        self.y_purpose = self.Xy_train['purpose_true'].dropna()
+        self.y_mode = self.Xy_train['mode_true'].dropna()
+        self.y_replaced = self.Xy_train['replaced_true'].dropna()
+
+        ################################
+        ### fit random forest models ###
+        ################################
+        if len(self.X_purpose) > 0:
+            self.purpose_predictor.fit(self.X_purpose, self.y_purpose)
+        if len(self.X_mode) > 0:
+            self.mode_predictor.fit(self.X_mode, self.y_mode)
+        if len(self.X_replaced) > 0:
+            self.replaced_predictor.fit(self.X_replaced, self.y_replaced)
+
+        return self
+
+    def predict(self, test_df):
+        """ Predict labels. 
+        
+            Args:
+                test_df (dataframe): dataframe containing trips. must contain 
+                    the following columns: 'start_loc', 'end_loc', 'duration', 
+                    'distance', 'start_local_dt_year', 'start_local_dt_month', 
+                    'start_local_dt_day', 'start_local_dt_hour', 
+                    'start_local_dt_weekday', 'end_local_dt_year', 
+                    'end_local_dt_month', 'end_local_dt_day', 
+                    'end_local_dt_hour', 'end_local_dt_weekday'
+
+            Returns:
+                a 3-tuple, consisting of mode_pred, purpose_pred, 
+                replaced_pred. 
+
+                mode_pred, purpose_pred, replaced_pred are pandas Series, where the ith element of the Series is the prediction for the ith trip in the test dataframe. 
+                
+                Note that the index of the Series does NOT match the index of test_df (the outputs have been reindexed).
+        """
+        ################
+        ### get data ###
+        ################
+        self.X_test_for_purpose = DBSCANSVM_Clustering()._clean_data(
+            test_df).loc[:, self.base_features]
+
+        ########################
+        ### make predictions ###
+        ########################
+        # note that we want to use purpose data to aid our mode predictions,
+        # and use both purpose and mode data to aid our replaced-mode
+        # predictions
+        try:
+            purpose_pred = self.purpose_predictor.predict(
+                self.X_test_for_purpose)
+            self.purpose_proba_raw = self.purpose_predictor.predict_proba(
+                self.X_test_for_purpose)
+
+            # update X_test with one-hot-encoded purpose predictions to aid
+            # mode predictor
+            # TODO: converting purpose_pred to a DataFrame feels super
+            # unnecessary, make this more efficient
+            onehot_purpose_df = self.purpose_enc.transform(
+                pd.DataFrame(purpose_pred).set_index(
+                    self.X_test_for_purpose.index))
+            self.X_test_for_mode = pd.concat(
+                [self.X_test_for_purpose, onehot_purpose_df], axis=1)
+
+            mode_pred, replaced_pred = self._try_predict_mode_replaced()
+
+        except NotFittedError as e:
+            # if we can't predict purpose, we can still try to predict mode and
+            # replaced-mode without one-hot encoding the purpose
+            purpose_pred = np.full((len(self.X_test_for_purpose), ), np.nan)
+            self.purpose_proba_raw = np.full((len(self.X_test_for_purpose), 1),
+                                             0)
+            # TODO: think about if it makes more sense to set the probability
+            # to 0 or nan (since there is actually no prediction taking place)
+
+            self.X_test_for_mode = self.X_test_for_purpose
+            mode_pred, replaced_pred = self._try_predict_mode_replaced()
+
+        if purpose_pred.dtype == np.float64 and mode_pred.dtype == np.float64 and replaced_pred.dtype == np.float64:
+            # this indicates that all the predictions are np.nan so none of the
+            # random forest classifiers were fitted
+            raise NotFittedError
+
+        self.predictions = pd.DataFrame(
+            list(zip(purpose_pred, mode_pred, replaced_pred)),
+            columns=['purpose_pred', 'mode_pred', 'replaced_pred'])
+
+        return self.predictions.mode_pred, self.predictions.purpose_pred, self.predictions.replaced_pred
+
+
 class TripGrouper():
 
     def __init__(self,
@@ -1411,8 +1686,6 @@ class TripGrouper():
             trip_cluster_idx[trip_idxs_in_group] = group_idx
 
         return trip_cluster_idx
-        # # append the trip cluster indices
-        # self.test_df.loc[trip_idxs_in_group, "trip_cluster_idx"] = group_idx
 
 
 class OneHotWrapper():
