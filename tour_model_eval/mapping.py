@@ -12,13 +12,14 @@ import emission.storage.decorations.trip_queries as esdtq
 
 DENVER_COORD = [39.7392, -104.9903]
 MTV_COORD = [37.3861, -122.0839]
+CLM_COORD = [34.0967, -117.7198]
 
 # list of valid default colors in folium
 COLORS = [
     'darkred',
     'orange',
     'gray',
-    'green',
+    # 'green', # reserved for correct labels
     'darkblue',
     # 'lightblue',  # too hard to see on map
     'purple',
@@ -28,25 +29,29 @@ COLORS = [
     # 'darkpurple', # this color does not exist?
     'cadetblue',
     # 'lightgray', # too hard to see point on map
-    'black',
+    # 'black', # reserved for no_pred
     'blue',
-    # 'red', # reserved for noise/unlabeled data
+    # 'red', # reserved for noise/unlabeled data/incorrect labels
     # 'lightred', # this color does not exist in folium?
     # 'beige', # too hard to see point on map
 ]
 
 
-def plot_clusters(user_df,
-                  loc_type,
-                  alg,
-                  SVM=False,
-                  radii=[50, 100, 150, 200],
-                  cluster_unlabeled=False,
-                  plot_unlabeled=False,
-                  optics_min_samples=None,
-                  optics_xi=0.05,
-                  optics_cluster_method='xi',
-                  map_loc=MTV_COORD):
+def find_plot_clusters(user_df,
+                       loc_type,
+                       alg,
+                       SVM=False,
+                       radii=[50, 100, 150, 200],
+                       cluster_unlabeled=False,
+                       plot_unlabeled=False,
+                    #    optics_min_samples=None,
+                       optics_xi=0.05,
+                       optics_cluster_method='xi',
+                       svm_min_size=6,
+                       svm_purity_thresh=0.7,
+                       svm_gamma=0.05,
+                       svm_C=1,
+                       map_loc=MTV_COORD):
     """ Plot points and clusters on a folium map. 
             
         Points with the same purpose will have the same color (unless there are more purposes than available colors in folium, in which case some colors may be duplicated). Hovering over a point will also reveal the purpose in the tooltip. 
@@ -71,6 +76,12 @@ def plot_clusters(user_df,
             optics_xi (float): xi value if using the xi method of the OPTICS algorithm.
             optics_cluster_method (str): method to use for the OPTICS 
                 algorithm. either 'xi' or 'dbscan'
+            svm_min_size (int): the min number of trips a cluster must have to 
+                be considered for sub-division, if using SVM
+            svm_purity_thresh (float): the min purity a cluster must have to be 
+                sub-divided, if using SVM
+            svm_gamma (float): if using SVM, the gamma hyperparameter
+            svm_C (float): if using SVM, the C hyperparameter
             map_loc (array-like): lat and lon coordinate for the default folium 
                 map position. 
     
@@ -112,9 +123,13 @@ def plot_clusters(user_df,
         # cluster_unlabeled=cluster_unlabeled,
         loc_type=loc_type,
         min_samples=2,
-        optics_min_samples=optics_min_samples,
+        # optics_min_samples=optics_min_samples,
         optics_xi=optics_xi,
-        optics_cluster_method=optics_cluster_method)
+        optics_cluster_method=optics_cluster_method,
+        svm_min_size=svm_min_size,
+        svm_purity_thresh=svm_purity_thresh,
+        svm_gamma=svm_gamma,
+        svm_C=svm_C)
 
     for r in radii:
         fig_index = fig_index + 1
@@ -142,11 +157,11 @@ def plot_clusters(user_df,
                 raise Exception(
                     'nan cluster detected; all trips should have a proper cluster index'
                 )
-
             m = plot_cluster_border(points_in_cluster,
                                     loc_type=loc_type,
                                     m=m,
-                                    color=COLORS[i % (len(COLORS) - 1)])
+                                    color=COLORS[i % (len(COLORS) - 1)],
+                                    cluster_idx=c)
 
         # plot all the destinations, color-coordinated by purpose
         # we want to plot these on *top* of the cluster circles so that we can
@@ -164,11 +179,63 @@ def plot_clusters(user_df,
     return fig
 
 
+def plot_model_clusters(
+        model,
+        category,
+        # purpose_col='purpose_confirm',
+        m=None,
+        map_loc=CLM_COORD):
+    """ category (str): 'test' or 'train' """
+    loc_type = 'end'
+
+    if m == None:
+        m = folium.Map(location=map_loc, zoom_start=12)
+
+    if category == 'test':
+        df = model.test_df
+    elif category == 'train':
+        df = model.train_df
+
+    cluster_ids = df['final_cluster_idx'].unique()
+
+    # draw the convex hull of the clusters
+    for i in range(len(cluster_ids)):
+        c = cluster_ids[i]
+        if c == -1:
+            print(
+                'we should never get here because we want to convert the -1 cluster into single-trip clusters'
+            )
+            continue
+
+        points_in_cluster = df[df['final_cluster_idx'] == c]
+
+        if np.isnan(c):
+            print(points_in_cluster)
+            print(df[df['final_cluster_idx'].isnull()])
+            raise Exception(
+                'nan cluster detected; all trips should have a proper cluster index'
+            )
+        m = plot_cluster_border(points_in_cluster,
+                                loc_type=loc_type,
+                                m=m,
+                                color=COLORS[i % (len(COLORS) - 1)],
+                                cluster_idx=c)
+
+    # plot all the destinations, color-coordinated by purpose
+    # we want to plot these on *top* of the cluster circles so that we can
+    # hover over the points and see the purpose on the tooltip
+    # m = plot_user_trips(df, loc_type, plot_100=False, plot_unlabeled=True, m=m)
+
+    return m
+
+
 def plot_user_trips(user_df,
                     loc_type,
                     plot_100=True,
                     plot_500=False,
                     plot_unlabeled=False,
+                    purpose_col='purpose_confirm',
+                    color=None,
                     m=None):
     """ Args:
             user_df (dataframe): must contain the columns 'start/end_lat/lon'
@@ -177,8 +244,8 @@ def plot_user_trips(user_df,
                 each location point
             plot_500 (bool): whether or not to plot 500m radius circles around 
                 each location point
-            plot_500 (bool): whether or not to plot unlabeled points (if so, 
-                they will be red)
+            plot_unlabeled (bool): whether or not to plot unlabeled points (if 
+                so, they will be red)
             m (folium.Map): optional, an existing map onto which this function 
                 will plot markers
     """
@@ -187,16 +254,16 @@ def plot_user_trips(user_df,
     if m is None:
         m = folium.Map(location=MTV_COORD, zoom_start=13)
 
-    purpose_list = user_df.purpose_confirm.dropna().unique()
+    purpose_list = user_df[purpose_col].dropna().unique()
 
     # plot circles with a 500m radius around each point
     if plot_500:
         for i, purpose in enumerate(purpose_list):
-            if i < len(COLORS):
+            if color is None and i < len(COLORS):
                 color = COLORS[i]
-            else:
+            elif color is None:
                 color = COLORS[len(COLORS) - 1]
-            purpose_trips = user_df[user_df.purpose_confirm == purpose]
+            purpose_trips = user_df[user_df[purpose_col] == purpose]
             for j in range(len(purpose_trips)):
                 coords = purpose_trips[loc_type +
                                        '_loc'].iloc[j]['coordinates']
@@ -208,7 +275,7 @@ def plot_user_trips(user_df,
                               fill_opacity=0.1,
                               weight=1).add_to(m)
         if plot_unlabeled:
-            unlabeled_trips = user_df[user_df.purpose_confirm.isna()]
+            unlabeled_trips = user_df[user_df[purpose_col].isna()]
             for j in range(len(unlabeled_trips)):
                 coords = unlabeled_trips[loc_type +
                                          '_loc'].iloc[j]['coordinates']
@@ -228,7 +295,7 @@ def plot_user_trips(user_df,
                 color = COLORS[i]
             else:
                 color = COLORS[len(COLORS) - 1]
-            purpose_trips = user_df[user_df.purpose_confirm == purpose]
+            purpose_trips = user_df[user_df[purpose_col] == purpose]
             for j in range(len(purpose_trips)):
                 coords = purpose_trips[loc_type +
                                        '_loc'].iloc[j]['coordinates']
@@ -240,7 +307,7 @@ def plot_user_trips(user_df,
                               fill_opacity=0.1,
                               weight=1).add_to(m)
         if plot_unlabeled:
-            unlabeled_trips = user_df[user_df.purpose_confirm.isna()]
+            unlabeled_trips = user_df[user_df[purpose_col].isna()]
             for j in range(len(unlabeled_trips)):
                 coords = unlabeled_trips[loc_type +
                                          '_loc'].iloc[j]['coordinates']
@@ -260,26 +327,37 @@ def plot_user_trips(user_df,
         else:
             color = COLORS[len(COLORS) - 1]
         # print('{:<15} {:<15}'.format(color, purpose))
-        purpose_trips = user_df[user_df.purpose_confirm == purpose]
+        purpose_trips = user_df[user_df[purpose_col] == purpose]
+        # print(purpose_trips)
         for j in range(len(purpose_trips)):
             coords = purpose_trips[loc_type + '_loc'].iloc[j]['coordinates']
+            # print(purpose_trips.iloc[j])
+            # print(purpose_trips.iloc[j].index)
+            trip_idx = purpose_trips.iloc[j].name
             folium.CircleMarker([coords[1], coords[0]],
                                 radius=2.5,
                                 color=color,
-                                tooltip=purpose).add_to(m)
+                                tooltip=purpose + ' ' +
+                                str(trip_idx)).add_to(m)
     if plot_unlabeled:
-        unlabeled_trips = user_df[user_df.purpose_confirm.isna()]
+        unlabeled_trips = user_df[user_df[purpose_col].isna()]
         for j in range(len(unlabeled_trips)):
             coords = unlabeled_trips[loc_type + '_loc'].iloc[j]['coordinates']
+            trip_idx = unlabeled_trips.iloc[j].name
             folium.CircleMarker([coords[1], coords[0]],
                                 radius=2.5,
                                 color='red',
-                                tooltip='UNLABELED').add_to(m)
+                                tooltip='UNLABELED' + ' ' +
+                                str(trip_idx)).add_to(m)
 
     return m
 
 
-def plot_cluster_border(points_df, loc_type, m=None, color='green'):
+def plot_cluster_border(points_df,
+                        loc_type,
+                        m=None,
+                        color='green',
+                        cluster_idx=None):
     """ plots a convex hull around the given points. 
     
         Args:
@@ -288,6 +366,7 @@ def plot_cluster_border(points_df, loc_type, m=None, color='green'):
             m (folium.Map): optional, an existing map onto which this function 
                 will plot markers
             color (str): cluster color. must be valid in folium. 
+            cluster_idx (int): cluster index, to be added to tooltip
     """
     assert loc_type == 'start' or loc_type == 'end'
     if m is None:
@@ -303,12 +382,22 @@ def plot_cluster_border(points_df, loc_type, m=None, color='green'):
     else:
         border_points = points
 
-    folium.Polygon(
-        border_points,  # list of points (latitude, longitude)
-        color=color,
-        weight=20,
-        opacity=0.6,
-        fill=True,
-        fill_opacity=0.5).add_to(m)
+    if cluster_idx is not None:
+        folium.Polygon(
+            border_points,  # list of points (latitude, longitude)
+            color=color,
+            weight=20,
+            opacity=0.6,
+            fill=True,
+            fill_opacity=0.5,
+            tooltip=f'cluster {cluster_idx}').add_to(m)
+    else:
+        folium.Polygon(
+            border_points,  # list of points (latitude, longitude)
+            color=color,
+            weight=20,
+            opacity=0.6,
+            fill=True,
+            fill_opacity=0.5).add_to(m)
 
     return m
