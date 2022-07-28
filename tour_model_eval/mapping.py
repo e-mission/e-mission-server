@@ -37,21 +37,22 @@ COLORS = [
 ]
 
 
-def find_plot_clusters(user_df,
-                       loc_type,
-                       alg,
-                       SVM=False,
-                       radii=[50, 100, 150, 200],
-                       cluster_unlabeled=False,
-                       plot_unlabeled=False,
-                    #    optics_min_samples=None,
-                       optics_xi=0.05,
-                       optics_cluster_method='xi',
-                       svm_min_size=6,
-                       svm_purity_thresh=0.7,
-                       svm_gamma=0.05,
-                       svm_C=1,
-                       map_loc=MTV_COORD):
+def find_plot_clusters(
+        user_df,
+        loc_type,
+        alg,
+        SVM=False,
+        radii=[50, 100, 150, 200],
+        cluster_unlabeled=False,
+        plot_unlabeled=False,
+        #    optics_min_samples=None,
+        optics_xi=0.05,
+        optics_cluster_method='xi',
+        svm_min_size=6,
+        svm_purity_thresh=0.7,
+        svm_gamma=0.05,
+        svm_C=1,
+        map_loc=MTV_COORD):
     """ Plot points and clusters on a folium map. 
             
         Points with the same purpose will have the same color (unless there are more purposes than available colors in folium, in which case some colors may be duplicated). Hovering over a point will also reveal the purpose in the tooltip. 
@@ -133,7 +134,21 @@ def find_plot_clusters(user_df,
 
     for r in radii:
         fig_index = fig_index + 1
-        m = folium.Map(location=map_loc, zoom_start=12)
+        m = folium.Map(
+            location=map_loc,
+            zoom_start=12,
+            tiles=
+            'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png',
+            attr=
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        )
+        folium.TileLayer(
+            tiles=
+            'https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lines/{z}/{x}/{y}{r}.png',
+            attr=
+            'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        ).add_to(m)
+        # folium.TileLayer('Stamen Toner').add_to(m)
 
         cluster_ids = df_for_cluster[
             f"{loc_type}_{alg}_clusters_{r}_m"].unique()
@@ -157,11 +172,13 @@ def find_plot_clusters(user_df,
                 raise Exception(
                     'nan cluster detected; all trips should have a proper cluster index'
                 )
-            m = plot_cluster_border(points_in_cluster,
-                                    loc_type=loc_type,
-                                    m=m,
-                                    color=COLORS[i % (len(COLORS) - 1)],
-                                    cluster_idx=c)
+            m = plot_cluster_border(
+                points_in_cluster,
+                loc_type=loc_type,
+                m=m,
+                color='gray',
+                # color=COLORS[i % (len(COLORS) - 1)],
+                cluster_idx=c)
 
         # plot all the destinations, color-coordinated by purpose
         # we want to plot these on *top* of the cluster circles so that we can
@@ -386,7 +403,7 @@ def plot_cluster_border(points_df,
         folium.Polygon(
             border_points,  # list of points (latitude, longitude)
             color=color,
-            weight=20,
+            weight=15,
             opacity=0.6,
             fill=True,
             fill_opacity=0.5,
