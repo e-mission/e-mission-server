@@ -34,7 +34,7 @@ def add_loc_clusters(
         alg,
         SVM=False,
         #  cluster_unlabeled=False,
-        min_samples=2,
+        min_samples=1,
         # optics_min_samples=None,
         optics_xi=0.05,
         optics_cluster_method='xi',
@@ -95,12 +95,6 @@ def add_loc_clusters(
             # ints)
             loc_df.loc[:, f"{loc_type}_DBSCAN_clusters_{r}_m"] = labels
 
-            # move "noisy" trips to their own single-trip clusters
-            for idx in loc_df.loc[loc_df[f"{loc_type}_DBSCAN_clusters_{r}_m"]
-                                  == -1].index.values:
-                loc_df.loc[idx,
-                           f"{loc_type}_DBSCAN_clusters_{r}_m"] = 1 + loc_df[
-                               f"{loc_type}_DBSCAN_clusters_{r}_m"].max()
 
     elif alg == 'oursim':
         for r in radii:
@@ -355,7 +349,6 @@ def get_distance_matrix(loc_df, loc_type):
             loc_type (str): 'start' or 'end'
     """
     assert loc_type == 'start' or loc_type == 'end'
-    logging.debug('in get_distance_matrix')
 
     radians_lat_lon = np.radians(loc_df[[loc_type + "_lat",
                                          loc_type + "_lon"]])

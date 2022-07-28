@@ -123,7 +123,7 @@ def find_plot_clusters(
         SVM=SVM,
         # cluster_unlabeled=cluster_unlabeled,
         loc_type=loc_type,
-        min_samples=2,
+        min_samples=1,
         # optics_min_samples=optics_min_samples,
         optics_xi=optics_xi,
         optics_cluster_method=optics_cluster_method,
