@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import itertools
 import logging
 import os
+from datetime import datetime
 
 import sklearn.metrics as sm
 from sklearn.metrics.cluster import contingency_matrix
@@ -32,7 +33,7 @@ DEFAULT_REPLACED = [
 ]
 DEFAULT_PURPOSES = [
     'home', 'work', 'at_work', 'school', 'transit_transfer', 'shopping',
-    'meal', 'pick_drop_person', 'pick_drop_person', 'personal_med',
+    'meal', 'pick_drop_person', 'pick_drop_item', 'personal_med',
     'access_recreation', 'exercise', 'entertainment', 'religious',
     'not_a_trip', 'no pred', np.nan
 ]
@@ -73,6 +74,12 @@ PREDICTORS = {
         'drop_unclustered': False,
         'radius': 100,
     }),
+    'random forest with end r150m': (models.ClusterForestPredictor, {
+        'use_start_clusters': False,
+        'use_trip_clusters': False,
+        'drop_unclustered': False,
+        'radius': 100,
+    }),
     'random forest with end and trip r100m': (models.ClusterForestPredictor, {
         'use_start_clusters': False,
         'use_trip_clusters': True,
@@ -87,6 +94,18 @@ PREDICTORS = {
         'radius': 100,
     }),
     'random forest with end and trip r150m': (models.ClusterForestPredictor, {
+        'use_start_clusters': False,
+        'use_trip_clusters': True,
+        'drop_unclustered': False,
+        'radius': 150,
+    }),
+    'final random forest with clustering': (models.ClusterForestPredictor, {
+        'n_estimators': 100,
+        'max_depth': None,
+        'min_samples_split': 2,
+        'min_samples_leaf': 1,
+        'max_features': 'sqrt',
+        'bootstrap': False,
         'use_start_clusters': False,
         'use_trip_clusters': True,
         'drop_unclustered': False,
@@ -112,6 +131,7 @@ PREDICTORS = {
         'drop_unclustered': False,
         'radius': 100,
     }),
+    'random forest, no clustering': (models.BasicForestPredictor, {}),
     'adaboost basic': (models.ClusterAdaBoostPredictor, {}),
 }
 
@@ -154,8 +174,8 @@ def cross_val_predict(model,
     replaced_true = []
     replaced_pred = []
     # confidence = np.empty([0], dtype=int)
-    # note: we can't use np arrays or call np.append for any list-like object containing labels because the label elements may be of multiple types (str, for actual labels and np.nan for missing labels). 
-    # TODO: actually, we should probably change all the np.nan labels to Nonetype instead. 
+    # note: we can't use np arrays or call np.append for any list-like object containing labels because the label elements may be of multiple types (str, for actual labels and np.nan for missing labels).
+    # TODO: actually, we should probably change all the np.nan labels to Nonetype instead.
 
     if data_type == 'dataframe':
         logging.debug(f'num trips {len(user_df)}')
@@ -170,17 +190,17 @@ def cross_val_predict(model,
 
         # keeps valid trips that have user labels and are not points
         filter_trips = np.array(pp.filter_data(trips, RADIUS))
-        logging.info(f'num trips {len(filter_trips)}')
+        logging.debug(f'num trips {len(filter_trips)}')
 
         # valid user should have >= 10 trips for further analysis and the proportion of filter_trips is >=50%
         # todo: we should update this to account for the smaller training set in each fold (80%)
         if min_samples and not gu.valid_user(filter_trips, trips):
-            logging.info(
+            logging.debug(
                 f"Total: {len(trips)}, labeled: {len(filter_trips)}, user {user} doesn't have enough valid trips for further analysis."
             )
             return
         elif not min_samples and len(filter_trips) < k:
-            logging.info(
+            logging.debug(
                 'At least 5 valid trips are needed for cross-validation, user {} only had {}.'
                 .format(user, len(filter_trips)))
             return
@@ -204,12 +224,12 @@ def cross_val_predict(model,
 
             # store information on the test trips
             idx = np.append(idx, test_idx)
-            # handle case where users input partial labels (e.g. some users 
+            # handle case where users input partial labels (e.g. some users
             # never input replaced-mode)
             if 'mode_confirm' in test_trips.columns:
                 mode_true += test_trips['mode_confirm'].to_list()
             else:
-                mode_true += np.full(len(test_trips), np.nan)
+                mode_true += list(np.full(len(test_trips), np.nan))
             if 'purpose_confirm' in test_trips.columns:
                 purpose_true += list(test_trips['purpose_confirm'].to_list())
             else:
@@ -301,9 +321,13 @@ def cv_for_all_users(model,
                 logging.info(f'skipping user {user} due to error: {repr(e)}')
                 continue
 
-        cross_val_results = pd.DataFrame(data=results)
+        try:
+            cross_val_results = pd.DataFrame(data=results)
+        except Exception as e:
+            print(results)
+            raise e
         cross_val_results['user_id'] = user
-        cross_val_results['program'] = 'minipilot'
+        cross_val_results['program'] = 'minipilot'  # TODO: fix this
         dfs += [cross_val_results]
 
     logging.info('using {}/{} users, excluded {}'.format(
@@ -327,9 +351,15 @@ def cv_for_all_algs(uuid_list,
         csv_path = f'cv results {model_name}.csv'
         if not override_prior_runs and os.path.exists(csv_path):
             print('loading prior cross validation data for model:', model_name)
-            cv_df = pd.read_csv(csv_path)
+            cv_df = pd.read_csv(csv_path,
+                                keep_default_na=False,
+                                na_values=[''])
+            # we need to specify the parameters about na because pandas will
+            # try to read the string 'n/a' as np.nan, when in fact 'n/a' is a
+            # valid prediction
         else:
             print('running cross validation for model:', model_name)
+            start_time = datetime.now()
             model, model_params = PREDICTORS[model_name]
             if model_name.startswith('old'):
                 # we have to handle this separately because the old model was structured differently
@@ -352,6 +382,9 @@ def cv_for_all_algs(uuid_list,
                     min_samples=min_samples,
                     raise_errors=raise_errors)
             cv_df.to_csv(csv_path)
+            end_time = datetime.now()
+            print('{} time taken for {}\n'.format(end_time - start_time,
+                                                  model_name))
 
         cv_results[model_name] = cv_df
 
@@ -467,10 +500,10 @@ def get_clf_metrics(trip_df,
     label_pred = labeled_predicted_df[label_type +
                                       '_pred'].fillna('no pred').astype(str)
 
-    # reset the labels list since the old labels list may contain labels that 
-    # are unused in the final label_true/label_pred array? also, it's possible 
-    # that label_pred contains labels not found in label_true due to the k-fold 
-    # splits, hence we want a union of the unique classes in label_true and 
+    # reset the labels list since the old labels list may contain labels that
+    # are unused in the final label_true/label_pred array? also, it's possible
+    # that label_pred contains labels not found in label_true due to the k-fold
+    # splits, hence we want a union of the unique classes in label_true and
     # label_pred
     labels = np.sort(np.union1d(np.unique(label_true), np.unique(label_pred)))
 
@@ -641,7 +674,7 @@ def get_cluster_metrics(expanded_all_trip_df_map, user_list, radii, loc_type,
                         print(f'user {user} has invalid dataframe, skipping')
                         continue
 
-                    # expand the 'start_loc' and 'end_loc' column into 
+                    # expand the 'start_loc' and 'end_loc' column into
                     # 'start_lat', 'start_lon', 'end_lat', and 'end_lon' columns
                     user_trips = expand_coords(user_trips)
 
