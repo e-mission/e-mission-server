@@ -108,7 +108,7 @@ def add_loc_clusters(
             # we only bin the loc_type points to speed up the alg. avoid
             # unnecessary binning since this is really slow
             sim_model.bin_helper(loc_type=loc_type)
-            labels = sim_model.data_df[loc_type + '_bin']
+            labels = sim_model.data_df[loc_type + '_bin'].to_list()
 
             # # pd.Categorical converts the type from int to category (so
             # # numerical operations aren't possible)
