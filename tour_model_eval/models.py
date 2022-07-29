@@ -269,19 +269,11 @@ class DBSCANSVM_Clustering():
         dist_matrix_meters = get_distance_matrix(self.train_df, self.loc_type)
         self.base_model = DBSCAN(self.radius,
                                  metric="precomputed",
-                                 min_samples=2).fit(dist_matrix_meters)
+                                 min_samples=1).fit(dist_matrix_meters)
         base_clusters = self.base_model.labels_
 
         self.train_df.loc[:,
                           f'{self.loc_type}_base_cluster_idx'] = base_clusters
-
-        # move "noisy" trips to their own single-trip clusters
-        for idx, row in self.train_df.loc[
-                self.train_df[f'{self.loc_type}_base_cluster_idx'] ==
-                -1].iterrows():
-            self.train_df.loc[
-                idx, f'{self.loc_type}_base_cluster_idx'] = 1 + self.train_df[
-                    f'{self.loc_type}_base_cluster_idx'].max()
 
         ########################
         ### get sub-clusters ###
@@ -375,65 +367,7 @@ class DBSCANSVM_Clustering():
         pred_base_clusters = self._dbscan_predict(self.test_df)
 
         self.test_df.loc[:,
-                         f'{self.loc_type}_base_cluster_idx'] = pred_base_clusters
-        self.test_df.loc[:,
                          f'{self.loc_type}_cluster_idx'] = pred_base_clusters
-
-        # iterate over all clusters and check if SVM was used. the while loop
-        # is so we can do multiple iterations of subdividing if needed
-        c = 0
-        while c < self.test_df[f'{self.loc_type}_cluster_idx'].max():
-            # if c is in the set of final cluster indices, then it will be our
-            # final prediction; don't modify anything.
-            if c in self.train_df[f'{self.loc_type}_cluster_idx'].unique():
-                c += 1
-                continue
-
-            # if c is not a final cluster idx, that must mean that it was
-            # subdivided. therefore, it should appear as a key in self.svm_models.
-            assert c in self.svm_models.keys()
-
-            points_in_cluster = self.test_df[
-                self.test_df[f'{self.loc_type}_cluster_idx'] == c]
-
-            # if we didn't predict any labels to be c, then skip
-            if len(points_in_cluster) == 0:
-                c += 1
-                continue
-
-            X = points_in_cluster[[
-                f"{self.loc_type}_lon", f"{self.loc_type}_lat"
-            ]]
-
-            svm_model, label_to_cluster = self.svm_models[c]
-            labels = svm_model.predict(X)
-            unique_labels = np.unique(labels)
-
-            # NOTE: it is possible (though from spot-checking, it appears very
-            # rare) that the set of labels the svm will predict is greater than
-            # the set of labels it predicted for the existing labeled points.
-            # (for example, Shankari's home cluster at DBSCAN+SVM, rad=150m,
-            # purity=0.7, size=6, gamma=0.05, C=1). in such a scenario, SVM may
-            # predict a final cluster label that isn't present in the
-            # 'final_cluster_idx' column of the train data, nor will it be in
-            # the keys of self.svm_models. if we wanted to predict labels for
-            # this trip, we would want to use the original base cluster rather
-            # than the SVM subcluster (because it would be the only trip in its
-            # SVM subcluster and we would not have any label information).
-            # thus, I'll keep the 'base_cluster_idx' columns for now, and
-            # assign a final_cluster_idx of -2 to indicate that such an error
-            # as occurred.
-            # TODO: we can try to restrict SVM predictions to the labels it assigned during the fit() process. perhaps could create a custom svm.predict() using the model's decision functions?
-            for l in unique_labels:
-                if l not in label_to_cluster.keys():
-                    label_to_cluster[l] = -2
-
-            # map purpose labels to new cluster indices
-            indices = np.array([label_to_cluster[l] for l in labels])
-            self.test_df.loc[self.test_df[f'{self.loc_type}_cluster_idx'] == c,
-                             f'{self.loc_type}_cluster_idx'] = indices
-
-            c += 1
 
         return self.test_df[[f'{self.loc_type}_cluster_idx']]
 
@@ -492,7 +426,8 @@ class DBSCANSVM_Clustering():
         return df.reset_index(drop=True)
 
     def _dbscan_predict(self, test_df):
-        """ Generate base-cluster predictions for the test data. 
+        """ Generate base-cluster predictions for the test data using a 
+            nearest-neighbor approach. 
         
             sklearn doesn't implement predict() for DBSCAN, which is why we 
             need a custom method.
@@ -593,12 +528,10 @@ class ClusterOnlyPredictor():
 
         if self.cluster_method in ['trip', 'combination']:
             self.start_cluster_model.fit(train_df)
-            self.train_df.loc[:,
-                              ['start_base_cluster_idx', 'start_cluster_idx'
-                               ]] = self.start_cluster_model.train_df[[
-                                   'start_base_cluster_idx',
-                                   'start_cluster_idx'
-                               ]]
+            self.train_df.loc[:, ['start_cluster_idx'
+                                  ]] = self.start_cluster_model.train_df[[
+                                      'start_cluster_idx'
+                                  ]]
 
             # create trip-level clusters
             trip_cluster_idx = self.trip_grouper.fit_transform(self.train_df)
@@ -618,11 +551,9 @@ class ClusterOnlyPredictor():
         if self.cluster_method in ['trip', 'combination']:
             self.start_cluster_model.predict(test_df)
             # append the start cluster indices
-            self.test_df.loc[:,
-                             ['start_base_cluster_idx', 'start_cluster_idx'
-                              ]] = self.start_cluster_model.test_df.loc[:, [
-                                  'start_base_cluster_idx', 'start_cluster_idx'
-                              ]]
+            self.test_df.loc[:, [
+                'start_cluster_idx'
+            ]] = self.start_cluster_model.test_df.loc[:, ['start_cluster_idx']]
 
             # create trip-level clusters
             trip_cluster_idx = self.trip_grouper.transform(self.test_df)
@@ -1711,7 +1642,7 @@ class OneHotWrapper():
 
     def fit_transform(self, train_df, output_col_prefix=None):
         """ Args: 
-                train_series: e.g. train_df['base_cluster_idx']) 
+                train_series: e.g. train_df['end_cluster_idx']) 
                 output_col_prefix (str): only if train_df is a single column
         """
         # TODO: handle pd series
