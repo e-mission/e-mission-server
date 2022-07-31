@@ -226,7 +226,6 @@ class DBSCANSVM_Clustering():
         self.purity_thresh = purity_thresh
         self.gamma = gamma
         self.C = C
-        self.svm_models = {}
 
     def fit(self, train_df):
         """ Creates clusters of trip points. 
@@ -340,10 +339,6 @@ class DBSCANSVM_Clustering():
                         self.train_df[f'{self.loc_type}_cluster_idx'] == c,
                         f'{self.loc_type}_cluster_idx'] = indices
 
-                    # store the svm model in the dict, along with the
-                    # label_to_cluster map so that we can calculate the correct
-                    # cluster index inside predict()
-                    self.svm_models[c] = (svm_model, label_to_cluster)
 
             c += 1
         # TODO: make things categorical at the end? or maybe at the start of the decision tree pipeline
