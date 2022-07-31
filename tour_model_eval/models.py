@@ -216,8 +216,8 @@ class DBSCANSVM_Clustering():
     def __init__(self,
                  loc_type='end',
                  radius=100,
-                 size_thresh=6,
-                 purity_thresh=0.7,
+                 size_thresh=1,
+                 purity_thresh=1.0,
                  gamma=0.05,
                  C=1):
         self.loc_type = loc_type
@@ -466,8 +466,8 @@ class ClusterOnlyPredictor():
     def __init__(
             self,
             radius=100,  # TODO: add diff start and end radii
-            size_thresh=6,
-            purity_thresh=0.7,
+            size_thresh=1,
+            purity_thresh=1.0,
             gamma=0.05,
             C=1,
             cluster_method='end'):
@@ -504,9 +504,9 @@ class ClusterOnlyPredictor():
         """
         radius = params['radius'] if 'radius' in params.keys() else 100
         size_thresh = params['size_thresh'] if 'size_thresh' in params.keys(
-        ) else 6
+        ) else 1
         purity_thresh = params[
-            'purity_thresh'] if 'purity_thresh' in params.keys() else 0.7
+            'purity_thresh'] if 'purity_thresh' in params.keys() else 1.0
         gamma = params['gamma'] if 'gamma' in params.keys() else 0.05
         C = params['C'] if 'C' in params.keys() else 1
         cluster_method = params[
@@ -677,8 +677,8 @@ class ClusterForestPredictor():
     def __init__(
             self,
             radius=100,  # TODO: add different start and end radii
-            size_thresh=6,
-            purity_thresh=0.7,
+            size_thresh=1,
+            purity_thresh=1.0,
             gamma=0.05,
             C=1,
             n_estimators=100,
@@ -794,9 +794,9 @@ class ClusterForestPredictor():
         """
         radius = params['radius'] if 'radius' in params.keys() else 100
         size_thresh = params['size_thresh'] if 'size_thresh' in params.keys(
-        ) else 6
+        ) else 1
         purity_thresh = params[
-            'purity_thresh'] if 'purity_thresh' in params.keys() else 0.7
+            'purity_thresh'] if 'purity_thresh' in params.keys() else 1.0
         gamma = params['gamma'] if 'gamma' in params.keys() else 0.05
         C = params['C'] if 'C' in params.keys() else 1
         n_estimators = params['n_estimators'] if 'n_estimators' in params.keys(
@@ -1166,8 +1166,8 @@ class ClusterForestSlimPredictor(ClusterForestPredictor):
             # user_id,
             # trips_df,
             radius=100,
-            size_thresh=6,
-            purity_thresh=0.7,
+            size_thresh=1,
+            purity_thresh=1.0,
             gamma=0.05,
             C=1,
             n_estimators=100,
@@ -1195,8 +1195,8 @@ class ClusterAdaBoostPredictor(ClusterForestPredictor):
     def __init__(
             self,
             radius=100,  # TODO: add different start and end radii
-            size_thresh=6,
-            purity_thresh=0.7,
+            size_thresh=1,
+            purity_thresh=1.0,
             gamma=0.05,
             C=1,
             n_estimators=100,
@@ -1259,9 +1259,9 @@ class ClusterAdaBoostPredictor(ClusterForestPredictor):
         """
         radius = params['radius'] if 'radius' in params.keys() else 100
         size_thresh = params['size_thresh'] if 'size_thresh' in params.keys(
-        ) else 6
+        ) else 1
         purity_thresh = params[
-            'purity_thresh'] if 'purity_thresh' in params.keys() else 0.7
+            'purity_thresh'] if 'purity_thresh' in params.keys() else 1.0
         gamma = params['gamma'] if 'gamma' in params.keys() else 0.05
         C = params['C'] if 'C' in params.keys() else 1
         n_estimators = params['n_estimators'] if 'n_estimators' in params.keys(

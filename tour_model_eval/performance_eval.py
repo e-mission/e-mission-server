@@ -43,19 +43,52 @@ RADIUS = 500
 PREDICTORS = {
     # key: model name
     # value: (model class, model params)
-    'old clustering': (models.OldClusteringPredictor, None),
-    'new clustering by end r100m': (models.ClusterOnlyPredictor, {
-        'cluster_method': 'end',
-        'radius': 100,
-    }),
-    'new clustering by trip r100m': (models.ClusterOnlyPredictor, {
-        'cluster_method': 'trip',
-        'radius': 100,
-    }),
-    'new clustering by combo r100m': (models.ClusterOnlyPredictor, {
-        'cluster_method': 'combination',
-        'radius': 100,
-    }),
+    # 'old clustering r100m': (models.OldClusteringPredictor, {
+    #     'radius': 100,
+    # }),
+    # 'new clustering by end r100m': (models.ClusterOnlyPredictor, {
+    #     'cluster_method': 'end',
+    #     'radius': 100,
+    # }),
+    # 'new clustering by trip r100m': (models.ClusterOnlyPredictor, {
+    #     'cluster_method': 'trip',
+    #     'radius': 100,
+    # }),
+    # 'new clustering by combo r100m': (models.ClusterOnlyPredictor, {
+    #     'cluster_method': 'combination',
+    #     'radius': 100,
+    # }),
+    # 'random forest with end r100m': (models.ClusterForestPredictor, {
+    #     'use_start_clusters': False,
+    #     'use_trip_clusters': False,
+    #     'drop_unclustered': False,
+    #     'radius': 100,
+    # }),
+    # 'random forest with end and trip r100m': (models.ClusterForestPredictor, {
+    #     'use_start_clusters': False,
+    #     'use_trip_clusters': True,
+    #     'drop_unclustered': False,
+    #     'radius': 100,
+    # }),
+    # 'random forest with start end r100m': (models.ClusterForestPredictor, {
+    #     'use_start_clusters': True,
+    #     'use_trip_clusters': False,
+    #     'drop_unclustered': False,
+    #     'radius': 100,
+    # }),
+    # 'random forest with start end trip r100m': (models.ClusterForestPredictor, {
+    #     'use_start_clusters': True,
+    #     'use_trip_clusters': True,
+    #     'drop_unclustered': False,
+    #     'radius': 100,
+    # }),
+    # 'random forest with end and trip, drop unclustered r100m':
+    # (models.ClusterForestPredictor, {
+    #     'use_start_clusters': False,
+    #     'use_trip_clusters': True,
+    #     'drop_unclustered': True,
+    #     'radius': 100,
+    # }),
     'new clustering by end r150m': (models.ClusterOnlyPredictor, {
         'cluster_method': 'end',
         'radius': 150,
@@ -68,38 +101,32 @@ PREDICTORS = {
         'cluster_method': 'combination',
         'radius': 150,
     }),
-    'random forest with end r100m': (models.ClusterForestPredictor, {
-        'use_start_clusters': False,
-        'use_trip_clusters': False,
-        'drop_unclustered': False,
-        'radius': 100,
-    }),
     'random forest with end r150m': (models.ClusterForestPredictor, {
+        'n_estimators': 100,
+        'max_depth': None,
+        'min_samples_split': 2,
+        'min_samples_leaf': 1,
+        'max_features': 'sqrt',
+        'bootstrap': False,
         'use_start_clusters': False,
         'use_trip_clusters': False,
-        'drop_unclustered': False,
-        'radius': 100,
-    }),
-    'random forest with end and trip r100m': (models.ClusterForestPredictor, {
-        'use_start_clusters': False,
-        'use_trip_clusters': True,
-        'drop_unclustered': False,
-        'radius': 100,
-    }),
-    'random forest with end and trip, drop unclustered r100m':
-    (models.ClusterForestPredictor, {
-        'use_start_clusters': False,
-        'use_trip_clusters': True,
-        'drop_unclustered': True,
-        'radius': 100,
-    }),
-    'random forest with end and trip r150m': (models.ClusterForestPredictor, {
-        'use_start_clusters': False,
-        'use_trip_clusters': True,
         'drop_unclustered': False,
         'radius': 150,
     }),
-    'final random forest with clustering': (models.ClusterForestPredictor, {
+    # 'random forest with end and trip r150m': (models.ClusterForestPredictor, {
+    #     'use_start_clusters': False,
+    #     'use_trip_clusters': True,
+    #     'drop_unclustered': False,
+    #     'radius': 150,
+    # }),
+    # 'random forest with start end r150m': (models.ClusterForestPredictor, {
+    #     'use_start_clusters': True,
+    #     'use_trip_clusters': False,
+    #     'drop_unclustered': False,
+    #     'radius': 150,
+    # }),
+    'random forest with start end trip r150m':
+    (models.ClusterForestPredictor, {
         'n_estimators': 100,
         'max_depth': None,
         'min_samples_split': 2,
@@ -113,26 +140,23 @@ PREDICTORS = {
     }),
     'random forest with end and trip, drop unclustered r150m':
     (models.ClusterForestPredictor, {
+        'n_estimators': 100,
+        'max_depth': None,
+        'min_samples_split': 2,
+        'min_samples_leaf': 1,
+        'max_features': 'sqrt',
+        'bootstrap': False,
         'use_start_clusters': False,
         'use_trip_clusters': True,
         'drop_unclustered': True,
         'radius': 150,
-    }),
-    'random forest with start and end r100m': (models.ClusterForestPredictor, {
-        'use_start_clusters': True,
-        'use_trip_clusters': False,
-        'drop_unclustered': False,
-        'radius': 100,
-    }),
-    'random forest with start end trip r100m':
-    (models.ClusterForestPredictor, {
-        'use_start_clusters': True,
-        'use_trip_clusters': True,
-        'drop_unclustered': False,
-        'radius': 100,
+        'radius': 150,
     }),
     'random forest, no clustering': (models.BasicForestPredictor, {}),
-    'adaboost basic': (models.ClusterAdaBoostPredictor, {}),
+    # 'adaboost basic': (models.ClusterAdaBoostPredictor, {}),
+    'old clustering r150m': (models.OldClusteringPredictor, {
+        'radius': 150,
+    }),
 }
 
 
