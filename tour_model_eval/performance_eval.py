@@ -11,7 +11,7 @@ from datetime import datetime
 
 import sklearn.metrics as sm
 from sklearn.metrics.cluster import contingency_matrix
-from sklearn.model_selection import KFold, ParameterGrid
+from sklearn.model_selection import KFold, ParameterGrid, ParameterSampler
 
 # our imports
 import models
@@ -113,20 +113,7 @@ PREDICTORS = {
         'drop_unclustered': False,
         'radius': 150,
     }),
-    # 'random forest with end and trip r150m': (models.ClusterForestPredictor, {
-    #     'use_start_clusters': False,
-    #     'use_trip_clusters': True,
-    #     'drop_unclustered': False,
-    #     'radius': 150,
-    # }),
-    # 'random forest with start end r150m': (models.ClusterForestPredictor, {
-    #     'use_start_clusters': True,
-    #     'use_trip_clusters': False,
-    #     'drop_unclustered': False,
-    #     'radius': 150,
-    # }),
-    'random forest with start end trip r150m':
-    (models.ClusterForestPredictor, {
+    'random forest with end and trip r150m': (models.ClusterForestPredictor, {
         'n_estimators': 100,
         'max_depth': None,
         'min_samples_split': 2,
@@ -138,6 +125,25 @@ PREDICTORS = {
         'drop_unclustered': False,
         'radius': 150,
     }),
+    # 'random forest with start end r150m': (models.ClusterForestPredictor, {
+    #     'use_start_clusters': True,
+    #     'use_trip_clusters': False,
+    #     'drop_unclustered': False,
+    #     'radius': 150,
+    # }),
+    # 'random forest with start end trip r150m':
+    # (models.ClusterForestPredictor, {
+    #     'n_estimators': 100,
+    #     'max_depth': None,
+    #     'min_samples_split': 2,
+    #     'min_samples_leaf': 1,
+    #     'max_features': 'sqrt',
+    #     'bootstrap': False,
+    #     'use_start_clusters': True,
+    #     'use_trip_clusters': True,
+    #     'drop_unclustered': False,
+    #     'radius': 150,
+    # }),
     'random forest with end and trip, drop unclustered r150m':
     (models.ClusterForestPredictor, {
         'n_estimators': 100,
@@ -150,9 +156,23 @@ PREDICTORS = {
         'use_trip_clusters': True,
         'drop_unclustered': True,
         'radius': 150,
-        'radius': 150,
     }),
-    'random forest, no clustering': (models.BasicForestPredictor, {}),
+    'random forest, no clustering v1': (models.BasicForestPredictor, {
+        'n_estimators': 100,
+        'max_depth': None,
+        'min_samples_split': 2,
+        'min_samples_leaf': 1,
+        'max_features': 'sqrt',
+        'bootstrap': True,
+    }),
+    'random forest, no clustering v2': (models.BasicForestPredictor, {
+        'n_estimators': 100,
+        'max_depth': None,
+        'min_samples_split': 2,
+        'min_samples_leaf': 1,
+        'max_features': 'log2',
+        'bootstrap': False,
+    }),
     # 'adaboost basic': (models.ClusterAdaBoostPredictor, {}),
     'old clustering r150m': (models.OldClusteringPredictor, {
         'radius': 150,
@@ -632,8 +652,14 @@ def plot_mcm(mcm,
         # plt.tight_layout()
 
 
-def get_cluster_metrics(expanded_all_trip_df_map, user_list, radii, loc_type,
-                        algs, param_grid):
+def get_cluster_metrics(expanded_all_trip_df_map,
+                        user_list,
+                        radii,
+                        loc_type,
+                        algs,
+                        param_grid,
+                        n_iter=10,
+                        random_state=42):
     """ Runs a bunch of clustering algorithms with varying parameters and 
         reports cluster metrics (homogeneity, modified homogeneity, purity, number of clusters, cluster sizes, etc.)
 
@@ -685,12 +711,19 @@ def get_cluster_metrics(expanded_all_trip_df_map, user_list, radii, loc_type,
             alg_params = param_grid[alg]
             # print(alg_params)
             # iterate over permutation of params
-            for params in iter(ParameterGrid(alg_params)):
+            params = list(
+                ParameterSampler(
+                    alg_params, n_iter,
+                    random_state=random_state))  # list of dictionaries
+            for param in params:
                 # print(f'params for {alg}')
-                print(params)
+                print(param)
 
                 for user in user_list:
                     user_trips = expanded_all_trip_df_map[user]
+                    if len(user_trips) == 0:
+                        print(f'user {user} has no trips')
+                        continue
 
                     if ('start_loc' not in user_trips.columns) or (
                             'end_loc' not in user_trips.columns) or (
@@ -703,23 +736,23 @@ def get_cluster_metrics(expanded_all_trip_df_map, user_list, radii, loc_type,
                     user_trips = expand_coords(user_trips)
 
                     # parse parameters
-                    SVM = params['SVM'] if 'SVM' in params.keys() else False
-                    min_samples = params[
-                        'min_samples'] if 'min_samples' in params.keys(
+                    SVM = param['SVM'] if 'SVM' in param.keys() else False
+                    min_samples = param[
+                        'min_samples'] if 'min_samples' in param.keys(
                         ) else None
-                    xi = params['xi'] if 'xi' in params.keys() else None
-                    cluster_method = params[
-                        'cluster_method'] if 'cluster_method' in params.keys(
+                    xi = param['xi'] if 'xi' in param.keys() else None
+                    cluster_method = param[
+                        'cluster_method'] if 'cluster_method' in param.keys(
                         ) else None
-                    svm_size_thresh = params[
-                        'size_thresh'] if 'size_thresh' in params.keys(
+                    svm_size_thresh = param[
+                        'size_thresh'] if 'size_thresh' in param.keys(
                         ) else None
-                    svm_purity_thresh = params[
-                        'purity_thresh'] if 'purity_thresh' in params.keys(
+                    svm_purity_thresh = param[
+                        'purity_thresh'] if 'purity_thresh' in param.keys(
                         ) else None
-                    svm_gamma = params['gamma'] if 'gamma' in params.keys(
+                    svm_gamma = param['gamma'] if 'gamma' in param.keys(
                     ) else None
-                    svm_C = params['C'] if 'C' in params.keys() else None
+                    svm_C = param['C'] if 'C' in param.keys() else None
 
                     user_trips = add_loc_clusters(
                         user_trips,
@@ -769,7 +802,7 @@ def get_cluster_metrics(expanded_all_trip_df_map, user_list, radii, loc_type,
                             'UUID': user,
                             'alg': alg,
                             'radius': r,
-                            'params': params,
+                            'params': param,
                             'n_trips': n_trips,
                             'n_clusters': n_clusters,
                             'n_single_trip_clusters': n_single_trip_clusters,
@@ -787,13 +820,14 @@ def get_cluster_metrics(expanded_all_trip_df_map, user_list, radii, loc_type,
 
     except Exception as e:
         print('aborting due to Exception')
+        # raise e
+        print(repr(e))
         if len(all_results) > 0:
             print('returning existing results')
             return pd.concat(all_results)
         else:
             print('no completed results to return')
             return
-        print(repr(e))
     except KeyboardInterrupt as e:
         print('aborting due to KeyboardInterrupt')
         if len(all_results) > 0:
