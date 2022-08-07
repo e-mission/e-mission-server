@@ -4,6 +4,8 @@ import emission.analysis.modelling.tour_model.similarity as oursim
 import emission.analysis.modelling.trip_model.greedy_similarity_binning as eamtg
 import emission.tests.modellingTests.modellingTestAssets as etmm
 import emission.analysis.modelling.similarity.od_similarity as eamso
+import emission.analysis.modelling.tour_model_first_only.build_save_model as eamtb
+import emission.analysis.modelling.tour_model_first_only.load_predict as eamtl
 import json
 import logging
 import numpy as np
@@ -66,7 +68,139 @@ class TestBackwardsCompat(unittest.TestCase):
         self.assertEqual(len(old_bins), len(new_bins),
             f"old bins = {old_bins} but new_bins = {new_bins}")
 
+    @staticmethod
+    def old_predict_with_n(trip, bin_locations, user_labels, cluster_sizes, RADIUS):
+        logging.debug(f"At stage: first round prediction")
+        pred_bin = eamtl.find_bin(trip, bin_locations, RADIUS)
+        logging.debug(f"At stage: matched with bin {pred_bin}")
 
+        if pred_bin == -1:
+            logging.info(f"No match found for {trip['data']['start_loc']} early return")
+            return [], 0
+
+        user_input_pred_list = user_labels[pred_bin]
+        this_cluster_size = cluster_sizes[pred_bin]
+        logging.debug(f"At stage: looked up user input {user_input_pred_list}")
+        return user_input_pred_list, this_cluster_size
+
+    def testRandomTripsWithinTheSameThreshold(self):
+        label_data = {
+            "mode_confirm": ['walk', 'bike', 'transit'],
+            "purpose_confirm": ['work', 'home', 'school'],
+            "replaced_mode": ['drive']
+        }
+
+        n = 60
+        trips = etmm.generate_mock_trips(
+            user_id="joe", 
+            trips=n, 
+            origin=(0, 0), 
+            destination=(1, 1), 
+            label_data=label_data, 
+            threshold=0.001,  # ~ 111 meters in degrees WGS84
+        )
+
+        # These fields should ignored for the first round, but are extracted anyway
+        # So let's fill them in with dummy values
+        for t in trips:
+            t["data"]["distance"] = 1000
+            t["data"]["duration"] = 10
+
+        train = trips[0:50]
+        test = trips[50:60]
+
+        model_config = {
+            "metric": "od_similarity",
+            "similarity_threshold_meters": 500,      # meters,
+            "apply_cutoff": False,
+            "incremental_evaluation": False
+        }
+        new_model = eamtg.GreedySimilarityBinning(model_config)
+        new_model.fit(train)
+
+        old_builder = oursim.similarity(train, 500,
+            shouldFilter=False, cutoff=False)
+        old_builder.fit()
+
+        self.assertEqual(len(old_builder.bins), len(new_model.bins),
+            f"old bins = {old_builder.bins} but new_bins = {new_model.bins}")
+
+        self.assertEqual(len(old_builder.bins), 1,
+            f"all trips within threshold, so expected one bin, found {len(old_builder.bins)}")
+
+        old_user_inputs = eamtb.create_user_input_map(train, old_builder.bins)
+        old_location_map = eamtb.create_location_map(train, old_builder.bins)
+        old_cluster_sizes = {k: len(old_location_map[k]) for k in old_location_map}
+
+        for test_trip in test:
+            new_results, new_n = new_model.predict(test_trip)
+            old_results, old_n = TestBackwardsCompat.old_predict_with_n(test_trip,
+                old_location_map, old_user_inputs, old_cluster_sizes, 500)
+
+            self.assertEqual(old_n, new_n,
+                f"for test trip {test_trip} old n = {old_n} and new_n = {new_n}")
+
+            self.assertEqual(old_results, new_results,
+                f"for test trip {test_trip} old result = {old_results} and new result = {new_results}")
+
+    def testRandomTripsOutsideTheSameThreshold(self):
+        label_data = {
+            "mode_confirm": ['walk', 'bike', 'transit'],
+            "purpose_confirm": ['work', 'home', 'school'],
+            "replaced_mode": ['drive']
+        }
+
+        n = 60
+        trips = etmm.generate_mock_trips(
+            user_id="joe", 
+            trips=n, 
+            origin=(0, 0), 
+            destination=(1, 1), 
+            label_data=label_data, 
+            threshold=0.1,  # Much bigger than the 500m threshold, so we will get multiple bins
+        )
+
+        # These fields should ignored for the first round, but are extracted anyway
+        # So let's fill them in with dummy values
+        for t in trips:
+            t["data"]["distance"] = 1000
+            t["data"]["duration"] = 10
+
+        train = trips[0:50]
+        test = trips[50:60]
+
+        model_config = {
+            "metric": "od_similarity",
+            "similarity_threshold_meters": 500,      # meters,
+            "apply_cutoff": False,
+            "incremental_evaluation": False
+        }
+        new_model = eamtg.GreedySimilarityBinning(model_config)
+        new_model.fit(train)
+
+        old_builder = oursim.similarity(train, 500,
+            shouldFilter=False, cutoff=False)
+        old_builder.fit()
+
+        logging.debug(f"old bins = {len(old_builder.bins)} but new_bins = {len(new_model.bins)}")
+
+        self.assertEqual(len(old_builder.bins), len(new_model.bins),
+            f"old bins = {old_builder.bins} but new_bins = {new_model.bins}")
+
+        old_user_inputs = eamtb.create_user_input_map(train, old_builder.bins)
+        old_location_map = eamtb.create_location_map(train, old_builder.bins)
+        old_cluster_sizes = {k: len(old_location_map[k]) for k in old_location_map}
+
+        for test_trip in test:
+            new_results, new_n = new_model.predict(test_trip)
+            old_results, old_n = TestBackwardsCompat.old_predict_with_n(test_trip,
+                old_location_map, old_user_inputs, old_cluster_sizes, 500)
+
+            self.assertEqual(old_n, new_n,
+                f"for test trip {test_trip} old n = {old_n} and new_n = {new_n}")
+
+            self.assertEqual(old_results, new_results,
+                f"for test trip {test_trip} old result = {old_results} and new result = {new_results}")
 if __name__ == '__main__':
     unittest.main()
 
