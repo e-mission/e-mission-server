@@ -131,6 +131,8 @@ class Entry(ecwb.WrapperBase):
             "inference/prediction": "modeprediction",
             # the predicted labels for a particular trip (one entry per algorithm)
             "inference/labels": "labelprediction",
+            # the serialized trip model for user label prediction
+            "inference/trip_model": "tripmodel",
             # equivalent of cleaned_section, but with the mode set to the 
             # inferred mode instead of just walk/bike/motorized
             # used for consistency and to make the client work whether or not we were

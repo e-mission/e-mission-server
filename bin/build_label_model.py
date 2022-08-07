@@ -5,13 +5,13 @@ import logging
 
 import argparse
 import uuid
-import copy
 
 import emission.pipeline.reset as epr
 import emission.core.get_database as edb
 import emission.core.wrapper.user as ecwu
 import emission.storage.timeseries.abstract_timeseries as esta
-import emission.analysis.modelling.tour_model_first_only.build_save_model as eamtb
+import emission.analysis.modelling.trip_model.run_model as eamur
+import emission.analysis.modelling.trip_model.config as eamtc
 
 def _get_user_list(args):
     if args.all:
@@ -64,4 +64,9 @@ if __name__ == '__main__':
     logging.info("received list with %s users" % user_list)
     for user_id in user_list:
         logging.info("building model for user %s" % user_id)
-        eamtb.build_user_model(user_id)
+        # these can come from the application config as default values
+
+        model_type = eamtc.get_model_type()
+        model_storage = eamtc.get_model_storage()
+        min_trips = eamtc.get_minimum_trips()
+        eamur.update_trip_model(user_id, model_type, model_storage, min_trips)
