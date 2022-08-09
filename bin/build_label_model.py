@@ -69,4 +69,5 @@ if __name__ == '__main__':
         model_type = eamtc.get_model_type()
         model_storage = eamtc.get_model_storage()
         min_trips = eamtc.get_minimum_trips()
+        ## Rebuild and save the trip model with the specified parameters
         eamur.update_trip_model(user_id, model_type, model_storage, min_trips)
