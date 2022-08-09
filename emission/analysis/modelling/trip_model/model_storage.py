@@ -6,7 +6,6 @@ import json
 import emission.analysis.modelling.trip_model.model_type as eamum
 import emission.core.wrapper.tripmodel as ecwu
 import emission.storage.decorations.analysis_timeseries_queries as esda
-import emission.storage.pipeline_queries as epq
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.builtin_timeseries as estb
 import pymongo

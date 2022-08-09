@@ -7,7 +7,8 @@ import emission.analysis.modelling.trip_model.run_model as eamur
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.tests.modellingTests.modellingTestAssets as etmm
 import emission.storage.decorations.analysis_timeseries_queries as esda
-import emission.analysis.modelling.trip_model.config as eamtc
+import emission.core.get_database as edb
+import emission.storage.pipeline_queries as epq
 
 
 class TestRunGreedyModel(unittest.TestCase):
@@ -35,6 +36,9 @@ class TestRunGreedyModel(unittest.TestCase):
         self.has_label_percent = 0.9 # let's make a few that don't have a label, but invariant
                                 # $clustered_trips * $has_label_percent > self.min_trips
                                 # must be correct or else this test could fail under some random test cases.
+
+        # for a negative test, below
+        self.unused_user_id = 'asdjfkl;asdfjkl;asd08234ur13fi4jhf2103mkl'
 
         # test data can be saved between test invocations, check if data exists before generating
         ts = esta.TimeSeries.get_time_series(user_id)
@@ -75,11 +79,9 @@ class TestRunGreedyModel(unittest.TestCase):
 
     def tearDown(self):
         """
-        delete entries for user self.user_id in the database, not
-        yet implemented in database operations, so these test entries will
-        have to stick around for now.
+        clean up database
         """
-        pass
+        edb.get_analysis_timeseries_db().delete_many({'user_id': self.user_id})
 
     def testBuildGreedyModelFromConfig(self):
         """
@@ -96,9 +98,6 @@ class TestRunGreedyModel(unittest.TestCase):
         purposes but will load from a file in /conf/analysis/ which is tested here
         """
 
-        # making an assumption here...
-        unused_user_id = 'asdjfkl;asdfjkl;asd08234ur13fi4jhf2103mkl'
-
         # pass along debug model configuration
         greedy_model_config = {
             "metric": "od_similarity",
@@ -109,14 +108,18 @@ class TestRunGreedyModel(unittest.TestCase):
 
         logging.debug(f'~~~~ do nothing ~~~~')
         eamur.update_trip_model(
-            user_id=unused_user_id,
+            user_id=self.unused_user_id,
             model_type=eamumt.ModelType.GREEDY_SIMILARITY_BINNING,
             model_storage=eamums.ModelStorage.DOCUMENT_DATABASE,
             min_trips=self.min_trips,
             model_config=greedy_model_config
         )
 
-        # todo: check the pipeline for this user to confirm they don't have a current timestamp
+        # user had no entries so their pipeline state should not have been set
+        # if it was set, the time query here would 
+        time_query = epq.get_time_query_for_trip_model(self.unused_user_id)
+        self.assertIsNone(time_query, "should not have a pipeline state entry")
+
 
     def test1RoundTripGreedySimilarityBinning(self):
         """

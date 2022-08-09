@@ -1,8 +1,6 @@
 import unittest
 import emission.analysis.modelling.trip_model.greedy_similarity_binning as eamtg
 import emission.tests.modellingTests.modellingTestAssets as etmm
-import emission.analysis.modelling.similarity.od_similarity as eamso
-import json
 import logging
 
 
@@ -22,21 +20,24 @@ class TestGreedySimilarityBinning(unittest.TestCase):
             "replaced_mode": ['drive']
         }
 
+        # generate $n trips. $m of them should have origin and destinations sampled
+        # within a radius that should have them binned.
         n = 20
-        should_be_grouped = 5
+        m = 5
         trips = etmm.generate_mock_trips(
             user_id="joe", 
             trips=n, 
             origin=(0, 0), 
             destination=(1, 1), 
             label_data=label_data, 
-            within_threshold=should_be_grouped, 
+            within_threshold=m, 
             threshold=0.001,  # ~ 111 meters in degrees WGS84
         )
 
+        # pass in a test configuration to the binning algorithm
         model_config = {
             "metric": "od_similarity",
-            "similarity_threshold_meters": 500,      # meters,
+            "similarity_threshold_meters": 500,  # meters,
             "apply_cutoff": False,
             "incremental_evaluation": False
         }
@@ -44,8 +45,8 @@ class TestGreedySimilarityBinning(unittest.TestCase):
         
         model.fit(trips)
 
-        # $should_be_grouped trip features should appear together in one bin
-        at_least_one_large_bin = any(map(lambda b: len(b['features']) >= should_be_grouped, model.bins.values()))
+        # $m trip features should appear together in one bin
+        at_least_one_large_bin = any(map(lambda b: len(b['features']) == m, model.bins.values()))
         self.assertTrue(at_least_one_large_bin, "at least one bin should have at least 5 features in it")
 
     def testPrediction(self):

@@ -1,4 +1,3 @@
-from this import d
 import unittest
 import logging
 import json
@@ -15,9 +14,8 @@ import emission.analysis.modelling.trip_model.run_model as eamur
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.analysis_timeseries_queries as esdatq
 import emission.tests.modellingTests.modellingTestAssets as etmm
-import emission.storage.decorations.analysis_timeseries_queries as esda
-import emission.analysis.modelling.trip_model.config as eamtc
 import emission.core.wrapper.entry as ecwe
+import emission.core.get_database as edb
 
 
 class TestRunGreedyModel(unittest.TestCase):
@@ -120,11 +118,9 @@ class TestRunGreedyModel(unittest.TestCase):
 
     def tearDown(self):
         """
-        delete entries for user self.user_id in the database, not
-        yet implemented in database operations, so these test entries will
-        have to stick around for now.
+        clean up database entries related to this test
         """
-        pass
+        edb.get_analysis_timeseries_db().delete_many({'user_id': self.user_id})
 
     def testIncrementalRun(self):
         """

@@ -3,7 +3,6 @@ from tokenize import group
 from typing import Dict, List, Optional, Tuple
 
 import emission.analysis.modelling.similarity.similarity_metric_type as eamssmt
-import emission.analysis.modelling.similarity.similarity_metric as eamss
 import emission.analysis.modelling.tour_model.label_processing as lp
 import emission.analysis.modelling.trip_model.trip_model as eamuu
 import emission.analysis.modelling.trip_model.util as util

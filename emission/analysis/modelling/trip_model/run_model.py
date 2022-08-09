@@ -4,8 +4,6 @@ from uuid import UUID
 
 import time
 import emission.storage.timeseries.timequery as estt
-import emission.analysis.modelling.similarity.od_similarity as eamso
-import emission.analysis.modelling.trip_model.greedy_similarity_binning as eamug
 import emission.analysis.modelling.trip_model.model_storage as eamums
 import emission.analysis.modelling.trip_model.model_type as eamumt
 import emission.analysis.modelling.trip_model.trip_model as eamuu
