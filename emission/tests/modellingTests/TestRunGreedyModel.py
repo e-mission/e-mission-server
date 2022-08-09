@@ -9,6 +9,7 @@ import emission.tests.modellingTests.modellingTestAssets as etmm
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.core.get_database as edb
 import emission.storage.pipeline_queries as epq
+import emission.core.wrapper.pipelinestate as ecwp
 
 
 class TestRunGreedyModel(unittest.TestCase):
@@ -117,8 +118,11 @@ class TestRunGreedyModel(unittest.TestCase):
 
         # user had no entries so their pipeline state should not have been set
         # if it was set, the time query here would 
-        time_query = epq.get_time_query_for_trip_model(self.unused_user_id)
-        self.assertIsNone(time_query, "should not have a pipeline state entry")
+        stage = ecwp.PipelineStages.TRIP_MODEL
+        pipeline_state = epq.get_current_state(self.unused_user_id, stage)
+        self.assertIsNone(
+            pipeline_state['curr_run_ts'], 
+            "pipeline should not have a current timestamp for the test user")
 
 
     def test1RoundTripGreedySimilarityBinning(self):

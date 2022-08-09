@@ -113,7 +113,6 @@ class GreedySimilarityBinning(eamuu.TripModel):
             self._apply_cutoff()
         self._generate_predictions()
 
-        binned_features = sum([len(b['features']) for b in self.bins.values() ])
         logging.info(f"greedy binning model fit to {len(trips)} rows of trip data")
 
     def predict(self, trip: ecwc.Confirmedtrip) -> Tuple[List[Dict], int]:
@@ -151,11 +150,13 @@ class GreedySimilarityBinning(eamuu.TripModel):
         for trip in trips:
             trip_features = self.extract_features(trip)
             trip_labels = trip['data']['user_input']
-            bin_id, bin_record = self._nearest_bin(trip)
+            
+            bin_id = self._find_matching_bin_id(trip_features)
             if bin_id is not None:
                 # add to existing bin
-                bin_record['features'].append(trip_features)
-                bin_record['labels'].append(trip_labels)
+                logging.debug(f"adding trip to bin {bin_id} with features {trip_features}")
+                self.bins[bin_id]['features'].append(trip_features)
+                self.bins[bin_id]['labels'].append(trip_labels)
             else:
                 # create new bin
                 new_bin_id = str(len(self.bins))
@@ -167,11 +168,28 @@ class GreedySimilarityBinning(eamuu.TripModel):
                 logging.debug(f"creating new bin {new_bin_id} at location {trip_features}")
                 self.bins[new_bin_id] = new_bin_record
 
+    def _find_matching_bin_id(self, trip_features: List[float]) -> Optional[str]:
+        """
+        finds an existing bin where all bin features are "similar" to the incoming
+        trip features.
+
+        :param trip_features: feature row for the incoming trip
+        :return: the id of a bin if a match was found, otherwise None
+        """
+        for bin_id, bin_record in self.bins.items():
+                matches_bin = all([self.metric.similar(trip_features, bin_sample, self.sim_thresh)
+                    for bin_sample in bin_record['features']])
+                if matches_bin:
+                    return bin_id
+        return None
+
     def _nearest_bin(self, trip: ecwc.Confirmedtrip) -> Tuple[Optional[int], Optional[Dict]]:
         """
         finds a bin which contains at least one matching feature. the 
         first record matching by similarity measure is returned. if
         none are found, (None, None) is returned.
+
+        [see https://github.com/e-mission/e-mission-server/blob/10772f892385d44e11e51e796b0780d8f6609a2c/emission/analysis/modelling/tour_model_first_only/load_predict.py#L46]
 
         :param trip: incoming trip features to test with
         :return: nearest bin record, if found
