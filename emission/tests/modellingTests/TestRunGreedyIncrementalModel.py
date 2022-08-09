@@ -173,6 +173,7 @@ class TestRunGreedyModel(unittest.TestCase):
             model_config=self.greedy_model_config
         )
 
+        # the 6th trip in the original dataset was an outlier and should form it's own cluster
         self.assertEqual(len(updated_model.bins), 2, 
             'there should be two bins, one with similar trips, one with an outlier')
 

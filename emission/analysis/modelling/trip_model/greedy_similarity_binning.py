@@ -201,18 +201,22 @@ class GreedySimilarityBinning(eamuu.TripModel):
         removes small clusters by an "elbow search" heuristic. see
         https://stackoverflow.com/a/2022348/4803266.
         """
-        num_bins = len(self.bins)
-        bin_sizes = [len(bin_rec['features']) for bin_rec in self.bins.values()]
+        # the cutoff point is an index along the sorted bins. any bin with a gte
+        # index value is removed, as that bin has been found to be smaller than the cutoff.
+        bins_sorted =  self.bins.sort(key=lambda bin: len(bin['features']), reverse=True)
+        
+        num_bins = len(bins_sorted)
+        bin_sizes = [len(bin_rec['features']) for bin_rec in bins_sorted.values()]
         _, cutoff_bin_size = util.find_knee_point(bin_sizes)
         logging.debug(
             "bins = %s, elbow distance = %s" % (num_bins, cutoff_bin_size)
         )
 
         updated_bins = {bin_id: bin_rec 
-                        for bin_id, bin_rec in self.bins.items() 
+                        for bin_id, bin_rec in bins_sorted.items() 
                         if len(bin_rec['features']) >= cutoff_bin_size}
 
-        removed = len(self.bins) - len(updated_bins)
+        removed = len(bins_sorted) - len(updated_bins)
         logging.debug(
             f"removed %s bins with less than %s entries"
             % (removed, cutoff_bin_size)
