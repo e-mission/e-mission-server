@@ -36,7 +36,7 @@ Additional documentation has been moved to its own repository [e-mission-docs](h
 ## Deployment: ##
 -------------------
 - If you just want to run the server, you can use [our docker image](https://github.com/e-mission/e-mission-docker).
-- Alternatively, you can follow the [manual installation instructions](https://github.com/e-mission/e-mission-docs/blob/master/docs/e-mission-server/manual_install.md) to pull from the repo to the server, change the config files slightly and just not change any code.
+- Alternatively, you can follow the [manual installation instructions](https://e-mission.readthedocs.io/en/latest/install/manual_install.html) to pull from the repo to the server, change the config files slightly and just not change any code.
 
 ## Development: ##
 -------------------
