@@ -125,5 +125,5 @@ class TestGreedySimilarityBinning(unittest.TestCase):
         model.fit(train)
         results, n = model.predict(test[0])
 
-        self.assertEqual(len(results), 0, "should have found a matching bin")
-        self.assertEqual(n, -1, "that bin should have had the whole train set in it")
+        self.assertEqual(len(results), 0, "should not have found a matching bin")
+        self.assertEqual(n, 0, "the number of features in an empty bin is zero")
