@@ -22,7 +22,7 @@ def destination_features(trip: ecwc.Confirmedtrip) -> List[float]:
     :return: destination coordinates
     """
     try:
-        destination = trip['data']['start_loc']["coordinates"]
+        destination = trip['data']['end_loc']["coordinates"]
         return destination
     except KeyError as e:
         msg = 'Confirmedtrip expected to have path data.start_loc.coordinates'
