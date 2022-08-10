@@ -13,5 +13,10 @@ for ue in edb.get_uuid_db().find():
     now = arrow.now()
     month_ago = now.shift(months=-1)
     last_month_tq = estt.TimeQuery("data.start_ts", month_ago.timestamp, now.timestamp)
-    confirmed_pct, valid_replacement_pct, score = ecwu.User.computeConfirmed(ue["uuid"], last_month_tq)
-    print(f"For {ue['user_email']}: Trip count = {trip_count}, location count = {location_count}, first trip = {first_trip_time}, last trip = {last_trip_time}, confirmed_pct ({month_ago} -> {now}) = {confirmed_pct:.2f}")
+    if 'computeConfirmed' in vars(ecwu.User):
+        confirmed_pct, valid_replacement_pct, score = ecwu.User.computeConfirmed(ue["uuid"], last_month_tq)
+        print(f"For {ue['user_email']}: Trip count = {trip_count}, location count = {location_count}, first trip = {first_trip_time}, last trip = {last_trip_time}, confirmed_pct ({month_ago} -> {now}) = exactly {confirmed_pct:.2f}")
+    else:
+        confirmed_count = edb.get_analysis_timeseries_db().count_documents({"user_id": ue["uuid"], "metadata.key": "analysis/confirmed_trip", "data.user_input": {"$ne": {}}})
+        confirmed_pct = confirmed_count / trip_count
+        print(f"For {ue['user_email']}: Trip count = {trip_count}, location count = {location_count}, first trip = {first_trip_time}, last trip = {last_trip_time}, confirmed_pct  = approximately {confirmed_pct:.2f}")
