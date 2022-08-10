@@ -314,14 +314,14 @@ class User(object):
     return deltaCarbon + 0.5
 
   @staticmethod
-  def computeConfirmed(user_id):
+  def computeConfirmed(user_id, time_query=None):
     """
     Computers carbon metric for specified user.
     Formula is (Actual CO2 + penalty) / distance travelled
     """
     ts = esta.TimeSeries.get_time_series(user_id)
 
-    ct_df = ts.get_data_df("analysis/confirmed_trip", time_query=None)
+    ct_df = ts.get_data_df("analysis/confirmed_trip", time_query)
     if ct_df.shape[0] <= 0:
       return (0, None, None)
     ct_df_confirmed = esdt.has_final_labels_df(ct_df)
