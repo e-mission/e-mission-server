@@ -25,7 +25,7 @@ def destination_features(trip: ecwc.Confirmedtrip) -> List[float]:
         destination = trip['data']['end_loc']["coordinates"]
         return destination
     except KeyError as e:
-        msg = 'Confirmedtrip expected to have path data.start_loc.coordinates'
+        msg = 'Confirmedtrip expected to have path data.end_loc.coordinates'
         raise KeyError(msg) from e
     
 
