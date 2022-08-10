@@ -118,14 +118,14 @@ class GreedySimilarityBinning(eamuu.TripModel):
     def predict(self, trip: ecwc.Confirmedtrip) -> Tuple[List[Dict], int]:
 
         logging.debug(f"running greedy similarity clustering")
-        predicted_bin, bin_record = self._nearest_bin(trip)
-        if predicted_bin is None:
+        predicted_bin_id, predicted_bin_record = self._nearest_bin(trip)
+        if predicted_bin_id is None:
             logging.debug(f"unable to predict bin for trip {trip}")
-            return [], -1
+            return [], 0
         else:
-            predictions = bin_record['predictions']
-            n_features = len(bin_record['features'])
-            logging.debug(f"found cluster {predicted_bin} with predictions {predictions}")
+            predictions = predicted_bin_record['predictions']
+            n_features = len(predicted_bin_record['features'])
+            logging.debug(f"found cluster {predicted_bin_id} with predictions {predictions}")
             return predictions, n_features
 
     def to_dict(self) -> Dict:
@@ -197,21 +197,15 @@ class GreedySimilarityBinning(eamuu.TripModel):
         logging.debug(f"_nearest_bin called")
 
         trip_features = self.extract_features(trip)
-        selected_bin = None
-        selected_record = None
         
         for bin_id, bin_record in self.bins.items():
             for bin_features in bin_record['features']:
                 if self.metric.similar(trip_features, bin_features, self.sim_thresh):
                     logging.debug(f"found nearest bin id {bin_id}")
                     logging.debug(f"similar: {trip_features}, {bin_features}")
-                    selected_bin = bin_id
-                    selected_record = bin_record
-                    break
-            if selected_bin is not None:
-                break
-                
-        return selected_bin, selected_record
+                    return bin_id, bin_record
+
+        return None, None
 
     def _apply_cutoff(self):
         """
