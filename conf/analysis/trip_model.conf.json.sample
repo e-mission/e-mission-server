@@ -1,0 +1,13 @@
+{
+    "model_type": "greedy",
+    "model_storage": "document_database",
+    "minimum_trips": 14,
+    "model_parameters": {
+        "greedy": {
+            "metric": "od_similarity",
+            "similarity_threshold_meters": 500,
+            "apply_cutoff": false,
+            "incremental_evaluation": false
+        }
+    }
+}
