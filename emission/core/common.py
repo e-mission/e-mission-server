@@ -40,8 +40,14 @@ def travel_date_time(time1,time2):
     return travel_time.seconds
 
 def calDistance(point1, point2, coordinates=False):
+    """haversine distance
 
-    earthRadius = 6371000
+    :param point1: a coordinate in degrees WGS84
+    :param point2: another coordinate in degrees WGS84
+    :param coordinates: if false, expect a list of coordinates, defaults to False
+    :return: distance approximately in meters
+    """
+    earthRadius = 6371000  # meters
     # SHANKARI: Why do we have two calDistance() functions?
     # Need to combine into one
     # points are now in geojson format (lng,lat)
