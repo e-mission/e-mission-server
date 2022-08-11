@@ -218,6 +218,12 @@ class GreedySimilarityBinning(eamuu.TripModel):
         # This was the last line of calc_cutoff_bins in the old code, and is moved to the equivalent of delete_bins in the new code
         bins_sorted =  self.bins.sort(key=lambda bin: len(bin['features']), reverse=True)
         
+
+
+# The first two lines below correspond to the original lines below in the original elbow_distance
+#         y = [0] * len(self.bins)
+#         for i in range(len(self.bins)):
+#             y[i] = len(self.bins[i])
         num_bins = len(bins_sorted)
         bin_sizes = [len(bin_rec['features']) for bin_rec in bins_sorted.values()]
         _, cutoff_bin_size = util.find_knee_point(bin_sizes)
