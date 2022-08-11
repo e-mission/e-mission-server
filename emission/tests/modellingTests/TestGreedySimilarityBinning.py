@@ -46,7 +46,7 @@ class TestGreedySimilarityBinning(unittest.TestCase):
         model.fit(trips)
 
         # $m trip features should appear together in one bin
-        at_least_one_large_bin = any(map(lambda b: len(b['features']) == m, model.bins.values()))
+        at_least_one_large_bin = any(map(lambda b: len(b['feature_rows']) == m, model.bins.values()))
         self.assertTrue(at_least_one_large_bin, "at least one bin should have at least 5 features in it")
 
     def testPrediction(self):

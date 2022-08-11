@@ -23,30 +23,57 @@ class GreedySimilarityBinning(eamuu.TripModel):
         [https://github.com/e-mission/e-mission-server/blob/5b9e608154de15e32df4f70a07a5b95477e7dbf5/emission/analysis/modelling/tour_model/similarity.py#L67]
 
         this technique employs a greedy similarity heuristic to associate
-        trips with collections of probabilistic class labels. in pseudocode:
+        trips with collections of probabilistic class labels. new bins are
+        created when the next feature vector is not similar to any existing bins.
+        for a new feature vector to be similar to an existing bin, it must be
+        similar to all of the previous feature vectors found in that bin, by way
+        of a provided similarity metric and threshold value.
+
+        in pseudocode:
         
         # fit
         for each bin_id, bin in bins:
-            for each bin_trip in bin.trips:
-                if similar(trip, bin_trip):
-                    append trip to bin.trips
+            for each bin_feature_row in bin.feature_rows:
+                if not similar(trip.feature_row, bin_feature_row):
+                    return
+                append trip to bin
+
+        the prediction of labels for some input trip takes a similar form,
+        where the first bin that is found to be similar is treated as the 
+        class label to apply:
 
         # prediction
         for each bin_id, bin in bins:
-            for each bin_trip in bin.trips:
-                if similar(trip, bin_trip):
-                    return bin.predictions: List[Prediction]
+            for each bin_feature_row in bin.feature_rows:
+                if not similar(trip.feature_row, bin_feature_row):
+                    break
+            return bin_id
 
-        the number of predictions is not assumed to be the number of features.
+        to train the predictions, label sets are aggregated within a bin so that
+        the occurences of some unique label combination is counted. the probability
+        of a specific unique label combination is assigned by the proportion
+        of counts of this unique label set to the total number of trips stored at
+        this bin. the set of unique label sets and their prediction value are then
+        returned during prediction.
 
-        the original similarity class (link above) used a nested List data 
+        in terms of the data structure of the model, each bin is a Dictionary with 
+        three fields, "feature_rows", "labels", and "predictions", each a list.
+        whereas the number and index of "feature_rows" and "labels" are assumed to 
+        match and be idempotent across multiple training calls, the "predictions" 
+        are over-written at each call of "fit" and are not assumed to match the number 
+        of "feature_rows" or "labels" stored in a bin.
+
+        historical note: the original similarity class (link above) used a nested list data 
         structure to capture the notion of binning. this was then copied into
-        a Dict when the model needed to be saved. the same technique can be 
-        written to work directly on nested Dicts with no loss in performance. 
+        a Dict when the model needed to be saved. the same technique can be re-written to 
+        work directly on Dictionaries with no loss in the algorithm's time complexity. this 
+        also helps when running in incremental mode to persist relevant training data and to
+        minimize codec + serialization errors.
+
         the data takes the form:
         {
             bin_id: {
-                "features": [
+                "feature_rows": [
                     [f1, f2, .., fn],
                     ...
                 ],
@@ -124,7 +151,7 @@ class GreedySimilarityBinning(eamuu.TripModel):
             return [], 0
         else:
             predictions = predicted_bin_record['predictions']
-            n_features = len(predicted_bin_record['features'])
+            n_features = len(predicted_bin_record['feature_rows'])
             logging.debug(f"found cluster {predicted_bin_id} with predictions {predictions}")
             return predictions, n_features
 
@@ -155,15 +182,15 @@ class GreedySimilarityBinning(eamuu.TripModel):
             if bin_id is not None:
                 # add to existing bin
                 logging.debug(f"adding trip to bin {bin_id} with features {trip_features}")
-                self.bins[bin_id]['features'].append(trip_features)
+                self.bins[bin_id]['feature_rows'].append(trip_features)
                 self.bins[bin_id]['labels'].append(trip_labels)
             else:
                 # create new bin
                 new_bin_id = str(len(self.bins))
                 new_bin_record = {
-                    "features": [trip_features],
-                    "labels": [trip_labels],
-                    "predictions": []
+                    'feature_rows': [trip_features],
+                    'labels': [trip_labels],
+                    'predictions': []
                 }
                 logging.debug(f"creating new bin {new_bin_id} at location {trip_features}")
                 self.bins[new_bin_id] = new_bin_record
@@ -178,7 +205,7 @@ class GreedySimilarityBinning(eamuu.TripModel):
         """
         for bin_id, bin_record in self.bins.items():
                 matches_bin = all([self.metric.similar(trip_features, bin_sample, self.sim_thresh)
-                    for bin_sample in bin_record['features']])
+                    for bin_sample in bin_record['feature_rows']])
                 if matches_bin:
                     return bin_id
         return None
@@ -199,7 +226,7 @@ class GreedySimilarityBinning(eamuu.TripModel):
         trip_features = self.extract_features(trip)
         
         for bin_id, bin_record in self.bins.items():
-            for bin_features in bin_record['features']:
+            for bin_features in bin_record['feature_rows']:
                 if self.metric.similar(trip_features, bin_features, self.sim_thresh):
                     logging.debug(f"found nearest bin id {bin_id}")
                     logging.debug(f"similar: {trip_features}, {bin_features}")
@@ -216,7 +243,7 @@ class GreedySimilarityBinning(eamuu.TripModel):
         # the cutoff point is an index along the sorted bins. any bin with a gte
         # index value is removed, as that bin has been found to be smaller than the cutoff.
         # This was the last line of calc_cutoff_bins in the old code, and is moved to the equivalent of delete_bins in the new code
-        bins_sorted =  self.bins.sort(key=lambda bin: len(bin['features']), reverse=True)
+        bins_sorted =  self.bins.sort(key=lambda bin: len(bin['feature_rows']), reverse=True)
         
 
 
@@ -225,7 +252,7 @@ class GreedySimilarityBinning(eamuu.TripModel):
 #         for i in range(len(self.bins)):
 #             y[i] = len(self.bins[i])
         num_bins = len(bins_sorted)
-        bin_sizes = [len(bin_rec['features']) for bin_rec in bins_sorted.values()]
+        bin_sizes = [len(bin_rec['feature_rows']) for bin_rec in bins_sorted.values()]
         _, cutoff_bin_size = util.find_knee_point(bin_sizes)
         logging.debug(
             "bins = %s, elbow distance = %s" % (num_bins, cutoff_bin_size)
@@ -233,7 +260,7 @@ class GreedySimilarityBinning(eamuu.TripModel):
 
         updated_bins = {bin_id: bin_rec 
                         for bin_id, bin_rec in bins_sorted.items() 
-                        if len(bin_rec['features']) >= cutoff_bin_size}
+                        if len(bin_rec['feature_rows']) >= cutoff_bin_size}
 
         removed = len(bins_sorted) - len(updated_bins)
         logging.debug(

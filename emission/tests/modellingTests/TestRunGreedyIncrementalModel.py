@@ -186,13 +186,13 @@ class TestRunGreedyModel(unittest.TestCase):
         self.assertEqual(len(updated_model.bins), 3, 
             'there should be three bins, one with 2 similar trips, and two singleton bins')
 
-        trips_in_bin = len(updated_model.bins['0']['features'])
-        print(f'trips in bins: {[len(x["features"]) for x in updated_model.bins.values()]}')
+        trips_in_bin = len(updated_model.bins['0']['feature_rows'])
+        print(f'trips in bins: {[len(x["feature_vectors"]) for x in updated_model.bins.values()]}')
         self.assertEqual(trips_in_bin, self.expected_trips,
             'expected number of trips stored in bin')
 
-        self.assertEqual(len(updated_model.bins['1']['features']), 1,
+        self.assertEqual(len(updated_model.bins['1']['feature_rows']), 1,
             'the second bin should have exactly one entry (an outlier)')
-        self.assertEqual(len(updated_model.bins['2']['features']), 1,
+        self.assertEqual(len(updated_model.bins['2']['feature_rows']), 1,
             'the third bin should have exactly one entry (an outlier)')
         
