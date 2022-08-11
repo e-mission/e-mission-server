@@ -185,7 +185,7 @@ class GreedySimilarityBinning(eamuu.TripModel):
 
     def _nearest_bin(self, trip: ecwc.Confirmedtrip) -> Tuple[Optional[int], Optional[Dict]]:
         """
-        finds a bin which contains at least one matching feature. the 
+        finds a bin which contains at least all matching features. the 
         first record matching by similarity measure is returned. if
         none are found, (None, None) is returned.
 
@@ -211,9 +211,11 @@ class GreedySimilarityBinning(eamuu.TripModel):
         """
         removes small clusters by an "elbow search" heuristic. see
         https://stackoverflow.com/a/2022348/4803266.
+        Copied over from https://github.com/e-mission/e-mission-server/blob/5b9e608154de15e32df4f70a07a5b95477e7dbf5/emission/analysis/modelling/tour_model/similarity.py#L158
         """
         # the cutoff point is an index along the sorted bins. any bin with a gte
         # index value is removed, as that bin has been found to be smaller than the cutoff.
+        # This was the last line of calc_cutoff_bins in the old code, and is moved to the equivalent of delete_bins in the new code
         bins_sorted =  self.bins.sort(key=lambda bin: len(bin['features']), reverse=True)
         
         num_bins = len(bins_sorted)
