@@ -37,22 +37,21 @@ COLORS = [
 ]
 
 
-def find_plot_clusters(
-        user_df,
-        loc_type,
-        alg,
-        SVM=False,
-        radii=[50, 100, 150, 200],
-        cluster_unlabeled=False,
-        plot_unlabeled=False,
-        #    optics_min_samples=None,
-        optics_xi=0.05,
-        optics_cluster_method='xi',
-        svm_min_size=6,
-        svm_purity_thresh=0.7,
-        svm_gamma=0.05,
-        svm_C=1,
-        map_loc=MTV_COORD):
+def find_plot_clusters(user_df,
+                       loc_type,
+                       alg,
+                       SVM=False,
+                       radii=[50, 100, 150, 200],
+                       cluster_unlabeled=False,
+                       plot_unlabeled=False,
+                       optics_min_samples=None,
+                       optics_xi=0.05,
+                       optics_cluster_method='xi',
+                       svm_min_size=6,
+                       svm_purity_thresh=0.7,
+                       svm_gamma=0.05,
+                       svm_C=1,
+                       map_loc=MTV_COORD):
     """ Plot points and clusters on a folium map. 
             
         Points with the same purpose will have the same color (unless there are more purposes than available colors in folium, in which case some colors may be duplicated). Hovering over a point will also reveal the purpose in the tooltip. 
@@ -64,7 +63,7 @@ def find_plot_clusters(
                 'start_loc', 'end_loc', 'user_input'
             loc_type (str): 'start' or 'end', the type of points to cluster
             alg (str): the clustering algorithm to be used. must be one of the 
-                following: 'DBSCAN', 'oursim', 'OPTICS', 'SVM', 'fuzzy' or
+                following: 'DBSCAN', 'naive', 'OPTICS', 'SVM', 'fuzzy' or
                 'mean_shift'
             SVM (bool): whether or not to sub-divide clusters with SVM
             radii (int list): list of radii to pass to the clustering alg
@@ -99,7 +98,7 @@ def find_plot_clusters(
     fig_index = 0
 
     # clean up the dataframe by dropping entries with NaN locations and
-    # reset index (because oursim needs the position of each trip to match
+    # reset index (because naive needs the position of each trip to match
     # its nominal index)
     all_trips_df = user_df.dropna(subset=['start_loc', 'end_loc']).reset_index(
         drop=True)
@@ -124,7 +123,7 @@ def find_plot_clusters(
         # cluster_unlabeled=cluster_unlabeled,
         loc_type=loc_type,
         min_samples=1,
-        # optics_min_samples=optics_min_samples,
+        optics_min_samples=optics_min_samples,
         optics_xi=optics_xi,
         optics_cluster_method=optics_cluster_method,
         svm_min_size=svm_min_size,
@@ -166,12 +165,16 @@ def find_plot_clusters(
                 df_for_cluster[f"{loc_type}_{alg}_clusters_{r}_m"] == c]
 
             if np.isnan(c):
-                print(points_in_cluster)
-                print(df_for_cluster[df_for_cluster[
-                    f"{loc_type}_{alg}_clusters_{r}_m"].isnull()])
-                raise Exception(
-                    'nan cluster detected; all trips should have a proper cluster index'
-                )
+                # if False:
+                if len(points_in_cluster) == 0:
+                    continue
+                else:
+                    print(points_in_cluster)
+                    print(df_for_cluster[df_for_cluster[
+                        f"{loc_type}_{alg}_clusters_{r}_m"].isnull()])
+                    raise Exception(
+                        'nan cluster detected; all trips should have a proper cluster index'
+                    )
             m = plot_cluster_border(
                 points_in_cluster,
                 loc_type=loc_type,

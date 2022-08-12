@@ -20,7 +20,7 @@ import emission.storage.decorations.trip_queries as esdtq
 EARTH_RADIUS = 6371000
 ALG_OPTIONS = [
     'DBSCAN',
-    'oursim',
+    'naive',
     'OPTICS',
     # 'fuzzy',
     'mean_shift'
@@ -35,7 +35,7 @@ def add_loc_clusters(
         SVM=False,
         #  cluster_unlabeled=False,
         min_samples=1,
-        # optics_min_samples=None,
+        optics_min_samples=None,
         optics_xi=0.05,
         optics_cluster_method='xi',
         svm_min_size=6,
@@ -53,7 +53,7 @@ def add_loc_clusters(
                 or 'end_lat' and 'end_lon'
             radii (int list): list of radii to run the clustering algs with
             loc_type (str): 'start' or 'end'
-            alg (str): 'DBSCAN', 'oursim', 'OPTICS', 'SVM', 'fuzzy', or
+            alg (str): 'DBSCAN', 'naive', 'OPTICS', 'SVM', 'fuzzy', or
                 'mean_shift'
             SVM (bool): whether or not to sub-divide clusters with SVM
             # cluster_unlabeled (bool): whether or not unlabeled points are used 
@@ -95,8 +95,7 @@ def add_loc_clusters(
             # ints)
             loc_df.loc[:, f"{loc_type}_DBSCAN_clusters_{r}_m"] = labels
 
-
-    elif alg == 'oursim':
+    elif alg == 'naive':
         for r in radii:
             # this is using a modified Similarity class that bins start/end
             # points separately before creating trip-level bins
@@ -117,13 +116,13 @@ def add_loc_clusters(
             loc_df.loc[:, f"{loc_type}_{alg}_clusters_{r}_m"] = labels
 
     elif alg == 'OPTICS':
-        # if optics_min_samples == None:
-        #     optics_min_samples = 2
+        if optics_min_samples == None:
+            optics_min_samples = 2
         dist_matrix_meters = get_distance_matrix(loc_df, loc_type)
 
         for r in radii:
             labels = sc.OPTICS(
-                min_samples=min_samples,
+                min_samples=optics_min_samples,
                 max_eps=r,
                 xi=optics_xi,
                 cluster_method=optics_cluster_method,
