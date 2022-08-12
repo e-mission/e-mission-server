@@ -136,6 +136,7 @@ class TestRunGreedyModel(unittest.TestCase):
         clean up database entries related to this test
         """
         edb.get_analysis_timeseries_db().delete_many({'user_id': self.user_id})
+        edb.get_model_db().delete_many({'user_id': self.user_id})
         edb.get_pipeline_state_db().delete_many({'user_id': self.user_id})
 
     def testIncrementalRun(self):
@@ -195,4 +196,3 @@ class TestRunGreedyModel(unittest.TestCase):
             'the second bin should have exactly one entry (an outlier)')
         self.assertEqual(len(updated_model.bins['2']['feature_rows']), 1,
             'the third bin should have exactly one entry (an outlier)')
-        

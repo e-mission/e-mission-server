@@ -212,6 +212,27 @@ def get_non_user_timeseries_db():
     _create_analysis_result_indices(NonUserTimeSeries)
     return NonUserTimeSeries
 
+def get_model_db():
+    """
+    " Let's create a separate model DB to store periodically updated documents
+    " This has a fundamentally different access pattern than the existing databases:
+    " Timeseries_DB: - essentially read-only from an analysis perspective,
+    " Analysis_DB: - essentially write-once from an analysis perspective (except for confirmed trip)
+    " There are also many entries for each user in both these databases, since they represent timelines.
+    "
+    " The new model_db will effectively be write_many, since it will be
+    " rewritten every time we retrain models. It will also have only a few entries per user.
+    " Note that we may not actually rewrite the model every time, instead
+    " choosing to keep a short history of a few archived models. However, we
+    " will eventually delete them. This means that the elements are essentially
+    " getting updated, only over time and as a log-structured filesystem.
+    """
+    ModelDB = _get_current_db().Stage_updateable_models
+    ModelDB.create_index([("user_id", pymongo.ASCENDING)])
+    ModelDB.create_index([("metadata.key", pymongo.ASCENDING)])
+    ModelDB.create_index([("metadata.write_ts", pymongo.DESCENDING)])
+    return ModelDB
+
 def _create_analysis_result_indices(tscoll):
     tscoll.create_index([("metadata.key", pymongo.ASCENDING)])
 
