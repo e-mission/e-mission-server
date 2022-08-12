@@ -652,7 +652,7 @@ class NaiveBinningClassifier(TripClassifier):
         self.bins = bins
 
         # save all user labels
-        user_id = train_df.user_id[0]
+        user_id = train_df.user_id.iloc[0]
         bsm.save_models('user_labels',
                         bsm.create_user_input_map(train_trips, bins), user_id)
 
