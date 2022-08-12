@@ -181,7 +181,8 @@ class TripClassifier(SetupMixin, metaclass=ABCMeta):
                                          ('mode', 'top_proba'),
                                          ('replaced', 'top_pred'),
                                          ('replaced', 'top_proba')]]
-
+        
+        prediction_df.columns = prediction_df.columns.to_flat_index()
         prediction_df = prediction_df.rename(
             columns={
                 ('purpose', 'top_pred'): 'purpose_pred',
