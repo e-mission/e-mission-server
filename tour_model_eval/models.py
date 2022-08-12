@@ -15,6 +15,15 @@ from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.exceptions import NotFittedError
 
+# hack because jupyter notebook doesn't work properly through my vscode for
+# some reason and therefore cant import stuff from emission? remove this before
+# pushing
+###
+import sys
+
+sys.path.append('/Users/hlu2/Documents/GitHub/e-mission-server/')
+###
+
 # our imports
 from clustering import get_distance_matrix, single_cluster_purity
 import data_wrangling
@@ -42,7 +51,8 @@ class SetupMixin(metaclass=ABCMeta):
         """ Set the parameters of the estimator.  
 
             Args: 
-                params (dict): dictionary where the keys are the param names (strings) and the values are the parameter inputs
+                params (dict): dictionary where the keys are the param names 
+                    (strings) and the values are the parameter inputs
             
             Returns:
                 self
@@ -55,7 +65,10 @@ class SetupMixin(metaclass=ABCMeta):
             columns, ensure all essential columns are present)
 
             Args:
-                df: a dataframe of trips. must contain the columns 'start_loc', 'end_loc', and should also contain the user input columns ('mode_confirm', 'purpose_confirm', 'replaced_mode') if available
+                df: a dataframe of trips. must contain the columns 'start_loc', 
+                'end_loc', and should also contain the user input columns 
+                ('mode_confirm', 'purpose_confirm', 'replaced_mode') if 
+                available
         """
         assert 'start_loc' in df.columns and 'end_loc' in df.columns
 
@@ -130,7 +143,8 @@ class Cluster(SetupMixin, metaclass=ABCMeta):
                 test_df (DataFrame): dataframe of test trips
             
             Returns:
-                pd DataFrame containing one column, 'start_cluster_idx' or 'end_cluster_idx'
+                pd DataFrame containing one column, 'start_cluster_idx' or 
+                'end_cluster_idx'
         """
         raise NotImplementedError
 
@@ -142,7 +156,8 @@ class Cluster(SetupMixin, metaclass=ABCMeta):
                 train_df (DataFrame): dataframe of labeled trips
             
             Returns:
-                pd DataFrame containing one column, 'start_cluster_idx' or 'end_cluster_idx'
+                pd DataFrame containing one column, 'start_cluster_idx' or 
+                'end_cluster_idx'
         """
         self.fit(train_df)
         return self.predict(train_df)
@@ -170,9 +185,12 @@ class TripClassifier(SetupMixin, metaclass=ABCMeta):
             
             Returns:
                 DataFrame containing the following columns: 
-                    'purpose_pred', 'mode_pred', 'replaced_pred', 'purpose_proba', 'mode_proba', 'replaced_proba'
-                the *_pred columns contain the most-likely label prediction (string for a label or float for np.nan). 
-                the *_proba columns contain the probability of the most-likely prediction. 
+                    'purpose_pred', 'mode_pred', 'replaced_pred', 
+                    'purpose_proba', 'mode_proba', 'replaced_proba'
+                the *_pred columns contain the most-likely label prediction 
+                (string for a label or float for np.nan). 
+                the *_proba columns contain the probability of the most-likely 
+                prediction. 
         """
         proba_df = self.predict_proba(test_df)
         prediction_df = proba_df.loc[:, [('purpose', 'top_pred'),
@@ -181,7 +199,7 @@ class TripClassifier(SetupMixin, metaclass=ABCMeta):
                                          ('mode', 'top_proba'),
                                          ('replaced', 'top_pred'),
                                          ('replaced', 'top_proba')]]
-        
+
         prediction_df.columns = prediction_df.columns.to_flat_index()
         prediction_df = prediction_df.rename(
             columns={
@@ -203,9 +221,12 @@ class TripClassifier(SetupMixin, metaclass=ABCMeta):
             
             Returns:
                 DataFrame containing the following columns: 
-                    'purpose_pred', 'mode_pred', 'replaced_pred', 'purpose_proba', 'mode_proba', 'replaced_proba'
-                the *_pred columns contain the most-likely label prediction (string for a label or float for np.nan). 
-                the *_proba columns contain the probability of the most-likely prediction. 
+                    'purpose_pred', 'mode_pred', 'replaced_pred', 
+                    'purpose_proba', 'mode_proba', 'replaced_proba'
+                the *_pred columns contain the most-likely label prediction 
+                (string for a label or float for np.nan). 
+                the *_proba columns contain the probability of the most-likely 
+                prediction. 
         """
         self.fit(train_df)
         return self.predict(train_df)
@@ -218,8 +239,17 @@ class TripClassifier(SetupMixin, metaclass=ABCMeta):
                 test_df (DataFrame): dataframe of trips
             
             Returns:
-                DataFrame with multiindexing. Each row represents a trip. There are 3 columns at level 1, one for each label category ('purpose', 'mode', 'replaced'). Within each category, there is a column for each label, with the row's entry being the probability that the trip has the label. There are three additional columns within each category, one indicating the most-likely label, one indicating the probability of the most-likely label, and one indicating whether or not the trip can be clustered. 
-                TODO: add a fourth optional column for the number of trips in the cluster (if clusterable)
+                DataFrame with multiindexing. Each row represents a trip. There 
+                are 3 columns at level 1, one for each label category 
+                ('purpose', 'mode', 'replaced'). Within each category, there is 
+                a column for each label, with the row's entry being the 
+                probability that the trip has the label. There are three 
+                additional columns within each category, one indicating the 
+                most-likely label, one indicating the probability of the 
+                most-likely label, and one indicating whether or not the trip 
+                can be clustered. 
+                TODO: add a fourth optional column for the number of trips in 
+                the cluster (if clusterable)
 
                 Level 1 columns are: purpose, mode, replaced
                 Lebel 2 columns are: 
@@ -414,7 +444,8 @@ class DBSCANSVMCluster(Cluster):
 
     def fit(self, train_df):
         """ Creates clusters of trip points. 
-            self.train_df will be updated with columns containing base and final clusters. 
+            self.train_df will be updated with columns containing base and 
+            final clusters. 
 
             TODO: perhaps move the loc_type argument to fit() so we can use a 
             single class instance to cluster both start and end points. This 
@@ -555,16 +586,24 @@ class DBSCANSVMCluster(Cluster):
         n_samples = test_df.shape[0]
         labels = np.ones(shape=n_samples, dtype=int) * -1
 
-        # get coordinates of core points (we can't use model.components_ because our input feature was a distance matrix and doesn't contain info about the raw coordinates)
-        # NOTE: technically, every single point in a cluster is a core point because it has at least minPts (2) points, including itself, in its radius
+        # get coordinates of core points (we can't use model.components_
+        # because our input feature was a distance matrix and doesn't contain
+        # info about the raw coordinates)
+        # NOTE: technically, every single point in a cluster is a core point
+        # because it has at least minPts (2) points, including itself, in its
+        # radius
         train_coordinates = self.train_df[[
             f'{self.loc_type}_lat', f'{self.loc_type}_lon'
         ]]
         train_radians = np.radians(train_coordinates)
 
         for idx, row in test_df.reset_index(drop=True).iterrows():
-            # calculate the distances between the ith test data and all points, then find the index of the closest point. if the ith test data is within epsilon of the point, then assign its cluster to the ith test data (otherwise, leave it as -1, indicating noise)
-            # unfortunately, pairwise_distances_argmin() does not support haversine distance, so we have to reimplement it ourselves
+            # calculate the distances between the ith test data and all points,
+            # then find the index of the closest point. if the ith test data is
+            # within epsilon of the point, then assign its cluster to the ith
+            # test data (otherwise, leave it as -1, indicating noise).
+            # unfortunately, pairwise_distances_argmin() does not support
+            # haversine distance, so we have to reimplement it ourselves
             new_loc_radians = np.radians(
                 row[[self.loc_type + "_lat",
                      self.loc_type + "_lon"]].to_list())
@@ -689,7 +728,9 @@ class NaiveBinningClassifier(TripClassifier):
     def _trip_df_to_list(self, trip_df):
         """ Converts a dataframe of trips into a list of trip Entry objects. 
 
-            Allows this class to accept DataFrames (which are used by the new clustering algorithms) without having to refactor the old clustering algorithm. 
+            Allows this class to accept DataFrames (which are used by the new 
+            clustering algorithms) without having to refactor the old 
+            clustering algorithm. 
         
             Args:
                 trip_df: DataFrame containing trips. See code below for the 
@@ -744,8 +785,9 @@ class ClusterExtrapolationClassifier(TripClassifier):
                 to be sub-divided using SVM
             gamma (float): coefficient for the rbf kernel in SVM
             C (float): regularization hyperparameter for SVM
-            cluster_method (str): 'end', 'trip', 'combination'. whether to extrapolate labels from only end clusters, only trip clusters, or 
-                both end and trip clusters when available.
+            cluster_method (str): 'end', 'trip', 'combination'. whether to 
+                extrapolate labels from only end clusters, only trip clusters, 
+                or both end and trip clusters when available.
     """
 
     def __init__(
@@ -848,7 +890,8 @@ class ClusterExtrapolationClassifier(TripClassifier):
 
     def predict_proba(self, test_df):
         self.end_cluster_model.predict(test_df)
-        # store a copy of test_df for now (TODO: make this more efficient since the data is duplicated)
+        # store a copy of test_df for now (TODO: make this more efficient since
+        # the data is duplicated)
         self.test_df = self.end_cluster_model.test_df
 
         if self.cluster_method in ['trip', 'combination']:
@@ -873,14 +916,23 @@ class ClusterExtrapolationClassifier(TripClassifier):
                 self.test_df, cluster_col)
 
         else:  # self.cluster_method == 'combination'
-            # try to get label distributions from trip-level clusters first, because trip-level clusters tend to be more homogenous and will yield more accurate predictions
+            # try to get label distributions from trip-level clusters first,
+            # because trip-level clusters tend to be more homogenous and will
+            # yield more accurate predictions
             self.test_df = self._add_label_distributions(
                 self.test_df, 'trip_cluster_idx')
 
-            # for trips that have an empty label-distribution after the first pass using trip clusters, try to get a distribution from the destination cluster (this includes both trips that *don't* fall into a trip cluster, as well as trips that *do* fall into a trip cluster but are missing some/all categories of labels due to missing user inputs.)
+            # for trips that have an empty label-distribution after the first
+            # pass using trip clusters, try to get a distribution from the
+            # destination cluster (this includes both trips that *don't* fall
+            # into a trip cluster, as well as trips that *do* fall into a trip
+            # cluster but are missing some/all categories of labels due to
+            # missing user inputs.)
 
             # fill in missing label-distributions by the label_type
-            # (we want to iterate by label_type rather than check cluster idx because it's possible that some trips in a trip-cluster have predictions for one label_type but not another)
+            # (we want to iterate by label_type rather than check cluster idx
+            # because it's possible that some trips in a trip-cluster have
+            # predictions for one label_type but not another)
             for label_type in ['mode', 'purpose', 'replaced']:
                 self.test_df.loc[self.test_df[f'{label_type}_distrib'] ==
                                  {}] = self._add_label_distributions(
@@ -1123,7 +1175,8 @@ class EnsembleClassifier(TripClassifier, metaclass=ABCMeta):
         # and use both purpose and mode data to aid our replaced-mode
         # predictions
 
-        # TODO: some of the code across the try and except blocks can be consolidated by considering one-hot encoding fully np.nan arrays
+        # TODO: some of the code across the try and except blocks can be
+        # consolidated by considering one-hot encoding fully np.nan arrays
         try:
             purpose_proba_raw = self.purpose_predictor.predict_proba(
                 self.X_test_for_purpose)
@@ -1159,12 +1212,14 @@ class EnsembleClassifier(TripClassifier, metaclass=ABCMeta):
         mode_pred = mode_proba.idxmax(axis=1)
         replaced_pred = replaced_proba.idxmax(axis=1)
 
-        if purpose_pred.dtype == np.float64 and mode_pred.dtype == np.float64 and replaced_pred.dtype == np.float64:
+        if (purpose_pred.dtype == np.float64 and mode_pred.dtype == np.float64
+                and replaced_pred.dtype == np.float64):
             # this indicates that all the predictions are np.nan so none of the
             # random forest classifiers were fitted
             raise NotFittedError
 
-        # TODO: move this to a Mixin for cluster-based predictors and use the 'cluster' column of the proba_df outputs
+        # TODO: move this to a Mixin for cluster-based predictors and use the
+        # 'cluster' column of the proba_df outputs
         # if self.drop_unclustered:
         #     # TODO: actually, we should only drop purpose predictions. we can
         #     # then impute the missing entries in the purpose feature and still
@@ -1255,7 +1310,8 @@ class EnsembleClassifier(TripClassifier, metaclass=ABCMeta):
                                       columns=self.mode_predictor.classes_)
             mode_pred = mode_proba.idxmax(axis=1)
 
-            # update X_test with one-hot-encoded mode predictions to aid replaced-mode predictor
+            # update X_test with one-hot-encoded mode predictions to aid
+            # replaced-mode predictor
             onehot_mode_df = self.mode_enc.transform(
                 pd.DataFrame(mode_pred).set_index(self.X_test_for_mode.index))
             self.X_test_for_replaced = pd.concat(
@@ -1312,8 +1368,11 @@ class EnsembleClassifier(TripClassifier, metaclass=ABCMeta):
         train_radians = np.radians(train_coordinates)
 
         for idx, row in test_df.reset_index(drop=True).iterrows():
-            # calculate the distances between the ith test data and all points, then find the minimum distance for each point and check if it's within the distance threshold.
-            # unfortunately, pairwise_distances_argmin() does not support haversine distance, so we have to reimplement it ourselves
+            # calculate the distances between the ith test data and all points,
+            # then find the minimum distance for each point and check if it's
+            # within the distance threshold.
+            # unfortunately, pairwise_distances_argmin() does not support
+            # haversine distance, so we have to reimplement it ourselves
             new_loc_radians = np.radians(row[["end_lat", "end_lon"]].to_list())
             new_loc_radians = np.reshape(new_loc_radians, (1, 2))
             dist_matrix_meters = haversine_distances(
@@ -1352,7 +1411,8 @@ class ForestClassifier(EnsembleClassifier):
                 internal node in a decision tree
             min_samples_leaf (int): min number of samples required for a leaf 
                 node in a decision tree
-            max_features (str): number of features to consider when looking for the best split in a decision tree
+            max_features (str): number of features to consider when looking for 
+                the best split in a decision tree
             bootstrap (bool): whether bootstrap samples are used when building 
                 decision trees
             random_state (int): random state for deterministic random forest 
@@ -1551,7 +1611,8 @@ class ClusterForestSlimPredictor(ForestClassifier):
                 internal node in a decision tree
             min_samples_leaf (int): min number of samples required for a leaf 
                 node in a decision tree
-            max_features (str): number of features to consider when looking for the best split in a decision tree
+            max_features (str): number of features to consider when looking for 
+                the best split in a decision tree
             bootstrap (bool): whether bootstrap samples are used when building 
                 decision trees
             random_state (int): random state for deterministic random forest 
@@ -1614,14 +1675,16 @@ class AdaBoostClassifier(EnsembleClassifier):
             C (float): regularization hyperparameter for SVM. only if 
                 loc_feature=='cluster'
             n_estimators (int): number of estimators
-            criterion (str): function to measure the quality of a split in a decision tree
+            criterion (str): function to measure the quality of a split in a 
+                decision tree
             max_depth (int): max depth of a tree in the random forest. 
                 unlimited if None. 
             min_samples_split (int): min number of samples required to split an 
                 internal node in a decision tree
             min_samples_leaf (int): min number of samples required for a leaf 
                 node in a decision tree
-            max_features (str): number of features to consider when looking for the best split in a decision tree
+            max_features (str): number of features to consider when looking for 
+                the best split in a decision tree
             random_state (int): random state for deterministic random forest 
                 construction
             use_start_clusters (bool): whether or not to use start clusters as 
