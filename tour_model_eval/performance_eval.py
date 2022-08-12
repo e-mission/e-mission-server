@@ -43,65 +43,32 @@ RADIUS = 500
 PREDICTORS = {
     # key: model name
     # value: (model class, model params)
-    # 'old clustering r100m': (models.OldClusteringPredictor, {
-    #     'radius': 100,
-    # }),
-    # 'new clustering by end r100m': (models.ClusterOnlyPredictor, {
-    #     'cluster_method': 'end',
-    #     'radius': 100,
-    # }),
-    # 'new clustering by trip r100m': (models.ClusterOnlyPredictor, {
-    #     'cluster_method': 'trip',
-    #     'radius': 100,
-    # }),
-    # 'new clustering by combo r100m': (models.ClusterOnlyPredictor, {
-    #     'cluster_method': 'combination',
-    #     'radius': 100,
-    # }),
-    # 'random forest with end r100m': (models.ClusterForestPredictor, {
-    #     'use_start_clusters': False,
-    #     'use_trip_clusters': False,
-    #     'drop_unclustered': False,
-    #     'radius': 100,
-    # }),
-    # 'random forest with end and trip r100m': (models.ClusterForestPredictor, {
-    #     'use_start_clusters': False,
-    #     'use_trip_clusters': True,
-    #     'drop_unclustered': False,
-    #     'radius': 100,
-    # }),
-    # 'random forest with start end r100m': (models.ClusterForestPredictor, {
-    #     'use_start_clusters': True,
-    #     'use_trip_clusters': False,
-    #     'drop_unclustered': False,
-    #     'radius': 100,
-    # }),
-    # 'random forest with start end trip r100m': (models.ClusterForestPredictor, {
-    #     'use_start_clusters': True,
-    #     'use_trip_clusters': True,
-    #     'drop_unclustered': False,
-    #     'radius': 100,
-    # }),
-    # 'random forest with end and trip, drop unclustered r100m':
-    # (models.ClusterForestPredictor, {
-    #     'use_start_clusters': False,
-    #     'use_trip_clusters': True,
-    #     'drop_unclustered': True,
-    #     'radius': 100,
-    # }),
-    'new clustering by end r150m': (models.ClusterOnlyPredictor, {
+    'DBSCAN+SVM (destination)': (models.ClusterExtrapolationClassifier, {
+        'alg': 'DBSCAN',
+        'svm': True,
         'cluster_method': 'end',
         'radius': 150,
     }),
-    'new clustering by trip r150m': (models.ClusterOnlyPredictor, {
+    'DBSCAN+SVM (O-D)': (models.ClusterExtrapolationClassifier, {
+        'alg': 'DBSCAN',
+        'svm': True,
         'cluster_method': 'trip',
         'radius': 150,
     }),
-    'new clustering by combo r150m': (models.ClusterOnlyPredictor, {
+    'DBSCAN+SVM (O-D, destination)': (models.ClusterExtrapolationClassifier, {
+        'alg': 'DBSCAN',
+        'svm': True,
         'cluster_method': 'combination',
         'radius': 150,
     }),
-    'random forest with end r150m': (models.ClusterForestPredictor, {
+    'DBSCAN-only (O-D, destination)': (models.ClusterExtrapolationClassifier, {
+        'alg': 'DBSCAN',
+        'svm': False,
+        'cluster_method': 'combination',
+        'radius': 150,
+    }),
+    'random forests (destination clusters)': (models.ForestClassifier, {
+        'loc_feature': 'cluster',
         'n_estimators': 100,
         'max_depth': None,
         'min_samples_split': 2,
@@ -113,7 +80,8 @@ PREDICTORS = {
         'drop_unclustered': False,
         'radius': 150,
     }),
-    'random forest with end and trip r150m': (models.ClusterForestPredictor, {
+    'random forests (O-D, destination clusters)': (models.ForestClassifier, {
+        'loc_feature': 'cluster',
         'n_estimators': 100,
         'max_depth': None,
         'min_samples_split': 2,
@@ -125,47 +93,8 @@ PREDICTORS = {
         'drop_unclustered': False,
         'radius': 150,
     }),
-    # 'random forest with start end r150m': (models.ClusterForestPredictor, {
-    #     'use_start_clusters': True,
-    #     'use_trip_clusters': False,
-    #     'drop_unclustered': False,
-    #     'radius': 150,
-    # }),
-    # 'random forest with start end trip r150m':
-    # (models.ClusterForestPredictor, {
-    #     'n_estimators': 100,
-    #     'max_depth': None,
-    #     'min_samples_split': 2,
-    #     'min_samples_leaf': 1,
-    #     'max_features': 'sqrt',
-    #     'bootstrap': False,
-    #     'use_start_clusters': True,
-    #     'use_trip_clusters': True,
-    #     'drop_unclustered': False,
-    #     'radius': 150,
-    # }),
-    'random forest with end and trip, drop unclustered r150m':
-    (models.ClusterForestPredictor, {
-        'n_estimators': 100,
-        'max_depth': None,
-        'min_samples_split': 2,
-        'min_samples_leaf': 1,
-        'max_features': 'sqrt',
-        'bootstrap': False,
-        'use_start_clusters': False,
-        'use_trip_clusters': True,
-        'drop_unclustered': True,
-        'radius': 150,
-    }),
-    'random forest, no clustering v1': (models.BasicForestPredictor, {
-        'n_estimators': 100,
-        'max_depth': None,
-        'min_samples_split': 2,
-        'min_samples_leaf': 1,
-        'max_features': 'sqrt',
-        'bootstrap': True,
-    }),
-    'random forest, no clustering v2': (models.BasicForestPredictor, {
+    'random forests (coordinates)': (models.ForestClassifier, {
+        'loc_feature': 'coordinates',
         'n_estimators': 100,
         'max_depth': None,
         'min_samples_split': 2,
@@ -173,9 +102,18 @@ PREDICTORS = {
         'max_features': 'log2',
         'bootstrap': False,
     }),
-    # 'adaboost basic': (models.ClusterAdaBoostPredictor, {}),
-    'old clustering r150m': (models.OldClusteringPredictor, {
+    'fixed-width (O-D)': (
+        models.NaiveBinningClassifier,
+        {
+            # this implementation of the fixed-width algorithm is faster than
+            # ClusterExtrapolationClassifier, but only works for O-D pairs (does
+            # not work for destination-only or O-D + destination extrapolation)
+            'radius': 150,
+        }),
+    'fixed-width (O-D, destination)': (models.ClusterExtrapolationClassifier, {
+        'alg': 'naive',
         'radius': 150,
+        'cluster_method': 'combination',
     }),
 }
 
@@ -624,7 +562,7 @@ def get_cluster_metrics(expanded_all_trip_df_map,
             user_list (UUID list): list of user UUIDs to test on
             radii (int list): list of radii to run the clustering algs with
             loc_type (str): 'start' or 'end'
-            algs (str list): may contain 'DBSCAN', 'oursim', 'OPTICS', or 'mean_shift'
+            algs (str list): may contain 'DBSCAN', 'naive', 'OPTICS', or 'mean_shift'
             param_grid (dict): dictionary of dictionaries. keys in the outer 
                 dictionary are the alg name. keys in the inner dictionary are the param names. values in the inner dictionary are lists of parameters to test. 
                 for example: 
@@ -642,7 +580,7 @@ def get_cluster_metrics(expanded_all_trip_df_map,
                         'gamma': [0.05, 0.01, 0.1],
                         'C': [1, 0.5, 2],
                     },
-                    'oursim' : {},
+                    'naive' : {},
                     'OPTICS' : {
                         'min_samples' : [2, 3, 4],
                         'xi' : [0.95, 0.9, 9.85, 0.8, 0.75],
