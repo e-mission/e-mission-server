@@ -34,7 +34,7 @@ class BuiltinModelStorage(esma.ModelStorage):
         :return: the most recent database entry for this key
         """
         find_query = {"user_id": self.user_id, "metadata.key": key}
-        result_it = edb.get_model_db().find(find_query).limit(1)
+        result_it = edb.get_model_db().find(find_query).sort("metadata.write_ts", -1).limit(1)
         # this differs from the timeseries `get_first_entry` only in the find query
         # and the fact that the sort key and sort order are hardcoded
         # everything below this point is identical
