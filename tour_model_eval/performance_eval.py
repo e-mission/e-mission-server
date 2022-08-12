@@ -182,9 +182,7 @@ PREDICTORS = {
 
 def cross_val_predict(model,
                       model_params=None,
-                      data_type='dataframe',
                       user_df=None,
-                      user=None,
                       k=5,
                       random_state=42,
                       min_samples=False):
@@ -198,16 +196,12 @@ def cross_val_predict(model,
         Args: 
             model: a model class with fit() and predict() methods. predict() 
                 should return a tuple containing 3 array-like objects of equal length: predicted modes, predicted purposes, and predicted replaced modes.
-            data_type (str): either 'list' or 'dataframe', indicating whether 
-                the model accepts trips in the form of a list or dataframe. (some  hackery so we can still use OldClusteringPredictor, which takes in a list of trips.)
             user_df (dataframe): dataframe containing 
-            user: UUID for a user. only if data_type = 'list'
             k (int): number of folds
             random_state (int): random seed for reproducibility 
             min_samples (bool): whether or not to require a minimum number of 
                 trips. If True, the value is determined by gu.valid_user(). If False, we still require a minimum of k trips in order for k-fold cross-validation to work. 
     """
-    assert data_type == 'dataframe' or data_type == 'list'
     kfolds = KFold(k, random_state=random_state, shuffle=True)
     idx = []
     # trip_idx = []
@@ -217,95 +211,54 @@ def cross_val_predict(model,
     purpose_pred = []
     replaced_true = []
     replaced_pred = []
-    # confidence = np.empty([0], dtype=int)
+    distance = []
     # note: we can't use np arrays or call np.append for any list-like object containing labels because the label elements may be of multiple types (str, for actual labels and np.nan for missing labels).
-    # TODO: actually, we should probably change all the np.nan labels to Nonetype instead.
 
-    if data_type == 'dataframe':
-        logging.debug(f'num trips {len(user_df)}')
-        if not min_samples and len(user_df) < 5:
-            logging.info(
-                'At least 5 valid trips are needed for cross-validation, user only had {}.'
-                .format(len(user_df)))
-            return
+    logging.debug(f'num trips {len(user_df)}')
+    if not min_samples and len(user_df) < 5:
+        logging.info(
+            'At least 5 valid trips are needed for cross-validation, user only had {}.'
+            .format(len(user_df)))
+        return
 
-    elif data_type == 'list':
-        trips = pp.read_data(user)
+    for train_idx, test_idx in kfolds.split(user_df):
+        # set up model and data
+        model_ = model()
+        if model_params is not None:
+            model_.set_params(model_params)
+        train_trips = user_df.iloc[train_idx]
+        test_trips = user_df.iloc[test_idx]
 
-        # keeps valid trips that have user labels and are not points
-        filter_trips = np.array(pp.filter_data(trips, RADIUS))
-        logging.debug(f'num trips {len(filter_trips)}')
+        # train the model
+        model_.fit(train_trips)
 
-        # valid user should have >= 10 trips for further analysis and the proportion of filter_trips is >=50%
-        # todo: we should update this to account for the smaller training set in each fold (80%)
-        if min_samples and not gu.valid_user(filter_trips, trips):
-            logging.debug(
-                f"Total: {len(trips)}, labeled: {len(filter_trips)}, user {user} doesn't have enough valid trips for further analysis."
-            )
-            return
-        elif not min_samples and len(filter_trips) < k:
-            logging.debug(
-                'At least 5 valid trips are needed for cross-validation, user {} only had {}.'
-                .format(user, len(filter_trips)))
-            return
+        # generate predictions
+        pred_df = model_.predict(test_trips)
+        next_mode_pred = pred_df['mode_pred']
+        next_purpose_pred = pred_df['purpose_pred']
+        next_replaced_pred = pred_df['replaced_pred']
 
-    num_trips = len(user_df) if user_df is not None else len(filter_trips)
-    for train_idx, test_idx in kfolds.split(np.arange(num_trips)):
-        if data_type == 'dataframe':
-            # set up model and data
-            model_ = model()
-            if model_params is not None:
-                model_.set_params(model_params)
-            train_trips = user_df.iloc[train_idx]
-            test_trips = user_df.iloc[test_idx]
+        # store information on the test trips
+        idx = np.append(idx, test_trips.index)
+        # handle case where users input partial labels (e.g. some users
+        # never input replaced-mode)
+        if 'mode_confirm' in test_trips.columns:
+            mode_true += test_trips['mode_confirm'].to_list()
+        else:
+            mode_true += list(np.full(len(test_trips), np.nan))
+        if 'purpose_confirm' in test_trips.columns:
+            purpose_true += list(test_trips['purpose_confirm'].to_list())
+        else:
+            purpose_true += np.full(len(test_trips), np.nan)
+        if 'replaced_mode' in test_trips.columns:
+            replaced_true += list(test_trips['replaced_mode'].to_list())
+        else:
+            replaced_true += list(np.full(len(test_trips), np.nan))
 
-            # train the model
-            model_.fit(train_trips)
-
-            # generate predictions
-            next_mode_pred, next_purpose_pred, next_replaced_pred = model_.predict(
-                test_trips)
-
-            # store information on the test trips
-            idx = np.append(idx, test_idx)
-            # handle case where users input partial labels (e.g. some users
-            # never input replaced-mode)
-            if 'mode_confirm' in test_trips.columns:
-                mode_true += test_trips['mode_confirm'].to_list()
-            else:
-                mode_true += list(np.full(len(test_trips), np.nan))
-            if 'purpose_confirm' in test_trips.columns:
-                purpose_true += list(test_trips['purpose_confirm'].to_list())
-            else:
-                purpose_true += np.full(len(test_trips), np.nan)
-            if 'replaced_mode' in test_trips.columns:
-                replaced_true += list(test_trips['replaced_mode'].to_list())
-            else:
-                replaced_true += list(np.full(len(test_trips), np.nan))
-
-            mode_pred += list(next_mode_pred)
-            purpose_pred += list(next_purpose_pred)
-            replaced_pred += list(next_replaced_pred)
-
-        elif data_type == 'list':
-            model_ = model(user)
-            train_trips = list(filter_trips[train_idx])
-            test_trips = list(filter_trips[test_idx])
-
-            idx = np.append(idx, test_idx)
-            model_.fit(train_trips)
-
-            next_mode_true, next_purpose_true, next_replaced_true = get_labels(
-                test_trips)
-            mode_true += next_mode_true
-            purpose_true += next_purpose_true
-            replaced_true += next_replaced_true
-
-            next_mode_pred, next_purpose_pred, next_replaced_pred = model_.predict(
-                test_trips)
-            mode_pred += list(next_mode_pred)
-            purpose_pred += list(next_purpose_pred)
-            replaced_pred += list(next_replaced_pred)
+        mode_pred += list(next_mode_pred)
+        purpose_pred += list(next_purpose_pred)
+        replaced_pred += list(next_replaced_pred)
+        distance += list(test_trips.distance)
 
     return {
         'idx': idx,
@@ -316,7 +269,7 @@ def cross_val_predict(model,
         'mode_pred': mode_pred,
         'purpose_pred': purpose_pred,
         'replaced_pred': replaced_pred,
-        # 'confidence': confidence
+        'distance': distance,
     }
 
 
@@ -324,36 +277,23 @@ def cv_for_all_users(model,
                      uuid_list,
                      expanded_trip_df_map=None,
                      model_params=None,
-                     data_type='dataframe',
                      k=5,
                      random_state=42,
                      min_samples=False,
                      raise_errors=False):
     """ runs cross_val_predict for all users in a list and returns a combined dataframe of outputs """
-    assert data_type == 'dataframe' or data_type == 'list'
     dfs = []
     excluded_user_count = 0
     total_users = len(uuid_list)
 
     for user in uuid_list:
-        # print('num trips', len(expanded_trip_df_map[user]))
         try:
-            if data_type == 'dataframe':
-                results = cross_val_predict(model,
-                                            model_params,
-                                            data_type=data_type,
-                                            user_df=expanded_trip_df_map[user],
-                                            k=k,
-                                            random_state=random_state,
-                                            min_samples=min_samples)
-            elif data_type == 'list':
-                results = cross_val_predict(model,
-                                            model_params,
-                                            data_type=data_type,
-                                            user=user,
-                                            k=k,
-                                            random_state=random_state,
-                                            min_samples=min_samples)
+            results = cross_val_predict(model,
+                                        model_params,
+                                        user_df=expanded_trip_df_map[user],
+                                        k=k,
+                                        random_state=random_state,
+                                        min_samples=min_samples)
             if results == None:
                 excluded_user_count += 1
                 continue
@@ -368,10 +308,8 @@ def cv_for_all_users(model,
         try:
             cross_val_results = pd.DataFrame(data=results)
         except Exception as e:
-            print(results)
             raise e
         cross_val_results['user_id'] = user
-        cross_val_results['program'] = 'minipilot'  # TODO: fix this
         dfs += [cross_val_results]
 
     logging.info('using {}/{} users, excluded {}'.format(
@@ -405,26 +343,14 @@ def cv_for_all_algs(uuid_list,
             print('running cross validation for model:', model_name)
             start_time = datetime.now()
             model, model_params = PREDICTORS[model_name]
-            if model_name.startswith('old'):
-                # we have to handle this separately because the old model was structured differently
-                cv_df = cv_for_all_users(model,
-                                         uuid_list=uuid_list,
-                                         model_params=model_params,
-                                         data_type='list',
-                                         k=k,
-                                         random_state=random_state,
-                                         min_samples=min_samples,
-                                         raise_errors=raise_errors)
-            else:
-                cv_df = cv_for_all_users(
-                    model,
-                    uuid_list=uuid_list,
-                    expanded_trip_df_map=expanded_trip_df_map,
-                    model_params=model_params,
-                    k=k,
-                    random_state=random_state,
-                    min_samples=min_samples,
-                    raise_errors=raise_errors)
+            cv_df = cv_for_all_users(model,
+                                     uuid_list=uuid_list,
+                                     expanded_trip_df_map=expanded_trip_df_map,
+                                     model_params=model_params,
+                                     k=k,
+                                     random_state=random_state,
+                                     min_samples=min_samples,
+                                     raise_errors=raise_errors)
             cv_df.to_csv(csv_path)
             end_time = datetime.now()
             print('{} time taken for {}\n'.format(end_time - start_time,
@@ -437,17 +363,22 @@ def cv_for_all_algs(uuid_list,
 
 def get_clf_metrics(trip_df,
                     label_type,
+                    weight='distance',
                     keep_nopred=True,
                     ignore_custom=False):
-    """ Args:
+    """ Calculate a bunch of classification metrics. Returns a dictionary 
+        containing class labels, confusion matrix, multilabel confusion matrix, label_true, label_pred, distance, macro_f_score, weighted_f_score, accuracy, n_trips_without_prediction
+    
+        Args:
             trip_df: DataFrame with true labels and predicted labels. Any missing labels should be marked with np.nan
-                Should have the following columns: 'mode_true', 'purpose_true', 'replaced_true', 
-                'mode_pred', 'purpose_pred', 'replaced_pred', 'top_pred'
-            label_type (str): 'mode', 'purpose', 'replaced', or 'tuple'
+                Should have the following columns: 'distance', 'mode_true', 'purpose_true', 'replaced_true', 'mode_pred', 'purpose_pred', 'replaced_pred', 'top_pred'
+            label_type (str): 'mode', 'purpose', or 'replaced'
+            weight (str): 'distance' or 'count'; whether to calculate the confusion matrices using trip distances or trip counts
             keep_nopred (bool): whether or not to keep trips without a predicted label
             ignore_custom (bool): whether or not to remove custom labels
     """
     assert label_type in ['mode', 'purpose', 'replaced']
+    assert weight in ['distance', 'count']
     assert f'{label_type}_pred' in trip_df.columns
     assert f'{label_type}_true' in trip_df.columns
 
@@ -469,7 +400,6 @@ def get_clf_metrics(trip_df,
     # alternative predictions if there were multiple predicted labels
     labeled_predicted_df = trip_df[trip_df[label_type + '_true'].notnull() & (
         trip_df['top_pred'] | (trip_df[label_type + '_pred'].isnull()))]
-
     n_trips_without_prediction = len(
         labeled_predicted_df[labeled_predicted_df[label_type +
                                                   '_pred'].isnull()])
@@ -543,6 +473,7 @@ def get_clf_metrics(trip_df,
     label_true = labeled_predicted_df[label_type + '_true'].astype(str)
     label_pred = labeled_predicted_df[label_type +
                                       '_pred'].fillna('no pred').astype(str)
+    trip_dists = labeled_predicted_df['distance'].astype(float)
 
     # reset the labels list since the old labels list may contain labels that
     # are unused in the final label_true/label_pred array? also, it's possible
@@ -551,8 +482,15 @@ def get_clf_metrics(trip_df,
     # label_pred
     labels = np.sort(np.union1d(np.unique(label_true), np.unique(label_pred)))
 
-    cm = sm.confusion_matrix(label_true, label_pred, labels=labels)
-    mcm = sm.multilabel_confusion_matrix(label_true, label_pred, labels=labels)
+    sample_weight = trip_dists if weight == 'distance' else None
+    cm = sm.confusion_matrix(label_true,
+                             label_pred,
+                             labels=labels,
+                             sample_weight=sample_weight)
+    mcm = sm.multilabel_confusion_matrix(label_true,
+                                         label_pred,
+                                         labels=labels,
+                                         sample_weight=sample_weight)
 
     macro_f_score = sm.f1_score(label_true, label_pred, average='macro')
     weighted_f_score = sm.f1_score(label_true, label_pred, average='weighted')
@@ -564,23 +502,36 @@ def get_clf_metrics(trip_df,
         'mcm': mcm,
         'label_true': label_true,
         'label_pred': label_pred,
+        'trip_dists': trip_dists,
         'macro_f_score': macro_f_score,
         'weighted_f_score': weighted_f_score,
         'accuracy': accuracy,
         'n_trips_without_prediction': n_trips_without_prediction,
+        'labeled_predicted_df': labeled_predicted_df,
     }
 
 
 def print_clf_metrics(trip_df,
                       label_type,
+                      weight='distance',
                       keep_nopred=True,
                       ignore_custom=False,
                       show_cm=True):
-    """ prints results with nice formatting and plots the confusion matrix.
+    """ Print classification results with nice formatting. 
+
+        Args:
+            trip_df: DataFrame with true labels and predicted labels. Any missing labels should be marked with np.nan
+                Should have the following columns: 'distance', 'mode_true', 'purpose_true', 'replaced_true', 'mode_pred', 'purpose_pred', 'replaced_pred', 'top_pred'
+            label_type (str): 'mode', 'purpose', or 'replaced'
+            weight (str): 'distance' or 'count'; whether to calculate the confusion matrices using trip distances or trip counts
+            keep_nopred (bool): whether or not to keep trips without a predicted label
+            ignore_custom (bool): whether or not to remove custom labels
+
     
         label_type = 'mode', 'purpose', 'replaced'
     """
-    results = get_clf_metrics(trip_df, label_type, keep_nopred, ignore_custom)
+    results = get_clf_metrics(trip_df, label_type, weight, keep_nopred,
+                              ignore_custom)
     title = 'Performance results for ' + label_type
     if keep_nopred:
         title += '\nkeep non-predicted trips'
@@ -593,10 +544,12 @@ def print_clf_metrics(trip_df,
 
     print(title)
 
+    sample_weight = results['trip_dists'] if weight == 'distance' else None
     print(
         sm.classification_report(results['label_true'],
                                  results['label_pred'],
                                  target_names=results['labels'],
+                                 sample_weight=sample_weight,
                                  zero_division=0))
 
     if show_cm:
@@ -625,7 +578,7 @@ def plot_cm(cm, classes, ax=None, title='Confusion matrix'):
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
         ax.text(j,
                 i,
-                cm[i, j],
+                round(cm[i, j], 1),
                 horizontalalignment='center',
                 color='white' if cm[i, j] > color_thresh else 'black')
 
