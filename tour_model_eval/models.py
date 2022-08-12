@@ -15,15 +15,6 @@ from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.exceptions import NotFittedError
 
-# hack because jupyter notebook doesn't work properly through my vscode for
-# some reason and therefore cant import stuff from emission? remove this before
-# pushing
-###
-import sys
-
-sys.path.append('/Users/hlu2/Documents/GitHub/e-mission-server/')
-###
-
 # our imports
 from clustering import get_distance_matrix, single_cluster_purity
 import data_wrangling
@@ -234,6 +225,9 @@ class TripClassifier(SetupMixin, metaclass=ABCMeta):
     @abstractmethod
     def predict_proba(self, test_df):
         """ Predict class probabilities for each trip.  
+
+            NOTE: check the specific model to see if the class probabilities 
+            have confidence-discounting or not.
         
             Args: 
                 test_df (DataFrame): dataframe of trips
@@ -668,6 +662,9 @@ class NaiveBinningClassifier(TripClassifier):
         return self
 
     def predict_proba(self, test_df):
+        """ NOTE: these class probabilities have the confidence-discounting 
+            heuristic applied. 
+        """
         # convert test_df to a list because the existing binning algorithm
         # only accepts lists of Entry objects
         test_trips = self._trip_df_to_list(test_df)
@@ -889,6 +886,9 @@ class ClusterExtrapolationClassifier(TripClassifier):
         return self
 
     def predict_proba(self, test_df):
+        """ NOTE: these class probabilities do NOT have a 
+            confidence-discounting heuristic applied. 
+        """
         self.end_cluster_model.predict(test_df)
         # store a copy of test_df for now (TODO: make this more efficient since
         # the data is duplicated)
@@ -1163,6 +1163,9 @@ class EnsembleClassifier(TripClassifier, metaclass=ABCMeta):
         return self
 
     def predict_proba(self, test_df):
+        """ NOTE: these class probabilities do NOT have a 
+            confidence-discounting heuristic applied. 
+        """
         ################
         ### get data ###
         ################
@@ -1888,10 +1891,13 @@ class TripGrouper():
         trip_groups = trip_df.groupby(
             [self.start_cluster_col, self.end_cluster_col])
 
-        # need dict so we can access the trip indices of all the trips in each group. the key is the group tuple and the value is the list of trip indices in the group.
+        # need dict so we can access the trip indices of all the trips in each
+        # group. the key is the group tuple and the value is the list of trip
+        # indices in the group.
         self.trip_groups_dict = dict(trip_groups.groups)
 
-        # we want to convert trip-group tuples to to trip-cluster indices, hence the pd Series
+        # we want to convert trip-group tuples to to trip-cluster indices,
+        # hence the pd Series
         trip_groups_series = pd.Series(list(self.trip_groups_dict.keys()))
 
         trip_cluster_idx = np.empty(len(trip_df))
@@ -1913,7 +1919,9 @@ class TripGrouper():
         prediction_trip_groups = new_trip_df.groupby(
             [self.start_cluster_col, self.end_cluster_col])
 
-        # need dict so we can access the trip indices of all the trips in each group. the key is the group tuple and the value is the list of trip indices in the group.
+        # need dict so we can access the trip indices of all the trips in each
+        # group. the key is the group tuple and the value is the list of trip
+        # indices in the group.
         prediction_trip_groups_dict = dict(prediction_trip_groups.groups)
         trip_groups_series = pd.Series(list(self.trip_groups_dict.keys()))
         trip_cluster_idx = np.empty(len(new_trip_df))
@@ -1922,7 +1930,8 @@ class TripGrouper():
             # check if the trip cluster exists in the training set
             trip_idxs_in_group = prediction_trip_groups_dict[group_tuple]
             if group_tuple in self.trip_groups_dict.keys():
-                # look up the group index from the series we created when we fit the model
+                # look up the group index from the series we created when we
+                # fit the model
                 group_idx = trip_groups_series[trip_groups_series ==
                                                group_tuple].index[0]
             else:
@@ -1971,7 +1980,8 @@ class OneHotWrapper():
 
         train_df = train_df.copy()  # to avoid SettingWithCopyWarning
 
-        # if imputing, the dtype of each column must be string/object and not numerical, otherwise the SimpleImputer will fail
+        # if imputing, the dtype of each column must be string/object and not
+        # numerical, otherwise the SimpleImputer will fail
         if self.impute_missing:
             for col in train_df.columns:
                 train_df[col] = train_df[col].astype(object)
@@ -1984,7 +1994,9 @@ class OneHotWrapper():
                 f'{output_col_prefix}_{val}'
                 for val in np.sort(train_df[col].dropna().unique())
             ]
-            # we handle np.nan separately because it is of type float, and may cause issues with np.sort if the rest of the unique values are strings
+            # we handle np.nan separately because it is of type float, and may
+            # cause issues with np.sort if the rest of the unique values are
+            # strings
             if any((train_df[col].isna())):
                 self.onehot_encoding_cols_all += [f'{output_col_prefix}_nan']
 
