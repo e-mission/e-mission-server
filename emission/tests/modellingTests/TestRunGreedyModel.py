@@ -83,6 +83,7 @@ class TestRunGreedyModel(unittest.TestCase):
         clean up database
         """
         edb.get_analysis_timeseries_db().delete_many({'user_id': self.user_id})
+        edb.get_model_db().delete_many({'user_id': self.user_id})
         edb.get_pipeline_state_db().delete_many({'user_id': self.user_id})
 
     def testBuildGreedyModelFromConfig(self):
