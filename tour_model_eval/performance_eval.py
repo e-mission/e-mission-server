@@ -185,11 +185,11 @@ def cross_val_predict(model,
         else:
             mode_true += list(np.full(len(test_trips), np.nan))
         if 'purpose_confirm' in test_trips.columns:
-            purpose_true += list(test_trips['purpose_confirm'].to_list())
+            purpose_true += test_trips['purpose_confirm'].to_list()
         else:
-            purpose_true += np.full(len(test_trips), np.nan)
+            purpose_true += list(np.full(len(test_trips), np.nan))
         if 'replaced_mode' in test_trips.columns:
-            replaced_true += list(test_trips['replaced_mode'].to_list())
+            replaced_true += test_trips['replaced_mode'].to_list()
         else:
             replaced_true += list(np.full(len(test_trips), np.nan))
 
@@ -237,6 +237,7 @@ def cv_for_all_users(model,
                 continue
         except Exception as e:
             if raise_errors:
+                logging.warning(f'error for user {user}')
                 raise e
             else:
                 excluded_user_count += 1

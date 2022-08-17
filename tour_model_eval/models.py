@@ -709,13 +709,17 @@ class NaiveBinningClassifier(TripClassifier):
             [purpose_distribs, mode_distribs, replaced_distribs]):
 
             proba = pd.DataFrame(label_distribs)
-            proba['clusterable'] = proba.sum(axis=1) > 0
-            proba['top_pred'] = proba.drop(columns=['clusterable']).idxmax(
-                axis=1)
-            proba['top_proba'] = proba.drop(
-                columns=['clusterable', 'top_pred']).max(axis=1, skipna=True)
-            classes = proba.columns[:-3]
-            proba.loc[:, classes] = proba.loc[:, classes].fillna(0)
+            if proba.shape[1] == 0:
+                # i.e. there are no predictions
+                proba = pd.DataFrame(index=range(len(test_df)),
+                                     columns=[np.nan, 'top_pred', 'top_proba'])
+            else:
+                proba['top_pred'] = proba.idxmax(axis=1)
+                proba['top_proba'] = proba.max(axis=1, skipna=True)
+                classes = proba.columns[:-3]
+                proba.loc[:, classes] = proba.loc[:, classes].fillna(0)
+            proba['clusterable'] = proba.drop(
+                columns=['top_pred', 'top_proba']).sum(axis=1) > 0
             proba = pd.concat([proba], keys=[label_type], axis=1)
             proba_dfs += [proba]
 
@@ -736,30 +740,34 @@ class NaiveBinningClassifier(TripClassifier):
         """
         trips_list = []
 
-        for idx, row in trip_df.iterrows():
-            data = {
-                'source': row['source'],
-                'end_ts': row['end_ts'],
-                # 'end_local_dt':row['end_local_dt'], # this attribute doesn't seem to appear in the dataframes I've tested with
-                'end_fmt_time': row['end_fmt_time'],
-                'end_loc': row['end_loc'],
-                'raw_trip': row['raw_trip'],
-                'start_ts': row['start_ts'],
-                # 'start_local_dt':row['start_local_dt'], # this attribute doesn't seem to appear in the dataframes I've tested with
-                'start_fmt_time': row['start_fmt_time'],
-                'start_loc': row['start_loc'],
-                'duration': row['duration'],
-                'distance': row['distance'],
-                'start_place': row['start_place'],
-                'end_place': row['end_place'],
-                'cleaned_trip': row['cleaned_trip'],
-                'inferred_labels': row['inferred_labels'],
-                'inferred_trip': row['inferred_trip'],
-                'expectation': row['expectation'],
-                'confidence_threshold': row['confidence_threshold'],
-                'expected_trip': row['expected_trip'],
-                'user_input': row['user_input']
-            }
+        for idx, row in trip_df.iterrows():                
+            try:
+                data = {
+                    'source': row['source'],
+                    'end_ts': row['end_ts'],
+                    # 'end_local_dt':row['end_local_dt'], # this attribute doesn't seem to appear in the dataframes I've tested with
+                    'end_fmt_time': row['end_fmt_time'],
+                    'end_loc': row['end_loc'],
+                    'raw_trip': row['raw_trip'],
+                    'start_ts': row['start_ts'],
+                    # 'start_local_dt':row['start_local_dt'], # this attribute doesn't seem to appear in the dataframes I've tested with
+                    'start_fmt_time': row['start_fmt_time'],
+                    'start_loc': row['start_loc'],
+                    'duration': row['duration'],
+                    'distance': row['distance'],
+                    'start_place': row['start_place'],
+                    'end_place': row['end_place'],
+                    'cleaned_trip': row['cleaned_trip'],
+                    # the following data entries are omitted because not all trips entries have them, and it's also not necessary for our cross-validation
+                    # 'inferred_labels': row['inferred_labels'], 
+                    # 'inferred_trip': row['inferred_trip'], 
+                    # 'expectation': row['expectation'],
+                    # 'confidence_threshold': row['confidence_threshold'],
+                    # 'expected_trip': row['expected_trip'],
+                    'user_input': row['user_input']
+                }
+            except KeyError as e:
+                raise Exception('invalid data: ' + repr(e))
             trip = ecwe.Entry.create_entry(user_id=row['user_id'],
                                            key='analysis/confirmed_trip',
                                            data=data)
@@ -946,13 +954,17 @@ class ClusterExtrapolationClassifier(TripClassifier):
         proba_dfs = []
         for label_type in ['purpose', 'mode', 'replaced']:
             classes = self.train_df[f'{label_type}_true'].dropna().unique()
-            proba = pd.DataFrame(
-                self.test_df[f'{label_type}_distrib'].to_list(),
-                columns=classes)
-            proba['top_pred'] = proba.idxmax(axis=1)
-            proba['top_proba'] = proba.max(axis=1, skipna=True)
+            if len(classes) == 0:
+                proba = pd.DataFrame(index=range(len(test_df)),
+                                     columns=[np.nan, 'top_pred', 'top_proba'])
+            else:
+                proba = pd.DataFrame(
+                    self.test_df[f'{label_type}_distrib'].to_list(),
+                    columns=classes)
+                proba['top_pred'] = proba.idxmax(axis=1)
+                proba['top_proba'] = proba.max(axis=1, skipna=True)
+                proba.loc[:, classes] = proba.loc[:, classes].fillna(0)
             proba['clusterable'] = self.test_df.end_cluster_idx >= 0
-            proba.loc[:, classes] = proba.loc[:, classes].fillna(0)
             proba = pd.concat([proba], keys=[label_type], axis=1)
             proba_dfs += [proba]
 
