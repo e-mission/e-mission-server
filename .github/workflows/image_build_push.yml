@@ -21,6 +21,9 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
+    - name: docker login
+      run: | # log into docker hub account
+        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
 
     # Runs a single command using the runners shell
     - name: Run a one-line script
@@ -31,3 +34,4 @@ jobs:
       run: |
         docker build -t agutt/e-mission-server:image_CI .
         docker images
+        docker push $DOCKER_USER/e-mission-server:image_CI
