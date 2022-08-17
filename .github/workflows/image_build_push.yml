@@ -38,6 +38,6 @@ jobs:
     # Runs a set of commands using the runners shell
     - name: Run Docker
       run: |
-        docker build -t agutt/e-mission-server:image_CI .
+        docker build -t agutt/e-mission-server:test .
         docker images
-        docker push $DOCKER_USER/e-mission-server:image_CI
+        docker push $DOCKER_USER/e-mission-server:test
