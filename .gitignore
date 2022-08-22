@@ -20,3 +20,5 @@ conf/**/*.json
 *.ipynb_checkpoints*
 
 *.secret
+
+.coverage
