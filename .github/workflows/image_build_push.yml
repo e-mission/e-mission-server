@@ -7,8 +7,6 @@ name: docker image
 on:
   push:
     branches: [ master, gis-based-mode-detection, join_redirect_to_static, image_CI ]
-  pull_request:
-    branches: [ master, gis-based-mode-detection, join_redirect_to_static, image_CI ]
 
 
 # Env variable
@@ -42,9 +40,9 @@ jobs:
     # Runs a set of commands using the runners shell
     - name: build docker image
       run: |
-        docker build -t $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}-${{ steps.date.outputs.date }} .
+        docker build -t $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}_${{ steps.date.outputs.date }} .
         docker images
 
     - name: push docker image
       run: |
-        docker push $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}-${{ steps.date.outputs.date }}
+        docker push $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}_${{ steps.date.outputs.date }}

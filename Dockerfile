@@ -31,7 +31,7 @@ RUN chmod u+x ./clone_server.sh
 # # This clone puts the server code into the image, not the container
 # RUN . setup/setup_conda.sh Linux-x86_64
 # RUN . setup/setup.sh
-RUN bash -c "./clone_server.sh"
+RUN bash -c "./docker_supp.sh"
 
 # #declare environment variables
 # ENV DB_HOST=''
@@ -43,4 +43,4 @@ RUN bash -c "./clone_server.sh"
 
 EXPOSE 8080
 
-CMD ["/bin/bash", "-c", "source setup/activate.sh && ./runSingleTestDebug.sh"]
+CMD ["/bin/bash", "/docker_start_script.sh"]
