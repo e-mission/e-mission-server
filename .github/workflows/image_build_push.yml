@@ -39,12 +39,12 @@ jobs:
     - name: Run a one-line script
       run: echo running in repo ${GITHUB_REPOSITORY#*/} branch ${GITHUB_REF##*/} on ${{ steps.date.outputs.date }}
 
-    # # Runs a set of commands using the runners shell
-    # - name: build docker image
-    #   run: |
-    #     docker build -t $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/} .
-    #     docker images
+    # Runs a set of commands using the runners shell
+    - name: build docker image
+      run: |
+        docker build -t $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}-${{ steps.date.outputs.date }} .
+        docker images
 
-    # - name: push docker image
-    #   run: |
-    #     docker push $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}
+    - name: push docker image
+      run: |
+        docker push $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}-${{ steps.date.outputs.date }}
