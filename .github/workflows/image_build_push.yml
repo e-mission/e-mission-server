@@ -31,7 +31,7 @@ jobs:
       run: | # log into docker hub account
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
 
-    Runs a single command using the runners shell
+    #Runs a single command using the runners shell
     - name: Run a one-line script
       run: echo running on branch ${GITHUB_REF##*/}
 
