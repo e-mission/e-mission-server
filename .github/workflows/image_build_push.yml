@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: docker
+name: docker image
 
 # Controls when the action will run. Triggers the workflow on push or pull request 
 # events but only for the master branch
@@ -33,14 +33,14 @@ jobs:
 
     #Runs a single command using the runners shell
     - name: Run a one-line script
-      run: echo running in repo ${GITHUB_REPOSITORY#*/}
+      run: echo running in repo ${GITHUB_REPOSITORY#*/} branch ${GITHUB_REF##*/} on ${{ steps.date.outputs.date }}
 
-    # Runs a set of commands using the runners shell
-    - name: build docker image
-      run: |
-        docker build -t $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/} .
-        docker images
+    # # Runs a set of commands using the runners shell
+    # - name: build docker image
+    #   run: |
+    #     docker build -t $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/} .
+    #     docker images
 
-    - name: push docker image
-      run: |
-        docker push $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}
+    # - name: push docker image
+    #   run: |
+    #     docker push $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}
