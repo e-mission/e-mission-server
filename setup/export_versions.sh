@@ -1,1 +1,1 @@
-export EXP_CONDA_VER=4.8.3
+export EXP_CONDA_VER=4.12.0
