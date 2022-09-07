@@ -25,19 +25,19 @@ COPY . .
 # ENV SERVER_BRANCH=${SERVER_BRANCH:-master}
 
 # ADD clone_server.sh /clone_server.sh
-RUN chmod u+x ./docker_supp.sh
+RUN chmod u+x ./.docker/setup_config.sh
 # ADD index.html /index.html
 
 # # This clone puts the server code into the image, not the container
-RUN bash -c "./docker_supp.sh"
+RUN bash -c "./.docker/setup_config.sh"
 
 # #declare environment variables
 ENV DB_HOST=''
 ENV WEB_SERVER_HOST=''
 
 ENV LIVERELOAD_SRC=''
-RUN chmod u+x ./docker_start_script.sh
+RUN chmod u+x ./.docker/docker_start_script.sh
 
 EXPOSE 8080
 
-CMD ["/bin/bash", "./docker_start_script.sh"]
+CMD ["/bin/bash", "./.docker/docker_start_script.sh"]

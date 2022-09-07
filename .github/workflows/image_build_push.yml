@@ -6,7 +6,7 @@ name: docker image
 # events but only for the master branch
 on:
   push:
-    branches: [ master, gis-based-mode-detection, join_redirect_to_static, image_CI ]
+    branches: [ master, gis-based-mode-detection, join_redirect_to_static ]
 
 
 # Env variable
