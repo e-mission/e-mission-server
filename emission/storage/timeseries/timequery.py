@@ -22,3 +22,5 @@ class TimeQuery(object):
             ret_query[time_key].update({"$gte": self.startTs})
         return ret_query
 
+    def __repr__(self):
+        return f"TimeQuery {self.timeType} with range [{self.startTs}, {self.endTs})"

@@ -1,0 +1,10 @@
+{
+    "alert_type": "popup",
+    "title": "[Popup] Do you remember...",
+    "message": "how to check your bike before you ride?",
+    "image": "icon",
+    "spec": {
+       "title": "ABC Quick Check New",
+       "text": "<button onclick=\"window.cordova.InAppBrowser.open('https://youtu.be/fD0JwrzMJlM', '_system')\">https://youtu.be/fD0JwrzMJlM</button>"
+    }
+}

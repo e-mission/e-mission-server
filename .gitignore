@@ -3,6 +3,7 @@
 *.swp
 *debug.log
 .DS_Store
+.vscode
 
 CFC_WebApp/config.json
 CFC_WebApp/keys.json
