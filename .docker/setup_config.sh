@@ -2,7 +2,7 @@ echo "About to start conda update, this may take some time..."
 source setup/setup_conda.sh Linux-x86_64
 source setup/setup.sh
 conda clean -t
-conda clean -p
+find /root/miniconda-*/pkgs -wholename \*info/test\* -type d | xargs rm -rf
 
 if [ -d "webapp/www/" ]; then
     cp /index.html webapp/www/index.html
