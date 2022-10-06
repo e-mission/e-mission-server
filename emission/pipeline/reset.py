@@ -270,3 +270,80 @@ def _del_entries_for_query(del_query, is_dry_run):
 # 
 # END: reset_to_start
 # 
+
+#
+# START: auto_reset
+#
+
+THREE_HOURS_IN_SECS = 60 * 60 * 3
+
+def fill_and_print(all_invalid_states):
+    all_invalid_states['curr_run_fmt_time'] = all_invalid_states.curr_run_ts.apply(lambda ts: arrow.get(ts).format("YYYY-MM-DDTHH:mm:ssZZ"))
+    all_invalid_states['pipeline_stage_name'] = all_invalid_states.pipeline_stage.apply(lambda ps: ecwp.PipelineStages(ps).name)
+    logging.debug("----- All invalid states --------")
+    logging.debug(all_invalid_states[['user_id', 'pipeline_stage', 'curr_run_fmt_time']])
+
+def split_single_and_multi(all_invalid_states):
+    all_invalid_states_grouped = all_invalid_states.groupby(by="user_id")
+    multiple_state_uuids = all_invalid_states_grouped.count().query('curr_run_ts > 1').index.to_list()
+    single_state_uuids = all_invalid_states_grouped.count().query('curr_run_ts == 1').index.to_list()
+    logging.debug("Found multiple states for UUIDs %s" % multiple_state_uuids)
+    logging.debug("Found single states for UUIDs %s" % single_state_uuids)
+    multiple_state_groups = all_invalid_states_grouped.filter(lambda x: x.name in multiple_state_uuids)
+    single_state_groups = all_invalid_states_grouped.filter(lambda x: x.name in single_state_uuids)
+    return multiple_state_groups, single_state_groups
+
+def get_single_state_resets(single_state_groups):
+    # print(single_state_groups[["user_id", "pipeline_stage_name", "curr_run_fmt_time"]])
+    reset_ts = single_state_groups.copy()
+    reset_ts["reset_ts"] = single_state_groups.curr_run_ts.apply(lambda ts: ts - THREE_HOURS_IN_SECS)
+    cols_to_drop = [c for c in reset_ts.columns if c not in ["user_id", "reset_ts"]]
+    # print(cols_to_drop)
+    reset_ts.drop(cols_to_drop, axis=1, inplace=True)
+    # print(reset_ts.columns)
+    return reset_ts
+        # epr.reset_user_to_ts(user_id, three_hours_before, dry_run)
+
+def get_multi_state_resets(multi_state_groups):
+    earliest_invalid_state_per_user = multi_state_groups.groupby(by="user_id").min()
+    print(earliest_invalid_state_per_user.columns)
+    reset_ts = earliest_invalid_state_per_user.apply(lambda g: g.curr_run_ts - THREE_HOURS_IN_SECS, axis=1).reset_index()
+    # print(reset_ts.columns)
+    reset_ts.rename(columns={0: "reset_ts"}, inplace=True)
+    # print(reset_ts)
+    return reset_ts
+
+def get_all_resets(all_invalid_states):
+    fill_and_print(all_invalid_states)
+    multiple_state_groups, single_state_groups = split_single_and_multi(all_invalid_states)
+    reset_ts_single = get_single_state_resets(single_state_groups)
+    reset_ts_multi = get_multi_state_resets(multiple_state_groups)
+    reset_ts = pd.concat([reset_ts_single, reset_ts_multi])
+    reset_ts["reset_ts_fmt"] = reset_ts.reset_ts.apply(lambda t: arrow.get(t))
+    print(reset_ts)
+    return reset_ts
+
+def auto_reset(dry_run, only_calc):
+    # Only read all states that are not for `OUTPUT_GEN` since we are not going to reset that state
+    # Also only read states which have been running for more than three hours
+    # If we are running the pipeline every hour, then having a run_ts that is
+    # more than three hours old indicates that it is likely invalid
+    three_hours_ago = arrow.utcnow().shift(hours=-3).timestamp
+    all_invalid_states = pd.json_normalize(edb.get_pipeline_state_db().find({"$and": [
+        {"curr_run_ts": {"$lt": three_hours_ago}},
+        {"pipeline_stage": {"$ne": 9}}]}))
+    if len(all_invalid_states) == 0:
+        logging.info("No invalid states found, returning early")
+        return
+    reset_ts = get_all_resets(all_invalid_states)
+    if only_calc:
+        print("finished calculating values, early return")
+        return
+
+    for index, invalid_state in reset_ts.iterrows():
+        print(f"Resetting {invalid_state['user_id']} to {arrow.get(invalid_state['reset_ts'])}")
+        reset_user_to_ts(invalid_state['user_id'], invalid_state['reset_ts'], dry_run)
+
+#
+# END: auto_reset
+#
