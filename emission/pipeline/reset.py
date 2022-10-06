@@ -6,6 +6,8 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import *
 import logging
+import pandas as pd
+import arrow
 
 import emission.core.get_database as edb
 import emission.core.wrapper.pipelinestate as ecwp
@@ -169,13 +171,18 @@ def reset_pipeline_state(user_id, reset_ts, is_dry_run):
     if reset_ts is None:
         logging.info("reset_ts = %s, returning from reset_pipeline_state without modifying anything" % None)
         return
+
+    stages_with_fuzz = [ecwp.PipelineStages.TRIP_SEGMENTATION.value,
+                        ecwp.PipelineStages.LABEL_INFERENCE.value,
+                        ecwp.PipelineStages.EXPECTATION_POPULATION.value,
+                        ecwp.PipelineStages.CREATE_CONFIRMED_OBJECTS.value]
         
     trip_seg_reset_pipeline_query = {'user_id': user_id,
                                      'last_processed_ts': {'$ne': None},
     # only reset entries that are after the reset_ts
     # https://github.com/e-mission/e-mission-server/issues/333#issuecomment-312958309
                                      'last_processed_ts': {'$gt': reset_ts + FUZZ_FACTOR},
-                                     'pipeline_stage': ecwp.PipelineStages.TRIP_SEGMENTATION.value}
+                                     'pipeline_stage': {'$in': stages_with_fuzz}}
     trip_seg_update_pipeline_query = {'$set': {'last_processed_ts': reset_ts + FUZZ_FACTOR}}
     logging.debug("trip_seg_reset_pipeline_query = %s" % trip_seg_reset_pipeline_query)
     logging.debug("trip_seg_update_pipeline_query = %s" % trip_seg_update_pipeline_query)
@@ -190,7 +197,7 @@ def reset_pipeline_state(user_id, reset_ts, is_dry_run):
     # only reset entries that are after the reset_ts
     # https://github.com/e-mission/e-mission-server/issues/333#issuecomment-312958309
                             'last_processed_ts': {'$gt': reset_ts},
-                            'pipeline_stage': {'$ne': ecwp.PipelineStages.TRIP_SEGMENTATION.value}}
+                            'pipeline_stage': {'$nin': stages_with_fuzz}}
     update_pipeline_query = {'$set': {'last_processed_ts': reset_ts}}
     logging.debug("reset_pipeline_query = %s" % reset_pipeline_query)
     logging.debug("update_pipeline_query = %s" % update_pipeline_query)
@@ -204,7 +211,7 @@ def reset_pipeline_state(user_id, reset_ts, is_dry_run):
     else:
         result = edb.get_pipeline_state_db().update(
                     trip_seg_reset_pipeline_query, trip_seg_update_pipeline_query,
-                    upsert=False)
+                    upsert=False, multi=True)
         logging.debug("this is not a dry run, result of updating trip_segmentation stage in reset_pipeline_state = %s" % result)
 
         result = edb.get_pipeline_state_db().update(
