@@ -329,9 +329,9 @@ def auto_reset(dry_run, only_calc):
     # If we are running the pipeline every hour, then having a run_ts that is
     # more than three hours old indicates that it is likely invalid
     three_hours_ago = arrow.utcnow().shift(hours=-3).timestamp
-    all_invalid_states = pd.json_normalize(edb.get_pipeline_state_db().find({"$and": [
+    all_invalid_states = pd.json_normalize(list(edb.get_pipeline_state_db().find({"$and": [
         {"curr_run_ts": {"$lt": three_hours_ago}},
-        {"pipeline_stage": {"$ne": 9}}]}))
+        {"pipeline_stage": {"$ne": 9}}]})))
     if len(all_invalid_states) == 0:
         logging.info("No invalid states found, returning early")
         return
