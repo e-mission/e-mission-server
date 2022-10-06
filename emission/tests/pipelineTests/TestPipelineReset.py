@@ -697,8 +697,7 @@ class TestPipelineReset(unittest.TestCase):
         # but it is the current behavior, so let's flag if it changes
         self.assertEqual(len(df_from_cursor), len(invalid_states_mixed) - 1)
 
-        # This is actually incorrect because we saved everything, so we should read back everything
-        # but it is the current behavior, so let's flag if it changes
+        # This is the expected behavior in all cases, but let's make sure that it stays as we move through versions of pandas
         self.assertEqual(len(df_from_list), len(invalid_states_mixed))
 
     def testAutoResetMock(self):
