@@ -676,10 +676,7 @@ class TestPipelineReset(unittest.TestCase):
              arrow.get("2022-09-21").shift(hours=-3).timestamp, # user3, only one entry
              arrow.get("2022-09-22").shift(hours=-3).timestamp]) # user4, only one entry
 
-    def testAutoResetMock(self):
-        # The expectation is that user_5 and user_6 will be stripped out since:
-        # user5 does not have a curr_run_ts
-        # user6 is an output_gen state
+    def testNormalizeWithACursor(self):
         invalid_states_mixed = pd.DataFrame({
             "user_id": ["user_1", "user_1", "user_1", "user_2", "user_3", "user_4",
                 "user_5", "user_6"],
@@ -693,6 +690,35 @@ class TestPipelineReset(unittest.TestCase):
         for index, e in invalid_states_mixed.iterrows():
             edb.get_pipeline_state_db().insert_one(e.to_dict())
 
+        df_from_cursor = pd.json_normalize(edb.get_pipeline_state_db().find())
+        df_from_list = pd.json_normalize(list(edb.get_pipeline_state_db().find()))
+
+        # This is actually incorrect because we saved everything, so we should read back everything
+        # but it is the current behavior, so let's flag if it changes
+        self.assertEqual(len(df_from_cursor), len(invalid_states_mixed) - 1)
+
+        # This is the expected behavior in all cases, but let's make sure that it stays as we move through versions of pandas
+        self.assertEqual(len(df_from_list), len(invalid_states_mixed))
+
+    def testAutoResetMock(self):
+        # The expectation is that user_5 and user_6 will be stripped out since:
+        # user5 does not have a curr_run_ts
+        # user6 is an output_gen state
+        invalid_states_mixed = pd.DataFrame({
+            "user_id": ["user_no_missing", "user_1", "user_1", "user_1", "user_2", "user_3", "user_4",
+                "user_5", "user_6"],
+            "curr_run_ts": [arrow.get("2022-09-19").timestamp]+
+                [arrow.get("2022-09-20").timestamp,
+                arrow.get("2022-09-21").timestamp,
+                arrow.get("2022-09-22").timestamp] * 2 +
+                [None, arrow.get("2022-09-09").timestamp],
+            "pipeline_stage": [2] + [0, 6, 13] * 2 + [11, 9] # add an output gen
+        })
+        self.testUUIDList = invalid_states_mixed.user_id.to_list()
+        for index, e in invalid_states_mixed.iterrows():
+            edb.get_pipeline_state_db().insert_one(e.to_dict())
+
+        self.assertEqual(edb.get_pipeline_state_db().count_documents({"user_id": "user_no_missing"}), 1)
         self.assertEqual(edb.get_pipeline_state_db().count_documents({"user_id": "user_1"}), 3)
         self.assertEqual(edb.get_pipeline_state_db().count_documents({"user_id": "user_2"}), 1)
 
@@ -701,6 +727,7 @@ class TestPipelineReset(unittest.TestCase):
         # These entries don't have any data, so there is no last place and we
         # reset to start. Which involves deleting the pipeline states
         # so there won't be any states left.
+        self.assertEqual(edb.get_pipeline_state_db().count_documents({"user_id": "user_no_missing"}), 0)
         self.assertEqual(edb.get_pipeline_state_db().count_documents({"user_id": "user_1"}), 0)
         self.assertEqual(edb.get_pipeline_state_db().count_documents({"user_id": "user_2"}), 0)
 
