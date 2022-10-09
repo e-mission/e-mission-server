@@ -27,6 +27,8 @@ import emission.core.wrapper.pipelinestate as ecwp
 import emission.pipeline.reset as epr
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.tcquery as esttc
+import emission.storage.decorations.place_queries as esdp
+import emission.storage.decorations.analysis_timeseries_queries as esda
 
 import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
 
@@ -312,6 +314,80 @@ class TestPipelineReset(unittest.TestCase):
         self.compare_result(ad.AttrDict({'result': api_result}).result,
                             ad.AttrDict(ground_truth_2).data)
 
+    def testResetTwiceHack(self):
+        """
+        - Load data for both days
+        - Run pipelines
+        - Verify that all is well
+        - Reset to a date between the two
+        - Ensure that the raw places of the last cleaned place are removed
+        - Reset again to a slightly later date (representing the use case where
+          the next run also fails, and we re-reset)
+        - Ensure that the raw places of the last cleaned place are still removed
+        - Verify that analysis data for the first day is unchanged
+        - Verify that analysis data for the second day does not exist
+        - Re-run pipelines
+        - Verify that all is well
+        """
+
+        # Load all data
+        dataFile_1 = "emission/tests/data/real_examples/shankari_2016-07-22"
+        dataFile_2 = "emission/tests/data/real_examples/shankari_2016-07-25"
+        start_ld_1 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 22})
+        start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
+        cacheKey_1 = "diary/trips-2016-07-22"
+        cacheKey_2 = "diary/trips-2016-07-25"
+        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=bju.object_hook)
+        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=bju.object_hook)
+
+        # Run both pipelines
+        etc.setupRealExample(self, dataFile_1)
+        etc.runIntakePipeline(self.testUUID)
+        self.entries = json.load(open(dataFile_2), object_hook = bju.object_hook)
+        etc.setupRealExampleWithEntries(self)
+        etc.runIntakePipeline(self.testUUID)
+
+        # Check results: so far, so good
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_1, start_ld_1)
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth_1).data)
+
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_2, start_ld_2)
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth_2).data)
+
+        # Reset pipeline to july 24.
+        # Note that this is actually 23nd 16:00 PDT
+        # This will reset in the middle of the untracked time, which is
+        # technically a trip, and will allow us to test the trip resetting
+        # code
+        reset_ts = arrow.get("2016-07-24").timestamp
+        epr.reset_user_to_ts(self.testUUID, reset_ts, is_dry_run=False)
+        last_cleaned_place = esdp.get_last_place_before(esda.CLEANED_PLACE_KEY, reset_ts, self.testUUID)
+        self.assertEqual(len(last_cleaned_place["data"]["raw_places"]), 0)
+
+        # Pretend next run fails and we try to reset to it
+        reset_ts = arrow.get("2016-07-24T02:00:00").timestamp
+        epr.reset_user_to_ts(self.testUUID, reset_ts, is_dry_run=False)
+        last_cleaned_place = esdp.get_last_place_before(esda.CLEANED_PLACE_KEY, reset_ts, self.testUUID)
+        self.assertEqual(len(last_cleaned_place["data"]["raw_places"]), 0)
+
+        # Second day does not exist
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_2, start_ld_2)
+        logging.debug(json.dumps(api_result, indent=4, default=bju.default))
+        self.assertEqual(api_result, [])
+
+        # Re-run the pipeline again
+        etc.runIntakePipeline(self.testUUID)
+
+        # Should be back to ground truth
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_1, start_ld_1)
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth_1).data)
+
+        api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_2, start_ld_2)
+        self.compare_result(ad.AttrDict({'result': api_result}).result,
+                            ad.AttrDict(ground_truth_2).data)
         
     def testResetToFuture(self):
         """
