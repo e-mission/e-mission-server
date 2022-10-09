@@ -87,6 +87,18 @@ def reset_user_to_ts(user_id, ts, is_dry_run):
 
 def get_reset_ts(user_id, last_cleaned_place, is_dry_run):
     assert last_cleaned_place is not None, "last_cleaned_place = %s" % last_cleaned_place
+    # TODO: Remove me in 2023
+    # Historically, when we unset the entries for the last cleaned place during
+    # a reset, we set the raw place array to empty. if the next run of the
+    # pipeline also fails, then the last cleaned place will not have any raw
+    # places associated with it. In that case, we find the matching raw place
+    # and fill it in
+    # Hack to deal with this historical fact
+    if len(last_cleaned_place["data"]["raw_places"]) == 0:
+        ending_trip = esda.get_entry(esda.CLEANED_TRIP_KEY, last_cleaned_place["data"]["ending_trip"])
+        ending_raw_trip = esda.get_entry(esda.RAW_TRIP_KEY, ending_trip["data"]["raw_trip"])
+        raw_place_id = ending_raw_trip["data"]["end_place"]
+        last_cleaned_place["data"]["raw_places"] = [raw_place_id]
     last_raw_place_id = last_cleaned_place["data"]["raw_places"][-1]
     last_raw_place = esda.get_entry(esda.RAW_PLACE_KEY, last_raw_place_id)
     logging.debug("last_raw_place = %s" % last_raw_place)
