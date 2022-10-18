@@ -9,7 +9,9 @@ from builtins import object
 import urllib.request, urllib.parse, urllib.error, json
 import json
 import logging
-from jwcrypto import jwt, jwk
+# Disable this due to https://security.snyk.io/vuln/SNYK-PYTHON-JWCRYPTO-3030035
+# We should consider removing this completely when we remove the openid option from the app as well
+# from jwcrypto import jwt, jwk
 
 
 class OpenIDAuthMethod(object):
