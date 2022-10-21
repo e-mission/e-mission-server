@@ -93,6 +93,9 @@ def get_user_input_dict(ts, tct, input_key_list):
         matched_userinput = esdt.get_user_input_for_trip_object(ts, tct, ikey)
         if matched_userinput is not None:
             ikey_name = obj_to_dict_key(ikey)
-            tct_userinput[ikey_name] = matched_userinput.data.label
+            if ikey_name == "trip_user_input":
+                tct_userinput[ikey_name] = matched_userinput
+            else:
+                tct_userinput[ikey_name] = matched_userinput.data.label
     logging.debug("for trip %s, returning user input dict %s" % (tct.get_id(), tct_userinput))
     return tct_userinput
