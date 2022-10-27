@@ -13,6 +13,10 @@ import requests
 
 class TokenListMethod(object):
     def __init__(self):
+
+        # import emission.storage.decorations.token_queiries as tq
+        # key_file = tq.get_all_tokens()
+
         key_file = open('conf/net/auth/token_list.json')
         key_data = json.load(key_file)
         key_file.close()
