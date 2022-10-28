@@ -7,4 +7,4 @@ set -e
 # rm: missing operand
 # Try `rm --help' for more information.
 # PYTHONPATH=. python -m unittest discover -s emission/tests -p Test*;
-PYTHONPATH=. python emission/tests/netTests/TestPush.py
+PYTHONPATH=. python emission/tests/storageTests/token_test.py

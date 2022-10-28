@@ -10,21 +10,13 @@ import logging
 import json
 import traceback
 import requests
+import emission.storage.decorations.token_queries as tq
 
 class TokenListMethod(object):
-    def __init__(self):
+    def __init__(self, source='conf/net/auth/token_list.json', userid=0):
 
-        # import emission.storage.decorations.token_queiries as tq
-        # key_file = tq.get_all_tokens()
-
-        key_file = open('conf/net/auth/token_list.json')
-        key_data = json.load(key_file)
-        key_file.close()
-        self.token_list_file = key_data["token_list"]
-        with open(self.token_list_file) as tlf:
-            raw_token_list = tlf.readlines()
-        self.token_list = [t.strip() for t in raw_token_list]
-        raw_token_list = None
+        tq.insert_from_json(source, userid)
+        self.token_list = tq.get_all_tokens()
 
     def verifyUserToken(self, token):
         # attempt to validate token on the client-side

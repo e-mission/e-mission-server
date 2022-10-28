@@ -42,11 +42,6 @@ def _get_current_db():
 
 def get_token_db():
     Tokens= _get_current_db().Stage_Tokens
-    print("tokens")
-    mydict = { "name": "John", "address": "Highway 37" }
-
-    x = Tokens.insert_one(mydict)
-    print(_get_current_db().list_collection_names())
     return Tokens
 
 get_token_db()
