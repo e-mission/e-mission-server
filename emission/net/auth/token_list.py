@@ -10,13 +10,11 @@ import logging
 import json
 import traceback
 import requests
-import emission.storage.decorations.token_queries as tq
+import emission.storage.decorations.token_queries as esdt
 
 class TokenListMethod(object):
     def __init__(self, source='conf/net/auth/token_list.json', userid=0):
-
-        tq.insert_from_json(source, userid)
-        self.token_list = tq.get_all_tokens()
+        self.token_list = esdt.get_all_tokens()
 
     def verifyUserToken(self, token):
         # attempt to validate token on the client-side
