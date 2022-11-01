@@ -13,7 +13,7 @@ import requests
 import emission.storage.decorations.token_queries as esdt
 
 class TokenListMethod(object):
-    def __init__(self, source='conf/net/auth/token_list.json', userid=0):
+    def __init__(self, source='conf/net/auth/token_list.json'):
         self.token_list = esdt.get_all_tokens()
 
     def verifyUserToken(self, token):
