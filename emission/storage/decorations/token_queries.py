@@ -22,5 +22,4 @@ def get_tokens_from_file(file):
     with open(file) as tlf:
         raw_token_list = tlf.readlines()
     token_list = [t.strip() for t in raw_token_list]
-    print(token_list)
     return(token_list)
