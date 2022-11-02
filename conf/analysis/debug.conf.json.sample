@@ -8,5 +8,5 @@
     "classification.validityAssertions": true,
     "output.conversion.validityAssertions": true,
     "analysis.result.section.key": "analysis/inferred_section",
-    "userinput.keylist": ["manual/mode_confirm", "manual/purpose_confirm"]
+    "userinput.keylist": ["manual/mode_confirm", "manual/purpose_confirm", "manual/trip_user_input"]
 }

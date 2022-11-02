@@ -38,7 +38,10 @@ def match_incoming_inputs(user_id, timerange):
         confirmed_trip = esdt.get_trip_for_user_input_obj(ts, ui)
         if confirmed_trip is not None:
             input_name = obj_to_dict_key(ui.metadata.key)
-            confirmed_trip["data"]["user_input"][input_name] = ui.data.label
+            if input_name == "trip_user_input":
+                confirmed_trip["data"]["user_input"][input_name] = ui
+            else:
+                confirmed_trip["data"]["user_input"][input_name] = ui.data.label
             import emission.storage.timeseries.builtin_timeseries as estbt
             estbt.BuiltinTimeSeries.update(confirmed_trip)
         else:
@@ -93,6 +96,9 @@ def get_user_input_dict(ts, tct, input_key_list):
         matched_userinput = esdt.get_user_input_for_trip_object(ts, tct, ikey)
         if matched_userinput is not None:
             ikey_name = obj_to_dict_key(ikey)
-            tct_userinput[ikey_name] = matched_userinput.data.label
+            if ikey_name == "trip_user_input":
+                tct_userinput[ikey_name] = matched_userinput
+            else:
+                tct_userinput[ikey_name] = matched_userinput.data.label
     logging.debug("for trip %s, returning user input dict %s" % (tct.get_id(), tct_userinput))
     return tct_userinput

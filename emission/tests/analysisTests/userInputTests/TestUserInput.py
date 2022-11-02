@@ -43,7 +43,7 @@ class TestUserInput(unittest.TestCase):
         logging.info("Analysis delete result %s" % edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID}).raw_result)
         logging.info("Usercache delete result %s" % edb.get_usercache_db().delete_many({"user_id": self.testUUID}).raw_result)
 
-    def compare_trip_result(self, result_dicts, expect_dicts):
+    def compare_trip_result(self, result_dicts, expect_dicts, manual_trip_user_input=False):
         # This is basically a bunch of asserts to ensure that the timeline is as
         # expected. We are not using a recursive diff because things like the IDs
         # will change from run to run. Instead, I pick out a bunch of important
@@ -62,7 +62,11 @@ class TestUserInput(unittest.TestCase):
             logging.debug(json.dumps(rt, indent=4, default=bju.default))
             logging.debug(json.dumps(et, indent=4, default=bju.default))
             # Highly user visible
-            self.assertEqual(rt.data["user_input"], et.data["user_input"])
+            if manual_trip_user_input and "trip_user_input" in rt.data["user_input"]: 
+                # rt.data["user_input"] can be emptied if there is no user input for the confirm trip.
+                self.assertEqual(rt.data["user_input"]["trip_user_input"]["data"], et.data["user_input"]["trip_user_input"]["data"])
+            else:
+                self.assertEqual(rt.data["user_input"], et.data["user_input"])
             # self.assertEqual(rt.data.inferred_primary_mode, et.data.inferred_primary_mode)
             logging.debug(20 * "=")
 
@@ -87,24 +91,24 @@ class TestUserInput(unittest.TestCase):
             self.assertEqual(rt.display_mode, et.display_mode)
             logging.debug(20 * "=")
 
-    def checkConfirmedTripsAndSections(self, dataFile, ld, preload=False):
+    def checkConfirmedTripsAndSections(self, dataFile, ld, preload=False, manual_trip_user_input=False):
         with open(dataFile+".ground_truth") as gfp:
             ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
         if (preload):
-            self.entries = json.load(open(dataFile+".user_inputs"), object_hook = bju.object_hook)
+            self.entries = json.load(open(dataFile+".user_inputs"+(".manual_trip_user_input" if manual_trip_user_input else "")), object_hook = bju.object_hook)
             etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
         if (not preload):
-            self.entries = json.load(open(dataFile+".user_inputs"), object_hook = bju.object_hook)
+            self.entries = json.load(open(dataFile+".user_inputs"+(".manual_trip_user_input" if manual_trip_user_input else "")), object_hook = bju.object_hook)
             etc.setupRealExampleWithEntries(self)
             etc.runIntakePipeline(self.testUUID)
         ts = esta.TimeSeries.get_time_series(self.testUUID)
         confirmed_trips = list(ts.find_entries(["analysis/confirmed_trip"], None))
-        with open(dataFile+".expected_confirmed_trips") as dect:
+        with open(dataFile+".expected_confirmed_trips"+(".manual_trip_user_input" if manual_trip_user_input else "")) as dect:
             expected_confirmed_trips = json.load(dect, object_hook = bju.object_hook)
-            self.compare_trip_result(confirmed_trips, expected_confirmed_trips)
+            self.compare_trip_result(confirmed_trips, expected_confirmed_trips, manual_trip_user_input=True if manual_trip_user_input else False)
 
 #         confirmed_sections = ts.find_entries(["analysis/confirmed_section"],
 #             estc.TimeComponentQuery("data.local_dt", ld, ld))
@@ -139,6 +143,11 @@ class TestUserInput(unittest.TestCase):
         dataFile = "emission/tests/data/real_examples/shankari_2016-06-20"
         ld = ecwl.LocalDate({'year': 2016, 'month': 6, 'day': 20})
         self.checkConfirmedTripsAndSections(dataFile, ld, preload=False)
+
+    def testManualUserInput(self):
+        dataFile = "emission/tests/data/real_examples/shankari_2016-06-20"
+        ld = ecwl.LocalDate({'year': 2016, 'month': 6, 'day': 20})
+        self.checkConfirmedTripsAndSections(dataFile, ld, preload=True, manual_trip_user_input=True)
 
 if __name__ == '__main__':
     etc.configLogging()

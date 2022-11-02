@@ -1,0 +1,886 @@
+[
+    {
+        "_id": {
+            "$oid": "6358c4b9a03616e6f1a790fe"
+        },
+        "user_id": {
+            "$uuid": "aa9fdec92944446c8ee250d79b3044d3"
+        },
+        "metadata": {
+            "key": "analysis/confirmed_trip",
+            "platform": "server",
+            "write_ts": 1666761913.764895,
+            "time_zone": "America/Los_Angeles",
+            "write_local_dt": {
+                "year": 2022,
+                "month": 10,
+                "day": 25,
+                "hour": 22,
+                "minute": 25,
+                "second": 13,
+                "weekday": 1,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2022-10-25T22:25:13.764895-07:00"
+        },
+        "data": {
+            "source": "DwellSegmentationTimeFilter",
+            "end_ts": 1466437275.856,
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 8,
+                "minute": 41,
+                "second": 15,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T08:41:15.856000-07:00",
+            "end_loc": {
+                "type": "Point",
+                "coordinates": [
+                    -122.0826931,
+                    37.3914184
+                ]
+            },
+            "raw_trip": {
+                "$oid": "6358c4b7a03616e6f1a78ff5"
+            },
+            "start_ts": 1466436483.395,
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 8,
+                "minute": 28,
+                "second": 3,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T08:28:03.395000-07:00",
+            "start_loc": {
+                "type": "Point",
+                "coordinates": [
+                    -122.0857861,
+                    37.3898049
+                ]
+            },
+            "duration": 792.4609999656677,
+            "distance": 1047.1630675866315,
+            "start_place": {
+                "$oid": "6358c4b9a03616e6f1a790c9"
+            },
+            "end_place": {
+                "$oid": "6358c4b9a03616e6f1a790ca"
+            },
+            "cleaned_trip": {
+                "$oid": "6358c4b8a03616e6f1a79018"
+            },
+            "inferred_labels": [],
+            "inferred_trip": {
+                "$oid": "6358c4b9a03616e6f1a790e4"
+            },
+            "expectation": {
+                "to_label": true
+            },
+            "confidence_threshold": 0.55,
+            "expected_trip": {
+                "$oid": "6358c4b9a03616e6f1a790f7"
+            },
+            "user_input": {
+                "trip_user_input": {
+                    "_id": {
+                        "$oid": "5fd7b7bdf181cd8feb045f29"
+                    },
+                    "user_id": {
+                        "$uuid": "aa9fdec92944446c8ee250d79b3044d3"
+                    },
+                    "metadata": {
+                        "key": "manual/trip_user_input",
+                        "platform": "android",
+                        "read_ts": 0,
+                        "time_zone": "America/Los_Angeles",
+                        "type": "message",
+                        "write_ts": 1607970514.069,
+                        "write_local_dt": {
+                            "year": 2020,
+                            "month": 12,
+                            "day": 14,
+                            "hour": 10,
+                            "minute": 28,
+                            "second": 34,
+                            "weekday": 0,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2020-12-14T10:28:34.069000-08:00"
+                    },
+                    "data": {
+                        "start_ts": 1466436506.53,
+                        "end_ts": 1466437492.486,
+                        "xmlResponse": "<data xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:orx=\"http://openrosa.org/xforms\" xmlns:odk=\"http://www.opendatakit.org/xforms\" id=\"snapshot_xml\" version=\"2 (2022-10-24 06:26:19)\"><start>2022-10-25T18:31:00.880+11:00</start><end>2022-10-26T11:19:40.296+11:00</end><destination_purpose>Trip_not_valid</destination_purpose><travel_mode>driver</travel_mode><Total_people_in_trip_party/><Non_household_member_s_on_trip/><Vehicle_trip_Parking_location>1</Vehicle_trip_Parking_location><Parking_cost>0</Parking_cost><Total_toll_charges_p_uring_the_trip_AUD>0</Total_toll_charges_p_uring_the_trip_AUD><Taxi_fees/><__version__>vHye84TqSbFUbMrrsirRhg</__version__><meta><instanceID>uuid:618b9c26-6e8d-493f-84b7-cb25ab9e929b</instanceID>\n            \n          </meta>\n          \n          \n          \n          \n          \n          \n          \n          \n          \n          <Transit_fees_AUD/>\n          \n          \n        </data>",
+                        "label": "1 purpose, 1 mode",
+                        "jsonDocResponse": {
+                            "data": {
+                                "Parking_cost": "0",
+                                "start": "2022-10-25T18:31:00.880+11:00",
+                                "travel_mode": "driver",
+                                "Total_toll_charges_p_uring_the_trip_AUD": "0",
+                                "Vehicle_trip_Parking_location": "1",
+                                "Total_people_in_trip_party": "",
+                                "Transit_fees_AUD": "",
+                                "destination_purpose": "Trip_not_valid",
+                                "__version__": "vHye84TqSbFUbMrrsirRhg",
+                                "meta": {
+                                    "attr": {},
+                                    "instanceID": "uuid:618b9c26-6e8d-493f-84b7-cb25ab9e929b"
+                                },
+                                "Taxi_fees": "",
+                                "end": "2022-10-26T11:19:40.296+11:00",
+                                "Non_household_member_s_on_trip": "",
+                                "attr": {
+                                    "xmlns:jr": "http://openrosa.org/javarosa",
+                                    "xmlns:orx": "http://openrosa.org/xforms",
+                                    "id": "snapshot_xml",
+                                    "xmlns:odk": "http://www.opendatakit.org/xforms",
+                                    "version": "2 (2022-10-24 06:26:19)"
+                                }
+                            }
+                        },
+                        "start_local_dt": {
+                            "year": 2016,
+                            "month": 6,
+                            "day": 20,
+                            "hour": 8,
+                            "minute": 28,
+                            "second": 26,
+                            "weekday": 0,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "start_fmt_time": "2016-06-20T08:28:26.530000-07:00",
+                        "end_local_dt": {
+                            "year": 2016,
+                            "month": 6,
+                            "day": 20,
+                            "hour": 8,
+                            "minute": 44,
+                            "second": 52,
+                            "weekday": 0,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "end_fmt_time": "2016-06-20T08:44:52.486000-07:00"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6358c4b9a03616e6f1a790ff"
+        },
+        "user_id": {
+            "$uuid": "aa9fdec92944446c8ee250d79b3044d3"
+        },
+        "metadata": {
+            "key": "analysis/confirmed_trip",
+            "platform": "server",
+            "write_ts": 1666761913.766536,
+            "time_zone": "America/Los_Angeles",
+            "write_local_dt": {
+                "year": 2022,
+                "month": 10,
+                "day": 25,
+                "hour": 22,
+                "minute": 25,
+                "second": 13,
+                "weekday": 1,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2022-10-25T22:25:13.766536-07:00"
+        },
+        "data": {
+            "source": "DwellSegmentationTimeFilter",
+            "end_ts": 1466438022.959,
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 8,
+                "minute": 53,
+                "second": 42,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T08:53:42.959000-07:00",
+            "end_loc": {
+                "type": "Point",
+                "coordinates": [
+                    -122.0866181,
+                    37.3910231
+                ]
+            },
+            "raw_trip": {
+                "$oid": "6358c4b7a03616e6f1a78ff7"
+            },
+            "start_ts": 1466437438.6453953,
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 8,
+                "minute": 43,
+                "second": 58,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T08:43:58.645395-07:00",
+            "start_loc": {
+                "type": "Point",
+                "coordinates": [
+                    -122.0826931,
+                    37.3914184
+                ]
+            },
+            "duration": 584.3136048316956,
+            "distance": 886.4937093667857,
+            "start_place": {
+                "$oid": "6358c4b9a03616e6f1a790ca"
+            },
+            "end_place": {
+                "$oid": "6358c4b9a03616e6f1a790cb"
+            },
+            "cleaned_trip": {
+                "$oid": "6358c4b8a03616e6f1a79037"
+            },
+            "inferred_labels": [],
+            "inferred_trip": {
+                "$oid": "6358c4b9a03616e6f1a790e7"
+            },
+            "expectation": {
+                "to_label": true
+            },
+            "confidence_threshold": 0.55,
+            "expected_trip": {
+                "$oid": "6358c4b9a03616e6f1a790f8"
+            },
+            "user_input": {}
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6358c4b9a03616e6f1a79100"
+        },
+        "user_id": {
+            "$uuid": "aa9fdec92944446c8ee250d79b3044d3"
+        },
+        "metadata": {
+            "key": "analysis/confirmed_trip",
+            "platform": "server",
+            "write_ts": 1666761913.767939,
+            "time_zone": "America/Los_Angeles",
+            "write_local_dt": {
+                "year": 2022,
+                "month": 10,
+                "day": 25,
+                "hour": 22,
+                "minute": 25,
+                "second": 13,
+                "weekday": 1,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2022-10-25T22:25:13.767939-07:00"
+        },
+        "data": {
+            "source": "DwellSegmentationTimeFilter",
+            "end_ts": 1466461966.379,
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 15,
+                "minute": 32,
+                "second": 46,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T15:32:46.379000-07:00",
+            "end_loc": {
+                "type": "Point",
+                "coordinates": [
+                    -122.0830016,
+                    37.3901637
+                ]
+            },
+            "raw_trip": {
+                "$oid": "6358c4b7a03616e6f1a78ff9"
+            },
+            "start_ts": 1466461623.1195338,
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 15,
+                "minute": 27,
+                "second": 3,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T15:27:03.119534-07:00",
+            "start_loc": {
+                "type": "Point",
+                "coordinates": [
+                    -122.0866181,
+                    37.3910231
+                ]
+            },
+            "duration": 343.25946617126465,
+            "distance": 610.2234223038181,
+            "start_place": {
+                "$oid": "6358c4b9a03616e6f1a790cb"
+            },
+            "end_place": {
+                "$oid": "6358c4b9a03616e6f1a790cc"
+            },
+            "cleaned_trip": {
+                "$oid": "6358c4b8a03616e6f1a7904f"
+            },
+            "inferred_labels": [],
+            "inferred_trip": {
+                "$oid": "6358c4b9a03616e6f1a790ea"
+            },
+            "expectation": {
+                "to_label": true
+            },
+            "confidence_threshold": 0.55,
+            "expected_trip": {
+                "$oid": "6358c4b9a03616e6f1a790f9"
+            },
+            "user_input": {}
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6358c4b9a03616e6f1a79101"
+        },
+        "user_id": {
+            "$uuid": "aa9fdec92944446c8ee250d79b3044d3"
+        },
+        "metadata": {
+            "key": "analysis/confirmed_trip",
+            "platform": "server",
+            "write_ts": 1666761913.769408,
+            "time_zone": "America/Los_Angeles",
+            "write_local_dt": {
+                "year": 2022,
+                "month": 10,
+                "day": 25,
+                "hour": 22,
+                "minute": 25,
+                "second": 13,
+                "weekday": 1,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2022-10-25T22:25:13.769408-07:00"
+        },
+        "data": {
+            "source": "DwellSegmentationTimeFilter",
+            "end_ts": 1466462452.708,
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 15,
+                "minute": 40,
+                "second": 52,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T15:40:52.708000-07:00",
+            "end_loc": {
+                "type": "Point",
+                "coordinates": [
+                    -122.086605,
+                    37.3910011
+                ]
+            },
+            "raw_trip": {
+                "$oid": "6358c4b7a03616e6f1a78ffb"
+            },
+            "start_ts": 1466462052.158904,
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 15,
+                "minute": 34,
+                "second": 12,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T15:34:12.158904-07:00",
+            "start_loc": {
+                "type": "Point",
+                "coordinates": [
+                    -122.0830016,
+                    37.3901637
+                ]
+            },
+            "duration": 400.54909586906433,
+            "distance": 405.97685486691756,
+            "start_place": {
+                "$oid": "6358c4b9a03616e6f1a790cc"
+            },
+            "end_place": {
+                "$oid": "6358c4b9a03616e6f1a790cd"
+            },
+            "cleaned_trip": {
+                "$oid": "6358c4b8a03616e6f1a7905f"
+            },
+            "inferred_labels": [],
+            "inferred_trip": {
+                "$oid": "6358c4b9a03616e6f1a790ed"
+            },
+            "expectation": {
+                "to_label": true
+            },
+            "confidence_threshold": 0.55,
+            "expected_trip": {
+                "$oid": "6358c4b9a03616e6f1a790fa"
+            },
+            "user_input": {
+                "trip_user_input": {
+                    "_id": {
+                        "$oid": "5fd7b7bdf181cd8feb045f41"
+                    },
+                    "user_id": {
+                        "$uuid": "aa9fdec92944446c8ee250d79b3044d3"
+                    },
+                    "metadata": {
+                        "key": "manual/trip_user_input",
+                        "platform": "android",
+                        "read_ts": 0,
+                        "time_zone": "America/Los_Angeles",
+                        "type": "message",
+                        "write_ts": 1607972464.372,
+                        "write_local_dt": {
+                            "year": 2020,
+                            "month": 12,
+                            "day": 14,
+                            "hour": 11,
+                            "minute": 1,
+                            "second": 4,
+                            "weekday": 0,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2020-12-14T11:01:04.372000-08:00"
+                    },
+                    "data": {
+                        "start_ts": 1466462052.158904,
+                        "end_ts": 1466462452.708,
+                        "xmlResponse": "<data xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:orx=\"http://openrosa.org/xforms\" xmlns:odk=\"http://www.opendatakit.org/xforms\" id=\"snapshot_xml\" version=\"2 (2022-10-24 06:26:19)\"><start>2022-10-25T18:31:00.880+11:00</start><end>2022-10-26T11:19:40.296+11:00</end><destination_purpose>Trip_not_valid</destination_purpose><travel_mode>driver</travel_mode><Total_people_in_trip_party/><Non_household_member_s_on_trip/><Vehicle_trip_Parking_location>1</Vehicle_trip_Parking_location><Parking_cost>0</Parking_cost><Total_toll_charges_p_uring_the_trip_AUD>0</Total_toll_charges_p_uring_the_trip_AUD><Taxi_fees/><__version__>vHye84TqSbFUbMrrsirRhg</__version__><meta><instanceID>uuid:618b9c26-6e8d-493f-84b7-cb25ab9e929b</instanceID>\n            \n          </meta>\n          \n          \n          \n          \n          \n          \n          \n          \n          \n          <Transit_fees_AUD/>\n          \n          \n        </data>",
+                        "label": "1 purpose, 1 mode",
+                        "jsonDocResponse": {
+                            "data": {
+                                "Parking_cost": "0",
+                                "start": "2022-10-25T18:31:00.880+11:00",
+                                "travel_mode": "driver",
+                                "Total_toll_charges_p_uring_the_trip_AUD": "0",
+                                "Vehicle_trip_Parking_location": "1",
+                                "Total_people_in_trip_party": "",
+                                "Transit_fees_AUD": "",
+                                "destination_purpose": "Trip_not_valid",
+                                "__version__": "vHye84TqSbFUbMrrsirRhg",
+                                "meta": {
+                                    "attr": {},
+                                    "instanceID": "uuid:618b9c26-6e8d-493f-84b7-cb25ab9e929b"
+                                },
+                                "Taxi_fees": "",
+                                "end": "2022-10-26T11:19:40.296+11:00",
+                                "Non_household_member_s_on_trip": "",
+                                "attr": {
+                                    "xmlns:jr": "http://openrosa.org/javarosa",
+                                    "xmlns:orx": "http://openrosa.org/xforms",
+                                    "id": "snapshot_xml",
+                                    "xmlns:odk": "http://www.opendatakit.org/xforms",
+                                    "version": "2 (2022-10-24 06:26:19)"
+                                }
+                            }
+                        },
+                        "start_local_dt": {
+                            "year": 2016,
+                            "month": 6,
+                            "day": 20,
+                            "hour": 15,
+                            "minute": 34,
+                            "second": 12,
+                            "weekday": 0,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "start_fmt_time": "2016-06-20T15:34:12.158904-07:00",
+                        "end_local_dt": {
+                            "year": 2016,
+                            "month": 6,
+                            "day": 20,
+                            "hour": 15,
+                            "minute": 40,
+                            "second": 52,
+                            "weekday": 0,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "end_fmt_time": "2016-06-20T15:40:52.708000-07:00"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6358c4b9a03616e6f1a79102"
+        },
+        "user_id": {
+            "$uuid": "aa9fdec92944446c8ee250d79b3044d3"
+        },
+        "metadata": {
+            "key": "analysis/confirmed_trip",
+            "platform": "server",
+            "write_ts": 1666761913.770894,
+            "time_zone": "America/Los_Angeles",
+            "write_local_dt": {
+                "year": 2022,
+                "month": 10,
+                "day": 25,
+                "hour": 22,
+                "minute": 25,
+                "second": 13,
+                "weekday": 1,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2022-10-25T22:25:13.770894-07:00"
+        },
+        "data": {
+            "source": "DwellSegmentationTimeFilter",
+            "end_ts": 1466463835.713,
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 16,
+                "minute": 3,
+                "second": 55,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T16:03:55.713000-07:00",
+            "end_loc": {
+                "type": "Point",
+                "coordinates": [
+                    -122.1081974,
+                    37.4168828
+                ]
+            },
+            "raw_trip": {
+                "$oid": "6358c4b7a03616e6f1a78ffd"
+            },
+            "start_ts": 1466462970.2807262,
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 15,
+                "minute": 49,
+                "second": 30,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T15:49:30.280726-07:00",
+            "start_loc": {
+                "type": "Point",
+                "coordinates": [
+                    -122.086605,
+                    37.3910011
+                ]
+            },
+            "duration": 865.4322738647461,
+            "distance": 4521.417177464177,
+            "start_place": {
+                "$oid": "6358c4b9a03616e6f1a790cd"
+            },
+            "end_place": {
+                "$oid": "6358c4b9a03616e6f1a790ce"
+            },
+            "cleaned_trip": {
+                "$oid": "6358c4b9a03616e6f1a79071"
+            },
+            "inferred_labels": [],
+            "inferred_trip": {
+                "$oid": "6358c4b9a03616e6f1a790f0"
+            },
+            "expectation": {
+                "to_label": true
+            },
+            "confidence_threshold": 0.55,
+            "expected_trip": {
+                "$oid": "6358c4b9a03616e6f1a790fb"
+            },
+            "user_input": {
+                "trip_user_input": {
+                    "_id": {
+                        "$oid": "5fd7b7bdf181cd8feb045f47"
+                    },
+                    "user_id": {
+                        "$uuid": "aa9fdec92944446c8ee250d79b3044d3"
+                    },
+                    "metadata": {
+                        "key": "manual/trip_user_input",
+                        "platform": "android",
+                        "read_ts": 0,
+                        "time_zone": "America/Los_Angeles",
+                        "type": "message",
+                        "write_ts": 1607972700.068,
+                        "write_local_dt": {
+                            "year": 2020,
+                            "month": 12,
+                            "day": 14,
+                            "hour": 11,
+                            "minute": 5,
+                            "second": 0,
+                            "weekday": 0,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2020-12-14T11:05:00.068000-08:00"
+                    },
+                    "data": {
+                        "start_ts": 1466462970.2807262,
+                        "end_ts": 1466463835.713,
+                        "xmlResponse": "<data xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:orx=\"http://openrosa.org/xforms\" xmlns:odk=\"http://www.opendatakit.org/xforms\" id=\"snapshot_xml\" version=\"2 (2022-10-24 06:26:19)\"><start>2022-10-25T18:31:00.880+11:00</start><end>2022-10-26T11:19:40.296+11:00</end><destination_purpose>Trip_not_valid</destination_purpose><travel_mode>driver</travel_mode><Total_people_in_trip_party/><Non_household_member_s_on_trip/><Vehicle_trip_Parking_location>1</Vehicle_trip_Parking_location><Parking_cost>0</Parking_cost><Total_toll_charges_p_uring_the_trip_AUD>0</Total_toll_charges_p_uring_the_trip_AUD><Taxi_fees/><__version__>vHye84TqSbFUbMrrsirRhg</__version__><meta><instanceID>uuid:618b9c26-6e8d-493f-84b7-cb25ab9e929b</instanceID>\n            \n          </meta>\n          \n          \n          \n          \n          \n          \n          \n          \n          \n          <Transit_fees_AUD/>\n          \n          \n        </data>",
+                        "label": "1 purpose, 1 mode",
+                        "jsonDocResponse": {
+                            "data": {
+                                "Parking_cost": "0",
+                                "start": "2022-10-25T18:31:00.880+11:00",
+                                "travel_mode": "driver",
+                                "Total_toll_charges_p_uring_the_trip_AUD": "0",
+                                "Vehicle_trip_Parking_location": "1",
+                                "Total_people_in_trip_party": "",
+                                "Transit_fees_AUD": "",
+                                "destination_purpose": "Trip_not_valid",
+                                "__version__": "vHye84TqSbFUbMrrsirRhg",
+                                "meta": {
+                                    "attr": {},
+                                    "instanceID": "uuid:618b9c26-6e8d-493f-84b7-cb25ab9e929b"
+                                },
+                                "Taxi_fees": "",
+                                "end": "2022-10-26T11:19:40.296+11:00",
+                                "Non_household_member_s_on_trip": "",
+                                "attr": {
+                                    "xmlns:jr": "http://openrosa.org/javarosa",
+                                    "xmlns:orx": "http://openrosa.org/xforms",
+                                    "id": "snapshot_xml",
+                                    "xmlns:odk": "http://www.opendatakit.org/xforms",
+                                    "version": "2 (2022-10-24 06:26:19)"
+                                }
+                            }
+                        },
+                        "start_local_dt": {
+                            "year": 2016,
+                            "month": 6,
+                            "day": 20,
+                            "hour": 15,
+                            "minute": 49,
+                            "second": 30,
+                            "weekday": 0,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "start_fmt_time": "2016-06-20T15:49:30.280726-07:00",
+                        "end_local_dt": {
+                            "year": 2016,
+                            "month": 6,
+                            "day": 20,
+                            "hour": 16,
+                            "minute": 3,
+                            "second": 55,
+                            "weekday": 0,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "end_fmt_time": "2016-06-20T16:03:55.713000-07:00"
+                    }
+                }
+            }
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6358c4b9a03616e6f1a79103"
+        },
+        "user_id": {
+            "$uuid": "aa9fdec92944446c8ee250d79b3044d3"
+        },
+        "metadata": {
+            "key": "analysis/confirmed_trip",
+            "platform": "server",
+            "write_ts": 1666761913.772286,
+            "time_zone": "America/Los_Angeles",
+            "write_local_dt": {
+                "year": 2022,
+                "month": 10,
+                "day": 25,
+                "hour": 22,
+                "minute": 25,
+                "second": 13,
+                "weekday": 1,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2022-10-25T22:25:13.772286-07:00"
+        },
+        "data": {
+            "source": "DwellSegmentationTimeFilter",
+            "end_ts": 1466467959.767,
+            "end_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 17,
+                "minute": 12,
+                "second": 39,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2016-06-20T17:12:39.767000-07:00",
+            "end_loc": {
+                "type": "Point",
+                "coordinates": [
+                    -122.0864051,
+                    37.3907649
+                ]
+            },
+            "raw_trip": {
+                "$oid": "6358c4b7a03616e6f1a79001"
+            },
+            "start_ts": 1466466584.0461695,
+            "start_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 16,
+                "minute": 49,
+                "second": 44,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2016-06-20T16:49:44.046170-07:00",
+            "start_loc": {
+                "type": "Point",
+                "coordinates": [
+                    -122.1081974,
+                    37.4168828
+                ]
+            },
+            "duration": 1375.7208304405212,
+            "distance": 5136.824369981995,
+            "start_place": {
+                "$oid": "6358c4b9a03616e6f1a790ce"
+            },
+            "end_place": {
+                "$oid": "6358c4b9a03616e6f1a790d0"
+            },
+            "cleaned_trip": {
+                "$oid": "6358c4b9a03616e6f1a79095"
+            },
+            "inferred_labels": [],
+            "inferred_trip": {
+                "$oid": "6358c4b9a03616e6f1a790f3"
+            },
+            "expectation": {
+                "to_label": true
+            },
+            "confidence_threshold": 0.55,
+            "expected_trip": {
+                "$oid": "6358c4b9a03616e6f1a790fc"
+            },
+            "user_input": {
+                "trip_user_input": {
+                    "_id": {
+                        "$oid": "5fd7b7bdf181cd8feb045f37"
+                    },
+                    "user_id": {
+                        "$uuid": "aa9fdec92944446c8ee250d79b3044d3"
+                    },
+                    "metadata": {
+                        "key": "manual/trip_user_input",
+                        "platform": "android",
+                        "read_ts": 0,
+                        "time_zone": "America/Los_Angeles",
+                        "type": "message",
+                        "write_ts": 1607970729.493,
+                        "write_local_dt": {
+                            "year": 2020,
+                            "month": 12,
+                            "day": 14,
+                            "hour": 10,
+                            "minute": 32,
+                            "second": 9,
+                            "weekday": 0,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2020-12-14T10:32:09.493000-08:00"
+                    },
+                    "data": {
+                        "start_ts": 1466466680.964,
+                        "end_ts": 1466468087.626,
+                        "xmlResponse": "<data xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:orx=\"http://openrosa.org/xforms\" xmlns:odk=\"http://www.opendatakit.org/xforms\" id=\"snapshot_xml\" version=\"2 (2022-10-24 06:26:19)\"><start>2022-10-25T18:31:00.880+11:00</start><end>2022-10-26T11:19:40.296+11:00</end><destination_purpose>Trip_not_valid</destination_purpose><travel_mode>driver</travel_mode><Total_people_in_trip_party/><Non_household_member_s_on_trip/><Vehicle_trip_Parking_location>1</Vehicle_trip_Parking_location><Parking_cost>0</Parking_cost><Total_toll_charges_p_uring_the_trip_AUD>0</Total_toll_charges_p_uring_the_trip_AUD><Taxi_fees/><__version__>vHye84TqSbFUbMrrsirRhg</__version__><meta><instanceID>uuid:618b9c26-6e8d-493f-84b7-cb25ab9e929b</instanceID>\n            \n          </meta>\n          \n          \n          \n          \n          \n          \n          \n          \n          \n          <Transit_fees_AUD/>\n          \n          \n        </data>",
+                        "label": "1 purpose, 1 mode",
+                        "jsonDocResponse": {
+                            "data": {
+                                "Parking_cost": "0",
+                                "start": "2022-10-25T18:31:00.880+11:00",
+                                "travel_mode": "driver",
+                                "Total_toll_charges_p_uring_the_trip_AUD": "0",
+                                "Vehicle_trip_Parking_location": "1",
+                                "Total_people_in_trip_party": "",
+                                "Transit_fees_AUD": "",
+                                "destination_purpose": "Trip_not_valid",
+                                "__version__": "vHye84TqSbFUbMrrsirRhg",
+                                "meta": {
+                                    "attr": {},
+                                    "instanceID": "uuid:618b9c26-6e8d-493f-84b7-cb25ab9e929b"
+                                },
+                                "Taxi_fees": "",
+                                "end": "2022-10-26T11:19:40.296+11:00",
+                                "Non_household_member_s_on_trip": "",
+                                "attr": {
+                                    "xmlns:jr": "http://openrosa.org/javarosa",
+                                    "xmlns:orx": "http://openrosa.org/xforms",
+                                    "id": "snapshot_xml",
+                                    "xmlns:odk": "http://www.opendatakit.org/xforms",
+                                    "version": "2 (2022-10-24 06:26:19)"
+                                }
+                            }
+                        },
+                        "start_local_dt": {
+                            "year": 2016,
+                            "month": 6,
+                            "day": 20,
+                            "hour": 16,
+                            "minute": 51,
+                            "second": 20,
+                            "weekday": 0,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "start_fmt_time": "2016-06-20T16:51:20.964000-07:00",
+                        "end_local_dt": {
+                            "year": 2016,
+                            "month": 6,
+                            "day": 20,
+                            "hour": 17,
+                            "minute": 14,
+                            "second": 47,
+                            "weekday": 0,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "end_fmt_time": "2016-06-20T17:14:47.626000-07:00"
+                    }
+                }
+            }
+        }
+    }
+]
