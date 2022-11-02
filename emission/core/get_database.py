@@ -44,8 +44,6 @@ def get_token_db():
     Tokens= _get_current_db().Stage_Tokens
     return Tokens
 
-get_token_db()
-
 def get_mode_db():
     # #current_db = MongoClient().Stage_database
     Modes= _get_current_db().Stage_Modes
