@@ -10,7 +10,6 @@ import emission.core.get_database as edb
 import emission.storage.decorations.token_queries as esdt
 import emission.net.auth.token_list as enat
 
-import bin.auth.insert_tokens as bai
 
 class TestTokenQueries(unittest.TestCase):
     def setUp(self):
