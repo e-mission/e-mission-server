@@ -12,9 +12,13 @@ import emission.net.auth.token_list as enat
 
 
 class TestTokenQueries(unittest.TestCase):
-    def setUp(self):
-        self.testUserId = uuid.uuid3(uuid.NAMESPACE_URL, "mailto:test@test.me")
-        edb.get_token_db().delete_many({})
+
+    def tearDown(self):
+    #All tests insert tokens of length one. Delete them once the test is done.
+    #Shouldn't affect "real" tokens with greater length that might be in the DB
+        for t in edb.get_token_db().find({}):
+            if len(t["token"]) == 1:
+                edb.get_token_db().delete_one(t)
 
     def test_single_insert(self):
         esdt.insert({'token':'z'})
