@@ -59,6 +59,7 @@ except:
     config_file = open('conf/net/api/webserver.conf.sample')
 
 OPENPATH_URL="https://www.nrel.gov/transportation/openpath.html"
+STUDY_CONFIG = os.getenv('STUDY_CONFIG', "stage-program")
 
 config_data = json.load(config_file)
 config_file.close()
@@ -482,6 +483,25 @@ def getUUID(request, inHeader=False):
         traceback.print_exc()
         abort(403, e)
 
+def resolve_auth(auth_method):
+    if auth_method == "dynamic":
+        download_url = "https://raw.githubusercontent.com/e-mission/nrel-openpath-deploy-configs/main/configs/" + STUDY_CONFIG + ".nrel-op.json"
+        print("About to download config from %s" % download_url)
+        r = requests.get(download_url)
+        if r.status_code is not 200:
+            print(f"Unable to download study config, status code: {r.status_code}")
+            sys.exit(1)
+        else:
+            dynamic_config = json.loads(r.text)
+            print(f"Successfully downloaded config with version {dynamic_config['version']} "\
+                f"for {dynamic_config['intro']['translated_text']['en']['deployment_name']} "\
+                f"and data collection URL {dynamic_config['server']['connectUrl']}")
+        if dynamic_config["intro"]["program_or_study"] == "program":
+            return "token_list"
+        else:
+            return "skip"
+    else:
+        return auth_method
 # Auth helpers END
 
 if __name__ == '__main__':
@@ -489,6 +509,8 @@ if __name__ == '__main__':
         webserver_log_config = json.load(open("conf/log/webserver.conf", "r"))
     except:
         webserver_log_config = json.load(open("conf/log/webserver.conf.sample", "r"))
+
+    auth_method = resolve_auth(auth_method)
 
     print(f"Using auth method {auth_method}")
 
