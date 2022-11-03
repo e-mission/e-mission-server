@@ -20,6 +20,7 @@ import emission.net.auth.auth as enaa
 import emission.net.auth.skip as enas
 import emission.net.auth.token_list as enat
 
+import emission.storage.decorations.token_queries as esdt
 # Test the auth methods. We will primarily test the "skip" and "token_list" 
 # since they require no external integration
 
@@ -43,6 +44,9 @@ class TestAuthSelection(unittest.TestCase):
         self.google_auth_conf_path = "conf/net/auth/google_auth.json"
         shutil.copyfile("%s.sample" % self.google_auth_conf_path,
                         self.google_auth_conf_path)
+
+        my_tl = esdt.get_tokens_from_file(self.token_list_path)
+        esdt.insert_many_tokens(my_tl)
 
     def tearDown(self):
         etc.tearDownTokenListAuth(self)

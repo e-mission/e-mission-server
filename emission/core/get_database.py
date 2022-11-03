@@ -40,6 +40,10 @@ _current_db = MongoClient(url)[db_name]
 def _get_current_db():
     return _current_db
 
+def get_token_db():
+    Tokens= _get_current_db().Stage_Tokens
+    return Tokens
+
 def get_mode_db():
     # #current_db = MongoClient().Stage_database
     Modes= _get_current_db().Stage_Modes
