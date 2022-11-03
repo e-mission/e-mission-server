@@ -8,7 +8,7 @@ from builtins import *
 import logging
 import emission.core.wrapper.wrapperbase as ecwb
 
-class TripUserInput(ecwb.WrapperBase):
+class Tripuserinput(ecwb.WrapperBase):
     props = {"start_ts": ecwb.WrapperBase.Access.RO,    # geojson representation of the point
              "start_local_dt": ecwb.WrapperBase.Access.RO, # start datetime in local time
              "start_fmt_time": ecwb.WrapperBase.Access.RO, # start formatted time (in timezone of point)
