@@ -71,8 +71,7 @@ socket_timeout = config_data["server"]["timeout"]
 log_base_dir = config_data["paths"]["log_base_dir"]
 auth_method = config_data["server"]["auth"]
 aggregate_call_auth = config_data["server"]["aggregate_call_auth"]
-# not_found_redirect = "foo" if len(config_data["paths"]) == 5 else "bar"
-not_found_redirect = config_data["paths"]["404_redirect"] if "404_redirect" in config_data["paths"] else OPENPATH_URL
+not_found_redirect = config_data["paths"].get("404_redirect", OPENPATH_URL)
 
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes
@@ -415,7 +414,7 @@ def habiticaProxy():
 @error(404)
 def error404(error):
     response.status = 301
-    response.set_header('Location', "https://www.nrel.gov/transportation/openpath.html")
+    response.set_header('Location', not_found_redirect)
 
 @app.hook('before_request')
 def before_request():
