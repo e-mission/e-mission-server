@@ -484,22 +484,27 @@ def getUUID(request, inHeader=False):
 
 def resolve_auth(auth_method):
     if auth_method == "dynamic":
+        logging.debug("auth_method is dynamic")
+        logging.debug(f"STUDY_CONFIG is {STUDY_CONFIG}")
         download_url = "https://raw.githubusercontent.com/e-mission/nrel-openpath-deploy-configs/main/configs/" + STUDY_CONFIG + ".nrel-op.json"
-        print("About to download config from %s" % download_url)
+        logging.debug("About to download config from %s" % download_url)
         r = requests.get(download_url)
         if r.status_code is not 200:
-            print(f"Unable to download study config, status code: {r.status_code}")
+            logging.debug(f"Unable to download study config, status code: {r.status_code}")
             sys.exit(1)
         else:
             dynamic_config = json.loads(r.text)
-            print(f"Successfully downloaded config with version {dynamic_config['version']} "\
+            logging.debug(f"Successfully downloaded config with version {dynamic_config['version']} "\
                 f"for {dynamic_config['intro']['translated_text']['en']['deployment_name']} "\
                 f"and data collection URL {dynamic_config['server']['connectUrl']}")
         if dynamic_config["intro"]["program_or_study"] == "program":
+            logging.debug("is a program set auth_method to token_list")
             return "token_list"
         else:
+            logging.debug("is a study set auth_method to skip")
             return "skip"
     else:
+        logging.debug("auth_method is static")
         return auth_method
 # Auth helpers END
 
@@ -509,8 +514,10 @@ if __name__ == '__main__':
     except:
         webserver_log_config = json.load(open("conf/log/webserver.conf.sample", "r"))
 
+    logging.debug("attempting to resolve auth_method")
     auth_method = resolve_auth(auth_method)
 
+    logging.debug(f"Using auth method {auth_method}")
     print(f"Using auth method {auth_method}")
 
     logging.config.dictConfig(webserver_log_config)
