@@ -69,8 +69,6 @@ class TestWebserver(unittest.TestCase):
         self.assertEqual(response.get_header("Location"), "http://somewhere.else")
 
     def testResolveAuth(self):
-        import emission.net.api.cfc_webapp as enacw
-
         self.assertEqual(enacw.resolve_auth("skip"),"skip")
         self.assertEqual(enacw.resolve_auth("token_list"),"token_list")
         self.assertEqual(enacw.resolve_auth("dynamic"),"token_list")
