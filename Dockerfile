@@ -36,6 +36,7 @@ ENV DB_HOST=''
 ENV WEB_SERVER_HOST=''
 
 ENV LIVERELOAD_SRC=''
+ENV STUDY_CONFIG=''
 RUN chmod u+x ./.docker/docker_start_script.sh
 
 EXPOSE 8080
