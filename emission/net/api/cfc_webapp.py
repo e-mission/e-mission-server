@@ -497,12 +497,17 @@ def resolve_auth(auth_method):
             logging.debug(f"Successfully downloaded config with version {dynamic_config['version']} "\
                 f"for {dynamic_config['intro']['translated_text']['en']['deployment_name']} "\
                 f"and data collection URL {dynamic_config['server']['connectUrl']}")
-        if dynamic_config["intro"]["program_or_study"] == "program":
-            logging.debug("is a program set auth_method to token_list")
-            return "token_list"
-        else:
-            logging.debug("is a study set auth_method to skip")
-            return "skip"
+
+            if STUDY_CONFIG.startswith('stage-'):
+                logging.debug("On staging, use token_list for testing purposes")
+                return "token_list"
+
+            elif dynamic_config["intro"]["program_or_study"] == "program":
+                logging.debug("is a program set auth_method to token_list")
+                return "token_list"
+            else:
+                logging.debug("is a study set auth_method to skip")
+                return "skip"
     else:
         logging.debug("auth_method is static")
         return auth_method
@@ -514,14 +519,12 @@ if __name__ == '__main__':
     except:
         webserver_log_config = json.load(open("conf/log/webserver.conf.sample", "r"))
 
+    logging.config.dictConfig(webserver_log_config)
     logging.debug("attempting to resolve auth_method")
     auth_method = resolve_auth(auth_method)
 
     logging.debug(f"Using auth method {auth_method}")
     print(f"Using auth method {auth_method}")
-
-    logging.config.dictConfig(webserver_log_config)
-    logging.debug("This should go to the log file")
 
     # We have see the sockets hang in practice. Let's set the socket timeout = 1
     # hour to be on the safe side, and see if it is hit.
