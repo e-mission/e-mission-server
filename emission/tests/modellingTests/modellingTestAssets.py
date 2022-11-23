@@ -187,11 +187,23 @@ def generate_mock_trips(
             purpose_weights=label_data.get('purpose_weights')
         )
         trip = build_mock_trip(user_id, o, d, labels, start_ts, end_ts)
+        trip = add_trip_demographics(trip)
         result.append(trip)
         
     random.shuffle(result) 
     return result
 
+
+def add_trip_demographics(trip):
+    trip['data']['survey'] = {}
+    survey_features = {
+        'hhinc':['0-24999','25000-49000','50000-99999','100000+'],
+        'age':[x for x in range(0, 70)],
+        'veh':['0','1','2','3','4+']
+    }
+    for feature in survey_features:
+        trip['data']['survey'][feature] = random.choice(survey_features[feature])
+    return trip
 
 if __name__ == '__main__':
     label_data = {

@@ -2,6 +2,7 @@ import logging
 from tokenize import group
 from typing import Dict, List, Optional, Tuple
 
+from math import radians, cos, sin, asin, sqrt
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
@@ -13,13 +14,13 @@ import emission.analysis.modelling.tour_model.label_processing as lp
 import emission.analysis.modelling.trip_model.trip_model as eamuu
 import emission.analysis.modelling.trip_model.util as util
 import emission.analysis.modelling.trip_model.config as eamtc
+import emission.core.get_database as edb
 import emission.core.wrapper.confirmedtrip as ecwc
 
 
 class GradientBoostedDecisionTree(eamuu.TripModel):
 
     is_incremental: bool = False  # overwritten during __init__
-    class_map: dict = {}  # overwritten during fit
 
     def __init__(self, config=None):
         """
@@ -71,11 +72,12 @@ class GradientBoostedDecisionTree(eamuu.TripModel):
         X_train, y_train = self.extract_features(trips)
         self.gbdt.fit(X_train, y_train)
         logging.info(f"gradient boosted decision tree model fit to {len(X_train)} rows of trip data")
+        logging.info(f"training features were {X_train.columns}")
 
-    def predict(self, trip: ecwc.Confirmedtrip) -> Tuple[List[Dict], int]:
+    def predict(self, trip: ecwc.Confirmedtrip) -> List[int]:
         logging.debug(f"running gradient boosted mode prediction")
-        X_train, y_train = self.extract_features(trip)
-        y_pred = self.gbdt.predict(X_train)
+        X_test, y_pred = self.extract_features(trip, is_prediction=True)
+        y_pred = self.gbdt.predict(X_test)
         if y_pred is None:
             logging.debug(f"unable to predict bin for trip {trip}")
             return []
@@ -84,39 +86,59 @@ class GradientBoostedDecisionTree(eamuu.TripModel):
             return y_pred
 
     def to_dict(self) -> Dict:
-        return self.gbdt
+        return dict(self.gbdt)
 
     def from_dict(self, model: Dict):
         self.gbdt = model
 
-    def extract_features(self, trips: ecwc.Confirmedtrip) -> List[float]:
-        # TODO: need to enable generic paths other than just user input for features
-        X = pd.DataFrame(
-            [[trip['data']['user_input'][x] for x in self.feature_list] for trip in trips],
-            columns=self.feature_list
-        )
-        y = pd.DataFrame(
-            [trip['data']['user_input'][self.dependent_var] for trip in trips],
-            columns=[self.dependent_var]
-        )
-        # Clean up and recode the feature columns for training/prediction
-        X_processed, y_processed = self._process_data(X, y)
-        return X_processed, y_processed
-
-    def _process_data(self, X, y):
-        """
-        helper function to transform binned features and labels.
-        """
-        # Any non-numeric dtype must be one-hot encoded (if unordered) or numerically coded (if ordered)
+    def extract_features(self, trips: ecwc.Confirmedtrip, is_prediction=False) -> List[float]:
+        # Get dataframe from json trips; fill in calculated columns
+        trips_df = pd.json_normalize(trips)
+        # distance
+        trips_coords = trips_df[['data.start_loc.coordinates','data.end_loc.coordinates']]
+        trips_df['distance_miles'] = trips_coords.apply(lambda row : self.haversine(row[0],row[1]), axis=1)
+        # collect all features
+        X = trips_df[self.feature_list]
+        # Any object/categorical dtype features must be one-hot encoded if unordered
         dummies = []
         for col in X:
             if X[col].dtype=='object':
                 dummies.append(pd.get_dummies(X[col], prefix=col))
         X = pd.concat(dummies, axis=1)
-        # The outcome must be a single categorical column; recode to numeric
-        for col in y:
-            cat_list = list(pd.unique(y[col])).sort()
-            if y[col].dtype=='object':
-                y[col] = pd.Categorical(y[col], ordered=True, categories=cat_list)
-                y[col] = y[col].cat.codes
+        # Only extract dependent var if fitting a new model
+        if is_prediction:
+            y = None
+        else:
+            y = trips_df[self.dependent_var].values
         return X, y
+
+    # If the non-mock trips have distance calculated then this can be removed
+    # https://stackoverflow.com/questions/4913349/haversine-formula-in-python-bearing-and-distance-between-two-gps-points
+    def haversine(self, coord1, coord2):
+        """
+        Calculate the great circle distance in kilometers between two points 
+        on the earth (specified in decimal degrees)
+        """
+        lon1 = coord1[0]
+        lat1 = coord1[1]
+        lon2 = coord2[0]
+        lat2 = coord2[1]
+        # convert decimal degrees to radians 
+        lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+
+        # haversine formula 
+        dlon = lon2 - lon1 
+        dlat = lat2 - lat1 
+        a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+        c = 2 * asin(sqrt(a)) 
+        r = 3956 # Radius of earth in kilometers. Use 3956 for miles. Determines return value units.
+        return c * r
+
+    def export_demographic_table(self, uuid_list):
+        print("Looking up details for %s" % uuid_list)
+        all_survey_results = list(edb.get_timeseries_db().find({"user_id": {"$in": uuid_list}, "metadata.key": "manual/demographic_survey"}))
+        for s in all_survey_results:
+            s["data"]["user_id"] = s["user_id"]
+        all_survey_results_df = pd.json_normalize([s["data"] for s in all_survey_results])
+        all_survey_results_df.drop(columns=['xmlResponse', 'name', 'version', 'label'], axis=1, inplace=True)
+        return all_survey_results_df
