@@ -2,6 +2,7 @@ import unittest
 import emission.analysis.modelling.trip_model.gradient_boosted_decision_tree as eamtg
 import emission.tests.modellingTests.modellingTestAssets as etmm
 import logging
+import pandas as pd
 
 
 class TestGradientBoostedDecisionTree(unittest.TestCase):
@@ -168,4 +169,8 @@ class TestGradientBoostedDecisionTree(unittest.TestCase):
         }
         model = eamtg.GradientBoostedDecisionTree(model_config)
         model.fit(trips)
-        model.predict(trips)
+        y = model.predict(trips)
+
+        # No class in predictions that's not in training data
+        for predicted_class in pd.unique(y):
+            self.assertIn(predicted_class, pd.unique(pd.json_normalize(trips)[model_config['dependent_var']]))

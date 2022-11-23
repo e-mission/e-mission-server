@@ -52,9 +52,8 @@ class GradientBoostedDecisionTree(eamuu.TripModel):
                 msg = f"gbdt trip model config missing expected key {k}"
                 raise KeyError(msg)
         self.is_incremental = config['incremental_evaluation']
-        # Use the sklearn implementation of a GBDT
+        # use the sklearn implementation of a GBDT
         self.gbdt = GradientBoostingClassifier(n_estimators=50)
-        # Which features to use in the fit/prediction
         self.feature_list = config['feature_list']
         self.dependent_var = config['dependent_var']
 
@@ -86,20 +85,20 @@ class GradientBoostedDecisionTree(eamuu.TripModel):
             return y_pred
 
     def to_dict(self) -> Dict:
-        return dict(self.gbdt)
+        return self.gbdt.get_params()
 
     def from_dict(self, model: Dict):
-        self.gbdt = model
+        self.gbdt.set_params(model)
 
     def extract_features(self, trips: ecwc.Confirmedtrip, is_prediction=False) -> List[float]:
-        # Get dataframe from json trips; fill in calculated columns
+        # get dataframe from json trips; fill in calculated columns
         trips_df = pd.json_normalize(trips)
         # distance
         trips_coords = trips_df[['data.start_loc.coordinates','data.end_loc.coordinates']]
         trips_df['distance_miles'] = trips_coords.apply(lambda row : self.haversine(row[0],row[1]), axis=1)
         # collect all features
         X = trips_df[self.feature_list]
-        # Any object/categorical dtype features must be one-hot encoded if unordered
+        # any object/categorical dtype features must be one-hot encoded if unordered
         dummies = []
         for col in X:
             if X[col].dtype=='object':
@@ -112,7 +111,7 @@ class GradientBoostedDecisionTree(eamuu.TripModel):
             y = trips_df[self.dependent_var].values
         return X, y
 
-    # If the non-mock trips have distance calculated then this can be removed
+    # if the non-mock trips have distance calculated then this can be removed
     # https://stackoverflow.com/questions/4913349/haversine-formula-in-python-bearing-and-distance-between-two-gps-points
     def haversine(self, coord1, coord2):
         """
@@ -131,14 +130,5 @@ class GradientBoostedDecisionTree(eamuu.TripModel):
         dlat = lat2 - lat1 
         a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
         c = 2 * asin(sqrt(a)) 
-        r = 3956 # Radius of earth in kilometers. Use 3956 for miles. Determines return value units.
+        r = 3956 # radius of earth in kilometers. Use 3956 for miles. Determines return value units.
         return c * r
-
-    def export_demographic_table(self, uuid_list):
-        print("Looking up details for %s" % uuid_list)
-        all_survey_results = list(edb.get_timeseries_db().find({"user_id": {"$in": uuid_list}, "metadata.key": "manual/demographic_survey"}))
-        for s in all_survey_results:
-            s["data"]["user_id"] = s["user_id"]
-        all_survey_results_df = pd.json_normalize([s["data"] for s in all_survey_results])
-        all_survey_results_df.drop(columns=['xmlResponse', 'name', 'version', 'label'], axis=1, inplace=True)
-        return all_survey_results_df
