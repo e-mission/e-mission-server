@@ -3,6 +3,7 @@ from enum import Enum
 import emission.analysis.modelling.trip_model.trip_model as eamuu
 import emission.analysis.modelling.similarity.od_similarity as eamso
 import emission.analysis.modelling.trip_model.greedy_similarity_binning as eamug
+import emission.analysis.modelling.trip_model.gradient_boosted_decision_tree as eamtg
 
 
 SIMILARITY_THRESHOLD_METERS=500
@@ -11,6 +12,7 @@ SIMILARITY_THRESHOLD_METERS=500
 class ModelType(Enum):
     # ENUM_NAME_CAPS = 'SHORTHAND_NAME_CAPS'
     GREEDY_SIMILARITY_BINNING = 'GREEDY'
+    GRADIENT_BOOSTED_DECISION_TREE = 'GBDT'
     
     def build(self, config=None) -> eamuu.TripModel:
         """
@@ -25,7 +27,8 @@ class ModelType(Enum):
         """
         # Dict[ModelType, TripModel]
         MODELS = {
-                ModelType.GREEDY_SIMILARITY_BINNING: eamug.GreedySimilarityBinning(config)
+                ModelType.GREEDY_SIMILARITY_BINNING: eamug.GreedySimilarityBinning(config),
+                ModelType.GRADIENT_BOOSTED_DECISION_TREE: eamtg.GradientBoostedDecisionTree(config)
         }
         model = MODELS.get(self)
         if model is None:
