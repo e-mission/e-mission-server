@@ -174,3 +174,116 @@ class TestSupportVectorMachine(unittest.TestCase):
         # No class in predictions that's not in training data
         for predicted_class in pd.unique(y):
             self.assertIn(predicted_class, pd.unique(pd.json_normalize(trips)[model_config['dependent_var']]))
+
+
+    def testIncremental(self):
+        """
+        the model should fit and predict incrementally on normal data without errors
+        """
+        label_data = {
+            "mode_confirm": ['walk', 'bike', 'transit'],
+            "purpose_confirm": ['work', 'home', 'school'],
+            "replaced_mode": ['drive','walk']
+        }
+        # generate $n trips.
+        n = 20
+        m = 5
+        initial_trips = etmm.generate_mock_trips(
+            user_id="joe", 
+            trips=n, 
+            origin=(0, 0), 
+            destination=(1, 1), 
+            label_data=label_data, 
+            within_threshold=m, 
+            threshold=0.001,  # ~ 111 meters in degrees WGS84
+        )
+        additional_trips = etmm.generate_mock_trips(
+            user_id="joe", 
+            trips=n*5, 
+            origin=(0, 0), 
+            destination=(1, 1), 
+            label_data=label_data, 
+            within_threshold=m, 
+            threshold=0.001,  # ~ 111 meters in degrees WGS84
+        )
+        # pass in a test configuration
+        model_config = {
+            "incremental_evaluation": True,
+            "feature_list": [
+                'data.user_input.mode_confirm',
+                'data.user_input.purpose_confirm'
+            ],
+            "dependent_var": 'data.user_input.replaced_mode'
+        }
+        model = eamts.SupportVectorMachine(model_config)
+        # Start with some initialization data
+        model.fit(initial_trips)
+        # Train on additional sets of data and predict for initial data
+        for i in range(0, 5):
+            model.fit(additional_trips[i:(i+1)*n])
+            model.predict(initial_trips)
+
+
+    def testUnseenClassesIncremental(self):
+        """
+        if the input classes for a feature change throw sklearn error
+        """
+        train_label_data = {
+            "mode_confirm": ['walk', 'bike', 'transit'],
+            "purpose_confirm": ['work', 'home', 'school'],
+            "replaced_mode": ['drive','walk']
+        }
+        test_label_data = {
+            "mode_confirm": ['drive'],
+            "purpose_confirm": ['work', 'home', 'school'],
+            "replaced_mode": ['drive','walk']
+        }
+        # generate $n trips.
+        n = 20
+        m = 5
+        initial_trips = etmm.generate_mock_trips(
+            user_id="joe", 
+            trips=n, 
+            origin=(0, 0), 
+            destination=(1, 1), 
+            label_data=train_label_data, 
+            within_threshold=m, 
+            threshold=0.001,  # ~ 111 meters in degrees WGS84
+        )
+        additional_trips = etmm.generate_mock_trips(
+            user_id="joe", 
+            trips=n*5, 
+            origin=(0, 0), 
+            destination=(1, 1), 
+            label_data=train_label_data, 
+            within_threshold=m, 
+            threshold=0.001,  # ~ 111 meters in degrees WGS84
+        )
+        test_trips = etmm.generate_mock_trips(
+            user_id="joe", 
+            trips=n, 
+            origin=(0, 0), 
+            destination=(1, 1), 
+            label_data=test_label_data, 
+            within_threshold=m, 
+            threshold=0.001,  # ~ 111 meters in degrees WGS84
+        )
+        # pass in a test configuration
+        model_config = {
+            "incremental_evaluation": False,
+            "feature_list": [
+                'data.user_input.mode_confirm',
+                'data.user_input.purpose_confirm'
+            ],
+            "dependent_var": 'data.user_input.replaced_mode'
+        }
+        model = eamts.SupportVectorMachine(model_config)
+        # Start with some initialization data
+        model.fit(initial_trips)
+        # Train on additional sets of data
+        for i in range(0, 5):
+            model.fit(additional_trips[i:(i+1)*n])
+
+        # If an unseen class is introduced, allow sklearn to throw error
+        with self.assertRaises(ValueError):
+            model.predict(test_trips)
