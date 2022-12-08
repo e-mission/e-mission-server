@@ -36,6 +36,8 @@ class TestTimeSeries(unittest.TestCase):
 
     def tearDown(self):
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
+        edb.get_uuid_db().delete_one({"user_email": "user1"})
+        edb.get_uuid_db().delete_one({"user_email": "user2"})
 
     def testGetUUIDList(self):
         uuid_list = esta.TimeSeries.get_uuid_list()
