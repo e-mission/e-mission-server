@@ -2,6 +2,7 @@ import random
 from typing import Optional, Tuple, List, Dict
 from uuid import UUID
 import emission.analysis.modelling.trip_model.trip_model as eamtm
+import emission.core.common as ecc
 import emission.core.wrapper.confirmedtrip as ecwc
 
 import emission.core.wrapper.entry as ecwe
@@ -120,6 +121,7 @@ def build_mock_trip(
             "type": "Point",
             "coordinates": destination
         },
+        "distance": ecc.calDistance(origin, destination),
         "user_input": labels
     }
 

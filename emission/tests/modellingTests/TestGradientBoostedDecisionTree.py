@@ -3,6 +3,7 @@ import emission.analysis.modelling.trip_model.gradient_boosted_decision_tree as 
 import emission.tests.modellingTests.modellingTestAssets as etmm
 import logging
 import pandas as pd
+import random
 
 
 class TestGradientBoostedDecisionTree(unittest.TestCase):
@@ -36,11 +37,19 @@ class TestGradientBoostedDecisionTree(unittest.TestCase):
         # pass in a test configuration
         model_config = {
             "incremental_evaluation": False,
-            "feature_list": [
-                'data.user_input.mode_confirm',
-                'data.user_input.purpose_confirm'
-            ],
-            "dependent_var": 'data.user_input.replaced_mode'
+            "feature_list": {
+                "data.user_input.mode_confirm": [
+                    "walk",
+                    "bike",
+                    "transit"
+                ],
+                "data.user_input.purpose_confirm": [
+                    "work",
+                    "home",
+                    "school"
+                ]
+            },
+            "dependent_var": "data.user_input.replaced_mode"
         }
         model = eamtg.GradientBoostedDecisionTree(model_config)
         model.fit(trips)
@@ -50,6 +59,7 @@ class TestGradientBoostedDecisionTree(unittest.TestCase):
     def testUnseenFeatures(self):
         """
         if the input classes for a feature change throw sklearn error
+        the test mode_confirm includes 'drive' which is not in the training set nor config
         """
         train_label_data = {
             "mode_confirm": ['walk', 'bike', 'transit'],
@@ -85,17 +95,25 @@ class TestGradientBoostedDecisionTree(unittest.TestCase):
         # pass in a test configuration
         model_config = {
             "incremental_evaluation": False,
-            "feature_list": [
-                'data.user_input.mode_confirm',
-                'data.user_input.purpose_confirm'
-            ],
+            "feature_list": {
+                "data.user_input.mode_confirm": [
+                    'walk',
+                    'bike',
+                    'transit'
+                ],
+                "data.user_input.purpose_confirm": [
+                    'work',
+                    'home',
+                    'school'
+                ]
+            },
             "dependent_var": 'data.user_input.replaced_mode'
         }
         model = eamtg.GradientBoostedDecisionTree(model_config)
         model.fit(train_trips)
 
         with self.assertRaises(ValueError):
-            model.predict(test_trips)
+            y = model.predict(test_trips)
 
 
     def testNumeric(self):
@@ -122,16 +140,27 @@ class TestGradientBoostedDecisionTree(unittest.TestCase):
         # pass in a test configuration
         model_config = {
             "incremental_evaluation": False,
-            "feature_list": [
-                'data.user_input.mode_confirm',
-                'data.user_input.purpose_confirm',
-                'distance_miles'
-            ],
+            "feature_list": {
+                "data.user_input.mode_confirm": [
+                    'walk',
+                    'bike',
+                    'transit'
+                ],
+                "data.user_input.purpose_confirm": [
+                    'work',
+                    'home',
+                    'school'
+                ],
+                "data.distance": None
+            },
             "dependent_var": 'data.user_input.replaced_mode'
         }
         model = eamtg.GradientBoostedDecisionTree(model_config)
-        model.fit(trips)
-        model.predict(trips)
+        X_train, y_train = model.extract_features(trips)
+        # 3 features for mode confirm, 3 for trip purpose, 1 for distance
+        self.assertEqual(len(X_train.columns), 7)
+        # all feature columns should be strictly numeric
+        self.assertTrue(X_train.apply(lambda s: pd.to_numeric(s, errors='coerce').notnull().all()).all())
 
 
     def testFull(self):
@@ -158,13 +187,26 @@ class TestGradientBoostedDecisionTree(unittest.TestCase):
         # pass in a test configuration
         model_config = {
             "incremental_evaluation": False,
-            "feature_list": [
-                'data.user_input.mode_confirm',
-                'data.user_input.purpose_confirm',
-                'data.survey.age',
-                'data.survey.hhinc',
-                'distance_miles'
-            ],
+            "feature_list": {
+                "data.user_input.mode_confirm": [
+                    'walk',
+                    'bike',
+                    'transit'
+                ],
+                "data.user_input.purpose_confirm": [
+                    'work',
+                    'home',
+                    'school'
+                ],
+                "data.distance": None,
+                "data.survey.age": None,
+                "data.survey.hhinc": [
+                    '0-24999',
+                    '25000-49000',
+                    '50000-99999',
+                    '100000+'
+                ]
+            },
             "dependent_var": 'data.user_input.replaced_mode'
         }
         model = eamtg.GradientBoostedDecisionTree(model_config)
@@ -174,3 +216,56 @@ class TestGradientBoostedDecisionTree(unittest.TestCase):
         # No class in predictions that's not in training data
         for predicted_class in pd.unique(y):
             self.assertIn(predicted_class, pd.unique(pd.json_normalize(trips)[model_config['dependent_var']]))
+
+
+    def testPredictions(self):
+        """
+        with a fixed seed, the model should make consistent predictions
+        """
+        random.seed(42)
+        label_data = {
+            "mode_confirm": ['walk', 'bike', 'transit'],
+            "purpose_confirm": ['work', 'home', 'school'],
+            "replaced_mode": ['drive','walk','bike','transit']
+        }
+        # generate $n trips.
+        n = 20
+        m = 5
+        trips = etmm.generate_mock_trips(
+            user_id="joe", 
+            trips=n, 
+            origin=(0, 0), 
+            destination=(1, 1), 
+            label_data=label_data, 
+            within_threshold=m, 
+            threshold=0.001,  # ~ 111 meters in degrees WGS84
+        )
+        # pass in a test configuration
+        model_config = {
+            "incremental_evaluation": False,
+            "feature_list": {
+                "data.user_input.mode_confirm": [
+                    'walk',
+                    'bike',
+                    'transit'
+                ],
+                "data.user_input.purpose_confirm": [
+                    'work',
+                    'home',
+                    'school'
+                ]
+            },
+            "dependent_var": 'data.user_input.replaced_mode'
+        }
+        model = eamtg.GradientBoostedDecisionTree(model_config)
+        model.fit(trips)
+        y = model.predict(trips)
+
+        # Test that predicted == expected
+        expected_result = [
+            'transit', 'transit', 'walk', 'transit', 'drive', 'walk', 'bike', 'transit',
+            'transit', 'transit', 'walk', 'drive', 'drive', 'drive', 'drive', 'drive',
+            'transit', 'transit', 'walk', 'walk'
+        ]
+        for i, prediction in enumerate(y):
+            self.assertEqual(prediction, expected_result[i])

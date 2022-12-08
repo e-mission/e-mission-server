@@ -2,7 +2,7 @@ import logging
 from tokenize import group
 from typing import Dict, List, Optional, Tuple
 
-from sklearn.ensemble import GradientBoostingClassifier
+import sklearn.ensemble as ske
 
 import emission.analysis.modelling.trip_model.trip_model as eamuu
 import emission.analysis.modelling.trip_model.util as eamtu
@@ -25,7 +25,8 @@ class GradientBoostedDecisionTree(eamuu.TripModel):
 
         Replacement modes are considered to be the second-best choice for
         a given trip (i.e., what mode would have been chosen if the actual
-        choice wasn't available).
+        choice wasn't available). These labels are gathered from the user 
+        along with the chosen mode and trip purpose after the trip takes place.
 
         The model is currently trained on data from all users.
         """
@@ -45,7 +46,7 @@ class GradientBoostedDecisionTree(eamuu.TripModel):
                 raise KeyError(msg)
         self.is_incremental = config['incremental_evaluation']
         # use the sklearn implementation of a GBDT
-        self.gbdt = GradientBoostingClassifier(n_estimators=50)
+        self.gbdt = ske.GradientBoostingClassifier(n_estimators=50)
         self.feature_list = config['feature_list']
         self.dependent_var = config['dependent_var']
 
@@ -65,12 +66,12 @@ class GradientBoostedDecisionTree(eamuu.TripModel):
         logging.info(f"gradient boosted decision tree model fit to {len(X_train)} rows of trip data")
         logging.info(f"training features were {X_train.columns}")
 
-    def predict(self, trip: ecwc.Confirmedtrip) -> List:
+    def predict(self, trip: ecwc.Confirmedtrip) -> List[str]:
         logging.debug(f"running gradient boosted mode prediction")
         X_test, y_pred = self.extract_features(trip, is_prediction=True)
         y_pred = self.gbdt.predict(X_test)
         if y_pred is None:
-            logging.debug(f"unable to predict bin for trip {trip}")
+            logging.debug(f"unable to predict mode for trip {trip}")
             return []
         else:
             logging.debug(f"made predictions {y_pred}")
@@ -83,4 +84,4 @@ class GradientBoostedDecisionTree(eamuu.TripModel):
         self.gbdt.set_params(model)
 
     def extract_features(self, trips: ecwc.Confirmedtrip, is_prediction=False) -> List[float]:
-        return eamtu.get_replacement_mode_features(self.feature_list, self.dependent_var, is_prediction, trips)
+        return eamtu.get_replacement_mode_features(self.feature_list, self.dependent_var, trips, is_prediction)
