@@ -3,7 +3,10 @@ import logging
 import uuid
 import json
 
-import os
+#changed all script runs from os() to subprocess.run() for consistency
+#TODO clean up commented out os() lines
+# import os
+import subprocess 
 
 import emission.core.get_database as edb
 
@@ -77,34 +80,43 @@ class TestTokenQueries(unittest.TestCase):
             tlm.verifyUserToken('z')
 
     def test_run_script_file(self):
-        os.system("python3 bin/auth/insert_tokens.py --file emission/tests/storageTests/token_test_files/tokens.txt")
+        # os.system("python3 bin/auth/insert_tokens.py --file emission/tests/storageTests/token_test_files/tokens.txt")
+        subprocess.run(["python3", "bin/auth/insert_tokens.py", "--file", "emission/tests/storageTests/token_test_files/tokens.txt"])
         self.assertEqual(esdt.get_all_tokens(), ['a','b','c','d'])
 
     def test_run_script_file_auth(self):
-        os.system("python3 bin/auth/insert_tokens.py --file emission/tests/storageTests/token_test_files/tokens.txt")
+        # os.system("python3 bin/auth/insert_tokens.py --file emission/tests/storageTests/token_test_files/tokens.txt")
+        subprocess.run(["python3", "bin/auth/insert_tokens.py", "--file", "emission/tests/storageTests/token_test_files/tokens.txt"])
         tlm = enat.TokenListMethod()
         self.assertEqual(tlm.verifyUserToken('b'), 'b')
 
     def test_run_script_file_auth_fail(self):
-        os.system("python3 bin/auth/insert_tokens.py --file emission/tests/storageTests/token_test_files/tokens.txt")
+        # os.system("python3 bin/auth/insert_tokens.py --file emission/tests/storageTests/token_test_files/tokens.txt")
+        subprocess.run(["python3", "bin/auth/insert_tokens.py", "--file", "emission/tests/storageTests/token_test_files/tokens.txt"])
         with self.assertRaises(ValueError):
             tlm = enat.TokenListMethod()
             tlm.verifyUserToken('z')
 
     def test_run_script_single(self):
-        os.system("python3 bin/auth/insert_tokens.py --single a")
-        os.system("python3 bin/auth/insert_tokens.py --single b")
+        # os.system("python3 bin/auth/insert_tokens.py --single a")
+        subprocess.run(["python3", "bin/auth/insert_tokens.py", "--single", "a"])
+        # os.system("python3 bin/auth/insert_tokens.py --single b")
+        subprocess.run(["python3", "bin/auth/insert_tokens.py", "--single", "b"])
         self.assertEqual(esdt.get_all_tokens(), ['a','b'])
 
     def test_run_script_single_auth(self):
-        os.system("python3 bin/auth/insert_tokens.py --single a")
-        os.system("python3 bin/auth/insert_tokens.py --single b")
+        # os.system("python3 bin/auth/insert_tokens.py --single a")
+        subprocess.run(["python3", "bin/auth/insert_tokens.py", "--single", "a"])
+        # os.system("python3 bin/auth/insert_tokens.py --single b")
+        subprocess.run(["python3", "bin/auth/insert_tokens.py", "--single", "b"])
         tlm = enat.TokenListMethod()
         self.assertEqual(tlm.verifyUserToken('b'), 'b')
 
     def test_run_script_single_auth_fail(self):
-        os.system("python3 bin/auth/insert_tokens.py --single a")
-        os.system("python3 bin/auth/insert_tokens.py --single b")
+        # os.system("python3 bin/auth/insert_tokens.py --single a")
+        subprocess.run(["python3", "bin/auth/insert_tokens.py", "--single", "a"])
+        # os.system("python3 bin/auth/insert_tokens.py --single b")
+        subprocess.run(["python3", "bin/auth/insert_tokens.py", "--single", "b"])
         with self.assertRaises(ValueError):
             tlm = enat.TokenListMethod()
             tlm.verifyUserToken('z')
@@ -114,7 +126,8 @@ class TestTokenQueries(unittest.TestCase):
         edb.get_uuid_db().insert_one({"user_email":"b"})
         edb.get_uuid_db().insert_one({"user_email":"c"})
         edb.get_uuid_db().insert_one({"user_email":"d"})
-        os.system("python3 bin/auth/insert_tokens.py --uuid")
+        # os.system("python3 bin/auth/insert_tokens.py --uuid")
+        subprocess.run(["python3", "bin/auth/insert_tokens.py", "--uuid"])
         self.assertEqual(esdt.get_all_tokens(), ['a','b','c','d'])
 
     def test_run_script_uuid_auth(self):
@@ -122,7 +135,8 @@ class TestTokenQueries(unittest.TestCase):
         edb.get_uuid_db().insert_one({"user_email":"b"})
         edb.get_uuid_db().insert_one({"user_email":"c"})
         edb.get_uuid_db().insert_one({"user_email":"d"})
-        os.system("python3 bin/auth/insert_tokens.py --uuid")
+        # os.system("python3 bin/auth/insert_tokens.py --uuid")
+        subprocess.run(["python3", "bin/auth/insert_tokens.py", "--uuid"])
         tlm = enat.TokenListMethod()
         self.assertEqual(tlm.verifyUserToken('b'), 'b')
 
@@ -131,7 +145,8 @@ class TestTokenQueries(unittest.TestCase):
         edb.get_uuid_db().insert_one({"user_email":"b"})
         edb.get_uuid_db().insert_one({"user_email":"c"})
         edb.get_uuid_db().insert_one({"user_email":"d"})
-        os.system("python3 bin/auth/insert_tokens.py --uuid")
+        # os.system("python3 bin/auth/insert_tokens.py --uuid")
+        subprocess.run(["python3", "bin/auth/insert_tokens.py", "--uuid"])
         with self.assertRaises(ValueError):
             tlm = enat.TokenListMethod()
             tlm.verifyUserToken('z')
@@ -140,8 +155,34 @@ class TestTokenQueries(unittest.TestCase):
         esdt.insert({'token':'x'})
         esdt.insert({'token':'y'})
         esdt.insert({'token':'z'})
-        os.system("python3 bin/auth/insert_tokens.py --show")
-        self.assertEqual(True, True)
+        sp = subprocess.run(["python3", "bin/auth/insert_tokens.py", "--show"], capture_output=True)
+        self.assertEqual(sp.stdout, b'storage not configured, falling back to sample, default configuration\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL localhost\nx\ny\nz\n')
+
+    def test_run_script_empty(self):
+        sp = subprocess.run(["python3", "bin/auth/insert_tokens.py"], capture_output=True)
+        self.assertEqual(sp.stdout, b'storage not configured, falling back to sample, default configuration\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL localhost\nPlease provide the script with an argument. Use the "--help" option for more details\n')
+
+    #test that no two options can be used together
+    def test_run_script_mutex(self):
+        #code wil be anded with returncode of each subprocess
+        #an unsuccessful run is indicated by some number other than 0
+        #a single successful run will force code to be stuck at 0
+        code = 1
+        sp = subprocess.run(["python3", "bin/auth/insert_tokens.py", "--show", "--file", "emission/tests/storageTests/token_test_files/tokens.txt"])
+        code = code and sp.returncode
+        sp = subprocess.run(["python3", "bin/auth/insert_tokens.py", "--show", "--single", "z"])
+        code = code and sp.returncode
+        sp = subprocess.run(["python3", "bin/auth/insert_tokens.py", "--show", "uuid"])
+        code = code and sp.returncode
+        sp = subprocess.run(["python3", "bin/auth/insert_tokens.py", "--file", "emission/tests/storageTests/token_test_files/tokens.txt", "single", "z"])
+        code = code and sp.returncode
+        sp = subprocess.run(["python3", "bin/auth/insert_tokens.py", "--file", "emission/tests/storageTests/token_test_files/tokens.txt", "uuid"])
+        code = code and sp.returncode
+        sp = subprocess.run(["python3", "bin/auth/insert_tokens.py", "--uuid", "single", "z"])
+        code = code and sp.returncode
+
+        #if code is 0, at least one run was successful, which we don't want
+        self.assertNotEqual(code, 0)
 
 if __name__ == '__main__':
     import emission.tests.common as etc
