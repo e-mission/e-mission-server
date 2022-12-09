@@ -49,7 +49,15 @@ class TestGradientBoostedDecisionTree(unittest.TestCase):
                     "school"
                 ]
             },
-            "dependent_var": "data.user_input.replaced_mode"
+            "dependent_var": {
+                "name": "data.user_input.replaced_mode",
+                "classes": [
+                    "drive",
+                    "walk",
+                    "bike",
+                    "transit"
+                ]
+            }
         }
         model = eamtg.GradientBoostedDecisionTree(model_config)
         model.fit(trips)
@@ -107,7 +115,15 @@ class TestGradientBoostedDecisionTree(unittest.TestCase):
                     'school'
                 ]
             },
-            "dependent_var": 'data.user_input.replaced_mode'
+            "dependent_var": {
+                "name": "data.user_input.replaced_mode",
+                "classes": [
+                    "drive",
+                    "walk",
+                    "bike",
+                    "transit"
+                ]
+            }
         }
         model = eamtg.GradientBoostedDecisionTree(model_config)
         model.fit(train_trips)
@@ -153,7 +169,15 @@ class TestGradientBoostedDecisionTree(unittest.TestCase):
                 ],
                 "data.distance": None
             },
-            "dependent_var": 'data.user_input.replaced_mode'
+            "dependent_var": {
+                "name": "data.user_input.replaced_mode",
+                "classes": [
+                    "drive",
+                    "walk",
+                    "bike",
+                    "transit"
+                ]
+            }
         }
         model = eamtg.GradientBoostedDecisionTree(model_config)
         X_train, y_train = model.extract_features(trips)
@@ -207,7 +231,15 @@ class TestGradientBoostedDecisionTree(unittest.TestCase):
                     '100000+'
                 ]
             },
-            "dependent_var": 'data.user_input.replaced_mode'
+            "dependent_var": {
+                "name": "data.user_input.replaced_mode",
+                "classes": [
+                    "drive",
+                    "walk",
+                    "bike",
+                    "transit"
+                ]
+            }
         }
         model = eamtg.GradientBoostedDecisionTree(model_config)
         model.fit(trips)
@@ -215,7 +247,8 @@ class TestGradientBoostedDecisionTree(unittest.TestCase):
 
         # No class in predictions that's not in training data
         for predicted_class in pd.unique(y):
-            self.assertIn(predicted_class, pd.unique(pd.json_normalize(trips)[model_config['dependent_var']]))
+            
+            self.assertIn(predicted_class, model_config['dependent_var']['classes'])
 
 
     def testPredictions(self):
@@ -255,7 +288,15 @@ class TestGradientBoostedDecisionTree(unittest.TestCase):
                     'school'
                 ]
             },
-            "dependent_var": 'data.user_input.replaced_mode'
+            "dependent_var": {
+                "name": "data.user_input.replaced_mode",
+                "classes": [
+                    "drive",
+                    "walk",
+                    "bike",
+                    "transit"
+                ]
+            }
         }
         model = eamtg.GradientBoostedDecisionTree(model_config)
         model.fit(trips)

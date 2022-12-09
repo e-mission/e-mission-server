@@ -23,7 +23,15 @@
                     "school"
                 ]
             },
-            "dependent_var": "data.user_input.replaced_mode",
+            "dependent_var": {
+                "name": "data.user_input.replaced_mode",
+                "classes": [
+                    "drive",
+                    "walk",
+                    "bike",
+                    "transit"
+                ]
+            },
             "incremental_evaluation": false
         },
         "svm": {
@@ -40,7 +48,15 @@
                     "school"
                 ]
             },
-            "dependent_var": "data.user_input.replaced_mode",
+            "dependent_var": {
+                "name": "data.user_input.replaced_mode",
+                "classes": [
+                    "drive",
+                    "walk",
+                    "bike",
+                    "transit"
+                ]
+            },
             "incremental_evaluation": true
         }
     }

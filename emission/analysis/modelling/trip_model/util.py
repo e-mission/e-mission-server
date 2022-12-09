@@ -12,7 +12,7 @@ def get_replacement_mode_features(feature_list, dependent_var, trips: ecwc.Confi
     """extract the features needed to perform replacement mode modeling from a set of
     trips.
 
-    recodes variables that are categorical, and (TODO: scales numeric variables 0-1).
+    recodes variables that are categorical.
 
     :param feature_list: features to gather from each trip
     :type feature_list: List[string]
@@ -27,7 +27,7 @@ def get_replacement_mode_features(feature_list, dependent_var, trips: ecwc.Confi
     """
     # get dataframe from json trips
     trips_df = pd.json_normalize(trips)
-    X = trips_df[list(feature_list.keys())]
+    X = trips_df[feature_list.keys()]
     # any features that are strings must be encoded as numeric variables
     # we use one-hot encoding for categorical variables
     # https://pbpython.com/pandas_dtypes.html
@@ -52,7 +52,7 @@ def get_replacement_mode_features(feature_list, dependent_var, trips: ecwc.Confi
     if is_prediction:
         y = None
     else:
-        y = trips_df[dependent_var]
+        y = trips_df[dependent_var['name']]
     return X, y
 
 

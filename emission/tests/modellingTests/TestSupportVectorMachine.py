@@ -3,6 +3,7 @@ import emission.analysis.modelling.trip_model.support_vector_machine as eamts
 import emission.tests.modellingTests.modellingTestAssets as etmm
 import logging
 import pandas as pd
+import random
 
 
 class TestSupportVectorMachine(unittest.TestCase):
@@ -36,11 +37,27 @@ class TestSupportVectorMachine(unittest.TestCase):
         # pass in a test configuration
         model_config = {
             "incremental_evaluation": False,
-            "feature_list": [
-                'data.user_input.mode_confirm',
-                'data.user_input.purpose_confirm'
-            ],
-            "dependent_var": 'data.user_input.replaced_mode'
+            "feature_list": {
+                "data.user_input.mode_confirm": [
+                    "walk",
+                    "bike",
+                    "transit"
+                ],
+                "data.user_input.purpose_confirm": [
+                    "work",
+                    "home",
+                    "school"
+                ]
+            },
+            "dependent_var": {
+                "name": "data.user_input.replaced_mode",
+                "classes": [
+                    "drive",
+                    "walk",
+                    "bike",
+                    "transit"
+                ]
+            }
         }
         model = eamts.SupportVectorMachine(model_config)
         model.fit(trips)
@@ -85,11 +102,27 @@ class TestSupportVectorMachine(unittest.TestCase):
         # pass in a test configuration
         model_config = {
             "incremental_evaluation": False,
-            "feature_list": [
-                'data.user_input.mode_confirm',
-                'data.user_input.purpose_confirm'
-            ],
-            "dependent_var": 'data.user_input.replaced_mode'
+            "feature_list": {
+                "data.user_input.mode_confirm": [
+                    "walk",
+                    "bike",
+                    "transit"
+                ],
+                "data.user_input.purpose_confirm": [
+                    "work",
+                    "home",
+                    "school"
+                ]
+            },
+            "dependent_var": {
+                "name": "data.user_input.replaced_mode",
+                "classes": [
+                    "drive",
+                    "walk",
+                    "bike",
+                    "transit"
+                ]
+            }
         }
         model = eamts.SupportVectorMachine(model_config)
         model.fit(train_trips)
@@ -122,16 +155,35 @@ class TestSupportVectorMachine(unittest.TestCase):
         # pass in a test configuration
         model_config = {
             "incremental_evaluation": False,
-            "feature_list": [
-                'data.user_input.mode_confirm',
-                'data.user_input.purpose_confirm',
-                'distance_miles'
-            ],
-            "dependent_var": 'data.user_input.replaced_mode'
+            "feature_list": {
+                "data.user_input.mode_confirm": [
+                    "walk",
+                    "bike",
+                    "transit"
+                ],
+                "data.user_input.purpose_confirm": [
+                    "work",
+                    "home",
+                    "school"
+                ],
+                "data.distance": None
+            },
+            "dependent_var": {
+                "name": "data.user_input.replaced_mode",
+                "classes": [
+                    "drive",
+                    "walk",
+                    "bike",
+                    "transit"
+                ]
+            }
         }
         model = eamts.SupportVectorMachine(model_config)
-        model.fit(trips)
-        model.predict(trips)
+        X_train, y_train = model.extract_features(trips)
+        # 3 features for mode confirm, 3 for trip purpose, 1 for distance
+        self.assertEqual(len(X_train.columns), 7)
+        # all feature columns should be strictly numeric
+        self.assertTrue(X_train.apply(lambda s: pd.to_numeric(s, errors='coerce').notnull().all()).all())
 
 
     def testFull(self):
@@ -158,14 +210,35 @@ class TestSupportVectorMachine(unittest.TestCase):
         # pass in a test configuration
         model_config = {
             "incremental_evaluation": False,
-            "feature_list": [
-                'data.user_input.mode_confirm',
-                'data.user_input.purpose_confirm',
-                'data.survey.age',
-                'data.survey.hhinc',
-                'distance_miles'
-            ],
-            "dependent_var": 'data.user_input.replaced_mode'
+            "feature_list": {
+                "data.user_input.mode_confirm": [
+                    "walk",
+                    "bike",
+                    "transit"
+                ],
+                "data.user_input.purpose_confirm": [
+                    "work",
+                    "home",
+                    "school"
+                ],
+                "data.survey.age": None,
+                "data.survey.hhinc": [
+                    '0-24999',
+                    '25000-49000',
+                    '50000-99999',
+                    '100000+'
+                ],
+                "data.distance": None
+            },
+            "dependent_var": {
+                "name": "data.user_input.replaced_mode",
+                "classes": [
+                    "drive",
+                    "walk",
+                    "bike",
+                    "transit"
+                ]
+            }
         }
         model = eamts.SupportVectorMachine(model_config)
         model.fit(trips)
@@ -173,7 +246,7 @@ class TestSupportVectorMachine(unittest.TestCase):
 
         # No class in predictions that's not in training data
         for predicted_class in pd.unique(y):
-            self.assertIn(predicted_class, pd.unique(pd.json_normalize(trips)[model_config['dependent_var']]))
+            self.assertIn(predicted_class, model_config['dependent_var']['classes'])
 
 
     def testIncremental(self):
@@ -209,11 +282,27 @@ class TestSupportVectorMachine(unittest.TestCase):
         # pass in a test configuration
         model_config = {
             "incremental_evaluation": True,
-            "feature_list": [
-                'data.user_input.mode_confirm',
-                'data.user_input.purpose_confirm'
-            ],
-            "dependent_var": 'data.user_input.replaced_mode'
+            "feature_list": {
+                "data.user_input.mode_confirm": [
+                    "walk",
+                    "bike",
+                    "transit"
+                ],
+                "data.user_input.purpose_confirm": [
+                    "work",
+                    "home",
+                    "school"
+                ]
+            },
+            "dependent_var": {
+                "name": "data.user_input.replaced_mode",
+                "classes": [
+                    "drive",
+                    "walk",
+                    "bike",
+                    "transit"
+                ]
+            }
         }
         model = eamts.SupportVectorMachine(model_config)
         # Start with some initialization data
@@ -271,11 +360,27 @@ class TestSupportVectorMachine(unittest.TestCase):
         # pass in a test configuration
         model_config = {
             "incremental_evaluation": False,
-            "feature_list": [
-                'data.user_input.mode_confirm',
-                'data.user_input.purpose_confirm'
-            ],
-            "dependent_var": 'data.user_input.replaced_mode'
+            "feature_list": {
+                "data.user_input.mode_confirm": [
+                    "walk",
+                    "bike",
+                    "transit"
+                ],
+                "data.user_input.purpose_confirm": [
+                    "work",
+                    "home",
+                    "school"
+                ]
+            },
+            "dependent_var": {
+                "name": "data.user_input.replaced_mode",
+                "classes": [
+                    "drive",
+                    "walk",
+                    "bike",
+                    "transit"
+                ]
+            }
         }
         model = eamts.SupportVectorMachine(model_config)
         # Start with some initialization data
@@ -286,4 +391,70 @@ class TestSupportVectorMachine(unittest.TestCase):
 
         # If an unseen class is introduced, allow sklearn to throw error
         with self.assertRaises(ValueError):
-            model.predict(test_trips)
+            model.predict(test_trips)        
+
+
+    def testPredictions(self):
+        """
+        with a fixed seed, the model should make consistent predictions
+        """
+        random.seed(42)
+        label_data = {
+            "mode_confirm": ['walk', 'bike', 'transit'],
+            "purpose_confirm": ['work', 'home', 'school'],
+            "replaced_mode": ['drive','walk','bike','transit']
+        }
+        # generate $n trips.
+        n = 20
+        m = 5
+        trips = etmm.generate_mock_trips(
+            user_id="joe", 
+            trips=n, 
+            origin=(0, 0), 
+            destination=(1, 1), 
+            label_data=label_data, 
+            within_threshold=m, 
+            threshold=0.001,  # ~ 111 meters in degrees WGS84
+        )
+        # pass in a test configuration
+        model_config = {
+            "incremental_evaluation": False,
+            "feature_list": {
+                "data.user_input.mode_confirm": [
+                    "walk",
+                    "bike",
+                    "transit"
+                ],
+                "data.user_input.purpose_confirm": [
+                    "work",
+                    "home",
+                    "school"
+                ]
+            },
+            "dependent_var": {
+                "name": "data.user_input.replaced_mode",
+                "classes": [
+                    "drive",
+                    "walk",
+                    "bike",
+                    "transit"
+                ]
+            }
+        }
+        model = eamts.SupportVectorMachine(model_config)
+        # there is a separate random number generator in SGDClassifier that 
+        # must be fixed to get consistent predictions
+        model.svm.random_state = (3)
+        model.fit(trips)
+        y = model.predict(trips)
+
+        # Test that predicted == expected
+        # note that it seems with a small dataset the svm tends to predict a single category
+        expected_result = [
+            'transit', 'transit', 'bike', 'transit', 'transit', 'bike', 'transit', 'transit',
+            'transit', 'transit', 'bike', 'transit', 'transit', 'transit', 'transit',
+            'transit', 'transit', 'transit', 'bike', 'bike'
+        ]
+        print(y)
+        for i, prediction in enumerate(y):
+            self.assertEqual(prediction, expected_result[i])
