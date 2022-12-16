@@ -14,6 +14,8 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
 # our imports
+# NOTE: this requires changing the branch of e-mission-server to
+# eval-private-data-compatibility
 import emission.analysis.modelling.tour_model_extended.similarity as eamts
 import emission.storage.decorations.trip_queries as esdtq
 
@@ -349,8 +351,7 @@ def get_distance_matrix(loc_df, loc_type):
     """
     assert loc_type == 'start' or loc_type == 'end'
 
-    radians_lat_lon = np.radians(loc_df[[loc_type + "_lat",
-                                         loc_type + "_lon"]])
+    radians_lat_lon = np.radians(loc_df[[loc_type + "_lat", loc_type + "_lon"]])
 
     dist_matrix_meters = pd.DataFrame(
         smp.haversine_distances(radians_lat_lon, radians_lat_lon) *
