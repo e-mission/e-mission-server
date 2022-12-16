@@ -24,6 +24,8 @@ import emission.analysis.modelling.tour_model_first_only.evaluation_pipeline as 
 from emission.analysis.classification.inference.labels.inferrers import predict_cluster_confidence_discounting
 import emission.core.wrapper.entry as ecwe
 import emission.analysis.modelling.tour_model_extended.similarity as eamts
+# NOTE: tour_model_extended.similarity is on the
+# eval-private-data-compatibility branch in e-mission-server
 
 # logging.basicConfig(level=logging.DEBUG)
 
@@ -599,8 +601,7 @@ class DBSCANSVMCluster(Cluster):
             # unfortunately, pairwise_distances_argmin() does not support
             # haversine distance, so we have to reimplement it ourselves
             new_loc_radians = np.radians(
-                row[[self.loc_type + "_lat",
-                     self.loc_type + "_lon"]].to_list())
+                row[[self.loc_type + "_lat", self.loc_type + "_lon"]].to_list())
             new_loc_radians = np.reshape(new_loc_radians, (1, 2))
             dist_matrix_meters = haversine_distances(
                 new_loc_radians, train_radians) * EARTH_RADIUS
@@ -657,8 +658,8 @@ class NaiveBinningClassifier(TripClassifier):
                         bsm.create_user_input_map(train_trips, bins), user_id)
 
         # save location features of all bins
-        bsm.save_models('locations',
-                        bsm.create_location_map(train_trips, bins), user_id)
+        bsm.save_models('locations', bsm.create_location_map(train_trips, bins),
+                        user_id)
         return self
 
     def predict_proba(self, test_df):
@@ -1053,17 +1054,14 @@ class EnsembleClassifier(TripClassifier, metaclass=ABCMeta):
 
                 if self.use_start_clusters:
                     clusters_to_encode = pd.concat([
-                        clusters_to_encode, self.start_cluster_model.train_df[[
-                            'start_cluster_idx'
-                        ]]
+                        clusters_to_encode,
+                        self.start_cluster_model.train_df[['start_cluster_idx']]
                     ],
                                                    axis=1)
                 if self.use_trip_clusters:
                     start_end_clusters = pd.concat([
                         self.end_cluster_model.train_df[['end_cluster_idx']],
-                        self.start_cluster_model.train_df[[
-                            'start_cluster_idx'
-                        ]]
+                        self.start_cluster_model.train_df[['start_cluster_idx']]
                     ],
                                                    axis=1)
                     trip_cluster_idx = self.trip_grouper.fit_transform(
@@ -1120,10 +1118,9 @@ class EnsembleClassifier(TripClassifier, metaclass=ABCMeta):
         # features, but also preserve an unencoded copy for the target columns
 
         # dataframe holding all features and targets
-        self.Xy_train = pd.concat([
-            self.train_df[self.base_features + self.targets], loc_features_df
-        ],
-                                  axis=1)
+        self.Xy_train = pd.concat(
+            [self.train_df[self.base_features + self.targets], loc_features_df],
+            axis=1)
 
         # encode purposes and modes
         onehot_purpose_df = self.purpose_enc.fit_transform(
@@ -1197,8 +1194,7 @@ class EnsembleClassifier(TripClassifier, metaclass=ABCMeta):
             self.X_test_for_mode = pd.concat(
                 [self.X_test_for_purpose, onehot_purpose_df], axis=1)
 
-            mode_proba, replaced_proba = self._try_predict_proba_mode_replaced(
-            )
+            mode_proba, replaced_proba = self._try_predict_proba_mode_replaced()
 
         except NotFittedError as e:
             # if we can't predict purpose, we can still try to predict mode and
@@ -1209,8 +1205,7 @@ class EnsembleClassifier(TripClassifier, metaclass=ABCMeta):
             purpose_proba = pd.DataFrame(purpose_proba_raw, columns=[np.nan])
 
             self.X_test_for_mode = self.X_test_for_purpose
-            mode_proba, replaced_proba = self._try_predict_proba_mode_replaced(
-            )
+            mode_proba, replaced_proba = self._try_predict_proba_mode_replaced()
 
         mode_pred = mode_proba.idxmax(axis=1)
         replaced_pred = replaced_proba.idxmax(axis=1)
@@ -1580,8 +1575,8 @@ class ForestClassifier(EnsembleClassifier):
             ) else self.use_trip_clusters
 
         # yes, calling __init__ again is not good practice...
-        self.__init__(loc_feature, radius, size_thresh, purity_thresh, gamma,
-                      C, n_estimators, criterion, max_depth, min_samples_split,
+        self.__init__(loc_feature, radius, size_thresh, purity_thresh, gamma, C,
+                      n_estimators, criterion, max_depth, min_samples_split,
                       min_samples_leaf, max_features, bootstrap, random_state,
                       use_start_clusters, use_trip_clusters)
         return self
@@ -1648,8 +1643,8 @@ class ClusterForestSlimPredictor(ForestClassifier):
             use_start_clusters=False,
             use_trip_clusters=True):
 
-        super().__init__(loc_feature, radius, size_thresh, purity_thresh,
-                         gamma, C, n_estimators, criterion, max_depth,
+        super().__init__(loc_feature, radius, size_thresh, purity_thresh, gamma,
+                         C, n_estimators, criterion, max_depth,
                          min_samples_split, min_samples_leaf, max_features,
                          bootstrap, random_state, use_start_clusters,
                          use_trip_clusters)
@@ -2005,8 +2000,7 @@ class OneHotWrapper():
             columns=self.onehot_encoding_cols_all).set_index(train_df.index)
 
         # ignore the encoded columns for missing entries
-        self.onehot_encoding_cols = copy.deepcopy(
-            self.onehot_encoding_cols_all)
+        self.onehot_encoding_cols = copy.deepcopy(self.onehot_encoding_cols_all)
         for col in self.onehot_encoding_cols_all:
             if col.endswith('_nan'):
                 onehot_encoding_df = onehot_encoding_df.drop(columns=[col])
