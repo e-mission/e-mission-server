@@ -8,6 +8,19 @@ import pandas as pd
 import emission.core.wrapper.confirmedtrip as ecwc
 
 
+def get_survey_df(trips_df, survey_features, response_ids):
+    survey_data = []
+    for feature in survey_features:
+        feature_data = []
+        for i, response_id in enumerate(response_ids):
+            feature_string = feature.split(".")
+            feature_string.insert(2, response_id)
+            feature_string = ".".join(feature_string)
+            feature_data.append(trips_df.iloc[i,][feature_string])
+        survey_data.append(feature_data)
+    return pd.DataFrame(numpy.column_stack(survey_data), columns=survey_features)
+
+
 def get_replacement_mode_features(feature_list, dependent_var, trips: ecwc.Confirmedtrip, is_prediction=False) -> List[float]:
     """extract the features needed to perform replacement mode modeling from a set of
     trips.
@@ -27,7 +40,24 @@ def get_replacement_mode_features(feature_list, dependent_var, trips: ecwc.Confi
     """
     # get dataframe from json trips
     trips_df = pd.json_normalize(trips)
-    X = trips_df[feature_list.keys()]
+    # any features that are part of the demographic survey require special attention
+    # the first nested value of the survey data responses changes depending on the user/response
+    feature_names = list(feature_list.keys())
+    survey_features = []
+    nonsurvey_features = []
+    for x in feature_names:
+        if 'jsonDocResponse' in x:
+            survey_features.append(x)
+        else:
+            nonsurvey_features.append(x)
+    # make sure no features are being lost during separation
+    assert(len(survey_features) + len(nonsurvey_features) == len(feature_names))
+    # need unique response id for every trip to identify survey features in the trip dataframe (key below jsonDocResponse)
+    if len(survey_features) > 0:
+        response_ids = [list(trip['data']['jsonDocResponse'].keys())[0] for trip in trips]
+        X = pd.concat([trips_df[nonsurvey_features], get_survey_df(trips_df, survey_features, response_ids)], axis=1)
+    else:
+        X = trips_df[nonsurvey_features]
     # any features that are strings must be encoded as numeric variables
     # we use one-hot encoding for categorical variables
     # https://pbpython.com/pandas_dtypes.html
@@ -37,7 +67,7 @@ def get_replacement_mode_features(feature_list, dependent_var, trips: ecwc.Confi
         # object column == string or mixed variable
         if X[col].dtype=='object':
             cat_col = pd.Categorical(X[col], categories=feature_list[col])
-            # If new features are present in X_test, throw value error
+            # if new features are present in X_test, throw value error
             if cat_col.isnull().any():
                 raise ValueError(f"Cannot predict on unseen classes in: {col}")
             dummies.append(pd.get_dummies(cat_col, prefix=col))

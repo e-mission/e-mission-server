@@ -1,4 +1,5 @@
 import random
+import string
 from typing import Optional, Tuple, List, Dict
 from uuid import UUID
 import emission.analysis.modelling.trip_model.trip_model as eamtm
@@ -134,6 +135,7 @@ def generate_mock_trips(
     origin, 
     destination, 
     label_data = None, 
+    survey_data = None,
     within_threshold = None,
     start_ts: None = None,
     end_ts: None = None,
@@ -145,7 +147,7 @@ def generate_mock_trips(
     within a threshold from the provided o/d pair, and some have labels. some other
     ones can be sampled to appear outside of the threshold of the o/d locations.
 
-    label_data is an optional dictionary with labels and sample weights, for example:
+    label_data and survey_data are optional dictionaries with labels and sample weights, for example:
     {
         "mode_confirm": ['walk', 'bike'],
         "replaced_mode": ['drive', 'tnc'],
@@ -153,6 +155,14 @@ def generate_mock_trips(
         "mode_weights": [0.8, 0.2],
         "replaced_mode_weights": [0.4, 0.6],
         "purpose_weights": [0.1, 0.9]
+    }
+    {
+        "group_hg4zz25.Please_identify_which_category": ['0_to__49_999', '_50_000_to__99_999', '100_000_or_more'],
+        "group_hg4zz25.Are_you_a_student": ['not_a_student', 'yes'],
+        "data.jsonDocResponse.group_hg4zz25.How_old_are_you": ['0___25_years_old', '26___55_years_old', '56___70_years_old'],
+        "group_hg4zz25.Please_identify_which_category_weights": [0.8, 0.1, 0.1],
+        "group_hg4zz25.Are_you_a_student": [0.9, 0.1],
+        "data.jsonDocResponse.group_hg4zz25.How_old_are_you_weights": [0.4, 0.4, 0.2]
     }
 
     weights entries are optional and result in uniform sampling.
@@ -162,6 +172,7 @@ def generate_mock_trips(
     :param origin: origin coordinates
     :param destination: destination coordinates
     :param label_data: dictionary of label data, see above, defaults to None
+    :param survey_data: dictionary of survey data, see above, defaults to None
     :param within_threshold: number of trips that should fall within the provided
            distance threshold in degrees WGS84, defaults to None
     :param threshold: distance threshold in WGS84 for sampling, defaults to 0.01
@@ -189,22 +200,23 @@ def generate_mock_trips(
             purpose_weights=label_data.get('purpose_weights')
         )
         trip = build_mock_trip(user_id, o, d, labels, start_ts, end_ts)
-        trip = add_trip_demographics(trip)
+        if survey_data is not None:
+            trip = add_trip_demographics(trip, survey_data)
         result.append(trip)
         
     random.shuffle(result) 
     return result
 
 
-def add_trip_demographics(trip):
-    trip['data']['survey'] = {}
-    survey_features = {
-        'hhinc':['0-24999','25000-49000','50000-99999','100000+'],
-        'age':[x for x in range(0, 70)],
-        'veh':['0','1','2','3','4+']
-    }
+def add_trip_demographics(trip, survey_features):
+    response_id = ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase, k=22))
+    trip['data']['jsonDocResponse'] = {response_id: {'group_yk8eb99': {}, 'group_hg4zz25': {}, 'group_pa5ah98': {}}}
     for feature in survey_features:
-        trip['data']['survey'][feature] = random.choice(survey_features[feature])
+        feature_labels = feature.split(".")
+        feature_group = feature_labels[0]
+        feature_name = feature_labels[1]
+        feature_value = random.choice(survey_features[feature])
+        trip['data']['jsonDocResponse'][response_id][feature_group].update({feature_name: feature_value})
     return trip
 
 if __name__ == '__main__':

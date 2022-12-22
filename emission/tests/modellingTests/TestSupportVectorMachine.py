@@ -195,6 +195,11 @@ class TestSupportVectorMachine(unittest.TestCase):
             "purpose_confirm": ['work', 'home', 'school'],
             "replaced_mode": ['drive','walk','bike','transit']
         }
+        survey_data = {
+           "group_hg4zz25.How_old_are_you": ['0___25_years_old', '26___55_years_old', '56___70_years_old'],
+           "group_hg4zz25.Are_you_a_student": ['not_a_student', 'yes'],
+           "group_pa5ah98.Please_identify_which_category": ['0_to__49_999', '_50_000_to__99_999', '100_000_or_more']
+        }
         # generate $n trips.
         n = 20
         m = 5
@@ -204,6 +209,7 @@ class TestSupportVectorMachine(unittest.TestCase):
             origin=(0, 0), 
             destination=(1, 1), 
             label_data=label_data, 
+            survey_data=survey_data, 
             within_threshold=m, 
             threshold=0.001,  # ~ 111 meters in degrees WGS84
         )
@@ -221,14 +227,21 @@ class TestSupportVectorMachine(unittest.TestCase):
                     "home",
                     "school"
                 ],
-                "data.survey.age": None,
-                "data.survey.hhinc": [
-                    '0-24999',
-                    '25000-49000',
-                    '50000-99999',
-                    '100000+'
+                "data.distance": None,
+                "data.jsonDocResponse.group_hg4zz25.How_old_are_you": [
+                    '0___25_years_old',
+                    '26___55_years_old',
+                    '56___70_years_old'
                 ],
-                "data.distance": None
+                "data.jsonDocResponse.group_hg4zz25.Are_you_a_student": [
+                    'not_a_student',
+                    'yes'
+                ],
+                "data.jsonDocResponse.group_pa5ah98.Please_identify_which_category": [
+                    '0_to__49_999',
+                    '_50_000_to__99_999',
+                    '100_000_or_more'
+                ]
             },
             "dependent_var": {
                 "name": "data.user_input.replaced_mode",
