@@ -118,6 +118,27 @@ def predict_labels_with_n(
         predictions, n = model.predict(trip)
         return predictions, n
 
+def predict_labels_with_gbdt(
+    trip: ecwc.Confirmedtrip,
+    model_type = eamumt.ModelType.GRADIENT_BOOSTED_DECISION_TREE,
+    model_storage = eamums.ModelStorage.DOCUMENT_DATABASE,
+    model_config = None):
+    """
+    invoke the user label prediction model to predict labels for a trip.
+
+    :param trip: the trip to predict labels for
+    :param model_type: type of prediction model to run
+    :param model_storage: location to read/write models
+    :param model_config: optional configuration for model, for debugging purposes
+    :return: a list of predictions
+    """
+    user_id = trip['user_id']
+    model = _load_stored_trip_model_all_users(model_type, model_storage, model_config)
+    if model is None:
+        return [], -1
+    else:
+        predictions, n = model.predict(trip)
+        return predictions, n
 
 def _get_training_data(user_id: UUID, time_query: Optional[estt.TimeQuery]):
     """
@@ -159,6 +180,25 @@ def _load_stored_trip_model(
         model.from_dict(model_dict)
         return model
     
+def _load_stored_trip_model_all_users(
+    model_type: eamumt.ModelType, 
+    model_storage: eamums.ModelStorage,
+    model_config = None) -> Optional[eamuu.TripModel]:
+    """helper to build a user label prediction model class with the 
+    contents of a stored model shared across all users.
+
+    :param model_type: TripModel type configured for this OpenPATH server
+    :param model_storage: storage type
+    :param model_config: optional configuration for model, for debugging purposes
+    :return: model, or None if no model is stored for this user
+    """
+    model_dict = eamums.load_model_all_users(model_type, model_storage)
+    if model_dict is None:
+        return None
+    else:    
+        model = model_type.build(model_config)
+        model.from_dict(model_dict)
+        return model
 
 def _latest_timestamp(trips: List[ecwc.Confirmedtrip]) -> float:
     """extract the latest timestamp observed from a list of trips
