@@ -38,6 +38,7 @@ METRICS_DAILY_USER_MEDIAN_SPEED = "metrics/daily_user_median_speed"
 METRICS_DAILY_MEAN_MEDIAN_SPEED = "metrics/daily_mean_median_speed"
 INFERRED_LABELS_KEY = "inference/labels"
 TRIP_MODEL_STORE_KEY = "inference/trip_model"
+REPLACE_MODEL_STORE_KEY = "inference/replace_model"
 
 # General methods
 

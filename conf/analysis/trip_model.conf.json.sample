@@ -8,6 +8,56 @@
             "similarity_threshold_meters": 500,
             "apply_cutoff": false,
             "incremental_evaluation": false
+        },
+        "gbdt": {
+            "feature_list": {
+                "data.user_input.mode_confirm": [
+                    "drive",
+                    "bike",
+                    "walk",
+                    "transit"
+                ],
+                "data.user_input.purpose_confirm": [
+                    "work",
+                    "home",
+                    "school"
+                ]
+            },
+            "dependent_var": {
+                "name": "data.user_input.replaced_mode",
+                "classes": [
+                    "drive",
+                    "walk",
+                    "bike",
+                    "transit"
+                ]
+            },
+            "incremental_evaluation": false
+        },
+        "svm": {
+            "feature_list": {
+                "data.user_input.mode_confirm": [
+                    "drive",
+                    "bike",
+                    "walk",
+                    "transit"
+                ],
+                "data.user_input.purpose_confirm": [
+                    "work",
+                    "home",
+                    "school"
+                ]
+            },
+            "dependent_var": {
+                "name": "data.user_input.replaced_mode",
+                "classes": [
+                    "drive",
+                    "walk",
+                    "bike",
+                    "transit"
+                ]
+            },
+            "incremental_evaluation": true
         }
     }
 }

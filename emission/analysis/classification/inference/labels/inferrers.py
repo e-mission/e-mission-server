@@ -156,3 +156,19 @@ def predict_cluster_confidence_discounting(trip, max_confidence=None, first_conf
     labels = copy.deepcopy(labels)
     for l in labels: l["p"] *= confidence_coeff
     return labels
+
+def predict_gradient_boosted_decision_tree(trip, max_confidence=None, first_confidence=None, confidence_multiplier=None):
+    # load application config 
+    model_type = eamtc.get_model_type()
+    model_storage = eamtc.get_model_storage()
+    labels, n = eamur.predict_labels_with_gbdt(trip, model_type, model_storage)
+    if n <= 0:  # No model data or trip didn't match a cluster
+        logging.debug(f"In predict_gradient_boosted_decision_tree: n={n}; returning as-is")
+        return labels
+
+    # confidence_coeff = n_to_confidence_coeff(n, max_confidence, first_confidence, confidence_multiplier)
+    # logging.debug(f"In predict_cluster_confidence_discounting: n={n}; discounting with coefficient {confidence_coeff}")
+
+    labels = copy.deepcopy(labels)
+    for l in labels: l["p"] *= confidence_coeff
+    return labels

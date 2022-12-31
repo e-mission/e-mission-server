@@ -35,6 +35,57 @@ class ModelStorage(Enum):
             msg = f"{str} is not a known ModelStorage, must be one of {names}"
             raise KeyError(msg)
 
+def load_model_all_users(model_type: eamum.ModelType, model_storage: ModelStorage) -> Optional[Dict]:
+    """load a user label model from a model storage location
+
+    :param user_id: the user to request a model for
+    :param model_type: expected type of model stored
+    :param model_storage: storage format 
+    :return: the model representation as a Python Dict or None
+    :raises: TypeError if loaded model has different type than expected type
+             KeyError if the ModelType is not known
+    """
+    if model_storage == ModelStorage.DOCUMENT_DATABASE:
+        
+        # retrieve stored model with timestamp that matches/exceeds the most
+        # recent PipelineState.TRIP_MODEL entry        
+        ms = esma.ModelStorage.get_model_storage(0)
+        latest_model_entry = ms.get_current_model(key=esda.REPLACE_MODEL_STORE_KEY)
+
+        if latest_model_entry is None:
+            logging.debug(f'no {model_type.name} model found')
+            return None
+
+        write_ts = latest_model_entry['metadata']['write_ts']
+        logging.debug(f'retrieved latest trip model recorded at timestamp {write_ts}')
+        logging.debug(latest_model_entry)
+
+        # parse str to enum for ModelType
+        latest_model_type_str = latest_model_entry.get('data', {}).get('model_type')
+        if latest_model_type_str is None:
+            raise TypeError('stored model does not have a model type')
+        latest_model_type = eamum.ModelType.from_str(latest_model_type_str)
+        
+        # validate and return
+        if latest_model_entry is None:
+            return None
+        elif latest_model_type != model_type:
+            msg = (
+                f"loading model has model type '{latest_model_type.name}' " 
+                f"but was expected to have model type {model_type.name}"
+            )
+            raise TypeError(msg)
+        else:
+            return latest_model_entry['data']['model']
+
+    else:
+        storage_types_str = ",".join(ModelStorage.names())
+        msg = (
+            f"unknown model storage type {model_storage}, must be one of "
+            f"{{{storage_types_str}}}"
+        )
+        raise TypeError(msg)
+
 def load_model(user_id, model_type: eamum.ModelType, model_storage: ModelStorage) -> Optional[Dict]:
     """load a user label model from a model storage location
 
