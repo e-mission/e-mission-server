@@ -16,16 +16,16 @@ if __name__ == '__main__':
         token_list = (esdt.get_tokens_from_file(args.file))
         esdt.insert_many_tokens(token_list)
 
-    if args.single:
+    elif args.single:
         token = args.single
         esdt.insert({"token":token})
 
-    if args.uuid:
+    elif args.uuid:
         uuid_list = edb.get_uuid_db().find()
         for u in uuid_list:
             esdt.insert({"token":u["user_email"]})
 
-    if args.show:
+    elif args.show:
         token_list = esdt.get_all_tokens()
         for t in token_list:
             print(t)
