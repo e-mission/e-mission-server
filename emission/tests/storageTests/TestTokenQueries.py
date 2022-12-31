@@ -164,7 +164,7 @@ class TestTokenQueries(unittest.TestCase):
 
     #test that no two options can be used together
     def test_run_script_mutex(self):
-        #code wil be anded with returncode of each subprocess
+        #code will be anded with returncode of each subprocess
         #an unsuccessful run is indicated by some number other than 0
         #a single successful run will force code to be stuck at 0
         code = 1
