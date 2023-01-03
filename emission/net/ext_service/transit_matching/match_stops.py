@@ -23,22 +23,20 @@ url = config_data["url"]
 
 query_string = "".join(query_file.readlines())
 
-def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
-    bbox_string = "%s,%s,%s,%s" % (min_lat, min_lon, max_lat, max_lon)
-    logging.debug("bbox_string = %s" % bbox_string)
-    overpass_public_transit_query_template = query_string
-    overpass_query = overpass_public_transit_query_template.format(bbox=bbox_string)
-    response = requests.post(url + "api/interpreter", data=overpass_query)
+RETRY = -1
+
+def make_request_and_catch(overpass_query):
     try:
-        all_results = response.json()["elements"]
-    except json.decoder.JSONDecodeError as e:
-        logging.info("Unable to decode response with status_code %s, text %s" %
-            (response.status_code, response.text))
-        time.sleep(5)
-        logging.info("Retrying after 5 second sleep")
         response = requests.post(url + "api/interpreter", data=overpass_query)
+    except requests.exceptions.ChunkedEncodingError as e:
+        logging.info("ChunkedEncodingError while creating request %s" % (e))
+        time.sleep(10)
+        logging.info("Retrying after 10 second sleep")
+        return RETRY
+
     try:
         all_results = response.json()["elements"]
+        return all_results
     except json.decoder.JSONDecodeError as e:
         logging.info("Unable to decode response with status_code %s, text %s" %
             (response.status_code, response.text))
@@ -46,32 +44,48 @@ def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
             logging.info("Checking when a slot is available")
             response = requests.get(url + "api/status")
             status_string = response.text.split("\n")
+            logging.info("status string is %s", status_string)
             try:
-                available_slots = int(status_string[3].split(" ")[0])
+                available_slots = int(status_string[4].split(" ")[0])
                 if available_slots > 0:
                     logging.info("No need to wait")
-                    response = requests.post(url + "api/interpreter", data=overpass_query)
-                    all_results = response.json()["elements"]
+                    return RETRY
                 # Some api/status returns 0 slots available and then when they will be available
                 elif available_slots == 0:
-                    min_waiting_time = min(int(status_string[4].split(" ")[5]), int(status_string[5].split(" ")[5]))
+                    min_waiting_time = min(int(status_string[5].split(" ")[5]), int(status_string[6].split(" ")[5]))
                     time.sleep(min_waiting_time)
-                    logging.info("Retrying after " + str(min_waiting_time) +  " second sleep")
-                    response = requests.post(url + "api/interpreter", data=overpass_query)
-                    all_results = response.json()["elements"]
+                    return RETRY
             except ValueError as e:
                 # And some api/status directly returns when the slots will be available
                 try:
-                    min_waiting_time = min(int(status_string[3].split(" ")[5]), int(status_string[4].split(" ")[5]))
+                    min_waiting_time = min(int(status_string[4].split(" ")[5]), int(status_string[5].split(" ")[5]))
                     time.sleep(min_waiting_time)
-                    logging.info("Retrying after " + str(min_waiting_time) +  " second sleep")
-                    response = requests.post(url + "api/interpreter", data=overpass_query)
-                    all_results = response.json()["elements"]
+                    return RETRY
                 except ValueError as e:
-                    logging.info("Unable to find availables slots")
+                    logging.info("Unable to find available slots")
                     all_results = []
         else:
             all_results = []
+    return all_results
+
+def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
+    bbox_string = "%s,%s,%s,%s" % (min_lat, min_lon, max_lat, max_lon)
+    logging.debug("bbox_string = %s" % bbox_string)
+    overpass_public_transit_query_template = query_string
+    overpass_query = overpass_public_transit_query_template.format(bbox=bbox_string)
+    call_return = RETRY
+    retry_count = 0
+    while call_return == RETRY:
+        if retry_count > 0:
+            logging.info(f"call_return = {call_return}, retrying...")
+        call_return = make_request_and_catch(overpass_query)
+        logging.info(f"after retry, got {'RETRY' if call_return == RETRY else len(call_return)}...")
+        if call_return == RETRY:
+            retry_count = retry_count + 1
+            logging.info(f"after incrementing, retry_count = {retry_count}...")
+
+    logging.info(f"after all retries, retry_count = {retry_count}, call_return = {'RETRY' if call_return == RETRY else len(call_return)}...")
+    all_results = call_return
 
     relations = [ad.AttrDict(r) for r in all_results if r["type"] == "relation" and r["tags"]["type"] == "route"]
     logging.debug("Found %d relations with ids %s" % (len(relations), [r["id"] for r in relations]))
