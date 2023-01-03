@@ -198,9 +198,12 @@ def collapse_modes(section_entry, modes):
     if modes is None or len(modes) == 0:
         return None
 
+    modes_no_suspend = [m.replace(":suspended", "").replace(":SUSPENDED", "")
+                            for m in modes]
+
     # map all train-like modes to train
     map_train = lambda m: 'TRAIN' if m in train_mode_list else m.upper()
-    train_mapped_modes = list(map(map_train, modes))
+    train_mapped_modes = list(map(map_train, modes_no_suspend))
 
     logging.debug("train_mapped_modes = %s" % train_mapped_modes)
 
