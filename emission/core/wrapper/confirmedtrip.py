@@ -23,7 +23,7 @@ class Confirmedtrip(ecwt.Trip):
                   "inferred_primary_mode": ecwb.WrapperBase.Access.WORM,
 # the user input will have all `manual/*` entries
 # let's make that be somewhat flexible instead of hardcoding into the data model
-                  "user_input": ecwb.WrapperBase.Access.WORM
+                  "user_input": ecwb.WrapperBase.Access.WORM,
                   "trip_addition": ecwb.WrapperBase.Access.WORM
                   })
 
