@@ -71,6 +71,37 @@ class TestUserInputFakeData(unittest.TestCase):
             eaum.handle_single_most_recent_match(fake_ct, fm)
         self.assertEqual(fake_ct["data"]["user_input"], {"mode_confirm": "FOO", "purpose_confirm": "BAR"})
 
+        # Multiple matches for two multi-labels
+        fake_ct = ecwe.Entry({"metadata": {"key": "analysis/confirmed_trip"}, "data": {"user_input": {}}})
+        fake_matches = [
+            ecwe.Entry({"metadata": {"key": "manual/mode_confirm"}, "data": {"label": "FOO"}}),
+            ecwe.Entry({"metadata": {"key": "manual/purpose_confirm"}, "data": {"label": "BAR"}}),
+            ecwe.Entry({"metadata": {"key": "manual/mode_confirm"}, "data": {"label": "GOO"}}),
+            ecwe.Entry({"metadata": {"key": "manual/purpose_confirm"}, "data": {"label": "JAR"}})
+        ]
+        for fm in fake_matches:
+            eaum.handle_single_most_recent_match(fake_ct, fm)
+        self.assertEqual(fake_ct["data"]["user_input"], {"mode_confirm": "GOO", "purpose_confirm": "JAR"})
+
+        # Single match for a trip user input
+        fake_ct = ecwe.Entry({"metadata": {"key": "analysis/confirmed_trip"}, "data": {"user_input": {}}})
+        fake_matches = [
+            ecwe.Entry({"metadata": {"key": "manual/trip_user_input"}, "data": {"label": "2 modes, 2 purposes"}})
+        ]
+        for fm in fake_matches:
+            eaum.handle_single_most_recent_match(fake_ct, fm)
+        self.assertEqual(fake_ct["data"]["user_input"], {"trip_user_input": fake_matches[0]})
+
+        # multiple matches for a trip user input
+        fake_ct = ecwe.Entry({"metadata": {"key": "analysis/confirmed_trip"}, "data": {"user_input": {}}})
+        fake_matches = [
+            ecwe.Entry({"metadata": {"key": "manual/trip_user_input"}, "data": {"label": "2 modes, 2 purposes"}}),
+            ecwe.Entry({"metadata": {"key": "manual/trip_user_input"}, "data": {"label": "5 modes, 5 purposes"}})
+        ]
+        for fm in fake_matches:
+            eaum.handle_single_most_recent_match(fake_ct, fm)
+        self.assertEqual(fake_ct["data"]["user_input"], {"trip_user_input": fake_matches[1]})
+
     def testHandleMultiNonDeletedMatch(self):
         # Single add match
         fake_ct = ecwe.Entry({"metadata": {"key": "analysis/confirmed_trip"}, "data": {"user_input": {}}})
@@ -103,6 +134,51 @@ class TestUserInputFakeData(unittest.TestCase):
         self.assertEqual(len(fake_ct["data"]["trip_addition"]), 1)
         # and it should be the bar entry
         self.assertEqual(fake_ct["data"]["trip_addition"], [fake_matches[1]])
+
+        # Add two, delete two
+        fake_ct = ecwe.Entry({"metadata": {"key": "analysis/confirmed_trip"}, "data": {"user_input": {}}})
+        fake_matches = [
+            ecwe.Entry({"_id": "foo", "metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<foo></foo>", "status": "ACTIVE"}}),
+            ecwe.Entry({"_id": "bar", "metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<bar></bar>", "status": "ACTIVE"}}),
+            ecwe.Entry({"_id": "foo", "metadata": {"key": "manual/trip_addition_input"}, "data": {"status": "DELETED"}}),
+            ecwe.Entry({"_id": "bar", "metadata": {"key": "manual/trip_addition_input"}, "data": {"status": "DELETED"}})
+        ]
+        for fm in fake_matches:
+            eaum.handle_multi_non_deleted_match(fake_ct, fm)
+        # Add two, delete two, we end up with none
+        self.assertEqual(len(fake_ct["data"]["trip_addition"]), 0)
+        # and it should be the bar entry
+        self.assertEqual(fake_ct["data"]["trip_addition"], [])
+
+        # Add none, delete two existing
+        fake_ct = ecwe.Entry({"metadata": {"key": "analysis/confirmed_trip"}, "data": {"user_input": {}, "trip_addition": [
+                {"_id": "foo", "metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<foo></foo>", "status": "ACTIVE"}},
+                {"_id": "bar", "metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<bar></bar>", "status": "ACTIVE"}}
+        ]}})
+        fake_matches = [
+            ecwe.Entry({"_id": "foo", "metadata": {"key": "manual/trip_addition_input"}, "data": {"status": "DELETED"}}),
+            ecwe.Entry({"_id": "bar", "metadata": {"key": "manual/trip_addition_input"}, "data": {"status": "DELETED"}})
+        ]
+        for fm in fake_matches:
+            eaum.handle_multi_non_deleted_match(fake_ct, fm)
+        # Existing two, delete two, we end up with none
+        self.assertEqual(len(fake_ct["data"]["trip_addition"]), 0)
+        # and it should be the bar entry
+        self.assertEqual(fake_ct["data"]["trip_addition"], [])
+
+        # Add none, delete non-existing
+        fake_ct = ecwe.Entry({"metadata": {"key": "analysis/confirmed_trip"}, "data": {"user_input": {}, "trip_addition": [
+                {"_id": "foo", "metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<foo></foo>", "status": "ACTIVE"}}
+        ]}})
+        fake_matches = [
+            ecwe.Entry({"_id": "bar", "metadata": {"key": "manual/trip_addition_input"}, "data": {"status": "DELETED"}})
+        ]
+        for fm in fake_matches:
+            eaum.handle_multi_non_deleted_match(fake_ct, fm)
+        # Existing 1, delete non-existent, we end up with one
+        self.assertEqual(len(fake_ct["data"]["trip_addition"]), 1)
+        # and it should be the bar entry
+        self.assertEqual(fake_ct["data"]["trip_addition"], [{"_id": "foo", "metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<foo></foo>", "status": "ACTIVE"}}])
 
 if __name__ == '__main__':
     etc.configLogging()
