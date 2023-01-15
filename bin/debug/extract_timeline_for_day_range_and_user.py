@@ -45,10 +45,12 @@ def export_timeline(user_id, start_day_str, end_day_str, timezone, file_name):
     ma_time_query = estt.TimeQuery("metadata.write_ts", start_day_ts, end_day_ts)
     uc = enua.UserCache.getUserCache(user_id)
     ma_entry_list = uc.getMessage(["background/motion_activity"], ma_time_query)
+    # Changing to estcs so that we will read the manual entries, which have data.start_ts and data.enter_ts
+    # from the usercache as well
     trip_time_query = estt.TimeQuery("data.start_ts", start_day_ts, end_day_ts)
-    trip_entry_list = list(ts.find_entries(key_list=None, time_query=trip_time_query))
+    trip_entry_list = list(estcs.find_entries(key_list=None, time_query=trip_time_query))
     place_time_query = estt.TimeQuery("data.enter_ts", start_day_ts, end_day_ts)
-    place_entry_list = list(ts.find_entries(key_list=None, time_query=place_time_query))
+    place_entry_list = list(estcs.find_entries(key_list=None, time_query=place_time_query))
     # Handle the case of the first place, which has no enter_ts and won't be
     # matched by the default query
     first_place_extra_query = {'$and': [{'data.enter_ts': {'$exists': False}},
