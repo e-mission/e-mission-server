@@ -7,6 +7,7 @@ import numpy as np
 
 import emission.core.wrapper.entry as ecwe
 import emission.analysis.userinput.matcher as eaum
+import emission.storage.decorations.trip_queries as esdt
 
 # Test imports
 import emission.tests.common as etc
@@ -179,6 +180,39 @@ class TestUserInputFakeData(unittest.TestCase):
         self.assertEqual(len(fake_ct["data"]["trip_addition"]), 1)
         # and it should be the bar entry
         self.assertEqual(fake_ct["data"]["trip_addition"], [{"_id": "foo", "metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<foo></foo>", "status": "ACTIVE"}}])
+
+    def testFinalCandidate(self):
+        # define some filter functions
+        always_accept_fn = lambda pc: True
+        always_reject_fn = lambda pc: False
+        keep_start_lt_10 = lambda pc: pc.data.start_ts < 10
+
+        # single entry multilabel
+        single_entry_multilabel = {"metadata": {"key": "manual/mode_confirm", "write_ts": 1, "write_fmt_time": "1"},
+            "data": {"start_ts": 8, "label": "foo"}}
+        self.assertEqual(esdt.final_candidate(always_accept_fn, [single_entry_multilabel]), single_entry_multilabel)
+        self.assertEqual(esdt.final_candidate(always_reject_fn, [single_entry_multilabel]), None)
+        self.assertEqual(esdt.final_candidate(keep_start_lt_10, [single_entry_multilabel]), single_entry_multilabel)
+        single_entry_multilabel["data"]["start_ts"] = 15
+        self.assertEqual(esdt.final_candidate(keep_start_lt_10, [single_entry_multilabel]), None)
+
+        # multi entry multilabel
+        multi_entry_multilabel = [
+            {"metadata": {"key": "manual/mode_confirm", "write_ts": 1, "write_fmt_time": "1"},
+                "data": {"start_ts": 8, "label": "foo"}},
+            {"metadata": {"key": "manual/mode_confirm", "write_ts": 2, "write_fmt_time": "2"},
+                "data": {"start_ts": 8, "label": "foo"}},
+            {"metadata": {"key": "manual/mode_confirm", "write_ts": 3, "write_fmt_time": "3"},
+                "data": {"start_ts": 8, "label": "foo"}}]
+
+        self.assertEqual(esdt.final_candidate(always_accept_fn, multi_entry_multilabel), multi_entry_multilabel)
+        self.assertEqual(esdt.final_candidate(always_reject_fn, multi_entry_multilabel), None)
+        self.assertEqual(esdt.final_candidate(keep_start_lt_10, [single_entry_multilabel]), single_entry_multilabel)
+        single_entry_multilabel["data"]["start_ts"] = 15
+        self.assertEqual(esdt.final_candidate(keep_start_lt_10, [single_entry_multilabel]), None)
+
+    def testGetNotDeletedCandidates(self):
+        pass
 
 if __name__ == '__main__':
     etc.configLogging()
