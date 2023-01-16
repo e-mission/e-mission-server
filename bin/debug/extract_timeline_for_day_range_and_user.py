@@ -42,9 +42,6 @@ def export_timeline(user_id, start_day_str, end_day_str, timezone, file_name):
     ts = esta.TimeSeries.get_time_series(user_id)
     loc_time_query = estt.TimeQuery("data.ts", start_day_ts, end_day_ts)
     loc_entry_list = list(estcs.find_entries(user_id, key_list=None, time_query=loc_time_query))
-    ma_time_query = estt.TimeQuery("metadata.write_ts", start_day_ts, end_day_ts)
-    uc = enua.UserCache.getUserCache(user_id)
-    ma_entry_list = uc.getMessage(["background/motion_activity"], ma_time_query)
     # Changing to estcs so that we will read the manual entries, which have data.start_ts and data.enter_ts
     # from the usercache as well
     trip_time_query = estt.TimeQuery("data.start_ts", start_day_ts, end_day_ts)
