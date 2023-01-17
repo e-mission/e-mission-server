@@ -52,7 +52,7 @@ class UserCache(object):
         """
         pass
 
-    def getMessage(self, key, timeQuery = None):
+    def getMessage(self, key_list = None, timeQuery = None):
         """
         Retrieve values from the phone->server part of the cache.
         These have been automatically retrieved from the phone.
@@ -67,7 +67,7 @@ class UserCache(object):
         """
         pass
 
-    def getMessageCount(self):
+    def getMessageCount(self, key_list = None, timeQuery = None):
         pass
 
     # TODO: Should we have a separate clear method, or should we just clear on get?
