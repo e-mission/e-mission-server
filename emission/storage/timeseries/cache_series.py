@@ -35,7 +35,8 @@ def find_entries(uuid, key_list=None, time_query=None):
     uc_entries = uc.getMessage(key_list, time_query)
     return list(ts_entries) + uc_entries
 
-def insert_entries(uuid, entry_it):
+def insert_entries(uuid, entry_it, continue_on_error):
+    import pymongo
     # We want to get the references to the databases upfront, because
     # otherwise, we will get a new connection for each reference, which
     # will slow things down a lot
@@ -52,13 +53,17 @@ def insert_entries(uuid, entry_it):
     ucdb_count = 0
     for entry in entry_it:
         assert entry["user_id"] is not None, "user_id for entry %s is None, cannot insert" % entry
-        if "write_fmt_time" in entry["metadata"]:
-            # write_fmt_time is filled in only during the formatting process
-            # so if write_fmt_time exists, it must be in the timeseries already
-            ts.insert(entry)
-            tsdb_count = tsdb_count + 1
-        else:
-            ucdb.save(entry)
-            ucdb_count = ucdb_count + 1
+        try:
+            if "write_fmt_time" in entry["metadata"]:
+                # write_fmt_time is filled in only during the formatting process
+                # so if write_fmt_time exists, it must be in the timeseries already
+                ts.insert(entry)
+                tsdb_count = tsdb_count + 1
+            else:
+                ucdb.insert_one(entry)
+                ucdb_count = ucdb_count + 1
+        except pymongo.errors.DuplicateKeyError as e:
+            if not continue_on_error:
+                raise(e)
 
     return (tsdb_count, ucdb_count)
