@@ -186,8 +186,8 @@ def get_user_input_from_cache_series(user_id, trip_obj, user_input_key):
 
 def get_additions_for_trip_object(ts, trip_obj):
     tq = estt.TimeQuery("data.start_ts", trip_obj.data.start_ts, trip_obj.data.end_ts)
-    potential_candidates = ts.find_entries([user_input_key], tq)
-    return not_deleted_candidates(valid_user_input(ts, trip_obj), potential_candidates)
+    potential_candidates = ts.find_entries(["manual/trip_addition_input"], tq)
+    return get_not_deleted_candidates(valid_user_input(ts, trip_obj), potential_candidates)
 
 def valid_trip(ts, user_input):
     def curried(trip_obj):

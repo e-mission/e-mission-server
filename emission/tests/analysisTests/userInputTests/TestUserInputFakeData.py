@@ -303,6 +303,59 @@ class TestUserInputFakeData(unittest.TestCase):
         multi_entry_multilabel[1]["data"]["start_ts"] = 15
         self.assertEqual(esdt.get_not_deleted_candidates(keep_start_lt_10, multi_entry_multilabel), [])
 
+    def testGetAdditionsForTripObjects(self):
+        # We already have an exhaustive set of tests for various matching options.
+        # but we had some syntax errors in the additionsForTrip code
+        # so let's add a few calls to ensure that it doesn't break
+        import emission.storage.timeseries.abstract_timeseries as esta
+
+        # Single add match
+        self.testUUID = "INVALID_DUMMY"
+        fake_ct = ecwe.Entry({"metadata": {"key": "analysis/confirmed_trip"},
+            "data": {"user_input": {}, "start_ts": 5, "end_ts": 15,
+                "start_fmt_time": 5, "end_fmt_time": 15}})
+        try:
+            ts = esta.TimeSeries.get_time_series(self.testUUID)
+            fake_match = {"_id": "foo","user_id": self.testUUID,
+                "metadata": {"key": "manual/trip_addition_input", "write_ts": 1, "write_fmt_time": "1", "time_zone": "UTC"},
+                "data": {"start_ts": 8, "end_ts": 10,
+                    "label": "answered", "xmlResponse": "<foo></foo>",
+                    "start_fmt_time": 8, "status": "ACTIVE"}
+                }
+            ts.insert(fake_match)
+            self.assertEqual(esdt.get_additions_for_trip_object(ts, fake_ct), [fake_match])
+        finally:
+            import emission.core.get_database as edb
+            edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
+       
+        ## Note that another issue with using `_id` instead of `match_id` is that
+        ## we cannot insert two entries (e.g. one ACTIVE and one DELETED) with the same id into the database.
+        ## so for now, the second and third insert fail in this case, and the result is the first entry
+        try:
+            fake_matches = [
+                {"_id": "foo","user_id": self.testUUID,
+                "metadata": {"key": "manual/trip_addition_input", "write_ts": 1, "write_fmt_time": "1", "time_zone": "UTC"},
+                "data": {"start_ts": 8, "end_ts": 10,
+                    "label": "answered", "xmlResponse": "<foo></foo>",
+                    "start_fmt_time": 8, "status": "ACTIVE"}
+                }, {"_id": "foo","user_id": self.testUUID,
+                "metadata": {"key": "manual/trip_addition_input", "write_ts": 1, "write_fmt_time": "1", "time_zone": "UTC"},
+                "data": {"start_ts": 8, "end_ts": 10,
+                    "label": "answered", "xmlResponse": "<foo></foo>",
+                    "start_fmt_time": 8, "status": "DELETED"}
+                }, {"_id": "bar","user_id": self.testUUID,
+                "metadata": {"key": "manual/trip_addition_input", "write_ts": 1, "write_fmt_time": "1", "time_zone": "UTC"},
+                "data": {"start_ts": 9, "end_ts": 12,
+                    "label": "answered", "xmlResponse": "<bar></bar>",
+                    "start_fmt_time": 8, "status": "ACTIVE"}
+                }
+            ]
+            ts.bulk_insert([ecwe.Entry(e) for e in fake_matches])
+            self.assertEqual(esdt.get_additions_for_trip_object(ts, fake_ct), [fake_matches[0]])
+        finally:
+            import emission.core.get_database as edb
+            edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
+
 if __name__ == '__main__':
     etc.configLogging()
 
