@@ -60,8 +60,10 @@ def get_load_ranges(entries):
     ranges.append((start_indices[-1], len(entries)))
     return ranges
 
-def load_pipeline_states(file_prefix, all_uuid_list):
+def load_pipeline_states(file_prefix, all_uuid_list, continue_on_error):
     import emission.core.get_database as edb
+    import pymongo
+
     for curr_uuid in all_uuid_list:
         pipeline_filename = "%s_pipelinestate_%s.gz" % (file_prefix, curr_uuid)
         print("Loading pipeline state for %s from %s" % 
@@ -71,7 +73,17 @@ def load_pipeline_states(file_prefix, all_uuid_list):
             if args.verbose:
                 logging.debug("Loading states of length %s" % len(states))
             if len(states) > 0:
-                edb.get_pipeline_state_db().insert_many(states)
+                try:
+                    edb.get_pipeline_state_db().insert_many(states)
+                except pymongo.errors.BulkWriteError as e:
+                    # print(e.__dict__.keys())
+                    # print(e._OperationFailure__details.keys())
+                    all_error_codes = list(set([we['code'] for we in e.details['writeErrors']]))
+                    if len(all_error_codes) == 1 and all_error_codes[0] == 11000 and continue_on_error:
+                        logging.info("ignoring duplicate key error while restoring pipeline state")
+                    else:
+                        logging.error(e.details['writeErrors'])
+                        raise(e)
             else:
                 logging.info("No pipeline states found, skipping load")
 
@@ -103,6 +115,9 @@ if __name__ == '__main__':
         help="the name of the file or file prefix that contains the json representation of the timeline")
 
     parser.add_argument("-d", "--debug", type=int,
+        help="set log level to DEBUG")
+
+    parser.add_argument("-c", "--continue-on-error", default=False, action='store_true',
         help="set log level to DEBUG")
 
     parser.add_argument("-v", "--verbose", type=int,
@@ -158,12 +173,12 @@ if __name__ == '__main__':
                 if args.verbose is not None and j % args.verbose == 0:
                     logging.info("About to load range %s -> %s" % (curr_range[0], curr_range[1]))
                 wrapped_entries = [ecwe.Entry(e) for e in entries[curr_range[0]:curr_range[1]]]
-                (tsdb_count, ucdb_count) = estcs.insert_entries(curr_uuid, wrapped_entries)
+                (tsdb_count, ucdb_count) = estcs.insert_entries(curr_uuid, wrapped_entries, args.continue_on_error)
         print("For uuid %s, finished loading %d entries into the usercache and %d entries into the timeseries" % (curr_uuid, ucdb_count, tsdb_count))
 
     unique_user_list = set(all_user_list)
     if not args.info_only:
-        load_pipeline_states(args.file_prefix, unique_user_list)
+        load_pipeline_states(args.file_prefix, unique_user_list, args.continue_on_error)
         if args.mapfile is not None:
             register_mapped_users(args.mapfile, unique_user_list)
         elif args.prefix is not None:

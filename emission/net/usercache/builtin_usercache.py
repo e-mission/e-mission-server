@@ -136,13 +136,13 @@ class BuiltinUserCache(ucauc.UserCache):
         logging.debug("Found %d messages in response to query %s" % (len(retrievedMsgs), combo_query))
         return retrievedMsgs
 
-    def getMessageCount(self):
+    def getMessageCount(self, key_list = None, timeQuery = None):
         """
             phone -> server
             Returns None if the key does not exist
         """
         read_ts = time.time()
-        combo_query = self._get_msg_query(None, None)
+        combo_query = self._get_msg_query(key_list, timeQuery)
         count = self.db.count_documents(combo_query)
         logging.debug("For %s, found %s messages in usercache" %
                       (self.user_id, count))
