@@ -104,6 +104,8 @@ def create_confirmed_trips(user_id, timerange):
         confirmed_trip_dict["data"]["expected_trip"] = tct.get_id()
         confirmed_trip_dict["data"]["user_input"] = \
             get_user_input_dict(ts, tct, input_key_list)
+        confirmed_trip_dict["data"]["trip_addition"] = \
+            esdt.get_additions_for_trip_object(ts, tct)
         confirmed_trip_entry = ecwe.Entry(confirmed_trip_dict)
         # save the entry
         ts.insert(confirmed_trip_entry)

@@ -15,6 +15,7 @@ import emission.storage.timeseries.timequery as estt
 import emission.core.get_database as edb
 import emission.core.wrapper.rawtrip as ecwrt
 import emission.core.wrapper.entry as ecwe
+import emission.core.wrapper.tripuserinput as ecwtui
 
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.cache_series as estsc
@@ -153,6 +154,20 @@ def final_candidate(filter_fn, potential_candidates):
         (most_recent_entry.metadata.write_fmt_time, entry_detail(most_recent_entry)))
     return most_recent_entry
 
+def get_not_deleted_candidates(filter_fn, potential_candidates):
+    potential_candidate_objects = [ecwe.Entry(c) for c in potential_candidates]
+    extra_filtered_potential_candidates = list(filter(filter_fn, potential_candidate_objects))
+    if len(extra_filtered_potential_candidates) == 0:
+        return None
+
+    # We want to retain all ACTIVE entries that have not been DELETED
+    all_active_list = [efpc for efpc in extra_filtered_potential_candidates if efpc.data.status == ecwtui.InputStatus.ACTIVE]
+    all_deleted_id = [efpc["_id"] for efpc in extra_filtered_potential_candidates if efpc.data.status == ecwtui.InputStatus.DELETED]
+    # TODO: Replace this with filter and a lambda if we decide not to match by ID after all
+    not_deleted_active = [efpc for efpc in all_active_list if efpc["_id"] not in all_deleted_id]
+    logging.info(f"Found {len(all_active_list)} active entries, {len(all_deleted_id)} deleted entries -> {len(not_deleted_active)} non deleted active entries")
+    return not_deleted_active
+
 def get_user_input_for_trip_object(ts, trip_obj, user_input_key):
     tq = estt.TimeQuery("data.start_ts", trip_obj.data.start_ts, trip_obj.data.end_ts)
     potential_candidates = ts.find_entries([user_input_key], tq)
@@ -168,6 +183,11 @@ def get_user_input_from_cache_series(user_id, trip_obj, user_input_key):
     ts = esta.TimeSeries.get_time_series(user_id)
     potential_candidates = estsc.find_entries(user_id, [user_input_key], tq)
     return final_candidate(valid_user_input(ts, trip_obj), potential_candidates)
+
+def get_additions_for_trip_object(ts, trip_obj):
+    tq = estt.TimeQuery("data.start_ts", trip_obj.data.start_ts, trip_obj.data.end_ts)
+    potential_candidates = ts.find_entries([user_input_key], tq)
+    return not_deleted_candidates(valid_user_input(ts, trip_obj), potential_candidates)
 
 def valid_trip(ts, user_input):
     def curried(trip_obj):
