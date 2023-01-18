@@ -11,7 +11,7 @@ print(edb.get_analysis_timeseries_db().update_many({"metadata.key": "analysis/co
 print("-" * 10, "inferred_labels", "-" * 10)
 
 ### See whether we have entries which need to be changed
-def has_inferred_air_labels(lpe):
+def has_inferred_ebike_labels(lpe):
     for label_opt in lpe:
         if "mode_confirm" in label_opt["labels"] and label_opt["labels"]["mode_confirm"] in OLD_EBIKE_LABELS:
             return True
@@ -33,15 +33,19 @@ def fix_inferred_labels(field, tp):
             # print("Update response %s" % edb.get_analysis_timeseries_db().update_many({"_id": idx}, {"$set": {data_field: lpe}}))
 
 def fix_label_field_if_needed(field, trip_projections):
+    print(f"Fixing label fields for {len(trip_projections)} trips and the {field} field")
     fixed_entry_count = 0
+    total_label_opt_count = 0
     for tp in trip_projections:
         # print("Checking tp %s" % tp)
         if field in tp["data"]:
-            if has_inferred_air_labels(tp["data"][field]):
+            total_label_opt_count = total_label_opt_count + len(tp["data"][field])
+            if has_inferred_ebike_labels(tp["data"][field]):
                 # print("Fixing projection %s" % tp)
                 fix_inferred_labels(field, tp)
                 fixed_entry_count = fixed_entry_count + 1
                 # print("Fixed projection %s" % tp)
+    # print(f"Total label opt = {total_label_opt_count}")
     return "Fixed %s entries" % fixed_entry_count
 
 print("_" * 10, "label predictions", "_" * 10)

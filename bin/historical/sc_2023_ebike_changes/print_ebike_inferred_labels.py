@@ -4,14 +4,23 @@ CURR_EBIKE_LABELS = ["pilot_ebike"]
 
 def inferred_ebike_ids(label_prediction_entries):
     object_ids = []
+    oid_per_lpe = []
+    print(f"Finding inferred bike ids from {len(label_prediction_entries)} trips")
+    total_label_opt_count = 0
     for idx, lpe in label_prediction_entries:
         # print(lpe)
+        total_label_opt_count = total_label_opt_count + len(lpe)
+        curr_lpe_oids = []
         for label_opt in lpe:
             # print(label_opt)
             if "mode_confirm" in label_opt["labels"] and label_opt["labels"]["mode_confirm"] in CURR_EBIKE_LABELS:
                 # print(lpe)
+                curr_lpe_oids.append(idx)
                 object_ids.append(idx)
+        oid_per_lpe.append(len(curr_lpe_oids))
     # print(object_ids)
+    # print(f"Total label opt = {total_label_opt_count}")
+    # print(f"OID per LPE = {[c for c in oid_per_lpe if c != 0]}")
     return object_ids
 
 print("_" * 10, "label predictions", "_" * 10)
