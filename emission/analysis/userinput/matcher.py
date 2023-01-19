@@ -62,7 +62,9 @@ def handle_single_most_recent_match(confirmed_trip, ui):
         confirmed_trip["data"]["user_input"][input_name] = ui.data.label
 
 def handle_multi_non_deleted_match(confirmed_trip, ui):
-    if "trip_addition" not in confirmed_trip["data"]:
+    logging.debug(f"handling user input {ui} for {confirmed_trip}")
+    if "trip_addition" not in confirmed_trip["data"] or \
+        confirmed_trip["data"]["trip_addition"] is None:
         confirmed_trip["data"]["trip_addition"] = []
     if "status" not in ui.data or ui.data.status == ecwtui.InputStatus.ACTIVE:
         confirmed_trip["data"]["trip_addition"].append(ui)

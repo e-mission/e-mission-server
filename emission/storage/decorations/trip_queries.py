@@ -158,11 +158,12 @@ def get_not_deleted_candidates(filter_fn, potential_candidates):
     potential_candidate_objects = [ecwe.Entry(c) for c in potential_candidates]
     extra_filtered_potential_candidates = list(filter(filter_fn, potential_candidate_objects))
     if len(extra_filtered_potential_candidates) == 0:
-        return None
+        logging.debug(f"in get_not_deleted_candidates, no candidates, returning []")
+        return []
 
     # We want to retain all ACTIVE entries that have not been DELETED
-    all_active_list = [efpc for efpc in extra_filtered_potential_candidates if efpc.data.status == ecwtui.InputStatus.ACTIVE]
-    all_deleted_id = [efpc["match_id"] for efpc in extra_filtered_potential_candidates if efpc.data.status == ecwtui.InputStatus.DELETED]
+    all_active_list = [efpc for efpc in extra_filtered_potential_candidates if "status" not in efpc.data or efpc.data.status == ecwtui.InputStatus.ACTIVE]
+    all_deleted_id = [efpc["match_id"] for efpc in extra_filtered_potential_candidates if "status" in efpc.data and efpc.data.status == ecwtui.InputStatus.DELETED]
     # TODO: Replace this with filter and a lambda if we decide not to match by ID after all
     not_deleted_active = [efpc for efpc in all_active_list if efpc["match_id"] not in all_deleted_id]
     logging.info(f"Found {len(all_active_list)} active entries, {len(all_deleted_id)} deleted entries -> {len(not_deleted_active)} non deleted active entries")

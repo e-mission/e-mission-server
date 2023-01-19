@@ -237,10 +237,10 @@ class TestUserInputFakeData(unittest.TestCase):
         single_entry_multilabel = {"match_id": "foo", "metadata": {"key": "manual/trip_addition_input", "write_ts": 1, "write_fmt_time": "1"},
             "data": {"start_ts": 8, "xmlResponse": "<foo></foo>", "start_fmt_time": 8, "status": "ACTIVE"}}
         self.assertEqual(esdt.get_not_deleted_candidates(always_accept_fn, [single_entry_multilabel]), [single_entry_multilabel])
-        self.assertEqual(esdt.get_not_deleted_candidates(always_reject_fn, [single_entry_multilabel]), None)
+        self.assertEqual(esdt.get_not_deleted_candidates(always_reject_fn, [single_entry_multilabel]), [])
         self.assertEqual(esdt.get_not_deleted_candidates(keep_start_lt_10, [single_entry_multilabel]), [single_entry_multilabel])
         single_entry_multilabel["data"]["start_ts"] = 15
-        self.assertEqual(esdt.get_not_deleted_candidates(keep_start_lt_10, [single_entry_multilabel]), None)
+        self.assertEqual(esdt.get_not_deleted_candidates(keep_start_lt_10, [single_entry_multilabel]), [])
 
         # multi entry all active
         multi_entry_multilabel = [
@@ -252,7 +252,7 @@ class TestUserInputFakeData(unittest.TestCase):
                 "data": {"start_ts": 8, "xmlResponse": "<foo></foo>", "start_fmt_time": 8, "status": "ACTIVE"}}]
 
         self.assertEqual(esdt.get_not_deleted_candidates(always_accept_fn, multi_entry_multilabel), multi_entry_multilabel)
-        self.assertEqual(esdt.get_not_deleted_candidates(always_reject_fn, multi_entry_multilabel), None)
+        self.assertEqual(esdt.get_not_deleted_candidates(always_reject_fn, multi_entry_multilabel), [])
         self.assertEqual(esdt.get_not_deleted_candidates(keep_start_lt_10, multi_entry_multilabel), multi_entry_multilabel)
         multi_entry_multilabel[2]["data"]["start_ts"] = 15
         self.assertEqual(esdt.get_not_deleted_candidates(keep_start_lt_10, multi_entry_multilabel), multi_entry_multilabel[0:2])
@@ -267,7 +267,7 @@ class TestUserInputFakeData(unittest.TestCase):
                 "data": {"xmlResponse": "<jar></jar>", "start_ts": 8, "start_fmt_time": 8, "status": "ACTIVE"}}]
 
         self.assertEqual(esdt.get_not_deleted_candidates(always_accept_fn, multi_entry_multilabel), [multi_entry_multilabel[2]])
-        self.assertEqual(esdt.get_not_deleted_candidates(always_reject_fn, multi_entry_multilabel), None)
+        self.assertEqual(esdt.get_not_deleted_candidates(always_reject_fn, multi_entry_multilabel), [])
         self.assertEqual(esdt.get_not_deleted_candidates(keep_start_lt_10, multi_entry_multilabel), [multi_entry_multilabel[2]])
         multi_entry_multilabel[2]["data"]["start_ts"] = 15
         self.assertEqual(esdt.get_not_deleted_candidates(keep_start_lt_10, multi_entry_multilabel), [])
@@ -285,7 +285,7 @@ class TestUserInputFakeData(unittest.TestCase):
                 "data": {"xmlResponse": "<jar></jar>", "start_ts": 8, "start_fmt_time": 8, "status": "ACTIVE"}}]
 
         self.assertEqual(esdt.get_not_deleted_candidates(always_accept_fn, multi_entry_multilabel), [])
-        self.assertEqual(esdt.get_not_deleted_candidates(always_reject_fn, multi_entry_multilabel), None)
+        self.assertEqual(esdt.get_not_deleted_candidates(always_reject_fn, multi_entry_multilabel), [])
         self.assertEqual(esdt.get_not_deleted_candidates(keep_start_lt_10, multi_entry_multilabel), [])
         multi_entry_multilabel[2]["data"]["start_ts"] = 15
         self.assertEqual(esdt.get_not_deleted_candidates(keep_start_lt_10, multi_entry_multilabel), [])
@@ -298,7 +298,7 @@ class TestUserInputFakeData(unittest.TestCase):
                 "data": {"xmlResponse": "<jar></jar>", "start_ts": 8, "start_fmt_time": 8, "status": "DELETED"}}]
 
         self.assertEqual(esdt.get_not_deleted_candidates(always_accept_fn, multi_entry_multilabel), [])
-        self.assertEqual(esdt.get_not_deleted_candidates(always_reject_fn, multi_entry_multilabel), None)
+        self.assertEqual(esdt.get_not_deleted_candidates(always_reject_fn, multi_entry_multilabel), [])
         self.assertEqual(esdt.get_not_deleted_candidates(keep_start_lt_10, multi_entry_multilabel), [])
         multi_entry_multilabel[1]["data"]["start_ts"] = 15
         self.assertEqual(esdt.get_not_deleted_candidates(keep_start_lt_10, multi_entry_multilabel), [])
