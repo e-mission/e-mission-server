@@ -151,6 +151,32 @@ class TestLocationSmoothing(unittest.TestCase):
             self.assertEqual(np.count_nonzero(to_delete_mask), 1)
             self.assertEqual([str(id) for id in delete_ids], ["55e86dbb7d65cb39ee987e09"])
 
+    # Tests for the special handling of big jumps in trips where all other points are in clusters
+    # If there are multiple clusters, then the simple alternation of GOOD and BAD fails
+    # and we need a more sophisticated check
+    def testFilterAllClusters(self):
+        import pandas as pd
+        import itertools
+
+        outlier_algo = eaics.BoxplotOutlier()
+        jump_algo = eaicj.SmoothZigzag(False, 100)
+
+        # US to ocean jump: case 1 of https://github.com/e-mission/e-mission-docs/issues/843
+        with_speeds_df = pd.read_csv("emission/tests/data/smoothing_data/all_cluster_case_1.csv", index_col=0)
+        with_speeds_df.drop(["distance", "speed", "heading"], axis="columns", inplace=True)
+        with_speeds_df["loc"] = with_speeds_df["loc"].apply(lambda lstr: json.loads(lstr.replace("'",  '"')))
+        filtered_points = eaicl.get_points_to_filter(with_speeds_df, outlier_algo, jump_algo)
+        expected_result_idx = list(itertools.chain(range(0,11), [16], range(21, 26)))
+        self.assertEqual(list(filtered_points._id.dropna()), list(with_speeds_df.loc[expected_result_idx]._id))
+  
+        # PR to pakistan jump: case 2 of https://github.com/e-mission/e-mission-docs/issues/843
+        with_speeds_df = pd.read_csv("emission/tests/data/smoothing_data/all_cluster_case_2.csv")
+        with_speeds_df.drop(["distance", "speed", "heading"], axis="columns", inplace=True)
+        with_speeds_df["loc"] = with_speeds_df["loc"].apply(lambda lstr: json.loads(lstr.replace("'",  '"')))
+        filtered_points = eaicl.get_points_to_filter(with_speeds_df, outlier_algo, jump_algo)
+        expected_result_idx = list(itertools.chain([0], range(2,11), range(12, 14)))
+        self.assertEqual(list(filtered_points._id.dropna()), list(with_speeds_df.loc[expected_result_idx]._id))
+
     def testPointFilteringZigzag(self):
         classicJumpTrip1 = self.trip_entries[8]
         self.loadPointsForTrip(classicJumpTrip1.get_id())
