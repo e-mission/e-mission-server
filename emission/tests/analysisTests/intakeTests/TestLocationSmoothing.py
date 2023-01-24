@@ -166,28 +166,34 @@ class TestLocationSmoothing(unittest.TestCase):
         with_speeds_df = pd.read_csv("emission/tests/data/smoothing_data/all_cluster_case_2.csv")
         with_speeds_df.drop(["distance", "speed", "heading"], axis="columns", inplace=True)
         with_speeds_df["loc"] = with_speeds_df["loc"].apply(lambda lstr: json.loads(lstr.replace("'",  '"')))
-        filtered_points = eaicl.get_points_to_filter(with_speeds_df, outlier_algo, jump_algo, None)
+        (sel_algo, filtered_points) = eaicl.get_points_to_filter(with_speeds_df, outlier_algo, jump_algo, None)
         # original values, inserted in
         # https://github.com/e-mission/e-mission-server/pull/897/commits/434a9a19b7f41ae868102e0154df95db8ec633c4
         # removed in https://github.com/e-mission/e-mission-server/pull/897/commits/67f5c86206e41168c6f3664fa5a2d4152d9d4091
         expected_result_idx = list(itertools.chain([0], range(2,11), range(12, 14)))
         self.assertEqual(list(filtered_points.dropna().index), expected_result_idx)
+        self.assertEqual(sel_algo, jump_algo)
+        self.assertEqual(sel_algo.__class__.__name__.split(".")[-1], "SmoothZigzag")
 
         # US to ocean jump: case 1 of https://github.com/e-mission/e-mission-docs/issues/843
         with_speeds_df = pd.read_csv("emission/tests/data/smoothing_data/all_cluster_case_1.csv", index_col=0)
         with_speeds_df.drop(["distance", "speed", "heading"], axis="columns", inplace=True)
         with_speeds_df["loc"] = with_speeds_df["loc"].apply(lambda lstr: json.loads(lstr.replace("'",  '"')))
-        filtered_points = eaicl.get_points_to_filter(with_speeds_df, outlier_algo, jump_algo, backup_algo)
+        (sel_algo, filtered_points) = eaicl.get_points_to_filter(with_speeds_df, outlier_algo, jump_algo, backup_algo)
         expected_result_idx = list(range(16, 21))
         self.assertEqual(list(filtered_points.dropna().index), expected_result_idx)
+        self.assertEqual(sel_algo, backup_algo)
+        self.assertEqual(sel_algo.__class__.__name__.split(".")[-1], "SmoothPosdap")
   
         # PR to pakistan jump: case 2 of https://github.com/e-mission/e-mission-docs/issues/843
         with_speeds_df = pd.read_csv("emission/tests/data/smoothing_data/all_cluster_case_2.csv")
         with_speeds_df.drop(["distance", "speed", "heading"], axis="columns", inplace=True)
         with_speeds_df["loc"] = with_speeds_df["loc"].apply(lambda lstr: json.loads(lstr.replace("'",  '"')))
-        filtered_points = eaicl.get_points_to_filter(with_speeds_df, outlier_algo, jump_algo, backup_algo)
+        (sel_algo, filtered_points) = eaicl.get_points_to_filter(with_speeds_df, outlier_algo, jump_algo, backup_algo)
         expected_result_idx = [11]
         self.assertEqual(list(filtered_points.dropna().index), expected_result_idx)
+        self.assertEqual(sel_algo, backup_algo)
+        self.assertEqual(sel_algo.__class__.__name__.split(".")[-1], "SmoothPosdap")
 
     def testPointFilteringZigzag(self):
         classicJumpTrip1 = self.trip_entries[8]

@@ -143,13 +143,13 @@ def filter_jumps(user_id, section_id):
     backup_filtering_algo = eaicj.SmoothPosdap(MACH1)
 
     logging.debug("len(section_points_df) = %s" % len(section_points_df))
-    points_to_ignore_df = get_points_to_filter(section_points_df, outlier_algo, filtering_algo, backup_filtering_algo)
+    (sel_algo, points_to_ignore_df) = get_points_to_filter(section_points_df, outlier_algo, filtering_algo, backup_filtering_algo)
     if points_to_ignore_df is None:
         # There were no points to delete
         return
     points_to_ignore_df_filtered = points_to_ignore_df._id.dropna()
-    logging.debug("after filtering ignored points, %s -> %s" %
-                  (len(points_to_ignore_df), len(points_to_ignore_df_filtered)))
+    logging.debug("after filtering ignored points, using %s, %s -> %s" %
+                  (sel_algo, len(points_to_ignore_df), len(points_to_ignore_df_filtered)))
     # We shouldn't really filter any fuzzed points because they represent 100m in 60 secs
     # but let's actually check for that
     # assert len(points_to_ignore_df) == len(points_to_ignore_df_filtered)
@@ -160,7 +160,7 @@ def filter_jumps(user_id, section_id):
     filter_result.section = section_id
     filter_result.deleted_points = deleted_point_id_list
     filter_result.outlier_algo = "BoxplotOutlier"
-    filter_result.filtering_algo = "SmoothZigzag"
+    filter_result.filtering_algo = sel_algo.__class__.__name__.split(".")[-1]
 
     result_entry = ecwe.Entry.create_entry(user_id, "analysis/smoothing", filter_result)
     ts.insert(result_entry)
@@ -188,7 +188,6 @@ def get_points_to_filter(section_points_df, outlier_algo, filtering_algo, backup
         logging.debug("maxSpeed = %s" % filtering_algo.maxSpeed)
     if filtering_algo is not None:
         try:
-            sel_inlier_mask_ = [True] * with_speeds_df.shape[0]
             filtering_algo.filter(with_speeds_df)
             recomputed_speeds_df = recalc_speed(with_speeds_df[filtering_algo.inlier_mask_])
             recomputed_threshold = outlier_algo.get_threshold(recomputed_speeds_df)
@@ -198,13 +197,13 @@ def get_points_to_filter(section_points_df, outlier_algo, filtering_algo, backup
             if recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold].shape[0] == 0:
                 logging.info("No outliers after first round, default algo worked, to_delete = %s" %
                     np.nonzero(np.logical_not(filtering_algo.inlier_mask_)))
-                sel_inlier_mask = filtering_algo.inlier_mask_
+                sel_algo = filtering_algo
             else:
                 logging.info("After first round, still have outliers %s" % recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold])
                 if backup_filtering_algo is None or recomputed_speeds_df.speed.max() < MACH1:
                     logging.debug("backup algo is %s, max < MACH1, so returning default algo outliers %s" %
                         (backup_filtering_algo, np.nonzero(np.logical_not(filtering_algo.inlier_mask_))))
-                    sel_inlier_mask_ = filtering_algo.inlier_mask_
+                    sel_algo = filtering_algo
                 else:
                     backup_filtering_algo.filter(with_speeds_df)
                     recomputed_speeds_df = recalc_speed(with_speeds_df[backup_filtering_algo.inlier_mask_])
@@ -215,22 +214,22 @@ def get_points_to_filter(section_points_df, outlier_algo, filtering_algo, backup
                     if recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold].shape[0] == 0:
                         logging.info("After second round, no outliers, returning backup to delete %s" %
                             np.nonzero(np.logical_not(backup_filtering_algo.inlier_mask_)))
-                        sel_inlier_mask_ = backup_filtering_algo.inlier_mask_
+                        sel_algo = backup_filtering_algo
                     else:
                         logging.info("After second round, still have outliers %s" % recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold])
                         if recomputed_speeds_df.speed.max() < MACH1:
                             logging.debug("But they are all < %s, so returning backup to delete %s" %
                                 (MACH1, np.nonzero(np.logical_not(backup_filtering_algo.inlier_mask_))))
-                            sel_inlier_mask_ = backup_filtering_algo.inlier_mask_
+                            sel_algo = backup_filtering_algo
                         else:
                             logging.info("And they are also > %s, backup algo also failed, returning default to delete = %s" %
                                 (MACH1, np.nonzero(np.logical_not(filtering_algo.inlier_mask_))))
-                            sel_inlier_mask_ = filtering_algo.inlier_mask_
+                            sel_algo = filtering_algo
 
-            to_delete_mask = np.logical_not(sel_inlier_mask_)
+            to_delete_mask = np.logical_not(sel_algo.inlier_mask_)
             logging.info("After all checks, inlier mask = %s, outlier_mask = %s" %
-                (np.nonzero(sel_inlier_mask_), np.nonzero(np.logical_not(sel_inlier_mask_))))
-            return with_speeds_df[to_delete_mask]
+                (np.nonzero(sel_algo.inlier_mask_), np.nonzero(to_delete_mask)))
+            return (sel_algo, with_speeds_df[to_delete_mask])
         except Exception as e:
             logging.exception("Caught error %s while processing section, skipping..." % e)
             return None
