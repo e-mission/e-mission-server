@@ -166,7 +166,7 @@ class TestLocationSmoothing(unittest.TestCase):
         with_speeds_df.drop(["distance", "speed", "heading"], axis="columns", inplace=True)
         with_speeds_df["loc"] = with_speeds_df["loc"].apply(lambda lstr: json.loads(lstr.replace("'",  '"')))
         filtered_points = eaicl.get_points_to_filter(with_speeds_df, outlier_algo, jump_algo)
-        expected_result_idx = list(itertools.chain(range(0,11), [16], range(21, 26)))
+        expected_result_idx = list(range(16, 21))
         self.assertEqual(list(filtered_points.dropna().index), expected_result_idx)
   
         # PR to pakistan jump: case 2 of https://github.com/e-mission/e-mission-docs/issues/843
@@ -174,7 +174,7 @@ class TestLocationSmoothing(unittest.TestCase):
         with_speeds_df.drop(["distance", "speed", "heading"], axis="columns", inplace=True)
         with_speeds_df["loc"] = with_speeds_df["loc"].apply(lambda lstr: json.loads(lstr.replace("'",  '"')))
         filtered_points = eaicl.get_points_to_filter(with_speeds_df, outlier_algo, jump_algo)
-        expected_result_idx = list(itertools.chain([0], range(2,11), range(12, 14)))
+        expected_result_idx = [11]
         self.assertEqual(list(filtered_points.dropna().index), expected_result_idx)
 
     def testPointFilteringZigzag(self):

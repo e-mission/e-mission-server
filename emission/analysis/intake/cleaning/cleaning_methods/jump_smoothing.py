@@ -267,10 +267,36 @@ class SmoothZigzag(object):
 
         recomputed_speeds_df = ls.recalc_speed(self.with_speeds_df[self.inlier_mask_])
         recomputed_threshold = cso.BoxplotOutlier(ignore_zeros = True).get_threshold(recomputed_speeds_df)
+        logging.info("After first round, recomputed max = %s, recomputed threshold = %s" %
+            (recomputed_speeds_df.speed.max(), recomputed_threshold))
         # assert recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold].shape[0] == 0, "After first round, still have outliers %s" % recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold] 
         if recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold].shape[0] != 0:
             logging.info("After first round, still have outliers %s" % recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold])
+            MACH1 = 340.29
+            if recomputed_speeds_df.speed.max() > MACH1:
+                backup_filtering_algo = SmoothPosdap(MACH1)
+                backup_filtering_algo.filter(with_speeds_df)
 
+                recomputed_speeds_df = ls.recalc_speed(self.with_speeds_df[backup_filtering_algo.inlier_mask_])
+                recomputed_threshold = cso.BoxplotOutlier(ignore_zeros = True).get_threshold(recomputed_speeds_df)
+                logging.info("After second round, max = %s, recomputed threshold = %s" %
+                    (recomputed_speeds_df.speed.max(), recomputed_threshold))
+                # assert recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold].shape[0] == 0, "After first round, still have outliers %s" % recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold] 
+                if recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold].shape[0] == 0:
+                    logging.info("After second round, no outliers, returning backup mask  %s" % backup_filtering_algo.inlier_mask_)
+                    self.inlier_mask_ = backup_filtering_algo.inlier_mask_
+                else:
+                    logging.info("After second round, still have outliers %s" % recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold])
+                    if recomputed_speeds_df.speed.max() > MACH1:
+                        logging.info("And they are also > %s, backup algo also failed" % MACH1)
+                    else:
+                        logging.debug("But they are all < %s, so returning outliers %s" %
+                            (MACH1, np.nonzero(np.logical_not(backup_filtering_algo.inlier_mask_))))
+                        self.inlier_mask_ = backup_filtering_algo.inlier_mask_
+
+
+### Re-implemented from the prior POSDAP algorithm
+### This does seem to use some kind of max speed 
 
 class SmoothPosdap(object):
     def __init__(self, maxSpeed = 100):
@@ -324,8 +350,8 @@ class SmoothPosdap(object):
                 logging.info("len(last_segment) = %d, len(curr_segment) = %d, skipping" %
                     (len(last_segment), len(curr_segment)))
                 continue
-            get_coords = lambda i: [with_speeds_df.iloc[i]["mLongitude"], with_speeds_df.iloc[i]["mLatitude"]]
-            get_ts = lambda i: with_speeds_df.iloc[i]["mTime"]
+            get_coords = lambda i: [with_speeds_df.iloc[i]["longitude"], with_speeds_df.iloc[i]["latitude"]]
+            get_ts = lambda i: with_speeds_df.iloc[i]["ts"]
             # I don't know why they would use time instead of distance, but
             # this is what the existing POSDAP code does.
             print("About to compare curr_segment duration %s with last segment duration %s" %
@@ -338,7 +364,7 @@ class SmoothPosdap(object):
                 for curr_idx in curr_segment:
                     print("Comparing distance %s with speed %s * time %s = %s" %
                         (math.fabs(ec.calDistance(get_coords(ref_idx), get_coords(curr_idx))),
-                         old_div(self.maxSpeed, 100), abs(get_ts(ref_idx) - get_ts(curr_idx)),
+                         self.maxSpeed / 100, abs(get_ts(ref_idx) - get_ts(curr_idx)),
                          self.maxSpeed / 100 * abs(get_ts(ref_idx) - get_ts(curr_idx))))
 
                     if (math.fabs(ec.calDistance(get_coords(ref_idx), get_coords(curr_idx))) >
@@ -351,14 +377,16 @@ class SmoothPosdap(object):
                 for curr_idx in reversed(last_segment):
                     print("Comparing distance %s with speed %s * time %s = %s" %
                         (math.fabs(ec.calDistance(get_coords(ref_idx), get_coords(curr_idx))),
-                         old_div(self.maxSpeed, 1000) , abs(get_ts(ref_idx) - get_ts(curr_idx)),
+                         self.maxSpeed / 1000, abs(get_ts(ref_idx) - get_ts(curr_idx)),
                          self.maxSpeed / 1000 * abs(get_ts(ref_idx) - get_ts(curr_idx))))
                     if (abs(ec.calDistance(get_coords(ref_idx), get_coords(curr_idx))) >
                         (self.maxSpeed / 1000 *  abs(get_ts(ref_idx) - get_ts(curr_idx)))):
                         print("Distance is greater than max speed * time, deleting %s" % curr_idx)
                         self.inlier_mask_[curr_idx] = False
             last_segment = curr_segment
-        logging.info("Filtering complete, removed indices = %s" % np.nonzero(self.inlier_mask_))
+        self.outlier_mask_ = np.logical_not(self.inlier_mask_)
+        logging.info("Filtering complete, retained indices = %s, removed indices = %s" %
+            (np.nonzero(self.inlier_mask_), np.nonzero(self.outlier_mask_)))
 
 class SmoothPiecewiseRansac(object):
     def __init__(self, maxSpeed = 100):
