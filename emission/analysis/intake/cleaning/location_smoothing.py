@@ -232,11 +232,10 @@ def get_points_to_filter(section_points_df, outlier_algo, filtering_algo, backup
             return (sel_algo, with_speeds_df[to_delete_mask])
         except Exception as e:
             logging.exception("Caught error %s while processing section, skipping..." % e)
-            return None
+            return (None, None)
     else:
         logging.debug("no filtering algo specified, returning None")
-        return None
-
+        return (None, None)
 
 def get_filtered_points(section_df, outlier_algo, filtering_algo):
     """
