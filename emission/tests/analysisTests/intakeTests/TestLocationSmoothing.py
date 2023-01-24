@@ -162,6 +162,17 @@ class TestLocationSmoothing(unittest.TestCase):
         jump_algo = eaicj.SmoothZigzag(False, 100)
         backup_algo = eaicj.SmoothPosdap(eaicl.MACH1)
 
+        # basic check that if the backup algo is not specified, we return the original values
+        with_speeds_df = pd.read_csv("emission/tests/data/smoothing_data/all_cluster_case_2.csv")
+        with_speeds_df.drop(["distance", "speed", "heading"], axis="columns", inplace=True)
+        with_speeds_df["loc"] = with_speeds_df["loc"].apply(lambda lstr: json.loads(lstr.replace("'",  '"')))
+        filtered_points = eaicl.get_points_to_filter(with_speeds_df, outlier_algo, jump_algo, None)
+        # original values, inserted in
+        # https://github.com/e-mission/e-mission-server/pull/897/commits/434a9a19b7f41ae868102e0154df95db8ec633c4
+        # removed in https://github.com/e-mission/e-mission-server/pull/897/commits/67f5c86206e41168c6f3664fa5a2d4152d9d4091
+        expected_result_idx = list(itertools.chain([0], range(2,11), range(12, 14)))
+        self.assertEqual(list(filtered_points.dropna().index), expected_result_idx)
+
         # US to ocean jump: case 1 of https://github.com/e-mission/e-mission-docs/issues/843
         with_speeds_df = pd.read_csv("emission/tests/data/smoothing_data/all_cluster_case_1.csv", index_col=0)
         with_speeds_df.drop(["distance", "speed", "heading"], axis="columns", inplace=True)

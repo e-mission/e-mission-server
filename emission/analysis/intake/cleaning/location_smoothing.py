@@ -188,6 +188,7 @@ def get_points_to_filter(section_points_df, outlier_algo, filtering_algo, backup
         logging.debug("maxSpeed = %s" % filtering_algo.maxSpeed)
     if filtering_algo is not None:
         try:
+            sel_inlier_mask_ = [True] * with_speeds_df.shape[0]
             filtering_algo.filter(with_speeds_df)
             recomputed_speeds_df = recalc_speed(with_speeds_df[filtering_algo.inlier_mask_])
             recomputed_threshold = outlier_algo.get_threshold(recomputed_speeds_df)
@@ -197,12 +198,12 @@ def get_points_to_filter(section_points_df, outlier_algo, filtering_algo, backup
             if recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold].shape[0] == 0:
                 logging.info("No outliers after first round, default algo worked, to_delete = %s" %
                     np.nonzero(np.logical_not(filtering_algo.inlier_mask_)))
-                sel_inlier_mask = filtering_algo.inlier_mask
+                sel_inlier_mask = filtering_algo.inlier_mask_
             else:
                 logging.info("After first round, still have outliers %s" % recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold])
                 if backup_filtering_algo is None or recomputed_speeds_df.speed.max() < MACH1:
-                    logging.debug("backup algo is %s, max < MACH1 %s, so returning default algo outliers %s" %
-                        (MACH1, np.nonzero(np.logical_not(filtering_algo.inlier_mask_))))
+                    logging.debug("backup algo is %s, max < MACH1, so returning default algo outliers %s" %
+                        (backup_filtering_algo, np.nonzero(np.logical_not(filtering_algo.inlier_mask_))))
                     sel_inlier_mask_ = filtering_algo.inlier_mask_
                 else:
                     backup_filtering_algo.filter(with_speeds_df)
