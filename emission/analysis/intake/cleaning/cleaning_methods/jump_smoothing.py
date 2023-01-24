@@ -259,41 +259,6 @@ class SmoothZigzag(object):
         logging.debug("after setting values, outlier_mask = %s" % np.nonzero((self.inlier_mask_ == False).to_numpy()))
         # logging.debug("point details are %s" % with_speeds_df[np.logical_not(self.inlier_mask_)])
 
-        # TODO: This is not the right place for this - adds too many dependencies
-        # Should do this in the outer class in general so that we can do
-        # multiple passes of any filtering algorithm
-        import emission.analysis.intake.cleaning.cleaning_methods.speed_outlier_detection as cso
-        import emission.analysis.intake.cleaning.location_smoothing as ls
-
-        recomputed_speeds_df = ls.recalc_speed(self.with_speeds_df[self.inlier_mask_])
-        recomputed_threshold = cso.BoxplotOutlier(ignore_zeros = True).get_threshold(recomputed_speeds_df)
-        logging.info("After first round, recomputed max = %s, recomputed threshold = %s" %
-            (recomputed_speeds_df.speed.max(), recomputed_threshold))
-        # assert recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold].shape[0] == 0, "After first round, still have outliers %s" % recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold] 
-        if recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold].shape[0] != 0:
-            logging.info("After first round, still have outliers %s" % recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold])
-            MACH1 = 340.29
-            if recomputed_speeds_df.speed.max() > MACH1:
-                backup_filtering_algo = SmoothPosdap(MACH1)
-                backup_filtering_algo.filter(with_speeds_df)
-
-                recomputed_speeds_df = ls.recalc_speed(self.with_speeds_df[backup_filtering_algo.inlier_mask_])
-                recomputed_threshold = cso.BoxplotOutlier(ignore_zeros = True).get_threshold(recomputed_speeds_df)
-                logging.info("After second round, max = %s, recomputed threshold = %s" %
-                    (recomputed_speeds_df.speed.max(), recomputed_threshold))
-                # assert recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold].shape[0] == 0, "After first round, still have outliers %s" % recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold] 
-                if recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold].shape[0] == 0:
-                    logging.info("After second round, no outliers, returning backup mask  %s" % backup_filtering_algo.inlier_mask_)
-                    self.inlier_mask_ = backup_filtering_algo.inlier_mask_
-                else:
-                    logging.info("After second round, still have outliers %s" % recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold])
-                    if recomputed_speeds_df.speed.max() > MACH1:
-                        logging.info("And they are also > %s, backup algo also failed" % MACH1)
-                    else:
-                        logging.debug("But they are all < %s, so returning outliers %s" %
-                            (MACH1, np.nonzero(np.logical_not(backup_filtering_algo.inlier_mask_))))
-                        self.inlier_mask_ = backup_filtering_algo.inlier_mask_
-
 
 ### Re-implemented from the prior POSDAP algorithm
 ### This does seem to use some kind of max speed 

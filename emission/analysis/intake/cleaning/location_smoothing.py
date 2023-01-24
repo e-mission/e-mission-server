@@ -43,6 +43,7 @@ np.set_printoptions(suppress=True)
 
 # This is what we use in the segmentation code to see if the points are "the same"
 DEFAULT_SAME_POINT_DISTANCE = 100
+MACH1 = 340.29
 
 def recalc_speed(points_df):
     """
@@ -139,9 +140,10 @@ def filter_jumps(user_id, section_id):
         logging.debug("Found iOS section, filling in gaps with fake data")
         section_points_df = _ios_fill_fake_data(section_points_df)
     filtering_algo = eaicj.SmoothZigzag(is_ios, DEFAULT_SAME_POINT_DISTANCE)
+    backup_filtering_algo = eaicj.SmoothPosdap(MACH1)
 
     logging.debug("len(section_points_df) = %s" % len(section_points_df))
-    points_to_ignore_df = get_points_to_filter(section_points_df, outlier_algo, filtering_algo)
+    points_to_ignore_df = get_points_to_filter(section_points_df, outlier_algo, filtering_algo, backup_filtering_algo)
     if points_to_ignore_df is None:
         # There were no points to delete
         return
@@ -163,7 +165,7 @@ def filter_jumps(user_id, section_id):
     result_entry = ecwe.Entry.create_entry(user_id, "analysis/smoothing", filter_result)
     ts.insert(result_entry)
 
-def get_points_to_filter(section_points_df, outlier_algo, filtering_algo):
+def get_points_to_filter(section_points_df, outlier_algo, filtering_algo, backup_filtering_algo):
     """
     From the incoming dataframe, filter out large jumps using the specified outlier detection algorithm and
     the specified filtering algorithm.
@@ -187,7 +189,46 @@ def get_points_to_filter(section_points_df, outlier_algo, filtering_algo):
     if filtering_algo is not None:
         try:
             filtering_algo.filter(with_speeds_df)
-            to_delete_mask = np.logical_not(filtering_algo.inlier_mask_)
+            recomputed_speeds_df = recalc_speed(with_speeds_df[filtering_algo.inlier_mask_])
+            recomputed_threshold = outlier_algo.get_threshold(recomputed_speeds_df)
+            logging.info("After first round, recomputed max = %s, recomputed threshold = %s" %
+                (recomputed_speeds_df.speed.max(), recomputed_threshold))
+            # assert recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold].shape[0] == 0, "After first round, still have outliers %s" % recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold] 
+            if recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold].shape[0] == 0:
+                logging.info("No outliers after first round, default algo worked, to_delete = %s" %
+                    np.nonzero(np.logical_not(filtering_algo.inlier_mask_)))
+                sel_inlier_mask = filtering_algo.inlier_mask
+            else:
+                logging.info("After first round, still have outliers %s" % recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold])
+                if backup_filtering_algo is None or recomputed_speeds_df.speed.max() < MACH1:
+                    logging.debug("backup algo is %s, max < MACH1 %s, so returning default algo outliers %s" %
+                        (MACH1, np.nonzero(np.logical_not(filtering_algo.inlier_mask_))))
+                    sel_inlier_mask_ = filtering_algo.inlier_mask_
+                else:
+                    backup_filtering_algo.filter(with_speeds_df)
+                    recomputed_speeds_df = recalc_speed(with_speeds_df[backup_filtering_algo.inlier_mask_])
+                    recomputed_threshold = outlier_algo.get_threshold(recomputed_speeds_df)
+                    logging.info("After second round, max = %s, recomputed threshold = %s" %
+                        (recomputed_speeds_df.speed.max(), recomputed_threshold))
+                    # assert recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold].shape[0] == 0, "After first round, still have outliers %s" % recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold] 
+                    if recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold].shape[0] == 0:
+                        logging.info("After second round, no outliers, returning backup to delete %s" %
+                            np.nonzero(np.logical_not(backup_filtering_algo.inlier_mask_)))
+                        sel_inlier_mask_ = backup_filtering_algo.inlier_mask_
+                    else:
+                        logging.info("After second round, still have outliers %s" % recomputed_speeds_df[recomputed_speeds_df.speed > recomputed_threshold])
+                        if recomputed_speeds_df.speed.max() < MACH1:
+                            logging.debug("But they are all < %s, so returning backup to delete %s" %
+                                (MACH1, np.nonzero(np.logical_not(backup_filtering_algo.inlier_mask_))))
+                            sel_inlier_mask_ = backup_filtering_algo.inlier_mask_
+                        else:
+                            logging.info("And they are also > %s, backup algo also failed, returning default to delete = %s" %
+                                (MACH1, np.nonzero(np.logical_not(filtering_algo.inlier_mask_))))
+                            sel_inlier_mask_ = filtering_algo.inlier_mask_
+
+            to_delete_mask = np.logical_not(sel_inlier_mask_)
+            logging.info("After all checks, inlier mask = %s, outlier_mask = %s" %
+                (np.nonzero(sel_inlier_mask_), np.nonzero(np.logical_not(sel_inlier_mask_))))
             return with_speeds_df[to_delete_mask]
         except Exception as e:
             logging.exception("Caught error %s while processing section, skipping..." % e)
