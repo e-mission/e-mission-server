@@ -242,8 +242,7 @@ class SmoothZigzag(object):
                 (self.segment_list, len(self.segment_list)))
         if len(self.segment_list) == 1:
             # there were no jumps, so there's nothing to do
-            logging.info("No jumps, nothing to filter, early return, series = %s, to_numpy = %s" %
-                (self.inlier_mask_, self.inlier_mask_.to_numpy()))
+            logging.info("No jumps, nothing to filter, early return")
             self.inlier_mask_ = self.inlier_mask_.to_numpy()
             return
         start_segment_idx = self.find_start_segment(self.segment_list)

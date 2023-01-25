@@ -243,34 +243,6 @@ def get_points_to_filter(section_points_df, outlier_algo, filtering_algo, backup
         logging.debug("no filtering algo specified, returning None")
         return (None, None)
 
-def get_filtered_points(section_df, outlier_algo, filtering_algo):
-    """
-    Filter the points that correspond to the section object that is passed in.
-    The section object is an AttrDict with the startTs and endTs fields.
-    Returns a filtered df with the index after the initial filter for accuracy
-    TODO: Switch this to the section wrapper object going forward
-    TODO: Note that here, we assume that the data has already been chunked into sections.
-    But really, we need to filter (at least for accuracy) before segmenting in
-    order to avoid issues like https://github.com/e-mission/e-mission-data-collection/issues/45
-    """
-    with_speeds_df = add_dist_heading_speed(section_df)
-    # if filtering algo is none, there's nothing that can use the max speed
-    if outlier_algo is not None and filtering_algo is not None:
-        maxSpeed = outlier_algo.get_threshold(with_speeds_df)
-        # TODO: Is this the best way to do this? Or should I pass this in as an argument to filter?
-        # Or create an explicit set_speed() method?
-        # Or pass the outlier_algo as the parameter to the filtering_algo?
-        filtering_algo.maxSpeed = maxSpeed
-    if filtering_algo is not None:
-        try:
-            filtering_algo.filter(with_speeds_df)
-            return with_speeds_df[filtering_algo.inlier_mask_]
-        except Exception as e:
-            logging.info("Caught error %s while processing section, skipping..." % e)
-            return with_speeds_df
-    else:
-        return with_speeds_df
-
 def _ios_fill_fake_data(locs_df):
     diff_ts = locs_df.ts.diff()
     fill_ends = diff_ts[diff_ts > 60].index.tolist()
