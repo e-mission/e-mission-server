@@ -16,6 +16,7 @@ import bson.json_util as bju
 import bson.objectid as boi
 import numpy as np
 import attrdict as ad
+import pandas as pd
 
 # Our imports
 import emission.net.usercache.abstract_usercache as enua
@@ -99,10 +100,10 @@ class TestLocationSmoothing(unittest.TestCase):
             logging.debug("Max speed for section %s = %s" % (i, maxSpeed))
 
             jump_algo.filter(with_speeds_df)
-            logging.debug("Retaining points %s" % np.nonzero(jump_algo.inlier_mask_.to_numpy()))
+            logging.debug("Retaining points %s" % np.nonzero(jump_algo.inlier_mask_))
 
             to_delete_mask = np.logical_not(jump_algo.inlier_mask_)
-            logging.debug("Deleting points %s" % np.nonzero(to_delete_mask.to_numpy()))
+            logging.debug("Deleting points %s" % np.nonzero(to_delete_mask))
 
             delete_ids = list(with_speeds_df[to_delete_mask]._id)
             logging.debug("Deleting ids %s" % delete_ids)
@@ -137,10 +138,10 @@ class TestLocationSmoothing(unittest.TestCase):
             logging.debug("Max speed for section %s = %s" % (i, maxSpeed))
 
             jump_algo.filter(with_speeds_df)
-            logging.debug("Retaining points %s" % np.nonzero(jump_algo.inlier_mask_.to_numpy()))
+            logging.debug("Retaining points %s" % np.nonzero(jump_algo.inlier_mask_))
 
             to_delete_mask = np.logical_not(jump_algo.inlier_mask_)
-            logging.debug("Deleting points %s" % np.nonzero(to_delete_mask.to_numpy()))
+            logging.debug("Deleting points %s" % np.nonzero(to_delete_mask))
 
             delete_ids = list(with_speeds_df[to_delete_mask]._id)
             logging.debug("Deleting ids %s" % delete_ids)
@@ -150,6 +151,62 @@ class TestLocationSmoothing(unittest.TestCase):
             # The bad section, should have the third point filtered
             self.assertEqual(np.count_nonzero(to_delete_mask), 1)
             self.assertEqual([str(id) for id in delete_ids], ["55e86dbb7d65cb39ee987e09"])
+
+    # Tests for the special handling of big jumps in trips where all other points are in clusters
+    # If there are multiple clusters, then the simple alternation of GOOD and BAD fails
+    # and we need a more sophisticated check
+    def testFilterAllClusters(self):
+        import pandas as pd
+        import itertools
+
+        outlier_algo = eaics.BoxplotOutlier()
+        jump_algo = eaicj.SmoothZigzag(False, 100)
+        backup_algo = eaicj.SmoothPosdap(eaicl.MACH1)
+
+        # basic check that if the backup algo is not specified, we return the original values
+        with_speeds_df = pd.read_csv("emission/tests/data/smoothing_data/all_cluster_case_2.csv")
+        with_speeds_df.drop(["distance", "speed", "heading"], axis="columns", inplace=True)
+        with_speeds_df["loc"] = with_speeds_df["loc"].apply(lambda lstr: json.loads(lstr.replace("'",  '"')))
+        (sel_algo, filtered_points) = eaicl.get_points_to_filter(with_speeds_df, outlier_algo, jump_algo, None)
+        # original values, inserted in
+        # https://github.com/e-mission/e-mission-server/pull/897/commits/434a9a19b7f41ae868102e0154df95db8ec633c4
+        # removed in https://github.com/e-mission/e-mission-server/pull/897/commits/67f5c86206e41168c6f3664fa5a2d4152d9d4091
+        expected_result_idx = list(itertools.chain([0], range(2,11), range(12, 14)))
+        self.assertEqual(list(filtered_points.dropna().index), expected_result_idx)
+        self.assertEqual(sel_algo, jump_algo)
+        self.assertEqual(sel_algo.__class__.__name__.split(".")[-1], "SmoothZigzag")
+
+        # US to ocean jump: case 1 of https://github.com/e-mission/e-mission-docs/issues/843
+        with_speeds_df = pd.read_csv("emission/tests/data/smoothing_data/all_cluster_case_1.csv", index_col=0)
+        with_speeds_df.drop(["distance", "speed", "heading"], axis="columns", inplace=True)
+        with_speeds_df["loc"] = with_speeds_df["loc"].apply(lambda lstr: json.loads(lstr.replace("'",  '"')))
+        (sel_algo, filtered_points) = eaicl.get_points_to_filter(with_speeds_df, outlier_algo, jump_algo, backup_algo)
+        expected_result_idx = list(range(16, 21))
+        self.assertEqual(list(filtered_points.dropna().index), expected_result_idx)
+        self.assertEqual(sel_algo, backup_algo)
+        self.assertEqual(sel_algo.__class__.__name__.split(".")[-1], "SmoothPosdap")
+  
+        # PR to pakistan jump: case 2 of https://github.com/e-mission/e-mission-docs/issues/843
+        with_speeds_df = pd.read_csv("emission/tests/data/smoothing_data/all_cluster_case_2.csv")
+        with_speeds_df.drop(["distance", "speed", "heading"], axis="columns", inplace=True)
+        with_speeds_df["loc"] = with_speeds_df["loc"].apply(lambda lstr: json.loads(lstr.replace("'",  '"')))
+        (sel_algo, filtered_points) = eaicl.get_points_to_filter(with_speeds_df, outlier_algo, jump_algo, backup_algo)
+        expected_result_idx = [11]
+        self.assertEqual(list(filtered_points.dropna().index), expected_result_idx)
+        self.assertEqual(sel_algo, backup_algo)
+        self.assertEqual(sel_algo.__class__.__name__.split(".")[-1], "SmoothPosdap")
+
+    # I found some super weird behavior while fixing the issue with the early
+    # return when there are no jumps
+    # It looks like series -> numpy array -> non_zero returns a tuple so we can't get its length directly
+    # instead, we return the size of the first element in the tuple
+    def testWeirdNumpyBehavior(self):
+        test = pd.Series([True] * 10)
+        test = test.to_numpy()
+        self.assertEqual(test.shape, (10,))
+        self.assertEqual(np.logical_not(test).shape, (10,))
+        np.testing.assert_equal(np.nonzero(np.logical_not(test)), (np.array([], dtype=np.int64),))
+        self.assertEqual(np.nonzero(np.logical_not(test))[0].shape[0], 0)
 
     def testPointFilteringZigzag(self):
         classicJumpTrip1 = self.trip_entries[8]
@@ -171,17 +228,17 @@ class TestLocationSmoothing(unittest.TestCase):
             logging.debug("Max speed for section %s = %s" % (i, maxSpeed))
 
             jump_algo.filter(with_speeds_df)
-            logging.debug("Retaining points %s" % np.nonzero(jump_algo.inlier_mask_.to_numpy()))
+            logging.debug("Retaining points %s" % np.nonzero(jump_algo.inlier_mask_))
 
             to_delete_mask = np.logical_not(jump_algo.inlier_mask_)
-            logging.debug("Deleting points %s" % np.nonzero(to_delete_mask.to_numpy()))
+            logging.debug("Deleting points %s" % np.nonzero(to_delete_mask))
 
             delete_ids = list(with_speeds_df[to_delete_mask]._id)
             logging.debug("Deleting ids %s" % delete_ids)
 
             if i == 0:
                 # this is the zigzag section
-                self.assertEqual(np.nonzero(to_delete_mask.to_numpy())[0].tolist(),
+                self.assertEqual(np.nonzero(to_delete_mask)[0].tolist(),
                                  [25, 64, 114, 115, 116, 117, 118, 119, 120, 123, 126])
                 self.assertEqual(delete_ids,
                                  [boi.ObjectId('55edafe77d65cb39ee9882ff'),
@@ -196,7 +253,7 @@ class TestLocationSmoothing(unittest.TestCase):
                                   boi.ObjectId('55edcc217d65cb39ee98841f'),
                                   boi.ObjectId('55edcc217d65cb39ee988429')])
             else:
-                self.assertEqual(len(np.nonzero(to_delete_mask.to_numpy())[0]), 0)
+                self.assertEqual(len(np.nonzero(to_delete_mask)[0]), 0)
                 self.assertEqual(len(delete_ids), 0)
 
     def testFilterSection(self):
