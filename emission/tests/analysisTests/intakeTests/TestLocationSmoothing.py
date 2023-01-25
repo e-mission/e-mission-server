@@ -16,6 +16,7 @@ import bson.json_util as bju
 import bson.objectid as boi
 import numpy as np
 import attrdict as ad
+import pandas as pd
 
 # Our imports
 import emission.net.usercache.abstract_usercache as enua
@@ -194,6 +195,18 @@ class TestLocationSmoothing(unittest.TestCase):
         self.assertEqual(list(filtered_points.dropna().index), expected_result_idx)
         self.assertEqual(sel_algo, backup_algo)
         self.assertEqual(sel_algo.__class__.__name__.split(".")[-1], "SmoothPosdap")
+
+    # I found some super weird behavior while fixing the issue with the early
+    # return when there are no jumps
+    # It looks like series -> numpy array -> non_zero returns a tuple so we can't get its length directly
+    # instead, we return the size of the first element in the tuple
+    def testWeirdNumpyBehavior(self):
+        test = pd.Series([True] * 10)
+        test = test.to_numpy()
+        self.assertEqual(test.shape, (10,))
+        self.assertEqual(np.logical_not(test).shape, (10,))
+        np.testing.assert_equal(np.nonzero(np.logical_not(test)), (np.array([], dtype=np.int64),))
+        self.assertEqual(np.nonzero(np.logical_not(test))[0].shape[0], 0)
 
     def testPointFilteringZigzag(self):
         classicJumpTrip1 = self.trip_entries[8]
