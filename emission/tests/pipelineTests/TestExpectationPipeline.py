@@ -8,13 +8,14 @@ import emission.core.wrapper.labelprediction as ecwl
 import emission.analysis.userinput.expectations as eaue
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.analysis.classification.inference.labels.pipeline as eacilp
+import emission.analysis.classification.inference.labels.inferrers as eacili
 import emission.core.get_database as edb
 import emission.tests.common as etc
 import emission.analysis.configs.expectation_notification_config as eace
 
 class TestExpectationPipeline(unittest.TestCase):
     test_algorithms = {
-            ecwl.AlgorithmTypes.PLACEHOLDER_3: eacilp.placeholder_predictor_3
+            ecwl.AlgorithmTypes.PLACEHOLDER_3: eacili.placeholder_predictor_3
     }
     tz = "America/Chicago"
     contrived_dates = {  # Reused from TestExpectationNotificationConfig
