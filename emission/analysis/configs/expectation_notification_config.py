@@ -2,6 +2,7 @@ import json
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 import arrow
+import logging
 
 import emission.analysis.config as eac
 
@@ -27,7 +28,9 @@ def _get_expectation_config():
     return config_data
 
 def _get_keylist():
-    if _test_options["override_keylist"] is not None: return _test_options["override_keylist"]
+    if _test_options["override_keylist"] is not None:
+        # logging.info("Returning overridden keylist %s" % _test_options["override_keylist"])
+        return _test_options["override_keylist"]
     keylist = eac.get_config()["userinput.keylist"]
     assert len(keylist) > 0
     keylist = [s.split("/")[1] for s in keylist]  # Turns e.g. "manual/mode_confirm" into "mode_confirm"
@@ -85,10 +88,13 @@ def _get_collection_mode_by_schedule(trip):
 def _rule_matches_label(mode, rule, trip, label):
     # If we were doing this on the phone, we would use finalInference.
     # Here, we just take the most likely prediction.
+    # logging.debug(f"EXPECT CHECK inferred_labels {trip['data']['inferred_labels']} against {rule} for {label}")
     if len(trip["data"]["inferred_labels"]) == 0:
         return rule["trigger"] == -1
     prediction = max(trip["data"]["inferred_labels"], key = lambda d: d["p"])
+    # logging.debug(f"EXPECT CHECK prediction {prediction}")
     confidence = prediction["p"]
+    # logging.debug(f"EXPECT CHECK confidence {confidence}")
     if confidence <= mode["confidenceThreshold"] or label not in prediction["labels"]:
         return rule["trigger"] == -1
     return confidence <= rule["trigger"]
@@ -100,11 +106,14 @@ def _get_rule_for_label(mode, trip, label):
     return None if len(rules) == 0 else min(rules, key = lambda r: r["trigger"])
 
 def _get_rule(trip):
+    # logging.debug(f"EXPECT CHECK line 103 {_keylist}")
     if len(_keylist) == 0: return _get_done_rule()
     mode = _get_collection_mode_by_schedule(trip)
+    # logging.debug(f"EXPECT CHECK mode line 105 {mode}")
     rules = []
     for input in _keylist:
         rule = _get_rule_for_label(mode, trip, input)
+        # logging.debug(f"EXPECT CHECK rule = {rule}")
         if rule is not None: rules.append(rule)
     if len(rules) == 0:
         raise ValueError("Trip does not match any rules; this means the trip is malformed or the active collection mode is missing required rules")

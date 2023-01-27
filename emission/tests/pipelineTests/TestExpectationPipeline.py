@@ -36,7 +36,7 @@ class TestExpectationPipeline(unittest.TestCase):
         self.test_options_stash = eace._test_options
         eace._test_options = {
             "use_sample": True,
-            "override_keylist": None
+            "override_keylist": ["mode_confirm", "purpose_confirm"]
         }
         eace.reload_config()
         
@@ -51,7 +51,6 @@ class TestExpectationPipeline(unittest.TestCase):
 
     def tearDown(self):
         self.reset_all()
-        
         eace._test_options = self.test_options_stash
         eace.reload_config()
 
@@ -93,7 +92,8 @@ class TestExpectationPipeline(unittest.TestCase):
             960: {"type": "randomFraction", "value": 0.05}
         }
         for trip in self.expected_trips:
-            self.assertEqual(eace.get_expectation(trip), answers[self.fingerprint(trip)])
+            self.assertEqual(eace.get_expectation(trip), answers[self.fingerprint(trip)],
+                "trip: %s with fingerprint %s" % (trip, self.fingerprint(trip)))
 
     def testProcessedAgainstAnswers(self):
         answers = {
@@ -106,7 +106,7 @@ class TestExpectationPipeline(unittest.TestCase):
         }
         for trip in self.expected_trips:
             ans = answers[self.fingerprint(trip)]
-            if ans is not None: self.assertEqual(trip["data"]["expectation"]["to_label"], ans)
+            if ans is not None: self.assertEqual(trip["data"]["expectation"]["to_label"], ans, "trip: %s with fingerprint %s" % (trip, self.fingerprint(trip)))
 
     def testProcessedAgainstRaw(self):
         for trip in self.expected_trips:
