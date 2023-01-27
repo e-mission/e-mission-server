@@ -2,6 +2,7 @@ import unittest
 import numpy as np
 import time
 import arrow
+import copy
 
 import emission.storage.timeseries.timequery as estt
 import emission.core.wrapper.labelprediction as ecwl
@@ -33,7 +34,7 @@ class TestExpectationPipeline(unittest.TestCase):
         return trip["data"]["start_local_dt"]["hour"]*60+trip["data"]["start_local_dt"]["minute"]
 
     def setUp(self):
-        self.test_options_stash = eace._test_options
+        self.test_options_stash = copy.copy(eace._test_options)
         eace._test_options = {
             "use_sample": True,
             "override_keylist": ["mode_confirm", "purpose_confirm"]
@@ -57,7 +58,7 @@ class TestExpectationPipeline(unittest.TestCase):
     def run_pipeline(self, algorithms):
         primary_algorithms_stash = eacilp.primary_algorithms
         eacilp.primary_algorithms = algorithms
-        test_options_stash = eaue._test_options
+        test_options_stash = copy.copy(eaue._test_options)
         eaue._test_options["preprocess_trip"] = lambda trip: self.preprocess(trip)
         etc.runIntakePipeline(self.testUUID)
         eacilp.primary_algorithms = primary_algorithms_stash
