@@ -9,7 +9,7 @@ import emission.tests.common as etc
 # Exhaustive (and exhausting) tests of expectation_notification_config, including the behind-the-scenes rules algorithms and timey-wimey stuff
 class TestExpectationNotificationConfig(unittest.TestCase):
     def setUp(self):
-        self.test_options_stash = eace._test_options
+        self.test_options_stash = copy.copy(eace._test_options)
         eace._test_options = {
             "use_sample": True,
             "override_keylist": ["label1", "label2"]
