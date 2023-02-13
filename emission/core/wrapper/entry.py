@@ -150,8 +150,9 @@ class Entry(ecwb.WrapperBase):
             "analysis/inferred_trip": "inferredtrip",
             "analysis/expected_trip": "expectedtrip",
             "analysis/confirmed_trip": "confirmedtrip",
-            "analysis/confirmed_section": "confirmedsection"
+            "analysis/confirmed_section": "confirmedsection",
             ### ** END: confirmed objects which combine inferred and user input values
+            "analysis/confirmed_place": "confirmedplace"
             }
 
   @staticmethod
