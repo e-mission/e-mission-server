@@ -20,3 +20,8 @@ conf/**/*.json
 *.ipynb_checkpoints*
 
 *.secret
+emission/net/api/cfc_webapp.py
+seed_model.json
+emission/net/api/cfc_webapp.py
+file.txt
+emission/net/api/cfc_webapp.py
