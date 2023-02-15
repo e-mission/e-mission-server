@@ -326,7 +326,7 @@ class TestUserInputFakeData(unittest.TestCase):
             # Now that we have a `match_id` instead of `_id`, the database inserts an `_id`
             # we need to remove it before checking equality because otherwise the extra field
             # will cause the check to fail
-            addition_list = esdt.get_additions_for_trip_object(ts, fake_ct)
+            addition_list = esdt.get_additions_for_timeline_entry_object(ts, fake_ct)
             del addition_list[0]["_id"]
             self.assertEqual(addition_list, [fake_match])
         finally:
@@ -356,7 +356,7 @@ class TestUserInputFakeData(unittest.TestCase):
                 }
             ]
             ts.bulk_insert([ecwe.Entry(e) for e in fake_matches])
-            addition_list = esdt.get_additions_for_trip_object(ts, fake_ct)
+            addition_list = esdt.get_additions_for_timeline_entry_object(ts, fake_ct)
             # Now that we have a `match_id` instead of `_id`, the database inserts an `_id`
             # we need to remove it before checking equality because otherwise the extra field
             # will cause the check to fail

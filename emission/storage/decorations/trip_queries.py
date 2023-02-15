@@ -185,10 +185,17 @@ def get_user_input_from_cache_series(user_id, trip_obj, user_input_key):
     potential_candidates = estsc.find_entries(user_id, [user_input_key], tq)
     return final_candidate(valid_user_input(ts, trip_obj), potential_candidates)
 
-def get_additions_for_trip_object(ts, trip_obj):
-    tq = estt.TimeQuery("data.start_ts", trip_obj.data.start_ts, trip_obj.data.end_ts)
+def get_additions_for_timeline_entry_object(ts, timeline_entry):
+    # timeline_entry can be either a trip or place, so let's check for start/enter or end/exit
+    if (hasattr(timeline_entry.data, 'start_ts')):
+        start = timeline_entry.data.start_ts
+        end = timeline_entry.data.end_ts
+    else:
+        start = timeline_entry.data.enter_ts
+        end = timeline_entry.data.exit_ts
+    tq = estt.TimeQuery("data.start_ts", start, end)
     potential_candidates = ts.find_entries(["manual/trip_addition_input"], tq)
-    return get_not_deleted_candidates(valid_user_input(ts, trip_obj), potential_candidates)
+    return get_not_deleted_candidates(valid_user_input(ts, timeline_entry), potential_candidates)
 
 def valid_trip(ts, user_input):
     def curried(trip_obj):

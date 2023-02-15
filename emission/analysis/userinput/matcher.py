@@ -79,6 +79,7 @@ def create_confirmed_objects(user_id):
     time_query = epq.get_time_range_for_confirmed_object_creation(user_id)
     try:
         last_expected_trip_done = create_confirmed_trips(user_id, time_query)
+        time_query.timeType = "data.exit_ts"
         last_expected_place_done = create_confirmed_places(user_id, time_query)
         if last_expected_trip_done is None or last_expected_place_done is None:
             logging.debug("after run, last_expected_trip_done == None, must be early return")
@@ -109,11 +110,11 @@ def create_confirmed_places(user_id, timerange):
 #        confirmed_trip_dict["data"]["user_input"] = \
 #            get_user_input_dict(ts, tct, input_key_list)
         confirmed_place_dict["data"]["place_addition"] = \
-            esdt.get_additions_for_trip_object(ts, tcp)
+            esdt.get_additions_for_timeline_entry_object(ts, tcp)
         confirmed_place_entry = ecwe.Entry(confirmed_place_dict)
         # save the entry
         ts.insert(confirmed_place_entry)
-        # if everything is successful, then update the last successful trip
+        # if everything is successful, then update the last successful place
         lastPlaceProcessed = tcp
 
     return lastPlaceProcessed
@@ -137,7 +138,7 @@ def create_confirmed_trips(user_id, timerange):
         confirmed_trip_dict["data"]["user_input"] = \
             get_user_input_dict(ts, tct, input_key_list)
         confirmed_trip_dict["data"]["trip_addition"] = \
-            esdt.get_additions_for_trip_object(ts, tct)
+            esdt.get_additions_for_timeline_entry_object(ts, tct)
         confirmed_trip_entry = ecwe.Entry(confirmed_trip_dict)
         # save the entry
         ts.insert(confirmed_trip_entry)
