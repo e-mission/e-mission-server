@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import itertools
 import logging
 import os
+import time
 from datetime import datetime
 
 import sklearn.metrics as sm
@@ -159,8 +160,9 @@ def cross_val_predict(model,
             .format(len(user_df)))
         return
 
-    for train_idx, test_idx in kfolds.split(user_df):
+    for i, (train_idx, test_idx) in enumerate(kfolds.split(user_df)):
         # set up model and data
+        logging.info("----- Building model %s for fold %s" % (model, i))
         model_ = model()
         if model_params is not None:
             model_.set_params(model_params)
@@ -168,8 +170,10 @@ def cross_val_predict(model,
         test_trips = user_df.iloc[test_idx]
 
         # train the model
+        logging.info("About to fit the model %s" % model)
         model_.fit(train_trips)
 
+        logging.info("About to generate predictions for the model %s" % model)
         # generate predictions
         pred_df = model_.predict(test_trips)
         next_mode_pred = pred_df['mode_pred']
@@ -225,6 +229,8 @@ def cv_for_all_users(model,
     total_users = len(uuid_list)
 
     for user in uuid_list:
+        start_ts = time.time()
+        logging.info("------ START: predictions for user %s and model %s" % (user, model))
         try:
             results = cross_val_predict(model,
                                         model_params,
@@ -240,8 +246,9 @@ def cv_for_all_users(model,
                 raise e
             else:
                 excluded_user_count += 1
-                logging.info(f'skipping user {user} due to error: {repr(e)}')
+                logging.exception(f'skipping user {user} due to error: {repr(e)}')
                 continue
+        logging.info("------ END: predictions for user %s and model %s took %s secs" % (user, model, time.time() - start_ts))
 
         try:
             cross_val_results = pd.DataFrame(data=results)
@@ -268,7 +275,7 @@ def cv_for_all_algs(uuid_list,
                     raise_errors=False):
     cv_results = {}
     for model_name in model_names:
-        csv_path = f'cv results {model_name}.csv'
+        csv_path = f'first_trial_results/cv results {model_name}.csv'
         if not override_prior_runs and os.path.exists(csv_path):
             print('loading prior cross validation data for model:', model_name)
             cv_df = pd.read_csv(csv_path,

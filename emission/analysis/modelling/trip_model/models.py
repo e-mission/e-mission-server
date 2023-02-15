@@ -283,6 +283,7 @@ class RefactoredNaiveCluster(Cluster):
     """
 
     def __init__(self, loc_type='end', radius=100):
+        logging.info("PERF: Initializing RefactoredNaiveCluster")
         self.loc_type = loc_type
         self.radius = radius
 
@@ -294,6 +295,7 @@ class RefactoredNaiveCluster(Cluster):
 
     def fit(self, train_df):
         # clean data
+        logging.info("PERF: Fitting RefactoredNaiveCluster with size %s" % len(train_df))
         self.train_df = self._clean_data(train_df)
 
         # we can use all trips as long as they have purpose labels. it's ok if
@@ -328,6 +330,7 @@ class RefactoredNaiveCluster(Cluster):
         return self
 
     def predict(self, test_df):
+        logging.info("PERF: Predicting RefactoredNaiveCluster for %s" % len(test_df))
         self.test_df = self._clean_data(test_df)
 
         if self.loc_type == 'start':
@@ -339,6 +342,8 @@ class RefactoredNaiveCluster(Cluster):
 
         # for each trip in the test list:
         for idx, row in self.test_df.iterrows():
+            if idx % 100 == 0:
+                logging.info("PERF: RefactoredNaiveCluster Working on trip %s/%s" % (idx, len(self.test_df)))
             # iterate over all bins
             trip_binned = False
             for i, bin in enumerate(bins):
@@ -418,6 +423,7 @@ class DBSCANSVMCluster(Cluster):
                  purity_thresh=1.0,
                  gamma=0.05,
                  C=1):
+        logging.info("PERF: Initializing DBSCANSVMCluster")
         self.loc_type = loc_type
         self.radius = radius
         self.svm = svm
@@ -453,6 +459,7 @@ class DBSCANSVMCluster(Cluster):
         ##################
         ### clean data ###
         ##################
+        logging.info("PERF: Fitting DBSCANSVMCluster")
         self.train_df = self._clean_data(train_df)
 
         # we can use all trips as long as they have purpose labels. it's ok if
@@ -563,6 +570,7 @@ class DBSCANSVMCluster(Cluster):
         return self.train_df[[f'{self.loc_type}_cluster_idx']]
 
     def predict(self, test_df):
+        logging.info("PERF: Predicting DBSCANSVMCluster")
         # TODO: store clusters as polygons so the prediction is faster
         # TODO: we probably don't want to store test_df in self to be more memory-efficient
         self.test_df = self._clean_data(test_df)
@@ -579,6 +587,7 @@ class DBSCANSVMCluster(Cluster):
             sklearn doesn't implement predict() for DBSCAN, which is why we 
             need a custom method.
         """
+        logging.info("PERF: NN_predicting DBSCANSVMCluster")
         n_samples = test_df.shape[0]
         labels = np.ones(shape=n_samples, dtype=int) * -1
 
@@ -631,6 +640,7 @@ class NaiveBinningClassifier(TripClassifier):
     """
 
     def __init__(self, radius=500):
+        logging.info("PERF: Initializing NaiveBinningClassifier")
         self.radius = radius
 
     def set_params(self, params):
@@ -639,6 +649,7 @@ class NaiveBinningClassifier(TripClassifier):
         return self
 
     def fit(self, train_df):
+        logging.info("PERF: Fitting NaiveBinningClassifier")
         # (copied from bsm.build_user_model())
 
         # convert train_df to a list because the existing binning algorithm
@@ -668,6 +679,7 @@ class NaiveBinningClassifier(TripClassifier):
         """
         # convert test_df to a list because the existing binning algorithm
         # only accepts lists of Entry objects
+        logging.info("PERF: Predicting NaiveBinningClassifier")
         test_trips = self._trip_df_to_list(test_df)
 
         purpose_distribs = []
