@@ -79,33 +79,22 @@ def create_confirmed_objects(user_id):
     time_query = epq.get_time_range_for_confirmed_object_creation(user_id)
     try:
         last_expected_trip_done = create_confirmed_trips(user_id, time_query)
-        if last_expected_trip_done is None:
+        last_expected_place_done = create_confirmed_places(user_id, time_query)
+        if last_expected_trip_done is None or last_expected_place_done is None:
             logging.debug("after run, last_expected_trip_done == None, must be early return")
             epq.mark_confirmed_object_creation_done(user_id, None)
         else:
             epq.mark_confirmed_object_creation_done(user_id, last_expected_trip_done.data.end_ts)
+
     except:
         logging.exception("Error while creating confirmed objects, timestamp is unchanged")
         epq.mark_confirmed_object_creation_failed(user_id)
 
-def create_place_objects(user_id):
-    time_query = epq.get_time_range_for_confirmed_object_creation(user_id)
-    try:
-        last_expected_place_done = create_confirmed_places(user_id, time_query)
-        if last_expected_place_done is None:
-            logging.debug("after run, last_expected_place_done == None, must be early return")
-            epq.mark_confirmed_object_creation_done(user_id, None)
-        else:
-            epq.mark_confirmed_object_creation_done(user_id, last_expected_place_done.data.end_ts)
-    except:
-        logging.exception("Error while creating place objects, timestamp is unchanged")
-        epq.mark_confirmed_object_creation_failed(user_id)
-
 def create_confirmed_places(user_id, timerange):
     ts = esta.TimeSeries.get_time_series(user_id)
-    toConfirmPlaces = esda.get_entries(esda.CLEANED_PLACE_KEY, user_id,
+    toConfirmPlaces = esda.get_entries(esda.CLEANED_PLACE_KEY, user_id, #eventually change this to be confirmed_place?
         time_query=timerange)
-    logging.debug("Converting %d expected Places to confirmed ones" % len(toConfirmPlaces))
+    logging.info("Converting %d cleaned Places to confirmed ones" % len(toConfirmPlaces))
     lastPlaceProcessed = None
     if len(toConfirmPlaces) == 0:
         logging.debug("len(toConfirmPlaces) == 0, early return")

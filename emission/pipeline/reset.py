@@ -187,8 +187,7 @@ def reset_pipeline_state(user_id, reset_ts, is_dry_run):
     stages_with_fuzz = [ecwp.PipelineStages.TRIP_SEGMENTATION.value,
                         ecwp.PipelineStages.LABEL_INFERENCE.value,
                         ecwp.PipelineStages.EXPECTATION_POPULATION.value,
-                        ecwp.PipelineStages.CREATE_CONFIRMED_OBJECTS.value,
-                        ecwp.PipelineStages.CREATE_PLACE_OBJECTS.value]
+                        ecwp.PipelineStages.CREATE_CONFIRMED_OBJECTS.value]
         
     trip_seg_reset_pipeline_query = {'user_id': user_id,
                                      'last_processed_ts': {'$ne': None},

@@ -184,14 +184,6 @@ def run_intake_pipeline_for_user(uuid):
         esds.store_pipeline_time(uuid, ecwp.PipelineStages.CREATE_CONFIRMED_OBJECTS.name,
                                  time.time(), crt.elapsed)
 
-        with ect.Timer() as crt:
-            logging.info("*" * 10 + "UUID %s: creating place objects " % uuid + "*" * 10)
-            print(str(arrow.now()) + "*" * 10 + "UUID %s: creating place objects " % uuid + "*" * 10)
-            eaum.create_place_objects(uuid)
-
-        esds.store_pipeline_time(uuid, ecwp.PipelineStages.CREATE_PLACE_OBJECTS.name,
-                                 time.time(), crt.elapsed)
-
         with ect.Timer() as ogt:
             logging.info("*" * 10 + "UUID %s: storing views to cache" % uuid + "*" * 10)
             print(str(arrow.now()) + "*" * 10 + "UUID %s: storing views to cache" % uuid + "*" * 10)
