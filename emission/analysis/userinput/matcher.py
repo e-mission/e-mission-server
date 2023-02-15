@@ -87,7 +87,48 @@ def create_confirmed_objects(user_id):
     except:
         logging.exception("Error while creating confirmed objects, timestamp is unchanged")
         epq.mark_confirmed_object_creation_failed(user_id)
-   
+
+def create_place_objects(user_id):
+    time_query = epq.get_time_range_for_confirmed_object_creation(user_id)
+    try:
+        last_expected_place_done = create_confirmed_places(user_id, time_query)
+        if last_expected_place_done is None:
+            logging.debug("after run, last_expected_place_done == None, must be early return")
+            epq.mark_confirmed_object_creation_done(user_id, None)
+        else:
+            epq.mark_confirmed_object_creation_done(user_id, last_expected_place_done.data.end_ts)
+    except:
+        logging.exception("Error while creating place objects, timestamp is unchanged")
+        epq.mark_confirmed_object_creation_failed(user_id)
+
+def create_confirmed_places(user_id, timerange):
+    ts = esta.TimeSeries.get_time_series(user_id)
+    toConfirmPlaces = esda.get_entries(esda.CLEANED_PLACE_KEY, user_id,
+        time_query=timerange)
+    logging.debug("Converting %d expected Places to confirmed ones" % len(toConfirmPlaces))
+    lastPlaceProcessed = None
+    if len(toConfirmPlaces) == 0:
+        logging.debug("len(toConfirmPlaces) == 0, early return")
+        return None
+    # input_key_list = eac.get_config()["userinput.keylist"]
+    for tcp in toConfirmPlaces:
+        # Copy the Place and fill in the new values
+        confirmed_place_dict = copy.copy(tcp)
+        del confirmed_place_dict["_id"]
+        confirmed_place_dict["metadata"]["key"] = "analysis/confirmed_place"
+#        confirmed_trip_dict["data"]["expected_place"] = tcp.get_id()
+#        confirmed_trip_dict["data"]["user_input"] = \
+#            get_user_input_dict(ts, tct, input_key_list)
+        confirmed_place_dict["data"]["place_addition"] = \
+            esdt.get_additions_for_trip_object(ts, tcp)
+        confirmed_place_entry = ecwe.Entry(confirmed_place_dict)
+        # save the entry
+        ts.insert(confirmed_place_entry)
+        # if everything is successful, then update the last successful trip
+        lastPlaceProcessed = tcp
+
+    return lastPlaceProcessed
+
 def create_confirmed_trips(user_id, timerange):
     ts = esta.TimeSeries.get_time_series(user_id)
     toConfirmTrips = esda.get_entries(esda.EXPECTED_TRIP_KEY, user_id,
