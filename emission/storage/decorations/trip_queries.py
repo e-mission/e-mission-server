@@ -87,7 +87,7 @@ def _get_next_cleaned_trip(ts, trip_obj):
 def get_user_input_for_trip(trip_key, user_id, trip_id, user_input_key):
     ts = esta.TimeSeries.get_time_series(user_id)
     trip_obj = ts.get_entry_from_id(trip_key, trip_id)
-    return get_user_input_for_trip_object(ts, trip_obj, user_input_key)
+    return get_user_input_for_timeline_entry_object(ts, trip_obj, user_input_key)
 
 # Additional checks to be consistent with the phone code
 # www/js/diary/services.js
@@ -169,10 +169,17 @@ def get_not_deleted_candidates(filter_fn, potential_candidates):
     logging.info(f"Found {len(all_active_list)} active entries, {len(all_deleted_id)} deleted entries -> {len(not_deleted_active)} non deleted active entries")
     return not_deleted_active
 
-def get_user_input_for_trip_object(ts, trip_obj, user_input_key):
-    tq = estt.TimeQuery("data.start_ts", trip_obj.data.start_ts, trip_obj.data.end_ts)
+def get_user_input_for_timeline_entry_object(ts, timeline_entry, user_input_key):
+    # timeline_entry can be either a trip or place, so let's check for start/enter or end/exit
+    if (hasattr(timeline_entry.data, 'start_ts')):
+        start = timeline_entry.data.start_ts
+        end = timeline_entry.data.end_ts
+    else:
+        start = timeline_entry.data.enter_ts
+        end = timeline_entry.data.exit_ts
+    tq = estt.TimeQuery("data.start_ts", start, end)
     potential_candidates = ts.find_entries([user_input_key], tq)
-    return final_candidate(valid_user_input(ts, trip_obj), potential_candidates)
+    return final_candidate(valid_user_input(ts, timeline_entry), potential_candidates)
 
 # This is almost an exact copy of get_user_input_for_trip_object, but it
 # retrieves an interable instead of a dataframe. So almost everything is

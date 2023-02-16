@@ -21,7 +21,7 @@ class Confirmedplace(ecwp.Place):
 # the user input will have all `manual/*` entries
 # let's make that be somewhat flexible instead of hardcoding into the data model
                   "user_input": ecwb.WrapperBase.Access.WORM,
-                  "place_addition": ecwb.WrapperBase.Access.WORM
+                  "additions": ecwb.WrapperBase.Access.WORM
                   })
 
     def _populateDependencies(self):

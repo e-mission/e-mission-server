@@ -108,8 +108,8 @@ class TestUserInputFakeData(unittest.TestCase):
         fake_ct = ecwe.Entry({"metadata": {"key": "analysis/confirmed_trip"}, "data": {"user_input": {}}})
         fake_match = ecwe.Entry({"metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<foo></foo>", "status": "ACTIVE"}})
         eaum.handle_multi_non_deleted_match(fake_ct, fake_match)
-        self.assertEqual(len(fake_ct["data"]["trip_addition"]), 1)
-        self.assertEqual(fake_ct["data"]["trip_addition"], [fake_match])
+        self.assertEqual(len(fake_ct["data"]["additions"]), 1)
+        self.assertEqual(fake_ct["data"]["additions"], [fake_match])
 
         # Two add matches
         fake_ct = ecwe.Entry({"metadata": {"key": "analysis/confirmed_trip"}, "data": {"user_input": {}}})
@@ -119,8 +119,8 @@ class TestUserInputFakeData(unittest.TestCase):
         ]
         for fm in fake_matches:
             eaum.handle_multi_non_deleted_match(fake_ct, fm)
-        self.assertEqual(len(fake_ct["data"]["trip_addition"]), 2)
-        self.assertEqual(fake_ct["data"]["trip_addition"], fake_matches)
+        self.assertEqual(len(fake_ct["data"]["additions"]), 2)
+        self.assertEqual(fake_ct["data"]["additions"], fake_matches)
     
         # Add two, delete one
         fake_ct = ecwe.Entry({"metadata": {"key": "analysis/confirmed_trip"}, "data": {"user_input": {}}})
@@ -132,9 +132,9 @@ class TestUserInputFakeData(unittest.TestCase):
         for fm in fake_matches:
             eaum.handle_multi_non_deleted_match(fake_ct, fm)
         # Add two, delete 1, we end up with one
-        self.assertEqual(len(fake_ct["data"]["trip_addition"]), 1)
+        self.assertEqual(len(fake_ct["data"]["additions"]), 1)
         # and it should be the bar entry
-        self.assertEqual(fake_ct["data"]["trip_addition"], [fake_matches[1]])
+        self.assertEqual(fake_ct["data"]["additions"], [fake_matches[1]])
 
         # Add two, delete two
         fake_ct = ecwe.Entry({"metadata": {"key": "analysis/confirmed_trip"}, "data": {"user_input": {}}})
@@ -147,12 +147,12 @@ class TestUserInputFakeData(unittest.TestCase):
         for fm in fake_matches:
             eaum.handle_multi_non_deleted_match(fake_ct, fm)
         # Add two, delete two, we end up with none
-        self.assertEqual(len(fake_ct["data"]["trip_addition"]), 0)
+        self.assertEqual(len(fake_ct["data"]["additions"]), 0)
         # and it should be the bar entry
-        self.assertEqual(fake_ct["data"]["trip_addition"], [])
+        self.assertEqual(fake_ct["data"]["additions"], [])
 
         # Add none, delete two existing
-        fake_ct = ecwe.Entry({"metadata": {"key": "analysis/confirmed_trip"}, "data": {"user_input": {}, "trip_addition": [
+        fake_ct = ecwe.Entry({"metadata": {"key": "analysis/confirmed_trip"}, "data": {"user_input": {}, "additions": [
                 {"match_id": "foo", "metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<foo></foo>", "status": "ACTIVE"}},
                 {"match_id": "bar", "metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<bar></bar>", "status": "ACTIVE"}}
         ]}})
@@ -163,12 +163,12 @@ class TestUserInputFakeData(unittest.TestCase):
         for fm in fake_matches:
             eaum.handle_multi_non_deleted_match(fake_ct, fm)
         # Existing two, delete two, we end up with none
-        self.assertEqual(len(fake_ct["data"]["trip_addition"]), 0)
+        self.assertEqual(len(fake_ct["data"]["additions"]), 0)
         # and it should be the bar entry
-        self.assertEqual(fake_ct["data"]["trip_addition"], [])
+        self.assertEqual(fake_ct["data"]["additions"], [])
 
         # Add none, delete non-existing
-        fake_ct = ecwe.Entry({"metadata": {"key": "analysis/confirmed_trip"}, "data": {"user_input": {}, "trip_addition": [
+        fake_ct = ecwe.Entry({"metadata": {"key": "analysis/confirmed_trip"}, "data": {"user_input": {}, "additions": [
                 {"match_id": "foo", "metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<foo></foo>", "status": "ACTIVE"}}
         ]}})
         fake_matches = [
@@ -177,9 +177,9 @@ class TestUserInputFakeData(unittest.TestCase):
         for fm in fake_matches:
             eaum.handle_multi_non_deleted_match(fake_ct, fm)
         # Existing 1, delete non-existent, we end up with one
-        self.assertEqual(len(fake_ct["data"]["trip_addition"]), 1)
+        self.assertEqual(len(fake_ct["data"]["additions"]), 1)
         # and it should be the bar entry
-        self.assertEqual(fake_ct["data"]["trip_addition"], [{"match_id": "foo", "metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<foo></foo>", "status": "ACTIVE"}}])
+        self.assertEqual(fake_ct["data"]["additions"], [{"match_id": "foo", "metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<foo></foo>", "status": "ACTIVE"}}])
 
     def testFinalCandidate(self):
         # define some filter functions
