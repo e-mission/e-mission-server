@@ -12,15 +12,7 @@ class Confirmedplace(ecwp.Place):
     props = ecwp.Place.props
     props.update({"raw_place": ecwb.WrapperBase.Access.WORM,
                   "cleaned_place": ecwb.WrapperBase.Access.WORM,
-                  "inferred_labels": ecwb.WrapperBase.Access.WORM,
-                  "expectation": ecwb.WrapperBase.Access.WORM,
                   "confidence_threshold": ecwb.WrapperBase.Access.WORM,
-# the confirmed section that is the "primary"
-# https://github.com/e-mission/e-mission-docs/issues/476#issuecomment-738120752
-                  "inferred_primary_mode": ecwb.WrapperBase.Access.WORM,
-# the user input will have all `manual/*` entries
-# let's make that be somewhat flexible instead of hardcoding into the data model
-                  "user_input": ecwb.WrapperBase.Access.WORM,
                   "additions": ecwb.WrapperBase.Access.WORM
                   })
 
