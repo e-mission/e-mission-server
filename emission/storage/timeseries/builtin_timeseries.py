@@ -371,7 +371,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
         """
         Inserts the specified entry and returns the object ID 
         """
-        logging.info("insert called with entry of type %s" % type(entry))
+        logging.debug("insert called with entry of type %s" % type(entry))
         if type(entry) == dict:
             entry = ecwe.Entry(entry)
         if "user_id" not in entry or entry["user_id"] is None:
@@ -380,9 +380,9 @@ class BuiltinTimeSeries(esta.TimeSeries):
             raise AttributeError("Saving entry %s for %s in timeseries for %s" % 
 		(entry, entry["user_id"], self.user_id))
         else:
-            logging.info("entry was fine, no need to fix it")
+            logging.debug("entry was fine, no need to fix it")
 
-        logging.info("Inserting entry %s into timeseries" % entry)
+        logging.debug("Inserting entry %s into timeseries" % entry)
         ins_result = self.get_timeseries_db(entry.metadata.key).insert_one(entry)
         return ins_result.inserted_id
 
