@@ -12,7 +12,9 @@ class Confirmedplace(ecwp.Place):
     props = ecwp.Place.props
     props.update({"raw_place": ecwb.WrapperBase.Access.WORM,
                   "cleaned_place": ecwb.WrapperBase.Access.WORM,
-                  "confidence_threshold": ecwb.WrapperBase.Access.WORM,
+# the user input will have all `manual/*` entries
+# let's make that be somewhat flexible instead of hardcoding into the data model
+                  "user_input": ecwb.WrapperBase.Access.WORM,
                   "additions": ecwb.WrapperBase.Access.WORM
                   })
 

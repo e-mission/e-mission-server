@@ -118,20 +118,20 @@ def create_confirmed_objects(user_id):
 
 def create_confirmed_places(user_id, timerange):
     ts = esta.TimeSeries.get_time_series(user_id)
-    toConfirmPlaces = esda.get_entries(esda.CLEANED_PLACE_KEY, user_id, #eventually change this to be confirmed_place?
+    toConfirmPlaces = esda.get_entries(esda.CLEANED_PLACE_KEY, user_id,
         time_query=timerange)
-    logging.info("Converting %d cleaned Places to confirmed ones" % len(toConfirmPlaces))
+    logging.info("Converting %d cleaned places to confirmed ones" % len(toConfirmPlaces))
     lastPlaceProcessed = None
     if len(toConfirmPlaces) == 0:
         logging.debug("len(toConfirmPlaces) == 0, early return")
         return None
     input_key_list = eac.get_config()["userinput.keylist"]
     for tcp in toConfirmPlaces:
-        # Copy the Place and fill in the new values
+        # Copy the place and fill in the new values
         confirmed_place_dict = copy.copy(tcp)
         del confirmed_place_dict["_id"]
         confirmed_place_dict["metadata"]["key"] = "analysis/confirmed_place"
-#        confirmed_trip_dict["data"]["expected_place"] = tcp.get_id()
+        confirmed_trip_dict["data"]["cleaned_place"] = tcp.get_id()
         confirmed_place_dict["data"]["user_input"] = \
            get_user_input_dict(ts, tcp, input_key_list)
         confirmed_place_dict["data"]["additions"] = \
