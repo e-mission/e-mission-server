@@ -5,6 +5,7 @@ import copy
 import emission.analysis.config as eac
 
 import emission.storage.timeseries.abstract_timeseries as esta
+import emission.storage.timeseries.timequery as estt
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.decorations.trip_queries as esdt
 import emission.storage.pipeline_queries as epq
@@ -85,11 +86,25 @@ def create_composite_objects(user_id):
         return None
     for ct in confirmedTrips:
         logging.info("End place type for trip is %s" %  type(ct.data.end_place))
-        end_place = esda.get_entry(esda.CONFIRMED_PLACE_KEY, ct["data"]["confirmed_place"])
         composite_trip_dict = copy.copy(ct)
         del composite_trip_dict["_id"]
         composite_trip_dict["metadata"]["key"] = "analysis/composite_trip"
-        composite_trip_dict["data"]["confirmed_place"] = end_place
+
+        # confirmed_trip has an id for its corresponding confirmed_place
+        # for composite_trip, we want to get the actual confirmed_place object
+        confirmed_place_id = ct["data"]["confirmed_place"]
+        confirmed_place = esda.get_entry(esda.CONFIRMED_PLACE_KEY, confirmed_place_id)
+        composite_trip_dict["data"]["confirmed_place"] = confirmed_place
+
+        # retrieve locations for the trajectory of the trip
+        time_query = estt.TimeQuery("data.ts", ct["data"]["start_ts"], ct["data"]["end_ts"])
+        locations = esda.get_entries(esda.CLEANED_LOCATION_KEY, user_id, time_query=time_query)
+        max_entries = 100; # we will downsample to 100 locations
+        if len(locations) > max_entries:
+            logging.debug('Downsampling to %d points' % max_entries)
+            sample_rate = len(locations)//max_entries + 1
+            locations = locations[::sample_rate]
+        composite_trip_dict["data"]["locations"] = locations
 
         # later we will want to put section & modes in composite_trip as well
 

@@ -13,15 +13,16 @@ class Compositetrip(ecwc.Confirmedtrip):
     props = ecwc.Confirmedtrip.props
     props.update({#      # confirmedplace stuff
                   "confirmed_place": ecwb.WrapperBase.Access.WORM, # object contains all properties for the destination confirmed_place object
+                  "locations": ecwb.WrapperBase.Access.WORM, # object containing cleaned location entries (max 100)
                   #      # sections stuff
                   "cleaned_section": ecwb.WrapperBase.Access.WORM,
-                  "inferred_section": ecwb.WrapperBase.WORM,
-                  "inferred_mode": ecwb.WrapperBase.WORM, # inferred by mode inference algo
-                  "confirmed_mode": ecwb.WrapperBase.WORM, # confirmed by user
+                  "inferred_section": ecwb.WrapperBase.Access.WORM,
+                  "inferred_mode": ecwb.WrapperBase.Access.WORM, # inferred by mode inference algo
+                  "confirmed_mode": ecwb.WrapperBase.Access.WORM, # confirmed by user
 # mode to be used for analysis; confirmed mode if we know factors for it, inferred mode otherwise
-                  "analysis_mode": ecwb.WrapperBase.WORM,
+                  "analysis_mode": ecwb.WrapperBase.Access.WORM,
 # mode for user display; inferred mode if not confirmed; confirmed mode otherwise
-                  "display_mode": ecwb.WrapperBase.WORM
+                  "display_mode": ecwb.WrapperBase.Access.WORM
     })
     #      # sections stuff
     enums = {"inferred_mode": ecwm.PredictedModeTypes,
