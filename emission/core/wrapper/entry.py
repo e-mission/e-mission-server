@@ -151,8 +151,10 @@ class Entry(ecwb.WrapperBase):
             "analysis/expected_trip": "expectedtrip",
             "analysis/confirmed_trip": "confirmedtrip",
             "analysis/confirmed_section": "confirmedsection",
-            ### ** END: confirmed objects which combine inferred and user input values
             "analysis/confirmed_place": "confirmedplace",
+            ### ** END: confirmed objects which combine inferred and user input values
+            # the composite trip structure for the presentation layer, which includes
+            # the confirmed trip, its confirmed end place, and its trajectory
             "analysis/composite_trip": "compositetrip"
             }
 

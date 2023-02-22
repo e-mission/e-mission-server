@@ -119,8 +119,9 @@ def create_confirmed_objects(user_id):
         # we will use the same query for trips and places, but using 'exit_ts' instead 'end_ts'
         time_query.timeType = "data.exit_ts"
         last_expected_place_done = create_confirmed_places(user_id, time_query)
+        last_place_id = last_expected_place_done["_id"] if last_expected_place_done is not None else None
         time_query.timeType = "data.end_ts"
-        last_expected_trip_done = create_confirmed_trips(user_id, time_query, last_expected_place_done["_id"])
+        last_expected_trip_done = create_confirmed_trips(user_id, time_query, last_place_id)
         if last_expected_trip_done is None or last_expected_place_done is None:
             logging.debug("after run, last_expected_trip_done == None, must be early return")
             epq.mark_confirmed_object_creation_done(user_id, None)
@@ -146,7 +147,7 @@ def create_confirmed_places(user_id, timerange):
         confirmed_place_dict = copy.copy(tcp)
         del confirmed_place_dict["_id"]
         confirmed_place_dict["metadata"]["key"] = "analysis/confirmed_place"
-        confirmed_trip_dict["data"]["cleaned_place"] = tcp.get_id()
+        confirmed_place_dict["data"]["cleaned_place"] = tcp.get_id()
         confirmed_place_dict["data"]["user_input"] = \
            get_user_input_dict(ts, tcp, input_key_list)
         confirmed_place_dict["data"]["additions"] = \
