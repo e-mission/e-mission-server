@@ -84,6 +84,8 @@ def create_composite_objects(user_id):
     if len(confirmedTrips) == 0:
         logging.debug("len(confirmedTrips) == 0, early return")
         return None
+
+    last_done_ts = None
     for ct in confirmedTrips:
         logging.info("End place type for trip is %s" %  type(ct.data.end_place))
         composite_trip_dict = copy.copy(ct)
@@ -111,13 +113,16 @@ def create_composite_objects(user_id):
         composite_trip_entry = ecwe.Entry(composite_trip_dict)
         # save the entry
         ts.insert(composite_trip_entry)
-    epq.mark_composite_object_creation_done(user_id, None)
+        last_done_ts = confirmed_place["data"]["enter_ts"]
+
+    epq.mark_composite_object_creation_done(user_id, last_done_ts)
 
 def create_confirmed_objects(user_id):
     time_query = epq.get_time_range_for_confirmed_object_creation(user_id)
     try:
-        # we will use the same query for trips and places, but using 'exit_ts' instead 'end_ts'
-        time_query.timeType = "data.exit_ts"
+        # we will query the same time range for trips and places,
+        # but querying 'enter_ts' for places and 'end_ts' for trips
+        time_query.timeType = "data.enter_ts"
         last_expected_place_done = create_confirmed_places(user_id, time_query)
         last_place_id = last_expected_place_done["_id"] if last_expected_place_done is not None else None
         time_query.timeType = "data.end_ts"
