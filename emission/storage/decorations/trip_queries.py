@@ -73,16 +73,16 @@ def get_stops_for_trip(key, user_id, trip_id):
         "data.enter_ts", pymongo.ASCENDING)
     return [ecwe.Entry(doc) for doc in stop_doc_cursor]
 
-def _get_next_cleaned_trip(ts, trip_obj):
+def _get_next_cleaned_timeline_entry(ts, tl_entry):
     """
-    Find the next trip in the timeline
+    Find the next trip or place in the timeline
     """
-    next_place = ts.get_entry_from_id(esda.CLEANED_PLACE_KEY, trip_obj.data.end_place)
-    if next_place is None:
-        return None
+    if (tl_entry.data.end_place is not None):
+        return ts.get_entry_from_id(esda.CLEANED_PLACE_KEY, tl_entry.data.end_place)
+    elif (tl_entry.data.ending_trip is not None):
+        return ts.get_entry_from_id(esda.CLEANED_TRIP_KEY, tl_entry.data.ending_trip)
     else:
-        next_trip = ts.get_entry_from_id(esda.CLEANED_TRIP_KEY, next_place.data.starting_trip)
-        return next_trip
+        return None
 
 def get_user_input_for_trip(trip_key, user_id, trip_id, user_input_key):
     ts = esta.TimeSeries.get_time_series(user_id)
@@ -93,27 +93,31 @@ def get_user_input_for_trip(trip_key, user_id, trip_id, user_input_key):
 # www/js/diary/services.js
 # Since that has been tested the most
 # If we no longer need these checks (maybe with trip editing), we can remove them
-def valid_user_input_for_trip(ts, trip_obj, user_input):
+def valid_user_input_for_timeline_entry(ts, tl_entry, user_input):
     # we know that the trip is cleaned so we can use the fmt_time
     # but the confirm objects are not necessarily filled out
     fmt_ts = lambda ts, tz: arrow.get(ts).to(tz)
+
+    entry_start = tl_entry.data.start_ts or tl_entry.data.enter_ts
+    entry_end = tl_entry.data.end_ts or tl_entry.data.exit_ts
+
     logging.debug("Comparing user input %s: %s -> %s, trip %s -> %s, start checks are (%s && %s) and end checks are (%s || %s)" % (
         user_input.data.label,
         fmt_ts(user_input.data.start_ts, user_input.metadata.time_zone),
         fmt_ts(user_input.data.end_ts, user_input.metadata.time_zone),
-        trip_obj.data.start_fmt_time, trip_obj.data.end_fmt_time,
-        (user_input.data.start_ts >= trip_obj.data.start_ts),
-        (user_input.data.start_ts <= trip_obj.data.end_ts),
-        (user_input.data.end_ts <= trip_obj.data.end_ts),
-        ((user_input.data.end_ts - trip_obj.data.end_ts) <= 15 * 60)
+        fmt_ts(entry_start, user_input.metadata.time_zone), fmt_ts(entry_end, user_input.metadata.time_zone),
+        (user_input.data.start_ts >= entry_start),
+        (user_input.data.start_ts < entry_end),
+        (user_input.data.end_ts <= entry_end),
+        ((user_input.data.end_ts - entry_end) <= 15 * 60)
     ))
-    start_checks = (user_input.data.start_ts >= trip_obj.data.start_ts and
-        user_input.data.start_ts >= trip_obj.data.start_ts)
-    end_checks = (user_input.data.end_ts <= trip_obj.data.end_ts or
-        ((user_input.data.end_ts - trip_obj.data.end_ts) <= 15 * 60))
+    start_checks = (user_input.data.start_ts >= entry_start and
+        user_input.data.start_ts < entry_end)
+    end_checks = (user_input.data.end_ts <= entry_end or
+        ((user_input.data.end_ts - entry_end) <= 15 * 60))
     if start_checks and not end_checks:
         logging.debug("Handling corner case where start check matches, but end check does not")
-        next_trip_obj = _get_next_cleaned_trip(ts, trip_obj)
+        next_trip_obj = _get_next_cleaned_timeline_entry(ts, tl_entry)
         if next_trip_obj is not None:
             end_checks = user_input.data.end_ts <= next_trip_obj.data.start_ts
             logging.debug("Second level of end checks when the next trip is defined (%s <= %s) = %s" % (
@@ -124,15 +128,15 @@ def valid_user_input_for_trip(ts, trip_obj, user_input):
         if end_checks:
             # If we have flipped the values, check to see that there is sufficient overlap
             # https://github.com/e-mission/e-mission-docs/issues/476#issuecomment-747587041
-            overlapDuration = min(user_input.data.end_ts, trip_obj.data.end_ts) - max(user_input.data.start_ts, trip_obj.data.start_ts)
+            overlapDuration = min(user_input.data.end_ts, entry_end) - max(user_input.data.start_ts, entry_start)
             logging.debug("Flipped endCheck, overlap(%s)/trip(%s) = %s" %
-                (overlapDuration, trip_obj.data.duration, (overlapDuration / trip_obj.data.duration)));
-            end_checks = (overlapDuration/trip_obj.data.duration) > 0.5;
+                (overlapDuration, tl_entry.data.duration, (overlapDuration / tl_entry.data.duration)));
+            end_checks = (overlapDuration/tl_entry.data.duration) > 0.5;
     return start_checks and end_checks
 
 def valid_user_input(ts, trip_obj):
     def curried(user_input):
-        return valid_user_input_for_trip(ts, trip_obj, user_input)
+        return valid_user_input_for_timeline_entry(ts, trip_obj, user_input)
     return curried
 
 def final_candidate(filter_fn, potential_candidates):
@@ -206,7 +210,7 @@ def get_additions_for_timeline_entry_object(ts, timeline_entry):
 
 def valid_trip(ts, user_input):
     def curried(trip_obj):
-        return valid_user_input_for_trip(ts, trip_obj, user_input)
+        return valid_user_input_for_timeline_entry(ts, trip_obj, user_input)
     return curried
 
 def get_trip_for_user_input_obj(ts, ui_obj):

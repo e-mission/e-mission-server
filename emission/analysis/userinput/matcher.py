@@ -123,11 +123,10 @@ def create_confirmed_objects(user_id):
         # we will query the same time range for trips and places,
         # but querying 'enter_ts' for places and 'end_ts' for trips
         time_query.timeType = "data.enter_ts"
-        last_expected_place_done = create_confirmed_places(user_id, time_query)
-        last_place_id = last_expected_place_done["_id"] if last_expected_place_done is not None else None
+        processed_places = create_confirmed_places(user_id, time_query)
         time_query.timeType = "data.end_ts"
-        last_expected_trip_done = create_confirmed_trips(user_id, time_query, last_place_id)
-        if last_expected_trip_done is None or last_expected_place_done is None:
+        last_expected_trip_done = create_confirmed_trips(user_id, time_query, processed_places)
+        if last_expected_trip_done is None:
             logging.debug("after run, last_expected_trip_done == None, must be early return")
             epq.mark_confirmed_object_creation_done(user_id, None)
         else:
@@ -142,7 +141,7 @@ def create_confirmed_places(user_id, timerange):
     toConfirmPlaces = esda.get_entries(esda.CLEANED_PLACE_KEY, user_id,
         time_query=timerange)
     logging.info("Converting %d cleaned places to confirmed ones" % len(toConfirmPlaces))
-    lastPlaceProcessed = None
+    processed_places = []
     if len(toConfirmPlaces) == 0:
         logging.debug("len(toConfirmPlaces) == 0, early return")
         return None
@@ -161,11 +160,11 @@ def create_confirmed_places(user_id, timerange):
         # save the entry
         ts.insert(confirmed_place_entry)
         # if everything is successful, then update the last successful place
-        lastPlaceProcessed = confirmed_place_entry
+        processed_places.append(confirmed_place_entry)
 
-    return lastPlaceProcessed
+    return processed_places
 
-def create_confirmed_trips(user_id, timerange, confirmed_place_id=None):
+def create_confirmed_trips(user_id, timerange, processed_places):
     ts = esta.TimeSeries.get_time_series(user_id)
     toConfirmTrips = esda.get_entries(esda.EXPECTED_TRIP_KEY, user_id,
         time_query=timerange)
@@ -175,13 +174,13 @@ def create_confirmed_trips(user_id, timerange, confirmed_place_id=None):
         logging.debug("len(toConfirmTrips) == 0, early return")
         return None
     input_key_list = eac.get_config()["userinput.keylist"]
-    for tct in toConfirmTrips:
+    for i, tct in enumerate(toConfirmTrips):
         # Copy the trip and fill in the new values
         confirmed_trip_dict = copy.copy(tct)
         del confirmed_trip_dict["_id"]
         confirmed_trip_dict["metadata"]["key"] = "analysis/confirmed_trip"
         confirmed_trip_dict["data"]["expected_trip"] = tct.get_id()
-        confirmed_trip_dict["data"]["confirmed_place"] = confirmed_place_id
+        confirmed_trip_dict["data"]["confirmed_place"] = processed_places[i]["_id"]
         confirmed_trip_dict["data"]["user_input"] = \
             get_user_input_dict(ts, tct, input_key_list)
         confirmed_trip_dict["data"]["additions"] = \
