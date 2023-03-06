@@ -15,6 +15,7 @@ import attrdict as ad
 import geojson
 # This change should be removed in the next server update, by which time hopefully the new geojson version will incorporate the long-term fix for their default precision
 # See - jazzband/geojson#177
+# See = https://github.com/e-mission/e-mission-server/pull/900/commits/d2ada640f260aad8cbcfecb81345f4087c810baa
 geojson.geometry.Geometry.__init__.__defaults__ = (None, False, 15)
 
 import emission.tests.common as etc
