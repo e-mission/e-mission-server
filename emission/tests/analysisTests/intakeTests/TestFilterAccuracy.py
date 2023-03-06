@@ -165,8 +165,9 @@ class TestFilterAccuracy(unittest.TestCase):
         import pandas as pd
         df_a = pd.DataFrame({"ts": [1,2,3,4]})
         df_b = pd.DataFrame({"ts": [1,3]})
-        merged_left_idx = df_a.merge(df_b, on="ts", how="inner", left_index=True)
-        merged_right_idx = df_a.merge(df_b, on="ts", how="inner", right_index=True)
+        merged_left_idx = df_a.merge(df_b, on="ts", how="inner")
+        merged_right_idx = df_a.reset_index().merge(df_b, on="ts", how="inner")
+        merged_right_idx.set_index('index', inplace=True)
         self.assertEqual(merged_left_idx.index.to_list(), [0,1])
         self.assertEqual(merged_right_idx.index.to_list(), [0,2])
 
