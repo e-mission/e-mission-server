@@ -24,6 +24,7 @@ import scipy.interpolate as spi
 import pandas as pd
 import arrow
 import geojson as gj
+gj.geometry.Geometry.__init__.__defaults__ = (None, False, 15)
 import json
 
 # Our imports
@@ -716,8 +717,8 @@ def _overwrite_from_loc_row(filtered_section_data, fixed_loc, prefix):
 
 def _overwrite_from_timestamp(filtered_trip_like, prefix, ts, tz, loc):
     filtered_trip_like[prefix+"_ts"] = float(ts)
-    filtered_trip_like[prefix+"_local_dt"] = ecwld.LocalDate.get_local_date(ts, tz)
-    filtered_trip_like[prefix+"_fmt_time"] = arrow.get(ts).to(tz).isoformat()
+    filtered_trip_like[prefix+"_local_dt"] = ecwld.LocalDate.get_local_date(float(ts), tz)
+    filtered_trip_like[prefix+"_fmt_time"] = arrow.get(float(ts)).to(tz).isoformat()
     filtered_trip_like[prefix+"_loc"] = loc
 
 def remove_outliers(raw_loc_entry_list, filtered_point_id_list):
@@ -790,9 +791,9 @@ def resample(filtered_loc_df, interval):
     lng_new = lng_fn(ts_new)
     alt_new = altitude_fn(ts_new)
     tz_new = [_get_timezone(ts, tz_ranges_df) for ts in ts_new]
-    ld_new = [ecwld.LocalDate.get_local_date(ts, tz) for (ts, tz) in zip(ts_new, tz_new)]
+    ld_new = [ecwld.LocalDate.get_local_date(float(ts), tz) for (ts, tz) in zip(ts_new, tz_new)]
     loc_new = [gj.Point((lng, lat)) for (lng, lat) in zip(lng_new, lat_new)]
-    fmt_time_new = [arrow.get(ts).to(tz).isoformat() for
+    fmt_time_new = [arrow.get(float(ts)).to(tz).isoformat() for
                         (ts, tz) in zip(ts_new, tz_new)]
     loc_df_new = pd.DataFrame({"latitude": lat_new, "longitude": lng_new,
                                "loc": loc_new, "ts": ts_new, "local_dt": ld_new,
