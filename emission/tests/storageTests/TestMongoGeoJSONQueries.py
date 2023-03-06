@@ -17,7 +17,7 @@ class TestGeoJSON(unittest.TestCase):
     self.Sections=get_test_db()
 
   def tearDown(self):
-    get_test_db().remove()
+    get_test_db().delete_many({})
 
   def testGeoWithinPostsData(self):
     post1 = {"author": "Mike",
@@ -112,11 +112,11 @@ class TestGeoJSON(unittest.TestCase):
             [-123,38],[-123,37]]
 
   def testGeoWithNegativeValues(self):
-    test = {'track_location': {'type':'Point', 'coordinates': [122.5,37.5]} }
+    test = {'track_location': {'type':'Point', 'coordinates': [-122.5,37.5]} }
     self.Sections.insert_one(test)
 
     retVal = []
-    for a in self.Sections.find({ "track_location" : { "$geoWithin" : { "$polygon" : [ [122,37],[122,38],[123,38],[123,37]] } } }):
+    for a in self.Sections.find({ "track_location" : { "$geoWithin" : { "$polygon" : self.getTestNegPolygon() } } }):
         retVal.append(a)
         print("Found match for %s" % a)
 
