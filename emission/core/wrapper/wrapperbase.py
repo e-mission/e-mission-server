@@ -10,6 +10,7 @@ import attrdict as ad
 import enum as enum
 import collections as coll
 import geojson as gj
+gj.geometry.Geometry.__init__.__defaults__ = (None, False, 15)
 
 class WrapperBase(ad.AttrDict):
   """

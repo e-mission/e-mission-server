@@ -7,6 +7,7 @@ standard_library.install_aliases()
 from builtins import range
 from builtins import *
 import geojson as gj
+gj.geometry.Geometry.__init__.__defaults__ = (None, False, 15)
 import logging
 
 import bson.objectid as boi

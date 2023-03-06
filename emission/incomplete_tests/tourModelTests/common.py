@@ -8,6 +8,7 @@ from builtins import str
 from builtins import *
 import logging
 import geojson as gj
+gj.geometry.Geometry.__init__.__defaults__ = (None, False, 15)
 import uuid
 
 import emission.core.wrapper.cleanedtrip as ecwct

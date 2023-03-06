@@ -16,6 +16,7 @@ from builtins import object
 from past.utils import old_div
 import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse, datetime, time, random
 import geojson as gj
+gj.geometry.Geometry.__init__.__defaults__ = (None, False, 15)
 import arrow
 from polyline.codec import PolylineCodec
 from geopy.distance import great_circle

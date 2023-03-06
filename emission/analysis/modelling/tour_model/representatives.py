@@ -14,6 +14,7 @@ import numpy
 import math
 import copy
 import geojson as gj
+gj.geometry.Geometry.__init__.__defaults__ = (None, False, 15)
 
 # our imports
 import emission.core.wrapper.trip as ecwt

@@ -14,6 +14,7 @@ import itertools
 import numpy as np
 import logging
 import geojson as gj
+gj.geometry.Geometry.__init__.__defaults__ = (None, False, 15)
 import copy
 import attrdict as ad
 

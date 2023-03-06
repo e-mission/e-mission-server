@@ -15,6 +15,7 @@ import uuid
 import attrdict as ad
 import time
 import geojson as gj
+gj.geometry.Geometry.__init__.__defaults__ = (None, False, 15)
 import bson.objectid as boi
 
 # Our imports

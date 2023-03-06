@@ -15,6 +15,7 @@ import attrdict as ad
 import pytz
 import datetime as pydt
 import geojson
+geojson.geometry.Geometry.__init__.__defaults__ = (None, False, 15)
 import arrow
 
 import emission.core.wrapper.location as ecwl

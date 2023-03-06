@@ -11,6 +11,7 @@ import datetime as pydt
 import logging
 import json
 import geojson as gj
+gj.geometry.Geometry.__init__.__defaults__ = (None, False, 15)
 import bson.json_util as bju
 import os
 

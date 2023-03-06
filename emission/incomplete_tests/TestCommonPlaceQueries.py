@@ -9,6 +9,7 @@ import logging
 import unittest
 import uuid
 import geojson as gj
+gj.geometry.Geometry.__init__.__defaults__ = (None, False, 15)
 import datetime
 import numpy as np
 

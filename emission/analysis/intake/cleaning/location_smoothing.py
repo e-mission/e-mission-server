@@ -19,6 +19,7 @@ import datetime as pydt
 import time as time
 import pytz
 import geojson as gj
+gj.geometry.Geometry.__init__.__defaults__ = (None, False, 15)
 
 # Our imports
 import emission.analysis.point_features as pf

@@ -14,6 +14,7 @@ from pykml.factory import KML_ElementMaker as KML
 from os import path
 import json
 import geojson
+gj.geometry.Geometry.__init__.__defaults__ = (None, False, 15)
 from lxml import etree
 import sys, os, random
 from datetime import datetime

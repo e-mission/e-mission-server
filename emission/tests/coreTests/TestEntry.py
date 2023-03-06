@@ -13,6 +13,7 @@ import logging
 import unittest
 from uuid import UUID
 import geojson as gj
+gj.geometry.Geometry.__init__.__defaults__ = (None, False, 15)
 import bson.objectid as bo
 
 # Our imports

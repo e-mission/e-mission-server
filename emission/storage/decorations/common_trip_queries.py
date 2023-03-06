@@ -11,6 +11,7 @@ import pickle
 import numpy as np
 import bson
 import geojson as gj
+gj.geometry.Geometry.__init__.__defaults__ = (None, False, 15)
 
 import emission.core.wrapper.common_trip as ecwct
 import emission.core.get_database as edb

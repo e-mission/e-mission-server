@@ -9,6 +9,7 @@ from builtins import *
 import unittest
 import uuid
 import geojson as gj
+gj.geometry.Geometry.__init__.__defaults__ = (None, False, 15)
 import numpy as np
 import datetime
 import random
