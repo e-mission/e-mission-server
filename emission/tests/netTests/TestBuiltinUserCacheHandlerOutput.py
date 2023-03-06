@@ -15,6 +15,7 @@ import uuid
 import attrdict as ad
 import time
 import geojson as gj
+gj.geometry.Geometry.__init__.__defaults__ = (None, False, 15)
 import arrow
 
 # Our imports
@@ -81,7 +82,7 @@ class TestBuiltinUserCacheHandlerOutput(unittest.TestCase):
     # Let's add a new test for this
     def testGetLocalDay(self):
         adt = arrow.get(pydt.datetime(2016, 1, 1, 9, 46, 0, 0))
-        test_dt = ecwld.LocalDate.get_local_date(adt.timestamp, "America/Los_Angeles")
+        test_dt = ecwld.LocalDate.get_local_date(adt.int_timestamp, "America/Los_Angeles")
         test_trip = ecwt.Trip({'start_local_dt': test_dt, 'start_fmt_time': adt.isoformat()})
         test_handler = enuah.UserCacheHandler.getUserCacheHandler(self.testUserUUID1)
         self.assertEqual(test_handler.get_local_day_from_fmt_time(test_trip), "2016-01-01")
