@@ -6,6 +6,10 @@ import uuid
 import time
 import pandas as pd
 import bson.json_util as bju
+import bson
+from bson.json_util import loads
+from itertools import chain
+from bson.binary import Binary, UuidRepresentation
 
 import emission.analysis.modelling.trip_model.model_storage as eamums
 import emission.analysis.modelling.trip_model.model_type as eamumt
@@ -31,7 +35,13 @@ class TestRunGreedyModel(unittest.TestCase):
 
         # emission/tests/data/real_examples/shankari_2016-06-20.expected_confirmed_trips
         self.user_id = uuid.UUID('aa9fdec9-2944-446c-8ee2-50d79b3044d3')
+        # self.user_id = Binary.from_uuid(uuid.UUID('aa9fdec9-2944-446c-8ee2-50d79b3044d3'), UuidRepresentation.PYTHON_LEGACY)
+        print("USER IDDDDD", self.user_id)
         self.ts = esta.TimeSeries.get_time_series(self.user_id)
+        print("TSSSS", self.ts.find_entries([esdatq.CONFIRMED_TRIP_KEY]))
+        # for ent in self.ts.find_entries([esdatq.CONFIRMED_TRIP_KEY]):
+        # res = list(chain(self.ts.find_entries([esdatq.CONFIRMED_TRIP_KEY])))
+        # print("RES", res)
         self.new_trips_per_invocation = 3
         self.model_type = eamumt.ModelType.GREEDY_SIMILARITY_BINNING
         self.model_storage = eamums.ModelStorage.DOCUMENT_DATABASE
@@ -50,7 +60,7 @@ class TestRunGreedyModel(unittest.TestCase):
         # load in trips from a test file source
         input_file = 'emission/tests/data/real_examples/shankari_2016-06-20.expected_confirmed_trips'
         with open(input_file, 'r') as f:
-            trips_json = json.loads(f.read(), object_hook=bju.object_hook)
+            trips_json = bju.loads(f.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(strict_uuid= False, uuid_representation= UuidRepresentation.PYTHON_LEGACY))
             trips = [ecwe.Entry(r) for r in trips_json]
         logging.debug(f'loaded {len(trips)} trips from {input_file}')
         self.ts.bulk_insert(trips)
