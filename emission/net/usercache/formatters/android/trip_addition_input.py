@@ -9,8 +9,4 @@ import logging
 import emission.net.usercache.formatters.generic.userlabel as fgl
 
 def format(entry):
-    import arrow
-
-    entry["data"]["start_ts"] = 0
-    entry["data"]["end_ts"] = arrow.get()
     return fgl.format(entry)
