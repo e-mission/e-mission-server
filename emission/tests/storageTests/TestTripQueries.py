@@ -95,8 +95,8 @@ class TestTripQueries(unittest.TestCase):
 
         new_trip = self.create_fake_trip()
         new_mc = ecul.Userlabel()
-        new_mc["start_ts"] = new_trip.data.start_ts + 1
-        new_mc["end_ts"] = new_trip.data.end_ts + 1
+        new_mc["start_ts"] = new_trip.data.start_ts + .25
+        new_mc["end_ts"] = new_trip.data.end_ts + .25
         new_mc["label"] = "roller_blading"
         new_mce = ecwe.Entry.create_entry(self.testUserId, MODE_CONFIRM_KEY, new_mc)
         new_mce["metadata"]["type"] = "message"
@@ -115,8 +115,8 @@ class TestTripQueries(unittest.TestCase):
 
         new_trip = self.create_fake_trip()
         new_mc = ecul.Userlabel()
-        new_mc["start_ts"] = new_trip.data.start_ts + 1
-        new_mc["end_ts"] = new_trip.data.end_ts + 1
+        new_mc["start_ts"] = new_trip.data.start_ts + .25
+        new_mc["end_ts"] = new_trip.data.end_ts + .25
         new_mc["label"] = "pogo_sticking"
         ts = esta.TimeSeries.get_time_series(self.testUserId)
         ts.insert_data(self.testUserId, MODE_CONFIRM_KEY, new_mc) 
@@ -134,8 +134,8 @@ class TestTripQueries(unittest.TestCase):
 
         new_trip = self.create_fake_trip()
         new_mc = ecul.Userlabel()
-        new_mc["start_ts"] = new_trip.data.start_ts + 1
-        new_mc["end_ts"] = new_trip.data.end_ts + 1
+        new_mc["start_ts"] = new_trip.data.start_ts + .25
+        new_mc["end_ts"] = new_trip.data.end_ts + .25
         new_mc["label"] = "roller_blading"
         new_mce = ecwe.Entry.create_entry(self.testUserId, MODE_CONFIRM_KEY, new_mc)
         new_mce["metadata"]["type"] = "message"
@@ -172,8 +172,8 @@ class TestTripQueries(unittest.TestCase):
 
         new_trip = self.create_fake_trip()
         new_mc = ecul.Userlabel()
-        new_mc["start_ts"] = new_trip.data.start_ts + 1
-        new_mc["end_ts"] = new_trip.data.end_ts + 1
+        new_mc["start_ts"] = new_trip.data.start_ts + .25
+        new_mc["end_ts"] = new_trip.data.end_ts + .25
         new_mc["label"] = "car"
         ts.insert_data(self.testUserId, MODE_CONFIRM_KEY, new_mc) 
         user_input = esdt.get_user_input_for_trip(esda.RAW_TRIP_KEY, self.testUserId,
