@@ -39,7 +39,7 @@ class TestLocalDateQueries(unittest.TestCase):
 
     def testLocalDateReadWrite(self):
         ts = esta.TimeSeries.get_time_series(self.testUUID)
-        start_ts = arrow.now().timestamp
+        start_ts = arrow.now().int_timestamp
         ma_ts = 1460586729
         local_dt = ecwl.LocalDate.get_local_date(ma_ts, "America/Los_Angeles")
         fmt_time = arrow.get(ma_ts).to("America/Los_Angeles").isoformat()

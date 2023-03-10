@@ -66,8 +66,8 @@ def group_by_timestamp(user_id, start_ts, end_ts, freq, summary_fn_list):
 
 def timestamp_fill_times(key, ignored, metric_summary):
     dt = arrow.get(key)
-    metric_summary.ts = dt.timestamp
-    metric_summary.local_dt = ecwl.LocalDate.get_local_date(dt.timestamp, 'UTC')
+    metric_summary.ts = dt.int_timestamp
+    metric_summary.local_dt = ecwl.LocalDate.get_local_date(dt.int_timestamp, 'UTC')
     metric_summary.fmt_time = dt.isoformat()
 
 class LocalFreq(enum.Enum):
@@ -254,7 +254,7 @@ def local_dt_fill_times_daily(key, section_group_df, metric_summary):
                          'timezone': first_tz})
     dt = arrow.Arrow(ld.year, ld.month, ld.day, tzinfo=first_tz
                      ).floor('day')
-    metric_summary.ts = dt.timestamp
+    metric_summary.ts = dt.int_timestamp
     metric_summary.local_dt = ld
     metric_summary.fmt_time = dt.format("YYYY-MM-DD")
 
@@ -265,7 +265,7 @@ def local_dt_fill_times_monthly(key, section_group_df, metric_summary):
                          'timezone': first_tz})
     dt = arrow.Arrow(ld.year, ld.month, 1,
                      tzinfo=first_tz).floor('month')
-    metric_summary.ts = dt.timestamp
+    metric_summary.ts = dt.int_timestamp
     metric_summary.local_dt = ld
     metric_summary.fmt_time = dt.format("YYYY-MM")
 
@@ -275,7 +275,7 @@ def local_dt_fill_times_yearly(key, section_group_df, metric_summary):
                          'timezone': first_tz})
     dt = arrow.Arrow(ld.year, 1, 1, tzinfo=first_tz
                      ).floor('year')
-    metric_summary.ts = dt.timestamp
+    metric_summary.ts = dt.int_timestamp
     metric_summary.local_dt = ld
     metric_summary.fmt_time = dt.format("YYYY")
 
