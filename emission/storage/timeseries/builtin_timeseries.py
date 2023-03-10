@@ -62,6 +62,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "manual/purpose_confirm": self.timeseries_db,
                 "manual/replaced_mode": self.timeseries_db,
                 "manual/trip_user_input": self.timeseries_db,
+                "manual/place_user_input": self.timeseries_db,
                 "manual/trip_addition_input": self.timeseries_db,
                 "manual/place_addition_input": self.timeseries_db,
                 "manual/demographic_survey": self.timeseries_db,
