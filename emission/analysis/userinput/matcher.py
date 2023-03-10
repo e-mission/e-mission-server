@@ -70,8 +70,8 @@ def handle_multi_non_deleted_match(confirmed_object, ui):
     if "status" not in ui.data or ui.data.status == ecwtui.InputStatus.ACTIVE:
         confirmed_object["data"]["additions"].append(ui)
     elif ui.data.status == ecwtui.InputStatus.DELETED:
-        after_del_list = [ta for ta in confirmed_object["data"]["additions"] if ta["match_id"] != ui["match_id"]]
-        confirmed_object["data"]["additions"] = after_del_list
+        after_del_list = [ta for ta in confirmed_trip["data"]["additions"] if ta["data"]["match_id"] != ui["data"]["match_id"]]
+        confirmed_trip["data"]["additions"] = after_del_list
     else:
         # TODO: Decide whether to error or to warn here
         logging.warn("Invalid status found in user input %s, moving forward anyway" % ui)

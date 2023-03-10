@@ -125,9 +125,9 @@ class TestUserInputFakeData(unittest.TestCase):
         # Add two, delete one
         fake_ct = ecwe.Entry({"metadata": {"key": "analysis/confirmed_trip"}, "data": {"user_input": {}}})
         fake_matches = [
-            ecwe.Entry({"match_id": "foo", "metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<foo></foo>", "status": "ACTIVE"}}),
-            ecwe.Entry({"match_id": "bar", "metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<bar></bar>", "status": "ACTIVE"}}),
-            ecwe.Entry({"match_id": "foo", "metadata": {"key": "manual/trip_addition_input"}, "data": {"status": "DELETED"}})
+            ecwe.Entry({"metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<foo></foo>", "status": "ACTIVE", "match_id": "foo"}}),
+            ecwe.Entry({"metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<bar></bar>", "status": "ACTIVE", "match_id": "bar"}}),
+            ecwe.Entry({"metadata": {"key": "manual/trip_addition_input"}, "data": {"status": "DELETED", "match_id": "foo"}})
         ]
         for fm in fake_matches:
             eaum.handle_multi_non_deleted_match(fake_ct, fm)
@@ -139,10 +139,10 @@ class TestUserInputFakeData(unittest.TestCase):
         # Add two, delete two
         fake_ct = ecwe.Entry({"metadata": {"key": "analysis/confirmed_trip"}, "data": {"user_input": {}}})
         fake_matches = [
-            ecwe.Entry({"match_id": "foo", "metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<foo></foo>", "status": "ACTIVE"}}),
-            ecwe.Entry({"match_id": "bar", "metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<bar></bar>", "status": "ACTIVE"}}),
-            ecwe.Entry({"match_id": "foo", "metadata": {"key": "manual/trip_addition_input"}, "data": {"status": "DELETED"}}),
-            ecwe.Entry({"match_id": "bar", "metadata": {"key": "manual/trip_addition_input"}, "data": {"status": "DELETED"}})
+            ecwe.Entry({"metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<foo></foo>", "status": "ACTIVE", "match_id": "foo"}}),
+            ecwe.Entry({"metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<bar></bar>", "status": "ACTIVE", "match_id": "bar"}}),
+            ecwe.Entry({"metadata": {"key": "manual/trip_addition_input"}, "data": {"status": "DELETED", "match_id": "foo"}}),
+            ecwe.Entry({"metadata": {"key": "manual/trip_addition_input"}, "data": {"status": "DELETED", "match_id": "bar"}})
         ]
         for fm in fake_matches:
             eaum.handle_multi_non_deleted_match(fake_ct, fm)
@@ -153,12 +153,12 @@ class TestUserInputFakeData(unittest.TestCase):
 
         # Add none, delete two existing
         fake_ct = ecwe.Entry({"metadata": {"key": "analysis/confirmed_trip"}, "data": {"user_input": {}, "additions": [
-                {"match_id": "foo", "metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<foo></foo>", "status": "ACTIVE"}},
-                {"match_id": "bar", "metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<bar></bar>", "status": "ACTIVE"}}
+                {"metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<foo></foo>", "status": "ACTIVE", "match_id": "foo"}},
+                {"metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<bar></bar>", "status": "ACTIVE", "match_id": "bar"}}
         ]}})
         fake_matches = [
-            ecwe.Entry({"match_id": "foo", "metadata": {"key": "manual/trip_addition_input"}, "data": {"status": "DELETED"}}),
-            ecwe.Entry({"match_id": "bar", "metadata": {"key": "manual/trip_addition_input"}, "data": {"status": "DELETED"}})
+            ecwe.Entry({"metadata": {"key": "manual/trip_addition_input"}, "data": {"status": "DELETED", "match_id": "foo"}}),
+            ecwe.Entry({"metadata": {"key": "manual/trip_addition_input"}, "data": {"status": "DELETED", "match_id": "bar"}})
         ]
         for fm in fake_matches:
             eaum.handle_multi_non_deleted_match(fake_ct, fm)
@@ -169,17 +169,17 @@ class TestUserInputFakeData(unittest.TestCase):
 
         # Add none, delete non-existing
         fake_ct = ecwe.Entry({"metadata": {"key": "analysis/confirmed_trip"}, "data": {"user_input": {}, "additions": [
-                {"match_id": "foo", "metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<foo></foo>", "status": "ACTIVE"}}
+                {"metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<foo></foo>", "status": "ACTIVE", "match_id": "foo"}}
         ]}})
         fake_matches = [
-            ecwe.Entry({"match_id": "bar", "metadata": {"key": "manual/trip_addition_input"}, "data": {"status": "DELETED"}})
+            ecwe.Entry({"metadata": {"key": "manual/trip_addition_input"}, "data": {"status": "DELETED", "match_id": "bar"}})
         ]
         for fm in fake_matches:
             eaum.handle_multi_non_deleted_match(fake_ct, fm)
         # Existing 1, delete non-existent, we end up with one
         self.assertEqual(len(fake_ct["data"]["additions"]), 1)
         # and it should be the bar entry
-        self.assertEqual(fake_ct["data"]["additions"], [{"match_id": "foo", "metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<foo></foo>", "status": "ACTIVE"}}])
+        self.assertEqual(fake_ct["data"]["additions"], [{"metadata": {"key": "manual/trip_addition_input"}, "data": {"xmlResponse": "<foo></foo>", "status": "ACTIVE", "match_id": "foo"}}])
 
     def testFinalCandidate(self):
         # define some filter functions
@@ -234,8 +234,8 @@ class TestUserInputFakeData(unittest.TestCase):
         keep_start_lt_10 = lambda pc: pc.data.start_ts < 10
 
         # single entry multilabel
-        single_entry_multilabel = {"match_id": "foo", "metadata": {"key": "manual/trip_addition_input", "write_ts": 1, "write_fmt_time": "1"},
-            "data": {"start_ts": 8, "xmlResponse": "<foo></foo>", "start_fmt_time": 8, "status": "ACTIVE"}}
+        single_entry_multilabel = {"metadata": {"key": "manual/trip_addition_input", "write_ts": 1, "write_fmt_time": "1"},
+            "data": {"start_ts": 8, "xmlResponse": "<foo></foo>", "start_fmt_time": 8, "status": "ACTIVE", "match_id": "foo"}}
         self.assertEqual(esdt.get_not_deleted_candidates(always_accept_fn, [single_entry_multilabel]), [single_entry_multilabel])
         self.assertEqual(esdt.get_not_deleted_candidates(always_reject_fn, [single_entry_multilabel]), [])
         self.assertEqual(esdt.get_not_deleted_candidates(keep_start_lt_10, [single_entry_multilabel]), [single_entry_multilabel])
@@ -244,12 +244,12 @@ class TestUserInputFakeData(unittest.TestCase):
 
         # multi entry all active
         multi_entry_multilabel = [
-            {"match_id": "foo", "metadata": {"key": "manual/trip_addition_input", "write_ts": 1, "write_fmt_time": "1"},
-                "data": {"start_ts": 8, "xmlResponse": "<foo></foo>", "start_fmt_time": 8, "status": "ACTIVE"}},
-            {"match_id": "bar", "metadata": {"key": "manual/trip_addition_input", "write_ts": 2, "write_fmt_time": "2"},
-                "data": {"start_ts": 8, "xmlResponse": "<foo></foo>", "start_fmt_time": 8, "status": "ACTIVE"}},
-            {"match_id": "baz", "metadata": {"key": "manual/trip_addition_input", "write_ts": 3, "write_fmt_time": "3"},
-                "data": {"start_ts": 8, "xmlResponse": "<foo></foo>", "start_fmt_time": 8, "status": "ACTIVE"}}]
+            {"metadata": {"key": "manual/trip_addition_input", "write_ts": 1, "write_fmt_time": "1"},
+                "data": {"start_ts": 8, "xmlResponse": "<foo></foo>", "start_fmt_time": 8, "status": "ACTIVE", "match_id": "foo"}},
+            {"metadata": {"key": "manual/trip_addition_input", "write_ts": 2, "write_fmt_time": "2"},
+                "data": {"start_ts": 8, "xmlResponse": "<foo></foo>", "start_fmt_time": 8, "status": "ACTIVE", "match_id": "bar"}},
+            {"metadata": {"key": "manual/trip_addition_input", "write_ts": 3, "write_fmt_time": "3"},
+                "data": {"start_ts": 8, "xmlResponse": "<foo></foo>", "start_fmt_time": 8, "status": "ACTIVE", "match_id": "baz"}}]
 
         self.assertEqual(esdt.get_not_deleted_candidates(always_accept_fn, multi_entry_multilabel), multi_entry_multilabel)
         self.assertEqual(esdt.get_not_deleted_candidates(always_reject_fn, multi_entry_multilabel), [])
@@ -259,12 +259,12 @@ class TestUserInputFakeData(unittest.TestCase):
 
         # multi entry one not deleted
         multi_entry_multilabel = [
-            {"match_id": "foo", "metadata": {"key": "manual/trip_addition_input", "write_ts": 1, "write_fmt_time": "1"},
-                "data": {"xmlResponse": "<foo></foo>", "start_ts": 8, "start_fmt_time": 8, "status": "ACTIVE"}},
-            {"match_id": "foo", "metadata": {"key": "manual/trip_addition_input", "write_ts": 2, "write_fmt_time": "2"},
-                "data": {"xmlResponse": "<bar></bar>", "start_ts": 8, "start_fmt_time": 8, "status": "DELETED"}},
-            {"match_id": "bar", "metadata": {"key": "manual/trip_addition_input", "write_ts": 3, "write_fmt_time": "3"},
-                "data": {"xmlResponse": "<jar></jar>", "start_ts": 8, "start_fmt_time": 8, "status": "ACTIVE"}}]
+            {"metadata": {"key": "manual/trip_addition_input", "write_ts": 1, "write_fmt_time": "1"},
+                "data": {"xmlResponse": "<foo></foo>", "start_ts": 8, "start_fmt_time": 8, "status": "ACTIVE", "match_id": "foo"}},
+            {"metadata": {"key": "manual/trip_addition_input", "write_ts": 2, "write_fmt_time": "2"},
+                "data": {"xmlResponse": "<bar></bar>", "start_ts": 8, "start_fmt_time": 8, "status": "DELETED", "match_id": "foo"}},
+            {"metadata": {"key": "manual/trip_addition_input", "write_ts": 3, "write_fmt_time": "3"},
+                "data": {"xmlResponse": "<jar></jar>", "start_ts": 8, "start_fmt_time": 8, "status": "ACTIVE", "match_id": "bar"}}]
 
         self.assertEqual(esdt.get_not_deleted_candidates(always_accept_fn, multi_entry_multilabel), [multi_entry_multilabel[2]])
         self.assertEqual(esdt.get_not_deleted_candidates(always_reject_fn, multi_entry_multilabel), [])
@@ -277,12 +277,12 @@ class TestUserInputFakeData(unittest.TestCase):
         # we delete *all* matching ACTIVE entries, even if there are more than one
         # this is consistent in both testHandleMultiNonDeletedMatch and in this function
         multi_entry_multilabel = [
-            {"match_id": "foo", "metadata": {"key": "manual/trip_addition_input", "write_ts": 1, "write_fmt_time": "1"},
-                "data": {"xmlResponse": "<foo></foo>", "start_ts": 8, "start_fmt_time": 8, "status": "ACTIVE"}},
-            {"match_id": "foo", "metadata": {"key": "manual/trip_addition_input", "write_ts": 2, "write_fmt_time": "2"},
-                "data": {"xmlResponse": "<bar></bar>", "start_ts": 8, "start_fmt_time": 8, "status": "DELETED"}},
-            {"match_id": "foo", "metadata": {"key": "manual/trip_addition_input", "write_ts": 3, "write_fmt_time": "3"},
-                "data": {"xmlResponse": "<jar></jar>", "start_ts": 8, "start_fmt_time": 8, "status": "ACTIVE"}}]
+            {"metadata": {"key": "manual/trip_addition_input", "write_ts": 1, "write_fmt_time": "1"},
+                "data": {"xmlResponse": "<foo></foo>", "start_ts": 8, "start_fmt_time": 8, "status": "ACTIVE", "match_id": "foo"}},
+            {"metadata": {"key": "manual/trip_addition_input", "write_ts": 2, "write_fmt_time": "2"},
+                "data": {"xmlResponse": "<bar></bar>", "start_ts": 8, "start_fmt_time": 8, "status": "DELETED", "match_id": "foo"}},
+            {"metadata": {"key": "manual/trip_addition_input", "write_ts": 3, "write_fmt_time": "3"},
+                "data": {"xmlResponse": "<jar></jar>", "start_ts": 8, "start_fmt_time": 8, "status": "ACTIVE", "match_id": "foo"}}]
 
         self.assertEqual(esdt.get_not_deleted_candidates(always_accept_fn, multi_entry_multilabel), [])
         self.assertEqual(esdt.get_not_deleted_candidates(always_reject_fn, multi_entry_multilabel), [])
@@ -292,10 +292,10 @@ class TestUserInputFakeData(unittest.TestCase):
 
         # multi entry only DELETED entries
         multi_entry_multilabel = [
-            {"match_id": "foo", "metadata": {"key": "manual/trip_addition_input", "write_ts": 2, "write_fmt_time": "2"},
-                "data": {"xmlResponse": "<bar></bar>", "start_ts": 8, "start_fmt_time": 8, "status": "DELETED"}},
-            {"match_id": "foo", "metadata": {"key": "manual/trip_addition_input", "write_ts": 3, "write_fmt_time": "3"},
-                "data": {"xmlResponse": "<jar></jar>", "start_ts": 8, "start_fmt_time": 8, "status": "DELETED"}}]
+            {"metadata": {"key": "manual/trip_addition_input", "write_ts": 2, "write_fmt_time": "2"},
+                "data": {"xmlResponse": "<bar></bar>", "start_ts": 8, "start_fmt_time": 8, "status": "DELETED", "match_id": "foo"}},
+            {"metadata": {"key": "manual/trip_addition_input", "write_ts": 3, "write_fmt_time": "3"},
+                "data": {"xmlResponse": "<jar></jar>", "start_ts": 8, "start_fmt_time": 8, "status": "DELETED", "match_id": "foo"}}]
 
         self.assertEqual(esdt.get_not_deleted_candidates(always_accept_fn, multi_entry_multilabel), [])
         self.assertEqual(esdt.get_not_deleted_candidates(always_reject_fn, multi_entry_multilabel), [])
@@ -316,11 +316,11 @@ class TestUserInputFakeData(unittest.TestCase):
                 "start_fmt_time": 5, "end_fmt_time": 15}})
         try:
             ts = esta.TimeSeries.get_time_series(self.testUUID)
-            fake_match = {"match_id": "foo","user_id": self.testUUID,
+            fake_match = {"user_id": self.testUUID,
                 "metadata": {"key": "manual/trip_addition_input", "write_ts": 1, "write_fmt_time": "1", "time_zone": "UTC"},
                 "data": {"start_ts": 8, "end_ts": 10,
                     "label": "answered", "xmlResponse": "<foo></foo>",
-                    "start_fmt_time": 8, "status": "ACTIVE"}
+                    "start_fmt_time": 8, "status": "ACTIVE", "match_id": "foo"}
                 }
             ts.insert(fake_match)
             # Now that we have a `match_id` instead of `_id`, the database inserts an `_id`
@@ -338,21 +338,21 @@ class TestUserInputFakeData(unittest.TestCase):
         ## so for now, the second and third insert fail in this case, and the result is the first entry
         try:
             fake_matches = [
-                {"match_id": "foo","user_id": self.testUUID,
+                {"user_id": self.testUUID,
                 "metadata": {"key": "manual/trip_addition_input", "write_ts": 1, "write_fmt_time": "1", "time_zone": "UTC"},
                 "data": {"start_ts": 8, "end_ts": 10,
                     "label": "answered", "xmlResponse": "<foo></foo>",
-                    "start_fmt_time": 8, "status": "ACTIVE"}
-                }, {"match_id": "foo","user_id": self.testUUID,
+                    "start_fmt_time": 8, "status": "ACTIVE", "match_id": "foo"}
+                }, {"user_id": self.testUUID,
                 "metadata": {"key": "manual/trip_addition_input", "write_ts": 1, "write_fmt_time": "1", "time_zone": "UTC"},
                 "data": {"start_ts": 8, "end_ts": 10,
                     "label": "answered", "xmlResponse": "<foo></foo>",
-                    "start_fmt_time": 8, "status": "DELETED"}
-                }, {"match_id": "bar","user_id": self.testUUID,
+                    "start_fmt_time": 8, "status": "DELETED", "match_id": "foo"}
+                }, {"user_id": self.testUUID,
                 "metadata": {"key": "manual/trip_addition_input", "write_ts": 1, "write_fmt_time": "1", "time_zone": "UTC"},
                 "data": {"start_ts": 9, "end_ts": 12,
                     "label": "answered", "xmlResponse": "<bar></bar>",
-                    "start_fmt_time": 8, "status": "ACTIVE"}
+                    "start_fmt_time": 8, "status": "ACTIVE", "match_id": "bar"}
                 }
             ]
             ts.bulk_insert([ecwe.Entry(e) for e in fake_matches])
