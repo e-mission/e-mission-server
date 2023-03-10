@@ -69,7 +69,7 @@ def handle_multi_non_deleted_match(confirmed_trip, ui):
     if "status" not in ui.data or ui.data.status == ecwtui.InputStatus.ACTIVE:
         confirmed_trip["data"]["trip_addition"].append(ui)
     elif ui.data.status == ecwtui.InputStatus.DELETED:
-        after_del_list = [ta for ta in confirmed_trip["data"]["trip_addition"] if ta["match_id"] != ui["match_id"]]
+        after_del_list = [ta for ta in confirmed_trip["data"]["trip_addition"] if ta["data"]["match_id"] != ui["data"]["match_id"]]
         confirmed_trip["data"]["trip_addition"] = after_del_list
     else:
         # TODO: Decide whether to error or to warn here
