@@ -98,8 +98,14 @@ def valid_user_input_for_timeline_entry(ts, tl_entry, user_input):
     # but the confirm objects are not necessarily filled out
     fmt_ts = lambda ts, tz: arrow.get(ts).to(tz)
 
-    entry_start = tl_entry.data.start_ts or tl_entry.data.enter_ts
-    entry_end = tl_entry.data.end_ts or tl_entry.data.exit_ts
+    if hasattr(tl_entry.data, 'start_ts'):
+        entry_start = tl_entry.data.start_ts
+    else:
+        entry_start = tl_entry.data.enter_ts
+    if hasattr(tl_entry.data, 'end_ts'):
+        entry_end = tl_entry.data.end_ts
+    else:
+        entry_end = tl_entry.data.exit_ts
 
     logging.debug("Comparing user input %s: %s -> %s, trip %s -> %s, start checks are (%s && %s) and end checks are (%s || %s)" % (
         user_input.data.label,
@@ -117,11 +123,19 @@ def valid_user_input_for_timeline_entry(ts, tl_entry, user_input):
         ((user_input.data.end_ts - entry_end) <= 15 * 60))
     if start_checks and not end_checks:
         logging.debug("Handling corner case where start check matches, but end check does not")
-        next_trip_obj = _get_next_cleaned_timeline_entry(ts, tl_entry)
-        if next_trip_obj is not None:
-            end_checks = user_input.data.end_ts <= next_trip_obj.data.start_ts
-            logging.debug("Second level of end checks when the next trip is defined (%s <= %s) = %s" % (
-                user_input.data.end_ts, next_trip_obj.data.start_ts, end_checks))
+        next_entry_obj = _get_next_cleaned_timeline_entry(ts, tl_entry)
+        if next_entry_obj is not None:
+            if hasattr(next_entry_obj.data, 'end_ts'):
+                next_entry_end = next_entry_obj.data.end_ts
+            elif hasattr(next_entry_obj.data, 'exit_ts'):
+                next_entry_end = next_entry_obj.data.exit_ts
+
+            if next_entry_end is None: # the last place will not have an exit_ts
+                end_checks = True # so we will just skip the end check
+            else:
+                end_checks = user_input.data.end_ts <= next_entry_end
+                logging.debug("Second level of end checks when the next trip is defined (%s <= %s) = %s" % (
+                    user_input.data.end_ts, next_entry_end, end_checks))
         else:
             end_checks = True
             logging.debug("Second level of end checks when the next trip is not defined = %s" % end_checks)
