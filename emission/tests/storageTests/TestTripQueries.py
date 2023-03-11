@@ -276,11 +276,11 @@ class TestTripQueries(unittest.TestCase):
         mc_trip_start_fmt_time_list = []
         pc_trip_start_fmt_time_list = []
         for mode in mode_confirm_list:
-            mc_trip = esdt.get_trip_for_user_input_obj(ts, mode)
+            mc_trip = esdt.get_confirmed_obj_for_user_input_obj(ts, mode)
             mc_trip_start_fmt_time_list.append(mc_trip.data.start_fmt_time if mc_trip is not None else None)
 
         for purpose in purpose_confirm_list:
-            pc_trip = esdt.get_trip_for_user_input_obj(ts, purpose)
+            pc_trip = esdt.get_confirmed_obj_for_user_input_obj(ts, purpose)
             print("Found pc_trip %s" % pc_trip.data.start_fmt_time if pc_trip is not None else None)
             pc_trip_start_fmt_time_list.append(pc_trip.data.start_fmt_time if pc_trip is not None else None)
 
