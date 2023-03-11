@@ -14,8 +14,6 @@ License: MIT (see LICENSE for details)
 """
 
 import sys
-import bson.json_util as bju
-from bson.binary import UuidRepresentation
 
 __author__ = 'Marcel Hellkamp'
 __version__ = '0.13-dev'
@@ -2003,7 +2001,7 @@ class JSONPlugin(object):
 
             if isinstance(rv, dict):
                 #Attempt to serialize, raises exception on failure
-                json_response = bju.dumps(rv, json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+                json_response = dumps(rv)
                 #Set content type only if serialization successful
                 response.content_type = 'application/json'
                 return json_response
