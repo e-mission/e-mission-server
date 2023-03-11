@@ -66,8 +66,16 @@ class TestUserInput(unittest.TestCase):
             # Highly user visible
             if manual_keys:
                 for key in manual_keys:
+                    # Compare result user inputs to expected user inputs
                     if key in rt.data['user_input']:
                         self.assertEqual(rt.data['user_input'][key]['data'], et.data['user_input'][key]['data'])
+                    else:
+                        self.assertFalse(key in et.data['user_input'])
+
+                # Compare result additions to expected additions
+                self.assertEqual(len(rt.data['additions']), len(et.data['additions']))
+                for ra, ea in zip(rt.data['additions'], et.data['additions']):
+                    self.assertEqual(ra['data'], ea['data'])
             else:
                 self.assertEqual(rt.data["user_input"], et.data["user_input"])
             # self.assertEqual(rt.data.inferred_primary_mode, et.data.inferred_primary_mode)
@@ -95,28 +103,29 @@ class TestUserInput(unittest.TestCase):
             logging.debug(20 * "=")
 
     def checkConfirmedTripsAndSections(self, dataFile, ld, preload=False, trip_user_inputs=False, place_user_inputs=False):
-        suffix = ".manual_trip_user_input" if trip_user_inputs else "" \
-            + ".manual_place_user_input" if place_user_inputs else ""
+        ct_suffix = "".join(".manual_" + k for k in trip_user_inputs) if trip_user_inputs else ""
+        cp_suffix = "".join(".manual_" + k for k in place_user_inputs) if place_user_inputs else ""
         
         with open(dataFile+".ground_truth") as gfp:
             ground_truth = json.load(gfp, object_hook=bju.object_hook)
 
         etc.setupRealExample(self, dataFile)
         if (preload):
-            self.entries = json.load(open(dataFile+".user_inputs"+suffix), object_hook = bju.object_hook)
+            self.entries = json.load(open(dataFile+".user_inputs"+ct_suffix+cp_suffix), object_hook = bju.object_hook)
             etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
         if (not preload):
-            self.entries = json.load(open(dataFile+".user_inputs"+suffix), object_hook = bju.object_hook)
+            self.entries = json.load(open(dataFile+".user_inputs"+ct_suffix+cp_suffix), object_hook = bju.object_hook)
             etc.setupRealExampleWithEntries(self)
             etc.runIntakePipeline(self.testUUID)
         ts = esta.TimeSeries.get_time_series(self.testUUID)
         confirmed_trips = list(ts.find_entries(["analysis/confirmed_trip"], None))
         confirmed_places = list(ts.find_entries(["analysis/confirmed_place"], None))
-        with open(dataFile+".expected_confirmed_trips"+suffix) as dect:
+
+        with open(dataFile+".expected_confirmed_trips"+ct_suffix) as dect:
             expected_confirmed_trips = json.load(dect, object_hook = bju.object_hook)
             self.compare_confirmed_objs_result(confirmed_trips, expected_confirmed_trips, manual_keys=["trip_user_input"] if trip_user_inputs else None) 
-        with open(dataFile+".expected_confirmed_places"+suffix) as dect:
+        with open(dataFile+".expected_confirmed_places"+cp_suffix) as dect:
             expected_confirmed_places = json.load(dect, object_hook = bju.object_hook)
             self.compare_confirmed_objs_result(confirmed_places, expected_confirmed_places, manual_keys=["place_user_input"] if place_user_inputs else None)
 
@@ -157,12 +166,18 @@ class TestUserInput(unittest.TestCase):
     def testTripUserInput(self):
         dataFile = "emission/tests/data/real_examples/shankari_2016-06-20"
         ld = ecwl.LocalDate({'year': 2016, 'month': 6, 'day': 20})
-        self.checkConfirmedTripsAndSections(dataFile, ld, preload=True, trip_user_inputs=True)
+        self.checkConfirmedTripsAndSections(dataFile, ld, preload=True,
+                                            trip_user_inputs=["trip_user_input"])
 
-    def testTripAndPlaceUserInput(self):
+    def testTripAndPlaceAdditions(self):
+        # > shankari_2016-06-20.user_inputs.manual_trip_addition_input.manual_place_addition_input
+        # This will load trip-level and place-level additions from the above file
+        # This includes a few DELETED entries, which should not be matched
         dataFile = "emission/tests/data/real_examples/shankari_2016-06-20"
         ld = ecwl.LocalDate({'year': 2016, 'month': 6, 'day': 20})
-        self.checkConfirmedTripsAndSections(dataFile, ld, preload=True, trip_user_inputs=True, place_user_inputs=True)
+        self.checkConfirmedTripsAndSections(dataFile, ld, preload=True,
+                                            trip_user_inputs=["trip_addition_input"],
+                                            place_user_inputs=["place_addition_input"])
 
 if __name__ == '__main__':
     etc.configLogging()
