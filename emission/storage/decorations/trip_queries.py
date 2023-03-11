@@ -23,6 +23,8 @@ import emission.storage.timeseries.cache_series as estsc
 import emission.storage.decorations.timeline as esdt
 import emission.storage.decorations.analysis_timeseries_queries as esda
 
+EPOCH_MAXIMUM = 2**31 - 1
+
 def get_raw_sections_for_trip(user_id, trip_id):
     return get_sections_for_trip("segmentation/raw_section", user_id, trip_id)
 
@@ -80,8 +82,8 @@ def _get_next_cleaned_timeline_entry(ts, tl_entry):
     """
     if (tl_entry.data.end_place is not None):
         return ts.get_entry_from_id(esda.CLEANED_PLACE_KEY, tl_entry.data.end_place)
-    elif (tl_entry.data.ending_trip is not None):
-        return ts.get_entry_from_id(esda.CLEANED_TRIP_KEY, tl_entry.data.ending_trip)
+    elif (tl_entry.data.starting_trip is not None):
+        return ts.get_entry_from_id(esda.CLEANED_TRIP_KEY, tl_entry.data.starting_trip)
     else:
         return None
 
@@ -108,8 +110,8 @@ def valid_user_input_for_timeline_entry(ts, tl_entry, user_input):
     else:
         entry_end = tl_entry.data.exit_ts
         # if a place has no exit time, the user hasn't left there yet
-        # so we will set the end time to be infinity for the purpose of comparison
-        entry_end = 9999999999 if entry_end is None else entry_end
+        # so we will set the end time as high as possible for the purpose of comparison
+        entry_end = EPOCH_MAXIMUM if entry_end is None else entry_end
 
     logging.debug("Comparing user input %s: %s -> %s, trip %s -> %s, start checks are (%s && %s) and end checks are (%s || %s)" % (
         user_input.data.label,
@@ -168,7 +170,9 @@ def final_candidate(filter_fn, potential_candidates):
     # input before the pipeline is run, and then overwrites after pipeline is
     # run
     sorted_pc = sorted(extra_filtered_potential_candidates, key=lambda c:c["metadata"]["write_ts"])
-    entry_detail = lambda c: c.data.label if "label" in c.data else c.data.start_fmt_time
+    entry_detail = lambda c: getattr(c.data, "label", \
+                                getattr(c.data, "start_fmt_time", \
+                                getattr(c.data, "enter_fmt_time", None)))
     logging.debug("sorted candidates are %s" %
         [{"write_fmt_time": c.metadata.write_fmt_time, "detail": entry_detail(c)} for c in sorted_pc])
     most_recent_entry = sorted_pc[-1]
@@ -221,7 +225,8 @@ def get_additions_for_timeline_entry_object(ts, timeline_entry):
         end = timeline_entry.data.end_ts
     else:
         start = timeline_entry.data.enter_ts
-        end = timeline_entry.data.exit_ts
+        exit_ts = timeline_entry.data.exit_ts
+        end = exit_ts if exit_ts is not None else EPOCH_MAXIMUM
     tq = estt.TimeQuery("data.start_ts", start, end)
     potential_candidates = ts.find_entries(["manual/trip_addition_input", "manual/place_addition_input"], tq)
     return get_not_deleted_candidates(valid_user_input(ts, timeline_entry), potential_candidates)
