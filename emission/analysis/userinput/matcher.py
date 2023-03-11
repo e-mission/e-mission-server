@@ -10,7 +10,7 @@ import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.decorations.trip_queries as esdt
 import emission.storage.pipeline_queries as epq
 import emission.core.wrapper.entry as ecwe
-import emission.core.wrapper.tripuserinput as ecwtui
+import emission.core.wrapper.userinput as ecwui
 
 obj_to_dict_key = lambda key: key.split("/")[1]
 
@@ -30,7 +30,7 @@ def match_incoming_user_inputs(user_id):
 def match_incoming_inputs(user_id, timerange):
     ts = esta.TimeSeries.get_time_series(user_id)
     single_most_recent_match_key_list = eac.get_config()["userinput.keylist"]
-    multi_non_deleted_key_list = ["manual/trip_addition_input"]
+    multi_non_deleted_key_list = ["manual/trip_addition_input", "manual/place_addition_input"]
     input_key_list = single_most_recent_match_key_list + multi_non_deleted_key_list
     toMatchInputs = [ecwe.Entry(e) for e in ts.find_entries(input_key_list, time_query=timerange)]
     logging.debug("Matching %d single inputs to trips" % len(toMatchInputs))
@@ -39,39 +39,39 @@ def match_incoming_inputs(user_id, timerange):
         logging.debug("len(toMatchInputs) == 0, early return")
         return None
     for ui in toMatchInputs:
-        confirmed_trip = esdt.get_trip_for_user_input_obj(ts, ui)
-        if confirmed_trip is not None:
+        confirmed_obj = esdt.get_confirmed_obj_for_user_input_obj(ts, ui)
+        if confirmed_obj is not None:
             if ui.metadata.key in single_most_recent_match_key_list:
-                handle_single_most_recent_match(confirmed_trip, ui)
+                handle_single_most_recent_match(confirmed_obj, ui)
             elif ui.metadata.key in multi_non_deleted_key_list:
-                handle_multi_non_deleted_match(confirmed_trip, ui)
+                handle_multi_non_deleted_match(confirmed_obj, ui)
             else:
                 assert False, "Found weird key {ui.metadata.key} that was not in the search list"
             import emission.storage.timeseries.builtin_timeseries as estbt
-            estbt.BuiltinTimeSeries.update(confirmed_trip)
+            estbt.BuiltinTimeSeries.update(confirmed_obj)
         else:
             logging.warn("No match found for single user input %s, moving forward anyway" % ui)
         lastInputProcessed = ui
 
     return lastInputProcessed
 
-def handle_single_most_recent_match(confirmed_trip, ui):
+def handle_single_most_recent_match(confirmed_obj, ui):
     input_name = obj_to_dict_key(ui.metadata.key)
-    if input_name == "trip_user_input":
-        confirmed_trip["data"]["user_input"][input_name] = ui
+    if input_name == "trip_user_input" or input_name == "place_user_input":
+        confirmed_obj["data"]["user_input"][input_name] = ui
     else:
-        confirmed_trip["data"]["user_input"][input_name] = ui.data.label
+        confirmed_obj["data"]["user_input"][input_name] = ui.data.label
 
-def handle_multi_non_deleted_match(confirmed_object, ui):
-    logging.debug(f"handling user input {ui} for {confirmed_object}")
-    if "additions" not in confirmed_object["data"] or \
-        confirmed_object["data"]["additions"] is None:
-        confirmed_object["data"]["additions"] = []
-    if "status" not in ui.data or ui.data.status == ecwtui.InputStatus.ACTIVE:
-        confirmed_object["data"]["additions"].append(ui)
-    elif ui.data.status == ecwtui.InputStatus.DELETED:
-        after_del_list = [ta for ta in confirmed_trip["data"]["additions"] if ta["data"]["match_id"] != ui["data"]["match_id"]]
-        confirmed_trip["data"]["additions"] = after_del_list
+def handle_multi_non_deleted_match(confirmed_obj, ui):
+    logging.debug(f"handling user input {ui} for {confirmed_obj}")
+    if "additions" not in confirmed_obj["data"] or \
+        confirmed_obj["data"]["additions"] is None:
+        confirmed_obj["data"]["additions"] = []
+    if "status" not in ui.data or ui.data.status == ecwui.InputStatus.ACTIVE:
+        confirmed_obj["data"]["additions"].append(ui)
+    elif ui.data.status == ecwui.InputStatus.DELETED:
+        after_del_list = [ta for ta in confirmed_obj["data"]["additions"] if ta["data"]["match_id"] != ui["data"]["match_id"]]
+        confirmed_obj["data"]["additions"] = after_del_list
     else:
         # TODO: Decide whether to error or to warn here
         logging.warn("Invalid status found in user input %s, moving forward anyway" % ui)
@@ -199,7 +199,7 @@ def get_user_input_dict(ts, tct, input_key_list):
         matched_userinput = esdt.get_user_input_for_timeline_entry_object(ts, tct, ikey)
         if matched_userinput is not None:
             ikey_name = obj_to_dict_key(ikey)
-            if ikey_name == "trip_user_input":
+            if ikey_name == "trip_user_input" or ikey_name == "place_user_input":
                 tct_userinput[ikey_name] = matched_userinput
             else:
                 tct_userinput[ikey_name] = matched_userinput.data.label

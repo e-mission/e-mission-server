@@ -5,6 +5,7 @@ from __future__ import absolute_import
 from future import standard_library
 standard_library.install_aliases()
 from builtins import *
+import itertools
 import logging
 import pymongo
 import arrow
@@ -15,7 +16,7 @@ import emission.storage.timeseries.timequery as estt
 import emission.core.get_database as edb
 import emission.core.wrapper.rawtrip as ecwrt
 import emission.core.wrapper.entry as ecwe
-import emission.core.wrapper.tripuserinput as ecwtui
+import emission.core.wrapper.userinput as ecwui
 
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.cache_series as estsc
@@ -106,6 +107,9 @@ def valid_user_input_for_timeline_entry(ts, tl_entry, user_input):
         entry_end = tl_entry.data.end_ts
     else:
         entry_end = tl_entry.data.exit_ts
+        # if a place has no exit time, the user hasn't left there yet
+        # so we will set the end time to be infinity for the purpose of comparison
+        entry_end = 9999999999 if entry_end is None else entry_end
 
     logging.debug("Comparing user input %s: %s -> %s, trip %s -> %s, start checks are (%s && %s) and end checks are (%s || %s)" % (
         user_input.data.label,
@@ -180,8 +184,8 @@ def get_not_deleted_candidates(filter_fn, potential_candidates):
         return []
 
     # We want to retain all ACTIVE entries that have not been DELETED
-    all_active_list = [efpc for efpc in extra_filtered_potential_candidates if "status" not in efpc.data or efpc.data.status == ecwtui.InputStatus.ACTIVE]
-    all_deleted_id = [efpc["data"]["match_id"] for efpc in extra_filtered_potential_candidates if "status" in efpc.data and efpc.data.status == ecwtui.InputStatus.DELETED]
+    all_active_list = [efpc for efpc in extra_filtered_potential_candidates if "status" not in efpc.data or efpc.data.status == ecwui.InputStatus.ACTIVE]
+    all_deleted_id = [efpc["data"]["match_id"] for efpc in extra_filtered_potential_candidates if "status" in efpc.data and efpc.data.status == ecwui.InputStatus.DELETED]
     # TODO: Replace this with filter and a lambda if we decide not to match by ID after all
     not_deleted_active = [efpc for efpc in all_active_list if efpc["data"]["match_id"] not in all_deleted_id]
     logging.info(f"Found {len(all_active_list)} active entries, {len(all_deleted_id)} deleted entries -> {len(not_deleted_active)} non deleted active entries")
@@ -219,15 +223,15 @@ def get_additions_for_timeline_entry_object(ts, timeline_entry):
         start = timeline_entry.data.enter_ts
         end = timeline_entry.data.exit_ts
     tq = estt.TimeQuery("data.start_ts", start, end)
-    potential_candidates = ts.find_entries(["manual/trip_addition_input"], tq)
+    potential_candidates = ts.find_entries(["manual/trip_addition_input", "manual/place_addition_input"], tq)
     return get_not_deleted_candidates(valid_user_input(ts, timeline_entry), potential_candidates)
 
-def valid_trip(ts, user_input):
-    def curried(trip_obj):
-        return valid_user_input_for_timeline_entry(ts, trip_obj, user_input)
+def valid_timeline_entry(ts, user_input):
+    def curried(confirmed_obj):
+        return valid_user_input_for_timeline_entry(ts, confirmed_obj, user_input)
     return curried
 
-def get_trip_for_user_input_obj(ts, ui_obj):
+def get_confirmed_obj_for_user_input_obj(ts, ui_obj):
     # the match check that we have is:
     # user input can start after trip start
     # user input can end before trip end OR user input is within 5 mins of trip end
@@ -243,8 +247,12 @@ def get_trip_for_user_input_obj(ts, ui_obj):
     ONE_DAY = 24 * 60 * 60
     tq = estt.TimeQuery("data.start_ts", ui_obj.data.start_ts - ONE_DAY,
         ui_obj.data.start_ts + ONE_DAY)
-    potential_candidates = ts.find_entries(["analysis/confirmed_trip"], tq)
-    return final_candidate(valid_trip(ts, ui_obj), potential_candidates)
+    trip_candidates = ts.find_entries(["analysis/confirmed_trip"], tq)
+    # We should also consider places in this same time range as candidates
+    tq.timeType = "data.enter_ts"
+    place_candidates = ts.find_entries(["analysis/confirmed_place"], tq)
+    potential_candidates = itertools.chain(trip_candidates, place_candidates)
+    return final_candidate(valid_timeline_entry(ts, ui_obj), potential_candidates)
 
 def filter_labeled_trips(mixed_trip_df):
     """
