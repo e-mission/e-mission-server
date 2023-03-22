@@ -195,6 +195,7 @@ def runIntakePipeline(uuid):
     eacilp.infer_labels(uuid)
     eaue.populate_expectations(uuid)
     eaum.create_confirmed_objects(uuid)
+    eaum.create_composite_objects(uuid)
 
 def configLogging():
     """

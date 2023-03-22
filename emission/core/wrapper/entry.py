@@ -79,10 +79,12 @@ class Entry(ecwb.WrapperBase):
             "manual/replaced_mode": "userlabel",
             # user input for the trip; in one entry instead of being split up
             "manual/trip_user_input": "tripuserinput",
+            # user input for the place (no use case for this yet)
+            "manual/place_user_input": "placeuserinput",
             # trip-level additions/splits: currently only used for the time-use survey
             "manual/trip_addition_input": "tripuserinput",
             # place-level additions/splits: currently only used for the
-            # time-use survey, and potentially 
+            # time-use survey, and potentially 'trip not taken'
             "manual/place_addition_input": "placeuserinput",
             # user confirmation of the destination (unsure how this will
             # interact with purpose
@@ -150,8 +152,12 @@ class Entry(ecwb.WrapperBase):
             "analysis/inferred_trip": "inferredtrip",
             "analysis/expected_trip": "expectedtrip",
             "analysis/confirmed_trip": "confirmedtrip",
-            "analysis/confirmed_section": "confirmedsection"
+            "analysis/confirmed_section": "confirmedsection",
+            "analysis/confirmed_place": "confirmedplace",
             ### ** END: confirmed objects which combine inferred and user input values
+            # the composite trip structure for the presentation layer, which includes
+            # the confirmed trip, its confirmed end place, and its trajectory
+            "analysis/composite_trip": "compositetrip"
             }
 
   @staticmethod

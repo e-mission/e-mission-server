@@ -62,6 +62,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "manual/purpose_confirm": self.timeseries_db,
                 "manual/replaced_mode": self.timeseries_db,
                 "manual/trip_user_input": self.timeseries_db,
+                "manual/place_user_input": self.timeseries_db,
                 "manual/trip_addition_input": self.timeseries_db,
                 "manual/place_addition_input": self.timeseries_db,
                 "manual/demographic_survey": self.timeseries_db,
@@ -93,7 +94,9 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "analysis/inferred_trip": self.analysis_timeseries_db,
                 "analysis/expected_trip": self.analysis_timeseries_db,
                 "analysis/confirmed_trip": self.analysis_timeseries_db,
-                "analysis/confirmed_section": self.analysis_timeseries_db
+                "analysis/confirmed_section": self.analysis_timeseries_db,
+                "analysis/confirmed_place": self.analysis_timeseries_db,
+                "analysis/composite_trip": self.analysis_timeseries_db
             }
 
 

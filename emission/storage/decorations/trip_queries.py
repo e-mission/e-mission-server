@@ -5,6 +5,7 @@ from __future__ import absolute_import
 from future import standard_library
 standard_library.install_aliases()
 from builtins import *
+import itertools
 import logging
 import pymongo
 import arrow
@@ -15,12 +16,14 @@ import emission.storage.timeseries.timequery as estt
 import emission.core.get_database as edb
 import emission.core.wrapper.rawtrip as ecwrt
 import emission.core.wrapper.entry as ecwe
-import emission.core.wrapper.tripuserinput as ecwtui
+import emission.core.wrapper.userinput as ecwui
 
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.cache_series as estsc
 import emission.storage.decorations.timeline as esdt
 import emission.storage.decorations.analysis_timeseries_queries as esda
+
+EPOCH_MAXIMUM = 2**31 - 1
 
 def get_raw_sections_for_trip(user_id, trip_id):
     return get_sections_for_trip("segmentation/raw_section", user_id, trip_id)
@@ -73,66 +76,87 @@ def get_stops_for_trip(key, user_id, trip_id):
         "data.enter_ts", pymongo.ASCENDING)
     return [ecwe.Entry(doc) for doc in stop_doc_cursor]
 
-def _get_next_cleaned_trip(ts, trip_obj):
+def _get_next_cleaned_timeline_entry(ts, tl_entry):
     """
-    Find the next trip in the timeline
+    Find the next trip or place in the timeline
     """
-    next_place = ts.get_entry_from_id(esda.CLEANED_PLACE_KEY, trip_obj.data.end_place)
-    if next_place is None:
-        return None
+    if (tl_entry.data.end_place is not None):
+        return ts.get_entry_from_id(esda.CLEANED_PLACE_KEY, tl_entry.data.end_place)
+    elif (tl_entry.data.starting_trip is not None):
+        return ts.get_entry_from_id(esda.CLEANED_TRIP_KEY, tl_entry.data.starting_trip)
     else:
-        next_trip = ts.get_entry_from_id(esda.CLEANED_TRIP_KEY, next_place.data.starting_trip)
-        return next_trip
+        return None
 
 def get_user_input_for_trip(trip_key, user_id, trip_id, user_input_key):
     ts = esta.TimeSeries.get_time_series(user_id)
     trip_obj = ts.get_entry_from_id(trip_key, trip_id)
-    return get_user_input_for_trip_object(ts, trip_obj, user_input_key)
+    return get_user_input_for_timeline_entry_object(ts, trip_obj, user_input_key)
 
 # Additional checks to be consistent with the phone code
 # www/js/diary/services.js
 # Since that has been tested the most
 # If we no longer need these checks (maybe with trip editing), we can remove them
-def valid_user_input_for_trip(ts, trip_obj, user_input):
+def valid_user_input_for_timeline_entry(ts, tl_entry, user_input):
     # we know that the trip is cleaned so we can use the fmt_time
     # but the confirm objects are not necessarily filled out
     fmt_ts = lambda ts, tz: arrow.get(ts).to(tz)
+
+    if hasattr(tl_entry.data, 'start_ts'):
+        entry_start = tl_entry.data.start_ts
+    else:
+        entry_start = tl_entry.data.enter_ts
+    if hasattr(tl_entry.data, 'end_ts'):
+        entry_end = tl_entry.data.end_ts
+    else:
+        entry_end = tl_entry.data.exit_ts
+        # if a place has no exit time, the user hasn't left there yet
+        # so we will set the end time as high as possible for the purpose of comparison
+        entry_end = EPOCH_MAXIMUM if entry_end is None else entry_end
+
     logging.debug("Comparing user input %s: %s -> %s, trip %s -> %s, start checks are (%s && %s) and end checks are (%s || %s)" % (
         user_input.data.label,
         fmt_ts(user_input.data.start_ts, user_input.metadata.time_zone),
         fmt_ts(user_input.data.end_ts, user_input.metadata.time_zone),
-        trip_obj.data.start_fmt_time, trip_obj.data.end_fmt_time,
-        (user_input.data.start_ts >= trip_obj.data.start_ts),
-        (user_input.data.start_ts <= trip_obj.data.end_ts),
-        (user_input.data.end_ts <= trip_obj.data.end_ts),
-        ((user_input.data.end_ts - trip_obj.data.end_ts) <= 15 * 60)
+        fmt_ts(entry_start, user_input.metadata.time_zone), fmt_ts(entry_end, user_input.metadata.time_zone),
+        (user_input.data.start_ts >= entry_start),
+        (user_input.data.start_ts < entry_end),
+        (user_input.data.end_ts <= entry_end),
+        ((user_input.data.end_ts - entry_end) <= 15 * 60)
     ))
-    start_checks = (user_input.data.start_ts >= trip_obj.data.start_ts and
-        user_input.data.start_ts >= trip_obj.data.start_ts)
-    end_checks = (user_input.data.end_ts <= trip_obj.data.end_ts or
-        ((user_input.data.end_ts - trip_obj.data.end_ts) <= 15 * 60))
+    start_checks = (user_input.data.start_ts >= entry_start and
+        user_input.data.start_ts < entry_end)
+    end_checks = (user_input.data.end_ts <= entry_end or
+        ((user_input.data.end_ts - entry_end) <= 15 * 60))
     if start_checks and not end_checks:
         logging.debug("Handling corner case where start check matches, but end check does not")
-        next_trip_obj = _get_next_cleaned_trip(ts, trip_obj)
-        if next_trip_obj is not None:
-            end_checks = user_input.data.end_ts <= next_trip_obj.data.start_ts
-            logging.debug("Second level of end checks when the next trip is defined (%s <= %s) = %s" % (
-                user_input.data.end_ts, next_trip_obj.data.start_ts, end_checks))
+        next_entry_obj = _get_next_cleaned_timeline_entry(ts, tl_entry)
+        if next_entry_obj is not None:
+            if hasattr(next_entry_obj.data, 'end_ts'):
+                next_entry_end = next_entry_obj.data.end_ts
+            elif hasattr(next_entry_obj.data, 'exit_ts'):
+                next_entry_end = next_entry_obj.data.exit_ts
+
+            if next_entry_end is None: # the last place will not have an exit_ts
+                end_checks = True # so we will just skip the end check
+            else:
+                end_checks = user_input.data.end_ts <= next_entry_end
+                logging.debug("Second level of end checks when the next trip is defined (%s <= %s) = %s" % (
+                    user_input.data.end_ts, next_entry_end, end_checks))
         else:
             end_checks = True
             logging.debug("Second level of end checks when the next trip is not defined = %s" % end_checks)
         if end_checks:
             # If we have flipped the values, check to see that there is sufficient overlap
             # https://github.com/e-mission/e-mission-docs/issues/476#issuecomment-747587041
-            overlapDuration = min(user_input.data.end_ts, trip_obj.data.end_ts) - max(user_input.data.start_ts, trip_obj.data.start_ts)
+            overlapDuration = min(user_input.data.end_ts, entry_end) - max(user_input.data.start_ts, entry_start)
             logging.debug("Flipped endCheck, overlap(%s)/trip(%s) = %s" %
-                (overlapDuration, trip_obj.data.duration, (overlapDuration / trip_obj.data.duration)));
-            end_checks = (overlapDuration/trip_obj.data.duration) > 0.5;
+                (overlapDuration, tl_entry.data.duration, (overlapDuration / tl_entry.data.duration)));
+            end_checks = (overlapDuration/tl_entry.data.duration) > 0.5;
     return start_checks and end_checks
 
 def valid_user_input(ts, trip_obj):
     def curried(user_input):
-        return valid_user_input_for_trip(ts, trip_obj, user_input)
+        return valid_user_input_for_timeline_entry(ts, trip_obj, user_input)
     return curried
 
 def final_candidate(filter_fn, potential_candidates):
@@ -146,7 +170,9 @@ def final_candidate(filter_fn, potential_candidates):
     # input before the pipeline is run, and then overwrites after pipeline is
     # run
     sorted_pc = sorted(extra_filtered_potential_candidates, key=lambda c:c["metadata"]["write_ts"])
-    entry_detail = lambda c: c.data.label if "label" in c.data else c.data.start_fmt_time
+    entry_detail = lambda c: getattr(c.data, "label", \
+                                getattr(c.data, "start_fmt_time", \
+                                getattr(c.data, "enter_fmt_time", None)))
     logging.debug("sorted candidates are %s" %
         [{"write_fmt_time": c.metadata.write_fmt_time, "detail": entry_detail(c)} for c in sorted_pc])
     most_recent_entry = sorted_pc[-1]
@@ -162,17 +188,24 @@ def get_not_deleted_candidates(filter_fn, potential_candidates):
         return []
 
     # We want to retain all ACTIVE entries that have not been DELETED
-    all_active_list = [efpc for efpc in extra_filtered_potential_candidates if "status" not in efpc.data or efpc.data.status == ecwtui.InputStatus.ACTIVE]
-    all_deleted_id = [efpc["data"]["match_id"] for efpc in extra_filtered_potential_candidates if "status" in efpc.data and efpc.data.status == ecwtui.InputStatus.DELETED]
+    all_active_list = [efpc for efpc in extra_filtered_potential_candidates if "status" not in efpc.data or efpc.data.status == ecwui.InputStatus.ACTIVE]
+    all_deleted_id = [efpc["data"]["match_id"] for efpc in extra_filtered_potential_candidates if "status" in efpc.data and efpc.data.status == ecwui.InputStatus.DELETED]
     # TODO: Replace this with filter and a lambda if we decide not to match by ID after all
     not_deleted_active = [efpc for efpc in all_active_list if efpc["data"]["match_id"] not in all_deleted_id]
     logging.info(f"Found {len(all_active_list)} active entries, {len(all_deleted_id)} deleted entries -> {len(not_deleted_active)} non deleted active entries")
     return not_deleted_active
 
-def get_user_input_for_trip_object(ts, trip_obj, user_input_key):
-    tq = estt.TimeQuery("data.start_ts", trip_obj.data.start_ts, trip_obj.data.end_ts)
+def get_user_input_for_timeline_entry_object(ts, timeline_entry, user_input_key):
+    # timeline_entry can be either a trip or place, so let's check for start/enter or end/exit
+    if (hasattr(timeline_entry.data, 'start_ts')):
+        start = timeline_entry.data.start_ts
+        end = timeline_entry.data.end_ts
+    else:
+        start = timeline_entry.data.enter_ts
+        end = timeline_entry.data.exit_ts
+    tq = estt.TimeQuery("data.start_ts", start, end)
     potential_candidates = ts.find_entries([user_input_key], tq)
-    return final_candidate(valid_user_input(ts, trip_obj), potential_candidates)
+    return final_candidate(valid_user_input(ts, timeline_entry), potential_candidates)
 
 # This is almost an exact copy of get_user_input_for_trip_object, but it
 # retrieves an interable instead of a dataframe. So almost everything is
@@ -185,17 +218,25 @@ def get_user_input_from_cache_series(user_id, trip_obj, user_input_key):
     potential_candidates = estsc.find_entries(user_id, [user_input_key], tq)
     return final_candidate(valid_user_input(ts, trip_obj), potential_candidates)
 
-def get_additions_for_trip_object(ts, trip_obj):
-    tq = estt.TimeQuery("data.start_ts", trip_obj.data.start_ts, trip_obj.data.end_ts)
-    potential_candidates = ts.find_entries(["manual/trip_addition_input"], tq)
-    return get_not_deleted_candidates(valid_user_input(ts, trip_obj), potential_candidates)
+def get_additions_for_timeline_entry_object(ts, timeline_entry):
+    # timeline_entry can be either a trip or place, so let's check for start/enter or end/exit
+    if (hasattr(timeline_entry.data, 'start_ts')):
+        start = timeline_entry.data.start_ts
+        end = timeline_entry.data.end_ts
+    else:
+        start = timeline_entry.data.enter_ts
+        exit_ts = timeline_entry.data.exit_ts
+        end = exit_ts if exit_ts is not None else EPOCH_MAXIMUM
+    tq = estt.TimeQuery("data.start_ts", start, end)
+    potential_candidates = ts.find_entries(["manual/trip_addition_input", "manual/place_addition_input"], tq)
+    return get_not_deleted_candidates(valid_user_input(ts, timeline_entry), potential_candidates)
 
-def valid_trip(ts, user_input):
-    def curried(trip_obj):
-        return valid_user_input_for_trip(ts, trip_obj, user_input)
+def valid_timeline_entry(ts, user_input):
+    def curried(confirmed_obj):
+        return valid_user_input_for_timeline_entry(ts, confirmed_obj, user_input)
     return curried
 
-def get_trip_for_user_input_obj(ts, ui_obj):
+def get_confirmed_obj_for_user_input_obj(ts, ui_obj):
     # the match check that we have is:
     # user input can start after trip start
     # user input can end before trip end OR user input is within 5 mins of trip end
@@ -211,8 +252,12 @@ def get_trip_for_user_input_obj(ts, ui_obj):
     ONE_DAY = 24 * 60 * 60
     tq = estt.TimeQuery("data.start_ts", ui_obj.data.start_ts - ONE_DAY,
         ui_obj.data.start_ts + ONE_DAY)
-    potential_candidates = ts.find_entries(["analysis/confirmed_trip"], tq)
-    return final_candidate(valid_trip(ts, ui_obj), potential_candidates)
+    trip_candidates = ts.find_entries(["analysis/confirmed_trip"], tq)
+    # We should also consider places in this same time range as candidates
+    tq.timeType = "data.enter_ts"
+    place_candidates = ts.find_entries(["analysis/confirmed_place"], tq)
+    potential_candidates = itertools.chain(trip_candidates, place_candidates)
+    return final_candidate(valid_timeline_entry(ts, ui_obj), potential_candidates)
 
 def filter_labeled_trips(mixed_trip_df):
     """
