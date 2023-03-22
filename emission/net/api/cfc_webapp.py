@@ -498,10 +498,6 @@ def resolve_auth(auth_method):
                 f"for {dynamic_config['intro']['translated_text']['en']['deployment_name']} "\
                 f"and data collection URL {dynamic_config['server']['connectUrl']}")
 
-            if STUDY_CONFIG.startswith('stage-'):
-                logging.debug("On staging, use token_list for testing purposes")
-                return "token_list"
-
             elif dynamic_config["intro"]["program_or_study"] == "program":
                 logging.debug("is a program set auth_method to token_list")
                 return "token_list"
