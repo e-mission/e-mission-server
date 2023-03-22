@@ -93,8 +93,9 @@ def create_composite_objects(user_id):
         if "confirmed_place" not in ct["data"]:
             cleaned_place = esda.get_entry(esda.CLEANED_PLACE_KEY, ct["data"]["end_place"])
             confirmed_place_entry = create_confirmed_place_entry(ts, cleaned_place)
-            ts.insert(confirmed_place_entry)
-            ct["data"]["confirmed_place"] = confirmed_place_entry["_id"]
+            cpeid = ts.insert(confirmed_place_entry)
+            ct["data"]["confirmed_place"] = cpeid
+            logging.debug("Setting the confirmed_place key to the newly created id %s" % cpeid)
             import emission.storage.timeseries.builtin_timeseries as estbt
             estbt.BuiltinTimeSeries.update(ct)
 
