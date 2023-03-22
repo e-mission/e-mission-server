@@ -30,6 +30,7 @@ import requests
 import traceback
 import urllib.request, urllib.error, urllib.parse
 import bson.json_util
+from bson.binary import UuidRepresentation
 
 # Our imports
 import emission.net.api.visualize as visualize
@@ -529,7 +530,7 @@ if __name__ == '__main__':
     for plugin in app.plugins:
         if isinstance(plugin, JSONPlugin):
             print("Replaced json_dumps in plugin with the one from bson")
-            plugin.json_dumps = bson.json_util.dumps
+            plugin.json_dumps = lambda s: bson.json_util.dumps(s, json_options = bson.json_util.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
 
     print("Changing bt.json_loads from %s to %s" % (bt.json_loads, bson.json_util.loads))
     bt.json_loads = bson.json_util.loads

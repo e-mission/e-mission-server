@@ -100,7 +100,8 @@ def filter_accuracy(user_id):
                 logging.debug("Partial filtered points %d found" % len(filtered_points_df))
                 filtered_points_df = filtered_points_df[SEL_FIELDS_FOR_DUP]
                 filtered_points_df["msts"] = filtered_points_df.ts.apply(lambda x: int(x * 10**3))
-                matched_points_df = filtered_from_unfiltered_df.merge(filtered_points_df, on="msts", right_index=True)
+                matched_points_df = filtered_from_unfiltered_df.reset_index().merge(filtered_points_df, on="msts")
+                matched_points_df.set_index('index', inplace=True)
                 to_insert_df = filtered_from_unfiltered_df.drop(index=matched_points_df.index)
             for idx, entry in to_insert_df.iterrows():
                 unfiltered_entry = unfiltered_points_list[idx]
