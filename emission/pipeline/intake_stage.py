@@ -2,6 +2,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import division
 from __future__ import absolute_import
+import emission.analysis.plotting.composite_trip_creation
 from future import standard_library
 standard_library.install_aliases()
 from builtins import str
@@ -187,7 +188,7 @@ def run_intake_pipeline_for_user(uuid):
         with ect.Timer() as crt:
             logging.info("*" * 10 + "UUID %s: creating composite objects " % uuid + "*" * 10)
             print(str(arrow.now()) + "*" * 10 + "UUID %s: creating composite objects " % uuid + "*" * 10)
-            eaum.create_composite_objects(uuid)
+            emission.analysis.plotting.composite_trip_creation.create_composite_objects(uuid)
 
         esds.store_pipeline_time(uuid, ecwp.PipelineStages.CREATE_COMPOSITE_OBJECTS.name,
                                  time.time(), crt.elapsed)
