@@ -93,10 +93,11 @@ class TestTripQueries(unittest.TestCase):
         """
         MODE_CONFIRM_KEY = "manual/mode_confirm"
 
-        new_trip = self.create_fake_trip()
+        new_trip = self.create_fake_trip() # dummy trip with start_ts = 5, end_ts = 6
         new_mc = ecul.Userlabel()
-        new_mc["start_ts"] = new_trip.data.start_ts + .25
-        new_mc["end_ts"] = new_trip.data.end_ts + .25
+        # https://github.com/shankari/e-mission-server/pull/4/commits/1cc481eca023b924c56bab8bcdf25200c9ba8809
+        new_mc["start_ts"] = new_trip.data.start_ts + .25 # input start must be after 5 but before 6
+        new_mc["end_ts"] = new_trip.data.end_ts + .25 # input end can lag behind the end of the trip
         new_mc["label"] = "roller_blading"
         new_mce = ecwe.Entry.create_entry(self.testUserId, MODE_CONFIRM_KEY, new_mc)
         new_mce["metadata"]["type"] = "message"
@@ -113,10 +114,11 @@ class TestTripQueries(unittest.TestCase):
         """
         MODE_CONFIRM_KEY = "manual/mode_confirm"
 
-        new_trip = self.create_fake_trip()
+        new_trip = self.create_fake_trip() # dummy trip with start_ts = 5, end_ts = 6
         new_mc = ecul.Userlabel()
-        new_mc["start_ts"] = new_trip.data.start_ts + .25
-        new_mc["end_ts"] = new_trip.data.end_ts + .25
+        # https://github.com/shankari/e-mission-server/pull/4/commits/1cc481eca023b924c56bab8bcdf25200c9ba8809
+        new_mc["start_ts"] = new_trip.data.start_ts + .25 # input start must be after 5 but before 6
+        new_mc["end_ts"] = new_trip.data.end_ts + .25 # input end can lag behind the end of the trip
         new_mc["label"] = "pogo_sticking"
         ts = esta.TimeSeries.get_time_series(self.testUserId)
         ts.insert_data(self.testUserId, MODE_CONFIRM_KEY, new_mc) 
@@ -132,10 +134,11 @@ class TestTripQueries(unittest.TestCase):
         """
         MODE_CONFIRM_KEY = "manual/mode_confirm"
 
-        new_trip = self.create_fake_trip()
+        new_trip = self.create_fake_trip() # dummy trip with start_ts = 5, end_ts = 6
         new_mc = ecul.Userlabel()
-        new_mc["start_ts"] = new_trip.data.start_ts + .25
-        new_mc["end_ts"] = new_trip.data.end_ts + .25
+        # https://github.com/shankari/e-mission-server/pull/4/commits/1cc481eca023b924c56bab8bcdf25200c9ba8809
+        new_mc["start_ts"] = new_trip.data.start_ts + .25 # input start must be after 5 but before 6
+        new_mc["end_ts"] = new_trip.data.end_ts + .25 # input end can lag behind the end of the trip
         new_mc["label"] = "roller_blading"
         new_mce = ecwe.Entry.create_entry(self.testUserId, MODE_CONFIRM_KEY, new_mc)
         new_mce["metadata"]["type"] = "message"
@@ -170,10 +173,11 @@ class TestTripQueries(unittest.TestCase):
 
         ts = esta.TimeSeries.get_time_series(self.testUserId)
 
-        new_trip = self.create_fake_trip()
+        new_trip = self.create_fake_trip() # dummy trip with start_ts = 5, end_ts = 6
         new_mc = ecul.Userlabel()
-        new_mc["start_ts"] = new_trip.data.start_ts + .25
-        new_mc["end_ts"] = new_trip.data.end_ts + .25
+        # https://github.com/shankari/e-mission-server/pull/4/commits/1cc481eca023b924c56bab8bcdf25200c9ba8809
+        new_mc["start_ts"] = new_trip.data.start_ts + .25 # input start must be after 5 but before 6
+        new_mc["end_ts"] = new_trip.data.end_ts + .25 # input end can lag behind the end of the trip
         new_mc["label"] = "car"
         ts.insert_data(self.testUserId, MODE_CONFIRM_KEY, new_mc) 
         user_input = esdt.get_user_input_for_trip(esda.RAW_TRIP_KEY, self.testUserId,
