@@ -236,27 +236,31 @@ def valid_timeline_entry(ts, user_input):
         return valid_user_input_for_timeline_entry(ts, confirmed_obj, user_input)
     return curried
 
+# Find the trip or place that the user input belongs to to
 def get_confirmed_obj_for_user_input_obj(ts, ui_obj):
     # the match check that we have is:
-    # user input can start after trip start
-    # user input can end before trip end OR user input is within 5 mins of trip end
-    # Given those considerations, there is no principled query for trip data
+    # user input can start after trip/place start
+    # user input can end before trip/place end OR within 15 minutes after
+    # Given those considerations, there is no principled query for trip/place data
     # that fits into our query model
-    # the trip start is before the user input start, but that can go until eternity
-    # and the trip end can be either before or after the user input end
-    # we know that the trip end is after the user input start, but again, that
+    # the trip/place start is before the user input start, but that can go until eternity
+    # and the trip/place end can be either before or after the user input end
+    # we know that the trip/place end is after the user input start, but again, that
     # can go on until now.
-    # As a workaround, let us assume that the trip start is no more than a day
+    # As a workaround, let us assume that the trip/place start is no more than a day
     # before the start of the ui object, which seems like a fairly conservative
     # assumption
     ONE_DAY = 24 * 60 * 60
     tq = estt.TimeQuery("data.start_ts", ui_obj.data.start_ts - ONE_DAY,
         ui_obj.data.start_ts + ONE_DAY)
-    trip_candidates = ts.find_entries(["analysis/confirmed_trip"], tq)
-    # We should also consider places in this same time range as candidates
-    tq.timeType = "data.enter_ts"
-    place_candidates = ts.find_entries(["analysis/confirmed_place"], tq)
-    potential_candidates = itertools.chain(trip_candidates, place_candidates)
+    if ui_obj['metadata']['key'] == 'manual/trip_user_input':
+        potential_candidates = ts.find_entries(["analysis/confirmed_trip"], tq)
+    elif ui_obj['metadata']['key'] == 'manual/place_user_input':
+        # if place, we'll query the same time range, but with 'enter_ts'
+        tq.timeType = "data.enter_ts"
+        potential_candidates = ts.find_entries(["analysis/confirmed_place"], tq)
+    else:
+        raise ValueError("Unknown user input key %s" % ui_obj['metadata']['key'])
     return final_candidate(valid_timeline_entry(ts, ui_obj), potential_candidates)
 
 def filter_labeled_trips(mixed_trip_df):
