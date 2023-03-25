@@ -165,6 +165,8 @@ def final_candidate(filter_fn, potential_candidates):
     # input before the pipeline is run, and then overwrites after pipeline is
     # run
     sorted_pc = sorted(extra_filtered_potential_candidates, key=lambda c:c["metadata"]["write_ts"])
+    
+    # for debug logs, we'll print out label if it exists; else use the start or enter time of the input
     entry_detail = lambda c: getattr(c.data, "label", \
                                 getattr(c.data, "start_fmt_time", \
                                 getattr(c.data, "enter_fmt_time", None)))
