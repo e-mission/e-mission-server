@@ -244,14 +244,17 @@ def get_confirmed_obj_for_user_input_obj(ts, ui_obj):
     ONE_DAY = 24 * 60 * 60
     tq = estt.TimeQuery("data.start_ts", ui_obj.data.start_ts - ONE_DAY,
         ui_obj.data.start_ts + ONE_DAY)
-    if ui_obj['metadata']['key'] == 'manual/trip_user_input':
-        potential_candidates = ts.find_entries(["analysis/confirmed_trip"], tq)
-    elif ui_obj['metadata']['key'] == 'manual/place_user_input':
+    
+    # iff the input's key is one of these, the input belongs on a place
+    # all other keys are only used for trip inputs
+    place_keys = ["manual/place_user_input", "manual/place_addition_input"]
+    if ui_obj['metadata']['key'] in place_keys:
         # if place, we'll query the same time range, but with 'enter_ts'
         tq.timeType = "data.enter_ts"
         potential_candidates = ts.find_entries(["analysis/confirmed_place"], tq)
     else:
-        raise ValueError("Unknown user input key %s" % ui_obj['metadata']['key'])
+        potential_candidates = ts.find_entries(["analysis/confirmed_trip"], tq)
+
     return final_candidate(valid_timeline_entry(ts, ui_obj), potential_candidates)
 
 def filter_labeled_trips(mixed_trip_df):
