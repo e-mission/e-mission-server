@@ -162,7 +162,7 @@ def get_confirmed_place_for_confirmed_trip(ct):
 def get_user_input_dict(ts, tct, input_key_list):
     tct_userinput = {}
     for ikey in input_key_list:
-        matched_userinput = esdt.get_user_input_for_timeline_entry_object(ts, tct, ikey)
+        matched_userinput = esdt.get_user_input_for_timeline_entry(ts, tct, ikey)
         if matched_userinput is not None:
             ikey_name = obj_to_dict_key(ikey)
             if ikey_name == "trip_user_input" or ikey_name == "place_user_input":

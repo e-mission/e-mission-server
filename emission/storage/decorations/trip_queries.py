@@ -25,6 +25,10 @@ import emission.storage.decorations.analysis_timeseries_queries as esda
 
 EPOCH_MAXIMUM = 2**31 - 1
 
+# helpers for getting start/enter and end/exit times of a trip/place
+begin_of = lambda te: te['data'].get('start_ts', te['data'].get('enter_ts'))
+end_of = lambda te: te['data'].get('end_ts', te['data'].get('exit_ts'))
+
 def get_raw_sections_for_trip(user_id, trip_id):
     return get_sections_for_trip("segmentation/raw_section", user_id, trip_id)
 
@@ -90,7 +94,7 @@ def _get_next_cleaned_timeline_entry(ts, tl_entry):
 def get_user_input_for_trip(trip_key, user_id, trip_id, user_input_key):
     ts = esta.TimeSeries.get_time_series(user_id)
     trip_obj = ts.get_entry_from_id(trip_key, trip_id)
-    return get_user_input_for_timeline_entry_object(ts, trip_obj, user_input_key)
+    return get_user_input_for_timeline_entry(ts, trip_obj, user_input_key)
 
 # Additional checks to be consistent with the phone code
 # www/js/diary/services.js
@@ -101,17 +105,12 @@ def valid_user_input_for_timeline_entry(ts, tl_entry, user_input):
     # but the confirm objects are not necessarily filled out
     fmt_ts = lambda ts, tz: arrow.get(ts).to(tz)
 
-    if hasattr(tl_entry.data, 'start_ts'):
-        entry_start = tl_entry.data.start_ts
-    else:
-        entry_start = tl_entry.data.enter_ts
-    if hasattr(tl_entry.data, 'end_ts'):
-        entry_end = tl_entry.data.end_ts
-    else:
-        entry_end = tl_entry.data.exit_ts
-        # if a place has no exit time, the user hasn't left there yet
+    entry_start = begin_of(tl_entry)
+    entry_end = end_of(tl_entry)
+    if entry_end is None:
+        # a place will have no exit time if the user hasn't left there yet
         # so we will set the end time as high as possible for the purpose of comparison
-        entry_end = EPOCH_MAXIMUM if entry_end is None else entry_end
+        entry_end = EPOCH_MAXIMUM
 
     logging.debug("Comparing user input %s: %s -> %s, trip %s -> %s, start checks are (%s && %s) and end checks are (%s || %s)" % (
         user_input.data.label,
@@ -131,11 +130,7 @@ def valid_user_input_for_timeline_entry(ts, tl_entry, user_input):
         logging.debug("Handling corner case where start check matches, but end check does not")
         next_entry_obj = _get_next_cleaned_timeline_entry(ts, tl_entry)
         if next_entry_obj is not None:
-            if hasattr(next_entry_obj.data, 'end_ts'):
-                next_entry_end = next_entry_obj.data.end_ts
-            elif hasattr(next_entry_obj.data, 'exit_ts'):
-                next_entry_end = next_entry_obj.data.exit_ts
-
+            next_entry_end = end_of(next_entry_obj)
             if next_entry_end is None: # the last place will not have an exit_ts
                 end_checks = True # so we will just skip the end check
             else:
@@ -195,15 +190,18 @@ def get_not_deleted_candidates(filter_fn, potential_candidates):
     logging.info(f"Found {len(all_active_list)} active entries, {len(all_deleted_id)} deleted entries -> {len(not_deleted_active)} non deleted active entries")
     return not_deleted_active
 
-def get_user_input_for_timeline_entry_object(ts, timeline_entry, user_input_key):
-    # timeline_entry can be either a trip or place, so let's check for start/enter or end/exit
-    if (hasattr(timeline_entry.data, 'start_ts')):
-        start = timeline_entry.data.start_ts
-        end = timeline_entry.data.end_ts
-    else:
-        start = timeline_entry.data.enter_ts
-        end = timeline_entry.data.exit_ts
-    tq = estt.TimeQuery("data.start_ts", start, end)
+def get_time_query_for_timeline_entry(timeline_entry):
+    begin_of_entry = begin_of(timeline_entry)
+    end_of_entry = end_of(timeline_entry)
+    timeType = "data.start_ts" if "start_ts" in timeline_entry.data else "data.enter_ts"
+    if end_of_entry is None:
+        # the last place (user's current place) will not have an exit_ts, so
+        # every input from its enter_ts onward is fair game
+        end_of_entry = EPOCH_MAXIMUM
+    return estt.TimeQuery(timeType, begin_of_entry, end_of_entry)
+
+def get_user_input_for_timeline_entry(ts, timeline_entry, user_input_key):
+    tq = get_time_query_for_timeline_entry(timeline_entry)
     potential_candidates = ts.find_entries([user_input_key], tq)
     return final_candidate(valid_user_input(ts, timeline_entry), potential_candidates)
 
@@ -212,23 +210,16 @@ def get_user_input_for_timeline_entry_object(ts, timeline_entry, user_input_key)
 # different and it is hard to unify the implementations. Switching the existing
 # function from get_data_df to find_entries may help us unify in the future
 
-def get_user_input_from_cache_series(user_id, trip_obj, user_input_key):
-    tq = estt.TimeQuery("data.start_ts", trip_obj.data.start_ts, trip_obj.data.end_ts)
+def get_user_input_from_cache_series(user_id, timeline_entry, user_input_key):
     ts = esta.TimeSeries.get_time_series(user_id)
+    tq = get_time_query_for_timeline_entry(timeline_entry)
     potential_candidates = estsc.find_entries(user_id, [user_input_key], tq)
-    return final_candidate(valid_user_input(ts, trip_obj), potential_candidates)
+    return final_candidate(valid_user_input(ts, timeline_entry), potential_candidates)
 
 def get_additions_for_timeline_entry_object(ts, timeline_entry):
-    # timeline_entry can be either a trip or place, so let's check for start/enter or end/exit
-    if (hasattr(timeline_entry.data, 'start_ts')):
-        start = timeline_entry.data.start_ts
-        end = timeline_entry.data.end_ts
-    else:
-        start = timeline_entry.data.enter_ts
-        exit_ts = timeline_entry.data.exit_ts
-        end = exit_ts if exit_ts is not None else EPOCH_MAXIMUM
-    tq = estt.TimeQuery("data.start_ts", start, end)
-    potential_candidates = ts.find_entries(["manual/trip_addition_input", "manual/place_addition_input"], tq)
+    addition_keys = ["manual/trip_addition_input", "manual/place_addition_input"]
+    tq = get_time_query_for_timeline_entry(timeline_entry)
+    potential_candidates = ts.find_entries(addition_keys, tq)
     return get_not_deleted_candidates(valid_user_input(ts, timeline_entry), potential_candidates)
 
 def valid_timeline_entry(ts, user_input):
