@@ -2,7 +2,6 @@ from __future__ import print_function
 from __future__ import unicode_literals
 from __future__ import division
 from __future__ import absolute_import
-import emission.analysis.plotting.composite_trip_creation
 # Standard imports
 from future import standard_library
 standard_library.install_aliases()
@@ -185,6 +184,7 @@ def runIntakePipeline(uuid):
     import emission.analysis.classification.inference.mode.pipeline as eacimp
     import emission.analysis.userinput.expectations as eaue
     import emission.analysis.classification.inference.labels.pipeline as eacilp
+    import emission.analysis.plotting.composite_trip_creation as eapcc
 
     eaum.match_incoming_user_inputs(uuid)
     eaicf.filter_accuracy(uuid)
@@ -196,7 +196,7 @@ def runIntakePipeline(uuid):
     eacilp.infer_labels(uuid)
     eaue.populate_expectations(uuid)
     eaum.create_confirmed_objects(uuid)
-    emission.analysis.plotting.composite_trip_creation.create_composite_objects(uuid)
+    eapcc.create_composite_objects(uuid)
 
 def configLogging():
     """
