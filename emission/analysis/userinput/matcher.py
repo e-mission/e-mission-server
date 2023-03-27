@@ -5,7 +5,6 @@ import copy
 import emission.analysis.config as eac
 
 import emission.storage.timeseries.abstract_timeseries as esta
-import emission.storage.timeseries.timequery as estt
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.decorations.trip_queries as esdt
 import emission.storage.pipeline_queries as epq
@@ -75,59 +74,6 @@ def handle_multi_non_deleted_match(confirmed_obj, ui):
     else:
         # TODO: Decide whether to error or to warn here
         logging.warn("Invalid status found in user input %s, moving forward anyway" % ui)
-
-def create_composite_objects(user_id):
-    time_query = epq.get_time_range_for_composite_object_creation(user_id)
-    ts = esta.TimeSeries.get_time_series(user_id)
-    confirmedTrips = esda.get_entries(esda.CONFIRMED_TRIP_KEY, user_id, time_query=time_query)
-    logging.info("Creating composite trips from %d confirmed trips" % len(confirmedTrips))
-    if len(confirmedTrips) == 0:
-        logging.debug("len(confirmedTrips) == 0, early return")
-        return None
-
-    last_done_ts = None
-    for ct in confirmedTrips:
-        # Before confirmed_place was introduced, we created confirmed_trips without a confirmed_place
-        # For those trips, we will generate a confirmed_place just-in-time and add its ID to the trip
-        # Once every trip has a confirmed_place, we can remove this code
-        if "confirmed_place" not in ct["data"]:
-            cleaned_place = esda.get_entry(esda.CLEANED_PLACE_KEY, ct["data"]["end_place"])
-            confirmed_place_entry = create_confirmed_place_entry(ts, cleaned_place)
-            cpeid = ts.insert(confirmed_place_entry)
-            ct["data"]["confirmed_place"] = cpeid
-            logging.debug("Setting the confirmed_place key to the newly created id %s" % cpeid)
-            import emission.storage.timeseries.builtin_timeseries as estbt
-            estbt.BuiltinTimeSeries.update(ct)
-
-        logging.info("End place type for trip is %s" %  type(ct.data.end_place))
-        composite_trip_dict = copy.copy(ct)
-        del composite_trip_dict["_id"]
-        composite_trip_dict["metadata"]["key"] = "analysis/composite_trip"
-
-        # confirmed_trip has an id for its corresponding confirmed_place
-        # for composite_trip, we want to get the actual confirmed_place object
-        confirmed_place_id = ct["data"]["confirmed_place"]
-        confirmed_place = esda.get_entry(esda.CONFIRMED_PLACE_KEY, confirmed_place_id)
-        composite_trip_dict["data"]["confirmed_place"] = confirmed_place
-
-        # retrieve locations for the trajectory of the trip
-        time_query = estt.TimeQuery("data.ts", ct["data"]["start_ts"], ct["data"]["end_ts"])
-        locations = esda.get_entries(esda.CLEANED_LOCATION_KEY, user_id, time_query=time_query)
-        max_entries = 100; # we will downsample to 100 locations
-        if len(locations) > max_entries:
-            logging.debug('Downsampling to %d points' % max_entries)
-            sample_rate = len(locations)//max_entries + 1
-            locations = locations[::sample_rate]
-        composite_trip_dict["data"]["locations"] = locations
-
-        # later we will want to put section & modes in composite_trip as well
-
-        composite_trip_entry = ecwe.Entry(composite_trip_dict)
-        # save the entry
-        ts.insert(composite_trip_entry)
-        last_done_ts = confirmed_place["data"]["enter_ts"]
-
-    epq.mark_composite_object_creation_done(user_id, last_done_ts)
 
 def create_confirmed_objects(user_id):
     time_query = epq.get_time_range_for_confirmed_object_creation(user_id)
@@ -208,10 +154,15 @@ def create_confirmed_trips(user_id, timerange, processed_places):
 
     return lastTripProcessed
 
+def get_confirmed_place_for_confirmed_trip(ct):
+    # confirmed_trip already has an id for its confirmed_place we can lookup
+    confirmed_place_id = ct["data"]["confirmed_place"]
+    return esda.get_entry(esda.CONFIRMED_PLACE_KEY, confirmed_place_id)
+
 def get_user_input_dict(ts, tct, input_key_list):
     tct_userinput = {}
     for ikey in input_key_list:
-        matched_userinput = esdt.get_user_input_for_timeline_entry_object(ts, tct, ikey)
+        matched_userinput = esdt.get_user_input_for_timeline_entry(ts, tct, ikey)
         if matched_userinput is not None:
             ikey_name = obj_to_dict_key(ikey)
             if ikey_name == "trip_user_input" or ikey_name == "place_user_input":

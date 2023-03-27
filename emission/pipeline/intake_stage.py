@@ -32,6 +32,7 @@ import emission.analysis.intake.cleaning.clean_and_resample as eaicr
 import emission.analysis.classification.inference.mode.pipeline as eacimp
 import emission.analysis.classification.inference.labels.pipeline as eacilp
 import emission.analysis.userinput.expectations as eaue
+import emission.analysis.plotting.composite_trip_creation as eapcc
 import emission.net.ext_service.habitica.executor as autocheck
 
 import emission.storage.decorations.stats_queries as esds
@@ -187,7 +188,7 @@ def run_intake_pipeline_for_user(uuid):
         with ect.Timer() as crt:
             logging.info("*" * 10 + "UUID %s: creating composite objects " % uuid + "*" * 10)
             print(str(arrow.now()) + "*" * 10 + "UUID %s: creating composite objects " % uuid + "*" * 10)
-            eaum.create_composite_objects(uuid)
+            eapcc.create_composite_objects(uuid)
 
         esds.store_pipeline_time(uuid, ecwp.PipelineStages.CREATE_COMPOSITE_OBJECTS.name,
                                  time.time(), crt.elapsed)
