@@ -5,7 +5,6 @@ from __future__ import absolute_import
 from future import standard_library
 standard_library.install_aliases()
 from builtins import *
-from past.utils import old_div
 from builtins import object
 import logging
 
@@ -199,7 +198,7 @@ def create_places_and_trips(user_id, segmentation_points, segmentation_method_na
         new_place_entry = ecwe.Entry.create_entry(user_id,
                             "segmentation/raw_place", new_place, create_id = True)
 
-        if found_untracked_period(ts, last_place_entry.data, start_loc):
+        if found_untracked_period(ts, last_place_entry.data, start_loc, segmentation_method_name):
             # Fill in the gap in the chain with an untracked period
             curr_untracked = ecwut.Untrackedtime()
             curr_untracked.source = segmentation_method_name
@@ -239,7 +238,7 @@ def _link_and_save(ts, last_place_entry, curr_trip_entry, new_place_entry, start
     # it will be lost
     ts.update(last_place_entry)
 
-def found_untracked_period(timeseries, last_place, start_loc):
+def found_untracked_period(timeseries, last_place, start_loc, segmentation_method_name):
     """
     Check to see whether the two places are the same.
     This is a fix for https://github.com/e-mission/e-mission-server/issues/378
@@ -262,17 +261,20 @@ def found_untracked_period(timeseries, last_place, start_loc):
     transition_distance = ecc.calDistance(last_place.location.coordinates,
                        start_loc.loc.coordinates)
     logging.debug("while determining new_start_place, transition_distance = %s" % transition_distance)
-    if transition_distance < 1000:
-        logging.debug("transition_distance %s < 1000, returning False", transition_distance)
+    distance_thresholds = {"DwellSegmentationDistFilter": 1200, "DwellSegmentationTimeFilter": 2500}
+    curr_os_distance_threshold = distance_thresholds[segmentation_method_name]
+    if transition_distance < curr_os_distance_threshold:
+        logging.debug("transition_distance %s < %s for method %s, returning False",
+            (transition_distance, curr_os_distance_threshold, segmentation_method_name))
         return False
 
     time_delta = start_loc.ts - last_place.enter_ts
-    transition_speed = old_div(transition_distance, time_delta)
+    transition_speed = transition_distance / time_delta
     logging.debug("while determining new_start_place, time_delta = %s, transition_speed = %s"
                   % (time_delta, transition_speed))
 
     # Let's use a little less than walking speed 3km/hr < 3mph (4.83 kmph)
-    speed_threshold = old_div(float(3000), (60*60))
+    speed_threshold = 3000 / (60*60)
 
     if transition_speed > speed_threshold:
         logging.debug("transition_speed %s > %s, returning False" %
