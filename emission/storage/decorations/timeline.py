@@ -47,7 +47,7 @@ def get_confirmed_timeline(user_id, start_ts, end_ts,
                         start_ts, end_ts, geojson, extra_query_list)
 
 def get_timeline(user_id, place_key, trip_key, untracked_key, start_ts, end_ts,
-                 geojson=None, extra_query_list=None):
+                 geojson=None, extra_query_list=None, trip_id_key=None):
     logging.info("About to query for timestamps %s -> %s" % (start_ts, end_ts))
     """
     Return a timeline of the trips and places from this start timestamp to this end timestamp.
@@ -85,7 +85,7 @@ def get_timeline(user_id, place_key, trip_key, untracked_key, start_ts, end_ts,
         logging.debug("Considering trip %s: %s -> %s " % (trip.get_id(),
                         trip.data.start_fmt_time, trip.data.end_fmt_time))
 
-    return Timeline(place_key, trip_key, places_entries, trips_entries)
+    return Timeline(place_key, trip_key, places_entries, trips_entries, trip_id_key=trip_id_key)
 
 def get_timeline_from_dt(user_id, place_key, trip_key, untracked_key,
                          start_local_dt, end_local_dt,
@@ -139,7 +139,14 @@ class Timeline(object):
 
 
     def __init__(self, place_or_stop_key, trip_or_section_key,
-                 places_or_stops_entries, trips_or_sections_entries):
+                 places_or_stops_entries, trips_or_sections_entries, trip_id_key=None):
+        """
+        :param trip_id_key: We may want to identify trips by a different key than their '_id'.
+                            For example, if we want a timeseries of CLEANED_PLACE and EXPECTED_TRIP,
+                            we will need to identify the expected trips by their 'cleaned_trip' key
+                            because this is what the cleaned places refer to.
+                            If this is None, we just use the usual '_id'.
+        """
         logging.debug("keys = (%s, %s), len(places) = %s, len(trips) = %s" %
                       (place_or_stop_key, trip_or_section_key,
                        len(places_or_stops_entries), len(trips_or_sections_entries)))
@@ -153,7 +160,11 @@ class Timeline(object):
         self.places = places_or_stops_entries
         self.trips = trips_or_sections_entries
         self.id_map = dict((p.get_id(), p) for p in self.places)
-        self.id_map.update(dict((t.get_id(), t) for t in self.trips))
+        if trip_id_key:
+            trip_ids = [(t['data'][trip_id_key], t) for t in self.trips if trip_id_key in t['data']]
+            self.id_map.update(dict(trip_ids))
+        else:
+            self.id_map.update(dict((t.get_id(), t) for t in self.trips))
 
         if (len(self.places) == 0) and (len(self.trips) == 0):
             self.state = Timeline.State("none", None)
