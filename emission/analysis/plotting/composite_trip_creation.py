@@ -45,15 +45,13 @@ def create_composite_objects(user_id):
         ts = esta.TimeSeries.get_time_series(user_id)
         # composite trips are created from both confirmed trips and cleaned untracked trips
         triplikeEntries = ts.find_entries([esda.CONFIRMED_TRIP_KEY, esda.CLEANED_UNTRACKED_KEY], time_query=time_query)
-        logging.info("Creating composite trips from triplike entries")
-        if not any(triplikeEntries):
-            logging.debug("confirmedTrips is empty, early return")
-            return None
-
         last_done_ts = None
-        for t in triplikeEntries:
-            last_done_ts = create_composite_trip(ts, t)
-
+        if any(triplikeEntries):
+            logging.debug("Creating composite trips from triplike entries")
+            for t in triplikeEntries:
+                last_done_ts = create_composite_trip(ts, t)
+        else:
+            logging.debug("No new triplikeEntries to process, timestamp is unchanged")
         epq.mark_composite_object_creation_done(user_id, last_done_ts)
     except:
         logging.exception("Error while creating composite objects, timestamp is unchanged")
