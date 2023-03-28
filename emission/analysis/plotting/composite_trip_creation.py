@@ -45,7 +45,7 @@ def create_composite_objects(user_id):
         logging.info("Creating composite trips from %d confirmed trips" % len(confirmedTrips))
         if len(confirmedTrips) == 0:
             logging.debug("len(confirmedTrips) == 0, early return")
-            return None
+            last_done_ts = None
 
         last_done_ts = None
         for ct in confirmedTrips:
