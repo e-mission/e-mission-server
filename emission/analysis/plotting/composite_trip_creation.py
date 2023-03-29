@@ -27,6 +27,7 @@ def create_composite_trip(ts, ct):
     composite_trip_dict = copy.copy(ct)
     del composite_trip_dict["_id"]
     composite_trip_dict["metadata"]["key"] = "analysis/composite_trip"
+    composite_trip_dict["metadata"]["origin_key"] = ct["metadata"]["key"]
 
     if not isUntrackedTime:
         composite_trip_dict["data"]["confirmed_place"] = eaum.get_confirmed_place_for_confirmed_trip(ct)
