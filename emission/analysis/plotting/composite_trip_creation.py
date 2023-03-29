@@ -28,12 +28,10 @@ def create_composite_trip(ts, ct):
     del composite_trip_dict["_id"]
     composite_trip_dict["metadata"]["origin_key"] = ct["metadata"]["key"]
     composite_trip_dict["metadata"]["key"] = "analysis/composite_trip"
-
+    composite_trip_dict["data"]["locations"] = get_locations_for_confirmed_trip(ct)
     if not isUntrackedTime:
         composite_trip_dict["data"]["confirmed_place"] = eaum.get_confirmed_place_for_confirmed_trip(ct)
-        composite_trip_dict["data"]["locations"] = get_locations_for_confirmed_trip(ct)
-        # later we will want to put section & modes in composite_trip as well
-
+    # later we will want to put section & modes in composite_trip as well
     composite_trip_entry = ecwe.Entry(composite_trip_dict)
     ts.insert(composite_trip_entry)
 
@@ -62,6 +60,8 @@ def create_composite_objects(user_id):
 # retrieve locations for the trajectory of the trip
 # downsampled to max_entries (default 100)
 def get_locations_for_confirmed_trip(ct, max_entries=100):
+    if ct["metadata"]["key"] == esda.CLEANED_UNTRACKED_KEY:
+        return [] # untracked time has no locations
     # retrieve locations for the trajectory of the trip
     time_query = estt.TimeQuery("data.ts", ct["data"]["start_ts"], ct["data"]["end_ts"])
     locations = esda.get_entries(esda.CLEANED_LOCATION_KEY, ct['user_id'], time_query=time_query)
