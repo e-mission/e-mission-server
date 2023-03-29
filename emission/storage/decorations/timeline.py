@@ -145,7 +145,8 @@ class Timeline(object):
                             For example, if we want a timeseries of CLEANED_PLACE and EXPECTED_TRIP,
                             we will need to identify the expected trips by their 'cleaned_trip' key
                             because this is what the cleaned places refer to.
-                            If this is None, we just use the usual '_id'.
+                            If this is None, or it is not found on a triplike entry, we just use
+                            the usual '_id'.
         """
         logging.debug("keys = (%s, %s), len(places) = %s, len(trips) = %s" %
                       (place_or_stop_key, trip_or_section_key,
@@ -161,7 +162,8 @@ class Timeline(object):
         self.trips = trips_or_sections_entries
         self.id_map = dict((p.get_id(), p) for p in self.places)
         if trip_id_key:
-            trip_ids = [(t['data'][trip_id_key], t) for t in self.trips if trip_id_key in t['data']]
+            trip_ids = [(t['data'][trip_id_key], t) if trip_id_key in t['data']
+                        else (t.get_id(), t) for t in self.trips]
             self.id_map.update(dict(trip_ids))
         else:
             self.id_map.update(dict((t.get_id(), t) for t in self.trips))
