@@ -720,7 +720,49 @@ class TestPipelineRealData(unittest.TestCase):
             self.assertEqual(len(composite_trips), len(expected_trips))
             for i in range(len(composite_trips)):
                 self.compare_composite_objects(composite_trips[i], expected_trips[i])
-    
+
+    def testShankariNotUntrackedTimeMar21(self):
+        # https://github.com/e-mission/e-mission-docs/issues/870
+        # This data *used to* process with untracked time.
+        # We tweaked the threshold for untracked time, so from now on this data
+        # should process smoothly into a continuous sequence of confirmed trips.
+        # https://github.com/e-mission/e-mission-server/commit/df9d9f0844eedcf7405d88afe9da1b02ee365986
+        dataFile = "emission/tests/data/real_examples/shankari_not_untracked_time_mar_21"
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        for ct in composite_trips:
+            # for this data, every composite trip should come from a confirmed trip,
+            # NOT from untracked time
+            self.assertEqual(ct['metadata']['origin_key'], 'analysis/confirmed_trip')
+
+    def testShankariNotUntrackedTimeJan15(self):
+        # This data has a reboot, so it should process with 1 instance of untracked time
+        dataFile = "emission/tests/data/real_examples/shankari_untracked_time_jan_15_reboot_multi_day"
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        countUntrackedTime = 0
+        for ct in composite_trips:
+            if ct['metadata']['origin_key'] == 'analysis/cleaned_untracked':
+                countUntrackedTime += 1
+        self.assertEqual(countUntrackedTime, 1)
+
+    def testShankariUntrackedTimeJul20(self):
+        # This data has a large gap, so it should process with 1 instance of untracked time
+        dataFile = "emission/tests/data/real_examples/shankari_untracked_time_jul_20_large_gap"
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        countUntrackedTime = 0
+        for ct in composite_trips:
+            if ct['metadata']['origin_key'] == 'analysis/cleaned_untracked':
+                countUntrackedTime += 1
+        self.assertEqual(countUntrackedTime, 1)
+
 if __name__ == '__main__':
     etc.configLogging()
 
