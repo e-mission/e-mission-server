@@ -102,13 +102,13 @@ def create_confirmed_objects(user_id):
                 logging.debug("Creating confirmed place")
                 cp_id = ts.insert(cPlace)
                 if cTrip:
-                    logging.debug("Found trip that came before place, inserting confirmed trip with confirmed place id")
+                    logging.debug("Trip was before place, inserting confirmed trip with confirmed place id")
                     cTrip['data']['confirmed_place'] = cp_id
                     ts.insert(cTrip)
                 elif untracked:
-                    logging.debug("Found place that follows untracked time, confirmed trip will not be created")
+                    logging.debug("Untracked time was before place, confirmed trip will not be created")
                 else:
-                    logging.error("Found place that does not follow triplike")
+                    logging.error("There was no triplike object before the place")
                 last_processed_ts = cPlace['data']['enter_ts']
                 cTrip = cPlace = untracked = False
 
