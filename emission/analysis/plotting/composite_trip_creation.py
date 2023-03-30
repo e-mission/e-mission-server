@@ -29,6 +29,9 @@ def create_composite_trip(ts, ct):
     composite_trip_dict["metadata"]["origin_key"] = ct["metadata"]["key"]
     composite_trip_dict["metadata"]["key"] = "analysis/composite_trip"
     composite_trip_dict["data"]["locations"] = get_locations_for_confirmed_trip(ct)
+    # The place that follows untracked time has a duration of 0.
+    # Thus, we are not going to consider it eligible for additions or user input,
+    # and so untracked composite objects will not have a confirmed_place.
     if not isUntrackedTime:
         composite_trip_dict["data"]["confirmed_place"] = eaum.get_confirmed_place_for_confirmed_trip(ct)
     # later we will want to put section & modes in composite_trip as well
