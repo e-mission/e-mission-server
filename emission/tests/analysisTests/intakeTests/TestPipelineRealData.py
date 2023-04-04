@@ -47,6 +47,7 @@ import emission.core.wrapper.localdate as ecwl
 import emission.net.usercache.abstract_usercache_handler as enuah
 import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
 import emission.storage.timeseries.tcquery as estt
+import emission.storage.timeseries.abstract_timeseries as esta
 import emission.core.common as ecc
 
 # Test imports
@@ -696,6 +697,74 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 1, 'day': 16})
         cacheKey = "diary/trips-2016-01-16"
         self.standardMatchDataGroundTruth(dataFile, start_ld, cacheKey)
+
+    def compare_composite_objects(self, ct, et):
+        self.assertEqual(ct['data']['start_ts'], et['data']['start_ts'])
+        self.assertEqual(ct['data']['end_ts'], et['data']['end_ts'])
+        if 'confirmed_place' in et['data']:
+            self.assertEqual(ct['data']['confirmed_place']['data']['enter_ts'],
+                                et['data']['confirmed_place']['data']['enter_ts'])
+            if 'exit_ts' in et['data']['confirmed_place']:
+                self.assertEqual(ct['data']['confirmed_place']['exit_ts'],
+                                    et['data']['confirmed_place']['exit_ts'])
+        self.assertEqual(len(ct['data']['locations']), len(et['data']['locations']))
+
+    def testJackUntrackedTimeMar12(self):
+        dataFile = "emission/tests/data/real_examples/jack_untracked_time_2023-03-12"
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        with open(dataFile+".expected_composite_trips") as expectation:
+            expected_trips = json.load(expectation, object_hook = bju.object_hook)
+            self.assertEqual(len(composite_trips), len(expected_trips))
+            for i in range(len(composite_trips)):
+                self.compare_composite_objects(composite_trips[i], expected_trips[i])
+
+    def testShankariNotUntrackedTimeMar21(self):
+        # https://github.com/e-mission/e-mission-docs/issues/870
+        # This data *used to* process with untracked time.
+        # We tweaked the threshold for untracked time, so from now on this data
+        # should process smoothly into a continuous sequence of confirmed trips.
+        # https://github.com/e-mission/e-mission-server/commit/df9d9f0844eedcf7405d88afe9da1b02ee365986
+        dataFile = "emission/tests/data/real_examples/shankari_not_untracked_time_mar_21"
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        for ct in composite_trips:
+            # for this data, every composite trip should come from a confirmed trip,
+            # NOT from untracked time
+            self.assertEqual(ct['metadata']['origin_key'], 'analysis/confirmed_trip')
+
+    def testShankariNotUntrackedTimeJan15(self):
+        # This data has a reboot, so it should process with 1 instance of untracked time
+        dataFile = "emission/tests/data/real_examples/shankari_untracked_time_jan_15_reboot_multi_day"
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        countUntrackedTime = 0
+        for ct in composite_trips:
+            if ct['metadata']['origin_key'] == 'analysis/cleaned_untracked':
+                countUntrackedTime += 1
+        self.assertEqual(countUntrackedTime, 1)
+
+    def testShankariUntrackedTimeJul20(self):
+        # This data has a large gap, so it should process with 1 instance of untracked time
+        dataFile = "emission/tests/data/real_examples/shankari_untracked_time_jul_20_large_gap"
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        countUntrackedTime = 0
+        for ct in composite_trips:
+            if ct['metadata']['origin_key'] == 'analysis/cleaned_untracked':
+                cleanUntrackedTime += 1
+            elif ct['metadata']['origin_key'] == 'segmentation/raw_untracked':
+                rawUntrackedTime += 1
+        self.assertEqual(rawUntrackedTime, 1)
+        self.assertEqual(cleanUntrackedTime, 0)
 
 if __name__ == '__main__':
     etc.configLogging()

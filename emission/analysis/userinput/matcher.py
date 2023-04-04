@@ -7,6 +7,7 @@ import emission.analysis.config as eac
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.decorations.trip_queries as esdt
+import emission.storage.decorations.timeline as esdtl
 import emission.storage.pipeline_queries as epq
 import emission.core.wrapper.entry as ecwe
 import emission.core.wrapper.userinput as ecwui
@@ -76,83 +77,60 @@ def handle_multi_non_deleted_match(confirmed_obj, ui):
         logging.warn("Invalid status found in user input %s, moving forward anyway" % ui)
 
 def create_confirmed_objects(user_id):
-    time_query = epq.get_time_range_for_confirmed_object_creation(user_id)
+    tq = epq.get_time_range_for_confirmed_object_creation(user_id)
     try:
-        # we will query the same time range for trips and places,
-        # but querying 'enter_ts' for places and 'end_ts' for trips
-        time_query.timeType = "data.enter_ts"
-        processed_places = create_confirmed_places(user_id, time_query)
-        time_query.timeType = "data.end_ts"
-        last_expected_trip_done = create_confirmed_trips(user_id, time_query, processed_places)
-        if last_expected_trip_done is None:
-            logging.debug("after run, last_expected_trip_done == None, must be early return")
-            epq.mark_confirmed_object_creation_done(user_id, None)
-        else:
-            epq.mark_confirmed_object_creation_done(user_id, last_expected_trip_done.data.end_ts)
+        ts = esta.TimeSeries.get_time_series(user_id)
+        timeline = esdtl.get_timeline(user_id,
+                           esda.CLEANED_PLACE_KEY,
+                           esda.EXPECTED_TRIP_KEY,
+                           esda.CLEANED_UNTRACKED_KEY,
+                           tq.startTs, tq.endTs, trip_id_key='cleaned_trip')
+        keys = eac.get_config()["userinput.keylist"]
+        
+        last_processed_ts = None
+        cTrip = cPlace = untracked = False
+        for tle in timeline:
+            logging.debug("timeline entry = %s" % tle)
+            if tle['metadata']['key'] == esda.CLEANED_PLACE_KEY:
+                cPlace = create_confirmed_entry(ts, tle, esda.CONFIRMED_PLACE_KEY, keys)
+            elif tle['metadata']['key'] == esda.EXPECTED_TRIP_KEY:
+                cTrip = create_confirmed_entry(ts, tle, esda.CONFIRMED_TRIP_KEY, keys)
+            elif tle['metadata']['key'] == esda.CLEANED_UNTRACKED_KEY:
+                untracked = True
 
+            if cPlace:
+                logging.debug("Creating confirmed place")
+                cp_id = ts.insert(cPlace)
+                if cTrip:
+                    logging.debug("Trip was before place, inserting confirmed trip with confirmed place id")
+                    cTrip['data']['confirmed_place'] = cp_id
+                    ts.insert(cTrip)
+                elif untracked:
+                    logging.debug("Untracked time was before place, confirmed trip will not be created")
+                else:
+                    logging.error("There was no triplike object before the place")
+                last_processed_ts = cPlace['data']['enter_ts']
+                cTrip = cPlace = untracked = False
+
+        epq.mark_confirmed_object_creation_done(user_id, last_processed_ts)
     except:
         logging.exception("Error while creating confirmed objects, timestamp is unchanged")
         epq.mark_confirmed_object_creation_failed(user_id)
 
-def create_confirmed_place_entry(ts, tcp):
-    input_key_list = eac.get_config()["userinput.keylist"]
-    # Copy the place and fill in the new values
-    confirmed_place_dict = copy.copy(tcp)
-    del confirmed_place_dict["_id"]
-    confirmed_place_dict["metadata"]["key"] = "analysis/confirmed_place"
-    confirmed_place_dict["data"]["cleaned_place"] = tcp.get_id()
-    confirmed_place_dict["data"]["user_input"] = \
-        get_user_input_dict(ts, tcp, input_key_list)
-    confirmed_place_dict["data"]["additions"] = \
-        esdt.get_additions_for_timeline_entry_object(ts, tcp)
-    return ecwe.Entry(confirmed_place_dict)
-
-def create_confirmed_places(user_id, timerange):
-    ts = esta.TimeSeries.get_time_series(user_id)
-    toConfirmPlaces = esda.get_entries(esda.CLEANED_PLACE_KEY, user_id,
-        time_query=timerange)
-    logging.info("Converting %d cleaned places to confirmed ones" % len(toConfirmPlaces))
-    processed_places = []
-    if len(toConfirmPlaces) == 0:
-        logging.debug("len(toConfirmPlaces) == 0, early return")
-        return None
-    for tcp in toConfirmPlaces:
-        confirmed_place_entry = create_confirmed_place_entry(ts, tcp)
-        # save the entry
-        ts.insert(confirmed_place_entry)
-        # if everything is successful, then update the last successful place
-        processed_places.append(confirmed_place_entry)
-
-    return processed_places
-
-def create_confirmed_trips(user_id, timerange, processed_places):
-    ts = esta.TimeSeries.get_time_series(user_id)
-    toConfirmTrips = esda.get_entries(esda.EXPECTED_TRIP_KEY, user_id,
-        time_query=timerange)
-    logging.debug("Converting %d expected trips to confirmed ones" % len(toConfirmTrips))
-    lastTripProcessed = None
-    if len(toConfirmTrips) == 0:
-        logging.debug("len(toConfirmTrips) == 0, early return")
-        return None
-    input_key_list = eac.get_config()["userinput.keylist"]
-    for i, tct in enumerate(toConfirmTrips):
-        # Copy the trip and fill in the new values
-        confirmed_trip_dict = copy.copy(tct)
-        del confirmed_trip_dict["_id"]
-        confirmed_trip_dict["metadata"]["key"] = "analysis/confirmed_trip"
-        confirmed_trip_dict["data"]["expected_trip"] = tct.get_id()
-        confirmed_trip_dict["data"]["confirmed_place"] = processed_places[i]["_id"]
-        confirmed_trip_dict["data"]["user_input"] = \
-            get_user_input_dict(ts, tct, input_key_list)
-        confirmed_trip_dict["data"]["additions"] = \
-            esdt.get_additions_for_timeline_entry_object(ts, tct)
-        confirmed_trip_entry = ecwe.Entry(confirmed_trip_dict)
-        # save the entry
-        ts.insert(confirmed_trip_entry)
-        # if everything is successful, then update the last successful trip
-        lastTripProcessed = confirmed_trip_entry
-
-    return lastTripProcessed
+def create_confirmed_entry(ts, tce, confirmed_key, input_key_list):
+    # Copy the entry and fill in the new values
+    confirmed_trip_dict = copy.copy(tce)
+    del confirmed_trip_dict["_id"]
+    confirmed_trip_dict["metadata"]["key"] = confirmed_key
+    if (confirmed_key == esda.CONFIRMED_TRIP_KEY):
+        confirmed_trip_dict["data"]["expected_trip"] = tce.get_id()
+    elif (confirmed_key == esda.CONFIRMED_PLACE_KEY):
+        confirmed_trip_dict["data"]["cleaned_place"] = tce.get_id()
+    confirmed_trip_dict["data"]["user_input"] = \
+        get_user_input_dict(ts, tce, input_key_list)
+    confirmed_trip_dict["data"]["additions"] = \
+        esdt.get_additions_for_timeline_entry_object(ts, tce)
+    return ecwe.Entry(confirmed_trip_dict)
 
 def get_confirmed_place_for_confirmed_trip(ct):
     # confirmed_trip already has an id for its confirmed_place we can lookup
