@@ -760,8 +760,11 @@ class TestPipelineRealData(unittest.TestCase):
         countUntrackedTime = 0
         for ct in composite_trips:
             if ct['metadata']['origin_key'] == 'analysis/cleaned_untracked':
-                countUntrackedTime += 1
-        self.assertEqual(countUntrackedTime, 1)
+                cleanUntrackedTime += 1
+            elif ct['metadata']['origin_key'] == 'segmentation/raw_untracked':
+                rawUntrackedTime += 1
+        self.assertEqual(rawUntrackedTime, 1)
+        self.assertEqual(cleanUntrackedTime, 0)
 
 if __name__ == '__main__':
     etc.configLogging()
