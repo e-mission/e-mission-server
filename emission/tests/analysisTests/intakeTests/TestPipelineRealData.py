@@ -702,12 +702,12 @@ class TestPipelineRealData(unittest.TestCase):
     def compare_composite_objects(self, ct, et):
         self.assertEqual(ct['data']['start_ts'], et['data']['start_ts'])
         self.assertEqual(ct['data']['end_ts'], et['data']['end_ts'])
-        if 'confirmed_place' in et['data']:
-            self.assertEqual(ct['data']['confirmed_place']['data']['enter_ts'],
-                                et['data']['confirmed_place']['data']['enter_ts'])
-            if 'exit_ts' in et['data']['confirmed_place']:
-                self.assertEqual(ct['data']['confirmed_place']['exit_ts'],
-                                    et['data']['confirmed_place']['exit_ts'])
+        if 'end_confirmed_place' in et['data']:
+            self.assertEqual(ct['data']['end_confirmed_place']['data']['enter_ts'],
+                                et['data']['end_confirmed_place']['data']['enter_ts'])
+            if 'exit_ts' in et['data']['end_confirmed_place']:
+                self.assertEqual(ct['data']['end_confirmed_place']['exit_ts'],
+                                    et['data']['end_confirmed_place']['exit_ts'])
         self.assertEqual(len(ct['data']['locations']), len(et['data']['locations']))
 
     def testJackUntrackedTimeMar12(self):
