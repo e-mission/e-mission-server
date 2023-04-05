@@ -1,140 +1,6 @@
 [
     {
         "_id": {
-            "$oid": "6424f6cdfaa2035f6639303e"
-        },
-        "user_id": {
-            "$uuid": "7e923ca2c4f24acb83c5fa89fce2d2d0"
-        },
-        "metadata": {
-            "key": "analysis/composite_trip",
-            "platform": "server",
-            "write_ts": 1680144071.062072,
-            "time_zone": "America/Los_Angeles",
-            "write_local_dt": {
-                "year": 2023,
-                "month": 3,
-                "day": 29,
-                "hour": 19,
-                "minute": 41,
-                "second": 11,
-                "weekday": 2,
-                "timezone": "America/Los_Angeles"
-            },
-            "write_fmt_time": "2023-03-29T19:41:11.062072-07:00",
-            "origin_key": "analysis/cleaned_untracked"
-        },
-        "data": {
-            "source": "DwellSegmentationTimeFilter",
-            "start_ts": 1678651111.264,
-            "start_local_dt": {
-                "year": 2023,
-                "month": 3,
-                "day": 12,
-                "hour": 15,
-                "minute": 58,
-                "second": 26,
-                "weekday": 6,
-                "timezone": "America/New_York"
-            },
-            "start_fmt_time": "2023-03-12T15:58:26.264000-04:00",
-            "start_loc": {
-                "type": "Point",
-                "coordinates": [
-                    -83.4604138,
-                    35.7326732
-                ]
-            },
-            "end_ts": 1678658742.268,
-            "end_local_dt": {
-                "year": 2023,
-                "month": 3,
-                "day": 12,
-                "hour": 18,
-                "minute": 5,
-                "second": 42,
-                "weekday": 6,
-                "timezone": "America/New_York"
-            },
-            "end_fmt_time": "2023-03-12T18:05:42.268000-04:00",
-            "end_loc": {
-                "type": "Point",
-                "coordinates": [
-                    -83.5054012,
-                    35.7158873
-                ]
-            },
-            "duration": 7631.003999948502,
-            "distance": 4469.499369190262,
-            "start_place": {
-                "$oid": "6424f6c9faa2035f66393021"
-            },
-            "end_place": {
-                "$oid": "6424f6c9faa2035f66393022"
-            },
-            "locations": [
-                {
-                    "_id": {
-                        "$oid": "6424f6c8faa2035f66393002"
-                    },
-                    "user_id": {
-                        "$uuid": "7e923ca2c4f24acb83c5fa89fce2d2d0"
-                    },
-                    "metadata": {
-                        "key": "analysis/recreated_location",
-                        "platform": "server",
-                        "write_ts": 1680144072.338559,
-                        "time_zone": "America/Los_Angeles",
-                        "write_local_dt": {
-                            "year": 2023,
-                            "month": 3,
-                            "day": 29,
-                            "hour": 19,
-                            "minute": 41,
-                            "second": 12,
-                            "weekday": 2,
-                            "timezone": "America/Los_Angeles"
-                        },
-                        "write_fmt_time": "2023-03-29T19:41:12.338559-07:00"
-                    },
-                    "data": {
-                        "latitude": 35.7158873,
-                        "longitude": -83.5054012,
-                        "loc": {
-                            "type": "Point",
-                            "coordinates": [
-                                -83.5054012,
-                                35.7158873
-                            ]
-                        },
-                        "ts": 1678658742.268,
-                        "local_dt": {
-                            "year": 2023,
-                            "month": 3,
-                            "day": 12,
-                            "hour": 18,
-                            "minute": 5,
-                            "second": 42,
-                            "weekday": 6,
-                            "timezone": "America/New_York"
-                        },
-                        "fmt_time": "2023-03-12T18:05:42.268000-04:00",
-                        "altitude": 393.02093505859375,
-                        "distance": 0.0,
-                        "speed": 0.0,
-                        "heading": 0.0,
-                        "idx": 0,
-                        "mode": 4,
-                        "section": {
-                            "$oid": "6424f6c8faa2035f66393001"
-                        }
-                    }
-                }
-            ]
-        }
-    },
-    {
-        "_id": {
             "$oid": "6424f6cdfaa2035f6639303d"
         },
         "user_id": {
@@ -6006,6 +5872,82 @@
                     }
                 }
             ]
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6424f6cdfaa2035f6639303e"
+        },
+        "user_id": {
+            "$uuid": "7e923ca2c4f24acb83c5fa89fce2d2d0"
+        },
+        "metadata": {
+            "key": "analysis/composite_trip",
+            "platform": "server",
+            "write_ts": 1680144071.062072,
+            "time_zone": "America/Los_Angeles",
+            "write_local_dt": {
+                "year": 2023,
+                "month": 3,
+                "day": 29,
+                "hour": 19,
+                "minute": 41,
+                "second": 11,
+                "weekday": 2,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-03-29T19:41:11.062072-07:00",
+            "origin_key": "analysis/cleaned_untracked"
+        },
+        "data": {
+            "source": "DwellSegmentationTimeFilter",
+            "start_ts": 1678651111.264,
+            "start_local_dt": {
+                "year": 2023,
+                "month": 3,
+                "day": 12,
+                "hour": 15,
+                "minute": 58,
+                "second": 26,
+                "weekday": 6,
+                "timezone": "America/New_York"
+            },
+            "start_fmt_time": "2023-03-12T15:58:26.264000-04:00",
+            "start_loc": {
+                "type": "Point",
+                "coordinates": [
+                    -83.4604138,
+                    35.7326732
+                ]
+            },
+            "end_ts": 1678658742.268,
+            "end_local_dt": {
+                "year": 2023,
+                "month": 3,
+                "day": 12,
+                "hour": 18,
+                "minute": 5,
+                "second": 42,
+                "weekday": 6,
+                "timezone": "America/New_York"
+            },
+            "end_fmt_time": "2023-03-12T18:05:42.268000-04:00",
+            "end_loc": {
+                "type": "Point",
+                "coordinates": [
+                    -83.5054012,
+                    35.7158873
+                ]
+            },
+            "duration": 7631.003999948502,
+            "distance": 4469.499369190262,
+            "start_place": {
+                "$oid": "6424f6c9faa2035f66393021"
+            },
+            "end_place": {
+                "$oid": "6424f6c9faa2035f66393022"
+            },
+            "locations": []
         }
     },
     {

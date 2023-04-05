@@ -24,21 +24,21 @@ def create_composite_trip(ts, ct):
         estbt.BuiltinTimeSeries.update(ct)
 
     logging.info("End place type for trip is %s" % type(ct['data']['end_place']))
-    composite_trip_dict = copy.copy(ct)
-    del composite_trip_dict["_id"]
-    composite_trip_dict["metadata"]["origin_key"] = ct["metadata"]["key"]
-    composite_trip_dict["metadata"]["key"] = "analysis/composite_trip"
-    composite_trip_dict["data"]["locations"] = get_locations_for_confirmed_trip(ct)
+    composite_trip_data = copy.copy(ct["data"])
+    origin_key = ct["metadata"]["key"]
+    logging.debug("Origin key for trip %s is %s" % (ct["_id"], origin_key))
+    composite_trip_data["locations"] = get_locations_for_confirmed_trip(ct)
     # The place that follows untracked time has a duration of 0.
     # Thus, we are not going to consider it eligible for additions or user input,
     # and so untracked composite objects will not have a confirmed_place.
     if not isUntrackedTime:
-        composite_trip_dict["data"]["end_confirmed_place"] = eaum.get_confirmed_place_for_confirmed_trip(ct)
+        composite_trip_data["end_confirmed_place"] = eaum.get_confirmed_place_for_confirmed_trip(ct)
     # later we will want to put section & modes in composite_trip as well
-    composite_trip_entry = ecwe.Entry(composite_trip_dict)
+    composite_trip_entry = ecwe.Entry.create_entry(ct["user_id"], "analysis/composite_trip", composite_trip_data)
+    composite_trip_entry["metadata"]["origin_key"] = origin_key
     ts.insert(composite_trip_entry)
 
-    return composite_trip_dict['data']['end_ts']
+    return composite_trip_data['end_ts']
 
 
 def create_composite_objects(user_id):
