@@ -33,7 +33,7 @@ def create_composite_trip(ts, ct):
     # Thus, we are not going to consider it eligible for additions or user input,
     # and so untracked composite objects will not have a confirmed_place.
     if not isUntrackedTime:
-        composite_trip_dict["data"]["confirmed_place"] = eaum.get_confirmed_place_for_confirmed_trip(ct)
+        composite_trip_dict["data"]["end_confirmed_place"] = eaum.get_confirmed_place_for_confirmed_trip(ct)
     # later we will want to put section & modes in composite_trip as well
     composite_trip_entry = ecwe.Entry(composite_trip_dict)
     ts.insert(composite_trip_entry)
