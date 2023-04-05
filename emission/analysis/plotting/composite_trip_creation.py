@@ -32,7 +32,7 @@ def create_composite_trip(ts, ct):
     # Thus, we are not going to consider it eligible for additions or user input,
     # and so untracked composite objects will not have a confirmed_place.
     if not isUntrackedTime:
-        composite_trip_data["confirmed_place"] = eaum.get_confirmed_place_for_confirmed_trip(ct)
+        composite_trip_data["end_confirmed_place"] = eaum.get_confirmed_place_for_confirmed_trip(ct)
     # later we will want to put section & modes in composite_trip as well
     composite_trip_entry = ecwe.Entry.create_entry(ct["user_id"], "analysis/composite_trip", composite_trip_data)
     composite_trip_entry["metadata"]["origin_key"] = origin_key
@@ -48,12 +48,12 @@ def create_composite_objects(user_id):
         # composite trips are created from both confirmed trips and cleaned untracked trips
         triplikeEntries = ts.find_entries([esda.CONFIRMED_TRIP_KEY, esda.CLEANED_UNTRACKED_KEY], time_query=time_query)
         last_done_ts = None
-        if any(triplikeEntries):
-            logging.debug("Creating composite trips from triplike entries")
-            for t in triplikeEntries:
-                last_done_ts = create_composite_trip(ts, t)
-        else:
-            logging.debug("No new triplikeEntries to process, timestamp is unchanged")
+        count_created = 0
+        for t in triplikeEntries:
+            last_done_ts = create_composite_trip(ts, t)
+            count_created += 1
+        logging.debug("Created %d composite trips" % count_created if count_created > 0
+                      else "No new triplike entries to process, no composite trips created")
         epq.mark_composite_object_creation_done(user_id, last_done_ts)
     except:
         logging.exception("Error while creating composite objects, timestamp is unchanged")
