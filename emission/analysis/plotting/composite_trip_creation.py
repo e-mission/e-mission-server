@@ -51,6 +51,7 @@ def create_composite_trip(ts, ct):
     origin_key = ct["metadata"]["key"]
     logging.debug("Origin key for trip %s is %s" % (ct["_id"], origin_key))
     composite_trip_data["locations"] = get_locations_for_confirmed_trip(ct)
+    composite_trip_data["confirmed_trip"] = ct["_id"]
     # The place that follows untracked time has a duration of 0.
     # Thus, we are not going to consider it eligible for additions or user input,
     # and so untracked composite objects will not have a confirmed_place.
