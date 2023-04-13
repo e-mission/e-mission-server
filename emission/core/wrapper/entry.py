@@ -154,6 +154,8 @@ class Entry(ecwb.WrapperBase):
             "analysis/confirmed_trip": "confirmedtrip",
             "analysis/confirmed_section": "confirmedsection",
             "analysis/confirmed_place": "confirmedplace",
+            # later, we should change this to untrackedwithlabels or something
+            "analysis/confirmed_untracked": "untrackedtime",
             ### ** END: confirmed objects which combine inferred and user input values
             # the composite trip structure for the presentation layer, which includes
             # the confirmed trip, its confirmed end place, and its trajectory

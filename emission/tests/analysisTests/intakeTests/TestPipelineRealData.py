@@ -777,6 +777,62 @@ class TestPipelineRealData(unittest.TestCase):
             self.assertLessEqual(ct["metadata"]["write_ts"], end_run)
         self.assertEqual(countUntrackedTime, 0)
 
+    def testCompositeTripIncremental(self):
+        # Test for 545114feb5ac15caac4110d39935612525954b71
+        dataFile_1 = "emission/tests/data/real_examples/shankari_2016-08-04"
+        dataFile_2 = "emission/tests/data/real_examples/shankari_2016-08-05"
+
+        etc.setupRealExample(self, dataFile_1)
+        etc.runIntakePipeline(self.testUUID)
+
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        with open(dataFile_1+".before-user-inputs.expected_composite_trips") as expectation:
+            expected_trips = json.load(expectation, object_hook = bju.object_hook)
+            self.assertEqual(len(composite_trips), len(expected_trips))
+            for i in range(len(composite_trips)):
+                self.compare_composite_objects(composite_trips[i], expected_trips[i])
+
+        self.entries = json.load(open(dataFile_2+".user_inputs"), object_hook = bju.object_hook)
+        # Load the place additions from the 5th (so after the end of the current day)
+        etc.setupRealExampleWithEntries(self)
+        etc.runIntakePipeline(self.testUUID)
+        # They should all match the final place
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        with open(dataFile_1+".all-match-last-place.expected_composite_trips") as expectation:
+            expected_trips = json.load(expectation, object_hook = bju.object_hook)
+            self.assertEqual(len(composite_trips), len(expected_trips))
+            for i in range(len(composite_trips)):
+                self.compare_composite_objects(composite_trips[i], expected_trips[i])
+
+        # load day 2
+        with open(dataFile_2) as df2:
+            self.entries = json.load(df2, object_hook = bju.object_hook)
+        etc.setupRealExampleWithEntries(self)
+        etc.runIntakePipeline(self.testUUID)
+        # The place additions should be dispersed to the actual places
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        with open(dataFile_1+".spread-across-aug-5.expected_composite_trips") as expectation:
+            expected_trips = json.load(expectation, object_hook = bju.object_hook)
+            self.assertEqual(len(composite_trips), len(expected_trips))
+            for i in range(len(composite_trips)):
+                self.compare_composite_objects(composite_trips[i], expected_trips[i])
+
+        # load place and trip additions and trip inputs for the first day
+        self.entries = json.load(open(dataFile_1+".user_inputs"), object_hook = bju.object_hook)
+        # Load the place additions from the 4th (so somewhere in the middle, and all mixed)
+        etc.setupRealExampleWithEntries(self)
+        etc.runIntakePipeline(self.testUUID)
+        # They should all match the actual entries
+        # Trip matches should also work
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        with open(dataFile_1+".trip-matches-check-aug-4.expected_composite_trips") as expectation:
+            expected_trips = json.load(expectation, object_hook = bju.object_hook)
+            self.assertEqual(len(composite_trips), len(expected_trips))
+            for i in range(len(composite_trips)):
+                self.compare_composite_objects(composite_trips[i], expected_trips[i])
+
+
 if __name__ == '__main__':
     etc.configLogging()
 

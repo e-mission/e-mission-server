@@ -96,6 +96,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "analysis/confirmed_trip": self.analysis_timeseries_db,
                 "analysis/confirmed_section": self.analysis_timeseries_db,
                 "analysis/confirmed_place": self.analysis_timeseries_db,
+                "analysis/confirmed_untracked": self.analysis_timeseries_db,
                 "analysis/composite_trip": self.analysis_timeseries_db
             }
 

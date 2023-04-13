@@ -13,6 +13,7 @@ class Compositetrip(ecwc.Confirmedtrip):
     props = ecwc.Confirmedtrip.props
     props.update({#      # confirmedplace stuff
                   "end_confirmed_place": ecwb.WrapperBase.Access.WORM, # object contains all properties for the destination confirmed_place object
+                  "confirmed_trip": ecwb.WrapperBase.Access.WORM, # the id of the corresponding confirmed trip
                   "locations": ecwb.WrapperBase.Access.WORM, # object containing cleaned location entries (max 100)
                   #      # sections stuff
                   "cleaned_section": ecwb.WrapperBase.Access.WORM,
