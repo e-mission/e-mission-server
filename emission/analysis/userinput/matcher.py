@@ -94,8 +94,8 @@ def create_confirmed_objects(user_id):
             confirmed_tl = create_and_link_timeline(ts, timeline, last_confirmed_place)
 
             if last_confirmed_place is not None:
-                logging.debug("last confirmed_place %s was already in database, updating with linked trip info..." % 
-                    last_confirmed_place)
+                logging.debug("last confirmed_place %s was already in database, updating with linked trip info... and %s additions" %
+                    (last_confirmed_place["_id"], len(last_confirmed_place["data"]["additions"])))
                 update_confirmed_and_composite(last_confirmed_place)
 
             if confirmed_tl is not None and not confirmed_tl.is_empty():
@@ -128,7 +128,7 @@ def create_and_link_timeline(ts, timeline, last_confirmed_place):
         curr_confirmed_start_place["data"]["exit_local_dt"] = matching_cleaned_place.data.exit_local_dt
         curr_confirmed_start_place["data"]["user_input"] = \
             get_user_input_dict(ts, matching_cleaned_place, keys)
-        curr_confirmed_start_place["additions"] = \
+        curr_confirmed_start_place["data"]["additions"] = \
             esdt.get_additions_for_timeline_entry_object(ts, matching_cleaned_place)
         logging.debug("Found existing last confirmed place, setting exit information to %s, and trimming additions to %s" %
             (matching_cleaned_place.data.exit_fmt_time, len(curr_confirmed_start_place["data"]["additions"])))
