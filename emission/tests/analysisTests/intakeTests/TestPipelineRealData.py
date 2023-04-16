@@ -705,6 +705,7 @@ class TestPipelineRealData(unittest.TestCase):
         self.standardMatchDataGroundTruth(dataFile, start_ld, cacheKey)
 
     def compare_composite_objects(self, ct, et):
+        print(f"--------------- Comparing composite trip {ct['_id']} to expected composite trip {et['_id']} -------------------")
         self.assertEqual(ct['data']['start_ts'], et['data']['start_ts'])
         self.assertEqual(ct['data']['end_ts'], et['data']['end_ts'])
         if 'end_confirmed_place' in et['data']:
@@ -758,7 +759,7 @@ class TestPipelineRealData(unittest.TestCase):
         composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
         countUntrackedTime = 0
         for ct in composite_trips:
-            if ct['metadata']['origin_key'] == 'analysis/cleaned_untracked':
+            if ct['metadata']['origin_key'] == 'analysis/confirmed_untracked':
                 countUntrackedTime += 1
             self.assertGreater(ct["metadata"]["write_ts"], start_run)
             self.assertLessEqual(ct["metadata"]["write_ts"], end_run)
@@ -776,7 +777,7 @@ class TestPipelineRealData(unittest.TestCase):
         countUntrackedTime = 0
         for ct in composite_trips:
             logging.debug("composite trip metadata %s = " % ct['metadata'])
-            if ct['metadata']['origin_key'] == 'analysis/cleaned_untracked':
+            if ct['metadata']['origin_key'] == 'analysis/confirmed_untracked':
                 countUntrackedTime += 1
             self.assertGreater(ct["metadata"]["write_ts"], start_run)
             self.assertLessEqual(ct["metadata"]["write_ts"], end_run)
