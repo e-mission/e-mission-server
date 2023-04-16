@@ -49,6 +49,7 @@ import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
 import emission.storage.timeseries.tcquery as estt
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.core.common as ecc
+import emission.core.wrapper.user as ecwu
 
 # Test imports
 import emission.tests.common as etc
@@ -63,16 +64,20 @@ class TestPipelineRealData(unittest.TestCase):
         logging.info("setUp complete")
 
     def tearDown(self):
-        logging.debug("Clearing related databases for %s" % self.testUUID)
-        # Clear the database only if it is not an evaluation run
-        # A testing run validates that nothing has changed
-        # An evaluation run compares to different algorithm implementations
-        # to determine whether to switch to a new implementation
-        if not hasattr(self, "evaluation") or not self.evaluation:
-            self.clearRelatedDb()
-        if hasattr(self, "analysis_conf_path"):
-            os.remove(self.analysis_conf_path)
-        logging.info("tearDown complete")
+        if os.environ.get("SKIP_TEARDOWN", False):
+            logging.info("SKIP_TEARDOWN = true, not clearing related databases")
+            ecwu.User.registerWithUUID("automated_tests", self.testUUID)
+        else:
+            logging.debug("Clearing related databases for %s" % self.testUUID)
+            # Clear the database only if it is not an evaluation run
+            # A testing run validates that nothing has changed
+            # An evaluation run compares to different algorithm implementations
+            # to determine whether to switch to a new implementation
+            if not hasattr(self, "evaluation") or not self.evaluation:
+                self.clearRelatedDb()
+            if hasattr(self, "analysis_conf_path"):
+                os.remove(self.analysis_conf_path)
+            logging.info("tearDown complete")
 
     def clearRelatedDb(self):
         logging.info("Timeseries delete result %s" % edb.get_timeseries_db().delete_many({"user_id": self.testUUID}).raw_result)
