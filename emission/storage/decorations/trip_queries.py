@@ -192,10 +192,11 @@ def get_not_deleted_candidates(filter_fn, potential_candidates):
     logging.info(f"Found {len(all_active_list)} active entries, {len(all_deleted_id)} deleted entries -> {len(not_deleted_active)} non deleted active entries")
     return not_deleted_active
 
-def get_time_query_for_timeline_entry(timeline_entry):
+def get_time_query_for_timeline_entry(timeline_entry, force_start_end=True):
     begin_of_entry = begin_of(timeline_entry)
     end_of_entry = end_of(timeline_entry)
-    timeType = "data.start_ts" if "start_ts" in timeline_entry.data else "data.enter_ts"
+    inferred_time_type = lambda timeline_entry: "data.start_ts" if "start_ts" in timeline_entry.data else "data.enter_ts"
+    timeType = "data.start_ts" if force_start_end else inferred_time_type
     if end_of_entry is None:
         # the last place (user's current place) will not have an exit_ts, so
         # every input from its enter_ts onward is fair game
@@ -203,6 +204,10 @@ def get_time_query_for_timeline_entry(timeline_entry):
     return estt.TimeQuery(timeType, begin_of_entry, end_of_entry)
 
 def get_user_input_for_timeline_entry(ts, timeline_entry, user_input_key):
+    # When we start supporting user inputs for places, we need to decide whether they will have
+    # start/end or enter/exit. Depending on the decision, we can either remove support for
+    # force_start_end (since we always use start/end) or pass in False (so we
+    # use start/end or enter/exit appropriately)
     tq = get_time_query_for_timeline_entry(timeline_entry)
     potential_candidates = ts.find_entries([user_input_key], tq)
     return final_candidate(valid_user_input(ts, timeline_entry), potential_candidates)
@@ -213,6 +218,10 @@ def get_user_input_for_timeline_entry(ts, timeline_entry, user_input_key):
 # function from get_data_df to find_entries may help us unify in the future
 
 def get_user_input_from_cache_series(user_id, timeline_entry, user_input_key):
+    # When we start supporting user inputs for places, we need to decide whether they will have
+    # start/end or enter/exit. Depending on the decision, we can either remove support for
+    # force_start_end (since we always use start/end) or pass in False (so we
+    # use start/end or enter/exit appropriately)
     ts = esta.TimeSeries.get_time_series(user_id)
     tq = get_time_query_for_timeline_entry(timeline_entry)
     potential_candidates = estsc.find_entries(user_id, [user_input_key], tq)
@@ -220,6 +229,8 @@ def get_user_input_from_cache_series(user_id, timeline_entry, user_input_key):
 
 def get_additions_for_timeline_entry_object(ts, timeline_entry):
     addition_keys = ["manual/trip_addition_input", "manual/place_addition_input"]
+    # This should always be start/end
+    # https://github.com/e-mission/e-mission-docs/issues/880#issuecomment-1509875714
     tq = get_time_query_for_timeline_entry(timeline_entry)
     potential_candidates = ts.find_entries(addition_keys, tq)
     return get_not_deleted_candidates(valid_user_input(ts, timeline_entry), potential_candidates)
