@@ -84,10 +84,15 @@ def _get_next_cleaned_timeline_entry(ts, tl_entry):
     """
     Find the next trip or place in the timeline
     """
-    if (tl_entry.data.end_place is not None):
+    if ("end_place" in tl_entry.data):
         return ts.get_entry_from_id(esda.CLEANED_PLACE_KEY, tl_entry.data.end_place)
-    elif (tl_entry.data.starting_trip is not None):
-        return ts.get_entry_from_id(esda.CLEANED_TRIP_KEY, tl_entry.data.starting_trip)
+    elif ("starting_trip" in tl_entry.data):
+        starting_trip = ts.get_entry_from_id(esda.CLEANED_TRIP_KEY, tl_entry.data.starting_trip)
+        # if there is no cleaned trip, fall back to untracked time
+        if starting_trip is None:
+            logging.debug("Starting trip %s is not tracked, checking untracked time..." % tl_entry.data.starting_trip)
+            starting_trip = ts.get_entry_from_id(esda.CLEANED_UNTRACKED_KEY, tl_entry.data.starting_trip)
+        return starting_trip
     else:
         return None
 
