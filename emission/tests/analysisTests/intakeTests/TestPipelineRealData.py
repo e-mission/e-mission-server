@@ -49,6 +49,7 @@ import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
 import emission.storage.timeseries.tcquery as estt
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.core.common as ecc
+import emission.core.wrapper.user as ecwu
 
 # Test imports
 import emission.tests.common as etc
@@ -63,16 +64,20 @@ class TestPipelineRealData(unittest.TestCase):
         logging.info("setUp complete")
 
     def tearDown(self):
-        logging.debug("Clearing related databases for %s" % self.testUUID)
-        # Clear the database only if it is not an evaluation run
-        # A testing run validates that nothing has changed
-        # An evaluation run compares to different algorithm implementations
-        # to determine whether to switch to a new implementation
-        if not hasattr(self, "evaluation") or not self.evaluation:
-            self.clearRelatedDb()
-        if hasattr(self, "analysis_conf_path"):
-            os.remove(self.analysis_conf_path)
-        logging.info("tearDown complete")
+        if os.environ.get("SKIP_TEARDOWN", False):
+            logging.info("SKIP_TEARDOWN = true, not clearing related databases")
+            ecwu.User.registerWithUUID("automated_tests", self.testUUID)
+        else:
+            logging.debug("Clearing related databases for %s" % self.testUUID)
+            # Clear the database only if it is not an evaluation run
+            # A testing run validates that nothing has changed
+            # An evaluation run compares to different algorithm implementations
+            # to determine whether to switch to a new implementation
+            if not hasattr(self, "evaluation") or not self.evaluation:
+                self.clearRelatedDb()
+            if hasattr(self, "analysis_conf_path"):
+                os.remove(self.analysis_conf_path)
+            logging.info("tearDown complete")
 
     def clearRelatedDb(self):
         logging.info("Timeseries delete result %s" % edb.get_timeseries_db().delete_many({"user_id": self.testUUID}).raw_result)
@@ -700,6 +705,7 @@ class TestPipelineRealData(unittest.TestCase):
         self.standardMatchDataGroundTruth(dataFile, start_ld, cacheKey)
 
     def compare_composite_objects(self, ct, et):
+        print(f"--------------- Comparing composite trip {ct['_id']} to expected composite trip {et['_id']} -------------------")
         self.assertEqual(ct['data']['start_ts'], et['data']['start_ts'])
         self.assertEqual(ct['data']['end_ts'], et['data']['end_ts'])
         if 'end_confirmed_place' in et['data']:
@@ -753,7 +759,7 @@ class TestPipelineRealData(unittest.TestCase):
         composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
         countUntrackedTime = 0
         for ct in composite_trips:
-            if ct['metadata']['origin_key'] == 'analysis/cleaned_untracked':
+            if ct['metadata']['origin_key'] == 'analysis/confirmed_untracked':
                 countUntrackedTime += 1
             self.assertGreater(ct["metadata"]["write_ts"], start_run)
             self.assertLessEqual(ct["metadata"]["write_ts"], end_run)
@@ -771,7 +777,7 @@ class TestPipelineRealData(unittest.TestCase):
         countUntrackedTime = 0
         for ct in composite_trips:
             logging.debug("composite trip metadata %s = " % ct['metadata'])
-            if ct['metadata']['origin_key'] == 'analysis/cleaned_untracked':
+            if ct['metadata']['origin_key'] == 'analysis/confirmed_untracked':
                 countUntrackedTime += 1
             self.assertGreater(ct["metadata"]["write_ts"], start_run)
             self.assertLessEqual(ct["metadata"]["write_ts"], end_run)
@@ -832,6 +838,49 @@ class TestPipelineRealData(unittest.TestCase):
             for i in range(len(composite_trips)):
                 self.compare_composite_objects(composite_trips[i], expected_trips[i])
 
+    def testCompositeTripIncrementalLastPlaceMatches(self):
+        # Test for 545114feb5ac15caac4110d39935612525954b71
+        dataFile_1 = "emission/tests/data/real_examples/shankari_2023-04-13"
+        dataFile_2 = "emission/tests/data/real_examples/shankari_2023-04-14"
+
+        etc.setupRealExample(self, dataFile_1)
+        etc.runIntakePipeline(self.testUUID)
+
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        with open(dataFile_1+".before-user-inputs.expected_composite_trips") as expectation:
+            expected_trips = json.load(expectation, object_hook = bju.object_hook)
+            self.assertEqual(len(composite_trips), len(expected_trips))
+            for i in range(len(composite_trips)):
+                self.compare_composite_objects(composite_trips[i], expected_trips[i])
+
+        # Load the place additions for both days
+        self.entries = json.load(open(dataFile_1+".user_inputs"), object_hook = bju.object_hook)
+        etc.setupRealExampleWithEntries(self)
+        self.entries = json.load(open(dataFile_2+".user_inputs"), object_hook = bju.object_hook)
+        etc.setupRealExampleWithEntries(self)
+        etc.runIntakePipeline(self.testUUID)
+
+        # They should all match the final place
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        with open(dataFile_1+".all-match-last-place.expected_composite_trips") as expectation:
+            expected_trips = json.load(expectation, object_hook = bju.object_hook)
+            self.assertEqual(len(composite_trips), len(expected_trips))
+            for i in range(len(composite_trips)):
+                self.compare_composite_objects(composite_trips[i], expected_trips[i])
+
+        # load day 2
+        with open(dataFile_2) as df2:
+            self.entries = json.load(df2, object_hook = bju.object_hook)
+        etc.setupRealExampleWithEntries(self)
+        etc.runIntakePipeline(self.testUUID)
+        # The place additions should be dispersed to the actual places
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        with open(dataFile_1+".retained-last-place.expected_composite_trips") as expectation:
+            expected_trips = json.load(expectation, object_hook = bju.object_hook)
+            self.assertEqual(len(composite_trips), len(expected_trips))
+            for i in range(len(composite_trips)):
+                self.compare_composite_objects(composite_trips[i], expected_trips[i])
 
 if __name__ == '__main__':
     etc.configLogging()

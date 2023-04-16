@@ -102,8 +102,8 @@ statuscheck = {}
 def create_composite_objects(user_id):
     time_query = epq.get_time_range_for_composite_object_creation(user_id)
     import emission.core.get_database as edb
-    statuscheck["curr_confirmed_place_count"] = edb.get_analysis_timeseries_db().count_documents({"metadata.key": "analysis/confirmed_place", "user_id": user_id})
-    statuscheck["curr_composite_trip_count"] = edb.get_analysis_timeseries_db().count_documents({"metadata.key": "analysis/composite_trip", "user_id": user_id})
+    statuscheck["curr_confirmed_place_count"] = edb.get_analysis_timeseries_db().count_documents({"metadata.key": esda.CONFIRMED_PLACE_KEY, "user_id": user_id})
+    statuscheck["curr_composite_trip_count"] = edb.get_analysis_timeseries_db().count_documents({"metadata.key": esda.COMPOSITE_TRIP_KEY, "user_id": user_id})
     logging.debug(f"Found {statuscheck} existing entries before this run")
     try:
         ts = esta.TimeSeries.get_time_series(user_id)
@@ -125,7 +125,7 @@ def create_composite_objects(user_id):
 # retrieve locations for the trajectory of the trip
 # downsampled to max_entries (default 100)
 def get_locations_for_confirmed_trip(ct, max_entries=100):
-    if ct["metadata"]["key"] == esda.CLEANED_UNTRACKED_KEY:
+    if ct["metadata"]["key"] == esda.CONFIRMED_UNTRACKED_KEY:
         return [] # untracked time has no locations
     # retrieve locations for the trajectory of the trip
     time_query = estt.TimeQuery("data.ts", ct["data"]["start_ts"], ct["data"]["end_ts"])
