@@ -8,7 +8,7 @@ from builtins import *
 import emission.core.wrapper.userinput as ecwui
 import emission.core.wrapper.wrapperbase as ecwb
 
-class Tripuserinput(ecwui.Userinput):
+class Placeuserinput(ecwui.Userinput):
     props = ecwui.Userinput.props
     props.update({"start_ts": ecwb.WrapperBase.Access.RO,    # geojson representation of the point
              "start_local_dt": ecwb.WrapperBase.Access.RO, # start datetime in local time

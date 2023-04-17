@@ -19,12 +19,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04, ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest]
         include:
         - os: macos-latest
           PLATFORM: MacOSX-x86_64
-        - os: ubuntu-18.04
-          PLATFORM: Linux-x86_64
         - os: ubuntu-latest
           PLATFORM: Linux-x86_64
 
