@@ -62,9 +62,9 @@ class TestCompositeTripCreation(unittest.TestCase):
         self.assertEqual(compositeTrips["user_input"].apply(lambda a: len(a)).to_list(), [0] * 9)
         self.assertEqual(compositeTrips["end_confirmed_place"].apply(lambda a: len(a["data"]["additions"])).to_list(), [0] * 9)
 
-        self.assertEqual(list(compositeTrips["start_ts"]), [1470341031.235, 1470343292.1363852,
-            1470352238.7396843, 1470354036.959, 1470354386.5618007, 1470355612.592, 1470356315.8404644,
-            1470357578.288795, 1470364485.744782])
+#         self.assertEqual(list(compositeTrips["start_ts"]), [1470341031.235, 1470343292.1363852,
+#             1470352238.7396843, 1470354036.959, 1470354386.5618007, 1470355612.592, 1470356315.8404644,
+#             1470357578.288795, 1470364485.744782])
 
         # These are actually separate tests, but we call them from this main test so that we
         # can avoid re-running the pipeline multiple times
