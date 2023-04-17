@@ -264,7 +264,7 @@ def found_untracked_period(timeseries, last_place, start_loc, segmentation_metho
     distance_thresholds = {"DwellSegmentationDistFilter": 1200, "DwellSegmentationTimeFilter": 2500}
     curr_os_distance_threshold = distance_thresholds[segmentation_method_name]
     if transition_distance < curr_os_distance_threshold:
-        logging.debug("transition_distance %s < %s for method %s, returning False",
+        logging.debug("transition_distance %s < %s for method %s, returning False" %
             (transition_distance, curr_os_distance_threshold, segmentation_method_name))
         return False
 
