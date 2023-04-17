@@ -2,19 +2,21 @@ import unittest
 import numpy as np
 import time
 import arrow
+import copy
 
 import emission.storage.timeseries.timequery as estt
 import emission.core.wrapper.labelprediction as ecwl
 import emission.analysis.userinput.expectations as eaue
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.analysis.classification.inference.labels.pipeline as eacilp
+import emission.analysis.classification.inference.labels.inferrers as eacili
 import emission.core.get_database as edb
 import emission.tests.common as etc
 import emission.analysis.configs.expectation_notification_config as eace
 
 class TestExpectationPipeline(unittest.TestCase):
     test_algorithms = {
-            ecwl.AlgorithmTypes.PLACEHOLDER_3: eacilp.placeholder_predictor_3
+            ecwl.AlgorithmTypes.PLACEHOLDER_3: eacili.placeholder_predictor_3
     }
     tz = "America/Chicago"
     contrived_dates = {  # Reused from TestExpectationNotificationConfig
@@ -32,10 +34,10 @@ class TestExpectationPipeline(unittest.TestCase):
         return trip["data"]["start_local_dt"]["hour"]*60+trip["data"]["start_local_dt"]["minute"]
 
     def setUp(self):
-        self.test_options_stash = eace._test_options
+        self.test_options_stash = copy.copy(eace._test_options)
         eace._test_options = {
             "use_sample": True,
-            "override_keylist": None
+            "override_keylist": ["mode_confirm", "purpose_confirm"]
         }
         eace.reload_config()
         
@@ -50,14 +52,13 @@ class TestExpectationPipeline(unittest.TestCase):
 
     def tearDown(self):
         self.reset_all()
-        
         eace._test_options = self.test_options_stash
         eace.reload_config()
 
     def run_pipeline(self, algorithms):
         primary_algorithms_stash = eacilp.primary_algorithms
         eacilp.primary_algorithms = algorithms
-        test_options_stash = eaue._test_options
+        test_options_stash = copy.copy(eaue._test_options)
         eaue._test_options["preprocess_trip"] = lambda trip: self.preprocess(trip)
         etc.runIntakePipeline(self.testUUID)
         eacilp.primary_algorithms = primary_algorithms_stash
@@ -92,7 +93,8 @@ class TestExpectationPipeline(unittest.TestCase):
             960: {"type": "randomFraction", "value": 0.05}
         }
         for trip in self.expected_trips:
-            self.assertEqual(eace.get_expectation(trip), answers[self.fingerprint(trip)])
+            self.assertEqual(eace.get_expectation(trip), answers[self.fingerprint(trip)],
+                "trip: %s with fingerprint %s" % (trip, self.fingerprint(trip)))
 
     def testProcessedAgainstAnswers(self):
         answers = {
@@ -105,7 +107,7 @@ class TestExpectationPipeline(unittest.TestCase):
         }
         for trip in self.expected_trips:
             ans = answers[self.fingerprint(trip)]
-            if ans is not None: self.assertEqual(trip["data"]["expectation"]["to_label"], ans)
+            if ans is not None: self.assertEqual(trip["data"]["expectation"]["to_label"], ans, "trip: %s with fingerprint %s" % (trip, self.fingerprint(trip)))
 
     def testProcessedAgainstRaw(self):
         for trip in self.expected_trips:

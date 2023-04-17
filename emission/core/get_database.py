@@ -34,7 +34,7 @@ else:
         db_name = "Stage_database"
 
 print("Connecting to database URL "+url)
-_current_db = MongoClient(url)[db_name]
+_current_db = MongoClient(url, uuidRepresentation='pythonLegacy')[db_name]
 #config_file.close()
 
 def _get_current_db():

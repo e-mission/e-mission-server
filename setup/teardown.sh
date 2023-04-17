@@ -1,2 +1,2 @@
-conda deactivate emission
+conda deactivate
 conda env remove --name emission

@@ -204,7 +204,7 @@ class TestPipelineSeed(unittest.TestCase):
 
   def testEntirePipeline(self):
     self.setupTestTrips(self.SectionsColl)
-    self.setupTestTrips(MongoClient(edb.url).Backup_database.Stage_Sections)
+    self.setupTestTrips(MongoClient(edb.url, uuidRepresentation='pythonLegacy').Backup_database.Stage_Sections)
     # Here, we only have 5 trips, so the pipeline looks for the backup training
     # set instead, which fails because there is no backup. So let's copy data from
     # the main DB to the backup DB to make this test pass

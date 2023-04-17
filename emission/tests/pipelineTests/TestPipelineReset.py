@@ -19,6 +19,7 @@ import pandas as pd
 import copy
 import arrow
 import uuid
+from bson.binary import UuidRepresentation
 
 # Our imports
 import emission.core.get_database as edb
@@ -129,13 +130,13 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=bju.object_hook)
-        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=bju.object_hook)
+        ground_truth_1 = bju.loads(open(dataFile_1+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        ground_truth_2 = bju.loads(open(dataFile_2+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
 
         # Run both pipelines
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = json.load(open(dataFile_2), object_hook = bju.object_hook)
+        self.entries = bju.loads(open(dataFile_2).read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -189,13 +190,13 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=bju.object_hook)
-        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=bju.object_hook)
+        ground_truth_1 = bju.loads(open(dataFile_1+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        ground_truth_2 = bju.loads(open(dataFile_2+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
 
         # Run both pipelines
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = json.load(open(dataFile_2), object_hook = bju.object_hook)
+        self.entries = bju.loads(open(dataFile_2).read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -211,7 +212,7 @@ class TestPipelineReset(unittest.TestCase):
         # Reset pipeline to july 23.
         # Note that this is actually 22nd 16:00 PDT, so this is partway
         # through the 22nd
-        reset_ts = arrow.get("2016-07-23").timestamp
+        reset_ts = arrow.get("2016-07-23").int_timestamp
         epr.reset_user_to_ts(self.testUUID, reset_ts, is_dry_run=False)
 
         # First day is unchanged, except that the last place doesn't have
@@ -270,13 +271,13 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=bju.object_hook)
-        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=bju.object_hook)
+        ground_truth_1 = bju.loads(open(dataFile_1+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        ground_truth_2 = bju.loads(open(dataFile_2+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
 
         # Run both pipelines
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = json.load(open(dataFile_2), object_hook = bju.object_hook)
+        self.entries = bju.loads(open(dataFile_2).read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -294,7 +295,7 @@ class TestPipelineReset(unittest.TestCase):
         # This will reset in the middle of the untracked time, which is
         # technically a trip, and will allow us to test the trip resetting
         # code
-        reset_ts = arrow.get("2016-07-24").timestamp
+        reset_ts = arrow.get("2016-07-24").int_timestamp
         epr.reset_user_to_ts(self.testUUID, reset_ts, is_dry_run=False)
 
         # Second day does not exist
@@ -337,13 +338,13 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=bju.object_hook)
-        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=bju.object_hook)
+        ground_truth_1 = bju.loads(open(dataFile_1+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        ground_truth_2 = bju.loads(open(dataFile_2+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
 
         # Run both pipelines
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = json.load(open(dataFile_2), object_hook = bju.object_hook)
+        self.entries = bju.loads(open(dataFile_2).read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -361,13 +362,13 @@ class TestPipelineReset(unittest.TestCase):
         # This will reset in the middle of the untracked time, which is
         # technically a trip, and will allow us to test the trip resetting
         # code
-        reset_ts = arrow.get("2016-07-24").timestamp
+        reset_ts = arrow.get("2016-07-24").int_timestamp
         epr.reset_user_to_ts(self.testUUID, reset_ts, is_dry_run=False)
         last_cleaned_place = esdp.get_last_place_before(esda.CLEANED_PLACE_KEY, reset_ts, self.testUUID)
         self.assertEqual(len(last_cleaned_place["data"]["raw_places"]), 0)
 
         # Pretend next run fails and we try to reset to it
-        reset_ts = arrow.get("2016-07-24T02:00:00").timestamp
+        reset_ts = arrow.get("2016-07-24T02:00:00").int_timestamp
         epr.reset_user_to_ts(self.testUUID, reset_ts, is_dry_run=False)
         last_cleaned_place = esdp.get_last_place_before(esda.CLEANED_PLACE_KEY, reset_ts, self.testUUID)
         self.assertEqual(len(last_cleaned_place["data"]["raw_places"]), 0)
@@ -375,7 +376,7 @@ class TestPipelineReset(unittest.TestCase):
         # Second day does not exist
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_2, start_ld_2)
         logging.debug(json.dumps(api_result, indent=4, default=bju.default))
-        self.assertEqual(api_result, [])
+        self.assertEqual(api_result, [], msg=f"api_result={json.dumps(api_result, default=bju.default)}, expected []")
 
         # Re-run the pipeline again
         etc.runIntakePipeline(self.testUUID)
@@ -404,18 +405,18 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=bju.object_hook)
-        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=bju.object_hook)
+        ground_truth_1 = bju.loads(open(dataFile_1+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        ground_truth_2 = bju.loads(open(dataFile_2+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
 
         # Run both pipelines
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = json.load(open(dataFile_2), object_hook = bju.object_hook)
+        self.entries = bju.loads(open(dataFile_2).read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
         # Reset to a date well after the two days
-        reset_ts = arrow.get("2017-07-24").timestamp
+        reset_ts = arrow.get("2017-07-24").int_timestamp
         epr.reset_user_to_ts(self.testUUID, reset_ts, is_dry_run=False)
 
         # Data should be untouched because of early return
@@ -447,13 +448,13 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=bju.object_hook)
-        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=bju.object_hook)
+        ground_truth_1 = bju.loads(open(dataFile_1+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        ground_truth_2 = bju.loads(open(dataFile_2+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
 
         # Run both pipelines
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = json.load(open(dataFile_2), object_hook = bju.object_hook)
+        self.entries = bju.loads(open(dataFile_2).read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -467,7 +468,7 @@ class TestPipelineReset(unittest.TestCase):
                             ad.AttrDict(ground_truth_2).data)
 
         # Reset to a date well before the two days
-        reset_ts = arrow.get("2015-07-24").timestamp
+        reset_ts = arrow.get("2015-07-24").int_timestamp
         epr.reset_user_to_ts(self.testUUID, reset_ts, is_dry_run=False)
 
         # Data should be completely deleted
@@ -513,8 +514,8 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=bju.object_hook)
-        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=bju.object_hook)
+        ground_truth_1 = bju.loads(open(dataFile_1+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        ground_truth_2 = bju.loads(open(dataFile_2+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
 
         # Run the first pipeline
         etc.setupRealExample(self, dataFile_1)
@@ -558,7 +559,7 @@ class TestPipelineReset(unittest.TestCase):
         self.assertNotIn("exit_ts", last_cleaned_place_first_day["data"])
 
         # Now, load more entries
-        self.entries = json.load(open(dataFile_2), object_hook = bju.object_hook)
+        self.entries = bju.loads(open(dataFile_2).read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
         etc.setupRealExampleWithEntries(self)
         # Run only trip and section segmentation code
         eaist.segment_current_trips(self.testUUID)
@@ -599,7 +600,7 @@ class TestPipelineReset(unittest.TestCase):
         # we are going to reset to a point in the middle
         # Note that this is actually 23nd 16:00 PDT, so this is partway
         # through the 23rd, between the 22nd and the 24th
-        reset_ts = arrow.get("2016-07-24").timestamp
+        reset_ts = arrow.get("2016-07-24").int_timestamp
         epr.reset_user_to_ts(self.testUUID, reset_ts, is_dry_run=False)
 
         # now the raw place on the first day should terminate
@@ -645,7 +646,7 @@ class TestPipelineReset(unittest.TestCase):
         self.testUUID = None
         invalid_states = pd.DataFrame({
             "user_id": ["user_1", "user_1", "user_2"],
-            "curr_run_ts": [arrow.get("2022-09-20").timestamp, arrow.get("2022-09-21").timestamp, arrow.get("2022-09-22").timestamp],
+            "curr_run_ts": [arrow.get("2022-09-20").int_timestamp, arrow.get("2022-09-21").int_timestamp, arrow.get("2022-09-22").int_timestamp],
             "pipeline_stage": [0, 6, 13]
         })
 
@@ -658,7 +659,7 @@ class TestPipelineReset(unittest.TestCase):
         self.testUUID = None
         invalid_states_only_single = pd.DataFrame({
             "user_id": ["user_1", "user_2", "user_3"],
-            "curr_run_ts": [arrow.get("2022-09-20").timestamp, arrow.get("2022-09-21").timestamp, arrow.get("2022-09-22").timestamp],
+            "curr_run_ts": [arrow.get("2022-09-20").int_timestamp, arrow.get("2022-09-21").int_timestamp, arrow.get("2022-09-22").int_timestamp],
             "pipeline_stage": [0, 6, 13]
         })
         multi_group, single_group = epr.split_single_and_multi(invalid_states_only_single)
@@ -668,7 +669,7 @@ class TestPipelineReset(unittest.TestCase):
 
         invalid_states_only_multi = pd.DataFrame({
             "user_id": ["user_2", "user_2", "user_2"],
-            "curr_run_ts": [arrow.get("2022-09-20").timestamp, arrow.get("2022-09-21").timestamp, arrow.get("2022-09-22").timestamp],
+            "curr_run_ts": [arrow.get("2022-09-20").int_timestamp, arrow.get("2022-09-21").int_timestamp, arrow.get("2022-09-22").int_timestamp],
             "pipeline_stage": [0, 6, 13]
         })
         multi_group, single_group = epr.split_single_and_multi(invalid_states_only_multi)
@@ -678,7 +679,7 @@ class TestPipelineReset(unittest.TestCase):
 
         invalid_states_mixed = pd.DataFrame({
             "user_id": ["user_1", "user_1", "user_2"],
-            "curr_run_ts": [arrow.get("2022-09-20").timestamp, arrow.get("2022-09-21").timestamp, arrow.get("2022-09-22").timestamp],
+            "curr_run_ts": [arrow.get("2022-09-20").int_timestamp, arrow.get("2022-09-21").int_timestamp, arrow.get("2022-09-22").int_timestamp],
             "pipeline_stage": [0, 6, 13]
         })
         multi_group, single_group = epr.split_single_and_multi(invalid_states_mixed)
@@ -693,20 +694,20 @@ class TestPipelineReset(unittest.TestCase):
         self.testUUID = None
         invalid_states_only_single = pd.DataFrame({
             "user_id": ["user_1", "user_2", "user_3"],
-            "curr_run_ts": [arrow.get("2022-09-20").timestamp, arrow.get("2022-09-21").timestamp, arrow.get("2022-09-22").timestamp],
+            "curr_run_ts": [arrow.get("2022-09-20").int_timestamp, arrow.get("2022-09-21").int_timestamp, arrow.get("2022-09-22").int_timestamp],
             "pipeline_stage": [0, 6, 13]
         })
         epr.get_single_state_resets(invalid_states_only_single)
         self.assertEqual(len(invalid_states_only_single), 3)
         self.assertTrue("reset_ts" in invalid_states_only_single.columns)
         self.assertEqual(invalid_states_only_single.reset_ts.to_list(),
-            invalid_states_only_single.curr_run_ts.apply(lambda ts: arrow.get(ts).shift(hours=-3).timestamp).to_list())
+            invalid_states_only_single.curr_run_ts.apply(lambda ts: arrow.get(ts).shift(hours=-3).int_timestamp).to_list())
 
     def testGetSingleStateResets(self):
         self.testUUID = None
         invalid_states_only_single = pd.DataFrame({
             "user_id": ["user_1", "user_2", "user_3"],
-            "curr_run_ts": [arrow.get("2022-09-20").timestamp, arrow.get("2022-09-21").timestamp, arrow.get("2022-09-22").timestamp],
+            "curr_run_ts": [arrow.get("2022-09-20").int_timestamp, arrow.get("2022-09-21").int_timestamp, arrow.get("2022-09-22").int_timestamp],
             "pipeline_stage": [0, 6, 13]
         })
         reset_ts_df = epr.get_single_state_resets(invalid_states_only_single)
@@ -715,13 +716,13 @@ class TestPipelineReset(unittest.TestCase):
         self.assertTrue("reset_ts" in reset_ts_df.columns)
         self.assertTrue("reset_ts" not in invalid_states_only_single.columns)
         self.assertEqual(reset_ts_df.reset_ts.to_list(),
-            invalid_states_only_single.curr_run_ts.apply(lambda ts: arrow.get(ts).shift(hours=-3).timestamp).to_list())
+            invalid_states_only_single.curr_run_ts.apply(lambda ts: arrow.get(ts).shift(hours=-3).int_timestamp).to_list())
 
     def testGetMultiStateResets(self):
         self.testUUID = None
         invalid_states_only_multi = pd.DataFrame({
             "user_id": ["user_1", "user_1", "user_1", "user_2", "user_2", "user_2"],
-            "curr_run_ts": [arrow.get("2022-09-20").timestamp, arrow.get("2022-09-21").timestamp, arrow.get("2022-09-22").timestamp] * 2,
+            "curr_run_ts": [arrow.get("2022-09-20").int_timestamp, arrow.get("2022-09-21").int_timestamp, arrow.get("2022-09-22").int_timestamp] * 2,
             "pipeline_stage": [0, 6, 13] * 2
         })
         reset_ts_df = epr.get_multi_state_resets(invalid_states_only_multi)
@@ -729,15 +730,15 @@ class TestPipelineReset(unittest.TestCase):
         self.assertTrue("reset_ts" in reset_ts_df)
         # Since there are multiple entries, we will reset to the most recent one
         self.assertEqual(reset_ts_df.reset_ts.to_list(),
-            [arrow.get("2022-09-20").shift(hours=-3).timestamp] * 2)
+            [arrow.get("2022-09-20").shift(hours=-3).int_timestamp] * 2)
 
     def testGetAllResets(self):
         self.testUUID = None
         invalid_states_mixed = pd.DataFrame({
             "user_id": ["user_1", "user_1", "user_1", "user_2", "user_3", "user_4"],
-            "curr_run_ts": [arrow.get("2022-09-20").timestamp,
-                arrow.get("2022-09-21").timestamp,
-                arrow.get("2022-09-22").timestamp] * 2,
+            "curr_run_ts": [arrow.get("2022-09-20").int_timestamp,
+                arrow.get("2022-09-21").int_timestamp,
+                arrow.get("2022-09-22").int_timestamp] * 2,
             "pipeline_stage": [0, 6, 13] * 2
         })
         reset_ts_df = epr.get_all_resets(invalid_states_mixed).sort_values(
@@ -747,19 +748,19 @@ class TestPipelineReset(unittest.TestCase):
         print(reset_ts_df)
         # Since there are multiple entries, we will reset to the most recent one
         self.assertEqual(reset_ts_df.reset_ts.to_list(),
-            [arrow.get("2022-09-20").shift(hours=-3).timestamp, # user1, most recent
-             arrow.get("2022-09-20").shift(hours=-3).timestamp, # user2, only one entry
-             arrow.get("2022-09-21").shift(hours=-3).timestamp, # user3, only one entry
-             arrow.get("2022-09-22").shift(hours=-3).timestamp]) # user4, only one entry
+            [arrow.get("2022-09-20").shift(hours=-3).int_timestamp, # user1, most recent
+             arrow.get("2022-09-20").shift(hours=-3).int_timestamp, # user2, only one entry
+             arrow.get("2022-09-21").shift(hours=-3).int_timestamp, # user3, only one entry
+             arrow.get("2022-09-22").shift(hours=-3).int_timestamp]) # user4, only one entry
 
     def testNormalizeWithACursor(self):
         invalid_states_mixed = pd.DataFrame({
             "user_id": ["user_1", "user_1", "user_1", "user_2", "user_3", "user_4",
                 "user_5", "user_6"],
-            "curr_run_ts": [arrow.get("2022-09-20").timestamp,
-                arrow.get("2022-09-21").timestamp,
-                arrow.get("2022-09-22").timestamp] * 2 +
-                [None, arrow.get("2022-09-09").timestamp],
+            "curr_run_ts": [arrow.get("2022-09-20").int_timestamp,
+                arrow.get("2022-09-21").int_timestamp,
+                arrow.get("2022-09-22").int_timestamp] * 2 +
+                [None, arrow.get("2022-09-09").int_timestamp],
             "pipeline_stage": [0, 6, 13] * 2 + [11, 9] # add an output gen
         })
         self.testUUIDList = invalid_states_mixed.user_id.to_list()
@@ -769,9 +770,7 @@ class TestPipelineReset(unittest.TestCase):
         df_from_cursor = pd.json_normalize(edb.get_pipeline_state_db().find())
         df_from_list = pd.json_normalize(list(edb.get_pipeline_state_db().find()))
 
-        # This is actually incorrect because we saved everything, so we should read back everything
-        # but it is the current behavior, so let's flag if it changes
-        self.assertEqual(len(df_from_cursor), len(invalid_states_mixed) - 1)
+        self.assertEqual(len(df_from_cursor), len(invalid_states_mixed))
 
         # This is the expected behavior in all cases, but let's make sure that it stays as we move through versions of pandas
         self.assertEqual(len(df_from_list), len(invalid_states_mixed))
@@ -783,11 +782,11 @@ class TestPipelineReset(unittest.TestCase):
         invalid_states_mixed = pd.DataFrame({
             "user_id": ["user_no_missing", "user_1", "user_1", "user_1", "user_2", "user_3", "user_4",
                 "user_5", "user_6"],
-            "curr_run_ts": [arrow.get("2022-09-19").timestamp]+
-                [arrow.get("2022-09-20").timestamp,
-                arrow.get("2022-09-21").timestamp,
-                arrow.get("2022-09-22").timestamp] * 2 +
-                [None, arrow.get("2022-09-09").timestamp],
+            "curr_run_ts": [arrow.get("2022-09-19").int_timestamp]+
+                [arrow.get("2022-09-20").int_timestamp,
+                arrow.get("2022-09-21").int_timestamp,
+                arrow.get("2022-09-22").int_timestamp] * 2 +
+                [None, arrow.get("2022-09-09").int_timestamp],
             "pipeline_stage": [2] + [0, 6, 13] * 2 + [11, 9] # add an output gen
         })
         self.testUUIDList = invalid_states_mixed.user_id.to_list()
@@ -835,13 +834,13 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=bju.object_hook)
-        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=bju.object_hook)
+        ground_truth_1 = bju.loads(open(dataFile_1+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        ground_truth_2 = bju.loads(open(dataFile_2+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
 
         # Run both pipelines
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = json.load(open(dataFile_2), object_hook = bju.object_hook)
+        self.entries = bju.loads(open(dataFile_2).read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -865,10 +864,10 @@ class TestPipelineReset(unittest.TestCase):
 
         jul_24 = arrow.get("2016-07-24")
 
-        force_run_state(ecwp.PipelineStages.EXPECTATION_POPULATION, jul_24.shift(hours=-1).timestamp)
-        force_run_state(ecwp.PipelineStages.CLEAN_RESAMPLING, jul_24.shift(hours=-2).timestamp)
-        force_run_state(ecwp.PipelineStages.SECTION_SEGMENTATION, jul_24.shift(hours=-3).timestamp)
-        force_run_state(ecwp.PipelineStages.OUTPUT_GEN, jul_24.shift(hours=-4).timestamp)
+        force_run_state(ecwp.PipelineStages.EXPECTATION_POPULATION, jul_24.shift(hours=-1).int_timestamp)
+        force_run_state(ecwp.PipelineStages.CLEAN_RESAMPLING, jul_24.shift(hours=-2).int_timestamp)
+        force_run_state(ecwp.PipelineStages.SECTION_SEGMENTATION, jul_24.shift(hours=-3).int_timestamp)
+        force_run_state(ecwp.PipelineStages.OUTPUT_GEN, jul_24.shift(hours=-4).int_timestamp)
 
         epr.auto_reset(dry_run=False, only_calc=False)
         # Second day does not exist
