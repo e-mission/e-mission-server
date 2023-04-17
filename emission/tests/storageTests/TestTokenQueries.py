@@ -156,11 +156,21 @@ class TestTokenQueries(unittest.TestCase):
         esdt.insert({'token':'y'})
         esdt.insert({'token':'z'})
         sp = subprocess.run(["python3", "bin/auth/insert_tokens.py", "--show"], capture_output=True)
-        self.assertEqual(sp.stdout, b'storage not configured, falling back to sample, default configuration\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL localhost\nx\ny\nz\n')
+        # The first message is displayed when we run tests locally
+        # The second is displayed when we run in the docker CI, since the `DB_HOST` is set to `db`
+        self.assertIn(sp.stdout,
+            [b'storage not configured, falling back to sample, default configuration\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL localhost\nx\ny\nz\n',
+            b'URL not formatted, defaulting to "Stage_database"\nConnecting to database URL db\nx\ny\nz\n'
+        ])
 
     def test_run_script_empty(self):
         sp = subprocess.run(["python3", "bin/auth/insert_tokens.py"], capture_output=True)
-        self.assertEqual(sp.stdout, b'storage not configured, falling back to sample, default configuration\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL localhost\nPlease provide the script with an argument. Use the "--help" option for more details\n')
+        # The first message is displayed when we run tests locally
+        # The second is displayed when we run in the docker CI, since the `DB_HOST` is set to `db`
+        self.assertIn(sp.stdout,
+            [b'storage not configured, falling back to sample, default configuration\nURL not formatted, defaulting to "Stage_database"\nConnecting to database URL localhost\nPlease provide the script with an argument. Use the "--help" option for more details\n',
+            b'URL not formatted, defaulting to "Stage_database"\nConnecting to database URL db\nPlease provide the script with an argument. Use the "--help" option for more details\n'
+        ])
 
     #test that no two options can be used together
     def test_run_script_mutex(self):
