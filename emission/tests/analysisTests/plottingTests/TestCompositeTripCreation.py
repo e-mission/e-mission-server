@@ -6,6 +6,7 @@ import geojson as gj
 import bson.json_util as bju
 import os
 import uuid
+import numpy as np
 
 # Our imports
 import emission.core.get_database as edb
@@ -34,6 +35,8 @@ import emission.tests.common as etc
 
 class TestCompositeTripCreation(unittest.TestCase):
     def setUp(self):
+        # Thanks to M&J for the number!
+        np.random.seed(61297777)
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2016-08-04")
         etc.runIntakePipeline(self.testUUID)
         self.testTs = esta.TimeSeries.get_time_series(self.testUUID)
