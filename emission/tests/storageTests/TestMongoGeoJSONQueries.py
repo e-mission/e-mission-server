@@ -17,7 +17,7 @@ class TestGeoJSON(unittest.TestCase):
     self.Sections=get_test_db()
 
   def tearDown(self):
-    get_test_db().remove()
+    get_test_db().delete_many({})
 
   def testGeoWithinPostsData(self):
     post1 = {"author": "Mike",

@@ -4,6 +4,7 @@
 
 import unittest
 import numpy as np
+import copy
 
 import emission.tests.common as etc
 import emission.core.get_database as edb
@@ -31,7 +32,7 @@ class TestPipelineStageNonrepetition(unittest.TestCase):
     ]
 
     def setUp(self):
-        self.test_options_stash = eace._test_options
+        self.test_options_stash = copy.copy(eace._test_options)
         eace._test_options = {
             "use_sample": True,
             "override_keylist": None
@@ -51,7 +52,7 @@ class TestPipelineStageNonrepetition(unittest.TestCase):
     def run_pipeline(self, algorithms={ecwl.AlgorithmTypes.PLACEHOLDER_2: eacili.placeholder_predictor_2}):
         primary_algorithms_stash = eacilp.primary_algorithms
         eacilp.primary_algorithms = algorithms
-        test_options_stash = eaue._test_options
+        test_options_stash = copy.copy(eaue._test_options)
         etc.runIntakePipeline(self.testUUID)  # testUUID is set in setupRealExample
         eacilp.primary_algorithms = primary_algorithms_stash
         eaue._test_options = test_options_stash
