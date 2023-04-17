@@ -817,7 +817,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID)
         # The place additions should be dispersed to the actual places
         composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
-        with open(dataFile_1+".spread-across-aug-5.expected_composite_trips") as expectation:
+        with open(dataFile_1+".spread-across-aug-5.alt.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = bju.object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
             for i in range(len(composite_trips)):
@@ -831,7 +831,7 @@ class TestPipelineRealData(unittest.TestCase):
         # They should all match the actual entries
         # Trip matches should also work
         composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
-        with open(dataFile_1+".trip-matches-check-aug-4.expected_composite_trips") as expectation:
+        with open(dataFile_1+".trip-matches-check-aug-4.alt.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = bju.object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
             for i in range(len(composite_trips)):
@@ -875,7 +875,7 @@ class TestPipelineRealData(unittest.TestCase):
         etc.runIntakePipeline(self.testUUID)
         # The place additions should be dispersed to the actual places
         composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
-        with open(dataFile_1+".retained-last-place.expected_composite_trips") as expectation:
+        with open(dataFile_1+".retained-last-place.alt.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = bju.object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
             for i in range(len(composite_trips)):
