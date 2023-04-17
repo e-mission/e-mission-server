@@ -26,8 +26,8 @@ class TestMetrics(unittest.TestCase):
 
         logging.info(
             "After loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
-        self.jun_start_ts = arrow.get(datetime(2016,6,1), "America/Los_Angeles").timestamp
-        self.jun_end_ts = arrow.get(datetime(2016,7,30), "America/Los_Angeles").timestamp
+        self.jun_start_ts = arrow.get(datetime(2016,6,1), "America/Los_Angeles").int_timestamp
+        self.jun_end_ts = arrow.get(datetime(2016,7,30), "America/Los_Angeles").int_timestamp
         self.jun_start_dt = ecwl.LocalDate.get_local_date(self.jun_start_ts, "America/Los_Angeles")
         self.jun_end_dt = ecwl.LocalDate.get_local_date(self.jun_end_ts, "America/Los_Angeles")
 
@@ -110,10 +110,10 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual([[m.nUsers for m in ml] for ml in met_result["user_metrics"]],
             [[1, 1]]*5)
         self.assertEqual(user_met_count_result[0]["label_bike"], 2)
-        self.assertAlmostEqual(user_met_dist_result[0]["label_bike"], 4305.02678, places=3)
+        self.assertAlmostEqual(user_met_dist_result[0]["label_bike"], 4108.08351, places=3)
         self.assertAlmostEqual(user_met_dur_result[0]["label_bike"], 2388.97132, places=3)
-        self.assertAlmostEqual(user_met_old_spd_result[0]["label_bike"], 2.24535722467578, places=3)
-        self.assertAlmostEqual(user_met_spd_result[0]["label_bike"], 2.24535722467578, places=3)
+        self.assertAlmostEqual(user_met_old_spd_result[0]["label_bike"], 2.195459, places=3)
+        self.assertAlmostEqual(user_met_spd_result[0]["label_bike"], 2.195459, places=3)
 
     def testCountTimestampPartialMissingLabels(self):
         self.entries = json.load(open("emission/tests/data/real_examples/shankari_2016-07-22"), object_hook = bju.object_hook)
@@ -290,8 +290,8 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual(met_result_ld['user_metrics'][0], [])
 
         met_result_ts = metrics.summarize_by_timestamp(self.testUUID,
-                                                       arrow.get(2000,1,1).timestamp,
-                                                       arrow.get(2001,1,1).timestamp,
+                                                       arrow.get(2000,1,1).int_timestamp,
+                                                       arrow.get(2001,1,1).int_timestamp,
                                                         'm', ['count'], True)
         self.assertEqual(list(met_result_ts.keys()), ['aggregate_metrics', 'user_metrics'])
         self.assertEqual(met_result_ts['aggregate_metrics'][0], [])

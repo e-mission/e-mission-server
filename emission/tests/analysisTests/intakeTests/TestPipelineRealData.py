@@ -33,6 +33,7 @@ import unittest
 import logging
 import json
 import bson.json_util as bju
+from bson.binary import UuidRepresentation
 import attrdict as ad
 import arrow
 import numpy as np
@@ -47,10 +48,13 @@ import emission.core.wrapper.localdate as ecwl
 import emission.net.usercache.abstract_usercache_handler as enuah
 import emission.analysis.plotting.geojson.geojson_feature_converter as gfc
 import emission.storage.timeseries.tcquery as estt
+import emission.storage.timeseries.abstract_timeseries as esta
 import emission.core.common as ecc
+import emission.core.wrapper.user as ecwu
 
 # Test imports
 import emission.tests.common as etc
+import time
 
 class TestPipelineRealData(unittest.TestCase):
     def setUp(self):
@@ -61,16 +65,20 @@ class TestPipelineRealData(unittest.TestCase):
         logging.info("setUp complete")
 
     def tearDown(self):
-        logging.debug("Clearing related databases for %s" % self.testUUID)
-        # Clear the database only if it is not an evaluation run
-        # A testing run validates that nothing has changed
-        # An evaluation run compares to different algorithm implementations
-        # to determine whether to switch to a new implementation
-        if not hasattr(self, "evaluation") or not self.evaluation:
-            self.clearRelatedDb()
-        if hasattr(self, "analysis_conf_path"):
-            os.remove(self.analysis_conf_path)
-        logging.info("tearDown complete")
+        if os.environ.get("SKIP_TEARDOWN", False):
+            logging.info("SKIP_TEARDOWN = true, not clearing related databases")
+            ecwu.User.registerWithUUID("automated_tests", self.testUUID)
+        else:
+            logging.debug("Clearing related databases for %s" % self.testUUID)
+            # Clear the database only if it is not an evaluation run
+            # A testing run validates that nothing has changed
+            # An evaluation run compares to different algorithm implementations
+            # to determine whether to switch to a new implementation
+            if not hasattr(self, "evaluation") or not self.evaluation:
+                self.clearRelatedDb()
+            if hasattr(self, "analysis_conf_path"):
+                os.remove(self.analysis_conf_path)
+            logging.info("tearDown complete")
 
     def clearRelatedDb(self):
         logging.info("Timeseries delete result %s" % edb.get_timeseries_db().delete_many({"user_id": self.testUUID}).raw_result)
@@ -200,8 +208,8 @@ class TestPipelineRealData(unittest.TestCase):
 
     def standardMatchDataGroundTruth(self, dataFile, ld, cacheKey):
         with open(dataFile+".ground_truth") as gfp:
-            ground_truth = json.load(gfp, object_hook=bju.object_hook)
-
+            ground_truth = bju.loads(gfp.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
         # runIntakePipeline does not run the common trips, habitica or store views to cache
@@ -321,7 +329,7 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 15})
         cacheKey = "diary/trips-2016-08-15"
         with open("emission/tests/data/real_examples/shankari_2016-independence_day.alt.ground_truth") as gfp:
-            ground_truth = json.load(gfp, object_hook=bju.object_hook)
+            ground_truth = bju.loads(gfp.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
 
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
@@ -337,7 +345,7 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 15})
         cacheKey = "diary/trips-2016-08-15"
         with open("emission/tests/data/real_examples/shankari_2016-independence_day.alt.ground_truth") as gfp:
-            ground_truth = json.load(gfp, object_hook=bju.object_hook)
+            ground_truth = bju.loads(gfp.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
 
         etc.setupRealExample(self, dataFile)
         etc.runIntakePipeline(self.testUUID)
@@ -385,14 +393,13 @@ class TestPipelineRealData(unittest.TestCase):
         end_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 10})
         cacheKey = "diary/trips-2016-08-10"
         with open("emission/tests/data/real_examples/shankari_2016-08-910.ground_truth") as gtf:
-            ground_truth = json.load(gtf,
-                                 object_hook=bju.object_hook)
+            ground_truth = bju.loads(gtf.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
 
         logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
         all_entries = None
         with open(dataFile) as secondfp:
-            all_entries = json.load(secondfp, object_hook = bju.object_hook)
-        ts_1030 = arrow.get("2016-08-10T10:30:00-07:00").timestamp
+            all_entries = bju.loads(secondfp.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        ts_1030 = arrow.get("2016-08-10T10:30:00-07:00").int_timestamp
         logging.debug("ts_1030 = %s, converted back = %s" % (ts_1030, arrow.get(ts_1030).to("America/Los_Angeles")))
         before_1030_entries = [e for e in all_entries if ad.AttrDict(e).metadata.write_ts <= ts_1030]
         after_1030_entries = [e for e in all_entries if ad.AttrDict(e).metadata.write_ts > ts_1030]
@@ -428,14 +435,14 @@ class TestPipelineRealData(unittest.TestCase):
         end_ld = ecwl.LocalDate({'year': 2016, 'month': 2, 'day': 22})
         cacheKey = "diary/trips-2016-02-22"
         with open(dataFile+".ground_truth") as gtf:
-            ground_truth = json.load(gtf, object_hook=bju.object_hook)
+            ground_truth = bju.loads(gtf.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
 
         logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
         with open(dataFile) as df:
-            all_entries = json.load(df, object_hook = bju.object_hook)
+            all_entries = bju.loads(df.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
         # 18:01 because the transition was at 2016-02-22T18:00:09.623404-08:00, so right after
         # 18:00
-        ts_1800 = arrow.get("2016-02-22T18:00:30-08:00").timestamp
+        ts_1800 = arrow.get("2016-02-22T18:00:30-08:00").int_timestamp
         logging.debug("ts_1800 = %s, converted back = %s" % (ts_1800, arrow.get(ts_1800).to("America/Los_Angeles")))
         before_1800_entries = [e for e in all_entries if ad.AttrDict(e).metadata.write_ts <= ts_1800]
         after_1800_entries = [e for e in all_entries if ad.AttrDict(e).metadata.write_ts > ts_1800]
@@ -467,13 +474,12 @@ class TestPipelineRealData(unittest.TestCase):
         end_ld = ecwl.LocalDate({'year': 2016, 'month': 8, 'day': 10})
         cacheKey = "diary/trips-2016-08-10"
         with open("emission/tests/data/real_examples/shankari_2016-08-910.ground_truth") as gtf:
-            ground_truth = json.load(gtf,
-                                 object_hook=bju.object_hook)
+            ground_truth = bju.loads(gtf.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
 
         logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
         with open(dataFile) as df:
-            all_entries = json.load(df, object_hook = bju.object_hook)
-        ts_1030 = arrow.get("2016-08-10T10:30:00-07:00").timestamp
+            all_entries = bju.loads(df.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        ts_1030 = arrow.get("2016-08-10T10:30:00-07:00").int_timestamp
         logging.debug("ts_1030 = %s, converted back = %s" % (ts_1030, arrow.get(ts_1030).to("America/Los_Angeles")))
         before_1030_entries = [e for e in all_entries if ad.AttrDict(e).metadata.write_ts <= ts_1030]
         after_1030_entries = [e for e in all_entries if ad.AttrDict(e).metadata.write_ts > ts_1030]
@@ -509,14 +515,14 @@ class TestPipelineRealData(unittest.TestCase):
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
         with open(dataFile_1+".ground_truth") as gtf1:
-            ground_truth_1 = json.load(gtf1, object_hook=bju.object_hook)
+            ground_truth_1 = bju.loads(gtf1.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
         with open(dataFile_2+".ground_truth") as gtf2:
-            ground_truth_2 = json.load(gtf2, object_hook=bju.object_hook)
+            ground_truth_2 = bju.loads(gtf2.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
 
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
         with open(dataFile_2) as df2:
-            self.entries = json.load(df2, object_hook = bju.object_hook)
+            self.entries = bju.loads(df2.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -541,14 +547,14 @@ class TestPipelineRealData(unittest.TestCase):
         end_ld = ecwl.LocalDate({'year': 2016, 'month': 2, 'day': 22})
         cacheKey = "diary/trips-2016-02-22"
         with open(dataFile+".ground_truth") as gtf:
-            ground_truth = json.load(gtf, object_hook=bju.object_hook)
+            ground_truth = bju.loads(gtf.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
 
         logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
         with open(dataFile) as df:
-            all_entries = json.load(df, object_hook = bju.object_hook)
+            all_entries = bju.loads(df.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
         # 18:01 because the transition was at 2016-02-22T18:00:09.623404-08:00, so right after
         # 18:00
-        ts_1800 = arrow.get("2016-02-22T18:00:30-08:00").timestamp
+        ts_1800 = arrow.get("2016-02-22T18:00:30-08:00").int_timestamp
         logging.debug("ts_1800 = %s, converted back = %s" % (ts_1800, arrow.get(ts_1800).to("America/Los_Angeles")))
         before_1800_entries = [e for e in all_entries if ad.AttrDict(e).metadata.write_ts <= ts_1800]
         after_1800_entries = [e for e in all_entries if ad.AttrDict(e).metadata.write_ts > ts_1800]
@@ -581,14 +587,14 @@ class TestPipelineRealData(unittest.TestCase):
         end_ld = ecwl.LocalDate({'year': 2016, 'month': 10, 'day': 0o7})
         cacheKey = "diary/trips-2016-10-07"
         with open(dataFile+".ground_truth") as gtf:
-            ground_truth = json.load(gtf, object_hook=bju.object_hook)
+            ground_truth = bju.loads(gtf.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
 
         logging.info("Before loading, timeseries db size = %s" % edb.get_timeseries_db().estimated_document_count())
         with open(dataFile) as df:
-            all_entries = json.load(df, object_hook = bju.object_hook)
+            all_entries = bju.loads(df.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
         # 18:01 because the transition was at 2016-02-22T18:00:09.623404-08:00, so right after
         # 18:00
-        ts_1800 = arrow.get("2016-10-07T18:33:11-07:00").timestamp
+        ts_1800 = arrow.get("2016-10-07T18:33:11-07:00").int_timestamp
         logging.debug("ts_1800 = %s, converted back = %s" % (ts_1800, arrow.get(ts_1800).to("America/Los_Angeles")))
         before_1800_entries = [e for e in all_entries if ad.AttrDict(e).metadata.write_ts <= ts_1800]
         after_1800_entries = [e for e in all_entries if ad.AttrDict(e).metadata.write_ts > ts_1800]
@@ -621,13 +627,13 @@ class TestPipelineRealData(unittest.TestCase):
         cacheKey_1 = "diary/trips-2016-01-12"
         cacheKey_2 = "diary/trips-2016-01-13"
         with open(dataFile_1+".ground_truth") as gtf1:
-            ground_truth_1 = json.load(gtf1, object_hook=bju.object_hook)
+            ground_truth_1 = bju.loads(gtf1.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
         with open(dataFile_2+".ground_truth") as gtf2:
-            ground_truth_2 = json.load(gtf2, object_hook=bju.object_hook)
+            ground_truth_2 = bju.loads(gtf2.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
 
         etc.setupRealExample(self, dataFile_1)
         with open(dataFile_2) as df2:
-            self.entries = json.load(df2, object_hook = bju.object_hook)
+            self.entries = bju.loads(df2.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -653,14 +659,14 @@ class TestPipelineRealData(unittest.TestCase):
         cacheKey_1 = "diary/trips-2016-01-12"
         cacheKey_2 = "diary/trips-2016-01-13"
         with open(dataFile_1+".ground_truth") as gtf1:
-            ground_truth_1 = json.load(gtf1, object_hook=bju.object_hook)
+            ground_truth_1 = bju.loads(gtf1.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
         with open(dataFile_2+".ground_truth") as gtf2:
-            ground_truth_2 = json.load(gtf2, object_hook=bju.object_hook)
+            ground_truth_2 = bju.loads(gtf2.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
 
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
         with open(dataFile_2) as df2:
-            self.entries = json.load(df2, object_hook = bju.object_hook)
+            self.entries = bju.loads(df2.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -696,6 +702,184 @@ class TestPipelineRealData(unittest.TestCase):
         start_ld = ecwl.LocalDate({'year': 2016, 'month': 1, 'day': 16})
         cacheKey = "diary/trips-2016-01-16"
         self.standardMatchDataGroundTruth(dataFile, start_ld, cacheKey)
+
+    def compare_composite_objects(self, ct, et):
+        print(f"--------------- Comparing composite trip {ct['_id']} to expected composite trip {et['_id']} -------------------")
+        self.assertEqual(ct['data']['start_ts'], et['data']['start_ts'])
+        self.assertEqual(ct['data']['end_ts'], et['data']['end_ts'])
+        if 'end_confirmed_place' in et['data']:
+            self.assertEqual(ct['data']['end_confirmed_place']['data']['enter_ts'],
+                                et['data']['end_confirmed_place']['data']['enter_ts'])
+            if 'exit_ts' in et['data']['end_confirmed_place']:
+                self.assertEqual(ct['data']['end_confirmed_place']['exit_ts'],
+                                    et['data']['end_confirmed_place']['exit_ts'])
+        self.assertEqual(len(ct['data']['locations']), len(et['data']['locations']))
+
+    def testJackUntrackedTimeMar12(self):
+        dataFile = "emission/tests/data/real_examples/jack_untracked_time_2023-03-12"
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        with open(dataFile+".expected_composite_trips") as expectation:
+            expected_trips = json.load(expectation, object_hook = bju.object_hook)
+            self.assertEqual(len(composite_trips), len(expected_trips))
+            for i in range(len(composite_trips)):
+                self.compare_composite_objects(composite_trips[i], expected_trips[i])
+
+    def testShankariNotUntrackedTimeMar21(self):
+        # https://github.com/e-mission/e-mission-docs/issues/870
+        # This data *used to* process with untracked time.
+        # We tweaked the threshold for untracked time, so from now on this data
+        # should process smoothly into a continuous sequence of confirmed trips.
+        # https://github.com/e-mission/e-mission-server/commit/df9d9f0844eedcf7405d88afe9da1b02ee365986
+        dataFile = "emission/tests/data/real_examples/shankari_not_untracked_time_mar_21"
+        start_run = time.time()
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        end_run = time.time()
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        for ct in composite_trips:
+            # for this data, every composite trip should come from a confirmed trip,
+            # NOT from untracked time
+            self.assertEqual(ct['metadata']['origin_key'], 'analysis/confirmed_trip')
+            self.assertGreater(ct["metadata"]["write_ts"], start_run)
+            self.assertLessEqual(ct["metadata"]["write_ts"], end_run)
+
+    def testShankariNotUntrackedTimeJan15(self):
+        # This data has a reboot, so it should process with 1 instance of untracked time
+        dataFile = "emission/tests/data/real_examples/shankari_untracked_time_jan_15_reboot_multi_day"
+        start_run = time.time()
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        end_run = time.time()
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        countUntrackedTime = 0
+        for ct in composite_trips:
+            if ct['metadata']['origin_key'] == 'analysis/confirmed_untracked':
+                countUntrackedTime += 1
+            self.assertGreater(ct["metadata"]["write_ts"], start_run)
+            self.assertLessEqual(ct["metadata"]["write_ts"], end_run)
+        self.assertEqual(countUntrackedTime, 1)
+
+    def testShankariUntrackedTimeJul20(self):
+        # This data has a large gap, so it should process with 1 instance of untracked time
+        dataFile = "emission/tests/data/real_examples/shankari_untracked_time_jul_20_large_gap"
+        start_run = time.time()
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        end_run = time.time()
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        countUntrackedTime = 0
+        for ct in composite_trips:
+            logging.debug("composite trip metadata %s = " % ct['metadata'])
+            if ct['metadata']['origin_key'] == 'analysis/confirmed_untracked':
+                countUntrackedTime += 1
+            self.assertGreater(ct["metadata"]["write_ts"], start_run)
+            self.assertLessEqual(ct["metadata"]["write_ts"], end_run)
+        self.assertEqual(countUntrackedTime, 0)
+
+    def testCompositeTripIncremental(self):
+        # Test for 545114feb5ac15caac4110d39935612525954b71
+        dataFile_1 = "emission/tests/data/real_examples/shankari_2016-08-04"
+        dataFile_2 = "emission/tests/data/real_examples/shankari_2016-08-05"
+
+        etc.setupRealExample(self, dataFile_1)
+        etc.runIntakePipeline(self.testUUID)
+
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        with open(dataFile_1+".before-user-inputs.expected_composite_trips") as expectation:
+            expected_trips = json.load(expectation, object_hook = bju.object_hook)
+            self.assertEqual(len(composite_trips), len(expected_trips))
+            for i in range(len(composite_trips)):
+                self.compare_composite_objects(composite_trips[i], expected_trips[i])
+
+        self.entries = json.load(open(dataFile_2+".user_inputs"), object_hook = bju.object_hook)
+        # Load the place additions from the 5th (so after the end of the current day)
+        etc.setupRealExampleWithEntries(self)
+        etc.runIntakePipeline(self.testUUID)
+        # They should all match the final place
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        with open(dataFile_1+".all-match-last-place.expected_composite_trips") as expectation:
+            expected_trips = json.load(expectation, object_hook = bju.object_hook)
+            self.assertEqual(len(composite_trips), len(expected_trips))
+            for i in range(len(composite_trips)):
+                self.compare_composite_objects(composite_trips[i], expected_trips[i])
+
+        # load day 2
+        with open(dataFile_2) as df2:
+            self.entries = json.load(df2, object_hook = bju.object_hook)
+        etc.setupRealExampleWithEntries(self)
+        etc.runIntakePipeline(self.testUUID)
+        # The place additions should be dispersed to the actual places
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        with open(dataFile_1+".spread-across-aug-5.alt.expected_composite_trips") as expectation:
+            expected_trips = json.load(expectation, object_hook = bju.object_hook)
+            self.assertEqual(len(composite_trips), len(expected_trips))
+            for i in range(len(composite_trips)):
+                self.compare_composite_objects(composite_trips[i], expected_trips[i])
+
+        # load place and trip additions and trip inputs for the first day
+        self.entries = json.load(open(dataFile_1+".user_inputs"), object_hook = bju.object_hook)
+        # Load the place additions from the 4th (so somewhere in the middle, and all mixed)
+        etc.setupRealExampleWithEntries(self)
+        etc.runIntakePipeline(self.testUUID)
+        # They should all match the actual entries
+        # Trip matches should also work
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        with open(dataFile_1+".trip-matches-check-aug-4.alt.expected_composite_trips") as expectation:
+            expected_trips = json.load(expectation, object_hook = bju.object_hook)
+            self.assertEqual(len(composite_trips), len(expected_trips))
+            for i in range(len(composite_trips)):
+                self.compare_composite_objects(composite_trips[i], expected_trips[i])
+
+    def testCompositeTripIncrementalLastPlaceMatches(self):
+        # Test for 545114feb5ac15caac4110d39935612525954b71
+        dataFile_1 = "emission/tests/data/real_examples/shankari_2023-04-13"
+        dataFile_2 = "emission/tests/data/real_examples/shankari_2023-04-14"
+
+        etc.setupRealExample(self, dataFile_1)
+        etc.runIntakePipeline(self.testUUID)
+
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        with open(dataFile_1+".before-user-inputs.expected_composite_trips") as expectation:
+            expected_trips = json.load(expectation, object_hook = bju.object_hook)
+            self.assertEqual(len(composite_trips), len(expected_trips))
+            for i in range(len(composite_trips)):
+                self.compare_composite_objects(composite_trips[i], expected_trips[i])
+
+        # Load the place additions for both days
+        self.entries = json.load(open(dataFile_1+".user_inputs"), object_hook = bju.object_hook)
+        etc.setupRealExampleWithEntries(self)
+        self.entries = json.load(open(dataFile_2+".user_inputs"), object_hook = bju.object_hook)
+        etc.setupRealExampleWithEntries(self)
+        etc.runIntakePipeline(self.testUUID)
+
+        # They should all match the final place
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        with open(dataFile_1+".all-match-last-place.expected_composite_trips") as expectation:
+            expected_trips = json.load(expectation, object_hook = bju.object_hook)
+            self.assertEqual(len(composite_trips), len(expected_trips))
+            for i in range(len(composite_trips)):
+                self.compare_composite_objects(composite_trips[i], expected_trips[i])
+
+        # load day 2
+        with open(dataFile_2) as df2:
+            self.entries = json.load(df2, object_hook = bju.object_hook)
+        etc.setupRealExampleWithEntries(self)
+        etc.runIntakePipeline(self.testUUID)
+        # The place additions should be dispersed to the actual places
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        with open(dataFile_1+".retained-last-place.alt.expected_composite_trips") as expectation:
+            expected_trips = json.load(expectation, object_hook = bju.object_hook)
+            self.assertEqual(len(composite_trips), len(expected_trips))
+            for i in range(len(composite_trips)):
+                self.compare_composite_objects(composite_trips[i], expected_trips[i])
 
 if __name__ == '__main__':
     etc.configLogging()

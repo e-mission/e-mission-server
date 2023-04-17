@@ -23,6 +23,10 @@ import numpy as np
 import pandas as pd
 import arrow
 import geojson as gj
+# This change should be removed in the next server update, by which time hopefully the new geojson version will incorporate the long-term fix for their default precision
+# See - jazzband/geojson#177
+# See = https://github.com/e-mission/e-mission-server/pull/900/commits/d2ada640f260aad8cbcfecb81345f4087c810baa
+gj.geometry.Geometry.__init__.__defaults__ = (None, False, 15)
 import json
 
 # Our imports
@@ -760,8 +764,8 @@ def _overwrite_from_loc_row(filtered_section_data, fixed_loc, prefix):
 
 def _overwrite_from_timestamp(filtered_trip_like, prefix, ts, tz, loc):
     filtered_trip_like[prefix+"_ts"] = float(ts)
-    filtered_trip_like[prefix+"_local_dt"] = ecwld.LocalDate.get_local_date(ts, tz)
-    filtered_trip_like[prefix+"_fmt_time"] = arrow.get(ts).to(tz).isoformat()
+    filtered_trip_like[prefix+"_local_dt"] = ecwld.LocalDate.get_local_date(float(ts), tz)
+    filtered_trip_like[prefix+"_fmt_time"] = arrow.get(float(ts)).to(tz).isoformat()
     filtered_trip_like[prefix+"_loc"] = loc
 
 def remove_outliers(raw_loc_entry_list, filtered_point_id_list):

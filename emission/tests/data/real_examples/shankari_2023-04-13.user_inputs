@@ -1,0 +1,2211 @@
+[
+    {
+        "_id": {
+            "$oid": "643a1a4080ea0c733078b6c3"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/place_addition_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681446720.367,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 21,
+                "minute": 32,
+                "second": 0,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T21:32:00.367000-07:00"
+        },
+        "data": {
+            "label": "1 Personal Care, ",
+            "name": "TimeUseSurvey",
+            "version": 9,
+            "xmlResponse": "<a88RxBtE3jwSar3cwiZTdn xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"a88RxBtE3jwSar3cwiZTdn\">\n          <start>2023-04-13T21:31:40.320-07:00</start>\n          <end>2023-04-13T21:31:40.321-07:00</end>\n          <group_hg4zz25>\n            <Date>2023-04-13</Date>\n            <Start_time>21:00:00.000-07:00</Start_time>\n            <End_time>21:31:40.192-07:00</End_time>\n            <Activity_Type>personal_care_activities</Activity_Type>\n            <Personal_Care_activities>eating_or_drinking</Personal_Care_activities>\n            <Employment_related_a_Education_activities/>\n            <Domestic_activities/>\n            <Recreation_and_leisure/>\n            <Voluntary_work_and_care_activities/>\n            <Other/>\n          </group_hg4zz25>\n          <meta>\n            <instanceID>uuid:f0edb504-8fd1-4aa5-a937-bcbcc315109b</instanceID>\n          </meta>\n        </a88RxBtE3jwSar3cwiZTdn>",
+            "jsonDocResponse": {
+                "a88RxBtE3jwSar3cwiZTdn": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "a88RxBtE3jwSar3cwiZTdn"
+                    },
+                    "start": "2023-04-13T21:31:40.320-07:00",
+                    "end": "2023-04-13T21:31:40.321-07:00",
+                    "group_hg4zz25": {
+                        "attr": {},
+                        "Date": "2023-04-13",
+                        "Start_time": "21:00:00.000-07:00",
+                        "End_time": "21:31:40.192-07:00",
+                        "Activity_Type": "personal_care_activities",
+                        "Personal_Care_activities": "eating_or_drinking",
+                        "Employment_related_a_Education_activities": "",
+                        "Domestic_activities": "",
+                        "Recreation_and_leisure": "",
+                        "Voluntary_work_and_care_activities": "",
+                        "Other": ""
+                    },
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:f0edb504-8fd1-4aa5-a937-bcbcc315109b"
+                    }
+                }
+            },
+            "start_ts": 1681444800,
+            "end_ts": 1681446700,
+            "match_id": "2f94bd8d-d631-4dd6-8c52-a44038c1c252",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 21,
+                "minute": 0,
+                "second": 0,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-13T21:00:00-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 21,
+                "minute": 31,
+                "second": 40,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-13T21:31:40-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "643a1a4080ea0c46334769f1"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/place_addition_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681446697.777,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 21,
+                "minute": 31,
+                "second": 37,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T21:31:37.777000-07:00"
+        },
+        "data": {
+            "label": "1 Domestic, ",
+            "name": "TimeUseSurvey",
+            "version": 9,
+            "xmlResponse": "<a88RxBtE3jwSar3cwiZTdn xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"a88RxBtE3jwSar3cwiZTdn\">\n          <start>2023-04-13T21:31:04.570-07:00</start>\n          <end>2023-04-13T21:31:04.570-07:00</end>\n          <group_hg4zz25>\n            <Date>2023-04-13</Date>\n            <Start_time>20:22:52.978-07:00</Start_time>\n            <End_time>21:00:00.000-07:00</End_time>\n            <Activity_Type>domestic_activities</Activity_Type>\n            <Personal_Care_activities/>\n            <Employment_related_a_Education_activities/>\n            <Domestic_activities>preparing_meals_or_snacks</Domestic_activities>\n            <Recreation_and_leisure/>\n            <Voluntary_work_and_care_activities/>\n            <Other/>\n          </group_hg4zz25>\n          <meta>\n            <instanceID>uuid:2c4df962-617d-424a-839f-75f4f3147226</instanceID>\n          </meta>\n        </a88RxBtE3jwSar3cwiZTdn>",
+            "jsonDocResponse": {
+                "a88RxBtE3jwSar3cwiZTdn": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "a88RxBtE3jwSar3cwiZTdn"
+                    },
+                    "start": "2023-04-13T21:31:04.570-07:00",
+                    "end": "2023-04-13T21:31:04.570-07:00",
+                    "group_hg4zz25": {
+                        "attr": {},
+                        "Date": "2023-04-13",
+                        "Start_time": "20:22:52.978-07:00",
+                        "End_time": "21:00:00.000-07:00",
+                        "Activity_Type": "domestic_activities",
+                        "Personal_Care_activities": "",
+                        "Employment_related_a_Education_activities": "",
+                        "Domestic_activities": "preparing_meals_or_snacks",
+                        "Recreation_and_leisure": "",
+                        "Voluntary_work_and_care_activities": "",
+                        "Other": ""
+                    },
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:2c4df962-617d-424a-839f-75f4f3147226"
+                    }
+                }
+            },
+            "start_ts": 1681442572.978,
+            "end_ts": 1681444800,
+            "match_id": "30427f9d-8faf-4448-bdbb-50378daaf644",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 20,
+                "minute": 22,
+                "second": 52,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-13T20:22:52.978000-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 21,
+                "minute": 0,
+                "second": 0,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-13T21:00:00-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "643a1a4080ea0c46334769f0"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/trip_addition_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681446662.171,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 21,
+                "minute": 31,
+                "second": 2,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T21:31:02.171000-07:00"
+        },
+        "data": {
+            "label": "1 Recreation/Leisure, ",
+            "name": "TimeUseSurvey",
+            "version": 9,
+            "xmlResponse": "<a88RxBtE3jwSar3cwiZTdn xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"a88RxBtE3jwSar3cwiZTdn\">\n          <start>2023-04-13T21:30:53.863-07:00</start>\n          <end>2023-04-13T21:30:53.864-07:00</end>\n          <group_hg4zz25>\n            <Date>2023-04-13</Date>\n            <Start_time>20:10:58.404-07:00</Start_time>\n            <End_time>20:22:52.978-07:00</End_time>\n            <Activity_Type>recreation_and_leisure</Activity_Type>\n            <Personal_Care_activities/>\n            <Employment_related_a_Education_activities/>\n            <Domestic_activities/>\n            <Recreation_and_leisure>spending_time_with_family_friends</Recreation_and_leisure>\n            <Voluntary_work_and_care_activities/>\n            <Other/>\n          </group_hg4zz25>\n          <meta>\n            <instanceID>uuid:d3f17e37-016c-4e1b-9228-50afd72cd782</instanceID>\n          </meta>\n        </a88RxBtE3jwSar3cwiZTdn>",
+            "jsonDocResponse": {
+                "a88RxBtE3jwSar3cwiZTdn": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "a88RxBtE3jwSar3cwiZTdn"
+                    },
+                    "start": "2023-04-13T21:30:53.863-07:00",
+                    "end": "2023-04-13T21:30:53.864-07:00",
+                    "group_hg4zz25": {
+                        "attr": {},
+                        "Date": "2023-04-13",
+                        "Start_time": "20:10:58.404-07:00",
+                        "End_time": "20:22:52.978-07:00",
+                        "Activity_Type": "recreation_and_leisure",
+                        "Personal_Care_activities": "",
+                        "Employment_related_a_Education_activities": "",
+                        "Domestic_activities": "",
+                        "Recreation_and_leisure": "spending_time_with_family_friends",
+                        "Voluntary_work_and_care_activities": "",
+                        "Other": ""
+                    },
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:d3f17e37-016c-4e1b-9228-50afd72cd782"
+                    }
+                }
+            },
+            "start_ts": 1681441858.40454,
+            "end_ts": 1681442572.978,
+            "match_id": "4354960f-2f89-4863-b9e3-5ed069b271b1",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 20,
+                "minute": 10,
+                "second": 58,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-13T20:10:58.404540-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 20,
+                "minute": 22,
+                "second": 52,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-13T20:22:52.978000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "643a1a4080ea0c733078b6c2"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/trip_user_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681446650.064,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 21,
+                "minute": 30,
+                "second": 50,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T21:30:50.064000-07:00"
+        },
+        "data": {
+            "label": "1 purpose, 1 mode",
+            "name": "TripConfirmSurvey",
+            "version": 1.2,
+            "xmlResponse": "<data xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:odk=\"http://www.opendatakit.org/xforms\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"snapshot_xml\">\n          <start>2023-04-13T21:30:42.667-07:00</start>\n          <end>2023-04-13T21:30:42.667-07:00</end>\n          <destination_purpose>go_home</destination_purpose>\n          <travel_mode>passenger</travel_mode>\n          <Total_people_in_trip_party>4</Total_people_in_trip_party>\n          <Non_household_member_s_on_trip>0</Non_household_member_s_on_trip>\n          <Vehicle_trip_Parking_location>1</Vehicle_trip_Parking_location>\n          <Parking_cost>0</Parking_cost>\n          <Total_toll_charges_p_uring_the_trip_AUD>0</Total_toll_charges_p_uring_the_trip_AUD>\n          <Transit_fees_AUD/>\n          <Taxi_fees/>\n          <meta>\n            <instanceID>uuid:66a99128-a3aa-480d-ba65-230905cacdb7</instanceID>\n          </meta>\n        </data>",
+            "jsonDocResponse": {
+                "data": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:odk": "http://www.opendatakit.org/xforms",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "snapshot_xml"
+                    },
+                    "start": "2023-04-13T21:30:42.667-07:00",
+                    "end": "2023-04-13T21:30:42.667-07:00",
+                    "destination_purpose": "go_home",
+                    "travel_mode": "passenger",
+                    "Total_people_in_trip_party": "4",
+                    "Non_household_member_s_on_trip": "0",
+                    "Vehicle_trip_Parking_location": "1",
+                    "Parking_cost": "0",
+                    "Total_toll_charges_p_uring_the_trip_AUD": "0",
+                    "Transit_fees_AUD": "",
+                    "Taxi_fees": "",
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:66a99128-a3aa-480d-ba65-230905cacdb7"
+                    }
+                }
+            },
+            "start_ts": 1681441858.40454,
+            "end_ts": 1681442572.978,
+            "match_id": "e7600bd8-e23e-41bc-94b0-b58d7d3a5cdd",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 20,
+                "minute": 10,
+                "second": 58,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-13T20:10:58.404540-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 20,
+                "minute": 22,
+                "second": 52,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-13T20:22:52.978000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "643a1a4080ea0c46334769ef"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/place_addition_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681446630.951,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 21,
+                "minute": 30,
+                "second": 30,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T21:30:30.951000-07:00"
+        },
+        "data": {
+            "label": "3 Other",
+            "name": "TimeUseSurvey",
+            "version": 9,
+            "xmlResponse": "<a88RxBtE3jwSar3cwiZTdn xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"a88RxBtE3jwSar3cwiZTdn\">\n          <start>2023-04-13T21:30:12.328-07:00</start>\n          <end>2023-04-13T21:30:12.329-07:00</end>\n          <group_hg4zz25>\n            <Date>2023-04-13</Date>\n            <Start_time>19:28:59.983-07:00</Start_time>\n            <End_time>19:31:59.983-07:00</End_time>\n            <Activity_Type>other</Activity_Type>\n            <Personal_Care_activities/>\n            <Employment_related_a_Education_activities/>\n            <Domestic_activities/>\n            <Recreation_and_leisure/>\n            <Voluntary_work_and_care_activities/>\n            <Other>Picking flowers </Other>\n          </group_hg4zz25>\n          <meta>\n            <instanceID>uuid:3e75c2f7-41b0-4c7b-9c68-b912227ba45b</instanceID>\n          </meta>\n        </a88RxBtE3jwSar3cwiZTdn>",
+            "jsonDocResponse": {
+                "a88RxBtE3jwSar3cwiZTdn": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "a88RxBtE3jwSar3cwiZTdn"
+                    },
+                    "start": "2023-04-13T21:30:12.328-07:00",
+                    "end": "2023-04-13T21:30:12.329-07:00",
+                    "group_hg4zz25": {
+                        "attr": {},
+                        "Date": "2023-04-13",
+                        "Start_time": "19:28:59.983-07:00",
+                        "End_time": "19:31:59.983-07:00",
+                        "Activity_Type": "other",
+                        "Personal_Care_activities": "",
+                        "Employment_related_a_Education_activities": "",
+                        "Domestic_activities": "",
+                        "Recreation_and_leisure": "",
+                        "Voluntary_work_and_care_activities": "",
+                        "Other": "Picking flowers "
+                    },
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:3e75c2f7-41b0-4c7b-9c68-b912227ba45b"
+                    }
+                }
+            },
+            "start_ts": 1681439339.983,
+            "end_ts": 1681439519.983,
+            "match_id": "4b9c6e7d-815e-429c-b612-647e21cdba38",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 19,
+                "minute": 28,
+                "second": 59,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-13T19:28:59.983000-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 19,
+                "minute": 31,
+                "second": 59,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-13T19:31:59.983000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "643a1a4080ea0c733078b6c1"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/trip_addition_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681446603.779,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 21,
+                "minute": 30,
+                "second": 3,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T21:30:03.779000-07:00"
+        },
+        "data": {
+            "label": "1 Personal Care, 1 Recreation/Leisure, 1 Voluntary Work, ",
+            "name": "TimeUseSurvey",
+            "version": 9,
+            "xmlResponse": "<a88RxBtE3jwSar3cwiZTdn xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"a88RxBtE3jwSar3cwiZTdn\">\n          <start>2023-04-13T21:29:44.470-07:00</start>\n          <end>2023-04-13T21:29:44.471-07:00</end>\n          <group_hg4zz25>\n            <Date>2023-04-13</Date>\n            <Start_time>19:21:58.659-07:00</Start_time>\n            <End_time>19:28:59.983-07:00</End_time>\n            <Activity_Type>personal_care_activities recreation_and_leisure voluntary_work_and_care_activities</Activity_Type>\n            <Personal_Care_activities>doing_sport</Personal_Care_activities>\n            <Employment_related_a_Education_activities/>\n            <Domestic_activities/>\n            <Recreation_and_leisure>spending_time_with_family_friends</Recreation_and_leisure>\n            <Voluntary_work_and_care_activities>caring_for_adults</Voluntary_work_and_care_activities>\n            <Other/>\n          </group_hg4zz25>\n          <meta>\n            <instanceID>uuid:0919385a-56cf-4a24-8934-df6fd9513b7c</instanceID>\n          </meta>\n        </a88RxBtE3jwSar3cwiZTdn>",
+            "jsonDocResponse": {
+                "a88RxBtE3jwSar3cwiZTdn": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "a88RxBtE3jwSar3cwiZTdn"
+                    },
+                    "start": "2023-04-13T21:29:44.470-07:00",
+                    "end": "2023-04-13T21:29:44.471-07:00",
+                    "group_hg4zz25": {
+                        "attr": {},
+                        "Date": "2023-04-13",
+                        "Start_time": "19:21:58.659-07:00",
+                        "End_time": "19:28:59.983-07:00",
+                        "Activity_Type": "personal_care_activities recreation_and_leisure voluntary_work_and_care_activities",
+                        "Personal_Care_activities": "doing_sport",
+                        "Employment_related_a_Education_activities": "",
+                        "Domestic_activities": "",
+                        "Recreation_and_leisure": "spending_time_with_family_friends",
+                        "Voluntary_work_and_care_activities": "caring_for_adults",
+                        "Other": ""
+                    },
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:0919385a-56cf-4a24-8934-df6fd9513b7c"
+                    }
+                }
+            },
+            "start_ts": 1681438918.6598706,
+            "end_ts": 1681439339.983,
+            "match_id": "e545b111-b8ab-462b-ad4a-b102c58a4e1b",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 19,
+                "minute": 21,
+                "second": 58,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-13T19:21:58.659871-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 19,
+                "minute": 28,
+                "second": 59,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-13T19:28:59.983000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "643a1a4080ea0c733078b6c0"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/trip_user_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681446579.628,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 21,
+                "minute": 29,
+                "second": 39,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T21:29:39.628000-07:00"
+        },
+        "data": {
+            "label": "1 purpose, 1 mode",
+            "name": "TripConfirmSurvey",
+            "version": 1.2,
+            "xmlResponse": "<data xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:odk=\"http://www.opendatakit.org/xforms\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"snapshot_xml\">\n          <start>2023-04-13T21:29:32.241-07:00</start>\n          <end>2023-04-13T21:29:32.242-07:00</end>\n          <destination_purpose>recreational__eg__exercise</destination_purpose>\n          <travel_mode>walk</travel_mode>\n          <Total_people_in_trip_party>2</Total_people_in_trip_party>\n          <Non_household_member_s_on_trip>0</Non_household_member_s_on_trip>\n          <Vehicle_trip_Parking_location>1</Vehicle_trip_Parking_location>\n          <Parking_cost>0</Parking_cost>\n          <Total_toll_charges_p_uring_the_trip_AUD>0</Total_toll_charges_p_uring_the_trip_AUD>\n          <Transit_fees_AUD/>\n          <Taxi_fees/>\n          <meta>\n            <instanceID>uuid:22d2e226-e53c-49aa-8897-7c7666ffc600</instanceID>\n          </meta>\n        </data>",
+            "jsonDocResponse": {
+                "data": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:odk": "http://www.opendatakit.org/xforms",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "snapshot_xml"
+                    },
+                    "start": "2023-04-13T21:29:32.241-07:00",
+                    "end": "2023-04-13T21:29:32.242-07:00",
+                    "destination_purpose": "recreational__eg__exercise",
+                    "travel_mode": "walk",
+                    "Total_people_in_trip_party": "2",
+                    "Non_household_member_s_on_trip": "0",
+                    "Vehicle_trip_Parking_location": "1",
+                    "Parking_cost": "0",
+                    "Total_toll_charges_p_uring_the_trip_AUD": "0",
+                    "Transit_fees_AUD": "",
+                    "Taxi_fees": "",
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:22d2e226-e53c-49aa-8897-7c7666ffc600"
+                    }
+                }
+            },
+            "start_ts": 1681438918.6598706,
+            "end_ts": 1681439339.983,
+            "match_id": "5ef88218-5133-435f-a72a-4c6913515bd6",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 19,
+                "minute": 21,
+                "second": 58,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-13T19:21:58.659871-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 19,
+                "minute": 28,
+                "second": 59,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-13T19:28:59.983000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "643a1a4080ea0c733078b6be"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/trip_user_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681446502.735,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 21,
+                "minute": 28,
+                "second": 22,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T21:28:22.735000-07:00"
+        },
+        "data": {
+            "label": "1 purpose, 1 mode",
+            "name": "TripConfirmSurvey",
+            "version": 1.2,
+            "xmlResponse": "<data xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:odk=\"http://www.opendatakit.org/xforms\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"snapshot_xml\">\n          <start>2023-04-13T21:28:06.420-07:00</start>\n          <end>2023-04-13T21:28:06.421-07:00</end>\n          <destination_purpose>recreational__eg__exercise</destination_purpose>\n          <travel_mode>walk</travel_mode>\n          <Total_people_in_trip_party>2</Total_people_in_trip_party>\n          <Non_household_member_s_on_trip>0</Non_household_member_s_on_trip>\n          <Vehicle_trip_Parking_location>1</Vehicle_trip_Parking_location>\n          <Parking_cost>0</Parking_cost>\n          <Total_toll_charges_p_uring_the_trip_AUD>0</Total_toll_charges_p_uring_the_trip_AUD>\n          <Transit_fees_AUD/>\n          <Taxi_fees/>\n          <meta>\n            <instanceID>uuid:b3018298-ecb9-49fa-bd03-fe291ee51620</instanceID>\n          </meta>\n        </data>",
+            "jsonDocResponse": {
+                "data": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:odk": "http://www.opendatakit.org/xforms",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "snapshot_xml"
+                    },
+                    "start": "2023-04-13T21:28:06.420-07:00",
+                    "end": "2023-04-13T21:28:06.421-07:00",
+                    "destination_purpose": "recreational__eg__exercise",
+                    "travel_mode": "walk",
+                    "Total_people_in_trip_party": "2",
+                    "Non_household_member_s_on_trip": "0",
+                    "Vehicle_trip_Parking_location": "1",
+                    "Parking_cost": "0",
+                    "Total_toll_charges_p_uring_the_trip_AUD": "0",
+                    "Transit_fees_AUD": "",
+                    "Taxi_fees": "",
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:b3018298-ecb9-49fa-bd03-fe291ee51620"
+                    }
+                }
+            },
+            "start_ts": 1681439519.983,
+            "end_ts": 1681439851.972,
+            "match_id": "17db10a1-4c50-40ec-8f44-17e0d6ef7005",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 19,
+                "minute": 31,
+                "second": 59,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-13T19:31:59.983000-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 19,
+                "minute": 37,
+                "second": 31,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-13T19:37:31.972000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "643a1a4080ea0c733078b6bc"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/place_addition_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681446473.347,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 21,
+                "minute": 27,
+                "second": 53,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T21:27:53.347000-07:00"
+        },
+        "data": {
+            "label": "1 Recreation/Leisure, 1 Voluntary Work, ",
+            "name": "TimeUseSurvey",
+            "version": 9,
+            "xmlResponse": "<a88RxBtE3jwSar3cwiZTdn xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"a88RxBtE3jwSar3cwiZTdn\">\n          <start>2023-04-13T21:27:15.221-07:00</start>\n          <end>2023-04-13T21:27:15.222-07:00</end>\n          <group_hg4zz25>\n            <Date>2023-04-13</Date>\n            <Start_time>19:37:31.972-07:00</Start_time>\n            <End_time>20:10:58.404-07:00</End_time>\n            <Activity_Type>recreation_and_leisure voluntary_work_and_care_activities</Activity_Type>\n            <Personal_Care_activities/>\n            <Employment_related_a_Education_activities/>\n            <Domestic_activities/>\n            <Recreation_and_leisure>spending_time_with_family_friends</Recreation_and_leisure>\n            <Voluntary_work_and_care_activities>caring_for_adults</Voluntary_work_and_care_activities>\n            <Other/>\n          </group_hg4zz25>\n          <meta>\n            <instanceID>uuid:b791dd04-9d3d-4edd-b518-6df44f463e3b</instanceID>\n          </meta>\n        </a88RxBtE3jwSar3cwiZTdn>",
+            "jsonDocResponse": {
+                "a88RxBtE3jwSar3cwiZTdn": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "a88RxBtE3jwSar3cwiZTdn"
+                    },
+                    "start": "2023-04-13T21:27:15.221-07:00",
+                    "end": "2023-04-13T21:27:15.222-07:00",
+                    "group_hg4zz25": {
+                        "attr": {},
+                        "Date": "2023-04-13",
+                        "Start_time": "19:37:31.972-07:00",
+                        "End_time": "20:10:58.404-07:00",
+                        "Activity_Type": "recreation_and_leisure voluntary_work_and_care_activities",
+                        "Personal_Care_activities": "",
+                        "Employment_related_a_Education_activities": "",
+                        "Domestic_activities": "",
+                        "Recreation_and_leisure": "spending_time_with_family_friends",
+                        "Voluntary_work_and_care_activities": "caring_for_adults",
+                        "Other": ""
+                    },
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:b791dd04-9d3d-4edd-b518-6df44f463e3b"
+                    }
+                }
+            },
+            "start_ts": 1681439851.972,
+            "end_ts": 1681441858.40454,
+            "match_id": "de965848-af35-4040-b1c9-317d62b36873",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 19,
+                "minute": 37,
+                "second": 31,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-13T19:37:31.972000-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 20,
+                "minute": 10,
+                "second": 58,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-13T20:10:58.404540-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "643a1a4080ea0c733078b6bb"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/trip_addition_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681446402.917,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 21,
+                "minute": 26,
+                "second": 42,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T21:26:42.917000-07:00"
+        },
+        "data": {
+            "label": "1 Personal Care, 1 Recreation/Leisure, 1 Voluntary Work, ",
+            "name": "TimeUseSurvey",
+            "version": 9,
+            "xmlResponse": "<a88RxBtE3jwSar3cwiZTdn xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"a88RxBtE3jwSar3cwiZTdn\">\n          <start>2023-04-13T21:26:26.477-07:00</start>\n          <end>2023-04-13T21:26:26.478-07:00</end>\n          <group_hg4zz25>\n            <Date>2023-04-13</Date>\n            <Start_time>18:58:47.497-07:00</Start_time>\n            <End_time>19:12:02.981-07:00</End_time>\n            <Activity_Type>personal_care_activities recreation_and_leisure voluntary_work_and_care_activities</Activity_Type>\n            <Personal_Care_activities>doing_sport</Personal_Care_activities>\n            <Employment_related_a_Education_activities/>\n            <Domestic_activities/>\n            <Recreation_and_leisure>spending_time_with_family_friends</Recreation_and_leisure>\n            <Voluntary_work_and_care_activities>caring_for_adults</Voluntary_work_and_care_activities>\n            <Other/>\n          </group_hg4zz25>\n          <meta>\n            <instanceID>uuid:95ecb845-07ad-44f0-a030-e80490116cda</instanceID>\n          </meta>\n        </a88RxBtE3jwSar3cwiZTdn>",
+            "jsonDocResponse": {
+                "a88RxBtE3jwSar3cwiZTdn": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "a88RxBtE3jwSar3cwiZTdn"
+                    },
+                    "start": "2023-04-13T21:26:26.477-07:00",
+                    "end": "2023-04-13T21:26:26.478-07:00",
+                    "group_hg4zz25": {
+                        "attr": {},
+                        "Date": "2023-04-13",
+                        "Start_time": "18:58:47.497-07:00",
+                        "End_time": "19:12:02.981-07:00",
+                        "Activity_Type": "personal_care_activities recreation_and_leisure voluntary_work_and_care_activities",
+                        "Personal_Care_activities": "doing_sport",
+                        "Employment_related_a_Education_activities": "",
+                        "Domestic_activities": "",
+                        "Recreation_and_leisure": "spending_time_with_family_friends",
+                        "Voluntary_work_and_care_activities": "caring_for_adults",
+                        "Other": ""
+                    },
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:95ecb845-07ad-44f0-a030-e80490116cda"
+                    }
+                }
+            },
+            "start_ts": 1681437527.4971218,
+            "end_ts": 1681438322.981,
+            "match_id": "466808c8-b14c-41c3-a114-0ade69b52c90",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 18,
+                "minute": 58,
+                "second": 47,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-13T18:58:47.497122-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 19,
+                "minute": 12,
+                "second": 2,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-13T19:12:02.981000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "643a1a4080ea0c733078b6ba"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/trip_user_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681446384.069,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 21,
+                "minute": 26,
+                "second": 24,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T21:26:24.069000-07:00"
+        },
+        "data": {
+            "label": "1 purpose, 1 mode",
+            "name": "TripConfirmSurvey",
+            "version": 1.2,
+            "xmlResponse": "<data xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:odk=\"http://www.opendatakit.org/xforms\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"snapshot_xml\">\n          <start>2023-04-13T21:26:14.118-07:00</start>\n          <end>2023-04-13T21:26:14.119-07:00</end>\n          <destination_purpose>recreational__eg__exercise</destination_purpose>\n          <travel_mode>walk</travel_mode>\n          <Total_people_in_trip_party>2</Total_people_in_trip_party>\n          <Non_household_member_s_on_trip>0</Non_household_member_s_on_trip>\n          <Vehicle_trip_Parking_location>1</Vehicle_trip_Parking_location>\n          <Parking_cost>0</Parking_cost>\n          <Total_toll_charges_p_uring_the_trip_AUD>0</Total_toll_charges_p_uring_the_trip_AUD>\n          <Transit_fees_AUD/>\n          <Taxi_fees/>\n          <meta>\n            <instanceID>uuid:30f4cb28-c642-441d-8f9c-b806ace19ff4</instanceID>\n          </meta>\n        </data>",
+            "jsonDocResponse": {
+                "data": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:odk": "http://www.opendatakit.org/xforms",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "snapshot_xml"
+                    },
+                    "start": "2023-04-13T21:26:14.118-07:00",
+                    "end": "2023-04-13T21:26:14.119-07:00",
+                    "destination_purpose": "recreational__eg__exercise",
+                    "travel_mode": "walk",
+                    "Total_people_in_trip_party": "2",
+                    "Non_household_member_s_on_trip": "0",
+                    "Vehicle_trip_Parking_location": "1",
+                    "Parking_cost": "0",
+                    "Total_toll_charges_p_uring_the_trip_AUD": "0",
+                    "Transit_fees_AUD": "",
+                    "Taxi_fees": "",
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:30f4cb28-c642-441d-8f9c-b806ace19ff4"
+                    }
+                }
+            },
+            "start_ts": 1681437527.4971218,
+            "end_ts": 1681438322.981,
+            "match_id": "b5726fa7-6f20-467c-93ab-c9a22e4b5040",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 18,
+                "minute": 58,
+                "second": 47,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-13T18:58:47.497122-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 19,
+                "minute": 12,
+                "second": 2,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-13T19:12:02.981000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "643a1a4080ea0c733078b6b9"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/trip_addition_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681446361.901,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 21,
+                "minute": 26,
+                "second": 1,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T21:26:01.901000-07:00"
+        },
+        "data": {
+            "label": "1 Recreation/Leisure, ",
+            "name": "TimeUseSurvey",
+            "version": 9,
+            "xmlResponse": "<a88RxBtE3jwSar3cwiZTdn xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"a88RxBtE3jwSar3cwiZTdn\">\n          <start>2023-04-13T21:25:50.797-07:00</start>\n          <end>2023-04-13T21:25:50.798-07:00</end>\n          <group_hg4zz25>\n            <Date>2023-04-13</Date>\n            <Start_time>18:45:43.402-07:00</Start_time>\n            <End_time>18:57:59.975-07:00</End_time>\n            <Activity_Type>recreation_and_leisure</Activity_Type>\n            <Personal_Care_activities/>\n            <Employment_related_a_Education_activities/>\n            <Domestic_activities/>\n            <Recreation_and_leisure>spending_time_with_family_friends</Recreation_and_leisure>\n            <Voluntary_work_and_care_activities/>\n            <Other/>\n          </group_hg4zz25>\n          <meta>\n            <instanceID>uuid:1fc2374b-9cf5-4f62-bda2-a87b2f12b174</instanceID>\n          </meta>\n        </a88RxBtE3jwSar3cwiZTdn>",
+            "jsonDocResponse": {
+                "a88RxBtE3jwSar3cwiZTdn": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "a88RxBtE3jwSar3cwiZTdn"
+                    },
+                    "start": "2023-04-13T21:25:50.797-07:00",
+                    "end": "2023-04-13T21:25:50.798-07:00",
+                    "group_hg4zz25": {
+                        "attr": {},
+                        "Date": "2023-04-13",
+                        "Start_time": "18:45:43.402-07:00",
+                        "End_time": "18:57:59.975-07:00",
+                        "Activity_Type": "recreation_and_leisure",
+                        "Personal_Care_activities": "",
+                        "Employment_related_a_Education_activities": "",
+                        "Domestic_activities": "",
+                        "Recreation_and_leisure": "spending_time_with_family_friends",
+                        "Voluntary_work_and_care_activities": "",
+                        "Other": ""
+                    },
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:1fc2374b-9cf5-4f62-bda2-a87b2f12b174"
+                    }
+                }
+            },
+            "start_ts": 1681436743.402,
+            "end_ts": 1681437479.975,
+            "match_id": "3d1b1969-465f-4d77-b399-d05d0a7c8048",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 18,
+                "minute": 45,
+                "second": 43,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-13T18:45:43.402000-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 18,
+                "minute": 57,
+                "second": 59,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-13T18:57:59.975000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "643a1a4080ea0c7ed470d9c2"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/trip_user_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681446348.619,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 21,
+                "minute": 25,
+                "second": 48,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T21:25:48.619000-07:00"
+        },
+        "data": {
+            "label": "2 purposes, 1 mode",
+            "name": "TripConfirmSurvey",
+            "version": 1.2,
+            "xmlResponse": "<data xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:odk=\"http://www.opendatakit.org/xforms\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"snapshot_xml\">\n          <start>2023-04-13T21:25:36.116-07:00</start>\n          <end>2023-04-13T21:25:36.119-07:00</end>\n          <destination_purpose>recreational__eg__exercise accompany_someone</destination_purpose>\n          <travel_mode>passenger</travel_mode>\n          <Total_people_in_trip_party>4</Total_people_in_trip_party>\n          <Non_household_member_s_on_trip>0</Non_household_member_s_on_trip>\n          <Vehicle_trip_Parking_location>1</Vehicle_trip_Parking_location>\n          <Parking_cost>0</Parking_cost>\n          <Total_toll_charges_p_uring_the_trip_AUD>0</Total_toll_charges_p_uring_the_trip_AUD>\n          <Transit_fees_AUD/>\n          <Taxi_fees/>\n          <meta>\n            <instanceID>uuid:80eb543a-3a57-46c6-a8c4-1240788683fa</instanceID>\n          </meta>\n        </data>",
+            "jsonDocResponse": {
+                "data": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:odk": "http://www.opendatakit.org/xforms",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "snapshot_xml"
+                    },
+                    "start": "2023-04-13T21:25:36.116-07:00",
+                    "end": "2023-04-13T21:25:36.119-07:00",
+                    "destination_purpose": "recreational__eg__exercise accompany_someone",
+                    "travel_mode": "passenger",
+                    "Total_people_in_trip_party": "4",
+                    "Non_household_member_s_on_trip": "0",
+                    "Vehicle_trip_Parking_location": "1",
+                    "Parking_cost": "0",
+                    "Total_toll_charges_p_uring_the_trip_AUD": "0",
+                    "Transit_fees_AUD": "",
+                    "Taxi_fees": "",
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:80eb543a-3a57-46c6-a8c4-1240788683fa"
+                    }
+                }
+            },
+            "start_ts": 1681436743.402,
+            "end_ts": 1681437479.975,
+            "match_id": "11c6f655-595b-4138-8925-775415849619",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 18,
+                "minute": 45,
+                "second": 43,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-13T18:45:43.402000-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 18,
+                "minute": 57,
+                "second": 59,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-13T18:57:59.975000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6438c6bd80ea0c699b49ffd4"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/trip_user_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681434939.699,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 18,
+                "minute": 15,
+                "second": 39,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T18:15:39.699000-07:00"
+        },
+        "data": {
+            "label": "2 purposes, 1 mode",
+            "name": "TripConfirmSurvey",
+            "version": 1.2,
+            "xmlResponse": "<data xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:odk=\"http://www.opendatakit.org/xforms\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"snapshot_xml\">\n          <start>2023-04-13T18:15:04.387-07:00</start>\n          <end>2023-04-13T18:15:27.331-07:00</end>\n          <destination_purpose>pick_up_or_drop_off_someone buy_something</destination_purpose>\n          <travel_mode>driver</travel_mode>\n          <Total_people_in_trip_party>3</Total_people_in_trip_party>\n          <Non_household_member_s_on_trip>0</Non_household_member_s_on_trip>\n          <Vehicle_trip_Parking_location>4</Vehicle_trip_Parking_location>\n          <Parking_cost>0</Parking_cost>\n          <Total_toll_charges_p_uring_the_trip_AUD>0</Total_toll_charges_p_uring_the_trip_AUD>\n          <Transit_fees_AUD/>\n          <Taxi_fees/>\n          <meta>\n            <instanceID>uuid:44b4854a-53a9-4a3d-829c-2b531a964293</instanceID>\n          </meta>\n        </data>",
+            "jsonDocResponse": {
+                "data": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:odk": "http://www.opendatakit.org/xforms",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "snapshot_xml"
+                    },
+                    "start": "2023-04-13T18:15:04.387-07:00",
+                    "end": "2023-04-13T18:15:27.331-07:00",
+                    "destination_purpose": "pick_up_or_drop_off_someone buy_something",
+                    "travel_mode": "driver",
+                    "Total_people_in_trip_party": "3",
+                    "Non_household_member_s_on_trip": "0",
+                    "Vehicle_trip_Parking_location": "4",
+                    "Parking_cost": "0",
+                    "Total_toll_charges_p_uring_the_trip_AUD": "0",
+                    "Transit_fees_AUD": "",
+                    "Taxi_fees": "",
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:44b4854a-53a9-4a3d-829c-2b531a964293"
+                    }
+                }
+            },
+            "start_ts": 1681170604.344536,
+            "end_ts": 1681172044.36,
+            "match_id": "97a37c63-c596-4503-81fe-5ce94157eb1e",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 10,
+                "hour": 16,
+                "minute": 50,
+                "second": 4,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-10T16:50:04.344536-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 10,
+                "hour": 17,
+                "minute": 14,
+                "second": 4,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-10T17:14:04.360000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6438c6bd80ea0c699b49ffd3"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/trip_user_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681434921.962,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 18,
+                "minute": 15,
+                "second": 21,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T18:15:21.962000-07:00"
+        },
+        "data": {
+            "label": "1 purpose, 1 mode",
+            "name": "TripConfirmSurvey",
+            "version": 1.2,
+            "xmlResponse": "<data xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:odk=\"http://www.opendatakit.org/xforms\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"snapshot_xml\">\n          <start>2023-04-13T18:15:04.387-07:00</start>\n          <end>2023-04-13T18:15:04.388-07:00</end>\n          <destination_purpose>pick_up_or_drop_off_someone</destination_purpose>\n          <travel_mode>driver</travel_mode>\n          <Total_people_in_trip_party>3</Total_people_in_trip_party>\n          <Non_household_member_s_on_trip>2</Non_household_member_s_on_trip>\n          <Vehicle_trip_Parking_location>4</Vehicle_trip_Parking_location>\n          <Parking_cost>0</Parking_cost>\n          <Total_toll_charges_p_uring_the_trip_AUD>0</Total_toll_charges_p_uring_the_trip_AUD>\n          <Transit_fees_AUD/>\n          <Taxi_fees/>\n          <meta>\n            <instanceID>uuid:44b4854a-53a9-4a3d-829c-2b531a964293</instanceID>\n          </meta>\n        </data>",
+            "jsonDocResponse": {
+                "data": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:odk": "http://www.opendatakit.org/xforms",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "snapshot_xml"
+                    },
+                    "start": "2023-04-13T18:15:04.387-07:00",
+                    "end": "2023-04-13T18:15:04.388-07:00",
+                    "destination_purpose": "pick_up_or_drop_off_someone",
+                    "travel_mode": "driver",
+                    "Total_people_in_trip_party": "3",
+                    "Non_household_member_s_on_trip": "2",
+                    "Vehicle_trip_Parking_location": "4",
+                    "Parking_cost": "0",
+                    "Total_toll_charges_p_uring_the_trip_AUD": "0",
+                    "Transit_fees_AUD": "",
+                    "Taxi_fees": "",
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:44b4854a-53a9-4a3d-829c-2b531a964293"
+                    }
+                }
+            },
+            "start_ts": 1681170604.344536,
+            "end_ts": 1681172044.36,
+            "match_id": "b17f9fbd-2d45-4396-bd24-2c7116e21c81",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 10,
+                "hour": 16,
+                "minute": 50,
+                "second": 4,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-10T16:50:04.344536-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 10,
+                "hour": 17,
+                "minute": 14,
+                "second": 4,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-10T17:14:04.360000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6438c6bd80ea0c699b49ffd2"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/trip_user_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681434872.465,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 18,
+                "minute": 14,
+                "second": 32,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T18:14:32.465000-07:00"
+        },
+        "data": {
+            "label": "1 purpose, 1 mode",
+            "name": "TripConfirmSurvey",
+            "version": 1.2,
+            "xmlResponse": "<data xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:odk=\"http://www.opendatakit.org/xforms\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"snapshot_xml\">\n          <start>2023-04-13T18:14:11.527-07:00</start>\n          <end>2023-04-13T18:14:11.528-07:00</end>\n          <destination_purpose>pick_up_or_drop_off_someone</destination_purpose>\n          <travel_mode>driver</travel_mode>\n          <Total_people_in_trip_party>2</Total_people_in_trip_party>\n          <Non_household_member_s_on_trip>0</Non_household_member_s_on_trip>\n          <Vehicle_trip_Parking_location>4</Vehicle_trip_Parking_location>\n          <Parking_cost>0</Parking_cost>\n          <Total_toll_charges_p_uring_the_trip_AUD>0</Total_toll_charges_p_uring_the_trip_AUD>\n          <Transit_fees_AUD/>\n          <Taxi_fees/>\n          <meta>\n            <instanceID>uuid:04905e2b-9403-483b-a219-08280b3bf764</instanceID>\n          </meta>\n        </data>",
+            "jsonDocResponse": {
+                "data": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:odk": "http://www.opendatakit.org/xforms",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "snapshot_xml"
+                    },
+                    "start": "2023-04-13T18:14:11.527-07:00",
+                    "end": "2023-04-13T18:14:11.528-07:00",
+                    "destination_purpose": "pick_up_or_drop_off_someone",
+                    "travel_mode": "driver",
+                    "Total_people_in_trip_party": "2",
+                    "Non_household_member_s_on_trip": "0",
+                    "Vehicle_trip_Parking_location": "4",
+                    "Parking_cost": "0",
+                    "Total_toll_charges_p_uring_the_trip_AUD": "0",
+                    "Transit_fees_AUD": "",
+                    "Taxi_fees": "",
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:04905e2b-9403-483b-a219-08280b3bf764"
+                    }
+                }
+            },
+            "start_ts": 1681173600.2794478,
+            "end_ts": 1681174829.356,
+            "match_id": "9a42910f-fb7a-4911-899b-d0db62c224cf",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 10,
+                "hour": 17,
+                "minute": 40,
+                "second": 0,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-10T17:40:00.279448-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 10,
+                "hour": 18,
+                "minute": 0,
+                "second": 29,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-10T18:00:29.356000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6438c6bd80ea0c699b49ffd1"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/place_addition_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681434846.49,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 18,
+                "minute": 14,
+                "second": 6,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T18:14:06.490000-07:00"
+        },
+        "data": {
+            "label": "1 Personal Care, 1 Voluntary Work, ",
+            "name": "TimeUseSurvey",
+            "version": 9,
+            "xmlResponse": "<a88RxBtE3jwSar3cwiZTdn xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"a88RxBtE3jwSar3cwiZTdn\">\n          <start>2023-04-13T18:13:56.128-07:00</start>\n          <end>2023-04-13T18:13:56.129-07:00</end>\n          <group_hg4zz25>\n            <Date>2023-04-10</Date>\n            <Start_time>18:00:29.356-07:00</Start_time>\n            <End_time>18:03:29.356-07:00</End_time>\n            <Activity_Type>personal_care_activities voluntary_work_and_care_activities</Activity_Type>\n            <Personal_Care_activities>doing_sport</Personal_Care_activities>\n            <Employment_related_a_Education_activities/>\n            <Domestic_activities/>\n            <Recreation_and_leisure/>\n            <Voluntary_work_and_care_activities>caring_for_adults</Voluntary_work_and_care_activities>\n            <Other/>\n          </group_hg4zz25>\n          <meta>\n            <instanceID>uuid:55313799-6ae7-4b94-ac0d-bdabf1d0f709</instanceID>\n          </meta>\n        </a88RxBtE3jwSar3cwiZTdn>",
+            "jsonDocResponse": {
+                "a88RxBtE3jwSar3cwiZTdn": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "a88RxBtE3jwSar3cwiZTdn"
+                    },
+                    "start": "2023-04-13T18:13:56.128-07:00",
+                    "end": "2023-04-13T18:13:56.129-07:00",
+                    "group_hg4zz25": {
+                        "attr": {},
+                        "Date": "2023-04-10",
+                        "Start_time": "18:00:29.356-07:00",
+                        "End_time": "18:03:29.356-07:00",
+                        "Activity_Type": "personal_care_activities voluntary_work_and_care_activities",
+                        "Personal_Care_activities": "doing_sport",
+                        "Employment_related_a_Education_activities": "",
+                        "Domestic_activities": "",
+                        "Recreation_and_leisure": "",
+                        "Voluntary_work_and_care_activities": "caring_for_adults",
+                        "Other": ""
+                    },
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:55313799-6ae7-4b94-ac0d-bdabf1d0f709"
+                    }
+                }
+            },
+            "start_ts": 1681174829.356,
+            "end_ts": 1681175009.356,
+            "match_id": "66e5a10b-efa8-4f03-857f-10142cb07954",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 10,
+                "hour": 18,
+                "minute": 0,
+                "second": 29,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-10T18:00:29.356000-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 10,
+                "hour": 18,
+                "minute": 3,
+                "second": 29,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-10T18:03:29.356000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6438c6bd80ea0c1b2912c0fa"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/place_addition_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681434829.804,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 18,
+                "minute": 13,
+                "second": 49,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T18:13:49.804000-07:00"
+        },
+        "data": {
+            "label": "1 Domestic, ",
+            "name": "TimeUseSurvey",
+            "version": 9,
+            "xmlResponse": "<a88RxBtE3jwSar3cwiZTdn xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"a88RxBtE3jwSar3cwiZTdn\">\n          <start>2023-04-13T18:13:33.453-07:00</start>\n          <end>2023-04-13T18:13:33.454-07:00</end>\n          <group_hg4zz25>\n            <Date>2023-04-10</Date>\n            <Start_time>17:14:04.360-07:00</Start_time>\n            <End_time>17:40:00.279-07:00</End_time>\n            <Activity_Type>domestic_activities</Activity_Type>\n            <Personal_Care_activities/>\n            <Employment_related_a_Education_activities/>\n            <Domestic_activities>grocery_shopping</Domestic_activities>\n            <Recreation_and_leisure/>\n            <Voluntary_work_and_care_activities/>\n            <Other/>\n          </group_hg4zz25>\n          <meta>\n            <instanceID>uuid:382df8ee-f2e1-49d2-b80e-4203ec166aca</instanceID>\n          </meta>\n        </a88RxBtE3jwSar3cwiZTdn>",
+            "jsonDocResponse": {
+                "a88RxBtE3jwSar3cwiZTdn": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "a88RxBtE3jwSar3cwiZTdn"
+                    },
+                    "start": "2023-04-13T18:13:33.453-07:00",
+                    "end": "2023-04-13T18:13:33.454-07:00",
+                    "group_hg4zz25": {
+                        "attr": {},
+                        "Date": "2023-04-10",
+                        "Start_time": "17:14:04.360-07:00",
+                        "End_time": "17:40:00.279-07:00",
+                        "Activity_Type": "domestic_activities",
+                        "Personal_Care_activities": "",
+                        "Employment_related_a_Education_activities": "",
+                        "Domestic_activities": "grocery_shopping",
+                        "Recreation_and_leisure": "",
+                        "Voluntary_work_and_care_activities": "",
+                        "Other": ""
+                    },
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:382df8ee-f2e1-49d2-b80e-4203ec166aca"
+                    }
+                }
+            },
+            "start_ts": 1681172044.36,
+            "end_ts": 1681173600.2794478,
+            "match_id": "811b313c-053b-428a-9dec-18f7a44a54ea",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 10,
+                "hour": 17,
+                "minute": 14,
+                "second": 4,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-10T17:14:04.360000-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 10,
+                "hour": 17,
+                "minute": 40,
+                "second": 0,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-10T17:40:00.279448-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6438c6bd80ea0c1b2912c0f9"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/place_addition_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681434790.923,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 18,
+                "minute": 13,
+                "second": 10,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T18:13:10.923000-07:00"
+        },
+        "data": {
+            "label": "1 Employment/Education, ",
+            "name": "TimeUseSurvey",
+            "version": 9,
+            "xmlResponse": "<a88RxBtE3jwSar3cwiZTdn xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"a88RxBtE3jwSar3cwiZTdn\">\n          <start>2023-04-13T18:12:43.024-07:00</start>\n          <end>2023-04-13T18:12:43.025-07:00</end>\n          <group_hg4zz25>\n            <Date>2023-04-10</Date>\n            <Start_time>18:36:59.350-07:00</Start_time>\n            <End_time>21:00:00.000-07:00</End_time>\n            <Activity_Type>employment_related_and_educational_activ</Activity_Type>\n            <Personal_Care_activities/>\n            <Employment_related_a_Education_activities>working_at_main_job</Employment_related_a_Education_activities>\n            <Domestic_activities/>\n            <Recreation_and_leisure/>\n            <Voluntary_work_and_care_activities/>\n            <Other/>\n          </group_hg4zz25>\n          <meta>\n            <instanceID>uuid:02839ce6-ded9-439b-bdd3-5219f40860cd</instanceID>\n          </meta>\n        </a88RxBtE3jwSar3cwiZTdn>",
+            "jsonDocResponse": {
+                "a88RxBtE3jwSar3cwiZTdn": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "a88RxBtE3jwSar3cwiZTdn"
+                    },
+                    "start": "2023-04-13T18:12:43.024-07:00",
+                    "end": "2023-04-13T18:12:43.025-07:00",
+                    "group_hg4zz25": {
+                        "attr": {},
+                        "Date": "2023-04-10",
+                        "Start_time": "18:36:59.350-07:00",
+                        "End_time": "21:00:00.000-07:00",
+                        "Activity_Type": "employment_related_and_educational_activ",
+                        "Personal_Care_activities": "",
+                        "Employment_related_a_Education_activities": "working_at_main_job",
+                        "Domestic_activities": "",
+                        "Recreation_and_leisure": "",
+                        "Voluntary_work_and_care_activities": "",
+                        "Other": ""
+                    },
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:02839ce6-ded9-439b-bdd3-5219f40860cd"
+                    }
+                }
+            },
+            "start_ts": 1681177019.35,
+            "end_ts": 1681185600,
+            "match_id": "c5e9d85f-e07b-462f-bb19-6128de15e38a",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 10,
+                "hour": 18,
+                "minute": 36,
+                "second": 59,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-10T18:36:59.350000-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 10,
+                "hour": 21,
+                "minute": 0,
+                "second": 0,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-10T21:00:00-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6438c6bd80ea0c699a16c6a2"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/trip_addition_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681434744.638,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 18,
+                "minute": 12,
+                "second": 24,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T18:12:24.638000-07:00"
+        },
+        "data": {
+            "label": "1 Recreation/Leisure, 2 Voluntary Work, ",
+            "name": "TimeUseSurvey",
+            "version": 9,
+            "xmlResponse": "<a88RxBtE3jwSar3cwiZTdn xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"a88RxBtE3jwSar3cwiZTdn\">\n          <start>2023-04-13T18:11:45.851-07:00</start>\n          <end>2023-04-13T18:11:45.852-07:00</end>\n          <group_hg4zz25>\n            <Date>2023-04-10</Date>\n            <Start_time>18:03:29.356-07:00</Start_time>\n            <End_time>18:36:59.350-07:00</End_time>\n            <Activity_Type>recreation_and_leisure voluntary_work_and_care_activities</Activity_Type>\n            <Personal_Care_activities/>\n            <Employment_related_a_Education_activities/>\n            <Domestic_activities/>\n            <Recreation_and_leisure>spending_time_with_family_friends</Recreation_and_leisure>\n            <Voluntary_work_and_care_activities>caring_for_own_children caring_for_adults</Voluntary_work_and_care_activities>\n            <Other/>\n          </group_hg4zz25>\n          <meta>\n            <instanceID>uuid:61d6df68-16c1-433f-9e01-9f8ff9aa5481</instanceID>\n          </meta>\n        </a88RxBtE3jwSar3cwiZTdn>",
+            "jsonDocResponse": {
+                "a88RxBtE3jwSar3cwiZTdn": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "a88RxBtE3jwSar3cwiZTdn"
+                    },
+                    "start": "2023-04-13T18:11:45.851-07:00",
+                    "end": "2023-04-13T18:11:45.852-07:00",
+                    "group_hg4zz25": {
+                        "attr": {},
+                        "Date": "2023-04-10",
+                        "Start_time": "18:03:29.356-07:00",
+                        "End_time": "18:36:59.350-07:00",
+                        "Activity_Type": "recreation_and_leisure voluntary_work_and_care_activities",
+                        "Personal_Care_activities": "",
+                        "Employment_related_a_Education_activities": "",
+                        "Domestic_activities": "",
+                        "Recreation_and_leisure": "spending_time_with_family_friends",
+                        "Voluntary_work_and_care_activities": "caring_for_own_children caring_for_adults",
+                        "Other": ""
+                    },
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:61d6df68-16c1-433f-9e01-9f8ff9aa5481"
+                    }
+                }
+            },
+            "start_ts": 1681175009.356,
+            "end_ts": 1681177019.35,
+            "match_id": "da7690ba-7fcb-48bc-a472-2cb662c4df83",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 10,
+                "hour": 18,
+                "minute": 3,
+                "second": 29,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-10T18:03:29.356000-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 10,
+                "hour": 18,
+                "minute": 36,
+                "second": 59,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-10T18:36:59.350000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6438c6bd80ea0c699b49ffd0"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/trip_user_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681434702.594,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 18,
+                "minute": 11,
+                "second": 42,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T18:11:42.594000-07:00"
+        },
+        "data": {
+            "label": "2 purposes, 1 mode",
+            "name": "TripConfirmSurvey",
+            "version": 1.2,
+            "xmlResponse": "<data xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:odk=\"http://www.opendatakit.org/xforms\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"snapshot_xml\">\n          <start>2023-04-13T18:11:16.059-07:00</start>\n          <end>2023-04-13T18:11:16.060-07:00</end>\n          <destination_purpose>accompany_someone pick_up_or_deliver_something</destination_purpose>\n          <travel_mode>driver</travel_mode>\n          <Total_people_in_trip_party>3</Total_people_in_trip_party>\n          <Non_household_member_s_on_trip>0</Non_household_member_s_on_trip>\n          <Vehicle_trip_Parking_location>1</Vehicle_trip_Parking_location>\n          <Parking_cost>0</Parking_cost>\n          <Total_toll_charges_p_uring_the_trip_AUD>0</Total_toll_charges_p_uring_the_trip_AUD>\n          <Transit_fees_AUD/>\n          <Taxi_fees/>\n          <meta>\n            <instanceID>uuid:ac867347-4f69-4f77-bd64-703e4f63a6ec</instanceID>\n          </meta>\n        </data>",
+            "jsonDocResponse": {
+                "data": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:odk": "http://www.opendatakit.org/xforms",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "snapshot_xml"
+                    },
+                    "start": "2023-04-13T18:11:16.059-07:00",
+                    "end": "2023-04-13T18:11:16.060-07:00",
+                    "destination_purpose": "accompany_someone pick_up_or_deliver_something",
+                    "travel_mode": "driver",
+                    "Total_people_in_trip_party": "3",
+                    "Non_household_member_s_on_trip": "0",
+                    "Vehicle_trip_Parking_location": "1",
+                    "Parking_cost": "0",
+                    "Total_toll_charges_p_uring_the_trip_AUD": "0",
+                    "Transit_fees_AUD": "",
+                    "Taxi_fees": "",
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:ac867347-4f69-4f77-bd64-703e4f63a6ec"
+                    }
+                }
+            },
+            "start_ts": 1681175009.356,
+            "end_ts": 1681177019.35,
+            "match_id": "aa8139e4-49c8-40e8-9ab4-f92040593295",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 10,
+                "hour": 18,
+                "minute": 3,
+                "second": 29,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-10T18:03:29.356000-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 10,
+                "hour": 18,
+                "minute": 36,
+                "second": 59,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-10T18:36:59.350000-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6438c6bd80ea0c1b2912c0f7"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/place_addition_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681424548.623,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 15,
+                "minute": 22,
+                "second": 28,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T15:22:28.623000-07:00"
+        },
+        "data": {
+            "label": "1 Personal Care, 1 Recreation/Leisure, ",
+            "name": "TimeUseSurvey",
+            "version": 9,
+            "xmlResponse": "<a88RxBtE3jwSar3cwiZTdn xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"a88RxBtE3jwSar3cwiZTdn\">\n          <start>2023-04-13T15:21:46.430-07:00</start>\n          <end>2023-04-13T15:21:46.430-07:00</end>\n          <group_hg4zz25>\n            <Date>2023-04-09</Date>\n            <Start_time>19:29:00.000-07:00</Start_time>\n            <End_time>20:30:00.000-07:00</End_time>\n            <Activity_Type>personal_care_activities recreation_and_leisure</Activity_Type>\n            <Personal_Care_activities>option_1</Personal_Care_activities>\n            <Employment_related_a_Education_activities/>\n            <Domestic_activities/>\n            <Recreation_and_leisure>spending_time_with_family_friends</Recreation_and_leisure>\n            <Voluntary_work_and_care_activities/>\n            <Other/>\n          </group_hg4zz25>\n          <meta>\n            <instanceID>uuid:af015ede-5374-42f4-8e28-e36e1726647f</instanceID>\n          </meta>\n        </a88RxBtE3jwSar3cwiZTdn>",
+            "jsonDocResponse": {
+                "a88RxBtE3jwSar3cwiZTdn": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "a88RxBtE3jwSar3cwiZTdn"
+                    },
+                    "start": "2023-04-13T15:21:46.430-07:00",
+                    "end": "2023-04-13T15:21:46.430-07:00",
+                    "group_hg4zz25": {
+                        "attr": {},
+                        "Date": "2023-04-09",
+                        "Start_time": "19:29:00.000-07:00",
+                        "End_time": "20:30:00.000-07:00",
+                        "Activity_Type": "personal_care_activities recreation_and_leisure",
+                        "Personal_Care_activities": "option_1",
+                        "Employment_related_a_Education_activities": "",
+                        "Domestic_activities": "",
+                        "Recreation_and_leisure": "spending_time_with_family_friends",
+                        "Voluntary_work_and_care_activities": "",
+                        "Other": ""
+                    },
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:af015ede-5374-42f4-8e28-e36e1726647f"
+                    }
+                }
+            },
+            "start_ts": 1681093740,
+            "end_ts": 1681097400,
+            "match_id": "f5995868-948f-484a-8733-6e7bfe0829a5",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 9,
+                "hour": 19,
+                "minute": 29,
+                "second": 0,
+                "weekday": 6,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-09T19:29:00-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 9,
+                "hour": 20,
+                "minute": 30,
+                "second": 0,
+                "weekday": 6,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-09T20:30:00-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6438c6bd80ea0c1b2912c0f6"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/place_addition_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681424501.249,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 15,
+                "minute": 21,
+                "second": 41,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T15:21:41.249000-07:00"
+        },
+        "data": {
+            "label": "1 Employment/Education, ",
+            "name": "TimeUseSurvey",
+            "version": 9,
+            "xmlResponse": "<a88RxBtE3jwSar3cwiZTdn xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"a88RxBtE3jwSar3cwiZTdn\">\n          <start>2023-04-13T15:21:23.125-07:00</start>\n          <end>2023-04-13T15:21:23.126-07:00</end>\n          <group_hg4zz25>\n            <Date>2023-04-09</Date>\n            <Start_time>18:29:00.000-07:00</Start_time>\n            <End_time>19:30:00.000-07:00</End_time>\n            <Activity_Type>employment_related_and_educational_activ</Activity_Type>\n            <Personal_Care_activities/>\n            <Employment_related_a_Education_activities>working_at_main_job</Employment_related_a_Education_activities>\n            <Domestic_activities/>\n            <Recreation_and_leisure/>\n            <Voluntary_work_and_care_activities/>\n            <Other/>\n          </group_hg4zz25>\n          <meta>\n            <instanceID>uuid:3b8970af-fc00-4c45-9a3a-5cff75549b09</instanceID>\n          </meta>\n        </a88RxBtE3jwSar3cwiZTdn>",
+            "jsonDocResponse": {
+                "a88RxBtE3jwSar3cwiZTdn": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "a88RxBtE3jwSar3cwiZTdn"
+                    },
+                    "start": "2023-04-13T15:21:23.125-07:00",
+                    "end": "2023-04-13T15:21:23.126-07:00",
+                    "group_hg4zz25": {
+                        "attr": {},
+                        "Date": "2023-04-09",
+                        "Start_time": "18:29:00.000-07:00",
+                        "End_time": "19:30:00.000-07:00",
+                        "Activity_Type": "employment_related_and_educational_activ",
+                        "Personal_Care_activities": "",
+                        "Employment_related_a_Education_activities": "working_at_main_job",
+                        "Domestic_activities": "",
+                        "Recreation_and_leisure": "",
+                        "Voluntary_work_and_care_activities": "",
+                        "Other": ""
+                    },
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:3b8970af-fc00-4c45-9a3a-5cff75549b09"
+                    }
+                }
+            },
+            "start_ts": 1681090140,
+            "end_ts": 1681093800,
+            "match_id": "c2a2783f-23d2-4871-8dbc-18f96d43fa9d",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 9,
+                "hour": 18,
+                "minute": 29,
+                "second": 0,
+                "weekday": 6,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-09T18:29:00-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 9,
+                "hour": 19,
+                "minute": 30,
+                "second": 0,
+                "weekday": 6,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-09T19:30:00-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6438c6bd80ea0c1b2912c0f5"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/place_addition_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681424480.298,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 15,
+                "minute": 21,
+                "second": 20,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T15:21:20.298000-07:00"
+        },
+        "data": {
+            "label": "1 Personal Care, 1 Recreation/Leisure, ",
+            "name": "TimeUseSurvey",
+            "version": 9,
+            "xmlResponse": "<a88RxBtE3jwSar3cwiZTdn xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"a88RxBtE3jwSar3cwiZTdn\">\n          <start>2023-04-13T15:19:15.210-07:00</start>\n          <end>2023-04-13T15:19:15.211-07:00</end>\n          <group_hg4zz25>\n            <Date>2023-04-09</Date>\n            <Start_time>17:30:00.000-07:00</Start_time>\n            <End_time>18:30:00.000-07:00</End_time>\n            <Activity_Type>personal_care_activities recreation_and_leisure</Activity_Type>\n            <Personal_Care_activities>eating_or_drinking</Personal_Care_activities>\n            <Employment_related_a_Education_activities/>\n            <Domestic_activities/>\n            <Recreation_and_leisure>recreational_study</Recreation_and_leisure>\n            <Voluntary_work_and_care_activities/>\n            <Other/>\n          </group_hg4zz25>\n          <meta>\n            <instanceID>uuid:6ff9fdea-bc90-4211-9f73-9f155b8204a7</instanceID>\n          </meta>\n        </a88RxBtE3jwSar3cwiZTdn>",
+            "jsonDocResponse": {
+                "a88RxBtE3jwSar3cwiZTdn": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "a88RxBtE3jwSar3cwiZTdn"
+                    },
+                    "start": "2023-04-13T15:19:15.210-07:00",
+                    "end": "2023-04-13T15:19:15.211-07:00",
+                    "group_hg4zz25": {
+                        "attr": {},
+                        "Date": "2023-04-09",
+                        "Start_time": "17:30:00.000-07:00",
+                        "End_time": "18:30:00.000-07:00",
+                        "Activity_Type": "personal_care_activities recreation_and_leisure",
+                        "Personal_Care_activities": "eating_or_drinking",
+                        "Employment_related_a_Education_activities": "",
+                        "Domestic_activities": "",
+                        "Recreation_and_leisure": "recreational_study",
+                        "Voluntary_work_and_care_activities": "",
+                        "Other": ""
+                    },
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:6ff9fdea-bc90-4211-9f73-9f155b8204a7"
+                    }
+                }
+            },
+            "start_ts": 1681086600,
+            "end_ts": 1681090200,
+            "match_id": "d7788d5a-6618-4d5d-83db-b73cb2e6005a",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 9,
+                "hour": 17,
+                "minute": 30,
+                "second": 0,
+                "weekday": 6,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-09T17:30:00-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 9,
+                "hour": 18,
+                "minute": 30,
+                "second": 0,
+                "weekday": 6,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-09T18:30:00-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6438c6bd80ea0c1b2912c0f4"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/place_addition_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681424351.299,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 15,
+                "minute": 19,
+                "second": 11,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T15:19:11.299000-07:00"
+        },
+        "data": {
+            "label": "1 Personal Care, ",
+            "name": "TimeUseSurvey",
+            "version": 9,
+            "xmlResponse": "<a88RxBtE3jwSar3cwiZTdn xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"a88RxBtE3jwSar3cwiZTdn\">\n          <start>2023-04-13T15:18:46.814-07:00</start>\n          <end>2023-04-13T15:18:46.815-07:00</end>\n          <group_hg4zz25>\n            <Date>2023-04-09</Date>\n            <Start_time>16:30:00.000-07:00</Start_time>\n            <End_time>17:30:00.000-07:00</End_time>\n            <Activity_Type>personal_care_activities</Activity_Type>\n            <Personal_Care_activities>eating_or_drinking</Personal_Care_activities>\n            <Employment_related_a_Education_activities/>\n            <Domestic_activities/>\n            <Recreation_and_leisure/>\n            <Voluntary_work_and_care_activities/>\n            <Other/>\n          </group_hg4zz25>\n          <meta>\n            <instanceID>uuid:0d47108d-ea2a-4cb1-82bc-a908e03e94a2</instanceID>\n          </meta>\n        </a88RxBtE3jwSar3cwiZTdn>",
+            "jsonDocResponse": {
+                "a88RxBtE3jwSar3cwiZTdn": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "a88RxBtE3jwSar3cwiZTdn"
+                    },
+                    "start": "2023-04-13T15:18:46.814-07:00",
+                    "end": "2023-04-13T15:18:46.815-07:00",
+                    "group_hg4zz25": {
+                        "attr": {},
+                        "Date": "2023-04-09",
+                        "Start_time": "16:30:00.000-07:00",
+                        "End_time": "17:30:00.000-07:00",
+                        "Activity_Type": "personal_care_activities",
+                        "Personal_Care_activities": "eating_or_drinking",
+                        "Employment_related_a_Education_activities": "",
+                        "Domestic_activities": "",
+                        "Recreation_and_leisure": "",
+                        "Voluntary_work_and_care_activities": "",
+                        "Other": ""
+                    },
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:0d47108d-ea2a-4cb1-82bc-a908e03e94a2"
+                    }
+                }
+            },
+            "start_ts": 1681083000,
+            "end_ts": 1681086600,
+            "match_id": "e0a11625-1017-400c-9053-87c19ba83e22",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 9,
+                "hour": 16,
+                "minute": 30,
+                "second": 0,
+                "weekday": 6,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-09T16:30:00-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 9,
+                "hour": 17,
+                "minute": 30,
+                "second": 0,
+                "weekday": 6,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-09T17:30:00-07:00"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "6438c6bd80ea0c1b2912c0f3"
+        },
+        "user_id": {
+            "$uuid": "9c084ef42f974196bd37950c17938ec6"
+        },
+        "metadata": {
+            "key": "manual/place_addition_input",
+            "platform": "android",
+            "read_ts": 0,
+            "time_zone": "America/Los_Angeles",
+            "type": "message",
+            "write_ts": 1681424324.595,
+            "write_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 13,
+                "hour": 15,
+                "minute": 18,
+                "second": 44,
+                "weekday": 3,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-04-13T15:18:44.595000-07:00"
+        },
+        "data": {
+            "label": "1 Personal Care, 2 Domestic, ",
+            "name": "TimeUseSurvey",
+            "version": 9,
+            "xmlResponse": "<a88RxBtE3jwSar3cwiZTdn xmlns:jr=\"http://openrosa.org/javarosa\" xmlns:orx=\"http://openrosa.org/xforms\" id=\"a88RxBtE3jwSar3cwiZTdn\">\n          <start>2023-04-13T15:17:59.550-07:00</start>\n          <end>2023-04-13T15:17:59.552-07:00</end>\n          <group_hg4zz25>\n            <Date>2023-04-09</Date>\n            <Start_time>15:29:17.206-07:00</Start_time>\n            <End_time>16:30:00.000-07:00</End_time>\n            <Activity_Type>personal_care_activities domestic_activities</Activity_Type>\n            <Personal_Care_activities>personal_care_i_e__wash__dress__grooming</Personal_Care_activities>\n            <Employment_related_a_Education_activities/>\n            <Domestic_activities>cleaning_and_tidying doing_laundry</Domestic_activities>\n            <Recreation_and_leisure/>\n            <Voluntary_work_and_care_activities/>\n            <Other/>\n          </group_hg4zz25>\n          <meta>\n            <instanceID>uuid:83302e47-ddf1-4b0c-8c58-34139d37c17f</instanceID>\n          </meta>\n        </a88RxBtE3jwSar3cwiZTdn>",
+            "jsonDocResponse": {
+                "a88RxBtE3jwSar3cwiZTdn": {
+                    "attr": {
+                        "xmlns:jr": "http://openrosa.org/javarosa",
+                        "xmlns:orx": "http://openrosa.org/xforms",
+                        "id": "a88RxBtE3jwSar3cwiZTdn"
+                    },
+                    "start": "2023-04-13T15:17:59.550-07:00",
+                    "end": "2023-04-13T15:17:59.552-07:00",
+                    "group_hg4zz25": {
+                        "attr": {},
+                        "Date": "2023-04-09",
+                        "Start_time": "15:29:17.206-07:00",
+                        "End_time": "16:30:00.000-07:00",
+                        "Activity_Type": "personal_care_activities domestic_activities",
+                        "Personal_Care_activities": "personal_care_i_e__wash__dress__grooming",
+                        "Employment_related_a_Education_activities": "",
+                        "Domestic_activities": "cleaning_and_tidying doing_laundry",
+                        "Recreation_and_leisure": "",
+                        "Voluntary_work_and_care_activities": "",
+                        "Other": ""
+                    },
+                    "meta": {
+                        "attr": {},
+                        "instanceID": "uuid:83302e47-ddf1-4b0c-8c58-34139d37c17f"
+                    }
+                }
+            },
+            "start_ts": 1681079357.206,
+            "end_ts": 1681083000,
+            "match_id": "dfbdbc48-1bff-41d9-99a5-e2b92a0faf88",
+            "start_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 9,
+                "hour": 15,
+                "minute": 29,
+                "second": 17,
+                "weekday": 6,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-04-09T15:29:17.206000-07:00",
+            "end_local_dt": {
+                "year": 2023,
+                "month": 4,
+                "day": 9,
+                "hour": 16,
+                "minute": 30,
+                "second": 0,
+                "weekday": 6,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-04-09T16:30:00-07:00"
+        }
+    }
+]

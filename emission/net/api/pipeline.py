@@ -18,13 +18,17 @@ def get_complete_ts(user_id):
 
 def get_range(user_id):
     ts = esta.TimeSeries.get_time_series(user_id)
-    start_ts = ts.get_first_value_for_field("analysis/confirmed_trip", "data.start_ts", pymongo.ASCENDING)
+    start_ts = ts.get_first_value_for_field("analysis/composite_trip", "data.start_ts", pymongo.ASCENDING)
+    if start_ts == -1:
+        start_ts = ts.get_first_value_for_field("analysis/confirmed_trip", "data.start_ts", pymongo.ASCENDING)
     if start_ts == -1:
         start_ts = ts.get_first_value_for_field("analysis/cleaned_trip", "data.start_ts", pymongo.ASCENDING)
     if start_ts == -1:
         start_ts = None
 
-    end_ts = ts.get_first_value_for_field("analysis/confirmed_trip", "data.end_ts", pymongo.DESCENDING)
+    end_ts = ts.get_first_value_for_field("analysis/composite_trip", "data.end_ts", pymongo.DESCENDING)
+    if start_ts == -1:
+        end_ts = ts.get_first_value_for_field("analysis/confirmed_trip", "data.end_ts", pymongo.DESCENDING)
     if end_ts == -1:
         end_ts = ts.get_first_value_for_field("analysis/cleaned_trip", "data.end_ts", pymongo.DESCENDING)
     if end_ts == -1:

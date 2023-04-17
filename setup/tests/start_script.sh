@@ -1,3 +1,5 @@
+# Run the tests in the docker environment
+# Using an automated install 
 cd /src/e-mission-server
 
 #set database URL using environment variable
@@ -19,4 +21,5 @@ source setup/setup_tests.sh
 echo "Running tests..."
 source setup/activate_tests.sh
 ./runAllTests.sh
-source setup/teardown_tests.sh
+# We don't need to teardown the tests in the docker version since we only install in the docker container
+# source setup/teardown_tests.sh

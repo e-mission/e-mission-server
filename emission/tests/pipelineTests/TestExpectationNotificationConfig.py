@@ -31,7 +31,7 @@ class TestExpectationNotificationConfig(unittest.TestCase):
         self.fake_trips = {
             label: {
                 "data": {
-                    "end_ts": testdate.timestamp,
+                    "end_ts": testdate.int_timestamp,
                     "end_local_dt": {
                         "timezone": self.tz
                     }
