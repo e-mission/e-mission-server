@@ -139,7 +139,7 @@ def del_objects_after(user_id, reset_ts, is_dry_run):
     if is_dry_run:
         logging.info("this is a dry-run, returning from del_objects_after without modifying anything")
     else:
-        result = edb.get_analysis_timeseries_db().remove(del_query)
+        result = edb.get_analysis_timeseries_db().delete_many(del_query)
         logging.info("this is not a dry-run, result of deleting analysis entries is %s" % result)
 
 def reset_last_place(last_place, is_dry_run):
@@ -168,7 +168,7 @@ def reset_last_place(last_place, is_dry_run):
 
     logging.debug("reset_query = %s" % reset_query)
 
-    result = edb.get_analysis_timeseries_db().update(match_query, reset_query)
+    result = edb.get_analysis_timeseries_db().update_one(match_query, reset_query)
     logging.debug("this is not a dry run, result of update in reset_last_place = %s" % result)
 
     logging.debug("after update, entry is %s" %
@@ -221,14 +221,14 @@ def reset_pipeline_state(user_id, reset_ts, is_dry_run):
     if is_dry_run:
         logging.info("this is a dry run, returning from reset_pipeline_state without modifying anything")
     else:
-        result = edb.get_pipeline_state_db().update(
+        result = edb.get_pipeline_state_db().update_many(
                     trip_seg_reset_pipeline_query, trip_seg_update_pipeline_query,
-                    upsert=False, multi=True)
+                    upsert=False)
         logging.debug("this is not a dry run, result of updating trip_segmentation stage in reset_pipeline_state = %s" % result)
 
-        result = edb.get_pipeline_state_db().update(
+        result = edb.get_pipeline_state_db().update_many(
                     reset_pipeline_query, update_pipeline_query,
-                    upsert=False, multi=True)
+                    upsert=False)
         logging.debug("this is not a dry run, result of updating all other stages in reset_pipeline_state = %s" % result)
 
 
@@ -273,9 +273,9 @@ def _del_entries_for_query(del_query, is_dry_run):
     if is_dry_run:
         logging.info("this is a dry run, returning from reset_user_to-start without modifying anything")
     else: 
-        result = edb.get_analysis_timeseries_db().remove(del_query)
+        result = edb.get_analysis_timeseries_db().delete_many(del_query)
         logging.info("this is not a dry run, result of removing analysis objects = %s" % result)
-        result = edb.get_pipeline_state_db().remove(del_query)
+        result = edb.get_pipeline_state_db().delete_many(del_query)
         logging.info("this is not a dry run, result of removing pipeline states = %s" % result)
 
 
@@ -340,7 +340,7 @@ def auto_reset(dry_run, only_calc):
     # Also only read states which have been running for more than three hours
     # If we are running the pipeline every hour, then having a run_ts that is
     # more than three hours old indicates that it is likely invalid
-    three_hours_ago = arrow.utcnow().shift(hours=-3).timestamp
+    three_hours_ago = arrow.utcnow().shift(hours=-3).int_timestamp
     all_invalid_states = pd.json_normalize(list(edb.get_pipeline_state_db().find({"$and": [
         {"curr_run_ts": {"$lt": three_hours_ago}},
         {"pipeline_stage": {"$ne": 9}}]})))

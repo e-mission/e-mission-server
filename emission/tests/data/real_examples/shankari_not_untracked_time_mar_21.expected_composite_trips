@@ -1,0 +1,4494 @@
+[
+    {
+        "_id": {
+            "$oid": "642507514cb6153d68fc4d58"
+        },
+        "user_id": {
+            "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+        },
+        "metadata": {
+            "key": "analysis/composite_trip",
+            "platform": "server",
+            "write_ts": 1680148303.964892,
+            "time_zone": "America/Los_Angeles",
+            "write_local_dt": {
+                "year": 2023,
+                "month": 3,
+                "day": 29,
+                "hour": 20,
+                "minute": 51,
+                "second": 43,
+                "weekday": 2,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-03-29T20:51:43.964892-07:00",
+            "origin_key": "analysis/confirmed_trip"
+        },
+        "data": {
+            "source": "DwellSegmentationTimeFilter",
+            "end_ts": 1679439746.601,
+            "end_local_dt": {
+                "year": 2023,
+                "month": 3,
+                "day": 21,
+                "hour": 16,
+                "minute": 2,
+                "second": 26,
+                "weekday": 1,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-03-21T16:02:26.601000-07:00",
+            "end_loc": {
+                "type": "Point",
+                "coordinates": [
+                    -122.1075705,
+                    37.3885592
+                ]
+            },
+            "raw_trip": {
+                "$oid": "6425074a4cb6153d68fc4ca8"
+            },
+            "start_ts": 1679438430.424537,
+            "start_local_dt": {
+                "year": 2023,
+                "month": 3,
+                "day": 21,
+                "hour": 15,
+                "minute": 40,
+                "second": 30,
+                "weekday": 1,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-03-21T15:40:30.424537-07:00",
+            "start_loc": {
+                "type": "Point",
+                "coordinates": [
+                    -122.0865042,
+                    37.3910047
+                ]
+            },
+            "duration": 1316.1764631271362,
+            "distance": 1992.8094330905838,
+            "start_place": {
+                "$oid": "6425074f4cb6153d68fc4d3d"
+            },
+            "end_place": {
+                "$oid": "6425074f4cb6153d68fc4d3e"
+            },
+            "cleaned_trip": {
+                "$oid": "6425074e4cb6153d68fc4ceb"
+            },
+            "inferred_labels": [],
+            "inferred_trip": {
+                "$oid": "6425074f4cb6153d68fc4d46"
+            },
+            "expectation": {
+                "to_label": true
+            },
+            "confidence_threshold": 0.55,
+            "expected_trip": {
+                "$oid": "6425074f4cb6153d68fc4d4e"
+            },
+            "user_input": {},
+            "additions": [],
+            "confirmed_place": {
+                "_id": {
+                    "$oid": "642507504cb6153d68fc4d53"
+                },
+                "user_id": {
+                    "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                },
+                "metadata": {
+                    "key": "analysis/confirmed_place",
+                    "platform": "server",
+                    "write_ts": 1680148303.417804,
+                    "time_zone": "America/Los_Angeles",
+                    "write_local_dt": {
+                        "year": 2023,
+                        "month": 3,
+                        "day": 29,
+                        "hour": 20,
+                        "minute": 51,
+                        "second": 43,
+                        "weekday": 2,
+                        "timezone": "America/Los_Angeles"
+                    },
+                    "write_fmt_time": "2023-03-29T20:51:43.417804-07:00"
+                },
+                "data": {
+                    "source": "DwellSegmentationTimeFilter",
+                    "enter_ts": 1679439746.601,
+                    "enter_local_dt": {
+                        "year": 2023,
+                        "month": 3,
+                        "day": 21,
+                        "hour": 16,
+                        "minute": 2,
+                        "second": 26,
+                        "weekday": 1,
+                        "timezone": "America/Los_Angeles"
+                    },
+                    "enter_fmt_time": "2023-03-21T16:02:26.601000-07:00",
+                    "location": {
+                        "type": "Point",
+                        "coordinates": [
+                            -122.1075705,
+                            37.3885592
+                        ]
+                    },
+                    "raw_places": [
+                        {
+                            "$oid": "6425074a4cb6153d68fc4ca9"
+                        },
+                        {
+                            "$oid": "6425074a4cb6153d68fc4ca9"
+                        }
+                    ],
+                    "ending_trip": {
+                        "$oid": "6425074e4cb6153d68fc4ceb"
+                    },
+                    "starting_trip": {
+                        "$oid": "6425074e4cb6153d68fc4d1b"
+                    },
+                    "exit_ts": 1679439926.601,
+                    "exit_fmt_time": "2023-03-21T16:05:26.601000-07:00",
+                    "exit_local_dt": {
+                        "year": 2023,
+                        "month": 3,
+                        "day": 21,
+                        "hour": 16,
+                        "minute": 5,
+                        "second": 26,
+                        "weekday": 1,
+                        "timezone": "America/Los_Angeles"
+                    },
+                    "duration": 180.0,
+                    "cleaned_place": {
+                        "$oid": "6425074f4cb6153d68fc4d3e"
+                    },
+                    "user_input": {},
+                    "additions": []
+                }
+            },
+            "locations": [
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4cee"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.7680058,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.768006-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.3910047,
+                        "longitude": -122.0865042,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.0865042,
+                                37.3910047
+                            ]
+                        },
+                        "ts": 1679438430.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 40,
+                            "second": 30,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:40:30.424537-07:00",
+                        "altitude": -4.299999713897705,
+                        "distance": 0.0,
+                        "speed": 0.0,
+                        "heading": 0.0,
+                        "idx": 0,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4cef"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.768364,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.768364-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.39094836805119,
+                        "longitude": -122.08695157609675,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.08695157609675,
+                                37.39094836805119
+                            ]
+                        },
+                        "ts": 1679438460.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 41,
+                            "second": 0,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:41:00.424537-07:00",
+                        "altitude": -4.065197254757512,
+                        "distance": 40.01694639137145,
+                        "speed": 1.3338982130457149,
+                        "heading": -99.00536892939127,
+                        "idx": 1,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4cf0"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.7686558,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.768656-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.390892036102386,
+                        "longitude": -122.0873989521935,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.0873989521935,
+                                37.390892036102386
+                            ]
+                        },
+                        "ts": 1679438490.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 41,
+                            "second": 30,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:41:30.424537-07:00",
+                        "altitude": -3.8303947956173197,
+                        "distance": 40.01697572398648,
+                        "speed": 1.3338991907995492,
+                        "heading": -99.00536227221482,
+                        "idx": 2,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4cf1"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.768942,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.768942-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.390835704153574,
+                        "longitude": -122.08784632829025,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.08784632829025,
+                                37.390835704153574
+                            ]
+                        },
+                        "ts": 1679438520.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 42,
+                            "second": 0,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:42:00.424537-07:00",
+                        "altitude": -3.5955923364771265,
+                        "distance": 40.017005059291634,
+                        "speed": 1.3339001686430545,
+                        "heading": -99.00535561604964,
+                        "idx": 3,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4cf2"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.769225,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.769225-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.39077937220476,
+                        "longitude": -122.08829370438701,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.08829370438701,
+                                37.39077937220476
+                            ]
+                        },
+                        "ts": 1679438550.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 42,
+                            "second": 30,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:42:30.424537-07:00",
+                        "altitude": -3.360789877336934,
+                        "distance": 40.01703439319593,
+                        "speed": 1.3339011464398642,
+                        "heading": -99.00534896040658,
+                        "idx": 4,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4cf3"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.769504,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.769504-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.390723040255956,
+                        "longitude": -122.08874108048377,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.08874108048377,
+                                37.390723040255956
+                            ]
+                        },
+                        "ts": 1679438580.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 43,
+                            "second": 0,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:43:00.424537-07:00",
+                        "altitude": -3.125987418196741,
+                        "distance": 40.01706372693936,
+                        "speed": 1.333902124231312,
+                        "heading": -99.00534230328144,
+                        "idx": 5,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4cf4"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.769783,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.769783-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.390666708307144,
+                        "longitude": -122.08918845658052,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.08918845658052,
+                                37.390666708307144
+                            ]
+                        },
+                        "ts": 1679438610.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 43,
+                            "second": 30,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:43:30.424537-07:00",
+                        "altitude": -2.891184959056548,
+                        "distance": 40.01709305965294,
+                        "speed": 1.3339031019884315,
+                        "heading": -99.00533564867892,
+                        "idx": 6,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4cf5"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.7700648,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.770065-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.39061037635834,
+                        "longitude": -122.08963583267727,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.08963583267727,
+                                37.39061037635834
+                            ]
+                        },
+                        "ts": 1679438640.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 44,
+                            "second": 0,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:44:00.424537-07:00",
+                        "altitude": -2.6563824999163552,
+                        "distance": 40.01712239456198,
+                        "speed": 1.3339040798187327,
+                        "heading": -99.00532899108666,
+                        "idx": 7,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4cf6"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.7703428,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.770343-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.39055404440953,
+                        "longitude": -122.09008320877403,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09008320877403,
+                                37.39055404440953
+                            ]
+                        },
+                        "ts": 1679438670.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 44,
+                            "second": 30,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:44:30.424537-07:00",
+                        "altitude": -2.4215800407761625,
+                        "distance": 40.01715172844117,
+                        "speed": 1.3339050576147058,
+                        "heading": -99.0053223365171,
+                        "idx": 8,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4cf7"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.770638,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.770638-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.390497712460714,
+                        "longitude": -122.09053058487079,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09053058487079,
+                                37.390497712460714
+                            ]
+                        },
+                        "ts": 1679438700.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 45,
+                            "second": 0,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:45:00.424537-07:00",
+                        "altitude": -2.18677758163597,
+                        "distance": 40.0171810621595,
+                        "speed": 1.3339060354053167,
+                        "heading": -99.00531567996539,
+                        "idx": 9,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4cf8"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.770918,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.770918-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.39044138051191,
+                        "longitude": -122.09097796096754,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09097796096754,
+                                37.39044138051191
+                            ]
+                        },
+                        "ts": 1679438730.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 45,
+                            "second": 30,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:45:30.424537-07:00",
+                        "altitude": -1.951975122495777,
+                        "distance": 40.01721039447697,
+                        "speed": 1.3339070131492323,
+                        "heading": -99.00530902393577,
+                        "idx": 10,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4cf9"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.771289,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.771289-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.3903850485631,
+                        "longitude": -122.0914253370643,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.0914253370643,
+                                37.3903850485631
+                            ]
+                        },
+                        "ts": 1679438760.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 46,
+                            "second": 0,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:46:00.424537-07:00",
+                        "altitude": -1.7171726633555844,
+                        "distance": 40.017239729484565,
+                        "speed": 1.3339079909828189,
+                        "heading": -99.00530236741703,
+                        "idx": 11,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4cfa"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.771592,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.771592-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.390328716614285,
+                        "longitude": -122.09187271316105,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09187271316105,
+                                37.390328716614285
+                            ]
+                        },
+                        "ts": 1679438790.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 46,
+                            "second": 30,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:46:30.424537-07:00",
+                        "altitude": -1.4823702042153912,
+                        "distance": 40.017269063091305,
+                        "speed": 1.33390896876971,
+                        "heading": -99.00529571242065,
+                        "idx": 12,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4cfb"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.7718809,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.771881-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.39027238466548,
+                        "longitude": -122.09232008925781,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09232008925781,
+                                37.39027238466548
+                            ]
+                        },
+                        "ts": 1679438820.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 47,
+                            "second": 0,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:47:00.424537-07:00",
+                        "altitude": -1.2475677450751985,
+                        "distance": 40.01729839653719,
+                        "speed": 1.3339099465512398,
+                        "heading": -99.00528905644232,
+                        "idx": 13,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4cfc"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.772492,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.772492-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.39021605271667,
+                        "longitude": -122.09276746535456,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09276746535456,
+                                37.39021605271667
+                            ]
+                        },
+                        "ts": 1679438850.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 47,
+                            "second": 30,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:47:30.424537-07:00",
+                        "altitude": -1.0127652859350058,
+                        "distance": 40.01732772895321,
+                        "speed": 1.3339109242984404,
+                        "heading": -99.0052824009861,
+                        "idx": 14,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4cfd"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.773067,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.773067-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.390159720767855,
+                        "longitude": -122.09321484145131,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09321484145131,
+                                37.390159720767855
+                            ]
+                        },
+                        "ts": 1679438880.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 48,
+                            "second": 0,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:48:00.424537-07:00",
+                        "altitude": -0.7779628267948131,
+                        "distance": 40.01735706368838,
+                        "speed": 1.333911902122946,
+                        "heading": -99.00527574454065,
+                        "idx": 15,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4cfe"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.773542,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.773542-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.39010338881905,
+                        "longitude": -122.09366221754807,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09366221754807,
+                                37.39010338881905
+                            ]
+                        },
+                        "ts": 1679438910.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 48,
+                            "second": 30,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:48:30.424537-07:00",
+                        "altitude": -0.54316036765462,
+                        "distance": 40.017386397022676,
+                        "speed": 1.3339128799007558,
+                        "heading": -99.00526908711693,
+                        "idx": 16,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4cff"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.774008,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.774008-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.39004705687024,
+                        "longitude": -122.09410959364483,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09410959364483,
+                                37.39004705687024
+                            ]
+                        },
+                        "ts": 1679438940.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 49,
+                            "second": 0,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:49:00.424537-07:00",
+                        "altitude": -0.30835790851442724,
+                        "distance": 40.017415730567116,
+                        "speed": 1.3339138576855705,
+                        "heading": -99.00526243421263,
+                        "idx": 17,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d00"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.7744782,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.774478-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.38999072492143,
+                        "longitude": -122.09455696974157,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09455696974157,
+                                37.38999072492143
+                            ]
+                        },
+                        "ts": 1679438970.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 49,
+                            "second": 30,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:49:30.424537-07:00",
+                        "altitude": -0.07355544937423453,
+                        "distance": 40.017445062587015,
+                        "speed": 1.3339148354195671,
+                        "heading": -99.0052557763291,
+                        "idx": 18,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d01"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.774976,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.774976-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.38993439297262,
+                        "longitude": -122.09500434583833,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09500434583833,
+                                37.38993439297262
+                            ]
+                        },
+                        "ts": 1679439000.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 50,
+                            "second": 0,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:50:00.424537-07:00",
+                        "altitude": 0.16124700976595818,
+                        "distance": 40.01747439729707,
+                        "speed": 1.3339158132432358,
+                        "heading": -99.00524912145727,
+                        "idx": 19,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d02"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.775441,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.775441-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.38987806102381,
+                        "longitude": -122.09545172193509,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09545172193509,
+                                37.38987806102381
+                            ]
+                        },
+                        "ts": 1679439030.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 50,
+                            "second": 30,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:50:30.424537-07:00",
+                        "altitude": 0.3960494689061509,
+                        "distance": 40.01750373060626,
+                        "speed": 1.3339167910202085,
+                        "heading": -99.00524246610732,
+                        "idx": 20,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d03"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.775896,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.775896-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.389821729075,
+                        "longitude": -122.09589909803185,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09589909803185,
+                                37.389821729075
+                            ]
+                        },
+                        "ts": 1679439060.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 51,
+                            "second": 0,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:51:00.424537-07:00",
+                        "altitude": 0.6308519280463436,
+                        "distance": 40.017533063754584,
+                        "speed": 1.3339177687918196,
+                        "heading": -99.00523580927532,
+                        "idx": 21,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d04"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.776358,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.776358-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.38976539712619,
+                        "longitude": -122.0963464741286,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.0963464741286,
+                                37.38976539712619
+                            ]
+                        },
+                        "ts": 1679439090.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 51,
+                            "second": 30,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:51:30.424537-07:00",
+                        "altitude": 0.8656543871865363,
+                        "distance": 40.017562395873036,
+                        "speed": 1.3339187465291011,
+                        "heading": -99.00522915446578,
+                        "idx": 22,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d05"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.776814,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.776814-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.38970906517738,
+                        "longitude": -122.09679385022535,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09679385022535,
+                                37.38970906517738
+                            ]
+                        },
+                        "ts": 1679439120.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 52,
+                            "second": 0,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:52:00.424537-07:00",
+                        "altitude": 1.10045684632673,
+                        "distance": 40.017591730310656,
+                        "speed": 1.3339197243436884,
+                        "heading": -99.00522249866701,
+                        "idx": 23,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d06"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.7772741,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.777274-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.38965273322857,
+                        "longitude": -122.09724122632211,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09724122632211,
+                                37.38965273322857
+                            ]
+                        },
+                        "ts": 1679439150.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 52,
+                            "second": 30,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:52:30.424537-07:00",
+                        "altitude": 1.3352593054669226,
+                        "distance": 40.01762106334739,
+                        "speed": 1.3339207021115798,
+                        "heading": -99.00521584138986,
+                        "idx": 24,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d07"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.777738,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.777738-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.38959640127976,
+                        "longitude": -122.09768860241887,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09768860241887,
+                                37.38959640127976
+                            ]
+                        },
+                        "ts": 1679439180.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 53,
+                            "second": 0,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:53:00.424537-07:00",
+                        "altitude": 1.5700617646071153,
+                        "distance": 40.01765039659427,
+                        "speed": 1.3339216798864757,
+                        "heading": -99.00520918763185,
+                        "idx": 25,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d08"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.7782998,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.778300-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.38954006933095,
+                        "longitude": -122.09813597851561,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09813597851561,
+                                37.38954006933095
+                            ]
+                        },
+                        "ts": 1679439210.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 53,
+                            "second": 30,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:53:30.424537-07:00",
+                        "altitude": 1.804864223747308,
+                        "distance": 40.01767972844027,
+                        "speed": 1.3339226576146757,
+                        "heading": -99.00520253189168,
+                        "idx": 26,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d09"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.778802,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.778802-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.38948373738214,
+                        "longitude": -122.09858335461237,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09858335461237,
+                                37.38948373738214
+                            ]
+                        },
+                        "ts": 1679439240.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 54,
+                            "second": 0,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:54:00.424537-07:00",
+                        "altitude": 2.0396666828875007,
+                        "distance": 40.01770906260544,
+                        "speed": 1.3339236354201813,
+                        "heading": -99.00519587517327,
+                        "idx": 27,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d0a"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.77927,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.779270-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.38942740543333,
+                        "longitude": -122.09903073070913,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09903073070913,
+                                37.38942740543333
+                            ]
+                        },
+                        "ts": 1679439270.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 54,
+                            "second": 30,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:54:30.424537-07:00",
+                        "altitude": 2.2744691420276935,
+                        "distance": 40.017738395740736,
+                        "speed": 1.3339246131913578,
+                        "heading": -99.00518921946609,
+                        "idx": 28,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d0b"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.7797241,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.779724-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.389371073484526,
+                        "longitude": -122.09947810680589,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09947810680589,
+                                37.389371073484526
+                            ]
+                        },
+                        "ts": 1679439300.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 55,
+                            "second": 0,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:55:00.424537-07:00",
+                        "altitude": 2.509271601167886,
+                        "distance": 40.0177677285915,
+                        "speed": 1.33392559095305,
+                        "heading": -99.00518256528123,
+                        "idx": 29,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d0c"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.780425,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.780425-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.38931474153571,
+                        "longitude": -122.09992548290263,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09992548290263,
+                                37.38931474153571
+                            ]
+                        },
+                        "ts": 1679439330.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 55,
+                            "second": 30,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:55:30.424537-07:00",
+                        "altitude": 2.744074060308079,
+                        "distance": 40.01779706041239,
+                        "speed": 1.3339265686804131,
+                        "heading": -99.00517590811401,
+                        "idx": 30,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d0d"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.780896,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.780896-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.3892584095869,
+                        "longitude": -122.10037285899939,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.10037285899939,
+                                37.3892584095869
+                            ]
+                        },
+                        "ts": 1679439360.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 56,
+                            "second": 0,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:56:00.424537-07:00",
+                        "altitude": 2.9788765194482716,
+                        "distance": 40.01782639455246,
+                        "speed": 1.333927546485082,
+                        "heading": -99.00516925296922,
+                        "idx": 31,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d0e"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.781355,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.781355-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.389202077638096,
+                        "longitude": -122.10082023509615,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.10082023509615,
+                                37.389202077638096
+                            ]
+                        },
+                        "ts": 1679439390.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 56,
+                            "second": 30,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:56:30.424537-07:00",
+                        "altitude": 3.213678978588465,
+                        "distance": 40.01785572729163,
+                        "speed": 1.3339285242430543,
+                        "heading": -99.0051625968352,
+                        "idx": 32,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d0f"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.7818081,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.781808-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.389145745689284,
+                        "longitude": -122.10126761119291,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.10126761119291,
+                                37.389145745689284
+                            ]
+                        },
+                        "ts": 1679439420.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 57,
+                            "second": 0,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:57:00.424537-07:00",
+                        "altitude": 3.448481437728658,
+                        "distance": 40.01788506024096,
+                        "speed": 1.333929502008032,
+                        "heading": -99.00515594372385,
+                        "idx": 33,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d10"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.782261,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.782261-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.38908941374047,
+                        "longitude": -122.10171498728965,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.10171498728965,
+                                37.38908941374047
+                            ]
+                        },
+                        "ts": 1679439450.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 57,
+                            "second": 30,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:57:30.424537-07:00",
+                        "altitude": 3.6832838968688506,
+                        "distance": 40.0179143917894,
+                        "speed": 1.3339304797263132,
+                        "heading": -99.00514928662992,
+                        "idx": 34,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d11"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.7827158,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.782716-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.389033081791666,
+                        "longitude": -122.10216236338641,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.10216236338641,
+                                37.389033081791666
+                            ]
+                        },
+                        "ts": 1679439480.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 58,
+                            "second": 0,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:58:00.424537-07:00",
+                        "altitude": 3.9180863560090433,
+                        "distance": 40.01794372565701,
+                        "speed": 1.3339314575219003,
+                        "heading": -99.00514262955427,
+                        "idx": 35,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d12"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.783179,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.783179-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.388976749842854,
+                        "longitude": -122.10260973948317,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.10260973948317,
+                                37.388976749842854
+                            ]
+                        },
+                        "ts": 1679439510.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 58,
+                            "second": 30,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:58:30.424537-07:00",
+                        "altitude": 4.152888815149236,
+                        "distance": 40.017973058494746,
+                        "speed": 1.3339324352831583,
+                        "heading": -99.00513597600143,
+                        "idx": 36,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d13"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.783696,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.783696-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.38892041789404,
+                        "longitude": -122.10305711557993,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.10305711557993,
+                                37.38892041789404
+                            ]
+                        },
+                        "ts": 1679439540.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 59,
+                            "second": 0,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:59:00.424537-07:00",
+                        "altitude": 4.387691274289429,
+                        "distance": 40.01800239117162,
+                        "speed": 1.333933413039054,
+                        "heading": -99.00512932095924,
+                        "idx": 37,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d14"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.7841222,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.784122-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.38886408594524,
+                        "longitude": -122.10350449167667,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.10350449167667,
+                                37.38886408594524
+                            ]
+                        },
+                        "ts": 1679439570.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 15,
+                            "minute": 59,
+                            "second": 30,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T15:59:30.424537-07:00",
+                        "altitude": 4.622493733429621,
+                        "distance": 40.0180317224476,
+                        "speed": 1.3339343907482535,
+                        "heading": -99.00512266393856,
+                        "idx": 38,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d15"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.784541,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.784541-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.38878406866633,
+                        "longitude": -122.10460658781284,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.10460658781284,
+                                37.38878406866633
+                            ]
+                        },
+                        "ts": 1679439600.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 0,
+                            "second": 0,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:00:00.424537-07:00",
+                        "altitude": 4.778136010563313,
+                        "distance": 97.77372503880565,
+                        "speed": 3.2591241679601883,
+                        "heading": -95.22086700653865,
+                        "idx": 39,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d16"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.784984,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.784984-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.388648994636355,
+                        "longitude": -122.10740915244533,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.10740915244533,
+                                37.388648994636355
+                            ]
+                        },
+                        "ts": 1679439630.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 0,
+                            "second": 30,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:00:30.424537-07:00",
+                        "altitude": 5.007144208998509,
+                        "distance": 248.05659382839164,
+                        "speed": 8.268553127613055,
+                        "heading": -93.47046719055139,
+                        "idx": 40,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d17"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.7854369,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.785437-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.3886401,
+                        "longitude": -122.1079042,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.1079042,
+                                37.3886401
+                            ]
+                        },
+                        "ts": 1679439660.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 1,
+                            "second": 0,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:01:00.424537-07:00",
+                        "altitude": 5.940405937799723,
+                        "distance": 43.74777092223727,
+                        "speed": 1.4582590307412424,
+                        "heading": -91.29528842279372,
+                        "idx": 41,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d18"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.7859042,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.785904-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.38863019342679,
+                        "longitude": -122.10801494053895,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.10801494053895,
+                                37.38863019342679
+                            ]
+                        },
+                        "ts": 1679439690.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 1,
+                            "second": 30,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:01:30.424537-07:00",
+                        "altitude": 7.0,
+                        "distance": 9.845552658201264,
+                        "speed": 0.3281850886067088,
+                        "heading": -96.4239027928719,
+                        "idx": 42,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d19"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.786398,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.786398-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.38842108774434,
+                        "longitude": -122.10809133393815,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.10809133393815,
+                                37.38842108774434
+                            ]
+                        },
+                        "ts": 1679439720.424537,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 2,
+                            "second": 0,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:02:00.424537-07:00",
+                        "altitude": 6.591787601663226,
+                        "distance": 24.211237086293284,
+                        "speed": 0.8070412362097762,
+                        "heading": -163.81349400857195,
+                        "idx": 43,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074e4cb6153d68fc4d1a"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148302.7869282,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 42,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:42.786928-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.3885592,
+                        "longitude": -122.1075705,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.1075705,
+                                37.3885592
+                            ]
+                        },
+                        "ts": 1679439746.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 2,
+                            "second": 26,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:02:26.601000-07:00",
+                        "altitude": 7.099999904632568,
+                        "distance": 48.509969225426076,
+                        "speed": 1.8531903637943155,
+                        "heading": 71.54349890548698,
+                        "idx": 44,
+                        "mode": 4,
+                        "section": {
+                            "$oid": "6425074e4cb6153d68fc4ced"
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "_id": {
+            "$oid": "642507514cb6153d68fc4d59"
+        },
+        "user_id": {
+            "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+        },
+        "metadata": {
+            "key": "analysis/composite_trip",
+            "platform": "server",
+            "write_ts": 1680148303.981982,
+            "time_zone": "America/Los_Angeles",
+            "write_local_dt": {
+                "year": 2023,
+                "month": 3,
+                "day": 29,
+                "hour": 20,
+                "minute": 51,
+                "second": 43,
+                "weekday": 2,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-03-29T20:51:43.981982-07:00",
+            "origin_key": "analysis/confirmed_trip"
+        },
+        "data": {
+            "source": "DwellSegmentationTimeFilter",
+            "end_ts": 1679440787.579,
+            "end_local_dt": {
+                "year": 2023,
+                "month": 3,
+                "day": 21,
+                "hour": 16,
+                "minute": 19,
+                "second": 47,
+                "weekday": 1,
+                "timezone": "America/Los_Angeles"
+            },
+            "end_fmt_time": "2023-03-21T16:19:47.579000-07:00",
+            "end_loc": {
+                "type": "Point",
+                "coordinates": [
+                    -122.0865007,
+                    37.3909951
+                ]
+            },
+            "raw_trip": {
+                "$oid": "6425074a4cb6153d68fc4caa"
+            },
+            "start_ts": 1679439926.601,
+            "start_local_dt": {
+                "year": 2023,
+                "month": 3,
+                "day": 21,
+                "hour": 16,
+                "minute": 5,
+                "second": 26,
+                "weekday": 1,
+                "timezone": "America/Los_Angeles"
+            },
+            "start_fmt_time": "2023-03-21T16:05:26.601000-07:00",
+            "start_loc": {
+                "type": "Point",
+                "coordinates": [
+                    -122.1075705,
+                    37.3885592
+                ]
+            },
+            "duration": 860.9779999256134,
+            "distance": 2977.7302387747704,
+            "start_place": {
+                "$oid": "6425074f4cb6153d68fc4d3e"
+            },
+            "end_place": {
+                "$oid": "6425074f4cb6153d68fc4d3f"
+            },
+            "cleaned_trip": {
+                "$oid": "6425074e4cb6153d68fc4d1b"
+            },
+            "inferred_labels": [],
+            "inferred_trip": {
+                "$oid": "6425074f4cb6153d68fc4d49"
+            },
+            "expectation": {
+                "to_label": true
+            },
+            "confidence_threshold": 0.55,
+            "expected_trip": {
+                "$oid": "6425074f4cb6153d68fc4d4f"
+            },
+            "user_input": {},
+            "additions": [],
+            "confirmed_place": {
+                "_id": {
+                    "$oid": "642507514cb6153d68fc4d55"
+                },
+                "user_id": {
+                    "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                },
+                "metadata": {
+                    "key": "analysis/confirmed_place",
+                    "platform": "server",
+                    "write_ts": 1680148303.423539,
+                    "time_zone": "America/Los_Angeles",
+                    "write_local_dt": {
+                        "year": 2023,
+                        "month": 3,
+                        "day": 29,
+                        "hour": 20,
+                        "minute": 51,
+                        "second": 43,
+                        "weekday": 2,
+                        "timezone": "America/Los_Angeles"
+                    },
+                    "write_fmt_time": "2023-03-29T20:51:43.423539-07:00"
+                },
+                "data": {
+                    "source": "DwellSegmentationTimeFilter",
+                    "enter_ts": 1679440787.579,
+                    "enter_local_dt": {
+                        "year": 2023,
+                        "month": 3,
+                        "day": 21,
+                        "hour": 16,
+                        "minute": 19,
+                        "second": 47,
+                        "weekday": 1,
+                        "timezone": "America/Los_Angeles"
+                    },
+                    "enter_fmt_time": "2023-03-21T16:19:47.579000-07:00",
+                    "location": {
+                        "type": "Point",
+                        "coordinates": [
+                            -122.0865007,
+                            37.3909951
+                        ]
+                    },
+                    "raw_places": [
+                        {
+                            "$oid": "6425074a4cb6153d68fc4cab"
+                        }
+                    ],
+                    "ending_trip": {
+                        "$oid": "6425074e4cb6153d68fc4d1b"
+                    },
+                    "cleaned_place": {
+                        "$oid": "6425074f4cb6153d68fc4d3f"
+                    },
+                    "user_input": {},
+                    "additions": []
+                }
+            },
+            "locations": [
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d1e"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.1957052,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.195705-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.3885592,
+                        "longitude": -122.1075705,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.1075705,
+                                37.3885592
+                            ]
+                        },
+                        "ts": 1679439926.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 5,
+                            "second": 26,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:05:26.601000-07:00",
+                        "altitude": 7.099999904632568,
+                        "distance": 0.0,
+                        "speed": 0.0,
+                        "heading": 0.0,
+                        "idx": 0,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d1f"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.196262,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.196262-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.38917346472227,
+                        "longitude": -122.10613643486067,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.10613643486067,
+                                37.38917346472227
+                            ]
+                        },
+                        "ts": 1679439956.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 5,
+                            "second": 56,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:05:56.601000-07:00",
+                        "altitude": 4.910060275775521,
+                        "distance": 143.9353716993174,
+                        "speed": 4.797845723310579,
+                        "heading": 61.67014758649088,
+                        "idx": 1,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d20"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.1967318,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.196732-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.389787729444535,
+                        "longitude": -122.10470236972135,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.10470236972135,
+                                37.389787729444535
+                            ]
+                        },
+                        "ts": 1679439986.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 6,
+                            "second": 26,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:06:26.601000-07:00",
+                        "altitude": 2.720120646918473,
+                        "distance": 143.93445793413804,
+                        "speed": 4.797815264471268,
+                        "heading": 61.66995148545483,
+                        "idx": 2,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d21"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.197289,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.197289-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.3904019941668,
+                        "longitude": -122.10326830458203,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.10326830458203,
+                                37.3904019941668
+                            ]
+                        },
+                        "ts": 1679440016.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 6,
+                            "second": 56,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:06:56.601000-07:00",
+                        "altitude": 0.5301810180614259,
+                        "distance": 143.9335441578266,
+                        "speed": 4.7977848052608865,
+                        "heading": 61.669755378080886,
+                        "idx": 3,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d22"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.1976042,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.197604-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.39101625888907,
+                        "longitude": -122.10183423944271,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.10183423944271,
+                                37.39101625888907
+                            ]
+                        },
+                        "ts": 1679440046.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 7,
+                            "second": 26,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:07:26.601000-07:00",
+                        "altitude": -1.6597586107956221,
+                        "distance": 143.93263037038324,
+                        "speed": 4.797754345679441,
+                        "heading": 61.66955926619139,
+                        "idx": 4,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d23"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.197889,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.197889-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.391630523611326,
+                        "longitude": -122.10040017430339,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.10040017430339,
+                                37.391630523611326
+                            ]
+                        },
+                        "ts": 1679440076.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 7,
+                            "second": 56,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:07:56.601000-07:00",
+                        "altitude": -3.8496982396526693,
+                        "distance": 143.9317165714333,
+                        "speed": 4.7977238857144435,
+                        "heading": 61.66936314870725,
+                        "idx": 5,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d24"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.198169,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.198169-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.39224478833359,
+                        "longitude": -122.09896610916407,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09896610916407,
+                                37.39224478833359
+                            ]
+                        },
+                        "ts": 1679440106.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 8,
+                            "second": 26,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:08:26.601000-07:00",
+                        "altitude": -6.0396378685097165,
+                        "distance": 143.93080276210168,
+                        "speed": 4.79769342540339,
+                        "heading": 61.669167025963795,
+                        "idx": 6,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d25"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.1984499,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.198450-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.39285905305586,
+                        "longitude": -122.09753204402475,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09753204402475,
+                                37.39285905305586
+                            ]
+                        },
+                        "ts": 1679440136.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 8,
+                            "second": 56,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:08:56.601000-07:00",
+                        "altitude": -8.229577497366765,
+                        "distance": 143.92988894126387,
+                        "speed": 4.797662964708795,
+                        "heading": 61.66897089799719,
+                        "idx": 7,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d26"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.198729,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.198729-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.39285559110841,
+                        "longitude": -122.0963675708713,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.0963675708713,
+                                37.39285559110841
+                            ]
+                        },
+                        "ts": 1679440166.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 9,
+                            "second": 26,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:09:26.601000-07:00",
+                        "altitude": -8.030670926556231,
+                        "distance": 102.8741145804823,
+                        "speed": 3.429137152682743,
+                        "heading": 90.2140455319839,
+                        "idx": 8,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d27"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.1990001,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.199000-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.39130713778289,
+                        "longitude": -122.09446644529817,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09446644529817,
+                                37.39130713778289
+                            ]
+                        },
+                        "ts": 1679440196.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 9,
+                            "second": 56,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:09:56.601000-07:00",
+                        "altitude": -4.099593035834091,
+                        "distance": 240.52933606773325,
+                        "speed": 8.017644535591108,
+                        "heading": 135.71138046242797,
+                        "idx": 9,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d28"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.199776,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.199776-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.3895011608564,
+                        "longitude": -122.09152346644294,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.09152346644294,
+                                37.3895011608564
+                            ]
+                        },
+                        "ts": 1679440226.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 10,
+                            "second": 26,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:10:26.601000-07:00",
+                        "altitude": -2.6999998092651367,
+                        "distance": 328.5229831076516,
+                        "speed": 10.950766103588387,
+                        "heading": 127.68032529759942,
+                        "idx": 10,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d29"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.200195,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.200195-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.38855488297899,
+                        "longitude": -122.08947170337893,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.08947170337893,
+                                37.38855488297899
+                            ]
+                        },
+                        "ts": 1679440256.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 10,
+                            "second": 56,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:10:56.601000-07:00",
+                        "altitude": -2.6999998092651367,
+                        "distance": 209.59457949192614,
+                        "speed": 6.986485983064204,
+                        "heading": 120.13330802481885,
+                        "idx": 11,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d2a"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.2005491,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.200549-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.388133800806266,
+                        "longitude": -122.08835970557665,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.08835970557665,
+                                37.388133800806266
+                            ]
+                        },
+                        "ts": 1679440286.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 11,
+                            "second": 26,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:11:26.601000-07:00",
+                        "altitude": -2.6999998092651367,
+                        "distance": 108.83058661489035,
+                        "speed": 3.627686220496345,
+                        "heading": 115.48183030576179,
+                        "idx": 12,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d2b"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.2008462,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.200846-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.388145079468416,
+                        "longitude": -122.08825684893728,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.08825684893728,
+                                37.388145079468416
+                            ]
+                        },
+                        "ts": 1679440316.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 11,
+                            "second": 56,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:11:56.601000-07:00",
+                        "altitude": -1.973678671726565,
+                        "distance": 9.173399021177907,
+                        "speed": 0.3057799673725969,
+                        "heading": 82.14223788002106,
+                        "idx": 13,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d2c"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.201182,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.201182-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.38803595117295,
+                        "longitude": -122.08852988724324,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.08852988724324,
+                                37.38803595117295
+                            ]
+                        },
+                        "ts": 1679440346.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 12,
+                            "second": 26,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:12:26.601000-07:00",
+                        "altitude": -0.6000000238418579,
+                        "distance": 27.00274110251647,
+                        "speed": 0.9000913700838823,
+                        "heading": -116.70387936317071,
+                        "idx": 14,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d2d"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.201487,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.201487-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.38776256386601,
+                        "longitude": -122.08785665324602,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.08785665324602,
+                                37.38776256386601
+                            ]
+                        },
+                        "ts": 1679440376.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 12,
+                            "second": 56,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:12:56.601000-07:00",
+                        "altitude": -4.12497373925536,
+                        "distance": 66.79778605870467,
+                        "speed": 2.2265928686234893,
+                        "heading": 117.0707876485248,
+                        "idx": 15,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d2e"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.2018182,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.201818-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.39156450103554,
+                        "longitude": -122.0856819867753,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.0856819867753,
+                                37.39156450103554
+                            ]
+                        },
+                        "ts": 1679440406.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 13,
+                            "second": 26,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:13:26.601000-07:00",
+                        "altitude": -5.563399052973549,
+                        "distance": 464.36505517337406,
+                        "speed": 15.478835172445802,
+                        "heading": 24.439195771349123,
+                        "idx": 16,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d2f"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.202112,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.202112-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.392213422156374,
+                        "longitude": -122.08551523600917,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.08551523600917,
+                                37.392213422156374
+                            ]
+                        },
+                        "ts": 1679440436.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 13,
+                            "second": 56,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:13:56.601000-07:00",
+                        "altitude": -7.575579263035124,
+                        "distance": 73.64517480328273,
+                        "speed": 2.454839160109424,
+                        "heading": 11.53886756635161,
+                        "idx": 17,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d30"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.20255,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.202550-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.392761015769814,
+                        "longitude": -122.08505951264124,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.08505951264124,
+                                37.392761015769814
+                            ]
+                        },
+                        "ts": 1679440466.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 14,
+                            "second": 26,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:14:26.601000-07:00",
+                        "altitude": -8.263707543674116,
+                        "distance": 72.99615873144575,
+                        "speed": 2.4332052910481914,
+                        "heading": 33.472590194923114,
+                        "idx": 18,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d31"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.203007,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.203007-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.39274498273621,
+                        "longitude": -122.08495681667374,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.08495681667374,
+                                37.39274498273621
+                            ]
+                        },
+                        "ts": 1679440496.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 14,
+                            "second": 56,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:14:56.601000-07:00",
+                        "altitude": -10.734598151310793,
+                        "distance": 9.246017188987068,
+                        "speed": 0.3082005729662356,
+                        "heading": 101.1172128081224,
+                        "idx": 19,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d32"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.203433,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.203433-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.392795075513526,
+                        "longitude": -122.08493515502805,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.08493515502805,
+                                37.392795075513526
+                            ]
+                        },
+                        "ts": 1679440526.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 15,
+                            "second": 26,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:15:26.601000-07:00",
+                        "altitude": -7.209895627825227,
+                        "distance": 5.889626978634938,
+                        "speed": 0.19632089928783128,
+                        "heading": 18.960781031823412,
+                        "idx": 20,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d33"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.203726,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.203726-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.392731551592284,
+                        "longitude": -122.08490656647785,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.08490656647785,
+                                37.392731551592284
+                            ]
+                        },
+                        "ts": 1679440556.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 15,
+                            "second": 56,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:15:56.601000-07:00",
+                        "altitude": -11.647848146145423,
+                        "distance": 7.50148458133369,
+                        "speed": 0.2500494860444563,
+                        "heading": 160.32517958866316,
+                        "idx": 21,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d34"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.2040079,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.204008-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.39272534617542,
+                        "longitude": -122.08488346494595,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.08488346494595,
+                                37.39272534617542
+                            ]
+                        },
+                        "ts": 1679440586.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 16,
+                            "second": 26,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:16:26.601000-07:00",
+                        "altitude": -9.856589821606322,
+                        "distance": 2.1543586114240405,
+                        "speed": 0.07181195371413468,
+                        "heading": 108.68021400851514,
+                        "idx": 22,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d35"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.204283,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.204283-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.3922416,
+                        "longitude": -122.0854987,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.0854987,
+                                37.3922416
+                            ]
+                        },
+                        "ts": 1679440616.601,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 16,
+                            "second": 56,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:16:56.601000-07:00",
+                        "altitude": -7.075905995931848,
+                        "distance": 76.4691743348165,
+                        "speed": 2.5489724778272165,
+                        "heading": -134.7020356681888,
+                        "idx": 23,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d36"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.204715,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.204715-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.3922416,
+                        "longitude": -122.0854987,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.0854987,
+                                37.3922416
+                            ]
+                        },
+                        "ts": 1679440629.696,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 17,
+                            "second": 9,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:17:09.696000-07:00",
+                        "altitude": -7.200000286102295,
+                        "distance": 0.0,
+                        "speed": 0.0,
+                        "heading": 0.0,
+                        "idx": 24,
+                        "mode": 1,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d1d"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d38"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.362895,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.362895-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.3910308,
+                        "longitude": -122.0864857,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.0864857,
+                                37.3910308
+                            ]
+                        },
+                        "ts": 1679440744.776,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 19,
+                            "second": 4,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:19:04.776000-07:00",
+                        "altitude": -6.900000095367432,
+                        "distance": 0.0,
+                        "speed": 0.0,
+                        "heading": 0.0,
+                        "idx": 0,
+                        "mode": 2,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d37"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d39"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.363424,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.363424-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.39100747216811,
+                        "longitude": -122.0864931884531,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.0864931884531,
+                                37.39100747216811
+                            ]
+                        },
+                        "ts": 1679440774.776,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 19,
+                            "second": 34,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:19:34.776000-07:00",
+                        "altitude": -4.299999713897705,
+                        "distance": 2.676972698720345,
+                        "speed": 0.08923242329067817,
+                        "heading": -165.6920190229233,
+                        "idx": 1,
+                        "mode": 2,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d37"
+                        }
+                    }
+                },
+                {
+                    "_id": {
+                        "$oid": "6425074f4cb6153d68fc4d3a"
+                    },
+                    "user_id": {
+                        "$uuid": "29eaf9930b054ec5998a9f9fb2905100"
+                    },
+                    "metadata": {
+                        "key": "analysis/recreated_location",
+                        "platform": "server",
+                        "write_ts": 1680148303.363909,
+                        "time_zone": "America/Los_Angeles",
+                        "write_local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 29,
+                            "hour": 20,
+                            "minute": 51,
+                            "second": 43,
+                            "weekday": 2,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "write_fmt_time": "2023-03-29T20:51:43.363909-07:00"
+                    },
+                    "data": {
+                        "latitude": 37.3909951,
+                        "longitude": -122.0865007,
+                        "loc": {
+                            "type": "Point",
+                            "coordinates": [
+                                -122.0865007,
+                                37.3909951
+                            ]
+                        },
+                        "ts": 1679440787.579,
+                        "local_dt": {
+                            "year": 2023,
+                            "month": 3,
+                            "day": 21,
+                            "hour": 16,
+                            "minute": 19,
+                            "second": 47,
+                            "weekday": 1,
+                            "timezone": "America/Los_Angeles"
+                        },
+                        "fmt_time": "2023-03-21T16:19:47.579000-07:00",
+                        "altitude": -4.299999713897705,
+                        "distance": 1.5274134279655494,
+                        "speed": 0.11930121308687303,
+                        "heading": -154.24859384771997,
+                        "idx": 2,
+                        "mode": 2,
+                        "section": {
+                            "$oid": "6425074f4cb6153d68fc4d37"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+]

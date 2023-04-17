@@ -129,8 +129,8 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual(met_result_ld['user_metrics'][0], [])
 
         met_result_ts = metrics.summarize_by_timestamp(self.testUUID,
-                                                       arrow.get(2000,1,1).timestamp,
-                                                       arrow.get(2001,1,1).timestamp,
+                                                       arrow.get(2000,1,1).int_timestamp,
+                                                       arrow.get(2001,1,1).int_timestamp,
                                                         'm', ['count'], True)
         self.assertEqual(list(met_result_ts.keys()), ['aggregate_metrics', 'user_metrics'])
         self.assertEqual(met_result_ts['aggregate_metrics'][0], [])

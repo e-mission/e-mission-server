@@ -58,31 +58,31 @@ def purge_entries_for_user(curr_uuid, is_purge_state, db_array=None):
         psdb = edb.get_pipeline_state_db()
         logging.debug("db_array not passed in, looking up databases")
 
-    timeseries_del_result = ts_db.remove({"user_id": curr_uuid})
+    timeseries_del_result = ts_db.delete_many({"user_id": curr_uuid})
     logging.info("result = %s" % timeseries_del_result)
 
     logging.info("For uuid = %s, deleting entries from the profiles" % curr_uuid)
-    profiles_del_result = pr_db.remove({"user_id": curr_uuid})
+    profiles_del_result = pr_db.delete_many({"user_id": curr_uuid})
     logging.info("result = %s" % profiles_del_result)
 
     logging.info("For uuid = %s, deleting entries from the usercache" % curr_uuid)
-    usercache_del_result = uc_db.remove({"user_id": curr_uuid})
+    usercache_del_result = uc_db.delete_many({"user_id": curr_uuid})
     logging.info("result = %s" % usercache_del_result)
 
     logging.info("For uuid = %s, deleting entries from the timeseries_error" % curr_uuid)
-    timeseries_error_del_result = tse_db.remove({"user_id": curr_uuid})
+    timeseries_error_del_result = tse_db.delete_many({"user_id": curr_uuid})
     logging.info("result = %s" % timeseries_error_del_result)
 
     logging.info("For uuid = %s, deleting entries from the analysis_timeseries" % curr_uuid)
-    analysis_timeseries_del_result = ats_db.remove({"user_id": curr_uuid})
+    analysis_timeseries_del_result = ats_db.delete_many({"user_id": curr_uuid})
     logging.info("result = %s" % analysis_timeseries_del_result)
 
     logging.info("For uuid %s, deleting entries from the user_db" % curr_uuid)
-    user_db_del_result = udb.remove({"uuid": curr_uuid})
+    user_db_del_result = udb.delete_many({"uuid": curr_uuid})
     logging.info("result = %s" % user_db_del_result)
 
     if is_purge_state:
         logging.info("For uuid %s, deleting entries from the pipeline_state_db" % curr_uuid)
-        psdb_del_result = psdb.remove({"user_id": curr_uuid})
+        psdb_del_result = psdb.delete_many({"user_id": curr_uuid})
         logging.info("result = %s" % psdb_del_result)
  

@@ -137,6 +137,22 @@ def mark_trip_model_done(user_id, last_ts):
 def mark_trip_model_failed(user_id):
     mark_stage_failed(user_id, ps.PipelineStages.TRIP_MODEL)
 
+def get_time_range_for_composite_object_creation(user_id):
+    tq = get_time_range_for_stage(user_id, ps.PipelineStages.CREATE_COMPOSITE_OBJECTS)
+    tq.timeType = "data.end_ts"
+    return tq
+
+def mark_composite_object_creation_done(user_id, last_processed_ts):
+    if last_processed_ts is None:
+        mark_stage_done(user_id, ps.PipelineStages.CREATE_COMPOSITE_OBJECTS, None)
+    else:
+        mark_stage_done(user_id, ps.PipelineStages.CREATE_COMPOSITE_OBJECTS,
+                        last_processed_ts + END_FUZZ_AVOID_LTE)
+        
+def mark_composite_object_creation_failed(user_id):
+    mark_stage_failed(user_id, ps.PipelineStages.CREATE_COMPOSITE_OBJECTS)
+
+
 def get_time_range_for_confirmed_object_creation(user_id):
     tq = get_time_range_for_stage(user_id, ps.PipelineStages.CREATE_CONFIRMED_OBJECTS)
     tq.timeType = "data.end_ts"
