@@ -23,6 +23,7 @@ import emission.storage.timeseries.cache_series as estsc
 import emission.storage.decorations.timeline as esdt
 import emission.storage.decorations.analysis_timeseries_queries as esda
 
+EPOCH_MINIMUM = 0
 EPOCH_MAXIMUM = 2**31 - 1
 
 # helpers for getting start/enter and end/exit times of a trip/place
@@ -112,10 +113,22 @@ def valid_user_input_for_timeline_entry(ts, tl_entry, user_input):
 
     entry_start = begin_of(tl_entry)
     entry_end = end_of(tl_entry)
+    if entry_start is None:
+        # a place will have no enter time if it is the first place in the timeline
+        # so we will set the start time as low as possible for the purpose of comparison
+        entry_start = EPOCH_MINIMUM
     if entry_end is None:
         # a place will have no exit time if the user hasn't left there yet
         # so we will set the end time as high as possible for the purpose of comparison
         entry_end = EPOCH_MAXIMUM
+
+#     logging.warn("Comparing user input %s (%s) of type %s: %s -> %s, trip of type %s %s (%s) -> %s (%s)" %
+#         (user_input.data.label, user_input.get_id(), user_input.metadata.key,
+#         fmt_ts(user_input.data.start_ts, user_input.metadata.time_zone),
+#         fmt_ts(user_input.data.end_ts, user_input.metadata.time_zone),
+#         tl_entry.get_id(),
+#         fmt_ts(entry_start, user_input.metadata.time_zone), entry_start,
+#         fmt_ts(entry_end, user_input.metadata.time_zone), entry_end))
 
     logging.debug("Comparing user input %s: %s -> %s, trip %s -> %s, start checks are (%s && %s) and end checks are (%s || %s)" % (
         user_input.data.label,
@@ -202,6 +215,10 @@ def get_time_query_for_timeline_entry(timeline_entry, force_start_end=True):
     end_of_entry = end_of(timeline_entry)
     inferred_time_type = lambda timeline_entry: "data.start_ts" if "start_ts" in timeline_entry.data else "data.enter_ts"
     timeType = "data.start_ts" if force_start_end else inferred_time_type
+    if begin_of_entry is None:
+        # a place will have no enter time if it is the first place in the timeline
+        # so we will set the start time as low as possible for the purpose of comparison
+        entry_start = EPOCH_MINIMUM
     if end_of_entry is None:
         # the last place (user's current place) will not have an exit_ts, so
         # every input from its enter_ts onward is fair game
