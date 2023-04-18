@@ -1,16 +1,21 @@
 # python 3
-FROM ubuntu:focal
+FROM ubuntu:jammy
 
 MAINTAINER K. Shankari (shankari@eecs.berkeley.edu)
 
 WORKDIR /usr/src/app
 
-RUN apt-get update
-RUN apt-get install -y curl
-RUN apt-get install -y git
+RUN apt-get -y -qq update
+RUN apt-get install -y -qq curl
+RUN apt-get install -y -qq wget
+# RUN apt-get install -y git
 
 # install nano and vim for editing
-RUN apt-get -y install nano vim
+# RUN apt-get -y install nano vim
+
+# install jq to parse json within bash scripts
+RUN curl -o /usr/local/bin/jq http://stedolan.github.io/jq/download/linux64/jq && \
+  chmod +x /usr/local/bin/jq
 
 # cleanup
 RUN apt-get -y remove --purge build-essential
@@ -18,15 +23,7 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 COPY . .
 
-# ARG SERVER_REPO
-# ENV SERVER_REPO=${SERVER_REPO:-https://github.com/e-mission/e-mission-server.git}
-
-# ARG SERVER_BRANCH
-# ENV SERVER_BRANCH=${SERVER_BRANCH:-master}
-
-# ADD clone_server.sh /clone_server.sh
 RUN chmod u+x ./.docker/setup_config.sh
-# ADD index.html /index.html
 
 # # This clone puts the server code into the image, not the container
 RUN bash -c "./.docker/setup_config.sh"
