@@ -20,14 +20,6 @@ class AuthMethodFactory(object):
             import emission.net.auth.secret as enar
             logging.debug("methodName = secret, returning %s" % enar.SecretMethod)
             return enar.SecretMethod()
-        elif methodName == "openid_auth":
-            import emission.net.auth.openid_auth as enao
-            logging.debug("methodName = openid_auth, returning %s" % enao.OpenIDAuthMethod)
-            return enao.OpenIDAuthMethod()
-        elif methodName == "google_auth":
-            import emission.net.auth.google_auth as enag
-            logging.debug("methodName = google_auth, returning %s" % enag.GoogleAuthMethod)
-            return enag.GoogleAuthMethod()
         elif methodName == "token_list":
             import emission.net.auth.token_list as enat
             logging.debug("methodName = token_list, returning %s" % enat.TokenListMethod)
