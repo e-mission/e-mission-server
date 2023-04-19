@@ -1,6 +1,15 @@
 echo "About to start conda update, this may take some time..."
 source setup/setup_conda.sh Linux-x86_64
+# now install the emission environment
 source setup/setup.sh
+
+## Only in the docker environment, update the base image to the emission versions as well
+## So that during vulnerability checks, we will sink or swim together
+## aka if there is a vulnerabity in the base image, it will also be in emission
+## and can be updated at the same time.
+conda env update --name base --file setup/environment36.yml
+
+# Clean up the conda install
 conda clean -t
 find /root/miniconda-*/pkgs -wholename \*info/test\* -type d | xargs rm -rf
 
