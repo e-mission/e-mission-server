@@ -1,7 +1,9 @@
 import random
+import string
 from typing import Optional, Tuple, List, Dict
 from uuid import UUID
 import emission.analysis.modelling.trip_model.trip_model as eamtm
+import emission.core.common as ecc
 import emission.core.wrapper.confirmedtrip as ecwc
 
 import emission.core.wrapper.entry as ecwe
@@ -120,6 +122,7 @@ def build_mock_trip(
             "type": "Point",
             "coordinates": destination
         },
+        "distance": ecc.calDistance(origin, destination),
         "user_input": labels
     }
 
@@ -132,6 +135,7 @@ def generate_mock_trips(
     origin, 
     destination, 
     label_data = None, 
+    sensed_label_data = None,
     within_threshold = None,
     start_ts: None = None,
     end_ts: None = None,
@@ -143,7 +147,7 @@ def generate_mock_trips(
     within a threshold from the provided o/d pair, and some have labels. some other
     ones can be sampled to appear outside of the threshold of the o/d locations.
 
-    label_data is an optional dictionary with labels and sample weights, for example:
+    label_data/sensed_label-data is optional dictionary with labels and sample weights, for example:
     {
         "mode_confirm": ['walk', 'bike'],
         "replaced_mode": ['drive', 'tnc'],
@@ -160,6 +164,7 @@ def generate_mock_trips(
     :param origin: origin coordinates
     :param destination: destination coordinates
     :param label_data: dictionary of label data, see above, defaults to None
+    :param sensed_label_data: dictionary of sensed data, see above, defaults to None
     :param within_threshold: number of trips that should fall within the provided
            distance threshold in degrees WGS84, defaults to None
     :param threshold: distance threshold in WGS84 for sampling, defaults to 0.01
@@ -187,10 +192,19 @@ def generate_mock_trips(
             purpose_weights=label_data.get('purpose_weights')
         )
         trip = build_mock_trip(user_id, o, d, labels, start_ts, end_ts)
+        if sensed_label_data is not None:
+            trip = add_sensed_labels(trip, sensed_label_data)
         result.append(trip)
         
     random.shuffle(result) 
     return result
+
+
+def add_sensed_labels(trip, sensed_label_data):
+    for label in sensed_label_data:
+        # TODO: currently just makes one inferred label 'drive'; should be random option from sensed_label_data
+        trip['data']['inferred_labels'] = {'mode_confirm': sensed_label_data[label][0]}
+    return trip
 
 
 if __name__ == '__main__':
