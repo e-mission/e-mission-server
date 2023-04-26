@@ -53,8 +53,8 @@ def create_composite_trip(ts, ct):
     logging.debug("Origin key for trip %s is %s" % (ct["_id"], origin_key))
     composite_trip_data["locations"] = get_locations_for_confirmed_trip(ct)
     composite_trip_data["confirmed_trip"] = ct["_id"]
+    composite_trip_data["start_confirmed_place"] = eaum.get_confirmed_place_for_confirmed_trip(ct, "start_place")
     composite_trip_data["end_confirmed_place"] = eaum.get_confirmed_place_for_confirmed_trip(ct, "end_place")
-
     # later we will want to put section & modes in composite_trip as well
     composite_trip_entry = ecwe.Entry.create_entry(ct["user_id"], "analysis/composite_trip", composite_trip_data)
     composite_trip_entry["metadata"]["origin_key"] = origin_key
