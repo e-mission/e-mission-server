@@ -12,7 +12,6 @@ import logging
 
 def create_composite_trip(ts, ct):
     keys = eac.get_config()["userinput.keylist"]
-    isUntrackedTime = ct["metadata"]["key"] == esda.CONFIRMED_UNTRACKED_KEY
 
     # Before all this place work, we created confirmed trips by copying from cleaned trips,
     # so the start and end places were cleaned places. We add in hack to
@@ -54,12 +53,8 @@ def create_composite_trip(ts, ct):
     logging.debug("Origin key for trip %s is %s" % (ct["_id"], origin_key))
     composite_trip_data["locations"] = get_locations_for_confirmed_trip(ct)
     composite_trip_data["confirmed_trip"] = ct["_id"]
-    # The place that follows untracked time has a duration of 0.
-    # Thus, we are not going to consider it eligible for additions or user input,
-    # and so untracked composite objects will not have a confirmed_place.
-    if not isUntrackedTime:
-        composite_trip_data["start_confirmed_place"] = eaum.get_confirmed_place_for_confirmed_trip(ct, "start_place")
-        composite_trip_data["end_confirmed_place"] = eaum.get_confirmed_place_for_confirmed_trip(ct, "end_place")
+    composite_trip_data["start_confirmed_place"] = eaum.get_confirmed_place_for_confirmed_trip(ct, "start_place")
+    composite_trip_data["end_confirmed_place"] = eaum.get_confirmed_place_for_confirmed_trip(ct, "end_place")
     # later we will want to put section & modes in composite_trip as well
     composite_trip_entry = ecwe.Entry.create_entry(ct["user_id"], "analysis/composite_trip", composite_trip_data)
     composite_trip_entry["metadata"]["origin_key"] = origin_key
