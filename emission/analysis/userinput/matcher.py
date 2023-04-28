@@ -145,9 +145,11 @@ def create_and_link_timeline(ts, timeline, last_confirmed_place):
     else:
         # we update it with the information from the matching cleaned place
         matching_cleaned_place = timeline.first_place()
-        curr_confirmed_start_place["data"]["exit_ts"] = matching_cleaned_place.data.exit_ts
-        curr_confirmed_start_place["data"]["exit_fmt_time"] = matching_cleaned_place.data.exit_fmt_time
-        curr_confirmed_start_place["data"]["exit_local_dt"] = matching_cleaned_place.data.exit_local_dt
+        # only fill in the exit timestamps if the underlying cleaned place had them
+        if "exit_ts" in matching_cleaned_place.data:
+            curr_confirmed_start_place["data"]["exit_ts"] = matching_cleaned_place.data.exit_ts
+            curr_confirmed_start_place["data"]["exit_fmt_time"] = matching_cleaned_place.data.exit_fmt_time
+            curr_confirmed_start_place["data"]["exit_local_dt"] = matching_cleaned_place.data.exit_local_dt
         curr_confirmed_start_place["data"]["user_input"] = \
             get_user_input_dict(ts, matching_cleaned_place, keys)
         curr_confirmed_start_place["data"]["additions"] = \
