@@ -52,7 +52,7 @@ def create_composite_trip(ts, ct):
         # CREATE_CONFIRMED_OBJECTS stage, so it must be the start place for a new-style
         # confirmed trip
         existing_end_confirmed_place = edb.get_analysis_timeseries_db().find_one({"data.cleaned_place": ct["data"]["end_place"]})
-        if existing_end_confirmed_place is not None:
+        if existing_end_confirmed_place is not None and "starting_trip" in existing_end_confirmed_place["data"]:
             next_trip = edb.get_analysis_timeseries_db().find_one({"data.start_place": existing_end_confirmed_place["_id"]})
             assert next_trip is not None and next_trip["metadata"]["key"] == "analysis/confirmed_trip" \
                 and "additions" in next_trip["data"] and "trip_addition" not in next_trip["data"],\
