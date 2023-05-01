@@ -19,12 +19,15 @@ import pandas as pd
 import copy
 import arrow
 import uuid
+import os
 from bson.binary import UuidRepresentation
 
 # Our imports
 import emission.core.get_database as edb
 import emission.core.wrapper.localdate as ecwl
 import emission.core.wrapper.pipelinestate as ecwp
+import emission.core.wrapper.user as ecwu
+
 import emission.pipeline.reset as epr
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.tcquery as esttc
@@ -41,17 +44,21 @@ class TestPipelineReset(unittest.TestCase):
         np.random.seed(61297777)
 
     def tearDown(self):
-        logging.debug("Clearing related databases")
-        if hasattr(self, 'testUUID') and self.testUUID is not None:
-            logging.info("found single UUID, deleting entries")
-            self.clearRelatedDb()
-
-        if hasattr(self, 'testUUIDList') and self.testUUIDList is not None:
-            logging.info("found UUID list of length %d, deleting entries" % len(self.testUUIDList))
-            for uuid in self.testUUIDList:
-                self.testUUID = uuid
-                logging.info("Deleting entries for %s" % self.testUUID)
+        if os.environ.get("SKIP_TEARDOWN", False):
+            logging.info("SKIP_TEARDOWN = true, not clearing related databases")
+            ecwu.User.registerWithUUID("automated_tests", self.testUUID)
+        else:
+            logging.debug("Clearing related databases")
+            if hasattr(self, 'testUUID') and self.testUUID is not None:
+                logging.info("found single UUID, deleting entries")
                 self.clearRelatedDb()
+
+            if hasattr(self, 'testUUIDList') and self.testUUIDList is not None:
+                logging.info("found UUID list of length %d, deleting entries" % len(self.testUUIDList))
+                for uuid in self.testUUIDList:
+                    self.testUUID = uuid
+                    logging.info("Deleting entries for %s" % self.testUUID)
+                    self.clearRelatedDb()
 
     def clearRelatedDb(self):
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})

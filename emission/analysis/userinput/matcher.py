@@ -99,7 +99,11 @@ def create_confirmed_objects(user_id):
                 update_confirmed_and_composite(last_confirmed_place)
 
             if confirmed_tl is not None and not confirmed_tl.is_empty():
-                ts.bulk_insert(list(confirmed_tl), esta.EntryType.ANALYSIS_TYPE)
+                tl_list = list(confirmed_tl)
+                # Commented out to avoid log spew on production
+                # for t in tl_list:
+                #     logging.debug(f"COMPAT HACK TEST: Inserting confirmed timeline entry {t=}")
+                ts.bulk_insert(tl_list, esta.EntryType.ANALYSIS_TYPE)
 
             last_processed_ts = timeline.last_place().data.enter_ts
 
@@ -119,13 +123,33 @@ def create_and_link_timeline(ts, timeline, last_confirmed_place):
             timeline.first_place(), esda.CONFIRMED_PLACE_KEY, keys)
         logging.debug("no last confirmed place found, created place with id %s" %
             curr_confirmed_start_place.get_id())
+        # COMPAT HACK:
+        # During lazy migration, this could also be the first place in the incremental processing
+        # so there are confirmed trips before this, but they don't have any confirmed places
+        # in that case, timeline.first_place has a cleaned trip `ending_trip`, which we should replace
+        # with the corresponding confirmed trip
+        # https://github.com/e-mission/e-mission-docs/issues/898#issuecomment-1524081748
+        if "ending_trip" in curr_confirmed_start_place.data:
+            import emission.core.get_database as edb
+            # There can be multiple trip types that have a cleaned trip
+            # expected trip and inferred trip come to mind
+            # so if we use find_one we need to actually specify the key that we are looking for as well
+            matching_confirmed_trip = edb.get_analysis_timeseries_db().find_one({
+                "metadata.key": "analysis/confirmed_trip",
+                "data.cleaned_trip": curr_confirmed_start_place.data.ending_trip})
+            assert matching_confirmed_trip is not None,\
+                f"no matching confirmed trip for cleaned trip {curr_confirmed_start_place.data.ending_trip=}"
+            logging.debug(f"Found {matching_confirmed_trip=} for {curr_confirmed_start_place.data.ending_trip=}")
+            curr_confirmed_start_place["data"]["ending_trip"] = matching_confirmed_trip["_id"]
         confirmed_places.append(curr_confirmed_start_place)
     else:
         # we update it with the information from the matching cleaned place
         matching_cleaned_place = timeline.first_place()
-        curr_confirmed_start_place["data"]["exit_ts"] = matching_cleaned_place.data.exit_ts
-        curr_confirmed_start_place["data"]["exit_fmt_time"] = matching_cleaned_place.data.exit_fmt_time
-        curr_confirmed_start_place["data"]["exit_local_dt"] = matching_cleaned_place.data.exit_local_dt
+        # only fill in the exit timestamps if the underlying cleaned place had them
+        if "exit_ts" in matching_cleaned_place.data:
+            curr_confirmed_start_place["data"]["exit_ts"] = matching_cleaned_place.data.exit_ts
+            curr_confirmed_start_place["data"]["exit_fmt_time"] = matching_cleaned_place.data.exit_fmt_time
+            curr_confirmed_start_place["data"]["exit_local_dt"] = matching_cleaned_place.data.exit_local_dt
         curr_confirmed_start_place["data"]["user_input"] = \
             get_user_input_dict(ts, matching_cleaned_place, keys)
         curr_confirmed_start_place["data"]["additions"] = \
