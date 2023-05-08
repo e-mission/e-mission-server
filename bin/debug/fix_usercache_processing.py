@@ -20,7 +20,6 @@ logging.basicConfig(level=logging.DEBUG)
 import uuid
 import datetime as pydt
 import json
-import bson.json_util as bju
 
 import emission.core.get_database as edb
 import emission.net.usercache.abstract_usercache_handler as euah

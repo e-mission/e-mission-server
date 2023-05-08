@@ -18,5 +18,5 @@ for ue in edb.get_uuid_db().find():
         print(f"For {ue['user_email']}: Trip count = {trip_count}, location count = {location_count}, first trip = {first_trip_time}, last trip = {last_trip_time}, confirmed_pct ({month_ago} -> {now}) = exactly {confirmed_pct:.2f}")
     else:
         confirmed_count = edb.get_analysis_timeseries_db().count_documents({"user_id": ue["uuid"], "metadata.key": "analysis/confirmed_trip", "data.user_input": {"$ne": {}}})
-        confirmed_pct = confirmed_count / trip_count
+        confirmed_pct = confirmed_count / trip_count if trip_count != 0 else 0
         print(f"For {ue['user_email']}: Trip count = {trip_count}, location count = {location_count}, first trip = {first_trip_time}, last trip = {last_trip_time}, confirmed_pct  = approximately {confirmed_pct:.2f}")

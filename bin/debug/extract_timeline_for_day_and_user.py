@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.DEBUG)
 import uuid
 import datetime as pydt
 import json
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 
 import emission.core.get_database as edb
 
@@ -34,7 +34,7 @@ def export_timeline(user_id_str, day_str, file_name):
     final_query.update(date_query)
     entry_list = list(edb.get_timeseries_db().find(final_query))
     logging.info("Found %d entries" % len(entry_list))
-    json.dump(entry_list, open(file_name, "w"), default=bju.default, allow_nan=False, indent=4)
+    json.dump(entry_list, open(file_name, "w"), default=esj.wrapped_default, allow_nan=False, indent=4)
 
 if __name__ == '__main__':
     if len(sys.argv) != 4:

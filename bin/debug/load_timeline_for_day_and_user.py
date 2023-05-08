@@ -6,7 +6,7 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import *
 import json
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 import emission.storage.timeseries.cache_series as estcs
 import argparse
 import emission.core.wrapper.user as ecwu
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     user = ecwu.User.register(args.user_email)
     override_uuid = user.uuid
     print("After registration, %s -> %s" % (args.user_email, override_uuid))
-    entries = json.load(open(fn), object_hook = bju.object_hook)
+    entries = json.load(open(fn), object_hook = esj.wrapped_object_hook)
     munged_entries = []
     for i, entry in enumerate(entries):
         entry["user_id"] = override_uuid

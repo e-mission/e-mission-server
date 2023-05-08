@@ -18,7 +18,7 @@ import gzip
 import uuid
 import datetime as pydt
 import json
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 import arrow
 import argparse
 
@@ -50,7 +50,7 @@ def export_geojson(user_id, start_day_str, end_day_str, timezone, file_name):
     geojson_filename = "%s_%s.gz" % (file_name, user_id)
     with gzip.open(geojson_filename, "wt") as gcfd:
         json.dump(user_gj,
-            gcfd, default=bju.default, allow_nan=False, indent=4)
+            gcfd, default=esj.wrapped_default, allow_nan=False, indent=4)
 
 def export_geojson_for_users(user_id_list, args):
     for curr_uuid in user_id_list:
@@ -85,6 +85,6 @@ if __name__ == '__main__':
         uuid_list = esdu.get_all_uuids()
     elif args.file:
         with open(args.file) as fd:
-            uuid_entries = json.load(fd, object_hook=bju.object_hook)
+            uuid_entries = json.load(fd, object_hook=esj.wrapped_object_hook)
             uuid_list = [ue["uuid"] for ue in uuid_entries]
     export_geojson_for_users(uuid_list, args)

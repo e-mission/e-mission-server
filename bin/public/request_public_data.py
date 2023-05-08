@@ -11,7 +11,7 @@ import logging
 import arrow 
 from uuid import UUID
 import json
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 
 # This script pulls public data from the server and then loads it to a local server 
 parser = argparse.ArgumentParser(prog="request_public_data")
@@ -66,4 +66,4 @@ if args.database:
 else:
     assert(args.output_file is not None)
     with open(args.output_file, "w") as fp:
-        json.dump(entries, fp, default=bju.default, allow_nan=False, indent=4)
+        json.dump(entries, fp, default=esj.wrapped_default, allow_nan=False, indent=4)

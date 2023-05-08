@@ -2,7 +2,6 @@ import arrow
 import logging
 import json
 import argparse
-import bson.json_util as bju
 from uuid import UUID
 import emission.core.get_database as edb
 

@@ -6,7 +6,7 @@ import gzip
 import uuid
 import datetime as pydt
 import json
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 import arrow
 import argparse
 
@@ -111,7 +111,7 @@ if __name__ == '__main__':
         uuid_list = esdu.get_all_uuids()
     elif args.file:
         with open(args.file) as fd:
-            uuid_entries = json.load(fd, object_hook=bju.object_hook)
+            uuid_entries = json.load(fd, object_hook=esj.wrapped_object_hook)
             uuid_list = [ue["uuid"] for ue in uuid_entries]
     export_participant_table_as_csv(uuid_list, args)
     export_trip_tables_as_csv(uuid_list, args)
