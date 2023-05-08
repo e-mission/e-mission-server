@@ -54,8 +54,8 @@ def export_trip_table_as_csv(user_id, start_day_str, end_day_str, timezone, fp):
     logging.info("Extracting trip list for user %s day %s -> %s and saving to file %s" %
                  (user_id, start_day_str, end_day_str, fp))
 
-    start_day_ts = arrow.get(start_day_str).replace(tzinfo=timezone).timestamp
-    end_day_ts = arrow.get(end_day_str).replace(tzinfo=timezone).timestamp
+    start_day_ts = arrow.get(start_day_str).replace(tzinfo=timezone).timestamp()
+    end_day_ts = arrow.get(end_day_str).replace(tzinfo=timezone).timestamp()
     logging.debug("start_day_ts = %s (%s), end_day_ts = %s (%s)" % 
         (start_day_ts, arrow.get(start_day_ts).to(timezone),
          end_day_ts, arrow.get(end_day_ts).to(timezone)))
