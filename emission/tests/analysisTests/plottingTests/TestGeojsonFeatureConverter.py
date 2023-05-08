@@ -72,7 +72,7 @@ class TestGeojsonFeatureConverter(unittest.TestCase):
         self.assertEqual(len(created_trips), 9)
 
         trip_geojson = gjfc.trip_to_geojson(created_trips[0], tl)
-        logging.debug("first trip_geojson = %s" % json.dumps(trip_geojson, default=esj.default, indent=4))
+        logging.debug("first trip_geojson = %s" % json.dumps(trip_geojson, default=esj.wrapped_default, indent=4))
 
         self.assertEqual(trip_geojson.type, "FeatureCollection")
         self.assertEqual(trip_geojson.properties["feature_type"], "trip")
