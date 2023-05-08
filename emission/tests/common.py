@@ -10,7 +10,7 @@ from builtins import *
 import logging
 from datetime import datetime, timedelta
 import json
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 import uuid
 import pymongo
 
@@ -132,7 +132,7 @@ def setupRealExample(testObj, dump_file):
     logging.info("Before loading from %s, timeseries db size = %s" %
         (dump_file, edb.get_timeseries_db().estimated_document_count()))
     with open(dump_file) as dfp:
-        testObj.entries = json.load(dfp, object_hook = bju.object_hook)
+        testObj.entries = json.load(dfp, object_hook = esj.wrapped_object_hook)
         createAndFillUUID(testObj)
         print("Setting up real example for %s" % testObj.testUUID)
         setupRealExampleWithEntries(testObj)
