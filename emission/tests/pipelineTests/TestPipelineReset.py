@@ -137,13 +137,13 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=ejs.wrapped_object_hook)
-        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=ejs.wrapped_object_hook)
+        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=esj.wrapped_object_hook)
+        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=esj.wrapped_object_hook)
 
         # Run both pipelines
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = json.load(open(dataFile_2), object_hook=ejs.wrapped_object_hook)
+        self.entries = json.load(open(dataFile_2), object_hook=esj.wrapped_object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -197,13 +197,13 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=ejs.wrapped_object_hook)
-        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=ejs.wrapped_object_hook)
+        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=esj.wrapped_object_hook)
+        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=esj.wrapped_object_hook)
 
         # Run both pipelines
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = json.load(open(dataFile_2), object_hook=ejs.wrapped_object_hook)
+        self.entries = json.load(open(dataFile_2), object_hook=esj.wrapped_object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -278,13 +278,13 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=ejs.wrapped_object_hook)
-        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=ejs.wrapped_object_hook)
+        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=esj.wrapped_object_hook)
+        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=esj.wrapped_object_hook)
 
         # Run both pipelines
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = json.load(open(dataFile_2), object_hook=ejs.wrapped_object_hook)
+        self.entries = json.load(open(dataFile_2), object_hook=esj.wrapped_object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -345,13 +345,13 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=ejs.wrapped_object_hook)
-        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=ejs.wrapped_object_hook)
+        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=esj.wrapped_object_hook)
+        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=esj.wrapped_object_hook)
 
         # Run both pipelines
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = json.load(open(dataFile_2), object_hook=ejs.wrapped_object_hook)
+        self.entries = json.load(open(dataFile_2), object_hook=esj.wrapped_object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -412,13 +412,13 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=ejs.wrapped_object_hook)
-        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=ejs.wrapped_object_hook)
+        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=esj.wrapped_object_hook)
+        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=esj.wrapped_object_hook)
 
         # Run both pipelines
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = json.load(open(dataFile_2), object_hook=ejs.wrapped_object_hook)
+        self.entries = json.load(open(dataFile_2), object_hook=esj.wrapped_object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -455,13 +455,13 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=ejs.wrapped_object_hook)
-        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=ejs.wrapped_object_hook)
+        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=esj.wrapped_object_hook)
+        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=esj.wrapped_object_hook)
 
         # Run both pipelines
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = json.load(open(dataFile_2), object_hook=ejs.wrapped_object_hook)
+        self.entries = json.load(open(dataFile_2), object_hook=esj.wrapped_object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -521,8 +521,8 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=ejs.wrapped_object_hook)
-        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=ejs.wrapped_object_hook)
+        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=esj.wrapped_object_hook)
+        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=esj.wrapped_object_hook)
 
         # Run the first pipeline
         etc.setupRealExample(self, dataFile_1)
@@ -566,7 +566,7 @@ class TestPipelineReset(unittest.TestCase):
         self.assertNotIn("exit_ts", last_cleaned_place_first_day["data"])
 
         # Now, load more entries
-        self.entries = json.load(open(dataFile_2), object_hook=ejs.wrapped_object_hook)
+        self.entries = json.load(open(dataFile_2), object_hook=esj.wrapped_object_hook)
         etc.setupRealExampleWithEntries(self)
         # Run only trip and section segmentation code
         eaist.segment_current_trips(self.testUUID)
@@ -841,13 +841,13 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=ejs.wrapped_object_hook)
-        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=ejs.wrapped_object_hook)
+        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=esj.wrapped_object_hook)
+        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=esj.wrapped_object_hook)
 
         # Run both pipelines
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = json.load(open(dataFile_2), object_hook=ejs.wrapped_object_hook)
+        self.entries = json.load(open(dataFile_2), object_hook=esj.wrapped_object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
