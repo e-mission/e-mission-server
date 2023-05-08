@@ -10,6 +10,7 @@ import unittest
 import datetime as pydt
 import logging
 import json
+import emission.storage.json_wrappers as esj
 import uuid
 import os
 
