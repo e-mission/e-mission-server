@@ -12,7 +12,7 @@ for ue in edb.get_uuid_db().find():
     last_trip_time = last_trip[0]["data"]["end_fmt_time"] if len(last_trip) > 0 else None
     now = arrow.now()
     month_ago = now.shift(months=-1)
-    last_month_tq = estt.TimeQuery("data.start_ts", month_ago.timestamp, now.timestamp)
+    last_month_tq = estt.TimeQuery("data.start_ts", month_ago.timestamp(), now.timestamp())
     if 'computeConfirmed' in vars(ecwu.User):
         confirmed_pct, valid_replacement_pct, score = ecwu.User.computeConfirmed(ue["uuid"], last_month_tq)
         print(f"For {ue['user_email']}: Trip count = {trip_count}, location count = {location_count}, first trip = {first_trip_time}, last trip = {last_trip_time}, confirmed_pct ({month_ago} -> {now}) = exactly {confirmed_pct:.2f}")

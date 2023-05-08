@@ -13,13 +13,13 @@ def find_last_get(uuid):
     return last_get
 
 def check_active(uuid_list, threshold):
-    now = arrow.get().timestamp
+    now = arrow.get().timestamp()
     last_get_entries = [find_last_get(npu) for npu in uuid_list]
     for uuid, lge in zip(uuid_list, last_get_entries):
         if lge is None:
             print(uuid, None, "inactive")
         else:
-            last_call_diff = arrow.get().timestamp - lge["metadata"]["write_ts"]
+            last_call_diff = arrow.get().timestamp() - lge["metadata"]["write_ts"]
             if last_call_diff > threshold:
                 print(uuid, lge["metadata"]["write_fmt_time"], "inactive")
             else:

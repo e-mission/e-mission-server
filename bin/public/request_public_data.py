@@ -45,8 +45,8 @@ if args.verbose:
 	logging.basicConfig(level=logging.DEBUG)
 
 # Time query range
-from_ts = arrow.get(from_date, 'YYYY-MM-DD-HH').to('local').timestamp
-to_ts = arrow.get(to_date, 'YYYY-MM-DD-HH').to('local').timestamp
+from_ts = arrow.get(from_date, 'YYYY-MM-DD-HH').to('local').timestamp()
+to_ts = arrow.get(to_date, 'YYYY-MM-DD-HH').to('local').timestamp()
 
 logging.debug("from_ts = " + str(from_ts))
 logging.debug("to_ts = " + str(to_ts))

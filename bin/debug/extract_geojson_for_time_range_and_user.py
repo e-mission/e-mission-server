@@ -37,8 +37,8 @@ def export_geojson(user_id, start_day_str, end_day_str, timezone, file_name):
                  (user_id, start_day_str, end_day_str, file_name))
 
     # day_dt = pydt.datetime.strptime(day_str, "%Y-%m-%d").date()
-    start_day_ts = arrow.get(start_day_str).replace(tzinfo=timezone).timestamp
-    end_day_ts = arrow.get(end_day_str).replace(tzinfo=timezone).timestamp
+    start_day_ts = arrow.get(start_day_str).replace(tzinfo=timezone).timestamp()
+    end_day_ts = arrow.get(end_day_str).replace(tzinfo=timezone).timestamp()
     logging.debug("start_day_ts = %s (%s), end_day_ts = %s (%s)" % 
         (start_day_ts, arrow.get(start_day_ts).to(timezone),
          end_day_ts, arrow.get(end_day_ts).to(timezone)))
