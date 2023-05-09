@@ -33,10 +33,29 @@ def create_composite_trip(ts, ct):
         convert_cleaned_to_confirmed(ts, ct, keys)
         del ct["data"]["trip_addition"]
     else:
+        import emission.core.get_database as edb
         assert "additions" not in ct["data"]
         logging.info("old-style format, converting from cleaned to confirmed")
         needs_hack = True
-        assert statuscheck["curr_confirmed_place_count"] == 0
+        # we expect that the start place will have been converted in the common
+        # case, even for old-style format, because it would be the end place of
+        # the previous trip.
+        # https://github.com/e-mission/e-mission-docs/issues/898#issuecomment-1523885338
+        existing_start_confirmed_place = edb.get_analysis_timeseries_db().find_one({"data.cleaned_place": ct["data"]["start_place"]})
+        if existing_start_confirmed_place is not None:
+            previous_trip = edb.get_analysis_timeseries_db().find_one({"data.end_confirmed_place._id": existing_start_confirmed_place["_id"]})
+            assert previous_trip is not None,\
+                f"For {ct['_id']} found {existing_start_confirmed_place=} but no associated composite trip"
+
+        # if the end place also exists, it must have been created in the previous
+        # CREATE_CONFIRMED_OBJECTS stage, so it must be the start place for a new-style
+        # confirmed trip
+        existing_end_confirmed_place = edb.get_analysis_timeseries_db().find_one({"data.cleaned_place": ct["data"]["end_place"]})
+        if existing_end_confirmed_place is not None and "starting_trip" in existing_end_confirmed_place["data"]:
+            next_trip = edb.get_analysis_timeseries_db().find_one({"data.start_place": existing_end_confirmed_place["_id"]})
+            assert next_trip is not None and next_trip["metadata"]["key"] == "analysis/confirmed_trip" \
+                and "additions" in next_trip["data"] and "trip_addition" not in next_trip["data"],\
+                f"for {ct['_id']} found {existing_end_confirmed_place=} but {next_trip=}"
         convert_cleaned_to_confirmed(ts, ct, keys)
         ct["data"]["additions"] = []
 
@@ -104,7 +123,9 @@ def create_composite_objects(user_id):
     try:
         ts = esta.TimeSeries.get_time_series(user_id)
         # composite trips are created from both confirmed trips and cleaned untracked trips
-        triplikeEntries = ts.find_entries([esda.CONFIRMED_TRIP_KEY, esda.CONFIRMED_UNTRACKED_KEY], time_query=time_query)
+        # read them into memory immediately to avoid cursor timeouts
+        # https://github.com/e-mission/e-mission-docs/issues/898#issuecomment-1526857742
+        triplikeEntries = list(ts.find_entries([esda.CONFIRMED_TRIP_KEY, esda.CONFIRMED_UNTRACKED_KEY], time_query=time_query))
         last_done_ts = None
         count_created = 0
         for t in triplikeEntries:

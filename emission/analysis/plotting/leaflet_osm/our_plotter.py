@@ -22,7 +22,7 @@ import copy
 import attrdict as ad
 
 # import emission.analysis.classification.cleaning.location_smoothing as ls
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 
 import emission.storage.decorations.location_queries as lq
 import emission.storage.decorations.trip_queries as esdt
@@ -116,16 +116,16 @@ def get_map_for_geojson_trip(geojson_trip):
     return m
 
 def get_place_ui(place):
-    return folium.Marker(place["geometry"]["coordinates"][::-1], popup=bju.dumps(place["properties"]))
+    return folium.Marker(place["geometry"]["coordinates"][::-1], popup=esj.wrapped_dumps(place["properties"]))
 
 def get_section_ui(section):
     lat_lng_points = list((p[::-1] for p in section["geometry"]["coordinates"]))
-    return folium.PolyLine(lat_lng_points, popup=bju.dumps(section["properties"]))
+    return folium.PolyLine(lat_lng_points, popup=esj.wrapped_dumps(section["properties"]))
 
 def get_stop_ui(stop):
     lat_lng_points = list((p[::-1] for p in stop["geometry"]["coordinates"]))
-    return (folium.CircleMarker(lat_lng_points[0], popup=bju.dumps(stop["properties"]), color="green", fill_color="green", fill=True),
-            folium.CircleMarker(lat_lng_points[1], popup=bju.dumps(stop["properties"]), color="red", fill_color="red", fill=True))
+    return (folium.CircleMarker(lat_lng_points[0], popup=esj.wrapped_dumps(stop["properties"]), color="green", fill_color="green", fill=True),
+            folium.CircleMarker(lat_lng_points[1], popup=esj.wrapped_dumps(stop["properties"]), color="red", fill_color="red", fill=True))
 
         
 def flipped(coord):
@@ -152,7 +152,7 @@ def get_maps_for_geojson_unsectioned(geojson_list):
 def get_map_for_geojson_unsectioned(geojson):
     div_icon = folium.DivIcon()
     all_div_markers = [folium.CircleMarker(p["geometry"]["coordinates"][::-1],
-                                           popup=bju.dumps(p["properties"]),
+                                           popup=esj.wrapped_dumps(p["properties"]),
                                            radius=5)
                        for p in geojson["features"][0]["features"]]
     # all_div_markers = [folium.Marker(p["geometry"]["coordinates"][::-1],
@@ -173,7 +173,7 @@ def get_map_for_geojson_unsectioned(geojson):
     return m
 
 def get_coords(feature):
-    # logging.debug("Getting coordinates for feature %s" % bju.dumps(feature))
+    # logging.debug("Getting coordinates for feature %s" % esj.wrapped_dumps(feature))
     if feature["type"] == "FeatureCollection":
         retVal = []
         for f in feature["features"]:

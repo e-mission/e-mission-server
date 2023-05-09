@@ -5,7 +5,7 @@ import numpy as np
 import uuid
 import time
 import pandas as pd
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 from bson.binary import UuidRepresentation
 
 import emission.analysis.modelling.trip_model.model_storage as eamums
@@ -51,7 +51,7 @@ class TestRunGreedyModel(unittest.TestCase):
         # load in trips from a test file source
         input_file = 'emission/tests/data/real_examples/shankari_2016-06-20.expected_confirmed_trips'
         with open(input_file, 'r') as f:
-            trips_json = bju.loads(f.read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+            trips_json = json.load(f, object_hook=esj.wrapped_object_hook)
             trips = [ecwe.Entry(r) for r in trips_json]
         logging.debug(f'loaded {len(trips)} trips from {input_file}')
         self.ts.bulk_insert(trips)

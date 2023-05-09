@@ -274,6 +274,11 @@ class Timeline(object):
         if self.first_trip() is not None and \
             self.first_trip().data.start_place is not None:
             return self.get_object(self.first_trip().data.start_place)
+        # there are only places; if there are no trips, there must only be one place, so we return it
+        # https://github.com/e-mission/e-mission-docs/issues/898#issuecomment-1526862427
+        # https://github.com/e-mission/e-mission-docs/issues/898#issuecomment-1526891589
+        elif len(self.trips) == 0 and len(self.places) == 1:
+            return self.places[0]
         else:
             return None
 
@@ -281,6 +286,9 @@ class Timeline(object):
         if self.last_trip() is not None and \
             self.last_trip().data.end_place is not None:
             return self.get_object(self.last_trip().data.end_place)
+        # there are only places; if there are no trips, there must only be one place, so we return it
+        elif len(self.trips) == 0 and len(self.places) == 1:
+            return self.places[0]
         else:
             return None
 

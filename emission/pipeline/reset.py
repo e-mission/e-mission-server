@@ -53,29 +53,30 @@ def reset_user_to_ts(user_id, ts, is_dry_run):
 
     # Find the place before the time
     try:
-        last_cleaned_place = esdp.get_last_place_before(esda.CLEANED_PLACE_KEY, ts, user_id)
-        logging.debug("last_cleaned_place = %s" % last_cleaned_place)
-        if last_cleaned_place is None:
-            logging.info("last_cleaned_place is None, resetting to start and early return")
+        last_confirmed_place = esdp.get_last_place_before(esda.CONFIRMED_PLACE_KEY, ts, user_id)
+        logging.debug("last_confirmed_place = %s" % last_confirmed_place)
+        if last_confirmed_place is None:
+            logging.info("last_confirmed_place is None, resetting to start and early return")
             reset_user_to_start(user_id, is_dry_run)
             return
     except ValueError as e:
-        first_cleaned_place = esdp.get_first_place_entry(esda.CLEANED_PLACE_KEY, user_id)
-        if first_cleaned_place is not None and first_cleaned_place.data.exit_ts > ts:
-            logging.info("first_cleaned_place.exit = %s (%s), resetting to start" % 
-                (first_cleaned_place.data.exit_ts,
-                first_cleaned_place.data.exit_fmt_time))
+        first_confirmed_place = esdp.get_first_place_entry(esda.CONFIRMED_PLACE_KEY, user_id)
+        if first_confirmed_place is not None and first_confirmed_place.data.exit_ts > ts:
+            logging.info("first_confirmed_place.exit = %s (%s), resetting to start" %
+                (first_confirmed_place.data.exit_ts,
+                first_confirmed_place.data.exit_fmt_time))
             reset_user_to_start(user_id, is_dry_run)
             return
         else:
             raise
 
-    reset_ts, last_cleaned_place, last_raw_place = get_reset_ts(user_id, last_cleaned_place, is_dry_run)
+    reset_ts, last_cleaned_place, last_raw_place = get_reset_ts(user_id, last_confirmed_place, is_dry_run)
 
     # clear all analysis results after it
     del_objects_after(user_id, reset_ts, is_dry_run)
 
     # open the raw and cleaned places
+    reset_last_place(last_confirmed_place, is_dry_run)
     reset_last_place(last_cleaned_place, is_dry_run)
     reset_last_place(last_raw_place, is_dry_run)
 
@@ -85,8 +86,12 @@ def reset_user_to_ts(user_id, ts, is_dry_run):
     # reset any curr_run_ts
     reset_curr_run_state(user_id, is_dry_run)
 
-def get_reset_ts(user_id, last_cleaned_place, is_dry_run):
-    assert last_cleaned_place is not None, "last_cleaned_place = %s" % last_cleaned_place
+def get_reset_ts(user_id, last_confirmed_place, is_dry_run):
+    assert last_confirmed_place is not None, "last_confirmed_place = %s" % last_confirmed_place
+
+    last_cleaned_place_id = last_confirmed_place["data"]["cleaned_place"]
+    last_cleaned_place = esda.get_entry(esda.CLEANED_PLACE_KEY, last_cleaned_place_id)
+
     # TODO: Remove me in 2023
     # Historically, when we unset the entries for the last cleaned place during
     # a reset, we set the raw place array to empty. if the next run of the
@@ -187,7 +192,7 @@ def reset_pipeline_state(user_id, reset_ts, is_dry_run):
     stages_with_fuzz = [ecwp.PipelineStages.TRIP_SEGMENTATION.value,
                         ecwp.PipelineStages.LABEL_INFERENCE.value,
                         ecwp.PipelineStages.EXPECTATION_POPULATION.value,
-                        ecwp.PipelineStages.CREATE_CONFIRMED_OBJECTS.value]
+                        ecwp.PipelineStages.CREATE_COMPOSITE_OBJECTS.value]
         
     trip_seg_reset_pipeline_query = {'user_id': user_id,
                                      'last_processed_ts': {'$ne': None},

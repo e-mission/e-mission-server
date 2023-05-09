@@ -11,7 +11,7 @@ from builtins import *
 import unittest
 import logging
 import json
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 import attrdict as ad
 import arrow
 import numpy as np
@@ -19,12 +19,15 @@ import pandas as pd
 import copy
 import arrow
 import uuid
+import os
 from bson.binary import UuidRepresentation
 
 # Our imports
 import emission.core.get_database as edb
 import emission.core.wrapper.localdate as ecwl
 import emission.core.wrapper.pipelinestate as ecwp
+import emission.core.wrapper.user as ecwu
+
 import emission.pipeline.reset as epr
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.tcquery as esttc
@@ -41,17 +44,21 @@ class TestPipelineReset(unittest.TestCase):
         np.random.seed(61297777)
 
     def tearDown(self):
-        logging.debug("Clearing related databases")
-        if hasattr(self, 'testUUID') and self.testUUID is not None:
-            logging.info("found single UUID, deleting entries")
-            self.clearRelatedDb()
-
-        if hasattr(self, 'testUUIDList') and self.testUUIDList is not None:
-            logging.info("found UUID list of length %d, deleting entries" % len(self.testUUIDList))
-            for uuid in self.testUUIDList:
-                self.testUUID = uuid
-                logging.info("Deleting entries for %s" % self.testUUID)
+        if os.environ.get("SKIP_TEARDOWN", False):
+            logging.info("SKIP_TEARDOWN = true, not clearing related databases")
+            ecwu.User.registerWithUUID("automated_tests", self.testUUID)
+        else:
+            logging.debug("Clearing related databases")
+            if hasattr(self, 'testUUID') and self.testUUID is not None:
+                logging.info("found single UUID, deleting entries")
                 self.clearRelatedDb()
+
+            if hasattr(self, 'testUUIDList') and self.testUUIDList is not None:
+                logging.info("found UUID list of length %d, deleting entries" % len(self.testUUIDList))
+                for uuid in self.testUUIDList:
+                    self.testUUID = uuid
+                    logging.info("Deleting entries for %s" % self.testUUID)
+                    self.clearRelatedDb()
 
     def clearRelatedDb(self):
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
@@ -73,8 +80,8 @@ class TestPipelineReset(unittest.TestCase):
         self.assertEqual(len(result), len(expect))
         for rt, et in zip(result, expect):
             logging.debug("======= Comparing trip =========")
-            logging.debug(json.dumps(rt.properties, indent=4, default=bju.default))
-            logging.debug(json.dumps(et.properties, indent=4, default=bju.default))
+            logging.debug(json.dumps(rt.properties, indent=4, default=esj.wrapped_default))
+            logging.debug(json.dumps(et.properties, indent=4, default=esj.wrapped_default))
             # Highly user visible
             self.assertEqual(rt.properties.start_ts, et.properties.start_ts)
             self.assertEqual(rt.properties.end_ts, et.properties.end_ts)
@@ -85,8 +92,8 @@ class TestPipelineReset(unittest.TestCase):
 
             for rs, es in zip(rt.features, et.features):
                 logging.debug("------- Comparing trip feature ---------")
-                logging.debug(json.dumps(rs, indent=4, default=bju.default))
-                logging.debug(json.dumps(es, indent=4, default=bju.default))
+                logging.debug(json.dumps(rs, indent=4, default=esj.wrapped_default))
+                logging.debug(json.dumps(es, indent=4, default=esj.wrapped_default))
                 self.assertEqual(rs.type, es.type)
                 if rs.type == "Feature":
                     # The first place will not have an enter time, so we can't check it
@@ -130,13 +137,13 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = bju.loads(open(dataFile_1+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
-        ground_truth_2 = bju.loads(open(dataFile_2+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=esj.wrapped_object_hook)
+        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=esj.wrapped_object_hook)
 
         # Run both pipelines
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = bju.loads(open(dataFile_2).read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        self.entries = json.load(open(dataFile_2), object_hook=esj.wrapped_object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -190,13 +197,13 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = bju.loads(open(dataFile_1+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
-        ground_truth_2 = bju.loads(open(dataFile_2+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=esj.wrapped_object_hook)
+        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=esj.wrapped_object_hook)
 
         # Run both pipelines
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = bju.loads(open(dataFile_2).read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        self.entries = json.load(open(dataFile_2), object_hook=esj.wrapped_object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -236,7 +243,7 @@ class TestPipelineReset(unittest.TestCase):
 
         # Second day does not exist
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_2, start_ld_2)
-        logging.debug(json.dumps(api_result, indent=4, default=bju.default))
+        logging.debug(json.dumps(api_result, indent=4, default=esj.wrapped_default))
         self.assertEqual(api_result, [])
 
         # Re-run the pipeline again
@@ -271,13 +278,13 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = bju.loads(open(dataFile_1+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
-        ground_truth_2 = bju.loads(open(dataFile_2+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=esj.wrapped_object_hook)
+        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=esj.wrapped_object_hook)
 
         # Run both pipelines
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = bju.loads(open(dataFile_2).read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        self.entries = json.load(open(dataFile_2), object_hook=esj.wrapped_object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -300,7 +307,7 @@ class TestPipelineReset(unittest.TestCase):
 
         # Second day does not exist
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_2, start_ld_2)
-        logging.debug(json.dumps(api_result, indent=4, default=bju.default))
+        logging.debug(json.dumps(api_result, indent=4, default=esj.wrapped_default))
         self.assertEqual(api_result, [])
 
         # Re-run the pipeline again
@@ -338,13 +345,13 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = bju.loads(open(dataFile_1+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
-        ground_truth_2 = bju.loads(open(dataFile_2+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=esj.wrapped_object_hook)
+        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=esj.wrapped_object_hook)
 
         # Run both pipelines
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = bju.loads(open(dataFile_2).read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        self.entries = json.load(open(dataFile_2), object_hook=esj.wrapped_object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -375,8 +382,8 @@ class TestPipelineReset(unittest.TestCase):
 
         # Second day does not exist
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_2, start_ld_2)
-        logging.debug(json.dumps(api_result, indent=4, default=bju.default))
-        self.assertEqual(api_result, [], msg=f"api_result={json.dumps(api_result, default=bju.default)}, expected []")
+        logging.debug(json.dumps(api_result, indent=4, default=esj.wrapped_default))
+        self.assertEqual(api_result, [], msg=f"api_result={json.dumps(api_result, default=esj.wrapped_default)}, expected []")
 
         # Re-run the pipeline again
         etc.runIntakePipeline(self.testUUID)
@@ -405,13 +412,13 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = bju.loads(open(dataFile_1+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
-        ground_truth_2 = bju.loads(open(dataFile_2+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=esj.wrapped_object_hook)
+        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=esj.wrapped_object_hook)
 
         # Run both pipelines
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = bju.loads(open(dataFile_2).read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        self.entries = json.load(open(dataFile_2), object_hook=esj.wrapped_object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -448,13 +455,13 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = bju.loads(open(dataFile_1+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
-        ground_truth_2 = bju.loads(open(dataFile_2+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=esj.wrapped_object_hook)
+        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=esj.wrapped_object_hook)
 
         # Run both pipelines
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = bju.loads(open(dataFile_2).read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        self.entries = json.load(open(dataFile_2), object_hook=esj.wrapped_object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -514,8 +521,8 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = bju.loads(open(dataFile_1+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
-        ground_truth_2 = bju.loads(open(dataFile_2+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=esj.wrapped_object_hook)
+        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=esj.wrapped_object_hook)
 
         # Run the first pipeline
         etc.setupRealExample(self, dataFile_1)
@@ -559,7 +566,7 @@ class TestPipelineReset(unittest.TestCase):
         self.assertNotIn("exit_ts", last_cleaned_place_first_day["data"])
 
         # Now, load more entries
-        self.entries = bju.loads(open(dataFile_2).read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        self.entries = json.load(open(dataFile_2), object_hook=esj.wrapped_object_hook)
         etc.setupRealExampleWithEntries(self)
         # Run only trip and section segmentation code
         eaist.segment_current_trips(self.testUUID)
@@ -834,13 +841,13 @@ class TestPipelineReset(unittest.TestCase):
         start_ld_2 = ecwl.LocalDate({'year': 2016, 'month': 7, 'day': 25})
         cacheKey_1 = "diary/trips-2016-07-22"
         cacheKey_2 = "diary/trips-2016-07-25"
-        ground_truth_1 = bju.loads(open(dataFile_1+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
-        ground_truth_2 = bju.loads(open(dataFile_2+".ground_truth").read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        ground_truth_1 = json.load(open(dataFile_1+".ground_truth"), object_hook=esj.wrapped_object_hook)
+        ground_truth_2 = json.load(open(dataFile_2+".ground_truth"), object_hook=esj.wrapped_object_hook)
 
         # Run both pipelines
         etc.setupRealExample(self, dataFile_1)
         etc.runIntakePipeline(self.testUUID)
-        self.entries = bju.loads(open(dataFile_2).read(), json_options = bju.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+        self.entries = json.load(open(dataFile_2), object_hook=esj.wrapped_object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -872,7 +879,7 @@ class TestPipelineReset(unittest.TestCase):
         epr.auto_reset(dry_run=False, only_calc=False)
         # Second day does not exist
         api_result = gfc.get_geojson_for_dt(self.testUUID, start_ld_2, start_ld_2)
-        logging.debug(json.dumps(api_result, indent=4, default=bju.default))
+        logging.debug(json.dumps(api_result, indent=4, default=esj.wrapped_default))
         self.assertEqual(api_result, [])
 
         # Re-run the pipeline again

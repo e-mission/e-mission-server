@@ -19,8 +19,8 @@ def find_inactive_users():
     inactive_users_old_consent = ""
     inactive_users_before_september = ""
     inactive_users_after_september = ""
-    one_week_ago_ts = arrow.utcnow().replace(weeks=-1).timestamp
-    september_first = arrow.get('2016-09-01').timestamp
+    one_week_ago_ts = arrow.utcnow().replace(weeks=-1).timestamp()
+    september_first = arrow.get('2016-09-01').timestamp()
     for user in edb.get_uuid_db().find():
         db = esta.TimeSeries.get_time_series(user['uuid']).get_data_df("stats/server_api_time", time_query=None)
         new_consent = esta.TimeSeries.get_time_series(user['uuid']).get_data_df("config/consent", time_query=None)
@@ -31,7 +31,7 @@ def find_inactive_users():
                 inactive_users_new_consent+=str(user['user_email'])+', '
             else:
                 inactive_users_old_consent+=str(user['user_email'])+', '
-            if signup_date.timestamp < september_first:
+            if signup_date.timestamp() < september_first:
                 inactive_users_before_september+=str(user['user_email'])+', '
             else:
                 inactive_users_after_september+=str(user['user_email'])+', '
@@ -45,7 +45,7 @@ def find_inactive_users():
                     inactive_users_new_consent+=str(user['user_email'])+', '
                 else:
                     inactive_users_old_consent+=str(user['user_email'])+', '
-                if signup_date.timestamp < september_first:
+                if signup_date.timestamp() < september_first:
                     inactive_users_before_september+=str(user['user_email'])+', '
                 else:
                     inactive_users_after_september+=str(user['user_email'])+', '
@@ -56,7 +56,7 @@ def find_inactive_users():
                         inactive_users_new_consent+=str(user['user_email'])+', '
                     else:
                         inactive_users_old_consent+=str(user['user_email'])+', '
-                    if signup_date.timestamp < september_first:
+                    if signup_date.timestamp() < september_first:
                         inactive_users_before_september+=str(user['user_email'])+', '
                     else:
                         inactive_users_after_september+=str(user['user_email'])+', '

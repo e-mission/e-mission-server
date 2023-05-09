@@ -26,11 +26,10 @@ from uuid import UUID
 import socket
 # For decoding JWTs using the google decode URL
 import urllib.request, urllib.parse, urllib.error
+import emission.storage.json_wrappers as esj
 import requests
 import traceback
 import urllib.request, urllib.error, urllib.parse
-import bson.json_util
-from bson.binary import UuidRepresentation
 
 # Our imports
 import emission.net.api.visualize as visualize
@@ -337,7 +336,6 @@ def summarize_metrics(time_type):
     ret_val = metric_fn(user_uuid,
               start_time, end_time,
               freq_name, metric_list, is_return_aggregate)
-    # logging.debug("ret_val = %s" % bson.json_util.dumps(ret_val))
     if old_style:
         logging.debug("old_style metrics found, returning array of entries instead of array of arrays")
         assert(len(metric_list) == 1)
@@ -357,7 +355,6 @@ def habiticaJoinGroup(group_id):
                   (user_uuid, group_id, inviter_id))
     try:
         ret_val = habitproxy.setup_party(user_uuid, group_id, inviter_id)
-        logging.debug("ret_val = %s after joining group" % bson.json_util.dumps(ret_val))
         return {'result': ret_val}
     except RuntimeError as e:
         logging.info("Aborting call with message %s" % e.message)
@@ -530,10 +527,10 @@ if __name__ == '__main__':
     for plugin in app.plugins:
         if isinstance(plugin, JSONPlugin):
             print("Replaced json_dumps in plugin with the one from bson")
-            plugin.json_dumps = lambda s: bson.json_util.dumps(s, json_options = bson.json_util.LEGACY_JSON_OPTIONS.with_options(uuid_representation= UuidRepresentation.PYTHON_LEGACY))
+            plugin.json_dumps = esj.wrapped_dumps
 
-    print("Changing bt.json_loads from %s to %s" % (bt.json_loads, bson.json_util.loads))
-    bt.json_loads = bson.json_util.loads
+    print("Changing bt.json_loads from %s to %s" % (bt.json_loads, esj.wrapped_loads))
+    bt.json_loads = esj.wrapped_loads
 
     # The selection of SSL versus non-SSL should really be done through a config
     # option and not through editing source code, so let's make this keyed off the

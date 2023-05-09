@@ -10,7 +10,7 @@ import unittest
 import datetime as pydt
 import logging
 import json
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 import uuid
 import os
 
@@ -50,7 +50,7 @@ class TestSectionSegmentation(unittest.TestCase):
 
         self.testUUID = uuid.UUID("c76a0487-7e5a-3b17-a449-47be666b36f6")
         with open("emission/tests/data/real_examples/iphone_2015-11-06") as fp:
-            self.entries = json.load(fp, object_hook = bju.object_hook)
+            self.entries = json.load(fp, object_hook = esj.wrapped_object_hook)
         etc.setupRealExampleWithEntries(self)
         self.iosUUID = self.testUUID
         eaicf.filter_accuracy(self.iosUUID)

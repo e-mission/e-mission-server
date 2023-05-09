@@ -11,7 +11,7 @@ import datetime as pydt
 import logging
 import uuid
 import json
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 import numpy as np
 import copy
 import pandas as pd
@@ -213,11 +213,11 @@ class TestTripQueries(unittest.TestCase):
 
         # Now, let's load the mode_confirm and purpose_confirm objects
         with open("emission/tests/data/real_examples/shankari_single_positional_indexer.dec-12.mode_confirm") as mcfp:
-            mode_confirm_list = json.load(mcfp, object_hook=bju.object_hook)
+            mode_confirm_list = json.load(mcfp, object_hook=esj.wrapped_object_hook)
         self.assertEqual(len(mode_confirm_list), 5)
 
         with open("emission/tests/data/real_examples/shankari_single_positional_indexer.dec-12.purpose_confirm") as pcfp:
-            purpose_confirm_list = json.load(pcfp, object_hook=bju.object_hook)
+            purpose_confirm_list = json.load(pcfp, object_hook=esj.wrapped_object_hook)
         self.assertEqual(len(purpose_confirm_list), 7)
 
         for mc in mode_confirm_list:
@@ -270,11 +270,11 @@ class TestTripQueries(unittest.TestCase):
 
         # Now, let's load the mode_confirm and purpose_confirm objects
         with open("emission/tests/data/real_examples/shankari_single_positional_indexer.dec-12.mode_confirm") as mcfp:
-            mode_confirm_list = [ecwe.Entry(mc) for mc in json.load(mcfp, object_hook=bju.object_hook)]
+            mode_confirm_list = [ecwe.Entry(mc) for mc in json.load(mcfp, object_hook=esj.wrapped_object_hook)]
         self.assertEqual(len(mode_confirm_list), 5)
 
         with open("emission/tests/data/real_examples/shankari_single_positional_indexer.dec-12.purpose_confirm") as pcfp:
-            purpose_confirm_list = [ecwe.Entry(pc) for pc in json.load(pcfp, object_hook=bju.object_hook)]
+            purpose_confirm_list = [ecwe.Entry(pc) for pc in json.load(pcfp, object_hook=esj.wrapped_object_hook)]
         self.assertEqual(len(purpose_confirm_list), 7)
 
         mc_trip_start_fmt_time_list = []

@@ -123,6 +123,8 @@ def get_last_place_before(place_key, reset_ts, user_id):
     return ret_place
 
 def _get_trip_key_query(place_key):
+    if place_key == esda.CONFIRMED_PLACE_KEY:
+        return {"$in": [esda.CONFIRMED_TRIP_KEY, esda.CONFIRMED_UNTRACKED_KEY]}
     if place_key == esda.CLEANED_PLACE_KEY:
         return {"$in": [esda.CLEANED_TRIP_KEY, esda.CLEANED_UNTRACKED_KEY]}
     elif place_key == esda.RAW_PLACE_KEY:

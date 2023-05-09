@@ -7,7 +7,7 @@ standard_library.install_aliases()
 from builtins import str
 from builtins import *
 
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 import requests
 import json
 import logging
@@ -28,7 +28,7 @@ def request_data(server_url, from_ts, to_ts, phone_id, key_list, debug):
 
     r.raise_for_status()
 
-    dic = json.loads(r.text, object_hook=bju.object_hook)
+    dic = json.loads(r.text, object_hook=esj.wrapped_object_hook)
     entry_list = dic['phone_data']
 
     if debug:
