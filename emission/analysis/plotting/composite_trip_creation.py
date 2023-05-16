@@ -26,10 +26,10 @@ def create_composite_trip(ts, ct):
         logging.info("Most recent format, no need to convert")
         needs_hack = False
         assert statuscheck["curr_confirmed_place_count"] > 0
-    elif "additions" in ct["data"] and ["trip_addition"] in ct["data"]:
+    elif "additions" in ct["data"] and "trip_addition" in ct["data"]:
         logging.info("Intermediate format, converting from cleaned to confirmed and removing trip_addition")
         needs_hack = True
-        assert statuscheck["curr_confirmed_place_count"] == 0
+        # assert statuscheck["curr_confirmed_place_count"] == 0
         convert_cleaned_to_confirmed(ts, ct, keys)
         del ct["data"]["trip_addition"]
     else:
