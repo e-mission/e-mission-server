@@ -74,6 +74,15 @@ class TestWebserver(unittest.TestCase):
         importlib.reload(enacw)
         self.assertEqual(enacw.resolve_auth("dynamic"),"skip")
 
+    @mock.patch.dict(os.environ, {"STUDY_CONFIG":"denver-casr"}, clear=True)
+    def test_ResolveAuthWithEnvVar(self):
+        importlib.reload(enacw)
+        self.assertEqual(enacw.resolve_auth("dynamic"),"skip")
+
+    @mock.patch.dict(os.environ, {"STUDY_CONFIG":"stage-program"}, clear=True)
+    def test_ResolveAuthWithEnvVar(self):
+        importlib.reload(enacw)
+        self.assertEqual(enacw.resolve_auth("dynamic"),"token_list")
 
     def testResolveAuthNoEnvVar(self):
         importlib.reload(enacw)
