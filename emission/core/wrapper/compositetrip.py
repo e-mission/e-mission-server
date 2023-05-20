@@ -11,11 +11,11 @@ import emission.core.wrapper.modeprediction as ecwm
 
 class Compositetrip(ecwc.Confirmedtrip):
     props = ecwc.Confirmedtrip.props
-    props.update({#      # confirmedplace stuff
+    props.update({
                   "start_confirmed_place": ecwb.WrapperBase.Access.WORM, # object contains all properties for the source confirmed_place object
                   "end_confirmed_place": ecwb.WrapperBase.Access.WORM, # object contains all properties for the destination confirmed_place object
                   "confirmed_trip": ecwb.WrapperBase.Access.WORM, # the id of the corresponding confirmed trip
-                  "locations": ecwb.WrapperBase.Access.WORM, # object containing cleaned location entries (max 100)
+                  "locations": ecwb.WrapperBase.Access.WORM, # list containing cleaned location entries (max 100)
                   "sections": ecwb.WrapperBase.Access.WORM, # list containing cleaned sections during the trip
     })
 
