@@ -2,6 +2,7 @@ import emission.analysis.config as eac
 import emission.core.wrapper.entry as ecwe
 import emission.analysis.userinput.matcher as eaum
 import emission.storage.decorations.analysis_timeseries_queries as esda
+import emission.storage.decorations.trip_queries as esdt
 import emission.storage.pipeline_queries as epq
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.timequery as estt
@@ -74,7 +75,7 @@ def create_composite_trip(ts, ct):
     composite_trip_data["confirmed_trip"] = ct["_id"]
     composite_trip_data["start_confirmed_place"] = eaum.get_confirmed_place_for_confirmed_trip(ct, "start_place")
     composite_trip_data["end_confirmed_place"] = eaum.get_confirmed_place_for_confirmed_trip(ct, "end_place")
-    # later we will want to put section & modes in composite_trip as well
+    composite_trip_data["sections"] = get_sections_for_confirmed_trip(ct)
     composite_trip_entry = ecwe.Entry.create_entry(ct["user_id"], "analysis/composite_trip", composite_trip_data)
     composite_trip_entry["metadata"]["origin_key"] = origin_key
     ts.insert(composite_trip_entry)
@@ -152,3 +153,15 @@ def get_locations_for_confirmed_trip(ct, max_entries=100):
         sample_rate = len(locations)//max_entries + 1
         locations = locations[::sample_rate]
     return locations
+
+def get_sections_for_confirmed_trip(ct):
+    if "cleaned_trip" not in ct["data"]:
+        return [] # untracked time has no sections
+    trip_tl = esdt.get_cleaned_timeline_for_trip(ct["user_id"], ct["data"]["cleaned_trip"])
+    sections = trip_tl.trips
+    # on the phone, we don't need lists of 'speeds' and 'distances'
+    # for every section, and they can get big - so let's save some bandwidth
+    for section in sections:
+        del section["data"]["speeds"]
+        del section["data"]["distances"]
+    return sections
