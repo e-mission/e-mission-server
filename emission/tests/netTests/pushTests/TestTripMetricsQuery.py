@@ -8,7 +8,6 @@ from builtins import *
 import unittest
 import logging
 import json
-import bson.json_util as bju
 import attrdict as ad
 import arrow
 import numpy as np

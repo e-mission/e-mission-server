@@ -15,7 +15,7 @@ import logging
 import gzip
 import json
 import argparse
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 
 import emission.core.wrapper.user as ecwu
 
@@ -46,4 +46,4 @@ if __name__ == '__main__':
             uuids.append(uuid)
 
     uuid_strs = [{"uuid": u} for u in uuids]
-    json.dump(uuid_strs, out_fd, default=bju.default)
+    json.dump(uuid_strs, out_fd, default=esj.wrapped_default)

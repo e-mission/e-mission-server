@@ -89,7 +89,7 @@ if __name__ == '__main__':
     # Handle the second row in the table
         day_dt = arrow.get(args.date, "YYYY-MM-DD")
         logging.debug("day_dt is %s" % day_dt)
-        day_ts = day_dt.timestamp
+        day_ts = day_dt.timestamp()
         logging.debug("day_ts is %s" % day_ts)
         user_list = _get_user_list(args)
         logging.info("received list with %s users" % user_list)

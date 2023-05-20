@@ -12,7 +12,7 @@ import datetime as pydt
 import logging
 import pymongo
 import json
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 import bson.objectid as boi
 import numpy as np
 import attrdict as ad
@@ -48,7 +48,7 @@ class TestLocationSmoothing(unittest.TestCase):
         self.ts = esta.TimeSeries.get_time_series(self.testUUID)
         with open("emission/tests/data/smoothing_data/trip_list.txt") as tfp:
             self.trip_entries = json.load(tfp,
-                                      object_hook=bju.object_hook)
+                                      object_hook=esj.wrapped_object_hook)
         for trip_entry in self.trip_entries:
             trip_entry["user_id"] = self.testUUID
             self.ts.insert(trip_entry)
@@ -57,7 +57,7 @@ class TestLocationSmoothing(unittest.TestCase):
 
         with open("emission/tests/data/smoothing_data/section_list.txt") as sfp:
             self.section_entries = json.load(sfp,
-                                         object_hook=bju.object_hook)
+                                         object_hook=esj.wrapped_object_hook)
         for section_entry in self.section_entries:
             section_entry["user_id"] = self.testUUID
             self.ts.insert(section_entry)
@@ -74,7 +74,7 @@ class TestLocationSmoothing(unittest.TestCase):
 
         with open("emission/tests/data/smoothing_data/%s" % trip_id) as pfp:
             entries = json.load(pfp,
-                                 object_hook=bju.object_hook)
+                                 object_hook=esj.wrapped_object_hook)
         tsdb = edb.get_timeseries_db()
         for entry in entries:
             entry["user_id"] = self.testUUID

@@ -178,12 +178,12 @@ def grouped_to_summary(time_grouped_df, key_to_fill_fn, summary_fn):
             else:
                 curr_msts[ecwm.MotionTypes(mode).name] = result
         ret_list.append(curr_msts)
-#         import bson.json_util as bju
+#         import emission.storage.json_wrappers as esj
 #         logging.debug("After appending %s, ret_list = %s" % (curr_msts, ret_list))
 #         for k in curr_msts.keys():
 #             print("Serializing key = %s" % k)
 #             logging.debug("Serializing key %s = %s" %
-#                 (k, bju.dumps(curr_msts[k])))
+#                 (k, esj.wrapped_dumps(curr_msts[k])))
     return ret_list
 
 def _get_local_group_by(local_freq):
