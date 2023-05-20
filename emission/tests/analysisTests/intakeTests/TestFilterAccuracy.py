@@ -11,7 +11,7 @@ import datetime as pydt
 import logging
 import pymongo
 import json
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 import pandas as pd
 from uuid import UUID
 import os

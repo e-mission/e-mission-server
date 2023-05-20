@@ -1,6 +1,6 @@
 import attrdict as ad
 import json
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 import sys
 from uuid import UUID
 import argparse
@@ -13,14 +13,14 @@ def save_diary(args):
     print("Saving data for %s, %s to file %s" % (args.sel_uuid, args.date, args.file_name))
     tj = edb.get_usercache_db().find_one({'metadata.key': "diary/trips-%s" % args.date, "user_id": args.sel_uuid})
     print("Retrieved object is of length %s" % len(tj))
-    json.dump(tj, open(args.file_name, "w"), indent=4, default=bju.default)
+    json.dump(tj, open(args.file_name, "w"), indent=4, default=esj.wrapped_default)
 
 def save_ct_list(args):
     print("Saving confirmed trip list for %s to file %s" % (args.sel_uuid, args.file_name))
     ts = esta.TimeSeries.get_time_series(args.sel_uuid)
     composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
     print("Retrieved object is of length %s" % len(composite_trips))
-    json.dump(composite_trips, open(args.file_name, "w"), indent=4, default=bju.default)
+    json.dump(composite_trips, open(args.file_name, "w"), indent=4, default=esj.wrapped_default)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog="save_ground_truth")

@@ -57,9 +57,9 @@ class TestMetricsInferredSections(unittest.TestCase):
                                        'd', ['count'], True)
 
         import json
-        import bson.json_util as bju
+        import emission.storage.json_wrappers as esj
         
-        logging.debug(json.dumps(met_result, default=bju.default))
+        logging.debug(json.dumps(met_result, default=esj.wrapped_default))
 
         self.assertEqual(list(met_result.keys()), ['aggregate_metrics', 'user_metrics'])
         user_met_result = met_result['user_metrics'][0]

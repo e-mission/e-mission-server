@@ -1,7 +1,7 @@
 import unittest
 import logging
 import json
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 import argparse
 import numpy as np
 
@@ -61,8 +61,8 @@ class TestUserInput(unittest.TestCase):
         self.assertEqual(len(result), len(expect))
         for rt, et in zip(result, expect):
             logging.debug("======= Comparing trip =========")
-            logging.debug(json.dumps(rt, indent=4, default=bju.default))
-            logging.debug(json.dumps(et, indent=4, default=bju.default))
+            logging.debug(json.dumps(rt, indent=4, default=esj.wrapped_default))
+            logging.debug(json.dumps(et, indent=4, default=esj.wrapped_default))
             # Highly user visible
             if manual_keys:
                 for key in manual_keys:
@@ -107,15 +107,15 @@ class TestUserInput(unittest.TestCase):
         cp_suffix = "".join(".manual_" + k for k in place_user_inputs) if place_user_inputs else ""
         
         with open(dataFile+".ground_truth") as gfp:
-            ground_truth = json.load(gfp, object_hook=bju.object_hook)
+            ground_truth = json.load(gfp, object_hook=esj.wrapped_object_hook)
 
         etc.setupRealExample(self, dataFile)
         if (preload):
-            self.entries = json.load(open(dataFile+".user_inputs"+ct_suffix+cp_suffix), object_hook = bju.object_hook)
+            self.entries = json.load(open(dataFile+".user_inputs"+ct_suffix+cp_suffix), object_hook = esj.wrapped_object_hook)
             etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
         if (not preload):
-            self.entries = json.load(open(dataFile+".user_inputs"+ct_suffix+cp_suffix), object_hook = bju.object_hook)
+            self.entries = json.load(open(dataFile+".user_inputs"+ct_suffix+cp_suffix), object_hook = esj.wrapped_object_hook)
             etc.setupRealExampleWithEntries(self)
             etc.runIntakePipeline(self.testUUID)
         ts = esta.TimeSeries.get_time_series(self.testUUID)
@@ -123,16 +123,16 @@ class TestUserInput(unittest.TestCase):
         confirmed_places = list(ts.find_entries(["analysis/confirmed_place"], None))
 
         with open(dataFile+".expected_confirmed_trips"+ct_suffix) as dect:
-            expected_confirmed_trips = json.load(dect, object_hook = bju.object_hook)
+            expected_confirmed_trips = json.load(dect, object_hook = esj.wrapped_object_hook)
             self.compare_confirmed_objs_result(confirmed_trips, expected_confirmed_trips, manual_keys=["trip_user_input"] if trip_user_inputs else None) 
         with open(dataFile+".expected_confirmed_places"+cp_suffix) as dect:
-            expected_confirmed_places = json.load(dect, object_hook = bju.object_hook)
+            expected_confirmed_places = json.load(dect, object_hook = esj.wrapped_object_hook)
             self.compare_confirmed_objs_result(confirmed_places, expected_confirmed_places, manual_keys=["place_user_input"] if place_user_inputs else None)
 
 #         confirmed_sections = ts.find_entries(["analysis/confirmed_section"],
 #             estc.TimeComponentQuery("data.local_dt", ld, ld))
 #         with open(dataFile+".expected_confirmed_sections") as dect:
-#             expected_confirmed_sections = json.load(dect, object_hook = bju.object_hook)
+#             expected_confirmed_sections = json.load(dect, object_hook = esj.wrapped_object_hook)
 #             self.compare_section_result(confirmed_sections, expected_confirmed_sections)
 
 
