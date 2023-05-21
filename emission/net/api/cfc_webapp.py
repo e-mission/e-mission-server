@@ -487,7 +487,7 @@ def resolve_auth(auth_method):
         download_url = "https://raw.githubusercontent.com/e-mission/nrel-openpath-deploy-configs/main/configs/" + STUDY_CONFIG + ".nrel-op.json"
         logging.debug("About to download config from %s" % download_url)
         r = requests.get(download_url)
-        if r.status_code is not 200:
+        if r.status_code != 200:
             logging.debug(f"Unable to download study config, status code: {r.status_code}")
             sys.exit(1)
         else:
