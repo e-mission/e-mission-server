@@ -6,7 +6,7 @@ import copy
 
 import uuid
 import json
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 import emission.storage.timeseries.timequery as estt
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.cache_series as estcs
@@ -89,7 +89,7 @@ def export(user_id, ts, start_ts, end_ts, file_name, ma_bool):
         combined_filename = "%s.gz" % (file_name)
         with gzip.open(combined_filename, "wt") as gcfd:
             json.dump(combined_list,
-                gcfd, default=bju.default, allow_nan=False, indent=4)
+                gcfd, default=esj.wrapped_default, allow_nan=False, indent=4)
 
 
 def validate_truncation(loc_entry_list, trip_entry_list, place_entry_list):
