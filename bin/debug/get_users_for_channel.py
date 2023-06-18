@@ -10,7 +10,7 @@ import sys
 import argparse
 import logging
 import json
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 
 import emission.core.get_database as edb
 
@@ -30,4 +30,4 @@ if __name__ == '__main__':
     logging.debug("Mapped %d entries for channel %s" % (len(matched_email2uuid_it), args.channel)) 
 
     out_fd = sys.stdout if args.outfile is None else open(args.outfile, "w")
-    json.dump(matched_email2uuid_it, out_fd, default=bju.default)
+    json.dump(matched_email2uuid_it, out_fd, default=esj.wrapped_default)

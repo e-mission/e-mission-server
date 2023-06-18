@@ -3,7 +3,6 @@ import datetime as pydt
 import logging
 import json
 import geojson as gj
-import bson.json_util as bju
 import os
 import uuid
 import numpy as np

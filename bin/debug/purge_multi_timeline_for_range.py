@@ -9,7 +9,7 @@ import logging
 import argparse
 import json
 import gzip
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 
 # Our imports
 import common
@@ -50,7 +50,7 @@ if __name__ == '__main__':
         logging.info("=" * 50)
         logging.info("Deleting data from file %s" % filename)
 
-        entries = json.load(gzip.open(filename), object_hook = bju.object_hook)
+        entries = json.load(gzip.open(filename), object_hook = esj.wrapped_object_hook)
 
         # Obtain uuid and rerun information from entries
         curr_uuid_list, needs_rerun = common.analyse_timeline(entries)

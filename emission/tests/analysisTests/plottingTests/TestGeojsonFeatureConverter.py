@@ -15,7 +15,7 @@ import geojson as gj
 # See - jazzband/geojson#177
 # See = https://github.com/e-mission/e-mission-server/pull/900/commits/d2ada640f260aad8cbcfecb81345f4087c810baa
 gj.geometry.Geometry.__init__.__defaults__ = (None, False, 15)
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 import os
 
 # Our imports
@@ -72,7 +72,7 @@ class TestGeojsonFeatureConverter(unittest.TestCase):
         self.assertEqual(len(created_trips), 9)
 
         trip_geojson = gjfc.trip_to_geojson(created_trips[0], tl)
-        logging.debug("first trip_geojson = %s" % bju.dumps(trip_geojson, indent=4))
+        logging.debug("first trip_geojson = %s" % json.dumps(trip_geojson, default=esj.wrapped_default, indent=4))
 
         self.assertEqual(trip_geojson.type, "FeatureCollection")
         self.assertEqual(trip_geojson.properties["feature_type"], "trip")

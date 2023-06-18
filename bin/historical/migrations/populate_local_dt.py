@@ -36,7 +36,7 @@ def get_local_date(fmt_time, timezone):
     """
     adt = arrow.get(fmt_time)
     logging.debug("after parsing, adt = %s" % adt)
-    return ecwld.LocalDate.get_local_date(adt.timestamp, timezone)
+    return ecwld.LocalDate.get_local_date(adt.timestamp(), timezone)
         
 def fix_timeseries(key):
     tsdb = edb.get_timeseries_db()

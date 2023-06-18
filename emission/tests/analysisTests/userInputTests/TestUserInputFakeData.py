@@ -1,7 +1,6 @@
 import unittest
 import logging
 import json
-import bson.json_util as bju
 import argparse
 import numpy as np
 

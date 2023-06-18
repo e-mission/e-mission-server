@@ -11,7 +11,7 @@ from builtins import *
 import logging
 
 import json
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 import argparse
 
 import common
@@ -39,7 +39,7 @@ def register_fake_users(prefix, unique_user_list):
         user = ecwu.User.registerWithUUID(username, uuid)
 
 def register_mapped_users(mapfile, unique_user_list):
-    uuid_entries = json.load(open(mapfile), object_hook=bju.object_hook)
+    uuid_entries = json.load(open(mapfile), object_hook=esj.wrapped_object_hook)
     logging.info("Creating user entries for %d users from map of length %d" % (len(unique_user_list), len(mapfile)))
 
     lookup_map = dict([(eu["uuid"], eu) for eu in uuid_entries])
@@ -69,7 +69,7 @@ def load_pipeline_states(file_prefix, all_uuid_list, continue_on_error):
         print("Loading pipeline state for %s from %s" % 
             (curr_uuid, pipeline_filename))
         with gzip.open(pipeline_filename) as gfd:
-            states = json.load(gfd, object_hook = bju.object_hook)
+            states = json.load(gfd, object_hook = esj.wrapped_object_hook)
             if args.verbose:
                 logging.debug("Loading states of length %s" % len(states))
             if len(states) > 0:
@@ -154,7 +154,7 @@ if __name__ == '__main__':
         logging.info("=" * 50)
         logging.info("Loading data from file %s" % filename)
         
-        entries = json.load(gzip.open(filename), object_hook = bju.object_hook)
+        entries = json.load(gzip.open(filename), object_hook = esj.wrapped_object_hook)
 
         # Obtain uuid and rerun information from entries
         curr_uuid_list, needs_rerun = common.analyse_timeline(entries)

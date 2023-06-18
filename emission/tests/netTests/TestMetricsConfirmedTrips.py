@@ -3,7 +3,7 @@ import logging
 import arrow
 import os
 import json
-import bson.json_util as bju
+import emission.storage.json_wrappers as esj
 from datetime import datetime
 
 import emission.core.get_database as edb
@@ -33,7 +33,7 @@ class TestMetrics(unittest.TestCase):
 
     def _loadDataFileAndInputs(self, dataFile):
         etc.setupRealExample(self, dataFile)
-        self.entries = json.load(open(dataFile+".user_inputs"), object_hook = bju.object_hook)
+        self.entries = json.load(open(dataFile+".user_inputs"), object_hook = esj.wrapped_object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID)
 
@@ -116,7 +116,7 @@ class TestMetrics(unittest.TestCase):
         self.assertAlmostEqual(user_met_spd_result[0]["label_bike"], 2.24535722467578, places=3)
 
     def testCountTimestampPartialMissingLabels(self):
-        self.entries = json.load(open("emission/tests/data/real_examples/shankari_2016-07-22"), object_hook = bju.object_hook)
+        self.entries = json.load(open("emission/tests/data/real_examples/shankari_2016-07-22"), object_hook = esj.wrapped_object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID2)
         # We group the entire year so we get partial labels
@@ -151,7 +151,7 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual(agg_met_result[0]["label_unlabeled"], 5)
 
     def testCountTimestampFullMissingLabels(self):
-        self.entries = json.load(open("emission/tests/data/real_examples/shankari_2016-07-22"), object_hook = bju.object_hook)
+        self.entries = json.load(open("emission/tests/data/real_examples/shankari_2016-07-22"), object_hook = esj.wrapped_object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID2)
         # We group by day, so the last day will not have any labeled entries
@@ -187,7 +187,7 @@ class TestMetrics(unittest.TestCase):
         self.assertEqual(agg_met_result[32]["label_unlabeled"], 3)
 
     def testCountTimestampFullMissingLabelsMonth(self):
-        self.entries = json.load(open("emission/tests/data/real_examples/shankari_2016-07-22"), object_hook = bju.object_hook)
+        self.entries = json.load(open("emission/tests/data/real_examples/shankari_2016-07-22"), object_hook = esj.wrapped_object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID2)
         # We group by day, so the last day will not have any labeled entries
@@ -243,7 +243,7 @@ class TestMetrics(unittest.TestCase):
         self.assertGreaterEqual(agg_met_result[0]["label_unlabeled"], 2)
 
     def testCountLocalDateFullMissingLabelsMonth(self):
-        self.entries = json.load(open("emission/tests/data/real_examples/shankari_2016-07-22"), object_hook = bju.object_hook)
+        self.entries = json.load(open("emission/tests/data/real_examples/shankari_2016-07-22"), object_hook = esj.wrapped_object_hook)
         etc.setupRealExampleWithEntries(self)
         etc.runIntakePipeline(self.testUUID2)
         # We group by day, so the last day will not have any labeled entries
