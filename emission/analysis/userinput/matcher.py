@@ -11,6 +11,8 @@ import emission.storage.decorations.timeline as esdtl
 import emission.storage.pipeline_queries as epq
 import emission.core.wrapper.entry as ecwe
 import emission.core.wrapper.userinput as ecwui
+import emission.core.wrapper.motionactivity as ecwm
+import emission.core.wrapper.modeprediction as ecwmp
 import emission.storage.decorations.place_queries as esdp
 
 obj_to_dict_key = lambda key: key.split("/")[1]
@@ -191,6 +193,32 @@ def create_and_link_timeline(ts, timeline, last_confirmed_place):
                                     confirmed_places, confirmed_trips)
     return confirmed_tl
 
+def get_section_summary(ts, cleaned_trip, section_key):
+    """
+    Returns the proportions of the distance, duration and count for each mode
+    in this trip. Note that sections are unimodal by definition.
+    cleaned_trip: the cleaned trip object associated with the sections
+    section_key: 'inferred_section' or 'cleaned_section'
+    """
+    import emission.core.get_database as edb
+    
+    sections = esdt.get_sections_for_trip(key = section_key,
+        user_id = cleaned_trip["user_id"], trip_id = cleaned_trip["_id"])
+    if len(sections) == 0:
+        logging.warning("While getting section summary, section length = 0. This should never happen, but let's not crash if it does")
+        return {"distance": {}, "duration": {}, "count": {}}
+    sections_df = ts.to_data_df(section_key, sections)
+    cleaned_section_mapper = lambda sm: ecwm.MotionTypes(sm).name
+    inferred_section_mapper = lambda sm: ecwmp.PredictedModeTypes(sm).name
+    sel_section_mapper = cleaned_section_mapper \
+        if section_key == "analysis/cleaned_section" else inferred_section_mapper
+    sections_df["sensed_mode_str"] = sections_df["sensed_mode"].apply(sel_section_mapper)
+    grouped_section_df = sections_df.groupby("sensed_mode_str")
+    return {
+        "distance": grouped_section_df.distance.sum().to_dict(),
+        "duration": grouped_section_df.duration.sum().to_dict(),
+        "count": grouped_section_df.trip_id.count().to_dict()
+    }
 
 def create_confirmed_entry(ts, tce, confirmed_key, input_key_list):
     # Copy the entry and fill in the new values
@@ -199,6 +227,11 @@ def create_confirmed_entry(ts, tce, confirmed_key, input_key_list):
     # confirmed_object_dict["metadata"]["key"] = confirmed_key
     if (confirmed_key == esda.CONFIRMED_TRIP_KEY):
         confirmed_object_data["expected_trip"] = tce.get_id()
+        logging.debug("creating confimed entry from %s" % tce)
+        cleaned_trip = ts.get_entry_from_id(esda.CLEANED_TRIP_KEY,
+            tce["data"]["cleaned_trip"])
+        confirmed_object_data['inferred_section_summary'] = get_section_summary(ts, cleaned_trip, "analysis/inferred_section")
+        confirmed_object_data['cleaned_section_summary'] = get_section_summary(ts, cleaned_trip, "analysis/cleaned_section")
     elif (confirmed_key == esda.CONFIRMED_PLACE_KEY):
         confirmed_object_data["cleaned_place"] = tce.get_id()
     confirmed_object_data["user_input"] = \
