@@ -4,11 +4,13 @@ import json
 import emission.storage.json_wrappers as esj
 import argparse
 import numpy as np
+import os
 
 # Our imports
 import emission.core.get_database as edb
 import emission.core.wrapper.localdate as ecwl
 import emission.core.wrapper.entry as ecwe
+import emission.core.wrapper.user as ecwu
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.tcquery as estc
 
@@ -27,16 +29,20 @@ class TestUserInput(unittest.TestCase):
         logging.info("setUp complete")
 
     def tearDown(self):
-        logging.debug("Clearing related databases for %s" % self.testUUID)
-        # Clear the database only if it is not an evaluation run
-        # A testing run validates that nothing has changed
-        # An evaluation run compares to different algorithm implementations
-        # to determine whether to switch to a new implementation
-        if not hasattr(self, "evaluation") or not self.evaluation:
-            self.clearRelatedDb()
-        if hasattr(self, "analysis_conf_path"):
-            os.remove(self.analysis_conf_path)
-        logging.info("tearDown complete")
+        if os.environ.get("SKIP_TEARDOWN", False):
+            logging.info("SKIP_TEARDOWN = true, not clearing related databases")
+            ecwu.User.registerWithUUID("automated_tests", self.testUUID)
+        else:
+            logging.debug("Clearing related databases for %s" % self.testUUID)
+            # Clear the database only if it is not an evaluation run
+            # A testing run validates that nothing has changed
+            # An evaluation run compares to different algorithm implementations
+            # to determine whether to switch to a new implementation
+            if not hasattr(self, "evaluation") or not self.evaluation:
+                self.clearRelatedDb()
+            if hasattr(self, "analysis_conf_path"):
+                os.remove(self.analysis_conf_path)
+            logging.info("tearDown complete")
 
     def clearRelatedDb(self):
         logging.info("Timeseries delete result %s" % edb.get_timeseries_db().delete_many({"user_id": self.testUUID}).raw_result)
@@ -105,6 +111,7 @@ class TestUserInput(unittest.TestCase):
     def checkConfirmedTripsAndSections(self, dataFile, ld, preload=False, trip_user_inputs=False, place_user_inputs=False):
         ct_suffix = "".join(".manual_" + k for k in trip_user_inputs) if trip_user_inputs else ""
         cp_suffix = "".join(".manual_" + k for k in place_user_inputs) if place_user_inputs else ""
+        logging.debug("Checking confirmed entries against trip suffix %s and place suffix %s" % (ct_suffix, cp_suffix))
         
         with open(dataFile+".ground_truth") as gfp:
             ground_truth = json.load(gfp, object_hook=esj.wrapped_object_hook)
