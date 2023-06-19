@@ -18,9 +18,9 @@ def save_diary(args):
 def save_ct_list(args):
     print("Saving confirmed trip list for %s to file %s" % (args.sel_uuid, args.file_name))
     ts = esta.TimeSeries.get_time_series(args.sel_uuid)
-    composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
-    print("Retrieved object is of length %s" % len(composite_trips))
-    json.dump(composite_trips, open(args.file_name, "w"), indent=4, default=esj.wrapped_default)
+    analysis_objects = list(ts.find_entries(args.key_list, None))
+    print("Retrieved object is of length %s" % len(analysis_objects))
+    json.dump(analysis_objects, open(args.file_name, "w"), indent=4, default=esj.wrapped_default)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog="save_ground_truth")
@@ -34,9 +34,10 @@ if __name__ == '__main__':
     parser_diary.add_argument("date", help="date to retrieve ground truth (YYYY-MM-DD)")
     parser_diary.set_defaults(func=save_diary)
 
-    parser_diary = subparsers.add_parser('composite_list', help='list of composite trips')
-    parser.add_argument("file_name", help="file_name to store the result to")
-    parser_diary.set_defaults(func=save_ct_list)
+    parser_obj_list = subparsers.add_parser('objects', help='download analysis objects directly')
+    parser_obj_list.add_argument("file_name", help="file_name to store the result to")
+    parser_obj_list.add_argument("key_list", nargs="+", help="list of keys to download")
+    parser_obj_list.set_defaults(func=save_ct_list)
 
     args = parser.parse_args()
 
