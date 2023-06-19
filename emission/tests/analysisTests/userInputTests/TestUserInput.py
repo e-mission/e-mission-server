@@ -84,7 +84,12 @@ class TestUserInput(unittest.TestCase):
                     self.assertEqual(ra['data'], ea['data'])
             else:
                 self.assertEqual(rt.data["user_input"], et.data["user_input"])
-            # self.assertEqual(rt.data.inferred_primary_mode, et.data.inferred_primary_mode)
+
+            self.assertEqual(rt.data.keys(), et.data.keys())
+            if "inferred_section_summary" in rt.data:
+                self.assertEqual(rt.data["inferred_section_summary"], et.data["inferred_section_summary"])
+            if "cleaned_section_summary" in et.data:
+                self.assertEqual(rt.data["cleaned_section_summary"], et.data["cleaned_section_summary"])
             logging.debug(20 * "=")
 
     def compare_section_result(self, result, expect):

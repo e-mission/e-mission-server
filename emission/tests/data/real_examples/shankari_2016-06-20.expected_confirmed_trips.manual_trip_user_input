@@ -1,27 +1,27 @@
 [
     {
         "_id": {
-            "$oid": "648f7b5d6a6c7eb8b0420287"
+            "$oid": "648fc1bf9e5d20d94472ea75"
         },
         "user_id": {
-            "$uuid": "b218dac70fb4455f8b20e8abb50011fa"
+            "$uuid": "670426c8e17e427296d7181ec5933560"
         },
         "metadata": {
             "key": "analysis/confirmed_trip",
             "platform": "server",
-            "write_ts": 1687124829.380877,
+            "write_ts": 1687142847.5000699,
             "time_zone": "America/Los_Angeles",
             "write_local_dt": {
                 "year": 2023,
                 "month": 6,
                 "day": 18,
-                "hour": 14,
+                "hour": 19,
                 "minute": 47,
-                "second": 9,
+                "second": 27,
                 "weekday": 6,
                 "timezone": "America/Los_Angeles"
             },
-            "write_fmt_time": "2023-06-18T14:47:09.380877-07:00"
+            "write_fmt_time": "2023-06-18T19:47:27.500070-07:00"
         },
         "data": {
             "source": "DwellSegmentationTimeFilter",
@@ -45,7 +45,7 @@
                 ]
             },
             "raw_trip": {
-                "$oid": "648f7b5a6a6c7eb8b042018d"
+                "$oid": "648fc1bc9e5d20d94472e97b"
             },
             "start_ts": 1466436483.395,
             "start_local_dt": {
@@ -69,24 +69,40 @@
             "duration": 792.4609999656677,
             "distance": 1047.1630675866315,
             "start_place": {
-                "$oid": "648f7b5d6a6c7eb8b0420286"
+                "$oid": "648fc1bf9e5d20d94472ea74"
             },
             "end_place": {
-                "$oid": "648f7b5d6a6c7eb8b0420288"
+                "$oid": "648fc1bf9e5d20d94472ea76"
             },
             "cleaned_trip": {
-                "$oid": "648f7b5b6a6c7eb8b04201b0"
+                "$oid": "648fc1bd9e5d20d94472e99e"
             },
             "inferred_labels": [],
             "inferred_trip": {
-                "$oid": "648f7b5d6a6c7eb8b042026c"
+                "$oid": "648fc1bf9e5d20d94472ea5a"
             },
             "expectation": {
                 "to_label": true
             },
             "confidence_threshold": 0.55,
             "expected_trip": {
-                "$oid": "648f7b5d6a6c7eb8b042027f"
+                "$oid": "648fc1bf9e5d20d94472ea6d"
+            },
+            "inferred_section_summary": {
+                "distance": {},
+                "duration": {},
+                "count": {}
+            },
+            "cleaned_section_summary": {
+                "distance": {
+                    "ON_FOOT": 1047.1630675866315
+                },
+                "duration": {
+                    "ON_FOOT": 792.4609999656677
+                },
+                "count": {
+                    "ON_FOOT": 1
+                }
             },
             "user_input": {
                 "trip_user_input": {
@@ -94,7 +110,7 @@
                         "$oid": "5fd7b7bdf181cd8feb045f29"
                     },
                     "user_id": {
-                        "$uuid": "b218dac70fb4455f8b20e8abb50011fa"
+                        "$uuid": "670426c8e17e427296d7181ec5933560"
                     },
                     "metadata": {
                         "key": "manual/trip_user_input",
@@ -177,27 +193,27 @@
     },
     {
         "_id": {
-            "$oid": "648f7b5d6a6c7eb8b0420289"
+            "$oid": "648fc1bf9e5d20d94472ea77"
         },
         "user_id": {
-            "$uuid": "b218dac70fb4455f8b20e8abb50011fa"
+            "$uuid": "670426c8e17e427296d7181ec5933560"
         },
         "metadata": {
             "key": "analysis/confirmed_trip",
             "platform": "server",
-            "write_ts": 1687124829.44154,
+            "write_ts": 1687142847.690061,
             "time_zone": "America/Los_Angeles",
             "write_local_dt": {
                 "year": 2023,
                 "month": 6,
                 "day": 18,
-                "hour": 14,
+                "hour": 19,
                 "minute": 47,
-                "second": 9,
+                "second": 27,
                 "weekday": 6,
                 "timezone": "America/Los_Angeles"
             },
-            "write_fmt_time": "2023-06-18T14:47:09.441540-07:00"
+            "write_fmt_time": "2023-06-18T19:47:27.690061-07:00"
         },
         "data": {
             "source": "DwellSegmentationTimeFilter",
@@ -221,7 +237,7 @@
                 ]
             },
             "raw_trip": {
-                "$oid": "648f7b5a6a6c7eb8b042018f"
+                "$oid": "648fc1bc9e5d20d94472e97d"
             },
             "start_ts": 1466437438.6453953,
             "start_local_dt": {
@@ -245,24 +261,40 @@
             "duration": 584.3136048316956,
             "distance": 886.4937093667857,
             "start_place": {
-                "$oid": "648f7b5d6a6c7eb8b0420288"
+                "$oid": "648fc1bf9e5d20d94472ea76"
             },
             "end_place": {
-                "$oid": "648f7b5d6a6c7eb8b042028a"
+                "$oid": "648fc1bf9e5d20d94472ea78"
             },
             "cleaned_trip": {
-                "$oid": "648f7b5b6a6c7eb8b04201cf"
+                "$oid": "648fc1bd9e5d20d94472e9bd"
             },
             "inferred_labels": [],
             "inferred_trip": {
-                "$oid": "648f7b5d6a6c7eb8b042026f"
+                "$oid": "648fc1bf9e5d20d94472ea5d"
             },
             "expectation": {
                 "to_label": true
             },
             "confidence_threshold": 0.55,
             "expected_trip": {
-                "$oid": "648f7b5d6a6c7eb8b0420280"
+                "$oid": "648fc1bf9e5d20d94472ea6e"
+            },
+            "inferred_section_summary": {
+                "distance": {},
+                "duration": {},
+                "count": {}
+            },
+            "cleaned_section_summary": {
+                "distance": {
+                    "ON_FOOT": 886.4937093667857
+                },
+                "duration": {
+                    "ON_FOOT": 584.3136048316956
+                },
+                "count": {
+                    "ON_FOOT": 1
+                }
             },
             "user_input": {},
             "additions": []
@@ -270,27 +302,27 @@
     },
     {
         "_id": {
-            "$oid": "648f7b5d6a6c7eb8b042028b"
+            "$oid": "648fc1bf9e5d20d94472ea79"
         },
         "user_id": {
-            "$uuid": "b218dac70fb4455f8b20e8abb50011fa"
+            "$uuid": "670426c8e17e427296d7181ec5933560"
         },
         "metadata": {
             "key": "analysis/confirmed_trip",
             "platform": "server",
-            "write_ts": 1687124829.494791,
+            "write_ts": 1687142847.8682098,
             "time_zone": "America/Los_Angeles",
             "write_local_dt": {
                 "year": 2023,
                 "month": 6,
                 "day": 18,
-                "hour": 14,
+                "hour": 19,
                 "minute": 47,
-                "second": 9,
+                "second": 27,
                 "weekday": 6,
                 "timezone": "America/Los_Angeles"
             },
-            "write_fmt_time": "2023-06-18T14:47:09.494791-07:00"
+            "write_fmt_time": "2023-06-18T19:47:27.868210-07:00"
         },
         "data": {
             "source": "DwellSegmentationTimeFilter",
@@ -314,7 +346,7 @@
                 ]
             },
             "raw_trip": {
-                "$oid": "648f7b5a6a6c7eb8b0420191"
+                "$oid": "648fc1bc9e5d20d94472e97f"
             },
             "start_ts": 1466461623.1195338,
             "start_local_dt": {
@@ -338,24 +370,40 @@
             "duration": 343.25946617126465,
             "distance": 610.2234223038181,
             "start_place": {
-                "$oid": "648f7b5d6a6c7eb8b042028a"
+                "$oid": "648fc1bf9e5d20d94472ea78"
             },
             "end_place": {
-                "$oid": "648f7b5d6a6c7eb8b042028c"
+                "$oid": "648fc1bf9e5d20d94472ea7a"
             },
             "cleaned_trip": {
-                "$oid": "648f7b5b6a6c7eb8b04201e7"
+                "$oid": "648fc1bd9e5d20d94472e9d5"
             },
             "inferred_labels": [],
             "inferred_trip": {
-                "$oid": "648f7b5d6a6c7eb8b0420272"
+                "$oid": "648fc1bf9e5d20d94472ea60"
             },
             "expectation": {
                 "to_label": true
             },
             "confidence_threshold": 0.55,
             "expected_trip": {
-                "$oid": "648f7b5d6a6c7eb8b0420281"
+                "$oid": "648fc1bf9e5d20d94472ea6f"
+            },
+            "inferred_section_summary": {
+                "distance": {},
+                "duration": {},
+                "count": {}
+            },
+            "cleaned_section_summary": {
+                "distance": {
+                    "ON_FOOT": 610.2234223038181
+                },
+                "duration": {
+                    "ON_FOOT": 343.25946617126465
+                },
+                "count": {
+                    "ON_FOOT": 1
+                }
             },
             "user_input": {},
             "additions": []
@@ -363,27 +411,27 @@
     },
     {
         "_id": {
-            "$oid": "648f7b5d6a6c7eb8b042028d"
+            "$oid": "648fc1c09e5d20d94472ea7b"
         },
         "user_id": {
-            "$uuid": "b218dac70fb4455f8b20e8abb50011fa"
+            "$uuid": "670426c8e17e427296d7181ec5933560"
         },
         "metadata": {
             "key": "analysis/confirmed_trip",
             "platform": "server",
-            "write_ts": 1687124829.5599911,
+            "write_ts": 1687142848.061907,
             "time_zone": "America/Los_Angeles",
             "write_local_dt": {
                 "year": 2023,
                 "month": 6,
                 "day": 18,
-                "hour": 14,
+                "hour": 19,
                 "minute": 47,
-                "second": 9,
+                "second": 28,
                 "weekday": 6,
                 "timezone": "America/Los_Angeles"
             },
-            "write_fmt_time": "2023-06-18T14:47:09.559991-07:00"
+            "write_fmt_time": "2023-06-18T19:47:28.061907-07:00"
         },
         "data": {
             "source": "DwellSegmentationTimeFilter",
@@ -407,7 +455,7 @@
                 ]
             },
             "raw_trip": {
-                "$oid": "648f7b5a6a6c7eb8b0420193"
+                "$oid": "648fc1bc9e5d20d94472e981"
             },
             "start_ts": 1466462052.158904,
             "start_local_dt": {
@@ -431,24 +479,40 @@
             "duration": 400.54909586906433,
             "distance": 405.97685486691756,
             "start_place": {
-                "$oid": "648f7b5d6a6c7eb8b042028c"
+                "$oid": "648fc1bf9e5d20d94472ea7a"
             },
             "end_place": {
-                "$oid": "648f7b5d6a6c7eb8b042028e"
+                "$oid": "648fc1c09e5d20d94472ea7c"
             },
             "cleaned_trip": {
-                "$oid": "648f7b5c6a6c7eb8b04201f7"
+                "$oid": "648fc1be9e5d20d94472e9e5"
             },
             "inferred_labels": [],
             "inferred_trip": {
-                "$oid": "648f7b5d6a6c7eb8b0420275"
+                "$oid": "648fc1bf9e5d20d94472ea63"
             },
             "expectation": {
                 "to_label": true
             },
             "confidence_threshold": 0.55,
             "expected_trip": {
-                "$oid": "648f7b5d6a6c7eb8b0420282"
+                "$oid": "648fc1bf9e5d20d94472ea70"
+            },
+            "inferred_section_summary": {
+                "distance": {},
+                "duration": {},
+                "count": {}
+            },
+            "cleaned_section_summary": {
+                "distance": {
+                    "ON_FOOT": 405.97685486691756
+                },
+                "duration": {
+                    "ON_FOOT": 400.54909586906433
+                },
+                "count": {
+                    "ON_FOOT": 1
+                }
             },
             "user_input": {
                 "trip_user_input": {
@@ -456,7 +520,7 @@
                         "$oid": "5fd7b7bdf181cd8feb045f41"
                     },
                     "user_id": {
-                        "$uuid": "b218dac70fb4455f8b20e8abb50011fa"
+                        "$uuid": "670426c8e17e427296d7181ec5933560"
                     },
                     "metadata": {
                         "key": "manual/trip_user_input",
@@ -539,27 +603,27 @@
     },
     {
         "_id": {
-            "$oid": "648f7b5d6a6c7eb8b042028f"
+            "$oid": "648fc1c09e5d20d94472ea7d"
         },
         "user_id": {
-            "$uuid": "b218dac70fb4455f8b20e8abb50011fa"
+            "$uuid": "670426c8e17e427296d7181ec5933560"
         },
         "metadata": {
             "key": "analysis/confirmed_trip",
             "platform": "server",
-            "write_ts": 1687124829.623279,
+            "write_ts": 1687142848.254436,
             "time_zone": "America/Los_Angeles",
             "write_local_dt": {
                 "year": 2023,
                 "month": 6,
                 "day": 18,
-                "hour": 14,
+                "hour": 19,
                 "minute": 47,
-                "second": 9,
+                "second": 28,
                 "weekday": 6,
                 "timezone": "America/Los_Angeles"
             },
-            "write_fmt_time": "2023-06-18T14:47:09.623279-07:00"
+            "write_fmt_time": "2023-06-18T19:47:28.254436-07:00"
         },
         "data": {
             "source": "DwellSegmentationTimeFilter",
@@ -583,7 +647,7 @@
                 ]
             },
             "raw_trip": {
-                "$oid": "648f7b5a6a6c7eb8b0420195"
+                "$oid": "648fc1bc9e5d20d94472e983"
             },
             "start_ts": 1466462970.2807262,
             "start_local_dt": {
@@ -607,24 +671,43 @@
             "duration": 865.4322738647461,
             "distance": 4521.417177464177,
             "start_place": {
-                "$oid": "648f7b5d6a6c7eb8b042028e"
+                "$oid": "648fc1c09e5d20d94472ea7c"
             },
             "end_place": {
-                "$oid": "648f7b5d6a6c7eb8b0420290"
+                "$oid": "648fc1c09e5d20d94472ea7e"
             },
             "cleaned_trip": {
-                "$oid": "648f7b5c6a6c7eb8b0420209"
+                "$oid": "648fc1be9e5d20d94472e9f7"
             },
             "inferred_labels": [],
             "inferred_trip": {
-                "$oid": "648f7b5d6a6c7eb8b0420278"
+                "$oid": "648fc1bf9e5d20d94472ea66"
             },
             "expectation": {
                 "to_label": true
             },
             "confidence_threshold": 0.55,
             "expected_trip": {
-                "$oid": "648f7b5d6a6c7eb8b0420283"
+                "$oid": "648fc1bf9e5d20d94472ea71"
+            },
+            "inferred_section_summary": {
+                "distance": {},
+                "duration": {},
+                "count": {}
+            },
+            "cleaned_section_summary": {
+                "distance": {
+                    "IN_VEHICLE": 4230.990793080315,
+                    "ON_FOOT": 263.78214582296704
+                },
+                "duration": {
+                    "IN_VEHICLE": 579.9892737865448,
+                    "ON_FOOT": 248.88300013542175
+                },
+                "count": {
+                    "IN_VEHICLE": 1,
+                    "ON_FOOT": 1
+                }
             },
             "user_input": {
                 "trip_user_input": {
@@ -632,7 +715,7 @@
                         "$oid": "5fd7b7bdf181cd8feb045f47"
                     },
                     "user_id": {
-                        "$uuid": "b218dac70fb4455f8b20e8abb50011fa"
+                        "$uuid": "670426c8e17e427296d7181ec5933560"
                     },
                     "metadata": {
                         "key": "manual/trip_user_input",
@@ -715,27 +798,27 @@
     },
     {
         "_id": {
-            "$oid": "648f7b5d6a6c7eb8b0420291"
+            "$oid": "648fc1c09e5d20d94472ea7f"
         },
         "user_id": {
-            "$uuid": "b218dac70fb4455f8b20e8abb50011fa"
+            "$uuid": "670426c8e17e427296d7181ec5933560"
         },
         "metadata": {
             "key": "analysis/confirmed_trip",
             "platform": "server",
-            "write_ts": 1687124829.688531,
+            "write_ts": 1687142848.4550269,
             "time_zone": "America/Los_Angeles",
             "write_local_dt": {
                 "year": 2023,
                 "month": 6,
                 "day": 18,
-                "hour": 14,
+                "hour": 19,
                 "minute": 47,
-                "second": 9,
+                "second": 28,
                 "weekday": 6,
                 "timezone": "America/Los_Angeles"
             },
-            "write_fmt_time": "2023-06-18T14:47:09.688531-07:00"
+            "write_fmt_time": "2023-06-18T19:47:28.455027-07:00"
         },
         "data": {
             "source": "DwellSegmentationTimeFilter",
@@ -759,7 +842,7 @@
                 ]
             },
             "raw_trip": {
-                "$oid": "648f7b5a6a6c7eb8b0420199"
+                "$oid": "648fc1bc9e5d20d94472e987"
             },
             "start_ts": 1466466584.0461695,
             "start_local_dt": {
@@ -783,24 +866,43 @@
             "duration": 1375.7208304405212,
             "distance": 5136.824369981995,
             "start_place": {
-                "$oid": "648f7b5d6a6c7eb8b0420290"
+                "$oid": "648fc1c09e5d20d94472ea7e"
             },
             "end_place": {
-                "$oid": "648f7b5d6a6c7eb8b0420292"
+                "$oid": "648fc1c09e5d20d94472ea80"
             },
             "cleaned_trip": {
-                "$oid": "648f7b5c6a6c7eb8b042022d"
+                "$oid": "648fc1be9e5d20d94472ea1b"
             },
             "inferred_labels": [],
             "inferred_trip": {
-                "$oid": "648f7b5d6a6c7eb8b042027b"
+                "$oid": "648fc1bf9e5d20d94472ea69"
             },
             "expectation": {
                 "to_label": true
             },
             "confidence_threshold": 0.55,
             "expected_trip": {
-                "$oid": "648f7b5d6a6c7eb8b0420284"
+                "$oid": "648fc1bf9e5d20d94472ea72"
+            },
+            "inferred_section_summary": {
+                "distance": {},
+                "duration": {},
+                "count": {}
+            },
+            "cleaned_section_summary": {
+                "distance": {
+                    "IN_VEHICLE": 4045.1075258799774,
+                    "ON_FOOT": 1059.0165269763859
+                },
+                "duration": {
+                    "IN_VEHICLE": 825.5899999141693,
+                    "ON_FOOT": 527.3768305778503
+                },
+                "count": {
+                    "IN_VEHICLE": 1,
+                    "ON_FOOT": 1
+                }
             },
             "user_input": {
                 "trip_user_input": {
@@ -808,7 +910,7 @@
                         "$oid": "5fd7b7bdf181cd8feb045f37"
                     },
                     "user_id": {
-                        "$uuid": "b218dac70fb4455f8b20e8abb50011fa"
+                        "$uuid": "670426c8e17e427296d7181ec5933560"
                     },
                     "metadata": {
                         "key": "manual/trip_user_input",
