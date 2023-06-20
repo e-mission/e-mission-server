@@ -1,11 +1,16 @@
 import emission.analysis.config as eac
 import emission.core.wrapper.entry as ecwe
+import emission.core.wrapper.motionactivity as ecwm
+import emission.core.wrapper.modeprediction as ecwmp
+
 import emission.analysis.userinput.matcher as eaum
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.decorations.trip_queries as esdt
 import emission.storage.pipeline_queries as epq
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.timequery as estt
+
+import emission.analysis.config as eac
 
 import copy
 import logging
@@ -157,11 +162,28 @@ def get_locations_for_confirmed_trip(ct, max_entries=100):
 def get_sections_for_confirmed_trip(ct):
     if "cleaned_trip" not in ct["data"]:
         return [] # untracked time has no sections
-    trip_tl = esdt.get_cleaned_timeline_for_trip(ct["user_id"], ct["data"]["cleaned_trip"])
-    sections = trip_tl.trips
+    section_key = eac.get_section_key_for_analysis_results()
+    logging.debug("Retrieving sections with key %s" % section_key)
+    sections = esdt.get_sections_for_trip(key = section_key,
+        user_id = ct["user_id"], trip_id = ct["data"]["cleaned_trip"])
+
+    # Fallback to cleaned sections if inferred sections do not exist
+    # TODO: Decide whether to keep or remove the fallback
+    if len(sections) == 0 and section_key == esda.INFERRED_SECTION_KEY:
+        logging.debug("len(inferred_sections) == 0, falling back to cleaned_sections")
+        section_key = "analysis/cleaned_section"
+        sections = esdt.get_sections_for_trip(key = section_key,
+            user_id = ct["user_id"], trip_id = ct["data"]["cleaned_trip"])
+
+    cleaned_section_mapper = lambda sm: ecwm.MotionTypes(sm).name
+    inferred_section_mapper = lambda sm: ecwmp.PredictedModeTypes(sm).name
+    sel_section_mapper = cleaned_section_mapper \
+        if section_key == "analysis/cleaned_section" else inferred_section_mapper
+
     # on the phone, we don't need lists of 'speeds' and 'distances'
     # for every section, and they can get big - so let's save some bandwidth
     for section in sections:
+        section["sensed_mode_str"] = sel_section_mapper(section["data"]["sensed_mode"])
         del section["data"]["speeds"]
         del section["data"]["distances"]
     return sections
