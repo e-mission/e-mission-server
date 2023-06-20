@@ -17,10 +17,6 @@ class Confirmedtrip(ecwt.Trip):
                   "expectation": ecwb.WrapperBase.Access.WORM,
                   "confidence_threshold": ecwb.WrapperBase.Access.WORM,
                   "expected_trip": ecwb.WrapperBase.Access.WORM,
-# the confirmed section that is the "primary"
-# https://github.com/e-mission/e-mission-docs/issues/476#issuecomment-738120752
-                  "primary_section": ecwb.WrapperBase.Access.WORM,
-                  "inferred_primary_mode": ecwb.WrapperBase.Access.WORM,
                   "inferred_section_summary": ecwb.WrapperBase.Access.WORM,
                   "cleaned_section_summary": ecwb.WrapperBase.Access.WORM,
 # the user input will have all `manual/*` entries
