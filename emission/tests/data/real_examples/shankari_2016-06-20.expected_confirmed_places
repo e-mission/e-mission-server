@@ -1,65 +1,62 @@
 [
     {
         "_id": {
-            "$oid": "649288dac1bda5e8e4555eff"
+            "$oid": "64930e5cf453648aa0d1015f"
         },
         "user_id": {
-            "$uuid": "ea457419eec3429196c5a69ee726f9c8"
+            "$uuid": "6fd9cdaaaba145eca8b607ba1a80ac5f"
         },
         "metadata": {
             "key": "analysis/confirmed_place",
             "platform": "server",
-            "write_ts": 1687324890.4722009,
+            "write_ts": 1687359068.236246,
             "time_zone": "America/Los_Angeles",
             "write_local_dt": {
                 "year": 2023,
                 "month": 6,
-                "day": 20,
-                "hour": 22,
-                "minute": 21,
-                "second": 30,
-                "weekday": 1,
+                "day": 21,
+                "hour": 7,
+                "minute": 51,
+                "second": 8,
+                "weekday": 2,
                 "timezone": "America/Los_Angeles"
             },
-            "write_fmt_time": "2023-06-20T22:21:30.472201-07:00"
+            "write_fmt_time": "2023-06-21T07:51:08.236246-07:00"
         },
         "data": {
             "source": "DwellSegmentationTimeFilter",
             "location": {
                 "type": "Point",
                 "coordinates": [
-                    -84.7888212,
-                    39.2625805
+                    -122.0857861,
+                    37.3898049
                 ]
             },
             "raw_places": [
                 {
-                    "$oid": "649288d7c1bda5e8e4555c60"
+                    "$oid": "64930e59f453648aa0d10055"
                 },
                 {
-                    "$oid": "649288d7c1bda5e8e4555c60"
-                },
-                {
-                    "$oid": "649288d7c1bda5e8e4555c62"
+                    "$oid": "64930e59f453648aa0d10055"
                 }
             ],
             "starting_trip": {
-                "$oid": "649288dac1bda5e8e4555f00"
+                "$oid": "64930e5cf453648aa0d10160"
             },
-            "exit_ts": 1678632794.566166,
-            "exit_fmt_time": "2023-03-12T10:53:14.566166-04:00",
+            "exit_ts": 1466436483.395,
+            "exit_fmt_time": "2016-06-20T08:28:03.395000-07:00",
             "exit_local_dt": {
-                "year": 2023,
-                "month": 3,
-                "day": 12,
-                "hour": 10,
-                "minute": 53,
-                "second": 14,
-                "weekday": 6,
-                "timezone": "America/New_York"
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 8,
+                "minute": 28,
+                "second": 3,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
             },
             "cleaned_place": {
-                "$oid": "649288d9c1bda5e8e4555ee2"
+                "$oid": "64930e5bf453648aa0d1012a"
             },
             "user_input": {},
             "additions": []
@@ -67,296 +64,457 @@
     },
     {
         "_id": {
-            "$oid": "649288dac1bda5e8e4555f01"
+            "$oid": "64930e5cf453648aa0d10161"
         },
         "user_id": {
-            "$uuid": "ea457419eec3429196c5a69ee726f9c8"
+            "$uuid": "6fd9cdaaaba145eca8b607ba1a80ac5f"
         },
         "metadata": {
             "key": "analysis/confirmed_place",
             "platform": "server",
-            "write_ts": 1687324890.705579,
+            "write_ts": 1687359068.416828,
             "time_zone": "America/Los_Angeles",
             "write_local_dt": {
                 "year": 2023,
                 "month": 6,
-                "day": 20,
-                "hour": 22,
-                "minute": 21,
-                "second": 30,
-                "weekday": 1,
+                "day": 21,
+                "hour": 7,
+                "minute": 51,
+                "second": 8,
+                "weekday": 2,
                 "timezone": "America/Los_Angeles"
             },
-            "write_fmt_time": "2023-06-20T22:21:30.705579-07:00"
+            "write_fmt_time": "2023-06-21T07:51:08.416828-07:00"
         },
         "data": {
             "source": "DwellSegmentationTimeFilter",
-            "enter_ts": 1678641399.257,
+            "enter_ts": 1466437275.856,
             "enter_local_dt": {
+                "hour": 8,
+                "month": 6,
+                "second": 15,
+                "weekday": 0,
+                "year": 2016,
+                "timezone": "America/Los_Angeles",
+                "day": 20,
+                "minute": 41
+            },
+            "enter_fmt_time": "2016-06-20T08:41:15.856000-07:00",
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -122.0826931,
+                    37.3914184
+                ]
+            },
+            "raw_places": [
+                {
+                    "$oid": "64930e59f453648aa0d10057"
+                },
+                {
+                    "$oid": "64930e59f453648aa0d10057"
+                }
+            ],
+            "ending_trip": {
+                "$oid": "64930e5cf453648aa0d10160"
+            },
+            "starting_trip": {
+                "$oid": "64930e5cf453648aa0d10162"
+            },
+            "exit_ts": 1466437438.6453953,
+            "exit_fmt_time": "2016-06-20T08:43:58.645395-07:00",
+            "exit_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 8,
+                "minute": 43,
+                "second": 58,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "duration": 162.78939533233643,
+            "cleaned_place": {
+                "$oid": "64930e5bf453648aa0d1012b"
+            },
+            "user_input": {},
+            "additions": []
+        }
+    },
+    {
+        "_id": {
+            "$oid": "64930e5cf453648aa0d10163"
+        },
+        "user_id": {
+            "$uuid": "6fd9cdaaaba145eca8b607ba1a80ac5f"
+        },
+        "metadata": {
+            "key": "analysis/confirmed_place",
+            "platform": "server",
+            "write_ts": 1687359068.598122,
+            "time_zone": "America/Los_Angeles",
+            "write_local_dt": {
                 "year": 2023,
-                "month": 3,
-                "day": 12,
-                "hour": 13,
-                "minute": 16,
+                "month": 6,
+                "day": 21,
+                "hour": 7,
+                "minute": 51,
+                "second": 8,
+                "weekday": 2,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-06-21T07:51:08.598122-07:00"
+        },
+        "data": {
+            "source": "DwellSegmentationTimeFilter",
+            "enter_ts": 1466438022.959,
+            "enter_local_dt": {
+                "hour": 8,
+                "month": 6,
+                "second": 42,
+                "weekday": 0,
+                "year": 2016,
+                "timezone": "America/Los_Angeles",
+                "day": 20,
+                "minute": 53
+            },
+            "enter_fmt_time": "2016-06-20T08:53:42.959000-07:00",
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -122.0866181,
+                    37.3910231
+                ]
+            },
+            "raw_places": [
+                {
+                    "$oid": "64930e59f453648aa0d10059"
+                },
+                {
+                    "$oid": "64930e59f453648aa0d10059"
+                }
+            ],
+            "ending_trip": {
+                "$oid": "64930e5cf453648aa0d10162"
+            },
+            "starting_trip": {
+                "$oid": "64930e5cf453648aa0d10164"
+            },
+            "exit_ts": 1466461623.1195338,
+            "exit_fmt_time": "2016-06-20T15:27:03.119534-07:00",
+            "exit_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 15,
+                "minute": 27,
+                "second": 3,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "duration": 23600.16053366661,
+            "cleaned_place": {
+                "$oid": "64930e5bf453648aa0d1012c"
+            },
+            "user_input": {},
+            "additions": []
+        }
+    },
+    {
+        "_id": {
+            "$oid": "64930e5cf453648aa0d10165"
+        },
+        "user_id": {
+            "$uuid": "6fd9cdaaaba145eca8b607ba1a80ac5f"
+        },
+        "metadata": {
+            "key": "analysis/confirmed_place",
+            "platform": "server",
+            "write_ts": 1687359068.778975,
+            "time_zone": "America/Los_Angeles",
+            "write_local_dt": {
+                "year": 2023,
+                "month": 6,
+                "day": 21,
+                "hour": 7,
+                "minute": 51,
+                "second": 8,
+                "weekday": 2,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-06-21T07:51:08.778975-07:00"
+        },
+        "data": {
+            "source": "DwellSegmentationTimeFilter",
+            "enter_ts": 1466461966.379,
+            "enter_local_dt": {
+                "hour": 15,
+                "month": 6,
+                "second": 46,
+                "weekday": 0,
+                "year": 2016,
+                "timezone": "America/Los_Angeles",
+                "day": 20,
+                "minute": 32
+            },
+            "enter_fmt_time": "2016-06-20T15:32:46.379000-07:00",
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -122.0830016,
+                    37.3901637
+                ]
+            },
+            "raw_places": [
+                {
+                    "$oid": "64930e59f453648aa0d1005b"
+                },
+                {
+                    "$oid": "64930e59f453648aa0d1005b"
+                }
+            ],
+            "ending_trip": {
+                "$oid": "64930e5cf453648aa0d10164"
+            },
+            "starting_trip": {
+                "$oid": "64930e5cf453648aa0d10166"
+            },
+            "exit_ts": 1466462052.158904,
+            "exit_fmt_time": "2016-06-20T15:34:12.158904-07:00",
+            "exit_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 15,
+                "minute": 34,
+                "second": 12,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "duration": 85.77990412712097,
+            "cleaned_place": {
+                "$oid": "64930e5bf453648aa0d1012d"
+            },
+            "user_input": {},
+            "additions": []
+        }
+    },
+    {
+        "_id": {
+            "$oid": "64930e5cf453648aa0d10167"
+        },
+        "user_id": {
+            "$uuid": "6fd9cdaaaba145eca8b607ba1a80ac5f"
+        },
+        "metadata": {
+            "key": "analysis/confirmed_place",
+            "platform": "server",
+            "write_ts": 1687359068.9516559,
+            "time_zone": "America/Los_Angeles",
+            "write_local_dt": {
+                "year": 2023,
+                "month": 6,
+                "day": 21,
+                "hour": 7,
+                "minute": 51,
+                "second": 8,
+                "weekday": 2,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-06-21T07:51:08.951656-07:00"
+        },
+        "data": {
+            "source": "DwellSegmentationTimeFilter",
+            "enter_ts": 1466462452.708,
+            "enter_local_dt": {
+                "hour": 15,
+                "month": 6,
+                "second": 52,
+                "weekday": 0,
+                "year": 2016,
+                "timezone": "America/Los_Angeles",
+                "day": 20,
+                "minute": 40
+            },
+            "enter_fmt_time": "2016-06-20T15:40:52.708000-07:00",
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -122.086605,
+                    37.3910011
+                ]
+            },
+            "raw_places": [
+                {
+                    "$oid": "64930e59f453648aa0d1005d"
+                },
+                {
+                    "$oid": "64930e59f453648aa0d1005d"
+                }
+            ],
+            "ending_trip": {
+                "$oid": "64930e5cf453648aa0d10166"
+            },
+            "starting_trip": {
+                "$oid": "64930e5df453648aa0d10168"
+            },
+            "exit_ts": 1466462970.2807262,
+            "exit_fmt_time": "2016-06-20T15:49:30.280726-07:00",
+            "exit_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 15,
+                "minute": 49,
+                "second": 30,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "duration": 517.5727262496948,
+            "cleaned_place": {
+                "$oid": "64930e5bf453648aa0d1012e"
+            },
+            "user_input": {},
+            "additions": []
+        }
+    },
+    {
+        "_id": {
+            "$oid": "64930e5df453648aa0d10169"
+        },
+        "user_id": {
+            "$uuid": "6fd9cdaaaba145eca8b607ba1a80ac5f"
+        },
+        "metadata": {
+            "key": "analysis/confirmed_place",
+            "platform": "server",
+            "write_ts": 1687359069.130561,
+            "time_zone": "America/Los_Angeles",
+            "write_local_dt": {
+                "year": 2023,
+                "month": 6,
+                "day": 21,
+                "hour": 7,
+                "minute": 51,
+                "second": 9,
+                "weekday": 2,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-06-21T07:51:09.130561-07:00"
+        },
+        "data": {
+            "source": "DwellSegmentationTimeFilter",
+            "enter_ts": 1466463835.713,
+            "enter_local_dt": {
+                "hour": 16,
+                "month": 6,
+                "second": 55,
+                "weekday": 0,
+                "year": 2016,
+                "timezone": "America/Los_Angeles",
+                "day": 20,
+                "minute": 3
+            },
+            "enter_fmt_time": "2016-06-20T16:03:55.713000-07:00",
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -122.1081974,
+                    37.4168828
+                ]
+            },
+            "raw_places": [
+                {
+                    "$oid": "64930e59f453648aa0d1005f"
+                },
+                {
+                    "$oid": "64930e59f453648aa0d1005f"
+                },
+                {
+                    "$oid": "64930e59f453648aa0d10061"
+                }
+            ],
+            "ending_trip": {
+                "$oid": "64930e5df453648aa0d10168"
+            },
+            "starting_trip": {
+                "$oid": "64930e5df453648aa0d1016a"
+            },
+            "exit_ts": 1466466589.3710227,
+            "exit_fmt_time": "2016-06-20T16:49:49.371023-07:00",
+            "exit_local_dt": {
+                "year": 2016,
+                "month": 6,
+                "day": 20,
+                "hour": 16,
+                "minute": 49,
+                "second": 49,
+                "weekday": 0,
+                "timezone": "America/Los_Angeles"
+            },
+            "duration": 2753.6580226421356,
+            "cleaned_place": {
+                "$oid": "64930e5bf453648aa0d1012f"
+            },
+            "user_input": {},
+            "additions": []
+        }
+    },
+    {
+        "_id": {
+            "$oid": "64930e5df453648aa0d1016b"
+        },
+        "user_id": {
+            "$uuid": "6fd9cdaaaba145eca8b607ba1a80ac5f"
+        },
+        "metadata": {
+            "key": "analysis/confirmed_place",
+            "platform": "server",
+            "write_ts": 1687359069.310071,
+            "time_zone": "America/Los_Angeles",
+            "write_local_dt": {
+                "year": 2023,
+                "month": 6,
+                "day": 21,
+                "hour": 7,
+                "minute": 51,
+                "second": 9,
+                "weekday": 2,
+                "timezone": "America/Los_Angeles"
+            },
+            "write_fmt_time": "2023-06-21T07:51:09.310071-07:00"
+        },
+        "data": {
+            "source": "DwellSegmentationTimeFilter",
+            "enter_ts": 1466467959.767,
+            "enter_local_dt": {
+                "hour": 17,
+                "month": 6,
                 "second": 39,
-                "weekday": 6,
-                "timezone": "America/New_York"
-            },
-            "enter_fmt_time": "2023-03-12T13:16:39.257000-04:00",
-            "location": {
-                "type": "Point",
-                "coordinates": [
-                    -84.1162207,
-                    36.9776568
-                ]
-            },
-            "raw_places": [
-                {
-                    "$oid": "649288d7c1bda5e8e4555c64"
-                },
-                {
-                    "$oid": "649288d7c1bda5e8e4555c64"
-                }
-            ],
-            "ending_trip": {
-                "$oid": "649288dac1bda5e8e4555f00"
-            },
-            "starting_trip": {
-                "$oid": "649288dac1bda5e8e4555f02"
-            },
-            "exit_ts": 1678642210.9015162,
-            "exit_fmt_time": "2023-03-12T13:30:10.901516-04:00",
-            "exit_local_dt": {
-                "year": 2023,
-                "month": 3,
-                "day": 12,
-                "hour": 13,
-                "minute": 30,
-                "second": 10,
-                "weekday": 6,
-                "timezone": "America/New_York"
-            },
-            "duration": 811.6445162296295,
-            "cleaned_place": {
-                "$oid": "649288d9c1bda5e8e4555ee4"
-            },
-            "user_input": {},
-            "additions": []
-        }
-    },
-    {
-        "_id": {
-            "$oid": "649288dac1bda5e8e4555f03"
-        },
-        "user_id": {
-            "$uuid": "ea457419eec3429196c5a69ee726f9c8"
-        },
-        "metadata": {
-            "key": "analysis/confirmed_place",
-            "platform": "server",
-            "write_ts": 1687324890.929492,
-            "time_zone": "America/Los_Angeles",
-            "write_local_dt": {
-                "year": 2023,
-                "month": 6,
+                "weekday": 0,
+                "year": 2016,
+                "timezone": "America/Los_Angeles",
                 "day": 20,
-                "hour": 22,
-                "minute": 21,
-                "second": 30,
-                "weekday": 1,
-                "timezone": "America/Los_Angeles"
+                "minute": 12
             },
-            "write_fmt_time": "2023-06-20T22:21:30.929492-07:00"
-        },
-        "data": {
-            "source": "DwellSegmentationTimeFilter",
-            "enter_ts": 1678651106.264,
-            "enter_local_dt": {
-                "year": 2023,
-                "month": 3,
-                "day": 12,
-                "hour": 15,
-                "minute": 58,
-                "second": 26,
-                "weekday": 6,
-                "timezone": "America/New_York"
-            },
-            "enter_fmt_time": "2023-03-12T15:58:26.264000-04:00",
+            "enter_fmt_time": "2016-06-20T17:12:39.767000-07:00",
             "location": {
                 "type": "Point",
                 "coordinates": [
-                    -83.4604138,
-                    35.7326732
+                    -122.0864051,
+                    37.3907649
                 ]
             },
             "raw_places": [
                 {
-                    "$oid": "649288d7c1bda5e8e4555c66"
-                },
-                {
-                    "$oid": "649288d7c1bda5e8e4555c66"
+                    "$oid": "64930e59f453648aa0d10063"
                 }
             ],
             "ending_trip": {
-                "$oid": "649288dac1bda5e8e4555f02"
-            },
-            "starting_trip": {
-                "$oid": "649288dac1bda5e8e4555f04"
-            },
-            "exit_ts": 1678651111.264,
-            "exit_fmt_time": "2023-03-12T15:58:26.264000-04:00",
-            "exit_local_dt": {
-                "year": 2023,
-                "month": 3,
-                "day": 12,
-                "hour": 15,
-                "minute": 58,
-                "second": 26,
-                "weekday": 6,
-                "timezone": "America/New_York"
-            },
-            "duration": 5.0,
-            "cleaned_place": {
-                "$oid": "649288d9c1bda5e8e4555ee5"
-            },
-            "user_input": {},
-            "additions": []
-        }
-    },
-    {
-        "_id": {
-            "$oid": "649288dac1bda5e8e4555f05"
-        },
-        "user_id": {
-            "$uuid": "ea457419eec3429196c5a69ee726f9c8"
-        },
-        "metadata": {
-            "key": "analysis/confirmed_place",
-            "platform": "server",
-            "write_ts": 1687324890.996077,
-            "time_zone": "America/Los_Angeles",
-            "write_local_dt": {
-                "year": 2023,
-                "month": 6,
-                "day": 20,
-                "hour": 22,
-                "minute": 21,
-                "second": 30,
-                "weekday": 1,
-                "timezone": "America/Los_Angeles"
-            },
-            "write_fmt_time": "2023-06-20T22:21:30.996077-07:00"
-        },
-        "data": {
-            "source": "DwellSegmentationTimeFilter",
-            "enter_ts": 1678658742.268,
-            "enter_local_dt": {
-                "year": 2023,
-                "month": 3,
-                "day": 12,
-                "hour": 18,
-                "minute": 5,
-                "second": 42,
-                "weekday": 6,
-                "timezone": "America/New_York"
-            },
-            "enter_fmt_time": "2023-03-12T18:05:42.268000-04:00",
-            "location": {
-                "type": "Point",
-                "coordinates": [
-                    -83.5054012,
-                    35.7158873
-                ]
-            },
-            "raw_places": [
-                {
-                    "$oid": "649288d7c1bda5e8e4555c6a"
-                },
-                {
-                    "$oid": "649288d7c1bda5e8e4555c6a"
-                }
-            ],
-            "ending_trip": {
-                "$oid": "649288dac1bda5e8e4555f04"
-            },
-            "starting_trip": {
-                "$oid": "649288dbc1bda5e8e4555f06"
-            },
-            "exit_ts": 1678658742.268,
-            "exit_fmt_time": "2023-03-12T18:05:42.268000-04:00",
-            "exit_local_dt": {
-                "year": 2023,
-                "month": 3,
-                "day": 12,
-                "hour": 18,
-                "minute": 5,
-                "second": 42,
-                "weekday": 6,
-                "timezone": "America/New_York"
-            },
-            "duration": 0.0,
-            "cleaned_place": {
-                "$oid": "649288d9c1bda5e8e4555ee6"
-            },
-            "user_input": {},
-            "additions": []
-        }
-    },
-    {
-        "_id": {
-            "$oid": "649288dbc1bda5e8e4555f07"
-        },
-        "user_id": {
-            "$uuid": "ea457419eec3429196c5a69ee726f9c8"
-        },
-        "metadata": {
-            "key": "analysis/confirmed_place",
-            "platform": "server",
-            "write_ts": 1687324891.222014,
-            "time_zone": "America/Los_Angeles",
-            "write_local_dt": {
-                "year": 2023,
-                "month": 6,
-                "day": 20,
-                "hour": 22,
-                "minute": 21,
-                "second": 31,
-                "weekday": 1,
-                "timezone": "America/Los_Angeles"
-            },
-            "write_fmt_time": "2023-06-20T22:21:31.222014-07:00"
-        },
-        "data": {
-            "source": "DwellSegmentationTimeFilter",
-            "enter_ts": 1678659530.271,
-            "enter_local_dt": {
-                "year": 2023,
-                "month": 3,
-                "day": 12,
-                "hour": 18,
-                "minute": 18,
-                "second": 50,
-                "weekday": 6,
-                "timezone": "America/New_York"
-            },
-            "enter_fmt_time": "2023-03-12T18:18:50.271000-04:00",
-            "location": {
-                "type": "Point",
-                "coordinates": [
-                    -83.4604075,
-                    35.7325579
-                ]
-            },
-            "raw_places": [
-                {
-                    "$oid": "649288d7c1bda5e8e4555c68"
-                }
-            ],
-            "ending_trip": {
-                "$oid": "649288dbc1bda5e8e4555f06"
+                "$oid": "64930e5df453648aa0d1016a"
             },
             "cleaned_place": {
-                "$oid": "649288d9c1bda5e8e4555ee7"
+                "$oid": "64930e5bf453648aa0d10131"
             },
             "user_input": {},
             "additions": []
