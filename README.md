@@ -89,6 +89,14 @@ Note that loading the data retains the object IDs. This means that if you load t
 $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py -n /tmp/data-collection-eval/results_dec_2015/ucb.sdb.android.1/timeseries/active_day_2.2015-11-27 shankari@eecs.berkeley.edu
 ```
 
+Note that this will typically only generate cleaned sections which only distinguish between 4 modes - `walk`, `bike`, `motorized` and `air_or_hsr`. This should be sufficient in general, since the most of the server code falls back to cleaned sections if inferred sections are not present.
+
+However, if you do want to work with inferred sections, perhaps to test the UI with a more complex set of outputs, you will need to copy a saved random forest model. If you do not care about model accuracy, you can use the included model from test data. **DO NOT USE THIS MODEL IN PRODUCTION**
+
+```
+$ cp emission/tests/data/seed_model_from_test_data.json seed_model.json
+```
+
 #### Other data sources ####
 1. Get your own data. You can export your timeline for a particular day via email (Profile -> Download json dump) and then load and view it as above.
 
