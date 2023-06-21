@@ -78,6 +78,8 @@ class TestPipelineRealData(unittest.TestCase):
                 self.clearRelatedDb()
             if hasattr(self, "analysis_conf_path"):
                 os.remove(self.analysis_conf_path)
+            if hasattr(self, "seed_mode_path"):
+                os.remove(self.seed_mode_path)
             logging.info("tearDown complete")
 
     def clearRelatedDb(self):
@@ -713,7 +715,18 @@ class TestPipelineRealData(unittest.TestCase):
             if 'exit_ts' in et['data']['end_confirmed_place']:
                 self.assertEqual(ct['data']['end_confirmed_place']['exit_ts'],
                                     et['data']['end_confirmed_place']['exit_ts'])
+        # check locations
         self.assertEqual(len(ct['data']['locations']), len(et['data']['locations']))
+        self.assertEqual([l['data']['ts'] for l in  ct['data']['locations']],
+            [l['data']['ts'] for l in et['data']['locations']])
+
+        # check sections; if this gets more complex, we might want to move it to a separate
+        # compare_sections method
+        self.assertEqual(len(ct['data']['sections']), len(et['data']['sections']))
+        self.assertEqual([s['data']['start_ts'] for s in ct['data']['sections']],
+            [s['data']['start_ts'] for s in et['data']['sections']])
+        self.assertEqual([s['data']['sensed_mode'] for s in  ct['data']['sections']],
+            [l['data']['sensed_mode'] for l in et['data']['sections']])
 
     def testJackUntrackedTimeMar12(self):
         dataFile = "emission/tests/data/real_examples/jack_untracked_time_2023-03-12"
@@ -726,6 +739,24 @@ class TestPipelineRealData(unittest.TestCase):
             self.assertEqual(len(composite_trips), len(expected_trips))
             for i in range(len(composite_trips)):
                 self.compare_composite_objects(composite_trips[i], expected_trips[i])
+
+    def testJackUntrackedTimeMar12InferredSections(self):
+        # Setup to use the inferred sections
+        self.analysis_conf_path = \
+            etc.set_analysis_config("analysis.result.section.key", "analysis/inferred_section")
+        # along with the proper random seed
+        self.seed_mode_path = etc.copy_dummy_seed_for_inference()
+        dataFile = "emission/tests/data/real_examples/jack_untracked_time_2023-03-12"
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        with open(dataFile+".inferred_section.expected_composite_trips") as expectation:
+            expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
+            self.assertEqual(len(composite_trips), len(expected_trips))
+            for i in range(len(composite_trips)):
+                self.compare_composite_objects(composite_trips[i], expected_trips[i])
+
 
     def testShankariNotUntrackedTimeMar21(self):
         # https://github.com/e-mission/e-mission-docs/issues/870
@@ -847,7 +878,7 @@ class TestPipelineRealData(unittest.TestCase):
 
         ts = esta.TimeSeries.get_time_series(self.testUUID)
         composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
-        with open(dataFile_1+".before-user-inputs.expected_composite_trips") as expectation:
+        with open(dataFile_1+".before-user-inputs.alt.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
             for i in range(len(composite_trips)):
@@ -862,7 +893,7 @@ class TestPipelineRealData(unittest.TestCase):
 
         # They should all match the final place
         composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
-        with open(dataFile_1+".all-match-last-place.expected_composite_trips") as expectation:
+        with open(dataFile_1+".all-match-last-place.alt.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
             for i in range(len(composite_trips)):

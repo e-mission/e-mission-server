@@ -89,6 +89,10 @@ Note that loading the data retains the object IDs. This means that if you load t
 $ ./e-mission-py.bash bin/debug/load_timeline_for_day_and_user.py -n /tmp/data-collection-eval/results_dec_2015/ucb.sdb.android.1/timeseries/active_day_2.2015-11-27 shankari@eecs.berkeley.edu
 ```
 
+Note that this will create both cleaned sections (distinguishing between 4 modes - `walk`, `bike`, `motorized` and `air_or_hsr`) and inferred sections (multiple transit modes using a GIS integration). However, the inferred section creation requires a call to an external service, so it might fail if there are problems with the network connection.
+
+This is not terrible, since most of the server code falls back to cleaned sections if inferred sections are not present. However, if you do want to work with inferred sections, perhaps to test the UI with a more complex set of outputs, you will need to ensure that you can connect to the overpass server - and there are no connection errors (network/SSL etc).
+
 #### Other data sources ####
 1. Get your own data. You can export your timeline for a particular day via email (Profile -> Download json dump) and then load and view it as above.
 
