@@ -878,7 +878,7 @@ class TestPipelineRealData(unittest.TestCase):
 
         ts = esta.TimeSeries.get_time_series(self.testUUID)
         composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
-        with open(dataFile_1+".before-user-inputs.expected_composite_trips") as expectation:
+        with open(dataFile_1+".before-user-inputs.alt.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
             for i in range(len(composite_trips)):
@@ -893,7 +893,7 @@ class TestPipelineRealData(unittest.TestCase):
 
         # They should all match the final place
         composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
-        with open(dataFile_1+".all-match-last-place.expected_composite_trips") as expectation:
+        with open(dataFile_1+".all-match-last-place.alt.expected_composite_trips") as expectation:
             expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
             self.assertEqual(len(composite_trips), len(expected_trips))
             for i in range(len(composite_trips)):
