@@ -1,4 +1,5 @@
 import unittest
+import emission.tests.common as etc
 import logging
 import json
 import numpy as np
@@ -7,6 +8,7 @@ import time
 import pandas as pd
 import emission.storage.json_wrappers as esj
 from bson.binary import UuidRepresentation
+import argparse
 
 import emission.analysis.modelling.trip_model.model_storage as eamums
 import emission.analysis.modelling.trip_model.model_type as eamumt
@@ -18,8 +20,9 @@ import emission.tests.modellingTests.modellingTestAssets as etmm
 import emission.core.wrapper.entry as ecwe
 import emission.core.get_database as edb
 
+import emission.tests.common as etc
 
-class TestRunGreedyModel(unittest.TestCase):
+class TestRunGreedyIncrementalModel(unittest.TestCase):
     
     def setUp(self):
         """
@@ -197,3 +200,11 @@ class TestRunGreedyModel(unittest.TestCase):
             'the second bin should have exactly one entry (an outlier)')
         self.assertEqual(len(updated_model.bins['2']['feature_rows']), 1,
             'the third bin should have exactly one entry (an outlier)')
+
+if __name__ == '__main__':
+    etc.configLogging()
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--algo_change",
+        help="modifications to the algorithm", action="store_true")
+    unittest.main()
