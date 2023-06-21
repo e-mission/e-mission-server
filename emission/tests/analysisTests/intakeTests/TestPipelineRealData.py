@@ -78,6 +78,8 @@ class TestPipelineRealData(unittest.TestCase):
                 self.clearRelatedDb()
             if hasattr(self, "analysis_conf_path"):
                 os.remove(self.analysis_conf_path)
+            if hasattr(self, "seed_mode_path"):
+                os.remove(self.seed_mode_path)
             logging.info("tearDown complete")
 
     def clearRelatedDb(self):
@@ -737,6 +739,24 @@ class TestPipelineRealData(unittest.TestCase):
             self.assertEqual(len(composite_trips), len(expected_trips))
             for i in range(len(composite_trips)):
                 self.compare_composite_objects(composite_trips[i], expected_trips[i])
+
+    def testJackUntrackedTimeMar12InferredSections(self):
+        # Setup to use the inferred sections
+        self.analysis_conf_path = \
+            etc.set_analysis_config("analysis.result.section.key", "analysis/inferred_section")
+        # along with the proper random seed
+        self.seed_mode_path = etc.copy_dummy_seed_for_inference()
+        dataFile = "emission/tests/data/real_examples/jack_untracked_time_2023-03-12"
+        etc.setupRealExample(self, dataFile)
+        etc.runIntakePipeline(self.testUUID)
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        composite_trips = list(ts.find_entries(["analysis/composite_trip"], None))
+        with open(dataFile+".inferred_section.expected_composite_trips") as expectation:
+            expected_trips = json.load(expectation, object_hook = esj.wrapped_object_hook)
+            self.assertEqual(len(composite_trips), len(expected_trips))
+            for i in range(len(composite_trips)):
+                self.compare_composite_objects(composite_trips[i], expected_trips[i])
+
 
     def testShankariNotUntrackedTimeMar21(self):
         # https://github.com/e-mission/e-mission-docs/issues/870
