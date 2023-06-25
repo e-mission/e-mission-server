@@ -14,8 +14,7 @@ RUN apt-get install -y -qq wget
 # RUN apt-get -y install nano vim
 
 # install jq to parse json within bash scripts
-RUN curl -o /usr/local/bin/jq http://stedolan.github.io/jq/download/linux64/jq && \
-  chmod +x /usr/local/bin/jq
+RUN apt-get install jq
 
 # cleanup
 RUN apt-get -y remove --purge build-essential
