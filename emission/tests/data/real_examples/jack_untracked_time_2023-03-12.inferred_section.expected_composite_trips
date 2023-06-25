@@ -5811,9 +5811,9 @@
                         "sensed_mode": 3,
                         "cleaned_section": {
                             "$oid": "649288d8c1bda5e8e4555c76"
-                        }
-                    },
-                    "sensed_mode_str": "BUS"
+                        },
+                        "sensed_mode_str": "BUS"
+                    }
                 }
             ]
         }
@@ -11868,9 +11868,9 @@
                         "sensed_mode": 3,
                         "cleaned_section": {
                             "$oid": "649288d9c1bda5e8e4555d98"
-                        }
-                    },
-                    "sensed_mode_str": "BUS"
+                        },
+                        "sensed_mode_str": "BUS"
+                    }
                 }
             ]
         }
@@ -14042,9 +14042,9 @@
                         "sensed_mode": 3,
                         "cleaned_section": {
                             "$oid": "649288d9c1bda5e8e4555ec5"
-                        }
-                    },
-                    "sensed_mode_str": "BUS"
+                        },
+                        "sensed_mode_str": "BUS"
+                    }
                 }
             ]
         }
