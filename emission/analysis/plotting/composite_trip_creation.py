@@ -183,7 +183,7 @@ def get_sections_for_confirmed_trip(ct):
     # on the phone, we don't need lists of 'speeds' and 'distances'
     # for every section, and they can get big - so let's save some bandwidth
     for section in sections:
-        section["sensed_mode_str"] = sel_section_mapper(section["data"]["sensed_mode"])
+        section["data"]["sensed_mode_str"] = sel_section_mapper(section["data"]["sensed_mode"])
         del section["data"]["speeds"]
         del section["data"]["distances"]
     return sections
