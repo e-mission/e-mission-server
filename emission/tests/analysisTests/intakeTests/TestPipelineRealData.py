@@ -727,6 +727,8 @@ class TestPipelineRealData(unittest.TestCase):
             [s['data']['start_ts'] for s in et['data']['sections']])
         self.assertEqual([s['data']['sensed_mode'] for s in  ct['data']['sections']],
             [l['data']['sensed_mode'] for l in et['data']['sections']])
+        self.assertEqual([s['data']['sensed_mode_str'] for s in  ct['data']['sections']],
+            [l['data']['sensed_mode_str'] for l in et['data']['sections']])
 
     def testJackUntrackedTimeMar12(self):
         dataFile = "emission/tests/data/real_examples/jack_untracked_time_2023-03-12"

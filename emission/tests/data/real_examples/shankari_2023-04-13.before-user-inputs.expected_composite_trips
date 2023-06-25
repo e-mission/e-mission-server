@@ -1810,11 +1810,11 @@
                         "duration": 676.5729999542236,
                         "distance": 4163.979971299704,
                         "sensed_mode": 0,
+                        "sensed_mode_str": "IN_VEHICLE",
                         "end_stop": {
                             "$oid": "6491cccde4d284fa6c397f7d"
                         }
-                    },
-                    "sensed_mode_str": "IN_VEHICLE"
+                    }
                 },
                 {
                     "_id": {
@@ -1886,11 +1886,11 @@
                         "duration": 28.996999979019165,
                         "distance": 41.170096253577036,
                         "sensed_mode": 2,
+                        "sensed_mode_str": "ON_FOOT",
                         "start_stop": {
                             "$oid": "6491cccde4d284fa6c397f7d"
                         }
-                    },
-                    "sensed_mode_str": "ON_FOOT"
+                    }
                 }
             ]
         }
@@ -3832,9 +3832,9 @@
                         },
                         "duration": 795.4838781356812,
                         "distance": 405.42749579207134,
-                        "sensed_mode": 2
-                    },
-                    "sensed_mode_str": "ON_FOOT"
+                        "sensed_mode": 2,
+                        "sensed_mode_str": "ON_FOOT"
+                    }
                 }
             ]
         }
@@ -5092,9 +5092,9 @@
                         },
                         "duration": 421.3231294155121,
                         "distance": 237.26692970607118,
-                        "sensed_mode": 2
-                    },
-                    "sensed_mode_str": "ON_FOOT"
+                        "sensed_mode": 2,
+                        "sensed_mode_str": "ON_FOOT"
+                    }
                 }
             ]
         }
@@ -6181,9 +6181,9 @@
                         },
                         "duration": 331.9889998435974,
                         "distance": 251.2941296800962,
-                        "sensed_mode": 4
-                    },
-                    "sensed_mode_str": "UNKNOWN"
+                        "sensed_mode": 4,
+                        "sensed_mode_str": "UNKNOWN"
+                    }
                 }
             ]
         }
@@ -7935,9 +7935,9 @@
                         },
                         "duration": 714.5734598636627,
                         "distance": 4906.45313823509,
-                        "sensed_mode": 0
-                    },
-                    "sensed_mode_str": "IN_VEHICLE"
+                        "sensed_mode": 0,
+                        "sensed_mode_str": "IN_VEHICLE"
+                    }
                 }
             ]
         }

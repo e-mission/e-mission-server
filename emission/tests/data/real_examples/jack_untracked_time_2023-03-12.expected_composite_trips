@@ -5802,9 +5802,9 @@
                         },
                         "duration": 8604.69083404541,
                         "distance": 291529.0171651621,
-                        "sensed_mode": 4
-                    },
-                    "sensed_mode_str": "UNKNOWN"
+                        "sensed_mode": 4,
+                        "sensed_mode_str": "UNKNOWN"
+                    }
                 }
             ]
         }
@@ -11850,9 +11850,9 @@
                         },
                         "duration": 8895.362483739853,
                         "distance": 192292.6194098783,
-                        "sensed_mode": 4
-                    },
-                    "sensed_mode_str": "UNKNOWN"
+                        "sensed_mode": 4,
+                        "sensed_mode_str": "UNKNOWN"
+                    }
                 }
             ]
         }
@@ -14015,9 +14015,9 @@
                         },
                         "duration": 788.0030000209808,
                         "distance": 5365.3076466935945,
-                        "sensed_mode": 4
-                    },
-                    "sensed_mode_str": "UNKNOWN"
+                        "sensed_mode": 4,
+                        "sensed_mode_str": "UNKNOWN"
+                    }
                 }
             ]
         }

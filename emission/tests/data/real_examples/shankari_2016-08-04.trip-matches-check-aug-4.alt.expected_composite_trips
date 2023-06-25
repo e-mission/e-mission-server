@@ -3972,9 +3972,9 @@
                         },
                         "duration": 1880.7650001049042,
                         "distance": 24806.987825634333,
-                        "sensed_mode": 0
-                    },
-                    "sensed_mode_str": "IN_VEHICLE"
+                        "sensed_mode": 0,
+                        "sensed_mode_str": "IN_VEHICLE"
+                    }
                 }
             ]
         }
@@ -9541,9 +9541,9 @@
                         },
                         "duration": 8056.584614753723,
                         "distance": 157827.54864780518,
-                        "sensed_mode": 0
-                    },
-                    "sensed_mode_str": "IN_VEHICLE"
+                        "sensed_mode": 0,
+                        "sensed_mode_str": "IN_VEHICLE"
+                    }
                 }
             ]
         }
@@ -11240,9 +11240,9 @@
                         },
                         "duration": 605.260315656662,
                         "distance": 299.07376498948594,
-                        "sensed_mode": 4
-                    },
-                    "sensed_mode_str": "UNKNOWN"
+                        "sensed_mode": 4,
+                        "sensed_mode_str": "UNKNOWN"
+                    }
                 }
             ]
         }
@@ -12024,9 +12024,9 @@
                         },
                         "duration": 135.75,
                         "distance": 202.4315483599345,
-                        "sensed_mode": 2
-                    },
-                    "sensed_mode_str": "ON_FOOT"
+                        "sensed_mode": 2,
+                        "sensed_mode_str": "ON_FOOT"
+                    }
                 }
             ]
         }
@@ -14118,9 +14118,9 @@
                         },
                         "duration": 745.4381992816925,
                         "distance": 1401.0643734125963,
-                        "sensed_mode": 2
-                    },
-                    "sensed_mode_str": "ON_FOOT"
+                        "sensed_mode": 2,
+                        "sensed_mode_str": "ON_FOOT"
+                    }
                 }
             ]
         }
@@ -15272,9 +15272,9 @@
                         },
                         "duration": 280.5680000782013,
                         "distance": 149.38151426404383,
-                        "sensed_mode": 4
-                    },
-                    "sensed_mode_str": "UNKNOWN"
+                        "sensed_mode": 4,
+                        "sensed_mode_str": "UNKNOWN"
+                    }
                 }
             ]
         }
@@ -17586,9 +17586,9 @@
                         },
                         "duration": 936.7305357456207,
                         "distance": 1316.3118354165358,
-                        "sensed_mode": 2
-                    },
-                    "sensed_mode_str": "ON_FOOT"
+                        "sensed_mode": 2,
+                        "sensed_mode_str": "ON_FOOT"
+                    }
                 }
             ]
         }
@@ -21756,9 +21756,9 @@
                         },
                         "duration": 5956.420205116272,
                         "distance": 48630.60382206579,
-                        "sensed_mode": 0
-                    },
-                    "sensed_mode_str": "IN_VEHICLE"
+                        "sensed_mode": 0,
+                        "sensed_mode_str": "IN_VEHICLE"
+                    }
                 }
             ]
         }
@@ -22707,9 +22707,9 @@
                         },
                         "duration": 232.60321807861328,
                         "distance": 346.3349064026148,
-                        "sensed_mode": 4
-                    },
-                    "sensed_mode_str": "UNKNOWN"
+                        "sensed_mode": 4,
+                        "sensed_mode_str": "UNKNOWN"
+                    }
                 }
             ]
         }
@@ -28682,9 +28682,9 @@
                         "sensed_mode": 11,
                         "end_stop": {
                             "$oid": "64928665840476818c3462fc"
-                        }
-                    },
-                    "sensed_mode_str": "AIR_OR_HSR"
+                        },
+                        "sensed_mode_str": "AIR_OR_HSR"
+                    }
                 },
                 {
                     "_id": {
@@ -28761,9 +28761,9 @@
                         },
                         "end_stop": {
                             "$oid": "64928665840476818c3462fd"
-                        }
-                    },
-                    "sensed_mode_str": "ON_FOOT"
+                        },
+                        "sensed_mode_str": "ON_FOOT"
+                    }
                 },
                 {
                     "_id": {
@@ -28840,9 +28840,9 @@
                         },
                         "end_stop": {
                             "$oid": "64928665840476818c3462fe"
-                        }
-                    },
-                    "sensed_mode_str": "IN_VEHICLE"
+                        },
+                        "sensed_mode_str": "IN_VEHICLE"
+                    }
                 },
                 {
                     "_id": {
@@ -28919,9 +28919,9 @@
                         },
                         "end_stop": {
                             "$oid": "64928665840476818c3462ff"
-                        }
-                    },
-                    "sensed_mode_str": "ON_FOOT"
+                        },
+                        "sensed_mode_str": "ON_FOOT"
+                    }
                 },
                 {
                     "_id": {
@@ -28998,9 +28998,9 @@
                         },
                         "end_stop": {
                             "$oid": "64928665840476818c346300"
-                        }
-                    },
-                    "sensed_mode_str": "IN_VEHICLE"
+                        },
+                        "sensed_mode_str": "IN_VEHICLE"
+                    }
                 },
                 {
                     "_id": {
@@ -29074,9 +29074,9 @@
                         "sensed_mode": 2,
                         "start_stop": {
                             "$oid": "64928665840476818c346300"
-                        }
-                    },
-                    "sensed_mode_str": "ON_FOOT"
+                        },
+                        "sensed_mode_str": "ON_FOOT"
+                    }
                 }
             ]
         }
@@ -30148,9 +30148,9 @@
                         },
                         "duration": 257.169686794281,
                         "distance": 470.39370803512986,
-                        "sensed_mode": 2
-                    },
-                    "sensed_mode_str": "ON_FOOT"
+                        "sensed_mode": 2,
+                        "sensed_mode_str": "ON_FOOT"
+                    }
                 }
             ]
         }
