@@ -6,7 +6,7 @@ name: docker image
 # events but only for the master branch
 on:
   push:
-    branches: [ master, gis-based-mode-detection ]
+    branches: [natalie_testbranch ]
 
 
 # Env variable
@@ -43,6 +43,6 @@ jobs:
         docker build -t $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}_${{ steps.date.outputs.date }} .
         docker images
 
-    - name: push docker image
-      run: |
-        docker push $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}_${{ steps.date.outputs.date }}
+    # - name: push docker image
+    #   run: |
+    #     docker push $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}_${{ steps.date.outputs.date }}
