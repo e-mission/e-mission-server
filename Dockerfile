@@ -23,9 +23,9 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 COPY . .
 
-RUN chmod u+x ./.docker/setup_config.sh
+RUN chmod u+x ./.docker/setup_config.sh && echo "finished setup_config.sh"
 
-echo "force quit"
+
 # # # This clone puts the server code into the image, not the container
 # RUN bash -c "./.docker/setup_config.sh"
 
