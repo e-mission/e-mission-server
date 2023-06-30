@@ -1,7 +1,12 @@
 echo "About to start conda update, this may take some time..."
 source setup/setup_conda.sh Linux-x86_64
+
+echo "setup_conda.sh successful"
+
 # now install the emission environment
 source setup/setup.sh
+
+echo "finished installing e-mission environment"
 
 ## Only in the docker environment, force upgrade the base image
 ## I tried to do this by just installing from the emission environment
@@ -10,22 +15,19 @@ source setup/setup.sh
 ## So we just manually upgrade the failing dependencies in the base image
 conda install -c conda-forge cryptography=40.0.2 wheel=0.40.0
 
-echo "test 1"
+echo "finished installing conda"
 
 ## Remove the old, unused packages to avoid tripping up the checker
 rm -rf /root/miniconda-23.1.0/pkgs/cryptography-38.0.4-py39h9ce1e76_0
 rm -rf /root/miniconda-23.1.0/pkgs/wheel-0.37.1-pyhd3eb1b0_0
 
-echo "test 2"
 
 # Clean up the conda install
 conda clean -t
 
-echo "test 3" 
 
 find /root/miniconda-*/pkgs -wholename \*info/test\* -type d | xargs rm -rf
 
-echo "test 4" 
 
 if [ -d "webapp/www/" ]; then
     cp /index.html webapp/www/index.html

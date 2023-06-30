@@ -25,17 +25,18 @@ COPY . .
 
 RUN chmod u+x ./.docker/setup_config.sh
 
-# # This clone puts the server code into the image, not the container
-RUN bash -c "./.docker/setup_config.sh"
+echo "force quit"
+# # # This clone puts the server code into the image, not the container
+# RUN bash -c "./.docker/setup_config.sh"
 
-# #declare environment variables
-ENV DB_HOST=''
-ENV WEB_SERVER_HOST=''
+# # #declare environment variables
+# ENV DB_HOST=''
+# ENV WEB_SERVER_HOST=''
 
-ENV LIVERELOAD_SRC=''
-ENV STUDY_CONFIG=''
-RUN chmod u+x ./.docker/docker_start_script.sh
+# ENV LIVERELOAD_SRC=''
+# ENV STUDY_CONFIG=''
+# RUN chmod u+x ./.docker/docker_start_script.sh
 
-EXPOSE 8080
+# EXPOSE 8080
 
-CMD ["/bin/bash", "./.docker/docker_start_script.sh"]
+# CMD ["/bin/bash", "./.docker/docker_start_script.sh"]
