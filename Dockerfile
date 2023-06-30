@@ -23,11 +23,11 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 COPY . .
 
-RUN chmod u+x ./.docker/setup_config.sh && echo "finished setup_config.sh"
+RUN chmod u+x ./.docker/setup_config.sh 
 
 
-# # # This clone puts the server code into the image, not the container
-# RUN bash -c "./.docker/setup_config.sh"
+# # This clone puts the server code into the image, not the container
+RUN bash -c "./.docker/setup_config.sh" && echo "finished setup_config.sh"
 
 # # #declare environment variables
 # ENV DB_HOST=''
