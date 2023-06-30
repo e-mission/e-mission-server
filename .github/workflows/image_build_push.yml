@@ -6,7 +6,7 @@ name: docker image
 # events but only for the master branch
 on:
   push:
-    branches: [natalie_testbranch, gis-based-mode-detection]
+    branches: [master, gis-based-mode-detection]
 
 
 # Env variable
