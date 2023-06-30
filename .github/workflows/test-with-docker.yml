@@ -6,9 +6,9 @@ name: test-with-docker
 # events but only for the master branch
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    branches: [ natalie_testbranch ]
+  # pull_request:
+  #   branches: [ master ]
   schedule:
     # * is a special character in YAML so you have to quote this string
     - cron:  '5 4 * * 0'
@@ -31,3 +31,7 @@ jobs:
 
     - name: Run the tests using docker-compose
       run: docker-compose -f setup/docker-compose.tests.yml up --exit-code-from web-server
+
+    - name: build docker image
+      run: |
+        docker build .
