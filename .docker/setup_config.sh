@@ -14,7 +14,9 @@ echo "finished installing e-mission environment"
 ## level instead of upgrading to cryptography=40)
 ## So we just manually upgrade the failing dependencies in the base image
 
-set -e 
+set -eE
+
+trap 'echo Something went wrong!' ERR 
 conda install -c conda-forge cryptography=40.0.2 wheel=0.40.0 
 
 
