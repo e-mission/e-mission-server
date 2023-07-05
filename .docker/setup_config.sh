@@ -17,7 +17,8 @@ echo "finished installing e-mission environment"
 # set -eE
 
 # trap 'echo Something went wrong!' ERR 
-conda install -vv -c conda-forge cryptography=40.0.2 wheel=0.40.0
+
+conda install -c conda-forge cryptography=40.0.2 wheel=0.40.0
 
 
 echo "finished installing conda"
