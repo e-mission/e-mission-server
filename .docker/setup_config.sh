@@ -14,11 +14,12 @@ echo "finished installing e-mission environment"
 ## But that doesn't update all packages (e.g. cryptography=38 stays at that
 ## level instead of upgrading to cryptography=40)
 ## So we just manually upgrade the failing dependencies in the base image
+# conda config --add channels conda-forge
 
-if [[ $(conda install -c conda-forge cryptography=40.0.2 wheel=0.40.0) == *Killed* ]]; then
-    echo "!!!!! Error !!!!!"
-    exit code 1
-fi
+# if [[ $(conda install -c conda-forge cryptography=40.0.2 wheel=0.40.0) == *Killed* ]]; then
+#     echo "!!!!! Error !!!!!"
+#     exit code 1
+# fi
 # conda install -vv -c conda-forge cryptography=40.0.2 wheel=0.40.0
 
 
