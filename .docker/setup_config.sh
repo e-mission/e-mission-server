@@ -17,10 +17,9 @@ echo "finished installing e-mission environment"
 
 if [[ $(conda install -vv -c conda-forge cryptography=40.0.2 wheel=0.40.0) == *Killed* ]]; then
   echo "!!!!! Error !!!!!"
-
+fi
 # conda install -vv -c conda-forge cryptography=40.0.2 wheel=0.40.0
 
-exit 1 
 
 echo "finished installing conda"
 
