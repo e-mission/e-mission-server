@@ -1,3 +1,4 @@
+set -e
 echo "About to start conda update, this may take some time..."
 source setup/setup_conda.sh Linux-x86_64
 
@@ -14,12 +15,12 @@ echo "finished installing e-mission environment"
 ## level instead of upgrading to cryptography=40)
 ## So we just manually upgrade the failing dependencies in the base image
 
-# set -eE
+if [[ $(conda install -vv -c conda-forge cryptography=40.0.2 wheel=0.40.0) == *Killed* ]]; then
+  echo "!!!!! Error !!!!!"
 
-# trap 'echo Something went wrong!' ERR 
+# conda install -vv -c conda-forge cryptography=40.0.2 wheel=0.40.0
 
-conda install -c conda-forge cryptography=40.0.2 wheel=0.40.0
-
+exit 1 
 
 echo "finished installing conda"
 

@@ -27,7 +27,7 @@ RUN chmod u+x ./.docker/setup_config.sh
 
 
 # # This clone puts the server code into the image, not the container
-RUN bash -x -c "./.docker/setup_config.sh" && echo "finished setup_config.sh"
+RUN bash -c "./.docker/setup_config.sh" && echo "finished setup_config.sh"
 
 # # #declare environment variables
 # ENV DB_HOST=''
