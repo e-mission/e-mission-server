@@ -25,12 +25,11 @@ COPY . .
 
 RUN chmod u+x ./.docker/setup_config.sh 
 
-
 # # This clone puts the server code into the image, not the container
 
 RUN bash -c "./.docker/setup_config.sh" && echo "finished setup_config.sh" 
 
-RUN if [ -z "$_CE_CONDA" ]; then echo 'Environment variable _CE_CONDA must be specified. Exiting.'; exit 1; fi
+# RUN if [ -z "$_CE_CONDA" ]; then echo 'Environment variable _CE_CONDA must be specified. Exiting.'; exit 1; fi
 # # #declare environment variables
 # ENV DB_HOST=''
 # ENV WEB_SERVER_HOST=''
