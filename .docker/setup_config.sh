@@ -1,5 +1,11 @@
-# set -e
+set -e
 echo "About to start conda update, this may take some time..."
+
+# if [[ $(conda install -c conda-forge cryptography=40.0.2 wheel=0.40.0) == *Killed* ]]; then
+#     echo "!!!!! Error !!!!!"
+#     exit code 1
+# fi
+
 source setup/setup_conda.sh Linux-x86_64
 
 echo "setup_conda.sh successful"
@@ -20,12 +26,14 @@ echo "finished installing e-mission environment"
 #     echo "!!!!! Error !!!!!"
 #     exit code 1
 # fi
+
+
 conda install -c conda-forge cryptography=40.0.2 wheel=0.40.0
 
-if [ -z "$CONDA_EXE" ]; then
-    echo 'Environment variable CONDA_EXE must be specified. Exiting.'
-    exit 1
-fi
+# if [ -z "$CONDA_EXE" ]; then
+#     echo 'Environment variable CONDA_EXE must be specified. Exiting.'
+#     exit 1
+# fi
 
 echo "finished installing conda"
 
