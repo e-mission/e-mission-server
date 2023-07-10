@@ -1,3 +1,4 @@
+set -e
 echo "About to start conda update, this may take some time..."
 source setup/setup_conda.sh Linux-x86_64
 # now install the emission environment
