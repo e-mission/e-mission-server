@@ -16,6 +16,8 @@ else
     bash miniconda.sh -b -p $INSTALL_PREFIX
     source $SOURCE_SCRIPT
     hash -r
+    conda install -n base conda-libmamba-solver
+    conda config --set solver libmamba
     conda config --set always_yes yes
     # Useful for debugging any issues with conda
     conda info -a
