@@ -1,14 +1,14 @@
 version: "3"
 services:
   web-server:
-  #builds from tests/dockerfile
-    build: tests
+    build: ../../integrationTests
     depends_on:
       - db
     environment:
       - DB_HOST=db
       - WEB_SERVER_HOST=0.0.0.0
-
+    # ports:
+    #   - "8080:8080"
     volumes:
       # specify the host directory where the source code should live
       # If this is ~/e-mission-server-docker, then you can edit the files at
@@ -31,12 +31,28 @@ services:
       - mongo-data:/data/db
     networks:
        - emission
-
+  #adding section to incorporate nominatim server functionality
+  nominatim:
+    image: mediagis/nominatim:4.2
+    container_name: norcal-nominatim
+    environment:
+      - PBF_URL=https://download.geofabrik.de/north-america/us/california/norcal-latest.osm.pbf
+      - REPLICATION_URL=https://download.geofabrik.de/north-america/us/california/norcal-updates/
+      - IMPORT_WIKIPEDIA=false
+    ports:
+      - "8080:8080"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - nominatim-data:/var/lib/postgresql/14/main
+    networks:
+      - emission
 
 networks:
   emission:
 
 volumes:
   mongo-data:
-    
-
+  nominatim-data:
