@@ -121,6 +121,7 @@ class GreedySimilarityBinning(eamuu.TripModel):
         self.is_incremental = config['incremental_evaluation']
 
         self.bins: Dict[str, Dict] = {}
+        self.tripLabels=[]
         
 
     def fit(self, trips: List[ecwc.Confirmedtrip]):
@@ -184,9 +185,11 @@ class GreedySimilarityBinning(eamuu.TripModel):
                 logging.debug(f"adding trip to bin {bin_id} with features {trip_features}")
                 self.bins[bin_id]['feature_rows'].append(trip_features)
                 self.bins[bin_id]['labels'].append(trip_labels)
+                self.tripLabels.append(bin_id)
             else:
                 # create new bin
                 new_bin_id = str(len(self.bins))
+                self.tripLabels.append(new_bin_id)
                 new_bin_record = {
                     'feature_rows': [trip_features],
                     'labels': [trip_labels],
