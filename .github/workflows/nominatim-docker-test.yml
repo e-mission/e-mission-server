@@ -3,13 +3,9 @@ name: nominatim-docker-test
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
 on:
-  push:
-    branches:
-        - master
-        - nominatim
-  pull_request:
-    branches:
-        - master
+  # pull_request:
+  #   branches:
+  #       - master
 
   schedule:
     # Run every Sunday at 4:05 am
@@ -30,5 +26,5 @@ jobs:
     - name: Workflow test
       run: echo Smoke test
 
-    - name: Initialize nominatim 
-      run: docker-compose -f docker-compose.yml up --exit-code-from web-server
+    - name: Test nominatim 
+      run: docker-compose -f ../../emission/integrationTests/docker-compose.yml up --exit-code-from web-server

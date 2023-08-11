@@ -1,11 +1,16 @@
 import urllib.request, urllib.parse
 import json
 import unittest
+import os
+
+NOMINATIM_QUERY_URL = os.environ.get("NOMINATIM_QUERY_URL")
+print("query URL:", NOMINATIM_QUERY_URL)
+
 
 class TestReverseGeocode(unittest.TestCase):
     def testCompareResult(self):
         #Didn't use the query in nominatim.json because it would change how we query nominatim regularly. 
-        nominatim_reverse_query = "http://localhost:8080/reverse?"
+        nominatim_reverse_query = NOMINATIM_QUERY_URL + "/reverse?"
         params = {
                 "lat" : 41.831174, 
                 "lon" : -71.414907,

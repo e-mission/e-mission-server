@@ -12,5 +12,13 @@ else
 fi
 cat conf/storage/db.conf
 
-echo "Testing nominatim..."
-# source path_to_nominatim.py
+echo "Setting up conda..."
+source setup/setup_conda.sh Linux-x86_64
+
+echo "Setting up the test environment..."
+source setup/setup_tests.sh
+
+echo "Running tests..."
+source setup/activate_tests.sh
+
+./runIntegrationTests.sh
