@@ -28,6 +28,8 @@ class UserCacheHandler(object):
         """
         Moves all messages that have arrived for the current user into long-term
         storage, after converting into a platform-independent format.
+        Returns the number of entries that were moved so that we can return
+        early if this is zero.
         """
         pass
 

@@ -87,10 +87,16 @@ def run_intake_pipeline_for_user(uuid):
         with ect.Timer() as uct:
             logging.info("*" * 10 + "UUID %s: moving to long term" % uuid + "*" * 10)
             print(str(arrow.now()) + "*" * 10 + "UUID %s: moving to long term" % uuid + "*" * 10)
-            uh.moveToLongTerm()
+            new_entry_count = uh.moveToLongTerm()
 
         esds.store_pipeline_time(uuid, ecwp.PipelineStages.USERCACHE.name,
                                  time.time(), uct.elapsed)
+
+        if new_entry_count == 0:
+            print("No new entries, skipping the rest of the pipeline")
+            return
+        else:
+            print("New entry count == %s, continuing" % new_entry_count)
 
         with ect.Timer() as uit:
             logging.info("*" * 10 + "UUID %s: updating incoming user inputs" % uuid + "*" * 10)

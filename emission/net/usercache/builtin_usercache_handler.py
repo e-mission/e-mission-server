@@ -58,7 +58,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
             # Since we didn't get the current time range, there is no current
             # state, so we don't need to mark it as done
             # esp.mark_usercache_done(None)
-            return
+            return 0
 
         time_query = esp.get_time_range_for_usercache(self.user_id)
 
@@ -99,6 +99,7 @@ class BuiltinUserCacheHandler(enuah.UserCacheHandler):
         logging.debug("Deleting all entries for query %s" % time_query)
         uc.clearProcessedMessages(time_query)
         esp.mark_usercache_done(self.user_id, last_ts_processed)
+        return len(unified_entry_list)
 
     def storeViewsToCache(self):
         """
