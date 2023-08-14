@@ -49,6 +49,9 @@ if __name__ == '__main__':
         level=logging.DEBUG)
 
     parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--ignore_older_than_weeks", type=int,
+        help="skip model build if last trip is older than this")
+
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-a", "--all", action="store_true", default=False,
         help="build the model for all users")
@@ -68,19 +71,20 @@ if __name__ == '__main__':
         logging.info("building model for user %s" % user_id)
         # these can come from the application config as default values
 
-        ts = esta.TimeSeries.get_time_series(user_id)
-        last_confirmed_trip_end = arrow.get(
-                ts.get_first_value_for_field("analysis/confirmed_trip",
-                    "data.end_ts", pymongo.DESCENDING))
+        if args.ignore_older_than_weeks:
+            ts = esta.TimeSeries.get_time_series(user_id)
+            last_confirmed_trip_end = arrow.get(
+                    ts.get_first_value_for_field("analysis/confirmed_trip",
+                        "data.end_ts", pymongo.DESCENDING))
 
-        three_weeks_ago = arrow.utcnow().shift(weeks=-3)
-        if last_confirmed_trip_end.timestamp() < three_weeks_ago.timestamp():
-            logging.debug("last trip was at %s, three weeks ago was %s, gap = %s, skipping model building..." %
-                (last_confirmed_trip_end, three_weeks_ago, last_confirmed_trip_end.humanize(three_weeks_ago)))
-            continue
-        else:
-            logging.debug("last trip was at %s, three weeks ago was %s, gap is %s, building model..." %
-                (last_confirmed_trip_end, three_weeks_ago, last_confirmed_trip_end.humanize(three_weeks_ago)))
+            week_limit = arrow.utcnow().shift(weeks=-args.ignore_older_than_weeks)
+            if last_confirmed_trip_end.timestamp() < week_limit.timestamp():
+                logging.debug("last trip was at %s, three weeks ago was %s, gap = %s, skipping model building..." %
+                    (last_confirmed_trip_end, week_limit, last_confirmed_trip_end.humanize(week_limit)))
+                continue
+            else:
+                logging.debug("last trip was at %s, three weeks ago was %s, gap is %s, building model..." %
+                    (last_confirmed_trip_end, week_limit, last_confirmed_trip_end.humanize(week_limit)))
 
         model_type = eamtc.get_model_type()
         model_storage = eamtc.get_model_storage()
