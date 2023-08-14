@@ -20,11 +20,11 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - name: Checkout
-    - uses: actions/checkout@v2
+      uses: actions/checkout@v2
 
     # Runs a single command using the runners shell
     - name: Workflow test
       run: echo Smoke test
 
     - name: Test nominatim 
-      run: docker-compose -f ../../emission/integrationTests/docker-compose.yml up --exit-code-from web-server
+      run: docker-compose -f emission/integrationTests/docker-compose.yml up --exit-code-from web-server

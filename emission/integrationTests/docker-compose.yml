@@ -1,7 +1,8 @@
 version: "3"
 services:
   web-server:
-    build: integrationTests
+    build: 
+      context: .
     depends_on:
       - db
       - nominatim
