@@ -5,6 +5,8 @@ import logging
 
 import argparse
 import uuid
+import arrow
+import pymongo
 
 import emission.pipeline.reset as epr
 import emission.core.get_database as edb
@@ -65,6 +67,20 @@ if __name__ == '__main__':
     for user_id in user_list:
         logging.info("building model for user %s" % user_id)
         # these can come from the application config as default values
+
+        ts = esta.TimeSeries.get_time_series(user_id)
+        last_confirmed_trip_end = arrow.get(
+                ts.get_first_value_for_field("analysis/confirmed_trip",
+                    "data.end_ts", pymongo.DESCENDING))
+
+        three_weeks_ago = arrow.utcnow().shift(weeks=-3)
+        if last_confirmed_trip_end.timestamp() < three_weeks_ago.timestamp():
+            logging.debug("last trip was at %s, three weeks ago was %s, gap = %s, skipping model building..." %
+                (last_confirmed_trip_end, three_weeks_ago, last_confirmed_trip_end.humanize(three_weeks_ago)))
+            continue
+        else:
+            logging.debug("last trip was at %s, three weeks ago was %s, gap is %s, building model..." %
+                (last_confirmed_trip_end, three_weeks_ago, last_confirmed_trip_end.humanize(three_weeks_ago)))
 
         model_type = eamtc.get_model_type()
         model_storage = eamtc.get_model_storage()
