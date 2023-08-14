@@ -13,19 +13,25 @@ it needs to be included while running them.
     $ export EMISSION_SERVER_HOME=<path_to_emission_server_repo>
     ```
 
+     To verify, check the environment variables using 
+
+        $ env
+
+    and ensure ```ENV_SERVER_HOME``` is present in the list and has the right path (as mentioned above).
+    
 1. If you haven't setup before, set up the evaluation system
 
     ```
     $ source setup.sh
     ```
-
 1. If you have, activate
 
     ```
     $ source activate.sh
     ```
 
-1. Access the visualizations of interest and copy the config over
+1. Access the visualizations of interest and copy the config over. The `<eval_folder>` mentioned below can be any folder containing notebooks and/or .py files for visualisation or other purposes. E.g. : `TRB_label_assist` is one such folder.
+
 
 ```
 $ cd <eval_folder>
