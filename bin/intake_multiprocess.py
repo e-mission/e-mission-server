@@ -20,6 +20,8 @@ if __name__ == '__main__':
         intake_log_config = json.load(open("conf/log/intake.conf.sample", "r"))
 
     parser = argparse.ArgumentParser()
+    parser.add_argument("--skip_if_no_new_data", action="store_true"
+                        help="skip the pipeline if there is no new data")
     parser.add_argument("n_workers", type=int,
                         help="the number of worker processors to use")
     args = parser.parse_args()
@@ -32,4 +34,4 @@ if __name__ == '__main__':
 
     split_lists = eps.get_split_uuid_lists(args.n_workers)
     logging.info("Finished generating split lists %s" % split_lists)
-    eps.dispatch(split_lists)
+    eps.dispatch(split_lists, skip_if_no_new_data)

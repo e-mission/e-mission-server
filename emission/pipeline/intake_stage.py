@@ -38,7 +38,7 @@ import emission.net.ext_service.habitica.executor as autocheck
 import emission.storage.decorations.stats_queries as esds
 
 
-def run_intake_pipeline(process_number, uuid_list):
+def run_intake_pipeline(process_number, uuid_list, skip_if_no_new_data=False):
     """
     Run the intake pipeline with the specified process number and uuid list.
     Note that the process_number is only really used to customize the log file name
@@ -75,13 +75,13 @@ def run_intake_pipeline(process_number, uuid_list):
             continue
 
         try:
-            run_intake_pipeline_for_user(uuid)
+            run_intake_pipeline_for_user(uuid, skip_if_no_new_data)
         except Exception as e:
             esds.store_pipeline_error(uuid, "WHOLE_PIPELINE", time.time(), None)
             logging.exception("Found error %s while processing pipeline "
                               "for user %s, skipping" % (e, uuid))
 
-def run_intake_pipeline_for_user(uuid):
+def run_intake_pipeline_for_user(uuid, skip_if_no_new_data):
         uh = euah.UserCacheHandler.getUserCacheHandler(uuid)
 
         with ect.Timer() as uct:
@@ -92,11 +92,12 @@ def run_intake_pipeline_for_user(uuid):
         esds.store_pipeline_time(uuid, ecwp.PipelineStages.USERCACHE.name,
                                  time.time(), uct.elapsed)
 
-        if new_entry_count == 0:
-            print("No new entries, skipping the rest of the pipeline")
+        if skip_if_no_new_data and new_entry_count == 0:
+            print("No new entries, and skip_if_no_new_data = %s, skipping the rest of the pipeline" % skip_if_no_new_data)
             return
         else:
-            print("New entry count == %s, continuing" % new_entry_count)
+            print("New entry count == %s and skip_if_no_new_data = %s, continuing" %
+                (new_entry_count, skip_if_no_new_data))
 
         with ect.Timer() as uit:
             logging.info("*" * 10 + "UUID %s: updating incoming user inputs" % uuid + "*" * 10)

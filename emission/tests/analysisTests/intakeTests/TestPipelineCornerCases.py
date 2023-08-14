@@ -83,14 +83,14 @@ class TestPipelineCornerCases(unittest.TestCase):
             ewps.PipelineStages.OUTPUT_GEN]
         test_run_states = list([pse.value for pse in
             filter(lambda pse: pse not in stages_skipped_in_testing,
-                ewps.PipelineStages.__iter__())])
+                ewps.PipelineStages.__iter__())]) + [ewps.PipelineStages.OUTPUT_GEN.value]
         curr_user_states = list(filter(lambda ps: ps["user_id"] == self.testUUID,
             all_pipeline_states))
         self.assertEqual(len(curr_user_states), 0)
         # next, we run the real pipeline, and end up with no entries
         # and we have an early return in that case
         print("-" * 10, "Running real pipeline on empty DB, expecting no change", "-" * 10)
-        epi.run_intake_pipeline_for_user(self.testUUID)
+        epi.run_intake_pipeline_for_user(self.testUUID, True)
         all_pipeline_states = edb.get_pipeline_state_db().find()
         curr_user_states = list(filter(lambda ps: ps["user_id"] == self.testUUID,
             all_pipeline_states))
@@ -99,7 +99,7 @@ class TestPipelineCornerCases(unittest.TestCase):
         # which will generate some pipeline states
         print("-" * 10, "Running test pipeline on real data, expecting states to be set", "-" * 10)
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2016-07-25")
-        etc.runIntakePipeline(self.testUUID)
+        epi.run_intake_pipeline_for_user(self.testUUID, False)
 
         all_pipeline_states_after_run = edb.get_pipeline_state_db().find()
         curr_user_states_after_run = list(filter(lambda ps: ps["user_id"] == self.testUUID,
@@ -112,6 +112,7 @@ class TestPipelineCornerCases(unittest.TestCase):
         # then we run the real pipeline again
         # We expect to see no changes between the first and the second run
         # because of the usercache skip
+        epi.run_intake_pipeline_for_user(self.testUUID, True)
         all_pipeline_states_after_test_run = edb.get_pipeline_state_db().find()
         curr_user_states_after_test_run = list(filter(lambda ps: ps["user_id"] == self.testUUID,
             all_pipeline_states_after_test_run))
@@ -120,6 +121,20 @@ class TestPipelineCornerCases(unittest.TestCase):
         self.assertEqual(list(map(get_last_processed, curr_user_states_after_run)),
             list(map(get_last_processed, curr_user_states_after_test_run)))
         self.assertEqual(list(map(get_last_run, curr_user_states_after_run)),
+            list(map(get_last_run, curr_user_states_after_test_run)))
+
+        # then we run the real pipeline again with skip=False
+        # We expect to see no changes between the first and the second run
+        # because of the usercache skip
+        epi.run_intake_pipeline_for_user(self.testUUID, False)
+        all_pipeline_states_after_test_run = edb.get_pipeline_state_db().find()
+        curr_user_states_after_test_run = list(filter(lambda ps: ps["user_id"] == self.testUUID,
+            all_pipeline_states_after_test_run))
+        get_last_processed = lambda ps: ps['last_processed_ts']
+        get_last_run = lambda ps: ps['last_ts_run']
+        self.assertEqual(list(map(get_last_processed, curr_user_states_after_run)),
+            list(map(get_last_processed, curr_user_states_after_test_run)))
+        self.assertNotEqual(list(map(get_last_run, curr_user_states_after_run)),
             list(map(get_last_run, curr_user_states_after_test_run)))
 
 if __name__ == '__main__':
