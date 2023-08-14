@@ -50,7 +50,7 @@ def match_incoming_inputs(user_id, timerange):
                 handle_multi_non_deleted_match(confirmed_obj, ui)
             else:
                 assert False, "Found weird key {ui.metadata.key} that was not in the search list"
-            update_confirmed_and_composite(confirmed_obj)
+            update_confirmed_and_composite(ts, confirmed_obj)
         else:
             logging.warn("No match found for single user input %s, moving forward anyway" % ui)
         lastInputProcessed = ui
@@ -98,7 +98,7 @@ def create_confirmed_objects(user_id):
             if last_confirmed_place is not None:
                 logging.debug("last confirmed_place %s was already in database, updating with linked trip info... and %s additions" %
                     (last_confirmed_place["_id"], len(last_confirmed_place["data"]["additions"])))
-                update_confirmed_and_composite(last_confirmed_place)
+                update_confirmed_and_composite(ts, last_confirmed_place)
 
             if confirmed_tl is not None and not confirmed_tl.is_empty():
                 tl_list = list(confirmed_tl)
@@ -271,7 +271,7 @@ def link_trip_end(confirmed_trip, confirmed_end_place):
     confirmed_trip["data"]["end_place"] = confirmed_end_place.get_id()
     confirmed_end_place["data"]["ending_trip"] = confirmed_trip.get_id()
 
-def update_confirmed_and_composite(confirmed_obj):
+def update_confirmed_and_composite(ts, confirmed_obj):
     import emission.storage.timeseries.builtin_timeseries as estbt
     import emission.core.get_database as edb
     estbt.BuiltinTimeSeries.update(confirmed_obj)
@@ -281,10 +281,10 @@ def update_confirmed_and_composite(confirmed_obj):
     # if we don't find a matching composite trip, we don't need to do anything
     # since it has not been created yet and will be created with updated values when we get to that stage
     if confirmed_obj["metadata"]["key"] in [esda.CONFIRMED_TRIP_KEY, esda.CONFIRMED_UNTRACKED_KEY]:
-        composite_trip = edb.get_analysis_timeseries_db().find_one({"data.confirmed_trip": confirmed_obj.get_id()})
+        composite_trip = ts.get_entry_at_ts("analysis/composite_trip", "data.start_ts", confirmed_obj.data.start_ts)
         if composite_trip is not None:
             # copy over all the fields other than the end_confimed_place
-            EXCLUDED_FIELDS = ["end_confirmed_place"]
+            EXCLUDED_FIELDS = ["end_confirmed_place", "start_ts", "end_ts", "start_loc", "end_loc"]
             for k in confirmed_obj["data"].keys():
                 if k not in EXCLUDED_FIELDS:
                     composite_trip["data"][k] = confirmed_obj["data"][k]
@@ -293,7 +293,7 @@ def update_confirmed_and_composite(confirmed_obj):
             logging.debug("No composite trip matching confirmed trip %s, nothing to update" % confirmed_obj["_id"])
 
     if confirmed_obj["metadata"]["key"] == esda.CONFIRMED_PLACE_KEY:
-        composite_trip = edb.get_analysis_timeseries_db().find_one({"data.end_confirmed_place._id": confirmed_obj["_id"]})
+        composite_trip = ts.get_entry_at_ts("analysis/composite_trip", "data.end_ts", confirmed_obj['data']['enter_ts'])
         if composite_trip is not None:
             composite_trip["data"]["end_confirmed_place"] = confirmed_obj
             estbt.BuiltinTimeSeries.update(ecwe.Entry(composite_trip))
