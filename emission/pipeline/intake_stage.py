@@ -223,3 +223,4 @@ def _get_and_store_range(user_id, trip_key):
 
     user = ecwu.User(user_id)
     user.update({"pipeline_range": {"start_ts": start_ts, "end_ts": end_ts}})
+    logging.debug("After updating, new profiles is %s" % user.getProfile())
