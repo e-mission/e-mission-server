@@ -202,14 +202,6 @@ def run_intake_pipeline_for_user(uuid, skip_if_no_new_data):
         esds.store_pipeline_time(uuid, ecwp.PipelineStages.CREATE_COMPOSITE_OBJECTS.name,
                                  time.time(), crt.elapsed)
 
-        with ect.Timer() as ogt:
-            logging.info("*" * 10 + "UUID %s: storing views to cache" % uuid + "*" * 10)
-            print(str(arrow.now()) + "*" * 10 + "UUID %s: storing views to cache" % uuid + "*" * 10)
-            uh.storeViewsToCache()
-
-        esds.store_pipeline_time(uuid, ecwp.PipelineStages.OUTPUT_GEN.name,
-                                 time.time(), ogt.elapsed)
-
         _get_and_store_range(uuid, "analysis/composite_trip")
 
 def _get_and_store_range(user_id, trip_key):
