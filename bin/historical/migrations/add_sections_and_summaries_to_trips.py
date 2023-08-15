@@ -13,7 +13,7 @@ import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.analysis.plotting.composite_trip_creation as eapc
 import emission.analysis.userinput.matcher as eaum
 
-def add_sections_to_trips(process_number, uuid_list):
+def add_sections_to_trips(process_number, uuid_list, skip_if_no_new_data):
     import logging
     logging.basicConfig(level=logging.DEBUG, filename="/var/tmp/add_section_summary_%s.log" % process_number,
         force=True)
