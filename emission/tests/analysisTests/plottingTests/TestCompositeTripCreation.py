@@ -79,15 +79,15 @@ class TestCompositeTripCreation(unittest.TestCase):
 
         # set a couple of confirmed trip properties
         tripSacrifice = confirmedTrips[0]
-        tripSacrifice["data"]["start_ts"] = 1000
-        tripSacrifice["data"]["start_fmt_time"] = "I want to go back in time"
-        eaum.update_confirmed_and_composite(ecwe.Entry(tripSacrifice))
+        tripSacrifice["data"]["some_field"] = 1000
+        tripSacrifice["data"]["user_input"] = "I want to go back in time"
+        eaum.update_confirmed_and_composite(self.testTs, ecwe.Entry(tripSacrifice))
         
         compositeTrips = list(self.testTs.find_entries(["analysis/composite_trip"]))
         tripExpected = compositeTrips[0]
 
-        self.assertEqual(tripExpected["data"]["start_ts"], 1000)
-        self.assertEqual(tripExpected["data"]["start_fmt_time"], "I want to go back in time")
+        self.assertEqual(tripExpected["data"]["some_field"], 1000)
+        self.assertEqual(tripExpected["data"]["user_input"], "I want to go back in time")
         print("testUpdateConfirmedTripProperties DONE")
 
 
@@ -100,7 +100,7 @@ class TestCompositeTripCreation(unittest.TestCase):
         tripSacrifice = confirmedTrips[1]
         ADDITIONS = ["mimi", "fifi", "gigi", "bibi"]
         tripSacrifice["data"]["additions"] = ADDITIONS
-        eaum.update_confirmed_and_composite(ecwe.Entry(tripSacrifice))
+        eaum.update_confirmed_and_composite(self.testTs, ecwe.Entry(tripSacrifice))
         
         compositeTrips = list(self.testTs.find_entries(["analysis/composite_trip"]))
         tripExpected = compositeTrips[1]
@@ -117,7 +117,7 @@ class TestCompositeTripCreation(unittest.TestCase):
         tripSacrifice = confirmedTrips[2]
         USERINPUT = {"mimi": 1, "fifi": 100, "gigi": 200, "bibi": 300}
         tripSacrifice["data"]["user_input"] = USERINPUT
-        eaum.update_confirmed_and_composite(ecwe.Entry(tripSacrifice))
+        eaum.update_confirmed_and_composite(self.testTs, ecwe.Entry(tripSacrifice))
         
         compositeTrips = list(self.testTs.find_entries(["analysis/composite_trip"]))
         tripExpected = compositeTrips[2]
@@ -135,7 +135,7 @@ class TestCompositeTripCreation(unittest.TestCase):
         placeSacrifice = confirmedPlaces[2]
         placeSacrifice["data"]["exit_ts"] = 1000
         placeSacrifice["data"]["exit_fmt_time"] = "I want to go back in time"
-        eaum.update_confirmed_and_composite(ecwe.Entry(placeSacrifice))
+        eaum.update_confirmed_and_composite(self.testTs, ecwe.Entry(placeSacrifice))
         
         compositeTrips = list(self.testTs.find_entries(["analysis/composite_trip"]))
         tripExpected = compositeTrips[1]
@@ -154,7 +154,7 @@ class TestCompositeTripCreation(unittest.TestCase):
         placeSacrifice = confirmedPlaces[5]
         ADDITIONS = ["mimi", "fifi", "gigi", "bibi"]
         placeSacrifice["data"]["additions"] = ADDITIONS
-        eaum.update_confirmed_and_composite(ecwe.Entry(placeSacrifice))
+        eaum.update_confirmed_and_composite(self.testTs, ecwe.Entry(placeSacrifice))
         
         compositeTrips= list(self.testTs.find_entries(["analysis/composite_trip"]))
         tripExpected = compositeTrips[4]

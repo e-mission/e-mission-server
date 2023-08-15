@@ -113,7 +113,7 @@ class TestConfirmedObjectFakeData(unittest.TestCase):
         with self.assertRaises(KeyError) as ke:
             fake_ct = ecwe.Entry({"metadata": {"key": "analysis/cleaned_trip"}, "data": {}})
             eaum.get_section_summary(self.test_ts, fake_ct, "foobar")
-        self.assertEqual(str(ke.exception), "'user_id'")
+        self.assertEqual(str(ke.exception), "'_id'")
 
         fake_ct = ecwe.Entry({"metadata": {"key": "analysis/cleaned_trip"}, "data": {}})
         fake_ct_id = self.test_ts.insert(fake_ct)
