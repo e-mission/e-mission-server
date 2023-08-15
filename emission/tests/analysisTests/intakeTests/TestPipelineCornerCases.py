@@ -83,7 +83,7 @@ class TestPipelineCornerCases(unittest.TestCase):
             ewps.PipelineStages.OUTPUT_GEN]
         test_run_states = list([pse.value for pse in
             filter(lambda pse: pse not in stages_skipped_in_testing,
-                ewps.PipelineStages.__iter__())]) + [ewps.PipelineStages.OUTPUT_GEN.value]
+                ewps.PipelineStages.__iter__())])
         curr_user_states = list(filter(lambda ps: ps["user_id"] == self.testUUID,
             all_pipeline_states))
         self.assertEqual(len(curr_user_states), 0)
