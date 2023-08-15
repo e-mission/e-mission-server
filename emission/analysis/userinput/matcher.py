@@ -200,8 +200,7 @@ def get_section_summary(ts, cleaned_trip, section_key):
     cleaned_trip: the cleaned trip object associated with the sections
     section_key: 'inferred_section' or 'cleaned_section'
     """
-    import emission.core.get_database as edb
-    
+    logging.debug(f"get_section_summary({cleaned_trip['_id']}, {section_key}) called")
     sections = esdt.get_sections_for_trip(key = section_key,
         user_id = cleaned_trip["user_id"], trip_id = cleaned_trip["_id"])
     if len(sections) == 0:
@@ -214,11 +213,13 @@ def get_section_summary(ts, cleaned_trip, section_key):
         if section_key == "analysis/cleaned_section" else inferred_section_mapper
     sections_df["sensed_mode_str"] = sections_df["sensed_mode"].apply(sel_section_mapper)
     grouped_section_df = sections_df.groupby("sensed_mode_str")
-    return {
+    retVal = {
         "distance": grouped_section_df.distance.sum().to_dict(),
         "duration": grouped_section_df.duration.sum().to_dict(),
         "count": grouped_section_df.trip_id.count().to_dict()
     }
+    logging.debug(f"get_section_summary({cleaned_trip['_id']}, {section_key}) returning {retVal}")
+    return retVal
 
 def create_confirmed_entry(ts, tce, confirmed_key, input_key_list):
     # Copy the entry and fill in the new values
