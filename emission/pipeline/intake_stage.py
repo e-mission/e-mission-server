@@ -12,6 +12,7 @@ import numpy as np
 import arrow
 from uuid import UUID
 import time
+import pymongo
 
 import emission.core.get_database as edb
 import emission.core.timer as ect
@@ -37,6 +38,7 @@ import emission.net.ext_service.habitica.executor as autocheck
 
 import emission.storage.decorations.stats_queries as esds
 
+import emission.core.wrapper.user as ecwu
 
 def run_intake_pipeline(process_number, uuid_list, skip_if_no_new_data=False):
     """
@@ -207,3 +209,17 @@ def run_intake_pipeline_for_user(uuid, skip_if_no_new_data):
 
         esds.store_pipeline_time(uuid, ecwp.PipelineStages.OUTPUT_GEN.name,
                                  time.time(), ogt.elapsed)
+
+        _get_and_store_range(uuid, "analysis/composite_trip")
+
+def _get_and_store_range(user_id, trip_key):
+    ts = esta.TimeSeries.get_time_series(user_id)
+    start_ts = ts.get_first_value_for_field(trip_key, "data.start_ts", pymongo.ASCENDING)
+    if start_ts == -1:
+        start_ts = None
+    end_ts = ts.get_first_value_for_field(trip_key, "data.end_ts", pymongo.DESCENDING)
+    if end_ts == -1:
+        end_ts = None
+
+    user = ecwu.User(user_id)
+    user.update({"pipeline_range": {"start_ts": start_ts, "end_ts": end_ts}})
