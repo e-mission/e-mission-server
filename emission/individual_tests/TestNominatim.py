@@ -6,14 +6,13 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import *
 import unittest
-
+import os
 from emission.core.wrapper.trip_old import Coordinate
-
 import emission.net.ext_service.geocoder.nominatim as eco
 
 #temporarily sets NOMINATIM_QUERY_URL to the environment variable for testing.
 eco.NOMINATIM_QUERY_URL = os.environ.get("NOMINATIM_QUERY_URL")
-print("query URL:", eco.NOMINATIM_QUERY_URL)
+# print("query URL:", eco.NOMINATIM_QUERY_URL)
 
 class NominatimTest(unittest.TestCase):
 
