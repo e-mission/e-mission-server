@@ -10,6 +10,7 @@ import pymongo
 
 import emission.storage.pipeline_queries as esp
 import emission.storage.timeseries.abstract_timeseries as esta
+import emission.core.wrapper.user as ecwu
 
 def get_complete_ts(user_id):
     complete_ts = esp.get_complete_ts(user_id)
@@ -17,28 +18,8 @@ def get_complete_ts(user_id):
     return complete_ts
 
 def get_range(user_id):
-    ts = esta.TimeSeries.get_time_series(user_id)
-    start_ts = ts.get_first_value_for_field("analysis/composite_trip", "data.start_ts", pymongo.ASCENDING)
-    if start_ts == -1:
-        start_ts = ts.get_first_value_for_field("analysis/confirmed_trip", "data.start_ts", pymongo.ASCENDING)
-    if start_ts == -1:
-        start_ts = ts.get_first_value_for_field("analysis/cleaned_trip", "data.start_ts", pymongo.ASCENDING)
-    if start_ts == -1:
-        start_ts = None
-
-    end_ts = ts.get_first_value_for_field("analysis/composite_trip", "data.end_ts", pymongo.DESCENDING)
-    if start_ts == -1:
-        end_ts = ts.get_first_value_for_field("analysis/confirmed_trip", "data.end_ts", pymongo.DESCENDING)
-    if end_ts == -1:
-        end_ts = ts.get_first_value_for_field("analysis/cleaned_trip", "data.end_ts", pymongo.DESCENDING)
-    if end_ts == -1:
-        end_ts = None
-
-    complete_ts = get_complete_ts(user_id)
-    if complete_ts is not None and end_ts is not None\
-        and (end_ts != (complete_ts - esp.END_FUZZ_AVOID_LTE)):
-        logging.exception("end_ts %s != complete_ts no fuzz %s" %
-            (end_ts, (complete_ts - esp.END_FUZZ_AVOID_LTE)))
-
+    user_profile = ecwu.User(user_id).getProfile()
+    start_ts = user_profile.get("pipeline_range", {}).get("start_ts", None)
+    end_ts = user_profile.get("pipeline_range", {}).get("end_ts", None)
     logging.debug("Returning range (%s, %s)" % (start_ts, end_ts))
     return (start_ts, end_ts)

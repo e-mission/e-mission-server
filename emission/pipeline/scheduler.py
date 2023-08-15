@@ -60,13 +60,13 @@ def get_split_uuid_lists(n_splits):
     logging.debug("Split values are %s" % ret_splits)
     return ret_splits
 
-def dispatch(split_lists):
+def dispatch(split_lists, skip_if_no_new_data):
     ctx = mp.get_context('spawn')
     process_list = []
     for i, uuid_list in enumerate(split_lists):
         logging.debug("Dispatching list %s" % uuid_list)
         pid = i
-        p = ctx.Process(target=epi.run_intake_pipeline, args=(pid, uuid_list))
+        p = ctx.Process(target=epi.run_intake_pipeline, args=(pid, uuid_list, skip_if_no_new_data))
         logging.info("Created process %s to process %s list of size %s" %
                      (p, i, len(uuid_list)))
         p.start()
