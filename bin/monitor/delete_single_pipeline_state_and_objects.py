@@ -108,4 +108,4 @@ if __name__ == '__main__':
             if not args.dry_run:
                 logging.info(f"Pipeline delete result is {edb.get_pipeline_state_db().delete_many(pipeline_query).raw_result}")
                 logging.info(f"Composite trip delete result is {edb.get_analysis_timeseries_db().delete_many(trip_query).raw_result}")
-            edb.get_pipeline_state_db().update_one(pipeline_query, {"$unset": {"curr_run_ts": ""}})
+            edb.get_pipeline_state_db().update_one(pipeline_query, {"$set": {"curr_run_ts": None}})
