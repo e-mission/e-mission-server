@@ -23,6 +23,9 @@ ts_enum_map = {
 INVALID_QUERY = {'metadata.key': 'invalid'}
 
 class BuiltinTimeSeries(esta.TimeSeries):
+
+    entryList=[]
+
     def __init__(self, user_id):
         super(BuiltinTimeSeries, self).__init__(user_id)
         self.key_query = lambda key: {"metadata.key": key}
@@ -261,6 +264,9 @@ class BuiltinTimeSeries(esta.TimeSeries):
         logging.debug("get_entry_at_ts result = %s" % retValue)
         return retValue
 
+    def getEntryList(self):
+        return self.entryList
+       
     def get_data_df(self, key, time_query = None, geo_query = None,
                     extra_query_list=None,
                     map_fn = None):
@@ -290,7 +296,11 @@ class BuiltinTimeSeries(esta.TimeSeries):
         if map_fn is None:
             map_fn = BuiltinTimeSeries._to_df_entry
         # Dataframe doesn't like to work off an iterator - it wants everything in memory
-        df = pd.DataFrame([map_fn(e) for e in entry_it])
+        
+        for e in entry_it:
+            BuiltinTimeSeries.entryList.append(map_fn(e)) 
+        df = pd.DataFrame(BuiltinTimeSeries.entryList)
+
         logging.debug("Found %s results" % len(df))
         if len(df) > 0:
             dedup_check_list = [item for item in ecwe.Entry.get_dedup_list(key)
