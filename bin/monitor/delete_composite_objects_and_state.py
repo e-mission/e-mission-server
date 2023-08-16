@@ -70,13 +70,17 @@ if __name__ == '__main__':
         help="email addresses to reset the pipeline for")
     parser.add_argument("-n", "--dry_run", action="store_true", default=False,
                         help="do everything except actually perform the operations")
+    parser.add_argument("-s", "--state", required=True,
+                        help="state to reset")
+    parser.add_argument("-d", "--del_objects", nargs="+", required=True,
+                        help="list of objects to delete")
 
     args = parser.parse_args()
     print(args)
 
     # Handle the first row in the table
-    pipeline_query = {"pipeline_stage": ewps.PipelineStages.CREATE_COMPOSITE_OBJECTS.value}
-    trip_query = {"metadata.key": "analysis/composite_trip"}
+    pipeline_query = {"pipeline_stage": ewps.PipelineStages[args.state].value}
+    trip_query = {"metadata.key": {"$in": args.del_objects}}
     if args.all:
         all_composite_states = list(edb.get_pipeline_state_db().find(pipeline_query))
         logging.info(f"About to delete {len(all_composite_states)} entries for {ewps.PipelineStages.CREATE_COMPOSITE_OBJECTS}")
@@ -95,7 +99,13 @@ if __name__ == '__main__':
             user_composite_states = list(edb.get_pipeline_state_db().find(pipeline_query))
             logging.info(f"found {len(user_composite_states)} for user {user_id}")
             assert len(user_composite_states) == 1
+            print("current pipeline state = %s" % user_composite_states)
+            if user_composite_states[0].get('curr_run_ts', None) is not None:
+                logging.info(f"Skipping {user_id=} since the pipeline is currently running ")
+                continue
+            edb.get_pipeline_state_db().update_one(pipeline_query, {"$set": {"curr_run_ts": "MANUAL_RESET"}})
             logging.info(f"About to delete {edb.get_analysis_timeseries_db().count_documents(trip_query)} trips")
             if not args.dry_run:
                 logging.info(f"Pipeline delete result is {edb.get_pipeline_state_db().delete_many(pipeline_query).raw_result}")
                 logging.info(f"Composite trip delete result is {edb.get_analysis_timeseries_db().delete_many(trip_query).raw_result}")
+            edb.get_pipeline_state_db().update_one(pipeline_query, {"$unset": {"curr_run_ts": ""}})
