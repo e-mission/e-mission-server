@@ -30,6 +30,7 @@ echo "Python path after setup_tests: $PYTHONPATH"
 echo "Running tests..."
 source setup/activate_tests.sh
 echo "Python path after activate_tests: $PYTHONPATH"
-# tail -f /dev/null
+
 chmod +x runIntegrationTests.sh
+# tail -f /dev/null
 ./runIntegrationTests.sh

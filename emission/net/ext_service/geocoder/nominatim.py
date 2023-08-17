@@ -9,13 +9,12 @@ from builtins import object
 import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
 import logging
 import json
+import os
 
 from emission.core.wrapper.trip_old import Coordinate
-
 try:
-    nominatim_file = open("conf/net/ext_service/nominatim.json")
-    NOMINATIM_QUERY_URL = json.load(nominatim_file)["query_url"]
-    nominatim_file.close()
+    NOMINATIM_QUERY_URL_env = os.environ.get("NOMINATIM_QUERY_URL", "")
+    NOMINATIM_QUERY_URL = NOMINATIM_QUERY_URL_env if NOMINATIM_QUERY_URL_env != "" else "http://nominatim.openstreetmap.org"
 
 except:
     print("nominatim not configured either, place decoding must happen on the client")
@@ -41,8 +40,11 @@ class Geocoder(object):
     @classmethod
     def get_json_geo(cls, address):
         request = urllib.request.Request(cls.make_url_geo(address))
+        print("request", request)
         response = urllib.request.urlopen(request)
+        print("response", response)
         jsn = json.loads(response.read())
+        print("jsn", jsn)
         return jsn
 
     @classmethod
@@ -61,7 +63,6 @@ class Geocoder(object):
         }
 
         query_url = NOMINATIM_QUERY_URL + "/reverse?"
-        print("=====Query_URL:", query_url)
         encoded_params = urllib.parse.urlencode(params)
         url = query_url + encoded_params
         logging.debug("For reverse geocoding, using URL %s" % url)
@@ -70,11 +71,11 @@ class Geocoder(object):
     @classmethod
     def get_json_reverse(cls, lat, lng):
         request = urllib.request.Request(cls.make_url_reverse(lat, lng))
-        print("======request", request)
-        print(cls.make_url_reverse(lat, lng))
         response = urllib.request.urlopen(request)
         parsed_response = json.loads(response.read())
         logging.debug("parsed_response = %s" % parsed_response)
+        print("parsed res", parsed_response)
+        print("restype", type(parsed_response))
         return parsed_response
 
     @classmethod
