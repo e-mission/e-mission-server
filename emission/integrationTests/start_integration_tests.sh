@@ -2,6 +2,10 @@
 # Using an automated install 
 cd /src/e-mission-server
 
+echo "++++++++++"
+echo "$PWD"
+
+
 #set database URL using environment variable
 echo ${DB_HOST}
 if [ -z ${DB_HOST} ] ; then
@@ -12,13 +16,20 @@ else
 fi
 cat conf/storage/db.conf
 
+echo "Python path before setting up conda: $PYTHONPATH"
 echo "Setting up conda..."
 source setup/setup_conda.sh Linux-x86_64
+
+echo "Python path after setup_conda: $PYTHONPATH"
 
 echo "Setting up the test environment..."
 source setup/setup_tests.sh
 
+echo "Python path after setup_tests: $PYTHONPATH"
+
 echo "Running tests..."
 source setup/activate_tests.sh
-
+echo "Python path after activate_tests: $PYTHONPATH"
+# tail -f /dev/null
+chmod +x runIntegrationTests.sh
 ./runIntegrationTests.sh
