@@ -119,6 +119,11 @@ class GreedySimilarityBinning(eamuu.TripModel):
         self.sim_thresh = config['similarity_threshold_meters']
         self.apply_cutoff = config['apply_cutoff']
         self.is_incremental = config['incremental_evaluation']
+        if config.get('clustering_way') is None:
+            self.clusteringWay='origin-destination'   # previous default
+        else:
+            self.clusteringWay= config['clustering_way'] 
+        self.tripLabels=[]
 
         self.bins: Dict[str, Dict] = {}
         
@@ -184,9 +189,11 @@ class GreedySimilarityBinning(eamuu.TripModel):
                 logging.debug(f"adding trip to bin {bin_id} with features {trip_features}")
                 self.bins[bin_id]['feature_rows'].append(trip_features)
                 self.bins[bin_id]['labels'].append(trip_labels)
+                self.tripLabels.append(bin_id)
             else:
                 # create new bin
                 new_bin_id = str(len(self.bins))
+                self.tripLabels.append(new_bin_id)
                 new_bin_record = {
                     'feature_rows': [trip_features],
                     'labels': [trip_labels],
@@ -204,7 +211,7 @@ class GreedySimilarityBinning(eamuu.TripModel):
         :return: the id of a bin if a match was found, otherwise None
         """
         for bin_id, bin_record in self.bins.items():
-                matches_bin = all([self.metric.similar(trip_features, bin_sample, self.sim_thresh)
+                matches_bin = all([self.metric.similar(trip_features, bin_sample, self.sim_thresh,self.clusteringWay)
                     for bin_sample in bin_record['feature_rows']])
                 if matches_bin:
                     return bin_id
