@@ -40,11 +40,8 @@ class Geocoder(object):
     @classmethod
     def get_json_geo(cls, address):
         request = urllib.request.Request(cls.make_url_geo(address))
-        print("request", request)
         response = urllib.request.urlopen(request)
-        print("response", response)
         jsn = json.loads(response.read())
-        print("jsn", jsn)
         return jsn
 
     @classmethod
@@ -74,8 +71,6 @@ class Geocoder(object):
         response = urllib.request.urlopen(request)
         parsed_response = json.loads(response.read())
         logging.debug("parsed_response = %s" % parsed_response)
-        print("parsed res", parsed_response)
-        print("restype", type(parsed_response))
         return parsed_response
 
     @classmethod
