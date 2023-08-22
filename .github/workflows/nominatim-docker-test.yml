@@ -27,4 +27,4 @@ jobs:
       run: echo Smoke test
 
     - name: Test nominatim 
-      run: docker-compose -f emission/integrationTests/docker-compose.yml up --wait
+      run: docker-compose -f emission/integrationTests/docker-compose.yml up --exit-code-from web-server

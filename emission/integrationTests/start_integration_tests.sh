@@ -29,4 +29,7 @@ source setup/activate_tests.sh
 
 chmod +x runIntegrationTests.sh
 # tail -f /dev/null
+echo "About to sleep! Zzzz..."
+sleep 120
+echo "Done sleeping! Running integration tests:"
 ./runIntegrationTests.sh
