@@ -1,15 +1,15 @@
-# version: "3"
+version: "3"
 services:
   web-server:
     build: 
       context: .
     depends_on:
       - db
-      - nominatim:
-          condition: service_healthy
+      - nominatim
     environment:
       - DB_HOST=db
       - WEB_SERVER_HOST=0.0.0.0
+      - NOMINATIM_QUERY_URL=http://rhodeisland-nominatim:8080
     volumes:
       # specify the host directory where the source code should live
       # If this is ~/e-mission-server-docker, then you can edit the files at
@@ -19,6 +19,7 @@ services:
     networks:
        - emission
        - nominatim
+    restart: on-failure
   db:
     image: mongo:4.4.0
     ports:
@@ -46,6 +47,11 @@ services:
       - IMPORT_WIKIPEDIA=false
     ports:
       - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-v", "http://localhost:8080"]
+      interval: 1m
+      timeout: 15s
+      retries: 3
     deploy:
       replicas: 1
       restart_policy:
