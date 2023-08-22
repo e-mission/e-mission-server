@@ -1,18 +1,15 @@
-version: "3"
+# version: "3"
 services:
   web-server:
     build: 
       context: .
     depends_on:
       - db
-      - nominatim
+      - nominatim:
+          condition: service_healthy
     environment:
       - DB_HOST=db
       - WEB_SERVER_HOST=0.0.0.0
-    ports:
-      - "8181:8181"
-    links:
-      - nominatim:rhodeisland-nominatim
     volumes:
       # specify the host directory where the source code should live
       # If this is ~/e-mission-server-docker, then you can edit the files at
@@ -21,7 +18,7 @@ services:
       - ../..:/src/e-mission-server
     networks:
        - emission
-       - nominatim-network
+       - nominatim
   db:
     image: mongo:4.4.0
     ports:
@@ -49,7 +46,6 @@ services:
       - IMPORT_WIKIPEDIA=false
     ports:
       - "8080:8080"
-  
     deploy:
       replicas: 1
       restart_policy:
@@ -57,14 +53,11 @@ services:
     volumes:
       - nominatim-data:/var/lib/postgresql/14/main
     networks:
-      - nominatim-network
+      - nominatim
 
 networks:
   emission:
-    name: emission
-  nominatim-network:
-    name: nominatim-network
-    driver: bridge
+  nominatim:
 
 volumes:
   mongo-data:

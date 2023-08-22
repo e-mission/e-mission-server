@@ -16,20 +16,16 @@ else
 fi
 cat conf/storage/db.conf
 
-echo "Python path before setting up conda: $PYTHONPATH"
 echo "Setting up conda..."
 source setup/setup_conda.sh Linux-x86_64
 
-echo "Python path after setup_conda: $PYTHONPATH"
 
 echo "Setting up the test environment..."
 source setup/setup_tests.sh
 
-echo "Python path after setup_tests: $PYTHONPATH"
 
 echo "Running tests..."
 source setup/activate_tests.sh
-echo "Python path after activate_tests: $PYTHONPATH"
 
 chmod +x runIntegrationTests.sh
 # tail -f /dev/null
