@@ -23,7 +23,8 @@ import emission.analysis.modelling.tour_model_first_only.build_save_model as bsm
 import emission.analysis.modelling.tour_model_first_only.evaluation_pipeline as ep
 from emission.analysis.classification.inference.labels.inferrers import predict_cluster_confidence_discounting
 import emission.core.wrapper.entry as ecwe
-import emission.analysis.modelling.tour_model_extended.similarity as eamts
+import emission.analysis.modelling.trip_model.greedy_similarity_binning as eamtg
+import clustering
 # NOTE: tour_model_extended.similarity is on the
 # eval-private-data-compatibility branch in e-mission-server
 
@@ -293,7 +294,7 @@ class RefactoredNaiveCluster(Cluster):
 
         return self
 
-    def fit(self, train_df):
+    def fit(self, train_df,ct_entry):
         # clean data
         logging.info("PERF: Fitting RefactoredNaiveCluster with size %s" % len(train_df))
         self.train_df = self._clean_data(train_df)
@@ -315,17 +316,23 @@ class RefactoredNaiveCluster(Cluster):
         if len(self.train_df) == 0:
             # i.e. no valid trips after removing all nans
             raise Exception('no valid trips; nothing to fit')
-
+        
+        model_config = {
+                "metric": "od_similarity",
+                "similarity_threshold_meters": self.radius,  # meters,
+                "apply_cutoff": False,
+                "clustering_way":'origin' if self.loc_type=='start' 
+                                        else 'destination' if self.loc_type =='end' 
+                                        else 'origin-destination',
+                "incremental_evaluation": False
+            }   
+          
         # fit the bins
-        self.sim_model = eamts.Similarity(self.train_df,
-                                          radius_start=self.radius,
-                                          radius_end=self.radius,
-                                          shouldFilter=False,
-                                          cutoff=False)
-        # we only bin the loc_type points to speed up the alg. avoid
-        # unnecessary binning since this is really slow
-        self.sim_model.bin_helper(loc_type=self.loc_type)
-        labels = self.sim_model.data_df[self.loc_type + '_bin'].to_list()
+        self.sim_model= eamtg.GreedySimilarityBinning(model_config)
+        cleaned_trip_entry= clustering.cleanEntryTypeData(self.train_df,ct_entry)
+        self.sim_model.fit(cleaned_trip_entry)
+
+        labels = [int(l) for l in self.sim_model.tripLabels]
         self.train_df.loc[:, f'{self.loc_type}_cluster_idx'] = labels
         return self
 
@@ -880,13 +887,19 @@ class ClusterExtrapolationClassifier(TripClassifier):
 
         return self
 
-    def fit(self, train_df):
+    def fit(self, train_df,ct_entry):
         # fit clustering model
-        self.end_cluster_model.fit(train_df)
+        if self.__class__.__name__ == 'RefactoredNaiveCluster':
+            self.end_cluster_model.fit(train_df,ct_entry)
+        else:
+            self.end_cluster_model.fit(train_df)
         self.train_df = self.end_cluster_model.train_df
 
         if self.cluster_method in ['trip', 'combination']:
-            self.start_cluster_model.fit(train_df)
+            if self.__class__.__name__ == 'RefactoredNaiveCluster':
+                self.start_cluster_model.fit(train_df,ct_entry)
+            else:
+                self.start_cluster_model.fit(train_df)
             self.train_df.loc[:, ['start_cluster_idx'
                                   ]] = self.start_cluster_model.train_df[[
                                       'start_cluster_idx'
