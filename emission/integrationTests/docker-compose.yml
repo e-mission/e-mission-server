@@ -19,7 +19,7 @@ services:
     networks:
        - emission
        - nominatim
-    restart: on-failure
+
   db:
     image: mongo:4.4.0
     ports:
