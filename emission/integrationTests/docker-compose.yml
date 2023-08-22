@@ -55,10 +55,6 @@ services:
     networks:
       - nominatim-network
 
-networks:
-  emission:
-  nominatim-network:
-
 volumes:
   mongo-data:
   nominatim-data:
