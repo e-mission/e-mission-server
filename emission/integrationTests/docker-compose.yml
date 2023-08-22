@@ -9,6 +9,10 @@ services:
     environment:
       - DB_HOST=db
       - WEB_SERVER_HOST=0.0.0.0
+    ports:
+      - "8181:8181"
+    links:
+      - nominatim:rhodeisland-nominatim
     volumes:
       # specify the host directory where the source code should live
       # If this is ~/e-mission-server-docker, then you can edit the files at
@@ -54,6 +58,13 @@ services:
       - nominatim-data:/var/lib/postgresql/14/main
     networks:
       - nominatim-network
+
+networks:
+  emission:
+    name: emission
+  nominatim-network:
+    name: nominatim-network
+    driver: bridge
 
 volumes:
   mongo-data:
