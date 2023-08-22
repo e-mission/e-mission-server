@@ -30,8 +30,8 @@ class Geocoder(object):
             "q" : address,
             "format" : "json"
         }
-
-        query_url = NOMINATIM_QUERY_URL + "/search?"
+#testing calling by the name of the service/network
+        query_url = "http://nominatim" + "/search?"
         encoded_params = urllib.parse.urlencode(params)
         url = query_url + encoded_params
         logging.debug("For geocoding, using URL %s" % url)
@@ -59,7 +59,7 @@ class Geocoder(object):
             "format" : "json"
         }
 
-        query_url = NOMINATIM_QUERY_URL + "/reverse?"
+        query_url = "http://localhost:8080" + "/reverse?"
         encoded_params = urllib.parse.urlencode(params)
         url = query_url + encoded_params
         logging.debug("For reverse geocoding, using URL %s" % url)
