@@ -9,7 +9,7 @@ RUN apt-get install -y curl
 RUN echo "About to copy e-mission server code"
 COPY start_integration_tests.sh/ /start_integration_tests.sh
 
-ENV NOMINATIM_QUERY_URL='http://rhodeisland-nominatim:8080'
+ENV NOMINATIM_QUERY_URL='http://nominatim:8080'
 
 # CMD ["python", "../individual_tests/TestNominatim.py"]
 CMD ["/bin/bash", "/start_integration_tests.sh"]

@@ -31,7 +31,7 @@ class Geocoder(object):
             "format" : "json"
         }
 #testing calling by the name of the service/network
-        query_url = "http://nominatim:8080" + "/search?"
+        query_url = NOMINATIM_QUERY_URL + "/search?"
         encoded_params = urllib.parse.urlencode(params)
         url = query_url + encoded_params
         logging.debug("For geocoding, using URL %s" % url)
@@ -59,7 +59,7 @@ class Geocoder(object):
             "format" : "json"
         }
 
-        query_url = "http://mediagis/nominatim:4.2:8080" + "/reverse?"
+        query_url = NOMINATIM_QUERY_URL + "/reverse?"
         encoded_params = urllib.parse.urlencode(params)
         url = query_url + encoded_params
         logging.debug("For reverse geocoding, using URL %s" % url)
