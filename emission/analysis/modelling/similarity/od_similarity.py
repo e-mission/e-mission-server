@@ -16,6 +16,16 @@ class OriginDestinationSimilarity(eamss.SimilarityMetric):
         return ctfe.od_features(trip)
 
     def similarity(self, a: List[float], b: List[float]) -> List[float]:
-        o_dist = ecc.calDistance([a[0], a[1]], [b[0], b[1]])
-        d_dist = ecc.calDistance([a[2], a[3]], [b[2], b[3]])
-        return [o_dist, d_dist]
+        """
+        a : a list of point features that can take either of two forms
+                    1. [point1_latitude,point1_longitude]  
+                    2. [point1_latitude,point1_longitude,point2_latitude,point2_longitude] 
+                    
+        b : a list of point features that can take either of two forms
+                    1. [point1_latitude,point1_longitude]  
+                    2. [point1_latitude,point1_longitude,point2_latitude,point2_longitude] 
+        """
+        point_dist = [ecc.calDistance(a[i:i+2], b[i:i+2]) 
+                      for i in range (0,len(a),2)] 
+        
+        return point_dist

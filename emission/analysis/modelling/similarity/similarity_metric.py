@@ -27,21 +27,17 @@ class SimilarityMetric(metaclass=ABCMeta):
         """
         pass
 
-    def similar(self, a: List[float], b: List[float], thresh: float, clusteringWay :str = 'origin-destination') -> bool:
+    def similar(self, a: List[float], b: List[float], thresh: float) -> bool:
         """compares the features, returning true if they are similar
         within some threshold
 
-        :param a: features for a trip
+        :param a: features for a trip , 
         :param b: features for another trip
         :param thresh: threshold for similarity
-        :clusterinWay: clustering based on origin/destination/origin-destination-pair
+        :clusteringWay: clustering based on origin/destination/origin-destination-pair
         :return: true if the feature similarity is within some threshold
         """
         similarity_values = self.similarity(a, b)
-        if clusteringWay == 'origin':
-            is_similar = similarity_values[0] <= thresh
-        elif clusteringWay == 'destination':
-            is_similar = similarity_values[1] <= thresh
-        else:
-            is_similar = all(map(lambda sim: sim <= thresh, similarity_values))
+        is_similar = all(sim <= thresh for sim in similarity_values)
+
         return is_similar
