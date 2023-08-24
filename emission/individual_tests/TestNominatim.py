@@ -6,6 +6,7 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import *
 import unittest
+import unittest.mock as mock
 import os
 from emission.core.wrapper.trip_old import Coordinate
 import emission.net.ext_service.geocoder.nominatim as eco
@@ -22,8 +23,9 @@ class NominatimTest(unittest.TestCase):
         actual_result = eco.Geocoder.make_url_geo("Providence, Rhode Island")
         self.assertEqual(expected_result, actual_result)
 
+#we ignore the place_id because it is an internal Nominatim identifier 
     def test_get_json_geo(self):
-        expected_result = [{'place_id': 139763, 'licence': 'Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright', 'osm_type': 'way', 'osm_id': 121496393, 'boundingbox': ['41.8237547', '41.8243153', '-71.4132816', '-71.4125278'], 'lat': '41.824034499999996', 'lon': '-71.41290469687814', 'display_name': 'Providence City Hall, Fulton Street, Downtown, Providence, Providence County, 02903, United States', 'class': 'amenity', 'type': 'townhall', 'importance': 1.25001}]
+        expected_result = [{'place_id': mock.ANY, 'licence': 'Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright', 'osm_type': 'way', 'osm_id': 121496393, 'boundingbox': ['41.8237547', '41.8243153', '-71.4132816', '-71.4125278'], 'lat': '41.824034499999996', 'lon': '-71.41290469687814', 'display_name': 'Providence City Hall, Fulton Street, Downtown, Providence, Providence County, 02903, United States', 'class': 'amenity', 'type': 'townhall', 'importance': 1.25001}]
         actual_result = eco.Geocoder.get_json_geo("Providence City Hall, Fulton Street, Downtown, Providence, Providence County, 02903, United States")
         self.assertEqual(expected_result, actual_result)
 
@@ -42,10 +44,9 @@ class NominatimTest(unittest.TestCase):
         actual_result = (eco.Geocoder.make_url_reverse(41.8239891, -71.4128343))
         self.assertEqual(expected_result, actual_result)
  
- #started modifying this test to potentially use three results: ground truth, nominatim in docker container (specific version), and regular nominatim query (most current version)
- #if this is necessary, it will help us see if the container or query needs to be updated for nominatim compatibility.
+#we ignore the place_id because it is an internal Nominatim identifier 
     def test_get_json_reverse(self):
-        expected_result = {'place_id': 139763, 'licence': 'Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright', 'osm_type': 'way', 'osm_id': 121496393, 'lat': '41.824034499999996', 'lon': '-71.41290469687814', 'display_name': 'Providence City Hall, Fulton Street, Downtown, Providence, Providence County, 02903, United States', 'address': {'amenity': 'Providence City Hall', 'road': 'Fulton Street', 'neighbourhood': 'Downtown', 'city': 'Providence', 'county': 'Providence County', 'postcode': '02903', 'country': 'United States', 'country_code': 'us'}, 'boundingbox': ['41.8237547', '41.8243153', '-71.4132816', '-71.4125278']}
+        expected_result = {'place_id': mock.ANY, 'licence': 'Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright', 'osm_type': 'way', 'osm_id': 121496393, 'lat': '41.824034499999996', 'lon': '-71.41290469687814', 'display_name': 'Providence City Hall, Fulton Street, Downtown, Providence, Providence County, 02903, United States', 'address': {'amenity': 'Providence City Hall', 'road': 'Fulton Street', 'neighbourhood': 'Downtown', 'city': 'Providence', 'county': 'Providence County', 'postcode': '02903', 'country': 'United States', 'country_code': 'us'}, 'boundingbox': ['41.8237547', '41.8243153', '-71.4132816', '-71.4125278']}
         actual_docker = eco.Geocoder.get_json_reverse(41.8239891, -71.4128343)
         # actual_nominatim = "httsp://nominatim.openstreetmap.org/"
         self.assertEqual(expected_result, actual_docker)
