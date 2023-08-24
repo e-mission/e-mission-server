@@ -22,9 +22,16 @@ class OriginDestinationSimilarity(eamss.SimilarityMetric):
                     2. [point1_latitude,point1_longitude,point2_latitude,point2_longitude] 
                     
         b : a list of point features that can take either of two forms
-                    1. [point1_latitude,point1_longitude]  
-                    2. [point1_latitude,point1_longitude,point2_latitude,point2_longitude] 
+                    1. [point3_latitude,point3_longitude]  
+                    2. [point3_latitude,point3_longitude,point4_latitude,point4_longitude] 
+            
+            It'll always take the same form as parameter a.
+
+        return: a list of size 1 ([distance between point1-point3]) if a and b take form 1
+                or of size 2 ([distance between point1-point3, distance between point2-point4])
+                if a and b take form 2.
         """
+        
         point_dist = [ecc.calDistance(a[i:i+2], b[i:i+2]) 
                       for i in range (0,len(a),2)] 
         

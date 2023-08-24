@@ -31,10 +31,9 @@ class SimilarityMetric(metaclass=ABCMeta):
         """compares the features, returning true if they are similar
         within some threshold
 
-        :param a: features for a trip , 
+        :param a: features for a trip 
         :param b: features for another trip
         :param thresh: threshold for similarity
-        :clusteringWay: clustering based on origin/destination/origin-destination-pair
         :return: true if the feature similarity is within some threshold
         """
         similarity_values = self.similarity(a, b)
