@@ -440,3 +440,15 @@ class BuiltinTimeSeries(esta.TimeSeries):
         logging.debug("updating entry %s into timeseries" % new_entry)
         edb.save(ts.get_timeseries_db(key), new_entry)
 
+    def count_data(self, key, extra_query_list):
+        """
+        Returns the total number of documents for the specific key referring to a timeseries db.
+        Additional keys can be passed as an optional list for filtering data.
+        """
+        logging.debug("count_data timeseries called")
+        created_query = self._get_query([key], extra_query_list)
+        result_dataset = self.get_timeseries_db(key)
+        total_entries = result_set.count_documents(created_query)
+        return total_entries
+
+
