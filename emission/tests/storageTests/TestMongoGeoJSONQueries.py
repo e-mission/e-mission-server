@@ -39,6 +39,23 @@ class TestGeoJSON(unittest.TestCase):
     self.assertEqual(retVal[0]['text'], "My first blog post!")
     self.assertEqual(retVal[0]['loc']['coordinates'], [100,32])
 
+  def testGeoWithinCounts(self):
+    post1 = {"author": "Mike",
+           "text": "My first blog post!",
+           "tags": ["mongodb", "python", "pymongo"],
+           'loc':{'type':'Point', 'coordinates':[100,32]}}
+    self.Sections.insert_one(post1)
+    post2 = {"author": "hh",
+           "text": "My 2 blog post!",
+           "tags": ["mongodb", "python", "pymongo"],
+           "loc":{'type':'Point', 'coordinates':[200,30]}}
+    self.Sections.insert_one(post2)
+
+    retVal = []
+    matching_counts = self.Sections.count_documents({ "loc" : { "$geoWithin" : { "$polygon" :[ [ 90,31 ],[90,40] ,[ 110,40 ],[110,31]] } } })
+
+    self.assertEqual(matching_counts, 1)
+
   def getTestPolygon(self):
     return [ [ 90.234,-31.0323 ],[95.0343,-45.03453] ,[ 110.02322,-43.3435 ],[100.343423,-33.33423]]
 
