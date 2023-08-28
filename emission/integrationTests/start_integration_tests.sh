@@ -32,5 +32,5 @@ chmod +x runIntegrationTests.sh
 # echo "About to sleep! Zzzz..."
 # sleep 240
 # echo "Done sleeping! Running integration tests:"
-dockerize -wait http://rhodeisland-nominatim:8080 
+dockerize -wait http://rhodeisland-nominatim:8080 -timeout 160s
 ./runIntegrationTests.sh
