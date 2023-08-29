@@ -448,7 +448,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
         logging.debug("count_data timeseries called")
         created_query = self._get_query([key], extra_query_list)
         result_dataset = self.get_timeseries_db(key)
-        total_entries = result_set.count_documents(created_query)
+        total_entries = result_dataset.count_documents(created_query)
         return total_entries
 
 
