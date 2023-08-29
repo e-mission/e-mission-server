@@ -81,6 +81,22 @@ class TestTimeSeries(unittest.TestCase):
         with self.assertRaises(AttributeError):
             list(ts.find_entries(time_query=tq, extra_query_list=[ignored_phones]))
 
+    def testCountData(self):
+        '''
+        Test 1 : Specific key with empty extra_queries
+        key = 'background/location', extra_query_list = []
+        Results in empty query = {}, which matches all documents for a user for that key.
+        Hence should return total count of all documents matching that key.
+        Testing this with sample dataset: "shankari_2015-aug-27"
+        '''
+        ts = esta.TimeSeries.get_time_series(self.testUUID)
+        total_count = ts.count_data("background/location",[])
+        print(total_count)
+        self.assertEqual(total_count, 555)
+        print("Assert Test for Count Data successful!")
+
+
+
 if __name__ == '__main__':
     import emission.tests.common as etc
     etc.configLogging()

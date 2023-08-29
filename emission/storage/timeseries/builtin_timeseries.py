@@ -446,7 +446,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
         Additional keys can be passed as an optional list for filtering data.
         """
         logging.debug("count_data timeseries called")
-        created_query = self._get_query([key], extra_query_list)
+        created_query = self._get_query(key_list=[key], extra_query_list=extra_query_list)
         result_dataset = self.get_timeseries_db(key)
         total_entries = result_dataset.count_documents(created_query)
         return total_entries
