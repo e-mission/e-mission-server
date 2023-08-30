@@ -24,6 +24,12 @@ import emission.analysis.modelling.tour_model_first_only.evaluation_pipeline as 
 from emission.analysis.classification.inference.labels.inferrers import predict_cluster_confidence_discounting
 import emission.core.wrapper.entry as ecwe
 import emission.analysis.modelling.trip_model.greedy_similarity_binning as eamtg
+import emission.analysis.modelling.tour_model.similarity as eamts
+import emission.analysis.modelling.trip_model.model_storage as eamums
+import emission.analysis.modelling.trip_model.model_type as eamumt
+import emission.analysis.modelling.trip_model.run_model as eamur
+
+
 import clustering
 # NOTE: tour_model_extended.similarity is on the
 # eval-private-data-compatibility branch in e-mission-server
@@ -343,9 +349,9 @@ class RefactoredNaiveCluster(Cluster):
         self.test_df = self._clean_data(test_df)
 
         if self.loc_type == 'start':
-            bins = self.sim_model.start_bins
+            bins = self.sim_model.bins
         elif self.loc_type == 'end':
-            bins = self.sim_model.end_bins
+            bins = self.sim_model.bins
 
         labels = []
 
@@ -376,7 +382,7 @@ class RefactoredNaiveCluster(Cluster):
             copied from the Similarity class on the e-mission-server. 
         """
         for t_idx in bin:
-            trip_in_bin = self.train_df.iloc[t_idx]
+            trip_in_bin = self.train_df.iloc[int(t_idx)]
             if not self._distance_helper(trip, trip_in_bin, loc_type):
                 return False
         return True
@@ -666,21 +672,29 @@ class NaiveBinningClassifier(TripClassifier):
         # only accepts lists of Entry objects
         train_trips = self._trip_df_to_list(train_df)
 
-        sim, bins, bin_trips, train_trips = ep.first_round(
-            train_trips, self.radius)
+        
+        model_config = {
+            "metric": "od_similarity",
+            "similarity_threshold_meters": self.radius,  # meters,
+            "apply_cutoff": False,
+            "clustering_way": "origin-destination", #cause thats what is set in performance_eval.py for this model
+            "incremental_evaluation": False
+        }    
 
+        sim_model = eamtg.GreedySimilarityBinning(model_config)
+        sim_model.fit(train_trips)
         # set instance variables so we can access results later as well
-        self.sim = sim
-        self.bins = bins
+        self.sim = sim_model
+        self.bins = sim_model.bins
 
         # save all user labels
         user_id = train_df.user_id.iloc[0]
-        bsm.save_models('user_labels',
-                        bsm.create_user_input_map(train_trips, bins), user_id)
+        model_type=eamumt.ModelType.GREEDY_SIMILARITY_BINNING
+        model_storage=eamums.ModelStorage.DOCUMENT_DATABASE
+        model_data_next=sim_model.to_dict()
+        last_done_ts = eamur._latest_timestamp(train_trips)
+        eamums.save_model(user_id, model_type, model_data_next, last_done_ts, model_storage)
 
-        # save location features of all bins
-        bsm.save_models('locations', bsm.create_location_map(train_trips, bins),
-                        user_id)
         return self
 
     def predict_proba(self, test_df):
