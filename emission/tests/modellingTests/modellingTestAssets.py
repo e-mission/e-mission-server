@@ -131,6 +131,7 @@ def generate_mock_trips(
     trips,
     origin, 
     destination, 
+    trip_part='od',
     label_data = None, 
     within_threshold = None,
     start_ts: None = None,
@@ -159,6 +160,17 @@ def generate_mock_trips(
     :param trips: number of trips
     :param origin: origin coordinates
     :param destination: destination coordinates
+    :param trip_part: when mock trips are generated, coordinates of this part of 
+                      the trips will be within the threshold. trip_part can take one
+                      among the four values:
+                    1. '__' ->(None, meaning NEITHER origin nor destination of any trip will lie 
+                     within the mentioned threshold when trips are generated),        
+                    2. 'o_' ->(origin, meaning ONLY origin of m trips will lie within the mentioned 
+                     threshold when trips are generated),        
+                    3. '_d' ->(destination),meaning ONLY destination of m trips will lie within the 
+                     mentioned threshold when trips are generated)        
+                    4. 'od' ->(origin and destination,meaning BOTH origin and destination of m trips
+                     will lie within the mentioned threshold when trips are generated)
     :param label_data: dictionary of label data, see above, defaults to None
     :param within_threshold: number of trips that should fall within the provided
            distance threshold in degrees WGS84, defaults to None
@@ -175,8 +187,8 @@ def generate_mock_trips(
     trips_within_threshold = [i < within for i in range(trips)]
     result = []
     for within in trips_within_threshold:
-        o = generate_trip_coordinates(origin, within, threshold, max)
-        d = generate_trip_coordinates(destination, within, threshold, max)
+        o = generate_trip_coordinates(origin, (trip_part[0] == 'o' and within), threshold, max)
+        d = generate_trip_coordinates(destination, (trip_part[1] == 'd' and within), threshold, max)
         labels = {} if label_data is None or random.random() > has_label_p \
             else sample_trip_labels(
             mode_labels=label_data.get('mode_confirm'),
