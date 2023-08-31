@@ -59,6 +59,7 @@ class TestBackwardsCompat(unittest.TestCase):
             "metric": "od_similarity",
             "similarity_threshold_meters": 16000,      # meters,
             "apply_cutoff": False,
+            "clustering_way": 'origin-destination',
             "incremental_evaluation": False
         }
         new_builder = eamtg.GreedySimilarityBinning(model_config)
@@ -96,6 +97,7 @@ class TestBackwardsCompat(unittest.TestCase):
             trips=n, 
             origin=(0, 0), 
             destination=(1, 1), 
+            trip_part='od',
             label_data=label_data, 
             threshold=0.001,  # ~ 111 meters in degrees WGS84
         )
@@ -113,6 +115,7 @@ class TestBackwardsCompat(unittest.TestCase):
             "metric": "od_similarity",
             "similarity_threshold_meters": 500,      # meters,
             "apply_cutoff": False,
+            "clustering_way": 'origin-destination',
             "incremental_evaluation": False
         }
         new_model = eamtg.GreedySimilarityBinning(model_config)
@@ -156,6 +159,7 @@ class TestBackwardsCompat(unittest.TestCase):
             trips=n, 
             origin=(0, 0), 
             destination=(1, 1), 
+            trip_part='od', 
             label_data=label_data, 
             threshold=0.1,  # Much bigger than the 500m threshold, so we will get multiple bins
         )
@@ -173,6 +177,7 @@ class TestBackwardsCompat(unittest.TestCase):
             "metric": "od_similarity",
             "similarity_threshold_meters": 500,      # meters,
             "apply_cutoff": False,
+            "clustering_way": 'origin-destination',
             "incremental_evaluation": False
         }
         new_model = eamtg.GreedySimilarityBinning(model_config)

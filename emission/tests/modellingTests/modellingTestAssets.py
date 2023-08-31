@@ -211,6 +211,6 @@ if __name__ == '__main__':
         "purpose_confirm": ['work', 'home', 'school'],
         "replaced_mode": ['walk', 'bike', 'drive']
     }
-    result = generate_mock_trips('joe-bob', 14, [0, 0], [1,1], label_data, 6)
+    result = generate_mock_trips('joe-bob', 14, [0, 0], [1,1],'od', label_data, 6)
     for r in result:
         print(r)
