@@ -81,18 +81,30 @@ class TestTimeSeries(unittest.TestCase):
         with self.assertRaises(AttributeError):
             list(ts.find_entries(time_query=tq, extra_query_list=[ignored_phones]))
 
-    def testCountData(self):
+    def testFindEntriesCount(self):
         '''
-        Test 1 : Specific key with empty extra_queries
-        key = 'background/location', extra_query_list = []
-        Results in empty query = {}, which matches all documents for a user for that key.
-        Hence should return total count of all documents matching that key.
-        Testing this with sample dataset: "shankari_2015-aug-27"
+        Test: Specific keys with other parameters not passed values.
+        Input: For each dataset: ["background/location", "background/filtered_location]
+            - Testing this with sample dataset: "shankari_2015-aug-21", "shankari_2015-aug-27"
+        Output: Aug_21: [738, 508], Aug_27: [555, 327]
+            - Actual output just returns a single number for count of entries.
+            - Validated using grep count of occurrences for keys: 1) "background/location"     2) "background/filtered_location"
+                - $ grep -c <key> <dataset>.json
         '''
-        ts = esta.TimeSeries.get_time_series(self.testUUID)
-        total_count = ts.count_data("background/location",[])
-        print(total_count)
-        self.assertEqual(total_count, 555)
+        # Fetching the two test datasets defined in setup()
+        ts1_aug_21 = esta.TimeSeries.get_time_series(self.testUUID1)
+        ts2_aug_27 = esta.TimeSeries.get_time_series(self.testUUID)
+
+        # Counts for each of the two keys in each dataset
+        count_ts1 = [ts1_aug_21.find_entries_count(key="background/location"), ts1_aug_21.find_entries_count(key="background/filtered_location")]
+        count_ts2 = [ts2_aug_27.find_entries_count(key="background/location"), ts2_aug_27.find_entries_count(key="background/filtered_location")]
+
+        print("\nEntry counts for location, filtered_location on {} = {}".format("Aug_21", count_ts1))
+        print("Entry counts for location, filtered_location on {} = {}".format("Aug_27", count_ts2))
+
+        self.assertEqual(count_ts1, [738, 508])
+        self.assertEqual(count_ts2, [555, 327])
+
         print("Assert Test for Count Data successful!")
 
 

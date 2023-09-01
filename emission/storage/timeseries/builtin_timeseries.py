@@ -440,13 +440,16 @@ class BuiltinTimeSeries(esta.TimeSeries):
         logging.debug("updating entry %s into timeseries" % new_entry)
         edb.save(ts.get_timeseries_db(key), new_entry)
 
-    def count_data(self, key, extra_query_list):
+    def find_entries_count(self, key, time_query = None, geo_query = None, extra_query_list = None):
         """
         Returns the total number of documents for the specific key referring to a timeseries db.
-        Additional keys can be passed as an optional list for filtering data.
+        :param key: the metadata key we are querying for. Only supports one key for now.
+        :param time_query: the time range in which to search the stream
+        :param geo_query: the query for a geographical area
+        :param extra_query_list: any additional queries to filter out data
         """
-        logging.debug("count_data timeseries called")
-        created_query = self._get_query(key_list=[key], extra_query_list=extra_query_list)
+        logging.debug("builtin_timeseries.find_entries_count() called")
+        created_query = self._get_query([key], time_query, geo_query, extra_query_list)
         result_dataset = self.get_timeseries_db(key)
         total_entries = result_dataset.count_documents(created_query)
         return total_entries
