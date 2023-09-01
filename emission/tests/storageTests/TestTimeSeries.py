@@ -91,23 +91,19 @@ class TestTimeSeries(unittest.TestCase):
             - Validated using grep count of occurrences for keys: 1) "background/location"     2) "background/filtered_location"
                 - $ grep -c <key> <dataset>.json
         '''
-        # Fetching the two test datasets defined in setup()
         ts1_aug_21 = esta.TimeSeries.get_time_series(self.testUUID1)
         ts2_aug_27 = esta.TimeSeries.get_time_series(self.testUUID)
 
-        # Counts for each of the two keys in each dataset
         count_ts1 = [ts1_aug_21.find_entries_count(key="background/location"), ts1_aug_21.find_entries_count(key="background/filtered_location")]
-        count_ts2 = [ts2_aug_27.find_entries_count(key="background/location"), ts2_aug_27.find_entries_count(key="background/filtered_location")]
-
         print("\nEntry counts for location, filtered_location on {} = {}".format("Aug_21", count_ts1))
-        print("Entry counts for location, filtered_location on {} = {}".format("Aug_27", count_ts2))
-
         self.assertEqual(count_ts1, [738, 508])
+
+        count_ts2 = [ts2_aug_27.find_entries_count(key="background/location"), ts2_aug_27.find_entries_count(key="background/filtered_location")]
+        print("Entry counts for location, filtered_location on {} = {}".format("Aug_27", count_ts2))
         self.assertEqual(count_ts2, [555, 327])
 
         print("Assert Test for Count Data successful!")
-
-
+        
 
 if __name__ == '__main__':
     import emission.tests.common as etc
