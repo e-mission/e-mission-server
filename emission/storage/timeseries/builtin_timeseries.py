@@ -440,18 +440,63 @@ class BuiltinTimeSeries(esta.TimeSeries):
         logging.debug("updating entry %s into timeseries" % new_entry)
         edb.save(ts.get_timeseries_db(key), new_entry)
 
-    def find_entries_count(self, key, time_query = None, geo_query = None, extra_query_list = None):
+    def find_entries_count(self, key_list = None, time_query = None, geo_query = None, extra_query_list = None):
         """
-        Returns the total number of documents for the specific key referring to a timeseries db.
-        :param key: the metadata key we are querying for. Only supports one key for now.
+        Returns the total number of documents for the given key_list referring to each of the two timeseries db.
+
+        Input: Key list with keys from both timeseries DBs = [key1, key2, key3, key4, ...]
+                Suppose (key1, key2) are orig_tsdb keys and (key3, key4) are analysis_tsdb keys
+        Output: Tuple of lists  = (orig_tsdb_count, analysis_tsdb_count)
+                                = ([count_key1, count_key2, ...], [count_key3, count_key4, ...])
+                Orig_tsdb_count and Analysis_tsdb_count are lists containing counts of matching documents 
+                for each key considered separately for the specific timeseries DB.
+
+        :param key_list: list of metadata keys we are querying for.
         :param time_query: the time range in which to search the stream
         :param geo_query: the query for a geographical area
         :param extra_query_list: any additional queries to filter out data
+
+        For key_list = None, total count of all documents are returned for each of the matching timeseries DBs.
         """
         logging.debug("builtin_timeseries.find_entries_count() called")
-        created_query = self._get_query([key], time_query, geo_query, extra_query_list)
-        result_dataset = self.get_timeseries_db(key)
-        total_entries = result_dataset.count_documents(created_query)
-        return total_entries
+        
+        orig_tsdb = self.timeseries_db
+        analysis_tsdb = self.analysis_timeseries_db
+        
+        orig_tsdb_counts = []
+        analysis_tsdb_counts = []
+
+        if key_list == [] or key_list is None:
+            key_list = None
+        
+        # Segregate orig_tsdb and analysis_tsdb keys
+        (orig_tsdb_keys, analysis_tsdb_keys) = self._split_key_list(key_list)
+
+        orig_tsdb_counts = self._get_entries_counts_for_timeseries(orig_tsdb, orig_tsdb_keys, time_query, geo_query, extra_query_list)
+        analysis_tsdb_counts = self._get_entries_counts_for_timeseries(analysis_tsdb, analysis_tsdb_keys, time_query, geo_query, extra_query_list)
+
+        return (orig_tsdb_counts, analysis_tsdb_counts)
+
+
+    def _get_entries_counts_for_timeseries(self, tsdb, key_list, time_query, geo_query, extra_query_list):
+        
+        tsdb_queries = []
+        tsdb_counts = []
+
+        # For each key in orig_tsdb keys, create a query
+        if key_list is not None:
+            for key in key_list:
+                tsdb_query = self._get_query([key], time_query, geo_query, extra_query_list)
+                tsdb_queries.append(tsdb_query)
+            # For each query generated for each orig_tsdb key, fetch count of matching documents
+            for query in tsdb_queries:
+                entries_count = tsdb.count_documents(query)
+                tsdb_counts.append(entries_count)
+        else:
+            tsdb_queries = self._get_query(key_list, time_query, geo_query, extra_query_list)
+            entries_count = tsdb.count_documents(tsdb_queries)
+            tsdb_counts = [entries_count]
+
+        return tsdb_counts      
 
 

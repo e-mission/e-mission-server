@@ -84,24 +84,76 @@ class TestTimeSeries(unittest.TestCase):
     def testFindEntriesCount(self):
         '''
         Test: Specific keys with other parameters not passed values.
-        Input: For each dataset: ["background/location", "background/filtered_location]
+        Input: For each dataset: ["background/location", "background/filtered_location", "analysis/confirmed_trip"]
             - Testing this with sample dataset: "shankari_2015-aug-21", "shankari_2015-aug-27"
-        Output: Aug_21: [738, 508], Aug_27: [555, 327]
+        Output: Aug_21: ([738, 508], [0]), Aug_27: ([555, 327], [0])
             - Actual output just returns a single number for count of entries.
             - Validated using grep count of occurrences for keys: 1) "background/location"     2) "background/filtered_location"
                 - $ grep -c <key> <dataset>.json
+        
+        For Aggregate Timeseries test case:
+        - UUID('e66d0a3a-4316-4d9d-ac66-ee3754081d09') is returned as only distinct user which is stored in monogDB as BinData datatype.
+        - Validated the count of documents for the keys using mongo DB access via terminal.
+        - Ran these queries inside mongo terminal to get the counts:
+        $ db.Stage_timeseries.find({$and: [{"user_id" : BinData(3,"5m0KOkMWTZ2sZu43VAgdCQ==")}, {"metadata.key" : "background/location"}]}).count()
+        $ db.Stage_timeseries.find({$and: [{"user_id" : BinData(3,"5m0KOkMWTZ2sZu43VAgdCQ==")}, {"metadata.key" : "background/filtered_location"}]}).count()
+        $ db.Stage_analysis_timeseries.find({$and: [{"user_id" : BinData(3,"5m0KOkMWTZ2sZu43VAgdCQ==")}, {"metadata.key" : "analysis/confirmed_trip"}]}).count() 
+
+        - The counts returned were 1476, 1016, 5, respectively.
         '''
+
         ts1_aug_21 = esta.TimeSeries.get_time_series(self.testUUID1)
         ts2_aug_27 = esta.TimeSeries.get_time_series(self.testUUID)
 
-        count_ts1 = [ts1_aug_21.find_entries_count(key="background/location"), ts1_aug_21.find_entries_count(key="background/filtered_location")]
-        print("\nEntry counts for location, filtered_location on {} = {}".format("Aug_21", count_ts1))
-        self.assertEqual(count_ts1, [738, 508])
+        # Test case: Combination of original and analysis timeseries DB keys for Aug-21 dataset
+        key_list1=["background/location", "background/filtered_location", "analysis/confirmed_trip"]
+        count_ts1 = ts1_aug_21.find_entries_count(key_list=key_list1)
+        self.assertEqual(count_ts1, ([738, 508], [0]))
 
-        count_ts2 = [ts2_aug_27.find_entries_count(key="background/location"), ts2_aug_27.find_entries_count(key="background/filtered_location")]
-        print("Entry counts for location, filtered_location on {} = {}".format("Aug_27", count_ts2))
-        self.assertEqual(count_ts2, [555, 327])
+        # Test case: Combination of original and analysis timeseries DB keys for Aug-27 dataset
+        key_list1=["background/location", "background/filtered_location", "analysis/confirmed_trip"]
+        count_ts2 = ts2_aug_27.find_entries_count(key_list=key_list1)
+        self.assertEqual(count_ts2, ([555, 327], [0]))
 
+        # Test case: Only original timeseries DB keys for Aug-27 dataset
+        key_list2=["background/location", "background/filtered_location"]
+        count_ts3 = ts2_aug_27.find_entries_count(key_list=key_list2)
+        self.assertEqual(count_ts3, ([555, 327], []))
+
+        # Test case: Only analysis timeseries DB keys
+        key_list3=["analysis/confirmed_trip"]
+        count_ts4 = ts2_aug_27.find_entries_count(key_list=key_list3)
+        self.assertEqual(count_ts4, ([], [0]))
+
+        # Test case: Empty key_list which should return total count of all documents in the two DBs
+        key_list4=[]
+        count_ts5 = ts1_aug_21.find_entries_count(key_list=key_list4)
+        self.assertEqual(count_ts5, ([2125], [0]))
+
+        # Test case: Invalid or unmatched key in metadata field 
+        key_list5=["randomxyz_123test"]
+        with self.assertRaises(KeyError) as ke:
+            count_ts6 = ts1_aug_21.find_entries_count(key_list=key_list5)
+        self.assertEqual(str(ke.exception), "'randomxyz_123test'")
+
+        # Test case: Aggregate timeseries DB User data passed as input
+        ts_agg = esta.TimeSeries.get_aggregate_time_series()
+        users_distinct = ts_agg.get_distinct_users()
+        for uuid in users_distinct:
+            ts_user_ag = esta.TimeSeries.get_time_series(uuid)
+            count_ts7 = ts_user_ag.find_entries_count(key_list=key_list1)
+            self.assertEqual(count_ts7, ([1476, 1016], [5]))
+
+        # Test case: New User created with no data to check
+        self.testEmail = None
+        self.testUUID2 = self.testUUID
+        etc.createAndFillUUID(self)
+        ts_new_user = esta.TimeSeries.get_time_series(self.testUUID)
+        count_ts8 = ts_new_user.find_entries_count(key_list=key_list1)
+        self.assertEqual(count_ts8, ([0, 0], [0]))
+        self.testUUID = self.testUUID2
+        self.testEmail = "user2"
+        
         print("Assert Test for Count Data successful!")
         
 
