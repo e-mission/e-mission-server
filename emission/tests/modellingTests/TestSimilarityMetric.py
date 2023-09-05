@@ -1,98 +1,61 @@
 import unittest
-import emission.tests.modellingTests.modellingTestAssets as etmm
 import emission.analysis.modelling.similarity.od_similarity as eamso
+import emission.tests.modellingTests.utilities as etmu
 
 class TestSimilarityMetric(unittest.TestCase):
 
     def testODsAreSimilar(self):
         generate_points_thresh = 0.001  # approx. 111 meters
-        similarity_threshold = 111  # 
-
+        similarity_threshold = 500  # in meters
         metric = eamso.OriginDestinationSimilarity()
-        ## Sub-Test 1 - 3 :
-        # random, but, origin and destination points are sampled within a circle and should always be < sim threshold
-        # Since both origin and destination poitns lie within threshold limits,they should be similar
-        # when we check by just origin or just destination or both origin-and-destination
 
-        trips = etmm.generate_mock_trips('bob', 2, [0, 0], [1, 1], 'od',threshold=generate_points_thresh) 
-        coords0 = metric.extract_features(trips[0])
-        coords1 = metric.extract_features(trips[1])        
-        similarOD1 = metric.similar(coords0, coords1, similarity_threshold)
-        similarOD2 = metric.similar(coords0[:2], coords1[:2], similarity_threshold)
-        similarOD3 = metric.similar(coords0[2:], coords1[2:], similarity_threshold)
+        # parameters passed for testing is set here. A list, where each element of this list takes the form 
+        # [trip part to be sampled within mentioned threshold, (start_coord,end_coord)]
+        # Since the extracted_features function returns in the form [origin_lat,origin_long,destination_lat,destination_long],
+        # if clustering is to be done by :
+        #   a.origin, we pass first two values of this list,i.e. from 0 till before 2 index
+        #   b.destination, we pas last two values of this list,i.e. from 2 till before 4 index
+        #   c.origin-destination, we pass the entire list , i.e. from 0 till before 4 index
+        parameters= [["od",(0,4)],["_d",(2,4)],["o_",(0,2)]]
 
-        ## Sub-Test 4 :
-        # random, but, only origin points are sampled within a circle and should always be < sim threshold
-        # Since origin of two points lies within threshold limits,they should be similar
-        # when we check just origin for similarity.
-
-
-        trips = etmm.generate_mock_trips('alice', 2, [0, 0], [1, 1], 'o_',threshold=generate_points_thresh)        
-        coords0 = metric.extract_features(trips[0])[:2]
-        coords1 = metric.extract_features(trips[1])[:2]        
-        similarO = metric.similar(coords0, coords1, similarity_threshold)
-
-        ##Sub-Test 5 :
-        # random, but, only destination points are sampled within a circle and should always be < sim threshold
-        # Since destination of two points lies within threshold limits,they should be similar
-        # when we check just destination for similarity.
-
-        trips = etmm.generate_mock_trips('Caty', 2, [0, 0], [1, 1], '_d',threshold=generate_points_thresh)        
-        coords0 = metric.extract_features(trips[0])[2:]
-        coords1 = metric.extract_features(trips[1])[2:]        
-        similarD = metric.similar(coords0, coords1, similarity_threshold)
-
-        # All the similars must be true
-        self.assertTrue(similarOD1) # RESULT SUB-TEST 1
-        self.assertTrue(similarOD2) # RESULT SUB-TEST 2
-        self.assertTrue(similarOD3) # RESULT SUB-TEST 3
-        self.assertTrue(similarO)  # RESULT SUB-TEST 4
-        self.assertTrue(similarD) # RESULT SUB-TEST 5
+        for tp,(coord_start,coord_end) in parameters:
+            with self.subTest(trip_part=tp):
+                #generate 2 trips with parameter values
+                trips = etmu.setTripConfig(2, [0, 0], [1, 1], trip_part=tp,threshold=generate_points_thresh) 
+                # depending on the parametrs, extract the relevant coordinates
+                trip0_coords = metric.extract_features(trips[0])[coord_start:coord_end]
+                trip1_coords = metric.extract_features(trips[1])[coord_start:coord_end]
+                #check for similarity using relevant coordinates
+                similarOD = metric.similar(trip0_coords,trip1_coords, similarity_threshold)
+                # Since both origin and destination poitns lie within threshold limits,they should be similar
+                # when we check by just origin or just destination or both origin-and-destination
+                self.assertTrue(similarOD)
     
     def testODsAreNotSimilar(self):
-        generate_points_thresh = 0.001  # approx. 111 meters
-        similarity_threshold = 111  # 
+        similarity_threshold = 500
         metric = eamso.OriginDestinationSimilarity()
 
-        ## Sub-Test 1-2: 
-        # Two trips with neither origin nor destination coordinates within threshold
-        # must not be similar in any configuration of similarity testing.
-        trips = etmm.generate_mock_trips('bob', 2, [0, 0], [1, 1], '__', threshold=generate_points_thresh)  
-        coords0 = metric.extract_features(trips[0])
-        coords1 = metric.extract_features(trips[1])
-        similar11 = metric.similar(coords0[:2], coords1[:2], similarity_threshold)
-        similar12 = metric.similar(coords0[2:], coords1[:], similarity_threshold)
+        # parameters passed for testing is set. A list, where each element of this list takes the form 
+        # [(start_coord,end_coord)]
+        # Since the extracted_features function return in the form [origin_lat,origin_long,destination_lat,destination_long],
+        # if clustering shouldn't happend, then
+        #   a.origin, we pass first two values of this list,i.e. from 0 till before 2 index
+        #   b.destination, we pas last two values of this list,i.e. from 2 till before 4 index
+        #   c.origin-destination, we pass the entire list , i.e. from 0 till before 4 index
+        parameters= [(0,2),(2,4),[0,4]]
+        n=2
+        #this generates 2 trips one-by-one, where each trip's respective origin and destination 
+        # points are more than 500m away.
+        trips = [etmu.setTripConfig(1, (i, i), (i+1, i+1), 'od', 1)[0] for i in range(n)]    
+        trip0_coord = metric.extract_features(trips[0])
+        trip1_coord = metric.extract_features(trips[1])
 
-        ## Sub-Test 3-4: 
-        # Two trips with  origin coordinates within threshold but we check  
-        # similarity using destination coordinates or origin-and-destination
-        # should not be similar.
-        trips = etmm.generate_mock_trips('Alice', 2, [2, 2], [3, 3], 'o_', threshold=generate_points_thresh)
-        metric = eamso.OriginDestinationSimilarity()
-        coords0 = metric.extract_features(trips[0])
-        coords1 = metric.extract_features(trips[1])
-        similar21 = metric.similar(coords0[2:], coords1[2:], similarity_threshold)
-        similar22 = metric.similar(coords0, coords1, similarity_threshold)
-
-        ## Sub-Test 5-6: 
-        # Two trips with destination coordinates within threshold but we check 
-        # similarity using origin coordinates or origin-and-destination 
-        # should not be similar.        
-        trips = etmm.generate_mock_trips('Caty', 2, [3, 3], [4, 4], '_d', threshold=generate_points_thresh)
-        metric = eamso.OriginDestinationSimilarity()
-        coords0 = metric.extract_features(trips[0])
-        coords1 = metric.extract_features(trips[1])
-        similar31 = metric.similar(coords0[:2], coords1[:2], similarity_threshold)
-        similar32 = metric.similar(coords0, coords1, similarity_threshold)
-
-        # All the similars must be False
-        self.assertFalse(similar11) # RESULT SUB-TEST 1
-        self.assertFalse(similar12) # RESULT SUB-TEST 2
-        self.assertFalse(similar21) # RESULT SUB-TEST 3
-        self.assertFalse(similar22) # RESULT SUB-TEST 4
-        self.assertFalse(similar31) # RESULT SUB-TEST 5
-        self.assertFalse(similar32) # RESULT SUB-TEST 6
-
+        for (coord_start,coord_end) in parameters:
+            with self.subTest(coordinates=(coord_start,coord_end)):      
+                IsSimilar = metric.similar(trip0_coord[coord_start:coord_end],trip1_coord[coord_start:coord_end], similarity_threshold)
+                # Two trips with neither origin nor destination coordinates within the threshold
+                # must not be similar by any configuration of similarity testing.
+                self.assertFalse(IsSimilar)
 
 if __name__ == '__main__':
     unittest.main()
