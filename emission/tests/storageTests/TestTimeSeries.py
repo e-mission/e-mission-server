@@ -92,14 +92,13 @@ class TestTimeSeries(unittest.TestCase):
                 - $ grep -c <key> <dataset>.json
         
         For Aggregate Timeseries test case:
-        - UUID('e66d0a3a-4316-4d9d-ac66-ee3754081d09') is returned as only distinct user which is stored in monogDB as BinData datatype.
-        - Validated the count of documents for the keys using mongo DB access via terminal.
-        - Ran these queries inside mongo terminal to get the counts:
-        $ db.Stage_timeseries.find({$and: [{"user_id" : BinData(3,"5m0KOkMWTZ2sZu43VAgdCQ==")}, {"metadata.key" : "background/location"}]}).count()
-        $ db.Stage_timeseries.find({$and: [{"user_id" : BinData(3,"5m0KOkMWTZ2sZu43VAgdCQ==")}, {"metadata.key" : "background/filtered_location"}]}).count()
-        $ db.Stage_analysis_timeseries.find({$and: [{"user_id" : BinData(3,"5m0KOkMWTZ2sZu43VAgdCQ==")}, {"metadata.key" : "analysis/confirmed_trip"}]}).count() 
+        - The expected output would be summed-up values for the respective keys from the individual users testing outputs mentioned above.
+        - Output: ([1293, 835], [0])
+            - For each of the 3 input keys from key_list1: 
+                - 1293 = 738 (UUID1) + 555 (UUID2)
+                - 835 = 508 (UUID1) + 327 (UUID2)
+                - 0 = 0 (UUID1) + 0 (UUID2)
 
-        - The counts returned were 1476, 1016, 5, respectively.
         '''
 
         ts1_aug_21 = esta.TimeSeries.get_time_series(self.testUUID1)
@@ -138,11 +137,8 @@ class TestTimeSeries(unittest.TestCase):
 
         # Test case: Aggregate timeseries DB User data passed as input
         ts_agg = esta.TimeSeries.get_aggregate_time_series()
-        users_distinct = ts_agg.get_distinct_users()
-        for uuid in users_distinct:
-            ts_user_ag = esta.TimeSeries.get_time_series(uuid)
-            count_ts7 = ts_user_ag.find_entries_count(key_list=key_list1)
-            self.assertEqual(count_ts7, ([1476, 1016], [5]))
+        count_ts7 = ts_agg.find_entries_count(key_list=key_list1)
+        self.assertEqual(count_ts7, ([1293, 835], [0]))
 
         # Test case: New User created with no data to check
         self.testEmail = None
@@ -151,9 +147,7 @@ class TestTimeSeries(unittest.TestCase):
         ts_new_user = esta.TimeSeries.get_time_series(self.testUUID)
         count_ts8 = ts_new_user.find_entries_count(key_list=key_list1)
         self.assertEqual(count_ts8, ([0, 0], [0]))
-        self.testUUID = self.testUUID2
-        self.testEmail = "user2"
-        
+
         print("Assert Test for Count Data successful!")
         
 
