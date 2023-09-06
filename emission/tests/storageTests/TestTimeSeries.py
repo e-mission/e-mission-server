@@ -84,12 +84,22 @@ class TestTimeSeries(unittest.TestCase):
     def testFindEntriesCount(self):
         '''
         Test: Specific keys with other parameters not passed values.
+        Input: A set of keys from either of the two timeseries databases.
+        Output: A tuple of two lists (one for each timeseries database). Length of list depends on number of keys for that specific timeseries database.
+
         Input: For each dataset: ["background/location", "background/filtered_location", "analysis/confirmed_trip"]
             - Testing this with sample dataset: "shankari_2015-aug-21", "shankari_2015-aug-27"
         Output: Aug_21: ([738, 508], [0]), Aug_27: ([555, 327], [0])
             - Actual output just returns a single number for count of entries.
-            - Validated using grep count of occurrences for keys: 1) "background/location"     2) "background/filtered_location"
-                - $ grep -c <key> <dataset>.json
+            - Validated using grep count of occurrences for keys: 1) "background/location"     2) "background/filtered_location"    3) "analysis/confirmed_trip"
+                - Syntax: $ grep -c <key> <dataset>.json
+                - Sample: $ grep -c "background/location" emission/tests/data/real_examples/shankari_2015-aug-21
+
+            - Grep Output Counts For Aug-21 dataset for each key:
+                1) background/location = 738,    2) background/filtered_location = 508,   3) analysis/confirmed_trip = 0
+
+            - Grep Output Counts For Aug-27 dataset for each key:
+                1) background/location = 555,    2) background/filtered_location = 327,   3) analysis/confirmed_trip = 0
         
         For Aggregate Timeseries test case:
         - The expected output would be summed-up values for the respective keys from the individual users testing outputs mentioned above.
@@ -98,6 +108,11 @@ class TestTimeSeries(unittest.TestCase):
                 - 1293 = 738 (UUID1) + 555 (UUID2)
                 - 835 = 508 (UUID1) + 327 (UUID2)
                 - 0 = 0 (UUID1) + 0 (UUID2)
+
+        Empty/Blank keys
+        - Empty array is returned in case there were no keys pertaining to the respective timeseries database.
+        - This is to differentiate from the [0] case where a key might be present in the input but no matching documents found.
+        - Whereas in this case of [], no key was present in the input itself.
 
         '''
 
