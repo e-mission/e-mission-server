@@ -84,35 +84,40 @@ class TestTimeSeries(unittest.TestCase):
     def testFindEntriesCount(self):
         '''
         Test: Specific keys with other parameters not passed values.
-        Input: A set of keys from either of the two timeseries databases.
-        Output: A tuple of two lists (one for each timeseries database). Length of list depends on number of keys for that specific timeseries database.
 
-        Input: For each dataset: ["background/location", "background/filtered_location", "analysis/confirmed_trip"]
+        Input: A list of keys from either of the timeseries databases.
+            - For each dataset: ["background/location", "background/filtered_location", "analysis/confirmed_trip"]
             - Testing this with sample dataset: "shankari_2015-aug-21", "shankari_2015-aug-27"
-        Output: Aug_21: ([738, 508], [0]), Aug_27: ([555, 327], [0])
-            - Actual output just returns a single number for count of entries.
+            
+        Outputs: Single number representing total count of matching entries.
+            - For builtin_timeseries: Returns total count of all entries matching the userid. 
+            - For aggregate_timeseries: Returns total count of all entries matching all users.
+
             - Validated using grep count of occurrences for keys: 1) "background/location"     2) "background/filtered_location"    3) "analysis/confirmed_trip"
                 - Syntax: $ grep -c <key> <dataset>.json
                 - Sample: $ grep -c "background/location" emission/tests/data/real_examples/shankari_2015-aug-21
 
             - Grep Output Counts For Aug-21 dataset for each key:
                 1) background/location = 738,    2) background/filtered_location = 508,   3) analysis/confirmed_trip = 0
+                Hence total count = 738 + 508 + 0 = 1246
 
             - Grep Output Counts For Aug-27 dataset for each key:
                 1) background/location = 555,    2) background/filtered_location = 327,   3) analysis/confirmed_trip = 0
+                Hence total count = 555 + 327 + 0 = 882
         
         For Aggregate Timeseries test case:
-        - The expected output would be summed-up values for the respective keys from the individual users testing outputs mentioned above.
-        - Output: ([1293, 835], [0])
+
+        - Input: []
+        - Output: 3607
+            - 3607 = 2125 (UUID1) + 1482 (UUID2)
+
+        - Input: ["background/location", "background/filtered_location", "analysis/confirmed_trip"]
+        - Output: 2128
             - For each of the 3 input keys from key_list1: 
                 - 1293 = 738 (UUID1) + 555 (UUID2)
                 - 835 = 508 (UUID1) + 327 (UUID2)
                 - 0 = 0 (UUID1) + 0 (UUID2)
-
-        Empty/Blank keys
-        - Empty array is returned in case there were no keys pertaining to the respective timeseries database.
-        - This is to differentiate from the [0] case where a key might be present in the input but no matching documents found.
-        - Whereas in this case of [], no key was present in the input itself.
+            - Hence total count = 1293 + 835 + 0 = 2128
 
         '''
 
@@ -122,27 +127,27 @@ class TestTimeSeries(unittest.TestCase):
         # Test case: Combination of original and analysis timeseries DB keys for Aug-21 dataset
         key_list1=["background/location", "background/filtered_location", "analysis/confirmed_trip"]
         count_ts1 = ts1_aug_21.find_entries_count(key_list=key_list1)
-        self.assertEqual(count_ts1, ([738, 508], [0]))
+        self.assertEqual(count_ts1, 1246)
 
         # Test case: Combination of original and analysis timeseries DB keys for Aug-27 dataset
         key_list1=["background/location", "background/filtered_location", "analysis/confirmed_trip"]
         count_ts2 = ts2_aug_27.find_entries_count(key_list=key_list1)
-        self.assertEqual(count_ts2, ([555, 327], [0]))
+        self.assertEqual(count_ts2, 882)
 
         # Test case: Only original timeseries DB keys for Aug-27 dataset
         key_list2=["background/location", "background/filtered_location"]
         count_ts3 = ts2_aug_27.find_entries_count(key_list=key_list2)
-        self.assertEqual(count_ts3, ([555, 327], []))
+        self.assertEqual(count_ts3, 882)
 
         # Test case: Only analysis timeseries DB keys
         key_list3=["analysis/confirmed_trip"]
         count_ts4 = ts2_aug_27.find_entries_count(key_list=key_list3)
-        self.assertEqual(count_ts4, ([], [0]))
+        self.assertEqual(count_ts4, 0)
 
         # Test case: Empty key_list which should return total count of all documents in the two DBs
         key_list4=[]
         count_ts5 = ts1_aug_21.find_entries_count(key_list=key_list4)
-        self.assertEqual(count_ts5, ([2125], [0]))
+        self.assertEqual(count_ts5, 2125)
 
         # Test case: Invalid or unmatched key in metadata field 
         key_list5=["randomxyz_123test"]
@@ -150,18 +155,23 @@ class TestTimeSeries(unittest.TestCase):
             count_ts6 = ts1_aug_21.find_entries_count(key_list=key_list5)
         self.assertEqual(str(ke.exception), "'randomxyz_123test'")
 
-        # Test case: Aggregate timeseries DB User data passed as input
+        # Test case: Aggregate timeseries DB User data passed as input with non-empty key_list
         ts_agg = esta.TimeSeries.get_aggregate_time_series()
         count_ts7 = ts_agg.find_entries_count(key_list=key_list1)
-        self.assertEqual(count_ts7, ([1293, 835], [0]))
+        self.assertEqual(count_ts7, 2128)
+
+        # Test case: Aggregate timeseries DB User data passed as input with empty key_list
+        ts_agg = esta.TimeSeries.get_aggregate_time_series()
+        count_ts8 = ts_agg.find_entries_count(key_list=key_list4)
+        self.assertEqual(count_ts8, 3607)
 
         # Test case: New User created with no data to check
         self.testEmail = None
         self.testUUID2 = self.testUUID
         etc.createAndFillUUID(self)
         ts_new_user = esta.TimeSeries.get_time_series(self.testUUID)
-        count_ts8 = ts_new_user.find_entries_count(key_list=key_list1)
-        self.assertEqual(count_ts8, ([0, 0], [0]))
+        count_ts9 = ts_new_user.find_entries_count(key_list=key_list1)
+        self.assertEqual(count_ts9, 0)
 
         print("Assert Test for Count Data successful!")
         
