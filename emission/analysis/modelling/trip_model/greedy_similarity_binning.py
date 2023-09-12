@@ -212,14 +212,7 @@ class GreedySimilarityBinning(eamuu.TripModel):
         :return: the id of a bin if a match was found, otherwise None
         """
         for bin_id, bin_record in self.bins.items():
-            if self.clusteringWay == 'origin':
-                start,end=0,2  #since first two features in trip_features are for origin
-            elif self.clusteringWay == 'destination':
-                start,end=2,4  #third and fourth values intrip_features are for destination
-            elif self.clusteringWay == 'origin-destination':
-                start,end=0,4  #when clusteromgWay is 'origin-destination',we pass all four features
-
-            matches_bin = all([self.metric.similar(trip_features[start:end], bin_sample[start:end], self.sim_thresh)
+            matches_bin = all([self.metric.similar(trip_features, bin_sample, self.sim_thresh,self.clusteringWay)
                 for bin_sample in bin_record['feature_rows']])
             if matches_bin:
                 return bin_id

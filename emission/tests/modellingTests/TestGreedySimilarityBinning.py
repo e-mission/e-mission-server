@@ -1,6 +1,7 @@
 import unittest
 import emission.analysis.modelling.trip_model.greedy_similarity_binning as eamtg
-import emission.tests.modellingTests.utilities as etmu
+import emission.tests.modellingTests.modellingTestAssets as etmm
+
 import logging
 
 
@@ -21,11 +22,29 @@ class TestGreedySimilarityBinning(unittest.TestCase):
         """
 
         # generate $n trips.
-        n = 20     
-
+        n = 20   
+        binning_threshold=500
         #this generates 20 trips one-by-one, where each trip's respective origin and destination 
         # points are more than 500m away.
-        trips = [ etmu.setTripConfig(1, (i, i), (i+1, i+1), 'od', 1)[0] for i in range(n)]    
+ 
+        
+        label_data = {
+            "mode_confirm": ['walk', 'bike', 'transit'],
+            "purpose_confirm": ['work', 'home', 'school'],
+            "replaced_mode": ['drive']
+        }         
+
+
+        trips =etmm.generate_mock_trips(
+                user_id="joe", 
+                trips=n, 
+                trip_part='__',
+                label_data=label_data, 
+                within_threshold=1, 
+                threshold=binning_threshold,
+                origin=(0,0),
+                destination=(1,1)
+            )
 
         # parameters passed for testing. A list, where each element is one way of clustering
         clustering_ways_paramters= ["origin","destination","origin-destination"]
@@ -34,7 +53,14 @@ class TestGreedySimilarityBinning(unittest.TestCase):
         for cw in clustering_ways_paramters:
             with self.subTest(clustering_way=cw):
                 #initialise the binning model and fit with previously generated trips
-                model = etmu.setModelConfig("od_similarity",  500,  False, cw, False)
+                model_config = {
+                                    "metric": "od_similarity",
+                                    "similarity_threshold_meters": binning_threshold,  # meters,
+                                    "apply_cutoff": False,
+                                    "clustering_way": cw,  
+                                    "incremental_evaluation": False
+                                }
+                model= eamtg.GreedySimilarityBinning(model_config)
                 model.fit(trips)
                 #check each bins for no of trips
                 no_large_bin = all(map(lambda b: len(b['feature_rows']) == 1, model.bins.values()))
@@ -53,6 +79,12 @@ class TestGreedySimilarityBinning(unittest.TestCase):
         # within a radius that should have them binned.
         n = 20
         m = 5
+        binning_threshold=500
+        label_data = {
+            "mode_confirm": ['walk', 'bike', 'transit'],
+            "purpose_confirm": ['work', 'home', 'school'],
+            "replaced_mode": ['drive']
+        }
 
         # parameters passed for testing. A list, where each element of this list takes the form 
         # [trip part to be sampled within mentioned threshold , clustering way used to check similarity]
@@ -60,10 +92,25 @@ class TestGreedySimilarityBinning(unittest.TestCase):
         for tp,cw in parameters:
             with self.subTest(trip_part=tp,clustering_way=cw):
                 #generate random trips using utilities
-                trips = etmu.setTripConfig(trips=n, org=(0, 0), dest=(1, 1),
-                                trip_part=tp, within_thr=m)
+                trips =etmm.generate_mock_trips(
+                    user_id="joe", 
+                    trips=n, 
+                    trip_part=tp,
+                    label_data=label_data, 
+                    within_threshold=m, 
+                    threshold=binning_threshold,
+                    origin=(0,0),
+                    destination=(1,1)
+                )
                 #initialise the binning model and fit with previously generated trips
-                model = etmu.setModelConfig("od_similarity",  500,  False, cw, False)
+                model_config = {
+                            "metric": "od_similarity" ,
+                            "similarity_threshold_meters": binning_threshold,  # meters,
+                            "apply_cutoff": False,
+                            "clustering_way": cw,  
+                            "incremental_evaluation": False
+                 }
+                model = eamtg.GreedySimilarityBinning(model_config)
                 model.fit(trips)
                 #check each bins for no of trips
                 at_least_one_large_bin = any(map(lambda b: len(b['feature_rows']) == m, model.bins.values()))
@@ -81,11 +128,24 @@ class TestGreedySimilarityBinning(unittest.TestCase):
         }
 
         n = 6
-        trips = etmu.setTripConfig(trips=n, org=(0, 0), dest=(1, 1),
-                                   trip_part='od', label_data=label_data,                                   
-        )
-        model = etmu.setModelConfig("od_similarity",  500,  False, "origin-destination", False)
-        
+        trips =etmm.generate_mock_trips(
+                user_id="joe", 
+                trips=n, 
+                trip_part='od',
+                label_data=label_data, 
+                within_threshold=n, 
+                threshold=500,
+                origin=(0,0),
+                destination=(1,1)
+            )
+        model_config = {
+                    "metric": "od_similarity",
+                    "similarity_threshold_meters": 500,  # meters,
+                    "apply_cutoff": False,
+                    "clustering_way": 'origin_destination',  
+                    "incremental_evaluation": False
+                                }
+        model= eamtg.GreedySimilarityBinning(model_config)
         train = trips[0:5]
         test = trips[5]
 
@@ -105,16 +165,25 @@ class TestGreedySimilarityBinning(unittest.TestCase):
             "replaced_mode": ['crabwalking']
         }
         n = 5
-
-        train = etmu.setTripConfig(trips=n, org=(39.7645187, -104.9951944), # Denver, CO
-                                   dest=(39.7435206, -105.2369292),  # Golden, CO
-                                   trip_part='od', label_data=label_data                                 
+        binning_threshold = 500
+        train = etmm.generate_mock_trips( user_id="joe",trips=n, origin=(39.7645187, -104.9951944), # Denver, CO
+                                   destination=(39.7435206, -105.2369292),  # Golden, CO
+                                   trip_part='od', label_data=label_data,
+                                   threshold=binning_threshold, within_threshold=n
         )
-        test = etmu.setTripConfig(trips=n, org=(61.1042262, -150.5611644), # Denver, CO
-                                   dest=(62.2721466, -150.3233046),  # Golden, CO
+        test = etmm.generate_mock_trips( user_id="amanda",trips=n, origin=(61.1042262, -150.5611644), # Denver, CO
+                                   destination=(62.2721466, -150.3233046),  # Golden, CO
                                    trip_part='od', label_data=label_data,                                   
+                                    threshold=binning_threshold, within_threshold=n
         )
-        model = etmu.setModelConfig("od_similarity",  500,  False, "origin-destination", False)
+        model_config = {
+                    "metric": "od_similarity",
+                    "similarity_threshold_meters": 500,  # meters,
+                    "apply_cutoff": False,
+                    "clustering_way": 'origin_destination',  
+                    "incremental_evaluation": False
+                                }
+        model= eamtg.GreedySimilarityBinning(model_config)
         model.fit(train)
         results, n = model.predict(test[0])
 
