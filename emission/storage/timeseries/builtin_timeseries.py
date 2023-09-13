@@ -440,3 +440,39 @@ class BuiltinTimeSeries(esta.TimeSeries):
         logging.debug("updating entry %s into timeseries" % new_entry)
         edb.save(ts.get_timeseries_db(key), new_entry)
 
+    def find_entries_count(self, key_list = None, time_query = None, geo_query = None, extra_query_list = None):
+        """
+        Returns the total number of documents for the given key_list referring to each of the two timeseries db.
+
+        Input: Key list with keys from both timeseries DBs = [key1, key2, key3, key4, ...]
+                Suppose (key1, key2) are orig_tsdb keys and (key3, key4) are analysis_tsdb keys
+        Output: total_count = orig_tsdb_count + analysis_tsdb_count
+                            
+                Orig_tsdb_count and Analysis_tsdb_count are lists containing counts of matching documents 
+                for each key considered separately for the specific timeseries DB.
+
+        :param key_list: list of metadata keys we are querying for.
+        :param time_query: the time range in which to search the stream
+        :param geo_query: the query for a geographical area
+        :param extra_query_list: any additional queries to filter out data
+
+        For key_list = None or empty, total count of all documents are returned considering the matching entries from entire dataset.
+        """
+        print("builtin_timeseries.find_entries_count() called")
+        
+        orig_tsdb = self.timeseries_db
+        analysis_tsdb = self.analysis_timeseries_db
+
+        if key_list == []:
+            key_list = None
+        
+        # Segregate orig_tsdb and analysis_tsdb keys so as to fetch counts on each dataset
+        (orig_tsdb_keys, analysis_tsdb_keys) = self._split_key_list(key_list)
+
+        orig_tsdb_count = self._get_entries_for_timeseries(orig_tsdb, orig_tsdb_keys, time_query, geo_query, extra_query_list, None)[0]
+        analysis_tsdb_count = self._get_entries_for_timeseries(analysis_tsdb, analysis_tsdb_keys, time_query, geo_query, extra_query_list, None)[0]
+
+        total_matching_count = orig_tsdb_count + analysis_tsdb_count
+        return total_matching_count
+
+

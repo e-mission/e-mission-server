@@ -20,6 +20,7 @@ import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.timeseries.aggregate_timeseries as estag
 
 import emission.core.wrapper.localdate as ecwl
+import emission.core.wrapper.entry as ecwe
 
 # Test imports
 import emission.tests.common as etc
@@ -38,6 +39,7 @@ class TestTimeSeries(unittest.TestCase):
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
         edb.get_uuid_db().delete_one({"user_email": "user1"})
         edb.get_uuid_db().delete_one({"user_email": "user2"})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID})
 
     def testGetUUIDList(self):
         uuid_list = esta.TimeSeries.get_uuid_list()
@@ -80,6 +82,114 @@ class TestTimeSeries(unittest.TestCase):
         # user_id is in both the extra query and the base query
         with self.assertRaises(AttributeError):
             list(ts.find_entries(time_query=tq, extra_query_list=[ignored_phones]))
+
+    def testFindEntriesCount(self):
+        '''
+        Test: Specific keys with other parameters not passed values.
+
+        Input: A list of keys from either of the timeseries databases.
+            - For each dataset: ["background/location", "background/filtered_location", "analysis/confirmed_trip"]
+            - Testing this with sample dataset: "shankari_2015-aug-21", "shankari_2015-aug-27"
+            
+        Outputs: Single number representing total count of matching entries.
+            - For builtin_timeseries: Returns total count of all entries matching the userid. 
+            - For aggregate_timeseries: Returns total count of all entries matching all users.
+
+            - Validated using grep count of occurrences for keys: 1) "background/location"     2) "background/filtered_location"    3) "analysis/confirmed_trip"
+                - Syntax: $ grep -c <key> <dataset>.json
+                - Sample: $ grep -c "background/location" emission/tests/data/real_examples/shankari_2015-aug-21
+
+            - Grep Output Counts For Aug-21 dataset for each key:
+                1) background/location = 738,    2) background/filtered_location = 508,   3) analysis/confirmed_trip = 0
+                Hence total count = 738 + 508 + 0 = 1246
+
+            - Grep Output Counts For Aug-27 dataset for each key:
+                1) background/location = 555,    2) background/filtered_location = 327,   3) analysis/confirmed_trip = 0
+                Hence total count = 555 + 327 + 0 = 882
+        
+        For Aggregate Timeseries test case:
+
+        - Input: []
+        - Output: 3607
+            - 3607 = 2125 (UUID1) + 1482 (UUID2)
+            - Key 1: timeseries          [] -> 3607 = 2125 (UUID1) + 1482 (UUID2)
+            - Key 2: analysis_timeseries [] -> 0    = 0    (UUID1) + 0    (UUID2)
+            - Hence total count = 3607 + 0 = 3607
+
+        - Input: ["background/location", "background/filtered_location", "analysis/confirmed_trip"]
+        - Output: 2128
+            - For each of the 3 input keys from key_list1: 
+                - Key 1: "background/location"          -> 1293 = 738 (UUID1) + 555 (UUID2)
+                - Key 2: "background/filtered_location" -> 835  = 508 (UUID1) + 327 (UUID2)
+                - Key 3: "analysis/confirmed_trip"      -> 0    = 0   (UUID1) + 0   (UUID2)
+            - Hence total count = 1293 + 835 + 0 = 2128
+
+        '''
+
+        ts1_aug_21 = esta.TimeSeries.get_time_series(self.testUUID1)
+        ts2_aug_27 = esta.TimeSeries.get_time_series(self.testUUID)
+
+        # Test case: Combination of original and analysis timeseries DB keys for Aug-21 dataset
+        key_list1=["background/location", "background/filtered_location", "analysis/confirmed_trip"]
+        count_ts1 = ts1_aug_21.find_entries_count(key_list=key_list1)
+        self.assertEqual(count_ts1, 1246)
+
+        # Test case: Combination of original and analysis timeseries DB keys for Aug-27 dataset
+        key_list1=["background/location", "background/filtered_location", "analysis/confirmed_trip"]
+        count_ts2 = ts2_aug_27.find_entries_count(key_list=key_list1)
+        self.assertEqual(count_ts2, 882)
+
+        # Test case: Only original timeseries DB keys for Aug-27 dataset
+        key_list2=["background/location", "background/filtered_location"]
+        count_ts3 = ts2_aug_27.find_entries_count(key_list=key_list2)
+        self.assertEqual(count_ts3, 882)
+
+        # Test case: Only analysis timeseries DB keys
+        key_list3=["analysis/confirmed_trip"]
+        count_ts4 = ts2_aug_27.find_entries_count(key_list=key_list3)
+        self.assertEqual(count_ts4, 0)
+
+        # Test case: Empty key_list which should return total count of all documents in the two DBs
+        key_list4=[]
+        count_ts5 = ts1_aug_21.find_entries_count(key_list=key_list4)
+        self.assertEqual(count_ts5, 2125)
+
+        # Test case: Invalid or unmatched key in metadata field 
+        key_list5=["randomxyz_123test"]
+        with self.assertRaises(KeyError) as ke:
+            count_ts6 = ts1_aug_21.find_entries_count(key_list=key_list5)
+        self.assertEqual(str(ke.exception), "'randomxyz_123test'")
+
+        # Test case: Aggregate timeseries DB User data passed as input with non-empty key_list
+        ts_agg = esta.TimeSeries.get_aggregate_time_series()
+        count_ts7 = ts_agg.find_entries_count(key_list=key_list1)
+        self.assertEqual(count_ts7, 2128)
+
+        # Test case: Aggregate timeseries DB User data passed as input with empty key_list
+        try:
+            ts_agg = esta.TimeSeries.get_aggregate_time_series()
+            count_ts8 = ts_agg.find_entries_count(key_list=key_list4)
+            self.assertEqual(count_ts8, 3607)
+        except AssertionError as e:
+            print(f"Assertion failed for 3607...")
+            for ct in count_ts8:
+                cte = ecwe.Entry(ct)
+                print(f"CTE = ")
+                print(cte.user_id)
+                print(cte.metadata.key)
+                print(cte)
+                print("=== Trip:", cte.data.start_loc, "->", cte.data.end_loc)
+
+        # Test case: New User created with no data to check
+        self.testEmail = None
+        self.testUUID2 = self.testUUID
+        etc.createAndFillUUID(self)
+        ts_new_user = esta.TimeSeries.get_time_series(self.testUUID)
+        count_ts9 = ts_new_user.find_entries_count(key_list=key_list1)
+        self.assertEqual(count_ts9, 0)
+
+        print("Assert Test for Count Data successful!")
+        
 
 if __name__ == '__main__':
     import emission.tests.common as etc

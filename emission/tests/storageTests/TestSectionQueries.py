@@ -30,6 +30,13 @@ class TestSectionQueries(unittest.TestCase):
         edb.get_analysis_timeseries_db().delete_many({'user_id': self.testUserId})
         self.test_trip_id = "test_trip_id"
 
+    def tearDown(self):
+        self.clearRelatedDb()
+
+    def clearRelatedDb(self):
+        edb.get_timeseries_db().delete_many({"user_id": self.testUserId})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUserId})
+        
     def testQuerySections(self):
         new_section = ecws.Section()
         new_section.start_ts = 5
