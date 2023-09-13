@@ -31,6 +31,13 @@ class TestStopQueries(unittest.TestCase):
         edb.get_analysis_timeseries_db().delete_many({'user_id': self.testUserId})
         self.test_trip_id = "test_trip_id"
 
+    def tearDown(self):
+        self.clearRelatedDb()
+
+    def clearRelatedDb(self):
+        edb.get_timeseries_db().delete_many({"user_id": self.testUserId})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUserId})
+
     def testQueryStops(self):
         new_stop = etsa.savePlaceLike(self, esda.RAW_STOP_KEY, ecws.Stop)
         new_stop["data"]["trip_id"] = self.test_trip_id

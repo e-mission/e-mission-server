@@ -28,6 +28,13 @@ class TestPlaceQueries(unittest.TestCase):
         self.testUserId = uuid.uuid3(uuid.NAMESPACE_URL, "mailto:test@test.me")
         edb.get_analysis_timeseries_db().delete_many({'user_id': self.testUserId})
 
+    def tearDown(self):
+        self.clearRelatedDb()
+
+    def clearRelatedDb(self):
+        edb.get_timeseries_db().delete_many({"user_id": self.testUserId})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUserId})
+
     def testGetLastPlace(self):
         old_place = ecwrp.Rawplace()
         old_place.enter_ts = 5

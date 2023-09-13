@@ -39,6 +39,7 @@ class TestTimeSeries(unittest.TestCase):
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
         edb.get_uuid_db().delete_one({"user_email": "user1"})
         edb.get_uuid_db().delete_one({"user_email": "user2"})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID})
 
     def testGetUUIDList(self):
         uuid_list = esta.TimeSeries.get_uuid_list()
@@ -111,13 +112,16 @@ class TestTimeSeries(unittest.TestCase):
         - Input: []
         - Output: 3607
             - 3607 = 2125 (UUID1) + 1482 (UUID2)
+            - Key 1: timeseries          [] -> 3607 = 2125 (UUID1) + 1482 (UUID2)
+            - Key 2: analysis_timeseries [] -> 0    = 0    (UUID1) + 0    (UUID2)
+            - Hence total count = 3607 + 0 = 3607
 
         - Input: ["background/location", "background/filtered_location", "analysis/confirmed_trip"]
         - Output: 2128
             - For each of the 3 input keys from key_list1: 
-                - 1293 = 738 (UUID1) + 555 (UUID2)
-                - 835 = 508 (UUID1) + 327 (UUID2)
-                - 0 = 0 (UUID1) + 0 (UUID2)
+                - Key 1: "background/location"          -> 1293 = 738 (UUID1) + 555 (UUID2)
+                - Key 2: "background/filtered_location" -> 835  = 508 (UUID1) + 327 (UUID2)
+                - Key 3: "analysis/confirmed_trip"      -> 0    = 0   (UUID1) + 0   (UUID2)
             - Hence total count = 1293 + 835 + 0 = 2128
 
         '''
@@ -161,25 +165,20 @@ class TestTimeSeries(unittest.TestCase):
         count_ts7 = ts_agg.find_entries_count(key_list=key_list1)
         self.assertEqual(count_ts7, 2128)
 
-        '''
-         FAILING Testcase 
-         Happening due to unaccounted analysis_timeseries entry on running all tests
-         key = segmentation/raw_stop
-        '''
         # Test case: Aggregate timeseries DB User data passed as input with empty key_list
-        # try:
-        #     ts_agg = esta.TimeSeries.get_aggregate_time_series()
-        #     count_ts8 = ts_agg.find_entries_count(key_list=key_list4)
-        #     self.assertEqual(count_ts8, 3607)
-        # except AssertionError as e:
-        #     print(f"Assertion failed for 3607...")
-        #     for ct in count_ts8:
-        #         cte = ecwe.Entry(ct)
-        #         print(f"CTE = ")
-        #         print(cte.user_id)
-        #         print(cte.metadata.key)
-        #         print(cte)
-        #         print("=== Trip:", cte.data.start_loc, "->", cte.data.end_loc)
+        try:
+            ts_agg = esta.TimeSeries.get_aggregate_time_series()
+            count_ts8 = ts_agg.find_entries_count(key_list=key_list4)
+            self.assertEqual(count_ts8, 3607)
+        except AssertionError as e:
+            print(f"Assertion failed for 3607...")
+            for ct in count_ts8:
+                cte = ecwe.Entry(ct)
+                print(f"CTE = ")
+                print(cte.user_id)
+                print(cte.metadata.key)
+                print(cte)
+                print("=== Trip:", cte.data.start_loc, "->", cte.data.end_loc)
 
         # Test case: New User created with no data to check
         self.testEmail = None
