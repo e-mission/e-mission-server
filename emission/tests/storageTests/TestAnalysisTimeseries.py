@@ -31,6 +31,13 @@ class TestAnalysisTimeseriesQueries(unittest.TestCase):
         edb.get_analysis_timeseries_db().delete_many({'user_id': self.testUserId})
         self.test_trip_id = "test_trip_id"
 
+    def tearDown(self):
+        self.clearRelatedDb()
+
+    def clearRelatedDb(self):
+        edb.get_timeseries_db().delete_many({"user_id": self.testUserId})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUserId})
+
     def testCreateNew(self):
         etsa.createNewTripLike(self, esda.RAW_TRIP_KEY, ecwrt.Rawtrip)
         etsa.createNewPlaceLike(self, esda.RAW_PLACE_KEY, ecwrp.Rawplace)
