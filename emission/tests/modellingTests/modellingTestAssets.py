@@ -23,18 +23,26 @@ def generate_nearby_random_points(ref_coords,threshold):
     #convert given threshold in m to approx WGS84 coord dist.
     thresholdInWGS84 = threshold* (0.000001/0.11)
     
-    #generate a random coordinate in threshold's limit around the ref points. 
-    dx=random.uniform(-thresholdInWGS84/2,thresholdInWGS84/2)
-    dy=random.uniform(-thresholdInWGS84/2,thresholdInWGS84/2)
+    #generate a random coordinate in threshold's limit around the ref points. OR we 
 
+    # for eg, ref point is 0,0 and threshold is  100m , so we generate a radius from 0 to 50, say 34 
+    # in this example. A random radius is also generted from 0 to 360,say 0. We then take 34 step along x axis direction 
+    # till radius length to get our new point, (34,0). When this function is called the next time to generate a point
+    #that has to be binned with previous one, we again generate r and theta , say 24 , 180 this time. 
+    # Now this new point is at (-24,0). Both these points are within threshold (100 in this case)limit and therefore will 
+    #be binned together.
+    radius=random.uniform(0,thresholdInWGS84/2)
+    theta=random.uniform(0,2*math.pi)
+    dx = radius * math.cos(theta)
+    dy = radius * math.sin (theta)
     #This basically gives a way to sample a point from within a square of length thresholdInWGS84 
     # around the ref. point.  
-    return [ref_coords[0] +dx , ref_coords[1] +dy]
+    return [ref_coords[0] + dy , ref_coords[1] + dx]
 
 def generate_trip_coordinates(
     points_list: list[float],
     ref_coords, 
-    InsideThreshold: bool,
+    insideThreshold: bool,
     threshold_meters: float, 
     ) -> Tuple[float, float]:
     """generates trip coordinate data to use when mocking a set of trip data.i
@@ -50,7 +58,7 @@ def generate_trip_coordinates(
              circle from some coordinates up to some threshold
     """
     # if the point is to be generated within a threshold and it's not the first point
-    if InsideThreshold and points_list:
+    if insideThreshold and points_list:
         # if  no ref. coordinates are provided, use any previously accepted point as ref.
         if ref_coords == None:
             ref_coords=random.choice(points_list)
@@ -61,9 +69,10 @@ def generate_trip_coordinates(
         if ref_coords == None:            
             new_point = generate_random_point()
         else:
-         # if ref coordinate are provided, use them as the starting point and iterate till required
-         # condition is satisfied
+         # if ref coordinate are provided, use them as the startisng point. 
             new_point = ref_coords
+        # If the newly generated new_point ( be it when ref_coords given or not given) is not more 
+        # than threshold_meters away from all the previously accepted points, keep generating new_point        # 
         while not all(ecc.calDistance(new_point, pt) > threshold_meters for pt in points_list):
             new_point = generate_random_point()
     return new_point
@@ -226,8 +235,8 @@ def generate_mock_trips(
     # generate 'trip' number of points based on which among 'o' (Origin) ,'d' (Destination) or
     # 'od' (Origin-Destination) or '__' (None) should be in threshold proximity to each other. 
     for within in trips_within_threshold:
-        origin_points.append(generate_trip_coordinates(origin_points, origin, InsideThreshold= (trip_part[0] == 'o' and within), threshold_meters= threshold))
-        destination_points.append(generate_trip_coordinates(destination_points, destination, InsideThreshold=(trip_part[1] == 'd' and within), threshold_meters=threshold))
+        origin_points.append(generate_trip_coordinates(origin_points, origin, insideThreshold= (trip_part[0] == 'o' and within), threshold_meters= threshold))
+        destination_points.append(generate_trip_coordinates(destination_points, destination, insideThreshold=(trip_part[1] == 'd' and within), threshold_meters=threshold))
 
     for o,d in zip(origin_points,destination_points):    
         labels = {} if label_data is None or random.random() > has_label_p \

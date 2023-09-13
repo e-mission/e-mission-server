@@ -139,12 +139,12 @@ class TestGreedySimilarityBinning(unittest.TestCase):
                 destination=(1,1)
             )
         model_config = {
-                    "metric": "od_similarity",
-                    "similarity_threshold_meters": 500,  # meters,
-                    "apply_cutoff": False,
-                    "clustering_way": 'origin_destination',  
-                    "incremental_evaluation": False
-                                }
+            "metric": "od_similarity",
+            "similarity_threshold_meters": 500, # meters,
+            "apply_cutoff": False,
+            "clustering_way": 'origin_destination',
+            "incremental_evaluation": False
+        }
         model= eamtg.GreedySimilarityBinning(model_config)
         train = trips[0:5]
         test = trips[5]
@@ -177,12 +177,12 @@ class TestGreedySimilarityBinning(unittest.TestCase):
                                     threshold=binning_threshold, within_threshold=n
         )
         model_config = {
-                    "metric": "od_similarity",
-                    "similarity_threshold_meters": 500,  # meters,
-                    "apply_cutoff": False,
-                    "clustering_way": 'origin_destination',  
-                    "incremental_evaluation": False
-                                }
+            "metric": "od_similarity",
+            "similarity_threshold_meters": 500,  # meters,
+            "apply_cutoff": False,
+            "clustering_way": 'origin_destination',  
+            "incremental_evaluation": False
+        }
         model= eamtg.GreedySimilarityBinning(model_config)
         model.fit(train)
         results, n = model.predict(test[0])
