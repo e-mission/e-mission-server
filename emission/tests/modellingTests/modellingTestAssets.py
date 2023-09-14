@@ -35,7 +35,7 @@ def generate_nearby_random_points(ref_coords,threshold):
     theta=random.uniform(0,2*math.pi)
     dx = radius * math.cos(theta)
     dy = radius * math.sin (theta)
-    #This basically gives a way to sample a point from within a square of length thresholdInWGS84 
+    #This basically gives a way to sample a point from within a circle of radius thresholdInWGS84/2 
     # around the ref. point.  
     return [ref_coords[0] + dy , ref_coords[1] + dx]
 

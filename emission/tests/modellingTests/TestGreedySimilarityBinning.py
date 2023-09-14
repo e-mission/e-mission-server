@@ -113,9 +113,9 @@ class TestGreedySimilarityBinning(unittest.TestCase):
                 model = eamtg.GreedySimilarityBinning(model_config)
                 model.fit(trips)
                 #check each bins for no of trips
-                at_least_one_large_bin = any(map(lambda b: len(b['feature_rows']) == m, model.bins.values()))
+                one_large_bin = any(map(lambda b: len(b['feature_rows']) == m, model.bins.values()))
                 #Since 5 trips were sampled within the threshold, there should be one bin with 5 trips
-                self.assertTrue(at_least_one_large_bin, "at least one bin should have at least 5 features in it")
+                self.assertTrue(one_large_bin, "one bin should have 5 features in it")
 
     def testPrediction(self):
         """
