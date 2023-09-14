@@ -28,5 +28,5 @@ jobs:
 
     - name: Test nominatim
       env:
-        GEOFABRIK_QUERY_URL: https://geocoding.geofabrik.de/${{secrets.GEOFABRIK_API}}
+        GEOFABRIK_QUERY_URL: "https://geocoding.geofabrik.de/${{secrets.GEOFABRIK_API}}""
       run: docker-compose -f emission/integrationTests/docker-compose.yml up --exit-code-from web-server

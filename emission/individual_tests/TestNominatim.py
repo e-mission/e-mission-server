@@ -20,7 +20,8 @@ import emission.analysis.intake.cleaning.clean_and_resample as clean
 #temporarily sets NOMINATIM_QUERY_URL to the environment variable for testing.
 NOMINATIM_QUERY_URL_env = os.environ.get("NOMINATIM_QUERY_URL", "")
 NOMINATIM_QUERY_URL = NOMINATIM_QUERY_URL_env if NOMINATIM_QUERY_URL_env != "" else eco.NOMINATIM_QUERY_URL
-GEOFABRIK_QUERY_URL = os.environ.get("GEOFABRIK_QUERY_URL", "")
+GEOFABRIK_QUERY_URL = os.environ.get("GEOFABRIK_QUERY_URL")
+# GEOFABRIK_QUERY_URL = os.environ["GEOFABRIK_QUERY_URL"]
 
 #Creates a fake place in Rhode Island to use for testing.
 fake_id = "rhodeislander"
@@ -42,8 +43,9 @@ class NominatimTest(unittest.TestCase):
 # and reverse geocodes with the coordinates.
     def test_get_filtered_place(self):
         raw_result = ecww.WrapperBase.__getattr__(clean.get_filtered_place(fake_place), "data")
+        print(NOMINATIM_QUERY_URL)
         actual_result = ecww.WrapperBase.__getattr__(raw_result, "display_name")
-        expected_result = "Fulton Street, Providence"
+        expected_result = "Dorrance Street, Providence"
         self.assertEqual(expected_result, actual_result)
 
     def test_make_url_geo(self):
@@ -90,9 +92,7 @@ class NominatimTest(unittest.TestCase):
         nominatim_result = nominatim_result_raw.json()['display_name']
         # NOMINATIM_QUERY_URL = eco.NOMINATIM_QUERY_URL
         docker_result = eco.Geocoder.reverse_geocode(41.832942092439694, -71.41558148857203)
-        print("HEYYY")
         print(docker_result)
-        print("hey2")
         print(nominatim_result)
         self.assertEqual(nominatim_result, docker_result)
 

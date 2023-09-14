@@ -14,6 +14,7 @@ import os
 from emission.core.wrapper.trip_old import Coordinate
 try:
     NOMINATIM_QUERY_URL_env = os.environ.get("NOMINATIM_QUERY_URL", "")
+    logging.info(f"NOMINATIM_QUERY_URL_env: {NOMINATIM_QUERY_URL_env}")
     NOMINATIM_QUERY_URL = NOMINATIM_QUERY_URL_env if NOMINATIM_QUERY_URL_env != "" else "http://nominatim.openstreetmap.org"
 
 except:
