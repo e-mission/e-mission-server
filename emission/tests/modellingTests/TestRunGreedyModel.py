@@ -62,6 +62,7 @@ class TestRunGreedyModel(unittest.TestCase):
                 trips=self.total_trips,
                 origin=self.origin,
                 destination=self.destination,
+                trip_part='od',
                 label_data=label_data,
                 within_threshold=self.clustered_trips,  
                 threshold=0.004, # ~400m
@@ -106,6 +107,7 @@ class TestRunGreedyModel(unittest.TestCase):
             "metric": "od_similarity",
             "similarity_threshold_meters": 500,
             "apply_cutoff": False,
+            "clustering_way": 'origin-destination',
             "incremental_evaluation": False
         }
 
@@ -142,6 +144,7 @@ class TestRunGreedyModel(unittest.TestCase):
             "metric": "od_similarity",
             "similarity_threshold_meters": 500,
             "apply_cutoff": False,
+            "clustering_way": 'origin-destination',
             "incremental_evaluation": False
         }
 
