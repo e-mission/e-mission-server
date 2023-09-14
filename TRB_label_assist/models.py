@@ -19,12 +19,10 @@ from sklearn.exceptions import NotFittedError
 from clustering import get_distance_matrix, single_cluster_purity
 import data_wrangling
 import emission.storage.decorations.trip_queries as esdtq
-import emission.analysis.modelling.tour_model_first_only.build_save_model as bsm
-import emission.analysis.modelling.tour_model_first_only.evaluation_pipeline as ep
 from emission.analysis.classification.inference.labels.inferrers import predict_cluster_confidence_discounting
 import emission.core.wrapper.entry as ecwe
 import emission.analysis.modelling.trip_model.greedy_similarity_binning as eamtg
-import emission.analysis.modelling.tour_model.similarity as eamts
+import emission.core.common as ecc
 import emission.analysis.modelling.trip_model.model_storage as eamums
 import emission.analysis.modelling.trip_model.model_type as eamumt
 import emission.analysis.modelling.trip_model.run_model as eamur
@@ -398,8 +396,8 @@ class RefactoredNaiveCluster(Cluster):
         ptb_lat = tripb[[loc_type + '_lat']]
         ptb_lon = tripb[[loc_type + '_lon']]
 
-        return eamts.within_radius(pta_lat, pta_lon, ptb_lat, ptb_lon,
-                                   self.radius)
+        dist= ecc.calDistance([pta_lon,pta_lat],[ptb_lon,ptb_lat])                                   
+        return dist <= self.radius
 
 
 class DBSCANSVMCluster(Cluster):
