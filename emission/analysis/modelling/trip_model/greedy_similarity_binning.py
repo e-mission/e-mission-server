@@ -119,6 +119,11 @@ class GreedySimilarityBinning(eamuu.TripModel):
         self.sim_thresh = config['similarity_threshold_meters']
         self.apply_cutoff = config['apply_cutoff']
         self.is_incremental = config['incremental_evaluation']
+        if config.get('clustering_way') is None:
+            self.clusteringWay='origin-destination'   # previous default
+        else:
+            self.clusteringWay= config['clustering_way'] 
+        self.tripLabels=[]
 
         self.bins: Dict[str, Dict] = {}
         
@@ -184,9 +189,11 @@ class GreedySimilarityBinning(eamuu.TripModel):
                 logging.debug(f"adding trip to bin {bin_id} with features {trip_features}")
                 self.bins[bin_id]['feature_rows'].append(trip_features)
                 self.bins[bin_id]['labels'].append(trip_labels)
+                self.tripLabels.append(bin_id)
             else:
                 # create new bin
                 new_bin_id = str(len(self.bins))
+                self.tripLabels.append(new_bin_id)
                 new_bin_record = {
                     'feature_rows': [trip_features],
                     'labels': [trip_labels],
@@ -200,14 +207,15 @@ class GreedySimilarityBinning(eamuu.TripModel):
         finds an existing bin where all bin features are "similar" to the incoming
         trip features.
 
-        :param trip_features: feature row for the incoming trip
+        :param trip_features: feature row for the incoming trip. 
+                            takes the form [orig_lat, orig_lon, dest_lat, dest_lon]
         :return: the id of a bin if a match was found, otherwise None
         """
         for bin_id, bin_record in self.bins.items():
-                matches_bin = all([self.metric.similar(trip_features, bin_sample, self.sim_thresh)
-                    for bin_sample in bin_record['feature_rows']])
-                if matches_bin:
-                    return bin_id
+            matches_bin = all([self.metric.similar(trip_features, bin_sample, self.sim_thresh,self.clusteringWay)
+                for bin_sample in bin_record['feature_rows']])
+            if matches_bin:
+                return bin_id
         return None
 
     def _nearest_bin(self, trip: ecwc.Confirmedtrip) -> Tuple[Optional[int], Optional[Dict]]:

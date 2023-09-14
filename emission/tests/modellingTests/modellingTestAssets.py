@@ -1,35 +1,81 @@
 import random
 from typing import Optional, Tuple, List, Dict
 from uuid import UUID
-import emission.analysis.modelling.trip_model.trip_model as eamtm
+import emission.analysis.modelling.trip_model.greedy_similarity_binning as eamtg
 import emission.core.wrapper.confirmedtrip as ecwc
-
+import emission.core.common as ecc
 import emission.core.wrapper.entry as ecwe
 import time 
 import math
 
+def generate_random_point():
+    """Generate a completetly random point valid WGS84 latitiude and longtidude.   
+    CAUTION : In order to save trips, GeoJSON requires points in [lon,lat] format"""    
+    lat=random.uniform(-90,90)
+    lon=random.uniform(-180,180)
+    return [lon,lat]
+
+def generate_nearby_random_points(ref_coords,threshold):
+    """
+    Generate valid WGS84 latitiude and longtidude in threshold(m) proximity to
+    ref coordinates.
+    """
+    #convert given threshold in m to approx WGS84 coord dist.
+    thresholdInWGS84 = threshold* (0.000001/0.11)
+    
+    #generate a random coordinate in threshold's limit around the ref points. OR we 
+
+    # for eg, ref point is 0,0 and threshold is  100m , so we generate a radius from 0 to 50, say 34 
+    # in this example. A random radius is also generted from 0 to 360,say 0. We then take 34 step along x axis direction 
+    # till radius length to get our new point, (34,0). When this function is called the next time to generate a point
+    #that has to be binned with previous one, we again generate r and theta , say 24 , 180 this time. 
+    # Now this new point is at (-24,0). Both these points are within threshold (100 in this case)limit and therefore will 
+    #be binned together.
+    radius=random.uniform(0,thresholdInWGS84/2)
+    theta=random.uniform(0,2*math.pi)
+    dx = radius * math.cos(theta)
+    dy = radius * math.sin (theta)
+    #This basically gives a way to sample a point from within a circle of radius thresholdInWGS84/2 
+    # around the ref. point.  
+    return [ref_coords[0] + dy , ref_coords[1] + dx]
 
 def generate_trip_coordinates(
-    ref_coords: Tuple[float, float], 
-    within_threshold: bool,
-    threshold: float, 
-    max: float = 0.1  # approx. 10km in WGS84 
+    points_list: list[float],
+    ref_coords, 
+    insideThreshold: bool,
+    threshold_meters: float, 
     ) -> Tuple[float, float]:
-    """generates trip coordinate data to use when mocking a set of trip data.
+    """generates trip coordinate data to use when mocking a set of trip data.i
+    If the coordinate generated  is to be binned together, it is generated in proximity of
+    the previous points in the points_list. Otherwise, if this point is not to be binned together,
+    keep generating a random trip unless we find one that would not bin with previously
+    accepeted trips.
 
-    :param ref_coords: reference coordinates to use as the center of the sampling circle
-    :param within_threshold: how many of these trips are within some distance threshold
-    :param threshold: the distance threshold, in WGS84
-    :param max: max distance, in WGS84, defaults to 0.1 (approx. 10km)
+    :param points_list: list of all the previoushlt selected points 
+    :param within_threshold: is this point  supposed to be within some distance threshold
+    :param threshold_meters: the distance threshold, in meters
     :return: generated coordinate pairs sampled in a 
              circle from some coordinates up to some threshold
     """
-    angle = 2 * math.pi * random.random()
-    radius_threshold = threshold / 2
-    radius = random.uniform(0, radius_threshold) if within_threshold else random.uniform(radius_threshold, max)
-    x = radius * math.cos(angle) + ref_coords[0]
-    y = radius * math.sin(angle) + ref_coords[1]
-    return (x, y)
+    # if the point is to be generated within a threshold and it's not the first point
+    if insideThreshold and points_list:
+        # if  no ref. coordinates are provided, use any previously accepted point as ref.
+        if ref_coords == None:
+            ref_coords=random.choice(points_list)
+        # generate a new point in threshold proximity to ref. point
+        new_point = generate_nearby_random_points(ref_coords, threshold_meters)    
+    else: # If point need not be in the threshold  OR if its the first point we are generating, then
+         #Generate random coordinates if no reference coords were provided  
+        if ref_coords == None:            
+            new_point = generate_random_point()
+        else:
+         # if ref coordinate are provided, use them as the startisng point. 
+            new_point = ref_coords
+        # If the newly generated new_point ( be it when ref_coords given or not given) is not more 
+        # than threshold_meters away from all the previously accepted points, keep generating new_point        # 
+        while not all(ecc.calDistance(new_point, pt) > threshold_meters for pt in points_list):
+            new_point = generate_random_point()
+    return new_point
 
 
 def extract_trip_labels(trips: List[ecwc.Confirmedtrip]) -> Dict:
@@ -129,14 +175,14 @@ def build_mock_trip(
 def generate_mock_trips(
     user_id, 
     trips,
-    origin, 
-    destination, 
+    threshold,
+    trip_part='od',
+    origin=None,
+    destination=None,
     label_data = None, 
     within_threshold = None,
     start_ts: None = None,
     end_ts: None = None,
-    threshold = 0.01,
-    max = 0.1, 
     has_label_p = 1.0,
     seed = 0):
     """mocking function that generates multiple trips for a user. some are sampled 
@@ -157,14 +203,23 @@ def generate_mock_trips(
 
     :param user_id: user UUID
     :param trips: number of trips
-    :param origin: origin coordinates
-    :param destination: destination coordinates
+    :param trip_part: when mock trips are generated, coordinates of this part of 
+                      the trips will be within the threshold. trip_part can take one
+                      among the four values:
+                    1. '__' ->(None, meaning NEITHER origin nor destination of any trip will lie 
+                     within the mentioned threshold when trips are generated),        
+                    2. 'o_' ->(origin, meaning ONLY origin of m trips will lie within the mentioned 
+                     threshold when trips are generated),        
+                    3. '_d' ->(destination),meaning ONLY destination of m trips will lie within the 
+                     mentioned threshold when trips are generated)        
+                    4. 'od' ->(origin and destination,meaning BOTH origin and destination of m trips
+                     will lie within the mentioned threshold when trips are generated)
+    :param origin : reference point for trip origin generally
+    :param destination : reference point for trip origin generally
     :param label_data: dictionary of label data, see above, defaults to None
     :param within_threshold: number of trips that should fall within the provided
-           distance threshold in degrees WGS84, defaults to None
-    :param threshold: distance threshold in WGS84 for sampling, defaults to 0.01
-    :param max: maximum distance beyond the threshold for trips sampled that
-                are not within the threshold, defaults to 0.1 degrees WGS84
+           distance threshold in m
+    :param threshold: distance threshold in WGS84 for sampling
     :param has_label_p: probability a trip has labels, defaults to 1.0
     :param seed: random seed, defaults to 0
     :return: randomly sampled trips
@@ -174,9 +229,16 @@ def generate_mock_trips(
     within = within_threshold if within_threshold is not None else trips
     trips_within_threshold = [i < within for i in range(trips)]
     result = []
+    origin_points=[]
+    destination_points=[]    
+
+    # generate 'trip' number of points based on which among 'o' (Origin) ,'d' (Destination) or
+    # 'od' (Origin-Destination) or '__' (None) should be in threshold proximity to each other. 
     for within in trips_within_threshold:
-        o = generate_trip_coordinates(origin, within, threshold, max)
-        d = generate_trip_coordinates(destination, within, threshold, max)
+        origin_points.append(generate_trip_coordinates(origin_points, origin, insideThreshold= (trip_part[0] == 'o' and within), threshold_meters= threshold))
+        destination_points.append(generate_trip_coordinates(destination_points, destination, insideThreshold=(trip_part[1] == 'd' and within), threshold_meters=threshold))
+
+    for o,d in zip(origin_points,destination_points):    
         labels = {} if label_data is None or random.random() > has_label_p \
             else sample_trip_labels(
             mode_labels=label_data.get('mode_confirm'),
@@ -199,6 +261,6 @@ if __name__ == '__main__':
         "purpose_confirm": ['work', 'home', 'school'],
         "replaced_mode": ['walk', 'bike', 'drive']
     }
-    result = generate_mock_trips('joe-bob', 14, [0, 0], [1,1], label_data, 6)
+    result = generate_mock_trips('joe-bob', 14, [0, 0], [1,1],'od', label_data, 6)
     for r in result:
         print(r)

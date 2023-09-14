@@ -44,6 +44,7 @@ class TestRunGreedyIncrementalModel(unittest.TestCase):
             "metric": "od_similarity",
             "similarity_threshold_meters": sim_threshold,
             "apply_cutoff": False,
+            "clustering_way": 'origin-destination',
             "incremental_evaluation": True
         }
 
@@ -162,6 +163,7 @@ class TestRunGreedyIncrementalModel(unittest.TestCase):
             trips=self.new_trips_per_invocation,
             origin=self.origin,
             destination=self.destination,
+            trip_part='od',
             label_data=label_data,
             threshold=0.0001, # ~10m,
             start_ts=time.time() - 20,
