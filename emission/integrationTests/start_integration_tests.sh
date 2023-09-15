@@ -28,9 +28,9 @@ echo "Running tests..."
 source setup/activate_tests.sh
 
 chmod +x runIntegrationTests.sh
-# tail -f /dev/null
-# echo "About to sleep! Zzzz..."
-# sleep 240
-# echo "Done sleeping! Running integration tests:"
-dockerize -wait http://rhodeisland-nominatim:8080 -timeout 240s
+tail -f /dev/null
+echo "About to sleep! Zzzz..."
+sleep 240
+echo "Done sleeping! Running integration tests:"
+dockerize -wait http://rhodeisland-nominatim:8080 -timeout 20s
 ./runIntegrationTests.sh

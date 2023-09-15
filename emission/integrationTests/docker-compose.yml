@@ -44,7 +44,7 @@ services:
     environment:
       - PBF_URL=https://download.geofabrik.de/north-america/us/rhode-island-latest.osm.pbf
       - REPLICATION_URL=https://download.geofabrik.de/north-america/us/rhode-island-updates/
-      # - IMPORT_WIKIPEDIA=false
+      - IMPORT_WIKIPEDIA=false
     ports:
       - "8080:8080"
       #healthcheck currently commented out, since it isn't necessary and keeps going the entire time the container is running. 
