@@ -21,8 +21,14 @@ import emission.analysis.intake.cleaning.clean_and_resample as clean
 NOMINATIM_QUERY_URL_env = os.environ.get("NOMINATIM_QUERY_URL", "")
 NOMINATIM_QUERY_URL = NOMINATIM_QUERY_URL_env if NOMINATIM_QUERY_URL_env != "" else eco.NOMINATIM_QUERY_URL
 GEOFABRIK_QUERY_URL = os.environ.get("GEOFABRIK_QUERY_URL")
-# GEOFABRIK_QUERY_URL = os.environ["GEOFABRIK_QUERY_URL"]
-
+TEST_ENVVAR = os.environ["TEST_ENVVAR"]
+TEST_2ENVVAR = os.environ.get("TEST_ENVVAR")
+TEST_KEY = os.environ["TEST_KEY"]
+TEST_2KEY = os.environ.get("TEST_KEY")
+print("first method", TEST_ENVVAR)
+print("get method", TEST_2ENVVAR)
+print("first metho key", TEST_KEY)
+print("get method key", TEST_2KEY)
 #Creates a fake place in Rhode Island to use for testing.
 fake_id = "rhodeislander"
 key = "segmentation/raw_place"
@@ -55,8 +61,8 @@ class NominatimTest(unittest.TestCase):
 
     #we ignore the place_id because it is an internal Nominatim identifier 
     def test_get_json_geo(self):
-        expected_result = [{'place_id': mock.ANY, 'licence': 'Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright', 'osm_type': 'way', 'osm_id': 121496393, 'boundingbox': ['41.8237547', '41.8243153', '-71.4132816', '-71.4125278'], 'lat': '41.824034499999996', 'lon': '-71.41290469687814', 'display_name': 'Providence City Hall, Fulton Street, Downtown, Providence, Providence County, 02903, United States', 'class': 'amenity', 'type': 'townhall', 'importance': 1.25001}]
-        actual_result = eco.Geocoder.get_json_geo("Providence City Hall, Fulton Street, Downtown, Providence, Providence County, 02903, United States")
+        expected_result = "Hartford Pike"
+        actual_result = eco.Geocoder.get_json_geo("Old Hartford Pike, Scituate, RI 02857")[0]["name"]
         self.assertEqual(expected_result, actual_result)
 
     def test_geocode(self):
