@@ -6,6 +6,9 @@ on:
   pull_request:
     branches:
         - master
+  push:
+    branches:
+        -nominatim
 
   schedule:
     # Run every Sunday at 4:05 am
@@ -29,4 +32,6 @@ jobs:
     - name: Test nominatim
       env:
         GEOFABRIK_QUERY_URL: "https://geocoding.geofabrik.de/${{secrets.GEOFABRIK_API}}"
+        TEST_KEY: ${{secrets.TEST_SECRET}}
+        TEST_ENVVAR: "https://geocoding.geofabrik.de/${{secrets.TEST_SECRET}}"
       run: docker-compose -f emission/integrationTests/docker-compose.yml up --exit-code-from web-server
