@@ -11,9 +11,9 @@ on:
     branches:
         - 'nataliejschultz/nominatim'
 
-  schedule:
-    # Run every Sunday at 4:05 am
-    - cron:  '5 4 * * 0'
+  # schedule:
+  #   # Run every Sunday at 4:05 am
+  #   - cron:  '5 4 * * 0'
 jobs:
   # This workflow contains a single job called "build"
   build:
