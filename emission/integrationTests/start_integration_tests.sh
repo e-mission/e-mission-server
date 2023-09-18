@@ -27,7 +27,7 @@ echo "Adding permissions"
 chmod +x runIntegrationTests.sh
 echo "Permissions added"
 
-tail -f /dev/null
+# tail -f /dev/null
 # echo "About to sleep! Zzzz..."
 # sleep 240
 # echo "Done sleeping! Running integration tests:"
