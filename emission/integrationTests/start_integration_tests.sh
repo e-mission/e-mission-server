@@ -2,10 +2,6 @@
 # Using an automated install 
 cd /src/e-mission-server
 
-echo "++++++++++"
-echo "$PWD"
-
-
 #set database URL using environment variable
 echo ${DB_HOST}
 if [ -z ${DB_HOST} ] ; then
@@ -27,10 +23,15 @@ source setup/setup_tests.sh
 echo "Running tests..."
 source setup/activate_tests.sh
 
+echo "Adding permissions"
 chmod +x runIntegrationTests.sh
+echo "Permissions added"
+
 tail -f /dev/null
 # echo "About to sleep! Zzzz..."
 # sleep 240
 # echo "Done sleeping! Running integration tests:"
-dockerize -wait http://rhodeisland-nominatim:8080 -timeout 20s
+echo "Dockerize running!"
+dockerize -wait http://rhodeisland-nominatim:8080 -timeout 240s
+echo "Dockerize done! Running integration tests:"
 ./runIntegrationTests.sh
