@@ -16,7 +16,7 @@ import emission.core.wrapper.wrapperbase as ecww
 import emission.net.ext_service.geocoder.nominatim as eco
 import emission.analysis.intake.cleaning.clean_and_resample as clean
 
-
+print("Starting to test Nominatim")
 #temporarily sets NOMINATIM_QUERY_URL to the environment variable for testing.
 NOMINATIM_QUERY_URL_env = os.environ.get("NOMINATIM_QUERY_URL", "")
 NOMINATIM_QUERY_URL = NOMINATIM_QUERY_URL_env if NOMINATIM_QUERY_URL_env != "" else eco.NOMINATIM_QUERY_URL

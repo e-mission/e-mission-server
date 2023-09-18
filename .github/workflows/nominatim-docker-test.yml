@@ -5,8 +5,7 @@ name: nominatim-docker-test
 on:
   pull_request:
     branches:
-      - 'nominatim'
-  #       - master
+        - master
   push:
     branches:
         - 'nataliejschultz/nominatim'
