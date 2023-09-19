@@ -18,6 +18,8 @@ import emission.analysis.intake.cleaning.clean_and_resample as clean
 
 print("Starting to test Nominatim")
 #temporarily sets NOMINATIM_QUERY_URL to the environment variable for testing.
+print("testkey", TEST_KEY)
+print("testenvvar", TEST_ENVVAR)
 NOMINATIM_QUERY_URL_env = os.environ.get("NOMINATIM_QUERY_URL", "")
 NOMINATIM_QUERY_URL = NOMINATIM_QUERY_URL_env if NOMINATIM_QUERY_URL_env != "" else eco.NOMINATIM_QUERY_URL
 GEOFABRIK_QUERY_URL = os.environ.get("GEOFABRIK_QUERY_URL")
