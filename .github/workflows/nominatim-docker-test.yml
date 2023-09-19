@@ -30,9 +30,9 @@ jobs:
       run: echo Smoke test
 
     - name: Test nominatim
+      run: docker-compose -f emission/integrationTests/docker-compose.yml up --exit-code-from web-server
       env:
         GEOFABRIK_QUERY_URL: "https://geocoding.geofabrik.de/${{ secrets.GEOFABRIK_API }}"
         TEST_KEY: ${{ secrets.TEST_SECRET }}
         TEST_ENVVAR: "https://geocoding.geofabrik.de/${{ secrets.TEST_SECRET }}"
         TEST_STR: "https://geocoding.geofabrik.de/"
-      run: docker-compose -f emission/integrationTests/docker-compose.yml up --exit-code-from web-server
