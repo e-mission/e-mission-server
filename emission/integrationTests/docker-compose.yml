@@ -10,6 +10,7 @@ services:
       - DB_HOST=db
       - WEB_SERVER_HOST=0.0.0.0
       - NOMINATIM_QUERY_URL=http://rhodeisland-nominatim:8080
+      - TEST_KEY=$TEST_KEY
     volumes:
       # specify the host directory where the source code should live
       # If this is ~/e-mission-server-docker, then you can edit the files at
@@ -45,7 +46,6 @@ services:
       - PBF_URL=https://download.geofabrik.de/north-america/us/rhode-island-latest.osm.pbf
       - REPLICATION_URL=https://download.geofabrik.de/north-america/us/rhode-island-updates/
       - IMPORT_WIKIPEDIA=false
-      - TEST_KEY=$TEST_KEY
     ports:
       - "8080:8080"
       # healthcheck currently commented out, since it isn't necessary and keeps going the entire time the container is running. 

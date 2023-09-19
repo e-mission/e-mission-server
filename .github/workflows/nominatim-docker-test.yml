@@ -34,14 +34,13 @@ jobs:
     - name: Workflow test
       run: echo Smoke test
 
-    # - name: Variable
-    #   run: echo "TEST_KEY=$TEST_KEY" > emission/integrationTests/.env
+    - name: Variable
+      run: echo "TEST_KEY=$TEST_KEY" > emission/integrationTests/.env
 
-    # - name: Variable2
-    #   run: cat emission/integrationTests/.env
-
+    - name: Variable2
+      run: cat emission/integrationTests/.env
 
     - name: Test nominatim
-      run: TEST_KEY=$TEST_KEY docker-compose -f emission/integrationTests/docker-compose.yml up --exit-code-from web-server
+      run: docker-compose -f emission/integrationTests/docker-compose.yml up --exit-code-from web-server
       
 
