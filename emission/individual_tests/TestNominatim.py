@@ -17,15 +17,16 @@ import emission.net.ext_service.geocoder.nominatim as eco
 import emission.analysis.intake.cleaning.clean_and_resample as clean
 
 print("Starting to test Nominatim")
+print("keys", os.environ.keys())
 #temporarily sets NOMINATIM_QUERY_URL to the environment variable for testing.
 NOMINATIM_QUERY_URL_env = os.environ.get("NOMINATIM_QUERY_URL", "")
 NOMINATIM_QUERY_URL = NOMINATIM_QUERY_URL_env if NOMINATIM_QUERY_URL_env != "" else eco.NOMINATIM_QUERY_URL
 GEOFABRIK_QUERY_URL = os.environ.get("GEOFABRIK_QUERY_URL")
-TEST_2ENVVAR = os.environ.get("TEST_ENVVAR")
-print("get method", TEST_2ENVVAR)
-TEST_2KEY = os.environ.get("TEST_KEY")
-print("get method key", TEST_2KEY)
+TEST_ENVVAR = os.environ.get("TEST_ENVVAR")
+TEST_KEY = os.environ.get("TEST_KEY")
 TEST_STR = os.environ.get("TEST_STR")
+print("Test str w envvar", TEST_ENVVAR)
+print("Test key", TEST_KEY)
 print("TESTSTRING", TEST_STR)
 #Creates a fake place in Rhode Island to use for testing.
 fake_id = "rhodeislander"
