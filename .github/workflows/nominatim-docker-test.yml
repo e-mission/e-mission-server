@@ -38,7 +38,7 @@ jobs:
       run: echo "TEST_KEY=$TEST_KEY" > emission/integrationTests/.env
 
     - name: Variable2
-      run: cat .env
+      run: cat emission/integrationTests/.env
 
 
     - name: Test nominatim
