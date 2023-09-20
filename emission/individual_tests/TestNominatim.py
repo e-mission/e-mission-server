@@ -65,9 +65,11 @@ class NominatimTest(unittest.TestCase):
 
     #we ignore the place_id because it is an internal Nominatim identifier 
     def test_get_json_geo(self):
-        expected_result = "Hartford Pike"
-        actual_result = eco.Geocoder.get_json_geo("Old Hartford Pike, Scituate, RI 02857")[0]["name"]
-        self.assertEqual(expected_result, actual_result)
+        expected_result = {'place_id': 132490, 'licence': 'Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright', 'osm_type': 'way', 'osm_id': 141567710, 'boundingbox': ['41.8325787', '41.8332278', '-71.4161848', '-71.4152064'], 'lat': '41.8330097', 'lon': '-71.41568124868104', 'display_name': 'State of Rhode Island Department of Administration, 1, Park Street, Downtown, Providence, Providence County, 02908, United States', 'class': 'building', 'type': 'civic', 'importance': 1.75001}
+        actual_result = eco.Geocoder.get_json_geo("State of Rhode Island Department of Administration, 1, Park Street, Downtown, Providence, Providence County, 02908, United States")[0]
+        key_list = ['osm_id', 'boundingbox', 'display_name']
+        for k in key_list:
+            self.assertEqual(expected_result[k], actual_result[k])
 
     def test_geocode(self):
         expected_result_lon = Coordinate(41.8239891, -71.4128343).get_lon()
