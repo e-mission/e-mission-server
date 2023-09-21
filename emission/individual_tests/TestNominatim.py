@@ -101,9 +101,9 @@ class NominatimTest(unittest.TestCase):
     def test_nominatim_api(self):
         nominatim_url = "http://nominatim.openstreetmap.org/reverse?lat=41.832942092439694&lon=-71.41558148857203&format=json"
         nominatim_result_raw = requests.get(nominatim_url)
-        nominatim_result = nominatim_result_raw.json()['display_name'][0:30]
+        nominatim_result = nominatim_result_raw.json()['display_name'][0:70]
         # NOMINATIM_QUERY_URL = eco.NOMINATIM_QUERY_URL
-        docker_result = eco.Geocoder.reverse_geocode(41.832942092439694, -71.41558148857203)
+        docker_result = eco.Geocoder.reverse_geocode(41.832942092439694, -71.41558148857203)[0:70]
         print(docker_result)
         print(nominatim_result)
         self.assertEqual(nominatim_result, docker_result)
