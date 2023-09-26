@@ -39,9 +39,8 @@ services:
        - emission
   #adding section to incorporate nominatim server functionality
   nominatim:
-    image: nataliejschultz/rhodeisland-image:sept25-2023
+    image: nataliejschultz/rhodeisland-image:2.0
     container_name: rhodeisland-nominatim
-    # command: "/app/start.sh"
     ports:
       - "8080:8080"
       # healthcheck currently commented out, since it isn't necessary and keeps going the entire time the container is running. 
