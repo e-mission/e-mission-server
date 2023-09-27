@@ -40,7 +40,7 @@ services:
   #adding section to incorporate nominatim server functionality
   nominatim:
     entrypoint: /app/start.sh
-    image: nataliejschultz/rhodeisland-image:test
+    image: nataliejschultz/rhodeisland-image:4.0
     container_name: rhodeisland-nominatim
     ports:
       - "8080:8080"
