@@ -39,7 +39,7 @@ services:
        - emission
   #adding section to incorporate nominatim server functionality
   nominatim:
-    image: nataliejschultz/rhodeisland-image:2.0
+    image: nataliejschultz/rhodeisland-image:test
     container_name: rhodeisland-nominatim
     ports:
       - "8080:8080"
