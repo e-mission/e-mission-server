@@ -29,7 +29,8 @@ jobs:
     - name: Workflow test
       run: echo Smoke test
 
-    - name: Test nominatim
+      # Passes the geofabrik key into the docker-compose.yml file. 
+    - name: Test nominatim.py
       run: GFBK_KEY=${{ secrets.GEOFABRIK_API }} docker-compose -f emission/integrationTests/docker-compose.yml up --exit-code-from web-server
       
 
