@@ -8,7 +8,6 @@ services:
       - nominatim
     environment:
       - DB_HOST=db
-      - WEB_SERVER_HOST=0.0.0.0
       - OPENSTREETMAP_QUERY_URL=http://rhodeisland-nominatim:8080
       - GFBK_KEY=$GFBK_KEY
     volumes:

@@ -23,9 +23,9 @@ source setup/setup_tests.sh
 echo "Running tests..."
 source setup/activate_tests.sh
 
-echo "Adding permissions for the `runIntegrationTests.sh` script"
+echo "Adding permissions for the runIntegrationTests.sh script"
 chmod +x runIntegrationTests.sh
-echo "Permissions added for the `runIntegrationTests.sh` script"
+echo "Permissions added for the runIntegrationTests.sh script"
 
 echo "Dockerize running!"
 dockerize -wait http://rhodeisland-nominatim:8080 -timeout 240s
