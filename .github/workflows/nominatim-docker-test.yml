@@ -9,8 +9,12 @@ on:
   push:
     branches:
         - nominatim
+    # paths:
+    #   - 'net/ext_service/geocoder'
+    #   - 'analysis/intake/cleaning/clean_and_resample.py'
 
   # schedule:
+
   #   # Run every Sunday at 4:05 am
   #   - cron:  '5 4 * * 0'
 jobs:

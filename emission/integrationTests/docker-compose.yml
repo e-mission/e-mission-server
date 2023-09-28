@@ -44,12 +44,6 @@ services:
     container_name: rhodeisland-nominatim
     ports:
       - "8080:8080"
-      # healthcheck currently commented out, since it isn't necessary and keeps going the entire time the container is running. 
-    healthcheck:
-      test: ["CMD", "curl", "-v", "http://localhost:8080"]
-      interval: 1m
-      timeout: 15s
-      retries: 3
     deploy:
       replicas: 1
       restart_policy:
