@@ -16,7 +16,7 @@ try:
     OPENSTREETMAP_QUERY_URL_env = os.environ.get("OPENSTREETMAP_QUERY_URL", "")
     logging.info(f"OPENSTREETMAP_QUERY_URL_env: {OPENSTREETMAP_QUERY_URL_env}")
     OPENSTREETMAP_QUERY_URL = OPENSTREETMAP_QUERY_URL_env if OPENSTREETMAP_QUERY_URL_env != "" else "http://nominatim.openstreetmap.org"
-    print("Open Street Map URL not configured, defaulting to nominatim:") if OPENSTREETMAP_QUERY_URL = "http://nominatim.openstreetmap.org" elif print "Open Street Map URL configured!" 
+    print("Open Street Map URL not configured, defaulting to nominatim:") if OPENSTREETMAP_QUERY_URL == "http://nominatim.openstreetmap.org" elif print "Open Street Map URL configured!" 
 except:
     print("URL not configured, place decoding must happen on the client")
 
