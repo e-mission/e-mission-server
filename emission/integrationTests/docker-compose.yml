@@ -8,7 +8,7 @@ services:
       - nominatim
     environment:
       - DB_HOST=db
-      - OPENSTREETMAP_QUERY_URL=http://rhodeisland-nominatim
+      - OPENSTREETMAP_QUERY_URL=http://rhodeisland-nominatim:8080
       - GFBK_KEY=$GFBK_KEY
     volumes:
       # specify the host directory where the source code should live
@@ -39,6 +39,8 @@ services:
     entrypoint: /app/start.sh
     image: nataliejschultz/rhodeisland-image:4.0
     container_name: rhodeisland-nominatim
+    ports:
+      - "8080:8080"
     deploy:
       replicas: 1
       restart_policy:
