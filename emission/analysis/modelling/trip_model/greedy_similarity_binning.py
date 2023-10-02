@@ -128,11 +128,12 @@ class GreedySimilarityBinning(eamuu.TripModel):
         self.bins: Dict[str, Dict] = {}
         
 
-    def fit(self, trips: List[ecwc.Confirmedtrip]):
+    def fit(self, trips: List[ecwc.Confirmedtrip],tripsdf=None):
         """train the model by passing data, where each row in the data
         corresponds to a label at the matching index of the label input
 
         :param trips: 2D array of features to train from
+        :param tripsdf: trips data in dataframe format
         """
         
         logging.debug(f'fit called with {len(trips)} trips')

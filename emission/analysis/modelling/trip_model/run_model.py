@@ -56,8 +56,10 @@ def update_trip_model(
         logging.debug(f'model type {model_type.name} is incremental? {model.is_incremental}')
         logging.debug(f'time query for training data collection: {time_query}')
 
+        ts = esta.TimeSeries.get_time_series(user_id)
         trips = _get_training_data(user_id, time_query)
-        
+
+        trips_df = ts.to_data_df("analysis/confirmed_trip",trips)
         # don't start training for a user that doesn't have at least $trips many trips
         # (assume if a stored model exists for the user, that they met this requirement previously)
         if len(trips) == 0:
@@ -73,8 +75,9 @@ def update_trip_model(
             epq.mark_trip_model_failed(user_id)
         else:
             
-            # train and store the model
-            model.fit(trips)
+            # train and store the model. pass both List of event and dataframe time data
+            # that both standard( which mostly work on df) and self implemented models can use.
+            model.fit(trips,trips_df)
             model_data_next = model.to_dict()
 
             if len(model_data_next) == 0:
