@@ -12,7 +12,7 @@ else
     INSTALL_PREFIX=$HOME/miniconda-$EXP_CONDA_VER
     SOURCE_SCRIPT="$HOME/miniconda-$EXP_CONDA_VER/etc/profile.d/conda.sh"
     
-    curl -o miniconda.sh -L https://repo.continuum.io/miniconda/Miniconda3-py39_$EXP_CONDA_VER-1-$PLATFORM.sh;
+    curl -o miniconda.sh -L https://repo.anaconda.com/miniconda/Miniconda3-py39_$EXP_CONDA_VER-0-$PLATFORM.sh;
     bash miniconda.sh -b -p $INSTALL_PREFIX
     source $SOURCE_SCRIPT
     hash -r
