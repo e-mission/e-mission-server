@@ -31,7 +31,7 @@ GEOFABRIK_QUERY_URL = (
 class NominatimTest(unittest.TestCase):
     maxDiff = None
 
-    #Basic query to check that nominatim and geofabrik are calling the same area.
+    #Basic query to check that nominatim and geofabrik are returning the same data.
     def test_geofabrik_and_nominatim(self):
         OPENSTREETMAP_result = requests.get(OPENSTREETMAP_QUERY_URL + "/reverse?lat=41.8239891&lon=-71.4128343&format=json").json()
         geofabrik_result = requests.get(GEOFABRIK_QUERY_URL + "/reverse?lat=41.8239891&lon=-71.4128343&format=json").json()
