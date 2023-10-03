@@ -8,7 +8,6 @@ services:
     environment:
       - DB_HOST=db
       - WEB_SERVER_HOST=0.0.0.0
-
     volumes:
       # specify the host directory where the source code should live
       # If this is ~/e-mission-server-docker, then you can edit the files at
