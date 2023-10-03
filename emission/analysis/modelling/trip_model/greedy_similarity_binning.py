@@ -128,7 +128,7 @@ class GreedySimilarityBinning(eamuu.TripModel):
         self.bins: Dict[str, Dict] = {}
         
 
-    def fit(self, trips: List[ecwc.Confirmedtrip],tripsdf=None):
+    def fit(self, trips: List[ecwc.Confirmedtrip]):
         """train the model by passing data, where each row in the data
         corresponds to a label at the matching index of the label input
 
