@@ -19,6 +19,7 @@ conda install -c conda-forge cryptography=41.0.4 wheel=0.40.0
 rm -rf /root/miniconda-23.1.0/pkgs/cryptography-38.0.4-py39h9ce1e76_0
 rm -rf /root/miniconda-23.1.0/pkgs/wheel-0.37.1-pyhd3eb1b0_0
 rm -rf /root/miniconda-23.5.2/pkgs/cryptography-39.0.1-py39h9ce1e76_2
+rm -rf /root/miniconda-23.5.2/pkgs/certifi-2023.5.7-py39h06a4308_0
 
 # Clean up the conda install
 conda clean -t
