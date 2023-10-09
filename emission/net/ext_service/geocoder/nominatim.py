@@ -15,7 +15,7 @@ from emission.core.wrapper.trip_old import Coordinate
 try:
     NOMINATIM_QUERY_URL = os.environ.get("NOMINATIM_QUERY_URL")
     # logging.info(f"NOMINATIM_QUERY_URL: {NOMINATIM_QUERY_URL}")
-    print("URL Configured:", NOMINATIM_QUERY_URL)
+    print("Nominatim Query URL Configured!")
 
     if NOMINATIM_QUERY_URL is None:
         raise Exception("Nominatim query url not configured")
@@ -61,7 +61,6 @@ class Geocoder(object):
             "lon" : lon,
             "format" : "json"
         }
-
         query_url = NOMINATIM_QUERY_URL + "/reverse?"
         encoded_params = urllib.parse.urlencode(params)
         url = query_url + encoded_params
