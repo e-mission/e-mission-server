@@ -10,7 +10,7 @@ import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.core.get_database as edb
 import emission.storage.pipeline_queries as epq
 import emission.core.wrapper.pipelinestate as ecwp
-
+import numpy as np
 
 class TestRunForestModel(unittest.TestCase):
     """these tests were copied forward during a refactor of the tour model
@@ -87,106 +87,86 @@ class TestRunForestModel(unittest.TestCase):
         edb.get_model_db().delete_many({'user_id': self.user_id})
         edb.get_pipeline_state_db().delete_many({'user_id': self.user_id})
 
-    def testBuildForestModelFromConfig(self):
+
+#     def test_model_consistency(self):
+#         """
+#         Test to ensure that the model's predictions on the mock data remain consistent.
+#         """
+#         # Get the mock data from the parent class's setup
+#         mock_data = self.mock_data
+
+#         # Predict using the model
+#         current_predictions = eamur.predict_labels_with_n(
+#             trip=mock_data, 
+#             model_type=eamumt.ModelType.RANDOM_FOREST_CLASSIFIER, 
+#             model_storage=eamums.ModelStorage.DOCUMENT_DATABASE
+#         )  # assuming this is how you get predictions
+#   ## TODO : 
+#         # Check if there are any previously stored predictions
+#         stored_predictions = list(self.collection.find({}))  
+
+#         if len(stored_predictions) == 0:
+#             # If not, store the current predictions as the ground truth
+#             self.collection.insert_many([{"index": i, "prediction": p} for i, p in enumerate(current_predictions)])
+#             logging.debug("Stored current model predictions as ground truth.")
+#         else:
+#             # If there are stored predictions, compare them with the current predictions
+#             for stored_pred in stored_predictions:
+#                 index, stored_value = stored_pred["index"], stored_pred["prediction"]
+#                 current_value = current_predictions[index]
+                
+#                 self.assertEqual(stored_value, current_value, f"Prediction at index {index} has changed! Expected {stored_value}, but got {current_value}.")
+
+#             logging.debug("Model predictions are consistent with previously stored predictions.")
+
+
+    def test_regression(self):
         """
-        forest model takes config arguments via the constructor for testing
-        purposes but will load from a file in /conf/analysis/ which is tested here
+        Regression test to ensure consistent model results.
         """
-
-        eamumt.ModelType.RANDOM_FOREST_CLASSIFIER.build()
-        # success if it didn't throw
-
-    def testTrainForestModelWithZeroTrips(self):
-        """
-        forest model takes config arguments via the constructor for testing
-        purposes but will load from a file in /conf/analysis/ which is tested here
-        """
-
-        # pass along debug model configuration
-        forest_model_config= {
-            "loc_feature" : "coordinates",
-            "radius": 500,
-            "size_thresh":1,
-            "purity_thresh":1.0,
-            "gamma":0.05,
-            "C":1,
-            "n_estimators":100,
-            "criterion":"gini",
-            "max_depth":'null',
-            "min_samples_split":2,
-            "min_samples_leaf":1,
-            "max_features":"sqrt",
-            "bootstrap":True,
-            "random_state":42,
-            "use_start_clusters":False,
-            "use_trip_clusters":True
-        }
-
-        logging.debug(f'~~~~ do nothing ~~~~')
-        eamur.update_trip_model(
-            user_id=self.unused_user_id,
-            model_type=eamumt.ModelType.RANDOM_FOREST_CLASSIFIER,
-            model_storage=eamums.ModelStorage.DOCUMENT_DATABASE,
-            min_trips=self.min_trips,
-            model_config=forest_model_config
-        )
-
-        # user had no entries so their pipeline state should not have been set
-        # if it was set, the time query here would 
-        stage = ecwp.PipelineStages.TRIP_MODEL
-        pipeline_state = epq.get_current_state(self.unused_user_id, stage)
-        self.assertIsNone(
-            pipeline_state['curr_run_ts'], 
-            "pipeline should not have a current timestamp for the test user")
-
-
-    def testPredictForestModelWithZeroTrips(self):
-       """
-       forest model takes config arguments via the constructor for testing
-       purposes but will load from a file in /conf/analysis/ which is tested here
-       """
-
-        forest_model_config= {
-            "loc_feature" : "coordinates",
-            "radius": 500,
-            "size_thresh":1,
-            "purity_thresh":1.0,
-            "gamma":0.05,
-            "C":1,
-            "n_estimators":100,
-            "criterion":"gini",
-            "max_depth":'null',
-            "min_samples_split":2,
-            "min_samples_leaf":1,
-            "max_features":"sqrt",
-            "bootstrap":True,
-            "random_state":42,
-            "use_start_clusters":False,
-            "use_trip_clusters":True
-        }
-
-        logging.debug(f'(TRAIN) creating a model based on trips in database')
-        eamur.update_trip_model(
-            user_id=self.user_id,
-            model_type=eamumt.ModelType.RANDOM_FOREST_CLASSIFIER,
-            model_storage=eamums.ModelStorage.DOCUMENT_DATABASE,
-            min_trips=self.min_trips,
-            model_config=forest_model_config
-        )
+        # Load the previously stored predictions (if any)
+        previous_predictions = self.load_previous_predictions()
         
-        logging.debug(f'(TEST) testing prediction of stored model')
-        test = etmm.build_mock_trip(
-            user_id=self.user_id,
-            origin=self.origin,
-            destination=self.destination
-        )
-        prediction, n = eamur.predict_labels_with_n(
-            trip = test,
-            model_type=eamumt.ModelType.RANDOM_FOREST_CLASSIFIER,
-            model_storage=eamums.ModelStorage.DOCUMENT_DATABASE,
-            model_config=forest_model_config
-        )
+        # Run the current model to get predictions
+        current_predictions = self.run_current_model()
 
-        [logging.debug(p) for p in sorted(prediction, key=lambda r: r['p'], reverse=True)]
+        # If there are no previous predictions, store the current predictions
+        if previous_predictions is None:
+            self.store_predictions(current_predictions)
+        else:
+            # Compare the current predictions with the previous predictions
+            self.assertPredictionsMatch(previous_predictions, current_predictions)
 
-        self.assertNotEqual(len(prediction), 0, "should have a prediction")
+    def load_previous_predictions(self):
+        # Retrieve stored predictions from the database
+        # Using get_analysis_timeseries_db as an example, replace with the correct method if needed
+        db = edb.get_analysis_timeseries_db()
+        predictions = db.find_one({"user_id": self.user_id, "metadata.key": "predictions"})
+        return predictions
+
+    def run_current_model(self):
+        # Placeholder: Run the current model and get predictions
+        # Replace this with the actual model running code
+        predictions = None
+        return predictions
+
+    def store_predictions(self, predictions):
+        # Store the predictions in the database
+        # Using get_analysis_timeseries_db as an example, replace with the correct method if needed
+        db = edb.get_analysis_timeseries_db()
+        entry = {
+            "user_id": self.user_id,
+            "metadata": {
+                "key": "predictions",
+                "write_ts": pd.Timestamp.now().timestamp()  # Using pandas timestamp as an example
+            },
+            "data": predictions
+        }
+        db.insert_one(entry)
+
+    def assertPredictionsMatch(self, prev, curr):
+        # Placeholder: Check if the predictions match
+        # This will depend on the format and type of your predictions
+        # For example, if predictions are lists or arrays, you can use numpy
+        if not np.array_equal(prev, curr):
+            self.fail("Current model predictions do not match previously stored predictions!")

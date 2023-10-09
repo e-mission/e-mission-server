@@ -558,8 +558,39 @@ class ForestClassifier(eamuu.TripModel):
         # display.display(end_loc_df.head())
         return pd.concat(dfs, axis=1)
     
-    def to_dict(self) -> Dict:
-        return joblib.dump(self,compress=3)
-    
-    def from_dict(self, model: Dict):
-        pass
+def to_dict(self):
+    """
+    Convert the model to a dictionary suitable for storage.
+    """
+    data = {
+        'purpose_predictor': joblib.dumps(self.purpose_predictor).hex(),
+        'mode_predictor': joblib.dumps(self.mode_predictor).hex(),
+        'replaced_predictor': joblib.dumps(self.replaced_predictor).hex(),
+        'cluster_enc': joblib.dumps(self.cluster_enc).hex(),
+        'purpose_enc': joblib.dumps(self.purpose_enc).hex(),
+        'mode_enc': joblib.dumps(self.mode_enc).hex(),
+    }
+
+    if self.loc_feature == 'cluster':
+        data.update({
+        'end_cluster_model' : joblib.dumps(self.end_cluster_model).hex(),
+        'start_cluster_model': joblib.dumps(self.start_cluster_model).hex(),
+        'trip_grouper': joblib.dumps(self.trip_grouper).hex()})
+
+    return data
+
+def from_dict(self, model_data: Dict):
+    """
+    Load the model from a dictionary.
+    """
+    self.purpose_predictor = joblib.loads(bytes.fromhex(model_data['purpose_predictor']))
+    self.mode_predictor = joblib.loads(bytes.fromhex(model_data['mode_predictor']))
+    self.replaced_predictor = joblib.loads(bytes.fromhex(model_data['replaced_predictor']))
+    self.cluster_enc = joblib.loads(bytes.fromhex(model_data['cluster_enc']))
+    self.purpose_enc = joblib.loads(bytes.fromhex(model_data['purpose_enc']))
+    self.mode_enc = joblib.loads(bytes.fromhex(model_data['mode_enc']))
+    if self.loc_feature == 'cluster':    
+        self.end_cluster_model = joblib.loads(bytes.fromhex(model_data['end_cluster_model']))
+        self.start_cluster_model = joblib.loads(bytes.fromhex(model_data['start_cluster_model']))
+        self.trip_grouper = joblib.loads(bytes.fromhex(model_data['trip_grouper']))
+
