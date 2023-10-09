@@ -8,8 +8,11 @@ services:
       - nominatim
     environment:
       - DB_HOST=db
-      - OPENSTREETMAP_QUERY_URL=http://rhodeisland-nominatim:8080
       - GFBK_KEY=$GFBK_KEY
+      - GEOFABRIK_QUERY_URL=https://geocoding.geofabrik.de/$GFBK_KEY
+      - OPENSTREETMAP_QUERY_URL=https://nominatim.openstreetmap.org
+      - NOMINATIM_CONTAINER_URL=http://rhodeisland-nominatim:8080
+
     volumes:
       # specify the host directory where the source code should live
       # If this is ~/e-mission-server-docker, then you can edit the files at

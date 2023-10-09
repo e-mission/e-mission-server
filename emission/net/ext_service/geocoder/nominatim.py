@@ -13,14 +13,17 @@ import os
 
 from emission.core.wrapper.trip_old import Coordinate
 try:
-    OPENSTREETMAP_QUERY_URL_env = os.environ.get("OPENSTREETMAP_QUERY_URL", "")
-    logging.info(f"OPENSTREETMAP_QUERY_URL_env: {OPENSTREETMAP_QUERY_URL_env}")
-    OPENSTREETMAP_QUERY_URL = OPENSTREETMAP_QUERY_URL_env if OPENSTREETMAP_QUERY_URL_env != "" else "http://nominatim.openstreetmap.org"
-    print("Open Street Map URL not configured, defaulting to nominatim:") if OPENSTREETMAP_QUERY_URL == "http://nominatim.openstreetmap.org" else print("Open Street Map URL configured!") 
+    NOMINATIM_QUERY_URL = os.environ.get("NOMINATIM_QUERY_URL")
+    # logging.info(f"NOMINATIM_QUERY_URL: {NOMINATIM_QUERY_URL}")
+    print("URL Configured:", NOMINATIM_QUERY_URL)
+
+    if NOMINATIM_QUERY_URL is None:
+        raise Exception("Nominatim query url not configured")
 except:
     print("URL not configured, place decoding must happen on the client")
 
 class Geocoder(object):
+
 
     def __init__(self):
         pass
@@ -31,7 +34,7 @@ class Geocoder(object):
             "q" : address,
             "format" : "json"
         }
-        query_url = OPENSTREETMAP_QUERY_URL + "/search?"
+        query_url = NOMINATIM_QUERY_URL + "/search?"
         encoded_params = urllib.parse.urlencode(params)
         url = query_url + encoded_params
         logging.debug("For geocoding, using URL %s" % url)
@@ -59,7 +62,7 @@ class Geocoder(object):
             "format" : "json"
         }
 
-        query_url = OPENSTREETMAP_QUERY_URL + "/reverse?"
+        query_url = NOMINATIM_QUERY_URL + "/reverse?"
         encoded_params = urllib.parse.urlencode(params)
         url = query_url + encoded_params
         logging.debug("For reverse geocoding, using URL %s" % url)
