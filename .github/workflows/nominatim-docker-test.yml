@@ -5,16 +5,14 @@ name: nominatim-docker-test
 on:
   
   push:
-    branches:
-      - nominatim
-  #   paths:
-  #     - 'net/ext_service/geocoder'
-  #     - 'analysis/intake/cleaning/clean_and_resample.py'
+    paths:
+      - 'net/ext_service/geocoder'
+      - 'analysis/intake/cleaning/clean_and_resample.py'
 
-  # schedule:
+  schedule:
 
-  #   # Run every Sunday at 4:05 am
-  #   - cron:  '5 4 * * 0'
+    # Run every Sunday at 4:05 am
+    - cron:  '5 4 * * 0'
 jobs:
   # This workflow contains a single job called "build"
   build:
