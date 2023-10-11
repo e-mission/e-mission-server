@@ -5,6 +5,8 @@ name: nominatim-docker-test
 on:
   
   push:
+    branches:
+      - nominatim
     paths:
       - 'net/ext_service/geocoder'
       - 'analysis/intake/cleaning/clean_and_resample.py'

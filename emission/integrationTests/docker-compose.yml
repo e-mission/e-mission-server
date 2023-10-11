@@ -21,7 +21,6 @@ services:
       - ../..:/src/e-mission-server
     networks:
        - emission
-       - nominatim
 
   db:
     image: mongo:4.4.0
@@ -51,11 +50,10 @@ services:
     volumes:
       - nominatim-data:/var/lib/postgresql/14/main
     networks:
-      - nominatim
+      - emission
 
 networks:
   emission:
-  nominatim:
 
 volumes:
   mongo-data:
