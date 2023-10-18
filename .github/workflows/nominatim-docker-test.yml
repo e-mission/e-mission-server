@@ -6,9 +6,15 @@ on:
   
   push:
     paths:
+      - 'emission/integrationTests/docker-compose.yml'
       - 'net/ext_service/geocoder'
       - 'analysis/intake/cleaning/clean_and_resample.py'
 
+  pull_request:
+    paths:
+      - 'emission/integrationTests/docker-compose.yml'
+      - 'net/ext_service/geocoder'
+      - 'analysis/intake/cleaning/clean_and_resample.py'
   schedule:
 
     # Run every Sunday at 4:05 am
