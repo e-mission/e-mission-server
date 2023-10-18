@@ -15,7 +15,7 @@ from emission.core.wrapper.trip_old import Coordinate
 try:
     NOMINATIM_QUERY_URL = os.environ.get("NOMINATIM_QUERY_URL")
     logging.info(f"NOMINATIM_QUERY_URL: {NOMINATIM_QUERY_URL}")
-    print("Nominatim Query URL Configured!")
+    print("Nominatim Query URL Configured:", NOMINATIM_QUERY_URL)
 
     if NOMINATIM_QUERY_URL is None:
         raise Exception("Nominatim query url not configured")
