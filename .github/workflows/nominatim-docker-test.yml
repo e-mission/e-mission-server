@@ -3,7 +3,11 @@ name: nominatim-docker-test
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
 on:
-  
+  workflow_call:
+    secrets:
+      GEOFABRIK_API:
+        description: "Geofabrik API Key"
+        required: true
   push:
     paths:
       - 'emission/integrationTests/docker-compose.yml'
