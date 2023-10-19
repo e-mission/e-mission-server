@@ -24,7 +24,7 @@ on:
     # Run every Sunday at 4:05 am
     - cron:  '5 4 * * 0'
 env:
-  GEOFABRIK_API: ${{ secrets.GEOFABRIK_API }}
+  GEOFABRIK_API: ${{ secrets.DOCKER_USER }}
 jobs:
   # This workflow contains a single job called "build"
   build:
