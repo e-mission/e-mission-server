@@ -3,11 +3,11 @@ name: nominatim-docker-test
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
 on:
-  workflow_call:
-    secrets:
-      DOCKER_USER:
-        description: "Docker user known working secret test"
-        required: true
+  # workflow_call:
+  #   secrets:
+  #     DOCKER_USER:
+  #       description: "Docker user known working secret test"
+  #       required: true
   push:
     paths:
       - 'emission/integrationTests/docker-compose.yml'
@@ -23,6 +23,8 @@ on:
 
     # Run every Sunday at 4:05 am
     - cron:  '5 4 * * 0'
+env:
+  GEOFABRIK_API: ${{ secrets.GEOFABRIK_API }}
 jobs:
   # This workflow contains a single job called "build"
   build:
@@ -41,6 +43,6 @@ jobs:
 
       # Passes the geofabrik key into the docker-compose.yml file. 
     - name: Test nominatim.py
-      run: GFBK_KEY=${{ secrets.DOCKER_USER }} docker-compose -f emission/integrationTests/docker-compose.yml up --exit-code-from web-server
+      run: GFBK_KEY=$GEOFABRIK_API docker-compose -f emission/integrationTests/docker-compose.yml up --exit-code-from web-server
       
 
