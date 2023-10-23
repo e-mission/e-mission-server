@@ -1,5 +1,5 @@
 # python 3
-FROM ubuntu:jammy
+FROM ubuntu:jammy-20231004
 
 MAINTAINER K. Shankari (shankari@eecs.berkeley.edu)
 
@@ -15,8 +15,6 @@ RUN apt-get install -y -qq wget
 
 # install jq to parse json within bash scripts
 RUN apt-get install -y jq
-
-RUN apt-get -y -qq update && apt-get -y -qq upgrade
 
 # cleanup
 RUN apt-get -y remove --purge build-essential
