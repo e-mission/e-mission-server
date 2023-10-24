@@ -42,10 +42,10 @@ jobs:
       run: echo Smoke test
 
     - name: Secret test
-      run: echo $GEOFABRIK_API
+      run: echo "$GEOFABRIK_API"
       
       # Passes the geofabrik key into the docker-compose.yml file. 
     - name: Test nominatim.py
-      run: GFBK_KEY=$GEOFABRIK_API docker-compose -f emission/integrationTests/docker-compose.yml up --exit-code-from web-server
+      run: GFBK_KEY="$GEOFABRIK_API" docker-compose -f emission/integrationTests/docker-compose.yml up --exit-code-from web-server
       
 
