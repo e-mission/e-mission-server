@@ -4,8 +4,8 @@ name: nominatim-docker-test
 # events but only for the master branch
 on:
   push:
-    paths:
-      - 'emission/integrationTests'
+    branches:
+        - nominatim
   # schedule:
 
   #   # Run every Sunday at 4:05 am
