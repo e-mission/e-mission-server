@@ -32,6 +32,7 @@ if __name__ == '__main__':
 
     parser_diary = subparsers.add_parser('diary', help='diary-based ground truth')
     parser_diary.add_argument("date", help="date to retrieve ground truth (YYYY-MM-DD)")
+    parser_diary.add_argument("file_name", help="file name to store the result to")
     parser_diary.set_defaults(func=save_diary)
 
     parser_obj_list = subparsers.add_parser('objects', help='download analysis objects directly')
