@@ -3,13 +3,10 @@ name: nominatim-docker-test
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
 on:
-  push:
-    branches:
-        - nominatim
-  # schedule:
+  schedule:
 
-  #   # Run every Sunday at 4:05 am
-  #   - cron:  '5 4 * * 0'
+    # Run every Sunday at 4:05 am
+    - cron:  '5 4 * * 0'
 jobs:
   # This workflow contains a single job called "build"
   build:
