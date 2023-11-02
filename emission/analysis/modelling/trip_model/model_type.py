@@ -26,17 +26,16 @@ class ModelType(Enum):
         :raises KeyError: if the requested model name does not exist
         """
         # Dict[ModelType, TripModel]
-        MODELS = {
-                #ModelType.GREEDY_SIMILARITY_BINNING: eamug.GreedySimilarityBinning(config),
-                ModelType.RANDOM_FOREST_CLASSIFIER: eamuf.ForestClassifier(config)
-        }
+        MODELS = {                
+                ModelType.GREEDY_SIMILARITY_BINNING: eamug.GreedySimilarityBinning,
+                ModelType.RANDOM_FOREST_CLASSIFIER: eamuf.ForestClassifier
+                }    
         model = MODELS.get(self)
         if model is None:
-            model_names = list(lambda e: e.name, MODELS.keys())
-            models = ",".join(model_names)
-            raise KeyError(f"ModelType {self.name} not found in factory, please add to build method")
-                
-        return model
+            available_models = ', '.join([ e.name for e in ModelType])
+            raise KeyError(f"ModelType {self.name} not found in factory, Available models are {available_models}."\
+                           "Otherwise please add new model to build method")
+        return model(config)
 
     @classmethod
     def names(cls):

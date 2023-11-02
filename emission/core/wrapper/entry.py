@@ -182,6 +182,9 @@ class Entry(ecwb.WrapperBase):
       result_entry.user_id = user_id
       result_entry.metadata = ecwm.Metadata.create_metadata_for_fake_result(key, write_ts)
       result_entry.data = data
+      #necessary values required by forest model
+      result_entry['data']['start_local_dt']=result_entry['metadata']['write_local_dt']
+      result_entry['data']['end_local_dt']=result_entry['metadata']['write_local_dt']
       result_entry._populateDependencies()
       return result_entry
 

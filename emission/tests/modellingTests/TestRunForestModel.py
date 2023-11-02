@@ -140,8 +140,8 @@ class TestRunForestModel(unittest.TestCase):
             "pipeline should not have a current timestamp for the test user")
 
 
-    def testPredictForestModelWithZeroTrips(self):
-       """
+    def test1RoundPredictForestModel(self):
+        """
        forest model takes config arguments via the constructor for testing
        purposes but will load from a file in /conf/analysis/ which is tested here
        """
@@ -175,13 +175,9 @@ class TestRunForestModel(unittest.TestCase):
         )
         
         logging.debug(f'(TEST) testing prediction of stored model')
-        test = etmm.build_mock_trip(
-            user_id=self.user_id,
-            origin=self.origin,
-            destination=self.destination
-        )
+        test = esda.get_entries(key="analysis/confirmed_trip", user_id=self.user_id, time_query=None)    
         prediction, n = eamur.predict_labels_with_n(
-            trip = test,
+            trip = test[0],
             model_type=eamumt.ModelType.RANDOM_FOREST_CLASSIFIER,
             model_storage=eamums.ModelStorage.DOCUMENT_DATABASE,
             model_config=forest_model_config
