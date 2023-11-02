@@ -133,7 +133,6 @@ class GreedySimilarityBinning(eamuu.TripModel):
         corresponds to a label at the matching index of the label input
 
         :param trips: 2D array of features to train from
-        :param tripsdf: trips data in dataframe format
         """
         
         logging.debug(f'fit called with {len(trips)} trips')

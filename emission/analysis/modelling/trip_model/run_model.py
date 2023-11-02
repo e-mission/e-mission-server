@@ -72,8 +72,8 @@ def update_trip_model(
             epq.mark_trip_model_failed(user_id)
         else:
             
-            # train and store the model. pass both List of event and dataframe time data
-            # that both standard( which mostly work on df) and self implemented models can use.
+            # train and store the model. pass only List of event and only convert 
+            # to dataframe type data whereever required.
             model.fit(trips)
             model_data_next = model.to_dict()
 
