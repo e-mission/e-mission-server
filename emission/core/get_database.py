@@ -37,8 +37,17 @@ print("Connecting to database URL "+url)
 _current_db = MongoClient(url, uuidRepresentation='pythonLegacy')[db_name]
 #config_file.close()
 
+# Store the latest model globally for implementing controlled access and allow model loading only once
+_model_db = None
+
 def _get_current_db():
     return _current_db
+
+def _get_model_db():
+    return _model_db
+
+def _set_model_db(model_db):
+    _model_db = model_db
 
 def get_token_db():
     Tokens= _get_current_db().Stage_Tokens
@@ -99,7 +108,6 @@ def update_routeDistanceMatrix_db(user_id, method, updatedMatrix):
     f = open('routeDistanceMatrices/' + user_id + '_' + method + '_routeDistanceMatrix.json', 'w+')
     f.write(json.dumps(updatedMatrix))
     f.close()   
-
 
 def get_client_db():
     # current_db=MongoClient().Stage_database
@@ -231,10 +239,16 @@ def get_model_db():
     " will eventually delete them. This means that the elements are essentially
     " getting updated, only over time and as a log-structured filesystem.
     """
-    ModelDB = _get_current_db().Stage_updateable_models
-    ModelDB.create_index([("user_id", pymongo.ASCENDING)])
-    ModelDB.create_index([("metadata.key", pymongo.ASCENDING)])
-    ModelDB.create_index([("metadata.write_ts", pymongo.DESCENDING)])
+    ModelDB = _get_model_db()
+    if ModelDB == None:
+        logging.debug("Started model load in edb.get_model_db()...")
+        ModelDB = _get_current_db().Stage_updateable_models
+        ModelDB.create_index([("user_id", pymongo.ASCENDING)])
+        ModelDB.create_index([("metadata.key", pymongo.ASCENDING)])
+        ModelDB.create_index([("metadata.write_ts", pymongo.DESCENDING)])
+        _set_model_db(ModelDB)
+        logging.debug("Finished model load in edb.get_model_db()...")
+    logging.debug("Fetched model in edb.get_model_db()")       
     return ModelDB
 
 def _create_analysis_result_indices(tscoll):
