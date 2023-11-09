@@ -17,10 +17,10 @@ class BuiltinModelStorage(esma.ModelStorage):
         self.user_query = {"user_id": self.user_id} # UUID is mandatory for this version
         self.current_model = None
 
-    def _get_model():
+    def _get_model(self):
         return self.current_model
 
-    def _set_model(model):
+    def _set_model(self, model):
         self.current_model = model
 
     def upsert_model(self, key:str, model: ecwb.WrapperBase):
@@ -41,7 +41,7 @@ class BuiltinModelStorage(esma.ModelStorage):
         :return: the most recent database entry for this key
         """
         find_query = {"user_id": self.user_id, "metadata.key": key}
-        result_it = _get_model()
+        result_it = self._get_model()
         if result_it == None:
             logging.debug("Started model load in builtin_model_storage.get_current_model()...")
             result_it = edb.get_model_db().find(find_query).sort("metadata.write_ts", -1).limit(1)
@@ -50,7 +50,7 @@ class BuiltinModelStorage(esma.ModelStorage):
             # everything below this point is identical
             # but it is also fairly trivial, so I am not sure it is worth pulling
             # out into common code at this point
-            _set_model(result_it)
+            self._set_model(result_it)
             logging.debug("Finished model load in builtin_model_storage.get_current_model()...")
         logging.debug("Fetched model in builtin_model_storage.get_current_model()...")
         result_list = list(result_it)

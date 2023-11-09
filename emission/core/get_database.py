@@ -9,6 +9,7 @@ from pymongo import MongoClient
 import pymongo
 import os
 import json
+import logging
 
 try:
     config_file = open('conf/storage/db.conf')
