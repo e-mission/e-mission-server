@@ -106,7 +106,7 @@ class LabelInferencePipeline:
         il_list = []
         for trip, key in zip(trip_list, predictions_dict):
             # Print trip ids to see if order maintained: 
-            print(f"Trip_ID: {trip.get_id} and Pred_Key: {key}")
+            print(f"Trip_ID: {trip.get_id()} and Pred_Key: {key}")
             il = ecwl.Labelprediction()
             il.trip_id = trip.get_id()
             il.start_ts = trip["data"]["start_ts"]
