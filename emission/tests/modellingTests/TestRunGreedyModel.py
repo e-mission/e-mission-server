@@ -163,7 +163,8 @@ class TestRunGreedyModel(unittest.TestCase):
             origin=self.origin,
             destination=self.destination
         )
-        prediction, n = eamur.predict_labels_with_n(
+        
+        predictions_list = eamur.predict_labels_with_n(
             user_id = self.user_id,
             trip_list = [test],
             model_type=eamumt.ModelType.GREEDY_SIMILARITY_BINNING,
@@ -171,7 +172,6 @@ class TestRunGreedyModel(unittest.TestCase):
             model_config=greedy_model_config
         )
 
-        [logging.debug(p) for p in sorted(prediction, key=lambda r: r['p'], reverse=True)]
-
-        self.assertNotEqual(len(prediction), 0, "should have a prediction")
-
+        for prediction, n in predictions_list:
+            [logging.debug(p) for p in sorted(prediction, key=lambda r: r['p'], reverse=True)]
+            self.assertNotEqual(len(prediction), 0, "should have a prediction")

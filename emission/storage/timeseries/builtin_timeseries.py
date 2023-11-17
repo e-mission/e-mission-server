@@ -461,8 +461,6 @@ class BuiltinTimeSeries(esta.TimeSeries):
 
         For key_list = None or empty, total count of all documents are returned considering the matching entries from entire dataset.
         """
-        print("builtin_timeseries.find_entries_count() called")
-        
         orig_tsdb = self.timeseries_db
         analysis_tsdb = self.analysis_timeseries_db
 
