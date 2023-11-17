@@ -141,18 +141,20 @@ def n_to_confidence_coeff(n, max_confidence=None, first_confidence=None, confide
     return max_confidence-(max_confidence-first_confidence)*(1-confidence_multiplier)**(n-1)  # This is the u = ... formula in the issue
 
 # predict_two_stage_bin_cluster but with the above reduction in confidence
-def predict_cluster_confidence_discounting(trip, max_confidence=None, first_confidence=None, confidence_multiplier=None):
+def predict_cluster_confidence_discounting(user_id, trip_list, max_confidence=None, first_confidence=None, confidence_multiplier=None):
     # load application config 
     model_type = eamtc.get_model_type()
     model_storage = eamtc.get_model_storage()
-    labels, n = eamur.predict_labels_with_n(trip, model_type, model_storage)
-    if n <= 0:  # No model data or trip didn't match a cluster
-        logging.debug(f"In predict_cluster_confidence_discounting: n={n}; returning as-is")
-        return labels
-
-    confidence_coeff = n_to_confidence_coeff(n, max_confidence, first_confidence, confidence_multiplier)
-    logging.debug(f"In predict_cluster_confidence_discounting: n={n}; discounting with coefficient {confidence_coeff}")
-
-    labels = copy.deepcopy(labels)
-    for l in labels: l["p"] *= confidence_coeff
-    return labels
+    labels_n_list = eamur.predict_labels_with_n(user_id, trip_list, model_type, model_storage)
+    labels_list = []
+    for labels, n in labels_n_list:
+        if n <= 0:  # No model data or trip didn't match a cluster
+            logging.debug(f"In predict_cluster_confidence_discounting: n={n}; returning as-is")
+            labels_list.append(labels)
+            continue
+        confidence_coeff = n_to_confidence_coeff(n, max_confidence, first_confidence, confidence_multiplier)
+        logging.debug(f"In predict_cluster_confidence_discounting: n={n}; discounting with coefficient {confidence_coeff}")
+        labels = copy.deepcopy(labels)
+        for l in labels: l["p"] *= confidence_coeff
+        labels_list.append(labels)
+    return labels_list
