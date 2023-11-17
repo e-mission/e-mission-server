@@ -1,21 +1,27 @@
 version: "3"
 services:
   web-server:
-  #builds from tests/dockerfile
-    build: tests
+    build: 
+      context: .
     depends_on:
       - db
+      - nominatim
     environment:
       - DB_HOST=db
-      - WEB_SERVER_HOST=0.0.0.0
+      - GFBK_KEY=$GFBK_KEY
+      - GEOFABRIK_QUERY_URL=https://geocoding.geofabrik.de/$GFBK_KEY
+      - OPENSTREETMAP_QUERY_URL=https://nominatim.openstreetmap.org
+      - NOMINATIM_CONTAINER_URL=http://rhodeisland-nominatim:8080
+
     volumes:
       # specify the host directory where the source code should live
       # If this is ~/e-mission-server-docker, then you can edit the files at
       # ~/e-mission-server-docker/src/e-mission-server/emission/...
       # - CHANGEME:/src/
-      - ..:/src/e-mission-server
+      - ../..:/src/e-mission-server
     networks:
        - emission
+
   db:
     image: mongo:4.4.0
     deploy:
@@ -30,11 +36,23 @@ services:
       - mongo-data:/data/db
     networks:
        - emission
+  #adding section to incorporate nominatim server functionality
+  nominatim:
+    entrypoint: /app/start.sh
+    image: nataliejschultz/rhodeisland-image:4.0
+    container_name: rhodeisland-nominatim
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - nominatim-data:/var/lib/postgresql/14/main
+    networks:
+      - emission
 
 networks:
   emission:
 
 volumes:
   mongo-data:
-    
-
+  nominatim-data:

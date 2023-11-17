@@ -9,25 +9,21 @@ from builtins import object
 import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
 import logging
 import json
+import os
 
 from emission.core.wrapper.trip_old import Coordinate
-from pygeocoder import Geocoder as pyGeo  ## We fall back on this if we have to
-
 try:
-    googlemaps_key_file = open("conf/net/ext_service/googlemaps.json")
-    GOOGLE_MAPS_KEY = json.load(googlemaps_key_file)["api_key"]
-    googlemaps_key_file.close()
-except:
-    print("google maps key not configured, falling back to nominatim")
+    NOMINATIM_QUERY_URL = os.environ.get("NOMINATIM_QUERY_URL")
+    logging.info(f"NOMINATIM_QUERY_URL: {NOMINATIM_QUERY_URL}")
+    print("Nominatim Query URL Configured:", NOMINATIM_QUERY_URL)
 
-try:
-    nominatim_file = open("conf/net/ext_service/nominatim.json")
-    NOMINATIM_QUERY_URL = json.load(nominatim_file)["query_url"]
-    nominatim_file.close()
+    if NOMINATIM_QUERY_URL is None:
+        raise Exception("Nominatim query url not configured")
 except:
-    print("nominatim not configured either, place decoding must happen on the client")
+    print("Nominatim URL not configured, place decoding must happen on the client")
 
 class Geocoder(object):
+
 
     def __init__(self):
         pass
@@ -38,7 +34,6 @@ class Geocoder(object):
             "q" : address,
             "format" : "json"
         }
-
         query_url = NOMINATIM_QUERY_URL + "/search?"
         encoded_params = urllib.parse.urlencode(params)
         url = query_url + encoded_params
@@ -54,15 +49,10 @@ class Geocoder(object):
 
     @classmethod
     def geocode(cls, address):
-        # try:
-        #     jsn = cls.get_json_geo(address)
-        #     lat = float(jsn[0]["lat"])
-        #     lon = float(jsn[0]["lon"])
-        #     return Coordinate(lat, lon)
-        # except:
-        #     print "defaulting"
-        return _do_google_geo(address) # If we fail ask the gods
-
+        jsn = cls.get_json_geo(address)
+        lat = float(jsn[0]["lat"])
+        lon = float(jsn[0]["lon"])
+        return Coordinate(lat, lon)
 
     @classmethod
     def make_url_reverse(cls, lat, lon):
@@ -71,7 +61,6 @@ class Geocoder(object):
             "lon" : lon,
             "format" : "json"
         }
-
         query_url = NOMINATIM_QUERY_URL + "/reverse?"
         encoded_params = urllib.parse.urlencode(params)
         url = query_url + encoded_params
@@ -88,22 +77,6 @@ class Geocoder(object):
 
     @classmethod
     def reverse_geocode(cls, lat, lng):
-        # try:
-        #     jsn = cls.get_json_reverse(lat, lng)
-        #     address = jsn["display_name"]
-        #     return address
-
-        # except:
-        #     print "defaulting"
-        return _do_google_reverse(lat, lng) # Just in case
-
-## Failsafe section
-def _do_google_geo(address):
-    geo = pyGeo(GOOGLE_MAPS_KEY)
-    results = geo.geocode(address)
-    return Coordinate(results[0].coordinates[0], results[0].coordinates[1])
-
-def _do_google_reverse(lat, lng):
-    geo = pyGeo(GOOGLE_MAPS_KEY)
-    address = geo.reverse_geocode(lat, lng)
-    return address[0]
+        jsn = cls.get_json_reverse(lat, lng)
+        address = jsn["display_name"]
+        return address
