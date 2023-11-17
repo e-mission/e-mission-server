@@ -55,15 +55,24 @@ class LabelInferencePipeline:
         self.ts = esta.TimeSeries.get_time_series(user_id)
         self.toPredictTrips = esda.get_entries(
             esda.CLEANED_TRIP_KEY, user_id, time_query=time_range)
-        for cleaned_trip in self.toPredictTrips:
-            # Create an inferred trip
+        
+        cleaned_trip_list = self.toPredictTrips
+        inferred_trip_list = []
+        results_list = []
+        ensemble_list = []
+
+        # Create list of inferred trips
+        for cleaned_trip in cleaned_trip_list:
             cleaned_trip_dict = copy.copy(cleaned_trip)["data"]
             inferred_trip = ecwe.Entry.create_entry(user_id, "analysis/inferred_trip", cleaned_trip_dict)
-            
-            # Run the algorithms and the ensemble, store results
-            results = self.compute_and_save_algorithms(inferred_trip)
-            ensemble = self.compute_and_save_ensemble(inferred_trip, results)
+            inferred_trip_list.append(inferred_trip)
+    
+        # Computing outside loop by passing trip_list to ensure model loads once
+        # Run the algorithms and the ensemble, store results
+        results_list = self.compute_and_save_algorithms(user_id, inferred_trip_list)
+        ensemble_list = self.compute_and_save_ensemble(inferred_trip_list, results_list)
 
+        for cleaned_trip, inferred_trip, ensemble in zip(cleaned_trip_list, inferred_trip_list, ensemble_list):
             # Put final results into the inferred trip and store it
             inferred_trip["data"]["cleaned_trip"] = cleaned_trip.get_id()
             inferred_trip["data"]["inferred_labels"] = ensemble["prediction"]
@@ -75,28 +84,32 @@ class LabelInferencePipeline:
     # This is where the labels for a given trip are actually predicted.
     # Though the only information passed in is the trip object, the trip object can provide the
     # user_id and other potentially useful information.
-    def compute_and_save_algorithms(self, trip):
+    def compute_and_save_algorithms(self, user_id, trip_list):
         predictions = []
         for algorithm_id, algorithm_fn in primary_algorithms.items():
-            prediction = algorithm_fn(trip)
-            lp = ecwl.Labelprediction()
-            lp.trip_id = trip.get_id()
-            lp.algorithm_id = algorithm_id
-            lp.prediction = prediction
-            lp.start_ts = trip["data"]["start_ts"]
-            lp.end_ts = trip["data"]["end_ts"]
-            self.ts.insert_data(self.user_id, "inference/labels", lp)
-            predictions.append(lp)
+            prediction_list = algorithm_fn(user_id, trip_list)
+            for trip, prediction in zip(trip_list, prediction_list):
+                lp = ecwl.Labelprediction()
+                lp.algorithm_id = algorithm_id
+                lp.trip_id = trip.get_id()
+                lp.prediction = prediction
+                lp.start_ts = trip["data"]["start_ts"]
+                lp.end_ts = trip["data"]["end_ts"]
+                self.ts.insert_data(self.user_id, "inference/labels", lp)
+                predictions.append(lp)
         return predictions
 
     # Combine all our predictions into a single ensemble prediction.
     # As a placeholder, we just take the first prediction.
     # TODO: implement a real combination algorithm.
-    def compute_and_save_ensemble(self, trip, predictions):
-        il = ecwl.Labelprediction()
-        il.trip_id = trip.get_id()
-        il.start_ts = trip["data"]["start_ts"]
-        il.end_ts = trip["data"]["end_ts"]
-        (il.algorithm_id, il.prediction) = ensemble(trip, predictions)
-        self.ts.insert_data(self.user_id, "analysis/inferred_labels", il)
-        return il
+    def compute_and_save_ensemble(self, trip_list, predictions_list):
+        il_list = []
+        for trip, predictions in zip(trip_list, prediction_list):
+            il = ecwl.Labelprediction()
+            il.trip_id = trip.get_id()
+            il.start_ts = trip["data"]["start_ts"]
+            il.end_ts = trip["data"]["end_ts"]
+            (il.algorithm_id, il.prediction) = ensemble(trip, predictions)
+            self.ts.insert_data(self.user_id, "analysis/inferred_labels", il)
+            il_list.append(il)
+        return il_list

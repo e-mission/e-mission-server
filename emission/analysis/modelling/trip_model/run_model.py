@@ -97,7 +97,8 @@ def update_trip_model(
 
 
 def predict_labels_with_n(
-    trip: ecwc.Confirmedtrip,
+    user_id: UUID,
+    trip_list: List[ecwc.Confirmedtrip],
     model_type = eamumt.ModelType.GREEDY_SIMILARITY_BINNING,
     model_storage = eamums.ModelStorage.DOCUMENT_DATABASE,
     model_config = None):
@@ -110,13 +111,21 @@ def predict_labels_with_n(
     :param model_config: optional configuration for model, for debugging purposes
     :return: a list of predictions
     """
-    user_id = trip['user_id']
+    # user_id = trip['user_id']
+    # Start timer
+    start = time.process_time()
     model = _load_stored_trip_model(user_id, model_type, model_storage, model_config)
-    if model is None:
-        return [], -1
-    else:
-        predictions, n = model.predict(trip)
-        return predictions, n
+    print(f"Inside predict_labels_n: model load time = {time.process_time() - start}")
+    # End timer
+    predictions_list = []
+    for trip in trip_list:
+        if model is None:
+            predictions_list.append(([], -1))
+            continue
+        else:
+            predictions, n = model.predict(trip)
+            predictions_list.append((predictions, n))
+    return predictions_list
 
 
 def _get_training_data(user_id: UUID, time_query: Optional[estt.TimeQuery]):
