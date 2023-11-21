@@ -24,14 +24,14 @@ config_file.close()
 try:
     parsed=pymongo.uri_parser.parse_uri(url)
 except:
-    print("URL not formatted, defaulting to \"Stage_database\"")
-    db_name = "Stage_database"
+    print("URL not formatted, defaulting to \"openpath_stage\"")
+    db_name = "openpath_stage"
 else:
     if parsed['database']:
         db_name = parsed['database']
     else:
-        print("URL does not specify a DB name, defaulting to \"Stage_database\"")
-        db_name = "Stage_database"
+        print("URL does not specify a DB name, defaulting to \"openpath_stage\"")
+        db_name = "openpath_stage"
 
 print("Connecting to database URL "+url)
 _current_db = MongoClient(url, uuidRepresentation='pythonLegacy')[db_name]

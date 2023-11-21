@@ -1,8 +1,9 @@
 import logging
 from typing import List, Optional
 from uuid import UUID
-
 import time
+import arrow 
+
 import emission.storage.timeseries.timequery as estt
 import emission.analysis.modelling.trip_model.model_storage as eamums
 import emission.analysis.modelling.trip_model.model_type as eamumt
@@ -113,11 +114,13 @@ def predict_labels_with_n(
     """
     # user_id = trip['user_id']
     # Start timer
-    start = time.process_time()
+    start_model_load_time = time.process_time()
     model = _load_stored_trip_model(user_id, model_type, model_storage, model_config)
-    print(f"Inside predict_labels_n: model load time = {time.process_time() - start}")
+    print(f"{arrow.now()} Inside predict_labels_n: Model load time = {time.process_time() - start_model_load_time}")
     # End timer
     predictions_list = []
+    print(f"{arrow.now()} Inside predict_labels_n: Predicting...")
+    start_predict_time = time.process_time()
     for trip in trip_list:
         if model is None:
             predictions_list.append(([], -1))
@@ -125,6 +128,7 @@ def predict_labels_with_n(
         else:
             predictions, n = model.predict(trip)
             predictions_list.append((predictions, n))
+    print(f"{arrow.now()} Inside predict_labels_n: Predictions complete for trip_list in time = {time.process_time() - start_predict_time}")
     return predictions_list
 
 
