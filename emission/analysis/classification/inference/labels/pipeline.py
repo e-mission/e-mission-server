@@ -79,9 +79,7 @@ class LabelInferencePipeline:
             # Put final results into the inferred trip and store it
             inferred_trip["data"]["cleaned_trip"] = cleaned_trip.get_id()
             inferred_trip["data"]["inferred_labels"] = ensemble["prediction"]
-            # start_0 = time.process_time()
             self.ts.insert(inferred_trip)
-            # print(f"Inside run_prediction_pipeline: inferred_trip insert time = {time.process_time() - start_0}")
 
             if self._last_trip_done is None or self._last_trip_done["data"]["end_ts"] < cleaned_trip["data"]["end_ts"]:
                 self._last_trip_done = cleaned_trip
@@ -102,9 +100,7 @@ class LabelInferencePipeline:
                 lp.prediction = prediction
                 lp.start_ts = trip["data"]["start_ts"]
                 lp.end_ts = trip["data"]["end_ts"]
-                # start_1 = time.process_time()
                 self.ts.insert_data(self.user_id, "inference/labels", lp)
-                # print(f"Inside compute_and_save_algorithms: inference/labels insert time = {time.process_time() - start_1}")
                 predictions_dict[trip.get_id()].append(lp)
             print(f"{arrow.now()} Inside compute_and_save_algorithms: Saving inference/labels total time = {time.process_time() - start_insert_inference_labels_time}")
         return predictions_dict
@@ -121,9 +117,7 @@ class LabelInferencePipeline:
             il.start_ts = trip["data"]["start_ts"]
             il.end_ts = trip["data"]["end_ts"]
             (il.algorithm_id, il.prediction) = ensemble(trip, predictions_dict[key])
-            # start_2 = time.process_time()
             self.ts.insert_data(self.user_id, "analysis/inferred_labels", il)
-            # print(f"Inside compute_and_save_ensemble: inferred_labels insert time = {time.process_time() - start_2}")
             il_list.append(il)
         print(f"{arrow.now()} Inside compute_and_save_ensemble: Saving inferred_labels total time = {time.process_time() - start_insert_inferred_labels_time}")
         return il_list
