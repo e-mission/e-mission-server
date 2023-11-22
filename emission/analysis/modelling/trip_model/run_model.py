@@ -112,12 +112,9 @@ def predict_labels_with_n(
     :param model_config: optional configuration for model, for debugging purposes
     :return: a list of predictions
     """
-    # user_id = trip['user_id']
-    # Start timer
     start_model_load_time = time.process_time()
     model = _load_stored_trip_model(user_id, model_type, model_storage, model_config)
     print(f"{arrow.now()} Inside predict_labels_n: Model load time = {time.process_time() - start_model_load_time}")
-    # End timer
     predictions_list = []
     print(f"{arrow.now()} Inside predict_labels_n: Predicting...")
     start_predict_time = time.process_time()

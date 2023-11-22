@@ -64,8 +64,8 @@ if __name__ == '__main__':
                         help="reset the pipeline for all on the specified platform")
     # Add this back when we have the ability to turn off the pipeline
     # or we handle parallel pipeline runs (by checking `curr_run_ts` properly below)
-    group.add_argument("-a", "--all", action="store_true", default=False,
-        help="reset the pipeline for all users")
+    # group.add_argument("-a", "--all", action="store_true", default=False,
+    #     help="reset the pipeline for all users")
     group.add_argument("-u", "--user_list", nargs='+',
         help="user ids to reset the pipeline for")
     group.add_argument("-e", "--email_list", nargs='+',
