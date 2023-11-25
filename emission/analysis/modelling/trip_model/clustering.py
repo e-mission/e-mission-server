@@ -16,8 +16,8 @@ from sklearn.preprocessing import StandardScaler
 # our imports
 # NOTE: this requires changing the branch of e-mission-server to
 # eval-private-data-compatibility
-import emission.analysis.modelling.tour_model_extended.similarity as eamts
 import emission.storage.decorations.trip_queries as esdtq
+import emission.analysis.modelling.trip_model.greedy_similarity_binning as eamtg
 
 EARTH_RADIUS = 6371000
 ALG_OPTIONS = [
@@ -28,9 +28,27 @@ ALG_OPTIONS = [
     'mean_shift'
 ]
 
+def cleanEntryTypeData(loc_df,trip_entry):
+
+    """
+    Helps weed out entries from the list of entries which were removed from the df using
+    esdtq.filter_labeled_trips() and esdtq.expand_userinputs()
+
+    loc_df : dataframe amde from entry type data
+    trip_entry : the entry type equivalent of loc_df ,
+                which was passed alongside the dataframe while loading the data
+
+    """
+
+    ids_in_df=loc_df['_id']
+    filtered_trip_entry = list(filter(lambda entry: entry['_id'] in ids_in_df.values, trip_entry))
+    return filtered_trip_entry
+
 
 def add_loc_clusters(
         loc_df,
+        trip_entry,
+        clustering_way,
         radii,
         loc_type,
         alg,
@@ -53,6 +71,9 @@ def add_loc_clusters(
         Args:
             loc_df (dataframe): must have columns 'start_lat' and 'start_lon' 
                 or 'end_lat' and 'end_lon'
+            trip_entry ( list of Entry/confirmedTrip): list consisting all entries from the
+                time data was loaded. loc_df was obtained from this by converting to df and 
+                then filtering out labeled trips and expanding user_inputs   
             radii (int list): list of radii to run the clustering algs with
             loc_type (str): 'start' or 'end'
             alg (str): 'DBSCAN', 'naive', 'OPTICS', 'SVM', 'fuzzy', or
@@ -98,19 +119,25 @@ def add_loc_clusters(
             loc_df.loc[:, f"{loc_type}_DBSCAN_clusters_{r}_m"] = labels
 
     elif alg == 'naive':
+
+        cleaned_trip_entry= cleanEntryTypeData(loc_df,trip_entry)
+
         for r in radii:
             # this is using a modified Similarity class that bins start/end
             # points separately before creating trip-level bins
-            sim_model = eamts.Similarity(loc_df,
-                                         radius_start=r,
-                                         radius_end=r,
-                                         shouldFilter=False,
-                                         cutoff=False)
-            # we only bin the loc_type points to speed up the alg. avoid
-            # unnecessary binning since this is really slow
-            sim_model.bin_helper(loc_type=loc_type)
-            labels = sim_model.data_df[loc_type + '_bin'].to_list()
 
+            model_config = {
+                "metric": "od_similarity",
+                "similarity_threshold_meters": r,  # meters,
+                "apply_cutoff": False,
+                "clustering_way": clustering_way,
+                "shouldFilter":False,
+                "incremental_evaluation": False
+            }    
+
+            sim_model = eamtg.GreedySimilarityBinning(model_config)       
+            sim_model.fit(cleaned_trip_entry)
+            labels = [int(l) for l in sim_model.tripLabels]
             # # pd.Categorical converts the type from int to category (so
             # # numerical operations aren't possible)
             # loc_df.loc[:, f"{loc_type}_{alg}_clusters_{r}_m"] = pd.Categorical(

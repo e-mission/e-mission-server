@@ -19,11 +19,16 @@ from sklearn.exceptions import NotFittedError
 from clustering import get_distance_matrix, single_cluster_purity
 import data_wrangling
 import emission.storage.decorations.trip_queries as esdtq
-import emission.analysis.modelling.tour_model_first_only.build_save_model as bsm
-import emission.analysis.modelling.tour_model_first_only.evaluation_pipeline as ep
 from emission.analysis.classification.inference.labels.inferrers import predict_cluster_confidence_discounting
 import emission.core.wrapper.entry as ecwe
-import emission.analysis.modelling.tour_model_extended.similarity as eamts
+import emission.analysis.modelling.trip_model.greedy_similarity_binning as eamtg
+import emission.core.common as ecc
+import emission.analysis.modelling.trip_model.model_storage as eamums
+import emission.analysis.modelling.trip_model.model_type as eamumt
+import emission.analysis.modelling.trip_model.run_model as eamur
+
+
+import clustering
 # NOTE: tour_model_extended.similarity is on the
 # eval-private-data-compatibility branch in e-mission-server
 
@@ -116,12 +121,12 @@ class Cluster(SetupMixin, metaclass=ABCMeta):
     """ blueprint for clustering models. """
 
     @abstractmethod
-    def fit(self, train_df):
+    def fit(self, train_df,train_entry_list):
         """ Fit the clustering algorithm.  
         
             Args: 
                 train_df (DataFrame): dataframe of labeled trips
-            
+                train_entry_list (List) : A list of trips where each element is of Entry type
             Returns:
                 self
         """
@@ -159,12 +164,13 @@ class Cluster(SetupMixin, metaclass=ABCMeta):
 class TripClassifier(SetupMixin, metaclass=ABCMeta):
 
     @abstractmethod
-    def fit(self, train_df):
+    def fit(self, train_df,unused=None):
         """ Fit a classification model.  
         
             Args: 
                 train_df (DataFrame): dataframe of labeled trips
-            
+                unused (List) : A list of Entry type of labeled and unlabeled trips which is not used in current function. 
+                                Passed to keep fit function generic.            
             Returns:
                 self
         """
@@ -293,10 +299,10 @@ class RefactoredNaiveCluster(Cluster):
 
         return self
 
-    def fit(self, train_df):
+    def fit(self, unused,train_entry_list=None):
         # clean data
-        logging.info("PERF: Fitting RefactoredNaiveCluster with size %s" % len(train_df))
-        self.train_df = self._clean_data(train_df)
+        logging.info("PERF: Fitting RefactoredNaiveCluster with size %s" % len(unused))
+        self.train_df = self._clean_data(unused)
 
         # we can use all trips as long as they have purpose labels. it's ok if
         # they're missing mode/replaced-mode labels, because they aren't as
@@ -315,17 +321,23 @@ class RefactoredNaiveCluster(Cluster):
         if len(self.train_df) == 0:
             # i.e. no valid trips after removing all nans
             raise Exception('no valid trips; nothing to fit')
-
+        
+        model_config = {
+                "metric": "od_similarity",
+                "similarity_threshold_meters": self.radius,  # meters,
+                "apply_cutoff": False,
+                "clustering_way":'origin' if self.loc_type=='start' 
+                                        else 'destination' if self.loc_type =='end' 
+                                        else 'origin-destination',
+                "incremental_evaluation": False
+            }   
+          
         # fit the bins
-        self.sim_model = eamts.Similarity(self.train_df,
-                                          radius_start=self.radius,
-                                          radius_end=self.radius,
-                                          shouldFilter=False,
-                                          cutoff=False)
-        # we only bin the loc_type points to speed up the alg. avoid
-        # unnecessary binning since this is really slow
-        self.sim_model.bin_helper(loc_type=self.loc_type)
-        labels = self.sim_model.data_df[self.loc_type + '_bin'].to_list()
+        self.sim_model= eamtg.GreedySimilarityBinning(model_config)
+        cleaned_trip_entry= clustering.cleanEntryTypeData(self.train_df,train_entry_list)
+        self.sim_model.fit(cleaned_trip_entry)
+
+        labels = [int(l) for l in self.sim_model.tripLabels]
         self.train_df.loc[:, f'{self.loc_type}_cluster_idx'] = labels
         return self
 
@@ -334,10 +346,32 @@ class RefactoredNaiveCluster(Cluster):
         self.test_df = self._clean_data(test_df)
 
         if self.loc_type == 'start':
-            bins = self.sim_model.start_bins
+            bins = self.sim_model.bins
         elif self.loc_type == 'end':
-            bins = self.sim_model.end_bins
+            bins = self.sim_model.bins
 
+        # This looks weird but works
+        # >>> x = [(1, 'a'), (2, 'b'), (3, 'c')]
+        # >>> {int(key):value for key,value in x}
+        # {1: 'a', 2: 'b', 3: 'c'}
+        #
+        # bins = { '1': [ 'key1': [] , 'key2' :[],.. ....], 
+        #          '2': ['key1': [] , 'key2' :[],...], 
+        #          '3': ['key1': [] , 'key2' :[],.....] ...}
+        #
+        # the code below converts above to 
+        #
+        # bins = { 1: [ 'key1': [] , 'key2' :[],.. ....], 
+        #          2: ['key1': [] , 'key2' :[],...], 
+        #          3: ['key1': [] , 'key2' :[],.....] ....}
+        #
+        # This is why it works :
+        # 1. Iterate over (key,value) pairs in 'bins.items()'
+        # 2. for each pair, 'key' is a string . so  use int(key) to convert it into an integer.
+        # 3. Create a new dictionary(using {} within the dictionary comprehension) 
+        #     where the keys are now integers and the values are same
+
+        bins = {int(key):value for key,value in bins.items()}        
         labels = []
 
         # for each trip in the test list:
@@ -346,10 +380,15 @@ class RefactoredNaiveCluster(Cluster):
                 logging.info("PERF: RefactoredNaiveCluster Working on trip %s/%s" % (idx, len(self.test_df)))
             # iterate over all bins
             trip_binned = False
-            for i, bin in enumerate(bins):
+            for i in bins:
                 # check if the trip can fit in the bin
-                # if so, get the bin index
-                if self._match(row, bin, self.loc_type):
+                # if so, get the bin index.
+                #
+                # 'feature_rows' is the key that contains the list of list where 
+                #  each of the inner list takes the form  :
+                #
+                #            [ start_lon,start_lat,end_lon,end_lat]
+                if self._match(row, bins[i]['feature_rows'], self.loc_type):
                     labels += [i]
                     trip_binned = True
                     break
@@ -366,8 +405,7 @@ class RefactoredNaiveCluster(Cluster):
         
             copied from the Similarity class on the e-mission-server. 
         """
-        for t_idx in bin:
-            trip_in_bin = self.train_df.iloc[t_idx]
+        for trip_in_bin in bin:            
             if not self._distance_helper(trip, trip_in_bin, loc_type):
                 return False
         return True
@@ -375,16 +413,20 @@ class RefactoredNaiveCluster(Cluster):
     def _distance_helper(self, tripa, tripb, loc_type):
         """ Check if two trips have start/end points within the distance 
             threshold. 
-        
-            copied from the Similarity class on the e-mission-server. 
         """
+        #tripa is taken from the test datframe. 
+        #tripb is taken from the stored bin list.
         pta_lat = tripa[[loc_type + '_lat']]
         pta_lon = tripa[[loc_type + '_lon']]
-        ptb_lat = tripb[[loc_type + '_lat']]
-        ptb_lon = tripb[[loc_type + '_lon']]
+        if loc_type == 'start':
+            ptb_lat = tripb[1]
+            ptb_lon = tripb[0]
+        elif loc_type == 'end':
+            ptb_lat = tripb[3]
+            ptb_lon = tripb[2]
 
-        return eamts.within_radius(pta_lat, pta_lon, ptb_lat, ptb_lon,
-                                   self.radius)
+        dist= ecc.calDistance([pta_lon,pta_lat],[ptb_lon,ptb_lat])                                   
+        return dist <= self.radius
 
 
 class DBSCANSVMCluster(Cluster):
@@ -444,7 +486,7 @@ class DBSCANSVMCluster(Cluster):
 
         return self
 
-    def fit(self, train_df):
+    def fit(self, train_df,unused=None):
         """ Creates clusters of trip points. 
             self.train_df will be updated with columns containing base and 
             final clusters. 
@@ -455,7 +497,8 @@ class DBSCANSVMCluster(Cluster):
 
             Args:
                 train_df (dataframe): dataframe of labeled trips
-        """
+                unused (List) : A list of Entry type of labeled and unlabeled trips which is not used in current function. 
+                                Passed to keep fit function generic.        """
         ##################
         ### clean data ###
         ##################
@@ -648,7 +691,7 @@ class NaiveBinningClassifier(TripClassifier):
 
         return self
 
-    def fit(self, train_df):
+    def fit(self, train_df,unused=None):
         logging.info("PERF: Fitting NaiveBinningClassifier")
         # (copied from bsm.build_user_model())
 
@@ -656,21 +699,29 @@ class NaiveBinningClassifier(TripClassifier):
         # only accepts lists of Entry objects
         train_trips = self._trip_df_to_list(train_df)
 
-        sim, bins, bin_trips, train_trips = ep.first_round(
-            train_trips, self.radius)
+        
+        model_config = {
+            "metric": "od_similarity",
+            "similarity_threshold_meters": self.radius,  # meters,
+            "apply_cutoff": False,
+            "clustering_way": "origin-destination", #cause thats what is set in performance_eval.py for this model
+            "incremental_evaluation": False
+        }    
 
+        sim_model = eamtg.GreedySimilarityBinning(model_config)
+        sim_model.fit(train_trips)
         # set instance variables so we can access results later as well
-        self.sim = sim
-        self.bins = bins
+        self.sim = sim_model
+        self.bins = sim_model.bins
 
         # save all user labels
         user_id = train_df.user_id.iloc[0]
-        bsm.save_models('user_labels',
-                        bsm.create_user_input_map(train_trips, bins), user_id)
+        model_type=eamumt.ModelType.GREEDY_SIMILARITY_BINNING
+        model_storage=eamums.ModelStorage.DOCUMENT_DATABASE
+        model_data_next=sim_model.to_dict()
+        last_done_ts = eamur._latest_timestamp(train_trips)
+        eamums.save_model(user_id, model_type, model_data_next, last_done_ts, model_storage)
 
-        # save location features of all bins
-        bsm.save_models('locations', bsm.create_location_map(train_trips, bins),
-                        user_id)
         return self
 
     def predict_proba(self, test_df):
@@ -880,13 +931,13 @@ class ClusterExtrapolationClassifier(TripClassifier):
 
         return self
 
-    def fit(self, train_df):
+    def fit(self, train_df,train_entry_list=None):
         # fit clustering model
-        self.end_cluster_model.fit(train_df)
+        self.end_cluster_model.fit(train_df,train_entry_list)
         self.train_df = self.end_cluster_model.train_df
 
         if self.cluster_method in ['trip', 'combination']:
-            self.start_cluster_model.fit(train_df)
+            self.start_cluster_model.fit(train_df,train_entry_list)
             self.train_df.loc[:, ['start_cluster_idx'
                                   ]] = self.start_cluster_model.train_df[[
                                       'start_cluster_idx'
@@ -1049,7 +1100,7 @@ class EnsembleClassifier(TripClassifier, metaclass=ABCMeta):
     replaced_predictor = NotImplemented
 
     # required methods
-    def fit(self, train_df):
+    def fit(self, train_df,unused=None):
         # get location features
         if self.loc_feature == 'cluster':
             # fit clustering model(s) and one-hot encode their indices

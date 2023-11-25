@@ -37,8 +37,10 @@ COLORS = [
 
 
 def find_plot_clusters(user_df,
+                       user_entry,
                        loc_type,
                        alg,
+                       clustering_way,
                        SVM=False,
                        radii=[50, 100, 150, 200],
                        cluster_unlabeled=False,
@@ -64,6 +66,8 @@ def find_plot_clusters(user_df,
             alg (str): the clustering algorithm to be used. must be one of the 
                 following: 'DBSCAN', 'naive', 'OPTICS', 'SVM', 'fuzzy' or
                 'mean_shift'
+            clustering_way(str): 'origin'or 'destination' or 'origin-destination'.
+                Decides the way we can cluster trips geospatially. 
             SVM (bool): whether or not to sub-divide clusters with SVM
             radii (int list): list of radii to pass to the clustering alg
             cluster_unlabeled (bool): whether or not unlabeled points are used 
@@ -91,6 +95,7 @@ def find_plot_clusters(user_df,
     assert 'start_loc' in user_df.columns
     assert 'end_loc' in user_df.columns
     assert 'user_input' in user_df.columns
+    assert clustering_way in ['origin','destination','origin-destination']
     assert alg in ALG_OPTIONS
 
     fig = bre.Figure(figsize=(20, 20))
@@ -116,6 +121,8 @@ def find_plot_clusters(user_df,
 
     df_for_cluster = add_loc_clusters(
         df_for_cluster,
+        user_entry,
+        clustering_way,
         radii=radii,
         alg=alg,
         SVM=SVM,

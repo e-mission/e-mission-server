@@ -9,6 +9,7 @@ import logging
 import os
 import time
 from datetime import datetime
+import pathlib
 
 import sklearn.metrics as sm
 from sklearn.metrics.cluster import contingency_matrix
@@ -18,8 +19,6 @@ from sklearn.model_selection import KFold, ParameterGrid, ParameterSampler
 import models
 from data_wrangling import expand_coords
 from clustering import add_loc_clusters, ALG_OPTIONS, purity_score
-import emission.analysis.modelling.tour_model_first_only.get_users as gu
-import emission.analysis.modelling.tour_model_first_only.data_preprocessing as pp
 
 # TODO: these may require further updating
 DEFAULT_MODES = [
@@ -120,6 +119,7 @@ PREDICTORS = {
 
 
 def cross_val_predict(model,
+                      ct_entry,
                       model_params=None,
                       user_df=None,
                       k=5,
@@ -171,8 +171,7 @@ def cross_val_predict(model,
 
         # train the model
         logging.info("About to fit the model %s" % model)
-        model_.fit(train_trips)
-
+        model_.fit(train_trips,ct_entry)
         logging.info("About to generate predictions for the model %s" % model)
         # generate predictions
         pred_df = model_.predict(test_trips)
@@ -216,6 +215,7 @@ def cross_val_predict(model,
 
 
 def cv_for_all_users(model,
+                     ct_entry,
                      uuid_list,
                      expanded_trip_df_map=None,
                      model_params=None,
@@ -233,6 +233,7 @@ def cv_for_all_users(model,
         logging.info("------ START: predictions for user %s and model %s" % (user, model))
         try:
             results = cross_val_predict(model,
+                                        ct_entry[user],
                                         model_params,
                                         user_df=expanded_trip_df_map[user],
                                         k=k,
@@ -265,7 +266,8 @@ def cv_for_all_users(model,
     return cross_val_all
 
 
-def cv_for_all_algs(uuid_list,
+def cv_for_all_algs(ct_entry,
+                    uuid_list,
                     expanded_trip_df_map,
                     model_names=list(PREDICTORS.keys()),
                     override_prior_runs=True,
@@ -274,6 +276,7 @@ def cv_for_all_algs(uuid_list,
                     min_samples=False,
                     raise_errors=False):
     cv_results = {}
+    pathlib.Path('first_trial_results').mkdir(parents=True,exist_ok=True) #needed first time
     for model_name in model_names:
         csv_path = f'first_trial_results/cv results {model_name}.csv'
         if not override_prior_runs and os.path.exists(csv_path):
@@ -289,6 +292,7 @@ def cv_for_all_algs(uuid_list,
             start_time = datetime.now()
             model, model_params = PREDICTORS[model_name]
             cv_df = cv_for_all_users(model,
+                                     ct_entry,
                                      uuid_list=uuid_list,
                                      expanded_trip_df_map=expanded_trip_df_map,
                                      model_params=model_params,
@@ -627,6 +631,8 @@ def get_cluster_metrics(trip_df):
 
 
 def run_eval_cluster_metrics(expanded_all_trip_df_map,
+                             ct_entry,
+                             clustering_way,
                              user_list,
                              radii,
                              loc_type,
@@ -730,6 +736,8 @@ def run_eval_cluster_metrics(expanded_all_trip_df_map,
 
                     user_trips = add_loc_clusters(
                         user_trips,
+                        ct_entry,
+                        clustering_way,
                         radii=radii,
                         alg=alg,
                         SVM=SVM,
