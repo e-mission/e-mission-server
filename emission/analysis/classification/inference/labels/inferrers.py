@@ -20,7 +20,7 @@ import emission.analysis.modelling.trip_model.config as eamtc
 # the user walks to the location it is to shop (e.g., because they don't have a basket on
 # their bike), and the user bikes to the location four times more than they walk there.
 # Obviously, it is a simplification.
-def placeholder_predictor_0(user_id, trip_list):
+def placeholder_predictor_0(trip_list):
     predictions_list = []
     for trip in trip_list:
         predictions = [
@@ -33,7 +33,7 @@ def placeholder_predictor_0(user_id, trip_list):
 
 # The next placeholder scenario provides that same set of labels in 75% of cases and no
 # labels in the rest.
-def placeholder_predictor_1(user_id, trip_list):
+def placeholder_predictor_1(trip_list):
     predictions_list = []
     for trip in trip_list:
         predictions = [
@@ -47,7 +47,7 @@ def placeholder_predictor_1(user_id, trip_list):
 
 # This third scenario provides labels designed to test the soundness and resilience of
 # the client-side inference processing algorithms.
-def placeholder_predictor_2(user_id, trip_list):
+def placeholder_predictor_2(trip_list):
     predictions_list = []
     for trip in trip_list:
         # Timestamp2index gives us a deterministic way to match test trips with labels
@@ -88,7 +88,7 @@ def placeholder_predictor_2(user_id, trip_list):
 
 
 # This fourth scenario provides labels designed to test the expectation and notification system.
-def placeholder_predictor_3(user_id, trip_list):
+def placeholder_predictor_3(trip_list):
     predictions_list = []
     for trip in trip_list:
         timestamp2index = {494: 5, 565: 4, 795: 3, 805: 2, 880: 1, 960: 0}
@@ -128,7 +128,7 @@ def placeholder_predictor_3(user_id, trip_list):
 
 # Placeholder that is suitable for a demo.
 # Finds all unique label combinations for this user and picks one randomly
-def placeholder_predictor_demo(user_id, trip_list):
+def placeholder_predictor_demo(trip_list):
     import random
     import emission.core.get_database as edb
     

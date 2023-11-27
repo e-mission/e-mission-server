@@ -63,7 +63,7 @@ class TestLabelInferencePipeline(unittest.TestCase):
                 self.assertEqual(entry["data"]["trip_id"], trip.get_id())
                 this_algorithm = ecwl.AlgorithmTypes(entry["data"]["algorithm_id"])
                 self.assertIn(this_algorithm, self.test_algorithms)
-                self.assertEqual(entry["data"]["prediction"], self.test_algorithms[this_algorithm](self.testUUID, [trip])[0])
+                self.assertEqual(entry["data"]["prediction"], self.test_algorithms[this_algorithm]([trip])[0])
                 self.assertEqual(entry["data"]["start_ts"], trip["data"]["start_ts"])
                 self.assertEqual(entry["data"]["end_ts"], trip["data"]["end_ts"])
     

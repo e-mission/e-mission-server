@@ -165,7 +165,6 @@ class TestRunGreedyModel(unittest.TestCase):
         )
         
         predictions_list = eamur.predict_labels_with_n(
-            user_id = self.user_id,
             trip_list = [test],
             model_type=eamumt.ModelType.GREEDY_SIMILARITY_BINNING,
             model_storage=eamums.ModelStorage.DOCUMENT_DATABASE,

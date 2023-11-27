@@ -47,3 +47,4 @@ class BuiltinModelStorage(esma.ModelStorage):
             first_entry = result_list[0]
             del first_entry["_id"]
             return first_entry 
+
