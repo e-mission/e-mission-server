@@ -98,7 +98,6 @@ def update_trip_model(
 
 
 def predict_labels_with_n(
-    user_id: UUID,
     trip_list: List[ecwc.Confirmedtrip],
     model_type = eamumt.ModelType.GREEDY_SIMILARITY_BINNING,
     model_storage = eamums.ModelStorage.DOCUMENT_DATABASE,
@@ -106,12 +105,20 @@ def predict_labels_with_n(
     """
     invoke the user label prediction model to predict labels for a trip.
 
-    :param trip: the trip to predict labels for
+    :param trip_list: the list of trips to predict labels for
     :param model_type: type of prediction model to run
     :param model_storage: location to read/write models
     :param model_config: optional configuration for model, for debugging purposes
     :return: a list of predictions
     """
+
+    user_id_list = []
+    for trip in trip_list:
+        user_id_list.append(trip['user_id'])
+    assert user_id_list.count(user_id_list[0]) == len(user_id_list), "Multiple user_ids found for trip_list, expected unique user_id for all trips"
+    # Assertion successful, use unique user_id
+    user_id = user_id_list[0]
+
     start_model_load_time = time.process_time()
     model = _load_stored_trip_model(user_id, model_type, model_storage, model_config)
     print(f"{arrow.now()} Inside predict_labels_n: Model load time = {time.process_time() - start_model_load_time}")

@@ -69,10 +69,11 @@ class LabelInferencePipeline:
             inferred_trip = ecwe.Entry.create_entry(user_id, "analysis/inferred_trip", cleaned_trip_dict)
             inferred_trip_list.append(inferred_trip)
     
-        # Computing outside loop by passing trip_list to ensure model loads once
-        # Run the algorithms and the ensemble, store results
-        results_dict = self.compute_and_save_algorithms(user_id, inferred_trip_list)
-        ensemble_list = self.compute_and_save_ensemble(inferred_trip_list, results_dict)
+        if inferred_trip_list:
+            # Computing outside loop by passing trip_list to ensure model loads once
+            # Run the algorithms and the ensemble, store results
+            results_dict = self.compute_and_save_algorithms(inferred_trip_list)
+            ensemble_list = self.compute_and_save_ensemble(inferred_trip_list, results_dict)
 
         start_insert_inferred_trip_time = time.process_time()
         for cleaned_trip, inferred_trip, ensemble in zip(cleaned_trip_list, inferred_trip_list, ensemble_list):
@@ -83,15 +84,15 @@ class LabelInferencePipeline:
 
             if self._last_trip_done is None or self._last_trip_done["data"]["end_ts"] < cleaned_trip["data"]["end_ts"]:
                 self._last_trip_done = cleaned_trip
-        print(f"{arrow.now()} Inside run_prediction_pipeline: Saving inferred_trip total time = {time.process_time() - start_insert_inferred_trip_time}")
+        # print(f"{arrow.now()} Inside run_prediction_pipeline: Saving inferred_trip total time = {time.process_time() - start_insert_inferred_trip_time}")
     
     # This is where the labels for a given trip are actually predicted.
     # Though the only information passed in is the trip object, the trip object can provide the
     # user_id and other potentially useful information.
-    def compute_and_save_algorithms(self, user_id, trip_list):
+    def compute_and_save_algorithms(self, trip_list):
         predictions_dict = {trip.get_id(): [] for trip in trip_list}
         for algorithm_id, algorithm_fn in primary_algorithms.items():
-            prediction_list = algorithm_fn(user_id, trip_list)
+            prediction_list = algorithm_fn(trip_list)
             start_insert_inference_labels_time = time.process_time()
             for trip, prediction in zip(trip_list, prediction_list):
                 lp = ecwl.Labelprediction()
@@ -102,7 +103,7 @@ class LabelInferencePipeline:
                 lp.end_ts = trip["data"]["end_ts"]
                 self.ts.insert_data(self.user_id, "inference/labels", lp)
                 predictions_dict[trip.get_id()].append(lp)
-            print(f"{arrow.now()} Inside compute_and_save_algorithms: Saving inference/labels total time = {time.process_time() - start_insert_inference_labels_time}")
+            # print(f"{arrow.now()} Inside compute_and_save_algorithms: Saving inference/labels total time = {time.process_time() - start_insert_inference_labels_time}")
         return predictions_dict
 
     # Combine all our predictions into a single ensemble prediction.
@@ -119,5 +120,5 @@ class LabelInferencePipeline:
             (il.algorithm_id, il.prediction) = ensemble(trip, predictions_dict[key])
             self.ts.insert_data(self.user_id, "analysis/inferred_labels", il)
             il_list.append(il)
-        print(f"{arrow.now()} Inside compute_and_save_ensemble: Saving inferred_labels total time = {time.process_time() - start_insert_inferred_labels_time}")
+        # print(f"{arrow.now()} Inside compute_and_save_ensemble: Saving inferred_labels total time = {time.process_time() - start_insert_inferred_labels_time}")
         return il_list

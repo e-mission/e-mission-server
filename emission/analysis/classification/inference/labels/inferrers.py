@@ -160,11 +160,11 @@ def n_to_confidence_coeff(n, max_confidence=None, first_confidence=None, confide
     return max_confidence-(max_confidence-first_confidence)*(1-confidence_multiplier)**(n-1)  # This is the u = ... formula in the issue
 
 # predict_two_stage_bin_cluster but with the above reduction in confidence
-def predict_cluster_confidence_discounting(user_id, trip_list, max_confidence=None, first_confidence=None, confidence_multiplier=None):
+def predict_cluster_confidence_discounting(trip_list, max_confidence=None, first_confidence=None, confidence_multiplier=None):
     # load application config 
     model_type = eamtc.get_model_type()
     model_storage = eamtc.get_model_storage()
-    labels_n_list = eamur.predict_labels_with_n(user_id, trip_list, model_type, model_storage)
+    labels_n_list = eamur.predict_labels_with_n(trip_list, model_type, model_storage)
     predictions_list = []
     for labels, n in labels_n_list:
         if n <= 0:  # No model data or trip didn't match a cluster
