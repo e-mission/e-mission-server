@@ -1,0 +1,11 @@
+[
+    { "mode_id": 1,"mode_name":"walking"},
+    { "mode_id": 2,"mode_name":"running"},
+    { "mode_id": 3,"mode_name":"cycling"},
+    { "mode_id": 4,"mode_name":"transport"},
+    { "mode_id": 5,"mode_name":"bus"},
+    { "mode_id": 6,"mode_name":"train"},
+    { "mode_id": 7,"mode_name":"car"},
+    { "mode_id": 8,"mode_name":"mixed"},
+    { "mode_id": 9,"mode_name":"air"}
+]
