@@ -7,7 +7,7 @@ import branca.element as bre
 from scipy.spatial import ConvexHull
 
 import emission.analysis.modelling.trip_model.data_wrangling as eamtd
-from clustering import add_loc_clusters, ALG_OPTIONS
+from emission.analysis.modelling.trip_model.clustering import add_loc_clusters, ALG_OPTIONS
 
 DENVER_COORD = [39.7392, -104.9903]
 MTV_COORD = [37.3861, -122.0839]

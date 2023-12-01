@@ -16,7 +16,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.exceptions import NotFittedError
 
 # our imports
-from clustering import get_distance_matrix, single_cluster_purity
+from emission.analysis.modelling.trip_model.clustering import get_distance_matrix, single_cluster_purity
 import emission.analysis.modelling.trip_model.data_wrangling as eamtd
 import emission.storage.decorations.trip_queries as esdtq
 from emission.analysis.classification.inference.labels.inferrers import predict_cluster_confidence_discounting
