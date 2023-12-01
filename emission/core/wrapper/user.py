@@ -127,10 +127,13 @@ class User(object):
 
   @staticmethod
   def createProfile(uuid, ts):
-    initProfileObj = {'user_id': uuid,
+    initProfileObj = {
+                      'user_id': uuid,
                       'source':'Shankari',
                       'update_ts': ts,
-                      'mpg_array': [defaultMpg]}
+                      'mpg_array': [defaultMpg],
+                      'modes': {}
+                    }
     writeResultProfile = get_profile_db().update_one(
         {'user_id': uuid},
         {'$set': initProfileObj},
