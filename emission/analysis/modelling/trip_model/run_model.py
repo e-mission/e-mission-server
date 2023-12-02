@@ -1,8 +1,9 @@
 import logging
 from typing import List, Optional
 from uuid import UUID
-
 import time
+import arrow 
+
 import emission.storage.timeseries.timequery as estt
 import emission.analysis.modelling.trip_model.model_storage as eamums
 import emission.analysis.modelling.trip_model.model_type as eamumt
@@ -97,26 +98,28 @@ def update_trip_model(
 
 
 def predict_labels_with_n(
-    trip: ecwc.Confirmedtrip,
-    model_type = eamumt.ModelType.GREEDY_SIMILARITY_BINNING,
-    model_storage = eamums.ModelStorage.DOCUMENT_DATABASE,
-    model_config = None):
+    trip_list: List[ecwc.Confirmedtrip],
+    model: eamuu.TripModel):
     """
     invoke the user label prediction model to predict labels for a trip.
 
-    :param trip: the trip to predict labels for
-    :param model_type: type of prediction model to run
-    :param model_storage: location to read/write models
-    :param model_config: optional configuration for model, for debugging purposes
+    :param trip_list: the list of trips to predict labels for
+    :param model: trip model used for predictions
     :return: a list of predictions
     """
-    user_id = trip['user_id']
-    model = _load_stored_trip_model(user_id, model_type, model_storage, model_config)
-    if model is None:
-        return [], -1
-    else:
-        predictions, n = model.predict(trip)
-        return predictions, n
+
+    predictions_list = []
+    print(f"{arrow.now()} Inside predict_labels_n: Predicting...")
+    start_predict_time = time.process_time()
+    for trip in trip_list:
+        if model is None:
+            predictions_list.append(([], -1))
+            continue
+        else:
+            predictions, n = model.predict(trip)
+            predictions_list.append((predictions, n))
+    print(f"{arrow.now()} Inside predict_labels_n: Predictions complete for trip_list in time = {time.process_time() - start_predict_time}")
+    return predictions_list
 
 
 def _get_training_data(user_id: UUID, time_query: Optional[estt.TimeQuery]):

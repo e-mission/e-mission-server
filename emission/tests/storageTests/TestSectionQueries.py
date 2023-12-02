@@ -100,7 +100,6 @@ class TestSectionQueries(unittest.TestCase):
         # Total = 25 = 10 (UUID1) + 15 (UUID2)
         curr_predicted_entries = esds.cleaned2inferred_section_list(section_user_list)
         self.assertEqual(len(curr_predicted_entries), len(sections_entries))
-        print(curr_predicted_entries)
 
         # Testcase 2: Null user_id value is passed
         curr_predicted_entries = esds.cleaned2inferred_section_list([{'section' : section_id, 'user_id' : ''}])

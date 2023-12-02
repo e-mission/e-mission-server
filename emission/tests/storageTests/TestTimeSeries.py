@@ -184,9 +184,6 @@ class TestTimeSeries(unittest.TestCase):
         count_ts9 = ts_new_user.find_entries_count(key_list=key_list1)
         self.assertEqual(count_ts9, 0)
 
-        print("Assert Test for Count Data successful!")
-        
-
 if __name__ == '__main__':
     import emission.tests.common as etc
     etc.configLogging()
