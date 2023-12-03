@@ -6,8 +6,8 @@ import folium
 import branca.element as bre
 from scipy.spatial import ConvexHull
 
-import data_wrangling
-from clustering import add_loc_clusters, ALG_OPTIONS
+import emission.analysis.modelling.trip_model.data_wrangling as eamtd
+from emission.analysis.modelling.trip_model.clustering import add_loc_clusters, ALG_OPTIONS
 
 DENVER_COORD = [39.7392, -104.9903]
 MTV_COORD = [37.3861, -122.0839]
@@ -109,7 +109,7 @@ def find_plot_clusters(user_df,
 
     # expand the 'start_loc' and 'end_loc' column into 'start_lat',
     # 'start_lon', 'end_lat', and 'end_lon' columns
-    all_trips_df = data_wrangling.expand_coords(all_trips_df)
+    all_trips_df = eamtd.expand_coords(all_trips_df)
 
     labeled_trips_df = all_trips_df.loc[all_trips_df.user_input != {}].dropna(
         subset=['purpose_confirm'])

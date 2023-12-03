@@ -16,8 +16,8 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.exceptions import NotFittedError
 
 # our imports
-from clustering import get_distance_matrix, single_cluster_purity
-import data_wrangling
+from emission.analysis.modelling.trip_model.clustering import get_distance_matrix, single_cluster_purity
+import emission.analysis.modelling.trip_model.data_wrangling as eamtd
 import emission.storage.decorations.trip_queries as esdtq
 from emission.analysis.classification.inference.labels.inferrers import predict_cluster_confidence_discounting
 import emission.core.wrapper.entry as ecwe
@@ -28,7 +28,7 @@ import emission.analysis.modelling.trip_model.model_type as eamumt
 import emission.analysis.modelling.trip_model.run_model as eamur
 
 
-import clustering
+import emission.analysis.modelling.trip_model.clustering as eamtc
 # NOTE: tour_model_extended.similarity is on the
 # eval-private-data-compatibility branch in e-mission-server
 
@@ -82,7 +82,7 @@ class SetupMixin(metaclass=ABCMeta):
 
         # expand the 'start_loc' and 'end_loc' column into 'start_lat',
         # 'start_lon', 'end_lat', and 'end_lon' columns
-        df = data_wrangling.expand_coords(df)
+        df = eamtd.expand_coords(df)
 
         # drop trips with missing coordinates
         if df.start_lat.isna().any():
@@ -334,7 +334,7 @@ class RefactoredNaiveCluster(Cluster):
           
         # fit the bins
         self.sim_model= eamtg.GreedySimilarityBinning(model_config)
-        cleaned_trip_entry= clustering.cleanEntryTypeData(self.train_df,train_entry_list)
+        cleaned_trip_entry= eamtc.cleanEntryTypeData(self.train_df,train_entry_list)
         self.sim_model.fit(cleaned_trip_entry)
 
         labels = [int(l) for l in self.sim_model.tripLabels]
