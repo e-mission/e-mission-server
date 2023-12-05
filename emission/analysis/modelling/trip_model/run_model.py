@@ -119,6 +119,7 @@ def predict_labels_with_n(
             predictions, n = model.predict(trip)
             predictions_list.append((predictions, n))
     print(f"{arrow.now()} Inside predict_labels_n: Predictions complete for trip_list in time = {time.process_time() - start_predict_time}")
+    print(f"No. of trips = {len(trip_list)}; No. of predictions = {len(predictions_list)}")
     return predictions_list
 
 
