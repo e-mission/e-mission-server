@@ -260,6 +260,7 @@ def _create_analysis_result_indices(tscoll):
     tscoll.create_index([("data.duration", pymongo.DESCENDING)], sparse=True)
     tscoll.create_index([("data.mode", pymongo.ASCENDING)], sparse=True)
     tscoll.create_index([("data.section", pymongo.ASCENDING)], sparse=True)
+    tscoll.create_index([("data.cleaned_section", pymongo.ASCENDING)], sparse=True)
 
     # recreated location
     tscoll.create_index([("data.ts", pymongo.DESCENDING)], sparse=True)

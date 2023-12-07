@@ -45,6 +45,16 @@ def cleaned2inferred_section(user_id, section_id):
     curr_predicted_entry = _get_inference_entry_for_section(user_id, section_id, "analysis/inferred_section", "data.cleaned_section")
     return curr_predicted_entry
 
+def cleaned2inferred_section_list(section_user_list):
+    curr_predicted_entries = {}
+    for section_userid in section_user_list:
+        matching_inferred_section = cleaned2inferred_section(section_userid.get('user_id'), section_userid.get('section'))
+        if matching_inferred_section is None:
+            curr_predicted_entries[str(section_userid.get('section'))] = ecwm.PredictedModeTypes.UNKNOWN
+        else:
+            curr_predicted_entries[str(section_userid.get('section'))] = matching_inferred_section.data.sensed_mode # PredictedModeTypes
+    return curr_predicted_entries
+
 def _get_inference_entry_for_section(user_id, section_id, entry_key, section_id_key):
     prediction_key_query = {"metadata.key": entry_key}
     inference_query = {"user_id": user_id, section_id_key: section_id}

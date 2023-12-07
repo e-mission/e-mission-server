@@ -36,10 +36,12 @@ class TestTimeSeries(unittest.TestCase):
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-aug-27")
 
     def tearDown(self):
+        edb.get_timeseries_db().delete_many({"user_id": self.testUUID1})
         edb.get_timeseries_db().delete_many({"user_id": self.testUUID})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID1})
+        edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID})
         edb.get_uuid_db().delete_one({"user_email": "user1"})
         edb.get_uuid_db().delete_one({"user_email": "user2"})
-        edb.get_analysis_timeseries_db().delete_many({"user_id": self.testUUID})
 
     def testGetUUIDList(self):
         uuid_list = esta.TimeSeries.get_uuid_list()
@@ -165,20 +167,14 @@ class TestTimeSeries(unittest.TestCase):
         count_ts7 = ts_agg.find_entries_count(key_list=key_list1)
         self.assertEqual(count_ts7, 2128)
 
+
+        # TODO: Update conversation in PR #935
+        # Code cleanup pending once debugging was complete for failing assertion
+        # Removed try/catch block -> code present in issue #933
         # Test case: Aggregate timeseries DB User data passed as input with empty key_list
-        try:
-            ts_agg = esta.TimeSeries.get_aggregate_time_series()
-            count_ts8 = ts_agg.find_entries_count(key_list=key_list4)
-            self.assertEqual(count_ts8, 3607)
-        except AssertionError as e:
-            print(f"Assertion failed for 3607...")
-            for ct in count_ts8:
-                cte = ecwe.Entry(ct)
-                print(f"CTE = ")
-                print(cte.user_id)
-                print(cte.metadata.key)
-                print(cte)
-                print("=== Trip:", cte.data.start_loc, "->", cte.data.end_loc)
+        ts_agg = esta.TimeSeries.get_aggregate_time_series()
+        count_ts8 = ts_agg.find_entries_count(key_list=key_list4)
+        self.assertEqual(count_ts8, 3607)
 
         # Test case: New User created with no data to check
         self.testEmail = None
@@ -187,9 +183,6 @@ class TestTimeSeries(unittest.TestCase):
         ts_new_user = esta.TimeSeries.get_time_series(self.testUUID)
         count_ts9 = ts_new_user.find_entries_count(key_list=key_list1)
         self.assertEqual(count_ts9, 0)
-
-        print("Assert Test for Count Data successful!")
-        
 
 if __name__ == '__main__':
     import emission.tests.common as etc
