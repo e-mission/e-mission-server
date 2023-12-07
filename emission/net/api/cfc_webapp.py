@@ -306,6 +306,23 @@ def getUserProfile():
   user = User.fromUUID(user_uuid)
   return user.getProfile()
 
+@post('/mode/get')
+def getUserModes():
+  logging.debug("Called getUserModes")
+  user_uuid = getUUID(request)
+  user = User.fromUUID(user_uuid)
+  return user.getModes()
+
+@post('/mode/create')
+def createUserMode():
+  logging.debug("Called createUserMode")
+  new_mode = request.json['mode']
+  user_uuid = getUUID(request)
+  user = User.fromUUID(user_uuid)
+  to_return = user.insertMode(new_mode)
+  logging.debug("Successfully created mode for user %s" % user_uuid)
+  return {"modes": to_return}
+
 @post('/result/metrics/<time_type>')
 def summarize_metrics(time_type):
     _fill_aggregate_backward_compat(request)

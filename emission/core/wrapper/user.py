@@ -228,3 +228,25 @@ class User(object):
     get_uuid_db().delete_one({'user_email': userEmail})
     get_profile_db().delete_one({'user_id': uuid})
     return uuid
+
+  def getModes(self):
+    user = get_profile_db().find_one({'user_id': self.uuid})
+    modes = user['modes']
+    filteredModes = {key: value for key, value in modes.items() if value.get('isActive', False)}
+    sortedModes = dict(sorted(filteredModes.items(), key=lambda x: (x[1]["frequency"]), reverse=True))
+    return sortedModes  
+  
+  def insertMode(self, mode):
+    from datetime import datetime
+    modes = self.getModes()
+    if mode in modes:
+      modes[mode]['frequency'] = modes[mode]['frequency'] + 1
+    else:  
+      modes[mode] = {
+        'createdAt': datetime.now(),
+        'frequency': 1,
+        'isActive': True,
+      }
+    get_profile_db().update_one({'user_id': self.uuid}, {'$set': {'modes': modes}})
+    return modes
+  
