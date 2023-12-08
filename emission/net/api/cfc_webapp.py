@@ -313,14 +313,14 @@ def getUserModes():
   user = User.fromUUID(user_uuid)
   return user.getModes()
 
-@post('/mode/create')
-def createUserMode():
+@post('/mode/update')
+def updateUserMode():
   logging.debug("Called createUserMode")
-  new_mode = request.json['mode']
+  updated_mode = request.json['updated_mode']
   user_uuid = getUUID(request)
   user = User.fromUUID(user_uuid)
-  to_return = user.insertMode(new_mode)
-  logging.debug("Successfully created mode for user %s" % user_uuid)
+  to_return = user.updateModes(updated_mode)
+  logging.debug("Successfully updated mode for user %s" % user_uuid)
   return {"modes": to_return}
 
 @post('/result/metrics/<time_type>')

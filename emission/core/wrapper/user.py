@@ -236,17 +236,29 @@ class User(object):
     sortedModes = dict(sorted(filteredModes.items(), key=lambda x: (x[1]["frequency"]), reverse=True))
     return sortedModes  
   
-  def insertMode(self, mode):
+  def updateModes(self, updated_mode):
     from datetime import datetime
-    modes = self.getModes()
-    if mode in modes:
-      modes[mode]['frequency'] = modes[mode]['frequency'] + 1
-    else:  
-      modes[mode] = {
+    user = get_profile_db().find_one({'user_id': self.uuid})
+    modes = user['modes']   
+    old_mode = updated_mode['old_mode']
+    new_mode = updated_mode['new_mode']
+    is_new_mode_must_added = updated_mode['is_new_mode_must_added']
+    
+    if new_mode in modes:
+      updated_frequency = modes[new_mode]['frequency'] + 1
+      modes[new_mode]['frequency'] = updated_frequency
+    
+    if is_new_mode_must_added and not new_mode in modes:
+      modes[new_mode] = {
         'createdAt': datetime.now(),
         'frequency': 1,
         'isActive': True,
       }
+
+    if old_mode in modes:
+      updated_frequency = modes[old_mode]['frequency'] - 1
+      modes[old_mode]['frequency'] = updated_frequency
+
     get_profile_db().update_one({'user_id': self.uuid}, {'$set': {'modes': modes}})
-    return modes
+    return self.getModes()
   
