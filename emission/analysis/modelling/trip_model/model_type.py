@@ -28,7 +28,7 @@ class ModelType(Enum):
         # Dict[ModelType, TripModel]
         MODELS = {                
                 ModelType.GREEDY_SIMILARITY_BINNING: eamug.GreedySimilarityBinning,
-                ModelType.RANDOM_FOREST_CLASSIFIER: eamuf.ForestClassifier
+                ModelType.RANDOM_FOREST_CLASSIFIER: eamuf.ForestClassifierModel
                 }    
         model = MODELS.get(self)
         if model is None:

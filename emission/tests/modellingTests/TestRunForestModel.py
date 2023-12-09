@@ -1,9 +1,10 @@
 import unittest
 import logging
 
-import emission.analysis.modelling.trip_model.model_storage as eamums
-import emission.analysis.modelling.trip_model.model_type as eamumt
 import emission.analysis.modelling.trip_model.run_model as eamur
+import emission.analysis.modelling.trip_model.model_type as eamumt
+import emission.analysis.modelling.trip_model.model_storage as eamums
+
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.tests.modellingTests.modellingTestAssets as etmm
 import emission.storage.decorations.analysis_timeseries_queries as esda
@@ -176,13 +177,17 @@ class TestRunForestModel(unittest.TestCase):
         
         logging.debug(f'(TEST) testing prediction of stored model')
         test = esda.get_entries(key="analysis/confirmed_trip", user_id=self.user_id, time_query=None)    
-        prediction, n = eamur.predict_labels_with_n(
-            trip = test[0],
+        model = eamur._load_stored_trip_model(
+            user_id=self.user_id,
             model_type=eamumt.ModelType.RANDOM_FOREST_CLASSIFIER,
             model_storage=eamums.ModelStorage.DOCUMENT_DATABASE,
-            model_config=forest_model_config
+            model_config=forest_model_config        
+            )
+             
+        predictions_list = eamur.predict_labels_with_n(
+            trip_list = [test],
+            model=model            
         )
-
-        [logging.debug(p) for p in sorted(prediction, key=lambda r: r['p'], reverse=True)]
-
-        self.assertNotEqual(len(prediction), 0, "should have a prediction")
+        for prediction, n in predictions_list:
+            [logging.debug(p) for p in sorted(prediction, key=lambda r: r['p'], reverse=True)]
+            self.assertNotEqual(len(prediction), 0, "should have a prediction")

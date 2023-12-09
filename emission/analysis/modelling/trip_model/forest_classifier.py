@@ -11,11 +11,11 @@ import emission.analysis.modelling.trip_model.trip_model as eamuu
 import emission.analysis.modelling.trip_model.config as eamtc
 import emission.storage.timeseries.builtin_timeseries as estb
 import emission.storage.decorations.trip_queries as esdtq
-from emission.analysis.modelling.trip_model.models import ForestClassifierModel
+from emission.analysis.modelling.trip_model.models import ForestClassifier
 
 EARTH_RADIUS = 6371000
 
-class ForestClassifier(eamuu.TripModel):
+class ForestClassifierModel(eamuu.TripModel):
 
     def __init__(self,config=None):
 
@@ -54,7 +54,24 @@ class ForestClassifier(eamuu.TripModel):
                 if config.get(k) is None:
                     msg = f"cluster trip model config missing expected key {k}"
                     raise KeyError(msg)
-        self.model=ForestClassifierModel(config=config)
+        maxdepth =config['max_depth'] if config['max_depth']!='null' else None
+        self.model=ForestClassifier( loc_feature=config['loc_feature'],
+                                     radius= config['radius'],
+                                     size_thresh=config['radius'],
+                                     purity_thresh=config['purity_thresh'],
+                                     gamma=config['gamma'],
+                                     C=config['C'],
+                                     n_estimators=config['n_estimators'],
+                                     criterion=config['criterion'],
+                                     max_depth=maxdepth, 
+                                     min_samples_split=config['min_samples_split'],
+                                     min_samples_leaf=config['min_samples_leaf'],
+                                     max_features=config['max_features'],
+                                     bootstrap=config['bootstrap'],
+                                     random_state=config['random_state'],
+                                     # drop_unclustered=False,
+                                     use_start_clusters=config['use_start_clusters'],
+                                     use_trip_clusters=config['use_trip_clusters'])
         
 
     def fit(self,trips: List[ecwc.Confirmedtrip]):
@@ -89,7 +106,7 @@ class ForestClassifier(eamuu.TripModel):
             msg = f'model.predict cannot be called with an empty trips'
             raise Exception(msg)        
         # CONVERT LIST OF TRIPS TO dataFrame 
-        test_df = estb.BuiltinTimeSeries.to_data_df("analysis/confirmed_trip",[trip])
+        test_df = estb.BuiltinTimeSeries.to_data_df("analysis/confirmed_trip",trip)
         labeled_trip_df = esdtq.filter_labeled_trips(test_df)
         expanded_labeled_trip_df= esdtq.expand_userinputs(labeled_trip_df)
         predcitions_df= self.model.predict(expanded_labeled_trip_df)
@@ -128,8 +145,14 @@ class ForestClassifier(eamuu.TripModel):
             ## confirm this includes all the extra encoders/models
             attr.extend([ 'cluster_enc','end_cluster_model','start_cluster_model','trip_grouper'])
         for attribute_name in attr:
+            if not hasattr(self.model,attribute_name):
+                raise ValueError(f"Attribute {attribute_name} not found in the model")
+
             buffer=BytesIO()
-            joblib.dump(getattr(self.model,attribute_name),buffer)
+            try:
+                joblib.dump(getattr(self.model,attribute_name),buffer)
+            except Exception as e:
+                raise RuntimeError(f"Error serializing { attribute_name}: {str(e)}")    
             buffer.seek(0)
             data[attribute_name]=buffer.getvalue()
 
@@ -144,14 +167,14 @@ class ForestClassifier(eamuu.TripModel):
             ## TODO : confirm this includes all the extra encoders/models
             attr.extend([ 'cluster_enc','end_cluster_model','start_cluster_model','trip_grouper'])
         for attribute_name in attr:
+            if attribute_name not in model:
+                raise ValueError(f"Attribute {attribute_name} missing in the model")
             try:
-                if attribute_name in model:
-                    buffer = BytesIO(model[attribute_name])
-                    setattr(self.model,attribute_name, joblib.load(buffer))
+                buffer = BytesIO(model[attribute_name])
+                setattr(self.model,attribute_name, joblib.load(buffer))
             except Exception as e:
-                print(f"Error loading {attribute_name}: {str(e)}")
-                # If we do not wish to raise the exception after logging the error, comment the line below
-                raise e
+                raise RuntimeError(f"Error deserializing { attribute_name}: {str(e)}")    
+                # If we do not wish to raise the exception after logging the error, comment the line above
 
     def extract_features(self, trip: ecwc.Confirmedtrip) -> List[float]:
         """
