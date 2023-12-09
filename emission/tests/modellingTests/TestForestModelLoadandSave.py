@@ -16,11 +16,8 @@ import emission.core.wrapper.pipelinestate as ecwp
 
 
 class TestForestModelLoadandSave(unittest.TestCase):
-    """these tests were copied forward during a refactor of the tour model
-    [https://github.com/e-mission/e-mission-server/blob/10772f892385d44e11e51e796b0780d8f6609a2c/emission/analysis/modelling/tour_model_first_only/load_predict.py#L114]
-
-    it's uncertain what condition they are in besides having been refactored to
-    use the more recent tour modeling code.    
+    """
+    Tests to make sure the model load and save properly
     """
     
     def setUp(self):
