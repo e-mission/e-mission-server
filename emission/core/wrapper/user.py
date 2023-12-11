@@ -234,7 +234,7 @@ class User(object):
     modes = user['modes']
     filteredModes = {key: value for key, value in modes.items() if value.get('isActive', False)}
     sortedModes = dict(sorted(filteredModes.items(), key=lambda x: (x[1]["frequency"]), reverse=True))
-    return sortedModes  
+    return list(sortedModes)  
   
   def updateModes(self, updated_mode):
     from datetime import datetime
@@ -243,7 +243,7 @@ class User(object):
     old_mode = updated_mode['old_mode']
     new_mode = updated_mode['new_mode']
     is_new_mode_must_added = updated_mode['is_new_mode_must_added']
-    
+
     if new_mode in modes:
       updated_frequency = modes[new_mode]['frequency'] + 1
       modes[new_mode]['frequency'] = updated_frequency

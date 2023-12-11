@@ -311,17 +311,17 @@ def getUserModes():
   logging.debug("Called getUserModes")
   user_uuid = getUUID(request)
   user = User.fromUUID(user_uuid)
-  return user.getModes()
+  return { 'modes' : user.getModes() }
 
 @post('/mode/update')
 def updateUserMode():
-  logging.debug("Called createUserMode")
+  logging.debug("Called updateUserMode")
   updated_mode = request.json['updated_mode']
   user_uuid = getUUID(request)
   user = User.fromUUID(user_uuid)
   to_return = user.updateModes(updated_mode)
   logging.debug("Successfully updated mode for user %s" % user_uuid)
-  return {"modes": to_return}
+  return { 'modes' : to_return }
 
 @post('/result/metrics/<time_type>')
 def summarize_metrics(time_type):
