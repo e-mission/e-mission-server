@@ -24,9 +24,11 @@ class BuiltinModelStorage(esma.ModelStorage):
         """
         logging.debug("upsert_doc called with key %s" % key)
         entry = ecwe.Entry.create_entry(self.user_id, key, model)
+        ## TODO: Cleanup old/obsolete models
+        # Cleaning up older models, before inserting new model
+        self.trim_model_entries(key)
         logging.debug("Inserting entry %s into model DB" % entry)
         ins_result = edb.get_model_db().insert_one(entry)
-        ## TODO: Cleanup old/obsolete models
         return ins_result.inserted_id
 
     def get_current_model(self, key:str) -> Optional[Dict]:
@@ -60,7 +62,6 @@ class BuiltinModelStorage(esma.ModelStorage):
         find_query = {"user_id": self.user_id, "metadata.key": key}
         result_it = edb.get_model_db().find(find_query).sort("metadata.write_ts", -1)
         result_list = list(result_it)
-        print(len(result_list))
 
         if current_model_count >= K_MODEL_COUNT:
             # Specify the last or minimum timestamp of Kth model entry
