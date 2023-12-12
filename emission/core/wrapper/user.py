@@ -244,10 +244,12 @@ class User(object):
     new_mode = updated_mode['new_mode']
     is_new_mode_must_added = updated_mode['is_new_mode_must_added']
 
+    # when a user changed a mode to an exsiting customized mode
     if new_mode in modes:
       updated_frequency = modes[new_mode]['frequency'] + 1
       modes[new_mode]['frequency'] = updated_frequency
     
+    # when a user added a new customized mode
     if is_new_mode_must_added and not new_mode in modes:
       modes[new_mode] = {
         'createdAt': datetime.now(),
@@ -255,6 +257,7 @@ class User(object):
         'isActive': True,
       }
 
+    # when a user chaged a mode from an exsiting customized mode
     if old_mode in modes:
       updated_frequency = modes[old_mode]['frequency'] - 1
       modes[old_mode]['frequency'] = updated_frequency
