@@ -114,20 +114,38 @@ class TestForestModel(unittest.TestCase):
 
         ## predictions take the form like :
         #
-        #{'labels': {'mode_confirm': 'ebike', 'replaced_mode': 'walk', 'purpose_confirm': 'dog-park'}, 'p': 1.0}
-        #  we can store these predictions in a json and then for every run other than the first we
-        # can load the predictions and compare
+        #{'labels': {'mode_confirm': 'ebike', 'replaced_mode': 'walk', 'purpose_confirm': 'dog-park'}, 'p': 1.0}       
 
-        try:
-            if os.path.exists(file_path) and os.path.getsize(file_path)>0:
-                with open(file_path, 'r') as f:
-                    prev_predictions_list = json.load(f)
-                    logging.debug()
-                    self.assertEqual(prev_predictions_list,curr_predictions_list," previous predictions should match current predictions")
-            else:
-                with open(file_path,'w') as file:
-                    json.dump(curr_predictions_list,file,indent=4)
-                    logging.debug("Previous predicitons stored for future matching" )
-        except json.JSONDecodeError:
-            logging.debug("jsonDecodeErrorError")
-            return " decoding JSON."
+        #Below are two ways we can store prev. predictions  list . Whichever way we finalise, I'll delete the other one.
+        #
+        #Method 1 : Run predictions for the first time and hardcode them into
+        #prev_prdictions_list. For every iteration, simply  compare them
+        #
+        # for the current data that we read from json, the predictions we get is an empty list. If 
+        # we use a different file with more data, this'll take the for as mentioned above
+        #
+        prev_predictions_list= [
+            (
+                [],
+                -1
+            )
+        ]   
+
+        self.assertEqual(prev_predictions_list,curr_predictions_list," previous predictions should match current predictions")
+
+
+        #Method 2 ( which was failing): Store these predictions into a json and read from
+        #that json
+        # 
+        # try:
+        #     if os.path.exists(file_path) and os.path.getsize(file_path)>0:
+        #         with open(file_path, 'r') as f:
+        #             prev_predictions_list = json.load(f)
+        #             logging.debug()
+        #             self.assertEqual(prev_predictions_list,curr_predictions_list," previous predictions should match current predictions")
+        #     else:
+        #         with open(file_path,'w') as file:
+        #             json.dump(curr_predictions_list,file,indent=4)
+        #             logging.debug("Previous predicitons stored for future matching" )
+        # except json.JSONDecodeError:
+        #     logging.debug("jsonDecodeErrorError")
