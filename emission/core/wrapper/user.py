@@ -239,7 +239,7 @@ class User(object):
   def updateModes(self, updated_mode):
     from datetime import datetime
     user = get_profile_db().find_one({'user_id': self.uuid})
-    modes = user['modes']   
+    modes = user['modes'] if 'modes' in user else {} 
     old_mode = updated_mode['old_mode']
     new_mode = updated_mode['new_mode']
     is_new_mode_must_added = updated_mode['is_new_mode_must_added']
