@@ -13,7 +13,7 @@ source setup/setup.sh
 ## 10/02 - Mukul
 ## - Above comments talk about manually updating cryptography to version 40
 ## - I have upgraded to 41.0.4 as per latest vulnerability fixes.
-conda install -c conda-forge cryptography=41.0.4 wheel=0.40.0
+conda install -c conda-forge cryptography=41.0.7 wheel=0.40.0
 
 ## Remove the old, unused packages to avoid tripping up the checker
 rm -rf /root/miniconda-23.1.0/pkgs/cryptography-38.0.4-py39h9ce1e76_0
