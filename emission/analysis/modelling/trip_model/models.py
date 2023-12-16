@@ -19,7 +19,7 @@ from sklearn.exceptions import NotFittedError
 from emission.analysis.modelling.trip_model.clustering import get_distance_matrix, single_cluster_purity
 import emission.analysis.modelling.trip_model.data_wrangling as eamtd
 import emission.storage.decorations.trip_queries as esdtq
-from emission.analysis.classification.inference.labels.inferrers import predict_cluster_confidence_discounting
+import emission.analysis.classification.inference.labels.inferrers as eacili
 import emission.core.wrapper.entry as ecwe
 import emission.analysis.modelling.trip_model.greedy_similarity_binning as eamtg
 import emission.core.common as ecc
@@ -738,7 +738,7 @@ class NaiveBinningClassifier(TripClassifier):
         replaced_distribs = []
 
         for trip in test_trips:
-            trip_prediction = predict_cluster_confidence_discounting(trip)
+            trip_prediction = eacili.predict_cluster_confidence_discounting(trip)
 
             if len(trip_prediction) == 0:
                 # model could not find cluster for the trip

@@ -1,7 +1,6 @@
 from typing import ByteString
 import unittest
 import logging
-import pytest
 from unittest.mock import patch
 import emission.analysis.modelling.trip_model.run_model as eamur
 import emission.analysis.modelling.trip_model.model_type as eamumt
