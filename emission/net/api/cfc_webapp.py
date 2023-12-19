@@ -307,20 +307,30 @@ def getUserProfile():
   return user.getProfile()
 
 @post('/mode/get')
-def getUserModes():
-  logging.debug("Called getUserModes")
+def getUserCustomModes():
+  logging.debug("Called getUserCustomModes")
   user_uuid = getUUID(request)
   user = User.fromUUID(user_uuid)
-  return { 'modes' : user.getModes() }
+  return { 'modes' : user.getUserCustomModes() }
 
 @post('/mode/update')
-def updateUserMode():
+def updateUserCustomMode():
   logging.debug("Called updateUserMode")
   updated_mode = request.json['updated_mode']
   user_uuid = getUUID(request)
   user = User.fromUUID(user_uuid)
-  to_return = user.updateModes(updated_mode)
+  to_return = user.updateUserCustomMode(updated_mode)
   logging.debug("Successfully updated mode for user %s" % user_uuid)
+  return { 'modes' : to_return }
+
+@post('/mode/delete')
+def deleteUserCustomMode():
+  logging.debug("Called deleteUserCustomMode")
+  deleted_mode = request.json['deleted_mode']
+  user_uuid = getUUID(request)
+  user = User.fromUUID(user_uuid)
+  to_return = user.deleteUserCustomMode(deleted_mode)
+  logging.debug("Successfully deleted mode for user %s" % user_uuid)
   return { 'modes' : to_return }
 
 @post('/result/metrics/<time_type>')

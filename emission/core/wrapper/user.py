@@ -229,14 +229,17 @@ class User(object):
     get_profile_db().delete_one({'user_id': uuid})
     return uuid
 
-  def getModes(self):
+  def getUserCustomModes(self):
     user = get_profile_db().find_one({'user_id': self.uuid})
-    modes = user['modes']
-    filteredModes = {key: value for key, value in modes.items() if value.get('isActive', False)}
-    sortedModes = dict(sorted(filteredModes.items(), key=lambda x: (x[1]["frequency"]), reverse=True))
-    return list(sortedModes)  
+    if 'modes' in user:
+      modes = user['modes']
+      filteredModes = {key: value for key, value in modes.items() if value.get('isActive', False)}
+      sortedModes = dict(sorted(filteredModes.items(), key=lambda x: (x[1]["frequency"]), reverse=True))
+      return list(sortedModes)  
+    else:
+      return []
   
-  def updateModes(self, updated_mode):
+  def updateUserCustomMode(self, updated_mode):
     from datetime import datetime
     user = get_profile_db().find_one({'user_id': self.uuid})
     modes = user['modes'] if 'modes' in user else {} 
@@ -263,5 +266,15 @@ class User(object):
       modes[old_mode]['frequency'] = updated_frequency
 
     get_profile_db().update_one({'user_id': self.uuid}, {'$set': {'modes': modes}})
-    return self.getModes()
+    return self.getUserCustomModes()
+  
+  def deleteUserCustomMode(self, deleted_mode):
+    user = get_profile_db().find_one({'user_id': self.uuid})
+    modes = user['modes'] if 'modes' in user else {} 
+
+    if deleted_mode in modes:
+      modes[deleted_mode]['isActive'] = False
+
+    get_profile_db().update_one({'user_id': self.uuid}, {'$set': {'modes': modes}})
+    return self.getUserCustomModes()
   
