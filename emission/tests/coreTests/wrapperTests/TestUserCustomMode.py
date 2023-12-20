@@ -18,7 +18,6 @@ import emission.tests.common as etc
 class TestUserCustomMode(unittest.TestCase):
 
   def setUp(self):
-    etc.dropAllCollections(edb._get_current_db())
     self.user = User.register('fake@fake.com')
 
   def testinitialGetUserCustomModes(self):
@@ -47,6 +46,9 @@ class TestUserCustomMode(unittest.TestCase):
     self.testInsertUserCustomMode()
     mode = self.user.deleteUserCustomMode('test1')
     self.assertListEqual(mode, [])
+
+  def tearDown(self):
+    etc.dropAllCollections(edb._get_current_db())
 
 
 if __name__ == '__main__':
