@@ -24,6 +24,8 @@ rm -rf /root/miniconda-23.5.2/pkgs/conda-23.5.2-py39h06a4308_0/lib/python3.9/sit
 rm -rf /root/miniconda-23.5.2/pkgs/urllib3-1.26.16-py39h06a4308_0
 rm -rf /root/miniconda-23.5.2/pkgs/urllib3-1.26.17-pyhd8ed1ab_0
 rm -rf /root/miniconda-23.5.2/envs/emission/lib/python3.9/site-packages/urllib3-1.26.17.dist-info
+rm -rf /root/miniconda-23.5.2/lib/python3.9/site-packages/urllib3-1.26.16.dist-info
+rm -rf /root/miniconda-23.5.2/lib/python3.9/site-packages/tests
 
 # Clean up the conda install
 conda clean -t
