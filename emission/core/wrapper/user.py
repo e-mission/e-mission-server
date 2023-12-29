@@ -238,6 +238,18 @@ class User(object):
       return list(sortedModes)  
     else:
       return []
+
+  def insertUserCustomMode(self, new_mode):
+    from datetime import datetime
+    user = get_profile_db().find_one({'user_id': self.uuid})
+    modes = user['modes'] if 'modes' in user else {} 
+    modes[new_mode] = {
+      'createdAt': datetime.now(),
+      'frequency': 0,
+      'isActive': True,
+    }
+    get_profile_db().update_one({'user_id': self.uuid}, {'$set': {'modes': modes}})
+    return self.getUserCustomModes()
   
   def updateUserCustomMode(self, updated_mode):
     from datetime import datetime

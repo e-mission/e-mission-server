@@ -313,6 +313,16 @@ def getUserCustomModes():
   user = User.fromUUID(user_uuid)
   return { 'modes' : user.getUserCustomModes() }
 
+@post('/mode/insert')
+def insertUserCustomModes():
+  logging.debug("Called insertUserMode")
+  new_mode = request.json['new_mode']
+  user_uuid = getUUID(request)
+  user = User.fromUUID(user_uuid)
+  to_return = user.insertUserCustomMode(new_mode)
+  logging.debug("Successfully inserted mode for user %s" % user_uuid)
+  return { 'modes' : to_return }
+
 @post('/mode/update')
 def updateUserCustomMode():
   logging.debug("Called updateUserMode")
