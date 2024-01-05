@@ -306,42 +306,46 @@ def getUserProfile():
   user = User.fromUUID(user_uuid)
   return user.getProfile()
 
-@post('/mode/get')
-def getUserCustomModes():
-  logging.debug("Called getUserCustomModes")
+@post('/customlabel/get')
+def getUserCustomLabels():
+  logging.debug("Called getUserCustomLabels")
+  keys = request.json['keys']
   user_uuid = getUUID(request)
   user = User.fromUUID(user_uuid)
-  return { 'modes' : user.getUserCustomModes() }
+  to_return = {}
+  for key in keys:
+     to_return[key] = user.getUserCustomLabel(key)
+  return to_return
 
-@post('/mode/insert')
-def insertUserCustomModes():
-  logging.debug("Called insertUserMode")
-  new_mode = request.json['new_mode']
+@post('/customlabel/insert')
+def insertUserCustomLabel():
+  logging.debug("Called insertUserCustomLabel")
+  inserted_label = request.json['inserted_label']
   user_uuid = getUUID(request)
   user = User.fromUUID(user_uuid)
-  to_return = user.insertUserCustomMode(new_mode)
-  logging.debug("Successfully inserted mode for user %s" % user_uuid)
-  return { 'modes' : to_return }
+  to_return = user.insertUserCustomLabel(inserted_label)
+  logging.debug("Successfully inserted label for user %s" % user_uuid)
+  return { 'label' : to_return }
 
-@post('/mode/update')
-def updateUserCustomMode():
-  logging.debug("Called updateUserMode")
-  updated_mode = request.json['updated_mode']
+@post('/customlabel/update')
+def updateUserCustomLabel():
+  logging.debug("Called updateUserCustomLabel")
+  updated_label = request.json['updated_label']
   user_uuid = getUUID(request)
   user = User.fromUUID(user_uuid)
-  to_return = user.updateUserCustomMode(updated_mode)
-  logging.debug("Successfully updated mode for user %s" % user_uuid)
-  return { 'modes' : to_return }
+  to_return = user.updateUserCustomLabel(updated_label)
+  logging.debug("Successfully updated label label for user %s" % user_uuid)
+  return { 'label' : to_return }
 
-@post('/mode/delete')
-def deleteUserCustomMode():
-  logging.debug("Called deleteUserCustomMode")
-  deleted_mode = request.json['deleted_mode']
+@post('/customlabel/delete')
+def deleteUserCustomLabel():
+  logging.debug("Called deleteUserCustomLabel")
+  deleted_label = request.json['deleted_label']
   user_uuid = getUUID(request)
   user = User.fromUUID(user_uuid)
-  to_return = user.deleteUserCustomMode(deleted_mode)
-  logging.debug("Successfully deleted mode for user %s" % user_uuid)
-  return { 'modes' : to_return }
+  to_return = user.deleteUserCustomLabel(deleted_label)
+  logging.debug("Successfully deleted label for user %s" % user_uuid)
+  return { 'label' : to_return }
 
 @post('/result/metrics/<time_type>')
 def summarize_metrics(time_type):

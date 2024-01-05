@@ -132,7 +132,9 @@ class User(object):
                       'source':'Shankari',
                       'update_ts': ts,
                       'mpg_array': [defaultMpg],
-                      'modes': {}
+                      'mode': {},
+                      'purpose': {},
+                      'replaced_mode' : {}
                     }
     writeResultProfile = get_profile_db().update_one(
         {'user_id': uuid},
@@ -229,64 +231,68 @@ class User(object):
     get_profile_db().delete_one({'user_id': uuid})
     return uuid
 
-  def getUserCustomModes(self):
+  def getUserCustomLabel(self, key):
     user = get_profile_db().find_one({'user_id': self.uuid})
-    if 'modes' in user:
-      modes = user['modes']
-      filteredModes = {key: value for key, value in modes.items() if value.get('isActive', False)}
-      sortedModes = dict(sorted(filteredModes.items(), key=lambda x: (x[1]["frequency"]), reverse=True))
-      return list(sortedModes)  
+    if key in user:
+      labels = user[key]
+      filteredLabels = {key: value for key, value in labels.items() if value.get('isActive', False)}
+      sortedLabels = dict(sorted(filteredLabels.items(), key=lambda x: (x[1]["frequency"]), reverse=True))
+      return list(sortedLabels)  
     else:
       return []
 
-  def insertUserCustomMode(self, new_mode):
+  def insertUserCustomLabel(self, inserted_label):
     from datetime import datetime
     user = get_profile_db().find_one({'user_id': self.uuid})
-    modes = user['modes'] if 'modes' in user else {} 
-    modes[new_mode] = {
+    key = inserted_label['key']
+    label = inserted_label['label']
+    items = user[key] if key in user else {} 
+    items[label] = {
       'createdAt': datetime.now(),
       'frequency': 0,
       'isActive': True,
     }
-    get_profile_db().update_one({'user_id': self.uuid}, {'$set': {'modes': modes}})
-    return self.getUserCustomModes()
+    get_profile_db().update_one({'user_id': self.uuid}, {'$set': {key: items}})
+    return self.getUserCustomLabel(key)
   
-  def updateUserCustomMode(self, updated_mode):
+  def updateUserCustomLabel(self, updated_label):
     from datetime import datetime
     user = get_profile_db().find_one({'user_id': self.uuid})
-    modes = user['modes'] if 'modes' in user else {} 
-    old_mode = updated_mode['old_mode']
-    new_mode = updated_mode['new_mode']
-    is_new_mode_must_added = updated_mode['is_new_mode_must_added']
-
-    # when a user changed a mode to an exsiting customized mode
-    if new_mode in modes:
-      updated_frequency = modes[new_mode]['frequency'] + 1
-      modes[new_mode]['frequency'] = updated_frequency
+    key = updated_label['key']
+    items = user[key] if key in user else {} 
+    old_label = updated_label['old_label']
+    new_label = updated_label['new_label']
+    is_new_label_must_added = updated_label['is_new_label_must_added']
+    # when a user changed a label to an exsiting customized label
+    if new_label in items:
+      updated_frequency = items[new_label]['frequency'] + 1
+      items[new_label]['frequency'] = updated_frequency
     
-    # when a user added a new customized mode
-    if is_new_mode_must_added and not new_mode in modes:
-      modes[new_mode] = {
+    # when a user added a new customized label
+    if is_new_label_must_added and not new_label in items:
+      items[new_label] = {
         'createdAt': datetime.now(),
         'frequency': 1,
         'isActive': True,
       }
 
-    # when a user chaged a mode from an exsiting customized mode
-    if old_mode in modes:
-      updated_frequency = modes[old_mode]['frequency'] - 1
-      modes[old_mode]['frequency'] = updated_frequency
+    # when a user chaged a label from an exsiting customized label
+    if old_label in items:
+      updated_frequency = items[old_label]['frequency'] - 1
+      items[old_label]['frequency'] = updated_frequency
 
-    get_profile_db().update_one({'user_id': self.uuid}, {'$set': {'modes': modes}})
-    return self.getUserCustomModes()
+    get_profile_db().update_one({'user_id': self.uuid}, {'$set': {key: items}})
+    return self.getUserCustomLabel(key)
   
-  def deleteUserCustomMode(self, deleted_mode):
+  def deleteUserCustomLabel(self, deleted_label):
     user = get_profile_db().find_one({'user_id': self.uuid})
-    modes = user['modes'] if 'modes' in user else {} 
+    key = deleted_label['key']
+    label = deleted_label['label']
+    items = user[key] if key in user else {} 
 
-    if deleted_mode in modes:
-      modes[deleted_mode]['isActive'] = False
+    if label in items:
+      items[label]['isActive'] = False
 
-    get_profile_db().update_one({'user_id': self.uuid}, {'$set': {'modes': modes}})
-    return self.getUserCustomModes()
+    get_profile_db().update_one({'user_id': self.uuid}, {'$set': {key: items}})
+    return self.getUserCustomLabel(key)
   
