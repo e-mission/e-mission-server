@@ -109,7 +109,7 @@ def predict_labels_with_n(
     """
 
     predictions_list = []
-    print(f"{arrow.now()} Inside predict_labels_n: Predicting...")
+    logging.debug(f"{arrow.now()} Inside predict_labels_n: Predicting...")
     start_predict_time = time.process_time()
     for trip in trip_list:
         if model is None:
@@ -118,7 +118,7 @@ def predict_labels_with_n(
         else:
             predictions, n = model.predict(trip)
             predictions_list.append((predictions, n))
-    print(f"{arrow.now()} Inside predict_labels_n: Predictions complete for trip_list in time = {time.process_time() - start_predict_time}")
+    logging.debug(f"{arrow.now()} Inside predict_labels_n: Predictions complete for trip_list in time = {time.process_time() - start_predict_time}")
     return predictions_list
 
 
