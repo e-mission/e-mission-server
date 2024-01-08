@@ -8,16 +8,29 @@ import emission.core.wrapper.pipelinestate as ecwp
 import emission.core.wrapper.pipelinestate as ecwp
 import emission.storage.pipeline_queries as esp
 import pandas as pd
-
+import pymongo
+from bson import ObjectId
+import json
+from uuid import UUID
 
 DEFAULT_DIR_NAME = "/tmp"
 DEFAULT_FILE_PREFIX = "old_timeseries_"
 
 def exportOldTimeseriesAsCsv(user_id, last_ts_run, dir_name, file_prefix):
-    filename = dir_name + "/" + file_prefix + str(user_id) + ".csv"
+    filename = dir_name + "/" + file_prefix + str(user_id) + ".json"
     all_data = list(edb.get_timeseries_db().find({"user_id": user_id, "metadata.write_ts": { "$lt": last_ts_run}}))
-    all_df = pd.json_normalize(all_data)
-    all_df.to_csv(filename)
+    # all_df = pd.json_normalize(all_data)
+    # print(all_df)
+    # all_df.to_csv(filename)
+
+    def custom_encoder(obj):
+        if isinstance(obj, (UUID, ObjectId)):
+            return str(obj)
+        raise TypeError(f"Type {type(obj)} not serializable")
+
+    with open(filename, 'w') as file:
+        json.dump(all_data, file, default=custom_encoder)
+
     logging.info("Old timeseries data exported to {}".format(filename))
 
 def purgeUserTimeseries(user_uuid, user_email=None, dir_name=DEFAULT_DIR_NAME, file_prefix=DEFAULT_FILE_PREFIX, unsafe_ignore_save=False):
@@ -28,9 +41,10 @@ def purgeUserTimeseries(user_uuid, user_email=None, dir_name=DEFAULT_DIR_NAME, f
 
     cstate = esp.get_current_state(user_id, ecwp.PipelineStages.CREATE_CONFIRMED_OBJECTS)
     last_ts_run = cstate['last_ts_run']
+    print(f"last_ts_run : {last_ts_run}")
 
     if not last_ts_run:
-        logging.warning("No processed timeserie for user {}".format(user_id))
+        logging.warning("No processed timeseries for user {}".format(user_id))
         exit(1)
 
     if unsafe_ignore_save is True:
@@ -38,8 +52,8 @@ def purgeUserTimeseries(user_uuid, user_email=None, dir_name=DEFAULT_DIR_NAME, f
     else:
         exportOldTimeseriesAsCsv(user_id, last_ts_run, dir_name, file_prefix)
 
-    res = edb.get_timeseries_db().delete_many({"user_id": user_id, "metadata.write_ts": { "$lt": last_ts_run}})
-    logging.info("{} deleted entries since {}".format(res.deleted_count, datetime.fromtimestamp(last_ts_run)))
+    # res = edb.get_timeseries_db().delete_many({"user_id": user_id, "metadata.write_ts": { "$lt": last_ts_run}})
+    # logging.info("{} deleted entries since {}".format(res.deleted_count, datetime.fromtimestamp(last_ts_run)))
     
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
