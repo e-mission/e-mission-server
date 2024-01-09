@@ -9,6 +9,7 @@ import emission.core.wrapper.pipelinestate as ecwp
 import emission.storage.pipeline_queries as esp
 import pandas as pd
 import pymongo
+from bson.binary import Binary
 from bson import ObjectId
 import json
 
@@ -21,9 +22,14 @@ def restoreUserTimeseries(filename):
 
     with open(filename, 'r') as file:
         data = json.load(file)
-    result = edb.get_timeseries_db().insert_many(data)
 
-    logging.info("{} documents successfully inserted".format(len(result.inserted_ids)))
+    # Converting _id to ObjectId and UUID string to binary BinData
+    for document in data:
+        document["_id"] = ObjectId(document["_id"])
+        document["user_id"] = Binary(uuid.UUID(document["user_id"]).bytes, 0x03)
+
+    result = edb.get_timeseries_db().insert_many(data)
+    logging.debug("{} documents successfully inserted".format(len(result.inserted_ids)))
     
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)

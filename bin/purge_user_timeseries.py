@@ -52,8 +52,8 @@ def purgeUserTimeseries(user_uuid, user_email=None, dir_name=DEFAULT_DIR_NAME, f
     else:
         exportOldTimeseriesAsCsv(user_id, last_ts_run, dir_name, file_prefix)
 
-    # res = edb.get_timeseries_db().delete_many({"user_id": user_id, "metadata.write_ts": { "$lt": last_ts_run}})
-    # logging.info("{} deleted entries since {}".format(res.deleted_count, datetime.fromtimestamp(last_ts_run)))
+    result = edb.get_timeseries_db().delete_many({"user_id": user_id, "metadata.write_ts": { "$lt": last_ts_run}})
+    logging.debug("{} deleted entries since {}".format(result.deleted_count, datetime.fromtimestamp(last_ts_run)))
     
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
