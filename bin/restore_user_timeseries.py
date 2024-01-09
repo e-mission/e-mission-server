@@ -20,6 +20,7 @@ def restoreUserTimeseries(filename):
     # print(df)
     # result = edb.get_timeseries_db().insert_many(data)
 
+    logging.info("Importing data from file...")
     with open(filename, 'r') as file:
         data = json.load(file)
 
@@ -28,8 +29,9 @@ def restoreUserTimeseries(filename):
         document["_id"] = ObjectId(document["_id"])
         document["user_id"] = Binary(uuid.UUID(document["user_id"]).bytes, 0x03)
 
+    logging.info("Inserting data into database...")
     result = edb.get_timeseries_db().insert_many(data)
-    logging.debug("{} documents successfully inserted".format(len(result.inserted_ids)))
+    logging.info("{} documents successfully inserted".format(len(result.inserted_ids)))
     
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
