@@ -247,11 +247,17 @@ class User(object):
     key = inserted_label['key']
     label = inserted_label['label']
     items = user[key] if key in user else {} 
-    items[label] = {
-      'createdAt': datetime.now(),
-      'frequency': 0,
-      'isActive': True,
-    }
+    
+    # if label exists in database, chage it as 'active' label
+    if label in items:
+      items[label]['isActive'] = True
+    else:
+      items[label] = {
+        'createdAt': datetime.now(),
+        'frequency': 0,
+        'isActive': True,
+      }
+
     get_profile_db().update_one({'user_id': self.uuid}, {'$set': {key: items}})
     return self.getUserCustomLabel(key)
   
