@@ -12,9 +12,8 @@ import emission.tests.common as etc
 import emission.core.get_database as edb
 import emission.storage.pipeline_queries as esp
 import emission.core.wrapper.pipelinestate as ecwp
-from bin.purge_user_timeseries import purgeUserTimeseries
-from bin.restore_user_timeseries import restoreUserTimeseries
-
+import bin.purge_user_timeseries as bput
+import bin.restore_user_timeseries as brut
 
 class TestPurgeRestoreUserTimeseries(unittest.TestCase):
     def setUp(self):
@@ -25,7 +24,8 @@ class TestPurgeRestoreUserTimeseries(unittest.TestCase):
         etc.dropAllCollections(edb._get_current_db())
 
     def testPurgeRestoreUserTimeseries(self):
-        with tempfile.TemporaryDirectory(dir="/var/tmp") as tmpdirname:
+        with tempfile.TemporaryDirectory() as tmpdirname:
+            logging.info(f"Default temporary directory: {tempfile.gettempdir()}")
             cstate = esp.get_current_state(self.testUUID, ecwp.PipelineStages.CREATE_CONFIRMED_OBJECTS)
             last_ts_run = cstate['last_ts_run']
             self.assertTrue(last_ts_run > 0)
@@ -45,17 +45,17 @@ class TestPurgeRestoreUserTimeseries(unittest.TestCase):
                 'csv_export': True
             }
             filename = tmpdirname + "/" + file_prefix + str(self.testUUID)
-            purgeUserTimeseries(exportFileFlags, str(self.testUUID), dir_name=tmpdirname, file_prefix=file_prefix)
+            bput.purgeUserTimeseries(exportFileFlags, str(self.testUUID), dir_name=tmpdirname, file_prefix=file_prefix)
 
             # Check how much data there is after
             res = edb.get_timeseries_db().count_documents({"user_id": self.testUUID, "metadata.write_ts": { "$lt": last_ts_run}})
-            logging.debug(f"Purging complete: {res} entries remaining")
+            logging.info(f"Purging complete: {res} entries remaining")
             self.assertEqual(res, 0)
 
             # Check that data was properly saved (1906 lines of data + 1 line of header)
             with open(filename + ".csv", 'r') as f:
                 csv_lines = f.readlines()
-                logging.debug(f"No. of entries in CSV file: {len(csv_lines)}")
+                logging.info(f"No. of entries in CSV file: {len(csv_lines)}")
                 self.assertEqual(len(csv_lines), 1907)
 
             '''
@@ -63,7 +63,7 @@ class TestPurgeRestoreUserTimeseries(unittest.TestCase):
             '''
             # Run the restore function
             logging.info(f"About to restore entries")
-            restoreUserTimeseries(filename + ".json")
+            brut.restoreUserTimeseries(filename + ".json")
 
             # Check how much data there is after
             res = edb.get_timeseries_db().count_documents({"user_id": self.testUUID, "metadata.write_ts": { "$lt": last_ts_run}})
@@ -75,7 +75,7 @@ class TestPurgeRestoreUserTimeseries(unittest.TestCase):
             '''
             logging.info("Attempting to load duplicate data...")
             with self.assertRaises(errors.BulkWriteError) as bwe:
-                restoreUserTimeseries(filename + ".json")
+                brut.restoreUserTimeseries(filename + ".json")
             write_errors = bwe.exception.details.get('writeErrors', [])
             for write_error in write_errors:
                 index = write_error.get('index', None)
@@ -91,10 +91,9 @@ class TestPurgeRestoreUserTimeseries(unittest.TestCase):
             json.dump([], file)
         logging.info("Attempting to load empty data...")
         with self.assertRaises(TypeError) as te:
-            restoreUserTimeseries(emptyJsonFile)
+            brut.restoreUserTimeseries(emptyJsonFile)
         self.assertEqual(str(te.exception), "documents must be a non-empty list")
         os.remove(emptyJsonFile)
-
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)

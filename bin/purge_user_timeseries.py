@@ -12,8 +12,9 @@ import pymongo
 from bson import ObjectId
 import json
 from uuid import UUID
+import tempfile
 
-DEFAULT_DIR_NAME = "/tmp"
+DEFAULT_DIR_NAME = tempfile.gettempdir()
 DEFAULT_FILE_PREFIX = "old_timeseries_"
 
 def exportOldTimeseriesAsCsv(user_id, all_data, filename):
@@ -104,4 +105,5 @@ if __name__ == '__main__':
         'json_export': True,
         'csv_export': args.csv_export if args.csv_export is not None else False
     }
+    logging.info(f"Default temporary directory: {DEFAULT_DIR_NAME}")
     purgeUserTimeseries(exportFileFlags, args.user_uuid, args.user_email, args.dir_name, args.file_prefix, args.unsafe_ignore_save)
