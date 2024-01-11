@@ -272,6 +272,7 @@ class User(object):
     if new_label in items:
       updated_frequency = items[new_label]['frequency'] + 1
       items[new_label]['frequency'] = updated_frequency
+      items[new_label]['isActive'] = True
     
     # when a user added a new customized label
     if is_new_label_must_added and not new_label in items:
