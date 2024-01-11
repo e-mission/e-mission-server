@@ -133,8 +133,7 @@ class User(object):
                       'update_ts': ts,
                       'mpg_array': [defaultMpg],
                       'mode': {},
-                      'purpose': {},
-                      'replaced_mode' : {}
+                      'purpose': {}
                     }
     writeResultProfile = get_profile_db().update_one(
         {'user_id': uuid},
