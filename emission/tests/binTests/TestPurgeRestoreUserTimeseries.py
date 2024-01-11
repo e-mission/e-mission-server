@@ -86,7 +86,7 @@ class TestPurgeRestoreUserTimeseries(unittest.TestCase):
         '''
         Test 4 - Restoring from an empty JSON file should fail as the insert command needs non-empty document data
         '''
-        emptyJsonFile = '/Users/mmahadik/Documents/GitHub/logs/data/restore_csv/empty_file.json'
+        emptyJsonFile = '/var/tmp/empty_file.json'
         with open(emptyJsonFile, 'w') as file:
             json.dump([], file)
         logging.info("Attempting to load empty data...")
