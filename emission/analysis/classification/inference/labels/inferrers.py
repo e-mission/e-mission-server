@@ -6,6 +6,7 @@ import random
 import copy
 import time
 import arrow
+from uuid import UUID
 
 import emission.analysis.modelling.tour_model_first_only.load_predict as lp
 import emission.analysis.modelling.trip_model.run_model as eamur
@@ -171,14 +172,19 @@ def predict_cluster_confidence_discounting(trip_list, max_confidence=None, first
     user_id_list = []
     for trip in trip_list:
         user_id_list.append(trip['user_id'])
-    assert user_id_list.count(user_id_list[0]) == len(user_id_list), "Multiple user_ids found for trip_list, expected unique user_id for all trips"
+    error_message = f"""
+            Multiple user_ids found for trip_list, expected unique user_id for all trips.
+            Unique user_ids count = {len(set(user_id_list))}
+            {set(user_id_list)}
+        """
+    assert user_id_list.count(user_id_list[0]) == len(user_id_list), error_message
     # Assertion successful, use unique user_id
     user_id = user_id_list[0]
 
     # load model
     start_model_load_time = time.process_time()
     model = eamur._load_stored_trip_model(user_id, model_type, model_storage)
-    print(f"{arrow.now()} Inside predict_labels_n: Model load time = {time.process_time() - start_model_load_time}")
+    logging.debug(f"{arrow.now()} Inside predict_cluster_confidence_discounting: Model load time = {time.process_time() - start_model_load_time}")
 
     labels_n_list = eamur.predict_labels_with_n(trip_list, model)
     predictions_list = []
