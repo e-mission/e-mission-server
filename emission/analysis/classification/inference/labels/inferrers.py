@@ -184,7 +184,7 @@ def predict_cluster_confidence_discounting(trip_list, max_confidence=None, first
     # load model
     start_model_load_time = time.process_time()
     model = eamur._load_stored_trip_model(user_id, model_type, model_storage)
-    print(f"{arrow.now()} Inside predict_cluster_confidence_discounting: Model load time = {time.process_time() - start_model_load_time}")
+    logging.debug(f"{arrow.now()} Inside predict_cluster_confidence_discounting: Model load time = {time.process_time() - start_model_load_time}")
 
     labels_n_list = eamur.predict_labels_with_n(trip_list, model)
     predictions_list = []
