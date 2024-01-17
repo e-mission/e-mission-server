@@ -9,7 +9,7 @@ import logging
 import pandas as pd
 import pymongo
 import itertools
-
+from pymongo import UpdateOne
 import emission.core.get_database as edb
 import emission.storage.timeseries.abstract_timeseries as esta
 
@@ -440,8 +440,27 @@ class BuiltinTimeSeries(esta.TimeSeries):
         logging.debug("updating entry %s into timeseries" % new_entry)
         edb.save(ts.get_timeseries_db(key), new_entry)
 
-    def invalidate_raw_entry(self, obj_id):
-        self.timeseries_db.update_one({"_id": obj_id, "user_id": self.user_id}, {"$set": {"invalid": True}})
+    def invalidate_raw_entry(self, out_of_order_id_list):
+        update_operations = [
+            UpdateOne({"_id": obj_id, "user_id": self.user_id}, {"$set": {"invalid": True}})
+            for obj_id in out_of_order_id_list
+        ]
+        if update_operations:
+            self.timeseries_db.bulk_write(update_operations)
+
+    ## Other way could be to make batches as below. However, I couldn't find any
+    # improvement in times for update_operations of the size range 3000.
+    #
+    #
+    # def invalidate_raw_entry(self, out_of_order_id_list):
+    #     update_operations = [
+    #         UpdateOne({"_id": obj_id, "user_id": self.user_id}, {"$set": {"invalid": True}})
+    #         for obj_id in out_of_order_id_list
+    #     ]
+    #     batch_size=1000
+    #     for i in range(0,len(update_operations),batch_size):
+    #         batch=update_operations[i:i+ batch_size]
+    #         self.timeseries_db.bulk_write(batch)    
 
     def find_entries_count(self, key_list = None, time_query = None, geo_query = None, extra_query_list = None):
         """

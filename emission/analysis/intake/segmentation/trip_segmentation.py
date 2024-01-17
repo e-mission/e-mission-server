@@ -7,7 +7,10 @@ standard_library.install_aliases()
 from builtins import *
 from builtins import object
 import logging
-
+import pandas as pd
+logger=logging.getLogger("")
+logger.setLevel(logging.DEBUG)
+from timeit import default_timer as timer
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.place_queries as esdp
 import emission.storage.decorations.analysis_timeseries_queries as esda
@@ -70,7 +73,6 @@ def segment_current_trips(user_id):
         logging.debug("len(loc_df) == 0, early return")
         epq.mark_segmentation_done(user_id, None)
         return
-
     out_of_order_points = loc_df[loc_df.ts.diff() < 0]
     if len(out_of_order_points) > 0:
         logging.info("Found out of order points!")
@@ -81,8 +83,10 @@ def segment_current_trips(user_id):
         # invalidate in the database.
         out_of_order_id_list = out_of_order_points["_id"].tolist()
         logging.debug("out_of_order_id_list = %s" % out_of_order_id_list)
-        for ooid in out_of_order_id_list:
-            ts.invalidate_raw_entry(ooid)
+        #start=timer()
+        ts.invalidate_raw_entry(out_of_order_id_list)
+        #end=timer()
+        #logger.debug(f"Elapsed: {end-start}")
 
     filters_in_df = loc_df["filter"].dropna().unique()
     logging.debug("Filters in the dataframe = %s" % filters_in_df)
