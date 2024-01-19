@@ -22,7 +22,6 @@ def importOldTimeseriesFromJson(filename):
     for document in data:
         document["_id"] = ObjectId(document["_id"])
         document["user_id"] = Binary(uuid.UUID(document["user_id"]).bytes, 0x03)
-        print(document["user_id"])
     logging.info("Old timeseries data loaded from JSON...")
     return data
 
