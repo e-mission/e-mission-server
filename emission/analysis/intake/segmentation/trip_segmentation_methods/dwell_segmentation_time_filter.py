@@ -20,7 +20,7 @@ logger.setLevel(logging.DEBUG)
 import emission.analysis.point_features as pf
 import emission.analysis.intake.segmentation.trip_segmentation as eaist
 import emission.core.wrapper.location as ecwl
-
+import emission.core.common as ec
 import emission.analysis.intake.segmentation.restart_checking as eaisr
 
 class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
@@ -109,17 +109,20 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             # We are going to use the last 8 points for now.
             # TODO: Change this back to last 10 points once we normalize phone and this
             last10Points_df = filtered_points_df.iloc[max(idx-self.point_threshold, curr_trip_start_point.idx):idx+1]
-            distanceToLast = lambda row: pf.calDistance(ad.AttrDict(row), currPoint)
-            timeToLast = lambda row: currPoint.ts - ad.AttrDict(row).ts
-            last5MinsDistances = last5MinsPoints_df.apply(distanceToLast, axis=1)
-            logging.debug("last5MinsDistances = %s with length %d" % (last5MinsDistances.to_numpy(), len(last5MinsDistances)))
-            last10PointsDistances = last10Points_df.apply(distanceToLast, axis=1)
-            logging.debug("last10PointsDistances = %s with length %d, shape %s" % (last10PointsDistances.to_numpy(),
-                                                                           len(last10PointsDistances),
-                                                                           last10PointsDistances.shape))
-
+            # get 2d numpy array, from df
+            last10Points_coords=last10Points_df[['longitude','latitude']].to_numpy()
+            # create a similar dimension current cordintaes numpy array
+            currPoint_coords = np.repeat(np.array([[currPoint.longitude,currPoint.latitude]]),len(last10Points_df),axis=0)
+            #compute distance
+            last10PointsDistances=ec.calDistance(last10Points_coords,currPoint_coords)
+            # Reset current coordintes numpy array as per last 5 mins  Points array's dimensions
+            currPoint_coords = np.repeat(np.array([[currPoint.longitude,currPoint.latitude]]),len(last5MinsPoints_df),axis=0)
+            # get 2d numpy array, from df
+            last5MinsPoints_coords=last5MinsPoints_df[['longitude','latitude']].to_numpy()
+            # calcualte distance
+            last5MinsDistances=ec.calDistance(last5MinsPoints_coords,currPoint_coords)            
             # Fix for https://github.com/e-mission/e-mission-server/issues/348
-            last5MinTimes = last5MinsPoints_df.apply(timeToLast, axis=1)
+            last5MinTimes = currPoint.ts-last5MinsPoints_df.ts
             
             logging.debug("len(last10PointsDistances) = %d, len(last5MinsDistances) = %d" %
                   (len(last10PointsDistances), len(last5MinsDistances)))
