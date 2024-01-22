@@ -68,6 +68,12 @@ def segment_current_trips(user_id):
     # We need to use the appropriate filter based on the incoming data
     # So let's read in the location points for the specified query
     loc_df = ts.get_data_df("background/filtered_location", time_query)
+    transition_df = ts.get_data_df("statemachine/transition", time_query)
+    motion_df = ts.get_data_df("background/motion_activity",time_query)
+    if len(transition_df) > 0:
+        logging.debug("transition_df = %s" % transition_df[["fmt_time", "transition"]])
+    else:
+        logging.debug("no transitions found. This can happen for continuous sensing")
     if len(loc_df) == 0:
         # no new segments, no need to keep looking at these again
         logging.debug("len(loc_df) == 0, early return")
@@ -93,7 +99,7 @@ def segment_current_trips(user_id):
     if len(filters_in_df) == 1:
         # Common case - let's make it easy
         
-        segmentation_points = filter_methods[filters_in_df[0]].segment_into_trips(ts,
+        segmentation_points = filter_methods[filters_in_df[0]].segment_into_trips(loc_df,transition_df,motion_df,
             time_query)
     else:
         segmentation_points = get_combined_segmentation_points(ts, loc_df, time_query,
@@ -108,7 +114,7 @@ def segment_current_trips(user_id):
         epq.mark_segmentation_done(user_id, None)
     else:
         try:
-            create_places_and_trips(user_id, segmentation_points, filter_method_names[filters_in_df[0]])
+            create_places_and_trips(user_id, transition_df,segmentation_points, filter_method_names[filters_in_df[0]])
             epq.mark_segmentation_done(user_id, get_last_ts_processed(filter_methods))
         except:
             logging.exception("Trip generation failed for user %s" % user_id)
@@ -175,7 +181,7 @@ def get_last_ts_processed(filter_methods):
     logging.info("Returning last_ts_processed = %s" % last_ts_processed)
     return last_ts_processed
 
-def create_places_and_trips(user_id, segmentation_points, segmentation_method_name):
+def create_places_and_trips(user_id, transition_df, segmentation_points, segmentation_method_name):
     # new segments, need to deal with them
     # First, retrieve the last place so that we can stitch it to the newly created trip.
     # Again, there are easy and hard. In the easy case, the trip was
@@ -218,7 +224,7 @@ def create_places_and_trips(user_id, segmentation_points, segmentation_method_na
         new_place_entry = ecwe.Entry.create_entry(user_id,
                             "segmentation/raw_place", new_place, create_id = True)
 
-        if found_untracked_period(ts, last_place_entry.data, start_loc, segmentation_method_name):
+        if found_untracked_period(transition_df, last_place_entry.data, start_loc, segmentation_method_name):
             # Fill in the gap in the chain with an untracked period
             curr_untracked = ecwut.Untrackedtime()
             curr_untracked.source = segmentation_method_name
@@ -258,7 +264,7 @@ def _link_and_save(ts, last_place_entry, curr_trip_entry, new_place_entry, start
     # it will be lost
     ts.update(last_place_entry)
 
-def found_untracked_period(timeseries, last_place, start_loc, segmentation_method_name):
+def found_untracked_period(transition_df, last_place, start_loc, segmentation_method_name):
     """
     Check to see whether the two places are the same.
     This is a fix for https://github.com/e-mission/e-mission-server/issues/378
@@ -274,7 +280,7 @@ def found_untracked_period(timeseries, last_place, start_loc, segmentation_metho
         logging.debug("start of a chain, unable to check for restart from previous trip end, assuming not restarted")
         return False
 
-    if _is_tracking_restarted(last_place, start_loc, timeseries):
+    if _is_tracking_restarted(last_place, start_loc, transition_df):
         logging.debug("tracking has been restarted, returning True")
         return True
 
@@ -382,6 +388,6 @@ def stitch_together_end(new_place_entry, curr_trip_entry, end_loc):
     new_place_entry["data"] = new_place
     curr_trip_entry["data"] = curr_trip
 
-def _is_tracking_restarted(last_place, start_loc, timeseries):
-    return eaisr.is_tracking_restarted_in_range(last_place.enter_ts, start_loc.ts, timeseries)
+def _is_tracking_restarted(last_place, start_loc, transition_df):
+    return eaisr.is_tracking_restarted_in_range(last_place.enter_ts, start_loc.ts, transition_df)
 
