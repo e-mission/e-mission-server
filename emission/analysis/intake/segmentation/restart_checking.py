@@ -34,11 +34,11 @@ def get_ongoing_motion_in_range(start_ts, end_ts, motion_df):
 
     motion_df_start_idx=motion_df.ts.searchsorted(start_ts,side='left')    
     motion_df_end_idx=motion_df.ts.searchsorted(end_ts,side='right')
-    motion_list=motion_df.iloc[motion_df_start_idx:motion_df_end_idx]
+    filtered_motion_df=motion_df.iloc[motion_df_start_idx:motion_df_end_idx]
     logging.debug("Found %s motion_activity entries in range %s -> %s" %
-                 (len(motion_list),start_ts, end_ts))
+                 (len(filtered_motion_df),start_ts, end_ts))
   #  logging.debug("sample activities are %s" % motion_list[0:5])
-    return motion_list
+    return filtered_motion_df
 
 def _is_tracking_restarted_android(transition_df):
     """

@@ -55,7 +55,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         self.point_threshold = point_threshold
         self.distance_threshold = distance_threshold
 
-    def segment_into_trips(self, filtered_points_pre_ts_diff_df,transition_df,timeseries, time_query):
+    def segment_into_trips(self,transition_df,motion_df,timeseries, time_query):
         """
         Examines the timeseries database for a specific range and returns the
         segmentation points. Note that the input is the entire timeseries and
@@ -63,6 +63,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         data that they want from the sensor streams in order to determine the
         segmentation points.
         """
+        filtered_points_pre_ts_diff_df = timeseries.get_data_df("background/filtered_location", time_query)
         # Sometimes, we can get bogus points because data.ts and
         # metadata.write_ts are off by a lot. If we don't do this, we end up
         # appearing to travel back in time
@@ -129,7 +130,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             logging.debug("last5MinsTimes.max() = %s, time_threshold = %s" %
                           (last5MinTimes.max() if len(last5MinTimes) > 0 else np.NaN, self.time_threshold))
 
-            if self.has_trip_ended(prevPoint, currPoint, timeseries, last10PointsDistances, last5MinsDistances, last5MinTimes,transition_df):
+            if self.has_trip_ended(prevPoint, currPoint, timeseries, last10PointsDistances, last5MinsDistances, last5MinTimes,transition_df,motion_df):
                 (ended_before_this, last_trip_end_point) = self.get_last_trip_end_point(filtered_points_df,
                                                                                        last10Points_df, last5MinsPoints_df)
                 segmentation_points.append((curr_trip_start_point, last_trip_end_point))
@@ -198,7 +199,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             else:
                 return False
 
-    def has_trip_ended(self, prev_point, curr_point, motion_df, last10PointsDistances, last5MinsDistances, last5MinTimes,transition_df):
+    def has_trip_ended(self, prev_point, curr_point, timeseries, last10PointsDistances, last5MinsDistances, last5MinTimes,transition_df,motion_df):
         # Another mismatch between phone and server. Phone stops tracking too soon,
         # so the distance is still greater than the threshold at the end of the trip.
         # But then the next point is a long time away, so we can split again (similar to a distance filter)

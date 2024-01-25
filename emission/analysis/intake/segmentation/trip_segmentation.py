@@ -99,12 +99,12 @@ def segment_current_trips(user_id):
     if len(filters_in_df) == 1:
         # Common case - let's make it easy
         
-        segmentation_points = filter_methods[filters_in_df[0]].segment_into_trips(loc_df,transition_df,motion_df,
+        segmentation_points = filter_methods[filters_in_df[0]].segment_into_trips(transition_df,motion_df,ts,
             time_query)
     else:
         segmentation_points = get_combined_segmentation_points(ts, loc_df, time_query,
                                                                filters_in_df,
-                                                               filter_methods)
+                                                               filter_methods,transition_df,motion_df)
     # Create and store trips and places based on the segmentation points
     if segmentation_points is None:
         epq.mark_segmentation_failed(user_id)
@@ -120,7 +120,7 @@ def segment_current_trips(user_id):
             logging.exception("Trip generation failed for user %s" % user_id)
             epq.mark_segmentation_failed(user_id)
             
-def get_combined_segmentation_points(ts, loc_df, time_query, filters_in_df, filter_methods):
+def get_combined_segmentation_points(ts, loc_df, time_query, filters_in_df, filter_methods,transition_df,motion_df):
     """
     We can have mixed filters in a particular time range for multiple reasons.
     a) user switches phones from one platform to another
@@ -159,7 +159,7 @@ def get_combined_segmentation_points(ts, loc_df, time_query, filters_in_df, filt
             time_query.endTs = loc_df.iloc[endIndex+1].ts
         logging.debug("for filter %s, startTs = %d and endTs = %d" %
             (curr_filter, time_query.startTs, time_query.endTs))
-        segmentation_map[time_query.startTs] = filter_methods[curr_filter].segment_into_trips(ts, time_query)
+        segmentation_map[time_query.startTs] = filter_methods[curr_filter].segment_into_trips(transition_df,motion_df,ts, time_query)
     logging.debug("After filtering, segmentation_map has keys %s" % list(segmentation_map.keys()))
     sortedStartTsList = sorted(segmentation_map.keys())
     segmentation_points = []
