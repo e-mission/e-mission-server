@@ -297,6 +297,7 @@ class GreedySimilarityBinning(eamuu.TripModel):
             group_cols = user_label_df.columns.tolist()
             # Filtering out rows from the user_label_df if they are dictionary objects which come from the survey inputs provided by the users instead of multilabels
             if 'trip_user_input' in group_cols:
+                logging.debug("Filtering out any dictionary rows from the dataframe provided as survey inputs")
                 user_label_df = user_label_df.loc[user_label_df['trip_user_input'].apply(lambda x: not isinstance(x, dict))]
             unique_labels = user_label_df.groupby(group_cols).size().reset_index(name='uniqcount')
             unique_labels['p'] = unique_labels.uniqcount / sum_trips
