@@ -6,7 +6,6 @@ from typing import Dict, Optional
 
 import emission.core.get_database as edb
 import emission.storage.modifiable.abstract_model_storage as esma
-import emission.storage.decorations.analysis_timeseries_queries as esda
 
 import emission.core.wrapper.entry as ecwe
 import emission.core.wrapper.wrapperbase as ecwb
@@ -55,9 +54,6 @@ class BuiltinModelStorage(esma.ModelStorage):
             first_entry = result_list[0]
             del first_entry["_id"]
             return first_entry 
-        
-    def get_model_limit(self):
-        return self.K_MODEL_COUNT
 
     def trim_model_entries(self, key:str):
         """
