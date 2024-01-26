@@ -32,6 +32,10 @@ def is_tracking_restarted_in_range(start_ts, end_ts,transition_df):
 
 def get_ongoing_motion_in_range(start_ts, end_ts, motion_df):
 
+    ## in case when we receive an empty dataframe, there's nothing to
+    ## process
+    if motion_df.shape == (0,0): 
+        return motion_df
     motion_df_start_idx=motion_df.ts.searchsorted(start_ts,side='left')    
     motion_df_end_idx=motion_df.ts.searchsorted(end_ts,side='right')
     filtered_motion_df=motion_df.iloc[motion_df_start_idx:motion_df_end_idx]
