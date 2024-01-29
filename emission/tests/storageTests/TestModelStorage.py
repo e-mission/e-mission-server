@@ -21,7 +21,7 @@ import emission.analysis.modelling.trip_model.model_type as eamumt
 import emission.analysis.modelling.trip_model.run_model as eamur
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.tests.modellingTests.modellingTestAssets as etmm
-from emission.storage.modifiable.builtin_model_storage import BuiltinModelStorage as esmb
+import emission.analysis.modelling.trip_model.config as eamtc
 
 # Test imports
 import emission.tests.common as etc
@@ -98,7 +98,7 @@ class TestModelStorage(unittest.TestCase):
         Took this code from emission.tests.modellingTests.TestRunGreedyModel.py
         with the objective of inserting multiple models into the model_db.
         The test involves building and inserting 20 models, which is greater than 
-        the K_MODEL_COUNT (= 10) limit defined in emission.storage.modifiable.builtin_model_storage.py
+        the maximum_stored_model_count (= 3) limit defined in conf/analysis/trip_model.conf.json.sample
 
         train a model, save it, load it, and use it for prediction, using
         the high-level training/testing API provided via 
@@ -107,7 +107,6 @@ class TestModelStorage(unittest.TestCase):
 
         for clustering, use the default greedy similarity binning model
         """
-
         # pass along debug model configuration
         greedy_model_config = {
             "metric": "od_similarity",
@@ -116,7 +115,7 @@ class TestModelStorage(unittest.TestCase):
             "clustering_way": 'origin-destination',
             "incremental_evaluation": False
         }
-
+        maximum_stored_model_count = eamtc.get_maximum_stored_model_count()
         logging.debug(f'(TRAIN) creating a model based on trips in database')
         for i in range(20):
             logging.debug(f"Creating dummy model no. {i}")
@@ -128,10 +127,10 @@ class TestModelStorage(unittest.TestCase):
                 model_config=greedy_model_config
             )
             current_model_count = edb.get_model_db().count_documents({"user_id": self.user_id})
-            if i <= (esmb.K_MODEL_COUNT - 1):
+            if i <= (maximum_stored_model_count - 1):
                 self.assertEqual(current_model_count, i+1)
             else:
-                self.assertEqual(current_model_count, esmb.K_MODEL_COUNT)
+                self.assertEqual(current_model_count, maximum_stored_model_count)
 
 if __name__ == '__main__':
     import emission.tests.common as etc

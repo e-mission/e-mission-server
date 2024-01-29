@@ -6,14 +6,11 @@ from typing import Dict, Optional
 
 import emission.core.get_database as edb
 import emission.storage.modifiable.abstract_model_storage as esma
-
+import emission.analysis.modelling.trip_model.config as eamtc
 import emission.core.wrapper.entry as ecwe
 import emission.core.wrapper.wrapperbase as ecwb
 
 class BuiltinModelStorage(esma.ModelStorage):
-    # TODO: Discuss how to decide on model_count limit
-    K_MODEL_COUNT = 10
-
     def __init__(self, user_id):
         super(BuiltinModelStorage, self).__init__(user_id)
         self.key_query = lambda key: {"metadata.key": key}
@@ -64,30 +61,25 @@ class BuiltinModelStorage(esma.ModelStorage):
         The flow of model insertion function calls is:
         eamur.update_trip_model() -> eamums.save_model() -> esma.upsert_model() -> esma.trim_model_entries()
         """
-
         current_model_count = edb.get_model_db().count_documents({"user_id": self.user_id})
         logging.debug("Before trimming, model count for user %s = %s" % (self.user_id, current_model_count))
         find_query = {"user_id": self.user_id, "metadata.key": key}
         result_it = edb.get_model_db().find(find_query).sort("metadata.write_ts", -1)
         result_list = list(result_it)
-
-        if current_model_count >= self.K_MODEL_COUNT:
+        maximum_stored_model_count = eamtc.get_maximum_stored_model_count()
+        if current_model_count >= maximum_stored_model_count:
             # Specify the last or minimum timestamp of Kth model entry
-            write_ts_limit = result_list[self.K_MODEL_COUNT - 1]['metadata']['write_ts']
+            write_ts_limit = result_list[maximum_stored_model_count - 1]['metadata']['write_ts']
             logging.debug(f"Write ts limit = {write_ts_limit}")
-
             filter_clause = {
                 "user_id" : self.user_id,
                 "metadata.key" : key,
                 "metadata.write_ts" : { "$lte" : write_ts_limit }
             }
-
             models_to_delete = edb.get_model_db().delete_many(filter_clause)
-
             if models_to_delete.deleted_count > 0:
                 logging.debug(f"{models_to_delete.deleted_count} documents deleted successfully\n")
             else:
                 logging.debug("No documents found or none deleted\n")
-
         new_model_count = edb.get_model_db().count_documents({"user_id": self.user_id})
         logging.debug("After trimming, model count for user %s = %s" % (self.user_id, new_model_count))

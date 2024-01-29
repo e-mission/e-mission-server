@@ -2,6 +2,7 @@
     "model_type": "greedy",
     "model_storage": "document_database",
     "minimum_trips": 14,
+    "maximum_stored_model_count": 3,
     "model_parameters": {
         "greedy": {
             "metric": "od_similarity",
