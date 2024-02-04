@@ -20,6 +20,7 @@ import emission.analysis.intake.segmentation.trip_segmentation as eaist
 import emission.core.wrapper.location as ecwl
 
 import emission.analysis.intake.segmentation.restart_checking as eaisr
+import emission.core.common as ec
 
 class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
     def __init__(self, time_threshold, point_threshold, distance_threshold):
@@ -53,7 +54,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         self.point_threshold = point_threshold
         self.distance_threshold = distance_threshold
 
-    def segment_into_trips(self, timeseries, time_query):
+    def segment_into_trips(self,transition_df,motion_df,timeseries, time_query):
         """
         Examines the timeseries database for a specific range and returns the
         segmentation points. Note that the input is the entire timeseries and
@@ -113,24 +114,26 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             # We are going to use the last 8 points for now.
             # TODO: Change this back to last 10 points once we normalize phone and this
             last10Points_df = filtered_points_df.iloc[max(idx-self.point_threshold, curr_trip_start_point.idx):idx+1]
-            distanceToLast = lambda row: pf.calDistance(ad.AttrDict(row), currPoint)
-            timeToLast = lambda row: currPoint.ts - ad.AttrDict(row).ts
-            last5MinsDistances = last5MinsPoints_df.apply(distanceToLast, axis=1)
-            logging.debug("last5MinsDistances = %s with length %d" % (last5MinsDistances.to_numpy(), len(last5MinsDistances)))
-            last10PointsDistances = last10Points_df.apply(distanceToLast, axis=1)
-            logging.debug("last10PointsDistances = %s with length %d, shape %s" % (last10PointsDistances.to_numpy(),
-                                                                           len(last10PointsDistances),
-                                                                           last10PointsDistances.shape))
-
+            last10Points_coords=last10Points_df[['longitude','latitude']].to_numpy()
+            # create a similar dimension current cordintaes numpy array
+            currPoint_coords = np.repeat(np.array([[currPoint.longitude,currPoint.latitude]]),len(last10Points_df),axis=0)
+            #compute distance
+            last10PointsDistances=ec.calDistance(last10Points_coords,currPoint_coords)
+            # Reset current coordintes numpy array as per last 5 mins  Points array's dimensions
+            currPoint_coords = np.repeat(np.array([[currPoint.longitude,currPoint.latitude]]),len(last5MinsPoints_df),axis=0)
+            # get 2d numpy array, from df
+            last5MinsPoints_coords=last5MinsPoints_df[['longitude','latitude']].to_numpy()
+            # calcualte distance
+            last5MinsDistances=ec.calDistance(last5MinsPoints_coords,currPoint_coords) 
             # Fix for https://github.com/e-mission/e-mission-server/issues/348
-            last5MinTimes = last5MinsPoints_df.apply(timeToLast, axis=1)
+            last5MinTimes = currPoint.ts-last5MinsPoints_df.ts
             
             logging.debug("len(last10PointsDistances) = %d, len(last5MinsDistances) = %d" %
                   (len(last10PointsDistances), len(last5MinsDistances)))
             logging.debug("last5MinsTimes.max() = %s, time_threshold = %s" %
                           (last5MinTimes.max() if len(last5MinTimes) > 0 else np.NaN, self.time_threshold))
 
-            if self.has_trip_ended(prevPoint, currPoint, timeseries, last10PointsDistances, last5MinsDistances, last5MinTimes):
+            if self.has_trip_ended(prevPoint, currPoint, timeseries, last10PointsDistances, last5MinsDistances, last5MinTimes, transition_df, motion_df):
                 (ended_before_this, last_trip_end_point) = self.get_last_trip_end_point(filtered_points_df,
                                                                                        last10Points_df, last5MinsPoints_df)
                 segmentation_points.append((curr_trip_start_point, last_trip_end_point))
@@ -199,7 +202,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             else:
                 return False
 
-    def has_trip_ended(self, prev_point, curr_point, timeseries, last10PointsDistances, last5MinsDistances, last5MinTimes):
+    def has_trip_ended(self, prev_point, curr_point, timeseries, last10PointsDistances, last5MinsDistances, last5MinTimes, transition_df, motion_df):
         # Another mismatch between phone and server. Phone stops tracking too soon,
         # so the distance is still greater than the threshold at the end of the trip.
         # But then the next point is a long time away, so we can split again (similar to a distance filter)
@@ -214,11 +217,11 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                 speedDelta = np.nan
             speedThreshold = old_div(float(self.distance_threshold), self.time_threshold)
 
-            if eaisr.is_tracking_restarted_in_range(prev_point.ts, curr_point.ts, timeseries):
+            if eaisr.is_tracking_restarted_in_range(prev_point.ts, curr_point.ts, transition_df):
                 logging.debug("tracking was restarted, ending trip")
                 return True
 
-            ongoing_motion_check = len(eaisr.get_ongoing_motion_in_range(prev_point.ts, curr_point.ts, timeseries)) > 0
+            ongoing_motion_check = len(eaisr.get_ongoing_motion_in_range(prev_point.ts, curr_point.ts, motion_df)) > 0
             if timeDelta > 2 * self.time_threshold and not ongoing_motion_check:
                 logging.debug("lastPoint.ts = %s, currPoint.ts = %s, threshold = %s, large gap = %s, ongoing_motion_in_range = %s, ending trip" %
                               (prev_point.ts, curr_point.ts,self.time_threshold, curr_point.ts - prev_point.ts, ongoing_motion_check))
