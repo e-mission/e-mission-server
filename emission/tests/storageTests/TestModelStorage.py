@@ -47,46 +47,39 @@ class TestModelStorage(unittest.TestCase):
                                 # $clustered_trips * $has_label_percent > self.min_trips
                                 # must be correct or else this test could fail under some random test cases.
 
-        # for a negative test, below
-        self.unused_user_id = 'asdjfkl;asdfjkl;asd08234ur13fi4jhf2103mkl'
-
-        # test data can be saved between test invocations, check if data exists before generating
         ts = esta.TimeSeries.get_time_series(user_id)
-        test_data = list(ts.find_entries(["analysis/confirmed_trip"]))  
-        if len(test_data) == 0:
-            # generate test data for the database
-            logging.debug(f"inserting mock Confirmedtrips into database")
-            
-            # generate labels with a known sample weight that we can rely on in the test
-            label_data = {
-                "mode_confirm": ['ebike', 'bike'],
-                "purpose_confirm": ['happy-hour', 'dog-park'],
-                "replaced_mode": ['walk'],
-                "mode_weights": [0.9, 0.1],
-                "purpose_weights": [0.1, 0.9]
-            }
+        logging.debug(f"inserting mock Confirmedtrips into database")
+        
+        # generate labels with a known sample weight that we can rely on in the test
+        label_data = {
+            "mode_confirm": ['ebike', 'bike'],
+            "purpose_confirm": ['happy-hour', 'dog-park'],
+            "replaced_mode": ['walk'],
+            "mode_weights": [0.9, 0.1],
+            "purpose_weights": [0.1, 0.9]
+        }
 
-            train = etmm.generate_mock_trips(
-                user_id=user_id,
-                trips=self.total_trips,
-                origin=self.origin,
-                destination=self.destination,
-                trip_part='od',
-                label_data=label_data,
-                within_threshold=self.clustered_trips,  
-                threshold=0.004, # ~400m
-                has_label_p=self.has_label_percent
-            )
+        train = etmm.generate_mock_trips(
+            user_id=user_id,
+            trips=self.total_trips,
+            origin=self.origin,
+            destination=self.destination,
+            trip_part='od',
+            label_data=label_data,
+            within_threshold=self.clustered_trips,  
+            threshold=0.004, # ~400m
+            has_label_p=self.has_label_percent
+        )
 
-            ts.bulk_insert(train)
+        ts.bulk_insert(train)
 
-            # confirm data write did not fail
-            test_data = esda.get_entries(key="analysis/confirmed_trip", user_id=user_id, time_query=None)
-            if len(test_data) != self.total_trips:
-                logging.debug(f'test invariant failed after generating test data')
-                self.fail()
-            else:
-                logging.debug(f'found {self.total_trips} trips in database')        
+        # confirm data write did not fail
+        test_data = esda.get_entries(key="analysis/confirmed_trip", user_id=user_id, time_query=None)
+        if len(test_data) != self.total_trips:
+            logging.debug(f'test invariant failed after generating test data')
+            self.fail()
+        else:
+            logging.debug(f'found {self.total_trips} trips in database')        
 
     def tearDown(self):
         edb.get_analysis_timeseries_db().delete_many({'user_id': self.user_id})
