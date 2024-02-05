@@ -103,13 +103,11 @@ class ForestClassifierModel(eamuu.TripModel):
         #check if theres no trip to predict        
         logging.debug(f"forest classifier predict called with {len(trip)} trips")
         if len(trip) == 0:
-            msg = f'model.predict cannot be called with an empty trips'
+            msg = f'model.predict cannot be called with an empty trip'
             raise Exception(msg)        
-        # CONVERT LIST OF TRIPS TO dataFrame 
-        test_df = estb.BuiltinTimeSeries.to_data_df("analysis/confirmed_trip",trip)
-        labeled_trip_df = esdtq.filter_labeled_trips(test_df)
-        expanded_labeled_trip_df= esdtq.expand_userinputs(labeled_trip_df)
-        predcitions_df= self.model.predict(expanded_labeled_trip_df)
+        # CONVERT TRIP TO dataFrame        
+        test_df = estb.BuiltinTimeSeries.to_data_df("analysis/confirmed_trip",[trip])
+        predcitions_df= self.model.predict(test_df)
 
         # the predictions_df currently holds the highest probable options
         # individually in all three categories. the predictions_df are in the form 

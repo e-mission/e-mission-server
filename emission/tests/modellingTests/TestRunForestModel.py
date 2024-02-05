@@ -183,9 +183,16 @@ class TestRunForestModel(unittest.TestCase):
             )
              
         predictions_list = eamur.predict_labels_with_n(
-            trip_list = [test],
+            trip_list = test,
             model=model            
         )
         for prediction, n in predictions_list:
             [logging.debug(p) for p in sorted(prediction, key=lambda r: r['p'], reverse=True)]
             self.assertNotEqual(len(prediction), 0, "should have a prediction")
+            self.assertIn('labels',prediction[0].keys())
+            self.assertIn('p',prediction[0].keys())
+            self.assertIsInstance(prediction[0], dict, " should be an instance of the dictionary class")
+            self.assertIsInstance(prediction[0]['labels'], dict, " should be an instance of the dictionary class")
+            self.assertIn('mode_confirm',prediction[0]['labels'].keys())
+            self.assertIn('replaced_mode',prediction[0]['labels'].keys())
+            self.assertIn('purpose_confirm',prediction[0]['labels'].keys())

@@ -134,7 +134,7 @@ class TestForestModelLoadandSave(unittest.TestCase):
 #       logging.debug(f'Predictions on trips in database')
 
         predictions_list = eamur.predict_labels_with_n(
-            trip_list = [test],
+            trip_list = test,
             model=model            
         )
 
@@ -151,7 +151,7 @@ class TestForestModelLoadandSave(unittest.TestCase):
 
 #       logging.debug(f'Predictions on trips using deserialised model')
         predictions_loaded_model_list = eamur.predict_labels_with_n(
-                trip_list = [test],
+                trip_list = test,
                 model=deserialized_model           
         )
 #       logging.debug(f'Assert that both predictions are the same')
@@ -184,7 +184,7 @@ class TestForestModelLoadandSave(unittest.TestCase):
         # logging.debug(f' Model Predictions on trips in database')
 
         predictions_list_model1 = eamur.predict_labels_with_n(
-            trip_list = [test],
+            trip_list = test,
             model=model_iter1           
         )
         # logging.debug(f' Loading Model again')
@@ -197,7 +197,7 @@ class TestForestModelLoadandSave(unittest.TestCase):
             )
         # logging.debug(f' Model Predictions on trips in database')
         predictions_list_model2 = eamur.predict_labels_with_n(
-            trip_list = [test],
+            trip_list = test,
             model=model_iter2           
         )
         
