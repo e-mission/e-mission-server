@@ -68,12 +68,10 @@ class TestTripSegmentation(unittest.TestCase):
     def testSegmentationPointsDwellSegmentationTimeFilter(self):
         ts = esta.TimeSeries.get_time_series(self.androidUUID)
         tq = estt.TimeQuery("metadata.write_ts", 1440658800, 1440745200)
-        transition_df = ts.get_data_df("statemachine/transition", tq)
-        motion_df = ts.get_data_df("background/motion_activity",tq)
         dstfsm = dstf.DwellSegmentationTimeFilter(time_threshold = 5 * 60, # 5 mins
                                                   point_threshold = 10,
                                                   distance_threshold = 100) # 100 m
-        segmentation_points = dstfsm.segment_into_trips(transition_df, motion_df, ts, tq)
+        segmentation_points = dstfsm.segment_into_trips(ts, tq)
         for (start, end) in segmentation_points:
             logging.debug("trip is from %s (%f) -> %s (%f)" % (start.fmt_time, start.ts, end.fmt_time, end.ts))
         self.assertIsNotNone(segmentation_points)
@@ -88,12 +86,10 @@ class TestTripSegmentation(unittest.TestCase):
     def testSegmentationPointsDwellSegmentationDistFilter(self):
         ts = esta.TimeSeries.get_time_series(self.iosUUID)
         tq = estt.TimeQuery("metadata.write_ts", 1446796800, 1446847600)
-        transition_df = ts.get_data_df("statemachine/transition", tq)
-        motion_df = ts.get_data_df("background/motion_activity",tq)
         dstdsm = dsdf.DwellSegmentationDistFilter(time_threshold = 10 * 60, # 5 mins
                                                   point_threshold = 10,
                                                   distance_threshold = 100) # 100 m
-        segmentation_points = dstdsm.segment_into_trips(transition_df, motion_df, ts, tq)
+        segmentation_points = dstdsm.segment_into_trips(ts, tq)
         for (start, end) in segmentation_points:
             logging.debug("trip is from %s (%f) -> %s (%f)" % (start.fmt_time, start.ts, end.fmt_time, end.ts))
         self.assertIsNotNone(segmentation_points)

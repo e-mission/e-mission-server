@@ -10,7 +10,6 @@ from builtins import *
 from random import randrange
 import logging
 import copy
-import numpy as np
 from datetime import datetime, timedelta
 from dateutil import parser
 from pytz import timezone
@@ -52,20 +51,7 @@ def calDistance(point1, point2, coordinates=False):
     # SHANKARI: Why do we have two calDistance() functions?
     # Need to combine into one
     # points are now in geojson format (lng,lat)
-
-    #Added to Support vectorization when dealing with numpy array
-    if isinstance(point1,np.ndarray) and isinstance(point2,np.ndarray):
-        dLat = np.radians(point1[:,1]-point2[:,1])
-        dLon = np.radians(point1[:,0]-point2[:,0])
-        lat1 = np.radians(point1[:,1])
-        lat2 = np.radians(point2[:,1]) 
-
-        a = (np.sin(dLat/2) ** 2) + ((np.sin(dLon/2) ** 2) * np.cos(lat1) * np.cos(lat2))
-        c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1-a))
-        d = earthRadius * c
-
-        return d
-    elif coordinates:
+    if coordinates:
         dLat = math.radians(point1.lat-point2.lat)
         dLon = math.radians(point1.lon-point2.lon)
         lat1 = math.radians(point1.lat)

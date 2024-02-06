@@ -38,7 +38,7 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
         self.point_threshold = point_threshold
         self.distance_threshold = distance_threshold
 
-    def segment_into_trips(self, transition_df, motion_df, timeseries, time_query):
+    def segment_into_trips(self, timeseries, time_query):
         """
         Examines the timeseries database for a specific range and returns the
         segmentation points. Note that the input is the entire timeseries and
@@ -48,7 +48,7 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
         """
         self.filtered_points_df = timeseries.get_data_df("background/filtered_location", time_query)
         self.filtered_points_df.loc[:,"valid"] = True
-        self.transition_df = transition_df
+        self.transition_df = timeseries.get_data_df("statemachine/transition", time_query)
         if len(self.transition_df) > 0:
             logging.debug("self.transition_df = %s" % self.transition_df[["fmt_time", "transition"]])
         else:
@@ -88,7 +88,7 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
                 # So we reset_index upstream and use it here.
                 last10Points_df = self.filtered_points_df.iloc[max(idx-self.point_threshold, curr_trip_start_point.idx):idx+1]
                 lastPoint = self.find_last_valid_point(idx)
-                if self.has_trip_ended(lastPoint, currPoint, timeseries, motion_df):
+                if self.has_trip_ended(lastPoint, currPoint, timeseries):
                     last_trip_end_point = lastPoint
                     logging.debug("Appending last_trip_end_point %s with index %s " %
                         (last_trip_end_point, idx-1))
@@ -144,7 +144,7 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
                 logging.debug("Found %d transitions after last point, not ending trip..." % len(stopped_moving_after_last))
         return segmentation_points
 
-    def has_trip_ended(self, lastPoint, currPoint, timeseries, motion_df):
+    def has_trip_ended(self, lastPoint, currPoint, timeseries):
         # So we must not have been moving for the last _time filter_
         # points. So the trip must have ended
         # Since this is a distance filter, we detect that the last
@@ -173,14 +173,14 @@ class DwellSegmentationDistFilter(eaist.TripSegmentationMethod):
             # for this kind of test
             speedThreshold = old_div(float(self.distance_threshold * 2), (old_div(self.time_threshold, 2)))
 
-            if eaisr.is_tracking_restarted_in_range(lastPoint.ts, currPoint.ts, self.transition_df):
+            if eaisr.is_tracking_restarted_in_range(lastPoint.ts, currPoint.ts, timeseries):
                 logging.debug("tracking was restarted, ending trip")
                 return True
 
             # In general, we get multiple locations between each motion activity. If we see a bunch of motion activities
             # between two location points, and there is a large gap between the last location and the first
             # motion activity as well, let us just assume that there was a restart
-            ongoing_motion_in_range = eaisr.get_ongoing_motion_in_range(lastPoint.ts, currPoint.ts, motion_df)
+            ongoing_motion_in_range = eaisr.get_ongoing_motion_in_range(lastPoint.ts, currPoint.ts, timeseries)
             ongoing_motion_check = len(ongoing_motion_in_range) > 0
             if timeDelta > self.time_threshold and not ongoing_motion_check:
                 logging.debug("lastPoint.ts = %s, currPoint.ts = %s, threshold = %s, large gap = %s, ongoing_motion_in_range = %s, ending trip" %
