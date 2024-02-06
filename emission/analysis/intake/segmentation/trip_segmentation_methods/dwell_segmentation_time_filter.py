@@ -53,7 +53,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
         self.point_threshold = point_threshold
         self.distance_threshold = distance_threshold
 
-    def segment_into_trips(self, timeseries, time_query):
+    def segment_into_trips(self, transition_df,motion_df, timeseries, time_query):
         """
         Examines the timeseries database for a specific range and returns the
         segmentation points. Note that the input is the entire timeseries and
@@ -130,7 +130,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             logging.debug("last5MinsTimes.max() = %s, time_threshold = %s" %
                           (last5MinTimes.max() if len(last5MinTimes) > 0 else np.NaN, self.time_threshold))
 
-            if self.has_trip_ended(prevPoint, currPoint, timeseries, last10PointsDistances, last5MinsDistances, last5MinTimes):
+            if self.has_trip_ended(prevPoint, currPoint, timeseries, last10PointsDistances, last5MinsDistances, last5MinTimes,transition_df, motion_df):
                 (ended_before_this, last_trip_end_point) = self.get_last_trip_end_point(filtered_points_df,
                                                                                        last10Points_df, last5MinsPoints_df)
                 segmentation_points.append((curr_trip_start_point, last_trip_end_point))
@@ -199,7 +199,7 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
             else:
                 return False
 
-    def has_trip_ended(self, prev_point, curr_point, timeseries, last10PointsDistances, last5MinsDistances, last5MinTimes):
+    def has_trip_ended(self, prev_point, curr_point, timeseries, last10PointsDistances, last5MinsDistances, last5MinTimes, transition_df, motion_df):
         # Another mismatch between phone and server. Phone stops tracking too soon,
         # so the distance is still greater than the threshold at the end of the trip.
         # But then the next point is a long time away, so we can split again (similar to a distance filter)
@@ -214,11 +214,11 @@ class DwellSegmentationTimeFilter(eaist.TripSegmentationMethod):
                 speedDelta = np.nan
             speedThreshold = old_div(float(self.distance_threshold), self.time_threshold)
 
-            if eaisr.is_tracking_restarted_in_range(prev_point.ts, curr_point.ts, timeseries):
+            if eaisr.is_tracking_restarted_in_range(prev_point.ts, curr_point.ts, transition_df):
                 logging.debug("tracking was restarted, ending trip")
                 return True
 
-            ongoing_motion_check = len(eaisr.get_ongoing_motion_in_range(prev_point.ts, curr_point.ts, timeseries)) > 0
+            ongoing_motion_check = len(eaisr.get_ongoing_motion_in_range(prev_point.ts, curr_point.ts, motion_df)) > 0
             if timeDelta > 2 * self.time_threshold and not ongoing_motion_check:
                 logging.debug("lastPoint.ts = %s, currPoint.ts = %s, threshold = %s, large gap = %s, ongoing_motion_in_range = %s, ending trip" %
                               (prev_point.ts, curr_point.ts,self.time_threshold, curr_point.ts - prev_point.ts, ongoing_motion_check))
