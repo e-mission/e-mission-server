@@ -27,5 +27,5 @@ jobs:
         OVERPASS_KEY: '${{ secrets.OVERPASS_API }}'
       run: |
         echo Testing!
-        chmod +x setup_overpass_tests.sh
+        chmod +x emission/individual_tests/setup_overpass_tests.sh
         ./emission/individual_tests/setup_overpass_tests.sh
