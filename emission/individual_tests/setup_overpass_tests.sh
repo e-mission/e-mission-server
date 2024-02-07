@@ -21,9 +21,5 @@ source setup/setup_tests.sh
 echo "Running tests..."
 source setup/activate_tests.sh
 
-echo "Adding permissions for the runIntegrationTests.sh script"
-chmod +x runIntegrationTests.sh
-echo "Permissions added for the runIntegrationTests.sh script"
-
 set -e
 PYTHONPATH=. python -m unittest emission/individual_tests/TestOverpass.py
