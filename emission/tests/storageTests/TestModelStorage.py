@@ -22,6 +22,7 @@ import emission.analysis.modelling.trip_model.run_model as eamur
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.tests.modellingTests.modellingTestAssets as etmm
 import emission.analysis.modelling.trip_model.config as eamtc
+import emission.storage.modifiable.abstract_model_storage as esma
 
 # Test imports
 import emission.tests.common as etc
@@ -90,7 +91,7 @@ class TestModelStorage(unittest.TestCase):
         """
         Took this code from emission.tests.modellingTests.TestRunGreedyModel.py
         with the objective of inserting multiple models into the model_db.
-        The test involves building and inserting 20 models, which is greater than 
+        The test involves building and inserting (maximum_stored_model_count + 15) models, which is greater than 
         the maximum_stored_model_count (= 3) limit defined in conf/analysis/trip_model.conf.json.sample
 
         train a model, save it, load it, and use it for prediction, using
@@ -110,7 +111,10 @@ class TestModelStorage(unittest.TestCase):
         }
         maximum_stored_model_count = eamtc.get_maximum_stored_model_count()
         logging.debug(f'(TRAIN) creating a model based on trips in database')
-        for i in range(20):
+        model_creation_write_ts_list = []
+        stored_model_write_ts_list = []
+        ms = esma.ModelStorage.get_model_storage(self.user_id,)
+        for i in range(maximum_stored_model_count + 15):
             logging.debug(f"Creating dummy model no. {i}")
             eamur.update_trip_model(
                 user_id=self.user_id,
@@ -119,11 +123,33 @@ class TestModelStorage(unittest.TestCase):
                 min_trips=self.min_trips,
                 model_config=greedy_model_config
             )
+            latest_model_entry = ms.get_current_model(key=esda.TRIP_MODEL_STORE_KEY)
+            model_creation_write_ts_list.append(latest_model_entry['metadata']['write_ts'])
             current_model_count = edb.get_model_db().count_documents({"user_id": self.user_id})
+
+            """
+            Test 1: Ensure that the total number of models in the model_DB is less than or equal to the maximum_stored_model_count
+                - Can use assertLessEqual() but using assertEqual to distinguish between the 
+                cases when it should be less and when it should be equal.
+            """
             if i <= (maximum_stored_model_count - 1):
                 self.assertEqual(current_model_count, i+1)
             else:
                 self.assertEqual(current_model_count, maximum_stored_model_count)
+
+        find_query = {"user_id": self.user_id, "metadata.key": esda.TRIP_MODEL_STORE_KEY}
+        result_it = edb.get_model_db().find(find_query)
+        result_list = list(result_it)
+        stored_model_write_ts_list = [model['metadata']['write_ts'] for model in result_list]        
+        
+        """
+        Test 2: Ensure that the latest 'maximum_stored_model_count' models are only stored and the oldest are deleted and not the other way around.
+            - This involves storing the write_ts times in two lists:
+                - model_creation_write_ts_list : stores write_ts times each time a model is created in the for loop.
+                - stored_model_write_ts_list : stores write_ts times of all the already stored models in the DB, which should just have the latest models.
+                - The last 'maximum_stored_model_count' in model_creation_write_ts_list should match those in stored_model_write_ts_list.
+        """
+        self.assertEqual(model_creation_write_ts_list[-maximum_stored_model_count : ], stored_model_write_ts_list)
 
 if __name__ == '__main__':
     import emission.tests.common as etc
