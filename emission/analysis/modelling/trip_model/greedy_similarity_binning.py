@@ -288,17 +288,16 @@ class GreedySimilarityBinning(eamuu.TripModel):
         probability is estimated with label_count / total_labels.
         """
         for _, bin_record in self.bins.items():
-            user_label_df = pd.DataFrame(bin_record['labels'])
+            logging.debug("Filtering out any nested dictionaries from the list of dictionary labels")
+            filtered_label_dicts = [label_dict for label_dict in bin_record['labels'] if not any(isinstance(x, dict) for x in label_dict.values())]            
+            logging.debug("Number of entries after filtering changed %s -> %s" % (len(bin_record['labels']), len(filtered_label_dicts)))
+            user_label_df = pd.DataFrame(filtered_label_dicts)
             user_label_df = lp.map_labels(user_label_df).dropna()
             # compute the sum of trips in this cluster
             sum_trips = len(user_label_df)
             # compute unique label sets and their probabilities in one cluster
             # 'p' refers to probability
             group_cols = user_label_df.columns.tolist()
-            # Filtering out rows from the user_label_df if they are dictionary objects which come from the survey inputs provided by the users instead of multilabels
-            if 'trip_user_input' in group_cols:
-                logging.debug("Filtering out any dictionary rows from the dataframe provided as survey inputs")
-                user_label_df = user_label_df.loc[user_label_df['trip_user_input'].apply(lambda x: not isinstance(x, dict))]
             unique_labels = user_label_df.groupby(group_cols).size().reset_index(name='uniqcount')
             unique_labels['p'] = unique_labels.uniqcount / sum_trips
             labels_columns = user_label_df.columns.to_list()
