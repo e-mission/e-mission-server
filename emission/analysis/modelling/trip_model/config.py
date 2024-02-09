@@ -75,6 +75,8 @@ def get_minimum_trips():
         raise TypeError(msg)
     return minimum_trips
 
+
+
 def get_maximum_stored_model_count():
     maximum_stored_model_count = get_config_value_or_raise('maximum_stored_model_count')
     if not isinstance(maximum_stored_model_count, int):
