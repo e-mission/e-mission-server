@@ -6,6 +6,7 @@ from typing import Dict, Optional
 
 import emission.core.get_database as edb
 import emission.storage.modifiable.abstract_model_storage as esma
+
 import emission.analysis.modelling.trip_model.config as eamtc
 import emission.core.wrapper.entry as ecwe
 import emission.core.wrapper.wrapperbase as ecwb
