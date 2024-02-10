@@ -288,6 +288,7 @@ class GreedySimilarityBinning(eamuu.TripModel):
         probability is estimated with label_count / total_labels.
         """
         for _, bin_record in self.bins.items():
+            # TODO: Revisit after we have unified label and survey inputs (https://github.com/e-mission/e-mission-docs/issues/1045)
             logging.debug("Filtering out any nested dictionaries from the list of dictionary labels")
             filtered_label_dicts = [label_dict for label_dict in bin_record['labels'] if not any(isinstance(x, dict) for x in label_dict.values())]            
             logging.debug("Number of entries after filtering changed %s -> %s" % (len(bin_record['labels']), len(filtered_label_dicts)))
