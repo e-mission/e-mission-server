@@ -29,3 +29,9 @@ class ModelStorage(object):
         : return: the most recent database entry for this key
         """
         pass
+
+    def trim_model_entries(self, key:str):
+        """
+        :param: the metadata key for the entries, used to identify the model type
+        """
+        pass
