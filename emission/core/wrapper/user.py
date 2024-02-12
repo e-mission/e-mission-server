@@ -127,10 +127,14 @@ class User(object):
 
   @staticmethod
   def createProfile(uuid, ts):
-    initProfileObj = {'user_id': uuid,
+    initProfileObj = {
+                      'user_id': uuid,
                       'source':'Shankari',
                       'update_ts': ts,
-                      'mpg_array': [defaultMpg]}
+                      'mpg_array': [defaultMpg],
+                      'mode': {},
+                      'purpose': {}
+                    }
     writeResultProfile = get_profile_db().update_one(
         {'user_id': uuid},
         {'$set': initProfileObj},
@@ -225,3 +229,76 @@ class User(object):
     get_uuid_db().delete_one({'user_email': userEmail})
     get_profile_db().delete_one({'user_id': uuid})
     return uuid
+
+  def getUserCustomLabel(self, key):
+    user = get_profile_db().find_one({'user_id': self.uuid})
+    if key in user:
+      labels = user[key]
+      filteredLabels = {key: value for key, value in labels.items() if value.get('isActive', False)}
+      sortedLabels = dict(sorted(filteredLabels.items(), key=lambda x: (x[1]["frequency"]), reverse=True))
+      return list(sortedLabels)  
+    else:
+      return []
+
+  def insertUserCustomLabel(self, inserted_label):
+    from datetime import datetime
+    user = get_profile_db().find_one({'user_id': self.uuid})
+    key = inserted_label['key']
+    label = inserted_label['label']
+    items = user[key] if key in user else {} 
+    
+    # if label exists in database, chage it as 'active' label
+    if label in items:
+      items[label]['isActive'] = True
+    else:
+      items[label] = {
+        'createdAt': datetime.now(),
+        'frequency': 0,
+        'isActive': True,
+      }
+
+    get_profile_db().update_one({'user_id': self.uuid}, {'$set': {key: items}})
+    return self.getUserCustomLabel(key)
+  
+  def updateUserCustomLabel(self, updated_label):
+    from datetime import datetime
+    user = get_profile_db().find_one({'user_id': self.uuid})
+    key = updated_label['key']
+    items = user[key] if key in user else {} 
+    old_label = updated_label['old_label']
+    new_label = updated_label['new_label']
+    is_new_label_must_added = updated_label['is_new_label_must_added']
+    # when a user changed a label to an exsiting customized label
+    if new_label in items:
+      updated_frequency = items[new_label]['frequency'] + 1
+      items[new_label]['frequency'] = updated_frequency
+      items[new_label]['isActive'] = True
+    
+    # when a user added a new customized label
+    if is_new_label_must_added and not new_label in items:
+      items[new_label] = {
+        'createdAt': datetime.now(),
+        'frequency': 1,
+        'isActive': True,
+      }
+
+    # when a user chaged a label from an exsiting customized label
+    if old_label in items:
+      updated_frequency = items[old_label]['frequency'] - 1
+      items[old_label]['frequency'] = updated_frequency
+
+    get_profile_db().update_one({'user_id': self.uuid}, {'$set': {key: items}})
+    return self.getUserCustomLabel(key)
+  
+  def deleteUserCustomLabel(self, deleted_label):
+    user = get_profile_db().find_one({'user_id': self.uuid})
+    key = deleted_label['key']
+    label = deleted_label['label']
+    items = user[key] if key in user else {} 
+
+    if label in items:
+      items[label]['isActive'] = False
+
+    get_profile_db().update_one({'user_id': self.uuid}, {'$set': {key: items}})
+    return self.getUserCustomLabel(key)
+  
