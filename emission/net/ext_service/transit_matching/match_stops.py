@@ -295,6 +295,8 @@ def extract_railway_modes(stop):
             p_modes.append("TRAM")
         if "light_rail" in stop:
             p_modes.append("LIGHT_RAIL")
+        if "trolleybus" in stop:
+            p_modes.append("TROLLEYBUS")
 
     logging.debug("After extracting data from tags, potential modes = %s" %
         [p for p in p_modes])
