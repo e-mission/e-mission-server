@@ -5,14 +5,13 @@ from unittest.mock import patch
 import emission.analysis.modelling.trip_model.run_model as eamur
 import emission.analysis.modelling.trip_model.model_type as eamumt
 import emission.analysis.modelling.trip_model.model_storage as eamums
-
+import emission.analysis.modelling.trip_model.config as eamtc
+import uuid
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.tests.modellingTests.modellingTestAssets as etmm
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.core.get_database as edb
-import emission.storage.pipeline_queries as epq
-import emission.core.wrapper.pipelinestate as ecwp
-
+import emission.analysis.modelling.trip_model.run_model as eamtr
 
 class TestForestModelLoadandSave(unittest.TestCase):
     """
@@ -40,7 +39,7 @@ class TestForestModelLoadandSave(unittest.TestCase):
         # for a negative test, below
         self.unused_user_id = 'asdjfkl;asdfjkl;asd08234ur13fi4jhf2103mkl'
 
-        # test data can be saved between test invocations, check if data exists before generating
+        # Ensuring that no previous test data was left in DB after teardown,
         ts = esta.TimeSeries.get_time_series(user_id)
         test_data = list(ts.find_entries(["analysis/confirmed_trip"]))  
         if len(test_data) == 0:
@@ -56,7 +55,7 @@ class TestForestModelLoadandSave(unittest.TestCase):
                 "purpose_weights": [0.1, 0.9]
             }
 
-            train = etmm.generate_mock_trips(
+            test_data = etmm.generate_mock_trips(
                 user_id=user_id,
                 trips=self.total_trips,
                 origin=self.origin,
@@ -68,7 +67,7 @@ class TestForestModelLoadandSave(unittest.TestCase):
                 has_label_p=self.has_label_percent
             )
 
-            ts.bulk_insert(train)
+            ts.bulk_insert(test_data)
 
             # confirm data write did not fail
             test_data = esda.get_entries(key="analysis/confirmed_trip", user_id=user_id, time_query=None)
@@ -78,24 +77,7 @@ class TestForestModelLoadandSave(unittest.TestCase):
             else:
                 logging.debug(f'found {self.total_trips} trips in database')
 
-            self.forest_model_config= {
-            "loc_feature" : "coordinates",
-            "radius": 500,
-            "size_thresh":1,
-            "purity_thresh":1.0,
-            "gamma":0.05,
-            "C":1,
-            "n_estimators":100,
-            "criterion":"gini",
-            "max_depth":'null',
-            "min_samples_split":2,
-            "min_samples_leaf":1,
-            "max_features":"sqrt",
-            "bootstrap":True,
-            "random_state":42,
-            "use_start_clusters":False,
-            "use_trip_clusters":True
-        }
+            self.forest_model_config= eamtc.get_config_value_or_raise('model_parameters.forest')
                 
     def tearDown(self):
         """
@@ -283,31 +265,51 @@ class TestForestModelLoadandSave(unittest.TestCase):
     def testRandomForestTypePreservation(self):
         """
          TypePreservationTest: To ensure that the serialization and deserialization
-         process maintains the data types of all model attributes.
+         process maintains the data types of all model attributes. 
+         The model is trained, preditions stored, serialised and then desserialized.
+         The type of deserialised model attributes and the predictions of this must mast initial
+         serialised model.
         """
+        ## Get trips for a user
+        test_user=uuid.UUID('feb6a3a8-a2ef-4f4a-8754-bd79f7154495')
+        ct_entry=eamtr._get_training_data(test_user,None)
 
-        logging.debug(f'(TRAIN) creating a model based on trips in database')
-        eamur.update_trip_model(
-            user_id=self.user_id,
-            model_type=eamumt.ModelType.RANDOM_FOREST_CLASSIFIER,
-            model_storage=eamums.ModelStorage.DOCUMENT_DATABASE,
-            min_trips=self.min_trips,
-            model_config=self.forest_model_config
+        split= int(len(ct_entry)*0.8)  
+        trips=ct_entry[:split]
+        test_trips=ct_entry[split:]
+
+        ## Build and train model
+        model_type= eamumt.ModelType.RANDOM_FOREST_CLASSIFIER
+        model = model_type.build(self.forest_model_config)
+        model.fit(trips)   
+
+        ## Get pre serialization predictions
+        predictions_list = eamur.predict_labels_with_n(
+            trip_list = test_trips,
+            model=model            
         )
-             
-        model = eamur._load_stored_trip_model(
-            user_id=self.user_id,
-            model_type=eamumt.ModelType.RANDOM_FOREST_CLASSIFIER,
-            model_storage=eamums.ModelStorage.DOCUMENT_DATABASE,
-            model_config=self.forest_model_config        
-            )
-                
-        model_data=model.to_dict()
-        loaded_model_type=eamumt.ModelType.RANDOM_FOREST_CLASSIFIER
-        loaded_model = loaded_model_type.build(self.forest_model_config)
-        loaded_model.from_dict(model_data)
 
-        
+        ## Serialise
+        serialised_model_data=model.to_dict()
+
+        ## build and deserialise a different model
+        deserialised_model = model_type.build(self.forest_model_config)
+        deserialised_model.from_dict(serialised_model_data)
+
+        ## test if the types are correct        
         for attr in ['purpose_predictor','mode_predictor','replaced_predictor','purpose_enc','mode_enc','train_df']:
-            assert isinstance(getattr(loaded_model.model,attr),type(getattr(model.model,attr)))
+            deSerialised_attr_value=getattr(deserialised_model.model,attr)
+            original_attr_value=getattr(model.model,attr)
+            #Check type preservation
+            self.assertIsInstance(deSerialised_attr_value,type(original_attr_value), f"Type mismatch for {attr} ")
+            #Check for value equality. This assumes that the attributes are either direc
+
+        ## test if the predictions are correct
+        deserialised_predictions_list = eamur.predict_labels_with_n(
+            trip_list = test_trips,
+            model=deserialised_model            
+        )
+        logging.debug(f'TESTIN:{deserialised_predictions_list}')
+        logging.debug(f'{predictions_list}')
+        self.assertEqual(deserialised_predictions_list,predictions_list,'predictions list not same.')
 

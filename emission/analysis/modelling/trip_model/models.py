@@ -1514,7 +1514,7 @@ class ForestClassifier(EnsembleClassifier):
         self.C = C
         self.n_estimators = n_estimators
         self.criterion = criterion
-        self.max_depth = max_depth
+        self.max_depth = max_depth if max_depth!= 'null' else None
         self.min_samples_split = min_samples_split
         self.min_samples_leaf = min_samples_leaf
         self.max_features = max_features
@@ -1524,36 +1524,42 @@ class ForestClassifier(EnsembleClassifier):
         self.use_start_clusters = use_start_clusters
         self.use_trip_clusters = use_trip_clusters
 
-        if self.loc_feature == 'cluster':
-            # clustering algorithm to generate end clusters
-            self.end_cluster_model = DBSCANSVMCluster(
-                loc_type='end',
-                radius=self.radius,
-                size_thresh=self.size_thresh,
-                purity_thresh=self.purity_thresh,
-                gamma=self.gamma,
-                C=self.C)
+        ######### Not Tested #########
+        # The below code is used when we cluster the coordinates (loc_cluster parameter = True)
+        # before passing to Random Forest. Commenting this for now since it is not tested.
+        ###############################
+        # if self.loc_feature == 'cluster':
+        #     # clustering algorithm to generate end clusters
+        #     self.end_cluster_model = DBSCANSVMCluster(
+        #         loc_type='end',
+        #         radius=self.radius,
+        #         size_thresh=self.size_thresh,
+        #         purity_thresh=self.purity_thresh,
+        #         gamma=self.gamma,
+        #         C=self.C)
 
-            if self.use_start_clusters or self.use_trip_clusters:
-                # clustering algorithm to generate start clusters
-                self.start_cluster_model = DBSCANSVMCluster(
-                    loc_type='start',
-                    radius=self.radius,
-                    size_thresh=self.size_thresh,
-                    purity_thresh=self.purity_thresh,
-                    gamma=self.gamma,
-                    C=self.C)
+        #     if self.use_start_clusters or self.use_trip_clusters:
+        #         # clustering algorithm to generate start clusters
+        #         self.start_cluster_model = DBSCANSVMCluster(
+        #             loc_type='start',
+        #             radius=self.radius,
+        #             size_thresh=self.size_thresh,
+        #             purity_thresh=self.purity_thresh,
+        #             gamma=self.gamma,
+        #             C=self.C)
 
-                if self.use_trip_clusters:
-                    # helper class to generate trip-level clusters
-                    self.trip_grouper = TripGrouper(
-                        start_cluster_col='start_cluster_idx',
-                        end_cluster_col='end_cluster_idx')
+        #         if self.use_trip_clusters:
+        #             # helper class to generate trip-level clusters
+        #             self.trip_grouper = TripGrouper(
+        #                 start_cluster_col='start_cluster_idx',
+        #                 end_cluster_col='end_cluster_idx')
 
-            # wrapper class to generate one-hot encodings for cluster indices
-            self.cluster_enc = OneHotWrapper(sparse=False,
-                                             handle_unknown='ignore')
+        #     # wrapper class to generate one-hot encodings for cluster indices
+        #     self.cluster_enc = OneHotWrapper(sparse=False,
+        #                                      handle_unknown='ignore')
+        #############################################################################
 
+        
         # wrapper class to generate one-hot encodings for purposes and modes
         self.purpose_enc = OneHotWrapper(impute_missing=True,
                                          sparse=False,

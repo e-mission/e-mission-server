@@ -12,6 +12,7 @@ import emission.core.get_database as edb
 import emission.tests.common as etc
 import emission.pipeline.intake_stage as epi
 import logging
+import emission.analysis.modelling.trip_model.config as eamtc
 
 import emission.analysis.modelling.trip_model.run_model as eamur
 import emission.analysis.modelling.trip_model.model_type as eamumt
@@ -26,29 +27,10 @@ class TestForestModelIntegration(unittest.TestCase):
     # Finally in the test, assert the type of label predictions expected.
 
     def setUp(self):
-
-        self.reset_all()
         np.random.seed(91)
         self.test_algorithms = eacilp.primary_algorithms
-            
-        forest_model_config= {
-            "loc_feature" : "coordinates",
-            "radius": 500,
-            "size_thresh":1,
-            "purity_thresh":1.0,
-            "gamma":0.05,
-            "C":1,
-            "n_estimators":100,
-            "criterion":"gini",
-            "max_depth":'null',
-            "min_samples_split":2,
-            "min_samples_leaf":1,
-            "max_features":"sqrt",
-            "bootstrap":True,
-            "random_state":42,
-            "use_start_clusters":False,
-            "use_trip_clusters":True
-        }
+        forest_model_config = eamtc.get_config_value_or_raise('model_parameters.forest')
+
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-07-22")  ##maybe use a different file
         ts = esta.TimeSeries.get_time_series(self.testUUID)
         label_data = {
@@ -59,23 +41,18 @@ class TestForestModelIntegration(unittest.TestCase):
             "purpose_weights": [0.1, 0.9]
         }
 
-        self.origin = (-105.1705977, 39.7402654,)
-        self.destination = (-105.1755606, 39.7673075)
-        self.min_trips = 14
-        self.total_trips = 100
-        self.clustered_trips = 33
-        self.has_label_percent = 0.9
+        self.total_trips=100
         ## generate mock trips
         train = etmm.generate_mock_trips(
             user_id=self.testUUID,
             trips=self.total_trips,
-            origin=self.origin,
-            destination=self.destination,
+            origin=(-105.1705977, 39.7402654),
+            destination=(-105.1755606, 39.7673075),
             trip_part='od',
             label_data=label_data,
-            within_threshold=self.clustered_trips,  
+            within_threshold= 33,  
             threshold=0.004, # ~400m
-            has_label_p=self.has_label_percent
+            has_label_p=0.9
         )
         ts.bulk_insert(train)
         # confirm data write did not fail
@@ -108,7 +85,10 @@ class TestForestModelIntegration(unittest.TestCase):
         eacilp.primary_algorithms = default_primary_algorithms
 
     def reset_all(self):
-        etc.dropAllCollections(edb._get_current_db())
+        edb.get_analysis_timeseries_db().delete_many({'user_id': self.testUUID})
+        edb.get_model_db().delete_many({'user_id': self.testUUID})
+        edb.get_pipeline_state_db().delete_many({'user_id': self.testUUID})
+
 
     # Tests that forest algorithm being tested runs successfully
     def testForestAlgorithm(self):

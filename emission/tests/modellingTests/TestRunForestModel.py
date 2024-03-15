@@ -4,14 +4,17 @@ import logging
 import emission.analysis.modelling.trip_model.run_model as eamur
 import emission.analysis.modelling.trip_model.model_type as eamumt
 import emission.analysis.modelling.trip_model.model_storage as eamums
-
+import emission.analysis.modelling.trip_model.models as eamtm
+logger=logging.getLogger("")
+logger.setLevel(logging.DEBUG)
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.tests.modellingTests.modellingTestAssets as etmm
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.core.get_database as edb
 import emission.storage.pipeline_queries as epq
 import emission.core.wrapper.pipelinestate as ecwp
-
+import emission.analysis.modelling.trip_model.forest_classifier as eamtf
+from sklearn.ensemble import RandomForestClassifier 
 
 class TestRunForestModel(unittest.TestCase):
     """
@@ -67,6 +70,10 @@ class TestRunForestModel(unittest.TestCase):
                 threshold=0.004, # ~400m
                 has_label_p=self.has_label_percent
             )
+              #values required by forest model
+            for entry in train:
+                entry['data']['start_local_dt']=entry['metadata']['write_local_dt']
+                entry['data']['end_local_dt']=entry['metadata']['write_local_dt']
 
             ts.bulk_insert(train)
 
@@ -92,7 +99,18 @@ class TestRunForestModel(unittest.TestCase):
         purposes but will load from a file in /conf/analysis/ which is tested here
         """
 
-        eamumt.ModelType.RANDOM_FOREST_CLASSIFIER.build()
+        built_model = eamumt.ModelType.RANDOM_FOREST_CLASSIFIER.build()
+        attributes={'purpose_predictor': RandomForestClassifier ,
+                    'mode_predictor' :RandomForestClassifier,
+                    'replaced_predictor':RandomForestClassifier,
+                    'purpose_enc' : eamtm.OneHotWrapper,
+                    'mode_enc':eamtm.OneHotWrapper
+                    }
+        self.assertIsInstance(built_model,eamtf.ForestClassifierModel)
+        for attr in attributes:
+            #logging.debug(f'{attr,attributes[attr]}')
+            x=getattr(built_model.model,attr)
+            self.assertIsInstance(x, attributes[attr])
         # success if it didn't throw
 
     def testTrainForestModelWithZeroTrips(self):

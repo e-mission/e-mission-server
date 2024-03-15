@@ -1,17 +1,16 @@
-import pandas as pd
-from sklearn.preprocessing import OneHotEncoder
 import joblib
 from typing import Dict, List, Optional, Tuple
-from sklearn.metrics.pairwise import haversine_distances
+import sklearn.metrics.pairwise as smp 
 import emission.core.wrapper.confirmedtrip as ecwc
 import logging
 from io import BytesIO
 
+import json
 import emission.analysis.modelling.trip_model.trip_model as eamuu
 import emission.analysis.modelling.trip_model.config as eamtc
 import emission.storage.timeseries.builtin_timeseries as estb
 import emission.storage.decorations.trip_queries as esdtq
-from emission.analysis.modelling.trip_model.models import ForestClassifier
+import emission.analysis.modelling.trip_model.models as eamtm
 
 EARTH_RADIUS = 6371000
 
@@ -33,45 +32,33 @@ class ForestClassifierModel(eamuu.TripModel):
             'min_samples_leaf',
             'max_features',
             'bootstrap',
-        ]            
-        cluster_expected_keys= [
-            'radius',
-            'size_thresh',  
-            'purity_thresh',
-            'gamma',
-            'C',
-            'use_start_clusters',
-            'use_trip_clusters',
-        ]
+        ]     
+        ######### Not Tested #########
+        # The below code is used when we cluster the coordinates (loc_cluster parameter = True)
+        # before passing to Random Forest. Commenting this for now since it is not used. Not tested either.
+        ###############################
 
+        # cluster_expected_keys= [
+        #     'radius',
+        #     'size_thresh',  
+        #     'purity_thresh',
+        #     'gamma',
+        #     'C',
+        #     'use_start_clusters',
+        #     'use_trip_clusters',
+        # ]
+        #
+        # if config['loc_feature'] == 'cluster':
+        #     for k in cluster_expected_keys:
+        #         if config.get(k) is None:
+        #             msg = f"cluster trip model config missing expected key {k}"
+        #             raise KeyError(msg)
+        #######################################
         for k in random_forest_expected_keys:
             if config.get(k) is None:
                 msg = f"forest trip model config missing expected key {k}"
                 raise KeyError(msg)   
-        
-        if config['loc_feature'] == 'cluster':
-            for k in cluster_expected_keys:
-                if config.get(k) is None:
-                    msg = f"cluster trip model config missing expected key {k}"
-                    raise KeyError(msg)
-        maxdepth =config['max_depth'] if config['max_depth']!='null' else None
-        self.model=ForestClassifier( loc_feature=config['loc_feature'],
-                                     radius= config['radius'],
-                                     size_thresh=config['radius'],
-                                     purity_thresh=config['purity_thresh'],
-                                     gamma=config['gamma'],
-                                     C=config['C'],
-                                     n_estimators=config['n_estimators'],
-                                     criterion=config['criterion'],
-                                     max_depth=maxdepth, 
-                                     min_samples_split=config['min_samples_split'],
-                                     min_samples_leaf=config['min_samples_leaf'],
-                                     max_features=config['max_features'],
-                                     bootstrap=config['bootstrap'],
-                                     random_state=config['random_state'],
-                                     # drop_unclustered=False,
-                                     use_start_clusters=config['use_start_clusters'],
-                                     use_trip_clusters=config['use_trip_clusters'])
+        self.model=eamtm.ForestClassifier(**config)
         
 
     def fit(self,trips: List[ecwc.Confirmedtrip]):
@@ -139,9 +126,15 @@ class ForestClassifierModel(eamuu.TripModel):
         """
         data={}
         attr=[ 'purpose_predictor','mode_predictor','replaced_predictor','purpose_enc','mode_enc','train_df']
-        if self.model.loc_feature == 'cluster':
-            ## confirm this includes all the extra encoders/models
-            attr.extend([ 'cluster_enc','end_cluster_model','start_cluster_model','trip_grouper'])
+
+        ######### Not Tested #########
+        # The below code is used when we cluster the coordinates (loc_cluster parameter = True)
+        # before passing to Random Forest. Commenting this for now since it is not used. Not tested either.
+        ###############################
+        # if self.model.loc_feature == 'cluster':
+        #     ## confirm this includes all the extra encoders/models
+        #     attr.extend([ 'cluster_enc','end_cluster_model','start_cluster_model','trip_grouper'])
+        
         for attribute_name in attr:
             if not hasattr(self.model,attribute_name):
                 raise ValueError(f"Attribute {attribute_name} not found in the model")
@@ -153,7 +146,7 @@ class ForestClassifierModel(eamuu.TripModel):
                 raise RuntimeError(f"Error serializing { attribute_name}: {str(e)}")    
             buffer.seek(0)
             data[attribute_name]=buffer.getvalue()
-
+        
         return data
 
     def from_dict(self,model: Dict):
@@ -161,9 +154,14 @@ class ForestClassifierModel(eamuu.TripModel):
         Load the model from a dictionary.
         """
         attr=[ 'purpose_predictor','mode_predictor','replaced_predictor','purpose_enc','mode_enc','train_df']
-        if self.model.loc_feature == 'cluster':
-            ## TODO : confirm this includes all the extra encoders/models
-            attr.extend([ 'cluster_enc','end_cluster_model','start_cluster_model','trip_grouper'])
+
+        ######### Not Tested #########
+        # The below code is used when we cluster the coordinates (loc_cluster parameter = True)
+        # before passing to Random Forest. Commenting this for now since it is not used. Not tested either.
+        ###############################
+        # if self.model.loc_feature == 'cluster':
+        #     ## TODO : confirm this includes all the extra encoders/models
+        #     attr.extend([ 'cluster_enc','end_cluster_model','start_cluster_model','trip_grouper'])
         for attribute_name in attr:
             if attribute_name not in model:
                 raise ValueError(f"Attribute {attribute_name} missing in the model")
@@ -183,6 +181,7 @@ class ForestClassifierModel(eamuu.TripModel):
         :return: a vector containing features to predict from
         :rtype: List[float]
         """
+        # ForestClassifier class in models.py file handles features extraction.
         pass
 
     def is_incremental(self) -> bool:
