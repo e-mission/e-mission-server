@@ -5,8 +5,6 @@ import emission.analysis.modelling.trip_model.run_model as eamur
 import emission.analysis.modelling.trip_model.model_type as eamumt
 import emission.analysis.modelling.trip_model.model_storage as eamums
 import emission.analysis.modelling.trip_model.models as eamtm
-logger=logging.getLogger("")
-logger.setLevel(logging.DEBUG)
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.tests.modellingTests.modellingTestAssets as etmm
 import emission.storage.decorations.analysis_timeseries_queries as esda

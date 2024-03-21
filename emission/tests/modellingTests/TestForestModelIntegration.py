@@ -54,6 +54,11 @@ class TestForestModelIntegration(unittest.TestCase):
             threshold=0.004, # ~400m
             has_label_p=0.9
         )
+
+        for result_entry in train:
+            result_entry['data']['start_local_dt']=result_entry['metadata']['write_local_dt']
+            result_entry['data']['end_local_dt']=result_entry['metadata']['write_local_dt']
+            
         ts.bulk_insert(train)
         # confirm data write did not fail
         check_data = esda.get_entries(key="analysis/confirmed_trip", user_id=self.testUUID, time_query=None)
