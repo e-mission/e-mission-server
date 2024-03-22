@@ -67,6 +67,10 @@ class TestForestModelLoadandSave(unittest.TestCase):
                 has_label_p=self.has_label_percent
             )
 
+            for result_entry in test_data:
+                result_entry['data']['start_local_dt']=result_entry['metadata']['write_local_dt']
+                result_entry['data']['end_local_dt']=result_entry['metadata']['write_local_dt']
+
             ts.bulk_insert(test_data)
 
             # confirm data write did not fail
