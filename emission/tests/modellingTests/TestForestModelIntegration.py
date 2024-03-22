@@ -12,6 +12,8 @@ import emission.core.get_database as edb
 import emission.tests.common as etc
 import emission.pipeline.intake_stage as epi
 import logging
+from bson.objectid import ObjectId
+
 import emission.analysis.modelling.trip_model.config as eamtc
 
 import emission.analysis.modelling.trip_model.run_model as eamur
@@ -54,11 +56,12 @@ class TestForestModelIntegration(unittest.TestCase):
             threshold=0.004, # ~400m
             has_label_p=0.9
         )
-
+        ## Required for Forest model inference
         for result_entry in train:
             result_entry['data']['start_local_dt']=result_entry['metadata']['write_local_dt']
             result_entry['data']['end_local_dt']=result_entry['metadata']['write_local_dt']
-            
+            result_entry['data']['start_place']=ObjectId()
+            result_entry['data']['end_place']=ObjectId()
         ts.bulk_insert(train)
         # confirm data write did not fail
         check_data = esda.get_entries(key="analysis/confirmed_trip", user_id=self.testUUID, time_query=None)
