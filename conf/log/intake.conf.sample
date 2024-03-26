@@ -12,7 +12,8 @@
         }, 
         "console": {
             "class": "logging.StreamHandler", 
-            "level": "WARNING"
+            "level": "DEBUG",
+            "formatter": "detailed"
         }, 
         "file": {
             "backupCount": 8, 

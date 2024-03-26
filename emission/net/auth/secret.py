@@ -9,6 +9,15 @@ class SecretMethod(object):
         key_file.close()
         self.client_secret_list = key_data["client_secret_list"]
 
+        try:
+            key_file = open('conf/net/auth/secret_list.json')
+        except:
+            print("secret_list.json not configured, falling back to sample, default configuration")
+            key_file = open('conf/net/auth/secret_list.json.sample')
+        key_data = json.load(key_file)
+        key_file.close()
+        self.client_secret_list = key_data["client_secret_list"]
+
     def verifyUserToken(self, token):
         # attempt to validate token on the client-side
         logging.debug("Using the SecretAuthMethod to verify id token %s of length %d against secret list %s..." % 
