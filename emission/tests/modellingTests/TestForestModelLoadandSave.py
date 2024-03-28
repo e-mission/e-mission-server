@@ -36,7 +36,6 @@ class TestForestModelLoadandSave(unittest.TestCase):
                                 # $clustered_trips * $has_label_percent > self.min_trips
                                 # must be correct or else this test could fail under some random test cases.
 
-        # for a negative test, below
         self.unused_user_id = 'asdjfkl;asdfjkl;asd08234ur13fi4jhf2103mkl'
 
         # Ensuring that no previous test data was left in DB after teardown,
@@ -271,13 +270,10 @@ class TestForestModelLoadandSave(unittest.TestCase):
          TypePreservationTest: To ensure that the serialization and deserialization
          process maintains the data types of all model attributes. 
          The model is trained, preditions stored, serialised and then desserialized.
-         The type of deserialised model attributes and the predictions of this must mast initial
-         serialised model.
+         The type of deserialised model attributes and the predictions of this must match 
+         those of initial model.
         """
-        ## Get trips for a user
-        test_user=uuid.UUID('feb6a3a8-a2ef-4f4a-8754-bd79f7154495')
-        ct_entry=eamtr._get_training_data(test_user,None)
-
+        ct_entry=eamtr._get_training_data(self.user_id,None)
         split= int(len(ct_entry)*0.8)  
         trips=ct_entry[:split]
         test_trips=ct_entry[split:]
