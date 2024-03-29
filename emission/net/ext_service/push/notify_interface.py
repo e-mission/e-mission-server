@@ -11,15 +11,15 @@ import json
 import logging
 import importlib
 
+import emission.net.ext_service.push.config as pc
+
 # Note that the URL is hardcoded because the API endpoints are not standardized.
 # If we change a push provider, we will need to modify to match their endpoints.
 # Hardcoding will remind us of this :)
 # We can revisit this if push providers eventually decide to standardize...
 
 try:
-    push_config_file = open('conf/net/ext_service/push.json')
-    push_config = json.load(push_config_file)
-    push_config_file.close()
+    push_config = pc.get_config_data()
 except:
     logging.warning("push service not configured, push notifications not supported")
 
