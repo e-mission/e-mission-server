@@ -16,6 +16,7 @@ CFC_DataCollector/moves_collect.log
 webapp/www/lib
 conf/**/*.json
 !conf/**/*.schema.json
+!conf/analysis/debug.conf.internal.json
 
 *.ipynb_checkpoints*
 
