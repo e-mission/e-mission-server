@@ -7,7 +7,6 @@ standard_library.install_aliases()
 from builtins import *
 from builtins import object
 import logging
-import pandas as pd
 
 import emission.storage.timeseries.abstract_timeseries as esta
 import emission.storage.decorations.place_queries as esdp
