@@ -1,5 +1,5 @@
 # python 3
-FROM ubuntu:jammy-20231211.1
+FROM ubuntu:jammy-20240227
 
 MAINTAINER K. Shankari (shankari@eecs.berkeley.edu)
 
