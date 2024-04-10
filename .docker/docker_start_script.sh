@@ -17,9 +17,8 @@ cat conf/storage/db.conf
 echo ${WEB_SERVER_HOST}
 if [ -z ${WEB_SERVER_HOST} ] ; then
     local_host=`hostname -i`
-    sed "s_localhost_${local_host}_" conf/net/api/webserver.conf.sample > conf/net/api/webserver.conf
-else
-    sed "s_localhost_${WEB_SERVER_HOST}_" conf/net/api/webserver.conf.sample > conf/net/api/webserver.conf
+    export WEB_SERVER_HOST=$local_host
+    echo "Setting webserver host environment variable to localhost"
 fi
 cat conf/net/api/webserver.conf
 

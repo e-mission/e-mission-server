@@ -58,20 +58,15 @@ except:
     logging.debug("webserver not configured, falling back to sample, default configuration")
     config_file = open('conf/net/api/webserver.conf.sample')
 
-OPENPATH_URL="https://www.nrel.gov/transportation/openpath.html"
 STUDY_CONFIG = os.getenv('STUDY_CONFIG', "stage-program")
-
-config_data = json.load(config_file)
 config_file.close()
-static_path = config_data["paths"]["static_path"]
-python_path = config_data["paths"]["python_path"]
-server_host = config_data["server"]["host"]
-server_port = config_data["server"]["port"]
-socket_timeout = config_data["server"]["timeout"]
-log_base_dir = config_data["paths"]["log_base_dir"]
-auth_method = config_data["server"]["auth"]
-aggregate_call_auth = config_data["server"]["aggregate_call_auth"]
-not_found_redirect = config_data["paths"].get("404_redirect", OPENPATH_URL)
+static_path = os.getenv('WEB_SERVER_STATIC_PATH', "webapp/www/")
+server_host = os.getenv('WEB_SERVER_HOST', "0.0.0.0")
+server_port = os.getenv('WEB_SERVER_PORT', "8080")
+socket_timeout = os.getenv('WEB_SERVER_TIMEOUT', "3600")
+auth_method = os.getenv('WEB_SERVER_AUTH', "skip")
+aggregate_call_auth = os.getenv('WEB_SERVER_AGGREGATE_CALL_AUTH', "no_auth")
+not_found_redirect = os.getenv('WEB_SERVER_OPENPATH_URL', "https://www.nrel.gov/transportation/openpath.html")   
 
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes
