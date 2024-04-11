@@ -32,8 +32,8 @@ class TestWebserver(unittest.TestCase):
             if os.getenv(env_var_name) is not None:
                 # Storing original webserver environment variables before modification
                 self.originalWebserverEnvVars[env_var_name] = os.getenv(env_var_name)
-                # Setting webserver environment variables with test values
-                os.environ[env_var_name] = env_var_value
+            # Setting webserver environment variables with test values
+            os.environ[env_var_name] = env_var_value
 
         logging.debug("Finished setting up test webserver environment variables")
         logging.debug("Current original values are = %s" % self.originalWebserverEnvVars)
