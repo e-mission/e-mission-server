@@ -10,16 +10,10 @@ import pymongo
 import os
 import json
 
-try:
-    config_file = open('conf/storage/db.conf')
-except:
-    print("storage not configured, falling back to sample, default configuration")
-    config_file = open('conf/storage/db.conf.sample')
+import emission.core.config as ecc
 
-config_data = json.load(config_file)
-url = config_data["timeseries"]["url"]
-result_limit = config_data["timeseries"]["result_limit"]
-config_file.close()
+url = ecc.get_config()["url"]
+result_limit = ecc.get_config()["result_limit"]
 
 try:
     parsed=pymongo.uri_parser.parse_uri(url)

@@ -25,7 +25,7 @@ class TestWebserver(unittest.TestCase):
     def setUp(self):
         self.originalWebserverEnvVars = {}
         self.testModifiedEnvVars = {
-            'WEB_SERVER_OPENPATH_URL' : "http://somewhere.else"
+            'WEB_SERVER_REDIRECT_URL' : "http://somewhere.else"
         }
 
         for env_var_name, env_var_value in self.testModifiedEnvVars.items():
@@ -35,16 +35,19 @@ class TestWebserver(unittest.TestCase):
             # Setting webserver environment variables with test values
             os.environ[env_var_name] = env_var_value
 
-        logging.debug("Finished setting up test webserver environment variables")
-        logging.debug("Current original values are = %s" % self.originalWebserverEnvVars)
-        logging.debug("Current modified values are = %s" % self.testModifiedEnvVars)
+        print("Finished setting up test webserver environment variables")
+        print("Current original values are = %s" % self.originalWebserverEnvVars)
+        print("Current modified values are = %s" % self.testModifiedEnvVars)
 
     def tearDown(self):
+        print("Deleting test webserver environment variables")
+        for env_var_name, env_var_value in self.testModifiedEnvVars.items():
+            del os.environ[env_var_name]
         # Restoring original webserver environment variables
         for env_var_name, env_var_value in self.originalWebserverEnvVars.items():
             os.environ[env_var_name] = env_var_value
-        logging.debug("Finished restoring original webserver environment variables")
-        logging.debug("Restored original values are = %s" % self.originalWebserverEnvVars)
+        print("Finished restoring original webserver environment variables")
+        print("Restored original values are = %s" % self.originalWebserverEnvVars)
 
     def test404Redirect(self):
         from emission.net.api.bottle import response

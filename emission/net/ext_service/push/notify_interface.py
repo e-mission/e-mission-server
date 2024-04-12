@@ -19,7 +19,7 @@ import emission.net.ext_service.push.config as pc
 # We can revisit this if push providers eventually decide to standardize...
 
 try:
-    push_config = pc.get_config_data()
+    push_config = pc.get_config()
 except:
     logging.warning("push service not configured, push notifications not supported")
 

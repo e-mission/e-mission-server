@@ -47,10 +47,19 @@ class TestMongodbAuth(unittest.TestCase):
         self.uuid = uuid.uuid4()
         self.testUserId = self.uuid
         self.db_conf_file = "conf/storage/db.conf"
+        self.originalDBEnvVars = {}
         self.createAdmin()
 
     def tearDown(self):
         self.admin_auth.command({"dropAllUsersFromDatabase": 1})
+        logging.debug("Deleting test db environment variables")
+        for env_var_name, env_var_value in self.testModifiedEnvVars.items():
+            del os.environ[env_var_name]
+		# Restoring original db environment variables
+        for env_var_name, env_var_value in self.originalDBEnvVars.items():
+            os.environ[env_var_name] = env_var_value
+        logging.debug("Finished restoring original db environment variables")
+        logging.debug("Restored original values are = %s" % self.originalDBEnvVars)
         try:
             os.remove(self.db_conf_file)
         except FileNotFoundError as e:
@@ -67,14 +76,20 @@ class TestMongodbAuth(unittest.TestCase):
         self.admin_auth = pymongo.MongoClient(self.getURL(self.test_username, self.test_password)).admin
 
     def configureDB(self, url):
-        config = {
-            "timeseries": {
-                "url": url,
-                "result_limit": 250000
-            }
+        self.testModifiedEnvVars = {
+            'DB_HOST' : url
         }
-        with open(self.db_conf_file, "w") as fp:
-            json.dump(config, fp, indent=4)
+
+        for env_var_name, env_var_value in self.testModifiedEnvVars.items():
+            if os.getenv(env_var_name) is not None:
+                # Storing original db environment variables before modification
+                self.originalDBEnvVars[env_var_name] = os.getenv(env_var_name)
+            # Setting db environment variables with test values
+            os.environ[env_var_name] = env_var_value
+
+        logging.debug("Finished setting up test db environment variables")
+        logging.debug("Current original values are = %s" % self.originalDBEnvVars)
+        logging.debug("Current modified values are = %s" % self.testModifiedEnvVars)
 
     def getURL(self, username, password, dbname="admin"):
         return "mongodb://%s:%s@localhost/%s?authSource=admin&authMechanism=SCRAM-SHA-1" % (username, password, dbname)

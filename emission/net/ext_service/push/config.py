@@ -17,7 +17,7 @@ def get_config_data():
         ret_val = json.load(config_file)
         config_file.close()
     except:
-        logging.debug("net.ext_service.push.json not configured, checking environment variables...")
+        logging.warning("net.ext_service.push.json not configured, checking environment variables...")
         ret_val = get_config_data_from_env()
         # Check if all PUSH environment variables are not set
         if (not any(ret_val.values())):
@@ -27,7 +27,7 @@ def get_config_data():
 try:
     config_data = get_config_data()
 except:
-    logging.debug("All push environment variables are set to None")
+    logging.warning("All push environment variables are set to None")
 
 def get_config():
     return config_data

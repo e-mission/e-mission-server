@@ -40,22 +40,33 @@ def generate_fake_result(successful_tokens, failed_tokens):
 
 class TestPush(unittest.TestCase):
     def setUp(self):
-        import shutil
-        self.push_conf_path = "conf/net/ext_service/push.json"
-        shutil.copyfile("%s.sample" % self.push_conf_path,
-                        self.push_conf_path)
-        with open(self.push_conf_path, "w") as fd:
-            fd.write(json.dumps({
-                "provider": "firebase",
-                "server_auth_token": "firebase_api_key",
-                "ios_token_format": "apns"
-            }))
-        logging.debug("Finished setting up %s" % self.push_conf_path)
-        with open(self.push_conf_path) as fd:
-            logging.debug("Current values are %s" % json.load(fd))
+        self.originalPushEnvVars = {}
+        self.testModifiedEnvVars = {
+            'PUSH_PROVIDER' : "firebase",
+            'PUSH_SERVER_AUTH_TOKEN' : "firebase_api_key",
+            'PUSH_IOS_TOKEN_FORMAT' : "apns"
+        }
+
+        for env_var_name, env_var_value in self.testModifiedEnvVars.items():
+            if os.getenv(env_var_name) is not None:
+                # Storing original push environment variables before modification
+                self.originalPushEnvVars[env_var_name] = os.getenv(env_var_name)
+            # Setting push environment variables with test values
+            os.environ[env_var_name] = env_var_value
+
+        logging.debug("Finished setting up test push environment variables")
+        logging.debug("Current original values are = %s" % self.originalPushEnvVars)
+        logging.debug("Current modified values are = %s" % self.testModifiedEnvVars)
 
     def tearDown(self):
-        os.remove(self.push_conf_path)
+        logging.debug("Deleting test push environment variables")
+        for env_var_name, env_var_value in self.testModifiedEnvVars.items():
+            del os.environ[env_var_name]
+        # Restoring original push environment variables
+        for env_var_name, env_var_value in self.originalPushEnvVars.items():
+            os.environ[env_var_name] = env_var_value
+        logging.debug("Finished restoring original push environment variables")
+        logging.debug("Restored original values are = %s" % self.originalPushEnvVars)
 
     def testGetInterface(self):
         import emission.net.ext_service.push.notify_interface as pni
@@ -177,6 +188,15 @@ class TestPush(unittest.TestCase):
         
         # and there will be no entries in the token mapping database
         self.assertEqual(edb.get_push_token_mapping_db().count_documents({}), 0)
+
+    def testNoEnvVarSetUp(self):
+        self.tearDown()
+        import emission.net.ext_service.push.notify_interface as pni
+        # import emission.net.ext_service.push.config as pc
+        # print("Fetching push config from ENV variables by deleting existing non-sample JSON file")
+        # self.tearDown()
+        # self.assertRaises(TypeError, pc.get_config_data())
+        self.setUp()
     
 if __name__ == '__main__':
     import emission.tests.common as etc
