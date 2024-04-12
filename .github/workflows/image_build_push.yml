@@ -6,7 +6,7 @@ name: docker image
 # events but only for the master branch
 on:
   push:
-    branches: [ master, gis-based-mode-detection, consolidate-differences ]
+    branches: [ image-push-merge ]
 
 
 # Env variable
@@ -46,14 +46,3 @@ jobs:
     - name: push docker image
       run: |
         docker push $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}_${{ steps.date.outputs.date }}
-
-    - name: Write tag file 
-      run: |
-        echo 'foo bar' > tag.txt
-
-    - uses: actions/upload-artifact@v4
-      with:
-        name: Create tag artifact
-        path: tag.txt
-        if-no-files-found: error
-        overwrite: true
