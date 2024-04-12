@@ -25,8 +25,9 @@ def get_config_data():
         # Check if all DB environment variables are not set
         # if check_unset_env_vars():
             # print("All DB environment variables are set to None")
-        print("storage not configured, falling back to sample, default configuration")
         ret_val = get_config_data_from_env()
+        if ret_val["url"] == "localhost":
+            print("storage not configured, falling back to sample, default configuration")
     return ret_val
 
 config_data = get_config_data()
