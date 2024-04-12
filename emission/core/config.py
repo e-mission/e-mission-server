@@ -25,7 +25,7 @@ def get_config_data():
         # Check if all DB environment variables are not set
         # if check_unset_env_vars():
             # print("All DB environment variables are set to None")
-        logging.debug("storage not configured, falling back to sample, default configuration")
+        print("storage not configured, falling back to sample, default configuration")
         ret_val = get_config_data_from_env()
     return ret_val
 

@@ -28,7 +28,7 @@ def check_unset_env_vars():
 
 def get_config_data():
     try:
-        config_file = open('conf/storage/db.conf')
+        config_file = open('conf/net/api/webserver.conf')
         ret_val = json.load(config_file)
         config_file.close()
     except:
