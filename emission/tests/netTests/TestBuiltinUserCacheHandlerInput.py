@@ -138,7 +138,7 @@ class TestBuiltinUserCacheHandlerInput(unittest.TestCase):
         edb.get_usercache_db().insert_one({
             'user_id': self.testUserUUID1,
             '_id': boi.ObjectId('572d3621d282b8f30def7e85'),
-            'data': {u'transition': None,
+            'data': {u'transition': "MY_FAKE_TRANSITION",
                      'currState': u'STATE_ONGOING_TRIP'},
             'metadata': {'plugin': 'none',
                          'write_ts': self.curr_ts - 25,
