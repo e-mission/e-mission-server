@@ -45,6 +45,7 @@ class BuiltinTimeSeries(esta.TimeSeries):
                 "background/filtered_location": self.timeseries_db,
                 "background/motion_activity": self.timeseries_db,
                 "background/battery": self.timeseries_db,
+                "background/bluetooth_ble": self.timeseries_db,
                 "statemachine/transition": self.timeseries_db,
                 "config/sensor_config": self.timeseries_db,
                 "config/sync_config": self.timeseries_db,
