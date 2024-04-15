@@ -39,6 +39,8 @@ class TransitionType(enum.Enum):
     DATA_PUSHED = 16
     # joint transition again
     START_TRACKING = 17
+    BLE_BEACON_FOUND = 18
+    BLE_BEACON_LOST = 19
 
 class Transition(ecwb.WrapperBase):
     props = {"curr_state": ecwb.WrapperBase.Access.RO,

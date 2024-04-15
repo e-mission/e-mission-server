@@ -26,6 +26,8 @@ transition_map = {
     "local.transition.stopped_moving": et.TransitionType.STOPPED_MOVING,
     "local.transition.stop_tracking": et.TransitionType.STOP_TRACKING,
     "local.transition.start_tracking": et.TransitionType.START_TRACKING,
+    "local.transition.ble_beacon_found": et.TransitionType.BLE_BEACON_FOUND,
+    "local.transition.ble_beacon_lost": et.TransitionType.BLE_BEACON_LOST,
     "local.transition.tracking_error": et.TransitionType.TRACKING_ERROR
 }
 
@@ -44,7 +46,11 @@ def format(entry):
     data = ad.AttrDict()
     data.curr_state = state_map[entry.data.currState].value
     logging.debug("Mapped %s -> %s" % (entry.data.currState, data.curr_state))
-    data.transition = transition_map[entry.data.transition].value
+    if entry.data.transition is not None:
+        data.transition = transition_map[entry.data.transition].value
+    else:
+        data.transition = None
+
     if "ts" not in data:
         data.ts = formatted_entry.metadata.write_ts
         logging.debug("No existing timestamp, copyied from metadata%s" % data.ts)

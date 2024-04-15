@@ -34,6 +34,8 @@ transition_map = {
     "T_TRACKING_STOPPED": et.TransitionType.TRACKING_STOPPED,
     "T_VISIT_STARTED": et.TransitionType.VISIT_STARTED,
     "T_VISIT_ENDED": et.TransitionType.VISIT_ENDED,
+    "T_BLE_BEACON_FOUND": et.TransitionType.BLE_BEACON_FOUND,
+    "T_BLE_BEACON_LOST": et.TransitionType.BLE_BEACON_LOST,
     "T_NOP": et.TransitionType.NOP,
     "T_START_TRACKING": et.TransitionType.START_TRACKING
 }
@@ -59,7 +61,6 @@ def format(entry):
     # deal with collapsing later
     # data.transition_raw = entry.data.transition
     
-    data.transition = transition_map[entry.data.transition].value
     if entry.data.transition is not None:
         data.transition = transition_map[entry.data.transition].value
     else:
