@@ -2,18 +2,17 @@ import json
 import os
 
 def get_config_data():
-    if os.getenv("PROD_STAGE") == "TRUE":
-        print("In production environment, opening internal debug.conf")
-        config_file = open('conf/analysis/debug.conf.internal.json')
-    else:
-        try:
-            print("Trying to open debug.conf.json")
-            config_file = open('conf/analysis/debug.conf.json')
-        except:
+    try:
+        print("Trying to open debug.conf.json")
+        config_file = open('conf/analysis/debug.conf.json')
+    except:
+        if os.getenv("PROD_STAGE") == "TRUE":
+            print("In production environment, opening internal debug.conf")
+            config_file = open('conf/analysis/debug.conf.internal.json')
+        else:
             print("analysis.debug.conf.json not configured, falling back to sample, default configuration")
             config_file = open('conf/analysis/debug.conf.json.sample')
     ret_val = json.load(config_file)
-    print(ret_val)
     config_file.close()
     return ret_val
 
