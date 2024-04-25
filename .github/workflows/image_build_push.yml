@@ -47,3 +47,15 @@ jobs:
     - name: push docker image
       run: |
         docker push $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}_${{ steps.date.outputs.date }}
+
+    - name: Create a text file
+      run: |
+        echo "hello world" > tag_file.txt
+				echo "Created tag text file"
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+			with:
+        name: docker-image-tag
+				path: tag_file.txt 
+				overwrite: true
