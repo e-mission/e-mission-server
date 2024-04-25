@@ -50,7 +50,7 @@ jobs:
 
     - name: Create a text file
       run: |
-        echo "hello world" > tag_file.txt
+        echo ${{ steps.date.outputs.date }} > tag_file.txt
         echo "Created tag text file"
 
     - name: Upload Artifact
