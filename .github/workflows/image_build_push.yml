@@ -6,7 +6,7 @@ name: docker image
 # events but only for the master branch
 on:
   push:
-    branches: [ image-push-merge ]
+    branches: [ consolidate-differences ]
 
 
 # Env variable
