@@ -49,6 +49,7 @@ jobs:
     #     docker push $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}_${{ steps.date.outputs.date }}
 
   dispatch:
+    needs: build
     runs-on: ubuntu-latest
     strategy:
       matrix:
