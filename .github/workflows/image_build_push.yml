@@ -22,6 +22,9 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
+    outputs:
+      date: ${{ steps.date.outputs.date }}
+
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -51,6 +54,10 @@ jobs:
   dispatch:
     needs: build
     runs-on: ubuntu-latest
+
+    env:
+      DOCKER_IMAGE_TAG: ${{needs.build.outputs.date}}
+
     strategy:
       matrix:
         repo: ['MukuFlash03/nrel-openpath-join-page', 'MukuFlash03/op-admin-dashboard', 'MukuFlash03/em-public-dashboard']
@@ -66,4 +73,4 @@ jobs:
           -H "Authorization: Bearer ${{ secrets.GH_FG_PAT_TAGS }}" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
           https://api.github.com/repos/${{ matrix.repo }}/actions/workflows/image_build_push.yml/dispatches \
-          -d '{"ref":"tags-matrix", "inputs": {"docker_image_tag" : "${{ needs.build.outputs.date }}"}}'
+          -d '{"ref":"tags-matrix", "inputs": {"docker_image_tag" : "${{ env.DOCKER_IMAGE_TAG }}"}}'
