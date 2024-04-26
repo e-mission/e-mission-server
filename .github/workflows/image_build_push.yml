@@ -48,18 +48,6 @@ jobs:
     #   run: |
     #     docker push $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}_${{ steps.date.outputs.date }}
 
-    - name: Create a text file
-      run: |
-        echo ${{ steps.date.outputs.date }} > tag_file.txt
-        echo "Created tag text file"
-
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: docker-image-tag
-        path: tag_file.txt
-        overwrite: true
-
     - name: Trigger workflow in join-page, admin-dash, public-dash
       run: |
         curl -L \
