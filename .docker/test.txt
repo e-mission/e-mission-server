@@ -7,3 +7,7 @@ Testing again to see if workflow dispatch works
 
 Yes, working with updated branch as well.
 ------
+
+Testing if working with updated token scopes to have only actions: write
+
+-----
