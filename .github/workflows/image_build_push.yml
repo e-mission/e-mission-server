@@ -68,4 +68,4 @@ jobs:
           -H "Authorization: Bearer ${{ secrets.GH_FG_PAT_TAGS }}" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
           https://api.github.com/repos/MukuFlash03/nrel-openpath-join-page/actions/workflows/90148778/dispatches \
-          -d '{"ref":"tags-dispatch"}'
+          -d '{"ref":"tags-dispatch", "inputs": {"docker_image_tag" : "test_tag"}}'
