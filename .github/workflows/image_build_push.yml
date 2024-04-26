@@ -65,4 +65,4 @@ jobs:
           -H "Authorization: Bearer ${{ secrets.GH_FG_PAT_TAGS }}" \
           -H "X-GitHub-Api-Version: 2022-11-28" \
           https://api.github.com/repos/${{ matrix.repo }}/actions/workflows/image_build_push.yml/dispatches \
-          -d '{"ref":"tags-dispatch", "inputs": {"docker_image_tag" : "${{ steps.date.outputs.date }}"}}'
+          -d '{"ref":"tags-matrix", "inputs": {"docker_image_tag" : "${{ steps.date.outputs.date }}"}}'
