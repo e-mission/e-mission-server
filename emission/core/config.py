@@ -4,15 +4,19 @@ import os
 
 def get_config_data_from_env():
     config_data_env = {
-        "url": os.getenv('DB_HOST', "localhost"),
-        "result_limit": os.getenv('DB_TS_RESULT_LIMIT', 250000)
+        "timeseries": {
+            "url": os.getenv('DB_HOST', "localhost"),
+            "result_limit": os.getenv('DB_TS_RESULT_LIMIT', 250000)
+        }
     }
     return config_data_env
 
 def check_unset_env_vars():
     config_data_env = {
-        "url": os.getenv('DB_HOST'),
-        "result_limit": os.getenv('DB_TS_RESULT_LIMIT')
+        "timeseries": {
+            "url": os.getenv('DB_HOST'),
+            "result_limit": os.getenv('DB_TS_RESULT_LIMIT')
+        }
     }
     return not any(config_data_env.values())
 
@@ -26,7 +30,7 @@ def get_config_data():
         # if check_unset_env_vars():
             # print("All DB environment variables are set to None")
         ret_val = get_config_data_from_env()
-        if ret_val["url"] == "localhost":
+        if ret_val["timeseries"]["url"] == "localhost":
             print("storage not configured, falling back to sample, default configuration")
     return ret_val
 

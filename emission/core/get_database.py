@@ -12,8 +12,8 @@ import json
 
 import emission.core.config as ecc
 
-url = ecc.get_config()["url"]
-result_limit = ecc.get_config()["result_limit"]
+url = ecc.get_config()["timeseries"]["url"]
+result_limit = ecc.get_config()["timeseries"]["result_limit"]
 
 try:
     parsed=pymongo.uri_parser.parse_uri(url)
