@@ -7,8 +7,7 @@ name: docker image
 # TODO: Change to master branch once changes are final.
 on:
   push:
-    branches: [ tags-matrix ]
-
+    branches: [ tags-combo-approach ]
 
 # Env variable
 env:
@@ -42,28 +41,40 @@ jobs:
       run: echo running in repo ${GITHUB_REPOSITORY#*/} branch ${GITHUB_REF##*/} on ${{ steps.date.outputs.date }}
 
     # Runs a set of commands using the runners shell
-    # - name: build docker image
-    #   run: |
-    #     docker build -t $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}_${{ steps.date.outputs.date }} .
-    #     docker images
+    - name: build docker image
+      run: |
+        docker build -t $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}_${{ steps.date.outputs.date }} .
+        docker images
 
-    # - name: push docker image
-    #   run: |
-    #     docker push $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}_${{ steps.date.outputs.date }}
+    - name: push docker image
+      run: |
+        docker push $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}_${{ steps.date.outputs.date }}
+
+    - name: Create a text file
+      run: |
+        echo ${{ steps.date.outputs.date }} > tag_file.txt
+        echo "Created tag text file"
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-image-tag
+        path: tag_file.txt
+        overwrite: true
 
   dispatch:
     needs: build
     runs-on: ubuntu-latest
 
     env:
-      DOCKER_IMAGE_TAG: ${{needs.build.outputs.date}}
+      DOCKER_IMAGE_TAG: ${{ needs.build.outputs.date }}
 
     strategy:
       matrix:
-        repo: ['MukuFlash03/nrel-openpath-join-page', 'MukuFlash03/op-admin-dashboard', 'MukuFlash03/em-public-dashboard']
+        repo: ['MukuFlash03/op-admin-dashboard', 'MukuFlash03/em-public-dashboard']
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
 
     - name: Trigger workflow in join-page, admin-dash, public-dash
       run: |
