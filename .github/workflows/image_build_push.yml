@@ -76,7 +76,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Trigger workflow in join-page, admin-dash, public-dash
+    - name: Trigger workflow in admin-dash, public-dash
       run: |
         curl -L \
           -X POST \
