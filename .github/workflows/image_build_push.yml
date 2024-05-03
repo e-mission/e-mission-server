@@ -6,6 +6,7 @@ name: docker image
 # events but only for the master branch
 on:
   push:
+    # TODO: Change branch to master
     branches: [ tags-combo-approach ]
 
 # Env variable
@@ -70,12 +71,15 @@ jobs:
 
     strategy:
       matrix:
+        # TODO: Change user / organization to emission instead of MukuFlash03
         repo: ['MukuFlash03/op-admin-dashboard', 'MukuFlash03/em-public-dashboard']
 
     steps:
     - uses: actions/checkout@v4
 
     - name: Trigger workflow in admin-dash, public-dash
+      # TODO: Create Fine-grained token with "Actions: write" permissions 
+      # TODO: Change branch name under "ref" in the curl command
       run: |
         curl -L \
           -X POST \
