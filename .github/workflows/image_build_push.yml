@@ -6,7 +6,7 @@ name: docker image
 # events but only for the master branch
 on:
   push:
-    # TODO: Change branch to master
+    # TODO: Change branch to master branch of e-mission-server
     branches: [ tags-combo-approach ]
 
 # Env variable
