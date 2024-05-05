@@ -193,12 +193,13 @@ def create_and_link_timeline(ts, timeline, last_confirmed_place):
                                     confirmed_places, confirmed_trips)
     return confirmed_tl
 
-def get_section_summary(ts, cleaned_trip, section_key):
+def get_section_summary(ts, cleaned_trip, section_key, mode_prop="sensed_mode"):
     """
     Returns the proportions of the distance, duration and count for each mode
     in this trip. Note that sections are unimodal by definition.
     cleaned_trip: the cleaned trip object associated with the sections
     section_key: 'inferred_section' or 'cleaned_section'
+    mode_prop: the section property used as the basis for mode: 'sensed_mode' or 'ble_sensed_mode'.
     """
     logging.debug(f"get_section_summary({cleaned_trip['_id']}, {section_key}) called")
     sections = esdt.get_sections_for_trip(key = section_key,
@@ -207,12 +208,14 @@ def get_section_summary(ts, cleaned_trip, section_key):
         logging.warning("While getting section summary, section length = 0. This should never happen, but let's not crash if it does")
         return {"distance": {}, "duration": {}, "count": {}}
     sections_df = ts.to_data_df(section_key, sections)
-    cleaned_section_mapper = lambda sm: ecwm.MotionTypes(sm).name
-    inferred_section_mapper = lambda sm: ecwmp.PredictedModeTypes(sm).name
-    sel_section_mapper = cleaned_section_mapper \
-        if section_key == "analysis/cleaned_section" else inferred_section_mapper
-    sections_df["sensed_mode_str"] = sections_df["sensed_mode"].apply(sel_section_mapper)
-    grouped_section_df = sections_df.groupby("sensed_mode_str")
+    if mode_prop == "ble_sensed_mode":
+        mapper = lambda bsm: bsm['baseMode'] if bsm is not None else ecwm.MotionTypes.UNKNOWN.name
+    elif section_key == "analysis/cleaned_section":
+        mapper = lambda sm: ecwm.MotionTypes(sm).name
+    else:
+        mapper = lambda sm: ecwmp.PredictedModeTypes(sm).name
+    sections_df[mode_prop + "_str"] = sections_df[mode_prop].apply(mapper)
+    grouped_section_df = sections_df.groupby(mode_prop + "_str")
     retVal = {
         "distance": grouped_section_df.distance.sum().to_dict(),
         "duration": grouped_section_df.duration.sum().to_dict(),
@@ -233,6 +236,7 @@ def create_confirmed_entry(ts, tce, confirmed_key, input_key_list):
             tce["data"]["cleaned_trip"])
         confirmed_object_data['inferred_section_summary'] = get_section_summary(ts, cleaned_trip, "analysis/inferred_section")
         confirmed_object_data['cleaned_section_summary'] = get_section_summary(ts, cleaned_trip, "analysis/cleaned_section")
+        confirmed_object_data['ble_sensed_summary'] = get_section_summary(ts, cleaned_trip, "analysis/inferred_section", mode_prop="ble_sensed_mode")
     elif (confirmed_key == esda.CONFIRMED_PLACE_KEY):
         confirmed_object_data["cleaned_place"] = tce.get_id()
     confirmed_object_data["user_input"] = \

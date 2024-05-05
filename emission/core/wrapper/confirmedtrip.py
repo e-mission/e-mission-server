@@ -19,6 +19,7 @@ class Confirmedtrip(ecwt.Trip):
                   "expected_trip": ecwb.WrapperBase.Access.WORM,
                   "inferred_section_summary": ecwb.WrapperBase.Access.WORM,
                   "cleaned_section_summary": ecwb.WrapperBase.Access.WORM,
+                  "ble_sensed_summary": ecwb.WrapperBase.Access.WORM,
 # the user input will have all `manual/*` entries
 # let's make that be somewhat flexible instead of hardcoding into the data model
                   "user_input": ecwb.WrapperBase.Access.WORM,
