@@ -8,7 +8,7 @@ WORKDIR /usr/src/app
 RUN apt-get -y -qq update
 RUN apt-get install -y -qq curl
 RUN apt-get install -y -qq wget
-# RUN apt-get install -y git
+RUN apt-get install -y -qq git
 
 # install nano and vim for editing
 # RUN apt-get -y install nano vim
