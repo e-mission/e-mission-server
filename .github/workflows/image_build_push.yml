@@ -6,8 +6,8 @@ name: docker image
 # events but only for the master branch
 on:
   push:
+    # TODO: Change branch to master branch of e-mission-server
     branches: [ consolidate-differences ]
-
 
 # Env variable
 env:
@@ -20,6 +20,9 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+
+    outputs:
+      date: ${{ steps.date.outputs.date }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -46,3 +49,42 @@ jobs:
     - name: push docker image
       run: |
         docker push $DOCKER_USER/${GITHUB_REPOSITORY#*/}:${GITHUB_REF##*/}_${{ steps.date.outputs.date }}
+
+    - name: Create a text file
+      run: |
+        echo ${{ steps.date.outputs.date }} > tag_file.txt
+        echo "Created tag text file"
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-image-tag
+        path: tag_file.txt
+        overwrite: true
+
+  dispatch:
+    needs: build
+    runs-on: ubuntu-latest
+
+    env:
+      DOCKER_IMAGE_TAG: ${{ needs.build.outputs.date }}
+
+    strategy:
+      matrix:
+        # TODO: Change user / organization to emission instead of MukuFlash03
+        repo: ['MukuFlash03/op-admin-dashboard', 'MukuFlash03/em-public-dashboard']
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Trigger workflow in admin-dash, public-dash
+      # TODO: Create Fine-grained token with "Actions: write" permissions 
+      # TODO: Change branch name under "ref" in the curl command
+      run: |
+        curl -L \
+          -X POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "Authorization: Bearer ${{ secrets.GH_FG_PAT_TAGS }}" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          https://api.github.com/repos/${{ matrix.repo }}/actions/workflows/image_build_push.yml/dispatches \
+          -d '{"ref":"tags-combo-approach", "inputs": {"docker_image_tag" : "${{ env.DOCKER_IMAGE_TAG }}"}}'
