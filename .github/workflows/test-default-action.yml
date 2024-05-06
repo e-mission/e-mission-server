@@ -7,11 +7,12 @@ name: CI
 on:
   push:
     branches:
-        - master
-        - gis-based-mode-detection
+        # - master
+        # - gis-based-mode-detection
+        - consolidate-differences
   pull_request:
     branches:
-        - master
+        # - master
         - gis-based-mode-detection
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel

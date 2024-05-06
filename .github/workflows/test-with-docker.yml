@@ -6,9 +6,9 @@ name: test-with-docker
 # events but only for the master branch
 on:
   push:
-    branches: [ master ]
+    branches: [ consolidate-differences ]
   pull_request:
-    branches: [ master ]
+    branches: [ consolidate-differences ]
   schedule:
     # * is a special character in YAML so you have to quote this string
     - cron:  '5 4 * * 0'

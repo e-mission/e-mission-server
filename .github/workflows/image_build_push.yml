@@ -7,7 +7,7 @@ name: docker image
 on:
   push:
     # TODO: Change branch to master branch of e-mission-server
-    branches: [ tags-combo-approach ]
+    branches: [ consolidate-differences ]
 
 # Env variable
 env:
