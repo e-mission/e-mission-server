@@ -9,12 +9,10 @@ on:
     branches: 
         - master
         - gis-based-mode-detection
-        - consolidate-differences
   pull_request:
     branches: 
         - master
         - gis-based-mode-detection
-        - consolidate-differences
   schedule:
     # * is a special character in YAML so you have to quote this string
     - cron:  '5 4 * * 0'

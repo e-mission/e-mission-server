@@ -7,7 +7,6 @@ on:
     branches:
         - master
         - gis-based-mode-detection
-        - consolidate-differences
   pull_request:
     branches:
         - master
