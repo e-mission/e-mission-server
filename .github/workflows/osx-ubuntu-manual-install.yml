@@ -5,12 +5,12 @@ name: osx-ubuntu-manual-install
 on:
   push:
     branches:
-        # - master
-        # - gis-based-mode-detection
+        - master
+        - gis-based-mode-detection
         - consolidate-differences
   pull_request:
     branches:
-        # - master
+        - master
         - gis-based-mode-detection
   schedule:
     # * is a special character in YAML so you have to quote this string

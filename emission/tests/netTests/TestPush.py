@@ -188,7 +188,6 @@ class TestPush(unittest.TestCase):
         
         # and there will be no entries in the token mapping database
         self.assertEqual(edb.get_push_token_mapping_db().count_documents({}), 0)
-
     
 if __name__ == '__main__':
     import emission.tests.common as etc
