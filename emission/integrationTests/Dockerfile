@@ -2,7 +2,8 @@
 FROM ubuntu:latest
 
 RUN apt-get update
-RUN apt-get install -y curl
+RUN apt-get install -y -qq curl
+RUN apt-get install -y -qq git
 
 # CHANGEME: Create the files that correspond to your configuration in the conf directory
 
