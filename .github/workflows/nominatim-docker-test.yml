@@ -4,7 +4,6 @@ name: nominatim-docker-test
 # events but only for the master branch
 on:
   schedule:
-
     # Run every Sunday at 4:05 am
     - cron:  '5 4 * * 0'
   push:
