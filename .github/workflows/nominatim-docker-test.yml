@@ -7,6 +7,10 @@ on:
 
     # Run every Sunday at 4:05 am
     - cron:  '5 4 * * 0'
+  push:
+    branches: 
+      - master
+      - nominatim-regression-fix
 jobs:
   # This workflow contains a single job called "build"
   build:
