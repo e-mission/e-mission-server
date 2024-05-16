@@ -9,6 +9,8 @@ if [ -z ${DB_HOST} ] ; then
     export DB_HOST=$local_host
     echo "Setting db host environment variable to localhost"
 fi
+
+export WEB_SERVER_HOST=0.0.0.0
 cat conf/storage/db.conf
 
 echo "Setting up conda..."

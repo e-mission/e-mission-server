@@ -14,25 +14,12 @@ def get_config_data_from_env():
     }
     return config_data_env
 
-def check_unset_env_vars():
-    config_data_env = {
-        "static_path": os.getenv('WEB_SERVER_STATIC_PATH'),
-        "server_host": os.getenv('WEB_SERVER_HOST'),
-        "server_port": os.getenv('WEB_SERVER_PORT'),
-        "socket_timeout": os.getenv('WEB_SERVER_TIMEOUT'),
-        "auth_method": os.getenv('WEB_SERVER_AUTH'),
-        "aggregate_call_auth": os.getenv('WEB_SERVER_AGGREGATE_CALL_AUTH'),
-        "not_found_redirect": os.getenv('WEB_SERVER_REDIRECT_URL')
-    }
-    return not any(config_data_env.values())
-
 def get_config_data():
     try:
         config_file = open('conf/net/api/webserver.conf')
         ret_val = json.load(config_file)
         config_file.close()
     except:
-        # Check if all Webserver environment variables are not set
         # if check_unset_env_vars():
         logging.debug("webserver not configured, falling back to sample, default configuration")
         ret_val = get_config_data_from_env()

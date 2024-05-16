@@ -12,15 +12,6 @@ if [ -z ${DB_HOST} ] ; then
 fi
 cat conf/storage/db.conf
 
-#set Web Server host using environment variable
-echo ${WEB_SERVER_HOST}
-if [ -z ${WEB_SERVER_HOST} ] ; then
-    local_host=`hostname -i`
-    export WEB_SERVER_HOST=$local_host
-    echo "Setting webserver host environment variable to localhost"
-fi
-cat conf/net/api/webserver.conf
-
 if [ -z ${LIVERELOAD_SRC} ] ; then
     echo "Live reload disabled, "
 else
