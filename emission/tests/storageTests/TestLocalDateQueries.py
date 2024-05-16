@@ -77,7 +77,7 @@ class TestLocalDateQueries(unittest.TestCase):
 
     def testLocalRangeRolloverQuery(self):
         """
-        Search for all entries between 8:18 and 8:20 local time, both inclusive
+        Search for all entries between 8:18 and 9:08 local time, both inclusive
         """
         start_local_dt = ecwl.LocalDate({'year': 2015, 'month': 8, 'hour': 8, 'minute': 18})
         end_local_dt = ecwl.LocalDate({'year': 2015, 'month': 8, 'hour': 9, 'minute': 8})
