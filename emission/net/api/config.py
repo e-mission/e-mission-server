@@ -14,6 +14,7 @@ def get_config_data_from_env():
     }
     return config_data_env
 
+
 def get_config_data():
     try:
         config_file = open('conf/net/api/webserver.conf')
