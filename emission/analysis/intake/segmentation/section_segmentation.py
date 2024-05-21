@@ -10,6 +10,7 @@ from builtins import object
 import logging
 
 # Our imports
+import emission.analysis.configs.dynamic_config as eadc
 import emission.storage.pipeline_queries as epq
 import emission.storage.decorations.analysis_timeseries_queries as esda
 
@@ -22,6 +23,7 @@ import emission.core.wrapper.stop as ecws
 import emission.core.wrapper.entry as ecwe
 
 import emission.core.common as ecc
+import emcommon.bluetooth.ble_matching as emcble
 
 class SectionSegmentationMethod(object):
     def segment_into_sections(self, timeseries, distance_from_place, time_query):
@@ -64,6 +66,7 @@ def segment_trip_into_sections(user_id, trip_entry, trip_source):
     ts = esta.TimeSeries.get_time_series(user_id)
     time_query = esda.get_time_query_for_trip_like(esda.RAW_TRIP_KEY, trip_entry.get_id())
     distance_from_place = _get_distance_from_start_place_to_end(trip_entry)
+    ble_entries_during_trip = ts.find_entries(["background/bluetooth_ble"], time_query)
 
     if (trip_source == "DwellSegmentationTimeFilter"):
         import emission.analysis.intake.segmentation.section_segmentation_methods.smoothed_high_confidence_motion as shcm
@@ -118,7 +121,16 @@ def segment_trip_into_sections(user_id, trip_entry, trip_source):
             # Particularly in this case, if we don't do this, then the trip end may overshoot the section end
             end_loc = trip_end_loc
 
-        fill_section(section, start_loc, end_loc, sensed_mode)
+        # ble_sensed_mode represents the vehicle that was sensed via BLE beacon during the section.
+        # For now, we are going to rely on the current segmentation implementation and then fill in
+        # ble_sensed_mode by looking at scans within the timestamp range of the section.
+        # Later, we may want to actually use BLE sensor data as part of the basis for segmentation
+        dynamic_config = eadc.get_dynamic_config()
+        ble_sensed_mode = emcble.get_ble_sensed_vehicle_for_section(
+            ble_entries_during_trip, start_loc.ts, end_loc.ts, dynamic_config
+        )
+
+        fill_section(section, start_loc, end_loc, sensed_mode, ble_sensed_mode)
         # We create the entry after filling in the section so that we know
         # that the data is included properly
         section_entry = ecwe.Entry.create_entry(user_id, esda.RAW_SECTION_KEY,
@@ -143,7 +155,7 @@ def segment_trip_into_sections(user_id, trip_entry, trip_source):
         prev_section_entry = section_entry
 
 
-def fill_section(section, start_loc, end_loc, sensed_mode):
+def fill_section(section, start_loc, end_loc, sensed_mode, ble_sensed_mode=None):
     section.start_ts = start_loc.ts
     section.start_local_dt = start_loc.local_dt
     section.start_fmt_time = start_loc.fmt_time
@@ -161,6 +173,7 @@ def fill_section(section, start_loc, end_loc, sensed_mode):
     section.duration = end_loc.ts - start_loc.ts
     section.source = "SmoothedHighConfidenceMotion"
     section.sensed_mode = sensed_mode
+    section.ble_sensed_mode = ble_sensed_mode
 
 
 def stitch_together(ending_section_entry, stop_entry, starting_section_entry):

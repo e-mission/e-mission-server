@@ -25,6 +25,7 @@ class Section(ecwb.WrapperBase):
              "end_loc": ecwb.WrapperBase.Access.WORM,      # location of end point in geojson format
              "duration": ecwb.WrapperBase.Access.WORM,     # duration of the trip in secs
              "sensed_mode": ecwb.WrapperBase.Access.WORM,  # the sensed mode used for the segmentation
+             "ble_sensed_mode": ecwb.WrapperBase.Access.WORM,  # the mode sensed from BLE beacon scans
              "source": ecwb.WrapperBase.Access.WORM}        # the method used to generate this trip
 
     enums = {"sensed_mode": ecwm.MotionTypes}
