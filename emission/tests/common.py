@@ -259,7 +259,7 @@ def set_analysis_config(key, value):
     import shutil
 
     analysis_conf_path = "conf/analysis/debug.conf.json"
-    shutil.copyfile("%s.sample" % analysis_conf_path,
+    shutil.copyfile("conf/analysis/debug.conf.dev.json",
                     analysis_conf_path)
     with open(analysis_conf_path) as fd:
         curr_config = json.load(fd)
