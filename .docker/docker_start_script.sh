@@ -14,7 +14,6 @@ fi
 
 #TODO: start cron jobs
 # change python environment
-echo "Starting up e-mission-environment..."
 source setup/activate.sh
 
 # launch the webapp
