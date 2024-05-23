@@ -2,13 +2,7 @@
 # Using an automated install 
 cd /src/e-mission-server
 
-#set database URL using environment variable
 echo ${DB_HOST}
-if [ -z ${DB_HOST} ] ; then
-    local_host=`hostname -i`
-    export DB_HOST=$local_host
-    echo "Setting db host environment variable to localhost"
-fi
 cat conf/storage/db.conf
 
 echo "Setting up conda..."
