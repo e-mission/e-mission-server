@@ -28,7 +28,7 @@ RUN chmod u+x ./.docker/setup_config.sh
 RUN bash -c "./.docker/setup_config.sh"
 
 # #declare environment variables
-ENV DB_HOST=db
+ENV DB_HOST=''
 ENV WEB_SERVER_HOST=0.0.0.0
 
 ENV LIVERELOAD_SRC=''
