@@ -2,7 +2,7 @@ name: docker image
 
 on:
   push:
-    branches: [ master, gis-based-mode-detection, consolidate_differences ]
+    branches: [ master, gis-based-mode-detection, consolidate-differences ]
 
 env:
   DOCKER_USER: ${{secrets.DOCKER_USER}}
