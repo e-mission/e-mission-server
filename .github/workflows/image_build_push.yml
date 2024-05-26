@@ -2,7 +2,7 @@ name: docker image
 
 on:
   push:
-    branches: [ master, gis-based-mode-detection ]
+    branches: [ master, gis-based-mode-detection, consolidate_differences ]
 
 env:
   DOCKER_USER: ${{secrets.DOCKER_USER}}
@@ -60,7 +60,7 @@ jobs:
 
     strategy:
       matrix:
-        repo: ['e-mission/op-admin-dashboard', 'e-mission/em-public-dashboard']
+        repo: ['MukuFlash03/op-admin-dashboard', 'MukuFlash03/em-public-dashboard']
 
     steps:
     - uses: actions/checkout@v4
