@@ -48,3 +48,15 @@ def get_comparison_query(field_prefix, base_ld, limit_ld, units, gt_or_lt):
         return { "$or": or_conditions }
     else:
         return {}
+
+def yyyy_mm_dd_to_local_date(ymd: str) -> ecwl.LocalDate:
+    return ecwl.LocalDate({
+        'year': int(ymd[0:4]),
+        'month': int(ymd[5:7]),
+        'day': int(ymd[8:10])
+    })
+
+def get_yyyy_mm_dd_range_query(field_name, start_ymd: str, end_ymd: str) -> dict:
+    start_local_date = yyyy_mm_dd_to_local_date(start_ymd)
+    end_local_date = yyyy_mm_dd_to_local_date(end_ymd)
+    return get_range_query(field_name, start_local_date, end_local_date)
