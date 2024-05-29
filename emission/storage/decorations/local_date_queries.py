@@ -57,6 +57,6 @@ def yyyy_mm_dd_to_local_date(ymd: str) -> ecwl.LocalDate:
     })
 
 def get_yyyy_mm_dd_range_query(field_name, start_ymd: str, end_ymd: str) -> dict:
-    start_local_date = ymd_to_local_date(start_ymd)
+    start_local_date = yyyy_mm_dd_to_local_date(start_ymd)
     end_local_date = ymd_to_local_date(end_ymd)
     return get_range_query(field_name, start_local_date, end_local_date)
