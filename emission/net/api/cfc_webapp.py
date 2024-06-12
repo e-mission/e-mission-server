@@ -306,6 +306,47 @@ def getUserProfile():
   user = User.fromUUID(user_uuid)
   return user.getProfile()
 
+@post('/customlabel/get')
+def getUserCustomLabels():
+  logging.debug("Called getUserCustomLabels")
+  keys = request.json['keys']
+  user_uuid = getUUID(request)
+  user = User.fromUUID(user_uuid)
+  to_return = {}
+  for key in keys:
+     to_return[key] = user.getUserCustomLabel(key)
+  return to_return
+
+@post('/customlabel/insert')
+def insertUserCustomLabel():
+  logging.debug("Called insertUserCustomLabel")
+  inserted_label = request.json['inserted_label']
+  user_uuid = getUUID(request)
+  user = User.fromUUID(user_uuid)
+  to_return = user.insertUserCustomLabel(inserted_label)
+  logging.debug("Successfully inserted label for user %s" % user_uuid)
+  return { 'label' : to_return }
+
+@post('/customlabel/update')
+def updateUserCustomLabel():
+  logging.debug("Called updateUserCustomLabel")
+  updated_label = request.json['updated_label']
+  user_uuid = getUUID(request)
+  user = User.fromUUID(user_uuid)
+  to_return = user.updateUserCustomLabel(updated_label)
+  logging.debug("Successfully updated label label for user %s" % user_uuid)
+  return { 'label' : to_return }
+
+@post('/customlabel/delete')
+def deleteUserCustomLabel():
+  logging.debug("Called deleteUserCustomLabel")
+  deleted_label = request.json['deleted_label']
+  user_uuid = getUUID(request)
+  user = User.fromUUID(user_uuid)
+  to_return = user.deleteUserCustomLabel(deleted_label)
+  logging.debug("Successfully deleted label for user %s" % user_uuid)
+  return { 'label' : to_return }
+
 @post('/result/metrics/<time_type>')
 def summarize_metrics(time_type):
     _fill_aggregate_backward_compat(request)
