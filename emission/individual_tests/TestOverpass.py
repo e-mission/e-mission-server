@@ -9,6 +9,7 @@ import unittest
 import os
 import requests
 import emission.net.ext_service.transit_matching.match_stops as enetm
+import logging
 
 #Set up query
 OVERPASS_KEY = os.environ.get("OVERPASS_KEY")
@@ -22,6 +23,8 @@ loc3 = {'coordinates': [-108.57055213129632, 39.06472424640481]}
 
 class OverpassTest(unittest.TestCase):
     def setUp(self):
+        loglevel = logging.DEBUG
+        logging.basicConfig(level=loglevel)
         sample_data = '[out:json][bbox];way[amenity=parking];out;&bbox=-122.1111238,37.4142118,-122.1055791,37.4187945'
         call_base = 'api/interpreter?data='
         self.de_url_base = 'https://lz4.overpass-api.de/'+ call_base + sample_data
