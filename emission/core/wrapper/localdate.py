@@ -9,9 +9,6 @@ import logging
 import arrow
 import emission.core.wrapper.wrapperbase as ecwb
 
-# specify the order of time units, from largest to smallest
-DATETIME_UNITS = ['year', 'month', 'day', 'hour', 'minute', 'second']
-
 class LocalDate(ecwb.WrapperBase):
     """
     Supporting wrapper class that stores the expansions of the components
