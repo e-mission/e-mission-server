@@ -5,9 +5,9 @@ class FmtTimeQuery(object):
     Object that encapsulates a query for an inclusive range between two ISO-format strings.
     Useful for querying based on the local date/time at which data was collected,
       like with timeType of "data.fmt_time" or "data.start_fmt_time".
-    e.g. TimeQuery("data.fmt_time", "2024-01", "2024-03") # first quarter of 2024
-    e.g. TimeQuery("data.fmt_time", "2024-05-01", "2024-05-31") # all of May 2024
-    e.g. TimeQuery("data.fmt_time", "2024-06-03T08:00", "2024-06-03T16:59") # work hours on Jun 3 2024
+    e.g. FmtTimeQuery("data.fmt_time", "2024-01", "2024-03") # first quarter of 2024
+    e.g. FmtTimeQuery("data.fmt_time", "2024-05-01", "2024-05-31") # all of May 2024
+    e.g. FmtTimeQuery("data.fmt_time", "2024-06-03T08:00", "2024-06-03T16:59") # work hours on Jun 3 2024
     """
     def __init__(self, timeType: str, startIso: str, endIso: str) -> None:
         self.timeType = timeType
