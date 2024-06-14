@@ -26,8 +26,8 @@ RETRY = -1
 
 def make_request_and_catch(overpass_query):
     try:
-        print("***REQUEST_URL***", url)
         response = requests.post(url + "api/interpreter", data=overpass_query)
+        print("*********RESPONSE:" , response.text)
     except requests.exceptions.ChunkedEncodingError as e:
         logging.info("ChunkedEncodingError while creating request %s" % (e))
         time.sleep(10)
@@ -73,6 +73,7 @@ def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
     logging.debug("bbox_string = %s" % bbox_string)
     overpass_public_transit_query_template = query_string
     overpass_query = overpass_public_transit_query_template.format(bbox=bbox_string)
+    print("*************QUERY:", overpass_query)
     call_return = RETRY
     retry_count = 0
     while call_return == RETRY:
@@ -86,6 +87,7 @@ def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
 
     logging.info(f"after all retries, retry_count = {retry_count}, call_return = {'RETRY' if call_return == RETRY else len(call_return)}...")
     all_results = call_return
+    print("**********ALL_RESULTS: ", all_results)
 
     relations = [ad.AttrDict(r) for r in all_results if r["type"] == "relation" and r["tags"]["type"] == "route"]
     logging.debug("Found %d relations with ids %s" % (len(relations), [r["id"] for r in relations]))
@@ -108,6 +110,7 @@ def get_public_transit_stops(min_lat, min_lon, max_lat, max_lon):
             rel_nodes_ids = rel_map[relation["id"]]
             if stop.id in rel_nodes_ids:
                 stop["routes"].append({"id": relation["id"], "tags": relation["tags"]})
+    print("***********TRANSIT STOPS: ", stops)
     return stops
 
 # https://gis.stackexchange.com/a/19761
@@ -122,6 +125,7 @@ def get_stops_near(loc, distance_in_meters):
     lon = loc[COORDS][0]
     lat = loc[COORDS][1]
     stops = get_public_transit_stops(lat - bbox_delta, lon - bbox_delta, lat + bbox_delta, lon + bbox_delta)
+    print("********STOPS NEAR!: ", stops)
     logging.debug("Found %d stops" % len(stops))
     for i, stop in enumerate(stops):
         logging.debug("STOP %d: %s" % (i, stop))
@@ -138,6 +142,7 @@ def get_predicted_transit_mode(start_stops, end_stops):
     p_end_routes = list(itertools.chain.from_iterable([extract_routes(s) for s in end_stops]))
 
     rel_id_matches = get_rel_id_match(p_start_routes, p_end_routes)
+    print("**********ID_MATCHES: ", rel_id_matches)
     logging.debug("len(start_routes) = %d, len(end_routes) = %d, len(rel_id_matches) = %d" %
         (len(p_start_routes), len(p_end_routes), len(rel_id_matches)))
     if len(rel_id_matches) > 0:
