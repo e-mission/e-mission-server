@@ -8,7 +8,7 @@ import time
 
 try:
     OVERPASS_KEY = os.environ.get("OVERPASS_KEY")
-    url = 'http://overpass.geofabrik.de/' + OVERPASS_KEY + '/'
+    url = 'https://overpass.geofabrik.de/' + OVERPASS_KEY + '/'
     print("overpass configured")
 except:
     print("overpass not configured, falling back to default overleaf.de")
