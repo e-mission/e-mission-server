@@ -28,7 +28,7 @@ class OverpassTest(unittest.TestCase):
         sample_data = '[out:json][bbox];way[amenity=parking];out;&bbox=-122.1111238,37.4142118,-122.1055791,37.4187945'
         call_base = 'api/interpreter?data='
         self.de_url_base = 'https://lz4.overpass-api.de/'+ call_base + sample_data
-        self.gfbk_url_base = 'http://overpass.geofabrik.de/' + OVERPASS_KEY + '/' + call_base + sample_data
+        self.gfbk_url_base = 'https://overpass.geofabrik.de/' + OVERPASS_KEY + '/' + call_base + sample_data
 
     def test_overpass(self):
         r_gfbk = requests.get(self.gfbk_url_base)
