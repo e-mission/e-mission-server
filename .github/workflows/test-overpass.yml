@@ -26,6 +26,6 @@ jobs:
       env:
         OVERPASS_KEY: '${{ secrets.OVERPASS_API }}'
       run: |
-        echo Testing!
+        echo Testing overpass!
         chmod +x emission/individual_tests/setup_overpass_tests.sh
         ./emission/individual_tests/setup_overpass_tests.sh
