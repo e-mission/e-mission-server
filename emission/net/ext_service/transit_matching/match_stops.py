@@ -26,7 +26,7 @@ RETRY = -1
 
 def make_request_and_catch(overpass_query):
     try:
-        response = requests.post(url + "api/interpreter", data=overpass_query)   
+        response = requests.post(url + "api/interpreter", data=overpass_query)
     except requests.exceptions.ChunkedEncodingError as e:
         logging.info("ChunkedEncodingError while creating request %s" % (e))
         time.sleep(10)
