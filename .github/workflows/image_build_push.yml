@@ -4,6 +4,7 @@ on:
   push:
     branches: [ master, gis-based-mode-detection ]
 
+#Dockerhub credentials are set as environment variables
 env:
   DOCKER_USER: ${{secrets.DOCKER_USER}}
   DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
