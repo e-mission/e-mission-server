@@ -3,13 +3,10 @@ name: overpass-test
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
 on:
-  push:
-    branches:
-      - overpass
-  # schedule:
+  schedule:
 
-  #   # Run every Sunday at 6:05 am
-  #   - cron:  '5 6 * * 0'
+    # Run every Sunday at 6:05 am
+    - cron:  '5 6 * * 0'
 jobs:
   build:
     runs-on: ubuntu-latest
