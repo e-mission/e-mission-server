@@ -51,27 +51,17 @@ import emission.storage.timeseries.aggregate_timeseries as estag
 import emission.storage.timeseries.cache_series as esdc
 import emission.core.timer as ect
 import emission.core.get_database as edb
+import emission.net.api.config as enac
 
-try:
-    config_file = open('conf/net/api/webserver.conf')
-except:
-    logging.debug("webserver not configured, falling back to sample, default configuration")
-    config_file = open('conf/net/api/webserver.conf.sample')
-
-OPENPATH_URL="https://www.nrel.gov/transportation/openpath.html"
 STUDY_CONFIG = os.getenv('STUDY_CONFIG', "stage-program")
-
-config_data = json.load(config_file)
-config_file.close()
-static_path = config_data["paths"]["static_path"]
-python_path = config_data["paths"]["python_path"]
-server_host = config_data["server"]["host"]
-server_port = config_data["server"]["port"]
-socket_timeout = config_data["server"]["timeout"]
-log_base_dir = config_data["paths"]["log_base_dir"]
-auth_method = config_data["server"]["auth"]
-aggregate_call_auth = config_data["server"]["aggregate_call_auth"]
-not_found_redirect = config_data["paths"].get("404_redirect", OPENPATH_URL)
+enac.reload_config()
+static_path = enac.get_config()["static_path"]
+server_host = enac.get_config()["server_host"]
+server_port = enac.get_config()["server_port"]
+socket_timeout = enac.get_config()["socket_timeout"]
+auth_method = enac.get_config()["auth_method"]
+aggregate_call_auth = enac.get_config()["aggregate_call_auth"]
+not_found_redirect = enac.get_config()["not_found_redirect"]
 
 BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024 # Allow the request size to be 1G
 # to accomodate large section sizes

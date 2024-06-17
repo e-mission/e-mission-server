@@ -29,7 +29,7 @@ RUN bash -c "./.docker/setup_config.sh"
 
 # #declare environment variables
 ENV DB_HOST=''
-ENV WEB_SERVER_HOST=''
+ENV WEB_SERVER_HOST=0.0.0.0
 
 ENV LIVERELOAD_SRC=''
 ENV STUDY_CONFIG=''

@@ -4,7 +4,11 @@ import traceback
 
 class SecretMethod(object):
     def __init__(self):
-        key_file = open('conf/net/auth/secret_list.json')
+        try:
+            key_file = open('conf/net/auth/secret_list.json')
+        except:
+            print("secret_list.json not configured, falling back to sample, default configuration")
+            key_file = open('conf/net/auth/secret_list.json.sample')
         key_data = json.load(key_file)
         key_file.close()
         self.client_secret_list = key_data["client_secret_list"]
