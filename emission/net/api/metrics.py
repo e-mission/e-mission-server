@@ -12,7 +12,7 @@ import emission.analysis.result.metrics.time_grouping as earmt
 import emission.analysis.result.metrics.simple_metrics as earms
 import emission.storage.decorations.analysis_timeseries_queries as esda
 import emission.storage.decorations.local_date_queries as esdl
-import emission.storage.timeseries.tcquery as esttc
+import emission.storage.timeseries.fmt_time_query as estf
 
 import emcommon.metrics.metrics_summaries as emcms
 
@@ -25,14 +25,9 @@ def summarize_by_local_date(user_id, start_ld, end_ld, freq_name, metric_list, i
     return _call_group_fn(earmt.group_by_local_date, user_id, start_ld, end_ld,
                           local_freq, metric_list, include_aggregate)
 
-def summarize_by_yyyy_mm_dd(user_id, start_ymd, end_ymd, freq, metric_list, include_agg, app_config):
-    time_query = esttc.TimeComponentQuery(
-        "data.start_local_dt",
-        esdl.yyyy_mm_dd_to_local_date(start_ymd),
-        esdl.yyyy_mm_dd_to_local_date(end_ymd)
-    )
+def summarize_by_yyyy_mm_dd(user_id, start_ymd, end_ymd, freq, metric_list, include_agg, app_config): 
+    time_query = estf.FmtTimeQuery("data.start_fmt_time", start_ymd, end_ymd)
     trips = esda.get_entries(esda.COMPOSITE_TRIP_KEY, None, time_query)
-    print('found ' + str([e for e in trips]))
     return emcms.generate_summaries(metric_list, trips, app_config)
 
 def _call_group_fn(group_fn, user_id, start_time, end_time, freq, metric_list, include_aggregate):

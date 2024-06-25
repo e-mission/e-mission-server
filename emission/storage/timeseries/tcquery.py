@@ -11,8 +11,11 @@ import emission.storage.decorations.local_date_queries as esdl
 
 class TimeComponentQuery(object):
     """
-    Object that encapsulates a query for a particular time at the local time in
-    the timezone where the data was generated.
+    Object that encapsulates a query for filtering based on localdate objects.
+    This works as a set of filters for each localdate field, e.g. year, month, day, etc.
+    Useful for filtering on one or more localdate fields
+    e.g. TimeComponentQuery("data.start_local_dt", {"weekday": 0}, {"weekday": 4})
+    For range queries, use FmtTimeQuery instead.
     """
     def __init__(self, timeType, startLD, endLD):
         self.timeType = timeType
@@ -20,4 +23,4 @@ class TimeComponentQuery(object):
         self.endLD = endLD
 
     def get_query(self):
-        return esdl.get_range_query(self.timeType, self.startLD, self.endLD)
+        return esdl.get_filter_query(self.timeType, self.startLD, self.endLD)
