@@ -3,23 +3,22 @@ import json
 import requests
 import attrdict as ad
 import itertools
-import copy
+import os
 import time
 
 try:
-    config_file = open('conf/net/ext_service/overpass_server.json')
+    GEOFABRIK_OVERPASS_KEY = os.environ.get("GEOFABRIK_OVERPASS_KEY")
+    url = 'https://overpass.geofabrik.de/' + GEOFABRIK_OVERPASS_KEY + '/'
+    print("overpass configured")
 except:
-    print("overpass not configured, falling back to default overleaf.de")
-    config_file = open('conf/net/ext_service/overpass_server.json.sample')
+    print("overpass not configured, falling back to public overpass api")
+    url = "https://lz4.overpass-api.de/"
 
 try:
     query_file = open('conf/net/ext_service/overpass_transit_stops_query_template')
 except:
     print("transit stops query not configured, falling back to default")
     query_file = open('conf/net/ext_service/overpass_transit_stops_query_template.sample')
-
-config_data = json.load(config_file)
-url = config_data["url"]
 
 query_string = "".join(query_file.readlines())
 

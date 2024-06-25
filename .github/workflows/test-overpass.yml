@@ -1,0 +1,28 @@
+name: overpass-test
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  schedule:
+
+    # Run every Sunday at 6:05 am
+    - cron:  '5 6 * * 0'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Tests runner is functional
+    - name: Workflow test
+      run: echo Good morning!
+      
+      # Runs TestOverpass.py to check for API functionality
+    - name: Test Overpass
+      env:
+        GEOFABRIK_OVERPASS_KEY: '${{ secrets.OVERPASS_API }}'
+      run: |
+        echo Testing overpass!
+        chmod +x emission/individual_tests/setup_and_test_overpass.sh
+        ./emission/individual_tests/setup_and_test_overpass.sh
