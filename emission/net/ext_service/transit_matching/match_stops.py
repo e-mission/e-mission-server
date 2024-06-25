@@ -7,8 +7,8 @@ import os
 import time
 
 try:
-    OVERPASS_KEY = os.environ.get("OVERPASS_KEY")
-    url = 'https://overpass.geofabrik.de/' + OVERPASS_KEY + '/'
+    GEOFABRIK_OVERPASS_KEY = os.environ.get("GEOFABRIK_OVERPASS_KEY")
+    url = 'https://overpass.geofabrik.de/' + GEOFABRIK_OVERPASS_KEY + '/'
     print("overpass configured")
 except:
     print("overpass not configured, falling back to public overpass api")

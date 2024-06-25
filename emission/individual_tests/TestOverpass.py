@@ -12,7 +12,7 @@ import emission.net.ext_service.transit_matching.match_stops as enetm
 import logging
 
 #Set up query
-OVERPASS_KEY = os.environ.get("OVERPASS_KEY")
+GEOFABRIK_OVERPASS_KEY = os.environ.get("GEOFABRIK_OVERPASS_KEY")
 
 #Sample loc1 = NREL East Gate
 loc1 = {'coordinates': [-105.16844103184974, 39.740428870224605]}
@@ -29,7 +29,7 @@ class OverpassTest(unittest.TestCase):
         sample_data = '[out:json][bbox];way[amenity=parking];out;&bbox=-122.1111238,37.4142118,-122.1055791,37.4187945'
         call_base = 'api/interpreter?data='
         self.public_url_base = 'https://lz4.overpass-api.de/'+ call_base + sample_data
-        self.gfbk_url_base = 'https://overpass.geofabrik.de/' + OVERPASS_KEY + '/' + call_base + sample_data
+        self.gfbk_url_base = 'https://overpass.geofabrik.de/' + GEOFABRIK_OVERPASS_KEY + '/' + call_base + sample_data
 
     def test_overpass(self):
         r_gfbk = requests.get(self.gfbk_url_base)

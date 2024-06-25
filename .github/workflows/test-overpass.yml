@@ -21,8 +21,8 @@ jobs:
       # Runs TestOverpass.py to check for API functionality
     - name: Test Overpass
       env:
-        OVERPASS_KEY: '${{ secrets.OVERPASS_API }}'
+        GEOFABRIK_OVERPASS_KEY: '${{ secrets.OVERPASS_API }}'
       run: |
         echo Testing overpass!
-        chmod +x emission/individual_tests/setup_overpass_tests.sh
-        ./emission/individual_tests/setup_overpass_tests.sh
+        chmod +x emission/individual_tests/setup_and_test_overpass.sh
+        ./emission/individual_tests/setup_and_test_overpass.sh
