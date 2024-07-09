@@ -44,46 +44,83 @@ exportOptions = {
     'csv_export': exportOldTimeseriesAsCsv
 }
 
+# def purgeUserTimeseries(exportFileFlags, user_uuid, user_email=None, dir_name=DEFAULT_DIR_NAME, file_prefix=DEFAULT_FILE_PREFIX, unsafe_ignore_save=False):
+#     if user_uuid:
+#         user_id = uuid.UUID(user_uuid)
+#     else:
+#         user_id = ecwu.User.fromEmail(user_email).uuid
+
+#     cstate = esp.get_current_state(user_id, ecwp.PipelineStages.CREATE_CONFIRMED_OBJECTS)
+    
+#     if cstate is None:
+#         logging.info(f"No matching pipeline state found for {user_id}, purging aborted.")
+#     else:
+#         last_ts_run = cstate['last_ts_run']
+#         logging.info(f"last_ts_run : {last_ts_run}")
+
+#         if not last_ts_run:
+#             logging.warning("No processed timeseries for user {}, purging aborted".format(user_id))
+#             exit(1)
+
+#         filename = dir_name + "/" + file_prefix + str(user_id)
+#         logging.info("Querying data...")
+#         all_data = list(edb.get_timeseries_db().find({"user_id": user_id, "metadata.write_ts": { "$lt": last_ts_run}}))
+
+#         print(len(all_data))
+
+#         if len(all_data) == 0:
+#             logging.info("No matching data found for the user, purging aborted")
+#         else:
+#             logging.info("Fetched data, starting export")
+#             if unsafe_ignore_save is True:
+#                 logging.warning("CSV export was ignored")
+#             else: 
+#                 for key in exportFileFlags:
+#                     logging.info(f"{key} = {exportFileFlags[key]}")
+#                     if exportFileFlags[key] is True:
+#                         exportOptions[key](user_id, all_data, filename)
+
+#             # logging.info("Deleting entries from database...")
+#             # result = edb.get_timeseries_db().delete_many({"user_id": user_id, "metadata.write_ts": { "$lt": last_ts_run}})
+#             # logging.info("{} deleted entries since {}".format(result.deleted_count, datetime.fromtimestamp(last_ts_run)))
+    
+
+import emission.storage.timeseries.abstract_timeseries as esta
+import gzip
+import emission.tests.common as etc
+import emission.pipeline.export_stage as epe
+import emission.storage.pipeline_queries as espq
+import emission.exportdata.export_data as eeed
+import emission.export.export as eee
+import os
+
+
 def purgeUserTimeseries(exportFileFlags, user_uuid, user_email=None, dir_name=DEFAULT_DIR_NAME, file_prefix=DEFAULT_FILE_PREFIX, unsafe_ignore_save=False):
     if user_uuid:
         user_id = uuid.UUID(user_uuid)
     else:
         user_id = ecwu.User.fromEmail(user_email).uuid
 
-    cstate = esp.get_current_state(user_id, ecwp.PipelineStages.CREATE_CONFIRMED_OBJECTS)
+    ts = esta.TimeSeries.get_time_series(user_id)
+    time_query = espq.get_time_range_for_export_data(user_id)
+    file_name = os.environ.get('DATA_DIR', 'emission/archived') + "/archive_%s_%s_%s" % (user_id, time_query.startTs, time_query.endTs)
+
+    print("Start Ts: ", time_query.startTs)
+    print("End Ts: ", time_query.endTs)
+
+    if unsafe_ignore_save is True:
+        logging.warning("CSV export was ignored")
+    else: 
+        logging.info("Fetched data, starting export")    
+        eee.export(user_id, ts, time_query.startTs, time_query.endTs, file_name, False)
+        file_name += ".gz"
+
+        # logging.info("Deleting entries from database...")
+        # result = edb.get_timeseries_db().delete_many({"user_id": user_id, "metadata.write_ts": { "$lt": last_ts_run}})
+        # logging.info("{} deleted entries since {}".format(result.deleted_count, datetime.fromtimestamp(last_ts_run)))
     
-    if cstate is None:
-        logging.info(f"No matching pipeline state found for {user_id}, purging aborted.")
-    else:
-        last_ts_run = cstate['last_ts_run']
-        logging.info(f"last_ts_run : {last_ts_run}")
 
-        if not last_ts_run:
-            logging.warning("No processed timeseries for user {}, purging aborted".format(user_id))
-            exit(1)
 
-        filename = dir_name + "/" + file_prefix + str(user_id)
-        logging.info("Querying data...")
-        all_data = list(edb.get_timeseries_db().find({"user_id": user_id, "metadata.write_ts": { "$lt": last_ts_run}}))
-
-        print(len(all_data))
-
-        if len(all_data) == 0:
-            logging.info("No matching data found for the user, purging aborted")
-        else:
-            logging.info("Fetched data, starting export")
-            if unsafe_ignore_save is True:
-                logging.warning("CSV export was ignored")
-            else: 
-                for key in exportFileFlags:
-                    logging.info(f"{key} = {exportFileFlags[key]}")
-                    if exportFileFlags[key] is True:
-                        exportOptions[key](user_id, all_data, filename)
-
-            logging.info("Deleting entries from database...")
-            result = edb.get_timeseries_db().delete_many({"user_id": user_id, "metadata.write_ts": { "$lt": last_ts_run}})
-            logging.info("{} deleted entries since {}".format(result.deleted_count, datetime.fromtimestamp(last_ts_run)))
-    
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
 

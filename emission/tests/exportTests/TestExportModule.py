@@ -24,7 +24,13 @@ class TestExportModule(unittest.TestCase):
 
         ts = esta.TimeSeries.get_time_series(self.testUUID)
         time_query = espq.get_time_range_for_export_data(self.testUUID)
-        file_name = os.environ.get('DATA_DIR', 'emission/archived') + "/archive_%s_%s_%s" % (self.testUUID, time_query.startTs, time_query.endTs)
+        # file_name = os.environ.get('DATA_DIR', 'emission/archived') + "/archive_%s_%s_%s" % (self.testUUID, time_query.startTs, time_query.endTs)
+        file_name = "/Users/mmahadik/Documents/Work/OpenPATH/Code/GitHub/logs/data/export_purge_restore" + "/archive_%s_%s_%s" % (self.testUUID, time_query.startTs, time_query.endTs)
+
+        print("UUID: ", self.testUUID)        
+        print("Start Ts: ", time_query.startTs)
+        print("End Ts: ", time_query.endTs)
+        print("File Name: ", file_name)
 
         eee.export(self.testUUID, ts, time_query.startTs, time_query.endTs, file_name, False)
         file_name += ".gz"
