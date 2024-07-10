@@ -26,7 +26,7 @@ import emission.storage.decorations.user_queries as esdu
 # https://github.com/e-mission/e-mission-docs/issues/356#issuecomment-520630934
 import emission.export.export as eee
 
-def export_timeline(user_id, start_day_str, end_day_str, timezone, file_name):
+def export_timeline(user_id, start_day_str, end_day_str, timezone, file_name, databases):
     logging.info("Extracting timeline for user %s day %s -> %s and saving to file %s" %
                  (user_id, start_day_str, end_day_str, file_name))
 
@@ -38,7 +38,7 @@ def export_timeline(user_id, start_day_str, end_day_str, timezone, file_name):
          end_day_ts, arrow.get(end_day_ts).to(timezone)))
 
     ts = esta.TimeSeries.get_time_series(user_id)
-    eee.export(user_id, ts, start_day_ts, end_day_ts, "%s_%s" % (file_name, user_id), True)
+    eee.export(user_id, ts, start_day_ts, end_day_ts, "%s_%s" % (file_name, user_id), True, databases=databases)
  
     import emission.core.get_database as edb
     pipeline_state_list = list(edb.get_pipeline_state_db().find({"user_id": user_id}))
@@ -54,9 +54,9 @@ def export_timeline_for_users(user_id_list, args):
     for curr_uuid in user_id_list:
         if curr_uuid != '':
             logging.info("=" * 50)
-            export_timeline(user_id=curr_uuid, start_day_str=args.start_day,
-                end_day_str= args.end_day, timezone=args.timezone,
-                file_name=args.file_prefix)
+            export_timeline(user_id=curr_uuid, databases=args.databases,
+                start_day_str=args.start_day, end_day_str= args.end_day, 
+                timezone=args.timezone, file_name=args.file_prefix)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
@@ -68,6 +68,8 @@ if __name__ == '__main__':
     group.add_argument("-a", "--all", action="store_true")
     group.add_argument("-f", "--file")
 
+    parser.add_argument("--databases", nargs="+", default=None,
+                    help="List of databases to fetch data from (supported options: timeseries_db, analysis_timeseries_db, usercache)")
     parser.add_argument("--timezone", default="UTC")
     parser.add_argument("start_day", help="start day in utc - e.g. 'YYYY-MM-DD'" )
     parser.add_argument("end_day", help="start day in utc - e.g. 'YYYY-MM-DD'" )
