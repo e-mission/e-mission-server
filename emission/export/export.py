@@ -112,6 +112,8 @@ def export(user_id, ts, start_ts, end_ts, file_name, ma_bool, databases=None):
             json.dump(combined_list,
                 gcfd, default=esj.wrapped_default, allow_nan=False, indent=4)
             
+        # Returning these queries that were used to fetch the data entries that were exported.
+        # Need these for use in the purge_user_timeseries.py script so that we only delete those entries that were exported
         return {
             'trip_time_query': { 'query': trip_time_query, 'type': "time" },
             'place_time_query': { 'query': place_time_query, 'type': "time" },

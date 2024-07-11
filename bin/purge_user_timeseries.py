@@ -5,15 +5,16 @@ from datetime import datetime
 import emission.core.wrapper.user as ecwu
 import emission.core.get_database as edb
 import emission.core.wrapper.pipelinestate as ecwp
-import emission.core.wrapper.pipelinestate as ecwp
 import emission.storage.pipeline_queries as esp
 import pandas as pd
-import pymongo
 from bson import ObjectId
 import json
 from uuid import UUID
 import tempfile
 from datetime import datetime
+import emission.storage.timeseries.abstract_timeseries as esta
+import emission.storage.pipeline_queries as espq
+import emission.export.export as eee
 
 DEFAULT_DIR_NAME = tempfile.gettempdir()
 DEFAULT_FILE_PREFIX = "old_timeseries_"
@@ -85,18 +86,9 @@ exportOptions = {
 #             # logging.info("{} deleted entries since {}".format(result.deleted_count, datetime.fromtimestamp(last_ts_run)))
     
 
-import emission.storage.timeseries.abstract_timeseries as esta
-import gzip
-import emission.tests.common as etc
-import emission.pipeline.export_stage as epe
-import emission.storage.pipeline_queries as espq
-import emission.exportdata.export_data as eeed
-import emission.export.export as eee
-import os
-import emission.pipeline.export_stage as epe
 
-
-def purgeUserTimeseries(user_uuid, user_email=None, databases=None, dir_name=DEFAULT_DIR_NAME, unsafe_ignore_save=False):
+# def purgeUserTimeseries(user_uuid, user_email=None, databases=None, dir_name=DEFAULT_DIR_NAME, unsafe_ignore_save=False):
+def purgeUserTimeseries(user_uuid, user_email=None, dir_name=DEFAULT_DIR_NAME, unsafe_ignore_save=False):
     if user_uuid:
         user_id = uuid.UUID(user_uuid)
     else:
@@ -106,14 +98,6 @@ def purgeUserTimeseries(user_uuid, user_email=None, databases=None, dir_name=DEF
     
     print("user_id: ", user_id)
     
-    # time_query = espq.get_time_range_for_export_data(user_id)
-    # file_name = dir_name + "/" + file_prefix + "/archive_%s_%s_%s" % (user_id, time_query.startTs, time_query.endTs)
-    # export_dir_path = dir_name + "/" + file_prefix
-
-    # print("file_name: ", file_name)
-    # print("Start Ts: ", time_query.startTs)
-    # print("End Ts: ", time_query.endTs)
-
     if unsafe_ignore_save is True:
         logging.warning("CSV export was ignored")
     else: 
@@ -122,42 +106,42 @@ def purgeUserTimeseries(user_uuid, user_email=None, databases=None, dir_name=DEF
         
         ts = esta.TimeSeries.get_time_series(user_id)
         time_query = espq.get_time_range_for_export_data(user_id)
-        # file_name = os.environ.get('DATA_DIR', 'emission/archived') + "/archive_%s_%s_%s" % (user_id, time_query.startTs, time_query.endTs)
-        file_name = os.environ.get('DATA_DIR', '/Users/mmahadik/Documents/Work/OpenPATH/Code/GitHub/logs/data/export_purge_restore/purge/tests') + "/archive_%s_%s_%s" % (user_id, time_query.startTs, time_query.endTs)
+        export_file_name = dir_name + "/archive_%s_%s_%s" % (user_id, time_query.startTs, time_query.endTs)
 
-        import datetime
-        print("Start Time: ", datetime.datetime.fromtimestamp(time_query.startTs).strftime('%Y-%m-%d %H:%M:%S'))
+        
+        start_ts_datetime = datetime.datetime.fromtimestamp(time_query.startTs).strftime('%Y-%m-%d %H:%M:%S')
+        end_ts_datetime = datetime.datetime.fromtimestamp(time_query.endTs).strftime('%Y-%m-%d %H:%M:%S')
+        print("Start Time: ", start_ts_datetime)
         print("Start Ts: ", time_query.startTs)
-        print("End Time: ", datetime.datetime.fromtimestamp(time_query.endTs).strftime('%Y-%m-%d %H:%M:%S'))
+        print("End Time: ", end_ts_datetime)
         print("End Ts: ", time_query.endTs)
 
-        export_queries = eee.export(user_id, ts, time_query.startTs, time_query.endTs, file_name, False, databases)
+        # Receiving these queries from export.py that were used to fetch the data entries that were exported.
+        # Need these for use in the purge_user_timeseries.py script so that we only delete those entries that were exported
+        export_queries = eee.export(user_id, ts, time_query.startTs, time_query.endTs, export_file_name, False, databases=['timeseries_db'])
 
-        database_dict = {
-            'timeseries_db': ts.timeseries_db,
-            'analysis_timeseries_db': ts.analysis_timeseries_db
-            # TODO: Add usercache
-        }
+        for key, value in export_queries.items():
+            if value["type"] == "time":
+                ts_query = ts._get_query(time_query=value["query"])
+                print(ts_query)
+            # Separate case for handling the first_place_extra_query from export.py
+            # else: 
+            #     ts_query = ts._get_query(extra_query_list=[value["query"]])
+            #     print(ts_query)
+            #     sort_key = ts._get_sort_key(None)
+            #     print(len(list(ts.find_entries(key_list=None, time_query=None, extra_query_list=[value["query"]]))))
+            delete_query = {"user_id": user_id, **ts_query}
 
-        for database in databases:
-            for key, value in export_queries.items():
-                if value["type"] == "time":
-                    ts_query = ts._get_query(time_query=value["query"])
-                else: 
-                    ts_query = value["query"]
-                delete_query = {"user_id": user_id, **ts_query}
+            # Get the count of matching documents
+            count = ts.timeseries_db.count_documents(delete_query)
+            print(f"Number of documents matching for {ts.timeseries_db} with {key} query: {count}")
+            # print(f"Number of documents deleted for {ts.timeseries_db} with {key} query: {deleted_count}")
 
-                # Get the count of matching documents
-                count = database_dict[database].count_documents(delete_query)
-                print(f"Number of documents matching for {database_dict[database]} with {key} query: {count}")
-                # delete_result = database_dict[database].delete_many(delete_query)
-                # deleted_count = delete_result.deleted_count
-                # print(f"Number of documents deleted for {database_dict[database]} with {key} query: {deleted_count}")
-
-
-        # logging.info("Deleting entries from database...")
-        # result = edb.get_timeseries_db().delete_many({"user_id": user_id, "metadata.write_ts": { "$lt": last_ts_run}})
-        # logging.info("{} deleted entries since {}".format(result.deleted_count, datetime.fromtimestamp(last_ts_run)))
+            print("Deleting entries from database...")
+            # result = edb.get_timeseries_db().delete_many({"user_id": user_id, "metadata.write_ts": { "$lt": last_ts_run}})
+            result = ts.timeseries_db.delete_many(delete_query)
+            print(f"Key query: {key}")
+            print("{} deleted entries from {} to {}".format(result.deleted_count, start_ts_datetime, end_ts_datetime))
 
         return file_name
 
@@ -170,9 +154,6 @@ if __name__ == '__main__':
     group.add_argument("-e", "--user_email")
     group.add_argument("-u", "--user_uuid")
 
-    parser.add_argument("--databases", nargs="+", default=None,
-                    help="List of databases to fetch data from (supported options: timeseries_db, analysis_timeseries_db, usercache)"
-    )
     parser.add_argument(
         "-d", "--dir_name", 
         help="Target directory for exported JSON data (defaults to {})".format(DEFAULT_DIR_NAME), 
@@ -201,4 +182,4 @@ if __name__ == '__main__':
     # }
     logging.info(f"Default temporary directory: {DEFAULT_DIR_NAME}")
     # purgeUserTimeseries(exportFileFlags, args.user_uuid, args.user_email, args.dir_name, args.file_prefix, args.unsafe_ignore_save)
-    purgeUserTimeseries(args.user_uuid, args.user_email, args.databases, args.dir_name, args.unsafe_ignore_save)
+    purgeUserTimeseries(args.user_uuid, args.user_email, args.dir_name, args.unsafe_ignore_save)

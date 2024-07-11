@@ -20,7 +20,7 @@ import emission.core.wrapper.pipelinestate as ecwp
 import emission.storage.decorations.stats_queries as esds
 import emission.exportdata.export_data as eeded
 
-def run_export_pipeline(process_number, uuid_list, databases=None, dir_name=None):
+def run_export_pipeline(process_number, uuid_list):
     try:
         with open("conf/log/export.conf", "r") as cf:
             export_log_config = json.load(cf)
@@ -43,18 +43,18 @@ def run_export_pipeline(process_number, uuid_list, databases=None, dir_name=None
             continue
 
         try:
-            run_export_pipeline_for_user(uuid, databases, dir_name)
+            run_export_pipeline_for_user(uuid)
         except Exception as e:
             esds.store_pipeline_error(uuid, "WHOLE_PIPELINE", time.time(), None)
             logging.exception("Found error %s while processing pipeline "
                               "for user %s, skipping" % (e, uuid))
 
 
-def run_export_pipeline_for_user(uuid, databases=None, dir_name=None):
+def run_export_pipeline_for_user(uuid):
     with ect.Timer() as edt:
         logging.info("*" * 10 + "UUID %s: exporting data" % uuid + "*" * 10)
         print(str(arrow.now()) + "*" * 10 + "UUID %s: exporting data" % uuid + "*" * 10)
-        eeded.export_data(uuid, databases, dir_name)
+        eeded.export_data(uuid)
 
     esds.store_pipeline_time(uuid, ecwp.PipelineStages.EXPORT_DATA.name,
                              time.time(), edt.elapsed)

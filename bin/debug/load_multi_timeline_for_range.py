@@ -14,7 +14,7 @@ import json
 import emission.storage.json_wrappers as esj
 import argparse
 
-import bin.debug.common
+import bin.debug.common as common
 import os
 
 import gzip
@@ -26,7 +26,7 @@ import emission.storage.timeseries.cache_series as estcs
 
 args = None
 
-def register_fake_users(prefix, unique_user_list):
+def register_fake_users(prefix, unique_user_list, verbose):
     logging.info("Creating user entries for %d users" % len(unique_user_list))
 
     format_string = "{0}-%0{1}d".format(prefix, len(str(len(unique_user_list))))
@@ -34,11 +34,11 @@ def register_fake_users(prefix, unique_user_list):
 
     for i, uuid in enumerate(unique_user_list):
         username = (format_string % i)
-        if args.verbose is not None and i % args.verbose == 0:
+        if verbose is not None and i % verbose == 0:
             logging.info("About to insert mapping %s -> %s" % (username, uuid))
         user = ecwu.User.registerWithUUID(username, uuid)
 
-def register_mapped_users(mapfile, unique_user_list):
+def register_mapped_users(mapfile, unique_user_list, verbose):
     uuid_entries = json.load(open(mapfile), object_hook=esj.wrapped_object_hook)
     logging.info("Creating user entries for %d users from map of length %d" % (len(unique_user_list), len(mapfile)))
 
@@ -50,17 +50,17 @@ def register_mapped_users(mapfile, unique_user_list):
         # register this way
         # Pro: will do everything that register does, including creating the profile
         # Con: will insert only username and uuid - id and update_ts will be different
-        if args.verbose is not None and i % args.verbose == 0:
+        if verbose is not None and i % verbose == 0:
             logging.info("About to insert mapping %s -> %s" % (username, uuid))
         user = ecwu.User.registerWithUUID(username, uuid)
 
-def get_load_ranges(entries):
-    start_indices = list(range(0, len(entries), args.batch_size))
+def get_load_ranges(entries, batch_size):
+    start_indices = list(range(0, len(entries), batch_size))
     ranges = list(zip(start_indices, start_indices[1:]))
     ranges.append((start_indices[-1], len(entries)))
     return ranges
 
-def load_pipeline_states(file_prefix, all_uuid_list, continue_on_error):
+def load_pipeline_states(file_prefix, all_uuid_list, continue_on_error, verbose):
     import emission.core.get_database as edb
     import pymongo
 
@@ -70,7 +70,7 @@ def load_pipeline_states(file_prefix, all_uuid_list, continue_on_error):
             (curr_uuid, pipeline_filename))
         with gzip.open(pipeline_filename) as gfd:
             states = json.load(gfd, object_hook = esj.wrapped_object_hook)
-            if args.verbose:
+            if verbose:
                 logging.debug("Loading states of length %s" % len(states))
             if len(states) > 0:
                 try:
@@ -109,8 +109,8 @@ def post_check(unique_user_list, all_rerun_list):
     else:
         logging.info("timeline contains a mixture of analysis results and raw data - complain to shankari!")
 
-def load_multi_timeline_for_range(file_prefix, info_only, verbose, continue_on_error, mapfile, prefix):
-    fn = args.file_prefix
+def load_multi_timeline_for_range(file_prefix, info_only=None, verbose=None, continue_on_error=None, mapfile=None, prefix=None, batch_size=10000):
+    fn = file_prefix
     logging.info("Loading file or prefix %s" % fn)
     sel_file_list = common.read_files_with_prefix(fn)
 
@@ -136,22 +136,22 @@ def load_multi_timeline_for_range(file_prefix, info_only, verbose, continue_on_e
         all_user_list.append(curr_uuid)
         all_rerun_list.append(needs_rerun)
 
-        load_ranges = get_load_ranges(entries)
-        if not args.info_only:
+        load_ranges = get_load_ranges(entries, batch_size)
+        if not info_only:
             for j, curr_range in enumerate(load_ranges):
-                if args.verbose is not None and j % args.verbose == 0:
+                if verbose is not None and j % verbose == 0:
                     logging.info("About to load range %s -> %s" % (curr_range[0], curr_range[1]))
                 wrapped_entries = [ecwe.Entry(e) for e in entries[curr_range[0]:curr_range[1]]]
-                (tsdb_count, ucdb_count) = estcs.insert_entries(curr_uuid, wrapped_entries, args.continue_on_error)
+                (tsdb_count, ucdb_count) = estcs.insert_entries(curr_uuid, wrapped_entries, continue_on_error)
         print("For uuid %s, finished loading %d entries into the usercache and %d entries into the timeseries" % (curr_uuid, ucdb_count, tsdb_count))
 
     unique_user_list = set(all_user_list)
-    if not args.info_only:
-        load_pipeline_states(args.file_prefix, unique_user_list, args.continue_on_error)
-        if args.mapfile is not None:
-            register_mapped_users(args.mapfile, unique_user_list)
-        elif args.prefix is not None:
-            register_fake_users(args.prefix, unique_user_list)
+    if not info_only:
+        load_pipeline_states(file_prefix, unique_user_list, continue_on_error, verbose)
+        if mapfile is not None:
+            register_mapped_users(mapfile, unique_user_list, verbose)
+        elif prefix is not None:
+            register_fake_users(prefix, unique_user_list, verbose)
     
     post_check(unique_user_list, all_rerun_list) 
 
@@ -187,4 +187,4 @@ if __name__ == '__main__':
     else:
         logging.basicConfig(level=logging.INFO)
 
-    load_multi_timeline_for_range(args)
+    load_multi_timeline_for_range(args.file_prefix, args.info_only, args.verbose, args.continue_on_error, args.mapfile, args.prefix, args.batch_size)

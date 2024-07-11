@@ -24,29 +24,15 @@ class TestExportModule(unittest.TestCase):
 
         ts = esta.TimeSeries.get_time_series(self.testUUID)
         time_query = espq.get_time_range_for_export_data(self.testUUID)
-        # file_name = os.environ.get('DATA_DIR', 'emission/archived') + "/archive_%s_%s_%s" % (self.testUUID, time_query.startTs, time_query.endTs)
-        file_name = os.environ.get('DATA_DIR', '../logs/data/export_purge_restore/export/archived') + "/archive_%s_%s_%s" % (self.testUUID, time_query.startTs, time_query.endTs)
+        file_name = os.environ.get('DATA_DIR', 'emission/archived') + "/archive_%s_%s_%s" % (self.testUUID, time_query.startTs, time_query.endTs)
 
-        import datetime
-        print("UUID: ", self.testUUID)        
-        print("File Name: ", file_name)
-
-        print("Start Time: ", datetime.datetime.fromtimestamp(time_query.startTs).strftime('%Y-%m-%d %H:%M:%S'))
-        print("Start Ts: ", time_query.startTs)
-        print("End Time: ", datetime.datetime.fromtimestamp(time_query.endTs).strftime('%Y-%m-%d %H:%M:%S'))
-        print("End Ts: ", time_query.endTs)
-
-        eee.export(self.testUUID, ts, time_query.startTs, time_query.endTs, file_name, False, databases=["timeseries_db"])
-        # eee.export(self.testUUID, ts, time_query.startTs, time_query.endTs, file_name, False, databases=["analysis_timeseries_db"])
-        # eee.export(self.testUUID, ts, time_query.startTs, time_query.endTs, file_name, False, databases=["usercache_db"])
+        eee.export(self.testUUID, ts, time_query.startTs, time_query.endTs, file_name, False)
         file_name += ".gz"
 
         #Assert the file exists after the export process
         self.assertTrue(pl.Path(file_name).is_file()) 
         with gzip.open(file_name, 'r') as ef:
             exported_data = json.loads(ef.read().decode('utf-8'))
-        
-        print("Exported Data: ", len(exported_data))
 
         confirmed_trips_exported = []
         for t in exported_data:
@@ -83,57 +69,57 @@ class TestExportModule(unittest.TestCase):
         self.assertEqual(len(background_location_exported), len(background_location_raw))
         self.assertEqual(len(background_location_exported), len(background_location_db))
 
-    # def testExportPipelineFull(self):
-    #     #Testing functionality of the export pipeline entirely, first with tempdir usage
-    #     #Setup
-    #     etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-07-22")
-    #     etc.runIntakePipeline(self.testUUID)
+    def testExportPipelineFull(self):
+        #Testing functionality of the export pipeline entirely, first with tempdir usage
+        #Setup
+        etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-07-22")
+        etc.runIntakePipeline(self.testUUID)
 
-    #     #Create a temporary directory within the emission folder
-    #     with tempfile.TemporaryDirectory(dir='/tmp') as tmpdirname:
-    #         self.assertTrue(path.isdir(tmpdirname))
+        #Create a temporary directory within the emission folder
+        with tempfile.TemporaryDirectory(dir='/tmp') as tmpdirname:
+            self.assertTrue(path.isdir(tmpdirname))
 
-    #         #Set the envrionment variable
-    #         os.environ['DATA_DIR'] = tmpdirname
-    #         self.assertEqual(os.environ['DATA_DIR'], tmpdirname)
+            #Set the envrionment variable
+            os.environ['DATA_DIR'] = tmpdirname
+            self.assertEqual(os.environ['DATA_DIR'], tmpdirname)
 
-    #         #Run the export pipeline
-    #         eeed.export_data(self.testUUID)
-    #         directory = os.listdir(tmpdirname)
+            #Run the export pipeline
+            eeed.export_data(self.testUUID)
+            directory = os.listdir(tmpdirname)
 
-    #         #Check to see if there is a file in the temp directory
-    #         self.assertTrue(len(directory) == 1)
+            #Check to see if there is a file in the temp directory
+            self.assertTrue(len(directory) == 1)
 
-    #         #Check to make sure the file is of the correct UUID
-    #         uuid = str(self.testUUID)
-    #         file_name = directory[0]
-    #         self.assertTrue(uuid in file_name)
+            #Check to make sure the file is of the correct UUID
+            uuid = str(self.testUUID)
+            file_name = directory[0]
+            self.assertTrue(uuid in file_name)
 
-    # def testExportPipelineCreateDirectory(self):
-    #     #Testing for the creation of non existent directories (creation in export pipeline)
-    #     #Setup
-    #     etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-07-22")
-    #     etc.runIntakePipeline(self.testUUID)
+    def testExportPipelineCreateDirectory(self):
+        #Testing for the creation of non existent directories (creation in export pipeline)
+        #Setup
+        etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-07-22")
+        etc.runIntakePipeline(self.testUUID)
 
-    #     #Set the os.environ['DATA_DIR'] to a directory path that does not yet exist
-    #     os.environ['DATA_DIR'] = '/tmp/nonexistent'
-    #     self.assertTrue(os.environ['DATA_DIR'], '/tmp/nonexistent')
+        #Set the os.environ['DATA_DIR'] to a directory path that does not yet exist
+        os.environ['DATA_DIR'] = '/tmp/nonexistent'
+        self.assertTrue(os.environ['DATA_DIR'], '/tmp/nonexistent')
 
-    #     #Run the export pipeline
-    #     eeed.export_data(self.testUUID)
-    #     directory = os.listdir(os.environ['DATA_DIR'])
+        #Run the export pipeline
+        eeed.export_data(self.testUUID)
+        directory = os.listdir(os.environ['DATA_DIR'])
 
-    #     #Check to see if there is a file in the directory
-    #     uuid = str(self.testUUID)
-    #     file_name = directory[0]
-    #     self.assertTrue(uuid in file_name)
+        #Check to see if there is a file in the directory
+        uuid = str(self.testUUID)
+        file_name = directory[0]
+        self.assertTrue(uuid in file_name)
 
-    #     #Remove the file from the directory
-    #     dir = os.environ['DATA_DIR']
-    #     for f in os.listdir(dir):
-    #         os.remove(os.path.join(dir, f))
-    #     os.rmdir(dir)
-    #     self.assertFalse(os.path.isdir(os.environ['DATA_DIR']))
+        #Remove the file from the directory
+        dir = os.environ['DATA_DIR']
+        for f in os.listdir(dir):
+            os.remove(os.path.join(dir, f))
+        os.rmdir(dir)
+        self.assertFalse(os.path.isdir(os.environ['DATA_DIR']))
       
     def readDataFromFile(self, dataFile):
         with open(dataFile) as dect:
