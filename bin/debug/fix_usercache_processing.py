@@ -27,6 +27,7 @@ import emission.net.usercache.abstract_usercache as enua
 
 def fix_usercache_errors():
     copy_to_usercache()
+    print(">" * 30)
     move_to_long_term()
     
 def copy_to_usercache():       
@@ -37,8 +38,8 @@ def copy_to_usercache():
     logging.info("Found %d errors in this round" % edb.get_timeseries_error_db().estimated_document_count())
     for error in error_it:
         logging.debug("Copying entry %s" % error["metadata"])
-        save_result = uc.save(error)
-        remove_result = te.remove(error["_id"])    
+        save_result = uc.replace_one({"_id": error['_id']}, error, upsert=True)
+        remove_result = te.delete_one({"_id": error["_id"]})
         logging.debug("save_result = %s, remove_result = %s" % (save_result, remove_result))
     logging.info("step copy_to_usercache DONE")
     

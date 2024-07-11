@@ -11,7 +11,7 @@ import arrow
 
 import emission.core.wrapper.localdate as ecwl
 
-def get_range_query(field_name, start_local_dt, end_local_dt):
+def get_filter_query(field_name, start_local_dt, end_local_dt):
     if list(start_local_dt.keys()) != list(end_local_dt.keys()):
         raise RuntimeError("start_local_dt.keys() = %s does not match end_local_dt.keys() = %s" %
             (list(start_local_dt.keys()), list(end_local_dt.keys())))
@@ -43,9 +43,9 @@ def get_range_query(field_name, start_local_dt, end_local_dt):
         if len(gte_lte_query) > 0:
             query_result.update({curr_field: gte_lte_query})
         else:
-            logging.info("key %s exists, skipping because upper AND lower range are missing" % key)
+            logging.info("key %s exists, skipping because upper AND lower bounds are missing" % key)
 
-    logging.debug("In get_range_query, returning query %s" % query_result)
+    logging.debug("In get_filter_query, returning query %s" % query_result)
     return query_result
 
 def get_standard_query(start_int, end_int):

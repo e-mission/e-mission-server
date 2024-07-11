@@ -42,6 +42,8 @@ class Entry(ecwb.WrapperBase):
             "background/motion_activity": "motionactivity",
             # battery readings, to determine power drain empirically
             "background/battery": "battery",
+            # BLE events, including enter, exiting and ranging beacons
+            "background/bluetooth_ble": "bluetoothble",
             # transition events for the tracking finite state machine on the phone
             "statemachine/transition": "transition",
             # phone sensing configuration (e.g. sensing frequency, geofencing,...)

@@ -328,14 +328,18 @@ def summarize_metrics(time_type):
     else:
         old_style = True
         is_return_aggregate = True
+
+    app_config = request.json['app_config'] if 'app_config' in request.json else None
+
     time_type_map = {
-        'timestamp': metrics.summarize_by_timestamp,
-        'local_date': metrics.summarize_by_local_date
+        'timestamp': metrics.summarize_by_timestamp, # used by old UI
+        'local_date': metrics.summarize_by_local_date,
+        'yyyy_mm_dd': metrics.summarize_by_yyyy_mm_dd # used by new UI
     }
     metric_fn = time_type_map[time_type]
     ret_val = metric_fn(user_uuid,
               start_time, end_time,
-              freq_name, metric_list, is_return_aggregate)
+              freq_name, metric_list, is_return_aggregate, app_config)
     if old_style:
         logging.debug("old_style metrics found, returning array of entries instead of array of arrays")
         assert(len(metric_list) == 1)

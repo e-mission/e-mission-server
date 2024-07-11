@@ -77,3 +77,9 @@ def get_minimum_trips():
 
 
 
+def get_maximum_stored_model_count():
+    maximum_stored_model_count = get_config_value_or_raise('maximum_stored_model_count')
+    if not isinstance(maximum_stored_model_count, int):
+        msg = f"config key 'maximum_stored_model_count' not an integer in config file {config_filename}"
+        raise TypeError(msg)
+    return maximum_stored_model_count

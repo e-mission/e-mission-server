@@ -1,5 +1,5 @@
 # python 3
-FROM ubuntu:jammy-20231211.1
+FROM ubuntu:jammy-20240227
 
 MAINTAINER K. Shankari (shankari@eecs.berkeley.edu)
 
@@ -8,7 +8,7 @@ WORKDIR /usr/src/app
 RUN apt-get -y -qq update
 RUN apt-get install -y -qq curl
 RUN apt-get install -y -qq wget
-# RUN apt-get install -y git
+RUN apt-get install -y -qq git
 
 # install nano and vim for editing
 # RUN apt-get -y install nano vim

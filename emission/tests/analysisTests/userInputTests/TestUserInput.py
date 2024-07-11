@@ -90,6 +90,8 @@ class TestUserInput(unittest.TestCase):
                 self.assertEqual(rt.data["inferred_section_summary"], et.data["inferred_section_summary"])
             if "cleaned_section_summary" in et.data:
                 self.assertEqual(rt.data["cleaned_section_summary"], et.data["cleaned_section_summary"])
+            if 'ble_sensed_summary' in et.data:
+                self.assertEqual(rt.data["ble_sensed_summary"], et.data["ble_sensed_summary"])
             logging.debug(20 * "=")
 
     def compare_section_result(self, result, expect):
