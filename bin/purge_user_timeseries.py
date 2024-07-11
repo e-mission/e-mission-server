@@ -96,7 +96,7 @@ import os
 import emission.pipeline.export_stage as epe
 
 
-def purgeUserTimeseries(user_uuid, user_email=None, databases=None, dir_name=DEFAULT_DIR_NAME, file_prefix=DEFAULT_FILE_PREFIX, unsafe_ignore_save=False):
+def purgeUserTimeseries(user_uuid, user_email=None, databases=None, dir_name=DEFAULT_DIR_NAME, unsafe_ignore_save=False):
     if user_uuid:
         user_id = uuid.UUID(user_uuid)
     else:
@@ -108,8 +108,7 @@ def purgeUserTimeseries(user_uuid, user_email=None, databases=None, dir_name=DEF
     
     # time_query = espq.get_time_range_for_export_data(user_id)
     # file_name = dir_name + "/" + file_prefix + "/archive_%s_%s_%s" % (user_id, time_query.startTs, time_query.endTs)
-    export_dir_path = dir_name + "/" + file_prefix
-
+    # export_dir_path = dir_name + "/" + file_prefix
 
     # print("file_name: ", file_name)
     # print("Start Ts: ", time_query.startTs)
@@ -120,8 +119,8 @@ def purgeUserTimeseries(user_uuid, user_email=None, databases=None, dir_name=DEF
     else: 
         logging.info("Fetched data, starting export")    
         # eee.export(user_id, ts, time_query.startTs, time_query.endTs, file_name, False, databases)
-        epe.run_export_pipeline("single", [user_id], databases, export_dir_path)
-        file_name += ".gz"
+        epe.run_export_pipeline("single", [user_id], databases, dir_name)
+        # file_name += ".gz"
 
         # logging.info("Deleting entries from database...")
         # result = edb.get_timeseries_db().delete_many({"user_id": user_id, "metadata.write_ts": { "$lt": last_ts_run}})
@@ -168,4 +167,4 @@ if __name__ == '__main__':
     # }
     logging.info(f"Default temporary directory: {DEFAULT_DIR_NAME}")
     # purgeUserTimeseries(exportFileFlags, args.user_uuid, args.user_email, args.dir_name, args.file_prefix, args.unsafe_ignore_save)
-    purgeUserTimeseries(args.user_uuid, args.user_email, args.databases, args.dir_name, args.file_prefix, args.unsafe_ignore_save)
+    purgeUserTimeseries(args.user_uuid, args.user_email, args.databases, args.dir_name, args.unsafe_ignore_save)

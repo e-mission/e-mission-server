@@ -11,11 +11,11 @@ import json
 import bson.json_util as bju
 import os
 
-def export_data(user_id, databases=None, export_dir_path=None):
+def export_data(user_id, databases=None, dir_name=None):
     try:
         edp = ExportDataPipeline()
         edp.user_id = user_id
-        edp.run_export_data_pipeline(user_id, databases, export_dir_path)
+        edp.run_export_data_pipeline(user_id, databases, dir_name)
         if edp.last_trip_done is None:
             logging.debug("After run, last_trip_done == None, must be early return")
         espq.mark_export_data_done(user_id, edp.last_trip_done)
@@ -31,13 +31,15 @@ class ExportDataPipeline:
     def last_trip_done(self):
         return self._last_trip_done
 
-    def run_export_data_pipeline(self, user_id, databases=None, export_dir_path=None):
+    def run_export_data_pipeline(self, user_id, databases=None, dir_name=None):
         ts = esta.TimeSeries.get_time_series(user_id)
         time_query = espq.get_time_range_for_export_data(user_id)
         if "DATA_DIR" in os.environ:
             if os.path.isdir(os.environ['DATA_DIR']) == False:
                 os.mkdir(os.environ['DATA_DIR']) 
         # file_name = os.environ.get('DATA_DIR', 'emission/archived') + "/archive_%s_%s_%s" % (user_id, time_query.startTs, time_query.endTs)
-        file_name = export_dir_path + "/archive_%s_%s_%s" % (user_id, time_query.startTs, time_query.endTs)
+        print("In export_data.run_export_data_pipeline: Start timestamp: ", time_query.startTs)
+        print("In export_data.run_export_data_pipeline: End timestamp: ", time_query.endTs)
+        file_name = dir_name + "/archive_%s_%s_%s" % (user_id, time_query.startTs, time_query.endTs)
         eee.export(user_id, ts, time_query.startTs, time_query.endTs, file_name, False, databases)
 	        

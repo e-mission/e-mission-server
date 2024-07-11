@@ -106,8 +106,8 @@ def export(user_id, ts, start_ts, end_ts, file_name, ma_bool, databases=None):
         logging.info("No entries found in range for user %s, skipping save" % user_id)
     else:
         combined_filename = "%s.gz" % (file_name)
-        print("Combined list:")
-        print(len(combined_list))
+        logging.info("Combined list:")
+        logging.info(len(combined_list))
         with gzip.open(combined_filename, "wt") as gcfd:
             json.dump(combined_list,
                 gcfd, default=esj.wrapped_default, allow_nan=False, indent=4)

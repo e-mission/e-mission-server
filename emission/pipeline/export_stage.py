@@ -20,7 +20,7 @@ import emission.core.wrapper.pipelinestate as ecwp
 import emission.storage.decorations.stats_queries as esds
 import emission.exportdata.export_data as eeded
 
-def run_export_pipeline(process_number, uuid_list, databases=None, export_dir_path=None):
+def run_export_pipeline(process_number, uuid_list, databases=None, dir_name=None):
     try:
         with open("conf/log/export.conf", "r") as cf:
             export_log_config = json.load(cf)
@@ -33,7 +33,7 @@ def run_export_pipeline(process_number, uuid_list, databases=None, export_dir_pa
     export_log_config["handlers"]["errors"]["filename"] = \
         export_log_config["handlers"]["errors"]["filename"].replace("export", "export_%s" % process_number)
 
-    logging.config.dictConfig(export_log_config)
+    # logging.config.dictConfig(export_log_config)
     np.random.seed(61297777)
 
     logging.info("processing UUID list = %s" % uuid_list)
@@ -43,18 +43,18 @@ def run_export_pipeline(process_number, uuid_list, databases=None, export_dir_pa
             continue
 
         try:
-            run_export_pipeline_for_user(uuid, databases, export_dir_path)
+            run_export_pipeline_for_user(uuid, databases, dir_name)
         except Exception as e:
             esds.store_pipeline_error(uuid, "WHOLE_PIPELINE", time.time(), None)
             logging.exception("Found error %s while processing pipeline "
                               "for user %s, skipping" % (e, uuid))
 
 
-def run_export_pipeline_for_user(uuid, databases=None, export_dir_path=None):
+def run_export_pipeline_for_user(uuid, databases=None, dir_name=None):
     with ect.Timer() as edt:
         logging.info("*" * 10 + "UUID %s: exporting data" % uuid + "*" * 10)
         print(str(arrow.now()) + "*" * 10 + "UUID %s: exporting data" % uuid + "*" * 10)
-        eeded.export_data(uuid, databases, export_dir_path)
+        eeded.export_data(uuid, databases, dir_name)
 
     esds.store_pipeline_time(uuid, ecwp.PipelineStages.EXPORT_DATA.name,
                              time.time(), edt.elapsed)
