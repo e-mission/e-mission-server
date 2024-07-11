@@ -93,26 +93,34 @@ import emission.storage.pipeline_queries as espq
 import emission.exportdata.export_data as eeed
 import emission.export.export as eee
 import os
+import emission.pipeline.export_stage as epe
 
 
-def purgeUserTimeseries(exportFileFlags, user_uuid, user_email=None, dir_name=DEFAULT_DIR_NAME, file_prefix=DEFAULT_FILE_PREFIX, unsafe_ignore_save=False):
+def purgeUserTimeseries(user_uuid, user_email=None, databases=None, dir_name=DEFAULT_DIR_NAME, file_prefix=DEFAULT_FILE_PREFIX, unsafe_ignore_save=False):
     if user_uuid:
         user_id = uuid.UUID(user_uuid)
     else:
         user_id = ecwu.User.fromEmail(user_email).uuid
 
     ts = esta.TimeSeries.get_time_series(user_id)
-    time_query = espq.get_time_range_for_export_data(user_id)
-    file_name = os.environ.get('DATA_DIR', 'emission/archived') + "/archive_%s_%s_%s" % (user_id, time_query.startTs, time_query.endTs)
+    
+    print("user_id: ", user_id)
+    
+    # time_query = espq.get_time_range_for_export_data(user_id)
+    # file_name = dir_name + "/" + file_prefix + "/archive_%s_%s_%s" % (user_id, time_query.startTs, time_query.endTs)
+    export_dir_path = dir_name + "/" + file_prefix
 
-    print("Start Ts: ", time_query.startTs)
-    print("End Ts: ", time_query.endTs)
+
+    # print("file_name: ", file_name)
+    # print("Start Ts: ", time_query.startTs)
+    # print("End Ts: ", time_query.endTs)
 
     if unsafe_ignore_save is True:
         logging.warning("CSV export was ignored")
     else: 
         logging.info("Fetched data, starting export")    
-        eee.export(user_id, ts, time_query.startTs, time_query.endTs, file_name, False)
+        # eee.export(user_id, ts, time_query.startTs, time_query.endTs, file_name, False, databases)
+        epe.run_export_pipeline("single", [user_id], databases, export_dir_path)
         file_name += ".gz"
 
         # logging.info("Deleting entries from database...")
@@ -128,6 +136,10 @@ if __name__ == '__main__':
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-e", "--user_email")
     group.add_argument("-u", "--user_uuid")
+
+    parser.add_argument("--databases", nargs="+", default=None,
+                    help="List of databases to fetch data from (supported options: timeseries_db, analysis_timeseries_db, usercache)"
+    )
     parser.add_argument(
         "-d", "--dir_name", 
         help="Target directory for exported JSON data (defaults to {})".format(DEFAULT_DIR_NAME), 
@@ -150,9 +162,10 @@ if __name__ == '__main__':
     )
 
     args = parser.parse_args()
-    exportFileFlags = {
-        'json_export': True,
-        'csv_export': args.csv_export if args.csv_export is not None else False
-    }
+    # exportFileFlags = {
+    #     'json_export': True,
+    #     'csv_export': args.csv_export if args.csv_export is not None else False
+    # }
     logging.info(f"Default temporary directory: {DEFAULT_DIR_NAME}")
-    purgeUserTimeseries(exportFileFlags, args.user_uuid, args.user_email, args.dir_name, args.file_prefix, args.unsafe_ignore_save)
+    # purgeUserTimeseries(exportFileFlags, args.user_uuid, args.user_email, args.dir_name, args.file_prefix, args.unsafe_ignore_save)
+    purgeUserTimeseries(args.user_uuid, args.user_email, args.databases, args.dir_name, args.file_prefix, args.unsafe_ignore_save)

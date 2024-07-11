@@ -48,17 +48,22 @@ def get_from_all_three_sources_with_retry(user_id, in_query, databases=None):
     sort_key = ts._get_sort_key(in_query)
     source_db_calls = []
 
+    logging.info("In get_from_all_three_sources_with_retry: Databases = %s" % databases)
+
     if databases is None or 'timeseries_db' in databases:
+        logging.info("Fetching from timeseries_db")
         base_ts_call = lambda tq: ts._get_entries_for_timeseries(ts.timeseries_db, None, tq,
             geo_query=None, extra_query_list=None, sort_key = sort_key)
         source_db_calls.append(base_ts_call)
 
     if databases is None or 'analysis_timeseries_db' in databases:
+        logging.info("Fetching from analysis_timeseries_db")
         analysis_ts_call = lambda tq: ts._get_entries_for_timeseries(ts.analysis_timeseries_db, None, tq,
             geo_query=None, extra_query_list=None, sort_key = sort_key)
         source_db_calls.append(analysis_ts_call)
     
     if databases is None or 'usercache' in databases:
+        logging.info("Fetching from usercache")
         uc_ts_call = lambda tq: (uc.getMessageCount(None, tq), uc.getMessage(None, tq))
         source_db_calls.append(uc_ts_call)
 
@@ -69,6 +74,8 @@ def get_from_all_three_sources_with_retry(user_id, in_query, databases=None):
     return retry_lists
 
 def export(user_id, ts, start_ts, end_ts, file_name, ma_bool, databases=None):
+    logging.info("In export: Databases = %s" % databases)
+
     logging.info("Extracting timeline for user %s day %s -> %s and saving to file %s" %
                  (user_id, start_ts, end_ts, file_name))
 

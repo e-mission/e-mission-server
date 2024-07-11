@@ -20,5 +20,3 @@ conf/**/*.json
 *.ipynb_checkpoints*
 
 *.secret
-
-emission/archived

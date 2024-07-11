@@ -27,6 +27,8 @@ import emission.storage.decorations.user_queries as esdu
 import emission.export.export as eee
 
 def export_timeline(user_id, start_day_str, end_day_str, timezone, file_name, databases):
+    logging.info("In export_timeline: Databases = %s" % args.databases)
+
     logging.info("Extracting timeline for user %s day %s -> %s and saving to file %s" %
                  (user_id, start_day_str, end_day_str, file_name))
 
@@ -51,6 +53,7 @@ def export_timeline(user_id, start_day_str, end_day_str, timezone, file_name, da
           gpfd, default=esj.wrapped_default, allow_nan=False, indent=4)    
 
 def export_timeline_for_users(user_id_list, args):
+    logging.info("In export_timeline_for_users: Databases = %s" % args.databases)
     for curr_uuid in user_id_list:
         if curr_uuid != '':
             logging.info("=" * 50)
