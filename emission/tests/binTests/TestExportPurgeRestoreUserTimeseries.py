@@ -16,6 +16,12 @@ import bin.purge_user_timeseries as bput
 import bin.restore_user_timeseries as brut
 import bin.debug.load_multi_timeline_for_range as lmtfr
 
+"""
+TODO: Will replace the contents of existing TestPurgeRestoreUserTimeseries.py file once the new functionality looks good.
+Keeping the earlier Test file as well for now so that I can reuse any assertion tests if needed.
+This Test file doesn't have any assertions right now, just using it to run an end-to-end flow of Export -> Purge -> Restore
+"""
+
 class TestPurgeRestoreUserTimeseries(unittest.TestCase):
     def setUp(self):
         etc.setupRealExample(self, "emission/tests/data/real_examples/shankari_2015-07-22")
